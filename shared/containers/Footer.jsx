@@ -1,11 +1,12 @@
 import React from 'react';
 import styled from '@emotion/styled';
 
-const Container = styled.main`
+const Container = styled.footer`
   background-color: #f5f5f5;
+  height: 200px;
 `;
 
-const PageContainer = ({ children }) => {
+const Footer = ({ children }) => {
   return (
     <Container>
       {children}
@@ -13,4 +14,4 @@ const PageContainer = ({ children }) => {
   );
 };
 
-export default PageContainer;
+export default Footer;
