@@ -1,14 +1,11 @@
 import React from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-// import Image from 'next/image';
-// import { css } from '@emotion/css';
-import { css } from '@emotion/css';
-import PageContainer from '../../../shared/containers/Page';
-import Navigation from '../../../shared/components/navigation';
-import Footer from '../../../shared/containers/Footer';
-import SEO from '../../../shared/components/seo';
-import SiderBar from '../../../components/home/RightSiderBar';
+import PageContainer from '../shared/containers/Page';
+import Navigation from '../shared/components/navigation';
+import Footer from '../shared/containers/Footer';
+import SEO from '../shared/components/seo';
+import SiderBar from '../components/home/RightSiderBar';
 
 const SEOConfig = {
   title: '島島阿學 - 學習資源平台 - Daodao Online Learning Platform',
@@ -29,24 +26,10 @@ const Home = () => {
         <SEO config={SEOConfig} />
         {/* https://resources.daoedu.tw/media/2021/02/118222653_116618533489352_6821261858468995250_o.jpg */}
       </Head>
-      <Navigation>
-        nav
-      </Navigation>
+      <Navigation />
       <PageContainer>
-        <div
-          className={css`width: 70vw;`}
-        >
-          <h1>語言與文學</h1>
-          <p>這個分類下的所有標籤：</p>
-          <iframe
-            title="langlit"
-            className="airtable-embed"
-            src="https://airtable.com/embed/shry1mqxVqP4U2lqK?backgroundColor=purple&viewControls=on"
-            frameBorder="0"
-            width="100%"
-            height="533"
-            style={{ background: 'transparent', border: '1px solid #ccc' }}
-          />
+        <div>
+          這個頁面還在建構唷～
         </div>
         <div>
           <SiderBar />

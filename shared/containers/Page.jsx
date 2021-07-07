@@ -2,9 +2,10 @@ import React from 'react';
 import styled from '@emotion/styled';
 
 const Container = styled.main`
-  background-color: #f5f5f5;
   display: flex;
   justify-content: space-between;
+  margin-left: 100px;
+  margin-top: 40px;
 `;
 
 const PageContainer = ({ children }) => {

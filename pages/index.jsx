@@ -2,14 +2,19 @@ import React from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 // import Image from 'next/image';
-// import { css } from '@emotion/css';
+import styled from '@emotion/styled';
 import PageContainer from '../shared/containers/Page';
 import Navigation from '../shared/components/navigation';
 import Footer from '../shared/containers/Footer';
 import SEO from '../shared/components/seo';
 import CardList from '../components/home/CardList';
 import Banner from '../components/home/Banner';
-import SiderBar from '../components/home/SiderBar';
+import RightSiderBar from '../components/home/RightSiderBar';
+import LeftSiderBar from '../components/home/LeftSiderBar';
+
+const BodyWrapper = styled.div`
+  background-color: #f5f5f5;
+`;
 
 const SEOConfig = {
   title: '島島阿學 - 學習資源平台 - Daodao Online Learning Platform',
@@ -24,55 +29,54 @@ const SEOConfig = {
 const list = [
   {
     title: '語言與文學',
-    link: '',
+    link: '/category/learn/langlit',
   },
   {
     title: '數學與邏輯',
-    link: '',
+    link: '/category/learn/mathlog',
   },
   {
     title: '電腦科學',
-    link: '',
+    link: '/category/learn/infoeng',
   },
   {
     title: '自然科學',
-    link: '',
+    link: '/category/learn/natusci',
   },
   {
     title: '人文社會',
-    link: '',
+    link: '/category/learn/hum',
   },
   {
     title: '藝術',
-    link: '',
+    link: '/category/learn/art',
   },
   {
     title: '教育',
-    link: '',
+    link: '/category/learn/edu',
   },
   {
     title: '生活',
-    link: '',
+    link: '/category/learn/life',
   },
   {
     title: '運動/心理/醫學',
-    link: '',
+    link: '/category/learn/health',
   },
   {
     title: '商業與社會創新',
-    link: '',
+    link: '/category/learn/businv',
   },
   {
     title: '綜合型學習資源',
-    link: '',
+    link: '/category/learn/multi-res',
   },
 ];
-
 const Home = () => {
   const router = useRouter();
   console.log('router', router);
   return (
-    <div>
+    <BodyWrapper>
       <Head>
         <SEO config={SEOConfig} />
         {/* https://resources.daoedu.tw/media/2021/02/118222653_116618533489352_6821261858468995250_o.jpg */}
@@ -80,6 +84,7 @@ const Home = () => {
       <Navigation>
         nav
       </Navigation>
+      <LeftSiderBar />
       <PageContainer>
         <div>
           <Banner />
@@ -87,13 +92,13 @@ const Home = () => {
           <CardList list={list} />
         </div>
         <div>
-          <SiderBar />
+          <RightSiderBar />
         </div>
       </PageContainer>
       <Footer>
         123
       </Footer>
-    </div>
+    </BodyWrapper>
   );
 };
 
