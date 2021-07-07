@@ -3,13 +3,12 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 // import Image from 'next/image';
 // import { css } from '@emotion/css';
-import PageContainer from '../shared/containers/Page';
-import Navigation from '../shared/components/navigation';
-import Footer from '../shared/containers/Footer';
-import SEO from '../shared/components/seo';
-import CardList from '../components/home/CardList';
-import Banner from '../components/home/Banner';
-import SiderBar from '../components/home/SiderBar';
+import { css } from '@emotion/css';
+import PageContainer from '../../../shared/containers/Page';
+import Navigation from '../../../shared/components/navigation';
+import Footer from '../../../shared/containers/Footer';
+import SEO from '../../../shared/components/seo';
+import SiderBar from '../../../components/home/SiderBar';
 
 const SEOConfig = {
   title: '島島阿學 - 學習資源平台 - Daodao Online Learning Platform',
@@ -20,53 +19,6 @@ const SEOConfig = {
   imgLink: '',
   link: '',
 };
-
-const list = [
-  {
-    title: '語言與文學',
-    link: '',
-  },
-  {
-    title: '數學與邏輯',
-    link: '',
-  },
-  {
-    title: '電腦科學',
-    link: '',
-  },
-  {
-    title: '自然科學',
-    link: '',
-  },
-  {
-    title: '人文社會',
-    link: '',
-  },
-  {
-    title: '藝術',
-    link: '',
-  },
-  {
-    title: '教育',
-    link: '',
-  },
-  {
-    title: '生活',
-    link: '',
-  },
-  {
-    title: '運動/心理/醫學',
-    link: '',
-  },
-  {
-    title: '商業與社會創新',
-    link: '',
-  },
-  {
-    title: '綜合型學習資源',
-    link: '',
-  },
-];
 
 const Home = () => {
   const router = useRouter();
@@ -81,10 +33,20 @@ const Home = () => {
         nav
       </Navigation>
       <PageContainer>
-        <div>
-          <Banner />
-          <p>今晚，要不要來點＿＿的學習資源？ (點進去即可看到各領域的資源)</p>
-          <CardList list={list} />
+        <div
+          className={css`width: 70vw;`}
+        >
+          <h1>語言與文學</h1>
+          <p>這個分類下的所有標籤：</p>
+          <iframe
+            title="langlit"
+            className="airtable-embed"
+            src="https://airtable.com/embed/shry1mqxVqP4U2lqK?backgroundColor=purple&viewControls=on"
+            frameBorder="0"
+            width="100%"
+            height="533"
+            style={{ background: 'transparent', border: '1px solid #ccc' }}
+          />
         </div>
         <div>
           <SiderBar />
