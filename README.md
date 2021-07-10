@@ -1,34 +1,54 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
-
-First, run the development server:
+## 如何啟動
+1. 安裝相依套件
 
 ```bash
-npm run dev
-# or
+yarn install
+```
+
+2. 執行網站
+
+```bash
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. 打開網頁
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+基本上會自動打開，沒有的話可自行前往 [http://localhost:5000](http://localhost:5000)
+預設的port是5000，當然你也可以修改指令使用其他port
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+## 開發技術
+<p float="left" margin="10px">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nextjs-logo.svg/1200px-Nextjs-logo.svg.png" height="100px"> 
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" height="100px"> 
+  <img src="https://raw.githubusercontent.com/emotion-js/emotion/main/emotion.png" height="100px"> 
+  <img src="https://i.imgur.com/A2XaNqc.png" height="100px"> 
+</p>
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## 主要技術列表
+全端框架：Next.js
+前端：React.js
+後端：Node.js
+CSS-in-JS：[emotion](https://emotion.sh/docs/introduction)
+coding-style：[airbnb-eslint](https://github.com/airbnb/javascript)
+database：Notion
 
-## Learn More
+### 使用 Next.js 原因
+1. 提升專案整體的開發體驗與時程，讓工程更專注在設計網頁而非處理其他雜項的相依設定。
+2. 不需要額外複雜的設定就可以擁有SEO, html caching, database search cost......
+3. 使用SPA框架搭配CSS-in-JS solution使開發體驗和使用者體驗更加分
 
-To learn more about Next.js, take a look at the following resources:
+### 使用 emotion 原因
+emotion為近年討論度最高的CSS設計解決方案，除了部分撰寫方式如同styled-components，此外也提供部分強大的功能提升開發體驗，例如：inline-style 可以 hot reload。
+以往在開發CSS時，時常因為耦合性過高的關係而改A壞B，因此需要導入一些CSS coding style，例如：OOCSS。因此近年CSS模組化日益流行，尤其是可以設計模組元件的styled-components與emotion最具有代表性，也很適合搭配React的component設計。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 使用 airbnb-eslint 原因
+透過eslint的強大檢測與縮排功能，開發者不需要再花額外的時間處理縮排與查看瑣碎的小失誤。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### 其他
+目前暫時未使用Redux而選擇使用React原生的Context，也適合剛入門React的團隊夥伴協作開發，若未來有開發上的需求會考慮導入。
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## 參考
+[Next範例](https://github.com/vercel/next.js/tree/canary/examples/api-routes-rest/pages)
+[Notion API](https://developers.notion.com/docs/working-with-databases)
