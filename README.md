@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Daodao前台
 
 ## 如何啟動
 1. 安裝相依套件
@@ -23,16 +23,17 @@ yarn dev
   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nextjs-logo.svg/1200px-Nextjs-logo.svg.png" height="100px"> 
   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" height="100px"> 
   <img src="https://raw.githubusercontent.com/emotion-js/emotion/main/emotion.png" height="100px"> 
+  <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png" height="100px"> 
   <img src="https://i.imgur.com/A2XaNqc.png" height="100px"> 
 </p>
 
 ## 主要技術列表
-全端框架：Next.js
-前端：React.js
-後端：Node.js
-CSS-in-JS：[emotion](https://emotion.sh/docs/introduction)
-coding-style：[airbnb-eslint](https://github.com/airbnb/javascript)
-database：Notion
+全端框架：Next.js  
+前端：React.js  
+後端：Node.js  
+CSS-in-JS：[emotion](https://emotion.sh/docs/introduction)  
+coding-style：[airbnb-eslint](https://github.com/airbnb/javascript)  
+database：Notion  
 
 ### 使用 Next.js 原因
 1. 提升專案整體的開發體驗與時程，讓工程更專注在設計網頁而非處理其他雜項的相依設定。
