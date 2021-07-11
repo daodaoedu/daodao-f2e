@@ -14,7 +14,7 @@ const CardListWrapper = styled.ul`
 const CardList = ({ list }) => {
   return (
     <CardListWrapper>
-      { list.map((category) => <Card key={category.title} title={category.title} link={category.link} />) }
+      { list.map((category) => <Card key={category.title} title={category.title} link={category.link} image={category.image} />) }
     </CardListWrapper>
   );
 };

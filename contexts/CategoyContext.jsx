@@ -1,46 +1,44 @@
 import {
-  createContext, useContext, useReducer, useEffect, // useState
+  createContext, useContext, useReducer,
 } from 'react';
 import categoryReducer from './reducers/categoryReducer';
 
-const CategoyContext = createContext();
 const initialState = {
-  table: [],
+  category: [],
+  loading: {
+    category: true,
+  },
 };
 
-const loadNotionTable = async () => {
-  return fetch('/api/notion/database', {
-    method: 'POST',
-  }).then((res) => res.json())
-    .then((res) => {
-      console.log('res::: ', res);
-      const list = res.results.map((object) => {
-        return {
-          image: object.properties['縮圖 / Thumbnail'].files[0].name,
-          tags: object.properties['標籤 / Hashtag'].rich_text,
-          link: object.properties['連結 / Link'],
-          name: object.properties['資源名稱 / Name'].text,
-        };
-      });
+const CategoyContext = createContext();
 
-      return list;
-    })
-    .catch((error) => {
-      return error;
-    });
+const fetchNotionDatabase = async (databaseId) => {
+  return fetch(`https://api.daoedu.tw/notion/databases/${databaseId}`, {
+    method: 'GET',
+  }).then((res) => res.json())
+    .then((res) => res.payload.results.map((object) => ({
+      name: object.properties['資源名稱 / Name']?.title[0]?.plain_text,
+      image: object.properties['縮圖 / Thumbnail']?.rich_text[0]?.href,
+      link: object.properties['連結 / Link']?.url,
+      tags: object.properties['標籤 / Hashtag']?.multi_select.map((tag) => tag.name),
+    })))
+    .catch((error) => error);
 };
 
 // context wrapper
 export const CategoyProvider = ({ children }) => {
-  const [categoryState, dispatch] = useReducer(categoryReducer, initialState);
-  console.log('categoryState ', categoryState);
-  useEffect(() => {
-    loadNotionTable()
-      .then((res) => dispatch({ type: 'LOAD_NOTION_TABLE', payload: { data: res } }))
-      .catch((error) => console.log('loadNotionTable failed: ', error));
-  }, []);
+  const [state, dispatch] = useReducer(categoryReducer, initialState);
+  const actions = {
+    loadNotionTable: (categoryId) => {
+      dispatch({ type: 'REQUEST_LOAD_NOTION_TABLE' });
+      return fetchNotionDatabase(categoryId)
+        .then((payload) => dispatch({ type: 'LOAD_NOTION_TABLE', payload }))
+        .catch((error) => dispatch({ type: 'LOAD_NOTION_TABLE_FAILURE', error }));
+    },
+  };
+
   return (
-    <CategoyContext.Provider>
+    <CategoyContext.Provider value={{ state, dispatch, actions }}>
       {children}
     </CategoyContext.Provider>
   );

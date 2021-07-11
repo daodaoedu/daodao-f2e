@@ -10,13 +10,10 @@ const CardWrapper = styled.li`
 `;
 
 const ContentWrapper = styled.div`
-    background-color: #16b9b3;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     height: 260px;
-    font-size: 36px;
-    color: white;
+    background-image: url(${(props) => props.image});
+    background-repeat:no-repeat;
+    background-size: 100% 100%;
 `;
 
 const FooterWrapper = styled.div`
@@ -28,13 +25,11 @@ const FooterWrapper = styled.div`
     font-weight: 500;
 `;
 
-const Card = ({ title, link }) => {
+const Card = ({ title, link, image }) => {
   return (
     <Link href={link}>
       <CardWrapper>
-        <ContentWrapper>
-          {title}
-        </ContentWrapper>
+        <ContentWrapper image={image} />
         <FooterWrapper>
           {title}
         </FooterWrapper>
