@@ -4,7 +4,26 @@ import {
 import categoryReducer from './reducers/categoryReducer';
 
 const initialState = {
-  category: [],
+  category: [
+    {
+      name: '', image: '', link: '', tages: [],
+    },
+    {
+      name: '', image: '', link: '', tages: [],
+    },
+    {
+      name: '', image: '', link: '', tages: [],
+    },
+    {
+      name: '', image: '', link: '', tages: [],
+    },
+    {
+      name: '', image: '', link: '', tages: [],
+    },
+    {
+      name: '', image: '', link: '', tages: [],
+    },
+  ],
   loading: {
     category: true,
   },
@@ -17,10 +36,10 @@ const fetchNotionDatabase = async (databaseId) => {
     method: 'GET',
   }).then((res) => res.json())
     .then((res) => res.payload.results.map((object) => ({
-      name: object.properties['資源名稱 / Name']?.title[0]?.plain_text,
-      image: object.properties['縮圖 / Thumbnail']?.rich_text[0]?.href,
-      link: object.properties['連結 / Link']?.url,
-      tags: object.properties['標籤 / Hashtag']?.multi_select.map((tag) => tag.name),
+      name: object.properties['資源名稱 / Name']?.title[0]?.plain_text || '',
+      image: object.properties['縮圖 / Thumbnail']?.rich_text[0]?.href || '',
+      link: object.properties['連結 / Link']?.url || '',
+      tags: object.properties['標籤 / Hashtag']?.multi_select.map((tag) => tag.name) || [],
     })))
     .catch((error) => error);
 };

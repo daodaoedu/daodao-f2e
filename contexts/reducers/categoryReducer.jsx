@@ -12,10 +12,7 @@ const categoryReducer = (state, action) => {
     case 'LOAD_NOTION_TABLE': {
       return {
         ...state,
-        category: [
-          ...state.category,
-          ...action.payload,
-        ],
+        category: action.payload,
         loading: {
           ...state.loading,
           category: false,
