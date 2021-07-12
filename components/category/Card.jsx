@@ -52,13 +52,13 @@ const FooterWrapper = styled.div`
 `;
 
 const Card = ({
-  title, image, onClick, loading,
+  name, image, onClick, loading,
 }) => {
   return (
     <CardWrapper onClick={onClick}>
       <ContentWrapper image={image} loading={loading} />
       <FooterWrapper>
-        {title}
+        {name}
       </FooterWrapper>
     </CardWrapper>
   );

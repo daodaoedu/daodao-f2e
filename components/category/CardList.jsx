@@ -20,10 +20,10 @@ const openPage = (event, link, type) => {
 const CardList = ({ list, loading }) => {
   return (
     <CardListWrapper>
-      { list.map((category) => (
+      { Array.isArray(list) && list.map((category) => (
         <Card
           key={category.title}
-          title={category.name}
+          name={category.name}
           link={category.link}
           image={category.image}
           loading={loading}

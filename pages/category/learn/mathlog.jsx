@@ -12,7 +12,7 @@ import SEO from '../../../shared/components/seo';
 import SiderBar from '../../../components/home/RightSiderBar';
 import { useCategoyContext, CategoyProvider } from '../../../contexts/CategoyContext';
 import CardList from '../../../components/category/CardList';
-
+import TagList from '../../../shared/components/TagList';
 // export const getStaticProps = async () => {
 
 // }
@@ -31,6 +31,8 @@ const SEOConfig = {
   link: '/assets/images/preview.jpeg',
 };
 
+const tagList = ['中文', '英語', '電子報', '閱讀', '免費', '中文介面', '聽力'];
+
 const ContextPageWrapper = () => {
   return (
     <CategoyProvider>
@@ -41,13 +43,14 @@ const ContextPageWrapper = () => {
 
 const MathlogPage = () => {
   const router = useRouter();
+  const { query, route } = router;
   const { state, actions } = useCategoyContext();
   const { loadNotionTable } = actions;
   const categoryId = 'da015b1a389b43cda9f01876294064e0';
   console.log(router);
   useEffect(() => {
-    loadNotionTable(categoryId);
-  }, []);
+    loadNotionTable(categoryId, query);
+  }, [query]);
   console.log('state.category ', state.category);
   return (
     <BodyWrapper>
@@ -63,10 +66,16 @@ const MathlogPage = () => {
           <div
             className={css`width: 70vw;`}
           >
-            <h1>
-              語言與文學
-            </h1>
+            <h1>語言與文學</h1>
             <p>這個分類下的所有標籤：</p>
+            <TagList list={tagList} onSearch={(name) => router.push(`${route}?tags=${name}`)} />
+            <h2>
+              搜尋結果
+              {' '}
+              {state.category.length}
+              {' '}
+              筆：
+            </h2>
             <CardList list={state.category} loading={state.loading.category} />
             {/* <iframe
             title="langlit"

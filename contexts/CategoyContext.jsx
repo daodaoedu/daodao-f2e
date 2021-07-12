@@ -31,8 +31,12 @@ const initialState = {
 
 const CategoyContext = createContext();
 
-const fetchNotionDatabase = async (databaseId) => {
-  return fetch(`https://api.daoedu.tw/notion/databases/${databaseId}`, {
+const fetchNotionDatabase = async (databaseId, query) => {
+  // const queryString = Object.keys(query).map((key) => `${key}=${query[key]}`).join('&');
+  console.log('query ', query);
+
+  console.log('query.tags ', query.tags);
+  return fetch(`https://api.daoedu.tw/notion/databases/${databaseId}?tags=${query.tags}`, {
     method: 'GET',
   }).then((res) => res.json())
     .then((res) => res.payload.results.map((object) => ({
@@ -48,9 +52,9 @@ const fetchNotionDatabase = async (databaseId) => {
 export const CategoyProvider = ({ children }) => {
   const [state, dispatch] = useReducer(categoryReducer, initialState);
   const actions = {
-    loadNotionTable: (categoryId) => {
+    loadNotionTable: (categoryId, query) => {
       dispatch({ type: 'REQUEST_LOAD_NOTION_TABLE' });
-      return fetchNotionDatabase(categoryId)
+      return fetchNotionDatabase(categoryId, query)
         .then((payload) => dispatch({ type: 'LOAD_NOTION_TABLE', payload }))
         .catch((error) => dispatch({ type: 'LOAD_NOTION_TABLE_FAILURE', error }));
     },
