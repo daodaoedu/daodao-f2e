@@ -43,7 +43,7 @@ const fetchNotionDatabase = async (databaseId, query) => {
       tags: object.properties['標籤 / Hashtag']?.multi_select?.map((tag) => tag.name) || [],
       // image: object.properties['縮圖 / Thumbnail']?.rich_text[0]?.href || '',
       image: object.properties['縮圖 / Thumbnail'].type === 'files'
-        ? (object.properties['縮圖 / Thumbnail']?.files?.name || '')
+        ? (object.properties['縮圖 / Thumbnail']?.files[0]?.name || '')
         : (object.properties['縮圖 / Thumbnail']?.rich_text[0]?.href || ''),
     })))
     .catch((error) => error);
