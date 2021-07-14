@@ -1,4 +1,5 @@
 export const SEARCH_TAGS = {
+  langlit: ['數學', '邏輯', '英語'],
   mathlog: ['中文', '英語', '電子報', '閱讀', '免費', '中文介面', '聽力'],
 };
 
