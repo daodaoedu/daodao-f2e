@@ -61,7 +61,7 @@ const MathlogPage = () => {
             <h1>語言與文學</h1>
             <p>這個分類下的所有標籤：</p>
             <TagList
-              list={SEARCH_TAGS.mathlog}
+              list={SEARCH_TAGS.langlit}
               onSearch={(name) => router.push(`${route}?tags=${name}`)}
             />
             <h2>
