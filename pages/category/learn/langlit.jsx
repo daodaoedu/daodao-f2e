@@ -1,14 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-// import Image from 'next/image';
-// import { css } from '@emotion/css';
 import { css } from '@emotion/css';
+import styled from '@emotion/styled';
+import Footer from '../../../shared/containers/Footer';
 import PageContainer from '../../../shared/containers/Page';
 import Navigation from '../../../shared/components/navigation';
-import Footer from '../../../shared/containers/Footer';
 import SEO from '../../../shared/components/seo';
 import SiderBar from '../../../components/home/RightSiderBar';
+import { useCategoyContext, CategoyProvider } from '../../../contexts/CategoyContext';
+import CardList from '../../../components/category/CardList';
+import TagList from '../../../shared/components/TagList';
+import { SEARCH_TAGS, CATEGORY_ID } from '../../../constants/category';
+
+const BodyWrapper = styled.div`
+  background-color: #f5f5f5;
+`;
 
 const SEOConfig = {
   title: '島島阿學 - 學習資源平台 - Daodao Online Learning Platform',
@@ -16,47 +23,69 @@ const SEOConfig = {
   keywords: '島島阿學',
   author: '島島阿學',
   copyright: '島島阿學',
-  imgLink: '',
-  link: '',
+  imgLink: 'https://resources.daoedu.tw/media/2020/08/1597934192-e1624a7b0d09ec164a2887ab2880f4c1.png',
+  link: '/assets/images/preview.jpeg',
 };
 
-const Home = () => {
-  const router = useRouter();
-  console.log('router', router);
+const ContextPageWrapper = () => {
   return (
-    <div>
-      <Head>
-        <SEO config={SEOConfig} />
-        {/* https://resources.daoedu.tw/media/2021/02/118222653_116618533489352_6821261858468995250_o.jpg */}
-      </Head>
-      <Navigation>
-        nav
-      </Navigation>
-      <PageContainer>
-        <div
-          className={css`width: 70vw;`}
-        >
-          <h1>語言與文學</h1>
-          <p>這個分類下的所有標籤：</p>
-          <iframe
-            title="langlit"
-            className="airtable-embed"
-            src="https://airtable.com/embed/shry1mqxVqP4U2lqK?backgroundColor=purple&viewControls=on"
-            frameBorder="0"
-            width="100%"
-            height="533"
-            style={{ background: 'transparent', border: '1px solid #ccc' }}
-          />
-        </div>
-        <div>
-          <SiderBar />
-        </div>
-      </PageContainer>
-      <Footer>
-        123
-      </Footer>
-    </div>
+    <CategoyProvider>
+      <MathlogPage />
+    </CategoyProvider>
   );
 };
 
-export default Home;
+const MathlogPage = () => {
+  const router = useRouter();
+  const { query, route } = router;
+  const { state, actions } = useCategoyContext();
+  const { loadNotionTable } = actions;
+  const isLoading = state.loading.category;
+  useEffect(() => {
+    loadNotionTable(CATEGORY_ID.langlit, query);
+  }, [query]);
+  return (
+    <BodyWrapper>
+      <div>
+        <Head>
+          <SEO config={SEOConfig} />
+          {/* https://resources.daoedu.tw/media/2021/02/118222653_116618533489352_6821261858468995250_o.jpg */}
+        </Head>
+        <Navigation>
+          nav
+        </Navigation>
+        <PageContainer>
+          <div
+            className={css`width: 70vw;`}
+          >
+            <h1>語言與文學</h1>
+            <p>這個分類下的所有標籤：</p>
+            <TagList
+              list={SEARCH_TAGS.mathlog}
+              onSearch={(name) => router.push(`${route}?tags=${name}`)}
+            />
+            <h2>
+              搜尋結果
+              {' '}
+              {isLoading ? '-' : state.category.length}
+              {' '}
+              筆：
+            </h2>
+            <CardList
+              list={state.category}
+              loading={isLoading}
+            />
+          </div>
+          <div>
+            <SiderBar />
+          </div>
+        </PageContainer>
+        <Footer>
+          123
+        </Footer>
+      </div>
+    </BodyWrapper>
+  );
+};
+
+export default ContextPageWrapper;

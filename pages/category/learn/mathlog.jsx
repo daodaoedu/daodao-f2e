@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-// import Image from 'next/image';
-// import { css } from '@emotion/css';
 import { css } from '@emotion/css';
 import styled from '@emotion/styled';
 import Footer from '../../../shared/containers/Footer';
@@ -13,9 +11,7 @@ import SiderBar from '../../../components/home/RightSiderBar';
 import { useCategoyContext, CategoyProvider } from '../../../contexts/CategoyContext';
 import CardList from '../../../components/category/CardList';
 import TagList from '../../../shared/components/TagList';
-// export const getStaticProps = async () => {
-
-// }
+import { SEARCH_TAGS, CATEGORY_ID } from '../../../constants/category';
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
@@ -31,8 +27,6 @@ const SEOConfig = {
   link: '/assets/images/preview.jpeg',
 };
 
-const tagList = ['中文', '英語', '電子報', '閱讀', '免費', '中文介面', '聽力'];
-
 const ContextPageWrapper = () => {
   return (
     <CategoyProvider>
@@ -46,12 +40,10 @@ const MathlogPage = () => {
   const { query, route } = router;
   const { state, actions } = useCategoyContext();
   const { loadNotionTable } = actions;
-  const categoryId = 'da015b1a389b43cda9f01876294064e0';
-  console.log(router);
+  const isLoading = state.loading.category;
   useEffect(() => {
-    loadNotionTable(categoryId, query);
+    loadNotionTable(CATEGORY_ID.mathlog, query);
   }, [query]);
-  console.log('state.category ', state.category);
   return (
     <BodyWrapper>
       <div>
@@ -66,26 +58,23 @@ const MathlogPage = () => {
           <div
             className={css`width: 70vw;`}
           >
-            <h1>語言與文學</h1>
+            <h1>數學與邏輯</h1>
             <p>這個分類下的所有標籤：</p>
-            <TagList list={tagList} onSearch={(name) => router.push(`${route}?tags=${name}`)} />
+            <TagList
+              list={SEARCH_TAGS.mathlog}
+              onSearch={(name) => router.push(`${route}?tags=${name}`)}
+            />
             <h2>
               搜尋結果
               {' '}
-              {state.category.length}
+              {isLoading ? '-' : state.category.length}
               {' '}
               筆：
             </h2>
-            <CardList list={state.category} loading={state.loading.category} />
-            {/* <iframe
-            title="langlit"
-            className="airtable-embed"
-            src="https://airtable.com/embed/shry1mqxVqP4U2lqK?backgroundColor=purple&viewControls=on"
-            frameBorder="0"
-            width="100%"
-            height="533"
-            style={{ background: 'transparent', border: '1px solid #ccc' }}
-          /> */}
+            <CardList
+              list={state.category}
+              loading={isLoading}
+            />
           </div>
           <div>
             <SiderBar />
