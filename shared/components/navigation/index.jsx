@@ -68,10 +68,12 @@ const Navigation = () => {
     <NavigationWrapper>
       <Link href="/">
         <LogoWrapper>
-          <img src="https://resources.daoedu.tw/media/2020/08/1597934192-e1624a7b0d09ec164a2887ab2880f4c1.png" alt="logo" />
+          <img src="/logo.png" alt="daodao" />
         </LogoWrapper>
       </Link>
-      <DescWrapper>學習資源平台 – Daodao Online Learning Platform</DescWrapper>
+      <DescWrapper>
+        學習資源平台 – Daodao Online Learning Platform
+      </DescWrapper>
       <LinkListWrapper>
         {linkList.map((link) => <li key={link.title}><Link href={link.link}>{link.title}</Link></li>)}
       </LinkListWrapper>

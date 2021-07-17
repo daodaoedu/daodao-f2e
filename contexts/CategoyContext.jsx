@@ -6,22 +6,22 @@ import categoryReducer from './reducers/categoryReducer';
 const initialState = {
   category: [
     {
-      name: '', image: '', link: '', tages: [],
+      name: '1', image: '', link: '', tages: [],
     },
     {
-      name: '', image: '', link: '', tages: [],
+      name: '2', image: '', link: '', tages: [],
     },
     {
-      name: '', image: '', link: '', tages: [],
+      name: '3', image: '', link: '', tages: [],
     },
     {
-      name: '', image: '', link: '', tages: [],
+      name: '4', image: '', link: '', tages: [],
     },
     {
-      name: '', image: '', link: '', tages: [],
+      name: '5', image: '', link: '', tages: [],
     },
     {
-      name: '', image: '', link: '', tages: [],
+      name: '6', image: '', link: '', tages: [],
     },
   ],
   loading: {

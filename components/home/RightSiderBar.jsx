@@ -1,7 +1,5 @@
 import styled from '@emotion/styled';
-import TagCloud from 'react-tag-cloud';
-import randomColor from 'randomcolor';
-// import { memo } from 'react';
+// import { useCallback } from 'react';
 
 const SiderBarWrapper = styled.div`
     display: flex;
@@ -44,30 +42,15 @@ const thanksList = [
   '王玠堯',
   'Ael',
 ];
+// const tagList = ['國小英文', 'CSS', 'HTML', '中文', '心理學'];
 
 const SiderBar = () => {
-  const tagList = ['國小英文', 'CSS', 'HTML', '中文', '心理學'];
-
   return (
     <SiderBarWrapper>
       <FieldWrapper>
         <h3>標籤</h3>
         <div>
-          <TagCloud
-            style={{
-              fontFamily: 'sans-serif',
-              fontSize: 20,
-              fontWeight: 'bold',
-              fontStyle: 'italic',
-              color: () => randomColor(),
-              padding: 5,
-              width: '100%',
-              height: '300px',
-            }}
-          >
-            {/* 放入所有tags */}
-            { tagList.map((tag) => <p key={tag}>{tag}</p>) }
-          </TagCloud>
+          暫時拿掉標籤雲
         </div>
       </FieldWrapper>
       <FieldWrapper>

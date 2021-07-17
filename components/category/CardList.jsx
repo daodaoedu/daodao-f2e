@@ -22,7 +22,7 @@ const CardList = ({ list, loading }) => {
     <CardListWrapper>
       { Array.isArray(list) && list.map((category) => (
         <Card
-          key={category.title}
+          key={category.name}
           name={category.name}
           link={category.link}
           image={category.image}

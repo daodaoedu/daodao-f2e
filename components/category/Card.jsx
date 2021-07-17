@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import { css, keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
@@ -54,11 +55,12 @@ const FooterWrapper = styled.div`
 const Card = ({
   name, image, onClick, loading,
 }) => {
+  const footerName = useMemo(() => (loading ? '' : name), [name, loading]);
   return (
     <CardWrapper onClick={onClick}>
       <ContentWrapper image={image} loading={loading} />
       <FooterWrapper>
-        {name}
+        {footerName}
       </FooterWrapper>
     </CardWrapper>
   );

@@ -6,6 +6,7 @@ const Container = styled.main`
   justify-content: space-between;
   margin-left: 100px;
   margin-top: 40px;
+  /* width: 70vw; */
 `;
 
 const PageContainer = ({ children }) => {
