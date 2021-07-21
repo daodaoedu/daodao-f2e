@@ -21,6 +21,8 @@ const CardWrapper = styled.li`
     background-color: #ffffff;
 `;
 
+// const defaultImage = 'https://images.unsplash.com/photo-1564410267841-915d8e4d71ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=668&q=80';
+
 const ContentWrapper = styled.div`
     height: 260px;
     background-image: url(${(props) => props.image});

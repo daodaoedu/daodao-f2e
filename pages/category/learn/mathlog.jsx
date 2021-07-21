@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
@@ -35,12 +35,19 @@ const ContextPageWrapper = () => {
 
 const MathlogPage = () => {
   const router = useRouter();
-  const { query } = router;
+  const { query, route } = router;
   const { state, actions } = useCategoyContext();
   const { loadNotionTable } = actions;
   const isLoading = state.loading.category;
+  const onSearch = useCallback((name) => {
+    const queryString = name ? `?tags=${name}` : '';
+    router.push(`${route}${queryString}`);
+  }, [query]);
+
   useEffect(() => {
-    loadNotionTable(CATEGORY_ID.mathlog, query);
+    if (router.isReady) {
+      loadNotionTable(CATEGORY_ID.mathlog, query);
+    }
   }, [query]);
   return (
     <BodyWrapper>
@@ -54,6 +61,7 @@ const MathlogPage = () => {
           cardList={state.category}
           isLoading={isLoading}
           length={state.category.length}
+          onSearch={onSearch}
         />
         <SiderBar />
       </PageContainer>

@@ -1,6 +1,5 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
-import { useRouter } from 'next/router';
 import TagList from '../../shared/components/TagList';
 import CardList from './CardList';
 
@@ -8,15 +7,8 @@ const AboutWrapper = styled.div`
 `;
 
 const About = ({
-  tagList, cardList, isLoading, length,
+  tagList, cardList, isLoading, length, onSearch,
 }) => {
-  const router = useRouter();
-  const { route } = router;
-
-  const onSearch = useCallback((name) => {
-    router.push(`${route}?tags=${name}`);
-  }, [route]);
-
   return (
     <AboutWrapper>
       <h1>數學與邏輯</h1>

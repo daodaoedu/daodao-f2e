@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-// import { useRouter } from 'next/router';
 import Card from './Card';
 
 const CardListWrapper = styled.ul`
@@ -22,7 +21,7 @@ const CardList = ({ list, loading }) => {
     <CardListWrapper>
       { Array.isArray(list) && list.map((category) => (
         <Card
-          key={category.name}
+          key={`${category.name}-${category.link}`}
           name={category.name}
           link={category.link}
           image={category.image}

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { css } from '@emotion/css';
@@ -41,9 +41,18 @@ const MathlogPage = () => {
   const { state, actions } = useCategoyContext();
   const { loadNotionTable } = actions;
   const isLoading = state.loading.category;
-  useEffect(() => {
-    loadNotionTable(CATEGORY_ID.langlit, query);
+
+  const onSearch = useCallback((name) => {
+    const queryString = name ? `?tags=${name}` : '';
+    router.push(`${route}${queryString}`);
   }, [query]);
+
+  useEffect(() => {
+    if (router.isReady) {
+      loadNotionTable(CATEGORY_ID.langlit, query);
+    }
+  }, [query]);
+
   return (
     <BodyWrapper>
       <div>
@@ -62,7 +71,7 @@ const MathlogPage = () => {
             <p>這個分類下的所有標籤：</p>
             <TagList
               list={SEARCH_TAGS.langlit}
-              onSearch={(name) => router.push(`${route}?tags=${name}`)}
+              onSearch={onSearch}
             />
             <h2>
               搜尋結果
