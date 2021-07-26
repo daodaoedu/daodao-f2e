@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
@@ -7,9 +7,7 @@ import PageContainer from '../../../shared/containers/Page';
 import Navigation from '../../../shared/components/navigation';
 import SEO from '../../../shared/components/seo';
 import SiderBar from '../../../components/home/RightSiderBar';
-import { useCategoyContext, CategoyProvider } from '../../../contexts/CategoyContext';
-import About from '../../../components/category/About';
-import { SEARCH_TAGS, CATEGORY_ID } from '../../../constants/category';
+import { useCategoyContext } from '../../../contexts/CategoyContext';
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
@@ -25,28 +23,16 @@ const SEOConfig = {
   link: '/assets/images/preview.jpeg',
 };
 
-const ContextPageWrapper = () => {
-  return (
-    <CategoyProvider>
-      <MathlogPage />
-    </CategoyProvider>
-  );
-};
-
-const MathlogPage = () => {
+const LearingPage = () => {
   const router = useRouter();
-  const { query, route } = router;
+  const { query } = router;
   const { state, actions } = useCategoyContext();
-  const { loadNotionTable } = actions;
-  const isLoading = state.loading.category;
-  const onSearch = useCallback((name) => {
-    const queryString = name ? `?tags=${name}` : '';
-    router.push(`${route}${queryString}`);
-  }, [query]);
-
+  const { name, intro, link } = state.page;
+  const { loadNotionPage } = actions;
+  console.log('state ', state);
   useEffect(() => {
     if (router.isReady) {
-      loadNotionTable(CATEGORY_ID.mathlog, query);
+      loadNotionPage(query.pageId);
     }
   }, [query]);
   return (
@@ -56,13 +42,11 @@ const MathlogPage = () => {
       </Head>
       <Navigation />
       <PageContainer>
-        <About
-          tagList={SEARCH_TAGS.mathlog}
-          cardList={state.category}
-          isLoading={isLoading}
-          length={state.category.length}
-          onSearch={onSearch}
-        />
+        <div>
+          <p>{name}</p>
+          <p>{intro}</p>
+          <a href={link} target="_blank" rel="noreferrer">網站連結</a>
+        </div>
         <SiderBar />
       </PageContainer>
       <Footer text="Tomorrow will be fine. 島島阿學 © 2021." />
@@ -70,4 +54,4 @@ const MathlogPage = () => {
   );
 };
 
-export default ContextPageWrapper;
+export default LearingPage;

@@ -1,7 +1,14 @@
+import React from 'react';
 import '../styles/globals.css';
+import { CategoyProvider } from '../contexts/CategoyContext';
 
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />;
-}
+const MyApp = ({ Component, pageProps }) => {
+  return (
+    <CategoyProvider>
+      <Component {...pageProps} />
+    </CategoyProvider>
+
+  );
+};
 
 export default MyApp;

@@ -16,7 +16,7 @@ const openPage = (event, link, type) => {
   window.open(link, type);
 };
 
-const CardList = ({ list, loading }) => {
+const CardList = ({ list, isLoading }) => {
   return (
     <CardListWrapper>
       { Array.isArray(list) && list.map((category) => (
@@ -25,7 +25,7 @@ const CardList = ({ list, loading }) => {
           name={category.name}
           link={category.link}
           image={category.image}
-          loading={loading}
+          isLoading={isLoading}
           onClick={(event) => openPage(event, category.link, '_blank')}
         />
       )) }

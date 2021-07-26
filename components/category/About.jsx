@@ -26,7 +26,7 @@ const About = ({
       </p>
       <CardList
         list={cardList}
-        loading={isLoading}
+        isLoading={isLoading}
       />
     </AboutWrapper>
   );

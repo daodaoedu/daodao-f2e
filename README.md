@@ -28,8 +28,8 @@ yarn dev
 </p>
 
 ## 主要技術列表
-全端框架：Next.js  
-前端：React.js  
+前端library：React.js  
+前端框架：Next.js  
 CSS-in-JS：[emotion](https://emotion.sh/docs/introduction)  
 coding-style：[airbnb-eslint](https://github.com/airbnb/javascript)  
 database：Notion  
@@ -37,7 +37,7 @@ database：Notion
 ### 使用 Next.js 原因
 1. 提升專案整體的開發體驗與時程，讓工程更專注在設計網頁而非處理其他雜項的相依設定。
 2. 不需要設定額外複雜的設定
-3. 使用SPA框架搭配CSS-in-JS solution使開發體驗和使用者體驗更加分
+3. 搭配CSS-in-JS solution使開發體驗和使用者體驗更加分
 
 ### 使用 emotion 原因
 emotion為近年討論度最高的CSS設計解決方案，除了部分撰寫方式如同styled-components，此外也提供部分強大的功能提升開發體驗，例如：inline-style 可以 hot reload。

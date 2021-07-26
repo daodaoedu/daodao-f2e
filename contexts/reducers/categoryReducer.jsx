@@ -19,6 +19,12 @@ const categoryReducer = (state, action) => {
         },
       };
     }
+    case 'LOAD_NOTION_PAGE': {
+      return {
+        ...state,
+        page: action.payload,
+      };
+    }
     case 'LOAD_NOTION_TABLE_FAILURE': {
       return {
         ...state,

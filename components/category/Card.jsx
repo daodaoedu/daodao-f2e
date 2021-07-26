@@ -29,7 +29,7 @@ const ContentWrapper = styled.div`
     background-size: cover;
     background-repeat: no-repeat;
     background-position: 50% 50%;
-    ${(props) => props.loading && css`
+    ${(props) => props.isLoading && css`
     -webkit-animation: ${loadingFrames} 1.4s ease infinite; 
       animation: ${loadingFrames} 1.4s ease infinite;
       background: -webkit-gradient(linear, left top, right top, color-stop(25%, rgba(190, 190, 190, 0.2)), color-stop(37%, rgba(129, 129, 129, 0.24)), color-stop(63%, rgba(190, 190, 190, 0.2)));
@@ -55,12 +55,12 @@ const FooterWrapper = styled.div`
 `;
 
 const Card = ({
-  name, image, onClick, loading,
+  name, image, onClick, isLoading,
 }) => {
-  const footerName = useMemo(() => (loading ? '' : name), [name, loading]);
+  const footerName = useMemo(() => (isLoading ? '' : name), [name, isLoading]);
   return (
     <CardWrapper onClick={onClick}>
-      <ContentWrapper image={image} loading={loading} />
+      <ContentWrapper image={image} isLoading={isLoading} />
       <FooterWrapper>
         {footerName}
       </FooterWrapper>

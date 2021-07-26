@@ -24,6 +24,11 @@ const initialState = {
       name: '6', image: '', link: '', tages: [],
     },
   ],
+  page: {
+    name: '',
+    intro: '',
+    link: '',
+  },
   loading: {
     category: true,
   },
@@ -38,14 +43,35 @@ const fetchNotionDatabase = async (databaseId, query) => {
     method: 'GET',
   }).then((res) => res.json())
     .then((res) => res.payload.results.map((object) => ({
+      id: object.id,
       name: object.properties['資源名稱 / Name']?.title[0]?.plain_text || '',
-      link: object.properties['連結 / Link']?.url || '',
+      // link: object.properties['連結 / Link']?.url || '',
+      link: `/category/learn/${object.id}`,
       tags: object.properties['標籤 / Hashtag']?.multi_select?.map((tag) => tag.name) || [],
       // image: object.properties['縮圖 / Thumbnail']?.rich_text[0]?.href || '',
       image: object.properties['縮圖 / Thumbnail'].type === 'files'
         ? (object.properties['縮圖 / Thumbnail']?.files[0]?.name || '')
         : (object.properties['縮圖 / Thumbnail']?.rich_text[0]?.href || ''),
     })))
+    .catch((error) => error);
+};
+
+const fetchNotionPage = async (pageId) => {
+  return fetch(`https://api.daoedu.tw/notion/pages/${pageId}`, {
+    method: 'GET',
+  }).then((res) => res.json())
+    .then((res) => {
+      const { properties } = res.payload;
+      return {
+        name: properties['資源名稱 / Name']?.title[0]?.plain_text || '',
+        intro: properties['介紹 / Introduction']?.rich_text[0]?.plain_text || '',
+        link: properties['連結 / Link']?.url || '',
+        tags: properties['標籤 / Hashtag']?.multi_select?.map((tag) => tag.name) || [],
+        image: properties['縮圖 / Thumbnail'].type === 'files'
+          ? (properties['縮圖 / Thumbnail']?.files[0]?.name || '')
+          : (properties['縮圖 / Thumbnail']?.rich_text[0]?.href || ''),
+      };
+    })
     .catch((error) => error);
 };
 
@@ -60,8 +86,14 @@ export const CategoyProvider = ({ children }) => {
           .then((payload) => dispatch({ type: 'LOAD_NOTION_TABLE', payload }))
           .catch((error) => dispatch({ type: 'LOAD_NOTION_TABLE_FAILURE', error }));
       },
+      loadNotionPage: (pageId, query) => {
+        dispatch({ type: 'REQUEST_NOTION_PAGE' });
+        return fetchNotionPage(pageId, query)
+          .then((payload) => dispatch({ type: 'LOAD_NOTION_PAGE', payload }))
+          .catch((error) => dispatch({ type: 'LOAD_NOTION_PAGE_FAILURE', error }));
+      },
     };
-  }, []);
+  }, [fetchNotionDatabase, fetchNotionPage]);
   console.log('current state: ', state);
   return (
     <CategoyContext.Provider value={{ state, dispatch, actions }}>
