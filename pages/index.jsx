@@ -9,8 +9,6 @@ import Footer from '../shared/containers/Footer';
 import SEO from '../shared/components/seo';
 import CardList from '../components/home/CardList';
 import Banner from '../components/home/Banner';
-import RightSiderBar from '../components/home/RightSiderBar';
-import LeftSiderBar from '../components/home/LeftSiderBar';
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
@@ -92,18 +90,12 @@ const Home = () => {
         <SEO config={SEOConfig} />
         {/* https://resources.daoedu.tw/media/2021/02/118222653_116618533489352_6821261858468995250_o.jpg */}
       </Head>
-      <Navigation>
-        nav
-      </Navigation>
-      <LeftSiderBar />
+      <Navigation />
       <PageContainer>
         <div>
           <Banner />
           <p>今晚，要不要來點＿＿的學習資源？ (點進去即可看到各領域的資源)</p>
           <CardList list={list} />
-        </div>
-        <div>
-          <RightSiderBar />
         </div>
       </PageContainer>
       <Footer>

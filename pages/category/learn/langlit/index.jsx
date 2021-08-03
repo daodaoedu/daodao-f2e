@@ -1,15 +1,13 @@
 import React, { useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { css } from '@emotion/css';
 import styled from '@emotion/styled';
 import { useDispatch, useSelector } from 'react-redux';
 import Footer from '../../../../shared/containers/Footer';
 import PageContainer from '../../../../shared/containers/Page';
 import Navigation from '../../../../shared/components/navigation';
 import SiderBar from '../../../../components/home/RightSiderBar';
-import CardList from '../../../../components/category/CardList';
-import TagList from '../../../../shared/components/TagList';
+import About from '../../../../components/category/About';
 import { SEARCH_TAGS, CATEGORY_ID } from '../../../../constants/category';
 import SEO from '../../../../shared/components/seo';
 import { loadNotionTable } from '../../../../redux/actions/category';
@@ -51,38 +49,18 @@ const LanglitPage = () => {
       <Head>
         <SEO config={SEOConfig} />
       </Head>
-      <Navigation>
-        nav
-      </Navigation>
+      <Navigation />
       <PageContainer>
-        <div
-          className={css`width: 70vw;`}
-        >
-          <h1>語言與文學</h1>
-          <p>這個分類下的所有標籤：</p>
-          <TagList
-            list={SEARCH_TAGS.langlit}
-            onSearch={onSearch}
-          />
-          <h2>
-            搜尋結果
-            {' '}
-            {isLoading ? '-' : category.length}
-            {' '}
-            筆：
-          </h2>
-          <CardList
-            list={category}
-            isLoading={isLoading}
-          />
-        </div>
-        <div>
-          <SiderBar />
-        </div>
+        <About
+          tagList={SEARCH_TAGS.mathlog}
+          cardList={category}
+          isLoading={isLoading}
+          length={category.length}
+          onSearch={onSearch}
+        />
+        <SiderBar />
       </PageContainer>
-      <Footer>
-        123
-      </Footer>
+      <Footer text="Tomorrow will be fine. 島島阿學 © 2021." />
     </BodyWrapper>
   );
 };
