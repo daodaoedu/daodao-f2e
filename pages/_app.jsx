@@ -1,12 +1,23 @@
 import React from 'react';
 import '../styles/globals.css';
-import { CategoyProvider } from '../contexts/CategoyContext';
+import { Provider } from 'react-redux';
+// import { CategoyProvider } from '../contexts/CategoyContext';
+import configureStore from '../utils/configureStore';
+
+// if (window && window.__REDUX_DEVTOOLS_EXTENSION__) {
+//   window.__REDUX_DEVTOOLS_EXTENSION__();
+// }
+// window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__();
+
+const store = configureStore();
 
 const MyApp = ({ Component, pageProps }) => {
   return (
-    <CategoyProvider>
+    // <CategoyProvider>
+    <Provider store={store}>
       <Component {...pageProps} />
-    </CategoyProvider>
+    </Provider>
+    // </CategoyProvider>
 
   );
 };

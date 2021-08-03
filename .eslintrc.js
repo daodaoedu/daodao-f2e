@@ -24,5 +24,6 @@ module.exports = {
     'no-console': 0,
     'max-len': 0,
     'react/react-in-jsx-scope': 0,
+    'no-underscore-dangle': 0,
   },
 };

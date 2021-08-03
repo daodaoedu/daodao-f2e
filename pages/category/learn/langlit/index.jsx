@@ -3,15 +3,16 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { css } from '@emotion/css';
 import styled from '@emotion/styled';
+import { useDispatch, useSelector } from 'react-redux';
 import Footer from '../../../../shared/containers/Footer';
 import PageContainer from '../../../../shared/containers/Page';
 import Navigation from '../../../../shared/components/navigation';
 import SiderBar from '../../../../components/home/RightSiderBar';
-import { useCategoyContext } from '../../../../contexts/CategoyContext';
 import CardList from '../../../../components/category/CardList';
 import TagList from '../../../../shared/components/TagList';
 import { SEARCH_TAGS, CATEGORY_ID } from '../../../../constants/category';
 import SEO from '../../../../shared/components/seo';
+import { loadNotionTable } from '../../../../redux/actions/category';
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
@@ -28,11 +29,10 @@ const SEOConfig = {
 };
 
 const LanglitPage = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
+  const { loading, category } = useSelector((state) => state.category);
   const { query, route } = router;
-  const { state, actions } = useCategoyContext();
-  const { loadNotionTable } = actions;
-  const isLoading = state.loading.category;
 
   const onSearch = useCallback((name) => {
     const queryString = name ? `?tags=${name}` : '';
@@ -41,7 +41,7 @@ const LanglitPage = () => {
 
   useEffect(() => {
     if (router.isReady) {
-      loadNotionTable(CATEGORY_ID.langlit, query);
+      dispatch(loadNotionTable(CATEGORY_ID.langlit, query));
     }
   }, [query]);
 
@@ -66,13 +66,13 @@ const LanglitPage = () => {
           <h2>
             搜尋結果
             {' '}
-            {isLoading ? '-' : state.category.length}
+            {loading?.category ? '-' : category.length}
             {' '}
             筆：
           </h2>
           <CardList
-            list={state.category}
-            isLoading={isLoading}
+            list={category}
+            isLoading={loading?.category}
           />
         </div>
         <div>
