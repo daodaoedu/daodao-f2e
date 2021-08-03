@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import PageContainer from '../shared/containers/Page';
 import Navigation from '../shared/components/navigation';
-import Footer from '../shared/containers/Footer';
+import Footer from '../shared/components/footer';
 import SEO from '../shared/components/seo';
 import SiderBar from '../components/home/RightSiderBar';
 

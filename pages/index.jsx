@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 import PageContainer from '../shared/containers/Page';
 import Navigation from '../shared/components/navigation';
-import Footer from '../shared/containers/Footer';
+import Footer from '../shared/components/footer';
 import SEO from '../shared/components/seo';
 import CardList from '../components/home/CardList';
 import Banner from '../components/home/Banner';
@@ -98,9 +98,7 @@ const Home = () => {
           <CardList list={list} />
         </div>
       </PageContainer>
-      <Footer>
-        123
-      </Footer>
+      <Footer />
     </BodyWrapper>
   );
 };

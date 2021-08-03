@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 import { useDispatch, useSelector } from 'react-redux';
-import Footer from '../../../../shared/containers/Footer';
+import Footer from '../../../../shared/components/footer';
 import PageContainer from '../../../../shared/containers/Page';
 import Navigation from '../../../../shared/components/navigation';
 import SiderBar from '../../../../components/home/RightSiderBar';
