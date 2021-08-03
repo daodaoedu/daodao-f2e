@@ -15,7 +15,7 @@ function* fetchCategoryList(action) {
 
 function* fetchPageData(action) {
   const { pageId } = action.payload;
-  const url = `https://api.daoedu.tw/notion/databases/${pageId}`;
+  const url = `https://api.daoedu.tw/notion/pages/${pageId}`;
   try {
     const result = yield call(get, url);
     yield put({ type: 'LOAD_NOTION_PAGE', payload: result.payload });

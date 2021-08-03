@@ -33,6 +33,7 @@ const LanglitPage = () => {
   const router = useRouter();
   const { loading, category } = useSelector((state) => state.category);
   const { query, route } = router;
+  const isLoading = loading?.category;
 
   const onSearch = useCallback((name) => {
     const queryString = name ? `?tags=${name}` : '';
@@ -66,13 +67,13 @@ const LanglitPage = () => {
           <h2>
             搜尋結果
             {' '}
-            {loading?.category ? '-' : category.length}
+            {isLoading ? '-' : category.length}
             {' '}
             筆：
           </h2>
           <CardList
             list={category}
-            isLoading={loading?.category}
+            isLoading={isLoading}
           />
         </div>
         <div>

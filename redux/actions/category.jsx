@@ -7,8 +7,11 @@ export function loadNotionTable(categoryId, query) {
   };
 }
 
-export function loadNotionPage() {
+export function loadNotionPage(pageId) {
   return {
     type: 'REQUEST_NOTION_PAGE',
+    payload: {
+      pageId,
+    },
   };
 }

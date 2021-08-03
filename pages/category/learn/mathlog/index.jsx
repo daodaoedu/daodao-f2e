@@ -2,14 +2,15 @@ import React, { useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
+import { useDispatch, useSelector } from 'react-redux';
 import Footer from '../../../../shared/containers/Footer';
 import PageContainer from '../../../../shared/containers/Page';
 import Navigation from '../../../../shared/components/navigation';
 import SEO from '../../../../shared/components/seo';
 import SiderBar from '../../../../components/home/RightSiderBar';
-import { useCategoyContext } from '../../../../contexts/CategoyContext';
 import About from '../../../../components/category/About';
 import { SEARCH_TAGS, CATEGORY_ID } from '../../../../constants/category';
+import { loadNotionTable } from '../../../../redux/actions/category';
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
@@ -26,11 +27,11 @@ const SEOConfig = {
 };
 
 const MathlogPage = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
+  const { loading, category } = useSelector((state) => state.category);
   const { query, route } = router;
-  const { state, actions } = useCategoyContext();
-  const { loadNotionTable } = actions;
-  const isLoading = state.loading.category;
+  const isLoading = loading.category;
   const onSearch = useCallback((name) => {
     const queryString = name ? `?tags=${name}` : '';
     router.push(`${route}${queryString}`);
@@ -38,7 +39,7 @@ const MathlogPage = () => {
 
   useEffect(() => {
     if (router.isReady) {
-      loadNotionTable(CATEGORY_ID.mathlog, query);
+      dispatch(loadNotionTable(CATEGORY_ID.mathlog, query));
     }
   }, [query]);
   return (
@@ -50,9 +51,9 @@ const MathlogPage = () => {
       <PageContainer>
         <About
           tagList={SEARCH_TAGS.mathlog}
-          cardList={state.category}
+          cardList={category}
           isLoading={isLoading}
-          length={state.category.length}
+          length={category.length}
           onSearch={onSearch}
         />
         <SiderBar />

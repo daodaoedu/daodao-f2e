@@ -2,12 +2,13 @@ import React, { useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
+import { useDispatch, useSelector } from 'react-redux';
 import Footer from '../../../shared/containers/Footer';
 import PageContainer from '../../../shared/containers/Page';
 import Navigation from '../../../shared/components/navigation';
 import SEO from '../../../shared/components/seo';
 import SiderBar from '../../../components/home/RightSiderBar';
-import { useCategoyContext } from '../../../contexts/CategoyContext';
+import { loadNotionPage } from '../../../redux/actions/category';
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
@@ -24,15 +25,14 @@ const SEOConfig = {
 };
 
 const LearingPage = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
+  const { page } = useSelector((state) => state.category);
   const { query } = router;
-  const { state, actions } = useCategoyContext();
-  const { name, intro, link } = state.page;
-  const { loadNotionPage } = actions;
-  console.log('state ', state);
+  const { name, intro, link } = page;
   useEffect(() => {
     if (router.isReady) {
-      loadNotionPage(query.pageId);
+      dispatch(loadNotionPage(query.pageId));
     }
   }, [query]);
   return (
