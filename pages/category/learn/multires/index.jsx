@@ -27,7 +27,7 @@ const LanglitPage = ({ router, SEOConfig }) => {
 
   useEffect(() => {
     if (router.isReady) {
-      dispatch(loadNotionTable(CATEGORY_ID.multiRes, query));
+      dispatch(loadNotionTable(CATEGORY_ID.multires, query));
     }
   }, [query]);
 
@@ -39,7 +39,7 @@ const LanglitPage = ({ router, SEOConfig }) => {
       <Navigation />
       <PageContainer>
         <About
-          tagList={SEARCH_TAGS.multiRes}
+          tagList={SEARCH_TAGS.multires}
           cardList={category}
           isLoading={isLoading}
           length={category.length}

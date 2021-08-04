@@ -19,7 +19,7 @@ const App = ({ Component, pageProps }) => {
     keywords: '島島阿學',
     author: '島島阿學',
     copyright: '島島阿學',
-    imgLink: '/preview.jpg',
+    imgLink: '/preview.webp',
     link: `${router.pathname}`,
   }), []);
   return (

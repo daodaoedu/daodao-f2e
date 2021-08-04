@@ -25,7 +25,7 @@ const CardWrapper = styled.li`
 
 const ContentWrapper = styled.div`
     height: 260px;
-    background-image: url(${(props) => props.image});
+    background-image: url(${(props) => (typeof (props.image) === 'string' && props?.image?.includes('http') ? props.image : '/preview.webp')});
     background-size: cover;
     background-repeat: no-repeat;
     background-position: 50% 50%;

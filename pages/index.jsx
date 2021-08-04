@@ -65,7 +65,7 @@ const list = [
   },
   {
     title: '綜合型學習資源',
-    link: '/category/learn/multiRes',
+    link: '/category/learn/multires',
     image: '/assets/images/cat11.jpeg',
   },
 ];

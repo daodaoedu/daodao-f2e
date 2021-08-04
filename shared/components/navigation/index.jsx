@@ -95,7 +95,7 @@ const CATEGORY_LINK = [
   },
   {
     title: '綜合型學習資源',
-    link: '/category/learn/multi-res',
+    link: '/category/learn/multires',
     image: '/assets/images/cat11.jpeg',
   },
 ];

@@ -1,3 +1,5 @@
+import { getUrlFromCategory } from '../../utils/category';
+
 const initialState = {
   category: [
     {
@@ -44,14 +46,12 @@ const reducer = (state = initialState, action) => {
       const { results } = action.payload;
       const category = results.map((object) => ({
         id: object.id,
-        name: object.properties['資源名稱 / Name']?.title[0]?.plain_text || '',
+        name: Array.isArray(object.properties['資源名稱 / Name'].title) ? object.properties['資源名稱 / Name'].title[0]?.plain_text : '',
         // link: object.properties['連結 / Link']?.url || '',
         link: `/category/learn/${object.id}`,
         tags: object.properties['標籤 / Hashtag']?.multi_select?.map((tag) => tag.name) || [],
         // image: object.properties['縮圖 / Thumbnail']?.rich_text[0]?.href || '',
-        image: object.properties['縮圖 / Thumbnail'].type === 'files'
-          ? (object.properties['縮圖 / Thumbnail']?.files[0]?.name || '')
-          : (object.properties['縮圖 / Thumbnail']?.rich_text[0]?.href || ''),
+        image: getUrlFromCategory(object.properties['縮圖 / Thumbnail']),
       }));
 
       return {
