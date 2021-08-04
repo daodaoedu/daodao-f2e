@@ -23,5 +23,5 @@ export const CATEGORY_ID = {
   life: 'e958a830c3aa4f2ab181c68eb68eec91',
   health: '1a547d664bd147d7b4da7cc23fa68f45',
   businv: 'd014e00881b94985862c284af7397862',
-  'multi-res': '0d1bbefdc8e94bb09c96eabe239834a8',
+  multiRes: '0d1bbefdc8e94bb09c96eabe239834a8',
 };
