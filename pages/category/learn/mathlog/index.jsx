@@ -7,7 +7,6 @@ import Footer from '../../../../shared/components/footer';
 import PageContainer from '../../../../shared/containers/Page';
 import Navigation from '../../../../shared/components/navigation';
 import SEO from '../../../../shared/components/seo';
-import SiderBar from '../../../../components/home/RightSiderBar';
 import About from '../../../../components/category/About';
 import { SEARCH_TAGS, CATEGORY_ID } from '../../../../constants/category';
 import { loadNotionTable } from '../../../../redux/actions/category';
@@ -46,7 +45,6 @@ const MathlogPage = ({ SEOConfig }) => {
           length={category.length}
           onSearch={onSearch}
         />
-        <SiderBar />
       </PageContainer>
       <Footer text="Tomorrow will be fine. 島島阿學 © 2021." />
     </BodyWrapper>

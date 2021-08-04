@@ -4,6 +4,7 @@ import {
   FaFacebook, FaInstagram,
 } from 'react-icons/fa';
 import IntroList from './IntroList';
+import IconList from './IconList';
 
 const MainFooterWrapper = styled.div`
   height: 100%;
@@ -11,7 +12,7 @@ const MainFooterWrapper = styled.div`
   color: white;
   display: flex;
   justify-content: space-around;
-  align-items: center;
+  align-items: flex-start;
   font-size: 16px;
   letter-spacing: 0.08em;
 `;
@@ -28,6 +29,7 @@ const LogoWrapper = styled.div`
 const BlockWrapper = styled.div`
     display: flex;
     justify-content: space-around;
+    margin-top: 60px;
 `;
 
 const aboutDaoConfig = [
@@ -60,6 +62,19 @@ const aboutResourceConfig = [
   },
 ];
 
+const iconListConfig = [
+  {
+    icon: <FaInstagram />,
+    link: '/',
+    alt: 'instagram',
+  },
+  {
+    icon: <FaFacebook />,
+    link: '/',
+    alt: 'facebook',
+  },
+];
+
 const SubFooter = () => {
   return (
     <MainFooterWrapper>
@@ -82,15 +97,10 @@ const SubFooter = () => {
       </BlockWrapper>
       <BlockWrapper>
         {/* 追蹤島島 */}
-        <h2>追蹤島島</h2>
-        <ul>
-          <li>
-            <FaFacebook />
-          </li>
-          <li>
-            <FaInstagram />
-          </li>
-        </ul>
+        <IconList
+          title="追蹤島島"
+          list={iconListConfig}
+        />
       </BlockWrapper>
     </MainFooterWrapper>
   );

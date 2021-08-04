@@ -6,7 +6,8 @@ const Container = styled.main`
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  padding-top: 20px;
+  margin: auto;
+  margin-top: 40px;
 `;
 
 const PageContainer = ({ children }) => {

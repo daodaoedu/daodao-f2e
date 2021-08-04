@@ -4,6 +4,7 @@ import MainNav from './MainNav';
 import SubNav from './SubNav';
 
 const NavigationWrapper = styled.nav`
+  white-space: nowrap;
   /* height: 100px;
   background-color: #16b9b3;
   display: flex;

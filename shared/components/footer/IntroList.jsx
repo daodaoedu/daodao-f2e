@@ -3,14 +3,21 @@ import styled from '@emotion/styled';
 import Link from 'next/link';
 
 const IntroListWrapper = styled.div`
-    ul {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-    }
-    li {
-      cursor: pointer;
-    }
+  margin: 0 10px;
+  
+  h2 {
+      margin-bottom: 10px;
+  }
+  ul {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+  }
+  li {
+    cursor: pointer;
+    margin: 8px;
+    font-size: 14px;
+  }
 `;
 
 const IntroList = ({ title, list }) => {
