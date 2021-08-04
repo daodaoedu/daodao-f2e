@@ -6,8 +6,8 @@ import Footer from '../../../shared/components/footer';
 import PageContainer from '../../../shared/containers/Page';
 import Navigation from '../../../shared/components/navigation';
 import SEO from '../../../shared/components/seo';
-import SiderBar from '../../../components/home/RightSiderBar';
 import { loadNotionPage } from '../../../redux/actions/category';
+import Content from '../../../components/learn/Content';
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
@@ -31,12 +31,11 @@ const LearingPage = ({ router, SEOConfig }) => {
       </Head>
       <Navigation />
       <PageContainer>
-        <div>
-          <p>{name}</p>
-          <p>{intro}</p>
-          <a href={link} target="_blank" rel="noreferrer">網站連結</a>
-        </div>
-        <SiderBar />
+        <Content
+          title={name}
+          intro={intro}
+          link={link}
+        />
       </PageContainer>
       <Footer text="Tomorrow will be fine. 島島阿學 © 2021." />
     </BodyWrapper>

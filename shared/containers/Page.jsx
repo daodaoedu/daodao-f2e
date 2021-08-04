@@ -4,10 +4,11 @@ import styled from '@emotion/styled';
 const Container = styled.main`
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: flex-start;
   align-items: center;
   margin: auto;
   margin-top: 40px;
+  min-height: 100vh;
 `;
 
 const PageContainer = ({ children }) => {

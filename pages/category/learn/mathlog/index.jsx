@@ -1,6 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 import { useDispatch, useSelector } from 'react-redux';
 import Footer from '../../../../shared/components/footer';
@@ -15,9 +14,8 @@ const BodyWrapper = styled.div`
   background-color: #f5f5f5;
 `;
 
-const MathlogPage = ({ SEOConfig }) => {
+const MathlogPage = ({ router, SEOConfig }) => {
   const dispatch = useDispatch();
-  const router = useRouter();
   const { loading, category } = useSelector((state) => state.category);
   const { query, route } = router;
   const isLoading = loading.category;

@@ -4,7 +4,7 @@ import TagList from '../../shared/components/TagList';
 import CardList from './CardList';
 
 const AboutWrapper = styled.div`
-  margin: auto;
+  margin: 0 auto;
   width: 90%;
   padding: 10px;
 `;
