@@ -5,10 +5,14 @@ const SEO = ({ config }) => {
     title, description, keywords, author, copyright, imgLink, link,
   } = config;
   return (
-    <div>
+    <>
       <title>{title}</title>
       <meta name="description" content={description} />
-      <link rel="icon" href="/favicon.png" />
+      <link rel="shortcut icon" href="/favicon.png" />
+      <link rel="apple-touch-icon" href="/favicon.png" />
+      <link rel="mask-icon" href="/favicon.png" color="#5bbad5" />
+      {/* <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" /> */}
+      <link data-react-helmet="true" rel="canonical" href={link} />
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
       <meta name="author" content={author} />
@@ -46,7 +50,8 @@ const SEO = ({ config }) => {
       <meta name="twitter:creator" content={author} />
       <meta name="twitter:card" content={imgLink} />
       <meta name="twitter:image:src" content={imgLink} />
-    </div>
+      <meta name="twitter:image:alt" content="daodao logo" />
+    </>
   );
 };
 
