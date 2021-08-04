@@ -3,10 +3,10 @@ import styled from '@emotion/styled';
 
 const Container = styled.main`
   display: flex;
-  justify-content: space-between;
-  margin-left: 100px;
-  margin-top: 40px;
-  /* width: 70vw; */
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  padding-top: 20px;
 `;
 
 const PageContainer = ({ children }) => {

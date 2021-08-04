@@ -1,7 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-// import Image from 'next/image';
 import styled from '@emotion/styled';
 import PageContainer from '../shared/containers/Page';
 import Navigation from '../shared/components/navigation';
@@ -20,8 +19,8 @@ const SEOConfig = {
   keywords: '島島阿學',
   author: '島島阿學',
   copyright: '島島阿學',
-  imgLink: '',
-  link: '',
+  imgLink: '/preview.jpg',
+  link: '/',
 };
 
 const list = [
@@ -92,11 +91,9 @@ const Home = () => {
       </Head>
       <Navigation />
       <PageContainer>
-        <div>
-          <Banner />
-          <p>今晚，要不要來點＿＿的學習資源？ (點進去即可看到各領域的資源)</p>
-          <CardList list={list} />
-        </div>
+        <Banner />
+        <p>今晚，要不要來點＿＿的學習資源？ (點進去即可看到各領域的資源)</p>
+        <CardList list={list} />
       </PageContainer>
       <Footer />
     </BodyWrapper>

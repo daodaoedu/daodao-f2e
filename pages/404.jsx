@@ -1,11 +1,10 @@
 import React from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import styled from '@emotion/styled';
 import PageContainer from '../shared/containers/Page';
 import Navigation from '../shared/components/navigation';
 import Footer from '../shared/components/footer';
 import SEO from '../shared/components/seo';
-import SiderBar from '../components/home/RightSiderBar';
 
 const SEOConfig = {
   title: '島島阿學 - 學習資源平台 - Daodao Online Learning Platform',
@@ -17,28 +16,23 @@ const SEOConfig = {
   link: '',
 };
 
+const BodyWrapper = styled.div`
+  background-color: #f5f5f5;
+`;
+
 const Home = () => {
-  const router = useRouter();
-  console.log('router', router);
   return (
-    <div>
+    <BodyWrapper>
       <Head>
         <SEO config={SEOConfig} />
-        {/* https://resources.daoedu.tw/media/2021/02/118222653_116618533489352_6821261858468995250_o.jpg */}
       </Head>
       <Navigation />
       <PageContainer>
-        <div>
-          這個頁面還在建構唷～
-        </div>
-        <div>
-          <SiderBar />
-        </div>
+        <p>頁面不存在，可以去參觀其他地方喔</p>
+        <p>若有疑問，可聯絡我們</p>
       </PageContainer>
-      <Footer>
-        123
-      </Footer>
-    </div>
+      <Footer />
+    </BodyWrapper>
   );
 };
 

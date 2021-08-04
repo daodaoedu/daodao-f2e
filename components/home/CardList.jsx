@@ -4,8 +4,10 @@ import Card from './Card';
 const CardListWrapper = styled.ul`
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
     li {
         margin: 20px;
     }
