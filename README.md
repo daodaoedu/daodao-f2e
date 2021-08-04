@@ -22,6 +22,7 @@ yarn dev
 <p float="left" margin="10px">
   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nextjs-logo.svg/1200px-Nextjs-logo.svg.png" height="100px"> 
   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" height="100px"> 
+  <img src="https://redux-saga.js.org/img/Redux-Saga-Logo.png" height="100px"> 
   <img src="https://raw.githubusercontent.com/emotion-js/emotion/main/emotion.png" height="100px"> 
   <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png" height="100px"> 
   <img src="https://i.imgur.com/A2XaNqc.png" height="100px"> 
@@ -30,6 +31,7 @@ yarn dev
 ## 主要技術列表
 前端library：React.js  
 前端框架：Next.js  
+狀態管理：Redux-saga
 CSS-in-JS：[emotion](https://emotion.sh/docs/introduction)  
 coding-style：[airbnb-eslint](https://github.com/airbnb/javascript)  
 database：Notion  
@@ -46,8 +48,13 @@ emotion為近年討論度最高的CSS設計解決方案，除了部分撰寫方�
 ### 使用 airbnb-eslint 原因
 透過eslint的強大檢測與縮排功能，開發者不需要再花額外的時間處理縮排與查看瑣碎的小失誤。
 
-### 其他
-目前暫時未使用Redux而選擇使用React原生的Context，也適合剛入門React的團隊夥伴協作開發，若未來有開發上的需求會考慮導入。
+## 開發須知
+1. 進入點：page/_app.jsx
+  - 非必要通常不會動這邊
+2. 路徑即網址：page下的路徑等於網址的路徑
+3. 狀態管理：集中在redux裏面使用action與reducer
+4. 共享元件：有大量共享的元件請放在shared內，如：Nav, Footer
+5. 設計元件：盡可能多用CSS-in-JS設計元件避免影響到其他元件的樣式
 
 ## 參考
 [Next範例](https://github.com/vercel/next.js/tree/canary/examples/api-routes-rest/pages)
