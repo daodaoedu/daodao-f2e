@@ -25,7 +25,7 @@ const initialState = {
     link: '',
   },
   loading: {
-    category: false,
+    category: true,
   },
 };
 
