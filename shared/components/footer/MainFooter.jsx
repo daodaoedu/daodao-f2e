@@ -30,6 +30,36 @@ const BlockWrapper = styled.div`
     justify-content: space-around;
 `;
 
+const aboutDaoConfig = [
+  {
+    name: '關於我們',
+    link: '/',
+  },
+  {
+    name: '體驗問卷',
+    link: '/',
+  },
+];
+
+const aboutResourceConfig = [
+  {
+    name: '找學習資源',
+    link: '/',
+  },
+  {
+    name: '找課程活動',
+    link: '/',
+  },
+  {
+    name: '找學習空間',
+    link: '/',
+  },
+  {
+    name: '加入學習社群',
+    link: '/',
+  },
+];
+
 const SubFooter = () => {
   return (
     <MainFooterWrapper>
@@ -43,11 +73,11 @@ const SubFooter = () => {
         {/* 連結 */}
         <IntroList
           title="關於島島阿學"
-          list={['關於我們', '體驗問卷']}
+          list={aboutDaoConfig}
         />
         <IntroList
           title="找資源"
-          list={['找學習資源', '找課程活動', '找學習空間', '找課程活動', '加入學習社群']}
+          list={aboutResourceConfig}
         />
       </BlockWrapper>
       <BlockWrapper>

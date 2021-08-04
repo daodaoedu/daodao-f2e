@@ -1,6 +1,5 @@
 import React from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 import PageContainer from '../shared/containers/Page';
 import Navigation from '../shared/components/navigation';
@@ -12,16 +11,6 @@ import Banner from '../components/home/Banner';
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
 `;
-
-const SEOConfig = {
-  title: '島島阿學 - 學習資源平台 - Daodao Online Learning Platform',
-  description: '「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-  keywords: '島島阿學',
-  author: '島島阿學',
-  copyright: '島島阿學',
-  imgLink: '/preview.jpg',
-  link: '/',
-};
 
 const list = [
   {
@@ -80,9 +69,7 @@ const list = [
     image: '/assets/images/cat11.jpeg',
   },
 ];
-const Home = () => {
-  const router = useRouter();
-  console.log('router', router);
+const Home = ({ SEOConfig }) => {
   return (
     <BodyWrapper>
       <Head>
