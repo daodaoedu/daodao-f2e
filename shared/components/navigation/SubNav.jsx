@@ -1,17 +1,36 @@
 import styled from '@emotion/styled';
 import Link from 'next/link';
 
-const MainNavWrapper = styled.nav`
+const MainNavWrapper = styled.div`
   height: 60px;
   background-color: #ffffff;
+  color: #222222;
+`;
+
+const TagListWrapper = styled.div`
+  width: 70%;
+  height: 100%;
+  margin: auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-left: 100px;
-  padding-right: 10px;
-  color: #222222;
   overflow-x: scroll;
   overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+  &::-webkit-scrollbar:horizontal {
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: transparentize(#ccc, 0.8);
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: transparentize(#ccc, 0.6);
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.6); 
+  }
 `;
 
 const NavTagWrapper = styled.div`
@@ -25,7 +44,8 @@ const NavTagWrapper = styled.div`
 const SubNav = ({ list }) => {
   return (
     <MainNavWrapper>
-      {
+      <TagListWrapper>
+        {
         list.map((cat) => (
           <Link key={cat.title} href={cat.link}>
             <NavTagWrapper>
@@ -34,6 +54,7 @@ const SubNav = ({ list }) => {
           </Link>
         ))
     }
+      </TagListWrapper>
     </MainNavWrapper>
   );
 };

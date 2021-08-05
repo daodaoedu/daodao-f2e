@@ -44,7 +44,12 @@ q:before, q:after {
 table {
     border-collapse: collapse;
     border-spacing: 0;
-}`;
+}
+a {
+    color: rgba(255,255,255,1);
+    text-decoration: none;
+}
+`;
 
 const GlobalStyle = ({ children }) => {
   return (

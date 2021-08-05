@@ -5,39 +5,24 @@ import SubNav from './SubNav';
 
 const NavigationWrapper = styled.nav`
   white-space: nowrap;
-  /* height: 100px;
-  background-color: #16b9b3;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-left: 100px;
-  padding-right: 10px; */
 `;
 
 // 舊版
 const linkList = [
   {
-    title: '新增資源',
+    title: '找學習資源',
     link: '/',
   },
   {
-    title: '島島學習資源',
+    title: '找學習活動',
     link: '/',
   },
   {
-    title: '島島學習社群',
+    title: '找學習空間',
     link: '/',
   },
   {
-    title: '島島活動消息',
-    link: '/',
-  },
-  {
-    title: '島島教育場域',
-    link: '/',
-  },
-  {
-    title: '關於我們',
+    title: '加入學習社群',
     link: '/',
   },
 ];
