@@ -46,8 +46,9 @@ const LinkListWrapper = styled.ul`
 `;
 
 const MobileLinkListWrapper = styled.ul`
-  /* display: none; */
+  display: none;
   @media (max-width: 767px) {
+    display: block;
     position: relative;
     ul {
       display: none; 
@@ -59,7 +60,7 @@ const MobileLinkListWrapper = styled.ul`
     li {
       flex: none; 
       width: 100%;
-      border-bottom: solid 1px #777;
+      border-bottom: solid 1px white;
     } 
 
     svg[type="menu"]:checked + ul{
