@@ -20,8 +20,9 @@ const App = ({ Component, pageProps }) => {
     author: '島島阿學',
     copyright: '島島阿學',
     imgLink: '/preview.webp',
-    link: `${router.pathname}`,
+    link: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
   }), []);
+  console.log('router ', router);
   return (
     <Provider store={store}>
       <GlobalStyle>
