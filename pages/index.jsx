@@ -1,10 +1,9 @@
 import React from 'react';
-import Head from 'next/head';
 import styled from '@emotion/styled';
 import PageContainer from '../shared/containers/Page';
 import Navigation from '../shared/components/navigation';
 import Footer from '../shared/components/footer';
-import SEO from '../shared/components/seo';
+import Header from '../shared/components/Header';
 import CardList from '../components/home/CardList';
 import Banner from '../components/home/Banner';
 
@@ -72,10 +71,7 @@ const list = [
 const Home = ({ SEOConfig }) => {
   return (
     <BodyWrapper>
-      <Head>
-        <SEO config={SEOConfig} />
-        {/* https://resources.daoedu.tw/media/2021/02/118222653_116618533489352_6821261858468995250_o.jpg */}
-      </Head>
+      <Header config={SEOConfig} />
       <Navigation />
       <PageContainer>
         <Banner />

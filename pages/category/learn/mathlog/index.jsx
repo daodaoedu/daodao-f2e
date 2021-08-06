@@ -1,11 +1,10 @@
 import React, { useEffect, useCallback } from 'react';
-import Head from 'next/head';
 import styled from '@emotion/styled';
 import { useDispatch, useSelector } from 'react-redux';
 import Footer from '../../../../shared/components/footer';
 import PageContainer from '../../../../shared/containers/Page';
 import Navigation from '../../../../shared/components/navigation';
-import SEO from '../../../../shared/components/seo';
+import Header from '../../../../shared/components/Header';
 import About from '../../../../components/category/About';
 import { SEARCH_TAGS, CATEGORY_ID } from '../../../../constants/category';
 import { loadNotionTable } from '../../../../redux/actions/category';
@@ -31,9 +30,7 @@ const MathlogPage = ({ router, SEOConfig }) => {
   }, [query]);
   return (
     <BodyWrapper>
-      <Head>
-        <SEO config={SEOConfig} />
-      </Head>
+      <Header config={SEOConfig} />
       <Navigation />
       <PageContainer>
         <About

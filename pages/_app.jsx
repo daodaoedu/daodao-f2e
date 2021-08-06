@@ -22,7 +22,6 @@ const App = ({ Component, pageProps }) => {
     imgLink: '/preview.webp',
     link: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
   }), []);
-  console.log('router ', router);
   return (
     <Provider store={store}>
       <GlobalStyle>

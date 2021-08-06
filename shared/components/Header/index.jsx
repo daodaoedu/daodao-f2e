@@ -1,11 +1,12 @@
 import React from 'react';
+import Head from 'next/head';
 
 const SEO = ({ config }) => {
   const {
     title, description, keywords, author, copyright, imgLink, link,
   } = config;
   return (
-    <>
+    <Head>
       <title>{title}</title>
       <meta name="description" content={description} />
       <link rel="shortcut icon" href="/favicon.png" />
@@ -51,7 +52,7 @@ const SEO = ({ config }) => {
       <meta name="twitter:card" content={imgLink} />
       <meta name="twitter:image:src" content={imgLink} />
       <meta name="twitter:image:alt" content="daodao logo" />
-    </>
+    </Head>
   );
 };
 

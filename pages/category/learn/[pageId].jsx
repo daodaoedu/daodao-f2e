@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
-import Head from 'next/head';
 import styled from '@emotion/styled';
 import { useDispatch, useSelector } from 'react-redux';
+import Header from '../../../shared/components/Header';
 import Footer from '../../../shared/components/footer';
 import PageContainer from '../../../shared/containers/Page';
 import Navigation from '../../../shared/components/navigation';
-import SEO from '../../../shared/components/seo';
 import { loadNotionPage } from '../../../redux/actions/category';
 import Content from '../../../components/learn/Content';
 
@@ -26,9 +25,7 @@ const LearingPage = ({ router, SEOConfig }) => {
   }, [query]);
   return (
     <BodyWrapper>
-      <Head>
-        <SEO config={SEOConfig} />
-      </Head>
+      <Header config={SEOConfig} />
       <Navigation />
       <PageContainer>
         <Content

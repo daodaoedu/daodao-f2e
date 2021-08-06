@@ -23,7 +23,6 @@ const MenuListWrapper = styled.div`
 `;
 
 const Menu = ({ open, list, handleLinkClick }) => {
-  console.log('open ', open);
   return (
     <MenuWrapper open={open}>
       {

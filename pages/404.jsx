@@ -1,21 +1,18 @@
 import React from 'react';
-import Head from 'next/head';
 import styled from '@emotion/styled';
 import PageContainer from '../shared/containers/Page';
 import Navigation from '../shared/components/navigation';
 import Footer from '../shared/components/footer';
-import SEO from '../shared/components/seo';
+import Header from '../shared/components/Header';
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
 `;
 
-const Home = ({ SEOConfig }) => {
+const NotExistPage = ({ SEOConfig }) => {
   return (
     <BodyWrapper>
-      <Head>
-        <SEO config={SEOConfig} />
-      </Head>
+      <Header config={SEOConfig} />
       <Navigation />
       <PageContainer>
         <p>頁面不存在，可以去參觀其他地方喔</p>
@@ -26,4 +23,4 @@ const Home = ({ SEOConfig }) => {
   );
 };
 
-export default Home;
+export default NotExistPage;
