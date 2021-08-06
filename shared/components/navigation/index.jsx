@@ -7,7 +7,6 @@ const NavigationWrapper = styled.nav`
   white-space: nowrap;
 `;
 
-// 舊版
 const linkList = [
   {
     title: '找學習資源',
