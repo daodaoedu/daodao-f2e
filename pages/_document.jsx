@@ -10,7 +10,7 @@ class MyDocument extends Document {
 
   render() {
     return (
-      <Html>
+      <Html lang="zh-Hant">
         <Head />
         <body>
           <Main />

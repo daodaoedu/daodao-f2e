@@ -12,9 +12,9 @@ const SEO = ({ config }) => {
       <link rel="apple-touch-icon" href="/favicon.png" />
       <link rel="mask-icon" href="/favicon.png" color="#5bbad5" />
       {/* <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" /> */}
-      <link data-react-helmet="true" rel="canonical" href={link} />
+      <link rel="canonical" href={link} />
       <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
+      {/* <meta name="keywords" content={keywords} /> */}
       <meta name="author" content={author} />
       <meta name="copyright" content={copyright} />
       <meta name="thumbnail" content={imgLink} />

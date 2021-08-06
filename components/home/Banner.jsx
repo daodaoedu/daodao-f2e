@@ -12,7 +12,7 @@ const Banner = () => {
               width: 130px; 
               margin-right: 20px;
             `}
-          src="https://resources.daoedu.tw/media/2021/02/640x640.png"
+          src="/connectDao.webp"
           alt=""
         />
         <div className={css`
