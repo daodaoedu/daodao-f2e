@@ -79,7 +79,6 @@ const Home = ({ SEOConfig }) => {
       <Navigation />
       <PageContainer>
         <Banner />
-        <p>今晚，要不要來點＿＿的學習資源？ (點進去即可看到各領域的資源)</p>
         <CardList list={list} />
       </PageContainer>
       <Footer />
