@@ -15,6 +15,13 @@ const MainFooterWrapper = styled.div`
   align-items: flex-start;
   font-size: 16px;
   letter-spacing: 0.08em;
+
+  @media (max-width: 767px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+  }
 `;
 
 const LogoWrapper = styled.div`

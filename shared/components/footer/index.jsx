@@ -5,7 +5,7 @@ import MainFooter from './MainFooter';
 
 const FooterWrapper = styled.footer`
   background-color:#536166;
-  height: 270px;
+  min-height: 270px;
   display: flex;
   flex-direction: column;
   justify-content: center;
