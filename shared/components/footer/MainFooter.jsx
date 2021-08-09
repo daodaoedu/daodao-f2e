@@ -53,31 +53,31 @@ const aboutDaoConfig = [
 const aboutResourceConfig = [
   {
     name: '找學習資源',
-    link: '/',
+    link: 'https://www.facebook.com/groups/2237666046370459',
   },
   {
     name: '找課程活動',
-    link: '/',
+    link: 'https://www.facebook.com/groups/2237666046370459',
   },
   {
     name: '找學習空間',
-    link: '/',
+    link: 'https://www.facebook.com/groups/2237666046370459',
   },
   {
     name: '加入學習社群',
-    link: '/',
+    link: 'https://www.facebook.com/groups/2237666046370459',
   },
 ];
 
 const iconListConfig = [
   {
-    icon: <FaInstagram />,
-    link: '/',
+    icon: <FaInstagram size="16" />,
+    link: 'https://www.instagram.com/daodao_edu/',
     alt: 'instagram',
   },
   {
-    icon: <FaFacebook />,
-    link: '/',
+    icon: <FaFacebook size="16" />,
+    link: 'https://www.facebook.com/daodao.edu',
     alt: 'facebook',
   },
 ];

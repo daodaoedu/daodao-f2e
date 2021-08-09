@@ -29,7 +29,7 @@ const HeaderStyled = styled.h1`
   margin: 10px 0;
 `;
 
-const ContentStyled = styled.p`
+const ContentStyled = styled.div`
   font-size: 20px; 
   font-weight: 300;
   line-height: 30px;
