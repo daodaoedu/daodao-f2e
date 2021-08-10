@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { Provider } from 'react-redux';
 import { useRouter } from 'next/router';
+import { Toaster } from 'react-hot-toast';
 import configureStore from '../utils/configureStore';
 import GlobalStyle from '../shared/styles/Global';
-
 // if (window && window.__REDUX_DEVTOOLS_EXTENSION__) {
 //   window.__REDUX_DEVTOOLS_EXTENSION__();
 // }
@@ -30,6 +30,7 @@ const App = ({ Component, pageProps }) => {
           router={router}
           SEOConfig={SEOConfig}
         />
+        <Toaster />
       </GlobalStyle>
     </Provider>
   );

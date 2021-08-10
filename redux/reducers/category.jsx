@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { getUrlFromCategory } from '../../utils/category';
 
 const initialState = {
@@ -43,6 +44,7 @@ const reducer = (state = initialState, action) => {
       };
     }
     case 'LOAD_NOTION_TABLE': {
+      // toast.success('讀取資料成功');
       const { results } = action.payload;
       const category = results.map((object) => ({
         id: object.id,
@@ -80,6 +82,7 @@ const reducer = (state = initialState, action) => {
       };
     }
     case 'LOAD_NOTION_TABLE_FAILURE': {
+      toast.error('資料異常，如有問題請洽聯絡資訊');
       return {
         ...state,
         loading: {
