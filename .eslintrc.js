@@ -18,7 +18,6 @@ module.exports = {
     'react',
   ],
   rules: {
-    'linebreak-style': ['error', 'windows'],
     'react/prop-types': [0],
     'react/jsx-props-no-spreading': [0],
     'arrow-body-style': 0,
