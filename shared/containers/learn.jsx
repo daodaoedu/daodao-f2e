@@ -1,13 +1,13 @@
 import React, { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import BodyWrapper from "../../../../shared/styles/PageBody";
-import Footer from "../../../../shared/components/footer";
-import PageContainer from "../../../../shared/containers/Page";
-import Navigation from "../../../../shared/components/navigation";
-import About from "../../../../components/category/About";
-import { SEARCH_TAGS, CATEGORY_ID } from "../../../../constants/category";
-import Header from "../../../../shared/components/Header";
-import { loadNotionTable } from "../../../../redux/actions/category";
+import BodyWrapper from "../styles/PageBody";
+import Footer from "../components/footer";
+import PageContainer from "./Page";
+import Navigation from "../components/navigation";
+import About from "../../components/category/About";
+import { SEARCH_TAGS, CATEGORY_ID } from "../../constants/category";
+import Header from "../components/Header";
+import { loadNotionTable } from "../../redux/actions/category";
 
 const HumPage = ({ router, SEOConfig }) => {
   const dispatch = useDispatch();
