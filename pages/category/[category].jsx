@@ -5,7 +5,7 @@ import Footer from "../../shared/components/footer";
 import PageContainer from "../../shared/containers/Page";
 import Navigation from "../../shared/components/navigation";
 import About from "../../components/category/About";
-import { SEARCH_TAGS, CATEGORY_ID } from "../../constants/category";
+import { CATEGORY_ID } from "../../constants/category";
 import { loadNotionTable } from "../../redux/actions/category";
 import Header from "../../shared/components/Header";
 
@@ -41,7 +41,7 @@ const SearchPage = ({ router, SEOConfig }) => {
       <Navigation />
       <PageContainer>
         <About
-          tagList={SEARCH_TAGS[currentCategory]}
+          categoryType={currentCategory}
           cardList={category}
           isLoading={isLoading}
           length={category.length}

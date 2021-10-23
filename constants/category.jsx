@@ -26,6 +26,20 @@ export const CATEGORY_ID = {
   multires: "0d1bbefdc8e94bb09c96eabe239834a8",
 };
 
+export const CATEGORY_NAME = {
+  language: "語言與文學",
+  math: "數學與邏輯",
+  comsci: "電腦科學",
+  natusci: "自然科學",
+  humanity: "人文社會",
+  art: "藝術",
+  education: "教育",
+  life: "生活",
+  health: "運動/心理/醫學",
+  business: "商業與社會創新",
+  multires: "綜合型學習資源",
+};
+
 export const CATEGORY_LINK = [
   {
     title: "語言與文學",

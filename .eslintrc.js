@@ -25,5 +25,6 @@ module.exports = {
     "import/prefer-default-export": 0,
     quotes: 0,
     "comma-dangle": 0,
+    "object-curly-newline": 0,
   },
 };
