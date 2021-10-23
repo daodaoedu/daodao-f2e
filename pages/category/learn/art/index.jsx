@@ -1,13 +1,13 @@
-import React, { useEffect, useCallback } from 'react';
-import styled from '@emotion/styled';
-import { useDispatch, useSelector } from 'react-redux';
-import Footer from '../../../../shared/components/footer';
-import PageContainer from '../../../../shared/containers/Page';
-import Navigation from '../../../../shared/components/navigation';
-import About from '../../../../components/category/About';
-import { SEARCH_TAGS, CATEGORY_ID } from '../../../../constants/category';
-import { loadNotionTable } from '../../../../redux/actions/category';
-import Header from '../../../../shared/components/Header';
+import React, { useEffect, useCallback } from "react";
+import styled from "@emotion/styled";
+import { useDispatch, useSelector } from "react-redux";
+import Footer from "../../../../shared/components/footer";
+import PageContainer from "../../../../shared/containers/Page";
+import Navigation from "../../../../shared/components/navigation";
+import About from "../../../../components/category/About";
+import { SEARCH_TAGS, CATEGORY_ID } from "../../../../constants/category";
+import { loadNotionTable } from "../../../../redux/actions/category";
+import Header from "../../../../shared/components/Header";
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
@@ -19,10 +19,13 @@ const HumPage = ({ router, SEOConfig }) => {
   const { query, route } = router;
   const isLoading = loading?.category;
 
-  const onSearch = useCallback((name) => {
-    const queryString = name ? `?tags=${name}` : '';
-    router.push(`${route}${queryString}`);
-  }, [query]);
+  const onSearch = useCallback(
+    (name) => {
+      const queryString = name ? `?tags=${name}` : "";
+      router.push(`${route}${queryString}`);
+    },
+    [query]
+  );
 
   useEffect(() => {
     if (router.isReady) {
