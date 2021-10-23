@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useMemo } from "react";
 import styled from "@emotion/styled";
 import { useDispatch, useSelector } from "react-redux";
 import Footer from "../../shared/components/footer";
@@ -19,6 +19,8 @@ const SearchPage = ({ router, SEOConfig }) => {
   const { query, route } = router;
   const isLoading = loading?.category;
 
+  const currentCategory = useMemo(() => query.category, [query]);
+
   const onSearch = useCallback(
     (name) => {
       const queryString = name ? `?tags=${name}` : "";
@@ -29,8 +31,7 @@ const SearchPage = ({ router, SEOConfig }) => {
 
   useEffect(() => {
     if (router.isReady) {
-      const currentCat = query.categoryId;
-      dispatch(loadNotionTable(CATEGORY_ID[currentCat], query));
+      dispatch(loadNotionTable(CATEGORY_ID[currentCategory], query));
     }
   }, [query]);
 
@@ -40,7 +41,7 @@ const SearchPage = ({ router, SEOConfig }) => {
       <Navigation />
       <PageContainer>
         <About
-          tagList={SEARCH_TAGS.art}
+          tagList={SEARCH_TAGS[currentCategory]}
           cardList={category}
           isLoading={isLoading}
           length={category.length}
