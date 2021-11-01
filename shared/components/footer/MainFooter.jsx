@@ -5,6 +5,7 @@ import {
 } from 'react-icons/fa';
 import IntroList from './IntroList';
 import IconList from './IconList';
+import { NAV_LINK } from '../../../constants/category';
 
 const MainFooterWrapper = styled.div`
   height: 100%;
@@ -50,25 +51,6 @@ const aboutDaoConfig = [
   },
 ];
 
-const aboutResourceConfig = [
-  {
-    name: '找學習資源',
-    link: 'https://www.facebook.com/groups/2237666046370459',
-  },
-  {
-    name: '找課程活動',
-    link: 'https://www.facebook.com/groups/2237666046370459',
-  },
-  {
-    name: '找學習空間',
-    link: 'https://www.facebook.com/groups/2237666046370459',
-  },
-  {
-    name: '加入學習社群',
-    link: 'https://www.facebook.com/groups/2237666046370459',
-  },
-];
-
 const iconListConfig = [
   {
     icon: <FaInstagram size="16" />,
@@ -99,7 +81,7 @@ const SubFooter = () => {
         />
         <IntroList
           title="找資源"
-          list={aboutResourceConfig}
+          list={NAV_LINK}
         />
       </BlockWrapper>
       <BlockWrapper>

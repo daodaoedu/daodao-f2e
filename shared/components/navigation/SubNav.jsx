@@ -12,7 +12,7 @@ const TagListWrapper = styled.div`
   height: 100%;
   margin: auto;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   overflow-x: scroll;
   overflow-y: hidden;

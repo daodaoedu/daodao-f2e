@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import Link from 'next/link';
 
 const IntroListWrapper = styled.div`
   margin: 0 10px;
@@ -20,17 +19,17 @@ const IntroListWrapper = styled.div`
   }
 `;
 
-const IntroList = ({ title, list }) => {
+const IntroList = ({ name, list }) => {
   return (
     <IntroListWrapper>
-      <h2>{title}</h2>
+      <h2>{name}</h2>
       <ul>
         {list.map((value) => (
-          <Link key={value.name} href={value.link}>
+          <a key={value.name} href={value.link} target="_blank" rel="noopener noreferrer">
             <li>
               {value.name}
             </li>
-          </Link>
+          </a>
         ))}
       </ul>
     </IntroListWrapper>

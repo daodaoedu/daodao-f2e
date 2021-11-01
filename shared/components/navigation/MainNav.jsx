@@ -1,5 +1,4 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-import { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import styled from '@emotion/styled';
 import Link from 'next/link';
 import MenuButton from './MenuButton';
@@ -12,7 +11,8 @@ const MainNavWrapper = styled.div`
 `;
 
 const FixWrapper = styled.div`
-  width: 80%;
+  /* width: 80%; */
+  max-width: 1200px;
   height: 100%;
   margin: auto;
   display: flex;
@@ -28,17 +28,19 @@ const LogoWrapper = styled.div`
   cursor: pointer;
   z-index: 100;
   & > img {
-    width: 100px;
+    height: 50px;
   }
 `;
 
 const LinkListWrapper = styled.ul`
   display: flex;
   justify-content: space-around;
+  align-items: center;
   position: relative;
   /* max-width: 500px; */
   li {
     margin: 10px 15px;
+    cursor: pointer;
   }
   @media (max-width: 767px) {
     display: none;
@@ -80,8 +82,24 @@ const MobileLinkListWrapper = styled.ul`
   }
 `;
 
-const AddResourceWrapper = styled.p`
+const UserStatusWrapper = styled.div`
     color: rgba(255,255,255,0.7);
+    .login, .logout {
+      cursor: pointer;
+    }
+    .icon {
+      width: 32px;
+      border-radius: 50%;
+    }
+
+    .coin-field {
+      display: flex;
+      align-items: center;
+      span {
+        margin: 10px;
+      }
+    }
+
     @media (max-width: 767px) {
       display: none;
     }
@@ -93,28 +111,67 @@ const GroupWrapper = styled.div`
   align-items: center;
 `;
 
-const MainNav = ({ linkList }) => {
+const MainNav = ({
+  linkList, onLogin, onLogout// , userData,
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // const avatar = useMemo(() => userData.avatar, [userData]);
+  // const isUserLogin = useMemo(() => userData.googleId, [userData]);
+  const avatar = '';
+  const isUserLogin = false;
   return (
     <MainNavWrapper>
       <FixWrapper>
         <GroupWrapper>
           <Link href="/">
             <LogoWrapper>
-              <img src="/logo.png" alt="daodao" />
+              <img src="/logo.png" alt="logo" />
             </LogoWrapper>
           </Link>
           <LinkListWrapper>
-            {linkList.map((link) => <li key={link.title}><Link href={link.link}>{link.title}</Link></li>)}
+            {linkList.map(({ name, link }) => <li key={name}><a href={link} target="_blank" rel="noopener noreferrer">{name}</a></li>)}
           </LinkListWrapper>
         </GroupWrapper>
         <GroupWrapper>
-          <AddResourceWrapper>
-            <Link href="/">新增資源</Link>
-          </AddResourceWrapper>
+          <UserStatusWrapper>
+            <LinkListWrapper>
+              <li>
+                <p className="login" role="presentation">新增資源</p>
+              </li>
+            </LinkListWrapper>
+            {/* {
+              isUserLogin
+                ? (
+                  <LinkListWrapper>
+                    <li>
+                      <p className="logout" onClick={onLogout} onKeyPress={onLogout} role="presentation">登出</p>
+                    </li>
+                    <li>
+                      <img className="icon" src={avatar} alt="avatar" />
+                    </li>
+                    <li className="coin-field">
+                      <img className="icon" src="/coin.png" alt="coin" />
+                      <span>0</span>
+                    </li>
+                  </LinkListWrapper>
+                )
+                : (
+                  <LinkListWrapper>
+                    <li>
+                      <p className="login" onClick={onLogin} onKeyPress={onLogin} role="presentation">登入</p>
+                    </li>
+                  </LinkListWrapper>
+                )
+            } */}
+          </UserStatusWrapper>
           <MobileLinkListWrapper>
             <MenuList
+              isUserLogin={isUserLogin}
+              // onLogin={onLogin}
+              // onLogout={onLogout}
+              avatar={avatar}
               open={isMenuOpen}
+              onClick={() => setIsMenuOpen(false)}
               list={linkList}
             />
             <MenuButton

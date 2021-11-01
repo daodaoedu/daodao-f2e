@@ -15,9 +15,8 @@ const BodyWrapper = styled.div`
 
 const SearchPage = ({ router, SEOConfig }) => {
   const dispatch = useDispatch();
-  const { loading, category } = useSelector((state) => state.category);
+  const { isLoading, category } = useSelector((state) => state.category);
   const { query, route } = router;
-  const isLoading = loading?.category;
 
   const currentCategory = useMemo(() => query.category, [query]);
 
@@ -44,7 +43,6 @@ const SearchPage = ({ router, SEOConfig }) => {
           categoryType={currentCategory}
           cardList={category}
           isLoading={isLoading}
-          length={category.length}
           onSearch={onSearch}
         />
       </PageContainer>

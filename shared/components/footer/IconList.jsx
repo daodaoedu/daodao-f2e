@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import Link from 'next/link';
 
 const IconListWrapper = styled.div`
     h2 {
@@ -22,7 +21,7 @@ const SubFooter = ({ title, list }) => {
     <IconListWrapper>
       <h2>{title}</h2>
       <ul>
-        {list.map((value) => <Link key={value.alt} href={value.link}><li>{value.icon}</li></Link>)}
+        {list.map((value) => <a key={value.alt} href={value.link} target="_blank" rel="noopener noreferrer"><li>{value.icon}</li></a>)}
       </ul>
     </IconListWrapper>
   );

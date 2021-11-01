@@ -63,9 +63,11 @@ const LineStyle = styled.div`
     `}
 `;
 
-const MenuItem = ({ delay, text, link }) => {
+const MenuItem = ({
+  delay, text, link, onClick,
+}) => {
   return (
-    <MenuItemWrapper delay={delay}>
+    <MenuItemWrapper delay={delay} onClick={onClick}>
       <Link href={link}>
         <ItemWrapper delay={delay}>
           {text}

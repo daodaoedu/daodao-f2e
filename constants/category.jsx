@@ -100,19 +100,19 @@ export const CATEGORY_LINK = [
 
 export const NAV_LINK = [
   {
-    title: "找學習資源",
-    link: "/",
+    name: '找學習資源',
+    link: 'https://www.facebook.com/groups/2237666046370459',
   },
   {
-    title: "找學習活動",
-    link: "/",
+    name: '找課程活動',
+    link: 'https://www.facebook.com/groups/2237666046370459',
   },
   {
-    title: "找學習空間",
-    link: "/",
+    name: '找學習空間',
+    link: 'https://www.facebook.com/groups/2237666046370459',
   },
   {
-    title: "加入學習社群",
-    link: "/",
+    name: '加入學習社群',
+    link: 'https://www.facebook.com/groups/2237666046370459',
   },
 ];
