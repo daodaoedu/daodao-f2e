@@ -1,6 +1,6 @@
 # Daodao前台
 
-## 如何啟動
+## 如何在local測試(SSR/ISR)
 1. 安裝相依套件
 
 ```bash
@@ -17,6 +17,27 @@ yarn dev
 
 基本上會自動打開，沒有的話可自行前往 [http://localhost:5000](http://localhost:5000)
 預設的port是5000，當然你也可以修改指令使用其他port
+
+## 如何在local測試靜態檔(SSG)
+
+1. 打包指令
+組合技包含打包與輸出，會放在out裡面
+
+```bash
+yarn build
+```
+
+2. 執行靜態檔
+
+```bash
+serve out
+```
+
+如果還沒安裝serve，請先安裝：
+
+```bash
+npm install -g serve
+```
 
 ## 開發技術
 <p float="left" margin="10px">
