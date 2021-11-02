@@ -6,6 +6,7 @@ const IntroListWrapper = styled.div`
   
   h2 {
       margin-bottom: 10px;
+      
   }
   ul {
       display: flex;
@@ -14,15 +15,15 @@ const IntroListWrapper = styled.div`
   }
   li {
     cursor: pointer;
-    margin: 8px;
+    margin: 8px auto;
     font-size: 14px;
   }
 `;
 
-const IntroList = ({ name, list }) => {
+const IntroList = ({ title, list }) => {
   return (
     <IntroListWrapper>
-      <h2>{name}</h2>
+      <h2>{title}</h2>
       <ul>
         {list.map((value) => (
           <a key={value.name} href={value.link} target="_blank" rel="noopener noreferrer">

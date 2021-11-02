@@ -19,6 +19,7 @@ const FixWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   @media (max-width: 767px) {
+    width: 80%;
     /* flex-direction: column; */
   }
 `;
