@@ -27,7 +27,6 @@ const About = ({ categoryType, cardList, isLoading, onSearch }) => {
     () => CATEGORY_NAME[categoryType],
     [categoryType]
   );
-  console.log("tagList ", tagList);
   return (
     <AboutWrapper>
       <MainAboutWrapper>

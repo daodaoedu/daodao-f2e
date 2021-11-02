@@ -21,13 +21,12 @@ const App = ({ Component, pageProps }) => {
     copyright: '島島阿學',
     imgLink: '/preview.webp',
     link: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
-  }), []);
+  }), [router]);
   return (
     <Provider store={store}>
       <GlobalStyle>
         <Component
           {...pageProps}
-          router={router}
           SEOConfig={SEOConfig}
         />
         <Toaster />

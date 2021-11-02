@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 
 const TagWrapper = styled.div`
@@ -18,12 +19,24 @@ const TagWrapper = styled.div`
     background-color: #16b9b3;
     white-space: nowrap;
 `;
-const Tags = ({ name, onSearch }) => {
+const Tag = ({ name }) => {
+  const router = useRouter();
+  const onSearch = useCallback(
+    () => {
+      router.push({
+        query: {
+          ...router.query,
+          tags: name,
+        }
+      });
+    },
+    [router.query, name]
+  );
   return (
-    <TagWrapper onClick={() => onSearch(name)}>
+    <TagWrapper onClick={onSearch}>
       {name}
     </TagWrapper>
   );
 };
 
-export default Tags;
+export default Tag;
