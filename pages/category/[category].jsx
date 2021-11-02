@@ -6,13 +6,27 @@ import Footer from "../../shared/components/footer";
 import PageContainer from "../../shared/containers/Page";
 import Navigation from "../../shared/components/navigation";
 import About from "../../components/category/About";
-import { CATEGORY_ID } from "../../constants/category";
+import { CATEGORY_ID, CATEGORY_NAME } from "../../constants/category";
 import { loadNotionTable } from "../../redux/actions/category";
 import Header from "../../shared/components/Header";
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
 `;
+
+export const getStaticPaths = async () => {
+  const paths = Object.keys(CATEGORY_NAME).map((name) => ({ params: { category: name } }));
+  return {
+    paths,
+    fallback: false,
+  };
+};
+
+export async function getStaticProps() {
+  return {
+    props: {},
+  };
+}
 
 const SearchPage = () => {
   const router = useRouter();
