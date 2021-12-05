@@ -2,13 +2,13 @@ import React, { useEffect, useMemo } from "react";
 import styled from "@emotion/styled";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from 'next/router';
-import Footer from "../../shared/components/footer";
+import Footer from "../../shared/components/Footer";
 import PageContainer from "../../shared/containers/Page";
-import Navigation from "../../shared/components/navigation";
+import Navigation from "../../shared/components/Navigation";
 import About from "../../components/category/About";
 import { CATEGORY_ID, CATEGORY_NAME } from "../../constants/category";
 import { loadNotionTable } from "../../redux/actions/category";
-import Header from "../../shared/components/Header";
+import SEOConfig from "../../shared/components/SEO";
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
@@ -39,7 +39,7 @@ const SearchPage = () => {
     }
   }, [router.query]);
 
-  const SEOConfig = useMemo(() => ({
+  const SEOData = useMemo(() => ({
     title: '島島阿學 - 學習資源平台 - Daodao Online Learning Platform',
     description: '「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
     keywords: '島島阿學',
@@ -51,7 +51,7 @@ const SearchPage = () => {
 
   return (
     <BodyWrapper>
-      <Header config={SEOConfig} />
+      <SEOConfig config={SEOData} />
       <Navigation />
       <PageContainer>
         <About

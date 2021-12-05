@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import Link from 'next/link';
 import MenuButton from './MenuButton';
 import MenuList from './MenuList';
-// import { GiHamburgerMenu } from 'react-icons/gi';
+import { NAV_LINK } from "../../../../constants/category";
 
 const MainNavWrapper = styled.div`
   height: 80px;
@@ -112,9 +112,7 @@ const GroupWrapper = styled.div`
   align-items: center;
 `;
 
-const MainNav = ({
-  linkList, onLogin, onLogout// , userData,
-}) => {
+const MainNav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // const avatar = useMemo(() => userData.avatar, [userData]);
   // const isUserLogin = useMemo(() => userData.googleId, [userData]);
@@ -130,7 +128,7 @@ const MainNav = ({
             </LogoWrapper>
           </Link>
           <LinkListWrapper>
-            {linkList.map(({ name, link }) => <li key={name}><a href={link} target="_blank" rel="noopener noreferrer">{name}</a></li>)}
+            {NAV_LINK.map(({ name, link }) => <li key={name}><a href={link} target="_blank" rel="noopener noreferrer">{name}</a></li>)}
           </LinkListWrapper>
         </GroupWrapper>
         <GroupWrapper>
@@ -140,40 +138,14 @@ const MainNav = ({
                 <p className="login" role="presentation">新增資源</p>
               </li>
             </LinkListWrapper>
-            {/* {
-              isUserLogin
-                ? (
-                  <LinkListWrapper>
-                    <li>
-                      <p className="logout" onClick={onLogout} onKeyPress={onLogout} role="presentation">登出</p>
-                    </li>
-                    <li>
-                      <img className="icon" src={avatar} alt="avatar" />
-                    </li>
-                    <li className="coin-field">
-                      <img className="icon" src="/coin.png" alt="coin" />
-                      <span>0</span>
-                    </li>
-                  </LinkListWrapper>
-                )
-                : (
-                  <LinkListWrapper>
-                    <li>
-                      <p className="login" onClick={onLogin} onKeyPress={onLogin} role="presentation">登入</p>
-                    </li>
-                  </LinkListWrapper>
-                )
-            } */}
           </UserStatusWrapper>
           <MobileLinkListWrapper>
             <MenuList
               isUserLogin={isUserLogin}
-              // onLogin={onLogin}
-              // onLogout={onLogout}
               avatar={avatar}
               open={isMenuOpen}
               onClick={() => setIsMenuOpen(false)}
-              list={linkList}
+              list={NAV_LINK}
             />
             <MenuButton
               open={isMenuOpen}

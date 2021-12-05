@@ -1,10 +1,10 @@
 import React from 'react';
 import Head from 'next/head';
 
-const SEO = ({ config }) => {
+const SEO = ({ data }) => {
   const {
     title, description, keywords, author, copyright, imgLink, link,
-  } = config;
+  } = data;
   return (
     <Head>
       <title>{title}</title>
