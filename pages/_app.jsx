@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast';
 import configureStore from '../utils/configureStore';
 import GlobalStyle from '../shared/styles/Global';
 import theme from "../shared/styles/theme";
+import Navigation from '../shared/components/Navigation';
 
 const store = configureStore();
 
@@ -17,6 +18,7 @@ const App = ({ Component, pageProps }) => {
         <GlobalStyle>
           {/* mui normalize css */}
           <CssBaseline />
+          <Navigation />
           <Component {...pageProps} />
           <Toaster />
         </GlobalStyle>

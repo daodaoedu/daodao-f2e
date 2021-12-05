@@ -1,13 +1,10 @@
 import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from 'next/router';
-import PageContainer from "../shared/containers/Page";
-import Navigation from "../shared/components/Navigation";
 import Footer from "../shared/components/Footer";
 import SEOConfig from "../shared/components/SEO";
-import CardList from "../components/home/CardList";
-import Banner from "../components/home/Banner";
-import { CATEGORY_LINK } from "../constants/category";
+import Banner from "../components/Home/Banner";
+import BannerVideo from '../shared/components/BannerVideo';
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
@@ -27,11 +24,11 @@ const Home = () => {
   return (
     <BodyWrapper>
       <SEOConfig data={SEOData} />
-      <Navigation />
-      <PageContainer>
-        <Banner />
-        <CardList list={CATEGORY_LINK} />
-      </PageContainer>
+      {/* <PageContainer> */}
+      <BannerVideo />
+      <Banner />
+      {/* <CardList list={CATEGORY_LINK} /> */}
+      {/* </PageContainer> */}
       <Footer />
     </BodyWrapper>
   );

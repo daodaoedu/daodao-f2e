@@ -1,16 +1,25 @@
 import React from "react";
 import styled from "@emotion/styled";
+import { AppBar } from "@material-ui/core";
 import MainNav from "./MainNav";
-import { NAV_LINK } from "../../../constants/category";
 
-const NavigationWrapper = styled.nav`
-  white-space: nowrap;
+const NavigationWrapper = styled(AppBar)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
 `;
+
+// const ToolbarWrapper = styled(Toolbar)`
+//   margin: 0 auto;
+// `;
 
 const Navigation = () => {
   return (
-    <NavigationWrapper>
-      <MainNav linkList={NAV_LINK} />
+    <NavigationWrapper position="sticky">
+      {/* <Toolbar> */}
+      <MainNav />
+      {/* </Toolbar> */}
     </NavigationWrapper>
   );
 };

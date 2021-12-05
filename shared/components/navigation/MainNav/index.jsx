@@ -1,160 +1,43 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
-import Link from 'next/link';
-import MenuButton from './MenuButton';
-import MenuList from './MenuList';
-import { NAV_LINK } from "../../../../constants/category";
+import { Toolbar } from "@material-ui/core";
+import Box from "@mui/material/Box";
+import Hamberger from './Hamberger';
+import List from './List';
+import SubList from './SubList';
+import Logo from './Logo';
 
-const MainNavWrapper = styled.div`
+const MainNavWrapper = styled(Toolbar)`
+  max-width: 1200px;
+  width: 100%;
   height: 80px;
-  background-color: #16b9b3;
+  background-color: black;
 `;
 
-const FixWrapper = styled.div`
-  /* width: 80%; */
-  max-width: 1200px;
-  height: 100%;
-  margin: auto;
+const BoxWrapper = styled(Box)`
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin: auto;
   @media (max-width: 767px) {
     width: 80%;
     /* flex-direction: column; */
   }
 `;
 
-const LogoWrapper = styled.div`
-  margin: 0 15px;
-  cursor: pointer;
-  z-index: 100;
-  & > img {
-    height: 50px;
-  }
-`;
-
-const LinkListWrapper = styled.ul`
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  position: relative;
-  /* max-width: 500px; */
-  li {
-    margin: 10px 15px;
-    cursor: pointer;
-  }
-  @media (max-width: 767px) {
-    display: none;
-  }
-`;
-
-const MobileLinkListWrapper = styled.ul`
-  display: none;
-  @media (max-width: 767px) {
-    display: block;
-    position: relative;
-    ul {
-      display: none; 
-      box-shadow: 0 0 5px rgba(0,0,0, .7); 
-      position: absolute; 
-      top:0;
-    }
-
-    li {
-      flex: none; 
-      width: 100%;
-      border-bottom: solid 1px white;
-    } 
-
-    svg[type="menu"]:checked + ul{
-      display: block;
-      width: 100%;
-      background: #999;          
-    }
-
-    label {
-      display: block;
-    }  
-
-    svg[type="menu"]:checked + ul li:nth-child(1){
-      background: #777; 
-      color: #fff;
-    }  
-  }
-`;
-
-const UserStatusWrapper = styled.div`
-    color: rgba(255,255,255,0.7);
-    .login, .logout {
-      cursor: pointer;
-    }
-    .icon {
-      width: 32px;
-      border-radius: 50%;
-    }
-
-    .coin-field {
-      display: flex;
-      align-items: center;
-      span {
-        margin: 10px;
-      }
-    }
-
-    @media (max-width: 767px) {
-      display: none;
-    }
-`;
-
-const GroupWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
 const MainNav = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // const avatar = useMemo(() => userData.avatar, [userData]);
-  // const isUserLogin = useMemo(() => userData.googleId, [userData]);
-  const avatar = '';
-  const isUserLogin = false;
   return (
     <MainNavWrapper>
-      <FixWrapper>
-        <GroupWrapper>
-          <Link href="/">
-            <LogoWrapper>
-              <img src="/logo.png" alt="logo" />
-            </LogoWrapper>
-          </Link>
-          <LinkListWrapper>
-            {NAV_LINK.map(({ name, link }) => <li key={name}><a href={link} target="_blank" rel="noopener noreferrer">{name}</a></li>)}
-          </LinkListWrapper>
-        </GroupWrapper>
-        <GroupWrapper>
-          <UserStatusWrapper>
-            <LinkListWrapper>
-              <li>
-                <p className="login" role="presentation">新增資源</p>
-              </li>
-            </LinkListWrapper>
-          </UserStatusWrapper>
-          <MobileLinkListWrapper>
-            <MenuList
-              isUserLogin={isUserLogin}
-              avatar={avatar}
-              open={isMenuOpen}
-              onClick={() => setIsMenuOpen(false)}
-              list={NAV_LINK}
-            />
-            <MenuButton
-              open={isMenuOpen}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              color="white"
-            />
-          </MobileLinkListWrapper>
-        </GroupWrapper>
-      </FixWrapper>
+      <BoxWrapper sx={{ display: "flex", justifyContent: "flex-start" }}>
+        <Logo />
+        {/* main list */}
+        <List />
+        {/* right list */}
+        <SubList />
+        {/* mobile only */}
+        <Hamberger />
+      </BoxWrapper>
     </MainNavWrapper>
   );
 };

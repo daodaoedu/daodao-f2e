@@ -105,15 +105,15 @@ export const NAV_LINK = [
     link: 'https://www.facebook.com/groups/2237666046370459',
   },
   {
-    name: '找課程活動',
-    link: 'https://www.facebook.com/groups/2237666046370459',
-  },
-  {
-    name: '找學習空間',
+    name: '找學習活動',
     link: 'https://www.facebook.com/groups/2237666046370459',
   },
   {
     name: '加入學習社群',
     link: 'https://www.facebook.com/groups/2237666046370459',
   },
+  // {
+  //   name: '找學習空間',
+  //   link: 'https://www.facebook.com/groups/2237666046370459',
+  // },
 ];
