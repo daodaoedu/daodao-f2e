@@ -8,6 +8,7 @@ const NavigationWrapper = styled(AppBar)`
   justify-content: center;
   align-items: center;
   background-color: black;
+  height: 80px;
 `;
 
 // const ToolbarWrapper = styled(Toolbar)`

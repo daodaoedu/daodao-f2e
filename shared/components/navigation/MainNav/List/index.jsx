@@ -8,7 +8,7 @@ const LinkListWrapper = styled.ul`
   align-items: center;
   position: relative;
   li {
-    margin: 10px 20px;
+    margin: 0 20px;
     cursor: pointer;
   }
   @media (max-width: 767px) {

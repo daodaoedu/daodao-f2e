@@ -10,7 +10,6 @@ import Logo from './Logo';
 const MainNavWrapper = styled(Toolbar)`
   max-width: 1200px;
   width: 100%;
-  height: 80px;
   background-color: black;
 `;
 
@@ -21,7 +20,7 @@ const BoxWrapper = styled(Box)`
   align-items: center;
   margin: auto;
   @media (max-width: 767px) {
-    width: 80%;
+    width: 90%;
     /* flex-direction: column; */
   }
 `;
