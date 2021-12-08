@@ -2,6 +2,7 @@ import React from 'react';
 import { Global, css } from '@emotion/react';
 
 const ResetCSS = css`
+background-color: #f5f5f5;
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
