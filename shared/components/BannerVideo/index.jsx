@@ -8,6 +8,7 @@ const BannerVideoWrapper = styled.div`
   overflow: hidden;
   
   video {
+    position: absolute;
     object-fit: cover;
     width:100%;
     height:100%;

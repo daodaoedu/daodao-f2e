@@ -7,6 +7,7 @@ import configureStore from '../utils/configureStore';
 import GlobalStyle from '../shared/styles/Global';
 import theme from "../shared/styles/theme";
 import Navigation from '../shared/components/Navigation';
+import Footer from '../shared/components/Footer';
 
 const store = configureStore();
 
@@ -18,9 +19,10 @@ const App = ({ Component, pageProps }) => {
         <GlobalStyle>
           {/* mui normalize css */}
           <CssBaseline />
+          <Toaster />
           <Navigation />
           <Component {...pageProps} />
-          <Toaster />
+          <Footer />
         </GlobalStyle>
       </Provider>
     </ThemeProvider>

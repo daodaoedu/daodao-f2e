@@ -2,14 +2,14 @@ import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from 'next/router';
 // import { SWRConfig } from "swr";
-import Footer from "../shared/components/Footer";
 import SEOConfig from "../shared/components/SEO";
 import Banner from "../components/Home/Banner";
+import Guide from "../components/Home/Guide";
 import BannerVideo from '../shared/components/BannerVideo';
 // import logger from "../utils/logger";
 
 const BodyWrapper = styled.div`
-  background-color: #f5f5f5;
+  max-width: 1200px;
 `;
 
 const Home = () => {
@@ -28,7 +28,7 @@ const Home = () => {
       <SEOConfig data={SEOData} />
       <BannerVideo />
       <Banner />
-      <Footer />
+      <Guide />
     </BodyWrapper>
   );
 };
