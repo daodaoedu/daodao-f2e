@@ -7,6 +7,14 @@ const TagsWrapper = styled.ul`
   align-items: center;
   li {
     margin: auto 10px;
+    background-color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    
+    a {
+      color: #222222;
+      font-weight: 500;
+    }
   }
 `;
 const MOCK_TAGS = [{
@@ -26,8 +34,6 @@ const SearchField = () => (
       <li key={id}>
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a href="#">
-          #
-          {' '}
           {text}
         </a>
       </li>

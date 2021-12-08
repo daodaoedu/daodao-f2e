@@ -15,7 +15,7 @@ const SearchFieldWrapper = styled.div`
 const TrendingWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
-  margin-top: 10px;
+  margin-top: 20px;
 `;
 
 const SearchField = () => (

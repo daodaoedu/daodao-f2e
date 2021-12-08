@@ -42,7 +42,7 @@ const SearchInput = () => {
     >
       <InputBase
         sx={{ ml: 1, flex: 1 }}
-        placeholder="Search"
+        placeholder="今晚，要不要來點＿＿的學習資源？"
         inputProps={{ "aria-label": "search google maps" }}
         onChange={(event) => setWord(event.target.value)}
         style={{ color: 'white', fontWeight: '500', paddingLeft: '30px' }}
