@@ -3,8 +3,8 @@ import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 // import { SWRConfig } from "swr";
 import SEOConfig from "../shared/components/SEO";
-import Banner from "../components/Home/Banner";
-import Guide from "../components/Home/Guide";
+import Banner from "../components/home/Banner";
+import Guide from "../components/home/Guide";
 import BannerVideo from "../shared/components/BannerVideo";
 // import logger from "../utils/logger";
 
@@ -12,6 +12,7 @@ const BodyWrapper = styled.div``;
 
 const Home = () => {
   const router = useRouter();
+  const guideRef = useRef(null);
   const SEOData = useMemo(
     () => ({
       title: "島島阿學 - 學習資源平台 - Daodao Online Learning Platform",
@@ -25,21 +26,12 @@ const Home = () => {
     }),
     [router]
   );
-  // const bannerRef = useRef(null);
-  const guideRef = useRef(null);
-  const smoothScroll = (target) => {
-    console.log("target", target);
-    const { top } = target.getBoundingClientRect();
-    window.scrollTo({
-      top: top + window.pageYOffset,
-      behavior: "smooth",
-    });
-  };
+
   return (
     <BodyWrapper>
       <SEOConfig data={SEOData} />
       <BannerVideo />
-      <Banner smoothScroll={smoothScroll} guideRef={guideRef} />
+      <Banner guideRef={guideRef} />
       <div ref={guideRef} />
       <Guide />
     </BodyWrapper>

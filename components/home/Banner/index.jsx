@@ -1,3 +1,4 @@
+import React, { useCallback } from "react";
 import styled from "@emotion/styled";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -61,7 +62,15 @@ const BannerWrapper = styled.div`
   }
 `;
 
-const Banner = ({ guideRef, smoothScroll }) => {
+const Banner = ({ guideRef }) => {
+  const smoothScroll = useCallback(() => {
+    const top = guideRef?.current?.getBoundingClientRect()?.top ?? 0;
+    window.scrollTo({
+      top: top + window.pageYOffset,
+      behavior: "smooth",
+    });
+  }, [guideRef]);
+
   return (
     <BannerWrapper>
       <TopBox>
@@ -74,10 +83,7 @@ const Banner = ({ guideRef, smoothScroll }) => {
       <BottomBox>
         <h3>還不知道學什麼嗎？別擔心。</h3>
         <Box sx={{ marginTop: "20px" }}>
-          <Button
-            variant="contained"
-            onClick={() => smoothScroll(guideRef.current)}
-          >
+          <Button variant="contained" onClick={smoothScroll}>
             看看大家都學什麼
           </Button>
         </Box>
