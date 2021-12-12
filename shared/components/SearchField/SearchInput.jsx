@@ -11,7 +11,7 @@ const SearchInputWrapper = styled(Paper)`
   width: 100%;
   position: relative;
   border-radius: 10px;
-  border: white solid 1px;
+  border: #ffefef solid 1px;
   background-color: transparent;
 `;
 
@@ -45,7 +45,11 @@ const SearchInput = () => {
         placeholder="今晚，要不要來點＿＿的學習資源？"
         inputProps={{ "aria-label": "search google maps" }}
         onChange={(event) => setWord(event.target.value)}
-        style={{ color: 'white', fontWeight: '500', paddingLeft: '30px' }}
+        style={{
+          color: "white",
+          fontWeight: "500",
+          paddingLeft: "30px",
+        }}
       />
       <SearchButtonWrapper type="submit" sx={{ p: "10px" }} aria-label="search">
         <SearchIcon />

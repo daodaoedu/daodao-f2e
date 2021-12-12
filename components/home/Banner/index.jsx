@@ -1,7 +1,7 @@
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 import Box from "@mui/material/Box";
-import Button from '@mui/material/Button';
-import SearchField from '../../../shared/components/SearchField';
+import Button from "@mui/material/Button";
+import SearchField from "../../../shared/components/SearchField";
 
 const TopBox = styled(Box)`
   position: absolute;
@@ -29,7 +29,7 @@ const BannerWrapper = styled.div`
       font-size: 24px;
       line-height: 28px;
       letter-spacing: 0.08em;
-      color: #F0F0F0;
+      color: #f0f0f0;
       font-weight: 500;
       text-align: center;
     }
@@ -40,7 +40,7 @@ const BannerWrapper = styled.div`
       letter-spacing: 0.08em;
       text-align: center;
       margin-top: 10px;
-      color: #F0F0F0;
+      color: #f0f0f0;
       font-weight: 500;
     }
   }
@@ -49,7 +49,7 @@ const BannerWrapper = styled.div`
     h3 {
       line-height: 28px;
       letter-spacing: 0.08em;
-      color: #F0F0F0;
+      color: #f0f0f0;
       font-weight: 500;
       text-align: center;
       font-size: 36px;
@@ -59,44 +59,29 @@ const BannerWrapper = styled.div`
       margin: 20px;
     }
   }
-  
-  /* @media (max-width: 767px) {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  } */
 `;
 
-const Banner = () => {
+const Banner = ({ guideRef, smoothScroll }) => {
   return (
     <BannerWrapper>
       <TopBox>
         <h1>歡迎來到島島阿學！一起找找資源、共編資源吧～</h1>
-        <h2>If you want to go fast go alone. If you what to go far go together.</h2>
+        <h2>
+          If you want to go fast go alone. If you what to go far go together.
+        </h2>
         <SearchField />
       </TopBox>
       <BottomBox>
         <h3>還不知道學什麼嗎？別擔心。</h3>
-        <Button variant="contained">看看大家都學什麼</Button>
+        <Box sx={{ marginTop: "20px" }}>
+          <Button
+            variant="contained"
+            onClick={() => smoothScroll(guideRef.current)}
+          >
+            看看大家都學什麼
+          </Button>
+        </Box>
       </BottomBox>
-      {/* <ImageStyled
-        src="/connectDao.webp"
-        alt="connect-dao"
-      />
-      <BannerContentWrapper>
-        <HeaderStyled>
-          歡迎來到島島阿學！一起找找資源、共編資源吧
-        </HeaderStyled>
-        <ContentStyled>
-          If you want to go fast go alone.
-          <br />
-          If you want to go far go together.
-          <br />
-          <br />
-          <p>今晚，要不要來點＿＿的學習資源？ (點進去即可看到各領域的資源)</p>
-        </ContentStyled>
-      </BannerContentWrapper> */}
     </BannerWrapper>
   );
 };

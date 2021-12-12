@@ -3,15 +3,15 @@ import styled from "@emotion/styled";
 
 const BannerVideoWrapper = styled.div`
   background-color: #f5f5f5;
-  width:100%;
-  height:100vh;
+  width: 100%;
+  height: calc(100vh - 80px);
   overflow: hidden;
-  
+
   video {
     position: absolute;
     object-fit: cover;
-    width:100%;
-    height:100%;
+    width: 100%;
+    height: inherit;
   }
 `;
 
