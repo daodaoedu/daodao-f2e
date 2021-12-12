@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import styled from "@emotion/styled";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import SearchField from "../../../shared/components/SearchField";
+import SearchField from "../SearchField";
 
 const TopBox = styled(Box)`
   position: absolute;

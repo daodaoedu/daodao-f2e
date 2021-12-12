@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import SEOConfig from "../shared/components/SEO";
 import Banner from "../components/home/Banner";
 import Guide from "../components/home/Guide";
-import BannerVideo from "../shared/components/BannerVideo";
+import BannerVideo from "../components/home/BannerVideo";
 // import logger from "../utils/logger";
 
 const BodyWrapper = styled.div``;
