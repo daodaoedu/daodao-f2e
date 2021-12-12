@@ -32,7 +32,7 @@ const MobileLinkListWrapper = styled.ul`
       display: block;
     }  
 
-    svg[type="menu"]:checked + ul li:nth-child(1){
+    svg[type="menu"]:checked + ul li:nth-of-type(1){
       background: #777; 
       color: #fff;
     }  

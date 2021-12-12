@@ -1,6 +1,6 @@
 import React from 'react';
-import { ThemeProvider } from "@material-ui/core/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 import { Provider } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
 import configureStore from '../utils/configureStore';
@@ -16,14 +16,13 @@ const App = ({ Component, pageProps }) => {
     <ThemeProvider theme={theme}>
       <Provider store={store}>
         {/* For custum reset css */}
-        <GlobalStyle>
-          {/* mui normalize css */}
-          <CssBaseline />
-          <Toaster />
-          <Navigation />
-          <Component {...pageProps} />
-          <Footer />
-        </GlobalStyle>
+        <GlobalStyle />
+        {/* mui normalize css */}
+        <CssBaseline />
+        <Toaster />
+        <Navigation />
+        <Component {...pageProps} />
+        <Footer />
       </Provider>
     </ThemeProvider>
   );

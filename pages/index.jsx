@@ -9,7 +9,6 @@ import BannerVideo from '../shared/components/BannerVideo';
 // import logger from "../utils/logger";
 
 const BodyWrapper = styled.div`
-  max-width: 1200px;
 `;
 
 const Home = () => {

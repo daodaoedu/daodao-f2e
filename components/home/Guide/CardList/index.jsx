@@ -1,17 +1,12 @@
 import styled from '@emotion/styled';
 import { css } from "@emotion/react";
 
-const CardListWrapper = styled.ul`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-`;
-
 const CardWrapper = styled.li`
   width: 350px;   
   height: 430px;
   padding-top: 15%;
   padding-left: 20px;
+  border-radius: 20px;
   .title {
     color: #F0F0F0;
     font-size: 36px;
@@ -58,12 +53,18 @@ const data = [{
   image: '/assets/images/digital.png',
 }];
 
+const CardListWrapper = styled.ul`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+`;
+
 const CardList = () => {
   return (
     <CardListWrapper>
       {
-        data.map(({ image, title }) => (
-          <CardWrapper image={image}>
+        data.map(({ image, title, id }) => (
+          <CardWrapper key={id} image={image}>
             <p className="title">{title}</p>
             <p className="desc">學習夥伴成長中</p>
           </CardWrapper>

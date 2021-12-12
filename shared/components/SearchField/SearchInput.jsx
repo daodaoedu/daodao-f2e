@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IconButton } from "@material-ui/core";
+import { IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
@@ -27,8 +27,8 @@ const SearchButtonWrapper = styled(IconButton)`
   }
 `;
 
-// useState;
 const SearchInput = () => {
+  // eslint-disable-next-line no-unused-vars
   const [word, setWord] = useState("");
   return (
     <SearchInputWrapper

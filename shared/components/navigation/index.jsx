@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "@emotion/styled";
-import { AppBar } from "@material-ui/core";
+import { AppBar } from "@mui/material";
 import MainNav from "./MainNav";
 
 const NavigationWrapper = styled(AppBar)`

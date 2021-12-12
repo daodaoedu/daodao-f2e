@@ -1,7 +1,5 @@
 import styled from '@emotion/styled';
 import Box from "@mui/material/Box";
-import Button from '@mui/material/Button';
-import SearchField from '../../../shared/components/SearchField';
 import CardList from './CardList';
 
 const GuideWrapper = styled.div`
@@ -22,7 +20,9 @@ const Guide = () => {
   return (
     <GuideWrapper>
       <h2>大家正在學...</h2>
-      <CardList />
+      <Box sx={{ marginTop: '50px' }}>
+        <CardList />
+      </Box>
     </GuideWrapper>
   );
 };
