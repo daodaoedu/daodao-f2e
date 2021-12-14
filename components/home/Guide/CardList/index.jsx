@@ -1,5 +1,8 @@
+import { useRef, useState } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
+import { slideInUp } from "../../../../shared/styles/animation";
+import useIntersectionObserver from "../../../../hooks/useIntersectionObserver";
 
 const CardWrapper = styled.li`
   width: 30%;
@@ -7,6 +10,7 @@ const CardWrapper = styled.li`
   padding-top: 12%;
   padding-left: 20px;
   border-radius: 20px;
+  opacity: 0;
 
   .title {
     color: #f0f0f0;
@@ -23,6 +27,13 @@ const CardWrapper = styled.li`
     letter-spacing: 0.08em;
     font-weight: bold;
   }
+
+  ${({ isShow }) =>
+    isShow &&
+    css`
+      opacity: 1;
+      animation: 1.5s ${slideInUp} forwards;
+    `}
 
   ${({ image }) => css`
     background-image: ${`url(${image})`};
@@ -83,10 +94,18 @@ const data = [
 ];
 
 const CardList = () => {
+  const [isShow, setIsShow] = useState(false);
+  const trigger = useRef();
+
+  useIntersectionObserver({
+    onIntersect: () => setIsShow(true),
+    target: trigger,
+  });
+
   return (
-    <CardListWrapper>
+    <CardListWrapper ref={trigger}>
       {data.map(({ image, title, id }) => (
-        <CardWrapper key={id} image={image}>
+        <CardWrapper key={id} image={image} isShow={isShow}>
           <p className="title">{title}</p>
           <p className="desc">學習夥伴成長中</p>
         </CardWrapper>

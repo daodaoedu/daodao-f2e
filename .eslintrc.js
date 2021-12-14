@@ -26,5 +26,7 @@ module.exports = {
     quotes: 0,
     "comma-dangle": 0,
     "object-curly-newline": 0,
+    "implicit-arrow-linebreak": 0,
+    "operator-linebreak": 0,
   },
 };
