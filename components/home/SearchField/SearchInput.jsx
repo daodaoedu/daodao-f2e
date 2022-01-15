@@ -4,6 +4,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
 import styled from "@emotion/styled";
+import { useRouter } from "next/router";
 
 const SearchInputWrapper = styled(Paper)`
   height: 35px;
@@ -29,7 +30,14 @@ const SearchButtonWrapper = styled(IconButton)`
 
 const SearchInput = () => {
   // eslint-disable-next-line no-unused-vars
-  const [word, setWord] = useState("");
+  const [keyword, setKeyword] = useState("");
+  const { push } = useRouter();
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter" && keyword !== "") {
+      push(`/search?q=${keyword}`);
+    }
+  };
+
   return (
     <SearchInputWrapper
       component="form"
@@ -44,12 +52,13 @@ const SearchInput = () => {
         sx={{ ml: 1, flex: 1 }}
         placeholder="今晚，要不要來點＿＿的學習資源？"
         inputProps={{ "aria-label": "search google maps" }}
-        onChange={(event) => setWord(event.target.value)}
+        onChange={(event) => setKeyword(event.target.value)}
         style={{
           color: "white",
           fontWeight: "500",
           paddingLeft: "30px",
         }}
+        onKeyPress={handleKeyPress}
       />
       <SearchButtonWrapper type="submit" sx={{ p: "10px" }} aria-label="search">
         <SearchIcon />

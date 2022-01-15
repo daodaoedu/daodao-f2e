@@ -28,5 +28,6 @@ module.exports = {
     "object-curly-newline": 0,
     "implicit-arrow-linebreak": 0,
     "operator-linebreak": 0,
+    "function-paren-newline": 0,
   },
 };
