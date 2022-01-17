@@ -20,25 +20,28 @@ const TagsWrapper = styled.ul`
 `;
 const MOCK_TAGS = [
   {
-    id: 0,
+    key: "英語",
+    link: "/search?tags=英語&cats=language",
     text: "英語",
   },
   {
-    id: 1,
-    text: "程式設計",
+    key: "邏輯",
+    link: "/search?tags=邏輯&cats=math",
+    text: "邏輯",
   },
   {
-    id: 2,
-    text: "吉他",
+    key: "數學",
+    link: "/search?tags=數學&cats=math",
+    text: "數學",
   },
 ];
 
 const SearchField = () => (
   <TagsWrapper>
-    {MOCK_TAGS.map(({ text, id }) => (
-      <li key={id}>
+    {MOCK_TAGS.map(({ key, link, text }) => (
+      <li key={key}>
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-        <Link href={`/search?q=${text}`}>{text}</Link>
+        <Link href={link}>{text}</Link>
       </li>
     ))}
   </TagsWrapper>
