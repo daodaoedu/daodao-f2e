@@ -90,8 +90,6 @@ const Item = ({ data }) => {
         </TitleWrapper>
         <Tags tags={[...resourcesTags, ...hashTags]} />
         <Tags tags={ageOfUserTags} />
-        {/* <Skeleton variant="text" />
-        <Skeleton variant="text" /> */}
       </ContentWrapper>
     </ItemWrapper>
   );
