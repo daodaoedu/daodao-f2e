@@ -3,6 +3,8 @@ import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import SEOConfig from "../../shared/components/SEO";
 import Search from "../../components/Search";
+import Navigation from "../../shared/components/Navigation";
+import Footer from "../../shared/components/Footer";
 
 const SearchPageWrapper = styled.div`
   height: 100%;
@@ -29,12 +31,16 @@ const SearchPage = () => {
   );
 
   return (
-    <SearchPageWrapper>
+    <>
+      <Navigation />
       <SEOConfig data={SEOData} />
-      {/* <SWRConfig value={{ fallback, use: [logger] }}> */}
-      <Search />
-      {/* </SWRConfig> */}
-    </SearchPageWrapper>
+      <SearchPageWrapper>
+        {/* <SWRConfig value={{ fallback, use: [logger] }}> */}
+        <Search />
+        {/* </SWRConfig> */}
+      </SearchPageWrapper>
+      <Footer />
+    </>
   );
 };
 
