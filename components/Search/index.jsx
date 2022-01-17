@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import useSWR from "swr";
+import { Stack } from "@mui/material";
 import List from "./List";
 import SearchField from "../../shared/components/SearchField";
 import { postFetcher } from "../../utils/fetcher";
@@ -12,7 +13,7 @@ import SelectedTags from "./SelectedTags";
 const SearchWrapper = styled.div`
   height: 100%;
   min-height: calc(100vh - 80px);
-  & > .title {
+  .header-title {
     font-size: 30px;
     font-weight: 500;
   }
@@ -42,11 +43,25 @@ const Search = () => {
   return (
     <SearchWrapper>
       <SearchField />
-      <h1 className="title">搜尋結果</h1>
+      <Stack
+        sx={{
+          margin: "50px 0 20px 0",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          "& > .header-result": {
+            marginLeft: "20px",
+            fontSize: "24px",
+          },
+        }}
+      >
+        <h1 className="header-title">搜尋結果</h1>
+        {Array.isArray(data?.payload?.results) && (
+          <p className="header-result">共{data?.payload?.results.length}筆</p>
+        )}
+      </Stack>
       <SelectedTags queryTags={queryTags} />
-      {Array.isArray(data?.payload?.results) && (
-        <p>共{data?.payload?.results.length}筆</p>
-      )}
+
       <List
         list={data?.payload?.results ?? []}
         isLoading={isLoading}
