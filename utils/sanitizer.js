@@ -1,4 +1,4 @@
-const stringSanitizer = (string) =>
+const stringSanitizer = (string = "") =>
   string
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

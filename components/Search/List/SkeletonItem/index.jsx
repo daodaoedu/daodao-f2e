@@ -10,7 +10,7 @@ const ItemWrapper = styled.li`
   margin: 10px 0;
 `;
 const ContentWrapper = styled.div`
-  width: 100%;
+  width: calc(100% - 200px);
   padding: 0 10px;
 `;
 
@@ -18,7 +18,7 @@ const Item = () => {
   const router = useRouter();
   return (
     <ItemWrapper>
-      <Skeleton variant="rectangular" width={100} height={100} />
+      <Skeleton variant="rectangular" width={200} height={200} />
       <ContentWrapper>
         <Skeleton variant="text" />
         <Skeleton variant="text" />

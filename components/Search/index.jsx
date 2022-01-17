@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import List from "./List";
+import SearchField from "../../shared/components/SearchField";
 import { postFetcher } from "../../utils/fetcher";
+import { bodyHandler } from "../../utils/notion";
+import stringSanitizer from "../../utils/sanitizer";
 
 const SearchWrapper = styled.div`
   height: 100%;
@@ -14,53 +17,33 @@ const SearchWrapper = styled.div`
   }
 `;
 
-// if (isFilterRequest) {
-//   initialSetting.body = JSON.stringify({
-//     filter: {
-//       or: [
-//         {
-//           property: '標籤 / Hashtag',
-//           multi_select: {
-//             contains: tags,
-//           },
-//         },
-//       ],
-//     },
-//   })
-// }
-
 const Search = () => {
   const router = useRouter();
-  //   const { categoryId, query } = action.payload;
-  //   const queryString = `${query.tags ? `${`?tags=${query.tags}`}` : ""}`;
-  //   const url = `https://api.daoedu.tw/notion/databases/${categoryId}${queryString}`;
+  const tag = useMemo(
+    () => stringSanitizer(router.query.tag),
+    [router.query.tag]
+  );
+  const keyword = useMemo(
+    () => stringSanitizer(router.query.q),
+    [router.query.q]
+  );
   const { data } = useSWR(
     [
       `https://api.daoedu.tw/notion/databases/da015b1a389b43cda9f01876294064e0`,
-      {
-        filter: {
-          or: [
-            {
-              property: "標籤 / Hashtag",
-              multi_select: {
-                contains: router.query.q,
-              },
-            },
-          ],
-        },
-      },
+      bodyHandler(keyword, tag),
     ],
     postFetcher
   );
   const isLoading = !data;
-  console.log("data=>", data);
-
+  console.log("data", data);
+  console.log(bodyHandler(keyword, tag));
   return (
     <SearchWrapper>
-      <h1 className="title">
-        {router.query.q}
-        的搜尋結果
-      </h1>
+      <SearchField />
+      <h1 className="title">搜尋結果</h1>
+      {Array.isArray(data?.payload?.results) && (
+        <p>共{data?.payload?.results.length}筆</p>
+      )}
       <List list={data?.payload?.results ?? []} isLoading={isLoading} />
     </SearchWrapper>
   );

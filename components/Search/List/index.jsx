@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import styled from "@emotion/styled";
 import Item from "./Item";
 import SkeletonItem from "./SkeletonItem";
