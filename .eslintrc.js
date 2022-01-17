@@ -12,6 +12,13 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["react"],
+  settings: {
+    "import/resolver": {
+      node: {
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+      },
+    },
+  },
   rules: {
     "react/prop-types": [0],
     "react/jsx-props-no-spreading": [0],
@@ -32,5 +39,7 @@ module.exports = {
     "jsx-a11y/click-events-have-key-events": 0,
     "jsx-a11y/no-noninteractive-element-interactions": 0,
     "react/jsx-one-expression-per-line": 0,
+    "import/no-unresolved": 0,
+    "import/extensions": 0,
   },
 };
