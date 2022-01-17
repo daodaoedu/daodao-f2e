@@ -1,5 +1,5 @@
-import React, { useMemo, useState, useCallback, useEffect } from "react";
-import ClickAwayListener from "@mui/base/ClickAwayListener";
+import React, { useState, useEffect } from "react";
+// import ClickAwayListener from "@mui/base/ClickAwayListener";
 import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
 import styled from "@emotion/styled";
@@ -7,7 +7,7 @@ import { Search } from "@mui/icons-material";
 import { useRouter } from "next/router";
 import SearchButton from "./Button";
 // import i18n from "../../../../../constants/i18n";
-import SuggestList from "./SuggestList";
+// import SuggestList from "./SuggestList";
 
 const SearchInputWrapper = styled(Paper)`
   height: 40px;

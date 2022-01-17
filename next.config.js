@@ -1,5 +1,12 @@
+// const path = require("path");
+
 module.exports = {
   reactStrictMode: true,
+  // mode: "development",
+  // entry: path.resolve(__dirname, "src"),
+  // resolve: {
+  //   extensions: ["", ".js", ".jsx"],
+  // },
   // i18n: {
   //   /**
   //    * Provide the locales you want to support in your application
