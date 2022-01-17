@@ -1,16 +1,17 @@
 import React from "react";
 // import styled from "@emotion/styled";
 import PageContainer from "../../../../shared/containers/Page";
-import About from "../../../../components/category/About";
+// import About from "../../../../components/category/About";
 
-const Content = ({ currentCategory, category, isLoading }) => {
+// { currentCategory, category, isLoading }
+const Content = () => {
   return (
     <PageContainer>
-      <About
+      {/* <About
         categoryType={currentCategory}
         cardList={category}
         isLoading={isLoading}
-      />
+      /> */}
     </PageContainer>
   );
 };
