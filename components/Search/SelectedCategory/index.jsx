@@ -83,7 +83,8 @@ const SelectedCategory = ({ queryTags }) => {
           label={value}
           onClick={() => linkHandler(key)}
           sx={{
-            backgroundColor: COLOR_TABLE.default,
+            backgroundColor:
+              query.cats === key ? COLOR_TABLE.green : COLOR_TABLE.default,
             opacity: query.cats === key ? "100%" : "40%",
             cursor: "pointer",
             margin: "5px",

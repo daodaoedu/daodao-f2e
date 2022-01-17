@@ -59,7 +59,7 @@ const Tag = ({ title }) => {
       label={title}
       onClick={() => linkHandler(title)}
       sx={{
-        backgroundColor: COLOR_TABLE.default,
+        backgroundColor: COLOR_TABLE.pink,
         cursor: "pointer",
         margin: "5px",
         whiteSpace: "nowrap",

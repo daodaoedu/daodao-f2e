@@ -2,6 +2,7 @@ import React from "react";
 import styled from "@emotion/styled";
 import { Stack } from "@mui/material";
 import { useRouter } from "next/router";
+import WhatshotIcon from "@mui/icons-material/Whatshot";
 import HotTags from "./HotTags";
 import SearchInput from "./Input";
 
@@ -44,7 +45,8 @@ const SearchField = () => {
             marginTop: "20px",
           }}
         >
-          <p>熱門：</p>
+          {/* <p>熱門：</p> */}
+          <WhatshotIcon sx={{ color: "red" }} />
           <HotTags cats={query.cats} />
         </Stack>
       )}
