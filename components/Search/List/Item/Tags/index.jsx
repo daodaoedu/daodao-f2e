@@ -39,6 +39,10 @@ const Tags = ({ tags }) => {
                 whiteSpace: "nowrap",
                 fontWeight: 500,
                 fontSize: "14px",
+                "&:hover": {
+                  opacity: "60%",
+                  transition: "transform 0.4s",
+                },
               }}
             />
           </li>

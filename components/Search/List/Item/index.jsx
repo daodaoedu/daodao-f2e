@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
+import { useRouter } from "next/router";
 // import Link from "next/link";
 import Tags from "./Tags";
 
@@ -25,7 +26,16 @@ const ImageWrapper = styled.div`
     background-repeat: no-repeat;
     background-position: 50% 50%;
   `}
-  @media(max-width: 767px) {
+  border-radius: 20px;
+  /* opacity: 0; */
+
+  cursor: pointer;
+  /* object-fit: cover; */
+  &:hover {
+    transform: scale(1.05);
+    transition: transform 0.4s;
+  }
+  @media (max-width: 767px) {
     width: 100px;
     height: 100px;
   }
@@ -76,6 +86,7 @@ const Item = ({ data }) => {
   return (
     <ItemWrapper>
       <ImageWrapper
+        onClick={() => window.open(link, "_blank")}
         image={
           data?.properties["縮圖 / Thumbnail"]?.files[0].name ?? "/preview.webp"
         }
