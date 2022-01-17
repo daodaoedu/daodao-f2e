@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "@emotion/styled";
-import { useRouter } from "next/router";
 import { Skeleton } from "@mui/material";
 
 const ItemWrapper = styled.li`
@@ -15,7 +14,6 @@ const ContentWrapper = styled.div`
 `;
 
 const Item = () => {
-  const router = useRouter();
   return (
     <ItemWrapper>
       <Skeleton variant="rectangular" width={200} height={200} />

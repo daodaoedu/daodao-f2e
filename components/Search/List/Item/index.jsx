@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
-import { useRouter } from "next/router";
 // import Link from "next/link";
 import Tags from "./Tags";
 

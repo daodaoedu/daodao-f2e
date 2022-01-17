@@ -1,27 +1,23 @@
-import React, { useMemo } from "react";
-import styled from "@emotion/styled";
-import TagList from "../../../shared/components/TagList";
-import CardList from "../CardList";
-import { SEARCH_TAGS, CATEGORY_NAME } from "../../../constants/category";
+import React from "react";
+// import styled from "@emotion/styled";
+// const AboutWrapper = styled.div`
+//   margin: 0 auto;
+//   width: 90%;
+//   padding: 10px;
+// `;
 
-const AboutWrapper = styled.div`
-  margin: 0 auto;
-  width: 90%;
-  padding: 10px;
-`;
+// const MainAboutWrapper = styled.div`
+//   h1 {
+//     font-size: 24px;
+//     font-weight: 500;
+//   }
+// `;
 
-const MainAboutWrapper = styled.div`
-  h1 {
-    font-size: 24px;
-    font-weight: 500;
-  }
-`;
+// const TagsWrapper = styled.div`
+//   margin: 20px auto;
+// `;
 
-const TagsWrapper = styled.div`
-  margin: 20px auto;
-`;
-
-const About = ({ categoryType, cardList, isLoading, onSearch }) => {
+const About = () => {
   return <></>;
   // const tagList = useMemo(() => SEARCH_TAGS[categoryType], [categoryType]);
   // const categoryTitle = useMemo(

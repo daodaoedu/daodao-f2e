@@ -1,10 +1,8 @@
 import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
-import { SWRConfig } from "swr";
 import SEOConfig from "../../shared/components/SEO";
 import Search from "../../components/Search";
-import logger from "../../utils/logger";
 
 const SearchPageWrapper = styled.div`
   height: 100%;
@@ -14,7 +12,7 @@ const SearchPageWrapper = styled.div`
   padding-right: 5%;
 `;
 
-const SearchPage = ({ fallback }) => {
+const SearchPage = () => {
   const router = useRouter();
   const SEOData = useMemo(
     () => ({

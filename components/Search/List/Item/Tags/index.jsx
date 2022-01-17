@@ -1,8 +1,5 @@
-import React, { useMemo } from "react";
+import React from "react";
 import styled from "@emotion/styled";
-import { useRouter } from "next/router";
-import { Skeleton } from "@mui/material";
-import { css } from "@emotion/react";
 import Link from "next/link";
 import Chip from "@mui/material/Chip";
 import { COLOR_TABLE } from "../../../../../constants/notion";
