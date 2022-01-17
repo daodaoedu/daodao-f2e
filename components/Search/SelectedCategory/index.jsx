@@ -24,24 +24,36 @@ const CATEGORIES = [
     value: "電腦科學",
   },
   {
-    key: "art",
-    value: "自然科學",
-  },
-  {
-    key: "life",
+    key: "humanity",
     value: "人文社會",
   },
   {
-    key: "health",
+    key: "natusci",
+    value: "自然科學",
+  },
+  {
+    key: "art",
     value: "藝術",
   },
   {
-    key: "business",
+    key: "education",
     value: "教育",
   },
   {
-    key: "multires",
+    key: "life",
     value: "生活",
+  },
+  {
+    key: "health",
+    value: "運動/心理/醫學",
+  },
+  {
+    key: "business",
+    value: "商業與社會創新",
+  },
+  {
+    key: "multires",
+    value: "綜合型學習資源",
   },
 ];
 
