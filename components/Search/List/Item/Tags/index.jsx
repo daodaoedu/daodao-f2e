@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useCallback } from "react";
 import styled from "@emotion/styled";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import Chip from "@mui/material/Chip";
 import { COLOR_TABLE } from "../../../../../constants/notion";
 
@@ -21,11 +22,29 @@ const TagsWrapper = styled.ul`
 //   `}
 // `;
 
-const Tags = ({ tags }) => {
+const Tags = ({ tags, queryTags }) => {
+  const { query } = useRouter();
+  const linkTagsHandler = useCallback(
+    (newQuery) => {
+      if (query.q) {
+        return `/search?q=${query.q}&tags=${
+          Array.isArray(queryTags) && queryTags.length > 0
+            ? `${queryTags.join(",")},${newQuery}`
+            : newQuery
+        }`;
+      }
+      return `/search?tags=${
+        Array.isArray(queryTags) && queryTags.length > 0
+          ? `${queryTags.join(",")},${newQuery}`
+          : newQuery
+      }`;
+    },
+    [queryTags]
+  );
   return (
     <TagsWrapper>
       {tags.map(({ name, color }) => (
-        <Link key={name} href={`/search?tag=${name}`}>
+        <Link key={name} href={linkTagsHandler(name)}>
           <li>
             <Chip
               label={name}

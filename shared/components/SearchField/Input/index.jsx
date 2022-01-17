@@ -5,7 +5,7 @@ import Paper from "@mui/material/Paper";
 import styled from "@emotion/styled";
 import { Search } from "@mui/icons-material";
 import { useRouter } from "next/router";
-// import SearchButton from "./Button";
+import SearchButton from "./Button";
 // import i18n from "../../../../../constants/i18n";
 import SuggestList from "./SuggestList";
 
@@ -83,7 +83,21 @@ const SearchInput = () => {
   // const [isFocus, setIsFocus] = useState(false);
   const handleKeyPress = (event) => {
     if (event.key === "Enter" && keyword !== "") {
-      push(`search?q=${keyword}`);
+      if (query.tags) {
+        push(`/search?q=${keyword}&tags=${query.tags}`);
+      } else {
+        push(`/search?q=${keyword}`);
+      }
+    }
+  };
+
+  const routingPush = (path) => {
+    if (path !== "") {
+      if (query.tags) {
+        push(`/search?q=${keyword}&tags=${query.tags}`);
+      } else {
+        push(`/search?q=${keyword}`);
+      }
     }
   };
 
@@ -116,6 +130,12 @@ const SearchInput = () => {
           zIndex: 15,
           // transform: "translate(0,-25%)",
         }}
+      />
+      <SearchButton
+        routingPush={() => routingPush(keyword)}
+        // addSearchHistory={() =>
+        //   addSearchHistory(referenceList[referenceSelected] || keyword)
+        // }
       />
 
       {/* <SuggestList

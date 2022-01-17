@@ -64,7 +64,7 @@ const TitleWrapper = styled.div`
   }
 `;
 
-const Item = ({ data }) => {
+const Item = ({ data, queryTags }) => {
   const hashTags = useMemo(
     () => data?.properties["標籤 / Hashtag"]?.multi_select,
     [data]
@@ -95,11 +95,11 @@ const Item = ({ data }) => {
           <h2 className="title" onClick={() => window.open(link, "_blank")}>
             {data?.properties["資源名稱 / Name"]?.title[0]?.plain_text ?? ""}
           </h2>
-          <Tags tags={feeTags} />
-          <Tags tags={areaTags} />
+          <Tags tags={feeTags} queryTags={queryTags} />
+          <Tags tags={areaTags} queryTags={queryTags} />
         </TitleWrapper>
-        <Tags tags={[...resourcesTags, ...hashTags]} />
-        <Tags tags={ageOfUserTags} />
+        <Tags tags={[...resourcesTags, ...hashTags]} queryTags={queryTags} />
+        <Tags tags={ageOfUserTags} queryTags={queryTags} />
       </ContentWrapper>
     </ItemWrapper>
   );

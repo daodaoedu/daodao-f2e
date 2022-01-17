@@ -7,6 +7,7 @@ import SearchField from "../../shared/components/SearchField";
 import { postFetcher } from "../../utils/fetcher";
 import { bodyHandler } from "../../utils/notion";
 import stringSanitizer from "../../utils/sanitizer";
+import SelectedTags from "./SelectedTags";
 
 const SearchWrapper = styled.div`
   height: 100%;
@@ -19,9 +20,12 @@ const SearchWrapper = styled.div`
 
 const Search = () => {
   const router = useRouter();
-  const tag = useMemo(
-    () => stringSanitizer(router.query.tag),
-    [router.query.tag]
+  const queryTags = useMemo(
+    () =>
+      typeof router.query.tags === "string"
+        ? stringSanitizer(router.query.tags).split(",")
+        : [],
+    [router.query.tags]
   );
   const keyword = useMemo(
     () => stringSanitizer(router.query.q),
@@ -30,21 +34,24 @@ const Search = () => {
   const { data } = useSWR(
     [
       `https://api.daoedu.tw/notion/databases/da015b1a389b43cda9f01876294064e0`,
-      bodyHandler(keyword, tag),
+      bodyHandler(keyword, queryTags),
     ],
     postFetcher
   );
   const isLoading = !data;
-  console.log("data", data);
-  console.log(bodyHandler(keyword, tag));
   return (
     <SearchWrapper>
       <SearchField />
       <h1 className="title">搜尋結果</h1>
+      <SelectedTags queryTags={queryTags} />
       {Array.isArray(data?.payload?.results) && (
         <p>共{data?.payload?.results.length}筆</p>
       )}
-      <List list={data?.payload?.results ?? []} isLoading={isLoading} />
+      <List
+        list={data?.payload?.results ?? []}
+        isLoading={isLoading}
+        queryTags={queryTags}
+      />
     </SearchWrapper>
   );
 };

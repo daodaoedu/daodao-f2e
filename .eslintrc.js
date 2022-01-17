@@ -12,13 +12,13 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["react"],
-  settings: {
-    "import/resolver": {
-      node: {
-        extensions: [".js", ".jsx", ".ts", ".tsx"],
-      },
-    },
-  },
+  // settings: {
+  //   "import/resolver": {
+  //     node: {
+  //       extensions: [".js", ".jsx", ".ts", ".tsx"],
+  //     },
+  //   },
+  // },
   rules: {
     "react/prop-types": [0],
     "react/jsx-props-no-spreading": [0],
@@ -41,5 +41,6 @@ module.exports = {
     "react/jsx-one-expression-per-line": 0,
     "import/no-unresolved": 0,
     "import/extensions": 0,
+    "no-confusing-arrow": 0,
   },
 };

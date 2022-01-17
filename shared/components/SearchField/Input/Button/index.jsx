@@ -23,11 +23,11 @@ const SearchButtonWrapper = styled(IconButton)`
   }
 `;
 
-const SearchButton = ({ routingPush, addSearchHistory }) => (
+const SearchButton = ({ routingPush }) => (
   <SearchButtonWrapper
     onClick={() => {
       routingPush();
-      addSearchHistory();
+      // addSearchHistory();
     }}
     sx={{ p: "10px" }}
     aria-label="search"
