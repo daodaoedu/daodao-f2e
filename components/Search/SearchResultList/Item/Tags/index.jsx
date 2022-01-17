@@ -23,47 +23,45 @@ const TagsWrapper = styled.ul`
 // `;
 
 const Tags = ({ tags, queryTags }) => {
-  const { query } = useRouter();
+  const { query, push } = useRouter();
   const linkTagsHandler = useCallback(
     (newQuery) => {
-      if (query.q) {
-        return `/search?q=${query.q}&tags=${
-          Array.isArray(queryTags) && queryTags.length > 0
-            ? `${queryTags.join(",")},${newQuery}`
-            : newQuery
-        }`;
-      }
-      return `/search?tags=${
-        Array.isArray(queryTags) && queryTags.length > 0
-          ? `${queryTags.join(",")},${newQuery}`
-          : newQuery
-      }`;
+      push({
+        query: {
+          ...query,
+          tags: [
+            ...new Set(
+              Array.isArray(queryTags) && queryTags.length > 0
+                ? [...queryTags, newQuery]
+                : [newQuery]
+            ),
+          ].join(","),
+        },
+      });
     },
-    [queryTags]
+    [queryTags, query]
   );
   return (
     <TagsWrapper>
       {tags.map(({ name, color }) => (
-        <Link key={name} href={linkTagsHandler(name)}>
-          <li>
-            <Chip
-              label={name}
-              sx={{
-                backgroundColor: COLOR_TABLE[color ?? "default"],
-                cursor: "pointer",
-                margin: "5px",
-                whiteSpace: "nowrap",
-                fontWeight: 500,
-                fontSize: "14px",
-                "&:hover": {
-                  opacity: "60%",
-                  transition: "transform 0.4s",
-                },
-              }}
-            />
-          </li>
-          {/* <TagItemWrapper color={color}>{name}</TagItemWrapper> */}
-        </Link>
+        <li>
+          <Chip
+            label={name}
+            onClick={() => linkTagsHandler(name)}
+            sx={{
+              backgroundColor: COLOR_TABLE[color ?? "default"],
+              cursor: "pointer",
+              margin: "5px",
+              whiteSpace: "nowrap",
+              fontWeight: 500,
+              fontSize: "14px",
+              "&:hover": {
+                opacity: "60%",
+                transition: "transform 0.4s",
+              },
+            }}
+          />
+        </li>
       ))}
     </TagsWrapper>
   );

@@ -10,10 +10,10 @@ import theme from "../shared/styles/theme";
 const App = ({ Component, pageProps }) => {
   return (
     <ThemeProvider theme={theme}>
-      {/* For custum reset css */}
-      <GlobalStyle />
       {/* mui normalize css */}
       <CssBaseline />
+      {/* For custum reset css */}
+      <GlobalStyle />
       <Toaster />
       {/* <Navigation /> */}
       <Component {...pageProps} />

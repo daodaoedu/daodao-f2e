@@ -11,6 +11,7 @@ const ItemWrapper = styled.li`
 const ContentWrapper = styled.div`
   width: calc(100% - 200px);
   padding: 0 10px;
+  margin-left: 20px;
   @media (max-width: 767px) {
     width: 100%;
   }

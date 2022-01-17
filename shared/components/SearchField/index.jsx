@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "@emotion/styled";
-// import Tags from "./Tags";
+import { Stack } from "@mui/material";
+import { useRouter } from "next/router";
+import HotTags from "./HotTags";
 import SearchInput from "./Input";
 
 const SearchFieldWrapper = styled.div`
@@ -14,11 +16,38 @@ const SearchFieldWrapper = styled.div`
     width: 100%;
   } */
 `;
+const TYPE = [
+  "language",
+  "math",
+  "comsci",
+  "natusci",
+  "humanity",
+  "art",
+  "education",
+  "life",
+  "health",
+  "business",
+  "multires",
+];
 
 const SearchField = () => {
+  const { query } = useRouter();
   return (
     <SearchFieldWrapper>
       <SearchInput />
+      {TYPE.includes(query.cats) && (
+        <Stack
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: "20px",
+          }}
+        >
+          <p>熱門：</p>
+          <HotTags cats={query.cats} />
+        </Stack>
+      )}
     </SearchFieldWrapper>
   );
 };

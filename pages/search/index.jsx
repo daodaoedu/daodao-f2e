@@ -9,7 +9,7 @@ import Footer from "../../shared/components/Footer_v2";
 const SearchPageWrapper = styled.div`
   height: 100%;
   min-height: calc(100vh - 80px);
-  padding-top: 50px;
+  padding-top: 20px;
   padding-left: 5%;
   padding-right: 5%;
 `;
