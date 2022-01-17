@@ -84,9 +84,12 @@ const SearchInput = () => {
   const handleKeyPress = (event) => {
     if (event.key === "Enter" && keyword !== "") {
       if (query.tags) {
-        push(`/search?q=${keyword}&tags=${query.tags}`);
-      } else {
-        push(`/search?q=${keyword}`);
+        push({
+          query: {
+            ...query,
+            q: keyword,
+          },
+        });
       }
     }
   };
@@ -94,9 +97,12 @@ const SearchInput = () => {
   const routingPush = (path) => {
     if (path !== "") {
       if (query.tags) {
-        push(`/search?q=${keyword}&tags=${query.tags}`);
-      } else {
-        push(`/search?q=${keyword}`);
+        push({
+          query: {
+            ...query,
+            q: keyword,
+          },
+        });
       }
     }
   };
