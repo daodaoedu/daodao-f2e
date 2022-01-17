@@ -2,6 +2,7 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
+    node: true,
   },
   extends: ["plugin:react/recommended", "airbnb"],
   parserOptions: {
@@ -15,8 +16,7 @@ module.exports = {
   settings: {
     "import/resolver": {
       node: {
-        paths: ["."],
-        extensions: ["", ".js", ".jsx", ".ts", ".tsx"],
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
       },
     },
   },
