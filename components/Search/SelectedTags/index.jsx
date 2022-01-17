@@ -31,6 +31,9 @@ const SelectedTags = ({ queryTags }) => {
     },
     [queryTags]
   );
+  if (queryTags.length === 0) {
+    return <></>;
+  }
   return (
     <ListWrapper>
       {queryTags.map((tag) => (

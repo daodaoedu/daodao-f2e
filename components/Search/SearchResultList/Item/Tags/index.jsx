@@ -1,6 +1,5 @@
 import React, { useCallback } from "react";
 import styled from "@emotion/styled";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import Chip from "@mui/material/Chip";
 import { COLOR_TABLE } from "../../../../../constants/notion";

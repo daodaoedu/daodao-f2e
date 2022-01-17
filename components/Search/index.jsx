@@ -15,7 +15,7 @@ const SearchWrapper = styled.div`
   height: 100%;
   min-height: calc(100vh - 80px);
   .header-title {
-    font-size: 30px;
+    font-size: 26px;
     font-weight: 500;
   }
 `;
@@ -51,13 +51,13 @@ const Search = () => {
       <SearchField />
       <Stack
         sx={{
-          margin: "50px 0 20px 0",
+          margin: "20px 0 20px 0",
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
           "& > .header-result": {
             marginLeft: "20px",
-            fontSize: "24px",
+            fontSize: "20px",
           },
         }}
       >
