@@ -6,8 +6,8 @@ import SEOConfig from "../shared/components/SEO";
 import Banner from "../components/home/Banner";
 import Guide from "../components/home/Guide";
 import BannerVideo from "../components/home/BannerVideo";
-import Navigation from "../shared/components/Navigation";
-import Footer from "../shared/components/Footer";
+import Navigation from "../shared/components/Navigation_v2";
+import Footer from "../shared/components/Footer_v2";
 // import logger from "../utils/logger";
 
 const BodyWrapper = styled.div``;

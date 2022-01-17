@@ -70,7 +70,7 @@ const Item = ({ data, queryTags }) => {
     [data]
   );
   const resourcesTags = useMemo(
-    () => data?.properties["資源類型"]?.multi_select,
+    () => data?.properties["資源類型 / Type of the resource"]?.multi_select,
     [data]
   );
   const feeTags = useMemo(() => [data?.properties["費用"]?.select], [data]);

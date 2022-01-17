@@ -3,12 +3,13 @@ import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import { Stack } from "@mui/material";
-import List from "./List";
+import SearchResultList from "./SearchResultList";
 import SearchField from "../../shared/components/SearchField";
 import { postFetcher } from "../../utils/fetcher";
-import { bodyHandler } from "../../utils/notion";
+import { bodyHandler, searchTypeHandler } from "../../utils/notion";
 import stringSanitizer from "../../utils/sanitizer";
 import SelectedTags from "./SelectedTags";
+import SelectedCategory from "./SelectedCategory";
 
 const SearchWrapper = styled.div`
   height: 100%;
@@ -32,9 +33,13 @@ const Search = () => {
     () => stringSanitizer(router.query.q),
     [router.query.q]
   );
+  const cats = useMemo(
+    () => stringSanitizer(router.query.cats),
+    [router.query.cats]
+  );
   const { data } = useSWR(
     [
-      `https://api.daoedu.tw/notion/databases/da015b1a389b43cda9f01876294064e0`,
+      `https://api.daoedu.tw/notion/databases/${searchTypeHandler(cats)}`,
       bodyHandler(keyword, queryTags),
     ],
     postFetcher
@@ -42,6 +47,7 @@ const Search = () => {
   const isLoading = !data;
   return (
     <SearchWrapper>
+      <SelectedCategory queryTags={queryTags} />
       <SearchField />
       <Stack
         sx={{
@@ -62,7 +68,7 @@ const Search = () => {
       </Stack>
       <SelectedTags queryTags={queryTags} />
 
-      <List
+      <SearchResultList
         list={data?.payload?.results ?? []}
         isLoading={isLoading}
         queryTags={queryTags}
