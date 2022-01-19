@@ -12,6 +12,7 @@ const TagsWrapper = styled.ul`
   margin: auto 5px;
   white-space: nowrap;
   overflow-x: scroll;
+  flex-wrap: wrap;
 
   -ms-overflow-style: none; /* IE */
   scrollbar-width: none; /* Firefox */

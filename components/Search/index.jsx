@@ -45,6 +45,10 @@ const Search = () => {
     postFetcher
   );
   const isLoading = !data;
+  const isError = data?.payload?.object === "error";
+  const hasMoredata = data?.payload?.has_more;
+  const errorMessage = data?.payload?.message;
+  console.log("data", data);
   return (
     <SearchWrapper>
       <SelectedCategory queryTags={queryTags} />
@@ -67,12 +71,20 @@ const Search = () => {
         )}
       </Box>
       <SelectedTags queryTags={queryTags} />
-
-      <SearchResultList
-        list={data?.payload?.results ?? []}
-        isLoading={isLoading}
-        queryTags={queryTags}
-      />
+      {isError ? (
+        <>
+          <p>出問題囉：{errorMessage}</p>
+        </>
+      ) : (
+        <SearchResultList
+          list={data?.payload?.results ?? []}
+          isLoading={isLoading}
+          queryTags={queryTags}
+        />
+      )}
+      {!isError && !hasMoredata && (
+        <Box sx={{ margin: "20px" }}>已經抵達無人島囉～</Box>
+      )}
     </SearchWrapper>
   );
 };
