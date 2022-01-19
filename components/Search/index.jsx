@@ -44,15 +44,11 @@ const Search = () => {
     ],
     postFetcher
   );
-  console.log("keyword, tags", keyword, queryTags);
   const isLoading = !data;
   const isError = data?.payload?.object === "error";
   const hasMoredata = data?.payload?.has_more;
   const errorMessage = data?.payload?.message;
-  console.log(
-    "bodyHandler(keyword, queryTags)",
-    bodyHandler(keyword, queryTags)
-  );
+  console.log("data", data);
   return (
     <SearchWrapper>
       <SelectedCategory queryTags={queryTags} />

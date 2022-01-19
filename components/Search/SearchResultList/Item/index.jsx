@@ -67,21 +67,37 @@ const TitleWrapper = styled.div`
 
 const Item = ({ data, queryTags }) => {
   const hashTags = useMemo(
-    () => data?.properties["標籤 / Hashtag"]?.multi_select,
+    () => data?.properties["標籤 / Hashtag"]?.multi_select ?? [],
     [data]
   );
   const resourcesTags = useMemo(
-    () => data?.properties["資源類型 / Type of the resource"]?.multi_select,
+    () =>
+      data?.properties["資源類型 / Type of the resource"]?.multi_select ?? [],
     [data]
   );
-  const feeTags = useMemo(() => [data?.properties["費用"]?.select], [data]);
-  const areaTags = useMemo(() => [data?.properties["地區"]?.select], [data]);
+  const feeTags = useMemo(
+    () =>
+      data?.properties["費用"]?.select
+        ? [data?.properties["費用"]?.select]
+        : [],
+    [data]
+  );
+  const areaTags = useMemo(
+    () =>
+      data?.properties["地區"]?.select
+        ? [data?.properties["地區"]?.select]
+        : [],
+    [data]
+  );
   const ageOfUserTags = useMemo(
-    () => data?.properties["年齡層 / Age of users"]?.multi_select,
+    () => data?.properties["年齡層 / Age of users"]?.multi_select ?? [],
     [data]
   );
 
-  const link = useMemo(() => data?.properties["連結 / Link"]?.url, [data]);
+  const link = useMemo(
+    () => data?.properties["連結 / Link"]?.url ?? "",
+    [data]
+  );
 
   return (
     <ItemWrapper>

@@ -40,6 +40,7 @@ const Tags = ({ tags, queryTags }) => {
     },
     [queryTags, query]
   );
+  console.log("tags", tags);
   return (
     <TagsWrapper>
       {tags.map(({ name, color }) => (
