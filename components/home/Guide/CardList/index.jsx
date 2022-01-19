@@ -110,13 +110,13 @@ const data = [
 ];
 
 const CardList = () => {
-  const [isShow, setIsShow] = useState(false);
+  // const [isShow, setIsShow] = useState(false);
   const trigger = useRef();
 
-  useIntersectionObserver({
-    onIntersect: () => setIsShow(true),
-    target: trigger,
-  });
+  // useIntersectionObserver({
+  //   onIntersect: () => setIsShow(true),
+  //   target: trigger,
+  // });
 
   return (
     <CardListWrapper ref={trigger}>
