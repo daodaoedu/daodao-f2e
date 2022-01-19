@@ -48,7 +48,10 @@ const Search = () => {
   const isError = data?.payload?.object === "error";
   const hasMoredata = data?.payload?.has_more;
   const errorMessage = data?.payload?.message;
-  console.log("data", data);
+  console.log(
+    "bodyHandler(keyword, queryTags)",
+    bodyHandler(keyword, queryTags)
+  );
   return (
     <SearchWrapper>
       <SelectedCategory queryTags={queryTags} />

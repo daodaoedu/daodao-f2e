@@ -1,7 +1,7 @@
 // const path = require("path");
 
 module.exports = {
-  // reactStrictMode: true,
+  reactStrictMode: false,
   // mode: "development",
   // entry: path.resolve(__dirname, "src"),
   // resolve: {

@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import { slideInUp } from "../../../../shared/styles/animation";
-import useIntersectionObserver from "../../../../hooks/useIntersectionObserver";
+// import useIntersectionObserver from "../../../../hooks/useIntersectionObserver";
 
 const CardWrapper = styled.li`
   position: relative;
