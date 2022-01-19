@@ -34,7 +34,7 @@ export const bodyHandler = (keyword, tags) => {
   let body = {
     filter: {},
   };
-  if (!keyword && !tags) {
+  if (!keyword && tags.length === 0) {
     return {};
   }
   if (Array.isArray(tags) && tags.length > 0 && keyword) {

@@ -44,6 +44,7 @@ const Search = () => {
     ],
     postFetcher
   );
+  console.log("keyword, tags", keyword, queryTags);
   const isLoading = !data;
   const isError = data?.payload?.object === "error";
   const hasMoredata = data?.payload?.has_more;
