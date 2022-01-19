@@ -10,7 +10,6 @@ const TagsWrapper = styled.ul`
   justify-content: flex-start;
   align-items: center;
   margin: auto 5px;
-  float: left;
   white-space: nowrap;
   overflow-x: scroll;
 
@@ -26,14 +25,14 @@ const TrendingWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
 
-  @media (max-width: 767px) {
+  /* @media (max-width: 767px) {
     z-index: -1;
     position: absolute;
     margin-top: 40px;
     top: 50%;
     left: 5px;
     justify-content: flex-start;
-  }
+  } */
 `;
 
 const Tags = ({ cats }) => {

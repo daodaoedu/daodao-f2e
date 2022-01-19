@@ -5,7 +5,6 @@ import CardList from "./CardList";
 
 const GuideWrapper = styled.div`
   width: 90%;
-  height: 100vh;
   margin: 0 auto;
   padding-top: 80px;
   padding-bottom: 80px;

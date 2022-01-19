@@ -121,7 +121,11 @@ const CardList = () => {
   return (
     <CardListWrapper ref={trigger}>
       {data.map(({ image, title, id }) => (
-        <CardWrapper key={id} isShow={isShow}>
+        <CardWrapper
+          key={id}
+          isShow
+          // isShow={isShow}
+        >
           <BackgroundWrapper image={image} />
           <ContentWrapper>
             <p className="title">{title}</p>

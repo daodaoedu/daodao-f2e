@@ -33,12 +33,12 @@ const Home = () => {
     <>
       <SEOConfig data={SEOData} />
       <Navigation />
-      <BodyWrapper>
-        <BannerVideo />
-        <Banner guideRef={guideRef} />
-        <div ref={guideRef} />
-        <Guide />
-      </BodyWrapper>
+      {/* <BodyWrapper> */}
+      <BannerVideo />
+      <Banner guideRef={guideRef} />
+      <div ref={guideRef} />
+      <Guide />
+      {/* </BodyWrapper> */}
       <Footer />
     </>
   );

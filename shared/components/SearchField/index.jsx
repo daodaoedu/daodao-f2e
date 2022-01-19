@@ -1,13 +1,17 @@
 import React from "react";
 import styled from "@emotion/styled";
-import { Stack } from "@mui/material";
+import { Box } from "@mui/material";
 import { useRouter } from "next/router";
-import WhatshotIcon from "@mui/icons-material/Whatshot";
+import { Whatshot } from "@mui/icons-material";
 import HotTags from "./HotTags";
 import SearchInput from "./Input";
 
 const SearchFieldWrapper = styled.div`
   width: 80%;
+
+  @media (max-width: 767px) {
+    width: 100%;
+  }
 
   /* @media (max-width: 767px) {
     margin: 0 10px 10px 10px;
@@ -37,18 +41,19 @@ const SearchField = () => {
     <SearchFieldWrapper>
       <SearchInput />
       {TYPE.includes(query.cats) && (
-        <Stack
+        <Box
           sx={{
             display: "flex",
             flexDirection: "row",
+            justifyContent: "flex-start",
             alignItems: "center",
             marginTop: "20px",
           }}
         >
           {/* <p>熱門：</p> */}
-          <WhatshotIcon sx={{ color: "red" }} />
+          <Whatshot sx={{ color: "red" }} />
           <HotTags cats={query.cats} />
-        </Stack>
+        </Box>
       )}
     </SearchFieldWrapper>
   );

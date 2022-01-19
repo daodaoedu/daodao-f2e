@@ -8,8 +8,10 @@ const SearchFieldWrapper = styled.div`
   margin-top: 40px;
   display: flex;
   flex-direction: column;
-  max-width: 500px;
-  width: 100%;
+  width: 500px;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const TrendingWrapper = styled.div`

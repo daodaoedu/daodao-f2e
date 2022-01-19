@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import useSWR from "swr";
-import { Stack } from "@mui/material";
+import { Box } from "@mui/material";
 import SearchResultList from "./SearchResultList";
 import SearchField from "../../shared/components/SearchField";
 import { postFetcher } from "../../utils/fetcher";
@@ -49,7 +49,7 @@ const Search = () => {
     <SearchWrapper>
       <SelectedCategory queryTags={queryTags} />
       <SearchField />
-      <Stack
+      <Box
         sx={{
           margin: "20px 0 20px 0",
           display: "flex",
@@ -65,7 +65,7 @@ const Search = () => {
         {Array.isArray(data?.payload?.results) && (
           <p className="header-result">共{data?.payload?.results.length}筆</p>
         )}
-      </Stack>
+      </Box>
       <SelectedTags queryTags={queryTags} />
 
       <SearchResultList

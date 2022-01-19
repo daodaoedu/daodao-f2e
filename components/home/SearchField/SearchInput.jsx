@@ -8,12 +8,16 @@ import { useRouter } from "next/router";
 
 const SearchInputWrapper = styled(Paper)`
   height: 35px;
-  min-width: 500px;
   width: 100%;
   position: relative;
   border-radius: 10px;
   border: #ffefef solid 1px;
   background-color: transparent;
+
+  /* @media (max-width: 768px) {
+    width: 80%;
+    margin: 0 auto;
+  } */
 `;
 
 const SearchButtonWrapper = styled(IconButton)`
