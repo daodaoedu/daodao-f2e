@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
-import useSWR from "swr";
+// import useSWR from "swr";
+import useSWRImmutable from "swr/immutable";
 import { Box } from "@mui/material";
 import SearchResultList from "./SearchResultList";
 import SearchField from "../../shared/components/SearchField";
@@ -37,7 +38,7 @@ const Search = () => {
     () => stringSanitizer(router.query.cats),
     [router.query.cats]
   );
-  const { data } = useSWR(
+  const { data } = useSWRImmutable(
     [
       `https://api.daoedu.tw/notion/databases/${searchTypeHandler(cats)}`,
       bodyHandler(keyword, queryTags),
