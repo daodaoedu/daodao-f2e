@@ -6,7 +6,9 @@ import Tags from "./Tags";
 
 const ItemWrapper = styled.li`
   display: flex;
-  margin: 10px 0;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(168, 168, 168, 0.3);
 `;
 const ContentWrapper = styled.div`
   width: calc(100% - 200px);
@@ -20,6 +22,8 @@ const ContentWrapper = styled.div`
 const ImageWrapper = styled.div`
   width: 200px;
   height: 200px;
+  background-color: #f5f5f5;
+  filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.25));
   ${({ image }) => css`
     background-image: ${`url(${image})`};
     background-size: cover;
