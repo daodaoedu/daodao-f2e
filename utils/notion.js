@@ -76,10 +76,10 @@ export const bodyHandler = (query) => {
     };
   }
 
-  // 標籤
-  const queryTags =
-    typeof tags === "string" ? stringSanitizer(tags).split(",") : [];
-  if (Array.isArray(queryTags) && queryTags.length > 0) {
+  // 分類
+  const catTags =
+    typeof cats === "string" ? stringSanitizer(cats).split(",") : [];
+  if (Array.isArray(catTags) && catTags.length > 0) {
     body = {
       ...body,
       filter: {
@@ -87,13 +87,14 @@ export const bodyHandler = (query) => {
         and: [
           ...(body?.filter?.and ?? []),
           {
+            ...(body?.filter?.and[0] ?? []),
             or: [
-              ...(body?.filter?.and?.or ?? []),
-              ...queryTags.reduce(
+              ...(body?.filter?.and[0]?.or ?? []),
+              ...catTags.reduce(
                 (acc, val) => [
                   ...acc,
                   {
-                    property: "標籤",
+                    property: "領域名稱",
                     multi_select: {
                       contains: val,
                     },
@@ -108,10 +109,10 @@ export const bodyHandler = (query) => {
     };
   }
 
-  // 分類
-  const catTags =
-    typeof cats === "string" ? stringSanitizer(cats).split(",") : [];
-  if (Array.isArray(catTags) && catTags.length > 0) {
+  // 標籤
+  const queryTags =
+    typeof tags === "string" ? stringSanitizer(tags).split(",") : [];
+  if (Array.isArray(queryTags) && queryTags.length > 0) {
     body = {
       ...body,
       filter: {
@@ -119,13 +120,14 @@ export const bodyHandler = (query) => {
         and: [
           ...(body?.filter?.and ?? []),
           {
+            ...(body?.filter?.and[0] ?? []),
             or: [
               ...(body?.filter?.and[0]?.or ?? []),
-              ...catTags.reduce(
+              ...queryTags.reduce(
                 (acc, val) => [
                   ...acc,
                   {
-                    property: "領域名稱",
+                    property: "標籤",
                     multi_select: {
                       contains: val,
                     },

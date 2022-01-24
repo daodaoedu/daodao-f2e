@@ -21,17 +21,17 @@ const TagsWrapper = styled.ul`
 const MOCK_TAGS = [
   {
     key: "英語",
-    link: "/search?tags=英語&cats=language",
+    link: "/search?tags=英語&cats=語言與文學",
     text: "英語",
   },
   {
     key: "邏輯",
-    link: "/search?tags=邏輯&cats=math",
+    link: "/search?tags=邏輯&cats=數學與邏輯",
     text: "邏輯",
   },
   {
     key: "數學",
-    link: "/search?tags=數學&cats=math",
+    link: "/search?tags=數學&cats=數學與邏輯",
     text: "數學",
   },
 ];
