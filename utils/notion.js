@@ -1,3 +1,5 @@
+import stringSanitizer from "./sanitizer";
+
 // language: "語言與文學",
 // math: "數學與邏輯",
 // comsci: "電腦科學",
@@ -30,15 +32,28 @@ export const searchTypeHandler = (type) => {
   return "language";
 };
 
-export const bodyHandler = (keyword, tags) => {
-  let body = {
-    filter: {},
-  };
-  if (!keyword && tags.length === 0) {
+export const bodyHandler = (query) => {
+  if (Object.keys(query).length === 0) {
     return {};
   }
-  if (Array.isArray(tags) && tags.length > 0 && keyword) {
-    return {
+
+  let body = {
+    filter: {
+      // and裡面有兩個or，文案相關或標籤相關來做篩選
+      and: [
+        {
+          or: [],
+        },
+      ],
+    },
+  };
+
+  const { tags, q, cats, ages, fee } = query;
+
+  // 關鍵字
+  const keyword = stringSanitizer(q);
+  if (typeof keyword === "string" && keyword.length > 0) {
+    body = {
       ...body,
       filter: {
         ...body.filter,
@@ -59,40 +74,31 @@ export const bodyHandler = (keyword, tags) => {
               },
             ],
           },
+        ],
+      },
+    };
+  }
+
+  // 標籤
+  const queryTags =
+    typeof tags === "string" ? stringSanitizer(tags).split(",") : [];
+  if (Array.isArray(queryTags) && queryTags.length > 0) {
+    body = {
+      ...body,
+      filter: {
+        ...body.filter,
+        and: [
+          ...(body?.filter?.and ?? []),
           {
             or: [
-              ...(body?.filter?.or ?? []),
-              ...tags.reduce(
+              ...(body?.filter?.and?.or ?? []),
+              ...queryTags.reduce(
                 (acc, val) => [
                   ...acc,
                   {
-                    property: "標籤 / Hashtag",
+                    property: "標籤",
                     multi_select: {
                       contains: val,
-                    },
-                  },
-                  {
-                    property: "費用",
-                    select: {
-                      equals: val,
-                    },
-                  },
-                  {
-                    property: "資源類型 / Type of the resource",
-                    multi_select: {
-                      contains: val,
-                    },
-                  },
-                  {
-                    property: "年齡層 / Age of users",
-                    multi_select: {
-                      contains: val,
-                    },
-                  },
-                  {
-                    property: "地區",
-                    select: {
-                      equals: val,
                     },
                   },
                 ],
@@ -105,107 +111,89 @@ export const bodyHandler = (keyword, tags) => {
     };
   }
 
-  if (Array.isArray(tags) && tags.length > 0) {
+  // 分類
+  const catTags =
+    typeof cats === "string" ? stringSanitizer(cats).split(",") : [];
+  if (Array.isArray(catTags) && catTags.length > 0) {
     body = {
       ...body,
       filter: {
         ...body.filter,
-        or: [
-          ...(body?.filter?.or ?? []),
-          ...tags.reduce(
-            (acc, val) => [
-              ...acc,
-              {
-                property: "標籤 / Hashtag",
-                multi_select: {
-                  contains: val,
-                },
-              },
-              {
-                property: "費用",
-                select: {
-                  equals: val,
-                },
-              },
-              {
-                property: "資源類型 / Type of the resource",
-                multi_select: {
-                  contains: val,
-                },
-              },
-              {
-                property: "年齡層 / Age of users",
-                multi_select: {
-                  contains: val,
-                },
-              },
-              {
-                property: "地區",
-                select: {
-                  equals: val,
-                },
-              },
+        and: [
+          ...(body?.filter?.and ?? []),
+          {
+            or: [
+              ...(body?.filter?.and[0]?.or ?? []),
+              ...catTags.reduce(
+                (acc, val) => [
+                  ...acc,
+                  {
+                    property: "領域名稱",
+                    multi_select: {
+                      contains: val,
+                    },
+                  },
+                ],
+                []
+              ),
             ],
-            []
-          ),
+          },
         ],
       },
     };
   }
 
-  if (keyword) {
+  // 年齡層
+  const ageTags =
+    typeof ages === "string" ? stringSanitizer(ages).split(",") : [];
+  if (Array.isArray(catTags) && catTags.length > 0) {
     body = {
       ...body,
       filter: {
         ...body.filter,
-        or: [
-          ...(body?.filter?.or ?? []),
+        and: [
+          ...(body?.filter?.and ?? []),
           {
-            property: "資源名稱 / Name",
-            title: {
-              contains: keyword,
-            },
+            or: [
+              ...(body?.filter?.and[0]?.or ?? []),
+              ...ageTags.reduce(
+                (acc, val) => [
+                  ...acc,
+                  {
+                    property: "年齡層",
+                    multi_select: {
+                      contains: val,
+                    },
+                  },
+                ],
+                []
+              ),
+            ],
           },
-          {
-            property: "介紹 / Introduction",
-            rich_text: {
-              contains: keyword,
-            },
-          },
-          /// ///////////////////////////////////////////////////
-          {
-            property: "標籤 / Hashtag",
-            multi_select: {
-              contains: keyword,
-            },
-          },
+        ],
+      },
+    };
+  }
+
+  // 費用
+  const feeQuery = typeof fee === "string" ? stringSanitizer(fee) : "";
+  if (feeQuery.length > 0) {
+    body = {
+      ...body,
+      filter: {
+        ...body.filter,
+        and: [
+          ...(body?.filter?.and ?? []),
           {
             property: "費用",
             select: {
-              equals: keyword,
-            },
-          },
-          {
-            property: "資源類型 / Type of the resource",
-            multi_select: {
-              contains: keyword,
-            },
-          },
-          {
-            property: "年齡層 / Age of users",
-            multi_select: {
-              contains: keyword,
-            },
-          },
-          {
-            property: "地區",
-            select: {
-              equals: keyword,
+              equals: feeQuery,
             },
           },
         ],
       },
     };
   }
+
   return body;
 };

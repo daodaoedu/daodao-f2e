@@ -10,39 +10,59 @@ const ListWrapper = styled.ul`
   margin: 20px 0;
 `;
 
-const SelectedTags = ({ queryTags }) => {
+const SelectedTags = () => {
   const { push, query } = useRouter();
+  const queryTags = [
+    ...(query?.tags ?? "")
+      .split(",")
+      .map((tag) => ({ key: "tags", value: tag })),
+    ...(query?.fee ?? "").split(",").map((tag) => ({ key: "fee", value: tag })),
+    ...(query?.ages ?? "")
+      .split(",")
+      .map((tag) => ({ key: "ages", value: tag })),
+  ];
+
   const linkHandler = useCallback(
-    (targetQuery) => {
-      const filteredQuery = [...new Set([...query.tags.split(",")])].filter(
-        (tag) => tag !== targetQuery
-      );
-      if (filteredQuery.length > 0) {
-        push({
-          pathname: "/search",
-          query: {
-            ...query,
-            tags: filteredQuery.join(","),
-          },
-        });
-      } else {
-        delete query.tags;
-        push({
-          pathname: "/search",
-          query,
-        });
-      }
+    (targetQuery, key) => {
+      push({
+        pathname: "/search",
+        query: {
+          ...query,
+          // queryTags
+          // tags: queryTags.join(","),
+        },
+      });
+      // const filteredQuery = [...new Set([...query.tags.split(",")])].filter(
+      //   (tag) => tag !== targetQuery
+      // );
+      // if (filteredQuery.length > 0) {
+      //   push({
+      //     pathname: "/search",
+      //     query: {
+      //       ...query,
+      //       tags: filteredQuery.join(","),
+      //     },
+      //   });
+      // } else {
+      //   delete query.tags;
+      //   push({
+      //     pathname: "/search",
+      //     query,
+      //   });
+      // }
     },
     [queryTags]
   );
   if (queryTags.length === 0) {
     return <></>;
   }
+  console.log("queryTags", queryTags);
   return (
     <ListWrapper>
-      {queryTags.map((tag) => (
+      {queryTags.map(({ value, key }) => (
         <Chip
-          label={tag}
+          key={value}
+          label={value}
           sx={{
             backgroundColor: COLOR_TABLE.default,
             cursor: "pointer",
@@ -55,8 +75,8 @@ const SelectedTags = ({ queryTags }) => {
               transition: "transform 0.4s",
             },
           }}
-          onClick={() => linkHandler(tag)}
-          onDelete={() => linkHandler(tag)}
+          onClick={() => linkHandler(value, key)}
+          onDelete={() => linkHandler(value, key)}
         />
       ))}
     </ListWrapper>

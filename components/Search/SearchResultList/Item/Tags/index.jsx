@@ -21,14 +21,14 @@ const TagsWrapper = styled.ul`
 //   `}
 // `;
 
-const Tags = ({ tags, queryTags }) => {
+const Tags = ({ tags, queryTags, type }) => {
   const { query, push } = useRouter();
   const linkTagsHandler = useCallback(
     (newQuery) => {
       push({
         query: {
           ...query,
-          tags: [
+          [type]: [
             ...new Set(
               Array.isArray(queryTags) && queryTags.length > 0
                 ? [...queryTags, newQuery]

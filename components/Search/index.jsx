@@ -7,7 +7,7 @@ import { Box } from "@mui/material";
 import SearchResultList from "./SearchResultList";
 import SearchField from "../../shared/components/SearchField";
 import { postFetcher } from "../../utils/fetcher";
-import { bodyHandler, searchTypeHandler } from "../../utils/notion";
+import { bodyHandler } from "../../utils/notion";
 import stringSanitizer from "../../utils/sanitizer";
 import SelectedTags from "./SelectedTags";
 import SelectedCategory from "./SelectedCategory";
@@ -22,27 +22,17 @@ const SearchWrapper = styled.div`
 `;
 
 const Search = () => {
-  const router = useRouter();
+  const { query } = useRouter();
   const queryTags = useMemo(
     () =>
-      typeof router.query.tags === "string"
-        ? stringSanitizer(router.query.tags).split(",")
+      typeof query.tags === "string"
+        ? stringSanitizer(query.tags).split(",")
         : [],
-    [router.query.tags]
+    [query.tags]
   );
-  const keyword = useMemo(
-    () => stringSanitizer(router.query.q),
-    [router.query.q]
-  );
-  const cats = useMemo(
-    () => stringSanitizer(router.query.cats),
-    [router.query.cats]
-  );
+
   const { data } = useSWRImmutable(
-    [
-      `https://api.daoedu.tw/notion/databases/${searchTypeHandler(cats)}`,
-      bodyHandler(keyword, queryTags),
-    ],
+    [`https://api.daoedu.tw/notion/databases`, bodyHandler(query)],
     postFetcher
   );
   const isLoading = !data;
@@ -52,7 +42,7 @@ const Search = () => {
   console.log("data", data);
   return (
     <SearchWrapper>
-      <SelectedCategory queryTags={queryTags} />
+      <SelectedCategory />
       <SearchField />
       <Box
         sx={{
@@ -68,10 +58,13 @@ const Search = () => {
       >
         <h1 className="header-title">搜尋結果</h1>
         {Array.isArray(data?.payload?.results) && (
-          <p className="header-result">共{data?.payload?.results.length}筆</p>
+          <p className="header-result">
+            共{data?.payload?.results.length}
+            {hasMoredata && "+"}筆
+          </p>
         )}
       </Box>
-      <SelectedTags queryTags={queryTags} />
+      <SelectedTags query={query} />
       {isError ? (
         <>
           <p>出問題囉：{errorMessage}</p>

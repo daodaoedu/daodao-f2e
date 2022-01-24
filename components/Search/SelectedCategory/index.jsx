@@ -57,35 +57,69 @@ const CATEGORIES = [
   },
 ];
 
-const SelectedCategory = ({ queryTags }) => {
+const SelectedCategory = () => {
   const { push, query } = useRouter();
   const linkHandler = useCallback(
     (targetQuery) => {
-      push(
-        {
+      const isSelected = (query?.cats ?? "").includes(targetQuery);
+      const result = (query?.cats ?? "")
+        .split(",")
+        .filter((val) => val !== targetQuery);
+      if (isSelected) {
+        if (result.length > 0) {
+          push({
+            pathname: "/search",
+            query: {
+              ...query,
+              cats: result.join(","),
+            },
+          });
+        } else {
+          delete query.cats;
+          push({
+            pathname: "/search",
+            query,
+          });
+        }
+      } else if (result.length > 0) {
+        push({
           pathname: "/search",
           query: {
             ...query,
-            cats: targetQuery,
+            cats: [
+              ...new Set(
+                (query?.cats ?? "").split(",").length > 0
+                  ? [...(query?.cats ?? "").split(","), targetQuery]
+                  : [targetQuery]
+              ),
+            ].join(","),
           },
-        },
-        undefined,
-        { shallow: true }
-      );
+        });
+      } else {
+        push({
+          pathname: "/search",
+          query: {
+            ...query,
+            cats: [targetQuery],
+          },
+        });
+      }
     },
-    [queryTags, query]
+    [query]
   );
+
   return (
     <ListWrapper>
       {CATEGORIES.map(({ key, value }) => (
         <Chip
           key={key}
           label={value}
-          onClick={() => linkHandler(key)}
+          onClick={() => linkHandler(value)}
           sx={{
-            backgroundColor:
-              query.cats === key ? COLOR_TABLE.green : COLOR_TABLE.default,
-            opacity: query.cats === key ? "100%" : "40%",
+            backgroundColor: (query?.cats ?? "").includes(value)
+              ? COLOR_TABLE.green
+              : COLOR_TABLE.default,
+            opacity: (query?.cats ?? "").includes(value) ? "100%" : "40%",
             cursor: "pointer",
             margin: "5px",
             whiteSpace: "nowrap",

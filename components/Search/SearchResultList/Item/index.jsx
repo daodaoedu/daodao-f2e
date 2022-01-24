@@ -71,12 +71,11 @@ const TitleWrapper = styled.div`
 
 const Item = ({ data, queryTags }) => {
   const hashTags = useMemo(
-    () => data?.properties["標籤 / Hashtag"]?.multi_select ?? [],
+    () => data?.properties["標籤"]?.multi_select ?? [],
     [data]
   );
   const resourcesTags = useMemo(
-    () =>
-      data?.properties["資源類型 / Type of the resource"]?.multi_select ?? [],
+    () => data?.properties["資源類型"]?.multi_select ?? [],
     [data]
   );
   const feeTags = useMemo(
@@ -86,41 +85,40 @@ const Item = ({ data, queryTags }) => {
         : [],
     [data]
   );
-  const areaTags = useMemo(
-    () =>
-      data?.properties["地區"]?.select
-        ? [data?.properties["地區"]?.select]
-        : [],
-    [data]
-  );
+  // const areaTags = useMemo(
+  //   () =>
+  //     data?.properties["地區"]?.multi_select
+  //       ? data?.properties["地區"]?.multi_select
+  //       : [],
+  //   [data]
+  // );
   const ageOfUserTags = useMemo(
-    () => data?.properties["年齡層 / Age of users"]?.multi_select ?? [],
+    () => data?.properties["年齡層"]?.multi_select ?? [],
     [data]
   );
 
-  const link = useMemo(
-    () => data?.properties["連結 / Link"]?.url ?? "",
-    [data]
-  );
+  const link = useMemo(() => data?.properties["連結"]?.url ?? "", [data]);
 
   return (
     <ItemWrapper>
       <ImageWrapper
         onClick={() => window.open(link, "_blank")}
-        image={
-          data?.properties["縮圖 / Thumbnail"]?.files[0].name ?? "/preview.webp"
-        }
+        image={data?.properties["縮圖"]?.files[0].name ?? "/preview.webp"}
       />
       <ContentWrapper>
         <TitleWrapper>
           <h2 className="title" onClick={() => window.open(link, "_blank")}>
-            {data?.properties["資源名稱 / Name"]?.title[0]?.plain_text ?? ""}
+            {data?.properties["資源名稱"]?.title[0]?.plain_text ?? ""}
           </h2>
-          <Tags tags={feeTags} queryTags={queryTags} />
-          <Tags tags={areaTags} queryTags={queryTags} />
+          <Tags type="fee" tags={feeTags} queryTags={queryTags} />
+          {/* <Tags tags={areaTags} queryTags={queryTags} /> */}
         </TitleWrapper>
-        <Tags tags={[...resourcesTags, ...hashTags]} queryTags={queryTags} />
-        <Tags tags={ageOfUserTags} queryTags={queryTags} />
+        <Tags
+          type="tags"
+          tags={[...resourcesTags, ...hashTags]}
+          queryTags={queryTags}
+        />
+        <Tags type="ages" tags={ageOfUserTags} queryTags={queryTags} />
       </ContentWrapper>
     </ItemWrapper>
   );
