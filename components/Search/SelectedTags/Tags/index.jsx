@@ -1,7 +1,6 @@
-import React, { useCallback } from "react";
+import React from "react";
 import styled from "@emotion/styled";
 import Chip from "@mui/material/Chip";
-import { useRouter } from "next/router";
 import { COLOR_TABLE } from "../../../../constants/notion";
 
 const ListWrapper = styled.ul`
