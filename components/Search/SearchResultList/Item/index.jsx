@@ -110,7 +110,7 @@ const Item = ({ data, queryTags }) => {
           <h2 className="title" onClick={() => window.open(link, "_blank")}>
             {data?.properties["資源名稱"]?.title[0]?.plain_text ?? ""}
           </h2>
-          <Tags type="fee" tags={feeTags} queryTags={queryTags} />
+          <Tags type="fee" tags={feeTags} />
           {/* <Tags tags={areaTags} queryTags={queryTags} /> */}
         </TitleWrapper>
         <Tags
@@ -118,7 +118,7 @@ const Item = ({ data, queryTags }) => {
           tags={[...resourcesTags, ...hashTags]}
           queryTags={queryTags}
         />
-        <Tags type="ages" tags={ageOfUserTags} queryTags={queryTags} />
+        <Tags type="ages" tags={ageOfUserTags} />
       </ContentWrapper>
     </ItemWrapper>
   );

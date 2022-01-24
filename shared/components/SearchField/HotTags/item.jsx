@@ -40,17 +40,13 @@ const Tag = ({ title }) => {
   );
   const linkHandler = useCallback(
     (targetQuery) => {
-      push(
-        {
-          pathname: "/search",
-          query: {
-            ...query,
-            tags: [...new Set([...queryTags, targetQuery])].join(","),
-          },
+      push({
+        pathname: "/search",
+        query: {
+          ...query,
+          tags: [...new Set([...queryTags, targetQuery])].join(","),
         },
-        undefined,
-        { shallow: true }
-      );
+      });
     },
     [queryTags, query]
   );

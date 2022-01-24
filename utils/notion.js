@@ -40,11 +40,7 @@ export const bodyHandler = (query) => {
   let body = {
     filter: {
       // and裡面有兩個or，文案相關或標籤相關來做篩選
-      and: [
-        {
-          or: [],
-        },
-      ],
+      and: [],
     },
   };
 
@@ -59,15 +55,16 @@ export const bodyHandler = (query) => {
         ...body.filter,
         and: [
           {
+            ...(body.filter?.and[0] ?? []),
             or: [
               {
-                property: "資源名稱 / Name",
+                property: "資源名稱",
                 title: {
                   contains: keyword,
                 },
               },
               {
-                property: "介紹 / Introduction",
+                property: "介紹",
                 rich_text: {
                   contains: keyword,
                 },

@@ -83,27 +83,27 @@ const SearchInput = () => {
   // const [isFocus, setIsFocus] = useState(false);
   const handleKeyPress = (event) => {
     if (event.key === "Enter" && keyword !== "") {
-      if (query.tags) {
-        push({
-          query: {
-            ...query,
-            q: keyword,
-          },
-        });
-      }
+      // if (query.tags) {
+      push({
+        query: {
+          ...query,
+          q: keyword,
+        },
+      });
+      // }
     }
   };
 
-  const routingPush = (path) => {
-    if (path !== "") {
-      if (query.tags) {
-        push({
-          query: {
-            ...query,
-            q: keyword,
-          },
-        });
-      }
+  const routingPush = (words) => {
+    if (words !== "") {
+      // if (query.tags) {
+      push({
+        query: {
+          ...query,
+          q: words,
+        },
+      });
+      // }
     }
   };
 

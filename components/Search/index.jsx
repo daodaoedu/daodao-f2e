@@ -23,6 +23,10 @@ const SearchWrapper = styled.div`
 
 const Search = () => {
   const { query } = useRouter();
+  const { data } = useSWRImmutable(
+    [`https://api.daoedu.tw/notion/databases`, bodyHandler(query)],
+    postFetcher
+  );
   const queryTags = useMemo(
     () =>
       typeof query.tags === "string"
@@ -31,10 +35,6 @@ const Search = () => {
     [query.tags]
   );
 
-  const { data } = useSWRImmutable(
-    [`https://api.daoedu.tw/notion/databases`, bodyHandler(query)],
-    postFetcher
-  );
   const isLoading = !data;
   const isError = data?.payload?.object === "error";
   const hasMoredata = data?.payload?.has_more;

@@ -21,24 +21,28 @@ const TagsWrapper = styled.ul`
 //   `}
 // `;
 
-const Tags = ({ tags, queryTags, type }) => {
+const Tags = ({ tags, type }) => {
   const { query, push } = useRouter();
   const linkTagsHandler = useCallback(
     (newQuery) => {
+      if (query[type]) {
+        push({
+          pathname: "/search",
+          query: {
+            ...query,
+            [type]: [query[type].split(","), newQuery].join(","),
+          },
+        });
+      }
       push({
+        pathname: "/search",
         query: {
           ...query,
-          [type]: [
-            ...new Set(
-              Array.isArray(queryTags) && queryTags.length > 0
-                ? [...queryTags, newQuery]
-                : [newQuery]
-            ),
-          ].join(","),
+          [type]: newQuery,
         },
       });
     },
-    [queryTags, query]
+    [query]
   );
   return (
     <TagsWrapper>

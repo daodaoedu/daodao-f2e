@@ -1,84 +1,62 @@
 import React, { useCallback } from "react";
 import styled from "@emotion/styled";
-import Chip from "@mui/material/Chip";
+// import Chip from "@mui/material/Chip";
 import { useRouter } from "next/router";
-import { COLOR_TABLE } from "../../../constants/notion";
+// import { COLOR_TABLE } from "../../../constants/notion";
+import Tags from "./Tags";
 
 const ListWrapper = styled.ul`
   display: flex;
   flex-wrap: wrap;
-  margin: 20px 0;
 `;
 
 const SelectedTags = () => {
   const { push, query } = useRouter();
-  const queryTags = [
-    ...(query?.tags ?? "")
-      .split(",")
-      .map((tag) => ({ key: "tags", value: tag })),
-    ...(query?.fee ?? "").split(",").map((tag) => ({ key: "fee", value: tag })),
-    ...(query?.ages ?? "")
-      .split(",")
-      .map((tag) => ({ key: "ages", value: tag })),
-  ];
 
-  const linkHandler = useCallback(
-    (targetQuery, key) => {
-      push({
-        pathname: "/search",
-        query: {
-          ...query,
-          // queryTags
-          // tags: queryTags.join(","),
-        },
-      });
-      // const filteredQuery = [...new Set([...query.tags.split(",")])].filter(
-      //   (tag) => tag !== targetQuery
-      // );
-      // if (filteredQuery.length > 0) {
-      //   push({
-      //     pathname: "/search",
-      //     query: {
-      //       ...query,
-      //       tags: filteredQuery.join(","),
-      //     },
-      //   });
-      // } else {
-      //   delete query.tags;
-      //   push({
-      //     pathname: "/search",
-      //     query,
-      //   });
-      // }
+  const tags = (query?.tags ?? "")
+    .split(",")
+    .map((tag) => ({ key: "tags", value: tag }))
+    .filter(({ value }) => value !== "");
+
+  const feeTags = (query?.fee ?? "")
+    .split(",")
+    .map((tag) => ({ key: "fee", value: tag }))
+    .filter(({ value }) => value !== "");
+
+  const ageTags = (query?.ages ?? "")
+    .split(",")
+    .map((tag) => ({ key: "ages", value: tag }))
+    .filter(({ value }) => value !== "");
+
+  const onDelete = useCallback(
+    (key, targetValue) => {
+      if (typeof query[key] === "string" && query[key].split(",").length > 1) {
+        push({
+          pathname: "/search",
+          query: {
+            ...query,
+            [key]: query[key]
+              .split(",")
+              .filter((value) => value !== targetValue)
+              .join(","),
+          },
+        });
+      } else {
+        delete query[key];
+        push({
+          pathname: "/search",
+          query,
+        });
+      }
     },
-    [queryTags]
+    [query]
   );
-  if (queryTags.length === 0) {
-    return <></>;
-  }
-  console.log("queryTags", queryTags);
+
   return (
     <ListWrapper>
-      {queryTags.map(({ value, key }) => (
-        <Chip
-          key={value}
-          label={value}
-          sx={{
-            backgroundColor: COLOR_TABLE.default,
-            cursor: "pointer",
-            margin: "5px",
-            whiteSpace: "nowrap",
-            fontWeight: 500,
-            fontSize: "14px",
-            "&:hover": {
-              opacity: "60%",
-              transition: "transform 0.4s",
-            },
-          }}
-          onClick={() => linkHandler(value, key)}
-          onDelete={() => linkHandler(value, key)}
-        />
-      ))}
+      <Tags tags={tags} onDelete={onDelete} />
+      <Tags tags={feeTags} onDelete={onDelete} />
+      <Tags tags={ageTags} onDelete={onDelete} />
     </ListWrapper>
   );
 };
