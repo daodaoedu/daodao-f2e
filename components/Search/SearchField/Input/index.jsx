@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 // import ClickAwayListener from "@mui/base/ClickAwayListener";
 import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
@@ -83,31 +83,43 @@ const SearchInput = () => {
   // );
 
   // const [isFocus, setIsFocus] = useState(false);
-  const handleKeyPress = (event) => {
-    if (event.key === "Enter" && keyword !== "") {
-      // if (query.tags) {
-      push({
-        query: {
-          ...query,
-          q: keyword,
-        },
-      });
-      // }
-    }
-  };
+  const handleKeyPress = useCallback(
+    (event) => {
+      if (event.key === "Enter" && keyword !== "") {
+        push({
+          query: {
+            ...query,
+            q: keyword,
+          },
+        });
+      } else if (event.key === "Enter" && keyword === "") {
+        delete query.q;
+        push({
+          query,
+        });
+      }
+    },
+    [push, query]
+  );
 
-  const routingPush = (words) => {
-    if (words !== "") {
-      // if (query.tags) {
-      push({
-        query: {
-          ...query,
-          q: words,
-        },
-      });
-      // }
-    }
-  };
+  const routingPush = useCallback(
+    (words) => {
+      if (words !== "") {
+        push({
+          query: {
+            ...query,
+            q: words,
+          },
+        });
+      } else {
+        delete query.q;
+        push({
+          query,
+        });
+      }
+    },
+    [push, query]
+  );
 
   return (
     // <ClickAwayListener>
