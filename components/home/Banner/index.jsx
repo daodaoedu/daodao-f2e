@@ -36,6 +36,7 @@ const MainBannerWrapper = styled.div`
 
   @media (max-width: 768px) {
     width: 80%;
+    padding-top: 10vh;
   }
 `;
 

@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import useSWRImmutable from "swr/immutable";
 import { Box } from "@mui/material";
 import SearchResultList from "./SearchResultList";
-import SearchField from "../../shared/components/SearchField";
+import SearchField from "./SearchField";
 import { postFetcher } from "../../utils/fetcher";
 import { bodyHandler } from "../../utils/notion";
 import stringSanitizer from "../../utils/sanitizer";

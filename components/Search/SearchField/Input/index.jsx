@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
 import styled from "@emotion/styled";
-import { Search } from "@mui/icons-material";
+// import { Search } from "@mui/icons-material";
 import { useRouter } from "next/router";
 import SearchButton from "./Button";
 // import i18n from "../../../../../constants/i18n";
@@ -14,7 +14,7 @@ const SearchInputWrapper = styled(Paper)`
   width: 100%;
   position: relative;
   border-radius: 10px;
-  border: 2px solid #37b9eb;
+  border: 2px solid #16b9b3;
   box-shadow: none;
 
   @media (max-width: 767px) {
@@ -27,6 +27,8 @@ const InputBaseWrapper = styled(InputBase)`
   z-index: 10;
   border-bottom-right-radius: 20px;
   border-top-right-radius: 20px;
+  margin-left: 10px;
+  width: 100%;
 
   @media (max-width: 767px) {
     border-radius: 20px;
@@ -118,7 +120,6 @@ const SearchInput = () => {
       }}
     >
       <InputBaseWrapper
-        sx={{ ml: "40px", flex: 1 }}
         inputProps={{ "aria-label": "search google maps" }}
         value={keyword}
         onKeyPress={handleKeyPress}
@@ -127,7 +128,7 @@ const SearchInput = () => {
           setKeyword(event.target.value);
         }}
       />
-      <Search
+      {/* <Search
         sx={{
           position: "absolute",
           left: "12px",
@@ -136,7 +137,7 @@ const SearchInput = () => {
           zIndex: 15,
           // transform: "translate(0,-25%)",
         }}
-      />
+      /> */}
       <SearchButton
         routingPush={() => routingPush(keyword)}
         // addSearchHistory={() =>

@@ -15,7 +15,7 @@ const ContentWrapper = styled.div`
   padding: 0 10px;
   margin-left: 20px;
   @media (max-width: 767px) {
-    width: 100%;
+    width: calc(100% - 100px);
   }
 `;
 

@@ -6,20 +6,23 @@ import styled from "@emotion/styled";
 const SearchButtonWrapper = styled(IconButton)`
   position: absolute;
   overflow: hidden;
-  background-color: #007bbb;
+  background-color: #16b9b3;
   color: white;
-  border-radius: 10px;
+  /* border-radius: 10px; */
   width: 80px;
   height: 100%;
   right: 0;
   z-index: 20;
+  border-radius: 0;
 
   &:hover {
-    background-color: #007bbb;
+    background-color: #16b9b3;
+    opacity: 0.8;
+    transition: opacity 0.5s;
   }
   @media (max-width: 767px) {
     width: 60px;
-    border-radius: 20px;
+    /* border-radius: 20px; */
   }
 `;
 

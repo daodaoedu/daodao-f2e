@@ -9,6 +9,8 @@ const CardWrapper = styled.li`
   border-radius: 20px;
   opacity: 0;
 
+  margin: 10px;
+
   cursor: pointer;
   object-fit: cover;
   &:hover {
