@@ -2,13 +2,14 @@ import React from "react";
 import styled from "@emotion/styled";
 
 const BannerVideoWrapper = styled.div`
+  position: absolute;
   background-color: #f5f5f5;
   width: 100%;
   height: calc(100vh - 80px);
   overflow: hidden;
+  z-index: -1;
 
   video {
-    position: absolute;
     object-fit: cover;
     width: 100%;
     height: inherit;

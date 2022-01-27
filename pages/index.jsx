@@ -1,16 +1,18 @@
 import React, { useMemo, useRef } from "react";
-// import styled from "@emotion/styled";
+import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 // import { SWRConfig } from "swr";
 import SEOConfig from "../shared/components/SEO";
 import Banner from "../components/home/Banner";
 import Guide from "../components/home/Guide";
-import BannerVideo from "../components/home/BannerVideo";
 import Navigation from "../shared/components/Navigation_v2";
 import Footer from "../shared/components/Footer_v2";
 // import logger from "../utils/logger";
 
-// const BodyWrapper = styled.div``;
+const HomePageWrapper = styled.div`
+  --section-height: calc(100vh - 80px);
+  --section-height-offset: 80px;
+`;
 
 const Home = () => {
   const router = useRouter();
@@ -30,17 +32,14 @@ const Home = () => {
   );
 
   return (
-    <>
+    <HomePageWrapper>
       <SEOConfig data={SEOData} />
       <Navigation />
-      {/* <BodyWrapper> */}
-      <BannerVideo />
       <Banner guideRef={guideRef} />
       <div ref={guideRef} />
       <Guide />
-      {/* </BodyWrapper> */}
       <Footer />
-    </>
+    </HomePageWrapper>
   );
 };
 

@@ -2,6 +2,7 @@ import { useRef } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import { slideInUp } from "../../../../shared/styles/animation";
+import Card from "./Card";
 // import useIntersectionObserver from "../../../../hooks/useIntersectionObserver";
 
 const CardWrapper = styled.li`
@@ -53,44 +54,6 @@ const CardListWrapper = styled.ul`
   }
 `;
 
-const ContentWrapper = styled.div`
-  padding-left: 10%;
-  padding-top: 25%;
-  .title {
-    color: #f0f0f0;
-    font-size: 36px;
-    line-height: 45px;
-    letter-spacing: 0.08em;
-    font-weight: bold;
-  }
-
-  .desc {
-    color: #f0f0f0;
-    font-size: 17px;
-    line-height: 45px;
-    letter-spacing: 0.08em;
-    font-weight: bold;
-  }
-`;
-
-const BackgroundWrapper = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  border-radius: 20px;
-  z-index: -1;
-  ${({ image }) => css`
-    background-image: ${`url(${image})`};
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    filter: brightness(50%);
-  `}
-`;
-
 const data = [
   {
     id: 0,
@@ -121,17 +84,7 @@ const CardList = () => {
   return (
     <CardListWrapper ref={trigger}>
       {data.map(({ image, title, id }) => (
-        <CardWrapper
-          key={id}
-          isShow
-          // isShow={isShow}
-        >
-          <BackgroundWrapper image={image} />
-          <ContentWrapper>
-            <p className="title">{title}</p>
-            <p className="desc">學習夥伴成長中</p>
-          </ContentWrapper>
-        </CardWrapper>
+        <Card key={id} id={id} image={image} title={title} />
       ))}
     </CardListWrapper>
   );
