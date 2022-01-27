@@ -1,34 +1,33 @@
 import React, { useCallback, useMemo } from "react";
-import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import { Chip } from "@mui/material";
 import { COLOR_TABLE } from "../../../../constants/notion";
 import stringSanitizer from "../../../../utils/sanitizer";
 
-const TagWrapper = styled(Chip)`
-  margin: auto 5px;
-  font-weight: 700;
-  white-space: nowrap;
-  a {
-    color: #37b9eb;
-    font-weight: bold;
-    font-size: 16px;
-  }
+// const TagWrapper = styled(Chip)`
+//   margin: auto 5px;
+//   font-weight: 700;
+//   white-space: nowrap;
+//   a {
+//     color: #37b9eb;
+//     font-weight: bold;
+//     font-size: 16px;
+//   }
 
-  a:hover {
-    text-decoration: underline;
-  }
+//   a:hover {
+//     text-decoration: underline;
+//   }
 
-  @media (max-width: 767px) {
-    left: 70px;
-    width: 85vw;
-    overflow-x: visible;
-    a {
-      color: #007bbb;
-      font-size: 14px;
-    }
-  }
-`;
+//   @media (max-width: 767px) {
+//     left: 70px;
+//     width: 85vw;
+//     overflow-x: visible;
+//     a {
+//       color: #007bbb;
+//       font-size: 14px;
+//     }
+//   }
+// `;
 const Tag = ({ title }) => {
   const { push, query } = useRouter();
   const queryTags = useMemo(
