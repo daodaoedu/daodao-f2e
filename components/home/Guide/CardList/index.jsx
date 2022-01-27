@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import styled from "@emotion/styled";
-import { css } from "@emotion/react";
-import { slideInUp } from "../../../../shared/styles/animation";
+// import { css } from "@emotion/react";
+// import { slideInUp } from "../../../../shared/styles/animation";
 import Card from "./Card";
 // import useIntersectionObserver from "../../../../hooks/useIntersectionObserver";
 
