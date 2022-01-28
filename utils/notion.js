@@ -32,17 +32,29 @@ export const searchTypeHandler = (type) => {
   return "language";
 };
 
-export const bodyHandler = (query) => {
-  if (Object.keys(query).length === 0) {
-    return {};
+export const bodyHandler = (query, nextCursor, pageSize = 100) => {
+  let body = {};
+
+  // 下一頁 optional
+
+  if (nextCursor) {
+    body = {
+      ...body,
+      start_cursor: nextCursor,
+    };
   }
 
-  let body = {
-    filter: {
-      // and裡面有兩個or，文案相關或標籤相關來做篩選
-      and: [],
-    },
-  };
+  // optional
+  if (pageSize) {
+    body = {
+      ...body,
+      page_size: pageSize,
+    };
+  }
+
+  if (Object.keys(query).length === 0) {
+    return body;
+  }
 
   const { tags, q, cats, ages, fee } = query;
 

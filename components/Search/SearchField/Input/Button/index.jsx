@@ -8,11 +8,10 @@ const SearchButtonWrapper = styled(IconButton)`
   overflow: hidden;
   background-color: #16b9b3;
   color: white;
-  /* border-radius: 10px; */
   width: 80px;
   height: 100%;
   right: 0;
-  z-index: 20;
+  z-index: 10;
   border-radius: 0;
 
   &:hover {

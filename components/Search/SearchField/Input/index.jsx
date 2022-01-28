@@ -16,6 +16,7 @@ const SearchInputWrapper = styled(Paper)`
   border-radius: 10px;
   border: 2px solid #16b9b3;
   box-shadow: none;
+  overflow: hidden;
 
   @media (max-width: 767px) {
     border-radius: 20px;

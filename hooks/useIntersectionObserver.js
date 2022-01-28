@@ -15,7 +15,6 @@ export default function useIntersectionObserver({
 
     const observer = new IntersectionObserver(
       (entries) =>
-        // eslint-disable-next-line implicit-arrow-linebreak
         entries.forEach((entry) => entry.isIntersecting && onIntersect()),
       {
         root: root && root.current,
