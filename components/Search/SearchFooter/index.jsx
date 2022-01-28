@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "@emotion/styled";
-import { Box } from "@mui/material";
+// import { Box } from "@mui/material";
 
 const LoadMore = styled.div`
   position: absolute;
@@ -16,14 +16,15 @@ const SearchFooter = ({
   errorMessage,
 }) => {
   console.log("hasMoredata", hasMoredata);
-  if (!hasMoredata && !isError) {
-    <Box sx={{ margin: "20px" }}>已經抵達無人島囉～</Box>;
-  }
   if (hasMoredata) {
-    <LoadMore ref={loadMoreButtonRef} />;
+    return <LoadMore ref={loadMoreButtonRef} />;
+  }
+  if (!hasMoredata && !isError) {
+    return <p>已經抵達無人島囉～</p>;
+    //   <Box sx={{ margin: "20px" }}></Box>;
   }
   if (isError) {
-    <p>出問題囉：{errorMessage}</p>;
+    return <p>出問題囉：{errorMessage}</p>;
   }
   return <></>;
 };

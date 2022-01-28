@@ -59,13 +59,16 @@ const CATEGORIES = [
 
 const SelectedCategory = () => {
   const { push, query } = useRouter();
-  const linkHandler = useCallback(
-    (targetQuery) => {
+  const onClickCategory = useCallback(
+    (event) => {
+      const targetQuery = event.target.textContent;
       const isSelected = (query?.cats ?? "").includes(targetQuery);
       const result = (query?.cats ?? "")
         .split(",")
-        .filter((val) => val !== targetQuery);
+        .filter((val) => val !== targetQuery)
+        .filter((val) => val !== "");
       if (isSelected) {
+        // 取消選取可能會清空
         if (result.length > 0) {
           push({
             pathname: "/search",
@@ -100,7 +103,7 @@ const SelectedCategory = () => {
           pathname: "/search",
           query: {
             ...query,
-            cats: [targetQuery],
+            cats: targetQuery,
           },
         });
       }
@@ -114,7 +117,8 @@ const SelectedCategory = () => {
         <Chip
           key={key}
           label={value}
-          onClick={() => linkHandler(value)}
+          value={value}
+          onClick={onClickCategory}
           sx={{
             backgroundColor: (query?.cats ?? "").includes(value)
               ? COLOR_TABLE.green

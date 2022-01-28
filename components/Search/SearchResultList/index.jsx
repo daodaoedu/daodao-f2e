@@ -9,7 +9,7 @@ const ListWrapper = styled.ul`
   justify-content: space-between;
 `;
 
-const List = ({ list, queryTags, isLoading, isLoadingMoreData }) => {
+const List = ({ list, queryTags, isLoading }) => {
   if (isLoading) {
     return (
       <ListWrapper>
@@ -26,13 +26,13 @@ const List = ({ list, queryTags, isLoading, isLoadingMoreData }) => {
       {list.map((item) => (
         <Item key={item?.id} data={item} queryTags={queryTags} />
       ))}
-      {isLoadingMoreData && (
+      {/* {isLoadingMoreData && (
         <>
           <SkeletonItem />
           <SkeletonItem />
           <SkeletonItem />
         </>
-      )}
+      )} */}
     </ListWrapper>
   );
 };

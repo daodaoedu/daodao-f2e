@@ -7,8 +7,8 @@ import React, {
 } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
-import useSWR from "swr";
-// import useSWRImmutable from "swr/immutable";
+// import useSWR from "swr";
+import useSWRImmutable from "swr/immutable";
 import { Box } from "@mui/material";
 import SearchResultList from "./SearchResultList";
 import SearchField from "./SearchField";
@@ -34,11 +34,8 @@ const Search = () => {
   const { query } = useRouter();
   const loadMoreButtonRef = useRef();
   const [nextCursor, setNextCursor] = useState(null);
-  const { data = [] } = useSWR(
-    [
-      `https://api.daoedu.tw/notion/databases`,
-      bodyHandler(query, nextCursor, 10),
-    ],
+  const { data = [] } = useSWRImmutable(
+    [`https://api.daoedu.tw/notion/databases`, bodyHandler(query, nextCursor)],
     postFetcher
   );
   console.log("nextCursor", nextCursor);
@@ -53,10 +50,10 @@ const Search = () => {
     [query.tags]
   );
   const isLoadingMoreData = useMemo(() => data.length === 0, [data]);
-  const isLoadingPreviewList = useMemo(
-    () => previewList.length === 0,
-    [previewList]
-  );
+  // const isLoadingPreviewList = useMemo(
+  //   () => previewList.length === 0,
+  //   [previewList]
+  // );
   const isError = useMemo(
     () => data?.payload?.object === "error",
     [data?.payload?.object]
@@ -81,10 +78,9 @@ const Search = () => {
     }
   }, [data, setPreviewList]);
 
-  const onIntersect = useCallback(
-    () => setNextCursor(data?.payload?.next_cursor),
-    [setNextCursor, data?.payload?.next_cursor]
-  );
+  const onIntersect = useCallback(() => {
+    setNextCursor(data?.payload?.next_cursor);
+  }, [setNextCursor, data?.payload?.next_cursor]);
 
   useIntersectionObserver({
     enabled: !isLoadingMoreData,
@@ -93,11 +89,14 @@ const Search = () => {
     threshold: 0.3,
   });
 
+  console.log("data", data);
+
   console.log("nextCursor", nextCursor);
   return (
     <SearchWrapper>
       <SelectedCategory />
       <SearchField />
+      <SelectedTags query={query} />
       <Box
         sx={{
           margin: "20px 0 20px 0",
@@ -120,11 +119,11 @@ const Search = () => {
           </p>
         )}
       </Box>
-      <SelectedTags query={query} />
+
       <SearchResultList
         list={previewList}
-        isLoading={isLoadingPreviewList}
-        isLoadingMoreData={isLoadingMoreData}
+        isLoading={isLoadingMoreData}
+        // isLoadingMoreData={isLoadingMoreData}
         queryTags={queryTags}
       />
       <SearchFooter
