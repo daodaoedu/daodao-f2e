@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-// import { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import styled from "@emotion/styled";
 import { Paper } from "@mui/material";
 import useSWRImmutable from "swr/immutable";
@@ -12,7 +12,7 @@ const ResourceWrapper = styled.section`
 `;
 
 const Resource = () => {
-  // const {push} = useRouter()
+  const { query } = useRouter();
   // 理論上要用ID搜尋比較適合，但是notion目前沒有提供這種篩選方式，以後需要調整
   const { data: responseData } = useSWRImmutable(
     [
@@ -23,7 +23,7 @@ const Resource = () => {
             {
               property: "資源名稱",
               title: {
-                contains: "地表最強國文課沒有之一",
+                contains: query.title,
               },
             },
           ],
