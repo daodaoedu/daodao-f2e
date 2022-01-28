@@ -42,6 +42,7 @@ const Search = () => {
   const [previewList, setPreviewList] = useState(
     () => data?.payload?.results ?? []
   );
+
   const queryTags = useMemo(
     () =>
       typeof query.tags === "string"

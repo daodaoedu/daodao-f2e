@@ -97,7 +97,11 @@ const Item = ({ data, queryTags }) => {
     [data]
   );
 
-  const link = useMemo(() => data?.properties["連結"]?.url ?? "", [data]);
+  // const link = useMemo(() => data?.properties["連結"]?.url ?? "", [data]);
+  const link = useMemo(
+    () => `/resource/${data?.properties["資源名稱"]?.title[0]?.plain_text}`,
+    [data]
+  );
 
   return (
     <ItemWrapper>

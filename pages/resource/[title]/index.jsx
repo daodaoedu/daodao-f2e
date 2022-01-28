@@ -1,8 +1,9 @@
 import React, { useMemo } from "react";
 import { useRouter } from "next/router";
-import SEOConfig from "../../shared/components/SEO";
-import Navigation from "../../shared/components/Navigation_v2";
-import Footer from "../../shared/components/Footer_v2";
+import SEOConfig from "../../../shared/components/SEO";
+import Navigation from "../../../shared/components/Navigation_v2";
+import Footer from "../../../shared/components/Footer_v2";
+import Resource from "../../../components/Resource";
 
 const ResourcePage = () => {
   const router = useRouter();
@@ -24,6 +25,7 @@ const ResourcePage = () => {
     <>
       <SEOConfig data={SEOData} />
       <Navigation />
+      <Resource />
       <Footer />
     </>
   );
