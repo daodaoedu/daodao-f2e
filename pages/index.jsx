@@ -43,4 +43,14 @@ const Home = () => {
   );
 };
 
+export const getServerSideProps = async () => {
+  // const { res, req, locale, defaultLocale } = ctx;
+  return {
+    props: {
+      isDev: process.env.NODE_ENV === "development",
+      fallback: {},
+    },
+  };
+};
+
 export default Home;
