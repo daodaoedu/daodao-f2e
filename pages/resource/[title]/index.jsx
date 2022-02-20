@@ -31,22 +31,22 @@ const ResourcePage = () => {
   );
 };
 
-// export const getStaticProps = async () => {
-//   // const res = await fetch("https://jsonplaceholder.typicode.com/posts/1");
-//   // const post = await res.json();
+export const getStaticProps = async () => {
+  // const res = await fetch("https://jsonplaceholder.typicode.com/posts/1");
+  // const post = await res.json();
 
-//   return {
-//     props: {},
-//   };
-// };
+  return {
+    props: {},
+  };
+};
 
-// export const getStaticPaths = async () => {
-//   return {
-//     // paths: [{ params: { title: "跨校選修聯盟" } }],
-//     // fallback: false,
-//     paths: [], // indicates that no page needs be created at build time
-//     fallback: "blocking", // indicates the type of fallback
-//   };
-// };
+export const getStaticPaths = async () => {
+  return {
+    // paths: [{ params: { title: "跨校選修聯盟" } }],
+    // fallback: false,
+    paths: [], // indicates that no page needs be created at build time
+    fallback: "blocking", // indicates the type of fallback
+  };
+};
 
 export default ResourcePage;
