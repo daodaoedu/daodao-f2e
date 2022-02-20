@@ -31,6 +31,7 @@ const ResourcePage = () => {
   );
 };
 
+// stackoverflow.com/questions/62057131/next-js-getstaticpaths-list-every-path-or-only-those-in-the-immediate-vicinity
 export const getStaticProps = async () => {
   // const res = await fetch("https://jsonplaceholder.typicode.com/posts/1");
   // const post = await res.json();
@@ -44,7 +45,7 @@ export const getStaticPaths = async () => {
   return {
     // paths: [{ params: { title: "跨校選修聯盟" } }],
     // fallback: false,
-    paths: [], // indicates that no page needs be created at build time
+    paths: ["test"], // indicates that no page needs be created at build time
     fallback: false, // indicates the type of fallback
   };
 };
