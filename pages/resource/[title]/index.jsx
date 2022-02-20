@@ -45,7 +45,7 @@ export const getStaticPaths = async () => {
     // paths: [{ params: { title: "跨校選修聯盟" } }],
     // fallback: false,
     paths: [], // indicates that no page needs be created at build time
-    // fallback: "blocking", // indicates the type of fallback
+    fallback: false, // indicates the type of fallback
   };
 };
 
