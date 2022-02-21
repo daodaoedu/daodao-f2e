@@ -42,10 +42,21 @@ export const getStaticProps = async () => {
 };
 
 export const getStaticPaths = async () => {
+  const result = await fetch("https://api.daoedu.tw/notion/databases", {
+    method: "POST",
+  }).then((res) => res.json());
+  const pathList = (result?.payload?.results ?? []).map((item) => ({
+    params: {
+      title: item?.properties["資源名稱"]?.title[0]?.plain_text,
+    },
+  }));
+
+  console.log("pathList", pathList);
   return {
     // paths: [{ params: { title: "跨校選修聯盟" } }],
     // fallback: false,
-    paths: [{ params: { title: "test" } }], // indicates that no page needs be created at build time
+    paths: pathList,
+    // paths: [{ params: { title: "test" } }], // indicates that no page needs be created at build time
     fallback: false, // indicates the type of fallback
   };
 };

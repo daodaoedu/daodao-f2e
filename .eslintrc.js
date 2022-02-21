@@ -4,7 +4,8 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  extends: ["plugin:react/recommended", "airbnb"],
+  // extends: ["next", "plugin:react/recommended", "airbnb"],
+  extends: ["next"],
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -28,6 +29,8 @@ module.exports = {
   //   },
   // },
   rules: {
+    "react/no-unescaped-entities": "off",
+    "@next/next/no-page-custom-font": "off",
     "react/prop-types": [0],
     "react/jsx-props-no-spreading": [0],
     "arrow-body-style": 0,

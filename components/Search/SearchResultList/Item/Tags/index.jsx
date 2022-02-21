@@ -42,12 +42,12 @@ const Tags = ({ tags, type }) => {
         },
       });
     },
-    [query]
+    [push, query, type]
   );
   return (
     <TagsWrapper>
       {tags.map(({ name, color }) => (
-        <li>
+        <li key={name}>
           <Chip
             label={name}
             onClick={() => linkTagsHandler(name)}
