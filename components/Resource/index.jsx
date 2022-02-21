@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
-import Image from "next/image";
 import { Paper } from "@mui/material";
 import useSWRImmutable from "swr/immutable";
 import Tags from "./Tags";

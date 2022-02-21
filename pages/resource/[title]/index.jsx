@@ -240,10 +240,6 @@ export const getStaticPaths = async () => {
   const pathList = [];
   let cursor = undefined;
   for (let i = 0; i <= 1; ) {
-    // const requestUrl = nextCursor
-    //   ? `https://api.daoedu.tw/notion/databases?start_cursor=${nextCursor}`
-    //   : "https://api.daoedu.tw/notion/databases";
-
     let body = {
       start_cursor: cursor,
     };
@@ -259,24 +255,13 @@ export const getStaticPaths = async () => {
         },
       }))
     );
-    // console.log("result?.payload", result?.payload);
-    console.log("cursor", cursor);
+
     if (result?.payload?.has_more) {
       cursor = result?.payload?.next_cursor;
       continue;
     }
     i++;
   }
-
-  // const pathList = (result?.payload?.results ?? [])
-  //   .map((item) => ({
-  //     params: {
-  //       title: item?.properties["資源名稱"]?.title[0]?.plain_text,
-  //     },
-  //   }))
-  //   .slice(0, 10);
-  console.log("pathList", pathList);
-
   return {
     paths: pathList,
     // paths: [{ params: { title: "test" } }], // indicates that no page needs be created at build time
