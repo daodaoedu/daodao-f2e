@@ -32,10 +32,9 @@ const ResourcePage = ({ data = {} }) => {
 };
 
 export const getStaticProps = async ({ params }) => {
-  if (process.env.NODE_ENV) {
+  if (process.env.NODE_ENV === "development") {
     return {
       props: {
-        random: Math.random(),
         data: {
           object: "page",
           id: "ca3d9900-589f-4d81-bc3a-4afb101c5e88",
