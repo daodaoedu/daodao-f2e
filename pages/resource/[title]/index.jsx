@@ -280,7 +280,7 @@ export const getStaticPaths = async () => {
   return {
     paths: pathList,
     // paths: [{ params: { title: "test" } }], // indicates that no page needs be created at build time
-    fallback: true, // indicates the type of fallback
+    fallback: false, // indicates the type of fallback
   };
 };
 
