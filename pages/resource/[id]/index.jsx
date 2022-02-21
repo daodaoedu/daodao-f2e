@@ -207,7 +207,7 @@ export const getStaticProps = async ({ params }) => {
     };
   }
 
-  const title = params?.title ?? "";
+  const id = params?.id ?? "";
 
   const data = await fetch("https://api.daoedu.tw/notion/databases", {
     method: "POST",
@@ -215,10 +215,7 @@ export const getStaticProps = async ({ params }) => {
       filter: {
         and: [
           {
-            property: "資源名稱",
-            title: {
-              contains: title,
-            },
+            id: id,
           },
         ],
       },
@@ -250,7 +247,8 @@ export const getStaticPaths = async () => {
     pathList.push(
       ...(result?.payload?.results ?? []).map((item) => ({
         params: {
-          title: item?.properties["資源名稱"]?.title[0]?.plain_text,
+          // title: item?.properties["資源名稱"]?.title[0]?.plain_text,
+          id: item?.id,
         },
       }))
     );
