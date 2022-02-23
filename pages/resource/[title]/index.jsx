@@ -211,7 +211,7 @@ export const getStaticProps = async ({ params }) => {
 
   const data = await fetch("https://api.daoedu.tw/notion/databases", {
     method: "POST",
-    body: {
+    body: JSON.stringify({
       filter: {
         and: [
           {
@@ -222,13 +222,14 @@ export const getStaticProps = async ({ params }) => {
           },
         ],
       },
-    },
+    }),
   }).then((res) => res.json());
 
   return {
     props: {
-      data: data?.payload?.results.find(
-        ({ properties }) => properties["資源名稱"]?.title[0]?.plain_text
+      data: (data?.payload?.results ?? []).find(
+        ({ properties }) =>
+          properties && properties["資源名稱"]?.title[0]?.plain_text
       ),
     },
   };
@@ -250,7 +251,10 @@ export const getStaticPaths = async () => {
     pathList.push(
       ...(result?.payload?.results ?? []).map((item) => ({
         params: {
-          title: item?.properties["資源名稱"]?.title[0]?.plain_text,
+          title: (item?.properties["資源名稱"]?.title ?? []).find(
+            (item) => item?.type === "text"
+          )?.plain_text,
+          // title: item?.properties["資源名稱"]?.title[0]?.plain_text,
           // id: item?.id,
         },
       }))
@@ -265,7 +269,8 @@ export const getStaticPaths = async () => {
   return {
     paths: pathList,
     // paths: [{ params: { title: "test" } }], // indicates that no page needs be created at build time
-    fallback: false, // indicates the type of fallback
+    // fallback: false, // indicates the type of fallback
+    fallback: "blocking",
   };
 };
 
