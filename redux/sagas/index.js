@@ -1,8 +1,6 @@
-import { all } from 'redux-saga/effects';
-import categorySaga from './categorySaga';
+import { all } from "redux-saga/effects";
+import searchSaga from "./searchSaga";
 
 export default function* rootSaga() {
-  yield all([
-    categorySaga(),
-  ]);
+  yield all([searchSaga()]);
 }

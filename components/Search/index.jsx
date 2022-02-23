@@ -8,18 +8,22 @@ import React, {
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 // import useSWR from "swr";
-import useSWRImmutable from "swr/immutable";
+// import useSWRImmutable from "swr/immutable";
 import { Box } from "@mui/material";
 import SearchResultList from "./SearchResultList";
 import SearchField from "./SearchField";
-import { postFetcher } from "../../utils/fetcher";
+// import { postFetcher } from "../../utils/fetcher";
 import { bodyHandler } from "../../utils/notion";
 import stringSanitizer from "../../utils/sanitizer";
 import SelectedTags from "./SelectedTags";
 import SelectedCategory from "./SelectedCategory";
 import useIntersectionObserver from "../../hooks/useIntersectionObserver";
 import SearchFooter from "./SearchFooter";
-
+import { useSelector, useDispatch } from "react-redux";
+import {
+  loadSearchResult,
+  loadNextSearchResult,
+} from "../../redux/actions/search";
 const SearchWrapper = styled.div`
   position: relative;
   height: 100%;
@@ -31,73 +35,66 @@ const SearchWrapper = styled.div`
 `;
 
 const Search = () => {
-  const { query } = useRouter();
+  const dispatch = useDispatch();
+  const { results, isLoading, next_cursor, isLoadingNextData, has_more } =
+    useSelector((state) => state?.search ?? {});
+  const router = useRouter();
   const loadMoreButtonRef = useRef();
-  const [nextCursor, setNextCursor] = useState(null);
-  const { data = [] } = useSWRImmutable(
-    [`https://api.daoedu.tw/notion/databases`, bodyHandler(query, nextCursor)],
-    postFetcher
-  );
-  console.log("nextCursor", nextCursor);
-  const [previewList, setPreviewList] = useState(
-    () => data?.payload?.results ?? []
-  );
+  useEffect(() => {
+    if (router.isReady) {
+      dispatch(loadSearchResult(bodyHandler(router.query)));
+    }
+  }, [dispatch, router.isReady, router.query]);
+  // const { data = [] } = useSWRImmutable(
+  //   [`https://api.daoedu.tw/notion/databases`, bodyHandler(query, nextCursor)],
+  //   postFetcher
+  // );
+  // console.log("nextCursor", nextCursor);
+  // const [previewList, setPreviewList] = useState(
+  //   () => data?.payload?.results ?? []
+  // );
 
   const queryTags = useMemo(
     () =>
-      typeof query.tags === "string"
-        ? stringSanitizer(query.tags).split(",")
+      typeof router.query.tags === "string"
+        ? stringSanitizer(router.query.tags).split(",")
         : [],
-    [query.tags]
+    [router?.query?.tags]
   );
-  const isLoadingMoreData = useMemo(() => data.length === 0, [data]);
   // const isLoadingPreviewList = useMemo(
   //   () => previewList.length === 0,
   //   [previewList]
   // );
-  const isError = useMemo(
-    () => data?.payload?.object === "error",
-    [data?.payload?.object]
-  );
-  const hasMoredata = useMemo(
-    () => data?.payload?.has_more,
-    [data?.payload?.has_more]
-  );
-  const errorMessage = useMemo(
-    () => data?.payload?.message,
-    [data?.payload?.message]
-  );
 
-  useEffect(() => {
-    if (
-      Array.isArray(data?.payload?.results) &&
-      data?.payload?.results.length > 0
-    ) {
-      setPreviewList((prevList) => [
-        ...new Set([...prevList, ...(data?.payload?.results ?? [])]),
-      ]);
-    }
-  }, [data, setPreviewList]);
+  // useEffect(() => {
+  //   if (
+  //     Array.isArray(data?.payload?.results) &&
+  //     data?.payload?.results.length > 0
+  //   ) {
+  //     setPreviewList((prevList) => [
+  //       ...new Set([...prevList, ...(data?.payload?.results ?? [])]),
+  //     ]);
+  //   }
+  // }, [data, setPreviewList]);
 
   const onIntersect = useCallback(() => {
-    setNextCursor(data?.payload?.next_cursor);
-  }, [setNextCursor, data?.payload?.next_cursor]);
+    dispatch(loadNextSearchResult(bodyHandler(router?.query, next_cursor)));
+  }, [dispatch, next_cursor, router?.query]);
 
   useIntersectionObserver({
-    enabled: !isLoadingMoreData,
+    enabled: !isLoadingNextData && next_cursor && has_more,
     target: loadMoreButtonRef,
     onIntersect,
     threshold: 0.3,
   });
 
-  console.log("data", data);
+  console.log("isLoadingNextData", isLoadingNextData);
 
-  console.log("nextCursor", nextCursor);
   return (
     <SearchWrapper>
       <SelectedCategory />
       <SearchField />
-      <SelectedTags query={query} />
+      <SelectedTags query={router.query} />
       <Box
         sx={{
           margin: "20px 0 20px 0",
@@ -111,27 +108,24 @@ const Search = () => {
         }}
       >
         <h1 className="header-title">搜尋結果</h1>
-        {Array.isArray(previewList) && (
+        {Array.isArray(results) && (
           <p className="header-result">
-            共
-            {/* {data?.payload?.results.length}
-             */}
-            {previewList.length}筆{hasMoredata && "以上"}
+            共{results.length}筆{next_cursor && "以上"}
           </p>
         )}
       </Box>
 
       <SearchResultList
-        list={previewList}
-        isLoading={isLoadingMoreData}
-        // isLoadingMoreData={isLoadingMoreData}
+        list={results}
+        isLoading={isLoading}
+        isLoadingNextData={isLoadingNextData}
         queryTags={queryTags}
       />
       <SearchFooter
-        hasMoredata={hasMoredata}
+        hasMoredata={next_cursor}
         loadMoreButtonRef={loadMoreButtonRef}
-        isError={isError}
-        errorMessage={errorMessage}
+        // isError={isError}
+        // errorMessage={errorMessage}
       />
     </SearchWrapper>
   );

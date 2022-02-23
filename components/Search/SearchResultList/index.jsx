@@ -9,7 +9,7 @@ const ListWrapper = styled.ul`
   justify-content: space-between;
 `;
 
-const List = ({ list, queryTags, isLoading }) => {
+const List = ({ list, queryTags, isLoading, isLoadingNextData }) => {
   if (isLoading) {
     return (
       <ListWrapper>
@@ -24,15 +24,19 @@ const List = ({ list, queryTags, isLoading }) => {
   return (
     <ListWrapper>
       {list.map((item) => (
-        <Item key={item?.id} data={item} queryTags={queryTags} />
+        <Item
+          key={item.properties["資源名稱"].title[0].plain_text}
+          data={item}
+          queryTags={queryTags}
+        />
       ))}
-      {/* {isLoadingMoreData && (
+      {isLoadingNextData && (
         <>
           <SkeletonItem />
           <SkeletonItem />
           <SkeletonItem />
         </>
-      )} */}
+      )}
     </ListWrapper>
   );
 };

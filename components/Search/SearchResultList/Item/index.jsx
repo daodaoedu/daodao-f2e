@@ -112,7 +112,11 @@ const Item = ({ data, queryTags }) => {
     <ItemWrapper>
       <ImageWrapper
         onClick={() => window.open(link, "_blank")}
-        image={data?.properties["縮圖"]?.files[0].name ?? "/preview.webp"}
+        image={
+          (Array.isArray(data?.properties["縮圖"]?.files) &&
+            data.properties["縮圖"]?.files[0]?.name) ??
+          "/preview.webp"
+        }
       />
       <ContentWrapper>
         <TitleWrapper>
