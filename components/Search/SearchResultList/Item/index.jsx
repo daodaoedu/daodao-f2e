@@ -97,8 +97,16 @@ const Item = ({ data, queryTags }) => {
     [data]
   );
 
+  const title = useMemo(
+    () =>
+      (data?.properties["資源名稱"]?.title ?? []).find(
+        (item) => item?.type === "text"
+      )?.plain_text,
+    [data?.properties]
+  );
+
   // const link = useMemo(() => data?.properties["連結"]?.url ?? "", [data]);
-  const link = useMemo(() => `/resource/${data?.id}`, [data?.id]);
+  const link = useMemo(() => `/resource/${title}`, [title]);
 
   return (
     <ItemWrapper>
@@ -109,7 +117,7 @@ const Item = ({ data, queryTags }) => {
       <ContentWrapper>
         <TitleWrapper>
           <h2 className="title" onClick={() => window.open(link, "_blank")}>
-            {data?.properties["資源名稱"]?.title[0]?.plain_text ?? ""}
+            {title ?? ""}
           </h2>
           <Tags type="fee" tags={feeTags} />
           {/* <Tags tags={areaTags} queryTags={queryTags} /> */}
