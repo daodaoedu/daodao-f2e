@@ -50,7 +50,9 @@ const Search = () => {
   );
 
   const onIntersect = useCallback(() => {
-    dispatch(loadNextSearchResult(bodyHandler(router?.query, next_cursor)));
+    if (router.isReady) {
+      dispatch(loadNextSearchResult(bodyHandler(router?.query, next_cursor)));
+    }
   }, [dispatch, next_cursor, router?.query]);
 
   useIntersectionObserver({
@@ -62,9 +64,9 @@ const Search = () => {
 
   useEffect(() => {
     if (router.isReady) {
-      dispatch(loadSearchResult(bodyHandler(router.query)));
+      dispatch(loadSearchResult(bodyHandler(router?.query)));
     }
-  }, [dispatch, router.isReady, router.query]);
+  }, [dispatch, router.isReady, router?.query, router?.tags]);
 
   return (
     <SearchWrapper>

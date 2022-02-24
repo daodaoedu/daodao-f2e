@@ -93,14 +93,18 @@ const SearchInput = () => {
             q: keyword,
           },
         });
-      } else if (event.key === "Enter" && keyword === "") {
-        delete query.q;
-        push({
-          query,
-        });
       }
+      if (!query.q) {
+        delete query.q;
+      }
+      // else if (event.key === "Enter" && keyword === "") {
+      //   delete query.q;
+      //   push({
+      //     query,
+      //   });
+      // }
     },
-    [push, query]
+    [keyword, push, query]
   );
 
   const routingPush = useCallback(
