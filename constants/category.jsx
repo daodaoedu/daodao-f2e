@@ -143,7 +143,30 @@ export const NAV_LINK = [
   },
   {
     name: "找活動",
+    link: "/activities",
+  },
+  {
+    name: "加入社群",
     link: "https://www.facebook.com/groups/2237666046370459",
+  },
+  {
+    name: "教育場域",
+    link: "/locations",
+  },
+  // {
+  //   name: '找學習空間',
+  //   link: 'https://www.facebook.com/groups/2237666046370459',
+  // },
+];
+
+export const FOOTER_LINK = [
+  {
+    name: "找資源",
+    link: "/search",
+  },
+  {
+    name: "找活動",
+    link: "/activities",
   },
   {
     name: "加入社群",

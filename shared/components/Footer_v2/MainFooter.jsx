@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
 import IntroList from "./IntroList";
 import IconList from "./IconList";
-import { NAV_LINK } from "../../../constants/category";
+import { FOOTER_LINK } from "../../../constants/category";
 
 const MainFooterWrapper = styled.div`
   height: 100%;
@@ -74,7 +74,7 @@ const SubFooter = () => {
       <BlockWrapper>
         {/* 連結 */}
         <IntroList title="關於島島阿學" list={aboutDaoConfig} />
-        <IntroList title="找資源" list={NAV_LINK} />
+        <IntroList title="找資源" list={FOOTER_LINK} />
       </BlockWrapper>
       <BlockWrapper>
         {/* 追蹤島島 */}
