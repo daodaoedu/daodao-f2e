@@ -94,8 +94,6 @@ const Resource = ({ data }) => {
         : [],
     [data?.properties]
   );
-  // console.log("tags", tags);
-  console.log("router", router);
 
   if (isLoading) {
     return <ResourceWrapper />;

@@ -243,7 +243,6 @@ export const getStaticPaths = async () => {
     let body = {
       start_cursor: cursor,
     };
-    console.log("body", body);
     const result = await fetch("https://api.daoedu.tw/notion/databases", {
       method: "POST",
       body: JSON.stringify(body),
@@ -266,6 +265,7 @@ export const getStaticPaths = async () => {
     }
     i++;
   }
+  console.log("result:", pathList);
   return {
     paths: pathList,
     // paths: [{ params: { title: "test" } }], // indicates that no page needs be created at build time
