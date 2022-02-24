@@ -129,10 +129,10 @@ const Resource = ({ data }) => {
         <Tags tags={tags} />
         <p className="desc">{desc}</p>
         <DiscussionEmbed
-          shortname={title}
-          commentId="disqus_Aj6aqxdcxy"
-          showMedia={true}
-          showParentComment={true}
+          shortname="daodaoedu"
+          commentId={router.asPath}
+          // showMedia={true}
+          // showParentComment={true}
           width={420}
           height={320}
           config={{
