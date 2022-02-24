@@ -33,14 +33,15 @@ const Tags = ({ tags, type }) => {
             [type]: [query[type].split(","), newQuery].join(","),
           },
         });
+      } else {
+        push({
+          pathname: "/search",
+          query: {
+            ...query,
+            [type]: newQuery,
+          },
+        });
       }
-      push({
-        pathname: "/search",
-        query: {
-          ...query,
-          [type]: newQuery,
-        },
-      });
     },
     [push, query, type]
   );
