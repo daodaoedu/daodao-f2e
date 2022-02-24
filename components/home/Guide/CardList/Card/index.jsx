@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import { slideInUp } from "../../../../../shared/styles/animation";
+import { useRouter } from "next/router";
 
 const CardWrapper = styled.li`
   position: relative;
@@ -80,10 +81,12 @@ const BackgroundWrapper = styled.div`
 `;
 
 const Card = ({ id, image, title }) => {
+  const router = useRouter();
   return (
     <CardWrapper
       key={id}
       isShow
+      onClick={() => router.push(`/search?q=${title}`)}
       // isShow={isShow}
     >
       <BackgroundWrapper image={image} />

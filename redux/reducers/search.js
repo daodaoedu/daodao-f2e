@@ -12,6 +12,12 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
+    case "SEARCH_RESULT": {
+      return {
+        ...state,
+        isLoading: true,
+      };
+    }
     case "SEARCH_RESULT_SUCCESS": {
       return {
         ...state,

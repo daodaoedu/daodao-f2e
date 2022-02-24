@@ -3,6 +3,16 @@ import { createTheme } from "@mui/material/styles";
 
 // Create a theme instance.
 const theme = createTheme({
+  typography: {
+    h1: {
+      fontSize: "40px",
+      fontWeight: "400",
+    },
+    h2: {
+      fontSize: "32px",
+      fontWeight: "400",
+    },
+  },
   breakpoints: {
     values: {
       xs: 0,
@@ -24,7 +34,8 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: "#fff",
+      // main: "#fff",
+      main: "#16b9b3",
     },
     secondary: {
       main: "#32aedd",

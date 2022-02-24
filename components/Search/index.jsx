@@ -40,19 +40,6 @@ const Search = () => {
     useSelector((state) => state?.search ?? {});
   const router = useRouter();
   const loadMoreButtonRef = useRef();
-  useEffect(() => {
-    if (router.isReady) {
-      dispatch(loadSearchResult(bodyHandler(router.query)));
-    }
-  }, [dispatch, router.isReady, router.query]);
-  // const { data = [] } = useSWRImmutable(
-  //   [`https://api.daoedu.tw/notion/databases`, bodyHandler(query, nextCursor)],
-  //   postFetcher
-  // );
-  // console.log("nextCursor", nextCursor);
-  // const [previewList, setPreviewList] = useState(
-  //   () => data?.payload?.results ?? []
-  // );
 
   const queryTags = useMemo(
     () =>
@@ -61,21 +48,6 @@ const Search = () => {
         : [],
     [router?.query?.tags]
   );
-  // const isLoadingPreviewList = useMemo(
-  //   () => previewList.length === 0,
-  //   [previewList]
-  // );
-
-  // useEffect(() => {
-  //   if (
-  //     Array.isArray(data?.payload?.results) &&
-  //     data?.payload?.results.length > 0
-  //   ) {
-  //     setPreviewList((prevList) => [
-  //       ...new Set([...prevList, ...(data?.payload?.results ?? [])]),
-  //     ]);
-  //   }
-  // }, [data, setPreviewList]);
 
   const onIntersect = useCallback(() => {
     dispatch(loadNextSearchResult(bodyHandler(router?.query, next_cursor)));
@@ -88,7 +60,11 @@ const Search = () => {
     threshold: 0.3,
   });
 
-  console.log("isLoadingNextData", isLoadingNextData);
+  useEffect(() => {
+    if (router.isReady) {
+      dispatch(loadSearchResult(bodyHandler(router.query)));
+    }
+  }, [dispatch, router.isReady, router.query]);
 
   return (
     <SearchWrapper>

@@ -26,7 +26,7 @@ const SkeletonImageWrapper = styled(Skeleton)`
   }
 `;
 
-const Item = () => {
+const SkeletonItem = () => {
   return (
     <ItemWrapper>
       <SkeletonImageWrapper variant="rectangular" />
@@ -39,4 +39,4 @@ const Item = () => {
   );
 };
 
-export default Item;
+export default SkeletonItem;

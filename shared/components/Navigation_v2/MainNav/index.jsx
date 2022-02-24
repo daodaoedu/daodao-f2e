@@ -1,16 +1,15 @@
-import React from 'react';
-import styled from '@emotion/styled';
+import React from "react";
+import styled from "@emotion/styled";
 import { Toolbar } from "@mui/material";
 import Box from "@mui/material/Box";
-import Hamberger from './Hamberger';
-import List from './List';
-import SubList from './SubList';
-import Logo from './Logo';
+import Hamberger from "./Hamberger";
+import List from "./List";
+import SubList from "./SubList";
+import Logo from "./Logo";
 
 const MainNavWrapper = styled(Toolbar)`
   max-width: 1200px;
   width: 100%;
-  background-color: black;
 `;
 
 const BoxWrapper = styled(Box)`

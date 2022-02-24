@@ -1,8 +1,9 @@
 import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
-// import Link from "next/link";
+import Link from "next/link";
 import Tags from "./Tags";
+import { Typography } from "@mui/material";
 
 const ItemWrapper = styled.li`
   display: flex;
@@ -48,13 +49,13 @@ const ImageWrapper = styled.div`
 const TitleWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
-  /* flex-direction: column; */
   justify-content: flex-start;
   align-items: center;
   .title {
     font-size: 24px;
     font-weight: 500;
     margin: 0 10px 0 0;
+    color: black;
     &:hover {
       cursor: pointer;
       color: #37b9eb;
@@ -120,11 +121,10 @@ const Item = ({ data, queryTags }) => {
       />
       <ContentWrapper>
         <TitleWrapper>
-          <h2 className="title" onClick={() => window.open(link, "_blank")}>
-            {title ?? ""}
-          </h2>
+          <a target="_blank" href={link} rel="noopener noreferrer">
+            <h2 className="title">{title ?? "未命名"}</h2>
+          </a>
           <Tags type="fee" tags={feeTags} />
-          {/* <Tags tags={areaTags} queryTags={queryTags} /> */}
         </TitleWrapper>
         <Tags
           type="tags"

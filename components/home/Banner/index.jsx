@@ -85,7 +85,11 @@ const Banner = ({ guideRef }) => {
             alignItems: "center",
           }}
         >
-          <Button variant="contained" onClick={smoothScroll}>
+          <Button
+            variant="contained"
+            onClick={smoothScroll}
+            sx={{ backgroundColor: "white" }}
+          >
             看看大家都學什麼
           </Button>
         </Box>

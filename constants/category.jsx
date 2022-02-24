@@ -138,16 +138,28 @@ export const CATEGORY_LINK = [
 
 export const NAV_LINK = [
   {
-    name: "找學習資源",
+    name: "找資源",
     link: "/search",
   },
   {
-    name: "找學習活動",
+    name: "找活動",
     link: "https://www.facebook.com/groups/2237666046370459",
   },
   {
-    name: "加入學習社群",
+    name: "加入社群",
     link: "https://www.facebook.com/groups/2237666046370459",
+  },
+  {
+    name: "教育場域",
+    link: "/locations",
+  },
+  {
+    name: "體驗問卷",
+    link: "https://docs.google.com/forms/d/e/1FAIpQLSeyU9-Q-kIWp5uutcik3h-RO4o5VuG6oG0m-4u1Ua18EOu3aw/viewform",
+  },
+  {
+    name: "關於島島",
+    link: "/#",
   },
   // {
   //   name: '找學習空間',

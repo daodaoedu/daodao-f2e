@@ -5,7 +5,7 @@ module.exports = {
     node: true,
   },
   // extends: ["next", "plugin:react/recommended", "airbnb"],
-  extends: ["next"],
+  extends: ["next", "plugin:react/recommended"],
   parserOptions: {
     ecmaFeatures: {
       jsx: true,

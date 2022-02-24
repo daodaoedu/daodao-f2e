@@ -10,6 +10,23 @@ import { css } from "@emotion/react";
 const ResourceWrapper = styled.section`
   padding-top: 40px;
   padding-bottom: 40px;
+  .title {
+    font-size: 24px;
+    font-weight: 500;
+    margin: 0 10px 0 0;
+    color: black;
+    &:hover {
+      cursor: pointer;
+      color: #37b9eb;
+      transition: 0.5s;
+    }
+  }
+  @media (max-width: 767px) {
+    .title {
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+  }
 `;
 const ImageWrapper = styled.div`
   width: 200px;
@@ -100,9 +117,9 @@ const Resource = ({ data }) => {
           },
         }}
       >
-        <h1 className="title" onClick={() => window.open(link, "_blank")}>
-          {title} 的資源介紹
-        </h1>
+        <a target="_blank" href={link} rel="noopener noreferrer">
+          <h1 className="title">{title} 的資源介紹</h1>
+        </a>
         {/* <Image src={image} alt="image" layout="fill" /> */}
         <ImageWrapper
           onClick={() => window.open(link, "_blank")}
