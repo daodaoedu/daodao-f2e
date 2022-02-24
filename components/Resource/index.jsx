@@ -6,6 +6,7 @@ import useSWRImmutable from "swr/immutable";
 import Tags from "./Tags";
 import { postFetcher } from "../../utils/fetcher";
 import { css } from "@emotion/react";
+import { DiscussionEmbed } from "disqus-react";
 
 const ResourceWrapper = styled.section`
   padding-top: 40px;
@@ -56,6 +57,7 @@ const ImageWrapper = styled.div`
 `;
 
 const Resource = ({ data }) => {
+  const router = useRouter();
   const isLoading = useMemo(() => !data, [data]);
   const title = useMemo(
     () =>
@@ -93,6 +95,7 @@ const Resource = ({ data }) => {
     [data?.properties]
   );
   // console.log("tags", tags);
+  console.log("router", router);
 
   if (isLoading) {
     return <ResourceWrapper />;
@@ -127,6 +130,20 @@ const Resource = ({ data }) => {
         />
         <Tags tags={tags} />
         <p className="desc">{desc}</p>
+        <DiscussionEmbed
+          shortname={title}
+          commentId="disqus_Aj6aqxdcxy"
+          showMedia={true}
+          showParentComment={true}
+          width={420}
+          height={320}
+          config={{
+            url: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
+            identifier: title,
+            title: title,
+            language: "zh_TW", //e.g. for Traditional Chinese (Taiwan)
+          }}
+        />
       </Paper>
     </ResourceWrapper>
   );

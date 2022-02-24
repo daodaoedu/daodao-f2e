@@ -6,11 +6,15 @@ const theme = createTheme({
   typography: {
     h1: {
       fontSize: "40px",
-      fontWeight: "400",
+      fontWeight: "500",
     },
     h2: {
       fontSize: "32px",
-      fontWeight: "400",
+      fontWeight: "500",
+    },
+    h3: {
+      fontSize: "24px",
+      fontWeight: "500",
     },
   },
   breakpoints: {

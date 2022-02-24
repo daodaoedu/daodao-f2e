@@ -159,7 +159,7 @@ export const NAV_LINK = [
   },
   {
     name: "關於島島",
-    link: "/#",
+    link: "/about",
   },
   // {
   //   name: '找學習空間',

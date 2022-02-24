@@ -2,6 +2,9 @@
 
 module.exports = {
   reactStrictMode: false,
+  images: {
+    domains: ["imgur.com"],
+  },
   // mode: "development",
   // entry: path.resolve(__dirname, "src"),
   // resolve: {

@@ -1,15 +1,13 @@
-import React from 'react';
-import styled from '@emotion/styled';
-import {
-  FaFacebook, FaInstagram,
-} from 'react-icons/fa';
-import IntroList from './IntroList';
-import IconList from './IconList';
-import { NAV_LINK } from '../../../constants/category';
+import React from "react";
+import styled from "@emotion/styled";
+import { FaFacebook, FaInstagram } from "react-icons/fa";
+import IntroList from "./IntroList";
+import IconList from "./IconList";
+import { NAV_LINK } from "../../../constants/category";
 
 const MainFooterWrapper = styled.div`
   height: 100%;
-  background-color:#536166;
+  background-color: #536166;
   color: white;
   display: flex;
   justify-content: space-around;
@@ -35,32 +33,32 @@ const LogoWrapper = styled.div`
 `;
 
 const BlockWrapper = styled.div`
-    display: flex;
-    justify-content: space-around;
-    margin-top: 60px;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 60px;
 `;
 
 const aboutDaoConfig = [
   {
-    name: '關於我們',
-    link: '/',
+    name: "關於我們",
+    link: "/about",
   },
   {
-    name: '體驗問卷',
-    link: '/',
+    name: "體驗問卷",
+    link: "https://docs.google.com/forms/d/e/1FAIpQLSeyU9-Q-kIWp5uutcik3h-RO4o5VuG6oG0m-4u1Ua18EOu3aw/viewform",
   },
 ];
 
 const iconListConfig = [
   {
     icon: <FaInstagram size="16" />,
-    link: 'https://www.instagram.com/daodao_edu/',
-    alt: 'instagram',
+    link: "https://www.instagram.com/daodao_edu/",
+    alt: "instagram",
   },
   {
     icon: <FaFacebook size="16" />,
-    link: 'https://www.facebook.com/daodao.edu',
-    alt: 'facebook',
+    link: "https://www.facebook.com/daodao.edu",
+    alt: "facebook",
   },
 ];
 
@@ -75,21 +73,12 @@ const SubFooter = () => {
       </BlockWrapper>
       <BlockWrapper>
         {/* 連結 */}
-        <IntroList
-          title="關於島島阿學"
-          list={aboutDaoConfig}
-        />
-        <IntroList
-          title="找資源"
-          list={NAV_LINK}
-        />
+        <IntroList title="關於島島阿學" list={aboutDaoConfig} />
+        <IntroList title="找資源" list={NAV_LINK} />
       </BlockWrapper>
       <BlockWrapper>
         {/* 追蹤島島 */}
-        <IconList
-          title="追蹤島島"
-          list={iconListConfig}
-        />
+        <IconList title="追蹤島島" list={iconListConfig} />
       </BlockWrapper>
     </MainFooterWrapper>
   );
