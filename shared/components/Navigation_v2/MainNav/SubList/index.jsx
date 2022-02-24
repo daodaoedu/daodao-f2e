@@ -15,7 +15,8 @@ const LinkListWrapper = styled.ul`
 `;
 
 const SubListWrapper = styled.div`
-  color: rgba(255, 255, 255, 0.7);
+  /* color: rgba(255, 255, 255, 0.7); */
+  color: white;
   .login,
   .logout {
     cursor: pointer;
@@ -43,9 +44,16 @@ const SubList = () => {
     <SubListWrapper>
       <LinkListWrapper>
         <li>
-          <p className="login" role="presentation">
-            新增資源
-          </p>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a
+            target="_blank"
+            href="/contribute/resource"
+            rel="noopener noreferrer"
+          >
+            <p className="login" role="presentation">
+              新增資源
+            </p>
+          </a>
         </li>
       </LinkListWrapper>
     </SubListWrapper>
