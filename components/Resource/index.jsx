@@ -130,13 +130,14 @@ const Resource = ({ data }) => {
         <p className="desc">{desc}</p>
         <DiscussionEmbed
           shortname="daodaoedu"
-          commentId={router.asPath}
+          // commentId={router.asPath}
           // showMedia={true}
           // showParentComment={true}
-          width={420}
+          width="100%"
           height={320}
           config={{
-            url: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
+            // url: `test-page.notion.dev.daoedu.tw${router.asPath}`,
+            url: `test-page.notion.dev.daoedu.tw`,
             identifier: title,
             title: title,
             language: "zh_TW", //e.g. for Traditional Chinese (Taiwan)
