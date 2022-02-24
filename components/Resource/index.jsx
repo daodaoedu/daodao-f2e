@@ -94,7 +94,6 @@ const Resource = ({ data }) => {
         : [],
     [data?.properties]
   );
-
   if (isLoading) {
     return <ResourceWrapper />;
   }
@@ -133,15 +132,15 @@ const Resource = ({ data }) => {
           // commentId={router.asPath}
           // showMedia={true}
           // showParentComment={true}
-          width="100%"
-          height={320}
           config={{
             // url: `test-page.notion.dev.daoedu.tw${router.asPath}`,
-            url: `test-page.notion.dev.daoedu.tw`,
-            identifier: title,
+            url: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
+            identifier: encodeURIComponent(title),
             title: title,
             language: "zh_TW", //e.g. for Traditional Chinese (Taiwan)
           }}
+          width="100%"
+          height={320}
         />
       </Paper>
     </ResourceWrapper>
