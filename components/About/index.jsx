@@ -1,8 +1,8 @@
 import React from "react";
 import styled from "@emotion/styled";
-import { css } from "@emotion/react";
+// import { css } from "@emotion/react";
 import { Box, Paper, Typography, Stack } from "@mui/material";
-import Image from "next/image";
+
 const ResourceWrapper = styled.section`
   padding-top: 40px;
   padding-bottom: 40px;
