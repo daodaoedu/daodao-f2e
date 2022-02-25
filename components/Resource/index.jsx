@@ -104,6 +104,10 @@ const Resource = ({ data, title, desc, image }) => {
         : [],
     [data]
   );
+  const catTags = useMemo(
+    () => data?.properties["領域名稱"]?.multi_select ?? [],
+    [data]
+  );
   if (isLoading) {
     return <ResourceWrapper />;
   }
@@ -136,6 +140,21 @@ const Resource = ({ data, title, desc, image }) => {
           image={image ?? "/preview.webp"}
         />
         <Shares title={title} />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              fontWeight: "500",
+            }}
+          >
+            領域名稱：
+          </Box>
+          <Tags tags={catTags} type="cats" />
+        </Box>
 
         <Box
           sx={{
@@ -150,7 +169,7 @@ const Resource = ({ data, title, desc, image }) => {
           >
             資源類型：
           </Box>
-          <Tags tags={resourcesTags} type="cats" />
+          <Tags tags={resourcesTags} type="tags" />
         </Box>
         <Box
           sx={{

@@ -112,6 +112,12 @@ export const bodyHandler = (query, nextCursor, pageSize = 100) => {
                 contains: val,
               },
             },
+            {
+              property: "資源類型",
+              multi_select: {
+                contains: val,
+              },
+            },
           ],
           []
         ),
