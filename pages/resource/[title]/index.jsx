@@ -6,6 +6,7 @@ import Footer from "../../../shared/components/Footer_v2";
 import Resource from "../../../components/Resource";
 
 const ResourcePage = ({ data = {} }) => {
+  console.log("data", data);
   const router = useRouter();
   const title = useMemo(
     () =>

@@ -6,7 +6,7 @@ import useSWRImmutable from "swr/immutable";
 import Tags from "./Tags";
 import { postFetcher } from "../../utils/fetcher";
 import { css } from "@emotion/react";
-import { DiscussionEmbed } from "disqus-react";
+import { DiscussionEmbed, Recommendations, CommentEmbed } from "disqus-react";
 import { Share } from "@mui/icons-material";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import toast from "react-hot-toast";
@@ -89,10 +89,20 @@ const Resource = ({ data, title, desc, image }) => {
         : [],
     [data?.properties]
   );
-  const copyContent = useMemo(
+  const resourcesTags = useMemo(
+    () => data?.properties["資源類型"]?.multi_select ?? [],
+    [data]
+  );
+  const ageOfUserTags = useMemo(
+    () => data?.properties["年齡層"]?.multi_select ?? [],
+    [data]
+  );
+  const feeTags = useMemo(
     () =>
-      `我在島島阿學發現了不錯的學習資源想與你分享。\n資源名稱：${title}\nhttps://test-page.notion.dev.daoedu.tw${router.asPath}?source=share`,
-    [router.asPath, title]
+      data?.properties["費用"]?.select
+        ? [data?.properties["費用"]?.select]
+        : [],
+    [data]
   );
   if (isLoading) {
     return <ResourceWrapper />;
@@ -125,15 +135,72 @@ const Resource = ({ data, title, desc, image }) => {
           onClick={() => window.open(link, "_blank")}
           image={image ?? "/preview.webp"}
         />
-        <Tags tags={tags} />
         <Shares title={title} />
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              fontWeight: "500",
+            }}
+          >
+            資源類型：
+          </Box>
+          <Tags tags={resourcesTags} />
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              fontWeight: "500",
+            }}
+          >
+            標籤：
+          </Box>
+          <Tags tags={ageOfUserTags} />
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              fontWeight: "500",
+            }}
+          >
+            年齡層：
+          </Box>
+          <Tags tags={tags} />
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              fontWeight: "500",
+            }}
+          >
+            費用：
+          </Box>
+          <Tags tags={feeTags} />
+        </Box>
         <p className="desc">{desc}</p>
         {Object.keys(disqusConfig).length > 0 && (
           <DiscussionEmbed
-            shortname="daodaoedu"
-            // commentId={router.asPath}
-            // showMedia={true}
-            // showParentComment={true}
+            shortname="dao-dao-a-xue"
             config={disqusConfig}
             width="100%"
             height={320}

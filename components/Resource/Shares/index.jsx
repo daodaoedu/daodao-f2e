@@ -34,6 +34,7 @@ const Shares = ({ title }) => {
         display: "flex",
         justifyContent: "flex-start",
         alignItems: "center",
+        flexWrap: "wrap",
       }}
     >
       <Box>
@@ -68,6 +69,7 @@ const Shares = ({ title }) => {
           alignItems: "center",
           marginLeft: "10px",
           paddingTop: "5px",
+          flexWrap: "wrap",
         }}
       >
         <Box
