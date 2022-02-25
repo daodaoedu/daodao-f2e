@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import { Button, Paper, Box, Stack } from "@mui/material";
 import useSWRImmutable from "swr/immutable";
-import Tags from "./Tags";
+import Tags from "./Tags ";
 import { postFetcher } from "../../utils/fetcher";
 import { css } from "@emotion/react";
 import { DiscussionEmbed, Recommendations, CommentEmbed } from "disqus-react";
@@ -150,22 +150,7 @@ const Resource = ({ data, title, desc, image }) => {
           >
             資源類型：
           </Box>
-          <Tags tags={resourcesTags} />
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <Box
-            sx={{
-              fontWeight: "500",
-            }}
-          >
-            標籤：
-          </Box>
-          <Tags tags={ageOfUserTags} />
+          <Tags tags={resourcesTags} type="cats" />
         </Box>
         <Box
           sx={{
@@ -180,7 +165,22 @@ const Resource = ({ data, title, desc, image }) => {
           >
             年齡層：
           </Box>
-          <Tags tags={tags} />
+          <Tags tags={ageOfUserTags} type="ages" />
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              fontWeight: "500",
+            }}
+          >
+            標籤：
+          </Box>
+          <Tags tags={tags} type="tags" />
         </Box>
         <Box
           sx={{
@@ -195,7 +195,7 @@ const Resource = ({ data, title, desc, image }) => {
           >
             費用：
           </Box>
-          <Tags tags={feeTags} />
+          <Tags tags={feeTags} type="fee" />
         </Box>
         <p className="desc">{desc}</p>
         {Object.keys(disqusConfig).length > 0 && (
