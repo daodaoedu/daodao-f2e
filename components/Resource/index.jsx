@@ -1,13 +1,38 @@
 import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
-import { Paper } from "@mui/material";
+import { Button, Paper, Box, Stack } from "@mui/material";
 import useSWRImmutable from "swr/immutable";
 import Tags from "./Tags";
 import { postFetcher } from "../../utils/fetcher";
 import { css } from "@emotion/react";
 import { DiscussionEmbed } from "disqus-react";
-
+import { Share } from "@mui/icons-material";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import toast from "react-hot-toast";
+import Shares from "./Shares";
+import {
+  EmailShareButton,
+  FacebookShareButton,
+  HatenaShareButton,
+  InstapaperShareButton,
+  LineShareButton,
+  LinkedinShareButton,
+  LivejournalShareButton,
+  MailruShareButton,
+  OKShareButton,
+  PinterestShareButton,
+  PocketShareButton,
+  RedditShareButton,
+  TelegramShareButton,
+  TumblrShareButton,
+  TwitterShareButton,
+  ViberShareButton,
+  VKShareButton,
+  WhatsappShareButton,
+  WorkplaceShareButton,
+  FacebookIcon,
+} from "react-share";
 const ResourceWrapper = styled.section`
   padding-top: 40px;
   padding-bottom: 40px;
@@ -56,30 +81,9 @@ const ImageWrapper = styled.div`
   }
 `;
 
-const Resource = ({ data }) => {
+const Resource = ({ data, title, desc, image }) => {
   const router = useRouter();
   const isLoading = useMemo(() => !data, [data]);
-  const title = useMemo(
-    () =>
-      data?.properties && data?.properties["資源名稱"]
-        ? data?.properties["資源名稱"]?.title[0]?.plain_text
-        : "",
-    [data?.properties]
-  );
-  const desc = useMemo(
-    () =>
-      data?.properties && data?.properties["介紹"]
-        ? data.properties["介紹"]?.rich_text[0]?.plain_text
-        : "",
-    [data?.properties]
-  );
-  const image = useMemo(
-    () =>
-      data?.properties && data?.properties["縮圖"]
-        ? data.properties["縮圖"]?.files[0]?.external?.url
-        : "",
-    [data?.properties]
-  );
   const link = useMemo(
     () =>
       data?.properties && data?.properties["連結"]
@@ -93,6 +97,11 @@ const Resource = ({ data }) => {
         ? data?.properties["標籤"]?.multi_select
         : [],
     [data?.properties]
+  );
+  const copyContent = useMemo(
+    () =>
+      `我在島島阿學發現了不錯的學習資源想與你分享。\n資源名稱：${title}\nhttps://test-page.notion.dev.daoedu.tw${router.asPath}?source=share`,
+    [router.asPath, title]
   );
   if (isLoading) {
     return <ResourceWrapper />;
@@ -126,6 +135,7 @@ const Resource = ({ data }) => {
           image={image ?? "/preview.webp"}
         />
         <Tags tags={tags} />
+        <Shares title={title} />
         <p className="desc">{desc}</p>
         <DiscussionEmbed
           shortname="daodaoedu"

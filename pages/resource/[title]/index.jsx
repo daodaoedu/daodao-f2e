@@ -7,25 +7,45 @@ import Resource from "../../../components/Resource";
 
 const ResourcePage = ({ data = {} }) => {
   const router = useRouter();
+  const title = useMemo(
+    () =>
+      data?.properties && data?.properties["資源名稱"]
+        ? data?.properties["資源名稱"]?.title[0]?.plain_text
+        : "",
+    [data?.properties]
+  );
+  const desc = useMemo(
+    () =>
+      data?.properties && data?.properties["介紹"]
+        ? data.properties["介紹"]?.rich_text[0]?.plain_text
+        : "",
+    [data?.properties]
+  );
+  const image = useMemo(
+    () =>
+      data?.properties && data?.properties["縮圖"]
+        ? data.properties["縮圖"]?.files[0]?.external?.url
+        : "",
+    [data?.properties]
+  );
   const SEOData = useMemo(
     () => ({
-      title: "學習資源平台｜島島阿學",
-      description:
-        "「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
+      title: `${title}的學習資源介紹｜島島阿學`,
+      description: desc,
       keywords: "島島阿學",
       author: "島島阿學",
       copyright: "島島阿學",
-      imgLink: "/preview.webp",
+      imgLink: image ?? "/preview.webp",
       link: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
     }),
-    [router]
+    [desc, image, router.asPath, title]
   );
 
   return (
     <>
       <SEOConfig data={SEOData} />
       <Navigation />
-      <Resource data={data} />
+      <Resource data={data} title={title} desc={desc} image={image} />
       <Footer />
     </>
   );
@@ -237,6 +257,18 @@ export const getStaticProps = async ({ params }) => {
 
 // stackoverflow.com/questions/62057131/next-js-getstaticpaths-list-every-path-or-only-those-in-the-immediate-vicinity
 export const getStaticPaths = async () => {
+  if (process.env.NODE_ENV === "development") {
+    return {
+      paths: [
+        {
+          params: {
+            title: "大學生找實習",
+          },
+        },
+      ],
+      fallback: false,
+    };
+  }
   const pathList = [];
   let cursor = undefined;
   for (let i = 0; i <= 1; ) {
