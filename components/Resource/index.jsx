@@ -65,14 +65,16 @@ const Resource = ({ data, title, desc, image }) => {
   const isLoading = useMemo(() => !data, [data]);
   const [disqusConfig, setDisqusConfig] = useState({});
   useEffect(() => {
-    setDisqusConfig({
-      // url: `test-page.notion.dev.daoedu.tw${router.asPath}`,
-      url: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
-      identifier: encodeURIComponent(title),
-      title: title,
-      language: "zh_TW", //e.g. for Traditional Chinese (Taiwan)
-    });
-  }, [router.asPath, title]);
+    if (router.isReady) {
+      setDisqusConfig({
+        // url: `test-page.notion.dev.daoedu.tw${router.asPath}`,
+        url: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
+        identifier: encodeURIComponent(title),
+        title: title,
+        language: "zh_TW", //e.g. for Traditional Chinese (Taiwan)
+      });
+    }
+  }, [router.asPath, router.isReady, title]);
   const link = useMemo(
     () =>
       data?.properties && data?.properties["連結"]
