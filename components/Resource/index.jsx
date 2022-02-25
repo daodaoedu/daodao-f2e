@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import { Button, Paper, Box, Stack } from "@mui/material";
@@ -11,28 +11,7 @@ import { Share } from "@mui/icons-material";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import toast from "react-hot-toast";
 import Shares from "./Shares";
-import {
-  EmailShareButton,
-  FacebookShareButton,
-  HatenaShareButton,
-  InstapaperShareButton,
-  LineShareButton,
-  LinkedinShareButton,
-  LivejournalShareButton,
-  MailruShareButton,
-  OKShareButton,
-  PinterestShareButton,
-  PocketShareButton,
-  RedditShareButton,
-  TelegramShareButton,
-  TumblrShareButton,
-  TwitterShareButton,
-  ViberShareButton,
-  VKShareButton,
-  WhatsappShareButton,
-  WorkplaceShareButton,
-  FacebookIcon,
-} from "react-share";
+
 const ResourceWrapper = styled.section`
   padding-top: 40px;
   padding-bottom: 40px;
@@ -84,6 +63,16 @@ const ImageWrapper = styled.div`
 const Resource = ({ data, title, desc, image }) => {
   const router = useRouter();
   const isLoading = useMemo(() => !data, [data]);
+  const [disqusConfig, setDisqusConfig] = useState({});
+  useEffect(() => {
+    setDisqusConfig({
+      // url: `test-page.notion.dev.daoedu.tw${router.asPath}`,
+      url: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
+      identifier: encodeURIComponent(title),
+      title: title,
+      language: "zh_TW", //e.g. for Traditional Chinese (Taiwan)
+    });
+  }, [router.asPath, title]);
   const link = useMemo(
     () =>
       data?.properties && data?.properties["連結"]
@@ -137,21 +126,17 @@ const Resource = ({ data, title, desc, image }) => {
         <Tags tags={tags} />
         <Shares title={title} />
         <p className="desc">{desc}</p>
-        <DiscussionEmbed
-          shortname="daodaoedu"
-          // commentId={router.asPath}
-          // showMedia={true}
-          // showParentComment={true}
-          config={{
-            // url: `test-page.notion.dev.daoedu.tw${router.asPath}`,
-            url: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
-            identifier: encodeURIComponent(title),
-            title: title,
-            language: "zh_TW", //e.g. for Traditional Chinese (Taiwan)
-          }}
-          width="100%"
-          height={320}
-        />
+        {Object.keys(disqusConfig).length > 0 && (
+          <DiscussionEmbed
+            shortname="daodaoedu"
+            // commentId={router.asPath}
+            // showMedia={true}
+            // showParentComment={true}
+            config={disqusConfig}
+            width="100%"
+            height={320}
+          />
+        )}
       </Paper>
     </ResourceWrapper>
   );

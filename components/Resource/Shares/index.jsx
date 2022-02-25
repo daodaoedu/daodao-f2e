@@ -47,6 +47,7 @@ const Shares = ({ title }) => {
               borderRadius: "20px",
               fontWeight: 700,
               border: "1px solid #16b9b3",
+              "white-space": "nowrap",
               // color:
             }}
           >
@@ -87,8 +88,10 @@ const Shares = ({ title }) => {
           }}
         >
           <FacebookMessengerShareButton
-            url={`https://test-page.notion.dev.daoedu.tw${router.asPath}?source=fbm-btn`}
+            redirectUri={`https://test-page.notion.dev.daoedu.tw${router.asPath}`}
+            to={`https://test-page.notion.dev.daoedu.tw${router.asPath}?source=fbm-btn`}
             quote={copyContent}
+            appId="daodaoedu"
           >
             <FacebookMessengerIcon size={30} round />
           </FacebookMessengerShareButton>
