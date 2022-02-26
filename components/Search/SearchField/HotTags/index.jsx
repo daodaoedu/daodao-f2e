@@ -2,6 +2,8 @@ import React from "react";
 import styled from "@emotion/styled";
 import { SEARCH_TAGS } from "../../../../constants/category";
 import Item from "./item";
+import { Whatshot } from "@mui/icons-material";
+import { Box } from "@mui/material";
 
 const TagsWrapper = styled.ul`
   display: flex;
@@ -34,15 +36,31 @@ const TrendingWrapper = styled.div`
   } */
 `;
 
-const Tags = ({ cats }) => {
+const Tags = ({ queryList }) => {
+  const lastSelectedCat = queryList.length > 0 && queryList[0];
+  const hotTags =
+    Array.isArray(queryList) && queryList.length > 0 && lastSelectedCat
+      ? SEARCH_TAGS[lastSelectedCat]
+      : SEARCH_TAGS["語言與文學"];
   return (
-    <TrendingWrapper>
-      <TagsWrapper>
-        {SEARCH_TAGS[cats].map((value) => (
-          <Item key={`${value}`} title={value} />
-        ))}
-      </TagsWrapper>
-    </TrendingWrapper>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        marginTop: "20px",
+      }}
+    >
+      <Whatshot sx={{ color: "red" }} />
+      <TrendingWrapper>
+        <TagsWrapper>
+          {hotTags.map((value) => (
+            <Item key={`${value}`} title={value} />
+          ))}
+        </TagsWrapper>
+      </TrendingWrapper>
+    </Box>
   );
 };
 

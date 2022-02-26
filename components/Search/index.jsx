@@ -25,6 +25,7 @@ import {
   loadNextSearchResult,
 } from "../../redux/actions/search";
 import ScrollToTop from "../../shared/components/ScrollToTop";
+import { Divider } from "@mui/material";
 const SearchWrapper = styled.div`
   position: relative;
   height: 100%;
@@ -74,11 +75,16 @@ const Search = () => {
       {/* 搜尋條件 */}
       <SelectedCategory />
       <SearchField />
+      <Divider
+        sx={{
+          margin: "20px 0",
+        }}
+      />
       {/* 搜尋結果 */}
-      <SelectedTags query={router.query} />
+
       <Box
         sx={{
-          margin: "20px 0 20px 0",
+          margin: "10px 0",
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
@@ -95,7 +101,7 @@ const Search = () => {
           </p>
         )}
       </Box>
-
+      <SelectedTags query={router.query} />
       <SearchResultList
         list={results}
         isLoading={isLoading}

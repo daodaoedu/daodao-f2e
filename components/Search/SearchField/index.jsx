@@ -26,25 +26,10 @@ const SearchFieldWrapper = styled.div`
 const SearchField = () => {
   const { query } = useRouter();
   const queryList = (query?.cats ?? "").split(",").reverse();
-  console.log("queryList", queryList);
   return (
     <SearchFieldWrapper>
       <SearchInput />
-      {queryList.length > 0 && Object.keys(SEARCH_TAGS).includes(queryList[0]) && (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            marginTop: "20px",
-          }}
-        >
-          {/* <p>熱門：</p> */}
-          <Whatshot sx={{ color: "red" }} />
-          <HotTags cats={queryList[0]} />
-        </Box>
-      )}
+      <HotTags queryList={queryList} />
     </SearchFieldWrapper>
   );
 };

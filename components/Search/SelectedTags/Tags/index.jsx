@@ -6,7 +6,7 @@ import { COLOR_TABLE } from "../../../../constants/notion";
 const ListWrapper = styled.ul`
   display: flex;
   flex-wrap: wrap;
-  margin: 20px 0;
+  margin: 10px 0;
 `;
 
 const Tags = ({ tags, onDelete }) => {

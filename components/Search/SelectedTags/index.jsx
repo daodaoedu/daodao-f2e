@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 // import { COLOR_TABLE } from "../../../constants/notion";
 import Tags from "./Tags";
 import { LocalOffer } from "@mui/icons-material";
+import { Box } from "@mui/material";
 const ListWrapper = styled.ul`
   display: flex;
   justify-content: flex-start;
@@ -54,8 +55,18 @@ const SelectedTags = () => {
     [push, query]
   );
 
+  if (tags.length + feeTags.length + ageTags.length === 0) {
+    return <></>;
+  }
+
   return (
-    <ListWrapper>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "center",
+      }}
+    >
       <LocalOffer
         sx={{
           fontSize: "22px",
@@ -63,10 +74,12 @@ const SelectedTags = () => {
           marginRight: "6px",
         }}
       />
-      <Tags tags={tags} onDelete={onDelete} />
-      <Tags tags={feeTags} onDelete={onDelete} />
-      <Tags tags={ageTags} onDelete={onDelete} />
-    </ListWrapper>
+      <ListWrapper>
+        <Tags tags={tags} onDelete={onDelete} />
+        <Tags tags={feeTags} onDelete={onDelete} />
+        <Tags tags={ageTags} onDelete={onDelete} />
+      </ListWrapper>
+    </Box>
   );
 };
 

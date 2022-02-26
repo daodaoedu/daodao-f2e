@@ -55,6 +55,10 @@ const CATEGORIES = [
     key: "multires",
     value: "綜合型學習資源",
   },
+  {
+    key: "learningtools",
+    value: "學習/教學工具",
+  },
 ];
 
 const SelectedCategory = () => {
