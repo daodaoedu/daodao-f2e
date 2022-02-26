@@ -4,9 +4,11 @@ import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 // import { COLOR_TABLE } from "../../../constants/notion";
 import Tags from "./Tags";
-
+import { LocalOffer } from "@mui/icons-material";
 const ListWrapper = styled.ul`
   display: flex;
+  justify-content: flex-start;
+  align-items: center;
   flex-wrap: wrap;
 `;
 
@@ -54,6 +56,13 @@ const SelectedTags = () => {
 
   return (
     <ListWrapper>
+      <LocalOffer
+        sx={{
+          fontSize: "22px",
+          color: "rgb(72, 175, 226)",
+          marginRight: "6px",
+        }}
+      />
       <Tags tags={tags} onDelete={onDelete} />
       <Tags tags={feeTags} onDelete={onDelete} />
       <Tags tags={ageTags} onDelete={onDelete} />

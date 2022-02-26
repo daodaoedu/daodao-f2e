@@ -131,7 +131,8 @@ const SelectedCategory = () => {
             fontSize: "16px",
             "&:hover": {
               opacity: "100%",
-              transition: "transform 0.4s",
+              transition: "all 0.5s ease",
+              backgroundColor: COLOR_TABLE.green,
             },
           }}
         />

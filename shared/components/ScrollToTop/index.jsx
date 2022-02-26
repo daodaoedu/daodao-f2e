@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import Button from "@mui/material/Button";
+import { Button, Fab } from "@mui/material";
 import useScrollPosition from "@react-hook/window-scroll";
 import { scrollToTop } from "../../../utils/ux";
+// import { Navigation } from "@mui/icons-material";
 
 const ScrollToTopWrapper = styled.div`
   position: fixed;
@@ -25,21 +26,38 @@ const ScrollToTop = () => {
   const isScrollDown = useMemo(() => scrollY > 500, [scrollY]);
   if (isScrollDown) {
     return (
+      // <ScrollToTopWrapper>
+      //   <Button
+      //     variant="contained"
+      //     onClick={scrollToTop}
+      //     sx={{
+      //       width: "64px",
+      //       height: "64px",
+      //       borderRadius: "20px",
+      //       color: "white",
+      //       fontWeight: "bold",
+      //       borderRadius: "50%",
+      //     }}
+      //   >
+      //     <ArrowUpwardIcon />
+      //   </Button>
+      // </ScrollToTopWrapper>
       <ScrollToTopWrapper>
-        <Button
-          variant="contained"
+        <Fab
+          variant="extended"
           onClick={scrollToTop}
           sx={{
-            width: "64px",
-            height: "64px",
-            borderRadius: "20px",
+            backgroundColor: "#16b9b3",
             color: "white",
-            fontWeight: "bold",
-            borderRadius: "50%",
+            fontWeight: "500",
+            "&:focus": {
+              backgroundColor: "#16b9b3",
+            },
           }}
         >
-          <ArrowUpwardIcon />
-        </Button>
+          <ArrowUpwardIcon sx={{ marginRight: "6px" }} />
+          置頂
+        </Fab>
       </ScrollToTopWrapper>
     );
   }

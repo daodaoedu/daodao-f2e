@@ -71,8 +71,10 @@ const Search = () => {
 
   return (
     <SearchWrapper>
+      {/* 搜尋條件 */}
       <SelectedCategory />
       <SearchField />
+      {/* 搜尋結果 */}
       <SelectedTags query={router.query} />
       <Box
         sx={{

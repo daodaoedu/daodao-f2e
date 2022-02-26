@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { Whatshot } from "@mui/icons-material";
 import HotTags from "./HotTags";
 import SearchInput from "./Input";
+import { SEARCH_TAGS } from "../../../constants/category";
 
 const SearchFieldWrapper = styled.div`
   width: 80%;
@@ -21,26 +22,15 @@ const SearchFieldWrapper = styled.div`
     width: 100%;
   } */
 `;
-const TYPE = [
-  "language",
-  "math",
-  "comsci",
-  "natusci",
-  "humanity",
-  "art",
-  "education",
-  "life",
-  "health",
-  "business",
-  "multires",
-];
 
 const SearchField = () => {
   const { query } = useRouter();
+  const queryList = (query?.cats ?? "").split(",").reverse();
+  console.log("queryList", queryList);
   return (
     <SearchFieldWrapper>
       <SearchInput />
-      {TYPE.includes(query.cats) && (
+      {queryList.length > 0 && Object.keys(SEARCH_TAGS).includes(queryList[0]) && (
         <Box
           sx={{
             display: "flex",
@@ -52,7 +42,7 @@ const SearchField = () => {
         >
           {/* <p>熱門：</p> */}
           <Whatshot sx={{ color: "red" }} />
-          <HotTags cats={query.cats} />
+          <HotTags cats={queryList[0]} />
         </Box>
       )}
     </SearchFieldWrapper>
