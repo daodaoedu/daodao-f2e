@@ -3,8 +3,7 @@ import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 // import { SWRConfig } from "swr";
 import SEOConfig from "../shared/components/SEO";
-import Banner from "../components/home/Banner";
-import Guide from "../components/home/Guide";
+import Home from "../components/Home";
 import Navigation from "../shared/components/Navigation_v2";
 import Footer from "../shared/components/Footer_v2";
 // import logger from "../utils/logger";
@@ -14,9 +13,8 @@ const HomePageWrapper = styled.div`
   --section-height-offset: 80px;
 `;
 
-const Home = () => {
+const HomePage = () => {
   const router = useRouter();
-  const guideRef = useRef(null);
   const SEOData = useMemo(
     () => ({
       title: "學習資源平台｜島島阿學",
@@ -35,9 +33,7 @@ const Home = () => {
     <HomePageWrapper>
       <SEOConfig data={SEOData} />
       <Navigation />
-      <Banner guideRef={guideRef} />
-      <div ref={guideRef} />
-      <Guide />
+      <Home />
       <Footer />
     </HomePageWrapper>
   );
@@ -53,4 +49,4 @@ const Home = () => {
 //   };
 // };
 
-export default Home;
+export default HomePage;

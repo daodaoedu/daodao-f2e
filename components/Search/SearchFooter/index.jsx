@@ -14,11 +14,13 @@ const SearchFooter = ({
   loadMoreButtonRef,
   isError,
   errorMessage,
+  isLoading,
+  isLoadingNextData,
 }) => {
   if (hasMoredata) {
     return <LoadMore ref={loadMoreButtonRef} />;
   }
-  if (!hasMoredata && !isError) {
+  if (!isLoading && !isLoadingNextData && !hasMoredata && !isError) {
     return (
       <Box
         sx={{

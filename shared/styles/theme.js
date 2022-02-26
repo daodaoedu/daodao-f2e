@@ -16,6 +16,9 @@ const theme = createTheme({
       fontSize: "24px",
       fontWeight: "500",
     },
+    p: {
+      display: "inline-block",
+    },
   },
   breakpoints: {
     values: {

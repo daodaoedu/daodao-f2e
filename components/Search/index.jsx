@@ -103,6 +103,8 @@ const Search = () => {
       <SearchFooter
         hasMoredata={next_cursor}
         loadMoreButtonRef={loadMoreButtonRef}
+        isLoading={isLoading}
+        isLoadingNextData={isLoadingNextData}
         // isError={isError}
         // errorMessage={errorMessage}
       />

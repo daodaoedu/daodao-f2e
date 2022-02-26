@@ -2,7 +2,7 @@ import stringSanitizer from "./sanitizer";
 
 // language: "語言與文學",
 // math: "數學與邏輯",
-// comsci: "電腦科學",
+// comsci: "資訊與工程",
 // natusci: "自然科學",
 // humanity: "人文社會",
 // art: "藝術",

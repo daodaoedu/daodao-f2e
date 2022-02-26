@@ -67,7 +67,7 @@ export const CATEGORY_ID = {
 export const CATEGORY_NAME = {
   language: "語言與文學",
   math: "數學與邏輯",
-  comsci: "電腦科學",
+  comsci: "資訊與工程",
   natusci: "自然科學",
   humanity: "人文社會",
   art: "藝術",
@@ -90,7 +90,7 @@ export const CATEGORY_LINK = [
     image: "/assets/images/cat2.jpeg",
   },
   {
-    title: "電腦科學",
+    title: "資訊與工程",
     link: "/category/comsci",
     image: "/assets/images/cat3.jpeg",
   },

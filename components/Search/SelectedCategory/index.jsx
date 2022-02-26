@@ -21,7 +21,7 @@ const CATEGORIES = [
   },
   {
     key: "comsci",
-    value: "電腦科學",
+    value: "資訊與工程",
   },
   {
     key: "humanity",
