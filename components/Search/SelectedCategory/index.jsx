@@ -108,7 +108,7 @@ const SelectedCategory = () => {
         });
       }
     },
-    [query]
+    [push, query]
   );
 
   return (

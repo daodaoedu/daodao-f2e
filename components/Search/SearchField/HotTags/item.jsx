@@ -47,7 +47,7 @@ const Tag = ({ title }) => {
         },
       });
     },
-    [queryTags, query]
+    [push, query, queryTags]
   );
   return (
     <Chip

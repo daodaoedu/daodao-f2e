@@ -108,3 +108,13 @@ emotion 為近年討論度最高的 CSS 設計解決方案，除了部分撰寫�
 
 [Next 範例](https://github.com/vercel/next.js/tree/canary/examples/api-routes-rest/pages)
 [Notion API](https://developers.notion.com/docs/working-with-databases)
+
+## 筆記
+
+### 重新命名大小寫
+
+Git 不會紀錄你更改大小寫的命名，記得使用：
+
+```
+git mv hello.txt Hello.txt
+```

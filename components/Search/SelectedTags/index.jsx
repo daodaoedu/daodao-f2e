@@ -49,7 +49,7 @@ const SelectedTags = () => {
         });
       }
     },
-    [query]
+    [push, query]
   );
 
   return (
