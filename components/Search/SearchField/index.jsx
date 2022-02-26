@@ -58,11 +58,11 @@ const SearchField = () => {
   return (
     <SearchFieldWrapper>
       <SearchInput />
+      <HotTags queryList={queryList} />
       <Box sx={{ margin: "20px 0" }}>
         <AgeDropdown />
         <FeeDropdown />
       </Box>
-      <HotTags queryList={queryList} />
     </SearchFieldWrapper>
   );
 };
