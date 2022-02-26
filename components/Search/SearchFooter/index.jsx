@@ -31,6 +31,7 @@ const SearchFooter = ({
           marginBottom: "60px",
         }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/assets/nobody-land.gif"
           alt="nobody-land"

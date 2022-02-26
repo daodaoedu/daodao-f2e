@@ -88,6 +88,7 @@ const Group = () => {
             </Button>
           </Box>
         </Box>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/assets/group.gif"
           alt="coffeeandlearning"

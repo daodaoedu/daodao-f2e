@@ -104,6 +104,7 @@ const About = () => {
           },
         }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/assets/coffeeandlearning.gif"
           alt="coffeeandlearning"
