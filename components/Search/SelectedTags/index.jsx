@@ -55,7 +55,7 @@ const SelectedTags = () => {
     [push, query]
   );
 
-  if (tags.length + feeTags.length + ageTags.length === 0) {
+  if (tags.length === 0) {
     return <></>;
   }
 
@@ -76,8 +76,8 @@ const SelectedTags = () => {
       />
       <ListWrapper>
         <Tags tags={tags} onDelete={onDelete} />
-        <Tags tags={feeTags} onDelete={onDelete} />
-        <Tags tags={ageTags} onDelete={onDelete} />
+        {/* <Tags tags={feeTags} onDelete={onDelete} /> */}
+        {/* <Tags tags={ageTags} onDelete={onDelete} /> */}
       </ListWrapper>
     </Box>
   );

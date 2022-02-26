@@ -16,6 +16,7 @@ const SearchPageWrapper = styled.div`
 
 const SearchPage = () => {
   const router = useRouter();
+  // 這裡的參數主要都是處理SEO用的
   const title = useMemo(() => {
     if (!router.isReady) {
       return "";
@@ -69,9 +70,7 @@ const SearchPage = () => {
       <Navigation />
       <SEOConfig data={SEOData} />
       <SearchPageWrapper>
-        {/* <SWRConfig value={{ fallback, use: [logger] }}> */}
         <Search />
-        {/* </SWRConfig> */}
       </SearchPageWrapper>
       <Footer />
     </>

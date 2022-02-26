@@ -57,6 +57,58 @@ export const SEARCH_TAGS = {
   綜合型學習資源: ["MOOC", "多元學習類型", "學科類型"],
   "學習/教學工具": ["線上教學", "視訊軟體", "數位學習", "提案軟體"],
 };
+
+export const CATEGORIES = [
+  {
+    key: "language",
+    value: "語言與文學",
+  },
+  {
+    key: "math",
+    value: "數學與邏輯",
+  },
+  {
+    key: "comsci",
+    value: "資訊與工程",
+  },
+  {
+    key: "humanity",
+    value: "人文社會",
+  },
+  {
+    key: "natusci",
+    value: "自然科學",
+  },
+  {
+    key: "art",
+    value: "藝術",
+  },
+  {
+    key: "education",
+    value: "教育",
+  },
+  {
+    key: "life",
+    value: "生活",
+  },
+  {
+    key: "health",
+    value: "運動/心理/醫學",
+  },
+  {
+    key: "business",
+    value: "商業與社會創新",
+  },
+  {
+    key: "multires",
+    value: "綜合型學習資源",
+  },
+  {
+    key: "learningtools",
+    value: "學習/教學工具",
+  },
+];
+
 // 學習教育工具：線上教學, 視訊軟體, 數位學習, 提案軟體
 
 export const CATEGORY_ID = {

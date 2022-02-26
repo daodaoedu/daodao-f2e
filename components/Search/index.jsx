@@ -95,9 +95,9 @@ const Search = () => {
         }}
       >
         <h1 className="header-title">搜尋結果</h1>
-        {Array.isArray(results) && (
+        {!isLoadingNextData && !isLoading && Array.isArray(results) && (
           <p className="header-result">
-            共{results.length}筆{next_cursor && "以上"}
+            共 {results.length} 筆{next_cursor && "以上"}
           </p>
         )}
       </Box>
