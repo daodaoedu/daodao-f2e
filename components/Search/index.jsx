@@ -24,6 +24,7 @@ import {
   loadSearchResult,
   loadNextSearchResult,
 } from "../../redux/actions/search";
+import ScrollToTop from "../../shared/components/ScrollToTop";
 const SearchWrapper = styled.div`
   position: relative;
   height: 100%;
@@ -53,7 +54,7 @@ const Search = () => {
     if (router.isReady) {
       dispatch(loadNextSearchResult(bodyHandler(router?.query, next_cursor)));
     }
-  }, [dispatch, next_cursor, router?.query]);
+  }, [dispatch, next_cursor, router.isReady, router?.query]);
 
   useIntersectionObserver({
     enabled: !isLoadingNextData && next_cursor && has_more,
@@ -105,6 +106,7 @@ const Search = () => {
         // isError={isError}
         // errorMessage={errorMessage}
       />
+      <ScrollToTop />
     </SearchWrapper>
   );
 };
