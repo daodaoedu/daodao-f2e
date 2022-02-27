@@ -5,8 +5,17 @@ import { COLOR_TABLE } from "../../../../constants/notion";
 
 const ListWrapper = styled.ul`
   display: flex;
-  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  /* flex-wrap: wrap; */
   margin: 10px 0;
+  max-width: calc(100vw - 49px);
+  overflow-x: scroll;
+  -ms-overflow-style: none; /* IE */
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge and Opera */
+  }
 `;
 
 const Tags = ({ tags, onDelete }) => {

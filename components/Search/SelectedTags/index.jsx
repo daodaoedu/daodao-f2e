@@ -6,12 +6,19 @@ import { useRouter } from "next/router";
 import Tags from "./Tags";
 import { LocalOffer } from "@mui/icons-material";
 import { Box } from "@mui/material";
-const ListWrapper = styled.ul`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: wrap;
-`;
+// const ListWrapper = styled.ul`
+//   display: flex;
+//   justify-content: flex-start;
+//   align-items: center;
+//   /* flex-wrap: wrap; */
+//   max-width: calc(100vw - 49px);
+//   overflow-x: scroll;
+//   -ms-overflow-style: none; /* IE */
+//   scrollbar-width: none; /* Firefox */
+//   &::-webkit-scrollbar {
+//     display: none; /* Chrome, Safari, Edge and Opera */
+//   }
+// `;
 
 const SelectedTags = () => {
   const { push, query } = useRouter();
@@ -74,11 +81,11 @@ const SelectedTags = () => {
           marginRight: "6px",
         }}
       />
-      <ListWrapper>
-        <Tags tags={tags} onDelete={onDelete} />
-        {/* <Tags tags={feeTags} onDelete={onDelete} /> */}
-        {/* <Tags tags={ageTags} onDelete={onDelete} /> */}
-      </ListWrapper>
+      {/* <ListWrapper> */}
+      <Tags tags={tags} onDelete={onDelete} />
+      {/* <Tags tags={feeTags} onDelete={onDelete} /> */}
+      {/* <Tags tags={ageTags} onDelete={onDelete} /> */}
+      {/* </ListWrapper> */}
     </Box>
   );
 };

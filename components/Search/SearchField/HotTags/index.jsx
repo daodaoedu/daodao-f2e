@@ -11,29 +11,13 @@ const TagsWrapper = styled.ul`
   align-items: center;
   margin: auto 5px;
   white-space: nowrap;
+  max-width: calc(100vw - 49px);
   overflow-x: scroll;
-  flex-wrap: wrap;
-
   -ms-overflow-style: none; /* IE */
   scrollbar-width: none; /* Firefox */
   &::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Edge and Opera */
   }
-`;
-
-const TrendingWrapper = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-
-  /* @media (max-width: 767px) {
-    z-index: -1;
-    position: absolute;
-    margin-top: 40px;
-    top: 50%;
-    left: 5px;
-    justify-content: flex-start;
-  } */
 `;
 
 const Tags = ({ queryList }) => {
@@ -53,13 +37,11 @@ const Tags = ({ queryList }) => {
       }}
     >
       <Whatshot sx={{ color: "red" }} />
-      <TrendingWrapper>
-        <TagsWrapper>
-          {hotTags.map((value) => (
-            <Item key={`${value}`} title={value} />
-          ))}
-        </TagsWrapper>
-      </TrendingWrapper>
+      <TagsWrapper>
+        {hotTags.map((value) => (
+          <Item key={`${value}`} title={value} />
+        ))}
+      </TagsWrapper>
     </Box>
   );
 };

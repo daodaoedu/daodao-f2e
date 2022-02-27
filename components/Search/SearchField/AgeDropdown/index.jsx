@@ -28,8 +28,6 @@ const AgeDropdown = () => {
     const {
       target: { value },
     } = event;
-    console.log("value", value);
-    console.log("value.join(", ")", value.join(","));
 
     if (value.length > 0) {
       push({
@@ -48,10 +46,11 @@ const AgeDropdown = () => {
     }
   };
   return (
-    <FormControl sx={{ m: 1, width: 300 }}>
+    <FormControl sx={{ m: 1, minWidth: 150 }}>
       <InputLabel id="demo-multiple-chip-label">年齡層</InputLabel>
       <Select
         multiple
+        autoWidth
         value={ages}
         onChange={handleChange}
         input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
@@ -65,6 +64,9 @@ const AgeDropdown = () => {
           )
         }
         MenuProps={MenuProps}
+        sx={{
+          borderRadius: "20px",
+        }}
       >
         {names.map((name) => (
           <MenuItem key={name} value={name}>

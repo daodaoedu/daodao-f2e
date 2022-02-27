@@ -44,22 +44,23 @@ const names = ["學齡前", "國小", "國高中", "大學以上"];
 const SearchField = () => {
   const { query } = useRouter();
   const queryList = (query?.cats ?? "").split(",").reverse();
-  const [personName, setPersonName] = useState([]);
-
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setPersonName(
-      // On autofill we get a the stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
-  };
   return (
     <SearchFieldWrapper>
       <SearchInput />
       <HotTags queryList={queryList} />
-      <Box sx={{ margin: "20px 0" }}>
+      <Box
+        sx={{
+          margin: "20px 0",
+          display: "flex",
+          justifyContent: "flex-start",
+          alignItems: "center",
+          "@media (max-width: 767px)": {
+            margin: "10px 0",
+            flexDirection: "column",
+            alignItems: "flex-start",
+          },
+        }}
+      >
         <AgeDropdown />
         <FeeDropdown />
       </Box>

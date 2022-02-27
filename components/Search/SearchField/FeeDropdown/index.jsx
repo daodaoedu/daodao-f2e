@@ -7,6 +7,10 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import Chip from "@mui/material/Chip";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormLabel from "@mui/material/FormLabel";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -19,7 +23,7 @@ const MenuProps = {
   },
 };
 
-const names = ["免費", "部分免費"];
+const names = ["不拘", "免費", "部分免費"];
 
 const FeeDropdown = () => {
   const { query, push } = useRouter();
@@ -28,26 +32,43 @@ const FeeDropdown = () => {
     const {
       target: { value },
     } = event;
-    if (value.length > 0) {
-      push({
-        pathname: "/search",
-        query: {
-          ...query,
-          fee: value.join(","),
-        },
-      });
-    } else {
+
+    if (value === names[0]) {
       delete query.fee;
       push({
         pathname: "/search",
         query,
       });
+    } else {
+      push({
+        pathname: "/search",
+        query: {
+          ...query,
+          fee: value,
+        },
+      });
     }
   };
   return (
-    <FormControl sx={{ m: 1, width: 300 }}>
-      <InputLabel id="demo-multiple-chip-label">費用</InputLabel>
-      <Select
+    <FormControl sx={{ m: 1, marginLeft: "20px" }}>
+      <FormLabel>費用</FormLabel>
+      <RadioGroup
+        row
+        aria-labelledby="demo-row-radio-buttons-group-label"
+        name="row-radio-buttons-group"
+        onChange={handleChange}
+        value={query?.fee ? fee : "不拘"}
+      >
+        {names.map((name) => (
+          <FormControlLabel
+            key={name}
+            value={name}
+            label={name}
+            control={<Radio />}
+          />
+        ))}
+      </RadioGroup>
+      {/* <Select
         multiple
         value={fee}
         onChange={handleChange}
@@ -60,13 +81,17 @@ const FeeDropdown = () => {
           </Box>
         )}
         MenuProps={MenuProps}
+        sx={{
+          borderRadius: "20px",
+          width: 150,
+        }}
       >
         {names.map((name) => (
           <MenuItem key={name} value={name}>
             {name}
           </MenuItem>
         ))}
-      </Select>
+      </Select> */}
     </FormControl>
   );
 };
