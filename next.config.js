@@ -2,6 +2,7 @@
 
 module.exports = {
   reactStrictMode: false,
+  HOSTNAME: "www.daoedu.com",
   images: {
     domains: ["imgur.com"],
   },

@@ -37,7 +37,7 @@ const ResourcePage = ({ data = {} }) => {
       author: "島島阿學",
       copyright: "島島阿學",
       imgLink: image ?? "/preview.webp",
-      link: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
+      link: `${process.env.NEXT_PUBLIC_DEV_HOSTNAME}${router?.asPath ?? ""}`,
     }),
     [desc, image, router.asPath, title]
   );
