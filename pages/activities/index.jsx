@@ -11,7 +11,7 @@ const ActivitiesPage = () => {
     () => ({
       title: "找學習活動｜島島阿學",
       description:
-        "「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
+        "你知道什麼活動，抑或是想主辦一個呢？ 歡迎來信至 daodaoedunetwork@gmail.com 讓好的活動被更多人看見！",
       keywords: "島島阿學",
       author: "島島阿學",
       copyright: "島島阿學",
