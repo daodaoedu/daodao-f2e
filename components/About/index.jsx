@@ -1,7 +1,8 @@
 import React from "react";
 import styled from "@emotion/styled";
 // import { css } from "@emotion/react";
-import { Box, Paper, Typography, Stack } from "@mui/material";
+import { Box, Paper, Typography, Stack, Avatar } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
 
 const ResourceWrapper = styled.section`
   padding-top: 40px;
@@ -38,6 +39,115 @@ const LineWrapper = styled(Typography)`
   margin: 5px 0;
 `;
 
+const IMAGE_TAGS = [
+  "howcanihelp",
+  "hug",
+  "huge",
+  "hulu",
+  "hunger",
+  "icecream",
+  "jellybean toes toe beans grey gray mauve",
+  "jellybean toes toebeans squished beans",
+  "judgemental",
+  "jump",
+  "jumping",
+  "kick",
+  "kiss",
+  "kitler",
+  "kitten",
+  "kittenleg",
+  "kittens",
+  "kitty",
+  "knocknoc",
+  "kucing",
+  "kuro",
+  "laying",
+  "lazy fuck",
+  "legs",
+  "lights",
+  "loaf",
+  "logan",
+  "lolcat",
+  "long",
+  "long-cat",
+  "looking",
+  "lustful",
+  "lying down",
+  "macCat",
+  "mackerel tabby",
+  "mad",
+  "mama",
+  "marine",
+  "mask",
+  "meme",
+  "metal",
+  "misty",
+  "mixed",
+  "money",
+  "moody",
+  "morrigan",
+  "morrigan witch of the wilds",
+  "mousecat",
+  "multi",
+  "multiple_colors",
+  "munchkin",
+  "nasty",
+  "nelly",
+  "nelut",
+  "newyear",
+  "nicecat",
+  "no",
+  "nope",
+  "nyancat",
+  "nyancat-gif",
+  "old",
+  "ominous",
+  "orange",
+  "orange cat",
+  "ovni",
+  "pain",
+  "party",
+  "patoka",
+  "paw",
+  "pebba",
+  "peppa",
+  "pepper",
+  "petting",
+  "piano",
+  "pic",
+  "pippin",
+  "pirate",
+  "playful",
+  "please",
+  "plot",
+  "portrait-worthy",
+  "pretty",
+  "professional",
+  "programmer",
+  "puffy",
+  "quality",
+  "reading",
+  "resting",
+  "rich",
+  "roll",
+  "rolling",
+  "running",
+  "russia",
+  "russian blue",
+  "sad",
+  "sad catto",
+  "samurai",
+  "sara",
+  "sassy",
+  "sauna cat",
+  "savannah",
+  "scared",
+  "screm",
+  "seeya!",
+  "selfie",
+  "serious",
+];
+
 // const ImageWrapper = styled.div`
 //   border-radius: 20px;
 //   /* width: 100%;
@@ -51,6 +161,109 @@ const LineWrapper = styled(Typography)`
 //     filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
 //   `}
 // `;
+
+const Members = [
+  {
+    id: 0,
+    name: "Tiff",
+    image: "https://cataas.com/cat/0",
+  },
+  {
+    id: 1,
+    name: "小許",
+    image: "https://cataas.com/cat/1",
+  },
+  {
+    id: 2,
+    name: "小貝",
+    image: "https://cataas.com/cat/2",
+  },
+  {
+    id: 3,
+    name: "葦",
+    image: "https://cataas.com/cat/3",
+  },
+  {
+    id: 4,
+    name: "羊",
+    image: "https://cataas.com/cat/4",
+  },
+  {
+    id: 5,
+    name: "Sucre",
+    image: "https://cataas.com/cat/5",
+  },
+  {
+    id: 6,
+    name: "東玉",
+    image: "https://cataas.com/cat/6",
+  },
+  {
+    id: 7,
+    name: "百戰不殆",
+    image: "https://cataas.com/cat/7",
+  },
+  {
+    id: 8,
+    name: "Yvonne",
+    image: "https://cataas.com/cat/8",
+  },
+  {
+    id: 9,
+    name: "珮珮",
+    image: "https://cataas.com/cat/9",
+  },
+  {
+    id: 10,
+    name: "袋鼠",
+    image: "https://cataas.com/cat/10",
+  },
+  {
+    id: 11,
+    name: "芳芳",
+    image: "https://cataas.com/cat/11",
+  },
+  {
+    id: 12,
+    name: "預知",
+    image: "https://cataas.com/cat/12",
+  },
+  {
+    id: 13,
+    name: "Yu",
+    image: "https://cataas.com/cat/13",
+  },
+  {
+    id: 14,
+    name: "阿樂",
+    image: "https://cataas.com/cat/14",
+  },
+  {
+    id: 15,
+    name: "姵璇",
+    image: "https://cataas.com/cat/15",
+  },
+  {
+    id: 16,
+    name: "Trixie",
+    image: "https://cataas.com/cat/16",
+  },
+  {
+    id: 17,
+    name: "何廢料",
+    image: "https://cataas.com/cat/17",
+  },
+  {
+    id: 18,
+    name: "一路",
+    image: "https://cataas.com/cat/18",
+  },
+  {
+    id: 19,
+    name: "Yumi",
+    image: "https://cataas.com/cat/19",
+  },
+];
 
 const ContributeResource = () => {
   return (
@@ -266,6 +479,83 @@ const ContributeResource = () => {
                 📌 親子天下教育創新100 - 入選
               </LinkWrapper>
             </LineWrapper>
+          </Stack>
+        </Box>
+        <Box
+          sx={{
+            margin: "20px 0",
+          }}
+        >
+          <Typography
+            variant="h2"
+            sx={{
+              margin: "40px 0 10px 0",
+            }}
+          >
+            感謝名單
+          </Typography>
+          <Stack
+            sx={{
+              margin: "20px",
+            }}
+          >
+            <LineWrapper variant="p" sx={{ fontWeight: "500" }}>
+              「島島阿學－學習資源平台」是從一個人到一群人，並透過自學從無到有的過程。
+              這一路上，感謝每一位曾經參與其中的夥伴，論是針對組織、平台給予建議，又或者協助新增資源，都讓我們由衷的感謝，島島阿學是在每一位橋樑互助共好下誕生的。
+            </LineWrapper>
+            <LineWrapper variant="p">
+              臺灣實驗教育推動中心, 唐光華 老師, 丁志仁 老師, 曲智鑛 老師,
+              g0v零時小學校, 柯君翰, 高婷柔, 向恩霈, 詹喬智, 米苔目, 王玠堯, Ael
+            </LineWrapper>
+          </Stack>
+        </Box>
+        <Box
+          sx={{
+            margin: "20px 0",
+          }}
+        >
+          <Typography
+            variant="h2"
+            sx={{
+              margin: "40px 0 10px 0",
+            }}
+          >
+            團隊組成
+          </Typography>
+          <Stack
+            sx={{
+              margin: "20px",
+            }}
+          >
+            <Stack
+              sx={{
+                display: "flex",
+                justifyContent: "flex-start",
+                alignItems: "center",
+                flexWrap: "wrap",
+                flexDirection: "row",
+              }}
+            >
+              {Members.map(({ id, name, image }) => (
+                <Tooltip key={id} title={name}>
+                  <Avatar
+                    sx={{ margin: "10px", width: 38, height: 38 }}
+                    alt={name}
+                    src={`https://cataas.com/cat/${IMAGE_TAGS[id]}`}
+                  />
+                </Tooltip>
+              ))}
+            </Stack>
+            <LineWrapper variant="p">
+              島島阿學團隊由一群高中生、大學生、教育工作者、家長、工程師、設計師等來自不同背景的夥伴組成，親身經歷自主學習的各種困境，並有感教育不平等之議題，故自主發起島島阿學學習社群計畫。
+            </LineWrapper>
+            <LineWrapper variant="p">
+              包含：內容部, 管理部, IT部, 行銷公關部與設計部
+            </LineWrapper>
+            {/* <LineWrapper variant="p">
+              臺灣實驗教育推動中心, 唐光華 老師, 丁志仁 老師, 曲智鑛 老師,
+              g0v零時小學校, 柯君翰, 高婷柔, 向恩霈, 詹喬智, 米苔目, 王玠堯, Ael
+            </LineWrapper> */}
           </Stack>
         </Box>
         <Box
