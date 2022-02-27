@@ -15,6 +15,11 @@ const HomePageWrapper = styled.div`
 
 const HomePage = () => {
   const router = useRouter();
+  const queryString = useMemo(
+    () => (router?.isReady && router?.asPath ? router?.asPath : ""),
+    [router?.asPath, router?.isReady]
+  );
+
   const SEOData = useMemo(
     () => ({
       title: "學習資源平台｜島島阿學",
@@ -24,9 +29,9 @@ const HomePage = () => {
       author: "島島阿學",
       copyright: "島島阿學",
       imgLink: "/preview.webp",
-      link: `${process.env.NEXT_PUBLIC_DEV_HOSTNAME}${router?.asPath ?? ""}`,
+      link: `${process.env.NEXT_PUBLIC_DEV_HOSTNAME}${queryString}`,
     }),
-    [router]
+    [queryString]
   );
 
   return (

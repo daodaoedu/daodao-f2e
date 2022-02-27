@@ -6,7 +6,6 @@ import Footer from "../../../shared/components/Footer_v2";
 import Resource from "../../../components/Resource";
 
 const ResourcePage = ({ data = {} }) => {
-  console.log("data", data);
   const router = useRouter();
   const title = useMemo(
     () =>
@@ -29,6 +28,10 @@ const ResourcePage = ({ data = {} }) => {
         : "",
     [data?.properties]
   );
+  const queryString = useMemo(
+    () => (router?.isReady && router?.asPath ? router?.asPath : ""),
+    [router?.asPath, router?.isReady]
+  );
   const SEOData = useMemo(
     () => ({
       title: `${title}的學習資源介紹｜島島阿學`,
@@ -37,9 +40,9 @@ const ResourcePage = ({ data = {} }) => {
       author: "島島阿學",
       copyright: "島島阿學",
       imgLink: image ?? "/preview.webp",
-      link: `${process.env.NEXT_PUBLIC_DEV_HOSTNAME}${router?.asPath ?? ""}`,
+      link: `${process.env.NEXT_PUBLIC_DEV_HOSTNAME}${queryString}`,
     }),
-    [desc, image, router.asPath, title]
+    [desc, image, queryString, title]
   );
 
   return (

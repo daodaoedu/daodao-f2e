@@ -7,6 +7,10 @@ import Activities from "../../components/Activities";
 
 const ActivitiesPage = () => {
   const router = useRouter();
+  const queryString = useMemo(
+    () => (router?.isReady && router?.asPath ? router?.asPath : ""),
+    [router?.asPath, router?.isReady]
+  );
   const SEOData = useMemo(
     () => ({
       title: "找學習活動｜島島阿學",
@@ -16,9 +20,9 @@ const ActivitiesPage = () => {
       author: "島島阿學",
       copyright: "島島阿學",
       imgLink: "/preview.webp",
-      link: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
+      link: `${process.env.NEXT_PUBLIC_DEV_HOSTNAME}${queryString}`,
     }),
-    [router]
+    [queryString]
   );
 
   return (

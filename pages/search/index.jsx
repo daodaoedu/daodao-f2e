@@ -51,6 +51,10 @@ const SearchPage = () => {
     router?.query?.q,
     router?.query?.tags,
   ]);
+  const queryString = useMemo(
+    () => (router?.isReady && router?.asPath ? router?.asPath : ""),
+    [router?.asPath, router?.isReady]
+  );
   const SEOData = useMemo(
     () => ({
       title: `${title}學習資源列表｜島島阿學`,
@@ -60,9 +64,9 @@ const SearchPage = () => {
       author: "島島阿學",
       copyright: "島島阿學",
       imgLink: "/preview.webp",
-      link: `${process.env.NEXT_PUBLIC_DEV_HOSTNAME}${router?.asPath ?? ""}`,
+      link: `${process.env.NEXT_PUBLIC_DEV_HOSTNAME}${queryString}`,
     }),
-    [router.asPath, title]
+    [queryString, title]
   );
 
   return (
