@@ -6,8 +6,18 @@ import { COLOR_TABLE } from "../../../constants/notion";
 import { CATEGORIES } from "../../../constants/category";
 const ListWrapper = styled.ul`
   display: flex;
-  flex-wrap: wrap;
   margin: 20px 0;
+  /* flex-wrap: wrap; */
+  max-width: calc(100vw - 49px);
+  overflow-x: scroll;
+  -ms-overflow-style: none; /* IE */
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge and Opera */
+  }
+  @media (max-width: 767px) {
+    margin: 10px 0;
+  }
 `;
 
 const SelectedCategory = () => {
