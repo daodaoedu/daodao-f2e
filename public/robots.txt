@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Disallow: /api/
+
+# Host
+Host: https://www.daoedu.com
+
+# Sitemaps
+Sitemap: https://www.daoedu.com/sitemap.xml
