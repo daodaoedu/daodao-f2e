@@ -78,7 +78,7 @@ const Shares = ({ title }) => {
           }}
         >
           <FacebookShareButton
-            url={`https://test-page.notion.dev.daoedu.tw${router.asPath}?source=fb-btn`}
+            url={`${process.env.HOSTNAME}${router.asPath}?source=fb-btn`}
             quote={copyContent}
           >
             <FacebookIcon size={30} round />
@@ -90,8 +90,8 @@ const Shares = ({ title }) => {
           }}
         >
           <FacebookMessengerShareButton
-            redirectUri={`https://test-page.notion.dev.daoedu.tw${router.asPath}`}
-            to={`https://test-page.notion.dev.daoedu.tw${router.asPath}?source=fbm-btn`}
+            redirectUri={`${process.env.HOSTNAME}${router.asPath}`}
+            to={`${process.env.HOSTNAME}${router.asPath}?source=fbm-btn`}
             quote={copyContent}
             appId="daodaoedu"
           >
@@ -104,7 +104,7 @@ const Shares = ({ title }) => {
           }}
         >
           <LineShareButton
-            url={`https://test-page.notion.dev.daoedu.tw${router.asPath}?source=line-btn`}
+            url={`${process.env.HOSTNAME}${router.asPath}?source=line-btn`}
             title={copyContent}
           >
             <LineIcon size={30} round />
@@ -116,7 +116,7 @@ const Shares = ({ title }) => {
           }}
         >
           <TwitterShareButton
-            url={`https://test-page.notion.dev.daoedu.tw${router.asPath}?source=twitter-btn`}
+            url={`${process.env.HOSTNAME}${router.asPath}?source=twitter-btn`}
             title={copyContent}
           >
             <TwitterIcon size={30} round />
@@ -128,7 +128,7 @@ const Shares = ({ title }) => {
           }}
         >
           <TelegramShareButton
-            url={`https://test-page.notion.dev.daoedu.tw${router.asPath}?source=telegram-btn`}
+            url={`${process.env.HOSTNAME}${router.asPath}?source=telegram-btn`}
             title={copyContent}
           >
             <TelegramIcon size={30} round />
@@ -140,7 +140,7 @@ const Shares = ({ title }) => {
           }}
         >
           <WhatsappShareButton
-            url={`https://test-page.notion.dev.daoedu.tw${router.asPath}?source=whatapp-btn`}
+            url={`${process.env.HOSTNAME}${router.asPath}?source=whatapp-btn`}
             title={copyContent}
           >
             <WhatsappIcon size={30} round />

@@ -69,7 +69,7 @@ const Resource = ({ data, title, desc, image }) => {
     if (router.isReady) {
       setDisqusConfig({
         // url: `test-page.notion.dev.daoedu.tw${router.asPath}`,
-        url: `https://test-page.notion.dev.daoedu.tw${router.asPath}`,
+        url: `${process.env.HOSTNAME}${router.asPath}`,
         identifier: encodeURIComponent(title),
         title: title,
         language: "zh_TW", //e.g. for Traditional Chinese (Taiwan)
