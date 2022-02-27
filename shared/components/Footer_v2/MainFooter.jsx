@@ -40,7 +40,7 @@ const BlockWrapper = styled.div`
 
 const aboutDaoConfig = [
   {
-    name: "關於我們",
+    name: "關於島島",
     link: "/about",
   },
   {
@@ -51,12 +51,12 @@ const aboutDaoConfig = [
 
 const iconListConfig = [
   {
-    icon: <FaInstagram size="16" />,
+    icon: <FaInstagram size="18" />,
     link: "https://www.instagram.com/daodao_edu/",
     alt: "instagram",
   },
   {
-    icon: <FaFacebook size="16" />,
+    icon: <FaFacebook size="18" />,
     link: "https://www.facebook.com/daodao.edu",
     alt: "facebook",
   },

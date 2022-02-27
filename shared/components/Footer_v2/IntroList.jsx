@@ -1,12 +1,13 @@
 import React from "react";
 import styled from "@emotion/styled";
+import { Typography } from "@mui/material";
 
 const IntroListWrapper = styled.div`
-  margin: 0 10px;
+  margin: 0 15px;
 
-  h2 {
+  /* h2 {
     margin-bottom: 10px;
-  }
+  } */
   ul {
     display: flex;
     flex-direction: column;
@@ -15,7 +16,6 @@ const IntroListWrapper = styled.div`
   li {
     cursor: pointer;
     margin: 8px auto;
-    font-size: 14px;
   }
 `;
 
@@ -31,7 +31,15 @@ const IntroList = ({ title, list }) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <li>{value.name}</li>
+            <li>
+              <Typography
+                sx={{
+                  fontSize: "16px",
+                }}
+              >
+                {value.name}
+              </Typography>
+            </li>
           </a>
         ))}
       </ul>
