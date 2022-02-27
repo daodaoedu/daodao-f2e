@@ -220,7 +220,7 @@ const Members = [
   },
   {
     id: 11,
-    name: "芳芳",
+    name: "Karen",
     image: "https://cataas.com/cat/11",
   },
   {
@@ -262,6 +262,11 @@ const Members = [
     id: 19,
     name: "Yumi",
     image: "https://cataas.com/cat/19",
+  },
+  {
+    id: 20,
+    name: "芳芳",
+    image: "https://cataas.com/cat/20",
   },
 ];
 
