@@ -2,9 +2,11 @@
 
 module.exports = {
   reactStrictMode: false,
-  HOSTNAME: "www.daoedu.com",
   images: {
     domains: ["imgur.com"],
+  },
+  env: {
+    HOSTNAME: "https://www.daoedu.com",
   },
   // mode: "development",
   // entry: path.resolve(__dirname, "src"),

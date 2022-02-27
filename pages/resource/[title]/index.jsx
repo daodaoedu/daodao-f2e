@@ -40,7 +40,7 @@ const ResourcePage = ({ data = {} }) => {
       author: "島島阿學",
       copyright: "島島阿學",
       imgLink: image ?? "/preview.webp",
-      link: `${process.env.NEXT_PUBLIC_DEV_HOSTNAME}${queryString}`,
+      link: `${process.env.HOSTNAME}${queryString}`,
     }),
     [desc, image, queryString, title]
   );

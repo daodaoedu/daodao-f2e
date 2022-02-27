@@ -20,7 +20,7 @@ const LocationsPage = () => {
       author: "島島阿學",
       copyright: "島島阿學",
       imgLink: "/preview.webp",
-      link: `${process.env.NEXT_PUBLIC_DEV_HOSTNAME}${queryString}`,
+      link: `${process.env.HOSTNAME}${queryString}`,
     }),
     [queryString]
   );
