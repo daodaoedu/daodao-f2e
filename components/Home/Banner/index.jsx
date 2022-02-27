@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import styled from "@emotion/styled";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import SearchField from "../SearchField";
 import BannerVideo from "../BannerVideo";
 
@@ -11,24 +11,6 @@ const BannerWrapper = styled.section`
 const MainBannerWrapper = styled.div`
   margin: 0 auto 0 auto;
   padding-top: 20vh;
-  .main-title {
-    font-size: 24px;
-    line-height: 28px;
-    letter-spacing: 0.08em;
-    color: #f0f0f0;
-    font-weight: 500;
-    text-align: center;
-  }
-
-  .sub-title {
-    font-size: 16px;
-    line-height: 22px;
-    letter-spacing: 0.08em;
-    text-align: center;
-    margin-top: 10px;
-    color: #f0f0f0;
-    font-weight: 500;
-  }
 
   .promo-button {
     margin: 0 auto 0 auto;
@@ -37,21 +19,6 @@ const MainBannerWrapper = styled.div`
   @media (max-width: 768px) {
     width: 80%;
     padding-top: 10vh;
-  }
-`;
-
-const SubBannerWrapper = styled.div`
-  margin: 0 auto 0 auto;
-  padding-top: 120px;
-  .promo-title {
-    letter-spacing: 0.08em;
-    color: #f0f0f0;
-    font-weight: 500;
-    text-align: center;
-    font-size: 36px;
-    letter-spacing: 0.08em;
-    text-align: center;
-    margin: 20px;
   }
 `;
 
@@ -68,16 +35,56 @@ const Banner = ({ guideRef }) => {
     <BannerWrapper>
       <BannerVideo />
       <MainBannerWrapper>
-        <h1 className="main-title">
+        <Typography
+          variant="h1"
+          sx={{
+            "font-size": "24px",
+            "line-height": "28px",
+            "letter-spacing": "0.08em",
+            color: "#f0f0f0",
+            "font-weight": "500",
+            "text-align": "center",
+          }}
+        >
           歡迎來到島島阿學！一起找找資源、共編資源吧～
-        </h1>
-        <h2 className="sub-title">
+        </Typography>
+        <Typography
+          variant="h2"
+          sx={{
+            "font-size": "16px",
+            "line-height": "22px",
+            "letter-spacing": "0.08em",
+            "text-align": "center",
+            "margin-top": "10px",
+            color: "#f0f0f0",
+            "font-weight": "500",
+          }}
+        >
           If you want to go fast go alone. If you what to go far go together.
-        </h2>
+        </Typography>
         <SearchField />
       </MainBannerWrapper>
-      <SubBannerWrapper>
-        <h3 className="promo-title">還不知道學什麼嗎？別擔心。</h3>
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: 0,
+          marginBottom: "100px",
+          width: "100%",
+        }}
+      >
+        <Typography
+          variant="h3"
+          sx={{
+            "letter-spacing": "0.08em",
+            color: "#f0f0f0",
+            "font-weight": "500",
+            "text-align": "center",
+            "font-size": "30px",
+            margin: "20px",
+          }}
+        >
+          還不知道學什麼嗎？
+        </Typography>
         <Box
           sx={{
             display: "flex",
@@ -93,7 +100,7 @@ const Banner = ({ guideRef }) => {
             看看大家都學什麼
           </Button>
         </Box>
-      </SubBannerWrapper>
+      </Box>
     </BannerWrapper>
   );
 };
