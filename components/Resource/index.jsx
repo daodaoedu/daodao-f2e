@@ -11,6 +11,7 @@ import { Share } from "@mui/icons-material";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import toast from "react-hot-toast";
 import Shares from "./Shares";
+import appendQuery from "append-query";
 
 const ResourceWrapper = styled.section`
   padding-top: 40px;
@@ -78,7 +79,7 @@ const Resource = ({ data, title, desc, image }) => {
   const link = useMemo(
     () =>
       data?.properties && data?.properties["連結"]
-        ? data?.properties["連結"]?.url
+        ? appendQuery(data?.properties["連結"]?.url ?? "", "referral=daoedu.tw")
         : "",
     [data?.properties]
   );
@@ -108,6 +109,7 @@ const Resource = ({ data, title, desc, image }) => {
     () => data?.properties["領域名稱"]?.multi_select ?? [],
     [data]
   );
+
   if (isLoading) {
     return <ResourceWrapper />;
   }
