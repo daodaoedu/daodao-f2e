@@ -268,6 +268,11 @@ const Members = [
     name: "芳芳",
     image: "https://cataas.com/cat/20",
   },
+  {
+    id: 21,
+    name: "Pei",
+    image: "https://cataas.com/cat/21",
+  },
 ];
 
 const ContributeResource = () => {
