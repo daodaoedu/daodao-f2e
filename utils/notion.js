@@ -146,8 +146,6 @@ export const bodyHandler = (query, nextCursor, pageSize = 100) => {
     );
   }
 
-  console.log("=>", body.filter.and);
-
   // 費用
   const feeQuery = typeof fee === "string" ? stringSanitizer(fee) : "";
   if (feeQuery.length > 0) {
