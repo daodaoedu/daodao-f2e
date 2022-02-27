@@ -68,7 +68,7 @@ const Banner = ({ guideRef }) => {
         sx={{
           position: "absolute",
           bottom: 0,
-          marginBottom: "100px",
+          marginBottom: "70px",
           width: "100%",
         }}
       >
