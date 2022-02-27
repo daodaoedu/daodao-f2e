@@ -118,3 +118,6 @@ Git 不會紀錄你更改大小寫的命名，記得使用：
 ```
 git mv hello.txt Hello.txt
 ```
+
+開發版本請使用 Node 16.14.0。
+理論上在雲端放上 NODE_VERSION 就可以改版本，但是不知道為什麼只能用.node-version

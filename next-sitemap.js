@@ -3,7 +3,7 @@
 // const axios = require("axios");
 const fetch = require("node-fetch");
 // import fetch from "node-fetch";
-const siteUrl = process.env.SITE_URL || "https://www.daoedu.com";
+const siteUrl = process.env.SITE_URL || "https://www.daoedu.tw";
 
 const CATEGORIES = [
   {
