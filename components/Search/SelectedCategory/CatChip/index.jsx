@@ -22,12 +22,15 @@ const CatChip = ({ value, onClickCategory, isCurrentSelectAllCats }) => {
         fontWeight: 500,
         fontSize: "16px",
         "&:hover": {
-          opacity: "100%",
-          transition: "all 0.5s ease",
-          backgroundColor: !((query?.cats ?? "").includes(value)
-            ? COLOR_TABLE.green
-            : COLOR_TABLE.default),
+          backgroundColor: COLOR_TABLE.green,
         },
+        // "&:hover": {
+        //   opacity: "100%",
+        //   transition: "all 0.5s ease",
+        //   backgroundColor: (query?.cats ?? "").includes(value)
+        //     ? COLOR_TABLE.default
+        //     : COLOR_TABLE.green,
+        // },
       }}
     />
   );

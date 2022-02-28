@@ -86,13 +86,16 @@ const SelectedCategory = () => {
           fontWeight: 500,
           fontSize: "16px",
           "&:hover": {
-            opacity: "100%",
-            transition: "all 0.5s ease",
-            backgroundColor:
-              !(query?.cats ?? "") === ""
-                ? COLOR_TABLE.green
-                : COLOR_TABLE.default,
+            backgroundColor: COLOR_TABLE.green,
           },
+          // "&:hover": {
+          //   opacity: "100%",
+          //   transition: "all 0.5s ease",
+          //   backgroundColor:
+          //     (query?.cats ?? "") === ""
+          //       ? COLOR_TABLE.default
+          //       : COLOR_TABLE.green,
+          // },
         }}
       />
       {CATEGORIES.map(({ key, value }) => (
