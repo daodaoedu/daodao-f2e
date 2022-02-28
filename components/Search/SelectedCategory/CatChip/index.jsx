@@ -12,14 +12,10 @@ const CatChip = ({ value, onClickCategory, isCurrentSelectAllCats }) => {
       value={value}
       onClick={onClickCategory}
       sx={{
-        backgroundColor:
-          (query?.cats ?? "").includes(value) || isCurrentSelectAllCats
-            ? COLOR_TABLE.green
-            : COLOR_TABLE.default,
-        opacity:
-          (query?.cats ?? "").includes(value) || isCurrentSelectAllCats
-            ? "100%"
-            : "40%",
+        backgroundColor: (query?.cats ?? "").includes(value)
+          ? COLOR_TABLE.green
+          : COLOR_TABLE.default,
+        opacity: (query?.cats ?? "").includes(value) ? "100%" : "40%",
         cursor: "pointer",
         margin: "5px",
         whiteSpace: "nowrap",
@@ -28,7 +24,9 @@ const CatChip = ({ value, onClickCategory, isCurrentSelectAllCats }) => {
         "&:hover": {
           opacity: "100%",
           transition: "all 0.5s ease",
-          backgroundColor: COLOR_TABLE.green,
+          backgroundColor: !((query?.cats ?? "").includes(value)
+            ? COLOR_TABLE.green
+            : COLOR_TABLE.default),
         },
       }}
     />
