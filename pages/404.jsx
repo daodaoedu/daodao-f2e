@@ -16,6 +16,7 @@ const BodyWrapper = styled.div`
 `;
 
 const NotExistPage = () => {
+  const router = useRouter();
   return (
     <BodyWrapper>
       <Navigatin />
