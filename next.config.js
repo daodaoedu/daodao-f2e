@@ -8,6 +8,15 @@ module.exports = {
   env: {
     HOSTNAME: "https://www.daoedu.com",
   },
+  async redirects() {
+    return [
+      {
+        source: "/learn/:title",
+        destination: "/resource/:title",
+        permanent: true,
+      },
+    ];
+  },
   // mode: "development",
   // entry: path.resolve(__dirname, "src"),
   // resolve: {
