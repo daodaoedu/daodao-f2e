@@ -32,22 +32,38 @@ const NotExistPage = () => {
           variant="h2"
           sx={{
             color: "#536166",
+            marginTop: "10px",
             fontWeight: "bold",
             fontSize: "30px",
-            lineHeight: "50px",
             letterSpacing: "0.08em",
             textAlign: "center",
             marginRight: "20px",
           }}
         >
-          這座島已經沉入海裡了
+          這座島已經搬新家囉
         </Typography>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <img
+            src="/assets/nobody-land.gif"
+            alt="nobody-land"
+            width="300"
+            height="300"
+          />
+        </Box>
         <Typography
           variant="p"
           sx={{
             // fontWeight: "bold",
             fontSize: "20px",
-            margin: "10px",
+            // margin: "10px",
             textAlign: "center",
             width: "100%",
           }}
@@ -59,9 +75,10 @@ const NotExistPage = () => {
           sx={{
             // fontWeight: "bold",
             fontSize: "20px",
-            margin: "10px",
+            // margin: "10px",
             textAlign: "center",
             width: "100%",
+            marginTop: "10px",
           }}
         >
           要不要試試我們新版的資源搜尋或是參觀其他地方呢？
