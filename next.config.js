@@ -15,8 +15,39 @@ module.exports = {
         destination: "/resource/:title",
         permanent: true,
       },
+      {
+        source: "/list",
+        destination: "/search",
+        permanent: true,
+      },
+      {
+        source: "/category/learn/:cat",
+        destination: "/search",
+        permanent: true,
+      },
+      {
+        source: "/developer",
+        destination: "/about",
+        permanent: true,
+      },
+      {
+        source: "/tag:tag",
+        destination: "/search?q=:tag",
+        permanent: true,
+      },
+      {
+        source: "/privacy-policy",
+        destination: "/about",
+        permanent: true,
+      },
+      {
+        source: "/terms-of-service",
+        destination: "/about",
+        permanent: true,
+      },
     ];
   },
+
   // mode: "development",
   // entry: path.resolve(__dirname, "src"),
   // resolve: {
