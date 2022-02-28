@@ -32,76 +32,82 @@ const Banner = ({ guideRef }) => {
   }, [guideRef]);
 
   return (
-    <BannerWrapper>
-      <BannerVideo />
-      <MainBannerWrapper>
-        <Typography
-          variant="h1"
-          sx={{
-            "font-size": "24px",
-            "line-height": "28px",
-            "letter-spacing": "0.08em",
-            color: "#f0f0f0",
-            "font-weight": "500",
-            "text-align": "center",
-          }}
-        >
-          歡迎來到島島阿學！一起找找資源、共編資源吧～
-        </Typography>
-        <Typography
-          variant="h2"
-          sx={{
-            "font-size": "16px",
-            "line-height": "22px",
-            "letter-spacing": "0.08em",
-            "text-align": "center",
-            "margin-top": "10px",
-            color: "#f0f0f0",
-            "font-weight": "500",
-          }}
-        >
-          If you want to go fast go alone. If you what to go far go together.
-        </Typography>
-        <SearchField />
-      </MainBannerWrapper>
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: 0,
-          marginBottom: "70px",
-          width: "100%",
-        }}
-      >
-        <Typography
-          variant="h3"
-          sx={{
-            "letter-spacing": "0.08em",
-            color: "#f0f0f0",
-            "font-weight": "500",
-            "text-align": "center",
-            "font-size": "30px",
-            margin: "20px",
-          }}
-        >
-          還不知道學什麼嗎？
-        </Typography>
+    <Box
+      sx={{
+        position: "relative",
+      }}
+    >
+      <BannerWrapper>
+        <MainBannerWrapper>
+          <Typography
+            variant="h1"
+            sx={{
+              "font-size": "24px",
+              "line-height": "28px",
+              "letter-spacing": "0.08em",
+              color: "#f0f0f0",
+              "font-weight": "500",
+              "text-align": "center",
+            }}
+          >
+            歡迎來到島島阿學！一起找找資源、共編資源吧～
+          </Typography>
+          <Typography
+            variant="h2"
+            sx={{
+              "font-size": "16px",
+              "line-height": "22px",
+              "letter-spacing": "0.08em",
+              "text-align": "center",
+              "margin-top": "10px",
+              color: "#f0f0f0",
+              "font-weight": "500",
+            }}
+          >
+            If you want to go fast go alone. If you what to go far go together.
+          </Typography>
+          <SearchField />
+        </MainBannerWrapper>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            position: "absolute",
+            bottom: 0,
+            marginBottom: "70px",
+            width: "100%",
           }}
         >
-          <Button
-            variant="contained"
-            onClick={smoothScroll}
-            sx={{ backgroundColor: "white" }}
+          <Typography
+            variant="h3"
+            sx={{
+              "letter-spacing": "0.08em",
+              color: "#f0f0f0",
+              "font-weight": "500",
+              "text-align": "center",
+              "font-size": "30px",
+              margin: "20px",
+            }}
           >
-            看看大家都學什麼
-          </Button>
+            還不知道學什麼嗎？
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              variant="contained"
+              onClick={smoothScroll}
+              sx={{ backgroundColor: "white" }}
+            >
+              看看大家都學什麼
+            </Button>
+          </Box>
         </Box>
-      </Box>
-    </BannerWrapper>
+      </BannerWrapper>
+      <BannerVideo />
+    </Box>
   );
 };
 

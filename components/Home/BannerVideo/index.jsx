@@ -3,11 +3,12 @@ import styled from "@emotion/styled";
 
 const BannerVideoWrapper = styled.div`
   position: absolute;
-  background-color: #f5f5f5;
+  background-color: #172f46;
   width: 100%;
   height: calc(100vh - 80px);
   overflow: hidden;
   z-index: -1;
+  top: 0;
 
   video {
     object-fit: cover;
