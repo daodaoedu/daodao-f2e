@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import styled from "@emotion/styled";
 // import { css } from "@emotion/react";
 import { Box, Paper, Typography, Button } from "@mui/material";
@@ -34,6 +34,7 @@ const NckuBikeFestival = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [img] = useImage(selectedFile, "Anonymous");
   const [newImage] = useImage(stageRef?.current?.toDataURL(), "Anonymous");
+
   const handleUploadClick = (event) => {
     var file = event.target.files[0];
     const reader = new FileReader();
@@ -47,6 +48,14 @@ const NckuBikeFestival = () => {
     setSelectedFile(event.target.files[0]);
     setImageUploaded(1);
   };
+  function downloadURI(uri, name) {
+    var link = document.createElement("a");
+    link.download = name;
+    link.href = uri;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
   return (
     <ResourceWrapper>
       <Paper
@@ -84,7 +93,6 @@ const NckuBikeFestival = () => {
           <Button variant="outlined">
             <input
               accept="image/*"
-              id="contained-button-file"
               multiple
               type="file"
               onChange={handleUploadClick}
@@ -121,7 +129,11 @@ const NckuBikeFestival = () => {
         </Box>
         <Box>
           <a
-            href={`${newImage?.src}`}
+            onClick={() => {
+              var dataURL = stageRef?.current?.toDataURL({ pixelRatio: 3 });
+              downloadURI(dataURL, "stage.png");
+            }}
+            // href={`${downloadPath}`}
             target="_blank"
             download="canvas.png"
             rel="noreferrer"
