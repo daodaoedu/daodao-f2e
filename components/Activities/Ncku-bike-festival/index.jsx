@@ -47,9 +47,6 @@ const NckuBikeFestival = () => {
     setSelectedFile(event.target.files[0]);
     setImageUploaded(1);
   };
-  console.log("newImage", newImage.src);
-  //   console.log("selectedFile", selectedFile);
-  //   console.log(`data:image/png;base64, ${stageRef.current.toDataURL()}`);
   return (
     <ResourceWrapper>
       <Paper
