@@ -24,7 +24,7 @@ const Shares = ({ title }) => {
   const router = useRouter();
   const copyContent = useMemo(
     () =>
-      `我在島島阿學發現了不錯的學習資源想與你一起分享。\n資源名稱：${title}\nhttps://test-page.notion.dev.daoedu.tw${router.asPath}?source=share`,
+      `我在島島阿學發現了不錯的學習資源想與你一起分享。\n資源名稱：${title}\n${process.env.HOSTNAME}${router.asPath}?source=share`,
     [router.asPath, title]
   );
   return (

@@ -201,18 +201,22 @@ export const NAV_LINK = [
   {
     name: "找資源",
     link: "/search",
+    target: "_self",
   },
   {
     name: "找活動",
     link: "/activities",
+    target: "_self",
   },
   {
     name: "加入社群",
     link: "https://www.facebook.com/groups/2237666046370459",
+    target: "_blank",
   },
   {
     name: "教育場域",
     link: "/locations",
+    target: "_self",
   },
   // {
   //   name: '找學習空間',
@@ -224,18 +228,22 @@ export const FOOTER_LINK = [
   {
     name: "找資源",
     link: "/search",
+    target: "_self",
   },
   {
     name: "找活動",
     link: "/activities",
+    target: "_self",
   },
   {
     name: "加入社群",
     link: "https://www.facebook.com/groups/2237666046370459",
+    target: "_blank",
   },
   {
     name: "教育場域",
     link: "/locations",
+    target: "_self",
   },
   // {
   //   name: "體驗問卷",

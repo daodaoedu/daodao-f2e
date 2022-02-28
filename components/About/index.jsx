@@ -596,9 +596,7 @@ const ContributeResource = () => {
             <LineWrapper variant="p">
               <LinkWrapper
                 target="_blank"
-                href={
-                  "https://resources.daoedu.tw/%e6%96%b0%e5%a2%9e%e8%b3%87%e6%ba%90/"
-                }
+                href={"/contribute/resource"}
                 rel="noopener noreferrer"
               >
                 請點選連結進行新增

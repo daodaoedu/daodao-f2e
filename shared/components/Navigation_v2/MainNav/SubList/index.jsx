@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "@emotion/styled";
+import Link from "next/link";
 
 const LinkListWrapper = styled.ul`
   display: flex;
@@ -45,15 +46,11 @@ const SubList = () => {
       <LinkListWrapper>
         <li>
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a
-            target="_blank"
-            href="/contribute/resource"
-            rel="noopener noreferrer"
-          >
+          <Link href="/contribute/resource" passHref>
             <p className="login" role="presentation">
               新增資源
             </p>
-          </a>
+          </Link>
         </li>
       </LinkListWrapper>
     </SubListWrapper>
