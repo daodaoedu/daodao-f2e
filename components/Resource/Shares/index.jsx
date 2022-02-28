@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import { Button, Box, Stack } from "@mui/material";
-import { Share } from "@mui/icons-material";
+import { Share, DirectionsRun } from "@mui/icons-material";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import toast from "react-hot-toast";
 import {
@@ -21,11 +21,11 @@ import {
 } from "react-share";
 import appendQuery from "append-query";
 
-const Shares = ({ title }) => {
+const Shares = ({ title, link }) => {
   const router = useRouter();
   const copyContent = useMemo(
     () =>
-      `我在島島阿學發現了不錯的學習資源想與你一起分享。\n資源名稱：${title}\n${process.env.HOSTNAME}${router.asPath}`,
+      `我在島島阿學發現了不錯的學習資源想與你一起分享。\n資源名稱：${title}\n${process.env.HOSTNAME}${router.asPath}?source=share`,
     [router.asPath, title]
   );
   return (
@@ -39,6 +39,25 @@ const Shares = ({ title }) => {
       }}
     >
       <Box>
+        <Button
+          variant="outlined"
+          sx={{
+            borderRadius: "20px",
+            fontWeight: 700,
+            border: "1px solid #16b9b3",
+            "white-space": "nowrap",
+            marginRight: "10px",
+          }}
+          onClick={() => open(link, "_blank")}
+        >
+          <DirectionsRun
+            sx={{
+              fontSize: "14px",
+              marginRight: "10px",
+            }}
+          />
+          查看資源
+        </Button>
         <CopyToClipboard
           text={copyContent}
           onCopy={() => toast.success("已複製連結")}

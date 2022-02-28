@@ -56,8 +56,7 @@ const ImageWrapper = styled.div`
     transition: transform 0.4s;
   }
   @media (max-width: 767px) {
-    width: 100px;
-    height: 100px;
+    width: 90%;
   }
 `;
 
@@ -141,7 +140,7 @@ const Resource = ({ data, title, desc, image }) => {
           onClick={() => window.open(link, "_blank")}
           image={image ?? "/preview.webp"}
         />
-        <Shares title={title} />
+        <Shares title={title} link={link} />
         <Box
           sx={{
             display: "flex",
