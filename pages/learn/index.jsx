@@ -3,7 +3,7 @@ import { GetStaticProps } from "next";
 export const getStaticProps = async (context) => {
   return {
     redirect: {
-      destination: "/resource/:title",
+      destination: "/resource",
       permanent: false,
     },
   };
