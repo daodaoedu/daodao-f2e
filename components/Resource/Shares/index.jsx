@@ -26,7 +26,7 @@ const Shares = ({ title }) => {
   const copyContent = useMemo(
     () =>
       `我在島島阿學發現了不錯的學習資源想與你一起分享。\n資源名稱：${title}\n${process.env.HOSTNAME}${router.asPath}`,
-    [title]
+    [router.asPath, title]
   );
   return (
     <Box
