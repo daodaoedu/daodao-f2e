@@ -19,13 +19,14 @@ import {
   FacebookMessengerIcon,
   FacebookMessengerShareButton,
 } from "react-share";
+import appendQuery from "append-query";
 
 const Shares = ({ title }) => {
   const router = useRouter();
   const copyContent = useMemo(
     () =>
-      `我在島島阿學發現了不錯的學習資源想與你一起分享。\n資源名稱：${title}\n${process.env.HOSTNAME}${router.asPath}?source=share`,
-    [router.asPath, title]
+      `我在島島阿學發現了不錯的學習資源想與你一起分享。\n資源名稱：${title}`,
+    [title]
   );
   return (
     <Box
@@ -78,7 +79,10 @@ const Shares = ({ title }) => {
           }}
         >
           <FacebookShareButton
-            url={`${process.env.HOSTNAME}${router.asPath}?source=fb-btn`}
+            url={appendQuery(
+              `${process.env.HOSTNAME}${router.asPath}`,
+              "source=fb-btn"
+            )}
             quote={copyContent}
           >
             <FacebookIcon size={30} round />
@@ -89,14 +93,19 @@ const Shares = ({ title }) => {
             margin: "5px",
           }}
         >
-          <FacebookMessengerShareButton
-            redirectUri={`${process.env.HOSTNAME}${router.asPath}`}
-            to={`${process.env.HOSTNAME}${router.asPath}?source=fbm-btn`}
-            quote={copyContent}
-            appId="daodaoedu"
-          >
-            <FacebookMessengerIcon size={30} round />
-          </FacebookMessengerShareButton>
+          <Box>
+            {/* 可參考：https://developers.facebook.com/docs/sharing/reference/send-dialog#examples */}
+            <a
+              href={`http://www.facebook.com/dialog/send?app_id=374678340785771&link=${appendQuery(
+                `${process.env.HOSTNAME}${router.asPath}`,
+                "source=fbm-btn"
+              )}&redirect_uri=${process.env.HOSTNAME}${router.asPath}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <FacebookMessengerIcon size={30} round />
+            </a>
+          </Box>
         </Box>
         <Box
           sx={{
@@ -104,7 +113,10 @@ const Shares = ({ title }) => {
           }}
         >
           <LineShareButton
-            url={`${process.env.HOSTNAME}${router.asPath}?source=line-btn`}
+            url={appendQuery(
+              `${process.env.HOSTNAME}${router.asPath}`,
+              "source=line-btn"
+            )}
             title={copyContent}
           >
             <LineIcon size={30} round />
@@ -116,7 +128,10 @@ const Shares = ({ title }) => {
           }}
         >
           <TwitterShareButton
-            url={`${process.env.HOSTNAME}${router.asPath}?source=twitter-btn`}
+            url={appendQuery(
+              `${process.env.HOSTNAME}${router.asPath}`,
+              "source=twitter-btn"
+            )}
             title={copyContent}
           >
             <TwitterIcon size={30} round />
@@ -128,7 +143,10 @@ const Shares = ({ title }) => {
           }}
         >
           <TelegramShareButton
-            url={`${process.env.HOSTNAME}${router.asPath}?source=telegram-btn`}
+            url={appendQuery(
+              `${process.env.HOSTNAME}${router.asPath}`,
+              "source=telegram-btn"
+            )}
             title={copyContent}
           >
             <TelegramIcon size={30} round />
@@ -140,7 +158,10 @@ const Shares = ({ title }) => {
           }}
         >
           <WhatsappShareButton
-            url={`${process.env.HOSTNAME}${router.asPath}?source=whatapp-btn`}
+            url={appendQuery(
+              `${process.env.HOSTNAME}${router.asPath}`,
+              "source=whatapp-btn"
+            )}
             title={copyContent}
           >
             <WhatsappIcon size={30} round />

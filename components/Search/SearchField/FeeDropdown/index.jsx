@@ -23,7 +23,7 @@ const MenuProps = {
   },
 };
 
-const names = ["不拘", "免費", "部分免費"];
+const names = ["不拘", "免費", "部分免費", "需付費"];
 
 const FeeDropdown = () => {
   const { query, push } = useRouter();

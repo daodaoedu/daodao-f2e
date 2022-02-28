@@ -6,7 +6,7 @@ module.exports = {
     domains: ["imgur.com"],
   },
   env: {
-    HOSTNAME: "https://www.daoedu.com",
+    HOSTNAME: "https://www.daoedu.tw",
   },
   // async redirects() {
   //   return [
