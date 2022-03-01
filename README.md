@@ -1,32 +1,42 @@
 # Daodao 前台
 
-## 待執行
+島島前台使用目前 React 流行的開發套件與設計風格，以下將會詳細介紹。
 
-https://spacejelly.dev/posts/how-to-use-cloudflare-pages-to-host-deploy-a-next-js-app/
+## 開發技術
 
-## 如何切換 Node 版本
+<p float="left" margin="10px">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nextjs-logo.svg/1200px-Nextjs-logo.svg.png" height="100px"> 
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" height="100px"> 
+  <img src="https://redux-saga.js.org/img/Redux-Saga-Logo.png" height="100px"> 
+  <img src="https://mui.com/static/logo.png" height="100px"> 
+  <img src="https://raw.githubusercontent.com/emotion-js/emotion/main/emotion.png" height="100px"> 
+  <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png" height="100px"> 
+  <img src="https://i.imgur.com/A2XaNqc.png" height="100px"> 
+</p>
 
-### 安裝
+## 主要技術列表
 
-```
-nvm install 16.7
-```
+前端版本：React 17
+前端框架：Next.js  
+API server：Cloudflare worker  
+狀態管理：Redux（Redux-saga）
+Design System：mui（Material UI）
+CSS-in-JS：[emotion](https://emotion.sh/docs/introduction)  
+coding-style：[airbnb-eslint](https://github.com/airbnb/javascript)  
+運行環境：Cloudflare  
+database：Notion
 
-### 切換
-
-```
-nvm use 16.7
-```
-
-## 如何在 local 測試(SSR/ISR)
+## 如何在 local 測試(SSR，非 SSG)
 
 1. 安裝相依套件
+   安裝 package.json 內的 dependencies 的套件
 
 ```bash
-yarn install
+yarn
 ```
 
 2. 執行網站
+   組合技請參考 package.json 內的 scripts
 
 ```bash
 yarn dev
@@ -58,41 +68,6 @@ serve out
 npm install -g serve
 ```
 
-## 開發技術
-
-<p float="left" margin="10px">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nextjs-logo.svg/1200px-Nextjs-logo.svg.png" height="100px"> 
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" height="100px"> 
-  <img src="https://redux-saga.js.org/img/Redux-Saga-Logo.png" height="100px"> 
-  <img src="https://raw.githubusercontent.com/emotion-js/emotion/main/emotion.png" height="100px"> 
-  <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png" height="100px"> 
-  <img src="https://i.imgur.com/A2XaNqc.png" height="100px"> 
-</p>
-
-## 主要技術列表
-
-前端 library：React.js  
-前端框架：Next.js  
-狀態管理：Redux-saga
-CSS-in-JS：[emotion](https://emotion.sh/docs/introduction)  
-coding-style：[airbnb-eslint](https://github.com/airbnb/javascript)  
-database：Notion
-
-### 使用 Next.js 原因
-
-1. 提升專案整體的開發體驗與時程，讓工程更專注在設計網頁而非處理其他雜項的相依設定。
-2. 不需要設定額外複雜的設定
-3. 搭配 CSS-in-JS solution 使開發體驗和使用者體驗更加分
-
-### 使用 emotion 原因
-
-emotion 為近年討論度最高的 CSS 設計解決方案，除了部分撰寫方式如同 styled-components，此外也提供部分強大的功能提升開發體驗，例如：inline-style 可以 hot reload。
-以往在開發 CSS 時，時常因為耦合性過高的關係而改 A 壞 B，因此需要導入一些 CSS coding style，例如：OOCSS。因此近年 CSS 模組化日益流行，尤其是可以設計模組元件的 styled-components 與 emotion 最具有代表性，也很適合搭配 React 的 component 設計。
-
-### 使用 airbnb-eslint 原因
-
-透過 eslint 的強大檢測與縮排功能，開發者不需要再花額外的時間處理縮排與查看瑣碎的小失誤。
-
 ## 開發須知
 
 1. 進入點：page/\_app.jsx
@@ -101,15 +76,44 @@ emotion 為近年討論度最高的 CSS 設計解決方案，除了部分撰寫�
 
 2. 路徑即網址：page 下的路徑等於網址的路徑
 3. 狀態管理：集中在 redux 裏面使用 action 與 reducer
-4. 共享元件：有大量共享的元件請放在 shared 內，如：Nav, Footer
-5. 設計元件：盡可能多用 CSS-in-JS 設計元件避免影響到其他元件的樣式
+4. 共享元件：需要被大量共享使用的元件，請放在 shared 內，如：Nav, Footer
+5. 設計元件：盡可能多用 CSS-in-JS 設計元件（mui 可使用 sx 屬性）避免影響到其他元件的樣式
 
-## 參考
+## 如何切換 Node 版本
 
-[Next 範例](https://github.com/vercel/next.js/tree/canary/examples/api-routes-rest/pages)
-[Notion API](https://developers.notion.com/docs/working-with-databases)
+### local 自己切換
+
+```
+nvm use 16.7
+```
+
+無法切換則安裝
+
+```
+nvm install 16.7
+```
 
 ## 筆記
+
+### 關於 Next.js
+
+1. 提升未來專案整體的開發與維護體驗，讓工程更專注在設計網頁而非處理其他雜項的相依設定
+2. 可以選擇是否要產生靜態檔，或是選擇未來移到 Server 跑 Node 執行專案
+
+### 關於 emotion
+
+emotion 為近年討論度最高的 CSS 設計解決方案，除了部分撰寫方式如同 styled-components，此外也提供部分強大的功能提升開發體驗，例如：inline-style 可以 hot reload。
+以往在開發 CSS 時，時常因為耦合性過高的關係而導致改 A 壞 B 以至於不好調整 CSS，因此需要導入一些額外的 CSS coding style 避免開發生的失誤。因此近年 CSS 模組化日益流行，尤其是可以設計模組元件的 styled-components 與 emotion 最具有代表性，也很適合搭配 React 的 component 設計。
+
+## 關於 mui
+
+[mui](https://mui.com/) 參考 Google 的 [Meterial Design](https://material-design.hexschool.io/guide/) 來做設計系統
+目前官方最新版本（v5.0）原生使用 emotion 設計元件，可隨時切換使用 styled 或是 inline-style
+每個元件可以是獨立的，也可以透過全站調色盤一次更改樣式（例如：dark mode 的開關）
+
+### 關於 airbnb-eslint
+
+透過 eslint 的強大檢測與縮排功能，開發者不需要再花額外的時間處理縮排與查看瑣碎的小失誤。
 
 ### 重新命名大小寫
 
@@ -121,3 +125,9 @@ git mv hello.txt Hello.txt
 
 開發版本請使用 Node 16.14.0。
 理論上在雲端放上 NODE_VERSION 就可以改版本，但是不知道為什麼只能用.node-version
+
+## 其他參考資源
+
+[Next 範例](https://github.com/vercel/next.js/tree/canary/examples/api-routes-rest/pages)
+[Notion API](https://developers.notion.com/docs/working-with-databases)
+[How to Use Cloudflare Pages to Host & Deploy a Next.js App](https://spacejelly.dev/posts/how-to-use-cloudflare-pages-to-host-deploy-a-next-js-app/)
