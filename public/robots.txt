@@ -3,7 +3,7 @@ User-agent: *
 Disallow: /api/
 
 # Host
-Host: https://www.daoedu.com
+Host: https://www.daoedu.tw
 
 # Sitemaps
-Sitemap: https://www.daoedu.com/sitemap.xml
+Sitemap: https://www.daoedu.tw/sitemap.xml
