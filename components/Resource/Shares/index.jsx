@@ -31,14 +31,19 @@ const Shares = ({ title, link }) => {
   return (
     <Box
       sx={{
-        margin: "10px 0",
+        margin: "10px 0 10px 10px",
         display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "flex-start",
         flexWrap: "wrap",
       }}
     >
-      <Box>
+      <Box
+        sx={{
+          margin: "5px 0",
+        }}
+      >
         <Button
           variant="outlined"
           sx={{
@@ -60,7 +65,18 @@ const Shares = ({ title, link }) => {
         </Button>
         <CopyToClipboard
           text={copyContent}
-          onCopy={() => toast.success("已複製連結")}
+          onCopy={() =>
+            toast.success("已複製資源分享", {
+              style: {
+                color: "#16b9b3",
+                border: "1px solid #16b9b3",
+                marginTop: "70px",
+              },
+              iconTheme: {
+                primary: "#16b9b3",
+              },
+            })
+          }
         >
           <Button
             variant="outlined"
@@ -87,9 +103,9 @@ const Shares = ({ title, link }) => {
           display: "flex",
           justifyContent: "flex-start",
           alignItems: "center",
-          marginLeft: "10px",
           paddingTop: "5px",
           flexWrap: "wrap",
+          margin: "5px 0",
         }}
       >
         <Box

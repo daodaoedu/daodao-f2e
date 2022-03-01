@@ -3,7 +3,11 @@ import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import Link from "next/link";
 import Tags from "./Tags";
-import { Typography } from "@mui/material";
+import { Typography, Box } from "@mui/material";
+import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
+import LogoImage from "./LogoImage";
+dayjs.extend(isBetween);
 
 const ItemWrapper = styled.li`
   display: flex;
@@ -24,7 +28,6 @@ const ImageWrapper = styled.div`
   width: 200px;
   height: 200px;
   background-color: #f5f5f5;
-  filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.25));
   ${({ image }) => css`
     background-image: ${`url(${image})`};
     background-size: cover;
@@ -32,18 +35,33 @@ const ImageWrapper = styled.div`
     background-position: 50% 50%;
   `}
   border-radius: 20px;
+  /* object-fit: cover; */
   /* opacity: 0; */
 
-  cursor: pointer;
-  /* object-fit: cover; */
-  &:hover {
-    transform: scale(1.05);
-    transition: transform 0.4s;
-  }
   @media (max-width: 767px) {
     width: 100px;
     height: 100px;
   }
+`;
+
+const PromoteWrapper = styled.div`
+  & > p {
+    text-align: center;
+    font-weight: bold;
+  }
+  ${({ isNewResource }) =>
+    isNewResource &&
+    css`
+      position: absolute;
+      top: 20px;
+      right: -28px;
+      height: 25px;
+      width: 120px;
+      background-color: #16b9b3;
+      opacity: 0.7;
+      color: white;
+      transform: rotate(45deg);
+    `}
 `;
 
 const TitleWrapper = styled.div`
@@ -86,13 +104,17 @@ const Item = ({ data, queryTags }) => {
         : [],
     [data]
   );
-  // const areaTags = useMemo(
-  //   () =>
-  //     data?.properties["地區"]?.multi_select
-  //       ? data?.properties["地區"]?.multi_select
-  //       : [],
-  //   [data]
-  // );
+
+  const isNewResource = useMemo(() => {
+    const today = dayjs();
+    const createDay = dayjs(data?.created_time);
+    const isRecent = dayjs(createDay).isBetween(
+      today,
+      dayjs(today).subtract(1, "month")
+    );
+    return isRecent;
+  }, [data]);
+
   const ageOfUserTags = useMemo(
     () => data?.properties["年齡層"]?.multi_select ?? [],
     [data]
@@ -111,14 +133,7 @@ const Item = ({ data, queryTags }) => {
 
   return (
     <ItemWrapper>
-      <ImageWrapper
-        onClick={() => window.open(link, "_blank")}
-        image={
-          (Array.isArray(data?.properties["縮圖"]?.files) &&
-            data.properties["縮圖"]?.files[0]?.name) ??
-          "https://www.daoedu.tw/preview.webp"
-        }
-      />
+      <LogoImage isNewResource={isNewResource} link={link} data={data} />
       <ContentWrapper>
         <TitleWrapper>
           <a target="_blank" href={link} rel="noopener noreferrer">

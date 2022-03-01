@@ -33,7 +33,7 @@ const Tags = ({ queryList }) => {
         flexDirection: "row",
         justifyContent: "flex-start",
         alignItems: "center",
-        marginTop: "20px",
+        marginTop: "10px",
       }}
     >
       <Whatshot sx={{ color: "red" }} />

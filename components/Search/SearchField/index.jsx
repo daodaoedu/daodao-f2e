@@ -50,7 +50,7 @@ const SearchField = () => {
       <HotTags queryList={queryList} />
       <Box
         sx={{
-          margin: "20px 0",
+          margin: "10px 0",
           display: "flex",
           justifyContent: "flex-start",
           alignItems: "center",
