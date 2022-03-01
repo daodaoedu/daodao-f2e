@@ -33,8 +33,6 @@
     "next": "^11.0.1",
     "next-sitemap": "^1.6.203",
     "node-fetch": "^2.6.1",
-    "query-string": "^7.1.1",
-    "randomcolor": "^0.6.2",
     "react": "^17.0.2",
     "react-copy-to-clipboard": "^5.0.4",
     "react-dom": "^17.0.2",
@@ -42,13 +40,11 @@
     "react-hot-toast": "^2.1.0",
     "react-icons": "^4.2.0",
     "react-konva": "^17.0.2-5",
-    "react-lottie-player": "^1.4.1",
     "react-redux": "^7.2.4",
     "react-share": "^4.4.0",
     "redux": "^4.1.0",
     "redux-logger": "^3.0.6",
     "redux-saga": "^1.1.3",
-    "swr": "^1.1.0",
     "use-image": "^1.0.10"
   },
   "devDependencies": {

@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import { Button, Paper, Box, Stack } from "@mui/material";
-import useSWRImmutable from "swr/immutable";
 import Tags from "./Tags ";
 import { postFetcher } from "../../utils/fetcher";
 import { css } from "@emotion/react";

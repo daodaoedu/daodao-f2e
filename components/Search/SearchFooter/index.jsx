@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "@emotion/styled";
 import { Box } from "@mui/material";
-// import Lottie from "react-lottie-player";
 const LoadMore = styled.div`
   position: absolute;
   bottom: 100px;
