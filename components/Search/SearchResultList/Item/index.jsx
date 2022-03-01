@@ -116,7 +116,7 @@ const Item = ({ data, queryTags }) => {
         image={
           (Array.isArray(data?.properties["縮圖"]?.files) &&
             data.properties["縮圖"]?.files[0]?.name) ??
-          "/preview.webp"
+          "https://www.daoedu.tw/preview.webp"
         }
       />
       <ContentWrapper>

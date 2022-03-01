@@ -28,6 +28,40 @@ const ResourcePage = ({ data = {} }) => {
         : "",
     [data?.properties]
   );
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          item: { "@id": "https://data.gov.tw", name: "Home" },
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          item: { "@id": "https://data.gov.tw/dataset", name: "資料集" },
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          item: {
+            "@id": "https://data.gov.tw/dataset/18742",
+            name: "大學校院英語課程開設情形",
+          },
+        },
+      ],
+    },
+  ];
+
+  const tags = useMemo(
+    () =>
+      data?.properties && data?.properties["標籤"]
+        ? data?.properties["標籤"]?.multi_select
+        : [],
+    [data?.properties]
+  );
 
   const SEOData = useMemo(
     () => ({
@@ -36,21 +70,42 @@ const ResourcePage = ({ data = {} }) => {
       keywords: "島島阿學",
       author: "島島阿學",
       copyright: "島島阿學",
-      imgLink: image ?? "/preview.webp",
+      imgLink: image ?? "https://www.daoedu.tw/preview.webp",
       link: `${process.env.HOSTNAME}${router?.asPath}`,
+      structuredData: [
+        {
+          "@context": "https://schema.org/",
+          "@type": "Dataset",
+          name: `${title}的學習資源介紹｜島島阿學`,
+          description: desc,
+          url: `${process.env.HOSTNAME}${router?.asPath}`,
+          keywords: tags.map(({ name }) => name),
+          // license: "https://data.gov.tw/license",
+          creator: { "@type": "Organization", name: "島島阿學" },
+          // distribution: [
+          //   {
+          //     "@type": "DataDownload",
+          //     encodingFormat: "CSV",
+          //     contentUrl:
+          //       "https://ws.moe.edu.tw/001/Upload/4/relfile/0/5042/c7b8c3a5-cd9f-4063-91b2-d21afbf18dc3.csv",
+          //   },
+          // ],
+        },
+      ],
     }),
-    [desc, image, router?.asPath, title]
+    [desc, image, router?.asPath, tags, title]
   );
-
-  console.log("=>", `${process.env.HOSTNAME}${router?.asPath}`);
-
-  console.log();
-
   return (
     <>
       <SEOConfig data={SEOData} />
       <Navigation />
-      <Resource data={data} title={title} desc={desc} image={image} />
+      <Resource
+        data={data}
+        title={title}
+        desc={desc}
+        image={image}
+        tags={tags}
+      />
       <Footer />
     </>
   );

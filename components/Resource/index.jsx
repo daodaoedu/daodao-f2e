@@ -60,7 +60,7 @@ const ImageWrapper = styled.div`
   }
 `;
 
-const Resource = ({ data, title, desc, image }) => {
+const Resource = ({ data, title, desc, image, tags }) => {
   const router = useRouter();
   const isLoading = useMemo(() => !data, [data]);
   const [disqusConfig, setDisqusConfig] = useState({});
@@ -82,13 +82,7 @@ const Resource = ({ data, title, desc, image }) => {
         : "",
     [data?.properties]
   );
-  const tags = useMemo(
-    () =>
-      data?.properties && data?.properties["標籤"]
-        ? data?.properties["標籤"]?.multi_select
-        : [],
-    [data?.properties]
-  );
+
   const resourcesTags = useMemo(
     () => data?.properties["資源類型"]?.multi_select ?? [],
     [data]
@@ -138,7 +132,7 @@ const Resource = ({ data, title, desc, image }) => {
         {/* <Image src={image} alt="image" layout="fill" /> */}
         <ImageWrapper
           onClick={() => window.open(link, "_blank")}
-          image={image ?? "/preview.webp"}
+          image={image ?? "https://www.daoedu.tw/preview.webp"}
         />
         <Shares title={title} link={link} />
         <Box

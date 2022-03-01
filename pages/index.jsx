@@ -23,8 +23,60 @@ const HomePage = () => {
       keywords: "島島阿學",
       author: "島島阿學",
       copyright: "島島阿學",
-      imgLink: "/preview.webp",
+      imgLink: "https://www.daoedu.tw/preview.webp",
       link: `${process.env.HOSTNAME}${router?.asPath}`,
+      structuredData: [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          url: "https://www.daoedu.tw",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: {
+              "@type": "EntryPoint",
+              urlTemplate:
+                "https://www.daoedu.tw/search?q={search_term_string}",
+            },
+            "query-input": "required name=search_term_string",
+          },
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          url: "https://www.daoedu.tw",
+          logo: "https://www.daoedu.tw/favicon-112.png",
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "如何在島島查看資源?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: '進入<a href="https://www.daoedu.tw/search" target="_blank" rel="noreferrer">找資源</a>頁面即可搜尋資源',
+              },
+            },
+            {
+              "@type": "Question",
+              name: "如何加入島島社群?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: '點擊<a href="https://www.facebook.com/groups/2237666046370459" target="_blank" rel="noreferrer">學習社群</a>即可加入',
+              },
+            },
+            {
+              "@type": "Question",
+              name: "如何新增學習資源?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: '進入<a href="https://www.daoedu.tw/contribute/resource" target="_blank" rel="noreferrer">新增資源</a>頁面即可新增',
+              },
+            },
+          ],
+        },
+      ],
     }),
     [router?.asPath]
   );

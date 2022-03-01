@@ -51,8 +51,21 @@ const SearchPage = () => {
       keywords: "島島阿學",
       author: "島島阿學",
       copyright: "島島阿學",
-      imgLink: "/preview.webp",
+      imgLink: "https://www.daoedu.tw/preview.webp",
       link: `${process.env.HOSTNAME}${router?.asPath}`,
+      structuredData: {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        url: "https://www.daoedu.tw",
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: "https://www.daoedu.tw/search?q={search_term_string}",
+          },
+          "query-input": "required name=search_term_string",
+        },
+      },
     }),
     [router?.asPath, title]
   );

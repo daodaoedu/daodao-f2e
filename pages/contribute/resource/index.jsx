@@ -15,7 +15,7 @@ const ContributeResourcePage = () => {
       keywords: "島島阿學",
       author: "島島阿學",
       copyright: "島島阿學",
-      imgLink: "/preview.webp",
+      imgLink: "https://www.daoedu.tw/preview.webp",
       link: `${process.env.HOSTNAME}${router?.asPath}`,
     }),
     [router?.asPath]
