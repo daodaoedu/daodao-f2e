@@ -18,9 +18,6 @@ const SearchPage = () => {
   const router = useRouter();
   // 這裡的參數主要都是處理SEO用的
   const title = useMemo(() => {
-    if (!router.isReady) {
-      return "";
-    }
     const isCatsExist = router?.query?.cats && router?.query?.cats.length > 0;
     const isTagsExist = router?.query?.tags && router?.query?.tags.length > 0;
     const isQueryExist = router?.query?.q && router?.query?.q.length > 0;
@@ -45,16 +42,7 @@ const SearchPage = () => {
     } else {
       return "";
     }
-  }, [
-    router.isReady,
-    router?.query?.cats,
-    router?.query?.q,
-    router?.query?.tags,
-  ]);
-  const queryString = useMemo(
-    () => (router?.isReady && router?.asPath ? router?.asPath : ""),
-    [router?.asPath, router?.isReady]
-  );
+  }, [router?.query?.cats, router?.query?.q, router?.query?.tags]);
   const SEOData = useMemo(
     () => ({
       title: `${title}學習資源列表｜島島阿學`,
@@ -64,9 +52,9 @@ const SearchPage = () => {
       author: "島島阿學",
       copyright: "島島阿學",
       imgLink: "/preview.webp",
-      link: `${process.env.HOSTNAME}${queryString}`,
+      link: `${process.env.HOSTNAME}${router?.asPath}`,
     }),
-    [queryString, title]
+    [router?.asPath, title]
   );
   return (
     <>

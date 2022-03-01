@@ -28,10 +28,7 @@ const ResourcePage = ({ data = {} }) => {
         : "",
     [data?.properties]
   );
-  const queryString = useMemo(
-    () => (router?.isReady && router?.asPath ? router?.asPath : ""),
-    [router?.asPath, router?.isReady]
-  );
+
   const SEOData = useMemo(
     () => ({
       title: `${title}的學習資源介紹｜島島阿學`,
@@ -40,10 +37,14 @@ const ResourcePage = ({ data = {} }) => {
       author: "島島阿學",
       copyright: "島島阿學",
       imgLink: image ?? "/preview.webp",
-      link: `${process.env.HOSTNAME}${queryString}`,
+      link: `${process.env.HOSTNAME}${router?.asPath}`,
     }),
-    [desc, image, queryString, title]
+    [desc, image, router?.asPath, title]
   );
+
+  console.log("=>", `${process.env.HOSTNAME}${router?.asPath}`);
+
+  console.log();
 
   return (
     <>

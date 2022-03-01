@@ -7,10 +7,6 @@ import About from "../../components/About";
 
 const AboutPage = () => {
   const router = useRouter();
-  const queryString = useMemo(
-    () => (router?.isReady && router?.asPath ? router?.asPath : ""),
-    [router?.asPath, router?.isReady]
-  );
   const SEOData = useMemo(
     () => ({
       title: "關於島島｜島島阿學",
@@ -20,9 +16,9 @@ const AboutPage = () => {
       author: "島島阿學",
       copyright: "島島阿學",
       imgLink: "/preview.webp",
-      link: `${process.env.HOSTNAME}${queryString}`,
+      link: `${process.env.HOSTNAME}${router?.asPath}`,
     }),
-    [queryString]
+    [router?.asPath]
   );
 
   return (

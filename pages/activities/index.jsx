@@ -7,10 +7,6 @@ import Activities from "../../components/Activities";
 
 const ActivitiesPage = () => {
   const router = useRouter();
-  const queryString = useMemo(
-    () => (router?.isReady && router?.asPath ? router?.asPath : ""),
-    [router?.asPath, router?.isReady]
-  );
   const SEOData = useMemo(
     () => ({
       title: "找學習活動｜島島阿學",
@@ -20,9 +16,9 @@ const ActivitiesPage = () => {
       author: "島島阿學",
       copyright: "島島阿學",
       imgLink: "/preview.webp",
-      link: `${process.env.HOSTNAME}${queryString}`,
+      link: `${process.env.HOSTNAME}${router?.asPath}`,
     }),
-    [queryString]
+    [router?.asPath]
   );
 
   return (
