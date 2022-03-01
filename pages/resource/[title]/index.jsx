@@ -17,14 +17,14 @@ const ResourcePage = ({ data = {} }) => {
   const desc = useMemo(
     () =>
       data?.properties && data?.properties["介紹"]
-        ? data.properties["介紹"]?.rich_text[0]?.plain_text
+        ? data?.properties["介紹"]?.rich_text[0]?.plain_text
         : "",
     [data?.properties]
   );
   const image = useMemo(
     () =>
       data?.properties && data?.properties["縮圖"]
-        ? data.properties["縮圖"]?.files[0]?.external?.url
+        ? data?.properties["縮圖"]?.files[0]?.external?.url
         : "",
     [data?.properties]
   );
