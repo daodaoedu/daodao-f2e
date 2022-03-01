@@ -1,6 +1,6 @@
-import React from 'react';
-import styled from '@emotion/styled';
-import Link from 'next/link';
+import React from "react";
+import styled from "@emotion/styled";
+import Link from "next/link";
 
 const LogoWrapper = styled.div`
   margin: 0 15px;
@@ -12,9 +12,10 @@ const LogoWrapper = styled.div`
 `;
 const Logo = () => {
   return (
-    <Link href="/">
+    <Link href="/" passHref>
       <LogoWrapper>
-        <img src="/logo.png" alt="logo" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="logo" width="106" height="50" />
       </LogoWrapper>
     </Link>
   );

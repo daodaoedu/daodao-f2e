@@ -28,32 +28,6 @@ const ResourcePage = ({ data = {} }) => {
         : "",
     [data?.properties]
   );
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          item: { "@id": "https://data.gov.tw", name: "Home" },
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          item: { "@id": "https://data.gov.tw/dataset", name: "資料集" },
-        },
-        {
-          "@type": "ListItem",
-          position: 3,
-          item: {
-            "@id": "https://data.gov.tw/dataset/18742",
-            name: "大學校院英語課程開設情形",
-          },
-        },
-      ],
-    },
-  ];
 
   const tags = useMemo(
     () =>

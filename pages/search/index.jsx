@@ -5,7 +5,7 @@ import SEOConfig from "../../shared/components/SEO";
 import Search from "../../components/Search";
 import Navigation from "../../shared/components/Navigation_v2";
 import Footer from "../../shared/components/Footer_v2";
-
+import { SEARCH_TAGS } from "../../constants/category";
 const SearchPageWrapper = styled.div`
   height: 100%;
   min-height: calc(100vh - 80px);
@@ -55,20 +55,39 @@ const SearchPage = () => {
       link: `${process.env.HOSTNAME}${router?.asPath}`,
       structuredData: {
         "@context": "https://schema.org",
-        "@type": "WebSite",
-        url: "https://www.daoedu.tw",
-        potentialAction: {
-          "@type": "SearchAction",
-          target: {
-            "@type": "EntryPoint",
-            urlTemplate: "https://www.daoedu.tw/search?q={search_term_string}",
-          },
-          "query-input": "required name=search_term_string",
+        "@type": "Course",
+        name: `${title}學習資源列表`,
+        description:
+          "「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
+        itemListElement: router?.query?.cats
+          ? {
+              "@type": "ListItem",
+              position: 1,
+              item: {
+                "@id": `https://www.daoedu.tw/search?cats=${
+                  router?.query?.cats ?? ""
+                }`,
+                name: router?.query?.cats ?? "",
+              },
+            }
+          : Object.keys(SEARCH_TAGS).map((catName, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              item: {
+                "@id": `https://www.daoedu.tw/search?cats=${catName}`,
+                name: catName,
+              },
+            })),
+        provider: {
+          "@type": "Organization",
+          name: "島島阿學",
+          sameAs: "https://www.daoedu.tw",
         },
       },
     }),
-    [router?.asPath, title]
+    [router?.asPath, router?.query?.cats, title]
   );
+
   return (
     <>
       <Navigation />
