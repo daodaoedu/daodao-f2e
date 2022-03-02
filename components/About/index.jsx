@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "@emotion/styled";
-// import { css } from "@emotion/react";
 import { Box, Paper, Typography, Stack, Avatar } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import AboutUs from "./AboutUs";
@@ -12,7 +11,7 @@ import Thanks from "./Thanks";
 import NeedYou from "./NeedYou";
 import ContactUs from "./ContactUs";
 
-const ResourceWrapper = styled.section`
+const AboutWrapper = styled.section`
   padding-top: 40px;
   padding-bottom: 40px;
   .title {
@@ -34,7 +33,7 @@ const ResourceWrapper = styled.section`
   }
 `;
 
-const PapperWrapper = styled(Paper)`
+const PaperWrapper = styled(Paper)`
   width: 90%;
   margin: 0 auto;
   padding: 20px;
@@ -56,10 +55,10 @@ const LineWrapper = styled(Typography)`
   margin: 5px 0;
 `;
 
-const ContributeResource = () => {
+const About = () => {
   return (
-    <ResourceWrapper>
-      <PapperWrapper>
+    <AboutWrapper>
+      <PaperWrapper>
         <AboutUs />
         <RealizeMore />
         <RelatedReport />
@@ -68,9 +67,9 @@ const ContributeResource = () => {
         <AboutTeam />
         <NeedYou />
         <ContactUs />
-      </PapperWrapper>
-    </ResourceWrapper>
+      </PaperWrapper>
+    </AboutWrapper>
   );
 };
 
-export default ContributeResource;
+export default About;
