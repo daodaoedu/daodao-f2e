@@ -62,7 +62,7 @@ module.exports = {
   robotsTxtOptions: {
     // For dynamic sitemap
     // additionalSitemaps: [
-    //     'https://www.privago.com/server-sitemap.xml'
+    //     'https://www.daoedu.tw/server-sitemap.xml'
     // ],
     policies: [
       {
@@ -77,17 +77,14 @@ module.exports = {
       //     userAgent: "*",
       //     allow: "/search",
       //   },
-      //   {
-      //     userAgent: "*",
-      //     allow: "/watch",
-      //   },
     ],
   },
+  // https://www.sitemaps.org/protocol.html
   // Use default transformation for all other cases
   transform: async (config, path) => ({
     loc: path, // => this will be exported as http(s)://<config.siteUrl>/<path>
-    changefreq: config.changefreq,
-    priority: config.priority,
+    changefreq: config.changefreq, //always hourly daily weekly monthly yearly never
+    priority: config.priority, // 0.0 - 1.0
     lastmod: config.autoLastmod ? new Date().toISOString() : undefined,
     alternateRefs: config.alternateRefs ?? [],
   }),
@@ -95,31 +92,37 @@ module.exports = {
     const fields = [
       {
         loc: `/`,
-        priority: 1,
+        changefreq: "daily",
+        priority: 1.0,
         lastmod: new Date().toISOString(),
       },
       {
         loc: `/search`,
-        priority: 1,
+        changefreq: "daily",
+        priority: 1.0,
         lastmod: new Date().toISOString(),
       },
       {
         loc: `/contribute/resource`,
+        changefreq: "daily",
         priority: 0.7,
         lastmod: new Date().toISOString(),
       },
       {
         loc: `/about`,
+        changefreq: "daily",
         priority: 0.5,
         lastmod: new Date().toISOString(),
       },
       {
         loc: `/locations`,
+        changefreq: "daily",
         priority: 0.5,
         lastmod: new Date().toISOString(),
       },
       {
         loc: `/activities`,
+        changefreq: "daily",
         priority: 0.5,
         lastmod: new Date().toISOString(),
       },
@@ -127,6 +130,7 @@ module.exports = {
     CATEGORIES.forEach(({ value }) => {
       fields.push({
         loc: `/search?cats=${value}`,
+        changefreq: "daily",
         priority: 0.7,
         lastmod: new Date().toISOString(),
       });
@@ -142,7 +146,6 @@ module.exports = {
         page_size: 100,
         filter: { and: [] },
       };
-      console.log("body", body);
       const result = await fetch("https://api.daoedu.tw/notion/databases", {
         method: "POST",
         body: JSON.stringify(body),
@@ -165,9 +168,6 @@ module.exports = {
       }
       i++;
     }
-
-    // console.log("fields", fields);
     return fields;
   },
-  // exclude: [""]
 };

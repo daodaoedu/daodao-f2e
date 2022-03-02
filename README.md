@@ -131,3 +131,4 @@ git mv hello.txt Hello.txt
 [Next 範例](https://github.com/vercel/next.js/tree/canary/examples/api-routes-rest/pages)
 [Notion API](https://developers.notion.com/docs/working-with-databases)
 [How to Use Cloudflare Pages to Host & Deploy a Next.js App](https://spacejelly.dev/posts/how-to-use-cloudflare-pages-to-host-deploy-a-next-js-app/)
+[Google Search Console 的「已檢索」、「已找到」是什麼意思？](https://editor.leonh.space/2022/google-search-console/)
