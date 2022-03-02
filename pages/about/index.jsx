@@ -17,6 +17,36 @@ const AboutPage = () => {
       copyright: "島島阿學",
       imgLink: "https://www.daoedu.tw/preview.webp",
       link: `${process.env.HOSTNAME}${router?.asPath}`,
+      structuredData: {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: [
+          {
+            "@type": "Question",
+            name: "如何在島島查看資源?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: '進入<a href="https://www.daoedu.tw/search" target="_blank" rel="noreferrer">找資源頁面</a>即可搜尋資源',
+            },
+          },
+          {
+            "@type": "Question",
+            name: "如何加入島島社群?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: '進入<a href="https://www.facebook.com/groups/2237666046370459" target="_blank" rel="noreferrer">島島學習社群</a>即可加入',
+            },
+          },
+          {
+            "@type": "Question",
+            name: "如何新增學習資源?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: '進入<a href="https://www.daoedu.tw/contribute/resource" target="_blank" rel="noreferrer">新增資源頁面</a>即可新增',
+            },
+          },
+        ],
+      },
     }),
     [router?.asPath]
   );
