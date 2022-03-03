@@ -23,6 +23,7 @@ const ListWrapper = styled.ul`
 const SelectedCategory = () => {
   const { push, query } = useRouter();
   const isCurrentSelectAllCats = !query?.cats;
+  // 單選類別
   const onClickCategory = useCallback(
     (event) => {
       const targetCatName = event.target.textContent;
@@ -31,36 +32,63 @@ const SelectedCategory = () => {
         .filter((name) => name !== "");
       const isRemove = currentQueries.includes(targetCatName);
       if (isRemove) {
-        if (currentQueries.length > 1) {
-          push({
-            pathname: "/search",
-            query: {
-              ...query,
-              cats: currentQueries
-                .filter((name) => name !== targetCatName)
-                .join(","),
-            },
-          });
-        } else {
-          // 只剩一個直接刪除
-          delete query.cats;
-          push({
-            pathname: "/search",
-            query,
-          });
-        }
+        // 只剩一個直接刪除
+        delete query.cats;
+        push({
+          pathname: "/search",
+          query,
+        });
       } else {
         push({
           pathname: "/search",
           query: {
             ...query,
-            cats: [...currentQueries, targetCatName].join(","),
+            cats: targetCatName,
           },
         });
       }
     },
     [push, query]
   );
+  // 選取多個cat的方法（暫時不用）
+  // const onClickCategory = useCallback(
+  //   (event) => {
+  //     const targetCatName = event.target.textContent;
+  //     const currentQueries = (query?.cats ?? "")
+  //       .split(",")
+  //       .filter((name) => name !== "");
+  //     const isRemove = currentQueries.includes(targetCatName);
+  //     if (isRemove) {
+  //       if (currentQueries.length > 1) {
+  //         push({
+  //           pathname: "/search",
+  //           query: {
+  //             ...query,
+  //             cats: currentQueries
+  //               .filter((name) => name !== targetCatName)
+  //               .join(","),
+  //           },
+  //         });
+  //       } else {
+  //         // 只剩一個直接刪除
+  //         delete query.cats;
+  //         push({
+  //           pathname: "/search",
+  //           query,
+  //         });
+  //       }
+  //     } else {
+  //       push({
+  //         pathname: "/search",
+  //         query: {
+  //           ...query,
+  //           cats: [...currentQueries, targetCatName].join(","),
+  //         },
+  //       });
+  //     }
+  //   },
+  //   [push, query]
+  // );
 
   return (
     <ListWrapper>
