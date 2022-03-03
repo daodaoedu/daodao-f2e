@@ -8,7 +8,7 @@ import SubList from "./SubList";
 import Logo from "./Logo";
 
 const MainNavWrapper = styled(Toolbar)`
-  max-width: 1200px;
+  /* max-width: 1200px; */
   width: 100%;
 `;
 

@@ -8,6 +8,11 @@ const NavigationWrapper = styled(AppBar)`
   justify-content: center;
   align-items: center;
   height: 80px;
+  padding-left: 5%;
+  padding-right: 5%;
+  .MuiToolbar-root {
+    padding: 0;
+  }
 `;
 
 // const ToolbarWrapper = styled(Toolbar)`
