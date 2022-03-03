@@ -30,7 +30,6 @@ const IMAGE_TAGS = [
   "kucing",
   "kuro",
   "laying",
-  "lazy fuck",
   "legs",
   "lights",
   "loaf",
@@ -231,6 +230,11 @@ const Members = [
     id: 22,
     name: "Sebastian",
     image: "https://cataas.com/cat/22",
+  },
+  {
+    id: 23,
+    name: "Grace",
+    image: "https://cataas.com/cat/23",
   },
 ];
 
