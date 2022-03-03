@@ -11,7 +11,8 @@ import SearchButton from "./Button";
 
 const SearchInputWrapper = styled(Paper)`
   height: 40px;
-  width: 100%;
+  max-width: 1000px;
+  width: 80%;
   position: relative;
   border-radius: 10px;
   border: 2px solid #16b9b3;
@@ -20,6 +21,7 @@ const SearchInputWrapper = styled(Paper)`
 
   @media (max-width: 767px) {
     border-radius: 20px;
+    width: 100%;
   }
 `;
 

@@ -12,12 +12,10 @@ import FormControl from "@mui/material/FormControl";
 import Chip from "@mui/material/Chip";
 import AgeDropdown from "./AgeDropdown";
 import FeeDropdown from "./FeeDropdown";
-const SearchFieldWrapper = styled.div`
-  width: 80%;
+import AgeCheckbox from "./AgeCheckbox";
 
-  @media (max-width: 767px) {
-    width: 100%;
-  }
+const SearchFieldWrapper = styled.div`
+  width: 100%;
 
   /* @media (max-width: 767px) {
     margin: 0 10px 10px 10px;
@@ -50,7 +48,7 @@ const SearchField = () => {
       <HotTags queryList={queryList} />
       <Box
         sx={{
-          margin: "10px 0",
+          margin: "5px 0",
           display: "flex",
           justifyContent: "flex-start",
           alignItems: "center",
@@ -61,7 +59,8 @@ const SearchField = () => {
           },
         }}
       >
-        <AgeDropdown />
+        {/* <AgeDropdown /> */}
+        <AgeCheckbox />
         <FeeDropdown />
       </Box>
     </SearchFieldWrapper>

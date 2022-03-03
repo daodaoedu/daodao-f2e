@@ -50,7 +50,7 @@ const FeeDropdown = () => {
     }
   };
   return (
-    <FormControl sx={{ m: 1, marginLeft: "20px" }}>
+    <FormControl sx={{ m: 1, margin: "5px" }}>
       <FormLabel>費用</FormLabel>
       <RadioGroup
         row

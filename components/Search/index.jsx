@@ -75,7 +75,7 @@ const Search = () => {
       <SearchField />
       <Divider
         sx={{
-          margin: "20px 0",
+          margin: "10px 0",
         }}
       />
       {/* 搜尋結果 */}

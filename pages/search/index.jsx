@@ -12,6 +12,11 @@ const SearchPageWrapper = styled.div`
   padding-top: 20px;
   padding-left: 5%;
   padding-right: 5%;
+  @media (max-width: 767px) {
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 `;
 
 const SearchPage = () => {
