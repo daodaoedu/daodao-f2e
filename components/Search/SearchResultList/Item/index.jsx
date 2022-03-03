@@ -7,6 +7,7 @@ import { Typography, Box } from "@mui/material";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import LogoImage from "./LogoImage";
+import Contributors from "./Contributors";
 dayjs.extend(isBetween);
 
 const ItemWrapper = styled.li`
@@ -128,6 +129,11 @@ const Item = ({ data, queryTags }) => {
     [data?.properties]
   );
 
+  const contributors = useMemo(
+    () => data?.properties["創建者"]?.multi_select ?? [],
+    [data?.properties]
+  );
+
   // const link = useMemo(() => data?.properties["連結"]?.url ?? "", [data]);
   const link = useMemo(() => `/resource/${title}`, [title]);
 
@@ -147,6 +153,9 @@ const Item = ({ data, queryTags }) => {
           queryTags={queryTags}
         />
         <Tags type="ages" tags={ageOfUserTags} />
+        {contributors.length > 0 && (
+          <Contributors contributors={contributors} />
+        )}
       </ContentWrapper>
     </ItemWrapper>
   );
