@@ -29,7 +29,7 @@ const ContributeResource = () => {
     <ResourceWrapper>
       <Paper
         sx={{
-          width: "80%",
+          width: "95%",
           margin: "0 auto",
           padding: "20px",
         }}

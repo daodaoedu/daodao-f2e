@@ -30,7 +30,7 @@ const ActivitiesResource = () => {
         <iframe
           src="https://docs.google.com/forms/d/e/1FAIpQLSeMg55q91VIdvNOmqqkzhqJGCKG4106YM0cVidzX6wHS9AJIA/viewform?embedded=true"
           width="100%"
-          height="2500"
+          height="2600"
           frameBorder="0"
           marginHeight="0"
           marginWidth="0"
