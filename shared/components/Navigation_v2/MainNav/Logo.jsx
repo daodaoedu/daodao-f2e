@@ -6,9 +6,6 @@ const LogoWrapper = styled.div`
   margin: 0 15px;
   cursor: pointer;
   z-index: 100;
-  & > img {
-    height: 50px;
-  }
 `;
 const Logo = () => {
   return (

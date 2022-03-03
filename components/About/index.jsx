@@ -42,19 +42,6 @@ const PaperWrapper = styled(Paper)`
   }
 `;
 
-const LinkWrapper = styled.a`
-  color: black;
-  &:hover {
-    opacity: 100%;
-    transition: color 0.5s ease;
-    color: #16b9b3;
-  }
-`;
-
-const LineWrapper = styled(Typography)`
-  margin: 5px 0;
-`;
-
 const About = () => {
   return (
     <AboutWrapper>

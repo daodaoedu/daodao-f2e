@@ -51,12 +51,9 @@ const ContributeResource = () => {
             若您願意一同共編，以下為新增資源的表單，您新增完後我們將進行審核在新增至上方資料庫中：
           </Typography>
         </Box>
-        <LearningResource />
-        <ActivitiesResource />
-        <LocationResource />
         <Box
           sx={{
-            margin: "50px 0",
+            margin: "20px 0",
           }}
         >
           <Typography variant="p">謝謝你成為彼此自學路上的橋樑。</Typography>
@@ -64,6 +61,9 @@ const ContributeResource = () => {
             若有任何問題，歡迎與我們聯繫唷！謝謝！ Email：contact@daoedu.tw
           </Typography>
         </Box>
+        <LearningResource />
+        <ActivitiesResource />
+        {/* <LocationResource /> */}
       </Paper>
     </ResourceWrapper>
   );

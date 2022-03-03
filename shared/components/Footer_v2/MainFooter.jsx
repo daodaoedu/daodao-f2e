@@ -24,12 +24,8 @@ const MainFooterWrapper = styled.div`
 `;
 
 const LogoWrapper = styled.div`
-  width: 127.5px;
   margin: 0 10px;
   cursor: pointer;
-  & > img {
-    width: 100%;
-  }
 `;
 
 const BlockWrapper = styled.div`
