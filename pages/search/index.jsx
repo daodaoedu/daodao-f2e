@@ -59,20 +59,23 @@ const SearchPage = () => {
       imgLink: "https://www.daoedu.tw/preview.webp",
       link: `${process.env.HOSTNAME}${router?.asPath}`,
       // root才需要放這個，避免影響到其他頁面
-      structuredData: !router?.query && {
+      structuredData: {
         "@context": "https://schema.org",
         "@type": "Course",
         name: `學習資源列表`,
         description:
           "「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
-        itemListElement: Object.keys(SEARCH_TAGS).map((catName, index) => ({
-          "@type": "ListItem",
-          position: index + 1,
-          item: {
-            "@id": `https://www.daoedu.tw/search?cats=${catName}`,
-            name: catName,
-          },
-        })),
+        // 有cats才能放
+        itemListElement:
+          router?.query?.cats &&
+          SEARCH_TAGS[router?.query?.cats ?? []].map((tagName, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            item: {
+              "@id": `https://www.daoedu.tw/search?cats=${router?.query?.cats}&tags=${tagName}`,
+              name: `${tagName}的${router?.query?.cats}學習資源列表`,
+            },
+          })),
         provider: {
           "@type": "Organization",
           name: "島島阿學",
