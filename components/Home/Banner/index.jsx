@@ -70,10 +70,11 @@ const Banner = ({ guideRef }) => {
         </MainBannerWrapper>
         <Box
           sx={{
-            position: "absolute",
-            bottom: 0,
-            marginBottom: "70px",
+            // position: "absolute",
+            // bottom: 0,
+            // marginBottom: "70px",
             width: "100%",
+            marginTop: "25vh",
           }}
         >
           <Typography
@@ -83,7 +84,7 @@ const Banner = ({ guideRef }) => {
               color: "#f0f0f0",
               "font-weight": "500",
               "text-align": "center",
-              "font-size": "30px",
+              "font-size": "26px",
               margin: "20px",
             }}
           >
@@ -94,6 +95,7 @@ const Banner = ({ guideRef }) => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
+              margin: "10px 0",
             }}
           >
             <Button
