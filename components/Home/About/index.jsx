@@ -38,14 +38,14 @@ const About = () => {
         sx={{
           color: "#536166",
           fontWeight: "bold",
-          fontSize: "40px",
+          fontSize: "36px",
           lineHeight: "50px",
           letterSpacing: "0.08em",
           textAlign: "left",
           marginLeft: "20px",
         }}
       >
-        今天來一點島島阿學的資源吧
+        來點島島阿學的資源吧！
       </Typography>
       <Box
         sx={{
@@ -72,18 +72,28 @@ const About = () => {
             fontSize: "18px",
           }}
         >
-          <Typography variant="p">
-            我們是島島阿學學習社群，努力搭起互助學習的橋梁
-          </Typography>
-          <Typography variant="p">
-            期盼以集體智慧，打造沒有天花板的學習環境，一個以自主學習為主的民主社群。
-          </Typography>
-          <Typography variant="p">
-            平台提供資源分享與整合，以及社群的服務，包含各領域各種形式的資源、教育活動、學習場域、學習經驗等等。
-          </Typography>
-          <Typography variant="p">
-            我們認為社群即資源、支援，讓學習者在民主教育的社群中，以共好的概念，解決彼此學習的問題，支持彼此成為自己想成為的人。
-          </Typography>
+          <Box sx={{ margin: "5px 0" }}>
+            <Typography>✅ 由各領域資深學習者分享及彙整</Typography>
+          </Box>
+          <Box sx={{ margin: "5px 0" }}>
+            <Typography>✅ 免費資源百百種</Typography>
+          </Box>
+          <Box sx={{ margin: "5px 0" }}>
+            <Typography>✅ 資源跨領域跨年齡跨國</Typography>
+          </Box>
+          <Box sx={{ margin: "5px 0" }}>
+            <Typography>✅ 三鍵篩選出合適資源</Typography>
+          </Box>
+          <Box sx={{ margin: "5px 0" }}>
+            <Typography>✅ 人人都可以分享資源</Typography>
+          </Box>
+          <Box
+            sx={{
+              margin: "10px 0",
+            }}
+          >
+            自主學習的時代，用共好共享成為彼此學習路上的橋樑吧！
+          </Box>
           <Box
             sx={{
               margin: "20px 0",

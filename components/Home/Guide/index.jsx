@@ -12,7 +12,7 @@ const GuideWrapper = styled.div`
   .guide-title {
     color: #536166;
     font-weight: bold;
-    font-size: 40px;
+    font-size: 36px;
     line-height: 50px;
     letter-spacing: 0.08em;
   }

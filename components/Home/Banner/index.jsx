@@ -50,7 +50,7 @@ const Banner = ({ guideRef }) => {
               "text-align": "center",
             }}
           >
-            歡迎來到島島阿學！一起找找資源、共編資源吧～
+            歡迎來到島島阿學！一起找找資源、分享資源吧！
           </Typography>
           <Typography
             variant="h2"
@@ -87,7 +87,7 @@ const Banner = ({ guideRef }) => {
               margin: "20px",
             }}
           >
-            還不知道學什麼嗎？
+            「學習資源爆炸多，卻常常找不到適合自己的？」
           </Typography>
           <Box
             sx={{

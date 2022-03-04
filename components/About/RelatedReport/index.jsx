@@ -76,7 +76,7 @@ const RelatedReport = () => {
             href={"https://edu100.parenting.com.tw/2021/detail/37#loaded"}
             rel="noopener noreferrer"
           >
-            📌 親子天下教育創新
+            📌 親子天下教育創新 100
           </LinkWrapper>
         </LineWrapper>
       </Stack>

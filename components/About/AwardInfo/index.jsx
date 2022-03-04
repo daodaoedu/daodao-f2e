@@ -51,7 +51,7 @@ const AwardInfo = () => {
             href={"https://edu100.parenting.com.tw/2021/detail/37#loaded"}
             rel="noopener noreferrer"
           >
-            📌 親子天下教育創新100 - 入選
+            📌 親子天下教育創新 100 - 入選
           </LinkWrapper>
         </LineWrapper>
       </Stack>
