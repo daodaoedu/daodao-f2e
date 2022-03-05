@@ -88,7 +88,7 @@ const Banner = ({ guideRef }) => {
               margin: "20px",
             }}
           >
-            「學習資源爆炸多，卻常常找不到適合自己的？」
+            還不知道要學什麼嗎？
           </Typography>
           <Box
             sx={{

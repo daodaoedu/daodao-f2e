@@ -72,6 +72,11 @@ const About = () => {
             fontSize: "18px",
           }}
         >
+          <Box sx={{ margin: "5px 0", fontWeight: "500", fontSize: "20px" }}>
+            <Typography>
+              「學習資源爆炸多，卻常常找不到適合自己的？」
+            </Typography>
+          </Box>
           <Box sx={{ margin: "5px 0" }}>
             <Typography>✅ 由各領域資深學習者分享及彙整</Typography>
           </Box>
