@@ -231,6 +231,11 @@ export const NAV_LINK_MOBILE = [
     target: "_self",
   },
   {
+    name: "新增資源",
+    link: "/contribute/resource",
+    target: "_self",
+  },
+  {
     name: "找活動",
     link: "/activities",
     target: "_self",
