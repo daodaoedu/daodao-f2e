@@ -84,7 +84,10 @@ const Resource = ({ data, title, desc, image, tags }) => {
   const link = useMemo(
     () =>
       data?.properties && data?.properties["連結"]
-        ? appendQuery(data?.properties["連結"]?.url ?? "", "referral=daoedu.tw")
+        ? appendQuery(
+            data?.properties["連結"]?.url ?? "",
+            "promotefrom=daoedu.tw"
+          )
         : "",
     [data?.properties]
   );

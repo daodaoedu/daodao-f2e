@@ -116,7 +116,7 @@ const Shares = ({ title, link }) => {
           <FacebookShareButton
             url={appendQuery(
               `${process.env.HOSTNAME}${router.asPath}`,
-              "source=fb-btn"
+              "source=fb-share"
             )}
             quote={copyContent}
           >
@@ -133,7 +133,7 @@ const Shares = ({ title, link }) => {
             <a
               href={`http://www.facebook.com/dialog/send?app_id=374678340785771&link=${appendQuery(
                 `${process.env.HOSTNAME}${router.asPath}`,
-                "source=fbm-btn"
+                "source=fbm-share"
               )}&redirect_uri=${process.env.HOSTNAME}${router.asPath}`}
               target="_blank"
               rel="noreferrer"
@@ -150,7 +150,7 @@ const Shares = ({ title, link }) => {
           <LineShareButton
             url={appendQuery(
               `${process.env.HOSTNAME}${router.asPath}`,
-              "source=line-btn"
+              "source=line-share"
             )}
             title={copyContent}
           >
@@ -163,10 +163,10 @@ const Shares = ({ title, link }) => {
           }}
         >
           <TwitterShareButton
-            url={appendQuery(
-              `${process.env.HOSTNAME}${router.asPath}`,
-              "source=twitter-btn"
-            )}
+            // url={appendQuery(
+            //   `${process.env.HOSTNAME}${router.asPath}`,
+            //   "source=twitter-share"
+            // )}
             title={copyContent}
           >
             <TwitterIcon size={30} round />
@@ -180,7 +180,7 @@ const Shares = ({ title, link }) => {
           <TelegramShareButton
             url={appendQuery(
               `${process.env.HOSTNAME}${router.asPath}`,
-              "source=telegram-btn"
+              "source=telegram-share"
             )}
             title={copyContent}
           >
@@ -195,7 +195,7 @@ const Shares = ({ title, link }) => {
           <WhatsappShareButton
             url={appendQuery(
               `${process.env.HOSTNAME}${router.asPath}`,
-              "source=whatapp-btn"
+              "source=whatapp-share"
             )}
             title={copyContent}
           >
