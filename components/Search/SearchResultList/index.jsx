@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "@emotion/styled";
 import Item from "./Item";
+import SponsorItem from "./SponsorItem";
 import SkeletonItem from "./SkeletonItem";
 
 const ListWrapper = styled.ul`
@@ -9,7 +10,13 @@ const ListWrapper = styled.ul`
   justify-content: space-between;
 `;
 
-const List = ({ list, queryTags, isLoading, isLoadingNextData }) => {
+const List = ({
+  list,
+  sponsorList,
+  queryTags,
+  isLoading,
+  isLoadingNextData,
+}) => {
   if (isLoading) {
     return (
       <ListWrapper>
@@ -23,6 +30,13 @@ const List = ({ list, queryTags, isLoading, isLoadingNextData }) => {
   }
   return (
     <ListWrapper>
+      {sponsorList.map((item) => (
+        <SponsorItem
+          key={item.properties["資源名稱"].title[0].plain_text}
+          data={item}
+          queryTags={queryTags}
+        />
+      ))}
       {list.map((item) => (
         <Item
           key={item.properties["資源名稱"].title[0].plain_text}

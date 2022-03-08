@@ -36,8 +36,14 @@ const SearchWrapper = styled.div`
 
 const Search = () => {
   const dispatch = useDispatch();
-  const { results, isLoading, next_cursor, isLoadingNextData, has_more } =
-    useSelector((state) => state?.search ?? {});
+  const {
+    results,
+    sponsorResults,
+    isLoading,
+    next_cursor,
+    isLoadingNextData,
+    has_more,
+  } = useSelector((state) => state?.search ?? {});
   const router = useRouter();
   const loadMoreButtonRef = useRef();
 
@@ -102,6 +108,7 @@ const Search = () => {
       <SelectedTags query={router.query} />
       <SearchResultList
         list={results}
+        sponsorList={sponsorResults}
         isLoading={isLoading}
         isLoadingNextData={isLoadingNextData}
         queryTags={queryTags}
