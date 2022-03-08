@@ -47,26 +47,6 @@ const ImageWrapper = styled.div`
   }
 `;
 
-const PromoteWrapper = styled.div`
-  & > p {
-    text-align: center;
-    font-weight: bold;
-  }
-  ${({ isNewResource }) =>
-    isNewResource &&
-    css`
-      position: absolute;
-      top: 20px;
-      right: -28px;
-      height: 25px;
-      width: 120px;
-      background-color: #16b9b3;
-      opacity: 0.7;
-      color: white;
-      transform: rotate(45deg);
-    `}
-`;
-
 const TitleWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -108,16 +88,6 @@ const Item = ({ data, queryTags }) => {
     [data]
   );
 
-  const isNewResource = useMemo(() => {
-    const today = dayjs();
-    const createDay = dayjs(data?.created_time);
-    const isRecent = dayjs(createDay).isBetween(
-      today,
-      dayjs(today).subtract(1, "month")
-    );
-    return isRecent;
-  }, [data]);
-
   const ageOfUserTags = useMemo(
     () => data?.properties["年齡層"]?.multi_select ?? [],
     [data]
@@ -141,7 +111,7 @@ const Item = ({ data, queryTags }) => {
 
   return (
     <ItemWrapper>
-      <LogoImage isNewResource={isNewResource} link={link} data={data} />
+      <LogoImage link={link} data={data} />
       <ContentWrapper>
         <TitleWrapper>
           <a target="_blank" href={link} rel="noopener noreferrer">

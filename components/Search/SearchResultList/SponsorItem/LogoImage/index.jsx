@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Typography, Box } from "@mui/material";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
+import { COLOR_TABLE } from "../../../../../constants/notion";
 dayjs.extend(isBetween);
 
 const ImageWrapper = styled.div`
@@ -36,24 +37,21 @@ const PromoteWrapper = styled.div`
   &:after {
     position: absolute;
     color: #ffffffff;
-    content: "近期資源";
+    content: "合作夥伴";
     left: 20%;
   }
 
-  ${({ isNewResource }) =>
-    isNewResource &&
-    css`
-      position: absolute;
-      top: 20px;
-      right: -28px;
-      height: 25px;
-      width: 120px;
-      background-color: #16b9b3;
-      opacity: 0.9;
-      color: #ffffffff;
-      /* content: "近期資源"; */
-      transform: rotate(45deg);
-    `}
+  position: absolute;
+  top: 20px;
+  right: -28px;
+  height: 25px;
+  width: 120px;
+  background-color: red;
+  opacity: 0.9;
+  color: #ffffffff;
+  font-weight: bold;
+  /* content: "近期資源"; */
+  transform: rotate(45deg);
 
   @media (max-width: 767px) {
     width: 100px;
@@ -64,23 +62,19 @@ const PromoteWrapper = styled.div`
       content: "近期";
       left: 30%;
     }
-    ${({ isNewResource }) =>
-      isNewResource &&
-      css`
-        position: absolute;
-        top: 10px;
-        right: -30px;
-        height: 25px;
-        width: 100px;
-        background-color: #16b9b3;
-        opacity: 0.9;
-        color: #ffffffff;
-        transform: rotate(45deg);
-      `}
-  }
+    position: absolute;
+    top: 10px;
+    right: -30px;
+    height: 25px;
+    width: 100px;
+    background-color: red;
+    opacity: 0.9;
+    color: #ffffffff;
+    font-weight: bold;
+    transform: rotate(45deg);
 `;
 
-const LogoImage = ({ isNewResource, link, data }) => {
+const LogoImage = ({ link, data }) => {
   return (
     <Box
       sx={{
@@ -102,7 +96,7 @@ const LogoImage = ({ isNewResource, link, data }) => {
           "https://www.daoedu.tw/preview.webp"
         }
       />
-      {isNewResource && <PromoteWrapper isNewResource={isNewResource} />}
+      <PromoteWrapper />
     </Box>
   );
 };

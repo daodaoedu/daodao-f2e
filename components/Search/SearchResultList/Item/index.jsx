@@ -45,26 +45,6 @@ const ImageWrapper = styled.div`
   }
 `;
 
-const PromoteWrapper = styled.div`
-  & > p {
-    text-align: center;
-    font-weight: bold;
-  }
-  ${({ isNewResource }) =>
-    isNewResource &&
-    css`
-      position: absolute;
-      top: 20px;
-      right: -28px;
-      height: 25px;
-      width: 120px;
-      background-color: #16b9b3;
-      opacity: 0.7;
-      color: white;
-      transform: rotate(45deg);
-    `}
-`;
-
 const TitleWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
