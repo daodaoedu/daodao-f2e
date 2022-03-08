@@ -10,6 +10,7 @@ import AwardInfo from "./AwardInfo";
 import Thanks from "./Thanks";
 import NeedYou from "./NeedYou";
 import ContactUs from "./ContactUs";
+import TechStack from "./TechStack";
 
 const AboutWrapper = styled.section`
   padding-top: 40px;
@@ -52,6 +53,7 @@ const About = () => {
         <AwardInfo />
         <Thanks />
         <AboutTeam />
+        <TechStack />
         <NeedYou />
         <ContactUs />
       </PaperWrapper>
