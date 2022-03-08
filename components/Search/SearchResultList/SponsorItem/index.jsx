@@ -8,6 +8,8 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import LogoImage from "./LogoImage";
 import Contributors from "./Contributors";
+import { COLOR_TABLE } from "../../../../constants/notion";
+import { Whatshot } from "@mui/icons-material";
 dayjs.extend(isBetween);
 
 const ItemWrapper = styled.li`
@@ -175,6 +177,35 @@ const Item = ({ data, queryTags }) => {
         {contributors.length > 0 && (
           <Contributors contributors={contributors} />
         )}
+        <Box
+          sx={{
+            margin: "10px 0",
+            display: "flex",
+            justifyContent: "flex-start",
+            alignItems: "center",
+          }}
+        >
+          <Whatshot sx={{ color: "red" }} />
+          <a
+            href="https://www.facebook.com/daodao.edu/posts/461381185679750"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Typography
+              sx={{
+                color: "black",
+                fontWeight: "bold",
+                marginLeft: "10px",
+                "&:hover": {
+                  color: "#16b9b3",
+                  transition: "0.4s",
+                },
+              }}
+            >
+              2022/03/12（六）23:59前 分享貼文，抽線上課程與折價券！！
+            </Typography>
+          </a>
+        </Box>
       </ContentWrapper>
     </ItemWrapper>
   );
