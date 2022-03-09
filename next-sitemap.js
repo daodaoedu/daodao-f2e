@@ -139,7 +139,7 @@ module.exports = {
     let cursor = undefined;
     let body = {};
 
-    for (let i = 1; i <= 2; ) {
+    for (let i = 1; i <= 1; ) {
       body = {
         ...body,
         start_cursor: cursor,
