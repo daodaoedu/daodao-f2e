@@ -305,7 +305,7 @@ export const getStaticPaths = async () => {
   }
   const pathList = [];
   let cursor = undefined;
-  for (let i = 0; i <= 1; ) {
+  for (let i = 0; i <= 0; ) {
     let body = {
       start_cursor: cursor,
     };
@@ -331,6 +331,7 @@ export const getStaticPaths = async () => {
     }
     i++;
   }
+  console.log("打包長度:", pathList.length);
   console.log("result:", pathList);
   return {
     paths: pathList,
