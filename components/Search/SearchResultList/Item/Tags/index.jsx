@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import Chip from "@mui/material/Chip";
 import { COLOR_TABLE } from "../../../../../constants/notion";
-
+import { scrollToTop } from "../../../../../utils/ux";
 const TagsWrapper = styled.ul`
   display: flex;
   flex-wrap: wrap;
@@ -26,22 +26,31 @@ const Tags = ({ tags, type }) => {
   const linkTagsHandler = useCallback(
     (newQuery) => {
       if (query[type]) {
-        push({
-          pathname: "/search",
-          query: {
-            ...query,
-            [type]: [query[type].split(","), newQuery].join(","),
+        push(
+          {
+            pathname: "/search",
+            query: {
+              ...query,
+              [type]: [query[type].split(","), newQuery].join(","),
+            },
           },
-        });
+          undefined,
+          { shallow: true }
+        );
       } else {
-        push({
-          pathname: "/search",
-          query: {
-            ...query,
-            [type]: newQuery,
+        push(
+          {
+            pathname: "/search",
+            query: {
+              ...query,
+              [type]: newQuery,
+            },
           },
-        });
+          undefined,
+          { shallow: true }
+        );
       }
+      scrollToTop();
     },
     [push, query, type]
   );

@@ -17,7 +17,7 @@ const List = ({
   isLoading,
   isLoadingNextData,
 }) => {
-  if (isLoading) {
+  if (isLoading && list.length === 0) {
     return (
       <ListWrapper>
         <SkeletonItem />
@@ -37,13 +37,17 @@ const List = ({
           queryTags={queryTags}
         />
       ))}
-      {list.map((item) => (
-        <Item
-          key={item.properties["資源名稱"].title[0].plain_text}
-          data={item}
-          queryTags={queryTags}
-        />
-      ))}
+      {list.map((item) =>
+        isLoading ? (
+          <SkeletonItem key={item.properties["資源名稱"].title[0].plain_text} />
+        ) : (
+          <Item
+            key={item.properties["資源名稱"].title[0].plain_text}
+            data={item}
+            queryTags={queryTags}
+          />
+        )
+      )}
       {isLoadingNextData && (
         <>
           <SkeletonItem />

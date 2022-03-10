@@ -27,26 +27,6 @@ const ContentWrapper = styled.div`
   }
 `;
 
-const ImageWrapper = styled.div`
-  width: 200px;
-  height: 200px;
-  background-color: #f5f5f5;
-  ${({ image }) => css`
-    background-image: ${`url(${image})`};
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-  `}
-  border-radius: 20px;
-  /* object-fit: cover; */
-  /* opacity: 0; */
-
-  @media (max-width: 767px) {
-    width: 100px;
-    height: 100px;
-  }
-`;
-
 const TitleWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;

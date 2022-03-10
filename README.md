@@ -24,7 +24,7 @@ Design System：mui（Material UI）
 CSS-in-JS：[emotion](https://emotion.sh/docs/introduction)  
 coding-style：[airbnb-eslint](https://github.com/airbnb/javascript)  
 運行環境：Cloudflare  
-database：Notion
+資源管理：Notion
 
 ## 如何在 local 測試(SSR，非 SSG)
 
@@ -78,6 +78,34 @@ npm install -g serve
 3. 狀態管理：集中在 redux 裏面使用 action 與 reducer
 4. 共享元件：需要被大量共享使用的元件，請放在 shared 內，如：Nav, Footer
 5. 設計元件：盡可能多用 CSS-in-JS 設計元件（mui 可使用 sx 屬性）避免影響到其他元件的樣式
+
+## Git Branch
+
+dev - 開發分支：測試用的環境，模擬線上環境使用
+prod - 線上分支：需要更新線上功能才需要推過去
+
+## Git flow
+
+多人協作的情況，更新流程基本上會是以下：
+
+### 一般流程
+
+先從 dev 拉下來更新，再上到 dev 測試（能開分支 merge 到 dev 更好）
+feature(pull from dev) -> dev -> prod
+
+比較嚴謹的走法
+dev(create new branch from dev) -> feature -> feature(pull and merge) -> dev -> prod
+
+### 緊急維修流程
+
+多人同時開發時，需要走以下的 hotfix 流程：
+
+1. 從線上拉下來更新內容，再推到 dev 進行測試
+   hotfix(pull from prod) -> dev
+
+2. 確認沒問題之後，再把**hotfix 分支**推到 prod
+   請注意！不是從 dev 推到 prod，不然 commit 紀錄會混到某些 dev 的 feature
+   feature(pull from prod) -> prod
 
 ## 如何切換 Node 版本
 

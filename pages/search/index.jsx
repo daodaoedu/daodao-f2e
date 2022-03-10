@@ -91,7 +91,7 @@ const SearchPage = () => {
       <Navigation />
       <SEOConfig data={SEOData} />
       <SearchPageWrapper>
-        <Search />
+        <Search title={title} />
       </SearchPageWrapper>
       <Footer />
     </>

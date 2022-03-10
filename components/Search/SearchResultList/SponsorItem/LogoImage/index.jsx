@@ -59,7 +59,7 @@ const PromoteWrapper = styled.div`
     &:after {
       position: absolute;
       color: #ffffffff;
-      content: "近期";
+      content: "合作";
       left: 30%;
     }
     position: absolute;
