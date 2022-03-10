@@ -128,7 +128,7 @@ export const bodyHandler = (query, nextCursor, pageSize = 100) => {
   // 年齡層
   const ageTags =
     typeof ages === "string" ? stringSanitizer(ages).split(",") : [];
-  console.log("ageTags", ageTags);
+
   if (Array.isArray(ageTags) && ageTags.length > 0) {
     body.filter.and.push(
       ...ageTags.reduce(

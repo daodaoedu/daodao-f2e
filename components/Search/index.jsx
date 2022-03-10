@@ -98,7 +98,7 @@ const Search = ({ title }) => {
           },
         }}
       >
-        <h1 className="header-title">{title || "全部"}的搜尋結果</h1>
+        <h1 className="header-title">{title || "全部"} 搜尋結果</h1>
         {!isLoadingNextData && !isLoading && Array.isArray(results) && (
           <p className="header-result">
             共 {results.length} 筆{next_cursor && "以上"}
