@@ -25,6 +25,7 @@ const Tags = ({ tags, type }) => {
   const { query, push } = useRouter();
   const linkTagsHandler = useCallback(
     (newQuery) => {
+      scrollToTop();
       if (query[type]) {
         push(
           {
@@ -50,7 +51,6 @@ const Tags = ({ tags, type }) => {
           { shallow: true }
         );
       }
-      scrollToTop();
     },
     [push, query, type]
   );

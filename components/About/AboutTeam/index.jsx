@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "@emotion/styled";
-import { Box, Typography, Stack, Avatar } from "@mui/material";
+import { Box, Typography, Stack, Avatar, AvatarGroup } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 
 const LineWrapper = styled(Typography)`
@@ -276,6 +276,32 @@ const AboutTeam = () => {
               />
             </Tooltip>
           ))}
+          <Tooltip title="志工夥伴">
+            <AvatarGroup
+              max={2}
+              sx={{
+                ".MuiAvatarGroup-avatar": {
+                  width: 50,
+                  height: 50,
+                  marginLeft: "-12px",
+                },
+              }}
+            >
+              <Avatar
+                sx={{ margin: "4px 0", width: 50, height: 50 }}
+                alt="50+"
+                src="https://media.giphy.com/media/bErElGdAHUmoE/giphy.gif"
+              />
+              {new Array(50).fill("").map((_, index) => (
+                <Avatar
+                  key={index}
+                  alt={`dummy-${index}`}
+                  src="https://media.giphy.com/media/bErElGdAHUmoE/giphy.gif"
+                />
+              ))}
+              {/* https://media.giphy.com/media/7WH2eHCxpFcI0/giphy.gif */}
+            </AvatarGroup>
+          </Tooltip>
         </Stack>
         <LineWrapper variant="p">
           島島阿學團隊由一群高中生、大學生、教育工作者、家長、工程師、設計師等來自不同背景的夥伴組成，親身經歷自主學習的各種困境，並有感教育不平等之議題，故自主發起島島阿學學習社群計畫。
@@ -287,6 +313,7 @@ const AboutTeam = () => {
           <Typography variant="span">🧑‍💻 IT部</Typography>
           <Typography variant="span">🧑‍💼 行銷公關部</Typography>
           <Typography variant="span">🧑‍🎨 設計部</Typography>
+          <Typography variant="span">🧚 志工夥伴</Typography>
         </LineWrapper>
         {/* <LineWrapper variant="p">
               臺灣實驗教育推動中心, 唐光華 老師, 丁志仁 老師, 曲智鑛 老師,

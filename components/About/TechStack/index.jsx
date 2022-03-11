@@ -29,14 +29,12 @@ const Thanks = () => {
           margin: "20px",
         }}
       >
-        <LineWrapper variant="p" sx={{ fontWeight: "500" }}>
-          島島社群的IT部夥伴從高中生到工程師都有，我們是一群夢想的追尋者，我們認為開發不應該只是開發一個產品，而是實現夢想的一種方式。
-        </LineWrapper>
-        <LineWrapper variant="p" sx={{ fontWeight: "500" }}>
-          目前專案技術包含：React 17, MUI, emotion, cloudflare services, Notion
-        </LineWrapper>
         <LineWrapper variant="p">
           <p float="left" margin="10px">
+            <img
+              src="https://media.giphy.com/media/I2Gobnade5rqM/giphy.gif"
+              height="80px"
+            />
             {/* <img
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nextjs-logo.svg/1200px-Nextjs-logo.svg.png"
               height="100px"
@@ -68,6 +66,21 @@ const Thanks = () => {
             />
           </p>
         </LineWrapper>
+        <LineWrapper variant="p" sx={{ fontWeight: "500" }}>
+          島島社群的IT部夥伴從高中生到工程師都有，我們是一群夢想的追尋者，我們認為開發不應該只是開發一個產品，而是實現夢想的一種方式。
+        </LineWrapper>
+        <LineWrapper variant="p" sx={{ fontWeight: "500" }}>
+          目前專案技術包含：React 17, MUI, emotion, cloudflare services, 🤠
+          wrangler, Notion
+        </LineWrapper>
+        {/* <LineWrapper variant="p" sx={{ fontWeight: "500" }}>
+          <img
+            src="https://media.giphy.com/media/l0MYFwjgTKh5X4jew/giphy.gif"
+            alt="bear"
+            width={100}
+            height={100}
+          />
+        </LineWrapper> */}
       </Stack>
     </Box>
   );
