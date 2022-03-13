@@ -10,9 +10,6 @@ import { initGA, logPageView } from "../utils/analytics";
 import { useRouter } from "next/router";
 import Script from "next/script";
 
-// import Navigation from "../shared/components/Navigation";
-// import Footer from "../shared/components/Footer";
-
 const store = storeFactory();
 
 const App = ({ Component, pageProps }) => {
@@ -56,11 +53,9 @@ const App = ({ Component, pageProps }) => {
       {/* For custum reset css */}
       <GlobalStyle />
       <Toaster />
-      {/* <Navigation /> */}
       <Provider store={store}>
         <Component {...pageProps} />
       </Provider>
-      {/* <Footer /> */}
     </ThemeProvider>
   );
 };

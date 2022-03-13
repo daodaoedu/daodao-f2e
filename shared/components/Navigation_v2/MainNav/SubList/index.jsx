@@ -1,6 +1,14 @@
 import React from "react";
 import styled from "@emotion/styled";
 import Link from "next/link";
+import { Typography } from "@mui/material";
+import useFirebase from "../../../../../hooks/useFirebase";
+import UserAvatar from "./UserAvatar";
+// import { useAuthState } from "react-firebase-hooks/auth";
+// import { signInWithPopup } from "firebase/auth";
+// import { useDispatch, useSelector } from "react-redux";
+// import { userLogin } from "../../../../../redux/actions/user";
+// import { useCollectionData } from "react-firebase-hooks/firestore";
 
 const LinkListWrapper = styled.ul`
   display: flex;
@@ -41,6 +49,8 @@ const SubListWrapper = styled.div`
 `;
 
 const SubList = () => {
+  // const dispatch = useDispatch();
+  const { auth, signInWithGoogle, user } = useFirebase();
   return (
     <SubListWrapper>
       <LinkListWrapper>
@@ -52,6 +62,10 @@ const SubList = () => {
             </p>
           </Link>
         </li>
+        <li>
+          <UserAvatar user={user} />
+        </li>
+        {/* <Typography onClick={() => signInWithGoogle()}>登入</Typography> */}
       </LinkListWrapper>
     </SubListWrapper>
   );
