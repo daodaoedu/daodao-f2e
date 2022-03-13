@@ -36,7 +36,7 @@ const firebase = async () => {
   const signInWithGoogle = signInWithPopup(auth, googleAuthProvider)
     .then((result) => result)
     .catch((error) => error);
-  return { signInWithGoogle };
+  return {};
 };
 
 export default firebase;

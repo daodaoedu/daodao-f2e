@@ -154,6 +154,33 @@ git mv hello.txt Hello.txt
 開發版本請使用 Node 16.14.0。
 理論上在雲端放上 NODE_VERSION 就可以改版本，但是不知道為什麼只能用.node-version
 
+## 會員登入 https 設定（Oauth2.0）
+
+請注意！！一旦使用 gmail 註冊之後就無法使用其他供應商的登入方式了
+Google 登入不用設定，Meta 強制登入使用 https，以下是 local 環境設定：
+
+1. Install [Mkcert](https://github.com/FiloSottile/mkcert)
+
+```
+brew install mkcert
+mkcert -install
+```
+
+2. 產生金鑰匙
+   小心不要 push 到 GitHub
+
+```
+mkcert localhost
+```
+
+3. 執行 Server
+
+```
+node server.js
+or
+yarn dev-https
+```
+
 ## 其他參考資源
 
 [Next 範例](https://github.com/vercel/next.js/tree/canary/examples/api-routes-rest/pages)

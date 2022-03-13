@@ -8,13 +8,13 @@ import { Group } from "@mui/icons-material";
 import { useRouter } from "next/router";
 const UserAvatar = () => {
   const { push } = useRouter();
-  const { auth, signInWithGoogle, signOutWithGoogle, user } = useFirebase();
+  const { auth, user, signInWithFacebook } = useFirebase();
   const [isOpenMenu, setIsOpenMenu] = useState(null);
   if (!user) {
     return (
       <IconButton
         sx={{ margin: "0 10px", fontSize: "16px", color: "white" }}
-        onClick={() => signInWithGoogle()}
+        onClick={() => signInWithFacebook()}
       >
         <Group sx={{ fontSize: "30px" }} />
       </IconButton>

@@ -6,6 +6,7 @@ import {
   getAuth,
   onAuthStateChanged,
   GoogleAuthProvider,
+  FacebookAuthProvider,
   signInWithPopup,
   signOut,
 } from "firebase/auth";
@@ -36,6 +37,7 @@ const useFirebase = () => {
   //   const analytics = getAnalytics(firebaseApp);
   const auth = getAuth(firebaseApp);
   const googleAuthProvider = new GoogleAuthProvider();
+  const facebookAuthProvider = new FacebookAuthProvider();
   const [user, isLoading, isError] = useAuthState(auth);
   // const obj = useAuthState(auth);
   // console.log("obj", obj);
@@ -53,6 +55,8 @@ const useFirebase = () => {
   //   "=>",
   //   value?.docs.map((doc) => doc.data())
   // );
+
+  // 請注意！！一旦使用 gmail 註冊之後就無法使用其他供應商的登入方式了
   const signInWithGoogle = () => {
     signInWithPopup(auth, googleAuthProvider)
       .then((result) => {
@@ -103,12 +107,64 @@ const useFirebase = () => {
       });
   };
 
+  const signInWithFacebook = () => {
+    signInWithPopup(auth, facebookAuthProvider)
+      .then((result) => {
+        console.log("result", result);
+        const { displayName } = result.user;
+        toast.success(`歡迎登入 ${displayName}`, {
+          style: {
+            color: "#16b9b3",
+            border: "1px solid #16b9b3",
+            marginTop: "70px",
+          },
+          iconTheme: {
+            primary: "#16b9b3",
+          },
+        });
+      })
+      .catch((error) => {
+        console.log("error", error);
+        toast.error("登入失敗", {
+          style: {
+            marginTop: "70px",
+          },
+        });
+      });
+  };
+
+  const signOutWithFacebook = () => {
+    signOut(auth)
+      .then(() => {
+        toast.success(`登出成功`, {
+          style: {
+            color: "#16b9b3",
+            border: "1px solid #16b9b3",
+            marginTop: "70px",
+          },
+          iconTheme: {
+            primary: "#16b9b3",
+          },
+        });
+      })
+      .catch((error) => {
+        console.log("error", error);
+        toast.error("登出失敗", {
+          style: {
+            marginTop: "70px",
+          },
+        });
+      });
+  };
+
   return {
     firebaseApp,
     auth,
     googleAuthProvider,
     signInWithGoogle,
     signOutWithGoogle,
+    signInWithFacebook,
+    signOutWithFacebook,
     user,
     isLoading,
   };

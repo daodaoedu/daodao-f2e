@@ -50,7 +50,8 @@ const SubListWrapper = styled.div`
 
 const SubList = () => {
   // const dispatch = useDispatch();
-  const { auth, signInWithGoogle, user } = useFirebase();
+  const { auth, user } = useFirebase();
+
   return (
     <SubListWrapper>
       <LinkListWrapper>
@@ -65,7 +66,6 @@ const SubList = () => {
         <li>
           <UserAvatar user={user} />
         </li>
-        {/* <Typography onClick={() => signInWithGoogle()}>登入</Typography> */}
       </LinkListWrapper>
     </SubListWrapper>
   );

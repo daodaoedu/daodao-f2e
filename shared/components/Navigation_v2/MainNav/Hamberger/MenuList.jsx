@@ -28,7 +28,7 @@ const MenuListWrapper = styled.div`
 `;
 
 const Menu = ({ open, list, onClick }) => {
-  const { auth, signInWithGoogle, signOutWithGoogle, user } = useFirebase();
+  const { auth, user, signInWithFacebook, signOutWithFacebook } = useFirebase();
   return (
     <MenuWrapper open={open}>
       {open && (
@@ -39,7 +39,7 @@ const Menu = ({ open, list, onClick }) => {
               key={"登出"}
               delay={`0.1s`}
               onClick={() => {
-                signOutWithGoogle();
+                signOutWithFacebook();
                 onClick();
               }}
               text="登出"
@@ -49,7 +49,7 @@ const Menu = ({ open, list, onClick }) => {
               key={"登入"}
               delay={`0.1s`}
               onClick={() => {
-                signInWithGoogle();
+                signInWithFacebook();
               }}
               text="登入"
             />
