@@ -64,11 +64,19 @@ const LineStyle = styled.div`
 `;
 
 const MenuItem = ({ delay, text, link, onClick }) => {
+  if (link) {
+    return (
+      <MenuItemWrapper delay={delay} onClick={onClick}>
+        <Link href={link} passHref>
+          <ItemWrapper delay={delay}>{text}</ItemWrapper>
+        </Link>
+        <LineStyle delay={delay} />
+      </MenuItemWrapper>
+    );
+  }
   return (
     <MenuItemWrapper delay={delay} onClick={onClick}>
-      <Link href={link} passHref>
-        <ItemWrapper delay={delay}>{text}</ItemWrapper>
-      </Link>
+      <ItemWrapper delay={delay}>{text}</ItemWrapper>
       <LineStyle delay={delay} />
     </MenuItemWrapper>
   );

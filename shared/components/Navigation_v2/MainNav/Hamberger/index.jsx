@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "@emotion/styled";
-import MenuButton from "../MenuButton";
-import MenuList from "../MenuList";
+import MenuButton from "./MenuButton";
+import MenuList from "./MenuList";
 import { NAV_LINK_MOBILE } from "../../../../../constants/category";
 
 const MobileLinkListWrapper = styled.ul`
@@ -42,7 +42,7 @@ const MobileLinkListWrapper = styled.ul`
 const MainNav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const avatar = "";
-  const isUserLogin = false;
+  const isUserLogin = true;
   return (
     <MobileLinkListWrapper>
       <MenuList

@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { Paper, Box, Typography, Divider, Tooltip } from "@mui/material";
 import useFirebase from "../../hooks/useFirebase";
 import dayjs from "dayjs";
-import { getFirestore, collection } from "firebase/firestore";
+import { getFirestore, collection, doc } from "firebase/firestore";
 import { useDocument, useCollection } from "react-firebase-hooks/firestore";
 import ResourceCard from "./ResourceCard";
 import { HelpOutline } from "@mui/icons-material";
@@ -32,19 +32,33 @@ const MyIslandWrapper = styled.section`
 
 const MyIsland = () => {
   const { user, isLoading, firebaseApp } = useFirebase();
+
   const [
-    value,
+    userCollection,
     // , loading, error
-  ] = useCollection(
-    collection(getFirestore(firebaseApp), "favoriteCollection"),
-    {
-      snapshotListenOptions: { includeMetadataChanges: true },
-    }
-  );
-  console.log(
-    "=>",
-    value?.docs.map((doc) => doc.data())
-  );
+  ] = useCollection(collection(getFirestore(firebaseApp), "users"), {
+    snapshotListenOptions: { includeMetadataChanges: true },
+  });
+  //   const [
+  //     favoriteCollection,
+  //     // , loading, error
+  //   ] = useCollection(
+  //     collection(getFirestore(firebaseApp), "favoriteCollection"),
+  //     {
+  //       snapshotListenOptions: { includeMetadataChanges: true },
+  //     }
+  //   );
+  //   const userfFvoriteCollectionId =
+  //     userCollection?.docs.find((doc) => user?.uid === doc.id)?.data()
+  //       ?.favoriteCollectionId ?? "";
+
+  //   const userFavoriteCollection =
+  //     favoriteCollection?.docs
+  //       .find((doc) => userfFvoriteCollectionId === doc.id)
+  //       ?.data() ?? [];
+  //   console.log("userfFvoriteCollectionId", userfFvoriteCollectionId);
+  //   console.log("favoriteCollection", favoriteCollection);
+
   if (isLoading) {
     return (
       <MyIslandWrapper>
@@ -76,7 +90,28 @@ const MyIsland = () => {
     );
   }
   if (!user) {
-    return <>未登入</>;
+    return (
+      <MyIslandWrapper>
+        <Paper
+          sx={{
+            width: "95%",
+            margin: "0 auto",
+            padding: "10px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "60vh",
+          }}
+        >
+          <Typography
+            sx={{ margin: "20px 0", fontWeight: "500", fontSize: "20px" }}
+          >
+            看起來你還沒有登入會員唷，點擊右上角登入吧！
+          </Typography>
+        </Paper>
+      </MyIslandWrapper>
+    );
   }
   return (
     <MyIslandWrapper>
@@ -85,6 +120,7 @@ const MyIsland = () => {
           width: "95%",
           margin: "0 auto",
           padding: "10px",
+          minHeight: "60vh",
         }}
       >
         <Box sx={{ margin: "20px 0", fontWeight: "500", fontSize: "20px" }}>
@@ -111,19 +147,37 @@ const MyIsland = () => {
         <Box sx={{ margin: "20px 0", fontWeight: "500", fontSize: "20px" }}>
           註冊時間：{dayjs(user?.metadata?.creationTime).format("YYYY/MM/DD")}
         </Box>
+        <Box
+          sx={{
+            margin: "20px 0",
+            fontWeight: "500",
+            fontSize: "20px",
+            display: "flex",
+            justifyContent: "flex-start",
+            alignItems: "center",
+          }}
+        >
+          島島 Points：
+          <Box sx={{ margin: "0 10px" }}> 0</Box>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/assets/point.png" alt="point" width={20} height={20} />
+          <Tooltip title="鼓勵學習者學習的小獎勵">
+            <HelpOutline sx={{ color: "#16b9b3", marginLeft: "10px" }} />
+          </Tooltip>
+        </Box>
         <Box sx={{ margin: "20px 0", fontSize: "18px" }}>
           歡迎加入島島的行列，您期待島島未來有什麼功能可以使用嗎？
           歡迎來信：contact@daoedu.tw
         </Box>
-        <Divider />
-        <Box sx={{ margin: "20px 0" }}>
-          <Box sx={{ fontSize: "22px", fontWeight: "500" }}>我的收藏</Box>
-          <Box sx={{ margin: "10px 0" }}>
-            {value?.docs.map((doc, index) => (
+        {/* <Divider /> */}
+        {/* <Box sx={{ margin: "20px 0" }}>
+          <Box sx={{ fontSize: "22px", fontWeight: "500" }}>我的收藏</Box> */}
+        {/* <Box sx={{ margin: "10px 0" }}>
+            {userFavoriteCollection.map((doc, index) => (
               <ResourceCard key={index} data={doc.data()} />
             ))}
-          </Box>
-        </Box>
+          </Box> */}
+        {/* </Box> */}
       </Paper>
     </MyIslandWrapper>
   );
