@@ -5,7 +5,9 @@ import { Avatar } from "@mui/material";
 import useFirebase from "../../../../../../hooks/useFirebase";
 import { Box, IconButton, Menu, MenuItem } from "@mui/material";
 import { Group } from "@mui/icons-material";
+import { useRouter } from "next/router";
 const UserAvatar = () => {
+  const { push } = useRouter();
   const { auth, signInWithGoogle, signOutWithGoogle, user } = useFirebase();
   const [isOpenMenu, setIsOpenMenu] = useState(null);
   if (!user) {
@@ -34,6 +36,7 @@ const UserAvatar = () => {
         <MenuItem
           onClick={() => {
             setIsOpenMenu(false);
+            push("/myisland");
           }}
         >
           我的島島
