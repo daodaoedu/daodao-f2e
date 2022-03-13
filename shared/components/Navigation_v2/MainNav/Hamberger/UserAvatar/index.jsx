@@ -7,7 +7,7 @@ import { Box, IconButton, Menu, MenuItem } from "@mui/material";
 import { Group } from "@mui/icons-material";
 import { useRouter } from "next/router";
 
-const UserAvatar = () => {
+const UserAvatar = ({ onCloseMenu }) => {
   const { push } = useRouter();
   const { auth, user, signInWithFacebook, signOutWithFacebook } = useFirebase();
   const [isOpenMenu, setIsOpenMenu] = useState(null);
@@ -29,11 +29,15 @@ const UserAvatar = () => {
         justifyContent: "flex-start",
         alignItems: "center",
       }}
+      onClick={() => {
+        onCloseMenu();
+        push("/myisland");
+      }}
     >
       <Avatar
         alt={user?.displayName ?? ""}
         src={user?.photoURL ?? ""}
-        onClick={(event) => setIsOpenMenu(event.currentTarget)}
+        // onClick={(event) => setIsOpenMenu(event.currentTarget)}
       />
       <Box
         sx={{
@@ -56,7 +60,7 @@ const UserAvatar = () => {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/assets/point.png" alt="point" width={26} height={26} />
       </Box>
-      <Menu
+      {/* <Menu
         id="user-menu"
         anchorEl={isOpenMenu}
         open={Boolean(isOpenMenu)}
@@ -77,8 +81,8 @@ const UserAvatar = () => {
           }}
         >
           登出
-        </MenuItem>
-      </Menu>
+        </MenuItem> */}
+      {/* </Menu> */}
     </IconButton>
   );
 };

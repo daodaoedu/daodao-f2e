@@ -27,20 +27,20 @@ const MenuListWrapper = styled.div`
   z-index: 100;
 `;
 
-const Menu = ({ open, list, onClick }) => {
+const Menu = ({ open, list, onCloseMenu }) => {
   const { auth, user, signInWithFacebook, signOutWithFacebook } = useFirebase();
   return (
     <MenuWrapper open={open}>
       {open && (
         <MenuListWrapper>
-          {user && <UserAvatar />}
+          {user && <UserAvatar onCloseMenu={onCloseMenu} />}
           {user ? (
             <MenuItem
               key={"登出"}
               delay={`0.1s`}
               onClick={() => {
                 signOutWithFacebook();
-                onClick();
+                onCloseMenu();
               }}
               text="登出"
             />
@@ -60,7 +60,7 @@ const Menu = ({ open, list, onClick }) => {
               <MenuItem
                 key={value.name}
                 delay={`${index * 0.1}s`}
-                onClick={onClick}
+                onClick={onCloseMenu}
                 text={value.name}
                 link={value.link}
               />

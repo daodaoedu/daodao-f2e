@@ -149,7 +149,8 @@ const MyIsland = () => {
           島主信箱：{user.email}
         </Box>
         <Box sx={{ margin: "20px 0", fontWeight: "500", fontSize: "20px" }}>
-          註冊時間：{dayjs(user?.metadata?.creationTime).format("YYYY/MM/DD")}
+          創島時間：
+          {dayjs(user?.metadata?.creationTime).format("YYYY / MM / DD")}
         </Box>
         <Box
           sx={{
