@@ -137,7 +137,11 @@ const MyIsland = () => {
           }}
         >
           島主身份：VIP體驗會員
-          <Tooltip title="提早成為島島會員，搶先體驗最新功能！">
+          <Box sx={{ margin: "0 5px" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/vip.png" alt="vip" width={20} height={20} />
+          </Box>
+          <Tooltip title="提早成為島島會員，搶先體驗最新功能與回報使用體驗，你就是我們的VIP！">
             <HelpOutline sx={{ color: "#16b9b3", marginLeft: "10px" }} />
           </Tooltip>
         </Box>
