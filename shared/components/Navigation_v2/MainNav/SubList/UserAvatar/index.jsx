@@ -8,7 +8,7 @@ import { Group } from "@mui/icons-material";
 import { useRouter } from "next/router";
 const UserAvatar = () => {
   const { push } = useRouter();
-  const { auth, user, signInWithFacebook } = useFirebase();
+  const { auth, user, signInWithFacebook, signOutWithFacebook } = useFirebase();
   const [isOpenMenu, setIsOpenMenu] = useState(null);
   if (!user) {
     return (
@@ -43,7 +43,7 @@ const UserAvatar = () => {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            signOutWithGoogle();
+            signOutWithFacebook();
             setIsOpenMenu(false);
           }}
         >
