@@ -31,7 +31,7 @@ const LogoWrapper = styled.div`
 const BlockWrapper = styled.div`
   display: flex;
   justify-content: space-around;
-  margin-top: 60px;
+  margin-top: 30px;
 `;
 
 const aboutDaoConfig = [

@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "@emotion/styled";
-import { Box, Typography, Stack, Avatar, AvatarGroup } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Stack,
+  Avatar,
+  AvatarGroup,
+  Button,
+} from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
+import WramModal from "../../../shared/components/WarmModal";
 
 const LineWrapper = styled(Typography)`
   margin: 5px 0;
@@ -239,6 +247,7 @@ const Members = [
 ];
 
 const AboutTeam = () => {
+  const [open, setOpen] = useState(false);
   return (
     <Box
       sx={{
@@ -319,6 +328,28 @@ const AboutTeam = () => {
               臺灣實驗教育推動中心, 唐光華 老師, 丁志仁 老師, 曲智鑛 老師,
               g0v零時小學校, 柯君翰, 高婷柔, 向恩霈, 詹喬智, 米苔目, 王玠堯, Ael
             </LineWrapper> */}
+        <Typography
+          variant="h3"
+          sx={{
+            margin: "10px 0",
+          }}
+        >
+          來自IT夥伴的小彩蛋
+        </Typography>
+        <LineWrapper variant="p">
+          你知道你的一句話能造成多大的引響力嗎？歡迎送上暖暖的祝福給夥伴們！
+        </LineWrapper>
+        <Box
+          sx={{
+            margin: "20px 0 10px 0",
+          }}
+        >
+          <Button variant="outlined" onClick={() => setOpen(true)}>
+            {/* <FacebookRounded sx={{ margin: "5px 0" }} /> */}
+            <Typography variant="p">❤️ 送上祝福</Typography>
+          </Button>
+        </Box>
+        <WramModal open={open} setOpen={setOpen} />
       </Stack>
     </Box>
   );

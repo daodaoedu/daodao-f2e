@@ -1,10 +1,11 @@
-import React, { useMemo, useRef } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import styled from "@emotion/styled";
 import Banner from "./Banner";
 import Guide from "./Guide";
 import About from "./About";
 import Group from "./Group";
 import { Divider } from "@mui/material";
+
 const HomeWrapper = styled.div``;
 
 const Home = () => {

@@ -12,6 +12,7 @@ const SubFooterWrapper = styled.div`
   font-size: 16px;
   margin-top: auto;
   letter-spacing: 0.08em;
+  margin-top: 20px;
 `;
 
 const SubFooter = () => {

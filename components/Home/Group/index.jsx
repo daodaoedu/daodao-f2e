@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "@emotion/styled";
 import Box from "@mui/material/Box";
 import { Button, Typography } from "@mui/material";
 import { FacebookRounded } from "@mui/icons-material";
 import { useRouter } from "next/router";
-
+import WramModal from "../../../shared/components/WarmModal";
 const GroupWrapper = styled.div`
   width: 90%;
   /* height: calc(var(--section-height) + var(--section-height-offset)); */
@@ -20,6 +20,8 @@ const GroupWrapper = styled.div`
 
 const Group = () => {
   const router = useRouter();
+  const [open, setOpen] = useState(false);
+
   return (
     <GroupWrapper>
       <Typography
@@ -85,6 +87,9 @@ const Group = () => {
           <Box
             sx={{
               margin: "20px 0 10px 0",
+              display: "flex",
+              justifyContent: "flex-start",
+              alignItems: "center",
             }}
           >
             <Button
@@ -95,10 +100,25 @@ const Group = () => {
                   "_blank"
                 )
               }
+              sx={{ margin: "0 10px" }}
             >
               <FacebookRounded sx={{ margin: "5px 0" }} />
               <Typography variant="p">加入社群</Typography>
             </Button>
+            <Box>
+              <Button
+                variant="outlined"
+                onClick={() => setOpen(true)}
+                sx={{
+                  height: "46px",
+                  margin: "0 10px",
+                }}
+              >
+                {/* <FacebookRounded sx={{ margin: "5px 0" }} /> */}
+                <Typography variant="p">❤️ 送上祝福</Typography>
+              </Button>
+            </Box>
+            <WramModal open={open} setOpen={setOpen} />
           </Box>
         </Box>
         {/* eslint-disable-next-line @next/next/no-img-element */}
