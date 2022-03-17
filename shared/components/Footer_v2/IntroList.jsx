@@ -16,7 +16,8 @@ const IntroListWrapper = styled.div`
   }
   li {
     cursor: pointer;
-    margin: 8px auto;
+    margin: 8px auto 8px 0;
+    text-align: left:
   }
 `;
 
