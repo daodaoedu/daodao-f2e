@@ -43,7 +43,9 @@ const WarmModal = ({ open, setOpen }) => {
       <DialogTitle>送上滿滿的祝福 🎈</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          你的小小鼓勵是所有島島志工夥伴最大的動力🥳！歡迎留下你所想留的內容！
+          你的小小鼓勵是所有島島志工夥伴最大的動力🥳！歡迎留下你所想留的內容，你所留下的訊息會
+          <Typography sx={{ fontWeight: "bold" }}> 即時推播 </Typography>
+          給島島的夥伴看到喔！
         </DialogContentText>
         <TextField
           autoFocus
