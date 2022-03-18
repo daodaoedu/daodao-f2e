@@ -126,6 +126,12 @@ module.exports = {
         priority: 0.5,
         lastmod: new Date().toISOString(),
       },
+      {
+        loc: `/privacypolicy`,
+        changefreq: "daily",
+        priority: 0.5,
+        lastmod: new Date().toISOString(),
+      },
     ];
     CATEGORIES.forEach(({ value }) => {
       fields.push({
