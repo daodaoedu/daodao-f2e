@@ -17,7 +17,9 @@ const ResourcePage = ({ data = {} }) => {
   const desc = useMemo(
     () =>
       data?.properties && data?.properties["介紹"]
-        ? data?.properties["介紹"]?.rich_text[0]?.plain_text
+        ? data?.properties["介紹"]?.rich_text
+            .map((richText) => richText.plain_text)
+            .join("")
         : "",
     [data?.properties]
   );
@@ -37,10 +39,30 @@ const ResourcePage = ({ data = {} }) => {
     [data?.properties]
   );
 
+  const feeTags = useMemo(
+    () =>
+      data?.properties["費用"]?.select
+        ? [data?.properties["費用"]?.select]
+        : [],
+    [data]
+  );
+  const link = useMemo(
+    () =>
+      data?.properties && data?.properties["連結"]
+        ? appendQuery(
+            data?.properties["連結"]?.url ?? "",
+            "promotefrom=daoedu.tw"
+          )
+        : "",
+    [data?.properties]
+  );
   const SEOData = useMemo(
     () => ({
       title: `${title}的學習資源介紹｜島島阿學`,
-      description: desc,
+      description:
+        desc.length < 50
+          ? `${desc}\n此外，我們期盼能邀請在各領域深耕已久的夥伴們將自身累積的資源新增至教育資源網站，讓資源透明化。若您願意一同共編，請至新增資源的表單新增資源，我們將進行審核在新增至資料庫中。`
+          : desc,
       keywords: "島島阿學",
       author: "島島阿學",
       copyright: "島島阿學",
@@ -54,7 +76,14 @@ const ResourcePage = ({ data = {} }) => {
           description: desc,
           url: `${process.env.HOSTNAME}${router?.asPath}`,
           keywords: tags.map(({ name }) => name),
-          // license: "https://data.gov.tw/license",
+          license: "https://www.daoedu.tw/privacypolicy",
+          sameAs:
+            data?.properties &&
+            data?.properties["連結"] &&
+            data?.properties["連結"]?.url,
+          isAccessibleForFree: !(
+            data?.properties["費用"]?.select?.name === "需付費"
+          ),
           creator: { "@type": "Organization", name: "島島阿學" },
           // distribution: [
           //   {
@@ -67,7 +96,7 @@ const ResourcePage = ({ data = {} }) => {
         },
       ],
     }),
-    [desc, image, router?.asPath, tags, title]
+    [data?.properties, desc, image, router?.asPath, tags, title]
   );
   return (
     <>
@@ -79,6 +108,8 @@ const ResourcePage = ({ data = {} }) => {
         desc={desc}
         image={image}
         tags={tags}
+        feeTags={feeTags}
+        link={link}
       />
       <Footer />
     </>

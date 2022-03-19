@@ -66,7 +66,7 @@ const ImageWrapper = styled.div`
   }
 `;
 
-const Resource = ({ data, title, desc, image, tags }) => {
+const Resource = ({ data, title, desc, image, tags, feeTags, link }) => {
   const router = useRouter();
   const isLoading = useMemo(() => !data, [data]);
   const [disqusConfig, setDisqusConfig] = useState({});
@@ -81,16 +81,6 @@ const Resource = ({ data, title, desc, image, tags }) => {
       });
     }
   }, [router.asPath, router.isReady, title]);
-  const link = useMemo(
-    () =>
-      data?.properties && data?.properties["連結"]
-        ? appendQuery(
-            data?.properties["連結"]?.url ?? "",
-            "promotefrom=daoedu.tw"
-          )
-        : "",
-    [data?.properties]
-  );
 
   const resourcesTags = useMemo(
     () => data?.properties["資源類型"]?.multi_select ?? [],
@@ -98,13 +88,6 @@ const Resource = ({ data, title, desc, image, tags }) => {
   );
   const ageOfUserTags = useMemo(
     () => data?.properties["年齡層"]?.multi_select ?? [],
-    [data]
-  );
-  const feeTags = useMemo(
-    () =>
-      data?.properties["費用"]?.select
-        ? [data?.properties["費用"]?.select]
-        : [],
     [data]
   );
   const catTags = useMemo(
