@@ -4,6 +4,7 @@ import SEOConfig from "../../../shared/components/SEO";
 import Navigation from "../../../shared/components/Navigation_v2";
 import Footer from "../../../shared/components/Footer_v2";
 import Resource from "../../../components/Resource";
+import appendQuery from "append-query";
 
 const ResourcePage = ({ data = {} }) => {
   const router = useRouter();
