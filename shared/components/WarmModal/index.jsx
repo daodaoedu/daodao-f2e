@@ -22,7 +22,7 @@ const WarmModal = ({ open, setOpen }) => {
         channel: "#主頻道-大會報告島",
         // For test
         // channel: "#daodao-notion",
-        author: author ?? "匿名",
+        author: author || "匿名",
         text: text ?? "🥳",
       }),
     }).then(() => {
