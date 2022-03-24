@@ -32,7 +32,7 @@ const List = ({
     <ListWrapper>
       {sponsorList.map((item) => (
         <SponsorItem
-          key={item.properties["資源名稱"].title[0].plain_text}
+          key={`sponsor-${item.properties["資源名稱"].title[0].plain_text}`}
           data={item}
           queryTags={queryTags}
         />
