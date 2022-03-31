@@ -16,6 +16,7 @@ const ItemWrapper = styled.li`
   padding-bottom: 20px;
   border-bottom: 1px solid rgba(168, 168, 168, 0.3);
 `;
+
 const ContentWrapper = styled.div`
   width: calc(100% - 200px);
   padding: 0 10px;
