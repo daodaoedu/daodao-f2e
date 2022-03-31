@@ -30,13 +30,13 @@ const List = ({
   }
   return (
     <ListWrapper>
-      {sponsorList.map((item) => (
+      {/* {sponsorList.map((item) => (
         <SponsorItem
           key={`sponsor-${item.properties["資源名稱"].title[0].plain_text}`}
           data={item}
           queryTags={queryTags}
         />
-      ))}
+      ))} */}
       {list.map((item) =>
         isLoading ? (
           <SkeletonItem key={item.properties["資源名稱"].title[0].plain_text} />

@@ -8,6 +8,25 @@ import isBetween from "dayjs/plugin/isBetween";
 import { COLOR_TABLE } from "../../../../../constants/notion";
 dayjs.extend(isBetween);
 
+const LogoImageWrapper = styled(Box)`
+  flex: 0 0 200px;
+  width: 200px;
+  height: 200px;
+  position: relative;
+  overflow: hidden;
+  filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.25));
+  cursor: pointer;
+  &:hover: {
+    transform: scale(1.05);
+    transition: transform 0.4s;
+  }
+  @media (max-width: 767px) {
+    flex: 0 0 100px;
+    width: 100px;
+    height: 100px;
+  }
+`;
+
 const ImageWrapper = styled.div`
   width: 200px;
   height: 200px;
@@ -18,11 +37,12 @@ const ImageWrapper = styled.div`
     background-repeat: no-repeat;
     background-position: 50% 50%;
   `}
-  border-radius: 20px;
+  border-radius: 20%;
   /* object-fit: cover; */
   /* opacity: 0; */
 
   @media (max-width: 767px) {
+    border-radius: 10%;
     width: 100px;
     height: 100px;
   }
@@ -76,18 +96,7 @@ const PromoteWrapper = styled.div`
 
 const LogoImage = ({ link, data }) => {
   return (
-    <Box
-      sx={{
-        position: "relative",
-        overflow: "hidden",
-        filter: "drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.25))",
-        cursor: "pointer",
-        "&:hover": {
-          transform: "scale(1.05)",
-          transition: "transform 0.4s",
-        },
-      }}
-    >
+    <LogoImageWrapper>
       <ImageWrapper
         onClick={() => window.open(link, "_blank")}
         image={
@@ -97,7 +106,7 @@ const LogoImage = ({ link, data }) => {
         }
       />
       <PromoteWrapper />
-    </Box>
+    </LogoImageWrapper>
   );
 };
 

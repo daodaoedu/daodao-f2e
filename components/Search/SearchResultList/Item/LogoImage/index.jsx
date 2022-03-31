@@ -7,9 +7,28 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 dayjs.extend(isBetween);
 
-const ImageWrapper = styled.div`
+const LogoImageWrapper = styled(Box)`
+  flex: 0 0 200px;
   width: 200px;
   height: 200px;
+  position: relative;
+  overflow: hidden;
+  filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.25));
+  cursor: pointer;
+  &:hover: {
+    transform: scale(1.05);
+    transition: transform 0.4s;
+  }
+  @media (max-width: 767px) {
+    flex: 0 0 100px;
+    width: 100px;
+    height: 100px;
+  }
+`;
+
+const ImageWrapper = styled.div`
+  width: 100%;
+  height: 100%;
   background-color: #f5f5f5;
   ${({ image }) => css`
     background-image: ${`url(${image})`};
@@ -17,13 +36,12 @@ const ImageWrapper = styled.div`
     background-repeat: no-repeat;
     background-position: 50% 50%;
   `}
-  border-radius: 20px;
+  border-radius: 20%;
   /* object-fit: cover; */
   /* opacity: 0; */
 
   @media (max-width: 767px) {
-    width: 100px;
-    height: 100px;
+    border-radius: 10%;
   }
 `;
 
@@ -82,18 +100,7 @@ const PromoteWrapper = styled.div`
 
 const LogoImage = ({ isNewResource, link, data }) => {
   return (
-    <Box
-      sx={{
-        position: "relative",
-        overflow: "hidden",
-        filter: "drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.25))",
-        cursor: "pointer",
-        "&:hover": {
-          transform: "scale(1.05)",
-          transition: "transform 0.4s",
-        },
-      }}
-    >
+    <LogoImageWrapper>
       <ImageWrapper
         onClick={() => window.open(link, "_blank")}
         image={
@@ -103,7 +110,7 @@ const LogoImage = ({ isNewResource, link, data }) => {
         }
       />
       {isNewResource && <PromoteWrapper isNewResource={isNewResource} />}
-    </Box>
+    </LogoImageWrapper>
   );
 };
 

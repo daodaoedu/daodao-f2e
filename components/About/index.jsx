@@ -11,6 +11,7 @@ import Thanks from "./Thanks";
 import NeedYou from "./NeedYou";
 import ContactUs from "./ContactUs";
 import TechStack from "./TechStack";
+import Cooperate from "./Cooperate";
 
 const AboutWrapper = styled.section`
   padding-top: 40px;
@@ -51,10 +52,11 @@ const About = () => {
         <RealizeMore />
         <RelatedReport />
         <AwardInfo />
-        <Thanks />
         <AboutTeam />
         <TechStack />
         <NeedYou />
+        <Cooperate />
+        <Thanks />
         <ContactUs />
       </PaperWrapper>
     </AboutWrapper>
