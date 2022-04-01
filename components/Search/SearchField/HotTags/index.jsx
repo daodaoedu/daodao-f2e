@@ -4,6 +4,7 @@ import { SEARCH_TAGS } from "../../../../constants/category";
 import Item from "./item";
 import { Whatshot } from "@mui/icons-material";
 import { Box } from "@mui/material";
+import { TikTokFont } from "../../../../shared/styles/css";
 
 const TagsWrapper = styled.ul`
   display: flex;
@@ -18,6 +19,7 @@ const TagsWrapper = styled.ul`
   &::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Edge and Opera */
   }
+  ${TikTokFont}
 `;
 
 const Tags = ({ queryList }) => {

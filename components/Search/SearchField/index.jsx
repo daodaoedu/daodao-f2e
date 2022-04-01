@@ -4,7 +4,7 @@ import { Box, Select, MenuItem } from "@mui/material";
 import { useRouter } from "next/router";
 import { Whatshot } from "@mui/icons-material";
 import HotTags from "./HotTags";
-import SearchInput from "./Input";
+import SearchInput from "./SearchInput";
 import { SEARCH_TAGS } from "../../../constants/category";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";

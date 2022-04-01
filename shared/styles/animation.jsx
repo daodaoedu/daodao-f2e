@@ -109,3 +109,18 @@ export const bounce = keyframes`
     transform: translate3d(0,-4px,0);
   }
 `;
+
+export const TikTokShaking = keyframes`
+    0%, 100% {
+    text-shadow: 4px 0 0 #ee1d52, 0 -4px 0 #69c9d0;
+  }
+  25% {
+    text-shadow: 4px 4px 0 #ee1d52, -4px -4px 0 #69c9d0;
+  }
+  50% {
+    text-shadow: 0 4px 0 #ee1d52, -4px 0 0 #69c9d0;
+  }
+  75% {
+    text-shadow: 0 0 0 #ee1d52, 0 0 0 #69c9d0;
+  }
+`;

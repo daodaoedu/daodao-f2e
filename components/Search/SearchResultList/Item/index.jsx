@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import styled from "@emotion/styled";
-import { css } from "@emotion/react";
+import { css, keyframes } from "@emotion/react";
 import Link from "next/link";
 import Tags from "./Tags";
 import { Typography, Box } from "@mui/material";
@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import LogoImage from "./LogoImage";
 import Contributors from "./Contributors";
+import { TikTokFont } from '../../../../shared/styles/css';
 dayjs.extend(isBetween);
 
 const ItemWrapper = styled.li`
@@ -46,6 +47,7 @@ const ImageWrapper = styled.div`
   }
 `;
 
+
 const TitleWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -56,12 +58,14 @@ const TitleWrapper = styled.div`
     font-weight: 500;
     margin: 0 10px 0 0;
     color: black;
+    ${TikTokFont}
     &:hover {
       cursor: pointer;
-      color: #37b9eb;
+      color: #16b9b3;
       transition: 0.5s;
     }
   }
+
   @media (max-width: 767px) {
     .title {
       text-overflow: ellipsis;

@@ -24,6 +24,7 @@ const CatChip = ({ value, onClickCategory, isCurrentSelectAllCats }) => {
         "&:hover": {
           backgroundColor: COLOR_TABLE.green,
         },
+        
         // "&:hover": {
         //   opacity: "100%",
         //   transition: "all 0.5s ease",

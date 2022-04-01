@@ -24,6 +24,8 @@ import {
 } from "../../redux/actions/search";
 import ScrollToTop from "../../shared/components/ScrollToTop";
 import { Divider } from "@mui/material";
+import { TikTokFont } from "../../shared/styles/css";
+
 const SearchWrapper = styled.div`
   position: relative;
   height: 100%;
@@ -31,6 +33,7 @@ const SearchWrapper = styled.div`
   .header-title {
     font-size: 24px;
     font-weight: 500;
+    ${TikTokFont}
   }
 `;
 

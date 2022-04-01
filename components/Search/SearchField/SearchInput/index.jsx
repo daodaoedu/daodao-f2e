@@ -140,6 +140,8 @@ const SearchInput = () => {
     >
       <InputBaseWrapper
         inputProps={{ "aria-label": "search google maps" }}
+        id="search_term_string"
+        name="search_term_string"
         value={keyword}
         onKeyPress={handleKeyPress}
         onChange={(event) => {

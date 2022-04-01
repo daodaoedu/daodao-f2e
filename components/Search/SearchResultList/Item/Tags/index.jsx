@@ -4,9 +4,12 @@ import { useRouter } from "next/router";
 import Chip from "@mui/material/Chip";
 import { COLOR_TABLE } from "../../../../../constants/notion";
 import { scrollToTop } from "../../../../../utils/ux";
+import { TikTokFont } from "../../../../../shared/styles/css";
+
 const TagsWrapper = styled.ul`
   display: flex;
   flex-wrap: wrap;
+  ${TikTokFont}
 `;
 
 // const TagItemWrapper = styled.li`
