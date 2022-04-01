@@ -30,6 +30,7 @@ const Cooperate = () => {
           display: "flex",
           justifyContent: "flex-start",
           alignItems: "center",
+          flexWrap: 'wrap'
         }}
       >
         <Box
