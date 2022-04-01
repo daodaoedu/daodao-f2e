@@ -95,7 +95,7 @@ const Group = () => {
             <Button
               variant="outlined"
               onClick={() =>
-                open(
+                window.open(
                   "https://www.facebook.com/groups/2237666046370459",
                   "_blank"
                 )
