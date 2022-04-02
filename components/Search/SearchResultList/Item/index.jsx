@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import LogoImage from "./LogoImage";
 import Contributors from "./Contributors";
-import { TikTokFont } from '../../../../shared/styles/css';
+// import { TikTokFont } from '../../../../shared/styles/css';
 dayjs.extend(isBetween);
 
 const ItemWrapper = styled.li`
@@ -58,7 +58,7 @@ const TitleWrapper = styled.div`
     font-weight: 500;
     margin: 0 10px 0 0;
     color: black;
-    ${TikTokFont}
+    /* ${TikTokFont} */
     &:hover {
       cursor: pointer;
       color: #16b9b3;

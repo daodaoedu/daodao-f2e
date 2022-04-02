@@ -5,7 +5,7 @@ import router, { useRouter } from "next/router";
 import { COLOR_TABLE } from "../../../constants/notion";
 import { CATEGORIES } from "../../../constants/category";
 import CatChip from "./CatChip";
-import { TikTokFont } from "../../../shared/styles/css";
+// import { TikTokFont } from "../../../shared/styles/css";
 
 const ListWrapper = styled.ul`
   display: flex;
@@ -18,7 +18,7 @@ const ListWrapper = styled.ul`
     display: none; /* Chrome, Safari, Edge and Opera */
   }
 
-  ${TikTokFont}
+  /* ${TikTokFont} */
 
   @media (max-width: 767px) {
     margin: 10px 0;
