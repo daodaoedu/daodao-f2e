@@ -42,12 +42,12 @@ const Banner = ({ guideRef }) => {
           <Typography
             variant="h1"
             sx={{
-              "font-size": "24px",
-              "line-height": "28px",
-              "letter-spacing": "0.08em",
+              fontSize: "24px",
+              lineHeight: "28px",
+              letterSpacing: "0.08em",
               color: "#f0f0f0",
-              "font-weight": "500",
-              "text-align": "center",
+              fontWeight: "500",
+              textAlign: "center",
             }}
           >
             歡迎來到島島阿學！一起找找資源、分享資源吧！
@@ -55,13 +55,13 @@ const Banner = ({ guideRef }) => {
           <Typography
             variant="h2"
             sx={{
-              "font-size": "16px",
-              "line-height": "22px",
-              "letter-spacing": "0.08em",
-              "text-align": "center",
-              "margin-top": "10px",
+              fontSize: "16px",
+              lineHeight: "22px",
+              letterSpacing: "0.08em",
+              textAlign: "center",
+              marginTop: "10px",
               color: "#f0f0f0",
-              "font-weight": "500",
+              fontWeight: "500",
             }}
           >
             If you want to go fast go alone. If you what to go far go together.
@@ -80,11 +80,11 @@ const Banner = ({ guideRef }) => {
           <Typography
             variant="h3"
             sx={{
-              "letter-spacing": "0.08em",
+              letterSpacing: "0.08em",
               color: "#f0f0f0",
-              "font-weight": "500",
-              "text-align": "center",
-              "font-size": "26px",
+              fontWeight: "500",
+              textAlign: "center",
+              fontSize: "26px",
               margin: "20px",
             }}
           >

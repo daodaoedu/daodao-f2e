@@ -40,6 +40,7 @@ const theme = createTheme({
     },
   },
   palette: {
+    mode: 'dark',
     primary: {
       // main: "#fff",
       main: "#16b9b3",
