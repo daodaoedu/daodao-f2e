@@ -30,7 +30,7 @@ const Cooperate = () => {
           display: "flex",
           justifyContent: "flex-start",
           alignItems: "center",
-          flexWrap: 'wrap'
+          flexWrap: "wrap",
         }}
       >
         <Box
@@ -89,7 +89,7 @@ const Cooperate = () => {
             rel="noreferrer"
           >
             <img
-              src="https://scontent.ftpe7-1.fna.fbcdn.net/v/t39.30808-6/240526492_5275758315786731_8370468695684185354_n.png?_nc_cat=100&ccb=1-5&_nc_sid=09cbfe&_nc_ohc=hnRAHh3JjJIAX8Ddsyz&_nc_ht=scontent.ftpe7-1.fna&oh=00_AT_IowAP0zz6LHeQ6VQ8mBPR4hvXBN_xrxaiyzVf0G3rQw&oe=624B6E46"
+              src="https://i.imgur.com/QpMVwqe.png"
               height={120}
               alt="雜學校"
             />
@@ -129,7 +129,7 @@ const Cooperate = () => {
             rel="noreferrer"
           >
             <img
-              src="https://scontent.ftpe7-2.fna.fbcdn.net/v/t39.30808-6/275292567_337143075096566_3344158783595716236_n.png?_nc_cat=104&ccb=1-5&_nc_sid=09cbfe&_nc_ohc=qMtww4eYP5MAX-CsnTw&_nc_ht=scontent.ftpe7-2.fna&oh=00_AT_y9ZHvEdCHzpLx07s63elkrc41zGLkL_94SEqfC4gt3A&oe=624A5BCA"
+              src="https://i.imgur.com/n6GG0vF.png"
               height={120}
               alt="Coding bar"
             />
