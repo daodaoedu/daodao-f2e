@@ -4,6 +4,8 @@
 const fetch = require("node-fetch");
 // import fetch from "node-fetch";
 const siteUrl = process.env.SITE_URL || "https://www.daoedu.tw";
+const { Feed } = require("feed");
+const fs = require("fs");
 
 const CATEGORIES = [
   {
@@ -89,6 +91,32 @@ module.exports = {
     alternateRefs: config.alternateRefs ?? [],
   }),
   additionalPaths: async () => {
+    const siteURL = "https://www.daoedu.tw";
+    const date = new Date();
+    const author = {
+      name: "島島阿學",
+      email: "contact@daoedu.tw",
+      link: "https://www.daoedu.tw",
+    };
+
+    const feed = new Feed({
+      title: "島島阿學",
+      description:
+        "「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
+      id: siteURL,
+      link: siteURL,
+      image: `${siteURL}/preview.webp`,
+      favicon: `${siteURL}/favicon.png`,
+      copyright: `All rights reserved ${date.getFullYear()}, 島島阿學`,
+      updated: date,
+      generator: "Feed for Node.js",
+      feedLinks: {
+        rss2: `${siteURL}/rss/feed.xml`,
+        json: `${siteURL}/rss/feed.json`,
+        atom: `${siteURL}/rss/atom.xml`,
+      },
+      author,
+    });
     const fields = [
       {
         loc: `/`,
@@ -167,6 +195,29 @@ module.exports = {
           lastmod: new Date().toISOString(),
         }))
       );
+
+      (result?.payload?.results ?? []).forEach((item) => {
+        const title = (item?.properties["資源名稱"]?.title ?? []).find(
+          (item) => item?.type === "text"
+        )?.plain_text;
+        const url = `https://www.daoedu.tw/resource/${title}`;
+        const desc = (item?.properties["介紹"]?.rich_text ?? []).find(
+          (item) => item?.type === "text"
+        )?.plain_text;
+        // const desc = item?.properties["介紹"]?.rich_text[0].plain_text;
+        const createdTime = item?.created_time;
+        feed.addItem({
+          title: title,
+          id: url,
+          link: url,
+          description: desc,
+          content: desc,
+          author: [author],
+          contributor: [author],
+          date: new Date(createdTime),
+        });
+      });
+      
       console.log(`${cursor} 的分頁處理完成`);
       if (result?.payload?.has_more) {
         cursor = result?.payload?.next_cursor;
@@ -174,6 +225,12 @@ module.exports = {
       }
       i++;
     }
+    console.log("feed", feed);
+    console.log("feed => ", feed.rss2());
+    fs.mkdirSync("./public/rss", { recursive: true });
+    fs.writeFileSync("./public/rss/feed.xml", feed.rss2());
+    fs.writeFileSync("./public/rss/atom.xml", feed.atom1());
+    fs.writeFileSync("./public/rss/feed.json", feed.json1());
     return fields;
   },
 };

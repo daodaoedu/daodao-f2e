@@ -335,6 +335,7 @@ export const getStaticPaths = async () => {
       fallback: false,
     };
   }
+
   const pathList = [];
   let cursor = undefined;
   for (let i = 0; i <= 0; ) {
@@ -345,18 +346,19 @@ export const getStaticPaths = async () => {
       method: "POST",
       body: JSON.stringify(body),
     }).then((res) => res.json());
-    pathList.push(
-      ...(result?.payload?.results ?? []).map((item) => ({
-        params: {
-          title: (
-            (item?.properties["資源名稱"]?.title ?? []).find(
-              (item) => item?.type === "text"
-            )?.plain_text ?? ""
-          ).trim(),
-          // .replace(/\./g, "%2E"), // or try &#46; reference: https://stackoverflow.com/questions/4938900/how-to-encode-periods-for-urls-in-javascript
-        },
-      }))
-    );
+
+    const batchPathList = (result?.payload?.results ?? []).map((item) => ({
+      params: {
+        title: (
+          (item?.properties["資源名稱"]?.title ?? []).find(
+            (item) => item?.type === "text"
+          )?.plain_text ?? ""
+        ).trim(),
+        // .replace(/\./g, "%2E"), // or try &#46; reference: https://stackoverflow.com/questions/4938900/how-to-encode-periods-for-urls-in-javascript
+      },
+    }));
+    pathList.push(...batchPathList);
+    
     if (result?.payload?.has_more) {
       cursor = result?.payload?.next_cursor;
       continue;
@@ -365,6 +367,7 @@ export const getStaticPaths = async () => {
   }
   console.log("打包長度:", pathList.length);
   console.log("result:", pathList);
+
   return {
     paths: pathList,
     // paths: [{ params: { title: "test" } }], // indicates that no page needs be created at build time
