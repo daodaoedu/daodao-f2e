@@ -94,13 +94,13 @@ module.exports = {
     const siteURL = "https://www.daoedu.tw";
     const date = new Date();
     const author = {
-      name: "島島阿學",
+      name: "島島阿學多元學習社群",
       email: "contact@daoedu.tw",
       link: "https://www.daoedu.tw",
     };
 
     const feed = new Feed({
-      title: "島島阿學",
+      title: "島島阿學多元學習社群",
       description:
         "「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
       id: siteURL,
@@ -208,7 +208,7 @@ module.exports = {
         // const desc = item?.properties["介紹"]?.rich_text[0].plain_text;
         const createdTime = item?.created_time;
         feed.addItem({
-          title: title,
+          title: `${title}的學習資源介紹｜島島阿學`,
           id: url,
           link: url,
           image: image,
