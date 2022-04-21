@@ -6,11 +6,15 @@ import BannerVideo from "../BannerVideo";
 
 const BannerWrapper = styled.section`
   height: var(--section-height);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
 `;
 
 const MainBannerWrapper = styled.div`
   margin: 0 auto 0 auto;
-  padding-top: 20vh;
+  /* padding-top: 20vh; */
 
   .promo-button {
     margin: 0 auto 0 auto;
@@ -20,6 +24,9 @@ const MainBannerWrapper = styled.div`
     width: 80%;
     padding-top: 10vh;
   }
+`;
+
+const SubBannerWrapper = styled.div`
 `;
 
 const Banner = ({ guideRef }) => {
@@ -32,11 +39,7 @@ const Banner = ({ guideRef }) => {
   }, [guideRef]);
 
   return (
-    <Box
-      sx={{
-        position: "relative",
-      }}
-    >
+    <Box>
       <BannerWrapper>
         <MainBannerWrapper>
           <Typography
@@ -68,15 +71,7 @@ const Banner = ({ guideRef }) => {
           </Typography>
           <SearchField />
         </MainBannerWrapper>
-        <Box
-          sx={{
-            // position: "absolute",
-            // bottom: 0,
-            // marginBottom: "70px",
-            width: "100%",
-            marginTop: "25vh",
-          }}
-        >
+        <SubBannerWrapper>
           <Typography
             variant="h3"
             sx={{
@@ -106,7 +101,7 @@ const Banner = ({ guideRef }) => {
               看看大家都學什麼
             </Button>
           </Box>
-        </Box>
+        </SubBannerWrapper>
       </BannerWrapper>
       <BannerVideo />
     </Box>

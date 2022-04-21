@@ -5,7 +5,7 @@ const BannerVideoWrapper = styled.div`
   position: absolute;
   background-color: #172f46;
   width: 100%;
-  height: calc(100vh - 80px);
+  height: calc(100vh);
   overflow: hidden;
   z-index: -1;
   top: 0;
