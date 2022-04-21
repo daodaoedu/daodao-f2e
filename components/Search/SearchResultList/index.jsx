@@ -37,9 +37,9 @@ const List = ({
           queryTags={queryTags}
         />
       ))} */}
-      {list.map((item) =>
+      {list.map((item, index) =>
         isLoading ? (
-          <SkeletonItem key={item.properties["資源名稱"].title[0].plain_text} />
+          <SkeletonItem key={index} />
         ) : (
           <Item
             key={item.properties["資源名稱"].title[0].plain_text}

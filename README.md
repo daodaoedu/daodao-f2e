@@ -16,7 +16,7 @@
 
 ## 主要技術列表
 
-前端版本：React 17
+前端版本：React 18
 前端框架：Next.js  
 API server：Cloudflare worker  
 狀態管理：Redux（Redux-saga）

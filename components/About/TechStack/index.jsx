@@ -67,7 +67,7 @@ const Thanks = () => {
           </p>
         </LineWrapper>
         <LineWrapper variant="p" sx={{ fontWeight: "500" }}>
-          目前專案技術包含：React 17, NEXT.JS 12, MUI, emotion, cloudflare
+          目前專案技術包含：React 18, NEXT.JS 12, MUI, emotion, cloudflare
           services, 🤠 wrangler, Notion, Slack bot
         </LineWrapper>
         <LineWrapper variant="p" sx={{ fontWeight: "500" }}>
