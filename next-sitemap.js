@@ -201,6 +201,7 @@ module.exports = {
           (item) => item?.type === "text"
         )?.plain_text;
         const url = `https://www.daoedu.tw/resource/${title}`;
+        const image = item?.properties["縮圖"]?.files[0]?.name;
         const desc = (item?.properties["介紹"]?.rich_text ?? []).find(
           (item) => item?.type === "text"
         )?.plain_text;
@@ -210,6 +211,7 @@ module.exports = {
           title: title,
           id: url,
           link: url,
+          image: image,
           description: desc,
           content: desc,
           author: [author],
