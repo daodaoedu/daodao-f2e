@@ -225,12 +225,15 @@ module.exports = {
       }
       i++;
     }
-    console.log("feed", feed);
-    console.log("feed => ", feed.rss2());
-    fs.mkdirSync("./public/rss", { recursive: true });
-    fs.writeFileSync("./public/rss/feed.xml", feed.rss2());
-    fs.writeFileSync("./public/rss/atom.xml", feed.atom1());
-    fs.writeFileSync("./public/rss/feed.json", feed.json1());
+    try {
+      fs.mkdirSync("./public/rss", { recursive: true });
+      fs.writeFileSync("./public/rss/feed.xml", feed.rss2());
+      fs.writeFileSync("./public/rss/atom.xml", feed.atom1());
+      fs.writeFileSync("./public/rss/feed.json", feed.json1());
+      console.log('產生RSS成功');
+    } catch(error) {
+      console.log("產生RSS失敗：", error);
+    }
     return fields;
   },
 };
