@@ -96,15 +96,10 @@ const SearchInput = () => {
           },
         });
       }
-      if (!query.q) {
+      else if (keyword.length === 0) {
         delete query.q;
+        push({ query });
       }
-      // else if (event.key === "Enter" && keyword === "") {
-      //   delete query.q;
-      //   push({
-      //     query,
-      //   });
-      // }
     },
     [keyword, push, query]
   );

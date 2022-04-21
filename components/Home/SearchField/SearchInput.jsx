@@ -41,15 +41,19 @@ const SearchInput = () => {
   const { push } = useRouter();
   const handleKeyPress = useCallback(
     (event) => {
-      if (event.key === "Enter" && keyword !== "") {
+      if (event.key === "Enter" && keyword === "") {
+        push(`/search`);
+      } else if (event.key === "Enter" && keyword !== "") {
         push(`/search?q=${keyword}`);
       }
     },
     [keyword, push]
   );
   const onSearch = useCallback(() => {
-    if (keyword !== "") {
-      push(`/search?q=${keyword}`);
+    if (keyword === '') {
+        push(`/search`);
+    } else if (keyword !== "") {
+        push(`/search?q=${keyword}`);
     }
   }, [keyword, push]);
 
