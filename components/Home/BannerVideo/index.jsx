@@ -21,7 +21,7 @@ const BannerVideo = () => {
   return (
     <BannerVideoWrapper>
       <video autoPlay muted loop playsInline preload="auto">
-        <source src="/assets/daodao-banner.mov" type="video/mp4" />
+        <source src="/assets/daodao-banner.webm" type="video/webm" />
       </video>
     </BannerVideoWrapper>
   );
