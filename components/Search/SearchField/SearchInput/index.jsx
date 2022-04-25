@@ -9,6 +9,10 @@ import SearchButton from "./Button";
 // import i18n from "../../../../../constants/i18n";
 // import SuggestList from "./SuggestList";
 
+const FormWrapper = styled.form`
+  width: 100%;
+`;
+
 const SearchInputWrapper = styled(Paper)`
   height: 40px;
   max-width: 1000px;
@@ -133,6 +137,10 @@ const SearchInput = () => {
         width: 400,
       }}
     >
+      <FormWrapper
+        action
+        onSubmit={(e) => e.preventDefault()}
+      >
       <InputBaseWrapper
         type="search"
         inputProps={{ "aria-label": "search learning resources" }}
@@ -140,12 +148,14 @@ const SearchInput = () => {
         name="search_term_string"
         value={keyword}
         onKeyPress={handleKeyPress}
+        placeholder="英語, 心理學, 自主學習 ..."
         onChange={(event) => {
           // setReferenceSelected(null);
           setKeyword(event.target.value);
         }}
         // components={<></>}
       />
+      </FormWrapper>
       {/* <Search
         sx={{
           position: "absolute",

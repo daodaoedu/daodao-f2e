@@ -5,6 +5,11 @@ import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
+// import { FormControl } from "@mui/material";
+
+const FormWrapper = styled.form`
+  width: 100%;
+`;
 
 const SearchInputWrapper = styled(Paper)`
   height: 40px;
@@ -67,26 +72,31 @@ const SearchInput = () => {
         // width: 400,
       }}
     >
-      <InputBase
-        sx={{
-          ml: 1,
-          flex: 1,
-          width: "100%",
-          input: {
+      <FormWrapper
+        action
+        onSubmit={(e) => e.preventDefault()}
+      >
+        <InputBase
+          sx={{
+            ml: 1,
+            flex: 1,
             width: "100%",
-          },
-        }}
-        placeholder="今晚，要不要來點＿＿的學習資源？"
-        inputProps={{ "aria-label": "search learning resources" }}
-        type="search"
-        onChange={(event) => setKeyword(event.target.value)}
-        style={{
-          color: "white",
-          fontWeight: "500",
-          paddingLeft: "5px",
-        }}
-        onKeyPress={handleKeyPress}
-      />
+            input: {
+              width: "100%",
+            },
+          }}
+          placeholder="今晚，要不要來點 ＿＿ 的學習資源？"
+          inputProps={{ "aria-label": "search learning resources" }}
+          type="search"
+          onChange={(event) => setKeyword(event.target.value)}
+          style={{
+            color: "white",
+            fontWeight: "500",
+            paddingLeft: "5px",
+          }}
+          onKeyPress={handleKeyPress}
+        />
+      </FormWrapper>
       <SearchButtonWrapper
         sx={{ p: "10px" }}
         aria-label="search"
