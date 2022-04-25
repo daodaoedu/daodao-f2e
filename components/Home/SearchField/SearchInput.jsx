@@ -44,16 +44,6 @@ const SearchInput = () => {
   // eslint-disable-next-line no-unused-vars
   const [keyword, setKeyword] = useState("");
   const { push } = useRouter();
-  const handleKeyPress = useCallback(
-    (event) => {
-      if (event.key === "Enter" && keyword === "") {
-        push(`/search`);
-      } else if (event.key === "Enter" && keyword !== "") {
-        push(`/search?q=${keyword}`);
-      }
-    },
-    [keyword, push]
-  );
   const onSearch = useCallback(() => {
     if (keyword === '') {
         push(`/search`);
@@ -74,7 +64,14 @@ const SearchInput = () => {
     >
       <FormWrapper
         action
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (keyword === "") {
+            push(`/search`);
+          } else if (keyword !== "") {
+            push(`/search?q=${keyword}`);
+          }
+        }}
       >
         <InputBase
           sx={{
@@ -94,7 +91,6 @@ const SearchInput = () => {
             fontWeight: "500",
             paddingLeft: "5px",
           }}
-          onKeyPress={handleKeyPress}
         />
       </FormWrapper>
       <SearchButtonWrapper

@@ -52,62 +52,6 @@ const SearchInput = () => {
     setKeyword(query?.q ?? "");
   }, [query?.q]);
 
-  // const addSearchHistory = useCallback(
-  //   (word) => {
-  //     if (isServerSide) {
-  //       return [];
-  //     }
-  //     const list =
-  //       JSON.parse(window?.localStorage.getItem("historyKeywords") || null) ||
-  //       [];
-  //     if (keyword !== "") {
-  //       window?.localStorage.setItem(
-  //         "historyKeywords",
-  //         JSON.stringify([
-  //           ...(Array.isArray(list) && list.length > 0 ? list : []),
-  //           {
-  //             id: Array.isArray(list) ? list.length : 0,
-  //             keyword: word,
-  //           },
-  //         ])
-  //       );
-  //     }
-  //     if (Array.isArray(list) && list.length >= 10) {
-  //       window?.localStorage.setItem(
-  //         "historyKeywords",
-  //         JSON.stringify([
-  //           ...(list.length > 0 ? list.slice(1) : []),
-  //           {
-  //             id: list[list.length - 1].id + 1,
-  //             keyword: word,
-  //           },
-  //         ])
-  //       );
-  //     }
-  //     return [];
-  //   },
-  //   [isServerSide, keyword]
-  // );
-
-  // const [isFocus, setIsFocus] = useState(false);
-  const handleKeyPress = useCallback(
-    (event) => {
-      if (event.key === "Enter" && keyword !== "") {
-        push({
-          query: {
-            ...query,
-            q: keyword,
-          },
-        });
-      }
-      else if (keyword.length === 0) {
-        delete query.q;
-        push({ query });
-      }
-    },
-    [keyword, push, query]
-  );
-
   const routingPush = useCallback(
     (words) => {
       if (words !== "") {
@@ -139,7 +83,20 @@ const SearchInput = () => {
     >
       <FormWrapper
         action
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (keyword !== "") {
+            push({
+              query: {
+                ...query,
+                q: keyword,
+              },
+            });
+          } else if (keyword.length === 0) {
+            delete query.q;
+            push({ query });
+          }
+        }}
       >
       <InputBaseWrapper
         type="search"
@@ -147,7 +104,6 @@ const SearchInput = () => {
         id="search_term_string"
         name="search_term_string"
         value={keyword}
-        onKeyPress={handleKeyPress}
         placeholder="英語, 心理學, 自主學習 ..."
         onChange={(event) => {
           // setReferenceSelected(null);
