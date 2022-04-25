@@ -77,7 +77,8 @@ const SearchInput = () => {
           },
         }}
         placeholder="今晚，要不要來點＿＿的學習資源？"
-        inputProps={{ "aria-label": "search google maps" }}
+        inputProps={{ "aria-label": "search learning resources" }}
+        type="search"
         onChange={(event) => setKeyword(event.target.value)}
         style={{
           color: "white",

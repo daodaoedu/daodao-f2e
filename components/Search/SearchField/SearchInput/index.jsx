@@ -134,7 +134,8 @@ const SearchInput = () => {
       }}
     >
       <InputBaseWrapper
-        inputProps={{ "aria-label": "search google maps" }}
+        type="search"
+        inputProps={{ "aria-label": "search learning resources" }}
         id="search_term_string"
         name="search_term_string"
         value={keyword}
@@ -143,6 +144,7 @@ const SearchInput = () => {
           // setReferenceSelected(null);
           setKeyword(event.target.value);
         }}
+        // components={<></>}
       />
       {/* <Search
         sx={{
