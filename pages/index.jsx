@@ -31,8 +31,8 @@ const HomePage = () => {
           url: "https://www.daoedu.tw",
           potentialAction: {
             "@type": "SearchAction",
-            "query-input": "required name=search_term_string",
-            target: "https://www.daoedu.tw/search?q={search_term_string}",
+            "query-input": "required name=q",
+            target: "https://www.daoedu.tw/search?q={q}",
           },
         },
         {

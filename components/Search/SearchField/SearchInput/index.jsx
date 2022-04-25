@@ -82,7 +82,9 @@ const SearchInput = () => {
       }}
     >
       <FormWrapper
-        action
+        action="/search"
+        role="/search"
+        name="search"
         onSubmit={(e) => {
           e.preventDefault();
           if (keyword !== "") {
@@ -98,19 +100,19 @@ const SearchInput = () => {
           }
         }}
       >
-      <InputBaseWrapper
-        type="search"
-        inputProps={{ "aria-label": "search learning resources" }}
-        id="search_term_string"
-        name="search_term_string"
-        value={keyword}
-        placeholder="英語, 心理學, 自主學習 ..."
-        onChange={(event) => {
-          // setReferenceSelected(null);
-          setKeyword(event.target.value);
-        }}
-        // components={<></>}
-      />
+        <InputBaseWrapper
+          type="search"
+          inputProps={{ "aria-label": "search learning resources" }}
+          id="q"
+          name="q"
+          value={keyword}
+          placeholder="英語, 心理學, 自主學習 ..."
+          onChange={(event) => {
+            // setReferenceSelected(null);
+            setKeyword(event.target.value);
+          }}
+          // components={<></>}
+        />
       </FormWrapper>
       {/* <Search
         sx={{

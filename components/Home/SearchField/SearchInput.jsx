@@ -63,7 +63,9 @@ const SearchInput = () => {
       }}
     >
       <FormWrapper
-        action
+        action="/search"
+        role="/search"
+        name="search"
         onSubmit={(e) => {
           e.preventDefault();
           if (keyword === "") {
@@ -82,6 +84,8 @@ const SearchInput = () => {
               width: "100%",
             },
           }}
+          id="q"
+          name="q"
           placeholder="今晚，要不要來點 ＿＿ 的學習資源？"
           inputProps={{ "aria-label": "search learning resources" }}
           type="search"

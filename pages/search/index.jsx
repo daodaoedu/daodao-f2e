@@ -58,33 +58,45 @@ const SearchPage = () => {
       copyright: "島島阿學",
       imgLink: "https://www.daoedu.tw/preview.webp",
       link: `${process.env.HOSTNAME}${router?.asPath}`,
-      structuredData: {
-        "@context": "https://schema.org",
-        "@type": "Course",
-        name: `學習資源列表`,
-        description:
-          "「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
-        // 有cats才能放
-        itemListElement: SEARCH_TAGS[router?.query?.cats ?? "語言與文學"].map(
-          (tagName, index) => ({
-            "@type": "ListItem",
-            position: index + 1,
-            item: {
-              "@id": `https://www.daoedu.tw/search?cats=${
-                router?.query?.cats ?? "語言與文學"
-              }&tags=${tagName}`,
-              name: `${tagName}的${
-                router?.query?.cats ?? "語言與文學"
-              }學習資源列表`,
-            },
-          })
-        ),
-        provider: {
-          "@type": "Organization",
-          name: "島島阿學",
-          sameAs: "https://www.daoedu.tw",
+      structuredData: [
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          name: `學習資源列表`,
+          description:
+            "「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
+          // 有cats才能放
+          itemListElement: SEARCH_TAGS[router?.query?.cats ?? "語言與文學"].map(
+            (tagName, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              item: {
+                "@id": `https://www.daoedu.tw/search?cats=${
+                  router?.query?.cats ?? "語言與文學"
+                }&tags=${tagName}`,
+                name: `${tagName}的${
+                  router?.query?.cats ?? "語言與文學"
+                }學習資源列表`,
+              },
+            })
+          ),
+          provider: {
+            "@type": "Organization",
+            name: "島島阿學",
+            sameAs: "https://www.daoedu.tw",
+          },
         },
-      },
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          url: "https://www.daoedu.tw/search",
+          potentialAction: {
+            "@type": "SearchAction",
+            "query-input": "required name=q",
+            target: "https://www.daoedu.tw/search?q={q}",
+          },
+        },
+      ],
     }),
     [router?.asPath, router?.query, title]
   );
