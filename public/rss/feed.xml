@@ -4,7 +4,7 @@
         <title>島島阿學多元學習社群</title>
         <link>https://www.daoedu.tw</link>
         <description>「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。</description>
-        <lastBuildDate>Thu, 21 Apr 2022 06:27:30 GMT</lastBuildDate>
+        <lastBuildDate>Mon, 25 Apr 2022 14:05:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Feed for Node.js</generator>
         <image>
@@ -13,6 +13,26 @@
             <link>https://www.daoedu.tw</link>
         </image>
         <copyright>All rights reserved 2022, 島島阿學</copyright>
+        <item>
+            <title><![CDATA[小課旅-創新素養教育的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/小課旅-創新素養教育</link>
+            <guid>https://www.daoedu.tw/resource/小課旅-創新素養教育</guid>
+            <pubDate>Thu, 21 Apr 2022 10:35:00 GMT</pubDate>
+            <description><![CDATA[讓小孩上課就像在旅行，
+打開課本就看到了世界！
+用創新的課程設計翻轉教育現場教材，
+打開孩子對世界探索的渴望、
+做師培生的共備學習社群、
+也做現場老師的備課靠山。(簡介摘自粉絲專頁https://reurl.cc/55oDlV)]]></description>
+            <content:encoded><![CDATA[讓小孩上課就像在旅行，
+打開課本就看到了世界！
+用創新的課程設計翻轉教育現場教材，
+打開孩子對世界探索的渴望、
+做師培生的共備學習社群、
+也做現場老師的備課靠山。(簡介摘自粉絲專頁https://reurl.cc/55oDlV)]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/vujQaHw.png" length="0" type="image/png"/>
+        </item>
         <item>
             <title><![CDATA[國家漫畫博物館籌備小隊的學習資源介紹｜島島阿學]]></title>
             <link>https://www.daoedu.tw/resource/國家漫畫博物館籌備小隊</link>

@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://www.daoedu.tw</id>
     <title>島島阿學多元學習社群</title>
-    <updated>2022-04-21T06:27:30.737Z</updated>
+    <updated>2022-04-25T14:05:00.360Z</updated>
     <generator>Feed for Node.js</generator>
     <author>
         <name>島島阿學多元學習社群</name>
@@ -15,6 +15,34 @@
     <logo>https://www.daoedu.tw/preview.webp</logo>
     <icon>https://www.daoedu.tw/favicon.png</icon>
     <rights>All rights reserved 2022, 島島阿學</rights>
+    <entry>
+        <title type="html"><![CDATA[小課旅-創新素養教育的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/小課旅-創新素養教育</id>
+        <link href="https://www.daoedu.tw/resource/小課旅-創新素養教育"/>
+        <updated>2022-04-21T10:35:00.000Z</updated>
+        <summary type="html"><![CDATA[讓小孩上課就像在旅行，
+打開課本就看到了世界！
+用創新的課程設計翻轉教育現場教材，
+打開孩子對世界探索的渴望、
+做師培生的共備學習社群、
+也做現場老師的備課靠山。(簡介摘自粉絲專頁https://reurl.cc/55oDlV)]]></summary>
+        <content type="html"><![CDATA[讓小孩上課就像在旅行，
+打開課本就看到了世界！
+用創新的課程設計翻轉教育現場教材，
+打開孩子對世界探索的渴望、
+做師培生的共備學習社群、
+也做現場老師的備課靠山。(簡介摘自粉絲專頁https://reurl.cc/55oDlV)]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
     <entry>
         <title type="html"><![CDATA[國家漫畫博物館籌備小隊的學習資源介紹｜島島阿學]]></title>
         <id>https://www.daoedu.tw/resource/國家漫畫博物館籌備小隊</id>
