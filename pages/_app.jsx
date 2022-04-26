@@ -10,6 +10,7 @@ import { initGA, logPageView } from "../utils/analytics";
 import { useRouter } from "next/router";
 import Script from "next/script";
 import Mode from '../shared/components/Mode';
+import "regenerator-runtime/runtime"; // Speech.js
 
 const store = storeFactory();
 

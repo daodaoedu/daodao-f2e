@@ -1,26 +1,31 @@
 import React, { useState, useCallback } from "react";
-import { IconButton } from "@mui/material";
+import { IconButton, Box } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import MicIcon from "@mui/icons-material/Mic";
 import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
+import Speech from '../../../shared/components/Speech';
+
 // import { FormControl } from "@mui/material";
 
 const FormWrapper = styled.form`
   width: 100%;
 `;
 
-const SearchInputWrapper = styled(Paper)`
-  height: 40px;
-  width: 100%;
-  padding-top: 10px;
-  padding-bottom: 10px;
+const SearchToolsWrapper = styled(Box)`
   position: relative;
+  height: 40px;
+  margin-left: auto;
+  margin-right: 5px;
+  display: flex;
+`;
+
+const SearchInputWrapper = styled(Paper)`
   border-radius: 10px;
   border: #ffefef solid 1px;
   background-color: transparent;
-
   /* @media (max-width: 768px) {
     width: 80%;
     margin: 0 auto;
@@ -28,12 +33,13 @@ const SearchInputWrapper = styled(Paper)`
 `;
 
 const SearchButtonWrapper = styled(IconButton)`
-  position: absolute;
+  /* position: absolute; */
   overflow: hidden;
   color: white;
   border-radius: 10px;
+  float: right;
   height: 100%;
-  width: 60px;
+  width: 40px;
   right: 0;
   &:hover {
     /* background-color: #007bbb; */
@@ -43,6 +49,7 @@ const SearchButtonWrapper = styled(IconButton)`
 const SearchInput = () => {
   // eslint-disable-next-line no-unused-vars
   const [keyword, setKeyword] = useState("");
+  const [isSpeechMode, setIsSpeechMode] = useState(false);
   const { push } = useRouter();
   const onSearch = useCallback(() => {
     if (keyword === '') {
@@ -97,13 +104,25 @@ const SearchInput = () => {
           }}
         />
       </FormWrapper>
-      <SearchButtonWrapper
-        sx={{ p: "10px" }}
-        aria-label="search"
-        onClick={onSearch}
-      >
-        <SearchIcon />
-      </SearchButtonWrapper>
+      {isSpeechMode && (
+        <Speech lang="zh-tw" setIsSpeechMode={setIsSpeechMode} />
+      )}
+      <SearchToolsWrapper>
+        <SearchButtonWrapper
+          sx={{ p: "5px" }}
+          aria-label="speach"
+          onClick={() => setIsSpeechMode(true)}
+        >
+          <MicIcon />
+        </SearchButtonWrapper>
+        <SearchButtonWrapper
+          sx={{ p: "5px" }}
+          aria-label="search"
+          onClick={onSearch}
+        >
+          <SearchIcon />
+        </SearchButtonWrapper>
+      </SearchToolsWrapper>
     </SearchInputWrapper>
   );
 };
