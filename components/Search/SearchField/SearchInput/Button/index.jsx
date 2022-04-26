@@ -5,12 +5,10 @@ import styled from "@emotion/styled";
 
 const SearchButtonWrapper = styled(IconButton)`
   overflow: hidden;
-  /* background-color: #16b9b3; */
   color: #16b9b3;
   width: 40px;
   height: 100%;
   right: 0;
-  z-index: 10;
   border-radius: 0;
   padding: 10px;
 

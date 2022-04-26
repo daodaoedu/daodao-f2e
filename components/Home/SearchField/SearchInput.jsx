@@ -6,8 +6,10 @@ import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
-import Speech from '../../../shared/components/Speech';
-
+import dynamic from "next/dynamic";
+const Speech = dynamic(import("../../../shared/components/Speech"), {
+  ssr: false,
+});
 // import { FormControl } from "@mui/material";
 
 const FormWrapper = styled.form`

@@ -8,9 +8,12 @@ import { useRouter } from "next/router";
 import SearchButton from "./Button";
 // import i18n from "../../../../../constants/i18n";
 // import SuggestList from "./SuggestList";
-import Speech from '../../../../shared/components/Speech';
 import { IconButton, Box } from "@mui/material";
 import MicIcon from "@mui/icons-material/Mic";
+import dynamic from "next/dynamic";
+const Speech = dynamic(import("../../../../shared/components/Speech"), {
+  ssr: false,
+});
 
 const SearchToolsWrapper = styled(Box)`
   position: relative;
