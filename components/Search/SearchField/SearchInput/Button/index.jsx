@@ -4,23 +4,24 @@ import SearchIcon from "@mui/icons-material/Search";
 import styled from "@emotion/styled";
 
 const SearchButtonWrapper = styled(IconButton)`
-  position: absolute;
   overflow: hidden;
-  background-color: #16b9b3;
-  color: white;
-  width: 80px;
+  /* background-color: #16b9b3; */
+  color: #16b9b3;
+  width: 40px;
   height: 100%;
   right: 0;
   z-index: 10;
   border-radius: 0;
+  padding: 10px;
 
   &:hover {
-    background-color: #16b9b3;
-    opacity: 0.8;
-    transition: opacity 0.5s;
+    background-color: white;
+    /* opacity: 0.8;
+    transition: opacity 0.5s; */
   }
   @media (max-width: 767px) {
-    width: 60px;
+    width: 40px;
+    padding: 0px;
     /* border-radius: 20px; */
   }
 `;
@@ -31,7 +32,6 @@ const SearchButton = ({ routingPush }) => (
       routingPush();
       // addSearchHistory();
     }}
-    sx={{ p: "10px" }}
     aria-label="search"
   >
     <SearchIcon />

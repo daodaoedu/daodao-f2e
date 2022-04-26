@@ -110,7 +110,7 @@ const SearchInput = () => {
       <SearchToolsWrapper>
         <SearchButtonWrapper
           sx={{ p: "5px" }}
-          aria-label="speach"
+          aria-label="speech"
           onClick={() => setIsSpeechMode(true)}
         >
           <MicIcon />

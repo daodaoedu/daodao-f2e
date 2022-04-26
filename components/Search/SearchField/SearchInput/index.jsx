@@ -8,6 +8,32 @@ import { useRouter } from "next/router";
 import SearchButton from "./Button";
 // import i18n from "../../../../../constants/i18n";
 // import SuggestList from "./SuggestList";
+import Speech from '../../../../shared/components/Speech';
+import { IconButton, Box } from "@mui/material";
+import MicIcon from "@mui/icons-material/Mic";
+
+const SearchToolsWrapper = styled(Box)`
+  position: relative;
+  height: 40px;
+  margin-left: auto;
+  margin-right: 5px;
+  display: flex;
+`;
+
+const SearchButtonWrapper = styled(IconButton)`
+  /* position: absolute; */
+  overflow: hidden;
+  color: white;
+  border-radius: 10px;
+  float: right;
+  height: 100%;
+  width: 40px;
+  right: 0;
+  &:hover {
+    /* background-color: #007bbb; */
+  }
+`;
+
 
 const FormWrapper = styled.form`
   width: 100%;
@@ -46,6 +72,7 @@ const SearchInput = () => {
   const { query, push } = useRouter();
   // const isServerSide = useMemo(() => !process.browser, []);
   const [keyword, setKeyword] = useState(query?.q);
+  const [isSpeechMode, setIsSpeechMode] = useState(false);
   // const [referenceSelected, setReferenceSelected] = useState(null);
 
   useEffect(() => {
@@ -72,7 +99,6 @@ const SearchInput = () => {
   );
 
   return (
-    // <ClickAwayListener>
     <SearchInputWrapper
       sx={{
         p: "2px 4px",
@@ -114,31 +140,20 @@ const SearchInput = () => {
           // components={<></>}
         />
       </FormWrapper>
-      {/* <Search
-        sx={{
-          position: "absolute",
-          left: "12px",
-          top: "20%",
-          color: "#37b9eb",
-          zIndex: 15,
-          // transform: "translate(0,-25%)",
-        }}
-      /> */}
-      <SearchButton
-        routingPush={() => routingPush(keyword)}
-        // addSearchHistory={() =>
-        //   addSearchHistory(referenceList[referenceSelected] || keyword)
-        // }
-      />
-
-      {/* <SuggestList
-          isFocus={isFocus}
-          keyword={keyword}
-          addSearchHistory={addSearchHistory}
-          referenceSelected={referenceSelected}
-        /> */}
+      {isSpeechMode && (
+        <Speech lang="zh-tw" setIsSpeechMode={setIsSpeechMode} />
+      )}
+      <SearchToolsWrapper>
+        <SearchButtonWrapper
+          sx={{ p: "5px", color: "#16b9b3" }}
+          aria-label="speech"
+          onClick={() => setIsSpeechMode(true)}
+        >
+          <MicIcon sx={{ color: "#16b9b3" }} />
+        </SearchButtonWrapper>
+        <SearchButton routingPush={() => routingPush(keyword)} />
+      </SearchToolsWrapper>
     </SearchInputWrapper>
-    // </ClickAwayListener>
   );
 };
 
