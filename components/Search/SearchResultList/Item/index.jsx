@@ -18,7 +18,7 @@ const ItemWrapper = styled.li`
   border-bottom: 1px solid rgba(168, 168, 168, 0.3);
 `;
 
-const ContentWrapper = styled.div`
+const ContentWrapper = styled.article`
   width: calc(100% - 200px);
   padding: 0 10px;
   margin-left: 20px;

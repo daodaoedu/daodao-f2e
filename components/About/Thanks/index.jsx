@@ -7,13 +7,14 @@ const LineWrapper = styled(Typography)`
   margin: 5px 0;
 `;
 
+const SectionWrapper = styled.section`
+  margin: 20px 0;
+`;
+
+
 const Thanks = () => {
   return (
-    <Box
-      sx={{
-        margin: "20px 0",
-      }}
-    >
+    <SectionWrapper>
       <Typography
         variant="h2"
         sx={{
@@ -36,7 +37,7 @@ const Thanks = () => {
           g0v零時小學校, 柯君翰, 高婷柔, 向恩霈, 詹喬智, 米苔目, 王玠堯, Ael
         </LineWrapper>
       </Stack>
-    </Box>
+    </SectionWrapper>
   );
 };
 

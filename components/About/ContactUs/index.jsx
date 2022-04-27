@@ -3,6 +3,10 @@ import styled from "@emotion/styled";
 // import { css } from "@emotion/react";
 import { Box, Paper, Typography, Stack, Avatar } from "@mui/material";
 
+const ContactUsWrapper = styled.address`
+  margin: 20px 0;
+`;
+
 const LinkWrapper = styled.a`
   color: black;
   &:hover {
@@ -18,11 +22,7 @@ const LineWrapper = styled(Typography)`
 
 const ContactUs = () => {
   return (
-    <Box
-      sx={{
-        margin: "20px 0",
-      }}
-    >
+    <ContactUsWrapper>
       <Typography
         variant="h2"
         sx={{
@@ -60,11 +60,13 @@ const ContactUs = () => {
             href={"mailto:contact@daoedu.tw"}
             rel="noopener noreferrer"
           >
-            🏝️ 島島阿學的信箱 – contact@daoedu.tw
+            🏝️ 島島阿學的信箱 –{" "}
+            contact@daoedu.tw
+            <br></br>
           </LinkWrapper>
         </LineWrapper>
       </Stack>
-    </Box>
+    </ContactUsWrapper>
   );
 };
 

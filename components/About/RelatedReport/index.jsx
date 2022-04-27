@@ -12,17 +12,18 @@ const LinkWrapper = styled.a`
   }
 `;
 
+const SectionWrapper = styled.section`
+  margin: 20px 0;
+`;
+
+
 const LineWrapper = styled(Typography)`
   margin: 5px 0;
 `;
 
 const RelatedReport = () => {
   return (
-    <Box
-      sx={{
-        margin: "20px 0",
-      }}
-    >
+    <SectionWrapper>
       <Typography
         variant="h2"
         sx={{
@@ -80,7 +81,7 @@ const RelatedReport = () => {
           </LinkWrapper>
         </LineWrapper>
       </Stack>
-    </Box>
+    </SectionWrapper>
   );
 };
 

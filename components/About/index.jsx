@@ -13,7 +13,7 @@ import ContactUs from "./ContactUs";
 import TechStack from "./TechStack";
 import Cooperate from "./Cooperate";
 
-const AboutWrapper = styled.section`
+const AboutWrapper = styled.main`
   padding-top: 40px;
   padding-bottom: 40px;
   .title {

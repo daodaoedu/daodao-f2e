@@ -12,7 +12,14 @@ import toast from "react-hot-toast";
 import Shares from "./Shares";
 import appendQuery from "append-query";
 
-const ResourceWrapper = styled(Paper)`
+const ResourceWrapper = styled.article`
+  background-color: #fff;
+  color: rgba(0, 0, 0, 0.87);
+  box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%),
+    0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
+  -webkit-transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  border-radius: 4px;
   margin: 50px auto;
   padding: 10px;
   width: 80%;
@@ -68,7 +75,7 @@ const ImageWrapper = styled.div`
 
 const Resource = ({ data, title, desc, image, tags, feeTags, link }) => {
   const router = useRouter();
-  const isLoading = useMemo(() => !data, [data]);
+  // const isLoading = useMemo(() => !data, [data]);
   const [disqusConfig, setDisqusConfig] = useState({});
   useEffect(() => {
     if (router.isReady) {
@@ -112,6 +119,7 @@ const Resource = ({ data, title, desc, image, tags, feeTags, link }) => {
         sx={{
           display: "flex",
           alignItems: "center",
+          whiteSpace: "nowrap",
         }}
       >
         <Box
@@ -128,6 +136,7 @@ const Resource = ({ data, title, desc, image, tags, feeTags, link }) => {
         sx={{
           display: "flex",
           alignItems: "center",
+          whiteSpace: "nowrap",
         }}
       >
         <Box
@@ -143,6 +152,7 @@ const Resource = ({ data, title, desc, image, tags, feeTags, link }) => {
         sx={{
           display: "flex",
           alignItems: "center",
+          whiteSpace: "nowrap",
         }}
       >
         <Box
@@ -158,6 +168,7 @@ const Resource = ({ data, title, desc, image, tags, feeTags, link }) => {
         sx={{
           display: "flex",
           alignItems: "center",
+          whiteSpace: "nowrap",
         }}
       >
         <Box
@@ -173,6 +184,7 @@ const Resource = ({ data, title, desc, image, tags, feeTags, link }) => {
         sx={{
           display: "flex",
           alignItems: "center",
+          whiteSpace: "nowrap",
         }}
       >
         <Box
