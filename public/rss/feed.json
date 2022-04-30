@@ -11,6 +11,71 @@
     },
     "items": [
         {
+            "id": "https://www.daoedu.tw/resource/atomic design by brad frost",
+            "content_html": "Learn how to create and maintain digital design systems, allowing your team to roll out higher quality, more consistent UIs faster than ever before.",
+            "url": "https://www.daoedu.tw/resource/atomic design by brad frost",
+            "title": "atomic design by brad frost的學習資源介紹｜島島阿學",
+            "summary": "Learn how to create and maintain digital design systems, allowing your team to roll out higher quality, more consistent UIs faster than ever before.",
+            "image": "http://atomicdesign.bradfrost.com/images/social-card.jpg",
+            "date_modified": "2022-04-30T10:43:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/blush design",
+            "content_html": "Blush makes it easy to add free illustrations to your designs. Play with fully customizable graphics made by artists across the globe.（From website）",
+            "url": "https://www.daoedu.tw/resource/blush design",
+            "title": "blush design的學習資源介紹｜島島阿學",
+            "summary": "Blush makes it easy to add free illustrations to your designs. Play with fully customizable graphics made by artists across the globe.（From website）",
+            "image": "https://blush.design/og-image.png",
+            "date_modified": "2022-04-30T10:38:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/wolframalpha",
+            "content_html": "Wolfram Alpha是由 Wolfram Research 公司推出的一款在線自動問答系統。其特色是可以直接向用戶返回答案，而不是像傳統搜索引擎一樣提供一系列可能含有用戶所需答案的相關網頁。它是基於 Wolfram 早期旗艦產品 Mathematica，一款囊括了計算機代數、符號和數值計算、可視化和統計功能的計算平台和工具包開發的。其數據來源包括學術網站和出版物、商業網站和公司、科學機構等等，例如中央情報局出版物《世界概況》、康奈爾大學圖書館出版物《All About Birds》、《Chambers Biographical Dictionary》、道瓊斯公司、Catalogue of Life （頁面存檔備份，存於互聯網檔案館）、 CrunchBase、百思買 、美國聯邦航空管理局、美國地質調查局等。（轉自維基百科）",
+            "url": "https://www.daoedu.tw/resource/wolframalpha",
+            "title": "wolframalpha的學習資源介紹｜島島阿學",
+            "summary": "Wolfram Alpha是由 Wolfram Research 公司推出的一款在線自動問答系統。其特色是可以直接向用戶返回答案，而不是像傳統搜索引擎一樣提供一系列可能含有用戶所需答案的相關網頁。它是基於 Wolfram 早期旗艦產品 Mathematica，一款囊括了計算機代數、符號和數值計算、可視化和統計功能的計算平台和工具包開發的。其數據來源包括學術網站和出版物、商業網站和公司、科學機構等等，例如中央情報局出版物《世界概況》、康奈爾大學圖書館出版物《All About Birds》、《Chambers Biographical Dictionary》、道瓊斯公司、Catalogue of Life （頁面存檔備份，存於互聯網檔案館）、 CrunchBase、百思買 、美國聯邦航空管理局、美國地質調查局等。（轉自維基百科）",
+            "image": "https://www.wolframalpha.com/_next/static/images/share_3eSzXbxb.png",
+            "date_modified": "2022-04-30T10:34:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/aha",
+            "content_html": "Aha 是一家來自矽谷和紐約的新創軟體公司，由來自Stanford 史丹佛和 MIT 麻省理工學院的校友共同創立。我們的創辦人、投資者與顧問團隊擁有科技業、金融和管理諮詢的豐富經歷，致力創造非凡的軟體解決全球用戶的問題！我們正在打造 defi 產業的第一個 learn-to-earn 教育銀行，為 Z 世代的學生們推出 NFT-Crypto 錢包服務。在Aha線上英文平台，學生們不只可運用人工智慧、數據分析及客製化功能有效準備英文檢定及歐美升學考試（如 SAT, GMAT, TOEIC, IELTS, TOEFL...等），還能在過程中賺取學習代幣。（截自104）",
+            "url": "https://www.daoedu.tw/resource/aha",
+            "title": "aha的學習資源介紹｜島島阿學",
+            "summary": "Aha 是一家來自矽谷和紐約的新創軟體公司，由來自Stanford 史丹佛和 MIT 麻省理工學院的校友共同創立。我們的創辦人、投資者與顧問團隊擁有科技業、金融和管理諮詢的豐富經歷，致力創造非凡的軟體解決全球用戶的問題！我們正在打造 defi 產業的第一個 learn-to-earn 教育銀行，為 Z 世代的學生們推出 NFT-Crypto 錢包服務。在Aha線上英文平台，學生們不只可運用人工智慧、數據分析及客製化功能有效準備英文檢定及歐美升學考試（如 SAT, GMAT, TOEIC, IELTS, TOEFL...等），還能在過程中賺取學習代幣。（截自104）",
+            "image": "https://avl-images.s3.ap-south-1.amazonaws.com/perfectscore-landing/psl-slide7.png",
+            "date_modified": "2022-04-28T11:46:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/parrottalks抄筆記",
+            "content_html": "面對全民英檢、TOEIC及TOEFL等測驗，ParrotTalks 利用大腦的記憶原理，為您量身打造學習時程，幫助您用最有效率的方式，牢記最多的單字。依照您預計的完成日期，我們為您規劃每天的課程。每天的課程分為知新以及溫故兩階段：在知新階段，您將學習ㄧ些新單字。在溫故階段，系統呈現給您當日最需要複習的單字。（轉自官方網站）",
+            "url": "https://www.daoedu.tw/resource/parrottalks抄筆記",
+            "title": "parrottalks抄筆記的學習資源介紹｜島島阿學",
+            "summary": "面對全民英檢、TOEIC及TOEFL等測驗，ParrotTalks 利用大腦的記憶原理，為您量身打造學習時程，幫助您用最有效率的方式，牢記最多的單字。依照您預計的完成日期，我們為您規劃每天的課程。每天的課程分為知新以及溫故兩階段：在知新階段，您將學習ㄧ些新單字。在溫故階段，系統呈現給您當日最需要複習的單字。（轉自官方網站）",
+            "image": "https://www.parrottalks.com/image/share.png",
+            "date_modified": "2022-04-28T11:08:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
             "id": "https://www.daoedu.tw/resource/小課旅-創新素養教育",
             "content_html": "讓小孩上課就像在旅行，\n打開課本就看到了世界！\n用創新的課程設計翻轉教育現場教材，\n打開孩子對世界探索的渴望、\n做師培生的共備學習社群、\n也做現場老師的備課靠山。(簡介摘自粉絲專頁https://reurl.cc/55oDlV)",
             "url": "https://www.daoedu.tw/resource/小課旅-創新素養教育",
