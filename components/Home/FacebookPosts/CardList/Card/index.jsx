@@ -62,12 +62,16 @@ const BackgroundWrapper = styled.div`
   `}
 `;
 
-const Card = ({ id, message, date, title, link }) => {
+const Card = ({ id, message, date, title, link, type }) => {
   const router = useRouter();
   return (
     <CardWrapper
-      onClick={() =>
-        window.open(link, "_target")
+      onClick={() => window.open(
+            `https://www.facebook.com/${id.split("_")[0]}/posts/${
+              id.split("_")[1]
+            }`,
+            "_target"
+          )
       }
     >
       <Box
