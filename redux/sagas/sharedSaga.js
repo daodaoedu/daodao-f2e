@@ -3,12 +3,11 @@ import { put, call, takeEvery } from "redux-saga/effects";
 function* getFacebookGroupPost(action) {
   const { numOfPosts } = action.payload;
   const URL = `https://api.daoedu.tw/facebook/group/posts/${
-    numOfPosts || 5
+    numOfPosts || 6
   }`;
   try {
     const result = yield fetch(URL, {
-      method: "POST",
-      body: JSON.stringify(body),
+      method: "GET",
     }).then((res) => res.json());
     yield put({
       type: "GET_FACEBOOK_GROUP_POST_SUCCESS",
@@ -21,11 +20,10 @@ function* getFacebookGroupPost(action) {
 
 function* getFacebookFansPagePost(action) {
   const { numOfPosts } = action.payload;
-  const URL = `https://api.daoedu.tw/facebook/fanspage/posts/${numOfPosts || 5}`;
+  const URL = `https://api.daoedu.tw/facebook/fanspage/posts/${numOfPosts || 6}`;
   try {
     const result = yield fetch(URL, {
-      method: "POST",
-      body: JSON.stringify(body),
+      method: "GET",
     }).then((res) => res.json());
     yield put({
       type: "GET_FACEBOOK_FANSPAGE_POST_SUCCESS",
