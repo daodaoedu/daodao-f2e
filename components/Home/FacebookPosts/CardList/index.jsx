@@ -1,12 +1,8 @@
-import { useRef, useEffect } from "react";
+import React from "react";
 import styled from "@emotion/styled";
-// import { css } from "@emotion/react";
-// import { slideInUp } from "../../../../shared/styles/animation";
 import Card from "./Card";
-import { useSelector, useDispatch } from "react-redux";
-import { getFacebookFansPagePost, getFacebookGroupPost } from '../../../../redux/actions/shared';
 import { Box } from "@mui/material";
-// import useIntersectionObserver from "../../../../hooks/useIntersectionObserver";
+import Marquee from "react-fast-marquee";
 
 const CardListWrapper = styled.ul`
   display: flex;
@@ -25,6 +21,7 @@ const SubHeaderWrapper = styled.h3`
   font-size: 20px;
   color: #536166;
   font-weight: bold;
+  margin-bottom: 10px;
    @media (max-width: 767px) {
     display: flex;
     flex-direction: column;
@@ -32,52 +29,29 @@ const SubHeaderWrapper = styled.h3`
 `;
 
 
-const CardList = () => {
-  const dispatch = useDispatch();
-  const { groupPosts, fanpagesPosts } = useSelector((state) => state?.shared);
-  // const [isShow, setIsShow] = useState(false);
-  // useIntersectionObserver({
-  //   onIntersect: () => setIsShow(true),
-  //   target: trigger,
-  // });
-
-  useEffect(() => {
-    dispatch(getFacebookFansPagePost(6));
-    dispatch(getFacebookGroupPost(6));
-  }, [dispatch]);
-
+const CardList = ({ title, list, direction = "left" }) => {
   return (
     <Box>
-      <Box>
-        <SubHeaderWrapper>粉絲專頁</SubHeaderWrapper>
+      <SubHeaderWrapper>{title}</SubHeaderWrapper>
+      <Marquee
+        // gradient={false}
+        gradientWidth={50}
+        delay={3}
+        pauseOnHover
+        direction={direction}
+      >
         <CardListWrapper>
-          {fanpagesPosts.map(({ id, message, created_time }) => (
+          {list.map(({ id, message, created_time, updated_time }) => (
             <Card
               key={id}
               id={id}
               message={message}
-              date={created_time}
-              title="粉絲專頁"
-              link="https://www.facebook.com/daodao.edu"
+              date={created_time ?? updated_time}
+              title={title}
             />
           ))}
         </CardListWrapper>
-      </Box>
-      <Box sx={{ marginTop: "20px" }}>
-        <SubHeaderWrapper>學習社群</SubHeaderWrapper>
-        <CardListWrapper>
-          {groupPosts.map(({ id, message, created_time }) => (
-            <Card
-              key={id}
-              id={id}
-              message={message}
-              date={created_time}
-              title="學習社群"
-              link="https://www.facebook.com/groups/2237666046370459"
-            />
-          ))}
-        </CardListWrapper>
-      </Box>
+      </Marquee>
     </Box>
   );
 };

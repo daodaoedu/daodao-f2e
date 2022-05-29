@@ -1,7 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "@emotion/styled";
 import Box from "@mui/material/Box";
 import CardList from "./CardList";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  getFacebookFansPagePost,
+  getFacebookGroupPost,
+} from "../../../redux/actions/shared";
 
 const GuideWrapper = styled.div`
   width: 90%;
@@ -24,11 +29,22 @@ const GuideWrapper = styled.div`
 `;
 
 const Guide = () => {
+  const dispatch = useDispatch();
+  const { groupPosts, fanpagesPosts } = useSelector((state) => state?.shared);
+
+  useEffect(() => {
+    dispatch(getFacebookFansPagePost(7));
+    dispatch(getFacebookGroupPost(7));
+  }, [dispatch]);
+
   return (
     <GuideWrapper>
       <h2 className="guide-title">最新貼文</h2>
       <Box sx={{ marginTop: "20px" }}>
-        <CardList />
+        <CardList title="📌 粉絲專頁" list={fanpagesPosts} direction="left" />
+      </Box>
+      <Box sx={{ marginTop: "20px" }}>
+        <CardList title="📌 社群貼文" list={groupPosts} direction="right" />
       </Box>
     </GuideWrapper>
   );

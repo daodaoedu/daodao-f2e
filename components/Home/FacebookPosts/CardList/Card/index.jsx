@@ -2,7 +2,8 @@ import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import { slideInUp } from "../../../../../shared/styles/animation";
 import { useRouter } from "next/router";
-import { Box, Typography } from "@mui/material";
+import { Box, Tooltip, Typography } from "@mui/material";
+import dayjs from "dayjs";
 
 const CardWrapper = styled.li`
   position: relative;
@@ -42,6 +43,7 @@ const ContentWrapper = styled.p`
   -webkit-line-clamp: 2;
   overflow: hidden;
   white-space: pre-wrap;
+  font-size: 12px;
 `;
 
 const BackgroundWrapper = styled.div`
@@ -62,30 +64,34 @@ const BackgroundWrapper = styled.div`
   `}
 `;
 
-const Card = ({ id, message, date, title, link, type }) => {
+const Card = ({ id, message = "", date, title, link, type }) => {
   const router = useRouter();
   return (
-    <CardWrapper
-      onClick={() => window.open(
+    <Tooltip title={message.slice(0, 150)}>
+      <CardWrapper
+        onClick={() =>
+          window.open(
             `https://www.facebook.com/${id.split("_")[0]}/posts/${
               id.split("_")[1]
             }`,
             "_target"
           )
-      }
-    >
-      <Box
-        sx={{
-          // border: "1px solid #16b9b3",
-          // borderRadius: '10px'
-          fontWeight: "bold",
-        }}
+        }
       >
-        {title}
-      </Box>
-      <ContentWrapper>{message}</ContentWrapper>
-      {/* <Typography sx={{ color: "#16b9b3" }}>{message}</Typography> */}
-    </CardWrapper>
+        <Box
+          sx={{
+            // border: "1px solid #16b9b3",
+            // borderRadius: '10px'
+            fontWeight: "bold",
+          }}
+        >
+          {/* {title} */}
+          時間：{dayjs(date).format("YYYY/MM/DD")}
+        </Box>
+        <ContentWrapper>{message}</ContentWrapper>
+        {/* <Typography sx={{ color: "#16b9b3" }}>{message}</Typography> */}
+      </CardWrapper>
+    </Tooltip>
   );
 };
 

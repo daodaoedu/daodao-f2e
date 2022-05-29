@@ -48,6 +48,7 @@ const SearchInputWrapper = styled(Paper)`
   width: 80%;
   position: relative;
   border-radius: 10px;
+  // 可以試著淡化border
   border: 2px solid #16b9b3;
   box-shadow: none;
   overflow: hidden;
