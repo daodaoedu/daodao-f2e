@@ -15,18 +15,13 @@ const CardWrapper = styled.li`
   padding: 10px;
   color: #16b9b3;
   border: 2px #16b9b3 solid;
+  overflow: hidden;
 
   cursor: pointer;
   object-fit: cover;
   &:hover {
     transform: scale(1.05);
     transition: transform 0.4s;
-  }
-
-  @media (max-width: 767px) {
-    width: 80vw;
-    height: 120px;
-    flex: 0 0 120px;
   }
 `;
 

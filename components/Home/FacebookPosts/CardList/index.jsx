@@ -11,10 +11,6 @@ const CardListWrapper = styled.ul`
   overflow-x: scroll;
   scroll-behavior: smooth;
 
-  @media (max-width: 767px) {
-    display: flex;
-    flex-direction: column;
-  }
 `;
 
 const SubHeaderWrapper = styled.h3`

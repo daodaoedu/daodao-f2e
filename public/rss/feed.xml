@@ -4,7 +4,7 @@
         <title>島島阿學多元學習社群</title>
         <link>https://www.daoedu.tw</link>
         <description>「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。</description>
-        <lastBuildDate>Sat, 07 May 2022 06:11:07 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 29 May 2022 05:52:35 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Feed for Node.js</generator>
         <image>
@@ -13,6 +13,292 @@
             <link>https://www.daoedu.tw</link>
         </image>
         <copyright>All rights reserved 2022, 島島阿學</copyright>
+        <item>
+            <title><![CDATA[保障教育選擇權的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/保障教育選擇權</link>
+            <guid>https://www.daoedu.tw/resource/保障教育選擇權</guid>
+            <pubDate>Sat, 28 May 2022 11:45:00 GMT</pubDate>
+            <description><![CDATA[保障教育選擇權是關於如何撰寫自學生的學習計畫，以及實驗教育相關的資訊]]></description>
+            <content:encoded><![CDATA[保障教育選擇權是關於如何撰寫自學生的學習計畫，以及實驗教育相關的資訊]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/XGe2ArW.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[實習透視鏡的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/實習透視鏡</link>
+            <guid>https://www.daoedu.tw/resource/實習透視鏡</guid>
+            <pubDate>Sat, 28 May 2022 11:28:00 GMT</pubDate>
+            <description><![CDATA[哈囉大家！
+這裡是實習透視鏡-最透明的實習經驗分享平台的討論區，相較於匿名分享的網站，具名的即時討論交流仍有其必要性。
+這是個開放的討論社團，除了一樣歡迎分享經驗或是吐苦水之外（fb是實名制的請大家注意用字遣詞與曝光風險），大家對於某某職缺或是任何關於實習的問題也都可以儘管問，可能會有學長姐或大神現身回答你喔～
+我們也會隨時更新網站平台的進度，歡迎大家對我們各種批評指教！
+希望大家都有快樂、充實的實習生活喔。（取自官方網站）]]></description>
+            <content:encoded><![CDATA[哈囉大家！
+這裡是實習透視鏡-最透明的實習經驗分享平台的討論區，相較於匿名分享的網站，具名的即時討論交流仍有其必要性。
+這是個開放的討論社團，除了一樣歡迎分享經驗或是吐苦水之外（fb是實名制的請大家注意用字遣詞與曝光風險），大家對於某某職缺或是任何關於實習的問題也都可以儘管問，可能會有學長姐或大神現身回答你喔～
+我們也會隨時更新網站平台的進度，歡迎大家對我們各種批評指教！
+希望大家都有快樂、充實的實習生活喔。（取自官方網站）]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/V2jc3DV.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[青年活動吧的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/青年活動吧</link>
+            <guid>https://www.daoedu.tw/resource/青年活動吧</guid>
+            <pubDate>Sat, 28 May 2022 11:26:00 GMT</pubDate>
+            <description><![CDATA[👍請踴躍分享活動，讓更多好活動被看見
+👍歡迎邀請活動咖朋友一起進來社團和我們瘋狂
+👍各類型活動：實習、獎助計畫、培育計畫、國際交流、講座、工作坊、論壇、社會企業、SDG、創業創新等活動＆學習資源都歡迎（取自官方網站）]]></description>
+            <content:encoded><![CDATA[👍請踴躍分享活動，讓更多好活動被看見
+👍歡迎邀請活動咖朋友一起進來社團和我們瘋狂
+👍各類型活動：實習、獎助計畫、培育計畫、國際交流、講座、工作坊、論壇、社會企業、SDG、創業創新等活動＆學習資源都歡迎（取自官方網站）]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/Yu6ztQF.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[科技產品與牠們愛好者的產地的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/科技產品與牠們愛好者的產地</link>
+            <guid>https://www.daoedu.tw/resource/科技產品與牠們愛好者的產地</guid>
+            <pubDate>Sat, 28 May 2022 11:23:00 GMT</pubDate>
+            <description><![CDATA[歡迎加入 TechTech 官方臉書社團 🎉
+TechTech 是一個科技愛好者探索知識和分享知識的地方。 你可以在這裡探索其他人如何使用科技產品實現他們的目標，你也可以在這裡和其他人分享如何使用科技產品實現你的目標。（取自官方網站）]]></description>
+            <content:encoded><![CDATA[歡迎加入 TechTech 官方臉書社團 🎉
+TechTech 是一個科技愛好者探索知識和分享知識的地方。 你可以在這裡探索其他人如何使用科技產品實現他們的目標，你也可以在這裡和其他人分享如何使用科技產品實現你的目標。（取自官方網站）]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/DsPmIb5.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[文案人聊文案事的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/文案人聊文案事</link>
+            <guid>https://www.daoedu.tw/resource/文案人聊文案事</guid>
+            <pubDate>Sat, 28 May 2022 11:19:00 GMT</pubDate>
+            <description><![CDATA[本社團為文案人的社團，歡迎大家討論、分享文案相關內容，需答完整問題即可加入。（取自官方網站）]]></description>
+            <content:encoded><![CDATA[本社團為文案人的社團，歡迎大家討論、分享文案相關內容，需答完整問題即可加入。（取自官方網站）]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/KwDcYv0.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[Talk to me in korean的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/Talk to me in korean</link>
+            <guid>https://www.daoedu.tw/resource/Talk to me in korean</guid>
+            <pubDate>Fri, 27 May 2022 00:00:00 GMT</pubDate>
+            <description><![CDATA[適合的韓文程度：零基礎也能學
+學習目標：韓文日常對話。韓文句型、文法。從基礎開始到會話都能在這學習]]></description>
+            <content:encoded><![CDATA[適合的韓文程度：零基礎也能學
+學習目標：韓文日常對話。韓文句型、文法。從基礎開始到會話都能在這學習]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/ZqFStbX.png" length="0" type="image/png"/>
+        </item>
+        <item>
+            <title><![CDATA[similarweb的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/similarweb</link>
+            <guid>https://www.daoedu.tw/resource/similarweb</guid>
+            <pubDate>Thu, 26 May 2022 08:55:00 GMT</pubDate>
+            <description><![CDATA[Similarweb是一家免費提供網站排名以及網站競爭度數據分析的平台，在行銷上是個相當好用的利器，累積全球數以百萬計的網站訊息及用戶瀏覽數據，透過這個簡易上手的工具，讓您可以更了解自己與產業競爭對手網站流量與市佔率概況，以擬定更好的行銷企劃與解決方案。(簡介摘自：https://reurl.cc/Wr0M2L）]]></description>
+            <content:encoded><![CDATA[Similarweb是一家免費提供網站排名以及網站競爭度數據分析的平台，在行銷上是個相當好用的利器，累積全球數以百萬計的網站訊息及用戶瀏覽數據，透過這個簡易上手的工具，讓您可以更了解自己與產業競爭對手網站流量與市佔率概況，以擬定更好的行銷企劃與解決方案。(簡介摘自：https://reurl.cc/Wr0M2L）]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/0EhedX4.png" length="0" type="image/png"/>
+        </item>
+        <item>
+            <title><![CDATA[SOUL LAB 靈魂實驗所的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/SOUL LAB 靈魂實驗所</link>
+            <guid>https://www.daoedu.tw/resource/SOUL LAB 靈魂實驗所</guid>
+            <pubDate>Thu, 26 May 2022 08:46:00 GMT</pubDate>
+            <description><![CDATA[目標成為臺灣第一個女性利他影響力的公益人才培育中心，透過 #閱讀 與 #藝術療癒，培育女性在各種團體，包括家庭、職場與社會中，成為具有 #利他 思維與實質影響力的領導者。(簡介摘自網站)]]></description>
+            <content:encoded><![CDATA[目標成為臺灣第一個女性利他影響力的公益人才培育中心，透過 #閱讀 與 #藝術療癒，培育女性在各種團體，包括家庭、職場與社會中，成為具有 #利他 思維與實質影響力的領導者。(簡介摘自網站)]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/k4e3g6n.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[創作邦的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/創作邦</link>
+            <guid>https://www.daoedu.tw/resource/創作邦</guid>
+            <pubDate>Thu, 26 May 2022 08:42:00 GMT</pubDate>
+            <description><![CDATA[大家好，我是凱文，創作邦是我一人建立，因為我一直希望有一個替中文創作者整理的資源網站，但是一直沒有找到適合的，所以就決定自己架設，在內容上我以我身為創作者需要或喜歡的方式來整理，希望也能把這些內容分享出來提供給大家，讓大家使用這些方便與完整的創作資源。(簡介摘自https://reurl.cc/OAYL5g)]]></description>
+            <content:encoded><![CDATA[大家好，我是凱文，創作邦是我一人建立，因為我一直希望有一個替中文創作者整理的資源網站，但是一直沒有找到適合的，所以就決定自己架設，在內容上我以我身為創作者需要或喜歡的方式來整理，希望也能把這些內容分享出來提供給大家，讓大家使用這些方便與完整的創作資源。(簡介摘自https://reurl.cc/OAYL5g)]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/dVMPVuO.png" length="0" type="image/png"/>
+        </item>
+        <item>
+            <title><![CDATA[Google Developers Codelabs的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/Google Developers Codelabs</link>
+            <guid>https://www.daoedu.tw/resource/Google Developers Codelabs</guid>
+            <pubDate>Thu, 26 May 2022 08:37:00 GMT</pubDate>
+            <description><![CDATA[Google Developers Codelabs 提供了一個指導、教學性、動手做的程式撰寫體驗。
+大多數程式碼實驗室將引導你完成建立一個小型應用程式，或向現有的應用程式新增一個新功能。
+這些資源涵蓋了廣泛的主題，例如 Android Wear、Google Compute Engine、Project Tango、Flutter、AI、機器學習、AR、VR、遊戲、設計、開源、大數據、GoogleAPI 等主題。]]></description>
+            <content:encoded><![CDATA[Google Developers Codelabs 提供了一個指導、教學性、動手做的程式撰寫體驗。
+大多數程式碼實驗室將引導你完成建立一個小型應用程式，或向現有的應用程式新增一個新功能。
+這些資源涵蓋了廣泛的主題，例如 Android Wear、Google Compute Engine、Project Tango、Flutter、AI、機器學習、AR、VR、遊戲、設計、開源、大數據、GoogleAPI 等主題。]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/ukmFd4A.png" length="0" type="image/png"/>
+        </item>
+        <item>
+            <title><![CDATA[91吉他譜的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/91吉他譜</link>
+            <guid>https://www.daoedu.tw/resource/91吉他譜</guid>
+            <pubDate>Thu, 26 May 2022 08:31:00 GMT</pubDate>
+            <description><![CDATA[為了保存華語地區自民歌時代以來的音樂精粹，海馬團隊一直致力於營造良好的使用者體驗，提供使用者最適合彈唱的樂譜。91譜尚有許多不足，許多未完善的功能，仍需要大家起努力改進。我們會繼續努力，提供給大家更好的樂譜體驗。也請大家到我們粉專給予我們支持與鼓勵，也可以加入深海社區參與我們的研發計畫，與我們共同成長(簡介摘自：https://reurl.cc/M03GnW）]]></description>
+            <content:encoded><![CDATA[為了保存華語地區自民歌時代以來的音樂精粹，海馬團隊一直致力於營造良好的使用者體驗，提供使用者最適合彈唱的樂譜。91譜尚有許多不足，許多未完善的功能，仍需要大家起努力改進。我們會繼續努力，提供給大家更好的樂譜體驗。也請大家到我們粉專給予我們支持與鼓勵，也可以加入深海社區參與我們的研發計畫，與我們共同成長(簡介摘自：https://reurl.cc/M03GnW）]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/I5bAomV.png" length="0" type="image/png"/>
+        </item>
+        <item>
+            <title><![CDATA[Netlify的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/Netlify</link>
+            <guid>https://www.daoedu.tw/resource/Netlify</guid>
+            <pubDate>Wed, 25 May 2022 13:26:00 GMT</pubDate>
+            <description><![CDATA[Netlify 是一個熱門的靜態網站 Host 服務，其免費額度非常適合一般使用者
+可以自定義 subdomain 也可以使用自己的網域名，同時也提供了免費的 SSL
+而且只要將網站上傳到 GitHub Repository，Netlify 就會自動部署，非常方便(簡介摘自https://reurl.cc/DyqZRE)]]></description>
+            <content:encoded><![CDATA[Netlify 是一個熱門的靜態網站 Host 服務，其免費額度非常適合一般使用者
+可以自定義 subdomain 也可以使用自己的網域名，同時也提供了免費的 SSL
+而且只要將網站上傳到 GitHub Repository，Netlify 就會自動部署，非常方便(簡介摘自https://reurl.cc/DyqZRE)]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/O6rW9pW.png" length="0" type="image/png"/>
+        </item>
+        <item>
+            <title><![CDATA[進擊的職人Enter To WIN的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/進擊的職人Enter To WIN</link>
+            <guid>https://www.daoedu.tw/resource/進擊的職人Enter To WIN</guid>
+            <pubDate>Tue, 24 May 2022 10:57:00 GMT</pubDate>
+            <description><![CDATA[Hi！我是 Vance，現任為職涯與留學顧問
+我喜好閱讀、旅遊、各國文化與籃球。我曾在國內外取得資訊與行銷雙碩士，並在資訊科技業與電子製造業累積十年以上的資歷，曾任品牌行銷、產品行銷、產品經理、專案經理、系統分析與設計及研發工程師等職務。在我職涯過程中，經歷的四次的求職階段，我收到過許多公司的面試邀請，每次我都會從中挑選有興趣的十幾間公司進行面試，因此讓我累積非常豐富的面試經驗。而現在身為留學教育業的雇主，也面試過非常多的年輕人；同時，我目前也擔任履歷診療的顧問，因此發現許多人在求職中存在許多問題，希望能與你們分享職涯規劃、求職技巧、留學進修的經驗和資源，並幫助大家完成職涯與留學的規劃和目標。(簡介摘自https://reurl.cc/Yv4G0o)]]></description>
+            <content:encoded><![CDATA[Hi！我是 Vance，現任為職涯與留學顧問
+我喜好閱讀、旅遊、各國文化與籃球。我曾在國內外取得資訊與行銷雙碩士，並在資訊科技業與電子製造業累積十年以上的資歷，曾任品牌行銷、產品行銷、產品經理、專案經理、系統分析與設計及研發工程師等職務。在我職涯過程中，經歷的四次的求職階段，我收到過許多公司的面試邀請，每次我都會從中挑選有興趣的十幾間公司進行面試，因此讓我累積非常豐富的面試經驗。而現在身為留學教育業的雇主，也面試過非常多的年輕人；同時，我目前也擔任履歷診療的顧問，因此發現許多人在求職中存在許多問題，希望能與你們分享職涯規劃、求職技巧、留學進修的經驗和資源，並幫助大家完成職涯與留學的規劃和目標。(簡介摘自https://reurl.cc/Yv4G0o)]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/I6Ef8x4.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[EDC專長探索中心的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/EDC專長探索中心</link>
+            <guid>https://www.daoedu.tw/resource/EDC專長探索中心</guid>
+            <pubDate>Tue, 24 May 2022 10:53:00 GMT</pubDate>
+            <description><![CDATA[「EDC專長探索中心」是目前台灣市場上少見的綜合性知識型營隊，鎖定國高中學子，透過體驗式教學，讓孩子們融入課程，自主思考。 全程參與課程結束後，也將頒發中國文化大學推廣教育部或銘傳大學產學推廣處結業證書，豐富孩子每個階段的學習歷程。(簡介摘自https://reurl.cc/q5noLD)]]></description>
+            <content:encoded><![CDATA[「EDC專長探索中心」是目前台灣市場上少見的綜合性知識型營隊，鎖定國高中學子，透過體驗式教學，讓孩子們融入課程，自主思考。 全程參與課程結束後，也將頒發中國文化大學推廣教育部或銘傳大學產學推廣處結業證書，豐富孩子每個階段的學習歷程。(簡介摘自https://reurl.cc/q5noLD)]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/HNYNE3f.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[virtual judge的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/virtual judge</link>
+            <guid>https://www.daoedu.tw/resource/virtual judge</guid>
+            <pubDate>Tue, 17 May 2022 16:57:00 GMT</pubDate>
+            <description><![CDATA[可以解題與出題程式設計相關題目的網站]]></description>
+            <content:encoded><![CDATA[可以解題與出題程式設計相關題目的網站]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://vjudge.net/static/images/favicon.ico" length="0" type="image/ico"/>
+        </item>
+        <item>
+            <title><![CDATA[topcoder的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/topcoder</link>
+            <guid>https://www.daoedu.tw/resource/topcoder</guid>
+            <pubDate>Tue, 17 May 2022 16:53:00 GMT</pubDate>
+            <description><![CDATA[提供練習程式的地方]]></description>
+            <content:encoded><![CDATA[提供練習程式的地方]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://www.topcoder.com/wp-content/uploads/2021/09/og-image.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[codeforces的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/codeforces</link>
+            <guid>https://www.daoedu.tw/resource/codeforces</guid>
+            <pubDate>Tue, 17 May 2022 16:48:00 GMT</pubDate>
+            <description><![CDATA[Codeforces. Programming competitions and contests, programming community]]></description>
+            <content:encoded><![CDATA[Codeforces. Programming competitions and contests, programming community]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://codeforces.org/s/0/images/codeforces-telegram-square.png" length="0" type="image/png"/>
+        </item>
+        <item>
+            <title><![CDATA[前端修練精神時光屋的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/前端修練精神時光屋</link>
+            <guid>https://www.daoedu.tw/resource/前端修練精神時光屋</guid>
+            <pubDate>Tue, 17 May 2022 16:45:00 GMT</pubDate>
+            <description><![CDATA[六角學習地圖. 課程購買後不知從哪邊開始上嗎？ 我們這邊提供一張學習地圖給同學做參考。 對於前端還有不了解的地方，可以參考前端開發者技能樹！]]></description>
+            <content:encoded><![CDATA[六角學習地圖. 課程購買後不知從哪邊開始上嗎？ 我們這邊提供一張學習地圖給同學做參考。 對於前端還有不了解的地方，可以參考前端開發者技能樹！]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://firebasestorage.googleapis.com/v0/b/hexschool-api.appspot.com/o/blog%2F2019%2F06%2FF2E-2nd-1200x628.png?alt=media&token=3e297d87-8c3a-492a-8759-89af4ecd4c90" length="0" type="image/png"/>
+        </item>
+        <item>
+            <title><![CDATA[codewars的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/codewars</link>
+            <guid>https://www.daoedu.tw/resource/codewars</guid>
+            <pubDate>Tue, 17 May 2022 16:42:00 GMT</pubDate>
+            <description><![CDATA[codewars, code kata, kata, code gym, coding, code practice, ruby, javascript, coffeescript, web development, software development, dojo]]></description>
+            <content:encoded><![CDATA[codewars, code kata, kata, code gym, coding, code practice, ruby, javascript, coffeescript, web development, software development, dojo]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://www.codewars.com/packs/assets/logo-square-paper-bg.c3d2b1eb.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[咖啡滔客 cafetalk的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/咖啡滔客 cafetalk</link>
+            <guid>https://www.daoedu.tw/resource/咖啡滔客 cafetalk</guid>
+            <pubDate>Tue, 17 May 2022 16:39:00 GMT</pubDate>
+            <description><![CDATA[咖啡滔客是通過Skype進行線上語言學習的服務網站。無論是線上英語會話、商務英語、韓語、義大利語、還是音樂、瑜伽等您所感興趣的項目，您都能輕鬆找到屬於您自己的有趣課程。]]></description>
+            <content:encoded><![CDATA[咖啡滔客是通過Skype進行線上語言學習的服務網站。無論是線上英語會話、商務英語、韓語、義大利語、還是音樂、瑜伽等您所感興趣的項目，您都能輕鬆找到屬於您自己的有趣課程。]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://cafetalk.com/_global_resource/image/og-image/fb-image.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[School A+ 海外遊學評價網的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/School A+ 海外遊學評價網</link>
+            <guid>https://www.daoedu.tw/resource/School A+ 海外遊學評價網</guid>
+            <pubDate>Tue, 17 May 2022 16:35:00 GMT</pubDate>
+            <description><![CDATA[最真實的海外遊學心得│最實惠的語言學校費用比較推薦，School A+ 不只比較價格，同時查看最真實的學生評論，評分你的學校，選擇最推薦、適合的遊學精彩生活。熱門遊學代辦國家：菲律賓、澳洲、日本、澳洲、韓國、英國、美國。（轉自官方網站）]]></description>
+            <content:encoded><![CDATA[最真實的海外遊學心得│最實惠的語言學校費用比較推薦，School A+ 不只比較價格，同時查看最真實的學生評論，評分你的學校，選擇最推薦、適合的遊學精彩生活。熱門遊學代辦國家：菲律賓、澳洲、日本、澳洲、韓國、英國、美國。（轉自官方網站）]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://schoolaplus.com/images/logo.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[作伙學的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/作伙學</link>
+            <guid>https://www.daoedu.tw/resource/作伙學</guid>
+            <pubDate>Sun, 15 May 2022 12:08:00 GMT</pubDate>
+            <description><![CDATA[111學年度開始，大學申請入學（學測）審查將採計學習歷程檔案，而學習歷程檔案中的「課程學習成果」是新制中一項重要變革。為瞭解高中現場實行情況，並凝聚高中端和大學端對於「課程學習成果」該如何呈現、如何審查的共識，台大社會系「作伙學團隊」已於109年舉辦五十場審議會議，蒐集大學教授、高中教師、家長和學生的意見。超過九成的與會者認為大學在審查「課程學習成果」時，應該秉持「過程比結果更重要，或一樣重要」，以及「核心素養能力比學科知識更重要，或一樣重要」兩大原則。招聯會也將此意見納入大學審查學習歷程檔案將採「三重二不」的建議原則。（取自https://reurl.cc/zZ6M4y）]]></description>
+            <content:encoded><![CDATA[111學年度開始，大學申請入學（學測）審查將採計學習歷程檔案，而學習歷程檔案中的「課程學習成果」是新制中一項重要變革。為瞭解高中現場實行情況，並凝聚高中端和大學端對於「課程學習成果」該如何呈現、如何審查的共識，台大社會系「作伙學團隊」已於109年舉辦五十場審議會議，蒐集大學教授、高中教師、家長和學生的意見。超過九成的與會者認為大學在審查「課程學習成果」時，應該秉持「過程比結果更重要，或一樣重要」，以及「核心素養能力比學科知識更重要，或一樣重要」兩大原則。招聯會也將此意見納入大學審查學習歷程檔案將採「三重二不」的建議原則。（取自https://reurl.cc/zZ6M4y）]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/NxccNEO.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[全球話e視野－國際華語數位教學交流的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/全球話e視野－國際華語數位教學交流</link>
+            <guid>https://www.daoedu.tw/resource/全球話e視野－國際華語數位教學交流</guid>
+            <pubDate>Wed, 11 May 2022 13:37:00 GMT</pubDate>
+            <description><![CDATA[只要和國際華語數位教學相關之大小事、工具、服務、工作機會，通通歡迎在此社團交換。（取自官方社團）]]></description>
+            <content:encoded><![CDATA[只要和國際華語數位教學相關之大小事、工具、服務、工作機會，通通歡迎在此社團交換。（取自官方社團）]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/NJpTpQK.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[vince kotchian的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/vince kotchian</link>
+            <guid>https://www.daoedu.tw/resource/vince kotchian</guid>
+            <pubDate>Sun, 08 May 2022 15:01:00 GMT</pubDate>
+            <description><![CDATA[Our tutors average 10 years of experience delivering expert GRE, SAT, and ACT test prep to raise your scores. Free do-it-yourself resources inside. We've got rave reviews from 190+ clients!(From website)]]></description>
+            <content:encoded><![CDATA[Our tutors average 10 years of experience delivering expert GRE, SAT, and ACT test prep to raise your scores. Free do-it-yourself resources inside. We've got rave reviews from 190+ clients!(From website)]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://vincekotchian.com/media/3312/vk_logo.png" length="0" type="image/png"/>
+        </item>
+        <item>
+            <title><![CDATA[NAVER韓文字典的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/NAVER韓文字典</link>
+            <guid>https://www.daoedu.tw/resource/NAVER韓文字典</guid>
+            <pubDate>Sat, 07 May 2022 08:52:00 GMT</pubDate>
+            <description><![CDATA[NAVER 是韓國最大的網際網路公司，也是大部分韓國人日常使用的搜尋引擎。NAVER 旗下的字典不僅容易上手，資訊量也相當豐富，非常適合韓文初學者使用(簡介摘自https://reurl.cc/QLbg3o)]]></description>
+            <content:encoded><![CDATA[NAVER 是韓國最大的網際網路公司，也是大部分韓國人日常使用的搜尋引擎。NAVER 旗下的字典不僅容易上手，資訊量也相當豐富，非常適合韓文初學者使用(簡介摘自https://reurl.cc/QLbg3o)]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/XHVtJIp.png" length="0" type="image/png"/>
+        </item>
+        <item>
+            <title><![CDATA[天天韓文 Everyday Korean的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/天天韓文 Everyday Korean</link>
+            <guid>https://www.daoedu.tw/resource/天天韓文 Everyday Korean</guid>
+            <pubDate>Sat, 07 May 2022 08:44:00 GMT</pubDate>
+            <description><![CDATA[韓國老師能幫你們簡單快速的學習韓文。從學韓文字母開始到你們能講一口流利的韓文，我們一天十分鐘一起學習韓文吧。(簡介摘自https://reurl.cc/QLbg3o)]]></description>
+            <content:encoded><![CDATA[韓國老師能幫你們簡單快速的學習韓文。從學韓文字母開始到你們能講一口流利的韓文，我們一天十分鐘一起學習韓文吧。(簡介摘自https://reurl.cc/QLbg3o)]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/3XTDxbp.jpg" length="0" type="image/jpg"/>
+        </item>
         <item>
             <title><![CDATA[app scyborg的學習資源介紹｜島島阿學]]></title>
             <link>https://www.daoedu.tw/resource/app scyborg</link>
@@ -513,7 +799,7 @@ Voscreen 是基於自己的學習方法和途徑，通過對母語學習過程�
             <description><![CDATA[SHINLI/李勛的頻道，分享信用卡、投資、省錢存錢以及各種小資理財的訊息，在這個低薪的時代，年輕人省錢不是罪。（取自YouTube介紹）]]></description>
             <content:encoded><![CDATA[SHINLI/李勛的頻道，分享信用卡、投資、省錢存錢以及各種小資理財的訊息，在這個低薪的時代，年輕人省錢不是罪。（取自YouTube介紹）]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
-            <enclosure url="https://scontent.ftpe7-1.fna.fbcdn.net/v/t1.6435-9/151602306_3965235430199994_6893404434999618414_n.png?_nc_cat=110&ccb=1-5&_nc_sid=e3f864&_nc_ohc=AoeidAehMWQAX_Jl_07&_nc_ht=scontent.ftpe7-1.fna&oh=00_AT9wIOpejRsScutmN_jVqfsffhmRNBqaagRfyOw6aZgP-w&oe=6269D65B" length="0" type="image/png"/>
+            <enclosure url="https://i.imgur.com/glI5aZ8.png" length="0" type="image/png"/>
         </item>
         <item>
             <title><![CDATA[館長成吉思汗健身教學的學習資源介紹｜島島阿學]]></title>
@@ -523,7 +809,7 @@ Voscreen 是基於自己的學習方法和途徑，通過對母語學習過程�
             <description><![CDATA[館長在他的YouTube播放清單放了很多關於健身教學的影片，有滋事的校正與飲食的觀念分享。]]></description>
             <content:encoded><![CDATA[館長在他的YouTube播放清單放了很多關於健身教學的影片，有滋事的校正與飲食的觀念分享。]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
-            <enclosure url="https://scontent.ftpe7-2.fna.fbcdn.net/v/t39.30808-6/273041385_495876768563190_6002187639434362764_n.jpg?_nc_cat=104&ccb=1-5&_nc_sid=8bfeb9&_nc_ohc=gL2NIP0L83sAX8aOgxH&_nc_ht=scontent.ftpe7-2.fna&oh=00_AT_nM7vURgwv1q_ZdKV0Eemrexh2epleqQuJfIalPYIR_g&oe=624AECC8" length="0" type="image/jpg"/>
+            <enclosure url="https://i.imgur.com/K9ENTRa.jpg" length="0" type="image/jpg"/>
         </item>
         <item>
             <title><![CDATA[Urban Dictionary的學習資源介紹｜島島阿學]]></title>
@@ -6775,9 +7061,9 @@ Instagram:  https://www.instagram.com/gwenasuisse]]></content:encoded>
             <enclosure url="https://i.imgur.com/4NuAKyX.png" length="0" type="image/png"/>
         </item>
         <item>
-            <title><![CDATA[Zerojudge的學習資源介紹｜島島阿學]]></title>
-            <link>https://www.daoedu.tw/resource/Zerojudge</link>
-            <guid>https://www.daoedu.tw/resource/Zerojudge</guid>
+            <title><![CDATA[高中生程式解題系統 zerojudge的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/高中生程式解題系統 zerojudge</link>
+            <guid>https://www.daoedu.tw/resource/高中生程式解題系統 zerojudge</guid>
             <pubDate>Mon, 24 Jan 2022 06:26:00 GMT</pubDate>
             <description><![CDATA[此為高中生程式解題平台，但任何人都可以註冊。題庫豐富，適合具備基礎程式設計能力並想練習解題的人。可自行選擇想用來解題的程式語言。]]></description>
             <content:encoded><![CDATA[此為高中生程式解題平台，但任何人都可以註冊。題庫豐富，適合具備基礎程式設計能力並想練習解題的人。可自行選擇想用來解題的程式語言。]]></content:encoded>
@@ -6903,19 +7189,6 @@ Instagram:  https://www.instagram.com/gwenasuisse]]></content:encoded>
             <content:encoded><![CDATA[Fablab Taipei是個推廣使用數位製造工具的開放空間， 鼓勵實作與知識共享的實體社群，讓大家都可以成為一個"自造者"。]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/eqosDp2.jpg" length="0" type="image/jpg"/>
-        </item>
-        <item>
-            <title><![CDATA[FreeCodeCamp的學習資源介紹｜島島阿學]]></title>
-            <link>https://www.daoedu.tw/resource/FreeCodeCamp</link>
-            <guid>https://www.daoedu.tw/resource/FreeCodeCamp</guid>
-            <pubDate>Mon, 24 Jan 2022 06:26:00 GMT</pubDate>
-            <description><![CDATA[主要提供 HTML/CSS/JavaScript 線上學習資源和討論社群，並提供非營利組織專案實習機會。
-
-資料來源：HappyCoder]]></description>
-            <content:encoded><![CDATA[主要提供 HTML/CSS/JavaScript 線上學習資源和討論社群，並提供非營利組織專案實習機會。
-
-資料來源：HappyCoder]]></content:encoded>
-            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
         </item>
         <item>
             <title><![CDATA[猿創力程式設計的學習資源介紹｜島島阿學]]></title>
