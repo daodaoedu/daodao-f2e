@@ -14,10 +14,11 @@ const Home = () => {
   return (
     <HomeWrapper>
       <Banner guideRef={guideRef} />
-      <FacebookPosts />
       <About />
       <Divider sx={{ margin: "10px 0" }} />
       <Group />
+      <Divider sx={{ margin: "10px 0" }} />
+      <FacebookPosts />
       <Divider sx={{ margin: "10px 0" }} />
       <WishResource />
       <Divider sx={{ margin: "10px 0" }} />
