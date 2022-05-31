@@ -195,7 +195,26 @@ const Resource = ({ data, title, desc, image, tags, feeTags, link }) => {
         <Tags tags={feeTags} type="fee" />
       </Box>
       <Desc desc={desc} />
-      <RelatedResources />
+      <RelatedResources
+        title="📌 你可能感興趣的資源"
+        searchScheme={{
+          filter: {
+            and: [
+              {
+                or: [
+                  {
+                    property: "領域名稱",
+                    multi_select: {
+                      contains: catTags[0]?.name ?? "",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+          page_size: 10,
+        }}
+      />
       <Box sx={{ marginTop: "20px" }}>
         {Object.keys(disqusConfig).length > 0 && (
           <DiscussionEmbed
