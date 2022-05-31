@@ -17,7 +17,7 @@ const List = ({
   isLoading,
   isLoadingNextData,
 }) => {
-  if (isLoading && list.length === 0) {
+  if ((isLoading && list.length === 0)) {
     return (
       <ListWrapper>
         <SkeletonItem />

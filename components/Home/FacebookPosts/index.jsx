@@ -30,7 +30,12 @@ const GuideWrapper = styled.div`
 
 const Guide = () => {
   const dispatch = useDispatch();
-  const { groupPosts, fanpagesPosts } = useSelector((state) => state?.shared);
+  const {
+    groupPosts,
+    fanpagesPosts,
+    isLoadingFanpagesPosts,
+    isLoadingGroupPosts,
+  } = useSelector((state) => state?.shared);
 
   useEffect(() => {
     dispatch(getFacebookFansPagePost(7));
@@ -41,10 +46,20 @@ const Guide = () => {
     <GuideWrapper>
       <h2 className="guide-title">最新貼文</h2>
       <Box sx={{ marginTop: "20px" }}>
-        <CardList title="📌 粉絲專頁" list={fanpagesPosts} direction="left" />
+        <CardList
+          title="📌 粉絲專頁"
+          list={fanpagesPosts}
+          isLoading={isLoadingFanpagesPosts}
+          direction="left"
+        />
       </Box>
       <Box sx={{ marginTop: "20px" }}>
-        <CardList title="📌 社群貼文" list={groupPosts} direction="right" />
+        <CardList
+          title="📌 社群貼文"
+          list={groupPosts}
+          isLoading={isLoadingGroupPosts}
+          direction="right"
+        />
       </Box>
     </GuideWrapper>
   );

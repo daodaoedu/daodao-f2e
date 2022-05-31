@@ -13,8 +13,7 @@ dayjs.extend(isBetween);
 
 const ItemWrapper = styled.li`
   display: flex;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding: 20px 0;
   border-bottom: 1px solid rgba(168, 168, 168, 0.3);
 `;
 
@@ -30,6 +29,7 @@ const ContentWrapper = styled.article`
 const ImageWrapper = styled.div`
   width: 200px;
   height: 200px;
+  border-radius: 20px;
   background-color: #f5f5f5;
   ${({ image }) => css`
     background-image: ${`url(${image})`};
@@ -37,7 +37,6 @@ const ImageWrapper = styled.div`
     background-repeat: no-repeat;
     background-position: 50% 50%;
   `}
-  border-radius: 20px;
   /* object-fit: cover; */
   /* opacity: 0; */
 
