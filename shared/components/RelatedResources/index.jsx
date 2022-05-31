@@ -25,45 +25,6 @@ const CardListWrapper = styled.ul`
   margin-top: 15px;
 `;
 
-const CardWrapper = styled.li`
-  position: relative;
-  width: 200px;
-  height: 100px;
-  flex: 0 0 200px;
-  border-radius: 20px;
-  margin: 5px;
-  padding: 5px;
-  color: #16b9b3;
-  border: 2px #16b9b3 solid;
-  overflow: hidden;
-
-  cursor: pointer;
-  object-fit: cover;
-  &:hover {
-    transform: scale(1.05);
-    transition: transform 0.4s;
-  }
-`;
-
-const ImageWrapper = styled.div`
-  width: 40px;
-  height: 40px;
-  background-color: #f5f5f5;
-  ${({ image }) => css`
-    background-image: ${`url(${image})`};
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-  `}
-  border-radius: 20%;
-  /* object-fit: cover; */
-  /* opacity: 0; */
-
-  @media (max-width: 767px) {
-    border-radius: 10%;
-  }
-`;
-
 const RelatedResources = ({ title, searchScheme }) => {
   const { relatedResources, isLoading } = useSelector(
     (state) => state?.resource
@@ -86,37 +47,37 @@ const RelatedResources = ({ title, searchScheme }) => {
             variant="rectangular"
             width={200}
             height={100}
-            sx={{ borderRadius: "10px", margin: "5px" }}
+            sx={{ borderRadius: "10px", margin: "5px", flex: "0 0 200px" }}
           />
           <Skeleton
             variant="rectangular"
             width={200}
             height={100}
-            sx={{ borderRadius: "10px", margin: "5px" }}
+            sx={{ borderRadius: "10px", margin: "5px", flex: "0 0 200px" }}
           />
           <Skeleton
             variant="rectangular"
             width={200}
             height={100}
-            sx={{ borderRadius: "10px", margin: "5px" }}
+            sx={{ borderRadius: "10px", margin: "5px", flex: "0 0 200px" }}
           />
           <Skeleton
             variant="rectangular"
             width={200}
             height={100}
-            sx={{ borderRadius: "10px", margin: "5px" }}
+            sx={{ borderRadius: "10px", margin: "5px", flex: "0 0 200px" }}
           />
           <Skeleton
             variant="rectangular"
             width={200}
             height={100}
-            sx={{ borderRadius: "10px", margin: "5px" }}
+            sx={{ borderRadius: "10px", margin: "5px", flex: "0 0 200px" }}
           />
           <Skeleton
             variant="rectangular"
             width={200}
             height={100}
-            sx={{ borderRadius: "10px", margin: "5px" }}
+            sx={{ borderRadius: "10px", margin: "5px", flex: "0 0 200px" }}
           />
         </CardListWrapper>
       </RelatedResourcesWrapper>

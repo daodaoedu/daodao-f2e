@@ -10,6 +10,7 @@ const ItemWrapper = styled.li`
 const ContentWrapper = styled.div`
   width: calc(100% - 100px);
   margin-left: 20px;
+  margin-right: 20px;
   padding: 0 10px;
 `;
 
@@ -22,6 +23,7 @@ const SkeletonImageWrapper = styled(Skeleton)`
   @media (max-width: 767px) {
     width: 100px;
     height: 100px;
+    flex: 0 0 100px;
   }
 `;
 
@@ -30,7 +32,7 @@ const SkeletonItem = () => {
     <ItemWrapper>
       <SkeletonImageWrapper variant="rectangular" />
       <ContentWrapper>
-        <Skeleton variant="text" sx={{ fontSize: "32px", width: "300px" }} />
+        <Skeleton variant="text" sx={{ fontSize: "32px", maxWidth: "300px", width: "100%" }} />
         <Box
           sx={{
             display: "flex",

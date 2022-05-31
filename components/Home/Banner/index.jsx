@@ -3,6 +3,7 @@ import styled from "@emotion/styled";
 import { Box, Button, Typography } from "@mui/material";
 import SearchField from "../SearchField";
 import BannerVideo from "../BannerVideo";
+import Typed from "react-typed";
 
 const BannerWrapper = styled.section`
   height: var(--section-height);
@@ -53,7 +54,10 @@ const Banner = ({ guideRef }) => {
               textAlign: "center",
             }}
           >
-            歡迎來到島島阿學！一起找找資源、分享資源吧！
+            <Typed
+              strings={["歡迎來到島島阿學！一起找找資源、分享資源吧！"]}
+              typeSpeed={80}
+            />
           </Typography>
           <Typography
             variant="h2"
@@ -67,7 +71,12 @@ const Banner = ({ guideRef }) => {
               fontWeight: "500",
             }}
           >
-            If you want to go fast go alone. If you what to go far go together.
+            <Typed
+              strings={[
+                "If you want to go fast go alone. If you what to go far go together.",
+              ]}
+              typeSpeed={80}
+            />
           </Typography>
           <SearchField />
         </MainBannerWrapper>
@@ -96,7 +105,12 @@ const Banner = ({ guideRef }) => {
             <Button
               variant="contained"
               onClick={smoothScroll}
-              sx={{ backgroundColor: "white" }}
+              sx={{
+                backgroundColor: "#fff",
+                "&:hover": {
+                  backgroundColor: "#fff",
+                },
+              }}
             >
               看看大家都學什麼
             </Button>
