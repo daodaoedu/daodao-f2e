@@ -11,6 +11,8 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import toast from "react-hot-toast";
 import Shares from "./Shares";
 import appendQuery from "append-query";
+import RelatedResources from "./RelatedResources";
+import Desc from "./Desc";
 
 const ResourceWrapper = styled.article`
   background-color: #fff;
@@ -33,10 +35,6 @@ const ResourceWrapper = styled.article`
       color: #37b9eb;
       transition: 0.5s;
     }
-  }
-  .desc {
-    font-size: 18px;
-    margin: 10px 0;
   }
 
   @media (max-width: 767px) {
@@ -196,7 +194,8 @@ const Resource = ({ data, title, desc, image, tags, feeTags, link }) => {
         </Box>
         <Tags tags={feeTags} type="fee" />
       </Box>
-      <p className="desc">{desc}</p>
+      <Desc desc={desc} />
+      <RelatedResources />
       <Box sx={{ marginTop: "20px" }}>
         {Object.keys(disqusConfig).length > 0 && (
           <DiscussionEmbed

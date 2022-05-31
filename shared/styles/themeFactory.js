@@ -5,6 +5,9 @@ import { createTheme } from "@mui/material/styles";
 const themeFactory = (mode) =>
   createTheme({
     typography: {
+      fontFamily: [
+        "'-apple-system', 'PingFang TC', 'NotoSans TC', 'sans-serif'",
+      ],
       h1: {
         fontSize: "40px",
         fontWeight: "500",
