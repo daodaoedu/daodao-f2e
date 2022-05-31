@@ -6,6 +6,7 @@ import { Button, Paper, Box, Stack, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { loadRelatedResources } from "../../../redux/actions/resource";
 import Card from "./Card";
+import Marquee from "react-fast-marquee";
 
 const RelatedResourcesWrapper = styled.div`
   margin: 20px 0;
@@ -13,11 +14,8 @@ const RelatedResourcesWrapper = styled.div`
     font-size: 20px;
     font-weight: 500;
   }
-  p {
-    /* font-size: 18px; */
-  }
 `;
-// relatedResources;
+
 const CardListWrapper = styled.ul`
   display: flex;
   justify-content: space-between;
@@ -97,24 +95,30 @@ const RelatedResources = ({ catName = "運動/心理/醫學" }) => {
     return (
       <RelatedResourcesWrapper>
         <h2>📌 你可能感興趣的資源</h2>
-        <CardListWrapper>
-          {relatedResources.map(({ created_time, properties }) => (
-            <Card
-              key={created_time}
-              image={
-                (Array.isArray(properties["縮圖"]?.files) &&
-                  properties["縮圖"]?.files[0]?.name) ??
-                "https://www.daoedu.tw/preview.webp"
-              }
-              title={(properties["資源名稱"]?.title[0]?.plain_text ?? "").trim()}
-              desc={
-                ((properties["介紹"]?.rich_text ?? []).find(
-                  (item) => item?.type === "text"
-                )?.plain_text ?? "").slice(0, 40)
-              }
-            />
-          ))}
-        </CardListWrapper>
+        <Marquee
+          gradientWidth={20}
+          delay={3}
+          pauseOnHover
+            >
+            <CardListWrapper>
+            {relatedResources.map(({ created_time, properties }) => (
+                <Card
+                key={created_time}
+                image={
+                    (Array.isArray(properties["縮圖"]?.files) &&
+                    properties["縮圖"]?.files[0]?.name) ??
+                    "https://www.daoedu.tw/preview.webp"
+                }
+                title={(properties["資源名稱"]?.title[0]?.plain_text ?? "").trim()}
+                desc={
+                    ((properties["介紹"]?.rich_text ?? []).find(
+                    (item) => item?.type === "text"
+                    )?.plain_text ?? "").slice(0, 40)
+                }
+                />
+            ))}
+            </CardListWrapper>  
+        </Marquee>
       </RelatedResourcesWrapper>
     );
 };
