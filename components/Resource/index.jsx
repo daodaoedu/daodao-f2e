@@ -11,7 +11,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import toast from "react-hot-toast";
 import Shares from "./Shares";
 import appendQuery from "append-query";
-import RelatedResources from "./RelatedResources";
+import RelatedResources from "../../shared/components/RelatedResources";
 import Desc from "./Desc";
 
 const ResourceWrapper = styled.article`

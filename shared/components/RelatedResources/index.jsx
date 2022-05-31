@@ -124,7 +124,7 @@ const RelatedResources = ({ title, searchScheme }) => {
   }
   return (
     <RelatedResourcesWrapper>
-      <h2>📌 你可能感興趣的資源</h2>
+      <h2>{title}</h2>
       <Marquee gradientWidth={20} delay={1} pauseOnHover>
         <CardListWrapper>
           {relatedResources.map(({ created_time, properties }) => (

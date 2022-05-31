@@ -7,7 +7,7 @@ import Chip from "@mui/material/Chip";
 import { useRouter } from "next/router";
 import { COLOR_TABLE } from "../../../constants/notion";
 import { CATEGORIES } from "../../../constants/category";
-
+import RelatedResources from "../../../shared/components/RelatedResources";
 const GuideWrapper = styled.div`
   width: 90%;
   /* height: calc(var(--section-height) + var(--section-height-offset)); */
@@ -139,6 +139,13 @@ const About = () => {
           </Box>
         </Box>
       </Box>
+      <RelatedResources
+        title="👀 瞧瞧最新資源"
+        searchScheme={{
+          filter: { or: [] },
+          page_size: 10,
+        }}
+      />
     </GuideWrapper>
   );
 };
