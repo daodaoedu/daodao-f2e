@@ -72,7 +72,7 @@ const Thanks = () => {
           services, 🤠 wrangler, Notion, Slack bot
         </LineWrapper>
         <LineWrapper variant="p" sx={{ fontWeight: "500" }}>
-          島島社群的IT部夥伴從高中生到工程師都有，我們是一群夢想的追尋者，我們認為開發不應該只是開發一個產品，而是實現夢想的一種方式。
+          島島社群的IT部夥伴從國中生到工程師都有，我們是一群夢想的追尋者，我們認為開發不應該只是開發一個產品，而是實現夢想的一種方式。
         </LineWrapper>
         <LineWrapper variant="p" sx={{ fontWeight: "500" }}>
           夥伴們不定期會觀察最近有哪些新出的beta技術適合用在專案上，由於考量到開發夥伴的多樣性，因此我們的設計與技術會盡可能的親民化與保持開發彈性。選擇親民化的設計與彈性一直以來都是難以平衡的課題，因此不定期的技術研究是一件蠻重要的議題。

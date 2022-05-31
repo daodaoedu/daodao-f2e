@@ -10,6 +10,7 @@ import Chip from "@mui/material/Chip";
 import { useRouter } from "next/router";
 import { COLOR_TABLE } from "../constants/notion";
 import { CATEGORIES } from "../constants/category";
+import RelatedResources from "../shared/components/RelatedResources";
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
@@ -121,6 +122,13 @@ const NotExistPage = () => {
             ))}
           </Box>
         </Box>
+        <RelatedResources
+          title="👀 瞧瞧最新資源"
+          searchScheme={{
+            filter: { or: [] },
+            page_size: 10,
+          }}
+        />
         <Box
           sx={{
             margin: "40px 0 10px 0",
