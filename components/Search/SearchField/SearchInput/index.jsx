@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 // import ClickAwayListener from "@mui/base/ClickAwayListener";
 import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
@@ -59,6 +59,16 @@ const SearchInputWrapper = styled(Paper)`
   }
 `;
 
+const PLACEHOLDER_TEXT = [
+  "英語, 心理學, 自主學習 ...",
+  "好想出國喔～該來學英語了",
+  "我的腦袋不太好，但是知道邏輯要訓練",
+  "不會寫程式，也要了解科技趨勢",
+  "斜槓與文青的時間到了",
+  "誰說健身不是學習的一種？",
+  "生活在學習",
+];
+
 const InputBaseWrapper = styled(InputBase)`
   background: white;
   z-index: 10;
@@ -102,6 +112,11 @@ const SearchInput = () => {
     [push, query]
   );
 
+  const placeholder = useMemo(
+    () => PLACEHOLDER_TEXT[Math.floor(Math.random() * 7)],
+    []
+  );
+
   return (
     <SearchInputWrapper
       sx={{
@@ -136,7 +151,7 @@ const SearchInput = () => {
           id="q"
           name="q"
           value={keyword}
-          placeholder="英語, 心理學, 自主學習 ..."
+          placeholder={placeholder}
           onChange={(event) => {
             // setReferenceSelected(null);
             setKeyword(event.target.value);

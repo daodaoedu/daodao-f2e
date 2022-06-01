@@ -4,6 +4,7 @@ import { Box, Button, Typography } from "@mui/material";
 import SearchField from "../SearchField";
 import BannerVideo from "../BannerVideo";
 import Typed from "react-typed";
+import Title from "./Title";
 
 const BannerWrapper = styled.section`
   height: var(--section-height);
@@ -15,13 +16,15 @@ const BannerWrapper = styled.section`
 
 const MainBannerWrapper = styled.div`
   margin: 0 auto 0 auto;
-  /* padding-top: 20vh; */
 
   .promo-button {
     margin: 0 auto 0 auto;
   }
 
+  min-width: 600px;
+
   @media (max-width: 768px) {
+    min-width: auto;
     width: 80%;
     padding-top: 10vh;
   }
@@ -43,41 +46,7 @@ const Banner = ({ guideRef }) => {
     <Box>
       <BannerWrapper>
         <MainBannerWrapper>
-          <Typography
-            variant="h1"
-            sx={{
-              fontSize: "24px",
-              lineHeight: "28px",
-              letterSpacing: "0.08em",
-              color: "#f0f0f0",
-              fontWeight: "500",
-              textAlign: "center",
-            }}
-          >
-            <Typed
-              strings={["歡迎來到島島阿學！一起找找資源、分享資源吧！"]}
-              typeSpeed={80}
-            />
-          </Typography>
-          <Typography
-            variant="h2"
-            sx={{
-              fontSize: "16px",
-              lineHeight: "22px",
-              letterSpacing: "0.08em",
-              textAlign: "center",
-              marginTop: "10px",
-              color: "#f0f0f0",
-              fontWeight: "500",
-            }}
-          >
-            <Typed
-              strings={[
-                "If you want to go fast go alone. If you what to go far go together.",
-              ]}
-              typeSpeed={80}
-            />
-          </Typography>
+          <Title />
           <SearchField />
         </MainBannerWrapper>
         <SubBannerWrapper>
@@ -107,6 +76,7 @@ const Banner = ({ guideRef }) => {
               onClick={smoothScroll}
               sx={{
                 backgroundColor: "#fff",
+                opacity: "0.8",
                 "&:hover": {
                   backgroundColor: "#fff",
                 },

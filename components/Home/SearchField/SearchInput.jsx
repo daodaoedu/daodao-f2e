@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { IconButton, Box } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import MicIcon from "@mui/icons-material/Mic";
@@ -15,6 +15,13 @@ const Speech = dynamic(import("../../../shared/components/Speech"), {
 const FormWrapper = styled.form`
   width: 100%;
 `;
+
+const PLACEHOLDER_TEXT = [
+  "今晚，要不要來點 ＿＿ 的學習資源？",
+  "有好多令人興奮的事情在發生 ❗️",
+  "學膩了學科嗎，要不要來點別的？",
+  "有事沒事搜尋一下，增廣見聞 ➡️",
+];
 
 const SearchToolsWrapper = styled(Box)`
   position: relative;
@@ -61,6 +68,11 @@ const SearchInput = () => {
     }
   }, [keyword, push]);
 
+  const placeholder = useMemo(
+    () => PLACEHOLDER_TEXT[Math.floor(Math.random() * 4)],
+    []
+  );
+
   return (
     <SearchInputWrapper
       sx={{
@@ -95,7 +107,7 @@ const SearchInput = () => {
           }}
           id="q"
           name="q"
-          placeholder="今晚，要不要來點 ＿＿ 的學習資源？"
+          placeholder={placeholder}
           inputProps={{ "aria-label": "search learning resources" }}
           type="search"
           onChange={(event) => setKeyword(event.target.value)}

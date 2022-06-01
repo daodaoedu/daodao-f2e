@@ -8,7 +8,8 @@ const SearchFieldWrapper = styled.div`
   margin-top: 40px;
   display: flex;
   flex-direction: column;
-  width: 500px;
+  /* width: 500px; */
+  width: 100%;
   @media (max-width: 768px) {
     width: 100%;
   }
