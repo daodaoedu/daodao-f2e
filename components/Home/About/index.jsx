@@ -31,6 +31,8 @@ const GuideWrapper = styled.div`
 
 const About = () => {
   const router = useRouter();
+  console.log("locale", router?.locale);
+  console.log("locales", router?.locales);
   return (
     <GuideWrapper>
       <Typography
