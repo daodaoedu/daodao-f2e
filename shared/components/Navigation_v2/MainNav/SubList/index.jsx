@@ -17,6 +17,7 @@ const LinkListWrapper = styled.ul`
   position: relative;
   li {
     cursor: pointer;
+    font-weight: 500;
   }
   @media (max-width: 767px) {
     display: none;

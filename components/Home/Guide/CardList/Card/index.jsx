@@ -39,16 +39,16 @@ const CardWrapper = styled.li`
 
 const ContentWrapper = styled.div`
   margin: auto;
-  padding-top: 100px;
-  width: 200px;
-  height: 200px;
+  width: 240px;
+  height: 110px;
+  padding-top: 130px;
   .title {
     color: #f0f0f0;
-    font-size: 36px;
+    font-size: 32px;
     line-height: 45px;
     letter-spacing: 0.08em;
     font-weight: bold;
-    text-align: left;
+    text-align: center;
   }
 
   .desc {
@@ -57,8 +57,12 @@ const ContentWrapper = styled.div`
     line-height: 45px;
     letter-spacing: 0.08em;
     font-weight: bold;
-    text-align: left;
+    text-align: center;
     margin-top: 20px;
+  }
+
+  @media (max-width: 767px) {
+    padding-top: 0px;
   }
 `;
 
@@ -80,19 +84,19 @@ const BackgroundWrapper = styled.div`
   `}
 `;
 
-const Card = ({ id, image, title }) => {
+const Card = ({ id, image, title, desc }) => {
   const router = useRouter();
   return (
     <CardWrapper
       key={id}
       isShow
-      onClick={() => router.push(`/search?q=${title}`)}
+      onClick={() => router.push(`/search?cats=${title}`)}
       // isShow={isShow}
     >
       <BackgroundWrapper image={image} />
       <ContentWrapper>
         <p className="title">{title}</p>
-        <p className="desc">學習夥伴成長中</p>
+        <p className="desc">{desc}</p>
       </ContentWrapper>
     </CardWrapper>
   );

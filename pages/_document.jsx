@@ -11,7 +11,10 @@ class MyDocument extends Document {
   render() {
     return (
       <Html lang="zh-Hant">
-        <Head />
+        <Head>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin />
+        </Head>
         <body>
           <Main />
           <NextScript />

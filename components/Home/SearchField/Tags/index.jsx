@@ -3,54 +3,31 @@ import Link from "next/link";
 import styled from "@emotion/styled";
 import { Chip } from "@mui/material";
 import { useRouter } from "next/router";
-import { COLOR_TABLE } from "../../../../constants/notion";
+import { SEARCH_TAGS } from "../../../../constants/category";
 
 const TagsWrapper = styled.ul`
   display: flex;
   justify-content: center;
   align-items: center;
-  /* li {
-    margin: auto 10px;
-    background-color: white;
-    padding: 6px 12px;
-    border-radius: 20px;
+  flex-wrap: wrap;
 
-    a {
-      color: #222222;
-      font-weight: 500;
-    }
-  } */
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+  }
 `;
-const MOCK_TAGS = [
-  {
-    key: "英語",
-    link: "/search?tags=英語&cats=語言與文學",
-    text: "英語",
-  },
-  {
-    key: "邏輯",
-    link: "/search?tags=邏輯&cats=數學與邏輯",
-    text: "邏輯",
-  },
-  {
-    key: "數學",
-    link: "/search?tags=數學&cats=數學與邏輯",
-    text: "數學",
-  },
-];
 
 const SearchField = () => {
   const router = useRouter();
   return (
     <TagsWrapper>
-      {MOCK_TAGS.map(({ key, link, text }) => (
-        <li key={key}>
+      {SEARCH_TAGS["全部"].map((text) => (
+        <li key={text}>
           <Chip
-            onClick={() => router.push(link)}
+            onClick={() => router.push(`/search?tags=${text}`)}
             label={text}
             value={text}
             sx={{
-              backgroundColor:"#fff",
+              backgroundColor: "#fff",
               opacity: "80%",
               cursor: "pointer",
               margin: "5px",

@@ -19,17 +19,17 @@ const CardListWrapper = styled.ul`
 const data = [
   {
     id: 0,
-    title: "英語",
+    title: "語言與文學",
     image: "/assets/images/english.png",
   },
   {
     id: 1,
-    title: "程式設計",
+    title: "資訊與工程",
     image: "/assets/images/programming.png",
   },
   {
     id: 2,
-    title: "數位工具",
+    title: "學習/教學工具",
     image: "/assets/images/digital.png",
   },
 ];
@@ -46,7 +46,13 @@ const CardList = () => {
   return (
     <CardListWrapper ref={trigger}>
       {data.map(({ image, title, id }) => (
-        <Card key={id} id={id} image={image} title={title} />
+        <Card
+          key={id}
+          id={id}
+          image={image}
+          title={title}
+          desc="學習夥伴成長中"
+        />
       ))}
     </CardListWrapper>
   );

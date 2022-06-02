@@ -4,6 +4,7 @@ import { createTheme } from "@mui/material/styles";
 // Create a theme instance.
 const theme = createTheme({
   typography: {
+    fontFamily: ["'-apple-system', 'PingFang TC', 'NotoSans TC', 'sans-serif'"],
     h1: {
       fontSize: "40px",
       fontWeight: "500",
@@ -40,7 +41,7 @@ const theme = createTheme({
     },
   },
   palette: {
-    mode: 'dark',
+    mode: "dark",
     primary: {
       // main: "#fff",
       main: "#16b9b3",

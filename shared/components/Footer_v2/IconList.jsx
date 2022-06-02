@@ -7,6 +7,7 @@ const IconListWrapper = styled.div`
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    margin-top: 15px;
   }
   li {
     cursor: pointer;
