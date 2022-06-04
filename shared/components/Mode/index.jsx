@@ -22,6 +22,7 @@ const Mode = () => {
           justifyContent: "center",
           alignItems: "center",
           cursor: "pointer",
+          zIndex: 1,
         }}
         onClick={() => dispatch(changeMode())}
       >

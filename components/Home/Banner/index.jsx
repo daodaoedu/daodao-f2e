@@ -79,6 +79,7 @@ const Banner = ({ guideRef }) => {
                 opacity: "0.8",
                 "&:hover": {
                   backgroundColor: "#fff",
+                  opacity: "1",
                 },
               }}
             >
