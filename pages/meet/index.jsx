@@ -7,6 +7,7 @@ import Footer from "../../shared/components/Footer_v2";
 // import { JitsiMeeting } from "@jitsi/react-sdk";
 import Script from "next/script";
 import dynamic from "next/dynamic";
+import { Box } from "@mui/material";
 
 const JitsiMeeting = dynamic(
     () =>
@@ -96,22 +97,24 @@ const MeetPage = () => {
       <Script src="https://meet.jit.si/external_api.js"></Script>
       {/* <SEOConfig data={SEOData} /> */}
       <Navigation />
-      <JitsiMeeting
-        // roomName={generateRoomName()}
-        domain="meet.jit.si/DaoDaoEduuuu"
-        roomName={roomName}
-        spinner={renderSpinner}
-        config={{
-          subject: "xxx",
-          hideConferenceSubject: false,
-        }}
-        // onApiReady={(externalApi) => handleApiReady(externalApi)}
-        // onReadyToClose={handleReadyToClose}
-        getIFrameRef={handleJitsiIFrameRef1}
-        userInfo={{
-          displayName: userFullName,
-        }}
-      />
+      <Box sx={{ minHeight: "100vh" }}>
+        <JitsiMeeting
+          // roomName={generateRoomName()}
+          domain="meet.jit.si"
+          roomName={roomName}
+          spinner={renderSpinner}
+          config={{
+            subject: "xxx",
+            hideConferenceSubject: false,
+          }}
+          // onApiReady={(externalApi) => handleApiReady(externalApi)}
+          // onReadyToClose={handleReadyToClose}
+          getIFrameRef={handleJitsiIFrameRef1}
+          userInfo={{
+            displayName: userFullName,
+          }}
+        />
+      </Box>
       <Footer />
     </HomePageWrapper>
   );
