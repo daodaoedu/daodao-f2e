@@ -62,10 +62,8 @@ const WishResource = () => {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/assets/floating-dog.gif"
+          src="https://www.daoedu.tw/cdn-cgi/image/width=200,height=200,quality=80,format=webp/assets/floating-dog.gif"
           alt="floating-dog"
-          width="200"
-          height="200"
         />
         <Box
           sx={{
