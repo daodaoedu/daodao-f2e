@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
 import { Button, Paper, Box, Stack, Typography } from "@mui/material";
-import Tags from "./Tags ";
+import Tags from "./Tags";
 import { postFetcher } from "../../utils/fetcher";
 import { css } from "@emotion/react";
 import { DiscussionEmbed, Recommendations, CommentEmbed } from "disqus-react";
