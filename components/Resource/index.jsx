@@ -204,8 +204,8 @@ const Resource = ({
         </Box>
         <Tags tags={feeTags} type="fee" />
       </Box>
-      <Video videoLink={videoLink} />
       <Desc desc={desc} />
+      <Video videoLink={videoLink} />
       <RelatedResources
         title="📌 你可能感興趣的資源"
         searchScheme={{
