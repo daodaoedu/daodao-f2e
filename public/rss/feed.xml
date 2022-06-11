@@ -4,7 +4,7 @@
         <title>島島阿學多元學習社群</title>
         <link>https://www.daoedu.tw</link>
         <description>「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。</description>
-        <lastBuildDate>Tue, 31 May 2022 15:57:58 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 11 Jun 2022 08:01:07 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Feed for Node.js</generator>
         <image>
@@ -13,6 +13,28 @@
             <link>https://www.daoedu.tw</link>
         </image>
         <copyright>All rights reserved 2022, 島島阿學</copyright>
+        <item>
+            <title><![CDATA[whatfont的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/whatfont</link>
+            <guid>https://www.daoedu.tw/resource/whatfont</guid>
+            <pubDate>Thu, 09 Jun 2022 04:14:00 GMT</pubDate>
+            <description><![CDATA[可以輕易地透過套件檢查網頁上的字型是否符合預期。
+The easiest way to identify fonts on web pages. What is the easiest way to find out the fonts used in a webpage? Firebug and Webkit Inspector are easy enough to use for developers. However, for others, this should not be necessary. With this extension, you could inspect web fonts by just hovering on them. It is that simple and elegant. It also detects the services used for serving the web fonts. Supports Typekit and Google Font API. Recommended by Wired WebMonkey, Lifehacker, and SwissMiss. (From official)]]></description>
+            <content:encoded><![CDATA[可以輕易地透過套件檢查網頁上的字型是否符合預期。
+The easiest way to identify fonts on web pages. What is the easiest way to find out the fonts used in a webpage? Firebug and Webkit Inspector are easy enough to use for developers. However, for others, this should not be necessary. With this extension, you could inspect web fonts by just hovering on them. It is that simple and elegant. It also detects the services used for serving the web fonts. Supports Typekit and Google Font API. Recommended by Wired WebMonkey, Lifehacker, and SwissMiss. (From official)]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://lh3.googleusercontent.com/dPdyfSl7seUOpHe4rDj-oxo7oQ9P60809H2MY4NynmV9CDsY9p-p8Ovb_QmsYdGM7jgjCYG6s7MGYnMOMOjtpbdGLJ4=w128-h128-e365-rj-sc0x00ffffff" length="0" type="image//dPdyfSl7seUOpHe4rDj-oxo7oQ9P60809H2MY4NynmV9CDsY9p-p8Ovb_QmsYdGM7jgjCYG6s7MGYnMOMOjtpbdGLJ4=w128-h128-e365-rj-sc0x00ffffff"/>
+        </item>
+        <item>
+            <title><![CDATA[故宮線上學校的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/故宮線上學校</link>
+            <guid>https://www.daoedu.tw/resource/故宮線上學校</guid>
+            <pubDate>Wed, 08 Jun 2022 14:48:00 GMT</pubDate>
+            <description><![CDATA[故宮線上學校提供國小到高中的學生線上免費課程，讓學生能學習文物背後的歷史、文化等知識。此外也提供師培課程以及教學資源。]]></description>
+            <content:encoded><![CDATA[故宮線上學校提供國小到高中的學生線上免費課程，讓學生能學習文物背後的歷史、文化等知識。此外也提供師培課程以及教學資源。]]></content:encoded>
+            <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
+            <enclosure url="https://i.imgur.com/pIeTzCH.jpg" length="0" type="image/jpg"/>
+        </item>
         <item>
             <title><![CDATA[保障教育選擇權的學習資源介紹｜島島阿學]]></title>
             <link>https://www.daoedu.tw/resource/保障教育選擇權</link>

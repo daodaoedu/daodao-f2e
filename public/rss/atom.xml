@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://www.daoedu.tw</id>
     <title>島島阿學多元學習社群</title>
-    <updated>2022-05-31T15:57:58.355Z</updated>
+    <updated>2022-06-11T08:01:07.280Z</updated>
     <generator>Feed for Node.js</generator>
     <author>
         <name>島島阿學多元學習社群</name>
@@ -15,6 +15,44 @@
     <logo>https://www.daoedu.tw/preview.webp</logo>
     <icon>https://www.daoedu.tw/favicon.png</icon>
     <rights>All rights reserved 2022, 島島阿學</rights>
+    <entry>
+        <title type="html"><![CDATA[whatfont的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/whatfont</id>
+        <link href="https://www.daoedu.tw/resource/whatfont"/>
+        <updated>2022-06-09T04:14:00.000Z</updated>
+        <summary type="html"><![CDATA[可以輕易地透過套件檢查網頁上的字型是否符合預期。
+The easiest way to identify fonts on web pages. What is the easiest way to find out the fonts used in a webpage? Firebug and Webkit Inspector are easy enough to use for developers. However, for others, this should not be necessary. With this extension, you could inspect web fonts by just hovering on them. It is that simple and elegant. It also detects the services used for serving the web fonts. Supports Typekit and Google Font API. Recommended by Wired WebMonkey, Lifehacker, and SwissMiss. (From official)]]></summary>
+        <content type="html"><![CDATA[可以輕易地透過套件檢查網頁上的字型是否符合預期。
+The easiest way to identify fonts on web pages. What is the easiest way to find out the fonts used in a webpage? Firebug and Webkit Inspector are easy enough to use for developers. However, for others, this should not be necessary. With this extension, you could inspect web fonts by just hovering on them. It is that simple and elegant. It also detects the services used for serving the web fonts. Supports Typekit and Google Font API. Recommended by Wired WebMonkey, Lifehacker, and SwissMiss. (From official)]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[故宮線上學校的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/故宮線上學校</id>
+        <link href="https://www.daoedu.tw/resource/故宮線上學校"/>
+        <updated>2022-06-08T14:48:00.000Z</updated>
+        <summary type="html"><![CDATA[故宮線上學校提供國小到高中的學生線上免費課程，讓學生能學習文物背後的歷史、文化等知識。此外也提供師培課程以及教學資源。]]></summary>
+        <content type="html"><![CDATA[故宮線上學校提供國小到高中的學生線上免費課程，讓學生能學習文物背後的歷史、文化等知識。此外也提供師培課程以及教學資源。]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
     <entry>
         <title type="html"><![CDATA[保障教育選擇權的學習資源介紹｜島島阿學]]></title>
         <id>https://www.daoedu.tw/resource/保障教育選擇權</id>

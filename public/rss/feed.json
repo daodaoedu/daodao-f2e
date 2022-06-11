@@ -11,6 +11,32 @@
     },
     "items": [
         {
+            "id": "https://www.daoedu.tw/resource/whatfont",
+            "content_html": "可以輕易地透過套件檢查網頁上的字型是否符合預期。\nThe easiest way to identify fonts on web pages. What is the easiest way to find out the fonts used in a webpage? Firebug and Webkit Inspector are easy enough to use for developers. However, for others, this should not be necessary. With this extension, you could inspect web fonts by just hovering on them. It is that simple and elegant. It also detects the services used for serving the web fonts. Supports Typekit and Google Font API. Recommended by Wired WebMonkey, Lifehacker, and SwissMiss. (From official)",
+            "url": "https://www.daoedu.tw/resource/whatfont",
+            "title": "whatfont的學習資源介紹｜島島阿學",
+            "summary": "可以輕易地透過套件檢查網頁上的字型是否符合預期。\nThe easiest way to identify fonts on web pages. What is the easiest way to find out the fonts used in a webpage? Firebug and Webkit Inspector are easy enough to use for developers. However, for others, this should not be necessary. With this extension, you could inspect web fonts by just hovering on them. It is that simple and elegant. It also detects the services used for serving the web fonts. Supports Typekit and Google Font API. Recommended by Wired WebMonkey, Lifehacker, and SwissMiss. (From official)",
+            "image": "https://lh3.googleusercontent.com/dPdyfSl7seUOpHe4rDj-oxo7oQ9P60809H2MY4NynmV9CDsY9p-p8Ovb_QmsYdGM7jgjCYG6s7MGYnMOMOjtpbdGLJ4=w128-h128-e365-rj-sc0x00ffffff",
+            "date_modified": "2022-06-09T04:14:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/故宮線上學校",
+            "content_html": "故宮線上學校提供國小到高中的學生線上免費課程，讓學生能學習文物背後的歷史、文化等知識。此外也提供師培課程以及教學資源。",
+            "url": "https://www.daoedu.tw/resource/故宮線上學校",
+            "title": "故宮線上學校的學習資源介紹｜島島阿學",
+            "summary": "故宮線上學校提供國小到高中的學生線上免費課程，讓學生能學習文物背後的歷史、文化等知識。此外也提供師培課程以及教學資源。",
+            "image": "https://i.imgur.com/pIeTzCH.jpg",
+            "date_modified": "2022-06-08T14:48:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
             "id": "https://www.daoedu.tw/resource/保障教育選擇權",
             "content_html": "保障教育選擇權是關於如何撰寫自學生的學習計畫，以及實驗教育相關的資訊",
             "url": "https://www.daoedu.tw/resource/保障教育選擇權",
