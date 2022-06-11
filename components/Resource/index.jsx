@@ -13,6 +13,7 @@ import Shares from "./Shares";
 import appendQuery from "append-query";
 import RelatedResources from "../../shared/components/RelatedResources";
 import Desc from "./Desc";
+import Video from "./Video";
 
 const ResourceWrapper = styled.article`
   background-color: #fff;
@@ -71,7 +72,16 @@ const ImageWrapper = styled.div`
   }
 `;
 
-const Resource = ({ data, title, desc, image, tags, feeTags, link }) => {
+const Resource = ({
+  data,
+  title,
+  desc,
+  image,
+  tags,
+  feeTags,
+  link,
+  videoLink,
+}) => {
   const router = useRouter();
   // const isLoading = useMemo(() => !data, [data]);
   const [disqusConfig, setDisqusConfig] = useState({});
@@ -194,6 +204,7 @@ const Resource = ({ data, title, desc, image, tags, feeTags, link }) => {
         </Box>
         <Tags tags={feeTags} type="fee" />
       </Box>
+      <Video videoLink={videoLink} />
       <Desc desc={desc} />
       <RelatedResources
         title="📌 你可能感興趣的資源"

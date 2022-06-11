@@ -13,7 +13,11 @@ class MyDocument extends Document {
       <Html lang="zh-Hant">
         <Head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin />
+          <link
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossOrigin="true"
+          />
         </Head>
         <body>
           <Main />

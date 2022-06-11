@@ -47,6 +47,13 @@ const ResourcePage = ({ data = {} }) => {
         : [],
     [data]
   );
+
+  const videoLink = useMemo(
+    () =>
+      data?.properties["影片"]?.url,
+    [data]
+  );
+
   const link = useMemo(
     () =>
       data?.properties && data?.properties["連結"]
@@ -111,6 +118,7 @@ const ResourcePage = ({ data = {} }) => {
         tags={tags}
         feeTags={feeTags}
         link={link}
+        videoLink={videoLink}
       />
       <Footer />
     </>
@@ -247,6 +255,11 @@ export const getStaticProps = async ({ params }) => {
               type: "multi_select",
               multi_select: [],
             },
+            影片: {
+              id: "jC%3CM",
+              type: "url",
+              url: "https://www.youtube.com/watch?v=Mv_uPvf_pGQ",
+            },
             年齡層: {
               id: "wS%3Cy",
               type: "multi_select",
@@ -313,9 +326,12 @@ export const getStaticProps = async ({ params }) => {
 
   return {
     props: {
-      data: (data?.payload?.results ?? []).find(
-        ({ properties }) =>
-          properties && properties["資源名稱"]?.title[0]?.plain_text
+      data: (data?.payload?.results ?? []).find(({ properties }) =>
+        (
+          (properties["資源名稱"]?.title ?? []).find(
+            (item) => item?.type === "text"
+          )?.plain_text ?? ""
+        ).trim()
       ),
     },
   };
