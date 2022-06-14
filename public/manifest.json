@@ -1,33 +1,31 @@
 {
-  "background_color": "#16b9b3",
-  "description": "「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
-  "dir": "ltr",
-  "display": "standalone",
-  "name": "多元學習資源平台｜島島阿學",
-  "orientation": "any",
-  "scope": "/",
-  "name": "多元學習資源平台｜島島阿學",
   "short_name": "島島阿學",
-  "start_url": "/",
-  "theme_color": "#16b9b3",
-  "prefer_related_applications": "true",
+  "name": "多元學習資源平台｜島島阿學",
   "icons": [
     {
-      "src": "images/192x192.png",
+      "src": "/images/icons-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
-	  "src": "images/512x512.png",
+    {
+      "src": "/images/icons-512.png",
       "type": "image/png",
       "sizes": "512x512"
-	}
+    }
   ],
+  "start_url": "/?source=pwa",
+  "background_color": "#16b9b3",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#16b9b3",
   "shortcuts": [
     {
       "name": "島島阿學",
       "short_name": "島島阿學",
       "description": "島島阿學，可共編的學習資源平台",
       "url": "/",
-      "icons": [{ "src": "/images/192x192.png", "sizes": "192x192" }]
-    },
+      "icons": [{ "src": "/images/icons-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "description": "島島阿學，可共編的學習資源平台"
 }
