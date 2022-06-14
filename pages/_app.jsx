@@ -47,6 +47,7 @@ const App = ({ Component, pageProps }) => {
         src="https://www.googletagmanager.com/gtag/js?id=G-9Z1P1RKY69"
         strategy="afterInteractive"
       />
+	  <link rel="manifest" href="manifest.json" />
       <Script id="google-analytics" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
@@ -55,6 +56,11 @@ const App = ({ Component, pageProps }) => {
           gtag('config', 'G-9Z1P1RKY69');
         `}
       </Script>
+	  <script type="module">
+		import 'https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate';
+		const el = document.createElement('pwa-update');
+		document.body.appendChild(el);
+      </script>
       <Provider store={store}>
         <ThemeComponentWrap pageProps={pageProps} Component={Component} />
       </Provider>
