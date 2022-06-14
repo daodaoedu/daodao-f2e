@@ -1,5 +1,5 @@
 {
-  "background_color": "#ffffff",
+  "background_color": "#16b9b3",
   "description": "「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
   "dir": "ltr",
   "display": "standalone",
@@ -17,17 +17,17 @@
       "type": "image/png",
       "sizes": "192x192"
     },
-    {
-      "src": "images/200x200.png",
-      "type": "image/png",
-      "sizes": "200x200"
-    },
 	  "src": "images/512x512.png",
       "type": "image/png",
       "sizes": "512x512"
-	},
+	}
+  ],
+  "shortcuts": [
     {
-      "src": "https://www.daoedu.tw/preview.webp"
-    }
-  ]
+      "name": "島島阿學",
+      "short_name": "島島阿學",
+      "description": "島島阿學，可共編的學習資源平台",
+      "url": "/",
+      "icons": [{ "src": "/images/192x192.png", "sizes": "192x192" }]
+    },
 }
