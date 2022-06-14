@@ -11,6 +11,7 @@ const SEO = ({ data }) => {
     imgLink,
     link,
     structuredData,
+    themeColor = "#16b9b3",
   } = data;
   return (
     <>
@@ -61,6 +62,8 @@ const SEO = ({ data }) => {
         <meta name="twitter:card" content={imgLink} />
         <meta name="twitter:image:src" content={imgLink} />
         <meta name="twitter:image:alt" content="daodao logo" />
+
+        <meta name="theme-color" itemProp="theme-color" content={themeColor} />
       </Head>
       {/* 結構化資料 */}
       {structuredData && <StructuredData data={structuredData} />}
