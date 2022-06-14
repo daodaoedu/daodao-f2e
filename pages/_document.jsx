@@ -12,11 +12,18 @@ class MyDocument extends Document {
     return (
       <Html lang="zh-Hant">
         <Head>
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link
+			rel="preconnect"
+			href="https://fonts.googleapis.com"
+          />
           <link
             rel="preconnect"
             href="https://fonts.gstatic.com"
             crossOrigin="true"
+          />
+		  <link
+            rel="manifest"
+            href="manifest.json"
           />
         </Head>
         <body>
