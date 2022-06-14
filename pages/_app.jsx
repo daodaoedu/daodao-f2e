@@ -11,7 +11,6 @@ import { useRouter } from "next/router";
 import Script from "next/script";
 import Mode from '../shared/components/Mode';
 import "regenerator-runtime/runtime"; // Speech.js
-import "https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate"; //PWA
 
 const store = storeFactory();
 
@@ -56,10 +55,11 @@ const App = ({ Component, pageProps }) => {
           gtag('config', 'G-9Z1P1RKY69');
         `}
       </Script>     
-	　<Script>	  
+	　<Script type="module">	  
 		{`
-	  	　const el = document.createElement('pwa-update');
-		　document.body.appendChild(el);
+          import 'https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate';
+          const el = document.createElement('pwa-update');
+          document.body.appendChild(el);
         `}
       </Script>
       <Provider store={store}>
