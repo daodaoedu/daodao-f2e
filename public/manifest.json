@@ -6,15 +6,26 @@
   "name": "多元學習資源平台｜島島阿學",
   "orientation": "any",
   "scope": "/",
-  "short_name": "多元學習資源平台｜島島阿學",
+  "name": "多元學習資源平台｜島島阿學",
+  "short_name": "島島阿學",
   "start_url": "/",
   "theme_color": "#16b9b3",
+  "prefer_related_applications": "true",
   "icons": [
+    {
+      "src": "images/192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
     {
       "src": "images/200x200.png",
       "type": "image/png",
       "sizes": "200x200"
     },
+	  "src": "images/512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+	},
     {
       "src": "https://www.daoedu.tw/preview.webp"
     }

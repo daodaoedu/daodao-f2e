@@ -55,13 +55,6 @@ const App = ({ Component, pageProps }) => {
           gtag('config', 'G-9Z1P1RKY69');
         `}
       </Script>     
-	　<Script type="module">	  
-		{`
-          import 'https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate';
-          const el = document.createElement('pwa-update');
-          document.body.appendChild(el);
-        `}
-      </Script>
       <Provider store={store}>
         <ThemeComponentWrap pageProps={pageProps} Component={Component} />
       </Provider>

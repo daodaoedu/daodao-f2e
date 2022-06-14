@@ -25,6 +25,13 @@ class MyDocument extends Document {
             rel="manifest"
             href="manifest.json"
           />
+		  <Script type="module">	  
+			{`
+			  import 'https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate';
+			  const el = document.createElement('pwa-update');
+			  document.body.appendChild(el);
+			`}
+		  </Script>
         </Head>
         <body>
           <Main />
