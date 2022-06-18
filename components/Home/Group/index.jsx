@@ -123,7 +123,10 @@ const Group = () => {
         </Box>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://www.daoedu.tw/cdn-cgi/image/width=300,height=300,quality=80,format=webp/assets/group.gif"
+          // src="https://www.daoedu.tw/cdn-cgi/image/width=300,height=300,quality=80,format=webp/assets/group.gif"
+          src="/assets/group.gif"
+          width="200"
+          height="200"
           alt="group"
         />
       </Box>
