@@ -1,0 +1,27 @@
+name: daodao-f2e
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: daodao-f2e
+    steps:
+      - name: Await CF Pages and send Slack notification
+        uses: arddluma/cloudflare-pages-slack-notification@v2.4
+        with:
+          accountEmail: ${{ secrets.CF_ACCOUNT_EMAIL  }}
+          apiKey: ${{ secrets.CF_API_KEY  }}
+          accountId: ${{ secrets.CF_ACC_ID  }}
+          # CloudFlare Pages project name
+          project: ${{ secrets.CF_PAGES_PROJECT  }}
+          # Add this if you want GitHub Deployments (see below)
+          # githubToken: ${{ secrets.GITHUB_TOKEN }}
+          # Create Slack Incoming webhook and add as variable https://hooks.slack.com/...
+          slackWebHook: ${{ secrets.SLACK_WEBHOOK  }}
+          # Add this if you want to wait for a deployment triggered by a specfied commit
+          commitHash: ${{ steps.push-changes.outputs.commit-hash }}
+          - uses: actions/checkout@v2
