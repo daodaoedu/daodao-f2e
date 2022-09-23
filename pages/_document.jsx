@@ -1,6 +1,6 @@
-import React from "react";
-import Document, { Html, Head, Main, NextScript } from "next/document";
-import Script from "next/script";
+import React from 'react';
+import Document, { Html, Head, Main, NextScript } from 'next/document';
+import Script from 'next/script';
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -22,10 +22,10 @@ class MyDocument extends Document {
         </Head>
         <Script type="module">
           {`
-			  import 'https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate';
-			  const el = document.createElement('pwa-update');
-			  document.body.appendChild(el);
-			`}
+          import 'https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate';
+          const el = document.createElement('pwa-update');
+          document.body.appendChild(el);
+        `}
         </Script>
         <body>
           <Main />
