@@ -11,6 +11,578 @@
     },
     "items": [
         {
+            "id": "https://www.daoedu.tw/resource/Gapminder",
+            "content_html": "Gapminder 是一個瑞典的基金會、是非營利組織 ，網站使用可靠的數據開發易於理解的教材，以消除人們對世界的誤解。",
+            "url": "https://www.daoedu.tw/resource/Gapminder",
+            "title": "Gapminder的學習資源介紹｜島島阿學",
+            "summary": "Gapminder 是一個瑞典的基金會、是非營利組織 ，網站使用可靠的數據開發易於理解的教材，以消除人們對世界的誤解。",
+            "image": "https://i.imgur.com/j015lAY.png",
+            "date_modified": "2022-09-08T05:00:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/Parker English怕渴英文",
+            "content_html": "「Parker English」這個頻道希望能以影片的方式來解決你在英文學習上所遇到的困難。\n未來預計會在每週一、週三定期更新影片，歡迎一起在英文路上大步前進吧！",
+            "url": "https://www.daoedu.tw/resource/Parker English怕渴英文",
+            "title": "Parker English怕渴英文的學習資源介紹｜島島阿學",
+            "summary": "「Parker English」這個頻道希望能以影片的方式來解決你在英文學習上所遇到的困難。\n未來預計會在每週一、週三定期更新影片，歡迎一起在英文路上大步前進吧！",
+            "image": "https://i.imgur.com/HE92xBN.png",
+            "date_modified": "2022-09-08T04:58:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/故事 StoryStudio LINE社群",
+            "content_html": "以歷史脈絡書寫當代議題，和讀者一起從生活發現歷史、從臺灣看見世界、從過去想像未來。\n\n故事 StoryStudio 致力於人文知識的轉譯與傳播，創造屬於當代的，專注歷史與文化的新媒體，在這個破碎當道的時代，提供讀者理解世界的脈絡；在這個扁平至上的時代，探索文化議題的深度；在這個虛實不分的時代， 呈現真實而可靠的資訊。\n\n以上資料取自故事 StoryStudio Line 社群介紹",
+            "url": "https://www.daoedu.tw/resource/故事 StoryStudio LINE社群",
+            "title": "故事 StoryStudio LINE社群的學習資源介紹｜島島阿學",
+            "summary": "以歷史脈絡書寫當代議題，和讀者一起從生活發現歷史、從臺灣看見世界、從過去想像未來。\n\n故事 StoryStudio 致力於人文知識的轉譯與傳播，創造屬於當代的，專注歷史與文化的新媒體，在這個破碎當道的時代，提供讀者理解世界的脈絡；在這個扁平至上的時代，探索文化議題的深度；在這個虛實不分的時代， 呈現真實而可靠的資訊。\n\n以上資料取自故事 StoryStudio Line 社群介紹",
+            "image": "https://i.imgur.com/kfMdTBE.png",
+            "date_modified": "2022-08-25T02:13:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/出口日語",
+            "content_html": "日文教學，可學習、平假名、片假名和文法等。\n亦有書籍「大家的日本語」講解課程。",
+            "url": "https://www.daoedu.tw/resource/出口日語",
+            "title": "出口日語的學習資源介紹｜島島阿學",
+            "summary": "日文教學，可學習、平假名、片假名和文法等。\n亦有書籍「大家的日本語」講解課程。",
+            "image": "https://i.imgur.com/RT6M4op.png",
+            "date_modified": "2022-08-18T06:21:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/經濟學人",
+            "content_html": "《經濟學人》（The Economist）是一份英國的英文新聞週報，是一本涉及全球政治、經濟、文化、科技等多方面事務的綜合性新聞評論刊物，著重於對這些議題提供深入的分析和評論。",
+            "url": "https://www.daoedu.tw/resource/經濟學人",
+            "title": "經濟學人的學習資源介紹｜島島阿學",
+            "summary": "《經濟學人》（The Economist）是一份英國的英文新聞週報，是一本涉及全球政治、經濟、文化、科技等多方面事務的綜合性新聞評論刊物，著重於對這些議題提供深入的分析和評論。",
+            "image": "https://i.imgur.com/FmgH1iO.jpg",
+            "date_modified": "2022-08-17T09:36:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/玩一玩機器學習與人工智慧",
+            "content_html": "蒐集相關機器學習與AI的教學素材，並已經分類，方便老師可以選擇自己需要的素材來進行課程研發，或者是學生自學也很合適",
+            "url": "https://www.daoedu.tw/resource/玩一玩機器學習與人工智慧",
+            "title": "玩一玩機器學習與人工智慧的學習資源介紹｜島島阿學",
+            "summary": "蒐集相關機器學習與AI的教學素材，並已經分類，方便老師可以選擇自己需要的素材來進行課程研發，或者是學生自學也很合適",
+            "image": "https://i.imgur.com/ncYWvQI.png",
+            "date_modified": "2022-08-12T12:22:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/欸？誰的音樂課本掉了？",
+            "content_html": "這個podcast涵蓋台灣音樂史、代表性人物介紹、曲風解說等多面向，透過每個獨立的單元向民眾介紹音樂，頻道的風格多元呈現，也因為沒有過高的樂理先備知識門檻限制，可以很好入門，所以推薦它。",
+            "url": "https://www.daoedu.tw/resource/欸？誰的音樂課本掉了？",
+            "title": "欸？誰的音樂課本掉了？的學習資源介紹｜島島阿學",
+            "summary": "這個podcast涵蓋台灣音樂史、代表性人物介紹、曲風解說等多面向，透過每個獨立的單元向民眾介紹音樂，頻道的風格多元呈現，也因為沒有過高的樂理先備知識門檻限制，可以很好入門，所以推薦它。",
+            "image": "https://i.imgur.com/UkBivrt.png",
+            "date_modified": "2022-08-12T12:19:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/接棒啟蒙計劃",
+            "content_html": "接棒啟蒙計畫，是一個非營利組織，我們致力於將社會各界的專業善意，轉換成為學生們探索職業與了解自己天賦與熱情的價值。",
+            "url": "https://www.daoedu.tw/resource/接棒啟蒙計劃",
+            "title": "接棒啟蒙計劃的學習資源介紹｜島島阿學",
+            "summary": "接棒啟蒙計畫，是一個非營利組織，我們致力於將社會各界的專業善意，轉換成為學生們探索職業與了解自己天賦與熱情的價值。",
+            "image": "https://i.imgur.com/Xejf84S.png",
+            "date_modified": "2022-08-07T08:13:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/文學小說推薦",
+            "content_html": "裡面是一些我近期在閱讀的文學小說，有科幻、歷史等類型，我認為這些作者的文筆對寫作很有幫助，書中的內容也很發人深省，讓人能思考很多問題。",
+            "url": "https://www.daoedu.tw/resource/文學小說推薦",
+            "title": "文學小說推薦的學習資源介紹｜島島阿學",
+            "summary": "裡面是一些我近期在閱讀的文學小說，有科幻、歷史等類型，我認為這些作者的文筆對寫作很有幫助，書中的內容也很發人深省，讓人能思考很多問題。",
+            "image": "https://i.imgur.com/ikso0GB.png",
+            "date_modified": "2022-08-06T09:19:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/How to Start a Startup",
+            "content_html": "藉由網站影片可以逐步瞭解創業需思考的面向\n網站簡介：Everything we know about how to start a startup, for free, from some of the world experts.",
+            "url": "https://www.daoedu.tw/resource/How to Start a Startup",
+            "title": "How to Start a Startup的學習資源介紹｜島島阿學",
+            "summary": "藉由網站影片可以逐步瞭解創業需思考的面向\n網站簡介：Everything we know about how to start a startup, for free, from some of the world experts.",
+            "image": "https://i.imgur.com/FLnoQ1m.png",
+            "date_modified": "2022-08-06T09:13:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/番茄鐘app",
+            "content_html": "可以讓您透過番茄鐘計時法保持專注(專心25分鐘休息5分鐘)對於容易因手機分心的你非常受用，操作簡單頁面乾淨還有嚴格模式跟小組，工作學習再也不怕分心及一個人奮鬥的寂寞感，計時的畫面讓你在想放棄時能有再堅持下去的想法 (像是 再撐個十分鐘就可以休息了不如再堅持一下)，勞役雙修，學習不再是苦差事。",
+            "url": "https://www.daoedu.tw/resource/番茄鐘app",
+            "title": "番茄鐘app的學習資源介紹｜島島阿學",
+            "summary": "可以讓您透過番茄鐘計時法保持專注(專心25分鐘休息5分鐘)對於容易因手機分心的你非常受用，操作簡單頁面乾淨還有嚴格模式跟小組，工作學習再也不怕分心及一個人奮鬥的寂寞感，計時的畫面讓你在想放棄時能有再堅持下去的想法 (像是 再撐個十分鐘就可以休息了不如再堅持一下)，勞役雙修，學習不再是苦差事。",
+            "image": "https://i.imgur.com/rMsSWQz.png",
+            "date_modified": "2022-08-06T09:12:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/Cake",
+            "content_html": "Cake完全免費，讓你可以利用影片例句來輕鬆學習英文。",
+            "url": "https://www.daoedu.tw/resource/Cake",
+            "title": "Cake的學習資源介紹｜島島阿學",
+            "summary": "Cake完全免費，讓你可以利用影片例句來輕鬆學習英文。",
+            "image": "https://i.imgur.com/bnxUvp5.jpeg",
+            "date_modified": "2022-08-06T09:11:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/Straighterline",
+            "content_html": "Straighterline 是為了解決美國大學學費過貴而出現的學習資源網站。他開設了超過六十門被美國超過2000間大學承認，可以轉成大學學分的課程，收取相對來說一般人比較能負擔的費用。若是高中生想要跳級學習數理，Straighterline也是一個比美國大學開設的暑期學校更划算的選擇。",
+            "url": "https://www.daoedu.tw/resource/Straighterline",
+            "title": "Straighterline的學習資源介紹｜島島阿學",
+            "summary": "Straighterline 是為了解決美國大學學費過貴而出現的學習資源網站。他開設了超過六十門被美國超過2000間大學承認，可以轉成大學學分的課程，收取相對來說一般人比較能負擔的費用。若是高中生想要跳級學習數理，Straighterline也是一個比美國大學開設的暑期學校更划算的選擇。",
+            "image": "https://i.imgur.com/qRhFy1D.png",
+            "date_modified": "2022-08-06T08:55:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/SALU",
+            "content_html": "開心負債創業的社會新鮮人。從街友環島起步，以熱血、冒險、瘋狂作為精神，用影片傳遞小小的「善」。開著夢想巴士行遍台灣各地，鼓勵每個追夢中的人。Keep it cool！先做再說，回歸現實之前，我們想看看自己能跑多遠。\n\n「人生好難但很好玩 瓶蓋牆」位於台中沙鹿夢想街，是我們之前的工作室位置。\n「SALU傻子公寓」位於台中一中街附近，是我們現在的工作室位置。\n\n如果喜歡我們！想支持我們繼續創作！\n一起加入SALU夥伴大船團！ \n一起大鬧世界吧！夥伴們！\nhttps://www.zeczec.com/projects/salu",
+            "url": "https://www.daoedu.tw/resource/SALU",
+            "title": "SALU的學習資源介紹｜島島阿學",
+            "summary": "開心負債創業的社會新鮮人。從街友環島起步，以熱血、冒險、瘋狂作為精神，用影片傳遞小小的「善」。開著夢想巴士行遍台灣各地，鼓勵每個追夢中的人。Keep it cool！先做再說，回歸現實之前，我們想看看自己能跑多遠。\n\n「人生好難但很好玩 瓶蓋牆」位於台中沙鹿夢想街，是我們之前的工作室位置。\n「SALU傻子公寓」位於台中一中街附近，是我們現在的工作室位置。\n\n如果喜歡我們！想支持我們繼續創作！\n一起加入SALU夥伴大船團！ \n一起大鬧世界吧！夥伴們！\nhttps://www.zeczec.com/projects/salu",
+            "image": "https://i.imgur.com/vBOGeEx.png",
+            "date_modified": "2022-08-06T08:53:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/Study Spanish.com",
+            "content_html": "Learn Spanish for free with our grammar lessons, verb drills, cultural Spanish notes, vocabulary lists, podcasts, word of the day and more.",
+            "url": "https://www.daoedu.tw/resource/Study Spanish.com",
+            "title": "Study Spanish.com的學習資源介紹｜島島阿學",
+            "summary": "Learn Spanish for free with our grammar lessons, verb drills, cultural Spanish notes, vocabulary lists, podcasts, word of the day and more.",
+            "image": "https://i.imgur.com/WjChqD5.jpeg",
+            "date_modified": "2022-08-06T08:48:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/教育部樂器銀行",
+            "content_html": "樂器謀合維修交換系統資料庫，讓樂器重新獲得生命，讓自己對音樂的情感延續。",
+            "url": "https://www.daoedu.tw/resource/教育部樂器銀行",
+            "title": "教育部樂器銀行的學習資源介紹｜島島阿學",
+            "summary": "樂器謀合維修交換系統資料庫，讓樂器重新獲得生命，讓自己對音樂的情感延續。",
+            "image": "https://i.imgur.com/7naA4Vt.jpg",
+            "date_modified": "2022-08-06T07:23:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/公視兒少資源網",
+            "content_html": "將公視的兒少節目以主題之方式分類，並提供教師和家長搭配影片的教案應用。",
+            "url": "https://www.daoedu.tw/resource/公視兒少資源網",
+            "title": "公視兒少資源網的學習資源介紹｜島島阿學",
+            "summary": "將公視的兒少節目以主題之方式分類，並提供教師和家長搭配影片的教案應用。",
+            "image": "https://i.imgur.com/1U2O1Ln.png",
+            "date_modified": "2022-08-06T07:21:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/何必日語",
+            "content_html": "離開了大學教室的何必博士，將自身所學在此頻道分享，在這個頻道你可以學到標準的日語發音，易懂的文法以及日本流行事物，內容包羅萬象，不只是日文學習訊息，還包括了用日文去享受日本人的享受，而且在歌曲翻譯上何必博士也下了很多功夫，希望你能夠真的享受到日本流行歌曲以及日本演歌的真正含意。\n希望你在何必博士的頻道可以找到你要的日文或者日本的資訊喔！(來自「何必日語」YouTube頻道簡介)",
+            "url": "https://www.daoedu.tw/resource/何必日語",
+            "title": "何必日語的學習資源介紹｜島島阿學",
+            "summary": "離開了大學教室的何必博士，將自身所學在此頻道分享，在這個頻道你可以學到標準的日語發音，易懂的文法以及日本流行事物，內容包羅萬象，不只是日文學習訊息，還包括了用日文去享受日本人的享受，而且在歌曲翻譯上何必博士也下了很多功夫，希望你能夠真的享受到日本流行歌曲以及日本演歌的真正含意。\n希望你在何必博士的頻道可以找到你要的日文或者日本的資訊喔！(來自「何必日語」YouTube頻道簡介)",
+            "image": "https://i.imgur.com/ASjZsm7.jpeg",
+            "date_modified": "2022-08-06T07:17:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/Dancing with AI",
+            "content_html": "麻省理工媒體室發展的AI課程",
+            "url": "https://www.daoedu.tw/resource/Dancing with AI",
+            "title": "Dancing with AI的學習資源介紹｜島島阿學",
+            "summary": "麻省理工媒體室發展的AI課程",
+            "image": "https://i.imgur.com/elTGm42.png",
+            "date_modified": "2022-08-06T07:11:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/IBM數位教育平台",
+            "content_html": "在IBM，我們相信入門級技術（新的入門級技術工作）需要技能，而不僅僅是學位。 IBM SkillsBuild 提供免費的學習，支持和資源，以促進從中學教育（13-18歲的學生）到入門級就業的STEM和新的領技能。",
+            "url": "https://www.daoedu.tw/resource/IBM數位教育平台",
+            "title": "IBM數位教育平台的學習資源介紹｜島島阿學",
+            "summary": "在IBM，我們相信入門級技術（新的入門級技術工作）需要技能，而不僅僅是學位。 IBM SkillsBuild 提供免費的學習，支持和資源，以促進從中學教育（13-18歲的學生）到入門級就業的STEM和新的領技能。",
+            "image": "https://i.imgur.com/xjDXX3e.png",
+            "date_modified": "2022-07-21T00:48:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/漫遊藝術史",
+            "content_html": "漫遊藝術史，2016年9月誕生，是由中央大學藝術學研究所創立的共筆部落格。我們希望以平易近人的方式，為一般大眾介紹逸趣橫生的藝術人文知識。網站內容涵蓋：藝術史是什麼？藝術史研究方法、美學與藝術理論、亞洲和西方藝術史、視覺文化與電影研究、展覽評論和藝文生態、好書推介、數位學習資源、收藏與展示等。作者群來自臺灣與海外的大學及中學教師、碩博士生、雜誌編輯、自由撰稿者，以及美術館、博物館、藝文基金會、畫廊工作者。\n本站屬文化教育性質的交流平台，文章轉載或節錄不得為商業目的之使用，引用或分享時請務必標示網址與作者。",
+            "url": "https://www.daoedu.tw/resource/漫遊藝術史",
+            "title": "漫遊藝術史的學習資源介紹｜島島阿學",
+            "summary": "漫遊藝術史，2016年9月誕生，是由中央大學藝術學研究所創立的共筆部落格。我們希望以平易近人的方式，為一般大眾介紹逸趣橫生的藝術人文知識。網站內容涵蓋：藝術史是什麼？藝術史研究方法、美學與藝術理論、亞洲和西方藝術史、視覺文化與電影研究、展覽評論和藝文生態、好書推介、數位學習資源、收藏與展示等。作者群來自臺灣與海外的大學及中學教師、碩博士生、雜誌編輯、自由撰稿者，以及美術館、博物館、藝文基金會、畫廊工作者。\n本站屬文化教育性質的交流平台，文章轉載或節錄不得為商業目的之使用，引用或分享時請務必標示網址與作者。",
+            "image": "https://i.imgur.com/hrthLiO.png",
+            "date_modified": "2022-07-16T01:18:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/鳥巢老師",
+            "content_html": "我是鳥巢老師，民主派的老師，小孩很愛上我的課，讓許多討厭數學甚至已經放棄數學的自學生重啟對數學的興趣與好奇。\n有鳥巢自己研發國高中的數學課綱，歡迎大家到粉專上了解。\n陪伴學齡前的小孩練習表達與情緒、練習合作解決問題、也在這個過程中讓他們體驗民主的機制。",
+            "url": "https://www.daoedu.tw/resource/鳥巢老師",
+            "title": "鳥巢老師的學習資源介紹｜島島阿學",
+            "summary": "我是鳥巢老師，民主派的老師，小孩很愛上我的課，讓許多討厭數學甚至已經放棄數學的自學生重啟對數學的興趣與好奇。\n有鳥巢自己研發國高中的數學課綱，歡迎大家到粉專上了解。\n陪伴學齡前的小孩練習表達與情緒、練習合作解決問題、也在這個過程中讓他們體驗民主的機制。",
+            "image": "https://i.imgur.com/xjrzQj1.jpg",
+            "date_modified": "2022-07-16T01:14:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/謝感覺教學",
+            "content_html": "哈囉，歡迎來到 “謝感覺教學”\n我是 Feeling，擁有超過16年以上的業界接案、7年以上的教學經驗。\n【創造口訣，取代冗長步驟】\n頻道主要教學photoshop、Illustrator、動畫、網頁、文書...偶爾興起也會教些不同的電腦技能。\n我創造很多獨門秘技與口訣，讓學生能快速並且零負擔學習，不僅學軟體工具，還要學會運用工具、創造設計。\n教學中也會分享業界經驗、接案經驗，讓學生能更接軌業界與職場，開創自己的斜槓事業。\n跟著感覺走，學就對了!! 希望您們喜歡我的教學~\n學習有問題或有想錄製的主題可以影片下方留言，我會統一回覆。\n假如您喜歡教學影片，請分享給您的朋友，\n並且訂閱我的頻道，記得加上小鈴鐺喔。謝謝您!(簡介摘自yt網站)",
+            "url": "https://www.daoedu.tw/resource/謝感覺教學",
+            "title": "謝感覺教學的學習資源介紹｜島島阿學",
+            "summary": "哈囉，歡迎來到 “謝感覺教學”\n我是 Feeling，擁有超過16年以上的業界接案、7年以上的教學經驗。\n【創造口訣，取代冗長步驟】\n頻道主要教學photoshop、Illustrator、動畫、網頁、文書...偶爾興起也會教些不同的電腦技能。\n我創造很多獨門秘技與口訣，讓學生能快速並且零負擔學習，不僅學軟體工具，還要學會運用工具、創造設計。\n教學中也會分享業界經驗、接案經驗，讓學生能更接軌業界與職場，開創自己的斜槓事業。\n跟著感覺走，學就對了!! 希望您們喜歡我的教學~\n學習有問題或有想錄製的主題可以影片下方留言，我會統一回覆。\n假如您喜歡教學影片，請分享給您的朋友，\n並且訂閱我的頻道，記得加上小鈴鐺喔。謝謝您!(簡介摘自yt網站)",
+            "image": "https://i.imgur.com/gSRkxkT.png",
+            "date_modified": "2022-07-15T09:24:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/懶人Excel",
+            "content_html": "包括Excel 函数公式、操作技巧、數據分析、圖表模板、VBA…等技巧文章",
+            "url": "https://www.daoedu.tw/resource/懶人Excel",
+            "title": "懶人Excel的學習資源介紹｜島島阿學",
+            "summary": "包括Excel 函数公式、操作技巧、數據分析、圖表模板、VBA…等技巧文章",
+            "image": "https://i.imgur.com/ldKybxQ.png",
+            "date_modified": "2022-07-15T08:37:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/FutureLearners英國開放式課程",
+            "content_html": "FutureLearn 與其他 MOOCS 課程最大的不同之處來自於 FutureLearn 對學習者的認知及線上學習的教育理念。長期從事遠距教學（Distant Learning） 的英國空中大學，充分理解到不在實體環境（如教室）學習可能面臨的問題。 FutureLearn 清楚界定學習者是一群認同：＂Learning is for Life＂（終身學習）、＂Get joy from learning＂（為快樂學習）、＂Never be too old to learn＂（活到老，學到老）。(簡介摘自https://reurl.cc/q5yLVg)",
+            "url": "https://www.daoedu.tw/resource/FutureLearners英國開放式課程",
+            "title": "FutureLearners英國開放式課程的學習資源介紹｜島島阿學",
+            "summary": "FutureLearn 與其他 MOOCS 課程最大的不同之處來自於 FutureLearn 對學習者的認知及線上學習的教育理念。長期從事遠距教學（Distant Learning） 的英國空中大學，充分理解到不在實體環境（如教室）學習可能面臨的問題。 FutureLearn 清楚界定學習者是一群認同：＂Learning is for Life＂（終身學習）、＂Get joy from learning＂（為快樂學習）、＂Never be too old to learn＂（活到老，學到老）。(簡介摘自https://reurl.cc/q5yLVg)",
+            "image": "https://i.imgur.com/fVmi12M.jpg",
+            "date_modified": "2022-07-15T08:31:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/quillbot",
+            "content_html": "一款基於AI的英文作文或論文的批改平台。paraphrasing tool, smart thesaurus, article rewriter, thesaurus, smart, sentences, rewrite, smart thesaurus for sentences, Reword Essays, rewrite essays, plagiarism, paraphrasing, paraphraser, short response changer, essay changer, smart thesaurus, thesaurus, thesaurus for sentences, paper changer, reworder, artificial intelligence, natural language processing, NLP, reword responses, rephrase, paraphrasing, reword, rewordify, article spinner, reword paraphraph, paraphrasing tool online free, rewrite sentences, rewrite sentences generator, rephrase sentences, reword this, free paraphrasing（From official）",
+            "url": "https://www.daoedu.tw/resource/quillbot",
+            "title": "quillbot的學習資源介紹｜島島阿學",
+            "summary": "一款基於AI的英文作文或論文的批改平台。paraphrasing tool, smart thesaurus, article rewriter, thesaurus, smart, sentences, rewrite, smart thesaurus for sentences, Reword Essays, rewrite essays, plagiarism, paraphrasing, paraphraser, short response changer, essay changer, smart thesaurus, thesaurus, thesaurus for sentences, paper changer, reworder, artificial intelligence, natural language processing, NLP, reword responses, rephrase, paraphrasing, reword, rewordify, article spinner, reword paraphraph, paraphrasing tool online free, rewrite sentences, rewrite sentences generator, rephrase sentences, reword this, free paraphrasing（From official）",
+            "image": "https://quillbot.com/images/og_quillbot.png",
+            "date_modified": "2022-07-02T12:07:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/idiom connection",
+            "content_html": "依照主題分類，找尋適合英文寫作的相關idiom。Idiom Connection - 11,000 English idioms and phrasal verbs in different categories. 100 most common English idioms. Over 200 idiom quizzes! (From official)",
+            "url": "https://www.daoedu.tw/resource/idiom connection",
+            "title": "idiom connection的學習資源介紹｜島島阿學",
+            "summary": "依照主題分類，找尋適合英文寫作的相關idiom。Idiom Connection - 11,000 English idioms and phrasal verbs in different categories. 100 most common English idioms. Over 200 idiom quizzes! (From official)",
+            "image": "https://www.idiomconnection.com/1schoolboy7-med.jpg",
+            "date_modified": "2022-07-02T12:02:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/just the word collocations",
+            "content_html": "幫助你在英文寫作上可以找到適合的搭配詞",
+            "url": "https://www.daoedu.tw/resource/just the word collocations",
+            "title": "just the word collocations的學習資源介紹｜島島阿學",
+            "summary": "幫助你在英文寫作上可以找到適合的搭配詞",
+            "image": "http://www.just-the-word.com/img/logo.png",
+            "date_modified": "2022-07-02T11:59:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/maze",
+            "content_html": "一個提供Usability測試的平台。Build a product your users love. Test ideas, content, and designs with Maze and gather actionable user insights in hours, not days.",
+            "url": "https://www.daoedu.tw/resource/maze",
+            "title": "maze的學習資源介紹｜島島阿學",
+            "summary": "一個提供Usability測試的平台。Build a product your users love. Test ideas, content, and designs with Maze and gather actionable user insights in hours, not days.",
+            "image": "https://www.datocms-assets.com/38511/1649245983-rapid-product-research-universal-meta-image.png?auto=format",
+            "date_modified": "2022-06-27T15:36:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/GRE免費線上AWA寫作評分",
+            "content_html": "網站提供免費的GRE寫作評分，可以模擬官方評分系統的真實分數，主要評分是依據作文的組織性, 可讀性與連貫性。",
+            "url": "https://www.daoedu.tw/resource/GRE免費線上AWA寫作評分",
+            "title": "GRE免費線上AWA寫作評分的學習資源介紹｜島島阿學",
+            "summary": "網站提供免費的GRE寫作評分，可以模擬官方評分系統的真實分數，主要評分是依據作文的組織性, 可讀性與連貫性。",
+            "image": "https://d1nzhz3mk5ckry.cloudfront.net/wp-content/uploads/2021/07/MBA-Crystal-Ball-Logo.svg",
+            "date_modified": "2022-06-26T13:22:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/thesaurus",
+            "content_html": "找英文同義字的網站，適合準備英文寫作的同學拓展單字量與修飾句子。",
+            "url": "https://www.daoedu.tw/resource/thesaurus",
+            "title": "thesaurus的學習資源介紹｜島島阿學",
+            "summary": "找英文同義字的網站，適合準備英文寫作的同學拓展單字量與修飾句子。",
+            "image": "https://www.thesaurus.com/hp-assets/_next/static/images/thesaurus_social_logo-0bb8f9375748a874b7dbe7fcee29f592.png",
+            "date_modified": "2022-06-25T09:45:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/tunnel bear",
+            "content_html": "VPN提供500MB的免費使用流量供大家使用，適合有臨時少量需求的人使用",
+            "url": "https://www.daoedu.tw/resource/tunnel bear",
+            "title": "tunnel bear的學習資源介紹｜島島阿學",
+            "summary": "VPN提供500MB的免費使用流量供大家使用，適合有臨時少量需求的人使用",
+            "image": "https://www.tunnelbear.com/static/images/social-meta/pricing.png",
+            "date_modified": "2022-06-24T04:36:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/magoosh",
+            "content_html": "Magoosh offers online test prep, live classes, and free resources so you can score your best on the GRE, GMAT, LSAT, MCAT, ACT, or SAT.",
+            "url": "https://www.daoedu.tw/resource/magoosh",
+            "title": "magoosh的學習資源介紹｜島島阿學",
+            "summary": "Magoosh offers online test prep, live classes, and free resources so you can score your best on the GRE, GMAT, LSAT, MCAT, ACT, or SAT.",
+            "image": "https://i.imgur.com/Zg3LZ9G.png",
+            "date_modified": "2022-06-18T15:30:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/manhattan prep",
+            "content_html": "Manhattan Prep provides industry-leading test prep. Learn more about our online and in-person courses, free resources, and tutoring options.",
+            "url": "https://www.daoedu.tw/resource/manhattan prep",
+            "title": "manhattan prep的學習資源介紹｜島島阿學",
+            "summary": "Manhattan Prep provides industry-leading test prep. Learn more about our online and in-person courses, free resources, and tutoring options.",
+            "image": "https://cdn2.manhattanprep.com/wp-content/uploads/2021/03/screen-shot-2021-03-19-at-8.54.45-am.png",
+            "date_modified": "2022-06-18T15:27:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/30秒code系列",
+            "content_html": "Short JavaScript code snippets for all your development needs",
+            "url": "https://www.daoedu.tw/resource/30秒code系列",
+            "title": "30秒code系列的學習資源介紹｜島島阿學",
+            "summary": "Short JavaScript code snippets for all your development needs",
+            "image": "https://github.com/30-seconds/30-seconds-of-code/raw/master/logo.png",
+            "date_modified": "2022-06-18T15:10:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/h5bp的前端面試問題整理",
+            "content_html": "This repository contains a number of front-end interview questions that can be used when vetting potential candidates. It is by no means recommended to use every single question here on the same candidate (that would take hours). Choosing a few items from this list should help you vet the intended skills you require.\n",
+            "url": "https://www.daoedu.tw/resource/h5bp的前端面試問題整理",
+            "title": "h5bp的前端面試問題整理的學習資源介紹｜島島阿學",
+            "summary": "This repository contains a number of front-end interview questions that can be used when vetting potential candidates. It is by no means recommended to use every single question here on the same candidate (that would take hours). Choosing a few items from this list should help you vet the intended skills you require.\n",
+            "image": "https://i.imgur.com/o3sCeib.png",
+            "date_modified": "2022-06-18T15:08:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/javascript30",
+            "content_html": "Starter Files + Completed solutions for the JavaScript 30 Day Challenge.\nGrab the course at ",
+            "url": "https://www.daoedu.tw/resource/javascript30",
+            "title": "javascript30的學習資源介紹｜島島阿學",
+            "summary": "Starter Files + Completed solutions for the JavaScript 30 Day Challenge.\nGrab the course at ",
+            "image": "https://i.imgur.com/GxFn3HH.jpg",
+            "date_modified": "2022-06-18T15:06:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/XSS demo",
+            "content_html": "👮🏻‍♂️ XSS攻防靶場，issues 有答案",
+            "url": "https://www.daoedu.tw/resource/XSS demo",
+            "title": "XSS demo的學習資源介紹｜島島阿學",
+            "summary": "👮🏻‍♂️ XSS攻防靶場，issues 有答案",
+            "image": "https://i.imgur.com/Id9ayY1.png",
+            "date_modified": "2022-06-18T15:04:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/技術反向面試",
+            "content_html": "列表裡的問題對於參加技術面試的人來說可能有些用。 列表裡的問題並不一定適用於某個特定的職位或者工作類型，也沒有排序。 最開始的時候這只是我自己的問題列表，但是慢慢地添加了一些我覺得可能讓我對這家公司亮紅燈的問題。 我也注意到被我面試的人提問我的問題太少了，感覺他們挺浪費機會的。（轉自README）",
+            "url": "https://www.daoedu.tw/resource/技術反向面試",
+            "title": "技術反向面試的學習資源介紹｜島島阿學",
+            "summary": "列表裡的問題對於參加技術面試的人來說可能有些用。 列表裡的問題並不一定適用於某個特定的職位或者工作類型，也沒有排序。 最開始的時候這只是我自己的問題列表，但是慢慢地添加了一些我覺得可能讓我對這家公司亮紅燈的問題。 我也注意到被我面試的人提問我的問題太少了，感覺他們挺浪費機會的。（轉自README）",
+            "image": "https://i.imgur.com/cHPiGqv.png",
+            "date_modified": "2022-06-18T14:56:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/南臺灣實驗教育推動中心",
+            "content_html": "屏東大學在六、七年前，便已開始與非營利組織平台合作「雙東計畫」，即針對屏東、台東尤其原民區域展開規劃。這些地方有原民社區的青年想返鄉做服務，但是他們並沒教育的專業，便開始進行課輔師資培育計畫，而這個計畫即是屏大實質與在地合作的淵源之始。另外在幾年前，台灣的教改已經延至大學，第一波高教改革中，全台灣都要提出大學院校的特色分流，而第一波中全臺大學只過了２２案，屏大則拿到了其中的一案，即是將設計與遊戲的概念帶到師資培育甚至教學產業中，在此脈絡之下，漸漸開始與各校有許多合作機會，直到今年與學校和教育部拿到「AI屏大智造未來」專案計畫，正式成立了南臺灣實驗教育協作中心。(簡介摘自官方網站)",
+            "url": "https://www.daoedu.tw/resource/南臺灣實驗教育推動中心",
+            "title": "南臺灣實驗教育推動中心的學習資源介紹｜島島阿學",
+            "summary": "屏東大學在六、七年前，便已開始與非營利組織平台合作「雙東計畫」，即針對屏東、台東尤其原民區域展開規劃。這些地方有原民社區的青年想返鄉做服務，但是他們並沒教育的專業，便開始進行課輔師資培育計畫，而這個計畫即是屏大實質與在地合作的淵源之始。另外在幾年前，台灣的教改已經延至大學，第一波高教改革中，全台灣都要提出大學院校的特色分流，而第一波中全臺大學只過了２２案，屏大則拿到了其中的一案，即是將設計與遊戲的概念帶到師資培育甚至教學產業中，在此脈絡之下，漸漸開始與各校有許多合作機會，直到今年與學校和教育部拿到「AI屏大智造未來」專案計畫，正式成立了南臺灣實驗教育協作中心。(簡介摘自官方網站)",
+            "image": "https://i.imgur.com/iHV5ctc.png",
+            "date_modified": "2022-06-18T11:08:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/影創實驗室",
+            "content_html": "我是KEVIN，一個非常喜歡學習且興趣廣泛的人，我是一個跨領域的斜槓設計師和影像創作者，我涉略影片創作(拍攝剪輯)、教學、平面與3D設計、網站架設。\n用影像創作與教學一直是我所熱愛且擅長的。幾年前，我從0開始自學影片剪輯到擁有接案能力，並開始經營個人品牌-影創實驗室，透過部落格、線上家教與諮詢、媒合接案的方式協助對影像創作有興趣的人，踏上自學影像創作之路。\n在這裡，你可以結識更多和我一樣對影像創作、自學、設計、創業等有興趣的人，共同用分享與散播影響力，創造一個交流分享的互助平台。(簡介摘自https://reurl.cc/55zyAn)",
+            "url": "https://www.daoedu.tw/resource/影創實驗室",
+            "title": "影創實驗室的學習資源介紹｜島島阿學",
+            "summary": "我是KEVIN，一個非常喜歡學習且興趣廣泛的人，我是一個跨領域的斜槓設計師和影像創作者，我涉略影片創作(拍攝剪輯)、教學、平面與3D設計、網站架設。\n用影像創作與教學一直是我所熱愛且擅長的。幾年前，我從0開始自學影片剪輯到擁有接案能力，並開始經營個人品牌-影創實驗室，透過部落格、線上家教與諮詢、媒合接案的方式協助對影像創作有興趣的人，踏上自學影像創作之路。\n在這裡，你可以結識更多和我一樣對影像創作、自學、設計、創業等有興趣的人，共同用分享與散播影響力，創造一個交流分享的互助平台。(簡介摘自https://reurl.cc/55zyAn)",
+            "image": "https://i.imgur.com/QfKijmi.png",
+            "date_modified": "2022-06-15T07:12:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/工作與實習 Jobs and Internships",
+            "content_html": "工作與實習 Jobs and Internships會分享許多實習的單位",
+            "url": "https://www.daoedu.tw/resource/工作與實習 Jobs and Internships",
+            "title": "工作與實習 Jobs and Internships的學習資源介紹｜島島阿學",
+            "summary": "工作與實習 Jobs and Internships會分享許多實習的單位",
+            "image": "https://i.imgur.com/L9dkEbT.jpg",
+            "date_modified": "2022-06-15T06:55:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/蛋糕找實習",
+            "content_html": "「蛋糕找實習 🍰」希望提供透明的實習交流資訊，我們會定期更新和整理優質的實習職缺，也歡迎大家在這裡分享實習職缺、求職心得以及各式提問交流！（摘自社團簡介）",
+            "url": "https://www.daoedu.tw/resource/蛋糕找實習",
+            "title": "蛋糕找實習的學習資源介紹｜島島阿學",
+            "summary": "「蛋糕找實習 🍰」希望提供透明的實習交流資訊，我們會定期更新和整理優質的實習職缺，也歡迎大家在這裡分享實習職缺、求職心得以及各式提問交流！（摘自社團簡介）",
+            "image": "https://i.imgur.com/wc3vinH.jpg",
+            "date_modified": "2022-06-15T03:52:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/中文教學百寶箱",
+            "content_html": "中文教學百寶箱是華語文教學相關的補充資訊社團，網站內包含詞彙語法的誤點與如何教學，並配合數位媒材製作華語教材。",
+            "url": "https://www.daoedu.tw/resource/中文教學百寶箱",
+            "title": "中文教學百寶箱的學習資源介紹｜島島阿學",
+            "summary": "中文教學百寶箱是華語文教學相關的補充資訊社團，網站內包含詞彙語法的誤點與如何教學，並配合數位媒材製作華語教材。",
+            "image": "https://i.imgur.com/Rjoa0Xu.jpg",
+            "date_modified": "2022-06-15T03:17:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
             "id": "https://www.daoedu.tw/resource/whatfont",
             "content_html": "可以輕易地透過套件檢查網頁上的字型是否符合預期。\nThe easiest way to identify fonts on web pages. What is the easiest way to find out the fonts used in a webpage? Firebug and Webkit Inspector are easy enough to use for developers. However, for others, this should not be necessary. With this extension, you could inspect web fonts by just hovering on them. It is that simple and elegant. It also detects the services used for serving the web fonts. Supports Typekit and Google Font API. Recommended by Wired WebMonkey, Lifehacker, and SwissMiss. (From official)",
             "url": "https://www.daoedu.tw/resource/whatfont",
@@ -5354,10 +5926,10 @@
         },
         {
             "id": "https://www.daoedu.tw/resource/Canva",
-            "content_html": "可自行設計不同的簡報、海報、卡片及短片等。也有許多不同的模板可下載。",
+            "content_html": "Canva為大眾提供不須設計經驗，就能完成出色成品的平台，\n讓所有人都能用自己的創意打造亮眼的作品。\n\n功能介紹:\n1.現有成品-canva提供多樣化的範本供使用者套用，讓使用者一上手便能得心應手。\n2.團隊設置-除了打造自己的完美成果外，也能創建團隊，讓更多人一起協作(能跨區/跨國)。\n3.公開分享-藉由上傳/分享的動作，能讓所有人看見你的成品，進而激發靈感。(也能選擇不分享~)\n4.多功能列表-canva不僅體現在文書創作上，在影視上也能有絕佳的視覺效果，所以能依使用者的需求進行功能選擇。\n5.個人管理-canva能夠將個人作品作好整理，令使用者能安心操作。",
             "url": "https://www.daoedu.tw/resource/Canva",
             "title": "Canva的學習資源介紹｜島島阿學",
-            "summary": "可自行設計不同的簡報、海報、卡片及短片等。也有許多不同的模板可下載。",
+            "summary": "Canva為大眾提供不須設計經驗，就能完成出色成品的平台，\n讓所有人都能用自己的創意打造亮眼的作品。\n\n功能介紹:\n1.現有成品-canva提供多樣化的範本供使用者套用，讓使用者一上手便能得心應手。\n2.團隊設置-除了打造自己的完美成果外，也能創建團隊，讓更多人一起協作(能跨區/跨國)。\n3.公開分享-藉由上傳/分享的動作，能讓所有人看見你的成品，進而激發靈感。(也能選擇不分享~)\n4.多功能列表-canva不僅體現在文書創作上，在影視上也能有絕佳的視覺效果，所以能依使用者的需求進行功能選擇。\n5.個人管理-canva能夠將個人作品作好整理，令使用者能安心操作。",
             "image": "https://i.imgur.com/HjDfGww.png",
             "date_modified": "2022-01-24T06:41:00.000Z",
             "author": {
