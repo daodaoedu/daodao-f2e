@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { Box, Typography, Stack } from "@mui/material";
+import React from 'react';
+import styled from '@emotion/styled';
+import { Box, Typography, Stack } from '@mui/material';
 
 const LineWrapper = styled(Typography)`
   margin: 5px 0;
@@ -12,25 +12,20 @@ const AboutUs = () => {
       <Typography
         variant="h1"
         sx={{
-          margin: "10px 0",
+          margin: '10px 0',
         }}
       >
         關於我們
       </Typography>
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          margin: "20px 0",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          margin: '20px 0',
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={"https://i.imgur.com/1nhGPPR.png"}
-          width="100%"
-          alt="daodao"
-        />
+        <img src="https://i.imgur.com/1nhGPPR.png" width="100%" alt="daodao" />
       </Box>
       <Stack>
         <LineWrapper variant="p">

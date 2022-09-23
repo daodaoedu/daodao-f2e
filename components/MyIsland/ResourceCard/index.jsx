@@ -1,12 +1,13 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { css } from "@emotion/react";
-import { Paper, Box, Typography } from "@mui/material";
-import dayjs from "dayjs";
-import { getFirestore, collection } from "firebase/firestore";
-import { useDocument, useCollection } from "react-firebase-hooks/firestore";
-import { useRouter } from "next/router";
-import Tags from "./Tags";
+import React from 'react';
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
+import { Paper, Box, Typography } from '@mui/material';
+import dayjs from 'dayjs';
+import { getFirestore, collection } from 'firebase/firestore';
+import { useDocument, useCollection } from 'react-firebase-hooks/firestore';
+import { useRouter } from 'next/router';
+import Tags from './Tags';
+
 const ResourceCardWrapper = styled.div`
   /* border: 1px black solid;
   border-radius: 10px; */
@@ -61,9 +62,9 @@ const TitleWrapper = styled.div`
 `;
 
 const ResourceCard = ({ data }) => {
-  const cats = data["領域名稱"];
-  const resourceName = data["資源名稱"];
-  const imageLink = data["縮圖"];
+  const cats = data['領域名稱'];
+  const resourceName = data['資源名稱'];
+  const imageLink = data['縮圖'];
   const link = `/resource/${resourceName}`;
   //   const { push } = useRouter();
   return (
@@ -73,7 +74,7 @@ const ResourceCard = ({ data }) => {
       </a>
       <Box
         sx={{
-          marginLeft: "20px",
+          marginLeft: '20px',
           //   display: "flex",
           //   flexDirection: "column",
           //   justifyContent: "space-between",
@@ -81,7 +82,7 @@ const ResourceCard = ({ data }) => {
       >
         <TitleWrapper>
           <a target="_blank" href={link} rel="noopener noreferrer">
-            <h2 className="title">{resourceName ?? "未命名"}</h2>
+            <h2 className="title">{resourceName ?? '未命名'}</h2>
           </a>
         </TitleWrapper>
         <Tags type="cats" tags={cats} />

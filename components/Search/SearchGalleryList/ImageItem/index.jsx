@@ -1,15 +1,17 @@
-import React, { useMemo } from "react";
-import styled from "@emotion/styled";
-import { css, keyframes } from "@emotion/react";
-import { Typography, Box } from "@mui/material";
-import dayjs from "dayjs";
-import isBetween from "dayjs/plugin/isBetween";
+/* eslint-disable react/jsx-wrap-multilines */
+import React, { useMemo } from 'react';
+import styled from '@emotion/styled';
+import { css, keyframes } from '@emotion/react';
 import {
+  Typography,
+  Box,
   ImageList,
   ImageListItem,
   ImageListItemBar,
   IconButton,
-} from "@mui/material";
+} from '@mui/material';
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
 // import { TikTokFont } from '../../../../shared/styles/css';
 dayjs.extend(isBetween);
 
@@ -68,7 +70,6 @@ const TitleWrapper = styled.div`
     font-weight: 500;
     margin: 0 10px 0 0;
     color: black;
-    /* ${TikTokFont} */
     &:hover {
       cursor: pointer;
       color: #16b9b3;
@@ -86,19 +87,19 @@ const TitleWrapper = styled.div`
 
 const Item = ({ data, margin }) => {
   const hashTags = useMemo(
-    () => data?.properties["標籤"]?.multi_select ?? [],
-    [data]
+    () => data?.properties['標籤']?.multi_select ?? [],
+    [data],
   );
   const resourcesTags = useMemo(
-    () => data?.properties["資源類型"]?.multi_select ?? [],
-    [data]
+    () => data?.properties['資源類型']?.multi_select ?? [],
+    [data],
   );
   const feeTags = useMemo(
     () =>
-      data?.properties["費用"]?.select
-        ? [data?.properties["費用"]?.select]
+      data?.properties['費用']?.select
+        ? [data?.properties['費用']?.select]
         : [],
-    [data]
+    [data],
   );
 
   const isNewResource = useMemo(() => {
@@ -106,27 +107,27 @@ const Item = ({ data, margin }) => {
     const createDay = dayjs(data?.created_time);
     const isRecent = dayjs(createDay).isBetween(
       today,
-      dayjs(today).subtract(1, "month")
+      dayjs(today).subtract(1, 'month'),
     );
     return isRecent;
   }, [data]);
 
   const ageOfUserTags = useMemo(
-    () => data?.properties["年齡層"]?.multi_select ?? [],
-    [data]
+    () => data?.properties['年齡層']?.multi_select ?? [],
+    [data],
   );
 
   const title = useMemo(
     () =>
-      (data?.properties["資源名稱"]?.title ?? []).find(
-        (item) => item?.type === "text"
+      (data?.properties['資源名稱']?.title ?? []).find(
+        (item) => item?.type === 'text',
       )?.plain_text,
-    [data?.properties]
+    [data?.properties],
   );
 
   const contributors = useMemo(
-    () => data?.properties["創建者"]?.multi_select ?? [],
-    [data?.properties]
+    () => data?.properties['創建者']?.multi_select ?? [],
+    [data?.properties],
   );
 
   // const link = useMemo(() => data?.properties["連結"]?.url ?? "", [data]);
@@ -134,7 +135,6 @@ const Item = ({ data, margin }) => {
 
   return (
     <ImageListItem>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         // {...srcset(
         //   (Array.isArray(data?.properties["縮圖"]?.files) &&
@@ -146,9 +146,9 @@ const Item = ({ data, margin }) => {
         //   cols
         // )}
         src={
-          (Array.isArray(data?.properties["縮圖"]?.files) &&
-            data.properties["縮圖"]?.files[0]?.name) ??
-          "https://www.daoedu.tw/preview.webp"
+          (Array.isArray(data?.properties['縮圖']?.files) &&
+            data.properties['縮圖']?.files[0]?.name) ??
+          'https://www.daoedu.tw/preview.webp'
         }
         alt={title}
         loading="lazy"
@@ -156,13 +156,13 @@ const Item = ({ data, margin }) => {
       <ImageListItemBar
         sx={{
           background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, " +
-            "rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
+            'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, ' +
+            'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
         }}
         title={title}
         position="top"
         actionIcon={
-          <IconButton sx={{ color: "white" }} aria-label={`star ${title}`}>
+          <IconButton sx={{ color: 'white' }} aria-label={`star ${title}`}>
             {/* <StarBorderIcon /> */}
           </IconButton>
         }

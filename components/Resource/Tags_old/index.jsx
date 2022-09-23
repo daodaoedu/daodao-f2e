@@ -1,8 +1,8 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { useRouter } from "next/router";
-import Chip from "@mui/material/Chip";
-import { COLOR_TABLE } from "../../../constants/notion";
+import React from 'react';
+import styled from '@emotion/styled';
+import { useRouter } from 'next/router';
+import Chip from '@mui/material/Chip';
+import { COLOR_TABLE } from '../../../constants/notion';
 
 const TagsWrapper = styled.ul`
   display: flex;
@@ -32,15 +32,15 @@ const Tags = ({ tags }) => {
             label={name}
             onClick={() => push(`/search?tags=${name}`)}
             sx={{
-              backgroundColor: COLOR_TABLE[color ?? "default"],
-              cursor: "pointer",
-              margin: "5px",
-              whiteSpace: "nowrap",
+              backgroundColor: COLOR_TABLE[color ?? 'default'],
+              cursor: 'pointer',
+              margin: '5px',
+              whiteSpace: 'nowrap',
               fontWeight: 500,
-              fontSize: "14px",
-              "&:hover": {
-                opacity: "60%",
-                transition: "transform 0.4s",
+              fontSize: '14px',
+              '&:hover': {
+                opacity: '60%',
+                transition: 'transform 0.4s',
               },
             }}
           />

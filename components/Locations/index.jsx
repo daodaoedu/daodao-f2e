@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { Box, Paper, Typography } from "@mui/material";
+import React from 'react';
+import styled from '@emotion/styled';
+import { Box, Paper, Typography } from '@mui/material';
 
 const ResourceWrapper = styled.section`
   padding-top: 40px;
@@ -29,16 +29,16 @@ const ContributeResource = () => {
     <ResourceWrapper>
       <Paper
         sx={{
-          width: "95%",
-          margin: "0 auto",
-          padding: "20px",
+          width: '95%',
+          margin: '0 auto',
+          padding: '20px',
         }}
       >
         <Box>
           <Typography
             variant="h1"
             sx={{
-              margin: "10px 0",
+              margin: '10px 0',
             }}
           >
             島島教育場域
@@ -48,16 +48,17 @@ const ContributeResource = () => {
           <Typography
             variant="h2"
             sx={{
-              margin: "40px 0 10px 0",
+              margin: '40px 0 10px 0',
             }}
           >
             ⬇ 點擊此按鈕能看到篩選工具
           </Typography>
+          {/* eslint-disable-next-line jsx-a11y/iframe-has-title */}
           <iframe
             src="https://www.google.com/maps/d/embed?mid=1I2UZp4qujWgrb9tbztjdkBIDW0Gy3h6V&ehbc=2E312F"
             width="100%"
             height="880"
-          ></iframe>
+          />
         </Box>
       </Paper>
     </ResourceWrapper>

@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import styled from "@emotion/styled";
-import { Box, Select, MenuItem } from "@mui/material";
-import { useRouter } from "next/router";
+import React, { useState } from 'react';
+import styled from '@emotion/styled';
+import { Box, Select, MenuItem } from '@mui/material';
+import { useRouter } from 'next/router';
 // import { SEARCH_TAGS } from "../../../constants/category";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import Chip from "@mui/material/Chip";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormLabel from "@mui/material/FormLabel";
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import Chip from '@mui/material/Chip';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormLabel from '@mui/material/FormLabel';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -23,11 +23,11 @@ const MenuProps = {
   },
 };
 
-const names = ["不拘", "免費", "部分免費", "需付費"];
+const names = ['不拘', '免費', '部分免費', '需付費'];
 
 const FeeDropdown = () => {
   const { query, push } = useRouter();
-  const fee = query?.fee ? (query?.fee).split(",") : [];
+  const fee = query?.fee ? (query?.fee).split(',') : [];
   const handleChange = (event) => {
     const {
       target: { value },
@@ -36,12 +36,12 @@ const FeeDropdown = () => {
     if (value === names[0]) {
       delete query.fee;
       push({
-        pathname: "/search",
+        pathname: '/search',
         query,
       });
     } else {
       push({
-        pathname: "/search",
+        pathname: '/search',
         query: {
           ...query,
           fee: value,
@@ -50,14 +50,14 @@ const FeeDropdown = () => {
     }
   };
   return (
-    <FormControl sx={{ m: 1, margin: "5px" }}>
+    <FormControl sx={{ m: 1, margin: '5px' }}>
       <FormLabel>費用</FormLabel>
       <RadioGroup
         row
         aria-labelledby="demo-row-radio-buttons-group-label"
         name="row-radio-buttons-group"
         onChange={handleChange}
-        value={query?.fee ? fee : "不拘"}
+        value={query?.fee ? fee : '不拘'}
       >
         {names.map((name) => (
           <FormControlLabel

@@ -1,19 +1,19 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { Box, Paper, Typography } from "@mui/material";
+import React from 'react';
+import styled from '@emotion/styled';
+import { Box, Paper, Typography } from '@mui/material';
 
 const LearningResource = () => {
   return (
     <Box>
       <Box
         sx={{
-          margin: "20px 0",
+          margin: '20px 0',
         }}
       >
         <Typography
           variant="h2"
           sx={{
-            margin: "40px 0 10px 0",
+            margin: '40px 0 10px 0',
           }}
         >
           三、島島教育場域
@@ -25,7 +25,7 @@ const LearningResource = () => {
       </Box>
       <Box
         sx={{
-          margin: "40px 0 20px 0",
+          margin: '40px 0 20px 0',
         }}
       >
         待補

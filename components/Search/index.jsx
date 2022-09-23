@@ -1,29 +1,22 @@
-import React, {
-  useMemo,
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-} from "react";
-import styled from "@emotion/styled";
-import { useRouter } from "next/router";
-import { Box } from "@mui/material";
-import SearchResultList from "./SearchResultList";
-import SearchField from "./SearchField";
+import React, { useMemo, useEffect, useRef, useCallback } from 'react';
+import styled from '@emotion/styled';
+import { useRouter } from 'next/router';
+import { Box, Divider } from '@mui/material';
+import { useSelector, useDispatch } from 'react-redux';
+import SearchResultList from './SearchResultList';
+import SearchField from './SearchField';
 // import { postFetcher } from "../../utils/fetcher";
-import { bodyHandler } from "../../utils/notion";
-import stringSanitizer from "../../utils/sanitizer";
-import SelectedTags from "./SelectedTags";
-import SelectedCategory from "./SelectedCategory";
-import useIntersectionObserver from "../../hooks/useIntersectionObserver";
-import SearchFooter from "./SearchFooter";
-import { useSelector, useDispatch } from "react-redux";
+import { bodyHandler } from '../../utils/notion';
+import stringSanitizer from '../../utils/sanitizer';
+import SelectedTags from './SelectedTags';
+import SelectedCategory from './SelectedCategory';
+import useIntersectionObserver from '../../hooks/useIntersectionObserver';
+import SearchFooter from './SearchFooter';
 import {
   loadSearchResult,
   loadNextSearchResult,
-} from "../../redux/actions/search";
-import ScrollToTop from "../../shared/components/ScrollToTop";
-import { Divider } from "@mui/material";
+} from '../../redux/actions/search';
+import ScrollToTop from '../../shared/components/ScrollToTop';
 // import { TikTokFont } from "../../shared/styles/css";
 
 const SearchWrapper = styled.main`
@@ -33,7 +26,6 @@ const SearchWrapper = styled.main`
   .header-title {
     font-size: 24px;
     font-weight: 500;
-    /* ${TikTokFont} */
   }
 `;
 
@@ -52,10 +44,10 @@ const Search = () => {
 
   const queryTags = useMemo(
     () =>
-      typeof router.query.tags === "string"
-        ? stringSanitizer(router.query.tags).split(",")
+      typeof router.query.tags === 'string'
+        ? stringSanitizer(router.query.tags).split(',')
         : [],
-    [router?.query?.tags]
+    [router?.query?.tags],
   );
 
   const onIntersect = useCallback(() => {
@@ -84,27 +76,27 @@ const Search = () => {
       <SearchField />
       <Divider
         sx={{
-          margin: "10px 0",
+          margin: '10px 0',
         }}
       />
       {/* 搜尋結果 */}
 
       <Box
         sx={{
-          margin: "10px 0",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          "& > .header-result": {
-            marginLeft: "20px",
-            fontSize: "20px",
+          margin: '10px 0',
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          '& > .header-result': {
+            marginLeft: '20px',
+            fontSize: '20px',
           },
         }}
       >
         <h1 className="header-title"> 搜尋結果</h1>
         {!isLoadingNextData && !isLoading && Array.isArray(results) && (
           <p className="header-result">
-            共 {results.length} 筆{next_cursor && "以上"}
+            共 {results.length} 筆{next_cursor && '以上'}
           </p>
         )}
       </Box>

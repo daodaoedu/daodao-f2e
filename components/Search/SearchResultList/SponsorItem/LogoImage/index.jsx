@@ -1,11 +1,11 @@
-import React, { useMemo } from "react";
-import styled from "@emotion/styled";
-import { css } from "@emotion/react";
-import Link from "next/link";
-import { Typography, Box } from "@mui/material";
-import dayjs from "dayjs";
-import isBetween from "dayjs/plugin/isBetween";
-import { COLOR_TABLE } from "../../../../../constants/notion";
+import React, { useMemo } from 'react';
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
+import Link from 'next/link';
+import { Typography, Box } from '@mui/material';
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+
 dayjs.extend(isBetween);
 
 const LogoImageWrapper = styled(Box)`
@@ -98,11 +98,11 @@ const LogoImage = ({ link, data }) => {
   return (
     <LogoImageWrapper>
       <ImageWrapper
-        onClick={() => window.open(link, "_blank")}
+        onClick={() => window.open(link, '_blank')}
         image={
-          (Array.isArray(data?.properties["縮圖"]?.files) &&
-            data.properties["縮圖"]?.files[0]?.name) ??
-          "https://www.daoedu.tw/preview.webp"
+          (Array.isArray(data?.properties['縮圖']?.files) &&
+            data.properties['縮圖']?.files[0]?.name) ??
+          'https://www.daoedu.tw/preview.webp'
         }
       />
       <PromoteWrapper />

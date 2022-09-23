@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import styled from "@emotion/styled";
-import Chip from "@mui/material/Chip";
-import router, { useRouter } from "next/router";
-import { COLOR_TABLE } from "../../../constants/notion";
-import { CATEGORIES } from "../../../constants/category";
-import CatChip from "./CatChip";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import styled from '@emotion/styled';
+import Chip from '@mui/material/Chip';
+import { useRouter } from 'next/router';
+import { Box } from '@mui/material';
+import { COLOR_TABLE } from '../../../constants/notion';
+import { CATEGORIES } from '../../../constants/category';
+import CatChip from './CatChip';
 import ScrollButton from '../../../shared/components/ScrollButton';
-import { Box } from "@mui/material";
 // import { TikTokFont } from "../../../shared/styles/css";
 
 const ListWrapper = styled.ul`
@@ -21,15 +21,10 @@ const ListWrapper = styled.ul`
     display: none; /* Chrome, Safari, Edge and Opera */
   }
 
-  /* ${TikTokFont} */
-
   @media (max-width: 767px) {
     margin: 10px 0;
   }
 `;
-
-
-
 const SelectedCategory = () => {
   const [isShowLeftScrollButton, setIsShowLeftScrollButton] = useState(false);
   const [isShowRightScrollButton, setIsShowRightScrollButton] = useState(false);
@@ -50,20 +45,20 @@ const SelectedCategory = () => {
   const onClickCategory = useCallback(
     (event) => {
       const targetCatName = event.target.textContent;
-      const currentQueries = (query?.cats ?? "")
-        .split(",")
-        .filter((name) => name !== "");
+      const currentQueries = (query?.cats ?? '')
+        .split(',')
+        .filter((name) => name !== '');
       const isRemove = currentQueries.includes(targetCatName);
       if (isRemove) {
         // 只剩一個直接刪除
         delete query.cats;
         push({
-          pathname: "/search",
+          pathname: '/search',
           query,
         });
       } else {
         push({
-          pathname: "/search",
+          pathname: '/search',
           query: {
             ...query,
             cats: targetCatName,
@@ -71,14 +66,15 @@ const SelectedCategory = () => {
         });
       }
     },
-    [push, query]
+    [push, query],
   );
 
   return (
-    <Box sx={{ position: "relative" }}>
+    <Box sx={{ position: 'relative' }}>
       <ScrollButton
         type="left"
         isShowScrollButton={isShowLeftScrollButton}
+        // eslint-disable-next-line no-return-assign
         onScrollEvent={() =>
           (ref.current.scrollLeft -= ref.current.offsetWidth + 100)
         }
@@ -88,7 +84,8 @@ const SelectedCategory = () => {
         onScroll={(e) => {
           const isStartOfList = e.target.scrollLeft === 0;
           const isEndOfList =
-            ((e.target.scrollWidth - e.target.scrollLeft) - e.target.offsetWidth) <= 5;
+            e.target.scrollWidth - e.target.scrollLeft - e.target.offsetWidth <=
+            5;
           if (isStartOfList) {
             setIsShowLeftScrollButton(() => false);
           } else {
@@ -103,27 +100,27 @@ const SelectedCategory = () => {
         }}
       >
         <Chip
-          label={"全部"}
-          value={"全部"}
+          label="全部"
+          value="全部"
           onClick={() => {
             delete query.cats;
             push({
-              pathname: "/search",
+              pathname: '/search',
               query,
             });
           }}
           sx={{
             backgroundColor:
-              (query?.cats ?? "") === ""
+              (query?.cats ?? '') === ''
                 ? COLOR_TABLE.green
                 : COLOR_TABLE.default,
-            opacity: (query?.cats ?? "") === "" ? "100%" : "40%",
-            cursor: "pointer",
-            margin: "5px",
-            whiteSpace: "nowrap",
+            opacity: (query?.cats ?? '') === '' ? '100%' : '40%',
+            cursor: 'pointer',
+            margin: '5px',
+            whiteSpace: 'nowrap',
             fontWeight: 500,
-            fontSize: "16px",
-            "&:hover": {
+            fontSize: '16px',
+            '&:hover': {
               backgroundColor: COLOR_TABLE.green,
             },
           }}
@@ -140,6 +137,7 @@ const SelectedCategory = () => {
       <ScrollButton
         type="right"
         isShowScrollButton={isShowRightScrollButton}
+        // eslint-disable-next-line no-return-assign
         onScrollEvent={() =>
           (ref.current.scrollLeft += ref.current.offsetWidth + 100)
         }

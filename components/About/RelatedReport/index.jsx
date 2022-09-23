@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "@emotion/styled";
+import React from 'react';
+import styled from '@emotion/styled';
 // import { css } from "@emotion/react";
-import { Box, Paper, Typography, Stack, Avatar } from "@mui/material";
+import { Box, Paper, Typography, Stack, Avatar } from '@mui/material';
 
 const LinkWrapper = styled.a`
   color: black;
@@ -15,8 +15,6 @@ const LinkWrapper = styled.a`
 const SectionWrapper = styled.section`
   margin: 20px 0;
 `;
-
-
 const LineWrapper = styled(Typography)`
   margin: 5px 0;
 `;
@@ -27,22 +25,20 @@ const RelatedReport = () => {
       <Typography
         variant="h2"
         sx={{
-          margin: "40px 0 10px 0",
+          margin: '40px 0 10px 0',
         }}
       >
         相關報導
       </Typography>
       <Stack
         sx={{
-          margin: "20px",
+          margin: '20px',
         }}
       >
         <LineWrapper variant="p">
           <LinkWrapper
             target="_blank"
-            href={
-              "https://www.ner.gov.tw/program/5a83f4eac5fd8a01e2df012b/602e2793b702e0000801cf6e"
-            }
+            href="https://www.ner.gov.tw/program/5a83f4eac5fd8a01e2df012b/602e2793b702e0000801cf6e"
             rel="noopener noreferrer"
           >
             📌 國立教育廣播電台 – 生活 In
@@ -52,9 +48,7 @@ const RelatedReport = () => {
         <LineWrapper variant="p">
           <LinkWrapper
             target="_blank"
-            href={
-              "https://drive.google.com/file/d/1rDerbtnV0Abk2QWRyRB_RTRDyKsvn48e/view"
-            }
+            href="https://drive.google.com/file/d/1rDerbtnV0Abk2QWRyRB_RTRDyKsvn48e/view"
             rel="noopener noreferrer"
           >
             📌 零時小學校2020成果手冊：學生老師共創學習資源平台
@@ -64,7 +58,7 @@ const RelatedReport = () => {
         <LineWrapper variant="p">
           <LinkWrapper
             target="_blank"
-            href={"https://lab.ocf.tw/2020/11/17/sch001/"}
+            href="https://lab.ocf.tw/2020/11/17/sch001/"
             rel="noopener noreferrer"
           >
             📌 OCF
@@ -74,7 +68,7 @@ const RelatedReport = () => {
         <LineWrapper variant="p">
           <LinkWrapper
             target="_blank"
-            href={"https://edu100.parenting.com.tw/2021/detail/37#loaded"}
+            href="https://edu100.parenting.com.tw/2021/detail/37#loaded"
             rel="noopener noreferrer"
           >
             📌 親子天下教育創新 100

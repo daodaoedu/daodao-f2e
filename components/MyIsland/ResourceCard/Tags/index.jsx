@@ -1,9 +1,10 @@
-import React, { useCallback } from "react";
-import styled from "@emotion/styled";
-import { useRouter } from "next/router";
-import Chip from "@mui/material/Chip";
-import { COLOR_TABLE } from "../../../../constants/notion";
-import { scrollToTop } from "../../../../utils/ux";
+import React, { useCallback } from 'react';
+import styled from '@emotion/styled';
+import { useRouter } from 'next/router';
+import Chip from '@mui/material/Chip';
+import { COLOR_TABLE } from '../../../../constants/notion';
+import { scrollToTop } from '../../../../utils/ux';
+
 const TagsWrapper = styled.ul`
   display: flex;
   flex-wrap: wrap;
@@ -26,9 +27,9 @@ const Tags = ({ tags, type }) => {
   const linkTagsHandler = useCallback(
     (name) => {
       // const queryString = tags.join("&");
-      open(`/search?${type}=${name}`, "_blank");
+      open(`/search?${type}=${name}`, '_blank');
     },
-    [type]
+    [type],
   );
   return (
     <TagsWrapper>
@@ -38,15 +39,15 @@ const Tags = ({ tags, type }) => {
             label={name}
             onClick={() => linkTagsHandler(name)}
             sx={{
-              backgroundColor: COLOR_TABLE["green"],
-              cursor: "pointer",
-              margin: "5px",
-              whiteSpace: "nowrap",
+              backgroundColor: COLOR_TABLE.green,
+              cursor: 'pointer',
+              margin: '5px',
+              whiteSpace: 'nowrap',
               fontWeight: 500,
-              fontSize: "14px",
-              "&:hover": {
-                opacity: "60%",
-                transition: "transform 0.4s",
+              fontSize: '14px',
+              '&:hover': {
+                opacity: '60%',
+                transition: 'transform 0.4s',
               },
             }}
           />

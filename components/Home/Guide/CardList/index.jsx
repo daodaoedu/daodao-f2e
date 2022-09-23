@@ -1,8 +1,8 @@
-import { useRef } from "react";
-import styled from "@emotion/styled";
+import { useRef } from 'react';
+import styled from '@emotion/styled';
 // import { css } from "@emotion/react";
 // import { slideInUp } from "../../../../shared/styles/animation";
-import Card from "./Card";
+import Card from './Card';
 // import useIntersectionObserver from "../../../../hooks/useIntersectionObserver";
 
 const CardListWrapper = styled.ul`
@@ -19,18 +19,18 @@ const CardListWrapper = styled.ul`
 const data = [
   {
     id: 0,
-    title: "語言與文學",
-    image: "/assets/images/english.png",
+    title: '語言與文學',
+    image: '/assets/images/english.png',
   },
   {
     id: 1,
-    title: "資訊與工程",
-    image: "/assets/images/programming.png",
+    title: '資訊與工程',
+    image: '/assets/images/programming.png',
   },
   {
     id: 2,
-    title: "學習/教學工具",
-    image: "/assets/images/digital.png",
+    title: '學習/教學工具',
+    image: '/assets/images/digital.png',
   },
 ];
 

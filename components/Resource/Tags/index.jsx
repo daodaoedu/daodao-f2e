@@ -1,8 +1,8 @@
-import React, { useCallback } from "react";
-import styled from "@emotion/styled";
-import { useRouter } from "next/router";
-import Chip from "@mui/material/Chip";
-import { COLOR_TABLE } from "../../../constants/notion";
+import React, { useCallback } from 'react';
+import styled from '@emotion/styled';
+import { useRouter } from 'next/router';
+import Chip from '@mui/material/Chip';
+import { COLOR_TABLE } from '../../../constants/notion';
 
 const TagsWrapper = styled.ul`
   display: flex;
@@ -30,15 +30,15 @@ const Tags = ({ tags, type }) => {
       delete clonedQuery.title;
       if (clonedQuery[type]) {
         push({
-          pathname: "/search",
+          pathname: '/search',
           query: {
             ...clonedQuery,
-            [type]: [clonedQuery[type].split(","), newQuery].join(","),
+            [type]: [clonedQuery[type].split(','), newQuery].join(','),
           },
         });
       } else {
         push({
-          pathname: "/search",
+          pathname: '/search',
           query: {
             ...clonedQuery,
             [type]: newQuery,
@@ -46,7 +46,7 @@ const Tags = ({ tags, type }) => {
         });
       }
     },
-    [push, query, type]
+    [push, query, type],
   );
   return (
     <TagsWrapper>
@@ -56,15 +56,15 @@ const Tags = ({ tags, type }) => {
             label={name}
             onClick={() => linkTagsHandler(name)}
             sx={{
-              backgroundColor: COLOR_TABLE[color ?? "default"],
-              cursor: "pointer",
-              margin: "5px",
-              whiteSpace: "nowrap",
+              backgroundColor: COLOR_TABLE[color ?? 'default'],
+              cursor: 'pointer',
+              margin: '5px',
+              whiteSpace: 'nowrap',
               fontWeight: 500,
-              fontSize: "14px",
-              "&:hover": {
-                opacity: "60%",
-                transition: "transform 0.4s",
+              fontSize: '14px',
+              '&:hover': {
+                opacity: '60%',
+                transition: 'transform 0.4s',
               },
             }}
           />

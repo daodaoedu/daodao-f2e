@@ -1,19 +1,19 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { Box, Paper, Typography } from "@mui/material";
+import React from 'react';
+import styled from '@emotion/styled';
+import { Box, Paper, Typography } from '@mui/material';
 
 const LearningResource = () => {
   return (
     <Box>
       <Box
         sx={{
-          margin: "20px 0",
+          margin: '20px 0',
         }}
       >
         <Typography
           variant="h2"
           sx={{
-            margin: "40px 0 10px 0",
+            margin: '40px 0 10px 0',
           }}
         >
           一、多元學習資源
@@ -24,8 +24,8 @@ const LearningResource = () => {
         <Typography
           variant="p"
           sx={{
-            margin: "10px 0",
-            fontWeight: "500",
+            margin: '10px 0',
+            fontWeight: '500',
           }}
         >
           我們鼓勵彼此資源共享與共學的精神，歡迎留下自己的名稱/暱稱來展示自己的資源貢獻，也歡迎在表單上留下個人網站/專頁來曝光自己。
@@ -33,9 +33,10 @@ const LearningResource = () => {
       </Box>
       <Box
         sx={{
-          margin: "40px 0 20px 0",
+          margin: '40px 0 20px 0',
         }}
       >
+        {/* eslint-disable-next-line jsx-a11y/iframe-has-title */}
         <iframe
           src="https://docs.google.com/forms/d/e/1FAIpQLSdE9URRYAEJj1I8b-RJ6EG4PZ_5ggm_mcGq7Jis1LFxpjXvrw/viewform?embedded=true"
           width="100%"

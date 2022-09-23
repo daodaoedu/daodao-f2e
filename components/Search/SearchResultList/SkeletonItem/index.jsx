@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { Skeleton, Box } from "@mui/material";
+import React from 'react';
+import styled from '@emotion/styled';
+import { Skeleton, Box } from '@mui/material';
 
 const ItemWrapper = styled.li`
   display: flex;
@@ -32,39 +32,42 @@ const SkeletonItem = () => {
     <ItemWrapper>
       <SkeletonImageWrapper variant="rectangular" />
       <ContentWrapper>
-        <Skeleton variant="text" sx={{ fontSize: "32px", maxWidth: "300px", width: "100%" }} />
+        <Skeleton
+          variant="text"
+          sx={{ fontSize: '32px', maxWidth: '300px', width: '100%' }}
+        />
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "flex-start",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
           }}
         >
           <Skeleton
             variant="rectangular"
             sx={{
-              height: "32px",
-              width: "60px",
-              borderRadius: "20px",
-              margin: "5px",
+              height: '32px',
+              width: '60px',
+              borderRadius: '20px',
+              margin: '5px',
             }}
           />
           <Skeleton
             variant="rectangular"
             sx={{
-              height: "32px",
-              width: "80px",
-              borderRadius: "20px",
-              margin: "5px",
+              height: '32px',
+              width: '80px',
+              borderRadius: '20px',
+              margin: '5px',
             }}
           />
           <Skeleton
             variant="rectangular"
             sx={{
-              height: "32px",
-              width: "70px",
-              borderRadius: "20px",
-              margin: "5px",
+              height: '32px',
+              width: '70px',
+              borderRadius: '20px',
+              margin: '5px',
             }}
           />
         </Box>
@@ -72,13 +75,13 @@ const SkeletonItem = () => {
           <Skeleton
             variant="text"
             sx={{
-              fontSize: "24px",
+              fontSize: '24px',
             }}
           />
           <Skeleton
             variant="text"
             sx={{
-              fontSize: "24px",
+              fontSize: '24px',
             }}
           />
         </Box>

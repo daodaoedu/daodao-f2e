@@ -1,19 +1,19 @@
-import React, { useEffect, useMemo, useState } from "react";
-import styled from "@emotion/styled";
-import { useRouter } from "next/router";
-import { Button, Paper, Box, Stack, Typography } from "@mui/material";
-import Tags from "./Tags";
-import { postFetcher } from "../../utils/fetcher";
-import { css } from "@emotion/react";
-import { DiscussionEmbed, Recommendations, CommentEmbed } from "disqus-react";
-import { Share } from "@mui/icons-material";
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import toast from "react-hot-toast";
-import Shares from "./Shares";
-import appendQuery from "append-query";
-import RelatedResources from "../../shared/components/RelatedResources";
-import Desc from "./Desc";
-import Video from "./Video";
+import React, { useEffect, useMemo, useState } from 'react';
+import styled from '@emotion/styled';
+import { useRouter } from 'next/router';
+import { Button, Paper, Box, Stack, Typography } from '@mui/material';
+import { css } from '@emotion/react';
+import { DiscussionEmbed, Recommendations, CommentEmbed } from 'disqus-react';
+import { Share } from '@mui/icons-material';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import toast from 'react-hot-toast';
+import appendQuery from 'append-query';
+import Shares from './Shares';
+import { postFetcher } from '../../utils/fetcher';
+import Tags from './Tags';
+import RelatedResources from '../../shared/components/RelatedResources';
+import Desc from './Desc';
+import Video from './Video';
 
 const ResourceWrapper = styled.article`
   background-color: #fff;
@@ -91,23 +91,23 @@ const Resource = ({
         // url: `test-page.notion.dev.daoedu.tw${router.asPath}`,
         url: `${process.env.HOSTNAME}${router.asPath}`,
         identifier: encodeURIComponent(title),
-        title: title,
-        language: "zh_TW", //e.g. for Traditional Chinese (Taiwan)
+        title,
+        language: 'zh_TW', // e.g. for Traditional Chinese (Taiwan)
       });
     }
   }, [router.asPath, router.isReady, title]);
 
   const resourcesTags = useMemo(
-    () => data?.properties["資源類型"]?.multi_select ?? [],
-    [data]
+    () => data?.properties['資源類型']?.multi_select ?? [],
+    [data],
   );
   const ageOfUserTags = useMemo(
-    () => data?.properties["年齡層"]?.multi_select ?? [],
-    [data]
+    () => data?.properties['年齡層']?.multi_select ?? [],
+    [data],
   );
   const catTags = useMemo(
-    () => data?.properties["領域名稱"]?.multi_select ?? [],
-    [data]
+    () => data?.properties['領域名稱']?.multi_select ?? [],
+    [data],
   );
 
   return (
@@ -119,20 +119,20 @@ const Resource = ({
       </a>
       {/* <Image src={image} alt="image" layout="fill" /> */}
       <ImageWrapper
-        onClick={() => window.open(link, "_blank")}
-        image={image ?? "https://www.daoedu.tw/preview.webp"}
+        onClick={() => window.open(link, '_blank')}
+        image={image ?? 'https://www.daoedu.tw/preview.webp'}
       />
       <Shares title={title} link={link} />
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
-          whiteSpace: "nowrap",
+          display: 'flex',
+          alignItems: 'center',
+          whiteSpace: 'nowrap',
         }}
       >
         <Box
           sx={{
-            fontWeight: "500",
+            fontWeight: '500',
           }}
         >
           領域名稱：
@@ -142,14 +142,14 @@ const Resource = ({
 
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
-          whiteSpace: "nowrap",
+          display: 'flex',
+          alignItems: 'center',
+          whiteSpace: 'nowrap',
         }}
       >
         <Box
           sx={{
-            fontWeight: "500",
+            fontWeight: '500',
           }}
         >
           資源類型：
@@ -158,14 +158,14 @@ const Resource = ({
       </Box>
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
-          whiteSpace: "nowrap",
+          display: 'flex',
+          alignItems: 'center',
+          whiteSpace: 'nowrap',
         }}
       >
         <Box
           sx={{
-            fontWeight: "500",
+            fontWeight: '500',
           }}
         >
           年齡層：
@@ -174,14 +174,14 @@ const Resource = ({
       </Box>
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
-          whiteSpace: "nowrap",
+          display: 'flex',
+          alignItems: 'center',
+          whiteSpace: 'nowrap',
         }}
       >
         <Box
           sx={{
-            fontWeight: "500",
+            fontWeight: '500',
           }}
         >
           標籤：
@@ -190,14 +190,14 @@ const Resource = ({
       </Box>
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
-          whiteSpace: "nowrap",
+          display: 'flex',
+          alignItems: 'center',
+          whiteSpace: 'nowrap',
         }}
       >
         <Box
           sx={{
-            fontWeight: "500",
+            fontWeight: '500',
           }}
         >
           費用：
@@ -214,9 +214,9 @@ const Resource = ({
               {
                 or: [
                   {
-                    property: "領域名稱",
+                    property: '領域名稱',
                     multi_select: {
-                      contains: catTags[0]?.name ?? "",
+                      contains: catTags[0]?.name ?? '',
                     },
                   },
                 ],
@@ -226,7 +226,7 @@ const Resource = ({
           page_size: 10,
         }}
       />
-      <Box sx={{ marginTop: "20px" }}>
+      <Box sx={{ marginTop: '20px' }}>
         {Object.keys(disqusConfig).length > 0 && (
           <DiscussionEmbed
             shortname="dao-dao-a-xue"

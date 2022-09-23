@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import styled from "@emotion/styled";
-import { Box, Select, MenuItem } from "@mui/material";
-import { useRouter } from "next/router";
+import React, { useState } from 'react';
+import styled from '@emotion/styled';
+import { Box, Select, MenuItem } from '@mui/material';
+import { useRouter } from 'next/router';
 // import { SEARCH_TAGS } from "../../../constants/category";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import Chip from "@mui/material/Chip";
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import Chip from '@mui/material/Chip';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -19,11 +19,11 @@ const MenuProps = {
   },
 };
 
-const names = ["學齡前", "國小", "國高中", "大學以上"];
+const names = ['學齡前', '國小', '國高中', '大學以上'];
 
 const AgeDropdown = () => {
   const { query, push } = useRouter();
-  const ages = query?.ages ? (query?.ages).split(",") : [];
+  const ages = query?.ages ? (query?.ages).split(',') : [];
   const handleChange = (event) => {
     const {
       target: { value },
@@ -31,16 +31,16 @@ const AgeDropdown = () => {
 
     if (value.length > 0) {
       push({
-        pathname: "/search",
+        pathname: '/search',
         query: {
           ...query,
-          ages: value.join(","),
+          ages: value.join(','),
         },
       });
     } else {
       delete query.ages;
       push({
-        pathname: "/search",
+        pathname: '/search',
         query,
       });
     }
@@ -56,7 +56,7 @@ const AgeDropdown = () => {
         input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
         renderValue={(selected) =>
           selected.length > 0 && (
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
               {selected.map((value) => (
                 <Chip key={value} label={value} />
               ))}
@@ -65,7 +65,7 @@ const AgeDropdown = () => {
         }
         MenuProps={MenuProps}
         sx={{
-          borderRadius: "20px",
+          borderRadius: '20px',
         }}
       >
         {names.map((name) => (

@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { Box } from "@mui/material";
-import ReactPlayer from "react-player/youtube";
+import React from 'react';
+import styled from '@emotion/styled';
+import { Box } from '@mui/material';
+import ReactPlayer from 'react-player/youtube';
 
 const VideoWrapper = styled.div`
   --video-width: calc(80vw - 20px);
@@ -22,23 +22,22 @@ const ReactPlayerWrapper = styled(ReactPlayer)`
 `;
 
 const Video = ({ videoLink }) => {
-    if (videoLink) {
-      return (
-        <VideoWrapper>
-          <h2>🕹 影片介紹</h2>
-          <Box sx={{ width: "var(--video-width)" }}>
-            <ReactPlayerWrapper
-              url={videoLink}
-              controls
-              width="var(--video-width)"
-              height="calc(var(--video-width) * 0.5625)"
-            />
-          </Box>
-        </VideoWrapper>
-      );
-    }
-    return <></>;
+  if (videoLink) {
+    return (
+      <VideoWrapper>
+        <h2>🕹 影片介紹</h2>
+        <Box sx={{ width: 'var(--video-width)' }}>
+          <ReactPlayerWrapper
+            url={videoLink}
+            controls
+            width="var(--video-width)"
+            height="calc(var(--video-width) * 0.5625)"
+          />
+        </Box>
+      </VideoWrapper>
+    );
+  }
+  return <></>;
 };
 
 export default Video;
-

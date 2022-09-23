@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { css } from "@emotion/react";
-import Link from "next/link";
+import React from 'react';
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
+import Link from 'next/link';
 
 const SuggestWrapper = styled.div`
   width: 100%;
@@ -55,7 +55,7 @@ const SuggestList = ({
   const isServerSide = !process.browser;
   if (isServerSide) return <></>;
   const historyKeywords =
-    JSON.parse(window?.localStorage.getItem("historyKeywords") || null) || [];
+    JSON.parse(window?.localStorage.getItem('historyKeywords') || null) || [];
 
   if (!isFocus) return <></>;
 
@@ -66,7 +66,7 @@ const SuggestList = ({
           <Link
             key={id}
             href={`/search?q=${suggest}`}
-            style={{ background: referenceSelected === idx ? "#eee" : null }}
+            style={{ background: referenceSelected === idx ? '#eee' : null }}
           >
             {suggest}
           </Link>
@@ -85,8 +85,8 @@ const SuggestList = ({
             href={`/search?q=${suggest}`}
             onClick={() => addSearchHistory(suggest)}
             style={{
-              background: referenceSelected === idx ? "#eee" : null,
-              wordBreak: "break-all",
+              background: referenceSelected === idx ? '#eee' : null,
+              wordBreak: 'break-all',
             }}
           >
             {suggest}

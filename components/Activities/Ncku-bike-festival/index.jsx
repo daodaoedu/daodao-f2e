@@ -1,9 +1,11 @@
-import React, { useMemo, useState } from "react";
-import styled from "@emotion/styled";
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+import React, { useMemo, useState } from 'react';
+import styled from '@emotion/styled';
 // import { css } from "@emotion/react";
-import { Box, Paper, Typography, Button } from "@mui/material";
-import { Stage, Layer, Rect, Text, Circle, Line, Image } from "react-konva";
-import useImage from "use-image";
+import { Box, Paper, Typography, Button } from '@mui/material';
+import { Stage, Layer, Rect, Text, Circle, Line, Image } from 'react-konva';
+import useImage from 'use-image';
 
 const ResourceWrapper = styled.section`
   padding-top: 40px;
@@ -29,27 +31,27 @@ const ResourceWrapper = styled.section`
 
 const NckuBikeFestival = () => {
   const stageRef = React.useRef(null);
-  const [mainState, setMainState] = useState("initial"); // initial, search, gallery, uploaded
+  const [mainState, setMainState] = useState('initial'); // initial, search, gallery, uploaded
   const [imageUploaded, setImageUploaded] = useState(0);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [img] = useImage(selectedFile, "Anonymous");
-  const [newImage] = useImage(stageRef?.current?.toDataURL(), "Anonymous");
+  const [img] = useImage(selectedFile, 'Anonymous');
+  const [newImage] = useImage(stageRef?.current?.toDataURL(), 'Anonymous');
 
   const handleUploadClick = (event) => {
-    var file = event.target.files[0];
+    const file = event.target.files[0];
     const reader = new FileReader();
-    var url = reader.readAsDataURL(file);
+    const url = reader.readAsDataURL(file);
 
     reader.onloadend = function (e) {
       setSelectedFile([reader.result]);
     };
     console.log(url);
-    setMainState("uploaded");
+    setMainState('uploaded');
     setSelectedFile(event.target.files[0]);
     setImageUploaded(1);
   };
   function downloadURI(uri, name) {
-    var link = document.createElement("a");
+    const link = document.createElement('a');
     link.download = name;
     link.href = uri;
     document.body.appendChild(link);
@@ -60,21 +62,21 @@ const NckuBikeFestival = () => {
     <ResourceWrapper>
       <Paper
         sx={{
-          width: "80%",
-          margin: "0 auto",
-          padding: "20px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
+          width: '80%',
+          margin: '0 auto',
+          padding: '20px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexDirection: 'column',
         }}
       >
         <Box>
           <Typography
             variant="h1"
             sx={{
-              margin: "10px 0",
-              fontSize: "30px",
+              margin: '10px 0',
+              fontSize: '30px',
             }}
           >
             來做做看你可愛的照片
@@ -82,7 +84,7 @@ const NckuBikeFestival = () => {
         </Box>
         <Box
           sx={{
-            margin: "20px 0",
+            margin: '20px 0',
           }}
         >
           {/* <Typography
@@ -102,7 +104,7 @@ const NckuBikeFestival = () => {
           {/* </Typography> */}
           <Typography
             sx={{
-              margin: "20px 0",
+              margin: '20px 0',
             }}
           >
             <Stage width="300" height="300" ref={stageRef}>
@@ -113,7 +115,7 @@ const NckuBikeFestival = () => {
                   y={0}
                   width={300}
                   height={300}
-                  fill={true}
+                  fill
                   //   opacity="0.3"
                   alt="image"
                 />
@@ -130,8 +132,8 @@ const NckuBikeFestival = () => {
         <Box>
           <a
             onClick={() => {
-              var dataURL = stageRef?.current?.toDataURL({ pixelRatio: 3 });
-              downloadURI(dataURL, "stage.png");
+              const dataURL = stageRef?.current?.toDataURL({ pixelRatio: 3 });
+              downloadURI(dataURL, 'stage.png');
             }}
             // href={`${downloadPath}`}
             target="_blank"

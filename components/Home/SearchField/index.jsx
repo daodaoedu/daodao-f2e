@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "@emotion/styled";
-import SearchInput from "./SearchInput";
-import Tags from "./Tags";
+import React from 'react';
+import styled from '@emotion/styled';
+import SearchInput from './SearchInput';
+import Tags from './Tags';
 
 const SearchFieldWrapper = styled.div`
   margin: auto;

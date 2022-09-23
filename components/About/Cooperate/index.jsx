@@ -1,9 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
 /* eslint-disable jsx-a11y/alt-text */
-import React from "react";
-import styled from "@emotion/styled";
+import React from 'react';
+import styled from '@emotion/styled';
 // import { css } from "@emotion/react";
-import { Box, Paper, Typography, Stack, Avatar } from "@mui/material";
+import { Box, Paper, Typography, Stack, Avatar } from '@mui/material';
 
 const LineWrapper = styled(Typography)`
   margin: 5px 0;
@@ -12,35 +11,33 @@ const LineWrapper = styled(Typography)`
 const SectionWrapper = styled.section`
   margin: 20px 0;
 `;
-
-
 const Cooperate = () => {
   return (
     <SectionWrapper>
       <Typography
         variant="h2"
         sx={{
-          margin: "40px 0 10px 0",
+          margin: '40px 0 10px 0',
         }}
       >
         合作夥伴
       </Typography>
       <Box
         sx={{
-          margin: "20px",
-          display: "flex",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          flexWrap: "wrap",
+          margin: '20px',
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          flexWrap: 'wrap',
         }}
       >
         <Box
           sx={{
-            backgroundColor: "black",
-            padding: "5px",
-            width: "210px",
-            borderRadius: "5px",
-            margin: "10px",
+            backgroundColor: 'black',
+            padding: '5px',
+            width: '210px',
+            borderRadius: '5px',
+            margin: '10px',
           }}
         >
           <a
@@ -58,10 +55,10 @@ const Cooperate = () => {
         </Box>
         <Box
           sx={{
-            padding: "5px",
-            height: "120px",
-            borderRadius: "5px",
-            margin: "10px",
+            padding: '5px',
+            height: '120px',
+            borderRadius: '5px',
+            margin: '10px',
           }}
         >
           <a
@@ -78,10 +75,10 @@ const Cooperate = () => {
         </Box>
         <Box
           sx={{
-            padding: "5px",
-            height: "130px",
-            borderRadius: "5px",
-            margin: "10px",
+            padding: '5px',
+            height: '130px',
+            borderRadius: '5px',
+            margin: '10px',
           }}
         >
           <a
@@ -98,10 +95,10 @@ const Cooperate = () => {
         </Box>
         <Box
           sx={{
-            padding: "5px",
-            height: "130px",
-            borderRadius: "5px",
-            margin: "10px",
+            padding: '5px',
+            height: '130px',
+            borderRadius: '5px',
+            margin: '10px',
           }}
         >
           <a
@@ -118,10 +115,10 @@ const Cooperate = () => {
         </Box>
         <Box
           sx={{
-            padding: "5px",
-            height: "130px",
-            borderRadius: "5px",
-            margin: "10px",
+            padding: '5px',
+            height: '130px',
+            borderRadius: '5px',
+            margin: '10px',
           }}
         >
           <a

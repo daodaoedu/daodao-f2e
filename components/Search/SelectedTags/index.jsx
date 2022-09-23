@@ -1,11 +1,9 @@
-import React, { useCallback } from "react";
-import styled from "@emotion/styled";
-// import Chip from "@mui/material/Chip";
-import { useRouter } from "next/router";
+import React, { useCallback } from 'react';
+import { useRouter } from 'next/router';
 // import { COLOR_TABLE } from "../../../constants/notion";
-import Tags from "./Tags";
-import { LocalOffer } from "@mui/icons-material";
-import { Box } from "@mui/material";
+import { LocalOffer } from '@mui/icons-material';
+import { Box } from '@mui/material';
+import Tags from './Tags';
 // const ListWrapper = styled.ul`
 //   display: flex;
 //   justify-content: flex-start;
@@ -23,43 +21,43 @@ import { Box } from "@mui/material";
 const SelectedTags = () => {
   const { push, query } = useRouter();
 
-  const tags = (query?.tags ?? "")
-    .split(",")
-    .map((tag) => ({ key: "tags", value: tag }))
-    .filter(({ value }) => value !== "");
+  const tags = (query?.tags ?? '')
+    .split(',')
+    .map((tag) => ({ key: 'tags', value: tag }))
+    .filter(({ value }) => value !== '');
 
-  const feeTags = (query?.fee ?? "")
-    .split(",")
-    .map((tag) => ({ key: "fee", value: tag }))
-    .filter(({ value }) => value !== "");
+  // const feeTags = (query?.fee ?? '')
+  //   .split(',')
+  //   .map((tag) => ({ key: 'fee', value: tag }))
+  //   .filter(({ value }) => value !== '');
 
-  const ageTags = (query?.ages ?? "")
-    .split(",")
-    .map((tag) => ({ key: "ages", value: tag }))
-    .filter(({ value }) => value !== "");
+  // const ageTags = (query?.ages ?? '')
+  //   .split(',')
+  //   .map((tag) => ({ key: 'ages', value: tag }))
+  //   .filter(({ value }) => value !== '');
 
   const onDelete = useCallback(
     (key, targetValue) => {
-      if (typeof query[key] === "string" && query[key].split(",").length > 1) {
+      if (typeof query[key] === 'string' && query[key].split(',').length > 1) {
         push({
-          pathname: "/search",
+          pathname: '/search',
           query: {
             ...query,
             [key]: query[key]
-              .split(",")
+              .split(',')
               .filter((value) => value !== targetValue)
-              .join(","),
+              .join(','),
           },
         });
       } else {
         delete query[key];
         push({
-          pathname: "/search",
+          pathname: '/search',
           query,
         });
       }
     },
-    [push, query]
+    [push, query],
   );
 
   if (tags.length === 0) {
@@ -69,16 +67,16 @@ const SelectedTags = () => {
   return (
     <Box
       sx={{
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
+        display: 'flex',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
       }}
     >
       <LocalOffer
         sx={{
-          fontSize: "22px",
-          color: "rgb(72, 175, 226)",
-          marginRight: "6px",
+          fontSize: '22px',
+          color: 'rgb(72, 175, 226)',
+          marginRight: '6px',
         }}
       />
       {/* <ListWrapper> */}

@@ -1,9 +1,9 @@
-import styled from "@emotion/styled";
-import { css } from "@emotion/react";
-import { slideInUp } from "../../../../../shared/styles/animation";
-import { useRouter } from "next/router";
-import { Box, Tooltip, Typography } from "@mui/material";
-import dayjs from "dayjs";
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
+import { useRouter } from 'next/router';
+import { Box, Tooltip, Typography } from '@mui/material';
+import dayjs from 'dayjs';
+import { slideInUp } from '../../../../../shared/styles/animation';
 
 const CardWrapper = styled.li`
   position: relative;
@@ -59,17 +59,17 @@ const BackgroundWrapper = styled.div`
   `}
 `;
 
-const Card = ({ id, message = "", date, title, link, type }) => {
+const Card = ({ id, message = '', date, title, link, type }) => {
   const router = useRouter();
   return (
     <Tooltip title={message.slice(0, 150)}>
       <CardWrapper
         onClick={() =>
           window.open(
-            `https://www.facebook.com/${id.split("_")[0]}/posts/${
-              id.split("_")[1]
+            `https://www.facebook.com/${id.split('_')[0]}/posts/${
+              id.split('_')[1]
             }`,
-            "_target"
+            '_target',
           )
         }
       >
@@ -77,11 +77,11 @@ const Card = ({ id, message = "", date, title, link, type }) => {
           sx={{
             // border: "1px solid #16b9b3",
             // borderRadius: '10px'
-            fontWeight: "bold",
+            fontWeight: 'bold',
           }}
         >
           {/* {title} */}
-          時間：{dayjs(date).format("YYYY/MM/DD")}
+          時間：{dayjs(date).format('YYYY/MM/DD')}
         </Box>
         <ContentWrapper>{message}</ContentWrapper>
         {/* <Typography sx={{ color: "#16b9b3" }}>{message}</Typography> */}

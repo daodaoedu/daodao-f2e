@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo } from "react";
-import { useRouter } from "next/router";
-import { Chip } from "@mui/material";
-import { COLOR_TABLE } from "../../../../constants/notion";
-import stringSanitizer from "../../../../utils/sanitizer";
+import React, { useCallback, useMemo } from 'react';
+import { useRouter } from 'next/router';
+import { Chip } from '@mui/material';
+import { COLOR_TABLE } from '../../../../constants/notion';
+import stringSanitizer from '../../../../utils/sanitizer';
 
 // const TagWrapper = styled(Chip)`
 //   margin: auto 5px;
@@ -32,22 +32,22 @@ const Tag = ({ title }) => {
   const { push, query } = useRouter();
   const queryTags = useMemo(
     () =>
-      typeof query.tags === "string"
-        ? stringSanitizer(query.tags).split(",")
+      typeof query.tags === 'string'
+        ? stringSanitizer(query.tags).split(',')
         : [],
-    [query.tags]
+    [query.tags],
   );
   const linkHandler = useCallback(
     (targetQuery) => {
       push({
-        pathname: "/search",
+        pathname: '/search',
         query: {
           ...query,
-          tags: [...new Set([...queryTags, targetQuery])].join(","),
+          tags: [...new Set([...queryTags, targetQuery])].join(','),
         },
       });
     },
-    [push, query, queryTags]
+    [push, query, queryTags],
   );
   return (
     <Chip
@@ -55,14 +55,14 @@ const Tag = ({ title }) => {
       onClick={() => linkHandler(title)}
       sx={{
         backgroundColor: COLOR_TABLE.pink,
-        cursor: "pointer",
-        margin: "5px",
-        whiteSpace: "nowrap",
+        cursor: 'pointer',
+        margin: '5px',
+        whiteSpace: 'nowrap',
         fontWeight: 500,
-        fontSize: "14px",
-        "&:hover": {
-          opacity: "60%",
-          transition: "transform 0.4s",
+        fontSize: '14px',
+        '&:hover': {
+          opacity: '60%',
+          transition: 'transform 0.4s',
         },
       }}
     />

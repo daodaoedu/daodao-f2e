@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 // import ClickAwayListener from "@mui/base/ClickAwayListener";
-import InputBase from "@mui/material/InputBase";
-import Paper from "@mui/material/Paper";
-import styled from "@emotion/styled";
+import InputBase from '@mui/material/InputBase';
+import Paper from '@mui/material/Paper';
+import styled from '@emotion/styled';
 // import { Search } from "@mui/icons-material";
-import { useRouter } from "next/router";
-import SearchButton from "./Button";
+import { useRouter } from 'next/router';
 // import i18n from "../../../../../constants/i18n";
 // import SuggestList from "./SuggestList";
-import { IconButton, Box } from "@mui/material";
-import MicIcon from "@mui/icons-material/Mic";
-import dynamic from "next/dynamic";
-const Speech = dynamic(import("../../../../shared/components/Speech"), {
+import { IconButton, Box } from '@mui/material';
+import MicIcon from '@mui/icons-material/Mic';
+import dynamic from 'next/dynamic';
+import SearchButton from './Button';
+
+const Speech = dynamic(import('../../../../shared/components/Speech'), {
   ssr: false,
 });
 
@@ -36,8 +37,6 @@ const SearchButtonWrapper = styled(IconButton)`
     /* background-color: #007bbb; */
   }
 `;
-
-
 const FormWrapper = styled.form`
   width: 100%;
 `;
@@ -60,13 +59,13 @@ const SearchInputWrapper = styled(Paper)`
 `;
 
 const PLACEHOLDER_TEXT = [
-  "英語, 心理學, 自主學習 ...",
-  "好想出國喔～該來學英語了",
-  "我的腦袋不太好，但是知道邏輯要訓練",
-  "不會寫程式，也要了解科技趨勢",
-  "斜槓與文青的時間到了",
-  "誰說健身不是學習的一種？",
-  "生活在學習",
+  '英語, 心理學, 自主學習 ...',
+  '好想出國喔～該來學英語了',
+  '我的腦袋不太好，但是知道邏輯要訓練',
+  '不會寫程式，也要了解科技趨勢',
+  '斜槓與文青的時間到了',
+  '誰說健身不是學習的一種？',
+  '生活在學習',
 ];
 
 const InputBaseWrapper = styled(InputBase)`
@@ -90,12 +89,12 @@ const SearchInput = () => {
   // const [referenceSelected, setReferenceSelected] = useState(null);
 
   useEffect(() => {
-    setKeyword(query?.q ?? "");
+    setKeyword(query?.q ?? '');
   }, [query?.q]);
 
   const routingPush = useCallback(
     (words) => {
-      if (words !== "") {
+      if (words !== '') {
         push({
           query: {
             ...query,
@@ -109,30 +108,31 @@ const SearchInput = () => {
         });
       }
     },
-    [push, query]
+    [push, query],
   );
 
   const placeholder = useMemo(
     () => PLACEHOLDER_TEXT[Math.floor(Math.random() * 7)],
-    []
+    [],
   );
 
   return (
     <SearchInputWrapper
       sx={{
-        p: "2px 4px",
-        display: "flex",
-        alignItems: "center",
+        p: '2px 4px',
+        display: 'flex',
+        alignItems: 'center',
         width: 400,
       }}
     >
       <FormWrapper
         action="/search"
+        // eslint-disable-next-line jsx-a11y/aria-role
         role="/search"
         name="search"
         onSubmit={(e) => {
           e.preventDefault();
-          if (keyword !== "") {
+          if (keyword !== '') {
             push({
               query: {
                 ...query,
@@ -147,7 +147,7 @@ const SearchInput = () => {
       >
         <InputBaseWrapper
           type="search"
-          inputProps={{ "aria-label": "search learning resources" }}
+          inputProps={{ 'aria-label': 'search learning resources' }}
           id="q"
           name="q"
           value={keyword}
@@ -164,11 +164,11 @@ const SearchInput = () => {
       )}
       <SearchToolsWrapper>
         <SearchButtonWrapper
-          sx={{ p: "5px", color: "#16b9b3" }}
+          sx={{ p: '5px', color: '#16b9b3' }}
           aria-label="speech"
           onClick={() => setIsSpeechMode(true)}
         >
-          <MicIcon sx={{ color: "#16b9b3" }} />
+          <MicIcon sx={{ color: '#16b9b3' }} />
         </SearchButtonWrapper>
         <SearchButton routingPush={() => routingPush(keyword)} />
       </SearchToolsWrapper>

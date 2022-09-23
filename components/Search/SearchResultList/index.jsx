@@ -1,8 +1,7 @@
-import React from "react";
-import styled from "@emotion/styled";
-import Item from "./Item";
-import SponsorItem from "./SponsorItem";
-import SkeletonItem from "./SkeletonItem";
+import React from 'react';
+import styled from '@emotion/styled';
+import Item from './Item';
+import SkeletonItem from './SkeletonItem';
 
 const ListWrapper = styled.ul`
   display: flex;
@@ -10,14 +9,8 @@ const ListWrapper = styled.ul`
   justify-content: space-between;
 `;
 
-const List = ({
-  list,
-  sponsorList,
-  queryTags,
-  isLoading,
-  isLoadingNextData,
-}) => {
-  if ((isLoading && list.length === 0)) {
+const List = ({ list, queryTags, isLoading, isLoadingNextData }) => {
+  if (isLoading && list.length === 0) {
     return (
       <ListWrapper>
         <SkeletonItem />
@@ -39,14 +32,15 @@ const List = ({
       ))} */}
       {list.map((item, index) =>
         isLoading ? (
+          // eslint-disable-next-line react/no-array-index-key
           <SkeletonItem key={index} />
         ) : (
           <Item
-            key={item.properties["資源名稱"].title[0].plain_text}
+            key={item.properties['資源名稱'].title[0].plain_text}
             data={item}
             queryTags={queryTags}
           />
-        )
+        ),
       )}
       {isLoadingNextData && (
         <>

@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "@emotion/styled";
-import Box from "@mui/material/Box";
-import CardList from "./CardList";
+import React from 'react';
+import styled from '@emotion/styled';
+import Box from '@mui/material/Box';
+import CardList from './CardList';
 
 const GuideWrapper = styled.div`
   width: 90%;
@@ -27,7 +27,7 @@ const Guide = () => {
   return (
     <GuideWrapper>
       <h2 className="guide-title">大家正在學...</h2>
-      <Box sx={{ marginTop: "20px" }}>
+      <Box sx={{ marginTop: '20px' }}>
         <CardList />
       </Box>
     </GuideWrapper>

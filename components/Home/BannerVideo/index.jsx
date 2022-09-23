@@ -1,5 +1,5 @@
-import React from "react";
-import styled from "@emotion/styled";
+import React from 'react';
+import styled from '@emotion/styled';
 
 const BannerVideoWrapper = styled.div`
   position: absolute;
@@ -31,8 +31,6 @@ const BackgroundFilterWrapper = styled.div`
   opacity: 0.4;
   /* backdrop-filter: blur(10px); */
 `;
-
-
 const BannerVideo = () => {
   return (
     <BannerVideoWrapper>

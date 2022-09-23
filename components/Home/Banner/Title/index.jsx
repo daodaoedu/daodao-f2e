@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "@emotion/styled";
-import Typed from "react-typed";
+import React from 'react';
+import styled from '@emotion/styled';
+import Typed from 'react-typed';
 
 const TitleWrapper = styled.div`
   min-height: 70px;
@@ -32,14 +32,14 @@ const Title = () => {
     <TitleWrapper>
       <h1>
         <Typed
-          strings={["歡迎來到島島阿學！一起找找資源、分享資源吧！"]}
+          strings={['歡迎來到島島阿學！一起找找資源、分享資源吧！']}
           typeSpeed={80}
         />
       </h1>
       <h2>
         <Typed
           strings={[
-            "If you want to go fast go alone. If you what to go far go together.",
+            'If you want to go fast go alone. If you what to go far go together.',
           ]}
           typeSpeed={80}
         />

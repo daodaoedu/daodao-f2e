@@ -1,19 +1,19 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { Box, Paper, Typography } from "@mui/material";
+import React from 'react';
+import styled from '@emotion/styled';
+import { Box, Paper, Typography } from '@mui/material';
 
 const ActivitiesResource = () => {
   return (
     <Box>
       <Box
         sx={{
-          margin: "20px 0",
+          margin: '20px 0',
         }}
       >
         <Typography
           variant="h2"
           sx={{
-            margin: "40px 0 10px 0",
+            margin: '40px 0 10px 0',
           }}
         >
           二、島島活動消息
@@ -24,9 +24,10 @@ const ActivitiesResource = () => {
       </Box>
       <Box
         sx={{
-          margin: "40px 0 20px 0",
+          margin: '40px 0 20px 0',
         }}
       >
+        {/* eslint-disable-next-line jsx-a11y/iframe-has-title */}
         <iframe
           src="https://docs.google.com/forms/d/e/1FAIpQLSeMg55q91VIdvNOmqqkzhqJGCKG4106YM0cVidzX6wHS9AJIA/viewform?embedded=true"
           width="100%"

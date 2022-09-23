@@ -1,9 +1,10 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { Paper, Box, Typography } from "@mui/material";
-import LearningResource from "./LearningResource";
-import ActivitiesResource from "./ActivitiesResource";
-import LocationResource from "./LocationResource";
+import React from 'react';
+import styled from '@emotion/styled';
+import { Paper, Box, Typography } from '@mui/material';
+import LearningResource from './LearningResource';
+import ActivitiesResource from './ActivitiesResource';
+import LocationResource from './LocationResource';
+
 const ResourceWrapper = styled.section`
   padding-top: 40px;
   padding-bottom: 40px;
@@ -31,16 +32,16 @@ const ContributeResource = () => {
     <ResourceWrapper>
       <Paper
         sx={{
-          width: "95%",
-          margin: "0 auto",
-          padding: "10px",
+          width: '95%',
+          margin: '0 auto',
+          padding: '10px',
         }}
       >
         <Box>
           <Typography
             variant="h1"
             sx={{
-              margin: "10px 0",
+              margin: '10px 0',
             }}
           >
             新增資源
@@ -53,7 +54,7 @@ const ContributeResource = () => {
         </Box>
         <Box
           sx={{
-            margin: "20px 0",
+            margin: '20px 0',
           }}
         >
           <Typography variant="p">謝謝你成為彼此自學路上的橋樑。</Typography>

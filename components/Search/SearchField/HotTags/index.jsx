@@ -1,9 +1,9 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { SEARCH_TAGS } from "../../../../constants/category";
-import Item from "./item";
-import { Whatshot } from "@mui/icons-material";
-import { Box } from "@mui/material";
+import React from 'react';
+import styled from '@emotion/styled';
+import { Whatshot } from '@mui/icons-material';
+import { Box } from '@mui/material';
+import { SEARCH_TAGS } from '../../../../constants/category';
+import Item from './item';
 // import { TikTokFont } from "../../../../shared/styles/css";
 
 const TagsWrapper = styled.ul`
@@ -19,7 +19,6 @@ const TagsWrapper = styled.ul`
   &::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Edge and Opera */
   }
-  /* ${TikTokFont} */
 `;
 
 const Tags = ({ queryList }) => {
@@ -27,18 +26,18 @@ const Tags = ({ queryList }) => {
   const hotTags =
     Array.isArray(queryList) && queryList.length > 0 && lastSelectedCat
       ? SEARCH_TAGS[lastSelectedCat]
-      : SEARCH_TAGS["全部"];
+      : SEARCH_TAGS['全部'];
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        marginTop: "10px",
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        marginTop: '10px',
       }}
     >
-      <Whatshot sx={{ color: "red" }} />
+      <Whatshot sx={{ color: 'red' }} />
       <TagsWrapper>
         {hotTags.map((value) => (
           <Item key={`${value}`} title={value} />

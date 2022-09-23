@@ -47,5 +47,7 @@ module.exports = {
     indent: 0,
     'no-restricted-globals': 0,
     'react/jsx-curly-newline': 0,
+    camelcase: 0,
+    'no-unused-vars': 0,
   },
 };
