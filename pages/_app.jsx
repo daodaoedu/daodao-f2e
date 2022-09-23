@@ -9,7 +9,7 @@ import storeFactory from "../utils/configureStore";
 import { initGA, logPageView } from "../utils/analytics";
 import { useRouter } from "next/router";
 import Script from "next/script";
-import Mode from '../shared/components/Mode';
+import Mode from "../shared/components/Mode";
 import "regenerator-runtime/runtime"; // Speech.js
 
 const store = storeFactory();
@@ -26,7 +26,6 @@ const App = ({ Component, pageProps }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
 
   useEffect(() => {
     // Listen for page changes after a navigation or when the query changes
@@ -54,7 +53,7 @@ const App = ({ Component, pageProps }) => {
           gtag('js', new Date());
           gtag('config', 'G-9Z1P1RKY69');
         `}
-      </Script>     
+      </Script>
       <Provider store={store}>
         <ThemeComponentWrap pageProps={pageProps} Component={Component} />
       </Provider>
@@ -63,7 +62,7 @@ const App = ({ Component, pageProps }) => {
 };
 
 const ThemeComponentWrap = ({ pageProps, Component }) => {
-  const mode = useSelector((state) => state?.theme?.mode ?? 'light');
+  const mode = useSelector((state) => state?.theme?.mode ?? "light");
   const theme = useMemo(() => themeFactory(mode), [mode]);
   const isEnv = useMemo(() => process.env.NODE_ENV === "development", []);
   return (
