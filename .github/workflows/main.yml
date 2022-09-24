@@ -10,7 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     name: daodao-f2e
     steps:
+      - uses: actions/checkout@v2
       - name: Await CF Pages and send Slack notification
+        id: cf-pages
         uses: arddluma/cloudflare-pages-slack-notification@v2.4
         with:
           accountEmail: ${{ secrets.CF_ACCOUNT_EMAIL  }}
