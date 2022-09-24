@@ -21,7 +21,7 @@ jobs:
           # CloudFlare Pages project name
           project: ${{ secrets.CF_PAGES_PROJECT  }}
           # Add this if you want GitHub Deployments (see below)
-          # githubToken: ${{ secrets.GITHUB_TOKEN }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
           # Create Slack Incoming webhook and add as variable https://hooks.slack.com/...
           slackWebHook: ${{ secrets.SLACK_WEBHOOK  }}
           # Add this if you want to wait for a deployment triggered by a specfied commit
