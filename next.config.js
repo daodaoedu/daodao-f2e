@@ -3,10 +3,10 @@
 module.exports = {
   reactStrictMode: false,
   images: {
-    domains: ["imgur.com"],
+    domains: ['imgur.com'],
   },
   env: {
-    HOSTNAME: "https://www.daoedu.tw",
+    HOSTNAME: 'https://www.daoedu.tw',
   },
   // async redirects() {
   //   return [

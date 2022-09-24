@@ -1,6 +1,7 @@
-import React from "react";
-import Head from "next/head";
-import StructuredData from "./StructuredData";
+import React from 'react';
+import Head from 'next/head';
+import StructuredData from './StructuredData';
+
 const SEO = ({ data }) => {
   const {
     title,
@@ -11,7 +12,7 @@ const SEO = ({ data }) => {
     imgLink,
     link,
     structuredData,
-    themeColor = "#16b9b3",
+    themeColor = '#16b9b3',
   } = data;
   return (
     <>

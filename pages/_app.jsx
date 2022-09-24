@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { Provider, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
+import Head from 'next/head';
 import GlobalStyle from '../shared/styles/Global';
 import themeFactory from '../shared/styles/themeFactory';
 import storeFactory from '../utils/configureStore';
@@ -53,6 +54,13 @@ const App = ({ Component, pageProps }) => {
           gtag('config', 'G-9Z1P1RKY69');
         `}
       </Script>
+      <Head>
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          href="https://www.daoedu.tw/rss/feed.xml"
+        />
+      </Head>
       <Provider store={store}>
         <ThemeComponentWrap pageProps={pageProps} Component={Component} />
       </Provider>
