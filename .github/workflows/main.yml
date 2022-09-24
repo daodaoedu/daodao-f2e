@@ -13,6 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: daodao-f2e Slack notification
         id: cf-pages
+        # https://github.com/arddluma/cloudflare-pages-slack-notification
         uses: arddluma/cloudflare-pages-slack-notification@v2.4
         with:
           accountEmail: ${{ secrets.CF_ACCOUNT_EMAIL  }}
