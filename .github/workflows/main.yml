@@ -11,7 +11,7 @@ jobs:
     name: daodao-f2e
     steps:
       - uses: actions/checkout@v2
-      - name: Await CF Pages and send Slack notification
+      - name: daodao-f2e Slack notification
         id: cf-pages
         uses: arddluma/cloudflare-pages-slack-notification@v2.4
         with:
