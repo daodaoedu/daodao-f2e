@@ -207,16 +207,20 @@ module.exports = {
       );
 
       (result?.payload?.results ?? []).forEach((item) => {
-        const title = (item?.properties['資源名稱']?.title ?? []).find(
-          // eslint-disable-next-line no-shadow
-          (item) => item?.type === 'text',
-        )?.plain_text;
+        const title = stringSanitizer(
+          (item?.properties['資源名稱']?.title ?? []).find(
+            // eslint-disable-next-line no-shadow
+            (item) => item?.type === 'text',
+          )?.plain_text || '',
+        );
         const url = `https://www.daoedu.tw/resource/${stringSanitizer(title)}`;
-        const image = item?.properties['縮圖']?.files[0]?.name;
-        const desc = (item?.properties['介紹']?.rich_text ?? []).find(
-          // eslint-disable-next-line no-shadow
-          (item) => item?.type === 'text',
-        )?.plain_text;
+        const image = stringSanitizer(item?.properties['縮圖']?.files[0]?.name);
+        const desc = stringSanitizer(
+          (item?.properties['介紹']?.rich_text ?? []).find(
+            // eslint-disable-next-line no-shadow
+            (item) => item?.type === 'text',
+          )?.plain_text || '',
+        );
         // const desc = item?.properties["介紹"]?.rich_text[0].plain_text;
         const createdTime = item?.created_time;
         feed.addItem({

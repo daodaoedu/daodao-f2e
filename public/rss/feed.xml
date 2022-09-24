@@ -4,7 +4,7 @@
         <title>島島阿學多元學習社群</title>
         <link>https://www.daoedu.tw</link>
         <description>「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。</description>
-        <lastBuildDate>Sat, 24 Sep 2022 09:23:56 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 24 Sep 2022 09:40:19 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Feed for Node.js</generator>
         <image>
@@ -743,7 +743,7 @@ TechTech 是一個科技愛好者探索知識和分享知識的地方。 你可�
             <description><![CDATA[六角學習地圖. 課程購買後不知從哪邊開始上嗎？ 我們這邊提供一張學習地圖給同學做參考。 對於前端還有不了解的地方，可以參考前端開發者技能樹！]]></description>
             <content:encoded><![CDATA[六角學習地圖. 課程購買後不知從哪邊開始上嗎？ 我們這邊提供一張學習地圖給同學做參考。 對於前端還有不了解的地方，可以參考前端開發者技能樹！]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
-            <enclosure url="https://firebasestorage.googleapis.com/v0/b/hexschool-api.appspot.com/o/blog%2F2019%2F06%2FF2E-2nd-1200x628.png?alt=media&token=3e297d87-8c3a-492a-8759-89af4ecd4c90" length="0" type="image/png"/>
+            <enclosure url="https://firebasestorage.googleapis.com/v0/b/hexschool-api.appspot.com/o/blog%2F2019%2F06%2FF2E-2nd-1200x628.png?alt=media&amp;token=3e297d87-8c3a-492a-8759-89af4ecd4c90" length="0" type="image/png"/>
         </item>
         <item>
             <title><![CDATA[codewars的學習資源介紹｜島島阿學]]></title>
@@ -800,8 +800,8 @@ TechTech 是一個科技愛好者探索知識和分享知識的地方。 你可�
             <link>https://www.daoedu.tw/resource/vince kotchian</link>
             <guid>https://www.daoedu.tw/resource/vince kotchian</guid>
             <pubDate>Sun, 08 May 2022 15:01:00 GMT</pubDate>
-            <description><![CDATA[提供大量免費的GRE學習資源，包含單字, 閱讀, 數學教學等…。Our tutors average 10 years of experience delivering expert GRE, SAT, and ACT test prep to raise your scores. Free do-it-yourself resources inside. We've got rave reviews from 190+ clients!(From website)]]></description>
-            <content:encoded><![CDATA[提供大量免費的GRE學習資源，包含單字, 閱讀, 數學教學等…。Our tutors average 10 years of experience delivering expert GRE, SAT, and ACT test prep to raise your scores. Free do-it-yourself resources inside. We've got rave reviews from 190+ clients!(From website)]]></content:encoded>
+            <description><![CDATA[提供大量免費的GRE學習資源，包含單字, 閱讀, 數學教學等…。Our tutors average 10 years of experience delivering expert GRE, SAT, and ACT test prep to raise your scores. Free do-it-yourself resources inside. We&apos;ve got rave reviews from 190+ clients!(From website)]]></description>
+            <content:encoded><![CDATA[提供大量免費的GRE學習資源，包含單字, 閱讀, 數學教學等…。Our tutors average 10 years of experience delivering expert GRE, SAT, and ACT test prep to raise your scores. Free do-it-yourself resources inside. We&apos;ve got rave reviews from 190+ clients!(From website)]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://vincekotchian.com/media/3312/vk_logo.png" length="0" type="image/png"/>
         </item>
@@ -840,8 +840,8 @@ TechTech 是一個科技愛好者探索知識和分享知識的地方。 你可�
             <link>https://www.daoedu.tw/resource/english ninjas</link>
             <guid>https://www.daoedu.tw/resource/english ninjas</guid>
             <pubDate>Sat, 07 May 2022 05:41:00 GMT</pubDate>
-            <description><![CDATA[English Ninjas is the best platform to improve your English speaking skills. Hundreds of native tutors are online to teach English with affordable prices starting at 6.84$/month. You can learn more vocabulary, grammar and get fluent by speaking with your teachers. We are the best course for IELTS & TOEFL. Visit us now!(From website)]]></description>
-            <content:encoded><![CDATA[English Ninjas is the best platform to improve your English speaking skills. Hundreds of native tutors are online to teach English with affordable prices starting at 6.84$/month. You can learn more vocabulary, grammar and get fluent by speaking with your teachers. We are the best course for IELTS & TOEFL. Visit us now!(From website)]]></content:encoded>
+            <description><![CDATA[English Ninjas is the best platform to improve your English speaking skills. Hundreds of native tutors are online to teach English with affordable prices starting at 6.84$/month. You can learn more vocabulary, grammar and get fluent by speaking with your teachers. We are the best course for IELTS &amp; TOEFL. Visit us now!(From website)]]></description>
+            <content:encoded><![CDATA[English Ninjas is the best platform to improve your English speaking skills. Hundreds of native tutors are online to teach English with affordable prices starting at 6.84$/month. You can learn more vocabulary, grammar and get fluent by speaking with your teachers. We are the best course for IELTS &amp; TOEFL. Visit us now!(From website)]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://s3-eu-west-1.amazonaws.com/englishninjasstatic/000/logo-og-200-2020.png" length="0" type="image/png"/>
         </item>
@@ -860,8 +860,8 @@ TechTech 是一個科技愛好者探索知識和分享知識的地方。 你可�
             <link>https://www.daoedu.tw/resource/livexp</link>
             <guid>https://www.daoedu.tw/resource/livexp</guid>
             <pubDate>Sat, 07 May 2022 05:33:00 GMT</pubDate>
-            <description><![CDATA[LiveXP is all about providing the shortest & most efficient way to speak like a native. 🚀 Start now with 1-on-1 private lessons, courses & free live sessions! (From website)]]></description>
-            <content:encoded><![CDATA[LiveXP is all about providing the shortest & most efficient way to speak like a native. 🚀 Start now with 1-on-1 private lessons, courses & free live sessions! (From website)]]></content:encoded>
+            <description><![CDATA[LiveXP is all about providing the shortest &amp; most efficient way to speak like a native. 🚀 Start now with 1-on-1 private lessons, courses &amp; free live sessions! (From website)]]></description>
+            <content:encoded><![CDATA[LiveXP is all about providing the shortest &amp; most efficient way to speak like a native. 🚀 Start now with 1-on-1 private lessons, courses &amp; free live sessions! (From website)]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://livexp.com/images/og-default.png" length="0" type="image/png"/>
         </item>
@@ -951,9 +951,9 @@ Voscreen 是基於自己的學習方法和途徑，通過對母語學習過程�
             <guid>https://www.daoedu.tw/resource/Fooish程式技術</guid>
             <pubDate>Wed, 04 May 2022 14:04:00 GMT</pubDate>
             <description><![CDATA[大家好，我是站長 Mike，為什麼會有這個網站呢？因為自己最初在開始學習網頁開發技術的時候，發現網路上的中文技術教材不多，品質也參差不齊。在對相關技術熟悉後，希望能貢獻一點時間和實務經驗，撰寫分享各類主題的學習內容，幫助對相關技術有興趣的朋友更容易入門 😁
-站名 Fooish 的唸法是 Foo-ish，是 "有點 Foo" 的意思，每個人從開始學程式技術，都一定有看過不少 "Foo 範例" 吧？！所以說，沒有點 Foo 你怎麼變大神呢....(簡介摘自https://reurl.cc/8oo657)]]></description>
+站名 Fooish 的唸法是 Foo-ish，是 &quot;有點 Foo&quot; 的意思，每個人從開始學程式技術，都一定有看過不少 &quot;Foo 範例&quot; 吧？！所以說，沒有點 Foo 你怎麼變大神呢....(簡介摘自https://reurl.cc/8oo657)]]></description>
             <content:encoded><![CDATA[大家好，我是站長 Mike，為什麼會有這個網站呢？因為自己最初在開始學習網頁開發技術的時候，發現網路上的中文技術教材不多，品質也參差不齊。在對相關技術熟悉後，希望能貢獻一點時間和實務經驗，撰寫分享各類主題的學習內容，幫助對相關技術有興趣的朋友更容易入門 😁
-站名 Fooish 的唸法是 Foo-ish，是 "有點 Foo" 的意思，每個人從開始學程式技術，都一定有看過不少 "Foo 範例" 吧？！所以說，沒有點 Foo 你怎麼變大神呢....(簡介摘自https://reurl.cc/8oo657)]]></content:encoded>
+站名 Fooish 的唸法是 Foo-ish，是 &quot;有點 Foo&quot; 的意思，每個人從開始學程式技術，都一定有看過不少 &quot;Foo 範例&quot; 吧？！所以說，沒有點 Foo 你怎麼變大神呢....(簡介摘自https://reurl.cc/8oo657)]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/GFlDHEn.jpg" length="0" type="image/jpg"/>
         </item>
@@ -1218,12 +1218,12 @@ Voscreen 是基於自己的學習方法和途徑，通過對母語學習過程�
             <enclosure url="https://i.imgur.com/TOgMlIM.jpg" length="0" type="image/jpg"/>
         </item>
         <item>
-            <title><![CDATA[Learn to Code HTML & CSS的學習資源介紹｜島島阿學]]></title>
-            <link>https://www.daoedu.tw/resource/Learn to Code HTML &amp;amp; CSS</link>
-            <guid>https://www.daoedu.tw/resource/Learn to Code HTML &amp; CSS</guid>
+            <title><![CDATA[Learn to Code HTML &amp; CSS的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/Learn to Code HTML &amp;amp;amp; CSS</link>
+            <guid>https://www.daoedu.tw/resource/Learn to Code HTML &amp;amp; CSS</guid>
             <pubDate>Thu, 07 Apr 2022 01:07:00 GMT</pubDate>
-            <description><![CDATA[Learn to Code HTML & CSS 是一本簡單而全面的指南，致力於幫助初學者學習 HTML 和 CSS。本指南概述了基礎知識，涵蓋了前端設計和開發的所有常見元素。(取自官方網站)]]></description>
-            <content:encoded><![CDATA[Learn to Code HTML & CSS 是一本簡單而全面的指南，致力於幫助初學者學習 HTML 和 CSS。本指南概述了基礎知識，涵蓋了前端設計和開發的所有常見元素。(取自官方網站)]]></content:encoded>
+            <description><![CDATA[Learn to Code HTML &amp; CSS 是一本簡單而全面的指南，致力於幫助初學者學習 HTML 和 CSS。本指南概述了基礎知識，涵蓋了前端設計和開發的所有常見元素。(取自官方網站)]]></description>
+            <content:encoded><![CDATA[Learn to Code HTML &amp; CSS 是一本簡單而全面的指南，致力於幫助初學者學習 HTML 和 CSS。本指南概述了基礎知識，涵蓋了前端設計和開發的所有常見元素。(取自官方網站)]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/Q9Vy21J.jpg" length="0" type="image/jpg"/>
         </item>
@@ -1454,7 +1454,7 @@ Voscreen 是基於自己的學習方法和途徑，通過對母語學習過程�
             <description><![CDATA[胡搞的胡，小子的子，顧名思義就是生活中的各種胡思亂搞，我們從小就被各種規則和期待所束縛，偶爾無傷大雅的胡搞一番，其實是非常愉快噠！（摘自YouTube）]]></description>
             <content:encoded><![CDATA[胡搞的胡，小子的子，顧名思義就是生活中的各種胡思亂搞，我們從小就被各種規則和期待所束縛，偶爾無傷大雅的胡搞一番，其實是非常愉快噠！（摘自YouTube）]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
-            <enclosure url="https://scontent.ftpe7-2.fna.fbcdn.net/v/t39.30808-6/277487805_541262980697011_301648587710740616_n.jpg?_nc_cat=111&ccb=1-5&_nc_sid=730e14&_nc_ohc=H3dpeKASwe8AX_spw7m&_nc_ht=scontent.ftpe7-2.fna&oh=00_AT-G3LjSjAuaqgqe-gbtdala53lSILsQvHJ_knaKZnkJUQ&oe=62494AEC" length="0" type="image/jpg"/>
+            <enclosure url="https://scontent.ftpe7-2.fna.fbcdn.net/v/t39.30808-6/277487805_541262980697011_301648587710740616_n.jpg?_nc_cat=111&amp;ccb=1-5&amp;_nc_sid=730e14&amp;_nc_ohc=H3dpeKASwe8AX_spw7m&amp;_nc_ht=scontent.ftpe7-2.fna&amp;oh=00_AT-G3LjSjAuaqgqe-gbtdala53lSILsQvHJ_knaKZnkJUQ&amp;oe=62494AEC" length="0" type="image/jpg"/>
         </item>
         <item>
             <title><![CDATA[Alex宅幹嘛的學習資源介紹｜島島阿學]]></title>
@@ -1464,7 +1464,7 @@ Voscreen 是基於自己的學習方法和途徑，通過對母語學習過程�
             <description><![CDATA[頻道主要記錄與直播平常生活的事，包含打電動，寫網站，聊天打屁，分享面試技巧，職場生活等。網頁教學主要以Vue的開發為主。直播時間表定為：每週三晚上十點]]></description>
             <content:encoded><![CDATA[頻道主要記錄與直播平常生活的事，包含打電動，寫網站，聊天打屁，分享面試技巧，職場生活等。網頁教學主要以Vue的開發為主。直播時間表定為：每週三晚上十點]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
-            <enclosure url="https://scontent.ftpe7-1.fna.fbcdn.net/v/t1.18169-9/27459317_165827727391240_5823835991388829724_n.jpg?_nc_cat=100&ccb=1-5&_nc_sid=09cbfe&_nc_ohc=rYKcqZsN0ZIAX98IoRA&_nc_ht=scontent.ftpe7-1.fna&oh=00_AT9arfXMQsrRekFGzJc88AFKumZG0ygp4Zw-JMncpz10qQ&oe=6268AE91" length="0" type="image/jpg"/>
+            <enclosure url="https://scontent.ftpe7-1.fna.fbcdn.net/v/t1.18169-9/27459317_165827727391240_5823835991388829724_n.jpg?_nc_cat=100&amp;ccb=1-5&amp;_nc_sid=09cbfe&amp;_nc_ohc=rYKcqZsN0ZIAX98IoRA&amp;_nc_ht=scontent.ftpe7-1.fna&amp;oh=00_AT9arfXMQsrRekFGzJc88AFKumZG0ygp4Zw-JMncpz10qQ&amp;oe=6268AE91" length="0" type="image/jpg"/>
         </item>
         <item>
             <title><![CDATA[第一次戶外抱石怎麼做的學習資源介紹｜島島阿學]]></title>
@@ -1543,8 +1543,8 @@ SEAMi 以「分享」、「相互理解」與「多元美學」等三個理念�
             <link>https://www.daoedu.tw/resource/Dont Make Me Think</link>
             <guid>https://www.daoedu.tw/resource/Dont Make Me Think</guid>
             <pubDate>Thu, 24 Mar 2022 09:22:00 GMT</pubDate>
-            <description><![CDATA[Don't Make Me Think 是 Steve Krug 的一本關於人機互動和網路可用性的書。 本書的前提是一個好的軟體程序或網站應該讓用戶盡可能輕鬆直接地完成他們的預期任務。 Krug 指出，人們善於滿足，或採取第一個可用的解決方案來解決他們的問題，因此設計應該利用這一點。 ]]></description>
-            <content:encoded><![CDATA[Don't Make Me Think 是 Steve Krug 的一本關於人機互動和網路可用性的書。 本書的前提是一個好的軟體程序或網站應該讓用戶盡可能輕鬆直接地完成他們的預期任務。 Krug 指出，人們善於滿足，或採取第一個可用的解決方案來解決他們的問題，因此設計應該利用這一點。 ]]></content:encoded>
+            <description><![CDATA[Don&apos;t Make Me Think 是 Steve Krug 的一本關於人機互動和網路可用性的書。 本書的前提是一個好的軟體程序或網站應該讓用戶盡可能輕鬆直接地完成他們的預期任務。 Krug 指出，人們善於滿足，或採取第一個可用的解決方案來解決他們的問題，因此設計應該利用這一點。 ]]></description>
+            <content:encoded><![CDATA[Don&apos;t Make Me Think 是 Steve Krug 的一本關於人機互動和網路可用性的書。 本書的前提是一個好的軟體程序或網站應該讓用戶盡可能輕鬆直接地完成他們的預期任務。 Krug 指出，人們善於滿足，或採取第一個可用的解決方案來解決他們的問題，因此設計應該利用這一點。 ]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://sensible.com/divi/wp-content/uploads/2020/09/DMMT-cover-262x300.png" length="0" type="image/png"/>
         </item>
@@ -2004,7 +2004,7 @@ CodingBar 創辦人 Jerry 曾為上市公司洋華光電 (3622) 副總，在與�
             <description><![CDATA[提供很多網頁開發的基礎教學與開發分享，特別在CSS上有很多資源。]]></description>
             <content:encoded><![CDATA[提供很多網頁開發的基礎教學與開發分享，特別在CSS上有很多資源。]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
-            <enclosure url="https://scontent.ftpe7-3.fna.fbcdn.net/v/t1.18169-9/1381319_594470687277402_1827280285_n.jpg?_nc_cat=103&ccb=1-5&_nc_sid=09cbfe&_nc_ohc=EJ-0vVii16IAX-Vgw-k&_nc_ht=scontent.ftpe7-3.fna&oh=00_AT8or40LK9WSa_odfylx9fkpdA3rnLPhEbsPryXYJFwPXw&oe=624D905B" length="0" type="image/jpg"/>
+            <enclosure url="https://scontent.ftpe7-3.fna.fbcdn.net/v/t1.18169-9/1381319_594470687277402_1827280285_n.jpg?_nc_cat=103&amp;ccb=1-5&amp;_nc_sid=09cbfe&amp;_nc_ohc=EJ-0vVii16IAX-Vgw-k&amp;_nc_ht=scontent.ftpe7-3.fna&amp;oh=00_AT8or40LK9WSa_odfylx9fkpdA3rnLPhEbsPryXYJFwPXw&amp;oe=624D905B" length="0" type="image/jpg"/>
         </item>
         <item>
             <title><![CDATA[freeCodeCamp的學習資源介紹｜島島阿學]]></title>
@@ -2024,7 +2024,7 @@ CodingBar 創辦人 Jerry 曾為上市公司洋華光電 (3622) 副總，在與�
             <description><![CDATA[給你滿滿的前端學習力，老師助教作業批改幫助你精益求精，六角專屬交流社群不怕沒人回答問題！ 不曉得從何踏入前端領域？由淺入深就算是麻瓜新手也能學會，六角學院給你最完整的前端地圖. 線上帶你學會程式開發. 帶您學會一技之長]]></description>
             <content:encoded><![CDATA[給你滿滿的前端學習力，老師助教作業批改幫助你精益求精，六角專屬交流社群不怕沒人回答問題！ 不曉得從何踏入前端領域？由淺入深就算是麻瓜新手也能學會，六角學院給你最完整的前端地圖. 線上帶你學會程式開發. 帶您學會一技之長]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
-            <enclosure url="https://scontent.ftpe7-1.fna.fbcdn.net/v/t1.18169-9/12376849_608978222584828_5924595313927774439_n.png?_nc_cat=100&ccb=1-5&_nc_sid=09cbfe&_nc_ohc=h0Q72VOaq6UAX8RWMom&_nc_ht=scontent.ftpe7-1.fna&oh=00_AT_BgvT4-yp2821SgLI9RsX0rg7ap3Ll9TjcB8o6WGue6w&oe=624C8DD1" length="0" type="image/png"/>
+            <enclosure url="https://scontent.ftpe7-1.fna.fbcdn.net/v/t1.18169-9/12376849_608978222584828_5924595313927774439_n.png?_nc_cat=100&amp;ccb=1-5&amp;_nc_sid=09cbfe&amp;_nc_ohc=h0Q72VOaq6UAX8RWMom&amp;_nc_ht=scontent.ftpe7-1.fna&amp;oh=00_AT_BgvT4-yp2821SgLI9RsX0rg7ap3Ll9TjcB8o6WGue6w&amp;oe=624C8DD1" length="0" type="image/png"/>
         </item>
         <item>
             <title><![CDATA[Academind的學習資源介紹｜島島阿學]]></title>
@@ -2034,7 +2034,7 @@ CodingBar 創辦人 Jerry 曾為上市公司洋華光電 (3622) 副總，在與�
             <description><![CDATA[Academind是一個從Udemy起家很有名的前端開發教學團隊，他們的教學不只是學好程式，更注重善用對的工具]]></description>
             <content:encoded><![CDATA[Academind是一個從Udemy起家很有名的前端開發教學團隊，他們的教學不只是學好程式，更注重善用對的工具]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
-            <enclosure url="https://scontent.ftpe13-2.fna.fbcdn.net/v/t1.18169-9/28279546_2025201924370183_7797268193152299868_n.png?_nc_cat=103&ccb=1-5&_nc_sid=e3f864&_nc_ohc=Q7DQRKtW6ogAX9qga3H&_nc_ht=scontent.ftpe13-2.fna&oh=00_AT9FDOI7U4D2pdaJ2Mp2vXyoYA4jTjg4ahrw0i5767nseA&oe=624B816A" length="0" type="image/png"/>
+            <enclosure url="https://scontent.ftpe13-2.fna.fbcdn.net/v/t1.18169-9/28279546_2025201924370183_7797268193152299868_n.png?_nc_cat=103&amp;ccb=1-5&amp;_nc_sid=e3f864&amp;_nc_ohc=Q7DQRKtW6ogAX9qga3H&amp;_nc_ht=scontent.ftpe13-2.fna&amp;oh=00_AT9FDOI7U4D2pdaJ2Mp2vXyoYA4jTjg4ahrw0i5767nseA&amp;oe=624B816A" length="0" type="image/png"/>
         </item>
         <item>
             <title><![CDATA[Scrimba的學習資源介紹｜島島阿學]]></title>
@@ -2659,8 +2659,8 @@ CodingBar 創辦人 Jerry 曾為上市公司洋華光電 (3622) 副總，在與�
             <link>https://www.daoedu.tw/resource/Slido</link>
             <guid>https://www.daoedu.tw/resource/Slido</guid>
             <pubDate>Mon, 24 Jan 2022 06:49:00 GMT</pubDate>
-            <description><![CDATA[線上問答&票選系統，可立即和觀眾互動。]]></description>
-            <content:encoded><![CDATA[線上問答&票選系統，可立即和觀眾互動。]]></content:encoded>
+            <description><![CDATA[線上問答&amp;票選系統，可立即和觀眾互動。]]></description>
+            <content:encoded><![CDATA[線上問答&amp;票選系統，可立即和觀眾互動。]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/HqGpbyj.png" length="0" type="image/png"/>
         </item>
@@ -2789,14 +2789,14 @@ CodingBar 創辦人 Jerry 曾為上市公司洋華光電 (3622) 副總，在與�
             <pubDate>Mon, 24 Jan 2022 06:48:00 GMT</pubDate>
             <description><![CDATA[英文資源，等級大概是高中大學，內容多樣，包含大部分高中學科，內容有搭配動畫，讓學生想看下去
 At Crash Course, we believe that high quality educational videos should be available to everyone for free! 
-Subscribe for weekly videos from our current courses! Right now, we're producing Organic Chemistry and European History. We also recently teamed up with Arizona State University to bring you two more courses: Study Hall Composition, and Study Hall Algebra. 
+Subscribe for weekly videos from our current courses! Right now, we&apos;re producing Organic Chemistry and European History. We also recently teamed up with Arizona State University to bring you two more courses: Study Hall Composition, and Study Hall Algebra. 
 
 The Crash Course team has produced more than 32 courses on a wide variety of subjects, including organic chemistry, literature, world history, biology, philosophy, theater, ecology, and many more! 
 
 Help support Crash Course at Patreon.com/CrashCourse.]]></description>
             <content:encoded><![CDATA[英文資源，等級大概是高中大學，內容多樣，包含大部分高中學科，內容有搭配動畫，讓學生想看下去
 At Crash Course, we believe that high quality educational videos should be available to everyone for free! 
-Subscribe for weekly videos from our current courses! Right now, we're producing Organic Chemistry and European History. We also recently teamed up with Arizona State University to bring you two more courses: Study Hall Composition, and Study Hall Algebra. 
+Subscribe for weekly videos from our current courses! Right now, we&apos;re producing Organic Chemistry and European History. We also recently teamed up with Arizona State University to bring you two more courses: Study Hall Composition, and Study Hall Algebra. 
 
 The Crash Course team has produced more than 32 courses on a wide variety of subjects, including organic chemistry, literature, world history, biology, philosophy, theater, ecology, and many more! 
 
@@ -2861,8 +2861,8 @@ Help support Crash Course at Patreon.com/CrashCourse.]]></content:encoded>
             <link>https://www.daoedu.tw/resource/BYJU’S</link>
             <guid>https://www.daoedu.tw/resource/BYJU’S</guid>
             <pubDate>Mon, 24 Jan 2022 06:48:00 GMT</pubDate>
-            <description><![CDATA[BYJU'S-The Learning App主要為1至12年級（小學至高中階段教育）的在校學生提供教育內容，該公司為印度的考試培訓學生，如IIT-JEE、NEET、CAT、IAS，以及GRE和GMAT等國際考試。主要集中在數學和科學領域，使用12-20分鐘的數字動畫視頻來解釋概念。BYJU'S報告說總體上有4000萬用戶，300萬年度付費用戶，年留存率約為85%.，該應用聲稱會根據學生個人的學習節奏和風格來定制提供的內容，學生平均每天使用BYJU'S的時間為53分鐘.]]></description>
-            <content:encoded><![CDATA[BYJU'S-The Learning App主要為1至12年級（小學至高中階段教育）的在校學生提供教育內容，該公司為印度的考試培訓學生，如IIT-JEE、NEET、CAT、IAS，以及GRE和GMAT等國際考試。主要集中在數學和科學領域，使用12-20分鐘的數字動畫視頻來解釋概念。BYJU'S報告說總體上有4000萬用戶，300萬年度付費用戶，年留存率約為85%.，該應用聲稱會根據學生個人的學習節奏和風格來定制提供的內容，學生平均每天使用BYJU'S的時間為53分鐘.]]></content:encoded>
+            <description><![CDATA[BYJU&apos;S-The Learning App主要為1至12年級（小學至高中階段教育）的在校學生提供教育內容，該公司為印度的考試培訓學生，如IIT-JEE、NEET、CAT、IAS，以及GRE和GMAT等國際考試。主要集中在數學和科學領域，使用12-20分鐘的數字動畫視頻來解釋概念。BYJU&apos;S報告說總體上有4000萬用戶，300萬年度付費用戶，年留存率約為85%.，該應用聲稱會根據學生個人的學習節奏和風格來定制提供的內容，學生平均每天使用BYJU&apos;S的時間為53分鐘.]]></description>
+            <content:encoded><![CDATA[BYJU&apos;S-The Learning App主要為1至12年級（小學至高中階段教育）的在校學生提供教育內容，該公司為印度的考試培訓學生，如IIT-JEE、NEET、CAT、IAS，以及GRE和GMAT等國際考試。主要集中在數學和科學領域，使用12-20分鐘的數字動畫視頻來解釋概念。BYJU&apos;S報告說總體上有4000萬用戶，300萬年度付費用戶，年留存率約為85%.，該應用聲稱會根據學生個人的學習節奏和風格來定制提供的內容，學生平均每天使用BYJU&apos;S的時間為53分鐘.]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/SinzdPp.png" length="0" type="image/png"/>
         </item>
@@ -3299,8 +3299,8 @@ The School of Life 由英國作家 艾倫狄波頓 (Alain de Botton) 創立，�
             <link>https://www.daoedu.tw/resource/Chegg</link>
             <guid>https://www.daoedu.tw/resource/Chegg</guid>
             <pubDate>Mon, 24 Jan 2022 06:48:00 GMT</pubDate>
-            <description><![CDATA[一家以學生為主要連接的學習平台，提供教科書和數位產品。數位產品主要包括Student Hub，公司連接的學習平台、以網路為基礎、多平台的電子書閱讀器、大約有120家出版商的電子書和補充教材、線上輔導、Chegg學習服務、高校招生、獎學金和實習服務。公司在美國的印刷教材、電子書和補充教材的出版商，包括Pearson、Cengage Learning、McGraw Hill、Wiley和MacMillan.；此外，也提供大學招生的行銷服務。公司還與品牌公司合作，如Adobe、Dell、Microsoft、PayPal、P&G、 Red Bull和Shutterfly，為學生提供折扣，促銷和基於學生回饋的其他產品。]]></description>
-            <content:encoded><![CDATA[一家以學生為主要連接的學習平台，提供教科書和數位產品。數位產品主要包括Student Hub，公司連接的學習平台、以網路為基礎、多平台的電子書閱讀器、大約有120家出版商的電子書和補充教材、線上輔導、Chegg學習服務、高校招生、獎學金和實習服務。公司在美國的印刷教材、電子書和補充教材的出版商，包括Pearson、Cengage Learning、McGraw Hill、Wiley和MacMillan.；此外，也提供大學招生的行銷服務。公司還與品牌公司合作，如Adobe、Dell、Microsoft、PayPal、P&G、 Red Bull和Shutterfly，為學生提供折扣，促銷和基於學生回饋的其他產品。]]></content:encoded>
+            <description><![CDATA[一家以學生為主要連接的學習平台，提供教科書和數位產品。數位產品主要包括Student Hub，公司連接的學習平台、以網路為基礎、多平台的電子書閱讀器、大約有120家出版商的電子書和補充教材、線上輔導、Chegg學習服務、高校招生、獎學金和實習服務。公司在美國的印刷教材、電子書和補充教材的出版商，包括Pearson、Cengage Learning、McGraw Hill、Wiley和MacMillan.；此外，也提供大學招生的行銷服務。公司還與品牌公司合作，如Adobe、Dell、Microsoft、PayPal、P&amp;G、 Red Bull和Shutterfly，為學生提供折扣，促銷和基於學生回饋的其他產品。]]></description>
+            <content:encoded><![CDATA[一家以學生為主要連接的學習平台，提供教科書和數位產品。數位產品主要包括Student Hub，公司連接的學習平台、以網路為基礎、多平台的電子書閱讀器、大約有120家出版商的電子書和補充教材、線上輔導、Chegg學習服務、高校招生、獎學金和實習服務。公司在美國的印刷教材、電子書和補充教材的出版商，包括Pearson、Cengage Learning、McGraw Hill、Wiley和MacMillan.；此外，也提供大學招生的行銷服務。公司還與品牌公司合作，如Adobe、Dell、Microsoft、PayPal、P&amp;G、 Red Bull和Shutterfly，為學生提供折扣，促銷和基於學生回饋的其他產品。]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/wu14br0.png" length="0" type="image/png"/>
         </item>
@@ -3443,9 +3443,9 @@ The School of Life 由英國作家 艾倫狄波頓 (Alain de Botton) 創立，�
             <enclosure url="https://i.imgur.com/NohOPrh.jpg" length="0" type="image/jpg"/>
         </item>
         <item>
-            <title><![CDATA[財報狗 威宇 & 阿堯的學習資源介紹｜島島阿學]]></title>
-            <link>https://www.daoedu.tw/resource/財報狗 威宇 &amp;amp; 阿堯</link>
-            <guid>https://www.daoedu.tw/resource/財報狗 威宇 &amp; 阿堯</guid>
+            <title><![CDATA[財報狗 威宇 &amp; 阿堯的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/財報狗 威宇 &amp;amp;amp; 阿堯</link>
+            <guid>https://www.daoedu.tw/resource/財報狗 威宇 &amp;amp; 阿堯</guid>
             <pubDate>Mon, 24 Jan 2022 06:46:00 GMT</pubDate>
             <description><![CDATA[財經影片自媒體。]]></description>
             <content:encoded><![CDATA[財經影片自媒體。]]></content:encoded>
@@ -3507,8 +3507,8 @@ The School of Life 由英國作家 艾倫狄波頓 (Alain de Botton) 創立，�
             <link>https://www.daoedu.tw/resource/搖籃生活提案所</link>
             <guid>https://www.daoedu.tw/resource/搖籃生活提案所</guid>
             <pubDate>Mon, 24 Jan 2022 06:46:00 GMT</pubDate>
-            <description><![CDATA[Change the world, one home at a time." 「改變世界，從一家一戶開始」 ．搖籃生活提案所． 無論在婚姻經營、懷孕、生產、育兒、青少年教養等， 期能和中部的朋友們一起找到支持的力量。]]></description>
-            <content:encoded><![CDATA[Change the world, one home at a time." 「改變世界，從一家一戶開始」 ．搖籃生活提案所． 無論在婚姻經營、懷孕、生產、育兒、青少年教養等， 期能和中部的朋友們一起找到支持的力量。]]></content:encoded>
+            <description><![CDATA[Change the world, one home at a time.&quot; 「改變世界，從一家一戶開始」 ．搖籃生活提案所． 無論在婚姻經營、懷孕、生產、育兒、青少年教養等， 期能和中部的朋友們一起找到支持的力量。]]></description>
+            <content:encoded><![CDATA[Change the world, one home at a time.&quot; 「改變世界，從一家一戶開始」 ．搖籃生活提案所． 無論在婚姻經營、懷孕、生產、育兒、青少年教養等， 期能和中部的朋友們一起找到支持的力量。]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/syPUrEL.png" length="0" type="image/png"/>
         </item>
@@ -3881,9 +3881,9 @@ CSRone耕耘永續領域10餘年，引進國際CSR最新趨勢、擦亮台灣永
             <link>https://www.daoedu.tw/resource/上下游</link>
             <guid>https://www.daoedu.tw/resource/上下游</guid>
             <pubDate>Mon, 24 Jan 2022 06:44:00 GMT</pubDate>
-            <description><![CDATA[上下游 News&Market(新聞市集)創辦於2011年，是一個關心農業，以及友善土地議題的社會企業，提供新聞報導、市集、生活文學副刊。
+            <description><![CDATA[上下游 News&amp;Market(新聞市集)創辦於2011年，是一個關心農業，以及友善土地議題的社會企業，提供新聞報導、市集、生活文學副刊。
 ]]></description>
-            <content:encoded><![CDATA[上下游 News&Market(新聞市集)創辦於2011年，是一個關心農業，以及友善土地議題的社會企業，提供新聞報導、市集、生活文學副刊。
+            <content:encoded><![CDATA[上下游 News&amp;Market(新聞市集)創辦於2011年，是一個關心農業，以及友善土地議題的社會企業，提供新聞報導、市集、生活文學副刊。
 ]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/lJXIssN.png" length="0" type="image/png"/>
@@ -4211,8 +4211,8 @@ Nomad List 最酷的地方是什麼呢？隨著當地天氣、濕度、網路速
             <enclosure url="https://i.imgur.com/MK1GlBH.png" length="0" type="image/png"/>
         </item>
         <item>
-            <title><![CDATA[學習者向前走 Let's Fly high的學習資源介紹｜島島阿學]]></title>
-            <link>https://www.daoedu.tw/resource/學習者向前走 Let&amp;apos;s Fly high</link>
+            <title><![CDATA[學習者向前走 Let&apos;s Fly high的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/學習者向前走 Let&amp;amp;apos;s Fly high</link>
             <guid>https://www.daoedu.tw/resource/學習者向前走 Let&amp;apos;s Fly high</guid>
             <pubDate>Mon, 24 Jan 2022 06:42:00 GMT</pubDate>
             <description><![CDATA[一群對學生、教育、以及許多青年議題有想法與熱情的學生，
@@ -5026,9 +5026,9 @@ Emily⠀🇩🇪🇺🇲⠀熱愛學習的19歲女孩，在這裡分享我的學
 我們是微亮計畫，協助畢業十年內的上班族生活再設計，生涯再探索，建立一個認真又可以很鬧的社群。長遠來說，我們希望協助一大堆很棒的個人計畫誕生，未來當你回頭看，發現自己有很多精彩的故事。
 大部分的我們都曾經面臨不知道自己接下來想做什麼、能做什麼的困境。於是微亮計畫從2014年開始運用教練技巧，陪伴許多人開啟新的嘗試。在2017年發展出「微亮計畫工作坊」，一次協助一小組人在兩天內想到未來的新可能，而且攤開具體的步驟。
 目前提供的服務有：
-> 一對一教練
-> 微亮計畫工作坊 
-> 各種一個晚上主題式活動 
+&gt; 一對一教練
+&gt; 微亮計畫工作坊 
+&gt; 各種一個晚上主題式活動 
 搭配上每週的project night / co-working nights，有效克服拖延症，讓在乎的事每週都有些進展。]]></description>
             <content:encoded><![CDATA[我們想打亂很多人的人生規劃。
 如果一個人對未來有不少設定卻不期不待，那這樣的計畫是可以打亂的吧？
@@ -5037,9 +5037,9 @@ Emily⠀🇩🇪🇺🇲⠀熱愛學習的19歲女孩，在這裡分享我的學
 我們是微亮計畫，協助畢業十年內的上班族生活再設計，生涯再探索，建立一個認真又可以很鬧的社群。長遠來說，我們希望協助一大堆很棒的個人計畫誕生，未來當你回頭看，發現自己有很多精彩的故事。
 大部分的我們都曾經面臨不知道自己接下來想做什麼、能做什麼的困境。於是微亮計畫從2014年開始運用教練技巧，陪伴許多人開啟新的嘗試。在2017年發展出「微亮計畫工作坊」，一次協助一小組人在兩天內想到未來的新可能，而且攤開具體的步驟。
 目前提供的服務有：
-> 一對一教練
-> 微亮計畫工作坊 
-> 各種一個晚上主題式活動 
+&gt; 一對一教練
+&gt; 微亮計畫工作坊 
+&gt; 各種一個晚上主題式活動 
 搭配上每週的project night / co-working nights，有效克服拖延症，讓在乎的事每週都有些進展。]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/S9opDUl.png" length="0" type="image/png"/>
@@ -5839,8 +5839,8 @@ FoodiesFeed 照片主要是由單眼相機拍攝，經過修圖調整後釋出�
             <link>https://www.daoedu.tw/resource/FMA</link>
             <guid>https://www.daoedu.tw/resource/FMA</guid>
             <pubDate>Mon, 24 Jan 2022 06:41:00 GMT</pubDate>
-            <description><![CDATA[FMA擁有各類型不同的音樂供免費下載，包含搖滾、R&B、鄉村等。]]></description>
-            <content:encoded><![CDATA[FMA擁有各類型不同的音樂供免費下載，包含搖滾、R&B、鄉村等。]]></content:encoded>
+            <description><![CDATA[FMA擁有各類型不同的音樂供免費下載，包含搖滾、R&amp;B、鄉村等。]]></description>
+            <content:encoded><![CDATA[FMA擁有各類型不同的音樂供免費下載，包含搖滾、R&amp;B、鄉村等。]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/MBazRjp.jpg" length="0" type="image/jpg"/>
         </item>
@@ -6085,9 +6085,9 @@ FoodiesFeed 照片主要是由單眼相機拍攝，經過修圖調整後釋出�
             <enclosure url="https://i.imgur.com/aCA2Km3.jpg" length="0" type="image/jpg"/>
         </item>
         <item>
-            <title><![CDATA[British & Exotic Mineralogy(19世紀礦物地圖)的學習資源介紹｜島島阿學]]></title>
-            <link>https://www.daoedu.tw/resource/British &amp;amp; Exotic Mineralogy(19世紀礦物地圖)</link>
-            <guid>https://www.daoedu.tw/resource/British &amp; Exotic Mineralogy(19世紀礦物地圖)</guid>
+            <title><![CDATA[British &amp; Exotic Mineralogy(19世紀礦物地圖)的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/British &amp;amp;amp; Exotic Mineralogy(19世紀礦物地圖)</link>
+            <guid>https://www.daoedu.tw/resource/British &amp;amp; Exotic Mineralogy(19世紀礦物地圖)</guid>
             <pubDate>Mon, 24 Jan 2022 06:39:00 GMT</pubDate>
             <description><![CDATA[由設計師 Nicholas Rougeux 重新整理 19 世紀早期的博物學家、插畫家、礦物學家詹姆斯·索爾比（James Sowerby）的彩色插畫圖鑑，在數位修復後打造出線上的網路互動版。]]></description>
             <content:encoded><![CDATA[由設計師 Nicholas Rougeux 重新整理 19 世紀早期的博物學家、插畫家、礦物學家詹姆斯·索爾比（James Sowerby）的彩色插畫圖鑑，在數位修復後打造出線上的網路互動版。]]></content:encoded>
@@ -6305,9 +6305,9 @@ KTxYJ希望能藉由輕鬆有趣的分享，讓大家更了解平常常聽到的
             <link>https://www.daoedu.tw/resource/科普一傳十</link>
             <guid>https://www.daoedu.tw/resource/科普一傳十</guid>
             <pubDate>Mon, 24 Jan 2022 06:39:00 GMT</pubDate>
-            <description><![CDATA[科普一傳十 以高品質電視製作及新媒體技術，製作貼近時代議題相關科學知識影片，提供不同的方式傳遞科學知識。影片類型多元，不只是紀錄研究，還包含了許多動手做實驗與演講 Q&A 的內容，值得大家一同觀看思考。
+            <description><![CDATA[科普一傳十 以高品質電視製作及新媒體技術，製作貼近時代議題相關科學知識影片，提供不同的方式傳遞科學知識。影片類型多元，不只是紀錄研究，還包含了許多動手做實驗與演講 Q&amp;A 的內容，值得大家一同觀看思考。
 （資料來源：泛科學）]]></description>
-            <content:encoded><![CDATA[科普一傳十 以高品質電視製作及新媒體技術，製作貼近時代議題相關科學知識影片，提供不同的方式傳遞科學知識。影片類型多元，不只是紀錄研究，還包含了許多動手做實驗與演講 Q&A 的內容，值得大家一同觀看思考。
+            <content:encoded><![CDATA[科普一傳十 以高品質電視製作及新媒體技術，製作貼近時代議題相關科學知識影片，提供不同的方式傳遞科學知識。影片類型多元，不只是紀錄研究，還包含了許多動手做實驗與演講 Q&amp;A 的內容，值得大家一同觀看思考。
 （資料來源：泛科學）]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/cj8xKlY.png" length="0" type="image/png"/>
@@ -6380,9 +6380,9 @@ KTxYJ希望能藉由輕鬆有趣的分享，讓大家更了解平常常聽到的
             <guid>https://www.daoedu.tw/resource/全球之聲</guid>
             <pubDate>Mon, 24 Jan 2022 06:37:00 GMT</pubDate>
             <description><![CDATA[全球之聲是一個國際性的網站，開放給各國部落客和公民記者追蹤及報導。它的內容概括了世界上各個角落的博客。
-它是一個非營利的全球公民媒體計劃，創建者為伊丹·查克曼和麗貝卡·麥康瑞，在哈佛大學法學院貝克曼網路與社會中心（Berkman Center for Internet & Society）贊助下成立，在2004年十二月正式成為各國部落客的集結處。2008年時，在荷蘭阿姆斯特丹成為一個獨立非營利組織。不一定要有專家的專業性，而是用平凡人的觀點看到周遭的世界，以此建立的平台，是與其他翻譯介紹國際資訊的網站最大不同之處。]]></description>
+它是一個非營利的全球公民媒體計劃，創建者為伊丹·查克曼和麗貝卡·麥康瑞，在哈佛大學法學院貝克曼網路與社會中心（Berkman Center for Internet &amp; Society）贊助下成立，在2004年十二月正式成為各國部落客的集結處。2008年時，在荷蘭阿姆斯特丹成為一個獨立非營利組織。不一定要有專家的專業性，而是用平凡人的觀點看到周遭的世界，以此建立的平台，是與其他翻譯介紹國際資訊的網站最大不同之處。]]></description>
             <content:encoded><![CDATA[全球之聲是一個國際性的網站，開放給各國部落客和公民記者追蹤及報導。它的內容概括了世界上各個角落的博客。
-它是一個非營利的全球公民媒體計劃，創建者為伊丹·查克曼和麗貝卡·麥康瑞，在哈佛大學法學院貝克曼網路與社會中心（Berkman Center for Internet & Society）贊助下成立，在2004年十二月正式成為各國部落客的集結處。2008年時，在荷蘭阿姆斯特丹成為一個獨立非營利組織。不一定要有專家的專業性，而是用平凡人的觀點看到周遭的世界，以此建立的平台，是與其他翻譯介紹國際資訊的網站最大不同之處。]]></content:encoded>
+它是一個非營利的全球公民媒體計劃，創建者為伊丹·查克曼和麗貝卡·麥康瑞，在哈佛大學法學院貝克曼網路與社會中心（Berkman Center for Internet &amp; Society）贊助下成立，在2004年十二月正式成為各國部落客的集結處。2008年時，在荷蘭阿姆斯特丹成為一個獨立非營利組織。不一定要有專家的專業性，而是用平凡人的觀點看到周遭的世界，以此建立的平台，是與其他翻譯介紹國際資訊的網站最大不同之處。]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/aihGik7.png" length="0" type="image/png"/>
         </item>
@@ -6917,13 +6917,13 @@ Cheap專注於各種歷史，世界史、中國史與台灣史，我都不放過
 每天打開新聞，唉，不同的主角，雷同的故事：情色暴力，八卦毒舌，民眾不滿，政客白目，然後幾乎沒有國際新聞。
 小隊長深深相信，我們台灣人並不是不關心地球上的左鄰右舍，而是這麼小的一塊土地上，擠著好多的新聞媒體。惡劣的競爭，讓新聞用放大鏡在報導一些瑣事。其實再這樣下去，我們成見變深了，眼光變淺了，幸福變得不幸福，快樂變得不快樂。
 我們希望能打造一個讓台灣人能輕鬆上手的國際要聞網站，與其一堆文字，不如就用圖片說故事吧。這裡沒有審判，不帶情緒，也沒有艱澀的字彙。是悲，是喜，該怒，該憂，結論由自己主導。孔夫子說過，不患人之不己知，患不知人也。別老擔心別人不知道台灣多厲害，只怕我們無視別人多厲害！所以，就別再去細分你我，大家同樣身為地球人，那就一起關心地球事吧。
-Welcome aboard. It's good to see you here.
+Welcome aboard. It&apos;s good to see you here.
 小隊長 親啟 : ]]></description>
             <content:encoded><![CDATA[Welcome aboard！
 每天打開新聞，唉，不同的主角，雷同的故事：情色暴力，八卦毒舌，民眾不滿，政客白目，然後幾乎沒有國際新聞。
 小隊長深深相信，我們台灣人並不是不關心地球上的左鄰右舍，而是這麼小的一塊土地上，擠著好多的新聞媒體。惡劣的競爭，讓新聞用放大鏡在報導一些瑣事。其實再這樣下去，我們成見變深了，眼光變淺了，幸福變得不幸福，快樂變得不快樂。
 我們希望能打造一個讓台灣人能輕鬆上手的國際要聞網站，與其一堆文字，不如就用圖片說故事吧。這裡沒有審判，不帶情緒，也沒有艱澀的字彙。是悲，是喜，該怒，該憂，結論由自己主導。孔夫子說過，不患人之不己知，患不知人也。別老擔心別人不知道台灣多厲害，只怕我們無視別人多厲害！所以，就別再去細分你我，大家同樣身為地球人，那就一起關心地球事吧。
-Welcome aboard. It's good to see you here.
+Welcome aboard. It&apos;s good to see you here.
 小隊長 親啟 : ]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/urOH2lN.jpg" length="0" type="image/jpg"/>
@@ -7013,16 +7013,16 @@ Welcome aboard. It's good to see you here.
             <enclosure url="https://i.imgur.com/L7CYJR8.jpg" length="0" type="image/jpg"/>
         </item>
         <item>
-            <title><![CDATA[搖滾非洲 Let's Rock Africa的學習資源介紹｜島島阿學]]></title>
-            <link>https://www.daoedu.tw/resource/搖滾非洲 Let&amp;apos;s Rock Africa</link>
+            <title><![CDATA[搖滾非洲 Let&apos;s Rock Africa的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/搖滾非洲 Let&amp;amp;apos;s Rock Africa</link>
             <guid>https://www.daoedu.tw/resource/搖滾非洲 Let&amp;apos;s Rock Africa</guid>
             <pubDate>Mon, 24 Jan 2022 06:37:00 GMT</pubDate>
             <description><![CDATA[【搖滾非洲】由台飛國際志工交流協會所經營，每年協助清大教育志工及輔大醫療志工團至東非的坦尚尼亞與肯亞進行為期4~6週的服務，並持續監督與推動長期服務計畫。
 除當地志工服務外，希望透過搖滾非洲平台與分享會，和大家分享非洲相關的議題與有趣的資訊，像是非洲新創、醫療、趣聞、一手的志工觀察報導、當地NPO進行的計畫，打破單一故事的印象。
-邀請大家一同加入，成為搖滾非洲的歌手，Let's Rock Africa！]]></description>
+邀請大家一同加入，成為搖滾非洲的歌手，Let&apos;s Rock Africa！]]></description>
             <content:encoded><![CDATA[【搖滾非洲】由台飛國際志工交流協會所經營，每年協助清大教育志工及輔大醫療志工團至東非的坦尚尼亞與肯亞進行為期4~6週的服務，並持續監督與推動長期服務計畫。
 除當地志工服務外，希望透過搖滾非洲平台與分享會，和大家分享非洲相關的議題與有趣的資訊，像是非洲新創、醫療、趣聞、一手的志工觀察報導、當地NPO進行的計畫，打破單一故事的印象。
-邀請大家一同加入，成為搖滾非洲的歌手，Let's Rock Africa！]]></content:encoded>
+邀請大家一同加入，成為搖滾非洲的歌手，Let&apos;s Rock Africa！]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/AnUQow2.jpeg" length="0" type="image/jpeg"/>
         </item>
@@ -7617,8 +7617,8 @@ Instagram:  https://www.instagram.com/gwenasuisse]]></content:encoded>
             <link>https://www.daoedu.tw/resource/程式老爹</link>
             <guid>https://www.daoedu.tw/resource/程式老爹</guid>
             <pubDate>Mon, 24 Jan 2022 06:26:00 GMT</pubDate>
-            <description><![CDATA[利用<海霸>桌遊希望用遊戲讓孩子進入程式的世界，透過有趣的方法學程式，讓任何人都能體驗程式基本運用，​創造更好的程式教育環境！]]></description>
-            <content:encoded><![CDATA[利用<海霸>桌遊希望用遊戲讓孩子進入程式的世界，透過有趣的方法學程式，讓任何人都能體驗程式基本運用，​創造更好的程式教育環境！]]></content:encoded>
+            <description><![CDATA[利用&lt;海霸&gt;桌遊希望用遊戲讓孩子進入程式的世界，透過有趣的方法學程式，讓任何人都能體驗程式基本運用，​創造更好的程式教育環境！]]></description>
+            <content:encoded><![CDATA[利用&lt;海霸&gt;桌遊希望用遊戲讓孩子進入程式的世界，透過有趣的方法學程式，讓任何人都能體驗程式基本運用，​創造更好的程式教育環境！]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/FphdmWw.jpg" length="0" type="image/jpg"/>
         </item>
@@ -7727,8 +7727,8 @@ Instagram:  https://www.instagram.com/gwenasuisse]]></content:encoded>
             <link>https://www.daoedu.tw/resource/Fablab Taipei</link>
             <guid>https://www.daoedu.tw/resource/Fablab Taipei</guid>
             <pubDate>Mon, 24 Jan 2022 06:26:00 GMT</pubDate>
-            <description><![CDATA[Fablab Taipei是個推廣使用數位製造工具的開放空間， 鼓勵實作與知識共享的實體社群，讓大家都可以成為一個"自造者"。]]></description>
-            <content:encoded><![CDATA[Fablab Taipei是個推廣使用數位製造工具的開放空間， 鼓勵實作與知識共享的實體社群，讓大家都可以成為一個"自造者"。]]></content:encoded>
+            <description><![CDATA[Fablab Taipei是個推廣使用數位製造工具的開放空間， 鼓勵實作與知識共享的實體社群，讓大家都可以成為一個&quot;自造者&quot;。]]></description>
+            <content:encoded><![CDATA[Fablab Taipei是個推廣使用數位製造工具的開放空間， 鼓勵實作與知識共享的實體社群，讓大家都可以成為一個&quot;自造者&quot;。]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/eqosDp2.jpg" length="0" type="image/jpg"/>
         </item>
@@ -7783,9 +7783,9 @@ Instagram:  https://www.instagram.com/gwenasuisse]]></content:encoded>
             <link>https://www.daoedu.tw/resource/ccClub</link>
             <guid>https://www.daoedu.tw/resource/ccClub</guid>
             <pubDate>Mon, 24 Jan 2022 06:26:00 GMT</pubDate>
-            <description><![CDATA[Coding & Co-working Club（ccClub）是由一群國立臺灣大學學生及校友組成的教學團隊。他們認為程式設計不再只是特定領域的工具，而是應該成為任何領域的人都能運用的第二專長。
+            <description><![CDATA[Coding &amp; Co-working Club（ccClub）是由一群國立臺灣大學學生及校友組成的教學團隊。他們認為程式設計不再只是特定領域的工具，而是應該成為任何領域的人都能運用的第二專長。
 每學期開有線下課程，也有線上課程資源「跟著商管女孩一起學 Python」https://www.udemy.com/course/ccclub-python-for-beginners/]]></description>
-            <content:encoded><![CDATA[Coding & Co-working Club（ccClub）是由一群國立臺灣大學學生及校友組成的教學團隊。他們認為程式設計不再只是特定領域的工具，而是應該成為任何領域的人都能運用的第二專長。
+            <content:encoded><![CDATA[Coding &amp; Co-working Club（ccClub）是由一群國立臺灣大學學生及校友組成的教學團隊。他們認為程式設計不再只是特定領域的工具，而是應該成為任何領域的人都能運用的第二專長。
 每學期開有線下課程，也有線上課程資源「跟著商管女孩一起學 Python」https://www.udemy.com/course/ccclub-python-for-beginners/]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
             <enclosure url="https://i.imgur.com/Iic7CsW.png" length="0" type="image/png"/>
@@ -8415,8 +8415,8 @@ MightyBook.com故事的插圖具有國際色彩，來自世界各地的藝術家
             <enclosure url="https://i.imgur.com/DcetqWn.png" length="0" type="image/png"/>
         </item>
         <item>
-            <title><![CDATA[Rachel's English的學習資源介紹｜島島阿學]]></title>
-            <link>https://www.daoedu.tw/resource/Rachel&amp;apos;s English</link>
+            <title><![CDATA[Rachel&apos;s English的學習資源介紹｜島島阿學]]></title>
+            <link>https://www.daoedu.tw/resource/Rachel&amp;amp;apos;s English</link>
             <guid>https://www.daoedu.tw/resource/Rachel&amp;apos;s English</guid>
             <pubDate>Mon, 24 Jan 2022 04:48:00 GMT</pubDate>
             <description><![CDATA[超過400個免費的影片，可以教美式英語的發音節奏，語調，鏈接和壓力。
