@@ -58,6 +58,7 @@ const App = ({ Component, pageProps }) => {
         <link
           rel="alternate"
           type="application/rss+xml"
+          title="島島阿學多元學習資源"
           href="https://www.daoedu.tw/rss/feed.xml"
         />
       </Head>
