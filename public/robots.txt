@@ -2,6 +2,14 @@
 User-agent: *
 Disallow: /api/
 
+# *
+User-agent: *
+Allow: /search
+Allow: /activities
+Allow: /locations
+Allow: /about
+Allow: /resource/*
+
 # Host
 Host: https://www.daoedu.tw
 
