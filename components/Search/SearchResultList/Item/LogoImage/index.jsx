@@ -102,14 +102,15 @@ const PromoteWrapper = styled.div`
 const LogoImage = ({ isNewResource, link, data }) => {
   return (
     <LogoImageWrapper>
-      <ImageWrapper
-        onClick={() => window.open(link, '_blank')}
-        image={
-          (Array.isArray(data?.properties['縮圖']?.files) &&
-            data.properties['縮圖']?.files[0]?.name) ??
-          'https://www.daoedu.tw/preview.webp'
-        }
-      />
+      <a href={link} target="_blank" rel="noreferrer">
+        <ImageWrapper
+          image={
+            (Array.isArray(data?.properties['縮圖']?.files) &&
+              data.properties['縮圖']?.files[0]?.name) ??
+            'https://www.daoedu.tw/preview.webp'
+          }
+        />
+      </a>
       {isNewResource && <PromoteWrapper isNewResource={isNewResource} />}
     </LogoImageWrapper>
   );

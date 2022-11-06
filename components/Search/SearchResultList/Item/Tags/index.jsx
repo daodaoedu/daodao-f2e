@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import Chip from '@mui/material/Chip';
@@ -56,6 +56,33 @@ const Tags = ({ tags, type }) => {
     },
     [push, query, type],
   );
+  const linkList = useMemo(() => {
+    return tags.map((newQuery) => {
+      // 複製一份，避免影響到使用體驗
+      const clonedQuery = { ...query };
+      delete clonedQuery.title;
+      if (clonedQuery[type]) {
+        const queryObject = {
+          ...clonedQuery,
+          [type]: [clonedQuery[type].split(','), newQuery].join(','),
+        };
+        const queryStirng = Object.keys(queryObject)
+          .map((key) => queryObject[key])
+          .join('&');
+        return `/search?${queryStirng}`;
+      } else {
+        const queryObject = {
+          ...clonedQuery,
+          [type]: newQuery,
+        };
+        const queryStirng = Object.keys(queryObject)
+          .map((key) => queryObject[key])
+          .join('&');
+        return `/search?${queryStirng}`;
+      }
+    });
+  }, [tags, query]);
+
   return (
     <TagsWrapper>
       {tags.map(({ name, color }) => (
