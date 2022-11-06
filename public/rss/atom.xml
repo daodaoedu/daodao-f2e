@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://www.daoedu.tw</id>
     <title>島島阿學多元學習社群</title>
-    <updated>2022-10-06T03:10:40.004Z</updated>
+    <updated>2022-11-06T07:55:03.487Z</updated>
     <generator>Feed for Node.js</generator>
     <author>
         <name>島島阿學多元學習社群</name>
@@ -15,6 +15,136 @@
     <logo>https://www.daoedu.tw/preview.webp</logo>
     <icon>https://www.daoedu.tw/favicon.png</icon>
     <rights>All rights reserved 2022, 島島阿學</rights>
+    <entry>
+        <title type="html"><![CDATA[Readle German：每日德文閱讀＋即時德語助手字典的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/Readle German：每日德文閱讀＋即時德語助手字典</id>
+        <link href="https://www.daoedu.tw/resource/Readle German：每日德文閱讀＋即時德語助手字典"/>
+        <updated>2022-10-28T14:55:00.000Z</updated>
+        <summary type="html"><![CDATA[這個app,會以CEFR的分級方式，將德文分成a1~c1五個等級（沒有c2）可以依照自己的程度來做選擇來練習德文，內容包括時事、學術等等的文章，可以順便增進自己的德文閱讀能力喔]]></summary>
+        <content type="html"><![CDATA[這個app,會以CEFR的分級方式，將德文分成a1~c1五個等級（沒有c2）可以依照自己的程度來做選擇來練習德文，內容包括時事、學術等等的文章，可以順便增進自己的德文閱讀能力喔]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[World puzzle federation的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/World puzzle federation</id>
+        <link href="https://www.daoedu.tw/resource/World puzzle federation"/>
+        <updated>2022-10-28T14:51:00.000Z</updated>
+        <summary type="html"><![CDATA[世界盃解謎聯盟的主網站]]></summary>
+        <content type="html"><![CDATA[世界盃解謎聯盟的主網站]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[少年報導者的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/少年報導者</id>
+        <link href="https://www.daoedu.tw/resource/少年報導者"/>
+        <updated>2022-10-28T14:47:00.000Z</updated>
+        <summary type="html"><![CDATA[《少年報導者》是由非營利媒體《報導者》孕生出的「孩子」，對10～15歲的同學提供深度的新聞報導，每一篇文章都是記者獨立採訪、專家審核把關下完成。兒童和少年將是改變世界的起點。]]></summary>
+        <content type="html"><![CDATA[《少年報導者》是由非營利媒體《報導者》孕生出的「孩子」，對10～15歲的同學提供深度的新聞報導，每一篇文章都是記者獨立採訪、專家審核把關下完成。兒童和少年將是改變世界的起點。]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CoreLab－技能學習平台的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/CoreLab－技能學習平台</id>
+        <link href="https://www.daoedu.tw/resource/CoreLab－技能學習平台"/>
+        <updated>2022-10-22T15:35:00.000Z</updated>
+        <summary type="html"><![CDATA[「CoreLab」是一個ICT 技能成長學習平台，本平台有4大特色，包含能力本位精確教學、線上實作增進實力、直播共學或自學與適性學習提升效率。]]></summary>
+        <content type="html"><![CDATA[「CoreLab」是一個ICT 技能成長學習平台，本平台有4大特色，包含能力本位精確教學、線上實作增進實力、直播共學或自學與適性學習提升效率。]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[超牆青年ｅ學院的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/超牆青年ｅ學院</id>
+        <link href="https://www.daoedu.tw/resource/超牆青年ｅ學院"/>
+        <updated>2022-10-22T15:23:00.000Z</updated>
+        <summary type="html"><![CDATA[此平台為教育部青年發展署所創立的線上數位學習平台，平台內有許多議題、設計思考、社會設計與服務學習…等議題可供您學習。]]></summary>
+        <content type="html"><![CDATA[此平台為教育部青年發展署所創立的線上數位學習平台，平台內有許多議題、設計思考、社會設計與服務學習…等議題可供您學習。]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JIBAO教材共享平台的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/JIBAO教材共享平台</id>
+        <link href="https://www.daoedu.tw/resource/JIBAO教材共享平台"/>
+        <updated>2022-10-22T15:14:00.000Z</updated>
+        <summary type="html"><![CDATA[「JIBAO 優質教材共享平台－滿足跨領域、線上教學及特殊課程」
+整理教材對老師來說是件工程浩大但重要的事，吉寶是第一個專門幫助老師備課及授課的線上工具。其內容包含四特色：收藏、複製免去重複備課、簡報製作快速、焦點搜尋各式資源社群分享與關注。]]></summary>
+        <content type="html"><![CDATA[「JIBAO 優質教材共享平台－滿足跨領域、線上教學及特殊課程」
+整理教材對老師來說是件工程浩大但重要的事，吉寶是第一個專門幫助老師備課及授課的線上工具。其內容包含四特色：收藏、複製免去重複備課、簡報製作快速、焦點搜尋各式資源社群分享與關注。]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Test-English的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/Test-English</id>
+        <link href="https://www.daoedu.tw/resource/Test-English"/>
+        <updated>2022-10-07T14:20:00.000Z</updated>
+        <summary type="html"><![CDATA[我們是一群英語教師和電子學習愛好者，他們在過去幾年中一直在創建在線材料來幫助我們的學生準備他們的英語考試。我們的目標始終是打造一個適合每個學生的節奏、目標、智力、能力、時間和動機的英語學習平台。
+我們很清楚，每天都有越來越多的人出於職業原因或作為教育要求的一部分需要對他們的英語進行認證。不幸的是，他們經常無法在繁忙的日程中適應英語學習。通過 test-english.com，您可以在家中舒適地以自己的節奏輕鬆提高英語技能。]]></summary>
+        <content type="html"><![CDATA[我們是一群英語教師和電子學習愛好者，他們在過去幾年中一直在創建在線材料來幫助我們的學生準備他們的英語考試。我們的目標始終是打造一個適合每個學生的節奏、目標、智力、能力、時間和動機的英語學習平台。
+我們很清楚，每天都有越來越多的人出於職業原因或作為教育要求的一部分需要對他們的英語進行認證。不幸的是，他們經常無法在繁忙的日程中適應英語學習。通過 test-english.com，您可以在家中舒適地以自己的節奏輕鬆提高英語技能。]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Gapminder的學習資源介紹｜島島阿學]]></title>
         <id>https://www.daoedu.tw/resource/Gapminder</id>
