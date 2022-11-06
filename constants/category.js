@@ -205,6 +205,11 @@ export const NAV_LINK = [
     target: '_self',
   },
   {
+    name: '找故事',
+    link: 'https://blog.daoedu.tw',
+    target: '_blank',
+  },
+  {
     name: '找活動',
     link: '/activities',
     target: '_self',
@@ -230,6 +235,11 @@ export const NAV_LINK_MOBILE = [
     name: '找資源',
     link: '/search',
     target: '_self',
+  },
+  {
+    name: '找故事',
+    link: 'https://blog.daoedu.tw',
+    target: '_blank',
   },
   {
     name: '新增資源',
