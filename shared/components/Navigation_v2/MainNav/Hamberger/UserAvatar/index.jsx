@@ -1,11 +1,10 @@
-import React, { useState } from "react";
-import styled from "@emotion/styled";
-import Link from "next/link";
-import { Avatar } from "@mui/material";
-import useFirebase from "../../../../../../hooks/useFirebase";
-import { Box, IconButton, Menu, MenuItem } from "@mui/material";
-import { Group } from "@mui/icons-material";
-import { useRouter } from "next/router";
+import React, { useState } from 'react';
+import styled from '@emotion/styled';
+import Link from 'next/link';
+import { Avatar, Box, IconButton, Menu, MenuItem } from '@mui/material';
+import { Group } from '@mui/icons-material';
+import { useRouter } from 'next/router';
+import useFirebase from '../../../../../../hooks/useFirebase';
 
 const UserAvatar = ({ onCloseMenu }) => {
   const { push } = useRouter();
@@ -14,45 +13,45 @@ const UserAvatar = ({ onCloseMenu }) => {
   if (!user) {
     return (
       <IconButton
-        sx={{ margin: "0 10px", fontSize: "16px", color: "white" }}
+        sx={{ margin: '0 10px', fontSize: '16px', color: 'white' }}
         onClick={() => signInWithFacebook()}
       >
-        <Group sx={{ fontSize: "30px" }} />
+        <Group sx={{ fontSize: '30px' }} />
       </IconButton>
     );
   }
   return (
     <IconButton
       sx={{
-        margin: "0 10px",
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
+        margin: '0 10px',
+        display: 'flex',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
       }}
       onClick={() => {
         onCloseMenu();
-        push("/myisland");
+        push('/myisland');
       }}
     >
       <Avatar
-        alt={user?.displayName ?? ""}
-        src={user?.photoURL ?? ""}
+        alt={user?.displayName ?? ''}
+        src={user?.photoURL ?? ''}
         // onClick={(event) => setIsOpenMenu(event.currentTarget)}
       />
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          marginLeft: "20px",
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          marginLeft: '20px',
         }}
       >
         <Box
           sx={{
-            margin: "0 10px",
-            fontSize: "26px",
-            color: "white",
-            fontWeight: "500",
+            margin: '0 10px',
+            fontSize: '26px',
+            color: 'white',
+            fontWeight: '500',
           }}
         >
           Points: 0

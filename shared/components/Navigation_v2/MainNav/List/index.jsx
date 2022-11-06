@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { NAV_LINK } from "../../../../../constants/category";
-import Link from "next/link";
+import React from 'react';
+import styled from '@emotion/styled';
+import Link from 'next/link';
+import { NAV_LINK } from '../../../../../constants/category';
 
 const LinkListWrapper = styled.ul`
   display: flex;
@@ -22,7 +22,7 @@ const List = () => {
     <LinkListWrapper>
       {NAV_LINK.map(({ name, link, target }) => (
         <li key={name}>
-          {target === "_self" ? (
+          {target === '_self' ? (
             <Link href={link}>{name}</Link>
           ) : (
             <a href={link} target={target} rel="noopener noreferrer">

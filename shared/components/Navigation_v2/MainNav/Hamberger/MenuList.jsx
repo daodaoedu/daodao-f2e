@@ -1,15 +1,15 @@
 // import { keyframes, css } from '@emotion/react';
-import styled from "@emotion/styled";
-import { Box } from "@mui/material";
-import MenuItem from "./MenuItem";
-import UserAvatar from "./UserAvatar";
-import useFirebase from "../../../../../hooks/useFirebase";
+import styled from '@emotion/styled';
+import { Box } from '@mui/material';
+import MenuItem from './MenuItem';
+import UserAvatar from './UserAvatar';
+import useFirebase from '../../../../../hooks/useFirebase';
 
 const MenuWrapper = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  height: ${(props) => (props.open ? "100%" : 0)};
+  height: ${(props) => (props.open ? '100%' : 0)};
   width: 100vw;
   display: flex;
   flex-direction: column;
@@ -36,8 +36,8 @@ const Menu = ({ open, list, onCloseMenu }) => {
           {user && <UserAvatar onCloseMenu={onCloseMenu} />}
           {user ? (
             <MenuItem
-              key={"登出"}
-              delay={`0.1s`}
+              key="登出"
+              delay="0.1s"
               onClick={() => {
                 signOutWithFacebook();
                 onCloseMenu();
@@ -46,8 +46,8 @@ const Menu = ({ open, list, onCloseMenu }) => {
             />
           ) : (
             <MenuItem
-              key={"登入"}
-              delay={`0.1s`}
+              key="登入"
+              delay="0.1s"
               onClick={() => {
                 signInWithFacebook();
               }}

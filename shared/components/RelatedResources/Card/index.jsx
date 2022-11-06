@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
-import styled from "@emotion/styled";
-import { css } from "@emotion/react";
-import { Tooltip } from "@mui/material";
+import React, { useEffect, useMemo, useState } from 'react';
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
+import { Tooltip } from '@mui/material';
 
 const CardWrapper = styled.li`
   position: relative;
@@ -73,23 +73,23 @@ const FooterWrapper = styled.div`
 `;
 
 const Card = ({ image, title, desc }) => {
-    return (
-      <Tooltip title={desc}>
-        <CardWrapper
-          onClick={() =>
-            open(`https://www.daoedu.tw/resource/${title}`, "_target")
-          }
-        >
-          <HeaderWrapper>
-            <ImageWrapper image={image} />
-            <h3>{title}</h3>
-          </HeaderWrapper>
-          <FooterWrapper>
-            <p>{desc}</p>
-          </FooterWrapper>
-        </CardWrapper>
-      </Tooltip>
-    );
+  return (
+    <Tooltip title={desc}>
+      <CardWrapper
+        onClick={() =>
+          open(`https://www.daoedu.tw/resource/${title}`, '_target')
+        }
+      >
+        <HeaderWrapper>
+          <ImageWrapper image={image} />
+          <h3>{title}</h3>
+        </HeaderWrapper>
+        <FooterWrapper>
+          <p>{desc}</p>
+        </FooterWrapper>
+      </CardWrapper>
+    </Tooltip>
+  );
 };
 
 export default Card;

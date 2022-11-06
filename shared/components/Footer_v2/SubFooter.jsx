@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "@emotion/styled";
-import dayjs from "dayjs";
+import React from 'react';
+import styled from '@emotion/styled';
+import dayjs from 'dayjs';
 
 const SubFooterWrapper = styled.div`
   background-color: #536166;
@@ -16,7 +16,7 @@ const SubFooterWrapper = styled.div`
 `;
 
 const SubFooter = () => {
-  const year = dayjs().get("year");
+  const year = dayjs().get('year');
   return (
     <SubFooterWrapper>
       Tomorrow will be fine. 島島阿學 © {year}.

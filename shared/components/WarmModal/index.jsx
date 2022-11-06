@@ -1,39 +1,39 @@
-import React, { useState } from "react";
-import styled from "@emotion/styled";
+import React, { useState } from 'react';
+import styled from '@emotion/styled';
 // import { css } from "@emotion/react";
-import { Box, Paper, Typography, Stack, Avatar } from "@mui/material";
-import TextField from "@mui/material/TextField";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Button from "@mui/material/Button";
-import toast from "react-hot-toast";
+import { Box, Paper, Typography, Stack, Avatar } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import toast from 'react-hot-toast';
 
 const WarmModal = ({ open, setOpen }) => {
-  const [author, setAuthor] = useState("");
-  const [text, setText] = useState("");
+  const [author, setAuthor] = useState('');
+  const [text, setText] = useState('');
   //   console.log("debug: ", author, text);
   const onSubmit = () => {
-    fetch("https://api.daoedu.tw/slackbot/send/warm", {
-      method: "POST",
+    fetch('https://api.daoedu.tw/slackbot/send/warm', {
+      method: 'POST',
       body: JSON.stringify({
-        channel: "#主頻道-大會報告島",
+        channel: '#主頻道-大會報告島',
         // For test
         // channel: "#daodao-notion",
-        author: author || "匿名",
-        text: text ?? "🥳",
+        author: author || '匿名',
+        text: text ?? '🥳',
       }),
     }).then(() => {
-      toast.success("送上祝福成功！", {
+      toast.success('送上祝福成功！', {
         style: {
-          color: "#16b9b3",
-          border: "1px solid #16b9b3",
-          marginTop: "70px",
+          color: '#16b9b3',
+          border: '1px solid #16b9b3',
+          marginTop: '70px',
         },
         iconTheme: {
-          primary: "#16b9b3",
+          primary: '#16b9b3',
         },
       });
     });
@@ -44,7 +44,7 @@ const WarmModal = ({ open, setOpen }) => {
       <DialogContent>
         <DialogContentText>
           你的小小鼓勵是所有島島志工夥伴最大的動力🥳！歡迎留下你所想留的內容，你所留下的訊息會
-          <Typography sx={{ fontWeight: "bold" }}> 即時推播 </Typography>
+          <Typography sx={{ fontWeight: 'bold' }}> 即時推播 </Typography>
           給島島的夥伴看到喔！
         </DialogContentText>
         <TextField

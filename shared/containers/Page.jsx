@@ -12,11 +12,7 @@ const Container = styled.main`
 `;
 
 const PageContainer = ({ children }) => {
-  return (
-    <Container>
-      {children}
-    </Container>
-  );
+  return <Container>{children}</Container>;
 };
 
 export default PageContainer;

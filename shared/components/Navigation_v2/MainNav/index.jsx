@@ -1,11 +1,11 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { Toolbar } from "@mui/material";
-import Box from "@mui/material/Box";
-import Hamberger from "./Hamberger";
-import List from "./List";
-import SubList from "./SubList";
-import Logo from "./Logo";
+import React from 'react';
+import styled from '@emotion/styled';
+import { Toolbar } from '@mui/material';
+import Box from '@mui/material/Box';
+import Hamberger from './Hamberger';
+import List from './List';
+import SubList from './SubList';
+import Logo from './Logo';
 
 const MainNavWrapper = styled(Toolbar)`
   /* max-width: 1200px; */
@@ -27,7 +27,7 @@ const BoxWrapper = styled(Box)`
 const MainNav = () => {
   return (
     <MainNavWrapper>
-      <BoxWrapper sx={{ display: "flex", justifyContent: "flex-start" }}>
+      <BoxWrapper sx={{ display: 'flex', justifyContent: 'flex-start' }}>
         <Logo />
         {/* main list */}
         <List />

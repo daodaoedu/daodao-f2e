@@ -1,6 +1,6 @@
-import { keyframes, css } from "@emotion/react";
-import styled from "@emotion/styled";
-import Link from "next/link";
+import { keyframes, css } from '@emotion/react';
+import styled from '@emotion/styled';
+import Link from 'next/link';
 
 const appearFrames = keyframes`
   0% {
@@ -48,15 +48,15 @@ const ItemWrapper = styled.div`
     animation-delay: ${props.delay};
   `}
   &:hover {
-    color: "gray";
+    color: 'gray';
   }
 `;
 
 const LineStyle = styled.div`
-  width: "90%";
-  height: "1px";
-  background: "#fafafa";
-  margin: "0 auto";
+  width: '90%';
+  height: '1px';
+  background: '#fafafa';
+  margin: '0 auto';
   animation: 0.5s ${shrinkFrames} forwards;
   ${(props) => css`
     animation-delay: ${props.delay};

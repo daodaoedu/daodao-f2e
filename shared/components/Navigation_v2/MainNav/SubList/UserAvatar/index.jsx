@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import styled from "@emotion/styled";
-import Link from "next/link";
-import { Avatar } from "@mui/material";
-import useFirebase from "../../../../../../hooks/useFirebase";
-import { Box, IconButton, Menu, MenuItem } from "@mui/material";
-import { Group } from "@mui/icons-material";
-import { useRouter } from "next/router";
+import React, { useState } from 'react';
+import styled from '@emotion/styled';
+import Link from 'next/link';
+import { Avatar, Box, IconButton, Menu, MenuItem } from '@mui/material';
+import { Group } from '@mui/icons-material';
+import { useRouter } from 'next/router';
+import useFirebase from '../../../../../../hooks/useFirebase';
+
 const UserAvatar = () => {
   const { push } = useRouter();
   const { auth, user, signInWithFacebook, signOutWithFacebook } = useFirebase();
@@ -13,18 +13,18 @@ const UserAvatar = () => {
   if (!user) {
     return (
       <IconButton
-        sx={{ margin: "0 10px", fontSize: "16px", color: "white" }}
+        sx={{ margin: '0 10px', fontSize: '16px', color: 'white' }}
         onClick={() => signInWithFacebook()}
       >
-        <Group sx={{ fontSize: "30px" }} />
+        <Group sx={{ fontSize: '30px' }} />
       </IconButton>
     );
   }
   return (
-    <IconButton sx={{ margin: "0 10px" }}>
+    <IconButton sx={{ margin: '0 10px' }}>
       <Avatar
-        alt={user?.displayName ?? ""}
-        src={user?.photoURL ?? ""}
+        alt={user?.displayName ?? ''}
+        src={user?.photoURL ?? ''}
         onClick={(event) => setIsOpenMenu(event.currentTarget)}
       />
       <Menu
@@ -36,7 +36,7 @@ const UserAvatar = () => {
         <MenuItem
           onClick={() => {
             setIsOpenMenu(false);
-            push("/myisland");
+            push('/myisland');
           }}
         >
           我的島島

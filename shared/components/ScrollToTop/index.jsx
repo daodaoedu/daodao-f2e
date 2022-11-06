@@ -1,9 +1,9 @@
-import React, { useMemo } from "react";
-import styled from "@emotion/styled";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import { Button, Fab } from "@mui/material";
-import useScrollPosition from "@react-hook/window-scroll";
-import { scrollToTop } from "../../../utils/ux";
+import React, { useMemo } from 'react';
+import styled from '@emotion/styled';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import { Button, Fab } from '@mui/material';
+import useScrollPosition from '@react-hook/window-scroll';
+import { scrollToTop } from '../../../utils/ux';
 // import { Navigation } from "@mui/icons-material";
 
 const ScrollToTopWrapper = styled.div`
@@ -47,15 +47,15 @@ const ScrollToTop = () => {
           variant="extended"
           onClick={scrollToTop}
           sx={{
-            backgroundColor: "#16b9b3",
-            color: "white",
-            fontWeight: "500",
-            "&:focus": {
-              backgroundColor: "#16b9b3",
+            backgroundColor: '#16b9b3',
+            color: 'white',
+            fontWeight: '500',
+            '&:focus': {
+              backgroundColor: '#16b9b3',
             },
           }}
         >
-          <ArrowUpwardIcon sx={{ marginRight: "6px" }} />
+          <ArrowUpwardIcon sx={{ marginRight: '6px' }} />
           置頂
         </Fab>
       </ScrollToTopWrapper>

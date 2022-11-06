@@ -1,9 +1,9 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { FaFacebook, FaInstagram } from "react-icons/fa";
-import IntroList from "./IntroList";
-import IconList from "./IconList";
-import { FOOTER_LINK } from "../../../constants/category";
+import React from 'react';
+import styled from '@emotion/styled';
+import { FaFacebook, FaInstagram } from 'react-icons/fa';
+import IntroList from './IntroList';
+import IconList from './IconList';
+import { FOOTER_LINK } from '../../../constants/category';
 
 const MainFooterWrapper = styled.div`
   height: 100%;
@@ -36,27 +36,27 @@ const BlockWrapper = styled.div`
 
 const aboutDaoConfig = [
   {
-    name: "關於島島",
-    link: "/about",
-    target: "_self",
+    name: '關於島島',
+    link: '/about',
+    target: '_self',
   },
   {
-    name: "體驗問卷",
-    link: "https://docs.google.com/forms/d/e/1FAIpQLSeyU9-Q-kIWp5uutcik3h-RO4o5VuG6oG0m-4u1Ua18EOu3aw/viewform",
-    target: "_blank",
+    name: '體驗問卷',
+    link: 'https://docs.google.com/forms/d/e/1FAIpQLSeyU9-Q-kIWp5uutcik3h-RO4o5VuG6oG0m-4u1Ua18EOu3aw/viewform',
+    target: '_blank',
   },
 ];
 
 const iconListConfig = [
   {
     icon: <FaInstagram size="18" />,
-    link: "https://www.instagram.com/daodao_edu/",
-    alt: "instagram",
+    link: 'https://www.instagram.com/daodao_edu/',
+    alt: 'instagram',
   },
   {
     icon: <FaFacebook size="18" />,
-    link: "https://www.facebook.com/daodao.edu",
-    alt: "facebook",
+    link: 'https://www.facebook.com/daodao.edu',
+    alt: 'facebook',
   },
 ];
 

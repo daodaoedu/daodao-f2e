@@ -1,40 +1,40 @@
-import React, { useState } from "react";
-import styled from "@emotion/styled";
+import React, { useState } from 'react';
+import styled from '@emotion/styled';
 // import { css } from "@emotion/react";
-import { Box, Paper, Typography, Stack, Avatar } from "@mui/material";
-import TextField from "@mui/material/TextField";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Button from "@mui/material/Button";
-import toast from "react-hot-toast";
+import { Box, Paper, Typography, Stack, Avatar } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import toast from 'react-hot-toast';
 
 const SurveyModal = ({ open, setOpen }) => {
-  const [author, setAuthor] = useState("");
-  const [text, setText] = useState("");
+  const [author, setAuthor] = useState('');
+  const [text, setText] = useState('');
   //   console.log("debug: ", author, text);
   const onSubmit = () => {
-    fetch("https://api.daoedu.tw/slackbot/send", {
-      method: "POST",
+    fetch('https://api.daoedu.tw/slackbot/send', {
+      method: 'POST',
       body: JSON.stringify({
-        channel: "#主頻道-大會報告島",
+        channel: '#主頻道-大會報告島',
         // For test
         // channel: "#daodao-notion",
         text: `[意見調查即時推播]\n${
-          author || "訪客匿名"
+          author || '訪客匿名'
         }給予意見反饋：\n${text}`,
       }),
     }).then(() => {
-      toast.success("送上意見反饋成功！感謝你的分享", {
+      toast.success('送上意見反饋成功！感謝你的分享', {
         style: {
-          color: "#16b9b3",
-          border: "1px solid #16b9b3",
-          marginTop: "70px",
+          color: '#16b9b3',
+          border: '1px solid #16b9b3',
+          marginTop: '70px',
         },
         iconTheme: {
-          primary: "#16b9b3",
+          primary: '#16b9b3',
         },
       });
     });

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import styled from "@emotion/styled";
-import MenuButton from "./MenuButton";
-import MenuList from "./MenuList";
-import { NAV_LINK_MOBILE } from "../../../../../constants/category";
+import React, { useState } from 'react';
+import styled from '@emotion/styled';
+import MenuButton from './MenuButton';
+import MenuList from './MenuList';
+import { NAV_LINK_MOBILE } from '../../../../../constants/category';
 
 const MobileLinkListWrapper = styled.ul`
   display: none;
@@ -22,7 +22,7 @@ const MobileLinkListWrapper = styled.ul`
       border-bottom: solid 1px white;
     }
 
-    svg[type="menu"]:checked + ul {
+    svg[type='menu']:checked + ul {
       display: block;
       width: 100%;
       background: #999;
@@ -32,7 +32,7 @@ const MobileLinkListWrapper = styled.ul`
       display: block;
     }
 
-    svg[type="menu"]:checked + ul li:nth-of-type(1) {
+    svg[type='menu']:checked + ul li:nth-of-type(1) {
       background: #777;
       color: #fff;
     }
@@ -41,7 +41,7 @@ const MobileLinkListWrapper = styled.ul`
 
 const MainNav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const avatar = "";
+  const avatar = '';
   const isUserLogin = true;
   return (
     <MobileLinkListWrapper>

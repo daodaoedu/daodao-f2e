@@ -1,16 +1,16 @@
-const { createServer } = require("https");
-const { parse } = require("url");
-const next = require("next");
-const fs = require("fs");
+const { createServer } = require('https');
+const { parse } = require('url');
+const next = require('next');
+const fs = require('fs');
 
 const port = 5000;
-const dev = process.env.NODE_ENV !== "production";
+const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const httpsOptions = {
-  key: fs.readFileSync("./localhost-key.pem"),
-  cert: fs.readFileSync("./localhost.pem"),
+  key: fs.readFileSync('./localhost-key.pem'),
+  cert: fs.readFileSync('./localhost.pem'),
 };
 
 app.prepare().then(() => {

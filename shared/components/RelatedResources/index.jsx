@@ -1,12 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
-import styled from "@emotion/styled";
-import { css } from "@emotion/react";
-import { useRouter } from "next/router";
-import { Button, Paper, Box, Stack, Typography, Skeleton } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { loadRelatedResources } from "../../../redux/actions/resource";
-import Card from "./Card";
-import Marquee from "react-fast-marquee";
+import React, { useEffect, useMemo, useState } from 'react';
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
+import { useRouter } from 'next/router';
+import { Button, Paper, Box, Stack, Typography, Skeleton } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import Marquee from 'react-fast-marquee';
+import { loadRelatedResources } from '../../../redux/actions/resource';
+import Card from './Card';
 
 const RelatedResourcesWrapper = styled.div`
   margin: 20px 0;
@@ -27,7 +27,7 @@ const CardListWrapper = styled.ul`
 
 const RelatedResources = ({ title, searchScheme }) => {
   const { relatedResources, isLoading } = useSelector(
-    (state) => state?.resource
+    (state) => state?.resource,
   );
   const dispatch = useDispatch();
   const router = useRouter();
@@ -47,37 +47,37 @@ const RelatedResources = ({ title, searchScheme }) => {
             variant="rectangular"
             width={200}
             height={100}
-            sx={{ borderRadius: "10px", margin: "5px", flex: "0 0 200px" }}
+            sx={{ borderRadius: '10px', margin: '5px', flex: '0 0 200px' }}
           />
           <Skeleton
             variant="rectangular"
             width={200}
             height={100}
-            sx={{ borderRadius: "10px", margin: "5px", flex: "0 0 200px" }}
+            sx={{ borderRadius: '10px', margin: '5px', flex: '0 0 200px' }}
           />
           <Skeleton
             variant="rectangular"
             width={200}
             height={100}
-            sx={{ borderRadius: "10px", margin: "5px", flex: "0 0 200px" }}
+            sx={{ borderRadius: '10px', margin: '5px', flex: '0 0 200px' }}
           />
           <Skeleton
             variant="rectangular"
             width={200}
             height={100}
-            sx={{ borderRadius: "10px", margin: "5px", flex: "0 0 200px" }}
+            sx={{ borderRadius: '10px', margin: '5px', flex: '0 0 200px' }}
           />
           <Skeleton
             variant="rectangular"
             width={200}
             height={100}
-            sx={{ borderRadius: "10px", margin: "5px", flex: "0 0 200px" }}
+            sx={{ borderRadius: '10px', margin: '5px', flex: '0 0 200px' }}
           />
           <Skeleton
             variant="rectangular"
             width={200}
             height={100}
-            sx={{ borderRadius: "10px", margin: "5px", flex: "0 0 200px" }}
+            sx={{ borderRadius: '10px', margin: '5px', flex: '0 0 200px' }}
           />
         </CardListWrapper>
       </RelatedResourcesWrapper>
@@ -92,17 +92,17 @@ const RelatedResources = ({ title, searchScheme }) => {
             <Card
               key={created_time}
               image={
-                (Array.isArray(properties["縮圖"]?.files) &&
-                  properties["縮圖"]?.files[0]?.name) ??
-                "https://www.daoedu.tw/preview.webp"
+                (Array.isArray(properties['縮圖']?.files) &&
+                  properties['縮圖']?.files[0]?.name) ??
+                'https://www.daoedu.tw/preview.webp'
               }
               title={(
-                properties["資源名稱"]?.title[0]?.plain_text ?? ""
+                properties['資源名稱']?.title[0]?.plain_text ?? ''
               ).trim()}
               desc={(
-                (properties["介紹"]?.rich_text ?? []).find(
-                  (item) => item?.type === "text"
-                )?.plain_text ?? ""
+                (properties['介紹']?.rich_text ?? []).find(
+                  (item) => item?.type === 'text',
+                )?.plain_text ?? ''
               ).slice(0, 40)}
             />
           ))}

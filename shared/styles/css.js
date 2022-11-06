@@ -1,5 +1,6 @@
-import { css } from "@emotion/react";
+import { css } from '@emotion/react';
 import { TikTokShaking } from './animation';
+
 export const TikTokFont = css`
   /* $white: #ffffff;
     $black: #010101;

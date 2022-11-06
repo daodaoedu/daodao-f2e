@@ -1,9 +1,9 @@
-import React from "react";
-import styled from "@emotion/styled";
-import Link from "next/link";
-import { Typography } from "@mui/material";
-import useFirebase from "../../../../../hooks/useFirebase";
-import UserAvatar from "./UserAvatar";
+import React from 'react';
+import styled from '@emotion/styled';
+import Link from 'next/link';
+import { Typography } from '@mui/material';
+import useFirebase from '../../../../../hooks/useFirebase';
+import UserAvatar from './UserAvatar';
 // import { useAuthState } from "react-firebase-hooks/auth";
 // import { signInWithPopup } from "firebase/auth";
 // import { useDispatch, useSelector } from "react-redux";

@@ -1,4 +1,4 @@
-import { keyframes } from "@emotion/react";
+import { keyframes } from '@emotion/react';
 
 export const slideInUp = keyframes`
     0% {

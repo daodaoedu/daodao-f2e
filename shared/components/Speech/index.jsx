@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import SpeechRecognition, {
   useSpeechRecognition,
-} from "react-speech-recognition";
-import { keyframes } from "@emotion/react";
+} from 'react-speech-recognition';
+import { keyframes } from '@emotion/react';
 import {
   Button,
   CircularProgress,
   IconButton,
   Typography,
-} from "@mui/material";
-import { Clear as ClearIcon, Mic as MicIcon } from "@mui/icons-material";
-import styled from "@emotion/styled";
-import { Box } from "@mui/material";
+  Box,
+} from '@mui/material';
+import { Clear as ClearIcon, Mic as MicIcon } from '@mui/icons-material';
+import styled from '@emotion/styled';
 // import { CentralBlock, HorizontalBlock } from "./general";
-import useUnchanger from "../../../hooks/useUnchanger";
+import useUnchanger from '../../../hooks/useUnchanger';
 // import { speech as i18n } from "../i18n";
 // en - US;
 // eslint-disable-next-line react/display-name
@@ -67,12 +67,12 @@ const SpeechWrapper = styled(Box)`
 const Speech = ({ lang, setIsSpeechMode }) => {
   const router = useRouter();
   const { query = {} } = router;
-  const [text, setText] = useState("說些什麼");
+  const [text, setText] = useState('說些什麼');
   const [flag, setFlag] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [reset, setReset] = useState(false);
   const { listening, transcript, resetTranscript } = useSpeechRecognition();
-  const unchange = useUnchanger(transcript, listening && transcript !== "");
+  const unchange = useUnchanger(transcript, listening && transcript !== '');
 
   useEffect(() => {
     if (!listening) {
@@ -83,7 +83,7 @@ const Speech = ({ lang, setIsSpeechMode }) => {
 
     const timeout1 = setTimeout(() => {
       if (!reset && !flag) {
-        setText("正在聽");
+        setText('正在聽');
       }
     }, 1500);
 
@@ -101,11 +101,11 @@ const Speech = ({ lang, setIsSpeechMode }) => {
   }, [reset]);
 
   useEffect(() => {
-    if (transcript !== "") {
+    if (transcript !== '') {
       setFlag(true);
       setText(transcript);
     } else {
-      setText("說些什麼");
+      setText('說些什麼');
       setFlag(false);
     }
   }, [transcript, lang]);
@@ -117,21 +117,21 @@ const Speech = ({ lang, setIsSpeechMode }) => {
   }, [unchange]);
 
   useEffect(() => {
-    if (listening === false && transcript !== "" && flag) {
+    if (listening === false && transcript !== '' && flag) {
       setIsLoading(true);
       setIsSpeechMode(false);
 
       router.push({
-        pathname: "/search",
-          query: {
-            ...query,
+        pathname: '/search',
+        query: {
+          ...query,
           q: transcript,
         },
       });
     }
 
-    if (listening === false && text === "正在聽") {
-      setText("確認中");
+    if (listening === false && text === '正在聽') {
+      setText('確認中');
       setReset(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,12 +142,12 @@ const Speech = ({ lang, setIsSpeechMode }) => {
     resetTranscript();
     setFlag(false);
     setReset(false);
-    setText("說些什麼");
+    setText('說些什麼');
     SpeechRecognition.startListening({
       language: lang,
     });
   };
-    
+
   const isPulsing = flag && listening;
 
   return (
@@ -164,28 +164,28 @@ const Speech = ({ lang, setIsSpeechMode }) => {
         <>
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "space-between",
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}
           >
             <IconButton
               sx={{
                 animation: isPulsing ? `${pulse} 1s infinite` : null,
-                background: isPulsing ? "#16b9b3" : null,
-                border: "1px solid #ccc",
+                background: isPulsing ? '#16b9b3' : null,
+                border: '1px solid #ccc',
                 height: 165,
                 width: 165,
               }}
             >
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  fontSize: "50px",
-                  color: isPulsing ? "white" : "#16b9b3",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  fontSize: '50px',
+                  color: isPulsing ? 'white' : '#16b9b3',
                   height: 87,
                   width: 87,
                 }}
@@ -203,38 +203,38 @@ const Speech = ({ lang, setIsSpeechMode }) => {
             </IconButton>
             <Box
               sx={{
-                color: "#777",
+                color: '#777',
                 fontSize: 32,
                 fontWeight: 400,
-                lineHeight: "48px",
-                maxWidth: "calc(100% - 200px)",
-                display: "flex",
+                lineHeight: '48px',
+                maxWidth: 'calc(100% - 200px)',
+                display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
                 margin: '20px 0',
               }}
             >
-                <Box>{text}</Box>
-                <Box>
+              <Box>{text}</Box>
+              <Box>
                 {reset && (
-                    <Button
+                  <Button
                     color="primary"
                     onClick={resetSpeeching}
                     size="large"
                     variant="outlined"
                     sx={{
-                        margin: '10px 0'
+                      margin: '10px 0',
                     }}
-                    >
-                        再試一次
-                    </Button>
+                  >
+                    再試一次
+                  </Button>
                 )}
-                </Box>
+              </Box>
             </Box>
           </Box>
           <IconButton
-            sx={{ opacity: 0.7, position: "absolute", right: 30, top: 10 }}
+            sx={{ opacity: 0.7, position: 'absolute', right: 30, top: 10 }}
             size="small"
           >
             <ClearIcon />
@@ -243,6 +243,6 @@ const Speech = ({ lang, setIsSpeechMode }) => {
       )}
     </SpeechWrapper>
   );
-}
+};
 
 export default Speech;

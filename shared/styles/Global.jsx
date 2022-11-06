@@ -1,5 +1,5 @@
-import React from "react";
-import { Global, css } from "@emotion/react";
+import React from 'react';
+import { Global, css } from '@emotion/react';
 
 const ResetCSS = css`
   --blue: #007bff;
@@ -161,7 +161,7 @@ const ResetCSS = css`
   blockquote:after,
   q:before,
   q:after {
-    content: "";
+    content: '';
     content: none;
   }
   table {

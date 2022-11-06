@@ -1,24 +1,24 @@
 // https://github.com/mui-org/material-ui/blob/master/examples/nextjs/src/theme.js
-import { createTheme } from "@mui/material/styles";
+import { createTheme } from '@mui/material/styles';
 
 // Create a theme instance.
 const theme = createTheme({
   typography: {
     fontFamily: ["'-apple-system', 'PingFang TC', 'NotoSans TC', 'sans-serif'"],
     h1: {
-      fontSize: "40px",
-      fontWeight: "500",
+      fontSize: '40px',
+      fontWeight: '500',
     },
     h2: {
-      fontSize: "32px",
-      fontWeight: "500",
+      fontSize: '32px',
+      fontWeight: '500',
     },
     h3: {
-      fontSize: "24px",
-      fontWeight: "500",
+      fontSize: '24px',
+      fontWeight: '500',
     },
     p: {
-      display: "inline-block",
+      display: 'inline-block',
     },
   },
   breakpoints: {
@@ -34,30 +34,30 @@ const theme = createTheme({
     MuiTypography: {
       defaultProps: {
         variantMapping: {
-          body1: "span",
-          body2: "span",
+          body1: 'span',
+          body2: 'span',
         },
       },
     },
   },
   palette: {
-    mode: "dark",
+    mode: 'dark',
     primary: {
       // main: "#fff",
-      main: "#16b9b3",
+      main: '#16b9b3',
     },
     secondary: {
-      main: "#32aedd",
+      main: '#32aedd',
     },
     link: {
-      main: "#1461ad",
-      contrastText: "#fff",
+      main: '#1461ad',
+      contrastText: '#fff',
     },
     text: {
-      main: "#0f0f0f",
+      main: '#0f0f0f',
     },
     helper: {
-      main: "#71717a",
+      main: '#71717a',
     },
   },
 });

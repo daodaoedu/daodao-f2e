@@ -9,8 +9,9 @@
     "build": "next build && next export",
     "export": "next build && next export",
     "start": "next start",
-    "lint": "next lint",
-    "sitemap": "next-sitemap"
+    "sitemap": "next-sitemap",
+    "format": "prettier --write \"{pages,components,shared,constants,.vscode}/**/*.{ts*,js*,css,jsx}\" \"*.{ts*,js*,css,jsx}\"",
+    "lint": "yarn format && eslint \"{pages,components,shared,constants}/**/*.{ts,tsx,js,jsx}\" --fix"
   },
   "dependencies": {
     "@emotion/css": "^11.9.0",

@@ -1,17 +1,17 @@
 import styled from '@emotion/styled';
 
 const MenuButtonWrapper = styled.div`
-    height: '32px';
-    width: '32px';
-    display:'flex';
-    flex-direction: 'column';
-    justify-content: 'center';
-    align-items: 'center';
-    cursor: 'pointer';
-    padding: '4px';
-    position: relative;
-    z-index: 100;
-    cursor: pointer;
+  height: '32px';
+  width: '32px';
+  display: 'flex';
+  flex-direction: 'column';
+  justify-content: 'center';
+  align-items: 'center';
+  cursor: 'pointer';
+  padding: '4px';
+  position: relative;
+  z-index: 100;
+  cursor: pointer;
 `;
 
 const MenuButton = ({ onClick, color, open }) => {
@@ -50,9 +50,7 @@ const MenuButton = ({ onClick, color, open }) => {
     },
   };
   return (
-    <MenuButtonWrapper
-      onClick={onClick}
-    >
+    <MenuButtonWrapper onClick={onClick}>
       <div style={{ ...styles.line, ...styles.lineTop }} />
       <div style={{ ...styles.line, ...styles.lineMiddle }} />
       <div style={{ ...styles.line, ...styles.lineBottom }} />

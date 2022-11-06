@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { Typography } from "@mui/material";
+import React from 'react';
+import styled from '@emotion/styled';
+import { Typography } from '@mui/material';
 
 const IconListWrapper = styled.div`
   ul {
@@ -21,9 +21,9 @@ const SubFooter = ({ title, list }) => {
       <Typography
         variant="h2"
         sx={{
-          marginBottom: "10px",
-          fontSize: "18px",
-          fontWeight: "500",
+          marginBottom: '10px',
+          fontSize: '18px',
+          fontWeight: '500',
         }}
       >
         {title}
