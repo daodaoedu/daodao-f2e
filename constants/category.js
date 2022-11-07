@@ -210,14 +210,14 @@ export const NAV_LINK = [
     target: '_self',
   },
   {
-    name: '找場域',
-    link: '/locations',
-    target: '_self',
-  },
-  {
     name: '找故事',
     link: 'https://blog.daoedu.tw',
     target: '_blank',
+  },
+  {
+    name: '找場域',
+    link: '/locations',
+    target: '_self',
   },
   {
     name: '加入社群',
