@@ -205,24 +205,24 @@ export const NAV_LINK = [
     target: '_self',
   },
   {
-    name: '找故事',
-    link: 'https://blog.daoedu.tw',
-    target: '_blank',
-  },
-  {
     name: '找活動',
     link: '/activities',
     target: '_self',
   },
   {
-    name: '加入社群',
-    link: 'https://www.facebook.com/groups/2237666046370459',
+    name: '找場域',
+    link: '/locations',
+    target: '_self',
+  },
+  {
+    name: '找故事',
+    link: 'https://blog.daoedu.tw',
     target: '_blank',
   },
   {
-    name: '教育場域',
-    link: '/locations',
-    target: '_self',
+    name: '加入社群',
+    link: 'https://www.facebook.com/groups/2237666046370459',
+    target: '_blank',
   },
   // {
   //   name: '找學習空間',
@@ -237,23 +237,23 @@ export const NAV_LINK_MOBILE = [
     target: '_self',
   },
   {
-    name: '找故事',
-    link: 'https://blog.daoedu.tw',
-    target: '_blank',
-  },
-  {
-    name: '新增資源',
-    link: '/contribute/resource',
-    target: '_self',
-  },
-  {
     name: '找活動',
     link: '/activities',
     target: '_self',
   },
   {
-    name: '教育場域',
+    name: '找故事',
+    link: 'https://blog.daoedu.tw',
+    target: '_blank',
+  },
+  {
+    name: '找場域',
     link: '/locations',
+    target: '_self',
+  },
+  {
+    name: '新增資源',
+    link: '/contribute/resource',
     target: '_self',
   },
   {
@@ -284,14 +284,14 @@ export const FOOTER_LINK = [
     target: '_self',
   },
   {
+    name: '找場域',
+    link: '/locations',
+    target: '_self',
+  },
+  {
     name: '加入社群',
     link: 'https://www.facebook.com/groups/2237666046370459',
     target: '_blank',
-  },
-  {
-    name: '教育場域',
-    link: '/locations',
-    target: '_self',
   },
   {
     name: '隱私權政策',

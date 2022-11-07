@@ -9,7 +9,7 @@ const LocationsPage = () => {
   const router = useRouter();
   const SEOData = useMemo(
     () => ({
-      title: '教育場域地圖｜島島阿學',
+      title: '實驗教育場域導覽｜島島阿學',
       description:
         '「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
       keywords: '島島阿學',
