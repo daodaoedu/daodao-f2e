@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
@@ -14,6 +14,8 @@ import {
 } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import toast from 'react-hot-toast';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { getAuth } from 'firebase/auth';
 import SEOConfig from '../../../shared/components/SEO';
 import Navigation from '../../../shared/components/Navigation_v2';
 import Footer from '../../../shared/components/Footer_v2';
@@ -46,6 +48,13 @@ const ContentWrapper = styled.div`
 
 const EditPage = () => {
   const router = useRouter();
+  const auth = getAuth();
+  const [user, isLoading, isError] = useAuthState(auth);
+  const [userName, setUserName] = useState('');
+  useEffect(() => {
+    setUserName(user?.displayName || '');
+  }, [user]);
+
   const SEOData = useMemo(
     () => ({
       title: '編輯我的島島資料｜島島阿學',
@@ -92,17 +101,19 @@ const EditPage = () => {
           </Typography>
           <LazyLoadImage
             alt="login"
-            src="https://i.imgur.com/1nhGPPR.png"
+            src={user?.photoURL || ''}
+            // "https://i.imgur.com/1nhGPPR.png"
             height={128}
             width={128}
             effect="opacity"
             style={{
               marginTop: '24px',
-
               borderRadius: '100%',
               background: 'rgba(240, 240, 240, .8)',
               objectFit: 'cover',
               objectPosition: 'center',
+              minWidth: '128px',
+              minHeight: '128px',
             }}
             placeholder={
               // eslint-disable-next-line react/jsx-wrap-multilines
@@ -113,7 +124,7 @@ const EditPage = () => {
                   background: 'rgba(240, 240, 240, .8)',
                   marginTop: '4px',
                 }}
-                variant="rectangular"
+                variant="circular"
                 animation="wave"
               />
             }
@@ -130,7 +141,11 @@ const EditPage = () => {
               }}
             >
               <Typography>您的名稱 *</Typography>
-              <TextField sx={{ width: '100%' }} />
+              <TextField
+                sx={{ width: '100%' }}
+                value={userName}
+                onChange={(event) => setUserName(event.target.value)}
+              />
             </Box>
             <Box
               sx={{

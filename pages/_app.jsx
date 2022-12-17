@@ -6,6 +6,7 @@ import { Provider, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';
+import { initializeApp } from 'firebase/app';
 import GlobalStyle from '../shared/styles/Global';
 import themeFactory from '../shared/styles/themeFactory';
 import storeFactory from '../utils/configureStore';
@@ -14,6 +15,15 @@ import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
 
 const store = storeFactory();
+const firebaseConfig = {
+  apiKey: 'AIzaSyBJK-FKcGHwDy1TMcoJcBdEqbTYpEquUi4',
+  authDomain: 'daodaoedu-4ae8f.firebaseapp.com',
+  projectId: 'daodaoedu-4ae8f',
+  storageBucket: 'daodaoedu-4ae8f.appspot.com',
+  messagingSenderId: '653049466612',
+  appId: '1:653049466612:web:ba41fadb677499a5ae18a1',
+  measurementId: 'G-1EV81PDZF5',
+};
 
 const App = ({ Component, pageProps }) => {
   const router = useRouter();
@@ -79,6 +89,7 @@ const App = ({ Component, pageProps }) => {
 };
 
 const ThemeComponentWrap = ({ pageProps, Component }) => {
+  const firebaseApp = initializeApp(firebaseConfig);
   const mode = useSelector((state) => state?.theme?.mode ?? 'light');
   const theme = useMemo(() => themeFactory(mode), [mode]);
   const isEnv = useMemo(() => process.env.NODE_ENV === 'development', []);

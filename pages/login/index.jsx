@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import Script from 'next/script';
 import { Box, Typography, Button, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import toast from 'react-hot-toast';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import SEOConfig from '../../shared/components/SEO';
 import Navigation from '../../shared/components/Navigation_v2';
 import Footer from '../../shared/components/Footer_v2';
@@ -36,6 +37,7 @@ const ContentWrapper = styled.div`
 `;
 
 const LoginPage = () => {
+  const provider = new GoogleAuthProvider();
   const router = useRouter();
   const SEOData = useMemo(
     () => ({
@@ -50,6 +52,38 @@ const LoginPage = () => {
     }),
     [router?.asPath],
   );
+
+  const onLogin = () => {
+    const auth = getAuth();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        // const credential = GoogleAuthProvider.credentialFromResult(result);
+        // const token = credential.accessToken;
+        // The signed-in user info.
+        // console.log('result', result);
+        const { displayName } = result.user;
+        toast.success(`歡迎登入 ${displayName}`, {
+          style: {
+            color: '#16b9b3',
+            border: '1px solid #16b9b3',
+            marginTop: '70px',
+          },
+          iconTheme: {
+            primary: '#16b9b3',
+          },
+        });
+        router.push('/profile/edit');
+      })
+      .catch((error) => {
+        console.log('error', error);
+        toast.error('登入失敗', {
+          style: {
+            marginTop: '70px',
+          },
+        });
+      });
+  };
 
   return (
     <HomePageWrapper>
@@ -101,6 +135,7 @@ const LoginPage = () => {
             sx={{ marginTop: '24px', width: '100%', borderRadius: '50px' }}
             variant="outlined"
             onClick={() => {
+              onLogin();
               toast.success('你點我做什麼？？？？');
             }}
           >
