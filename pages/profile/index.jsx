@@ -145,7 +145,7 @@ const ProfilePage = () => {
               想一起
             </Typography>
             <Typography sx={{ marginLeft: '12px' }}>
-              學習交流、組課、共學、交朋友
+              衝浪、還有衝浪、或是找別人衝浪、交更多朋友一起衝浪
             </Typography>
           </Box>
           <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
@@ -154,8 +154,7 @@ const ProfilePage = () => {
               簡介
             </Typography>
             <Typography component="p" sx={{}}>
-              休學一年，目前是高二自學生，一直在探索自己喜歡什麼，
-              喜歡聽音樂，最近要開始準備英文考試中檢，有興趣想交流可以來私訊我～
+              開車去衝浪，偶而開出去衝浪
             </Typography>
           </Box>
           <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
