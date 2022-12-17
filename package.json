@@ -48,6 +48,7 @@
     "react-icons": "^4.2.0",
     "react-jitsi": "^1.0.4",
     "react-konva": "^17.0.2-5",
+    "react-lazy-load-image-component": "^1.5.6",
     "react-player": "^2.10.1",
     "react-redux": "^7.2.4",
     "react-share": "^4.4.0",
@@ -61,17 +62,17 @@
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.9.2",
+    "eslint": "^8.0.1",
     "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-html": "^6.1.2",
+    "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-no-console-log": "^2.0.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "prettier": "^2.4.0",
-    "prettier-eslint": "^13.0.0",
-    "eslint": "^8.0.1",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-no-console-log": "^2.0.0",
-    "eslint-plugin-prettier": "^4.0.0"
+    "prettier-eslint": "^13.0.0"
   }
 }
