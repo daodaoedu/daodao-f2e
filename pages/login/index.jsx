@@ -92,6 +92,7 @@ const LoginPage = () => {
                   background: 'rgba(240, 240, 240, .8)',
                   marginTop: '4px',
                 }}
+                variant="rectangular"
                 animation="wave"
               />
             }
@@ -103,7 +104,7 @@ const LoginPage = () => {
               toast.success('你點我做什麼？？？？');
             }}
           >
-            Google 登入
+            Google 登入 / 註冊
           </Button>
           <Box sx={{ marginTop: '24px' }}>
             <Typography sx={{ color: '#536166' }}>
