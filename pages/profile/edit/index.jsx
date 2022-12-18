@@ -25,6 +25,8 @@ import {
   getDocs,
   doc,
   getDoc,
+  setDoc,
+  addDoc,
 } from 'firebase/firestore';
 import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -70,7 +72,7 @@ const ContentWrapper = styled.div`
 const EditPage = () => {
   const router = useRouter();
   const auth = getAuth();
-  const [user, isLoading, isError] = useAuthState(auth);
+  const [user, isLoading] = useAuthState(auth);
   const [userName, setUserName] = useState('');
   const [photoURL, setPhotoURL] = useState('');
   const [birthDay, setBirthDay] = useState(dayjs());
@@ -84,6 +86,7 @@ const EditPage = () => {
   const [description, setDescription] = useState('');
   const [isOpenLocation, setIsOpenLocation] = useState(false);
   const [isOpenProfile, setIsOpenProfile] = useState(false);
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
 
   useEffect(() => {
     if (!isLoading) {
@@ -91,20 +94,83 @@ const EditPage = () => {
       setPhotoURL(user?.photoURL || '');
       const db = getFirestore();
       if (user?.uid) {
-        console.log('auth.currentUser', auth.currentUser);
+        // console.log('auth.currentUser', auth.currentUser);
         const docRef = doc(db, 'user', user?.uid);
         getDoc(docRef).then((docSnap) => {
-          console.log('Document data:', docSnap.data());
-          console.log('docSnap: ', docSnap);
+          const data = docSnap.data();
+          setUserName(data?.userName || '');
+          setPhotoURL(data?.photoURL || '');
+          setBirthDay(dayjs(data?.birthDay) || dayjs());
+          setGender(data?.gender || '');
+          setRoleList(data?.roleList || []);
+          setWantToLearnList(data?.wantToLearnList || []);
+          setInterestAreaList(data?.interestAreaList || []);
+          setEducationStep(data?.educationStep);
+          setLocation(data?.location || '');
+          setUrl(data?.url || '');
+          setDescription(data?.description || '');
+          setIsOpenLocation(data?.isOpenLocation || false);
+          setIsOpenProfile(data?.isOpenProfile || false);
         });
       }
     }
   }, [user, isLoading]);
 
-  const unUpdateUser = () => {
-    updateProfile(auth.currentUser, {
-      displayName: userName,
+  const onUpdateUser = () => {
+    const payload = {
+      userName,
       photoURL,
+      birthDay: birthDay.toISOString(),
+      gender,
+      roleList,
+      wantToLearnList,
+      interestAreaList,
+      educationStep,
+      location,
+      url,
+      description,
+      isOpenLocation,
+      isOpenProfile,
+      lastUpdateDate: dayjs().toISOString(),
+    };
+
+    const db = getFirestore();
+
+    const docRef = doc(db, 'user', user?.uid);
+    getDoc(docRef).then((docSnap) => {
+      setIsLoadingSubmit(true);
+      const isNewUser = Object.keys(docSnap.data() || {}).length === 0;
+      if (isNewUser) {
+        toast
+          .promise(
+            setDoc(docRef, payload).then(() => {
+              setIsLoadingSubmit(false);
+            }),
+            {
+              success: '更新成功！',
+              error: '更新失敗',
+              loading: '更新中...',
+            },
+          )
+          .then(() => {
+            router.push('/profile');
+          });
+      } else {
+        toast
+          .promise(
+            setDoc(docRef, payload).then(() => {
+              setIsLoadingSubmit(false);
+            }),
+            {
+              success: '更新成功！',
+              error: '更新失敗',
+              loading: '更新中...',
+            },
+          )
+          .then(() => {
+            router.push('/profile');
+          });
+      }
     });
   };
 
@@ -907,7 +973,7 @@ const EditPage = () => {
                   公開顯示居住地
                 </Typography>
                 <Switch
-                  value={isOpenLocation}
+                  checked={isOpenLocation}
                   onChange={(event) => setIsOpenLocation(event.target.value)}
                 />
               </Box>
@@ -933,7 +999,7 @@ const EditPage = () => {
                   公開個人頁面尋找夥伴
                 </Typography>
                 <Switch
-                  value={isOpenProfile}
+                  checked={isOpenProfile}
                   onChange={(event) => setIsOpenProfile(event.target.value)}
                 />
               </Box>
@@ -943,8 +1009,9 @@ const EditPage = () => {
               <Button
                 sx={{ width: '100%', borderRadius: '50px' }}
                 variant="outlined"
+                disabled={isLoadingSubmit}
                 onClick={() => {
-                  toast.success('你點我做什麼？？？？');
+                  onUpdateUser();
                 }}
               >
                 儲存資料

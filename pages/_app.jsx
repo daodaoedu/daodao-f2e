@@ -99,7 +99,20 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
       <CssBaseline />
       {/* For custum reset css */}
       <GlobalStyle />
-      <Toaster />
+      <Toaster
+        position="top-center"
+        containerStyle={{ background: 'none', marginTop: '80px' }}
+        toastOptions={{
+          style: {
+            color: '#16b9b3',
+            border: '1px solid #16b9b3',
+            marginTop: '50px',
+          },
+          iconTheme: {
+            primary: '#16b9b3',
+          },
+        }}
+      />
       {isEnv && <Mode />}
       <Component {...pageProps} />
     </ThemeProvider>

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
@@ -13,12 +13,25 @@ import {
   TextareaAutosize,
   Chip,
 } from '@mui/material';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { getAuth, updateProfile } from 'firebase/auth';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import toast from 'react-hot-toast';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  setDoc,
+  addDoc,
+} from 'firebase/firestore';
 import SEOConfig from '../../shared/components/SEO';
 import Navigation from '../../shared/components/Navigation_v2';
 import Footer from '../../shared/components/Footer_v2';
+import { WANT_TO_DO_WITH_PARTNER, CATEGORIES } from '../../constants/member';
+import { mapToTable } from '../../utils/helper';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -49,6 +62,32 @@ const Tag = ({ label }) => (
 
 const ProfilePage = () => {
   const router = useRouter();
+  const auth = getAuth();
+  const [user, isLoading] = useAuthState(auth);
+  const [userName, setUserName] = useState('');
+  const [description, setDescription] = useState('');
+  const [photoURL, setPhotoURL] = useState('');
+  const [wantToLearnList, setWantToLearnList] = useState([]);
+  const [interestAreaList, setInterestAreaList] = useState([]);
+  useEffect(() => {
+    if (!isLoading) {
+      setUserName(user?.displayName || '');
+      setPhotoURL(user?.photoURL || '');
+      const db = getFirestore();
+      if (user?.uid) {
+        const docRef = doc(db, 'user', user?.uid);
+        getDoc(docRef).then((docSnap) => {
+          const data = docSnap.data();
+          // console.log('data', data);
+          setUserName(data?.userName || '');
+          setPhotoURL(data?.photoURL || '');
+          setDescription(data?.description || '');
+          setWantToLearnList(data?.wantToLearnList || []);
+          setInterestAreaList(data?.interestAreaList || []);
+        });
+      }
+    }
+  }, [user, isLoading]);
   const SEOData = useMemo(
     () => ({
       title: '許浪手的小島｜島島阿學',
@@ -63,7 +102,8 @@ const ProfilePage = () => {
     [router?.asPath],
   );
 
-  const tagList = ['衝浪', '還是衝浪', '開車', '買車', '司機', '打電話'];
+  const tagList = interestAreaList.map((item) => mapToTable(CATEGORIES)[item]);
+  // ('衝浪', '還是衝浪', '開車', '買車', '司機', '打電話')
 
   return (
     <HomePageWrapper>
@@ -81,7 +121,10 @@ const ProfilePage = () => {
           >
             <LazyLoadImage
               alt="login"
-              src="https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60"
+              src={
+                photoURL ||
+                'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60'
+              }
               height={80}
               width={80}
               effect="opacity"
@@ -108,7 +151,7 @@ const ProfilePage = () => {
 
             <Box sx={{ marginLeft: '12px' }}>
               <Typography sx={{ color: '#536166', fontSize: '18px' }}>
-                許浪手
+                {userName || '許浪手'}
               </Typography>
               <Typography component="p" sx={{ color: '#92989A' }}>
                 自學生
@@ -145,7 +188,10 @@ const ProfilePage = () => {
               想一起
             </Typography>
             <Typography sx={{ marginLeft: '12px' }}>
-              衝浪、還有衝浪、或是找別人衝浪、交更多朋友一起衝浪
+              {wantToLearnList
+                .map((item) => mapToTable(WANT_TO_DO_WITH_PARTNER)[item])
+                .join(', ') ||
+                '衝浪、還有衝浪、或是找別人衝浪、交更多朋友一起衝浪'}
             </Typography>
           </Box>
           <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
@@ -154,7 +200,7 @@ const ProfilePage = () => {
               簡介
             </Typography>
             <Typography component="p" sx={{}}>
-              開車去衝浪，偶而開出去衝浪
+              {description || '開車去衝浪，偶而開出去衝浪'}
             </Typography>
           </Box>
           <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />

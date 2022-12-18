@@ -68,32 +68,14 @@ const LoginPage = () => {
         const db = getFirestore();
         const docRef = doc(db, 'user', result?.user?.uid);
         getDoc(docRef).then((docSnap) => {
-          const isNewUser = Object.keys(docSnap.data() || {}).length === 0;
-          if (isNewUser) {
-            toast.success(`歡迎初次登入！ ${displayName}`, {
-              style: {
-                color: '#16b9b3',
-                border: '1px solid #16b9b3',
-                marginTop: '70px',
-              },
-              iconTheme: {
-                primary: '#16b9b3',
-              },
-            });
-            router.push('/profile/edit');
-          } else {
-            toast.success(`歡迎回來！ ${displayName}`, {
-              style: {
-                color: '#16b9b3',
-                border: '1px solid #16b9b3',
-                marginTop: '70px',
-              },
-              iconTheme: {
-                primary: '#16b9b3',
-              },
-            });
-            router.push('/');
-          }
+          // const isNewUser = Object.keys(docSnap.data() || {}).length === 0;
+          // if (isNewUser) {
+          toast.success(`歡迎登入！ ${displayName}`);
+          router.push('/profile/edit');
+          // } else {
+          //   toast.success(`歡迎回來！ ${displayName}`);
+          //   router.push('/');
+          // }
         });
       })
       .catch((error) => {
