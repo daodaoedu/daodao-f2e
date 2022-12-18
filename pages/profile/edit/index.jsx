@@ -11,6 +11,8 @@ import {
   Divider,
   Switch,
   TextareaAutosize,
+  MenuItem,
+  Select,
 } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import toast from 'react-hot-toast';
@@ -30,7 +32,12 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import SEOConfig from '../../../shared/components/SEO';
 import Navigation from '../../../shared/components/Navigation_v2';
 import Footer from '../../../shared/components/Footer_v2';
-import { GENDER, ROLE } from '../../../constants/member';
+import {
+  GENDER,
+  ROLE,
+  EDUCATION_STEP,
+  WANT_TO_DO_WITH_PARTNER,
+} from '../../../constants/member';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -64,9 +71,17 @@ const EditPage = () => {
   const [user, isLoading, isError] = useAuthState(auth);
   const [userName, setUserName] = useState('');
   const [photoURL, setPhotoURL] = useState('');
-  const [birthDay, setBirthDay] = useState(dayjs('2014-08-18T21:11:54'));
+  const [birthDay, setBirthDay] = useState(dayjs());
   const [gender, setGender] = useState('');
-  const [role, setRole] = useState('');
+  const [roleList, setRoleList] = useState([]);
+  const [wantToLearnList, setWantToLearnList] = useState([]);
+  const [educationStep, setEducationStep] = useState('-1');
+  const [location, setLocation] = useState('台灣');
+  const [url, setUrl] = useState('');
+  const [description, setDescription] = useState('');
+  const [isOpenLocation, setIsOpenLocation] = useState(false);
+  const [isOpenProfile, setIsOpenProfile] = useState(false);
+
   useEffect(() => {
     if (!isLoading) {
       setUserName(user?.displayName || '');
@@ -265,13 +280,22 @@ const EditPage = () => {
                     alignItems: 'center',
                     width: '100%',
                     marginTop: '10px',
+                    '@media (max-width: 767px)': {
+                      flexDirection: 'column',
+                    },
                   }}
                 >
                   {ROLE.map(({ label, value, image }) => (
                     <Box
                       key={label}
                       onClick={() => {
-                        setRole(value);
+                        if (roleList.includes(value)) {
+                          setRoleList((state) =>
+                            state.filter((data) => data !== value),
+                          );
+                        } else {
+                          setRoleList((state) => [...state, value]);
+                        }
                       }}
                       sx={{
                         border: '1px solid #DBDBDB',
@@ -283,12 +307,16 @@ const EditPage = () => {
                         justifyItems: 'center',
                         alignItems: 'center',
                         cursor: 'pointer',
-                        ...(role === value
+                        ...(roleList.includes(value)
                           ? {
                               backgroundColor: '#DEF5F5',
                               border: '1px solid #16B9B3',
                             }
                           : {}),
+                        '@media (max-width: 767px)': {
+                          width: '100%',
+                          margin: '10px',
+                        },
                       }}
                     >
                       <LazyLoadImage
@@ -302,6 +330,9 @@ const EditPage = () => {
                           background: 'rgba(240, 240, 240, .8)',
                           objectFit: 'cover',
                           objectPosition: 'center',
+                          '@media (max-width: 767px)': {
+                            width: '100%',
+                          },
                         }}
                         placeholder={
                           // eslint-disable-next-line react/jsx-wrap-multilines
@@ -322,7 +353,7 @@ const EditPage = () => {
                         sx={{
                           margin: 'auto',
                           marginTop: '10px',
-                          ...(role === value
+                          ...(roleList.includes(value)
                             ? {
                                 fontWeight: 700,
                               }
@@ -346,10 +377,26 @@ const EditPage = () => {
                 }}
               >
                 <Typography>教育階段</Typography>
-                <TextField
+
+                <Select
+                  labelId="education-step"
+                  id="education-step"
+                  value={educationStep}
+                  onChange={(event) => {
+                    setEducationStep(event.target.value);
+                  }}
+                  // placeholder="請選擇您或孩子目前的教育階段"
                   sx={{ width: '100%' }}
-                  placeholder="請選擇您或孩子目前的教育階段"
-                />
+                >
+                  <MenuItem disabled value="-1">
+                    <em>請選擇您或孩子目前的教育階段</em>
+                  </MenuItem>
+                  {EDUCATION_STEP.map(({ label, value }) => (
+                    <MenuItem key={value} value={value}>
+                      {label}
+                    </MenuItem>
+                  ))}
+                </Select>
               </Box>
               <Box
                 sx={{
@@ -361,7 +408,13 @@ const EditPage = () => {
                 }}
               >
                 <Typography>居住地</Typography>
-                <TextField sx={{ width: '100%' }} />
+                <TextField
+                  sx={{ width: '100%' }}
+                  value={location}
+                  onChange={(event) => {
+                    setLocation(event.target.value);
+                  }}
+                />
               </Box>
               <Box
                 sx={{
@@ -373,7 +426,100 @@ const EditPage = () => {
                 }}
               >
                 <Typography>想和夥伴一起</Typography>
-                <TextField sx={{ width: '100%' }} />
+                <Box sx={{ width: '100%', marginTop: '12px' }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: '100%',
+                    }}
+                  >
+                    {WANT_TO_DO_WITH_PARTNER.slice(0, 3).map(
+                      ({ label, value }) => (
+                        <Box
+                          key={label}
+                          onClick={() => {
+                            if (wantToLearnList.includes(value)) {
+                              setWantToLearnList((state) =>
+                                state.filter((data) => data !== value),
+                              );
+                            } else {
+                              setWantToLearnList((state) => [...state, value]);
+                            }
+                          }}
+                          sx={{
+                            border: '1px solid #DBDBDB',
+                            borderRadius: '8px',
+                            padding: '10px',
+                            width: 'calc(calc(100% - 16px) / 3)',
+                            display: 'flex',
+                            justifyItems: 'center',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            ...(wantToLearnList.includes(value)
+                              ? {
+                                  backgroundColor: '#DEF5F5',
+                                  border: '1px solid #16B9B3',
+                                }
+                              : {}),
+                          }}
+                        >
+                          <Typography sx={{ margin: 'auto' }}>
+                            {label}
+                          </Typography>
+                        </Box>
+                      ),
+                    )}
+                  </Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: '100%',
+                      marginTop: '12px',
+                    }}
+                  >
+                    {WANT_TO_DO_WITH_PARTNER.slice(3).map(
+                      ({ label, value }) => (
+                        <Box
+                          key={label}
+                          onClick={() => {
+                            if (wantToLearnList.includes(value)) {
+                              setWantToLearnList((state) =>
+                                state.filter((data) => data !== value),
+                              );
+                            } else {
+                              setWantToLearnList((state) => [...state, value]);
+                            }
+                          }}
+                          sx={{
+                            border: '1px solid #DBDBDB',
+                            borderRadius: '8px',
+                            padding: '10px',
+                            width: 'calc(calc(100% - 16px) / 3)',
+                            display: 'flex',
+                            justifyItems: 'center',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            ...(wantToLearnList.includes(value)
+                              ? {
+                                  backgroundColor: '#DEF5F5',
+                                  border: '1px solid #16B9B3',
+                                }
+                              : {}),
+                          }}
+                        >
+                          <Typography sx={{ margin: 'auto' }}>
+                            {label}
+                          </Typography>
+                        </Box>
+                      ),
+                    )}
+                  </Box>
+                </Box>
+                {/* <TextField sx={{ width: '100%' }} /> */}
               </Box>
               <Box
                 sx={{
@@ -390,7 +536,7 @@ const EditPage = () => {
                   placeholder="ex.  自學申請、學習方法、學習資源，或各種學習領域的知識"
                 />
               </Box>
-              <Box
+              {/* <Box
                 sx={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -409,7 +555,7 @@ const EditPage = () => {
                 >
                   可以是學習領域、興趣等等的標籤，例如：音樂創作、程式語言、電繪、社會議題。
                 </Typography>
-              </Box>
+              </Box> */}
               <Box
                 sx={{
                   display: 'flex',
@@ -420,7 +566,14 @@ const EditPage = () => {
                 }}
               >
                 <Typography>個人網站或社群</Typography>
-                <TextField sx={{ width: '100%' }} placeholder="https://" />
+                <TextField
+                  sx={{ width: '100%' }}
+                  placeholder="https://"
+                  value={url}
+                  onChange={(event) => {
+                    setUrl(event.target.value);
+                  }}
+                />
               </Box>
               <Box
                 sx={{
@@ -435,11 +588,16 @@ const EditPage = () => {
                 <TextareaAutosize
                   style={{
                     width: '100%',
+                    minHeight: '100px',
                     padding: '10px',
                     borderRadius: '8px',
                     borderColor: 'rgb(0,0,0,0.87)',
                   }}
                   placeholder="寫下關於你的資訊，讓其他島民更認識你！也可以多描述想和夥伴一起做的事喔！"
+                  value={description}
+                  onChange={(event) => {
+                    setDescription(event.target.value);
+                  }}
                 />
               </Box>
               <Divider sx={{ margin: '32px 0' }} />
@@ -463,7 +621,10 @@ const EditPage = () => {
                 >
                   公開顯示居住地
                 </Typography>
-                <Switch />
+                <Switch
+                  value={isOpenLocation}
+                  onChange={(event) => setIsOpenLocation(event.target.value)}
+                />
               </Box>
               <Box
                 sx={{
@@ -486,7 +647,10 @@ const EditPage = () => {
                 >
                   公開個人頁面尋找夥伴
                 </Typography>
-                <Switch />
+                <Switch
+                  value={isOpenProfile}
+                  onChange={(event) => setIsOpenProfile(event.target.value)}
+                />
               </Box>
             </Box>
 

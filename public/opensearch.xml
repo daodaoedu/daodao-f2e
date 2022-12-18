@@ -1,0 +1,15 @@
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+    <ShortName>島島阿學多元學習資源平台</ShortName>
+    <Description>「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。</Description>
+    <Tags>daodaoedu</Tags>
+    <Image height="16" width="16" type="image/vnd.microsoft.icon">https://www.daoedu.tw/favicon.png</Image>
+    <Contact>contact@daoedu.tw</Contact>
+    <Url type="text/html" method="get"
+        template="https://www.daoedu.tw/search?q={searchTerms}" />
+    <Developer>島島阿學 IT Team</Developer>
+    <SyndicationRight>open</SyndicationRight>
+    <AdultContent>false</AdultContent>
+    <Language>zh-tw</Language>
+    <OutputEncoding>UTF-8</OutputEncoding>
+    <InputEncoding>UTF-8</InputEncoding>
+</OpenSearchDescription>
