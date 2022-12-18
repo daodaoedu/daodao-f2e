@@ -6,6 +6,7 @@ import { Box, Typography, Button, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import toast from 'react-hot-toast';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import SEOConfig from '../../shared/components/SEO';
 import Navigation from '../../shared/components/Navigation_v2';
 import Footer from '../../shared/components/Footer_v2';
@@ -55,6 +56,7 @@ const LoginPage = () => {
 
   const onLogin = () => {
     const auth = getAuth();
+
     signInWithPopup(auth, provider)
       .then((result) => {
         // This gives you a Google Access Token. You can use it to access the Google API.
@@ -63,17 +65,36 @@ const LoginPage = () => {
         // The signed-in user info.
         // console.log('result', result);
         const { displayName } = result.user;
-        toast.success(`歡迎登入 ${displayName}`, {
-          style: {
-            color: '#16b9b3',
-            border: '1px solid #16b9b3',
-            marginTop: '70px',
-          },
-          iconTheme: {
-            primary: '#16b9b3',
-          },
+        const db = getFirestore();
+        const docRef = doc(db, 'user', result?.user?.uid);
+        getDoc(docRef).then((docSnap) => {
+          const isNewUser = Object.keys(docSnap.data() || {}).length === 0;
+          if (isNewUser) {
+            toast.success(`歡迎初次登入！ ${displayName}`, {
+              style: {
+                color: '#16b9b3',
+                border: '1px solid #16b9b3',
+                marginTop: '70px',
+              },
+              iconTheme: {
+                primary: '#16b9b3',
+              },
+            });
+            router.push('/profile/edit');
+          } else {
+            toast.success(`歡迎登入 ${displayName}`, {
+              style: {
+                color: '#16b9b3',
+                border: '1px solid #16b9b3',
+                marginTop: '70px',
+              },
+              iconTheme: {
+                primary: '#16b9b3',
+              },
+            });
+            router.push('/profile/edit');
+          }
         });
-        router.push('/profile/edit');
       })
       .catch((error) => {
         console.log('error', error);
@@ -143,10 +164,34 @@ const LoginPage = () => {
           </Button>
           <Box sx={{ marginTop: '24px' }}>
             <Typography sx={{ color: '#536166' }}>
-              還沒有申請帳號嗎？
-            </Typography>
-            <Typography sx={{ color: '#536166', fontWeight: 700 }}>
-              註冊帳號
+              {`註冊即代表您同意島島阿學的 `}
+              <Typography
+                onClick={() => {
+                  router.push('/privacypolicy');
+                }}
+                sx={{
+                  color: '#536166',
+                  fontWeight: 700,
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                }}
+              >
+                服務條款
+              </Typography>
+              {` 與 `}
+              <Typography
+                onClick={() => {
+                  router.push('/privacypolicy');
+                }}
+                sx={{
+                  color: '#536166',
+                  fontWeight: 700,
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                }}
+              >
+                隱私政策
+              </Typography>
             </Typography>
           </Box>
         </ContentWrapper>

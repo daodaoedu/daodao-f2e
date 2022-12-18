@@ -15,7 +15,18 @@ import {
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import toast from 'react-hot-toast';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { getAuth } from 'firebase/auth';
+import { getAuth, updateProfile } from 'firebase/auth';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+} from 'firebase/firestore';
+import dayjs from 'dayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import SEOConfig from '../../../shared/components/SEO';
 import Navigation from '../../../shared/components/Navigation_v2';
 import Footer from '../../../shared/components/Footer_v2';
@@ -51,9 +62,31 @@ const EditPage = () => {
   const auth = getAuth();
   const [user, isLoading, isError] = useAuthState(auth);
   const [userName, setUserName] = useState('');
+  const [photoURL, setPhotoURL] = useState('');
+  const [birthDay, setBirthDay] = useState(dayjs('2014-08-18T21:11:54'));
+  const [gender, setGender] = useState('');
   useEffect(() => {
-    setUserName(user?.displayName || '');
-  }, [user]);
+    if (!isLoading) {
+      setUserName(user?.displayName || '');
+      setPhotoURL(user?.photoURL || '');
+      const db = getFirestore();
+      if (user?.uid) {
+        console.log('auth.currentUser', auth.currentUser);
+        const docRef = doc(db, 'user', user?.uid);
+        getDoc(docRef).then((docSnap) => {
+          console.log('Document data:', docSnap.data());
+          console.log('docSnap: ', docSnap);
+        });
+      }
+    }
+  }, [user, isLoading]);
+
+  const unUpdateUser = () => {
+    updateProfile(auth.currentUser, {
+      displayName: userName,
+      photoURL,
+    });
+  };
 
   const SEOData = useMemo(
     () => ({
@@ -71,341 +104,380 @@ const EditPage = () => {
 
   return (
     <HomePageWrapper>
-      <Script src="https://meet.jit.si/external_api.js" />
       <SEOConfig data={SEOData} />
       <Navigation />
-      <Box sx={{ minHeight: '100vh' }}>
-        <ContentWrapper>
-          <Typography
-            sx={{
-              fontWeight: 700,
-              fontSize: '22px',
-              lineHeight: '140%',
-              textAlign: 'center',
-              color: '#536166',
-            }}
-          >
-            編輯個人頁面
-          </Typography>
-          <Typography
-            sx={{
-              fontWeight: 700,
-              fontSize: '14px',
-              lineHeight: '140%',
-              textAlign: 'center',
-              color: '#536166',
-              marginTop: '8px',
-            }}
-          >
-            填寫完整資訊可以幫助其他夥伴更了解你哦！
-          </Typography>
-          <LazyLoadImage
-            alt="login"
-            src={user?.photoURL || ''}
-            // "https://i.imgur.com/1nhGPPR.png"
-            height={128}
-            width={128}
-            effect="opacity"
-            style={{
-              marginTop: '24px',
-              borderRadius: '100%',
-              background: 'rgba(240, 240, 240, .8)',
-              objectFit: 'cover',
-              objectPosition: 'center',
-              minWidth: '128px',
-              minHeight: '128px',
-            }}
-            placeholder={
-              // eslint-disable-next-line react/jsx-wrap-multilines
-              <Skeleton
-                sx={{
-                  height: '128px',
-                  width: '128px',
-                  background: 'rgba(240, 240, 240, .8)',
-                  marginTop: '4px',
-                }}
-                variant="circular"
-                animation="wave"
-              />
-            }
-          />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Box sx={{ minHeight: '100vh' }}>
+          <ContentWrapper>
+            <Typography
+              sx={{
+                fontWeight: 700,
+                fontSize: '22px',
+                lineHeight: '140%',
+                textAlign: 'center',
+                color: '#536166',
+              }}
+            >
+              編輯個人頁面
+            </Typography>
+            <Typography
+              sx={{
+                fontWeight: 700,
+                fontSize: '14px',
+                lineHeight: '140%',
+                textAlign: 'center',
+                color: '#536166',
+                marginTop: '8px',
+              }}
+            >
+              填寫完整資訊可以幫助其他夥伴更了解你哦！
+            </Typography>
+            <LazyLoadImage
+              alt="login"
+              src={photoURL || ''}
+              // "https://i.imgur.com/1nhGPPR.png"
+              height={128}
+              width={128}
+              effect="opacity"
+              style={{
+                marginTop: '24px',
+                borderRadius: '100%',
+                background: 'rgba(240, 240, 240, .8)',
+                objectFit: 'cover',
+                objectPosition: 'center',
+                minWidth: '128px',
+                minHeight: '128px',
+              }}
+              placeholder={
+                // eslint-disable-next-line react/jsx-wrap-multilines
+                <Skeleton
+                  sx={{
+                    height: '128px',
+                    width: '128px',
+                    background: 'rgba(240, 240, 240, .8)',
+                    marginTop: '4px',
+                  }}
+                  variant="circular"
+                  animation="wave"
+                />
+              }
+            />
 
-          <Box sx={{ marginTop: '50px', width: '100%', padding: '0 5%' }}>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                marginTop: '20px',
-              }}
-            >
-              <Typography>您的名稱 *</Typography>
-              <TextField
-                sx={{ width: '100%' }}
-                value={userName}
-                onChange={(event) => setUserName(event.target.value)}
-              />
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                marginTop: '20px',
-              }}
-            >
-              <Typography>生日 *</Typography>
-              <TextField sx={{ width: '100%' }} />
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                marginTop: '20px',
-              }}
-            >
-              <Typography>性別 *</Typography>
+            <Box sx={{ marginTop: '50px', width: '100%', padding: '0 5%' }}>
               <Box
                 sx={{
                   display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  width: '100%',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginTop: '20px',
                 }}
               >
+                <Typography>您的名稱 *</Typography>
+                <TextField
+                  sx={{ width: '100%' }}
+                  value={userName}
+                  onChange={(event) => setUserName(event.target.value)}
+                />
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginTop: '20px',
+                }}
+              >
+                <Typography>生日 *</Typography>
+                <MobileDatePicker
+                  label="birthDay"
+                  inputFormat="YYYY/MM/DD"
+                  value={birthDay}
+                  onChange={(date) => setBirthDay(date)}
+                  renderInput={(params) => (
+                    <TextField {...params} sx={{ width: '100%' }} label="" />
+                  )}
+                />
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginTop: '20px',
+                }}
+              >
+                <Typography>性別 *</Typography>
                 <Box
                   sx={{
-                    border: '1px solid #DBDBDB',
-                    borderRadius: '8px',
-                    padding: '10px',
-                    width: 'calc(calc(100% - 16px) / 3)',
                     display: 'flex',
-                    justifyItems: 'center',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    cursor: 'pointer',
+                    width: '100%',
                   }}
                 >
-                  <Typography sx={{ margin: 'auto' }}>男性</Typography>
-                </Box>
-                <Box
-                  sx={{
-                    border: '1px solid #DBDBDB',
-                    borderRadius: '8px',
-                    padding: '10px',
-                    width: 'calc(calc(100% - 16px) / 3)',
-                    display: 'flex',
-                    justifyItems: 'center',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Typography sx={{ margin: 'auto' }}>女性</Typography>
-                </Box>
-                <Box
-                  sx={{
-                    border: '1px solid #DBDBDB',
-                    borderRadius: '8px',
-                    padding: '10px',
-                    width: 'calc(calc(100% - 16px) / 3)',
-                    display: 'flex',
-                    justifyItems: 'center',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Typography sx={{ margin: 'auto' }}>其他</Typography>
+                  <Box
+                    onClick={() => {
+                      setGender('male');
+                    }}
+                    sx={{
+                      border: '1px solid #DBDBDB',
+                      borderRadius: '8px',
+                      padding: '10px',
+                      width: 'calc(calc(100% - 16px) / 3)',
+                      display: 'flex',
+                      justifyItems: 'center',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      ...(gender === 'male'
+                        ? {
+                            backgroundColor: '#DEF5F5',
+                            border: '1px solid #16B9B3',
+                          }
+                        : {}),
+                    }}
+                  >
+                    <Typography sx={{ margin: 'auto' }}>男性</Typography>
+                  </Box>
+                  <Box
+                    onClick={() => {
+                      setGender('female');
+                    }}
+                    sx={{
+                      border: '1px solid #DBDBDB',
+                      borderRadius: '8px',
+                      padding: '10px',
+                      width: 'calc(calc(100% - 16px) / 3)',
+                      display: 'flex',
+                      justifyItems: 'center',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      ...(gender === 'female'
+                        ? {
+                            backgroundColor: '#DEF5F5',
+                            border: '1px solid #16B9B3',
+                          }
+                        : {}),
+                    }}
+                  >
+                    <Typography sx={{ margin: 'auto' }}>女性</Typography>
+                  </Box>
+                  <Box
+                    onClick={() => {
+                      setGender('other');
+                    }}
+                    sx={{
+                      border: '1px solid #DBDBDB',
+                      borderRadius: '8px',
+                      padding: '10px',
+                      width: 'calc(calc(100% - 16px) / 3)',
+                      display: 'flex',
+                      justifyItems: 'center',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      ...(gender === 'other'
+                        ? {
+                            backgroundColor: '#DEF5F5',
+                            border: '1px solid #16B9B3',
+                          }
+                        : {}),
+                    }}
+                  >
+                    <Typography sx={{ margin: 'auto' }}>其他</Typography>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                marginTop: '20px',
-              }}
-            >
-              <Typography>身份 *</Typography>
-            </Box>
-            <Divider sx={{ margin: '32px 0' }} />
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                marginTop: '20px',
-              }}
-            >
-              <Typography>教育階段</Typography>
-              <TextField
-                sx={{ width: '100%' }}
-                placeholder="請選擇您或孩子目前的教育階段"
-              />
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                marginTop: '20px',
-              }}
-            >
-              <Typography>居住地</Typography>
-              <TextField sx={{ width: '100%' }} />
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                marginTop: '20px',
-              }}
-            >
-              <Typography>想和夥伴一起</Typography>
-              <TextField sx={{ width: '100%' }} />
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                marginTop: '20px',
-              }}
-            >
-              <Typography>可以和夥伴分享的事物</Typography>
-              <TextField
-                sx={{ width: '100%' }}
-                placeholder="ex.  自學申請、學習方法、學習資源，或各種學習領域的知識"
-              />
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                marginTop: '20px',
-              }}
-            >
-              <Typography>標籤</Typography>
-              <TextField sx={{ width: '100%' }} placeholder="搜尋或新增標籤" />
-              <Typography
-                sx={{ color: '#92989A', fontWeight: 400, fontSize: '14px' }}
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginTop: '20px',
+                }}
               >
-                可以是學習領域、興趣等等的標籤，例如：音樂創作、程式語言、電繪、社會議題。
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                marginTop: '20px',
-              }}
-            >
-              <Typography>個人網站或社群</Typography>
-              <TextField sx={{ width: '100%' }} placeholder="https://" />
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                marginTop: '20px',
-              }}
-            >
-              <Typography>個人簡介</Typography>
-              <TextareaAutosize
-                style={{
-                  width: '100%',
-                  padding: '10px',
+                <Typography>身份 *</Typography>
+              </Box>
+              <Divider sx={{ margin: '32px 0' }} />
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginTop: '20px',
+                }}
+              >
+                <Typography>教育階段</Typography>
+                <TextField
+                  sx={{ width: '100%' }}
+                  placeholder="請選擇您或孩子目前的教育階段"
+                />
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginTop: '20px',
+                }}
+              >
+                <Typography>居住地</Typography>
+                <TextField sx={{ width: '100%' }} />
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginTop: '20px',
+                }}
+              >
+                <Typography>想和夥伴一起</Typography>
+                <TextField sx={{ width: '100%' }} />
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginTop: '20px',
+                }}
+              >
+                <Typography>可以和夥伴分享的事物</Typography>
+                <TextField
+                  sx={{ width: '100%' }}
+                  placeholder="ex.  自學申請、學習方法、學習資源，或各種學習領域的知識"
+                />
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginTop: '20px',
+                }}
+              >
+                <Typography>標籤</Typography>
+                <TextField
+                  sx={{ width: '100%' }}
+                  placeholder="搜尋或新增標籤"
+                />
+                <Typography
+                  sx={{ color: '#92989A', fontWeight: 400, fontSize: '14px' }}
+                >
+                  可以是學習領域、興趣等等的標籤，例如：音樂創作、程式語言、電繪、社會議題。
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginTop: '20px',
+                }}
+              >
+                <Typography>個人網站或社群</Typography>
+                <TextField sx={{ width: '100%' }} placeholder="https://" />
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginTop: '20px',
+                }}
+              >
+                <Typography>個人簡介</Typography>
+                <TextareaAutosize
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    borderRadius: '8px',
+                    borderColor: 'rgb(0,0,0,0.87)',
+                  }}
+                  placeholder="寫下關於你的資訊，讓其他島民更認識你！也可以多描述想和夥伴一起做的事喔！"
+                />
+              </Box>
+              <Divider sx={{ margin: '32px 0' }} />
+              <Box
+                sx={{
+                  border: '1px solid #DBDBDB',
                   borderRadius: '8px',
-                  borderColor: 'rgb(0,0,0,0.87)',
-                }}
-                placeholder="寫下關於你的資訊，讓其他島民更認識你！也可以多描述想和夥伴一起做的事喔！"
-              />
-            </Box>
-            <Divider sx={{ margin: '32px 0' }} />
-            <Box
-              sx={{
-                border: '1px solid #DBDBDB',
-                borderRadius: '8px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '13px 16px',
-              }}
-            >
-              <Typography
-                sx={{
-                  fontWeight: 500,
-                  fontSize: '16px',
-                  lineHeight: '140%',
-                  color: '#293A3D',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '13px 16px',
                 }}
               >
-                公開顯示居住地
-              </Typography>
-              <Switch />
-            </Box>
-            <Box
-              sx={{
-                border: '1px solid #DBDBDB',
-                borderRadius: '8px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '13px 16px',
-                marginTop: '16px',
-              }}
-            >
-              <Typography
+                <Typography
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: '16px',
+                    lineHeight: '140%',
+                    color: '#293A3D',
+                  }}
+                >
+                  公開顯示居住地
+                </Typography>
+                <Switch />
+              </Box>
+              <Box
                 sx={{
-                  fontWeight: 500,
-                  fontSize: '16px',
-                  lineHeight: '140%',
-                  color: '#293A3D',
+                  border: '1px solid #DBDBDB',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '13px 16px',
+                  marginTop: '16px',
                 }}
               >
-                公開個人頁面尋找夥伴
-              </Typography>
-              <Switch />
+                <Typography
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: '16px',
+                    lineHeight: '140%',
+                    color: '#293A3D',
+                  }}
+                >
+                  公開個人頁面尋找夥伴
+                </Typography>
+                <Switch />
+              </Box>
             </Box>
-          </Box>
 
-          <Box sx={{ marginTop: '40px', width: '100%' }}>
-            <Button
-              sx={{ width: '100%', borderRadius: '50px' }}
-              variant="outlined"
-              onClick={() => {
-                toast.success('你點我做什麼？？？？');
-              }}
-            >
-              儲存資料
-            </Button>
-            <Button
-              sx={{ marginTop: '20px', width: '100%', borderRadius: '50px' }}
-              variant="outlined"
-              onClick={() => {
-                toast.success('你點我做什麼？？？？');
-              }}
-            >
-              查看我的頁面
-            </Button>
-          </Box>
-        </ContentWrapper>
-      </Box>
+            <Box sx={{ marginTop: '40px', width: '100%' }}>
+              <Button
+                sx={{ width: '100%', borderRadius: '50px' }}
+                variant="outlined"
+                onClick={() => {
+                  toast.success('你點我做什麼？？？？');
+                }}
+              >
+                儲存資料
+              </Button>
+              <Button
+                sx={{ marginTop: '20px', width: '100%', borderRadius: '50px' }}
+                variant="outlined"
+                onClick={() => {
+                  toast.success('你點我做什麼？？？？');
+                }}
+              >
+                查看我的頁面
+              </Button>
+            </Box>
+          </ContentWrapper>
+        </Box>
+      </LocalizationProvider>
       <Footer />
     </HomePageWrapper>
   );
