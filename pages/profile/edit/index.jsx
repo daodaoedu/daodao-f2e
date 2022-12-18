@@ -30,6 +30,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import SEOConfig from '../../../shared/components/SEO';
 import Navigation from '../../../shared/components/Navigation_v2';
 import Footer from '../../../shared/components/Footer_v2';
+import { GENDER, ROLE } from '../../../constants/member';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -46,7 +47,7 @@ const ContentWrapper = styled.div`
   border-radius: 8px;
   margin: 50px auto;
   padding: 40px 10px;
-  max-width: 440px;
+  max-width: 80%;
   width: 100%;
   @media (max-width: 767px) {
     width: 90%;
@@ -65,6 +66,7 @@ const EditPage = () => {
   const [photoURL, setPhotoURL] = useState('');
   const [birthDay, setBirthDay] = useState(dayjs('2014-08-18T21:11:54'));
   const [gender, setGender] = useState('');
+  const [role, setRole] = useState('');
   useEffect(() => {
     if (!isLoading) {
       setUserName(user?.displayName || '');
@@ -218,75 +220,32 @@ const EditPage = () => {
                     width: '100%',
                   }}
                 >
-                  <Box
-                    onClick={() => {
-                      setGender('male');
-                    }}
-                    sx={{
-                      border: '1px solid #DBDBDB',
-                      borderRadius: '8px',
-                      padding: '10px',
-                      width: 'calc(calc(100% - 16px) / 3)',
-                      display: 'flex',
-                      justifyItems: 'center',
-                      alignItems: 'center',
-                      cursor: 'pointer',
-                      ...(gender === 'male'
-                        ? {
-                            backgroundColor: '#DEF5F5',
-                            border: '1px solid #16B9B3',
-                          }
-                        : {}),
-                    }}
-                  >
-                    <Typography sx={{ margin: 'auto' }}>男性</Typography>
-                  </Box>
-                  <Box
-                    onClick={() => {
-                      setGender('female');
-                    }}
-                    sx={{
-                      border: '1px solid #DBDBDB',
-                      borderRadius: '8px',
-                      padding: '10px',
-                      width: 'calc(calc(100% - 16px) / 3)',
-                      display: 'flex',
-                      justifyItems: 'center',
-                      alignItems: 'center',
-                      cursor: 'pointer',
-                      ...(gender === 'female'
-                        ? {
-                            backgroundColor: '#DEF5F5',
-                            border: '1px solid #16B9B3',
-                          }
-                        : {}),
-                    }}
-                  >
-                    <Typography sx={{ margin: 'auto' }}>女性</Typography>
-                  </Box>
-                  <Box
-                    onClick={() => {
-                      setGender('other');
-                    }}
-                    sx={{
-                      border: '1px solid #DBDBDB',
-                      borderRadius: '8px',
-                      padding: '10px',
-                      width: 'calc(calc(100% - 16px) / 3)',
-                      display: 'flex',
-                      justifyItems: 'center',
-                      alignItems: 'center',
-                      cursor: 'pointer',
-                      ...(gender === 'other'
-                        ? {
-                            backgroundColor: '#DEF5F5',
-                            border: '1px solid #16B9B3',
-                          }
-                        : {}),
-                    }}
-                  >
-                    <Typography sx={{ margin: 'auto' }}>其他</Typography>
-                  </Box>
+                  {GENDER.map(({ label, value }) => (
+                    <Box
+                      key={label}
+                      onClick={() => {
+                        setGender(value);
+                      }}
+                      sx={{
+                        border: '1px solid #DBDBDB',
+                        borderRadius: '8px',
+                        padding: '10px',
+                        width: 'calc(calc(100% - 16px) / 3)',
+                        display: 'flex',
+                        justifyItems: 'center',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        ...(gender === value
+                          ? {
+                              backgroundColor: '#DEF5F5',
+                              border: '1px solid #16B9B3',
+                            }
+                          : {}),
+                      }}
+                    >
+                      <Typography sx={{ margin: 'auto' }}>{label}</Typography>
+                    </Box>
+                  ))}
                 </Box>
               </Box>
               <Box
@@ -299,6 +258,82 @@ const EditPage = () => {
                 }}
               >
                 <Typography>身份 *</Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    marginTop: '10px',
+                  }}
+                >
+                  {ROLE.map(({ label, value, image }) => (
+                    <Box
+                      key={label}
+                      onClick={() => {
+                        setRole(value);
+                      }}
+                      sx={{
+                        border: '1px solid #DBDBDB',
+                        borderRadius: '8px',
+                        padding: '10px',
+                        width: 'calc(calc(100% - 24px) / 4)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyItems: 'center',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        ...(role === value
+                          ? {
+                              backgroundColor: '#DEF5F5',
+                              border: '1px solid #16B9B3',
+                            }
+                          : {}),
+                      }}
+                    >
+                      <LazyLoadImage
+                        alt={label}
+                        src={image}
+                        effect="opacity"
+                        style={{
+                          height: '100px',
+                          width: '100%',
+                          borderRadius: '6px',
+                          background: 'rgba(240, 240, 240, .8)',
+                          objectFit: 'cover',
+                          objectPosition: 'center',
+                        }}
+                        placeholder={
+                          // eslint-disable-next-line react/jsx-wrap-multilines
+                          <Skeleton
+                            sx={{
+                              height: '100px',
+                              width: '100%',
+                              borderRadius: '6px',
+                              background: 'rgba(240, 240, 240, .8)',
+                              marginTop: '4px',
+                            }}
+                            variant="rectangular"
+                            animation="wave"
+                          />
+                        }
+                      />
+                      <Typography
+                        sx={{
+                          margin: 'auto',
+                          marginTop: '10px',
+                          ...(role === value
+                            ? {
+                                fontWeight: 700,
+                              }
+                            : {}),
+                        }}
+                      >
+                        {label}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
               </Box>
               <Divider sx={{ margin: '32px 0' }} />
               <Box
