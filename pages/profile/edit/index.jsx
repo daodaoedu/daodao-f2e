@@ -388,7 +388,7 @@ const EditPage = () => {
                       width: '100%',
                     }}
                   >
-                    {CATEGORIES.slice(0, 4).map(({ label, value }) => (
+                    {CATEGORIES.slice(0, 4).map(({ label, value, image }) => (
                       <Box
                         key={label}
                         onClick={() => {
@@ -406,6 +406,7 @@ const EditPage = () => {
                           padding: '10px',
                           width: 'calc(calc(100% - 16px) / 4)',
                           display: 'flex',
+                          flexDirection: 'column',
                           justifyItems: 'center',
                           alignItems: 'center',
                           cursor: 'pointer',
@@ -417,7 +418,48 @@ const EditPage = () => {
                             : {}),
                         }}
                       >
-                        <Typography sx={{ margin: 'auto' }}>{label}</Typography>
+                        <LazyLoadImage
+                          alt={label}
+                          src={image}
+                          effect="opacity"
+                          style={{
+                            height: '100px',
+                            width: '100%',
+                            borderRadius: '6px',
+                            background: 'rgba(240, 240, 240, .8)',
+                            objectFit: 'cover',
+                            objectPosition: 'center',
+                            '@media (max-width: 767px)': {
+                              width: '100%',
+                            },
+                          }}
+                          placeholder={
+                            // eslint-disable-next-line react/jsx-wrap-multilines
+                            <Skeleton
+                              sx={{
+                                height: '100px',
+                                width: '100%',
+                                borderRadius: '6px',
+                                background: 'rgba(240, 240, 240, .8)',
+                                marginTop: '4px',
+                              }}
+                              variant="rectangular"
+                              animation="wave"
+                            />
+                          }
+                        />
+                        <Typography
+                          sx={{
+                            margin: 'auto',
+                            ...(interestAreaList.includes(value)
+                              ? {
+                                  fontWeight: 700,
+                                }
+                              : {}),
+                          }}
+                        >
+                          {label}
+                        </Typography>
                       </Box>
                     ))}
                   </Box>
@@ -430,7 +472,7 @@ const EditPage = () => {
                       marginTop: '12px',
                     }}
                   >
-                    {CATEGORIES.slice(4, 8).map(({ label, value }) => (
+                    {CATEGORIES.slice(4, 8).map(({ label, value, image }) => (
                       <Box
                         key={label}
                         onClick={() => {
@@ -448,6 +490,7 @@ const EditPage = () => {
                           padding: '10px',
                           width: 'calc(calc(100% - 16px) / 4)',
                           display: 'flex',
+                          flexDirection: 'column',
                           justifyItems: 'center',
                           alignItems: 'center',
                           cursor: 'pointer',
@@ -459,7 +502,48 @@ const EditPage = () => {
                             : {}),
                         }}
                       >
-                        <Typography sx={{ margin: 'auto' }}>{label}</Typography>
+                        <LazyLoadImage
+                          alt={label}
+                          src={image}
+                          effect="opacity"
+                          style={{
+                            height: '100px',
+                            width: '100%',
+                            borderRadius: '6px',
+                            background: 'rgba(240, 240, 240, .8)',
+                            objectFit: 'cover',
+                            objectPosition: 'center',
+                            '@media (max-width: 767px)': {
+                              width: '100%',
+                            },
+                          }}
+                          placeholder={
+                            // eslint-disable-next-line react/jsx-wrap-multilines
+                            <Skeleton
+                              sx={{
+                                height: '100px',
+                                width: '100%',
+                                borderRadius: '6px',
+                                background: 'rgba(240, 240, 240, .8)',
+                                marginTop: '4px',
+                              }}
+                              variant="rectangular"
+                              animation="wave"
+                            />
+                          }
+                        />
+                        <Typography
+                          sx={{
+                            margin: 'auto',
+                            ...(interestAreaList.includes(value)
+                              ? {
+                                  fontWeight: 700,
+                                }
+                              : {}),
+                          }}
+                        >
+                          {label}
+                        </Typography>
                       </Box>
                     ))}
                   </Box>
@@ -472,7 +556,7 @@ const EditPage = () => {
                       marginTop: '12px',
                     }}
                   >
-                    {CATEGORIES.slice(8).map(({ label, value }) => (
+                    {CATEGORIES.slice(8).map(({ label, value, image }) => (
                       <Box
                         key={label}
                         onClick={() => {
@@ -490,6 +574,7 @@ const EditPage = () => {
                           padding: '10px',
                           width: 'calc(calc(100% - 16px) / 4)',
                           display: 'flex',
+                          flexDirection: 'column',
                           justifyItems: 'center',
                           alignItems: 'center',
                           cursor: 'pointer',
@@ -501,7 +586,48 @@ const EditPage = () => {
                             : {}),
                         }}
                       >
-                        <Typography sx={{ margin: 'auto' }}>{label}</Typography>
+                        <LazyLoadImage
+                          alt={label}
+                          src={image}
+                          effect="opacity"
+                          style={{
+                            height: '100px',
+                            width: '100%',
+                            borderRadius: '6px',
+                            background: 'rgba(240, 240, 240, .8)',
+                            objectFit: 'cover',
+                            objectPosition: 'center',
+                            '@media (max-width: 767px)': {
+                              width: '100%',
+                            },
+                          }}
+                          placeholder={
+                            // eslint-disable-next-line react/jsx-wrap-multilines
+                            <Skeleton
+                              sx={{
+                                height: '100px',
+                                width: '100%',
+                                borderRadius: '6px',
+                                background: 'rgba(240, 240, 240, .8)',
+                                marginTop: '4px',
+                              }}
+                              variant="rectangular"
+                              animation="wave"
+                            />
+                          }
+                        />
+                        <Typography
+                          sx={{
+                            margin: 'auto',
+                            ...(interestAreaList.includes(value)
+                              ? {
+                                  fontWeight: 700,
+                                }
+                              : {}),
+                          }}
+                        >
+                          {label}
+                        </Typography>
                       </Box>
                     ))}
                   </Box>
@@ -827,7 +953,7 @@ const EditPage = () => {
                 sx={{ marginTop: '20px', width: '100%', borderRadius: '50px' }}
                 variant="outlined"
                 onClick={() => {
-                  toast.success('你點我做什麼？？？？');
+                  router.push('/profile');
                 }}
               >
                 查看我的頁面
