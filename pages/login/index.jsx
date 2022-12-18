@@ -82,7 +82,7 @@ const LoginPage = () => {
             });
             router.push('/profile/edit');
           } else {
-            toast.success(`歡迎登入 ${displayName}`, {
+            toast.success(`歡迎回來！ ${displayName}`, {
               style: {
                 color: '#16b9b3',
                 border: '1px solid #16b9b3',
@@ -92,7 +92,7 @@ const LoginPage = () => {
                 primary: '#16b9b3',
               },
             });
-            router.push('/profile/edit');
+            router.push('/');
           }
         });
       })

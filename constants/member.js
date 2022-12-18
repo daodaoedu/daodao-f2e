@@ -102,3 +102,54 @@ export const WANT_TO_DO_WITH_PARTNER = [
     value: 'teach-together',
   },
 ];
+
+export const CATEGORIES = [
+  {
+    label: '語言與文學',
+    value: 'language',
+  },
+  {
+    label: '數學與邏輯',
+    value: 'math',
+  },
+  {
+    label: '資訊與工程',
+    value: 'computer',
+  },
+  {
+    label: '人文社會',
+    value: 'humanity',
+  },
+  {
+    label: '自然科學',
+    value: 'nature-science',
+  },
+  {
+    label: '藝術',
+    value: 'art',
+  },
+  {
+    label: '教育',
+    value: 'education',
+  },
+  {
+    label: '生活',
+    value: 'life',
+  },
+  {
+    label: '運動/心理/醫學',
+    value: 'health',
+  },
+  {
+    label: '商業與社會創新',
+    value: 'business',
+  },
+  {
+    label: '綜合型學習資源',
+    value: 'multires',
+  },
+  {
+    label: '學習/教學工具',
+    value: 'learningtools',
+  },
+];

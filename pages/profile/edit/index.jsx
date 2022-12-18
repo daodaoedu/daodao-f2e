@@ -37,7 +37,9 @@ import {
   ROLE,
   EDUCATION_STEP,
   WANT_TO_DO_WITH_PARTNER,
+  CATEGORIES,
 } from '../../../constants/member';
+import COUNTIES from '../../../constants/countries.json';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -75,8 +77,9 @@ const EditPage = () => {
   const [gender, setGender] = useState('');
   const [roleList, setRoleList] = useState([]);
   const [wantToLearnList, setWantToLearnList] = useState([]);
+  const [interestAreaList, setInterestAreaList] = useState([]);
   const [educationStep, setEducationStep] = useState('-1');
-  const [location, setLocation] = useState('台灣');
+  const [location, setLocation] = useState('tw');
   const [url, setUrl] = useState('');
   const [description, setDescription] = useState('');
   const [isOpenLocation, setIsOpenLocation] = useState(false);
@@ -366,6 +369,144 @@ const EditPage = () => {
                   ))}
                 </Box>
               </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginTop: '20px',
+                }}
+              >
+                <Typography>有興趣的領域 *</Typography>
+                <Box sx={{ width: '100%', marginTop: '12px' }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: '100%',
+                    }}
+                  >
+                    {CATEGORIES.slice(0, 4).map(({ label, value }) => (
+                      <Box
+                        key={label}
+                        onClick={() => {
+                          if (interestAreaList.includes(value)) {
+                            setInterestAreaList((state) =>
+                              state.filter((data) => data !== value),
+                            );
+                          } else {
+                            setInterestAreaList((state) => [...state, value]);
+                          }
+                        }}
+                        sx={{
+                          border: '1px solid #DBDBDB',
+                          borderRadius: '8px',
+                          padding: '10px',
+                          width: 'calc(calc(100% - 16px) / 4)',
+                          display: 'flex',
+                          justifyItems: 'center',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                          ...(interestAreaList.includes(value)
+                            ? {
+                                backgroundColor: '#DEF5F5',
+                                border: '1px solid #16B9B3',
+                              }
+                            : {}),
+                        }}
+                      >
+                        <Typography sx={{ margin: 'auto' }}>{label}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: '100%',
+                      marginTop: '12px',
+                    }}
+                  >
+                    {CATEGORIES.slice(4, 8).map(({ label, value }) => (
+                      <Box
+                        key={label}
+                        onClick={() => {
+                          if (interestAreaList.includes(value)) {
+                            setInterestAreaList((state) =>
+                              state.filter((data) => data !== value),
+                            );
+                          } else {
+                            setInterestAreaList((state) => [...state, value]);
+                          }
+                        }}
+                        sx={{
+                          border: '1px solid #DBDBDB',
+                          borderRadius: '8px',
+                          padding: '10px',
+                          width: 'calc(calc(100% - 16px) / 4)',
+                          display: 'flex',
+                          justifyItems: 'center',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                          ...(interestAreaList.includes(value)
+                            ? {
+                                backgroundColor: '#DEF5F5',
+                                border: '1px solid #16B9B3',
+                              }
+                            : {}),
+                        }}
+                      >
+                        <Typography sx={{ margin: 'auto' }}>{label}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: '100%',
+                      marginTop: '12px',
+                    }}
+                  >
+                    {CATEGORIES.slice(8).map(({ label, value }) => (
+                      <Box
+                        key={label}
+                        onClick={() => {
+                          if (interestAreaList.includes(value)) {
+                            setInterestAreaList((state) =>
+                              state.filter((data) => data !== value),
+                            );
+                          } else {
+                            setInterestAreaList((state) => [...state, value]);
+                          }
+                        }}
+                        sx={{
+                          border: '1px solid #DBDBDB',
+                          borderRadius: '8px',
+                          padding: '10px',
+                          width: 'calc(calc(100% - 16px) / 4)',
+                          display: 'flex',
+                          justifyItems: 'center',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                          ...(interestAreaList.includes(value)
+                            ? {
+                                backgroundColor: '#DEF5F5',
+                                border: '1px solid #16B9B3',
+                              }
+                            : {}),
+                        }}
+                      >
+                        <Typography sx={{ margin: 'auto' }}>{label}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+              </Box>
               <Divider sx={{ margin: '32px 0' }} />
               <Box
                 sx={{
@@ -377,7 +518,6 @@ const EditPage = () => {
                 }}
               >
                 <Typography>教育階段</Typography>
-
                 <Select
                   labelId="education-step"
                   id="education-step"
@@ -408,13 +548,32 @@ const EditPage = () => {
                 }}
               >
                 <Typography>居住地</Typography>
-                <TextField
+                <Select
+                  labelId="location"
+                  id="location"
+                  value={location}
+                  onChange={(event) => {
+                    setLocation(event.target.value);
+                  }}
+                  // placeholder="請選擇您或孩子目前的教育階段"
+                  sx={{ width: '100%' }}
+                >
+                  <MenuItem disabled value="-1">
+                    <em>請選擇居住地</em>
+                  </MenuItem>
+                  {COUNTIES.map(({ name, alpha2 }) => (
+                    <MenuItem key={alpha2} value={alpha2}>
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {/* <TextField
                   sx={{ width: '100%' }}
                   value={location}
                   onChange={(event) => {
                     setLocation(event.target.value);
                   }}
-                />
+                /> */}
               </Box>
               <Box
                 sx={{
