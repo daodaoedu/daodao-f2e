@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://www.daoedu.tw</id>
     <title>島島阿學多元學習社群</title>
-    <updated>2022-11-06T07:55:03.487Z</updated>
+    <updated>2022-12-19T12:43:27.029Z</updated>
     <generator>Feed for Node.js</generator>
     <author>
         <name>島島阿學多元學習社群</name>
@@ -15,6 +15,312 @@
     <logo>https://www.daoedu.tw/preview.webp</logo>
     <icon>https://www.daoedu.tw/favicon.png</icon>
     <rights>All rights reserved 2022, 島島阿學</rights>
+    <entry>
+        <title type="html"><![CDATA[kagi的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/kagi</id>
+        <link href="https://www.daoedu.tw/resource/kagi"/>
+        <updated>2022-12-19T09:13:00.000Z</updated>
+        <summary type="html"><![CDATA[讓使用者的搜尋更具有隱私性且擁有更好的搜尋體驗，每個月提供免費50次的搜尋額度，只需繳費10美金即可享受無線搜尋次數]]></summary>
+        <content type="html"><![CDATA[讓使用者的搜尋更具有隱私性且擁有更好的搜尋體驗，每個月提供免費50次的搜尋額度，只需繳費10美金即可享受無線搜尋次數]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[怪咖系列的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/怪咖系列</id>
+        <link href="https://www.daoedu.tw/resource/怪咖系列"/>
+        <updated>2022-12-18T12:57:00.000Z</updated>
+        <summary type="html"><![CDATA[由隆中向上教育基金會支持、是個三年、18支短片的拍攝計畫．由楊力州監製Ｘ新世代導演執導；橫跨動保、同婚、女性、教育等不同面向的反思和倡議…（簡介摘自]]></summary>
+        <content type="html"><![CDATA[由隆中向上教育基金會支持、是個三年、18支短片的拍攝計畫．由楊力州監製Ｘ新世代導演執導；橫跨動保、同婚、女性、教育等不同面向的反思和倡議…（簡介摘自]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[超級歪 SuperY的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/超級歪 SuperY</id>
+        <link href="https://www.daoedu.tw/resource/超級歪 SuperY"/>
+        <updated>2022-12-12T11:51:00.000Z</updated>
+        <summary type="html"><![CDATA[本頻道有許多大量社科領域知識、哲學思想介紹／思辨，還有一些社會議題的探討。]]></summary>
+        <content type="html"><![CDATA[本頻道有許多大量社科領域知識、哲學思想介紹／思辨，還有一些社會議題的探討。]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[上學之WHY的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/上學之WHY</id>
+        <link href="https://www.daoedu.tw/resource/上學之WHY"/>
+        <updated>2022-12-10T02:39:00.000Z</updated>
+        <summary type="html"><![CDATA[【探討教育、學習、校園風氣以及課程設計】
+鳥仔透過 ❝ 閒聊教育理論、比較國內外教育體制 ❞
+讓我們一起，重新思考台灣教育的過去、現況與未來吧！]]></summary>
+        <content type="html"><![CDATA[【探討教育、學習、校園風氣以及課程設計】
+鳥仔透過 ❝ 閒聊教育理論、比較國內外教育體制 ❞
+讓我們一起，重新思考台灣教育的過去、現況與未來吧！]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[知識好好玩的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/知識好好玩</id>
+        <link href="https://www.daoedu.tw/resource/知識好好玩"/>
+        <updated>2022-12-08T15:13:00.000Z</updated>
+        <summary type="html"><![CDATA[知識是什麼？知識是永無止盡的好奇心，是在假設與驗證間的來回探索，人們為何會傷心？大腦藏著甚麼秘密？說著不同話語為何代表相同的事？《知識好好玩》帶您與哲學、心理學、大腦、物理、性別、語言學等各領域專家，一起挖掘現象背後的原理，用最有趣的方式，把複雜困難的知識說給您聽。
+《知識好好玩》已企劃推出以下節目 #動物好好玩 #戒不了的癮 #哲學好好玩 #性別好好玩 #大腦好好玩 #物理好好玩 #語言好好玩 #犯罪心理學大解析 #科學月台 。
+跟著烏賊達人清大生科系焦傳金教授一起了解動物的感官有哪些「異於常人」之處？讓紀金慶教授以簡明生動的方式解析深奧的哲學經典，帶著大家跟著哲學家班雅明，思索與拆解現代性的核心概念，除此之外還有更多豐富精彩的知識等你來聽！]]></summary>
+        <content type="html"><![CDATA[知識是什麼？知識是永無止盡的好奇心，是在假設與驗證間的來回探索，人們為何會傷心？大腦藏著甚麼秘密？說著不同話語為何代表相同的事？《知識好好玩》帶您與哲學、心理學、大腦、物理、性別、語言學等各領域專家，一起挖掘現象背後的原理，用最有趣的方式，把複雜困難的知識說給您聽。
+《知識好好玩》已企劃推出以下節目 #動物好好玩 #戒不了的癮 #哲學好好玩 #性別好好玩 #大腦好好玩 #物理好好玩 #語言好好玩 #犯罪心理學大解析 #科學月台 。
+跟著烏賊達人清大生科系焦傳金教授一起了解動物的感官有哪些「異於常人」之處？讓紀金慶教授以簡明生動的方式解析深奧的哲學經典，帶著大家跟著哲學家班雅明，思索與拆解現代性的核心概念，除此之外還有更多豐富精彩的知識等你來聽！]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Story Corps的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/Story Corps</id>
+        <link href="https://www.daoedu.tw/resource/Story Corps"/>
+        <updated>2022-11-27T05:27:00.000Z</updated>
+        <summary type="html"><![CDATA[故事經歷分享／初級OK!／多元觀點
+每集二至四分鐘不等，以採訪各式各樣的美國人為核心，適合初次接觸全英文podcast的你❤️‍🔥]]></summary>
+        <content type="html"><![CDATA[故事經歷分享／初級OK!／多元觀點
+每集二至四分鐘不等，以採訪各式各樣的美國人為核心，適合初次接觸全英文podcast的你❤️‍🔥]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[To Fluency的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/To Fluency</id>
+        <link href="https://www.daoedu.tw/resource/To Fluency"/>
+        <updated>2022-11-27T05:22:00.000Z</updated>
+        <summary type="html"><![CDATA[專攻聽力／外師教學／英美式發音一次擁有🇬🇧🇺🇸
+由一對擁有專業外語教學背景的英美雙國籍夫婦經營，主題有趣又貼近生活，絕對是無壓學習的最佳管道！]]></summary>
+        <content type="html"><![CDATA[專攻聽力／外師教學／英美式發音一次擁有🇬🇧🇺🇸
+由一對擁有專業外語教學背景的英美雙國籍夫婦經營，主題有趣又貼近生活，絕對是無壓學習的最佳管道！]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[One-Forty的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/One-Forty</id>
+        <link href="https://www.daoedu.tw/resource/One-Forty"/>
+        <updated>2022-11-27T05:07:00.000Z</updated>
+        <summary type="html"><![CDATA[我們是 One-Forty，一個關注東南亞移工教育的非營利組織。從 2015 年開始，One-Forty 專注於培力東南亞移工，讓移工在台灣的跨國旅程持續學習實用的知識技能，除了適應異鄉生活，回國後更有能力經濟獨立、打破貧窮的惡性循環，為自己、家人、家鄉，乃至下一代創造更好的生活。One-Forty 也定期籌劃各種文化交流活動，持續創造台灣人與東南亞移工的互動與同理，更看見彼此身上的故事和價值。最終，我們希望讓台灣成為一個更多元包容且實質友善的社會。]]></summary>
+        <content type="html"><![CDATA[我們是 One-Forty，一個關注東南亞移工教育的非營利組織。從 2015 年開始，One-Forty 專注於培力東南亞移工，讓移工在台灣的跨國旅程持續學習實用的知識技能，除了適應異鄉生活，回國後更有能力經濟獨立、打破貧窮的惡性循環，為自己、家人、家鄉，乃至下一代創造更好的生活。One-Forty 也定期籌劃各種文化交流活動，持續創造台灣人與東南亞移工的互動與同理，更看見彼此身上的故事和價值。最終，我們希望讓台灣成為一個更多元包容且實質友善的社會。]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[NoteFull的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/NoteFull</id>
+        <link href="https://www.daoedu.tw/resource/NoteFull"/>
+        <updated>2022-11-14T04:06:00.000Z</updated>
+        <summary type="html"><![CDATA[外國人學習TOEFL推薦的YouTube影片，會教學生解題技巧與十常犯錯的問題。]]></summary>
+        <content type="html"><![CDATA[外國人學習TOEFL推薦的YouTube影片，會教學生解題技巧與十常犯錯的問題。]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[青年志工站的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/青年志工站</id>
+        <link href="https://www.daoedu.tw/resource/青年志工站"/>
+        <updated>2022-11-12T12:05:00.000Z</updated>
+        <summary type="html"><![CDATA[教育部青年發展署(以下簡稱本署)歷年致力於推展青年志願服務，成功累積並見證臺灣青年投入志願服務之經驗及風氣，然而面對臺灣快速的人口結構改變與社會變遷，新的社會議題與挑戰亦不斷產生。在過去推動志願服務的基礎上，除了持續整合縣市政府、民間團體及學校等資源共同推動青年志願服務外，也逐年藉由培力、參與、對話及合作的機制，並鏈結國內青年社會創新服務團隊，以青年持續的熱情及詮釋世界的方式，投入社會願景的創造、維繫及探討，塑造青年自主式社會行動的再生。]]></summary>
+        <content type="html"><![CDATA[教育部青年發展署(以下簡稱本署)歷年致力於推展青年志願服務，成功累積並見證臺灣青年投入志願服務之經驗及風氣，然而面對臺灣快速的人口結構改變與社會變遷，新的社會議題與挑戰亦不斷產生。在過去推動志願服務的基礎上，除了持續整合縣市政府、民間團體及學校等資源共同推動青年志願服務外，也逐年藉由培力、參與、對話及合作的機制，並鏈結國內青年社會創新服務團隊，以青年持續的熱情及詮釋世界的方式，投入社會願景的創造、維繫及探討，塑造青年自主式社會行動的再生。]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[芭樂人類學的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/芭樂人類學</id>
+        <link href="https://www.daoedu.tw/resource/芭樂人類學"/>
+        <updated>2022-11-12T12:01:00.000Z</updated>
+        <summary type="html"><![CDATA[非常知名的國內人類學科普網站，內容包含田野調查、民族誌、社會運動...等]]></summary>
+        <content type="html"><![CDATA[非常知名的國內人類學科普網站，內容包含田野調查、民族誌、社會運動...等]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[台灣開放教育推動團隊 TOEDU的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/台灣開放教育推動團隊 TOEDU</id>
+        <link href="https://www.daoedu.tw/resource/台灣開放教育推動團隊 TOEDU"/>
+        <updated>2022-11-09T13:42:00.000Z</updated>
+        <summary type="html"><![CDATA[CourseAPI 開放式課程資訊匯流學院，將整合近一萬筆開放式課程線上資源，建立入口查詢平台，提供個人學習者、自主學習推動單位與教育新創，取用資料並深化學習，就像是在書本上安置插座，讓知識如同電流一樣自由、廣闊。]]></summary>
+        <content type="html"><![CDATA[CourseAPI 開放式課程資訊匯流學院，將整合近一萬筆開放式課程線上資源，建立入口查詢平台，提供個人學習者、自主學習推動單位與教育新創，取用資料並深化學習，就像是在書本上安置插座，讓知識如同電流一樣自由、廣闊。]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[啟點文化 — 心理小學堂的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/啟點文化 — 心理小學堂</id>
+        <link href="https://www.daoedu.tw/resource/啟點文化 — 心理小學堂"/>
+        <updated>2022-11-09T13:40:00.000Z</updated>
+        <summary type="html"><![CDATA[你對心理學有好奇嗎？
+但心理學派這麼多，到底有什麼差別啊？！真想有人用簡單的話講給我聽！
+來！就讓諮商心理師嘉玲和主持人媗甯，用有系統的架構拆解諮商重要的12大學派，帶領你一同悠遊心理世界，理解不同大師們是怎麼看待人生和人性。]]></summary>
+        <content type="html"><![CDATA[你對心理學有好奇嗎？
+但心理學派這麼多，到底有什麼差別啊？！真想有人用簡單的話講給我聽！
+來！就讓諮商心理師嘉玲和主持人媗甯，用有系統的架構拆解諮商重要的12大學派，帶領你一同悠遊心理世界，理解不同大師們是怎麼看待人生和人性。]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[NNgroup的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/NNgroup</id>
+        <link href="https://www.daoedu.tw/resource/NNgroup"/>
+        <updated>2022-11-09T13:31:00.000Z</updated>
+        <summary type="html"><![CDATA[Nielsen Norman Group（簡稱 NN/g）是由 UX 界兩位先驅大佬 Jakob Nielsen 與 Don Norman 於 1988 年所創立的使用者經驗研究與顧問公司。
+NN/g 的宗旨在於以研究為本、散播 UX 知識，他們的使用者研究包羅萬象，同時也都有深入的研究基礎。如果在進行專案時，沒有資源做真正的使用者研究，可以將他們的研究當作參考指標。]]></summary>
+        <content type="html"><![CDATA[Nielsen Norman Group（簡稱 NN/g）是由 UX 界兩位先驅大佬 Jakob Nielsen 與 Don Norman 於 1988 年所創立的使用者經驗研究與顧問公司。
+NN/g 的宗旨在於以研究為本、散播 UX 知識，他們的使用者研究包羅萬象，同時也都有深入的研究基礎。如果在進行專案時，沒有資源做真正的使用者研究，可以將他們的研究當作參考指標。]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[No Stupid Questions的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/No Stupid Questions</id>
+        <link href="https://www.daoedu.tw/resource/No Stupid Questions"/>
+        <updated>2022-11-09T13:28:00.000Z</updated>
+        <summary type="html"><![CDATA[Stephen Dubner (co-author of the Freakonomics book series) and research psychologist Angela Duckworth (author of Grit) really like to ask people questions, and came to believe there’s no such thing as a stupid one. So they made a podcast where they can ask each other as many “stupid questions” as they want. New episodes each week. No Stupid Questions is a production of the Freakonomics Radio Network.]]></summary>
+        <content type="html"><![CDATA[Stephen Dubner (co-author of the Freakonomics book series) and research psychologist Angela Duckworth (author of Grit) really like to ask people questions, and came to believe there’s no such thing as a stupid one. So they made a podcast where they can ask each other as many “stupid questions” as they want. New episodes each week. No Stupid Questions is a production of the Freakonomics Radio Network.]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[excalidraw的學習資源介紹｜島島阿學]]></title>
+        <id>https://www.daoedu.tw/resource/excalidraw</id>
+        <link href="https://www.daoedu.tw/resource/excalidraw"/>
+        <updated>2022-11-07T05:05:00.000Z</updated>
+        <summary type="html"><![CDATA[可以離線使用與本地儲存的簡約開發協作製圖工具，也可共同線上編輯製作，甚至還支援darkmode, 多國語言使用]]></summary>
+        <content type="html"><![CDATA[可以離線使用與本地儲存的簡約開發協作製圖工具，也可共同線上編輯製作，甚至還支援darkmode, 多國語言使用]]></content>
+        <author>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </author>
+        <contributor>
+            <name>島島阿學多元學習社群</name>
+            <email>contact@daoedu.tw</email>
+            <uri>https://www.daoedu.tw</uri>
+        </contributor>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Readle German：每日德文閱讀＋即時德語助手字典的學習資源介紹｜島島阿學]]></title>
         <id>https://www.daoedu.tw/resource/Readle German：每日德文閱讀＋即時德語助手字典</id>
