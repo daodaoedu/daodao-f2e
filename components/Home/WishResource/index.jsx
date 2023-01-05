@@ -21,7 +21,7 @@ const GuideWrapper = styled.div`
     font-size: 40px;
     line-height: 50px;
     letter-spacing: 0.08em;
-    marginleft: '20px';
+    margin-left: '20px';
   }
 
   @media (max-width: 767px) {
