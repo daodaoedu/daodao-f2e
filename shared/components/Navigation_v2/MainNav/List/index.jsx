@@ -56,13 +56,13 @@ const List = () => {
                 color: '#D4ED7B',
                 fontWeight: '700',
                 /* Safari */
-                '-webkit-transform': 'rotate(45deg)',
+                WebkitTransform: 'rotate(45deg)',
                 /* Firefox */
-                '-moz-transform': 'rotate(45deg)',
+                MozTransform: 'rotate(45deg)',
                 /* IE */
-                '-ms-transform': 'rotate(45deg)',
+                msTransform: 'rotate(45deg)',
                 /* Opera */
-                '-o-transform': 'rotate(45deg)',
+                OTransform: 'rotate(45deg)',
               }}
             >
               HOT

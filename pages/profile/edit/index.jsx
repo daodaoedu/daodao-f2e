@@ -233,6 +233,8 @@ const EditPage = () => {
                 objectPosition: 'center',
                 minWidth: '128px',
                 minHeight: '128px',
+                filter: 'drop-shadow(rgba(0, 0, 0, 0.15) 0px 3px 30px)',
+                border: '2px solid rgb(255, 255, 255)',
               }}
               placeholder={
                 // eslint-disable-next-line react/jsx-wrap-multilines
@@ -349,7 +351,7 @@ const EditPage = () => {
                     alignItems: 'center',
                     width: '100%',
                     marginTop: '10px',
-                    '@media (max-width: 767px)': {
+                    '@media (maxWidth: 767px)': {
                       flexDirection: 'column',
                     },
                   }}
@@ -382,7 +384,7 @@ const EditPage = () => {
                               border: '1px solid #16B9B3',
                             }
                           : {}),
-                        '@media (max-width: 767px)': {
+                        '@media (maxWidth: 767px)': {
                           width: '100%',
                           margin: '10px',
                         },
@@ -399,7 +401,7 @@ const EditPage = () => {
                           background: 'rgba(240, 240, 240, .8)',
                           objectFit: 'cover',
                           objectPosition: 'center',
-                          '@media (max-width: 767px)': {
+                          '@media (maxWidth: 767px)': {
                             width: '100%',
                           },
                         }}
@@ -495,7 +497,7 @@ const EditPage = () => {
                             background: 'rgba(240, 240, 240, .8)',
                             objectFit: 'cover',
                             objectPosition: 'center',
-                            '@media (max-width: 767px)': {
+                            '@media (maxWidth: 767px)': {
                               width: '100%',
                             },
                           }}
@@ -579,7 +581,7 @@ const EditPage = () => {
                             background: 'rgba(240, 240, 240, .8)',
                             objectFit: 'cover',
                             objectPosition: 'center',
-                            '@media (max-width: 767px)': {
+                            '@media (maxWidth: 767px)': {
                               width: '100%',
                             },
                           }}
@@ -663,7 +665,7 @@ const EditPage = () => {
                             background: 'rgba(240, 240, 240, .8)',
                             objectFit: 'cover',
                             objectPosition: 'center',
-                            '@media (max-width: 767px)': {
+                            '@media (maxWidth: 767px)': {
                               width: '100%',
                             },
                           }}
@@ -974,7 +976,9 @@ const EditPage = () => {
                 </Typography>
                 <Switch
                   checked={isOpenLocation}
-                  onChange={(event) => setIsOpenLocation(event.target.value)}
+                  onChange={(_, value) => {
+                    setIsOpenLocation(value);
+                  }}
                 />
               </Box>
               <Box
@@ -1000,7 +1004,9 @@ const EditPage = () => {
                 </Typography>
                 <Switch
                   checked={isOpenProfile}
-                  onChange={(event) => setIsOpenProfile(event.target.value)}
+                  onChange={(_, value) => {
+                    setIsOpenProfile(value);
+                  }}
                 />
               </Box>
             </Box>
