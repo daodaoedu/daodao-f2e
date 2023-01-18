@@ -1,11 +1,10 @@
-import React, { useCallback } from 'react';
-import styled from '@emotion/styled';
+import React from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import BannerImage from './BannerImage';
 
 const Banner = () => {
   return (
-    <Box sx={{ height: '60vh' }}>
+    <Box sx={{ height: '60vh', zIndex: 1 }}>
       <Box
         sx={{
           display: 'flex',

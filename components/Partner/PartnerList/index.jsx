@@ -50,33 +50,25 @@ const LIST = [
 
 const PartnerList = () => {
   return (
-    <Box
-      sx={{
-        marginTop: '24px',
-        borderRadius: '20px',
-        boxShadow: '0px 4px 6px rgba(196, 194, 193, 0.2)',
-      }}
-    >
-      <Box sx={{ minHeight: '100vh', padding: '5%' }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          {LIST.map(({ name, image, subTitle, canShare, canTogether }) => (
-            <PartnerCard
-              key={name}
-              image={image}
-              name={name}
-              subTitle={subTitle}
-              canShare={canShare}
-              canTogether={canTogether}
-            />
-          ))}
-        </Box>
+    <Box sx={{ minHeight: '100vh', padding: '5%' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        {LIST.map(({ name, image, subTitle, canShare, canTogether }) => (
+          <PartnerCard
+            key={name}
+            image={image}
+            name={name}
+            subTitle={subTitle}
+            canShare={canShare}
+            canTogether={canTogether}
+          />
+        ))}
       </Box>
     </Box>
   );

@@ -1,40 +1,52 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
-import { Box, Typography, Divider, Skeleton } from '@mui/material';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { Box } from '@mui/material';
 import Banner from './Banner';
 import SearchField from './SearchField';
 import PartnerList from './PartnerList';
 
 const PartnerWrapper = styled.div`
   min-height: 100vh;
+  background-color: transparent;
+  z-index: 100;
+  margin-top: -150px;
 `;
 
 const Partner = () => {
-  const guideRef = useRef(null);
   return (
-    <PartnerWrapper>
-      <Banner guideRef={guideRef} />
-      <Box
-        sx={{
-          marginTop: '-60px',
-          padding: '0 10%',
-        }}
-      >
+    <>
+      <Banner />
+      <PartnerWrapper>
         <Box
           sx={{
-            background: '#FFFFFF',
-            boxShadow: '0px 4px 6px rgba(196, 194, 193, 0.2)',
-            borderRadius: '20px',
-            padding: '40px',
+            padding: '0 10%',
           }}
         >
-          <SearchField />
+          <Box
+            sx={{
+              marginTop: '24px',
+              borderRadius: '20px',
+              boxShadow: '0px 4px 6px rgba(196, 194, 193, 0.2)',
+              padding: '40px',
+              zIndex: 2,
+              background: '#fff',
+            }}
+          >
+            <SearchField />
+          </Box>
+          <Box
+            sx={{
+              marginTop: '24px',
+              borderRadius: '20px',
+              boxShadow: '0px 4px 6px rgba(196, 194, 193, 0.2)',
+              background: '#fff',
+            }}
+          >
+            <PartnerList />
+          </Box>
         </Box>
-        <PartnerList />
-      </Box>
-    </PartnerWrapper>
+      </PartnerWrapper>
+    </>
   );
 };
 

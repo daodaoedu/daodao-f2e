@@ -9,6 +9,7 @@ import Footer from '../../shared/components/Footer_v2';
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
   --section-height-offset: 80px;
+  background: #f3fcfc;
 `;
 
 const PartnerPage = () => {
