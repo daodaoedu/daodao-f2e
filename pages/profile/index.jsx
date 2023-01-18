@@ -32,11 +32,23 @@ import Navigation from '../../shared/components/Navigation_v2';
 import Footer from '../../shared/components/Footer_v2';
 import { WANT_TO_DO_WITH_PARTNER, CATEGORIES } from '../../constants/member';
 import { mapToTable } from '../../utils/helper';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
   --section-height-offset: 80px;
 `;
+
+const BottonBack = {
+  color: '#536166',
+  position: 'relative',
+  left: '-20%',
+  top: '10%',
+  boxShadow:'unset',
+  '&:hover': {
+    color: '#16B9B3'
+  },
+};
 
 const Tag = ({ label }) => (
   <Chip
@@ -110,8 +122,30 @@ const ProfilePage = () => {
       <Script src="https://meet.jit.si/external_api.js" />
       <SEOConfig data={SEOData} />
       <Navigation />
-      <Box sx={{ minHeight: '100vh' }}>
-        <Box sx={{ padding: '5%' }}>
+      <Box
+        sx={{
+          minHeight: '100vh',
+          background: 'linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Button variant="text" sx={BottonBack} onClick={() => {
+                  router.push('/partner');
+                }}>
+          <ChevronLeftIcon />
+          返回
+        </Button>
+        <Box
+          sx={{
+            width: '720px',
+            padding: '40px 30px ',
+            bgcolor: '#fff',
+            borderRadius: '20px',
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
@@ -175,7 +209,15 @@ const ProfilePage = () => {
             ))}
           </Box>
         </Box>
-        <Box sx={{ padding: '5%' }}>
+        <Box
+          sx={{
+            width: '720px',
+            padding: '40px 30px ',
+            marginTop: '10px',
+            bgcolor: '#fff',
+            borderRadius: '20px',
+          }}
+        >
           <Box>
             <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
               可分享
@@ -197,20 +239,34 @@ const ProfilePage = () => {
           <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
           <Box>
             <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
+              網站
+            </Typography>
+            <Typography sx={{ marginLeft: '12px' }}>xxx</Typography>
+          </Box>
+          <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
+          <Box>
+            <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
               簡介
             </Typography>
             <Typography component="p" sx={{}}>
               {description || '開車去衝浪，偶而開出去衝浪'}
             </Typography>
           </Box>
-          <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
-          <Box>
-            <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
-              網站
-            </Typography>
-            <Typography sx={{ marginLeft: '12px' }}>xxx</Typography>
-          </Box>
         </Box>
+        <Button
+          sx={{
+            marginTop: '24px',
+            width: '160px',
+            borderRadius: '20px',
+            color: '#fff',
+            bgcolor: '#16B9B3',
+            boxShadow: '0px 4px 10px rgba(89, 182, 178, 0.5)',
+          }}
+          variant="outlined"
+          onClick={() => {}}
+        >
+          加好友
+        </Button>
       </Box>
       <Footer />
     </HomePageWrapper>

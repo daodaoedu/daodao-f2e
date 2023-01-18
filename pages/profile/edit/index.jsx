@@ -221,7 +221,7 @@ const EditPage = () => {
             <LazyLoadImage
               alt="login"
               src={photoURL || ''}
-              // "https://i.imgur.com/1nhGPPR.png"
+              // "https://imgur.com/EADd1UD.png"
               height={128}
               width={128}
               effect="opacity"

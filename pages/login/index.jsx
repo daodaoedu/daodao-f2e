@@ -15,6 +15,7 @@ import sendDataToChromeExtension from '../../utils/sendDataToChromeExtension';
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
   --section-height-offset: 80px;
+  background: linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa; ;
 `;
 
 const ContentWrapper = styled.div`
@@ -23,9 +24,8 @@ const ContentWrapper = styled.div`
   justify-content: center;
   align-items: center;
   background-color: #fff;
-  border: 1px solid #536166;
   border-radius: 8px;
-  margin: 50px auto;
+  margin: 60px auto;
   padding: 40px 10px;
   max-width: 440px;
   width: 100%;
@@ -114,7 +114,7 @@ const LoginPage = () => {
           </Typography>
           <LazyLoadImage
             alt="login"
-            src="https://i.imgur.com/1nhGPPR.png"
+            src="https://imgur.com/EADd1UD.png"
             height={300}
             width={300}
             effect="opacity"
@@ -140,7 +140,15 @@ const LoginPage = () => {
             }
           />
           <Button
-            sx={{ marginTop: '24px', width: '100%', borderRadius: '50px' }}
+            sx={{
+              marginTop: '24px',
+              width: '100%',
+              borderRadius: '20px',
+              color: '#fff',
+              bgcolor: '#16B9B3',
+              boxShadow: '0px 4px 10px rgba(89, 182, 178, 0.5)',
+              borderColor:'#fff',
+            }}
             variant="outlined"
             onClick={() => {
               onLogin();
@@ -157,7 +165,7 @@ const LoginPage = () => {
                   router.push('/privacypolicy');
                 }}
                 sx={{
-                  color: '#536166',
+                  color: '#16B9B3',
                   fontWeight: 700,
                   textDecoration: 'underline',
                   cursor: 'pointer',
@@ -171,7 +179,7 @@ const LoginPage = () => {
                   router.push('/privacypolicy');
                 }}
                 sx={{
-                  color: '#536166',
+                  color: '#16B9B3',
                   fontWeight: 700,
                   textDecoration: 'underline',
                   cursor: 'pointer',
