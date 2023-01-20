@@ -1038,7 +1038,7 @@ const EditPage = () => {
                   }}
                   variant="outlined"
                   onClick={() => {
-                    router.push('/signin/interest');
+                    router.push('/profile');
                   }}
                 >
                   查看我的頁面
