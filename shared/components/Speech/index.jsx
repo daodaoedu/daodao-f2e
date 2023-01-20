@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import SpeechRecognition, {
@@ -37,19 +38,19 @@ import useUnchanger from '../../../hooks/useUnchanger';
 
 const pulse = keyframes`
     0% {
-		transform: scale(0.85);
-		box-shadow: 0 0 0 0 #32aeddb4;
-	}
+    transform: scale(0.85);
+    box-shadow: 0 0 0 0 #32aeddb4;
+  }
 
-	70% {
-		transform: scale(1);
-		box-shadow: 0 0 0 72px #32aedd00;
-	}
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 72px #32aedd00;
+  }
 
-	100% {
-		transform: scale(0.85);
-		box-shadow: 0 0 0 0 #32aedd00;
-	}
+  100% {
+    transform: scale(0.85);
+    box-shadow: 0 0 0 0 #32aedd00;
+  }
 `;
 
 const SpeechWrapper = styled(Box)`
@@ -97,7 +98,6 @@ const Speech = ({ lang, setIsSpeechMode }) => {
       clearTimeout(timeout1);
       clearTimeout(timeout2);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reset]);
 
   useEffect(() => {
@@ -134,7 +134,6 @@ const Speech = ({ lang, setIsSpeechMode }) => {
       setText('確認中');
       setReset(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listening]);
 
   const resetSpeeching = (event) => {

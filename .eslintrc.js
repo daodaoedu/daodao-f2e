@@ -6,7 +6,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['react', 'import'],
+  plugins: ['react', 'import', 'react-hooks'],
   extends: ['plugin:prettier/recommended', 'airbnb'],
   env: {
     browser: true,

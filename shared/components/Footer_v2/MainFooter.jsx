@@ -66,7 +66,6 @@ const SubFooter = () => {
       <BlockWrapper>
         {/* //img */}
         <LogoWrapper>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="daodao" width="106" height="50" />
         </LogoWrapper>
       </BlockWrapper>

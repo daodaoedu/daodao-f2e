@@ -57,7 +57,6 @@ const SubList = () => {
     <SubListWrapper>
       <LinkListWrapper>
         <li>
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <Link href="/contribute/resource" passHref>
             <p className="login" role="presentation">
               新增資源

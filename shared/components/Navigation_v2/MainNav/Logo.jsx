@@ -11,7 +11,6 @@ const Logo = () => {
   return (
     <Link href="/" passHref>
       <LogoWrapper>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo.png" alt="logo" width="106" height="50" />
       </LogoWrapper>
     </Link>

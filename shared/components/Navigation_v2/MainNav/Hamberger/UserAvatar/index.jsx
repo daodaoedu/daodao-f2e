@@ -56,7 +56,6 @@ const UserAvatar = ({ onCloseMenu }) => {
         >
           Points: 0
         </Box>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/assets/point.png" alt="point" width={26} height={26} />
       </Box>
       {/* <Menu
