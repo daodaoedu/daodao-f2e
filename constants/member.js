@@ -16,9 +16,16 @@ export const GENDER = [
 // 身份
 export const ROLE = [
   {
-    label: '學生',
+    label: '實驗教育學生',
     key: 'experimental-education-student',
     value: 'experimental-education-student',
+    image:
+      'https://images.unsplash.com/photo-1503945438517-f65904a52ce6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTE3fHxzdHVkeXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60',
+  },
+  {
+    label: '一般學生',
+    key: 'normal-student',
+    value: 'normal-student',
     image:
       'https://images.unsplash.com/photo-1503945438517-f65904a52ce6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTE3fHxzdHVkeXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60',
   },
@@ -35,6 +42,13 @@ export const ROLE = [
     value: 'experimental-educator',
     image:
       'https://images.unsplash.com/photo-1655556941591-697143cc669f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8N3x8ZWR1Y2F0b3J8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60',
+  },
+  {
+    label: '社會人士',
+    key: 'citizen',
+    value: 'citizen',
+    image:
+      'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8ZWR1Y2F0aW9ufGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60',
   },
   {
     label: '其他',
@@ -92,24 +106,24 @@ export const WANT_TO_DO_WITH_PARTNER = [
     value: 'interaction',
   },
   {
-    label: '共學',
-    key: 'learn-together',
-    value: 'learn-together',
+    label: '找老師',
+    key: 'find-teacher',
+    value: 'find-teacher',
   },
   {
-    label: '組課',
+    label: '揪團組課',
     key: 'make-group-class',
     value: 'make-group-class',
   },
   {
-    label: '互助分享',
-    key: 'sharing',
-    value: 'sharing',
+    label: '做專案',
+    key: 'do-project',
+    value: 'do-project',
   },
   {
-    label: '教學相長',
-    key: 'teach-together',
-    value: 'teach-together',
+    label: '找學生',
+    key: 'find-student',
+    value: 'find-student',
   },
 ];
 
