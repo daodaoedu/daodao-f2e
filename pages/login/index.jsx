@@ -147,7 +147,7 @@ const LoginPage = () => {
               color: '#fff',
               bgcolor: '#16B9B3',
               boxShadow: '0px 4px 10px rgba(89, 182, 178, 0.5)',
-              borderColor:'#fff',
+              borderColor: '#fff',
             }}
             variant="outlined"
             onClick={() => {

@@ -27,12 +27,12 @@ import {
   setDoc,
   addDoc,
 } from 'firebase/firestore';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import SEOConfig from '../../shared/components/SEO';
 import Navigation from '../../shared/components/Navigation_v2';
 import Footer from '../../shared/components/Footer_v2';
 import { WANT_TO_DO_WITH_PARTNER, CATEGORIES } from '../../constants/member';
 import { mapToTable } from '../../utils/helper';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -44,9 +44,9 @@ const BottonBack = {
   position: 'relative',
   left: '-20%',
   top: '10%',
-  boxShadow:'unset',
+  boxShadow: 'unset',
   '&:hover': {
-    color: '#16B9B3'
+    color: '#16B9B3',
   },
 };
 
@@ -132,9 +132,13 @@ const ProfilePage = () => {
           alignItems: 'center',
         }}
       >
-        <Button variant="text" sx={BottonBack} onClick={() => {
-                  router.push('/partner');
-                }}>
+        <Button
+          variant="text"
+          sx={BottonBack}
+          onClick={() => {
+            router.push('/partner');
+          }}
+        >
           <ChevronLeftIcon />
           返回
         </Button>

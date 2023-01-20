@@ -201,7 +201,7 @@ const EditPage = () => {
                   flexDirection: 'column',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  padding:'40px 15px'
+                  padding: '40px 15px',
                 }}
               >
                 <Typography
@@ -503,8 +503,8 @@ const EditPage = () => {
                       width: '100%',
                       borderRadius: '20px',
                       ml: '4px',
-                      color:'#ffff',
-                      bgcolor:'#16B9B3'
+                      color: '#ffff',
+                      bgcolor: '#16B9B3',
                     }}
                     variant="outlined"
                     onClick={() => {
