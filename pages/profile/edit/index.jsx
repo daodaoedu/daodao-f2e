@@ -192,9 +192,9 @@ const EditPage = () => {
     <HomePageWrapper>
       <SEOConfig data={SEOData} />
       <Navigation />
-      <Box >
+      <Box>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Box sx={{ minHeight: '100vh'}}>
+          <Box sx={{ minHeight: '100vh' }}>
             <ContentWrapper>
               <Typography
                 sx={{
@@ -203,7 +203,7 @@ const EditPage = () => {
                   lineHeight: '140%',
                   textAlign: 'center',
                   color: '#536166',
-                  mt:'40px'
+                  mt: '40px',
                 }}
               >
                 編輯個人頁面

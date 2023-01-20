@@ -191,334 +191,332 @@ const EditPage = () => {
     <HomePageWrapper>
       <SEOConfig data={SEOData} />
       <Navigation />
-      <Box>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Box sx={{ minHeight: '100vh' }}>
-            <ContentWrapper>
-              <Box
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Box sx={{ minHeight: '100vh' }}>
+          <ContentWrapper>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '40px 15px',
+              }}
+            >
+              <Typography
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  padding: '40px 15px',
+                  fontWeight: 700,
+                  fontSize: '22px',
+                  lineHeight: '140%',
+                  textAlign: 'center',
+                  color: '#536166',
                 }}
               >
-                <Typography
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: '22px',
-                    lineHeight: '140%',
-                    textAlign: 'center',
-                    color: '#536166',
-                  }}
-                >
-                  您對哪些領域感興趣？
-                </Typography>
-                <Typography
-                  sx={{
-                    fontWeight: 400,
-                    fontSize: '14px',
-                    lineHeight: '140%',
-                    textAlign: 'center',
-                    color: '#536166',
-                    mt: '8px',
-                  }}
-                >
-                  請選擇2-6個您想要關注的學習領域
-                </Typography>
-                <Box sx={{ width: '100%', marginTop: '16px' }}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      width: '100%',
-                    }}
-                  >
-                    {CATEGORIES.slice(0, 4).map(({ label, value, image }) => (
-                      <Box
-                        key={label}
-                        onClick={() => {
-                          if (interestAreaList.includes(value)) {
-                            setInterestAreaList((state) =>
-                              state.filter((data) => data !== value),
-                            );
-                          } else {
-                            setInterestAreaList((state) => [...state, value]);
-                          }
-                        }}
-                        sx={{
-                          border: '1px solid #DBDBDB',
-                          borderRadius: '8px',
-                          padding: '10px',
-                          width: 'calc(calc(100% - 16px) / 4)',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyItems: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          ...(interestAreaList.includes(value)
-                            ? {
-                                backgroundColor: '#DEF5F5',
-                                border: '1px solid #16B9B3',
-                              }
-                            : {}),
-                        }}
-                      >
-                        <LazyLoadImage
-                          alt={label}
-                          src={image}
-                          effect="opacity"
-                          style={{
-                            height: '100px',
-                            width: '100%',
-                            borderRadius: '6px',
-                            background: 'rgba(240, 240, 240, .8)',
-                            objectFit: 'cover',
-                            objectPosition: 'center',
-                            '@media (maxWidth: 767px)': {
-                              width: '100%',
-                            },
-                          }}
-                          placeholder={
-                            // eslint-disable-next-line react/jsx-wrap-multilines
-                            <Skeleton
-                              sx={{
-                                height: '100px',
-                                width: '100%',
-                                borderRadius: '6px',
-                                background: 'rgba(240, 240, 240, .8)',
-                                marginTop: '4px',
-                              }}
-                              variant="rectangular"
-                              animation="wave"
-                            />
-                          }
-                        />
-                        <Typography
-                          sx={{
-                            margin: 'auto',
-                            ...(interestAreaList.includes(value)
-                              ? {
-                                  fontWeight: 700,
-                                }
-                              : {}),
-                          }}
-                        >
-                          {label}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      width: '100%',
-                      marginTop: '12px',
-                    }}
-                  >
-                    {CATEGORIES.slice(4, 8).map(({ label, value, image }) => (
-                      <Box
-                        key={label}
-                        onClick={() => {
-                          if (interestAreaList.includes(value)) {
-                            setInterestAreaList((state) =>
-                              state.filter((data) => data !== value),
-                            );
-                          } else {
-                            setInterestAreaList((state) => [...state, value]);
-                          }
-                        }}
-                        sx={{
-                          border: '1px solid #DBDBDB',
-                          borderRadius: '8px',
-                          padding: '10px',
-                          width: 'calc(calc(100% - 16px) / 4)',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyItems: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          ...(interestAreaList.includes(value)
-                            ? {
-                                backgroundColor: '#DEF5F5',
-                                border: '1px solid #16B9B3',
-                              }
-                            : {}),
-                        }}
-                      >
-                        <LazyLoadImage
-                          alt={label}
-                          src={image}
-                          effect="opacity"
-                          style={{
-                            height: '100px',
-                            width: '100%',
-                            borderRadius: '6px',
-                            background: 'rgba(240, 240, 240, .8)',
-                            objectFit: 'cover',
-                            objectPosition: 'center',
-                            '@media (maxWidth: 767px)': {
-                              width: '100%',
-                            },
-                          }}
-                          placeholder={
-                            // eslint-disable-next-line react/jsx-wrap-multilines
-                            <Skeleton
-                              sx={{
-                                height: '100px',
-                                width: '100%',
-                                borderRadius: '6px',
-                                background: 'rgba(240, 240, 240, .8)',
-                                marginTop: '4px',
-                              }}
-                              variant="rectangular"
-                              animation="wave"
-                            />
-                          }
-                        />
-                        <Typography
-                          sx={{
-                            margin: 'auto',
-                            ...(interestAreaList.includes(value)
-                              ? {
-                                  fontWeight: 700,
-                                }
-                              : {}),
-                          }}
-                        >
-                          {label}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      width: '100%',
-                      marginTop: '12px',
-                    }}
-                  >
-                    {CATEGORIES.slice(8).map(({ label, value, image }) => (
-                      <Box
-                        key={label}
-                        onClick={() => {
-                          if (interestAreaList.includes(value)) {
-                            setInterestAreaList((state) =>
-                              state.filter((data) => data !== value),
-                            );
-                          } else {
-                            setInterestAreaList((state) => [...state, value]);
-                          }
-                        }}
-                        sx={{
-                          border: '1px solid #DBDBDB',
-                          borderRadius: '8px',
-                          padding: '10px',
-                          width: 'calc(calc(100% - 16px) / 4)',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyItems: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          ...(interestAreaList.includes(value)
-                            ? {
-                                backgroundColor: '#DEF5F5',
-                                border: '1px solid #16B9B3',
-                              }
-                            : {}),
-                        }}
-                      >
-                        <LazyLoadImage
-                          alt={label}
-                          src={image}
-                          effect="opacity"
-                          style={{
-                            height: '100px',
-                            width: '100%',
-                            borderRadius: '6px',
-                            background: 'rgba(240, 240, 240, .8)',
-                            objectFit: 'cover',
-                            objectPosition: 'center',
-                            '@media (maxWidth: 767px)': {
-                              width: '100%',
-                            },
-                          }}
-                          placeholder={
-                            // eslint-disable-next-line react/jsx-wrap-multilines
-                            <Skeleton
-                              sx={{
-                                height: '100px',
-                                width: '100%',
-                                borderRadius: '6px',
-                                background: 'rgba(240, 240, 240, .8)',
-                                marginTop: '4px',
-                              }}
-                              variant="rectangular"
-                              animation="wave"
-                            />
-                          }
-                        />
-                        <Typography
-                          sx={{
-                            margin: 'auto',
-                            ...(interestAreaList.includes(value)
-                              ? {
-                                  fontWeight: 700,
-                                }
-                              : {}),
-                          }}
-                        >
-                          {label}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
-
+                您對哪些領域感興趣？
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 400,
+                  fontSize: '14px',
+                  lineHeight: '140%',
+                  textAlign: 'center',
+                  color: '#536166',
+                  mt: '8px',
+                }}
+              >
+                請選擇2-6個您想要關注的學習領域
+              </Typography>
+              <Box sx={{ width: '100%', marginTop: '16px' }}>
                 <Box
                   sx={{
-                    mt: '40px',
-                    width: '100%',
                     display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
                   }}
                 >
-                  <Button
-                    sx={{ width: '100%', borderRadius: '20px', mr: '4px' }}
-                    variant="outlined"
-                    disabled={isLoadingSubmit}
-                    onClick={() => {
-                      router.back();
-                    }}
-                  >
-                    上一步
-                  </Button>
-                  <Button
-                    sx={{
-                      width: '100%',
-                      borderRadius: '20px',
-                      ml: '4px',
-                      color: '#ffff',
-                      bgcolor: '#16B9B3',
-                    }}
-                    variant="outlined"
-                    onClick={() => {
-                      router.push('/profile/edit');
-                    }}
-                  >
-                    下一步
-                  </Button>
+                  {CATEGORIES.slice(0, 4).map(({ label, value, image }) => (
+                    <Box
+                      key={label}
+                      onClick={() => {
+                        if (interestAreaList.includes(value)) {
+                          setInterestAreaList((state) =>
+                            state.filter((data) => data !== value),
+                          );
+                        } else {
+                          setInterestAreaList((state) => [...state, value]);
+                        }
+                      }}
+                      sx={{
+                        border: '1px solid #DBDBDB',
+                        borderRadius: '8px',
+                        padding: '10px',
+                        width: 'calc(calc(100% - 16px) / 4)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyItems: 'center',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        ...(interestAreaList.includes(value)
+                          ? {
+                              backgroundColor: '#DEF5F5',
+                              border: '1px solid #16B9B3',
+                            }
+                          : {}),
+                      }}
+                    >
+                      <LazyLoadImage
+                        alt={label}
+                        src={image}
+                        effect="opacity"
+                        style={{
+                          height: '100px',
+                          width: '100%',
+                          borderRadius: '6px',
+                          background: 'rgba(240, 240, 240, .8)',
+                          objectFit: 'cover',
+                          objectPosition: 'center',
+                          '@media (maxWidth: 767px)': {
+                            width: '100%',
+                          },
+                        }}
+                        placeholder={
+                          // eslint-disable-next-line react/jsx-wrap-multilines
+                          <Skeleton
+                            sx={{
+                              height: '100px',
+                              width: '100%',
+                              borderRadius: '6px',
+                              background: 'rgba(240, 240, 240, .8)',
+                              marginTop: '4px',
+                            }}
+                            variant="rectangular"
+                            animation="wave"
+                          />
+                        }
+                      />
+                      <Typography
+                        sx={{
+                          margin: 'auto',
+                          ...(interestAreaList.includes(value)
+                            ? {
+                                fontWeight: 700,
+                              }
+                            : {}),
+                        }}
+                      >
+                        {label}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    marginTop: '12px',
+                  }}
+                >
+                  {CATEGORIES.slice(4, 8).map(({ label, value, image }) => (
+                    <Box
+                      key={label}
+                      onClick={() => {
+                        if (interestAreaList.includes(value)) {
+                          setInterestAreaList((state) =>
+                            state.filter((data) => data !== value),
+                          );
+                        } else {
+                          setInterestAreaList((state) => [...state, value]);
+                        }
+                      }}
+                      sx={{
+                        border: '1px solid #DBDBDB',
+                        borderRadius: '8px',
+                        padding: '10px',
+                        width: 'calc(calc(100% - 16px) / 4)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyItems: 'center',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        ...(interestAreaList.includes(value)
+                          ? {
+                              backgroundColor: '#DEF5F5',
+                              border: '1px solid #16B9B3',
+                            }
+                          : {}),
+                      }}
+                    >
+                      <LazyLoadImage
+                        alt={label}
+                        src={image}
+                        effect="opacity"
+                        style={{
+                          height: '100px',
+                          width: '100%',
+                          borderRadius: '6px',
+                          background: 'rgba(240, 240, 240, .8)',
+                          objectFit: 'cover',
+                          objectPosition: 'center',
+                          '@media (maxWidth: 767px)': {
+                            width: '100%',
+                          },
+                        }}
+                        placeholder={
+                          // eslint-disable-next-line react/jsx-wrap-multilines
+                          <Skeleton
+                            sx={{
+                              height: '100px',
+                              width: '100%',
+                              borderRadius: '6px',
+                              background: 'rgba(240, 240, 240, .8)',
+                              marginTop: '4px',
+                            }}
+                            variant="rectangular"
+                            animation="wave"
+                          />
+                        }
+                      />
+                      <Typography
+                        sx={{
+                          margin: 'auto',
+                          ...(interestAreaList.includes(value)
+                            ? {
+                                fontWeight: 700,
+                              }
+                            : {}),
+                        }}
+                      >
+                        {label}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    marginTop: '12px',
+                  }}
+                >
+                  {CATEGORIES.slice(8).map(({ label, value, image }) => (
+                    <Box
+                      key={label}
+                      onClick={() => {
+                        if (interestAreaList.includes(value)) {
+                          setInterestAreaList((state) =>
+                            state.filter((data) => data !== value),
+                          );
+                        } else {
+                          setInterestAreaList((state) => [...state, value]);
+                        }
+                      }}
+                      sx={{
+                        border: '1px solid #DBDBDB',
+                        borderRadius: '8px',
+                        padding: '10px',
+                        width: 'calc(calc(100% - 16px) / 4)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyItems: 'center',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        ...(interestAreaList.includes(value)
+                          ? {
+                              backgroundColor: '#DEF5F5',
+                              border: '1px solid #16B9B3',
+                            }
+                          : {}),
+                      }}
+                    >
+                      <LazyLoadImage
+                        alt={label}
+                        src={image}
+                        effect="opacity"
+                        style={{
+                          height: '100px',
+                          width: '100%',
+                          borderRadius: '6px',
+                          background: 'rgba(240, 240, 240, .8)',
+                          objectFit: 'cover',
+                          objectPosition: 'center',
+                          '@media (maxWidth: 767px)': {
+                            width: '100%',
+                          },
+                        }}
+                        placeholder={
+                          // eslint-disable-next-line react/jsx-wrap-multilines
+                          <Skeleton
+                            sx={{
+                              height: '100px',
+                              width: '100%',
+                              borderRadius: '6px',
+                              background: 'rgba(240, 240, 240, .8)',
+                              marginTop: '4px',
+                            }}
+                            variant="rectangular"
+                            animation="wave"
+                          />
+                        }
+                      />
+                      <Typography
+                        sx={{
+                          margin: 'auto',
+                          ...(interestAreaList.includes(value)
+                            ? {
+                                fontWeight: 700,
+                              }
+                            : {}),
+                        }}
+                      >
+                        {label}
+                      </Typography>
+                    </Box>
+                  ))}
                 </Box>
               </Box>
-            </ContentWrapper>
-          </Box>
-        </LocalizationProvider>
-      </Box>
+
+              <Box
+                sx={{
+                  mt: '40px',
+                  width: '100%',
+                  display: 'flex',
+                }}
+              >
+                <Button
+                  sx={{ width: '100%', borderRadius: '20px', mr: '4px' }}
+                  variant="outlined"
+                  disabled={isLoadingSubmit}
+                  onClick={() => {
+                    router.back();
+                  }}
+                >
+                  上一步
+                </Button>
+                <Button
+                  sx={{
+                    width: '100%',
+                    borderRadius: '20px',
+                    ml: '4px',
+                    color: '#ffff',
+                    bgcolor: '#16B9B3',
+                  }}
+                  variant="outlined"
+                  onClick={() => {
+                    router.push('/profile/edit');
+                  }}
+                >
+                  下一步
+                </Button>
+              </Box>
+            </Box>
+          </ContentWrapper>
+        </Box>
+      </LocalizationProvider>
       <Footer />
     </HomePageWrapper>
   );

@@ -76,7 +76,7 @@ const LoginPage = () => {
           // const isNewUser = Object.keys(docSnap.data() || {}).length === 0;
           // if (isNewUser) {
           toast.success(`歡迎登入！ ${displayName}`);
-          router.push('/profile/edit');
+          router.push('/signin');
           // } else {
           //   toast.success(`歡迎回來！ ${displayName}`);
           //   router.push('/');
