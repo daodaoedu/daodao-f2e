@@ -28,6 +28,10 @@ import {
   addDoc,
 } from 'firebase/firestore';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import Tab from '@mui/material/Tab';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
 import SEOConfig from '../../shared/components/SEO';
 import Navigation from '../../shared/components/Navigation_v2';
 import Footer from '../../shared/components/Footer_v2';
@@ -50,29 +54,31 @@ const BottonBack = {
   },
 };
 
-const Tag = ({ label }) => (
-  <Chip
-    label={label}
-    value={label}
-    sx={{
-      backgroundColor: '#fff',
-      opacity: '80%',
-      cursor: 'pointer',
-      margin: '5px',
-      whiteSpace: 'nowrap',
-      fontWeight: 500,
-      fontSize: '16px',
-      bgcolor: 'rgb(219, 237, 219)',
-      '&:hover': {
-        opacity: '100%',
+function Tag({ label }) {
+  return (
+    <Chip
+      label={label}
+      value={label}
+      sx={{
         backgroundColor: '#fff',
-        transition: 'transform 0.4s',
-      },
-    }}
-  />
-);
+        opacity: '80%',
+        cursor: 'pointer',
+        margin: '5px',
+        whiteSpace: 'nowrap',
+        fontWeight: 500,
+        fontSize: '16px',
+        bgcolor: 'rgb(219, 237, 219)',
+        '&:hover': {
+          opacity: '100%',
+          backgroundColor: '#fff',
+          transition: 'transform 0.4s',
+        },
+      }}
+    />
+  );
+}
 
-const ProfilePage = () => {
+function ProfilePage() {
   const router = useRouter();
   const auth = getAuth();
   const [user, isLoading] = useAuthState(auth);
@@ -116,7 +122,11 @@ const ProfilePage = () => {
 
   const tagList = interestAreaList.map((item) => mapToTable(CATEGORIES)[item]);
   // ('衝浪', '還是衝浪', '開車', '買車', '司機', '打電話')
+  const [value, setValue] = React.useState('1');
 
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
   return (
     <HomePageWrapper>
       <Script src="https://meet.jit.si/external_api.js" />
@@ -215,48 +225,116 @@ const ProfilePage = () => {
         </Box>
         <Box
           sx={{
-            width: '720px',
-            padding: '40px 30px ',
-            marginTop: '10px',
-            bgcolor: '#fff',
-            borderRadius: '20px',
+            maxWidth:'720px',
+            width: '100%',
+            typography: 'body1',
           }}
         >
-          <Box>
-            <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
-              可分享
-            </Typography>
-            <Typography sx={{ marginLeft: '12px' }}>自學心得</Typography>
-          </Box>
-          <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
-          <Box>
-            <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
-              想一起
-            </Typography>
-            <Typography sx={{ marginLeft: '12px' }}>
-              {wantToLearnList
-                .map((item) => mapToTable(WANT_TO_DO_WITH_PARTNER)[item])
-                .join(', ') ||
-                '衝浪、還有衝浪、或是找別人衝浪、交更多朋友一起衝浪'}
-            </Typography>
-          </Box>
-          <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
-          <Box>
-            <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
-              網站
-            </Typography>
-            <Typography sx={{ marginLeft: '12px' }}>xxx</Typography>
-          </Box>
-          <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
-          <Box>
-            <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
-              簡介
-            </Typography>
-            <Typography component="p" sx={{}}>
-              {description || '開車去衝浪，偶而開出去衝浪'}
-            </Typography>
-          </Box>
+          <TabContext value={value}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <TabList
+                onChange={handleChange}
+                aria-label="lab API tabs example"
+              >
+                <Tab label="基本資訊" value="1" />
+                <Tab label="推薦資源" value="2" />
+              </TabList>
+            </Box>
+            <TabPanel value="1">
+              <Box
+                sx={{
+                  width: '720px',
+                  padding: '40px 30px ',
+                  marginTop: '10px',
+                  bgcolor: '#fff',
+                  borderRadius: '20px',
+                }}
+              >
+                <Box>
+                  <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
+                    可分享
+                  </Typography>
+                  <Typography sx={{ marginLeft: '12px' }}>自學心得</Typography>
+                </Box>
+                <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
+                <Box>
+                  <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
+                    想一起
+                  </Typography>
+                  <Typography sx={{ marginLeft: '12px' }}>
+                    {wantToLearnList
+                      .map((item) => mapToTable(WANT_TO_DO_WITH_PARTNER)[item])
+                      .join(', ') ||
+                      '衝浪、還有衝浪、或是找別人衝浪、交更多朋友一起衝浪'}
+                  </Typography>
+                </Box>
+                <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
+                <Box>
+                  <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
+                    網站
+                  </Typography>
+                  <Typography sx={{ marginLeft: '12px' }}>xxx</Typography>
+                </Box>
+                <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
+                <Box>
+                  <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
+                    簡介
+                  </Typography>
+                  <Typography component="p" sx={{}}>
+                    {description || '開車去衝浪，偶而開出去衝浪'}
+                  </Typography>
+                </Box>
+              </Box>
+            </TabPanel>
+            <TabPanel value="2">
+              <Box
+                sx={{
+                  width: '720px',
+                  padding: '40px 30px ',
+                  marginTop: '10px',
+                  bgcolor: '#fff',
+                  borderRadius: '20px',
+                }}
+              >
+                <Box>
+                  <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
+                    可分享
+                  </Typography>
+                  <Typography sx={{ marginLeft: '12px' }}>自學心得</Typography>
+                </Box>
+                <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
+                <Box>
+                  <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
+                    想一起
+                  </Typography>
+                  <Typography sx={{ marginLeft: '12px' }}>
+                    {wantToLearnList
+                      .map((item) => mapToTable(WANT_TO_DO_WITH_PARTNER)[item])
+                      .join(', ') ||
+                      '衝浪、還有衝浪、或是找別人衝浪、交更多朋友一起衝浪'}
+                  </Typography>
+                </Box>
+                <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
+                <Box>
+                  <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
+                    網站
+                  </Typography>
+                  <Typography sx={{ marginLeft: '12px' }}>xxx</Typography>
+                </Box>
+                <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
+                <Box>
+                  <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
+                    簡介
+                  </Typography>
+                  <Typography component="p" sx={{}}>
+                    {description || '開車去衝浪，偶而開出去衝浪'}
+                  </Typography>
+                </Box>
+              </Box>
+            </TabPanel>
+          </TabContext>
         </Box>
+
         <Button
           sx={{
             marginTop: '24px',
@@ -275,6 +353,6 @@ const ProfilePage = () => {
       <Footer />
     </HomePageWrapper>
   );
-};
+}
 
 export default ProfilePage;
