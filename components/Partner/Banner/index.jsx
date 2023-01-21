@@ -1,8 +1,12 @@
 import React from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import BannerImage from './BannerImage';
+import { useRouter } from 'next/router';
+
 
 const Banner = () => {
+  const router = useRouter();
+
   return (
     <Box sx={{ height: '60vh', zIndex: 1 }}>
       <Box
@@ -53,6 +57,9 @@ const Banner = () => {
             boxShadow: '0px 4px 10px rgba(89, 182, 178, 0.5)',
             borderRadius: '20px',
             padding: '9px 40px',
+          }}
+          onClick={() => {
+            router.push('/login');
           }}
         >
           註冊新夥伴

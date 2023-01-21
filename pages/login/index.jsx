@@ -15,7 +15,7 @@ import sendDataToChromeExtension from '../../utils/sendDataToChromeExtension';
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
   --section-height-offset: 80px;
-  background: linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa; ;
+  background: linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa;
 `;
 
 const ContentWrapper = styled.div`
@@ -26,7 +26,7 @@ const ContentWrapper = styled.div`
   background-color: #fff;
   border-radius: 8px;
   margin: 60px auto;
-  padding: 40px 10px;
+  padding: 40px 40px;
   max-width: 440px;
   width: 100%;
   @media (max-width: 767px) {
@@ -147,7 +147,6 @@ const LoginPage = () => {
               color: '#fff',
               bgcolor: '#16B9B3',
               boxShadow: '0px 4px 10px rgba(89, 182, 178, 0.5)',
-              borderColor: '#fff',
             }}
             variant="outlined"
             onClick={() => {
@@ -157,8 +156,8 @@ const LoginPage = () => {
           >
             Google 登入 / 註冊
           </Button>
-          <Box sx={{ marginTop: '24px' }}>
-            <Typography sx={{ color: '#536166' }}>
+          <Box sx={{ marginTop: '24px'}}>
+            <Typography sx={{ color: '#536166', fontSize: '14px' }}>
               {`註冊即代表您同意島島阿學的 `}
               <Typography
                 onClick={() => {
@@ -167,6 +166,7 @@ const LoginPage = () => {
                 sx={{
                   color: '#16B9B3',
                   fontWeight: 700,
+                  fontSize: '14px',
                   textDecoration: 'underline',
                   cursor: 'pointer',
                 }}
@@ -181,6 +181,7 @@ const LoginPage = () => {
                 sx={{
                   color: '#16B9B3',
                   fontWeight: 700,
+                  fontSize: '14px',
                   textDecoration: 'underline',
                   cursor: 'pointer',
                 }}
