@@ -225,7 +225,7 @@ function ProfilePage() {
         </Box>
         <Box
           sx={{
-            maxWidth:'720px',
+            maxWidth:'760px',
             width: '100%',
             typography: 'body1',
           }}
@@ -235,6 +235,7 @@ function ProfilePage() {
               <TabList
                 onChange={handleChange}
                 aria-label="lab API tabs example"
+                centered
               >
                 <Tab label="基本資訊" value="1" />
                 <Tab label="推薦資源" value="2" />
