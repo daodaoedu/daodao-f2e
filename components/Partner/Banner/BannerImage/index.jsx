@@ -19,7 +19,7 @@ const BannerImage = () => {
     <BannerImageWrapper>
       <Box
         component="img"
-        src="/assets/partner-banner.png"
+        src="/assets/images/partner-banner.png"
         sx={{
           objectFit: 'cover',
           width: '100%',

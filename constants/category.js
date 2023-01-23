@@ -205,6 +205,11 @@ export const NAV_LINK = [
     target: '_self',
   },
   {
+    name: '找夥伴',
+    link: '/partner',
+    target: '_self',
+  },
+  {
     name: '找活動',
     link: '/activities',
     target: '_self',
@@ -234,6 +239,11 @@ export const NAV_LINK_MOBILE = [
   {
     name: '找資源',
     link: '/search',
+    target: '_self',
+  },
+  {
+    name: '找夥伴',
+    link: '/partner',
     target: '_self',
   },
   {
@@ -276,6 +286,11 @@ export const FOOTER_LINK = [
   {
     name: '找資源',
     link: '/search',
+    target: '_self',
+  },
+  {
+    name: '找夥伴',
+    link: '/partner',
     target: '_self',
   },
   {

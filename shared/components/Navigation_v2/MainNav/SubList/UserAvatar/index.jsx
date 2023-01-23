@@ -36,10 +36,18 @@ const UserAvatar = () => {
         <MenuItem
           onClick={() => {
             setIsOpenMenu(false);
-            push('/myisland');
+            push('/profile');
           }}
         >
-          我的島島
+          個人頁面
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setIsOpenMenu(false);
+            push('/profile');
+          }}
+        >
+          帳號設定
         </MenuItem>
         <MenuItem
           onClick={() => {
