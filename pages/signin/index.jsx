@@ -487,7 +487,7 @@ const EditPage = () => {
                     color: '#ffff',
                     bgcolor: '#16B9B3',
                   }}
-                  variant="outlined"
+                  variant="contained"
                   onClick={() => {
                     router.push('/signin/interest');
                   }}

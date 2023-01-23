@@ -32,6 +32,7 @@ import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import SEOConfig from '../../shared/components/SEO';
 import Navigation from '../../shared/components/Navigation_v2';
 import Footer from '../../shared/components/Footer_v2';
@@ -45,10 +46,24 @@ const HomePageWrapper = styled.div`
 
 const BottonBack = {
   color: '#536166',
-  position: 'relative',
-  left: '-20%',
-  top: '10%',
+  fontSize: '14px',
+  position: 'absolute',
+  left: '-10px',
+  top: '-50px',
   boxShadow: 'unset',
+  '&:hover': {
+    color: '#16B9B3',
+  },
+};
+
+const BottonEdit = {
+  color: '#536166',
+  fontSize: '14px',
+  position: 'absolute',
+  right: '30px',
+  top: '30px',
+  boxShadow: 'unset',
+  borderRadius: '20px',
   '&:hover': {
     color: '#16B9B3',
   },
@@ -140,93 +155,107 @@ function ProfilePage() {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
+          position: 'relative',
         }}
       >
-        <Button
-          variant="text"
-          sx={BottonBack}
-          onClick={() => {
-            router.push('/partner');
-          }}
-        >
-          <ChevronLeftIcon />
-          返回
-        </Button>
         <Box
           sx={{
-            width: '720px',
-            padding: '40px 30px ',
-            bgcolor: '#fff',
-            borderRadius: '20px',
+            position: 'relative',
           }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
+          <Button
+            variant="text"
+            sx={BottonBack}
+            onClick={() => {
+              router.push('/partner');
             }}
           >
-            <LazyLoadImage
-              alt="login"
-              src={
-                photoURL ||
-                'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60'
-              }
-              height={80}
-              width={80}
-              effect="opacity"
-              style={{
-                borderRadius: '100%',
-                background: 'rgba(240, 240, 240, .8)',
-                objectFit: 'cover',
-                objectPosition: 'center',
+            <ChevronLeftIcon />
+            返回
+          </Button>
+          <Box
+            sx={{
+              width: '720px',
+              padding: '40px 30px ',
+              bgcolor: '#fff',
+              borderRadius: '20px',
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
               }}
-              placeholder={
-                // eslint-disable-next-line react/jsx-wrap-multilines
-                <Skeleton
-                  sx={{
-                    height: '80px',
-                    width: '80px',
-                    background: 'rgba(240, 240, 240, .8)',
-                    marginTop: '4px',
-                  }}
-                  variant="circular"
-                  animation="wave"
-                />
-              }
-            />
-
-            <Box sx={{ marginLeft: '12px' }}>
-              <Typography sx={{ color: '#536166', fontSize: '18px' }}>
-                {userName || '許浪手'}
-              </Typography>
-              <Typography component="p" sx={{ color: '#92989A' }}>
-                自學生
-              </Typography>
-              <Typography
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  marginTop: '12px',
+            >
+              <LazyLoadImage
+                alt="login"
+                src={
+                  photoURL ||
+                  'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60'
+                }
+                height={80}
+                width={80}
+                effect="opacity"
+                style={{
+                  borderRadius: '100%',
+                  background: 'rgba(240, 240, 240, .8)',
+                  objectFit: 'cover',
+                  objectPosition: 'center',
+                }}
+                placeholder={
+                  // eslint-disable-next-line react/jsx-wrap-multilines
+                  <Skeleton
+                    sx={{
+                      height: '80px',
+                      width: '80px',
+                      background: 'rgba(240, 240, 240, .8)',
+                      marginTop: '4px',
+                    }}
+                    variant="circular"
+                    animation="wave"
+                  />
+                }
+              />
+              <Button
+                variant="outlined"
+                sx={BottonEdit}
+                onClick={() => {
+                  router.push('/profile/edit');
                 }}
               >
-                <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />{' '}
-                台北市松山區
-              </Typography>
+                <EditOutlinedIcon />
+                編輯
+              </Button>
+              <Box sx={{ marginLeft: '12px' }}>
+                <Typography sx={{ color: '#536166', fontSize: '18px' }}>
+                  {userName || '許浪手'}
+                </Typography>
+                <Typography component="p" sx={{ color: '#92989A' }}>
+                  自學生
+                </Typography>
+                <Typography
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    marginTop: '12px',
+                  }}
+                >
+                  <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />{' '}
+                  台北市松山區
+                </Typography>
+              </Box>
             </Box>
-          </Box>
-          <Box sx={{ marginTop: '24px' }}>
-            {tagList.map((tag) => (
-              <Tag key={tag} label={tag} />
-            ))}
+            <Box sx={{ marginTop: '24px' }}>
+              {tagList.map((tag) => (
+                <Tag key={tag} label={tag} />
+              ))}
+            </Box>
           </Box>
         </Box>
         <Box
           sx={{
-            maxWidth:'760px',
-            width: '100%',
             typography: 'body1',
           }}
         >
@@ -236,9 +265,24 @@ function ProfilePage() {
                 onChange={handleChange}
                 aria-label="lab API tabs example"
                 centered
+                sx={{
+                  width: '100%',
+                }}
               >
-                <Tab label="基本資訊" value="1" />
-                <Tab label="推薦資源" value="2" />
+                <Tab
+                  label="基本資訊"
+                  value="1"
+                  sx={{
+                    width: '100%',
+                  }}
+                />
+                <Tab
+                  label="推薦資源"
+                  value="2"
+                  sx={{
+                    width: '100%',
+                  }}
+                />
               </TabList>
             </Box>
             <TabPanel value="1">
@@ -272,7 +316,7 @@ function ProfilePage() {
                 <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
                 <Box>
                   <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
-                    網站
+                    個人網站
                   </Typography>
                   <Typography sx={{ marginLeft: '12px' }}>xxx</Typography>
                 </Box>
@@ -337,6 +381,7 @@ function ProfilePage() {
         </Box>
 
         <Button
+          variant="contained"
           sx={{
             marginTop: '24px',
             width: '160px',
@@ -345,7 +390,6 @@ function ProfilePage() {
             bgcolor: '#16B9B3',
             boxShadow: '0px 4px 10px rgba(89, 182, 178, 0.5)',
           }}
-          variant="outlined"
           onClick={() => {}}
         >
           加好友

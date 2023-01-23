@@ -520,7 +520,7 @@ const EditPage = () => {
                     color: '#ffff',
                     bgcolor: '#16B9B3',
                   }}
-                  variant="outlined"
+                  variant="contained"
                   onClick={handleOpen}
                 >
                   下一步
@@ -605,7 +605,7 @@ const EditPage = () => {
                           color: '#ffff',
                           bgcolor: '#16B9B3',
                         }}
-                        variant="outlined"
+                        variant="contained"
                         onClick={() => {
                           router.push('/profile/edit');
                         }}

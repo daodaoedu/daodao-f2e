@@ -62,7 +62,7 @@ const Banner = () => {
             router.push('/login');
           }}
         >
-          註冊新夥伴
+          註冊找夥伴
         </Button>
       </Box>
       <BannerImage />

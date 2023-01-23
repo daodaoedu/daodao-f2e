@@ -833,7 +833,7 @@ const EditPage = () => {
                   bgcolor: '#16B9B3',
                   ml: '8px',
                 }}
-                variant="outlined"
+                variant="contained"
                 onClick={() => {
                   router.push('/profile');
                 }}
