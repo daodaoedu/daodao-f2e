@@ -327,7 +327,6 @@ const EditPage = () => {
                               }
                             : {}),
                           '@media (maxWidth: 767px)': {
-                            width: '100%',
                             margin: '10px',
                           },
                         }}
@@ -340,7 +339,7 @@ const EditPage = () => {
                             height: '100px',
                             width: '100%',
                             borderRadius: '6px',
-                            background: 'rgba(240, 240, 240, .8)',
+                            //background: 'rgba(240, 240, 240, .8)',
                             objectFit: 'cover',
                             objectPosition: 'center',
                             '@media (maxWidth: 767px)': {
@@ -432,7 +431,7 @@ const EditPage = () => {
                             height: '100px',
                             width: '100%',
                             borderRadius: '6px',
-                            background: 'rgba(240, 240, 240, .8)',
+                            //background: 'rgba(240, 240, 240, .8)',
                             objectFit: 'cover',
                             objectPosition: 'center',
                             '@media (maxWidth: 767px)': {
@@ -482,6 +481,7 @@ const EditPage = () => {
                 <Button
                   sx={{
                     width: '100%',
+                    height:'40px',
                     borderRadius: '20px',
                     margin: '24px 0px 45px 0px',
                     color: '#ffff',

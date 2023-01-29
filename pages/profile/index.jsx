@@ -54,6 +54,9 @@ const BottonBack = {
   '&:hover': {
     color: '#16B9B3',
   },
+  '@media (max-width: 767px)': {
+    position: 'unset',
+  },
 };
 
 const BottonEdit = {
@@ -66,6 +69,12 @@ const BottonEdit = {
   borderRadius: '20px',
   '&:hover': {
     color: '#16B9B3',
+  },
+  '@media (max-width: 767px)': {
+    position: 'absolute',
+    right: '25%',
+    top: '252%',
+    width: '160px',
   },
 };
 
@@ -179,6 +188,9 @@ function ProfilePage() {
               padding: '40px 30px ',
               bgcolor: '#fff',
               borderRadius: '20px',
+              '@media (max-width: 767px)': {
+                width: '316px',
+              },
             }}
           >
             <Box
@@ -257,10 +269,22 @@ function ProfilePage() {
         <Box
           sx={{
             typography: 'body1',
+            width: '720px',
+            '@media (max-width: 767px)': {
+              width: '316px',
+            },
           }}
         >
           <TabContext value={value}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Box
+              sx={{
+                borderBottom: 1,
+                borderColor: 'divider',
+                '@media (max-width: 767px)': {
+                  width: '316px',
+                },
+              }}
+            >
               <TabList
                 onChange={handleChange}
                 aria-label="lab API tabs example"
@@ -274,6 +298,9 @@ function ProfilePage() {
                   value="1"
                   sx={{
                     width: '100%',
+                    '@media (max-width: 767px)': {
+                      width: '158px',
+                    },
                   }}
                 />
                 <Tab
@@ -281,11 +308,19 @@ function ProfilePage() {
                   value="2"
                   sx={{
                     width: '100%',
+                    '@media (max-width: 767px)': {
+                      width: '158px',
+                    },
                   }}
                 />
               </TabList>
             </Box>
-            <TabPanel value="1">
+            <TabPanel
+              value="1"
+              sx={{
+                padding: '0',
+              }}
+            >
               <Box
                 sx={{
                   width: '720px',
@@ -293,6 +328,9 @@ function ProfilePage() {
                   marginTop: '10px',
                   bgcolor: '#fff',
                   borderRadius: '20px',
+                  '@media (max-width: 767px)': {
+                    width: '316px',
+                  },
                 }}
               >
                 <Box>
@@ -331,7 +369,12 @@ function ProfilePage() {
                 </Box>
               </Box>
             </TabPanel>
-            <TabPanel value="2">
+            <TabPanel
+              value="2"
+              sx={{
+                padding: '0',
+              }}
+            >
               <Box
                 sx={{
                   width: '720px',
@@ -339,6 +382,9 @@ function ProfilePage() {
                   marginTop: '10px',
                   bgcolor: '#fff',
                   borderRadius: '20px',
+                  '@media (max-width: 767px)': {
+                    width: '316px',
+                  },
                 }}
               >
                 <Box>

@@ -80,7 +80,7 @@ const style = {
   p: 4,
 };
 
-const EditPage = () => {
+function EditPage() {
   const router = useRouter();
   const auth = getAuth();
   const [user, isLoading] = useAuthState(auth);
@@ -503,7 +503,12 @@ const EditPage = () => {
                 }}
               >
                 <Button
-                  sx={{ width: '100%', borderRadius: '20px', mr: '4px' }}
+                  sx={{
+                    width: '100%',
+                    height:'40px',
+                    borderRadius: '20px',
+                    mr: '4px',
+                  }}
                   variant="outlined"
                   disabled={isLoadingSubmit}
                   onClick={() => {
@@ -515,6 +520,7 @@ const EditPage = () => {
                 <Button
                   sx={{
                     width: '100%',
+                    height:'40px',
                     borderRadius: '20px',
                     ml: '4px',
                     color: '#ffff',
@@ -623,6 +629,6 @@ const EditPage = () => {
       <Footer />
     </HomePageWrapper>
   );
-};
+}
 
 export default EditPage;

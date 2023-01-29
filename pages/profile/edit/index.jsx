@@ -69,7 +69,7 @@ const ContentWrapper = styled.div`
   }
 `;
 
-const EditPage = () => {
+function EditPage() {
   const router = useRouter();
   const auth = getAuth();
   const [user, isLoading] = useAuthState(auth);
@@ -731,8 +731,8 @@ const EditPage = () => {
                     width: '100%',
                     minHeight: '100px',
                     padding: '10px',
-                    borderRadius: '8px',
-                    borderColor: 'rgb(0,0,0,0.87)',
+                    borderRadius: '8px ',
+                    border: '1px solid #DBDBDB',
                   }}
                   placeholder="寫下關於你的資訊，讓其他島民更認識你！也可以多描述想和夥伴一起做的事喔！"
                   value={description}
@@ -816,7 +816,12 @@ const EditPage = () => {
               }}
             >
               <Button
-                sx={{ width: '100%', borderRadius: '20px', mr: '8px' }}
+                sx={{
+                  width: '100%',
+                  height: '40px',
+                  borderRadius: '20px',
+                  mr: '8px',
+                }}
                 variant="outlined"
                 disabled={isLoadingSubmit}
                 onClick={() => {
@@ -828,6 +833,7 @@ const EditPage = () => {
               <Button
                 sx={{
                   width: '100%',
+                  height: '40px',
                   borderRadius: '20px',
                   color: '#ffff',
                   bgcolor: '#16B9B3',
@@ -847,6 +853,6 @@ const EditPage = () => {
       <Footer />
     </HomePageWrapper>
   );
-};
+}
 
 export default EditPage;
