@@ -31,6 +31,8 @@ import {
 import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import SEOConfig from '../../shared/components/SEO';
 import Navigation from '../../shared/components/Navigation_v2';
 import Footer from '../../shared/components/Footer_v2';
@@ -42,8 +44,6 @@ import {
   CATEGORIES,
 } from '../../constants/member';
 import COUNTIES from '../../constants/countries.json';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -62,7 +62,7 @@ const ContentWrapper = styled.div`
   max-width: 50%;
   width: 100%;
   @media (max-width: 767px) {
-    width: 90%;
+    max-width: 80%;
     .title {
       text-overflow: ellipsis;
       width: 100%;
@@ -70,7 +70,7 @@ const ContentWrapper = styled.div`
   }
 `;
 
-const EditPage = () => {
+function EditPage() {
   const router = useRouter();
   const auth = getAuth();
   const [user, isLoading] = useAuthState(auth);
@@ -293,12 +293,9 @@ const EditPage = () => {
                       alignItems: 'center',
                       width: '100%',
                       marginTop: '10px',
-                      '@media (maxWidth: 767px)': {
-                        flexDirection: 'column',
-                      },
                     }}
                   >
-                    {ROLE.slice(0,3).map(({ label, value, image }) => (
+                    {ROLE.slice(0, 3).map(({ label, value, image }) => (
                       <Box
                         key={label}
                         onClick={() => {
@@ -326,8 +323,8 @@ const EditPage = () => {
                                 border: '1px solid #16B9B3',
                               }
                             : {}),
-                          '@media (maxWidth: 767px)': {
-                            margin: '10px',
+                          '@media (max-width: 767px)': {
+                            height: '100% auto',
                           },
                         }}
                       >
@@ -339,7 +336,7 @@ const EditPage = () => {
                             height: '100px',
                             width: '100%',
                             borderRadius: '6px',
-                            //background: 'rgba(240, 240, 240, .8)',
+                            // background: 'rgba(240, 240, 240, .8)',
                             objectFit: 'cover',
                             objectPosition: 'center',
                             '@media (maxWidth: 767px)': {
@@ -384,9 +381,6 @@ const EditPage = () => {
                       alignItems: 'center',
                       width: '100%',
                       marginTop: '10px',
-                      '@media (maxWidth: 767px)': {
-                        flexDirection: 'column',
-                      },
                     }}
                   >
                     {ROLE.slice(3).map(({ label, value, image }) => (
@@ -417,10 +411,6 @@ const EditPage = () => {
                                 border: '1px solid #16B9B3',
                               }
                             : {}),
-                          '@media (maxWidth: 767px)': {
-                            width: '100%',
-                            margin: '10px',
-                          },
                         }}
                       >
                         <LazyLoadImage
@@ -431,7 +421,7 @@ const EditPage = () => {
                             height: '100px',
                             width: '100%',
                             borderRadius: '6px',
-                            //background: 'rgba(240, 240, 240, .8)',
+                            // background: 'rgba(240, 240, 240, .8)',
                             objectFit: 'cover',
                             objectPosition: 'center',
                             '@media (maxWidth: 767px)': {
@@ -472,7 +462,6 @@ const EditPage = () => {
                 </Box>
                 <FormControlLabel
                   sx={{
-                   
                     marginTop: '20px',
                   }}
                   control={<Checkbox defaultChecked />}
@@ -481,7 +470,7 @@ const EditPage = () => {
                 <Button
                   sx={{
                     width: '100%',
-                    height:'40px',
+                    height: '40px',
                     borderRadius: '20px',
                     margin: '24px 0px 45px 0px',
                     color: '#ffff',
@@ -502,6 +491,6 @@ const EditPage = () => {
       <Footer />
     </HomePageWrapper>
   );
-};
+}
 
 export default EditPage;

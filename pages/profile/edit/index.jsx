@@ -61,7 +61,7 @@ const ContentWrapper = styled.div`
   max-width: 50%;
   width: 100%;
   @media (max-width: 767px) {
-    width: 90%;
+    max-width: 80%;
     .title {
       text-overflow: ellipsis;
       width: 100%;
