@@ -289,13 +289,14 @@ function EditPage() {
                   <Box
                     sx={{
                       display: 'flex',
+                      flexWrap: 'wrap',
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       width: '100%',
                       marginTop: '10px',
                     }}
                   >
-                    {ROLE.slice(0, 3).map(({ label, value, image }) => (
+                    {ROLE.map(({ label, value, image }) => (
                       <Box
                         key={label}
                         onClick={() => {
@@ -311,7 +312,9 @@ function EditPage() {
                           border: '1px solid #DBDBDB',
                           borderRadius: '8px',
                           padding: '10px',
-                          width: 'calc(calc(100% - 16px) / 3)',
+                          margin: '4px',
+                          width: 'calc(calc(100% - 24px) / 3)',
+                          flexBasis: 'calc(calc(100% - 24px) / 3)',
                           display: 'flex',
                           flexDirection: 'column',
                           justifyItems: 'center',
@@ -325,92 +328,9 @@ function EditPage() {
                             : {}),
                           '@media (max-width: 767px)': {
                             height: '100% auto',
+                            width: 'calc(calc(100% - 24px) / 2)',
+                            flexBasis: 'calc(calc(100% - 24px) / 2)',
                           },
-                        }}
-                      >
-                        <LazyLoadImage
-                          alt={label}
-                          src={image}
-                          effect="opacity"
-                          style={{
-                            height: '100px',
-                            width: '100%',
-                            borderRadius: '6px',
-                            // background: 'rgba(240, 240, 240, .8)',
-                            objectFit: 'cover',
-                            objectPosition: 'center',
-                            '@media (maxWidth: 767px)': {
-                              width: '100%',
-                            },
-                          }}
-                          placeholder={
-                            // eslint-disable-next-line react/jsx-wrap-multilines
-                            <Skeleton
-                              sx={{
-                                height: '100px',
-                                width: '100%',
-                                borderRadius: '6px',
-                                background: 'rgba(240, 240, 240, .8)',
-                                marginTop: '4px',
-                              }}
-                              variant="rectangular"
-                              animation="wave"
-                            />
-                          }
-                        />
-                        <Typography
-                          sx={{
-                            margin: 'auto',
-                            marginTop: '10px',
-                            ...(roleList.includes(value)
-                              ? {
-                                  fontWeight: 700,
-                                }
-                              : {}),
-                          }}
-                        >
-                          {label}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      width: '100%',
-                      marginTop: '10px',
-                    }}
-                  >
-                    {ROLE.slice(3).map(({ label, value, image }) => (
-                      <Box
-                        key={label}
-                        onClick={() => {
-                          if (roleList.includes(value)) {
-                            setRoleList((state) =>
-                              state.filter((data) => data !== value),
-                            );
-                          } else {
-                            setRoleList((state) => [...state, value]);
-                          }
-                        }}
-                        sx={{
-                          border: '1px solid #DBDBDB',
-                          borderRadius: '8px',
-                          padding: '10px',
-                          width: 'calc(calc(100% - 16px) / 3)',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyItems: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          ...(roleList.includes(value)
-                            ? {
-                                backgroundColor: '#DEF5F5',
-                                border: '1px solid #16B9B3',
-                              }
-                            : {}),
                         }}
                       >
                         <LazyLoadImage

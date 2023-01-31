@@ -12,7 +12,7 @@ const PartnerWrapper = styled.div`
   margin-top: -150px;
 `;
 
-const Partner = () => {
+function Partner() {
   return (
     <>
       <Banner />
@@ -48,6 +48,6 @@ const Partner = () => {
       </PartnerWrapper>
     </>
   );
-};
+}
 
 export default Partner;

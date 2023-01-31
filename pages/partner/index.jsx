@@ -12,7 +12,7 @@ const HomePageWrapper = styled.div`
   background: #f3fcfc;
 `;
 
-const PartnerPage = () => {
+function PartnerPage() {
   const router = useRouter();
   const SEOData = useMemo(
     () => ({
@@ -54,6 +54,6 @@ const PartnerPage = () => {
       <Footer />
     </HomePageWrapper>
   );
-};
+}
 
 export default PartnerPage;

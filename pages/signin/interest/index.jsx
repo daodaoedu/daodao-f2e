@@ -245,12 +245,13 @@ function EditPage() {
                 <Box
                   sx={{
                     display: 'flex',
+                    flexWrap: 'wrap',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     width: '100%',
                   }}
                 >
-                  {CATEGORIES.slice(0, 4).map(({ label, value, image }) => (
+                  {CATEGORIES.map(({ label, value, image }) => (
                     <Box
                       key={label}
                       onClick={() => {
@@ -265,8 +266,9 @@ function EditPage() {
                       sx={{
                         border: '1px solid #DBDBDB',
                         borderRadius: '8px',
+                        margin: '4px',
                         padding: '10px',
-                        width: 'calc(calc(100% - 16px) / 4)',
+                        width: 'calc(calc(100% - 32px) / 4)',
                         display: 'flex',
                         flexDirection: 'column',
                         justifyItems: 'center',
@@ -278,174 +280,11 @@ function EditPage() {
                               border: '1px solid #16B9B3',
                             }
                           : {}),
-                      }}
-                    >
-                      <LazyLoadImage
-                        alt={label}
-                        src={image}
-                        effect="opacity"
-                        style={{
-                          height: '100px',
-                          width: '100%',
-                          borderRadius: '6px',
-                          background: 'rgba(240, 240, 240, .8)',
-                          objectFit: 'cover',
-                          objectPosition: 'center',
-                          '@media (maxWidth: 767px)': {
-                            width: '100%',
-                          },
-                        }}
-                        placeholder={
-                          // eslint-disable-next-line react/jsx-wrap-multilines
-                          <Skeleton
-                            sx={{
-                              height: '100px',
-                              width: '100%',
-                              borderRadius: '6px',
-                              background: 'rgba(240, 240, 240, .8)',
-                              marginTop: '4px',
-                            }}
-                            variant="rectangular"
-                            animation="wave"
-                          />
-                        }
-                      />
-                      <Typography
-                        sx={{
-                          margin: 'auto',
-                          ...(interestAreaList.includes(value)
-                            ? {
-                                fontWeight: 700,
-                              }
-                            : {}),
-                        }}
-                      >
-                        {label}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                    marginTop: '12px',
-                  }}
-                >
-                  {CATEGORIES.slice(4, 8).map(({ label, value, image }) => (
-                    <Box
-                      key={label}
-                      onClick={() => {
-                        if (interestAreaList.includes(value)) {
-                          setInterestAreaList((state) =>
-                            state.filter((data) => data !== value),
-                          );
-                        } else {
-                          setInterestAreaList((state) => [...state, value]);
-                        }
-                      }}
-                      sx={{
-                        border: '1px solid #DBDBDB',
-                        borderRadius: '8px',
-                        padding: '10px',
-                        width: 'calc(calc(100% - 16px) / 4)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyItems: 'center',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                        ...(interestAreaList.includes(value)
-                          ? {
-                              backgroundColor: '#DEF5F5',
-                              border: '1px solid #16B9B3',
-                            }
-                          : {}),
-                      }}
-                    >
-                      <LazyLoadImage
-                        alt={label}
-                        src={image}
-                        effect="opacity"
-                        style={{
-                          height: '100px',
-                          width: '100%',
-                          borderRadius: '6px',
-                          background: 'rgba(240, 240, 240, .8)',
-                          objectFit: 'cover',
-                          objectPosition: 'center',
-                          '@media (maxWidth: 767px)': {
-                            width: '100%',
-                          },
-                        }}
-                        placeholder={
-                          // eslint-disable-next-line react/jsx-wrap-multilines
-                          <Skeleton
-                            sx={{
-                              height: '100px',
-                              width: '100%',
-                              borderRadius: '6px',
-                              background: 'rgba(240, 240, 240, .8)',
-                              marginTop: '4px',
-                            }}
-                            variant="rectangular"
-                            animation="wave"
-                          />
-                        }
-                      />
-                      <Typography
-                        sx={{
-                          margin: 'auto',
-                          ...(interestAreaList.includes(value)
-                            ? {
-                                fontWeight: 700,
-                              }
-                            : {}),
-                        }}
-                      >
-                        {label}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                    marginTop: '12px',
-                  }}
-                >
-                  {CATEGORIES.slice(8).map(({ label, value, image }) => (
-                    <Box
-                      key={label}
-                      onClick={() => {
-                        if (interestAreaList.includes(value)) {
-                          setInterestAreaList((state) =>
-                            state.filter((data) => data !== value),
-                          );
-                        } else {
-                          setInterestAreaList((state) => [...state, value]);
-                        }
-                      }}
-                      sx={{
-                        border: '1px solid #DBDBDB',
-                        borderRadius: '8px',
-                        padding: '10px',
-                        width: 'calc(calc(100% - 16px) / 4)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyItems: 'center',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                        ...(interestAreaList.includes(value)
-                          ? {
-                              backgroundColor: '#DEF5F5',
-                              border: '1px solid #16B9B3',
-                            }
-                          : {}),
+                        '@media (max-width: 767px)': {
+                          height: '100% auto',
+                          width: 'calc(calc(100% - 24px) / 2)',
+                          flexBasis: 'calc(calc(100% - 24px) / 2)',
+                        },
                       }}
                     >
                       <LazyLoadImage
@@ -505,7 +344,7 @@ function EditPage() {
                 <Button
                   sx={{
                     width: '100%',
-                    height:'40px',
+                    height: '40px',
                     borderRadius: '20px',
                     mr: '4px',
                   }}
@@ -520,7 +359,7 @@ function EditPage() {
                 <Button
                   sx={{
                     width: '100%',
-                    height:'40px',
+                    height: '40px',
                     borderRadius: '20px',
                     ml: '4px',
                     color: '#ffff',

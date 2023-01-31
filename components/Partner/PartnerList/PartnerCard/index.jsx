@@ -4,13 +4,18 @@ import { Box, Typography, Divider, Skeleton } from '@mui/material';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
-const PartnerCard = ({ image, name, subTitle, canShare, canTogether }) => {
+function PartnerCard({ image, name, subTitle, canShare, canTogether }) {
   return (
     <Box
       sx={{
         background: '#FFFFFF',
-        flex: '0 0 calc(50% - 24px)',
+        flexBasis: 'calc(50% - 24px)',
         margin: '12px',
+        '@media (max-width: 767px)': {
+          height: '100% auto',
+          width: 'calc(100% - 24px)',
+          flexBasis: 'calc(100% - 24px)',
+        },
       }}
     >
       <Box>
@@ -110,6 +115,6 @@ const PartnerCard = ({ image, name, subTitle, canShare, canTogether }) => {
       </Box>
     </Box>
   );
-};
+}
 
 export default PartnerCard;

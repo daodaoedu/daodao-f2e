@@ -48,7 +48,7 @@ const LIST = [
   },
 ];
 
-const PartnerList = () => {
+function PartnerList() {
   return (
     <Box sx={{ minHeight: '100vh', padding: '5%' }}>
       <Box
@@ -72,6 +72,6 @@ const PartnerList = () => {
       </Box>
     </Box>
   );
-};
+}
 
 export default PartnerList;
