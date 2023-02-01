@@ -75,45 +75,19 @@ function EditPage() {
   const router = useRouter();
   const auth = getAuth();
   const [user, isLoading] = useAuthState(auth);
-  const [userName, setUserName] = useState('');
-  const [photoURL, setPhotoURL] = useState('');
-  const [birthDay, setBirthDay] = useState(dayjs());
-  const [gender, setGender] = useState('');
-  const [roleList, setRoleList] = useState([]);
-  const [wantToLearnList, setWantToLearnList] = useState([]);
   const [interestAreaList, setInterestAreaList] = useState([]);
-  const [educationStep, setEducationStep] = useState('-1');
-  const [location, setLocation] = useState('tw');
-  const [url, setUrl] = useState('');
-  const [description, setDescription] = useState('');
-  const [isOpenLocation, setIsOpenLocation] = useState(false);
-  const [isOpenProfile, setIsOpenProfile] = useState(false);
   const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoading) {
-      setUserName(user?.displayName || '');
-      setPhotoURL(user?.photoURL || '');
       const db = getFirestore();
       if (user?.uid) {
         // console.log('auth.currentUser', auth.currentUser);
         const docRef = doc(db, 'user', user?.uid);
         getDoc(docRef).then((docSnap) => {
           const data = docSnap.data();
-          setUserName(data?.userName || '');
-          setPhotoURL(data?.photoURL || '');
-          setBirthDay(dayjs(data?.birthDay) || dayjs());
-          setGender(data?.gender || '');
-          setRoleList(data?.roleList || []);
-          setWantToLearnList(data?.wantToLearnList || []);
           setInterestAreaList(data?.interestAreaList || []);
-          setEducationStep(data?.educationStep);
-          setLocation(data?.location || '');
-          setUrl(data?.url || '');
-          setDescription(data?.description || '');
-          setIsOpenLocation(data?.isOpenLocation || false);
-          setIsOpenProfile(data?.isOpenProfile || false);
         });
       }
     }
@@ -121,19 +95,7 @@ function EditPage() {
 
   const onUpdateUser = (successCallback) => {
     const payload = {
-      userName,
-      photoURL,
-      birthDay: birthDay.toISOString(),
-      gender,
-      roleList,
-      wantToLearnList,
       interestAreaList,
-      educationStep,
-      location,
-      url,
-      description,
-      isOpenLocation,
-      isOpenProfile,
       lastUpdateDate: dayjs().toISOString(),
     };
 
