@@ -117,7 +117,7 @@ function EditPage() {
     }
   }, [user, isLoading]);
 
-  const onUpdateUser = () => {
+  const onUpdateUser = (successCallback) => {
     const payload = {
       userName,
       photoURL,
@@ -138,43 +138,24 @@ function EditPage() {
     const db = getFirestore();
 
     const docRef = doc(db, 'user', user?.uid);
-    getDoc(docRef).then((docSnap) => {
+    getDoc(docRef).then(() => {
       setIsLoadingSubmit(true);
-      const isNewUser = Object.keys(docSnap.data() || {}).length === 0;
-      if (isNewUser) {
-        toast
-          .promise(
-            setDoc(docRef, payload).then(() => {
-              setIsLoadingSubmit(false);
-            }),
-            {
-              success: '更新成功！',
-              error: '更新失敗',
-              loading: '更新中...',
-            },
-          )
-          .then(() => {
-            router.push('/profile');
-          });
-      } else {
-        toast
-          .promise(
-            setDoc(docRef, payload).then(() => {
-              setIsLoadingSubmit(false);
-            }),
-            {
-              success: '更新成功！',
-              error: '更新失敗',
-              loading: '更新中...',
-            },
-          )
-          .then(() => {
-            router.push('/profile');
-          });
-      }
+      toast
+        .promise(
+          setDoc(docRef, payload).then(() => {
+            setIsLoadingSubmit(false);
+          }),
+          {
+            success: '更新成功！',
+            error: '更新失敗',
+            loading: '更新中...',
+          },
+        )
+        .then(() => {
+          successCallback();
+        });
     });
   };
-
   const SEOData = useMemo(
     () => ({
       title: '編輯我的島島資料｜島島阿學',
@@ -398,7 +379,7 @@ function EditPage() {
                   }}
                   variant="contained"
                   onClick={() => {
-                    router.push('/signin/interest');
+                    onUpdateUser(() => router.push('/signin/interest'));
                   }}
                 >
                   下一步
