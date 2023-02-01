@@ -1,8 +1,7 @@
 import React from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import BannerImage from './BannerImage';
 import { useRouter } from 'next/router';
-
+import BannerImage from './BannerImage';
 
 const Banner = () => {
   const router = useRouter();

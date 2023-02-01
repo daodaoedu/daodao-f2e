@@ -49,5 +49,10 @@ module.exports = {
     'react/jsx-curly-newline': 0,
     camelcase: 0,
     'no-unused-vars': 0,
+    'react/function-component-definition': 0,
+    'react/jsx-no-useless-fragment': 0,
+    'react/no-unknown-property': 0,
+    'no-unsafe-optional-chaining': 0,
+    'react/no-invalid-html-attribute': 0,
   },
 };

@@ -156,7 +156,7 @@ const LoginPage = () => {
           >
             Google 登入 / 註冊
           </Button>
-          <Box sx={{ marginTop: '24px'}}>
+          <Box sx={{ marginTop: '24px' }}>
             <Typography sx={{ color: '#536166', fontSize: '14px' }}>
               {`註冊即代表您同意島島阿學的 `}
               <Typography
