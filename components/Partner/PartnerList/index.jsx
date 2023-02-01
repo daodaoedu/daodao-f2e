@@ -48,7 +48,7 @@ const LIST = [
   },
 ];
 
-function PartnerList() {
+function PartnerList({ list }) {
   return (
     <Box sx={{ minHeight: '100vh', padding: '5%' }}>
       <Box
@@ -59,16 +59,24 @@ function PartnerList() {
           alignItems: 'center',
         }}
       >
-        {LIST.map(({ name, image, subTitle, canShare, canTogether }) => (
-          <PartnerCard
-            key={name}
-            image={image}
-            name={name}
-            subTitle={subTitle}
-            canShare={canShare}
-            canTogether={canTogether}
-          />
-        ))}
+        {list.map(
+          ({
+            userName,
+            photoURL,
+            subTitle,
+            wantToLearnList,
+            interestAreaList,
+          }) => (
+            <PartnerCard
+              key={userName}
+              image={photoURL}
+              name={userName}
+              subTitle={subTitle}
+              canShare={wantToLearnList}
+              canTogether={interestAreaList}
+            />
+          ),
+        )}
       </Box>
     </Box>
   );

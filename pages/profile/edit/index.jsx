@@ -117,7 +117,7 @@ function EditPage() {
     }
   }, [user, isLoading]);
 
-  const onUpdateUser = () => {
+  const onUpdateUser = (successCallback) => {
     const payload = {
       userName,
       photoURL,
@@ -138,10 +138,28 @@ function EditPage() {
     const db = getFirestore();
 
     const docRef = doc(db, 'user', user?.uid);
+    const partnerlistDocRef = doc(db, 'partnerlist', user?.uid);
     getDoc(docRef).then((docSnap) => {
       setIsLoadingSubmit(true);
-      const isNewUser = Object.keys(docSnap.data() || {}).length === 0;
-      if (isNewUser) {
+      if (isOpenProfile) {
+        toast
+          .promise(
+            Promise.allSettled([
+              updateDoc(docRef, payload),
+              setDoc(partnerlistDocRef, payload),
+            ]).then(() => {
+              setIsLoadingSubmit(false);
+            }),
+            {
+              success: '更新成功！',
+              error: '更新失敗',
+              loading: '更新中...',
+            },
+          )
+          .then(() => {
+            successCallback();
+          });
+      } else {
         toast
           .promise(
             updateDoc(docRef, payload).then(() => {
@@ -154,22 +172,7 @@ function EditPage() {
             },
           )
           .then(() => {
-            router.push('/profile');
-          });
-      } else {
-        toast
-          .promise(
-            setDoc(docRef, payload).then(() => {
-              setIsLoadingSubmit(false);
-            }),
-            {
-              success: '更新成功！',
-              error: '更新失敗',
-              loading: '更新中...',
-            },
-          )
-          .then(() => {
-            router.push('/profile');
+            successCallback();
           });
       }
     });
@@ -826,7 +829,7 @@ function EditPage() {
                 variant="outlined"
                 disabled={isLoadingSubmit}
                 onClick={() => {
-                  onUpdateUser();
+                  onUpdateUser(() => router.push('/profile'));
                 }}
               >
                 儲存資料

@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
-import Banner from './Banner';
-import SearchField from './SearchField';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { getAuth, updateProfile } from 'firebase/auth';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  getDoc,
+  setDoc,
+  addDoc,
+} from 'firebase/firestore';
 import PartnerList from './PartnerList';
+import SearchField from './SearchField';
+import Banner from './Banner';
 
 const PartnerWrapper = styled.div`
   min-height: 100vh;
@@ -13,6 +24,43 @@ const PartnerWrapper = styled.div`
 `;
 
 function Partner() {
+  const [partnerList, setPartnerList] = useState([]);
+  useEffect(() => {
+    const db = getFirestore();
+    const colRef = collection(db, 'partnerlist');
+    getDocs(colRef).then((docsSnap) => {
+      docsSnap.forEach((doc) => {
+        setPartnerList((prevState) => [
+          ...prevState,
+          {
+            id: doc.id,
+            ...(doc.data() || {}),
+          },
+        ]);
+        console.log(doc.id, ' => ', doc.data());
+      });
+    });
+    // const test = collection('partnerlist').
+    // console.log('test', test);
+    // const docRef = doc(db, 'partnerlist', user?.uid);
+    // getDoc(docRef).then((docSnap) => {
+    //   const data = docSnap.data();
+    //   setUserName(data?.userName || '');
+    //   setPhotoURL(data?.photoURL || '');
+    //   setBirthDay(dayjs(data?.birthDay) || dayjs());
+    //   setGender(data?.gender || '');
+    //   setRoleList(data?.roleList || []);
+    //   setWantToLearnList(data?.wantToLearnList || []);
+    //   setInterestAreaList(data?.interestAreaList || []);
+    //   setEducationStep(data?.educationStep);
+    //   setLocation(data?.location || '');
+    //   setUrl(data?.url || '');
+    //   setDescription(data?.description || '');
+    //   setIsOpenLocation(data?.isOpenLocation || false);
+    //   setIsOpenProfile(data?.isOpenProfile || false);
+    // });
+  }, [setPartnerList]);
+  console.log('partnerList', partnerList);
   return (
     <>
       <Banner />
@@ -42,7 +90,7 @@ function Partner() {
               background: '#fff',
             }}
           >
-            <PartnerList />
+            <PartnerList list={partnerList} />
           </Box>
         </Box>
       </PartnerWrapper>
