@@ -26,6 +26,7 @@ import {
   getDocs,
   doc,
   getDoc,
+  updateDoc,
   setDoc,
   addDoc,
 } from 'firebase/firestore';
@@ -143,7 +144,7 @@ function EditPage() {
       setIsLoadingSubmit(true);
       toast
         .promise(
-          setDoc(docRef, payload).then(() => {
+          updateDoc(docRef, payload).then(() => {
             setIsLoadingSubmit(false);
           }),
           {

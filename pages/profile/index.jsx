@@ -26,6 +26,7 @@ import {
   getDoc,
   setDoc,
   addDoc,
+  updateDoc,
 } from 'firebase/firestore';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import Tab from '@mui/material/Tab';

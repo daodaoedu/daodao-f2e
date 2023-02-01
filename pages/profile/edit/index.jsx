@@ -27,6 +27,7 @@ import {
   getDoc,
   setDoc,
   addDoc,
+  updateDoc,
 } from 'firebase/firestore';
 import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -143,7 +144,7 @@ function EditPage() {
       if (isNewUser) {
         toast
           .promise(
-            setDoc(docRef, payload).then(() => {
+            updateDoc(docRef, payload).then(() => {
               setIsLoadingSubmit(false);
             }),
             {
