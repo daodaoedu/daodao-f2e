@@ -7,30 +7,29 @@ const BannerImageWrapper = styled.div`
   width: 100%;
   overflow: hidden;
   z-index: -1;
-  top: 80px;
+  top: 0px;
   height: 60vh;
   /* @media (max-width: 768px) {
     height: 80vh;
   } */
 `;
 
-const BannerImage = () => {
+function BannerImage() {
   return (
     <BannerImageWrapper>
       <Box
         component="img"
-        src="/assets/images/partner-banner.png"
+        src="/assets/partner-banner.png"
         sx={{
           objectFit: 'cover',
           width: '100%',
           height: 'inherit',
           background: 'rgba(0, 0, 0, 0.75)',
           backdropFilter: 'blur(180px)',
-          zIndex: 1,
         }}
       />
     </BannerImageWrapper>
   );
-};
+}
 
 export default BannerImage;
