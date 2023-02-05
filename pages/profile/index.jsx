@@ -114,8 +114,8 @@ function ProfilePage() {
   const [interestAreaList, setInterestAreaList] = useState([]);
   useEffect(() => {
     if (!isLoading) {
-      setUserName(user?.displayName || '');
-      setPhotoURL(user?.photoURL || '');
+      // setUserName(user?.displayName || '');
+      // setPhotoURL(user?.photoURL || '');
       const db = getFirestore();
       if (user?.uid) {
         const docRef = doc(db, 'user', user?.uid);
@@ -126,8 +126,10 @@ function ProfilePage() {
           setDescription(data?.description || '');
           setWantToLearnList(data?.wantToLearnList || []);
           setInterestAreaList(data?.interestAreaList || []);
+          console.log('data', data);
         });
       }
+      // console.log('user', user);
     }
   }, [user, isLoading]);
   const SEOData = useMemo(
@@ -386,42 +388,7 @@ function ProfilePage() {
                     width: '316px',
                   },
                 }}
-              >
-                <Box>
-                  <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
-                    可分享
-                  </Typography>
-                  <Typography sx={{ marginLeft: '12px' }}>自學心得</Typography>
-                </Box>
-                <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
-                <Box>
-                  <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
-                    想一起
-                  </Typography>
-                  <Typography sx={{ marginLeft: '12px' }}>
-                    {wantToLearnList
-                      .map((item) => mapToTable(WANT_TO_DO_WITH_PARTNER)[item])
-                      .join(', ') ||
-                      '衝浪、還有衝浪、或是找別人衝浪、交更多朋友一起衝浪'}
-                  </Typography>
-                </Box>
-                <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
-                <Box>
-                  <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
-                    網站
-                  </Typography>
-                  <Typography sx={{ marginLeft: '12px' }}>xxx</Typography>
-                </Box>
-                <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
-                <Box>
-                  <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
-                    簡介
-                  </Typography>
-                  <Typography component="p" sx={{}}>
-                    {description || '開車去衝浪，偶而開出去衝浪'}
-                  </Typography>
-                </Box>
-              </Box>
+              />
             </TabPanel>
           </TabContext>
         </Box>

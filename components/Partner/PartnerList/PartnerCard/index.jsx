@@ -3,8 +3,21 @@ import styled from '@emotion/styled';
 import { Box, Typography, Divider, Skeleton } from '@mui/material';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import {
+  WANT_TO_DO_WITH_PARTNER,
+  CATEGORIES,
+} from '../../../../constants/member';
+import { mapToTable } from '../../../../utils/helper';
 
-function PartnerCard({ image, name, subTitle, canShare, canTogether }) {
+const WANT_TO_DO_WITH_PARTNER_TABLE = mapToTable(WANT_TO_DO_WITH_PARTNER);
+const CATEGORIES_TABLE = mapToTable(CATEGORIES);
+function PartnerCard({
+  image,
+  name,
+  subTitle,
+  canShare = [],
+  canTogether = [],
+}) {
   return (
     <Box
       sx={{
@@ -100,7 +113,9 @@ function PartnerCard({ image, name, subTitle, canShare, canTogether }) {
               可分享
             </Typography>
             <Typography sx={{ marginLeft: '12px', color: '#536166' }}>
-              {canShare}
+              {canShare
+                .map((item) => WANT_TO_DO_WITH_PARTNER_TABLE[item] || '')
+                .join(', ')}
             </Typography>
           </Box>
           <Box>
@@ -108,7 +123,9 @@ function PartnerCard({ image, name, subTitle, canShare, canTogether }) {
               想一起
             </Typography>
             <Typography sx={{ marginLeft: '12px', color: '#536166' }}>
-              {canTogether}
+              {canTogether
+                .map((item) => CATEGORIES_TABLE[item] || '')
+                .join(', ')}
             </Typography>
           </Box>
         </Box>

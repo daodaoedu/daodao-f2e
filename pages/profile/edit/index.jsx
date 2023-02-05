@@ -88,19 +88,17 @@ function EditPage() {
   const [isOpenLocation, setIsOpenLocation] = useState(false);
   const [isOpenProfile, setIsOpenProfile] = useState(false);
   const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
-
+  console.log('user', user);
   useEffect(() => {
     if (!isLoading) {
-      setUserName(user?.displayName || '');
-      setPhotoURL(user?.photoURL || '');
       const db = getFirestore();
       if (user?.uid) {
-        // console.log('auth.currentUser', auth.currentUser);
         const docRef = doc(db, 'user', user?.uid);
         getDoc(docRef).then((docSnap) => {
           const data = docSnap.data();
-          setUserName(data?.userName || '');
-          setPhotoURL(data?.photoURL || '');
+          console.log('data', data);
+          setUserName(data?.userName || user?.displayName || '');
+          setPhotoURL(data?.photoURL || user?.photoURL || '');
           setBirthDay(dayjs(data?.birthDay) || dayjs());
           setGender(data?.gender || '');
           setRoleList(data?.roleList || []);

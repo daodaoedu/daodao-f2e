@@ -40,12 +40,12 @@ const MenuProps = {
 const names = ['學齡前', '國小', '國高中', '大學以上'];
 
 const SearchField = () => {
-  const { query } = useRouter();
-  const queryList = (query?.cats ?? '').split(',').reverse();
+  // const { query } = useRouter();
+  // const queryList = (query?.cats ?? '').split(',').reverse();
   return (
     <SearchFieldWrapper>
       <SearchInput />
-      <HotTags queryList={queryList} />
+      {/* <HotTags queryList={queryList} /> */}
       <Box
         sx={{
           margin: '5px 0',
