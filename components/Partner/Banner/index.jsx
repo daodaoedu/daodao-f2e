@@ -7,8 +7,7 @@ const Banner = () => {
   const router = useRouter();
 
   return (
-    <Box sx={{ height: '60vh',zIndex:0,position: 'relative',
-  }}>
+    <Box sx={{ height: '60vh', zIndex: 0, position: 'relative' }}>
       <Box
         sx={{
           display: 'flex',

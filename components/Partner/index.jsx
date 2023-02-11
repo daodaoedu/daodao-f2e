@@ -22,7 +22,6 @@ const PartnerWrapper = styled.div`
   z-index: 100;
   margin-top: -150px;
   position: relative;
-
 `;
 
 function Partner() {
