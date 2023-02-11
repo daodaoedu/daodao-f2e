@@ -12,6 +12,7 @@ import {
   setDoc,
   addDoc,
 } from 'firebase/firestore';
+import { useRouter } from 'next/router';
 import PartnerList from './PartnerList';
 import SearchField from './SearchField';
 import Banner from './Banner';
@@ -25,6 +26,7 @@ const PartnerWrapper = styled.div`
 `;
 
 function Partner() {
+  const router = useRouter();
   const [partnerList, setPartnerList] = useState([]);
   useEffect(() => {
     const db = getFirestore();

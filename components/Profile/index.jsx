@@ -40,10 +40,14 @@ function Profile() {
 
   useLayoutEffect(() => {
     const db = getFirestore();
-    if (!isLoadingUser && user?.uid) {
-      const docRef = doc(db, 'user', user?.uid);
+    if (
+      (router.isReady && !isLoadingUser && router?.query?.userId) ||
+      user?.uid
+    ) {
+      const docRef = doc(db, 'user', router?.query?.userId || user?.uid);
       getDoc(docRef).then((docSnap) => {
         const data = docSnap.data();
+        console.log('data', data);
         setUserName(data?.userName || '');
         setPhotoURL(data?.photoURL || '');
         setDescription(data?.description || '');
