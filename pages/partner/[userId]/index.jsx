@@ -12,7 +12,7 @@ const HomePageWrapper = styled.div`
   background: #f3fcfc;
 `;
 
-function PartnerPage() {
+function PartnerPage({ userId }) {
   const router = useRouter();
   const SEOData = useMemo(
     () => ({
@@ -50,10 +50,14 @@ function PartnerPage() {
     <HomePageWrapper>
       <SEOConfig data={SEOData} />
       <Navigation />
-      <Profile />
+      <Profile userId={userId} />
       <Footer />
     </HomePageWrapper>
   );
 }
+
+PartnerPage.getInitialProps = ({ query }) => {
+  return { userId: query.userId };
+};
 
 export default PartnerPage;

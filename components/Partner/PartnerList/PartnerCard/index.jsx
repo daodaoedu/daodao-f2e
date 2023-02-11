@@ -12,6 +12,7 @@ import { mapToTable } from '../../../../utils/helper';
 const WANT_TO_DO_WITH_PARTNER_TABLE = mapToTable(WANT_TO_DO_WITH_PARTNER);
 const CATEGORIES_TABLE = mapToTable(CATEGORIES);
 function PartnerCard({
+  id,
   image,
   name,
   subTitle,
@@ -78,6 +79,8 @@ function PartnerCard({
               }}
             >
               <Typography
+                component="a"
+                href={`/partner/${id}`}
                 sx={{ color: '#536166', fontSize: '16px', fontWeight: 500 }}
               >
                 {name}

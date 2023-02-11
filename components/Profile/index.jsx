@@ -26,7 +26,7 @@ const BottonBack = {
   },
 };
 
-function Profile() {
+function Profile({ userId }) {
   const router = useRouter();
   const auth = getAuth();
   const [user, isLoadingUser] = useAuthState(auth);
@@ -40,11 +40,8 @@ function Profile() {
 
   useLayoutEffect(() => {
     const db = getFirestore();
-    if (
-      (router.isReady && !isLoadingUser && router?.query?.userId) ||
-      user?.uid
-    ) {
-      const docRef = doc(db, 'user', router?.query?.userId || user?.uid);
+    if (!isLoadingUser || userId || user?.uid) {
+      const docRef = doc(db, 'user', userId || user?.uid);
       getDoc(docRef).then((docSnap) => {
         const data = docSnap.data();
         console.log('data', data);

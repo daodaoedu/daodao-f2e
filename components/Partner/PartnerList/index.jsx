@@ -62,6 +62,7 @@ function PartnerList({ list }) {
       >
         {list.map(
           ({
+            id,
             userName,
             photoURL,
             subTitle,
@@ -69,7 +70,8 @@ function PartnerList({ list }) {
             interestAreaList,
           }) => (
             <PartnerCard
-              key={userName}
+              key={`${id}-${userName}`}
+              id={id}
               image={photoURL}
               name={userName}
               subTitle={subTitle}
