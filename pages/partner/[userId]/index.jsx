@@ -59,9 +59,14 @@ function PartnerPage({ userId }) {
   );
 }
 
-export async function getStaticProps() {
+export async function getStaticProps({ params }) {
+  // params.id 包含动态路由参数的值
+  const { userId } = params;
+
   return {
-    props: {},
+    props: {
+      userId,
+    },
   };
 }
 
@@ -70,7 +75,7 @@ export async function getStaticPaths() {
 
   // fallback: true means that the missing pages
   // will not 404, and instead can render a fallback.
-  return { paths: [], fallback: true };
+  return { paths: [], fallback: 'blocking' };
 }
 
 // PartnerPage.getInitialProps = ({ query }) => {
