@@ -75,7 +75,7 @@ export async function getStaticPaths() {
 
   // fallback: true means that the missing pages
   // will not 404, and instead can render a fallback.
-  return { paths: [], fallback: 'blocking' };
+  return { paths: [], fallback: true };
 }
 
 // PartnerPage.getInitialProps = ({ query }) => {
