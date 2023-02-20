@@ -46,6 +46,9 @@ function PartnerPage({ userId }) {
     [router?.asPath],
   );
 
+  if (router.isFallback) {
+    return <div>Loading...</div>;
+  }
   return (
     <HomePageWrapper>
       <SEOConfig data={SEOData} />
@@ -56,8 +59,22 @@ function PartnerPage({ userId }) {
   );
 }
 
-PartnerPage.getInitialProps = ({ query }) => {
-  return { userId: query.userId };
-};
+export async function getStaticProps() {
+  return {
+    props: {},
+  };
+}
+
+export async function getStaticPaths() {
+  // ...
+
+  // fallback: true means that the missing pages
+  // will not 404, and instead can render a fallback.
+  return { paths: [], fallback: true };
+}
+
+// PartnerPage.getInitialProps = ({ query }) => {
+//   return { userId: query.userId };
+// };
 
 export default PartnerPage;
