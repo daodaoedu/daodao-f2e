@@ -71,11 +71,12 @@ export async function getStaticProps({ params }) {
 }
 
 export async function getStaticPaths() {
-  // ...
-
   // fallback: true means that the missing pages
   // will not 404, and instead can render a fallback.
-  return { paths: [], fallback: true };
+  return {
+    paths: [{ params: { userId: '1' } }, { params: { userId: '2' } }],
+    fallback: true,
+  };
 }
 
 // PartnerPage.getInitialProps = ({ query }) => {
