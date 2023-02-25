@@ -41,7 +41,6 @@ function Edm() {
             fontWeight: 'bold',
             fontSize: '36px',
             lineHeight: '140%',
-            letterSpacing: '0.08em',
             '@media(max-width: 767px)': {
               fontSize: '26px',
             },
@@ -57,7 +56,6 @@ function Edm() {
             fontWeight: 'bold',
             fontSize: '18px',
             lineHeight: '140%',
-            letterSpacing: '0.08em',
             '@media(max-width: 767px)': {
               fontSize: '14px',
             },
@@ -75,7 +73,6 @@ function Edm() {
             fontWeight: 'bold',
             fontSize: '14px',
             lineHeight: '140%',
-            letterSpacing: '0.08em',
             textAlign: 'center',
             '@media(max-width: 767px)': {
               fontSize: '8px',
