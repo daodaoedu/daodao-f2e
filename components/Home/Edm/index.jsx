@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { Button, Box, Typography,Link } from '@mui/material';
-import { bgcolor } from '@mui/system';
+import { Button, Box, Typography, Link } from '@mui/material';
 
 const EdmWrapper = styled.div`
   width: 90%;
@@ -29,8 +28,8 @@ function Edm() {
           justifyContent: 'center',
           alignItems: 'center',
           '@media(max-width: 767px)': {
-            paddingLeft:'5%',
-            paddingRight:'5%',
+            paddingLeft: '5%',
+            paddingRight: '5%',
           },
         }}
       >
@@ -66,7 +65,7 @@ function Edm() {
         <Typography
           variant="body1"
           sx={{
-            maxWidth:'370px',
+            maxWidth: '370px',
             paddingTop: '24px',
             paddingBottom: '24px',
             color: '#536166',
@@ -82,20 +81,20 @@ function Edm() {
           每月與您分享最新資訊，內容包含：國內外教育新聞、自學經驗分享、實驗教育職缺、每月最新自學資源
         </Typography>
         <Link href="https://forms.gle/wXuKYmQjzRKRxe387">
-        <Button
-          variant="contained"
-          sx={{
-            width: '200px',
-            padding: '9px 60px 9px 60px',
-            marginBottom: '60px',
-            bgcolor: '#16B9B3',
-            color: '#FFFFFF',
-            borderRadius: '20px',
-            fontSize: '16px',
-          }}
-        >
-          訂閱電子報
-        </Button>
+          <Button
+            variant="contained"
+            sx={{
+              width: '200px',
+              padding: '9px 60px 9px 60px',
+              marginBottom: '60px',
+              bgcolor: '#16B9B3',
+              color: '#FFFFFF',
+              borderRadius: '20px',
+              fontSize: '16px',
+            }}
+          >
+            訂閱電子報
+          </Button>
         </Link>
       </Box>
     </EdmWrapper>
