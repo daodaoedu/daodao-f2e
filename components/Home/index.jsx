@@ -5,12 +5,14 @@ import Banner from './Banner';
 import Guide from './Guide';
 import About from './About';
 import Group from './Group';
+import Edm from './Edm';
 import FacebookPosts from './FacebookPosts';
 import WishResource from './WishResource';
+import ComingSoon from './ComingSoon';
 
 const HomeWrapper = styled.div``;
 
-const Home = () => {
+function Home() {
   const guideRef = useRef(null);
   return (
     <HomeWrapper>
@@ -23,10 +25,13 @@ const Home = () => {
       <Divider sx={{ margin: '10px 0' }} />
       <WishResource />
       <Divider sx={{ margin: '10px 0' }} />
+      <ComingSoon />
+      <Divider sx={{ margin: '10px 0' }} />
       <div ref={guideRef} />
       <Guide />
+      <Edm />
     </HomeWrapper>
   );
-};
+}
 
 export default Home;
