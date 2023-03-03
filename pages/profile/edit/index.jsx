@@ -679,7 +679,7 @@ function EditPage() {
                   placeholder="ex.  自學申請、學習方法、學習資源，或各種學習領域的知識"
                 />
               </Box>
-              <Box
+              {/* <Box
                 sx={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -698,7 +698,7 @@ function EditPage() {
                 >
                   可以是學習領域、興趣等等的標籤，例如：音樂創作、程式語言、電繪、社會議題。
                 </Typography>
-              </Box>
+              </Box> */}
               <Box
                 sx={{
                   display: 'flex',

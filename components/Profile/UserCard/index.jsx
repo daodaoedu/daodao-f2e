@@ -126,10 +126,7 @@ function UserCard({ isLoading, tagList, photoURL, userName, location }) {
       >
         <LazyLoadImage
           alt="login"
-          src={
-            photoURL ||
-            'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60'
-          }
+          src={photoURL || ''}
           height={80}
           width={80}
           effect="opacity"
@@ -138,6 +135,8 @@ function UserCard({ isLoading, tagList, photoURL, userName, location }) {
             background: 'rgba(240, 240, 240, .8)',
             objectFit: 'cover',
             objectPosition: 'center',
+            minHeight: '80px',
+            minWidth: '80px',
           }}
           placeholder={
             // eslint-disable-next-line react/jsx-wrap-multilines
@@ -165,10 +164,10 @@ function UserCard({ isLoading, tagList, photoURL, userName, location }) {
         </Button>
         <Box sx={{ marginLeft: '12px' }}>
           <Typography sx={{ color: '#536166', fontSize: '18px' }}>
-            {userName || '許浪手'}
+            {userName || '-'}
           </Typography>
           <Typography component="p" sx={{ color: '#92989A' }}>
-            自學生
+            -
           </Typography>
           <Typography
             sx={{
@@ -181,7 +180,7 @@ function UserCard({ isLoading, tagList, photoURL, userName, location }) {
             <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />{' '}
             {LOCATION.find(
               (item) => item.alpha2 === location || item.alpha3 === location,
-            )?.name || '尚未設定'}
+            )?.name || '-'}
           </Typography>
         </Box>
       </Box>

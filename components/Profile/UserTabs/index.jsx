@@ -235,7 +235,7 @@ function UserTabs({ description, wantToLearnList, isLoading }) {
               <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
                 可分享
               </Typography>
-              <Typography sx={{ marginLeft: '12px' }}>自學心得</Typography>
+              <Typography sx={{ marginLeft: '12px' }}>-</Typography>
             </Box>
             <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
             <Box>
@@ -245,8 +245,7 @@ function UserTabs({ description, wantToLearnList, isLoading }) {
               <Typography sx={{ marginLeft: '12px' }}>
                 {wantToLearnList
                   .map((item) => mapToTable(WANT_TO_DO_WITH_PARTNER)[item])
-                  .join(', ') ||
-                  '衝浪、還有衝浪、或是找別人衝浪、交更多朋友一起衝浪'}
+                  .join(', ') || '-'}
               </Typography>
             </Box>
             <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
@@ -254,7 +253,7 @@ function UserTabs({ description, wantToLearnList, isLoading }) {
               <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
                 個人網站
               </Typography>
-              <Typography sx={{ marginLeft: '12px' }}>xxx</Typography>
+              <Typography sx={{ marginLeft: '12px' }}>-</Typography>
             </Box>
             <Divider sx={{ color: '#F3F3F3', margin: '6px 0' }} />
             <Box>
@@ -262,7 +261,7 @@ function UserTabs({ description, wantToLearnList, isLoading }) {
                 簡介
               </Typography>
               <Typography component="p" sx={{}}>
-                {description || '開車去衝浪，偶而開出去衝浪'}
+                {description || '-'}
               </Typography>
             </Box>
           </Box>
@@ -284,7 +283,9 @@ function UserTabs({ description, wantToLearnList, isLoading }) {
                 width: '316px',
               },
             }}
-          />
+          >
+            即將推出，敬請期待
+          </Box>
         </TabPanel>
       </TabContext>
     </Box>

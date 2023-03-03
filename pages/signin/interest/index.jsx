@@ -146,7 +146,8 @@ function EditPage() {
         }}
         onOk={() => {
           setOpen(false);
-          router.push('/profile/edit');
+          router.push('/');
+          // router.push('/profile/edit');
         }}
       />
       <SEOConfig data={SEOData} />
