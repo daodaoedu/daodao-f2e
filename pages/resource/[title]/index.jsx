@@ -323,13 +323,14 @@ export const getStaticProps = async ({ params }) => {
 
   return {
     props: {
-      data: (data?.payload?.results ?? []).find(({ properties }) =>
-        (
-          (properties['資源名稱']?.title ?? []).find(
-            (item) => item?.type === 'text',
-          )?.plain_text ?? ''
-        ).trim(),
-      ),
+      data:
+        (data?.payload?.results ?? []).find(({ properties }) =>
+          (
+            (properties['資源名稱']?.title ?? []).find(
+              (item) => item?.type === 'text',
+            )?.plain_text ?? ''
+          ).trim(),
+        ) || {},
     },
   };
 };

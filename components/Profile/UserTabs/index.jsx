@@ -1,7 +1,7 @@
 import { Box, Typography, Divider, Skeleton } from '@mui/material';
 import { useRouter } from 'next/router';
 import Tab from '@mui/material/Tab';
-import TabContext from '@mui/lab/TabContext';
+import TabContext from '@mui/lab';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import { useState } from 'react';
