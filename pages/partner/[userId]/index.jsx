@@ -12,7 +12,7 @@ const HomePageWrapper = styled.div`
   background: #f3fcfc;
 `;
 
-function PartnerPage({ userId }) {
+function PartnerPage({ userId = '' }) {
   const router = useRouter();
   const SEOData = useMemo(
     () => ({
@@ -59,25 +59,25 @@ function PartnerPage({ userId }) {
   );
 }
 
-export async function getStaticProps({ params }) {
-  // params.id 包含动态路由参数的值
-  const { userId } = params;
+// export async function getStaticProps({ params }) {
+//   // params.id 包含动态路由参数的值
+//   const { userId } = params;
 
-  return {
-    props: {
-      userId,
-    },
-  };
-}
+//   return {
+//     props: {
+//       userId,
+//     },
+//   };
+// }
 
-export async function getStaticPaths() {
-  // fallback: true means that the missing pages
-  // will not 404, and instead can render a fallback.
-  return {
-    paths: [{ params: { userId: '1' } }, { params: { userId: '2' } }],
-    fallback: true,
-  };
-}
+// export async function getStaticPaths() {
+//   // fallback: true means that the missing pages
+//   // will not 404, and instead can render a fallback.
+//   return {
+//     paths: [{ params: { userId: '1' } }, { params: { userId: '2' } }],
+//     fallback: true,
+//   };
+// }
 
 // PartnerPage.getInitialProps = ({ query }) => {
 //   return { userId: query.userId };
