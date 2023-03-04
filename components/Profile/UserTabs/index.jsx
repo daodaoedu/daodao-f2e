@@ -12,8 +12,8 @@ const UserTabs = ({
   wantToLearnList = [],
   isLoading = false,
 }) => {
-  console.log('description', description);
-  console.log('wantToLearnList', wantToLearnList);
+  // console.log('description', description);
+  // console.log('wantToLearnList', wantToLearnList);
 
   const [value, setValue] = useState('1');
   if (isLoading) {

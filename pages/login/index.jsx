@@ -10,7 +10,7 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import SEOConfig from '../../shared/components/SEO';
 import Navigation from '../../shared/components/Navigation_v2';
 import Footer from '../../shared/components/Footer_v2';
-import sendDataToChromeExtension from '../../utils/sendDataToChromeExtension';
+// import sendDataToChromeExtension from '../../utils/sendDataToChromeExtension';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -66,10 +66,10 @@ const LoginPage = () => {
         // The signed-in user info.
         // console.log('result', result);
         const { displayName } = result.user;
-        sendDataToChromeExtension(
-          'locidnghejlnnlnbglelhaflehebblei',
-          result.user,
-        );
+        // sendDataToChromeExtension(
+        //   'locidnghejlnnlnbglelhaflehebblei',
+        //   result.user,
+        // );
         const db = getFirestore();
         const docRef = doc(db, 'user', result?.user?.uid);
         getDoc(docRef).then((docSnap) => {
