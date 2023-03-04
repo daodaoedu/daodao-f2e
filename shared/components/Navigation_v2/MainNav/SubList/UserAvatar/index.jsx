@@ -8,13 +8,15 @@ import useFirebase from '../../../../../../hooks/useFirebase';
 
 const UserAvatar = () => {
   const { push } = useRouter();
-  const { auth, user, signInWithFacebook, signOutWithFacebook } = useFirebase();
+  const { auth, user, signInWithFacebook, signOutWithGoogle } = useFirebase();
   const [isOpenMenu, setIsOpenMenu] = useState(null);
   if (!user) {
     return (
       <IconButton
         sx={{ margin: '0 10px', fontSize: '16px', color: 'white' }}
-        onClick={() => signInWithFacebook()}
+        onClick={() => {
+          push('/login');
+        }}
       >
         <Group sx={{ fontSize: '30px' }} />
       </IconButton>
@@ -51,7 +53,8 @@ const UserAvatar = () => {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            signOutWithFacebook();
+            signOutWithGoogle();
+            push('/');
             setIsOpenMenu(false);
           }}
         >

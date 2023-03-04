@@ -1,6 +1,7 @@
 // import { keyframes, css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
+import { useRouter } from 'next/router';
 import MenuItem from './MenuItem';
 import UserAvatar from './UserAvatar';
 import useFirebase from '../../../../../hooks/useFirebase';
@@ -28,7 +29,14 @@ const MenuListWrapper = styled.div`
 `;
 
 const Menu = ({ open, list, onCloseMenu }) => {
-  const { auth, user, signInWithFacebook, signOutWithFacebook } = useFirebase();
+  const router = useRouter();
+  const {
+    auth,
+    user,
+    signInWithFacebook,
+    signOutWithFacebook,
+    signOutWithGoogle,
+  } = useFirebase();
   return (
     <MenuWrapper open={open}>
       {open && (
@@ -39,8 +47,10 @@ const Menu = ({ open, list, onCloseMenu }) => {
               key="登出"
               delay="0.1s"
               onClick={() => {
-                signOutWithFacebook();
+                // signOutWithFacebook();
                 onCloseMenu();
+                signOutWithGoogle();
+                router.push('/');
               }}
               text="登出"
             />
@@ -49,7 +59,8 @@ const Menu = ({ open, list, onCloseMenu }) => {
               key="登入"
               delay="0.1s"
               onClick={() => {
-                signInWithFacebook();
+                router.push('/login');
+                // signInWithFacebook();
               }}
               text="登入"
             />
