@@ -1,20 +1,25 @@
 import { Box, Typography, Divider, Skeleton } from '@mui/material';
-import { useRouter } from 'next/router';
 import Tab from '@mui/material/Tab';
-import TabContext from '@mui/lab';
+import { TabContext } from '@mui/lab';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import { useState } from 'react';
-import { WANT_TO_DO_WITH_PARTNER, CATEGORIES } from '../../../constants/member';
+import { WANT_TO_DO_WITH_PARTNER } from '../../../constants/member';
 import { mapToTable } from '../../../utils/helper';
 
-function UserTabs({ description, wantToLearnList, isLoading }) {
+const UserTabs = ({
+  description = '',
+  wantToLearnList = [],
+  isLoading = false,
+}) => {
+  console.log('description', description);
+  console.log('wantToLearnList', wantToLearnList);
+
   const [value, setValue] = useState('1');
   if (isLoading) {
     return (
       <Box
         sx={{
-          typography: 'body1',
           width: '720px',
           '@media (max-width: 767px)': {
             width: '316px',
@@ -166,7 +171,6 @@ function UserTabs({ description, wantToLearnList, isLoading }) {
   return (
     <Box
       sx={{
-        typography: 'body1',
         width: '720px',
         '@media (max-width: 767px)': {
           width: '316px',
@@ -290,6 +294,6 @@ function UserTabs({ description, wantToLearnList, isLoading }) {
       </TabContext>
     </Box>
   );
-}
+};
 
 export default UserTabs;

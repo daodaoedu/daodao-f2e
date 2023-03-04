@@ -26,7 +26,7 @@ const BottonBack = {
   },
 };
 
-function Profile({ userId }) {
+const Profile = () => {
   const router = useRouter();
   const auth = getAuth();
   const [user, isLoadingUser] = useAuthState(auth);
@@ -40,8 +40,8 @@ function Profile({ userId }) {
 
   useLayoutEffect(() => {
     const db = getFirestore();
-    if (!isLoadingUser || userId || user?.uid) {
-      const docRef = doc(db, 'user', userId || user?.uid);
+    if (!isLoadingUser && user?.uid) {
+      const docRef = doc(db, 'user', user?.uid || '');
       getDoc(docRef).then((docSnap) => {
         const data = docSnap.data();
         console.log('data', data);
@@ -113,23 +113,8 @@ function Profile({ userId }) {
         description={description}
         wantToLearnList={wantToLearnList}
       />
-
-      {/* <Button
-          variant="contained"
-          sx={{
-            marginTop: '24px',
-            width: '160px',
-            borderRadius: '20px',
-            color: '#fff',
-            bgcolor: '#16B9B3',
-            boxShadow: '0px 4px 10px rgba(89, 182, 178, 0.5)',
-          }}
-          onClick={() => {}}
-        >
-          加好友
-        </Button> */}
     </Box>
   );
-}
+};
 
 export default Profile;

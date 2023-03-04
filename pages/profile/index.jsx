@@ -10,7 +10,7 @@ const HomePageWrapper = styled.div`
   --section-height-offset: 80px;
 `;
 
-function ProfilePage() {
+const ProfilePage = () => {
   return (
     <HomePageWrapper>
       <Navigation />
@@ -18,6 +18,6 @@ function ProfilePage() {
       <Footer />
     </HomePageWrapper>
   );
-}
+};
 
 export default ProfilePage;
