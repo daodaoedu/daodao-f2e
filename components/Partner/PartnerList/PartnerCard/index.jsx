@@ -80,7 +80,8 @@ function PartnerCard({
             >
               <Typography
                 component="a"
-                href={`/partner/${id}`}
+                href="/"
+                // href={`/partner/${id}`}
                 sx={{ color: '#536166', fontSize: '16px', fontWeight: 500 }}
               >
                 {name}

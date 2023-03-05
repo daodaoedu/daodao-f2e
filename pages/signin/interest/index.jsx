@@ -142,7 +142,8 @@ function EditPage() {
         isLoadingSubmit={isLoadingSubmit}
         onClose={() => {
           setOpen(false);
-          router.push('/partner');
+          router.push('/');
+          // router.push('/partner');
         }}
         onOk={() => {
           setOpen(false);
