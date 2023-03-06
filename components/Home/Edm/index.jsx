@@ -38,7 +38,7 @@ function Edm() {
           sx={{
             color: '#293A3D',
             fontWeight: 'bold',
-            fontSize: '36px',
+            fontSize: '26px',
             lineHeight: '140%',
             '@media(max-width: 767px)': {
               fontSize: '26px',

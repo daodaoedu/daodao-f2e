@@ -8,7 +8,8 @@ import Group from './Group';
 import Edm from './Edm';
 import FacebookPosts from './FacebookPosts';
 import WishResource from './WishResource';
-import ComingSoon from './ComingSoon';
+import APPBanner from './APPBanner';
+import JoinCooperate from './JoinCooperate';
 
 const HomeWrapper = styled.div``;
 
@@ -19,16 +20,19 @@ function Home() {
       <Banner guideRef={guideRef} />
       <About />
       <Divider sx={{ margin: '10px 0' }} />
-      <Group />
+      <APPBanner />
       <Divider sx={{ margin: '10px 0' }} />
       <FacebookPosts />
       <Divider sx={{ margin: '10px 0' }} />
-      <WishResource />
+      <Group />
       <Divider sx={{ margin: '10px 0' }} />
-      <ComingSoon />
+      <JoinCooperate />
+      <Divider sx={{ margin: '10px 0' }} />
+      <WishResource />
       <Divider sx={{ margin: '10px 0' }} />
       <div ref={guideRef} />
       <Guide />
+      <Divider sx={{ margin: '10px 0' }} />
       <Edm />
     </HomeWrapper>
   );
