@@ -48,8 +48,7 @@ const LIST = [
   },
 ];
 
-function PartnerList({ list }) {
-  console.log('list: ', list);
+function PartnerList({ list = [] }) {
   return (
     <Box sx={{ minHeight: '100vh', padding: '5%' }}>
       <Box

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth, updateProfile } from 'firebase/auth';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
@@ -93,7 +93,49 @@ function Partner() {
               background: '#fff',
             }}
           >
-            <PartnerList list={partnerList} />
+            <Box sx={{ minHeight: '100vh', padding: '5%' }}>
+              找夥伴功能架構與維運中，如果你們希望加速開發的腳步的話，歡迎一起加入團隊共同協作！
+              <Box
+                sx={{
+                  margin: '20px 0 10px 0',
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                }}
+              >
+                <Button
+                  variant="outlined"
+                  onClick={() =>
+                    window.open('https://forms.gle/if2kwAEQkeaTUgm37', '_blank')
+                  }
+                  sx={{ margin: '0 10px' }}
+                >
+                  <Typography variant="p">加入團隊</Typography>
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() =>
+                    window.open(
+                      'https://g0v.hackmd.io/@daodaoedu/HydZGAUYc',
+                      '_blank',
+                    )
+                  }
+                  sx={{ margin: '0 10px' }}
+                >
+                  <Typography variant="p">了解更多</Typography>
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() =>
+                    window.open('https://www.daoedu.tw/about', '_blank')
+                  }
+                  sx={{ margin: '0 10px' }}
+                >
+                  <Typography variant="p">關於島島</Typography>
+                </Button>
+              </Box>
+            </Box>
+            {/* <PartnerList list={partnerList} /> */}
           </Box>
         </Box>
       </PartnerWrapper>
