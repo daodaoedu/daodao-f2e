@@ -49,15 +49,19 @@ const JoinCooperate = () => {
           justifyContent: 'center',
           alignItems: 'flex-start',
           '@media(max-width: 767px)': {
-            flexDirection: 'column-reverse',
+            flexDirection: 'column',
           },
         }}
       >
-        <img
+        <Box
+          component="img"
           // src="https://www.daoedu.tw/cdn-cgi/image/width=300,height=300,quality=80,format=webp/assets/group.gif"
           src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2Q0NmU2Y2QwYmViMDgxZDZlZWJjZTE3MTk2YzdmY2M3M2E1ZTU4ZiZjdD1n/l4KibK3JwaVo0CjDO/giphy.gif"
-          width="200"
-          height="200"
+          sx={{
+            width: '200px',
+            height: '200px',
+            borderRadius: '20px',
+          }}
           alt="group"
         />
         <Box
@@ -65,6 +69,9 @@ const JoinCooperate = () => {
             marginTop: '50px',
             marginLeft: '20px',
             fontSize: '18px',
+            '@media(max-width: 767px)': {
+              marginLeft: '0px',
+            },
           }}
         >
           <Typography variant="p" sx={{ margin: '5px 0' }}>
@@ -92,7 +99,7 @@ const JoinCooperate = () => {
               }
               sx={{ margin: '0 10px' }}
             >
-              <Typography variant="p">加入營運團隊</Typography>
+              <Typography variant="p">加入團隊</Typography>
             </Button>
             <Button
               variant="outlined"
