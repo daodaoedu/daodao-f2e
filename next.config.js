@@ -1,6 +1,8 @@
-// const path = require("path");
+const withPWA = require('next-pwa')({
+  dest: 'public',
+});
 
-module.exports = {
+module.exports = withPWA({
   reactStrictMode: false,
   images: {
     domains: ['imgur.com'],
@@ -81,4 +83,4 @@ module.exports = {
   //     },
   //   ];
   // },
-};
+});
