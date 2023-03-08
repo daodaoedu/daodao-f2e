@@ -11,11 +11,8 @@ const CardWrapper = styled.li`
   width: 150px;
   height: calc(calc(150px / 9) * 16);
   flex: 0 0 150px;
-  /* border-radius: 20px; */
   margin: 5px;
-  /* padding: 10px; */
   color: #16b9b3;
-  /* border: 2px #16b9b3 solid; */
   overflow: hidden;
 
   cursor: pointer;

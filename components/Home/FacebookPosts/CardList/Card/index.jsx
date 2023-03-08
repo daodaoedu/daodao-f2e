@@ -10,7 +10,7 @@ const CardWrapper = styled.li`
   width: 200px;
   height: 120px;
   flex: 0 0 200px;
-  border-radius: 20px;
+  border-radius: 12px;
   margin: 5px;
   padding: 10px;
   color: #16b9b3;

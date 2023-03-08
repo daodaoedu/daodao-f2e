@@ -6,7 +6,7 @@ import Card from './Card';
 
 const CardListWrapper = styled.ul`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   overflow-x: scroll;
   scroll-behavior: smooth;
@@ -25,51 +25,96 @@ const SubHeaderWrapper = styled.h3`
 const ImageCardList = ({ title, list, direction = 'left', isLoading }) => {
   if (isLoading) {
     return (
-      <Box>
+      <Box sx={{ marginTop: '20px' }}>
         <SubHeaderWrapper>{title}</SubHeaderWrapper>
         <CardListWrapper>
           <Skeleton
             variant="rectangular"
-            width={200}
-            height={120}
-            sx={{ margin: '5px', flex: '0 0 200px', borderRadius: '20px' }}
+            sx={{
+              width: '150px',
+              height: '150px',
+              flex: '0 0 150px',
+              margin: '5px',
+            }}
           />
           <Skeleton
             variant="rectangular"
-            width={200}
-            height={120}
-            sx={{ margin: '5px', flex: '0 0 200px', borderRadius: '20px' }}
+            sx={{
+              width: '150px',
+              height: '150px',
+              flex: '0 0 150px',
+              margin: '5px',
+            }}
           />
           <Skeleton
             variant="rectangular"
-            width={200}
-            height={120}
-            sx={{ margin: '5px', flex: '0 0 200px', borderRadius: '20px' }}
+            sx={{
+              width: '150px',
+              height: '150px',
+              flex: '0 0 150px',
+              margin: '5px',
+            }}
           />
           <Skeleton
             variant="rectangular"
-            width={200}
-            height={120}
-            sx={{ margin: '5px', flex: '0 0 200px', borderRadius: '20px' }}
+            sx={{
+              width: '150px',
+              height: '150px',
+              flex: '0 0 150px',
+              margin: '5px',
+            }}
           />
           <Skeleton
             variant="rectangular"
-            width={200}
-            height={120}
-            sx={{ margin: '5px', flex: '0 0 200px', borderRadius: '20px' }}
+            sx={{
+              width: '150px',
+              height: '150px',
+              flex: '0 0 150px',
+              margin: '5px',
+            }}
           />
           <Skeleton
             variant="rectangular"
-            width={200}
-            height={120}
-            sx={{ margin: '5px', flex: '0 0 200px', borderRadius: '20px' }}
+            sx={{
+              width: '150px',
+              height: '150px',
+              flex: '0 0 150px',
+              margin: '5px',
+            }}
+          />
+          <Skeleton
+            variant="rectangular"
+            sx={{
+              width: '150px',
+              height: '150px',
+              flex: '0 0 150px',
+              margin: '5px',
+            }}
+          />
+          <Skeleton
+            variant="rectangular"
+            sx={{
+              width: '150px',
+              height: '150px',
+              flex: '0 0 150px',
+              margin: '5px',
+            }}
+          />
+          <Skeleton
+            variant="rectangular"
+            sx={{
+              width: '150px',
+              height: '150px',
+              flex: '0 0 150px',
+              margin: '5px',
+            }}
           />
         </CardListWrapper>
       </Box>
     );
   }
   return (
-    <Box>
+    <Box sx={{ marginTop: '20px' }}>
       <SubHeaderWrapper>{title}</SubHeaderWrapper>
       <Marquee
         // gradient={false}

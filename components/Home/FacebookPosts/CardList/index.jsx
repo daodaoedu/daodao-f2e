@@ -6,7 +6,7 @@ import Card from './Card';
 
 const CardListWrapper = styled.ul`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   overflow-x: scroll;
   scroll-behavior: smooth;
@@ -25,7 +25,7 @@ const SubHeaderWrapper = styled.h3`
 const CardList = ({ title, list, direction = 'left', isLoading }) => {
   if (isLoading) {
     return (
-      <Box>
+      <Box sx={{ marginTop: '20px' }}>
         <SubHeaderWrapper>{title}</SubHeaderWrapper>
         <CardListWrapper>
           <Skeleton
@@ -69,7 +69,7 @@ const CardList = ({ title, list, direction = 'left', isLoading }) => {
     );
   }
   return (
-    <Box>
+    <Box sx={{ marginTop: '20px' }}>
       <SubHeaderWrapper>{title}</SubHeaderWrapper>
       <Marquee
         // gradient={false}
