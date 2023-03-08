@@ -51,9 +51,7 @@ const Guide = () => {
       instagramPosts: shared?.instagramPosts.filter(
         (item) => item?.media_type === 'IMAGE',
       ),
-      instagramStories: shared?.instagramStories.filter(
-        (item) => item?.media_type === 'IMAGE',
-      ),
+      instagramStories: shared?.instagramStories,
       isLoadingFanpagesPosts: shared?.isLoadingFanpagesPosts,
       isLoadingGroupPosts: shared?.isLoadingGroupPosts,
       isLoadingInstagramPosts: shared?.isLoadingInstagramPosts,
