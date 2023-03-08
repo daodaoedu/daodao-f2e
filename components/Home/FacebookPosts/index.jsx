@@ -71,14 +71,16 @@ const Guide = () => {
   return (
     <GuideWrapper>
       <h2 className="guide-title">最新貼文</h2>
-      <Box sx={{ marginTop: '20px' }}>
-        <StoryCardList
-          title="🧸 Instagram 限時動態"
-          list={instagramStories}
-          isLoading={isLoadingInstagramStories}
-          direction="left"
-        />
-      </Box>
+      {instagramStories.length > 0 && (
+        <Box sx={{ marginTop: '20px' }}>
+          <StoryCardList
+            title="🧸 Instagram 限時動態"
+            list={instagramStories}
+            isLoading={isLoadingInstagramStories}
+            direction="left"
+          />
+        </Box>
+      )}
       <Box sx={{ marginTop: '20px' }}>
         <ImageCardList
           title="🧸 Instagram 貼文"
