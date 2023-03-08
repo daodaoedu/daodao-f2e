@@ -56,7 +56,7 @@ const ResourcePage = ({ data = {} }) => {
       data?.properties && data?.properties['連結']
         ? appendQuery(
             data?.properties['連結']?.url ?? '',
-            'promotefrom=daoedu.tw',
+            'utm_source=daoedu.tw',
           )
         : '',
     [data?.properties],
