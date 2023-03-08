@@ -35,13 +35,13 @@ function* getFacebookFansPagePost(action) {
 }
 
 function* getInstagramPost() {
-  const URL = `https://api.daoedu.tw/facebook/instagram/media/id%2Cmedia_type%2Cmedia_url`;
+  const URL = `https://api.daoedu.tw/facebook/instagram/media/id%2Cmedia_type%2Cmedia_url%2Cpermalink%2Ctimestamp%2Clike_count%2Ccaption`;
   try {
     const result = yield fetch(URL, {
       method: 'GET',
     }).then((res) => res.json());
     yield put({
-      type: 'GET_INSTAGAM_POST_SUCCESS',
+      type: 'GET_INSTAGRAM_POST_SUCCESS',
       payload: result?.payload?.data ?? {},
     });
   } catch (error) {
@@ -50,13 +50,13 @@ function* getInstagramPost() {
 }
 
 function* getInstagramStory() {
-  const URL = `https://api.daoedu.tw/facebook/instagram/stories/id%2Cmedia_type%2Cmedia_url`;
+  const URL = `https://api.daoedu.tw/facebook/instagram/stories/id%2Cmedia_type%2Cmedia_url%2Cpermalink%2Ctimestamp%2Clike_count%2Ccaption`;
   try {
     const result = yield fetch(URL, {
       method: 'GET',
     }).then((res) => res.json());
     yield put({
-      type: 'GET_INSTAGAM_STORY_SUCCESS',
+      type: 'GET_INSTAGRAM_STORY_SUCCESS',
       payload: result?.payload?.data ?? {},
     });
   } catch (error) {

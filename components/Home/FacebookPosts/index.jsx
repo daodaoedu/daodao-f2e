@@ -1,11 +1,16 @@
 import React, { useEffect } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import CardList from './CardList';
+import ImageCardList from './ImageCardList';
+import StoryCardList from './StoryCardList';
+
 import {
   getFacebookFansPagePost,
   getFacebookGroupPost,
+  getInstagramPost,
+  getInstagramStory,
 } from '../../../redux/actions/shared';
 
 const GuideWrapper = styled.div`
@@ -33,18 +38,55 @@ const Guide = () => {
   const {
     groupPosts,
     fanpagesPosts,
+    instagramPosts,
+    instagramStories,
     isLoadingFanpagesPosts,
     isLoadingGroupPosts,
-  } = useSelector((state) => state?.shared);
+    isLoadingInstagramPosts,
+    isLoadingInstagramStories,
+  } = useSelector(({ shared }) => {
+    return {
+      groupPosts: shared?.groupPosts,
+      fanpagesPosts: shared?.fanpagesPosts,
+      instagramPosts: shared?.instagramPosts.filter(
+        (item) => item?.media_type === 'IMAGE',
+      ),
+      instagramStories: shared?.instagramStories.filter(
+        (item) => item?.media_type === 'IMAGE',
+      ),
+      isLoadingFanpagesPosts: shared?.isLoadingFanpagesPosts,
+      isLoadingGroupPosts: shared?.isLoadingGroupPosts,
+      isLoadingInstagramPosts: shared?.isLoadingInstagramPosts,
+      isLoadingInstagramStories: shared?.isLoadingInstagramStories,
+    };
+  }, shallowEqual);
 
   useEffect(() => {
     dispatch(getFacebookFansPagePost(7));
     dispatch(getFacebookGroupPost(7));
+    dispatch(getInstagramPost());
+    dispatch(getInstagramStory());
   }, [dispatch]);
 
   return (
     <GuideWrapper>
       <h2 className="guide-title">最新貼文</h2>
+      <Box sx={{ marginTop: '20px' }}>
+        <StoryCardList
+          title="🧸 Instagram 限時動態"
+          list={instagramStories}
+          isLoading={isLoadingInstagramStories}
+          direction="left"
+        />
+      </Box>
+      <Box sx={{ marginTop: '20px' }}>
+        <ImageCardList
+          title="🧸 Instagram 貼文"
+          list={instagramPosts}
+          isLoading={isLoadingInstagramPosts}
+          direction="right"
+        />
+      </Box>
       <Box sx={{ marginTop: '20px' }}>
         <CardList
           title="📌 粉絲專頁"
