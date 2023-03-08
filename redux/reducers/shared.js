@@ -1,5 +1,5 @@
-import toast from "react-hot-toast";
-import { getUrlFromCategory } from "../../utils/category";
+import toast from 'react-hot-toast';
+import { getUrlFromCategory } from '../../utils/category';
 
 const initialState = {
   groupPosts: [
@@ -10,36 +10,54 @@ const initialState = {
     // },
   ],
   fanpagesPosts: [],
+  instagramPosts: [],
+  instagramStories: [],
   isLoadingGroupPosts: true,
   isLoadingFanpagesPosts: true,
+  isLoadingInstagramPosts: true,
+  isLoadingInstagramStories: true,
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case "GET_FACEBOOK_GROUP_POST_SUCCESS": {
+    case 'GET_FACEBOOK_GROUP_POST_SUCCESS': {
       return {
         ...state,
         groupPosts: action.payload,
         isLoadingGroupPosts: false,
       };
     }
-    case "GET_FACEBOOK_GROUP_POST_FAILURE": {
+    case 'GET_FACEBOOK_GROUP_POST_FAILURE': {
       return {
         ...state,
         isLoadingGroupPosts: false,
       };
     }
-    case "GET_FACEBOOK_FANSPAGE_POST_SUCCESS": {
+    case 'GET_FACEBOOK_FANSPAGE_POST_SUCCESS': {
       return {
         ...state,
         fanpagesPosts: action.payload,
         isLoadingFanpagesPosts: false,
       };
     }
-    case "GET_FACEBOOK_FANSPAGE_POST_FAILURE": {
+    case 'GET_FACEBOOK_FANSPAGE_POST_FAILURE': {
       return {
         ...state,
         isLoadingFanpagesPosts: false,
+      };
+    }
+    case 'GET_INSTAGRAM_POST_SUCCESS': {
+      return {
+        ...state,
+        instagramPosts: action.payload,
+        isLoadingInstagramPosts: false,
+      };
+    }
+    case 'GET_INSTAGRAM_STORY_SUCCESS': {
+      return {
+        ...state,
+        instagramStories: action.payload,
+        isLoadingInstagramStories: false,
       };
     }
     default: {
