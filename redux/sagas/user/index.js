@@ -1,15 +1,11 @@
-import { put, call, takeEvery } from 'redux-saga/effects';
-import * as localForage from 'localforage';
-// import { get } from "../../utils/REST";
-import firebase from '../../utils/firebase';
+import { put, all, take, takeEvery, select } from 'redux-saga/effects';
+import * as localforage from 'localforage';
+import firebase from '../../../utils/firebase';
 
-function* checkUserStatus(action) {
-  //   const { body } = action.payload;
+function* checkUserStatus() {
   try {
-    const userData = yield localForage.getItem('userData');
+    const userData = yield localforage.getItem('userData');
     const { displayName, email, photoURL } = userData.user;
-    // const { refreshToken, accessToken, expirationTime } =
-    //   userData.user.stsTokenManager;
     yield put({
       type: 'CHECK_USER_ACCOUNT_SUCCESS',
       payload: {
@@ -23,15 +19,10 @@ function* checkUserStatus(action) {
   }
 }
 
-function* userLogin(action) {
-  //   const { body } = action.payload;
+function* userLogin() {
   try {
     const userData = yield firebase.signInWithGoogle();
-    console.log('=====>', userData);
-    localforage.setItem('userData', userData);
     const { displayName, email, photoURL } = userData.user;
-    // const { refreshToken, accessToken, expirationTime } =
-    //   userData.user.stsTokenManager;
     yield put({
       type: 'USER_LOGIN_SUCCESS',
       payload: {

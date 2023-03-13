@@ -9,7 +9,7 @@ import Head from 'next/head';
 import { initializeApp } from 'firebase/app';
 import GlobalStyle from '../shared/styles/Global';
 import themeFactory from '../shared/styles/themeFactory';
-import storeFactory from '../utils/configureStore';
+import storeFactory from '../redux/store';
 import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
