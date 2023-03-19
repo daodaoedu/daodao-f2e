@@ -3,6 +3,7 @@ name: daodao-f2e
 on:
   push:
     branches:
+      - dev
       - prod
 
 jobs:
