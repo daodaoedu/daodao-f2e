@@ -28,8 +28,7 @@ function Edm() {
           justifyContent: 'center',
           alignItems: 'center',
           '@media(max-width: 767px)': {
-            paddingLeft: '5%',
-            paddingRight: '5%',
+            paddingTop: '40px',
           },
         }}
       >
@@ -41,7 +40,7 @@ function Edm() {
             fontSize: '26px',
             lineHeight: '140%',
             '@media(max-width: 767px)': {
-              fontSize: '26px',
+              fontSize: '22px',
             },
           }}
         >
@@ -56,7 +55,7 @@ function Edm() {
             fontSize: '18px',
             lineHeight: '140%',
             '@media(max-width: 767px)': {
-              fontSize: '14px',
+              fontSize: '16px',
             },
           }}
         >
@@ -74,7 +73,9 @@ function Edm() {
             lineHeight: '140%',
             textAlign: 'center',
             '@media(max-width: 767px)': {
-              fontSize: '8px',
+              maxWidth: '273px',
+              paddingTop: '16px',
+              paddingBottom: '16px',
             },
           }}
         >
@@ -84,13 +85,16 @@ function Edm() {
           <Button
             variant="contained"
             sx={{
-              width: '200px',
+              width: '273px',
               padding: '9px 60px 9px 60px',
               marginBottom: '60px',
               bgcolor: '#16B9B3',
               color: '#FFFFFF',
               borderRadius: '20px',
               fontSize: '16px',
+              '@media(max-width: 767px)': {
+                marginBottom: '40px',
+              },
             }}
           >
             訂閱電子報
