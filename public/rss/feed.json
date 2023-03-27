@@ -11,6 +11,422 @@
     },
     "items": [
         {
+            "id": "https://www.daoedu.tw/resource/languageguide",
+            "content_html": "學習語言沒有什麼方向嗎？這裡可以搜尋全球的語言，讓你知道你可以加強哪些部分",
+            "url": "https://www.daoedu.tw/resource/languageguide",
+            "title": "languageguide的學習資源介紹｜島島阿學",
+            "summary": "學習語言沒有什麼方向嗎？這裡可以搜尋全球的語言，讓你知道你可以加強哪些部分",
+            "image": "https://www.languageguide.org/images/main/6884132132_6e2d05e036_o.jpg",
+            "date_modified": "2023-03-27T14:25:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/youglish",
+            "content_html": "搜尋單字即可從影片中學習到美式, 澳式與英式的口音",
+            "url": "https://www.daoedu.tw/resource/youglish",
+            "title": "youglish的學習資源介紹｜島島阿學",
+            "summary": "搜尋單字即可從影片中學習到美式, 澳式與英式的口音",
+            "image": "https://youglish.com/images/fb6.jpg",
+            "date_modified": "2023-03-27T14:19:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/Crack IELTS with Rob",
+            "content_html": "提供很多免費的雅思練習題目",
+            "url": "https://www.daoedu.tw/resource/Crack IELTS with Rob",
+            "title": "Crack IELTS with Rob的學習資源介紹｜島島阿學",
+            "summary": "提供很多免費的雅思練習題目",
+            "image": "https://crackieltswithrob.com/uploads/images/logvnew.jpg?ezimgfmt=rs:400x76/rscb1/ngcb1/notWebP",
+            "date_modified": "2023-03-27T14:16:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/The Turning Point 翻轉點",
+            "content_html": "我們的理念\n➤內心世界-帶著熱情去改變\n台灣一直以來不斷地在鼓勵全民與國際接軌，在認識自己土地國家的同時，希望我們能具備基本的國際觀素養，放眼未來並且和世界接軌，除了關心我們所處的台灣外，了解地球的另一端正在發生什麼，更是身為地球村一份子的我們需要關懷的事。\n➤Generation Alpha-翻轉未來觀點\n我們希望藉由 The Turning Point翻轉點，將國際知識向下紮根，帶領孩子們從新聞時事、國際關係、世界議題中，增加國際知識涵養，了解世界脈動；進而累積歸納論述及獨立思考的能力，演繹激發出更多創新觀點，讓「Generation Alpha 阿法世代」出生在21世紀世代的孩子，為世界帶來更多知識的累積，文化包容和人文素養，以及對世界的關懷。\n➤思者傳道-有思想就可以是老師\n韓愈說：「師者，所以傳道授業解惑也」，我說：「思」者就可以傳道。打開 The Turning Point 翻轉點我們都是老師！翻轉點從孩子的思考邏輯出發，將錯綜複雜艱深難懂的國際事件，轉化為孩子能理解的文字，利用生動活潑的多元操作，帶領孩子們認識國際議題，並於課後一起進行深入的探討和思考，為他們埋下關心世界的種子。",
+            "url": "https://www.daoedu.tw/resource/The Turning Point 翻轉點",
+            "title": "The Turning Point 翻轉點的學習資源介紹｜島島阿學",
+            "summary": "我們的理念\n➤內心世界-帶著熱情去改變\n台灣一直以來不斷地在鼓勵全民與國際接軌，在認識自己土地國家的同時，希望我們能具備基本的國際觀素養，放眼未來並且和世界接軌，除了關心我們所處的台灣外，了解地球的另一端正在發生什麼，更是身為地球村一份子的我們需要關懷的事。\n➤Generation Alpha-翻轉未來觀點\n我們希望藉由 The Turning Point翻轉點，將國際知識向下紮根，帶領孩子們從新聞時事、國際關係、世界議題中，增加國際知識涵養，了解世界脈動；進而累積歸納論述及獨立思考的能力，演繹激發出更多創新觀點，讓「Generation Alpha 阿法世代」出生在21世紀世代的孩子，為世界帶來更多知識的累積，文化包容和人文素養，以及對世界的關懷。\n➤思者傳道-有思想就可以是老師\n韓愈說：「師者，所以傳道授業解惑也」，我說：「思」者就可以傳道。打開 The Turning Point 翻轉點我們都是老師！翻轉點從孩子的思考邏輯出發，將錯綜複雜艱深難懂的國際事件，轉化為孩子能理解的文字，利用生動活潑的多元操作，帶領孩子們認識國際議題，並於課後一起進行深入的探討和思考，為他們埋下關心世界的種子。",
+            "image": "https://i.imgur.com/g0XzAjO.png",
+            "date_modified": "2023-03-16T14:10:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/gotyourpw",
+            "content_html": "Got Your PW 是一個簡易的資安資源網站，包含常用的工具，適合初學者的入門教材，和許多值得追蹤的資安相關網站。",
+            "url": "https://www.daoedu.tw/resource/gotyourpw",
+            "title": "gotyourpw的學習資源介紹｜島島阿學",
+            "summary": "Got Your PW 是一個簡易的資安資源網站，包含常用的工具，適合初學者的入門教材，和許多值得追蹤的資安相關網站。",
+            "image": "https://gotyour.pw/images/banner.jpg",
+            "date_modified": "2023-03-15T15:29:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/zeroday",
+            "content_html": "ZeroDay 是一個銜接資安專家與組織間的良性溝通橋樑的漏洞提報平台，專門協助接獲漏洞通報並提報予組織和修正漏洞等服務。",
+            "url": "https://www.daoedu.tw/resource/zeroday",
+            "title": "zeroday的學習資源介紹｜島島阿學",
+            "summary": "ZeroDay 是一個銜接資安專家與組織間的良性溝通橋樑的漏洞提報平台，專門協助接獲漏洞通報並提報予組織和修正漏洞等服務。",
+            "image": "https://zeroday.hitcon.org/images/favicon/fb-image.png",
+            "date_modified": "2023-03-15T15:25:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/bamboofox",
+            "content_html": "Bamboofox 由 Jeffxx、Atdog、以及現任 Bamboofox 的 Leader 寬寬等人創立於2014年，結合了交大 DSNSLab、SQLab、資工系計中的資源，聚集了交大研究資訊、系統安全與管理的人才，在一年內便發展為以 CTF 競賽為主的社群，現今 Bamboofox 的成員含括交大、清大、中央、中原、台科大等學校的學生，廣泛的參與各 CTF 競賽，以及國內資安社群的活動",
+            "url": "https://www.daoedu.tw/resource/bamboofox",
+            "title": "bamboofox的學習資源介紹｜島島阿學",
+            "summary": "Bamboofox 由 Jeffxx、Atdog、以及現任 Bamboofox 的 Leader 寬寬等人創立於2014年，結合了交大 DSNSLab、SQLab、資工系計中的資源，聚集了交大研究資訊、系統安全與管理的人才，在一年內便發展為以 CTF 競賽為主的社群，現今 Bamboofox 的成員含括交大、清大、中央、中原、台科大等學校的學生，廣泛的參與各 CTF 競賽，以及國內資安社群的活動",
+            "image": "https://bamboofox.cs.nctu.edu.tw/logo.png",
+            "date_modified": "2023-03-15T15:22:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/Detour人生設計團隊",
+            "content_html": "Detour 原意為「繞道」。我們常因不確定目標而做許多嘗試，卻總覺得繞了遠路。面對生命的不確定性，我們提醒自己，繞路僅是常態，並不可怕。Detour希望透過設計人生觀點，成為大家在人生探索路上的陪伴。（簡介摘自粉專）",
+            "url": "https://www.daoedu.tw/resource/Detour人生設計團隊",
+            "title": "Detour人生設計團隊的學習資源介紹｜島島阿學",
+            "summary": "Detour 原意為「繞道」。我們常因不確定目標而做許多嘗試，卻總覺得繞了遠路。面對生命的不確定性，我們提醒自己，繞路僅是常態，並不可怕。Detour希望透過設計人生觀點，成為大家在人生探索路上的陪伴。（簡介摘自粉專）",
+            "image": "https://i.imgur.com/X6WKi7s.png",
+            "date_modified": "2023-03-15T14:49:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/兒福聯盟",
+            "content_html": "兒福聯盟在台灣尚無兒童保護法令的年代成立，從「給孩子一個更好的世界」到「與孩子共創更好的世界」的願景轉變，三十年來，我們秉持初衷，始終是服務與倡議雙軌並進的兒少組織，敏銳地發現新的兒童需求，也深知台灣兒童已有潛能改造世界。與時俱進，是兒福聯盟不變的組織基因和工作態度。過去我們重視物質補給、家庭功能和情感支持，面對科技網路時代，終身學習是人類的基本能力，兒盟將加強重視培育照顧者成為育兒家，與社會共同打造創傷知情的環境，讓所有的兒童達到認識自己，愛己愛人，為社會公益付出的境界。（簡介摘自兒福聯盟官網）",
+            "url": "https://www.daoedu.tw/resource/兒福聯盟",
+            "title": "兒福聯盟的學習資源介紹｜島島阿學",
+            "summary": "兒福聯盟在台灣尚無兒童保護法令的年代成立，從「給孩子一個更好的世界」到「與孩子共創更好的世界」的願景轉變，三十年來，我們秉持初衷，始終是服務與倡議雙軌並進的兒少組織，敏銳地發現新的兒童需求，也深知台灣兒童已有潛能改造世界。與時俱進，是兒福聯盟不變的組織基因和工作態度。過去我們重視物質補給、家庭功能和情感支持，面對科技網路時代，終身學習是人類的基本能力，兒盟將加強重視培育照顧者成為育兒家，與社會共同打造創傷知情的環境，讓所有的兒童達到認識自己，愛己愛人，為社會公益付出的境界。（簡介摘自兒福聯盟官網）",
+            "image": "https://i.imgur.com/7LP9fpq.png",
+            "date_modified": "2023-03-11T07:26:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/念了心理學，然後呢？",
+            "content_html": "你想念心理學，但是擔心找不到工作嗎？來聽聽這些心理人的故事，讓你更有信心投向心理學的懷抱",
+            "url": "https://www.daoedu.tw/resource/念了心理學，然後呢？",
+            "title": "念了心理學，然後呢？的學習資源介紹｜島島阿學",
+            "summary": "你想念心理學，但是擔心找不到工作嗎？來聽聽這些心理人的故事，讓你更有信心投向心理學的懷抱",
+            "image": "https://i.imgur.com/JzRw13B.png",
+            "date_modified": "2023-03-10T12:33:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/高校化學事",
+            "content_html": "是一個能帶給你高中校園新鮮事、教育時事\n以及化學課程新觀點與科普小知識的播客頻道\n📻目前每週三會有固定的更新內容！\n📻不定期會有來賓訪談的節目播出喔！\n喜歡我的節目的朋友，記得一定要訂閱喔！\n才不會錯過每次精彩的節目內容👍（簡介摘自高校化學事的podcast）",
+            "url": "https://www.daoedu.tw/resource/高校化學事",
+            "title": "高校化學事的學習資源介紹｜島島阿學",
+            "summary": "是一個能帶給你高中校園新鮮事、教育時事\n以及化學課程新觀點與科普小知識的播客頻道\n📻目前每週三會有固定的更新內容！\n📻不定期會有來賓訪談的節目播出喔！\n喜歡我的節目的朋友，記得一定要訂閱喔！\n才不會錯過每次精彩的節目內容👍（簡介摘自高校化學事的podcast）",
+            "image": "https://i.imgur.com/l8b9SqL.png",
+            "date_modified": "2023-03-08T08:44:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/Mentor",
+            "content_html": "Mentor",
+            "url": "https://www.daoedu.tw/resource/Mentor",
+            "title": "Mentor的學習資源介紹｜島島阿學",
+            "summary": "Mentor",
+            "image": "https://i.imgur.com/2iQ2jUe.png",
+            "date_modified": "2023-03-08T08:35:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/消費者行為",
+            "content_html": "此網站為台北大學資管所的汪志堅老師，網站內提供關於消費者心理學的相關影片、個案研討、習題以及相關思考問題，想了解消費者心理學的你，絕對不要錯過囉~",
+            "url": "https://www.daoedu.tw/resource/消費者行為",
+            "title": "消費者行為的學習資源介紹｜島島阿學",
+            "summary": "此網站為台北大學資管所的汪志堅老師，網站內提供關於消費者心理學的相關影片、個案研討、習題以及相關思考問題，想了解消費者心理學的你，絕對不要錯過囉~",
+            "image": "https://i.imgur.com/zOPzlgo.png",
+            "date_modified": "2023-03-08T08:25:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/資料科學家的工作日常",
+            "content_html": "📊 分享 #資料科學 領域趨勢\n👨‍💻 交流 #網頁開發 技術發展\n💡 探索 #科技職涯 斜槓人生\n💥 持續 #技術培訓 社群經營",
+            "url": "https://www.daoedu.tw/resource/資料科學家的工作日常",
+            "title": "資料科學家的工作日常的學習資源介紹｜島島阿學",
+            "summary": "📊 分享 #資料科學 領域趨勢\n👨‍💻 交流 #網頁開發 技術發展\n💡 探索 #科技職涯 斜槓人生\n💥 持續 #技術培訓 社群經營",
+            "image": "https://i.imgur.com/ZS1IQQz.png",
+            "date_modified": "2023-03-03T15:09:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/COSCUP",
+            "content_html": "無論您是開放原始碼的開發者、推廣者、使用者、還是想了解軟體的新手，都歡迎您來參加為開放原始碼開發者、使用者和推廣者舉辦的「開源人年會」。",
+            "url": "https://www.daoedu.tw/resource/COSCUP",
+            "title": "COSCUP的學習資源介紹｜島島阿學",
+            "summary": "無論您是開放原始碼的開發者、推廣者、使用者、還是想了解軟體的新手，都歡迎您來參加為開放原始碼開發者、使用者和推廣者舉辦的「開源人年會」。",
+            "image": "https://i.imgur.com/NedtjRo.jpg",
+            "date_modified": "2023-03-03T15:04:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/SITCON 學生計算機年會",
+            "content_html": "學生計算機年會（Students’ Information Technology Conference）自 2013 年發起，以學生為本、由學生自發舉辦，長期投身學生資訊教育與推廣開源精神，希望引領更多學子踏入資訊的殿堂，更冀望所有對資訊有興趣的學生，能夠在年會裏齊聚一堂，彼此激盪、傳承、啟發，達到「學以致用、教學相長」的實際展現。\n在 SITCON 的第 X 週年，期望我們秉持初衷——讓學生們分享與交流知識，把各地學生串連起來的 X 字路口——也期望每人皆能在與大家的聊天與討論之中，找到自己的方向、熱情。（簡介摘自官網）",
+            "url": "https://www.daoedu.tw/resource/SITCON 學生計算機年會",
+            "title": "SITCON 學生計算機年會的學習資源介紹｜島島阿學",
+            "summary": "學生計算機年會（Students’ Information Technology Conference）自 2013 年發起，以學生為本、由學生自發舉辦，長期投身學生資訊教育與推廣開源精神，希望引領更多學子踏入資訊的殿堂，更冀望所有對資訊有興趣的學生，能夠在年會裏齊聚一堂，彼此激盪、傳承、啟發，達到「學以致用、教學相長」的實際展現。\n在 SITCON 的第 X 週年，期望我們秉持初衷——讓學生們分享與交流知識，把各地學生串連起來的 X 字路口——也期望每人皆能在與大家的聊天與討論之中，找到自己的方向、熱情。（簡介摘自官網）",
+            "image": "https://i.imgur.com/FDKZ20M.jpg",
+            "date_modified": "2023-03-03T15:00:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/歷史學柑仔店",
+            "content_html": "「歷史學柑仔店」是一個自發的寫作社群，也是一扇窗口，讓歷史學者與社會大眾分享各自的研究成果。沒有聚會、沒有宣言與旗幟、也沒有機構或學會支持，組織十分鬆散。就連臉書粉絲頁的介紹也只有一句：「我們是一群嘗試從臺灣思考歷史的書寫的史學界夥伴，我們成立了一個「歷史學柑仔店」（kám-á-tiàm）部落格。」\n似乎太簡單，但接著要寫些什麼，就令人煞費心思了。後現代史學之後，歷史研究進入百家爭鳴且難以定義的境地，唯一沒有爭議的是「嘗試從臺灣思考歷史的書寫」，就先這樣吧！(簡介摘自博客來)",
+            "url": "https://www.daoedu.tw/resource/歷史學柑仔店",
+            "title": "歷史學柑仔店的學習資源介紹｜島島阿學",
+            "summary": "「歷史學柑仔店」是一個自發的寫作社群，也是一扇窗口，讓歷史學者與社會大眾分享各自的研究成果。沒有聚會、沒有宣言與旗幟、也沒有機構或學會支持，組織十分鬆散。就連臉書粉絲頁的介紹也只有一句：「我們是一群嘗試從臺灣思考歷史的書寫的史學界夥伴，我們成立了一個「歷史學柑仔店」（kám-á-tiàm）部落格。」\n似乎太簡單，但接著要寫些什麼，就令人煞費心思了。後現代史學之後，歷史研究進入百家爭鳴且難以定義的境地，唯一沒有爭議的是「嘗試從臺灣思考歷史的書寫」，就先這樣吧！(簡介摘自博客來)",
+            "image": "https://i.imgur.com/SJFzQg9.jpg",
+            "date_modified": "2023-02-28T11:49:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/台灣文學網",
+            "content_html": "本網站為台灣文學館所建置。內容以文學史年表為主要架構，呈現台灣文學各發展時期重要之人、事、物。使用者可再以年表內容，串接「台灣2007作家作品目錄系統」、「台灣現當代作家研究資料庫」、「台灣文學研究人力論著目錄資料庫」，及辭條釋義，延伸查詢相關資料。總計包含約2500多位作家個人資料、作品出版資料，310位作家相關評論、學術論文，152位台灣文學研究者的個人資料、研究論著。網站並提供館內影音屋、展覽場訊息，及電子e書房、網路、資料庫等數位學習資源訊息，是認識台灣文學發展之最佳指引。(簡介來源自官網)",
+            "url": "https://www.daoedu.tw/resource/台灣文學網",
+            "title": "台灣文學網的學習資源介紹｜島島阿學",
+            "summary": "本網站為台灣文學館所建置。內容以文學史年表為主要架構，呈現台灣文學各發展時期重要之人、事、物。使用者可再以年表內容，串接「台灣2007作家作品目錄系統」、「台灣現當代作家研究資料庫」、「台灣文學研究人力論著目錄資料庫」，及辭條釋義，延伸查詢相關資料。總計包含約2500多位作家個人資料、作品出版資料，310位作家相關評論、學術論文，152位台灣文學研究者的個人資料、研究論著。網站並提供館內影音屋、展覽場訊息，及電子e書房、網路、資料庫等數位學習資源訊息，是認識台灣文學發展之最佳指引。(簡介來源自官網)",
+            "image": "https://i.imgur.com/a31n18h.png",
+            "date_modified": "2023-02-25T14:41:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/小紅帽 With Red",
+            "content_html": "2019年底成立，小紅帽是臺灣第一個專注於推動月經平權的非營利組織，致力於透過社福、教育、研究、倡議消弭月經貧窮與汙名，也在全臺灣推動從小學到大學，更全面、完整、不分性別的月經教育，及營造月經友善環境。",
+            "url": "https://www.daoedu.tw/resource/小紅帽 With Red",
+            "title": "小紅帽 With Red的學習資源介紹｜島島阿學",
+            "summary": "2019年底成立，小紅帽是臺灣第一個專注於推動月經平權的非營利組織，致力於透過社福、教育、研究、倡議消弭月經貧窮與汙名，也在全臺灣推動從小學到大學，更全面、完整、不分性別的月經教育，及營造月經友善環境。",
+            "image": "https://i.imgur.com/dHXnOgS.png",
+            "date_modified": "2023-02-10T03:43:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/Sketch Engine",
+            "content_html": "Sketch Engine是一個比字典還強大的功能，他除了會有例句之外，還會告訴你英文單字的搭配用語、相似詞等等。",
+            "url": "https://www.daoedu.tw/resource/Sketch Engine",
+            "title": "Sketch Engine的學習資源介紹｜島島阿學",
+            "summary": "Sketch Engine是一個比字典還強大的功能，他除了會有例句之外，還會告訴你英文單字的搭配用語、相似詞等等。",
+            "image": "https://i.imgur.com/WasQE1b.png",
+            "date_modified": "2023-02-09T07:12:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/百詞斬",
+            "content_html": "一億人都在用的英語學習大殺器！致力於為你解決背單詞難題，獨創圖背單詞學習法，趣味學英語；內涵海量詞庫，覆蓋全年齡段詞彙需求；配備單詞全解，發音例句輔助學習。（轉自官方描述）",
+            "url": "https://www.daoedu.tw/resource/百詞斬",
+            "title": "百詞斬的學習資源介紹｜島島阿學",
+            "summary": "一億人都在用的英語學習大殺器！致力於為你解決背單詞難題，獨創圖背單詞學習法，趣味學英語；內涵海量詞庫，覆蓋全年齡段詞彙需求；配備單詞全解，發音例句輔助學習。（轉自官方描述）",
+            "image": "https://7n.bczcdn.com/static/static/illu-1.dae721b6.svg",
+            "date_modified": "2023-02-05T07:55:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/教育不一樣",
+            "content_html": "「教育不一樣」把節目視為一個人的學習過程，透過高中、學習、大學、生涯四大面向來解析教育如何不一樣。期待透過主持人-藍偉瑩與來賓多元面向的分享，讓家長、學生在面對選擇時，可以更有把握！",
+            "url": "https://www.daoedu.tw/resource/教育不一樣",
+            "title": "教育不一樣的學習資源介紹｜島島阿學",
+            "summary": "「教育不一樣」把節目視為一個人的學習過程，透過高中、學習、大學、生涯四大面向來解析教育如何不一樣。期待透過主持人-藍偉瑩與來賓多元面向的分享，讓家長、學生在面對選擇時，可以更有把握！",
+            "image": "https://i.imgur.com/pe6QDJH.jpg",
+            "date_modified": "2023-02-05T05:10:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/倡議+",
+            "content_html": "本網站是由聯合新聞網旗下的一個網站，裡面有許多社會創新、永續、教育與許多議題等相關文章資訊，對於關注社會上種種議題的人來說，是一個很棒的網站。",
+            "url": "https://www.daoedu.tw/resource/倡議+",
+            "title": "倡議+的學習資源介紹｜島島阿學",
+            "summary": "本網站是由聯合新聞網旗下的一個網站，裡面有許多社會創新、永續、教育與許多議題等相關文章資訊，對於關注社會上種種議題的人來說，是一個很棒的網站。",
+            "image": "https://i.imgur.com/o60GGGr.jpg",
+            "date_modified": "2023-02-05T04:50:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/小鱷魚的諮商小教室",
+            "content_html": "「小鱷魚的諮商小教室」會分享許多諮商相關的概念，包含諮商的學派、倫理以及心理相關的故事",
+            "url": "https://www.daoedu.tw/resource/小鱷魚的諮商小教室",
+            "title": "小鱷魚的諮商小教室的學習資源介紹｜島島阿學",
+            "summary": "「小鱷魚的諮商小教室」會分享許多諮商相關的概念，包含諮商的學派、倫理以及心理相關的故事",
+            "image": "https://i.imgur.com/sW7xqQv.png",
+            "date_modified": "2023-02-05T04:44:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/學習家小羊",
+            "content_html": "「這個社會，太多教育家了。但人人都可以成為學習家！致力於打造新世代的學習場域」學習家小羊看見台灣教育的問題，因而開始舉辦許多場線上講座、問題解決課程與中學生的挑戰賽，幫助學生自我成長、學會解決未來面臨的問題。",
+            "url": "https://www.daoedu.tw/resource/學習家小羊",
+            "title": "學習家小羊的學習資源介紹｜島島阿學",
+            "summary": "「這個社會，太多教育家了。但人人都可以成為學習家！致力於打造新世代的學習場域」學習家小羊看見台灣教育的問題，因而開始舉辦許多場線上講座、問題解決課程與中學生的挑戰賽，幫助學生自我成長、學會解決未來面臨的問題。",
+            "image": "https://i.imgur.com/sjJPEjS.png",
+            "date_modified": "2023-02-03T10:20:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/Vivipic",
+            "content_html": "Vivipic-台灣行銷人的免費線上平面設計工具。\n針對「台灣行銷人」設計的平面設計工具－Vivipic，不僅免下載、可直接在網頁上進行編輯製作，還有在地化的模板讓你一鍵套用。\n版型操作相似於 canva ，但差別canva本身是英文版起家，許多版型都是源自於英文版面設計，若改成中文，空間平衡上會需要多加調整。但vivipic優點在於針對中文字元寬度與英文不同，版面設計上更貼近於中文圈，同時也支援較多中文字型，推薦給需要做中文版行的行銷人、快速簡報設計、海報製作等。",
+            "url": "https://www.daoedu.tw/resource/Vivipic",
+            "title": "Vivipic的學習資源介紹｜島島阿學",
+            "summary": "Vivipic-台灣行銷人的免費線上平面設計工具。\n針對「台灣行銷人」設計的平面設計工具－Vivipic，不僅免下載、可直接在網頁上進行編輯製作，還有在地化的模板讓你一鍵套用。\n版型操作相似於 canva ，但差別canva本身是英文版起家，許多版型都是源自於英文版面設計，若改成中文，空間平衡上會需要多加調整。但vivipic優點在於針對中文字元寬度與英文不同，版面設計上更貼近於中文圈，同時也支援較多中文字型，推薦給需要做中文版行的行銷人、快速簡報設計、海報製作等。",
+            "image": "https://i.imgur.com/aEuyFwP.jpg",
+            "date_modified": "2023-02-02T03:23:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/商業大數據平台",
+            "content_html": "本網站包含所有商業管理、大數據、行銷與資料科學等課程。而裡面也有許多學習地圖、資源與應用。更還有開放資料等你益起來研究。",
+            "url": "https://www.daoedu.tw/resource/商業大數據平台",
+            "title": "商業大數據平台的學習資源介紹｜島島阿學",
+            "summary": "本網站包含所有商業管理、大數據、行銷與資料科學等課程。而裡面也有許多學習地圖、資源與應用。更還有開放資料等你益起來研究。",
+            "image": "https://i.imgur.com/3f04PvZ.png",
+            "date_modified": "2023-01-29T10:55:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/UX pin",
+            "content_html": "是一個有豐富UX內容（研討會/電子書/原型工具/課程）的平台，也有許多實用的UX ebook可以免費下載，對於手機或網頁設計、專案管理以及設計流程的討論很多。(簡介節錄自https://reurl.cc/GX89rA)",
+            "url": "https://www.daoedu.tw/resource/UX pin",
+            "title": "UX pin的學習資源介紹｜島島阿學",
+            "summary": "是一個有豐富UX內容（研討會/電子書/原型工具/課程）的平台，也有許多實用的UX ebook可以免費下載，對於手機或網頁設計、專案管理以及設計流程的討論很多。(簡介節錄自https://reurl.cc/GX89rA)",
+            "image": "https://i.imgur.com/Ml9pj4b.png",
+            "date_modified": "2023-01-27T07:15:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/Hack design",
+            "content_html": "Hack Design 是一個收錄一些關於 UI、UX 與設計相關的教學的網站，你可以依順序看完每個內容的介紹，也可以依據自己需求找分類的文章來看。（簡介摘自https://tools.wingzero.tw/article/sn/1344）",
+            "url": "https://www.daoedu.tw/resource/Hack design",
+            "title": "Hack design的學習資源介紹｜島島阿學",
+            "summary": "Hack Design 是一個收錄一些關於 UI、UX 與設計相關的教學的網站，你可以依順序看完每個內容的介紹，也可以依據自己需求找分類的文章來看。（簡介摘自https://tools.wingzero.tw/article/sn/1344）",
+            "image": "https://i.imgur.com/vf9rNQo.png",
+            "date_modified": "2023-01-19T12:49:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/未來大人物",
+            "content_html": "我們尋找35歲以下正在改變社會的年輕人，呈現他們的故事，發揚他們的精神，把成功的定義還給每一個人。\n《未來大人物》是最早期關鍵評論網發展時萌生對世界的理想。我們每次都會在報章雜誌上看到許多成功的故事，但這些故事似乎都對成功有類似的定義。而同時我們看到台灣有許多年輕夥伴，面對這個不完美的世界但不抱怨，而是捲起袖子做著各種改變。\n我們深深受這些夥伴的鼓舞，在主流媒體的心中，他們或許不是典型的成功故事，但對我們來說，成功是由這些夥伴定義的，我們想要和所有不滿於現狀，想要改變現狀的夥伴說：讓我們一起動手不抱怨，讓我們一起參與，因為我們真的能一起讓世界變得更好！（簡介來源自https://www.tnlmedia.com/media/aces）",
+            "url": "https://www.daoedu.tw/resource/未來大人物",
+            "title": "未來大人物的學習資源介紹｜島島阿學",
+            "summary": "我們尋找35歲以下正在改變社會的年輕人，呈現他們的故事，發揚他們的精神，把成功的定義還給每一個人。\n《未來大人物》是最早期關鍵評論網發展時萌生對世界的理想。我們每次都會在報章雜誌上看到許多成功的故事，但這些故事似乎都對成功有類似的定義。而同時我們看到台灣有許多年輕夥伴，面對這個不完美的世界但不抱怨，而是捲起袖子做著各種改變。\n我們深深受這些夥伴的鼓舞，在主流媒體的心中，他們或許不是典型的成功故事，但對我們來說，成功是由這些夥伴定義的，我們想要和所有不滿於現狀，想要改變現狀的夥伴說：讓我們一起動手不抱怨，讓我們一起參與，因為我們真的能一起讓世界變得更好！（簡介來源自https://www.tnlmedia.com/media/aces）",
+            "image": "https://i.imgur.com/btiCeWK.png",
+            "date_modified": "2023-01-17T07:52:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/TYCIA台灣青年職涯創新協會",
+            "content_html": "TYCIA由職涯實驗室創辦人何則文號召 Yourator 、 TeSA 臺灣電商顧問、求職輔導室、職游創新職涯諮詢，組成。以引導青年找到職涯新可能、助力新創企業塑造雇主品牌為目標。\n透過各類線上線下活動、工作坊、論壇以及與公私部門合作，帶領青年找到方向。目前致力於打造職涯諮詢師生態圈，同時培訓各類職涯講師進入校園分享。以創新與利他為本，助力臺灣青年創造新世代價值。（簡介摘自https://tycia.org/about-us）",
+            "url": "https://www.daoedu.tw/resource/TYCIA台灣青年職涯創新協會",
+            "title": "TYCIA台灣青年職涯創新協會的學習資源介紹｜島島阿學",
+            "summary": "TYCIA由職涯實驗室創辦人何則文號召 Yourator 、 TeSA 臺灣電商顧問、求職輔導室、職游創新職涯諮詢，組成。以引導青年找到職涯新可能、助力新創企業塑造雇主品牌為目標。\n透過各類線上線下活動、工作坊、論壇以及與公私部門合作，帶領青年找到方向。目前致力於打造職涯諮詢師生態圈，同時培訓各類職涯講師進入校園分享。以創新與利他為本，助力臺灣青年創造新世代價值。（簡介摘自https://tycia.org/about-us）",
+            "image": "https://i.imgur.com/n7yApBU.png",
+            "date_modified": "2023-01-12T12:32:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
+            "id": "https://www.daoedu.tw/resource/trywilco",
+            "content_html": "讓你體驗工程師的一天，上班寫 code 會碰到什麼狀況",
+            "url": "https://www.daoedu.tw/resource/trywilco",
+            "title": "trywilco的學習資源介紹｜島島阿學",
+            "summary": "讓你體驗工程師的一天，上班寫 code 會碰到什麼狀況",
+            "image": "https://uploads-ssl.webflow.com/61cc7ec29b0bf84b1bdc4bf7/61d171b3b7e95637eb3ef528_thumb.jpg",
+            "date_modified": "2023-01-11T14:07:00.000Z",
+            "author": {
+                "name": "島島阿學多元學習社群",
+                "url": "https://www.daoedu.tw"
+            }
+        },
+        {
             "id": "https://www.daoedu.tw/resource/kagi",
             "content_html": "讓使用者的搜尋更具有隱私性且擁有更好的搜尋體驗，每個月提供免費50次的搜尋額度，只需繳費10美金即可享受無線搜尋次數",
             "url": "https://www.daoedu.tw/resource/kagi",
