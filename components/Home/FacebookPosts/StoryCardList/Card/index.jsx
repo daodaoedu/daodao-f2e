@@ -56,6 +56,7 @@ const BackgroundWrapper = styled.div`
     filter: brightness(50%);
   `}
 `;
+
 const ImageWrapper = styled(LazyLoadImage)`
   /* border-radius: 10px; */
   width: 150px;
@@ -67,11 +68,30 @@ const ImageWrapper = styled(LazyLoadImage)`
   object-position: center;
 `;
 
-const Card = ({ message = '', date, image, url }) => {
+const VideoWrapper = styled.video`
+  object-fit: cover;
+  width: 100%;
+  height: inherit;
+  /* background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(180px); */
+  /* z-index: 1; */
+`;
+const Card = ({ message = '', media, url, type }) => {
+  if (type === 'VIDEO') {
+    return (
+      <Tooltip title={message.slice(0, 150)}>
+        <CardWrapper onClick={() => window.open(url, '_target')}>
+          <VideoWrapper autoPlay muted loop playsInline preload="auto">
+            <source src={media} type="video/mp4" />
+          </VideoWrapper>
+        </CardWrapper>
+      </Tooltip>
+    );
+  }
   return (
     <Tooltip title={message.slice(0, 150)}>
       <CardWrapper onClick={() => window.open(url, '_target')}>
-        <ImageWrapper alt={message} src={image} effect="opacity" />
+        <ImageWrapper alt={message} src={media} effect="opacity" />
       </CardWrapper>
     </Tooltip>
   );

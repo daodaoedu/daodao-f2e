@@ -137,14 +137,16 @@ const StoryCardList = ({ title, list, direction = 'left', isLoading }) => {
                 timestamp,
                 permalink,
                 like_count,
+                media_type,
               }) => (
                 <Card
                   key={id}
                   id={id}
+                  type={media_type}
                   message={caption}
                   date={timestamp}
                   title={title}
-                  image={media_url}
+                  media={media_url}
                   url={permalink}
                   likeCount={like_count}
                 />
@@ -155,14 +157,23 @@ const StoryCardList = ({ title, list, direction = 'left', isLoading }) => {
       ) : (
         <CardListWrapper>
           {list.map(
-            ({ id, caption, media_url, timestamp, permalink, like_count }) => (
+            ({
+              id,
+              caption,
+              media_url,
+              timestamp,
+              permalink,
+              like_count,
+              media_type,
+            }) => (
               <Card
                 key={id}
                 id={id}
+                type={media_type}
                 message={caption}
                 date={timestamp}
                 title={title}
-                image={media_url}
+                media={media_url}
                 url={permalink}
                 likeCount={like_count}
               />

@@ -7,7 +7,7 @@ import ImageCardList from './ImageCardList';
 import StoryCardList from './StoryCardList';
 
 import {
-  getFacebookFansPagePost,
+  // getFacebookFansPagePost,
   getFacebookGroupPost,
   getInstagramPost,
   getInstagramStory,
