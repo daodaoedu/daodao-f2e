@@ -27,7 +27,11 @@ const UserAvatar = () => {
       <Avatar
         alt={user?.displayName ?? ''}
         src={user?.photoURL ?? ''}
-        onClick={(event) => setIsOpenMenu(event.currentTarget)}
+        // onClick={(event) => setIsOpenMenu(event.currentTarget)}
+        onClick={() => {
+          setIsOpenMenu(false);
+          push('/profile');
+        }}
       />
       <Menu
         id="user-menu"

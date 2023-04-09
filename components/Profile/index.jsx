@@ -5,11 +5,13 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { CATEGORIES } from '../../constants/member';
+import { CATEGORIES, EDUCATION_STEP } from '../../constants/member';
 import { mapToTable } from '../../utils/helper';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
 import SEOConfig from '../../shared/components/SEO';
+import ContactModal from './Contact';
+
 
 const BottonBack = {
   color: '#536166',
@@ -36,7 +38,10 @@ const Profile = () => {
   const [location, setLocation] = useState('');
   const [wantToLearnList, setWantToLearnList] = useState([]);
   const [interestAreaList, setInterestAreaList] = useState([]);
+  const [educationStep, setEducationStep] = useState('');
   const [isLoading, setIsLoading] = useState(isLoadingUser);
+  const [open, setOpen] = useState(false);
+
 
   useLayoutEffect(() => {
     const db = getFirestore();
@@ -50,10 +55,12 @@ const Profile = () => {
         setDescription(data?.description || '');
         setWantToLearnList(data?.wantToLearnList || []);
         setInterestAreaList(data?.interestAreaList || []);
+        setEducationStep(data?.educationStep || '');
         setLocation(data?.location || '');
         setIsLoading(false);
       });
     }
+    console.log(description);
   }, [user, isLoadingUser]);
 
   const SEOData = useMemo(
@@ -72,6 +79,17 @@ const Profile = () => {
 
   const tagList = interestAreaList.map((item) => mapToTable(CATEGORIES)[item]);
 
+  const educationStepLabel = (educationStep,EDUCATION_STEP)=> {
+    let result;
+    for (const step of EDUCATION_STEP) {
+      if (step.value === educationStep) {
+        result = step.label;
+        break;
+      }
+    }
+    return result;
+  };
+  
   return (
     <Box
       sx={{
@@ -84,6 +102,20 @@ const Profile = () => {
         position: 'relative',
       }}
     >
+      <ContactModal
+        open={open}
+        // isLoadingSubmit={isLoadingSubmit}
+        onClose={() => {
+          setOpen(false);
+          // router.push('/');
+          // router.push('/partner');
+        }}
+        onOk={() => {
+          setOpen(false);
+          // router.push('/profile');
+          // router.push('/profile/edit');
+        }}
+      />
       <SEOConfig data={SEOData} />
       <Box
         sx={{
@@ -107,6 +139,7 @@ const Profile = () => {
           photoURL={photoURL}
           userName={userName}
           location={location}
+          educationStepLabel={educationStepLabel}
         />
       </Box>
       <UserTabs
@@ -114,6 +147,20 @@ const Profile = () => {
         description={description}
         wantToLearnList={wantToLearnList}
       />
+      <Button
+            sx={{
+              width: '160px',
+              borderRadius: '20px',
+              ml: '4px',
+              mt: '56px',
+              color: '#ffff',
+              bgcolor: '#16B9B3',
+            }}
+            variant="contained"
+            onClick={() => setOpen(true)}
+          >
+            聯繫夥伴
+          </Button>
     </Box>
   );
 };

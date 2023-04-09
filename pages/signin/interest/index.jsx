@@ -147,7 +147,7 @@ function EditPage() {
         }}
         onOk={() => {
           setOpen(false);
-          router.push('/');
+          router.push('/profile');
           // router.push('/profile/edit');
         }}
       />
