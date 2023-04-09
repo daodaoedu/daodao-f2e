@@ -7,9 +7,9 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Edit from '../../components/Profile/Edit';
+import AccountSetting from '../../components/Profile/accountsetting';
 import Footer from '../../shared/components/Footer_v2';
 import Navigation from '../../shared/components/Navigation_v2';
-import AccountSetting from '../../components/Profile/Accountsetting';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -37,11 +37,11 @@ function TabPanel(props) {
   );
 }
 
-// TabPanel.propTypes = {
-//   children: PropTypes.node,
-//   index: PropTypes.number.isRequired,
-//   value: PropTypes.number.isRequired,
-// };
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
 
 function a11yProps(index) {
   return {
@@ -64,7 +64,7 @@ const ProfilePage = () => {
         sx={{
           display: 'flex',
           justifyContent: 'center',
-          marginTop: '60px',
+          marginTop:'60px'
         }}
       >
         <Box
@@ -73,7 +73,7 @@ const ProfilePage = () => {
             height: '118px',
             backgroundColor: 'white',
             borderRadius: '8px',
-            margin: '26px 40px 0 0',
+            margin: '26px 40px 0 0'
           }}
         >
           <Tabs

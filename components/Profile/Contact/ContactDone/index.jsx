@@ -1,10 +1,11 @@
 import { Modal, Box, Typography, Button } from '@mui/material';
 
-function ContactDoneModal() {
+function ContactDoneModal({ onClose, onOk, isLoadingSubmit, open }) {
   return (
     <Modal
       keepMounted
-      open
+      open={open}
+      onClose={onClose}
       aria-labelledby="keep-mounted-modal-title"
       aria-describedby="keep-mounted-modal-description"
     >
@@ -15,24 +16,18 @@ function ContactDoneModal() {
           left: '50%',
           transform: 'translate(-50%, -50%)',
           width: '480px',
-          height: '602px',
           bgcolor: 'background.paper',
           boxShadow: 24,
           borderRadius: '16px',
-          p: '45px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          p: 5,
         }}
       >
-        <Box sx={{ mt: '77px', mb: '16px' }}>
-          <img
-            src="/assets/contactdone.png"
-            alt="nobody-land"
-            width="312px"
-            height="184px"
-          />
-        </Box>
+        <img
+          src="/assets/partner-popup.png"
+          alt="nobody-land"
+          width="360"
+          height="280"
+        />
         <Typography
           id="keep-mounted-modal-title"
           variant="h3"
@@ -57,19 +52,15 @@ function ContactDoneModal() {
             fontWeight: 400,
             fontWize: '14px',
             lineHeight: '140%',
-            mt: '8px',
           }}
         >
           請耐心等候夥伴的回應
         </Typography>
         <Button
-          sx={{
-            color: 'white',
-            width: '100%',
-            borderRadius: '20px',
-            mt: '145px',
-          }}
-          variant="contained"
+          sx={{ width: '100%', borderRadius: '20px', mr: '4px' }}
+          variant="outlined"
+          disabled={isLoadingSubmit}
+          onClick={onClose}
         >
           關閉
         </Button>

@@ -2,7 +2,6 @@ import { Box, Button, Chip, Skeleton, Typography } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import moment from 'moment/moment';
 import { useRouter } from 'next/router';
 import LOCATION from '../../../constants/countries.json';
 
@@ -186,7 +185,7 @@ function UserCard({
             disabled
             size="small"
             sx={{
-              height: '24px',
+              height:'24px',
               fontSize: '14px',
               margin: '0px 0px 5px 8px ',
             }}
@@ -232,7 +231,7 @@ function UserCard({
           component="p"
           sx={{ fontSize: '12px', color: '#92989A', marginTop: '5px' }}
         >
-          {moment(new Date() - 500 * 60 * 60).fromNow()}
+          1天前更新
         </Typography>
       </Box>
     </Box>

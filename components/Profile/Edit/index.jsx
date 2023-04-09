@@ -47,6 +47,7 @@ import COUNTIES from '../../../constants/countries.json';
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
   --section-height-offset: 80px;
+
 `;
 
 const ContentWrapper = styled.div`
@@ -91,7 +92,7 @@ function EditPage() {
     if (!isLoading) {
       const db = getFirestore();
       if (user?.uid) {
-        const docRef = doc(db, 'partnerlist', user?.uid);
+        const docRef = doc(db, 'user', user?.uid);
         getDoc(docRef).then((docSnap) => {
           const data = docSnap.data();
           console.log('data', data);
@@ -133,7 +134,7 @@ function EditPage() {
 
     const db = getFirestore();
 
-    const docRef = doc(db, 'partnerlist', user?.uid);
+    const docRef = doc(db, 'user', user?.uid);
     const partnerlistDocRef = doc(db, 'partnerlist', user?.uid);
     getDoc(docRef).then((docSnap) => {
       setIsLoadingSubmit(true);
