@@ -5,13 +5,12 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { CATEGORIES, EDUCATION_STEP } from '../../constants/member';
+import { CATEGORIES } from '../../constants/member';
 import { mapToTable } from '../../utils/helper';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
 import SEOConfig from '../../shared/components/SEO';
 import ContactModal from './Contact';
-
 
 const BottonBack = {
   color: '#536166',
@@ -38,15 +37,13 @@ const Profile = () => {
   const [location, setLocation] = useState('');
   const [wantToLearnList, setWantToLearnList] = useState([]);
   const [interestAreaList, setInterestAreaList] = useState([]);
-  const [educationStep, setEducationStep] = useState('');
   const [isLoading, setIsLoading] = useState(isLoadingUser);
   const [open, setOpen] = useState(false);
-
 
   useLayoutEffect(() => {
     const db = getFirestore();
     if (!isLoadingUser && user?.uid) {
-      const docRef = doc(db, 'user', user?.uid || '');
+      const docRef = doc(db, 'partnerlist', user?.uid || '');
       getDoc(docRef).then((docSnap) => {
         const data = docSnap.data();
         console.log('data', data);
@@ -55,7 +52,6 @@ const Profile = () => {
         setDescription(data?.description || '');
         setWantToLearnList(data?.wantToLearnList || []);
         setInterestAreaList(data?.interestAreaList || []);
-        setEducationStep(data?.educationStep || '');
         setLocation(data?.location || '');
         setIsLoading(false);
       });
@@ -79,17 +75,6 @@ const Profile = () => {
 
   const tagList = interestAreaList.map((item) => mapToTable(CATEGORIES)[item]);
 
-  const educationStepLabel = (educationStep,EDUCATION_STEP)=> {
-    let result;
-    for (const step of EDUCATION_STEP) {
-      if (step.value === educationStep) {
-        result = step.label;
-        break;
-      }
-    }
-    return result;
-  };
-  
   return (
     <Box
       sx={{
@@ -139,7 +124,6 @@ const Profile = () => {
           photoURL={photoURL}
           userName={userName}
           location={location}
-          educationStepLabel={educationStepLabel}
         />
       </Box>
       <UserTabs
@@ -148,19 +132,19 @@ const Profile = () => {
         wantToLearnList={wantToLearnList}
       />
       <Button
-            sx={{
-              width: '160px',
-              borderRadius: '20px',
-              ml: '4px',
-              mt: '56px',
-              color: '#ffff',
-              bgcolor: '#16B9B3',
-            }}
-            variant="contained"
-            onClick={() => setOpen(true)}
-          >
-            聯繫夥伴
-          </Button>
+        sx={{
+          width: '160px',
+          borderRadius: '20px',
+          ml: '4px',
+          mt: '56px',
+          color: '#ffff',
+          bgcolor: '#16B9B3',
+        }}
+        variant="contained"
+        onClick={() => setOpen(true)}
+      >
+        聯繫夥伴
+      </Button>
     </Box>
   );
 };

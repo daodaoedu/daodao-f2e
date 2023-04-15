@@ -1,6 +1,6 @@
 import { Modal, Box, Typography, Button } from '@mui/material';
 
-function ContactDoneModal() {
+function ContactErrorModal() {
   return (
     <Modal
       keepMounted
@@ -25,11 +25,11 @@ function ContactDoneModal() {
           alignItems: 'center',
         }}
       >
-        <Box sx={{ mt: '77px', mb: '16px' }}>
+        <Box sx={{ mt: '68px', mb: '21px' }}>
           <img
-            src="/assets/contactdone.png"
+            src="/assets/contacterror.png"
             alt="nobody-land"
-            width="312px"
+            width="212px"
             height="184px"
           />
         </Box>
@@ -45,37 +45,22 @@ function ContactDoneModal() {
             lineHeight: '120%',
           }}
         >
-          已送出邀請
-        </Typography>
-        <Typography
-          id="keep-mounted-modal-subtitle"
-          variant="h6"
-          component="h4"
-          textAlign="center"
-          sx={{
-            color: ' #536166',
-            fontWeight: 400,
-            fontWize: '14px',
-            lineHeight: '140%',
-            mt: '8px',
-          }}
-        >
-          請耐心等候夥伴的回應
+          哎呀！有不明錯誤
         </Typography>
         <Button
           sx={{
             color: 'white',
             width: '100%',
             borderRadius: '20px',
-            mt: '145px',
+            mt: '173px ',
           }}
           variant="contained"
         >
-          關閉
+          再試一次
         </Button>
       </Box>
     </Modal>
   );
 }
 
-export default ContactDoneModal;
+export default ContactErrorModal;

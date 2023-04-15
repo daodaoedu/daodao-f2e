@@ -71,7 +71,7 @@ const LoginPage = () => {
         //   result.user,
         // );
         const db = getFirestore();
-        const docRef = doc(db, 'user', result?.user?.uid);
+        const docRef = doc(db, 'partnerlist', result?.user?.uid);
         getDoc(docRef).then((docSnap) => {
           // const isNewUser = Object.keys(docSnap.data() || {}).length === 0;
           // if (isNewUser) {
@@ -82,6 +82,7 @@ const LoginPage = () => {
           //   router.push('/');
           // }
         });
+        console.log(result);
       })
       .catch((error) => {
         console.log('error', error);

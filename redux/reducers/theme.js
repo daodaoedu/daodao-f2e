@@ -1,15 +1,15 @@
-import toast from "react-hot-toast";
+import toast from 'react-hot-toast';
 
 const initialState = {
-  mode: "light",
+  mode: 'light',
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case "THEME_MODE_CHANGE": {
+    case 'THEME_MODE_CHANGE': {
       return {
-          ...state,
-          mode: state.mode === 'light' ? 'dark' : 'light',
+        ...state,
+        mode: state.mode === 'light' ? 'dark' : 'light',
       };
     }
     default: {
