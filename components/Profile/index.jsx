@@ -10,6 +10,7 @@ import { mapToTable } from '../../utils/helper';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
 import SEOConfig from '../../shared/components/SEO';
+import ContactModal from './Contact';
 
 const BottonBack = {
   color: '#536166',
@@ -37,11 +38,12 @@ const Profile = () => {
   const [wantToLearnList, setWantToLearnList] = useState([]);
   const [interestAreaList, setInterestAreaList] = useState([]);
   const [isLoading, setIsLoading] = useState(isLoadingUser);
+  const [open, setOpen] = useState(false);
 
   useLayoutEffect(() => {
     const db = getFirestore();
     if (!isLoadingUser && user?.uid) {
-      const docRef = doc(db, 'user', user?.uid || '');
+      const docRef = doc(db, 'partnerlist', user?.uid || '');
       getDoc(docRef).then((docSnap) => {
         const data = docSnap.data();
         console.log('data', data);
@@ -54,6 +56,7 @@ const Profile = () => {
         setIsLoading(false);
       });
     }
+    console.log(description);
   }, [user, isLoadingUser]);
 
   const SEOData = useMemo(
@@ -84,6 +87,20 @@ const Profile = () => {
         position: 'relative',
       }}
     >
+      <ContactModal
+        open={open}
+        // isLoadingSubmit={isLoadingSubmit}
+        onClose={() => {
+          setOpen(false);
+          // router.push('/');
+          // router.push('/partner');
+        }}
+        onOk={() => {
+          setOpen(false);
+          // router.push('/profile');
+          // router.push('/profile/edit');
+        }}
+      />
       <SEOConfig data={SEOData} />
       <Box
         sx={{
@@ -114,6 +131,20 @@ const Profile = () => {
         description={description}
         wantToLearnList={wantToLearnList}
       />
+      <Button
+        sx={{
+          width: '160px',
+          borderRadius: '20px',
+          ml: '4px',
+          mt: '56px',
+          color: '#ffff',
+          bgcolor: '#16B9B3',
+        }}
+        variant="contained"
+        onClick={() => setOpen(true)}
+      >
+        聯繫夥伴
+      </Button>
     </Box>
   );
 };

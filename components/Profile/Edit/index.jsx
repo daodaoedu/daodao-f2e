@@ -47,7 +47,6 @@ import COUNTIES from '../../../constants/countries.json';
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
   --section-height-offset: 80px;
-  background: linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa;
 `;
 
 const ContentWrapper = styled.div`
@@ -55,14 +54,13 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa;
-  border-radius: 8px;
-  margin: 60px auto;
+  background: white;
+  border-radius: 16px;
+  margin: 0 auto;
   padding: 40px 10px;
-  max-width: 50%;
-  width: 100%;
+  width: 672px;
   @media (max-width: 767px) {
-    max-width: 80%;
+    width: 80%;
     .title {
       text-overflow: ellipsis;
       width: 100%;
@@ -93,7 +91,7 @@ function EditPage() {
     if (!isLoading) {
       const db = getFirestore();
       if (user?.uid) {
-        const docRef = doc(db, 'user', user?.uid);
+        const docRef = doc(db, 'partnerlist', user?.uid);
         getDoc(docRef).then((docSnap) => {
           const data = docSnap.data();
           console.log('data', data);
@@ -135,7 +133,7 @@ function EditPage() {
 
     const db = getFirestore();
 
-    const docRef = doc(db, 'user', user?.uid);
+    const docRef = doc(db, 'partnerlist', user?.uid);
     const partnerlistDocRef = doc(db, 'partnerlist', user?.uid);
     getDoc(docRef).then((docSnap) => {
       setIsLoadingSubmit(true);
@@ -193,7 +191,6 @@ function EditPage() {
   return (
     <HomePageWrapper>
       <SEOConfig data={SEOData} />
-      <Navigation />
       <LocalizationProvider
         dateAdapter={AdapterDayjs}
         sx={{
@@ -843,7 +840,7 @@ function EditPage() {
                 }}
                 variant="contained"
                 onClick={() => {
-                  router.push('/profile');
+                  router.push('/profile/myprofile');
                 }}
               >
                 查看我的頁面
@@ -852,7 +849,6 @@ function EditPage() {
           </ContentWrapper>
         </Box>
       </LocalizationProvider>
-      <Footer />
     </HomePageWrapper>
   );
 }

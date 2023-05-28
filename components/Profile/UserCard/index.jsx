@@ -2,6 +2,7 @@ import { Box, Button, Chip, Skeleton, Typography } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import moment from 'moment/moment';
 import { useRouter } from 'next/router';
 import LOCATION from '../../../constants/countries.json';
 
@@ -47,7 +48,15 @@ function Tag({ label }) {
     />
   );
 }
-function UserCard({ isLoading, tagList, photoURL, userName, location }) {
+function UserCard({
+  isLoading,
+  tagList,
+  educationStepLabel,
+  photoURL,
+  userName,
+  location,
+}) {
+  console.log(educationStepLabel);
   const router = useRouter();
   if (isLoading) {
     return (
@@ -156,16 +165,34 @@ function UserCard({ isLoading, tagList, photoURL, userName, location }) {
           variant="outlined"
           sx={BottonEdit}
           onClick={() => {
-            router.push('/profile/edit');
+            router.push('/profile');
           }}
         >
           <EditOutlinedIcon />
           編輯
         </Button>
         <Box sx={{ marginLeft: '12px' }}>
-          <Typography sx={{ color: '#536166', fontSize: '18px' }}>
+          <Typography
+            sx={{
+              color: '#536166',
+              fontSize: '18px',
+              margin: '10px 8px 0px 0px ',
+            }}
+          >
             {userName || '-'}
           </Typography>
+          <Button
+            variant="contained"
+            disabled
+            size="small"
+            sx={{
+              height: '24px',
+              fontSize: '14px',
+              margin: '0px 0px 5px 8px ',
+            }}
+          >
+            {educationStepLabel}
+          </Button>
           <Typography component="p" sx={{ color: '#92989A' }}>
             -
           </Typography>
@@ -184,10 +211,29 @@ function UserCard({ isLoading, tagList, photoURL, userName, location }) {
           </Typography>
         </Box>
       </Box>
-      <Box sx={{ marginTop: '24px' }}>
-        {tagList.map((tag) => (
-          <Tag key={tag} label={tag} />
-        ))}
+      <Box
+        sx={{
+          marginTop: '24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          '@media (max-width: 767px)': { flexDirection: 'column' },
+        }}
+      >
+        <Box
+          sx={{
+            '@media (max-width: 767px)': { display: 'flex', flexFlow: 'wrap' },
+          }}
+        >
+          {tagList.map((tag) => (
+            <Tag key={tag} label={tag} />
+          ))}
+        </Box>
+        <Typography
+          component="p"
+          sx={{ fontSize: '12px', color: '#92989A', marginTop: '5px' }}
+        >
+          {moment(new Date() - 500 * 60 * 60).fromNow()}
+        </Typography>
       </Box>
     </Box>
   );

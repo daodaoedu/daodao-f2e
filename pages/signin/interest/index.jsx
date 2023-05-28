@@ -84,7 +84,7 @@ function EditPage() {
       const db = getFirestore();
       if (user?.uid) {
         // console.log('auth.currentUser', auth.currentUser);
-        const docRef = doc(db, 'user', user?.uid);
+        const docRef = doc(db, 'partnerlist', user?.uid);
         getDoc(docRef).then((docSnap) => {
           const data = docSnap.data();
           setInterestAreaList(data?.interestAreaList || []);
@@ -101,7 +101,7 @@ function EditPage() {
 
     const db = getFirestore();
 
-    const docRef = doc(db, 'user', user?.uid);
+    const docRef = doc(db, 'partnerlist', user?.uid);
     getDoc(docRef).then(() => {
       setIsLoadingSubmit(true);
       toast
@@ -147,7 +147,7 @@ function EditPage() {
         }}
         onOk={() => {
           setOpen(false);
-          router.push('/');
+          router.push('/profile');
           // router.push('/profile/edit');
         }}
       />
