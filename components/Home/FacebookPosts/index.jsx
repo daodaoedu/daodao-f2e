@@ -81,12 +81,12 @@ const Guide = () => {
         isLoading={isLoadingInstagramPosts}
         direction="right"
       />
-      <CardList
+      {/* <CardList
         title="📌 FaceBook 社團貼文"
         list={groupPosts}
         isLoading={isLoadingGroupPosts}
         direction="left"
-      />
+      /> */}
     </GuideWrapper>
   );
 };
