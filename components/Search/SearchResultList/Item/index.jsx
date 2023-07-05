@@ -102,13 +102,11 @@ const Item = ({ data, queryTags }) => {
     [data],
   );
 
-  const title = useMemo(
-    () =>
-      (data?.properties['資源名稱']?.title ?? []).find(
-        (item) => item?.type === 'text',
-      )?.plain_text,
-    [data?.properties],
-  );
+  const titleTextList = (data?.properties['資源名稱']?.title ?? [])
+    .filter((item) => item?.type === 'text')
+    .map((item) => item?.plain_text);
+
+  const title = useMemo(() => titleTextList.join(''), [data?.properties]);
 
   const contributors = useMemo(
     () => data?.properties['創建者']?.multi_select ?? [],
