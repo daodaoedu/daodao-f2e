@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
+import { getResourceTitle } from '../../../../utils/date';
 // import { TikTokFont } from '../../../../shared/styles/css';
 dayjs.extend(isBetween);
 
@@ -118,10 +119,7 @@ const Item = ({ data, margin }) => {
   );
 
   const title = useMemo(
-    () =>
-      (data?.properties['資源名稱']?.title ?? []).find(
-        (item) => item?.type === 'text',
-      )?.plain_text,
+    () => getResourceTitle(data?.properties),
     [data?.properties],
   );
 

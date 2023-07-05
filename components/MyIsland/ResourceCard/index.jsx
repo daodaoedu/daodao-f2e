@@ -7,6 +7,7 @@ import { getFirestore, collection } from 'firebase/firestore';
 import { useDocument, useCollection } from 'react-firebase-hooks/firestore';
 import { useRouter } from 'next/router';
 import Tags from './Tags';
+import { getResourceTitle } from '../../../utils/date';
 
 const ResourceCardWrapper = styled.div`
   /* border: 1px black solid;
@@ -63,7 +64,7 @@ const TitleWrapper = styled.div`
 
 const ResourceCard = ({ data }) => {
   const cats = data['領域名稱'];
-  const resourceName = data['資源名稱'];
+  const resourceName = getResourceTitle(data?.properties);
   const imageLink = data['縮圖'];
   const link = `/resource/${resourceName}`;
   //   const { push } = useRouter();

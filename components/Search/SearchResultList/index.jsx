@@ -2,6 +2,7 @@ import React from 'react';
 import styled from '@emotion/styled';
 import Item from './Item';
 import SkeletonItem from './SkeletonItem';
+import { getResourceTitle } from '../../../utils/date';
 
 const ListWrapper = styled.ul`
   display: flex;
@@ -36,7 +37,7 @@ const List = ({ list, queryTags, isLoading, isLoadingNextData }) => {
           <SkeletonItem key={index} />
         ) : (
           <Item
-            key={item.properties['資源名稱'].title[0].plain_text}
+            key={getResourceTitle(item?.properties)}
             data={item}
             queryTags={queryTags}
           />

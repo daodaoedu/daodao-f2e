@@ -54,5 +54,6 @@ module.exports = {
     'react/no-unknown-property': 0,
     'no-unsafe-optional-chaining': 0,
     'react/no-invalid-html-attribute': 0,
+    'linebreak-style': 0
   },
 };

@@ -7,6 +7,7 @@ const fetch = require('node-fetch');
 const siteUrl = process.env.SITE_URL || 'https://www.daoedu.tw';
 const { Feed } = require('feed');
 const fs = require('fs');
+const { getResourceTitle } = require('./utils/date');
 
 const stringSanitizer = (string = '') =>
   string
@@ -195,24 +196,14 @@ module.exports = {
       }).then((res) => res.json());
       fields.push(
         ...(result?.payload?.results ?? []).map((item) => ({
-          loc: `/resource/${
-            (item?.properties['資源名稱']?.title ?? []).find(
-              // eslint-disable-next-line no-shadow
-              (item) => item?.type === 'text',
-            )?.plain_text
-          }`,
+          loc: `/resource/${getResourceTitle(item.properties)}`,
           priority: 0.8,
           lastmod: new Date().toISOString(),
         })),
       );
 
       (result?.payload?.results ?? []).forEach((item) => {
-        const title = stringSanitizer(
-          (item?.properties['資源名稱']?.title ?? []).find(
-            // eslint-disable-next-line no-shadow
-            (item) => item?.type === 'text',
-          )?.plain_text || '',
-        );
+        const title = stringSanitizer(getResourceTitle(item.properties));
         const url = `https://www.daoedu.tw/resource/${stringSanitizer(title)}`;
         const image = stringSanitizer(item?.properties['縮圖']?.files[0]?.name);
         const desc = stringSanitizer(

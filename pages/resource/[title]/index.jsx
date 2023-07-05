@@ -6,15 +6,12 @@ import SEOConfig from '../../../shared/components/SEO';
 import Navigation from '../../../shared/components/Navigation_v2';
 import Footer from '../../../shared/components/Footer_v2';
 import Resource from '../../../components/Resource';
+import { getResourceTitle } from '../../../utils/date';
 
 const ResourcePage = ({ data = {} }) => {
   const router = useRouter();
   const title = useMemo(
-    () =>
-      data?.properties && data?.properties['資源名稱']
-        ? data?.properties['資源名稱']?.title[0]?.plain_text
-        : '',
-    [data?.properties],
+    () => getResourceTitle(data?.properties)[data?.properties],
   );
   const desc = useMemo(
     () =>
@@ -325,11 +322,7 @@ export const getStaticProps = async ({ params }) => {
     props: {
       data:
         (data?.payload?.results ?? []).find(({ properties }) =>
-          (
-            (properties['資源名稱']?.title ?? []).find(
-              (item) => item?.type === 'text',
-            )?.plain_text ?? ''
-          ).trim(),
+          getResourceTitle(properties).trim(),
         ) || {},
     },
   };
