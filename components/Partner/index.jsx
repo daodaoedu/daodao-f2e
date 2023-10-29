@@ -1,18 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
-import { Box, Typography, Button } from '@mui/material';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { getAuth, updateProfile } from 'firebase/auth';
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  getDoc,
-  setDoc,
-  addDoc,
-} from 'firebase/firestore';
-import { useRouter } from 'next/router';
+import { Box, Grid, Typography } from '@mui/material';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+
 import PartnerList from './PartnerList';
 import SearchField from './SearchField';
 import Banner from './Banner';
@@ -25,45 +15,54 @@ const PartnerWrapper = styled.div`
   position: relative;
 `;
 
+const PartnerContent = styled(Box)`
+  margin-top: 24px;
+  padding: 32px 40px;
+  background-color: #fff;
+  border-radius: 20px;
+`;
+
+const TagWrapper = styled(Box)`
+  border-radius: 13px;
+  display: flex;
+  padding: 3px 7px 3px 10px;
+  justify-content: center;
+  align-items: center;
+  background: #16b9b3;
+`;
+
+const TagText = styled(Typography)`
+  color: var(--black-white-white, #fff);
+  text-align: center;
+  font-family: 'Noto Sans TC';
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.4;
+`;
+
+const SearchParamerters = () => (
+  <Grid container gap={'10px'} mb={'16px'}>
+    <Grid item>
+      <TagWrapper>
+        <TagText>台北市</TagText>
+        <CloseOutlinedIcon
+          style={{ padding: '2px', fontSize: '16px', color: 'white' }}
+        />
+      </TagWrapper>
+    </Grid>
+    <Grid item>
+      <TagWrapper>
+        <TagText>桃園市</TagText>
+        <CloseOutlinedIcon
+          style={{ padding: '2px', fontSize: '16px', color: 'white' }}
+        />
+      </TagWrapper>
+    </Grid>
+  </Grid>
+);
+
 function Partner() {
-  const router = useRouter();
-  const [partnerList, setPartnerList] = useState([]);
-  useEffect(() => {
-    const db = getFirestore();
-    const colRef = collection(db, 'partnerlist');
-    getDocs(colRef).then((docsSnap) => {
-      docsSnap.forEach((doc) => {
-        setPartnerList((prevState) => [
-          ...prevState,
-          {
-            id: doc.id,
-            ...(doc.data() || {}),
-          },
-        ]);
-        console.log(doc.id, ' => ', doc.data());
-      });
-    });
-    // const test = collection('partnerlist').
-    // console.log('test', test);
-    // const docRef = doc(db, 'partnerlist', user?.uid);
-    // getDoc(docRef).then((docSnap) => {
-    //   const data = docSnap.data();
-    //   setUserName(data?.userName || '');
-    //   setPhotoURL(data?.photoURL || '');
-    //   setBirthDay(dayjs(data?.birthDay) || dayjs());
-    //   setGender(data?.gender || '');
-    //   setRoleList(data?.roleList || []);
-    //   setWantToLearnList(data?.wantToLearnList || []);
-    //   setInterestAreaList(data?.interestAreaList || []);
-    //   setEducationStep(data?.educationStep);
-    //   setLocation(data?.location || '');
-    //   setUrl(data?.url || '');
-    //   setDescription(data?.description || '');
-    //   setIsOpenLocation(data?.isOpenLocation || false);
-    //   setIsOpenProfile(data?.isOpenProfile || false);
-    // });
-  }, [setPartnerList]);
-  console.log('partnerList', partnerList);
   return (
     <>
       <Banner />
@@ -85,58 +84,10 @@ function Partner() {
           >
             <SearchField />
           </Box>
-          <Box
-            sx={{
-              marginTop: '24px',
-              borderRadius: '20px',
-              boxShadow: '0px 4px 6px rgba(196, 194, 193, 0.2)',
-              background: '#fff',
-            }}
-          >
-            <Box sx={{ minHeight: '100vh', padding: '5%' }}>
-              找夥伴功能架構與維運中，如果你們希望加速開發的腳步的話，歡迎一起加入團隊共同協作！
-              <Box
-                sx={{
-                  margin: '20px 0 10px 0',
-                  display: 'flex',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                }}
-              >
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    window.open('https://forms.gle/if2kwAEQkeaTUgm37', '_blank')
-                  }
-                  sx={{ margin: '0 10px' }}
-                >
-                  <Typography variant="p">加入團隊</Typography>
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    window.open(
-                      'https://g0v.hackmd.io/@daodaoedu/HydZGAUYc',
-                      '_blank',
-                    )
-                  }
-                  sx={{ margin: '0 10px' }}
-                >
-                  <Typography variant="p">了解更多</Typography>
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    window.open('https://www.daoedu.tw/about', '_blank')
-                  }
-                  sx={{ margin: '0 10px' }}
-                >
-                  <Typography variant="p">關於島島</Typography>
-                </Button>
-              </Box>
-            </Box>
-            {/* <PartnerList list={partnerList} /> */}
-          </Box>
+          <PartnerContent>
+            <SearchParamerters />
+            <PartnerList />
+          </PartnerContent>
         </Box>
       </PartnerWrapper>
     </>

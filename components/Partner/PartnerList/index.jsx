@@ -1,86 +1,94 @@
 import React, { useRef } from 'react';
-import styled from '@emotion/styled';
-import { Box, Typography, Divider, Skeleton } from '@mui/material';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { useDispatch, useSelector } from 'react-redux';
+import { Grid, Box } from '@mui/material';
 import PartnerCard from './PartnerCard';
 
 const LIST = [
   {
+    id: 1,
     name: '許浪手',
     image:
       'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60',
     subTitle: '實驗教育老師',
     canShare: '心智圖法',
     canTogether: '學習交流、教學相長',
-    tags: ['實驗教育'],
+    tagList: ['tag1', 'tag2', 'tag3'],
     location: '台北市松山區',
   },
   {
+    id: 2,
     name: '許浪手2',
     image:
       'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60',
     subTitle: '實驗教育老師',
-    canShare: '心智圖法',
+    canShare: 'make-friends',
     canTogether: '學習交流、教學相長',
-    tags: ['實驗教育'],
+    tagList: ['tag1', 'tag2'],
     location: '台北市松山區',
+    date: '兩天前更新',
   },
   {
+    id: 3,
     name: '許浪手3',
     image:
       'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60',
     subTitle: '實驗教育老師',
     canShare: '心智圖法',
     canTogether: '學習交流、教學相長',
-    tags: ['實驗教育'],
+    tagList: ['tag12', 'tag2'],
     location: '台北市松山區',
+    date: '兩天前更新',
   },
   {
+    id: 4,
     name: '許浪手4',
     image:
       'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60',
     subTitle: '實驗教育老師',
     canShare: '心智圖法',
     canTogether: '學習交流、教學相長',
-    tags: ['實驗教育'],
+    tagList: ['tag1', 'tag2'],
     location: '台北市松山區',
+    date: '兩天前更新',
   },
 ];
 
-function PartnerList({ list = [] }) {
+function PartnerList() {
+  // TODO: get data from backend
+  //   const user = useSelector((state) => state.user);
+  const lists = LIST;
   return (
-    <Box sx={{ minHeight: '100vh', padding: '5%' }}>
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        {list.map(
-          ({
-            id,
-            userName,
-            photoURL,
-            subTitle,
-            wantToLearnList,
-            interestAreaList,
-          }) => (
+    <Grid
+      container
+      sx={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}
+    >
+      {lists.map((item, idx) => (
+        <>
+          <Grid item xs={6}>
             <PartnerCard
-              key={`${id}-${userName}`}
-              id={id}
-              image={photoURL}
-              name={userName}
-              subTitle={subTitle}
-              canShare={wantToLearnList}
-              canTogether={interestAreaList}
+              key={`${item.id}-${item.name}`}
+              id={item.id}
+              image={item.image}
+              tagList={item.tagList}
+              name={item.name}
+              subTitle={item.subTitle}
+              canShare={item.wantToLearnList}
+              canTogether={item.interestAreaList}
             />
-          ),
-        )}
-      </Box>
-    </Box>
+          </Grid>
+          {(idx + 1) % 2 == 0 && idx + 1 !== lists.length && (
+            <Grid item xs={12} py={'12px'}>
+              <Box height={1} width={'100%'} border={'1px solid #E5E5E5'} />
+            </Grid>
+          )}
+        </>
+      ))}
+    </Grid>
   );
 }
 
