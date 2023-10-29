@@ -142,11 +142,6 @@ function PartnerCard({
             <Typography sx={{ color: '#536166', fontWeight: 400 }}>
               學習交流、教學相長
             </Typography>
-            {/* <Typography sx={{ marginLeft: '12px', color: '#536166' }}>
-              {canTogether
-                .map((item) => CATEGORIES_TABLE[item] || '')
-                .join(', ')}
-            </Typography> */}
           </Box>
         </Box>
         <TagWrap container gap={'8px'} mb={'12px'}>
