@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Grid, Box } from '@mui/material';
 import PartnerCard from './PartnerCard';
@@ -14,6 +14,8 @@ const LIST = [
     canTogether: '學習交流、教學相長',
     tagList: ['tag1', 'tag2', 'tag3'],
     location: '台北市松山區',
+    share: '',
+    wantToDoList: [],
   },
   {
     id: 2,
@@ -26,6 +28,8 @@ const LIST = [
     tagList: ['tag1', 'tag2'],
     location: '台北市松山區',
     date: '兩天前更新',
+    share: '',
+    wantToDoList: [],
   },
   {
     id: 3,
@@ -38,6 +42,8 @@ const LIST = [
     tagList: ['tag12', 'tag2'],
     location: '台北市松山區',
     date: '兩天前更新',
+    share: '',
+    wantToDoList: [],
   },
   {
     id: 4,
@@ -50,12 +56,15 @@ const LIST = [
     tagList: ['tag1', 'tag2'],
     location: '台北市松山區',
     date: '兩天前更新',
+    share: '',
+    wantToDoList: [],
   },
 ];
 
 function PartnerList() {
   // TODO: get data from backend
-  //   const user = useSelector((state) => state.user);
+  // const user = useSelector((state) => state.user);
+  // const userURL = `http://localhost:3000/user/all_User`;
   const lists = LIST;
   return (
     <Grid
@@ -74,11 +83,13 @@ function PartnerList() {
               key={`${item.id}-${item.name}`}
               id={item.id}
               image={item.image}
-              tagList={item.tagList}
               name={item.name}
               subTitle={item.subTitle}
-              canShare={item.wantToLearnList}
-              canTogether={item.interestAreaList}
+              share={item.share}
+              roleList={item.roleList}
+              tagList={item.tagList}
+              wantToDoList={item.wantToDoList}
+              location={item.location}
             />
           </Grid>
           {(idx + 1) % 2 == 0 && idx + 1 !== lists.length && (
