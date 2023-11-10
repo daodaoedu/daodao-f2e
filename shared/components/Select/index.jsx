@@ -24,8 +24,8 @@ export default function Select({
   value,
   onChange,
   renderValue,
-  width = 160,
-  placeholder = '全部',
+  width = 200,
+  placeholder,
   multiple,
   items = [],
   itemValue = 'name',
@@ -65,10 +65,13 @@ export default function Select({
         input={<Input />}
         renderValue={renderValue}
         MenuProps={MenuProps}
+        sx={{ '.MuiSelect-select': { py: '6px' } }}
       >
-        <MenuItem disabled value="" sx={{ fontSize: 14 }}>
-          {placeholder}
-        </MenuItem>
+        {placeholder && (
+          <MenuItem disabled value="" sx={{ fontSize: 14 }}>
+            {placeholder}
+          </MenuItem>
+        )}
         {items.map((item) => (
           <MenuItem
             key={getValue(item, itemValue)}
