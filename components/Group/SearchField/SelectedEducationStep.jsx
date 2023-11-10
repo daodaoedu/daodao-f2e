@@ -1,23 +1,25 @@
 import Select from '@/shared/components/Select';
-import { AREAS } from '@/constants/areas';
+import { EDUCATION_STEP } from '@/constants/member';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
-export default function SelectedAreas() {
+export default function SelectedEducationStep() {
+  const QUERY_KEY = 'edu';
   const [getSearchParams, pushState] = useSearchParamsManager();
 
   const handleChange = ({ target: { value } }) => {
-    pushState('area', value.toString());
+    pushState(QUERY_KEY, value.toString());
   };
 
   return (
     <Select
       multiple
-      value={getSearchParams('area')}
+      value={getSearchParams(QUERY_KEY)}
       onChange={handleChange}
-      width={240}
-      items={AREAS}
+      items={EDUCATION_STEP}
+      itemLabel="label"
+      itemValue="label"
       renderValue={(selected) =>
-        selected.length === 0 ? '全部' : selected.join('、')
+        selected.length === 0 ? '適合的教育階段' : selected.join('、')
       }
       sx={{
         '@media (max-width: 767px)': {

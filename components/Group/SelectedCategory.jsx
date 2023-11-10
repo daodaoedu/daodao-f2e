@@ -1,23 +1,42 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import styled from '@emotion/styled';
-import { Box, Typography } from '@mui/material';
 import { CATEGORIES } from '@/constants/category';
-import ScrollButton from '@/shared/components/ScrollButton';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
-import CategoryChip from './CategoryChip';
+import ScrollButton from '@/shared/components/ScrollButton';
+import Chip from '@/shared/components/Chip';
 
-const ListWrapper = styled.ul`
+const StyledSelectedCategory = styled.div`
+  margin-top: 12px;
   display: flex;
-  overflow-x: scroll;
-  -ms-overflow-style: none; /* IE */
-  scrollbar-width: none; /* Firefox */
-  scroll-behavior: smooth;
-  &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Edge and Opera */
+  align-items: center;
+
+  > p {
+    margin-right: 20px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #536166;
+    flex-shrink: 0;
   }
 
-  @media (max-width: 767px) {
-    margin: 10px 0;
+  > div {
+    position: relative;
+    max-width: calc(100% - 76px);
+  }
+
+  ul {
+    display: flex;
+    overflow-x: scroll;
+    -ms-overflow-style: none; /* IE */
+    scrollbar-width: none; /* Firefox */
+    scroll-behavior: smooth;
+
+    &::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Edge and Opera */
+    }
+
+    @media (max-width: 767px) {
+      margin: 10px 0;
+    }
   }
 `;
 
@@ -71,26 +90,11 @@ const SelectedCategory = () => {
   };
 
   return (
-    <Box
-      sx={{
-        marginTop: '12px',
-        display: 'flex',
-        alignItems: 'center',
-      }}
-    >
-      <Typography
-        sx={{
-          marginRight: '20px',
-          fontWeight: 700,
-          fontSize: '14px',
-          color: '#536166',
-          flexShrink: '0',
-        }}
-      >
-        學習領域
-      </Typography>
-      <Box
-        sx={{ position: 'relative', maxWidth: 'calc(100% - 76px)' }}
+    <StyledSelectedCategory>
+      <p>學習領域</p>
+      <div
+        onBlur={resetScrollButtonVisibility}
+        onFocus={updateScrollButtonVisibility}
         onMouseOver={updateScrollButtonVisibility}
         onMouseLeave={resetScrollButtonVisibility}
       >
@@ -99,31 +103,31 @@ const SelectedCategory = () => {
           isShowScrollButton={isShowLeftScrollButton}
           onScrollEvent={scrollButtonHandler('left')}
         />
-        <ListWrapper
-          ref={categoryListRef}
-          onScroll={updateScrollButtonVisibility}
-        >
-          <CategoryChip
-            value="全部"
-            isActive={currentCategories.length === 0}
-            onClick={() => pushState('category')}
-          />
-          {CATEGORIES.map(({ key, value }) => (
-            <CategoryChip
-              key={key}
-              value={value}
-              isActive={currentCategories.includes(value)}
-              onClick={handleClickCategory}
+        <ul ref={categoryListRef} onScroll={updateScrollButtonVisibility}>
+          <li>
+            <Chip
+              value="全部"
+              isActive={currentCategories.length === 0}
+              onClick={() => pushState('category')}
             />
+          </li>
+          {CATEGORIES.map(({ key, value }) => (
+            <li key={key}>
+              <Chip
+                value={value}
+                isActive={currentCategories.includes(value)}
+                onClick={handleClickCategory}
+              />
+            </li>
           ))}
-        </ListWrapper>
+        </ul>
         <ScrollButton
           type="right"
           isShowScrollButton={isShowRightScrollButton}
           onScrollEvent={scrollButtonHandler('right')}
         />
-      </Box>
-    </Box>
+      </div>
+    </StyledSelectedCategory>
   );
 };
 

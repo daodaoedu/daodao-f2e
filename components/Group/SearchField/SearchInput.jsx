@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { styled } from '@mui/material/styles';
+import styled from '@emotion/styled';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
@@ -8,7 +8,7 @@ import MicIcon from '@mui/icons-material/Mic';
 import SearchIcon from '@mui/icons-material/Search';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
-const Speech = dynamic(import('../../../../shared/components/Speech'), {
+const Speech = dynamic(import('@/shared/components/Speech'), {
   ssr: false,
 });
 

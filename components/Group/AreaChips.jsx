@@ -2,9 +2,9 @@ import { useCallback, useMemo } from 'react';
 import styled from '@emotion/styled';
 import { AREAS } from '@/constants/areas';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
-import AreaChip from './AreaChip';
+import Chip from '@/shared/components/Chip';
 
-const ListWrapper = styled.ul`
+const StyledAreaChips = styled.ul`
   display: flex;
   flex-wrap: wrap;
   margin-bottom: 16px;
@@ -33,11 +33,13 @@ const AreaChips = () => {
 
   return (
     currentArea.length > 0 && (
-      <ListWrapper>
+      <StyledAreaChips>
         {currentArea.map((name) => (
-          <AreaChip key={name} value={name} onDelete={handleClickArea} />
+          <li key={name}>
+            <Chip value={name} onDelete={handleClickArea} />
+          </li>
         ))}
-      </ListWrapper>
+      </StyledAreaChips>
     )
   );
 };

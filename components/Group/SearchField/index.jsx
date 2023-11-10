@@ -1,42 +1,38 @@
-import { memo } from 'react';
 import styled from '@emotion/styled';
-import Box from '@mui/material/Box';
 import SearchInput from './SearchInput';
 import SelectedAreas from './SelectedAreas';
-import {
-  SelectedInitiatorEducationStep,
-  SelectedPartnerEducationStep,
-} from './SelectedEducationStep';
+import SelectedEducationStep from './SelectedEducationStep';
+import CheckboxGrouping from './CheckboxGrouping';
 
-const SearchFieldWrapper = styled.div`
+const StyledSearchField = styled.div`
   margin-top: 8px;
   width: 100%;
+
+  .selects-wrapper {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    @media (max-width: 767px) {
+      margin: 10px 0;
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
 `;
 
 const SearchField = () => {
   return (
-    <SearchFieldWrapper>
+    <StyledSearchField>
       <SearchInput />
-      <Box
-        sx={{
-          marginTop: '12px',
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          gap: 2,
-          '@media (max-width: 767px)': {
-            margin: '10px 0',
-            flexDirection: 'column',
-            alignItems: 'stretch',
-          },
-        }}
-      >
+      <div className="selects-wrapper">
         <SelectedAreas />
-        <SelectedInitiatorEducationStep />
-        <SelectedPartnerEducationStep />
-      </Box>
-    </SearchFieldWrapper>
+        <SelectedEducationStep />
+        <CheckboxGrouping />
+      </div>
+    </StyledSearchField>
   );
 };
 
-export default memo(SearchField);
+export default SearchField;
