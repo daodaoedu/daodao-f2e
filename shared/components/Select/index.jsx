@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { styled } from '@mui/material/styles';
+import styled from '@emotion/styled';
 import InputBase from '@mui/material/InputBase';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
