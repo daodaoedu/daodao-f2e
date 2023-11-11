@@ -1,8 +1,17 @@
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import Image from '@/shared/components/Image';
-import { StyledGroupCard, StyledLabel, StyledText } from './GroupCard.styled';
+import {
+  StyledAreas,
+  StyledContainer,
+  StyledFooter,
+  StyledGroupCard,
+  StyledInfo,
+  StyledLabel,
+  StyledText,
+  StyledTitle,
+} from './GroupCard.styled';
 
-function GroupItem({
+function GroupCard({
   photoURL,
   photoAlt,
   title = '未定義主題',
@@ -14,34 +23,34 @@ function GroupItem({
   return (
     <StyledGroupCard>
       <Image alt={photoAlt} src={photoURL} />
-      <div className="main">
-        <h2>{title}</h2>
-        <div>
-          <div className="flex">
+      <StyledContainer>
+        <StyledTitle>{title}</StyledTitle>
+        <StyledInfo>
+          <div>
             <StyledLabel>學習領域</StyledLabel>
             <StyledText>|</StyledText>
             <StyledText>{category.join('、')}</StyledText>
           </div>
-          <div className="flex">
+          <div>
             <StyledLabel>適合階段</StyledLabel>
             <StyledText>|</StyledText>
             <StyledText>{partnerEducationStep}</StyledText>
           </div>
-        </div>
+        </StyledInfo>
         <StyledText lineClamp="2" fontSize="14px">
           {description}
         </StyledText>
-        <div className="areas">
+        <StyledAreas>
           <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />
           <StyledText color="#92989A">{area}</StyledText>
-        </div>
-        <footer>
+        </StyledAreas>
+        <StyledFooter>
           <time>2天前更新</time>
           <div>揪團中</div>
-        </footer>
-      </div>
+        </StyledFooter>
+      </StyledContainer>
     </StyledGroupCard>
   );
 }
 
-export default GroupItem;
+export default GroupCard;
