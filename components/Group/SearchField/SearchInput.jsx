@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import styled from '@emotion/styled';
 import InputBase from '@mui/material/InputBase';
@@ -11,16 +11,6 @@ import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 const Speech = dynamic(import('../../../shared/components/Speech'), {
   ssr: false,
 });
-
-const PLACEHOLDER_TEXT = [
-  '英語, 心理學, 自主學習 ...',
-  '好想出國喔～該來學英語了',
-  '我的腦袋不太好，但是知道邏輯要訓練',
-  '不會寫程式，也要了解科技趨勢',
-  '斜槓與文青的時間到了',
-  '誰說健身不是學習的一種？',
-  '生活在學習',
-];
 
 const SearchInputWrapper = styled(Paper)`
   width: 100%;
@@ -80,11 +70,6 @@ const SearchInput = () => {
     pushState('q', keyword);
   };
 
-  const placeholder = useMemo(
-    () => PLACEHOLDER_TEXT[Math.floor(Math.random() * PLACEHOLDER_TEXT.length)],
-    [],
-  );
-
   return (
     <SearchInputWrapper as="form" onSubmit={handleSubmit}>
       <InputBaseWrapper
@@ -92,7 +77,7 @@ const SearchInput = () => {
         inputProps={{ 'aria-label': 'search group' }}
         name="q"
         value={keyword}
-        placeholder={placeholder}
+        placeholder="想尋找甚麼類型的揪團呢？"
         onChange={handleChange}
       />
       {isSpeechMode && (
