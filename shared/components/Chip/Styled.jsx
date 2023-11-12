@@ -3,9 +3,8 @@ import MuiChip from '@mui/material/Chip';
 import { COLOR_TABLE } from '@/constants/notion';
 
 export const SwitchableChip = styled(MuiChip)`
-  background-color: ${(props) =>
-    props.isActive ? '#DEF5F5' : COLOR_TABLE.default};
-  opacity: ${(props) => (props.isActive ? '100%' : '40%')};
+  background-color: ${COLOR_TABLE.default};
+  opacity: 0.4;
   cursor: pointer;
   margin: 0px 5px;
   white-space: nowrap;
@@ -13,6 +12,10 @@ export const SwitchableChip = styled(MuiChip)`
   font-size: 16px;
   &:hover {
     background-color: #def5f5;
+  }
+  &.isActive {
+    background-color: #DEF5F5;
+    opacity: 1;
   }
 `;
 
