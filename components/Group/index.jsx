@@ -36,7 +36,7 @@ const createTemplate = (_, id) => ({
   photoURL:
     'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60',
   photoAlt: '封面圖',
-  category: ['語言與文學', '人文社會'],
+  category: ['語言與文學', '人文社會', '自然科學', '生活'],
   partnerEducationStep: '高中',
   description:
     '希望能像朋友，一起讀有興趣的科目，每週1-2次見面練習這兩種，每次總時數2-3小時不限，希望你跟我一樣很想追求有效進步也不怕辛苦！一起讀日文也可以喔！',
