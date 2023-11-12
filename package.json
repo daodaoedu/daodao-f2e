@@ -70,6 +70,7 @@
     "@emotion/babel-plugin": "^11.9.2",
     "@next/eslint-plugin-next": "^13.2.1",
     "@types/chrome": "^0.0.206",
+    "babel-plugin-import": "^1.13.8",
     "eslint": "^8.35.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^8.6.0",
