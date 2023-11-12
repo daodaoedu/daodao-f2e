@@ -8,10 +8,10 @@ const Chip = ({ value, isActive, onClick, onDelete }) => {
     <StyledChip
       label={value}
       value={value}
-      isActive={isActive}
       onClick={onClick}
       onDelete={onDelete}
       deleteIcon={onDelete && <ClearIcon />}
+      className={isActive ? 'isActive' : ''}
     />
   );
 };
