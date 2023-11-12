@@ -7,7 +7,7 @@ export const StyledLabel = styled.span`
   font-weight: bold;
 `;
 
-export const StyledText = styled.span`
+export const StyledText = styled.div`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: ${(props) => props.lineClamp || '1'};
@@ -23,9 +23,10 @@ export const StyledTitle = styled.h2`
 `;
 
 export const StyledInfo = styled.div`
-  > div {
-    display: flex;
-    gap: 4px;
+  ${StyledLabel} {
+    margin-right: 5px;
+    padding-right: 5px;
+    border-right: 1px solid #536166;
   }
 `;
 

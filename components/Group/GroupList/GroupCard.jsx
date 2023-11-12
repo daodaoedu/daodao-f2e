@@ -26,16 +26,14 @@ function GroupCard({
       <StyledContainer>
         <StyledTitle>{title}</StyledTitle>
         <StyledInfo>
-          <div>
+          <StyledText>
             <StyledLabel>學習領域</StyledLabel>
-            <StyledText>|</StyledText>
-            <StyledText>{category.join('、')}</StyledText>
-          </div>
-          <div>
+            <span>{category.join('、')}</span>
+          </StyledText>
+          <StyledText>
             <StyledLabel>適合階段</StyledLabel>
-            <StyledText>|</StyledText>
-            <StyledText>{partnerEducationStep}</StyledText>
-          </div>
+            <span>{partnerEducationStep}</span>
+          </StyledText>
         </StyledInfo>
         <StyledText lineClamp="2" fontSize="14px">
           {description}

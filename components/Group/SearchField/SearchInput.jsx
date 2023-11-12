@@ -8,7 +8,7 @@ import MicIcon from '@mui/icons-material/Mic';
 import SearchIcon from '@mui/icons-material/Search';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
-const Speech = dynamic(import('../../../shared/components/Speech'), {
+const Speech = dynamic(import('@/shared/components/Speech'), {
   ssr: false,
 });
 
