@@ -14,7 +14,7 @@ export const SwitchableChip = styled(MuiChip)`
     background-color: #def5f5;
   }
   &.isActive {
-    background-color: #DEF5F5;
+    background-color: #def5f5;
     opacity: 1;
   }
 `;
