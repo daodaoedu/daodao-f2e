@@ -313,8 +313,7 @@ export const getStaticProps = async ({ params }) => {
           {
             property: '資源名稱',
             title: {
-              // FIXME: fix next export error occurred [Error: ENOENT: no such file or directory, rename
-              contains: title.replaceAll('%7C', '|').replaceAll('%3A', ':'),
+              contains: title,
             },
           },
         ],
@@ -370,12 +369,7 @@ export const getStaticPaths = async () => {
             // eslint-disable-next-line no-shadow
             (item) => item?.type === 'text',
           )?.plain_text ?? ''
-        )
-          .trim()
-          // FIXME: fix next export error occurred [Error: ENOENT: no such file or directory, rename
-          .replaceAll('|', '%7C')
-          .replaceAll(':', '%3A')
-          .replaceAll('Crash Course', 'Crash course'),
+        ).trim(),
         // .replace(/\./g, "%2E"), // or try &#46; reference: https://stackoverflow.com/questions/4938900/how-to-encode-periods-for-urls-in-javascript
       },
     }));
