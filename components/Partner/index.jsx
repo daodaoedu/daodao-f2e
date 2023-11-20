@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 import { Box, Grid, Typography, Button } from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import PartnerList from './PartnerList';
 import SearchField from './SearchField';
 import Banner from './Banner';
@@ -73,6 +74,7 @@ const SearchParamsList = ({ params }) =>
   );
 
 function Partner() {
+  const mobileScreen = useMediaQuery('(max-width: 767px)');
   const partners = useSelector((state) => state.partners);
 
   return (
@@ -86,13 +88,13 @@ function Partner() {
           <SearchParamsList params={['台北市', '桃園市']} />
           <PartnerList />
         </StyledContent>
-        {partners.length && (
+        {partners.items.length && (
           <Box
-            sx={{
-              textAlign: 'center',
-              paddingTop: '80px',
-              paddingBottom: '100px',
-            }}
+            sx={
+              mobileScreen
+                ? { textAlign: 'center', padding: '32px 0 80px' }
+                : { textAlign: 'center', padding: '72px 0 100px' }
+            }
           >
             <Button
               variant="outlined"
