@@ -5,7 +5,7 @@ const withPWA = require('next-pwa')({
 module.exports = withPWA({
   reactStrictMode: false,
   images: {
-    domains: ['imgur.com', 'images.unsplash.com'],
+    domains: ['imgur.com', 'images.unsplash.com', 'lh3.googleusercontent.com'],
   },
   env: {
     HOSTNAME: 'https://www.daoedu.tw',

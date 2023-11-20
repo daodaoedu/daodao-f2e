@@ -83,6 +83,14 @@ export const EDUCATION_STEP = [
     value: 'university',
   },
   {
+    label: '碩士',
+    value: 'master',
+  },
+  {
+    label: '博士',
+    value: 'doctor',
+  },
+  {
     label: '其他',
     value: 'other',
   },

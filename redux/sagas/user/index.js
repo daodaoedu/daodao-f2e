@@ -1,4 +1,4 @@
-import { put, all, take, takeEvery, select } from 'redux-saga/effects';
+import { put, all, take, takeEvery, select, call } from 'redux-saga/effects';
 import * as localforage from 'localforage';
 import firebase from '../../../utils/firebase';
 
@@ -36,9 +36,20 @@ function* userLogin() {
   }
 }
 
+function* fetchAllUsers() {
+  try {
+    const URL = process.env.NEXT_PUBLIC_API_URL;
+    const result = yield call(URL);
+    yield put({ type: 'FETCH_ALL_USER_SUCCESS', payload: result });
+  } catch (error) {
+    yield put({ type: 'FETCH_ALL_USER_FAILURE' });
+  }
+}
+
 function* userSaga() {
   yield takeEvery('CHECK_USER_ACCOUNT', checkUserStatus);
   yield takeEvery('USER_LOGIN', userLogin);
+  yield takeEvery('FETCH_ALL_USERS', fetchAllUsers);
 }
 
 export default userSaga;
