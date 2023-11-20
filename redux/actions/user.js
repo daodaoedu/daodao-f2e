@@ -10,6 +10,12 @@ export function checkUserAccount() {
   };
 }
 
+export function fetchAllUsers() {
+  return {
+    type: 'FETCH_ALL_USERS',
+  };
+}
+
 export function addResourceToCollection(resourceId) {
   return {
     type: 'ADD_RESOURCE_TO_COLLECTION',
