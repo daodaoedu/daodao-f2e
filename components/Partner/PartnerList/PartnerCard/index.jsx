@@ -65,10 +65,8 @@ const TagSection = ({ tagList = [] }) => {
           {tag}
         </StyledTagText>
       ))}
-      {hideItems.length ? (
+      {hideItems.length > 0 && (
         <StyledTagText fontWeight={'bold'}>{hideItems.length}</StyledTagText>
-      ) : (
-        ''
       )}
     </StyledTagContainer>
   );

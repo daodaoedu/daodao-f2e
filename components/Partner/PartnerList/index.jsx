@@ -4,7 +4,6 @@ import { fetchAllPartners } from '../../../redux/actions/partners';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Grid, Box } from '@mui/material';
 import PartnerCard from './PartnerCard';
-import mockData from './mock-data';
 
 function PartnerList() {
   const partners = useSelector((state) => state.partners);
@@ -20,12 +19,12 @@ function PartnerList() {
   }, []);
 
   const lists = partners.items || [];
-  // const lists = mockData;
   const mobileScreen = useMediaQuery('(max-width: 767px)');
 
   return (
     <Grid
       container
+      columnSpacing={2}
       sx={{
         display: 'flex',
         flexWrap: 'wrap',
@@ -35,7 +34,7 @@ function PartnerList() {
     >
       {lists.map((item, idx) => (
         <>
-          <Grid item md={6} width="100%" mb={mobileScreen && '12px'}>
+          <Grid item width="100%" md={6} mb={mobileScreen && '12px'}>
             <PartnerCard
               key={`${item.id}-${item.name}`}
               id={item.id}

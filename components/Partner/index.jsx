@@ -15,6 +15,9 @@ const StyledWrapper = styled.div`
   margin-top: -150px;
   position: relative;
   padding: 0 10%;
+  @media (max-width: 767px) {
+    padding: 0 16px;
+  }
 `;
 const StyledContent = styled(Box)`
   margin-top: 24px;
@@ -56,7 +59,7 @@ const StyledTagText = styled(Typography)`
 `;
 
 const SearchParamsList = ({ params }) =>
-  params.length ? (
+  params.length > 0 && (
     <Grid container gap={'10px'} mb={'16px'}>
       {params.map((param, idx) => (
         <Grid item key={param + idx}>
@@ -69,8 +72,6 @@ const SearchParamsList = ({ params }) =>
         </Grid>
       ))}
     </Grid>
-  ) : (
-    ''
   );
 
 function Partner() {
