@@ -1,8 +1,14 @@
 import { Box } from '@mui/material';
+import {
+  WANT_TO_DO_WITH_PARTNER,
+  ROLE,
+  EDUCATION_STEP,
+} from '@/constants/member';
+import { mapToTable } from '@/utils/helper';
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PartnerCardAvator from './PartnerCardAvator';
 import PartnerCardDescription from './PartnerCardDescription';
 import PartnerCardTag from './PartnerCardTag';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 
 import {
   StyledCard,
@@ -15,14 +21,6 @@ import {
   FlexAlignCenter,
   FlexColCenterSB,
 } from './PartnerCard.styled';
-
-// contants
-import {
-  WANT_TO_DO_WITH_PARTNER,
-  ROLE,
-  EDUCATION_STEP,
-} from '@/constants/member';
-import { mapToTable } from '@/utils/helper';
 
 const WANT_TO_DO_WITH_PARTNER_TABLE = mapToTable(WANT_TO_DO_WITH_PARTNER);
 const ROLELIST = mapToTable(ROLE);

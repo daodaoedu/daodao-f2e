@@ -33,10 +33,10 @@ const SearchParamsList = ({ paramsKey = [] }) => {
 
   return (
     params.length > 0 && (
-      <StyledGrid container gap={'10px'} mb={'16px'}>
-        {params.map((item, idx) =>
+      <StyledGrid container gap="10px" mb="16px">
+        {params.map((item) =>
           item.values.map((val) => (
-            <StyledGridItem item key={val + idx}>
+            <StyledGridItem item key={val}>
               <StyledTag>
                 <StyledTagText>{val}</StyledTagText>
                 <StyledClosed
