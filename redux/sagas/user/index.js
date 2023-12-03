@@ -38,7 +38,8 @@ function* userLogin() {
 
 function* fetchAllUsers() {
   try {
-    const URL = process.env.NEXT_PUBLIC_API_URL;
+    const URL =
+      process.env.NEXT_PUBLIC_API_URL || 'https://daodao-server.onrender.com';
     const result = yield call(URL);
     yield put({ type: 'FETCH_ALL_USER_SUCCESS', payload: result });
   } catch (error) {

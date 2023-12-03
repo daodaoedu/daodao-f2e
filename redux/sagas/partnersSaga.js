@@ -2,7 +2,9 @@ import { put, takeEvery } from 'redux-saga/effects';
 
 function* fetchAllPartners() {
   try {
-    const URL = `${process.env.NEXT_PUBLIC_API_URL}/user/all_User`;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_URL || 'https://daodao-server.onrender.com';
+    const URL = `${baseUrl}/user/all_User`;
     const result = yield fetch(URL).then((res) => res.json());
     yield put({ type: 'FETCH_ALL_PARTNERS_SUCCESS', payload: result });
   } catch (error) {
