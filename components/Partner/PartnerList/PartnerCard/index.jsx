@@ -1,101 +1,68 @@
-import { Box, Typography, Skeleton } from '@mui/material';
+import { Box } from '@mui/material';
+import PartnerCardAvator from './PartnerCardAvator';
+import PartnerCardDescription from './PartnerCardDescription';
+import PartnerCardTag from './PartnerCardTag';
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 
 import {
   StyledCard,
   StyledCardContainer,
-  StyledImage,
   StyledCardTitle,
   StyledCardLabel,
   StyledCardSubtitle,
   StyledTypoCaption,
-  StyledTagContainer,
-  StyledTagText,
-  StyledTypoEllipsis,
   FlexSBAlignCenter,
   FlexAlignCenter,
   FlexColCenterSB,
 } from './PartnerCard.styled';
 
-import { WANT_TO_DO_WITH_PARTNER } from '../../../../constants/member';
-
-import { mapToTable } from '../../../../utils/helper';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+// contants
+import {
+  WANT_TO_DO_WITH_PARTNER,
+  ROLE,
+  EDUCATION_STEP,
+} from '@/constants/member';
+import { mapToTable } from '@/utils/helper';
 
 const WANT_TO_DO_WITH_PARTNER_TABLE = mapToTable(WANT_TO_DO_WITH_PARTNER);
+const ROLELIST = mapToTable(ROLE);
+const EDUCATION_STEP_TABLE = mapToTable(EDUCATION_STEP);
 
-// component
-const PartnerAvator = ({ image }) => {
-  return image ? (
-    <StyledImage src={image} alt="avatar" effect="opacity" />
-  ) : (
-    <Skeleton
-      sx={{
-        height: '50px',
-        width: '50px',
-        background: 'rgba(240, 240, 240, .8)',
-        marginTop: '4px',
-      }}
-      variant="circular"
-      animation="wave"
-    />
-  );
-};
-const DescriptSection = ({ title, content, ...rest }) => {
-  return (
-    <StyledTypoEllipsis {...rest}>
-      <Typography sx={{ color: '#293A3D', fontWeight: 500 }}>
-        {title}
-      </Typography>
-      <Typography mx="5px" sx={{ color: '#536166', fontWeight: 400 }}>
-        |
-      </Typography>
-      <Typography sx={{ color: '#536166', fontWeight: 400 }}>
-        {content || '尚未填寫'}
-      </Typography>
-    </StyledTypoEllipsis>
-  );
-};
-const TagSection = ({ tagList = [] }) => {
-  const showItems = tagList.slice(0, 5);
-  const hideItems = tagList.slice(5);
-  return (
-    <StyledTagContainer container gap={'8px'} mb={'12px'}>
-      {showItems.map((tag, idx) => (
-        <StyledTagText item key={idx + tag} fontWeight={'400'}>
-          {tag}
-        </StyledTagText>
-      ))}
-      {hideItems.length > 0 && (
-        <StyledTagText fontWeight={'bold'}>{hideItems.length}</StyledTagText>
-      )}
-    </StyledTagContainer>
-  );
-};
-
-function PartnerCard({ image, name, share, tagList = [], wantToDoList = [] }) {
+function PartnerCard({
+  image,
+  name,
+  share,
+  tagList = [],
+  wantToDoList = [],
+  roleList = [],
+  educationStage,
+}) {
   const wantTodo = wantToDoList
     .map((item) => WANT_TO_DO_WITH_PARTNER_TABLE[item])
     .join('、');
+
+  const role = roleList.length > 0 && ROLELIST[roleList[0]];
+  const edu = educationStage && EDUCATION_STEP_TABLE[educationStage];
 
   return (
     <StyledCard>
       {/* TODO: href redirect */}
       <StyledCardContainer>
         <FlexAlignCenter mb="8px">
-          <PartnerAvator image={image} />
+          <PartnerCardAvator image={image} />
           <FlexColCenterSB ml="12px">
             <FlexAlignCenter>
               <StyledCardTitle>{name}</StyledCardTitle>
-              <StyledCardLabel>國中</StyledCardLabel>
+              {edu && <StyledCardLabel>{edu}</StyledCardLabel>}
             </FlexAlignCenter>
-            <StyledCardSubtitle>實驗教育老師</StyledCardSubtitle>
+            {role && <StyledCardSubtitle>{role}</StyledCardSubtitle>}
           </FlexColCenterSB>
         </FlexAlignCenter>
         <Box mb="20px">
-          <DescriptSection mb="2px" title="可分享" content={share} />
-          <DescriptSection title="想一起" content={wantTodo} />
+          <PartnerCardDescription mb="2px" title="可分享" content={share} />
+          <PartnerCardDescription title="想一起" content={wantTodo} />
         </Box>
-        <TagSection tagList={tagList} />
+        <PartnerCardTag tagList={tagList} />
         <FlexSBAlignCenter mt="12px">
           <StyledTypoCaption>
             <FlexAlignCenter>

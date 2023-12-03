@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllPartners } from '../../../redux/actions/partners';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -19,7 +19,7 @@ function PartnerList() {
   }, []);
 
   const lists = partners.items || [];
-  const mobileScreen = useMediaQuery('(max-width: 767px)');
+  const mobileScreen = useMediaQuery('(max-width: 900px)');
 
   return (
     <Grid
@@ -33,15 +33,13 @@ function PartnerList() {
       }}
     >
       {lists.map((item, idx) => (
-        <>
+        <Fragment key={`${item._id}`}>
           <Grid item width="100%" md={6} mb={mobileScreen && '12px'}>
             <PartnerCard
-              key={`${item.id}-${item.name}`}
-              id={item.id}
               image={item.photoURL}
               date={item.date}
               name={item.name}
-              subTitle={item.subTitle}
+              educationStage={item.educationStage}
               share={item.share}
               roleList={item.roleList}
               tagList={item.tagList}
@@ -54,7 +52,7 @@ function PartnerList() {
               <Box height={1} width={'100%'} border={'1px solid #E5E5E5'} />
             </Grid>
           )}
-        </>
+        </Fragment>
       ))}
     </Grid>
   );
