@@ -1,10 +1,13 @@
-import { Box, Button, Chip, Skeleton, Typography } from '@mui/material';
+import styled from '@emotion/styled';
+import { Box, Chip, Button, Skeleton, Typography } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import moment from 'moment/moment';
+import moment from 'moment';
 import { useRouter } from 'next/router';
-import LOCATION from '../../../constants/countries.json';
+import { RiInstagramFill } from 'react-icons/ri';
+import { FaFacebook, FaLine, FaDiscord } from 'react-icons/fa';
+import DropdownMenu from './Dropdown';
 
 const BottonEdit = {
   color: '#536166',
@@ -25,142 +28,173 @@ const BottonEdit = {
   },
 };
 
+const StyledProfileWrapper = styled(Box)`
+  width: 720px;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 20px;
+  @media (max-width: 767px) {
+    width: 100%;
+    padding: 16px;
+  }
+`;
+const StyledProfileBaseInfo = styled(Box)`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`;
+const StyledProfileTitle = styled(Box)`
+  div {
+    display: flex;
+    align-items: center;
+  }
+  h2 {
+    color: #536166;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 120%;
+    margin-right: 10px;
+  }
+  span {
+    border-radius: 4px;
+    background: #f3f3f3;
+    padding: 3px 10px;
+  }
+  p {
+    color: #92989a;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%; /* 19.6px */
+  }
+`;
+const StyledProfileLocation = styled(Typography)`
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  color: #536166;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 140%; /* 16.8px */
+`;
+const StyledProfileTag = styled(Box)`
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+`;
+const StyledProfileOther = styled(Box)`
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  @media (max-width: 767px) {
+    flex-direction: column;
+  }
+`;
+const StyledProfileSocial = styled.ul`
+  display: flex;
+  align-items: center;
+  @media (max-width: 767px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  li {
+    align-items: center;
+    display: flex;
+    margin-right: 16px;
+    @media (max-width: 767px) {
+      margin-bottom: 8px;
+    }
+  }
+  li:last-of-type {
+    margin-right: 0;
+  }
+  li svg {
+    color: #16b9b3;
+  }
+  li p {
+    margin-left: 5px;
+    color: #293a3d;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+  }
+`;
+const StyledProfileDate = styled.p`
+  font-size: 12px;
+  color: #92989a;
+  font-weight: 400;
+  line-height: 140%;
+  @media (max-width: 767px) {
+    text-align: right;
+  }
+`;
+
 function Tag({ label }) {
   return (
     <Chip
       label={label}
       value={label}
       sx={{
-        backgroundColor: '#fff',
-        opacity: '80%',
-        cursor: 'pointer',
         margin: '5px',
         whiteSpace: 'nowrap',
-        fontWeight: 500,
-        fontSize: '16px',
-        bgcolor: 'rgb(219, 237, 219)',
-        '&:hover': {
-          opacity: '100%',
-          backgroundColor: '#fff',
-          transition: 'transform 0.4s',
-        },
+        fontWeight: 400,
+        fontSize: '14px',
+        bgcolor: '#DEF5F5',
       }}
     />
   );
 }
+
+function Avator({ photoURL }) {
+  return (
+    <LazyLoadImage
+      alt="login"
+      src={photoURL || ''}
+      height={80}
+      width={80}
+      effect="opacity"
+      style={{
+        borderRadius: '100%',
+        background: 'rgba(240, 240, 240, .8)',
+        objectFit: 'cover',
+        objectPosition: 'center',
+        minHeight: '80px',
+        minWidth: '80px',
+      }}
+      placeholder={
+        // eslint-disable-next-line react/jsx-wrap-multilines
+        <Skeleton
+          sx={{
+            height: '80px',
+            width: '80px',
+            background: 'rgba(240, 240, 240, .8)',
+            marginTop: '4px',
+          }}
+          variant="circular"
+          animation="wave"
+        />
+      }
+    />
+  );
+}
+
 function UserCard({
-  isLoading,
+  isLoginUser,
   tagList,
   educationStepLabel,
   photoURL,
   userName,
   location,
 }) {
-  console.log(educationStepLabel);
   const router = useRouter();
-  if (isLoading) {
-    return (
-      <Box
-        sx={{
-          width: '720px',
-          padding: '40px 30px ',
-          bgcolor: '#fff',
-          borderRadius: '20px',
-          '@media (max-width: 767px)': {
-            width: '316px',
-          },
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-          }}
-        >
-          <Skeleton
-            sx={{
-              height: '80px',
-              width: '80px',
-              background: 'rgba(240, 240, 240, .8)',
-              marginTop: '4px',
-            }}
-            variant="circular"
-            animation="wave"
-          />
-          <Button variant="outlined" sx={BottonEdit}>
-            <EditOutlinedIcon />
-            編輯
-          </Button>
-          <Box sx={{ marginLeft: '12px' }}>
-            <Skeleton variant="text" width={200} />
-            <Skeleton variant="text" width={200} />
-            <Typography
-              sx={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                marginTop: '12px',
-              }}
-            >
-              <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />{' '}
-              <Skeleton variant="text" width={200} />
-            </Typography>
-          </Box>
-        </Box>
-        <Box sx={{ marginTop: '24px' }}>
-          <Skeleton variant="text" width={200} />
-        </Box>
-      </Box>
-    );
-  }
+
   return (
-    <Box
-      sx={{
-        width: '720px',
-        padding: '40px 30px ',
-        bgcolor: '#fff',
-        borderRadius: '20px',
-        '@media (max-width: 767px)': {
-          width: '316px',
-        },
-      }}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-        }}
-      >
-        <LazyLoadImage
-          alt="login"
-          src={photoURL || ''}
-          height={80}
-          width={80}
-          effect="opacity"
-          style={{
-            borderRadius: '100%',
-            background: 'rgba(240, 240, 240, .8)',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            minHeight: '80px',
-            minWidth: '80px',
-          }}
-          placeholder={
-            // eslint-disable-next-line react/jsx-wrap-multilines
-            <Skeleton
-              sx={{
-                height: '80px',
-                width: '80px',
-                background: 'rgba(240, 240, 240, .8)',
-                marginTop: '4px',
-              }}
-              variant="circular"
-              animation="wave"
-            />
-          }
-        />
+    <StyledProfileWrapper>
+      {isLoginUser ? (
         <Button
           variant="outlined"
           sx={BottonEdit}
@@ -171,71 +205,58 @@ function UserCard({
           <EditOutlinedIcon />
           編輯
         </Button>
+      ) : (
+        <DropdownMenu sx={BottonEdit} />
+      )}
+
+      <StyledProfileBaseInfo>
+        <Avator photoURL={photoURL} />
         <Box sx={{ marginLeft: '12px' }}>
-          <Typography
-            sx={{
-              color: '#536166',
-              fontSize: '18px',
-              margin: '10px 8px 0px 0px ',
-            }}
-          >
-            {userName || '-'}
-          </Typography>
-          <Button
-            variant="contained"
-            disabled
-            size="small"
-            sx={{
-              height: '24px',
-              fontSize: '14px',
-              margin: '0px 0px 5px 8px ',
-            }}
-          >
-            {educationStepLabel}
-          </Button>
-          <Typography component="p" sx={{ color: '#92989A' }}>
-            -
-          </Typography>
-          <Typography
-            sx={{
-              display: 'flex',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              marginTop: '12px',
-            }}
-          >
+          <StyledProfileTitle>
+            <div>
+              <h2>{userName || '-'}</h2>
+              <span>{educationStepLabel}</span>
+            </div>
+            <p>實驗教育學生</p>
+          </StyledProfileTitle>
+
+          <StyledProfileLocation>
             <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />{' '}
-            {LOCATION.find(
-              (item) => item.alpha2 === location || item.alpha3 === location,
-            )?.name || '-'}
-          </Typography>
+            {location || '-'}
+          </StyledProfileLocation>
         </Box>
-      </Box>
-      <Box
-        sx={{
-          marginTop: '24px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          '@media (max-width: 767px)': { flexDirection: 'column' },
-        }}
-      >
-        <Box
-          sx={{
-            '@media (max-width: 767px)': { display: 'flex', flexFlow: 'wrap' },
-          }}
-        >
-          {tagList.map((tag) => (
-            <Tag key={tag} label={tag} />
-          ))}
-        </Box>
-        <Typography
-          component="p"
-          sx={{ fontSize: '12px', color: '#92989A', marginTop: '5px' }}
-        >
+      </StyledProfileBaseInfo>
+
+      <StyledProfileTag>
+        {tagList.map((tag) => (
+          <Tag key={tag} label={tag} />
+        ))}
+      </StyledProfileTag>
+
+      <StyledProfileOther>
+        <StyledProfileSocial style={{ listStyle: 'none', display: 'flex' }}>
+          <li>
+            <RiInstagramFill size="20px" />
+            <p>Chien22</p>
+          </li>
+          <li>
+            <FaFacebook size="20px" />
+            <p>ene_soew</p>
+          </li>
+          <li>
+            <FaLine size="20px" />
+            <p>Chien12348888</p>
+          </li>
+          <li>
+            <FaDiscord size="20px" />
+            <p>#Chien22</p>
+          </li>
+        </StyledProfileSocial>
+        <StyledProfileDate>
           {moment(new Date() - 500 * 60 * 60).fromNow()}
-        </Typography>
-      </Box>
-    </Box>
+        </StyledProfileDate>
+      </StyledProfileOther>
+    </StyledProfileWrapper>
   );
 }
 
