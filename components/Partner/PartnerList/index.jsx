@@ -1,6 +1,6 @@
 import { useEffect, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllPartners } from '../../../redux/actions/partners';
+import { fetchAllPartners } from '@/redux/actions/partners';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Grid, Box } from '@mui/material';
 import PartnerCard from './PartnerCard';
@@ -47,9 +47,9 @@ function PartnerList() {
               location={item.location}
             />
           </Grid>
-          {!mobileScreen && (idx + 1) % 2 == 0 && idx + 1 !== lists.length && (
-            <Grid item xs={12} py={'12px'}>
-              <Box height={1} width={'100%'} border={'1px solid #E5E5E5'} />
+          {!mobileScreen && (idx + 1) % 2 === 0 && idx + 1 !== lists.length && (
+            <Grid item xs={12} py="12px">
+              <Box height={1} width="100%" border="1px solid #E5E5E5" />
             </Grid>
           )}
         </Fragment>
