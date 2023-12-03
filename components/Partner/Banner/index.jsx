@@ -6,11 +6,11 @@ import Image from '@/shared/components/Image';
 import partnerImg from '@/public/assets/partner-banner.png';
 
 const StyledBanner = styled(Box)(({ theme }) => ({
-  height: '60vh',
+  height: '398px',
   zIndex: 0,
   position: 'relative',
   [theme.breakpoints.down('md')]: {
-    height: '40vh',
+    height: '256px',
   },
   '> picture': {
     position: 'absolute',
@@ -32,8 +32,10 @@ const StyledContent = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
+  height: '100%',
+  paddingBottom: '40px',
   [theme.breakpoints.down('md')]: {
-    padding: '40px 20px 0',
+    paddingBottom: '0',
   },
   '> h1': {
     fontWeight: 700,
