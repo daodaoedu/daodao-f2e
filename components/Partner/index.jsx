@@ -1,6 +1,8 @@
 import { useSelector } from 'react-redux';
 import { Box, Button } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { AREAS } from '@/constants/areas';
+import { EDUCATION_STEP, ROLE } from '@/constants/member';
 import PartnerList from './PartnerList';
 import SearchField from './SearchField';
 import SearchParamsList from './SearchParamsList';
@@ -10,6 +12,8 @@ import {
   StyledContent,
   StyledSearchWrapper,
 } from './Parnter.styled';
+
+const _map = (arr, key) => arr.map((item) => item[key]);
 
 function Partner() {
   const mobileScreen = useMediaQuery('(max-width: 767px)');
@@ -23,7 +27,14 @@ function Partner() {
           <SearchField />
         </StyledSearchWrapper>
         <StyledContent>
-          <SearchParamsList paramsKey={['area', 'role', 'edu']} />
+          <SearchParamsList
+            paramsKey={['area', 'role', 'edu']}
+            keySelections={{
+              area: _map(AREAS, 'name'),
+              edu: _map(EDUCATION_STEP, 'label'),
+              role: _map(ROLE, 'label'),
+            }}
+          />
           <PartnerList />
         </StyledContent>
         {partners.items.length > 0 && (
