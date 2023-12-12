@@ -4,7 +4,7 @@ import user from './user';
 import theme from './theme';
 import shared from './shared';
 import resource from './resource';
-import partners from './partners';
+import group from './group';
 
 const allReducers = combineReducers({
   search,
@@ -12,7 +12,7 @@ const allReducers = combineReducers({
   theme,
   shared,
   resource,
-  partners,
+  group,
 });
 
 export default allReducers;

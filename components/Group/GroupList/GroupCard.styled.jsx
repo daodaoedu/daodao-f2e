@@ -20,6 +20,10 @@ export const StyledTitle = styled.h2`
   font-size: 14px;
   font-weight: bold;
   line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
 `;
 
 export const StyledInfo = styled.div`
@@ -66,7 +70,7 @@ export const StyledFooter = styled.footer`
       border-radius: 50%;
     }
 
-    &.end {
+    &.finished {
       --bg-color: #f3f3f3;
       --color: #92989a;
     }

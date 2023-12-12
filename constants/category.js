@@ -62,50 +62,62 @@ export const SEARCH_TAGS = {
 export const CATEGORIES = [
   {
     key: 'language',
+    label: '語言與文學',
     value: '語言與文學',
   },
   {
     key: 'math',
+    label: '數學與邏輯',
     value: '數學與邏輯',
   },
   {
     key: 'comsci',
+    label: '資訊與工程',
     value: '資訊與工程',
   },
   {
     key: 'humanity',
+    label: '人文社會',
     value: '人文社會',
   },
   {
     key: 'natusci',
+    label: '自然科學',
     value: '自然科學',
   },
   {
     key: 'art',
+    label: '藝術',
     value: '藝術',
   },
   {
     key: 'education',
+    label: '教育',
     value: '教育',
   },
   {
     key: 'life',
+    label: '生活',
     value: '生活',
   },
   {
     key: 'health',
+    label: '運動/心理/醫學',
     value: '運動/心理/醫學',
   },
   {
     key: 'business',
+    label: '商業與社會創新',
     value: '商業與社會創新',
   },
   {
     key: 'multires',
+    label: '綜合型學習資源',
     value: '綜合型學習資源',
   },
   {
     key: 'learningtools',
+    label: '學習/教學工具',
     value: '學習/教學工具',
   },
 ];
