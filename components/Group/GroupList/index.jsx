@@ -55,7 +55,6 @@ export const StyledGroupItem = styled.li`
 const StyledGroupList = styled.ul`
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
 `;
 
 function GroupList() {

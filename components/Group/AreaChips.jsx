@@ -8,6 +8,7 @@ const StyledAreaChips = styled.ul`
   display: flex;
   flex-wrap: wrap;
   margin-bottom: 16px;
+  gap: 12px 0;
 `;
 
 const AreaChips = () => {

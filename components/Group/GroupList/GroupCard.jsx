@@ -34,7 +34,7 @@ function GroupCard({
           </StyledText>
           <StyledText>
             <StyledLabel>適合階段</StyledLabel>
-            <span>{partnerEducationStep}</span>
+            <span>{partnerEducationStep || '皆可'}</span>
           </StyledText>
         </StyledInfo>
         <StyledText lineClamp="2" fontSize="14px">
