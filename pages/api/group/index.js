@@ -2,14 +2,19 @@ import groupMockData from '../__mocks__/group.mock.json';
 
 /**
  * 根據傳入的條件進行篩選
- * @param {string[]} itemValue - 資料的值
- * @param {string[]} conditionValue - 篩選條件的值
+ * @param {null | string[]} itemArray - 資料的值
+ * @param {string | string[]} conditionValue - 篩選條件的值
  * @returns {boolean} - 是否符合保留條件
  */
-function filterBy(itemValue, conditionValue = []) {
+function some(itemArray, conditionValue) {
+  const conditionArray = Array.isArray(conditionValue)
+    ? conditionValue
+    : conditionValue?.split(',') || [];
+
   return (
-    !conditionValue.length ||
-    conditionValue.every((cond) => itemValue.includes(cond))
+    !conditionArray.length ||
+    !Array.isArray(itemArray) ||
+    conditionArray.some((cond) => itemArray.includes(cond))
   );
 }
 
@@ -43,10 +48,10 @@ export default function handler(req, res) {
         const end = Number(limit);
         const filterData = groupMockData
           .filter((item) => !q || item.title.includes(q))
-          .filter((item) => !edu || edu.includes(item.partnerEducationStep))
           .filter((item) => !grouping || item.isGrouping === isGrouping)
-          .filter((item) => filterBy(item.area.split('、'), area?.split(',')))
-          .filter((item) => filterBy(item.category, category?.split(',')));
+          .filter((item) => some(item.area?.split('、'), area))
+          .filter((item) => some(item.category, category))
+          .filter((item) => some(item.partnerEducationStep?.split('、'), edu));
 
         const items = filterData.slice(0, end);
 

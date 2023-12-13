@@ -27,7 +27,7 @@
     "photoURL": "https://images.unsplash.com/photo-1583526241256-cb18e8635e5b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "photoAlt": "封面圖",
     "category": ["教育", "生活", "商業與社會創新", "綜合型學習資源"],
-    "partnerEducationStep": "大學",
+    "partnerEducationStep": "高中、大學",
     "description": "作為一位數學和科學老師，我理解學生對於這些學科的挑戰和挫折感，當遇到問題，不知從何想起，迷路的感覺。",
     "area": "南投縣",
     "isGrouping": true
@@ -38,7 +38,7 @@
     "photoURL": "",
     "photoAlt": "",
     "category": ["藝術", "自然科學", "生活"],
-    "partnerEducationStep": "其他",
+    "partnerEducationStep": null,
     "description": "希望能像朋友，一起讀有興趣的科目每週1-2次見面練習這兩種，每次總時數2-3小時不限，希望你跟我一樣很想追求有效進步也不怕辛苦！一起讀日文也可以喔！",
     "area": "嘉義縣、線上",
     "isGrouping": true
@@ -49,7 +49,7 @@
     "photoURL": "",
     "photoAlt": "",
     "category": ["人文社會", "運動/心理/醫學", "生活"],
-    "partnerEducationStep": "其他",
+    "partnerEducationStep": null,
     "description": "我家小朋友14歲，目前常駐在上海，申請在家自學。目前自己規畫學習進度。主要有興趣做些TTS、Vits、Yolov的聲音、視覺項目。不知道有沒有同好一起來研究、交流!",
     "area": "新竹縣、新竹市",
     "isGrouping": true
