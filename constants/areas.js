@@ -1,5 +1,4 @@
 export const AREAS = [
-  { name: '線上' },
   { name: '臺北市' },
   { name: '新北市' },
   { name: '基隆市' },
