@@ -16,7 +16,7 @@ const PromotionBarWrapper = styled.div`
 
 const CloseButton = styled.span`
   position: absolute;
-  top: 9px;
+  top: 7px;
   right: 7px;
   width: 20px;
   height: 20px;
