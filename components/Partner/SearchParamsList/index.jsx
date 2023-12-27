@@ -8,19 +8,14 @@ import {
   StyledClosed,
 } from './SearchParamsList.styles';
 
-const SearchParamsList = ({ paramsKey = [], keySelections = {} }) => {
-  const [getSearchParams, pushState] = useSearchParamsManager();
+const SearchParamsList = ({ paramsKey = [], paramsKeyOptions = {} }) => {
+  const [getSearchParams, pushState, genParamsItems] = useSearchParamsManager();
 
-  const handleGenerateParams = (params) => {
-    return params.reduce((acc, param) => {
-      const values = getSearchParams(param).filter((value) =>
-        keySelections[param]?.includes(value),
-      );
-      return [...acc, { key: param, values }];
-    }, []);
-  };
   const params = useMemo(
-    () => (Array.isArray(paramsKey) ? handleGenerateParams(paramsKey) : []),
+    () =>
+      Array.isArray(paramsKey)
+        ? genParamsItems(paramsKey, paramsKeyOptions)
+        : [],
     [getSearchParams],
   );
 
