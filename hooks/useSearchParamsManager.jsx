@@ -24,5 +24,20 @@ export default function useSearchParamsManager() {
     [push, searchParams],
   );
 
-  return [getSearchParams, pushState];
+  const generateParamsItems = useCallback(
+    (arr, keyObj = {}) => {
+      if (!Array.isArray(arr)) return [];
+      return arr.reduce((acc, param) => {
+        const values = getSearchParams(param).filter((value) =>
+          keyObj[param] === 'PASS_STRING'
+            ? value
+            : keyObj[param]?.includes(value),
+        );
+        return [...acc, { key: param, values }];
+      }, []);
+    },
+    [searchParams],
+  );
+
+  return [getSearchParams, pushState, generateParamsItems];
 }

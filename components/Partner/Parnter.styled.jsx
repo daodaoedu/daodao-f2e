@@ -4,13 +4,14 @@ import { Box } from '@mui/material';
 export const StyledWrapper = styled.div`
   position: relative;
   margin: 70px auto 0;
+  padding-bottom: 14px;
   width: 100%;
   max-width: 1024px;
   min-height: 100vh;
   margin-top: -80px;
 
   @media (max-width: 900px) {
-    padding: 0 16px;
+    padding: 0 16px 44px;
     margin-top: -50px;
   }
 `;
