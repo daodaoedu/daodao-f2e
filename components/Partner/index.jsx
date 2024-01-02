@@ -45,8 +45,8 @@ const keySelections = {
   q: 'PASS_STRING',
 };
 
-const eduObj = createObjFromArrary(EDUCATION_STEP);
-const roleObj = createObjFromArrary(ROLE);
+const eduObj = createObjFromArrary(EDUCATION_STEP, 'label', 'key');
+const roleObj = createObjFromArrary(ROLE, 'label', 'key');
 
 function Partner() {
   const dispatch = useDispatch();
@@ -102,7 +102,7 @@ function Partner() {
         <StyledContent>
           <SearchParamsList
             paramsKey={['area', 'role', 'edu', 'tag', 'q']}
-            keySelections={keySelections}
+            paramsKeyOptions={keySelections}
           />
           <PartnerList />
         </StyledContent>
