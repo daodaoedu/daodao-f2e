@@ -12,23 +12,9 @@ const HomePageWrapper = styled.div`
   --section-height-offset: 80px;
 `;
 
-const index = () => {
+const index = ({ user }) => {
   const router = useRouter();
   const { id } = router.query;
-  const user = {
-    name: '黃芊宇',
-    educationStepLabel: '大學',
-    tagList: [
-      '實驗教育實驗教育',
-      '標籤最多是八個字',
-      '前端工程師',
-      '後端工程師',
-      '太多標籤第二行',
-      '戶外運動',
-    ],
-    photoURL: 'https://i.imgur.com/QpMVwqe.png',
-    location: '台北市松山區',
-  };
 
   const fetchUser = async () => {
     console.log(id);
@@ -47,3 +33,31 @@ const index = () => {
 };
 
 export default index;
+
+export async function getStaticPaths() {
+  return {
+    paths: [{ params: { id: '22' } }],
+    fallback: true,
+  };
+}
+
+export const getStaticProps = async () => {
+  return {
+    props: {
+      user: {
+        name: '黃芊宇',
+        educationStepLabel: '大學',
+        tagList: [
+          '實驗教育實驗教育',
+          '標籤最多是八個字',
+          '前端工程師',
+          '後端工程師',
+          '太多標籤第二行',
+          '戶外運動',
+        ],
+        photoURL: 'https://i.imgur.com/QpMVwqe.png',
+        location: '台北市松山區',
+      },
+    },
+  };
+};
