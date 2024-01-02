@@ -1,15 +1,12 @@
-import React, { useMemo, useState, useLayoutEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Box, Button } from '@mui/material';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { CATEGORIES } from '../../constants/member';
-import { mapToTable } from '../../utils/helper';
+// import { CATEGORIES } from '@/constants/member';
+// import { mapToTable } from '@/utils/helper';
+import SEOConfig from '@/shared/components/SEO';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
-import SEOConfig from '../../shared/components/SEO';
 import ContactModal from './Contact';
 
 const BottonBack = {
@@ -27,41 +24,20 @@ const BottonBack = {
   },
 };
 
-const Profile = () => {
+const Profile = ({
+  name,
+  photoURL,
+  tagList = [],
+  educationStepLabel,
+  location,
+}) => {
   const router = useRouter();
-  const auth = getAuth();
-  const [user, isLoadingUser] = useAuthState(auth);
-  const [userName, setUserName] = useState('');
-  const [description, setDescription] = useState('');
-  const [photoURL, setPhotoURL] = useState('');
-  const [location, setLocation] = useState('');
-  const [wantToLearnList, setWantToLearnList] = useState([]);
-  const [interestAreaList, setInterestAreaList] = useState([]);
-  const [isLoading, setIsLoading] = useState(isLoadingUser);
+  const [isLoading] = useState(false);
   const [open, setOpen] = useState(false);
-
-  useLayoutEffect(() => {
-    const db = getFirestore();
-    if (!isLoadingUser && user?.uid) {
-      const docRef = doc(db, 'partnerlist', user?.uid || '');
-      getDoc(docRef).then((docSnap) => {
-        const data = docSnap.data();
-        console.log('data', data);
-        setUserName(data?.userName || '');
-        setPhotoURL(data?.photoURL || '');
-        setDescription(data?.description || '');
-        setWantToLearnList(data?.wantToLearnList || []);
-        setInterestAreaList(data?.interestAreaList || []);
-        setLocation(data?.location || '');
-        setIsLoading(false);
-      });
-    }
-    console.log(description);
-  }, [user, isLoadingUser]);
 
   const SEOData = useMemo(
     () => ({
-      title: `${userName}的小島｜島島阿學`,
+      title: `${name}的小島｜島島阿學`,
       description:
         '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
       keywords: '島島阿學',
@@ -73,18 +49,19 @@ const Profile = () => {
     [router?.asPath],
   );
 
-  const tagList = interestAreaList.map((item) => mapToTable(CATEGORIES)[item]);
-
   return (
     <Box
       sx={{
-        minHeight: '100vh',
         background: 'linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         position: 'relative',
+        padding: '80px 30px',
+        '@media (max-width: 767px)': {
+          padding: '30px',
+        },
       }}
     >
       <ContactModal
@@ -105,14 +82,14 @@ const Profile = () => {
       <Box
         sx={{
           position: 'relative',
+          mb: '10px',
         }}
       >
         <Button
           variant="text"
           sx={BottonBack}
           onClick={() => {
-            router.push('/');
-            // router.push('/partner');
+            router.push('/partner');
           }}
         >
           <ChevronLeftIcon />
@@ -120,17 +97,16 @@ const Profile = () => {
         </Button>
         <UserCard
           isLoading={isLoading}
+          educationStepLabel={educationStepLabel}
           tagList={tagList}
           photoURL={photoURL}
-          userName={userName}
+          userName={name}
           location={location}
         />
       </Box>
-      <UserTabs
-        isLoading={isLoading}
-        description={description}
-        wantToLearnList={wantToLearnList}
-      />
+
+      <UserTabs isLoading={isLoading} description={[]} wantToLearnList={[]} />
+
       <Button
         sx={{
           width: '160px',
