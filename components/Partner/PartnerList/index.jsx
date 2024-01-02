@@ -1,22 +1,14 @@
-import { useEffect, Fragment } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllPartners } from '@/redux/actions/partners';
+import { Fragment } from 'react';
+import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Grid, Box } from '@mui/material';
 import PartnerCard from './PartnerCard';
 
 function PartnerList() {
+  const router = useRouter();
+
   const partners = useSelector((state) => state.partners);
-  const dispatch = useDispatch();
-
-  // TODO: ADD PAGE
-  const handleFetchData = () => {
-    dispatch(fetchAllPartners());
-  };
-
-  useEffect(() => {
-    handleFetchData();
-  }, []);
 
   const lists = partners.items || [];
   const mobileScreen = useMediaQuery('(max-width: 900px)');
@@ -34,7 +26,13 @@ function PartnerList() {
     >
       {lists.map((item, idx) => (
         <Fragment key={`${item._id}`}>
-          <Grid item width="100%" md={6} mb={mobileScreen && '12px'}>
+          <Grid
+            onClick={() => router.push(`partner/${item._id}`)}
+            item
+            width="100%"
+            md={6}
+            mb={mobileScreen && '12px'}
+          >
             <PartnerCard
               image={item.photoURL}
               date={item.date}

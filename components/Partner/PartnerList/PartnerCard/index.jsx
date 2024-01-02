@@ -44,7 +44,6 @@ function PartnerCard({
 
   return (
     <StyledCard>
-      {/* TODO: href redirect */}
       <StyledCardContainer>
         <FlexAlignCenter mb="8px">
           <PartnerCardAvator image={image} />
