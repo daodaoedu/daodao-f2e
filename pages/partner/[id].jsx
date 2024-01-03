@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
@@ -16,7 +14,7 @@ const HomePageWrapper = styled.div`
 const index = () => {
   const router = useRouter();
   const { id } = router.query;
-  let user = {
+  const user = {
     name: '黃芊宇',
     educationStepLabel: '大學',
     tagList: [
