@@ -2,8 +2,12 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Box, Button } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-// import { CATEGORIES } from '@/constants/member';
-// import { mapToTable } from '@/utils/helper';
+import {
+  WANT_TO_DO_WITH_PARTNER,
+  ROLE,
+  EDUCATION_STEP,
+} from '@/constants/member';
+import { mapToTable } from '@/utils/helper';
 import SEOConfig from '@/shared/components/SEO';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
@@ -23,17 +27,30 @@ const BottonBack = {
     position: 'unset',
   },
 };
+const WANT_TO_DO_WITH_PARTNER_TABLE = mapToTable(WANT_TO_DO_WITH_PARTNER);
+const ROLELIST = mapToTable(ROLE);
+const EDUCATION_STEP_TABLE = mapToTable(EDUCATION_STEP);
 
 const Profile = ({
   name,
   photoURL,
   tagList = [],
-  educationStepLabel,
+  roleList = [],
+  educationStage,
+  selfIntroduction,
+  wantToDoList = [],
   location,
+  share,
 }) => {
   const router = useRouter();
   const [isLoading] = useState(false);
   const [open, setOpen] = useState(false);
+
+  const role = roleList.length > 0 && ROLELIST[roleList[0]];
+  const edu = educationStage && EDUCATION_STEP_TABLE[educationStage];
+  const wantTodo = wantToDoList
+    .map((item) => WANT_TO_DO_WITH_PARTNER_TABLE[item])
+    .join('、');
 
   const SEOData = useMemo(
     () => ({
@@ -46,7 +63,7 @@ const Profile = ({
       imgLink: 'https://www.daoedu.tw/preview.webp',
       link: `${process.env.HOSTNAME}${router?.asPath}`,
     }),
-    [router?.asPath],
+    [router?.asPath, name],
   );
 
   return (
@@ -95,9 +112,11 @@ const Profile = ({
           <ChevronLeftIcon />
           返回
         </Button>
+
         <UserCard
           isLoading={isLoading}
-          educationStepLabel={educationStepLabel}
+          educationStepLabel={edu}
+          role={role}
           tagList={tagList}
           photoURL={photoURL}
           userName={name}
@@ -105,7 +124,12 @@ const Profile = ({
         />
       </Box>
 
-      <UserTabs isLoading={isLoading} description={[]} wantToLearnList={[]} />
+      <UserTabs
+        isLoading={isLoading}
+        description={selfIntroduction}
+        wantToDoList={wantTodo}
+        share={share}
+      />
 
       <Button
         sx={{

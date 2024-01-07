@@ -1,5 +1,6 @@
 const initialState = {
   items: [],
+  partner: null,
   pagination: {
     pageSize: 10,
     page: 1,
@@ -26,6 +27,18 @@ const reducer = (state = initialState, action) => {
     case 'FETCH_PARTNERS_FAILURE': {
       return {
         ...initialState,
+      };
+    }
+    case 'FETCH_PARTNER_BY_ID_SUCCESS': {
+      return {
+        ...state,
+        partner: action.payload,
+      };
+    }
+    case 'FETCH_PARTNER_BY_ID_FAILURE': {
+      return {
+        ...state,
+        partner: null,
       };
     }
     default: {

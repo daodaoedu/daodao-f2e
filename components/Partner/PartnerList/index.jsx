@@ -27,7 +27,7 @@ function PartnerList() {
       {lists.map((item, idx) => (
         <Fragment key={`${item._id}`}>
           <Grid
-            onClick={() => router.push(`partner/${item._id}`)}
+            onClick={() => router.push(`partner/detail?id=${item._id}`)}
             item
             width="100%"
             md={6}
