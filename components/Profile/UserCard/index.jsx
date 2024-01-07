@@ -184,7 +184,8 @@ function Avator({ photoURL }) {
 
 function UserCard({
   isLoginUser,
-  tagList,
+  tagList = [],
+  role,
   educationStepLabel,
   photoURL,
   userName,
@@ -215,9 +216,9 @@ function UserCard({
           <StyledProfileTitle>
             <div>
               <h2>{userName || '-'}</h2>
-              <span>{educationStepLabel}</span>
+              {educationStepLabel && <span>{educationStepLabel}</span>}
             </div>
-            <p>實驗教育學生</p>
+            <p>{role || '-'}</p>
           </StyledProfileTitle>
 
           <StyledProfileLocation>
@@ -228,9 +229,8 @@ function UserCard({
       </StyledProfileBaseInfo>
 
       <StyledProfileTag>
-        {tagList.map((tag) => (
-          <Tag key={tag} label={tag} />
-        ))}
+        {!!tagList.length &&
+          tagList[0].split('、').map((tag) => <Tag key={tag} label={tag} />)}
       </StyledProfileTag>
 
       <StyledProfileOther>

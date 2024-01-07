@@ -10,14 +10,8 @@ import {
   StyledPanelText,
 } from './UserTabs.styled';
 
-const UserTabs = ({
-  description = '',
-  wantToLearnList = [],
-  isLoading = false,
-}) => {
+const UserTabs = ({ description = '', wantToDoList = [], share = '' }) => {
   const [value, setValue] = useState('1');
-  // TODO
-  console.log(description, wantToLearnList, isLoading);
   return (
     <Box
       sx={{
@@ -47,21 +41,17 @@ const UserTabs = ({
               sx={{ borderBottom: '1px solid #F3F3F3', paddingBottom: '6px' }}
             >
               <p>可分享</p>
-              <span sx={{ marginLeft: '12px' }}>自學心得</span>
+              <span>{share || '無'}</span>
             </StyledPanelText>
             <StyledPanelText
               sx={{ borderBottom: '1px solid #F3F3F3', padding: '6px 0' }}
             >
               <p>想一起</p>
-              <span>學習交流、組課、共學、交朋友</span>
+              <span>{wantToDoList || '無'}</span>
             </StyledPanelText>
             <StyledPanelText sx={{ paddingTop: '6px' }}>
               <p>簡介</p>
-              <span>
-                休學一年，目前是高二自學生，一直在探索自己喜歡什麼，
-                喜歡聽音樂，最近要開始準備英文考試中檢
-                有興趣想交流可以來私訊我～
-              </span>
+              <span>{description || '無'}</span>
             </StyledPanelText>
           </StyledPanelBox>
         </TabPanel>
