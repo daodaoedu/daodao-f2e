@@ -1,5 +1,7 @@
 import { put, takeEvery } from 'redux-saga/effects';
 
+const BASEURL = 'https://daodao-server.onrender.com';
+
 function* fetchPartnersResource(action) {
   const { pageSize = 10, page = 1, ...rest } = action.payload;
 
@@ -11,8 +13,7 @@ function* fetchPartnersResource(action) {
   }, startParams);
 
   try {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_API_URL || 'https://daodao-server.onrender.com';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || BASEURL;
     const URL = `${baseUrl}/user?${queryStr}`;
     const result = yield fetch(URL).then((res) => res.json());
     yield put({
@@ -33,8 +34,24 @@ function* fetchPartnersResource(action) {
   }
 }
 
+function* fetchPartnerById(action) {
+  const { id } = action.payload;
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || BASEURL;
+    const URL = `${baseUrl}/user/${id}`;
+    const result = yield fetch(URL).then((res) => res.json());
+    yield put({
+      type: 'FETCH_PARTNER_BY_ID_SUCCESS',
+      payload: result.data && result.data[0],
+    });
+  } catch (error) {
+    yield put({ type: 'FETCH_PARTNER_BY_ID_FAILURE' });
+  }
+}
+
 function* partnerSaga() {
   yield takeEvery('FETCH_PARTNERS', fetchPartnersResource);
+  yield takeEvery('FETCH_PARTNER_BY_ID', fetchPartnerById);
 }
 
 export default partnerSaga;

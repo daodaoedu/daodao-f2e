@@ -35,6 +35,8 @@ export const StyledPanelText = styled(Box)`
     font-weight: 400;
     line-height: 140%;
     margin-left: 12px;
+    display: grid;
+    place-items: center;
   }
   @media (max-width: 767px) {
     flex-direction: column;
