@@ -14,7 +14,12 @@ import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
 
+import { persistStore } from 'redux-persist';
+import { PersistGate } from 'redux-persist/integration/react';
+
 const store = storeFactory();
+let persistor = persistStore(store);
+
 const firebaseConfig = {
   apiKey: 'AIzaSyBJK-FKcGHwDy1TMcoJcBdEqbTYpEquUi4',
   authDomain: 'daodaoedu-4ae8f.firebaseapp.com',
@@ -93,7 +98,9 @@ const App = ({ Component, pageProps }) => {
         />
       </Head>
       <Provider store={store}>
-        <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+        <PersistGate persistor={persistor}>
+          <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+        </PersistGate>
       </Provider>
     </>
   );

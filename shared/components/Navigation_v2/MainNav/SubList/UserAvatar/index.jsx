@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
-import styled from '@emotion/styled';
-import Link from 'next/link';
+import { useSelector } from 'react-redux';
 import { Avatar, Box, IconButton, Menu, MenuItem } from '@mui/material';
 import { Group } from '@mui/icons-material';
 import { useRouter } from 'next/router';
-import useFirebase from '../../../../../../hooks/useFirebase';
 
 const UserAvatar = () => {
   const { push } = useRouter();
-  const { auth, user, signInWithFacebook, signOutWithGoogle } = useFirebase();
+  const user = useSelector((state) => state.user);
+
   const [isOpenMenu, setIsOpenMenu] = useState(null);
-  if (!user) {
+
+  const handleSignOut = () => {
+    console.log('handleSignOut');
+  };
+
+  if (!user._id) {
     return (
       <IconButton
         sx={{ margin: '0 10px', fontSize: '16px', color: 'white' }}
@@ -57,7 +61,7 @@ const UserAvatar = () => {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            signOutWithGoogle();
+            handleSignOut();
             push('/');
             setIsOpenMenu(false);
           }}
