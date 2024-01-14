@@ -77,7 +77,6 @@ function* fetchUserById(action) {
       process.env.NEXT_PUBLIC_API_URL || 'https://daodao-server.onrender.com';
     const URL = `${baseUrl}/user/${id}`;
     const result = yield fetch(URL).then((res) => res.json());
-    console.log(result);
     yield put({
       type: 'FETCH_USER_BY_ID_SUCCESS',
       payload: result.data && result.data[0],

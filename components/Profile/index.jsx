@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useDispatch } from 'react-redux';
 import { Box, Button } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import {
@@ -12,6 +13,8 @@ import SEOConfig from '@/shared/components/SEO';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
 import ContactModal from './Contact';
+import { sendEmailToPartner } from '@/redux/actions/partners';
+import toast from 'react-hot-toast';
 
 const BottonBack = {
   color: '#536166',
@@ -33,6 +36,7 @@ const EDUCATION_STEP_TABLE = mapToTable(EDUCATION_STEP);
 
 const Profile = ({
   name,
+  email,
   photoURL,
   tagList = [],
   roleList = [],
@@ -41,7 +45,10 @@ const Profile = ({
   wantToDoList = [],
   location,
   share,
+  enableContactBtn = false,
+  sendEmail,
 }) => {
+  const dispatch = useDispatch();
   const router = useRouter();
   const [isLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -66,6 +73,21 @@ const Profile = ({
     [router?.asPath, name],
   );
 
+  const handleOnOk = ({ message, contact }) => {
+    dispatch(
+      sendEmailToPartner({
+        to: email,
+        name,
+        roleList: roleList.length ? roleList : [],
+        photoURL,
+        text: message,
+        information: [sendEmail, contact],
+      }),
+    );
+    setOpen(false);
+    toast.success('寄送成功');
+  };
+
   return (
     <Box
       sx={{
@@ -83,17 +105,14 @@ const Profile = ({
     >
       <ContactModal
         open={open}
+        title={name}
+        descipt={role || '-'}
+        avatar={photoURL}
         // isLoadingSubmit={isLoadingSubmit}
         onClose={() => {
           setOpen(false);
-          // router.push('/');
-          // router.push('/partner');
         }}
-        onOk={() => {
-          setOpen(false);
-          // router.push('/profile');
-          // router.push('/profile/edit');
-        }}
+        onOk={handleOnOk}
       />
       <SEOConfig data={SEOData} />
       <Box
@@ -114,6 +133,7 @@ const Profile = ({
         </Button>
 
         <UserCard
+          isLoginUser={email === sendEmail}
           isLoading={isLoading}
           educationStepLabel={edu}
           role={role}
@@ -130,21 +150,23 @@ const Profile = ({
         wantToDoList={wantTodo}
         share={share}
       />
-
-      <Button
-        sx={{
-          width: '160px',
-          borderRadius: '20px',
-          ml: '4px',
-          mt: '56px',
-          color: '#ffff',
-          bgcolor: '#16B9B3',
-        }}
-        variant="contained"
-        onClick={() => setOpen(true)}
-      >
-        聯繫夥伴
-      </Button>
+      {email !== sendEmail && (
+        <Button
+          sx={{
+            width: '160px',
+            borderRadius: '20px',
+            ml: '4px',
+            mt: '56px',
+            color: '#ffff',
+            bgcolor: '#16B9B3',
+          }}
+          disabled={!enableContactBtn}
+          variant="contained"
+          onClick={() => setOpen(true)}
+        >
+          聯繫夥伴
+        </Button>
+      )}
     </Box>
   );
 };

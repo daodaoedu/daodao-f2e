@@ -17,6 +17,7 @@ const HomePageWrapper = styled.div`
 const Detail = () => {
   const dispatch = useDispatch();
   const { partner } = useSelector((state) => state?.partners);
+  const { email: loginUserEmail } = useSelector((state) => state?.user);
 
   const router = useRouter();
   const { id } = router.query;
@@ -33,7 +34,11 @@ const Detail = () => {
   return (
     <HomePageWrapper>
       <Navigation />
-      <Profile {...partner} />
+      <Profile
+        {...partner}
+        sendEmail={loginUserEmail}
+        enableContactBtn={!!loginUserEmail}
+      />
       <Footer />
     </HomePageWrapper>
   );

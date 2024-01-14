@@ -13,7 +13,6 @@ export const ContentWrapper = styled.div`
   align-items: center;
   border-radius: 16px;
   margin: 0 auto;
-  padding: 40px 10px;
   width: 672px;
   @media (max-width: 767px) {
     width: 80%;

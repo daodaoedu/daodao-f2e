@@ -49,9 +49,31 @@ function* fetchPartnerById(action) {
   }
 }
 
+function* sendEmailToPartner(action) {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || BASEURL;
+    const URL = `${baseUrl}/email`;
+    const result = yield fetch(URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...action.payload,
+      }),
+    }).then((res) => res.json());
+    yield put({
+      type: 'SEND_EMAIL_TO_PARTNER_SUCCESS',
+    });
+  } catch (error) {
+    yield put({ type: 'SEND_EMAIL_TO_PARTNER_FAILURE' });
+  }
+}
+
 function* partnerSaga() {
   yield takeEvery('FETCH_PARTNERS', fetchPartnersResource);
   yield takeEvery('FETCH_PARTNER_BY_ID', fetchPartnerById);
+  yield takeEvery('SEND_EMAIL_TO_PARTNER', sendEmailToPartner);
 }
 
 export default partnerSaga;
