@@ -1,130 +1,80 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import styled from '@emotion/styled';
+import { useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Script from 'next/script';
-import {
-  Box,
-  Typography,
-  Button,
-  Skeleton,
-  TextField,
-  Divider,
-  Switch,
-  TextareaAutosize,
-  MenuItem,
-  Select,
-} from '@mui/material';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import toast from 'react-hot-toast';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { getAuth, updateProfile } from 'firebase/auth';
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  setDoc,
-  addDoc,
-} from 'firebase/firestore';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchUserById, updateUser } from '@/redux/actions/user';
+import { GENDER, ROLE } from '@/constants/member';
 import dayjs from 'dayjs';
+
+import { Box, Typography, Button, Skeleton, TextField } from '@mui/material';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import SEOConfig from '../../shared/components/SEO';
-import Navigation from '../../shared/components/Navigation_v2';
-import Footer from '../../shared/components/Footer_v2';
+import SEOConfig from '@/shared/components/SEO';
+import Navigation from '@/shared/components/Navigation_v2';
+import Footer from '@/shared/components/Footer_v2';
 import {
-  GENDER,
-  ROLE,
-  EDUCATION_STEP,
-  WANT_TO_DO_WITH_PARTNER,
-  CATEGORIES,
-} from '../../constants/member';
-import COUNTIES from '../../constants/countries.json';
-
-const HomePageWrapper = styled.div`
-  --section-height: calc(100vh - 80px);
-  --section-height-offset: 80px;
-  background: linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa;
-`;
-
-const ContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #fff;
-  border-radius: 16px;
-  margin: 60px auto;
-  max-width: 50%;
-  width: 100%;
-  @media (max-width: 767px) {
-    max-width: 80%;
-    .title {
-      text-overflow: ellipsis;
-      width: 100%;
-    }
-  }
-`;
+  HomePageWrapper,
+  StyledContentWrapper,
+  StyledQuestionInput,
+} from './signin.styled';
 
 function EditPage() {
   const router = useRouter();
-  const auth = getAuth();
-  const [user, isLoading] = useAuthState(auth);
+  const dispatch = useDispatch();
+
+  const {
+    birthDay: userBirthDay,
+    gender: userGender,
+    roleList: userRoleList,
+    isSubscribeEmail: userIsSubscribeEmail,
+    email: userEmail,
+    createdDate,
+    updatedDate,
+  } = useSelector((state) => state?.user);
+  const { id } = router.query;
+
   const [isSubscribeEmail, setIsSubscribeEmail] = useState(false);
-  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
   const [birthDay, setBirthDay] = useState(dayjs());
   const [gender, setGender] = useState('');
   const [roleList, setRoleList] = useState([]);
-  useEffect(() => {
-    if (!isLoading) {
-      const db = getFirestore();
-      if (user?.uid) {
-        // console.log('auth.currentUser', auth.currentUser);
-        const docRef = doc(db, 'partnerlist', user?.uid);
-        getDoc(docRef).then((docSnap) => {
-          const data = docSnap.data();
-          setBirthDay(dayjs(data?.birthDay) || dayjs());
-          setGender(data?.gender || '');
-          setRoleList(data?.roleList || []);
-        });
-      }
-    }
-  }, [user, isLoading]);
 
-  const onUpdateUser = (successCallback) => {
+  const fetchUser = async () => {
+    dispatch(fetchUserById(id));
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchUser();
+    }
+  }, [id]);
+
+  useEffect(() => {
+    setBirthDay(userBirthDay ? dayjs(userBirthDay) : dayjs());
+    setGender(userGender || '');
+    setRoleList(userRoleList || []);
+    setIsSubscribeEmail(userIsSubscribeEmail || false);
+
+    if (createdDate !== updatedDate) {
+      router.push('/profile');
+    }
+  }, [userEmail]);
+
+  const onUpdateUser = () => {
     const payload = {
+      id,
+      email: userEmail,
       birthDay: birthDay.toISOString(),
       gender,
       roleList,
-      lastUpdateDate: dayjs().toISOString(),
       isSubscribeEmail,
     };
-
-    const db = getFirestore();
-
-    const docRef = doc(db, 'partnerlist', user?.uid);
-    getDoc(docRef).then(() => {
-      setIsLoadingSubmit(true);
-      toast
-        .promise(
-          setDoc(docRef, payload).then(() => {
-            setIsLoadingSubmit(false);
-          }),
-          {
-            success: '更新成功！',
-            error: '更新失敗',
-            loading: '更新中...',
-          },
-        )
-        .then(() => {
-          successCallback();
-        });
-    });
+    dispatch(updateUser(payload));
+    router.push(`/signin/interest?id=${id}`);
   };
+
   const SEOData = useMemo(
     () => ({
       title: '編輯我的島島資料｜島島阿學',
@@ -146,29 +96,10 @@ function EditPage() {
       <Box>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Box sx={{ minHeight: '100vh' }}>
-            <ContentWrapper>
-              <Typography
-                sx={{
-                  fontWeight: 700,
-                  fontSize: '22px',
-                  lineHeight: '140%',
-                  textAlign: 'center',
-                  color: '#536166',
-                  mt: '40px',
-                }}
-              >
-                基本資料
-              </Typography>
+            <StyledContentWrapper>
+              <h2>基本資料</h2>
               <Box sx={{ marginTop: '24px', width: '100%', padding: '0 5%' }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'flex-start',
-                    marginTop: '20px',
-                  }}
-                >
+                <StyledQuestionInput>
                   <Typography>生日 *</Typography>
                   <MobileDatePicker
                     label="birthDay"
@@ -179,16 +110,8 @@ function EditPage() {
                       <TextField {...params} sx={{ width: '100%' }} label="" />
                     )}
                   />
-                </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'flex-start',
-                    marginTop: '20px',
-                  }}
-                >
+                </StyledQuestionInput>
+                <StyledQuestionInput>
                   <Typography>性別 *</Typography>
                   <Box
                     sx={{
@@ -225,16 +148,8 @@ function EditPage() {
                       </Box>
                     ))}
                   </Box>
-                </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'flex-start',
-                    marginTop: '20px',
-                  }}
-                >
+                </StyledQuestionInput>
+                <StyledQuestionInput>
                   <Typography>身份 *</Typography>
                   <Box
                     sx={{
@@ -329,7 +244,7 @@ function EditPage() {
                       </Box>
                     ))}
                   </Box>
-                </Box>
+                </StyledQuestionInput>
                 <FormControlLabel
                   sx={{
                     marginTop: '20px',
@@ -355,14 +270,12 @@ function EditPage() {
                     bgcolor: '#16B9B3',
                   }}
                   variant="contained"
-                  onClick={() => {
-                    onUpdateUser(() => router.push('/signin/interest'));
-                  }}
+                  onClick={onUpdateUser}
                 >
                   下一步
                 </Button>
               </Box>
-            </ContentWrapper>
+            </StyledContentWrapper>
           </Box>
         </LocalizationProvider>
       </Box>

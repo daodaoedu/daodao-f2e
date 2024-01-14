@@ -1,41 +1,19 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
-import Script from 'next/script';
-import {
-  Box,
-  Typography,
-  Button,
-  Skeleton,
-  Modal,
-  TextField,
-  Divider,
-  Switch,
-  TextareaAutosize,
-  MenuItem,
-  Select,
-} from '@mui/material';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchUserById, updateUser } from '@/redux/actions/user';
+
+import { Box, Typography, Button, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import toast from 'react-hot-toast';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { getAuth, updateProfile } from 'firebase/auth';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc,
-  setDoc,
-  addDoc,
-} from 'firebase/firestore';
 import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import SEOConfig from '../../../shared/components/SEO';
-import Navigation from '../../../shared/components/Navigation_v2';
-import Footer from '../../../shared/components/Footer_v2';
+import SEOConfig from '@/shared/components/SEO';
+import Navigation from '@/shared/components/Navigation_v2';
+import Footer from '@/shared/components/Footer_v2';
 import {
   GENDER,
   ROLE,
@@ -73,52 +51,35 @@ const ContentWrapper = styled.div`
 
 function EditPage() {
   const router = useRouter();
-  const auth = getAuth();
-  const [user, isLoading] = useAuthState(auth);
-  const [interestAreaList, setInterestAreaList] = useState([]);
-  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
+  const { id } = router.query;
+  const dispatch = useDispatch();
+
+  const {
+    _id: userId,
+    interestList: userInterestList,
+    email: userEmail,
+  } = useSelector((state) => state?.user);
+
+  const [interestList, setInterestList] = useState([]);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (!isLoading) {
-      const db = getFirestore();
-      if (user?.uid) {
-        // console.log('auth.currentUser', auth.currentUser);
-        const docRef = doc(db, 'partnerlist', user?.uid);
-        getDoc(docRef).then((docSnap) => {
-          const data = docSnap.data();
-          setInterestAreaList(data?.interestAreaList || []);
-        });
-      }
+    if (userId) {
+      setInterestList(userInterestList);
     }
-  }, [user, isLoading]);
+    if (id) {
+      dispatch(fetchUserById(id));
+    }
+  }, [userId, id]);
 
   const onUpdateUser = (successCallback) => {
     const payload = {
-      interestAreaList,
-      lastUpdateDate: dayjs().toISOString(),
+      id: userId,
+      interestList,
+      email: userEmail,
     };
-
-    const db = getFirestore();
-
-    const docRef = doc(db, 'partnerlist', user?.uid);
-    getDoc(docRef).then(() => {
-      setIsLoadingSubmit(true);
-      toast
-        .promise(
-          updateDoc(docRef, payload).then(() => {
-            setIsLoadingSubmit(false);
-          }),
-          {
-            success: '更新成功！',
-            error: '更新失敗',
-            loading: '更新中...',
-          },
-        )
-        .then(() => {
-          successCallback();
-        });
-    });
+    dispatch(updateUser(payload));
+    successCallback();
   };
 
   const SEOData = useMemo(
@@ -139,7 +100,6 @@ function EditPage() {
     <HomePageWrapper>
       <TipModal
         open={open}
-        isLoadingSubmit={isLoadingSubmit}
         onClose={() => {
           setOpen(false);
           router.push('/');
@@ -202,12 +162,12 @@ function EditPage() {
                     <Box
                       key={label}
                       onClick={() => {
-                        if (interestAreaList.includes(value)) {
-                          setInterestAreaList((state) =>
+                        if (interestList.includes(value)) {
+                          setInterestList((state) =>
                             state.filter((data) => data !== value),
                           );
                         } else {
-                          setInterestAreaList((state) => [...state, value]);
+                          setInterestList((state) => [...state, value]);
                         }
                       }}
                       sx={{
@@ -221,7 +181,7 @@ function EditPage() {
                         justifyItems: 'center',
                         alignItems: 'center',
                         cursor: 'pointer',
-                        ...(interestAreaList.includes(value)
+                        ...(interestList.includes(value)
                           ? {
                               backgroundColor: '#DEF5F5',
                               border: '1px solid #16B9B3',
@@ -267,7 +227,7 @@ function EditPage() {
                       <Typography
                         sx={{
                           margin: 'auto',
-                          ...(interestAreaList.includes(value)
+                          ...(interestList.includes(value)
                             ? {
                                 fontWeight: 700,
                               }
@@ -296,7 +256,6 @@ function EditPage() {
                     mr: '4px',
                   }}
                   variant="outlined"
-                  disabled={isLoadingSubmit}
                   onClick={() => {
                     router.back();
                   }}
