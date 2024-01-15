@@ -1,4 +1,5 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import COUNTIES from '@/constants/countries.json';
@@ -28,14 +29,14 @@ import SEOConfig from '@/shared/components/SEO';
 
 import useEditProfile from './useEditProfile';
 import {
+  HomePageWrapper,
+  ContentWrapper,
   StyledGroup,
   StyledSelectWrapper,
   StyledSelectBox,
   StyledSelectText,
   StyledToggleWrapper,
   StyledToggleText,
-  HomePageWrapper,
-  ContentWrapper,
   StyledTitleWrap,
   StyledSection,
   StyledButtonGroup,
@@ -48,12 +49,18 @@ function EditPage() {
   const { userState, onChangeHandler, onSubmit } = useEditProfile();
   const user = useSelector((state) => state.user);
 
-  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
-
   useEffect(() => {
     if (user._id) {
       Object.entries(user).forEach(([key, value]) => {
-        onChangeHandler({ key, value });
+        if (key !== 'contactList') {
+          onChangeHandler({ key, value });
+        } else {
+          const { instagram, facebook, discord, line } = value;
+          onChangeHandler({ key: 'instagram', value: instagram || '' });
+          onChangeHandler({ key: 'facebook', value: facebook || '' });
+          onChangeHandler({ key: 'discord', value: discord || '' });
+          onChangeHandler({ key: 'line', value: line || '' });
+        }
       });
     } else {
       router.push('/');
@@ -61,9 +68,8 @@ function EditPage() {
   }, [user]);
 
   const onUpdateUser = async (successCallback) => {
-    setIsLoadingSubmit(true);
     await onSubmit({ id: user._id, email: user.email });
-    setIsLoadingSubmit(false);
+    toast.success('更新成功');
     successCallback();
   };
 
@@ -252,7 +258,6 @@ function EditPage() {
 
           {/* 聯絡方式 */}
           <StyledSection>
-            {/* TODO: 新增 Social */}
             <StyledGroup mt="0">
               <Typography>聯絡方式</Typography>
               <Typography
@@ -265,25 +270,65 @@ function EditPage() {
               <Grid item xs="6">
                 <StyledGroup>
                   <Typography>Instagram</Typography>
-                  <TextField placeholder="請填寫ID" sx={{ width: '100%' }} />
+                  <TextField
+                    value={userState.instagram}
+                    onChange={(event) => {
+                      onChangeHandler({
+                        key: 'instagram',
+                        value: event.target.value,
+                      });
+                    }}
+                    placeholder="請填寫ID"
+                    sx={{ width: '100%' }}
+                  />
                 </StyledGroup>
               </Grid>
               <Grid item xs="6">
                 <StyledGroup>
                   <Typography>Discord</Typography>
-                  <TextField placeholder="請填寫ID" sx={{ width: '100%' }} />
+                  <TextField
+                    value={userState.discord}
+                    onChange={(event) => {
+                      onChangeHandler({
+                        key: 'discord',
+                        value: event.target.value,
+                      });
+                    }}
+                    placeholder="請填寫ID"
+                    sx={{ width: '100%' }}
+                  />
                 </StyledGroup>
               </Grid>
               <Grid item xs="6">
                 <StyledGroup>
                   <Typography>Line</Typography>
-                  <TextField placeholder="請填寫ID" sx={{ width: '100%' }} />
+                  <TextField
+                    value={userState.line}
+                    onChange={(event) => {
+                      onChangeHandler({
+                        key: 'line',
+                        value: event.target.value,
+                      });
+                    }}
+                    placeholder="請填寫ID"
+                    sx={{ width: '100%' }}
+                  />
                 </StyledGroup>
               </Grid>
               <Grid item xs="6">
                 <StyledGroup>
                   <Typography>Facebook</Typography>
-                  <TextField placeholder="請填寫ID" sx={{ width: '100%' }} />
+                  <TextField
+                    value={userState.facebook}
+                    onChange={(event) => {
+                      onChangeHandler({
+                        key: 'facebook',
+                        value: event.target.value,
+                      });
+                    }}
+                    placeholder="請填寫ID"
+                    sx={{ width: '100%' }}
+                  />
                 </StyledGroup>
               </Grid>
             </Grid>
@@ -329,18 +374,17 @@ function EditPage() {
                 }}
               />
             </StyledGroup>
-            {/* TODO: 新增 TAG */}
             <StyledGroup>
+              {/* TODO: NEED TO FIXED */}
               <Typography>標籤</Typography>
               <TextField
                 sx={{ width: '100%' }}
                 placeholder="搜尋或新增標籤"
-                value={userState.tagList}
+                value={userState.tagList[0]}
                 onChange={(event) => {
                   onChangeHandler({
-                    tagList: event.target.value,
-                    isMultiple: true,
                     key: 'tagList',
+                    value: event.target.value,
                   });
                 }}
               />
