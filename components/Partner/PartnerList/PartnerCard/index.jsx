@@ -4,6 +4,7 @@ import {
   ROLE,
   EDUCATION_STEP,
 } from '@/constants/member';
+import moment from 'moment';
 import { mapToTable } from '@/utils/helper';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PartnerCardAvator from './PartnerCardAvator';
@@ -33,7 +34,9 @@ function PartnerCard({
   tagList = [],
   wantToDoList = [],
   roleList = [],
+  location,
   educationStage,
+  updatedDate,
 }) {
   const wantTodo = wantToDoList
     .map((item) => WANT_TO_DO_WITH_PARTNER_TABLE[item])
@@ -63,11 +66,19 @@ function PartnerCard({
         <FlexSBAlignCenter mt="12px">
           <StyledTypoCaption>
             <FlexAlignCenter>
-              <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />
-              台北市松山區
+              {location && (
+                <>
+                  <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />
+                  {location}
+                </>
+              )}
             </FlexAlignCenter>
           </StyledTypoCaption>
-          <StyledTypoCaption fontWeight={300}>兩天前更新</StyledTypoCaption>
+          <StyledTypoCaption fontWeight={300}>
+            {updatedDate
+              ? moment(updatedDate).fromNow()
+              : moment(new Date() - 500 * 60 * 60).fromNow()}
+          </StyledTypoCaption>
         </FlexSBAlignCenter>
       </StyledCardContainer>
     </StyledCard>

@@ -19,7 +19,7 @@ import {
   HomePageWrapper,
   StyledContentWrapper,
   StyledQuestionInput,
-} from './signin.styled';
+} from './Signin.styled';
 
 function EditPage() {
   const router = useRouter();
