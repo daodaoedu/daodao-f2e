@@ -43,6 +43,7 @@ function PartnerList() {
               tagList={item.tagList}
               wantToDoList={item.wantToDoList}
               location={item.location}
+              updatedDate={item.updatedDate}
             />
           </Grid>
           {!mobileScreen && (idx + 1) % 2 === 0 && idx + 1 !== lists.length && (

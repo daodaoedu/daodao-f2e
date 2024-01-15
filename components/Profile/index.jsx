@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useDispatch } from 'react-redux';
 import { Box, Button } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import {
@@ -12,9 +11,6 @@ import { mapToTable } from '@/utils/helper';
 import SEOConfig from '@/shared/components/SEO';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
-import ContactModal from './Contact';
-import { sendEmailToPartner } from '@/redux/actions/partners';
-import toast from 'react-hot-toast';
 
 const BottonBack = {
   color: '#536166',
@@ -47,12 +43,12 @@ const Profile = ({
   share,
   enableContactBtn = false,
   sendEmail,
+  handleContactPartner,
+  contactList = {},
+  updatedDate,
 }) => {
-  const dispatch = useDispatch();
   const router = useRouter();
   const [isLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-
   const role = roleList.length > 0 && ROLELIST[roleList[0]];
   const edu = educationStage && EDUCATION_STEP_TABLE[educationStage];
   const wantTodo = wantToDoList
@@ -73,21 +69,6 @@ const Profile = ({
     [router?.asPath, name],
   );
 
-  const handleOnOk = ({ message, contact }) => {
-    dispatch(
-      sendEmailToPartner({
-        to: email,
-        name,
-        roleList: roleList.length ? roleList : [],
-        photoURL,
-        text: message,
-        information: [sendEmail, contact],
-      }),
-    );
-    setOpen(false);
-    toast.success('寄送成功');
-  };
-
   return (
     <Box
       sx={{
@@ -103,17 +84,6 @@ const Profile = ({
         },
       }}
     >
-      <ContactModal
-        open={open}
-        title={name}
-        descipt={role || '-'}
-        avatar={photoURL}
-        // isLoadingSubmit={isLoadingSubmit}
-        onClose={() => {
-          setOpen(false);
-        }}
-        onOk={handleOnOk}
-      />
       <SEOConfig data={SEOData} />
       <Box
         sx={{
@@ -141,6 +111,8 @@ const Profile = ({
           photoURL={photoURL}
           userName={name}
           location={location}
+          updatedDate={updatedDate}
+          contactList={contactList}
         />
       </Box>
 
@@ -162,7 +134,7 @@ const Profile = ({
           }}
           disabled={!enableContactBtn}
           variant="contained"
-          onClick={() => setOpen(true)}
+          onClick={handleContactPartner}
         >
           聯繫夥伴
         </Button>
