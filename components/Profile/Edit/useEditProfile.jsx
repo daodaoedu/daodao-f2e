@@ -10,10 +10,12 @@ const initialState = {
   gender: '',
   roleList: [],
   wantToDoList: [],
-  // interestList: [],
+  instagram: '',
+  facebook: '',
+  discord: '',
+  line: '',
   educationStage: '-1',
   location: 'tw',
-  contactInformationList: [],
   tagList: [],
   selfIntroduction: '',
   share: '',
@@ -47,8 +49,8 @@ const useEditProfile = () => {
 
   // TODO ErrorMap
 
-  const onChangeHandler = ({ key, value }) => {
-    stateDispatch({ key, value });
+  const onChangeHandler = ({ key, value, isMultiple }) => {
+    stateDispatch({ key, value, isMultiple });
   };
 
   const onSubmit = async ({ id, email }) => {
@@ -64,23 +66,31 @@ const useEditProfile = () => {
       share,
       isOpenLocation,
       isOpenProfile,
-      contactInformationList,
       tagList,
       selfIntroduction,
+      instagram,
+      facebook,
+      discord,
+      line,
     } = userState;
 
     const payload = {
       id,
       email,
-      contactInformationList,
       name,
       birthDay,
       gender,
       roleList,
+      contactList: {
+        instagram,
+        facebook,
+        discord,
+        line,
+      },
       wantToDoList,
       educationStage,
       location,
-      tagList,
+      tagList: [tagList], // TODO: 要修改
       selfIntroduction,
       share,
       isOpenLocation,
