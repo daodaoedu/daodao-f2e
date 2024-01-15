@@ -11,7 +11,6 @@ import { mapToTable } from '@/utils/helper';
 import SEOConfig from '@/shared/components/SEO';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
-import ContactModal from './Contact';
 
 const BottonBack = {
   color: '#536166',
@@ -33,6 +32,7 @@ const EDUCATION_STEP_TABLE = mapToTable(EDUCATION_STEP);
 
 const Profile = ({
   name,
+  email,
   photoURL,
   tagList = [],
   roleList = [],
@@ -41,11 +41,14 @@ const Profile = ({
   wantToDoList = [],
   location,
   share,
+  enableContactBtn = false,
+  sendEmail,
+  handleContactPartner,
+  contactList = {},
+  updatedDate,
 }) => {
   const router = useRouter();
   const [isLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-
   const role = roleList.length > 0 && ROLELIST[roleList[0]];
   const edu = educationStage && EDUCATION_STEP_TABLE[educationStage];
   const wantTodo = wantToDoList
@@ -81,20 +84,6 @@ const Profile = ({
         },
       }}
     >
-      <ContactModal
-        open={open}
-        // isLoadingSubmit={isLoadingSubmit}
-        onClose={() => {
-          setOpen(false);
-          // router.push('/');
-          // router.push('/partner');
-        }}
-        onOk={() => {
-          setOpen(false);
-          // router.push('/profile');
-          // router.push('/profile/edit');
-        }}
-      />
       <SEOConfig data={SEOData} />
       <Box
         sx={{
@@ -114,6 +103,7 @@ const Profile = ({
         </Button>
 
         <UserCard
+          isLoginUser={email === sendEmail}
           isLoading={isLoading}
           educationStepLabel={edu}
           role={role}
@@ -121,6 +111,8 @@ const Profile = ({
           photoURL={photoURL}
           userName={name}
           location={location}
+          updatedDate={updatedDate}
+          contactList={contactList}
         />
       </Box>
 
@@ -130,21 +122,23 @@ const Profile = ({
         wantToDoList={wantTodo}
         share={share}
       />
-
-      <Button
-        sx={{
-          width: '160px',
-          borderRadius: '20px',
-          ml: '4px',
-          mt: '56px',
-          color: '#ffff',
-          bgcolor: '#16B9B3',
-        }}
-        variant="contained"
-        onClick={() => setOpen(true)}
-      >
-        聯繫夥伴
-      </Button>
+      {email !== sendEmail && (
+        <Button
+          sx={{
+            width: '160px',
+            borderRadius: '20px',
+            ml: '4px',
+            mt: '56px',
+            color: '#ffff',
+            bgcolor: '#16B9B3',
+          }}
+          disabled={!enableContactBtn}
+          variant="contained"
+          onClick={handleContactPartner}
+        >
+          聯繫夥伴
+        </Button>
+      )}
     </Box>
   );
 };

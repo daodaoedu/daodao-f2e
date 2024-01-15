@@ -190,6 +190,8 @@ function UserCard({
   photoURL,
   userName,
   location,
+  contactList = {},
+  updatedDate,
 }) {
   const router = useRouter();
 
@@ -230,30 +232,41 @@ function UserCard({
 
       <StyledProfileTag>
         {!!tagList.length &&
+          !!tagList[0] &&
           tagList[0].split('、').map((tag) => <Tag key={tag} label={tag} />)}
       </StyledProfileTag>
 
       <StyledProfileOther>
         <StyledProfileSocial style={{ listStyle: 'none', display: 'flex' }}>
-          <li>
-            <RiInstagramFill size="20px" />
-            <p>Chien22</p>
-          </li>
-          <li>
-            <FaFacebook size="20px" />
-            <p>ene_soew</p>
-          </li>
-          <li>
-            <FaLine size="20px" />
-            <p>Chien12348888</p>
-          </li>
-          <li>
-            <FaDiscord size="20px" />
-            <p>#Chien22</p>
-          </li>
+          {!!contactList.instagram && (
+            <li>
+              <RiInstagramFill size="20px" />
+              <p>{contactList.instagram}</p>
+            </li>
+          )}
+          {!!contactList.facebook && (
+            <li>
+              <FaFacebook size="20px" />
+              <p>{contactList.facebook}</p>
+            </li>
+          )}
+          {!!contactList.line && (
+            <li>
+              <FaLine size="20px" />
+              <p>{contactList.line}</p>
+            </li>
+          )}
+          {!!contactList.discord && (
+            <li>
+              <FaDiscord size="20px" />
+              <p>{contactList.discord}</p>
+            </li>
+          )}
         </StyledProfileSocial>
         <StyledProfileDate>
-          {moment(new Date() - 500 * 60 * 60).fromNow()}
+          {updatedDate
+            ? moment(updatedDate).fromNow()
+            : moment(new Date() - 500 * 60 * 60).fromNow()}
         </StyledProfileDate>
       </StyledProfileOther>
     </StyledProfileWrapper>

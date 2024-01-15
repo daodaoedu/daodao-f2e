@@ -1,10 +1,6 @@
 // import toast from 'react-hot-toast';
 
-const initialState = {
-  name: '',
-  email: '',
-  photoURL: '',
-};
+const initialState = {};
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -20,6 +16,11 @@ const reducer = (state = initialState, action) => {
         ...action.payload,
       };
     }
+    case 'USER_LOGOUT': {
+      return {
+        ...initialState,
+      };
+    }
     case 'ADD_RESOURCE_TO_COLLECTION_SUCCESS': {
       return {
         ...state,
@@ -27,6 +28,23 @@ const reducer = (state = initialState, action) => {
       };
     }
     case 'REMOVE_RESOURCE_FROM_COLLECTION_SUCCESS': {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    }
+    case 'FETCH_USER_BY_ID_SUCCESS': {
+      return {
+        ...action.payload,
+      };
+    }
+
+    case 'FETCH_USER_BY_ID_FAILURE': {
+      return {
+        ...state,
+      };
+    }
+    case 'UPDATE_USER_PROFILE_SUCCESS': {
       return {
         ...state,
         ...action.payload,

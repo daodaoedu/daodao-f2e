@@ -41,6 +41,12 @@ const reducer = (state = initialState, action) => {
         partner: null,
       };
     }
+    case 'SEND_EMAIL_TO_PARTNER_SUCCESS': {
+      return { ...state };
+    }
+    case 'SEND_EMAIL_TO_PARTNER_FAILURE': {
+      return { ...state };
+    }
     default: {
       return state;
     }
