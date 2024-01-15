@@ -147,12 +147,12 @@ function ContactModal({
           </StyledGroup>
           <StyledGroup>
             <StyledTitle id="keep-mounted-modal-description">
-              聯繫資訊
+              聯絡資訊
             </StyledTitle>
             <StyledTextArea
               value={contact}
               onChange={(e) => setContact(e.target.value)}
-              placeholder="ex.  自學申請、學習方法、學習資源，或各種學習領域的知識"
+              placeholder="寫下您的聯繫資訊，如 e-mail、line、Facebook、Instagram 等等。"
             />
           </StyledGroup>
 
