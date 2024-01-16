@@ -1,13 +1,13 @@
 import {
-  DEFAULT_LIMIT,
-  SET_LIMIT,
+  DEFAULT_PAGE_SIZE,
+  SET_PAGE_SIZE,
   SET_QUERY,
   GET_GROUP_ITEMS_SUCCESS,
   GET_GROUP_ITEMS_FAILURE,
 } from '../actions/group';
 
 const initialState = {
-  limit: DEFAULT_LIMIT,
+  pageSize: DEFAULT_PAGE_SIZE,
   query: {},
   items: [],
   total: 0,
@@ -15,13 +15,13 @@ const initialState = {
 };
 
 const reducer = (state = initialState, action) => {
-  const limit = action?.payload?.limit || DEFAULT_LIMIT;
+  const pageSize = action?.payload?.pageSize || DEFAULT_PAGE_SIZE;
 
   switch (action.type) {
-    case SET_LIMIT: {
+    case SET_PAGE_SIZE: {
       return {
         ...state,
-        limit,
+        pageSize,
         isLoading: true,
       };
     }
@@ -30,7 +30,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         ...(action.payload ?? {}),
         items: [],
-        limit,
+        pageSize,
         isLoading: true,
       };
     }

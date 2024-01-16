@@ -1,6 +1,7 @@
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import Image from '@/shared/components/Image';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
+import { timeDuration } from '@/utils/date';
 import {
   StyledAreas,
   StyledContainer,
@@ -21,6 +22,7 @@ function GroupCard({
   description,
   area,
   isGrouping,
+  updatedDate,
 }) {
   return (
     <StyledGroupCard>
@@ -45,7 +47,7 @@ function GroupCard({
           <StyledText color="#92989A">{area}</StyledText>
         </StyledAreas>
         <StyledFooter>
-          <time>2天前更新</time>
+          <time>{timeDuration(updatedDate)}</time>
           {isGrouping ? (
             <div>揪團中</div>
           ) : (
