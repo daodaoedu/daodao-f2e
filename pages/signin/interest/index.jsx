@@ -20,9 +20,8 @@ import {
   EDUCATION_STEP,
   WANT_TO_DO_WITH_PARTNER,
   CATEGORIES,
-} from '../../../constants/member';
-import TipModal from '../../../components/Signin/Interest/TipModal';
-import COUNTIES from '../../../constants/countries.json';
+} from '@/constants/member';
+import TipModal from '@/components/Signin/Interest/TipModal';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -67,10 +66,7 @@ function EditPage() {
     if (userId) {
       setInterestList(userInterestList);
     }
-    if (id) {
-      dispatch(fetchUserById(id));
-    }
-  }, [userId, id]);
+  }, [userId]);
 
   const onUpdateUser = (successCallback) => {
     const payload = {
