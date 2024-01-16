@@ -12,7 +12,7 @@ function* fetchPartnersResource(action) {
   }, startParams);
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || BASEURL;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || BASE_URL;
     const URL = `${baseUrl}/user?${queryStr}`;
     const result = yield fetch(URL).then((res) => res.json());
     yield put({
@@ -36,7 +36,7 @@ function* fetchPartnersResource(action) {
 function* fetchPartnerById(action) {
   const { id } = action.payload;
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || BASEURL;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || BASE_URL;
     const URL = `${baseUrl}/user/${id}`;
     const result = yield fetch(URL).then((res) => res.json());
     yield put({
