@@ -89,6 +89,9 @@ const Profile = ({
         sx={{
           position: 'relative',
           mb: '10px',
+          '@media (max-width: 767px)': {
+            width: '100%',
+          },
         }}
       >
         <Button

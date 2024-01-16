@@ -1,7 +1,5 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { useRouter } from 'next/router';
-import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
@@ -65,6 +63,11 @@ const ProfilePage = () => {
           display: 'flex',
           justifyContent: 'center',
           marginTop: '60px',
+          '@media (max-width: 767px)': {
+            flexDirection: 'column',
+            marginTop: '0',
+            padding: '16px',
+          },
         }}
       >
         <Box
@@ -75,6 +78,9 @@ const ProfilePage = () => {
             borderRadius: '8px',
             margin: '26px 40px 0 0',
             padding: '8px',
+            '@media (max-width: 767px)': {
+              width: '100%',
+            },
           }}
         >
           <Tabs
