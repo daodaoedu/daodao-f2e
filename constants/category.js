@@ -204,11 +204,11 @@ export const NAV_LINK = [
     link: '/search',
     target: '_self',
   },
-  // {
-  //   name: '找夥伴',
-  //   link: '/partner',
-  //   target: '_self',
-  // },
+  {
+    name: '找夥伴',
+    link: '/partner',
+    target: '_self',
+  },
   {
     name: '找活動',
     link: '/activities',

@@ -1,6 +1,5 @@
 import { put, takeEvery } from 'redux-saga/effects';
-
-const BASEURL = 'https://daodao-server.onrender.com';
+import { BASE_URL } from '@/constants/common';
 
 function* fetchPartnersResource(action) {
   const { pageSize = 10, page = 1, ...rest } = action.payload;
@@ -51,9 +50,8 @@ function* fetchPartnerById(action) {
 
 function* sendEmailToPartner(action) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || BASEURL;
-    const URL = `${baseUrl}/email`;
-    const result = yield fetch(URL, {
+    const URL = `${BASE_URL}/email`;
+    yield fetch(URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
