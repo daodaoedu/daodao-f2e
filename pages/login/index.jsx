@@ -1,16 +1,13 @@
-import React, { useEffect, useMemo } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
-import Router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
+import Link from '@mui/material/Link';
 import Script from 'next/script';
 import { Box, Typography, Button, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import toast from 'react-hot-toast';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
-import SEOConfig from '../../shared/components/SEO';
-import Navigation from '../../shared/components/Navigation_v2';
-import Footer from '../../shared/components/Footer_v2';
+import SEOConfig from '@/shared/components/SEO';
+import Navigation from '@/shared/components/Navigation_v2';
+import Footer from '@/shared/components/Footer_v2';
 // import sendDataToChromeExtension from '../../utils/sendDataToChromeExtension';
 
 const HomePageWrapper = styled.div`
@@ -40,6 +37,10 @@ const ContentWrapper = styled.div`
 `;
 
 const LoginPage = () => {
+  const BASEURL = `${
+    process.env.NEXT_PUBLIC_API_URL || 'https://daodao-server.onrender.com'
+  }`;
+  const LOGINPATH = `${BASEURL}/auth/google`;
   const router = useRouter();
 
   const SEOData = useMemo(
@@ -107,23 +108,21 @@ const LoginPage = () => {
               />
             }
           />
-          <Button
-            sx={{
-              marginTop: '24px',
-              width: '100%',
-              borderRadius: '20px',
-              color: '#fff',
-              bgcolor: '#16B9B3',
-              boxShadow: '0px 4px 10px rgba(89, 182, 178, 0.5)',
-            }}
-            variant="contained"
-            onClick={() => {
-              onLogin();
-              // toast.success('你點我做什麼？？？？');
-            }}
-          >
-            Google 登入 / 註冊
-          </Button>
+          <Link href={LOGINPATH} target="_blank" rel="noreferrer noopener">
+            <Button
+              sx={{
+                marginTop: '24px',
+                width: '100%',
+                borderRadius: '20px',
+                color: '#fff',
+                bgcolor: '#16B9B3',
+                boxShadow: '0px 4px 10px rgba(89, 182, 178, 0.5)',
+              }}
+              variant="contained"
+            >
+              Google 登入 / 註冊
+            </Button>
+          </Link>
           <Box sx={{ marginTop: '24px' }}>
             <Typography sx={{ color: '#536166', fontSize: '14px' }}>
               {`註冊即代表您同意島島阿學的 `}

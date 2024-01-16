@@ -110,7 +110,7 @@ function EditPage() {
       isSubscribeEmail,
     };
     dispatch(updateUser(payload));
-    router.push(`/signin/interest?id=${id}`);
+    router.push(`/signin/interest`);
   };
 
   const SEOData = useMemo(
