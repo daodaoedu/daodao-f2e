@@ -1,11 +1,11 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Button } from '@mui/material';
-import { setLimit } from '@/redux/actions/group';
+import { setPageSize } from '@/redux/actions/group';
 
 export default function More() {
   const dispatch = useDispatch();
-  const { limit, total, isLoading } = useSelector((state) => state.group);
-  const isMore = total > limit || isLoading;
+  const { pageSize, total, isLoading } = useSelector((state) => state.group);
+  const isMore = total > pageSize || isLoading;
 
   return (
     <Box
@@ -21,7 +21,7 @@ export default function More() {
             borderRadius: '20px',
             padding: '6px 48px',
           }}
-          onClick={() => dispatch(setLimit(limit + 12))}
+          onClick={() => dispatch(setPageSize(pageSize + 12))}
         >
           顯示更多
         </Button>

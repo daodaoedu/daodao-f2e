@@ -93,7 +93,7 @@ function GroupList() {
       <StyledGroupList>
         {items?.length || isLoading ? (
           items.map((data) => (
-            <StyledGroupItem key={data.id}>
+            <StyledGroupItem key={data._id}>
               <GroupCard {...data} />
             </StyledGroupItem>
           ))
