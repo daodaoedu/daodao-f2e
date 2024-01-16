@@ -1,6 +1,7 @@
 import { put, all, take, takeEvery, select, call } from 'redux-saga/effects';
 import * as localforage from 'localforage';
 import firebase from '../../../utils/firebase';
+import { BASE_URL } from '@/constants/common';
 
 function* checkUserStatus() {
   try {
@@ -38,8 +39,7 @@ function* userLogin() {
 
 function* fetchAllUsers() {
   try {
-    const URL =
-      process.env.NEXT_PUBLIC_API_URL || 'https://daodao-server.onrender.com';
+    const URL = BASE_URL;
     const result = yield call(URL);
     yield put({ type: 'FETCH_ALL_USER_SUCCESS', payload: result });
   } catch (error) {
@@ -50,9 +50,7 @@ function* fetchAllUsers() {
 function* updateUserProfile(action) {
   const { user } = action.payload;
   try {
-    const baseUri =
-      process.env.NEXT_PUBLIC_API_URL || 'https://daodao-server.onrender.com';
-    const URL = `${baseUri}/user/${user.id}`;
+    const URL = `${BASE_URL}/user/${user.id}`;
 
     const result = yield fetch(URL, {
       method: 'PUT',
@@ -73,9 +71,7 @@ function* updateUserProfile(action) {
 function* fetchUserById(action) {
   const { id } = action.payload;
   try {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_API_URL || 'https://daodao-server.onrender.com';
-    const URL = `${baseUrl}/user/${id}`;
+    const URL = `${BASE_URL}/user/${id}`;
     const result = yield fetch(URL).then((res) => res.json());
     yield put({
       type: 'FETCH_USER_BY_ID_SUCCESS',

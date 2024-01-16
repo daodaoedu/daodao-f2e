@@ -42,6 +42,7 @@ export const StyledPanelText = styled(Box)`
     flex-direction: column;
     span {
       margin-left: 0px;
+      place-items: start;
     }
   }
 `;

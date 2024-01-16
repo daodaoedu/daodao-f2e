@@ -8,6 +8,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
+import { BASE_URL } from '@/constants/common';
 // import sendDataToChromeExtension from '../../utils/sendDataToChromeExtension';
 
 const HomePageWrapper = styled.div`
@@ -37,10 +38,7 @@ const ContentWrapper = styled.div`
 `;
 
 const LoginPage = () => {
-  const BASEURL = `${
-    process.env.NEXT_PUBLIC_API_URL || 'https://daodao-server.onrender.com'
-  }`;
-  const LOGINPATH = `${BASEURL}/auth/google`;
+  const LOGINPATH = `${BASE_URL}/auth/google`;
   const router = useRouter();
 
   const SEOData = useMemo(
@@ -56,11 +54,6 @@ const LoginPage = () => {
     }),
     [router?.asPath],
   );
-
-  const onLogin = () => {
-    // toast.success(`歡迎登入！ ${displayName}`);
-    window.open('https://daodao-server.onrender.com/auth/google', '_target');
-  };
 
   return (
     <HomePageWrapper>
