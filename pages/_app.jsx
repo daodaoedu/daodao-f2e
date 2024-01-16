@@ -7,14 +7,18 @@ import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';
 import { initializeApp } from 'firebase/app';
-import GlobalStyle from '../shared/styles/Global';
-import themeFactory from '../shared/styles/themeFactory';
-import storeFactory from '../redux/store';
+import { persistStore } from 'redux-persist';
+import { PersistGate } from 'redux-persist/integration/react';
+import GlobalStyle from '@/shared/styles/Global';
+import themeFactory from '@/shared/styles/themeFactory';
+import storeFactory from '@/redux/store';
 import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
 
 const store = storeFactory();
+const persistor = persistStore(store);
+
 const firebaseConfig = {
   apiKey: 'AIzaSyBJK-FKcGHwDy1TMcoJcBdEqbTYpEquUi4',
   authDomain: 'daodaoedu-4ae8f.firebaseapp.com',
@@ -93,7 +97,9 @@ const App = ({ Component, pageProps }) => {
         />
       </Head>
       <Provider store={store}>
-        <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+        <PersistGate persistor={persistor}>
+          <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+        </PersistGate>
       </Provider>
     </>
   );

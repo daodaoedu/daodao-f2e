@@ -74,6 +74,7 @@ const ProfilePage = () => {
             backgroundColor: 'white',
             borderRadius: '8px',
             margin: '26px 40px 0 0',
+            padding: '8px',
           }}
         >
           <Tabs
@@ -82,9 +83,34 @@ const ProfilePage = () => {
             value={value}
             onChange={handleChange}
             aria-label="Vertical tabs example"
+            indicatorColor="transparent"
           >
-            <Tab label="個人資料編輯" {...a11yProps(0)} />
-            <Tab label="帳號設定" {...a11yProps(1)} />
+            <Tab
+              sx={{
+                color: '#536166',
+                borderRadius: '8px',
+                '&.Mui-selected': {
+                  borderColor: 'transparent',
+                  backgroundColor: `${value === 0 && '#DEF5F5'}`,
+                  color: `${value === 0 && '#16B9B3'}`,
+                },
+              }}
+              label="個人資料編輯"
+              {...a11yProps(0)}
+            />
+            <Tab
+              sx={{
+                color: '#536166',
+                borderRadius: '8px',
+                '&.Mui-selected': {
+                  borderColor: 'transparent',
+                  backgroundColor: `${value === 1 && '#DEF5F5'}`,
+                  color: `${value === 1 && '#16B9B3'}`,
+                },
+              }}
+              label="帳號設定"
+              {...a11yProps(1)}
+            />
           </Tabs>
         </Box>
         <Box>
