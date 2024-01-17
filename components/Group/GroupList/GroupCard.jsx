@@ -1,5 +1,7 @@
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import Image from '@/shared/components/Image';
+import emptyCoverImg from '@/public/assets/empty-cover.png';
+import { timeDuration } from '@/utils/date';
 import {
   StyledAreas,
   StyledContainer,
@@ -19,10 +21,12 @@ function GroupCard({
   partnerEducationStep,
   description,
   area,
+  isGrouping,
+  updatedDate,
 }) {
   return (
     <StyledGroupCard>
-      <Image alt={photoAlt} src={photoURL} />
+      <Image alt={photoAlt || '未放封面'} src={photoURL || emptyCoverImg.src} />
       <StyledContainer>
         <StyledTitle>{title}</StyledTitle>
         <StyledInfo>
@@ -32,7 +36,7 @@ function GroupCard({
           </StyledText>
           <StyledText>
             <StyledLabel>適合階段</StyledLabel>
-            <span>{partnerEducationStep}</span>
+            <span>{partnerEducationStep || '皆可'}</span>
           </StyledText>
         </StyledInfo>
         <StyledText lineClamp="2" fontSize="14px">
@@ -43,8 +47,12 @@ function GroupCard({
           <StyledText color="#92989A">{area}</StyledText>
         </StyledAreas>
         <StyledFooter>
-          <time>2天前更新</time>
-          <div>揪團中</div>
+          <time>{timeDuration(updatedDate)}</time>
+          {isGrouping ? (
+            <div>揪團中</div>
+          ) : (
+            <div className="finished">已結束</div>
+          )}
         </StyledFooter>
       </StyledContainer>
     </StyledGroupCard>

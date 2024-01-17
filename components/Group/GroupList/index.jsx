@@ -1,4 +1,12 @@
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from '@emotion/styled';
+import { Box } from '@mui/material';
+import { AREAS } from '@/constants/areas';
+import { CATEGORIES } from '@/constants/category';
+import { EDUCATION_STEP } from '@/constants/member';
+import useSearchParamsManager from '@/hooks/useSearchParamsManager';
+import { setQuery } from '@/redux/actions/group';
 import GroupCard from './GroupCard';
 
 export const StyledGroupItem = styled.li`
@@ -47,24 +55,59 @@ export const StyledGroupItem = styled.li`
 const StyledGroupList = styled.ul`
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
 `;
 
-function GroupList({ list, isLoading }) {
+function GroupList() {
+  const dispatch = useDispatch();
+  const [getSearchParams] = useSearchParamsManager();
+  const { items, isLoading } = useSelector((state) => state.group);
+
+  useEffect(() => {
+    const filterOptions = {
+      area: AREAS,
+      category: CATEGORIES,
+      edu: EDUCATION_STEP,
+      grouping: true,
+      q: true,
+    };
+    const params = {};
+    const searchParams = getSearchParams();
+    Object.keys(filterOptions).forEach((key) => {
+      const searchParam = searchParams[key];
+      const options = filterOptions[key];
+
+      if (searchParam && options) {
+        params[key] = Array.isArray(options)
+          ? searchParam
+              .split(',')
+              .filter((item) => options.some((option) => option.label === item))
+              .join(',')
+          : searchParam;
+      }
+    });
+    dispatch(setQuery(params));
+  }, [getSearchParams]);
+
   return (
-    <StyledGroupList>
-      {list?.length || isLoading ? (
-        list.map((data) => (
-          <StyledGroupItem key={data.id}>
-            <GroupCard {...data} />
-          </StyledGroupItem>
-        ))
-      ) : (
-        <li style={{ textAlign: 'center', width: '100%' }}>
-          哎呀！這裡好像沒有符合你條件的揪團，別失望！讓我們試試其他選項。
-        </li>
+    <>
+      <StyledGroupList>
+        {items?.length || isLoading ? (
+          items.map((data) => (
+            <StyledGroupItem key={data._id}>
+              <GroupCard {...data} />
+            </StyledGroupItem>
+          ))
+        ) : (
+          <li style={{ textAlign: 'center', width: '100%' }}>
+            哎呀！這裡好像沒有符合你條件的揪團，別失望！讓我們試試其他選項。
+          </li>
+        )}
+      </StyledGroupList>
+
+      {isLoading && (
+        <Box sx={{ textAlign: 'center', paddingTop: '32px' }}>搜尋揪團中～</Box>
       )}
-    </StyledGroupList>
+    </>
   );
 }
 
