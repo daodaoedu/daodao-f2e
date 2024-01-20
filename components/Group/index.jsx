@@ -4,10 +4,11 @@ import AreaChips from './AreaChips';
 import Banner from './Banner';
 import SearchField from './SearchField';
 import SelectedCategory from './SelectedCategory';
+import StyledPaper from './Paper.styled';
 import GroupList from './GroupList';
 import More from './More';
 
-const StyledGroup = styled.div`
+const StyledContainer = styled.div`
   position: relative;
   margin: 70px auto 0;
   width: 924px;
@@ -22,28 +23,20 @@ const StyledGroup = styled.div`
   }
 `;
 
-const ContainerWrapper = styled(Box)`
-  padding: 32px;
-  border-radius: 20px;
-  box-shadow: 0px 4px 6px rgba(196, 194, 193, 0.2);
-  background: #fff;
-  z-index: 2;
-`;
-
 function Group() {
   return (
     <Box sx={{ background: '#f3fcfc' }}>
       <Banner />
-      <StyledGroup>
-        <ContainerWrapper>
+      <StyledContainer>
+        <StyledPaper>
           <SearchField />
           <SelectedCategory />
-        </ContainerWrapper>
-        <ContainerWrapper as="main" sx={{ marginTop: '24px' }}>
+        </StyledPaper>
+        <StyledPaper as="main" sx={{ marginTop: '24px' }}>
           <AreaChips />
           <GroupList />
-        </ContainerWrapper>
-      </StyledGroup>
+        </StyledPaper>
+      </StyledContainer>
       <More />
     </Box>
   );

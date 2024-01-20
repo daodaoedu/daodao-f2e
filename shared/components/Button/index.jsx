@@ -1,9 +1,9 @@
 import MuiButton from '@mui/material/Button';
 
-const Button = ({ variant = 'contained', onClick, children }) => {
+const Button = ({ variant = 'contained', sx, ...props }) => {
   return (
     <MuiButton
-      variant="contained"
+      variant={variant}
       sx={{
         fontSize: '16px',
         marginTop: '40px',
@@ -11,11 +11,10 @@ const Button = ({ variant = 'contained', onClick, children }) => {
         boxShadow: '0px 4px 10px rgba(89, 182, 178, 0.5)',
         borderRadius: '20px',
         padding: '6px 48px',
+        ...sx,
       }}
-      onClick={onClick}
-    >
-      {children}
-    </MuiButton>
+      {...props}
+    />
   );
 };
 
