@@ -39,41 +39,39 @@ export const StyledFooter = styled.footer`
   justify-content: space-between;
   align-items: center;
 
-  time,
-  div {
-    font-size: 12px;
-  }
-
   time {
+    font-size: 12px;
     font-weight: 300;
     color: #92989a;
   }
+`;
 
-  div {
-    --bg-color: #def5f5;
-    --color: #16b9b3;
-    display: flex;
-    align-items: center;
-    padding: 4px 10px;
-    background: var(--bg-color);
-    color: var(--color);
-    border-radius: 4px;
-    font-weight: 500;
-    gap: 4px;
+export const StyledStatus = styled.div`
+  --bg-color: #def5f5;
+  --color: #16b9b3;
+  display: flex;
+  align-items: center;
+  width: max-content;
+  font-size: 12px;
+  padding: 4px 10px;
+  background: var(--bg-color);
+  color: var(--color);
+  border-radius: 4px;
+  font-weight: 500;
+  gap: 4px;
 
-    &::before {
-      content: '';
-      display: block;
-      width: 8px;
-      height: 8px;
-      background: var(--color);
-      border-radius: 50%;
-    }
+  &::before {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    background: var(--color);
+    border-radius: 50%;
+  }
 
-    &.finished {
-      --bg-color: #f3f3f3;
-      --color: #92989a;
-    }
+  &.finished {
+    --bg-color: #f3f3f3;
+    --color: #92989a;
   }
 `;
 
