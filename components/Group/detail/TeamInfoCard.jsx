@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import styled from '@emotion/styled';
 import bachelorCapSvg from '@/public/assets/icons/bachelorCap.svg';
 import categorySvg from '@/public/assets/icons/category.svg';
@@ -30,6 +29,14 @@ const StyledItem = styled.div`
   & + & {
     border-top: 1px solid #f3f3f3;
   }
+
+  &:first-of-type {
+    padding-top: 0;
+  }
+
+  &:last-of-type {
+    padding-bottom: 0;
+  }
 `;
 
 const labels = [
@@ -40,12 +47,7 @@ const labels = [
     format: (v) => (Array.isArray(v) ? v.join('、') : v),
   },
   { key: 'area', icon: locationSvg.src, text: '地點' },
-  {
-    key: 'time',
-    icon: clockSvg.src,
-    text: '時間',
-    format: (v) => dayjs(v).format('YYYY/MM/DD'),
-  },
+  { key: 'time', icon: clockSvg.src, text: '時間' },
   { key: 'partnerStyle', icon: personSvg.src, text: '想找的夥伴' },
   {
     key: 'partnerEducationStep',
@@ -54,24 +56,18 @@ const labels = [
   },
 ];
 
-function TeamInfoCard({ data }) {
-  return (
-    <div style={{ margin: '-7px 0' }}>
-      {labels.map(
-        ({ key, icon, text, format }) =>
-          data[key] && (
-            <StyledItem key={key}>
-              <h3>
-                <img src={icon} alt={`${text} icon`} />
-                {text}
-              </h3>
-              <p>
-                {typeof format === 'function' ? format(data[key]) : data[key]}
-              </p>
-            </StyledItem>
-          ),
-      )}
-    </div>
+function TeamInfoCard({ data = {} }) {
+  return labels.map(
+    ({ key, icon, text, format }) =>
+      data[key] && (
+        <StyledItem key={key}>
+          <h3>
+            <img src={icon} alt={`${text} icon`} />
+            {text}
+          </h3>
+          <p>{typeof format === 'function' ? format(data[key]) : data[key]}</p>
+        </StyledItem>
+      ),
   );
 }
 
