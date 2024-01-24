@@ -90,7 +90,7 @@ const useEditProfile = () => {
       wantToDoList,
       educationStage,
       location,
-      tagList: [tagList], // TODO: 要修改
+      tagList, // TODO: 要修改
       selfIntroduction,
       share,
       isOpenLocation,

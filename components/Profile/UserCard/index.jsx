@@ -230,11 +230,13 @@ function UserCard({
         </Box>
       </StyledProfileBaseInfo>
 
-      <StyledProfileTag>
-        {!!tagList.length &&
-          !!tagList[0] &&
-          tagList[0].split('、').map((tag) => <Tag key={tag} label={tag} />)}
-      </StyledProfileTag>
+      {Array.isArray(tagList) && (
+        <StyledProfileTag>
+          {tagList.map((tag) => (
+            <Tag key={tag} label={tag} />
+          ))}
+        </StyledProfileTag>
+      )}
 
       <StyledProfileOther>
         <StyledProfileSocial style={{ listStyle: 'none', display: 'flex' }}>

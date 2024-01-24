@@ -4,10 +4,11 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import Edit from '../../components/Profile/Edit';
-import Footer from '../../shared/components/Footer_v2';
-import Navigation from '../../shared/components/Navigation_v2';
-import AccountSetting from '../../components/Profile/Accountsetting';
+import Edit from '@/components/Profile/Edit';
+import Footer from '@/shared/components/Footer_v2';
+import Navigation from '@/shared/components/Navigation_v2';
+import AccountSetting from '@/components/Profile/Accountsetting';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -16,6 +17,7 @@ const HomePageWrapper = styled.div`
 `;
 
 function TabPanel(props) {
+  const mobileScreen = useMediaQuery('(max-width: 767px)');
   const { children, value, index, ...other } = props;
 
   return (
@@ -27,19 +29,13 @@ function TabPanel(props) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: mobileScreen ? 0 : 3 }}>
           <Typography>{children}</Typography>
         </Box>
       )}
     </div>
   );
 }
-
-// TabPanel.propTypes = {
-//   children: PropTypes.node,
-//   index: PropTypes.number.isRequired,
-//   value: PropTypes.number.isRequired,
-// };
 
 function a11yProps(index) {
   return {
@@ -49,6 +45,8 @@ function a11yProps(index) {
 }
 
 const ProfilePage = () => {
+  const mobileScreen = useMediaQuery('(max-width: 767px)');
+
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -80,11 +78,14 @@ const ProfilePage = () => {
             padding: '8px',
             '@media (max-width: 767px)': {
               width: '100%',
+              height: 'auto',
+              padding: 0,
+              mb: '16px',
             },
           }}
         >
           <Tabs
-            orientation="vertical"
+            orientation={mobileScreen ? 'horizontal' : 'vertical'}
             variant="scrollable"
             value={value}
             onChange={handleChange}
@@ -93,6 +94,7 @@ const ProfilePage = () => {
           >
             <Tab
               sx={{
+                width: mobileScreen ? '50%' : '100%',
                 color: '#536166',
                 borderRadius: '8px',
                 '&.Mui-selected': {
@@ -106,6 +108,7 @@ const ProfilePage = () => {
             />
             <Tab
               sx={{
+                width: mobileScreen ? '50%' : '100%',
                 color: '#536166',
                 borderRadius: '8px',
                 '&.Mui-selected': {
@@ -120,7 +123,7 @@ const ProfilePage = () => {
           </Tabs>
         </Box>
         <Box>
-          <TabPanel value={value} index={0}>
+          <TabPanel value={value} index={0} class="dfgh">
             <Edit />
           </TabPanel>
           <TabPanel value={value} index={1}>
@@ -134,15 +137,3 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
-
-// const ProfilePage = () => {
-//   return (
-//     <HomePageWrapper>
-//       <Navigation />
-//       <Profile />
-//       <Footer />
-//     </HomePageWrapper>
-//   );
-// };
-
-// export default ProfilePage;
