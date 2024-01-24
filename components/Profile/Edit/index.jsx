@@ -1,8 +1,9 @@
 import React, { useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
-import COUNTIES from '@/constants/countries.json';
+import { AREAS } from '@/constants/areas';
 import {
   GENDER,
   ROLE,
@@ -26,6 +27,7 @@ import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import SEOConfig from '@/shared/components/SEO';
+import InputTags from '../InputTags';
 
 import useEditProfile from './useEditProfile';
 import {
@@ -44,6 +46,8 @@ import {
 } from './Edit.styled';
 
 function EditPage() {
+  const mobileScreen = useMediaQuery('(max-width: 767px)');
+
   const router = useRouter();
 
   const { userState, onChangeHandler, onSubmit } = useEditProfile();
@@ -133,7 +137,7 @@ function EditPage() {
 
             <Box sx={{ marginTop: '24px', width: '100%' }}>
               <StyledGroup>
-                <Typography>名稱 *</Typography>
+                <Typography fontWeight="500">名稱 *</Typography>
                 <TextField
                   sx={{ width: '100%' }}
                   value={userState.name}
@@ -143,7 +147,7 @@ function EditPage() {
                 />
               </StyledGroup>
               <StyledGroup>
-                <Typography>生日 *</Typography>
+                <Typography fontWeight="500">生日 *</Typography>
                 <MobileDatePicker
                   label="birthDay"
                   inputFormat="YYYY/MM/DD"
@@ -157,7 +161,7 @@ function EditPage() {
                 />
               </StyledGroup>
               <StyledGroup>
-                <Typography>性別 *</Typography>
+                <Typography fontWeight="500">性別 *</Typography>
                 <StyledSelectWrapper>
                   {GENDER.map(({ label, value }) => (
                     <StyledSelectBox
@@ -177,10 +181,11 @@ function EditPage() {
                 </StyledSelectWrapper>
               </StyledGroup>
               <StyledGroup>
-                <Typography>身份 *</Typography>
+                <Typography fontWeight="500">身份 *</Typography>
                 <StyledSelectWrapper>
                   {ROLE.map(({ label, value }) => (
                     <StyledSelectBox
+                      col={mobileScreen ? '2' : '3'}
                       key={label}
                       isselected={userState.roleList.includes(value).toString()}
                       onClick={() =>
@@ -207,7 +212,7 @@ function EditPage() {
 
           <StyledSection>
             <StyledGroup mt="0">
-              <Typography>教育階段</Typography>
+              <Typography fontWeight="500">教育階段</Typography>
               <Select
                 labelId="education-stage"
                 id="education-stage"
@@ -247,8 +252,8 @@ function EditPage() {
                 <MenuItem disabled value="-1">
                   <em>請選擇居住地</em>
                 </MenuItem>
-                {COUNTIES.map(({ name, alpha2 }) => (
-                  <MenuItem key={alpha2} value={alpha2}>
+                {AREAS.map(({ name, label }) => (
+                  <MenuItem key={label} value={label}>
                     {name}
                   </MenuItem>
                 ))}
@@ -259,7 +264,9 @@ function EditPage() {
           {/* 聯絡方式 */}
           <StyledSection>
             <StyledGroup mt="0">
-              <Typography>聯絡方式</Typography>
+              <Typography sx={{ fontWeight: 700, fontSize: '18px' }}>
+                聯絡方式
+              </Typography>
               <Typography
                 sx={{ color: '#92989A', fontWeight: 400, fontSize: '14px' }}
               >
@@ -267,9 +274,9 @@ function EditPage() {
               </Typography>
             </StyledGroup>
             <Grid container columnSpacing={1}>
-              <Grid item xs="6">
+              <Grid item xs="12" sm="6">
                 <StyledGroup>
-                  <Typography>Instagram</Typography>
+                  <Typography sx={{ fontWeight: 500 }}>Instagram</Typography>
                   <TextField
                     value={userState.instagram}
                     onChange={(event) => {
@@ -283,9 +290,9 @@ function EditPage() {
                   />
                 </StyledGroup>
               </Grid>
-              <Grid item xs="6">
+              <Grid item xs="12" sm="6">
                 <StyledGroup>
-                  <Typography>Discord</Typography>
+                  <Typography sx={{ fontWeight: 500 }}>Discord</Typography>
                   <TextField
                     value={userState.discord}
                     onChange={(event) => {
@@ -299,9 +306,9 @@ function EditPage() {
                   />
                 </StyledGroup>
               </Grid>
-              <Grid item xs="6">
+              <Grid item xs="12" sm="6">
                 <StyledGroup>
-                  <Typography>Line</Typography>
+                  <Typography sx={{ fontWeight: 500 }}>Line</Typography>
                   <TextField
                     value={userState.line}
                     onChange={(event) => {
@@ -315,9 +322,9 @@ function EditPage() {
                   />
                 </StyledGroup>
               </Grid>
-              <Grid item xs="6">
+              <Grid item xs="12" sm="6">
                 <StyledGroup>
-                  <Typography>Facebook</Typography>
+                  <Typography sx={{ fontWeight: 500 }}>Facebook</Typography>
                   <TextField
                     value={userState.facebook}
                     onChange={(event) => {
@@ -336,11 +343,12 @@ function EditPage() {
 
           <StyledSection>
             <StyledGroup mt="0">
-              <Typography>想和夥伴一起</Typography>
+              <Typography sx={{ fontWeight: 500 }}>想和夥伴一起</Typography>
               <StyledSelectWrapper>
                 {WANT_TO_DO_WITH_PARTNER.map(({ label, value }) => (
                   <StyledSelectBox
                     key={label}
+                    col={mobileScreen ? '2' : '3'}
                     isselected={userState.wantToDoList
                       .includes(value)
                       .toString()}
@@ -364,7 +372,9 @@ function EditPage() {
               </StyledSelectWrapper>
             </StyledGroup>
             <StyledGroup>
-              <Typography>可以和夥伴分享的事物</Typography>
+              <Typography sx={{ fontWeight: 500 }}>
+                可以和夥伴分享的事物
+              </Typography>
               <TextField
                 sx={{ width: '100%' }}
                 placeholder="你擅長什麼？可以分享什麼呢？"
@@ -375,28 +385,29 @@ function EditPage() {
               />
             </StyledGroup>
             <StyledGroup>
-              {/* TODO: NEED TO FIXED */}
-              <Typography>標籤</Typography>
-              <TextField
-                sx={{ width: '100%' }}
-                placeholder="搜尋或新增標籤"
-                value={userState.tagList[0]}
-                onChange={(event) => {
-                  onChangeHandler({
-                    key: 'tagList',
-                    value: event.target.value,
-                  });
+              <Typography sx={{ fontWeight: 500 }}>標籤</Typography>
+              <InputTags
+                value={userState.tagList}
+                change={(value) => {
+                  onChangeHandler({ key: 'tagList', value, isMultiple: true });
                 }}
               />
               <Typography
-                sx={{ color: '#92989A', fontWeight: 400, fontSize: '14px' }}
+                sx={{
+                  color: '#92989A',
+                  fontWeight: 400,
+                  fontSize: '14px',
+                  mt: '2px',
+                }}
               >
                 可以是學習領域、興趣等等的標籤，例如：音樂創作、程式語言、電繪、社會議題。
               </Typography>
             </StyledGroup>
 
             <StyledGroup>
-              <Typography>個人簡介</Typography>
+              <Typography sx={{ fontWeight: 500, mb: '6px' }}>
+                個人簡介
+              </Typography>
               <TextareaAutosize
                 style={{
                   width: '100%',
@@ -430,7 +441,7 @@ function EditPage() {
                 }}
               />
             </StyledToggleWrapper>
-            <StyledToggleWrapper>
+            <StyledToggleWrapper sx={{ mt: '16px' }}>
               <StyledToggleText>公開個人頁面尋找夥伴</StyledToggleText>
               <Switch
                 checked={userState.isOpenProfile}
@@ -446,7 +457,7 @@ function EditPage() {
 
           <StyledButtonGroup>
             <StyledButton
-              variant="contained"
+              variant="outlined"
               onClick={() => {
                 router.push('/profile/myprofile');
               }}
@@ -454,7 +465,7 @@ function EditPage() {
               查看我的頁面
             </StyledButton>
             <StyledButton
-              variant="outlined"
+              variant="contained"
               onClick={() => {
                 onUpdateUser(() => router.push('/profile'));
               }}

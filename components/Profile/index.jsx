@@ -110,7 +110,7 @@ const Profile = ({
           isLoading={isLoading}
           educationStepLabel={edu}
           role={role}
-          tagList={tagList}
+          tagList={tagList.filter((t) => typeof t === 'string' && t !== '')}
           photoURL={photoURL}
           userName={name}
           location={location}

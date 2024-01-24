@@ -55,6 +55,9 @@ export const StyledSection = styled(Box)`
   margin-top: 16px;
   width: 100%;
   border-radius: 16px;
+  @media (max-width: 767px) {
+    padding: 32px 16px;
+  }
 `;
 
 export const StyledGroup = styled.div`
@@ -75,9 +78,6 @@ export const StyledSelectWrapper = styled.div`
   align-items: center;
   width: 100%;
   margin-top: 10px;
-  @media (maxwidth: 767px) {
-    flex-direction: column;
-  }
 `;
 
 export const StyledSelectText = styled(Typography)`
@@ -100,11 +100,6 @@ export const StyledSelectBox = styled(Box)`
   border: ${({ isselected }) =>
     isselected === 'true' ? '1px solid #16B9B3' : '1px solid #DBDBDB'};
   margin-bottom: 12px;
-
-  @media (maxwidth: 767px) {
-    width: 100%;
-    margin: 10px;
-  }
 `;
 
 export const StyledToggleWrapper = styled(Box)`
@@ -113,7 +108,6 @@ export const StyledToggleWrapper = styled(Box)`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 16px;
   padding: 13px 16px;
 `;
 
