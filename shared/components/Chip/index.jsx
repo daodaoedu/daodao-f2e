@@ -11,7 +11,9 @@ const Chip = ({ value, isActive, onClick, onDelete }) => {
       onClick={onClick}
       onDelete={onDelete}
       deleteIcon={onDelete && <ClearIcon />}
-      className={isActive ? 'isActive' : ''}
+      className={[isActive && 'isActive', onClick && 'isPointer']
+        .filter(Boolean)
+        .join(' ')}
     />
   );
 };
