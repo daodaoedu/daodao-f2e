@@ -45,7 +45,8 @@ const Detail = () => {
       sendEmailToPartner({
         to: partner.email,
         name,
-        roleList: roleList.length > 0 ? roleList : [''],
+        roleList:
+          roleList.length > 0 ? roleList.map((role) => ROLELIST[role]) : [''],
         photoURL,
         text: message,
         information: [loginUserEmail, contact],
