@@ -7,7 +7,7 @@ const PartnerCardTag = ({ tagList = [] }) => {
     tagList.length > 0 && (
       <StyledTagContainer container gap="8px" mb="12px">
         {showItems
-          .filter((t) => typeof t === 'string' && t !== '')
+          .filter((t) => typeof t === 'string' && t.trim() !== '')
           .map((tag) => (
             <StyledTagText item key={tag} fontWeight="400">
               {tag}
