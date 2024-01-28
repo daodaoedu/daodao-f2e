@@ -15,6 +15,7 @@ import {
 } from './GroupCard.styled';
 
 function GroupCard({
+  _id,
   photoURL,
   photoAlt,
   title = '未定義主題',
@@ -26,7 +27,7 @@ function GroupCard({
   updatedDate,
 }) {
   return (
-    <StyledGroupCard>
+    <StyledGroupCard href={`/group/detail?id=${_id}`}>
       <Image alt={photoAlt || '未放封面'} src={photoURL || emptyCoverImg.src} />
       <StyledContainer>
         <StyledTitle>{title}</StyledTitle>
