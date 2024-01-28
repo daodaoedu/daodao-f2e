@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import Link from 'next/link';
 
 export const StyledLabel = styled.span`
   flex-basis: 50px;
@@ -21,6 +22,7 @@ export const StyledTitle = styled.h2`
   font-weight: bold;
   line-height: 1.4;
   display: -webkit-box;
+  color: #293a3d;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   overflow: hidden;
@@ -87,7 +89,8 @@ export const StyledAreas = styled.div`
   align-items: center;
 `;
 
-export const StyledGroupCard = styled.div`
+export const StyledGroupCard = styled(Link)`
+  display: block;
   position: relative;
   background: #fff;
   padding: 0.5rem;

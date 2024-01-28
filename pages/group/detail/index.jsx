@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
 import GroupDetail from '@/components/Group/detail';
+import GroupEmpty from '@/components/Group/detail/Empty';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 import useFetch from '@/hooks/useFetch';
@@ -9,8 +10,8 @@ import useFetch from '@/hooks/useFetch';
 function GroupPage() {
   const router = useRouter();
   const { id } = router.query;
-  const { data, isFetching } = useFetch(
-    `https://daodao-server.vercel.app/activity/65ad345f4883b304b2df7c08`,
+  const { data, isFetching, isError } = useFetch(
+    `https://daodao-server.vercel.app/activity/${id}`,
   );
   const source = data?.data?.[0];
 
@@ -31,7 +32,11 @@ function GroupPage() {
     <>
       <SEOConfig data={SEOData} />
       <Navigation />
-      <GroupDetail source={source} isLoading={isFetching} />
+      {(id || isFetching) && !isError ? (
+        <GroupDetail source={source} isLoading={isFetching} />
+      ) : (
+        <GroupEmpty />
+      )}
       <Footer />
     </>
   );

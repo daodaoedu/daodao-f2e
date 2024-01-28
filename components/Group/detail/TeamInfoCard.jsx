@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import Skeleton from '@mui/material/Skeleton';
 import bachelorCapSvg from '@/public/assets/icons/bachelorCap.svg';
 import categorySvg from '@/public/assets/icons/category.svg';
 import clockSvg from '@/public/assets/icons/clock.svg';
@@ -9,10 +10,16 @@ const StyledItem = styled.div`
   padding: 7px 0;
   display: flex;
 
+  @media (max-width: 480px) {
+    padding: 12px 0;
+    flex-direction: column;
+  }
+
   h3 {
     display: flex;
+    padding-bottom: 5px;
     align-items: center;
-    flex: 0 0 140px;
+    min-width: 140px;
     font-size: 14px;
     font-weight: 500;
     color: #293a3d;
@@ -56,7 +63,7 @@ const labels = [
   },
 ];
 
-function TeamInfoCard({ data = {} }) {
+function TeamInfoCard({ data = {}, isLoading }) {
   return labels.map(
     ({ key, icon, text, format }) =>
       data[key] && (
@@ -65,7 +72,15 @@ function TeamInfoCard({ data = {} }) {
             <img src={icon} alt={`${text} icon`} />
             {text}
           </h3>
-          <p>{typeof format === 'function' ? format(data[key]) : data[key]}</p>
+          <p>
+            {isLoading ? (
+              <Skeleton animation="wave" />
+            ) : typeof format === 'function' ? (
+              format(data[key])
+            ) : (
+              data[key]
+            )}
+          </p>
         </StyledItem>
       ),
   );

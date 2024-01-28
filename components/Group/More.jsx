@@ -21,6 +21,7 @@ export default function More() {
             borderRadius: '20px',
             padding: '6px 48px',
           }}
+          disabled={isLoading}
           onClick={() => dispatch(setPageSize(pageSize + 12))}
         >
           顯示更多
