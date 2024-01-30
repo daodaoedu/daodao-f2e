@@ -15,13 +15,16 @@ const initialState = {
   discord: '',
   line: '',
   educationStage: '-1',
-  location: 'tw',
+  location: '台灣',
   tagList: [],
   selfIntroduction: '',
   share: '',
   isOpenLocation: false,
   isOpenProfile: false,
   isLoadingSubmit: false,
+  country: '',
+  city: '',
+  district: '',
 };
 
 const userReducer = (state, payload) => {
@@ -61,7 +64,6 @@ const useEditProfile = () => {
       gender,
       roleList,
       educationStage,
-      location,
       wantToDoList,
       share,
       isOpenLocation,
@@ -72,6 +74,9 @@ const useEditProfile = () => {
       facebook,
       discord,
       line,
+      country,
+      city,
+      district,
     } = userState;
 
     const payload = {
@@ -89,8 +94,8 @@ const useEditProfile = () => {
       },
       wantToDoList,
       educationStage,
-      location,
-      tagList, // TODO: 要修改
+      location: `${country}@${city}@${district}`,
+      tagList,
       selfIntroduction,
       share,
       isOpenLocation,

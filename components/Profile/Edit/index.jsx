@@ -3,7 +3,9 @@ import toast from 'react-hot-toast';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
-import { AREAS } from '@/constants/areas';
+import { AREAS, TAIWAN_DISTRICT } from '@/constants/areas';
+import COUNTIES from '@/constants/countries.json';
+
 import {
   GENDER,
   ROLE,
@@ -56,14 +58,20 @@ function EditPage() {
   useEffect(() => {
     if (user._id) {
       Object.entries(user).forEach(([key, value]) => {
-        if (key !== 'contactList') {
-          onChangeHandler({ key, value });
-        } else {
+        if (key === 'contactList') {
           const { instagram, facebook, discord, line } = value;
           onChangeHandler({ key: 'instagram', value: instagram || '' });
           onChangeHandler({ key: 'facebook', value: facebook || '' });
           onChangeHandler({ key: 'discord', value: discord || '' });
           onChangeHandler({ key: 'line', value: line || '' });
+        } else if (key === 'location') {
+          onChangeHandler({ key, value });
+          const [country, city, district] = value.split('@');
+          onChangeHandler({ key: 'country', value: country || null });
+          onChangeHandler({ key: 'city', value: city || null });
+          onChangeHandler({ key: 'district', value: district || null });
+        } else {
+          onChangeHandler({ key, value });
         }
       });
     } else {
@@ -238,12 +246,12 @@ function EditPage() {
             <StyledGroup>
               <Typography>居住地</Typography>
               <Select
-                labelId="location"
-                id="location"
-                value={userState.location}
+                labelId="country"
+                id="country"
+                value={userState.country}
                 onChange={(event) => {
                   onChangeHandler({
-                    key: 'location',
+                    key: 'country',
                     value: event.target.value,
                   });
                 }}
@@ -252,12 +260,64 @@ function EditPage() {
                 <MenuItem disabled value="-1">
                   <em>請選擇居住地</em>
                 </MenuItem>
-                {AREAS.map(({ name, label }) => (
-                  <MenuItem key={label} value={label}>
+                {COUNTIES.map(({ name, alpha2 }) => (
+                  <MenuItem key={alpha2} value={name}>
                     {name}
                   </MenuItem>
                 ))}
               </Select>
+              {(userState.country === '台灣' || userState.country === 'tw') && (
+                <Grid container columnSpacing={1}>
+                  <Grid item xs="12" sm="6">
+                    <Select
+                      labelId="country"
+                      id="country"
+                      value={userState.city}
+                      onChange={(event) => {
+                        onChangeHandler({
+                          key: 'city',
+                          value: event.target.value,
+                        });
+                      }}
+                      sx={{ width: '100%' }}
+                    >
+                      <MenuItem disabled value="-1">
+                        <em>縣市</em>
+                      </MenuItem>
+                      {TAIWAN_DISTRICT.map(({ name }) => (
+                        <MenuItem key={name} value={name}>
+                          {name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </Grid>
+                  <Grid item xs="12" sm="6">
+                    <Select
+                      labelId="district"
+                      id="district"
+                      value={userState.district}
+                      onChange={(event) => {
+                        onChangeHandler({
+                          key: 'district',
+                          value: event.target.value,
+                        });
+                      }}
+                      sx={{ width: '100%' }}
+                    >
+                      <MenuItem disabled value="-1">
+                        <em>鄉鎮市區</em>
+                      </MenuItem>
+                      {TAIWAN_DISTRICT.find(
+                        ({ name }) => name === userState.city,
+                      )?.districts.map(({ name, zip }) => (
+                        <MenuItem key={zip} value={name}>
+                          {name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </Grid>
+                </Grid>
+              )}
             </StyledGroup>
           </StyledSection>
 

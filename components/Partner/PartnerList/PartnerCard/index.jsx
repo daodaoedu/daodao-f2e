@@ -44,6 +44,7 @@ function PartnerCard({
 
   const role = roleList.length > 0 && ROLELIST[roleList[0]];
   const edu = educationStage && EDUCATION_STEP_TABLE[educationStage];
+  const locations = location && location.split('@');
 
   return (
     <StyledCard>
@@ -66,10 +67,14 @@ function PartnerCard({
         <FlexSBAlignCenter mt="12px">
           <StyledTypoCaption>
             <FlexAlignCenter>
-              {location && (
+              {locations && (
                 <>
                   <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />
-                  {location}
+                  {location
+                    ? location.length >= 2
+                      ? locations.join('').replace('台灣', '')
+                      : locations.join('')
+                    : '-'}
                 </>
               )}
             </FlexAlignCenter>
