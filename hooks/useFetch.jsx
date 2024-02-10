@@ -1,17 +1,26 @@
 import { useEffect, useState } from 'react';
 
-const useFetch = (url, initialValue) => {
-  const [result, setResult] = useState(initialValue);
-  const [loading, setLoading] = useState(true);
+const useFetch = (url, { initialValue } = {}) => {
+  const [data, setData] = useState(initialValue);
+  const [isFetching, setIsFetching] = useState(true);
+  const [isError, setIsError] = useState(false);
+
   useEffect(() => {
+    let pass = true;
+
+    setIsFetching(true);
+    setIsError(false);
+
     fetch(url)
       .then((res) => res.json())
-      .then((json) => {
-        setResult(json);
-        setLoading(false);
-      });
-  }, []);
-  return { result, loading };
+      .then((json) => pass && setData(json))
+      .catch(() => setIsError(true))
+      .finally(() => setIsFetching(false));
+
+    return () => pass = false;
+  }, [url]);
+
+  return { data, isFetching, isError };
 };
 
 export default useFetch;

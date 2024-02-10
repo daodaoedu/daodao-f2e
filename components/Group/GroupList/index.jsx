@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from '@emotion/styled';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { Box } from '@mui/material';
 import { AREAS } from '@/constants/areas';
 import { CATEGORIES } from '@/constants/category';
@@ -13,43 +14,20 @@ export const StyledGroupItem = styled.li`
   position: relative;
   margin-top: 1rem;
   flex-basis: 33.33%;
-  border-bottom: 1px solid #dbdbdb;
-
-  &:nth-of-type(1) {
-    margin-top: 0;
-  }
-
-  &:nth-last-of-type(1) {
-    border-bottom: none;
-  }
 
   @media (max-width: 767px) {
-    flex-basis: calc(50% - 12px);
-  }
-
-  @media (min-width: 767px) {
-    &:nth-of-type(3) {
-      margin-top: 0;
-    }
-
-    &:nth-last-of-type(3) {
-      border-bottom: none;
-    }
+    flex-basis: 50%;
   }
 
   @media (max-width: 560px) {
-    flex-basis: calc(100% - 24px);
+    flex-basis: 100%;
   }
+`;
 
-  @media (min-width: 560px) {
-    &:nth-of-type(2) {
-      margin-top: 0;
-    }
-
-    &:nth-last-of-type(2) {
-      border-bottom: none;
-    }
-  }
+const StyledDivider = styled.li`
+  flex-basis: 100%;
+  background: #dbdbdb;
+  height: 1px;
 `;
 
 const StyledGroupList = styled.ul`
@@ -62,11 +40,15 @@ function GroupList() {
   const [getSearchParams] = useSearchParamsManager();
   const { items, isLoading } = useSelector((state) => state.group);
 
+  const isMobileScreen = useMediaQuery('(max-width: 560px)');
+  const isPadScreen = useMediaQuery('(max-width: 767px)') && !isMobileScreen;
+  const isDeskTopScreen = !isPadScreen;
+
   useEffect(() => {
     const filterOptions = {
       area: AREAS,
       category: CATEGORIES,
-      edu: EDUCATION_STEP,
+      partnerEducationStep: EDUCATION_STEP,
       grouping: true,
       q: true,
     };
@@ -92,11 +74,22 @@ function GroupList() {
     <>
       <StyledGroupList>
         {items?.length || isLoading ? (
-          items.map((data) => (
-            <StyledGroupItem key={data._id}>
-              <GroupCard {...data} />
-            </StyledGroupItem>
-          ))
+          items.map((data, index) => {
+            const isLast = index === items.length - 1;
+            const shouldRenderDivider =
+              (isMobileScreen && !isLast) ||
+              (isPadScreen && !isLast && index % 2 === 1) ||
+              (isDeskTopScreen && !isLast && index % 3 === 2);
+
+            return (
+              <Fragment key={data._id}>
+                <StyledGroupItem>
+                  <GroupCard {...data} />
+                </StyledGroupItem>
+                {shouldRenderDivider && <StyledDivider />}
+              </Fragment>
+            );
+          })
         ) : (
           <li style={{ textAlign: 'center', width: '100%' }}>
             哎呀！這裡好像沒有符合你條件的揪團，別失望！讓我們試試其他選項。

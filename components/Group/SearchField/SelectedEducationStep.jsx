@@ -3,7 +3,7 @@ import { EDUCATION_STEP } from '@/constants/member';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
 export default function SelectedEducationStep() {
-  const QUERY_KEY = 'edu';
+  const QUERY_KEY = 'partnerEducationStep';
   const [getSearchParams, pushState] = useSearchParamsManager();
 
   const handleChange = ({ target: { value } }) => {

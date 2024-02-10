@@ -11,9 +11,11 @@ import {
   StyledLabel,
   StyledText,
   StyledTitle,
+  StyledStatus,
 } from './GroupCard.styled';
 
 function GroupCard({
+  _id,
   photoURL,
   photoAlt,
   title = '未定義主題',
@@ -25,7 +27,7 @@ function GroupCard({
   updatedDate,
 }) {
   return (
-    <StyledGroupCard>
+    <StyledGroupCard href={`/group/detail?id=${_id}`}>
       <Image alt={photoAlt || '未放封面'} src={photoURL || emptyCoverImg.src} />
       <StyledContainer>
         <StyledTitle>{title}</StyledTitle>
@@ -49,9 +51,9 @@ function GroupCard({
         <StyledFooter>
           <time>{timeDuration(updatedDate)}</time>
           {isGrouping ? (
-            <div>揪團中</div>
+            <StyledStatus>揪團中</StyledStatus>
           ) : (
-            <div className="finished">已結束</div>
+            <StyledStatus className="finished">已結束</StyledStatus>
           )}
         </StyledFooter>
       </StyledContainer>

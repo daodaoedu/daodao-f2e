@@ -3,14 +3,11 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import { useState } from 'react';
 
-const Loading = () => (
+const Loading = ({ height }) => (
   <Skeleton
-    sx={{
-      height: '50px',
-      width: '50px',
-      background: 'rgba(240, 240, 240, .8)',
-      marginTop: '4px',
-    }}
+    variant="rectangular"
+    height={height}
+    sx={{ marginTop: '4px' }}
     animation="wave"
   />
 );
@@ -37,7 +34,7 @@ const Image = ({
         borderRadius,
         background,
       }}
-      placeholder={<Loading />}
+      placeholder={<Loading height={height} />}
       onError={() => setIsError(true)}
     />
   );
