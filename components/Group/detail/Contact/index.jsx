@@ -16,8 +16,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { ROLE } from '@/constants/member';
 import chatSvg from '@/public/assets/icons/chat.svg';
-import ContactDoneModal from './ContactDone';
-import ContactErrorModal from './ContactError';
+import Feedback from './Feedback';
 
 const StyledTitle = styled.label`
   display: block;
@@ -38,7 +37,7 @@ const StyledTextArea = styled(TextareaAutosize)`
   min-height: 128px;
 `;
 
-const Transition = forwardRef(function InternalTransition(props, ref) {
+const Transition = forwardRef((props, ref) => {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
@@ -57,6 +56,7 @@ function ContactButton({
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [contact, setContact] = useState('');
+  const [feedback, setFeedback] = useState('');
   const isMobileScreen = useMediaQuery('(max-width: 560px)');
   const titleId = `modal-title-${id}`;
   const descriptionId = `modal-description-${id}`;
@@ -75,6 +75,7 @@ function ContactButton({
   const handleSubmit = () => {
     if (onSubmit) onSubmit({ message, contact });
     handleClose();
+    setFeedback('success');
   };
 
   return (
@@ -243,7 +244,7 @@ function ContactButton({
                 boxShadow: '0 4px 10px #C4C2C166',
               }}
               variant="contained"
-              disabled={isLoading}
+              disabled={isLoading || !message || !contact}
               onClick={handleSubmit}
             >
               送出
@@ -251,8 +252,7 @@ function ContactButton({
           </Box>
         </Box>
       </Dialog>
-      {/* <ContactDoneModal /> */}
-      {/* <ContactErrorModal /> */}
+      <Feedback type={feedback} onClose={() => setFeedback('')} />
     </>
   );
 }

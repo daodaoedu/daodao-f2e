@@ -48,7 +48,7 @@ function GroupList() {
     const filterOptions = {
       area: AREAS,
       category: CATEGORIES,
-      edu: EDUCATION_STEP,
+      partnerEducationStep: EDUCATION_STEP,
       grouping: true,
       q: true,
     };
