@@ -1,4 +1,5 @@
-import { useId, useState, forwardRef } from 'react';
+import { useId, useState, forwardRef, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 import {
@@ -52,6 +53,7 @@ function ContactButton({
 }) {
   // 判斷是否登入
   const id = useId();
+  const router = useRouter();
   const user = useSelector((state) => state.user);
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
@@ -75,8 +77,12 @@ function ContactButton({
   const handleSubmit = () => {
     if (onSubmit) onSubmit({ message, contact });
     handleClose();
-    setFeedback('success');
+    setFeedback('error');
   };
+
+  useEffect(() => {
+    if (!user?._id && open) router.push('/login');
+  }, [user, open, router]);
 
   return (
     <>
