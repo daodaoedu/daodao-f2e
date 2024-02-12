@@ -31,7 +31,8 @@ function Feedback({ type, onClose }) {
     error: {
       imgSrc: contractErrorImg.src,
       imgAlt: 'error cover',
-      title: '哎呀！有不明錯誤',
+      // title: '哎呀！有不明錯誤',
+      title: '目前功能還在測試階段，敬請期待！',
       buttonText: '再試一次',
     },
   };

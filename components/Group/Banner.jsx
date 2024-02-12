@@ -45,11 +45,6 @@ const StyledBanner = styled.div`
 const Banner = () => {
   const router = useRouter();
 
-  const handleClick = () => {
-    // TODO: 判斷是否登入決定按鈕導向哪個頁面
-    router.push('/login');
-  };
-
   return (
     <StyledBanner>
       <picture>
@@ -65,7 +60,7 @@ const Banner = () => {
         <h1>揪團</h1>
         <p>想一起組織有趣的活動或學習小組嗎？</p>
         <p>註冊並加入我們，然後創建你的活動，讓更多人一起參加！</p>
-        <Button onClick={handleClick}>我想揪團</Button>
+        <Button onClick={() => router.push('/group/create')}>我想揪團</Button>
       </div>
     </StyledBanner>
   );
