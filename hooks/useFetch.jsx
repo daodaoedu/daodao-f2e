@@ -8,6 +8,8 @@ const useFetch = (url, { initialValue } = {}) => {
   useEffect(() => {
     let pass = true;
 
+    if (url.includes('undefined')) return;
+
     setIsFetching(true);
     setIsError(false);
 
