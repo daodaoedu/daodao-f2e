@@ -136,7 +136,7 @@ export const EDUCATION_STAGE = [
     value: 'university',
   },
   {
-    label: '其他',
+    label: '大學以上',
     value: 'other',
   },
 ];
