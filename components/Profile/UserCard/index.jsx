@@ -29,7 +29,7 @@ const BottonEdit = {
 };
 
 const StyledProfileWrapper = styled(Box)`
-  width: 720px;
+  width: 100%;
   padding: 30px;
   background-color: #fff;
   border-radius: 20px;
