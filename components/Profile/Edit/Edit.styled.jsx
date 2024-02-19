@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Box, Typography, Button } from '@mui/material';
 
-export const HomePageWrapper = styled.div`
+export const FormWrapper = styled.form`
   --section-height: calc(100vh - 80px);
   --section-height-offset: 80px;
 `;
@@ -39,7 +39,7 @@ export const StyledTitleWrap = styled(Box)`
     text-align: center;
     color: #536166;
   }
-  p {
+  .title-memo {
     font-weight: 700;
     font-size: 14px;
     line-height: 140%;

@@ -20,9 +20,13 @@ const HomePageWrapper = styled.div`
 const ROLELIST = mapToTable(ROLE);
 
 const Detail = () => {
+  const router = useRouter();
+  const { id: partnerId } = router.query;
+
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
 
+  // get partner info
   const { partner } = useSelector((state) => state?.partners);
   const partnerRole = useMemo(() => {
     return partner?.roleList && partner.roleList.length > 0
@@ -30,6 +34,7 @@ const Detail = () => {
       : '';
   }, [partner]);
 
+  // fetch login user info
   const {
     name,
     roleList,
@@ -37,9 +42,17 @@ const Detail = () => {
     email: loginUserEmail,
   } = useSelector((state) => state?.user);
 
-  const router = useRouter();
-  const { id } = router.query;
+  const fetchUser = async () => {
+    dispatch(fetchPartnerById({ id: partnerId }));
+  };
 
+  useEffect(() => {
+    if (partnerId !== undefined) {
+      fetchUser();
+    }
+  }, [partnerId]);
+
+  // modal handle
   const handleOnOk = ({ message, contact }) => {
     dispatch(
       sendEmailToPartner({
@@ -56,15 +69,6 @@ const Detail = () => {
     toast.success('寄送成功');
   };
 
-  const fetchUser = async () => {
-    dispatch(fetchPartnerById({ id }));
-  };
-  useEffect(() => {
-    if (id) {
-      fetchUser();
-    }
-  }, [id]);
-
   return (
     <HomePageWrapper>
       <Navigation />
@@ -80,12 +84,15 @@ const Detail = () => {
           onOk={handleOnOk}
         />
       )}
+
       <Profile
         {...partner}
+        isLoading={!partner}
         sendEmail={loginUserEmail}
         enableContactBtn={!!loginUserEmail}
         handleContactPartner={() => setOpen(true)}
       />
+
       <Footer />
     </HomePageWrapper>
   );

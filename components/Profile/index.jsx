@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { Box, Button } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import {
   WANT_TO_DO_WITH_PARTNER,
@@ -46,9 +47,9 @@ const Profile = ({
   handleContactPartner,
   contactList = {},
   updatedDate,
+  isLoading,
 }) => {
   const router = useRouter();
-  const [isLoading] = useState(false);
   const role = roleList.length > 0 && ROLELIST[roleList[0]];
   const edu = educationStage && EDUCATION_STEP_TABLE[educationStage];
   const wantTodo = wantToDoList
@@ -87,6 +88,7 @@ const Profile = ({
       <SEOConfig data={SEOData} />
       <Box
         sx={{
+          width: '720px',
           position: 'relative',
           mb: '10px',
           '@media (max-width: 767px)': {
@@ -104,27 +106,44 @@ const Profile = ({
           <ChevronLeftIcon />
           返回
         </Button>
-
-        <UserCard
-          isLoginUser={email === sendEmail}
-          isLoading={isLoading}
-          educationStepLabel={edu}
-          role={role}
-          tagList={tagList.filter((t) => typeof t === 'string' && t !== '')}
-          photoURL={photoURL}
-          userName={name}
-          location={location}
-          updatedDate={updatedDate}
-          contactList={contactList}
-        />
+        {isLoading ? (
+          <Skeleton
+            variant="rounded"
+            width="720px"
+            height={250}
+            animation="wave"
+          />
+        ) : (
+          <UserCard
+            isLoginUser={email === sendEmail}
+            isLoading={isLoading}
+            educationStepLabel={edu}
+            role={role}
+            tagList={tagList.filter((t) => typeof t === 'string' && t !== '')}
+            photoURL={photoURL}
+            userName={name}
+            location={location}
+            updatedDate={updatedDate}
+            contactList={contactList}
+          />
+        )}
       </Box>
 
-      <UserTabs
-        isLoading={isLoading}
-        description={selfIntroduction}
-        wantToDoList={wantTodo}
-        share={share}
-      />
+      {isLoading ? (
+        <Skeleton
+          variant="rounded"
+          width="720px"
+          height={150}
+          animation="wave"
+        />
+      ) : (
+        <UserTabs
+          isLoading={isLoading}
+          description={selfIntroduction}
+          wantToDoList={wantTodo}
+          share={share}
+        />
+      )}
       {email !== sendEmail && (
         <Button
           sx={{

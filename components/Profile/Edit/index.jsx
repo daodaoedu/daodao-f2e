@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
-import { AREAS, TAIWAN_DISTRICT } from '@/constants/areas';
+import { TAIWAN_DISTRICT } from '@/constants/areas';
 import COUNTIES from '@/constants/countries.json';
 
 import {
@@ -16,7 +16,6 @@ import {
 import {
   Box,
   Typography,
-  Skeleton,
   TextField,
   Switch,
   TextareaAutosize,
@@ -24,16 +23,19 @@ import {
   Select,
   Grid,
 } from '@mui/material';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import SEOConfig from '@/shared/components/SEO';
 import InputTags from '../InputTags';
 
+import TheAvator from './TheAvator';
+import FormInput from './EditFormInput';
+
 import useEditProfile from './useEditProfile';
 import {
-  HomePageWrapper,
+  FormWrapper,
   ContentWrapper,
   StyledGroup,
   StyledSelectWrapper,
@@ -49,10 +51,15 @@ import {
 
 function EditPage() {
   const mobileScreen = useMediaQuery('(max-width: 767px)');
-
   const router = useRouter();
 
-  const { userState, onChangeHandler, onSubmit } = useEditProfile();
+  const {
+    userState,
+    errors,
+    onChangeHandler,
+    onSubmit: onEditSumit,
+  } = useEditProfile();
+
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -79,10 +86,18 @@ function EditPage() {
     }
   }, [user]);
 
-  const onUpdateUser = async (successCallback) => {
-    await onSubmit({ id: user._id, email: user.email });
-    toast.success('更新成功');
-    successCallback();
+  const onUpdateUser = () => {
+    if (Object.values(errors).length) {
+      toast.error('請修正錯誤');
+      return;
+    }
+    const resultStatus = onEditSumit({ id: user._id, email: user.email });
+    if (resultStatus) {
+      toast.success('更新成功');
+      router.push('/profile');
+    } else {
+      toast.error('更新失敗');
+    }
   };
 
   const SEOData = useMemo(
@@ -100,7 +115,7 @@ function EditPage() {
   );
 
   return (
-    <HomePageWrapper>
+    <FormWrapper>
       <SEOConfig data={SEOData} />
       <LocalizationProvider
         dateAdapter={AdapterDayjs}
@@ -111,53 +126,23 @@ function EditPage() {
         <ContentWrapper sx={{ minHeight: '100vh' }}>
           <StyledTitleWrap>
             <h2>編輯個人頁面</h2>
-            <p>填寫完整資訊可以幫助其他夥伴更了解你哦！</p>
-            <LazyLoadImage
-              alt="login"
-              src={userState.photoURL || ''}
-              // "https://imgur.com/EADd1UD.png"
-              height={128}
-              width={128}
-              effect="opacity"
-              style={{
-                marginTop: '24px',
-                borderRadius: '100%',
-                background: 'rgba(240, 240, 240, .8)',
-                objectFit: 'cover',
-                objectPosition: 'center',
-                minWidth: '128px',
-                minHeight: '128px',
-              }}
-              placeholder={
-                // eslint-disable-next-line react/jsx-wrap-multilines
-                <Skeleton
-                  sx={{
-                    height: '128px',
-                    width: '128px',
-                    background: 'rgba(240, 240, 240, .8)',
-                    marginTop: '4px',
-                  }}
-                  variant="circular"
-                  animation="wave"
-                />
-              }
-            />
+            <p className="title-memo">
+              填寫完整資訊可以幫助其他夥伴更了解你哦！
+            </p>
+            <TheAvator url={userState.photoURL} />
 
             <Box sx={{ marginTop: '24px', width: '100%' }}>
-              <StyledGroup>
-                <Typography fontWeight="500">名稱 *</Typography>
-                <TextField
-                  sx={{ width: '100%' }}
-                  value={userState.name}
-                  onChange={(event) =>
-                    onChangeHandler({ key: 'name', value: event.target.value })
-                  }
-                />
-              </StyledGroup>
+              <FormInput
+                isRequire
+                title="名稱"
+                parmKey="name"
+                value={userState.name || ''}
+                onChange={onChangeHandler}
+                errorMsg={errors.name ? errors.name : ''}
+              />
               <StyledGroup>
                 <Typography fontWeight="500">生日 *</Typography>
                 <MobileDatePicker
-                  label="birthDay"
                   inputFormat="YYYY/MM/DD"
                   value={userState.birthDay}
                   onChange={(date) =>
@@ -321,7 +306,6 @@ function EditPage() {
             </StyledGroup>
           </StyledSection>
 
-          {/* 聯絡方式 */}
           <StyledSection>
             <StyledGroup mt="0">
               <Typography sx={{ fontWeight: 700, fontSize: '18px' }}>
@@ -334,70 +318,23 @@ function EditPage() {
               </Typography>
             </StyledGroup>
             <Grid container columnSpacing={1}>
-              <Grid item xs="12" sm="6">
-                <StyledGroup>
-                  <Typography sx={{ fontWeight: 500 }}>Instagram</Typography>
-                  <TextField
-                    value={userState.instagram}
-                    onChange={(event) => {
-                      onChangeHandler({
-                        key: 'instagram',
-                        value: event.target.value,
-                      });
-                    }}
+              {Object.entries({
+                instagram: 'Instagram',
+                discord: 'Discord',
+                line: 'Line',
+                facebook: 'Facebook',
+              }).map(([key, title]) => (
+                <Grid item xs="12" sm="6">
+                  <FormInput
+                    title={title}
+                    parmKey={key}
+                    value={userState[key] || ''}
+                    onChange={onChangeHandler}
                     placeholder="請填寫ID"
-                    sx={{ width: '100%' }}
+                    errorMsg={errors[key] ? errors[key] : ''}
                   />
-                </StyledGroup>
-              </Grid>
-              <Grid item xs="12" sm="6">
-                <StyledGroup>
-                  <Typography sx={{ fontWeight: 500 }}>Discord</Typography>
-                  <TextField
-                    value={userState.discord}
-                    onChange={(event) => {
-                      onChangeHandler({
-                        key: 'discord',
-                        value: event.target.value,
-                      });
-                    }}
-                    placeholder="請填寫ID"
-                    sx={{ width: '100%' }}
-                  />
-                </StyledGroup>
-              </Grid>
-              <Grid item xs="12" sm="6">
-                <StyledGroup>
-                  <Typography sx={{ fontWeight: 500 }}>Line</Typography>
-                  <TextField
-                    value={userState.line}
-                    onChange={(event) => {
-                      onChangeHandler({
-                        key: 'line',
-                        value: event.target.value,
-                      });
-                    }}
-                    placeholder="請填寫ID"
-                    sx={{ width: '100%' }}
-                  />
-                </StyledGroup>
-              </Grid>
-              <Grid item xs="12" sm="6">
-                <StyledGroup>
-                  <Typography sx={{ fontWeight: 500 }}>Facebook</Typography>
-                  <TextField
-                    value={userState.facebook}
-                    onChange={(event) => {
-                      onChangeHandler({
-                        key: 'facebook',
-                        value: event.target.value,
-                      });
-                    }}
-                    placeholder="請填寫ID"
-                    sx={{ width: '100%' }}
-                  />
-                </StyledGroup>
-              </Grid>
+                </Grid>
+              ))}
             </Grid>
           </StyledSection>
 
@@ -524,18 +461,13 @@ function EditPage() {
             >
               查看我的頁面
             </StyledButton>
-            <StyledButton
-              variant="contained"
-              onClick={() => {
-                onUpdateUser(() => router.push('/profile'));
-              }}
-            >
+            <StyledButton variant="contained" onClick={onUpdateUser}>
               儲存資料
             </StyledButton>
           </StyledButtonGroup>
         </ContentWrapper>
       </LocalizationProvider>
-    </HomePageWrapper>
+    </FormWrapper>
   );
 }
 
