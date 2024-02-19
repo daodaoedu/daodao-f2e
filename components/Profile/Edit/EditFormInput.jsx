@@ -2,11 +2,11 @@ import { Typography, TextField } from '@mui/material';
 import { StyledGroup } from './Edit.styled';
 
 function EditFormInput({
-  title,
-  parmKey,
+  title = '',
+  parmKey = '',
   value = '',
-  onChange,
-  errorMsg,
+  onChange = () => ({}),
+  errorMsg = '',
   isRequire = false,
   placeholder = '',
 }) {

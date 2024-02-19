@@ -3,11 +3,15 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 import { Skeleton } from '@mui/material';
 
-const EditAvator = ({ url, height = 128, width = 128 }) => {
+const EditAvator = ({
+  url = 'https://imgur.com/EADd1UD.png',
+  height = 128,
+  width = 128,
+}) => {
   return (
     <LazyLoadImage
       alt="login"
-      src={url || 'https://imgur.com/EADd1UD.png'}
+      src={url}
       height={height}
       width={width}
       effect="opacity"
