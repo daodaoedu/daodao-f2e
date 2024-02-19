@@ -126,7 +126,9 @@ function EditPage() {
         <ContentWrapper sx={{ minHeight: '100vh' }}>
           <StyledTitleWrap>
             <h2>編輯個人頁面</h2>
-            <p class="title-memo">填寫完整資訊可以幫助其他夥伴更了解你哦！</p>
+            <p className="title-memo">
+              填寫完整資訊可以幫助其他夥伴更了解你哦！
+            </p>
             <TheAvator url={userState.photoURL} />
 
             <Box sx={{ marginTop: '24px', width: '100%' }}>
