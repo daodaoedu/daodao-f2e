@@ -4,7 +4,6 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import { TAIWAN_DISTRICT, COUNTRIES } from '@/constants/areas';
-import COUNTIES from '@/constants/countries.json';
 
 import {
   GENDER,
