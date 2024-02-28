@@ -109,34 +109,42 @@ export const EDUCATION_STEP = [
 export const EDUCATION_STAGE = [
   {
     label: '學齡前',
+    key: 'preschool',
     value: 'preschool',
   },
   {
     label: '國小低年級',
+    key: 'elementary-junior',
     value: 'elementary-junior',
   },
   {
     label: '國小中年級',
+    key: 'elementary-middle',
     value: 'elementary-middle',
   },
   {
     label: '國小高年級',
+    key: 'elementary-senior',
     value: 'elementary-senior',
   },
   {
     label: '國中',
+    key: 'junior-high',
     value: 'junior-high',
   },
   {
     label: '高中',
+    key: 'high',
     value: 'high',
   },
   {
     label: '大學',
+    key: 'university',
     value: 'university',
   },
   {
-    label: '大學以上',
+    label: '其他',
+    key: 'other',
     value: 'other',
   },
 ];

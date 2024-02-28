@@ -227,7 +227,11 @@ function UserCard({
             <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />{' '}
             {location
               ? location.split('@').length >= 2
-                ? location.split('@').join('').replace('台灣', '')
+                ? location
+                    .split('@')
+                    .join('')
+                    .replace(/台灣/g, '')
+                    .replace(/null/g, '')
                 : location.split('@').join('')
               : '-'}
           </StyledProfileLocation>

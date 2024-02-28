@@ -1643,3 +1643,8 @@ export const TAIWAN_DISTRICT = [
     name: '花蓮縣',
   },
 ];
+
+export const COUNTRIES = [
+  { name: '國外', label: '國外' },
+  { name: '台灣', label: '台灣' },
+];

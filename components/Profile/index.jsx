@@ -6,7 +6,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import {
   WANT_TO_DO_WITH_PARTNER,
   ROLE,
-  EDUCATION_STEP,
+  EDUCATION_STAGE,
 } from '@/constants/member';
 import { mapToTable } from '@/utils/helper';
 import SEOConfig from '@/shared/components/SEO';
@@ -29,7 +29,7 @@ const BottonBack = {
 };
 const WANT_TO_DO_WITH_PARTNER_TABLE = mapToTable(WANT_TO_DO_WITH_PARTNER);
 const ROLELIST = mapToTable(ROLE);
-const EDUCATION_STEP_TABLE = mapToTable(EDUCATION_STEP);
+const EDUCATION_STAGE_TABLE = mapToTable(EDUCATION_STAGE);
 
 const Profile = ({
   name,
@@ -51,7 +51,7 @@ const Profile = ({
 }) => {
   const router = useRouter();
   const role = roleList.length > 0 && ROLELIST[roleList[0]];
-  const edu = educationStage && EDUCATION_STEP_TABLE[educationStage];
+  const edu = educationStage && EDUCATION_STAGE_TABLE[educationStage];
   const wantTodo = wantToDoList
     .map((item) => WANT_TO_DO_WITH_PARTNER_TABLE[item])
     .join('、');
