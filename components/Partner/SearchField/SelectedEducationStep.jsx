@@ -1,5 +1,5 @@
 import Select from '@/shared/components/Select';
-import { EDUCATION_STEP } from '@/constants/member';
+import { EDUCATION_STAGE } from '@/constants/member';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
 export default function SelectedEducationStep() {
@@ -15,7 +15,7 @@ export default function SelectedEducationStep() {
       multiple
       value={getSearchParams(QUERY_KEY)}
       onChange={handleChange}
-      items={EDUCATION_STEP}
+      items={EDUCATION_STAGE}
       itemLabel="label"
       itemValue="label"
       renderValue={(selected) =>

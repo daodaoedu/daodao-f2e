@@ -38,7 +38,7 @@ const Tag = ({ label, onCancel }) => {
 
 const StyledTagsField = styled(TextField)`
   input {
-    padding-left: 0;
+    padding-left: ${({ hasData }) => (hasData ? '0' : '16px')};
   }
 `;
 
@@ -53,6 +53,7 @@ function InputTags({ value = [], change }) {
   };
   return (
     <StyledTagsField
+      hasData={value.length > 0}
       fullWidth="true"
       placeholder="搜尋或新增標籤"
       onKeyDown={keyDownHandle}
