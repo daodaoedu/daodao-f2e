@@ -34,7 +34,7 @@ function CreateGroupPage() {
         },
       }),
     {
-      onSuccess: router.replace('/profile'),
+      onSuccess: () => router.replace('/profile'),
     },
   );
 
