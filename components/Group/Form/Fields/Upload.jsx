@@ -5,8 +5,8 @@ import DeleteSvg from '@/public/assets/icons/delete.svg';
 import { StyledUpload } from '../Form.styled';
 import UploadSvg from './UploadSvg';
 
-export default function Upload({ name, onChange }) {
-  const [preview, setPreview] = useState('');
+export default function Upload({ name, value, control }) {
+  const [preview, setPreview] = useState(value || '');
   const [error, setError] = useState('');
   const inputRef = useRef();
 
@@ -17,14 +17,22 @@ export default function Upload({ name, onChange }) {
         value: file,
       },
     };
-    onChange(event);
+    control.onChange(event);
   };
 
   const handleFile = (file) => {
     const imageType = /image.*/;
+    const maxSize = 500 * 1024; // 500 KB
+
+    setPreview('');
     setError('');
     if (!file.type.match(imageType)) {
       setError('僅支援上傳圖片唷！');
+      return;
+    }
+
+    if (file.size > maxSize) {
+      setError('圖片最大限制 500 KB');
       return;
     }
 

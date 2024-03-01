@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import FormControl from '@mui/material/FormControl';
 import MuiSelect from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -5,14 +6,16 @@ import MenuItem from '@mui/material/MenuItem';
 export default function Select({
   id,
   name,
-  value,
   placeholder,
   options = [],
   itemLabel = 'label',
   fullWidth = true,
   multiple,
-  onChange,
   sx,
+  disabled,
+  control,
+  value,
+  error,
 }) {
   const getValue = (any, key) => (typeof any === 'object' ? any[key] : any);
   const renderValue = (selected) => {
@@ -37,7 +40,8 @@ export default function Select({
           ...sx,
         }}
         value={value}
-        onChange={onChange}
+        disabled={disabled}
+        {...control}
       >
         {placeholder && (
           <MenuItem disabled value="" sx={{ fontSize: 14 }}>
@@ -53,6 +57,7 @@ export default function Select({
           </MenuItem>
         ))}
       </MuiSelect>
+      <span className="error-message">{error}</span>
     </FormControl>
   );
 }

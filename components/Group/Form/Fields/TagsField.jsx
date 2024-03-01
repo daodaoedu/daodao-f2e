@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import IconButton from '@mui/material/IconButton';
 import FormHelperText from '@mui/material/FormHelperText';
 import ClearIcon from '@mui/icons-material/Clear';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { StyledChip, StyledTagsField } from '../Form.styled';
 
-function TagsField({ label, helperText, ...props }) {
+function TagsField({ name, helperText, control }) {
   const [tags, setTags] = useState([]);
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
@@ -30,6 +30,16 @@ function TagsField({ label, helperText, ...props }) {
     setTags((pre) => pre.filter((t) => t !== tag));
   };
 
+  useEffect(() => {
+    const event = {
+      target: {
+        name,
+        value: tags,
+      },
+    };
+    control.onChange(event);
+  }, [tags]);
+
   return (
     <>
       <StyledTagsField>
@@ -44,7 +54,6 @@ function TagsField({ label, helperText, ...props }) {
         ))}
         {tags.length < 8 && (
           <input
-            {...props}
             value={input}
             onChange={handleInput}
             onKeyDown={handleKeyDown}
