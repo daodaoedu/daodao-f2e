@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 import Edit from '@/components/Profile/Edit';
 import Footer from '@/shared/components/Footer_v2';
 import Navigation from '@/shared/components/Navigation_v2';
+import MyGroup from '@/components/Profile/MyGroup';
 import AccountSetting from '@/components/Profile/Accountsetting';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -71,7 +72,7 @@ const ProfilePage = () => {
         <Box
           sx={{
             width: '272px',
-            height: '118px',
+            height: 'max-content',
             backgroundColor: 'white',
             borderRadius: '8px',
             margin: '26px 40px 0 0',
@@ -113,20 +114,37 @@ const ProfilePage = () => {
                 borderRadius: '8px',
                 '&.Mui-selected': {
                   borderColor: 'transparent',
+                  backgroundColor: `${value === 0 && '#DEF5F5'}`,
+                  color: `${value === 0 && '#16B9B3'}`,
+                },
+              }}
+              label="我的揪團"
+              {...a11yProps(1)}
+            />
+            <Tab
+              sx={{
+                width: mobileScreen ? '50%' : '100%',
+                color: '#536166',
+                borderRadius: '8px',
+                '&.Mui-selected': {
+                  borderColor: 'transparent',
                   backgroundColor: `${value === 1 && '#DEF5F5'}`,
                   color: `${value === 1 && '#16B9B3'}`,
                 },
               }}
               label="帳號設定"
-              {...a11yProps(1)}
+              {...a11yProps(2)}
             />
           </Tabs>
         </Box>
         <Box>
-          <TabPanel value={value} index={0} class="dfgh">
+          <TabPanel value={value} index={0}>
             <Edit />
           </TabPanel>
           <TabPanel value={value} index={1}>
+            <MyGroup />
+          </TabPanel>
+          <TabPanel value={value} index={2}>
             <AccountSetting />
           </TabPanel>
         </Box>

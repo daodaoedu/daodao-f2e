@@ -1,12 +1,7 @@
-import styled from '@emotion/styled';
 import Link from 'next/link';
-
-export const StyledLabel = styled.span`
-  flex-basis: 50px;
-  color: #293a3d;
-  font-size: 12px;
-  font-weight: bold;
-`;
+import styled from '@emotion/styled';
+import Divider from '@mui/material/Divider';
+import MenuItem from '@mui/material/MenuItem';
 
 export const StyledText = styled.div`
   display: -webkit-box;
@@ -14,11 +9,11 @@ export const StyledText = styled.div`
   -webkit-line-clamp: ${(props) => props.lineClamp || '1'};
   overflow: hidden;
   color: ${(props) => props.color || '#536166'};
-  font-size: ${(props) => props.fontSize || '12px'};
+  font-size: ${(props) => props.fontSize || '14px'};
 `;
 
 export const StyledTitle = styled.h2`
-  font-size: 14px;
+  font-size: 16px;
   font-weight: bold;
   line-height: 1.4;
   display: -webkit-box;
@@ -28,24 +23,21 @@ export const StyledTitle = styled.h2`
   overflow: hidden;
 `;
 
-export const StyledInfo = styled.div`
-  ${StyledLabel} {
-    margin-right: 5px;
-    padding-right: 5px;
-    border-right: 1px solid #536166;
-  }
-`;
-
 export const StyledFooter = styled.footer`
   display: flex;
   justify-content: space-between;
   align-items: center;
+`;
 
-  time {
-    font-size: 12px;
-    font-weight: 300;
-    color: #92989a;
-  }
+export const StyledTime = styled.time`
+  font-size: 12px;
+  font-weight: 300;
+  color: #92989a;
+`;
+
+export const StyledFlex = styled.div`
+  display: flex;
+  gap: 8px;
 `;
 
 export const StyledStatus = styled.div`
@@ -78,25 +70,38 @@ export const StyledStatus = styled.div`
 `;
 
 export const StyledContainer = styled.div`
-  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  justify-content: space-around;
+  flex: 1;
 `;
 
 export const StyledAreas = styled.div`
+  padding: 4px 0;
   display: flex;
   align-items: center;
 `;
 
 export const StyledGroupCard = styled(Link)`
-  display: block;
+  display: flex;
   position: relative;
   background: #fff;
-  padding: 0.5rem;
+  padding: 10px;
   border-radius: 4px;
+  gap: 16px;
 
   img {
     vertical-align: middle;
   }
+`;
+
+export const StyledMenuItem = styled(MenuItem)`
+  min-width: 146px;
+`;
+
+export const StyledDivider = styled(Divider)`
+  width: 100%;
+  color: #000;
+  margin: 30px 0;
+  height: 2px;
 `;

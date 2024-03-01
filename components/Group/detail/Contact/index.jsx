@@ -15,6 +15,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { BASE_URL } from '@/constants/common';
 import { ROLE } from '@/constants/member';
 import chatSvg from '@/public/assets/icons/chat.svg';
 import Feedback from './Feedback';
@@ -43,18 +44,17 @@ const Transition = forwardRef((props, ref) => {
 });
 
 function ContactButton({
+  user,
   children,
   title,
   description,
   descriptionPlaceholder,
-  onSubmit,
-  onClose,
   isLoading,
 }) {
   // 判斷是否登入
   const id = useId();
   const router = useRouter();
-  const user = useSelector((state) => state.user);
+  const me = useSelector((state) => state.user);
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [contact, setContact] = useState('');
@@ -68,21 +68,39 @@ function ContactButton({
     ROLE.find(({ key }) => user?.roleList?.includes(key))?.label || '暫無資料';
 
   const handleClose = () => {
-    if (onClose) onClose();
     setOpen(false);
     setMessage('');
     setContact('');
   };
 
   const handleSubmit = () => {
-    if (onSubmit) onSubmit({ message, contact });
-    handleClose();
-    setFeedback('error');
+    fetch(`${BASE_URL}/email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...user,
+        subject: '【島島阿學】點開 Email，認識新夥伴',
+        title: '你發起的揪團有人來信！',
+        to: user.email,
+        text: message,
+        information: [me.email || 'tutelary.maomao@gmail.com', contact],
+      }),
+    })
+      .then(() => {
+        handleClose();
+        setFeedback('success');
+      })
+      .catch(() => {
+        handleClose();
+        setFeedback('error');
+      });
   };
 
   useEffect(() => {
-    if (!user?._id && open) router.push('/login');
-  }, [user, open, router]);
+    if (!me?._id && open) router.push('/login');
+  }, [me, open, router]);
 
   return (
     <>
