@@ -36,14 +36,17 @@ function EditGroupPage() {
   const goToDetail = () => router.replace(`/group/detail?id=${id}`);
 
   const { mutate, isLoading } = useMutation(
-    (values) =>
-      fetch(`${GROUP_API_URL}/${id}`, {
+    (values) => {
+      if (!id || id.includes('/')) return Promise.reject();
+
+      return fetch(`${GROUP_API_URL}/${id}`, {
         method: 'PUT',
         body: JSON.stringify(values),
         headers: {
           'Content-Type': 'application/json',
         },
-      }),
+      });
+    },
     { onSuccess: goToDetail },
   );
 
