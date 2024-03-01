@@ -55,6 +55,7 @@ function GroupDetail({ source, isLoading }) {
           }}
         >
           <ContactButton
+            user={source?.user || {}}
             title="聯繫主揪"
             description="想跟主揪說的話"
             descriptionPlaceholder="想參加主揪的團體嗎？可以簡單的自我介紹，寫下想加入的原因。"
