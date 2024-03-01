@@ -62,7 +62,7 @@ function EditPage() {
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
-    if (user._id) {
+    if (user._id || '65a7e0300604d7c3f4641bf9') {
       Object.entries(user).forEach(([key, value]) => {
         if (key === 'contactList') {
           const { instagram, facebook, discord, line } = value;
