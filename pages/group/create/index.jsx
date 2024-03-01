@@ -1,9 +1,11 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import SEOConfig from '@/shared/components/SEO';
 import GroupForm from '@/components/Group/Form';
+import useMutation from '@/hooks/useMutation';
+import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
+import { GROUP_API_URL } from '@/redux/actions/group';
 
 function GroupPage() {
   const router = useRouter();
@@ -22,11 +24,32 @@ function GroupPage() {
     [router?.asPath],
   );
 
+  const { mutate, isLoading } = useMutation(
+    (values) => {
+      // const formData = new FormData();
+
+      // Object.keys(values).forEach((key) => {
+      //   formData.append(key, values[key]);
+      // });
+
+      return fetch(GROUP_API_URL, {
+        method: 'POST',
+        body: JSON.stringify(values),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    },
+    {
+      onSuccess: console.log,
+    },
+  );
+
   return (
     <>
       <SEOConfig data={SEOData} />
       <Navigation />
-      <GroupForm mode="create" />
+      <GroupForm mode="create" isLoading={isLoading} onSubmit={mutate} />
       <Footer />
     </>
   );

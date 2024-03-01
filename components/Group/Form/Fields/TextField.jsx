@@ -1,24 +1,15 @@
 import MuiTextField from '@mui/material/TextField';
-import { useEffect, useState } from 'react';
 
 export default function TextField({
   id,
   placeholder,
   multiline,
   name,
-  value,
-  onChange,
   helperText,
-  max,
-  errorMessage,
+  control,
+  value,
+  error,
 }) {
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    if (value.length > max) setError(errorMessage);
-    else setError('');
-  }, [max, value]);
-
   return (
     <>
       <MuiTextField
@@ -31,8 +22,8 @@ export default function TextField({
         value={value}
         multiline={multiline}
         rows={multiline && 10}
-        onChange={onChange}
         helperText={helperText}
+        {...control}
       />
       <span className="error-message">{error}</span>
     </>
