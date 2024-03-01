@@ -41,7 +41,7 @@ function GroupCard({
             <span>{partnerEducationStep || '皆可'}</span>
           </StyledText>
         </StyledInfo>
-        <StyledText lineClamp="2" fontSize="14px">
+        <StyledText lineClamp="2" fontSize="14px" style={{ minHeight: '28px' }}>
           {description}
         </StyledText>
         <StyledAreas>

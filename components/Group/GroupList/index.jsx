@@ -14,6 +14,14 @@ export const StyledGroupItem = styled.li`
   position: relative;
   margin-top: 1rem;
   flex-basis: 33.33%;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    z-index: 1;
+    transform: scale(1.0125);
+    box-shadow: 0 0 6px 2px #0001;
+  }
 
   @media (max-width: 767px) {
     flex-basis: 50%;
