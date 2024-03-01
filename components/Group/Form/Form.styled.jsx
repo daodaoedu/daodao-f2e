@@ -67,6 +67,18 @@ export const StyledChip = styled(Chip)`
   }
 `;
 
+export const StyledSwitchWrapper = styled.div`
+  padding: 4px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: #293a3d;
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  border-radius: 4px;
+`;
+
 export const StyledTagsField = styled.div(
   ({ theme }) => `
   position: relative;

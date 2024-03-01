@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import Box from '@mui/material/Box';
+import Switch from '@mui/material/Switch';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@/shared/components/Button';
 import StyledPaper from '../Paper.styled';
@@ -7,6 +9,7 @@ import {
   StyledDescription,
   StyledContainer,
   StyledFooter,
+  StyledSwitchWrapper,
 } from './Form.styled';
 import Fields from './Fields';
 import useGroupForm, {
@@ -15,9 +18,19 @@ import useGroupForm, {
   eduOptions,
 } from './useGroupForm';
 
-export default function GroupForm({ mode, isLoading, onSubmit }) {
-  const { control, values, errors, handleSubmit } = useGroupForm();
+export default function GroupForm({
+  mode,
+  defaultValues,
+  isLoading,
+  onSubmit,
+}) {
+  const { control, values, errors, isDirty, setValues, handleSubmit } =
+    useGroupForm();
   const isCreateMode = mode === 'create';
+
+  useEffect(() => {
+    if (defaultValues) setValues(defaultValues);
+  }, [defaultValues]);
 
   return (
     <Box sx={{ background: '#f3fcfc', py: '60px' }}>
@@ -114,13 +127,29 @@ export default function GroupForm({ mode, isLoading, onSubmit }) {
             helperText="標籤填寫完成後，會用 Hashtag 的形式呈現，例如： #一起學日文"
           />
         </StyledPaper>
+        {!isCreateMode && (
+          <StyledPaper sx={{ p: '40px', mt: '16px' }}>
+            <StyledSwitchWrapper>
+              {values.isGrouping ? '開放揪團中' : '已關閉揪團'}
+              <Switch
+                name="isGrouping"
+                checked={values.isGrouping}
+                onClick={() =>
+                  control.onChange({
+                    target: { name: 'isGrouping', value: !values.isGrouping },
+                  })
+                }
+              />
+            </StyledSwitchWrapper>
+          </StyledPaper>
+        )}
         <StyledFooter>
           <Button
             sx={{ width: '100%', maxWidth: '287px' }}
-            disabled={isLoading}
+            disabled={isLoading || !isDirty}
             onClick={handleSubmit(onSubmit)}
           >
-            送出
+            {isCreateMode ? '送出' : '發布修改'}
             {isLoading && (
               <CircularProgress
                 size={24}

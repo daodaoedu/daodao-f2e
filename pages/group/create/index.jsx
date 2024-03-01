@@ -7,7 +7,7 @@ import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 import { GROUP_API_URL } from '@/redux/actions/group';
 
-function GroupPage() {
+function CreateGroupPage() {
   const router = useRouter();
 
   const SEOData = useMemo(
@@ -25,23 +25,16 @@ function GroupPage() {
   );
 
   const { mutate, isLoading } = useMutation(
-    (values) => {
-      // const formData = new FormData();
-
-      // Object.keys(values).forEach((key) => {
-      //   formData.append(key, values[key]);
-      // });
-
-      return fetch(GROUP_API_URL, {
+    (values) =>
+      fetch(GROUP_API_URL, {
         method: 'POST',
         body: JSON.stringify(values),
         headers: {
           'Content-Type': 'application/json',
         },
-      });
-    },
+      }),
     {
-      onSuccess: console.log,
+      onSuccess: router.replace('/profile'),
     },
   );
 
@@ -55,4 +48,4 @@ function GroupPage() {
   );
 }
 
-export default GroupPage;
+export default CreateGroupPage;

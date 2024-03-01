@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
@@ -47,6 +47,10 @@ export default function AreaCheckbox({
     onBlur: handlePhysicalAreaChange,
   };
 
+  useEffect(() => {
+    if (value.find((v) => getPhysicalArea([v]))) setIsPhysicalArea(true);
+  }, [value]);
+
   return (
     <>
       <Box sx={{ display: 'flex', label: { whiteSpace: 'nowrap' } }}>
@@ -55,17 +59,15 @@ export default function AreaCheckbox({
           label="實體活動"
           checked={isPhysicalArea}
         />
-        <Box width="100%" onClick={() => setIsPhysicalArea(true)}>
-          <Select
-            name={name}
-            options={options}
-            placeholder="地點"
-            value={physicalAreaValue}
-            itemLabel={itemLabel}
-            itemValue={itemValue}
-            control={physicalAreaControl}
-          />
-        </Box>
+        <Select
+          name={name}
+          options={options}
+          placeholder="地點"
+          value={physicalAreaValue}
+          itemLabel={itemLabel}
+          itemValue={itemValue}
+          control={physicalAreaControl}
+        />
       </Box>
       <div>
         <FormControlLabel

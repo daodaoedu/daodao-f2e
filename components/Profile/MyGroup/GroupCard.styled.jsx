@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import styled from '@emotion/styled';
 import Divider from '@mui/material/Divider';
 import MenuItem from '@mui/material/MenuItem';
@@ -81,7 +82,7 @@ export const StyledAreas = styled.div`
   align-items: center;
 `;
 
-export const StyledGroupCard = styled.div`
+export const StyledGroupCard = styled(Link)`
   display: flex;
   position: relative;
   background: #fff;
