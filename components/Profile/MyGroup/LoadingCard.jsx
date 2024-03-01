@@ -16,7 +16,7 @@ import {
 
 function LoadingCard() {
   return (
-    <StyledGroupCard>
+    <StyledGroupCard href="#">
       <Skeleton variant="rounded" width={240} height={122} animation="wave" />
       <StyledContainer>
         <StyledTitle>

@@ -73,7 +73,6 @@ function ContactButton({
     setContact('');
   };
 
-  console.log(user);
   const handleSubmit = () => {
     fetch(`${BASE_URL}/email`, {
       method: 'POST',

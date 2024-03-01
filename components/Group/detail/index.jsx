@@ -10,7 +10,7 @@ import More from './More';
 import { StyledContainer, StyledHeading, StyledLink } from './Detail.styled';
 import ContactButton from './Contact';
 
-function GroupDetail({ source, isLoading }) {
+function GroupDetail({ id, source, isLoading }) {
   return (
     <Box sx={{ background: '#f3fcfc', pb: '48px' }}>
       <StyledContainer>
@@ -36,7 +36,7 @@ function GroupDetail({ source, isLoading }) {
           ) : (
             <StyledStatus className="finished">已結束</StyledStatus>
           )}
-          <More />
+          <More groupId={id} userId={source?.userId} />
           <StyledHeading>
             {isLoading ? <Skeleton animation="wave" /> : source?.title}
           </StyledHeading>

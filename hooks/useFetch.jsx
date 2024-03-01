@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 
 const useFetch = (url, { initialValue } = {}) => {
+  const [render, refetch] = useReducer((pre) => !pre, true);
   const [data, setData] = useState(initialValue);
   const [isFetching, setIsFetching] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -8,7 +9,7 @@ const useFetch = (url, { initialValue } = {}) => {
   useEffect(() => {
     let pass = true;
 
-    if (url.includes('undefined')) return;
+    if (url.includes('undefined')) return undefined;
 
     setIsFetching(true);
     setIsError(false);
@@ -19,10 +20,12 @@ const useFetch = (url, { initialValue } = {}) => {
       .catch(() => setIsError(true))
       .finally(() => setIsFetching(false));
 
-    return () => pass = false;
-  }, [url]);
+    return () => {
+      pass = false;
+    };
+  }, [url, render]);
 
-  return { data, isFetching, isError };
+  return { data, isFetching, isError, refetch };
 };
 
 export default useFetch;

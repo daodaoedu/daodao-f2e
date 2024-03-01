@@ -58,10 +58,11 @@ const rules = {
 
 export default function useGroupForm() {
   const router = useRouter();
+  const [isDirty, setIsDirty] = useState(false);
   const me = useSelector((state) => state.user);
   const [values, setValues] = useState({
     ...DEFAULT_VALUES,
-    userId: me._id,
+    userId: me?._id,
   });
   const [errors, setErrors] = useState({});
   const schema = z.object(rules);
@@ -78,6 +79,7 @@ export default function useGroupForm() {
         [name]: result.error?.issues?.[0]?.message,
       }));
     }
+    setIsDirty(true);
     setValues((pre) => ({ ...pre, [name]: value }));
   };
 
@@ -110,6 +112,7 @@ export default function useGroupForm() {
     control,
     errors,
     values,
+    isDirty,
     setValues,
     handleSubmit,
   };
