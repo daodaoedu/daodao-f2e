@@ -2,6 +2,8 @@ import Select from '@/shared/components/Select';
 import { EDUCATION_STEP } from '@/constants/member';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
+const EduStep = EDUCATION_STEP.slice(0, 7);
+
 export default function SelectedEducationStep() {
   const QUERY_KEY = 'partnerEducationStep';
   const [getSearchParams, pushState] = useSearchParamsManager();
@@ -15,7 +17,7 @@ export default function SelectedEducationStep() {
       multiple
       value={getSearchParams(QUERY_KEY)}
       onChange={handleChange}
-      items={EDUCATION_STEP}
+      items={EduStep}
       itemLabel="label"
       itemValue="label"
       renderValue={(selected) =>

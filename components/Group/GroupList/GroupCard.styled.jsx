@@ -94,14 +94,7 @@ export const StyledGroupCard = styled(Link)`
   position: relative;
   background: #fff;
   padding: 0.5rem;
-  transition: transform 0.15s, box-shadow 0.15s;
   border-radius: 4px;
-
-  &:hover {
-    z-index: 1;
-    transform: scale(1.0125);
-    box-shadow: 0 0 6px 2px #0001;
-  }
 
   img {
     vertical-align: middle;
