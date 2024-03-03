@@ -11,7 +11,6 @@ import {
   StyledTitle,
   StyledTime,
   StyledFlex,
-  StyledStatus,
 } from './GroupCard.styled';
 
 function LoadingCard() {
