@@ -32,7 +32,7 @@ const DEFAULT_VALUES = {
 };
 
 const rules = {
-  userId: z.string(),
+  userId: z.string().optional(),
   title: z.string().min(1, '請輸入標題').max(50, '請勿輸入超過 50 字'),
   file: z.any(),
   photoURL: z.string(),
@@ -40,9 +40,7 @@ const rules = {
   category: z
     .array(z.enum(categoriesOptions.map(({ value }) => value)))
     .min(1, '請選擇學習領域'),
-  area: z
-    .array(z.enum(areasOptions.map(({ name }) => name)))
-    .min(1, '請選擇地點'),
+  area: z.array(z.string()).min(1, '請選擇地點'),
   time: z.string().max(50, '請勿輸入超過 50 字'),
   partnerStyle: z.string().max(50, '請勿輸入超過 50 字'),
   partnerEducationStep: z
