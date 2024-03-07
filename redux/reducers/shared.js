@@ -49,14 +49,14 @@ const reducer = (state = initialState, action) => {
     case 'GET_INSTAGRAM_POST_SUCCESS': {
       return {
         ...state,
-        instagramPosts: action.payload,
+        instagramPosts: Array.isArray(action.payload) ? action.payload : [],
         isLoadingInstagramPosts: false,
       };
     }
     case 'GET_INSTAGRAM_STORY_SUCCESS': {
       return {
         ...state,
-        instagramStories: action.payload,
+        instagramStories: Array.isArray(action.payload) ? action.payload : [],
         isLoadingInstagramStories: false,
       };
     }
