@@ -8,6 +8,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 import Tags from './Tags';
 import LogoImage from './LogoImage';
 import Contributors from './Contributors';
+import { getResourceTitle } from '../../../../utils/date';
 // import { TikTokFont } from '../../../../shared/styles/css';
 dayjs.extend(isBetween);
 
@@ -102,11 +103,10 @@ const Item = ({ data, queryTags }) => {
     [data],
   );
 
-  const titleTextList = (data?.properties['資源名稱']?.title ?? [])
-    .filter((item) => item?.type === 'text')
-    .map((item) => item?.plain_text);
-
-  const title = useMemo(() => titleTextList.join(''), [data?.properties]);
+  const title = useMemo(
+    () => getResourceTitle(data?.properties),
+    [data?.properties],
+  );
 
   const contributors = useMemo(
     () => data?.properties['創建者']?.multi_select ?? [],

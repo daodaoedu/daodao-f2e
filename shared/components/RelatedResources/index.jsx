@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Marquee from 'react-fast-marquee';
 import { loadRelatedResources } from '../../../redux/actions/resource';
 import Card from './Card';
+import { getResourceTitle } from '../../../utils/date';
 
 const RelatedResourcesWrapper = styled.div`
   margin: 20px 0;
@@ -96,9 +97,7 @@ const RelatedResources = ({ title, searchScheme }) => {
                   properties['縮圖']?.files[0]?.name) ??
                 'https://www.daoedu.tw/preview.webp'
               }
-              title={(
-                properties['資源名稱']?.title[0]?.plain_text ?? ''
-              ).trim()}
+              title={getResourceTitle(properties).trim()}
               desc={(
                 (properties['介紹']?.rich_text ?? []).find(
                   (item) => item?.type === 'text',

@@ -11,6 +11,7 @@ import Item from './Item';
 import SponsorItem from './SponsorItem';
 import SkeletonItem from './SkeletonItem';
 import ImageItem from './ImageItem';
+import { getResourceTitle } from '../../../utils/date';
 
 const ListWrapper = styled.ul`
   display: flex;
@@ -81,10 +82,7 @@ const SearchGalleryList = ({
     >
       {list.map((item) => {
         return (
-          <ImageItem
-            key={item?.properties['資源名稱']?.title[0].plain_text}
-            data={item}
-          />
+          <ImageItem key={getResourceTitle(item?.properties)} data={item} />
         );
       })}
     </ImageList>
