@@ -3,8 +3,7 @@ import toast from 'react-hot-toast';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
-import { TAIWAN_DISTRICT } from '@/constants/areas';
-import COUNTIES from '@/constants/countries.json';
+import { TAIWAN_DISTRICT, COUNTRIES } from '@/constants/areas';
 
 import {
   GENDER,
@@ -245,9 +244,9 @@ function EditPage() {
                 <MenuItem disabled value="-1">
                   <em>請選擇居住地</em>
                 </MenuItem>
-                {COUNTIES.map(({ name, alpha2 }) => (
-                  <MenuItem key={alpha2} value={name}>
-                    {name}
+                {COUNTRIES.map(({ name, label }) => (
+                  <MenuItem key={name} value={name}>
+                    {label}
                   </MenuItem>
                 ))}
               </Select>

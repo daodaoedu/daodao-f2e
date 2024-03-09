@@ -1,56 +1,34 @@
+import { useId } from 'react';
 import AreaCheckbox from './AreaCheckbox';
 import Select from './Select';
 import TagsField from './TagsField';
 import TextField from './TextField';
 import Upload from './Upload';
 import Wrapper from './Wrapper';
-import useWrapperProps from './useWrapperProps';
 
-const Fields = {};
+const withWrapper = (Component) => (props) => {
+  const id = useId();
+  const formItemId = `form-item-${id}`;
+  const { required, label, tooltip } = props;
 
-Fields.AreaCheckbox = (props) => {
-  const wrapperProps = useWrapperProps(props);
   return (
-    <Wrapper {...wrapperProps}>
-      <AreaCheckbox {...props} />
+    <Wrapper
+      id={formItemId}
+      required={required}
+      label={label}
+      tooltip={tooltip}
+    >
+      <Component {...props} />
     </Wrapper>
   );
 };
 
-Fields.Select = (props) => {
-  const wrapperProps = useWrapperProps(props);
-  return (
-    <Wrapper {...wrapperProps}>
-      <Select {...props} />
-    </Wrapper>
-  );
-};
-
-Fields.TagsField = (props) => {
-  const wrapperProps = useWrapperProps(props);
-  return (
-    <Wrapper {...wrapperProps}>
-      <TagsField {...props} />
-    </Wrapper>
-  );
-};
-
-Fields.TextField = (props) => {
-  const wrapperProps = useWrapperProps(props);
-  return (
-    <Wrapper {...wrapperProps}>
-      <TextField {...props} />
-    </Wrapper>
-  );
-};
-
-Fields.Upload = (props) => {
-  const wrapperProps = useWrapperProps(props);
-  return (
-    <Wrapper {...wrapperProps}>
-      <Upload {...props} />
-    </Wrapper>
-  );
+const Fields = {
+  AreaCheckbox: withWrapper(AreaCheckbox),
+  Select: withWrapper(Select),
+  TagsField: withWrapper(TagsField),
+  TextField: withWrapper(TextField),
+  Upload: withWrapper(Upload),
 };
 
 export default Fields;

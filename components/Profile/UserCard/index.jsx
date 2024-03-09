@@ -194,6 +194,7 @@ function UserCard({
   updatedDate,
 }) {
   const router = useRouter();
+  const locations = location && location.split('@');
 
   return (
     <StyledProfileWrapper>
@@ -226,9 +227,9 @@ function UserCard({
           <StyledProfileLocation>
             <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />{' '}
             {location
-              ? location.split('@').length >= 2
-                ? location.split('@').join('').replace('台灣', '')
-                : location.split('@').join('')
+              ? location.length >= 2
+                ? locations.join('').replace('台灣', '').replace('null', '')
+                : locations.join('')
               : '-'}
           </StyledProfileLocation>
         </Box>

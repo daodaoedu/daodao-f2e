@@ -5,7 +5,7 @@ import Button from '@/shared/components/Button';
 import StyledPaper from '../Paper.styled';
 import { StyledContainer } from './Detail.styled';
 
-function GroupDetail() {
+function EmptyGroup() {
   return (
     <Box sx={{ background: '#f3fcfc', pb: '48px' }}>
       <StyledContainer>
@@ -40,4 +40,4 @@ function GroupDetail() {
   );
 }
 
-export default GroupDetail;
+export default EmptyGroup;

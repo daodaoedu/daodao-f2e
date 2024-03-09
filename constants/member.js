@@ -106,40 +106,9 @@ export const EDUCATION_STEP = [
   },
 ];
 
-export const EDUCATION_STAGE = [
-  {
-    label: '學齡前',
-    value: 'preschool',
-  },
-  {
-    label: '國小低年級',
-    value: 'elementary-junior',
-  },
-  {
-    label: '國小中年級',
-    value: 'elementary-middle',
-  },
-  {
-    label: '國小高年級',
-    value: 'elementary-senior',
-  },
-  {
-    label: '國中',
-    value: 'junior-high',
-  },
-  {
-    label: '高中',
-    value: 'high',
-  },
-  {
-    label: '大學',
-    value: 'university',
-  },
-  {
-    label: '大學以上',
-    value: 'other',
-  },
-];
+export const EDUCATION_STAGE = EDUCATION_STEP.filter(
+  (step) => step.key !== 'master' && step.key !== 'doctor',
+);
 
 export const WANT_TO_DO_WITH_PARTNER = [
   {

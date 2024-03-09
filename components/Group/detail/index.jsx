@@ -10,7 +10,7 @@ import More from './More';
 import { StyledContainer, StyledHeading, StyledLink } from './Detail.styled';
 import ContactButton from './Contact';
 
-function GroupDetail({ source, isLoading }) {
+function GroupDetail({ id, source, isLoading }) {
   return (
     <Box sx={{ background: '#f3fcfc', pb: '48px' }}>
       <StyledContainer>
@@ -36,7 +36,7 @@ function GroupDetail({ source, isLoading }) {
           ) : (
             <StyledStatus className="finished">已結束</StyledStatus>
           )}
-          <More />
+          <More groupId={id} userId={source?.userId} />
           <StyledHeading>
             {isLoading ? <Skeleton animation="wave" /> : source?.title}
           </StyledHeading>
@@ -55,6 +55,7 @@ function GroupDetail({ source, isLoading }) {
           }}
         >
           <ContactButton
+            user={source?.user || {}}
             title="聯繫主揪"
             description="想跟主揪說的話"
             descriptionPlaceholder="想參加主揪的團體嗎？可以簡單的自我介紹，寫下想加入的原因。"
