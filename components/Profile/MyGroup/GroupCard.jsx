@@ -20,6 +20,7 @@ import {
   StyledFlex,
   StyledStatus,
   StyledMenuItem,
+  StyledImageWrapper,
 } from './GroupCard.styled';
 
 function GroupCard({
@@ -31,12 +32,13 @@ function GroupCard({
   area,
   isGrouping,
   updatedDate,
-  refetch,
+  onUpdateGrouping,
+  onDeleteGroup,
 }) {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState(null);
 
-  const apiGrouping = useMutation(
+  const apiUpdateGrouping = useMutation(
     () =>
       fetch(`${GROUP_API_URL}/${_id}`, {
         method: 'PUT',
@@ -45,7 +47,7 @@ function GroupCard({
           'Content-Type': 'application/json',
         },
       }),
-    { onSuccess: refetch },
+    { onSuccess: onUpdateGrouping },
   );
 
   const apiDeleteGroup = useMutation(
@@ -56,7 +58,7 @@ function GroupCard({
           'Content-Type': 'application/json',
         },
       }),
-    { onSuccess: refetch },
+    { onSuccess: onDeleteGroup },
   );
 
   const handleMenu = (event) => {
@@ -70,7 +72,7 @@ function GroupCard({
 
   const handleGrouping = () => {
     handleClose();
-    apiGrouping.mutate();
+    apiUpdateGrouping.mutate();
   };
 
   const handleDeleteGroup = () => {
@@ -78,14 +80,18 @@ function GroupCard({
     apiDeleteGroup.mutate();
   };
 
+  const formatToString = (data, defaultValue = '') =>
+    Array.isArray(data) && data.length ? data.join('、') : data || defaultValue;
+
   return (
     <>
       <StyledGroupCard href={`/group/detail?id=${_id}`}>
-        <Image
-          width="240px"
-          alt={photoAlt || '未放封面'}
-          src={photoURL || emptyCoverImg.src}
-        />
+        <StyledImageWrapper>
+          <Image
+            alt={photoAlt || '未放封面'}
+            src={photoURL || emptyCoverImg.src}
+          />
+        </StyledImageWrapper>
         <StyledContainer>
           <StyledTitle>{title}</StyledTitle>
           <StyledText lineClamp="2" style={{ minHeight: '32px' }}>
@@ -93,7 +99,7 @@ function GroupCard({
           </StyledText>
           <StyledAreas>
             <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />
-            <StyledText>{area}</StyledText>
+            <StyledText>{formatToString(area, '待討論')}</StyledText>
           </StyledAreas>
           <StyledFooter>
             <StyledTime>{timeDuration(updatedDate)}</StyledTime>
