@@ -1,3 +1,6 @@
+import { useRouter } from 'next/navigation';
+import styled from '@emotion/styled';
+import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -7,17 +10,30 @@ import StyledPaper from '../Paper.styled';
 import TeamInfoCard from './TeamInfoCard';
 import OrganizerCard from './OrganizerCard';
 import More from './More';
-import { StyledContainer, StyledHeading, StyledLink } from './Detail.styled';
+import { StyledContainer, StyledHeading, StyledGoBack } from './Detail.styled';
 import ContactButton from './Contact';
 
+const StyledEditButton = styled(Button)`
+  display: none;
+  max-width: 316px;
+  width: 100%;
+  border-radius: 20px;
+
+  @media (max-width: 767px) {
+    display: block;
+  }
+`;
+
 function GroupDetail({ id, source, isLoading }) {
+  const router = useRouter();
+
   return (
     <Box sx={{ background: '#f3fcfc', pb: '48px' }}>
       <StyledContainer>
-        <StyledLink href="/group" style={{ marginBottom: '10px' }}>
+        <StyledGoBack onClick={router.back}>
           <ArrowBackIosNewIcon fontSize="inherit" />
           <span>返回</span>
-        </StyledLink>
+        </StyledGoBack>
         {isLoading ? (
           <Skeleton variant="rounded" height={300} animation="wave" />
         ) : (
@@ -54,6 +70,12 @@ function GroupDetail({ id, source, isLoading }) {
             justifyContent: 'center',
           }}
         >
+          <StyledEditButton
+            variant="outlined"
+            onClick={() => router.push(`/group/edit?id=${id}`)}
+          >
+            編輯
+          </StyledEditButton>
           <ContactButton
             user={source?.user || {}}
             title="聯繫主揪"
