@@ -11,12 +11,15 @@ import {
   StyledTitle,
   StyledTime,
   StyledFlex,
+  StyledImageWrapper,
 } from './GroupCard.styled';
 
 function LoadingCard() {
   return (
     <StyledGroupCard href="#">
-      <Skeleton variant="rounded" width={240} height={122} animation="wave" />
+      <StyledImageWrapper>
+        <Skeleton variant="rounded" width={240} height={122} animation="wave" />
+      </StyledImageWrapper>
       <StyledContainer>
         <StyledTitle>
           <Skeleton width="60%" animation="wave" />
@@ -39,7 +42,7 @@ function LoadingCard() {
             <Skeleton
               variant="rounded"
               width={68}
-              height={34}
+              height={24}
               animation="wave"
             />
             <IconButton size="small" disabled>

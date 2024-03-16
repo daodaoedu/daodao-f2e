@@ -15,7 +15,8 @@ export const StyledText = styled.div`
 export const StyledTitle = styled.h2`
   font-size: 16px;
   font-weight: bold;
-  line-height: 1.4;
+  line-height: 1.6;
+  margin-bottom: 4px;
   display: -webkit-box;
   color: #293a3d;
   -webkit-box-orient: vertical;
@@ -37,6 +38,7 @@ export const StyledTime = styled.time`
 
 export const StyledFlex = styled.div`
   display: flex;
+  align-items: center;
   gap: 8px;
 `;
 
@@ -48,6 +50,7 @@ export const StyledStatus = styled.div`
   width: max-content;
   font-size: 12px;
   padding: 4px 10px;
+  height: 24px;
   background: var(--bg-color);
   color: var(--color);
   border-radius: 4px;
@@ -74,6 +77,7 @@ export const StyledContainer = styled.div`
   flex-direction: column;
   justify-content: space-around;
   flex: 1;
+  padding: 0 10px;
 `;
 
 export const StyledAreas = styled.div`
@@ -83,12 +87,21 @@ export const StyledAreas = styled.div`
 `;
 
 export const StyledGroupCard = styled(Link)`
+  width: 100%;
   display: flex;
   position: relative;
   background: #fff;
-  padding: 10px;
   border-radius: 4px;
   gap: 16px;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+  }
+`;
+
+export const StyledImageWrapper = styled.div`
+  flex: 1;
+  overflow: hidden;
 
   img {
     vertical-align: middle;
