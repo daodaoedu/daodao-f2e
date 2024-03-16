@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
@@ -26,7 +26,6 @@ import {
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import SEOConfig from '@/shared/components/SEO';
 import InputTags from '../InputTags';
 
 import TheAvator from './TheAvator';
@@ -99,23 +98,8 @@ function EditPage() {
     }
   };
 
-  const SEOData = useMemo(
-    () => ({
-      title: '編輯我的島島資料｜島島阿學',
-      description:
-        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-      keywords: '島島阿學',
-      author: '島島阿學',
-      copyright: '島島阿學',
-      imgLink: 'https://www.daoedu.tw/preview.webp',
-      link: `${process.env.HOSTNAME}${router?.asPath}`,
-    }),
-    [router?.asPath],
-  );
-
   return (
     <FormWrapper>
-      <SEOConfig data={SEOData} />
       <LocalizationProvider
         dateAdapter={AdapterDayjs}
         sx={{
