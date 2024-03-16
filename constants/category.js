@@ -222,6 +222,11 @@ export const NAV_LINK = [
     target: '_self',
   },
   {
+    name: '找揪團',
+    link: '/group',
+    target: '_self',
+  },
+  {
     name: '找活動',
     link: '/activities',
     target: '_self',
