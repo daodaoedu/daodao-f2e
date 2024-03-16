@@ -9,6 +9,7 @@ import Head from 'next/head';
 import { initializeApp } from 'firebase/app';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
+import SnackbarProvider from '@/contexts/Snackbar';
 import GlobalStyle from '@/shared/styles/Global';
 import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
@@ -96,9 +97,12 @@ const App = ({ Component, pageProps }) => {
           href="https://www.daoedu.tw/rss/feed.xml"
         />
       </Head>
+
       <Provider store={store}>
         <PersistGate persistor={persistor}>
-          <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+          <SnackbarProvider>
+            <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+          </SnackbarProvider>
         </PersistGate>
       </Provider>
     </>
