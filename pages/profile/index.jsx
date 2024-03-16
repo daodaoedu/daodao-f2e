@@ -1,4 +1,5 @@
-import React from 'react';
+import { useMemo, useState } from 'react';
+import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -6,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Edit from '@/components/Profile/Edit';
 import Footer from '@/shared/components/Footer_v2';
+import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import MyGroup from '@/components/Profile/MyGroup';
 import AccountSetting from '@/components/Profile/Accountsetting';
@@ -16,6 +18,35 @@ const HomePageWrapper = styled.div`
   --section-height-offset: 80px;
   background: linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa;
 `;
+
+const tabs = [
+  {
+    id: 'person-setting',
+    tabLabel: '個人資料編輯',
+    view: <Edit />,
+  },
+  {
+    id: 'my-group',
+    tabLabel: '我的揪團',
+    view: <MyGroup />,
+  },
+  {
+    id: 'account-setting',
+    tabLabel: '帳號設定',
+    view: <AccountSetting />,
+  },
+];
+
+const StyledTab = styled(Tab)(({ isActive, mobileScreen }) => ({
+  width: `${mobileScreen ? '50%' : '100%'}`,
+  color: '#536166',
+  borderRadius: '8px',
+  '&.Mui-selected': {
+    borderColor: 'transparent',
+    backgroundColor: `${isActive && '#DEF5F5'}`,
+    color: `${isActive && '#16B9B3'}`,
+  },
+}));
 
 function TabPanel(props) {
   const mobileScreen = useMediaQuery('(max-width: 767px)');
@@ -46,9 +77,28 @@ function a11yProps(index) {
 }
 
 const ProfilePage = () => {
+  const router = useRouter();
   const mobileScreen = useMediaQuery('(max-width: 767px)');
+  const [value, setValue] = useState(() => {
+    const id = new URLSearchParams(location.search).get('id');
+    const tabIndex = tabs.findIndex((tab) => tab.id === id);
+    if (tabIndex > -1) return tabIndex;
+    return 0;
+  });
 
-  const [value, setValue] = React.useState(0);
+  const SEOData = useMemo(
+    () => ({
+      title: '編輯我的島島資料｜島島阿學',
+      description:
+        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
+      keywords: '島島阿學',
+      author: '島島阿學',
+      copyright: '島島阿學',
+      imgLink: 'https://www.daoedu.tw/preview.webp',
+      link: `${process.env.HOSTNAME}${router?.asPath}`,
+    }),
+    [router?.asPath],
+  );
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -56,6 +106,7 @@ const ProfilePage = () => {
 
   return (
     <HomePageWrapper>
+      <SEOConfig data={SEOData} />
       <Navigation />
       <Box
         sx={{
@@ -93,60 +144,23 @@ const ProfilePage = () => {
             aria-label="Vertical tabs example"
             indicatorColor="transparent"
           >
-            <Tab
-              sx={{
-                width: mobileScreen ? '50%' : '100%',
-                color: '#536166',
-                borderRadius: '8px',
-                '&.Mui-selected': {
-                  borderColor: 'transparent',
-                  backgroundColor: `${value === 0 && '#DEF5F5'}`,
-                  color: `${value === 0 && '#16B9B3'}`,
-                },
-              }}
-              label="個人資料編輯"
-              {...a11yProps(0)}
-            />
-            <Tab
-              sx={{
-                width: mobileScreen ? '50%' : '100%',
-                color: '#536166',
-                borderRadius: '8px',
-                '&.Mui-selected': {
-                  borderColor: 'transparent',
-                  backgroundColor: `${value === 0 && '#DEF5F5'}`,
-                  color: `${value === 0 && '#16B9B3'}`,
-                },
-              }}
-              label="我的揪團"
-              {...a11yProps(1)}
-            />
-            <Tab
-              sx={{
-                width: mobileScreen ? '50%' : '100%',
-                color: '#536166',
-                borderRadius: '8px',
-                '&.Mui-selected': {
-                  borderColor: 'transparent',
-                  backgroundColor: `${value === 1 && '#DEF5F5'}`,
-                  color: `${value === 1 && '#16B9B3'}`,
-                },
-              }}
-              label="帳號設定"
-              {...a11yProps(2)}
-            />
+            {tabs.map((tab, index) => (
+              <StyledTab
+                key={tab.id}
+                label={tab.tabLabel}
+                mobileScreen={mobileScreen}
+                isActive={value === index}
+                {...a11yProps(index)}
+              />
+            ))}
           </Tabs>
         </Box>
-        <Box>
-          <TabPanel value={value} index={0}>
-            <Edit />
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <MyGroup />
-          </TabPanel>
-          <TabPanel value={value} index={2}>
-            <AccountSetting />
-          </TabPanel>
+        <Box sx={{ flex: 1, maxWidth: '672px' }}>
+          {tabs.map((tab, index) => (
+            <TabPanel key={tab.id} value={value} index={index}>
+              {tab.view}
+            </TabPanel>
+          ))}
         </Box>
       </Box>
       <Footer />
