@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
+import { useSnackbar } from '@/contexts/Snackbar';
 import GroupForm from '@/components/Group/Form';
 import useMutation from '@/hooks/useMutation';
 import SEOConfig from '@/shared/components/SEO';
@@ -8,8 +9,8 @@ import Footer from '@/shared/components/Footer_v2';
 import { GROUP_API_URL } from '@/redux/actions/group';
 
 function CreateGroupPage() {
+  const { pushSnackbar } = useSnackbar();
   const router = useRouter();
-
   const SEOData = useMemo(
     () => ({
       title: '發起揪團｜島島阿學',
@@ -34,7 +35,10 @@ function CreateGroupPage() {
         },
       }),
     {
-      onSuccess: () => router.replace('/profile'),
+      onSuccess: () => {
+        pushSnackbar({ message: '已成功發布揪團' });
+        router.replace('/profile?id=my-group');
+      },
     },
   );
 

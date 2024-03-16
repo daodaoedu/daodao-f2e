@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { Box, CircularProgress } from '@mui/material';
 import GroupForm from '@/components/Group/Form';
+import { useSnackbar } from '@/contexts/Snackbar';
 import useFetch from '@/hooks/useFetch';
 import useMutation from '@/hooks/useMutation';
 import SEOConfig from '@/shared/components/SEO';
@@ -11,6 +12,7 @@ import Footer from '@/shared/components/Footer_v2';
 import { GROUP_API_URL } from '@/redux/actions/group';
 
 function EditGroupPage() {
+  const { pushSnackbar } = useSnackbar();
   const router = useRouter();
   const me = useSelector((state) => state.user);
   const { id } = router.query;
@@ -47,7 +49,12 @@ function EditGroupPage() {
         },
       });
     },
-    { onSuccess: goToDetail },
+    {
+      onSuccess: () => {
+        pushSnackbar({ message: '已發布修改' });
+        router.replace('/profile?id=my-group');
+      },
+    },
   );
 
   useEffect(() => {
