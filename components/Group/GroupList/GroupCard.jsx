@@ -26,6 +26,9 @@ function GroupCard({
   isGrouping,
   updatedDate,
 }) {
+  const formatToString = (data, defaultValue = '') =>
+    Array.isArray(data) && data.length ? data.join('、') : data || defaultValue;
+
   return (
     <StyledGroupCard href={`/group/detail?id=${_id}`}>
       <Image alt={photoAlt || '未放封面'} src={photoURL || emptyCoverImg.src} />
@@ -34,11 +37,11 @@ function GroupCard({
         <StyledInfo>
           <StyledText>
             <StyledLabel>學習領域</StyledLabel>
-            <span>{category.join('、')}</span>
+            <span>{formatToString(category, '不拘')}</span>
           </StyledText>
           <StyledText>
             <StyledLabel>適合階段</StyledLabel>
-            <span>{partnerEducationStep || '皆可'}</span>
+            <span>{formatToString(partnerEducationStep, '皆可')}</span>
           </StyledText>
         </StyledInfo>
         <StyledText lineClamp="2" fontSize="14px" style={{ minHeight: '28px' }}>
@@ -46,7 +49,9 @@ function GroupCard({
         </StyledText>
         <StyledAreas>
           <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />
-          <StyledText color="#92989A">{area}</StyledText>
+          <StyledText color="#92989A">
+            {formatToString(area, '待討論')}
+          </StyledText>
         </StyledAreas>
         <StyledFooter>
           <time>{timeDuration(updatedDate)}</time>

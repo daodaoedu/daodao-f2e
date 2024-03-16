@@ -1,11 +1,13 @@
-import Link from 'next/link';
 import styled from '@emotion/styled';
 
-export const StyledLink = styled(Link)`
+export const StyledGoBack = styled.div`
   display: inline-block;
   padding: 0 4px;
+  margin-bottom: 10px;
   color: #536166;
   font-size: 14px;
+  cursor: pointer;
+
   span {
     padding-left: 4px;
   }

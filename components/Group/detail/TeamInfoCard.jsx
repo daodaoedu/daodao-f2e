@@ -53,13 +53,19 @@ const labels = [
     text: '學習領域',
     format: (v) => (Array.isArray(v) ? v.join('、') : v),
   },
-  { key: 'area', icon: locationSvg.src, text: '地點' },
+  {
+    key: 'area',
+    icon: locationSvg.src,
+    text: '地點',
+    format: (v) => (Array.isArray(v) ? v.join('、') : v),
+  },
   { key: 'time', icon: clockSvg.src, text: '時間' },
   { key: 'partnerStyle', icon: personSvg.src, text: '想找的夥伴' },
   {
     key: 'partnerEducationStep',
     icon: bachelorCapSvg.src,
     text: '適合的教育階段',
+    format: (v) => (Array.isArray(v) ? v.join('、') : v),
   },
 ];
 
