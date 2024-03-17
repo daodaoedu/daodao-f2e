@@ -21,9 +21,11 @@ const StyledGroupsWrapper = styled.div`
   @media (max-width: 767px) {
     padding: 16px 20px;
   }
+
+  ${(props) => props.sx}
 `;
 
-const MyGroup = () => {
+const MyGroup = ({ hasTitle = true, sx }) => {
   const [response, setResponse] = useState(null);
   const me = useSelector((state) => state.user);
   const { isFetching } = useFetch(`${GROUP_API_URL}/user/${me?._id}`, {
@@ -71,12 +73,15 @@ const MyGroup = () => {
   };
 
   return (
-    <StyledGroupsWrapper>
-      <Typography
-        sx={{ fontSize: '22px', color: '#536166', fontWeight: 700, mb: 1 }}
-      >
-        我的揪團
-      </Typography>
+    <StyledGroupsWrapper sx={sx}>
+      {hasTitle && (
+        <Typography
+          sx={{ fontSize: '22px', color: '#536166', fontWeight: 700, mb: 1 }}
+        >
+          我的揪團
+        </Typography>
+      )}
+
       <Box maxWidth="560px" width="100%">
         {isFetching ? (
           <LoadingCard />
