@@ -21,10 +21,7 @@ const BottonEdit = {
     color: '#16B9B3',
   },
   '@media (max-width: 767px)': {
-    position: 'absolute',
-    right: '25%',
-    top: '252%',
-    width: '160px',
+    display: 'none',
   },
 };
 
@@ -89,38 +86,43 @@ const StyledProfileOther = styled(Box)`
   margin-top: 24px;
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
   @media (max-width: 767px) {
     flex-direction: column;
+    align-items: flex-start;
   }
 `;
 const StyledProfileSocial = styled.ul`
   display: flex;
   align-items: center;
-  @media (max-width: 767px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+  flex-direction: column;
+  align-items: flex-start;
   li {
     align-items: center;
     display: flex;
     margin-right: 16px;
-    @media (max-width: 767px) {
-      margin-bottom: 8px;
-    }
+    margin-bottom: 8px;
   }
   li:last-of-type {
-    margin-right: 0;
+    margin-bottom: 0;
   }
   li svg {
     color: #16b9b3;
   }
-  li p {
+  li p,
+  li a {
     margin-left: 5px;
     color: #293a3d;
     font-size: 12px;
     font-style: normal;
     font-weight: 400;
     line-height: 140%;
+  }
+
+  li a {
+    color: #16b9b3;
+    cursor: pointer;
+    text-decoration: underline;
   }
 `;
 const StyledProfileDate = styled.p`
@@ -129,6 +131,7 @@ const StyledProfileDate = styled.p`
   font-weight: 400;
   line-height: 140%;
   @media (max-width: 767px) {
+    width: 100%;
     text-align: right;
   }
 `;
@@ -206,7 +209,7 @@ function UserCard({
             router.push('/profile');
           }}
         >
-          <EditOutlinedIcon />
+          <EditOutlinedIcon sx={{ color: '#16B9B3' }} />
           編輯
         </Button>
       ) : (
@@ -244,17 +247,29 @@ function UserCard({
       )}
 
       <StyledProfileOther>
-        <StyledProfileSocial style={{ listStyle: 'none', display: 'flex' }}>
+        <StyledProfileSocial style={{ listStyle: 'none' }}>
           {!!contactList.instagram && (
             <li>
               <RiInstagramFill size="20px" />
-              <p>{contactList.instagram}</p>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={`https://www.instagram.com/${contactList.instagram}`}
+              >
+                {contactList.instagram}
+              </a>
             </li>
           )}
           {!!contactList.facebook && (
             <li>
               <FaFacebook size="20px" />
-              <p>{contactList.facebook}</p>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={`https://www.facebook.com/${contactList.facebook}`}
+              >
+                {contactList.facebook}
+              </a>
             </li>
           )}
           {!!contactList.line && (

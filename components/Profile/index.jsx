@@ -3,6 +3,8 @@ import { useRouter } from 'next/router';
 import { Box, Button } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+
 import {
   WANT_TO_DO_WITH_PARTNER,
   ROLE,
@@ -10,8 +12,11 @@ import {
 } from '@/constants/member';
 import { mapToTable } from '@/utils/helper';
 import SEOConfig from '@/shared/components/SEO';
+import MyGroup from './MyGroup';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
+import UserInfoBasic from './UserTabs/UserInfoBasic';
+import { StyledPanelBox } from './UserTabs/UserTabs.styled';
 
 const BottonBack = {
   color: '#536166',
@@ -25,6 +30,22 @@ const BottonBack = {
   },
   '@media (max-width: 767px)': {
     position: 'unset',
+  },
+};
+const BottonEdit = {
+  display: 'none',
+  '@media (max-width: 767px)': {
+    display: 'flex',
+    width: '100%',
+    color: '#536166',
+    fontSize: '14px',
+    boxShadow: 'unset',
+    borderRadius: '20px',
+    marginTop: '32px',
+    padding: '8px 0',
+    '&:hover': {
+      color: '#16B9B3',
+    },
   },
 };
 const WANT_TO_DO_WITH_PARTNER_TABLE = mapToTable(WANT_TO_DO_WITH_PARTNER);
@@ -128,7 +149,7 @@ const Profile = ({
           />
         )}
       </Box>
-
+      {/* UserTabs */}
       {isLoading ? (
         <Skeleton
           variant="rounded"
@@ -139,12 +160,42 @@ const Profile = ({
       ) : (
         <UserTabs
           isLoading={isLoading}
-          description={selfIntroduction}
-          wantToDoList={wantTodo}
-          share={share}
+          panels={[
+            {
+              id: '1',
+              title: '基本資訊',
+              content: (
+                <UserInfoBasic
+                  description={selfIntroduction}
+                  wantToDoList={wantTodo}
+                  share={share}
+                />
+              ),
+            },
+            {
+              id: '2',
+              title: '推薦的資源',
+              content: <StyledPanelBox>即將推出，敬請期待</StyledPanelBox>,
+            },
+            {
+              id: '3',
+              title: '發起的揪團',
+              content: (
+                <MyGroup
+                  sx={{
+                    maxWidth: '100%',
+                    padding: '40px 30px',
+                    '@media (max-width: 767px)': {
+                      padding: '30px',
+                    },
+                  }}
+                />
+              ),
+            },
+          ]}
         />
       )}
-      {email !== sendEmail && (
+      {email !== sendEmail ? (
         <Button
           sx={{
             width: '160px',
@@ -159,6 +210,17 @@ const Profile = ({
           onClick={handleContactPartner}
         >
           聯繫夥伴
+        </Button>
+      ) : (
+        <Button
+          variant="outlined"
+          sx={BottonEdit}
+          onClick={() => {
+            router.push('/profile');
+          }}
+        >
+          <EditOutlinedIcon sx={{ color: '#16B9B3' }} />
+          編輯
         </Button>
       )}
     </Box>
