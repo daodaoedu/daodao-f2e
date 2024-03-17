@@ -18,9 +18,11 @@ function UserInfoBasic({ description = '', wantToDoList = [], share = '' }) {
       <StyledPanelText sx={{ paddingTop: '6px' }}>
         <p>簡介</p>
         <div>
-          {description
-            ? description.split('\n').map((d) => <span>{d}</span>)
-            : '尚未填寫'}
+          {description ? (
+            description.split('\n').map((d) => <span>{d}</span>)
+          ) : (
+            <span>尚未填寫</span>
+          )}
         </div>
       </StyledPanelText>
     </StyledPanelBox>
