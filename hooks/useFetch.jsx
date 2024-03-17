@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useState } from 'react';
 
-const useFetch = (url, { initialValue } = {}) => {
+const useFetch = (url, { initialValue, onSuccess } = {}) => {
   const [render, refetch] = useReducer((pre) => !pre, true);
   const [data, setData] = useState(initialValue);
   const [isFetching, setIsFetching] = useState(true);
@@ -24,6 +24,10 @@ const useFetch = (url, { initialValue } = {}) => {
       pass = false;
     };
   }, [url, render]);
+
+  useEffect(() => {
+    if (onSuccess) onSuccess(data);
+  }, [onSuccess, data]);
 
   return { data, isFetching, isError, refetch };
 };
