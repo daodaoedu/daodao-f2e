@@ -164,7 +164,8 @@ const useEditProfile = () => {
       },
       wantToDoList,
       educationStage,
-      location: `${country}@${city}@${district}`,
+      location:
+        country === '國外' ? country : [country, city, district].join('@'),
       tagList,
       selfIntroduction,
       share,
