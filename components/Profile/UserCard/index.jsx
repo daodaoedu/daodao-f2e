@@ -228,10 +228,10 @@ function UserCard({
           </StyledProfileTitle>
 
           <StyledProfileLocation>
-            <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />{' '}
+            <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />
             {location
               ? location.length >= 2
-                ? locations.join('').replace('台灣', '').replace('null', '')
+                ? locations.join('').replace('台灣', '').replaceAll('null', '')
                 : locations.join('')
               : '-'}
           </StyledProfileLocation>

@@ -25,10 +25,13 @@ const StyledGroupsWrapper = styled.div`
   ${(props) => props.sx}
 `;
 
-const MyGroup = ({ hasTitle = true, sx }) => {
+const MyGroup = ({ hasTitle = true, sx, userId }) => {
+  if (!userId) {
+    return <Typography py={7.5}>趕快發起屬於你的揪團吧～</Typography>;
+  }
+
   const [response, setResponse] = useState(null);
-  const me = useSelector((state) => state.user);
-  const { isFetching } = useFetch(`${GROUP_API_URL}/user/${me?._id}`, {
+  const { isFetching } = useFetch(`${GROUP_API_URL}/user/${userId}`, {
     onSuccess: setResponse,
   });
 

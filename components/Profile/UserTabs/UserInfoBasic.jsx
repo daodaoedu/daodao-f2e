@@ -19,7 +19,7 @@ function UserInfoBasic({ description = '', wantToDoList = [], share = '' }) {
         <p>簡介</p>
         <div>
           {description ? (
-            description.split('\n').map((d) => <span>{d}</span>)
+            description.split('\n').map((d) => <span key={d}>{d}</span>)
           ) : (
             <span>尚未填寫</span>
           )}

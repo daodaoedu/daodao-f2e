@@ -29,6 +29,7 @@ const UserTabs = ({ panels = [] }) => {
             {panels.length > 0 &&
               panels.map((panel) => (
                 <Tab
+                  key={panel.id}
                   style={{ flexGrow: 1 }}
                   label={panel.title}
                   value={panel.id}
@@ -38,7 +39,7 @@ const UserTabs = ({ panels = [] }) => {
         </StyledTabContextBox>
         {panels.length > 0 &&
           panels.map((panel) => (
-            <TabPanel value={panel.id} sx={{ padding: '0' }}>
+            <TabPanel key={panel.id} value={panel.id} sx={{ padding: '0' }}>
               {panel.content}
             </TabPanel>
           ))}

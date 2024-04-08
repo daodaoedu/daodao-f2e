@@ -12,6 +12,7 @@ import Navigation from '@/shared/components/Navigation_v2';
 import MyGroup from '@/components/Profile/MyGroup';
 import AccountSetting from '@/components/Profile/Accountsetting';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useSelector } from 'react-redux';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -79,6 +80,16 @@ function a11yProps(index) {
 const ProfilePage = () => {
   const router = useRouter();
   const mobileScreen = useMediaQuery('(max-width: 767px)');
+  const me = useSelector((state) => state.user);
+  const tabsItems = tabs.map((tab) =>
+    tab.id === 'my-group'
+      ? {
+          ...tab,
+          view: <MyGroup userId={me?._id} />,
+        }
+      : tab,
+  );
+
   const [value, setValue] = useState(() => {
     const id = new URLSearchParams(location.search).get('id');
     const tabIndex = tabs.findIndex((tab) => tab.id === id);
@@ -156,7 +167,7 @@ const ProfilePage = () => {
           </Tabs>
         </Box>
         <Box sx={{ flex: 1, maxWidth: '672px' }}>
-          {tabs.map((tab, index) => (
+          {tabsItems.map((tab, index) => (
             <TabPanel key={tab.id} value={value} index={index}>
               {tab.view}
             </TabPanel>

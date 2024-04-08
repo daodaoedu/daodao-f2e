@@ -53,6 +53,7 @@ const ROLELIST = mapToTable(ROLE);
 const EDUCATION_STAGE_TABLE = mapToTable(EDUCATION_STAGE);
 
 const Profile = ({
+  _id,
   name,
   email,
   photoURL,
@@ -182,9 +183,12 @@ const Profile = ({
               title: '發起的揪團',
               content: (
                 <MyGroup
+                  userId={_id}
+                  hasTitle={false}
                   sx={{
                     maxWidth: '100%',
                     padding: '40px 30px',
+                    alignItems: 'flex-start',
                     '@media (max-width: 767px)': {
                       padding: '30px',
                     },
