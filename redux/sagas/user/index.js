@@ -2,6 +2,7 @@ import { put, all, take, takeEvery, select, call } from 'redux-saga/effects';
 import * as localforage from 'localforage';
 import firebase from '../../../utils/firebase';
 import { BASE_URL } from '@/constants/common';
+import req from '@/utils/request';
 
 function* checkUserStatus() {
   try {
@@ -52,15 +53,12 @@ function* updateUserProfile(action) {
   try {
     const URL = `${BASE_URL}/user/${user.id}`;
 
-    const result = yield fetch(URL, {
+    const result = yield req(URL, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({
         ...user,
       }),
-    }).then((res) => res.json());
+    });
 
     yield put({ type: 'UPDATE_USER_PROFILE_SUCCESS', payload: result.data });
   } catch (error) {
@@ -68,14 +66,19 @@ function* updateUserProfile(action) {
   }
 }
 
+// fetch user data by id with header auth token
 function* fetchUserById(action) {
-  const { id } = action.payload;
+  const { id, token } = action.payload;
   try {
     const URL = `${BASE_URL}/user/${id}`;
-    const result = yield fetch(URL).then((res) => res.json());
+    const result = yield req(URL, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     yield put({
       type: 'FETCH_USER_BY_ID_SUCCESS',
-      payload: result.data && result.data[0],
+      payload: result.data && { ...result.data[0], token },
     });
   } catch (error) {
     console.log(error);

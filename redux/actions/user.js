@@ -22,11 +22,17 @@ export function fetchAllUsers() {
   };
 }
 
-export function fetchUserById(id) {
+/**
+ * @param {string} id
+ * @param {string} token
+ * @returns
+ */
+export function fetchUserById(id, token) {
   return {
     type: 'FETCH_USER_BY_ID',
     payload: {
       id,
+      token,
     },
   };
 }

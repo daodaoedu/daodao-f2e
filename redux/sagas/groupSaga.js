@@ -1,4 +1,6 @@
 import { put, takeEvery, select } from 'redux-saga/effects';
+import req from '@/utils/request';
+
 import {
   GROUP_API_URL,
   SET_PAGE_SIZE,
@@ -14,7 +16,7 @@ function* getGroupItems() {
   const queryString = new URLSearchParams({ ...query, pageSize }).toString();
   const URL = `${GROUP_API_URL}?${queryString}`;
   try {
-    const response = yield fetch(URL).then((res) => res.json());
+    const response = yield req(URL);
     yield put(getGroupItemsSuccess(response));
   } catch (error) {
     yield put(getGroupItemsError(error));

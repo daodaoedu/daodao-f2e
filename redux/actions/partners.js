@@ -1,3 +1,5 @@
+import { BASE_URL } from '@/constants/common';
+
 export function fetchPartners({ pageSize = 10, page = 1, ...rest } = {}) {
   return {
     type: 'FETCH_PARTNERS',
@@ -19,10 +21,14 @@ export function fetchPartnerById({ id } = {}) {
 }
 
 export function sendEmailToPartner(payload) {
-  const { to, name, roleList, photoURL, text, information } = payload;
+  const { userId, from, to, name, roleList, photoURL, text, information } =
+    payload;
   return {
     type: 'SEND_EMAIL_TO_PARTNER',
     payload: {
+      from,
+      userId, //寄件者id
+      url: BASE_URL,
       to, // 收件者信箱
       subject: '【島島阿學】點開 Email，認識新夥伴',
       title: '有新夥伴想認識你！',

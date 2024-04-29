@@ -1,5 +1,6 @@
 import { put, takeEvery } from 'redux-saga/effects';
 import { BASE_URL } from '@/constants/common';
+import req from '@/utils/request';
 
 function* fetchPartnersResource(action) {
   const { pageSize = 10, page = 1, ...rest } = action.payload;
@@ -12,9 +13,8 @@ function* fetchPartnersResource(action) {
   }, startParams);
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || BASE_URL;
-    const URL = `${baseUrl}/user?${queryStr}`;
-    const result = yield fetch(URL).then((res) => res.json());
+    const URL = `${BASE_URL}/user?${queryStr}`;
+    const result = yield req(URL);
     yield put({
       type:
         page !== 1 ? 'FETCH_PARTNERS_MORE_SUCCESS' : 'FETCH_PARTNERS_SUCCESS',
@@ -36,9 +36,8 @@ function* fetchPartnersResource(action) {
 function* fetchPartnerById(action) {
   const { id } = action.payload;
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || BASE_URL;
-    const URL = `${baseUrl}/user/${id}`;
-    const result = yield fetch(URL).then((res) => res.json());
+    const URL = `${BASE_URL}/user/${id}`;
+    const result = yield req(URL);
     yield put({
       type: 'FETCH_PARTNER_BY_ID_SUCCESS',
       payload: result.data && result.data[0],
@@ -51,19 +50,17 @@ function* fetchPartnerById(action) {
 function* sendEmailToPartner(action) {
   try {
     const URL = `${BASE_URL}/email`;
-    yield fetch(URL, {
+    yield req(URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({
         ...action.payload,
       }),
-    }).then((res) => res.json());
+    });
     yield put({
       type: 'SEND_EMAIL_TO_PARTNER_SUCCESS',
     });
   } catch (error) {
+    console.log(error);
     yield put({ type: 'SEND_EMAIL_TO_PARTNER_FAILURE' });
   }
 }

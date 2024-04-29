@@ -111,29 +111,31 @@ function Partner() {
           />
           <PartnerList />
         </StyledContent>
-        {partners.items.length > 0 && current < totalPages && (
-          <Box
-            sx={
-              mobileScreen
-                ? { textAlign: 'center', padding: '32px 0' }
-                : { textAlign: 'center', padding: '72px 0' }
-            }
-          >
-            <Button
-              onClick={() => handleFetchData(current + 1)}
-              variant="outlined"
-              sx={{
-                fontSize: '16px',
-                color: '#536166',
-                borderColor: '#16B9B3',
-                borderRadius: '20px',
-                padding: '6px 48px',
-              }}
+        {partners.items &&
+          partners.items.length > 0 &&
+          current < totalPages && (
+            <Box
+              sx={
+                mobileScreen
+                  ? { textAlign: 'center', padding: '32px 0' }
+                  : { textAlign: 'center', padding: '72px 0' }
+              }
             >
-              顯示更多
-            </Button>
-          </Box>
-        )}
+              <Button
+                onClick={() => handleFetchData(current + 1)}
+                variant="outlined"
+                sx={{
+                  fontSize: '16px',
+                  color: '#536166',
+                  borderColor: '#16B9B3',
+                  borderRadius: '20px',
+                  padding: '6px 48px',
+                }}
+              >
+                顯示更多
+              </Button>
+            </Box>
+          )}
       </StyledWrapper>
     </>
   );
