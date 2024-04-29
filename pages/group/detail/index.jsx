@@ -1,18 +1,23 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 import SEOConfig from '@/shared/components/SEO';
 import GroupDetail from '@/components/Group/detail';
 import GroupEmpty from '@/components/Group/detail/Empty';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 import useFetch from '@/hooks/useFetch';
+import { BASE_URL } from '@/constants/common';
 
 function GroupPage() {
   const router = useRouter();
   const { id } = router.query;
-  const { data, isFetching, isError } = useFetch(
-    `https://daodao-server.vercel.app/activity/${id}`,
-  );
+  const me = useSelector((state) => state.user);
+  const { data, isFetching, isError } = useFetch(`${BASE_URL}/activity/${id}`, {
+    headers: {
+      Authorization: `Bearer ${me.token}`,
+    },
+  });
   const source = data?.data?.[0];
 
   const SEOData = useMemo(

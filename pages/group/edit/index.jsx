@@ -10,15 +10,18 @@ import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 import { GROUP_API_URL } from '@/redux/actions/group';
+import { BASE_URL } from '@/constants/common';
 
 function EditGroupPage() {
   const { pushSnackbar } = useSnackbar();
   const router = useRouter();
   const me = useSelector((state) => state.user);
   const { id } = router.query;
-  const { data, isFetching } = useFetch(
-    `https://daodao-server.vercel.app/activity/${id}`,
-  );
+  const { data, isFetching } = useFetch(`${BASE_URL}/activity/${id}`, {
+    headers: {
+      Authorization: `Bearer ${me.token}`,
+    },
+  });
   const source = data?.data?.[0];
 
   const SEOData = useMemo(

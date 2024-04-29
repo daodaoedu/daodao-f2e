@@ -36,6 +36,8 @@ const Detail = () => {
 
   // fetch login user info
   const {
+    _id,
+    email,
     name,
     roleList,
     photoURL,
@@ -56,6 +58,8 @@ const Detail = () => {
   const handleOnOk = ({ message, contact }) => {
     dispatch(
       sendEmailToPartner({
+        userId: _id,
+        from: email,
         to: partner.email,
         name,
         roleList:

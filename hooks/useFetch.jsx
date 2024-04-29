@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useState } from 'react';
 
-const useFetch = (url, { initialValue, onSuccess } = {}) => {
+const useFetch = (url, options = {}, { initialValue, onSuccess } = {}) => {
   const [render, refetch] = useReducer((pre) => !pre, true);
   const [data, setData] = useState(initialValue);
   const [isFetching, setIsFetching] = useState(true);
@@ -14,7 +14,7 @@ const useFetch = (url, { initialValue, onSuccess } = {}) => {
     setIsFetching(true);
     setIsError(false);
 
-    fetch(url)
+    fetch(url, options)
       .then((res) => res.json())
       .then((json) => pass && setData(json))
       .catch(() => setIsError(true))
