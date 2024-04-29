@@ -12,12 +12,7 @@ import { BASE_URL } from '@/constants/common';
 function GroupPage() {
   const router = useRouter();
   const { id } = router.query;
-  const me = useSelector((state) => state.user);
-  const { data, isFetching, isError } = useFetch(`${BASE_URL}/activity/${id}`, {
-    headers: {
-      Authorization: `Bearer ${me.token}`,
-    },
-  });
+  const { data, isFetching, isError } = useFetch(`${BASE_URL}/activity/${id}`);
   const source = data?.data?.[0];
 
   const SEOData = useMemo(

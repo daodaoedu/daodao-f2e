@@ -17,11 +17,7 @@ function EditGroupPage() {
   const router = useRouter();
   const me = useSelector((state) => state.user);
   const { id } = router.query;
-  const { data, isFetching } = useFetch(`${BASE_URL}/activity/${id}`, {
-    headers: {
-      Authorization: `Bearer ${me.token}`,
-    },
-  });
+  const { data, isFetching } = useFetch(`${BASE_URL}/activity/${id}`);
   const source = data?.data?.[0];
 
   const SEOData = useMemo(

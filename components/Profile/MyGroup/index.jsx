@@ -29,21 +29,11 @@ const MyGroup = ({ hasTitle = true, sx, userId }) => {
   if (!userId) {
     return <Typography py={7.5}>趕快發起屬於你的揪團吧～</Typography>;
   }
-  // TODO: 待優化
-  const me = useSelector((state) => state.user);
 
   const [response, setResponse] = useState(null);
-  const { isFetching } = useFetch(
-    `${GROUP_API_URL}/${userId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${me.token}`,
-      },
-    },
-    {
-      onSuccess: setResponse,
-    },
-  );
+  const { isFetching } = useFetch(`${GROUP_API_URL}/user/${userId}`, {
+    onSuccess: setResponse,
+  });
 
   const getTargetIndexById = (data, id) => {
     if (!Array.isArray(data)) return -1;

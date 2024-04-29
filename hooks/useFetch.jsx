@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useState } from 'react';
 
-const useFetch = (url, options = {}, { initialValue, onSuccess } = {}) => {
+const useFetch = (url, { initialValue, onSuccess } = {}) => {
   const [render, refetch] = useReducer((pre) => !pre, true);
   const [data, setData] = useState(initialValue);
   const [isFetching, setIsFetching] = useState(true);
