@@ -54,7 +54,7 @@ const StyledContainer = styled.div`
   }
 `;
 
-const SearchTags = () => {
+const SearchTags = ({ searchTags = [] }) => {
   const [getSearchParams, pushState] = useSearchParamsManager();
   const [_, setTag] = useState();
   const currentTags = getSearchParams('tag').toString();
@@ -71,7 +71,7 @@ const SearchTags = () => {
     <StyledContainer>
       <p>熱門標籤</p>
       <ul>
-        {SEARCH_TAGS['全部'].map((t) => (
+        {searchTags.map((t) => (
           <li key={t} onClick={() => handleChange(t)}>
             {t}
           </li>
