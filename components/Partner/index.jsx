@@ -5,7 +5,6 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { TAIWAN_DISTRICT } from '@/constants/areas';
 import { fetchPartners } from '@/redux/actions/partners';
 import { EDUCATION_STEP, ROLE } from '@/constants/member';
-import { SEARCH_TAGS } from '@/constants/category';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
 import PartnerList from './PartnerList';
@@ -41,15 +40,6 @@ const AREAS = TAIWAN_DISTRICT.map(({ name }) => ({
   label: name,
 })).concat([{ name: '國外', label: '國外' }]);
 
-// constants
-const keySelections = {
-  area: _map(AREAS, 'name'),
-  edu: _map(EDUCATION_STEP, 'label'),
-  role: _map(ROLE, 'label'),
-  tag: SEARCH_TAGS['全部'],
-  q: 'PASS_STRING',
-};
-
 const eduObj = createObjFromArrary(EDUCATION_STEP, 'label', 'key');
 const roleObj = createObjFromArrary(ROLE, 'label', 'key');
 
@@ -57,9 +47,23 @@ function Partner() {
   const dispatch = useDispatch();
   const mobileScreen = useMediaQuery('(max-width: 767px)');
 
-  // main data
-  const partners = useSelector((state) => state.partners);
-  const { page: current = 1, totalPages } = partners.pagination;
+  // main data - partner and tag
+  const {
+    items: partnerItems,
+    pagination,
+    tags,
+  } = useSelector((state) => state.partners);
+
+  // constants
+  const keySelections = {
+    area: _map(AREAS, 'name'),
+    edu: _map(EDUCATION_STEP, 'label'),
+    role: _map(ROLE, 'label'),
+    tag: tags,
+    q: 'PASS_STRING',
+  };
+
+  const { page: current = 1, totalPages } = pagination;
 
   // queryStr
   const [getSearchParams, _, generateParamsItems] = useSearchParamsManager();
@@ -111,31 +115,29 @@ function Partner() {
           />
           <PartnerList />
         </StyledContent>
-        {partners.items &&
-          partners.items.length > 0 &&
-          current < totalPages && (
-            <Box
-              sx={
-                mobileScreen
-                  ? { textAlign: 'center', padding: '32px 0' }
-                  : { textAlign: 'center', padding: '72px 0' }
-              }
+        {partnerItems && partnerItems.length > 0 && current < totalPages && (
+          <Box
+            sx={
+              mobileScreen
+                ? { textAlign: 'center', padding: '32px 0' }
+                : { textAlign: 'center', padding: '72px 0' }
+            }
+          >
+            <Button
+              onClick={() => handleFetchData(current + 1)}
+              variant="outlined"
+              sx={{
+                fontSize: '16px',
+                color: '#536166',
+                borderColor: '#16B9B3',
+                borderRadius: '20px',
+                padding: '6px 48px',
+              }}
             >
-              <Button
-                onClick={() => handleFetchData(current + 1)}
-                variant="outlined"
-                sx={{
-                  fontSize: '16px',
-                  color: '#536166',
-                  borderColor: '#16B9B3',
-                  borderRadius: '20px',
-                  padding: '6px 48px',
-                }}
-              >
-                顯示更多
-              </Button>
-            </Box>
-          )}
+              顯示更多
+            </Button>
+          </Box>
+        )}
       </StyledWrapper>
     </>
   );

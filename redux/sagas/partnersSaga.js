@@ -60,8 +60,18 @@ function* sendEmailToPartner(action) {
       type: 'SEND_EMAIL_TO_PARTNER_SUCCESS',
     });
   } catch (error) {
-    console.log(error);
     yield put({ type: 'SEND_EMAIL_TO_PARTNER_FAILURE' });
+  }
+}
+
+function* fetchPartnerTags() {
+  try {
+    const URL = `${BASE_URL}/tag`;
+    const result = yield fetch(URL).then((res) => res.json());
+    console.log(result);
+    yield put({ type: 'FETCH_PARTNER_TAGS_SUCCESS', payload: result });
+  } catch (e) {
+    yield put({ type: 'FETCH_PARTNER_TAGS_FAILURE' });
   }
 }
 
@@ -69,6 +79,7 @@ function* partnerSaga() {
   yield takeEvery('FETCH_PARTNERS', fetchPartnersResource);
   yield takeEvery('FETCH_PARTNER_BY_ID', fetchPartnerById);
   yield takeEvery('SEND_EMAIL_TO_PARTNER', sendEmailToPartner);
+  yield takeEvery('FETCH_PARTNER_TAGS', fetchPartnerTags);
 }
 
 export default partnerSaga;

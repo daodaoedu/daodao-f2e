@@ -1,4 +1,7 @@
 import styled from '@emotion/styled';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchPartnerTags } from '@/redux/actions/partners';
 import SearchInput from './SearchInput';
 import SelectedAreas from './SelectedAreas';
 import SelectedEducationStep from './SelectedEducationStep';
@@ -31,6 +34,13 @@ const StyledSearchField = styled.div`
 `;
 
 const SearchField = () => {
+  const { tags = [] } = useSelector((state) => state.partners);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchPartnerTags());
+  }, []);
+
   return (
     <StyledSearchField>
       <SearchInput />
@@ -39,7 +49,7 @@ const SearchField = () => {
         <SelectedAreas />
         <SelectedEducationStep />
       </div>
-      <SearchTags />
+      <SearchTags searchTags={tags.filter((d) => d !== '' && d !== ' ')} />
     </StyledSearchField>
   );
 };

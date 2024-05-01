@@ -40,3 +40,9 @@ export function sendEmailToPartner(payload) {
     },
   };
 }
+
+export function fetchPartnerTags() {
+  return {
+    type: 'FETCH_PARTNER_TAGS',
+  };
+}

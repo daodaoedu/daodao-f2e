@@ -1,5 +1,6 @@
 const initialState = {
   items: [],
+  tags: [],
   partner: null,
   pagination: {
     pageSize: 10,
@@ -19,7 +20,7 @@ const reducer = (state = initialState, action) => {
     }
     case 'FETCH_PARTNERS_SUCCESS': {
       return {
-        ...initialState,
+        ...state,
         items: action.payload.data,
         pagination: action.payload.pagination,
       };
@@ -46,6 +47,18 @@ const reducer = (state = initialState, action) => {
     }
     case 'SEND_EMAIL_TO_PARTNER_FAILURE': {
       return { ...state };
+    }
+    case 'FETCH_PARTNER_TAGS_SUCCESS': {
+      return {
+        ...state,
+        tags: action.payload,
+      };
+    }
+    case 'FETCH_PARTNER_TAGS_FAILURE': {
+      return {
+        ...state,
+        tags: [],
+      };
     }
     default: {
       return state;
