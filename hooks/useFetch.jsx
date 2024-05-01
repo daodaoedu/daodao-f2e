@@ -14,7 +14,7 @@ const useFetch = (url, { initialValue, onSuccess } = {}) => {
     setIsFetching(true);
     setIsError(false);
 
-    fetch(url, options)
+    fetch(url)
       .then((res) => res.json())
       .then((json) => pass && setData(json))
       .catch(() => setIsError(true))
