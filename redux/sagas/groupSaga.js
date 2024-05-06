@@ -1,4 +1,4 @@
-import { put, takeEvery, select } from 'redux-saga/effects';
+import { put, takeLatest, select } from 'redux-saga/effects';
 import req from '@/utils/request';
 
 import {
@@ -24,7 +24,7 @@ function* getGroupItems() {
 }
 
 function* groupSaga() {
-  yield takeEvery([SET_PAGE_SIZE, SET_QUERY], getGroupItems);
+  yield takeLatest([SET_PAGE_SIZE, SET_QUERY], getGroupItems);
 }
 
 export default groupSaga;
