@@ -1,4 +1,5 @@
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -10,22 +11,19 @@ import StyledPaper from '../Paper.styled';
 import TeamInfoCard from './TeamInfoCard';
 import OrganizerCard from './OrganizerCard';
 import More from './More';
-import { StyledContainer, StyledHeading, StyledGoBack } from './Detail.styled';
+import {
+  StyledContainer,
+  StyledHeading,
+  StyledGoBack,
+  StyledDesktopEditButton,
+  StyledMobileEditButton,
+} from './Detail.styled';
 import ContactButton from './Contact';
-
-const StyledEditButton = styled(Button)`
-  display: none;
-  max-width: 316px;
-  width: 100%;
-  border-radius: 20px;
-
-  @media (max-width: 767px) {
-    display: block;
-  }
-`;
 
 function GroupDetail({ id, source, isLoading }) {
   const router = useRouter();
+  const me = useSelector((state) => state.user);
+  const isMyGroup = source?.userId === me?._id;
 
   return (
     <Box sx={{ background: '#f3fcfc', pb: '48px' }}>
@@ -52,7 +50,16 @@ function GroupDetail({ id, source, isLoading }) {
           ) : (
             <StyledStatus className="finished">已結束</StyledStatus>
           )}
-          <More groupId={id} userId={source?.userId} />
+          {isMyGroup ? (
+            <StyledDesktopEditButton
+              variant="outlined"
+              onClick={() => router.push(`/group/edit?id=${id}`)}
+            >
+              編輯
+            </StyledDesktopEditButton>
+          ) : (
+            <More />
+          )}
           <StyledHeading>
             {isLoading ? <Skeleton animation="wave" /> : source?.title}
           </StyledHeading>
@@ -70,18 +77,21 @@ function GroupDetail({ id, source, isLoading }) {
             justifyContent: 'center',
           }}
         >
-          <StyledEditButton
-            variant="outlined"
-            onClick={() => router.push(`/group/edit?id=${id}`)}
-          >
-            編輯
-          </StyledEditButton>
-          <ContactButton
-            user={source?.user || {}}
-            title="聯繫主揪"
-            description="想跟主揪說的話"
-            descriptionPlaceholder="想參加主揪的團體嗎？可以簡單的自我介紹，寫下想加入的原因。"
-          />
+          {isMyGroup ? (
+            <StyledMobileEditButton
+              variant="outlined"
+              onClick={() => router.push(`/group/edit?id=${id}`)}
+            >
+              編輯
+            </StyledMobileEditButton>
+          ) : (
+            <ContactButton
+              user={source?.user || {}}
+              title="聯繫主揪"
+              description="想跟主揪說的話"
+              descriptionPlaceholder="想參加主揪的團體嗎？可以簡單的自我介紹，寫下想加入的原因。"
+            />
+          )}
         </Box>
       </StyledContainer>
     </Box>

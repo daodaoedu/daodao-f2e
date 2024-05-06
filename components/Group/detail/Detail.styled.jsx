@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import Button from '@mui/material/Button';
 
 export const StyledGoBack = styled.div`
   display: inline-block;
@@ -29,5 +30,27 @@ export const StyledContainer = styled.main`
   @media (max-width: 760px) {
     padding: 20px;
     width: 100%;
+  }
+`;
+
+export const StyledDesktopEditButton = styled(Button)`
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-radius: 20px;
+
+  @media (max-width: 767px) {
+    display: none;
+  }
+`;
+
+export const StyledMobileEditButton = styled(Button)`
+  display: none;
+  max-width: 316px;
+  width: 100%;
+  border-radius: 20px;
+
+  @media (max-width: 767px) {
+    display: block;
   }
 `;
