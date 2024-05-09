@@ -19,6 +19,7 @@ const MenuWrapper = styled.div`
   color: #fafafa;
   transition: height 0.3s ease;
   z-index: 100;
+  overflow: auto;
 `;
 
 const MenuListWrapper = styled.div`

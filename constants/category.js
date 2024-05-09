@@ -258,11 +258,16 @@ export const NAV_LINK_MOBILE = [
     link: '/search',
     target: '_self',
   },
-  // {
-  //   name: '找夥伴',
-  //   link: '/partner',
-  //   target: '_self',
-  // },
+  {
+    name: '找夥伴',
+    link: '/partner',
+    target: '_self',
+  },
+  {
+    name: '找揪團',
+    link: '/group',
+    target: '_self',
+  },
   {
     name: '找活動',
     link: '/activities',
