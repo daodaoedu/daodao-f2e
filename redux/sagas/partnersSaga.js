@@ -1,4 +1,4 @@
-import { put, takeEvery } from 'redux-saga/effects';
+import { put, takeEvery, takeLatest } from 'redux-saga/effects';
 import { BASE_URL } from '@/constants/common';
 import req from '@/utils/request';
 
@@ -76,7 +76,7 @@ function* fetchPartnerTags() {
 }
 
 function* partnerSaga() {
-  yield takeEvery('FETCH_PARTNERS', fetchPartnersResource);
+  yield takeLatest('FETCH_PARTNERS', fetchPartnersResource);
   yield takeEvery('FETCH_PARTNER_BY_ID', fetchPartnerById);
   yield takeEvery('SEND_EMAIL_TO_PARTNER', sendEmailToPartner);
   yield takeEvery('FETCH_PARTNER_TAGS', fetchPartnerTags);
