@@ -78,7 +78,11 @@ function* fetchUserById(action) {
     });
     yield put({
       type: 'FETCH_USER_BY_ID_SUCCESS',
-      payload: result.data && { ...result.data[0], token },
+      payload: result.data && {
+        ...result.data[0],
+        token,
+        lastLogin: Date.now(),
+      },
     });
   } catch (error) {
     console.log(error);
