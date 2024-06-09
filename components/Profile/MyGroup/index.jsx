@@ -1,8 +1,6 @@
 import { Fragment, useState } from 'react';
 import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
-import { useSelector } from 'react-redux';
-import { GROUP_API_URL } from '@/redux/actions/group';
 import useFetch from '@/hooks/useFetch';
 import GroupCard from './GroupCard';
 import LoadingCard from './LoadingCard';
@@ -26,12 +24,9 @@ const StyledGroupsWrapper = styled.div`
 `;
 
 const MyGroup = ({ hasTitle = true, sx, userId }) => {
-  if (!userId) {
-    return <Typography py={7.5}>趕快發起屬於你的揪團吧～</Typography>;
-  }
-
   const [response, setResponse] = useState(null);
-  const { isFetching } = useFetch(`${GROUP_API_URL}/user/${userId}`, {
+  const { isFetching } = useFetch(`/activity/user/${userId}`, {
+    enabled: !!userId,
     onSuccess: setResponse,
   });
 
@@ -74,6 +69,10 @@ const MyGroup = ({ hasTitle = true, sx, userId }) => {
       };
     });
   };
+
+  if (!userId) {
+    return <Typography py={7.5}>趕快發起屬於你的揪團吧～</Typography>;
+  }
 
   return (
     <StyledGroupsWrapper sx={sx}>

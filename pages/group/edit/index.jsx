@@ -9,15 +9,15 @@ import useMutation from '@/hooks/useMutation';
 import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
-import { GROUP_API_URL } from '@/redux/actions/group';
-import { BASE_URL } from '@/constants/common';
 
 function EditGroupPage() {
   const { pushSnackbar } = useSnackbar();
   const router = useRouter();
   const me = useSelector((state) => state.user);
   const { id } = router.query;
-  const { data, isFetching } = useFetch(`${BASE_URL}/activity/${id}`);
+  const { data, isFetching } = useFetch(`/activity/${id}`, {
+    enabled: !!id,
+  });
   const source = data?.data?.[0];
 
   const SEOData = useMemo(
@@ -36,25 +36,13 @@ function EditGroupPage() {
 
   const goToDetail = () => router.replace(`/group/detail?id=${id}`);
 
-  const { mutate, isLoading } = useMutation(
-    (values) => {
-      if (!id || id.includes('/')) return Promise.reject();
-
-      return fetch(`${GROUP_API_URL}/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(values),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+  const { mutate, isLoading } = useMutation(`/activity${id}`, {
+    method: 'PUT',
+    onSuccess: () => {
+      pushSnackbar({ message: '已發布修改' });
+      router.replace('/profile?id=my-group');
     },
-    {
-      onSuccess: () => {
-        pushSnackbar({ message: '已發布修改' });
-        router.replace('/profile?id=my-group');
-      },
-    },
-  );
+  });
 
   useEffect(() => {
     if (!me?._id) router.push('/login');

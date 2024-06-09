@@ -6,7 +6,6 @@ import useMutation from '@/hooks/useMutation';
 import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
-import { GROUP_API_URL } from '@/redux/actions/group';
 
 function CreateGroupPage() {
   const { pushSnackbar } = useSnackbar();
@@ -25,22 +24,13 @@ function CreateGroupPage() {
     [router?.asPath],
   );
 
-  const { mutate, isLoading } = useMutation(
-    (values) =>
-      fetch(GROUP_API_URL, {
-        method: 'POST',
-        body: JSON.stringify(values),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }),
-    {
-      onSuccess: () => {
-        pushSnackbar({ message: '已成功發布揪團' });
-        router.replace('/profile?id=my-group');
-      },
+  const { mutate, isLoading } = useMutation('/activity', {
+    method: 'POST',
+    onSuccess: () => {
+      pushSnackbar({ message: '已成功發布揪團' });
+      router.replace('/profile?id=my-group');
     },
-  );
+  });
 
   return (
     <>
