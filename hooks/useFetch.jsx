@@ -1,9 +1,13 @@
 import { useEffect, useReducer, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 import { BASE_URL } from '@/constants/common';
+import { userLogout } from '@/redux/actions/user';
 
 const useFetch = (url, { enabled = true, initialValue, onSuccess } = {}) => {
   const { token } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const router = useRouter();
   const [render, refetch] = useReducer((pre) => !pre, true);
   const [data, setData] = useState(initialValue);
   const [isFetching, setIsFetching] = useState(enabled);
@@ -24,7 +28,14 @@ const useFetch = (url, { enabled = true, initialValue, onSuccess } = {}) => {
     setIsError(false);
 
     fetch(endpoint, requestData)
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status < 300) return res.json();
+        if (res.status === 401) {
+          dispatch(userLogout());
+          router.replace('/login')
+        }
+        throw res;
+      })
       .then((json) => pass && setData(json))
       .catch(() => setIsError(true))
       .finally(() => setIsFetching(false));
