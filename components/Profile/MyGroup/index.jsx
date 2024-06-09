@@ -24,10 +24,6 @@ const StyledGroupsWrapper = styled.div`
 `;
 
 const MyGroup = ({ hasTitle = true, sx, userId }) => {
-  if (!userId) {
-    return <Typography py={7.5}>趕快發起屬於你的揪團吧～</Typography>;
-  }
-
   const [response, setResponse] = useState(null);
   const { isFetching } = useFetch(`/activity/user/${userId}`, {
     enabled: !!userId,
@@ -73,6 +69,10 @@ const MyGroup = ({ hasTitle = true, sx, userId }) => {
       };
     });
   };
+
+  if (!userId) {
+    return <Typography py={7.5}>趕快發起屬於你的揪團吧～</Typography>;
+  }
 
   return (
     <StyledGroupsWrapper sx={sx}>
