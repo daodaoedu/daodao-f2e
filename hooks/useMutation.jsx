@@ -1,9 +1,13 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 import { BASE_URL } from '@/constants/common';
+import { userLogout } from '@/redux/actions/user';
 
 const useMutation = (url, { method, onSuccess, onError } = {}) => {
   const { token } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -23,7 +27,14 @@ const useMutation = (url, { method, onSuccess, onError } = {}) => {
     setIsError(false);
 
     fetch(endpoint, requestData)
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status < 300) return res.json();
+        if (res.status === 401) {
+          dispatch(userLogout());
+          router.replace('/login')
+        }
+        throw res;
+      })
       .then(onSuccess)
       .catch((e) => {
         onError(e);

@@ -36,7 +36,7 @@ function EditGroupPage() {
 
   const goToDetail = () => router.replace(`/group/detail?id=${id}`);
 
-  const { mutate, isLoading } = useMutation(`/activity${id}`, {
+  const { mutate, isLoading } = useMutation(`/activity/${id}`, {
     method: 'PUT',
     onSuccess: () => {
       pushSnackbar({ message: '已發布修改' });
