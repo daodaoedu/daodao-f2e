@@ -1,8 +1,6 @@
 import { Fragment, useState } from 'react';
 import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
-import { useSelector } from 'react-redux';
-import { GROUP_API_URL } from '@/redux/actions/group';
 import useFetch from '@/hooks/useFetch';
 import GroupCard from './GroupCard';
 import LoadingCard from './LoadingCard';
@@ -31,7 +29,8 @@ const MyGroup = ({ hasTitle = true, sx, userId }) => {
   }
 
   const [response, setResponse] = useState(null);
-  const { isFetching } = useFetch(`${GROUP_API_URL}/user/${userId}`, {
+  const { isFetching } = useFetch(`/activity/user/${userId}`, {
+    enabled: !!userId,
     onSuccess: setResponse,
   });
 

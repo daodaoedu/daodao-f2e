@@ -1,20 +1,29 @@
 import { useEffect, useReducer, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { BASE_URL } from '@/constants/common';
 
-const useFetch = (url, { initialValue, onSuccess } = {}) => {
+const useFetch = (url, { enabled = true, initialValue, onSuccess } = {}) => {
+  const { token } = useSelector((state) => state.user);
   const [render, refetch] = useReducer((pre) => !pre, true);
   const [data, setData] = useState(initialValue);
-  const [isFetching, setIsFetching] = useState(true);
+  const [isFetching, setIsFetching] = useState(enabled);
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    let pass = true;
+    if (!enabled) return;
 
-    if (url.includes('undefined')) return undefined;
+    const endpoint = url.startsWith('http') ? url : `${BASE_URL}${url}`;
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    };
+    const requestData = { headers }
+    let pass = true;
 
     setIsFetching(true);
     setIsError(false);
 
-    fetch(url)
+    fetch(endpoint, requestData)
       .then((res) => res.json())
       .then((json) => pass && setData(json))
       .catch(() => setIsError(true))
@@ -23,7 +32,7 @@ const useFetch = (url, { initialValue, onSuccess } = {}) => {
     return () => {
       pass = false;
     };
-  }, [url, render]);
+  }, [enabled, token, url, render]);
 
   useEffect(() => {
     if (onSuccess) onSuccess(data);

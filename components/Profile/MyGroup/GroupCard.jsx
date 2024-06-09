@@ -7,7 +7,6 @@ import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
 import Image from '@/shared/components/Image';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import useMutation from '@/hooks/useMutation';
-import { GROUP_API_URL } from '@/redux/actions/group';
 import { timeDuration } from '@/utils/date';
 import {
   StyledAreas,
@@ -38,28 +37,15 @@ function GroupCard({
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState(null);
 
-  const apiUpdateGrouping = useMutation(
-    () =>
-      fetch(`${GROUP_API_URL}/${_id}`, {
-        method: 'PUT',
-        body: JSON.stringify({ isGrouping: !isGrouping }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }),
-    { onSuccess: onUpdateGrouping },
-  );
+  const apiUpdateGrouping = useMutation(`/activity/${_id}`, {
+    method: 'PUT',
+    onSuccess: onUpdateGrouping,
+  });
 
-  const apiDeleteGroup = useMutation(
-    () =>
-      fetch(`${GROUP_API_URL}/${_id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }),
-    { onSuccess: onDeleteGroup },
-  );
+  const apiDeleteGroup = useMutation(`/activity/${_id}`, {
+    method: 'DELETE',
+    onSuccess: onDeleteGroup,
+  });
 
   const handleMenu = (event) => {
     event.preventDefault();
@@ -72,7 +58,7 @@ function GroupCard({
 
   const handleGrouping = () => {
     handleClose();
-    apiUpdateGrouping.mutate();
+    apiUpdateGrouping.mutate({ isGrouping: !isGrouping });
   };
 
   const handleDeleteGroup = () => {
