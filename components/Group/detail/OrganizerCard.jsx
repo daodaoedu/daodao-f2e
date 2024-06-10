@@ -30,6 +30,7 @@ const StyledText = styled.div`
   font-weight: 400;
   color: #536166;
   white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 const StyledTag = styled.div`

@@ -10,6 +10,7 @@ export const StyledText = styled.div`
   overflow: hidden;
   color: ${(props) => props.color || '#536166'};
   font-size: ${(props) => props.fontSize || '14px'};
+  word-break: break-word;
 `;
 
 export const StyledTitle = styled.h2`
