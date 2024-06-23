@@ -1,3 +1,11 @@
+export const CHECK_LOGIN_VALIDITY = 'CHECK_LOGIN_VALIDITY';
+
+export function checkLoginValidity() {
+  return {
+    type: CHECK_LOGIN_VALIDITY
+  }
+}
+
 export function userLogin() {
   return {
     type: 'USER_LOGIN',
