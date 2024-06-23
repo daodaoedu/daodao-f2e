@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
-import { Provider, useSelector } from 'react-redux';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';
@@ -13,6 +13,7 @@ import SnackbarProvider from '@/contexts/Snackbar';
 import GlobalStyle from '@/shared/styles/Global';
 import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
+import { checkLoginValidity } from '@/redux/actions/user';
 import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
@@ -110,10 +111,16 @@ const App = ({ Component, pageProps }) => {
 };
 
 const ThemeComponentWrap = ({ pageProps, Component }) => {
+  const dispatch = useDispatch();
   const firebaseApp = initializeApp(firebaseConfig);
   const mode = useSelector((state) => state?.theme?.mode ?? 'light');
   const theme = useMemo(() => themeFactory(mode), [mode]);
   const isEnv = useMemo(() => process.env.NODE_ENV === 'development', []);
+
+  useEffect(() => {
+    dispatch(checkLoginValidity());
+  }, [])
+
   return (
     <ThemeProvider theme={theme}>
       {/* mui normalize css */}
