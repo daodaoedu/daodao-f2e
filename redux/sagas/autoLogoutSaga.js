@@ -1,15 +1,26 @@
-import { put, take, delay } from 'redux-saga/effects';
-import { userLogout } from '../actions/user';
+import { put, delay, takeEvery, select } from 'redux-saga/effects';
+import { CHECK_LOGIN_VALIDITY, userLogout } from '../actions/user';
+
+// 6hr
+const MAX_TIME = 6 * 60 * 60 * 1000;
+
+function* autoLogout() {
+  const user = yield select(state => state.user);
+  const validityTime = user.lastLogin + MAX_TIME - Date.now();
+
+  if (validityTime <= 0 || Number.isNaN(validityTime)) {
+    yield put(userLogout());
+  }
+
+  yield delay(validityTime);
+
+  if (user.token) {
+    yield put(userLogout());
+  }
+}
 
 function* autoLogoutSaga() {
-  while (true) {
-    const action = yield take('FETCH_USER_BY_ID_SUCCESS');
-    yield delay(1000 * 60 * 60 * 6);
-    // Check if the login timestamp + 6 hours is still less than the current time
-    if (action.payload.lastLogin + 1000 * 60 * 60 * 6 <= Date.now()) {
-      yield put(userLogout());
-    }
-  }
+  yield takeEvery(CHECK_LOGIN_VALIDITY, autoLogout);
 }
 
 export default autoLogoutSaga;
