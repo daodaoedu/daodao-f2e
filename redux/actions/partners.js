@@ -28,7 +28,7 @@ export function sendEmailToPartner(payload) {
     payload: {
       from,
       userId, //寄件者id
-      url: BASE_URL,
+      url: location.origin,
       to, // 收件者信箱
       subject: '【島島阿學】點開 Email，認識新夥伴',
       title: '有新夥伴想認識你！',

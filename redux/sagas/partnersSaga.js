@@ -68,7 +68,6 @@ function* fetchPartnerTags() {
   try {
     const URL = `${BASE_URL}/tag`;
     const result = yield fetch(URL).then((res) => res.json());
-    console.log(result);
     yield put({ type: 'FETCH_PARTNER_TAGS_SUCCESS', payload: result });
   } catch (e) {
     yield put({ type: 'FETCH_PARTNER_TAGS_FAILURE' });
