@@ -3,7 +3,7 @@ import Checkbox from '@mui/material/Checkbox';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
 export default function CheckboxGrouping() {
-  const QUERY_KEY = 'grouping';
+  const QUERY_KEY = 'isGrouping';
   const [getSearchParams, pushState] = useSearchParamsManager();
 
   const handleClick = ({ target: { checked } }) => {

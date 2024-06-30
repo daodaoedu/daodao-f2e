@@ -3,9 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Box } from '@mui/material';
-import { AREAS } from '@/constants/areas';
-import { CATEGORIES } from '@/constants/category';
-import { EDUCATION_STEP } from '@/constants/member';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 import { setQuery } from '@/redux/actions/group';
 import GroupCard from './GroupCard';
@@ -53,29 +50,7 @@ function GroupList() {
   const isDeskTopScreen = !isPadScreen;
 
   useEffect(() => {
-    const filterOptions = {
-      area: AREAS,
-      category: CATEGORIES,
-      partnerEducationStep: EDUCATION_STEP,
-      grouping: true,
-      q: true,
-    };
-    const params = {};
-    const searchParams = getSearchParams();
-    Object.keys(filterOptions).forEach((key) => {
-      const searchParam = searchParams[key];
-      const options = filterOptions[key];
-
-      if (searchParam && options) {
-        params[key] = Array.isArray(options)
-          ? searchParam
-              .split(',')
-              .filter((item) => options.some((option) => option.label === item))
-              .join(',')
-          : searchParam;
-      }
-    });
-    dispatch(setQuery(params));
+    dispatch(setQuery(getSearchParams()));
   }, [getSearchParams]);
 
   return (
