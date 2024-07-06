@@ -37,7 +37,7 @@ const useMutation = (url, { method, onSuccess, onError } = {}) => {
       })
       .then(onSuccess)
       .catch((e) => {
-        onError(e);
+        onError?.(e);
         setIsError(true);
       })
       .finally(() => setIsLoading(false));
