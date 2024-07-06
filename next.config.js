@@ -10,6 +10,14 @@ module.exports = withPWA({
   env: {
     HOSTNAME: 'https://www.daoedu.tw',
   },
+  async rewrites() {
+    return [
+      {
+        source: '/dev-proxy-api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+      },
+    ]
+  },
   // async redirects() {
   //   return [
   //     {
