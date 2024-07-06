@@ -127,7 +127,7 @@ export const StyledTagsField = styled.div(
 
 export const StyledUpload = styled.div`
   position: relative;
-  height: 260px;
+  height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -146,7 +146,7 @@ export const StyledUpload = styled.div`
     pointer-events: none;
   }
   svg,
-  span {
+  .upload-message {
     position: relative;
     z-index: 1;
   }
@@ -169,17 +169,23 @@ export const StyledUpload = styled.div`
     transition: background 0.15s;
   }
 
+  .lazy-load-image-background {
+    position: absolute;
+  }
+
   &.has-image {
     color: #ffffff;
     border-style: solid;
+
     svg,
-    span {
+    .upload-message {
       transition: opacity 0.15s;
       opacity: 0;
     }
+
     &:hover {
       svg,
-      span {
+      .upload-message {
         opacity: 1;
       }
       &::after {

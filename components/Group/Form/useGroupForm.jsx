@@ -5,6 +5,7 @@ import { ZodType, z } from 'zod';
 import { CATEGORIES } from '@/constants/category';
 import { AREAS } from '@/constants/areas';
 import { EDUCATION_STEP } from '@/constants/member';
+import { BASE_URL } from '@/constants/common';
 
 const _eduOptions = EDUCATION_STEP.filter(
   (edu) => !['master', 'doctor', 'other'].includes(edu.value),
@@ -19,6 +20,7 @@ const DEFAULT_VALUES = {
   userId: '',
   title: '',
   file: null,
+  originPhotoURL: '',
   photoURL: '',
   photoAlt: '',
   category: [],
@@ -35,7 +37,7 @@ const rules = {
   userId: z.string().optional(),
   title: z.string().min(1, '請輸入標題').max(50, '請勿輸入超過 50 字'),
   file: z.any(),
-  photoURL: z.string(),
+  photoURL: z.string().or(z.instanceof(Blob)),
   photoAlt: z.string(),
   category: z
     .array(z.enum(categoriesOptions.map(({ value }) => value)))
@@ -88,18 +90,56 @@ export default function useGroupForm() {
     onBlur,
   };
 
-  const handleSubmit = (onValid) => () => {
-    if (schema.safeParse(values).success) {
+  const handleSubmit = (onValid) => async () => {
+    if (!schema.safeParse(values).success) {
+      const updatedErrors = Object.fromEntries(
+        Object.entries(rules).map(([key, rule]) => [
+          key,
+          rule.safeParse(values[key]).error?.issues?.[0]?.message,
+        ]),
+      );
+      setErrors(updatedErrors);
+      return;
+    }
+
+    if (values.originPhotoURL === values.photoURL) {
       onValid(values);
       return;
     }
-    const updatedErrors = Object.fromEntries(
-      Object.entries(rules).map(([key, rule]) => [
-        key,
-        rule.safeParse(values[key]).error?.issues?.[0]?.message,
-      ]),
-    );
-    setErrors(updatedErrors);
+
+    if (values.originPhotoURL) {
+      const pathArray = values.originPhotoURL.split('/');
+      fetch(`${BASE_URL}/image/${pathArray[pathArray.length - 1]}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${me.token}`,
+        },
+      });
+    }
+
+    let photoURL = '';
+
+    if (values.photoURL instanceof Blob) {
+      const formData = new FormData();
+
+      formData.append('file', values.photoURL);
+
+      try {
+        photoURL = await fetch(`${BASE_URL}/image`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${me.token}`,
+          },
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => data.url);
+      } catch {
+        photoURL = '';
+      }
+    }
+    onValid({ ...values, photoURL });
   };
 
   useEffect(() => {
