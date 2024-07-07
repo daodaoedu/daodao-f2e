@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import DeleteSvg from '@/public/assets/icons/delete.svg';
+import Image from '@/shared/components/Image';
 import { StyledUpload } from '../Form.styled';
 import UploadSvg from './UploadSvg';
 
@@ -69,8 +70,12 @@ export default function Upload({ name, value, control }) {
     setPreview('');
     setError('');
     inputRef.current.value = '';
-    changeHandler(null);
+    changeHandler('');
   };
+
+  useEffect(() => {
+    if (typeof value === 'string') setPreview(value);
+  }, [value]);
 
   return (
     <Box sx={{ position: 'relative' }}>
@@ -100,9 +105,18 @@ export default function Upload({ name, value, control }) {
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
-        {preview && <img className="preview" src={preview} alt="預覽封面圖" />}
+        {preview && (
+          <Image
+            height="300px"
+            className="preview"
+            src={preview}
+            alt="預覽封面圖"
+          />
+        )}
         <UploadSvg isActive={!!preview} />
-        <span>{preview ? '上傳其他圖片' : '點擊此處或將圖片拖曳至此'}</span>
+        <span className="upload-message">
+          {preview ? '上傳其他圖片' : '點擊此處或將圖片拖曳至此'}
+        </span>
         <input
           type="file"
           ref={inputRef}
