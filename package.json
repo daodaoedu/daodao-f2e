@@ -39,7 +39,7 @@
     "konva": "^7.0.0",
     "localforage": "^1.10.0",
     "moment": "^2.29.4",
-    "next": "^13.5.1",
+    "next": "^14.1.1",
     "next-pwa": "^5.6.0",
     "next-sitemap": "^1.6.203",
     "node-fetch": "^2.6.1",
