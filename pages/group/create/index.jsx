@@ -1,11 +1,15 @@
 import React, { useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useSnackbar } from '@/contexts/Snackbar';
-import GroupForm from '@/components/Group/Form';
 import useMutation from '@/hooks/useMutation';
 import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
+
+const GroupForm = dynamic(() => import('@/components/Group/Form'), {
+  ssr: false,
+});
 
 function CreateGroupPage() {
   const { pushSnackbar } = useSnackbar();
