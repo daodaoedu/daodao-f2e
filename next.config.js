@@ -16,7 +16,7 @@ module.exports = withPWA({
         source: '/dev-proxy-api/:path*',
         destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
       },
-    ]
+    ];
   },
   // async redirects() {
   //   return [

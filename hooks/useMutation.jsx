@@ -21,7 +21,7 @@ const useMutation = (url, { method, onSuccess, onError } = {}) => {
       method,
       body: JSON.stringify(values),
       headers,
-    }
+    };
 
     setIsLoading(true);
     setIsError(false);
@@ -31,7 +31,7 @@ const useMutation = (url, { method, onSuccess, onError } = {}) => {
         if (res.status < 300) return res.json();
         if (res.status === 401) {
           dispatch(userLogout());
-          router.replace('/login')
+          router.replace('/login');
         }
         throw res;
       })
