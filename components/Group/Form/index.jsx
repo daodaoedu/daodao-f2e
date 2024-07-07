@@ -29,7 +29,11 @@ export default function GroupForm({
   const isCreateMode = mode === 'create';
 
   useEffect(() => {
-    if (defaultValues) setValues(defaultValues);
+    if (!defaultValues) return;
+    setValues({
+      ...defaultValues,
+      originPhotoURL: defaultValues.photoURL,
+    });
   }, [defaultValues]);
 
   return (
@@ -52,7 +56,7 @@ export default function GroupForm({
             required
           />
           <Fields.Upload
-            name="file"
+            name="photoURL"
             label="活動圖片"
             value={values.photoURL}
             control={control}
