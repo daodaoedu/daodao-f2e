@@ -15,10 +15,13 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { BASE_URL } from '@/constants/common';
 import { ROLE } from '@/constants/member';
 import chatSvg from '@/public/assets/icons/chat.svg';
+import useMutation from '@/hooks/useMutation';
+import { mapToTable } from '@/utils/helper';
 import Feedback from './Feedback';
+
+const ROLELIST = mapToTable(ROLE);
 
 const StyledTitle = styled.label`
   display: block;
@@ -71,30 +74,35 @@ function ContactButton({
     setMessage('');
     setContact('');
   };
+  const { mutate } = useMutation(`/email`, {
+    method: 'POST',
+    onSuccess: () => {
+      handleClose();
+      setFeedback('success');
+    },
+    onError: () => {
+      handleClose();
+      setFeedback('error');
+    },
+  });
 
   const handleSubmit = () => {
-    fetch(`${BASE_URL}/email`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...user,
-        subject: '【島島阿學】點開 Email，認識新夥伴',
-        title: '你發起的揪團有人來信！',
-        to: user.email,
-        text: message,
-        information: [me.email, contact],
-      }),
-    })
-      .then(() => {
-        handleClose();
-        setFeedback('success');
-      })
-      .catch(() => {
-        handleClose();
-        setFeedback('error');
-      });
+    mutate({
+      userId: me._id,
+      url: window.location.origin,
+      name: me.name,
+      roleList:
+        me.roleList.length > 0
+          ? me.roleList.map((roleKey) => ROLELIST[roleKey])
+          : [''],
+      photoUrl: me.photoURL,
+      from: me.email,
+      to: user.email,
+      subject: '【島島阿學】點開 Email，認識新夥伴',
+      title: '你發起的揪團有人來信！',
+      text: message,
+      information: [me.email, contact],
+    });
   };
 
   useEffect(() => {
