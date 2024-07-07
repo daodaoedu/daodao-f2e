@@ -1,14 +1,18 @@
 import React, { useEffect, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { Box, CircularProgress } from '@mui/material';
-import GroupForm from '@/components/Group/Form';
 import { useSnackbar } from '@/contexts/Snackbar';
 import useFetch from '@/hooks/useFetch';
 import useMutation from '@/hooks/useMutation';
 import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
+
+const GroupForm = dynamic(() => import('@/components/Group/Form'), {
+  ssr: false,
+});
 
 function EditGroupPage() {
   const { pushSnackbar } = useSnackbar();
