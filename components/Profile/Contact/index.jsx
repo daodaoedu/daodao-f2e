@@ -152,7 +152,7 @@ function ContactModal({
             <StyledTextArea
               value={contact}
               onChange={(e) => setContact(e.target.value)}
-              placeholder="寫下您的聯繫資訊，如 e-mail、line、Facebook、Instagram 等等。"
+              placeholder="寫下您的聯絡資訊，初次聯繫建議提供「想公開的社群媒體帳號、email」即可。"
             />
           </StyledGroup>
 
