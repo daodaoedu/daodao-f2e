@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -200,21 +200,52 @@ const Profile = ({
         />
       )}
       {email !== sendEmail ? (
-        <Button
-          sx={{
-            width: '160px',
-            borderRadius: '20px',
-            ml: '4px',
-            mt: '56px',
-            color: '#ffff',
-            bgcolor: '#16B9B3',
-          }}
-          disabled={!enableContactBtn}
-          variant="contained"
-          onClick={handleContactPartner}
-        >
-          聯繫夥伴
-        </Button>
+        <>
+          <Button
+            sx={{
+              width: '160px',
+              borderRadius: '20px',
+              ml: '4px',
+              mt: '56px',
+              color: '#ffff',
+              bgcolor: '#16B9B3',
+            }}
+            disabled={!enableContactBtn}
+            variant="contained"
+            onClick={handleContactPartner}
+          >
+            聯繫夥伴
+          </Button>
+          {!enableContactBtn && (
+            <Typography
+              onClick={() => router.push('/login')}
+              sx={{ cursor: 'pointer', mt: '5px', fontSize: '12px' }}
+            >
+              <Typography
+                as="span"
+                sx={{
+                  color: '#16B9B3',
+                  fontSize: '12px',
+                  textDecoration: 'underline',
+                }}
+              >
+                註冊
+              </Typography>
+              或
+              <Typography
+                as="span"
+                sx={{
+                  color: '#16B9B3',
+                  fontSize: '12px',
+                  textDecoration: 'underline',
+                }}
+              >
+                登入
+              </Typography>
+              即可聯繫夥伴！
+            </Typography>
+          )}
+        </>
       ) : (
         <Button
           variant="outlined"
