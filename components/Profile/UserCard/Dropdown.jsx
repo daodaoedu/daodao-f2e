@@ -59,7 +59,13 @@ export default function Dropdown({ sx }) {
         <Icon color="#536166" component={MoreVertRoundedIcon} />
       </Button>
       <StyledMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem onClick={handleClose} disableRipple>
+        <MenuItem
+          component="a"
+          href="https://docs.google.com/forms/d/e/1FAIpQLSfgpHNzm9OAk44Jbgamkq7--odZfC3h4vgw96DPLYvZ07wC_g/viewform"
+          target="_blank"
+          sx={{ minWidth: '146px' }}
+          onClick={handleClose}
+        >
           檢舉
         </MenuItem>
       </StyledMenu>
