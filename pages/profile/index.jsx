@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -12,31 +13,12 @@ import Navigation from '@/shared/components/Navigation_v2';
 import MyGroup from '@/components/Profile/MyGroup';
 import AccountSetting from '@/components/Profile/Accountsetting';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useSelector } from 'react-redux';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
   --section-height-offset: 80px;
   background: linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa;
 `;
-
-const tabs = [
-  {
-    id: 'person-setting',
-    tabLabel: '個人資料編輯',
-    view: <Edit />,
-  },
-  {
-    id: 'my-group',
-    tabLabel: '我的揪團',
-    view: <MyGroup />,
-  },
-  {
-    id: 'account-setting',
-    tabLabel: '帳號設定',
-    view: <AccountSetting />,
-  },
-];
 
 const StyledTab = styled(Tab)(({ isActive, mobileScreen }) => ({
   width: `${mobileScreen ? '50%' : '100%'}`,
@@ -81,14 +63,23 @@ const ProfilePage = () => {
   const router = useRouter();
   const mobileScreen = useMediaQuery('(max-width: 767px)');
   const me = useSelector((state) => state.user);
-  const tabsItems = tabs.map((tab) =>
-    tab.id === 'my-group'
-      ? {
-          ...tab,
-          view: <MyGroup userId={me?._id} />,
-        }
-      : tab,
-  );
+  const tabs = [
+    {
+      id: 'person-setting',
+      tabLabel: '個人資料編輯',
+      view: <Edit />,
+    },
+    {
+      id: 'my-group',
+      tabLabel: '我的揪團',
+      view: <MyGroup title="我的揪團" userId={me?._id} />,
+    },
+    {
+      id: 'account-setting',
+      tabLabel: '帳號設定',
+      view: <AccountSetting />,
+    },
+  ];
 
   const [value, setValue] = useState(() => {
     const id = new URLSearchParams(location.search).get('id');
