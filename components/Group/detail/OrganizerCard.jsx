@@ -75,7 +75,9 @@ function OrganizerCard({ data = {}, isLoading }) {
     ROLE.find(({ key }) => data?.user?.roleList?.includes(key))?.label ||
     '暫無資料';
   const location =
-    data?.user?.location === 'tw' ? '台灣' : data?.user?.location;
+    data?.user?.location === 'tw'
+      ? '台灣'
+      : data?.user?.location.replace('台灣', '').split('@').join(' ');
 
   return (
     <>
