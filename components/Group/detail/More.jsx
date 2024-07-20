@@ -39,7 +39,13 @@ export default function More() {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <MenuItem sx={{ minWidth: '146px' }} onClick={handleClose}>
+        <MenuItem
+          component="a"
+          href="https://docs.google.com/forms/d/e/1FAIpQLSfgpHNzm9OAk44Jbgamkq7--odZfC3h4vgw96DPLYvZ07wC_g/viewform"
+          target="_blank"
+          sx={{ minWidth: '146px' }}
+          onClick={handleClose}
+        >
           檢舉
         </MenuItem>
       </Menu>
