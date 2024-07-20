@@ -23,7 +23,7 @@ const StyledGroupsWrapper = styled.div`
   ${(props) => props.sx}
 `;
 
-const MyGroup = ({ hasTitle = true, sx, userId }) => {
+const MyGroup = ({ title, sx, userId }) => {
   const [response, setResponse] = useState(null);
   const { isFetching } = useFetch(`/activity/user/${userId}`, {
     enabled: !!userId,
@@ -76,15 +76,15 @@ const MyGroup = ({ hasTitle = true, sx, userId }) => {
 
   return (
     <StyledGroupsWrapper sx={sx}>
-      {hasTitle && (
+      {title && (
         <Typography
           sx={{ fontSize: '22px', color: '#536166', fontWeight: 700, mb: 1 }}
         >
-          我的揪團
+          {title}
         </Typography>
       )}
 
-      <Box maxWidth="560px" width="100%">
+      <Box width="100%">
         {isFetching ? (
           <LoadingCard />
         ) : Array.isArray(response?.data) && response.data.length ? (
@@ -93,6 +93,7 @@ const MyGroup = ({ hasTitle = true, sx, userId }) => {
               {index > 0 && <StyledDivider />}
               <GroupCard
                 {...item}
+                userId={userId}
                 onUpdateGrouping={() => handleUpdateGrouping(item._id)}
                 onDeleteGroup={() => handleDeleteGroup(item._id)}
               />

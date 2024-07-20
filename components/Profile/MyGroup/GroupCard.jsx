@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 import Menu from '@mui/material/Menu';
 import IconButton from '@mui/material/IconButton';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
@@ -30,20 +31,25 @@ function GroupCard({
   description,
   area,
   isGrouping,
+  userId,
   updatedDate,
   onUpdateGrouping,
   onDeleteGroup,
 }) {
+  const me = useSelector((state) => state.user);
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState(null);
+  const isEnabledMutation = me._id === userId;
 
   const apiUpdateGrouping = useMutation(`/activity/${_id}`, {
     method: 'PUT',
+    enabled: isEnabledMutation,
     onSuccess: onUpdateGrouping,
   });
 
   const apiDeleteGroup = useMutation(`/activity/${_id}`, {
     method: 'DELETE',
+    enabled: isEnabledMutation,
     onSuccess: onDeleteGroup,
   });
 
@@ -95,9 +101,11 @@ function GroupCard({
               ) : (
                 <StyledStatus className="finished">已結束</StyledStatus>
               )}
-              <IconButton size="small" onClick={handleMenu}>
-                <MoreVertOutlinedIcon />
-              </IconButton>
+              {isEnabledMutation && (
+                <IconButton size="small" onClick={handleMenu}>
+                  <MoreVertOutlinedIcon />
+                </IconButton>
+              )}
             </StyledFlex>
           </StyledFooter>
         </StyledContainer>

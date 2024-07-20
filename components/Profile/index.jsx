@@ -184,7 +184,6 @@ const Profile = ({
               content: (
                 <MyGroup
                   userId={_id}
-                  hasTitle={false}
                   sx={{
                     maxWidth: '100%',
                     padding: '40px 30px',
