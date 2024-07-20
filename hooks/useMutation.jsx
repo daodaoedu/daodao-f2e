@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { BASE_URL } from '@/constants/common';
 import { userLogout } from '@/redux/actions/user';
 
-const useMutation = (url, { method, onSuccess, onError } = {}) => {
+const useMutation = (url, { method, enabled = true, onSuccess, onError } = {}) => {
   const { token } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const router = useRouter();
@@ -12,6 +12,8 @@ const useMutation = (url, { method, onSuccess, onError } = {}) => {
   const [isError, setIsError] = useState(false);
 
   const mutate = (values) => {
+    if (!enabled) return;
+
     const endpoint = url.startsWith('http') ? url : `${BASE_URL}${url}`;
     const headers = {
       'Content-Type': 'application/json',
