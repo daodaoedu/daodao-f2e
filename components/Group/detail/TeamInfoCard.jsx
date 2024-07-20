@@ -46,18 +46,19 @@ const StyledItem = styled.div`
   }
 `;
 
+const format = (value) =>
+  Array.isArray(value) ? value.filter(Boolean).join('、') : value;
+
 const labels = [
   {
     key: 'category',
     icon: categorySvg.src,
     text: '學習領域',
-    format: (v) => (Array.isArray(v) ? v.join('、') : v),
   },
   {
     key: 'area',
     icon: locationSvg.src,
     text: '地點',
-    format: (v) => (Array.isArray(v) ? v.join('、') : v),
   },
   { key: 'time', icon: clockSvg.src, text: '時間' },
   { key: 'partnerStyle', icon: personSvg.src, text: '想找的夥伴' },
@@ -65,28 +66,19 @@ const labels = [
     key: 'partnerEducationStep',
     icon: bachelorCapSvg.src,
     text: '適合的教育階段',
-    format: (v) => (Array.isArray(v) ? v.join('、') : v),
   },
 ];
 
 function TeamInfoCard({ data = {}, isLoading }) {
   return labels.map(
-    ({ key, icon, text, format }) =>
+    ({ key, icon, text }) =>
       data[key] && (
         <StyledItem key={key}>
           <h3>
             <img src={icon} alt={`${text} icon`} />
             {text}
           </h3>
-          <p>
-            {isLoading ? (
-              <Skeleton animation="wave" />
-            ) : typeof format === 'function' ? (
-              format(data[key])
-            ) : (
-              data[key]
-            )}
-          </p>
+          <p>{isLoading ? <Skeleton animation="wave" /> : format(data[key])}</p>
         </StyledItem>
       ),
   );
