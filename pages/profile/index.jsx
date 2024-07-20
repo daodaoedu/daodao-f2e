@@ -115,6 +115,7 @@ const ProfilePage = () => {
           display: 'flex',
           justifyContent: 'center',
           marginTop: '60px',
+          minHeight: 'calc(100vh - 518px)',
           '@media (max-width: 767px)': {
             flexDirection: 'column',
             marginTop: '0',
@@ -157,8 +158,8 @@ const ProfilePage = () => {
             ))}
           </Tabs>
         </Box>
-        <Box sx={{ flex: 1, maxWidth: '672px' }}>
-          {tabsItems.map((tab, index) => (
+        <Box sx={{ flex: 1, maxWidth: '720px' }}>
+          {tabs.map((tab, index) => (
             <TabPanel key={tab.id} value={value} index={index}>
               {tab.view}
             </TabPanel>

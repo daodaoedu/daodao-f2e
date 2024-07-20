@@ -18,7 +18,12 @@ function LoadingCard() {
   return (
     <StyledGroupCard href="#">
       <StyledImageWrapper>
-        <Skeleton variant="rounded" width={240} height={122} animation="wave" />
+        <Skeleton
+          variant="rounded"
+          width="100%"
+          height={122}
+          animation="wave"
+        />
       </StyledImageWrapper>
       <StyledContainer>
         <StyledTitle>
