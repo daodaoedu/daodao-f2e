@@ -1,16 +1,22 @@
-import React, { useMemo, useState, useLayoutEffect } from 'react';
+import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { Box, Button } from '@mui/material';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { Box, Button, Typography } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { CATEGORIES } from '../../constants/member';
-import { mapToTable } from '../../utils/helper';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+
+import {
+  WANT_TO_DO_WITH_PARTNER,
+  ROLE,
+  EDUCATION_STAGE,
+} from '@/constants/member';
+import { mapToTable } from '@/utils/helper';
+import SEOConfig from '@/shared/components/SEO';
+import MyGroup from './MyGroup';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
-import SEOConfig from '../../shared/components/SEO';
-import ContactModal from './Contact';
+import UserInfoBasic from './UserTabs/UserInfoBasic';
+import { StyledPanelBox } from './UserTabs/UserTabs.styled';
 
 const BottonBack = {
   color: '#536166',
@@ -26,42 +32,55 @@ const BottonBack = {
     position: 'unset',
   },
 };
+const BottonEdit = {
+  display: 'none',
+  '@media (max-width: 767px)': {
+    display: 'flex',
+    width: '100%',
+    color: '#536166',
+    fontSize: '14px',
+    boxShadow: 'unset',
+    borderRadius: '20px',
+    marginTop: '32px',
+    padding: '8px 0',
+    '&:hover': {
+      color: '#16B9B3',
+    },
+  },
+};
+const WANT_TO_DO_WITH_PARTNER_TABLE = mapToTable(WANT_TO_DO_WITH_PARTNER);
+const ROLELIST = mapToTable(ROLE);
+const EDUCATION_STAGE_TABLE = mapToTable(EDUCATION_STAGE);
 
-const Profile = () => {
+const Profile = ({
+  _id,
+  name,
+  email,
+  photoURL,
+  tagList = [],
+  roleList = [],
+  educationStage,
+  selfIntroduction,
+  wantToDoList = [],
+  location,
+  share,
+  enableContactBtn = false,
+  sendEmail,
+  handleContactPartner,
+  contactList = {},
+  updatedDate,
+  isLoading,
+}) => {
   const router = useRouter();
-  const auth = getAuth();
-  const [user, isLoadingUser] = useAuthState(auth);
-  const [userName, setUserName] = useState('');
-  const [description, setDescription] = useState('');
-  const [photoURL, setPhotoURL] = useState('');
-  const [location, setLocation] = useState('');
-  const [wantToLearnList, setWantToLearnList] = useState([]);
-  const [interestAreaList, setInterestAreaList] = useState([]);
-  const [isLoading, setIsLoading] = useState(isLoadingUser);
-  const [open, setOpen] = useState(false);
-
-  useLayoutEffect(() => {
-    const db = getFirestore();
-    if (!isLoadingUser && user?.uid) {
-      const docRef = doc(db, 'partnerlist', user?.uid || '');
-      getDoc(docRef).then((docSnap) => {
-        const data = docSnap.data();
-        console.log('data', data);
-        setUserName(data?.userName || '');
-        setPhotoURL(data?.photoURL || '');
-        setDescription(data?.description || '');
-        setWantToLearnList(data?.wantToLearnList || []);
-        setInterestAreaList(data?.interestAreaList || []);
-        setLocation(data?.location || '');
-        setIsLoading(false);
-      });
-    }
-    console.log(description);
-  }, [user, isLoadingUser]);
+  const role = roleList.length > 0 && ROLELIST[roleList[0]];
+  const edu = educationStage && EDUCATION_STAGE_TABLE[educationStage];
+  const wantTodo = wantToDoList
+    .map((item) => WANT_TO_DO_WITH_PARTNER_TABLE[item])
+    .join('、');
 
   const SEOData = useMemo(
     () => ({
-      title: `${userName}的小島｜島島阿學`,
+      title: `${name}的小島｜島島阿學`,
       description:
         '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
       keywords: '島島阿學',
@@ -70,81 +89,174 @@ const Profile = () => {
       imgLink: 'https://www.daoedu.tw/preview.webp',
       link: `${process.env.HOSTNAME}${router?.asPath}`,
     }),
-    [router?.asPath],
+    [router?.asPath, name],
   );
-
-  const tagList = interestAreaList.map((item) => mapToTable(CATEGORIES)[item]);
 
   return (
     <Box
       sx={{
-        minHeight: '100vh',
         background: 'linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         position: 'relative',
+        padding: '80px 30px',
+        '@media (max-width: 767px)': {
+          padding: '30px',
+        },
       }}
     >
-      <ContactModal
-        open={open}
-        // isLoadingSubmit={isLoadingSubmit}
-        onClose={() => {
-          setOpen(false);
-          // router.push('/');
-          // router.push('/partner');
-        }}
-        onOk={() => {
-          setOpen(false);
-          // router.push('/profile');
-          // router.push('/profile/edit');
-        }}
-      />
       <SEOConfig data={SEOData} />
       <Box
         sx={{
+          width: '720px',
           position: 'relative',
+          mb: '10px',
+          '@media (max-width: 767px)': {
+            width: '100%',
+          },
         }}
       >
         <Button
           variant="text"
           sx={BottonBack}
           onClick={() => {
-            router.push('/');
-            // router.push('/partner');
+            router.push('/partner');
           }}
         >
           <ChevronLeftIcon />
           返回
         </Button>
-        <UserCard
-          isLoading={isLoading}
-          tagList={tagList}
-          photoURL={photoURL}
-          userName={userName}
-          location={location}
-        />
+        {isLoading ? (
+          <Skeleton
+            variant="rounded"
+            width="720px"
+            height={250}
+            animation="wave"
+          />
+        ) : (
+          <UserCard
+            isLoginUser={email === sendEmail}
+            isLoading={isLoading}
+            educationStepLabel={edu}
+            role={role}
+            tagList={tagList.filter((t) => typeof t === 'string' && t !== '')}
+            photoURL={photoURL}
+            userName={name}
+            location={location}
+            updatedDate={updatedDate}
+            contactList={contactList}
+          />
+        )}
       </Box>
-      <UserTabs
-        isLoading={isLoading}
-        description={description}
-        wantToLearnList={wantToLearnList}
-      />
-      <Button
-        sx={{
-          width: '160px',
-          borderRadius: '20px',
-          ml: '4px',
-          mt: '56px',
-          color: '#ffff',
-          bgcolor: '#16B9B3',
-        }}
-        variant="contained"
-        onClick={() => setOpen(true)}
-      >
-        聯繫夥伴
-      </Button>
+      {/* UserTabs */}
+      {isLoading ? (
+        <Skeleton
+          variant="rounded"
+          width="720px"
+          height={150}
+          animation="wave"
+        />
+      ) : (
+        <UserTabs
+          isLoading={isLoading}
+          panels={[
+            {
+              id: '1',
+              title: '基本資訊',
+              content: (
+                <UserInfoBasic
+                  description={selfIntroduction}
+                  wantToDoList={wantTodo}
+                  share={share}
+                />
+              ),
+            },
+            {
+              id: '2',
+              title: '推薦的資源',
+              content: <StyledPanelBox>即將推出，敬請期待</StyledPanelBox>,
+            },
+            {
+              id: '3',
+              title: '發起的揪團',
+              content: (
+                <MyGroup
+                  userId={_id}
+                  sx={{
+                    maxWidth: '100%',
+                    padding: '40px 30px',
+                    alignItems: 'flex-start',
+                    '@media (max-width: 767px)': {
+                      padding: '30px',
+                    },
+                  }}
+                />
+              ),
+            },
+          ]}
+        />
+      )}
+      {email !== sendEmail ? (
+        <>
+          <Button
+            sx={{
+              width: '160px',
+              borderRadius: '20px',
+              ml: '4px',
+              mt: '56px',
+              color: '#ffff',
+              bgcolor: '#16B9B3',
+            }}
+            disabled={!enableContactBtn}
+            variant="contained"
+            onClick={handleContactPartner}
+          >
+            聯繫夥伴
+          </Button>
+          {!enableContactBtn && (
+            <Typography
+              onClick={() => router.push('/login')}
+              sx={{ cursor: 'pointer', mt: '5px', fontSize: '12px' }}
+            >
+              <Typography
+                as="span"
+                sx={{
+                  color: '#16B9B3',
+                  fontSize: '12px',
+                  textDecoration: 'underline',
+                }}
+              >
+                註冊
+              </Typography>
+              或
+              <Typography
+                as="span"
+                sx={{
+                  color: '#16B9B3',
+                  fontSize: '12px',
+                  textDecoration: 'underline',
+                }}
+              >
+                登入
+              </Typography>
+              即可聯繫夥伴！
+            </Typography>
+          )}
+        </>
+      ) : (
+        <Button
+          variant="outlined"
+          sx={BottonEdit}
+          onClick={() => {
+            router.push('/profile');
+          }}
+        >
+          <EditOutlinedIcon sx={{ color: '#16B9B3' }} />
+          編輯
+        </Button>
+      )}
     </Box>
   );
 };

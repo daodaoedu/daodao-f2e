@@ -1,3 +1,5 @@
+const isDev = process.env.NODE_ENV === 'development';
+
 const withPWA = require('next-pwa')({
   dest: 'public',
 });
@@ -5,11 +7,23 @@ const withPWA = require('next-pwa')({
 module.exports = withPWA({
   reactStrictMode: false,
   images: {
-    domains: ['imgur.com'],
+    domains: ['imgur.com', 'images.unsplash.com', 'lh3.googleusercontent.com'],
   },
   env: {
     HOSTNAME: 'https://www.daoedu.tw',
   },
+  ...(isDev
+    ? {
+        async rewrites() {
+          return [
+            {
+              source: '/dev-proxy-api/:path*',
+              destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+            },
+          ];
+        },
+      }
+    : {}),
   // async redirects() {
   //   return [
   //     {

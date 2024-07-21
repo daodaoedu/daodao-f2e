@@ -95,12 +95,7 @@ const Group = () => {
           >
             <Button
               variant="outlined"
-              onClick={() =>
-                window.open(
-                  'https://www.facebook.com/groups/2237666046370459',
-                  '_blank',
-                )
-              }
+              onClick={() => router.push('/join')}
               sx={{ margin: '0 10px' }}
             >
               <FacebookRounded sx={{ margin: '5px 0' }} />

@@ -1,86 +1,59 @@
-import React, { useRef } from 'react';
-import styled from '@emotion/styled';
-import { Box, Typography, Divider, Skeleton } from '@mui/material';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { Fragment } from 'react';
+import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { Grid, Box } from '@mui/material';
 import PartnerCard from './PartnerCard';
 
-const LIST = [
-  {
-    name: '許浪手',
-    image:
-      'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60',
-    subTitle: '實驗教育老師',
-    canShare: '心智圖法',
-    canTogether: '學習交流、教學相長',
-    tags: ['實驗教育'],
-    location: '台北市松山區',
-  },
-  {
-    name: '許浪手2',
-    image:
-      'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60',
-    subTitle: '實驗教育老師',
-    canShare: '心智圖法',
-    canTogether: '學習交流、教學相長',
-    tags: ['實驗教育'],
-    location: '台北市松山區',
-  },
-  {
-    name: '許浪手3',
-    image:
-      'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60',
-    subTitle: '實驗教育老師',
-    canShare: '心智圖法',
-    canTogether: '學習交流、教學相長',
-    tags: ['實驗教育'],
-    location: '台北市松山區',
-  },
-  {
-    name: '許浪手4',
-    image:
-      'https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VyZnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60',
-    subTitle: '實驗教育老師',
-    canShare: '心智圖法',
-    canTogether: '學習交流、教學相長',
-    tags: ['實驗教育'],
-    location: '台北市松山區',
-  },
-];
+function PartnerList() {
+  const router = useRouter();
 
-function PartnerList({ list = [] }) {
+  const partners = useSelector((state) => state.partners);
+
+  const lists = partners.items || [];
+  const mobileScreen = useMediaQuery('(max-width: 900px)');
+
   return (
-    <Box sx={{ minHeight: '100vh', padding: '5%' }}>
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        {list.map(
-          ({
-            id,
-            userName,
-            photoURL,
-            subTitle,
-            wantToLearnList,
-            interestAreaList,
-          }) => (
+    <Grid
+      container
+      columnSpacing={2}
+      sx={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}
+    >
+      {lists.map((item, idx) => (
+        <Fragment key={`${item._id}`}>
+          <Grid
+            onClick={() => router.push(`partner/detail?id=${item._id}`)}
+            item
+            width="100%"
+            md={6}
+            mb={mobileScreen && '12px'}
+          >
             <PartnerCard
-              key={`${id}-${userName}`}
-              id={id}
-              image={photoURL}
-              name={userName}
-              subTitle={subTitle}
-              canShare={wantToLearnList}
-              canTogether={interestAreaList}
+              image={item.photoURL}
+              date={item.date}
+              name={item.name}
+              educationStage={item.educationStage}
+              share={item.share}
+              roleList={item.roleList}
+              tagList={item.tagList}
+              wantToDoList={item.wantToDoList}
+              location={item.location}
+              updatedDate={item.updatedDate}
             />
-          ),
-        )}
-      </Box>
-    </Box>
+          </Grid>
+          {!mobileScreen && (idx + 1) % 2 === 0 && idx + 1 !== lists.length && (
+            <Grid item xs={12} py="12px">
+              <Box height={1} width="100%" border="1px solid #E5E5E5" />
+            </Grid>
+          )}
+        </Fragment>
+      ))}
+    </Grid>
   );
 }
 

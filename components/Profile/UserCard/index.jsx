@@ -1,10 +1,13 @@
-import { Box, Button, Chip, Skeleton, Typography } from '@mui/material';
+import styled from '@emotion/styled';
+import { Box, Chip, Button, Skeleton, Typography } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import moment from 'moment/moment';
+import moment from 'moment';
 import { useRouter } from 'next/router';
-import LOCATION from '../../../constants/countries.json';
+import { RiInstagramFill } from 'react-icons/ri';
+import { FaFacebook, FaLine, FaDiscord } from 'react-icons/fa';
+import DropdownMenu from './Dropdown';
 
 const BottonEdit = {
   color: '#536166',
@@ -18,12 +21,120 @@ const BottonEdit = {
     color: '#16B9B3',
   },
   '@media (max-width: 767px)': {
-    position: 'absolute',
-    right: '25%',
-    top: '252%',
-    width: '160px',
+    display: 'none',
   },
 };
+
+const StyledProfileWrapper = styled(Box)`
+  width: 100%;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 20px;
+  @media (max-width: 767px) {
+    width: 100%;
+    padding: 16px;
+  }
+`;
+const StyledProfileBaseInfo = styled(Box)`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`;
+const StyledProfileTitle = styled(Box)`
+  div {
+    display: flex;
+    align-items: center;
+  }
+  h2 {
+    color: #536166;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 120%;
+    margin-right: 10px;
+  }
+  span {
+    border-radius: 4px;
+    background: #f3f3f3;
+    padding: 3px 10px;
+  }
+  p {
+    color: #92989a;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%; /* 19.6px */
+  }
+`;
+const StyledProfileLocation = styled(Typography)`
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  color: #536166;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 140%; /* 16.8px */
+`;
+const StyledProfileTag = styled(Box)`
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+`;
+const StyledProfileOther = styled(Box)`
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  @media (max-width: 767px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+const StyledProfileSocial = styled.ul`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  li {
+    align-items: center;
+    display: flex;
+    margin-right: 16px;
+    margin-bottom: 8px;
+  }
+  li:last-of-type {
+    margin-bottom: 0;
+  }
+  li svg {
+    color: #16b9b3;
+  }
+  li p,
+  li a {
+    margin-left: 5px;
+    color: #293a3d;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+  }
+
+  li a {
+    color: #16b9b3;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+`;
+const StyledProfileDate = styled.p`
+  font-size: 12px;
+  color: #92989a;
+  font-weight: 400;
+  line-height: 140%;
+  @media (max-width: 767px) {
+    width: 100%;
+    text-align: right;
+  }
+`;
 
 function Tag({ label }) {
   return (
@@ -31,136 +142,66 @@ function Tag({ label }) {
       label={label}
       value={label}
       sx={{
-        backgroundColor: '#fff',
-        opacity: '80%',
-        cursor: 'pointer',
         margin: '5px',
         whiteSpace: 'nowrap',
-        fontWeight: 500,
-        fontSize: '16px',
-        bgcolor: 'rgb(219, 237, 219)',
-        '&:hover': {
-          opacity: '100%',
-          backgroundColor: '#fff',
-          transition: 'transform 0.4s',
-        },
+        fontWeight: 400,
+        fontSize: '14px',
+        bgcolor: '#DEF5F5',
       }}
     />
   );
 }
+
+function Avator({ photoURL }) {
+  return (
+    <LazyLoadImage
+      alt="login"
+      src={photoURL || ''}
+      height={80}
+      width={80}
+      effect="opacity"
+      style={{
+        borderRadius: '100%',
+        background: 'rgba(240, 240, 240, .8)',
+        objectFit: 'cover',
+        objectPosition: 'center',
+        minHeight: '80px',
+        minWidth: '80px',
+      }}
+      placeholder={
+        // eslint-disable-next-line react/jsx-wrap-multilines
+        <Skeleton
+          sx={{
+            height: '80px',
+            width: '80px',
+            background: 'rgba(240, 240, 240, .8)',
+            marginTop: '4px',
+          }}
+          variant="circular"
+          animation="wave"
+        />
+      }
+    />
+  );
+}
+
 function UserCard({
-  isLoading,
-  tagList,
+  isLoginUser,
+  tagList = [],
+  role,
   educationStepLabel,
   photoURL,
   userName,
   location,
+  contactList = {},
+  updatedDate,
 }) {
-  console.log(educationStepLabel);
   const router = useRouter();
-  if (isLoading) {
-    return (
-      <Box
-        sx={{
-          width: '720px',
-          padding: '40px 30px ',
-          bgcolor: '#fff',
-          borderRadius: '20px',
-          '@media (max-width: 767px)': {
-            width: '316px',
-          },
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-          }}
-        >
-          <Skeleton
-            sx={{
-              height: '80px',
-              width: '80px',
-              background: 'rgba(240, 240, 240, .8)',
-              marginTop: '4px',
-            }}
-            variant="circular"
-            animation="wave"
-          />
-          <Button variant="outlined" sx={BottonEdit}>
-            <EditOutlinedIcon />
-            編輯
-          </Button>
-          <Box sx={{ marginLeft: '12px' }}>
-            <Skeleton variant="text" width={200} />
-            <Skeleton variant="text" width={200} />
-            <Typography
-              sx={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                marginTop: '12px',
-              }}
-            >
-              <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />{' '}
-              <Skeleton variant="text" width={200} />
-            </Typography>
-          </Box>
-        </Box>
-        <Box sx={{ marginTop: '24px' }}>
-          <Skeleton variant="text" width={200} />
-        </Box>
-      </Box>
-    );
-  }
+  const locations = location && location.split('@');
+
   return (
-    <Box
-      sx={{
-        width: '720px',
-        padding: '40px 30px ',
-        bgcolor: '#fff',
-        borderRadius: '20px',
-        '@media (max-width: 767px)': {
-          width: '316px',
-        },
-      }}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-        }}
-      >
-        <LazyLoadImage
-          alt="login"
-          src={photoURL || ''}
-          height={80}
-          width={80}
-          effect="opacity"
-          style={{
-            borderRadius: '100%',
-            background: 'rgba(240, 240, 240, .8)',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            minHeight: '80px',
-            minWidth: '80px',
-          }}
-          placeholder={
-            // eslint-disable-next-line react/jsx-wrap-multilines
-            <Skeleton
-              sx={{
-                height: '80px',
-                width: '80px',
-                background: 'rgba(240, 240, 240, .8)',
-                marginTop: '4px',
-              }}
-              variant="circular"
-              animation="wave"
-            />
-          }
-        />
+    <StyledProfileWrapper>
+      {isLoginUser ? (
         <Button
           variant="outlined"
           sx={BottonEdit}
@@ -168,74 +209,89 @@ function UserCard({
             router.push('/profile');
           }}
         >
-          <EditOutlinedIcon />
+          <EditOutlinedIcon sx={{ color: '#16B9B3' }} />
           編輯
         </Button>
+      ) : (
+        <DropdownMenu sx={BottonEdit} />
+      )}
+
+      <StyledProfileBaseInfo>
+        <Avator photoURL={photoURL} />
         <Box sx={{ marginLeft: '12px' }}>
-          <Typography
-            sx={{
-              color: '#536166',
-              fontSize: '18px',
-              margin: '10px 8px 0px 0px ',
-            }}
-          >
-            {userName || '-'}
-          </Typography>
-          <Button
-            variant="contained"
-            disabled
-            size="small"
-            sx={{
-              height: '24px',
-              fontSize: '14px',
-              margin: '0px 0px 5px 8px ',
-            }}
-          >
-            {educationStepLabel}
-          </Button>
-          <Typography component="p" sx={{ color: '#92989A' }}>
-            -
-          </Typography>
-          <Typography
-            sx={{
-              display: 'flex',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              marginTop: '12px',
-            }}
-          >
-            <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />{' '}
-            {LOCATION.find(
-              (item) => item.alpha2 === location || item.alpha3 === location,
-            )?.name || '-'}
-          </Typography>
+          <StyledProfileTitle>
+            <div>
+              <h2>{userName || '-'}</h2>
+              {educationStepLabel && <span>{educationStepLabel}</span>}
+            </div>
+            <p>{role || '-'}</p>
+          </StyledProfileTitle>
+
+          <StyledProfileLocation>
+            <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />
+            {location
+              ? location.length >= 2
+                ? locations.join('').replace('台灣', '').replaceAll('null', '')
+                : locations.join('')
+              : '-'}
+          </StyledProfileLocation>
         </Box>
-      </Box>
-      <Box
-        sx={{
-          marginTop: '24px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          '@media (max-width: 767px)': { flexDirection: 'column' },
-        }}
-      >
-        <Box
-          sx={{
-            '@media (max-width: 767px)': { display: 'flex', flexFlow: 'wrap' },
-          }}
-        >
+      </StyledProfileBaseInfo>
+
+      {Array.isArray(tagList) && (
+        <StyledProfileTag>
           {tagList.map((tag) => (
             <Tag key={tag} label={tag} />
           ))}
-        </Box>
-        <Typography
-          component="p"
-          sx={{ fontSize: '12px', color: '#92989A', marginTop: '5px' }}
-        >
-          {moment(new Date() - 500 * 60 * 60).fromNow()}
-        </Typography>
-      </Box>
-    </Box>
+        </StyledProfileTag>
+      )}
+
+      <StyledProfileOther>
+        <StyledProfileSocial style={{ listStyle: 'none' }}>
+          {!!contactList.instagram && (
+            <li>
+              <RiInstagramFill size="20px" />
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={`https://www.instagram.com/${contactList.instagram}`}
+              >
+                {contactList.instagram}
+              </a>
+            </li>
+          )}
+          {!!contactList.facebook && (
+            <li>
+              <FaFacebook size="20px" />
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={`https://www.facebook.com/${contactList.facebook}`}
+              >
+                {contactList.facebook}
+              </a>
+            </li>
+          )}
+          {!!contactList.line && (
+            <li>
+              <FaLine size="20px" />
+              <p>{contactList.line}</p>
+            </li>
+          )}
+          {!!contactList.discord && (
+            <li>
+              <FaDiscord size="20px" />
+              <p>{contactList.discord}</p>
+            </li>
+          )}
+        </StyledProfileSocial>
+        <StyledProfileDate>
+          {updatedDate
+            ? moment(updatedDate).fromNow()
+            : moment(new Date() - 500 * 60 * 60).fromNow()}
+        </StyledProfileDate>
+      </StyledProfileOther>
+    </StyledProfileWrapper>
   );
 }
 

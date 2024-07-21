@@ -145,15 +145,7 @@ const NotExistPage = () => {
               margin: '20px 0',
             }}
           >
-            <Button
-              variant="outlined"
-              onClick={() =>
-                open(
-                  'https://www.facebook.com/groups/2237666046370459',
-                  '_blank',
-                )
-              }
-            >
+            <Button variant="outlined" onClick={() => router.push('/join')}>
               <FacebookRounded sx={{ margin: '5px 0' }} />
               <Typography variant="p">加入社群</Typography>
             </Button>

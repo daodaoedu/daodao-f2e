@@ -1,69 +1,56 @@
-import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import { Box, Select, MenuItem } from '@mui/material';
-import { useRouter } from 'next/router';
-import { Whatshot } from '@mui/icons-material';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Chip from '@mui/material/Chip';
-import { SEARCH_TAGS } from '../../../constants/category';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchPartnerTags } from '@/redux/actions/partners';
 import SearchInput from './SearchInput';
-import HotTags from './HotTags';
-import AgeDropdown from './AgeDropdown';
-import FeeDropdown from './FeeDropdown';
-import AgeCheckbox from './AgeCheckbox';
+import SelectedAreas from './SelectedAreas';
+import SelectedEducationStep from './SelectedEducationStep';
+import SelectedFriendType from './SelectedFriendType';
+import SearchTags from './SearchTags';
 
-const SearchFieldWrapper = styled.div`
+const StyledSearchField = styled.div`
   width: 100%;
+  border-radius: 20px;
+  box-shadow: 0px 4px 6px rgba(196, 194, 193, 0.2);
+  padding: 40px;
+  z-index: 2;
+  background: #fff;
 
-  /* @media (max-width: 767px) {
-    margin: 0 10px 10px 10px;
-    flex-direction: column;
-    justify-content: center;
+  @media (max-width: 767px) {
+    padding: 16px;
+  }
+  .selects-wrapper {
+    margin-top: 12px;
+    display: flex;
     align-items: center;
-    width: 100%;
-  } */
+    gap: 16px;
+
+    @media (max-width: 767px) {
+      margin: 10px 0;
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
 `;
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-const names = ['學齡前', '國小', '國高中', '大學以上'];
-
 const SearchField = () => {
-  // const { query } = useRouter();
-  // const queryList = (query?.cats ?? '').split(',').reverse();
+  const { tags = [] } = useSelector((state) => state.partners);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchPartnerTags());
+  }, []);
+
   return (
-    <SearchFieldWrapper>
+    <StyledSearchField>
       <SearchInput />
-      {/* <HotTags queryList={queryList} /> */}
-      <Box
-        sx={{
-          margin: '5px 0',
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          '@media (max-width: 767px)': {
-            margin: '10px 0',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-          },
-        }}
-      >
-        {/* <AgeDropdown /> */}
-        {/* <AgeCheckbox />
-        <FeeDropdown /> */}
-      </Box>
-    </SearchFieldWrapper>
+      <div className="selects-wrapper">
+        <SelectedFriendType />
+        <SelectedAreas />
+        <SelectedEducationStep />
+      </div>
+      <SearchTags searchTags={tags.filter((d) => d !== '' && d !== ' ')} />
+    </StyledSearchField>
   );
 };
 

@@ -1,144 +1,144 @@
-import React, { useEffect, useState } from 'react';
-import styled from '@emotion/styled';
-import { Box, Typography, Button } from '@mui/material';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { getAuth, updateProfile } from 'firebase/auth';
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  getDoc,
-  setDoc,
-  addDoc,
-} from 'firebase/firestore';
-import { useRouter } from 'next/router';
+import { useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Box, Button } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { TAIWAN_DISTRICT } from '@/constants/areas';
+import { fetchPartners } from '@/redux/actions/partners';
+import { EDUCATION_STEP, ROLE } from '@/constants/member';
+import useSearchParamsManager from '@/hooks/useSearchParamsManager';
+
 import PartnerList from './PartnerList';
 import SearchField from './SearchField';
+import SearchParamsList from './SearchParamsList';
 import Banner from './Banner';
+import {
+  StyledWrapper,
+  StyledContent,
+  StyledSearchWrapper,
+} from './Parnter.styled';
 
-const PartnerWrapper = styled.div`
-  min-height: 100vh;
-  background-color: transparent;
-  z-index: 100;
-  margin-top: -150px;
-  position: relative;
-`;
+// utils
+const _compose =
+  (...fns) =>
+  (x) =>
+    fns.reduceRight((v, f) => f(v), x);
+const _map = (arr, key) => arr.map((item) => item[key]);
+const mapValues = (values, mapFn) => values.map(mapFn).join(',');
+
+const createObjFromArrary = (arr, keyProp = 'label', valueProp = 'label') => {
+  return arr.reduce(
+    (obj, item) => ({
+      ...obj,
+      [item[keyProp]]: item[valueProp],
+    }),
+    {},
+  );
+};
+
+const AREAS = TAIWAN_DISTRICT.map(({ name }) => ({
+  name,
+  label: name,
+})).concat([{ name: '國外', label: '國外' }]);
+
+const eduObj = createObjFromArrary(EDUCATION_STEP, 'label', 'key');
+const roleObj = createObjFromArrary(ROLE, 'label', 'key');
 
 function Partner() {
-  const router = useRouter();
-  const [partnerList, setPartnerList] = useState([]);
+  const dispatch = useDispatch();
+  const mobileScreen = useMediaQuery('(max-width: 767px)');
+
+  // main data - partner and tag
+  const {
+    items: partnerItems,
+    pagination,
+    tags,
+  } = useSelector((state) => state.partners);
+
+  // constants
+  const keySelections = {
+    area: _map(AREAS, 'name'),
+    edu: _map(EDUCATION_STEP, 'label'),
+    role: _map(ROLE, 'label'),
+    tag: tags,
+    q: 'PASS_STRING',
+  };
+
+  const { page: current = 1, totalPages } = pagination;
+
+  // queryStr
+  const [getSearchParams, _, generateParamsItems] = useSearchParamsManager();
+  const searchParamsItems = useMemo(
+    () =>
+      generateParamsItems(['area', 'role', 'edu', 'tag', 'q'], keySelections),
+    [getSearchParams],
+  );
+
+  // fetch api - params
+  const findValues = (params, key) =>
+    params.find((item) => item.key === key)?.values;
+  const prepareData = _compose(
+    ([location, educationStage, roleList, tag, search]) => ({
+      location,
+      educationStage,
+      roleList,
+      tag,
+      search,
+    }),
+    (arg) => [
+      findValues(arg, 'area').join(','),
+      mapValues(findValues(arg, 'edu'), (item) => eduObj[item]),
+      mapValues(findValues(arg, 'role'), (item) => roleObj[item]),
+      findValues(arg, 'tag').join(','),
+      findValues(arg, 'q').join(','),
+    ],
+  );
+
+  const handleFetchData = (page = 1) => {
+    dispatch(fetchPartners({ page, ...prepareData(searchParamsItems) }));
+  };
+
   useEffect(() => {
-    const db = getFirestore();
-    const colRef = collection(db, 'partnerlist');
-    getDocs(colRef).then((docsSnap) => {
-      docsSnap.forEach((doc) => {
-        setPartnerList((prevState) => [
-          ...prevState,
-          {
-            id: doc.id,
-            ...(doc.data() || {}),
-          },
-        ]);
-        console.log(doc.id, ' => ', doc.data());
-      });
-    });
-    // const test = collection('partnerlist').
-    // console.log('test', test);
-    // const docRef = doc(db, 'partnerlist', user?.uid);
-    // getDoc(docRef).then((docSnap) => {
-    //   const data = docSnap.data();
-    //   setUserName(data?.userName || '');
-    //   setPhotoURL(data?.photoURL || '');
-    //   setBirthDay(dayjs(data?.birthDay) || dayjs());
-    //   setGender(data?.gender || '');
-    //   setRoleList(data?.roleList || []);
-    //   setWantToLearnList(data?.wantToLearnList || []);
-    //   setInterestAreaList(data?.interestAreaList || []);
-    //   setEducationStep(data?.educationStep);
-    //   setLocation(data?.location || '');
-    //   setUrl(data?.url || '');
-    //   setDescription(data?.description || '');
-    //   setIsOpenLocation(data?.isOpenLocation || false);
-    //   setIsOpenProfile(data?.isOpenProfile || false);
-    // });
-  }, [setPartnerList]);
-  console.log('partnerList', partnerList);
+    handleFetchData();
+  }, [getSearchParams]);
+
   return (
     <>
       <Banner />
-      <PartnerWrapper>
-        <Box
-          sx={{
-            padding: '0 10%',
-          }}
-        >
+      <StyledWrapper>
+        <StyledSearchWrapper>
+          <SearchField />
+        </StyledSearchWrapper>
+        <StyledContent>
+          <SearchParamsList
+            paramsKey={['area', 'role', 'edu', 'tag', 'q']}
+            paramsKeyOptions={keySelections}
+          />
+          <PartnerList />
+        </StyledContent>
+        {partnerItems && partnerItems.length > 0 && current < totalPages && (
           <Box
-            sx={{
-              marginTop: '24px',
-              borderRadius: '20px',
-              boxShadow: '0px 4px 6px rgba(196, 194, 193, 0.2)',
-              padding: '40px',
-              zIndex: 2,
-              background: '#fff',
-            }}
+            sx={
+              mobileScreen
+                ? { textAlign: 'center', padding: '32px 0' }
+                : { textAlign: 'center', padding: '72px 0' }
+            }
           >
-            <SearchField />
+            <Button
+              onClick={() => handleFetchData(current + 1)}
+              variant="outlined"
+              sx={{
+                fontSize: '16px',
+                color: '#536166',
+                borderColor: '#16B9B3',
+                borderRadius: '20px',
+                padding: '6px 48px',
+              }}
+            >
+              顯示更多
+            </Button>
           </Box>
-          <Box
-            sx={{
-              marginTop: '24px',
-              borderRadius: '20px',
-              boxShadow: '0px 4px 6px rgba(196, 194, 193, 0.2)',
-              background: '#fff',
-            }}
-          >
-            <Box sx={{ minHeight: '100vh', padding: '5%' }}>
-              找夥伴功能架構與維運中，如果你們希望加速開發的腳步的話，歡迎一起加入團隊共同協作！
-              <Box
-                sx={{
-                  margin: '20px 0 10px 0',
-                  display: 'flex',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                }}
-              >
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    window.open('https://forms.gle/if2kwAEQkeaTUgm37', '_blank')
-                  }
-                  sx={{ margin: '0 10px' }}
-                >
-                  <Typography variant="p">加入團隊</Typography>
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    window.open(
-                      'https://g0v.hackmd.io/@daodaoedu/HydZGAUYc',
-                      '_blank',
-                    )
-                  }
-                  sx={{ margin: '0 10px' }}
-                >
-                  <Typography variant="p">了解更多</Typography>
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    window.open('https://www.daoedu.tw/about', '_blank')
-                  }
-                  sx={{ margin: '0 10px' }}
-                >
-                  <Typography variant="p">關於島島</Typography>
-                </Button>
-              </Box>
-            </Box>
-            {/* <PartnerList list={partnerList} /> */}
-          </Box>
-        </Box>
-      </PartnerWrapper>
+        )}
+      </StyledWrapper>
     </>
   );
 }

@@ -56,37 +56,59 @@ export const ROLE = [
 export const EDUCATION_STEP = [
   {
     label: '學齡前',
+    key: 'preschool',
     value: 'preschool',
   },
   {
     label: '國小低年級',
+    key: 'elementary-junior',
     value: 'elementary-junior',
   },
   {
     label: '國小中年級',
+    key: 'elementary-middle',
     value: 'elementary-middle',
   },
   {
     label: '國小高年級',
+    key: 'elementary-senior',
     value: 'elementary-senior',
   },
   {
     label: '國中',
+    key: 'junior-high',
     value: 'junior-high',
   },
   {
     label: '高中',
+    key: 'high',
     value: 'high',
   },
   {
     label: '大學',
+    key: 'university',
     value: 'university',
   },
   {
+    label: '碩士',
+    key: 'master',
+    value: 'master',
+  },
+  {
+    label: '博士',
+    key: 'doctor',
+    value: 'doctor',
+  },
+  {
     label: '其他',
+    key: 'other',
     value: 'other',
   },
 ];
+
+export const EDUCATION_STAGE = EDUCATION_STEP.filter(
+  (step) => step.key !== 'master' && step.key !== 'doctor',
+);
 
 export const WANT_TO_DO_WITH_PARTNER = [
   {
@@ -110,7 +132,7 @@ export const WANT_TO_DO_WITH_PARTNER = [
     value: 'make-group-class',
   },
   {
-    label: '做專案',
+    label: '做專案/競賽',
     key: 'do-project',
     value: 'do-project',
   },

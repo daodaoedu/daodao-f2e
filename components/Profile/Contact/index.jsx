@@ -7,8 +7,49 @@ import {
   TextareaAutosize,
   Avatar,
 } from '@mui/material';
+import styled from '@emotion/styled';
 
-function ContactModal({ onClose, onOk, isLoadingSubmit, open }) {
+const StyledGroup = styled(Box)`
+  margin-bottom: 16px;
+`;
+
+const StyledTitle = styled(Typography)`
+  color: var(--black-white-gray-dark, #293a3d);
+  /* desktop/body-M-Medium */
+  font-family: Noto Sans TC;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 140%; /* 22.4px */
+  margin-bottom: 11px;
+`;
+const StyledTextArea = styled(TextareaAutosize)`
+  border-radius: 8px;
+  border: 1px solid var(--black-white-gray-very-light, #dbdbdb);
+  background: var(--black-white-white, #fff);
+  padding: 12px 16px;
+  width: 100%;
+  min-height: 128px;
+`;
+
+function ContactModal({
+  title,
+  descipt,
+  avatar,
+  onClose,
+  onOk,
+  isLoadingSubmit,
+  open,
+}) {
+  const [message, setMessage] = useState('');
+  const [contact, setContact] = useState('');
+
+  const handleSubmit = () => {
+    onOk({ message, contact });
+    setMessage('');
+    setContact('');
+  };
+
   return (
     <Modal
       keepMounted
@@ -60,9 +101,10 @@ function ContactModal({ onClose, onOk, isLoadingSubmit, open }) {
               justifyContent: 'flex-start',
               borderRadius: '16px',
               p: 2,
+              mb: '16px',
             }}
           >
-            <Avatar />
+            <Avatar alt={title} src={avatar} />
             <Box
               sx={{
                 width: '100%',
@@ -80,7 +122,7 @@ function ContactModal({ onClose, onOk, isLoadingSubmit, open }) {
                   lineHeight: '140%',
                 }}
               >
-                黃芊宇
+                {title}
               </Typography>
               <Typography
                 sx={{
@@ -90,54 +132,29 @@ function ContactModal({ onClose, onOk, isLoadingSubmit, open }) {
                   lineHeight: '140%',
                 }}
               >
-                實驗教育學生
+                {descipt}
               </Typography>
             </Box>
           </Box>
-          <Typography
-            id="keep-mounted-modal-subtitle"
-            sx={{
-              color: ' #293A3D',
-              fontWeight: 400,
-              fontSize: '16px',
-              lineHeight: '140%',
-              margin: '16px 0 11px 0',
-            }}
-          >
-            邀請訊息
-          </Typography>
-          <TextareaAutosize
-            sx={{
-              color: '#DBDBDB',
-              width: '100%',
-              minHeight: '200px',
-              padding: '10px',
-            }}
-            placeholder="想要和新夥伴交流什麼呢？可以簡單的自我介紹，寫下想認識夥伴的原因。"
-          />
 
-          <Typography
-            id="keep-mounted-modal-description"
-            sx={{
-              mt: 2,
-              color: ' #293A3D',
-              fontWeight: 400,
-              fontSize: '16px',
-              lineHeight: '140%',
-              margin: '16px 0 11px 0',
-            }}
-          >
-            聯繫資訊
-          </Typography>
-          <TextareaAutosize
-            sx={{
-              color: '#DBDBDB',
-              width: '100%',
-              minHeight: '200px',
-              padding: '10px',
-            }}
-            placeholder="ex.  自學申請、學習方法、學習資源，或各種學習領域的知識"
-          />
+          <StyledGroup>
+            <StyledTitle id="keep-mounted-modal-subtitle">邀請訊息</StyledTitle>
+            <StyledTextArea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="想要和新夥伴交流什麼呢？可以簡單的自我介紹，寫下想認識夥伴的原因。"
+            />
+          </StyledGroup>
+          <StyledGroup>
+            <StyledTitle id="keep-mounted-modal-description">
+              聯絡資訊
+            </StyledTitle>
+            <StyledTextArea
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+              placeholder="寫下您的聯絡資訊，初次聯繫建議提供「想公開的社群媒體帳號、email」即可。"
+            />
+          </StyledGroup>
 
           <Box
             sx={{
@@ -163,6 +180,8 @@ function ContactModal({ onClose, onOk, isLoadingSubmit, open }) {
                 bgcolor: '#16B9B3',
               }}
               variant="contained"
+              disabled={isLoadingSubmit}
+              onClick={() => handleSubmit({ message, contact })}
             >
               送出
             </Button>

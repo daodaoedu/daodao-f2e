@@ -14,13 +14,14 @@ module.exports = {
     node: true,
   },
   ignorePatterns: ['.eslintrc.js'],
-  // settings: {
-  //   'import/resolver': {
-  //     node: {
-  //       extensions: ['.js', '.jsx', '.ts', '.tsx'],
-  //     },
-  //   },
-  // },
+  settings: {
+    'import/resolver': {
+      alias: {
+        extensions: ['.js', '.jsx'],
+        map: [['@', '.']],
+      },
+    },
+  },
   rules: {
     'react/no-unescaped-entities': 'off',
     '@next/next/no-page-custom-font': 'off',
@@ -41,6 +42,7 @@ module.exports = {
     'operator-linebreak': 0,
     'function-paren-newline': 0,
     'jsx-a11y/click-events-have-key-events': 0,
+    'jsx-a11y/control-has-associated-label': 0,
     'jsx-a11y/no-noninteractive-element-interactions': 0,
     'react/jsx-one-expression-per-line': 0,
     'no-confusing-arrow': 0,
