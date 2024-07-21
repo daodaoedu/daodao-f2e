@@ -2,7 +2,14 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 
-import { Box, Divider, Typography, Button, Skeleton, TextField } from '@mui/material';
+import {
+  Box,
+  Divider,
+  Typography,
+  Button,
+  Skeleton,
+  TextField,
+} from '@mui/material';
 import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
@@ -91,7 +98,7 @@ const PaperLinkHeader = styled.div`
   @media (max-width: 800px) {
     flex-direction: row;
     gap: 12px;
-    
+
     > img {
       width: 50px;
       height: 50px;
@@ -149,9 +156,15 @@ function JoinPage() {
       <Container>
         <Paper>
           <PaperColumnCenter>
-            <Typography variant="h2" fontSize="22px" marginBottom={0.5}>加入社群</Typography>
-            <Typography variant="body2" color="#536166">在島島阿學，沒有人是一座孤島！</Typography>
-            <Typography variant="body2" color="#536166">歡迎加入島島阿學社群一起交流、學習、成長！</Typography>
+            <Typography variant="h2" fontSize="22px" marginBottom={0.5}>
+              加入社群
+            </Typography>
+            <Typography variant="body2" color="#536166">
+              在島島阿學，沒有人是一座孤島！
+            </Typography>
+            <Typography variant="body2" color="#536166">
+              歡迎加入島島阿學社群一起交流、學習、成長！
+            </Typography>
           </PaperColumnCenter>
           <PaperBody>
             <PaperItem>
@@ -164,17 +177,22 @@ function JoinPage() {
                   </Typography>
                 </PaperLinkHeader>
                 <ul>
-                  {discordCheckList.map(message => (
+                  {discordCheckList.map((message) => (
                     <CheckItem key={message}>
                       <img src={checkIconSvg.src} alt="check" />
-                      <Typography variant="body2" fontSize={12} color="#536166">{message}</Typography>
+                      <Typography variant="body2" fontSize={12} color="#536166">
+                        {message}
+                      </Typography>
                     </CheckItem>
                   ))}
                 </ul>
               </PaperLink>
             </PaperItem>
             <PaperItem>
-              <PaperLink href="https://www.facebook.com/groups/2237666046370459" target="_blank">
+              <PaperLink
+                href="https://www.facebook.com/groups/2237666046370459"
+                target="_blank"
+              >
                 <PaperLinkHeader>
                   <img src={facebookIconSvg.src} alt="facebook" />
                   <Typography variant="h3" fontSize={16} marginBottom={1.25}>
@@ -183,10 +201,12 @@ function JoinPage() {
                   </Typography>
                 </PaperLinkHeader>
                 <ul>
-                  {facebookCheckList.map(message => (
+                  {facebookCheckList.map((message) => (
                     <CheckItem key={message}>
                       <img src={checkIconSvg.src} alt="check" />
-                      <Typography variant="body2" fontSize={12} color="#536166">{message}</Typography>
+                      <Typography variant="body2" fontSize={12} color="#536166">
+                        {message}
+                      </Typography>
                     </CheckItem>
                   ))}
                 </ul>
@@ -195,9 +215,15 @@ function JoinPage() {
           </PaperBody>
           <Divider sx={{ marginTop: 5, marginBottom: 1 }} />
           <PaperColumnCenter>
-            <Typography variant="body2" color="#536166">社群即資源、支援，</Typography>
-            <Typography variant="body2" color="#536166">歡迎加入社群，一起在民主教育的社群中，</Typography>
-            <Typography variant="body2" color="#536166">以共好的概念，協助彼此學習的需求，支持彼此成為自己想成為的人吧！</Typography>
+            <Typography variant="body2" color="#536166">
+              社群即資源、支援，
+            </Typography>
+            <Typography variant="body2" color="#536166">
+              歡迎加入社群，一起在民主教育的社群中，
+            </Typography>
+            <Typography variant="body2" color="#536166">
+              以共好的概念，協助彼此學習的需求，支持彼此成為自己想成為的人吧！
+            </Typography>
           </PaperColumnCenter>
         </Paper>
       </Container>

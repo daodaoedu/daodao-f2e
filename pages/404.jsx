@@ -145,10 +145,7 @@ const NotExistPage = () => {
               margin: '20px 0',
             }}
           >
-            <Button
-              variant="outlined"
-              onClick={() => router.push('/join')}
-            >
+            <Button variant="outlined" onClick={() => router.push('/join')}>
               <FacebookRounded sx={{ margin: '5px 0' }} />
               <Typography variant="p">加入社群</Typography>
             </Button>
