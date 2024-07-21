@@ -3,8 +3,8 @@ import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import { useRouter } from 'next/router';
 import MenuItem from './MenuItem';
-import UserAvatar from './UserAvatar';
-import useFirebase from '../../../../../hooks/useFirebase';
+import UserAvatar from '../SubList/UserAvatar';
+import { useSelector } from 'react-redux';
 
 const MenuWrapper = styled.div`
   position: fixed;
@@ -31,42 +31,15 @@ const MenuListWrapper = styled.div`
 
 const Menu = ({ open, list, onCloseMenu }) => {
   const router = useRouter();
-  const {
-    auth,
-    user,
-    signInWithFacebook,
-    signOutWithFacebook,
-    signOutWithGoogle,
-  } = useFirebase();
+
+
+  const user = useSelector((state) => state.user);
+  console.log("MenuList", user);
   return (
     <MenuWrapper open={open}>
       {open && (
         <MenuListWrapper>
-          {user && <UserAvatar onCloseMenu={onCloseMenu} />}
-          {user ? (
-            <MenuItem
-              key="登出"
-              delay="0.1s"
-              onClick={() => {
-                // signOutWithFacebook();
-                onCloseMenu();
-                signOutWithGoogle();
-                router.push('/');
-              }}
-              text="登出"
-            />
-          ) : (
-            <MenuItem
-              key="登入"
-              delay="0.1s"
-              onClick={() => {
-                router.push('/login');
-                // signInWithFacebook();
-              }}
-              text="登入"
-            />
-          )}
-
+          <UserAvatar user={user} />
           {list.map((value, index) => {
             return (
               <MenuItem
