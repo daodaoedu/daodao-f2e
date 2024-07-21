@@ -226,25 +226,25 @@ export const NAV_LINK = [
     link: '/group',
     target: '_self',
   },
-  {
-    name: '找活動',
-    link: '/activities',
-    target: '_self',
-  },
+  // {
+  //   name: '找活動',
+  //   link: '/activities',
+  //   target: '_self',
+  // },
   {
     name: '找故事',
     link: 'https://blog.daoedu.tw',
     target: '_blank',
   },
-  {
-    name: '找場域',
-    link: '/locations',
-    target: '_self',
-  },
+  // {
+  //   name: '找場域',
+  //   link: '/locations',
+  //   target: '_self',
+  // },
   {
     name: '加入社群',
-    link: 'https://www.facebook.com/groups/2237666046370459',
-    target: '_blank',
+    link: '/join',
+    target: '_self',
   },
   // {
   //   name: '找學習空間',
@@ -268,21 +268,21 @@ export const NAV_LINK_MOBILE = [
     link: '/group',
     target: '_self',
   },
-  {
-    name: '找活動',
-    link: '/activities',
-    target: '_self',
-  },
+  // {
+  //   name: '找活動',
+  //   link: '/activities',
+  //   target: '_self',
+  // },
   {
     name: '找故事',
     link: 'https://blog.daoedu.tw',
     target: '_blank',
   },
-  {
-    name: '找場域',
-    link: '/locations',
-    target: '_self',
-  },
+  // {
+  //   name: '找場域',
+  //   link: '/locations',
+  //   target: '_self',
+  // },
   {
     name: '新增資源',
     link: '/contribute/resource',
@@ -295,8 +295,8 @@ export const NAV_LINK_MOBILE = [
   },
   {
     name: '加入社群',
-    link: 'https://www.facebook.com/groups/2237666046370459',
-    target: '_blank',
+    link: '/join',
+    target: '_self',
   },
   // {
   //   name: '找學習空間',
@@ -316,19 +316,24 @@ export const FOOTER_LINK = [
     target: '_self',
   },
   {
-    name: '找活動',
-    link: '/activities',
+    name: '找揪團',
+    link: '/group',
     target: '_self',
   },
-  {
-    name: '找場域',
-    link: '/locations',
-    target: '_self',
-  },
+  // {
+  //   name: '找活動',
+  //   link: '/activities',
+  //   target: '_self',
+  // },
+  // {
+  //   name: '找場域',
+  //   link: '/locations',
+  //   target: '_self',
+  // },
   {
     name: '加入社群',
-    link: 'https://www.facebook.com/groups/2237666046370459',
-    target: '_blank',
+    link: '/join',
+    target: '_self',
   },
   {
     name: '隱私權政策',
