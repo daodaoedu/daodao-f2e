@@ -66,6 +66,10 @@ const AccountSetting = () => {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
+        '@media (max-width: 767px)': {
+          width: '100%',
+          padding: '16px 20px',
+        }
       }}
     >
       <Typography sx={{ fontSize: '22px', color: '#536166' }}>
