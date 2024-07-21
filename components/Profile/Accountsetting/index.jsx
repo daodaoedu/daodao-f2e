@@ -26,6 +26,7 @@ const StyledLogoutBtn = styled(Button)`
   background: #fff;
   color: #1f4645;
   padding: 5px 0;
+  width: 100%;
   /* shadow-light-gray */
   box-shadow: 0px 4px 10px 0px rgba(196, 194, 193, 0.4);
 `;
@@ -59,16 +60,14 @@ const AccountSetting = () => {
     <Box
       sx={{
         backgroundColor: '#ffffff',
+        width: '100%',
         width: '672px',
         borderRadius: '16px',
-        padding: '36px 40px',
+        padding: { xs: '16px 20px', md: '36px 40px' },
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        '@media (max-width: 767px)': {
-          padding: '16px 20px',
-        },
       }}
     >
       <Typography sx={{ fontSize: '22px', color: '#536166' }}>
@@ -79,6 +78,7 @@ const AccountSetting = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
+          width: '100%',
           width: '544px',
         }}
       >
@@ -93,6 +93,7 @@ const AccountSetting = () => {
               background: '#F3F3F3',
               padding: '12px 16px',
               color: '#92989A',
+              wordBreak: 'break-all',
             }}
           >
             {user.email}
