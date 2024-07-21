@@ -61,7 +61,7 @@ const AccountSetting = () => {
       sx={{
         backgroundColor: '#ffffff',
         width: '100%',
-        width: '672px',
+        maxWidth: '672px',
         borderRadius: '16px',
         padding: { xs: '16px 20px', md: '36px 40px' },
         display: 'flex',
@@ -79,7 +79,7 @@ const AccountSetting = () => {
           flexDirection: 'column',
           alignItems: 'flex-start',
           width: '100%',
-          width: '544px',
+          maxWidth: '544px',
         }}
       >
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
