@@ -48,8 +48,8 @@ const Transition = forwardRef((props, ref) => {
 
 function ContactButton({
   user,
-  children,
-  title,
+  label,
+  activityTitle,
   description,
   descriptionPlaceholder,
   isLoading,
@@ -99,6 +99,7 @@ function ContactButton({
       from: me.email,
       to: user.email,
       subject: '【島島阿學】點開 Email，認識新夥伴',
+      activityTitle,
       title: '你發起的揪團有人來信！',
       text: message,
       information: [me.email, contact],
@@ -129,7 +130,7 @@ function ContactButton({
           alt="contact icon"
           style={{ marginRight: '8px' }}
         />
-        {children || title}
+        {label}
       </Button>
       <Dialog
         keepMounted
@@ -161,7 +162,7 @@ function ContactButton({
             textAlign: 'center',
           }}
         >
-          {title}
+          {label}
         </DialogTitle>
         <IconButton
           aria-label="close"
