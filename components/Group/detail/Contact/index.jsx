@@ -98,7 +98,7 @@ function ContactButton({
       photoUrl: me.photoURL,
       from: me.email,
       to: user.email,
-      subject: '【島島阿學】點開 Email，認識新夥伴',
+      subject: '【島島阿學】點開 Email，揪團有新消息',
       activityTitle,
       title: '你發起的揪團有人來信！',
       text: message,
