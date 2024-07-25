@@ -21,7 +21,7 @@ const HomePageWrapper = styled.div`
 `;
 
 const StyledTab = styled(Tab)(({ isActive, mobileScreen }) => ({
-  width: `${mobileScreen ? '50%' : '100%'}`,
+  width: `${mobileScreen ? '33%' : '100%'}`,
   color: '#536166',
   borderRadius: '8px',
   '&.Mui-selected': {

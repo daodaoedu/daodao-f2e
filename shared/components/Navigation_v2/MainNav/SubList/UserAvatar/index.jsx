@@ -1,75 +1,114 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { Avatar, Box, IconButton, Menu, MenuItem } from '@mui/material';
-import { Group } from '@mui/icons-material';
+import { keyframes, css } from '@emotion/react';
+import styled from '@emotion/styled';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { userLogout } from '@/redux/actions/user';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
+import { Avatar, Box, MenuItem, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 
-const UserAvatar = () => {
+const slideInFrames = keyframes`
+  0% {
+    transform: translateX(-2%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+`;
+
+const StyledMenuItem = styled(MenuItem)`
+  animation: 0.5s ${slideInFrames} forwards;
+  transition: color 0.2s ease-in-out;
+  color: #536166;
+  border-radius: 4px;
+  ${(props) => css`
+    animation-delay: ${props.delay};
+    padding: ${props.isPadScreen} ? 12px : 12px 52px;
+    font-size: ${props.isPadScreen} ? 18px : 16px;
+    magrin: ${props.isPadScreen} ? 8px 0; : '0';
+    &:hover {
+      background-color: #DEF5F5;
+    }
+  `}
+`;
+
+const UserAvatar = ({ onCloseMenu = () => {}, user }) => {
+  const isPadScreen = useMediaQuery('(max-width: 767px)');
+
   const { push } = useRouter();
-  const user = useSelector((state) => state.user);
 
   const [isOpenMenu, setIsOpenMenu] = useState(null);
 
-  const handleSignOut = () => {
-    console.log('handleSignOut');
+  const logout = () => {
+    dispatch(userLogout());
+    setIsOpenMenu(false);
+    onCloseMenu();
+    push('/');
   };
 
-  if (!user._id) {
-    return (
-      <IconButton
-        sx={{ margin: '0 10px', fontSize: '16px', color: 'white' }}
-        onClick={() => {
-          push('/login');
-        }}
-      >
-        <Group sx={{ fontSize: '30px' }} />
-      </IconButton>
-    );
-  }
   return (
-    <IconButton sx={{ margin: '0 10px' }}>
-      <Avatar
-        alt={user?.displayName ?? ''}
-        src={user?.photoURL ?? ''}
-        // onClick={(event) => setIsOpenMenu(event.currentTarget)}
-        onClick={() => {
-          setIsOpenMenu(false);
-          push('/profile');
-        }}
-      />
-      <Menu
-        id="user-menu"
-        anchorEl={isOpenMenu}
-        open={Boolean(isOpenMenu)}
-        onClose={() => setIsOpenMenu(false)}
+    <Box sx={{ margin: '8px 32px', cursor: 'pointer', position: 'relative' }}>
+      <Box
+        sx={{ display: 'flex', alignItems: 'center' }}
+        onClick={() => setIsOpenMenu(!isOpenMenu)}
       >
-        <MenuItem
-          onClick={() => {
-            setIsOpenMenu(false);
-            push('/profile');
-          }}
-        >
-          個人頁面
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            setIsOpenMenu(false);
-            push('/profile');
-          }}
-        >
-          帳號設定
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleSignOut();
-            push('/');
-            setIsOpenMenu(false);
-          }}
-        >
-          登出
-        </MenuItem>
-      </Menu>
-    </IconButton>
+        {user.name && (
+          <Avatar alt={user?.displayName ?? ''} src={user?.photoURL ?? ''} />
+        )}
+        {isPadScreen && (
+          <>
+            <Typography
+              sx={{
+                flexGrow: 1,
+                marginLeft: '12px',
+                fontWeight: 'bold',
+                fontSize: '18px',
+                color: '#536166',
+              }}
+            >
+              {user.name}
+            </Typography>
+            {isOpenMenu ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </>
+        )}
+      </Box>
+      <Box
+        sx={{
+          display: isOpenMenu ? 'block' : 'none',
+          position: isPadScreen ? 'relative' : 'absolute',
+          top: isPadScreen ? 0 : '60px',
+          borderRadius: '8px',
+          backgroundColor: 'white',
+          right: '0',
+          zIndex: 1,
+        }}
+      >
+        <Box sx={{ padding: !isPadScreen && '12px' }}>
+          {[
+            { name: '個人資料', id: 'person-setting' },
+            { name: '我的揪團', id: 'my-group' },
+            { name: '帳號設定', id: 'account-setting' },
+          ].map((v, i) => (
+            <StyledMenuItem
+              key={v.id}
+              delay={`${i * 0.1}s`}
+              isPadScreen={isPadScreen}
+              onClick={() => {
+                setIsOpenMenu(false);
+                onCloseMenu();
+                push('/profile?id=' + v.id);
+              }}
+            >
+              {v.name}
+            </StyledMenuItem>
+          ))}
+
+          <StyledMenuItem onClick={logout}>登出</StyledMenuItem>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
