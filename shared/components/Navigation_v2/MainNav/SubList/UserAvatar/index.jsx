@@ -26,11 +26,12 @@ const StyledMenuItem = styled(MenuItem)`
   border-radius: 4px;
   ${(props) => css`
     animation-delay: ${props.delay};
-    padding: ${props.isPadScreen} ? 12px : 12px 52px;
-    font-size: ${props.isPadScreen} ? 18px : 16px;
-    magrin: ${props.isPadScreen} ? 8px 0; : '0';
+    min-width: 126px;
+    padding: ${props.isPadScreen ? '12px 52px' : '12px'};
+    font-size: ${props.isPadScreen ? '18px' : '16px'};
+    margin-top: ${props.isPadScreen ? '8px' : '0'};
     &:hover {
-      background-color: #DEF5F5;
+      background-color: #def5f5;
     }
   `}
 `;
@@ -87,13 +88,14 @@ const UserAvatar = ({ onCloseMenu = () => {}, user }) => {
           zIndex: 1,
         }}
       >
-        <Box as="ul" sx={{ padding: !isPadScreen && '12px' }}>
+        <Box sx={{ padding: !isPadScreen && '12px' }}>
           {[
             { name: '個人資料', id: 'person-setting' },
             { name: '我的揪團', id: 'my-group' },
             { name: '帳號設定', id: 'account-setting' },
           ].map((v, i) => (
             <StyledMenuItem
+              as="div"
               key={v.id}
               delay={`${i * 0.1}s`}
               isPadScreen={isPadScreen}
@@ -107,7 +109,9 @@ const UserAvatar = ({ onCloseMenu = () => {}, user }) => {
             </StyledMenuItem>
           ))}
 
-          <StyledMenuItem onClick={logout}>登出</StyledMenuItem>
+          <StyledMenuItem as="div" isPadScreen={isPadScreen} onClick={logout}>
+            登出
+          </StyledMenuItem>
         </Box>
       </Box>
     </Box>

@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
-import { useRouter } from 'next/router';
 import MenuItem from './MenuItem';
 import UserAvatar from '../SubList/UserAvatar';
 import { useSelector } from 'react-redux';
 import { Button } from '@mui/material';
+import { BASE_URL } from '@/constants/common';
 
 const MenuWrapper = styled.div`
   position: fixed;
@@ -65,7 +65,7 @@ const Menu = ({ open, list, onCloseMenu, shiftTop = '80px' }) => {
           {user._id ? (
             <UserAvatar user={user} onCloseMenu={onCloseMenu} />
           ) : (
-            <LoginButton href="/login">登入</LoginButton>
+            <LoginButton href={`${BASE_URL}/auth/google`}>登入</LoginButton>
           )}
         </MenuListWrapper>
       )}
