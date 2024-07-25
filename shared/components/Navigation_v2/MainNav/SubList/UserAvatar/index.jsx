@@ -3,6 +3,7 @@ import { keyframes, css } from '@emotion/react';
 import styled from '@emotion/styled';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { useDispatch } from 'react-redux';
 import { userLogout } from '@/redux/actions/user';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -35,6 +36,7 @@ const StyledMenuItem = styled(MenuItem)`
 `;
 
 const UserAvatar = ({ onCloseMenu = () => {}, user }) => {
+  const dispatch = useDispatch();
   const isPadScreen = useMediaQuery('(max-width: 767px)');
 
   const { push } = useRouter();
@@ -85,7 +87,7 @@ const UserAvatar = ({ onCloseMenu = () => {}, user }) => {
           zIndex: 1,
         }}
       >
-        <Box sx={{ padding: !isPadScreen && '12px' }}>
+        <Box as="ul" sx={{ padding: !isPadScreen && '12px' }}>
           {[
             { name: '個人資料', id: 'person-setting' },
             { name: '我的揪團', id: 'my-group' },
