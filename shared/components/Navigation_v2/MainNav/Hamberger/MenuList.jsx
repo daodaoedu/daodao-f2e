@@ -15,6 +15,7 @@ const MenuWrapper = styled.div`
   flex-direction: column;
   background: white;
   transition: height 0.3s ease;
+  padding-bottom: 160px;
   z-index: 100;
   overflow: auto;
 `;
