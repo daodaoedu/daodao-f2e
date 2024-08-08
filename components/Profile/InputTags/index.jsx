@@ -13,6 +13,7 @@ const Tag = ({ label, onCancel }) => {
         borderRadius: '4px',
         padding: '4px 8px',
         mr: '8px',
+        mb: '8px',
       }}
     >
       <Typography
@@ -36,9 +37,20 @@ const Tag = ({ label, onCancel }) => {
   );
 };
 
-const StyledTagsField = styled(TextField)`
+const StyledTagsWrapper = styled(Box)`
+  width: 100%;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  align-items: center;
+  padding: 8px 16px;
+  min-height: 50px;
+  div {
+    &::before {
+      border-color: transparent;
+    }
+  }
   input {
-    padding-left: ${({ hasData }) => (hasData ? '0' : '16px')};
+    padding: 0;
   }
 `;
 
@@ -51,33 +63,38 @@ function InputTags({ value = [], change }) {
       }
     }
   };
+
   return (
-    <StyledTagsField
-      hasData={value.length > 0}
-      fullWidth="true"
-      placeholder="搜尋或新增標籤"
-      onKeyDown={keyDownHandle}
-      className="input-tags"
-      InputProps={
-        value.length && {
-          startAdornment: (
-            <Box sx={{ marginTop: '5px', display: 'flex' }}>
-              {Array.isArray(value) &&
-                value.map(
-                  (item) =>
-                    typeof item === 'string' && (
-                      <Tag
-                        key={item}
-                        label={item}
-                        onCancel={() => change(item)}
-                      />
-                    ),
-                )}
-            </Box>
-          ),
-        }
-      }
-    />
+    <StyledTagsWrapper>
+      <Box
+        sx={{
+          marginTop: '5px',
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+        }}
+      >
+        {Array.isArray(value) &&
+          value.map(
+            (item) =>
+              typeof item === 'string' && (
+                <Tag key={item} label={item} onCancel={() => change(item)} />
+              ),
+          )}
+        <TextField
+          fullWidth="true"
+          placeholder={value.length ? '' : '搜尋或新增標籤'}
+          onKeyDown={keyDownHandle}
+          variant="standard"
+          className="text-field"
+          sx={{
+            padding: '0',
+            minWidth: '50px',
+            width: 'auto',
+          }}
+        />
+      </Box>
+    </StyledTagsWrapper>
   );
 }
 

@@ -1,6 +1,7 @@
 import { useId, useState, forwardRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
+import Link from 'next/link';
 import styled from '@emotion/styled';
 import {
   Avatar,
@@ -23,6 +24,19 @@ import Feedback from './Feedback';
 
 const ROLELIST = mapToTable(ROLE);
 
+const StyledButton = styled(Button)`
+  padding: 8px 36px;
+  line-height: 1.5;
+  border-radius: 20px;
+  color: #ffff;
+  background-color: #16b9b3;
+  font-size: 16px;
+
+  &:disabled img {
+    mix-blend-mode: difference;
+    opacity: 0.3;
+  }
+`;
 const StyledTitle = styled.label`
   display: block;
   color: var(--black-white-gray-dark, #293a3d);
@@ -41,6 +55,18 @@ const StyledTextArea = styled(TextareaAutosize)`
   width: 100%;
   min-height: 128px;
 `;
+const StyledLink = styled(Link)`
+  margin-top: 6px;
+  margin-left: 6px;
+  display: block;
+  color: black;
+  font-size: 12px;
+`;
+const StyledSpan = styled.span`
+  padding: 0 2px;
+  color: #16b9b3;
+  text-decoration: underline;
+`;
 
 const Transition = forwardRef((props, ref) => {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -48,8 +74,8 @@ const Transition = forwardRef((props, ref) => {
 
 function ContactButton({
   user,
-  children,
-  title,
+  label,
+  activityTitle,
   description,
   descriptionPlaceholder,
   isLoading,
@@ -66,6 +92,7 @@ function ContactButton({
   const descriptionId = `modal-description-${id}`;
   const messageId = `message-${id}`;
   const contactId = `contact-${id}`;
+  const isLogin = !!me?._id;
   const role =
     ROLE.find(({ key }) => user?.roleList?.includes(key))?.label || '暫無資料';
 
@@ -98,7 +125,8 @@ function ContactButton({
       photoUrl: me.photoURL,
       from: me.email,
       to: user.email,
-      subject: '【島島阿學】點開 Email，認識新夥伴',
+      subject: '【島島阿學】點開 Email，揪團有新消息',
+      activityTitle,
       title: '你發起的揪團有人來信！',
       text: message,
       information: [me.email, contact],
@@ -107,21 +135,13 @@ function ContactButton({
 
   useEffect(() => {
     if (!me?._id && open) router.push('/login');
-  }, [me, open, router]);
+  }, [me?._id, open, router]);
 
   return (
-    <>
-      <Button
+    <div>
+      <StyledButton
         variant="contained"
-        sx={{
-          p: '8px 36px',
-          lineHeight: 1.5,
-          borderRadius: '20px',
-          color: '#ffff',
-          bgcolor: '#16B9B3',
-          fontSize: '16px',
-        }}
-        disabled={isLoading}
+        disabled={!isLogin || isLoading}
         onClick={() => setOpen(true)}
       >
         <img
@@ -129,8 +149,14 @@ function ContactButton({
           alt="contact icon"
           style={{ marginRight: '8px' }}
         />
-        {children || title}
-      </Button>
+        {label}
+      </StyledButton>
+      {!isLogin && (
+        <StyledLink href="/login">
+          <StyledSpan>註冊</StyledSpan>或<StyledSpan>登入</StyledSpan>
+          即可聯繫主揪！
+        </StyledLink>
+      )}
       <Dialog
         keepMounted
         scroll="body"
@@ -161,7 +187,7 @@ function ContactButton({
             textAlign: 'center',
           }}
         >
-          {title}
+          {label}
         </DialogTitle>
         <IconButton
           aria-label="close"
@@ -284,7 +310,7 @@ function ContactButton({
         </Box>
       </Dialog>
       <Feedback type={feedback} onClose={() => setFeedback('')} />
-    </>
+    </div>
   );
 }
 

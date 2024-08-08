@@ -63,7 +63,11 @@ function EditPage() {
   const router = useRouter();
   const dispatch = useDispatch();
 
+  const { id, token } = router.query;
+
   const {
+    _id: userId,
+    token: userToken,
     birthDay: userBirthDay,
     gender: userGender,
     roleList: userRoleList,
@@ -72,7 +76,6 @@ function EditPage() {
     createdDate,
     updatedDate,
   } = useSelector((state) => state?.user);
-  const { id } = router.query;
 
   const [isSubscribeEmail, setIsSubscribeEmail] = useState(false);
   const [birthDay, setBirthDay] = useState(dayjs());
@@ -80,14 +83,17 @@ function EditPage() {
   const [roleList, setRoleList] = useState([]);
 
   const fetchUser = async () => {
-    dispatch(fetchUserById(id));
+    if (!userId) {
+      dispatch(fetchUserById(id, token));
+    }
+    router.push(`/signin?id=${id}`);
   };
 
   useEffect(() => {
-    if (id) {
+    if (id || token) {
       fetchUser();
     }
-  }, [id]);
+  }, [id, token]);
 
   useEffect(() => {
     setBirthDay(userBirthDay ? dayjs(userBirthDay) : dayjs());

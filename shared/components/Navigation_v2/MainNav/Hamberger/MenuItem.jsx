@@ -37,47 +37,32 @@ const MenuItemWrapper = styled.li`
 `;
 
 const ItemWrapper = styled.div`
-  font-size: 30px;
-  padding: 1rem 0;
-  margin: 0 5%;
+  font-size: 18px;
+  padding: 12px 24px;
+  border-radius: 8px;
   cursor: pointer;
-  color: #fafafa;
   transition: color 0.2s ease-in-out;
   animation: 0.5s ${slideInFrames} forwards;
+  color: #536166;
   ${(props) => css`
     animation-delay: ${props.delay};
   `}
   &:hover {
-    color: 'gray';
+    background-color: #def5f5;
+    font-weight: bold;
   }
-`;
-
-const LineStyle = styled.div`
-  width: '90%';
-  height: '1px';
-  background: '#fafafa';
-  margin: '0 auto';
-  animation: 0.5s ${shrinkFrames} forwards;
-  ${(props) => css`
-    animation-delay: ${props.delay};
-  `}
 `;
 
 const MenuItem = ({ delay, text, link, onClick }) => {
-  if (link) {
-    return (
-      <MenuItemWrapper delay={delay} onClick={onClick}>
-        <Link href={link} passHref>
-          <ItemWrapper delay={delay}>{text}</ItemWrapper>
-        </Link>
-        <LineStyle delay={delay} />
-      </MenuItemWrapper>
-    );
-  }
   return (
     <MenuItemWrapper delay={delay} onClick={onClick}>
-      <ItemWrapper delay={delay}>{text}</ItemWrapper>
-      <LineStyle delay={delay} />
+      {link ? (
+        <Link href={link} passHref color="gray">
+          <ItemWrapper delay={delay}>{text}</ItemWrapper>
+        </Link>
+      ) : (
+        <ItemWrapper delay={delay}>{text}</ItemWrapper>
+      )}
     </MenuItemWrapper>
   );
 };

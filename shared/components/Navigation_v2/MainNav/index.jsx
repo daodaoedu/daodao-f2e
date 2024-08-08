@@ -24,7 +24,7 @@ const BoxWrapper = styled(Box)`
   }
 `;
 
-const MainNav = () => {
+const MainNav = ({ height }) => {
   return (
     <MainNavWrapper>
       <BoxWrapper sx={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -34,7 +34,7 @@ const MainNav = () => {
         {/* right list */}
         <SubList />
         {/* mobile only */}
-        <Hamberger />
+        <Hamberger shiftTop={height} />
       </BoxWrapper>
     </MainNavWrapper>
   );

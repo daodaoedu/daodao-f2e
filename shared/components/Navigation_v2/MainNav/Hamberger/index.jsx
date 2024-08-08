@@ -19,7 +19,10 @@ const MobileLinkListWrapper = styled.ul`
     li {
       flex: none;
       width: 100%;
-      border-bottom: solid 1px white;
+    }
+
+    li a {
+      color: #536166;
     }
 
     svg[type='menu']:checked + ul {
@@ -39,13 +42,14 @@ const MobileLinkListWrapper = styled.ul`
   }
 `;
 
-const MainNav = () => {
+const MainNav = ({ shiftTop = 0 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const avatar = '';
   const isUserLogin = true;
   return (
     <MobileLinkListWrapper>
       <MenuList
+        shiftTop={shiftTop}
         isUserLogin={isUserLogin}
         avatar={avatar}
         open={isMenuOpen}

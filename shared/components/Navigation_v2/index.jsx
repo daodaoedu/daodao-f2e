@@ -1,20 +1,23 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { AppBar } from '@mui/material';
 import MainNav from './MainNav';
 import PromotionBar from './PromotionBar';
 
-const NavigationWrapper = styled(AppBar)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 80px;
-  padding-left: 5%;
-  padding-right: 5%;
-  .MuiToolbar-root {
-    padding: 0;
-  }
-`;
+const NavigationWrapper = styled(AppBar)(({ hasPromote }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '80px',
+  padding: '0 5%',
+  ...(hasPromote && {
+    padding: '38px 5% 0',
+    height: '118px',
+  }),
+  '.MuiToolbar-root': {
+    padding: '0',
+  },
+}));
 
 const donateTexts = [
   '✨島島阿學需要你的支持，讓人人都享有同等資源✨',
@@ -32,12 +35,19 @@ const buildRandomText = () => {
 // `;
 // 問卷 https://docs.google.com/forms/d/e/1FAIpQLSeyU9-Q-kIWp5uutcik3h-RO4o5VuG6oG0m-4u1Ua18EOu3aw/viewform
 const Navigation = () => {
+  const [showPromotetionBar, setShowPromotionBar] = useState(true);
+
   return (
     <>
-      <PromotionBar link="https://ocf.tw/p/daodao/" text={buildRandomText()} />
-      <NavigationWrapper position="sticky">
+      <NavigationWrapper position="sticky" hasPromote={showPromotetionBar}>
+        <PromotionBar
+          isShow={showPromotetionBar}
+          link="https://ocf.tw/p/daodao/"
+          text={buildRandomText()}
+          toggleAction={setShowPromotionBar}
+        />
         {/* <Toolbar> */}
-        <MainNav />
+        <MainNav height={showPromotetionBar ? '118px' : '80px'} />
         {/* </Toolbar> */}
       </NavigationWrapper>
     </>

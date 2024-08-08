@@ -1,45 +1,56 @@
-// import { keyframes, css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
-import { useRouter } from 'next/router';
 import MenuItem from './MenuItem';
 import UserAvatar from '../SubList/UserAvatar';
 import { useSelector } from 'react-redux';
+import { Button } from '@mui/material';
+import { BASE_URL } from '@/constants/common';
 
 const MenuWrapper = styled.div`
   position: fixed;
-  top: 0;
+  top: ${(props) => props.shiftTop};
   left: 0;
-  height: ${(props) => (props.open ? '100%' : 0)};
+  height: ${(props) => (props.open ? '100dvh' : 0)};
   width: 100vw;
   display: flex;
   flex-direction: column;
-  background: #16b9b3;
-  opacity: 0.95;
-  color: #fafafa;
+  background: white;
   transition: height 0.3s ease;
+  padding-bottom: ${(props) => (props.open ? '180px' : 0)};
   z-index: 100;
   overflow: auto;
 `;
 
 const MenuListWrapper = styled.div`
-  padding: 3rem;
-  margin-top: 30px;
+  padding: 1rem;
   position: relative;
   z-index: 100;
+  height: inherit;
 `;
 
-const Menu = ({ open, list, onCloseMenu }) => {
-  const router = useRouter();
+const MenuDivider = styled.div`
+  height: 1px;
+  width: 100%;
+  background-color: #def5f5;
+  margin: 1rem 0;
+`;
 
+const LoginButton = styled(Button)`
+  width: 100%;
+  height: 40px;
+  padding: 5px 20px;
+  color: #536166;
+  font-size: 16px;
+  line-height: 1.4;
+  border-radius: 20px;
+  border: 1px solid #16b9b3;
+`;
 
+const Menu = ({ open, list, onCloseMenu, shiftTop = '80px' }) => {
   const user = useSelector((state) => state.user);
-  console.log("MenuList", user);
   return (
-    <MenuWrapper open={open}>
+    <MenuWrapper open={open} shiftTop={shiftTop}>
       {open && (
         <MenuListWrapper>
-          <UserAvatar user={user} />
           {list.map((value, index) => {
             return (
               <MenuItem
@@ -51,6 +62,12 @@ const Menu = ({ open, list, onCloseMenu }) => {
               />
             );
           })}
+          <MenuDivider />
+          {user._id ? (
+            <UserAvatar user={user} onCloseMenu={onCloseMenu} />
+          ) : (
+            <LoginButton href={`${BASE_URL}/auth/google`}>登入</LoginButton>
+          )}
         </MenuListWrapper>
       )}
     </MenuWrapper>

@@ -1,14 +1,10 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import Link from 'next/link';
-import { Typography } from '@mui/material';
-import useFirebase from '../../../../../hooks/useFirebase';
 import UserAvatar from './UserAvatar';
-// import { useAuthState } from "react-firebase-hooks/auth";
-// import { signInWithPopup } from "firebase/auth";
-// import { useDispatch, useSelector } from "react-redux";
-// import { userLogin } from "../../../../../redux/actions/user";
-// import { useCollectionData } from "react-firebase-hooks/firestore";
+import { useSelector } from 'react-redux';
+import { Button } from '@mui/material';
+import { BASE_URL } from '@/constants/common';
 
 const LinkListWrapper = styled.ul`
   display: flex;
@@ -50,8 +46,7 @@ const SubListWrapper = styled.div`
 `;
 
 const SubList = () => {
-  // const dispatch = useDispatch();
-  const { auth, user } = useFirebase();
+  const user = useSelector((state) => state.user);
 
   return (
     <SubListWrapper>
@@ -64,7 +59,23 @@ const SubList = () => {
           </Link>
         </li>
         <li>
-          <UserAvatar user={user} />
+          {user._id ? (
+            <UserAvatar user={user} />
+          ) : (
+            <Button
+              href={`${BASE_URL}/auth/google`}
+              sx={{
+                height: '40px',
+                padding: '5px 20px',
+                color: '#fff',
+                borderRadius: '20px',
+                border: '1px solid #fff',
+                marginLeft: '40px',
+              }}
+            >
+              登入
+            </Button>
+          )}
         </li>
       </LinkListWrapper>
     </SubListWrapper>

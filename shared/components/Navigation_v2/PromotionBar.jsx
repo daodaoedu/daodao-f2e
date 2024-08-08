@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 
 const PromotionBarWrapper = styled.div`
+  width: 100%;
+  position: fixed;
+  top: 0;
+  padding-bottom: 20px;
   background-color: #f37b5f;
   color: #fff;
   padding: 7px;
@@ -46,25 +50,15 @@ const CloseButton = styled.span`
   }
 `;
 
-const PromotionBar = ({ link, text }) => {
-  const [show, setShow] = useState(undefined);
-
-  useEffect(() => {
-    setShow(true);
-  }, []);
-
-  const handleClose = () => {
-    setShow(false);
-  };
-
+const PromotionBar = ({ isShow, link, text, toggleAction }) => {
   return (
     <>
-      {show && (
+      {isShow && (
         <PromotionBarWrapper>
           <a href={link} target="_blank" rel="noreferrer">
             {text}
           </a>
-          <CloseButton onClick={handleClose} />
+          <CloseButton onClick={() => toggleAction(false)} />
         </PromotionBarWrapper>
       )}
     </>
