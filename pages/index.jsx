@@ -54,7 +54,11 @@ const HomePage = () => {
   useEffect(() => {
     if (token) {
       dispatch(fetchUserById(id, token));
-      router.push('/');
+      // router.push('/');
+      // console.log('----------');
+      // console.log('fetch user');
+      // console.log('----------');
+      console.log('========2024-01-01 00:00:00================');
     }
   }, [id, token]);
 
