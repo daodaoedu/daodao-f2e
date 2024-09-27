@@ -60,6 +60,12 @@ const reducer = (state = initialState, action) => {
         tags: [],
       };
     }
+    case 'CLEAR_PARTNER_STATE': {
+      return {
+        ...state,
+        partner: null,
+      };
+    }
     default: {
       return state;
     }

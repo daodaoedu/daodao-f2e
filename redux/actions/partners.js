@@ -46,3 +46,9 @@ export function fetchPartnerTags() {
     type: 'FETCH_PARTNER_TAGS',
   };
 }
+
+export function clearPartnerState() {
+  return {
+    type: 'CLEAR_PARTNER_STATE',
+  };
+}
