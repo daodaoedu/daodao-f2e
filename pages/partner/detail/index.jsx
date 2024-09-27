@@ -7,7 +7,11 @@ import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 import Profile from '@/components/Profile';
 import ContactModal from '@/components/Profile/Contact';
-import { sendEmailToPartner, fetchPartnerById } from '@/redux/actions/partners';
+import {
+  clearPartnerState,
+  sendEmailToPartner,
+  fetchPartnerById,
+} from '@/redux/actions/partners';
 import toast from 'react-hot-toast';
 import { ROLE } from '@/constants/member';
 import { mapToTable } from '@/utils/helper';
@@ -52,6 +56,9 @@ const Detail = () => {
     if (partnerId !== undefined) {
       fetchUser();
     }
+    return () => {
+      dispatch(clearPartnerState());
+    };
   }, [partnerId]);
 
   // modal handle
