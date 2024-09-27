@@ -304,21 +304,8 @@ export const TAIWAN_DISTRICT = [
         zip: '272',
         name: '南澳鄉',
       },
-      {
-        zip: '290',
-        name: '釣魚臺',
-      },
     ],
     name: '宜蘭縣',
-  },
-  {
-    districts: [
-      {
-        zip: '290',
-        name: '釣魚臺',
-      },
-    ],
-    name: '釣魚臺',
   },
   {
     districts: [
