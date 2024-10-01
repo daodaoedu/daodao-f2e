@@ -6,6 +6,7 @@ import { Box } from '@mui/material';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 import { setQuery } from '@/redux/actions/group';
 import GroupCard from './GroupCard';
+import SkeletonGroupCard from './SkeletonGroupCard';
 
 export const StyledGroupItem = styled.li`
   position: relative;
@@ -56,7 +57,25 @@ function GroupList() {
   return (
     <>
       <StyledGroupList>
-        {items?.length || isLoading ? (
+        {isLoading ? (
+          // always show 3 || 6 skeleton cards in mobile || desktop screen
+          Array.from({ length: isMobileScreen ? 3 : 6 }, (_, index) => {
+            const isLast = index === (isMobileScreen ? 2 : 5);
+            const shouldRenderDivider =
+              (isMobileScreen && !isLast) ||
+              (isPadScreen && !isLast && index % 2 === 1) ||
+              (isDeskTopScreen && !isLast && index % 3 === 2);
+
+            return (
+              <Fragment key={index}>
+                <StyledGroupItem>
+                  <SkeletonGroupCard />
+                </StyledGroupItem>
+                {shouldRenderDivider && <StyledDivider />}
+              </Fragment>
+            );
+          })
+        ) : items?.length ? (
           items.map((data, index) => {
             const isLast = index === items.length - 1;
             const shouldRenderDivider =
