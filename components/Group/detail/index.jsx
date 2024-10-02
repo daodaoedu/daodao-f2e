@@ -1,7 +1,5 @@
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
-import styled from '@emotion/styled';
-import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -19,6 +17,7 @@ import {
   StyledMobileEditButton,
 } from './Detail.styled';
 import ContactButton from './Contact';
+import ShareButtonGroup from './ShareButtonGroup';
 
 function GroupDetail({ id, source, isLoading }) {
   const router = useRouter();
@@ -38,18 +37,26 @@ function GroupDetail({ id, source, isLoading }) {
           <Image height="300px" src={source?.photoURL} alt={source?.photoAlt} />
         )}
         <Box sx={{ position: 'relative', p: '10px' }}>
-          {isLoading ? (
-            <Skeleton
-              variant="rounded"
-              height={26}
-              width={68}
-              animation="wave"
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {isLoading ? (
+              <Skeleton
+                variant="rounded"
+                height={26}
+                width={68}
+                animation="wave"
+              />
+            ) : source?.isGrouping ? (
+              <StyledStatus>揪團中</StyledStatus>
+            ) : (
+              <StyledStatus className="finished">已結束</StyledStatus>
+            )}
+            <ShareButtonGroup
+              title={source?.title}
+              text={source?.description}
+              url={window.location.href}
+              hashtag={source?.hashtag}
             />
-          ) : source?.isGrouping ? (
-            <StyledStatus>揪團中</StyledStatus>
-          ) : (
-            <StyledStatus className="finished">已結束</StyledStatus>
-          )}
+          </Box>
           {isMyGroup ? (
             <StyledDesktopEditButton
               variant="outlined"
