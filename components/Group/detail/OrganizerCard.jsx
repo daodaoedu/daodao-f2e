@@ -5,6 +5,7 @@ import { EDUCATION_STEP, ROLE } from '@/constants/member';
 import locationSvg from '@/public/assets/icons/location.svg';
 import Chip from '@/shared/components/Chip';
 import { timeDuration } from '@/utils/date';
+import Link from 'next/link';
 
 const StyledHeader = styled.div`
   display: flex;
@@ -82,33 +83,35 @@ function OrganizerCard({ data = {}, isLoading }) {
   return (
     <>
       <StyledHeader>
-        <StyledFlex style={{ marginBottom: '10px', gap: 12 }}>
-          <Avatar
-            src={data?.user?.photoURL}
-            alt={`${data?.user?.name} avatar`}
-          />
-          <div>
-            <StyledFlex style={{ gap: 10 }}>
-              <StyledText>
-                {isLoading ? (
-                  <Skeleton width={80} animation="wave" />
-                ) : (
-                  data?.user?.name
-                )}
+        <Link href={`/partner/detail?id=${data?.userId}`}>
+          <StyledFlex style={{ marginBottom: '10px', gap: 12 }}>
+            <Avatar
+              src={data?.user?.photoURL}
+              alt={`${data?.user?.name} avatar`}
+            />
+            <div>
+              <StyledFlex style={{ gap: 10 }}>
+                <StyledText>
+                  {isLoading ? (
+                    <Skeleton width={80} animation="wave" />
+                  ) : (
+                    data?.user?.name
+                  )}
+                </StyledText>
+                <StyledTag>
+                  {isLoading ? (
+                    <Skeleton width={80} animation="wave" />
+                  ) : (
+                    educationStage
+                  )}
+                </StyledTag>
+              </StyledFlex>
+              <StyledText style={{ color: '#92989A' }}>
+                {isLoading ? <Skeleton width={88} animation="wave" /> : role}
               </StyledText>
-              <StyledTag>
-                {isLoading ? (
-                  <Skeleton width={80} animation="wave" />
-                ) : (
-                  educationStage
-                )}
-              </StyledTag>
-            </StyledFlex>
-            <StyledText style={{ color: '#92989A' }}>
-              {isLoading ? <Skeleton width={88} animation="wave" /> : role}
-            </StyledText>
-          </div>
-        </StyledFlex>
+            </div>
+          </StyledFlex>
+        </Link>
         <StyledText style={{ alignSelf: 'flex-start', gap: 1 }}>
           <img src={locationSvg.src} alt="location icon" />
           {isLoading ? <Skeleton width={48} animation="wave" /> : location}
