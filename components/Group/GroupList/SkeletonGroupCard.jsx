@@ -9,7 +9,7 @@ import {
 
 function SkeletonGroupCard() {
   return (
-    <StyledGroupCard sx={{ cursor: 'default' }}>
+    <StyledGroupCard href="#" sx={{ cursor: 'default' }}>
       <Skeleton variant="rounded" width="100%" height={122} animation="wave" />
       <StyledContainer>
         <Skeleton
