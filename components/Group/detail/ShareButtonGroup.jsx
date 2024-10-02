@@ -13,6 +13,12 @@ import {
 const StyledShareButtonGroup = styled.div`
   display: flex;
   gap: 0.25rem;
+  align-items: center;
+
+  .share-text {
+    font-size: 14px;
+    color: #536166;
+  }
 `;
 
 export default function ShareButtonGroup({ title, text, url, hashtag }) {
@@ -28,6 +34,7 @@ export default function ShareButtonGroup({ title, text, url, hashtag }) {
 
   return (
     <StyledShareButtonGroup>
+      <span className="share-text">分享至</span>
       <IconButton size="small" onClick={facebookShare}>
         <FaSquareFacebook fill="#1877F2" />
       </IconButton>
