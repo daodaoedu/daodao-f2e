@@ -7,9 +7,9 @@ import {
   StyledText,
 } from './GroupCard.styled';
 
-function SkeletonGroupCard({ _id }) {
+function SkeletonGroupCard() {
   return (
-    <StyledGroupCard href={`/group/detail?id=${_id}`}>
+    <StyledGroupCard sx={{ cursor: 'default' }}>
       <Skeleton variant="rounded" width="100%" height={122} animation="wave" />
       <StyledContainer>
         <Skeleton
