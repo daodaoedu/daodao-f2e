@@ -100,12 +100,12 @@ export default function GroupForm({
             placeholder="想找什麼類型的夥伴？"
           />
           <Fields.Select
-            label="適合的教育階段"
+            label="適合的學習階段"
             name="partnerEducationStep"
             control={control}
             value={values.partnerEducationStep}
             error={errors.partnerEducationStep}
-            placeholder="活動適合什麼教育階段的夥伴？"
+            placeholder="活動適合什麼學習階段的夥伴？"
             options={eduOptions}
             multiple
             required

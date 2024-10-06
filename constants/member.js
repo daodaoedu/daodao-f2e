@@ -8,7 +8,7 @@ export const GENDER = [
     value: 'female',
   },
   {
-    label: '其他',
+    label: '保持神秘',
     value: 'other',
   },
 ];
@@ -46,7 +46,7 @@ export const ROLE = [
     image: 'https://i.imgur.com/cXZXfBL.png',
   },
   {
-    label: '其他',
+    label: '終生學習',
     key: 'other',
     value: 'other',
     image: 'https://i.imgur.com/Z7oGEnb.png',
@@ -54,38 +54,38 @@ export const ROLE = [
 ];
 
 export const EDUCATION_STEP = [
-  {
-    label: '學齡前',
-    key: 'preschool',
-    value: 'preschool',
-  },
-  {
-    label: '國小低年級',
-    key: 'elementary-junior',
-    value: 'elementary-junior',
-  },
-  {
-    label: '國小中年級',
-    key: 'elementary-middle',
-    value: 'elementary-middle',
-  },
-  {
-    label: '國小高年級',
-    key: 'elementary-senior',
-    value: 'elementary-senior',
-  },
-  {
-    label: '國中',
-    key: 'junior-high',
-    value: 'junior-high',
-  },
+  // {
+  //   label: '學齡前',
+  //   key: 'preschool',
+  //   value: 'preschool',
+  // },
+  // {
+  //   label: '國小低年級',
+  //   key: 'elementary-junior',
+  //   value: 'elementary-junior',
+  // },
+  // {
+  //   label: '國小中年級',
+  //   key: 'elementary-middle',
+  //   value: 'elementary-middle',
+  // },
+  // {
+  //   label: '國小高年級',
+  //   key: 'elementary-senior',
+  //   value: 'elementary-senior',
+  // },
+  // {
+  //   label: '國中',
+  //   key: 'junior-high',
+  //   value: 'junior-high',
+  // },
   {
     label: '高中',
     key: 'high',
     value: 'high',
   },
   {
-    label: '大學',
+    label: '大學以上',
     key: 'university',
     value: 'university',
   },
@@ -100,7 +100,7 @@ export const EDUCATION_STEP = [
     value: 'doctor',
   },
   {
-    label: '其他',
+    label: '終生學習',
     key: 'other',
     value: 'other',
   },
@@ -112,29 +112,29 @@ export const EDUCATION_STAGE = EDUCATION_STEP.filter(
 
 export const WANT_TO_DO_WITH_PARTNER = [
   {
-    label: '交朋友',
-    key: 'make-friends',
-    value: 'make-friends',
-  },
-  {
     label: '學習交流',
     key: 'interaction',
     value: 'interaction',
   },
   {
-    label: '找老師',
-    key: 'find-teacher',
-    value: 'find-teacher',
+    label: '做專案/競賽',
+    key: 'do-project',
+    value: 'do-project',
   },
   {
-    label: '揪團組課',
+    label: '自組課程',
     key: 'make-group-class',
     value: 'make-group-class',
   },
   {
-    label: '做專案/競賽',
-    key: 'do-project',
-    value: 'do-project',
+    label: '找揪團',
+    key: 'find-group',
+    value: 'find-group',
+  },
+  {
+    label: '找老師',
+    key: 'find-teacher',
+    value: 'find-teacher',
   },
   {
     label: '找學生',
