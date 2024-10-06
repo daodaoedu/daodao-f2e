@@ -19,7 +19,7 @@ export default function SelectedEducationStep() {
       itemLabel="label"
       itemValue="label"
       renderValue={(selected) =>
-        selected.length === 0 ? '適合的教育階段' : selected.join('、')
+        selected.length === 0 ? '適合的學習階段' : selected.join('、')
       }
       sx={{
         '@media (max-width: 767px)': {
