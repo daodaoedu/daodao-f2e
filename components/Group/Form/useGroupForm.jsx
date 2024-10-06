@@ -10,7 +10,7 @@ import { BASE_URL } from '@/constants/common';
 const _eduOptions = EDUCATION_STEP.filter(
   (edu) => !['master', 'doctor', 'other'].includes(edu.value),
 );
-_eduOptions.push({ key: 'noLimit', value: 'noLimit', label: '不限' });
+_eduOptions.push({ key: 'noLimit', value: 'noLimit', label: '終生學習' });
 
 export const categoriesOptions = CATEGORIES;
 export const areasOptions = AREAS.filter((area) => area.label !== '線上');
@@ -47,7 +47,7 @@ const rules = {
   partnerStyle: z.string().max(50, '請勿輸入超過 50 字'),
   partnerEducationStep: z
     .array(z.enum(eduOptions.map(({ label }) => label)))
-    .min(1, '請選擇教育階段'),
+    .min(1, '請選擇的學習階段'),
   description: z
     .string()
     .min(1, '請輸入揪團描述')
