@@ -47,7 +47,7 @@ const rules = {
   partnerStyle: z.string().max(50, '請勿輸入超過 50 字'),
   partnerEducationStep: z
     .array(z.enum(eduOptions.map(({ label }) => label)))
-    .min(1, '請選擇的學習階段'),
+    .min(1, '請選擇適合的學習階段'),
   description: z
     .string()
     .min(1, '請輸入揪團描述')
