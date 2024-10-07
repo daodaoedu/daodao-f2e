@@ -4,7 +4,7 @@ export default function getShareApi({
   url = '',
   hashtag = '',
 }) {
-  const openInNewTab = (url) => () => window.open(url, '_blank');
+  const openInNewTab = (_url) => () => window.open(_url, '_blank');
 
   const nativeShare = () => {
     if (!navigator?.share) return;
