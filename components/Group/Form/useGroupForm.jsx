@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useRouter } from 'next/router';
 import { ZodType, z } from 'zod';
 import { CATEGORIES } from '@/constants/category';
 import { AREAS } from '@/constants/areas';
 import { EDUCATION_STEP } from '@/constants/member';
 import { BASE_URL } from '@/constants/common';
+import openLoginWindow from '@/utils/openLoginWindow';
 
 const _eduOptions = EDUCATION_STEP.filter(
   (edu) => !['master', 'doctor', 'other'].includes(edu.value),
@@ -57,9 +57,9 @@ const rules = {
 };
 
 export default function useGroupForm() {
-  const router = useRouter();
   const [isDirty, setIsDirty] = useState(false);
   const me = useSelector((state) => state.user);
+  const notLogin = !me?._id;
   const [values, setValues] = useState({
     ...DEFAULT_VALUES,
     userId: me?._id,
@@ -143,10 +143,11 @@ export default function useGroupForm() {
   };
 
   useEffect(() => {
-    if (!me?._id) router.push('/login');
-  }, [me, router]);
+    if (notLogin) openLoginWindow('/login');
+  }, [notLogin]);
 
   return {
+    notLogin,
     control,
     errors,
     values,

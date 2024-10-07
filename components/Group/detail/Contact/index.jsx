@@ -1,7 +1,6 @@
 import { useId, useState, forwardRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
-import Link from 'next/link';
 import styled from '@emotion/styled';
 import {
   Avatar,
@@ -20,6 +19,7 @@ import { ROLE } from '@/constants/member';
 import chatSvg from '@/public/assets/icons/chat.svg';
 import useMutation from '@/hooks/useMutation';
 import { mapToTable } from '@/utils/helper';
+import openLoginWindow from '@/utils/openLoginWindow';
 import Feedback from './Feedback';
 
 const ROLELIST = mapToTable(ROLE);
@@ -55,17 +55,18 @@ const StyledTextArea = styled(TextareaAutosize)`
   width: 100%;
   min-height: 128px;
 `;
-const StyledLink = styled(Link)`
+const StyledText = styled.div`
   margin-top: 6px;
   margin-left: 6px;
   display: block;
   color: black;
   font-size: 12px;
 `;
-const StyledSpan = styled.span`
+const StyledLink = styled.span`
   padding: 0 2px;
   color: #16b9b3;
   text-decoration: underline;
+  cursor: pointer;
 `;
 
 const Transition = forwardRef((props, ref) => {
@@ -152,10 +153,11 @@ function ContactButton({
         {label}
       </StyledButton>
       {!isLogin && (
-        <StyledLink href="/login">
-          <StyledSpan>註冊</StyledSpan>或<StyledSpan>登入</StyledSpan>
+        <StyledText>
+          <StyledLink onClick={() => router.push('/login')}>註冊</StyledLink>或
+          <StyledLink onClick={() => openLoginWindow()}>登入</StyledLink>
           即可聯繫主揪！
-        </StyledLink>
+        </StyledText>
       )}
       <Dialog
         keepMounted

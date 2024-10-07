@@ -24,8 +24,15 @@ export default function GroupForm({
   isLoading,
   onSubmit,
 }) {
-  const { control, values, errors, isDirty, setValues, handleSubmit } =
-    useGroupForm();
+  const {
+    notLogin,
+    control,
+    values,
+    errors,
+    isDirty,
+    setValues,
+    handleSubmit,
+  } = useGroupForm();
   const isCreateMode = mode === 'create';
 
   useEffect(() => {
@@ -35,6 +42,10 @@ export default function GroupForm({
       originPhotoURL: defaultValues.photoURL,
     });
   }, [defaultValues]);
+
+  if (notLogin) {
+    return <Box sx={{ minHeight: '50vh' }} />;
+  }
 
   return (
     <Box sx={{ background: '#f3fcfc', py: '60px' }}>

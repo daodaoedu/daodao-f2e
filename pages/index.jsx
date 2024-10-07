@@ -1,8 +1,6 @@
 import React, { useMemo, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserById } from '@/redux/actions/user';
 import SEOConfig from '../shared/components/SEO';
 import Home from '../components/Home';
 import Navigation from '../shared/components/Navigation_v2';
@@ -47,14 +45,15 @@ const HomePage = () => {
     [router?.asPath],
   );
 
-  // fetch signin userData with token and id from query String
-
-  const dispatch = useDispatch();
   const { token, id } = router.query;
+
   useEffect(() => {
-    if (token) {
-      dispatch(fetchUserById(id, token));
-      router.push('/');
+    if (id && token) {
+      window.opener?.postMessage(
+        { isLogin: true, id, token },
+        window.location.origin,
+      );
+      window.close();
     }
   }, [id, token]);
 
