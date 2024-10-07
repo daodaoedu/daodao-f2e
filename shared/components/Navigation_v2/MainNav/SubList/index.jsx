@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import Link from 'next/link';
-import UserAvatar from './UserAvatar';
 import { useSelector } from 'react-redux';
 import { Button } from '@mui/material';
-import { BASE_URL } from '@/constants/common';
+import openLoginWindow from '@/utils/openLoginWindow';
+import UserAvatar from './UserAvatar';
 
 const LinkListWrapper = styled.ul`
   display: flex;
@@ -63,7 +63,7 @@ const SubList = () => {
             <UserAvatar user={user} />
           ) : (
             <Button
-              href={`${BASE_URL}/auth/google`}
+              onClick={() => openLoginWindow()}
               sx={{
                 height: '40px',
                 padding: '5px 20px',

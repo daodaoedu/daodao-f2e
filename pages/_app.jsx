@@ -6,14 +6,14 @@ import { Provider, useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';
-import { initializeApp } from 'firebase/app';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import SnackbarProvider from '@/contexts/Snackbar';
 import GlobalStyle from '@/shared/styles/Global';
 import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
-import { checkLoginValidity } from '@/redux/actions/user';
+import { checkLoginValidity, fetchUserById } from '@/redux/actions/user';
+import { getRedirectionStorage } from '@/utils/storage';
 import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
@@ -112,13 +112,34 @@ const App = ({ Component, pageProps }) => {
 
 const ThemeComponentWrap = ({ pageProps, Component }) => {
   const dispatch = useDispatch();
-  const firebaseApp = initializeApp(firebaseConfig);
   const mode = useSelector((state) => state?.theme?.mode ?? 'light');
   const theme = useMemo(() => themeFactory(mode), [mode]);
   const isEnv = useMemo(() => process.env.NODE_ENV === 'development', []);
+  const router = useRouter();
 
   useEffect(() => {
     dispatch(checkLoginValidity());
+  }, []);
+
+  useEffect(() => {
+    const receiveMessage = (e) => {
+      if (e.origin !== window.location.origin) return;
+      if (e.data.isLogin) {
+        const { token, id } = e.data;
+        const redirectionStorage = getRedirectionStorage();
+        const redirection = redirectionStorage.get();
+        dispatch(fetchUserById(id, token));
+        if (redirection) {
+          redirectionStorage.remove();
+          router.push(redirection);
+        }
+      }
+    };
+    window.addEventListener('message', receiveMessage, false);
+
+    return () => {
+      window.removeEventListener('message', receiveMessage, false);
+    };
   }, []);
 
   return (

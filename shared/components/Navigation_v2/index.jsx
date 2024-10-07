@@ -4,7 +4,7 @@ import { AppBar } from '@mui/material';
 import MainNav from './MainNav';
 import PromotionBar from './PromotionBar';
 
-const NavigationWrapper = styled(AppBar)(({ hasPromote }) => ({
+export const NavigationWrapper = styled(AppBar)(({ hasPromote }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
