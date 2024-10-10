@@ -23,7 +23,7 @@ function* getGroupItems() {
     category: CATEGORIES,
     partnerEducationStep: EDUCATION_STEP,
     isGrouping: true,
-    q: true,
+    search: true,
   };
 
   Object.keys(searchParamsOptions).forEach((key) => {
@@ -33,10 +33,13 @@ function* getGroupItems() {
     if (!searchParam || !option) return;
 
     if (Array.isArray(option)) {
-      urlSearchParams.append(key, searchParam
-        .split(',')
-        .filter((item) => option.some((option) => option.label === item))
-        .join(','))
+      urlSearchParams.append(
+        key,
+        searchParam
+          .split(',')
+          .filter((item) => option.some((_option) => _option.label === item))
+          .join(','),
+      );
     } else {
       urlSearchParams.append(key, searchParam);
     }
