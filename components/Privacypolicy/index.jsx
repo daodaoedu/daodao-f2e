@@ -5,31 +5,85 @@ import { Paper } from '@mui/material';
 const PrivacypolicyWrapper = styled.section`
   padding-top: 40px;
   padding-bottom: 40px;
-  .title {
-    font-size: 24px;
-    font-weight: 500;
-    margin: 0 10px 0 0;
-    color: black;
-    &:hover {
-      cursor: pointer;
-      color: #37b9eb;
-      transition: 0.5s;
-    }
+`;
+
+const PaperWrapper = styled(Paper)`
+  width: 90%;
+  margin: 0 auto;
+  padding: 40px 20px;
+
+  @media (max-width: 767px) {
+    padding: 20px;
   }
+
+  h2 {
+    font-size: 40px;
+    font-size: min(max(24px, 5vw), 40px);
+    text-wrap: balance;
+    margin: 0 auto 1em;
+    color: #293a3d;
+    text-align: center;
+    font-weight: 500;
+  }
+
   @media (max-width: 767px) {
     .title {
       text-overflow: ellipsis;
       width: 100%;
     }
   }
-`;
 
-const PaperWrapper = styled(Paper)`
-  width: 90%;
-  margin: 0 auto;
-  padding: 20px;
-  @media (max-width: 767px) {
-    padding: 10px;
+  h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 1.5em 0 1em 0;
+    color: #293a3d;
+  }
+
+  p {
+    font-size: 16px;
+    margin: 0 0 1em 0;
+    color: #536166;
+    line-height: 150%;
+  }
+
+  ol {
+    counter-reset: section;
+
+    li {
+      counter-increment: section;
+      margin-bottom: 0.5em;
+    }
+  }
+
+  ol li ol {
+    counter-reset: item;
+    list-style-type: none;
+    margin-left: 20px;
+
+    li {
+      counter-increment: item;
+      list-style-type: none;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: flex-start;
+      line-height: 150%;
+
+      &:before {
+        content: counter(section) '.' counter(item) '.';
+        font-weight: 400;
+        display: inline-block;
+        width: 2em;
+        flex-shrink: 0;
+      }
+
+      p {
+        display: inline-block;
+        padding-left: 0.5em;
+        margin-bottom: 0;
+      }
+    }
   }
 `;
 
