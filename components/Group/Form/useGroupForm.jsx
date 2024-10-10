@@ -143,7 +143,7 @@ export default function useGroupForm() {
   };
 
   useEffect(() => {
-    if (notLogin) openLoginWindow('/login');
+    if (notLogin) openLoginWindow();
   }, [notLogin]);
 
   return {
