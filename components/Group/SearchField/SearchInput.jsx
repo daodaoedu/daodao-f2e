@@ -54,7 +54,7 @@ const SearchInput = () => {
   const [getSearchParams, pushState] = useSearchParamsManager();
   const [keyword, setKeyword] = useState('');
   const [isSpeechMode, setIsSpeechMode] = useState(false);
-  const currentKeyword = getSearchParams('q').toString();
+  const currentKeyword = getSearchParams('search').toString();
 
   useEffect(() => {
     setKeyword(currentKeyword);
@@ -67,7 +67,7 @@ const SearchInput = () => {
   /** @type {(event: SubmitEvent) => void} */
   const handleSubmit = (event) => {
     event.preventDefault();
-    pushState('q', keyword);
+    pushState('search', keyword);
   };
 
   return (
@@ -75,7 +75,7 @@ const SearchInput = () => {
       <InputBaseWrapper
         type="search"
         inputProps={{ 'aria-label': 'search group' }}
-        name="q"
+        name="search"
         value={keyword}
         placeholder="想尋找甚麼類型的揪團呢？"
         onChange={handleChange}
