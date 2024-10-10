@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { Box, Paper, Typography, Stack, Avatar } from '@mui/material';
+import { Paper } from '@mui/material';
 
 const PrivacypolicyWrapper = styled.section`
   padding-top: 40px;
@@ -22,18 +22,6 @@ const PrivacypolicyWrapper = styled.section`
       width: 100%;
     }
   }
-`;
-const LinkWrapper = styled.a`
-  color: black;
-  &:hover {
-    opacity: 100%;
-    transition: color 0.5s ease;
-    color: #16b9b3;
-  }
-`;
-
-const LineWrapper = styled(Typography)`
-  margin: 5px 0;
 `;
 
 const PaperWrapper = styled(Paper)`
