@@ -47,6 +47,15 @@ const schema = z.object({
     .min(1, { message: '請輸入名字' })
     .max(50, { message: '名字過長' })
     .optional(),
+  birthDay: z
+    .any()
+    .refine((date) => dayjs(date).isValid(), {
+      message: '請選擇您的出生日期',
+    })
+    .refine((date) => dayjs().diff(date, 'year') >= 16, {
+      message: '您的年齡未滿16歲，目前無法於平台註冊，請詳閱島島社群條款',
+    })
+    .optional(),
   isOpenLocation: z.boolean().optional(),
   isOpenProfile: z.boolean().optional(),
   instagram: buildValidator(
@@ -73,6 +82,10 @@ const schema = z.object({
     '長度最多20個字元',
     '長度最少6個字元，支援英文、數字、底線、句號',
   ),
+  isLoadingSubmit: z.boolean().optional(),
+  tagList: z.array(z.string()).optional(),
+  wantToDoList: z.array(z.string()).optional(),
+  roleList: z.array(z.string()).optional(),
 });
 
 const userReducer = (state, payload) => {
@@ -99,26 +112,26 @@ const useEditProfile = () => {
   const [errors, setErrors] = useState({});
 
   const validate = (state = {}, isPartial = false) => {
-    const [key, value] = Object.entries(state)[0];
-    if (key !== 'birthDay') {
-      const result = isPartial
-        ? schema.partial({ [key]: true }).safeParse({ [key]: value })
-        : schema.safeParse({ [key]: value });
-
-      if (!result.success) {
-        result.error.errors.forEach((err) => {
-          setErrors({ [err.path[0]]: err.message });
+    const [key, val] = Object.entries(state)[0];
+    const result = isPartial
+      ? schema
+          .partial({ [key]: true })
+          .safeParse({ [key]: key === 'birthDay' ? val?.$d : val })
+      : schema.safeParse({
+          ...state,
+          birthDay: state.birthDay.$d,
         });
-      }
-      if (isPartial && result.success) {
-        const obj = { ...errors };
-        delete obj[key];
-        setErrors(obj);
-      }
-
-      return result.success;
+    if (!result.success) {
+      result.error.errors.forEach((err) => {
+        setErrors({ [err.path[0]]: err.message });
+      });
     }
-    return true;
+    if (isPartial && result.success) {
+      const obj = { ...errors };
+      delete obj[key];
+      setErrors(obj);
+    }
+    return result.success;
   };
 
   const onChangeHandler = ({ key, value, isMultiple }) => {
@@ -153,7 +166,7 @@ const useEditProfile = () => {
       id,
       email,
       name,
-      birthDay,
+      birthDay: dayjs(birthDay).format('YYYY/MM/DD'),
       gender,
       roleList,
       contactList: {
