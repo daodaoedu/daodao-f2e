@@ -104,7 +104,7 @@ const IPRTerms = () => {
         </p>
         <ol>
           <li>
-            <h3>著作權</h3>
+            <h3>1. 著作權</h3>
             <ol>
               <li>
                 <p>
@@ -139,7 +139,7 @@ const IPRTerms = () => {
             </ol>
           </li>
           <li>
-            <h3>貢獻內容之合法及適當狀態</h3>
+            <h3>2. 貢獻內容之合法及適當狀態</h3>
             <ol>
               <li>
                 <p>
@@ -149,7 +149,7 @@ const IPRTerms = () => {
             </ol>
           </li>
           <li>
-            <h3>授與權利</h3>
+            <h3>3. 授與權利</h3>
             <ol>
               <li>
                 <p>
@@ -159,7 +159,7 @@ const IPRTerms = () => {
             </ol>
           </li>
           <li>
-            <h3>免責聲明</h3>
+            <h3>4. 免責聲明</h3>
             <ol>
               <li>
                 <p>
@@ -169,7 +169,7 @@ const IPRTerms = () => {
             </ol>
           </li>
           <li>
-            <h3>其他事項</h3>
+            <h3>5. 其他事項</h3>
             <ol>
               <li>
                 <p>
@@ -179,7 +179,7 @@ const IPRTerms = () => {
             </ol>
           </li>
           <li>
-            <h3>輔助條款</h3>
+            <h3>6. 輔助條款</h3>
             <ol>
               <li>
                 <p>
@@ -191,7 +191,7 @@ const IPRTerms = () => {
             </ol>
           </li>
           <li>
-            <h3>聯絡方式</h3>
+            <h3>7. 聯絡方式</h3>
             <ol>
               <li>
                 <p>
