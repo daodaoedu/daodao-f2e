@@ -1,7 +1,7 @@
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import Image from '@/shared/components/Image';
-import emptyCoverImg from '@/public/assets/empty-cover.png';
 import { timeDuration } from '@/utils/date';
+import emptyCoverWithBackgroundImg from '@/public/assets/empty-cover-with-background.png';
 import {
   StyledAreas,
   StyledContainer,
@@ -31,7 +31,10 @@ function GroupCard({
 
   return (
     <StyledGroupCard href={`/group/detail?id=${_id}`}>
-      <Image alt={photoAlt || '未放封面'} src={photoURL || emptyCoverImg.src} />
+      <Image
+        alt={photoAlt || '未放封面'}
+        src={photoURL || emptyCoverWithBackgroundImg.src}
+      />
       <StyledContainer>
         <StyledTitle>{title}</StyledTitle>
         <StyledInfo>
