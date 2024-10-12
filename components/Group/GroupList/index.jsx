@@ -1,11 +1,13 @@
 import { useEffect, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from '@emotion/styled';
+import Button from '@mui/material/Button';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 import { setQuery } from '@/redux/actions/group';
 import Image from '@/shared/components/Image';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
+import errorCoverImg from '@/public/assets/contacterror.png';
 import GroupCard from './GroupCard';
 import SkeletonGroupCard from './SkeletonGroupCard';
 
@@ -42,7 +44,7 @@ const StyledGroupList = styled.ul`
   flex-wrap: wrap;
 `;
 
-const StyledEmptyData = styled.li`
+const StyledFullItem = styled.li`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -50,15 +52,21 @@ const StyledEmptyData = styled.li`
   width: 100%;
   height: 412px;
 
+  .color-gray {
+    color: #536166;
+  }
+
+  .color-gray-light {
+    color: #92989a;
+  }
+
   p {
     margin-top: 20px;
-    color: #536166;
   }
 
   span {
     margin-top: 6px;
     font-size: 14px;
-    color: #92989a;
   }
 `;
 
@@ -77,23 +85,26 @@ function shouldRenderDivider(
 }
 
 function GroupItems({ items, isMobileScreen, isPadScreen, isDeskTopScreen }) {
-  return items.map((data, index) => {
-    const isLast = index === items.length - 1;
-    return (
-      <Fragment key={data._id}>
-        <StyledGroupItem>
-          <GroupCard {...data} />
-        </StyledGroupItem>
-        {shouldRenderDivider(
-          index,
-          isLast,
-          isMobileScreen,
-          isPadScreen,
-          isDeskTopScreen,
-        ) && <StyledDivider />}
-      </Fragment>
-    );
-  });
+  return (
+    Array.isArray(items) &&
+    items.map((data, index) => {
+      const isLast = index === items.length - 1;
+      return (
+        <Fragment key={data._id}>
+          <StyledGroupItem>
+            <GroupCard {...data} />
+          </StyledGroupItem>
+          {shouldRenderDivider(
+            index,
+            isLast,
+            isMobileScreen,
+            isPadScreen,
+            isDeskTopScreen,
+          ) && <StyledDivider />}
+        </Fragment>
+      );
+    })
+  );
 }
 
 function SkeletonItems({ isMobileScreen, isPadScreen, isDeskTopScreen }) {
@@ -119,7 +130,7 @@ function SkeletonItems({ isMobileScreen, isPadScreen, isDeskTopScreen }) {
 function GroupList() {
   const dispatch = useDispatch();
   const [getSearchParams] = useSearchParamsManager();
-  const { items, isLoading } = useSelector((state) => state.group);
+  const { items, isLoading, isError } = useSelector((state) => state.group);
 
   const isMobileScreen = useMediaQuery('(max-width: 560px)');
   const isPadScreen = useMediaQuery('(max-width: 767px)') && !isMobileScreen;
@@ -144,17 +155,46 @@ function GroupList() {
           isDeskTopScreen={isDeskTopScreen}
         />
       )}
-      {!isLoading && items.length === 0 && (
-        <StyledEmptyData>
+      {isError ? (
+        <StyledFullItem>
           <Image
-            alt="查無資料"
-            src={emptyCoverImg.src}
+            alt="異常錯誤"
+            src={errorCoverImg.src}
             width={160}
-            height={120}
+            height={142}
           />
-          <p>哎呀！這裡沒有符合條件的揪團</p>
-          <span>試著更改條件或搜尋其他關鍵字吧</span>
-        </StyledEmptyData>
+          <p className="color-gray-light">哎呀！有不明錯誤</p>
+          <Button
+            variant="outlined"
+            sx={{
+              marginTop: '20px',
+              fontSize: '16px',
+              color: '#536166',
+              borderColor: '#16B9B3',
+              borderRadius: '20px',
+              padding: '6px 48px',
+            }}
+            onClick={() => dispatch(setQuery(getSearchParams()))}
+          >
+            重新載入
+          </Button>
+        </StyledFullItem>
+      ) : (
+        !isLoading &&
+        items.length === 0 && (
+          <StyledFullItem>
+            <Image
+              alt="查無資料"
+              src={emptyCoverImg.src}
+              width={160}
+              height={120}
+            />
+            <p className="color-gray">哎呀！這裡沒有符合條件的揪團</p>
+            <span className="color-gray-light">
+              試著更改條件或搜尋其他關鍵字吧
+            </span>
+          </StyledFullItem>
+        )
       )}
     </StyledGroupList>
   );
