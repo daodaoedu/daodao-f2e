@@ -11,7 +11,7 @@ export default function More() {
     <Box
       sx={{ textAlign: 'center', paddingTop: '80px', paddingBottom: '100px' }}
     >
-      {isMore ? (
+      {isMore && (
         <Button
           variant="outlined"
           sx={{
@@ -26,8 +26,6 @@ export default function More() {
         >
           顯示更多
         </Button>
-      ) : (
-        '已經到底囉～'
       )}
     </Box>
   );

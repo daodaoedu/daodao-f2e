@@ -4,6 +4,8 @@ import styled from '@emotion/styled';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 import { setQuery } from '@/redux/actions/group';
+import Image from '@/shared/components/Image';
+import emptyCoverImg from '@/public/assets/empty-cover.png';
 import GroupCard from './GroupCard';
 import SkeletonGroupCard from './SkeletonGroupCard';
 
@@ -38,6 +40,26 @@ const StyledDivider = styled.li`
 const StyledGroupList = styled.ul`
   display: flex;
   flex-wrap: wrap;
+`;
+
+const StyledEmptyData = styled.li`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 412px;
+
+  p {
+    margin-top: 20px;
+    color: #536166;
+  }
+
+  span {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #92989a;
+  }
 `;
 
 function shouldRenderDivider(
@@ -122,6 +144,17 @@ function GroupList() {
           isDeskTopScreen={isDeskTopScreen}
         />
       )}
+      {!isLoading && items.length === 0 && (
+        <StyledEmptyData>
+          <Image
+            alt="查無資料"
+            src={emptyCoverImg.src}
+            width={160}
+            height={120}
+          />
+          <p>哎呀！這裡沒有符合條件的揪團</p>
+          <span>試著更改條件或搜尋其他關鍵字吧</span>
+        </StyledEmptyData>
       )}
     </StyledGroupList>
   );
