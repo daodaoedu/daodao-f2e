@@ -2,7 +2,6 @@ import { useEffect, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { Box } from '@mui/material';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 import { setQuery } from '@/redux/actions/group';
 import GroupCard from './GroupCard';
@@ -41,6 +40,60 @@ const StyledGroupList = styled.ul`
   flex-wrap: wrap;
 `;
 
+function shouldRenderDivider(
+  index,
+  isLast,
+  isMobileScreen,
+  isPadScreen,
+  isDeskTopScreen,
+) {
+  return (
+    (isMobileScreen && !isLast) ||
+    (isPadScreen && !isLast && index % 2 === 1) ||
+    (isDeskTopScreen && !isLast && index % 3 === 2)
+  );
+}
+
+function GroupItems({ items, isMobileScreen, isPadScreen, isDeskTopScreen }) {
+  return items.map((data, index) => {
+    const isLast = index === items.length - 1;
+    return (
+      <Fragment key={data._id}>
+        <StyledGroupItem>
+          <GroupCard {...data} />
+        </StyledGroupItem>
+        {shouldRenderDivider(
+          index,
+          isLast,
+          isMobileScreen,
+          isPadScreen,
+          isDeskTopScreen,
+        ) && <StyledDivider />}
+      </Fragment>
+    );
+  });
+}
+
+function SkeletonItems({ isMobileScreen, isPadScreen, isDeskTopScreen }) {
+  return Array.from({ length: isMobileScreen ? 3 : 6 }, (_, index) => {
+    const isLast = index === (isMobileScreen ? 2 : 5);
+    return (
+      <Fragment key={index}>
+        <StyledGroupItem>
+          <SkeletonGroupCard />
+        </StyledGroupItem>
+        {shouldRenderDivider(
+          index,
+          isLast,
+          isMobileScreen,
+          isPadScreen,
+          isDeskTopScreen,
+        ) && <StyledDivider />}
+      </Fragment>
+    );
+  });
+}
+
 function GroupList() {
   const dispatch = useDispatch();
   const [getSearchParams] = useSearchParamsManager();
@@ -55,54 +108,22 @@ function GroupList() {
   }, [getSearchParams]);
 
   return (
-    <>
-      <StyledGroupList>
-        {isLoading ? (
-          // always show 3 || 6 skeleton cards in mobile || desktop screen
-          Array.from({ length: isMobileScreen ? 3 : 6 }, (_, index) => {
-            const isLast = index === (isMobileScreen ? 2 : 5);
-            const shouldRenderDivider =
-              (isMobileScreen && !isLast) ||
-              (isPadScreen && !isLast && index % 2 === 1) ||
-              (isDeskTopScreen && !isLast && index % 3 === 2);
-
-            return (
-              <Fragment key={index}>
-                <StyledGroupItem>
-                  <SkeletonGroupCard />
-                </StyledGroupItem>
-                {shouldRenderDivider && <StyledDivider />}
-              </Fragment>
-            );
-          })
-        ) : items?.length ? (
-          items.map((data, index) => {
-            const isLast = index === items.length - 1;
-            const shouldRenderDivider =
-              (isMobileScreen && !isLast) ||
-              (isPadScreen && !isLast && index % 2 === 1) ||
-              (isDeskTopScreen && !isLast && index % 3 === 2);
-
-            return (
-              <Fragment key={data._id}>
-                <StyledGroupItem>
-                  <GroupCard {...data} />
-                </StyledGroupItem>
-                {shouldRenderDivider && <StyledDivider />}
-              </Fragment>
-            );
-          })
-        ) : (
-          <li style={{ textAlign: 'center', width: '100%' }}>
-            哎呀！這裡好像沒有符合你條件的揪團，別失望！讓我們試試其他選項。
-          </li>
-        )}
-      </StyledGroupList>
-
+    <StyledGroupList>
+      <GroupItems
+        items={items}
+        isMobileScreen={isMobileScreen}
+        isPadScreen={isPadScreen}
+        isDeskTopScreen={isDeskTopScreen}
+      />
       {isLoading && (
-        <Box sx={{ textAlign: 'center', paddingTop: '32px' }}>搜尋揪團中～</Box>
+        <SkeletonItems
+          isMobileScreen={isMobileScreen}
+          isPadScreen={isPadScreen}
+          isDeskTopScreen={isDeskTopScreen}
+        />
       )}
-    </>
+      )}
+    </StyledGroupList>
   );
 }
 
