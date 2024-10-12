@@ -8,7 +8,7 @@ const PrivacypolicyWrapper = styled.section`
 `;
 
 const PaperWrapper = styled(Paper)`
-  width: 90%;
+  width: min(90%, 800px);
   margin: 0 auto;
   padding: 40px 20px;
 
@@ -17,8 +17,8 @@ const PaperWrapper = styled(Paper)`
   }
 
   h2 {
-    font-size: 40px;
-    font-size: min(max(24px, 5vw), 40px);
+    font-size: 24px;
+    font-size: min(max(24px, 5vw), 24px);
     text-wrap: balance;
     margin: 0 auto 1em;
     color: #293a3d;
@@ -91,7 +91,7 @@ const Privacypolicy = () => {
   return (
     <PrivacypolicyWrapper>
       <PaperWrapper>
-        <h2 className="title">島島阿學資源共享自主學習網站隱私權政策</h2>
+        <h2>島島阿學資源共享自主學習網站隱私權政策</h2>
         <p>
           島島阿學的使命是透過促進自主學習來實現終身學習的能力，讓學習者可以交流真實的學習經驗，發掘和分享有價值的學習資源，並與志趣相投的人們建立聯繫。我們的隱私權政策適用於我們服務的任何註冊使用者或訪客。
           我們的註冊使用者（「會員」）分享他們的學習經驗、學習資源並與其他會員進行學習交流活動，展現個人技能、經歷與成長，發佈和查看相關內容，並尋找可能的共同成長及合作機會。非會員（「訪客」）可以查看我們某些服務的內容和資料。
