@@ -12,6 +12,7 @@ const initialState = {
   items: [],
   total: 0,
   isLoading: true,
+  isError: false,
 };
 
 const reducer = (state = initialState, action) => {
@@ -39,6 +40,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         ...(action.payload ?? {}),
         isLoading: false,
+        isError: false,
       };
     }
     case GET_GROUP_ITEMS_FAILURE: {
@@ -46,6 +48,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         total: 0,
         isLoading: false,
+        isError: true,
       };
     }
     default: {
