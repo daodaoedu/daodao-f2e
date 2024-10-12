@@ -127,7 +127,7 @@ const LoginPage = () => {
               {`註冊即代表您同意島島阿學的 `}
               <Typography
                 onClick={() => {
-                  router.push('/privacypolicy');
+                  router.push('/terms/privacypolicy');
                 }}
                 sx={{
                   color: '#16B9B3',
@@ -142,7 +142,7 @@ const LoginPage = () => {
               {` 與 `}
               <Typography
                 onClick={() => {
-                  router.push('/privacypolicy');
+                  router.push('/terms/privacypolicy');
                 }}
                 sx={{
                   color: '#16B9B3',

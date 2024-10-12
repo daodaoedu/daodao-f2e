@@ -163,7 +163,7 @@ module.exports = {
         lastmod: new Date().toISOString(),
       },
       {
-        loc: `/privacypolicy`,
+        loc: `/terms/privacypolicy`,
         changefreq: 'daily',
         priority: 0.5,
         lastmod: new Date().toISOString(),
