@@ -1,21 +1,17 @@
-import { useId, forwardRef } from 'react';
+import { useId } from 'react';
 import {
   Box,
   Button,
   Dialog,
   DialogTitle,
-  Slide,
   Typography,
   useMediaQuery,
 } from '@mui/material';
 import contractDoneImg from '@/public/assets/contactdone.png';
 import contractErrorImg from '@/public/assets/contacterror.png';
+import TransitionSlide from './TransitionSlide';
 
-const Transition = forwardRef((props, ref) => {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
-function Feedback({ type, onClose }) {
+function FeedbackPopup({ type, onClose }) {
   const id = useId();
   const isMobileScreen = useMediaQuery('(max-width: 560px)');
   const titleId = `modal-title-${id}`;
@@ -46,7 +42,7 @@ function Feedback({ type, onClose }) {
       onClose={onClose}
       aria-labelledby={titleId}
       aria-describedby={descriptionId}
-      TransitionComponent={Transition}
+      TransitionComponent={TransitionSlide}
       sx={{
         '.MuiPaper-root': {
           marginTop: isMobileScreen ? '84px' : undefined,
@@ -78,6 +74,7 @@ function Feedback({ type, onClose }) {
         {content.title}
       </DialogTitle>
       <Typography
+        id={descriptionId}
         sx={{
           display: 'block',
           textAlign: 'center',
@@ -107,4 +104,4 @@ function Feedback({ type, onClose }) {
   );
 }
 
-export default Feedback;
+export default FeedbackPopup;
