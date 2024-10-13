@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
@@ -69,6 +70,9 @@ function EditPage() {
           onChangeHandler({ key: 'facebook', value: facebook || '' });
           onChangeHandler({ key: 'discord', value: discord || '' });
           onChangeHandler({ key: 'line', value: line || '' });
+        } else if (key === 'birthDay') {
+          const parsedDate = dayjs(value);
+          onChangeHandler({ key: 'birthDay', value: parsedDate });
         } else if (key === 'location') {
           onChangeHandler({ key, value });
           const [country, city, district] = value.split('@');
@@ -132,8 +136,16 @@ function EditPage() {
                     onChangeHandler({ key: 'birthDay', value: date })
                   }
                   renderInput={(params) => (
-                    <TextField {...params} sx={{ width: '100%' }} label="" />
+                    <TextField
+                      {...params}
+                      sx={{ width: '100%' }}
+                      label=""
+                      error={!!errors.birthDay}
+                      helperText={errors.birthDay ? errors.birthDay : ''}
+                    />
                   )}
+                  maxDate={dayjs().subtract(16, 'year')}
+                  defaultCalendarMonth={dayjs().subtract(18, 'year')}
                 />
               </StyledGroup>
               <StyledGroup>
@@ -202,7 +214,7 @@ function EditPage() {
                 sx={{ width: '100%' }}
               >
                 <MenuItem disabled>
-                  <em>請選擇您或孩子目前的教育階段</em>
+                  <em>請選擇您目前的教育階段</em>
                 </MenuItem>
                 {EDUCATION_STAGE.map(({ label, value }) => (
                   <MenuItem key={value} value={value}>

@@ -81,7 +81,7 @@ const ResourcePage = ({ data = {} }) => {
           description: desc,
           url: `${process.env.HOSTNAME}${router?.asPath}`,
           keywords: tags.map(({ name }) => name),
-          license: 'https://www.daoedu.tw/privacypolicy',
+          license: 'https://www.daoedu.tw/terms/privacypolicy',
           sameAs:
             data?.properties &&
             data?.properties['連結'] &&

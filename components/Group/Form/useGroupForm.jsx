@@ -143,7 +143,13 @@ export default function useGroupForm() {
   };
 
   useEffect(() => {
-    if (notLogin) openLoginWindow('/login');
+    let timer;
+    if (notLogin) {
+      timer = setTimeout(() => {
+        openLoginWindow();
+      }, 100);
+    }
+    return () => clearTimeout(timer);
   }, [notLogin]);
 
   return {

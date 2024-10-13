@@ -40,10 +40,25 @@ const aboutDaoConfig = [
     link: '/about',
     target: '_self',
   },
+  // {
+  //   name: '體驗問卷',
+  //   link: 'https://docs.google.com/forms/d/e/1FAIpQLSeyU9-Q-kIWp5uutcik3h-RO4o5VuG6oG0m-4u1Ua18EOu3aw/viewform',
+  //   target: '_blank',
+  // },
   {
-    name: '體驗問卷',
-    link: 'https://docs.google.com/forms/d/e/1FAIpQLSeyU9-Q-kIWp5uutcik3h-RO4o5VuG6oG0m-4u1Ua18EOu3aw/viewform',
-    target: '_blank',
+    name: '隱私權政策',
+    link: '/terms/privacypolicy',
+    target: '_self',
+  },
+  {
+    name: '服務條款',
+    link: '/terms/service',
+    target: '_self',
+  },
+  {
+    name: '智慧財產權',
+    link: '/terms/ipr',
+    target: '_self',
   },
 ];
 

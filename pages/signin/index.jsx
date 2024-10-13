@@ -16,6 +16,7 @@ import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 import styled from '@emotion/styled';
+import { getRedirectionStorage } from '@/utils/storage';
 
 export const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -92,6 +93,17 @@ function EditPage() {
   useEffect(() => {
     if (id || token) {
       fetchUser();
+    }
+  }, [id, token]);
+
+  useEffect(() => {
+    if (id && token) {
+      getRedirectionStorage().set(`/signin?id=${id}`);
+      window.opener?.postMessage(
+        { isLogin: true, id, token },
+        window.location.origin,
+      );
+      window.close();
     }
   }, [id, token]);
 
