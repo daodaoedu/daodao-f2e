@@ -124,7 +124,7 @@ const LoginPage = () => {
           <Typography sx={{ color: '#536166', fontSize: '14px' }}>
             註冊即代表您同意島島阿學的
             <ExternalLink
-              href="/privacypolicy"
+              href="/terms/privacypolicy"
               target="_blank"
               sx={{
                 display: 'inline-block',
@@ -140,7 +140,7 @@ const LoginPage = () => {
             </ExternalLink>
             與
             <ExternalLink
-              href="/privacypolicy"
+              href="/terms/privacypolicy"
               target="_blank"
               sx={{
                 display: 'inline-block',

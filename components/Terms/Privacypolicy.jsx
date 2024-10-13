@@ -1,110 +1,28 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import { Paper } from '@mui/material';
+import { TermsWrapper, PaperWrapper } from './Terms.styled';
 
-const PrivacypolicyWrapper = styled.section`
-  padding-top: 40px;
-  padding-bottom: 40px;
-`;
-
-const PaperWrapper = styled(Paper)`
-  width: 90%;
-  margin: 0 auto;
-  padding: 40px 20px;
-
-  @media (max-width: 767px) {
-    padding: 20px;
-  }
-
-  h2 {
-    font-size: 40px;
-    font-size: min(max(24px, 5vw), 40px);
-    text-wrap: balance;
-    margin: 0 auto 1em;
-    color: #293a3d;
-    text-align: center;
-    font-weight: 500;
-  }
-
-  @media (max-width: 767px) {
-    .title {
-      text-overflow: ellipsis;
-      width: 100%;
-    }
-  }
-
-  h3 {
-    font-size: 18px;
-    font-weight: 500;
-    margin: 1.5em 0 1em 0;
-    color: #293a3d;
-  }
-
-  p {
-    font-size: 16px;
-    margin: 0 0 1em 0;
-    color: #536166;
-    line-height: 150%;
-  }
-
-  ol {
-    counter-reset: section;
-
-    li {
-      counter-increment: section;
-      margin-bottom: 0.5em;
-    }
-  }
-
-  ol li ol {
-    counter-reset: item;
-    list-style-type: none;
-    margin-left: 20px;
-
-    li {
-      counter-increment: item;
-      list-style-type: none;
-      display: flex;
-      flex-direction: row;
-      align-items: flex-start;
-      justify-content: flex-start;
-      line-height: 150%;
-
-      &:before {
-        content: counter(section) '.' counter(item) '.';
-        font-weight: 400;
-        display: inline-block;
-        width: 2em;
-        flex-shrink: 0;
-      }
-
-      p {
-        display: inline-block;
-        padding-left: 0.5em;
-        margin-bottom: 0;
-      }
-    }
-  }
-`;
-
-const Privacypolicy = () => {
+const Terms = () => {
   return (
-    <PrivacypolicyWrapper>
+    <TermsWrapper>
       <PaperWrapper>
-        <h2 className="title">島島阿學資源共享自主學習網站隱私權政策</h2>
+        <h2>島島阿學資源共享自主學習網站隱私權政策</h2>
         <p>
           島島阿學的使命是透過促進自主學習來實現終身學習的能力，讓學習者可以交流真實的學習經驗，發掘和分享有價值的學習資源，並與志趣相投的人們建立聯繫。我們的隱私權政策適用於我們服務的任何註冊使用者或訪客。
           我們的註冊使用者（「會員」）分享他們的學習經驗、學習資源並與其他會員進行學習交流活動，展現個人技能、經歷與成長，發佈和查看相關內容，並尋找可能的共同成長及合作機會。非會員（「訪客」）可以查看我們某些服務的內容和資料。
-          此隱私權政策存在於您及本網站管理機關島島阿學資源共享自主學習網站（https://www.daoedu.tw，以下簡稱「本網站」）（「管理者」）間。請閱讀以下條款及條件並確認，當您上傳內容至本網站時，即表示您接受本協議內容。
+          此隱私權政策存在於您及本網站管理機關島島阿學資源共享自主學習網站（
+          <a href="https://www.daoedu.tw"> https://www.daoedu.tw </a>
+          ，以下簡稱「本網站」）（「管理者」）間。請閱讀以下條款及條件並確認，當您上傳內容至本網站時，即表示您接受本協議內容。
         </p>
         <ol>
           <li>
             <h3>1. 個人資料</h3>
-            <ol>
+            <ol className="sublist">
               <li>
                 <p>
-                  網站會員登入後，島島阿學學習社群網站會取得會員在
-                  Google上的：電子郵件地址與應用程式使用者
+                  網站會員登入後，島島阿學學習社群網站會取得會員在 Google
+                  上的：電子郵件地址與應用程式使用者
                   ID，用以分辨不同帳號以及聯繫會員。顯示名稱與頭像等公開顯示資訊，作為島島阿學學習社群網站的預設頭像與顯示名稱。
                 </p>
               </li>
@@ -122,9 +40,9 @@ const Privacypolicy = () => {
                 <p>
                   網站會員可在個人頁面逕行變更自己在島島阿學網站的預設頭像與顯示名稱，使其不再與
                   Facebook、Twitter、Github 或 Google
-                  上的公開資訊相同。另外，會員亦可寄信至 本網站連絡信箱（
-                  contact@daoedu.tw ），請求刪除或更換取自
-                  Google、Facebook、Github 或 Google
+                  上的公開資訊相同。另外，會員亦可寄信至本網站連絡信箱（
+                  <a href="mailto:contact@daoedu.tw"> contact@daoedu.tw </a>
+                  ），請求刪除或更換取自 Google、Facebook、Github 或 Google
                   等平台的公開顯示資訊或電子郵件地址。
                 </p>
               </li>
@@ -142,7 +60,7 @@ const Privacypolicy = () => {
           </li>
           <li>
             <h3>2. 來自第三方網站的嵌入內容</h3>
-            <ol>
+            <ol className="sublist">
               <li>
                 <p>
                   這個網站上的文章可能會嵌入視訊、圖片、文章等內容，而來自第三方網站的嵌入內容，其隱私權處理方式與使用者造訪這些網站時的規定完全相同。無論使用者是否有這些第三方網站的帳號或是否登入網站，他們都會以各種方式收集與使用者相關的資料，如
@@ -153,7 +71,7 @@ const Privacypolicy = () => {
           </li>
           <li>
             <h3>3. 使用者資料分析</h3>
-            <ol>
+            <ol className="sublist">
               <li>
                 <p>
                   這個網站的個人資料分享對象，如果你提出密碼重設要求，你目前進行連線的
@@ -164,7 +82,7 @@ const Privacypolicy = () => {
           </li>
           <li>
             <h3>4. 這個網站的個人資料保留期限</h3>
-            <ol>
+            <ol className="sublist">
               <li>
                 <p>
                   當使用者在這個網站發佈留言後，該則留言及其中繼資料將會無限期保留。這樣系統便可以自動辨識及核准任何後續留言，而不須將其保留在待審核的佇列中。
@@ -179,7 +97,7 @@ const Privacypolicy = () => {
           </li>
           <li>
             <h3>5. 使用者對個人資料擁有哪些權利</h3>
-            <ol>
+            <ol className="sublist">
               <li>
                 <p>
                   如果使用者在這個網站擁有帳戶或曾發佈留言，便可以要求下載使用者在這個網站上的個人資料的資料匯出檔，這個檔案包含使用者提供給這個網站的全部個人資料。
@@ -194,8 +112,8 @@ const Privacypolicy = () => {
           </li>
         </ol>
       </PaperWrapper>
-    </PrivacypolicyWrapper>
+    </TermsWrapper>
   );
 };
 
-export default Privacypolicy;
+export default Terms;
