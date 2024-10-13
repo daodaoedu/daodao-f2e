@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
@@ -9,7 +9,7 @@ import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 import { BASE_URL } from '@/constants/common';
 import openLoginWindow from '@/utils/openLoginWindow';
-// import sendDataToChromeExtension from '../../utils/sendDataToChromeExtension';
+import { useSelector } from 'react-redux';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -40,6 +40,7 @@ const ContentWrapper = styled.div`
 const LoginPage = () => {
   const LOGIN_PATH = `${BASE_URL}/auth/google`;
   const router = useRouter();
+  const me = useSelector((state) => state.user);
 
   const SEOData = useMemo(
     () => ({
@@ -54,6 +55,12 @@ const LoginPage = () => {
     }),
     [router?.asPath],
   );
+
+  useEffect(() => {
+    if (me?._id) {
+      router.push('/');
+    }
+  }, []);
 
   return (
     <HomePageWrapper>
@@ -104,6 +111,7 @@ const LoginPage = () => {
           <Button
             onClick={() => openLoginWindow('/', LOGIN_PATH)}
             sx={{
+              width: '100%',
               marginTop: '24px',
               borderRadius: '20px',
               color: '#fff',

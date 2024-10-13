@@ -10,12 +10,6 @@ import { NavigationWrapper } from '@/shared/components/Navigation_v2';
 import { BASE_URL } from '@/constants/common';
 import Logo from '@/shared/components/Navigation_v2/MainNav/Logo';
 
-const HomePageWrapper = styled.div`
-  --section-height: calc(100vh - 80px);
-  --section-height-offset: 80px;
-  background: linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa;
-`;
-
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -36,8 +30,17 @@ const ContentWrapper = styled.div`
   }
 `;
 
+const ExternalLink = styled.a`
+  display: inline-block;
+  padding: 0 4px;
+  color: #16b9b3;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: underline;
+`;
+
 const LoginPage = () => {
-  const LOGINPATH = `${BASE_URL}/auth/google`;
+  const LOGIN_PATH = `${BASE_URL}/auth/google`;
   const router = useRouter();
 
   const SEOData = useMemo(
@@ -101,29 +104,31 @@ const LoginPage = () => {
             />
           }
         />
-        <Link href={LOGINPATH} rel="noreferrer noopener">
-          <Button
-            sx={{
-              marginTop: '24px',
-              width: '100%',
-              borderRadius: '20px',
-              color: '#fff',
-              bgcolor: '#16B9B3',
-              boxShadow: '0px 4px 10px rgba(89, 182, 178, 0.5)',
-            }}
-            variant="contained"
-          >
-            Google 登入 / 註冊
-          </Button>
-        </Link>
+        <Button
+          href={LOGIN_PATH}
+          rel="noreferrer noopener"
+          LinkComponent={Link}
+          sx={{
+            marginTop: '24px',
+            width: '100%',
+            borderRadius: '20px',
+            color: '#fff',
+            bgcolor: '#16B9B3',
+            boxShadow: '0px 4px 10px rgba(89, 182, 178, 0.5)',
+          }}
+          variant="contained"
+        >
+          Google 登入 / 註冊
+        </Button>
         <Box sx={{ marginTop: '24px' }}>
           <Typography sx={{ color: '#536166', fontSize: '14px' }}>
-            {`註冊即代表您同意島島阿學的 `}
-            <Typography
-              onClick={() => {
-                router.push('/privacypolicy');
-              }}
+            註冊即代表您同意島島阿學的
+            <ExternalLink
+              href="/privacypolicy"
+              target="_blank"
               sx={{
+                display: 'inline-block',
+                padding: '0 4px',
                 color: '#16B9B3',
                 fontWeight: 700,
                 fontSize: '14px',
@@ -132,13 +137,14 @@ const LoginPage = () => {
               }}
             >
               服務條款
-            </Typography>
-            {` 與 `}
-            <Typography
-              onClick={() => {
-                router.push('/privacypolicy');
-              }}
+            </ExternalLink>
+            與
+            <ExternalLink
+              href="/privacypolicy"
+              target="_blank"
               sx={{
+                display: 'inline-block',
+                padding: '0 4px',
                 color: '#16B9B3',
                 fontWeight: 700,
                 fontSize: '14px',
@@ -147,7 +153,7 @@ const LoginPage = () => {
               }}
             >
               隱私政策
-            </Typography>
+            </ExternalLink>
           </Typography>
         </Box>
       </ContentWrapper>
