@@ -214,7 +214,7 @@ function EditPage() {
                 sx={{ width: '100%' }}
               >
                 <MenuItem disabled>
-                  <em>請選擇您或孩子目前的教育階段</em>
+                  <em>請選擇您目前的教育階段</em>
                 </MenuItem>
                 {EDUCATION_STAGE.map(({ label, value }) => (
                   <MenuItem key={value} value={value}>
