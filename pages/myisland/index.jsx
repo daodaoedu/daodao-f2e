@@ -29,23 +29,21 @@ const MyIslandPage = () => {
   );
 
   return (
-    <MyIslandPageWrapper>
+    <>
       <SEOConfig data={SEOData} />
-      <Navigation />
       <MyIsland />
+    </>
+  );
+};
+
+MyIslandPage.getLayout = ({ children }) => {
+  return (
+    <MyIslandPageWrapper>
+      <Navigation />
+      {children}
       <Footer />
     </MyIslandPageWrapper>
   );
 };
-
-// export const getServerSideProps = async () => {
-//   // const { res, req, locale, defaultLocale } = ctx;
-//   return {
-//     props: {
-//       isDev: process.env.NODE_ENV === "development",
-//       fallback: {},
-//     },
-//   };
-// };
 
 export default MyIslandPage;

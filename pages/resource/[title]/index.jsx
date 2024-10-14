@@ -3,8 +3,6 @@ import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import appendQuery from 'append-query';
 import SEOConfig from '../../../shared/components/SEO';
-import Navigation from '../../../shared/components/Navigation_v2';
-import Footer from '../../../shared/components/Footer_v2';
 import Resource from '../../../components/Resource';
 
 const ResourcePage = ({ data = {} }) => {
@@ -106,7 +104,6 @@ const ResourcePage = ({ data = {} }) => {
   return (
     <>
       <SEOConfig data={SEOData} />
-      <Navigation />
       <Resource
         data={data}
         title={title}
@@ -117,7 +114,6 @@ const ResourcePage = ({ data = {} }) => {
         link={link}
         videoLink={videoLink}
       />
-      <Footer />
     </>
   );
 };

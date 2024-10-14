@@ -63,10 +63,9 @@ const LoginPage = () => {
   }, []);
 
   return (
-    <HomePageWrapper>
+    <>
       <Script src="https://meet.jit.si/external_api.js" />
       <SEOConfig data={SEOData} />
-      <Navigation />
       <Box sx={{ minHeight: '100vh' }}>
         <ContentWrapper>
           <Typography
@@ -158,6 +157,15 @@ const LoginPage = () => {
           </Box>
         </ContentWrapper>
       </Box>
+    </>
+  );
+};
+
+LoginPage.getLayout = ({ children }) => {
+  return (
+    <HomePageWrapper>
+      <Navigation />
+      {children}
       <Footer />
     </HomePageWrapper>
   );

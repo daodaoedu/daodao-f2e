@@ -39,7 +39,7 @@ const ExternalLink = styled.a`
   text-decoration: underline;
 `;
 
-const LoginPage = () => {
+const LoginPopupPage = () => {
   const LOGIN_PATH = `${BASE_URL}/auth/google`;
   const router = useRouter();
 
@@ -161,4 +161,6 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+LoginPopupPage.getLayout = ({ children }) => children;
+
+export default LoginPopupPage;

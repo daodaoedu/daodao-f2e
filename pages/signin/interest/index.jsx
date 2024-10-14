@@ -2,25 +2,16 @@ import React, { useMemo, useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchUserById, updateUser } from '@/redux/actions/user';
+import { updateUser } from '@/redux/actions/user';
 
 import { Box, Typography, Button, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import toast from 'react-hot-toast';
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
-import {
-  GENDER,
-  ROLE,
-  EDUCATION_STEP,
-  WANT_TO_DO_WITH_PARTNER,
-  CATEGORIES,
-} from '@/constants/member';
+import { CATEGORIES } from '@/constants/member';
 import TipModal from '@/components/Signin/Interest/TipModal';
 
 const HomePageWrapper = styled.div`
@@ -48,7 +39,7 @@ const ContentWrapper = styled.div`
   }
 `;
 
-function EditPage() {
+function SignInInterestPage() {
   const router = useRouter();
   const { id } = router.query;
   const dispatch = useDispatch();
@@ -93,7 +84,7 @@ function EditPage() {
   );
 
   return (
-    <HomePageWrapper>
+    <>
       <TipModal
         open={open}
         onClose={() => {
@@ -108,7 +99,6 @@ function EditPage() {
         }}
       />
       <SEOConfig data={SEOData} />
-      <Navigation />
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Box sx={{ minHeight: '100vh' }}>
           <ContentWrapper>
@@ -279,9 +269,18 @@ function EditPage() {
           </ContentWrapper>
         </Box>
       </LocalizationProvider>
-      <Footer />
-    </HomePageWrapper>
+    </>
   );
 }
 
-export default EditPage;
+SignInInterestPage.getLayout = ({ children }) => {
+  return (
+    <HomePageWrapper>
+      <Navigation />
+      {children}
+      <Footer />
+    </HomePageWrapper>
+  );
+};
+
+export default SignInInterestPage;

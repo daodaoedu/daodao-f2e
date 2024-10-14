@@ -47,13 +47,21 @@ function PartnerPage() {
   );
 
   return (
-    <HomePageWrapper>
+    <>
       <SEOConfig data={SEOData} />
-      <Navigation />
       <Partner />
+    </>
+  );
+}
+
+PartnerPage.getLayout = ({ children }) => {
+  return (
+    <HomePageWrapper>
+      <Navigation />
+      {children}
       <Footer />
     </HomePageWrapper>
   );
-}
+};
 
 export default PartnerPage;

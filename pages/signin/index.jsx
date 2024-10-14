@@ -60,7 +60,7 @@ export const StyledQuestionInput = styled.div`
   margin-top: 20px;
 `;
 
-function EditPage() {
+function SignInPage() {
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -146,9 +146,8 @@ function EditPage() {
   );
 
   return (
-    <HomePageWrapper>
+    <>
       <SEOConfig data={SEOData} />
-      <Navigation />
       <Box>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Box sx={{ minHeight: '100vh' }}>
@@ -335,9 +334,18 @@ function EditPage() {
           </Box>
         </LocalizationProvider>
       </Box>
-      <Footer />
-    </HomePageWrapper>
+    </>
   );
 }
 
-export default EditPage;
+SignInPage.getLayout = ({ children }) => {
+  return (
+    <HomePageWrapper>
+      <Navigation />
+      {children}
+      <Footer />
+    </HomePageWrapper>
+  );
+};
+
+export default SignInPage;
