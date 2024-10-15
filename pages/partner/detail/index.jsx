@@ -23,7 +23,7 @@ const HomePageWrapper = styled.div`
 
 const ROLELIST = mapToTable(ROLE);
 
-const Detail = () => {
+const PartnerDetailPage = () => {
   const router = useRouter();
   const { id: partnerId } = router.query;
 
@@ -81,8 +81,7 @@ const Detail = () => {
   };
 
   return (
-    <HomePageWrapper>
-      <Navigation />
+    <>
       {!!partner && (
         <ContactModal
           open={open}
@@ -103,10 +102,18 @@ const Detail = () => {
         enableContactBtn={!!loginUserEmail}
         handleContactPartner={() => setOpen(true)}
       />
+    </>
+  );
+};
 
+PartnerDetailPage.getLayout = ({ children }) => {
+  return (
+    <HomePageWrapper>
+      <Navigation />
+      {children}
       <Footer />
     </HomePageWrapper>
   );
 };
 
-export default Detail;
+export default PartnerDetailPage;

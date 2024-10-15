@@ -10,16 +10,20 @@ const HomePageWrapper = styled.div`
   --section-height-offset: 80px;
 `;
 
-const ProfilePage = () => {
+const MyProfilePage = () => {
   const user = useSelector((state) => state.user);
 
+  return <Profile {...user} enableContactBtn={false} sendEmail={user.email} />;
+};
+
+MyProfilePage.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
       <Navigation />
-      <Profile {...user} enableContactBtn={false} sendEmail={user.email} />
+      {children}
       <Footer />
     </HomePageWrapper>
   );
 };
 
-export default ProfilePage;
+export default MyProfilePage;

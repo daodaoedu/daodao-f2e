@@ -14,6 +14,7 @@ import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
 import { checkLoginValidity, fetchUserById } from '@/redux/actions/user';
 import { getRedirectionStorage } from '@/utils/storage';
+import DefaultLayout from '@/layout/DefaultLayout';
 import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
@@ -116,6 +117,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   const theme = useMemo(() => themeFactory(mode), [mode]);
   const isEnv = useMemo(() => process.env.NODE_ENV === 'development', []);
   const router = useRouter();
+  const Layout = Component?.getLayout || DefaultLayout;
 
   useEffect(() => {
     dispatch(checkLoginValidity());
@@ -163,7 +165,9 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
         }}
       />
       {isEnv && <Mode />}
-      <Component {...pageProps} />
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
     </ThemeProvider>
   );
 };

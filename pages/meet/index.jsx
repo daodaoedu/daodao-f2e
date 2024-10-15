@@ -73,10 +73,9 @@ const MeetPage = () => {
   // };
 
   return (
-    <HomePageWrapper>
+    <>
       <Script src="https://meet.jit.si/external_api.js" />
       <SEOConfig data={SEOData} />
-      <Navigation />
       <Box sx={{ minHeight: '100vh' }}>
         <JitsiMeeting
           // roomName={generateRoomName()}
@@ -95,19 +94,18 @@ const MeetPage = () => {
           }}
         />
       </Box>
+    </>
+  );
+};
+
+MeetPage.getLayout = ({ children }) => {
+  return (
+    <HomePageWrapper>
+      <Navigation />
+      {children}
       <Footer />
     </HomePageWrapper>
   );
 };
-
-// export const getServerSideProps = async () => {
-//   // const { res, req, locale, defaultLocale } = ctx;
-//   return {
-//     props: {
-//       isDev: process.env.NODE_ENV === "development",
-//       fallback: {},
-//     },
-//   };
-// };
 
 export default MeetPage;

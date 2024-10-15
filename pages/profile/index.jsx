@@ -107,9 +107,8 @@ const ProfilePage = () => {
   };
 
   return (
-    <HomePageWrapper>
+    <>
       <SEOConfig data={SEOData} />
-      <Navigation />
       <Box
         sx={{
           display: 'flex',
@@ -166,6 +165,15 @@ const ProfilePage = () => {
           ))}
         </Box>
       </Box>
+    </>
+  );
+};
+
+ProfilePage.getLayout = ({ children }) => {
+  return (
+    <HomePageWrapper>
+      <Navigation />
+      {children}
       <Footer />
     </HomePageWrapper>
   );
