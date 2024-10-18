@@ -4,11 +4,15 @@ import { Paper } from '@mui/material';
 export const TermsWrapper = styled.section`
   padding-top: 40px;
   padding-bottom: 40px;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
 `;
 
 export const PaperWrapper = styled(Paper)`
   width: min(90%, 800px);
-  margin: 0 auto;
   padding: 40px 20px;
 
   @media (max-width: 767px) {

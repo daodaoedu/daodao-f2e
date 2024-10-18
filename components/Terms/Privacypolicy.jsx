@@ -1,11 +1,11 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import { Paper } from '@mui/material';
 import { TermsWrapper, PaperWrapper } from './Terms.styled';
+import TermsMenu from './TermsMenu';
 
 const Terms = () => {
   return (
     <TermsWrapper>
+      <TermsMenu />
       <PaperWrapper>
         <h2>島島阿學資源共享自主學習網站隱私權政策</h2>
         <p>
