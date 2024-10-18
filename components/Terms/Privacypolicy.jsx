@@ -1,6 +1,4 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import { Paper } from '@mui/material';
 import { TermsWrapper, PaperWrapper } from './Terms.styled';
 import TermsMenu from './TermsMenu';
 
