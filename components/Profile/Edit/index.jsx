@@ -28,6 +28,7 @@ import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import InputTags from '../InputTags';
+import ErrorMessage from './ErrorMessage';
 
 import TheAvator from './TheAvator';
 import FormInput from './EditFormInput';
@@ -167,6 +168,7 @@ function EditPage() {
                     </StyledSelectBox>
                   ))}
                 </StyledSelectWrapper>
+                <ErrorMessage errText={errors.gender} />
               </StyledGroup>
               <StyledGroup>
                 <Typography fontWeight="500">身份 *</Typography>
@@ -194,6 +196,7 @@ function EditPage() {
                     </StyledSelectBox>
                   ))}
                 </StyledSelectWrapper>
+                <ErrorMessage errText={errors.roleList} />
               </StyledGroup>
             </Box>
           </StyledTitleWrap>
