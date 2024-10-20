@@ -31,21 +31,17 @@ const initialState = {
 const buildValidator = (maxLength, regex, maxMsg, regMsg) =>
   z.string().max(maxLength, maxMsg).regex(regex, regMsg).optional();
 
-const tempSchema = Object.keys(initialState).reduce((acc, key) => {
-  return key !== 'birthDay'
-    ? {
-        ...acc,
-        [key]: z.string().optional(),
-      }
-    : acc;
-}, {});
-
 const schema = z.object({
-  ...tempSchema,
   name: z
     .string()
     .min(1, { message: '請輸入名字' })
     .max(50, { message: '名字過長' })
+    .optional(),
+  gender: z
+    .string()
+    .refine((val) => val !== undefined && val !== '', {
+      message: '請選擇您的性別',
+    })
     .optional(),
   birthDay: z
     .any()
@@ -56,8 +52,6 @@ const schema = z.object({
       message: '您的年齡未滿16歲，目前無法於平台註冊，請詳閱島島社群條款',
     })
     .optional(),
-  isOpenLocation: z.boolean().optional(),
-  isOpenProfile: z.boolean().optional(),
   instagram: buildValidator(
     30,
     /^($|[a-zA-Z0-9_.]{2,20})$/,
@@ -82,10 +76,7 @@ const schema = z.object({
     '長度最多20個字元',
     '長度最少6個字元，支援英文、數字、底線、句號',
   ),
-  isLoadingSubmit: z.boolean().optional(),
-  tagList: z.array(z.string()).optional(),
-  wantToDoList: z.array(z.string()).optional(),
-  roleList: z.array(z.string()).optional(),
+  roleList: z.array(z.string()).min(1, '請選擇您的身份').optional(),
 });
 
 const userReducer = (state, payload) => {
@@ -136,7 +127,9 @@ const useEditProfile = () => {
 
   const onChangeHandler = ({ key, value, isMultiple }) => {
     stateDispatch({ key, value, isMultiple });
-    validate({ [key]: value }, true);
+    // if isMultiple is true, value must be in array , if not, create a new array then check
+    const checkVal = isMultiple && !Array.isArray(isMultiple) ? [value] : value;
+    validate({ [key]: checkVal }, true);
   };
 
   const onSubmit = async ({ id, email }) => {

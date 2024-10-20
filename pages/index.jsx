@@ -58,23 +58,21 @@ const HomePage = () => {
   }, [id, token]);
 
   return (
-    <HomePageWrapper>
+    <>
       <SEOConfig data={SEOData} />
-      <Navigation />
       <Home />
+    </>
+  );
+};
+
+HomePage.getLayout = ({ children }) => {
+  return (
+    <HomePageWrapper>
+      <Navigation />
+      {children}
       <Footer />
     </HomePageWrapper>
   );
 };
-
-// export const getServerSideProps = async () => {
-//   // const { res, req, locale, defaultLocale } = ctx;
-//   return {
-//     props: {
-//       isDev: process.env.NODE_ENV === "development",
-//       fallback: {},
-//     },
-//   };
-// };
 
 export default HomePage;

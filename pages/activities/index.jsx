@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '../../shared/components/SEO';
-import Navigation from '../../shared/components/Navigation_v2';
-import Footer from '../../shared/components/Footer_v2';
 import Activities from '../../components/Activities';
 
 const ActivitiesPage = () => {
@@ -24,9 +22,7 @@ const ActivitiesPage = () => {
   return (
     <>
       <SEOConfig data={SEOData} />
-      <Navigation />
       <Activities />
-      <Footer />
     </>
   );
 };

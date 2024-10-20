@@ -2,8 +2,6 @@ import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
 import Group from '@/components/Group';
-import Navigation from '@/shared/components/Navigation_v2';
-import Footer from '@/shared/components/Footer_v2';
 
 function GroupPage() {
   const router = useRouter();
@@ -24,9 +22,7 @@ function GroupPage() {
   return (
     <>
       <SEOConfig data={SEOData} />
-      <Navigation />
       <Group />
-      <Footer />
     </>
   );
 }

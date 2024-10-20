@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '../../../shared/components/SEO';
-import Navigation from '../../../shared/components/Navigation_v2';
-import Footer from '../../../shared/components/Footer_v2';
 import ContributeResource from '../../../components/ContributeResource';
 
 const ContributeResourcePage = () => {
@@ -24,9 +22,7 @@ const ContributeResourcePage = () => {
   return (
     <>
       <SEOConfig data={SEOData} />
-      <Navigation />
       <ContributeResource />
-      <Footer />
     </>
   );
 };

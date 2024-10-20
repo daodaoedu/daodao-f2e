@@ -150,9 +150,8 @@ function JoinPage() {
   );
 
   return (
-    <JoinPageWrapper>
+    <>
       <SEOConfig data={SEOData} />
-      <Navigation />
       <Container>
         <Paper>
           <PaperColumnCenter>
@@ -227,9 +226,18 @@ function JoinPage() {
           </PaperColumnCenter>
         </Paper>
       </Container>
+    </>
+  );
+}
+
+JoinPage.getLayout = ({ children }) => {
+  return (
+    <JoinPageWrapper>
+      <Navigation />
+      {children}
       <Footer />
     </JoinPageWrapper>
   );
-}
+};
 
 export default JoinPage;

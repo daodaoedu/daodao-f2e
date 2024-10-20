@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '../../shared/components/SEO';
-import Navigation from '../../shared/components/Navigation_v2';
-import Footer from '../../shared/components/Footer_v2';
-import Terms from '../../components/Terms/Service';
+import TermsService from '../../components/Terms/Service';
 
-const AboutPage = () => {
+const TermsServicePage = () => {
   const router = useRouter();
   const SEOData = useMemo(
     () => ({
@@ -24,11 +22,9 @@ const AboutPage = () => {
   return (
     <>
       <SEOConfig data={SEOData} />
-      <Navigation />
-      <Terms />
-      <Footer />
+      <TermsService />
     </>
   );
 };
 
-export default AboutPage;
+export default TermsServicePage;

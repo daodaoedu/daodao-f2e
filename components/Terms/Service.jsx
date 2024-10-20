@@ -1,9 +1,11 @@
 import React from 'react';
 import { TermsWrapper, PaperWrapper } from './Terms.styled';
+import TermsMenu from './TermsMenu';
 
 const Terms = () => {
   return (
     <TermsWrapper>
+      <TermsMenu />
       <PaperWrapper>
         <h2>島島阿學資源共享自主學習網站使用者條款</h2>
         <p>

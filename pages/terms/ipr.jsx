@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '../../shared/components/SEO';
-import Navigation from '../../shared/components/Navigation_v2';
-import Terms from '../../components/Terms/Ipr';
-import Footer from '../../shared/components/Footer_v2';
+import TermsIPR from '../../components/Terms/Ipr';
 
-const IPRPage = () => {
+const TermsIPRPage = () => {
   const router = useRouter();
   const SEOData = useMemo(
     () => ({
@@ -24,11 +22,9 @@ const IPRPage = () => {
   return (
     <>
       <SEOConfig data={SEOData} />
-      <Navigation />
-      <Terms />
-      <Footer />
+      <TermsIPR />
     </>
   );
 };
 
-export default IPRPage;
+export default TermsIPRPage;

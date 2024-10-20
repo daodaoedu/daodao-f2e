@@ -3,8 +3,6 @@ import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import SEOConfig from '../../shared/components/SEO';
 import Search from '../../components/Search';
-import Navigation from '../../shared/components/Navigation_v2';
-import Footer from '../../shared/components/Footer_v2';
 import { SEARCH_TAGS } from '../../constants/category';
 
 const SearchPageWrapper = styled.div`
@@ -103,12 +101,10 @@ const SearchPage = () => {
   );
   return (
     <>
-      <Navigation />
       <SEOConfig data={SEOData} />
       <SearchPageWrapper>
         <Search title={title} />
       </SearchPageWrapper>
-      <Footer />
     </>
   );
 };
