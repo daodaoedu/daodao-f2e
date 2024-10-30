@@ -28,6 +28,7 @@ export const StyledPanelText = styled(Box)`
     white-space: nowrap;
     min-width: 50px;
   }
+  .content p,
   span {
     color: #536166;
     font-size: 14px;
@@ -35,8 +36,9 @@ export const StyledPanelText = styled(Box)`
     font-weight: 400;
     line-height: 140%;
     margin-left: 12px;
-    display: grid;
+    display: flex;
     place-items: center;
+    text-align: left;
   }
   @media (max-width: 767px) {
     flex-direction: column;
