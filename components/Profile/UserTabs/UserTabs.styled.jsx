@@ -25,7 +25,7 @@ export const StyledPanelText = styled(Box)`
   p {
     color: #293a3d;
     font-weight: 500;
-    white-space: nowrap;
+    white-space: normal;
     min-width: 50px;
   }
   .content p,
@@ -37,14 +37,13 @@ export const StyledPanelText = styled(Box)`
     line-height: 140%;
     margin-left: 12px;
     display: flex;
-    place-items: center;
     text-align: left;
   }
   @media (max-width: 767px) {
     flex-direction: column;
     span {
       margin-left: 0px;
-      place-items: start;
+      text-align: left;
     }
   }
 `;
