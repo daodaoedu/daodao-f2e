@@ -31,7 +31,7 @@ function SignInPage() {
   const { errors, onChangeHandler, userState, validateFields } =
     useProfileValidation();
 
-  const { createdDate, updatedDate, _id } = useSelector((state) => state?.user);
+  const { createdDate, updatedDate } = useSelector((state) => state?.user);
 
   // Oath login
   useEffect(() => {
@@ -46,17 +46,10 @@ function SignInPage() {
   }, [id, token]);
 
   useEffect(() => {
-    if (_id || id) {
-      if (createdDate !== updatedDate) {
-        router.push('/profile');
-      }
-    } else {
-      router.push('/');
+    if (createdDate !== updatedDate) {
+      router.push('/profile');
     }
-    // if (id && UserToken) {
-    //   dispatch(fetchUserById(id, UserToken));
-    // }
-  }, [createdDate, updatedDate, _id, id]);
+  }, [createdDate, updatedDate]);
 
   const handleRoleListChange = (value) => {
     const { roleList } = userState;
