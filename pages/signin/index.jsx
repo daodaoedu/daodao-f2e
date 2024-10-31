@@ -118,7 +118,16 @@ function SignInPage() {
     }
   }, [userEmail]);
 
+  const calculateAge = (birthday) => {
+    return dayjs().diff(birthday, 'year');
+  };
+
   const onUpdateUser = () => {
+    const age = calculateAge(birthDay);
+    if (age < 16) {
+      router.push('/underage');
+      return;
+    }
     const payload = {
       id,
       email: userEmail,
