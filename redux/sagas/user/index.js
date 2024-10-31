@@ -4,6 +4,14 @@ import firebase from '../../../utils/firebase';
 import { BASE_URL } from '@/constants/common';
 import req from '@/utils/request';
 
+/**
+ *
+ * @param {boolean} isnormal 是否一般 token ?
+ * @returns time
+ */
+const handleTokenExpiry = (isnormal = false) =>
+  isnormal ? Date.now() + 60 * 60 * 1000 : Date.now() + 60 * 60 * 6000;
+
 function* checkUserStatus() {
   try {
     const userData = yield localforage.getItem('userData');
@@ -48,6 +56,29 @@ function* fetchAllUsers() {
   }
 }
 
+function* createUserProfile(action) {
+  const { user } = action.payload;
+  try {
+    const URL = `${BASE_URL}/user/${user.id}`;
+
+    const result = yield req(URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        ...user,
+      }),
+    });
+
+    // const result = yield reqHye();
+    const { token, user: resultUser } = result;
+    yield put({
+      type: 'UPDATE_USER_PROFILE_SUCCESS',
+      payload: { token, ...resultUser },
+    });
+  } catch (error) {
+    yield put({ type: 'UPDATE_USER_PROFILE_FAILURE' });
+  }
+}
+
 function* updateUserProfile(action) {
   const { user } = action.payload;
   try {
@@ -76,17 +107,21 @@ function* fetchUserById(action) {
         Authorization: `Bearer ${token}`,
       },
     });
+
     yield put({
       type: 'FETCH_USER_BY_ID_SUCCESS',
       payload: result.data && {
+        _id: id,
         ...result.data[0],
         token,
-        lastLogin: Date.now(),
+        tokenExpiry: handleTokenExpiry(true),
       },
     });
   } catch (error) {
-    console.log(error);
-    yield put({ type: 'FETCH_USER_BY_ID_FAILURE' });
+    yield put({
+      type: 'FETCH_USER_BY_ID_FAILURE',
+      payload: { _id: id, token, tokenExpiry: handleTokenExpiry(false) },
+    });
   }
 }
 
@@ -94,6 +129,7 @@ function* userSaga() {
   yield takeEvery('CHECK_USER_ACCOUNT', checkUserStatus);
   yield takeEvery('USER_LOGIN', userLogin);
   yield takeEvery('FETCH_ALL_USERS', fetchAllUsers);
+  yield takeEvery('CREATE_USER_PROFILE', createUserProfile);
   yield takeEvery('UPDATE_USER_PROFILE', updateUserProfile);
   yield takeEvery('FETCH_USER_BY_ID', fetchUserById);
 }

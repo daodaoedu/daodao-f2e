@@ -42,6 +42,7 @@ const reducer = (state = initialState, action) => {
     case 'FETCH_USER_BY_ID_FAILURE': {
       return {
         ...state,
+        ...action.payload,
       };
     }
     case 'UPDATE_USER_PROFILE_SUCCESS': {

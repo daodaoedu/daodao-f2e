@@ -1,10 +1,10 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchUserById, updateUser } from '@/redux/actions/user';
+import { fetchUserById, createUser } from '@/redux/actions/user';
 import { GENDER, ROLE } from '@/constants/member';
+import { getRedirectionStorage } from '@/utils/storage';
 import dayjs from 'dayjs';
-
 import { Box, Typography, Button, Skeleton, TextField } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
@@ -15,87 +15,25 @@ import Checkbox from '@mui/material/Checkbox';
 import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
-import styled from '@emotion/styled';
-import { getRedirectionStorage } from '@/utils/storage';
-
-export const HomePageWrapper = styled.div`
-  --section-height: calc(100vh - 80px);
-  --section-height-offset: 80px;
-  background: linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa;
-`;
-
-export const StyledContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #fff;
-  border-radius: 16px;
-  margin: 60px auto;
-  max-width: 50%;
-  width: 100%;
-  @media (max-width: 767px) {
-    max-width: 80%;
-    .title {
-      text-overflow: ellipsis;
-      width: 100%;
-    }
-  }
-
-  h2 {
-    font-weight: 700;
-    font-size: 22px;
-    line-height: 140%;
-    text-align: center;
-    color: #536166;
-    margin-top: 40px;
-  }
-`;
-
-export const StyledQuestionInput = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  margin-top: 20px;
-`;
+import {
+  HomePageWrapper,
+  StyledContentWrapper,
+  StyledQuestionInput,
+} from './Signin.styled';
+import ErrorMessage from './ErrorMessage';
+import useProfileValidation from './useValidation';
 
 function SignInPage() {
   const router = useRouter();
   const dispatch = useDispatch();
 
   const { id, token } = router.query;
+  const { errors, onChangeHandler, userState, validateFields } =
+    useProfileValidation();
 
-  const {
-    _id: userId,
-    token: userToken,
-    birthDay: userBirthDay,
-    gender: userGender,
-    roleList: userRoleList,
-    isSubscribeEmail: userIsSubscribeEmail,
-    email: userEmail,
-    createdDate,
-    updatedDate,
-  } = useSelector((state) => state?.user);
+  const { createdDate, updatedDate, _id } = useSelector((state) => state?.user);
 
-  const [isSubscribeEmail, setIsSubscribeEmail] = useState(false);
-  const [birthDay, setBirthDay] = useState(dayjs());
-  const [gender, setGender] = useState('');
-  const [roleList, setRoleList] = useState([]);
-
-  const fetchUser = async () => {
-    if (!userId) {
-      dispatch(fetchUserById(id, token));
-    }
-    router.push(`/signin?id=${id}`);
-  };
-
-  useEffect(() => {
-    if (id || token) {
-      fetchUser();
-    }
-  }, [id, token]);
-
+  // Oath login
   useEffect(() => {
     if (id && token) {
       getRedirectionStorage().set(`/signin?id=${id}`);
@@ -108,27 +46,39 @@ function SignInPage() {
   }, [id, token]);
 
   useEffect(() => {
-    setBirthDay(userBirthDay ? dayjs(userBirthDay) : dayjs());
-    setGender(userGender || '');
-    setRoleList(userRoleList || []);
-    setIsSubscribeEmail(userIsSubscribeEmail || false);
-
-    if (createdDate !== updatedDate) {
-      router.push('/profile');
+    if (_id || id) {
+      if (createdDate !== updatedDate) {
+        router.push('/profile');
+      }
+    } else {
+      router.push('/');
     }
-  }, [userEmail]);
+    // if (id && UserToken) {
+    //   dispatch(fetchUserById(id, UserToken));
+    // }
+  }, [createdDate, updatedDate, _id, id]);
 
-  const onUpdateUser = () => {
-    const payload = {
-      id,
-      email: userEmail,
-      birthDay: birthDay.toISOString(),
-      gender,
-      roleList,
-      isSubscribeEmail,
-    };
-    dispatch(updateUser(payload));
-    router.push(`/signin/interest`);
+  const handleRoleListChange = (value) => {
+    const { roleList } = userState;
+    const updatedRoleList = roleList.includes(value)
+      ? roleList.filter((role) => role !== value)
+      : [...roleList, value];
+    onChangeHandler({ key: 'roleList', value: updatedRoleList });
+  };
+
+  const onCreateUser = () => {
+    const { birthDay, gender, roleList, isSubscribeEmail } = userState;
+    if (validateFields({ birthDay, gender, roleList }, true)) {
+      const payload = {
+        id,
+        birthDay: birthDay.toISOString(),
+        gender,
+        roleList,
+        isSubscribeEmail,
+      };
+      dispatch(createUser(payload));
+      router.push(`/signin/interest?id=${id}`);
+    }
   };
 
   const SEOData = useMemo(
@@ -157,14 +107,19 @@ function SignInPage() {
                 <StyledQuestionInput>
                   <Typography>生日 *</Typography>
                   <MobileDatePicker
+                    maxDate={dayjs().subtract(16, 'year')}
+                    defaultCalendarMonth={dayjs().subtract(18, 'year')}
                     label="birthDay"
                     inputFormat="YYYY/MM/DD"
-                    value={birthDay}
-                    onChange={(date) => setBirthDay(date)}
+                    value={userState.birthDay}
+                    onChange={(date) =>
+                      onChangeHandler({ key: 'birthDay', value: date })
+                    }
                     renderInput={(params) => (
                       <TextField {...params} sx={{ width: '100%' }} label="" />
                     )}
                   />
+                  <ErrorMessage errText={errors.birthDay} />
                 </StyledQuestionInput>
                 <StyledQuestionInput>
                   <Typography>性別 *</Typography>
@@ -179,9 +134,9 @@ function SignInPage() {
                     {GENDER.map(({ label, value }) => (
                       <Box
                         key={label}
-                        onClick={() => {
-                          setGender(value);
-                        }}
+                        onClick={() =>
+                          onChangeHandler({ key: 'gender', value })
+                        }
                         sx={{
                           border: '1px solid #DBDBDB',
                           borderRadius: '8px',
@@ -191,7 +146,7 @@ function SignInPage() {
                           justifyItems: 'center',
                           alignItems: 'center',
                           cursor: 'pointer',
-                          ...(gender === value
+                          ...(userState.gender === value
                             ? {
                                 backgroundColor: '#DEF5F5',
                                 border: '1px solid #16B9B3',
@@ -203,6 +158,7 @@ function SignInPage() {
                       </Box>
                     ))}
                   </Box>
+                  <ErrorMessage errText={errors.gender} />
                 </StyledQuestionInput>
                 <StyledQuestionInput>
                   <Typography>身份 *</Typography>
@@ -219,15 +175,7 @@ function SignInPage() {
                     {ROLE.map(({ label, value, image }) => (
                       <Box
                         key={label}
-                        onClick={() => {
-                          if (roleList.includes(value)) {
-                            setRoleList((state) =>
-                              state.filter((data) => data !== value),
-                            );
-                          } else {
-                            setRoleList((state) => [...state, value]);
-                          }
-                        }}
+                        onClick={() => handleRoleListChange(value)}
                         sx={{
                           border: '1px solid #DBDBDB',
                           borderRadius: '8px',
@@ -240,7 +188,7 @@ function SignInPage() {
                           justifyItems: 'center',
                           alignItems: 'center',
                           cursor: 'pointer',
-                          ...(roleList.includes(value)
+                          ...(userState.roleList.includes(value)
                             ? {
                                 backgroundColor: '#DEF5F5',
                                 border: '1px solid #16B9B3',
@@ -287,7 +235,7 @@ function SignInPage() {
                           sx={{
                             margin: 'auto',
                             marginTop: '10px',
-                            ...(roleList.includes(value)
+                            ...(userState.roleList.includes(value)
                               ? {
                                   fontWeight: 700,
                                 }
@@ -299,6 +247,7 @@ function SignInPage() {
                       </Box>
                     ))}
                   </Box>
+                  <ErrorMessage errText={errors.roleList} />
                 </StyledQuestionInput>
                 <FormControlLabel
                   sx={{
@@ -307,9 +256,12 @@ function SignInPage() {
                   control={
                     // eslint-disable-next-line react/jsx-wrap-multilines
                     <Checkbox
-                      checked={isSubscribeEmail}
+                      checked={userState.isSubscribeEmail}
                       onChange={(event) =>
-                        setIsSubscribeEmail(event.target.checked)
+                        onChangeHandler({
+                          key: 'isSubscribeEmail',
+                          value: event.target.checked,
+                        })
                       }
                     />
                   }
@@ -325,10 +277,13 @@ function SignInPage() {
                     bgcolor: '#16B9B3',
                   }}
                   variant="contained"
-                  onClick={onUpdateUser}
+                  onClick={onCreateUser}
                 >
                   下一步
                 </Button>
+                {Object.values(errors).join('') && (
+                  <ErrorMessage errText="請將資訊填寫完整" />
+                )}
               </Box>
             </StyledContentWrapper>
           </Box>
