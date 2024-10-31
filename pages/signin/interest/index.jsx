@@ -46,7 +46,7 @@ function SignInInterestPage() {
 
   const {
     _id: userId,
-    interestList: userInterestList,
+    interestList: userInterestList = [],
     email: userEmail,
   } = useSelector((state) => state?.user);
 
