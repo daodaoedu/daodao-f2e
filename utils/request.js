@@ -20,7 +20,7 @@ const request = function* (url, options = {}) {
   const data = yield response.json();
 
   // Check for non-200 status and throw an error
-  if (response.status !== 200) {
+  if (![200, 201].includes(response.status)) {
     throw new Error(data);
   }
 

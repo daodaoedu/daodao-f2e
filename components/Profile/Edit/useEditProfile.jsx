@@ -133,7 +133,7 @@ const useEditProfile = () => {
   };
 
   const onSubmit = async ({ id, email }) => {
-    if (!id || !email) return;
+    if (!id || !email) return false;
     const {
       name,
       birthDay,
@@ -180,12 +180,13 @@ const useEditProfile = () => {
     };
 
     reduxDispatch(updateUser(payload));
+    return true;
   };
 
-  const checkBeforeSubmit = ({ id, email }) => {
+  const checkBeforeSubmit = async ({ id, email }) => {
     if (validate(userState)) {
-      onSubmit({ id, email });
-      return true;
+      const result = await onSubmit({ id, email });
+      return result;
     }
     return false;
   };

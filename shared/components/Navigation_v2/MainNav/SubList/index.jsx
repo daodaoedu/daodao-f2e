@@ -59,7 +59,7 @@ const SubList = () => {
           </Link>
         </li>
         <li>
-          {user._id ? (
+          {user._id && user.email ? (
             <UserAvatar user={user} />
           ) : (
             <Button

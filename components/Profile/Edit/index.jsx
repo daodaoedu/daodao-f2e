@@ -89,12 +89,12 @@ function EditPage() {
     }
   }, [user]);
 
-  const onUpdateUser = () => {
+  const onUpdateUser = async () => {
     if (Object.values(errors).length) {
       toast.error('請修正錯誤');
       return;
     }
-    const resultStatus = onEditSumit({ id: user._id, email: user.email });
+    const resultStatus = await onEditSumit({ id: user._id, email: user.email });
     if (resultStatus) {
       toast.success('更新成功');
       router.push('/profile');

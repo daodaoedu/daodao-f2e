@@ -2,8 +2,8 @@ export const CHECK_LOGIN_VALIDITY = 'CHECK_LOGIN_VALIDITY';
 
 export function checkLoginValidity() {
   return {
-    type: CHECK_LOGIN_VALIDITY
-  }
+    type: CHECK_LOGIN_VALIDITY,
+  };
 }
 
 export function userLogin() {
@@ -66,6 +66,15 @@ export function removeResourceFromCollection(resourceId) {
 export function updateUser(user) {
   return {
     type: 'UPDATE_USER_PROFILE',
+    payload: {
+      user,
+    },
+  };
+}
+
+export function createUser(user) {
+  return {
+    type: 'CREATE_USER_PROFILE',
     payload: {
       user,
     },
