@@ -21,7 +21,7 @@ export default function TextField({
         placeholder={placeholder}
         value={value}
         multiline={multiline}
-        rows={multiline && 10}
+        rows={multiline && 6}
         helperText={helperText}
         {...control}
       />

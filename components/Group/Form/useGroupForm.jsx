@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ZodType, z } from 'zod';
@@ -6,6 +7,7 @@ import { AREAS } from '@/constants/areas';
 import { EDUCATION_STEP } from '@/constants/member';
 import { BASE_URL } from '@/constants/common';
 import openLoginWindow from '@/utils/openLoginWindow';
+import { activityCategoryList } from '@/constants/activityCategory';
 
 const _eduOptions = EDUCATION_STEP.filter(
   (edu) => !['master', 'doctor', 'other'].includes(edu.value),
@@ -23,12 +25,19 @@ const DEFAULT_VALUES = {
   originPhotoURL: '',
   photoURL: '',
   photoAlt: '',
+  activityCategory: [],
   category: [],
+  participator: '',
   area: [],
   time: '',
   partnerStyle: '',
   partnerEducationStep: [],
-  description: '',
+  motivation: '',
+  content: '',
+  outcome: '',
+  notice: '',
+  deadline: dayjs().add(7, 'day'),
+  isNeedDeadline: false,
   tagList: [],
   isGrouping: true,
 };
@@ -39,19 +48,33 @@ const rules = {
   file: z.any(),
   photoURL: z.string().or(z.instanceof(Blob)),
   photoAlt: z.string(),
+  activityCategory: z.array(
+    z.enum(activityCategoryList.map(({ value }) => value)),
+  ),
   category: z
     .array(z.enum(categoriesOptions.map(({ value }) => value)))
     .min(1, '請選擇學習領域'),
+  participator: z
+    .string()
+    .regex(/^(100|[1-9]?\d)$/, '請輸入整數，需大於 0，不可超過 100'),
   area: z.array(z.string()).min(1, '請選擇地點'),
   time: z.string().max(50, '請勿輸入超過 50 字'),
-  partnerStyle: z.string().max(50, '請勿輸入超過 50 字'),
+  partnerStyle: z
+    .string()
+    .max(50, '請勿輸入超過 50 字')
+    .min(1, '請輸入想找的夥伴類型'),
   partnerEducationStep: z
     .array(z.enum(eduOptions.map(({ label }) => label)))
-    .min(1, '請選擇適合的學習階段'),
-  description: z
+    .min(1, '請選擇適合的教育階段'),
+  motivation: z.string().max(50, '請勿輸入超過 50 字').min(1, '請輸入揪團動機'),
+  content: z
     .string()
-    .min(1, '請輸入揪團描述')
+    .min(1, '請輸入揪團內容與運作方式')
     .max(2000, '請勿輸入超過 2000 字'),
+  outcome: z.string().max(50, '請勿輸入超過 50 字').min(1, '請輸入期待成果'),
+  notice: z.string().min(1, '請輸入注意事項').max(2000, '請勿輸入超過 2000 字'),
+  deadline: z.any(),
+  isNeedDeadline: z.boolean(),
   tagList: z.array(z.string()),
   isGrouping: z.boolean(),
 };

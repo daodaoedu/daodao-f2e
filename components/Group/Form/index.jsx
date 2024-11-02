@@ -1,8 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Switch from '@mui/material/Switch';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@/shared/components/Button';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import { activityCategoryList } from '@/constants/activityCategory';
 import StyledPaper from '../Paper.styled';
 import {
   StyledHeading,
@@ -17,6 +22,16 @@ import useGroupForm, {
   categoriesOptions,
   eduOptions,
 } from './useGroupForm';
+
+const StyledDesc = styled.p`
+  font-size: 14px;
+  color: #92989a;
+
+  a {
+    color: #92989a;
+    text-decoration: underline;
+  }
+`;
 
 export default function GroupForm({
   mode,
@@ -33,6 +48,7 @@ export default function GroupForm({
     setValues,
     handleSubmit,
   } = useGroupForm();
+  const [isChecked, setIsChecked] = useState(false);
   const isCreateMode = mode === 'create';
 
   useEffect(() => {
@@ -42,6 +58,19 @@ export default function GroupForm({
       originPhotoURL: defaultValues.photoURL,
     });
   }, [defaultValues]);
+
+  const desc = (
+    <StyledDesc>
+      請確認揪團未涉及不雅內容並符合本網站{' '}
+      <Link href="/terms/service" target="_blank">
+        使用者條款
+      </Link>
+    </StyledDesc>
+  );
+
+  const checkbox = (
+    <Checkbox size="small" onClick={() => setIsChecked((pre) => !pre)} />
+  );
 
   if (notLogin) {
     return <Box sx={{ minHeight: '50vh' }} />;
@@ -72,6 +101,13 @@ export default function GroupForm({
             value={values.photoURL}
             control={control}
           />
+          <Fields.CheckboxGroup
+            label="揪團類型"
+            name="activityCategory"
+            control={control}
+            value={values.activityCategory}
+            options={activityCategoryList}
+          />
           <Fields.Select
             label="學習領域"
             name="category"
@@ -81,6 +117,15 @@ export default function GroupForm({
             options={categoriesOptions}
             placeholder="這個活動的學習領域？"
             multiple
+            required
+          />
+          <Fields.TextField
+            label="期望的夥伴人數"
+            name="participator"
+            control={control}
+            value={values.participator}
+            error={errors.participator}
+            placeholder="請輸入整數，需大於 0，不可超過 100"
             required
           />
           <Fields.AreaCheckbox
@@ -101,7 +146,7 @@ export default function GroupForm({
             placeholder="希望在什麼時間舉行？"
           />
         </StyledPaper>
-        <StyledPaper sx={{ p: '40px' }}>
+        <StyledPaper sx={{ p: '40px', mb: '16px' }}>
           <Fields.TextField
             label="想找的夥伴"
             name="partnerStyle"
@@ -109,25 +154,54 @@ export default function GroupForm({
             value={values.partnerStyle}
             error={errors.partnerStyle}
             placeholder="想找什麼類型的夥伴？"
+            required
           />
           <Fields.Select
-            label="適合的學習階段"
+            label="適合的教育階段"
             name="partnerEducationStep"
             control={control}
             value={values.partnerEducationStep}
             error={errors.partnerEducationStep}
-            placeholder="活動適合什麼學習階段的夥伴？"
+            placeholder="活動適合什麼教育階段的夥伴？"
             options={eduOptions}
             multiple
             required
           />
           <Fields.TextField
-            label="描述"
-            name="description"
+            label="揪團動機"
+            name="motivation"
             control={control}
-            value={values.description}
-            error={errors.description}
-            placeholder="簡單的跟大家介紹你是誰，說明你的揪團活動內容、運作方式，邀請志同道合的夥伴一起來參與！"
+            value={values.motivation}
+            error={errors.motivation}
+            placeholder="讓大家更了解你為什麼發起這次揪團～"
+            required
+          />
+          <Fields.TextField
+            label="揪團內容與運作方式"
+            name="content"
+            control={control}
+            value={values.content}
+            error={errors.content}
+            placeholder="說明你的揪團活動內容、運作方式，邀請志同道合的夥伴一起來參與！"
+            required
+            multiline
+          />
+          <Fields.TextField
+            label="期待成果"
+            name="outcome"
+            control={control}
+            value={values.outcome}
+            error={errors.outcome}
+            placeholder="希望大家參與後能有的收獲或達成的目標"
+            required
+          />
+          <Fields.TextField
+            label="注意事項"
+            name="notice"
+            control={control}
+            value={values.notice}
+            error={errors.notice}
+            placeholder="如參與者必須參與的次數和遵守的規則等"
             required
             multiline
           />
@@ -140,6 +214,16 @@ export default function GroupForm({
             placeholder="搜尋或新增標籤"
             tooltip="填入適當的標籤，能讓你的文章更容易被搜尋到喔！"
             helperText="標籤填寫完成後，會用 Hashtag 的形式呈現，例如： #一起學日文"
+          />
+        </StyledPaper>
+        <StyledPaper>
+          <Fields.DateRadio
+            label="揪團期限"
+            name="deadline"
+            customValueName="isNeedDeadline"
+            value={values.deadline}
+            isCustomValue={values.isNeedDeadline}
+            control={control}
           />
         </StyledPaper>
         {!isCreateMode && (
@@ -158,10 +242,19 @@ export default function GroupForm({
             </StyledSwitchWrapper>
           </StyledPaper>
         )}
+
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+          <FormControlLabel
+            control={checkbox}
+            label={desc}
+            checked={isChecked}
+          />
+        </Box>
+
         <StyledFooter>
           <Button
-            sx={{ width: '100%', maxWidth: '287px' }}
-            disabled={isLoading || !isDirty}
+            sx={{ width: '100%', maxWidth: '287px', mt: 0 }}
+            disabled={isLoading || !isDirty || !isChecked}
             onClick={handleSubmit(onSubmit)}
           >
             {isCreateMode ? '送出' : '發布修改'}
