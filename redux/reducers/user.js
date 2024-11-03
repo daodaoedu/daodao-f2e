@@ -3,7 +3,28 @@
 const initialState = {};
 
 const reducer = (state = initialState, action) => {
+  const checkIsComplete = (data = {}) =>
+    [
+      'name',
+      'birthDay',
+      'gender',
+      'roleList',
+      'instagram',
+      'discord',
+      'line',
+      'facebook',
+      'wantToDoList',
+      'tagList',
+      'selfIntroduction',
+    ].some((key) => !data[key]);
+
   switch (action.type) {
+    case 'CHECK_LOGIN_VALIDITY': {
+      return {
+        ...state,
+        isComplete: !checkIsComplete(state),
+      };
+    }
     case 'CHECK_USER_ACCOUNT_SUCCESS': {
       return {
         ...state,
@@ -34,8 +55,10 @@ const reducer = (state = initialState, action) => {
       };
     }
     case 'FETCH_USER_BY_ID_SUCCESS': {
+      console.log(action.payload);
       return {
         ...action.payload,
+        isComplete: !checkIsComplete(action.payload),
       };
     }
 
@@ -44,10 +67,23 @@ const reducer = (state = initialState, action) => {
         ...state,
       };
     }
+    case 'UPDATE_USER_PROFILE': {
+      return {
+        ...state,
+        apiState: 'PENDING',
+      };
+    }
     case 'UPDATE_USER_PROFILE_SUCCESS': {
       return {
         ...state,
         ...action.payload,
+        apiState: 'Resolve',
+      };
+    }
+    case 'UPDATE_USER_PROFILE_FAILURE': {
+      return {
+        ...state,
+        apiState: 'Reject',
       };
     }
     default: {

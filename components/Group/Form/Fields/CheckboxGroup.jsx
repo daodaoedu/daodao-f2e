@@ -5,7 +5,7 @@ import Checkbox from '@mui/material/Checkbox';
 export default function CheckboxGroup({
   options,
   name,
-  value,
+  value = [],
   control,
   handleValues,
 }) {
