@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
+import { useSearchParams } from 'next/navigation';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
@@ -51,13 +52,17 @@ import {
 
 function EditPage() {
   const mobileScreen = useMediaQuery('(max-width: 767px)');
+  const [isSetting, setIsSetting] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const check = searchParams.get('check');
 
   const {
     userState,
     errors,
     onChangeHandler,
-    onSubmit: onEditSumit,
+    onSubmit: onEditSubmit,
+    setRef,
   } = useEditProfile();
 
   const user = useSelector((state) => state.user);
@@ -84,24 +89,49 @@ function EditPage() {
           onChangeHandler({ key, value });
         }
       });
+      setIsSetting(true);
     } else {
       router.push('/');
     }
   }, [user]);
 
   const onUpdateUser = async () => {
+    const resultStatus = await onEditSubmit({
+      id: user._id,
+      email: user.email,
+    });
     if (Object.values(errors).length) {
       toast.error('請修正錯誤');
       return;
     }
-    const resultStatus = await onEditSumit({ id: user._id, email: user.email });
-    if (resultStatus) {
-      toast.success('更新成功');
-      router.push('/profile');
-    } else {
+    if (!resultStatus && !check) {
       toast.error('更新失敗');
     }
   };
+
+  useEffect(() => {
+    switch (user.apiState) {
+      case 'Resolve': {
+        toast.success('更新成功');
+        router.push('/profile');
+        break;
+      }
+      case 'Reject': {
+        toast.error('更新失敗');
+        break;
+      }
+      default:
+    }
+  }, [user.apiState]);
+
+  useEffect(() => {
+    if (check === '1' && user._id && isSetting) {
+      onUpdateUser();
+      router.replace({ query: { id: 'person-setting' } }, undefined, {
+        scroll: false,
+      });
+    }
+  }, [searchParams, user._id && isSetting]);
 
   return (
     <FormWrapper>
@@ -112,7 +142,17 @@ function EditPage() {
         }}
       >
         <ContentWrapper sx={{ minHeight: '100vh' }}>
-          <StyledTitleWrap>
+          <StyledTitleWrap
+            sx={{
+              border:
+                errors.name ||
+                errors.birthDay ||
+                errors.gender ||
+                errors.roleList
+                  ? '1px solid red'
+                  : '',
+            }}
+          >
             <h2>編輯個人頁面</h2>
             <p className="title-memo">
               填寫完整資訊可以幫助其他夥伴更了解你哦！
@@ -122,6 +162,7 @@ function EditPage() {
             <Box sx={{ marginTop: '24px', width: '100%' }}>
               <FormInput
                 isRequire
+                ref={(element) => setRef('name', element)}
                 title="名稱"
                 parmKey="name"
                 value={userState.name || ''}
@@ -139,6 +180,7 @@ function EditPage() {
                   renderInput={(params) => (
                     <TextField
                       {...params}
+                      ref={(element) => setRef('birthDay', element)}
                       sx={{ width: '100%' }}
                       label=""
                       error={!!errors.birthDay}
@@ -151,7 +193,9 @@ function EditPage() {
               </StyledGroup>
               <StyledGroup>
                 <Typography fontWeight="500">性別 *</Typography>
-                <StyledSelectWrapper>
+                <StyledSelectWrapper
+                  ref={(element) => setRef('gender', element)}
+                >
                   {GENDER.map(({ label, value }) => (
                     <StyledSelectBox
                       isselected={`${userState.gender === value}`}
@@ -172,7 +216,9 @@ function EditPage() {
               </StyledGroup>
               <StyledGroup>
                 <Typography fontWeight="500">身份 *</Typography>
-                <StyledSelectWrapper>
+                <StyledSelectWrapper
+                  ref={(element) => setRef('roleList', element)}
+                >
                   {ROLE.map(({ label, value }) => (
                     <StyledSelectBox
                       col={mobileScreen ? '2' : '3'}
@@ -304,7 +350,10 @@ function EditPage() {
             </StyledGroup>
           </StyledSection>
 
-          <StyledSection>
+          <StyledSection
+            ref={(element) => setRef('socialCode', element)}
+            sx={{ border: errors.socialCode ? '1px solid red' : '' }}
+          >
             <StyledGroup mt="0">
               <Typography sx={{ fontWeight: 700, fontSize: '18px' }}>
                 聯絡方式
@@ -324,21 +373,41 @@ function EditPage() {
               }).map(([key, title]) => (
                 <Grid item xs="12" sm="6">
                   <FormInput
+                    ref={(element) => setRef(key, element)}
                     title={title}
                     parmKey={key}
                     value={userState[key] || ''}
                     onChange={onChangeHandler}
                     placeholder="請填寫ID"
-                    errorMsg={errors[key] ? errors[key] : ''}
+                    errorMsg={
+                      errors[key]
+                        ? errors[key]
+                        : errors.socialCode
+                        ? '請填寫您的 ID'
+                        : ''
+                    }
                   />
                 </Grid>
               ))}
             </Grid>
+            <ErrorMessage errText={errors.socialCode} />
           </StyledSection>
 
-          <StyledSection>
+          <StyledSection
+            sx={{
+              border:
+                errors.wantToDoList || errors.tagList || errors.selfIntroduction
+                  ? '1px solid red'
+                  : '',
+            }}
+          >
             <StyledGroup mt="0">
-              <Typography sx={{ fontWeight: 500 }}>想和夥伴一起</Typography>
+              <Typography
+                sx={{ fontWeight: 500 }}
+                ref={(element) => setRef('wantToDoList', element)}
+              >
+                想和夥伴一起
+              </Typography>
               <StyledSelectWrapper>
                 {WANT_TO_DO_WITH_PARTNER.map(({ label, value }) => (
                   <StyledSelectBox
@@ -365,6 +434,7 @@ function EditPage() {
                   </StyledSelectBox>
                 ))}
               </StyledSelectWrapper>
+              <ErrorMessage errText={errors.wantToDoList} />
             </StyledGroup>
             <StyledGroup>
               <Typography sx={{ fontWeight: 500 }}>
@@ -382,6 +452,7 @@ function EditPage() {
             <StyledGroup>
               <Typography sx={{ fontWeight: 500 }}>標籤</Typography>
               <InputTags
+                ref={(element) => setRef('tagList', element)}
                 value={userState.tagList}
                 change={(value) => {
                   onChangeHandler({ key: 'tagList', value, isMultiple: true });
@@ -397,6 +468,7 @@ function EditPage() {
               >
                 可以是學習領域、興趣等等的標籤，例如：音樂創作、程式語言、電繪、社會議題。
               </Typography>
+              <ErrorMessage errText={errors.tagList} />
             </StyledGroup>
 
             <StyledGroup>
@@ -404,6 +476,7 @@ function EditPage() {
                 個人簡介
               </Typography>
               <TextareaAutosize
+                ref={(element) => setRef('selfIntroduction', element)}
                 style={{
                   width: '100%',
                   minHeight: '100px',
@@ -420,6 +493,7 @@ function EditPage() {
                   });
                 }}
               />
+              <ErrorMessage errText={errors.selfIntroduction} />
             </StyledGroup>
           </StyledSection>
 

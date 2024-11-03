@@ -7,6 +7,7 @@ const ErrorMessage = ({ errText }) => {
       <Box
         sx={{
           mt: '8px',
+          width: 'max-content',
           display: 'flex',
           alignItems: 'center',
           gap: '8px',

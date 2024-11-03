@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { useReducer, useState } from 'react';
+import { useReducer, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '@/redux/actions/user';
 import { z } from 'zod';
@@ -76,6 +76,18 @@ const schema = z.object({
     '長度最多20個字元',
     '長度最少6個字元，支援英文、數字、底線、句號',
   ),
+  wantToDoList: z
+    .array(z.string())
+    .min(1, '為了讓其他島民更認識你，請至少選擇一項想進行的事項')
+    .optional(),
+  tagList: z
+    .array(z.string())
+    .min(1, '為了讓其他島民更認識你，請至少選擇一項標籤')
+    .optional(),
+  selfIntroduction: z
+    .string()
+    .min(1, '為了讓其他島民更認識你，請簡述您的個人經歷、想做的事項')
+    .optional(),
   roleList: z.array(z.string()).min(1, '請選擇您的身份').optional(),
 });
 
@@ -101,21 +113,51 @@ const useEditProfile = () => {
   const reduxDispatch = useDispatch();
   const [userState, stateDispatch] = useReducer(userReducer, initialState);
   const [errors, setErrors] = useState({});
+  const refs = useRef({});
 
   const validate = (state = {}, isPartial = false) => {
     const [key, val] = Object.entries(state)[0];
+
     const result = isPartial
       ? schema
           .partial({ [key]: true })
           .safeParse({ [key]: key === 'birthDay' ? val?.$d : val })
-      : schema.safeParse({
-          ...state,
-          birthDay: state.birthDay.$d,
-        });
+      : schema
+          .refine(
+            (data) =>
+              !!data.instagram ||
+              !!data.facebook ||
+              !!data.discord ||
+              !!data.line,
+            {
+              message: '至少填寫一個社交媒體帳號',
+              path: ['socialCode'],
+            },
+          )
+          .safeParse({
+            ...state,
+            birthDay: state.birthDay.$d,
+          });
+
+    let isFocus = false;
+
     if (!result.success) {
-      result.error.errors.forEach((err) => {
-        setErrors({ [err.path[0]]: err.message });
-      });
+      const newErrors = Object.fromEntries(
+        result.error.errors.map((err) => {
+          if (!isPartial && !isFocus) {
+            const element = refs.current[err.path[0]];
+            isFocus = true;
+
+            if (['INPUT', 'TEXTAREA'].includes(element.tagName)) {
+              element.focus();
+            } else {
+              element.scrollIntoView({ block: 'center' });
+            }
+          }
+          return [err.path[0], err.message];
+        }),
+      );
+      setErrors(newErrors);
     }
     if (isPartial && result.success) {
       const obj = { ...errors };
@@ -191,10 +233,15 @@ const useEditProfile = () => {
     return false;
   };
 
+  const setRef = (name, element) => {
+    refs.current[name] = element;
+  };
+
   return {
     userState,
     onChangeHandler,
     onSubmit: checkBeforeSubmit,
+    setRef,
     errors,
   };
 };

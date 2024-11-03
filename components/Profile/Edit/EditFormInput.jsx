@@ -1,21 +1,26 @@
+import { forwardRef } from 'react';
 import { Typography, TextField } from '@mui/material';
 import { StyledGroup } from './Edit.styled';
 
-function EditFormInput({
-  title = '',
-  parmKey = '',
-  value = '',
-  onChange = () => ({}),
-  errorMsg = '',
-  isRequire = false,
-  placeholder = '',
-}) {
+function EditFormInput(
+  {
+    title = '',
+    parmKey = '',
+    value = '',
+    onChange = () => ({}),
+    errorMsg = '',
+    isRequire = false,
+    placeholder = '',
+  },
+  ref,
+) {
   return (
     <StyledGroup>
       <Typography fontWeight="500">
         {title} {isRequire && '*'}
       </Typography>
       <TextField
+        inputRef={ref}
         name={parmKey}
         value={value}
         fullWidth
@@ -28,4 +33,4 @@ function EditFormInput({
   );
 }
 
-export default EditFormInput;
+export default forwardRef(EditFormInput);
