@@ -6,6 +6,7 @@ import { ROLE } from '@/constants/member';
 import chatSvg from '@/public/assets/icons/chat.svg';
 import useMutation from '@/hooks/useMutation';
 import { mapToTable } from '@/utils/helper';
+import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
 import ContactPopup from './ContactPopup';
 import FeedbackPopup from './FeedbackPopup';
 import LoginPopup from './LoginPopup';
@@ -76,14 +77,16 @@ function ContactButton({
 
   return (
     <div>
-      <StyledButton variant="contained" onClick={() => setOpen(true)}>
-        <img
-          src={chatSvg.src}
-          alt="contact icon"
-          style={{ marginRight: '8px' }}
-        />
-        {label}
-      </StyledButton>
+      <InfoCompletionGuard>
+        <StyledButton variant="contained" onClick={() => setOpen(true)}>
+          <img
+            src={chatSvg.src}
+            alt="contact icon"
+            style={{ marginRight: '8px' }}
+          />
+          {label}
+        </StyledButton>
+      </InfoCompletionGuard>
       {isLogin ? (
         <ContactPopup
           open={open}
