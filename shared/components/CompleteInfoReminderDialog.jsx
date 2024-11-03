@@ -1,6 +1,5 @@
-import { useState, forwardRef, useId, useEffect, useRef } from 'react';
+import { forwardRef, useId } from 'react';
 import Link from 'next/link';
-import { useSelector } from 'react-redux';
 import {
   Dialog,
   DialogTitle,
@@ -24,14 +23,6 @@ export default function CompleteInfoReminderDialog({ isOpen, onClose }) {
 
   return (
     <Dialog
-      keepMounted
-      scroll="body"
-      fullScreen={isMobileScreen}
-      open={isOpen}
-      onClose={onClose}
-      aria-labelledby={titleId}
-      aria-describedby={descriptionId}
-      TransitionComponent={TransitionSlide}
       sx={{
         '.MuiPaper-root': {
           marginTop: isMobileScreen ? 'calc(100vh - 580px)' : undefined,
@@ -45,6 +36,14 @@ export default function CompleteInfoReminderDialog({ isOpen, onClose }) {
           borderRadius: '16px',
         },
       }}
+      keepMounted
+      scroll="body"
+      aria-labelledby={titleId}
+      onClose={onClose}
+      open={isOpen}
+      fullScreen={isMobileScreen}
+      TransitionComponent={TransitionSlide}
+      aria-describedby={descriptionId}
     >
       <DialogTitle
         id={titleId}
