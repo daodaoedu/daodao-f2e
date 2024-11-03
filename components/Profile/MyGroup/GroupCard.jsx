@@ -28,7 +28,7 @@ function GroupCard({
   photoURL,
   photoAlt,
   title = '未定義主題',
-  description,
+  content,
   area,
   isGrouping,
   userId,
@@ -86,8 +86,8 @@ function GroupCard({
         </StyledImageWrapper>
         <StyledContainer>
           <StyledTitle>{title}</StyledTitle>
-          <StyledText lineClamp="2" style={{ minHeight: '32px' }}>
-            {description}
+          <StyledText lineClamp="2" style={{ minHeight: '42px' }}>
+            {content}
           </StyledText>
           <StyledAreas>
             <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />
