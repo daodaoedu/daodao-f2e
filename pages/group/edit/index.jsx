@@ -20,7 +20,10 @@ function EditGroupPage() {
   const { data, isFetching } = useFetch(`/activity/${id}`, {
     enabled: !!id,
   });
-  const source = data?.data?.[0];
+  const source = {
+    ...data?.data?.[0],
+    content: data?.data?.[0]?.content || data?.data?.[0]?.description,
+  };
 
   const SEOData = useMemo(
     () => ({

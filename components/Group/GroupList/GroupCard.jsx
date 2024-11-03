@@ -21,7 +21,7 @@ function GroupCard({
   title = '未定義主題',
   category = [],
   partnerEducationStep,
-  description,
+  content,
   area,
   isGrouping,
   updatedDate,
@@ -47,8 +47,8 @@ function GroupCard({
             <span>{formatToString(partnerEducationStep, '皆可')}</span>
           </StyledText>
         </StyledInfo>
-        <StyledText lineClamp="2" fontSize="14px" style={{ minHeight: '28px' }}>
-          {description}
+        <StyledText lineClamp="2" fontSize="14px" style={{ minHeight: '42px' }}>
+          {content}
         </StyledText>
         <StyledAreas>
           <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />

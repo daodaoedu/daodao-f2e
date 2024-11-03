@@ -11,7 +11,10 @@ function GroupPage() {
   const { data, isFetching, isError } = useFetch(`/activity/${id}`, {
     enabled: !!id,
   });
-  const source = data?.data?.[0];
+  const source = {
+    ...data?.data?.[0],
+    content: data?.data?.[0]?.content || data?.data?.[0]?.description,
+  };
 
   const SEOData = useMemo(
     () => ({

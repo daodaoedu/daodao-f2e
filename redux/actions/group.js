@@ -29,7 +29,12 @@ export function getGroupItemsSuccess({ data = [], totalCount = 0 } = {}) {
   return {
     type: GET_GROUP_ITEMS_SUCCESS,
     payload: {
-      items: data,
+      items: Array.isArray(data)
+        ? data.map((item) => ({
+            ...item,
+            content: item.content || item.description,
+          }))
+        : [],
       total: totalCount,
     },
   };

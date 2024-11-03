@@ -1,4 +1,5 @@
 import { useId, useState } from 'react';
+import Link from 'next/link';
 import styled from '@emotion/styled';
 import {
   Avatar,
@@ -11,6 +12,8 @@ import {
   TextareaAutosize,
   useMediaQuery,
 } from '@mui/material';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import CloseIcon from '@mui/icons-material/Close';
 import { ROLE } from '@/constants/member';
 import TransitionSlide from './TransitionSlide';
@@ -34,6 +37,26 @@ const StyledTextArea = styled(TextareaAutosize)`
   min-height: 128px;
 `;
 
+const StyledDesc = styled.p`
+  font-size: 14px;
+  color: #92989a;
+
+  a {
+    color: #92989a;
+    text-decoration: underline;
+  }
+`;
+
+const desc = (
+  <StyledDesc>
+    您填的資訊將透過島島阿學 email
+    給這位夥伴，請確認訊息未涉及個人隱私並符合本網站{' '}
+    <Link href="/terms/service" target="_blank">
+      使用者條款
+    </Link>
+  </StyledDesc>
+);
+
 function ContactPopup({
   open,
   user,
@@ -47,6 +70,7 @@ function ContactPopup({
   const isMobileScreen = useMediaQuery('(max-width: 560px)');
   const [message, setMessage] = useState('');
   const [contact, setContact] = useState('');
+  const [isChecked, setIsChecked] = useState(false);
   const id = useId();
   const titleId = `modal-title-${id}`;
   const descriptionId = `modal-description-${id}`;
@@ -64,6 +88,10 @@ function ContactPopup({
   const handleSubmit = () => {
     onSubmit({ message, contact });
   };
+
+  const checkbox = (
+    <Checkbox size="small" onClick={() => setIsChecked((pre) => !pre)} />
+  );
 
   return (
     <Dialog
@@ -181,6 +209,14 @@ function ContactPopup({
           />
         </div>
 
+        <div>
+          <FormControlLabel
+            control={checkbox}
+            label={desc}
+            checked={isChecked}
+          />
+        </div>
+
         <Box
           sx={{
             display: 'flex',
@@ -210,7 +246,7 @@ function ContactPopup({
               boxShadow: '0 4px 10px #C4C2C166',
             }}
             variant="contained"
-            disabled={isLoading || !message || !contact}
+            disabled={isLoading || !message || !contact || !isChecked}
             onClick={handleSubmit}
           >
             送出

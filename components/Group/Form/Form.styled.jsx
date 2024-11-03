@@ -43,7 +43,9 @@ export const StyledLabel = styled(InputLabel)`
 `;
 
 export const StyledGroup = styled.div`
-  margin-bottom: 20px;
+  & + & {
+    margin-top: 20px;
+  }
 
   .error-message {
     font-size: 14px;
