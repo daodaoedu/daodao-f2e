@@ -9,7 +9,7 @@ export default function AreaCheckbox({
   itemLabel,
   itemValue,
   name,
-  value,
+  value = [],
   control,
 }) {
   const [isPhysicalArea, setIsPhysicalArea] = useState(false);

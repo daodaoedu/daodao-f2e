@@ -13,7 +13,7 @@ export default function Select({
   sx,
   disabled,
   control,
-  value,
+  value = [],
   error,
 }) {
   const getValue = (any, key) => (typeof any === 'object' ? any[key] : any);
