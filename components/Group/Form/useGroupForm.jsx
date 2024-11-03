@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ZodType, z } from 'zod';
 import { CATEGORIES } from '@/constants/category';
@@ -88,6 +88,7 @@ export default function useGroupForm() {
     userId: me?._id,
   });
   const [errors, setErrors] = useState({});
+  const refs = useRef({});
   const schema = z.object(rules);
 
   const onChange = ({ target }) => {
@@ -107,19 +108,31 @@ export default function useGroupForm() {
   };
 
   const onBlur = onChange;
+  const setRef = (name, element) => {
+    refs.current[name] = element;
+  };
 
   const control = {
+    setRef,
     onChange,
     onBlur,
   };
 
   const handleSubmit = (onValid) => async () => {
     if (!schema.safeParse(values).success) {
+      let isFocus = false;
       const updatedErrors = Object.fromEntries(
-        Object.entries(rules).map(([key, rule]) => [
-          key,
-          rule.safeParse(values[key]).error?.issues?.[0]?.message,
-        ]),
+        Object.entries(rules).map(([key, rule]) => {
+          const errorMessage = rule.safeParse(values[key]).error?.issues?.[0]
+            ?.message;
+
+          if (errorMessage && !isFocus) {
+            isFocus = true;
+            refs.current[key]?.focus();
+          }
+
+          return [key, errorMessage];
+        }),
       );
       setErrors(updatedErrors);
       return;

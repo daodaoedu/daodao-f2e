@@ -60,6 +60,7 @@ function TagsField({ name, helperText, control, value = [] }) {
         ))}
         {value.length < 8 && (
           <input
+            ref={(element) => control.setRef?.(name, element)}
             value={input}
             onCompositionStart={() => {
               isComposing.current = true;

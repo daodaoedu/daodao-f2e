@@ -13,6 +13,7 @@ export default function TextField({
   return (
     <>
       <MuiTextField
+        inputRef={(element) => control.setRef?.(name, element)}
         fullWidth
         id={id}
         name={name}
