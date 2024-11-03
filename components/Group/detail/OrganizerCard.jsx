@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import styled from '@emotion/styled';
 import Skeleton from '@mui/material/Skeleton';
 import Avatar from '@mui/material/Avatar';
@@ -5,7 +6,7 @@ import { EDUCATION_STEP, ROLE } from '@/constants/member';
 import locationSvg from '@/public/assets/icons/location.svg';
 import Chip from '@/shared/components/Chip';
 import { timeDuration } from '@/utils/date';
-import Link from 'next/link';
+import TextWithLinks from '@/shared/components/TextWithLinks';
 
 const StyledHeader = styled.div`
   display: flex;
@@ -45,7 +46,7 @@ const StyledTag = styled.div`
 `;
 
 const StyledTags = styled.div`
-  margin-top: 10px;
+  margin-top: 20px;
   margin-bottom: 20px;
   display: flex;
   flex-wrap: wrap;
@@ -125,7 +126,12 @@ function OrganizerCard({ data = {}, isLoading }) {
             <Skeleton width="40%" animation="wave" />
           </div>
         ) : (
-          data?.description
+          <div>
+            <TextWithLinks>{data?.motivation}</TextWithLinks>
+            <TextWithLinks>{data?.content}</TextWithLinks>
+            <TextWithLinks>{data?.outcome}</TextWithLinks>
+            <TextWithLinks>{data?.notice}</TextWithLinks>
+          </div>
         )}
       </StyledText>
       <StyledTags>

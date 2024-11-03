@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import Skeleton from '@mui/material/Skeleton';
 import bachelorCapSvg from '@/public/assets/icons/bachelorCap.svg';
+import activityCategorySvg from '@/public/assets/icons/activityCategory.svg';
 import categorySvg from '@/public/assets/icons/category.svg';
 import clockSvg from '@/public/assets/icons/clock.svg';
 import locationSvg from '@/public/assets/icons/location.svg';
@@ -56,11 +57,17 @@ const labels = [
     text: '學習領域',
   },
   {
+    key: 'activityCategory',
+    icon: activityCategorySvg.src,
+    text: '揪團類型',
+  },
+  {
     key: 'area',
     icon: locationSvg.src,
     text: '地點',
   },
   { key: 'time', icon: clockSvg.src, text: '時間' },
+  { key: 'participator', icon: personSvg.src, text: '徵求人數' },
   { key: 'partnerStyle', icon: personSvg.src, text: '想找的夥伴' },
   {
     key: 'partnerEducationStep',
