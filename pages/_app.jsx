@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
@@ -9,6 +9,7 @@ import Head from 'next/head';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import SnackbarProvider from '@/contexts/Snackbar';
+import CompleteInfoReminderDialog from '@/shared/components/CompleteInfoReminderDialog';
 import GlobalStyle from '@/shared/styles/Global';
 import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
@@ -117,7 +118,15 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   const theme = useMemo(() => themeFactory(mode), [mode]);
   const isEnv = useMemo(() => process.env.NODE_ENV === 'development', []);
   const router = useRouter();
+  const user = useSelector((state) => state.user);
+  const [isOpen, setIsOpen] = useState(false);
+  const isFirst = useRef(true);
   const Layout = Component?.getLayout || DefaultLayout;
+
+  const handleClose = () => {
+    setIsOpen(false);
+    isFirst.current = false;
+  };
 
   useEffect(() => {
     dispatch(checkLoginValidity());
@@ -144,6 +153,13 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (user?._id && !user?.isComplete && isFirst.current) {
+      setIsOpen(true);
+      isFirst.current = false;
+    }
+  }, [user, isFirst]);
+
   return (
     <ThemeProvider theme={theme}>
       {/* mui normalize css */}
@@ -165,6 +181,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
         }}
       />
       {isEnv && <Mode />}
+      <CompleteInfoReminderDialog isOpen={isOpen} onClose={handleClose} />
       <Layout>
         <Component {...pageProps} />
       </Layout>
