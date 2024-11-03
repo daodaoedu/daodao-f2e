@@ -2,12 +2,25 @@ import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 
-export default function CheckboxGroup({ options, name, value, control }) {
+export default function CheckboxGroup({
+  options,
+  name,
+  value,
+  control,
+  handleValues,
+}) {
   const handleCheckboxChange = (_value) => {
-    const updatedValue = value.includes(_value)
+    const hasValue = value.includes(_value);
+    const updatedValue = hasValue
       ? value.filter((v) => v !== _value)
       : [...value, _value];
-    control.onChange({ target: { name, value: updatedValue } });
+    const newValue = handleValues(
+      hasValue ? 'remove' : 'add',
+      _value,
+      updatedValue,
+    );
+
+    control.onChange({ target: { name, value: newValue } });
   };
 
   return (

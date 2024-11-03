@@ -25,7 +25,7 @@ const DEFAULT_VALUES = {
   originPhotoURL: '',
   photoURL: '',
   photoAlt: '',
-  activityCategory: [],
+  activityCategory: ['Other'],
   category: [],
   participator: '',
   area: [],
