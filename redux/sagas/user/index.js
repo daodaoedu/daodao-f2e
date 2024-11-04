@@ -1,8 +1,8 @@
 import { put, all, take, takeEvery, select, call } from 'redux-saga/effects';
 import * as localforage from 'localforage';
-import firebase from '../../../utils/firebase';
 import { BASE_URL } from '@/constants/common';
 import req from '@/utils/request';
+import firebase from '../../../utils/firebase';
 
 /**
  *
@@ -91,6 +91,8 @@ function* updateUserProfile(action) {
     });
 
     yield put({ type: 'UPDATE_USER_PROFILE_SUCCESS', payload: result.data });
+    yield new Promise((res) => setTimeout(res, 300));
+    yield put({ type: 'UPDATE_USER_PROFILE_API_STATE_RESET' });
   } catch (error) {
     yield put({ type: 'UPDATE_USER_PROFILE_FAILURE' });
   }

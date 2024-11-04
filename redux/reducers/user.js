@@ -3,20 +3,24 @@
 const initialState = {};
 
 const reducer = (state = initialState, action) => {
-  const checkIsComplete = (data = {}) =>
-    [
+  const checkIsComplete = (data = {}) => {
+    const hasAnySocialCode = Object.values(data.contactList || '{}').some(
+      (socialCode) => Boolean(socialCode),
+    );
+    if (!hasAnySocialCode) return false;
+
+    return [
       'name',
       'birthDay',
       'gender',
       'roleList',
-      'instagram',
-      'discord',
-      'line',
-      'facebook',
       'wantToDoList',
       'tagList',
       'selfIntroduction',
-    ].every((key) => !data[key]);
+    ].every((key) =>
+      Boolean(Array.isArray(data[key]) ? data[key].length : data[key]),
+    );
+  };
 
   switch (action.type) {
     case 'CHECK_LOGIN_VALIDITY': {
@@ -69,7 +73,7 @@ const reducer = (state = initialState, action) => {
     case 'UPDATE_USER_PROFILE': {
       return {
         ...state,
-        apiState: 'PENDING',
+        apiState: 'Pending',
       };
     }
     case 'UPDATE_USER_PROFILE_SUCCESS': {
@@ -77,6 +81,12 @@ const reducer = (state = initialState, action) => {
         ...state,
         ...action.payload,
         apiState: 'Resolve',
+      };
+    }
+    case 'UPDATE_USER_PROFILE_API_STATE_RESET': {
+      return {
+        ...state,
+        apiState: 'None',
       };
     }
     case 'UPDATE_USER_PROFILE_FAILURE': {
