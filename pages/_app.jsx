@@ -14,7 +14,7 @@ import GlobalStyle from '@/shared/styles/Global';
 import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
 import { checkLoginValidity, fetchUserById } from '@/redux/actions/user';
-import { getRedirectionStorage } from '@/utils/storage';
+import { getRedirectionStorage, getReminderStorage } from '@/utils/storage';
 import DefaultLayout from '@/layout/DefaultLayout';
 import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
@@ -120,12 +120,11 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   const router = useRouter();
   const user = useSelector((state) => state.user);
   const [isOpen, setIsOpen] = useState(false);
-  const isFirst = useRef(true);
   const Layout = Component?.getLayout || DefaultLayout;
 
   const handleClose = () => {
     setIsOpen(false);
-    isFirst.current = false;
+    getReminderStorage().set(true);
   };
 
   useEffect(() => {
@@ -154,11 +153,10 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   }, []);
 
   useEffect(() => {
-    if (user?._id && !user?.isComplete && isFirst.current) {
+    if (user?._id && !user?.isComplete && getReminderStorage().get()) {
       setIsOpen(true);
-      isFirst.current = false;
     }
-  }, [user, isFirst]);
+  }, [user]);
 
   return (
     <ThemeProvider theme={theme}>
