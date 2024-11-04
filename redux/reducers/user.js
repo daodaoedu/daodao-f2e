@@ -16,7 +16,7 @@ const reducer = (state = initialState, action) => {
       'wantToDoList',
       'tagList',
       'selfIntroduction',
-    ].some((key) => !data[key]);
+    ].every((key) => !data[key]);
 
   switch (action.type) {
     case 'CHECK_LOGIN_VALIDITY': {
