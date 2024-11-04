@@ -8,6 +8,7 @@ import { StyledStatus } from '../GroupList/GroupCard.styled';
 import StyledPaper from '../Paper.styled';
 import TeamInfoCard from './TeamInfoCard';
 import OrganizerCard from './OrganizerCard';
+import NoticeCard from './NoticeCard';
 import More from './More';
 import {
   StyledContainer,
@@ -76,8 +77,11 @@ function GroupDetail({ id, source, isLoading }) {
         <StyledPaper sx={{ mb: '10px' }}>
           <TeamInfoCard data={source} isLoading={isLoading} />
         </StyledPaper>
-        <StyledPaper>
+        <StyledPaper sx={{ mb: '10px' }}>
           <OrganizerCard data={source} isLoading={isLoading} />
+        </StyledPaper>
+        <StyledPaper>
+          <NoticeCard data={source} isLoading={isLoading} />
         </StyledPaper>
         <Box
           sx={{
