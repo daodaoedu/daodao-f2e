@@ -25,6 +25,9 @@ const StyledSearchField = styled.div`
       margin: 10px 0;
       flex-direction: column;
       align-items: stretch;
+      > * {
+        max-width: none;
+      }
     }
   }
 `;

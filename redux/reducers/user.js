@@ -22,7 +22,7 @@ const reducer = (state = initialState, action) => {
     case 'CHECK_LOGIN_VALIDITY': {
       return {
         ...state,
-        isComplete: !checkIsComplete(state),
+        isComplete: checkIsComplete(state),
       };
     }
     case 'CHECK_USER_ACCOUNT_SUCCESS': {
@@ -55,10 +55,9 @@ const reducer = (state = initialState, action) => {
       };
     }
     case 'FETCH_USER_BY_ID_SUCCESS': {
-      console.log(action.payload);
       return {
         ...action.payload,
-        isComplete: !checkIsComplete(action.payload),
+        isComplete: checkIsComplete(action.payload),
       };
     }
 

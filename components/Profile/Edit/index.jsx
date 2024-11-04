@@ -390,7 +390,9 @@ function EditPage() {
                 </Grid>
               ))}
             </Grid>
-            <ErrorMessage errText={errors.socialCode} />
+            <StyledGroup>
+              <ErrorMessage errText={errors.socialCode} />
+            </StyledGroup>
           </StyledSection>
 
           <StyledSection

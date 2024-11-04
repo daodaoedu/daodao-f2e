@@ -7,7 +7,6 @@ const ErrorMessage = ({ errText }) => {
       <Box
         sx={{
           mt: '8px',
-          width: 'max-content',
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
@@ -16,6 +15,9 @@ const ErrorMessage = ({ errText }) => {
           borderRadius: '4px',
           padding: '4px 8px',
           fontSize: '14px',
+          svg: {
+            flexShrink: 0,
+          },
         }}
       >
         <IoMdCloseCircleOutline size={20} />
