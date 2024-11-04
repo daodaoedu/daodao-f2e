@@ -6,6 +6,8 @@ import categorySvg from '@/public/assets/icons/category.svg';
 import clockSvg from '@/public/assets/icons/clock.svg';
 import locationSvg from '@/public/assets/icons/location.svg';
 import personSvg from '@/public/assets/icons/person.svg';
+import outcomeSvg from '@/public/assets/icons/outcome_icon.svg';
+import motivationSvg from '@/public/assets/icons/motivation_icon.svg';
 
 const StyledItem = styled.div`
   padding: 7px 0;
@@ -73,6 +75,16 @@ const labels = [
     key: 'partnerEducationStep',
     icon: bachelorCapSvg.src,
     text: '適合的教育階段',
+  },
+  {
+    key: 'motivation',
+    icon: motivationSvg.src,
+    text: '揪團動機',
+  },
+  {
+    key: 'outcome',
+    icon: outcomeSvg.src,
+    text: '期待成果',
   },
 ];
 
