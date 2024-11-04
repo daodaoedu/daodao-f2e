@@ -46,7 +46,7 @@ export const ROLE = [
     image: 'https://i.imgur.com/cXZXfBL.png',
   },
   {
-    label: '其他',
+    label: '不設限',
     key: 'other',
     value: 'other',
     image: 'https://i.imgur.com/Z7oGEnb.png',
@@ -100,7 +100,7 @@ export const EDUCATION_STEP = [
     value: 'doctor',
   },
   {
-    label: '其他',
+    label: '不設限',
     key: 'other',
     value: 'other',
   },

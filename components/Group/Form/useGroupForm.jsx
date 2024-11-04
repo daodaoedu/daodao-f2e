@@ -12,7 +12,7 @@ import { activityCategoryList } from '@/constants/activityCategory';
 const _eduOptions = EDUCATION_STEP.filter(
   (edu) => !['master', 'doctor', 'other'].includes(edu.value),
 );
-_eduOptions.push({ key: 'noLimit', value: 'noLimit', label: '不限' });
+_eduOptions.push({ key: 'noLimit', value: 'noLimit', label: '不設限' });
 
 export const categoriesOptions = CATEGORIES;
 export const areasOptions = AREAS.filter((area) => area.label !== '線上');
