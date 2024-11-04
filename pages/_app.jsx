@@ -153,7 +153,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   }, []);
 
   useEffect(() => {
-    if (user?._id && !user?.isComplete && getReminderStorage().get()) {
+    if (user?._id && !user?.isComplete && !getReminderStorage().get()) {
       setIsOpen(true);
     }
   }, [user]);
