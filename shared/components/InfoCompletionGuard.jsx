@@ -19,7 +19,7 @@ export default function InfoCompletionGuard({ children }) {
     <>
       {cloneElement(
         children,
-        user?.isComplete ? {} : { onClick: handleClickProxy },
+        user?._id && !user?.isComplete ? { onClick: handleClickProxy } : {},
       )}
       <CompleteInfoReminderDialog isOpen={isOpen} onClose={handleClose} />
     </>
