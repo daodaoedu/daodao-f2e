@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
+import { GiPerspectiveDiceSixFacesThree } from 'react-icons/gi';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import DeleteSvg from '@/public/assets/icons/delete.svg';
 import Image from '@/shared/components/Image';
 import { StyledUpload } from '../Form.styled';
 import UploadSvg from './UploadSvg';
 
 export default function Upload({ name, value, control }) {
-  const [preview, setPreview] = useState(value || '');
+  const [preview, setPreview] = useState(value);
   const [error, setError] = useState('');
   const inputRef = useRef();
+  const isLoading = useRef(false);
 
   const changeHandler = (file) => {
     const event = {
@@ -66,7 +67,7 @@ export default function Upload({ name, value, control }) {
     if (files?.[0]) handleFile(files[0]);
   };
 
-  const handleClear = () => {
+  const handleRandom = () => {
     setPreview('');
     setError('');
     inputRef.current.value = '';
@@ -74,7 +75,17 @@ export default function Upload({ name, value, control }) {
   };
 
   useEffect(() => {
-    if (typeof value === 'string') setPreview(value);
+    if (typeof value === 'string' && value) {
+      setPreview(value);
+    } else if (!isLoading.current && !value) {
+      isLoading.current = true;
+      fetch('https://picsum.photos/436/244')
+        .then((res) => res.blob())
+        .then(handleFile)
+        .then(() => {
+          isLoading.current = false;
+        });
+    }
   }, [value]);
 
   return (
@@ -92,10 +103,10 @@ export default function Upload({ name, value, control }) {
               marginTop: 0.25,
             },
           }}
-          onClick={handleClear}
+          onClick={handleRandom}
         >
-          <img src={DeleteSvg.src} alt="delete icon" />
-          <span>清除</span>
+          <GiPerspectiveDiceSixFacesThree size={20} />
+          <span>隨機圖片</span>
         </Button>
       )}
       <StyledUpload
