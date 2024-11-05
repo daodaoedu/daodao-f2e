@@ -15,9 +15,6 @@ const ErrorMessage = ({ errText }) => {
           borderRadius: '4px',
           padding: '4px 8px',
           fontSize: '14px',
-          svg: {
-            flexShrink: 0,
-          },
         }}
       >
         <IoMdCloseCircleOutline size={20} />

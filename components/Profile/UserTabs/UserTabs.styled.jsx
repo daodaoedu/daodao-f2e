@@ -25,9 +25,10 @@ export const StyledPanelText = styled(Box)`
   p {
     color: #293a3d;
     font-weight: 500;
-    white-space: nowrap;
+    white-space: normal;
     min-width: 50px;
   }
+  .content p,
   span {
     color: #536166;
     font-size: 14px;
@@ -35,14 +36,14 @@ export const StyledPanelText = styled(Box)`
     font-weight: 400;
     line-height: 140%;
     margin-left: 12px;
-    display: grid;
-    place-items: center;
+    display: flex;
+    text-align: left;
   }
   @media (max-width: 767px) {
     flex-direction: column;
     span {
       margin-left: 0px;
-      place-items: start;
+      text-align: left;
     }
   }
 `;

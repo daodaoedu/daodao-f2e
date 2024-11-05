@@ -1,11 +1,11 @@
+import Link from 'next/link';
 import styled from '@emotion/styled';
 import Skeleton from '@mui/material/Skeleton';
 import Avatar from '@mui/material/Avatar';
 import { EDUCATION_STEP, ROLE } from '@/constants/member';
 import locationSvg from '@/public/assets/icons/location.svg';
 import Chip from '@/shared/components/Chip';
-import { timeDuration } from '@/utils/date';
-import Link from 'next/link';
+import TextWithLinks from '@/shared/components/TextWithLinks';
 
 const StyledHeader = styled.div`
   display: flex;
@@ -16,6 +16,17 @@ const StyledHeader = styled.div`
     flex-direction: column;
     align-items: start;
   }
+`;
+
+export const StyledTitle = styled.h2`
+  font-weight: bold;
+  font-size: 22px;
+  line-height: 140%;
+  color: #536166;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
 `;
 
 const StyledFlex = styled.div`
@@ -45,7 +56,7 @@ const StyledTag = styled.div`
 `;
 
 const StyledTags = styled.div`
-  margin-top: 10px;
+  margin-top: 20px;
   margin-bottom: 20px;
   display: flex;
   flex-wrap: wrap;
@@ -117,6 +128,9 @@ function OrganizerCard({ data = {}, isLoading }) {
           {isLoading ? <Skeleton width={48} animation="wave" /> : location}
         </StyledText>
       </StyledHeader>
+      <StyledTitle style={{ alignSelf: 'flex-start', gap: 1 }}>
+        揪團內容與進行方式
+      </StyledTitle>
       <StyledText style={{ margin: '10px 0' }}>
         {isLoading ? (
           <div style={{ width: '100%' }}>
@@ -125,20 +139,13 @@ function OrganizerCard({ data = {}, isLoading }) {
             <Skeleton width="40%" animation="wave" />
           </div>
         ) : (
-          data?.description
+          <TextWithLinks>{data?.content}</TextWithLinks>
         )}
       </StyledText>
       <StyledTags>
         {Array.isArray(data?.tagList) &&
           data.tagList.map((tag) => <Chip key={tag} value={tag} isActive />)}
       </StyledTags>
-      <StyledTime>
-        {isLoading ? (
-          <Skeleton width={36} animation="wave" />
-        ) : (
-          timeDuration(data?.updatedDate)
-        )}
-      </StyledTime>
     </>
   );
 }

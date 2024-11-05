@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { TextField, Box, Typography, Icon } from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import { forwardRef } from 'react';
 
 const Tag = ({ label, onCancel }) => {
   return (
@@ -54,7 +55,7 @@ const StyledTagsWrapper = styled(Box)`
   }
 `;
 
-function InputTags({ value = [], change }) {
+function InputTags({ value = [], change }, ref) {
   const keyDownHandle = (e) => {
     if (e.keyCode === 13) {
       if (!value.includes(e.target.value)) {
@@ -82,7 +83,8 @@ function InputTags({ value = [], change }) {
               ),
           )}
         <TextField
-          fullWidth="true"
+          inputRef={ref}
+          fullWidth
           placeholder={value.length ? '' : '搜尋或新增標籤'}
           onKeyDown={keyDownHandle}
           variant="standard"
@@ -98,4 +100,4 @@ function InputTags({ value = [], change }) {
   );
 }
 
-export default InputTags;
+export default forwardRef(InputTags);

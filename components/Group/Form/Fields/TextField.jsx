@@ -13,6 +13,7 @@ export default function TextField({
   return (
     <>
       <MuiTextField
+        inputRef={(element) => control.setRef?.(name, element)}
         fullWidth
         id={id}
         name={name}
@@ -21,7 +22,7 @@ export default function TextField({
         placeholder={placeholder}
         value={value}
         multiline={multiline}
-        rows={multiline && 10}
+        rows={multiline && 6}
         helperText={helperText}
         {...control}
       />

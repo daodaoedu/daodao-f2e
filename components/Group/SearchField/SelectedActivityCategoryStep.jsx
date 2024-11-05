@@ -1,11 +1,9 @@
 import Select from '@/shared/components/Select';
-import { AREAS } from '@/constants/areas';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
+import { activityCategoryList } from '@/constants/activityCategory';
 
-const AREAS_WITH_TBD = AREAS.concat({ name: '待討論', label: '待討論' });
-
-export default function SelectedAreas() {
-  const QUERY_KEY = 'area';
+export default function SelectedActivityCategoryStep() {
+  const QUERY_KEY = 'activityCategory';
   const [getSearchParams, pushState] = useSearchParamsManager();
 
   const handleChange = ({ target: { value } }) => {
@@ -17,9 +15,16 @@ export default function SelectedAreas() {
       multiple
       value={getSearchParams(QUERY_KEY)}
       onChange={handleChange}
-      items={AREAS_WITH_TBD}
+      items={activityCategoryList}
+      itemLabel="label"
+      itemValue="value"
       renderValue={(selected) =>
-        selected.length === 0 ? '地點' : selected.join('、')
+        selected.length === 0
+          ? '揪團類型'
+          : activityCategoryList
+              .filter((item) => selected.includes(item.value))
+              .map((item) => item.label)
+              .join('、')
       }
       sx={{
         '@media (max-width: 767px)': {

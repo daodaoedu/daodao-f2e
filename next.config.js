@@ -6,6 +6,7 @@ const withPWA = require('next-pwa')({
 
 module.exports = withPWA({
   reactStrictMode: false,
+  staticPageGenerationTimeout: 600,
   images: {
     domains: ['imgur.com', 'images.unsplash.com', 'lh3.googleusercontent.com'],
   },

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
@@ -9,11 +9,12 @@ import Head from 'next/head';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import SnackbarProvider from '@/contexts/Snackbar';
+import CompleteInfoReminderDialog from '@/shared/components/CompleteInfoReminderDialog';
 import GlobalStyle from '@/shared/styles/Global';
 import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
 import { checkLoginValidity, fetchUserById } from '@/redux/actions/user';
-import { getRedirectionStorage } from '@/utils/storage';
+import { getRedirectionStorage, getReminderStorage } from '@/utils/storage';
 import DefaultLayout from '@/layout/DefaultLayout';
 import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
@@ -117,7 +118,14 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   const theme = useMemo(() => themeFactory(mode), [mode]);
   const isEnv = useMemo(() => process.env.NODE_ENV === 'development', []);
   const router = useRouter();
+  const user = useSelector((state) => state.user);
+  const [isOpen, setIsOpen] = useState(false);
   const Layout = Component?.getLayout || DefaultLayout;
+
+  const handleClose = () => {
+    setIsOpen(false);
+    getReminderStorage().set(true);
+  };
 
   useEffect(() => {
     dispatch(checkLoginValidity());
@@ -144,6 +152,12 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (user?._id && !user?.isComplete && !getReminderStorage().get()) {
+      setIsOpen(true);
+    }
+  }, [user]);
+
   return (
     <ThemeProvider theme={theme}>
       {/* mui normalize css */}
@@ -165,6 +179,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
         }}
       />
       {isEnv && <Mode />}
+      <CompleteInfoReminderDialog isOpen={isOpen} onClose={handleClose} />
       <Layout>
         <Component {...pageProps} />
       </Layout>

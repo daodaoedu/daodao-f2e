@@ -9,7 +9,7 @@ export default function AreaCheckbox({
   itemLabel,
   itemValue,
   name,
-  value,
+  value = [],
   control,
 }) {
   const [isPhysicalArea, setIsPhysicalArea] = useState(false);
@@ -57,12 +57,14 @@ export default function AreaCheckbox({
         <FormControlLabel
           control={<Checkbox onClick={toggleIsPhysicalArea} />}
           label="實體活動"
+          disabled={value.includes('待討論')}
           checked={isPhysicalArea}
         />
         <Select
           name={name}
           options={options}
           placeholder="地點"
+          disabled={value.includes('待討論')}
           value={physicalAreaValue}
           itemLabel={itemLabel}
           itemValue={itemValue}
@@ -73,6 +75,7 @@ export default function AreaCheckbox({
         <FormControlLabel
           control={<Checkbox onClick={() => handleCheckboxChange('線上')} />}
           label="線上"
+          disabled={value.includes('待討論')}
           checked={value.includes('線上')}
         />
       </div>
@@ -81,6 +84,7 @@ export default function AreaCheckbox({
           control={<Checkbox onClick={() => handleCheckboxChange('待討論')} />}
           label="待討論"
           checked={value.includes('待討論')}
+          disabled={value.some((item) => item !== '待討論')}
         />
       </div>
     </>

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import FormControl from '@mui/material/FormControl';
 import MuiSelect from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -14,7 +13,7 @@ export default function Select({
   sx,
   disabled,
   control,
-  value,
+  value = [],
   error,
 }) {
   const getValue = (any, key) => (typeof any === 'object' ? any[key] : any);
@@ -27,6 +26,7 @@ export default function Select({
   return (
     <FormControl size="small" fullWidth>
       <MuiSelect
+        inputRef={(element) => control.setRef?.(name, element)}
         displayEmpty
         multiple={multiple}
         fullWidth={fullWidth}

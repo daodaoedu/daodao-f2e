@@ -2,6 +2,7 @@ import { put, takeLatest, select } from 'redux-saga/effects';
 import { AREAS } from '@/constants/areas';
 import { CATEGORIES } from '@/constants/category';
 import { EDUCATION_STEP } from '@/constants/member';
+import { activityCategoryList } from '@/constants/activityCategory';
 import req from '@/utils/request';
 
 import {
@@ -18,26 +19,31 @@ function* getGroupItems() {
   } = yield select();
 
   const urlSearchParams = new URLSearchParams({ pageSize });
-  const searchParamsOptions = {
-    area: AREAS,
-    category: CATEGORIES,
-    partnerEducationStep: EDUCATION_STEP,
+  const searchParamsConfigs = {
+    area: [AREAS, 'label'],
+    category: [CATEGORIES, 'label'],
+    activityCategory: [activityCategoryList, 'value'],
+    partnerEducationStep: [EDUCATION_STEP, 'label'],
     isGrouping: true,
     search: true,
   };
 
-  Object.keys(searchParamsOptions).forEach((key) => {
+  Object.keys(searchParamsConfigs).forEach((key) => {
     const searchParam = query[key];
-    const option = searchParamsOptions[key];
+    const config = searchParamsConfigs[key];
 
-    if (!searchParam || !option) return;
+    if (!searchParam || !config) return;
 
-    if (Array.isArray(option)) {
+    if (Array.isArray(config)) {
+      const [options, optionKey] = config;
+
       urlSearchParams.append(
         key,
         searchParam
           .split(',')
-          .filter((item) => option.some((_option) => _option.label === item))
+          .filter((item) =>
+            options.some((_option) => _option[optionKey] === item),
+          )
           .join(','),
       );
     } else {

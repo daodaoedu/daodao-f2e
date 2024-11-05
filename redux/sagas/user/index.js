@@ -1,8 +1,16 @@
 import { put, all, take, takeEvery, select, call } from 'redux-saga/effects';
 import * as localforage from 'localforage';
-import firebase from '../../../utils/firebase';
 import { BASE_URL } from '@/constants/common';
 import req from '@/utils/request';
+import firebase from '../../../utils/firebase';
+
+/**
+ *
+ * @param {boolean} isnormal 是否一般 token ?
+ * @returns time
+ */
+const handleTokenExpiry = (isnormal = false) =>
+  isnormal ? Date.now() + 60 * 60 * 1000 : Date.now() + 60 * 60 * 6000;
 
 function* checkUserStatus() {
   try {
@@ -48,6 +56,28 @@ function* fetchAllUsers() {
   }
 }
 
+function* createUserProfile(action) {
+  const { user } = action.payload;
+  try {
+    const URL = `${BASE_URL}/user/${user.id}`;
+    // if success => status: 201, token, user
+    const result = yield req(URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        ...user,
+      }),
+    });
+
+    const { token, user: resultUser } = result;
+    yield put({
+      type: 'UPDATE_USER_PROFILE_SUCCESS',
+      payload: { token, ...resultUser },
+    });
+  } catch (error) {
+    yield put({ type: 'UPDATE_USER_PROFILE_FAILURE' });
+  }
+}
+
 function* updateUserProfile(action) {
   const { user } = action.payload;
   try {
@@ -63,6 +93,9 @@ function* updateUserProfile(action) {
     yield put({ type: 'UPDATE_USER_PROFILE_SUCCESS', payload: result.data });
   } catch (error) {
     yield put({ type: 'UPDATE_USER_PROFILE_FAILURE' });
+  } finally {
+    yield new Promise((res) => setTimeout(res, 300));
+    yield put({ type: 'UPDATE_USER_PROFILE_API_STATE_RESET' });
   }
 }
 
@@ -76,12 +109,14 @@ function* fetchUserById(action) {
         Authorization: `Bearer ${token}`,
       },
     });
+
     yield put({
       type: 'FETCH_USER_BY_ID_SUCCESS',
       payload: result.data && {
+        _id: id,
         ...result.data[0],
         token,
-        lastLogin: Date.now(),
+        tokenExpiry: handleTokenExpiry(true),
       },
     });
   } catch (error) {
@@ -94,6 +129,7 @@ function* userSaga() {
   yield takeEvery('CHECK_USER_ACCOUNT', checkUserStatus);
   yield takeEvery('USER_LOGIN', userLogin);
   yield takeEvery('FETCH_ALL_USERS', fetchAllUsers);
+  yield takeEvery('CREATE_USER_PROFILE', createUserProfile);
   yield takeEvery('UPDATE_USER_PROFILE', updateUserProfile);
   yield takeEvery('FETCH_USER_BY_ID', fetchUserById);
 }

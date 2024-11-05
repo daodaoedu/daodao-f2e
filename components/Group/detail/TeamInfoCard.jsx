@@ -1,10 +1,13 @@
 import styled from '@emotion/styled';
 import Skeleton from '@mui/material/Skeleton';
 import bachelorCapSvg from '@/public/assets/icons/bachelorCap.svg';
+import activityCategorySvg from '@/public/assets/icons/activityCategory.svg';
 import categorySvg from '@/public/assets/icons/category.svg';
 import clockSvg from '@/public/assets/icons/clock.svg';
 import locationSvg from '@/public/assets/icons/location.svg';
 import personSvg from '@/public/assets/icons/person.svg';
+import outcomeSvg from '@/public/assets/icons/outcome_icon.svg';
+import motivationSvg from '@/public/assets/icons/motivation_icon.svg';
 
 const StyledItem = styled.div`
   padding: 7px 0;
@@ -56,16 +59,32 @@ const labels = [
     text: '學習領域',
   },
   {
+    key: 'activityCategory',
+    icon: activityCategorySvg.src,
+    text: '揪團類型',
+  },
+  {
     key: 'area',
     icon: locationSvg.src,
     text: '地點',
   },
   { key: 'time', icon: clockSvg.src, text: '時間' },
+  { key: 'participator', icon: personSvg.src, text: '徵求人數' },
   { key: 'partnerStyle', icon: personSvg.src, text: '想找的夥伴' },
   {
     key: 'partnerEducationStep',
     icon: bachelorCapSvg.src,
     text: '適合的教育階段',
+  },
+  {
+    key: 'motivation',
+    icon: motivationSvg.src,
+    text: '揪團動機',
+  },
+  {
+    key: 'outcome',
+    icon: outcomeSvg.src,
+    text: '期待成果',
   },
 ];
 

@@ -16,4 +16,6 @@ export default function createStorage(key, storage = localStorage) {
   return { set, get, remove };
 }
 
-export const getRedirectionStorage = () => createStorage('_redirection');
+export const getRedirectionStorage = () => createStorage('_r');
+export const getTrustWebsitesStorage = () => createStorage('_trustWeb');
+export const getReminderStorage = () => createStorage('_reminder');

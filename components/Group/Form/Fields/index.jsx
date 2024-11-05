@@ -5,6 +5,8 @@ import TagsField from './TagsField';
 import TextField from './TextField';
 import Upload from './Upload';
 import Wrapper from './Wrapper';
+import CheckboxGroup from './CheckboxGroup';
+import DateRadio from './DateRadio';
 
 const withWrapper = (Component) => (props) => {
   const id = useId();
@@ -25,6 +27,8 @@ const withWrapper = (Component) => (props) => {
 
 const Fields = {
   AreaCheckbox: withWrapper(AreaCheckbox),
+  CheckboxGroup: withWrapper(CheckboxGroup),
+  DateRadio: withWrapper(DateRadio),
   Select: withWrapper(Select),
   TagsField: withWrapper(TagsField),
   TextField: withWrapper(TextField),

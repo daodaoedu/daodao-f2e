@@ -12,6 +12,7 @@ import {
 } from '@/constants/member';
 import { mapToTable } from '@/utils/helper';
 import SEOConfig from '@/shared/components/SEO';
+import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
 import MyGroup from './MyGroup';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
@@ -200,21 +201,23 @@ const Profile = ({
       )}
       {email !== sendEmail ? (
         <>
-          <Button
-            sx={{
-              width: '160px',
-              borderRadius: '20px',
-              ml: '4px',
-              mt: '56px',
-              color: '#ffff',
-              bgcolor: '#16B9B3',
-            }}
-            disabled={!enableContactBtn}
-            variant="contained"
-            onClick={handleContactPartner}
-          >
-            聯繫夥伴
-          </Button>
+          <InfoCompletionGuard>
+            <Button
+              sx={{
+                width: '160px',
+                borderRadius: '20px',
+                ml: '4px',
+                mt: '56px',
+                color: '#ffff',
+                bgcolor: '#16B9B3',
+              }}
+              disabled={!enableContactBtn}
+              variant="contained"
+              onClick={handleContactPartner}
+            >
+              聯繫夥伴
+            </Button>
+          </InfoCompletionGuard>
           {!enableContactBtn && (
             <Typography
               onClick={() => router.push('/login')}
