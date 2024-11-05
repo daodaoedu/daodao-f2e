@@ -91,10 +91,11 @@ function* updateUserProfile(action) {
     });
 
     yield put({ type: 'UPDATE_USER_PROFILE_SUCCESS', payload: result.data });
-    yield new Promise((res) => setTimeout(res, 300));
-    yield put({ type: 'UPDATE_USER_PROFILE_API_STATE_RESET' });
   } catch (error) {
     yield put({ type: 'UPDATE_USER_PROFILE_FAILURE' });
+  } finally {
+    yield new Promise((res) => setTimeout(res, 300));
+    yield put({ type: 'UPDATE_USER_PROFILE_API_STATE_RESET' });
   }
 }
 
