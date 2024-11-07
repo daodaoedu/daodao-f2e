@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import window from 'global/window';
 
 const LearningResource = () => {
   return (
