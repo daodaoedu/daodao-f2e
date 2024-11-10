@@ -7,7 +7,7 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['react', 'import', 'react-hooks'],
-  extends: ['plugin:prettier/recommended', 'airbnb'],
+  extends: ['airbnb'],
   env: {
     browser: true,
     es2021: true,

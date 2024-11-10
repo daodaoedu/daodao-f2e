@@ -1,8 +1,6 @@
 // Reference: https://blog.wick.technology/pwa-install-prompt/
 import { useState, useEffect, useMemo } from 'react';
 
-import window from 'global/window';
-
 const isIOS = () => {
   if (window.navigator.standalone) {
     // User has already installed the app:

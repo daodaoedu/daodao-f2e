@@ -1,8 +1,7 @@
-import { put, all, take, takeEvery, select, call } from 'redux-saga/effects';
+import { put, takeEvery, call } from 'redux-saga/effects';
 import * as localforage from 'localforage';
 import { BASE_URL } from '@/constants/common';
 import req from '@/utils/request';
-import firebase from '../../../utils/firebase';
 
 /**
  *
@@ -26,23 +25,6 @@ function* checkUserStatus() {
     });
   } catch (error) {
     yield put({ type: 'CHECK_USER_ACCOUNT_FAILURE', error });
-  }
-}
-
-function* userLogin() {
-  try {
-    const userData = yield firebase.signInWithGoogle();
-    const { displayName, email, photoURL } = userData.user;
-    yield put({
-      type: 'USER_LOGIN_SUCCESS',
-      payload: {
-        name: displayName,
-        email,
-        photoURL,
-      },
-    });
-  } catch (error) {
-    yield put({ type: 'USER_LOGIN_FAILURE', error });
   }
 }
 
@@ -127,7 +109,6 @@ function* fetchUserById(action) {
 
 function* userSaga() {
   yield takeEvery('CHECK_USER_ACCOUNT', checkUserStatus);
-  yield takeEvery('USER_LOGIN', userLogin);
   yield takeEvery('FETCH_ALL_USERS', fetchAllUsers);
   yield takeEvery('CREATE_USER_PROFILE', createUserProfile);
   yield takeEvery('UPDATE_USER_PROFILE', updateUserProfile);

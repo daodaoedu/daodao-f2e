@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
@@ -19,19 +19,10 @@ import DefaultLayout from '@/layout/DefaultLayout';
 import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
+import "@/shared/styles/global.css";
 
 const store = storeFactory();
 const persistor = persistStore(store);
-
-const firebaseConfig = {
-  apiKey: 'AIzaSyBJK-FKcGHwDy1TMcoJcBdEqbTYpEquUi4',
-  authDomain: 'daodaoedu-4ae8f.firebaseapp.com',
-  projectId: 'daodaoedu-4ae8f',
-  storageBucket: 'daodaoedu-4ae8f.appspot.com',
-  messagingSenderId: '653049466612',
-  appId: '1:653049466612:web:ba41fadb677499a5ae18a1',
-  measurementId: 'G-1EV81PDZF5',
-};
 
 const App = ({ Component, pageProps }) => {
   const router = useRouter();
