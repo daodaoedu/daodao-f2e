@@ -19,6 +19,7 @@ import DefaultLayout from '@/layout/DefaultLayout';
 import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
+import "@/shared/styles/global.css";
 
 const store = storeFactory();
 const persistor = persistStore(store);
