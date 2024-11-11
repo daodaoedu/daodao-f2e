@@ -25,7 +25,7 @@ const initialState = {
   birthDay: dayjs(),
   gender: '',
   roleList: [],
-  isSubscribeEmail: false,
+  isSubscribeEmail: true,
 };
 
 const userReducer = (state, payload) => {

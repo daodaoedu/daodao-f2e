@@ -13,6 +13,7 @@ function TagsField({ name, helperText, control, value = [] }) {
   const handleChange = (e) => {
     const _value = e.target.value;
     if (_value.length > 8) setError('標籤最多 8 個字');
+    else if (value.includes(_value)) setError('請勿重複輸入');
     else setError('');
     setInput(_value);
   };

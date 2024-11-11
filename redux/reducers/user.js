@@ -81,6 +81,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         ...action.payload,
         apiState: 'Resolve',
+        isComplete: checkIsComplete(action.payload),
       };
     }
     case 'UPDATE_USER_PROFILE_API_STATE_RESET': {
