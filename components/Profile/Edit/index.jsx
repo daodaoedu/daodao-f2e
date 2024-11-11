@@ -28,7 +28,6 @@ import {
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import InputTags from '../InputTags';
 import ErrorMessage from './ErrorMessage';
 
 import TheAvator from './TheAvator';
@@ -49,6 +48,7 @@ import {
   StyledButtonGroup,
   StyledButton,
 } from './Edit.styled';
+import Fields from '@/components/Group/Form/Fields';
 
 function EditPage() {
   const mobileScreen = useMediaQuery('(max-width: 767px)');
@@ -453,11 +453,12 @@ function EditPage() {
             </StyledGroup>
             <StyledGroup>
               <Typography sx={{ fontWeight: 500 }}>標籤</Typography>
-              <InputTags
-                ref={(element) => setRef('tagList', element)}
+              <Fields.TagsField
+                name="tagList"
                 value={userState.tagList}
-                change={(value) => {
-                  onChangeHandler({ key: 'tagList', value, isMultiple: true });
+                control={{
+                  setRef: (name, element) => setRef(name, element),
+                  onChange: ({ target }) => onChangeHandler({ key: target.name, value: target.value })
                 }}
               />
               <Typography
