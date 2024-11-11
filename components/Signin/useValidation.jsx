@@ -49,12 +49,12 @@ const useProfileValidation = () => {
 
     const validateResult = !validateAll
       ? schema
-        .partial({ [key]: true })
-        .safeParse({ [key]: key === 'birthDay' ? val?.$d : val })
+          .partial({ [key]: true })
+          .safeParse({ [key]: key === 'birthDay' ? val?.$d : val })
       : schema.safeParse({
-        ...fields,
-        birthDay: fields.birthDay?.$d,
-      });
+          ...fields,
+          birthDay: fields.birthDay?.$d,
+        });
 
     if (!validateResult.success) {
       validateResult.error.issues.forEach((issue) => {

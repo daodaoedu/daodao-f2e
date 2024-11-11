@@ -146,9 +146,9 @@ function EditPage() {
             sx={{
               border:
                 errors.name ||
-                  errors.birthDay ||
-                  errors.gender ||
-                  errors.roleList
+                errors.birthDay ||
+                errors.gender ||
+                errors.roleList
                   ? '1px solid red'
                   : '',
             }}
@@ -383,8 +383,8 @@ function EditPage() {
                       errors[key]
                         ? errors[key]
                         : errors.socialCode
-                          ? '請填寫您的 ID'
-                          : ''
+                        ? '請填寫您的 ID'
+                        : ''
                     }
                   />
                 </Grid>
