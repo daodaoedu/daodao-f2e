@@ -28,7 +28,7 @@ import {
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import InputTags from '../InputTags';
+import Fields from '@/components/Group/Form/Fields';
 import ErrorMessage from './ErrorMessage';
 
 import TheAvator from './TheAvator';
@@ -356,12 +356,12 @@ function EditPage() {
           >
             <StyledGroup mt="0">
               <Typography sx={{ fontWeight: 700, fontSize: '18px' }}>
-                聯絡方式
+                聯絡方式 *
               </Typography>
               <Typography
                 sx={{ color: '#92989A', fontWeight: 400, fontSize: '14px' }}
               >
-                聯絡資訊會呈現在你的公開頁面上，讓夥伴能聯繫你
+                聯絡資訊會呈現在你的公開頁面上，讓夥伴能聯繫你，至少填寫一個社交媒體帳號
               </Typography>
             </StyledGroup>
             <Grid container columnSpacing={1}>
@@ -408,7 +408,7 @@ function EditPage() {
                 sx={{ fontWeight: 500 }}
                 ref={(element) => setRef('wantToDoList', element)}
               >
-                想和夥伴一起
+                想和夥伴一起 *
               </Typography>
               <StyledSelectWrapper>
                 {WANT_TO_DO_WITH_PARTNER.map(({ label, value }) => (
@@ -453,11 +453,13 @@ function EditPage() {
             </StyledGroup>
             <StyledGroup>
               <Typography sx={{ fontWeight: 500 }}>標籤</Typography>
-              <InputTags
-                ref={(element) => setRef('tagList', element)}
+              <Fields.TagsField
+                name="tagList"
                 value={userState.tagList}
-                change={(value) => {
-                  onChangeHandler({ key: 'tagList', value, isMultiple: true });
+                control={{
+                  setRef: (name, element) => setRef(name, element),
+                  onChange: ({ target }) =>
+                    onChangeHandler({ key: target.name, value: target.value }),
                 }}
               />
               <Typography
@@ -475,7 +477,7 @@ function EditPage() {
 
             <StyledGroup>
               <Typography sx={{ fontWeight: 500, mb: '6px' }}>
-                個人簡介
+                個人簡介 *
               </Typography>
               <TextareaAutosize
                 ref={(element) => setRef('selfIntroduction', element)}
