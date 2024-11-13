@@ -23,6 +23,7 @@ module.exports = {
     },
   },
   rules: {
+    "import/no-extraneous-dependencies": ["error", { devDependencies: ["./*.js"] }],
     'react/no-unescaped-entities': 'off',
     '@next/next/no-page-custom-font': 'off',
     'react/prop-types': [0],
