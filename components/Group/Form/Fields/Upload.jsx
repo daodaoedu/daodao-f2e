@@ -77,12 +77,14 @@ export default function Upload({ name, value, control }) {
   useEffect(() => {
     if (typeof value === 'string' && value) {
       setPreview(value);
+      isLoading.current = false;
     } else if (!isLoading.current && !value) {
       isLoading.current = true;
       fetch('https://picsum.photos/436/244')
         .then((res) => res.blob())
-        .then(handleFile)
-        .then(() => {
+        .then((blob) => {
+          if (!isLoading.current) return;
+          handleFile(blob);
           isLoading.current = false;
         });
     }

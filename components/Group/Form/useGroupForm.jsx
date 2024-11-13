@@ -18,7 +18,7 @@ export const categoriesOptions = CATEGORIES;
 export const areasOptions = AREAS.filter((area) => area.label !== '線上');
 export const eduOptions = _eduOptions;
 
-const DEFAULT_VALUES = {
+const INITIAL_VALUES = {
   userId: '',
   title: '',
   file: null,
@@ -79,12 +79,13 @@ const rules = {
   isGrouping: z.boolean(),
 };
 
-export default function useGroupForm() {
+export default function useGroupForm(defaultValue) {
   const [isDirty, setIsDirty] = useState(false);
   const me = useSelector((state) => state.user);
   const notLogin = !me?._id;
   const [values, setValues] = useState({
-    ...DEFAULT_VALUES,
+    ...INITIAL_VALUES,
+    ...defaultValue,
     userId: me?._id,
   });
   const [errors, setErrors] = useState({});
@@ -194,7 +195,6 @@ export default function useGroupForm() {
     errors,
     values,
     isDirty,
-    setValues,
     handleSubmit,
   };
 }

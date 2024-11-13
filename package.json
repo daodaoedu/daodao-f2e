@@ -17,6 +17,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@jitsi/react-sdk": "^1.0.1",
+    "@mdxeditor/editor": "^3.17.4",
     "@mui/base": "^5.0.0-alpha.77",
     "@mui/core": "^5.0.0-alpha.54",
     "@mui/icons-material": "^5.6.2",

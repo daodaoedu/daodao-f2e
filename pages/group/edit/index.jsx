@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
-import { Box, CircularProgress } from '@mui/material';
+import { Box } from '@mui/material';
 import { useSnackbar } from '@/contexts/Snackbar';
 import useFetch from '@/hooks/useFetch';
 import useMutation from '@/hooks/useMutation';
@@ -39,8 +39,6 @@ function EditGroupPage() {
     [router?.asPath],
   );
 
-  const goToDetail = () => router.replace(`/group/detail?id=${id}`);
-
   const { mutate, isLoading } = useMutation(`/activity/${id}`, {
     method: 'PUT',
     onSuccess: () => {
@@ -51,33 +49,22 @@ function EditGroupPage() {
 
   useEffect(() => {
     if (!me?._id) router.push('/login');
-    if (isFetching) return;
-    if (source?.userId !== me._id) goToDetail();
+    if (isFetching || !source?.userId) return;
+    if (source.userId !== me._id) router.replace(`/group/detail?id=${id}`);
   }, [me, source, isFetching, id]);
 
   return (
     <>
       <SEOConfig data={SEOData} />
-      {isFetching && (
-        <Box
-          sx={{
-            position: 'fixed',
-            bgcolor: '#3333',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1,
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      )}
-      <GroupForm
-        defaultValues={source}
-        isLoading={isLoading}
-        onSubmit={mutate}
-      />
+      <Box minHeight="60vh">
+        {source?.userId && (
+          <GroupForm
+            defaultValues={source}
+            isLoading={isLoading}
+            onSubmit={mutate}
+          />
+        )}
+      </Box>
     </>
   );
 }
