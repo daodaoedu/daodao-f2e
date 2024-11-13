@@ -14,8 +14,9 @@ import GlobalStyle from '@/shared/styles/Global';
 import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
 import { checkLoginValidity, fetchUserById } from '@/redux/actions/user';
-import { getRedirectionStorage, getReminderStorage } from '@/utils/storage';
+import { getReminderStorage } from '@/utils/storage';
 import DefaultLayout from '@/layout/DefaultLayout';
+import { startLoginListener } from '@/utils/openLoginWindow';
 import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
@@ -123,24 +124,10 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   }, []);
 
   useEffect(() => {
-    const receiveMessage = (e) => {
-      if (e.origin !== window.location.origin) return;
-      if (e.data.isLogin) {
-        const { token, id } = e.data;
-        const redirectionStorage = getRedirectionStorage();
-        const redirection = redirectionStorage.get();
-        dispatch(fetchUserById(id, token));
-        if (redirection) {
-          redirectionStorage.remove();
-          router.push(redirection);
-        }
-      }
-    };
-    window.addEventListener('message', receiveMessage, false);
-
-    return () => {
-      window.removeEventListener('message', receiveMessage, false);
-    };
+    const stopLoginListener = startLoginListener((id, token) => {
+      dispatch(fetchUserById(id, token));
+    });
+    return () => stopLoginListener();
   }, []);
 
   useEffect(() => {
