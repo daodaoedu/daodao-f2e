@@ -33,6 +33,7 @@ const Image = ({
         objectPosition: 'center',
         borderRadius,
         background,
+        height,
       }}
       placeholder={<Loading height={height} />}
       onError={() => setIsError(true)}

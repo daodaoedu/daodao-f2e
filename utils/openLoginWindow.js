@@ -56,7 +56,7 @@ export default function openLoginWindow(
   redirection = "",
   target = "/login/popup"
 ) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const width = 520;
     const height = 760;
     const left = (window.screen.width - width) / 2;
