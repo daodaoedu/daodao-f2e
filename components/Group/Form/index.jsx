@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
@@ -45,19 +45,13 @@ export default function GroupForm({
     values,
     errors,
     isDirty,
-    setValues,
     handleSubmit,
-  } = useGroupForm();
+  } = useGroupForm({
+    ...defaultValues,
+    originPhotoURL: defaultValues?.photoURL,
+  });
   const [isChecked, setIsChecked] = useState(false);
   const isCreateMode = mode === 'create';
-
-  useEffect(() => {
-    if (!defaultValues) return;
-    setValues({
-      ...defaultValues,
-      originPhotoURL: defaultValues.photoURL,
-    });
-  }, [defaultValues]);
 
   const desc = (
     <StyledDesc>

@@ -1,9 +1,8 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchUserById, createUser } from '@/redux/actions/user';
+import { createUser } from '@/redux/actions/user';
 import { GENDER, ROLE } from '@/constants/member';
-import { getRedirectionStorage } from '@/utils/storage';
 import dayjs from 'dayjs';
 import { Box, Typography, Button, Skeleton, TextField } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
@@ -22,6 +21,7 @@ import {
 } from '@/components/Signin/Signin.styled';
 import ErrorMessage from '@/components/Signin/ErrorMessage';
 import useProfileValidation from '@/components/Signin/useValidation';
+import { sendLoginConfirmation } from '@/utils/openLoginWindow';
 
 function SignInPage() {
   const router = useRouter();
@@ -35,14 +35,7 @@ function SignInPage() {
 
   // Oath login
   useEffect(() => {
-    if (id && token) {
-      getRedirectionStorage().set(`/signin?id=${id}`);
-      window.opener?.postMessage(
-        { isLogin: true, id, token },
-        window.location.origin,
-      );
-      window.close();
-    }
+    sendLoginConfirmation(id, token, `/signin?id=${id}`);
   }, [id, token]);
 
   useEffect(() => {
