@@ -22,24 +22,8 @@ const Cooperate = () => {
       >
         合作夥伴
       </Typography>
-      <Box
-        sx={{
-          margin: '20px',
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-        }}
-      >
-        <Box
-          sx={{
-            backgroundColor: 'black',
-            padding: '5px',
-            width: '210px',
-            borderRadius: '5px',
-            margin: '10px',
-          }}
-        >
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="bg-black">
           <a
             href="https://grants.g0v.tw/power/?from=daoedu.tw"
             target="_blank"
@@ -47,20 +31,12 @@ const Cooperate = () => {
           >
             <img
               src="https://grants.g0v.tw/power/images/g0v-logo.svg"
-              width={200}
-              height={32}
+              className="h-8 w-52"
               alt="g0v零時政府"
             />
           </a>
-        </Box>
-        <Box
-          sx={{
-            padding: '5px',
-            height: '120px',
-            borderRadius: '5px',
-            margin: '10px',
-          }}
-        >
+        </div>
+        <div>
           <a
             href="https://sch001.g0v.tw/?from=daoedu.tw"
             target="_blank"
@@ -68,19 +44,12 @@ const Cooperate = () => {
           >
             <img
               src="https://sch001.g0v.tw/assets/img/main_new.jpg"
-              height={120}
+              className="h-32"
               alt="g0v零時小學校"
             />
           </a>
-        </Box>
-        <Box
-          sx={{
-            padding: '5px',
-            height: '130px',
-            borderRadius: '5px',
-            margin: '10px',
-          }}
-        >
+        </div>
+        <div>
           <a
             href="https://zashare.org/?from=daoedu.tw"
             target="_blank"
@@ -88,19 +57,12 @@ const Cooperate = () => {
           >
             <img
               src="https://i.imgur.com/QpMVwqe.png"
-              height={120}
+              className="h-32"
               alt="雜學校"
             />
           </a>
-        </Box>
-        <Box
-          sx={{
-            padding: '5px',
-            height: '130px',
-            borderRadius: '5px',
-            margin: '10px',
-          }}
-        >
+        </div>
+        <div>
           <a
             href="https://www.parenting.com.tw/?from=daoedu.tw"
             target="_blank"
@@ -108,19 +70,12 @@ const Cooperate = () => {
           >
             <img
               src="https://www.parenting.com.tw/files/images/fb_share.png"
-              height={120}
+              className="h-32"
               alt="親子天下"
             />
           </a>
-        </Box>
-        <Box
-          sx={{
-            padding: '5px',
-            height: '130px',
-            borderRadius: '5px',
-            margin: '10px',
-          }}
-        >
+        </div>
+        <div>
           <a
             href="https://codingbar.ai/?from=daoedu.tw"
             target="_blank"
@@ -128,12 +83,12 @@ const Cooperate = () => {
           >
             <img
               src="https://i.imgur.com/n6GG0vF.png"
-              height={120}
+              className="h-32"
               alt="Coding bar"
             />
           </a>
-        </Box>
-      </Box>
+        </div>
+      </div>
     </SectionWrapper>
   );
 };
