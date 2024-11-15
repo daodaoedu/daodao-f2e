@@ -28,39 +28,39 @@ const Thanks = () => {
         }}
       >
         <LineWrapper variant="p">
-          <p float="left" margin="10px">
+          <p className="flex flex-wrap gap-2">
             <img
               src="https://media.giphy.com/media/I2Gobnade5rqM/giphy.gif"
-              height="80px"
+              className="h-20"
             />
             <img
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png"
-              height="80px"
+              className="h-20"
             />
             <img
               src="https://seeklogo.com/images/N/next-js-logo-8FCFF51DD2-seeklogo.com.png"
-              height="100px"
+              className="h-20"
             />
-            <img src="https://mui.com/static/logo.png" height="80px" />
+            <img src="https://mui.com/static/logo.png" className="h-20" />
             {/* <img
               src="https://redux-saga.js.org/img/Redux-Saga-Logo.png"
               height="100px"
             /> */}
             <img
               src="https://raw.githubusercontent.com/emotion-js/emotion/main/emotion.png"
-              height="80px"
+              className="h-20"
             />
             <img
               src="https://www.cloudflare.com/resources/images/slt3lc6tev37/CHOl0sUhrumCxOXfRotGt/9bf83d4ca877bb8f0f917c8d379a84ce/cloudflare-icon-color_3x.png"
-              height="80px"
+              className="h-20"
             />
             <img
               src="https://repository-images.githubusercontent.com/175043545/92352780-93a7-11ea-805a-0e76ca033a94"
-              height="80px"
+              className="h-20"
             />
             <img
               src="https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png"
-              height="80px"
+              className="h-20"
             />
           </p>
         </LineWrapper>
