@@ -26,7 +26,7 @@ import {
 import '@mdxeditor/editor/style.css';
 import zhTW from './locales/zh-tw';
 import { ImageDialog } from './ImageDialog';
-import CheckLink from './CheckLink';
+import CheckLink from '../CheckLink';
 
 const toolbarContents = () => (
   <DiffSourceToggleWrapper>
