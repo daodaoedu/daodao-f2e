@@ -9,6 +9,7 @@ import Image from '@/shared/components/Image';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import useMutation from '@/hooks/useMutation';
 import { timeDuration } from '@/utils/date';
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 import {
   StyledAreas,
   StyledContainer,
@@ -86,8 +87,8 @@ function GroupCard({
         </StyledImageWrapper>
         <StyledContainer>
           <StyledTitle>{title}</StyledTitle>
-          <StyledText lineClamp="2" style={{ minHeight: '42px' }}>
-            {content}
+          <StyledText lineClamp="2" style={{ height: '42px' }}>
+            <MarkdownEditor readOnly value={content?.split('\n')[0]} suppressLinkDefaultPrevent />
           </StyledText>
           <StyledAreas>
             <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />
