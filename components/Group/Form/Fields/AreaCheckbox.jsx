@@ -71,6 +71,7 @@ export default function AreaCheckbox({
           control={physicalAreaControl}
         />
       </Box>
+      {isPhysicalArea && !physicalAreaValue && <span className="ml-28 text-alert">請選擇地點</span>}
       <div>
         <FormControlLabel
           control={<Checkbox onClick={() => handleCheckboxChange('線上')} />}

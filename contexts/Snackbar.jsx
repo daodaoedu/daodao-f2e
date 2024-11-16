@@ -25,11 +25,11 @@ function CloseButton({ onClick }) {
 export default function SnackbarProvider({ children }) {
   const [queue, setQueue] = useState([]);
 
-  const pushSnackbar = ({ message }) =>
+  const pushSnackbar = ({ message, type, vertical = 'bottom', horizontal = 'left' }) =>
     new Promise((resolve) => {
       setQueue((pre) => [
         ...pre,
-        { id: Math.random(), open: true, message, resolve },
+        { id: Math.random(), open: true, message, resolve, type, vertical, horizontal },
       ]);
     });
 
@@ -49,7 +49,9 @@ export default function SnackbarProvider({ children }) {
       {queue.map((data) => (
         <MuiSnackbar
           key={data.id}
+          anchorOrigin={{ vertical: data.vertical, horizontal: data.horizontal }}
           open={data.open}
+          sx={{ '.MuiSnackbarContent-root': { backgroundColor: data.type === 'error' ? '#f33' : '#333' } }}
           message={data.message}
           onClose={closeSnackbar(data.id)}
           action={<CloseButton onClick={closeSnackbar(data.id)} />}

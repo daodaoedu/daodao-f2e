@@ -99,13 +99,13 @@ export default function GroupForm({
             label="揪團類型"
             name="activityCategory"
             handleValues={(action, value, activityCategory) => {
-              if (action === 'add' && value === 'Other') {
-                return ['Other'];
+              if (action === 'add' && value === '其他') {
+                return ['其他'];
               }
               if (action === 'remove' && !activityCategory.length) {
-                return ['Other'];
+                return ['其他'];
               }
-              return activityCategory.filter((item) => item !== 'Other');
+              return activityCategory.filter((item) => item !== '其他');
             }}
             control={control}
             value={values.activityCategory}
