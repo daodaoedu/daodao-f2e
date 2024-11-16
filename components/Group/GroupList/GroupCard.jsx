@@ -2,6 +2,7 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import Image from '@/shared/components/Image';
 import { timeDuration } from '@/utils/date';
 import emptyCoverWithBackgroundImg from '@/public/assets/empty-cover-with-background.png';
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 import {
   StyledAreas,
   StyledContainer,
@@ -47,8 +48,8 @@ function GroupCard({
             <span>{formatToString(partnerEducationStep, '皆可')}</span>
           </StyledText>
         </StyledInfo>
-        <StyledText lineClamp="2" fontSize="14px" style={{ minHeight: '42px' }}>
-          {content}
+        <StyledText lineClamp="2" fontSize="14px" style={{ height: '48px' }}>
+          <MarkdownEditor value={content?.split('\n')[0]} suppressLinkDefaultPrevent readOnly />
         </StyledText>
         <StyledAreas>
           <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />

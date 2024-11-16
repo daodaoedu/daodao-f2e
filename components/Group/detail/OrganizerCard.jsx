@@ -5,7 +5,7 @@ import Avatar from '@mui/material/Avatar';
 import { EDUCATION_STEP, ROLE } from '@/constants/member';
 import locationSvg from '@/public/assets/icons/location.svg';
 import Chip from '@/shared/components/Chip';
-import TextWithLinks from '@/shared/components/TextWithLinks';
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 
 const StyledHeader = styled.div`
   display: flex;
@@ -139,7 +139,7 @@ function OrganizerCard({ data = {}, isLoading }) {
             <Skeleton width="40%" animation="wave" />
           </div>
         ) : (
-          <TextWithLinks>{data?.content}</TextWithLinks>
+          <MarkdownEditor readOnly value={data?.content} />
         )}
       </StyledText>
       <StyledTags>

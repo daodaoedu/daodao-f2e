@@ -1,15 +1,13 @@
-import { useEffect, useId, useRef } from 'react';
+import { forwardRef, useEffect, useId, useMemo, useRef } from 'react';
 import {
   BlockTypeSelect,
   BoldItalicUnderlineToggles,
-  CodeToggle,
   CreateLink,
   DiffSourceToggleWrapper,
   InsertThematicBreak,
   ListsToggle,
   UndoRedo,
   MDXEditor,
-  codeBlockPlugin,
   diffSourcePlugin,
   headingsPlugin,
   linkDialogPlugin,
@@ -24,6 +22,7 @@ import {
   imagePlugin,
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
+import { cn } from '@/utils/cn';
 import zhTW from './locales/zh-tw';
 import { ImageDialog } from './ImageDialog';
 import CheckLink from '../CheckLink';
@@ -32,53 +31,76 @@ const toolbarContents = () => (
   <DiffSourceToggleWrapper>
     <UndoRedo />
     <Separator />
-    <BoldItalicUnderlineToggles />
-    <Separator />
-    <CodeToggle />
-    <Separator />
-    <ListsToggle />
-    <Separator />
     <BlockTypeSelect />
-    <Separator />
+    <BoldItalicUnderlineToggles />
     <CreateLink />
     <InsertImage />
     <InsertThematicBreak />
+    <ListsToggle />
   </DiffSourceToggleWrapper>
 );
 
-const generatePlugins = (diffMarkdown = '') => [
-  codeBlockPlugin(),
-  diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown }),
-  headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
-  imagePlugin({ ImageDialog }),
-  linkDialogPlugin(),
-  linkPlugin(),
-  listsPlugin(),
-  markdownShortcutPlugin(),
-  quotePlugin(),
-  thematicBreakPlugin()
-];
+const generatePluginsSettings = ({ diffMarkdown = '' }) => ({
+  diffSource: diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown }),
+  headings: headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
+  image: imagePlugin({ ImageDialog }),
+  linkDialog: linkDialogPlugin(),
+  link: linkPlugin(),
+  lists: listsPlugin(),
+  quote: quotePlugin(),
+  markdownShortcut: markdownShortcutPlugin(),
+  thematicBreak: thematicBreakPlugin(),
+  toolbar: toolbarPlugin({ toolbarContents }),
+});
 
-const generatePluginWithToolbar = (diffMarkdown = '') => [
-  ...generatePlugins(diffMarkdown),
-  toolbarPlugin({ toolbarContents })
-];
-
-export default function MarkdownEditor({ readOnly = false, value = '123123', onChange }) {
+function InternalMarkdownEditor(
+  {
+    readOnly = false,
+    hasHeadings,
+    value = '',
+    placeholder,
+    rootClassName,
+    className,
+    editorClassName,
+    onChange,
+    suppressLinkDefaultPrevent = false,
+  },
+  ref
+) {
   const id = useId();
   const checkLinkRef = useRef(null);
+  const markdown = useRef(value);
+  const pluginsSettings = useMemo(
+    () =>
+      Object.entries(generatePluginsSettings({ diffMarkdown: markdown.current }))
+        .filter(([key]) => {
+          if (readOnly) {
+            return key !== 'toolbar';
+          }
+          if (key === 'headings') {
+            return hasHeadings;
+          }
+          return true;
+        })
+        .map(([_, plugin]) => plugin),
+    [markdown.current]
+  );
 
   useEffect(() => {
     const editor = document.getElementById(id).querySelector('.prose');
 
     const handleClick = (e) => {
+      if (suppressLinkDefaultPrevent) {
+        return;
+      }
+
       let { target } = e;
-      e.preventDefault();
       while (target.tagName !== 'A') {
         if (editor === target) break;
         target = target.parentElement;
       }
       if (target.tagName === 'A') {
+        e.preventDefault();
         checkLinkRef.current?.check(target.href);
       }
     };
@@ -88,24 +110,35 @@ export default function MarkdownEditor({ readOnly = false, value = '123123', onC
   }, []);
 
   return (
-    <div id={id}>
+    <div id={id} className={rootClassName}>
       <MDXEditor
         key={readOnly ? 'readOnly' : 'withToolbar'}
+        ref={ref}
         readOnly={readOnly}
-        markdown={value}
+        markdown={markdown.current}
         onChange={onChange}
+        placeholder={placeholder}
         suppressHtmlProcessing
-        contentEditableClassName="prose"
-        plugins={readOnly ? generatePlugins(value) : generatePluginWithToolbar(value)}
-        translation={(keyString, defaultValue, interpolations) => {
+        className={className}
+        contentEditableClassName={cn(
+          'prose',
+          readOnly && '!p-0',
+          editorClassName
+        )}
+        plugins={pluginsSettings}
+        translation={(keyString, defaultText, interpolations) => {
           const keys = keyString.split('.');
           const text = keys.reduce((acc, key) => acc?.[key], zhTW);
           return typeof text === 'string'
             ? text.replace(/{{([^{}]+)}}/g, (_, p1) => interpolations?.[p1] || '')
-            : defaultValue;
+            : defaultText;
         }}
       />
       <CheckLink ref={checkLinkRef} />
     </div>
   );
 }
+
+const MarkdownEditor = forwardRef(InternalMarkdownEditor);
+
+export default MarkdownEditor;

@@ -51,7 +51,7 @@ function InternalCheckLink(props, ref) {
           const data = Array.isArray(trustWebsites) ? trustWebsites : [];
           const newLink = new URL(href);
 
-          if (data.includes(newLink.hostname)) {
+          if (data.includes(newLink.hostname) || newLink.hostname === window.location.hostname) {
             window.open(newLink.href, '_blank');
             return;
           }
