@@ -7,14 +7,14 @@ export default function CheckboxGroup({
   name,
   value = [],
   control,
-  handleValues,
+  transformCheckboxValues,
 }) {
   const handleCheckboxChange = (_value) => {
     const hasValue = value.includes(_value);
     const updatedValue = hasValue
       ? value.filter((v) => v !== _value)
       : [...value, _value];
-    const newValue = handleValues(
+    const newValue = transformCheckboxValues(
       hasValue ? 'remove' : 'add',
       _value,
       updatedValue,

@@ -17,29 +17,46 @@ export default function AreaCheckbox({
   const getPhysicalArea = (data) =>
     options.find((option) => data.includes(option.name));
 
-  const handleChange = (val) =>
-    control.onChange({ target: { name, value: val } });
+  const handleChange = (val, action, _value) => {
+    if (action === 'add' && _value === '待討論') {
+      control.onChange({ target: { name, value: ['待討論'] } });
+      setIsPhysicalArea(false);
+      return;
+    }
+    if (action === 'remove' && !val.length) {
+      control.onChange({ target: { name, value: ['待討論'] } });
+      setIsPhysicalArea(false);
+      return;
+    }
+    control.onChange({ target: { name, value: val.filter((v) => v !== '待討論') } });
+  };
 
   const physicalAreaValue = getPhysicalArea(value)?.name || '';
 
   const toggleIsPhysicalArea = () => {
     const updatedValue = value.filter((v) => !getPhysicalArea([v]));
-    handleChange(updatedValue);
-    setIsPhysicalArea((pre) => !pre);
+    if (isPhysicalArea && updatedValue.includes('待討論')) {
+      handleChange(updatedValue, 'add', '待討論');
+    } else {
+      handleChange(updatedValue);
+      setIsPhysicalArea((pre) => !pre);
+    }
   };
 
   const handleCheckboxChange = (_value) => {
-    const updatedValue = value.includes(_value)
+    const hasValue = value.includes(_value);
+    const action = hasValue ? 'remove' : 'add';
+    const updatedValue = hasValue
       ? value.filter((v) => v !== _value)
       : [...value, _value];
-    handleChange(updatedValue);
+    handleChange(updatedValue, action, _value);
   };
 
   const handlePhysicalAreaChange = ({ target }) => {
     const updatedValue = value
       .filter((v) => !getPhysicalArea([v]))
       .concat(target.value);
-    handleChange(updatedValue);
+    handleChange(updatedValue, 'add', target.value);
   };
 
   const physicalAreaControl = {
@@ -57,14 +74,12 @@ export default function AreaCheckbox({
         <FormControlLabel
           control={<Checkbox onClick={toggleIsPhysicalArea} />}
           label="實體活動"
-          disabled={value.includes('待討論')}
           checked={isPhysicalArea}
         />
         <Select
           name={name}
           options={options}
           placeholder="地點"
-          disabled={value.includes('待討論')}
           value={physicalAreaValue}
           itemLabel={itemLabel}
           itemValue={itemValue}
@@ -76,7 +91,6 @@ export default function AreaCheckbox({
         <FormControlLabel
           control={<Checkbox onClick={() => handleCheckboxChange('線上')} />}
           label="線上"
-          disabled={value.includes('待討論')}
           checked={value.includes('線上')}
         />
       </div>
@@ -85,7 +99,6 @@ export default function AreaCheckbox({
           control={<Checkbox onClick={() => handleCheckboxChange('待討論')} />}
           label="待討論"
           checked={value.includes('待討論')}
-          disabled={value.some((item) => item !== '待討論')}
         />
       </div>
     </>

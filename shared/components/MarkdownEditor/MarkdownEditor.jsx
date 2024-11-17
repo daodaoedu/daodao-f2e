@@ -64,12 +64,14 @@ function InternalMarkdownEditor(
     editorClassName,
     onChange,
     suppressLinkDefaultPrevent = false,
+    disabledProse = false,
   },
   ref
 ) {
   const id = useId();
   const checkLinkRef = useRef(null);
   const markdown = useRef(value);
+  const editorSelectors = 'markdown-editor';
   const pluginsSettings = useMemo(
     () =>
       Object.entries(generatePluginsSettings({ diffMarkdown: markdown.current }))
@@ -87,10 +89,15 @@ function InternalMarkdownEditor(
   );
 
   useEffect(() => {
-    const editor = document.getElementById(id).querySelector('.prose');
+    const editor = document.getElementById(id).querySelector(`.${editorSelectors}`);
 
     const handleClick = (e) => {
       if (suppressLinkDefaultPrevent) {
+        return;
+      }
+
+      if (!readOnly) {
+        e.preventDefault();
         return;
       }
 
@@ -121,7 +128,8 @@ function InternalMarkdownEditor(
         suppressHtmlProcessing
         className={className}
         contentEditableClassName={cn(
-          'prose',
+          editorSelectors,
+          disabledProse ? 'disabled-prose' : 'prose',
           readOnly && '!p-0',
           editorClassName
         )}
