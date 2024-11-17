@@ -98,7 +98,7 @@ export default function GroupForm({
           <Fields.CheckboxGroup
             label="揪團類型"
             name="activityCategory"
-            handleValues={(action, value, activityCategory) => {
+            transformCheckboxValues={(action, value, activityCategory) => {
               if (action === 'add' && value === '其他') {
                 return ['其他'];
               }

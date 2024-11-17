@@ -26,10 +26,10 @@ const INITIAL_VALUES = {
   originPhotoURL: '',
   photoURL: '',
   photoAlt: '',
-  activityCategory: ['Other'],
+  activityCategory: ['其他'],
   category: [],
   participator: '',
-  area: [],
+  area: ['待討論'],
   time: '',
   partnerStyle: '',
   partnerEducationStep: [],
@@ -57,7 +57,7 @@ const rules = {
     .min(1, '請選擇學習領域'),
   participator: z
     .string()
-    .regex(/^(100|[1-9]?\d)$/, '請輸入整數，需大於 0，不可超過 100'),
+    .regex(/^(100|[1-9]\d|[1-9])$/, '請輸入整數，需大於 0，不可超過 100'),
   area: z
     .array(z.enum(AREAS.concat({ label: '待討論' }).map(({ label }) => label)))
     .min(1, '請選擇地點'),
@@ -92,7 +92,7 @@ export default function useGroupForm(defaultValue) {
     ...Object.fromEntries(
       Object.entries(rules).map(([key, rule]) => [
         key,
-        rule.safeParse(defaultValue[key])?.data || INITIAL_VALUES[key],
+        rule.safeParse(defaultValue[key])?.data ?? INITIAL_VALUES[key],
       ])
     ),
     userId: me?._id,
@@ -189,7 +189,7 @@ export default function useGroupForm(defaultValue) {
       setErrors(updatedErrors);
       if (!isFocus) {
         pushSnackbar({
-          message: Object.values(updatedErrors)[0],
+          message: Object.values(updatedErrors).filter(Boolean)[0],
           vertical: 'top',
           horizontal: 'center',
           type: 'error',

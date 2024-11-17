@@ -41,7 +41,8 @@ export default function Select({
         }}
         value={value}
         disabled={disabled}
-        {...control}
+        onChange={control.onChange}
+        onBlur={control.onBlur}
       >
         {placeholder && (
           <MenuItem disabled value="" sx={{ fontSize: 14 }}>

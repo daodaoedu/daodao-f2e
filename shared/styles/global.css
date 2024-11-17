@@ -6,4 +6,10 @@
   .prose li[role=checkbox] {
     @apply indent-1 relative before:translate-y-1 after:absolute after:top-1/2 after:-translate-y-2/3 after:rotate-45;
   }
+  .disabled-prose li {
+    @apply my-0;
+  }
+  .disabled-prose a {
+    @apply text-basic-black;
+  }
 }
