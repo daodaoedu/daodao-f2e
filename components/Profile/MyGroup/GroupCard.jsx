@@ -88,7 +88,12 @@ function GroupCard({
         <StyledContainer>
           <StyledTitle>{title}</StyledTitle>
           <StyledText lineClamp="2" style={{ height: '42px' }}>
-            <MarkdownEditor readOnly value={content?.split('\n')[0]} suppressLinkDefaultPrevent />
+            <MarkdownEditor
+              readOnly
+              value={content?.split('\n')[0]}
+              disabledProse
+              suppressLinkDefaultPrevent
+            />
           </StyledText>
           <StyledAreas>
             <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />

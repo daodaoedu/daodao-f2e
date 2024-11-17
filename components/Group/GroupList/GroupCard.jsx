@@ -48,8 +48,13 @@ function GroupCard({
             <span>{formatToString(partnerEducationStep, '皆可')}</span>
           </StyledText>
         </StyledInfo>
-        <StyledText lineClamp="2" fontSize="14px" style={{ height: '48px' }}>
-          <MarkdownEditor value={content?.split('\n')[0]} suppressLinkDefaultPrevent readOnly />
+        <StyledText lineClamp="2" fontSize="14px" style={{ height: '42px' }}>
+          <MarkdownEditor
+            value={content?.split('\n')[0]}
+            disabledProse
+            suppressLinkDefaultPrevent
+            readOnly
+          />
         </StyledText>
         <StyledAreas>
           <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />
