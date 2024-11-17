@@ -33,7 +33,8 @@ export default function TextField({
           placeholder={placeholder}
           value={value}
           helperText={helperText}
-          {...control}
+          onChange={control.onChange}
+          onBlur={control.onBlur}
         />
       )}
       <span className="error-message">{error}</span>

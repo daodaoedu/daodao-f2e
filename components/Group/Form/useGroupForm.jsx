@@ -26,10 +26,10 @@ const INITIAL_VALUES = {
   originPhotoURL: '',
   photoURL: '',
   photoAlt: '',
-  activityCategory: ['Other'],
+  activityCategory: ['其他'],
   category: [],
   participator: '',
-  area: [],
+  area: ['待討論'],
   time: '',
   partnerStyle: '',
   partnerEducationStep: [],
@@ -92,7 +92,7 @@ export default function useGroupForm(defaultValue) {
     ...Object.fromEntries(
       Object.entries(rules).map(([key, rule]) => [
         key,
-        rule.safeParse(defaultValue[key])?.data || INITIAL_VALUES[key],
+        rule.safeParse(defaultValue[key])?.data ?? INITIAL_VALUES[key],
       ])
     ),
     userId: me?._id,
@@ -189,7 +189,7 @@ export default function useGroupForm(defaultValue) {
       setErrors(updatedErrors);
       if (!isFocus) {
         pushSnackbar({
-          message: Object.values(updatedErrors)[0],
+          message: Object.values(updatedErrors).filter(Boolean)[0],
           vertical: 'top',
           horizontal: 'center',
           type: 'error',
