@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import Skeleton from '@mui/material/Skeleton';
 import { timeDuration } from '@/utils/date';
-import TextWithLinks from '@/shared/components/TextWithLinks';
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 
 export const StyledTitle = styled.h2`
   font-weight: bold;
@@ -49,9 +49,7 @@ function NoticeCard({ data = {}, isLoading }) {
             <Skeleton width="60%" animation="wave" />
           </div>
         ) : (
-          <div>
-            <TextWithLinks>{data?.notice}</TextWithLinks>
-          </div>
+          <MarkdownEditor readOnly value={data?.notice} />
         )}
       </StyledText>
       <StyledTime>

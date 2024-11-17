@@ -7,8 +7,13 @@ const withPWA = require('next-pwa')({
 module.exports = withPWA({
   reactStrictMode: false,
   staticPageGenerationTimeout: 600,
+  transpilePackages: ['@mdxeditor/editor'],
   images: {
     domains: ['imgur.com', 'images.unsplash.com', 'lh3.googleusercontent.com'],
+  },
+  webpack: (config) => {
+    const experiments = { ...config.experiments, topLevelAwait: true };
+    return Object.assign(config, { experiments });
   },
   env: {
     HOSTNAME: 'https://www.daoedu.tw',

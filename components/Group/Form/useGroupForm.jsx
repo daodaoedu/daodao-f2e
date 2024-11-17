@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ZodType, z } from 'zod';
+import { useSnackbar } from '@/contexts/Snackbar';
 import { CATEGORIES } from '@/constants/category';
 import { AREAS } from '@/constants/areas';
 import { EDUCATION_STEP } from '@/constants/member';
@@ -57,7 +58,9 @@ const rules = {
   participator: z
     .string()
     .regex(/^(100|[1-9]?\d)$/, '請輸入整數，需大於 0，不可超過 100'),
-  area: z.array(z.string()).min(1, '請選擇地點'),
+  area: z
+    .array(z.enum(AREAS.concat({ label: '待討論' }).map(({ label }) => label)))
+    .min(1, '請選擇地點'),
   time: z.string().max(50, '請勿輸入超過 50 字'),
   partnerStyle: z
     .string()
@@ -83,12 +86,19 @@ export default function useGroupForm(defaultValue) {
   const [isDirty, setIsDirty] = useState(false);
   const me = useSelector((state) => state.user);
   const notLogin = !me?._id;
-  const [values, setValues] = useState({
+  const [values, setValues] = useState(() => ({
     ...INITIAL_VALUES,
     ...defaultValue,
+    ...Object.fromEntries(
+      Object.entries(rules).map(([key, rule]) => [
+        key,
+        rule.safeParse(defaultValue[key])?.data || INITIAL_VALUES[key],
+      ])
+    ),
     userId: me?._id,
-  });
+  }));
   const [errors, setErrors] = useState({});
+  const { pushSnackbar } = useSnackbar();
   const refs = useRef({});
   const schema = z.object(rules);
 
@@ -119,15 +129,56 @@ export default function useGroupForm(defaultValue) {
     onBlur,
   };
 
+  const removePhoto = (url) => {
+    const pathArray = url.split('/');
+    fetch(`${BASE_URL}/image/${pathArray[pathArray.length - 1]}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${me.token}`,
+      },
+    });
+  };
+
+  const uploadPhoto = async (oldPhoto, newPhoto) => {
+    if (oldPhoto) {
+      removePhoto(oldPhoto);
+    }
+    if (newPhoto instanceof Blob) {
+      const formData = new FormData();
+
+      formData.append('file', newPhoto);
+
+      try {
+        const response = await fetch(`${BASE_URL}/image`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${me.token}`,
+          },
+          body: formData,
+        });
+        const data = await response.json();
+
+        return typeof data.url === 'string' ? data.url : '';
+      } catch {
+        return '';
+      }
+    } else {
+      return '';
+    }
+  };
+
   const handleSubmit = (onValid) => async () => {
-    if (!schema.safeParse(values).success) {
+    const result = schema.safeParse(values);
+
+    if (!result.success) {
       let isFocus = false;
       const updatedErrors = Object.fromEntries(
         Object.entries(rules).map(([key, rule]) => {
           const errorMessage = rule.safeParse(values[key]).error?.issues?.[0]
             ?.message;
 
-          if (errorMessage && !isFocus) {
+          if (errorMessage && !isFocus && refs.current[key]) {
             isFocus = true;
             refs.current[key]?.focus();
           }
@@ -136,47 +187,25 @@ export default function useGroupForm(defaultValue) {
         }),
       );
       setErrors(updatedErrors);
+      if (!isFocus) {
+        pushSnackbar({
+          message: Object.values(updatedErrors)[0],
+          vertical: 'top',
+          horizontal: 'center',
+          type: 'error',
+        });
+      }
       return;
     }
 
     if (values.originPhotoURL === values.photoURL) {
-      onValid(values);
+      onValid(result.data);
       return;
     }
 
-    if (values.originPhotoURL) {
-      const pathArray = values.originPhotoURL.split('/');
-      fetch(`${BASE_URL}/image/${pathArray[pathArray.length - 1]}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${me.token}`,
-        },
-      });
-    }
+    const photoURL = await uploadPhoto(values.originPhotoURL, values.photoURL);
 
-    let photoURL = '';
-
-    if (values.photoURL instanceof Blob) {
-      const formData = new FormData();
-
-      formData.append('file', values.photoURL);
-
-      try {
-        photoURL = await fetch(`${BASE_URL}/image`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${me.token}`,
-          },
-          body: formData,
-        })
-          .then((response) => response.json())
-          .then((data) => data.url);
-      } catch {
-        photoURL = '';
-      }
-    }
-    onValid({ ...values, photoURL });
+    onValid({ ...result.data, photoURL });
   };
 
   useEffect(() => {

@@ -1,4 +1,5 @@
 const plugin = require("tailwindcss/plugin");
+const typography = require('@tailwindcss/typography');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -27,7 +28,7 @@ module.exports = {
           500: "#293A3D",
           black: "#011416",
         },
-        alert: "#B7DFDE",
+        alert: "#EF5364",
         tips: "#FF9526",
         success: "#86C84A",
       },
@@ -35,6 +36,7 @@ module.exports = {
   },
   plugins: [
     /** Typography */
+    typography,
     plugin(({ addComponents, theme }) => {
       const sizes = ["lg", "md", "sm"];
       const headingFontSizes = [
