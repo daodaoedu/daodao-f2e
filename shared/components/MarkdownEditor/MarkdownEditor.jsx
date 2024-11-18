@@ -42,7 +42,7 @@ const toolbarContents = () => (
 
 const generatePluginsSettings = ({ diffMarkdown = '' }) => ({
   diffSource: diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown }),
-  headings: headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
+  headings: headingsPlugin({ allowedHeadingLevels: [2, 3] }),
   image: imagePlugin({ ImageDialog }),
   linkDialog: linkDialogPlugin(),
   link: linkPlugin(),
