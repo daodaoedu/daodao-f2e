@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useRouter } from 'next/router';
 import { ZodType, z } from 'zod';
 import { useSnackbar } from '@/contexts/Snackbar';
 import { CATEGORIES } from '@/constants/category';
@@ -10,6 +9,7 @@ import { EDUCATION_STEP } from '@/constants/member';
 import { BASE_URL } from '@/constants/common';
 import openLoginWindow from '@/utils/openLoginWindow';
 import { activityCategoryList } from '@/constants/activityCategory';
+import useLeaveConfirm from '@/hooks/useLeaveConfirm';
 
 const _eduOptions = EDUCATION_STEP.filter(
   (edu) => !['master', 'doctor', 'other'].includes(edu.value),
@@ -85,7 +85,6 @@ const rules = {
 
 export default function useGroupForm(defaultValue) {
   const [isDirty, setIsDirty] = useState(false);
-  const router = useRouter();
   const me = useSelector((state) => state.user);
   const notLogin = !me?._id;
   const [values, setValues] = useState(() => ({
@@ -220,37 +219,7 @@ export default function useGroupForm(defaultValue) {
     return () => clearTimeout(timer);
   }, [notLogin]);
 
-  useEffect(() => {
-    const confirmMessage = '尚未儲存，確認要離開此頁面？';
-
-    const handleBeforeUnload = (event) => {
-      if (!isDirty) return '';
-      event.preventDefault();
-      return confirmMessage;
-    };
-
-    const handleRouteChangeStart = () => {
-      if (!isDirty || confirm(confirmMessage)) return;
-      router.events.emit('routeChangeError');
-      throw new Error(confirmMessage);
-    };
-
-    const handleUnhandledRejection = (event) => {
-      if (event?.reason?.message === confirmMessage) {
-        event.preventDefault();
-      }
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
-
-    return () => {
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
-    };
-  }, [isDirty, router.events]);
+  useLeaveConfirm({ shouldConfirm: isDirty });
 
   return {
     notLogin,
