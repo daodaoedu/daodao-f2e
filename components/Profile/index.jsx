@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -13,6 +13,7 @@ import {
 import { mapToTable } from '@/utils/helper';
 import SEOConfig from '@/shared/components/SEO';
 import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
+import ContactButton from '@/shared/components/ContactButton';
 import MyGroup from './MyGroup';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
@@ -50,7 +51,7 @@ const BottonEdit = {
   },
 };
 const WANT_TO_DO_WITH_PARTNER_TABLE = mapToTable(WANT_TO_DO_WITH_PARTNER);
-const ROLELIST = mapToTable(ROLE);
+const ROLE_LIST = mapToTable(ROLE);
 const EDUCATION_STAGE_TABLE = mapToTable(EDUCATION_STAGE);
 
 const Profile = ({
@@ -65,15 +66,13 @@ const Profile = ({
   wantToDoList = [],
   location,
   share,
-  enableContactBtn = false,
-  sendEmail,
-  handleContactPartner,
+  isMe,
   contactList = {},
   updatedDate,
   isLoading,
 }) => {
   const router = useRouter();
-  const role = roleList.length > 0 && ROLELIST[roleList[0]];
+  const role = roleList.length > 0 && ROLE_LIST[roleList[0]];
   const edu = educationStage && EDUCATION_STAGE_TABLE[educationStage];
   const wantTodo = wantToDoList
     .map((item) => WANT_TO_DO_WITH_PARTNER_TABLE[item])
@@ -138,7 +137,7 @@ const Profile = ({
           />
         ) : (
           <UserCard
-            isLoginUser={email === sendEmail}
+            isLoginUser={isMe}
             isLoading={isLoading}
             educationStepLabel={edu}
             role={role}
@@ -199,55 +198,18 @@ const Profile = ({
           ]}
         />
       )}
-      {email !== sendEmail ? (
-        <>
-          <InfoCompletionGuard>
-            <Button
-              sx={{
-                width: '160px',
-                borderRadius: '20px',
-                ml: '4px',
-                mt: '56px',
-                color: '#ffff',
-                bgcolor: '#16B9B3',
-              }}
-              disabled={!enableContactBtn}
-              variant="contained"
-              onClick={handleContactPartner}
-            >
-              聯繫夥伴
-            </Button>
-          </InfoCompletionGuard>
-          {!enableContactBtn && (
-            <Typography
-              onClick={() => router.push('/login')}
-              sx={{ cursor: 'pointer', mt: '5px', fontSize: '12px' }}
-            >
-              <Typography
-                as="span"
-                sx={{
-                  color: '#16B9B3',
-                  fontSize: '12px',
-                  textDecoration: 'underline',
-                }}
-              >
-                註冊
-              </Typography>
-              或
-              <Typography
-                as="span"
-                sx={{
-                  color: '#16B9B3',
-                  fontSize: '12px',
-                  textDecoration: 'underline',
-                }}
-              >
-                登入
-              </Typography>
-              即可聯繫夥伴！
-            </Typography>
-          )}
-        </>
+      {!isMe ? (
+        <InfoCompletionGuard>
+          <ContactButton
+            user={{ email, name, photoURL, roleList }}
+            className="!mt-12"
+            dialogTitle="聯繫夥伴"
+            description="邀請訊息"
+            descriptionPlaceholder="想要和新夥伴交流什麼呢？可以簡單的自我介紹，寫下想認識夥伴的原因。"
+            emailTitle="有新夥伴想認識你！"
+            emailSubject="【島島阿學】點開 Email，認識新夥伴"
+          />
+        </InfoCompletionGuard>
       ) : (
         <Button
           variant="outlined"
