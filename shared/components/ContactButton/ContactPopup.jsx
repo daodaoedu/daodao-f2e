@@ -60,7 +60,7 @@ const desc = (
 function ContactPopup({
   open,
   user,
-  label,
+  title,
   description,
   descriptionPlaceholder,
   isLoading,
@@ -124,7 +124,7 @@ function ContactPopup({
           textAlign: 'center',
         }}
       >
-        {label}
+        {title}
       </DialogTitle>
       <IconButton
         aria-label="close"

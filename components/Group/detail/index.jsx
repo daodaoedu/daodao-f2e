@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import Image from '@/shared/components/Image';
+import ContactButton from '@/shared/components/ContactButton';
 import { StyledStatus } from '../GroupList/GroupCard.styled';
 import StyledPaper from '../Paper.styled';
 import TeamInfoCard from './TeamInfoCard';
@@ -17,7 +18,6 @@ import {
   StyledDesktopEditButton,
   StyledMobileEditButton,
 } from './Detail.styled';
-import ContactButton from './Contact';
 import ShareButtonGroup from './ShareButtonGroup';
 
 function GroupDetail({ id, source, isLoading }) {
@@ -101,9 +101,11 @@ function GroupDetail({ id, source, isLoading }) {
             <ContactButton
               user={source?.user || {}}
               activityTitle={source?.title}
-              label="聯繫主揪"
+              dialogTitle="聯繫主揪"
               description="想跟主揪說的話"
               descriptionPlaceholder="想參加主揪的團體嗎？可以簡單的自我介紹，寫下想加入的原因。"
+              emailTitle="你發起的揪團有人來信！"
+              emailSubject="【島島阿學】點開 Email，揪團有新消息"
             />
           )}
         </Box>
