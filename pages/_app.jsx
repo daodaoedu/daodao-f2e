@@ -14,7 +14,7 @@ import GlobalStyle from '@/shared/styles/Global';
 import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
 import { checkLoginValidity, fetchUserById } from '@/redux/actions/user';
-import { getReminderStorage } from '@/utils/storage';
+import { getRedirectionStorage, getReminderStorage } from '@/utils/storage';
 import DefaultLayout from '@/layout/DefaultLayout';
 import { startLoginListener } from '@/utils/openLoginWindow';
 import { initGA, logPageView } from '../utils/analytics';
@@ -125,10 +125,18 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
 
   useEffect(() => {
     const stopLoginListener = startLoginListener((id, token) => {
+      const redirectionStorage = getRedirectionStorage();
+      const redirectUrl = redirectionStorage.get();
+
       dispatch(fetchUserById(id, token));
+
+      if (redirectUrl) {
+        redirectionStorage.remove();
+        router.replace(redirectUrl);
+      }
     });
     return () => stopLoginListener();
-  }, []);
+  }, [dispatch, router.replace]);
 
   useEffect(() => {
     if (user?._id && !user?.isComplete && !getReminderStorage().get()) {
