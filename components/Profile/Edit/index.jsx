@@ -28,7 +28,7 @@ import {
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import Fields from '@/components/Group/Form/Fields';
+import TagEditor from '@/shared/components/TagEditor';
 import ErrorMessage from './ErrorMessage';
 
 import TheAvator from './TheAvator';
@@ -66,6 +66,7 @@ function EditPage() {
   } = useEditProfile();
 
   const user = useSelector((state) => state.user);
+  const { tags } = useSelector((state) => state.partners);
 
   useEffect(() => {
     if (user._id) {
@@ -452,26 +453,18 @@ function EditPage() {
               />
             </StyledGroup>
             <StyledGroup>
-              <Typography sx={{ fontWeight: 500 }}>標籤</Typography>
-              <Fields.TagsField
+              <Typography sx={{ fontWeight: 500, mb: '6px' }}>標籤</Typography>
+              <TagEditor
                 name="tagList"
                 value={userState.tagList}
+                tagOptions={tags}
+                helperText="可以是學習領域、興趣等等的標籤，例如：音樂創作、程式語言、電繪、社會議題。"
                 control={{
                   setRef: (name, element) => setRef(name, element),
                   onChange: ({ target }) =>
                     onChangeHandler({ key: target.name, value: target.value }),
                 }}
               />
-              <Typography
-                sx={{
-                  color: '#92989A',
-                  fontWeight: 400,
-                  fontSize: '14px',
-                  mt: '2px',
-                }}
-              >
-                可以是學習領域、興趣等等的標籤，例如：音樂創作、程式語言、電繪、社會議題。
-              </Typography>
               <ErrorMessage errText={errors.tagList} />
             </StyledGroup>
 

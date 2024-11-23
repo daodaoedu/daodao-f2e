@@ -66,7 +66,7 @@ export const StyledGroup = styled.div`
   justify-content: center;
   align-items: flex-start;
   margin-top: ${({ mt = '20' }) => `${mt}px`};
-  input {
+  .MuiInputBase-input {
     padding: 17px 16px 12px;
   }
 `;
