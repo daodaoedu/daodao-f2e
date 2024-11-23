@@ -7,13 +7,13 @@ export default function CheckboxGrouping() {
   const [getSearchParams, pushState] = useSearchParamsManager();
 
   const handleClick = ({ target: { checked } }) => {
-    pushState(QUERY_KEY, checked || '');
+    pushState(QUERY_KEY, checked ? '0' : '');
   };
 
   const checkbox = (
     <Checkbox
       size="small"
-      checked={Boolean(getSearchParams(QUERY_KEY).length)}
+      checked={getSearchParams(QUERY_KEY).length}
       onChange={handleClick}
       name={QUERY_KEY}
       sx={{ p: 0.5 }}
@@ -22,7 +22,7 @@ export default function CheckboxGrouping() {
 
   return (
     <FormControlLabel
-      label="揪團中"
+      label="已結束"
       control={checkbox}
       sx={{
         fontWeight: 400,
