@@ -53,7 +53,10 @@ export default function DateRadio({
             <TextField
               {...params}
               size="small"
-              sx={{ '& legend': { display: 'none' } }}
+              sx={{
+                '& legend': { display: 'none' },
+                '& fieldset': { top: 0 },
+              }}
               fullWidth
             />
           )}

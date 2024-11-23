@@ -199,6 +199,8 @@ export default function useGroupForm(defaultValue) {
       return;
     }
 
+    setIsDirty(false);
+
     if (values.originPhotoURL === values.photoURL) {
       onValid(result.data);
       return;

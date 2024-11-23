@@ -43,6 +43,11 @@ export default function Select({
         disabled={disabled}
         onChange={control.onChange}
         onBlur={control.onBlur}
+        MenuProps={{
+          sx: {
+            maxHeight: '50vh',
+          },
+        }}
       >
         {placeholder && (
           <MenuItem disabled value="" sx={{ fontSize: 14 }}>
