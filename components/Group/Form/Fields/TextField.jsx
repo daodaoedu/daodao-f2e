@@ -28,7 +28,10 @@ export default function TextField({
           fullWidth
           id={id}
           name={name}
-          sx={{ '& legend': { display: 'none' } }}
+          sx={{
+            '& legend': { display: 'none' },
+            '& fieldset': { top: 0 },
+          }}
           size="small"
           placeholder={placeholder}
           value={value}

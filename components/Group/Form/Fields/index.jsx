@@ -1,7 +1,7 @@
 import { useId } from 'react';
+import TagEditor from '@/shared/components/TagEditor';
 import AreaCheckbox from './AreaCheckbox';
 import Select from './Select';
-import TagsField from './TagsField';
 import TextField from './TextField';
 import Upload from './Upload';
 import Wrapper from './Wrapper';
@@ -30,7 +30,7 @@ const Fields = {
   CheckboxGroup: withWrapper(CheckboxGroup),
   DateRadio: withWrapper(DateRadio),
   Select: withWrapper(Select),
-  TagsField: withWrapper(TagsField),
+  TagsField: withWrapper(TagEditor),
   TextField: withWrapper(TextField),
   Upload: withWrapper(Upload),
 };
