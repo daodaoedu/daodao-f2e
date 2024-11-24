@@ -142,7 +142,7 @@ function TagEditor({ name, helperText, control, value = [], tagOptions }) {
         htmlFor={id}
         className={cn(
           'relative flex flex-wrap items-center pl-3 py-1.5 gap-1.5 w-full text-sm',
-          'rounded border border-solid border-basic-200',
+          'rounded border border-solid border-basic-200 cursor-text',
           'outline outline-transparent focus-within:outline-primary-base',
         )}
         onBlur={handleBlur}

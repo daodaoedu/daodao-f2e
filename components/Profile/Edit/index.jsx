@@ -29,6 +29,7 @@ import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import TagEditor from '@/shared/components/TagEditor';
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 import ErrorMessage from './ErrorMessage';
 
 import TheAvator from './TheAvator';
@@ -472,24 +473,22 @@ function EditPage() {
               <Typography sx={{ fontWeight: 500, mb: '6px' }}>
                 個人簡介 *
               </Typography>
-              <TextareaAutosize
-                ref={(element) => setRef('selfIntroduction', element)}
-                style={{
-                  width: '100%',
-                  minHeight: '100px',
-                  padding: '10px',
-                  borderRadius: '8px ',
-                  border: '1px solid #DBDBDB',
-                }}
-                placeholder="寫下關於你的資訊，讓其他島民更認識你！也可以多描述想和夥伴一起做的事喔！"
-                value={userState.selfIntroduction}
-                onChange={(event) => {
-                  onChangeHandler({
-                    key: 'selfIntroduction',
-                    value: event.target.value,
-                  });
-                }}
-              />
+              {isSetting && (
+                <MarkdownEditor
+                  name="selfIntroduction"
+                  ref={(element) => setRef('selfIntroduction', element)}
+                  value={userState.selfIntroduction}
+                  rootClassName="w-full p-px bg-basic-200 rounded-md focus-within:bg-primary-base"
+                  className="bg-white rounded-md"
+                  placeholder="寫下關於你的資訊，讓其他島民更認識你！也可以多描述想和夥伴一起做的事喔！"
+                  onChange={(markdown) => {
+                    onChangeHandler({
+                      key: 'selfIntroduction',
+                      value: markdown,
+                    });
+                  }}
+                />
+              )}
               <ErrorMessage errText={errors.selfIntroduction} />
             </StyledGroup>
           </StyledSection>
