@@ -8,14 +8,8 @@ export const startLoginListener = (callback) => {
     if (e.origin !== window.location.origin) return;
     if (e.data.type === "login") {
       const { token, id } = e.data.payload;
-      const redirectionStorage = getRedirectionStorage();
-      const redirectUrl = redirectionStorage.get();
       if (typeof callback === "function") {
         callback(id, token);
-      }
-      if (redirectUrl) {
-        redirectionStorage.remove();
-        window.location.replace(redirectUrl);
       }
     }
   };
@@ -41,8 +35,6 @@ export const sendLoginConfirmation = (id, token, redirectUrl) => {
       window.location.origin
     );
     window.close();
-  } else {
-    window.location.replace(redirectUrl);
   }
 };
 

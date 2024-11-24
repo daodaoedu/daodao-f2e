@@ -9,6 +9,7 @@ import { EDUCATION_STEP } from '@/constants/member';
 import { BASE_URL } from '@/constants/common';
 import openLoginWindow from '@/utils/openLoginWindow';
 import { activityCategoryList } from '@/constants/activityCategory';
+import useLeaveConfirm from '@/hooks/useLeaveConfirm';
 
 const _eduOptions = EDUCATION_STEP.filter(
   (edu) => !['master', 'doctor', 'other'].includes(edu.value),
@@ -198,6 +199,8 @@ export default function useGroupForm(defaultValue) {
       return;
     }
 
+    setIsDirty(false);
+
     if (values.originPhotoURL === values.photoURL) {
       onValid(result.data);
       return;
@@ -217,6 +220,8 @@ export default function useGroupForm(defaultValue) {
     }
     return () => clearTimeout(timer);
   }, [notLogin]);
+
+  useLeaveConfirm({ shouldConfirm: isDirty });
 
   return {
     notLogin,

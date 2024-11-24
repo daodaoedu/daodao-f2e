@@ -13,7 +13,7 @@ const HomePageWrapper = styled.div`
 const MyProfilePage = () => {
   const user = useSelector((state) => state.user);
 
-  return <Profile {...user} enableContactBtn={false} sendEmail={user.email} />;
+  return <Profile {...user} isMe />;
 };
 
 MyProfilePage.getLayout = ({ children }) => {

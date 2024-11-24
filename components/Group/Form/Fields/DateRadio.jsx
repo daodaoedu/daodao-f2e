@@ -18,12 +18,15 @@ export default function DateRadio({
   const [isCustomDate, setIsCustomDate] = useState(isCustomValue);
   const [date, setDate] = useState(value);
 
-  useEffect(() => {
-    control.onChange({ target: { name, value: date } });
-    control.onChange({
-      target: { name: customValueName, value: isCustomDate },
-    });
-  }, [name, date, customValueName, isCustomDate]);
+  const handleClickRadio = (isCustom) => {
+    setIsCustomDate(isCustom);
+    control.onChange({ target: { name: customValueName, value: isCustom } });
+  };
+
+  const handleChange = (_date) => {
+    setDate(_date);
+    control.onChange({ target: { name, value: _date } });
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -35,22 +38,25 @@ export default function DateRadio({
         }}
       >
         <FormControlLabel
-          control={<Checkbox onClick={() => setIsCustomDate(true)} />}
+          control={<Checkbox onClick={() => handleClickRadio(true)} />}
           label="自訂"
           checked={isCustomDate}
         />
         <MobileDatePicker
           inputFormat="YYYY/MM/DD"
           value={date}
-          onChange={setDate}
-          onAccept={() => setIsCustomDate(true)}
+          onChange={handleChange}
+          onAccept={() => handleClickRadio(true)}
           minDate={dayjs().add(1, 'day')}
           maxDate={dayjs().add(4, 'year')}
           renderInput={(params) => (
             <TextField
               {...params}
               size="small"
-              sx={{ '& legend': { display: 'none' } }}
+              sx={{
+                '& legend': { display: 'none' },
+                '& fieldset': { top: 0 },
+              }}
               fullWidth
             />
           )}
@@ -58,7 +64,7 @@ export default function DateRadio({
       </Box>
       <div>
         <FormControlLabel
-          control={<Checkbox onClick={() => setIsCustomDate(false)} />}
+          control={<Checkbox onClick={() => handleClickRadio(false)} />}
           label="不限"
           checked={!isCustomDate}
         />

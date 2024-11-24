@@ -28,12 +28,15 @@ const StyledButton = styled(Button)`
 `;
 
 function ContactButton({
-  user,
-  label,
   activityTitle,
+  className,
   description,
   descriptionPlaceholder,
+  dialogTitle,
+  emailSubject,
+  emailTitle,
   isLoading,
+  user,
 }) {
   const me = useSelector((state) => state.user);
   const [open, setOpen] = useState(false);
@@ -67,9 +70,9 @@ function ContactButton({
       photoUrl: me.photoURL,
       from: me.email,
       to: user.email,
-      subject: '【島島阿學】點開 Email，揪團有新消息',
+      title: emailTitle,
+      subject: emailSubject,
       activityTitle,
-      title: '你發起的揪團有人來信！',
       text: message,
       information: [me.email, contact],
     });
@@ -78,20 +81,24 @@ function ContactButton({
   return (
     <div>
       <InfoCompletionGuard>
-        <StyledButton variant="contained" onClick={() => setOpen(true)}>
+        <StyledButton
+          variant="contained"
+          className={className}
+          onClick={() => setOpen(true)}
+        >
           <img
             src={chatSvg.src}
             alt="contact icon"
             style={{ marginRight: '8px' }}
           />
-          {label}
+          {dialogTitle}
         </StyledButton>
       </InfoCompletionGuard>
       {isLogin ? (
         <ContactPopup
           open={open}
           user={user}
-          label={label}
+          title={dialogTitle}
           description={description}
           descriptionPlaceholder={descriptionPlaceholder}
           isLoading={isLoading}
