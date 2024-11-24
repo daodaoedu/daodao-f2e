@@ -22,14 +22,13 @@ export const StyledPanelBox = styled(Box)`
 
 export const StyledPanelText = styled(Box)`
   display: flex;
-  p {
+  > p {
     color: #293a3d;
     font-weight: 500;
     white-space: normal;
     min-width: 50px;
   }
-  .content p,
-  span {
+  > span {
     color: #536166;
     font-size: 14px;
     font-style: normal;
@@ -41,7 +40,7 @@ export const StyledPanelText = styled(Box)`
   }
   @media (max-width: 767px) {
     flex-direction: column;
-    span {
+    > span {
       margin-left: 0px;
       text-align: left;
     }

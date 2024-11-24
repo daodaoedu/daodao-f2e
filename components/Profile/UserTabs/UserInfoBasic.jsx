@@ -1,3 +1,4 @@
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 import { StyledPanelBox, StyledPanelText } from './UserTabs.styled';
 
 function UserInfoBasic({ description = '', wantToDoList = [], share = '' }) {
@@ -17,13 +18,15 @@ function UserInfoBasic({ description = '', wantToDoList = [], share = '' }) {
       </StyledPanelText>
       <StyledPanelText sx={{ paddingTop: '6px' }}>
         <p>簡介</p>
-        <div className="content">
-          {description ? (
-            description.split('\n').map((d) => <p key={d}>{d}</p>)
-          ) : (
-            <span>尚未填寫</span>
-          )}
-        </div>
+        {description ? (
+          <MarkdownEditor
+            value={description}
+            readOnly
+            rootClassName="ml-3"
+          />
+        ) : (
+          <span>尚未填寫</span>
+        )}
       </StyledPanelText>
     </StyledPanelBox>
   );

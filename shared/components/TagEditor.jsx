@@ -2,25 +2,25 @@ import { useEffect, useId, useRef, useState } from "react";
 import ClearIcon from '@mui/icons-material/Clear';
 import { cn } from "@/utils/cn";
 
-function Item({ children, onClick }) {
+function Item({ children, onClick, text }) {
   return (
     <li>
       <button
         type="button"
         className={cn(
-          'flex items-center justify-between w-full',
+          'flex items-center justify-between w-full text-primary-base',
           'text-left px-4 py-2 focus-within:bg-primary-lightest focus-within:outline-primary-lighter',
         )}
-        onClick={() => onClick(children)}
+        onClick={() => onClick(text)}
       >
-        {children}
+        {children || text}
         <div className="text-xs text-primary-base">新增</div>
       </button>
     </li>
   );
 }
 
-function TagEditor({ name, helperText, value = [], control, tagOptions }) {
+function TagEditor({ name, helperText, control, value = [], tagOptions }) {
   const id = useId();
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
@@ -28,8 +28,10 @@ function TagEditor({ name, helperText, value = [], control, tagOptions }) {
   const inputRef = useRef(null);
   const tagOptionsRef = useRef(null);
   const tagOptionsFocusIndex = useRef(-1);
-  const filteredTagOptions = tagOptions.filter((tag) => input && tag.includes(input));
-  const hasTagOptions = Array.isArray(filteredTagOptions) && filteredTagOptions.length;
+  const filteredTagOptions = Array.isArray(tagOptions)
+    ? tagOptions.filter((tag) => input && tag.includes(input))
+    : [];
+  const hasTagOptions = !!filteredTagOptions.length;
 
   const handleChange = (e) => {
     const _value = e.target.value;
@@ -81,7 +83,6 @@ function TagEditor({ name, helperText, value = [], control, tagOptions }) {
   };
 
   const handleBlur = () => {
-    tagOptionsFocusIndex.current = -1;
     setTimeout(() => {
       if (
         tagOptionsRef.current.contains(document.activeElement) ||
@@ -89,50 +90,51 @@ function TagEditor({ name, helperText, value = [], control, tagOptions }) {
       ) {
         return;
       }
+      tagOptionsFocusIndex.current = -1;
       setInput('');
       setError('');
     }, 100);
   };
 
-  const handleComposition = (action) => () => {
-    isComposing.current = action;
+  const handleNavigateTagOptions = (e) => {
+    const buttons = tagOptionsRef.current.querySelectorAll('button');
+
+    switch (e.keyCode) {
+      /** 38 方向鍵上 */
+      case 38: {
+        e.preventDefault();
+        if (tagOptionsFocusIndex.current < 1) {
+          inputRef.current.focus();
+          return;
+        }
+        tagOptionsFocusIndex.current -= 1;
+        buttons[tagOptionsFocusIndex.current].focus();
+        break;
+      }
+      /** 40 方向鍵下 */
+      case 40: {
+        e.preventDefault();
+        if (tagOptionsFocusIndex.current >= buttons.length - 1) return;
+        tagOptionsFocusIndex.current += 1;
+        buttons[tagOptionsFocusIndex.current].focus();
+        break;
+      }
+      /** 9 Tab */
+      case 9: {
+        tagOptionsFocusIndex.current += 1;
+        break;
+      }
+      /** 13 Enter */
+      case 13: break;
+      default:
+        inputRef.current.focus();
+        break;
+    }
   };
 
   useEffect(() => {
     control.setRef?.(name, inputRef.current);
   }, [control.setRef, name]);
-
-  useEffect(() => {
-    const handleWindowKeyDown = (e) => {
-      const buttons = tagOptionsRef.current.querySelectorAll('button');
-
-      switch (e.keyCode) {
-        case 38: {
-          e.preventDefault();
-          if (tagOptionsFocusIndex.current < 1) {
-            inputRef.current.focus();
-            return;
-          }
-          tagOptionsFocusIndex.current -= 1;
-          buttons[tagOptionsFocusIndex.current].focus();
-          break;
-        }
-        case 40: {
-          e.preventDefault();
-          if (tagOptionsFocusIndex.current >= buttons.length - 1) return;
-          tagOptionsFocusIndex.current += 1;
-          buttons[tagOptionsFocusIndex.current].focus();
-          break;
-        }
-        default:
-          if (e.keyCode === 13) return;
-          inputRef.current.focus();
-          break;
-      }
-    };
-    window.addEventListener('keydown', handleWindowKeyDown);
-    return () => window.removeEventListener('keydown', handleWindowKeyDown);
-  }, [hasTagOptions]);
 
   return (
     <>
@@ -140,10 +142,11 @@ function TagEditor({ name, helperText, value = [], control, tagOptions }) {
         htmlFor={id}
         className={cn(
           'relative flex flex-wrap items-center pl-3 py-1.5 gap-1.5 w-full text-sm',
-          'rounded border border-solid border-basic-200',
+          'rounded border border-solid border-basic-200 cursor-text',
           'outline outline-transparent focus-within:outline-primary-base',
         )}
         onBlur={handleBlur}
+        onKeyDown={handleNavigateTagOptions}
       >
         {value.map((tag) => (
           <div
@@ -170,8 +173,9 @@ function TagEditor({ name, helperText, value = [], control, tagOptions }) {
           value={input}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          onCompositionStart={handleComposition(true)}
-          onCompositionEnd={handleComposition(false)}
+          onCompositionStart={() => { isComposing.current = true; }}
+          onCompositionEnd={() => { isComposing.current = false; }}
+          onFocus={() => { tagOptionsFocusIndex.current = -1; }}
         />
         <ul
           ref={tagOptionsRef}
@@ -184,9 +188,22 @@ function TagEditor({ name, helperText, value = [], control, tagOptions }) {
           )}
         >
           {hasTagOptions ? (
-            filteredTagOptions.map((tag) => <Item key={tag} onClick={handleAddTag}>{tag}</Item>)
+            filteredTagOptions.map((tag) => (
+              <Item key={tag} text={tag} onClick={handleAddTag}>
+                <div>
+                  {tag.split(new RegExp(`(${input})`)).map((part, index) => {
+                    const key = `${part}-${index}`;
+                    return (
+                      part === input
+                        ? part
+                        : <span key={key} className="text-black">{part}</span>
+                    );
+                  })}
+                </div>
+              </Item>
+            ))
           ) : (
-            <Item onClick={handleAddTag}>{input}</Item>
+            <Item text={input} onClick={handleAddTag} />
           )}
         </ul>
       </label>
