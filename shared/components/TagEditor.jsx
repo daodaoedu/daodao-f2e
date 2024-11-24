@@ -142,7 +142,7 @@ function TagEditor({ name, helperText, control, value = [], tagOptions }) {
         htmlFor={id}
         className={cn(
           'relative flex flex-wrap items-center pl-3 py-1.5 gap-1.5 w-full text-sm',
-          'rounded border border-solid border-basic-200',
+          'rounded border border-solid border-basic-200 cursor-text',
           'outline outline-transparent focus-within:outline-primary-base',
         )}
         onBlur={handleBlur}
@@ -180,7 +180,7 @@ function TagEditor({ name, helperText, control, value = [], tagOptions }) {
         <ul
           ref={tagOptionsRef}
           className={cn(
-            'absolute top-full inset-x-0 mt-1',
+            'absolute top-full inset-x-0 mt-1 max-h-40 overflow-y-auto z-10',
             'border border-basic-200 rounded-md shadow bg-white',
             'transition-[transform,opacity] origin-top opacity-100 scale-y-100',
             !(hasTagOptions || input) && 'opacity-0 scale-y-0',

@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useId, useMemo, useRef } from 'react';
+import { forwardRef, useEffect, useId, useMemo, useRef, useState } from 'react';
 import {
   BlockTypeSelect,
   BoldItalicUnderlineToggles,
@@ -42,7 +42,7 @@ const toolbarContents = () => (
 
 const generatePluginsSettings = ({ diffMarkdown = '' }) => ({
   diffSource: diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown }),
-  headings: headingsPlugin({ allowedHeadingLevels: [2, 3] }),
+  headings: headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
   image: imagePlugin({ ImageDialog }),
   linkDialog: linkDialogPlugin(),
   link: linkPlugin(),
@@ -69,6 +69,7 @@ function InternalMarkdownEditor(
   ref
 ) {
   const id = useId();
+  const [error, setError] = useState(null);
   const checkLinkRef = useRef(null);
   const markdown = useRef(value);
   const editorSelectors = 'markdown-editor';
@@ -118,6 +119,16 @@ function InternalMarkdownEditor(
 
   return (
     <div id={id} className={rootClassName}>
+      {error && readOnly && (
+        <div
+          className={cn(
+            disabledProse ? 'disabled-prose' : 'prose',
+            'whitespace-pre-wrap'
+          )}
+        >
+          {value}
+        </div>
+      )}
       <MDXEditor
         key={readOnly ? 'readOnly' : 'withToolbar'}
         ref={ref}
@@ -127,10 +138,11 @@ function InternalMarkdownEditor(
         placeholder={placeholder}
         suppressHtmlProcessing
         className={className}
+        onError={setError}
         contentEditableClassName={cn(
           editorSelectors,
-          disabledProse ? 'disabled-prose' : 'prose',
-          readOnly && '!p-0',
+          disabledProse ? 'disabled-prose' : 'prose min-h-36',
+          readOnly && '!p-0 min-h-0',
           editorClassName
         )}
         plugins={pluginsSettings}
