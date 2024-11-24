@@ -180,7 +180,7 @@ function TagEditor({ name, helperText, control, value = [], tagOptions }) {
         <ul
           ref={tagOptionsRef}
           className={cn(
-            'absolute top-full inset-x-0 mt-1',
+            'absolute top-full inset-x-0 mt-1 max-h-40 overflow-y-auto z-10',
             'border border-basic-200 rounded-md shadow bg-white',
             'transition-[transform,opacity] origin-top opacity-100 scale-y-100',
             !(hasTagOptions || input) && 'opacity-0 scale-y-0',
