@@ -107,12 +107,54 @@ function* fetchUserById(action) {
   }
 }
 
+// fetch user data by token
+function* fetchUserByToken(action) {
+  const token = action.payload?.token;
+  try {
+    const URL = `${BASE_URL}/user/me`;
+    const result = yield call(req, URL, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (result.data && result.data._id) {
+      yield put({
+        type: "FETCH_USER_BY_TOKEN_SUCCESS",
+        payload: result.data && {
+          _id: result.data._id,
+          ...result.data,
+          token,
+          tokenExpiry: handleTokenExpiry(true),
+        },
+      });
+    } else {
+      yield console.log("before no token");
+      yield put({
+        type: "FETCH_USER_BY_TOKEN_SUCCESS_NO_DATA",
+        payload: {
+          ...result.data,
+          tempToken: token,
+          tokenExpiry: handleTokenExpiry(true),
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching user by token:", JSON.stringify(error));
+    yield put({
+      type: "FETCH_USER_BY_TOKEN_FAILURE",
+      error: error.message || "Unknown error",
+    });
+  }
+}
 function* userSaga() {
   yield takeEvery('CHECK_USER_ACCOUNT', checkUserStatus);
   yield takeEvery('FETCH_ALL_USERS', fetchAllUsers);
   yield takeEvery('CREATE_USER_PROFILE', createUserProfile);
   yield takeEvery('UPDATE_USER_PROFILE', updateUserProfile);
   yield takeEvery('FETCH_USER_BY_ID', fetchUserById);
+  yield takeEvery("FETCH_USER_BY_TOKEN", fetchUserByToken);
 }
 
 export default userSaga;
