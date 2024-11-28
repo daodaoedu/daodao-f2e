@@ -80,3 +80,12 @@ export function createUser(user) {
     },
   };
 }
+
+export function fetchUserByToken(token) {
+  return {
+    type: 'FETCH_USER_BY_TOKEN',
+    payload: {
+      token,
+    },
+  };
+}

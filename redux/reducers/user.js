@@ -96,6 +96,31 @@ const reducer = (state = initialState, action) => {
         apiState: 'Reject',
       };
     }
+    case 'FETCH_USER_BY_TOKEN_SUCCESS': {
+      return {
+        ...state,
+        ...action.payload,
+        loading: false,
+        apiState: 'Resolve'
+      };
+    }
+    case 'FETCH_USER_BY_TOKEN_SUCCESS_NO_DATA': {
+      return {
+        ...state,
+        ...action.payload,
+        loading: false,
+        apiState: 'Resolve'
+      };
+    }
+    case 'FETCH_USER_BY_TOKEN_FAILURE': {
+      return {
+        ...state,
+        user: null,
+        loading: false,
+        error: action.error,
+        apiState: 'Reject',
+      };
+    }
     default: {
       return state;
     }
