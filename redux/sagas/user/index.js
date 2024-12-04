@@ -132,7 +132,6 @@ function* fetchUserByToken(action) {
         },
       });
     } else {
-      yield console.log("before no token");
       yield put({
         type: "FETCH_USER_BY_TOKEN_SUCCESS_NO_DATA",
         payload: {
