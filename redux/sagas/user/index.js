@@ -120,6 +120,7 @@ function* fetchUserByToken(action) {
     });
 
     if (result.data && result.data._id) {
+      const marathonResponse = yield call(req, `${BASE_URL}/marathon?userId=${result.data._id}`);
       yield put({
         type: "FETCH_USER_BY_TOKEN_SUCCESS",
         payload: result.data && {
@@ -127,10 +128,10 @@ function* fetchUserByToken(action) {
           ...result.data,
           token,
           tokenExpiry: handleTokenExpiry(true),
+          marathons: marathonResponse?.data || [],
         },
       });
     } else {
-      yield console.log("before no token");
       yield put({
         type: "FETCH_USER_BY_TOKEN_SUCCESS_NO_DATA",
         payload: {
