@@ -6,6 +6,7 @@ import shared from './shared';
 import resource from './resource';
 import group from './group';
 import partners from './partners';
+import marathon from './marathon';
 
 const allReducers = combineReducers({
   search,
@@ -15,6 +16,7 @@ const allReducers = combineReducers({
   resource,
   group,
   partners,
+  marathon,
 });
 
 export default allReducers;
