@@ -81,6 +81,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         ...action.payload,
         apiState: 'Resolve',
+        userType: 'normal',
         isComplete: checkIsComplete(action.payload),
       };
     }

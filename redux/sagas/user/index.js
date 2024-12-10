@@ -40,8 +40,15 @@ function* fetchAllUsers() {
 
 function* createUserProfile(action) {
   const { user } = action.payload;
+  let URL = "";
+
   try {
-    const URL = `${BASE_URL}/user/${user.id}`;
+    if (user.id) {
+      URL = `${BASE_URL}/user/${user.id}`;
+    } else {
+      URL = `${BASE_URL}/user`;
+    }
+
     // if success => status: 201, token, user
     const result = yield req(URL, {
       method: 'POST',
@@ -110,8 +117,8 @@ function* fetchUserById(action) {
 // fetch user data by token
 function* fetchUserByToken(action) {
   const token = action.payload?.token;
+  const URL = `${BASE_URL}/user/me`;
   try {
-    const URL = `${BASE_URL}/user/me`;
     const result = yield call(req, URL, {
       method: "GET",
       headers: {
@@ -126,6 +133,7 @@ function* fetchUserByToken(action) {
         payload: result.data && {
           _id: result.data._id,
           ...result.data,
+          userType: 'normal',
           token,
           tokenExpiry: handleTokenExpiry(true),
           marathons: marathonResponse?.data || [],
@@ -136,7 +144,8 @@ function* fetchUserByToken(action) {
         type: "FETCH_USER_BY_TOKEN_SUCCESS_NO_DATA",
         payload: {
           ...result.data,
-          tempToken: token,
+          userType: 'no_data',
+          token,
           tokenExpiry: handleTokenExpiry(true),
         },
       });
