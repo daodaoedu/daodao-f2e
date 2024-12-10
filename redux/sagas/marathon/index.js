@@ -1,4 +1,5 @@
-import { put, takeEvery, call } from "redux-saga/effects";
+import { put, takeEvery } from "redux-saga/effects";
+import * as localforage from "localforage";
 import { BASE_URL } from "@/constants/common";
 import req from "@/utils/request";
 
@@ -68,6 +69,9 @@ function* createMarathonProfileByToken(action) {
   } catch (error) {
     console.log(error);
     yield put({ type: "CREATE_MARATHON_PROFILE_BY_TOKEN_FAILURE" });
+  } finally {
+    yield new Promise((res) => setTimeout(res, 300));
+    yield put({ type: "CREATE_MARATHON_PROFILE_BY_TOKEN_API_STATE_RESET" });
   }
 }
 
@@ -126,7 +130,6 @@ function* marathonSaga() {
   yield takeEvery("CREATE_MARATHON_PROFILE_BY_TOKEN", createMarathonProfileByToken);
   yield takeEvery("UPDATE_MARATHON_PROFILE", updateMarathonProfile);
   yield takeEvery("DELETE_MARATHON_PROFILE", deleteMarathonProfile);
-  yield takeEvery("FETCH_MARATHON_PROFILE_BY_USER_ID", fetchMarathonProfileByUserId);
 }
 
 export default marathonSaga;
