@@ -18,6 +18,22 @@ function* fetchMarathonProfileByUserId(action) {
   }
 }
 
+function* fetchMarathonProfileByUserEvent(action) {
+  const { userId, eventId } = action.payload;
+  try {
+    const URL = `${BASE_URL}/marathon?userId=${userId}&eventId=${eventId}`;
+
+    const result = yield req(URL);
+    yield put({
+      type: "FETCH_MARATHON_PROFILE_BY_USER_EVENT_SUCCESS",
+      payload: result.data && result.data[0]
+    });
+  } catch (error) {
+    console.log(error);
+    yield put({ type: "FETCH_MARATHON_PROFILE_BY_USER_EVENT_FAILURE" });
+  }
+}
+
 function* fetchMarathonProfileById(action) {
   const { id } = action.payload; // marathon._id
   try {
@@ -106,6 +122,7 @@ function* deleteMarathonProfile(action) {
 
 function* marathonSaga() {
   yield takeEvery("FETCH_MARATHON_PROFILE_BY_ID", fetchMarathonProfileById);
+  yield takeEvery("FETCH_MARATHON_PROFILE_BY_USER_EVENT", fetchMarathonProfileByUserEvent);
   yield takeEvery("CREATE_MARATHON_PROFILE_BY_TOKEN", createMarathonProfileByToken);
   yield takeEvery("UPDATE_MARATHON_PROFILE", updateMarathonProfile);
   yield takeEvery("DELETE_MARATHON_PROFILE", deleteMarathonProfile);

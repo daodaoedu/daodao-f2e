@@ -46,3 +46,13 @@ export function fetchMarathonProfileByUserId(userId) {
     }
   };
 }
+
+export function fetchMarathonProfileByUserEvent(userId, eventId) {
+  return {
+    type: "FETCH_MARATHON_PROFILE_BY_USER_EVENT",
+    payload: {
+      userId,
+      eventId,
+    },
+  };
+}

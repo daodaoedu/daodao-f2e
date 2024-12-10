@@ -21,6 +21,7 @@ const initialState = {
 };
 
 const reducer = (state = initialState, action) => {
+  const { key, value } = action.payload || {};
   switch (action.type) {
     case 'FETCH_MARATHON_PROFILE_BY_USER_ID': {
       return {
@@ -78,6 +79,25 @@ const reducer = (state = initialState, action) => {
         ...state,
         ...action.payload,
         apiState: 'success',
+      };
+    }
+    case "FETCH_MARATHON_PROFILE_BY_USER_EVENT": {
+      return {
+        ...state,
+        apiState: "pending",
+      };
+    }
+    case "FETCH_MARATHON_PROFILE_BY_USER_EVENT_SUCCESS": {
+      return {
+        ...state,
+        ...action.payload,
+        apiState: "success",
+      };
+    }
+    case "FETCH_MARATHON_PROFILE_BY_USER_EVENT_FAILURE": {
+      return {
+        ...state,
+        apiState: "reject",
       };
     }
     default: {
