@@ -38,11 +38,18 @@ export function deleteMarathonProfile(token, id) {
   };
 }
 
-export function fetchMarathonProfileByUserId(userId) {
+export function fetchMarathonProfileByUserEvent(userId, eventId) {
   return {
-    type: 'FETCH_MARATHON_PROFILE_BY_USER_ID',
+    type: "FETCH_MARATHON_PROFILE_BY_USER_EVENT",
     payload: {
-      userId
-    }
+      userId,
+      eventId,
+    },
+  };
+}
+export function updateNewMarathon(marathon) {
+  return {
+    type: "UPDATE_NEW_MARATHON",
+    payload: marathon,
   };
 }

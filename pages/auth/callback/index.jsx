@@ -28,7 +28,7 @@ export default function AuthCallbackPage() {
         window.close();
       }
 
-      if (me.tempToken) {
+      if (me.userType === 'no_data') {
         window.opener.postMessage({ type: 'TEMP_TOKEN_UPDATED' }, window.location.origin);
         setIsLoading(false);
         window.close();

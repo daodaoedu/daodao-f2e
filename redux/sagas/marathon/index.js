@@ -1,4 +1,5 @@
-import { put, takeEvery, call } from "redux-saga/effects";
+import { put, takeEvery } from "redux-saga/effects";
+import * as localforage from "localforage";
 import { BASE_URL } from "@/constants/common";
 import req from "@/utils/request";
 
@@ -15,6 +16,22 @@ function* fetchMarathonProfileByUserId(action) {
   } catch (error) {
     console.log(error);
     yield put({ type: "FETCH_MARATHON_PROFILE_BY_USER_ID_FAILURE" });
+  }
+}
+
+function* fetchMarathonProfileByUserEvent(action) {
+  const { userId, eventId } = action.payload;
+  try {
+    const URL = `${BASE_URL}/marathon?userId=${userId}&eventId=${eventId}`;
+
+    const result = yield req(URL);
+    yield put({
+      type: "FETCH_MARATHON_PROFILE_BY_USER_EVENT_SUCCESS",
+      payload: result.data && result.data[0]
+    });
+  } catch (error) {
+    console.log(error);
+    yield put({ type: "FETCH_MARATHON_PROFILE_BY_USER_EVENT_FAILURE" });
   }
 }
 
@@ -52,6 +69,9 @@ function* createMarathonProfileByToken(action) {
   } catch (error) {
     console.log(error);
     yield put({ type: "CREATE_MARATHON_PROFILE_BY_TOKEN_FAILURE" });
+  } finally {
+    yield new Promise((res) => setTimeout(res, 300));
+    yield put({ type: "CREATE_MARATHON_PROFILE_BY_TOKEN_API_STATE_RESET" });
   }
 }
 
@@ -106,10 +126,10 @@ function* deleteMarathonProfile(action) {
 
 function* marathonSaga() {
   yield takeEvery("FETCH_MARATHON_PROFILE_BY_ID", fetchMarathonProfileById);
+  yield takeEvery("FETCH_MARATHON_PROFILE_BY_USER_EVENT", fetchMarathonProfileByUserEvent);
   yield takeEvery("CREATE_MARATHON_PROFILE_BY_TOKEN", createMarathonProfileByToken);
   yield takeEvery("UPDATE_MARATHON_PROFILE", updateMarathonProfile);
   yield takeEvery("DELETE_MARATHON_PROFILE", deleteMarathonProfile);
-  yield takeEvery("FETCH_MARATHON_PROFILE_BY_USER_ID", fetchMarathonProfileByUserId);
 }
 
 export default marathonSaga;

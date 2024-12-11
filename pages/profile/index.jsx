@@ -11,6 +11,7 @@ import Footer from '@/shared/components/Footer_v2';
 import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import MyGroup from '@/components/Profile/MyGroup';
+import MyMarathon from '@/components/Profile/MyMarathon';
 import AccountSetting from '@/components/Profile/Accountsetting';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -79,6 +80,11 @@ const ProfilePage = () => {
       tabLabel: '帳號設定',
       view: <AccountSetting />,
     },
+    {
+      id: 'my-marathon',
+      tabLabel: '學習計畫',
+      view: <MyMarathon title="我的學習計畫" userId={me?._id} />
+    }
   ];
 
   const [value, setValue] = useState(() => {
