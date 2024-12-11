@@ -78,4 +78,4 @@ export default function SaveBar({ currentStep }) {
       </div>
     </StyledSaveBar>
   );
-};
+}

@@ -137,7 +137,7 @@ const LearningMarathonSignUp = () => {
         >
           記得到信箱確認收到報名成功信，並確認信件沒有跑進垃圾桶。
         </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '20px'}}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
           <img src={emailImg.src} alt="signup success" height="224px" />
         </Box>
         <Typography
