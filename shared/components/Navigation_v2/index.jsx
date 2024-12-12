@@ -8,11 +8,11 @@ export const NavigationWrapper = styled(AppBar)(({ hasPromote }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  height: '80px',
-  padding: '0 5%',
+  height: 'auto',
+  padding: '0',
   ...(hasPromote && {
-    padding: '38px 5% 0',
-    height: '118px',
+    padding: '0',
+    height: 'auto',
   }),
   '.MuiToolbar-root': {
     padding: '0',
