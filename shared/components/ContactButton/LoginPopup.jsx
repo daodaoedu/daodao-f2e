@@ -7,13 +7,14 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
+import { useAuthDispatch } from '@/contexts/Auth';
 import partnerPopupImg from '@/public/assets/partner-popup.png';
-import openLoginWindow from '@/utils/openLoginWindow';
 import TransitionSlide from './TransitionSlide';
 
 function LoginPopup({ open, onClose }) {
   const id = useId();
   const isMobileScreen = useMediaQuery('(max-width: 560px)');
+  const { openLoginModal } = useAuthDispatch();
   const titleId = `modal-title-${id}`;
   const descriptionId = `modal-description-${id}`;
 
@@ -87,7 +88,7 @@ function LoginPopup({ open, onClose }) {
           }}
           size="large"
           variant="contained"
-          onClick={() => openLoginWindow()}
+          onClick={() => openLoginModal()}
           fullWidth
         >
           登入/註冊

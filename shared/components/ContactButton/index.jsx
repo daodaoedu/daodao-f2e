@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 import { Button } from '@mui/material';
+import { useAuth } from '@/contexts/Auth';
 import { ROLE } from '@/constants/member';
 import chatSvg from '@/public/assets/icons/chat.svg';
 import useMutation from '@/hooks/useMutation';
@@ -38,10 +38,9 @@ function ContactButton({
   isLoading,
   user,
 }) {
-  const me = useSelector((state) => state.user);
+  const { user: me, isLoggedIn } = useAuth();
   const [open, setOpen] = useState(false);
   const [feedback, setFeedback] = useState('');
-  const isLogin = !!me?._id;
 
   const handleClose = () => {
     setOpen(false);
@@ -94,7 +93,7 @@ function ContactButton({
           {dialogTitle}
         </StyledButton>
       </InfoCompletionGuard>
-      {isLogin ? (
+      {isLoggedIn ? (
         <ContactPopup
           open={open}
           user={user}

@@ -1,15 +1,14 @@
 import dayjs from 'dayjs';
-import { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useRef, useState } from 'react';
 import { ZodType, z } from 'zod';
 import { useSnackbar } from '@/contexts/Snackbar';
 import { CATEGORIES } from '@/constants/category';
 import { AREAS } from '@/constants/areas';
 import { EDUCATION_STEP } from '@/constants/member';
 import { BASE_URL } from '@/constants/common';
-import openLoginWindow from '@/utils/openLoginWindow';
 import { activityCategoryList } from '@/constants/activityCategory';
 import useLeaveConfirm from '@/hooks/useLeaveConfirm';
+import { useAuth } from '@/contexts/Auth';
 
 const _eduOptions = EDUCATION_STEP.filter(
   (edu) => !['master', 'doctor', 'other'].includes(edu.value),
@@ -84,9 +83,8 @@ const rules = {
 };
 
 export default function useGroupForm(defaultValue) {
+  const { user, token } = useAuth();
   const [isDirty, setIsDirty] = useState(false);
-  const me = useSelector((state) => state.user);
-  const notLogin = !me?._id;
   const [values, setValues] = useState(() => ({
     ...INITIAL_VALUES,
     ...defaultValue,
@@ -96,7 +94,7 @@ export default function useGroupForm(defaultValue) {
         rule.safeParse(defaultValue[key])?.data ?? INITIAL_VALUES[key],
       ])
     ),
-    userId: me?._id,
+    userId: user?._id,
   }));
   const [errors, setErrors] = useState({});
   const { pushSnackbar } = useSnackbar();
@@ -136,7 +134,7 @@ export default function useGroupForm(defaultValue) {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${me.token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
   };
@@ -154,7 +152,7 @@ export default function useGroupForm(defaultValue) {
         const response = await fetch(`${BASE_URL}/image`, {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${me.token}`,
+            Authorization: `Bearer ${token}`,
           },
           body: formData,
         });
@@ -211,20 +209,9 @@ export default function useGroupForm(defaultValue) {
     onValid({ ...result.data, photoURL });
   };
 
-  useEffect(() => {
-    let timer;
-    if (notLogin) {
-      timer = setTimeout(() => {
-        openLoginWindow();
-      }, 100);
-    }
-    return () => clearTimeout(timer);
-  }, [notLogin]);
-
   useLeaveConfirm({ shouldConfirm: isDirty });
 
   return {
-    notLogin,
     control,
     errors,
     values,

@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { BASE_URL } from '@/constants/common';
-import { userLogout } from '@/redux/actions/user';
+import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 
 const useMutation = (url, { method, enabled = true, onSuccess, onError } = {}) => {
-  const { token } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
+  const { token } = useAuth();
+  const authDispatch = useAuthDispatch();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -32,7 +31,7 @@ const useMutation = (url, { method, enabled = true, onSuccess, onError } = {}) =
       .then((res) => {
         if (res.status < 300) return res.json();
         if (res.status === 401) {
-          dispatch(userLogout());
+          authDispatch.logout();
           router.replace('/login');
         }
         throw res;

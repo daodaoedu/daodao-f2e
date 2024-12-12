@@ -1,9 +1,9 @@
-import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 import Button from '@/shared/components/Button';
 import groupBannerImg from '@/public/assets/group-banner.png';
 import Image from '@/shared/components/Image';
 import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
+import { useAuthDispatch } from '@/contexts/Auth';
 
 const StyledBanner = styled.div`
   position: relative;
@@ -47,7 +47,7 @@ const StyledBannerContent = styled.div`
 `;
 
 const Banner = () => {
-  const router = useRouter();
+  const { openLoginModal } = useAuthDispatch();
 
   return (
     <StyledBanner>
@@ -64,7 +64,7 @@ const Banner = () => {
         <h1>島島盃 - 學習馬拉松 2025 春季賽</h1>
         <p>註冊並加入我們，立即報名！</p>
         <InfoCompletionGuard>
-          <Button onClick={() => router.push('/learning-marathon/login')}>立即報名</Button>
+          <Button onClick={() => openLoginModal({ redirectUrl: '/learning-marathon/signup' })}>立即報名</Button>
         </InfoCompletionGuard>
       </StyledBannerContent>
     </StyledBanner>
