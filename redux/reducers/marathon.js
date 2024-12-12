@@ -14,7 +14,7 @@ export const initialState = {
   registrationStatus: "Open",
   registrationDate: "",
   pricing: {
-    option: "",
+    option: "優惠價：8000 元",
     price: 0,
     email: [],
     file: "",
@@ -129,7 +129,7 @@ const reducer = (state = initialState, action) => {
         apiState: "pending",
       };
     }
-    case 'UPDATE_USER_PROFILE_API_STATE_RESET': {
+    case 'UPDATE_MARATHON_PROFILE_API_STATE_RESET': {
       return {
         ...state,
         apiState: 'None',
