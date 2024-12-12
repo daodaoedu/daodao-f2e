@@ -129,7 +129,7 @@ const reducer = (state = initialState, action) => {
         apiState: "pending",
       };
     }
-    case 'UPDATE_USER_PROFILE_API_STATE_RESET': {
+    case 'UPDATE_MARATHON_PROFILE_API_STATE_RESET': {
       return {
         ...state,
         apiState: 'None',
