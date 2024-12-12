@@ -51,6 +51,9 @@ export const StyledSaveBar = styled(Box)`
   }
 
   @media (max-width: 767px) {
+    .top h2 {
+      font-size: 18px;
+    }
     .MuiStepLabel-label {
       display: none;
     }
