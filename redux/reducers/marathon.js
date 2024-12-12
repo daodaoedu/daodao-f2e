@@ -14,7 +14,7 @@ export const initialState = {
   registrationStatus: "Open",
   registrationDate: "",
   pricing: {
-    option: "",
+    option: "優惠價：8000 元",
     price: 0,
     email: [],
     file: "",
