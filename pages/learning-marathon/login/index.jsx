@@ -57,6 +57,12 @@ const LoginPage = () => {
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
+    if (user._id) {
+      router.push('/learning-marathon/signup');
+    }
+  }, [user]);
+
+  useEffect(() => {
     const onMessageChange = (e) => {
       const oldUser = e.data?.type === 'USER_UPDATED';
       const newUser = e.data?.type === 'TEMP_TOKEN_UPDATED';
