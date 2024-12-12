@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
+import Link from 'next/link';
+
 
 const PromotionBarWrapper = styled.div`
   width: 100%;
   position: fixed;
   top: 0;
   padding-bottom: 20px;
-  background-color: #f37b5f;
+  background-color: #FE9D35;
   color: #fff;
   padding: 7px;
   text-align: center;
@@ -55,9 +57,9 @@ const PromotionBar = ({ isShow, link, text, toggleAction }) => {
     <>
       {isShow && (
         <PromotionBarWrapper>
-          <a href={link} target="_blank" rel="noreferrer">
+         <Link href="/learning-marathon">
             {text}
-          </a>
+          </Link>
           <CloseButton onClick={() => toggleAction(false)} />
         </PromotionBarWrapper>
       )}
