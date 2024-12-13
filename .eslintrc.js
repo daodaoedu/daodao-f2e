@@ -17,13 +17,22 @@ module.exports = {
   settings: {
     'import/resolver': {
       alias: {
-        extensions: ['.js', '.jsx'],
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
         map: [['@', '.']],
+      },
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx']
       },
     },
   },
   rules: {
     "import/no-extraneous-dependencies": ["error", { devDependencies: ["./*.js"] }],
+    'import/extensions': ['error', 'ignorePackages', {
+      js: 'never',
+      jsx: 'never',
+      ts: 'never',
+      tsx: 'never',
+    }],
     'react/no-unescaped-entities': 'off',
     '@next/next/no-page-custom-font': 'off',
     'react/prop-types': [0],

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
 import Menu from '@mui/material/Menu';
 import IconButton from '@mui/material/IconButton';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
 import Image from '@/shared/components/Image';
+import { useAuth } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import useMutation from '@/hooks/useMutation';
 import { timeDuration } from '@/utils/date';
@@ -37,10 +37,10 @@ function GroupCard({
   onUpdateGrouping,
   onDeleteGroup,
 }) {
-  const me = useSelector((state) => state.user);
+  const { user } = useAuth();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState(null);
-  const isEnabledMutation = me._id === userId;
+  const isEnabledMutation = user?._id === userId;
 
   const apiUpdateGrouping = useMutation(`/activity/${_id}`, {
     method: 'PUT',

@@ -1,7 +1,6 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
-import { sendLoginConfirmation } from '@/utils/openLoginWindow';
 import SEOConfig from '../shared/components/SEO';
 import Home from '../components/Home';
 import Navigation from '../shared/components/Navigation_v2';
@@ -45,12 +44,6 @@ const HomePage = () => {
     }),
     [router?.asPath],
   );
-
-  const { token, id } = router.query;
-
-  useEffect(() => {
-    sendLoginConfirmation(id, token);
-  }, [id, token]);
 
   return (
     <>

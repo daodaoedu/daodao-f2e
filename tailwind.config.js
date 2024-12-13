@@ -5,7 +5,7 @@ const typography = require('@tailwindcss/typography');
 module.exports = {
   content: [
     "./components/**/*.{jsx,tsx}",
-    "./context/**/*.{jsx,tsx}",
+    "./contexts/**/*.{jsx,tsx}",
     "./layout/**/*.{jsx,tsx}",
     "./pages/**/*.{jsx,tsx}",
     "./shared/**/*.{jsx,tsx}",
@@ -37,7 +37,7 @@ module.exports = {
   plugins: [
     /** Typography */
     typography,
-    plugin(({ addComponents, theme }) => {
+    plugin(({ addComponents, addUtilities, theme }) => {
       const sizes = ["lg", "md", "sm"];
       const headingFontSizes = [
         [36, 28],
@@ -66,6 +66,24 @@ module.exports = {
             lineHeight: "140%",
             [`@media (min-width: ${theme("screens.md")})`]: {
               fontSize: bodyFontSizes[index][0],
+            },
+          },
+        });
+        addUtilities({
+          [`.animate-fade-in`]: {
+            animation: 'fade-in 200ms ease-in-out',
+            '@keyframes fade-in': {
+              '0%': { opacity: 0 },
+              '100%': { opacity: 1 },
+            },
+          },
+        });
+        addUtilities({
+          [`.animate-slide-in`]: {
+            animation: 'slide-in 200ms ease-in-out',
+            '@keyframes slide-in': {
+              '0%': { transform: 'translateY(100%)' },
+              '100%': { transform: 'translateY(0)' },
             },
           },
         });
