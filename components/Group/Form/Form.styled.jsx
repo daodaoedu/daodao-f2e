@@ -20,8 +20,13 @@ export const StyledDescription = styled.p`
 
 export const StyledContainer = styled.main`
   position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background: #f3fcfc;
+  padding: 60px 0;
+  min-height: 100vh;
   margin: 0 auto;
-  width: 720px;
 
   .MuiInputBase-input,
   .MuiFormControlLabel-label {
@@ -30,7 +35,6 @@ export const StyledContainer = styled.main`
 
   @media (max-width: 760px) {
     padding: 20px;
-    width: 100%;
   }
 `;
 
@@ -58,6 +62,7 @@ export const StyledGroup = styled.div`
 export const StyledFooter = styled.div`
   display: flex;
   justify-content: center;
+  width: 100%;
 `;
 
 export const StyledChip = styled(Chip)`

@@ -1,40 +1,10 @@
-import { useState, useEffect } from "react";
 import { Paper, Typography, Box } from "@mui/material";
 import { useSearchParams } from 'next/navigation';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserByToken } from "@/redux/actions/user";
+import { sendLoginEvent } from "@/contexts/Auth";
 
 export default function AuthCallbackPage() {
   const searchParams = useSearchParams();
-  const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(true);
-  const me = useSelector((state) => state.user);
-
-  useEffect(() => {
-    const tempToken = searchParams.get("token");
-
-    if (tempToken) {
-      dispatch(fetchUserByToken(tempToken));
-    } else {
-      console.error("unfound token");
-    }
-  }, [searchParams, dispatch]);
-
-  useEffect(() => {
-    if (window.opener && isLoading && me) {
-      if (me._id) {
-        window.opener.postMessage({ type: 'USER_UPDATED' }, window.location.origin);
-        setIsLoading(false);
-        window.close();
-      }
-
-      if (me.userType === 'no_data') {
-        window.opener.postMessage({ type: 'TEMP_TOKEN_UPDATED' }, window.location.origin);
-        setIsLoading(false);
-        window.close();
-      }
-    }
-  }, [me._id, me.tempToken, isLoading]);
+  sendLoginEvent(searchParams.get("token"));
 
   return (
     <Paper

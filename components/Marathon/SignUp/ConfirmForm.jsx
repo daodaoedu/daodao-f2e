@@ -17,6 +17,7 @@ import {
   Radio,
   FormControlLabel,
 } from '@mui/material';
+import { useAuthDispatch } from '@/contexts/Auth';
 
 import {
   StyledSection,
@@ -217,6 +218,7 @@ export default function ConfirmForm({
   const token = useSelector((state) => { return state.user.token; });
   const [newMarathon, setNewMarathon] = useState(reduxInitMarathonState);
   const router = useRouter();
+  const { openLoginModal } = useAuthDispatch();
   const [user, setUser] = useState({
     name: "",
     token: "",
@@ -259,9 +261,9 @@ export default function ConfirmForm({
         location: userLocation
       });
     } else {
-      router.push('/learning-marathon/login');
+      openLoginModal();
     }
-  }, [userState]);
+  }, [userState, openLoginModal]);
   const onSubmit = async () => {
     if (!marathonState) {
       console.error('no data to submit');

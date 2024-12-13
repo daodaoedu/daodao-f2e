@@ -3,10 +3,8 @@ import { keyframes, css } from '@emotion/react';
 import styled from '@emotion/styled';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { useDispatch } from 'react-redux';
-import { userLogout } from '@/redux/actions/user';
 import useMediaQuery from '@mui/material/useMediaQuery';
-
+import { useAuthDispatch } from '@/contexts/Auth';
 import { Avatar, Box, MenuItem, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 
@@ -37,15 +35,15 @@ const StyledMenuItem = styled(MenuItem)`
 `;
 
 const UserAvatar = ({ onCloseMenu = () => {}, user }) => {
-  const dispatch = useDispatch();
   const isPadScreen = useMediaQuery('(max-width: 767px)');
+  const authDispatch = useAuthDispatch();
 
   const { push } = useRouter();
 
   const [isOpenMenu, setIsOpenMenu] = useState(null);
 
   const logout = () => {
-    dispatch(userLogout());
+    authDispatch.logout();
     setIsOpenMenu(false);
     onCloseMenu();
     push('/');
@@ -102,7 +100,7 @@ const UserAvatar = ({ onCloseMenu = () => {}, user }) => {
               onClick={() => {
                 setIsOpenMenu(false);
                 onCloseMenu();
-                push('/profile?id=' + v.id);
+                push(`/profile?id=${v.id}`);
               }}
             >
               {v.name}
