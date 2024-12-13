@@ -116,9 +116,6 @@ export default function UserProfileForm({
   };
 
   useEffect(() => {
-    if (!user._id && (user.userType !== 'no_data')) {
-      router.push('/');
-    }
     if (user._id) {
       Object.entries(user).forEach(([key, value]) => {
         if (key === 'contactList') {
