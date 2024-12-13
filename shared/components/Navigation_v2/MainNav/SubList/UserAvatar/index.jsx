@@ -93,6 +93,7 @@ const UserAvatar = ({ onCloseMenu = () => {}, user }) => {
             { name: '個人資料', id: 'person-setting' },
             { name: '我的揪團', id: 'my-group' },
             { name: '帳號設定', id: 'account-setting' },
+            { name: '學習馬拉松', id: 'my-marathon' },
           ].map((v, i) => (
             <StyledMenuItem
               as="div"

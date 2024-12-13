@@ -273,26 +273,26 @@ export const NAV_LINK_MOBILE = [
   //   link: '/activities',
   //   target: '_self',
   // },
-  {
-    name: '找故事',
-    link: 'https://blog.daoedu.tw',
-    target: '_blank',
-  },
+  // {
+  //   name: '找故事',
+  //   link: 'https://blog.daoedu.tw',
+  //   target: '_blank',
+  // },
   // {
   //   name: '找場域',
   //   link: '/locations',
   //   target: '_self',
   // },
-  {
-    name: '新增資源',
-    link: '/contribute/resource',
-    target: '_self',
-  },
-  {
-    name: '關於島島',
-    link: '/about',
-    target: '_self',
-  },
+  // {
+  //   name: '新增資源',
+  //   link: '/contribute/resource',
+  //   target: '_self',
+  // },
+  // {
+  //   name: '關於島島',
+  //   link: '/about',
+  //   target: '_self',
+  // },
   {
     name: '加入社群',
     link: '/join',

@@ -31,7 +31,8 @@ const PromotionBarWrapper = styled.div`
   background-color: #FE9D35;
   color: #fff;
   padding: 10px 12% 10px 5%;
-  text-align: center;
+  text-align: left;
+  align-items: center;
   font-size: 16px;
   a:hover {
     text-decoration: underline;

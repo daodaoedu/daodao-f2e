@@ -28,9 +28,8 @@ const StyledMenuItem = styled(MenuItem)`
     cursor: ${props.isDisabled ? 'not-allowed' : 'pointer'};
     animation-delay: ${props.delay};
     min-width: 126px;
-    padding: ${props.isPadScreen ? '12px 52px' : '12px'};
-    font-size: ${props.isPadScreen ? '18px' : '16px'};
-    margin-top: ${props.isPadScreen ? '18px' : '0'};
+    padding: 12px;
+    font-size: 18px;
     &:hover {
       background-color: #def5f5;
     }
@@ -43,25 +42,17 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
 
   const { push } = useRouter();
 
-  const [isOpenMenu, setIsOpenMenu] = useState(null);
+  const [isOpenMenu, setIsOpenMenu] = useState(true);
 
-  const logout = () => {
-    dispatch(userLogout());
-    setIsOpenMenu(false);
-    onCloseMenu();
-    push('/');
-  };
 
   return (
-    <Box sx={{ margin: '8px 32px', cursor: 'pointer', position: 'relative' }}>
+    <Box sx={{ margin: '8px 32px 8px 24px', cursor: 'pointer', position: 'relative' }}>
       <Box
         sx={{
+          fontSize: '18px',
           display: 'flex',
-          alignItems: 'center',
-          backgroundColor: isOpenMenu ? '#def5f5' : 'transparent',
-          color: isOpenMenu ? '#16b9b3':'#def5f5',
-          padding: '8px',
-          borderRadius: '8px',
+          color:  '#16b9b3',
+          borderRadius: '4px',
           transition: 'background-color 0.3s ease, padding 0.3s ease',          
         }}        
         onClick={() => setIsOpenMenu(!isOpenMenu)}
@@ -72,15 +63,14 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
       <Box
         sx={{
           display: isOpenMenu ? 'block' : 'none',
-          position: isPadScreen ? 'relative' : 'absolute',
-          top: isPadScreen ? 0 : '50px',
+          position: 'relative',
           borderRadius: '8px',
           backgroundColor: 'white',
           right: '0',
           zIndex: 1,
         }}
       >
-        <Box sx={{ padding: !isPadScreen && '12px' }}>
+        <Box sx={{ marginTop: '6px' }}>
           {[
             { name: '活動詳情', id: 'marathon-detail' },
             { name: '學習計畫分享區', id: 'marathon-sharing' },

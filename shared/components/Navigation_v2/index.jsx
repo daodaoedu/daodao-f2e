@@ -9,7 +9,7 @@ export const NavigationWrapper = styled(AppBar)(({ hasPromote }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   height: 'auto',
-  minHeight: '68px',
+  minHeight: '64px',
   padding: '0',
   ...(hasPromote && {
     padding: '0',
@@ -47,12 +47,10 @@ const Navigation = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    // 設置一個定時器，每 5 秒更換一次文字
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % texts.length);
     }, 8000);
 
-    // 清除定時器以防止內存洩漏
     return () => clearInterval(interval);
   }, [texts.length]);
 
@@ -66,7 +64,7 @@ const Navigation = () => {
           toggleAction={setShowPromotionBar}
         />
         {/* <Toolbar> */}
-        <MainNav height={showPromotetionBar ? '118px' : '80px'} />
+        <MainNav height={showPromotetionBar ? '124px' : '80px'} />
         {/* </Toolbar> */}
       </NavigationWrapper>
     </>

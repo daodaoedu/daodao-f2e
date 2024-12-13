@@ -4,6 +4,7 @@ import { Button } from '@mui/material';
 import openLoginWindow from '@/utils/openLoginWindow';
 import UserAvatar from '../SubList/UserAvatar';
 import MenuItem from './MenuItem';
+import MarathonList from './MarathonList';
 
 const MenuWrapper = styled.div`
   position: fixed;
@@ -62,6 +63,7 @@ const Menu = ({ open, list, onCloseMenu, shiftTop = '80px' }) => {
               />
             );
           })}
+          <MarathonList/>
           <MenuDivider />
           {user._id ? (
             <UserAvatar user={user} onCloseMenu={onCloseMenu} />
