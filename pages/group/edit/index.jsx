@@ -1,17 +1,21 @@
 import React, { useEffect, useMemo } from 'react';
+import dynamic from 'next/dynamic';
+import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { Box } from '@mui/material';
-import { useAuth } from '@/contexts/Auth';
 import { useSnackbar } from '@/contexts/Snackbar';
 import useFetch from '@/hooks/useFetch';
 import useMutation from '@/hooks/useMutation';
 import SEOConfig from '@/shared/components/SEO';
-import GroupForm from '@/components/Group/Form';
+
+const GroupForm = dynamic(() => import('@/components/Group/Form'), {
+  ssr: false,
+});
 
 function EditGroupPage() {
   const { pushSnackbar } = useSnackbar();
   const router = useRouter();
-  const { user } = useAuth();
+  const me = useSelector((state) => state.user);
   const { id } = router.query;
   const { data, isFetching } = useFetch(`/activity/${id}`, {
     enabled: !!id,
@@ -44,10 +48,10 @@ function EditGroupPage() {
   });
 
   useEffect(() => {
-    if (!user?._id) router.push('/login');
+    if (!me?._id) router.push('/login');
     if (isFetching || !source?.userId) return;
-    if (source.userId !== user._id) router.replace(`/group/detail?id=${id}`);
-  }, [user, source, isFetching, id]);
+    if (source.userId !== me._id) router.replace(`/group/detail?id=${id}`);
+  }, [me, source, isFetching, id]);
 
   return (
     <>

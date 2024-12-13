@@ -8,7 +8,6 @@ import Button from '@/shared/components/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { activityCategoryList } from '@/constants/activityCategory';
-import { ProtectedComponent } from '@/contexts/Auth';
 import StyledPaper from '../Paper.styled';
 import {
   StyledHeading,
@@ -41,6 +40,7 @@ export default function GroupForm({
   onSubmit,
 }) {
   const {
+    notLogin,
     control,
     values,
     errors,
@@ -66,10 +66,14 @@ export default function GroupForm({
     <Checkbox size="small" onClick={() => setIsChecked((pre) => !pre)} />
   );
 
+  if (notLogin) {
+    return <Box sx={{ minHeight: '50vh' }} />;
+  }
+
   return (
-    <ProtectedComponent>
+    <Box sx={{ background: '#f3fcfc', py: '60px' }}>
       <StyledContainer>
-        <StyledPaper className="p-10 mb-4 md:w-[720px]">
+        <StyledPaper sx={{ p: '40px', mb: '16px' }}>
           <StyledHeading>
             {isCreateMode ? '發起揪團' : '編輯揪團'}
           </StyledHeading>
@@ -145,7 +149,7 @@ export default function GroupForm({
             placeholder="希望在什麼時間舉行？"
           />
         </StyledPaper>
-        <StyledPaper className="p-10 mb-4 md:w-[720px]">
+        <StyledPaper sx={{ p: '40px', mb: '16px' }}>
           <Fields.TextField
             label="想找的夥伴"
             name="partnerStyle"
@@ -215,7 +219,7 @@ export default function GroupForm({
             helperText="標籤填寫完成後，會用 Hashtag 的形式呈現，例如： #一起學日文"
           />
         </StyledPaper>
-        <StyledPaper className="md:w-[720px]">
+        <StyledPaper>
           <Fields.DateRadio
             label="揪團期限"
             name="deadline"
@@ -226,7 +230,7 @@ export default function GroupForm({
           />
         </StyledPaper>
         {!isCreateMode && (
-          <StyledPaper className="p-10 mb-4 md:w-[720px]">
+          <StyledPaper sx={{ p: '40px', mt: '16px' }}>
             <StyledSwitchWrapper>
               {values.isGrouping ? '開放揪團中' : '已關閉揪團'}
               <Switch
@@ -273,6 +277,6 @@ export default function GroupForm({
           </Button>
         </StyledFooter>
       </StyledContainer>
-    </ProtectedComponent>
+    </Box>
   );
 }

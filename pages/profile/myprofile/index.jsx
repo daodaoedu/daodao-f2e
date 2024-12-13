@@ -1,6 +1,6 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import styled from '@emotion/styled';
-import { useAuth } from '@/contexts/Auth';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 import Profile from '@/components/Profile';
@@ -11,7 +11,7 @@ const HomePageWrapper = styled.div`
 `;
 
 const MyProfilePage = () => {
-  const { user } = useAuth();
+  const user = useSelector((state) => state.user);
 
   return <Profile {...user} isMe />;
 };

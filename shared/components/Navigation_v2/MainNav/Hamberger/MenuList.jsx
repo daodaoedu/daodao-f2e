@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
+import { useSelector } from 'react-redux';
 import { Button } from '@mui/material';
-import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import openLoginWindow from '@/utils/openLoginWindow';
 import UserAvatar from '../SubList/UserAvatar';
 import MenuItem from './MenuItem';
 
@@ -45,9 +46,7 @@ const LoginButton = styled(Button)`
 `;
 
 const Menu = ({ open, list, onCloseMenu, shiftTop = '80px' }) => {
-  const auth = useAuth();
-  const authDispatch = useAuthDispatch();
-
+  const user = useSelector((state) => state.user);
   return (
     <MenuWrapper open={open} shiftTop={shiftTop}>
       {open && (
@@ -64,12 +63,10 @@ const Menu = ({ open, list, onCloseMenu, shiftTop = '80px' }) => {
             );
           })}
           <MenuDivider />
-          {auth.isLoggedIn ? (
-            <UserAvatar user={auth.user} onCloseMenu={onCloseMenu} />
+          {user._id ? (
+            <UserAvatar user={user} onCloseMenu={onCloseMenu} />
           ) : (
-            <LoginButton onClick={authDispatch.openLoginModal}>
-              登入
-            </LoginButton>
+            <LoginButton onClick={() => openLoginWindow()}>登入</LoginButton>
           )}
         </MenuListWrapper>
       )}

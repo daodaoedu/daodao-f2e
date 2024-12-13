@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import { ProtectedComponent, useAuth } from '@/contexts/Auth';
 import Edit from '@/components/Profile/Edit';
 import Footer from '@/shared/components/Footer_v2';
 import SEOConfig from '@/shared/components/SEO';
@@ -63,7 +63,7 @@ function a11yProps(index) {
 const ProfilePage = () => {
   const router = useRouter();
   const mobileScreen = useMediaQuery('(max-width: 767px)');
-  const { user } = useAuth();
+  const me = useSelector((state) => state.user);
   const tabs = [
     {
       id: 'person-setting',
@@ -73,7 +73,7 @@ const ProfilePage = () => {
     {
       id: 'my-group',
       tabLabel: '我的揪團',
-      view: <MyGroup title="我的揪團" userId={user?._id} />,
+      view: <MyGroup title="我的揪團" userId={me?._id} />,
     },
     {
       id: 'account-setting',
@@ -83,7 +83,7 @@ const ProfilePage = () => {
     {
       id: 'my-marathon',
       tabLabel: '學習計畫',
-      view: <MyMarathon title="我的學習計畫" userId={user?._id} />
+      view: <MyMarathon title="我的學習計畫" userId={me?._id} />
     }
   ];
 
@@ -113,7 +113,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <ProtectedComponent>
+    <>
       <SEOConfig data={SEOData} />
       <Box
         sx={{
@@ -163,7 +163,7 @@ const ProfilePage = () => {
             ))}
           </Tabs>
         </Box>
-        <Box sx={{ flex: 1, maxWidth: '720px', minHeight: '50vh' }}>
+        <Box sx={{ flex: 1, maxWidth: '720px' }}>
           {tabs.map((tab, index) => (
             <TabPanel key={tab.id} value={value} index={index}>
               {tab.view}
@@ -171,7 +171,7 @@ const ProfilePage = () => {
           ))}
         </Box>
       </Box>
-    </ProtectedComponent>
+    </>
   );
 };
 

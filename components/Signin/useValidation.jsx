@@ -19,8 +19,6 @@ const schema = z.object({
     })
     .optional(),
   roleList: z.array(z.string()).min(1, '請選擇您的身份').optional(),
-  isSubscribeEmail: z.boolean().optional(),
-  interestList: z.array(z.string()).optional(),
 });
 
 const initialState = {
@@ -28,7 +26,6 @@ const initialState = {
   gender: '',
   roleList: [],
   isSubscribeEmail: true,
-  interestList: [],
 };
 
 const userReducer = (state, payload) => {

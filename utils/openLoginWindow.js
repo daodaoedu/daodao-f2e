@@ -47,7 +47,10 @@ export const sendLoginConfirmation = (id, token, redirectUrl) => {
 };
 
 /**
- * @deprecated 即將棄用，請使用 useAuthDispatch 的 openLoginModal
+ * 開啟登入視窗
+ * @param {string} redirection 登入後重定向的地址
+ * @param {string} target 目標地址，可以替換成 /?id=...&token=... 自動登入
+ * @returns {Promise} 視窗關閉後 resolve
  */
 export default function openLoginWindow(
   redirection = "",

@@ -1,11 +1,12 @@
 import { useEffect, useReducer, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { BASE_URL } from '@/constants/common';
-import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import { userLogout } from '@/redux/actions/user';
 
 const useFetch = (url, { enabled = true, initialValue, onSuccess } = {}) => {
-  const { token } = useAuth();
-  const authDispatch = useAuthDispatch();
+  const { token } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const router = useRouter();
   const [render, refetch] = useReducer((pre) => !pre, true);
   const [data, setData] = useState(initialValue);
@@ -30,7 +31,7 @@ const useFetch = (url, { enabled = true, initialValue, onSuccess } = {}) => {
       .then((res) => {
         if (res.status < 300) return res.json();
         if (res.status === 401) {
-          authDispatch.logout();
+          dispatch(userLogout());
           router.replace('/login')
         }
         throw res;

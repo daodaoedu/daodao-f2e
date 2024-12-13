@@ -8,9 +8,9 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import { useRouter } from 'next/router';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateUser, userLogout } from '@/redux/actions/user';
 import styled from '@emotion/styled';
-import { useDispatch } from 'react-redux';
-import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 
 const StyledTypographyStyle = styled(Typography)`
   font-family: Noto Sans TC;
@@ -32,10 +32,11 @@ const StyledLogoutBtn = styled(Button)`
 `;
 
 const AccountSetting = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
-  const authDispatch = useAuthDispatch();
-  const { user } = useAuth();
+
   const [isSubscribeEmail, setIsSubscribeEmail] = useState(false);
+  const user = useSelector((state) => state.user);
 
   const onUpdateUser = (status) => {
     const payload = {
@@ -43,17 +44,17 @@ const AccountSetting = () => {
       email: user.email,
       isSubscribeEmail: status,
     };
-    authDispatch.updateUser(payload);
+    dispatch(updateUser(payload));
   };
 
   const logout = () => {
-    authDispatch.logout();
+    dispatch(userLogout());
     router.push('/');
   };
 
   useEffect(() => {
     setIsSubscribeEmail(user?.isSubscribeEmail || false);
-  }, [user]);
+  }, [user.isSubscribeEmail]);
 
   return (
     <Box
@@ -95,7 +96,7 @@ const AccountSetting = () => {
               wordBreak: 'break-all',
             }}
           >
-            {user?.email}
+            {user.email}
           </Box>
         </Box>
         {/* <Box sx={{ display: 'flex', flexDirection: 'column' }}>
