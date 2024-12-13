@@ -1,8 +1,8 @@
 import { useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import { useAuth } from '@/contexts/Auth';
 import Image from '@/shared/components/Image';
 import ContactButton from '@/shared/components/ContactButton';
 import { StyledStatus } from '../GroupList/GroupCard.styled';
@@ -22,8 +22,8 @@ import ShareButtonGroup from './ShareButtonGroup';
 
 function GroupDetail({ id, source, isLoading }) {
   const router = useRouter();
-  const me = useSelector((state) => state.user);
-  const isMyGroup = source?.userId === me?._id && !!me?._id;
+  const { user } = useAuth();
+  const isMyGroup = source?.userId === user?._id && !!user?._id;
 
   return (
     <Box sx={{ background: '#f3fcfc', pb: '48px' }}>

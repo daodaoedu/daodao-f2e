@@ -1,10 +1,11 @@
+import { useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { Box } from '@mui/material';
 import Button from '@/shared/components/Button';
 import Image from '@/shared/components/Image';
 import partnerImg from '@/public/assets/partner-banner.png';
-import { useSelector } from 'react-redux';
+import { useAuth } from '@/contexts/Auth';
 
 const StyledBanner = styled(Box)(({ theme }) => ({
   height: '398px',
@@ -62,7 +63,7 @@ const StyledContent = styled(Box)(({ theme }) => ({
 const Banner = () => {
   const router = useRouter();
   // select token from user
-  const { token } = useSelector((state) => state.user);
+  const { isLoggedIn } = useAuth();
 
   return (
     <StyledBanner>
@@ -70,7 +71,7 @@ const Banner = () => {
         <h1>尋找夥伴</h1>
         <p>想找到一起交流的學習夥伴嗎</p>
         <p>註冊加入會員，並填寫個人資料，你的資訊就會刊登在頁面上囉！</p>
-        {!token && (
+        {!isLoggedIn && (
           <Button onClick={() => router.push('/login')}>註冊找夥伴</Button>
         )}
       </StyledContent>
