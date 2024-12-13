@@ -63,7 +63,7 @@ const Menu = ({ open, list, onCloseMenu, shiftTop = '80px' }) => {
               />
             );
           })}
-          <MarathonList/>
+          <MarathonList onCloseMenu={onCloseMenu}/>
           <MenuDivider />
           {user._id ? (
             <UserAvatar user={user} onCloseMenu={onCloseMenu} />

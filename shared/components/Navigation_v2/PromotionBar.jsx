@@ -27,28 +27,23 @@ const TextContainer = styled.div`
 const PromotionBarWrapper = styled.div`
   width: 100%;
   top: 0;
-  padding-bottom: 20px;
   background-color: #FE9D35;
   color: #fff;
   padding: 10px 12% 10px 5%;
-  text-align: left;
+  display : flex;
+  justify-content: center;
   align-items: center;
   font-size: 16px;
+  min-height: 64px;
   a:hover {
     text-decoration: underline;
     text-underline-offset: 3px;
   }
-
-  @media (max-width: 767px) {
-    min-height: 68px;
-    /* flex-direction: column; */
-  }
-
 `;
 
 const CloseButton = styled.span`
   position: absolute;
-  top: calc(50% - 54px);
+  top: calc(50% - 49.88px);
   right: 5%;
   width: 20px;
   height: 20px;

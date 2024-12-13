@@ -3,11 +3,8 @@ import { keyframes, css } from '@emotion/react';
 import styled from '@emotion/styled';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { useDispatch } from 'react-redux';
-import { userLogout } from '@/redux/actions/user';
 import useMediaQuery from '@mui/material/useMediaQuery';
-
-import { Avatar, Box, MenuItem, Typography } from '@mui/material';
+import { Box, MenuItem } from '@mui/material';
 import { useRouter } from 'next/router';
 
 const slideInFrames = keyframes`
@@ -36,14 +33,9 @@ const StyledMenuItem = styled(MenuItem)`
   `}
 `;
 
-const MarathonList = ({ onCloseMenu = () => {}, user }) => {
-  const dispatch = useDispatch();
-  const isPadScreen = useMediaQuery('(max-width: 767px)');
-
+const MarathonList = ({ onCloseMenu = () => {} }) => {
   const { push } = useRouter();
-
   const [isOpenMenu, setIsOpenMenu] = useState(true);
-
 
   return (
     <Box sx={{ margin: '8px 32px 8px 24px', cursor: 'pointer', position: 'relative' }}>
@@ -81,12 +73,11 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
               as="div"
               key={v.id}
               delay={`${i * 0.1}s`}
-              isPadScreen={isPadScreen}
               isDisabled={v.id === 'project-sharing'}
               onClick={() => {
-                setIsOpenMenu(false);
+                setIsOpenMenu(!isOpenMenu);
                 onCloseMenu();
-                push('/learning-marathon?id=' + v.id);
+                push('/learning-marathon?id=' + v.id)
               }}
             >
               {v.name}

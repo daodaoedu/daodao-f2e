@@ -53,7 +53,7 @@ const MainNav = ({ shiftTop = 0 }) => {
         isUserLogin={isUserLogin}
         avatar={avatar}
         open={isMenuOpen}
-        onCloseMenu={() => setIsMenuOpen(false)}
+        onCloseMenu={() => setIsMenuOpen(!isMenuOpen)}
         list={NAV_LINK_MOBILE}
       />
       <MenuButton

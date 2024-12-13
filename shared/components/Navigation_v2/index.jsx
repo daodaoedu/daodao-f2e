@@ -64,7 +64,7 @@ const Navigation = () => {
           toggleAction={setShowPromotionBar}
         />
         {/* <Toolbar> */}
-        <MainNav height={showPromotetionBar ? '124px' : '80px'} />
+        <MainNav height={showPromotetionBar ? '128px' : '64px'} />
         {/* </Toolbar> */}
       </NavigationWrapper>
     </>
