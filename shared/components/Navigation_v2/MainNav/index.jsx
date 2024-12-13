@@ -18,8 +18,10 @@ const BoxWrapper = styled(Box)`
   justify-content: space-between;
   align-items: center;
   margin: auto;
+  padding: 0 16px;
   @media (max-width: 767px) {
     width: 90%;
+    padding: 0;
     /* flex-direction: column; */
   }
 `;

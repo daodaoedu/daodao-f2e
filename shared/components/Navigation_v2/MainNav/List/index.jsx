@@ -17,14 +17,14 @@ const LinkListWrapper = styled.ul`
   align-items: center;
   position: relative;
 
-  @media (max-width: 767px) {
+  @media (max-width: 1023px) {
     display: none;
   }
 `;
 
 const LinkItemWrapper = styled.li`
   position: relative;
-  margin: 0 20px;
+  margin: 0 16px;
   cursor: pointer;
   font-weight: 500;
 `;

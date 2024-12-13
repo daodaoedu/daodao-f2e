@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { Button } from '@mui/material';
 import openLoginWindow from '@/utils/openLoginWindow';
 import UserAvatar from './UserAvatar';
+import MarathonList from './MarathonList';
 
 const LinkListWrapper = styled.ul`
   display: flex;
@@ -15,7 +16,7 @@ const LinkListWrapper = styled.ul`
     cursor: pointer;
     font-weight: 500;
   }
-  @media (max-width: 767px) {
+  @media (max-width: 1023px) {
     display: none;
   }
 `;
@@ -40,7 +41,7 @@ const SubListWrapper = styled.div`
     }
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 1023px) {
     display: none;
   }
 `;
@@ -52,11 +53,7 @@ const SubList = () => {
     <SubListWrapper>
       <LinkListWrapper>
         <li>
-          <Link href="/contribute/resource" passHref>
-            <p className="login" role="presentation">
-              新增資源
-            </p>
-          </Link>
+          <MarathonList />
         </li>
         <li>
           {user._id && user.email ? (
@@ -66,7 +63,7 @@ const SubList = () => {
               onClick={() => openLoginWindow()}
               sx={{
                 height: '40px',
-                padding: '5px 20px',
+                padding: '5px 5px',
                 color: '#fff',
                 borderRadius: '20px',
                 border: '1px solid #fff',

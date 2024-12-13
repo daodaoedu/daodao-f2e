@@ -33,17 +33,21 @@ const PromotionBarWrapper = styled.div`
   padding: 10px 12% 10px 5%;
   text-align: center;
   font-size: 16px;
-
   a:hover {
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+
+  @media (max-width: 767px) {
+    min-height: 68px;
+    /* flex-direction: column; */
   }
 
 `;
 
 const CloseButton = styled.span`
   position: absolute;
-  top: calc(50% - 49.88px);
+  top: calc(50% - 54px);
   right: 5%;
   width: 20px;
   height: 20px;

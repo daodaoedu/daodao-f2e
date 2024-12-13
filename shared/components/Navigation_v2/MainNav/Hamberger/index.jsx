@@ -6,7 +6,7 @@ import { NAV_LINK_MOBILE } from '../../../../../constants/category';
 
 const MobileLinkListWrapper = styled.ul`
   display: none;
-  @media (max-width: 767px) {
+  @media (max-width: 1023px) {
     display: block;
     position: relative;
     ul {

@@ -9,6 +9,7 @@ export const NavigationWrapper = styled(AppBar)(({ hasPromote }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   height: 'auto',
+  minHeight: '68px',
   padding: '0',
   ...(hasPromote && {
     padding: '0',
@@ -31,9 +32,9 @@ const buildRandomText = () => {
 };
 
 const texts = [
-  '✨「島島盃島島盃 -  2025 春季學習馬拉松」開跑啦！1/19 截止報名！✨',
+  '✨「島島盃 -  2025 春季學習馬拉松」開跑啦！1/19 截止報名！✨',
   '✨參加學習馬拉松，一起為自己重新打造喜歡的學習生活吧！✨',
-  '✨報名學習馬拉松，即可試用最新個人化功能唷！✨',
+  '✨報名學習馬拉松，即可試用最新個人化功能輔助學習唷！✨',
 ];
 
 
@@ -49,7 +50,7 @@ const Navigation = () => {
     // 設置一個定時器，每 5 秒更換一次文字
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % texts.length);
-    }, 5000);
+    }, 8000);
 
     // 清除定時器以防止內存洩漏
     return () => clearInterval(interval);
