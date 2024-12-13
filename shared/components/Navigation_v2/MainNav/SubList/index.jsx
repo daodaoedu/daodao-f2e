@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import Link from 'next/link';
+import { useSelector } from 'react-redux';
 import { Button } from '@mui/material';
-import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import openLoginWindow from '@/utils/openLoginWindow';
 import UserAvatar from './UserAvatar';
 
 const LinkListWrapper = styled.ul`
@@ -45,8 +46,7 @@ const SubListWrapper = styled.div`
 `;
 
 const SubList = () => {
-  const auth = useAuth();
-  const authDispatch = useAuthDispatch();
+  const user = useSelector((state) => state.user);
 
   return (
     <SubListWrapper>
@@ -59,11 +59,11 @@ const SubList = () => {
           </Link>
         </li>
         <li>
-          {auth.isLoggedIn ? (
-            <UserAvatar user={auth.user} />
+          {user._id && user.email ? (
+            <UserAvatar user={user} />
           ) : (
             <Button
-              onClick={authDispatch.openLoginModal}
+              onClick={() => openLoginWindow()}
               sx={{
                 height: '40px',
                 padding: '5px 20px',

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
+import { useSearchParams } from 'next/navigation';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import { TAIWAN_DISTRICT, COUNTRIES } from '@/constants/areas';
-import { useAuth } from '@/contexts/Auth';
 
 import {
   GENDER,
@@ -19,6 +19,7 @@ import {
   Typography,
   TextField,
   Switch,
+  TextareaAutosize,
   MenuItem,
   Select,
   Grid,
@@ -50,26 +51,26 @@ import {
   StyledButton,
 } from './Edit.styled';
 
-// TODO: 待重構
 function EditPage() {
   const mobileScreen = useMediaQuery('(max-width: 767px)');
   const [isSetting, setIsSetting] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const check = searchParams.get('check');
 
   const {
     userState,
     errors,
     onChangeHandler,
-    validate,
     onSubmit: onEditSubmit,
     setRef,
   } = useEditProfile();
 
-  const { user, token, isComplete } = useAuth();
+  const user = useSelector((state) => state.user);
   const { tags } = useSelector((state) => state.partners);
 
   useEffect(() => {
-    if (user?._id) {
+    if (user._id) {
       Object.entries(user).forEach(([key, value]) => {
         if (key === 'contactList') {
           const { instagram, facebook, discord, line } = value;
@@ -94,7 +95,7 @@ function EditPage() {
     } else {
       router.push('/');
     }
-  }, [user, token]);
+  }, [user]);
 
   const onUpdateUser = async () => {
     const resultStatus = await onEditSubmit({
@@ -105,17 +106,34 @@ function EditPage() {
       toast.error('請修正錯誤');
       return;
     }
-    if (resultStatus) {
-      toast.success('更新成功');
-    } else {
+    if (!resultStatus && !check) {
       toast.error('更新失敗');
     }
   };
 
   useEffect(() => {
-    if (isComplete) return;
-    validate(userState);
-  }, [userState, isComplete]);
+    switch (user.apiState) {
+      case 'Resolve': {
+        toast.success('更新成功');
+        router.push('/profile');
+        break;
+      }
+      case 'Reject': {
+        toast.error('更新失敗');
+        break;
+      }
+      default:
+    }
+  }, [user.apiState]);
+
+  useEffect(() => {
+    if (check === '1' && user._id && isSetting) {
+      onUpdateUser();
+      router.replace({ query: { id: 'person-setting' } }, undefined, {
+        scroll: false,
+      });
+    }
+  }, [searchParams, user._id && isSetting]);
 
   return (
     <FormWrapper>

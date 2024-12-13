@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { SWRConfig } from 'swr';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
@@ -9,15 +8,15 @@ import Script from 'next/script';
 import Head from 'next/head';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
-import { AuthProvider, useAuth } from '@/contexts/Auth';
 import SnackbarProvider from '@/contexts/Snackbar';
 import CompleteInfoReminderDialog from '@/shared/components/CompleteInfoReminderDialog';
 import GlobalStyle from '@/shared/styles/Global';
 import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
-import { checkLoginValidity } from '@/redux/actions/user';
-import { getReminderStorage } from '@/utils/storage';
+import { checkLoginValidity, fetchUserById } from '@/redux/actions/user';
+import { getRedirectionStorage, getReminderStorage } from '@/utils/storage';
 import DefaultLayout from '@/layout/DefaultLayout';
+import { startLoginListener } from '@/utils/openLoginWindow';
 import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
@@ -25,11 +24,6 @@ import "@/shared/styles/global.css";
 
 const store = storeFactory();
 const persistor = persistStore(store);
-
-const swrConfig = {
-  revalidateOnFocus: false,
-  errorRetryCount: 0,
-};
 
 const App = ({ Component, pageProps }) => {
   const router = useRouter();
@@ -101,13 +95,9 @@ const App = ({ Component, pageProps }) => {
 
       <Provider store={store}>
         <PersistGate persistor={persistor}>
-          <SWRConfig value={swrConfig}>
-            <SnackbarProvider>
-              <AuthProvider>
-                <ThemeComponentWrap pageProps={pageProps} Component={Component} />
-              </AuthProvider>
-            </SnackbarProvider>
-          </SWRConfig>
+          <SnackbarProvider>
+            <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+          </SnackbarProvider>
         </PersistGate>
       </Provider>
     </>
@@ -119,13 +109,14 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   const mode = useSelector((state) => state?.theme?.mode ?? 'light');
   const theme = useMemo(() => themeFactory(mode), [mode]);
   const isEnv = useMemo(() => process.env.NODE_ENV === 'development', []);
-  const { isComplete, isLoggedIn } = useAuth();
+  const router = useRouter();
+  const user = useSelector((state) => state.user);
   const [isOpen, setIsOpen] = useState(false);
   const Layout = Component?.getLayout || DefaultLayout;
 
   const handleClose = () => {
     setIsOpen(false);
-    getReminderStorage().remove();
+    getReminderStorage().set(true);
   };
 
   useEffect(() => {
@@ -133,10 +124,25 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   }, []);
 
   useEffect(() => {
-    if (isLoggedIn && !isComplete && getReminderStorage().get() % 3 === 0) {
+    const stopLoginListener = startLoginListener((id, token) => {
+      const redirectionStorage = getRedirectionStorage();
+      const redirectUrl = redirectionStorage.get();
+
+      dispatch(fetchUserById(id, token));
+
+      if (redirectUrl) {
+        redirectionStorage.remove();
+        router.replace(redirectUrl);
+      }
+    });
+    return () => stopLoginListener();
+  }, [dispatch, router.replace]);
+
+  useEffect(() => {
+    if (user?._id && !user?.isComplete && !getReminderStorage().get()) {
       setIsOpen(true);
     }
-  }, [isLoggedIn, isComplete]);
+  }, [user]);
 
   return (
     <ThemeProvider theme={theme}>
