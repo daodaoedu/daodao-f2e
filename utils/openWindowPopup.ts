@@ -1,4 +1,26 @@
-export default function openWindowPopup({ url, title, width, height }) {
+import checkIsMobileAndTabletDevice from "@/utils/checkIsMobileAndTabletDevice";
+
+interface OpenWindowPopupProps {
+  url: string;
+  title?: string;
+  width?: number;
+  height?: number;
+}
+
+export default function openWindowPopup({
+  url,
+  title,
+  width,
+  height,
+}: OpenWindowPopupProps) {
+  if (checkIsMobileAndTabletDevice()) {
+    return window.open(url, title);
+  }
+
+  if (!width || !height) {
+    return window.open(url, title);
+  }
+
   // Fixes dual-screen position = Most browsers ?? Firefox
   const dualScreenLeft = window.screenLeft ?? window.screenX;
   const dualScreenTop = window.screenTop ?? window.screenY;
