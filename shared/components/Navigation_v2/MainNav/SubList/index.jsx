@@ -60,7 +60,7 @@ const SubList = () => {
             <UserAvatar user={auth.user} />
           ) : (
             <Button
-              onClick={authDispatch.openLoginModal}
+              onClick={() => authDispatch.openLoginModal()}
               sx={{
                 height: '40px',
                 padding: '5px 5px',

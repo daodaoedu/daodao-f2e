@@ -67,7 +67,7 @@ const Menu = ({ open, list, onCloseMenu, shiftTop = '80px' }) => {
           {auth.isLoggedIn ? (
             <UserAvatar user={auth.user} onCloseMenu={onCloseMenu} />
           ) : (
-            <LoginButton onClick={authDispatch.openLoginModal}>
+            <LoginButton onClick={() => authDispatch.openLoginModal()}>
               登入
             </LoginButton>
           )}

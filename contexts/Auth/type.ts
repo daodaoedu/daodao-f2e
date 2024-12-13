@@ -33,12 +33,8 @@ export enum ActionTypes {
   LOGOUT = "logout",
 }
 
-interface OpenLoginModalPayload {
-  redirectUrl?: string;
-}
-
 export type Action =
-  | { type: ActionTypes.OPEN_LOGIN_MODAL; payload?: OpenLoginModalPayload }
+  | { type: ActionTypes.OPEN_LOGIN_MODAL; payload?: string }
   | { type: ActionTypes.CLOSE_LOGIN_MODAL }
   | { type: ActionTypes.SET_TOKEN; payload: string }
   | { type: ActionTypes.UPDATE_USER; payload: IUser; }
@@ -46,7 +42,7 @@ export type Action =
   | { type: ActionTypes.LOGOUT };
 
 export type AuthDispatch = {
-  [ActionTypes.OPEN_LOGIN_MODAL]: (payload?: OpenLoginModalPayload) => void;
+  [ActionTypes.OPEN_LOGIN_MODAL]: (redirectUrl?: string) => void;
   [ActionTypes.CLOSE_LOGIN_MODAL]: () => void;
   [ActionTypes.SET_TOKEN]: (payload: string) => void;
   [ActionTypes.UPDATE_USER]: (payload: CreateUserProfile | UpdateUserProfile) => Promise<void>;

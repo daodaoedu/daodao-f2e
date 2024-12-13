@@ -5,13 +5,14 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
 } from "react";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import useSWR, { SWRConfig } from "swr";
 import { useDispatch } from "react-redux";
 
-import { fetchUserByToken } from "@/redux/actions/user";
+import { fetchUserByToken, userLogout } from "@/redux/actions/user";
 import {
   getRedirectionStorage,
   getReminderStorage,
@@ -95,7 +96,7 @@ const authReducer = (state: AuthState, action: Action): AuthState => {
       return {
         ...initialState,
         isOpenLoginModal: true,
-        redirectUrl: action.payload?.redirectUrl || "",
+        redirectUrl: action.payload || "",
       };
     }
     case ActionTypes.CLOSE_LOGIN_MODAL: {
@@ -161,24 +162,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
     };
     const logout = () => {
       // TODO: 待移除 localStorage.clear，目前只是為了讓 redux 同步登出的暫解
-      // localStorage.removeItem('persist:root');
+      reduxDispatch(userLogout());
       getTokenStorage().remove();
       getRedirectionStorage().remove();
       dispatch({ type: ActionTypes.LOGOUT });
     };
     return {
-      openLoginModal: (payload) => {
-        logout();
-        if (payload?.redirectUrl) {
-          console.log(`%c payload.redirectUrl ${payload.redirectUrl}`, 'color: red; font-size: 3rem;');
-          getRedirectionStorage().set(payload.redirectUrl);
-        }
-        dispatch({ type: ActionTypes.OPEN_LOGIN_MODAL, payload });
-      },
-      closeLoginModal: () => {
-        dispatch({ type: ActionTypes.CLOSE_LOGIN_MODAL });
-      },
       setToken,
+      logout,
+      login: (payload) => {
+        dispatch({ type: ActionTypes.LOGIN, payload });
+      },
       updateUser: async (input) => {
         switch (state.loginStatus) {
           case LoginStatus.TEMPORARY: {
@@ -199,10 +193,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
           }
         }
       },
-      login: (payload) => {
-        dispatch({ type: ActionTypes.LOGIN, payload });
+      openLoginModal: (payload) => {
+        logout();
+        if (typeof payload === "string") {
+          getRedirectionStorage().set(payload);
+        }
+        dispatch({ type: ActionTypes.OPEN_LOGIN_MODAL, payload });
       },
-      logout,
+      closeLoginModal: () => {
+        dispatch({ type: ActionTypes.CLOSE_LOGIN_MODAL });
+      },
     };
   }, [state.loginStatus, state.user, dispatch]);
 
@@ -212,14 +212,19 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   };
 
-  useSWR(state.token ? fetchUserProfile.name : null, fetchUserProfile, {
-    onSuccess: authDispatch.login,
-    onError: handleError,
-  });
+  useSWR(
+    state.token ? [fetchUserProfile.name, state.token] : null,
+    fetchUserProfile,
+    {
+      onSuccess: authDispatch.login,
+      onError: handleError,
+    }
+  );
 
   useEffect(() => {
     const handleToken = (token: string) => {
       if (!token) return;
+      // TODO: 待移除 redux，為了同步資訊
       reduxDispatch(fetchUserByToken(token));
       authDispatch.setToken(token);
     };
@@ -259,7 +264,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
     switch (state.loginStatus) {
       case LoginStatus.TEMPORARY: {
         const redirectUrl = state.redirectUrl || getRedirectionStorage().get();
-        console.log(`%c redirectUrl ${redirectUrl}`, 'color: red; font-size: 3rem;');
         authDispatch.closeLoginModal();
         router.replace(redirectUrl || "/signin");
         break;
@@ -304,28 +308,47 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
 interface ProtectedComponentProps extends PropsWithChildren {
   redirectOnCancel?: string;
+  onlyCheckToken?: boolean;
 }
 
-export const ProtectedComponent = ({ children, redirectOnCancel }: ProtectedComponentProps) => {
+export const ProtectedComponent = ({
+  children,
+  redirectOnCancel,
+  onlyCheckToken = false,
+}: ProtectedComponentProps) => {
   const router = useRouter();
-  const { user, isLoggedIn, isOpenLoginModal } = useAuth();
+  const opened = useRef(false);
+  const { user, isLoggedIn, isOpenLoginModal, token } = useAuth();
   const { openLoginModal } = useAuthDispatch();
+  const requiresLoginModal = onlyCheckToken ? !token : !isLoggedIn;
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (!isLoggedIn) {
+    if (requiresLoginModal) {
       timer = setTimeout(() => {
+        opened.current = true;
         openLoginModal();
       }, 1000);
     }
     return () => clearTimeout(timer);
-  }, [isLoggedIn, openLoginModal]);
+  }, [requiresLoginModal, openLoginModal]);
 
   useEffect(() => {
-    if (redirectOnCancel && !isOpenLoginModal && isLoggedIn) {
-      router.push(redirectOnCancel);
+    if (
+      redirectOnCancel &&
+      !isOpenLoginModal &&
+      opened.current &&
+      requiresLoginModal
+    ) {
+      router.replace(redirectOnCancel);
     }
-  }, [redirectOnCancel, router.replace]);
+  }, [
+    redirectOnCancel,
+    isOpenLoginModal,
+    opened.current,
+    requiresLoginModal,
+    router.replace,
+  ]);
 
   if (!user) return <div className="h-screen w-screen" />;
 

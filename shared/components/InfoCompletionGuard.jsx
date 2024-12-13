@@ -1,9 +1,9 @@
 import { useState, cloneElement } from 'react';
-import { useSelector } from 'react-redux';
+import { useAuth } from '@/contexts/Auth';
 import CompleteInfoReminderDialog from './CompleteInfoReminderDialog';
 
 export default function InfoCompletionGuard({ children }) {
-  const user = useSelector((state) => state.user);
+  const { isComplete, isLoggedIn } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleClose = () => {
@@ -19,7 +19,7 @@ export default function InfoCompletionGuard({ children }) {
     <>
       {cloneElement(
         children,
-        user?._id && !user?.isComplete ? { onClick: handleClickProxy } : {},
+        isLoggedIn && !isComplete ? { onClick: handleClickProxy } : {},
       )}
       <CompleteInfoReminderDialog isOpen={isOpen} onClose={handleClose} />
     </>
