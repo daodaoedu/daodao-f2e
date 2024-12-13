@@ -1,13 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState,useRef,useEffect } from 'react';
 import { keyframes, css } from '@emotion/react';
 import styled from '@emotion/styled';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { useDispatch } from 'react-redux';
-import { userLogout } from '@/redux/actions/user';
 import useMediaQuery from '@mui/material/useMediaQuery';
-
-import { Avatar, Box, MenuItem, Typography } from '@mui/material';
+import { Box, MenuItem } from '@mui/material';
 import { useRouter } from 'next/router';
 
 const slideInFrames = keyframes`
@@ -38,28 +35,41 @@ const StyledMenuItem = styled(MenuItem)`
 `;
 
 const MarathonList = ({ onCloseMenu = () => {}, user }) => {
-  const dispatch = useDispatch();
   const isPadScreen = useMediaQuery('(max-width: 767px)');
+  const [isOpenMenu, setIsOpenMenu] = useState(null);
+
+  const buttonRef = useRef(null);
+  const handleClickOutside = (event) => {
+    if (buttonRef.current && !buttonRef.current.contains(event.target)) {
+      setIsOpenMenu(!isOpenMenu);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpenMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpenMenu]);
 
   const { push } = useRouter();
 
-  const [isOpenMenu, setIsOpenMenu] = useState(null);
-
-  const logout = () => {
-    dispatch(userLogout());
-    setIsOpenMenu(false);
-    onCloseMenu();
-    push('/');
-  };
-
   return (
-    <Box sx={{ margin: '8px 32px', cursor: 'pointer', position: 'relative' }}>
+    <Box
+      ref={buttonRef}
+      sx={{ margin: '8px 32px', cursor: 'pointer', position: 'relative' }}
+    >
       <Box
         sx={{
+          fontWeight: '500',
           display: 'flex',
           alignItems: 'center',
-          backgroundColor: isOpenMenu ? '#def5f5' : 'transparent',
-          color: isOpenMenu ? '#16b9b3':'#def5f5',
+          backgroundColor: isOpenMenu ? '#def5f5' : '#16b9b3',
+          color: isOpenMenu ? '#16b9b3':'#fff',
           padding: '8px',
           borderRadius: '8px',
           transition: 'background-color 0.3s ease, padding 0.3s ease',          
