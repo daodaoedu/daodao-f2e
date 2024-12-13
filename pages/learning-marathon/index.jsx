@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { sendLoginConfirmation } from '@/utils/openLoginWindow';
 import SEOConfig from '@/shared/components/SEO';
-import Marathon from '@/components/Marathon';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 
@@ -55,7 +54,6 @@ const LearningMarathon = () => {
   return (
     <>
       <SEOConfig data={SEOData} />
-      <Marathon />
     </>
   );
 };
