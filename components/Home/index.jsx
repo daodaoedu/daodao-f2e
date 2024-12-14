@@ -10,6 +10,7 @@ import FacebookPosts from './FacebookPosts';
 import WishResource from './WishResource';
 import APPBanner from './APPBanner';
 import JoinCooperate from './JoinCooperate';
+import MarathonBanner from './MarathonBanner';
 
 const HomeWrapper = styled.div``;
 
@@ -17,7 +18,7 @@ function Home() {
   const guideRef = useRef(null);
   return (
     <HomeWrapper>
-      <Banner guideRef={guideRef} />
+      <MarathonBanner />
       <About />
       <Divider sx={{ margin: '10px 0' }} />
       <APPBanner />

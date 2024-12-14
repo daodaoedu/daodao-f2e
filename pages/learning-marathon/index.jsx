@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect,useLayoutEffect } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { sendLoginConfirmation } from '@/utils/openLoginWindow';
@@ -183,6 +183,32 @@ const LearningMarathon = () => {
     sendLoginConfirmation(id, token);
   }, [id, token]);
 
+  useLayoutEffect(() => {
+    const scrollToSection = () => {
+      const hash = router.asPath.split('#')[1];
+      if (hash) {
+        const element = document.getElementById(hash);
+        if (element) {
+          requestAnimationFrame(() => {
+            const headerOffset = document.querySelector('header')?.offsetHeight || 70;
+            const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+            const offsetPosition = elementPosition - headerOffset;
+
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth',
+            });
+          });
+        }
+      }
+    };
+
+    const timer = setTimeout(scrollToSection, 100);
+
+    return () => clearTimeout(timer);
+  }, [router.asPath]);
+
+
   return (
     <>
       <SEOConfig data={SEOData} />
@@ -226,7 +252,9 @@ const LearningMarathon = () => {
               component="h2"
               sx={{
                 marginBottom: '10px',
+                paddingTop: '60px'
               }}
+              id="marathon-intro"
             >
               活動介紹
             </StyledSectionTitle>

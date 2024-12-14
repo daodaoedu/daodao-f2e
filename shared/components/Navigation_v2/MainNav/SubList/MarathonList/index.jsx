@@ -37,7 +37,7 @@ const StyledMenuItem = styled(MenuItem)`
 const MarathonList = ({ onCloseMenu = () => {}, user }) => {
   const isPadScreen = useMediaQuery('(max-width: 767px)');
   const [isOpenMenu, setIsOpenMenu] = useState(null);
-
+  const router = useRouter();
   const buttonRef = useRef(null);
   const handleClickOutside = (event) => {
     if (buttonRef.current && !buttonRef.current.contains(event.target)) {
@@ -56,7 +56,37 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
     };
   }, [isOpenMenu]);
 
-  const { push } = useRouter();
+  const sections = [
+    { 
+      name: '活動詳情', 
+      id: 'marathon-intro', 
+      path: '/learning-marathon#marathon-intro' 
+    },
+    { 
+      name: '學習計畫分享區', 
+      id: 'marathon-sharing', 
+      path: '/marathon-sharing' 
+    },
+    { 
+      name: '活動公告', 
+      id: 'marathon-announcement', 
+      path: '/marathon-announcement' 
+    },
+    { 
+      name: '成果分享（暫不公開）', 
+      id: 'project-sharing', 
+      path: '/project-sharing',
+      disabled: true 
+    }
+  ];
+  const handleNavigation = (section) => {
+    if (section.disabled) return;
+  
+    setIsOpenMenu(false);
+    onCloseMenu && onCloseMenu();
+  
+    router.push(section.path);
+  };
 
   return (
     <Box
@@ -91,27 +121,17 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
         }}
       >
         <Box sx={{ padding: !isPadScreen && '12px' }}>
-          {[
-            { name: '活動詳情', id: 'marathon-detail' },
-            { name: '學習計畫分享區', id: 'marathon-sharing' },
-            { name: '活動公告', id: 'marathon-announcement' },
-            { name: '成果分享（暫不公開）', id: 'project-sharing' },
-          ].map((v, i) => (
-            <StyledMenuItem
-              as="div"
-              key={v.id}
-              delay={`${i * 0.1}s`}
-              isPadScreen={isPadScreen}
-              isDisabled={v.id === 'project-sharing'}
-              onClick={() => {
-                setIsOpenMenu(false);
-                onCloseMenu();
-                push('/learning-marathon?id=' + v.id);
-              }}
-            >
-              {v.name}
-            </StyledMenuItem>
-          ))}
+          {sections.map((section, i) => (
+              <StyledMenuItem
+                as="div"
+                key={section.id}
+                delay={`${i * 0.1}s`}
+                isDisabled={section.id === 'project-sharing'}
+                onClick={() => handleNavigation(section)}
+              >
+                {section.name}
+              </StyledMenuItem>
+            ))}
         </Box>
       </Box>
     </Box>

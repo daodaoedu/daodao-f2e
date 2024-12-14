@@ -34,8 +34,40 @@ const StyledMenuItem = styled(MenuItem)`
 `;
 
 const MarathonList = ({ onCloseMenu = () => {} }) => {
-  const { push } = useRouter();
+  const router = useRouter();
   const [isOpenMenu, setIsOpenMenu] = useState(true);
+
+  const sections = [
+    { 
+      name: '活動詳情', 
+      id: 'marathon-intro', 
+      path: '/learning-marathon#marathon-intro' 
+    },
+    { 
+      name: '學習計畫分享區', 
+      id: 'marathon-sharing', 
+      path: '/marathon-sharing' 
+    },
+    { 
+      name: '活動公告', 
+      id: 'marathon-announcement', 
+      path: '/marathon-announcement' 
+    },
+    { 
+      name: '成果分享（暫不公開）', 
+      id: 'project-sharing', 
+      path: '/project-sharing',
+      disabled: true 
+    }
+  ];
+  const handleNavigation = (section) => {
+    if (section.disabled) return;
+  
+    setIsOpenMenu(false);
+    onCloseMenu && onCloseMenu();
+  
+    router.push(section.path);
+  };
 
   return (
     <Box sx={{ margin: '8px 32px 8px 24px', cursor: 'pointer', position: 'relative' }}>
@@ -63,24 +95,15 @@ const MarathonList = ({ onCloseMenu = () => {} }) => {
         }}
       >
         <Box sx={{ marginTop: '6px' }}>
-          {[
-            { name: '活動詳情', id: 'marathon-detail' },
-            { name: '學習計畫分享區', id: 'marathon-sharing' },
-            { name: '活動公告', id: 'marathon-announcement' },
-            { name: '成果分享（暫不公開）', id: 'project-sharing' },
-          ].map((v, i) => (
+          {sections.map((section, i) => (
             <StyledMenuItem
               as="div"
-              key={v.id}
+              key={section.id}
               delay={`${i * 0.1}s`}
-              isDisabled={v.id === 'project-sharing'}
-              onClick={() => {
-                setIsOpenMenu(!isOpenMenu);
-                onCloseMenu();
-                push('/learning-marathon?id=' + v.id)
-              }}
+              isDisabled={section.id === 'project-sharing'}
+              onClick={() => handleNavigation(section)}
             >
-              {v.name}
+              {section.name}
             </StyledMenuItem>
           ))}
         </Box>
