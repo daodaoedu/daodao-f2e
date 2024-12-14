@@ -33,6 +33,12 @@ const StyledCard = styled(Box)`
     right: -70px;
     bottom: -22px;
   }
+
+  @media (max-width: 767px) {
+    &.boom:after {
+      display: none;
+    }
+  }
 `;
 
 const StyledTitle = styled(Typography)`

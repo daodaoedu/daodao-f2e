@@ -24,7 +24,7 @@ const StyledGroup = styled(Box)`
 const StyledCard = styled(Box)`
   height: 300px;
   border-radius: 10px;
-  padding: 25px 30px;
+  padding: 40px 30px;
   text-align: center;
   
   img {

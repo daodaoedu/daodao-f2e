@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  scroll-behavior: smooth;
+}
+
 @layer base {
   .prose li[role=checkbox] {
     @apply indent-1 relative before:translate-y-1 after:absolute after:top-1/2 after:-translate-y-2/3 after:rotate-45;
