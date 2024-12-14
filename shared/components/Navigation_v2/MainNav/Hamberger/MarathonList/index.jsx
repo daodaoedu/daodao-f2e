@@ -38,34 +38,34 @@ const MarathonList = ({ onCloseMenu = () => {} }) => {
   const [isOpenMenu, setIsOpenMenu] = useState(true);
 
   const sections = [
-    { 
-      name: '活動詳情', 
-      id: 'marathon-intro', 
-      path: '/learning-marathon#marathon-intro' 
+    {
+      name: '活動詳情',
+      id: 'marathon-intro',
+      path: '/learning-marathon#marathon-intro'
     },
-    { 
-      name: '學習計畫分享區', 
-      id: 'marathon-sharing', 
-      path: '/marathon-sharing' 
+    {
+      name: '學習計畫分享區',
+      id: 'marathon-sharing',
+      path: '/marathon-sharing'
     },
-    { 
-      name: '活動公告', 
-      id: 'marathon-announcement', 
-      path: '/marathon-announcement' 
+    {
+      name: '活動公告',
+      id: 'marathon-announcement',
+      path: '/marathon-announcement'
     },
-    { 
-      name: '成果分享（暫不公開）', 
-      id: 'project-sharing', 
+    {
+      name: '成果分享（暫不公開）',
+      id: 'project-sharing',
       path: '/project-sharing',
-      disabled: true 
+      disabled: true
     }
   ];
   const handleNavigation = (section) => {
     if (section.disabled) return;
-  
+
     setIsOpenMenu(false);
     onCloseMenu && onCloseMenu();
-  
+
     router.push(section.path);
   };
 
@@ -75,13 +75,13 @@ const MarathonList = ({ onCloseMenu = () => {} }) => {
         sx={{
           fontSize: '18px',
           display: 'flex',
-          color:  '#16b9b3',
+          color: '#16b9b3',
           borderRadius: '4px',
-          transition: 'background-color 0.3s ease, padding 0.3s ease',          
-        }}        
+          transition: 'background-color 0.3s ease, padding 0.3s ease',
+        }}
         onClick={() => setIsOpenMenu(!isOpenMenu)}
       >
-       島島盃-春季學習馬拉松
+        島島盃-春季學習馬拉松
         {isOpenMenu ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
       </Box>
       <Box

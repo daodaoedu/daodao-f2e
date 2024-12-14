@@ -1,4 +1,4 @@
-import React, { useState,useRef,useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { keyframes, css } from '@emotion/react';
 import styled from '@emotion/styled';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -57,34 +57,34 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
   }, [isOpenMenu]);
 
   const sections = [
-    { 
-      name: '活動詳情', 
-      id: 'marathon-intro', 
-      path: '/learning-marathon#marathon-intro' 
+    {
+      name: '活動詳情',
+      id: 'marathon-intro',
+      path: '/learning-marathon#marathon-intro'
     },
-    { 
-      name: '學習計畫分享區', 
-      id: 'marathon-sharing', 
-      path: '/marathon-sharing' 
+    {
+      name: '學習計畫分享區',
+      id: 'marathon-sharing',
+      path: '/marathon-sharing'
     },
-    { 
-      name: '活動公告', 
-      id: 'marathon-announcement', 
-      path: '/marathon-announcement' 
+    {
+      name: '活動公告',
+      id: 'marathon-announcement',
+      path: '/marathon-announcement'
     },
-    { 
-      name: '成果分享（暫不公開）', 
-      id: 'project-sharing', 
+    {
+      name: '成果分享（暫不公開）',
+      id: 'project-sharing',
       path: '/project-sharing',
-      disabled: true 
+      disabled: true
     }
   ];
   const handleNavigation = (section) => {
     if (section.disabled) return;
-  
+
     setIsOpenMenu(false);
     onCloseMenu && onCloseMenu();
-  
+
     router.push(section.path);
   };
 
@@ -99,14 +99,14 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
           display: 'flex',
           alignItems: 'center',
           backgroundColor: isOpenMenu ? '#def5f5' : '#16b9b3',
-          color: isOpenMenu ? '#16b9b3':'#fff',
+          color: isOpenMenu ? '#16b9b3' : '#fff',
           padding: '8px',
           borderRadius: '8px',
-          transition: 'background-color 0.3s ease, padding 0.3s ease',          
-        }}        
+          transition: 'background-color 0.3s ease, padding 0.3s ease',
+        }}
         onClick={() => setIsOpenMenu(!isOpenMenu)}
       >
-       島島盃-春季學習馬拉松
+        島島盃-春季學習馬拉松
         {isOpenMenu ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
       </Box>
       <Box
@@ -122,15 +122,15 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
       >
         <Box sx={{ padding: !isPadScreen && '12px' }}>
           {sections.map((section, i) => (
-              <StyledMenuItem
-                as="div"
-                key={section.id}
-                delay={`${i * 0.1}s`}
-                isDisabled={section.id === 'project-sharing'}
-                onClick={() => handleNavigation(section)}
-              >
-                {section.name}
-              </StyledMenuItem>
+            <StyledMenuItem
+              as="div"
+              key={section.id}
+              delay={`${i * 0.1}s`}
+              isDisabled={section.id === 'project-sharing'}
+              onClick={() => handleNavigation(section)}
+            >
+              {section.name}
+            </StyledMenuItem>
             ))}
         </Box>
       </Box>

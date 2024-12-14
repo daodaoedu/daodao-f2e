@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect,useLayoutEffect } from 'react';
+import React, { useMemo, useEffect, useLayoutEffect } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { sendLoginConfirmation } from '@/utils/openLoginWindow';
@@ -207,7 +207,6 @@ const LearningMarathon = () => {
 
     return () => clearTimeout(timer);
   }, [router.asPath]);
-
 
   return (
     <>

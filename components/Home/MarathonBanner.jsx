@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import Image from '@/shared/components/Image';
 import LearningMarathonImgDesktop from '@/public/assets/learning-marathon-2025S1-desktop@2x.png';
 import LearningMarathonImgMobile from '@/public/assets/learning-marathon-2025S1-mobile@2x.png';
-import { Box,Button} from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { useRouter } from 'next/router';
 
 const StyledBanner = styled(Box)`
@@ -63,33 +63,33 @@ const StyledBannerButton = styled(Button)`
 
 const MarathonBanner = () => {
     const router = useRouter();
-    
+
     return (
-        <StyledBanner>
+      <StyledBanner>
         <Box className="desktop">
-        <Image
+          <Image
             src={LearningMarathonImgDesktop.src}
             alt="島島盃 - 學習馬拉松 2025 春季賽"
             height="inherit"
             background="linear-gradient(#fcfefe 10%, #e0f1f2 40%)"
             borderRadius="0"
             className="desktop"
-        />
+          />
         </Box>
         <Box className="mobile">
-        <Image
+          <Image
             src={LearningMarathonImgMobile.src}
             alt="島島盃 - 學習馬拉松 2025 春季賽"
             height="inherit"
             background="linear-gradient(#fcfefe 10%, #e0f1f2 40%)"
             borderRadius="0"
             className="mobile"
-        />
+          />
         </Box>
         <StyledBannerButton onClick={() => { router.push('/learning-marathon#marathon-intro'); }}>
-            不要錯過！點我了解
+          不要錯過！點我了解
         </StyledBannerButton>
-    </StyledBanner>
+      </StyledBanner>
     );
 };
 

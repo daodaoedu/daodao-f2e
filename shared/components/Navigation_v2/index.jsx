@@ -37,7 +37,6 @@ const texts = [
   '✨報名學習馬拉松，即可試用最新個人化功能輔助學習唷！✨',
 ];
 
-
 // const ToolbarWrapper = styled(Toolbar)`
 //   margin: 0 auto;
 // `;
