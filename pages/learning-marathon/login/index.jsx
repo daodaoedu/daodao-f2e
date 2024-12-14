@@ -64,12 +64,9 @@ const LoginPage = () => {
 
   useEffect(() => {
     const onMessageChange = (e) => {
-      const oldUser = e.data?.type === 'USER_UPDATED';
-      const newUser = e.data?.type === 'TEMP_TOKEN_UPDATED';
-      const redirectUrl = getRedirectionStorage().get();
       const hasLogin = user._id || (user.userType === 'no_data');
-      if (hasLogin || oldUser || newUser) {
-        window.location.href = redirectUrl;
+      if (hasLogin) {
+        router.push('/learning-marathon/signup');
       }
     };
 
