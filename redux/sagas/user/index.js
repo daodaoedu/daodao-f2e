@@ -40,14 +40,9 @@ function* fetchAllUsers() {
 
 function* createUserProfile(action) {
   const { user } = action.payload;
-  let URL = "";
 
   try {
-    if (user.id) {
-      URL = `${BASE_URL}/user/${user.id}`;
-    } else {
-      URL = `${BASE_URL}/user`;
-    }
+    const URL = `${BASE_URL}/user`;
 
     // if success => status: 201, token, user
     const result = yield req(URL, {
