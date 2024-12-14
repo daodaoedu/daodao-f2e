@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchMarathonProfileByUserEvent
 } from "@/redux/actions/marathon";
+import { useAuthDispatch } from '@/contexts/Auth';
 import {
   GENDER,
   ROLE,
@@ -56,6 +57,7 @@ export default function UserProfileForm({
   currentStep,
   setCurrentStep,
 }) {
+  const authDispatch = useAuthDispatch();
   const reduxDispatch = useDispatch();
   const mobileScreen = useMediaQuery('(max-width: 767px)');
   const [isSetting, setIsSetting] = useState(false);
@@ -142,6 +144,7 @@ export default function UserProfileForm({
         reduxDispatch(fetchMarathonProfileByUserEvent(user._id, "2025S1"));
         setHasGetLatestMarathon(true);
       }
+      authDispatch.updateUser(user);
     }
   }, [user]);
 
