@@ -152,7 +152,7 @@ const StyledSignUpButton = styled(Button)`
 `;
 
 const LearningMarathon = () => {
-  const { openLoginModal, deleteUser } = useAuthDispatch();
+  const { openLoginModal } = useAuthDispatch();
   const { isLoggedIn, isTemporary } = useAuth();
   const router = useRouter();
   const SEOData = useMemo(
