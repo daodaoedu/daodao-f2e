@@ -53,6 +53,12 @@ const Navigation = () => {
     return () => clearInterval(interval);
   }, [texts.length]);
 
+  useEffect(() => {
+    // TODO: 先暫存 localStorage ，後續需要調整，不然 header 高度一直變
+    localStorage.setItem('isShowPromotionBar', showPromotetionBar);
+    window.dispatchEvent(new Event('storage'));
+  }, [showPromotetionBar]);
+
   return (
     <>
       <NavigationWrapper position="sticky" hasPromote={showPromotetionBar}>

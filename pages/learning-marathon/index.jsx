@@ -1,20 +1,17 @@
-import React, { useMemo, useEffect, useLayoutEffect } from 'react';
+import Link from 'next/link';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
-import { sendLoginConfirmation } from '@/utils/openLoginWindow';
 import SEOConfig from '@/shared/components/SEO';
 import Image from '@/shared/components/Image';
 import LearningMarathonImgDesktop from '@/public/assets/learning-marathon-2025S1-desktop@2x.png';
 import LearningMarathonImgMobile from '@/public/assets/learning-marathon-2025S1-mobile@2x.png';
+import { FaChevronRight, FaChevronLeft } from "react-icons/fa6";
 
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
-import {
-  Typography,
-  Box,
-  Button,
-} from '@mui/material';
+import { Box, Button, IconButton } from '@mui/material';
 import Participant from '@/components/Marathon/Participant';
 import Equip from '@/components/Marathon/Equip';
 import Spotlight from '@/components/Marathon/Spotlight';
@@ -23,6 +20,7 @@ import Price from '@/components/Marathon/Price';
 import Faq from '@/components/Marathon/Faq';
 
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import { cn } from '@/utils/cn';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -83,54 +81,6 @@ const StyledBannerButton = styled(Button)`
   }
 `;
 
-const StyledSection = styled(Box)`
-  padding: 100px 24px;
-  overflow: hidden;
-
-  @media (max-width: 767px) {
-    padding: 32px 24px;
-  }
-`;
-
-const StyledContent = styled(Box)`
-  width: 750px;
-  max-width: 100%;
-  margin: 0 auto;
-`;
-
-const StyledSectionTitle = styled(Typography)`
-  font-size: 22px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 140%;
-  color: #293A3D;
-`;
-
-const StyledParagraph = styled(Typography)`
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 140%;
-  color: #536166;
-`;
-
-const StyledList = styled(Box)`
-  ul { list-style-type: disc; }
-  ol { list-style-type: numeric; }
-  ol, ul {
-    padding: 0 0 0 1.5em;
-
-    ol, ul { padding-left: 3em; }
-
-    li {
-      color: #536166;
-      font-size: 16px;
-      font-weight: 400;
-      line-height: 140%;
-    }
-  }
-`;
-
 const StyledSignUpButton = styled(Button)`
   border-radius: 20px;
   padding: 10px 20px;
@@ -150,6 +100,222 @@ const StyledSignUpButton = styled(Button)`
     }
   }
 `;
+
+const useScrollPaddingTop = () => {
+  const [scrollPaddingTop, setScrollPaddingTop] = useState(0);
+
+  useEffect(() => {
+    const handleScrollPaddingTop = () => {
+      const headerOffset = document.querySelector('header')?.offsetHeight || 0;
+      const root = document.querySelector(":root");
+      root.style.scrollPaddingTop = `${headerOffset + 80}px`;
+      setScrollPaddingTop(headerOffset);
+    };
+
+    const handleStorage = () => {
+      const isShowPromotionBar = localStorage.getItem('isShowPromotionBar');
+      if (isShowPromotionBar) {
+        handleScrollPaddingTop();
+      }
+    };
+
+    handleScrollPaddingTop();
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
+
+  return scrollPaddingTop;
+};
+
+const Sidebar = ({ onClickSignupButton }) => {
+  const scrollPaddingTop = useScrollPaddingTop();
+  const [activeSection, setActiveSection] = useState(null);
+  const [isShow, setIsShow] = useState(false);
+
+  const sidebarItems = [
+    { label: '活動介紹', href: '#marathon-intro' },
+    { label: '馬拉松進行方式', href: '#marathon-how' },
+    { label: '引導師介紹', href: '#marathon-mentor' },
+    { label: '你可以預期的收穫', href: '#marathon-benefit' },
+    { label: '成果發表與獎勵', href: '#marathon-reward' },
+    { label: '如何申請', href: '#marathon-apply' },
+    { label: '本計畫價值', href: '#marathon-price' },
+    { label: 'FAQ', href: '#marathon-faq' },
+  ];
+
+  useEffect(() => {
+    const headings = Array.from(document.querySelectorAll('main h2'));
+    const filteredHeadings = headings.filter(
+      (heading) => sidebarItems.some((item) => item.href.replace('#', '') === heading.id),
+    );
+    const sections = filteredHeadings.map((heading) => heading.parentElement);
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry?.target?.children?.[0]?.id);
+        }
+      });
+    });
+
+    sections.forEach((section) => observer.observe(section));
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const bannerHeight = document.querySelector('main')?.children?.[0]?.offsetHeight || 0;
+    const handleScroll = () => {
+      if (window.scrollY < bannerHeight || window.scrollY + window.innerHeight > document.body.scrollHeight - 250) {
+        setIsShow(false);
+      } else {
+        setIsShow(true);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  return (
+    <aside
+      className={cn(
+        "hidden lg:block fixed left-8",
+        "p-2 bg-white rounded-lg shadow-md transition-opacity duration-300 z-20",
+        isShow ? 'opacity-100' : 'opacity-0 pointer-events-none',
+      )}
+      style={{ top: `${scrollPaddingTop + 100}px` }}
+    >
+      <ul className="flex flex-col gap-2 mb-2">
+        {sidebarItems.map((item) => (
+          <li key={item.label}>
+            <Link
+              href={item.href}
+              className={cn(
+                "block body-lg font-medium p-2.5 rounded-lg text-basic-400 transition-colors duration-300",
+                activeSection === item.href.replace('#', '') && 'text-primary-base bg-primary-lightest',
+              )}
+            >
+              {item.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <StyledSignUpButton className="w-full" onClick={onClickSignupButton}>立即報名</StyledSignUpButton>
+    </aside>
+  );
+};
+
+const Nav = () => {
+  const navItems = [
+    { label: '活動辦法', href: '#', active: true },
+    { label: '活動公告', href: '#' },
+    { label: '自學計畫分享區', href: '#' },
+    { label: '成果發表（未開放）', href: '#', disabled: true },
+  ];
+
+  const scrollPaddingTop = useScrollPaddingTop();
+
+  return (
+    <nav className="sticky z-10 bg-basic-100 text-nowrap overflow-x-auto" style={{ top: `${scrollPaddingTop}px` }}>
+      <ul className="max-w-[750px] mx-auto flex justify-between gap-4">
+        {navItems.map((item) => (
+          <li key={item.label}>
+            {item.disabled ? (
+              <span className="block text-basic-300 cursor-not-allowed body-sm font-medium p-4">
+                {item.label}
+              </span>
+            ) : (
+              <Link
+                href={item.href}
+                className={cn(
+                  'relative block text-primary-base body-sm font-medium p-4',
+                  item.active && 'before:content-[""] before:absolute before:bottom-2.5 before:left-4 before:right-4 before:h-[2px] before:bg-primary-base',
+                )}
+              >
+                {item.label}
+              </Link>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+};
+
+const Section = ({ title, id, className, children, withContainer = true }) => (
+  <section className={cn("py-8 px-6 md:py-[100px] body-md text-basic-400", className)}>
+    <div className={cn(withContainer && "max-w-[750px] mx-auto lg:mr-12 min-[1100px]:mr-24 min-[1180px]:mr-auto")}>
+      {title && <h2 className="heading-md text-basic-500" id={id}>{title}</h2>}
+      {children}
+    </div>
+  </section>
+);
+
+const List = ({ className, children }) => (
+  <ul className={cn("list-disc ml-6", className)}>{children}</ul>
+);
+
+const Mentors = () => {
+  const [currentMentor, setCurrentMentor] = useState(0);
+  const mentors = [
+    { name: '引導師1', image: '/assets/mentors/card-partner-0.jpg' },
+    { name: '引導師2', image: '/assets/mentors/card-partner-1.jpg' },
+    { name: '引導師3', image: '/assets/mentors/card-partner-2.jpg' },
+    { name: '引導師4', image: '/assets/mentors/card-partner-3.jpg' },
+    { name: '引導師5', image: '/assets/mentors/card-partner-4.jpg' },
+    { name: '引導師6', image: '/assets/mentors/card-partner-5.jpg' },
+    { name: '引導師7', image: '/assets/mentors/card-partner-6.jpg' },
+  ];
+
+  const handleNextMentor = () => {
+    if (currentMentor < mentors.length - 1) {
+      setCurrentMentor((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevMentor = () => {
+    if (currentMentor > 0) {
+      setCurrentMentor((prev) => prev - 1);
+    }
+  };
+
+  return (
+    <>
+      <div className="px-6 md:px-[100px] flex justify-between items-center">
+        <h2 className="heading-md text-basic-500" id="marathon-mentor">引導師介紹</h2>
+        <div className="flex gap-2">
+          <IconButton onClick={handlePrevMentor} disabled={currentMentor === 0}>
+            <FaChevronLeft />
+          </IconButton>
+          <IconButton onClick={handleNextMentor} disabled={currentMentor === mentors.length - 1}>
+            <FaChevronRight />
+          </IconButton>
+        </div>
+      </div>
+      <div className="flex gap-4 mt-9 px-6 md:px-[100px] overflow-x-hidden select-none">
+        {mentors.map((mentor) => (
+          <div
+            key={mentor.name}
+            className="relative shrink-0 rounded-lg w-[285px] h-[307px] overflow-hidden transition-transform duration-300"
+            style={{ transform: `translateX(-${currentMentor * 301}px)` }}
+          >
+            <div className="absolute inset-0">
+              <Image src={mentor.image} alt={mentor.name} width={293} height={321} borderRadius="0" />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-primary-base/80" />
+            <div className="heading-md text-white absolute bottom-0 left-0 right-0 p-4">學習馬拉松 | 引導師</div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};
 
 const LearningMarathon = () => {
   const { openLoginModal } = useAuthDispatch();
@@ -187,36 +353,6 @@ const LearningMarathon = () => {
     [router?.asPath],
   );
 
-  const { token, id } = router.query;
-
-  useEffect(() => {
-    sendLoginConfirmation(id, token);
-  }, [id, token]);
-
-  useLayoutEffect(() => {
-    const scrollToSection = () => {
-      const hash = router.asPath.split('#')[1];
-      if (hash) {
-        const element = document.getElementById(hash);
-        if (element) {
-          requestAnimationFrame(() => {
-            const headerOffset = document.querySelector('header')?.offsetHeight || 70;
-            const elementPosition = element.getBoundingClientRect().top + window.scrollY;
-            const offsetPosition = elementPosition - headerOffset;
-
-            window.scrollTo({
-              top: offsetPosition,
-              behavior: 'smooth',
-            });
-          });
-        }
-      }
-    };
-
-    const timer = setTimeout(scrollToSection, 100);
-
-    return () => clearTimeout(timer);
-  }, [router.asPath]);
   const handleClickSignupButton = () => {
     if (isLoggedIn || isTemporary) {
       router.push('/learning-marathon/signup');
@@ -224,10 +360,12 @@ const LearningMarathon = () => {
       openLoginModal('/learning-marathon/signup');
     }
   };
+
+  // TODO: Banner 動態效果
   return (
     <>
       <SEOConfig data={SEOData} />
-      <Box>
+      <main>
         <StyledBanner>
           <Box className="desktop">
             <Image
@@ -253,384 +391,184 @@ const LearningMarathon = () => {
             立即報名
           </StyledBannerButton>
         </StyledBanner>
-        <StyledSection
-          component="section"
-          sx={{
-            backgroundColor: '#FFFFFF'
-          }}
-          id="event-intro"
+        <Nav />
+        <Sidebar onClickSignupButton={handleClickSignupButton} />
+        <Section
+          title="活動介紹"
+          id="marathon-intro"
+          className="bg-white"
         >
-          <StyledContent>
-            <StyledSectionTitle
-              component="h2"
-              sx={{
-                marginBottom: '10px',
-                paddingTop: '60px'
-              }}
-              id="marathon-intro"
-            >
-              活動介紹
-            </StyledSectionTitle>
-            <StyledParagraph
-              component="p"
-            >
-              學習這趟漫長的馬拉松，我可不可以用我的方式跑向屬於我的終點？<br />
-              發展興趣、改變生活習慣、上理想的大學、生涯規劃、發起社會行動，每一個生活大小事都是一場學習馬拉松。然而，每一次的奮力前行總會遇到「不知道怎麼計畫」、「好難自律」、「沒有伴」、「資源與人脈有限」、「無限自我質疑」等難題...<br />
-              <br />
-            </StyledParagraph>
-            <StyledParagraph
-              component="p"
-            >
-              島島盃將提供你四大裝備：
-            </StyledParagraph>
-            <StyledList>
-              <ul>
-                <li>「專業陪跑員」陪你規劃路徑與自我釐清</li>
-                <li>「百人社群」讓你找到合適夥伴與各界人脈</li>
-                <li>「AI個人化數位工具」讓你在紀錄與覆盤中自律學習、AI智慧推薦與引導</li>
-                <li>「專業課程」帶你掌握自主學習要領</li>
-              </ul>
-              <br />
-            </StyledList>
-            <StyledParagraph
-              component="p"
-            >
-              如果你有些想做的計畫，正在等待個契機開始，現在就是時候。<br />
-              五個月的馬拉松後，你將會在計畫過程中「豐富知識經驗、在學習中形塑自我、為生活與社會帶來實際行動」，而最終的成果發表你還有機會獲得獎助金。
-              <br />
-            </StyledParagraph>
-            <StyledParagraph
-              component="p"
-            >
-              島島盃 2025 春季學習馬拉松，將以學習者以自我需求出發設計學習計畫，開啟一趟自我導向學習馬拉松，往哪跑？怎麼跑？跑多快？終點在哪由你決定，島島阿學陪你一起跑。<br />
-              邀請你一起「為自己重新打造喜歡的學習生活」，讓我們陪伴彼此，成就自我與他人。
-            </StyledParagraph>
-          </StyledContent>
-        </StyledSection>
+          <p className="mt-2.5 mb-5">
+            學習這趟漫長的馬拉松，我可不可以用我的方式跑向屬於我的終點？<br />
+            發展興趣、改變生活習慣、上理想的大學、生涯規劃、發起社會行動，每一個生活大小事都是一場學習馬拉松。然而，每一次的奮力前行總會遇到「不知道怎麼計畫」、「好難自律」、「沒有伴」、「資源與人脈有限」、「無限自我質疑」等難題...
+          </p>
+          <p>島島盃將提供你四大裝備：</p>
+          <List className="mb-5">
+            <li>「專業陪跑員」陪你規劃路徑與自我釐清</li>
+            <li>「百人社群」讓你找到合適夥伴與各界人脈</li>
+            <li>「AI個人化數位工具」讓你在紀錄與覆盤中自律學習、AI智慧推薦與引導</li>
+            <li>「專業課程」帶你掌握自主學習要領</li>
+          </List>
+          <p className="mb-5">
+            如果你有些想做的計畫，正在等待個契機開始，現在就是時候。<br />
+            五個月的馬拉松後，你將會在計畫過程中「豐富知識經驗、在學習中形塑自我、為生活與社會帶來實際行動」，而最終的成果發表你還有機會獲得獎助金。
+          </p>
+          <p>
+            島島盃 2025 春季學習馬拉松，將以學習者以自我需求出發設計學習計畫，開啟一趟自我導向學習馬拉松，往哪跑？怎麼跑？跑多快？終點在哪由你決定，島島阿學陪你一起跑。<br />
+            邀請你一起「為自己重新打造喜歡的學習生活」，讓我們陪伴彼此，成就自我與他人。
+          </p>
+        </Section>
 
-        <StyledSection
-          component="section"
-          sx={{
-            backgroundColor: '#DEF5F5',
-          }}
+        <Section
+          title="誰適合參加？"
+          id="marathon-who"
+          className="bg-primary-lightest"
         >
-          <StyledContent>
-            <StyledSectionTitle
-              component="h2"
-              sx={{
-                marginBottom: '36px',
-              }}
-            >
-              誰適合參加
-            </StyledSectionTitle>
-            <StyledList sx={{ marginBottom: '36px' }}>
-              <ul>
-                <li>16歲以上學習者皆可報名，優先以高中及大學生為主</li>
-                <li>有意願為自己打造專屬學習旅程的學習者</li>
-              </ul>
-            </StyledList>
-            <StyledParagraph
-              component="p"
-              sx={{ margin: '0 0 10px' }}
-            >
-              如果你符合下列一項，那你也許就是適合的參加的人：
-            </StyledParagraph>
-            <Box sx={{ marginBottom: '10px' }}>
-              <Participant />
-            </Box>
-            <StyledParagraph
-              component="p"
-            >
-              特別提醒： <br />
-              活動重視社群互動與共學，若無法在計劃期間投入時間參與並和其他夥伴和 Mentor 互動，請斟酌報名。
-            </StyledParagraph>
-          </StyledContent>
-        </StyledSection>
+          <List className="my-9">
+            <li>16歲以上學習者皆可報名，優先以高中及大學生為主</li>
+            <li>有意願為自己打造專屬學習旅程的學習者</li>
+          </List>
+          <p className="mb-2.5">
+            如果你符合下列一項，那你也許就是適合的參加的人：
+          </p>
+          <div className="mb-2.5">
+            <Participant />
+          </div>
+          <p>
+            特別提醒：<br />
+            活動重視社群互動與共學，若無法在計劃期間投入時間參與並和其他夥伴和 Mentor 互動，請斟酌報名。
+          </p>
+        </Section>
 
-        <StyledSection
-          component="section"
-          sx={{
-            backgroundColor: '#FFF'
-          }}
+        <Section
+          title="馬拉松進行方式"
+          id="marathon-how"
+          className="bg-white"
         >
-          <StyledContent>
-            <StyledSectionTitle
-              component="h2"
-              sx={{
-                marginBottom: '36px',
-              }}
-            >
-              馬拉松進行方式
-            </StyledSectionTitle>
-            <Typography
-              component="h3"
-              sx={{
-                fontSize: '18px',
-                fontWeight: '700',
-                lineHeight: '120%',
-                marginBottom: '36px'
-              }}
-            >
-              我們提供的裝備
-            </Typography>
-            <Box sx={{ marginBottom: '36px' }}>
-              <Equip />
-            </Box>
-            <Typography
-              component="h3"
-              sx={{
-                fontSize: '18px',
-                fontWeight: '700',
-                lineHeight: '120%',
-                marginBottom: '36px'
-              }}
-            >
-              這場馬拉松有什麼不一樣？
-            </Typography>
-            <Spotlight />
-          </StyledContent>
-        </StyledSection>
+          <h3 className="heading-sm text-basic-500 leading-[1.2] my-9">我們提供的裝備</h3>
+          <Equip />
+          <h3 className="heading-sm text-basic-500 leading-[1.2] my-9">這場馬拉松有什麼不一樣？</h3>
+          <Spotlight />
+        </Section>
 
-        <StyledSection
-          component="section"
-          sx={{
-            backgroundColor: '#DEF5F5',
-          }}
+        <Section
+          className="bg-basic-100 px-0"
+          withContainer={false}
         >
-          <StyledContent>
-            <StyledSectionTitle
-              component="h2"
-              sx={{
-                marginBottom: '36px',
-              }}
-            >
-              你可以預期的收穫
-            </StyledSectionTitle>
-            <StyledParagraph
-              component="p"
-            >
-              只要報名，不論有無入選，就可以優先使用島島阿學 AI 個人化學習工具，包含自主學習模板、學習日誌、學習進度追蹤、AI 智慧與引導等功能！
-              <br />
-            </StyledParagraph>
-            <StyledParagraph>
-              而入選後，你還可以與專屬引導師與學習夥伴跑完一趟自我導向學習的馬拉松，完成遲遲未開始的計畫，並在過程中...
-            </StyledParagraph>
-            <StyledList>
-              <ol>
-                <li>習得AI世代不可或缺的「自主學習力、協作力、跨領域學習力」</li>
-                <li>更深入認識自己，將學習與自身需求連結，找到學習的內在動機</li>
-                <li>豐富學習資源與人脈，讓學習不再孤單，並增加學習可能性</li>
-                <li>完成一份具體的學習計畫與成果，兼顧各自需求與外界認可</li>
-                <li>成為助人者，完成整趟學習馬拉松者將獲得自主學習引導師優先培訓機會</li>
-              </ol>
-            </StyledList>
-          </StyledContent>
-        </StyledSection>
+          <Mentors />
+        </Section>
 
-        <StyledSection
-          component="section"
-          sx={{
-            backgroundColor: '#FFF'
-          }}
+        <Section
+          title="你可以預期的收穫"
+          id="marathon-benefit"
+          className="bg-primary-lightest"
         >
-          <StyledContent>
-            <StyledSectionTitle
-              component="h2"
-              sx={{
-                marginBottom: '12px',
-              }}
-            >
-              成果發表與獎勵
-            </StyledSectionTitle>
-            <StyledParagraph
-              component="p"
-              sx={{
-                marginBottom: '12px'
-              }}
-            >
-              在學習馬拉松尾聲，針對入選的20位學員，島島阿學將舉辦成果分享日，並邀請引導師及入選者作為評審，更提供NT$ 5000元獎金支持優秀計畫持續發展！
-              <br />
-            </StyledParagraph>
-            <Typography
-              component="h3"
-              sx={{
-                marginBottom: '12px',
-                fontSize: '16px',
-                fontWeight: '500',
-                lineHeight: '140%',
-                color: '#000'
-              }}
-            >
-              獎勵
-            </Typography>
-            <StyledList sx={{
-              marginBottom: '12px'
-            }}
-            >
-              <ul>
-                <li>成果分享活動將選出5位優選參與者，每位可獲 NT$ 5000元獎金、優選證明，以及島島阿學專訪與媒體曝光。</li>
-                <li>評選標準：
-                  <ul>
-                    <li>
-                      學習歷程紀錄與反思完成度（60%）：可以清楚學習每一個過程的狀態（如遇的困難、解決方法、心態等）、反思以及下一步行動的改變。
-                    </li>
-                    <li>學習成果完成度（40%）：學習成果達到預期的學習目標的程度。</li>
-                  </ul>
+          <p className="mt-9 mb-5">
+            只要報名，不論有無入選，就可以優先使用島島阿學 AI 個人化學習工具，包含自主學習模板、學習日誌、學習進度追蹤、AI 智慧與引導等功能！
+          </p>
+          <p>
+            而入選後，你還可以與專屬引導師與學習夥伴跑完一趟自我導向學習的馬拉松，完成遲遲未開始的計畫，並在過程中...
+          </p>
+          <List className="list-decimal">
+            <li>習得AI世代不可或缺的「自主學習力、協作力、跨領域學習力」</li>
+            <li>更深入認識自己，將學習與自身需求連結，找到學習的內在動機</li>
+            <li>豐富學習資源與人脈，讓學習不再孤單，並增加學習可能性</li>
+            <li>完成一份具體的學習計畫與成果，兼顧各自需求與外界認可</li>
+            <li>成為助人者，完成整趟學習馬拉松者將獲得自主學習引導師優先培訓機會</li>
+          </List>
+        </Section>
+
+        <Section
+          title="成果發表與獎勵"
+          id="marathon-reward"
+          className="bg-white"
+        >
+          <p className="mt-3 mb-8">
+            在學習馬拉松尾聲，針對入選的20位學員，島島阿學將舉辦成果分享日，並邀請引導師及入選者作為評審，更提供NT$ 5000元獎金支持優秀計畫持續發展！
+          </p>
+          <h3 className="body-md text-black font-medium mb-3">獎勵</h3>
+          <List className="mb-5">
+            <li>成果分享活動將選出5位優選參與者，每位可獲 NT$ 5000元獎金、優選證明，以及島島阿學專訪與媒體曝光。</li>
+            <li>評選標準：
+              <List>
+                <li>
+                  學習歷程紀錄與反思完成度（60%）：可以清楚學習每一個過程的狀態（如遇的困難、解決方法、心態等）、反思以及下一步行動的改變。
                 </li>
-              </ul>
-              <br />
-            </StyledList>
+                <li>學習成果完成度（40%）：學習成果達到預期的學習目標的程度。</li>
+              </List>
+            </li>
+          </List>
 
-            <Typography
-              component="h3"
-              sx={{
-                marginBottom: '12px',
-                fontSize: '16px',
-                fontWeight: '500',
-                lineHeight: '140%',
-                color: '#000'
-              }}
-            >
-              分享路上的風景
-            </Typography>
-            <StyledList>
-              <ul>
-                <li>每位參與者在計劃結束時需在島島阿學網站公開學習計劃。</li>
-                <li>每位參與者在計劃結束時須分享至少三個於計劃期間使用的學習資源，並分享使用心得。</li>
-                <li>每位參與者需完成學習馬拉松回饋問卷。</li>
-              </ul>
-            </StyledList>
-          </StyledContent>
-        </StyledSection>
+          <h3 className="body-md text-black font-medium mb-3">分享路上的風景</h3>
+          <List>
+            <li>每位參與者在計劃結束時需在島島阿學網站公開學習計劃。</li>
+            <li>每位參與者在計劃結束時須分享至少三個於計劃期間使用的學習資源，並分享使用心得。</li>
+            <li>每位參與者需完成學習馬拉松回饋問卷。</li>
+          </List>
+        </Section>
 
-        <StyledSection
-          component="section"
-          sx={{
-            backgroundColor: '#EEF9F9'
-          }}
+        <Section
+          title="如何申請"
+          id="marathon-apply"
+          className="bg-[#EEF9F9]"
         >
-          <StyledContent>
-            <StyledSectionTitle
-              component="h2"
-              sx={{
-                marginBottom: '36px'
-              }}
-            >
-              如何申請
-            </StyledSectionTitle>
+          <div className="mt-9">
             <Apply />
-          </StyledContent>
-        </StyledSection>
+          </div>
+        </Section>
 
-        <StyledSection
-          component="section"
-          sx={{
-            backgroundColor: '#FFF'
-          }}
+        <Section
+          title="入選後課程費用"
+          id="marathon-price"
+          className="bg-white"
         >
-          <StyledContent>
-            <StyledSectionTitle
-              component="h2"
-              sx={{
-                marginBottom: '36px'
-              }}
-            >
-              入選後課程費用
-            </StyledSectionTitle>
+          <div className="mt-9">
             <Price />
-          </StyledContent>
-        </StyledSection>
+          </div>
+        </Section>
 
-        <Box sx={{
-          background: {
-            xs: "linear-gradient(0deg, #F3FCFC 0%, #F3FCFC 100%), linear-gradient(180deg, #F3FCFC 0%, #FFF 100%, #FFF 100%), #FFF",
-            md: "none",
-          },
-        }}
+        <Section
+          title="FAQ"
+          id="marathon-faq"
+          className="bg-white"
         >
-          <StyledSection
-            component="section"
-          >
-            <StyledContent>
-              <StyledSectionTitle
-                component="h2"
-                sx={{
-                  marginBottom: '36px'
-                }}
-              >
-                FAQ
-              </StyledSectionTitle>
-              <Faq />
-            </StyledContent>
-          </StyledSection>
+          <div className="mt-9">
+            <Faq />
+          </div>
+        </Section>
 
-          <StyledSection
-            component="section"
-          >
-            <StyledContent>
-              <StyledSectionTitle
-                component="h2"
-                sx={{
-                  marginBottom: '10px'
-                }}
-              >
-                主辦單位介紹
-              </StyledSectionTitle>
-              <StyledParagraph
-                component="p"
-                sx={{
-                  marginBottom: '10px'
-                }}
-              >
-                島島阿學團隊由一群大學生、教育工作者、工程師和設計師等來自不同背景的夥伴組成。<br />
-                島島阿學的使命是透過促進自我導向學習來實現終身學習的能力。我們致力於創造一個值得信賴的自主學習生態圈，讓學習者可以交流真實的學習經驗，透過自我探索、協作和成長，學習者可以充分發揮自己的潛力，並在瞬息萬變的世界中持續發展。<br />
-                <br />
-                島島阿學：https://www.daoedu.tw/<br />
-                聯絡方式：contact@daoedu.tw<br />
-              </StyledParagraph>
-              <StyledSectionTitle
-                component="h2"
-                sx={{
-                  marginBottom: '10px'
-                }}
-              >
-                合作夥伴
-              </StyledSectionTitle>
-              <StyledParagraph
-                component="p"
-                sx={{
-                  marginBottom: '10px'
-                }}
-              >
-                魚水教育催化劑<br />
-                青醒人共生文化智庫<br />
-              </StyledParagraph>
-              <StyledParagraph
-                component="p"
-              >
-                以上計畫細則主辦單位保留最終修改權利。
-              </StyledParagraph>
-            </StyledContent>
-          </StyledSection>
-        </Box>
-
-        <StyledSection
-          component="section"
-          sx={{
-            textAlign: 'center',
-            padding: {
-              md: '50px 24px',
-              xs: '32px 24px'
-            }
-          }}
+        <Section
+          title="主辦單位介紹"
+          id="marathon-organizer"
+          className="bg-white"
         >
+          <p className="my-2.5">
+            島島阿學團隊由一群大學生、教育工作者、工程師和設計師等來自不同背景的夥伴組成。<br />
+            島島阿學的使命是透過促進自我導向學習來實現終身學習的能力。我們致力於創造一個值得信賴的自主學習生態圈，讓學習者可以交流真實的學習經驗，透過自我探索、協作和成長，學習者可以充分發揮自己的潛力，並在瞬息萬變的世界中持續發展。<br />
+            <br />
+            島島阿學： https://www.daoedu.tw/<br />
+            聯絡方式： contact@daoedu.tw
+          </p>
+          <h2 className="heading-md text-basic-500 mb-2.5">
+            合作夥伴
+          </h2>
+          <p className="mb-2.5">
+            魚水教育催化劑<br />
+            青醒人共生文化智庫
+          </p>
+          <p>
+            以上計畫細則主辦單位保留最終修改權利。
+          </p>
+        </Section>
+
+        <Section className="text-center py-8 px-6 md:py-[50px]">
           <StyledSignUpButton
             onClick={handleClickSignupButton}
           >
             立即報名
           </StyledSignUpButton>
-        </StyledSection>
-      </Box>
+        </Section>
+      </main>
     </>
   );
 };

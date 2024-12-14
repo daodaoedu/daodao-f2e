@@ -8,7 +8,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 const StyledGroup = styled(Box)`
   width: 100%;
   max-width: 100%;
-
+  border: 1px solid #DEF5F5;
   @media (max-width: 767px) {
     grid-template: 1fr / 1fr;
   }
