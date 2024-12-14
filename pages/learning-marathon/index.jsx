@@ -316,9 +316,6 @@ const LearningMarathon = () => {
               <ul>
                 <li>16歲以上學習者皆可報名，優先以高中及大學生為主</li>
                 <li>有意願為自己打造專屬學習旅程的學習者</li>
-                <li>「百人社群」讓你找到合適夥伴與各界人脈</li>
-                <li>「AI個人化數位工具」讓你在紀錄與覆盤中自律學習、AI智慧推薦與引導</li>
-                <li>「專業課程」帶你掌握自主學習要領</li>
               </ul>
             </StyledList>
             <StyledParagraph
