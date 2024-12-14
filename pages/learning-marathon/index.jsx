@@ -15,7 +15,6 @@ import {
   Box,
   Button,
 } from '@mui/material';
-import Link from 'next/link';
 import Participant from '@/components/Marathon/Participant';
 import Equip from '@/components/Marathon/Equip';
 import Spotlight from '@/components/Marathon/Spotlight';
@@ -132,7 +131,7 @@ const StyledList = styled(Box)`
   }
 `;
 
-const StyledLink = styled(Link)`
+const StyledSignUpButton = styled(Button)`
   border-radius: 20px;
   padding: 10px 20px;
   background-color: #16B9B3;
@@ -143,6 +142,13 @@ const StyledLink = styled(Link)`
   margin: 0 auto;
   display: inline-block;
   height: 40px;
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: #16B9B3;
+      box-shadow: 0px 4px 10px 0px rgba(89, 182, 178, 0.50);
+    }
+  }
 `;
 
 const LearningMarathon = () => {
@@ -237,7 +243,7 @@ const LearningMarathon = () => {
             />
           </Box>
           <InfoCompletionGuard>
-            <StyledBannerButton onClick={() => { openLoginModal({ redirectUrl: '/learning-marathon/signup' }); }}>
+            <StyledBannerButton onClick={() => { openLoginModal('/learning-marathon/signup'); }}>
               立即報名
             </StyledBannerButton>
           </InfoCompletionGuard>
@@ -616,11 +622,11 @@ const LearningMarathon = () => {
             }
           }}
         >
-          <StyledLink
-            href="/learning-marathon/login"
+          <StyledSignUpButton
+            onClick={() => { openLoginModal('/learning-marathon/signup'); }}
           >
             立即報名
-          </StyledLink>
+          </StyledSignUpButton>
         </StyledSection>
       </Box>
     </>
