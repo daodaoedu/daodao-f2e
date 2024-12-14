@@ -318,27 +318,27 @@ export const ProtectedComponent = ({
 }: ProtectedComponentProps) => {
   const router = useRouter();
   const opened = useRef(false);
-  const { user, isLoggedIn, isOpenLoginModal, token } = useAuth();
+  const { isLoggedIn, isOpenLoginModal, token } = useAuth();
   const { openLoginModal } = useAuthDispatch();
-  const requiresLoginModal = onlyCheckToken ? !token : !isLoggedIn;
+  const requiresLogin = onlyCheckToken ? !token : !isLoggedIn;
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (requiresLoginModal) {
+    if (requiresLogin) {
       timer = setTimeout(() => {
         opened.current = true;
         openLoginModal();
       }, 1000);
     }
     return () => clearTimeout(timer);
-  }, [requiresLoginModal, openLoginModal]);
+  }, [requiresLogin, openLoginModal]);
 
   useEffect(() => {
     if (
       redirectOnCancel &&
       !isOpenLoginModal &&
       opened.current &&
-      requiresLoginModal
+      requiresLogin
     ) {
       router.replace(redirectOnCancel);
     }
@@ -346,11 +346,11 @@ export const ProtectedComponent = ({
     redirectOnCancel,
     isOpenLoginModal,
     opened.current,
-    requiresLoginModal,
+    requiresLogin,
     router.replace,
   ]);
 
-  if (!user) return <div className="h-screen w-screen" />;
+  if (requiresLogin) return <div className="h-screen w-screen" />;
 
   return children;
 };
