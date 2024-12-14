@@ -27,6 +27,8 @@ const initialState = {
   country: '',
   city: '',
   district: '',
+  interestList: [],
+  isSubscribeEmail: true
 };
 
 const buildValidator = (maxLength, regex, maxMsg, regMsg) =>
@@ -225,14 +227,16 @@ const useEditProfile = () => {
       share,
       isOpenLocation,
       isOpenProfile,
+      isSubscribeEmail: true,
+      interestList: []
     };
 
+    // TODO: replace with authDispatch
     if (type === 'update') {
       reduxDispatch(updateUser(payload));
-    } else {
+    } else if (type === 'create') {
       reduxDispatch(createUser(payload));
     }
-    authDispatch.updateUser(payload);
     return true;
   };
 

@@ -19,7 +19,7 @@ import Apply from '@/components/Marathon/Apply';
 import Price from '@/components/Marathon/Price';
 import Faq from '@/components/Marathon/Faq';
 
-import { useAuthDispatch } from '@/contexts/Auth';
+import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 
 const HomePageWrapper = styled.div`
@@ -129,8 +129,7 @@ const useScrollPaddingTop = () => {
   return scrollPaddingTop;
 };
 
-const Sidebar = () => {
-  const { openLoginModal } = useAuthDispatch();
+const Sidebar = ({ onClickSignupButton }) => {
   const scrollPaddingTop = useScrollPaddingTop();
   const [activeSection, setActiveSection] = useState(null);
   const [isShow, setIsShow] = useState(false);
@@ -207,7 +206,7 @@ const Sidebar = () => {
           </li>
         ))}
       </ul>
-      <StyledSignUpButton className="w-full" onClick={() => openLoginModal('/learning-marathon/signup')}>立即報名</StyledSignUpButton>
+      <StyledSignUpButton className="w-full" onClick={onClickSignupButton}>立即報名</StyledSignUpButton>
     </aside>
   );
 };
@@ -320,6 +319,7 @@ const Mentors = () => {
 
 const LearningMarathon = () => {
   const { openLoginModal } = useAuthDispatch();
+  const { isLoggedIn, isTemporary } = useAuth();
   const router = useRouter();
   const SEOData = useMemo(
     () => ({
@@ -353,6 +353,14 @@ const LearningMarathon = () => {
     [router?.asPath],
   );
 
+  const handleClickSignupButton = () => {
+    if (isLoggedIn || isTemporary) {
+      router.push('/learning-marathon/signup');
+    } else {
+      openLoginModal('/learning-marathon/signup');
+    }
+  };
+
   // TODO: Banner 動態效果
   return (
     <>
@@ -379,14 +387,12 @@ const LearningMarathon = () => {
               className="mobile"
             />
           </Box>
-          <InfoCompletionGuard>
-            <StyledBannerButton onClick={() => { openLoginModal('/learning-marathon/signup'); }}>
-              立即報名
-            </StyledBannerButton>
-          </InfoCompletionGuard>
+          <StyledBannerButton onClick={handleClickSignupButton}>
+            立即報名
+          </StyledBannerButton>
         </StyledBanner>
         <Nav />
-        <Sidebar />
+        <Sidebar onClickSignupButton={handleClickSignupButton} />
         <Section
           title="活動介紹"
           id="marathon-intro"
@@ -557,7 +563,7 @@ const LearningMarathon = () => {
 
         <Section className="text-center py-8 px-6 md:py-[50px]">
           <StyledSignUpButton
-            onClick={() => { openLoginModal('/learning-marathon/signup'); }}
+            onClick={handleClickSignupButton}
           >
             立即報名
           </StyledSignUpButton>

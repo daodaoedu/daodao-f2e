@@ -109,6 +109,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         ...action.payload,
+        userType: 'no_data',
         loading: false,
         apiState: 'Resolve'
       };
