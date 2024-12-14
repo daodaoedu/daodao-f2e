@@ -177,6 +177,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         // TODO: remove after removed redux
         if ((input as { _id?: string })?._id) {
           dispatch({ type: ActionTypes.UPDATE_USER, payload: input as any });
+          return;
         }
 
         switch (state.loginStatus) {
