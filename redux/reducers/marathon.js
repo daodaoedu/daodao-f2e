@@ -110,7 +110,6 @@ const reducer = (state = initialState, action) => {
       };
     }
     case "CREATE_MARATHON_PROFILE_BY_TOKEN_SUCCESS": {
-      console.log("in reducer", action.payload);
       return {
         ...state,
         ...action.payload,
