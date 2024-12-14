@@ -23,6 +23,8 @@ import Apply from '@/components/Marathon/Apply';
 import Price from '@/components/Marathon/Price';
 import Faq from '@/components/Marathon/Faq';
 
+import { useAuthDispatch } from '@/contexts/Auth';
+
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
   --section-height-offset: 80px;
@@ -144,6 +146,7 @@ const StyledLink = styled(Link)`
 `;
 
 const LearningMarathon = () => {
+  const { openLoginModal } = useAuthDispatch();
   const router = useRouter();
   const SEOData = useMemo(
     () => ({
@@ -234,7 +237,7 @@ const LearningMarathon = () => {
             />
           </Box>
           <InfoCompletionGuard>
-            <StyledBannerButton onClick={() => { router.push('/learning-marathon/login'); }}>
+            <StyledBannerButton onClick={() => { openLoginModal({ redirectUrl: '/learning-marathon/signup' }); }}>
               立即報名
             </StyledBannerButton>
           </InfoCompletionGuard>
