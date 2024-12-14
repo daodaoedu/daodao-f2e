@@ -22,7 +22,7 @@ import Apply from '@/components/Marathon/Apply';
 import Price from '@/components/Marathon/Price';
 import Faq from '@/components/Marathon/Faq';
 
-import { useAuthDispatch } from '@/contexts/Auth';
+import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -152,7 +152,8 @@ const StyledSignUpButton = styled(Button)`
 `;
 
 const LearningMarathon = () => {
-  const { openLoginModal } = useAuthDispatch();
+  const { openLoginModal, deleteUser } = useAuthDispatch();
+  const { isLoggedIn, isTemporary } = useAuth();
   const router = useRouter();
   const SEOData = useMemo(
     () => ({
@@ -216,7 +217,13 @@ const LearningMarathon = () => {
 
     return () => clearTimeout(timer);
   }, [router.asPath]);
-
+  const handleClickSignupButton = () => {
+    if (isLoggedIn || isTemporary) {
+      router.push('/learning-marathon/signup');
+    } else {
+      openLoginModal('/learning-marathon/signup');
+    }
+  };
   return (
     <>
       <SEOConfig data={SEOData} />
@@ -242,11 +249,9 @@ const LearningMarathon = () => {
               className="mobile"
             />
           </Box>
-          <InfoCompletionGuard>
-            <StyledBannerButton onClick={() => { openLoginModal('/learning-marathon/signup'); }}>
-              立即報名
-            </StyledBannerButton>
-          </InfoCompletionGuard>
+          <StyledBannerButton onClick={handleClickSignupButton}>
+            立即報名
+          </StyledBannerButton>
         </StyledBanner>
         <StyledSection
           component="section"
@@ -620,7 +625,7 @@ const LearningMarathon = () => {
           }}
         >
           <StyledSignUpButton
-            onClick={() => { openLoginModal('/learning-marathon/signup'); }}
+            onClick={handleClickSignupButton}
           >
             立即報名
           </StyledSignUpButton>

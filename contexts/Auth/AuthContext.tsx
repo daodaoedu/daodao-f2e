@@ -174,6 +174,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
         dispatch({ type: ActionTypes.LOGIN, payload });
       },
       updateUser: async (input) => {
+        // TODO: remove after removed redux
+        if ((input as { _id?: string })?._id) {
+          dispatch({ type: ActionTypes.UPDATE_USER, payload: input as any });
+        }
+
         switch (state.loginStatus) {
           case LoginStatus.TEMPORARY: {
             const request = createUserProfileSchema.parse(input);
