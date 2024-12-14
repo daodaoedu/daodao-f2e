@@ -299,11 +299,15 @@ export default function ConfirmForm({
         default:
       }
   }, [user.apiState]);
+
   useEffect(() => {
-    if (marathonState._id && hasClickSubmitButton) {
+    if (
+      marathonState._id &&
+      hasClickSubmitButton &&
+      (marathonState.apiState === 'success')) {
       router.push('/learning-marathon/success');
     }
-  }, [hasClickSubmitButton, user.apiState, marathonState]);
+  }, [hasClickSubmitButton, user.apiState, marathonState.apiState]);
   return (
     <>
       <StyledMarathonTitleSection>

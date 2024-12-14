@@ -234,7 +234,7 @@ const useEditProfile = () => {
     // TODO: replace with authDispatch
     if (type === 'update') {
       reduxDispatch(updateUser(payload));
-    } else {
+    } else if (type === 'create') {
       reduxDispatch(createUser(payload));
     }
     return true;
