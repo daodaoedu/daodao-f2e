@@ -167,8 +167,8 @@ const Sidebar = ({ onClickSignupButton }) => {
           "right-8 bottom-24 lg:right-auto lg:bottom-auto",
           "fixed lg:left-8 lg:top-[var(--sidebar-top)] max-h-[calc(100vh-var(--sidebar-top)-24px)] overflow-y-auto",
           "p-2 bg-white rounded-lg shadow-md transition-opacity duration-300 z-20",
-          isShow ? 'lg:opacity-100' : 'lg:opacity-0 lg:pointer-events-none',
-          isOpenSidebar ? 'opacity-100' : 'opacity-0 pointer-events-none',
+          isShow ? 'lg:opacity-100 lg:pointer-events-auto' : 'lg:opacity-0 lg:pointer-events-none',
+          isOpenSidebar ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
         )}
         style={{ '--sidebar-top': `${scrollPaddingTop + 100}px` }}
       >
