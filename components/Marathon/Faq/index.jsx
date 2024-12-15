@@ -117,7 +117,7 @@ export default function Faq() {
       <Accordion
         title="所有課程和活動都會有錄影嗎？"
       >
-        僅有工作坊會有錄影，小組討論和Mentor 團體諮詢不會有錄影。
+        僅有工作坊會有錄影，學習小組會議、引導師諮詢、社群活動等不會有錄影。
       </Accordion>
       <Accordion
         title="我最後的成果會有誰看到呢？"
@@ -127,7 +127,7 @@ export default function Faq() {
       <Accordion
         title="所有活動都是線上嗎？"
       >
-        本次計劃皆是線上進行，參與者需要有電腦和網路參與。
+        本次計劃鼓勵各地學習者參與，故多數活動為線上，但為增加實體互動，部分社群活動將以實體為主，實體地點將視入圍學員所在地調整，詳細請參考重要時程。
       </Accordion>
       <Accordion
         title="結束後會收到完成證書嗎？"

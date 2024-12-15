@@ -108,7 +108,7 @@ const LearningMarathonSignUp = () => {
     <>
       <SEOConfig data={SEOData} />
       <StyledBar>
-        <h2>報名參加學習徵件計畫</h2>
+        <h2>申請參加島島盃學習馬拉松</h2>
       </StyledBar>
       <StyledSection>
         <Typography

@@ -88,7 +88,7 @@ export default function Spotlight() {
             <li>萃取多位自我導向學習實踐者之經驗</li>
             <li>結合被譽為全球最接近民主教育的美國百年民主大學 Goddard College 教學方法（首次在台灣公開）</li>
             <li>結合 High Performance Learning Journeys 學習引導法</li>
-            <li>AI智慧推薦與引導</li>
+            <li>AI推薦與引導</li>
           </ul>
         </StyledList>
       </StyledCard>

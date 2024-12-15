@@ -102,7 +102,7 @@ export default function Equip() {
             <li>進度安排與檢核表</li>
             <li>自我檢核表</li>
             <li>學習成果分享專區</li>
-            <li>AI智慧推薦與引導</li>
+            <li>AI推薦與引導</li>
           </ul>
         </StyledList>
       </StyledCard>
