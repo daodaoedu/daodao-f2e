@@ -206,7 +206,7 @@ const Sidebar = ({ onClickSignupButton }) => {
           </li>
         ))}
       </ul>
-      <StyledSignUpButton className="w-full" onClick={onClickSignupButton}>立即報名</StyledSignUpButton>
+      <StyledSignUpButton className="w-full" onClick={onClickSignupButton}>立即申請</StyledSignUpButton>
     </aside>
   );
 };
@@ -388,7 +388,7 @@ const LearningMarathon = () => {
             />
           </Box>
           <StyledBannerButton onClick={handleClickSignupButton}>
-            立即報名
+            立即申請
           </StyledBannerButton>
         </StyledBanner>
         <Nav />
@@ -402,11 +402,11 @@ const LearningMarathon = () => {
             學習這趟漫長的馬拉松，我可不可以用我的方式跑向屬於我的終點？<br />
             發展興趣、改變生活習慣、上理想的大學、生涯規劃、發起社會行動，每一個生活大小事都是一場學習馬拉松。然而，每一次的奮力前行總會遇到「不知道怎麼計畫」、「好難自律」、「沒有伴」、「資源與人脈有限」、「無限自我質疑」等難題...
           </p>
-          <p>島島盃將提供你四大裝備：</p>
+          <p>島島盃學習馬拉松將提供你四大裝備：</p>
           <List className="mb-5">
-            <li>「專業陪跑員」陪你規劃路徑與自我釐清</li>
+            <li>「專業陪跑員」陪你自我釐清與規劃路徑</li>
             <li>「百人社群」讓你找到合適夥伴與各界人脈</li>
-            <li>「AI個人化數位工具」讓你在紀錄與覆盤中自律學習、AI智慧推薦與引導</li>
+            <li>「AI個人化數位工具」引導你學習方向與資源並自律學習</li>
             <li>「專業課程」帶你掌握自主學習要領</li>
           </List>
           <p className="mb-5">
@@ -415,7 +415,7 @@ const LearningMarathon = () => {
           </p>
           <p>
             島島盃 2025 春季學習馬拉松，將以學習者以自我需求出發設計學習計畫，開啟一趟自我導向學習馬拉松，往哪跑？怎麼跑？跑多快？終點在哪由你決定，島島阿學陪你一起跑。<br />
-            邀請你一起「為自己重新打造喜歡的學習生活」，讓我們陪伴彼此，成就自我與他人。
+            邀請你一起「為自己重新打造喜歡的學習生活」，把自主學習變成一種生活方式，並在彼此陪伴下，成就自我與他人。
           </p>
         </Section>
 
@@ -436,7 +436,7 @@ const LearningMarathon = () => {
           </div>
           <p>
             特別提醒：<br />
-            活動重視社群互動與共學，若無法在計劃期間投入時間參與並和其他夥伴和 Mentor 互動，請斟酌報名。
+            活動重視社群互動與共學，若無法在計劃期間投入時間參與並和其他夥伴和 Mentor 互動，請斟酌申請。
           </p>
         </Section>
 
@@ -464,7 +464,7 @@ const LearningMarathon = () => {
           className="bg-primary-lightest"
         >
           <p className="mt-9 mb-5">
-            只要報名，不論有無入選，就可以優先使用島島阿學 AI 個人化學習工具，包含自主學習模板、學習日誌、學習進度追蹤、AI 智慧與引導等功能！
+            只要申請，不論有無入選，就可以優先使用島島阿學 AI 個人化學習工具，包含自主學習模板、學習日誌、學習進度追蹤、AI智慧與引導等功能！
           </p>
           <p>
             而入選後，你還可以與專屬引導師與學習夥伴跑完一趟自我導向學習的馬拉松，完成遲遲未開始的計畫，並在過程中...
@@ -484,11 +484,31 @@ const LearningMarathon = () => {
           className="bg-white"
         >
           <p className="mt-3 mb-8">
-            在學習馬拉松尾聲，針對入選的20位學員，島島阿學將舉辦成果分享日，並邀請引導師及入選者作為評審，更提供NT$ 5000元獎金支持優秀計畫持續發展！
+            在學習馬拉松尾聲，針對入選的 20 位學員，島島阿學將舉辦成果分享日，並邀請引導師及入選者作為評審，更提供總獎金 NT$ 2,5000元 支持優秀計畫持續發展！
           </p>
           <h3 className="body-md text-black font-medium mb-3">獎勵</h3>
           <List className="mb-5">
-            <li>成果分享活動將選出5位優選參與者，每位可獲 NT$ 5000元獎金、優選證明，以及島島阿學專訪與媒體曝光。</li>
+            <li>為鼓勵學員的努力與支持持續發展，成果發表將選出 12 位學員，每位皆可獲得獎金、獎狀，以及島島阿學專訪與媒體曝光。計劃設有多層級獎項，涵蓋「學習達人獎」、「潛力無限獎」及「人氣獎」，具體分配如下：</li>
+              <List>
+                <li>
+                  [1 名] 學習達人獎：5000 元＋獎狀＋專訪
+                </li>
+                <li>
+                  [10 名] 潛力無限獎：2000 元＋獎狀＋專訪
+                </li>
+                <li>
+                  [2 名] 人氣獎：1000 元＋獎狀
+                </li>
+                <li>不論獲獎與否，所有學員皆會有參賽證明</li>
+              </List>
+            <li>評選方式：
+              <List>
+                <li>
+                  學習達人獎、潛力無限獎：由評審團依據評選標準評選。
+                </li>
+                <li>人氣獎：開放現場與會者票選，根據票數高低決定得獎者。</li>
+              </List>
+            </li>
             <li>評選標準：
               <List>
                 <li>
@@ -518,7 +538,7 @@ const LearningMarathon = () => {
         </Section>
 
         <Section
-          title="入選後課程費用"
+          title="入選後活動費用"
           id="marathon-price"
           className="bg-white"
         >
@@ -565,7 +585,7 @@ const LearningMarathon = () => {
           <StyledSignUpButton
             onClick={handleClickSignupButton}
           >
-            立即報名
+            立即申請
           </StyledSignUpButton>
         </Section>
       </main>

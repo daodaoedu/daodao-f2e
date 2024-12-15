@@ -161,19 +161,19 @@ export default function Apply() {
             </StyledDateGroup>
           </StyledDateCard>
           <StyledContent>
-            計畫開始報名
+            計畫開始申請
           </StyledContent>
         </StyledTimelineGroup>
         <StyledTimelineGroup sx={{ marginBottom: '8px' }}>
           <StyledDateCard className="time">
             <StyledDateGroup>
-              <div className="date">12/21</div>
+              <div className="date">12/29</div>
               <div className="weekday"><span>六</span></div>
             </StyledDateGroup>
             <StyledTime component="p" sx={{ lineBreak: 'none' }}>15:00-16:30</StyledTime>
           </StyledDateCard>
           <StyledContent>
-            線上說明會暨自主學習小小工作坊
+            自主學習工作坊暨說明會（線上）
           </StyledContent>
         </StyledTimelineGroup>
         <StyledYear component="p" sx={{ marginBottom: '8px' }}>
@@ -193,8 +193,8 @@ export default function Apply() {
         <StyledTimelineGroup sx={{ marginBottom: '8px' }}>
           <StyledDateCard className="time">
             <StyledDateGroup>
-              <div className="date">01/27</div>
-              <div className="weekday"><span>一</span></div>
+              <div className="date">02/03</div>
+              <div className="weekday"><span>日</span></div>
             </StyledDateGroup>
           </StyledDateCard>
           <StyledContent>
@@ -205,8 +205,8 @@ export default function Apply() {
         <StyledTimelineGroup sx={{ marginBottom: '8px' }}>
           <StyledDateCard className="time">
             <StyledDateGroup>
-              <div className="date">02/02</div>
-              <div className="weekday"><span>日</span></div>
+              <div className="date">02/03</div>
+              <div className="weekday"><span>一</span></div>
             </StyledDateGroup>
             <StyledTime component="p" sx={{ lineBreak: 'none' }}>23:59</StyledTime>
           </StyledDateCard>
@@ -218,8 +218,8 @@ export default function Apply() {
         <StyledTimelineGroup sx={{ marginBottom: '8px' }}>
           <StyledDateCard className="time">
             <StyledDateGroup>
-              <div className="date">02/04</div>
-              <div className="weekday"><span>二</span></div>
+              <div className="date">02/05</div>
+              <div className="weekday"><span>三</span></div>
             </StyledDateGroup>
           </StyledDateCard>
           <StyledContent>
@@ -277,7 +277,7 @@ export default function Apply() {
           </Typography>
           <StyledList>
             <ul>
-              <li>待確認，前三堂課程將於 2/10-3/10 之間舉行。</li>
+              <li>2025/2/15（六）、2025/2/22（六）、2025/3/1（六）14:00-15:30</li>
             </ul>
           </StyledList>
         </Box>
@@ -315,6 +315,7 @@ export default function Apply() {
             <ul>
               <li>線上：2/23（日）19:30-21:00、4/20（日）19:30-21:00、6/22（日）19:30-21:00</li>
               <li>實體：3/23（日）15:00-16:30 台北、5/25（日）15:00-16:30 台中</li>
+              <li>地點與時間將依入選學員進行調整</li>
             </ul>
           </StyledList>
         </Box>
@@ -326,9 +327,8 @@ export default function Apply() {
         </StyledParagraph>
         <StyledList>
           <ul>
-            <li>透過註冊島島阿學官網會員系統並同時填寫線上表單申請本計劃</li>
-            <li>請透過此連結申請</li>
-            <li>在報名截止日前皆可修改申請內容</li>
+            <li>進入島島阿學網站，點選學習馬拉松頁面「立即申請」</li>
+            <li>在申請截止日前皆可修改申請內容</li>
             <li>入選名額：20 位</li>
           </ul>
         </StyledList>
