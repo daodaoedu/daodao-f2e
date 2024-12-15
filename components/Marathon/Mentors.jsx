@@ -148,7 +148,7 @@ const mentors = [
     title: '助教小天使',
     name: '蘇冠彰',
     image: '/assets/mentors/card-partner-6.jpg',
-    tags: ['島島阿學行銷與網站改版開發夥伴', '中原大學應用華語系與心理學系大四生'],
+    tags: ['島島阿學核心團隊', '島島阿學行銷與網站改版開發夥伴', '中原大學應用華語系與心理學系大四生'],
     social: {
       medium: {
         text: 'kangarooblog',
@@ -202,6 +202,8 @@ const Mentors = () => {
   const mentorsRef = useRef(null);
   const [activeMentorName, setActiveMentorName] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [touchStartX, setTouchStartX] = useState(null);
+  const timer = useRef(null);
   const { translateX, isEnd } = useMemo(() => {
     const currentTranslateX = currentMentor * 301;
     if (window.innerWidth + currentTranslateX > mentorsRef.current?.scrollWidth) {
@@ -220,13 +222,24 @@ const Mentors = () => {
 
   const activeMentor = useMemo(() => mentors.find((mentor) => mentor.name === activeMentorName), [activeMentorName]);
 
+  const checkTimer = () => {
+    if (timer.current) return true;
+    timer.current = true;
+    setTimeout(() => {
+      timer.current = false;
+    }, 300);
+    return false;
+  };
+
   const handleNextMentor = () => {
+    if (checkTimer()) return;
     if (!isEnd) {
       setCurrentMentor((prev) => prev + 1);
     }
   };
 
   const handlePrevMentor = () => {
+    if (checkTimer()) return;
     if (currentMentor > 0) {
       setCurrentMentor((prev) => prev - 1);
     }
@@ -241,9 +254,29 @@ const Mentors = () => {
     setIsOpen(false);
   };
 
+  const handleTouchStart = (e) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    const touchMoveX = e.touches[0].clientX;
+    const deltaX = touchMoveX - touchStartX;
+    if (Math.abs(deltaX) > 50) {
+      if (deltaX < 0) {
+        handleNextMentor();
+      } else {
+        handlePrevMentor();
+      }
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    setTouchStartX(null);
+  };
+
   return (
     <>
-      <div className="px-6 md:px-[100px] flex justify-between items-center">
+      <div className="px-6 lg:px-60 flex justify-between items-center">
         <h2 className="heading-md text-basic-500" id="marathon-mentor">引導師介紹</h2>
         <div className="flex gap-2">
           <IconButton size="large" onClick={handlePrevMentor} disabled={currentMentor === 0}>
@@ -255,7 +288,13 @@ const Mentors = () => {
         </div>
       </div>
 
-      <div ref={mentorsRef} className="flex gap-4 mt-9 px-6 md:px-[100px] overflow-x-hidden select-none">
+      <div
+        ref={mentorsRef}
+        className="flex gap-4 mt-9 px-6 lg:pl-60 overflow-x-hidden select-none"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {mentors.map((mentor) => (
           <MentorCard
             key={mentor.name}
@@ -266,7 +305,7 @@ const Mentors = () => {
           >
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <div className="flex gap-2">
-                {mentor.tags.slice(0, 2).map((tag, index) => (
+                {mentor.tags.slice(0, 1).map((tag, index) => (
                   <Tag
                     key={tag}
                     text={tag}
@@ -298,7 +337,7 @@ const Mentors = () => {
               <div className="heading-md text-basic-500 mb-3">{activeMentor?.title} | {activeMentor?.name}</div>
               <div className="flex flex-col gap-2 items-start mb-3">
                 {activeMentor?.tags.map((tag) => (
-                  <Tag key={tag} text={tag} className="max-w-72" />
+                  <Tag key={tag} text={tag} className="max-w-72 text-wrap" />
                 ))}
               </div>
               <div className="flex flex-col gap-2.5 items-start">
