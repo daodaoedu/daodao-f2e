@@ -287,17 +287,17 @@ export default function ConfirmForm({
   };
 
   useEffect(() => {
-      switch (marathonState.apiState) {
-        case 'success': {
-          toast.success('更新成功');
-          break;
-        }
-        case 'Reject': {
-          toast.error('更新失敗');
-          break;
-        }
-        default:
+    switch (marathonState.apiState) {
+      case 'success': {
+        toast.success('更新成功');
+        break;
       }
+      case 'Reject': {
+        toast.error('更新失敗');
+        break;
+      }
+      default:
+    }
   }, [user.apiState]);
 
   useEffect(() => {
