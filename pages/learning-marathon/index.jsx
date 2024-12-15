@@ -4,10 +4,8 @@ import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
 import { GoArrowUpRight } from "react-icons/go";
+import { FaAngleUp } from "react-icons/fa6";
 
-import Navigation from '@/shared/components/Navigation_v2';
-import Footer from '@/shared/components/Footer_v2';
-import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
 import Button from '@mui/material/Button';
 import Participant from '@/components/Marathon/Participant';
 import Equip from '@/components/Marathon/Equip';
@@ -20,11 +18,6 @@ import Faq from '@/components/Marathon/Faq';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import Banner from '@/components/Banner';
-
-const HomePageWrapper = styled.div`
-  --section-height: calc(100vh - 80px);
-  --section-height-offset: 80px;
-`;
 
 const StyledBannerButton = styled(Button)`
   &.MuiButton-root {
@@ -117,6 +110,7 @@ const Sidebar = ({ onClickSignupButton }) => {
   const scrollPaddingTop = useScrollPaddingTop();
   const [activeSection, setActiveSection] = useState(null);
   const [isShow, setIsShow] = useState(false);
+  const [isOpenSidebar, setIsOpenSidebar] = useState(false);
 
   const sidebarItems = [
     { label: '活動介紹', href: '#marathon-intro' },
@@ -167,31 +161,51 @@ const Sidebar = ({ onClickSignupButton }) => {
   }, []);
 
   return (
-    <aside
-      className={cn(
-        "hidden lg:block fixed left-8 top-[var(--sidebar-top)] max-h-[calc(100vh-var(--sidebar-top)-24px)] overflow-y-auto",
-        "p-2 bg-white rounded-lg shadow-md transition-opacity duration-300 z-20",
-        isShow ? 'opacity-100' : 'opacity-0 pointer-events-none',
-      )}
-      style={{ '--sidebar-top': `${scrollPaddingTop + 100}px` }}
-    >
-      <ul className="flex flex-col gap-2 mb-2">
-        {sidebarItems.map((item) => (
-          <li key={item.label}>
-            <Link
-              href={item.href}
-              className={cn(
-                "block body-lg font-medium p-2.5 rounded-lg text-basic-400 transition-colors duration-300",
-                activeSection === item.href.replace('#', '') && 'text-primary-base bg-primary-lightest',
-              )}
-            >
-              {item.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-      <StyledSignUpButton className="w-full" onClick={onClickSignupButton}>立即申請</StyledSignUpButton>
-    </aside>
+    <>
+      <aside
+        className={cn(
+          "right-8 bottom-24 lg:right-auto lg:bottom-auto",
+          "fixed lg:left-8 lg:top-[var(--sidebar-top)] max-h-[calc(100vh-var(--sidebar-top)-24px)] overflow-y-auto",
+          "p-2 bg-white rounded-lg shadow-md transition-opacity duration-300 z-20",
+          isShow ? 'lg:opacity-100' : 'lg:opacity-0 lg:pointer-events-none',
+          isOpenSidebar ? 'opacity-100' : 'opacity-0 pointer-events-none',
+        )}
+        style={{ '--sidebar-top': `${scrollPaddingTop + 100}px` }}
+      >
+        <ul className="flex flex-col gap-2 mb-2">
+          {sidebarItems.map((item) => (
+            <li key={item.label}>
+              <Link
+                href={item.href}
+                className={cn(
+                  "block body-lg font-medium p-2.5 rounded-lg text-basic-400 transition-colors duration-300",
+                  activeSection === item.href.replace('#', '') && 'text-primary-base bg-primary-lightest',
+                )}
+              >
+                {item.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <StyledSignUpButton className="w-full" onClick={onClickSignupButton}>立即申請</StyledSignUpButton>
+      </aside>
+      <div
+        className={cn(
+          "fixed bottom-8 right-8 lg:hidden transition-opacity duration-300 z-20",
+          isShow ? 'opacity-100' : 'opacity-0 pointer-events-none',
+        )}
+      >
+        <button
+          type="button"
+          className="bg-primary-base text-white rounded-full p-3 shadow-md shadow-primary-base"
+          onClick={() => setIsOpenSidebar(!isOpenSidebar)}
+        >
+          <FaAngleUp
+            className={cn("text-white size-6 transition-transform duration-300", isOpenSidebar ? 'rotate-0' : '-rotate-180')}
+          />
+        </button>
+      </div>
+    </>
   );
 };
 
