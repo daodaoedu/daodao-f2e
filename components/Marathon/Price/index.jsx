@@ -332,7 +332,7 @@ export default function Price() {
   return (
     <StyledGroup>
       <StyledParagraph component="p" sx={{ marginBottom: '36px' }}>
-        報名無需費用，入選後才需繳交！<br/>
+        報名無需費用，入選後才需繳交！<br />
         完賽可退全額！
       </StyledParagraph>
       <StyledDiscount sx={{ marginBottom: '16px' }}>
@@ -433,7 +433,7 @@ export default function Price() {
                 工作坊、學習小組會議、團體諮詢及 1對1 諮詢，加總不得請假超過5小時。
               </li>
               <li>
-                準時提交所有每兩週的進度報告 。
+                準時提交所有每兩週的進度報告。
               </li>
               <li>
                 於 2025/7/10 前完成以下資料

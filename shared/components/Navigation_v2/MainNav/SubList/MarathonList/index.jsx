@@ -83,7 +83,7 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
     if (section.disabled) return;
 
     setIsOpenMenu(false);
-    onCloseMenu && onCloseMenu();
+    onCloseMenu();
 
     router.push(section.path);
   };
