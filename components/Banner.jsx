@@ -21,6 +21,7 @@ const StyledBanner = styled(Box)`
   height: calc(100vw / 1.6);
   position: relative;
   box-sizing: border-size;
+  overflow: hidden;
 
   @media (max-width: 767px) {
     height: calc(100vw / 0.6428);
