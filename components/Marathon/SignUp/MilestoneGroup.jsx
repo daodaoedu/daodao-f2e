@@ -19,20 +19,40 @@ export default function MilestoneGroup({
   onChange = null,
   isDisabled = false
 }) {
+  const eventWeekRange = 22;
+  const [startDate, setStartDate] = useState('2025-02-09');
+  const [endDate, setEndDate] = useState(dayjs(startDate).add('22', 'week'));
+  const [frequency, setFrequency] = useState('biweekly');
 
-  const eventWeekRange = 11; // Must be 11 weeks
-  const [startDate, setStartDate] = useState(dayjs());
-  const [endDate, setEndDate] = useState(dayjs().add('11', 'week'));
-  const [frequency, setFrequency] = useState('weekly');
+  function arabicToChinese(num) {
+    const digits = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
 
+    if (num < 1 || num > 100 || !Number.isInteger(num)) {
+      return "Input Number must >= 1 && =< 100";
+    }
+
+    if (num === 100) {
+      return "一百";
+    }
+
+    const tens = Math.floor(num / 10);
+    const ones = num % 10;
+
+    if (tens === 0) {
+      return digits[ones];
+    }
+    if (tens === 1) {
+      return ones === 0 ? "十" : `十${digits[ones]}`;
+    }
+    return `${digits[tens]}十${ones === 0 ? "" : digits[ones]}`;
+  }
   function calculateMilestones(
-    dateToStart = dayjs(),
-    freq = 'weekly',
+    dateToStart = '2025-02-09',
+    freq = 'biweekly',
     defaultMilestones = []
   ) {
     const interval = (freq === 'weekly') ? 7 : 14;
-    const milestoneLength = (freq === 'weekly') ? 11 : 6;
-    const week = (freq === 'weekly') ? ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一'] : ['一', '三', '五', '七', '九', '十一'];
+    const milestoneLength = (freq === 'weekly') ? 22 : 11;
     const newData = [];
     const mode = defaultMilestones.length ? 'modify' : 'create';
 
@@ -48,7 +68,6 @@ export default function MilestoneGroup({
         name: existingMilestone.name || '',
         startDate: start.format('YYYY-MM-DD'),
         endDate: end.format('YYYY-MM-DD'),
-        weekNumber: `第${week[i]}週`,
         subMilestones: newSubMilestones
       });
     }
@@ -98,57 +117,27 @@ export default function MilestoneGroup({
     });
   };
   useEffect(() => {
-    const storgedStartDate = milestones[0]?.startDate || dayjs();
-    setStartDate(storgedStartDate);
-
-    const biWeeklyMilestonesLength = 6;
-    const weeklyMilestonesLength = 11;
+    const weeklyMilestonesLength = 22;
+    const eventStartDate = '2025-02-09';
+    setStartDate(eventStartDate);
     let initMilestones = [];
 
-    if (isDisabled) {
-      if (milestones.length === biWeeklyMilestonesLength) {
-        setFrequency('biweekly');
-      } else {
-        setFrequency('weekly');
-      }
+    if (milestones.length === weeklyMilestonesLength) {
+      setFrequency('weekly');
+      initMilestones = calculateMilestones(eventStartDate, 'weekly', milestones);
     } else {
-      if (milestones.length === biWeeklyMilestonesLength) {
-        setFrequency('biweekly');
-        initMilestones = calculateMilestones(storgedStartDate, 'biweekly', milestones);
-        onChange({
-          type: 'UPDATE_FIELD',
-          payload: {
-            key: 'milestones',
-            value: initMilestones
-          }
-        });
-        return;
-      }
+      setFrequency('biweekly');
+      initMilestones = calculateMilestones(eventStartDate, 'biweekly', milestones);
+    }
 
-      if (milestones.length === weeklyMilestonesLength) {
-        setFrequency('weekly');
-        initMilestones = calculateMilestones(storgedStartDate, 'weekly', milestones);
-        onChange({
-          type: 'UPDATE_FIELD',
-          payload: {
-            key: 'milestones',
-            value: initMilestones
-          }
-        });
-        return;
-      }
-
-      if (!milestones.length) {
-        setFrequency('weekly');
-        initMilestones = calculateMilestones(dayjs(), 'weekly', []);
-        onChange({
-          type: 'UPDATE_FIELD',
-          payload: {
-            key: 'milestones',
-            value: initMilestones
-          }
-        });
-      }
+    if (!isDisabled) {
+      onChange({
+        type: 'UPDATE_FIELD',
+        payload: {
+          key: 'milestones',
+          value: initMilestones
+        }
+      });
     }
   }, []);
 
@@ -169,11 +158,9 @@ export default function MilestoneGroup({
               <Grid item xs={4}>
                 <DatePicker
                   label="開始日期"
-                  value={startDate}
-                  minDate={dayjs()}
-                  onChange={handleStartDate}
+                  value="2025-02-09"
                   inputFormat="YYYY-MM-DD"
-                  disabled={isDisabled}
+                  disabled
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -193,7 +180,7 @@ export default function MilestoneGroup({
               <Grid item xs={4}>
                 <DatePicker
                   label="結束日期"
-                  value={endDate}
+                  value="2025-07-12"
                   inputFormat="YYYY-MM-DD"
                   disabled
                   onChange={handleEndDate}
@@ -240,12 +227,19 @@ export default function MilestoneGroup({
             </Grid>
           </StyledGroup>
           <StyledGroup>
-            {milestones.map((milestone, _i) => {
+            {milestones.map((milestone, i) => {
+              const interval = frequency === 'biweekly' ? 14 : 7;
+              const taskStartDate = dayjs('2025-02-9').add(i * interval, 'day');
+              const taskEndDate = taskStartDate.add(interval - 1, 'day');
+              const weekNumber = frequency === 'biweekly' ? arabicToChinese(i * 2 + 1) : arabicToChinese(i + 1);
               return (
                 <MilestonePanel
-                  key={milestone._tempId}
+                  key={milestone._tempId || uuidv4()}
                   milestone={milestone}
-                  onChange={updateMilestone}
+                  startDate={taskStartDate.format('YYYY/MM/DD')}
+                  endDate={taskEndDate.format('YYYY/MM/DD')}
+                  weekNumber={`第${weekNumber}週`}
+                  onChange={updateMilestone || null}
                   isDisabled={isDisabled}
                 />
               );
