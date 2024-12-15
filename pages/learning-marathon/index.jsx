@@ -349,7 +349,7 @@ const LearningMarathon = () => {
           className="bg-primary-lightest"
         >
           <List className="my-9">
-            <li>16歲以上學習者皆可報名，優先以高中及大學生為主</li>
+            <li>16歲以上學習者皆可申請，優先以高中及大學生為主</li>
             <li>有意願為自己打造專屬學習旅程的學習者</li>
           </List>
           <p className="mb-2.5">

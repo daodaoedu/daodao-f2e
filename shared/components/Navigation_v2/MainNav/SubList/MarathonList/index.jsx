@@ -100,6 +100,7 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
           fontWeight: '500',
           display: 'flex',
           alignItems: 'center',
+          width: '215px',
           backgroundColor: isOpenMenu ? '#def5f5' : '#16b9b3',
           color: isOpenMenu ? '#16b9b3' : '#fff',
           padding: '8px',
@@ -122,7 +123,7 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
           zIndex: 1,
         }}
       >
-        <Box sx={{ padding: !isPadScreen && '12px' }}>
+        <Box >
           {sections.map((section, i) => (
             <StyledMenuItem
               as="div"

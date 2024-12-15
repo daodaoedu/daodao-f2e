@@ -332,7 +332,7 @@ export default function Price() {
   return (
     <StyledGroup>
       <StyledParagraph component="p" sx={{ marginBottom: '36px' }}>
-        報名無需費用，入選後才需繳交！<br />
+        申請無需費用，入選後才需繳交！<br />
         完賽可退全額！
       </StyledParagraph>
       <StyledDiscount sx={{ marginBottom: '16px' }}>
@@ -355,7 +355,7 @@ export default function Price() {
         <StyledPriceCard>
           <div className="title">
             <span>早鳥價</span>
-            <span className="note">12/31 23:59 前報名</span>
+            <span className="note">12/31 23:59 前申請</span>
           </div>
           <div className="price">
             <p className="curr">NT$</p>
@@ -408,7 +408,7 @@ export default function Price() {
         <ul>
           <li>活動費用於入選公告後再繳費即可，主辦單位將會寄發繳費通知到入選者信箱</li>
           <li>若完成指定的條件，會退回活動費用</li>
-          <li>島島阿學提供三名中低收入戶學習者免活動費用的參與機會，報名時須提供證明</li>
+          <li>島島阿學提供三名中低收入戶學習者免活動費用的參與機會，申請時須提供證明</li>
           <li>申請期間有不定期的折價優惠活動，至高可折 500 元，歡迎追蹤島島阿學 Instagram 與 FB 粉絲專頁。</li>
         </ul>
       </StyledList>

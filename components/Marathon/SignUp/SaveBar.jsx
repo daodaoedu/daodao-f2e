@@ -64,7 +64,7 @@ export default function SaveBar({ currentStep }) {
   return (
     <StyledSaveBar>
       <div className="top">
-        <h2>報名參加學習徵件計畫</h2>
+        <h2>申請參加學習馬拉松</h2>
       </div>
       <div className="bottom">
         <Stepper activeStep={currentStep}>
