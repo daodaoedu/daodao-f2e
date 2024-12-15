@@ -19,42 +19,6 @@ export default function MilestoneGroup({
   onChange = null,
   isDisabled = false
 }) {
-  const testMilestones = [
-    {
-      name: "第一階段 - 初步學習",
-      startDate: "2024-01-10T00:00:00.000Z",
-      endDate: "2024-02-10T00:00:00.000Z",
-      subMilestones: [
-        {
-          name: "學習自主學習方法",
-          dates: ["2024-01-05T00:00:00.000Z", "2024-01-06T00:00:00.000Z"],
-          description: "學員將學習不同的自主學習方法，並選擇適合自己的方式。",
-        },
-        {
-          name: "設立學習目標",
-          dates: ["2024-01-07T00:00:00.000Z", "2024-01-08T00:00:00.000Z"],
-          description: "學員將設立短期和長期的學習目標。",
-        },
-      ],
-    },
-    {
-      name: "第二階段 - 應用實踐",
-      startDate: "2024-03-01T00:00:00.000Z",
-      endDate: "2024-03-15T00:00:00.000Z",
-      subMilestones: [
-        {
-          name: "實踐學習技巧",
-          dates: ["2024-02-25T00:00:00.000Z", "2024-02-28T00:00:00.000Z"],
-          description: "學員將開始實踐所學的時間管理與學習技巧。",
-        },
-        {
-          name: "評估學習成果",
-          dates: ["2024-03-10T00:00:00.000Z", "2024-03-12T00:00:00.000Z"],
-          description: "學員將評估自己在學習過程中的進展，並調整學習策略。",
-        },
-      ],
-    },
-  ];
 
   const eventWeekRange = 11; // Must be 11 weeks
   const [startDate, setStartDate] = useState(dayjs());
