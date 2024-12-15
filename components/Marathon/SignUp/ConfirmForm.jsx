@@ -374,7 +374,7 @@ export default function ConfirmForm({
           }}
         >
           <Typography component="p">
-            {newMarathon?.resources}
+            {marathonState?.resources}
           </Typography>
         </Box>
       </StyledSection>
