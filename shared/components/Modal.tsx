@@ -6,16 +6,20 @@ interface ModalProps {
   isOpen: boolean;
   title: string;
   children: React.ReactNode;
-  onClose: () => void;
+  className?: string;
   keepMounted?: boolean;
+  onClose: () => void;
+  onRemovedDOM?: () => void;
 }
 
 function Modal({
   isOpen,
   title,
   children,
-  onClose,
+  className,
   keepMounted = false,
+  onClose,
+  onRemovedDOM,
 }: ModalProps) {
   const [removeDOM, setRemoveDOM] = useState(true);
 
@@ -34,6 +38,7 @@ function Modal({
     } else {
       timer = setTimeout(() => {
         setRemoveDOM(true);
+        onRemovedDOM?.();
       }, 200);
     }
 
@@ -41,7 +46,7 @@ function Modal({
       document.body.classList.remove("overflow-y-hidden");
       clearTimeout(timer);
     };
-  }, [isOpen]);
+  }, [isOpen, onRemovedDOM]);
 
   useEffect(() => {
     const handleWindowKeyUp = (e: KeyboardEvent) => {
@@ -74,7 +79,8 @@ function Modal({
             className={cn(
               "fixed -bottom-4 sm:bottom-auto p-10 w-full sm:max-w-96 rounded-lg bg-white",
               "transition-transform translate-y-full ease-in duration-200",
-              isOpen && "translate-y-0 animate-slide-in"
+              isOpen && "translate-y-0 animate-slide-y-in",
+              className
             )}
           >
             <header className="text-center text-2xl font-bold text-basic-400">
