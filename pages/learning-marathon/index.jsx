@@ -3,45 +3,29 @@ import React, { useEffect, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
-import Image from '@/shared/components/Image';
-import LearningMarathonImgDesktop from '@/public/assets/learning-marathon-2025S1-desktop@2x.png';
-import LearningMarathonImgMobile from '@/public/assets/learning-marathon-2025S1-mobile@2x.png';
-import { FaChevronRight, FaChevronLeft } from "react-icons/fa6";
+import { GoArrowUpRight } from "react-icons/go";
 
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
-import { Box, Button, IconButton } from '@mui/material';
+import Button from '@mui/material/Button';
 import Participant from '@/components/Marathon/Participant';
 import Equip from '@/components/Marathon/Equip';
 import Spotlight from '@/components/Marathon/Spotlight';
 import Apply from '@/components/Marathon/Apply';
+import Mentors from '@/components/Marathon/Mentors';
 import Price from '@/components/Marathon/Price';
 import Faq from '@/components/Marathon/Faq';
 
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
+import Banner from '@/components/Banner';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
   --section-height-offset: 80px;
 `;
-const StyledBanner = styled(Box)`
-  width: 100%;
-  height: calc(100vw / 1.6);
-  position: relative;
-  box-sizing: border-size;
 
-  .mobile {
-    display: none;
-  }
-
-  @media (max-width: 767px) {
-    height: calc(100vw / 0.6428);
-    .desktop { display: none; }
-    .mobile { display: block; }
-  }
-`;
 const StyledBannerButton = styled(Button)`
   &.MuiButton-root {
     position: absolute;
@@ -185,11 +169,11 @@ const Sidebar = ({ onClickSignupButton }) => {
   return (
     <aside
       className={cn(
-        "hidden lg:block fixed left-8",
+        "hidden lg:block fixed left-8 top-[var(--sidebar-top)] max-h-[calc(100vh-var(--sidebar-top)-24px)] overflow-y-auto",
         "p-2 bg-white rounded-lg shadow-md transition-opacity duration-300 z-20",
         isShow ? 'opacity-100' : 'opacity-0 pointer-events-none',
       )}
-      style={{ top: `${scrollPaddingTop + 100}px` }}
+      style={{ '--sidebar-top': `${scrollPaddingTop + 100}px` }}
     >
       <ul className="flex flex-col gap-2 mb-2">
         {sidebarItems.map((item) => (
@@ -214,8 +198,8 @@ const Sidebar = ({ onClickSignupButton }) => {
 const Nav = () => {
   const navItems = [
     { label: '活動辦法', href: '#', active: true },
-    { label: '活動公告', href: '#' },
-    { label: '自學計畫分享區', href: '#' },
+    { label: '活動公告', href: '/marathon-announcement' },
+    { label: '自學計畫分享區', href: '/marathon-sharing', external: true },
     { label: '成果發表（未開放）', href: '#', disabled: true },
   ];
 
@@ -233,12 +217,15 @@ const Nav = () => {
             ) : (
               <Link
                 href={item.href}
+                target={item.external ? '_blank' : '_self'}
+                rel={item.external ? 'noopener noreferrer' : ''}
                 className={cn(
-                  'relative block text-primary-base body-sm font-medium p-4',
+                  'relative block text-primary-base body-sm font-medium p-4 flex items-center gap-1',
                   item.active && 'before:content-[""] before:absolute before:bottom-2.5 before:left-4 before:right-4 before:h-[2px] before:bg-primary-base',
                 )}
               >
                 {item.label}
+                {item.external && <GoArrowUpRight className="size-4" />}
               </Link>
             )}
           </li>
@@ -260,62 +247,6 @@ const Section = ({ title, id, className, children, withContainer = true }) => (
 const List = ({ className, children }) => (
   <ul className={cn("list-disc ml-6", className)}>{children}</ul>
 );
-
-const Mentors = () => {
-  const [currentMentor, setCurrentMentor] = useState(0);
-  const mentors = [
-    { name: '引導師1', image: '/assets/mentors/card-partner-0.jpg' },
-    { name: '引導師2', image: '/assets/mentors/card-partner-1.jpg' },
-    { name: '引導師3', image: '/assets/mentors/card-partner-2.jpg' },
-    { name: '引導師4', image: '/assets/mentors/card-partner-3.jpg' },
-    { name: '引導師5', image: '/assets/mentors/card-partner-4.jpg' },
-    { name: '引導師6', image: '/assets/mentors/card-partner-5.jpg' },
-    { name: '引導師7', image: '/assets/mentors/card-partner-6.jpg' },
-  ];
-
-  const handleNextMentor = () => {
-    if (currentMentor < mentors.length - 1) {
-      setCurrentMentor((prev) => prev + 1);
-    }
-  };
-
-  const handlePrevMentor = () => {
-    if (currentMentor > 0) {
-      setCurrentMentor((prev) => prev - 1);
-    }
-  };
-
-  return (
-    <>
-      <div className="px-6 md:px-[100px] flex justify-between items-center">
-        <h2 className="heading-md text-basic-500" id="marathon-mentor">引導師介紹</h2>
-        <div className="flex gap-2">
-          <IconButton onClick={handlePrevMentor} disabled={currentMentor === 0}>
-            <FaChevronLeft />
-          </IconButton>
-          <IconButton onClick={handleNextMentor} disabled={currentMentor === mentors.length - 1}>
-            <FaChevronRight />
-          </IconButton>
-        </div>
-      </div>
-      <div className="flex gap-4 mt-9 px-6 md:px-[100px] overflow-x-hidden select-none">
-        {mentors.map((mentor) => (
-          <div
-            key={mentor.name}
-            className="relative shrink-0 rounded-lg w-[285px] h-[307px] overflow-hidden transition-transform duration-300"
-            style={{ transform: `translateX(-${currentMentor * 301}px)` }}
-          >
-            <div className="absolute inset-0">
-              <Image src={mentor.image} alt={mentor.name} width={293} height={321} borderRadius="0" />
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-primary-base/80" />
-            <div className="heading-md text-white absolute bottom-0 left-0 right-0 p-4">學習馬拉松 | 引導師</div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-};
 
 const LearningMarathon = () => {
   const { openLoginModal } = useAuthDispatch();
@@ -361,36 +292,15 @@ const LearningMarathon = () => {
     }
   };
 
-  // TODO: Banner 動態效果
   return (
     <>
       <SEOConfig data={SEOData} />
       <main>
-        <StyledBanner>
-          <Box className="desktop">
-            <Image
-              src={LearningMarathonImgDesktop.src}
-              alt="島島盃 - 學習馬拉松 2025 春季賽"
-              height="inherit"
-              background="linear-gradient(#fcfefe 10%, #e0f1f2 40%)"
-              borderRadius="0"
-              className="desktop"
-            />
-          </Box>
-          <Box className="mobile">
-            <Image
-              src={LearningMarathonImgMobile.src}
-              alt="島島盃 - 學習馬拉松 2025 春季賽"
-              height="inherit"
-              background="linear-gradient(#fcfefe 10%, #e0f1f2 40%)"
-              borderRadius="0"
-              className="mobile"
-            />
-          </Box>
+        <Banner>
           <StyledBannerButton onClick={handleClickSignupButton}>
             立即申請
           </StyledBannerButton>
-        </StyledBanner>
+        </Banner>
         <Nav />
         <Sidebar onClickSignupButton={handleClickSignupButton} />
         <Section
@@ -590,16 +500,6 @@ const LearningMarathon = () => {
         </Section>
       </main>
     </>
-  );
-};
-
-LearningMarathon.getLayout = ({ children }) => {
-  return (
-    <HomePageWrapper>
-      <Navigation />
-      {children}
-      <Footer />
-    </HomePageWrapper>
   );
 };
 
