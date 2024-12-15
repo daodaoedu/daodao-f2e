@@ -24,8 +24,7 @@ const StyledMenuItem = styled(MenuItem)`
     color: ${props.isDisabled ? 'rgba(83, 97, 102, 0.5)' : '#536166'};
     cursor: ${props.isDisabled ? 'not-allowed' : 'pointer'};
     animation-delay: ${props.delay};
-    min-width: 126px;
-    padding: ${props.isPadScreen ? '12px 52px' : '12px'};
+    padding: 8px;
     font-size: ${props.isPadScreen ? '18px' : '16px'};
     margin-top: ${props.isPadScreen ? '18px' : '0'};
     &:hover {
@@ -99,12 +98,13 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
         sx={{
           fontWeight: '500',
           display: 'flex',
+          justifyContent: 'center',
           alignItems: 'center',
-          width: '215px',
           backgroundColor: isOpenMenu ? '#def5f5' : '#16b9b3',
           color: isOpenMenu ? '#16b9b3' : '#fff',
+          width: '230px',
           padding: '8px',
-          borderRadius: '8px',
+          borderRadius: '4px',
           transition: 'background-color 0.3s ease, padding 0.3s ease',
         }}
         onClick={() => setIsOpenMenu(!isOpenMenu)}
@@ -123,7 +123,7 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
           zIndex: 1,
         }}
       >
-        <Box >
+        <Box sx={{padding:'12px'}}>
           {sections.map((section, i) => (
             <StyledMenuItem
               as="div"
