@@ -327,7 +327,6 @@ const Mentors = () => {
         ))}
       </div>
 
-
       <Modal
         isOpen={isOpen}
         onClose={handleCloseModal}
