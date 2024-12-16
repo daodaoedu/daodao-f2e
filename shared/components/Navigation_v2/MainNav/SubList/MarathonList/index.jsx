@@ -123,7 +123,7 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
           zIndex: 1,
         }}
       >
-        <Box sx={{padding:'12px'}}>
+        <Box sx={{ padding: '12px' }}>
           {sections.map((section, i) => (
             <StyledMenuItem
               as="div"

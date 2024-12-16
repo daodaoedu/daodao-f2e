@@ -212,9 +212,9 @@ const Sidebar = ({ onClickSignupButton }) => {
 const Nav = () => {
   const navItems = [
     { label: '活動詳情', href: '#', active: true },
-    { label: '活動公告（未開放）', href: '/marathon-announcement', disabled: true },
-    { label: '學習計畫分享區（未開放）', href: '/marathon-sharing', disabled: true, external: true },
-    { label: '成果發表（未開放）', href: '#', disabled: true },
+    { label: '活動公告', href: '/marathon-announcement', disabled: true },
+    { label: '學習計畫分享區', href: '/marathon-sharing', disabled: true, external: true },
+    { label: '成果發表', href: '#', disabled: true },
   ];
 
   const scrollPaddingTop = useScrollPaddingTop();
@@ -388,7 +388,7 @@ const LearningMarathon = () => {
           className="bg-primary-lightest"
         >
           <p className="mt-9 mb-5">
-            只要申請，不論有無入選，就可以優先使用島島阿學 AI 個人化學習工具，包含自主學習模板、學習日誌、學習進度追蹤、AI推薦與引導等功能！
+            只要申請，不論有無入選，就可以優先使用島島阿學AI個人化學習工具，包含自主學習模板、學習日誌、學習進度追蹤、AI推薦與引導等功能！
           </p>
           <p>
             而入選後，你還可以與專屬引導師與學習夥伴跑完一趟自我導向學習的馬拉松，完成遲遲未開始的計畫，並在過程中...

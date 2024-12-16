@@ -156,8 +156,8 @@ export default function Apply() {
         <StyledTimelineGroup sx={{ marginBottom: '8px' }}>
           <StyledDateCard>
             <StyledDateGroup>
-              <div className="date">12/15</div>
-              <div className="weekday"><span>日</span></div>
+              <div className="date">12/16</div>
+              <div className="weekday"><span>一</span></div>
             </StyledDateGroup>
           </StyledDateCard>
           <StyledContent>
