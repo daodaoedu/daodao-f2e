@@ -290,7 +290,7 @@ const Mentors = () => {
 
       <div
         ref={mentorsRef}
-        className="flex gap-4 mt-9 px-6 lg:pl-60 overflow-x-hidden select-none"
+        className="flex gap-4 mt-9 px-6 lg:pl-60 overflow-x-auto select-none"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
