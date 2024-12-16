@@ -81,6 +81,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         ...action.payload,
         apiState: 'Resolve',
+        userType: 'normal',
         isComplete: checkIsComplete(action.payload),
       };
     }
@@ -93,6 +94,32 @@ const reducer = (state = initialState, action) => {
     case 'UPDATE_USER_PROFILE_FAILURE': {
       return {
         ...state,
+        apiState: 'Reject',
+      };
+    }
+    case 'FETCH_USER_BY_TOKEN_SUCCESS': {
+      return {
+        ...state,
+        ...action.payload,
+        loading: false,
+        apiState: 'Resolve'
+      };
+    }
+    case 'FETCH_USER_BY_TOKEN_SUCCESS_NO_DATA': {
+      return {
+        ...state,
+        ...action.payload,
+        userType: 'no_data',
+        loading: false,
+        apiState: 'Resolve'
+      };
+    }
+    case 'FETCH_USER_BY_TOKEN_FAILURE': {
+      return {
+        ...state,
+        user: null,
+        loading: false,
+        error: action.error,
         apiState: 'Reject',
       };
     }

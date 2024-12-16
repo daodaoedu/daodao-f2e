@@ -1,0 +1,581 @@
+import { useState, useEffect } from 'react';
+import { TAIWAN_DISTRICT, COUNTRIES } from '@/constants/areas';
+import dayjs from 'dayjs';
+import toast from 'react-hot-toast';
+import { useSearchParams } from 'next/navigation';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useRouter } from 'next/router';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  fetchMarathonProfileByUserEvent
+} from "@/redux/actions/marathon";
+import { useAuthDispatch } from '@/contexts/Auth';
+import {
+  GENDER,
+  ROLE,
+  EDUCATION_STAGE,
+  WANT_TO_DO_WITH_PARTNER,
+} from '@/constants/member';
+
+import {
+  Box,
+  Typography,
+  TextField,
+  Switch,
+  TextareaAutosize,
+  MenuItem,
+  Select,
+  Grid,
+} from '@mui/material';
+
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import Fields from '@/components/Group/Form/Fields';
+import useEditProfile from './useEditProfile';
+import ErrorMessage from './ErrorMessage';
+
+import TheAvator from './TheAvator';
+import FormInput from './EditFormInput';
+import {
+  FormWrapper,
+  ContentWrapper,
+  StyledGroup,
+  StyledSelectWrapper,
+  StyledSelectBox,
+  StyledSelectText,
+  StyledToggleWrapper,
+  StyledToggleText,
+  StyledTitleWrap,
+  StyledSection,
+  StyledButtonGroup,
+  StyledButton,
+  MarathonSignUpWrapper,
+} from './Edit.styled';
+
+export default function UserProfileForm({
+  currentStep,
+  setCurrentStep,
+}) {
+  const authDispatch = useAuthDispatch();
+  const reduxDispatch = useDispatch();
+  const mobileScreen = useMediaQuery('(max-width: 767px)');
+  const [isSetting, setIsSetting] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const check = searchParams.get('check');
+  const [hasClickNextStep, setHasClickNextStep] = useState(false);
+  const [hasGetLatestMarathon, setHasGetLatestMarathon] = useState(false);
+  const [hasUpdateAuthContext, setHasUpdateAuthContext] = useState(false);
+  const {
+    userState,
+    errors,
+    onChangeHandler,
+    onSubmit: onEditSubmit,
+    setRef,
+  } = useEditProfile();
+
+  const user = useSelector((state) => state.user);
+  const marathonState = useSelector((state) => state.marathon);
+  const onUpdateUser = async () => {
+    const resultStatus = await onEditSubmit({
+      id: user._id,
+      email: user.email,
+      type: 'update'
+    });
+
+    setHasClickNextStep(true);
+    if (Object.values(errors).length) {
+      toast.error('請修正錯誤');
+      return;
+    }
+    if (!resultStatus && !check) {
+      toast.error('更新失敗');
+    }
+  };
+
+  const onCreateUser = async () => {
+    const resultStatus = await onEditSubmit({
+      id: user._id,
+      email: user.email,
+      type: 'create'
+    });
+    setHasClickNextStep(true);
+    if (Object.values(errors).length) {
+      toast.error('請修正錯誤');
+      return;
+    }
+    if (!resultStatus && !check) {
+      toast.error('註冊失敗');
+    }
+  };
+  const onNextStep = () => {
+    if (user.userType === 'normal') {
+      onUpdateUser();
+    }
+    if (user.userType === 'no_data') {
+      onCreateUser();
+    }
+  };
+
+  useEffect(() => {
+    if (user._id) {
+      Object.entries(user).forEach(([key, value]) => {
+        if (key === 'contactList') {
+          const { instagram, facebook, discord, line } = value;
+          onChangeHandler({ key: 'instagram', value: instagram || '' });
+          onChangeHandler({ key: 'facebook', value: facebook || '' });
+          onChangeHandler({ key: 'discord', value: discord || '' });
+          onChangeHandler({ key: 'line', value: line || '' });
+        } else if (key === 'birthDay') {
+          const parsedDate = dayjs(value);
+          onChangeHandler({ key: 'birthDay', value: parsedDate });
+        } else if (key === 'location') {
+          onChangeHandler({ key, value });
+          const [country, city, district] = value.split('@');
+          onChangeHandler({ key: 'country', value: country || null });
+          onChangeHandler({ key: 'city', value: city || null });
+          onChangeHandler({ key: 'district', value: district || null });
+        } else {
+          onChangeHandler({ key, value });
+        }
+      });
+      setIsSetting(true);
+      if (!hasGetLatestMarathon) {
+        reduxDispatch(fetchMarathonProfileByUserEvent(user._id, "2025S1"));
+        setHasGetLatestMarathon(true);
+      }
+      if (!hasUpdateAuthContext) {
+        authDispatch.updateUser(user);
+        setHasUpdateAuthContext(true);
+      }
+    }
+  }, [user]);
+
+  useEffect(() => {
+    switch (user.apiState) {
+      case 'Resolve': {
+        toast.success('更新成功');
+        break;
+      }
+      case 'Reject': {
+        toast.error('更新失敗');
+        break;
+      }
+      default:
+    }
+  }, [user.apiState]);
+
+  useEffect(() => {
+    if (
+      user._id &&
+      isSetting &&
+      (user.apiState === 'Resolve') &&
+      hasClickNextStep // set hasClickNextStep to avoid auto next step after login
+    ) {
+      setCurrentStep(currentStep + 1);
+    }
+  }, [user._id, isSetting, user.apiState, hasClickNextStep, marathonState]);
+  return (
+
+    <>
+      <StyledTitleWrap
+        sx={{
+          border:
+            errors.name ||
+              errors.birthDay ||
+              errors.gender ||
+              errors.roleList
+              ? '1px solid red'
+              : '',
+        }}
+      >
+        <h2>編輯個人頁面</h2>
+        <p className="title-memo">
+          填寫完整資訊可以幫助其他夥伴更了解你哦！
+        </p>
+        <TheAvator url={userState.photoURL} />
+
+        <Box sx={{ marginTop: '24px', width: '100%' }}>
+          <FormInput
+            isRequire
+            ref={(element) => setRef('name', element)}
+            title="名稱"
+            parmKey="name"
+            value={userState.name || ''}
+            onChange={onChangeHandler}
+            errorMsg={errors.name ? errors.name : ''}
+          />
+          <StyledGroup>
+            <Typography fontWeight="500">生日 *</Typography>
+            <MobileDatePicker
+              inputFormat="YYYY/MM/DD"
+              value={userState.birthDay}
+              onChange={(date) =>
+                onChangeHandler({ key: 'birthDay', value: date })
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  ref={(element) => setRef('birthDay', element)}
+                  sx={{ width: '100%' }}
+                  label=""
+                  error={!!errors.birthDay}
+                  helperText={errors.birthDay ? errors.birthDay : ''}
+                />
+              )}
+              maxDate={dayjs().subtract(16, 'year')}
+              defaultCalendarMonth={dayjs().subtract(18, 'year')}
+            />
+          </StyledGroup>
+          <StyledGroup>
+            <Typography fontWeight="500">性別 *</Typography>
+            <StyledSelectWrapper
+              ref={(element) => setRef('gender', element)}
+            >
+              {GENDER.map(({ label, value }) => (
+                <StyledSelectBox
+                  isselected={`${userState.gender === value}`}
+                  key={label}
+                  onClick={() => {
+                    onChangeHandler({ key: 'gender', value });
+                  }}
+                >
+                  <StyledSelectText
+                    isselected={`${userState.gender === value}`}
+                  >
+                    {label}
+                  </StyledSelectText>
+                </StyledSelectBox>
+              ))}
+            </StyledSelectWrapper>
+            <ErrorMessage errText={errors.gender} />
+          </StyledGroup>
+          <StyledGroup>
+            <Typography fontWeight="500">身份 *</Typography>
+            <StyledSelectWrapper
+              ref={(element) => setRef('roleList', element)}
+            >
+              {ROLE.map(({ label, value }) => (
+                <StyledSelectBox
+                  col={mobileScreen ? '2' : '3'}
+                  key={label}
+                  isselected={userState.roleList.includes(value).toString()}
+                  onClick={() =>
+                    onChangeHandler({
+                      key: 'roleList',
+                      value,
+                      isMultiple: true,
+                    })
+                  }
+                >
+                  <StyledSelectText
+                    isselected={userState.roleList
+                      .includes(value)
+                      .toString()}
+                  >
+                    {label}
+                  </StyledSelectText>
+                </StyledSelectBox>
+              ))}
+            </StyledSelectWrapper>
+            <ErrorMessage errText={errors.roleList} />
+          </StyledGroup>
+        </Box>
+      </StyledTitleWrap>
+
+      <StyledSection sx={{ marginTop: '16px' }}>
+        <StyledGroup mt="0">
+          <Typography fontWeight="500">教育階段</Typography>
+          <Select
+            labelId="education-stage"
+            id="education-stage"
+            value={userState.educationStage}
+            onChange={(event) => {
+              onChangeHandler({
+                key: 'educationStage',
+                value: event.target.value,
+              });
+            }}
+            sx={{ width: '100%' }}
+          >
+            <MenuItem disabled>
+              <em>請選擇您目前的教育階段</em>
+            </MenuItem>
+            {EDUCATION_STAGE.map(({ label, value }) => (
+              <MenuItem key={value} value={value}>
+                {label}
+              </MenuItem>
+            ))}
+          </Select>
+        </StyledGroup>
+        <StyledGroup>
+          <Typography>居住地</Typography>
+          <Select
+            labelId="country"
+            id="country"
+            value={userState.country}
+            onChange={(event) => {
+              onChangeHandler({
+                key: 'country',
+                value: event.target.value,
+              });
+            }}
+            sx={{ width: '100%' }}
+          >
+            <MenuItem disabled value="-1">
+              <em>請選擇居住地</em>
+            </MenuItem>
+            {COUNTRIES.map(({ name, label }) => (
+              <MenuItem key={name} value={name}>
+                {label}
+              </MenuItem>
+            ))}
+          </Select>
+          {(userState.country === '台灣' || userState.country === 'tw') && (
+            <Grid container columnSpacing={1}>
+              <Grid item xs={12} sm={6}>
+                <Select
+                  labelId="country"
+                  id="country"
+                  value={userState.city}
+                  onChange={(event) => {
+                    onChangeHandler({
+                      key: 'city',
+                      value: event.target.value,
+                    });
+                  }}
+                  sx={{ width: '100%' }}
+                >
+                  <MenuItem disabled value="-1">
+                    <em>縣市</em>
+                  </MenuItem>
+                  {TAIWAN_DISTRICT.map(({ name }) => (
+                    <MenuItem key={name} value={name}>
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Select
+                  labelId="district"
+                  id="district"
+                  value={userState.district}
+                  onChange={(event) => {
+                    onChangeHandler({
+                      key: 'district',
+                      value: event.target.value,
+                    });
+                  }}
+                  sx={{ width: '100%' }}
+                >
+                  <MenuItem disabled value="-1">
+                    <em>鄉鎮市區</em>
+                  </MenuItem>
+                  {TAIWAN_DISTRICT.find(
+                    ({ name }) => name === userState.city,
+                  )?.districts.map(({ name, zip }) => (
+                    <MenuItem key={zip} value={name}>
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+            </Grid>
+          )}
+        </StyledGroup>
+      </StyledSection>
+
+      <StyledSection
+        ref={(element) => setRef('socialCode', element)}
+        sx={{
+          marginTop: '16px',
+          border: errors.socialCode ? '1px solid red' : '',
+        }}
+      >
+        <StyledGroup mt="0">
+          <Typography sx={{ fontWeight: 700, fontSize: '18px' }}>
+            聯絡方式 *
+          </Typography>
+          <Typography
+            sx={{ color: '#92989A', fontWeight: 400, fontSize: '14px' }}
+          >
+            聯絡資訊會呈現在你的公開頁面上，讓夥伴能聯繫你，至少填寫一個社交媒體帳號
+          </Typography>
+        </StyledGroup>
+        <Grid container columnSpacing={1}>
+          {Object.entries({
+            instagram: 'Instagram',
+            discord: 'Discord',
+            line: 'Line',
+            facebook: 'Facebook',
+          }).map(([key, title]) => (
+            <Grid item xs={12} sm={6} key={key}>
+              <FormInput
+                ref={(element) => setRef(key, element)}
+                title={title}
+                parmKey={key}
+                value={userState[key] || ''}
+                onChange={onChangeHandler}
+                placeholder="請填寫ID"
+                errorMsg={
+                  errors[key]
+                    ? errors[key]
+                    : errors.socialCode
+                      ? '請填寫您的 ID'
+                      : ''
+                }
+              />
+            </Grid>
+          ))}
+        </Grid>
+        <StyledGroup>
+          <ErrorMessage errText={errors.socialCode} />
+        </StyledGroup>
+      </StyledSection>
+
+      <StyledSection
+        sx={{
+          marginTop: '16px',
+          border:
+            errors.wantToDoList || errors.tagList || errors.selfIntroduction
+              ? '1px solid red'
+              : '',
+        }}
+      >
+        <StyledGroup mt="0">
+          <Typography
+            sx={{ fontWeight: 500 }}
+            ref={(element) => setRef('wantToDoList', element)}
+          >
+            想和夥伴一起 *
+          </Typography>
+          <StyledSelectWrapper>
+            {WANT_TO_DO_WITH_PARTNER.map(({ label, value }) => (
+              <StyledSelectBox
+                key={label}
+                col={mobileScreen ? '2' : '3'}
+                isselected={userState.wantToDoList
+                  .includes(value)
+                  .toString()}
+                onClick={() => {
+                  onChangeHandler({
+                    key: 'wantToDoList',
+                    value,
+                    isMultiple: true,
+                  });
+                }}
+              >
+                <StyledSelectText
+                  isselected={userState.wantToDoList
+                    .includes(value)
+                    .toString()}
+                >
+                  {label}
+                </StyledSelectText>
+              </StyledSelectBox>
+            ))}
+          </StyledSelectWrapper>
+          <ErrorMessage errText={errors.wantToDoList} />
+        </StyledGroup>
+        <StyledGroup>
+          <Typography sx={{ fontWeight: 500 }}>
+            可以和夥伴分享的事物
+          </Typography>
+          <TextField
+            sx={{ width: '100%' }}
+            placeholder="你擅長什麼？可以分享什麼呢？"
+            value={userState.share}
+            onChange={(e) => {
+              onChangeHandler({ key: 'share', value: e.target.value });
+            }}
+          />
+        </StyledGroup>
+        <StyledGroup>
+          <Typography sx={{ fontWeight: 500 }}>標籤</Typography>
+          <Fields.TagsField
+            name="tagList"
+            value={userState.tagList}
+            control={{
+              setRef: (name, element) => setRef(name, element),
+              onChange: ({ target }) =>
+                onChangeHandler({ key: target.name, value: target.value }),
+            }}
+          />
+          <Typography
+            sx={{
+              color: '#92989A',
+              fontWeight: 400,
+              fontSize: '14px',
+              mt: '2px',
+            }}
+          >
+            可以是學習領域、興趣等等的標籤，例如：音樂創作、程式語言、電繪、社會議題。
+          </Typography>
+          <ErrorMessage errText={errors.tagList} />
+        </StyledGroup>
+
+        <StyledGroup>
+          <Typography sx={{ fontWeight: 500, mb: '6px' }}>
+            個人簡介 *
+          </Typography>
+          <TextareaAutosize
+            ref={(element) => setRef('selfIntroduction', element)}
+            style={{
+              width: '100%',
+              minHeight: '100px',
+              padding: '10px',
+              borderRadius: '8px ',
+              border: '1px solid #DBDBDB',
+            }}
+            placeholder="寫下關於你的資訊，讓其他島民更認識你！也可以多描述想和夥伴一起做的事喔！"
+            value={userState.selfIntroduction}
+            onChange={(event) => {
+              onChangeHandler({
+                key: 'selfIntroduction',
+                value: event.target.value,
+              });
+            }}
+          />
+          <ErrorMessage errText={errors.selfIntroduction} />
+        </StyledGroup>
+      </StyledSection>
+
+      <StyledSection sx={{ marginTop: '16px' }}>
+        <StyledToggleWrapper>
+          <StyledToggleText>公開顯示居住地</StyledToggleText>
+          <Switch
+            checked={userState.isOpenLocation}
+            onChange={(_, value) => {
+              onChangeHandler({
+                key: 'isOpenLocation',
+                value,
+              });
+            }}
+          />
+        </StyledToggleWrapper>
+        <StyledToggleWrapper sx={{ mt: '16px' }}>
+          <StyledToggleText>公開個人頁面尋找夥伴</StyledToggleText>
+          <Switch
+            checked={userState.isOpenProfile}
+            onChange={(_, value) => {
+              onChangeHandler({
+                key: 'isOpenProfile',
+                value,
+              });
+            }}
+          />
+        </StyledToggleWrapper>
+      </StyledSection>
+      <StyledButtonGroup>
+        <StyledButton
+          variant="contained"
+          onClick={onNextStep}
+        >
+          下一步
+        </StyledButton>
+      </StyledButtonGroup>
+    </>
+  );
+}

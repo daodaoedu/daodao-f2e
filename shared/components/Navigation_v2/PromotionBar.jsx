@@ -1,17 +1,40 @@
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
+import Link from 'next/link';
+
+const TextContainer = styled.div`
+  .fade-text {
+    opacity: 0;
+    animation: fade-in-out 5s linear infinite;
+  }
+
+  @keyframes fade-in-out {
+    0% {
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+`;
 
 const PromotionBarWrapper = styled.div`
   width: 100%;
-  position: fixed;
   top: 0;
-  padding-bottom: 20px;
-  background-color: #f37b5f;
+  background-color: #FE9D35;
   color: #fff;
-  padding: 7px;
-  text-align: center;
+  padding: 10px 12% 10px 5%;
+  display : flex;
+  justify-content: center;
+  align-items: center;
   font-size: 16px;
-
+  min-height: 64px;
   a:hover {
     text-decoration: underline;
     text-underline-offset: 3px;
@@ -20,13 +43,13 @@ const PromotionBarWrapper = styled.div`
 
 const CloseButton = styled.span`
   position: absolute;
-  top: 9px;
-  right: 7px;
+  top: calc(50% - 49.88px);
+  right: 5%;
   width: 20px;
   height: 20px;
-  opacity: 0.3;
+  opacity: 1;
   cursor: pointer;
-
+  transform: translateY(50%);
   &:hover {
     opacity: 1;
   }
@@ -38,7 +61,7 @@ const CloseButton = styled.span`
     content: ' ';
     height: 20px;
     width: 2px;
-    background-color: #333;
+    background-color: #fff;
   }
 
   &:before {
@@ -55,9 +78,13 @@ const PromotionBar = ({ isShow, link, text, toggleAction }) => {
     <>
       {isShow && (
         <PromotionBarWrapper>
-          <a href={link} target="_blank" rel="noreferrer">
-            {text}
-          </a>
+          <Link href="/learning-marathon">
+            <TextContainer>
+              <span className="fade-text">
+                {text}
+              </span>
+            </TextContainer>
+          </Link>
           <CloseButton onClick={() => toggleAction(false)} />
         </PromotionBarWrapper>
       )}

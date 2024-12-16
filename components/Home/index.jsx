@@ -1,7 +1,8 @@
-import React, { useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import React, { useRef } from 'react';
 import styled from '@emotion/styled';
-import { Divider } from '@mui/material';
-import Banner from './Banner';
+import { Button, Divider } from '@mui/material';
+import Banner from '../Banner';
 import Guide from './Guide';
 import About from './About';
 import Group from './Group';
@@ -11,13 +12,55 @@ import WishResource from './WishResource';
 import APPBanner from './APPBanner';
 import JoinCooperate from './JoinCooperate';
 
-const HomeWrapper = styled.div``;
+const StyledBannerButton = styled(Button)`
+  &.MuiButton-root {
+    position: absolute;
+    top: calc(100vw / 3.6);
+    left: 50%;
+    transform: translate(-50%);
+    border-radius: 40px;
+    background: #FFA10B;
+    display: flex;
+    width: 250px;
+    height: 50px;
+    padding: 5px 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    color: #FFF;
+  }
+    &.MuiButton-text {
+      color: #FFF;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 140%;
+    }
+
+  @media (hover: hover) {
+    &.MuiButton-root:hover {
+      box-shadow: 0px 4px 10px 0px rgba(255, 161, 11, 0.50);
+    }
+  }
+
+  @media (max-width: 767px) {
+    &.MuiButton-root {
+      top: calc(100vw / 1.434);
+    }
+  }
+`;
 
 function Home() {
   const guideRef = useRef(null);
+  const router = useRouter();
   return (
-    <HomeWrapper>
-      <Banner guideRef={guideRef} />
+    <div>
+      <Banner>
+        <StyledBannerButton onClick={() => { router.push('/learning-marathon#marathon-intro'); }}>
+          不要錯過！點我了解
+        </StyledBannerButton>
+      </Banner>
       <About />
       <Divider sx={{ margin: '10px 0' }} />
       <APPBanner />
@@ -34,7 +77,7 @@ function Home() {
       <Guide />
       <Divider sx={{ margin: '10px 0' }} />
       <Edm />
-    </HomeWrapper>
+    </div>
   );
 }
 

@@ -8,8 +8,16 @@ export const startLoginListener = (callback) => {
     if (e.origin !== window.location.origin) return;
     if (e.data.type === "login") {
       const { token, id } = e.data.payload;
+      const redirectionStorage = getRedirectionStorage();
+      const redirectUrl = redirectionStorage.get();
+
       if (typeof callback === "function") {
         callback(id, token);
+      }
+
+      if (redirectUrl) {
+        redirectionStorage.remove();
+        window.location.replace(redirectUrl);
       }
     }
   };
@@ -39,10 +47,7 @@ export const sendLoginConfirmation = (id, token, redirectUrl) => {
 };
 
 /**
- * 開啟登入視窗
- * @param {string} redirection 登入後重定向的地址
- * @param {string} target 目標地址，可以替換成 /?id=...&token=... 自動登入
- * @returns {Promise} 視窗關閉後 resolve
+ * @deprecated 即將棄用，請使用 useAuthDispatch 的 openLoginModal
  */
 export default function openLoginWindow(
   redirection = "",

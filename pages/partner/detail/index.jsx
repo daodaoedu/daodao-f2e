@@ -10,6 +10,7 @@ import {
   clearPartnerState,
   fetchPartnerById,
 } from '@/redux/actions/partners';
+import { useAuth } from '@/contexts/Auth';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -26,7 +27,7 @@ const PartnerDetailPage = () => {
   const { partner } = useSelector((state) => state?.partners);
 
   // fetch login user info
-  const { email } = useSelector((state) => state?.user);
+  const { user } = useAuth();
 
   const fetchUser = async () => {
     dispatch(fetchPartnerById({ id: partnerId }));
@@ -45,7 +46,7 @@ const PartnerDetailPage = () => {
     <Profile
       {...partner}
       isLoading={!partner}
-      isMe={partner?.email === email}
+      isMe={partner?.email === user?.email}
     />
   );
 };

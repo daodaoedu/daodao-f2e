@@ -14,7 +14,6 @@ const MainFooterWrapper = styled.div`
   align-items: flex-start;
   font-size: 16px;
   letter-spacing: 0.08em;
-
   @media (max-width: 767px) {
     display: flex;
     flex-direction: column;
@@ -81,7 +80,7 @@ const SubFooter = () => {
       <BlockWrapper>
         {/* //img */}
         <LogoWrapper>
-          <img src="/logo.png" alt="daodao" width="106" height="50" />
+          <img src="/new-logo-vertical.png" alt="daodao" width="120" height="123" />
         </LogoWrapper>
       </BlockWrapper>
       <BlockWrapper>

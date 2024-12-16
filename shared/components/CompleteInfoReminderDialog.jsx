@@ -88,7 +88,7 @@ export default function CompleteInfoReminderDialog({ isOpen, onClose }) {
           size="large"
           variant="contained"
           fullWidth
-          href="/profile?id=person-setting&check=1"
+          href="/profile?id=person-setting"
           onClick={onClose}
         >
           去填寫資料

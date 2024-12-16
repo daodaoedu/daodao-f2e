@@ -1,16 +1,17 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import { ProtectedComponent, useAuth } from '@/contexts/Auth';
 import Edit from '@/components/Profile/Edit';
 import Footer from '@/shared/components/Footer_v2';
 import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import MyGroup from '@/components/Profile/MyGroup';
+import MyMarathon from '@/components/Profile/MyMarathon';
 import AccountSetting from '@/components/Profile/Accountsetting';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -62,7 +63,7 @@ function a11yProps(index) {
 const ProfilePage = () => {
   const router = useRouter();
   const mobileScreen = useMediaQuery('(max-width: 767px)');
-  const me = useSelector((state) => state.user);
+  const { user } = useAuth();
   const tabs = [
     {
       id: 'person-setting',
@@ -72,13 +73,18 @@ const ProfilePage = () => {
     {
       id: 'my-group',
       tabLabel: '我的揪團',
-      view: <MyGroup title="我的揪團" userId={me?._id} />,
+      view: <MyGroup title="我的揪團" userId={user?._id} />,
     },
     {
       id: 'account-setting',
       tabLabel: '帳號設定',
       view: <AccountSetting />,
     },
+    {
+      id: 'my-marathon',
+      tabLabel: '學習馬拉松',
+      view: <MyMarathon title="我的學習馬拉松" userId={user?._id} />
+    }
   ];
 
   const [value, setValue] = useState(() => {
@@ -107,7 +113,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <>
+    <ProtectedComponent>
       <SEOConfig data={SEOData} />
       <Box
         sx={{
@@ -157,7 +163,7 @@ const ProfilePage = () => {
             ))}
           </Tabs>
         </Box>
-        <Box sx={{ flex: 1, maxWidth: '720px' }}>
+        <Box sx={{ flex: 1, maxWidth: '720px', minHeight: '50vh' }}>
           {tabs.map((tab, index) => (
             <TabPanel key={tab.id} value={value} index={index}>
               {tab.view}
@@ -165,7 +171,7 @@ const ProfilePage = () => {
           ))}
         </Box>
       </Box>
-    </>
+    </ProtectedComponent>
   );
 };
 

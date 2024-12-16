@@ -1,8 +1,7 @@
 import dayjs from 'dayjs';
 import { useReducer, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { updateUser } from '@/redux/actions/user';
 import { z } from 'zod';
+import { useAuthDispatch } from '@/contexts/Auth';
 
 const initialState = {
   name: '',
@@ -110,7 +109,7 @@ const userReducer = (state, payload) => {
 };
 
 const useEditProfile = () => {
-  const reduxDispatch = useDispatch();
+  const authDispatch = useAuthDispatch();
   const [userState, stateDispatch] = useReducer(userReducer, initialState);
   const [errors, setErrors] = useState({});
   const refs = useRef({});
@@ -221,8 +220,12 @@ const useEditProfile = () => {
       isOpenProfile,
     };
 
-    reduxDispatch(updateUser(payload));
-    return true;
+    try {
+      await authDispatch.updateUser(payload);
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   const checkBeforeSubmit = async ({ id, email }) => {
@@ -240,6 +243,7 @@ const useEditProfile = () => {
   return {
     userState,
     onChangeHandler,
+    validate,
     onSubmit: checkBeforeSubmit,
     setRef,
     errors,
