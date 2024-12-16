@@ -94,12 +94,12 @@ export default function MilestonePanel({
   milestone,
   onChange = null,
   isDisabled = false,
+  startDate = '',
+  endDate = '',
+  weekNumber = '',
 }) {
   const {
     name,
-    weekNumber,
-    startDate,
-    endDate,
     subMilestones
   } = milestone;
   const [onEdit, setOnEdit] = useState(false);
@@ -152,11 +152,11 @@ export default function MilestonePanel({
         <StyledWeek variant="h6">{weekNumber}</StyledWeek>
         <StyledWeekRange>
           <Typography variant="body1">
-            {dayjs(startDate).format('YYYY/MM/DD')}
+            {startDate}
           </Typography>
           <ArrowForwardIcon />
           <Typography variant="body1">
-            {dayjs(endDate).format('YYYY/MM/DD')}
+            {endDate}
           </Typography>
         </StyledWeekRange>
       </Grid>
