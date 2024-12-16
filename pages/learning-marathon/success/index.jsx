@@ -74,7 +74,7 @@ const LearningMarathonSignUp = () => {
   const router = useRouter();
   const SEOData = useMemo(
     () => ({
-      title: '報名島島盃 - 2025 春季學習馬拉松｜多元學習資源平台｜島島阿學',
+      title: '申請島島盃 - 2025 春季學習馬拉松｜多元學習資源平台｜島島阿學',
       description:
         '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
       keywords: '島島阿學',
@@ -108,7 +108,7 @@ const LearningMarathonSignUp = () => {
     <>
       <SEOConfig data={SEOData} />
       <StyledBar>
-        <h2>報名參加學習徵件計畫</h2>
+        <h2>申請參加島島盃學習馬拉松</h2>
       </StyledBar>
       <StyledSection>
         <Typography
@@ -122,7 +122,7 @@ const LearningMarathonSignUp = () => {
             marginBottom: '20px'
           }}
         >
-          報名成功
+          申請成功
         </Typography>
         <Typography
           component="p"
@@ -135,7 +135,7 @@ const LearningMarathonSignUp = () => {
             marginBottom: '20px'
           }}
         >
-          記得到信箱確認收到報名成功信，並確認信件沒有跑進垃圾桶。
+          記得到信箱確認收到申請成功信，並確認信件沒有跑進垃圾桶。
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
           <img src={emailImg.src} alt="signup success" height="224px" />

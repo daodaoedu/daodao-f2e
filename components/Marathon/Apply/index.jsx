@@ -156,8 +156,8 @@ export default function Apply() {
         <StyledTimelineGroup sx={{ marginBottom: '8px' }}>
           <StyledDateCard>
             <StyledDateGroup>
-              <div className="date">12/15</div>
-              <div className="weekday"><span>日</span></div>
+              <div className="date">12/16</div>
+              <div className="weekday"><span>一</span></div>
             </StyledDateGroup>
           </StyledDateCard>
           <StyledContent>
@@ -193,8 +193,8 @@ export default function Apply() {
         <StyledTimelineGroup sx={{ marginBottom: '8px' }}>
           <StyledDateCard className="time">
             <StyledDateGroup>
-              <div className="date">02/03</div>
-              <div className="weekday"><span>日</span></div>
+              <div className="date">01/27</div>
+              <div className="weekday"><span>一</span></div>
             </StyledDateGroup>
           </StyledDateCard>
           <StyledContent>
@@ -253,7 +253,7 @@ export default function Apply() {
             <StyledTime component="p" sx={{ lineBreak: 'none' }}>14:00-15:00</StyledTime>
           </StyledDateCard>
           <StyledContent>
-            線上暖身活動
+            暖身活動（線上）
           </StyledContent>
         </StyledTimelineGroup>
 

@@ -44,17 +44,19 @@ const MarathonList = ({ onCloseMenu = () => {} }) => {
       path: '/learning-marathon#marathon-intro'
     },
     {
-      name: '學習計畫分享區',
-      id: 'marathon-sharing',
-      path: '/marathon-sharing'
-    },
-    {
-      name: '活動公告',
+      name: '活動公告（未公開）',
       id: 'marathon-announcement',
-      path: '/marathon-announcement'
+      path: '/marathon-announcement',
+      disabled: true
     },
     {
-      name: '成果分享（暫不公開）',
+      name: '學習計畫分享區（未公開）',
+      id: 'marathon-sharing',
+      path: '/marathon-sharing',
+      disabled: true
+    },
+    {
+      name: '成果分享（未公開）',
       id: 'project-sharing',
       path: '/project-sharing',
       disabled: true
@@ -100,7 +102,7 @@ const MarathonList = ({ onCloseMenu = () => {} }) => {
               as="div"
               key={section.id}
               delay={`${i * 0.1}s`}
-              isDisabled={section.id === 'project-sharing'}
+              isDisabled={section.disabled === true}
               onClick={() => handleNavigation(section)}
             >
               {section.name}

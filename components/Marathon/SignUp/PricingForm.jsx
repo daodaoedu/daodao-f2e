@@ -97,7 +97,7 @@ export default function PricingForm({
   return (
     <>
       <Typography sx={{ fontWeight: 500, mb: '8px' }}>
-        請選擇你報名的資格
+        請選擇你申請的資格
       </Typography>
       <StyledRadioGroup>
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -299,7 +299,7 @@ export default function PricingForm({
       <StyledNote
         component="p"
       >
-        主辦單位將於報名成功後，確認並通知各報名者須繳交之費用
+        主辦單位將於申請成功後，確認並通知各申請者須繳交之費用
       </StyledNote>
     </>
   );

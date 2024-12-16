@@ -129,8 +129,8 @@ export default function MarathonForm({
             marginBottom: '20px',
           }}
         >
-          計劃內容在報名截止日前皆可修改。<br />
-          入選公告後，所有入選者及報名者亦可持續修改學習計劃
+          計劃內容在申請截止日前皆可修改。<br />
+          入選公告後，所有入選者及申請者亦可持續修改學習計劃
         </Typography>
 
         <Box sx={{ marginTop: '24px', width: '100%' }}>

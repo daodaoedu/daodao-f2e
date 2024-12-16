@@ -57,7 +57,7 @@ export default function Equip() {
           <ul>
             <li>3 次 1 小時一對一諮詢</li>
             <li>2 次 1 小時團體諮詢</li>
-            <li>Mentor 每兩週對學員的學習進度給予回饋</li>
+            <li>引導師每兩週對學員的學習進度給予回饋</li>
           </ul>
         </StyledList>
       </StyledCard>
@@ -84,7 +84,7 @@ export default function Equip() {
           <ul>
             <li>5 次 1 小時全員每月聚會</li>
             <li>專屬學習小組，5 次 1 小時學習小組每月聚會</li>
-            <li>島島阿學 Discord 社群即時交流</li>
+            <li>島島阿學Discord社群即時交流</li>
             <li>島島阿學網站找夥伴找揪團功能</li>
           </ul>
         </StyledList>
@@ -93,7 +93,7 @@ export default function Equip() {
         backgroundColor: '#DEF5F5'
       }}
       >
-        <StyledTitle component="h4">「AI 個人化學習工具」<br />引導你學習方向及自律學習</StyledTitle>
+        <StyledTitle component="h4">「AI個人化學習工具」<br />引導你學習方向及自律學習</StyledTitle>
         <StyledList>
           <ul>
             <li>具引導性的自主學習模板</li>
@@ -102,7 +102,7 @@ export default function Equip() {
             <li>進度安排與檢核表</li>
             <li>自我檢核表</li>
             <li>學習成果分享專區</li>
-            <li>AI智慧推薦與引導</li>
+            <li>AI推薦與引導</li>
           </ul>
         </StyledList>
       </StyledCard>

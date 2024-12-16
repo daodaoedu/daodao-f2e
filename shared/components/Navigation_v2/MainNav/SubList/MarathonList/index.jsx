@@ -24,8 +24,7 @@ const StyledMenuItem = styled(MenuItem)`
     color: ${props.isDisabled ? 'rgba(83, 97, 102, 0.5)' : '#536166'};
     cursor: ${props.isDisabled ? 'not-allowed' : 'pointer'};
     animation-delay: ${props.delay};
-    min-width: 126px;
-    padding: ${props.isPadScreen ? '12px 52px' : '12px'};
+    padding: 8px;
     font-size: ${props.isPadScreen ? '18px' : '16px'};
     margin-top: ${props.isPadScreen ? '18px' : '0'};
     &:hover {
@@ -63,17 +62,19 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
       path: '/learning-marathon#marathon-intro'
     },
     {
-      name: '學習計畫分享區',
-      id: 'marathon-sharing',
-      path: '/marathon-sharing'
-    },
-    {
-      name: '活動公告',
+      name: '活動公告（未公開）',
       id: 'marathon-announcement',
-      path: '/marathon-announcement'
+      path: '/marathon-announcement',
+      disabled: true
     },
     {
-      name: '成果分享（暫不公開）',
+      name: '學習計畫分享區（未公開）',
+      id: 'marathon-sharing',
+      path: '/marathon-sharing',
+      disabled: true
+    },
+    {
+      name: '成果分享（未公開）',
       id: 'project-sharing',
       path: '/project-sharing',
       disabled: true
@@ -97,11 +98,13 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
         sx={{
           fontWeight: '500',
           display: 'flex',
+          justifyContent: 'center',
           alignItems: 'center',
           backgroundColor: isOpenMenu ? '#def5f5' : '#16b9b3',
           color: isOpenMenu ? '#16b9b3' : '#fff',
+          width: '230px',
           padding: '8px',
-          borderRadius: '8px',
+          borderRadius: '4px',
           transition: 'background-color 0.3s ease, padding 0.3s ease',
         }}
         onClick={() => setIsOpenMenu(!isOpenMenu)}
@@ -120,13 +123,13 @@ const MarathonList = ({ onCloseMenu = () => {}, user }) => {
           zIndex: 1,
         }}
       >
-        <Box sx={{ padding: !isPadScreen && '12px' }}>
+        <Box sx={{ padding: '12px' }}>
           {sections.map((section, i) => (
             <StyledMenuItem
               as="div"
               key={section.id}
               delay={`${i * 0.1}s`}
-              isDisabled={section.id === 'project-sharing'}
+              isDisabled={section.disabled === true}
               onClick={() => handleNavigation(section)}
             >
               {section.name}

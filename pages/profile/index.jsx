@@ -82,8 +82,8 @@ const ProfilePage = () => {
     },
     {
       id: 'my-marathon',
-      tabLabel: '學習計畫',
-      view: <MyMarathon title="我的學習計畫" userId={user?._id} />
+      tabLabel: '學習馬拉松',
+      view: <MyMarathon title="我的學習馬拉松" userId={user?._id} />
     }
   ];
 

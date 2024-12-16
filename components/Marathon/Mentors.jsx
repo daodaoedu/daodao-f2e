@@ -288,7 +288,6 @@ const Mentors = () => {
           </IconButton>
         </div>
       </div>
-
       <div
         className="mt-9 overflow-x-hidden select-none"
         onTouchStart={handleTouchStart}

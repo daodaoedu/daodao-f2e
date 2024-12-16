@@ -287,32 +287,34 @@ export default function ConfirmForm({
   };
 
   useEffect(() => {
-      switch (marathonState.apiState) {
-        case 'success': {
-          toast.success('更新成功');
-          break;
-        }
-        case 'Reject': {
-          toast.error('更新失敗');
-          break;
-        }
-        default:
+    switch (marathonState.apiStateWithType) {
+      case 'updateMarathonProfileSuccess': {
+        toast.success('更新成功');
+        router.push('/learning-marathon/success');
+        break;
       }
-  }, [user.apiState]);
-
-  useEffect(() => {
-    if (
-      marathonState._id &&
-      hasClickSubmitButton &&
-      (marathonState.apiState === 'success')) {
-      router.push('/learning-marathon/success');
+      case 'createMarathonProfileByTokenSuccess': {
+        toast.success('申請成功');
+        router.push('/learning-marathon/success');
+        break;
+      }
+      case 'updateMarathonProfileFailure': {
+        toast.error('更新失敗');
+        break;
+      }
+      case 'createMarathonProfileByTokenFailure': {
+        toast.error('申請失敗');
+        break;
+      }
+      default:
     }
-  }, [hasClickSubmitButton, user.apiState, marathonState.apiState]);
+  }, [marathonState.apiStateWithType]);
+
   return (
     <>
       <StyledMarathonTitleSection>
         <div className="tag">
-          <span>徵件計畫</span>
+          <span>學習計畫</span>
         </div>
         <h2>學習主題名稱：{marathonState?.title}</h2>
       </StyledMarathonTitleSection>
@@ -374,7 +376,7 @@ export default function ConfirmForm({
           }}
         >
           <Typography component="p">
-            {newMarathon?.resources}
+            {marathonState?.resources}
           </Typography>
         </Box>
       </StyledSection>
@@ -412,7 +414,7 @@ export default function ConfirmForm({
         />
       </StyledSection>
       <StyledSection sx={{ mt: '16px' }}>
-        <StyledSectionTitle component="h3">報名的資格</StyledSectionTitle>
+        <StyledSectionTitle component="h3">申請資格</StyledSectionTitle>
         <StyledFormControlLabel
           sx={{ marginBottom: '8px' }}
           value=""
@@ -495,7 +497,7 @@ export default function ConfirmForm({
         <StyledNote
           component="p"
         >
-          主辦單位將於報名成功後，確認並通知各報名者須繳交之費用
+          主辦單位將於申請成功後，確認並通知各申請者須繳交之費用
         </StyledNote>
       </StyledSection>
       <StyledButtonGroup>
@@ -509,7 +511,7 @@ export default function ConfirmForm({
           variant="contained"
           onClick={onSubmit}
         >
-          提交報名
+          提交申請
         </StyledButton>
       </StyledButtonGroup>
     </>
