@@ -205,9 +205,12 @@ const Mentors = () => {
   const [touchStartX, setTouchStartX] = useState(null);
   const timer = useRef(null);
   const { translateX, isEnd } = useMemo(() => {
+    // 因為 Safari 使用父層的 scrollWidth 再搭配 transform 時，scrollWidth 會越變越小，所以改用計算寬度
+    // 計算 mentors 的寬度，包含了 gap 和 padding
+    const mentorsWidth = mentorsRef.current?.children?.[0]?.clientWidth * mentors.length + 16 * (mentors.length - 1) + 48;
     const currentTranslateX = currentMentor * 301;
-    if (window.innerWidth + currentTranslateX > mentorsRef.current?.scrollWidth) {
-      return { translateX: mentorsRef.current?.scrollWidth - window.innerWidth, isEnd: true };
+    if (window.innerWidth + currentTranslateX > mentorsWidth) {
+      return { translateX: mentorsWidth - window.innerWidth, isEnd: true };
     }
     return { translateX: currentTranslateX, isEnd: false };
   }, [currentMentor]);
