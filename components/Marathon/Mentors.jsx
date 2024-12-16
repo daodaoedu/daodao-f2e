@@ -205,12 +205,10 @@ const Mentors = () => {
   const [touchStartX, setTouchStartX] = useState(null);
   const timer = useRef(null);
   const { translateX, isEnd } = useMemo(() => {
-    // 因為 Safari 使用父層的 scrollWidth 再搭配 transform 時，scrollWidth 會越變越小，所以改用計算寬度
-    // 計算 mentors 的寬度，包含了 gap 和 padding
-    const mentorsWidth = mentorsRef.current?.children?.[0]?.clientWidth * mentors.length + 16 * (mentors.length - 1) + 48;
+    const mentorsWidth = mentorsRef.current?.scrollWidth;
     const currentTranslateX = currentMentor * 301;
     if (window.innerWidth + currentTranslateX > mentorsWidth) {
-      return { translateX: mentorsWidth - window.innerWidth, isEnd: true };
+      return { translateX: mentorsWidth - window.innerWidth + 16, isEnd: true };
     }
     return { translateX: currentTranslateX, isEnd: false };
   }, [currentMentor]);
@@ -290,41 +288,39 @@ const Mentors = () => {
           </IconButton>
         </div>
       </div>
-      <div className="px-6 lg:px-60 mt-4 text-basic-500">
-        <p>
-          本次引導師皆有豐富的自主學習實踐與陪伴引導經驗，共六位：林怡廷（島島阿學發起人）、許明宏（島島阿學發起人）、謝佩君（Talent Lab-Learning Facilitator）、沈潔伃（魚水教育催化劑創辦人）、閉恩濡（實驗教育工作者）、楊逸帆（《學習的理由》紀錄片導演）。
-        </p>
-      </div>
-
       <div
-        ref={mentorsRef}
-        className="flex gap-4 mt-9 px-6 lg:pl-60 overflow-x-auto select-none"
+        className="mt-9 overflow-x-hidden select-none"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {mentors.map((mentor) => (
-          <MentorCard
-            key={mentor.name}
-            mentor={mentor}
-            className="transition-transform duration-300 cursor-pointer"
-            style={{ transform: `translateX(-${translateX}px)` }}
-            onClick={() => handleOpenModal(mentor.name)}
-          >
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <div className="flex gap-2">
-                {mentor.tags.slice(0, 1).map((tag, index) => (
-                  <Tag
-                    key={tag}
-                    text={tag}
-                    className={index === 0 && "shrink-0"}
-                  />
-                ))}
+        <div
+          ref={mentorsRef}
+          className="flex gap-4 px-6 lg:pl-60 transition-transform duration-300"
+          style={{ transform: `translateX(-${translateX}px)` }}
+        >
+          {mentors.map((mentor) => (
+            <MentorCard
+              key={mentor.name}
+              mentor={mentor}
+              className="cursor-pointer"
+              onClick={() => handleOpenModal(mentor.name)}
+            >
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <div className="flex gap-2">
+                  {mentor.tags.slice(0, 1).map((tag, index) => (
+                    <Tag
+                      key={tag}
+                      text={tag}
+                      className={index === 0 && "shrink-0"}
+                    />
+                  ))}
+                </div>
+                <div className="heading-md text-white text-start mt-2">{mentor.title} | {mentor.name}</div>
               </div>
-              <div className="heading-md text-white text-start mt-2">{mentor.title} | {mentor.name}</div>
-            </div>
-          </MentorCard>
-        ))}
+            </MentorCard>
+          ))}
+        </div>
       </div>
 
       <Modal
