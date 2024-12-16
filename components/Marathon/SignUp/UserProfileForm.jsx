@@ -66,6 +66,7 @@ export default function UserProfileForm({
   const check = searchParams.get('check');
   const [hasClickNextStep, setHasClickNextStep] = useState(false);
   const [hasGetLatestMarathon, setHasGetLatestMarathon] = useState(false);
+  const [hasUpdateAuthContext, setHasUpdateAuthContext] = useState(false);
   const {
     userState,
     errors,
@@ -144,7 +145,10 @@ export default function UserProfileForm({
         reduxDispatch(fetchMarathonProfileByUserEvent(user._id, "2025S1"));
         setHasGetLatestMarathon(true);
       }
-      authDispatch.updateUser(user);
+      if (!hasUpdateAuthContext) {
+        authDispatch.updateUser(user);
+        setHasUpdateAuthContext(true);
+      }
     }
   }, [user]);
 
