@@ -18,6 +18,7 @@ import Faq from '@/components/Marathon/Faq';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import Banner from '@/components/Banner';
+import { logEvent } from '@/utils/analytics';
 
 const StyledBannerButton = styled(Button)`
   &.MuiButton-root {
@@ -299,6 +300,10 @@ const LearningMarathon = () => {
   );
 
   const handleClickSignupButton = () => {
+    logEvent('Learning Marathon', 'Signup Button Clicked', {
+      user_logged_in: isLoggedIn,
+      user_temporary: isTemporary
+    });
     if (isLoggedIn || isTemporary) {
       router.push('/learning-marathon/signup');
     } else {
