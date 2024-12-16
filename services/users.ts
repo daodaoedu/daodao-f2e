@@ -79,6 +79,6 @@ export const updateUserProfileSchema = z.object({
 export type UpdateUserProfile = z.infer<typeof updateUserProfileSchema>;
 
 export const updateUserProfile = async (user: UpdateUserProfile) => {
-  const response = await http.delete<{ data: IUser }>(`/user/${user.id}`, user);
+  const response = await http.put<{ data: IUser }>(`/user/${user.id}`, user);
   return response.data;
 };
