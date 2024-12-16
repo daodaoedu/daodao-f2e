@@ -287,27 +287,29 @@ export default function ConfirmForm({
   };
 
   useEffect(() => {
-    switch (marathonState.apiState) {
-      case 'success': {
+    switch (marathonState.apiStateWithType) {
+      case 'updateMarathonProfileSuccess': {
         toast.success('更新成功');
+        router.push('/learning-marathon/success');
         break;
       }
-      case 'Reject': {
+      case 'createMarathonProfileByTokenSuccess': {
+        toast.success('申請成功');
+        router.push('/learning-marathon/success');
+        break;
+      }
+      case 'updateMarathonProfileFailure': {
         toast.error('更新失敗');
+        break;
+      }
+      case 'createMarathonProfileByTokenFailure': {
+        toast.error('申請失敗');
         break;
       }
       default:
     }
-  }, [user.apiState]);
+  }, [marathonState.apiStateWithType]);
 
-  useEffect(() => {
-    if (
-      marathonState._id &&
-      hasClickSubmitButton &&
-      (marathonState.apiState === 'success')) {
-      router.push('/learning-marathon/success');
-    }
-  }, [hasClickSubmitButton, user.apiState, marathonState.apiState]);
   return (
     <>
       <StyledMarathonTitleSection>
