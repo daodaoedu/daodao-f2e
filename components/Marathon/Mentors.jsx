@@ -290,12 +290,6 @@ const Mentors = () => {
           </IconButton>
         </div>
       </div>
-      <div className="px-6 lg:px-60 mt-4 text-basic-500">
-        <p>
-          本次引導師皆有豐富的自主學習實踐與陪伴引導經驗，共六位：林怡廷（島島阿學發起人）、許明宏（島島阿學發起人）、謝佩君（Talent Lab-Learning Facilitator）、沈潔伃（魚水教育催化劑創辦人）、閉恩濡（實驗教育工作者）、楊逸帆（《學習的理由》紀錄片導演）。
-        </p>
-      </div>
-
       <div
         ref={mentorsRef}
         className="flex gap-4 mt-9 px-6 lg:pl-60 overflow-x-auto select-none"
