@@ -13,11 +13,14 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { StyledGroup } from "./Edit.styled";
 import MilestonePanel from "./MilestonePanel";
+import ErrorMessage from './ErrorMessage';
 
 export default function MilestoneGroup({
   milestones = [],
   onChange = null,
-  isDisabled = false
+  isDisabled = false,
+  onValidate = null,
+  errorMessage = null
 }) {
   const eventWeekRange = 22;
   const [startDate, setStartDate] = useState('2025-02-09');
@@ -103,11 +106,13 @@ export default function MilestoneGroup({
     const eventEndDate = dayjs(startDate).add(eventWeekRange, 'week');
     setEndDate(eventEndDate);
   };
+
   const updateMilestone = (newMilestone) => {
     const changedMilestones = milestones.map((item, _i) => {
       return (item._tempId === newMilestone._tempId ? newMilestone : item);
     });
-
+    // check if milestone name exist
+    onValidate('milestonesName', changedMilestones, '請填寫每週 / 隔週里程碑目標');
     onChange({
       type: 'UPDATE_FIELD',
       payload: {
@@ -246,6 +251,9 @@ export default function MilestoneGroup({
             })}
           </StyledGroup>
         </LocalizationProvider>
+        <ErrorMessage
+          errText={errorMessage || null}
+        />
       </Box>
     </>
   );
