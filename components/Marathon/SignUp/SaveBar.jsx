@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import Stepper from '@mui/material/Stepper';
@@ -43,14 +42,13 @@ export const StyledSaveBar = styled(Box)`
   }
 
   .MuiStepLabel-iconContainer {
-    
-    
     .MuiStepIcon-text {
       fill: #FFF;
     }
   }
 
   @media (max-width: 767px) {
+    padding: 8px 6.9vw;
     .top h2 {
       font-size: 18px;
     }
