@@ -3,7 +3,7 @@ import { CiCircleChevRight, CiCircleChevLeft } from "react-icons/ci";
 import { IoClose } from "react-icons/io5";
 import { FaLinkedin, FaMedium, FaResearchgate, FaSquareFacebook, FaSquareThreads } from "react-icons/fa6";
 import { IconButton } from '@mui/material';
-
+import EastIcon from '@mui/icons-material/East';
 import Image from '@/shared/components/Image';
 import Modal from '@/shared/components/Modal';
 import { cn } from '@/utils/cn';
@@ -303,11 +303,11 @@ const Mentors = () => {
             <MentorCard
               key={mentor.name}
               mentor={mentor}
-              className="cursor-pointer"
+              className="cursor-pointer group"
               onClick={() => handleOpenModal(mentor.name)}
             >
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="flex gap-2">
+              <div className="absolute bottom-0 left-0 right-0 pt-4">
+                <div className="flex gap-2 px-3">
                   {mentor.tags.slice(0, 1).map((tag, index) => (
                     <Tag
                       key={tag}
@@ -316,7 +316,8 @@ const Mentors = () => {
                     />
                   ))}
                 </div>
-                <div className="heading-md text-white text-start mt-2">{mentor.title} | {mentor.name}</div>
+                <div className="heading-md text-white text-start mt-2 px-3 pb-3">{mentor.title} | {mentor.name}</div>
+                <div className="bg-white flex justify-end items-center text-gray-400 px-3 py-2 gap-1 group-hover:text-primary-base">more <EastIcon className="!text-[16px]" /></div>
               </div>
             </MentorCard>
           ))}
