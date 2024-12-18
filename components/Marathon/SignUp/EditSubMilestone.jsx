@@ -40,10 +40,10 @@ const StyledContainer = styled(Box)`
   align-items: center;
   gap: 10px;
   width: 100%;
-  backgroundColor: #FFF;
   padding: 12px 16px;
   border-radius: 8px;
   border: 1px solid #DBDBDB;
+  background-color: #FFF;
 
   @media (max-width: 767px) {
     display: grid;
