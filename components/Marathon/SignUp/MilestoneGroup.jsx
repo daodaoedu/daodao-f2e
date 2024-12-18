@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { useState, useEffect } from "react";
+import styled from '@emotion/styled';
 import {
   Box,
   Grid,
@@ -13,11 +14,37 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { StyledGroup } from "./Edit.styled";
 import MilestonePanel from "./MilestonePanel";
+import ErrorMessage from './ErrorMessage';
+
+const StyledDateSection = styled(Box)`
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  gap: 10px;
+
+  .startDate, .endDate, .frequency {
+    flex-shrink: 0;
+    width: 25%;
+  }
+
+  @media (max-width: 767px) {
+    flex-wrap: wrap;
+    .startDate, .endDate {
+      width: calc(50% - 5px);
+    }
+    .frequency {
+      width: 100%;
+    }
+  }
+`;
 
 export default function MilestoneGroup({
   milestones = [],
   onChange = null,
-  isDisabled = false
+  isDisabled = false,
+  onValidate = null,
+  errorMessage = null
 }) {
   const eventWeekRange = 22;
   const [startDate, setStartDate] = useState('2025-02-09');
@@ -103,11 +130,13 @@ export default function MilestoneGroup({
     const eventEndDate = dayjs(startDate).add(eventWeekRange, 'week');
     setEndDate(eventEndDate);
   };
+
   const updateMilestone = (newMilestone) => {
     const changedMilestones = milestones.map((item, _i) => {
       return (item._tempId === newMilestone._tempId ? newMilestone : item);
     });
-
+    // check if milestone name exist
+    onValidate('milestonesName', changedMilestones, '請填寫每週 / 隔週里程碑目標');
     onChange({
       type: 'UPDATE_FIELD',
       payload: {
@@ -154,77 +183,75 @@ export default function MilestoneGroup({
       <Box sx={{ padding: '8px 0', width: '100%' }}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <StyledGroup>
-            <Grid container alignItems="center" columnSpacing={1}>
-              <Grid item xs={4}>
-                <DatePicker
-                  label="開始日期"
-                  value="2025-02-09"
-                  inputFormat="YYYY-MM-DD"
-                  disabled
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      sx={{
-                        height: '50px',
-                        '& .MuiInputBase-root': {
-                          height: '100%',
-                        }
-                      }}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <DatePicker
-                  label="結束日期"
-                  value="2025-07-12"
-                  inputFormat="YYYY-MM-DD"
-                  disabled
-                  onChange={handleEndDate}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      sx={{
-                        height: '50px',
-                        '& .MuiInputBase-root': {
-                          height: '100%',
-                        },
-                        '& .MuiFormHelperText-root': {
-                          marginTop: '4px',
-                        },
-                      }}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={3}>
-                <TextField
-                  select
-                  label="頻率"
-                  defaultValue="weekly"
-                  value={frequency}
-                  onChange={handleFrequency}
-                  variant="outlined"
-                  fullWidth
-                  disabled={isDisabled}
-                  sx={{
-                    height: '50px',
-                    '& .MuiInputBase-root': {
-                      height: '100%',
-                    }
-                  }}
-                >
-                  <MenuItem value="weekly">每週</MenuItem>
-                  <MenuItem value="biweekly">每兩週</MenuItem>
-                </TextField>
-              </Grid>
-            </Grid>
+            <StyledDateSection>
+              <DatePicker
+                className="startDate"
+                label="開始日期"
+                value="2025-02-09"
+                inputFormat="YYYY-MM-DD"
+                disabled
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    sx={{
+                      height: '50px',
+                      '& .MuiInputBase-root': {
+                        height: '100%',
+                      }
+                    }}
+                  />
+                )}
+              />
+
+              <DatePicker
+                className="endDate"
+                label="結束日期"
+                value="2025-07-12"
+                inputFormat="YYYY-MM-DD"
+                disabled
+                onChange={handleEndDate}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    sx={{
+                      height: '50px',
+                      '& .MuiInputBase-root': {
+                        height: '100%',
+                      },
+                      '& .MuiFormHelperText-root': {
+                        marginTop: '4px',
+                      },
+                    }}
+                  />
+                )}
+              />
+              <TextField
+                className="frequency"
+                select
+                label="頻率"
+                defaultValue="weekly"
+                value={frequency}
+                onChange={handleFrequency}
+                variant="outlined"
+                fullWidth
+                disabled={isDisabled}
+                sx={{
+                  height: '50px',
+                  '& .MuiInputBase-root': {
+                    height: '100%',
+                  }
+                }}
+              >
+                <MenuItem value="weekly">每週</MenuItem>
+                <MenuItem value="biweekly">每兩週</MenuItem>
+              </TextField>
+            </StyledDateSection>
           </StyledGroup>
           <StyledGroup>
             {milestones.map((milestone, i) => {
@@ -246,6 +273,9 @@ export default function MilestoneGroup({
             })}
           </StyledGroup>
         </LocalizationProvider>
+        <ErrorMessage
+          errText={errorMessage || null}
+        />
       </Box>
     </>
   );

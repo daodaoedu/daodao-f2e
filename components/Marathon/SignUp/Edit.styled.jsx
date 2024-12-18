@@ -80,6 +80,9 @@ export const StyledSection = styled(Box)`
   border-radius: 16px;
   border: 1px solid #DBDBDB;
 
+  &.error {
+    border-color: #EF5364;
+  }
 
   @media (max-width: 767px) {
     padding: 32px 16px;
@@ -187,6 +190,12 @@ export const StyledInputBase = styled(InputBase)`
     border-width: 1px;
     padding: 12px 16px;
   }
+
+  &.error {
+    border-color: #EF5364;
+    outline-color: #EF5364;
+    position: relative;
+  }
 `;
 export const StyledTextareaAutosize = styled(TextareaAutosize)`
   width: 100%;
@@ -200,10 +209,20 @@ export const StyledTextareaAutosize = styled(TextareaAutosize)`
     border: 2px solid #16B9B3;
     padding: 11px 15px;
     outline-color: #16B9B3;
+
+    &.error {
+      border-color: #EF5364;
+      outline-color: #EF5364;
+    }
   }
   
   .MuiInputBase-input {
     padding: 0;
     line-height: 140%;
+  }
+
+  &.error {
+    border-color: #EF5364;
+    outline-color: #16B9B3;
   }
 `;

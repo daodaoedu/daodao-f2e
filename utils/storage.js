@@ -20,3 +20,4 @@ export const getTokenStorage = () => createStorage('_token');
 export const getRedirectionStorage = () => createStorage('_r');
 export const getTrustWebsitesStorage = () => createStorage('_trustWeb');
 export const getReminderStorage = () => createStorage('_reminder');
+export const getMarathonErrorsStorage = () => createStorage('_marathonFormErrors');

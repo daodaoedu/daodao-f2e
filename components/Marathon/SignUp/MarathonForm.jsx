@@ -1,9 +1,11 @@
 import { useState, useEffect, useReducer } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 import {
   updateNewMarathon
 } from '@/redux/actions/marathon';
 import { initialState as reduxInitMarathonState } from '@/redux/reducers/marathon';
+import { getMarathonErrorsStorage } from '@/utils/storage';
 
 import {
   Box,
@@ -11,6 +13,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
 
 import MilestoneGroup from './MilestoneGroup';
 import {
@@ -72,7 +75,8 @@ export default function MarathonForm({
 }) {
   const reduxDispatch = useDispatch();
   const [hasLoaded, setHasLoaded] = useState(false);
-
+  const [errors, setErrors] = useState({});
+  const [hasErrors, setHasErrors] = useState(false);
   const marathonState = useSelector((state) => { return state.marathon; });
   const localStorgeStored = window.localStorage.getItem('newMarathon');
   const editingMarathon = localStorgeStored ? JSON.parse(localStorgeStored) : null;
@@ -84,17 +88,95 @@ export default function MarathonForm({
   const [newMarathon, setNewMarathon] = useReducer(marathonFormReducer, initialState());
 
   const onNextStep = () => {
-    reduxDispatch(updateNewMarathon(newMarathon));
-    setCurrentStep(currentStep + 1);
+    if (hasErrors) {
+      toast.error('請修正錯誤');
+    } else {
+      reduxDispatch(updateNewMarathon(newMarathon));
+      setCurrentStep(currentStep + 1);
+    }
   };
 
   const onPrevStep = () => {
     reduxDispatch(updateNewMarathon(newMarathon));
     setCurrentStep(currentStep - 1);
   };
+  const handleValidate = (name, input, errorMessage) => {
+    let validate = false;
+    switch (name) {
+      case 'title':
+        validate = (value) => {
+          return (value.trim().length > 0);
+        };
+        break;
+      case 'description':
+        validate = (value) => {
+          return (value.trim().length > 0);
+        };
+        break;
+      case 'motivationDescription':
+        validate = (value) => {
+          return (value.trim().length > 0);
+        };
+        break;
+      case 'milestonesName':
+        validate = (value) => {
+          const names = value.filter((milestone, _i) => {
+            return (milestone.name.trim().length > 0);
+          });
+          return names.length === newMarathon.milestones?.length;
+        };
+        break;
+      case 'goals':
+        validate = (value) => {
+          return (value.trim().length > 0);
+        };
+        break;
+      case 'content':
+        validate = (value) => {
+          return (value.trim().length > 0);
+        };
+        break;
+      case 'strategiesDescription':
+        validate = (value) => {
+          return (value.trim().length > 0);
+        };
+        break;
+      case 'outcomesDescription':
+        validate = (value) => {
+          return (value.trim().length > 0);
+        };
+        break;
+      case 'resources':
+        validate = (value) => {
+          return (value.trim().length > 0);
+        };
+        break;
+      default:
+        break;
+    }
+
+    if (validate(input)) {
+      setErrors((prevErrors) => {
+        const { [name]: _, ...remainingErrors } = prevErrors;
+        return remainingErrors;
+      });
+    } else {
+      setErrors({
+        ...errors,
+        [name]: {
+          message: errorMessage || null
+        }
+      });
+    }
+    return validate(input);
+  };
 
   useEffect(() => {
     setHasLoaded(true);
+    const storagedErrors = getMarathonErrorsStorage().get();
+    if (storagedErrors) {
+      setErrors(storagedErrors);
+    }
   }, []);
 
   useEffect(() => {
@@ -103,9 +185,21 @@ export default function MarathonForm({
     }
   }, [newMarathon]);
 
+  useEffect(() => {
+    getMarathonErrorsStorage().set(errors);
+    if (Object.keys(errors).length) {
+      setHasErrors(true);
+    } else {
+      setHasErrors(false);
+    }
+  }, [errors]);
+
   return (
     <>
-      <StyledSection>
+      <StyledSection className={
+        (errors.title || errors.description || errors.motivationDescription || errors.goals || errors.strategiesDescription || errors.resources) ? 'error' : ''
+      }
+      >
         <Typography
           component="h2"
           sx={{
@@ -142,13 +236,27 @@ export default function MarathonForm({
                 type: 'UPDATE_FIELD',
                 payload: { key: 'title', value: e.target.value }
               });
+              handleValidate('title', e.target.value, '請填寫表格');
             }}
             sx={{
               mb: '8px',
               padding: '17px 16px 12px'
             }}
+            className={errors.title ? 'error' : ''}
+            endAdornment={errors.title ? <ClearIcon sx={{ color: '#EF5364' }} /> : null}
             placeholder="範例：成為一位Youtuber、半世紀以來的氣候變遷紀錄研究、開一間線上甜點店"
           />
+          {errors.title && (
+            <Typography sx={{
+              color: '#EF5364',
+              marginTop: '8px',
+              fontSize: '14px',
+              fontWeight: 400
+            }}
+            >
+              {errors.title?.message}
+            </Typography>
+          )}
           <StyledGroup>
             <Typography sx={{ fontWeight: 500, mb: '8px' }}>
               計畫簡述 *
@@ -168,9 +276,22 @@ export default function MarathonForm({
                     value: e.target.value
                   }
                 });
+                handleValidate('description', e.target.value, '請填寫計畫簡述');
               }}
               placeholder="範例：因為對剪影片和當 Youtuber 有興趣，我預計會研究搞笑型 Youtuber 的影片腳本與剪輯方式、拍攝我日常生活及練習剪輯，並建立 Youtube 頻道上傳影片。希望能藉此了解如何當一位 Youtuber。"
+              className={errors.description ? 'error' : ''}
             />
+            {errors.description && (
+              <Typography sx={{
+                color: '#EF5364',
+                marginTop: '8px',
+                fontSize: '14px',
+                fontWeight: 400
+              }}
+              >
+                {errors.description?.message}
+              </Typography>
+            )}
           </StyledGroup>
           <StyledGroup>
             <Typography sx={{ fontWeight: 500, mb: '8px' }}>
@@ -215,10 +336,23 @@ export default function MarathonForm({
                     value: e.target.value
                   }
                 });
+                handleValidate('motivationDescription', e.target.value, '請填寫學習動機');
               }}
+              className={errors.motivationDescription ? 'error' : ''}
               value={newMarathon?.motivation?.description || ''}
               placeholder="範例：因為同學常常說我很好笑，很適合把生活日常做成影片，我也發現自己對做影片、當Youtuber有興趣，所以想要嘗試累積作品，並開一個 Youtuber 頻道。"
             />
+            {errors.motivationDescription && (
+              <Typography sx={{
+                color: '#EF5364',
+                marginTop: '8px',
+                fontSize: '14px',
+                fontWeight: 400
+              }}
+              >
+                {errors.motivationDescription?.message}
+              </Typography>
+            )}
           </StyledGroup>
           <StyledGroup>
             <Typography sx={{ fontWeight: 500, mb: '8px' }}>
@@ -238,12 +372,25 @@ export default function MarathonForm({
                     value: e.target.value
                   }
                 });
+                handleValidate('goals', e.target.value, '請填寫學習目標');
               }}
               value={newMarathon.goals || ''}
               placeholder="範例：
 - 能收集並分析搞笑風格的 Youtuber
 - 能拍攝畫面穩定、清晰且具專業感的影片"
+              className={errors.goals ? 'error' : ''}
             />
+            {errors.goals && (
+              <Typography sx={{
+                color: '#EF5364',
+                marginTop: '8px',
+                fontSize: '14px',
+                fontWeight: 400
+              }}
+              >
+                {errors.goals?.message}
+              </Typography>
+            )}
           </StyledGroup>
           <StyledGroup>
             <Typography sx={{ fontWeight: 500, mb: '8px' }}>
@@ -263,13 +410,26 @@ export default function MarathonForm({
                     value: e.target.value
                   }
                 });
+                handleValidate('content', e.target.value, '請填寫學習內容');
               }}
               value={newMarathon.content || ''}
               placeholder="範例：
 - 內容規劃與創意發想（定位、主題、腳本）
 - 基礎拍攝技術（攝影設備、燈光、語音）
 - 影片剪輯與後製（剪輯軟體、配樂）"
+              className={errors.content ? 'error' : ''}
             />
+            {errors.content && (
+              <Typography sx={{
+                color: '#EF5364',
+                marginTop: '8px',
+                fontSize: '14px',
+                fontWeight: 400
+              }}
+              >
+                {errors.content?.message}
+              </Typography>
+            )}
           </StyledGroup>
           <StyledGroup>
             <Typography sx={{ fontWeight: 500, mb: '8px' }}>
@@ -316,10 +476,23 @@ export default function MarathonForm({
                     value: e.target.value
                   }
                 });
+                handleValidate('strategiesDescription', e.target.value, '請填寫學習方法與策略');
               }}
               value={newMarathon?.strategies?.description || ''}
               placeholder="範例：我預計會研究影片腳本、拍攝與剪輯方式，接著了解拍攝、剪輯與Youtube頻道經營，並同時練習拍攝與剪輯，開始經營頻道。我會用notion整理我收集到的資料以及筆記。"
+              className={errors.strategiesDescription ? 'error' : ''}
             />
+            {errors.strategiesDescription && (
+              <Typography sx={{
+                color: '#EF5364',
+                marginTop: '8px',
+                fontSize: '14px',
+                fontWeight: 400
+              }}
+              >
+                {errors.strategiesDescription?.message}
+              </Typography>
+            )}
           </StyledGroup>
           <StyledGroup>
             <Typography sx={{ fontWeight: 500, mb: '8px' }}>
@@ -335,28 +508,52 @@ export default function MarathonForm({
               sx={{ width: '100%' }}
               placeholder="範例：YouTube 創作者的實用資源"
               value={newMarathon.resources || ''}
-              onChange={(e) => setNewMarathon({
-                type: 'UPDATE_FIELD',
-                payload: {
-                  key: 'resources',
-                  value: e.target.value
-                }
-              })}
+              onChange={(e) => {
+                setNewMarathon({
+                  type: 'UPDATE_FIELD',
+                  payload: {
+                    key: 'resources',
+                    value: e.target.value
+                  }
+                });
+                handleValidate('resources', e.target.value, '請填寫學習資源');
+              }}
+              className={errors.resources ? 'error' : 'warning'}
+              endAdornment={errors.resources ? <ClearIcon sx={{ color: '#EF5364' }} /> : null}
             />
+            {errors.resources && (
+              <Typography sx={{
+                color: '#EF5364',
+                marginTop: '8px',
+                fontSize: '14px',
+                fontWeight: 400
+              }}
+              >
+                {errors.resources?.message}
+              </Typography>
+            )}
           </StyledGroup>
         </Box>
       </StyledSection>
-      <StyledSection sx={{ mt: '16px' }}>
+      <StyledSection
+        sx={{ mt: '16px' }}
+        className={errors.milestonesName ? 'error' : ''}
+      >
         <Box>
           <StyledGroup>
             <MilestoneGroup
               milestones={newMarathon.milestones}
               onChange={setNewMarathon}
+              onValidate={handleValidate}
+              errorMessage={errors.milestonesName?.message}
             />
           </StyledGroup>
         </Box>
       </StyledSection>
-      <StyledSection sx={{ mt: '16px' }}>
+      <StyledSection
+        sx={{ mt: '16px' }}
+        className={errors.outcomesDescription ? 'error' : ''}
+      >
         <Typography component="h3" sx={{ fontWeight: 500, mb: '8px' }}>
           學習成果及呈現方式 *
         </Typography>
@@ -395,10 +592,25 @@ export default function MarathonForm({
                 value: e.target.value
               }
             });
+            handleValidate('outcomesDescription', e.target.value, '請填寫學習成果');
           }}
           value={newMarathon?.outcomes?.description || ''}
           placeholder="範例：我預計會架設一個Youtube頻道，並上傳至少5支影片，並整理觀眾回饋與相關數據。"
+          className={errors.outcomesDescription ? 'error' : ''}
         />
+        {errors.outcomesDescription && (
+          <Typography
+            component="p"
+            sx={{
+              color: '#EF5364',
+              marginTop: '8px',
+              fontSize: '14px',
+              fontWeight: 400
+            }}
+          >
+            {errors.outcomesDescription?.message}
+          </Typography>
+        )}
         <FormControlLabel
           label="是否公開給所有人看到 (馬拉松開始後才可以在活動網站上看到喔～）"
           sx={{
