@@ -33,6 +33,7 @@ const FixedLabel = styled(Typography)`
   width: 20px;
   flex-shrink: 0;
 `;
+
 const StyledContainer = styled(Box)`
   display: flex;
   flex-direction: row;
@@ -40,6 +41,24 @@ const StyledContainer = styled(Box)`
   align-items: center;
   gap: 10px;
   width: 100%;
+  backgroundColor: #FFF;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #DBDBDB;
+
+  @media (max-width: 767px) {
+    display: grid;
+    grid-template-areas:
+      "content buttons"
+      "date date";
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+  }
+
+  &:focus-within {
+    border: 1px solid #16B9B3;
+    padding: 12px 16px;
+  }
 
   .content {
     flex-grow: 1;
@@ -48,6 +67,11 @@ const StyledContainer = styled(Box)`
     align-items: center;
     justify-content: flex-start;
     gap: 10px;
+    grid-area: content;
+  }
+  .weekdaySelector {
+    grid-area: date;
+
   }
 
   .buttons {
@@ -56,29 +80,7 @@ const StyledContainer = styled(Box)`
     align-items: center;
     justify-content: center;
     gap: 10px;
-  }
-`;
-
-const StyledButtonGroup = styled(Box)`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-`;
-const StyledGridItem = styled(Grid)`
-  background-color: #FFF;
-  display: flex;
-  padding: 12px 16px;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  align-self: stretch;
-  border-radius: 8px;
-
-  &:focus-within {
-    border: 1px solid #16B9B3;
-    padding: 11px 15px;
+    grid-area: buttons;
   }
 
   .title {
@@ -88,7 +90,12 @@ const StyledGridItem = styled(Grid)`
     width: 100%;
     justify-content: space-between;
     flex-wrap: nowrap;
-    
+    grid-area: title;
+    gap: 4px;
+    span {
+      margin-right: 4px;
+      flex-shrink: 0;
+    }
     p {
       color: #293A3D;
       font-size: 14px;
@@ -96,8 +103,17 @@ const StyledGridItem = styled(Grid)`
       font-weight: 400;
       line-height: 140%;
     }
-  }
+  }  
 `;
+
+const StyledButtonGroup = styled(Box)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+`;
+
 const StyledWeekdaySelector = styled(Select)`
     font-size: 12px;
     font-style: normal;
@@ -109,7 +125,6 @@ const StyledWeekdaySelector = styled(Select)`
     justify-content: flex-start;
     width: 100%;
     max-width: 150px;
-    min-width: 56px;
     gap: 8px;
     padding: 0 0 0 0;
     height: 100%;
@@ -127,6 +142,16 @@ const StyledWeekdaySelector = styled(Select)`
       width: 16px;
       height: 16px;
       fill: #92989A;
+    }
+    .MuiInputBase-input {
+      padding-right: 0 !important;
+      text-align: right;
+    }
+    @media (max-width: 767px) {
+      .MuiInputBase-input {
+        text-align: left;
+        max-width: 100%;
+      }
     }
 `;
 const StyledInputBase = styled(InputBase)`
@@ -247,8 +272,8 @@ export default function EditSubMilestone({
   };
 
   return (
-    <StyledGridItem item xs={12}>
-      <StyledContainer>
+    <StyledContainer>
+      <Box className="content">
         <FixedLabel component="span">{`${index + 1}.`}</FixedLabel>
         <StyledInputBase
           placeholder="任務名稱"
@@ -257,81 +282,82 @@ export default function EditSubMilestone({
           value={newMilestone.name || ''}
           notched="false"
         />
-
-        <StyledButtonGroup>
-          <StyledWeekdaySelector
-            multiple
-            placeholder="自訂"
-            displayEmpty
-            value={newMilestone.dates}
-            onChange={handleChangeWeekdays}
-            input={(
-              <InputBase placeholder="自訂" startAdornment={(<CalendarTodayOutlinedIcon />)} />
-            )}
-            renderValue={
-              (selected) =>
-                selected?.length ? selected
-                  .map((ISODate) => ISOToWeekday(ISODate))
-                  .filter(Boolean)
-                  .join(", ") : '自訂'
-            }
-            sx={{
-              '.MuiSelect-icon': {
-                display: 'none',
+      </Box>
+      <Box className="weekdaySelector">
+        <StyledWeekdaySelector
+          multiple
+          placeholder="自訂"
+          displayEmpty
+          value={newMilestone.dates}
+          onChange={handleChangeWeekdays}
+          input={(
+            <InputBase placeholder="自訂" startAdornment={(<CalendarTodayOutlinedIcon />)} />
+          )}
+          renderValue={
+            (selected) =>
+              selected?.length ? selected
+                .map((ISODate) => ISOToWeekday(ISODate))
+                .filter(Boolean)
+                .join(", ") : '自訂'
+          }
+          sx={{
+            '.MuiSelect-icon': {
+              display: 'none',
+            },
+          }}
+          MenuProps={{
+            PaperProps: {
+              style: {
+                padding: '12px',
+                maxHeight: 150,
+                overflowY: 'auto',
+                scrollbarWidth: 'thin',
+                maxWidth: '140px'
               },
-            }}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  padding: '12px',
-                  maxHeight: 150,
-                  overflowY: 'auto',
-                  scrollbarWidth: 'thin',
-                  maxWidth: '140px'
-                },
-              },
-              MenuListProps: {
-                style: {
-                  padding: '0'
-                }
+            },
+            MenuListProps: {
+              style: {
+                padding: '0'
               }
-            }}
-          >
-            {ZH_WEEK_DAY_MAP.map((zhDay) => {
-              const isSelected = newMilestone.dates.includes(weekdayToISO(zhDay));
-              return (
-                <StyledMenuItem
-                  key={zhDay}
-                  value={weekdayToISO(zhDay)}
-                  style={{
-                    backgroundColor: isSelected ? '#DEF5F5' : 'transparent',
-                    margin: '0 0 4px',
-                    color: '#293A3D',
-                  }}
-                >
-                  {zhDay}
-                </StyledMenuItem>
-              );
-            })}
-          </StyledWeekdaySelector>
+            }
+          }}
+        >
+          {ZH_WEEK_DAY_MAP.map((zhDay) => {
+            const isSelected = newMilestone.dates.includes(weekdayToISO(zhDay));
+            return (
+              <StyledMenuItem
+                key={zhDay}
+                value={weekdayToISO(zhDay)}
+                style={{
+                  backgroundColor: isSelected ? '#DEF5F5' : 'transparent',
+                  margin: '0 0 4px',
+                  color: '#293A3D',
+                }}
+              >
+                {zhDay}
+              </StyledMenuItem>
+            );
+          })}
+        </StyledWeekdaySelector>
+      </Box>
 
-          <StyledCancelButton
-            onClick={handleCloseEditPanel}
-            className="cancel"
-            aria-label="cancel"
-          >
-            <ClearIcon />
-          </StyledCancelButton>
+      <StyledButtonGroup className="buttons">
+        <StyledCancelButton
+          onClick={handleCloseEditPanel}
+          className="cancel"
+          aria-label="cancel"
+        >
+          <ClearIcon />
+        </StyledCancelButton>
 
-          <StyledSubmitButton
-            onClick={handleClickSendButton}
-            className="submit"
-            aria-label="submit"
-          >
-            <SendIcon />
-          </StyledSubmitButton>
-        </StyledButtonGroup>
-      </StyledContainer>
-    </StyledGridItem>
+        <StyledSubmitButton
+          onClick={handleClickSendButton}
+          className="submit"
+          aria-label="submit"
+        >
+          <SendIcon />
+        </StyledSubmitButton>
+      </StyledButtonGroup>
+    </StyledContainer>
   );
 }
