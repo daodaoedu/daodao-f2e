@@ -1,4 +1,5 @@
 module.exports = {
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -6,8 +7,8 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['react', 'import', 'react-hooks'],
-  extends: ['airbnb'],
+  plugins: ['react', 'import', 'react-hooks', '@typescript-eslint'],
+  extends: ['airbnb', 'plugin:@typescript-eslint/recommended'],
   env: {
     browser: true,
     es2021: true,
@@ -21,21 +22,32 @@ module.exports = {
         map: [['@', '.']],
       },
       node: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx']
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
     },
   },
   rules: {
-    "import/no-extraneous-dependencies": ["error", { devDependencies: ["./*.js"] }],
-    'import/extensions': ['error', 'ignorePackages', {
-      js: 'never',
-      jsx: 'never',
-      ts: 'never',
-      tsx: 'never',
-    }],
+    'import/no-extraneous-dependencies': [
+      'error',
+      { devDependencies: ['./*.js'] },
+    ],
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        js: 'never',
+        jsx: 'never',
+        ts: 'never',
+        tsx: 'never',
+      },
+    ],
     'react/no-unescaped-entities': 'off',
     '@next/next/no-page-custom-font': 'off',
     'react/prop-types': [0],
+    'react/jsx-filename-extension': [
+      1,
+      { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
+    ],
     'react/jsx-props-no-spreading': [0],
     'arrow-body-style': 0,
     'no-console': 0,
