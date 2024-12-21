@@ -3,7 +3,7 @@ name: Push Change to Discord Webhook URL
 on:
   push:
     branches:
-      - main
+      - dev
 
   # Allow manual trigger
   workflow_dispatch:
