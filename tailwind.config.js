@@ -3,6 +3,9 @@ const typography = require('@tailwindcss/typography');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   content: [
     "./components/**/*.{jsx,tsx}",
     "./contexts/**/*.{jsx,tsx}",
@@ -103,6 +106,13 @@ module.exports = {
             '100%': { opacity: 1 },
           },
         },
+        [`.animate-fade-out`]: {
+          animation: 'fade-out var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards ease-in-out',
+          '@keyframes fade-out': {
+            '0%': { opacity: 1 },
+            '100%': { opacity: 0 },
+          },
+        },
       });
       addUtilities({
         [`.animate-slide-y-in`]: {
@@ -110,6 +120,13 @@ module.exports = {
           '@keyframes slide-y-in': {
             '0%': { transform: 'translateY(var(--animation-distance, 100%))' },
             '100%': { transform: 'translateY(0)' },
+          },
+        },
+        [`.animate-slide-y-out`]: {
+          animation: 'slide-y-out var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards ease-in-out',
+          '@keyframes slide-y-out': {
+            '0%': { transform: 'translateY(0)' },
+            '100%': { transform: 'translateY(var(--animation-distance, 100%))' },
           },
         },
       });

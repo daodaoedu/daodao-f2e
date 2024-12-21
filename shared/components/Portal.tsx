@@ -3,10 +3,10 @@ import { createPortal } from "react-dom";
 
 interface PortalProps {
   children: React.ReactNode;
-  rootId?: string;
+  rootId: string;
 }
 
-function Portal({ children, rootId = "portal-root" }: PortalProps) {
+function Portal({ children, rootId }: PortalProps) {
   const [targetRoot, setTargetRoot] = useState<HTMLElement | null>(null);
 
   useEffect(() => {

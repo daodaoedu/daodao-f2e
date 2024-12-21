@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import Navigation from '@/shared/components/Navigation_v2';
-import Footer from '@/shared/components/Footer_v2';
-import { HomePageWrapper } from '@/components/Signin/Signin.styled';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import useProfileValidation from '@/components/Signin/useValidation';
-import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import { ProtectedComponent, useAuthDispatch } from '@/contexts/Auth';
 import Step1 from '@/components/Signin/Step1';
 import Step2 from '@/components/Signin/Step2';
-import TipModal from '@/components/Signin/Interest/TipModal';
+import TipModal from '@/components/Signin/TipModal';
 
 function SignInPage() {
   const router = useRouter();
@@ -16,7 +14,6 @@ function SignInPage() {
   const { errors, onChangeHandler, userState, validateFields } =
     useProfileValidation();
 
-  const { isLoggedIn, token } = useAuth();
   const { updateUser } = useAuthDispatch();
 
   const handleSubmit = async () => {
@@ -28,22 +25,14 @@ function SignInPage() {
       };
       try {
         await updateUser(payload);
-      } catch (error) {
-        console.error(error);
+      } catch {
+        toast.error('伺服器異常，請稍後再試');
       }
     }
   };
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      setOpen(true);
-    } else if (!token) {
-      router.push('/');
-    }
-  }, [isLoggedIn, token]);
-
   return (
-    <>
+    <ProtectedComponent onlyCheckToken redirectOnCancel='/'>
       {step === 1 && (
         <Step1
           errors={errors}
@@ -69,7 +58,7 @@ function SignInPage() {
         />
       )}
       <TipModal
-        open={open}
+        isOpen={open}
         onClose={() => {
           setOpen(false);
           router.replace('/');
@@ -79,18 +68,8 @@ function SignInPage() {
           router.replace('/profile');
         }}
       />
-    </>
+    </ProtectedComponent>
   );
 }
-
-SignInPage.getLayout = ({ children }) => {
-  return (
-    <HomePageWrapper>
-      <Navigation />
-      {children}
-      <Footer />
-    </HomePageWrapper>
-  );
-};
 
 export default SignInPage;
