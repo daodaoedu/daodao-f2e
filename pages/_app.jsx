@@ -34,6 +34,123 @@ const swrConfig = {
   errorRetryCount: 0,
 };
 
+const ThemeComponentWrap = ({ pageProps, Component }) => {
+  const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const mode = useSelector((state) => state?.theme?.mode ?? 'light');
+  const theme = useMemo(() => themeFactory(mode), [mode]);
+  const isEnv = useMemo(() => process.env.NODE_ENV === 'development', []);
+  const { isComplete, isLoggedIn } = useAuth();
+  const [openModalType, setOpenModalType] = useState(null);
+  const Layout = Component?.getLayout || DefaultLayout;
+  const isVerified = searchParams.get("isVerified");
+
+  const handleClose = () => {
+    setOpenModalType(null);
+    getReminderStorage().remove();
+  };
+
+  useEffect(() => {
+    dispatch(checkLoginValidity());
+  }, []);
+
+  useEffect(() => {
+    if (isVerified) {
+      setOpenModalType("verifiedSuccess");
+      return;
+    }
+
+    if (isLoggedIn && !isComplete && getReminderStorage().get() % 3 === 0) {
+      setOpenModalType("completeInfoReminder");
+    }
+  }, [isVerified, isLoggedIn, isComplete]);
+
+  return (
+    <ThemeProvider theme={theme}>
+      {/* mui normalize css */}
+      <CssBaseline />
+      {/* For custum reset css */}
+      <GlobalStyle />
+      <Toaster
+        position="top-center"
+        containerStyle={{ background: 'none', marginTop: '80px' }}
+        toastOptions={{
+          style: {
+            color: '#16b9b3',
+            border: '1px solid #16b9b3',
+            marginTop: '50px',
+          },
+          iconTheme: {
+            primary: '#16b9b3',
+          },
+        }}
+      />
+      {isEnv && <Mode />}
+      <CompleteInfoReminderDialog isOpen={openModalType === "completeInfoReminder"} onClose={handleClose} />
+      <Modal
+        isOpen={openModalType === 'verifiedSuccess' && isLoggedIn}
+        onClose={handleClose}
+        title="驗證成功"
+        describedby="verifiedSuccess"
+      >
+        <Image
+          src="/assets/illustration.png"
+          alt="verified-success"
+          width="300"
+          height="289"
+        />
+        {
+          isComplete ? (
+            <>
+              <p id="verifiedSuccess" className="mb-6 text-center text-basic-400 body-sm">
+                帳號已驗證成功，快來體驗平台的特色功能！
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-primary-base text-white hover:bg-primary-darker"
+                  onClick={handleClose}
+                >
+                  開始探索
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p id="verifiedSuccess" className="mb-6 text-center text-basic-400 body-sm">
+                我們會公開你的<strong className="font-bold">個人檔案</strong>，填寫完整的資料，才能讓其他夥伴們更了解你喔！
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-white text-primary-darker hover:bg-basic-100"
+                  onClick={handleClose}
+                >
+                  暫時不需要
+                </button>
+                <button
+                  type="button"
+                  className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-primary-base text-white hover:bg-primary-darker"
+                  onClick={() => {
+                    handleClose();
+                    router.replace('/profile');
+                  }}
+                >
+                  想，填寫資料
+                </button>
+              </div>
+            </>
+          )
+        }
+      </Modal>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </ThemeProvider>
+  );
+};
+
 const App = ({ Component, pageProps }) => {
   const router = useRouter();
   useEffect(() => {
@@ -114,124 +231,6 @@ const App = ({ Component, pageProps }) => {
         </PersistGate>
       </Provider>
     </>
-  );
-};
-
-const ThemeComponentWrap = ({ pageProps, Component }) => {
-  const dispatch = useDispatch();
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const mode = useSelector((state) => state?.theme?.mode ?? 'light');
-  const theme = useMemo(() => themeFactory(mode), [mode]);
-  const isEnv = useMemo(() => process.env.NODE_ENV === 'development', []);
-  const { isComplete, isLoggedIn } = useAuth();
-  const [openModalType, setOpenModalType] = useState(null);
-  const Layout = Component?.getLayout || DefaultLayout;
-  const isVerified = searchParams.get("isVerified");
-
-  const handleClose = () => {
-    setOpenModalType(null);
-    getReminderStorage().remove();
-  };
-
-  useEffect(() => {
-    dispatch(checkLoginValidity());
-  }, []);
-
-  useEffect(() => {
-    if (isVerified) {
-      setOpenModalType("verifiedSuccess");
-      return;
-    }
-
-    if (isLoggedIn && !isComplete && getReminderStorage().get() % 3 === 0) {
-      setOpenModalType("completeInfoReminder");
-    }
-  }, [isVerified, isLoggedIn, isComplete]);
-
-  return (
-    <ThemeProvider theme={theme}>
-      {/* mui normalize css */}
-      <CssBaseline />
-      {/* For custum reset css */}
-      <GlobalStyle />
-      <Toaster
-        position="top-center"
-        containerStyle={{ background: 'none', marginTop: '80px' }}
-        toastOptions={{
-          style: {
-            color: '#16b9b3',
-            border: '1px solid #16b9b3',
-            marginTop: '50px',
-          },
-          iconTheme: {
-            primary: '#16b9b3',
-          },
-        }}
-      />
-      {isEnv && <Mode />}
-      <CompleteInfoReminderDialog isOpen={openModalType === "completeInfoReminder"} onClose={handleClose} />
-      <Modal
-        isOpen={openModalType === 'verifiedSuccess' && isLoggedIn}
-        onClose={handleClose}
-        title="驗證成功"
-        describedby="verifiedSuccess"
-      >
-        <Image
-          src="/assets/illustration.png"
-          alt="verified-success"
-          width="300"
-          height="289"
-        />
-        <p id="verifiedSuccess" className="mb-6 text-center text-basic-400 body-sm">
-          {
-            isComplete ?
-              <span>
-                帳號已驗證成功，快來體驗平台的特色功能！
-              </span>
-              :
-              <span>
-                我們會公開你的<strong className="font-bold">個人檔案</strong>，填寫完整的資料，才能讓其他夥伴們更了解你喔！
-              </span>
-          }
-        </p>
-        <div className="flex gap-2">
-          {
-            isComplete ?
-              <button
-                type="button"
-                className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-primary-base text-white hover:bg-primary-darker"
-                onClick={handleClose}
-              >
-                開始探索
-              </button>
-              :
-              <>
-                <button
-                  type="button"
-                  className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-white text-primary-darker hover:bg-basic-100"
-                  onClick={handleClose}
-                >
-                  暫時不需要
-                </button>
-                <button
-                  type="button"
-                  className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-primary-base text-white hover:bg-primary-darker"
-                  onClick={() => {
-                    handleClose();
-                    router.replace('/profile')
-                  }}
-                >
-                  想，填寫資料
-                </button>
-              </>
-          }
-        </div>
-      </Modal>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </ThemeProvider>
   );
 };
 
