@@ -5,7 +5,7 @@ import useProfileValidation from '@/components/Signin/useValidation';
 import { ProtectedComponent, useAuthDispatch } from '@/contexts/Auth';
 import Step1 from '@/components/Signin/Step1';
 import Step2 from '@/components/Signin/Step2';
-import TipModal from '@/components/Signin/Interest/TipModal';
+import TipModal from '@/components/Signin/TipModal';
 
 function SignInPage() {
   const router = useRouter();
@@ -58,7 +58,7 @@ function SignInPage() {
         />
       )}
       <TipModal
-        open={open}
+        isOpen={open}
         onClose={() => {
           setOpen(false);
           router.replace('/');
