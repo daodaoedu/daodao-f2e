@@ -10,7 +10,7 @@ const Logo = () => {
   return (
     <Link href="/" passHref>
       <LogoWrapper>
-        <img src="/new-logo.png" alt="logo" width="219" height="31" />
+        <img src="/new-logo.png" alt="logo" width="152" height="31" />
       </LogoWrapper>
     </Link>
   );
