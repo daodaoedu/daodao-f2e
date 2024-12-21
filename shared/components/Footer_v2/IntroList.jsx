@@ -6,9 +6,6 @@ import Link from 'next/link';
 const IntroListWrapper = styled.div`
   margin: 0 15px;
 
-  /* h2 {
-    margin-bottom: 10px;
-  } */
   ul {
     display: flex;
     flex-direction: column;
@@ -17,14 +14,13 @@ const IntroListWrapper = styled.div`
   li {
     cursor: pointer;
     margin: 8px auto 8px 0;
-    text-align: left:
+    text-align: left;
   }
 `;
 
-const IntroList = ({ title, list }) => {
+const IntroList = ({ list }) => {
   return (
     <IntroListWrapper>
-      {/* <h2>{title}</h2> */}
       <ul>
         {list.map(({ name, link, target }) => (
           <li key={name}>

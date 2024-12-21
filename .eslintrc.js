@@ -76,6 +76,7 @@ module.exports = {
     'react/function-component-definition': 0,
     'react/jsx-no-useless-fragment': 0,
     'react/no-unknown-property': 0,
+    'react/require-default-props': 0,
     'no-unsafe-optional-chaining': 0,
     'react/no-invalid-html-attribute': 0,
   },

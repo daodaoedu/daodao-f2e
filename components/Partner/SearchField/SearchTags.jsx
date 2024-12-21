@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { SEARCH_TAGS } from '@/constants/category';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
 const StyledContainer = styled.div`
@@ -56,7 +55,7 @@ const StyledContainer = styled.div`
 
 const SearchTags = ({ searchTags = [] }) => {
   const [getSearchParams, pushState] = useSearchParamsManager();
-  const [_, setTag] = useState();
+  const [, setTag] = useState();
   const currentTags = getSearchParams('tag').toString();
 
   const handleChange = (val) => {

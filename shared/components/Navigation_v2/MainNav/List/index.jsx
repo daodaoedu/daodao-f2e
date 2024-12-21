@@ -1,15 +1,8 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import Link from 'next/link';
-import { css, keyframes } from '@emotion/css';
 import { Box } from '@mui/material';
 import { NAV_LINK } from '../../../../../constants/category';
-
-const textclip = keyframes`
-  to {
-    background-position: 200% center;
-  }
-`;
 
 const LinkListWrapper = styled.ul`
   display: flex;

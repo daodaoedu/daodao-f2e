@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import Link from 'next/link';
 
@@ -75,7 +74,7 @@ const CloseButton = styled.span`
   }
 `;
 
-const PromotionBar = ({ isShow, link, text, toggleAction }) => {
+const PromotionBar = ({ isShow, text, toggleAction }) => {
   return (
     <>
       {isShow && (

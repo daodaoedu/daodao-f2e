@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import { Paper, Box, Typography } from '@mui/material';
 import LearningResource from './LearningResource';
 import ActivitiesResource from './ActivitiesResource';
-import LocationResource from './LocationResource';
 
 const ResourceWrapper = styled.section`
   padding-top: 40px;

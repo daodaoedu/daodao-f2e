@@ -20,26 +20,15 @@ export const NavigationWrapper = styled(AppBar)(({ hasPromote }) => ({
   },
 }));
 
-const donateTexts = [
-  '✨島島阿學需要你的支持，讓人人都享有同等資源✨',
-  '✨推廣民主教育，島島阿學需要你的支持✨',
-  '✨用捐款與島島阿學一同推動民主教育✨',
-];
-
-const buildRandomText = () => {
-  const randomIndex = Math.floor(Math.random() * donateTexts.length);
-  return donateTexts[randomIndex];
-};
-
 const texts = [
   '✨「島島盃 -  2025 春季學習馬拉松」開跑啦！1/19 截止申請！✨',
   '✨參加學習馬拉松，一起為自己重新打造喜歡的學習生活吧！✨',
   '✨申請學習馬拉松，即可試用最新個人化功能輔助學習唷！✨',
+  // '✨島島阿學需要你的支持，讓人人都享有同等資源✨',
+  // '✨推廣民主教育，島島阿學需要你的支持✨',
+  // '✨用捐款與島島阿學一同推動民主教育✨',
 ];
 
-// const ToolbarWrapper = styled(Toolbar)`
-//   margin: 0 auto;
-// `;
 // 問卷 https://docs.google.com/forms/d/e/1FAIpQLSeyU9-Q-kIWp5uutcik3h-RO4o5VuG6oG0m-4u1Ua18EOu3aw/viewform
 const Navigation = () => {
   const [showPromotetionBar, setShowPromotionBar] = useState(true);
@@ -68,9 +57,7 @@ const Navigation = () => {
           text={texts[currentIndex]}
           toggleAction={setShowPromotionBar}
         />
-        {/* <Toolbar> */}
         <MainNav height={showPromotetionBar ? '128px' : '64px'} />
-        {/* </Toolbar> */}
       </NavigationWrapper>
     </>
   );

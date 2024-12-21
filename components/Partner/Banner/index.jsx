@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { Box } from '@mui/material';

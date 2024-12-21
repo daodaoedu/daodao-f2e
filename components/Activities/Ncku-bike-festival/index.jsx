@@ -1,10 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
-// import { css } from "@emotion/react";
 import { Box, Paper, Typography, Button } from '@mui/material';
-import { Stage, Layer, Rect, Text, Circle, Line, Image } from 'react-konva';
+import { Stage, Layer, Text, Image } from 'react-konva';
 import useImage from 'use-image';
 
 const ResourceWrapper = styled.section`
@@ -31,18 +30,18 @@ const ResourceWrapper = styled.section`
 
 const NckuBikeFestival = () => {
   const stageRef = React.useRef(null);
-  const [mainState, setMainState] = useState('initial'); // initial, search, gallery, uploaded
-  const [imageUploaded, setImageUploaded] = useState(0);
+  const [, setMainState] = useState('initial'); // initial, search, gallery, uploaded
+  const [, setImageUploaded] = useState(0);
   const [selectedFile, setSelectedFile] = useState(null);
   const [img] = useImage(selectedFile, 'Anonymous');
-  const [newImage] = useImage(stageRef?.current?.toDataURL(), 'Anonymous');
+  useImage(stageRef?.current?.toDataURL(), 'Anonymous');
 
   const handleUploadClick = (event) => {
     const file = event.target.files[0];
     const reader = new FileReader();
     const url = reader.readAsDataURL(file);
 
-    reader.onloadend = function (e) {
+    reader.onloadend = () => {
       setSelectedFile([reader.result]);
     };
     console.log(url);

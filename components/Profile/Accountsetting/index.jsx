@@ -9,7 +9,6 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
-import { useDispatch } from 'react-redux';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 
 const StyledTypographyStyle = styled(Typography)`

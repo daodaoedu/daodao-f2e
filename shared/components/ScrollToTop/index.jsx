@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import { Button, Fab } from '@mui/material';
+import { Fab } from '@mui/material';
 import useScrollPosition from '@react-hook/window-scroll';
 import { scrollToTop } from '../../../utils/ux';
-// import { Navigation } from "@mui/icons-material";
 
 const ScrollToTopWrapper = styled.div`
   position: fixed;

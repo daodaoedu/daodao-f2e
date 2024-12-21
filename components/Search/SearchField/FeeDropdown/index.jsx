@@ -1,27 +1,9 @@
-import React, { useState } from 'react';
-import styled from '@emotion/styled';
-import { Box, Select, MenuItem } from '@mui/material';
 import { useRouter } from 'next/router';
-// import { SEARCH_TAGS } from "../../../constants/category";
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-import Chip from '@mui/material/Chip';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
 
 const names = ['不拘', '免費', '部分免費', '需付費'];
 

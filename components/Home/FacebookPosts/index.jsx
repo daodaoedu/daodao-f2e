@@ -1,13 +1,10 @@
 import React, { useEffect } from 'react';
 import styled from '@emotion/styled';
-import Box from '@mui/material/Box';
 import { useSelector, useDispatch, shallowEqual } from 'react-redux';
-import CardList from './CardList';
 import ImageCardList from './ImageCardList';
 import StoryCardList from './StoryCardList';
 
 import {
-  // getFacebookFansPagePost,
   getFacebookGroupPost,
   getInstagramPost,
   getInstagramStory,
@@ -15,7 +12,6 @@ import {
 
 const GuideWrapper = styled.div`
   width: 90%;
-  /* height: calc(var(--section-height) + var(--section-height-offset)); */
   margin: 0 auto;
   padding-top: 40px;
   padding-bottom: 40px;
@@ -36,12 +32,8 @@ const GuideWrapper = styled.div`
 const Guide = () => {
   const dispatch = useDispatch();
   const {
-    groupPosts,
-    // fanpagesPosts,
     instagramPosts,
     instagramStories,
-    // isLoadingFanpagesPosts,
-    isLoadingGroupPosts,
     isLoadingInstagramPosts,
     isLoadingInstagramStories,
   } = useSelector(({ shared }) => {
@@ -60,7 +52,6 @@ const Guide = () => {
   }, shallowEqual);
 
   useEffect(() => {
-    // dispatch(getFacebookFansPagePost(7));
     dispatch(getFacebookGroupPost(7));
     dispatch(getInstagramPost());
     dispatch(getInstagramStory());
@@ -81,12 +72,6 @@ const Guide = () => {
         isLoading={isLoadingInstagramPosts}
         direction="right"
       />
-      {/* <CardList
-        title="📌 FaceBook 社團貼文"
-        list={groupPosts}
-        isLoading={isLoadingGroupPosts}
-        direction="left"
-      /> */}
     </GuideWrapper>
   );
 };

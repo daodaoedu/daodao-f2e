@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 import styled from '@emotion/styled';
 import { Chip } from '@mui/material';
 import { useRouter } from 'next/router';

@@ -2,14 +2,7 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 
-import {
-  Box,
-  Divider,
-  Typography,
-  Button,
-  Skeleton,
-  TextField,
-} from '@mui/material';
+import { Divider, Typography } from '@mui/material';
 import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';

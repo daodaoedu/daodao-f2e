@@ -72,13 +72,6 @@ const StyledTags = styled.div`
   }
 `;
 
-const StyledTime = styled.time`
-  display: flex;
-  justify-content: flex-end;
-  font-size: 12px;
-  color: #92989a;
-`;
-
 function OrganizerCard({ data = {}, isLoading }) {
   const educationStage =
     EDUCATION_STEP.find(({ key }) => key === data?.user?.educationStage)

@@ -20,15 +20,6 @@ const slideInFrames = keyframes`
   }
 `;
 
-const shrinkFrames = keyframes`
-  0% {
-    width: 95%;
-  }
-  100% {
-    width: 90%;
-  }
-`;
-
 const MenuItemWrapper = styled.li`
   animation: 1s ${appearFrames} forwards;
   ${(props) => css`
