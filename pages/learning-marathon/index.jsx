@@ -179,7 +179,7 @@ const Sidebar = ({ onClickSignupButton }) => {
               <Link
                 href={item.href}
                 className={cn(
-                  "block body-lg font-medium p-2.5 rounded-lg text-basic-400 transition-colors duration-300",
+                  "block text-base font-medium p-2.5 rounded-lg text-basic-400 transition-colors duration-300",
                   activeSection === item.href.replace('#', '') && 'text-primary-base bg-primary-lightest',
                 )}
               >
