@@ -148,9 +148,9 @@ const useEditProfile = () => {
             isFocus = true;
 
             if (['INPUT', 'TEXTAREA'].includes(element.tagName)) {
-              element.focus();
+              element?.focus?.();
             } else {
-              element.scrollIntoView({ block: 'center' });
+              element?.scrollIntoView?.({ block: 'center' });
             }
           }
           return [err.path[0], err.message];

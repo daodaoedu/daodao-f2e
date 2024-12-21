@@ -118,10 +118,6 @@ const authReducer = (state: AuthState, action: Action): AuthState => {
         return initialState;
       }
       if (action.payload) {
-        const reminder = getReminderStorage().get();
-        getReminderStorage().set(
-          typeof reminder === "number" ? reminder + 1 : 1
-        );
         return {
           ...state,
           isComplete: checkIsComplete(action.payload),
@@ -229,7 +225,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   );
 
   useEffect(() => {
-    const handleToken = (token: string) => {
+    const handleToken = (token?: string) => {
       if (!token) return;
       // TODO: 待移除 redux，為了同步資訊
       reduxDispatch(fetchUserByToken(token));
@@ -271,12 +267,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
     switch (state.loginStatus) {
       case LoginStatus.TEMPORARY: {
         const redirectUrl = state.redirectUrl || getRedirectionStorage().get();
+        getReminderStorage().remove();
         authDispatch.closeLoginModal();
         router.replace(redirectUrl || "/signin");
         break;
       }
       case LoginStatus.PERMANENT: {
         const redirectUrl = state.redirectUrl || getRedirectionStorage().get();
+        const reminder = getReminderStorage().get();
+        getReminderStorage().set(
+          typeof reminder === "number" ? reminder + 1 : 1
+        );
         authDispatch.closeLoginModal();
         if (redirectUrl) router.replace(redirectUrl);
         break;
@@ -293,8 +294,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const redirectionStorage = getRedirectionStorage();
+    const redirection = redirectionStorage.get();
 
-    if (redirectionStorage.get() === pathname) {
+    if (redirection?.split("?")[0] === pathname) {
       redirectionStorage.remove();
     }
   }, [pathname]);
@@ -363,11 +365,6 @@ export const ProtectedComponent = ({
 };
 
 export const sendLoginEvent = (token: string) => {
-  if (!token) {
-    // TODO: 處理沒 token 的狀況
-    return;
-  }
-
   getTokenStorage().remove();
 
   if (
@@ -379,9 +376,8 @@ export const sendLoginEvent = (token: string) => {
       window.location.origin
     );
     window.close();
-  } else {
-    const redirection = getRedirectionStorage().get();
-    getTokenStorage().set(token);
-    window.location.replace(redirection || "/");
+    return true;
   }
+
+  return false;
 };
