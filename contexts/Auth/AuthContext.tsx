@@ -363,11 +363,6 @@ export const ProtectedComponent = ({
 };
 
 export const sendLoginEvent = (token: string) => {
-  if (!token) {
-    // TODO: 處理沒 token 的狀況
-    return;
-  }
-
   getTokenStorage().remove();
 
   if (
@@ -379,9 +374,8 @@ export const sendLoginEvent = (token: string) => {
       window.location.origin
     );
     window.close();
-  } else {
-    const redirection = getRedirectionStorage().get();
-    getTokenStorage().set(token);
-    window.location.replace(redirection || "/");
+    return true;
   }
+
+  return false;
 };
