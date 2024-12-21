@@ -120,7 +120,7 @@ export default function MarathonForm({
         break;
       case 'milestonesName':
         validate = (value) => {
-          const names = value.filter((milestone, _i) => {
+          const names = value.filter((milestone) => {
             return (milestone.name.trim().length > 0);
           });
           return names.length === newMarathon.milestones?.length;
@@ -156,10 +156,9 @@ export default function MarathonForm({
     }
 
     if (validate(input)) {
-      setErrors((prevErrors) => {
-        const { [name]: _, ...remainingErrors } = prevErrors;
-        return remainingErrors;
-      });
+      setErrors((prevErrors) =>
+        Object.fromEntries(Object.entries(prevErrors).filter(([key]) => key !== name))
+      );
     } else {
       setErrors({
         ...errors,

@@ -1,7 +1,5 @@
 import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
-import Link from 'next/link';
 import { Typography, Box } from '@mui/material';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
@@ -9,7 +7,6 @@ import { Whatshot } from '@mui/icons-material';
 import Tags from './Tags';
 import LogoImage from './LogoImage';
 import Contributors from './Contributors';
-import { COLOR_TABLE } from '../../../../constants/notion';
 
 dayjs.extend(isBetween);
 

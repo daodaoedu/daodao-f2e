@@ -242,7 +242,7 @@ export default function EditSubMilestone({
   onShow,
   onSubmit,
   tempId,
-  type = 'create'
+  // type = 'create'
 }) {
   const [newMilestone, setNewMilestone] = useState(milestone);
 

@@ -32,7 +32,7 @@ function SignInPage() {
   };
 
   return (
-    <ProtectedComponent onlyCheckToken redirectOnCancel='/'>
+    <ProtectedComponent onlyCheckToken redirectOnCancel="/">
       {step === 1 && (
         <Step1
           errors={errors}

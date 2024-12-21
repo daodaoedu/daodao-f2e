@@ -3,7 +3,6 @@ import {
   Box,
   Typography
 } from "@mui/material";
-import BoomImage from "@/public/assets/booming.png";
 
 const StyledGroup = styled(Box)`
   width: 100%;

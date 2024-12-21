@@ -1,8 +1,5 @@
-import React, { useState } from 'react';
-import styled from '@emotion/styled';
 import { Box, Select, MenuItem } from '@mui/material';
 import { useRouter } from 'next/router';
-// import { SEARCH_TAGS } from "../../../constants/category";
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';

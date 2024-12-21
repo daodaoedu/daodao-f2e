@@ -3,7 +3,6 @@ import { keyframes, css } from '@emotion/react';
 import styled from '@emotion/styled';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import { Box, MenuItem } from '@mui/material';
 import { useRouter } from 'next/router';
 

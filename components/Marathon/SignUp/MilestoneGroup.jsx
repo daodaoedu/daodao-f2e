@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import styled from '@emotion/styled';
 import {
   Box,
-  Grid,
   TextField,
   MenuItem,
   Typography,
@@ -48,7 +47,7 @@ export default function MilestoneGroup({
 }) {
   const eventWeekRange = 22;
   const [startDate, setStartDate] = useState('2025-02-09');
-  const [endDate, setEndDate] = useState(dayjs(startDate).add('22', 'week'));
+  const [/** endDate */, setEndDate] = useState(dayjs(startDate).add('22', 'week'));
   const [frequency, setFrequency] = useState('biweekly');
 
   function arabicToChinese(num) {
@@ -113,26 +112,26 @@ export default function MilestoneGroup({
       }
     });
   };
-  const handleStartDate = (eventStartDate) => {
-    setStartDate(eventStartDate);
-    const eventEndDate = dayjs(eventStartDate).add(eventWeekRange, 'week');
-    setEndDate(eventEndDate);
-    const changedMilestones = calculateMilestones(eventStartDate, frequency, milestones);
-    onChange({
-      type: 'UPDATE_FIELD',
-      payload: {
-        key: 'milestones',
-        value: changedMilestones
-      }
-    });
-  };
-  const handleEndDate = (fakeDate) => {
+  // const handleStartDate = (eventStartDate) => {
+  //   setStartDate(eventStartDate);
+  //   const eventEndDate = dayjs(eventStartDate).add(eventWeekRange, 'week');
+  //   setEndDate(eventEndDate);
+  //   const changedMilestones = calculateMilestones(eventStartDate, frequency, milestones);
+  //   onChange({
+  //     type: 'UPDATE_FIELD',
+  //     payload: {
+  //       key: 'milestones',
+  //       value: changedMilestones
+  //     }
+  //   });
+  // };
+  const handleEndDate = (/** fakeDate */) => {
     const eventEndDate = dayjs(startDate).add(eventWeekRange, 'week');
     setEndDate(eventEndDate);
   };
 
   const updateMilestone = (newMilestone) => {
-    const changedMilestones = milestones.map((item, _i) => {
+    const changedMilestones = milestones.map((item) => {
       return (item._tempId === newMilestone._tempId ? newMilestone : item);
     });
     // check if milestone name exist

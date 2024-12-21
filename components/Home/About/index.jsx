@@ -1,9 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import Box from '@mui/material/Box';
-import { Typography, Button } from '@mui/material';
-import { FacebookRounded } from '@mui/icons-material';
-import Chip from '@mui/material/Chip';
+import { Box, Chip, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { COLOR_TABLE } from '../../../constants/notion';
 import { CATEGORIES } from '../../../constants/category';

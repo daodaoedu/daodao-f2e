@@ -1,8 +1,6 @@
-import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import Link from 'next/link';
-import { Typography, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 
@@ -92,6 +90,7 @@ const PromoteWrapper = styled.div`
     color: #ffffffff;
     font-weight: bold;
     transform: rotate(45deg);
+  }
 `;
 
 const LogoImage = ({ link, data }) => {

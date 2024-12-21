@@ -276,7 +276,7 @@ const AboutTeam = () => {
             flexDirection: 'row',
           }}
         >
-          {Members.map(({ id, name, image }) => (
+          {Members.map(({ id, name }) => (
             <Tooltip key={id} title={name}>
               <Avatar
                 sx={{ margin: '4px', width: 50, height: 50 }}

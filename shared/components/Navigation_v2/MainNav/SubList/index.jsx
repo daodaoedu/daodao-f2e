@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import Link from 'next/link';
 import { Button } from '@mui/material';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import UserAvatar from './UserAvatar';

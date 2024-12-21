@@ -1,6 +1,5 @@
 import Skeleton from '@mui/material/Skeleton';
 import IconButton from '@mui/material/IconButton';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
 import {
   StyledContainer,

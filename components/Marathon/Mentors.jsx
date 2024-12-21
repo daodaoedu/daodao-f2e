@@ -271,7 +271,7 @@ const Mentors = () => {
     }
   };
 
-  const handleTouchEnd = (e) => {
+  const handleTouchEnd = () => {
     setTouchStartX(null);
   };
 

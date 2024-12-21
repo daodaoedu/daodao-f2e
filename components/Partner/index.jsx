@@ -66,7 +66,7 @@ function Partner() {
   const { page: current = 1, totalPages } = pagination;
 
   // queryStr
-  const [getSearchParams, _, generateParamsItems] = useSearchParamsManager();
+  const [getSearchParams, , generateParamsItems] = useSearchParamsManager();
   const searchParamsItems = useMemo(
     () =>
       generateParamsItems(['area', 'role', 'edu', 'tag', 'q'], keySelections),

@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { useState } from 'react';
 import styled from "@emotion/styled";
-import dayjs from "dayjs";
 
 import {
   Grid,
@@ -122,7 +121,7 @@ export default function MilestonePanel({
   };
 
   const handleDeleteSubMilestone = (deletedItem) => {
-    const newSubMilestones = (milestone.subMilestones).filter((item, _i) => {
+    const newSubMilestones = (milestone.subMilestones).filter((item) => {
       return (item._tempId !== deletedItem._tempId);
     });
     onChange({
@@ -132,7 +131,7 @@ export default function MilestonePanel({
   };
 
   const handleEditSubMilestone = (newItem) => {
-    const newSubMilestones = (milestone.subMilestones).map((item, _i) => {
+    const newSubMilestones = (milestone.subMilestones).map((item) => {
       return (newItem._tempId === item._tempId) ? newItem : item;
     });
     onChange({

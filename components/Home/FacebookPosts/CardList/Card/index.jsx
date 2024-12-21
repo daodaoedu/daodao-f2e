@@ -1,9 +1,6 @@
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
-import { useRouter } from 'next/router';
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
 import dayjs from 'dayjs';
-import { slideInUp } from '../../../../../shared/styles/animation';
 
 const CardWrapper = styled.li`
   position: relative;
@@ -41,26 +38,7 @@ const ContentWrapper = styled.p`
   font-size: 12px;
 `;
 
-const BackgroundWrapper = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  border-radius: 20px;
-  z-index: -1;
-  ${({ image }) => css`
-    background-image: ${`url(${image})`};
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    filter: brightness(50%);
-  `}
-`;
-
-const Card = ({ id, message = '', date, title, link, type }) => {
-  const router = useRouter();
+const Card = ({ id, message = '', date }) => {
   return (
     <Tooltip title={message.slice(0, 150)}>
       <CardWrapper

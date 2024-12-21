@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
-import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
-import { Button, Box, Stack } from '@mui/material';
+import { Button, Box } from '@mui/material';
 import { Share, DirectionsRun } from '@mui/icons-material';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import toast from 'react-hot-toast';
