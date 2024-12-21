@@ -34,10 +34,12 @@ const PromotionBarWrapper = styled.div`
   justify-content: center;
   align-items: center;
   font-size: 16px;
-  min-height: 64px;
-  a:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+  
+  @media (hover: hover) {
+    a:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
   }
 `;
 
