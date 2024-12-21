@@ -7,7 +7,7 @@ export default function createStorage<T>(key: string, storage = localStorage) {
   const set = (value: T) => storage.setItem(key, JSON.stringify(value));
   const get = (): T | undefined => {
     try {
-      return JSON.parse(storage.getItem(key) || 'undefined');
+      return JSON.parse(storage.getItem(key) ?? 'undefined');
     } catch {
       return undefined;
     }
