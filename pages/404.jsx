@@ -5,11 +5,11 @@ import { Typography, Button, Paper } from '@mui/material';
 import { FacebookRounded } from '@mui/icons-material';
 import Chip from '@mui/material/Chip';
 import { useRouter } from 'next/router';
-import Navigatin from '../shared/components/Navigation_v2';
-import Footer from '../shared/components/Footer_v2';
-import { COLOR_TABLE } from '../constants/notion';
-import { CATEGORIES } from '../constants/category';
-import RelatedResources from '../shared/components/RelatedResources';
+import Navigatin from '@/shared/components/Navigation_v2';
+import Footer from '@/shared/components/Footer_v2';
+import { COLOR_TABLE } from '@/constants/notion';
+import { CATEGORIES } from '@/constants/category';
+import RelatedResources from '@/shared/components/RelatedResources';
 import { getRedirectionStorage } from '@/utils/storage';
 
 const BodyWrapper = styled.div`
