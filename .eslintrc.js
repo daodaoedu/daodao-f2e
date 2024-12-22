@@ -31,6 +31,10 @@ module.exports = {
       'error',
       { devDependencies: ['./*.js'] },
     ],
+    '@typescript-eslint/no-var-requires': [
+      'error',
+      { devDependencies: ['./*.js'] },
+    ],
     'import/extensions': [
       'error',
       'ignorePackages',

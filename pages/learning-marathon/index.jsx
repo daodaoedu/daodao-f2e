@@ -98,8 +98,10 @@ const useScrollPaddingTop = () => {
     };
 
     handleScrollPaddingTop();
+    window.addEventListener('resize', handleScrollPaddingTop);
     window.addEventListener('storage', handleStorage);
     return () => {
+      window.removeEventListener('resize', handleScrollPaddingTop);
       window.removeEventListener('storage', handleStorage);
     };
   }, []);
@@ -224,9 +226,9 @@ const Nav = () => {
     <nav className="sticky z-10 bg-basic-100 text-nowrap overflow-x-auto" style={{ top: `${scrollPaddingTop}px` }}>
       <ul className="max-w-[750px] mx-auto flex justify-between gap-4">
         {navItems.map((item) => (
-          <li key={item.label}>
+          <li key={item.label} className="shrink-0">
             {item.disabled ? (
-              <span className="block text-basic-300 cursor-not-allowed body-sm font-medium p-4">
+              <span className="block p-4 text-nowrap text-basic-300 cursor-not-allowed body-sm font-medium">
                 {item.label}
               </span>
             ) : (
@@ -235,7 +237,7 @@ const Nav = () => {
                 target={item.external ? '_blank' : '_self'}
                 rel={item.external ? 'noopener noreferrer' : ''}
                 className={cn(
-                  'relative block text-primary-base body-sm font-medium p-4 flex items-center gap-1',
+                  'relative p-4 flex items-center gap-1 text-primary-base body-sm font-medium text-nowrap',
                   item.active && 'before:content-[""] before:absolute before:bottom-2.5 before:left-4 before:right-4 before:h-[2px] before:bg-primary-base',
                 )}
               >
@@ -252,7 +254,7 @@ const Nav = () => {
 
 const Section = ({ title, id, className, children, withContainer = true }) => (
   <section className={cn("py-8 px-6 md:py-[100px] body-md text-basic-400", className)}>
-    <div className={cn(withContainer && "max-w-[750px] mx-auto lg:mr-12 min-[1100px]:mr-24 min-[1180px]:mr-auto")}>
+    <div className={cn(withContainer && "max-w-[750px] mx-auto lg:ml-56 lg:mr-12 xl:mx-auto")}>
       {title && <h2 className="heading-md text-basic-500" id={id}>{title}</h2>}
       {children}
     </div>
