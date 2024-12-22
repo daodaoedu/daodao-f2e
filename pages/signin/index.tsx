@@ -25,6 +25,7 @@ function SignInPage() {
       };
       try {
         await updateUser(payload);
+        setOpen(true);
       } catch {
         toast.error('伺服器異常，請稍後再試');
       }
