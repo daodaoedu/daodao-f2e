@@ -242,7 +242,11 @@ export default function ConfirmForm({
       let userEdu = userState?.educationStage;
 
       if (userState?.location?.length > 1) {
-        userLocation = userState?.location.split('@')[1];
+        if (userState?.location.includes('@')) {
+          userLocation = userState?.location.split('@')[1];
+        } else {
+          userLocation = userState?.location;
+        }
       }
 
       if (userState?.roleList?.length) {
