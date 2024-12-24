@@ -105,19 +105,7 @@ export default function MilestoneGroup({
     const changedMilestones = calculateMilestones(startDate, e.target.value, []);
     onChangeHandler('UPDATE_FIELD', 'milestones', changedMilestones, 'milestonesName');
   };
-  // const handleStartDate = (eventStartDate) => {
-  //   setStartDate(eventStartDate);
-  //   const eventEndDate = dayjs(eventStartDate).add(eventWeekRange, 'week');
-  //   setEndDate(eventEndDate);
-  //   const changedMilestones = calculateMilestones(eventStartDate, frequency, milestones);
-  //   onChange({
-  //     type: 'UPDATE_FIELD',
-  //     payload: {
-  //       key: 'milestones',
-  //       value: changedMilestones
-  //     }
-  //   });
-  // };
+
   const handleEndDate = (/** fakeDate */) => {
     const eventEndDate = dayjs(startDate).add(eventWeekRange, 'week');
     setEndDate(eventEndDate);
