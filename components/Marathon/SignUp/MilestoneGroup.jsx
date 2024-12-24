@@ -40,9 +40,8 @@ const StyledDateSection = styled(Box)`
 
 export default function MilestoneGroup({
   milestones = [],
-  onChange = null,
+  onChangeHandler = null,
   isDisabled = false,
-  onValidate = null,
   errorMessage = null
 }) {
   const eventWeekRange = 22;
@@ -104,13 +103,7 @@ export default function MilestoneGroup({
     // if change frequency, clear all data
     setFrequency(e.target.value);
     const changedMilestones = calculateMilestones(startDate, e.target.value, []);
-    onChange({
-      type: 'UPDATE_FIELD',
-      payload: {
-        key: 'milestones',
-        value: changedMilestones
-      }
-    });
+    onChangeHandler('UPDATE_FIELD', 'milestones', changedMilestones, 'milestonesName');
   };
   // const handleStartDate = (eventStartDate) => {
   //   setStartDate(eventStartDate);
@@ -134,15 +127,7 @@ export default function MilestoneGroup({
     const changedMilestones = milestones.map((item) => {
       return (item._tempId === newMilestone._tempId ? newMilestone : item);
     });
-    // check if milestone name exist
-    onValidate('milestonesName', changedMilestones, '請填寫每週 / 隔週里程碑目標');
-    onChange({
-      type: 'UPDATE_FIELD',
-      payload: {
-        key: 'milestones',
-        value: changedMilestones
-      }
-    });
+    onChangeHandler('UPDATE_FIELD', 'milestones', changedMilestones, 'milestonesName');
   };
   useEffect(() => {
     const weeklyMilestonesLength = 22;
@@ -159,13 +144,7 @@ export default function MilestoneGroup({
     }
 
     if (!isDisabled) {
-      onChange({
-        type: 'UPDATE_FIELD',
-        payload: {
-          key: 'milestones',
-          value: initMilestones
-        }
-      });
+      onChangeHandler('UPDATE_FIELD', 'milestones', initMilestones, 'milestonesName');
     }
   }, []);
 

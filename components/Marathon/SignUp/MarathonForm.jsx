@@ -100,62 +100,61 @@ export default function MarathonForm({
     reduxDispatch(updateNewMarathon(newMarathon));
     setCurrentStep(currentStep - 1);
   };
-  const handleValidate = (name, input, errorMessage) => {
-    let validate = false;
-    switch (name) {
-      case 'title':
-        validate = (value) => {
-          return (value.trim().length > 0);
-        };
-        break;
-      case 'description':
-        validate = (value) => {
-          return (value.trim().length > 0);
-        };
-        break;
-      case 'motivationDescription':
-        validate = (value) => {
-          return (value.trim().length > 0);
-        };
-        break;
-      case 'milestonesName':
-        validate = (value) => {
-          const names = value.filter((milestone) => {
-            return (milestone.name.trim().length > 0);
-          });
-          return names.length === newMarathon.milestones?.length;
-        };
-        break;
-      case 'goals':
-        validate = (value) => {
-          return (value.trim().length > 0);
-        };
-        break;
-      case 'content':
-        validate = (value) => {
-          return (value.trim().length > 0);
-        };
-        break;
-      case 'strategiesDescription':
-        validate = (value) => {
-          return (value.trim().length > 0);
-        };
-        break;
-      case 'outcomesDescription':
-        validate = (value) => {
-          return (value.trim().length > 0);
-        };
-        break;
-      case 'resources':
-        validate = (value) => {
-          return (value.trim().length > 0);
-        };
-        break;
-      default:
-        break;
+  
+  const validators = {
+    required: (value) => {
+      return value.trim().length > 0;
+    },
+    allMilestonesNameRequired: (value, milestonesLength) => {
+      const names = value.filter((milestone) => milestone?.name.trim().length > 0);
+      return names.length === milestonesLength;
     }
+  }
+  const validateRules = {
+    title: {
+      validate: validators.required,
+      message: '請填寫表格',
+    },
+    description: {
+      validate: validators.required,
+      message: '請填寫計畫敘述',
+    },
+    motivationDescription: {
+      validate: validators.required,
+      message: '請填寫學習動機',
+    },
+    outcomesDescription: {
+      validate: validators.required,
+      message: '請填寫學習成果',
+    },
+    goals: {
+      validate: validators.required,
+      message: '請填寫學習目標',
+    },
+    content: {
+      validate: validators.required,
+      message: '請填寫學習內容',
+    },
+    milestonesName: {
+      validate: (value) => {
+        return validators.allMilestonesNameRequired(value, newMarathon.milestones?.length);
+      },
+      message: '請填寫每週/隔週里程碑目標',
+    },
+    strategiesDescription: {
+      validate: validators.required,
+      message: '請填寫學習策略',
+    },
+    resources: {
+      validate: validators.required,
+      message: '請填寫學習資源'
+    }
+  }
 
-    if (validate(input)) {
+  const handleValidate = (name, input) => {
+    const validateResult = validateRules[name]?.validate(input);
+    const errorMessage = validateRules[name]?.message;
+    if (validateResult) {
       setErrors((prevErrors) =>
         Object.fromEntries(Object.entries(prevErrors).filter(([key]) => key !== name))
       );
@@ -167,9 +166,24 @@ export default function MarathonForm({
         }
       });
     }
-    return validate(input);
+    return validateResult;
   };
-
+  const handleOnChange = (
+    stateDispatchType, 
+    stateDispatchKey, 
+    value, 
+    validateName,
+  ) => {
+    if (stateDispatchType && stateDispatchKey) {
+      setNewMarathon({
+        type: stateDispatchType,
+        payload: { key: stateDispatchKey, value }
+      });
+    }
+    if (validateName) {
+      handleValidate(validateName, value);
+    }
+  };
   useEffect(() => {
     setHasLoaded(true);
     const storagedErrors = getMarathonErrorsStorage().get();
@@ -231,11 +245,7 @@ export default function MarathonForm({
             title="學習主題名稱"
             value={newMarathon.title || ''}
             onChange={(e) => {
-              setNewMarathon({
-                type: 'UPDATE_FIELD',
-                payload: { key: 'title', value: e.target.value }
-              });
-              handleValidate('title', e.target.value, '請填寫表格');
+              handleOnChange('UPDATE_FIELD', 'title', e.target.value, 'title');
             }}
             sx={{
               mb: '8px',
@@ -268,14 +278,7 @@ export default function MarathonForm({
             <StyledTextareaAutosize
               value={newMarathon.description || ''}
               onChange={(e) => {
-                setNewMarathon({
-                  type: 'UPDATE_FIELD',
-                  payload: {
-                    key: 'description',
-                    value: e.target.value
-                  }
-                });
-                handleValidate('description', e.target.value, '請填寫計畫簡述');
+                handleOnChange('UPDATE_FIELD', 'description', e.target.value, 'description');
               }}
               placeholder="範例：因為對剪影片和當 Youtuber 有興趣，我預計會研究搞笑型 Youtuber 的影片腳本與剪輯方式、拍攝我日常生活及練習剪輯，並建立 Youtube 頻道上傳影片。希望能藉此了解如何當一位 Youtuber。"
               className={errors.description ? 'error' : ''}
@@ -328,14 +331,7 @@ export default function MarathonForm({
             />
             <StyledTextareaAutosize
               onChange={(e) => {
-                setNewMarathon({
-                  type: 'UPDATE_MOTIVATION_FIELD',
-                  payload: {
-                    key: 'description',
-                    value: e.target.value
-                  }
-                });
-                handleValidate('motivationDescription', e.target.value, '請填寫學習動機');
+                handleOnChange('UPDATE_MOTIVATION_FIELD', 'description', e.target.value, 'motivationDescription');
               }}
               className={errors.motivationDescription ? 'error' : ''}
               value={newMarathon?.motivation?.description || ''}
@@ -364,14 +360,7 @@ export default function MarathonForm({
             </Typography>
             <StyledTextareaAutosize
               onChange={(e) => {
-                setNewMarathon({
-                  type: 'UPDATE_FIELD',
-                  payload: {
-                    key: 'goals',
-                    value: e.target.value
-                  }
-                });
-                handleValidate('goals', e.target.value, '請填寫學習目標');
+                handleOnChange('UPDATE_FIELD', 'goals', e.target.value, 'goals');
               }}
               value={newMarathon.goals || ''}
               placeholder="範例：
@@ -402,14 +391,7 @@ export default function MarathonForm({
             </Typography>
             <StyledTextareaAutosize
               onChange={(e) => {
-                setNewMarathon({
-                  type: 'UPDATE_FIELD',
-                  payload: {
-                    key: 'content',
-                    value: e.target.value
-                  }
-                });
-                handleValidate('content', e.target.value, '請填寫學習內容');
+                handleOnChange('UPDATE_FIELD', 'content', e.target.value, 'content');
               }}
               value={newMarathon.content || ''}
               placeholder="範例：
@@ -468,14 +450,7 @@ export default function MarathonForm({
             />
             <StyledTextareaAutosize
               onChange={(e) => {
-                setNewMarathon({
-                  type: "UPDATE_STRATEGIES_FIELD",
-                  payload: {
-                    key: 'description',
-                    value: e.target.value
-                  }
-                });
-                handleValidate('strategiesDescription', e.target.value, '請填寫學習方法與策略');
+                handleOnChange('UPDATE_STRATEGIES_FIELD', 'description', e.target.value, 'strategiesDescription');
               }}
               value={newMarathon?.strategies?.description || ''}
               placeholder="範例：我預計會研究影片腳本、拍攝與剪輯方式，接著了解拍攝、剪輯與Youtube頻道經營，並同時練習拍攝與剪輯，開始經營頻道。我會用notion整理我收集到的資料以及筆記。"
@@ -508,14 +483,7 @@ export default function MarathonForm({
               placeholder="範例：YouTube 創作者的實用資源"
               value={newMarathon.resources || ''}
               onChange={(e) => {
-                setNewMarathon({
-                  type: 'UPDATE_FIELD',
-                  payload: {
-                    key: 'resources',
-                    value: e.target.value
-                  }
-                });
-                handleValidate('resources', e.target.value, '請填寫學習資源');
+                handleOnChange('UPDATE_FIELD', 'resources', e.target.value, 'resources');
               }}
               className={errors.resources ? 'error' : 'warning'}
               endAdornment={errors.resources ? <ClearIcon sx={{ color: '#EF5364' }} /> : null}
@@ -542,8 +510,7 @@ export default function MarathonForm({
           <StyledGroup>
             <MilestoneGroup
               milestones={newMarathon.milestones}
-              onChange={setNewMarathon}
-              onValidate={handleValidate}
+              onChangeHandler={handleOnChange}
               errorMessage={errors.milestonesName?.message}
             />
           </StyledGroup>
@@ -584,14 +551,7 @@ export default function MarathonForm({
         />
         <StyledTextareaAutosize
           onChange={(e) => {
-            setNewMarathon({
-              type: 'UPDATE_OUTCOMES_FIELD',
-              payload: {
-                key: 'description',
-                value: e.target.value
-              }
-            });
-            handleValidate('outcomesDescription', e.target.value, '請填寫學習成果');
+            handleOnChange('UPDATE_OUTCOMES_FIELD', 'description', e.target.value, 'outcomesDescription');
           }}
           value={newMarathon?.outcomes?.description || ''}
           placeholder="範例：我預計會架設一個Youtube頻道，並上傳至少5支影片，並整理觀眾回饋與相關數據。"
