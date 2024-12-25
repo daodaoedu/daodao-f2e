@@ -10,7 +10,7 @@ import SEOConfig from '@/shared/components/SEO';
 import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 
-import SaveBar from '@/components/Marathon/SignUp/SaveBar';
+import SaveBar from '@/components/Marathon/SignUp/StepperBar';
 import UserProfileForm from '@/components/Marathon/SignUp/UserProfileForm';
 import MarathonForm from '@/components/Marathon/SignUp/MarathonForm';
 import ConfirmForm from '@/components/Marathon/SignUp/ConfirmForm';
