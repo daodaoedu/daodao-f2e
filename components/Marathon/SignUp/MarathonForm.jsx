@@ -100,7 +100,7 @@ export default function MarathonForm({
     reduxDispatch(updateNewMarathon(newMarathon));
     setCurrentStep(currentStep - 1);
   };
-  
+
   const validators = {
     required: (value) => {
       return value.trim().length > 0;
@@ -109,7 +109,7 @@ export default function MarathonForm({
       const names = value.filter((milestone) => milestone?.name.trim().length > 0);
       return names.length === milestonesLength;
     }
-  }
+  };
   const validateRules = {
     title: {
       validate: validators.required,
@@ -149,7 +149,7 @@ export default function MarathonForm({
       validate: validators.required,
       message: '請填寫學習資源'
     }
-  }
+  };
 
   const handleValidate = (name, input) => {
     const validateResult = validateRules[name]?.validate(input);
@@ -169,9 +169,9 @@ export default function MarathonForm({
     return validateResult;
   };
   const handleOnChange = (
-    stateDispatchType, 
-    stateDispatchKey, 
-    value, 
+    stateDispatchType,
+    stateDispatchKey,
+    value,
     validateName,
   ) => {
     if (stateDispatchType && stateDispatchKey) {
