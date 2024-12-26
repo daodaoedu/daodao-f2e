@@ -7,8 +7,7 @@ import {
   useReducer,
   useRef,
 } from "react";
-import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import useSWR, { SWRConfig } from "swr";
 import { useDispatch } from "react-redux";
 
@@ -192,6 +191,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
             });
             const payload = await updateUserProfile(request);
             dispatch({ type: ActionTypes.UPDATE_USER, payload });
+            break;
+          }
+          default: {
             break;
           }
         }
