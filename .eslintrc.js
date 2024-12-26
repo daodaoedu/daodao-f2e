@@ -14,7 +14,12 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  ignorePatterns: ['.eslintrc.js'],
+  ignorePatterns: [
+    '*.config.js',
+    '.eslintrc.js',
+    'next-sitemap.js',
+    'server.js',
+  ],
   settings: {
     'import/resolver': {
       alias: {
@@ -29,12 +34,9 @@ module.exports = {
   rules: {
     'import/no-extraneous-dependencies': [
       'error',
-      { devDependencies: ['./*.js'] },
+      { devDependencies: ['./*.ts'] },
     ],
-    '@typescript-eslint/no-var-requires': [
-      'error',
-      { devDependencies: ['./*.js'] },
-    ],
+    '@typescript-eslint/no-require-imports': 'error',
     'import/extensions': [
       'error',
       'ignorePackages',
