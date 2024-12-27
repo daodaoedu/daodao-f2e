@@ -61,6 +61,35 @@ const StyledContent = styled.div`
   font-weight: 400;
   line-height: 140%; 
 `;
+
+const StyledList = styled(Box)`
+  margin-top: 10px;
+  ol {
+    list-style-type: decimal;
+    padding-left: 1.4em;
+
+    li {
+      color: #536166;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 140%;
+      text-align: left;
+    }
+  }
+
+  ul {
+    list-style-type: disc;
+    padding-left: 1.4em;
+
+    li {
+      color: #536166;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 140%;
+      text-align: left;
+    }
+  }
+`;
 function Accordion({ title, children }) {
   const [isOpen, setIsOpen] = useState(false);
   const [height, setHeight] = useState(0);
@@ -153,6 +182,40 @@ export default function Faq() {
         title="如果申請時一起團報的朋友沒有入圍，還可以享有團報費用嗎？"
       >
         可以唷！我們會以申請時選擇的資格為主。
+      </Accordion>
+      <Accordion
+        title="完賽的定義是什麼呢？"
+      >
+        完賽的定義不在於最終成果做得多好，而是過程的參與，遇到困難時如何反思並做出改變，以及最後對自己甚至社會帶來什麼改變，包含即使沒有達到預期目標也清楚原因及下一步。
+
+        <StyledList>
+            因此我們完賽退費標準只有需符合以下要求：
+            <ol>
+              <li>
+                工作坊、學習小組會議、團體諮詢及 1對1 諮詢，加總不得請假超過5小時。
+              </li>
+              <li>
+                提交所有每兩週的進度報告。
+              </li>
+              <li>
+                參與7/12成果發表日。
+              </li>
+              <li>
+                於 2025/7/10 前完成以下資料
+                <ul>
+                  <li>
+                    完成並上傳所有成果發表資料。
+                  </li>
+                  <li>
+                    分享至少三個於計劃期間使用的學習資源，並分享使用心得。
+                  </li>
+                  <li>
+                    完成學習馬拉松回饋問卷。
+                  </li>
+                </ul>
+              </li>
+            </ol>
+        </StyledList>
       </Accordion>
     </StyledGroup>
   );

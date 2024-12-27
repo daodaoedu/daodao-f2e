@@ -28,6 +28,19 @@ const StyledGroup = styled(Box)`
 `;
 
 const StyledList = styled(Box)`
+  ol {
+    list-style-type: decimal;
+    padding-left: 1.4em;
+
+    li {
+      color: #536166;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 140%;
+      text-align: left;
+    }
+  }
+
   ul {
     list-style-type: disc;
     padding-left: 1.4em;
@@ -38,7 +51,7 @@ const StyledList = styled(Box)`
       font-weight: 400;
       line-height: 140%;
       text-align: left;
-      }
+    }
   }
 `;
 
@@ -333,7 +346,7 @@ export default function Price() {
     <StyledGroup>
       <StyledParagraph component="p" sx={{ marginBottom: '36px' }}>
         申請無需費用，入選後才需繳交！<br />
-        完賽可退全額！
+        完賽可退全額，完賽標準請見退費標準！
       </StyledParagraph>
       <StyledDiscount sx={{ marginBottom: '16px' }}>
         <span className="price-type">原價</span>
@@ -425,15 +438,16 @@ export default function Price() {
         退費標準
       </Typography>
       <StyledList>
-        <ul>
-          <li>
             需符合以下三項要求
-            <ul>
+            <ol>
               <li>
                 工作坊、學習小組會議、團體諮詢及 1對1 諮詢，加總不得請假超過5小時。
               </li>
               <li>
-                準時提交所有每兩週的進度報告。
+                提交所有每兩週的進度報告。
+              </li>
+              <li>
+                參與7/12成果發表日。
               </li>
               <li>
                 於 2025/7/10 前完成以下資料
@@ -449,9 +463,7 @@ export default function Price() {
                   </li>
                 </ul>
               </li>
-            </ul>
-          </li>
-        </ul>
+            </ol>
       </StyledList>
 
     </StyledGroup>
