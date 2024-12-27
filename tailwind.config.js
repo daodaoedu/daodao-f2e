@@ -1,8 +1,12 @@
+const defaultTheme = require("tailwindcss/defaultTheme");
 const plugin = require("tailwindcss/plugin");
-const typography = require('@tailwindcss/typography');
+const typography = require("@tailwindcss/typography");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   content: [
     "./components/**/*.{jsx,tsx}",
     "./contexts/**/*.{jsx,tsx}",
@@ -11,6 +15,9 @@ module.exports = {
     "./shared/**/*.{jsx,tsx}",
   ],
   theme: {
+    fontFamily: {
+      sans: ["Noto Sans TC", ...defaultTheme.fontFamily.sans],
+    },
     extend: {
       colors: {
         primary: {
@@ -72,63 +79,94 @@ module.exports = {
       });
 
       /** Animation */
-      const times = ['200', '300', '500', '700', '1100', '1300', '1700', '1900'];
+      const times = [
+        "200",
+        "300",
+        "500",
+        "700",
+        "1100",
+        "1300",
+        "1700",
+        "1900",
+      ];
       times.forEach((time) => {
         addUtilities({
           [`.animate-delay-${time}`]: {
-            '--animation-delay': `${time}ms`,
+            "--animation-delay": `${time}ms`,
           },
         });
       });
       times.forEach((time) => {
         addUtilities({
           [`.animate-duration-${time}`]: {
-            '--animation-duration': `${time}ms`,
+            "--animation-duration": `${time}ms`,
           },
         });
       });
       addUtilities({
         [`.animate-distance-from-right`]: {
-          '--animation-distance': `100%`,
+          "--animation-distance": `100%`,
         },
         [`.animate-distance-from-left`]: {
-          '--animation-distance': `-100%`,
+          "--animation-distance": `-100%`,
         },
       });
       addUtilities({
         [`.animate-fade-in`]: {
-          animation: 'fade-in var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards ease-in-out',
-          '@keyframes fade-in': {
-            '0%': { opacity: 0 },
-            '100%': { opacity: 1 },
+          animation:
+            "fade-in var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards ease-in-out",
+          "@keyframes fade-in": {
+            "0%": { opacity: 0 },
+            "100%": { opacity: 1 },
+          },
+        },
+        [`.animate-fade-out`]: {
+          animation:
+            "fade-out var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards ease-in-out",
+          "@keyframes fade-out": {
+            "0%": { opacity: 1 },
+            "100%": { opacity: 0 },
           },
         },
       });
       addUtilities({
         [`.animate-slide-y-in`]: {
-          animation: 'slide-y-in var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards ease-in-out',
-          '@keyframes slide-y-in': {
-            '0%': { transform: 'translateY(var(--animation-distance, 100%))' },
-            '100%': { transform: 'translateY(0)' },
+          animation:
+            "slide-y-in var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards ease-in-out",
+          "@keyframes slide-y-in": {
+            "0%": { transform: "translateY(var(--animation-distance, 100%))" },
+            "100%": { transform: "translateY(0)" },
+          },
+        },
+        [`.animate-slide-y-out`]: {
+          animation:
+            "slide-y-out var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards ease-in-out",
+          "@keyframes slide-y-out": {
+            "0%": { transform: "translateY(0)" },
+            "100%": {
+              transform: "translateY(var(--animation-distance, 100%))",
+            },
           },
         },
       });
       addUtilities({
         [`.animate-slide-x-in`]: {
-          animation: 'slide-x-in var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards ease-in-out',
-          '@keyframes slide-x-in': {
-            '0%': { transform: 'translateX(var(--animation-distance, 100%))' },
-            '100%': { transform: 'translateX(0)' },
+          animation:
+            "slide-x-in var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards ease-in-out",
+          "@keyframes slide-x-in": {
+            "0%": { transform: "translateX(var(--animation-distance, 100%))" },
+            "100%": { transform: "translateX(0)" },
           },
         },
       });
       addUtilities({
         [`.animate-oscillate`]: {
-          animation: 'oscillate 3000ms var(--animation-delay, 0ms) ease-in-out infinite',
-          '@keyframes oscillate': {
-            '0%': { transform: 'translateY(0)' },
-            '50%': { transform: 'translateY(-10px)' },
-            '100%': { transform: 'translateY(0)' },
+          animation:
+            "oscillate 3000ms var(--animation-delay, 0ms) ease-in-out infinite",
+          "@keyframes oscillate": {
+            "0%": { transform: "translateY(0)" },
+            "50%": { transform: "translateY(-10px)" },
+            "100%": { transform: "translateY(0)" },
           },
         },
       });

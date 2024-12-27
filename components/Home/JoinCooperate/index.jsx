@@ -1,10 +1,6 @@
-import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import { Button, Typography } from '@mui/material';
-import { FacebookRounded } from '@mui/icons-material';
-import { useRouter } from 'next/router';
-import WramModal from '../../../shared/components/WarmModal';
 
 const GroupWrapper = styled.div`
   width: 90%;
@@ -20,9 +16,6 @@ const GroupWrapper = styled.div`
 `;
 
 const JoinCooperate = () => {
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-
   return (
     <GroupWrapper>
       <Typography

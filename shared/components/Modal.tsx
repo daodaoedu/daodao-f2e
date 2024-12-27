@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import { cn } from "@/utils/cn";
 import Portal from "./Portal";
 
@@ -6,6 +6,7 @@ interface ModalProps {
   isOpen: boolean;
   title: string;
   children: React.ReactNode;
+  describedby?: string;
   className?: string;
   keepMounted?: boolean;
   onClose: () => void;
@@ -16,12 +17,16 @@ function Modal({
   isOpen,
   title,
   children,
+  describedby,
   className,
   keepMounted = false,
   onClose,
   onRemovedDOM,
 }: ModalProps) {
+  const id = useId();
+  const modalId = `modal-${id}`;
   const [removeDOM, setRemoveDOM] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const handleKeyUp: React.KeyboardEventHandler<HTMLButtonElement> = (e) => {
     if (e.key === "Enter") {
@@ -35,6 +40,7 @@ function Modal({
     if (isOpen) {
       document.body.classList.add("overflow-y-hidden");
       setRemoveDOM(false);
+      setIsInitialized(true);
     } else {
       timer = setTimeout(() => {
         setRemoveDOM(true);
@@ -61,12 +67,16 @@ function Modal({
 
   return (
     (!removeDOM || keepMounted) && (
-      <Portal>
+      <Portal rootId={modalId}>
         <div
           className={cn(
             "fixed inset-0 z-[9999] flex items-center justify-center",
             "transition-opacity opacity-0 pointer-events-none ease-in duration-200",
-            isOpen && "opacity-100 pointer-events-auto animate-fade-in"
+            isInitialized && [
+              isOpen
+                ? "pointer-events-auto animate-fade-in"
+                : "animate-fade-out",
+            ]
           )}
         >
           <button
@@ -75,19 +85,25 @@ function Modal({
             onClick={onClose}
             onKeyUp={handleKeyUp}
           />
-          <div
+          <dialog
+            open={!removeDOM}
             className={cn(
               "fixed -bottom-4 sm:bottom-auto p-10 w-full sm:max-w-96 rounded-lg bg-white",
               "transition-transform translate-y-full ease-in duration-200",
-              isOpen && "translate-y-0 animate-slide-y-in",
+              isOpen ? "animate-slide-y-in" : "animate-slide-y-out",
               className
             )}
+            aria-labelledby={modalId}
+            aria-describedby={describedby}
           >
-            <header className="text-center text-2xl font-bold text-basic-400">
+            <header
+              id={modalId}
+              className="text-center heading-md text-basic-400"
+            >
               {title}
             </header>
             {children}
-          </div>
+          </dialog>
         </div>
       </Portal>
     )

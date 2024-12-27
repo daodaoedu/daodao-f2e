@@ -3,7 +3,6 @@ import { useReducer, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { updateUser, createUser } from '@/redux/actions/user';
 import { z } from 'zod';
-import { useAuthDispatch } from '@/contexts/Auth';
 
 const initialState = {
   name: '',
@@ -115,7 +114,6 @@ const userReducer = (state, payload) => {
 const useEditProfile = () => {
   const reduxDispatch = useDispatch();
   const [userState, stateDispatch] = useReducer(userReducer, initialState);
-  const authDispatch = useAuthDispatch();
   const [errors, setErrors] = useState({});
   const refs = useRef({});
 

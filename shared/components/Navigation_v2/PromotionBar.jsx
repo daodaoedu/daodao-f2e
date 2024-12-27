@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import Link from 'next/link';
 
@@ -34,10 +33,12 @@ const PromotionBarWrapper = styled.div`
   justify-content: center;
   align-items: center;
   font-size: 16px;
-  min-height: 64px;
-  a:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+  
+  @media (hover: hover) {
+    a:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
   }
 `;
 
@@ -73,7 +74,7 @@ const CloseButton = styled.span`
   }
 `;
 
-const PromotionBar = ({ isShow, link, text, toggleAction }) => {
+const PromotionBar = ({ isShow, text, toggleAction }) => {
   return (
     <>
       {isShow && (

@@ -1,12 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from 'react';
 import styled from '@emotion/styled';
-// import { css } from "@emotion/react";
-import { Box, Paper, Typography, Stack, Avatar } from '@mui/material';
-
-const LineWrapper = styled(Typography)`
-  margin: 5px 0;
-`;
+import { Typography } from '@mui/material';
 
 const SectionWrapper = styled.section`
   margin: 20px 0;

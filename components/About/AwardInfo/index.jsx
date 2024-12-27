@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-// import { css } from "@emotion/react";
-import { Box, Paper, Typography, Stack, Avatar } from '@mui/material';
+import { Typography, Stack } from '@mui/material';
 
 const LinkWrapper = styled.a`
   color: black;

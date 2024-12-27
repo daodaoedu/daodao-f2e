@@ -211,12 +211,12 @@ export default function ConfirmForm({
   setCurrentStep,
   currentStep,
 }) {
-  const [hasClickSubmitButton, setHasClickSubmitButton] = useState(false);
+  const [/** hasClickSubmitButton */, setHasClickSubmitButton] = useState(false);
   const reduxDispatch = useDispatch();
   const marathonState = useSelector((state) => { return state.marathon; });
   const userState = useSelector((state) => { return state.user; });
   const token = useSelector((state) => { return state.user.token; });
-  const [newMarathon, setNewMarathon] = useState(reduxInitMarathonState);
+  const [/** newMarathon */, setNewMarathon] = useState(reduxInitMarathonState);
   const router = useRouter();
   const { openLoginModal } = useAuthDispatch();
   const [user, setUser] = useState({
@@ -242,7 +242,11 @@ export default function ConfirmForm({
       let userEdu = userState?.educationStage;
 
       if (userState?.location?.length > 1) {
-        userLocation = userState?.location.split('@')[1];
+        if (userState?.location.includes('@')) {
+          userLocation = userState?.location.split('@')[1];
+        } else {
+          userLocation = userState?.location;
+        }
       }
 
       if (userState?.roleList?.length) {
@@ -338,7 +342,7 @@ export default function ConfirmForm({
         <StyledDivider />
         <StyledSectionTitle component="h3">學習動機</StyledSectionTitle>
         <StyledTags sx={{ marginBottom: '8px' }}>
-          {marathonState?.motivation?.tags?.map((tag, _i) => {
+          {marathonState?.motivation?.tags?.map((tag) => {
             return (
               <div className="tag" key={tag}>
                 <span>{tag}</span>
@@ -356,7 +360,7 @@ export default function ConfirmForm({
         <StyledDivider />
         <StyledSectionTitle component="h3">學習方法與策略</StyledSectionTitle>
         <StyledTags sx={{ marginBottom: '8px' }}>
-          {marathonState?.strategies?.tags.map((tag, _i) => {
+          {marathonState?.strategies?.tags.map((tag) => {
             return (
               <div className="tag" key={tag}>
                 <span>{tag}</span>
@@ -388,7 +392,7 @@ export default function ConfirmForm({
       <StyledSection sx={{ mt: '16px' }}>
         <StyledSectionTitle component="h3">學習成果及呈現方式</StyledSectionTitle>
         <StyledTags sx={{ marginBottom: '8px' }}>
-          {marathonState?.outcomes?.tags?.map((tag, _i) => {
+          {marathonState?.outcomes?.tags?.map((tag) => {
             return (
               <div className="tag" key={tag}>
                 <span>{tag}</span>
@@ -471,7 +475,7 @@ export default function ConfirmForm({
                   夥伴的 Email
                 </Typography>
                 {
-                  marathonState.pricing.email.map((email, _i) => {
+                  marathonState.pricing.email.map((email) => {
                     return (
                       <Box
                         sx={{

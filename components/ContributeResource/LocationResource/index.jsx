@@ -1,6 +1,5 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 const LearningResource = () => {
   return (

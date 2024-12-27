@@ -69,7 +69,7 @@ export default function MultiSelectDropdown({
         }}
       >
         {
-          listItems.map((item, index) => {
+          listItems.map((item) => {
             return (
               <StyledMenuItem
                 key={item}

@@ -1,7 +1,4 @@
 import { DarkMode, LightMode } from '@mui/icons-material';
-import React, { useCallback } from 'react';
-import { useRouter } from 'next/router';
-import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeMode } from '../../../redux/actions/theme';

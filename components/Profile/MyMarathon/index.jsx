@@ -50,7 +50,7 @@ const MyMarathon = ({ title, sx }) => {
       )}
       <Grid container spacing={1} rowGap={2}>
         {marathons.length > 0 && (
-            marathons.map((marathon, _i) => {
+            marathons.map((marathon) => {
               return (
                 <Grid item sx={{ width: '100%' }}>
                   <MarathonCard

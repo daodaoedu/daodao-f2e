@@ -33,7 +33,7 @@ const StyledMenuItem = styled(MenuItem)`
   `}
 `;
 
-const MarathonList = ({ onCloseMenu = () => {}, user }) => {
+const MarathonList = ({ onCloseMenu = () => {} }) => {
   const isPadScreen = useMediaQuery('(max-width: 767px)');
   const [isOpenMenu, setIsOpenMenu] = useState(null);
   const router = useRouter();

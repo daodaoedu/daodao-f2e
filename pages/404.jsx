@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import { Typography, Button, Paper } from '@mui/material';
 import { FacebookRounded } from '@mui/icons-material';
 import Chip from '@mui/material/Chip';
 import { useRouter } from 'next/router';
-import Navigatin from '../shared/components/Navigation_v2';
-import Footer from '../shared/components/Footer_v2';
-import { COLOR_TABLE } from '../constants/notion';
-import { CATEGORIES } from '../constants/category';
-import RelatedResources from '../shared/components/RelatedResources';
+import Navigatin from '@/shared/components/Navigation_v2';
+import Footer from '@/shared/components/Footer_v2';
+import { COLOR_TABLE } from '@/constants/notion';
+import { CATEGORIES } from '@/constants/category';
+import RelatedResources from '@/shared/components/RelatedResources';
+import { getRedirectionStorage } from '@/utils/storage';
 
 const BodyWrapper = styled.div`
   background-color: #f5f5f5;
@@ -17,6 +18,11 @@ const BodyWrapper = styled.div`
 
 const NotExistPage = () => {
   const router = useRouter();
+
+  useEffect(() => {
+    getRedirectionStorage().remove();
+  }, []);
+
   return (
     <Paper
       sx={{

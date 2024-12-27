@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import dayjs from 'dayjs';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import {
@@ -11,7 +9,7 @@ import {
   Typography
 } from '@mui/material';
 import EditSubMilestone from './EditSubMilestone';
-import { ISOToWeekday, weekdayToISO } from './dateMap';
+import { ISOToWeekday } from './dateMap';
 
 const FixedLabel = styled(Typography)`
   font-size: 14px;
@@ -143,7 +141,7 @@ export default function SubMilestonePanel({
   onDelete,
   isDisabled = false
 }) {
-  const [newMilestone, setNewMilestone] = useState({});
+  const [/** newMilestone */, setNewMilestone] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const formattedWeekdays = subMilestone.dates
     .map((ISODate) => ISOToWeekday(ISODate))

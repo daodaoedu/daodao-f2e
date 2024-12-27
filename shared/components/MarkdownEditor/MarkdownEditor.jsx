@@ -85,7 +85,7 @@ function InternalMarkdownEditor(
           }
           return true;
         })
-        .map(([_, plugin]) => plugin),
+        .map(([, plugin]) => plugin),
     [markdown.current]
   );
 

@@ -1,15 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
-import { Button, Paper, Box, Stack, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { css } from '@emotion/react';
-import { DiscussionEmbed, Recommendations, CommentEmbed } from 'disqus-react';
-import { Share } from '@mui/icons-material';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import toast from 'react-hot-toast';
-import appendQuery from 'append-query';
+import { DiscussionEmbed } from 'disqus-react';
 import Shares from './Shares';
-import { postFetcher } from '../../utils/fetcher';
 import Tags from './Tags';
 import RelatedResources from '../../shared/components/RelatedResources';
 import Desc from './Desc';

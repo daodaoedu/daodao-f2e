@@ -4,7 +4,6 @@ import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import { useSearchParams } from 'next/navigation';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchMarathonProfileByUserEvent
@@ -29,8 +28,6 @@ import {
 } from '@mui/material';
 
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import Fields from '@/components/Group/Form/Fields';
 import useEditProfile from './useEditProfile';
 import ErrorMessage from './ErrorMessage';
@@ -38,8 +35,6 @@ import ErrorMessage from './ErrorMessage';
 import TheAvator from './TheAvator';
 import FormInput from './EditFormInput';
 import {
-  FormWrapper,
-  ContentWrapper,
   StyledGroup,
   StyledSelectWrapper,
   StyledSelectBox,
@@ -50,7 +45,6 @@ import {
   StyledSection,
   StyledButtonGroup,
   StyledButton,
-  MarathonSignUpWrapper,
 } from './Edit.styled';
 
 export default function UserProfileForm({
@@ -61,7 +55,6 @@ export default function UserProfileForm({
   const reduxDispatch = useDispatch();
   const mobileScreen = useMediaQuery('(max-width: 767px)');
   const [isSetting, setIsSetting] = useState(false);
-  const router = useRouter();
   const searchParams = useSearchParams();
   const check = searchParams.get('check');
   const [hasClickNextStep, setHasClickNextStep] = useState(false);

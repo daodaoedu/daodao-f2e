@@ -9,32 +9,11 @@ import {
   Button,
   CircularProgress,
   IconButton,
-  Typography,
   Box,
 } from '@mui/material';
-import { Clear as ClearIcon, Mic as MicIcon } from '@mui/icons-material';
+import { Clear as ClearIcon } from '@mui/icons-material';
 import styled from '@emotion/styled';
-// import { CentralBlock, HorizontalBlock } from "./general";
 import useUnchanger from '../../../hooks/useUnchanger';
-// import { speech as i18n } from "../i18n";
-// en - US;
-// eslint-disable-next-line react/display-name
-// const HorizontalBlock = forwardRef(({ children = <></>, minWidth = 0, style = {}, Tag = "div", width = "auto", ...otherProps }, ref) => {
-//   return (
-//     <Tag
-//       sx={{
-//         alignItems: "center",
-//         display: "flex",
-//         justifyContent: "space-between",
-//       }}
-//       ref={ref}
-//       style={{ minWidth, width, ...style }}
-//       {...otherProps}
-//     >
-//       {children}
-//     </Tag>
-//   );
-// });
 
 const pulse = keyframes`
     0% {

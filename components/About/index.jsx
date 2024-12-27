@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { Box, Paper, Typography, Stack, Avatar } from '@mui/material';
-import Tooltip from '@mui/material/Tooltip';
+import { Paper } from '@mui/material';
 import AboutUs from './AboutUs';
 import RealizeMore from './RealizeMore';
 import RelatedReport from './RelatedReport';

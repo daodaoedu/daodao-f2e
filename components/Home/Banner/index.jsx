@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import styled from '@emotion/styled';
 import { Box, Button, Typography } from '@mui/material';
-import Typed from 'react-typed';
 import SearchField from '../SearchField';
 import BannerVideo from '../BannerVideo';
 import Title from './Title';

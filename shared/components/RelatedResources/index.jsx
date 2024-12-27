@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect } from 'react';
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
 import { useRouter } from 'next/router';
-import { Button, Paper, Box, Stack, Typography, Skeleton } from '@mui/material';
+import { Skeleton } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import Marquee from 'react-fast-marquee';
 import { loadRelatedResources } from '../../../redux/actions/resource';

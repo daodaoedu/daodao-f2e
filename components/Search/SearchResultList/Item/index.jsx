@@ -1,14 +1,11 @@
 import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
-import { css, keyframes } from '@emotion/react';
-import Link from 'next/link';
-import { Typography, Box } from '@mui/material';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import Tags from './Tags';
 import LogoImage from './LogoImage';
 import Contributors from './Contributors';
-// import { TikTokFont } from '../../../../shared/styles/css';
+
 dayjs.extend(isBetween);
 
 const ItemWrapper = styled.li`
@@ -26,25 +23,6 @@ const ContentWrapper = styled.article`
   }
 `;
 
-const ImageWrapper = styled.div`
-  width: 200px;
-  height: 200px;
-  border-radius: 20px;
-  background-color: #f5f5f5;
-  ${({ image }) => css`
-    background-image: ${`url(${image})`};
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-  `}
-  /* object-fit: cover; */
-  /* opacity: 0; */
-
-  @media (max-width: 767px) {
-    width: 100px;
-    height: 100px;
-  }
-`;
 const TitleWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;

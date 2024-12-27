@@ -98,8 +98,10 @@ const useScrollPaddingTop = () => {
     };
 
     handleScrollPaddingTop();
+    window.addEventListener('resize', handleScrollPaddingTop);
     window.addEventListener('storage', handleStorage);
     return () => {
+      window.removeEventListener('resize', handleScrollPaddingTop);
       window.removeEventListener('storage', handleStorage);
     };
   }, []);
@@ -179,7 +181,7 @@ const Sidebar = ({ onClickSignupButton }) => {
               <Link
                 href={item.href}
                 className={cn(
-                  "block body-lg font-medium p-2.5 rounded-lg text-basic-400 transition-colors duration-300",
+                  "block text-base font-medium p-2.5 rounded-lg text-basic-400 transition-colors duration-300",
                   activeSection === item.href.replace('#', '') && 'text-primary-base bg-primary-lightest',
                 )}
               >
@@ -224,9 +226,9 @@ const Nav = () => {
     <nav className="sticky z-10 bg-basic-100 text-nowrap overflow-x-auto" style={{ top: `${scrollPaddingTop}px` }}>
       <ul className="max-w-[750px] mx-auto flex justify-between gap-4">
         {navItems.map((item) => (
-          <li key={item.label}>
+          <li key={item.label} className="shrink-0">
             {item.disabled ? (
-              <span className="block text-basic-300 cursor-not-allowed body-sm font-medium p-4">
+              <span className="block p-4 text-nowrap text-basic-300 cursor-not-allowed body-sm font-medium">
                 {item.label}
               </span>
             ) : (
@@ -235,7 +237,7 @@ const Nav = () => {
                 target={item.external ? '_blank' : '_self'}
                 rel={item.external ? 'noopener noreferrer' : ''}
                 className={cn(
-                  'relative block text-primary-base body-sm font-medium p-4 flex items-center gap-1',
+                  'relative p-4 flex items-center gap-1 text-primary-base body-sm font-medium text-nowrap',
                   item.active && 'before:content-[""] before:absolute before:bottom-2.5 before:left-4 before:right-4 before:h-[2px] before:bg-primary-base',
                 )}
               >
@@ -252,7 +254,7 @@ const Nav = () => {
 
 const Section = ({ title, id, className, children, withContainer = true }) => (
   <section className={cn("py-8 px-6 md:py-[100px] body-md text-basic-400", className)}>
-    <div className={cn(withContainer && "max-w-[750px] mx-auto lg:mr-12 min-[1100px]:mr-24 min-[1180px]:mr-auto")}>
+    <div className={cn(withContainer && "max-w-[750px] mx-auto lg:ml-56 lg:mr-12 xl:mx-auto")}>
       {title && <h2 className="heading-md text-basic-500" id={id}>{title}</h2>}
       {children}
     </div>
@@ -340,10 +342,10 @@ const LearningMarathon = () => {
           </List>
           <p className="mb-5">
             如果你有些想做的計畫，正在等待個契機開始，現在就是時候。<br />
-            五個月的馬拉松後，你將會在計畫過程中「豐富知識經驗、在學習中形塑自我、為生活與社會帶來實際行動」，而最終的成果發表你還有機會獲得獎助金。
+            五個月的馬拉松後，你將會在計畫過程中「豐富知識經驗、在學習中形塑自我、為生活與社會帶來實際行動」，完賽不僅全額退費還有機會獲得獎助金。
           </p>
           <p>
-            島島盃 2025 春季學習馬拉松，將以學習者以自我需求出發設計學習計畫，開啟一趟自我導向學習馬拉松，往哪跑？怎麼跑？跑多快？終點在哪由你決定，島島阿學陪你一起跑。<br />
+            島島盃 2025 春季學習馬拉松，將以學習者的自我需求出發設計學習計畫，開啟一趟自我導向學習馬拉松，往哪跑？怎麼跑？跑多快？終點在哪由你決定，島島阿學陪你一起跑。<br />
             邀請你一起「為自己重新打造喜歡的學習生活」，把自主學習變成一種生活方式，並在彼此陪伴下，成就自我與他人。
           </p>
         </Section>
@@ -413,20 +415,20 @@ const LearningMarathon = () => {
           className="bg-white"
         >
           <p className="mt-3 mb-8">
-            在學習馬拉松尾聲，針對入選的 20 位學員，島島阿學將舉辦成果分享日，並邀請引導師及入選者作為評審，更提供總獎金 NT$ 2,5000元 支持優秀計畫持續發展！
+            在學習馬拉松尾聲，針對入選的 20 位學員，島島阿學將舉辦成果分享日，並邀請引導師及入選者作為評審，更提供總獎金 NT$ 25,000元 支持優秀計畫持續發展！
           </p>
           <h3 className="body-md text-black font-medium mb-3">獎勵</h3>
           <List className="mb-5">
             <li>為鼓勵學員的努力與支持持續發展，成果發表將選出 12 位學員，每位皆可獲得獎金、獎狀，以及島島阿學專訪與媒體曝光。計劃設有多層級獎項，涵蓋「學習達人獎」、「潛力無限獎」及「人氣獎」，具體分配如下：</li>
             <List>
               <li>
-                [1 名] 學習達人獎：5000 元＋獎狀＋專訪
+                [1 名] 學習達人獎：5,000 元＋獎狀＋專訪
               </li>
               <li>
-                [10 名] 潛力無限獎：2000 元＋獎狀＋專訪
+                [10 名] 潛力無限獎：2,000 元＋獎狀＋專訪
               </li>
               <li>
-                [2 名] 人氣獎：1000 元＋獎狀
+                [2 名] 人氣獎：1,000 元＋獎狀
               </li>
               <li>不論獲獎與否，所有學員皆會有參賽證明</li>
             </List>

@@ -2,11 +2,6 @@ import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import { Typography, Button } from '@mui/material';
-import { FacebookRounded } from '@mui/icons-material';
-import Chip from '@mui/material/Chip';
-import { useRouter } from 'next/router';
-import { COLOR_TABLE } from '../../../constants/notion';
-import { CATEGORIES } from '../../../constants/category';
 import SurveyModal from '../../../shared/components/SurveyModal';
 
 const GuideWrapper = styled.div`
@@ -31,7 +26,6 @@ const GuideWrapper = styled.div`
 `;
 
 const WishResource = () => {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   return (

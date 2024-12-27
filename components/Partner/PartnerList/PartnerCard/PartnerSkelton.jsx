@@ -21,7 +21,7 @@ const PartnerSkelton = () => {
         <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
       </Stack>
       <Stack direction="row">
-        {new Array(3).fill(0).map((_, idx) => (
+        {new Array(3).fill(0).map(() => (
           <Skeleton
             variant="rounded"
             width={60}
