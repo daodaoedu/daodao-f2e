@@ -5,6 +5,7 @@ import SEOConfig from '../../shared/components/SEO';
 import Partner from '../../components/Partner';
 import Navigation from '../../shared/components/Navigation_v2';
 import Footer from '../../shared/components/Footer_v2';
+import { NavigationProvider } from '@/contexts/Navigation';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -57,7 +58,9 @@ function PartnerPage() {
 PartnerPage.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
-      <Navigation />
+      <NavigationProvider>
+        <Navigation />
+      </NavigationProvider>
       {children}
       <Footer />
     </HomePageWrapper>

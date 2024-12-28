@@ -6,6 +6,7 @@ import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 import { Box, Typography, Button } from "@mui/material";
 import emailImg from '@/public/assets/mail.png';
+import { NavigationProvider } from '@/contexts/Navigation';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -175,7 +176,9 @@ const LearningMarathonSignUp = () => {
 LearningMarathonSignUp.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
-      <Navigation />
+      <NavigationProvider>
+        <Navigation />
+      </NavigationProvider>
       {children}
       <Footer />
     </HomePageWrapper>

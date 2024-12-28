@@ -14,6 +14,7 @@ import MyGroup from '@/components/Profile/MyGroup';
 import MyMarathon from '@/components/Profile/MyMarathon';
 import AccountSetting from '@/components/Profile/Accountsetting';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { NavigationProvider } from '@/contexts/Navigation';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -178,7 +179,9 @@ const ProfilePage = () => {
 ProfilePage.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
-      <Navigation />
+      <NavigationProvider>
+        <Navigation />
+      </NavigationProvider>
       {children}
       <Footer />
     </HomePageWrapper>

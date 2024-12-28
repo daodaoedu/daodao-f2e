@@ -15,6 +15,7 @@ import UserProfileForm from '@/components/Marathon/SignUp/UserProfileForm';
 import MarathonForm from '@/components/Marathon/SignUp/MarathonForm';
 import ConfirmForm from '@/components/Marathon/SignUp/ConfirmForm';
 import { ProtectedComponent } from '@/contexts/Auth';
+import { NavigationProvider } from '@/contexts/Navigation';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -129,7 +130,9 @@ const LearningMarathonSignUp = () => {
 LearningMarathonSignUp.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
-      <Navigation />
+      <NavigationProvider>
+        <Navigation />
+      </NavigationProvider>
       {children}
       <Footer />
     </HomePageWrapper>

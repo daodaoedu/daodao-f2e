@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import styled from '@emotion/styled';
 import { AppBar } from '@mui/material';
 import MainNav from './MainNav';
 import PromotionBar from './PromotionBar';
+import { NavigationProvider, useNavigation } from '@/contexts/Navigation';
 
 export const NavigationWrapper = styled(AppBar)(({ hasPromote }) => ({
   display: 'flex',
@@ -31,7 +32,7 @@ const texts = [
 
 // 問卷 https://docs.google.com/forms/d/e/1FAIpQLSeyU9-Q-kIWp5uutcik3h-RO4o5VuG6oG0m-4u1Ua18EOu3aw/viewform
 const Navigation = () => {
-  const [showPromotetionBar, setShowPromotionBar] = useState(true);
+  const { showPromotionBar, setShowPromotionBar, headerHeight } = useNavigation();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -42,22 +43,16 @@ const Navigation = () => {
     return () => clearInterval(interval);
   }, [texts.length]);
 
-  useEffect(() => {
-    // TODO: 先暫存 localStorage ，後續需要調整，不然 header 高度一直變
-    localStorage.setItem('isShowPromotionBar', showPromotetionBar);
-    window.dispatchEvent(new Event('storage'));
-  }, [showPromotetionBar]);
-
   return (
     <>
-      <NavigationWrapper position="sticky" hasPromote={showPromotetionBar}>
+      <NavigationWrapper position="sticky" hasPromote={showPromotionBar}>
         <PromotionBar
-          isShow={showPromotetionBar}
+          isShow={showPromotionBar}
           link="https://ocf.tw/p/daodao/"
           text={texts[currentIndex]}
           toggleAction={setShowPromotionBar}
         />
-        <MainNav height={showPromotetionBar ? '128px' : '64px'} />
+        <MainNav height={headerHeight} />
       </NavigationWrapper>
     </>
   );
