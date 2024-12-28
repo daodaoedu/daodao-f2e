@@ -170,9 +170,14 @@ export default function MarathonForm({
     }
   };
 
+  /**
+   * @param {string} name - The name of the field to validate.
+   * @param {*} input - The input value to validate.
+   * @returns {boolean} - Returns true if the input value passes validation, otherwise false.
+   */
   const handleValidate = (name, input) => {
-    const validateResult = validateRules[name]?.validate(input);
-    const errorMessage = validateRules[name]?.message;
+    const validateResult = marathonDataMap[name]?.validate(input);
+    const errorMessage = marathonDataMap[name]?.message;
     if (validateResult) {
       setErrors((prevErrors) =>
         Object.fromEntries(Object.entries(prevErrors).filter(([key]) => key !== name))
@@ -188,19 +193,21 @@ export default function MarathonForm({
     return validateResult;
   };
   const handleOnChange = (
-    stateDispatchType,
-    stateDispatchKey,
+    name,
     value,
-    validateName,
   ) => {
-    if (stateDispatchType && stateDispatchKey) {
+    const type = marathonDataMap[name]?.dispatchType;
+    const key = marathonDataMap[name]?.dispatchKey;
+
+    if (type && key) {
       setNewMarathon({
-        type: stateDispatchType,
-        payload: { key: stateDispatchKey, value }
+        type,
+        payload: { key, value }
       });
     }
-    if (validateName) {
-      handleValidate(validateName, value);
+
+    if (name) {
+      handleValidate(name, value);
     }
   };
   useEffect(() => {
@@ -264,7 +271,7 @@ export default function MarathonForm({
             title="學習主題名稱"
             value={newMarathon.title || ''}
             onChange={(e) => {
-              handleOnChange('UPDATE_FIELD', 'title', e.target.value, 'title');
+              handleOnChange('title', e.target.value);
             }}
             sx={{
               mb: '8px',
@@ -297,7 +304,7 @@ export default function MarathonForm({
             <StyledTextareaAutosize
               value={newMarathon.description || ''}
               onChange={(e) => {
-                handleOnChange('UPDATE_FIELD', 'description', e.target.value, 'description');
+                handleOnChange('description', e.target.value);
               }}
               placeholder="範例：因為對剪影片和當 Youtuber 有興趣，我預計會研究搞笑型 Youtuber 的影片腳本與剪輯方式、拍攝我日常生活及練習剪輯，並建立 Youtube 頻道上傳影片。希望能藉此了解如何當一位 Youtuber。"
               className={errors.description ? 'error' : ''}
@@ -350,7 +357,7 @@ export default function MarathonForm({
             />
             <StyledTextareaAutosize
               onChange={(e) => {
-                handleOnChange('UPDATE_MOTIVATION_FIELD', 'description', e.target.value, 'motivationDescription');
+                handleOnChange('motivationDescription', e.target.value);
               }}
               className={errors.motivationDescription ? 'error' : ''}
               value={newMarathon?.motivation?.description || ''}
@@ -379,7 +386,7 @@ export default function MarathonForm({
             </Typography>
             <StyledTextareaAutosize
               onChange={(e) => {
-                handleOnChange('UPDATE_FIELD', 'goals', e.target.value, 'goals');
+                handleOnChange('goals', e.target.value);
               }}
               value={newMarathon.goals || ''}
               placeholder="範例：
@@ -410,7 +417,7 @@ export default function MarathonForm({
             </Typography>
             <StyledTextareaAutosize
               onChange={(e) => {
-                handleOnChange('UPDATE_FIELD', 'content', e.target.value, 'content');
+                handleOnChange('content', e.target.value);
               }}
               value={newMarathon.content || ''}
               placeholder="範例：
@@ -469,7 +476,7 @@ export default function MarathonForm({
             />
             <StyledTextareaAutosize
               onChange={(e) => {
-                handleOnChange('UPDATE_STRATEGIES_FIELD', 'description', e.target.value, 'strategiesDescription');
+                handleOnChange('strategiesDescription', e.target.value);
               }}
               value={newMarathon?.strategies?.description || ''}
               placeholder="範例：我預計會研究影片腳本、拍攝與剪輯方式，接著了解拍攝、剪輯與Youtube頻道經營，並同時練習拍攝與剪輯，開始經營頻道。我會用notion整理我收集到的資料以及筆記。"
@@ -502,7 +509,7 @@ export default function MarathonForm({
               placeholder="範例：YouTube 創作者的實用資源"
               value={newMarathon.resources || ''}
               onChange={(e) => {
-                handleOnChange('UPDATE_FIELD', 'resources', e.target.value, 'resources');
+                handleOnChange('resources', e.target.value);
               }}
               className={errors.resources ? 'error' : 'warning'}
               endAdornment={errors.resources ? <ClearIcon sx={{ color: '#EF5364' }} /> : null}
@@ -570,7 +577,7 @@ export default function MarathonForm({
         />
         <StyledTextareaAutosize
           onChange={(e) => {
-            handleOnChange('UPDATE_OUTCOMES_FIELD', 'description', e.target.value, 'outcomesDescription');
+            handleOnChange('outcomesDescription', e.target.value);
           }}
           value={newMarathon?.outcomes?.description || ''}
           placeholder="範例：我預計會架設一個Youtube頻道，並上傳至少5支影片，並整理觀眾回饋與相關數據。"
