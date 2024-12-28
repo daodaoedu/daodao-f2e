@@ -4,7 +4,7 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 
-export const StyledSaveBar = styled(Box)`
+export const StyledStepperBar = styled(Box)`
   background-color: #FFF;
   padding: 15px 6.9vw;
   display: flex;
@@ -58,9 +58,9 @@ export const StyledSaveBar = styled(Box)`
   }
 `;
 
-export default function SaveBar({ currentStep }) {
+export default function StepperBar({ currentStep }) {
   return (
-    <StyledSaveBar>
+    <StyledStepperBar>
       <div className="top">
         <h2>申請參加學習馬拉松</h2>
       </div>
@@ -77,6 +77,6 @@ export default function SaveBar({ currentStep }) {
           </Step>
         </Stepper>
       </div>
-    </StyledSaveBar>
+    </StyledStepperBar>
   );
 }
