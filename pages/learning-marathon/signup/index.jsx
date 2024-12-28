@@ -101,9 +101,14 @@ const LearningMarathonSignUp = () => {
     });
   }, [currentStep]);
   return (
+    <>
+    <NavigationProvider>
+      <Navigation>
+        {<StepperBar currentStep={currentStep} />}
+      </Navigation>
+    </NavigationProvider>
     <ProtectedComponent redirectOnCancel="/learning-marathon" onlyCheckToken>
       <SEOConfig data={SEOData} />
-      <StepperBar currentStep={currentStep} />
       <FormWrapper sx={{
         background: 'linear-gradient(0deg, #F3FCFC 0%, #F3FCFC 100%), #F7F8FA'
       }}
@@ -124,15 +129,13 @@ const LearningMarathonSignUp = () => {
         </LocalizationProvider>
       </FormWrapper>
     </ProtectedComponent>
+    </>
   );
 };
 
 LearningMarathonSignUp.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
-      <NavigationProvider>
-        <Navigation />
-      </NavigationProvider>
       {children}
       <Footer />
     </HomePageWrapper>

@@ -31,7 +31,7 @@ const texts = [
 ];
 
 // 問卷 https://docs.google.com/forms/d/e/1FAIpQLSeyU9-Q-kIWp5uutcik3h-RO4o5VuG6oG0m-4u1Ua18EOu3aw/viewform
-const Navigation = () => {
+const Navigation = ({ children }) => {
   const { showPromotionBar, setShowPromotionBar, headerHeight } = useNavigation();
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -54,6 +54,7 @@ const Navigation = () => {
         />
         <MainNav height={headerHeight} />
       </NavigationWrapper>
+      {children}
     </>
   );
 };
