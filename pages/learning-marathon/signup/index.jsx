@@ -102,33 +102,33 @@ const LearningMarathonSignUp = () => {
   }, [currentStep]);
   return (
     <>
-    <NavigationProvider>
-      <Navigation>
-        {<StepperBar currentStep={currentStep} />}
-      </Navigation>
-    </NavigationProvider>
-    <ProtectedComponent redirectOnCancel="/learning-marathon" onlyCheckToken>
-      <SEOConfig data={SEOData} />
-      <FormWrapper sx={{
-        background: 'linear-gradient(0deg, #F3FCFC 0%, #F3FCFC 100%), #F7F8FA'
-      }}
-      >
-        <LocalizationProvider
-          dateAdapter={AdapterDayjs}
+      <NavigationProvider>
+        <Navigation>
+          {<StepperBar currentStep={currentStep} />}
+        </Navigation>
+      </NavigationProvider>
+      <ProtectedComponent redirectOnCancel="/learning-marathon" onlyCheckToken>
+        <SEOConfig data={SEOData} />
+        <FormWrapper sx={{
+          background: 'linear-gradient(0deg, #F3FCFC 0%, #F3FCFC 100%), #F7F8FA'
+        }}
         >
-          <ContentWrapper sx={{ minHeight: '100vh' }}>
-            {
-              currentStep === 0 ? (
-                <UserProfileForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
-              ) : currentStep === 1 ? (
-                <MarathonForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
-              ) : <ConfirmForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
-            }
+          <LocalizationProvider
+            dateAdapter={AdapterDayjs}
+          >
+            <ContentWrapper sx={{ minHeight: '100vh' }}>
+              {
+                currentStep === 0 ? (
+                  <UserProfileForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
+                ) : currentStep === 1 ? (
+                  <MarathonForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
+                ) : <ConfirmForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
+              }
 
-          </ContentWrapper>
-        </LocalizationProvider>
-      </FormWrapper>
-    </ProtectedComponent>
+            </ContentWrapper>
+          </LocalizationProvider>
+        </FormWrapper>
+      </ProtectedComponent>
     </>
   );
 };

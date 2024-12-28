@@ -1,9 +1,9 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { AppBar } from '@mui/material';
 import MainNav from './MainNav';
 import PromotionBar from './PromotionBar';
-import { NavigationProvider, useNavigation } from '@/contexts/Navigation';
+import { useNavigation } from '@/contexts/Navigation';
 
 export const NavigationWrapper = styled(AppBar)(({ hasPromote }) => ({
   display: 'flex',
