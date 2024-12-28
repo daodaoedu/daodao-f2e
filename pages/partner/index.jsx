@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
+import { NavigationProvider } from '@/contexts/Navigation';
 import SEOConfig from '../../shared/components/SEO';
 import Partner from '../../components/Partner';
 import Navigation from '../../shared/components/Navigation_v2';
 import Footer from '../../shared/components/Footer_v2';
-import { NavigationProvider } from '@/contexts/Navigation';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);

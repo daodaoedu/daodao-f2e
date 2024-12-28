@@ -104,7 +104,7 @@ const LearningMarathonSignUp = () => {
     <>
       <NavigationProvider>
         <Navigation>
-          {<StepperBar currentStep={currentStep} />}
+          <StepperBar currentStep={currentStep} />
         </Navigation>
       </NavigationProvider>
       <ProtectedComponent redirectOnCancel="/learning-marathon" onlyCheckToken>
