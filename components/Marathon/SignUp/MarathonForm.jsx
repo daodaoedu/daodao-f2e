@@ -110,42 +110,61 @@ export default function MarathonForm({
       return names.length === milestonesLength;
     }
   };
-  const validateRules = {
+
+  const marathonDataMap = {
     title: {
+      dispatchType: 'UPDATE_FIELD',
+      dispatchKey: 'title',
       validate: validators.required,
       message: '請填寫表格',
     },
     description: {
+      dispatchType: 'UPDATE_FIELD',
+      dispatchKey: 'description',
       validate: validators.required,
       message: '請填寫計畫敘述',
     },
     motivationDescription: {
+      dispatchType: 'UPDATE_MOTIVATION_FIELD',
+      dispatchKey: 'description',
       validate: validators.required,
       message: '請填寫學習動機',
     },
     outcomesDescription: {
+      dispatchType: 'UPDATE_OUTCOMES_FIELD',
+      dispatchKey: 'description',
       validate: validators.required,
       message: '請填寫學習成果',
     },
     goals: {
+      dispatchType: 'UPDATE_FIELD',
+      dispatchKey: 'goals',
       validate: validators.required,
       message: '請填寫學習目標',
     },
     content: {
+      dispatchType: 'UPDATE_FIELD',
+      dispatchKey: 'content',
       validate: validators.required,
       message: '請填寫學習內容',
     },
     milestonesName: {
+      dispatchType: 'UPDATE_FIELD',
+      dispatchKey: 'milestones',
       validate: (value) => {
         return validators.allMilestonesNameRequired(value, newMarathon.milestones?.length);
       },
       message: '請填寫每週/隔週里程碑目標',
     },
     strategiesDescription: {
+      dispatchType: 'UPDATE_STRATEGIES_FIELD',
+      dispatchKey: 'description',
       validate: validators.required,
       message: '請填寫學習策略',
     },
     resources: {
+      dispatchType: 'UPDATE_FIELD',
+      dispatchKey: 'resources',
       validate: validators.required,
       message: '請填寫學習資源'
     }
