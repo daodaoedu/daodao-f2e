@@ -76,7 +76,6 @@ export default function MarathonForm({
   const reduxDispatch = useDispatch();
   const [hasLoaded, setHasLoaded] = useState(false);
   const [errors, setErrors] = useState({});
-  const [hasErrors, setHasErrors] = useState(false);
   const marathonState = useSelector((state) => { return state.marathon; });
   const localStorgeStored = window.localStorage.getItem('newMarathon');
   const editingMarathon = localStorgeStored ? JSON.parse(localStorgeStored) : null;
@@ -263,11 +262,6 @@ export default function MarathonForm({
 
   useEffect(() => {
     getMarathonErrorsStorage().set(errors);
-    if (Object.keys(errors).length) {
-      setHasErrors(true);
-    } else {
-      setHasErrors(false);
-    }
   }, [errors]);
 
   return (
