@@ -87,20 +87,6 @@ export default function MarathonForm({
   };
   const [newMarathon, setNewMarathon] = useReducer(marathonFormReducer, initialState());
 
-  const onNextStep = () => {
-    if (hasErrors) {
-      toast.error('請修正錯誤');
-    } else {
-      reduxDispatch(updateNewMarathon(newMarathon));
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const onPrevStep = () => {
-    reduxDispatch(updateNewMarathon(newMarathon));
-    setCurrentStep(currentStep - 1);
-  };
-
   const validators = {
     required: (value) => {
       return value.trim().length > 0;
@@ -192,6 +178,41 @@ export default function MarathonForm({
     }
     return validateResult;
   };
+  const handleValidateAll = () => {
+    const newErrors = {};
+    let isValid = true;
+    Object.entries(marathonDataMap).forEach(([name, fieldData]) => {
+      const { validate, message } = fieldData;
+      let input;
+      if (validate) {
+        switch (name) {
+          case 'milestonesName':
+            input = newMarathon.milestones;
+            break;
+          case 'motivationDescription':
+            input = newMarathon.motivation?.description;
+            break;
+          case 'strategiesDescription':
+            input = newMarathon.strategies?.description;
+            break;
+          case 'outcomesDescription':
+            input = newMarathon.outcomes?.description;
+            break;
+          default:
+            input = newMarathon[name];
+          break;
+        }
+        const validationPassed = validate(input);
+
+        if (!validationPassed) {
+          newErrors[name] = { message: message || "驗證失敗" };
+          isValid = false;
+        }
+      }
+    });
+    setErrors(newErrors);
+    return isValid;
+  };
   const handleOnChange = (
     name,
     value,
@@ -210,6 +231,22 @@ export default function MarathonForm({
       handleValidate(name, value);
     }
   };
+
+  const onNextStep = () => {
+    const isValid = handleValidateAll();
+    if (!isValid) {
+      toast.error('請修正錯誤');
+    } else {
+      reduxDispatch(updateNewMarathon(newMarathon));
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const onPrevStep = () => {
+    reduxDispatch(updateNewMarathon(newMarathon));
+    setCurrentStep(currentStep - 1);
+  };
+
   useEffect(() => {
     setHasLoaded(true);
     const storagedErrors = getMarathonErrorsStorage().get();
