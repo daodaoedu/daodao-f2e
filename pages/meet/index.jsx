@@ -7,7 +7,7 @@ import { Box } from '@mui/material';
 import { NavigationProvider } from '@/contexts/Navigation';
 import { PromotionProvider } from '@/contexts/Promotion';
 import SEOConfig from '../../shared/components/SEO';
-import Navigation from '../../shared/components/Navigation_v2';
+import Navigation from '../../shared/components/Navigation';
 import Footer from '../../shared/components/Footer_v2';
 // import { JitsiMeeting } from "@jitsi/react-sdk";
 

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
-import Navigation from '@/shared/components/Navigation_v2';
+import Navigation from '@/shared/components/Navigation';
 import Footer from '@/shared/components/Footer_v2';
 import { Box, Typography, Button } from "@mui/material";
 import emailImg from '@/public/assets/mail.png';
