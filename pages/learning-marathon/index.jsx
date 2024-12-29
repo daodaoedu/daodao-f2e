@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
+import { usePromotion } from '@/contexts/Promotion';
 import { GoArrowUpRight } from "react-icons/go";
 import { FaAngleUp } from "react-icons/fa6";
 
@@ -81,6 +82,7 @@ const StyledSignUpButton = styled(Button)`
 
 const useScrollPaddingTop = () => {
   const [scrollPaddingTop, setScrollPaddingTop] = useState(0);
+  const { showPromotionBar } = usePromotion();
 
   useEffect(() => {
     const handleScrollPaddingTop = () => {
@@ -90,21 +92,12 @@ const useScrollPaddingTop = () => {
       setScrollPaddingTop(headerOffset);
     };
 
-    const handleStorage = () => {
-      const isShowPromotionBar = localStorage.getItem('isShowPromotionBar');
-      if (isShowPromotionBar) {
-        handleScrollPaddingTop();
-      }
-    };
-
     handleScrollPaddingTop();
     window.addEventListener('resize', handleScrollPaddingTop);
-    window.addEventListener('storage', handleStorage);
     return () => {
       window.removeEventListener('resize', handleScrollPaddingTop);
-      window.removeEventListener('storage', handleStorage);
     };
-  }, []);
+  }, [showPromotionBar]);
 
   return scrollPaddingTop;
 };
