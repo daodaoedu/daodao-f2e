@@ -600,7 +600,7 @@ export default function MarathonForm({
             "舉辦活動",
             "開課",
             "參與競賽",
-            "其他：請在下方補上其他原因，並詳細說明動機"
+            "其他：請於下方撰寫"
           ]}
           type="UPDATE_OUTCOMES_FIELD"
           onChange={setNewMarathon}
