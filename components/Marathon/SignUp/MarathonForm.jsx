@@ -499,7 +499,7 @@ export default function MarathonForm({
                 "田野調查",
                 "訪談",
                 "問卷調查",
-                "其他：請在下方補上其他原因，並詳細說明動機"
+                "其他：請於下方撰寫"
               ]}
               type="UPDATE_STRATEGIES_FIELD"
               onChange={setNewMarathon}
