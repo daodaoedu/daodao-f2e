@@ -380,7 +380,7 @@ export default function MarathonForm({
                 '生活發生變化',
                 '影響社會',
                 '受群體影響',
-                '其他：請在下方補上其他原因，並詳細說明動機'
+                '其他：請於下方撰寫'
               ]}
               type="UPDATE_MOTIVATION_FIELD"
               onChange={setNewMarathon}
