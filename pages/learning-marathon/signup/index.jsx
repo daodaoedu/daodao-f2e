@@ -16,6 +16,7 @@ import MarathonForm from '@/components/Marathon/SignUp/MarathonForm';
 import ConfirmForm from '@/components/Marathon/SignUp/ConfirmForm';
 import { ProtectedComponent } from '@/contexts/Auth';
 import { NavigationProvider } from '@/contexts/Navigation';
+import { PromotionProvider } from '@/contexts/Promotion';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -102,11 +103,13 @@ const LearningMarathonSignUp = () => {
   }, [currentStep]);
   return (
     <>
-      <NavigationProvider>
-        <Navigation>
-          <StepperBar currentStep={currentStep} />
-        </Navigation>
-      </NavigationProvider>
+      <PromotionProvider>
+        <NavigationProvider>
+          <Navigation>
+            <StepperBar currentStep={currentStep} />
+          </Navigation>
+        </NavigationProvider>
+      </PromotionProvider>
       <ProtectedComponent redirectOnCancel="/learning-marathon" onlyCheckToken>
         <SEOConfig data={SEOData} />
         <FormWrapper sx={{

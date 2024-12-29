@@ -11,6 +11,7 @@ import checkIconSvg from '@/public/assets/icons/check_icon.svg';
 import discordIconSvg from '@/public/assets/icons/discord_icon.svg';
 import facebookIconSvg from '@/public/assets/icons/facebook_icon.svg';
 import { NavigationProvider } from '@/contexts/Navigation';
+import { PromotionProvider } from '@/contexts/Promotion';
 
 const JoinPageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -227,9 +228,11 @@ function JoinPage() {
 JoinPage.getLayout = ({ children }) => {
   return (
     <JoinPageWrapper>
-      <NavigationProvider>
-        <Navigation />
-      </NavigationProvider>
+      <PromotionProvider>
+        <NavigationProvider>
+          <Navigation />
+        </NavigationProvider>
+      </PromotionProvider>
       {children}
       <Footer />
     </JoinPageWrapper>

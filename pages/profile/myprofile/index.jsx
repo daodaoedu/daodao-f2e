@@ -5,6 +5,7 @@ import Navigation from '@/shared/components/Navigation_v2';
 import Footer from '@/shared/components/Footer_v2';
 import Profile from '@/components/Profile';
 import { NavigationProvider } from '@/contexts/Navigation';
+import { PromotionProvider } from '@/contexts/Promotion';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -20,9 +21,11 @@ const MyProfilePage = () => {
 MyProfilePage.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
-      <NavigationProvider>
-        <Navigation />
-      </NavigationProvider>
+      <PromotionProvider>
+        <NavigationProvider>
+          <Navigation />
+        </NavigationProvider>
+      </PromotionProvider>
       {children}
       <Footer />
     </HomePageWrapper>

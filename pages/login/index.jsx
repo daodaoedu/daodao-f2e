@@ -11,6 +11,7 @@ import { BASE_URL } from '@/constants/common';
 import openLoginWindow from '@/utils/openLoginWindow';
 import { useSelector } from 'react-redux';
 import { NavigationProvider } from '@/contexts/Navigation';
+import { PromotionProvider } from '@/contexts/Promotion';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -165,9 +166,11 @@ const LoginPage = () => {
 LoginPage.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
-      <NavigationProvider>
-        <Navigation />
-      </NavigationProvider>
+      <PromotionProvider>
+        <NavigationProvider>
+          <Navigation />
+        </NavigationProvider>
+      </PromotionProvider>
       {children}
       <Footer />
     </HomePageWrapper>

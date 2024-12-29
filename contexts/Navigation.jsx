@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext, createContext } from 'react';
+import { usePromotion } from './Promotion';
 
 const NavigationContext = createContext();
 
@@ -11,7 +12,7 @@ export const useNavigation = () => {
 };
 
 export const NavigationProvider = ({ children }) => {
-  const [showPromotionBar, setShowPromotionBar] = useState(true);
+  const { showPromotionBar, setShowPromotionBar } = usePromotion();
   const [headerHeight, setHeaderHeight] = useState('128px');
   useEffect(() => {
     setHeaderHeight(showPromotionBar ? '128px' : '64px');

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { NavigationProvider } from '@/contexts/Navigation';
+import { PromotionProvider } from '@/contexts/Promotion';
 import SEOConfig from '../../shared/components/SEO';
 import Partner from '../../components/Partner';
 import Navigation from '../../shared/components/Navigation_v2';
@@ -58,9 +59,11 @@ function PartnerPage() {
 PartnerPage.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
-      <NavigationProvider>
-        <Navigation />
-      </NavigationProvider>
+      <PromotionProvider>
+        <NavigationProvider>
+          <Navigation />
+        </NavigationProvider>
+      </PromotionProvider>
       {children}
       <Footer />
     </HomePageWrapper>

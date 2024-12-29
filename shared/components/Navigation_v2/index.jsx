@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { AppBar } from '@mui/material';
+import { usePromotion } from '@/contexts/Promotion';
+import { useNavigation } from '@/contexts/Navigation';
 import MainNav from './MainNav';
 import PromotionBar from './PromotionBar';
-import { useNavigation } from '@/contexts/Navigation';
 
 export const NavigationWrapper = styled(AppBar)(({ hasPromote }) => ({
   display: 'flex',
@@ -32,7 +33,8 @@ const texts = [
 
 // 問卷 https://docs.google.com/forms/d/e/1FAIpQLSeyU9-Q-kIWp5uutcik3h-RO4o5VuG6oG0m-4u1Ua18EOu3aw/viewform
 const Navigation = ({ children }) => {
-  const { showPromotionBar, setShowPromotionBar, headerHeight } = useNavigation();
+  const { showPromotionBar, setShowPromotionBar } = usePromotion();
+  const { headerHeight } = useNavigation();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {

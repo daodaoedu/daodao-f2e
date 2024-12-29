@@ -12,6 +12,7 @@ import {
 } from '@/redux/actions/partners';
 import { useAuth } from '@/contexts/Auth';
 import { NavigationProvider } from '@/contexts/Navigation';
+import { PromotionProvider } from '@/contexts/Promotion';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -55,9 +56,11 @@ const PartnerDetailPage = () => {
 PartnerDetailPage.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
-      <NavigationProvider>
-        <Navigation />
-      </NavigationProvider>
+      <PromotionProvider>
+        <NavigationProvider>
+          <Navigation />
+        </NavigationProvider>
+      </PromotionProvider>
       {children}
       <Footer />
     </HomePageWrapper>
