@@ -6,9 +6,9 @@ import Script from 'next/script';
 import { Box, Typography, Button, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import SEOConfig from '@/shared/components/SEO';
-import { NavigationWrapper } from '@/shared/components/Navigation_v2';
+import { NavigationWrapper } from '@/shared/components/Navigation';
 import { BASE_URL } from '@/constants/common';
-import Logo from '@/shared/components/Navigation_v2/MainNav/Logo';
+import Logo from '@/shared/components/Navigation/MainNav/Logo';
 
 const ContentWrapper = styled.div`
   display: flex;
