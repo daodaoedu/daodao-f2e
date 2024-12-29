@@ -11,8 +11,8 @@ const DefaultLayout = ({ children }) => {
         <NavigationProvider>
           <Navigation />
         </NavigationProvider>
+        {children}
       </PromotionProvider>
-      {children}
       <Footer />
     </>
   );
