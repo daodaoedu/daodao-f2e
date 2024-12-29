@@ -8,7 +8,8 @@ export const useNavigation = () => {
     throw new Error('useNavigation must be used within an NavigationProvider');
   }
   return context;
-}
+};
+
 export const NavigationProvider = ({ children }) => {
   const [showPromotionBar, setShowPromotionBar] = useState(true);
   const [headerHeight, setHeaderHeight] = useState('128px');
@@ -16,11 +17,12 @@ export const NavigationProvider = ({ children }) => {
     setHeaderHeight(showPromotionBar ? '128px' : '64px');
   }, [showPromotionBar]);
   return (
-    <NavigationContext.Provider value={{ 
-      showPromotionBar, 
+    <NavigationContext.Provider value={{
+      showPromotionBar,
       setShowPromotionBar,
-      headerHeight 
-    }}>
+      headerHeight
+    }}
+    >
       {children}
     </NavigationContext.Provider>
   );
