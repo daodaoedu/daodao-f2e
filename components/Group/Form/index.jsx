@@ -69,7 +69,7 @@ export default function GroupForm({
   return (
     <ProtectedComponent>
       <StyledContainer>
-        <StyledPaper className="p-10 mb-4 md:w-[720px]">
+        <StyledPaper className="p-10 mb-4 w-full md:w-[720px]">
           <StyledHeading>
             {isCreateMode ? '發起揪團' : '編輯揪團'}
           </StyledHeading>
@@ -145,7 +145,7 @@ export default function GroupForm({
             placeholder="希望在什麼時間舉行？"
           />
         </StyledPaper>
-        <StyledPaper className="p-10 mb-4 md:w-[720px]">
+        <StyledPaper className="p-10 mb-4 w-full md:w-[720px]">
           <Fields.TextField
             label="想找的夥伴"
             name="partnerStyle"
@@ -215,7 +215,7 @@ export default function GroupForm({
             helperText="標籤填寫完成後，會用 Hashtag 的形式呈現，例如： #一起學日文"
           />
         </StyledPaper>
-        <StyledPaper className="md:w-[720px]">
+        <StyledPaper className="w-full md:w-[720px]">
           <Fields.DateRadio
             label="揪團期限"
             name="deadline"
