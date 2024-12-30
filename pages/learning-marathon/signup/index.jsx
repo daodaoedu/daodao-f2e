@@ -7,14 +7,16 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import SEOConfig from '@/shared/components/SEO';
-import Navigation from '@/shared/components/Navigation_v2';
+import Navigation from '@/shared/components/Navigation';
 import Footer from '@/shared/components/Footer_v2';
 
-import SaveBar from '@/components/Marathon/SignUp/StepperBar';
+import StepperBar from '@/components/Marathon/SignUp/StepperBar';
 import UserProfileForm from '@/components/Marathon/SignUp/UserProfileForm';
 import MarathonForm from '@/components/Marathon/SignUp/MarathonForm';
 import ConfirmForm from '@/components/Marathon/SignUp/ConfirmForm';
 import { ProtectedComponent } from '@/contexts/Auth';
+import { NavigationProvider } from '@/contexts/Navigation';
+import { PromotionProvider } from '@/contexts/Promotion';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -100,36 +102,43 @@ const LearningMarathonSignUp = () => {
     });
   }, [currentStep]);
   return (
-    <ProtectedComponent redirectOnCancel="/learning-marathon" onlyCheckToken>
-      <SEOConfig data={SEOData} />
-      <SaveBar currentStep={currentStep} />
-      <FormWrapper sx={{
-        background: 'linear-gradient(0deg, #F3FCFC 0%, #F3FCFC 100%), #F7F8FA'
-      }}
-      >
-        <LocalizationProvider
-          dateAdapter={AdapterDayjs}
+    <>
+      <PromotionProvider>
+        <NavigationProvider>
+          <Navigation>
+            <StepperBar currentStep={currentStep} />
+          </Navigation>
+        </NavigationProvider>
+      </PromotionProvider>
+      <ProtectedComponent redirectOnCancel="/learning-marathon" onlyCheckToken>
+        <SEOConfig data={SEOData} />
+        <FormWrapper sx={{
+          background: 'linear-gradient(0deg, #F3FCFC 0%, #F3FCFC 100%), #F7F8FA'
+        }}
         >
-          <ContentWrapper sx={{ minHeight: '100vh' }}>
-            {
-              currentStep === 0 ? (
-                <UserProfileForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
-              ) : currentStep === 1 ? (
-                <MarathonForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
-              ) : <ConfirmForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
-            }
+          <LocalizationProvider
+            dateAdapter={AdapterDayjs}
+          >
+            <ContentWrapper sx={{ minHeight: '100vh' }}>
+              {
+                currentStep === 0 ? (
+                  <UserProfileForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
+                ) : currentStep === 1 ? (
+                  <MarathonForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
+                ) : <ConfirmForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
+              }
 
-          </ContentWrapper>
-        </LocalizationProvider>
-      </FormWrapper>
-    </ProtectedComponent>
+            </ContentWrapper>
+          </LocalizationProvider>
+        </FormWrapper>
+      </ProtectedComponent>
+    </>
   );
 };
 
 LearningMarathonSignUp.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
-      <Navigation />
       {children}
       <Footer />
     </HomePageWrapper>

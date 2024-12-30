@@ -103,7 +103,7 @@ export default function MilestoneGroup({
     // if change frequency, clear all data
     setFrequency(e.target.value);
     const changedMilestones = calculateMilestones(startDate, e.target.value, []);
-    onChangeHandler('UPDATE_FIELD', 'milestones', changedMilestones, 'milestonesName');
+    onChangeHandler('milestonesName', changedMilestones);
   };
 
   const handleEndDate = (/** fakeDate */) => {
@@ -115,7 +115,7 @@ export default function MilestoneGroup({
     const changedMilestones = milestones.map((item) => {
       return (item._tempId === newMilestone._tempId ? newMilestone : item);
     });
-    onChangeHandler('UPDATE_FIELD', 'milestones', changedMilestones, 'milestonesName');
+    onChangeHandler('milestonesName', changedMilestones);
   };
   useEffect(() => {
     const weeklyMilestonesLength = 22;
@@ -132,7 +132,7 @@ export default function MilestoneGroup({
     }
 
     if (!isDisabled) {
-      onChangeHandler('UPDATE_FIELD', 'milestones', initMilestones, 'milestonesName');
+      onChangeHandler('milestonesName', initMilestones);
     }
   }, []);
 

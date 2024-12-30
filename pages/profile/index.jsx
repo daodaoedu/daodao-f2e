@@ -9,11 +9,13 @@ import { ProtectedComponent, useAuth } from '@/contexts/Auth';
 import Edit from '@/components/Profile/Edit';
 import Footer from '@/shared/components/Footer_v2';
 import SEOConfig from '@/shared/components/SEO';
-import Navigation from '@/shared/components/Navigation_v2';
+import Navigation from '@/shared/components/Navigation';
 import MyGroup from '@/components/Profile/MyGroup';
 import MyMarathon from '@/components/Profile/MyMarathon';
 import AccountSetting from '@/components/Profile/Accountsetting';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { NavigationProvider } from '@/contexts/Navigation';
+import { PromotionProvider } from '@/contexts/Promotion';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -178,7 +180,11 @@ const ProfilePage = () => {
 ProfilePage.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
-      <Navigation />
+      <PromotionProvider>
+        <NavigationProvider>
+          <Navigation />
+        </NavigationProvider>
+      </PromotionProvider>
       {children}
       <Footer />
     </HomePageWrapper>

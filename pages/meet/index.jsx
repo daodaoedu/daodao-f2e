@@ -4,8 +4,10 @@ import { useRouter } from 'next/router';
 import Script from 'next/script';
 import dynamic from 'next/dynamic';
 import { Box } from '@mui/material';
+import { NavigationProvider } from '@/contexts/Navigation';
+import { PromotionProvider } from '@/contexts/Promotion';
 import SEOConfig from '../../shared/components/SEO';
-import Navigation from '../../shared/components/Navigation_v2';
+import Navigation from '../../shared/components/Navigation';
 import Footer from '../../shared/components/Footer_v2';
 // import { JitsiMeeting } from "@jitsi/react-sdk";
 
@@ -101,7 +103,11 @@ const MeetPage = () => {
 MeetPage.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
-      <Navigation />
+      <PromotionProvider>
+        <NavigationProvider>
+          <Navigation />
+        </NavigationProvider>
+      </PromotionProvider>
       {children}
       <Footer />
     </HomePageWrapper>

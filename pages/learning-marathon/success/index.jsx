@@ -2,10 +2,12 @@ import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
-import Navigation from '@/shared/components/Navigation_v2';
+import Navigation from '@/shared/components/Navigation';
 import Footer from '@/shared/components/Footer_v2';
 import { Box, Typography, Button } from "@mui/material";
 import emailImg from '@/public/assets/mail.png';
+import { NavigationProvider } from '@/contexts/Navigation';
+import { PromotionProvider } from '@/contexts/Promotion';
 
 const HomePageWrapper = styled.div`
   --section-height: calc(100vh - 80px);
@@ -175,7 +177,11 @@ const LearningMarathonSignUp = () => {
 LearningMarathonSignUp.getLayout = ({ children }) => {
   return (
     <HomePageWrapper>
-      <Navigation />
+      <PromotionProvider>
+        <NavigationProvider>
+          <Navigation />
+        </NavigationProvider>
+      </PromotionProvider>
       {children}
       <Footer />
     </HomePageWrapper>
