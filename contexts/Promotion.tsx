@@ -76,9 +76,7 @@ type NestCallback = (nextCallback: NestCallback) => void;
 
 export function PromotionBar() {
   const { showPromotionBar, setShowPromotionBar } = usePromotion();
-  const [currentIndex, setCurrentIndex] = useState(() =>
-    Math.floor(Math.random() * texts.length)
-  );
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
