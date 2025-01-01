@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
+import { usePromotion } from '@/contexts/Promotion';
 
 export const StyledStepperBar = styled(Box)`
   background-color: #FFF;
@@ -58,8 +59,10 @@ export const StyledStepperBar = styled(Box)`
 `;
 
 export default function StepperBar({ currentStep }) {
+  const { height } = usePromotion();
 
   return (
+    <StyledStepperBar top={height}>
       <div className="top">
         <h2>申請參加學習馬拉松</h2>
       </div>
