@@ -7,21 +7,11 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { ProtectedComponent, useAuth } from '@/contexts/Auth';
 import Edit from '@/components/Profile/Edit';
-import Footer from '@/shared/components/Footer_v2';
 import SEOConfig from '@/shared/components/SEO';
-import Navigation from '@/shared/components/Header';
 import MyGroup from '@/components/Profile/MyGroup';
 import MyMarathon from '@/components/Profile/MyMarathon';
 import AccountSetting from '@/components/Profile/Accountsetting';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { NavigationProvider } from '@/contexts/Navigation';
-import { PromotionProvider } from '@/contexts/Promotion';
-
-const HomePageWrapper = styled.div`
-  --section-height: calc(100vh - 80px);
-  --section-height-offset: 80px;
-  background: linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa;
-`;
 
 const StyledTab = styled(Tab)(({ isActive, mobileScreen }) => ({
   width: `${mobileScreen ? '33%' : '100%'}`,
@@ -123,6 +113,7 @@ const ProfilePage = () => {
           justifyContent: 'center',
           marginTop: '60px',
           minHeight: 'calc(100vh - 518px)',
+          background: 'linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa',
           '@media (max-width: 767px)': {
             flexDirection: 'column',
             marginTop: '0',
@@ -174,20 +165,6 @@ const ProfilePage = () => {
         </Box>
       </Box>
     </ProtectedComponent>
-  );
-};
-
-ProfilePage.getLayout = ({ children }) => {
-  return (
-    <HomePageWrapper>
-      <PromotionProvider>
-        <NavigationProvider>
-          <Navigation />
-        </NavigationProvider>
-      </PromotionProvider>
-      {children}
-      <Footer />
-    </HomePageWrapper>
   );
 };
 

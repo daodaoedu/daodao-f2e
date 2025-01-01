@@ -1,14 +1,9 @@
 import React, { useMemo } from 'react';
-import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import dynamic from 'next/dynamic';
 import { Box } from '@mui/material';
-import { NavigationProvider } from '@/contexts/Navigation';
-import { PromotionProvider } from '@/contexts/Promotion';
 import SEOConfig from '../../shared/components/SEO';
-import Navigation from '../../shared/components/Header';
-import Footer from '../../shared/components/Footer_v2';
 // import { JitsiMeeting } from "@jitsi/react-sdk";
 
 const JitsiMeeting = dynamic(
@@ -18,10 +13,6 @@ const JitsiMeeting = dynamic(
     ssr: false,
   },
 );
-const HomePageWrapper = styled.div`
-  --section-height: calc(100vh - 80px);
-  --section-height-offset: 80px;
-`;
 
 const renderSpinner = () => (
   <div
@@ -97,20 +88,6 @@ const MeetPage = () => {
         />
       </Box>
     </>
-  );
-};
-
-MeetPage.getLayout = ({ children }) => {
-  return (
-    <HomePageWrapper>
-      <PromotionProvider>
-        <NavigationProvider>
-          <Navigation />
-        </NavigationProvider>
-      </PromotionProvider>
-      {children}
-      <Footer />
-    </HomePageWrapper>
   );
 };
 
