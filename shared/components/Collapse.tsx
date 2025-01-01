@@ -1,20 +1,5 @@
-import { createContext, useContext, useState } from "react";
+import { ToggleProvider, useToggle } from "@/contexts/Toggle";
 import { cn } from "@/utils/cn";
-
-interface CollapseContextType {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-}
-
-const CollapseContext = createContext<CollapseContextType | null>(null);
-
-const useCollapseContext = (errorMessage: string) => {
-  const context = useContext(CollapseContext);
-  if (!context) {
-    throw new Error(errorMessage);
-  }
-  return context;
-};
 
 interface CollapseProps {
   as?: React.ElementType;
@@ -22,12 +7,10 @@ interface CollapseProps {
 }
 
 function Collapse({ as: Root = "div", children }: CollapseProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <CollapseContext.Provider value={{ isOpen, setIsOpen }}>
+    <ToggleProvider>
       <Root className="relative">{children}</Root>
-    </CollapseContext.Provider>
+    </ToggleProvider>
   );
 }
 
@@ -37,14 +20,10 @@ interface CollapseToggleProps {
   withIcon?: boolean;
 }
 
-Collapse.Toggle = ({
-  children,
-  className,
-  withIcon,
-}: CollapseToggleProps) => {
-  const { isOpen, setIsOpen } = useCollapseContext(
-    "Collapse.Toggle must be used within a Collapse component"
-  );
+function Toggle({ children, className, withIcon }: CollapseToggleProps) {
+  const { isOpen, setIsOpen } = useToggle({
+    errorMessage: "Collapse.Toggle must be used within a Collapse",
+  });
 
   return (
     <button
@@ -66,17 +45,17 @@ Collapse.Toggle = ({
       )}
     </button>
   );
-};
+}
 
 interface CollapseListProps {
   children: React.ReactNode;
   className?: string;
 }
 
-Collapse.List = ({ children, className }: CollapseListProps) => {
-  const { isOpen } = useCollapseContext(
-    "Collapse.List must be used within a Collapse component"
-  );
+function List({ children, className }: CollapseListProps) {
+  const { isOpen } = useToggle({
+    errorMessage: "Collapse.List must be used within a Collapse",
+  });
 
   return (
     <ul
@@ -92,19 +71,23 @@ Collapse.List = ({ children, className }: CollapseListProps) => {
       {children}
     </ul>
   );
-};
+}
 
 interface CollapseItemProps {
   children: React.ReactNode;
   className?: string;
 }
 
-Collapse.Item = ({ children, className }: CollapseItemProps) => {
+function Item({ children, className }: CollapseItemProps) {
   return (
     <li>
       <div className={cn("overflow-hidden", className)}>{children}</div>
     </li>
   );
-};
+}
+
+Collapse.Toggle = Toggle;
+Collapse.List = List;
+Collapse.Item = Item;
 
 export default Collapse;
