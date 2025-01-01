@@ -10,22 +10,6 @@ function MobileHeader() {
   const auth = useAuth();
   const authDispatch = useAuthDispatch();
 
-  const avatar = auth.user && (
-    <div>
-      <div className="absolute top-0 left-0 border-x-[20px] mt-2 border-white border-solid w-full h-px bg-primary-lightest" />
-      <div className="py-2 pl-10 flex items-center gap-2">
-        <img
-          src={auth.user.photoURL}
-          alt={auth.user.name}
-          width="40"
-          height="40"
-          className="rounded-full"
-        />
-        <span className="text-basic-400">{auth.user.name}</span>
-      </div>
-    </div>
-  );
-
   useEffect(() => {
     if (isOpenMenu) {
       document.body.classList.add("overflow-y-hidden");
@@ -87,63 +71,73 @@ function MobileHeader() {
               ))}
             </ul>
           </nav>
-          <Collapse
-            rootElement="nav"
-            wrapperElement="ul"
-            className="py-2 px-10 flex items-center rounded-lg text-primary-base w-full"
-            wrapperClassName="[&_>*>*]:overflow-hidden"
-            trigger="島島盃-春季學習馬拉松"
-            withIcon
-          >
-            {MARATHON_LINKS.map(({ name, link, disabled }) => (
-              <li key={name} className="*:px-16 *:leading-10">
-                {disabled ? (
-                  <div className="text-basic-300 cursor-not-allowed">
-                    {name}
-                  </div>
-                ) : (
-                  <Link
-                    href={link}
-                    className="block text-basic-400"
-                    onClick={() => setIsOpenMenu(false)}
-                  >
-                    {name}
-                  </Link>
-                )}
-              </li>
-            ))}
-          </Collapse>
-          {auth.isLoggedIn ? (
-            <Collapse
-              rootElement="nav"
-              wrapperElement="ul"
-              className="w-full mt-4"
-              trigger={avatar}
+          <Collapse as="nav">
+            <Collapse.Toggle
+              className="py-2 px-10 flex items-center rounded-lg text-primary-base w-full"
               withIcon
             >
-              {USER_LINK.map(({ name, id }) => (
-                <li key={name} className="rounded-lg text-nowrap">
-                  <Link
-                    href={`/profile?id=${id}`}
-                    className="block px-16 py-2 text-basic-400"
-                    onClick={() => setIsOpenMenu(false)}
-                  >
-                    {name}
-                  </Link>
-                </li>
+              島島盃-春季學習馬拉松
+            </Collapse.Toggle>
+            <Collapse.List className="w-full">
+              {MARATHON_LINKS.map(({ name, link, disabled }) => (
+                <Collapse.Item key={name} className="*:px-16 *:leading-10">
+                  {disabled ? (
+                    <div className="text-basic-300 cursor-not-allowed">
+                      {name}
+                    </div>
+                  ) : (
+                    <Link
+                      href={link}
+                      className="block text-basic-400"
+                      onClick={() => setIsOpenMenu(false)}
+                    >
+                      {name}
+                    </Link>
+                  )}
+                </Collapse.Item>
               ))}
-              <li className="rounded-lg text-nowrap">
-                <button
-                  type="button"
-                  className="block text-left px-16 py-2 text-basic-400"
-                  onClick={() => {
-                    authDispatch.logout();
-                    setIsOpenMenu(false);
-                  }}
-                >
-                  登出
-                </button>
-              </li>
+            </Collapse.List>
+          </Collapse>
+          {auth.isLoggedIn ? (
+            <Collapse as="nav">
+              <Collapse.Toggle className="w-full mt-4" withIcon>
+                <div className="absolute top-0 left-0 border-x-[20px] mt-2 border-white border-solid w-full h-px bg-primary-lightest" />
+                <div className="py-2 pl-10 flex items-center gap-2">
+                  <img
+                    src={auth.user.photoURL}
+                    alt={auth.user.name}
+                    width="40"
+                    height="40"
+                    className="rounded-full"
+                  />
+                  <span className="text-basic-400">{auth.user.name}</span>
+                </div>
+              </Collapse.Toggle>
+              <Collapse.List>
+                {USER_LINK.map(({ name, id }) => (
+                  <Collapse.Item key={name}>
+                    <Link
+                      href={`/profile?id=${id}`}
+                      className="block px-16 py-2 text-basic-400"
+                      onClick={() => setIsOpenMenu(false)}
+                    >
+                      {name}
+                    </Link>
+                  </Collapse.Item>
+                ))}
+                <Collapse.Item>
+                  <button
+                    type="button"
+                    className="block text-left px-16 py-2 text-basic-400"
+                    onClick={() => {
+                      authDispatch.logout();
+                      setIsOpenMenu(false);
+                    }}
+                  >
+                    登出
+                  </button>
+                </Collapse.Item>
+              </Collapse.List>
             </Collapse>
           ) : (
             <button
