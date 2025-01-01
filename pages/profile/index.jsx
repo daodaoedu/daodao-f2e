@@ -9,7 +9,7 @@ import { ProtectedComponent, useAuth } from '@/contexts/Auth';
 import Edit from '@/components/Profile/Edit';
 import Footer from '@/shared/components/Footer_v2';
 import SEOConfig from '@/shared/components/SEO';
-import Navigation from '@/shared/components/Navigation';
+import Navigation from '@/shared/components/Header';
 import MyGroup from '@/components/Profile/MyGroup';
 import MyMarathon from '@/components/Profile/MyMarathon';
 import AccountSetting from '@/components/Profile/Accountsetting';

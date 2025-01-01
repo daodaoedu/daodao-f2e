@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 
 import { Divider, Typography } from '@mui/material';
 import SEOConfig from '@/shared/components/SEO';
-import Navigation from '@/shared/components/Navigation';
+import Navigation from '@/shared/components/Header';
 import Footer from '@/shared/components/Footer_v2';
 
 import checkIconSvg from '@/public/assets/icons/check_icon.svg';

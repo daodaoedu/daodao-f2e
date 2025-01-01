@@ -5,7 +5,7 @@ import { useAuth, useAuthDispatch } from "@/contexts/Auth";
 import { cn } from "@/utils/cn";
 import Collapse from "../Collapse";
 
-function MobileHeader() {
+function MobileMenu() {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const auth = useAuth();
   const authDispatch = useAuthDispatch();
@@ -19,10 +19,7 @@ function MobileHeader() {
   }, [isOpenMenu]);
 
   return (
-    <header className="relative flex items-center justify-between w-full pl-4 pr-2 body-md bg-primary-base">
-      <Link href="/" className="block py-5">
-        <img src="/new-logo.png" alt="logo" width="152" height="31" />
-      </Link>
+    <>
       <button
         type="button"
         title="menu"
@@ -153,8 +150,8 @@ function MobileHeader() {
           )}
         </div>
       </div>
-    </header>
+    </>
   );
 }
 
-export default MobileHeader;
+export default MobileMenu;

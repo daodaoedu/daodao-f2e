@@ -7,7 +7,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import SEOConfig from '@/shared/components/SEO';
-import Navigation from '@/shared/components/Navigation';
+import Navigation from '@/shared/components/Header';
 import Footer from '@/shared/components/Footer_v2';
 
 import StepperBar from '@/components/Marathon/SignUp/StepperBar';

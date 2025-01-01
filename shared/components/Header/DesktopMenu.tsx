@@ -4,15 +4,12 @@ import { useAuth, useAuthDispatch } from "@/contexts/Auth";
 import { cn } from "@/utils/cn";
 import Dropdown from "../Dropdown";
 
-function DesktopHeader() {
+function DesktopMenu() {
   const auth = useAuth();
   const authDispatch = useAuthDispatch();
 
   return (
-    <header className="flex items-center justify-between w-full px-4 bg-primary-base">
-      <Link href="/" className="block py-5">
-        <img src="/new-logo.png" alt="logo" width="152" height="31" />
-      </Link>
+    <>
       <nav>
         <ul className="flex items-center gap-1">
           {NAV_LINK.map(({ link, name, target }) => (
@@ -103,8 +100,8 @@ function DesktopHeader() {
           </button>
         )}
       </div>
-    </header>
+    </>
   );
 }
 
-export default DesktopHeader;
+export default DesktopMenu;
