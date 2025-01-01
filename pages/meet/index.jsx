@@ -8,7 +8,7 @@ import SEOConfig from '../../shared/components/SEO';
 
 const JitsiMeeting = dynamic(
   // eslint-disable-next-line no-shadow
-  () => import('@jitsi/react-sdk').then(({ JitsiMeeting }) => JitsiMeeting),
+  () => import('@jitsi/react-sdk').then((module) => module.JitsiMeeting),
   {
     ssr: false,
   },
