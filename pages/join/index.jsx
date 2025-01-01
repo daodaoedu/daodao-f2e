@@ -25,7 +25,7 @@ const Container = styled.div`
   }
 `;
 
-const Paper = styled.main`
+const Paper = styled.div`
   padding: 32px;
   border-radius: 20px;
   box-shadow: 0px 4px 6px rgba(196, 194, 193, 0.2);

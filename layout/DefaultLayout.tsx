@@ -40,7 +40,9 @@ function DefaultLayoutContent({ children }: React.PropsWithChildren) {
       <Header ref={headerRef}>
         <PromotionBar />
       </Header>
+      <main className="min-h-screen" style={{ paddingTop: `${height}px` }}>
         {children}
+      </main>
     </>
   );
 }

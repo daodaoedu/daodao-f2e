@@ -21,7 +21,7 @@ export const StyledHeading = styled.h1`
   color: #536166;
 `;
 
-export const StyledContainer = styled.main`
+export const StyledContainer = styled.div`
   position: relative;
   padding-top: 60px;
   margin: 0 auto;
