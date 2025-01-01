@@ -19,7 +19,7 @@ import {
 import ScrollToTop from '../../shared/components/ScrollToTop';
 // import { TikTokFont } from "../../shared/styles/css";
 
-const SearchWrapper = styled.main`
+const SearchWrapper = styled.div`
   position: relative;
   height: 100%;
   min-height: calc(100vh - 80px);

@@ -37,6 +37,8 @@ module.exports = {
       { devDependencies: ['./*.ts'] },
     ],
     '@typescript-eslint/no-require-imports': 'error',
+    "@typescript-eslint/no-shadow": "error",
+    "no-shadow": "off",
     'import/extensions': [
       'error',
       'ignorePackages',
