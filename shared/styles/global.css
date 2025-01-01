@@ -9,6 +9,10 @@
 }
 
 @layer base {
+  body {
+    @apply !bg-teal-50;
+  }
+
   .prose li[role=checkbox] {
     @apply indent-1 relative before:translate-y-1 after:absolute after:top-1/2 after:-translate-y-2/3 after:rotate-45;
   }

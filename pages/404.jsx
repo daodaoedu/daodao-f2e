@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import { Typography, Button, Paper } from '@mui/material';
 import { FacebookRounded } from '@mui/icons-material';
@@ -10,10 +9,6 @@ import { CATEGORIES } from '@/constants/category';
 import RelatedResources from '@/shared/components/RelatedResources';
 import { getRedirectionStorage } from '@/utils/storage';
 
-const Wrapper = styled.div`
-  background-color: #f5f5f5;
-`;
-
 const NotExistPage = () => {
   const router = useRouter();
 
@@ -22,7 +17,7 @@ const NotExistPage = () => {
   }, []);
 
   return (
-    <Wrapper>
+    <>
       <Paper
         sx={{
           width: '90%',
@@ -155,7 +150,7 @@ const NotExistPage = () => {
           </Box>
         </Box>
       </Paper>
-    </Wrapper>
+    </>
   );
 };
 
