@@ -1,7 +1,41 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import Link from "next/link";
-import { usePromotion } from "@/contexts/Promotion";
 import { cn } from "@/utils/cn";
+
+interface PromotionContextType {
+  height: number;
+  showPromotionBar: boolean;
+  setHeight: (height: number) => void;
+  setShowPromotionBar: (showPromotionBar: boolean) => void;
+}
+
+const PromotionContext = createContext<PromotionContextType | null>(null);
+
+export const usePromotion = () => {
+  const context = useContext(PromotionContext);
+  if (!context) {
+    throw new Error("usePromotion must be used within an NavigationProvider");
+  }
+  return context;
+};
+
+export const PromotionProvider = ({ children }: React.PropsWithChildren) => {
+  const [showPromotionBar, setShowPromotionBar] = useState(true);
+  const [height, setHeight] = useState(0);
+
+  return (
+    <PromotionContext.Provider
+      value={{
+        height,
+        showPromotionBar,
+        setHeight,
+        setShowPromotionBar,
+      }}
+    >
+      {children}
+    </PromotionContext.Provider>
+  );
+};
 
 enum PromotionType {
   LearningMarathon,
@@ -40,7 +74,7 @@ const { texts, link } = promotionConfigs[PromotionType.LearningMarathon];
 
 type NestCallback = (nextCallback: NestCallback) => void;
 
-function PromotionBar() {
+export function PromotionBar() {
   const { showPromotionBar, setShowPromotionBar } = usePromotion();
   const [currentIndex, setCurrentIndex] = useState(() =>
     Math.floor(Math.random() * texts.length)
@@ -71,11 +105,11 @@ function PromotionBar() {
 
   return (
     showPromotionBar && (
-      <div className="relative text-basic-white bg-tips text-center p-2.5">
+      <div className="relative text-basic-white bg-tips text-center">
         <Link
           href={link}
           className={cn(
-            "cursor-pointer animate-fade-in animate-duration-500",
+            "block cursor-pointer animate-fade-in animate-duration-500 p-2.5",
             isFadingOut && "animate-fade-out"
           )}
         >
@@ -103,5 +137,3 @@ function PromotionBar() {
     )
   );
 }
-
-export default PromotionBar;
