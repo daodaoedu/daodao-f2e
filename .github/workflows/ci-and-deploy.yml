@@ -1,0 +1,112 @@
+name: CI and Deploy workflow
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    branches: "**"
+  workflow_dispatch:
+
+env:
+  DEPLOY_OUTPUT: null
+
+jobs:
+  init:
+    name: Initial Common Steps
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            ~/.cache/Cypress
+          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    needs: init
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            ~/.cache/Cypress
+          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+      - name: lint
+        run: |
+          yarn lint
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff --cached --quiet || echo "changes=true" >> $GITHUB_ENV
+
+      - name: Commit lint Changes
+        if: env.changes == 'true'
+        run: |
+          git commit -m "chore: format code"
+          git push
+
+  build_and_deploy:
+    name: Build and Deploy to Cloudflare
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 30
+    needs: lint
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      - name: Build and Deploy to Cloudflare
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Save Deploy Output
+        run: |
+          echo "DEPLOY_OUTPUT=$(${{ steps.deploy.outputs.command-output }})" >> $GITHUB_ENV
+
+  notify_discord:
+    name: Notify Discord
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Notification
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            MESSAGE="✅ Build Succeeded: ${{ github.repository }} (${{ github.ref_name }})"
+            MESSAGE="$MESSAGE\n$${{ env.DEPLOY_OUTPUT }}"
+          else
+            MESSAGE="❌ Build Failed: ${{ github.repository }} (${{ github.ref_name }})"
+          fi
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d "{\"content\": \"$MESSAGE\", \"username\": \"島島阿學日誌\"}" \
+            ${{ secrets.SANDBOX_DISCORD_WEBHOOK_URL }}
