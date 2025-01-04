@@ -1,0 +1,30 @@
+name: Update i18n
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update_i18n:
+    name: Update i18n Translations
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      - name: Fetch i18n Translations
+        run: node fetchTranslations.js
+
+      - name: Check for i18n changes
+        id: check_changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/locales
+          git diff --cached --quiet || echo "changes=true" >> $GITHUB_ENV
+
+      - name: Commit i18n Changes
+        if: env.changes == 'true'
+        run: |
+          git commit -m "i18n: update translations"
+          git push
