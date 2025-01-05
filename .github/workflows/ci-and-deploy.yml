@@ -9,6 +9,10 @@ on:
     branches:
       - "**"
       - "!dependabot/**"
+  push:
+    branches:
+      - "prod"
+      - "dev"
   workflow_dispatch:
 
 env:
@@ -106,10 +110,11 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          command: pages deploy --branch=${{ github.event.pull_request.head.ref }}
+          command: pages deploy --branch=${{ github.event.pull_request.head.ref || github.ref_name }}
 
     outputs:
       preview-url: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+      deploy-env: ${{ steps.deploy.outputs.pages-environment }}
 
   send_result:
     name: Send Result
@@ -144,5 +149,5 @@ jobs:
         with:
           TYPE: success
           TITLE: "✅ Build Succeeded"
-          DESCRIPTION: "Preview URL: ${{ needs.build_and_deploy.outputs.preview-url }}"
+          DESCRIPTION: "Preview URL: ${{ needs.build_and_deploy.outputs.preview-url }}\\nEnvironment: ${{ needs.build_and_deploy.outputs.deploy-env }})"
           DISCORD_WEBHOOK_URL: ${{ secrets.SANDBOX_DISCORD_WEBHOOK_URL }}
