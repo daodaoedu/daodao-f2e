@@ -1,16 +1,10 @@
 import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
-import { NavigationProvider } from '@/contexts/Navigation';
-import { PromotionProvider } from '@/contexts/Promotion';
 import SEOConfig from '../../shared/components/SEO';
 import Partner from '../../components/Partner';
-import Navigation from '../../shared/components/Navigation';
-import Footer from '../../shared/components/Footer_v2';
 
-const HomePageWrapper = styled.div`
-  --section-height: calc(100vh - 80px);
-  --section-height-offset: 80px;
+const Wrapper = styled.div`
   background: #f3fcfc;
 `;
 
@@ -49,25 +43,11 @@ function PartnerPage() {
   );
 
   return (
-    <>
+    <Wrapper>
       <SEOConfig data={SEOData} />
       <Partner />
-    </>
+    </Wrapper>
   );
 }
-
-PartnerPage.getLayout = ({ children }) => {
-  return (
-    <HomePageWrapper>
-      <PromotionProvider>
-        <NavigationProvider>
-          <Navigation />
-        </NavigationProvider>
-      </PromotionProvider>
-      {children}
-      <Footer />
-    </HomePageWrapper>
-  );
-};
 
 export default PartnerPage;
