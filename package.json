@@ -10,7 +10,10 @@
     "export": "next build && next export",
     "start": "next start",
     "sitemap": "next-sitemap",
-    "lint": "eslint \"{pages,components,shared,constants}/**/*.{ts,tsx,js,jsx}\" --fix"
+    "lint": "eslint \"{pages,components,shared,constants}/**/*.{ts,tsx,js,jsx}\" --fix",
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "preview": "npm run pages:build && wrangler pages dev",
+    "deploy": "npm run pages:build && wrangler pages deploy"
   },
   "dependencies": {
     "@emotion/css": "^11.9.0",
@@ -68,10 +71,12 @@
     "tailwind-merge": "^2.5.4",
     "use-image": "^1.0.10",
     "uuid": "^11.0.3",
+    "wrangler": "^3.99.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.26.0",
+    "@cloudflare/next-on-pages": "^1.13.7",
     "@emotion/babel-plugin": "^11.9.2",
     "@next/eslint-plugin-next": "^13.2.1",
     "@tailwindcss/typography": "^0.5.15",
@@ -93,6 +98,7 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
-    "typescript": "5.7.2"
+    "typescript": "5.7.2",
+    "vercel": "^39.2.4"
   }
 }
