@@ -222,9 +222,10 @@ export default function Faq() {
       <Accordion
         title="我想團報但找不到人？"
       >
-          歡迎填寫團報表單，我們將協助促成！
-        <Link href="https://forms.gle/BZ24JnTxid4y7CCV6"
-              className={cn("block text-base font-medium p-2.5 rounded-lg text-basic-400 transition-colors duration-300")}
+        歡迎填寫團報表單，我們將協助促成！
+        <Link
+          href="https://forms.gle/BZ24JnTxid4y7CCV6"
+          className={cn("block text-base font-medium p-2.5 rounded-lg text-basic-400 transition-colors duration-300")}
         >
           https://forms.gle/BZ24JnTxid4y7CCV6
         </Link>
@@ -232,9 +233,10 @@ export default function Faq() {
       <Accordion
         title="有哪些機會可以獲得課程費用優惠折抵呢？"
       >
-          參加說明會、轉分享貼文等方式都可獲得優惠，優惠活動請參考折價券申請表單：
-        <Link href="https://forms.gle/BZ24JnTxid4y7CCV6"
-              className={cn("block text-base font-medium p-2.5 rounded-lg text-basic-400 transition-colors duration-300")}
+        參加說明會、轉分享貼文等方式都可獲得優惠，優惠活動請參考折價券申請表單：
+        <Link
+          href="https://forms.gle/BZ24JnTxid4y7CCV6"
+          className={cn("block text-base font-medium p-2.5 rounded-lg text-basic-400 transition-colors duration-300")}
         >
           https://forms.gle/9Pfa9Q5d27m1JEpUA （折抵金額無上限）
         </Link>
