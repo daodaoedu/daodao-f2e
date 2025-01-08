@@ -7,12 +7,21 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import SEOConfig from '@/shared/components/SEO';
+import Navigation from '@/shared/components/Navigation';
+import Footer from '@/shared/components/Footer_v2';
 
 import StepperBar from '@/components/Marathon/SignUp/StepperBar';
 import UserProfileForm from '@/components/Marathon/SignUp/UserProfileForm';
 import MarathonForm from '@/components/Marathon/SignUp/MarathonForm';
 import ConfirmForm from '@/components/Marathon/SignUp/ConfirmForm';
 import { ProtectedComponent } from '@/contexts/Auth';
+import { NavigationProvider } from '@/contexts/Navigation';
+import { PromotionProvider } from '@/contexts/Promotion';
+
+const HomePageWrapper = styled.div`
+  --section-height: calc(100vh - 80px);
+  --section-height-offset: 80px;
+`;
 
 const FormWrapper = styled.form`
   padding: 50px 0;
@@ -94,7 +103,13 @@ const LearningMarathonSignUp = () => {
   }, [currentStep]);
   return (
     <>
-      <StepperBar currentStep={currentStep} />
+      <PromotionProvider>
+        <NavigationProvider>
+          <Navigation>
+            <StepperBar currentStep={currentStep} />
+          </Navigation>
+        </NavigationProvider>
+      </PromotionProvider>
       <ProtectedComponent redirectOnCancel="/learning-marathon" onlyCheckToken>
         <SEOConfig data={SEOData} />
         <FormWrapper sx={{
@@ -118,6 +133,15 @@ const LearningMarathonSignUp = () => {
         </FormWrapper>
       </ProtectedComponent>
     </>
+  );
+};
+
+LearningMarathonSignUp.getLayout = ({ children }) => {
+  return (
+    <HomePageWrapper>
+      {children}
+      <Footer />
+    </HomePageWrapper>
   );
 };
 

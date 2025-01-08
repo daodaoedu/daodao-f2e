@@ -1,0 +1,46 @@
+import React from 'react';
+import styled from '@emotion/styled';
+import { Toolbar } from '@mui/material';
+import Box from '@mui/material/Box';
+import Hamberger from './Hamberger';
+import List from './List';
+import SubList from './SubList';
+import Logo from './Logo';
+
+const MainNavWrapper = styled(Toolbar)`
+  /* max-width: 1200px; */
+  width: 100%;
+  min-height: 64px;
+`;
+
+const BoxWrapper = styled(Box)`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: auto;
+  padding: 0 16px;
+  @media (max-width: 1023px) {
+    width: 90%;
+    padding: 0;
+    /* flex-direction: column; */
+  }
+`;
+
+const MainNav = ({ height }) => {
+  return (
+    <MainNavWrapper>
+      <BoxWrapper sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+        <Logo />
+        {/* main list */}
+        <List />
+        {/* right list */}
+        <SubList />
+        {/* mobile only */}
+        <Hamberger shiftTop={height} />
+      </BoxWrapper>
+    </MainNavWrapper>
+  );
+};
+
+export default MainNav;

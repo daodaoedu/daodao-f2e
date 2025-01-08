@@ -1,0 +1,70 @@
+import React from 'react';
+import styled from '@emotion/styled';
+import Link from 'next/link';
+import { Box } from '@mui/material';
+import { NAV_LINK } from '../../../../../constants/category';
+
+const LinkListWrapper = styled.ul`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: relative;
+
+  @media (max-width: 1023px) {
+    display: none;
+  }
+`;
+
+const LinkItemWrapper = styled.li`
+  position: relative;
+  margin: 0 16px;
+  cursor: pointer;
+  font-weight: 500;
+`;
+
+const AnchorWrapper = styled.a``;
+
+const List = () => {
+  return (
+    <LinkListWrapper>
+      {NAV_LINK.map(({ name, link, target }) => (
+        <LinkItemWrapper key={name} name={name}>
+          {target === '_self' ? (
+            <Link href={link}>{name}</Link>
+          ) : (
+            <AnchorWrapper
+              href={link}
+              target={target}
+              rel="noopener noreferrer"
+            >
+              {name}
+            </AnchorWrapper>
+          )}
+          {name === '找故事' && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '-12px',
+                right: '-22px',
+                color: '#D4ED7B',
+                fontWeight: '700',
+                /* Safari */
+                WebkitTransform: 'rotate(45deg)',
+                /* Firefox */
+                MozTransform: 'rotate(45deg)',
+                /* IE */
+                msTransform: 'rotate(45deg)',
+                /* Opera */
+                OTransform: 'rotate(45deg)',
+              }}
+            >
+              HOT
+            </Box>
+          )}
+        </LinkItemWrapper>
+      ))}
+    </LinkListWrapper>
+  );
+};
+
+export default List;

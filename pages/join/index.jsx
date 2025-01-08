@@ -4,18 +4,23 @@ import styled from '@emotion/styled';
 
 import { Divider, Typography } from '@mui/material';
 import SEOConfig from '@/shared/components/SEO';
+import Navigation from '@/shared/components/Navigation';
+import Footer from '@/shared/components/Footer_v2';
 
 import checkIconSvg from '@/public/assets/icons/check_icon.svg';
 import discordIconSvg from '@/public/assets/icons/discord_icon.svg';
 import facebookIconSvg from '@/public/assets/icons/facebook_icon.svg';
+import { NavigationProvider } from '@/contexts/Navigation';
+import { PromotionProvider } from '@/contexts/Promotion';
 
-const Wrapper = styled.div`
+const JoinPageWrapper = styled.div`
+  --section-height: calc(100vh - 80px);
+  --section-height-offset: 80px;
   background: #f3fcfc;
 `;
 
 const Container = styled.div`
-  margin: 0 auto;
-  padding: 60px 0 72px;
+  margin: 60px auto 72px;
   min-height: calc(100vh - 418px);
   width: 640px;
 
@@ -25,7 +30,7 @@ const Container = styled.div`
   }
 `;
 
-const Paper = styled.div`
+const Paper = styled.main`
   padding: 32px;
   border-radius: 20px;
   box-shadow: 0px 4px 6px rgba(196, 194, 193, 0.2);
@@ -140,7 +145,7 @@ function JoinPage() {
   );
 
   return (
-    <Wrapper>
+    <>
       <SEOConfig data={SEOData} />
       <Container>
         <Paper>
@@ -216,8 +221,22 @@ function JoinPage() {
           </PaperColumnCenter>
         </Paper>
       </Container>
-    </Wrapper>
+    </>
   );
 }
+
+JoinPage.getLayout = ({ children }) => {
+  return (
+    <JoinPageWrapper>
+      <PromotionProvider>
+        <NavigationProvider>
+          <Navigation />
+        </NavigationProvider>
+      </PromotionProvider>
+      {children}
+      <Footer />
+    </JoinPageWrapper>
+  );
+};
 
 export default JoinPage;

@@ -18,7 +18,7 @@ export const StyledDescription = styled.p`
   color: #536166;
 `;
 
-export const StyledContainer = styled.div`
+export const StyledContainer = styled.main`
   position: relative;
   display: flex;
   align-items: center;

@@ -2,10 +2,16 @@ import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
+import Navigation from '@/shared/components/Navigation';
+import Footer from '@/shared/components/Footer_v2';
 import { Box, Typography, Button } from "@mui/material";
 import emailImg from '@/public/assets/mail.png';
+import { NavigationProvider } from '@/contexts/Navigation';
+import { PromotionProvider } from '@/contexts/Promotion';
 
-const Wrapper = styled.div`
+const HomePageWrapper = styled.div`
+  --section-height: calc(100vh - 80px);
+  --section-height-offset: 80px;
   background: linear-gradient(0deg, #F3FCFC 0%, #F3FCFC 100%), #F7F8FA;
 `;
 
@@ -101,7 +107,7 @@ const LearningMarathonSignUp = () => {
   );
 
   return (
-    <Wrapper>
+    <>
       <SEOConfig data={SEOData} />
       <StyledBar>
         <h2>申請參加島島盃學習馬拉松</h2>
@@ -164,7 +170,21 @@ const LearningMarathonSignUp = () => {
           </StyledButton>
         </StyledButtonGroup>
       </StyledSection>
-    </Wrapper>
+    </>
+  );
+};
+
+LearningMarathonSignUp.getLayout = ({ children }) => {
+  return (
+    <HomePageWrapper>
+      <PromotionProvider>
+        <NavigationProvider>
+          <Navigation />
+        </NavigationProvider>
+      </PromotionProvider>
+      {children}
+      <Footer />
+    </HomePageWrapper>
   );
 };
 

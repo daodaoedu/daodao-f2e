@@ -1,7 +1,6 @@
 import MuiButton from '@mui/material/Button';
 
-/** @deprecated */
-const DeprecatedButton = ({ variant = 'contained', sx, ...props }) => {
+const Button = ({ variant = 'contained', sx, ...props }) => {
   return (
     <MuiButton
       variant={variant}
@@ -19,4 +18,4 @@ const DeprecatedButton = ({ variant = 'contained', sx, ...props }) => {
   );
 };
 
-export default DeprecatedButton;
+export default Button;
