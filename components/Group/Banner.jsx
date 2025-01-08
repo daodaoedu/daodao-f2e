@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
-import Button from '@/shared/components/Button';
+import DeprecatedButton from '@/shared/components/DeprecatedButton';
 import groupBannerImg from '@/public/assets/group-banner.png';
 import Image from '@/shared/components/Image';
 import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
@@ -62,7 +62,7 @@ const Banner = () => {
         <p>想一起組織有趣的活動或學習小組嗎？</p>
         <p>註冊並加入我們，然後創建你的活動，讓更多人一起參加！</p>
         <InfoCompletionGuard>
-          <Button onClick={() => router.push('/group/create')}>我想揪團</Button>
+          <DeprecatedButton onClick={() => router.push('/group/create')}>我想揪團</DeprecatedButton>
         </InfoCompletionGuard>
       </div>
     </StyledBanner>

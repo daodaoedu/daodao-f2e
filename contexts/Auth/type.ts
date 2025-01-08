@@ -13,16 +13,38 @@ export enum LoginStatus {
   PERMANENT,
 }
 
-export type AuthState = {
+interface CommonAuthState {
   isComplete: boolean;
-  isLoggedIn: boolean;
-  isTemporary: boolean;
   isOpenLoginModal: boolean;
-  loginStatus: LoginStatus;
   token: string | null;
-  user: IUser | null;
   redirectUrl: string;
-};
+}
+
+interface EmptyLoginState extends CommonAuthState {
+  isLoggedIn: false;
+  isTemporary: false;
+  loginStatus: LoginStatus.EMPTY;
+  user: null;
+}
+
+interface TemporaryLoginState extends CommonAuthState {
+  isLoggedIn: false;
+  isTemporary: true;
+  loginStatus: LoginStatus.TEMPORARY;
+  user: null;
+}
+
+interface PermanentLoginState extends CommonAuthState {
+  isLoggedIn: true;
+  isTemporary: false;
+  loginStatus: LoginStatus.PERMANENT;
+  user: IUser;
+}
+
+export type AuthState =
+  | EmptyLoginState
+  | TemporaryLoginState
+  | PermanentLoginState;
 
 export enum ActionTypes {
   OPEN_LOGIN_MODAL = "openLoginModal",
@@ -37,7 +59,7 @@ export type Action =
   | { type: ActionTypes.OPEN_LOGIN_MODAL; payload?: string }
   | { type: ActionTypes.CLOSE_LOGIN_MODAL }
   | { type: ActionTypes.SET_TOKEN; payload: string }
-  | { type: ActionTypes.UPDATE_USER; payload: IUser; }
+  | { type: ActionTypes.UPDATE_USER; payload: IUser }
   | { type: ActionTypes.LOGIN; payload: IUser | null }
   | { type: ActionTypes.LOGOUT };
 
@@ -45,7 +67,9 @@ export type AuthDispatch = {
   [ActionTypes.OPEN_LOGIN_MODAL]: (redirectUrl?: string) => void;
   [ActionTypes.CLOSE_LOGIN_MODAL]: () => void;
   [ActionTypes.SET_TOKEN]: (payload: string) => void;
-  [ActionTypes.UPDATE_USER]: (payload: CreateUserProfile | UpdateUserProfile) => Promise<void>;
+  [ActionTypes.UPDATE_USER]: (
+    payload: CreateUserProfile | UpdateUserProfile
+  ) => Promise<void>;
   [ActionTypes.LOGIN]: (payload: IUser | null) => void;
   [ActionTypes.LOGOUT]: () => void;
 };

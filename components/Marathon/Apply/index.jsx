@@ -182,7 +182,7 @@ export default function Apply() {
         <StyledTimelineGroup sx={{ marginBottom: '8px' }}>
           <StyledDateCard className="time">
             <StyledDateGroup>
-              <div className="date">01/19</div>
+              <div className="date">01/24</div>
               <div className="weekday"><span>日</span></div>
             </StyledDateGroup>
           </StyledDateCard>

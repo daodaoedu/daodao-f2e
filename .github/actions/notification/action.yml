@@ -1,0 +1,77 @@
+name: Discord Notification
+description: Send Discord Notification
+
+inputs:
+  TYPE:
+    description: "Embed Type"
+    required: false
+  TITLE:
+    description: "Title"
+    required: false
+  DESCRIPTION:
+    description: "Description"
+    required: false
+  AUTHOR_NAME:
+    description: "Author Name"
+    required: false
+  AUTHOR_URL:
+    description: "Author URL"
+    required: false
+  AUTHOR_ICON_URL:
+    description: "Author Icon URL"
+    required: false
+  DISCORD_WEBHOOK_URL:
+    description: "Discord Webhook URL"
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Send Discord Notification
+      shell: bash
+      run: |
+        if [ "${{ inputs.TYPE }}" == "success" ]; then
+          COLOR=5763207
+        elif [ "${{ inputs.TYPE }}" == "failure" ]; then
+          COLOR=15548997
+        elif [ "${{ inputs.TYPE }}" == "info" ]; then
+          COLOR=1752301
+        else
+          COLOR=9868950
+        fi
+
+        PAYLOAD=$(cat <<EOF
+        {
+          "avatar_url": "https://raw.githubusercontent.com/daodaoedu/daodao-f2e/main/public/daodao-logo.webp",
+          "username": "島島阿學",
+          "embeds": [
+            {
+              "author": {
+                "name": "${{ inputs.AUTHOR_NAME }}",
+                "url": "${{ inputs.AUTHOR_URL }}",
+                "icon_url": "${{ inputs.AUTHOR_ICON_URL }}"
+              },
+              "title": "${{ inputs.TITLE }}",
+              "description": "${{ inputs.DESCRIPTION }}",
+              "color": $COLOR
+            }
+          ]
+        }
+        EOF
+        )
+
+        response=$(curl -s -w "\n%{http_code}" -H "Content-Type: application/json" \
+          -X POST \
+          -d "$PAYLOAD" \
+          ${{ inputs.DISCORD_WEBHOOK_URL }})
+
+        status_code=$(echo "$response" | tail -n1)
+        response_body=$(echo "$response" | sed '$d')
+
+        if [ "$status_code" -ge 400 ]; then
+          echo "Error sending Discord notification"
+          echo "Status code: $status_code"
+          echo "Response: $response_body"
+          exit 1
+        fi
