@@ -17,6 +17,7 @@ on:
 
 env:
   PR_URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.number }}
+  BRANCH_NAME: ${{ github.event.pull_request.head.ref || github.ref_name }}
 
 jobs:
   init:
@@ -102,6 +103,8 @@ jobs:
 
       - name: Build
         run: yarn pages:build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ env.BRANCH_NAME == 'prod' && secrets.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL_DEV }}
 
       - name: Deploy to Cloudflare
         id: deploy
@@ -110,7 +113,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          command: pages deploy --branch=${{ github.event.pull_request.head.ref || github.ref_name }}
+          command: pages deploy --branch=${{ env.BRANCH_NAME }}
 
     outputs:
       preview-url: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
@@ -149,5 +152,5 @@ jobs:
         with:
           TYPE: success
           TITLE: "✅ Build Succeeded"
-          DESCRIPTION: "Preview URL: ${{ needs.build_and_deploy.outputs.preview-url }}\\nEnvironment: ${{ needs.build_and_deploy.outputs.deploy-env }})"
+          DESCRIPTION: "Preview URL: ${{ needs.build_and_deploy.outputs.preview-url }}\\nEnvironment: ${{ needs.build_and_deploy.outputs.deploy-env }}"
           DISCORD_WEBHOOK_URL: ${{ secrets.SANDBOX_DISCORD_WEBHOOK_URL }}
