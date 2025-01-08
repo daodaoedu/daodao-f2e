@@ -21,7 +21,6 @@ import {
   createUserProfile,
   createUserProfileSchema,
   fetchUserProfile,
-  IUser,
   updateUserProfile,
   updateUserProfileSchema,
 } from "@/services/users";
@@ -171,9 +170,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
       },
       updateUser: async (input) => {
         // TODO: remove after removed redux
-        if ((input as { _id: string })?._id) {
-          setToken((input as { token: string })?.token);
-          dispatch({ type: ActionTypes.UPDATE_USER, payload: input as IUser });
+        if ((input as { _id?: string })?._id) {
+          setToken((input as any)?.token);
+          dispatch({ type: ActionTypes.UPDATE_USER, payload: input as any });
           return;
         }
 

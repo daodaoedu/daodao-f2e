@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Switch from '@mui/material/Switch';
 import CircularProgress from '@mui/material/CircularProgress';
-import DeprecatedButton from '@/shared/components/DeprecatedButton';
+import Button from '@/shared/components/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { activityCategoryList } from '@/constants/activityCategory';
@@ -251,7 +251,7 @@ export default function GroupForm({
         </Box>
 
         <StyledFooter>
-          <DeprecatedButton
+          <Button
             sx={{ width: '100%', maxWidth: '287px', mt: 0 }}
             disabled={isLoading || !isDirty || !isChecked}
             onClick={handleSubmit(onSubmit)}
@@ -270,7 +270,7 @@ export default function GroupForm({
                 }}
               />
             )}
-          </DeprecatedButton>
+          </Button>
         </StyledFooter>
       </StyledContainer>
     </ProtectedComponent>

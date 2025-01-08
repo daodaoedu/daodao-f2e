@@ -363,7 +363,7 @@ export const getStaticPaths = async () => {
         title: (
           (item?.properties['資源名稱']?.title ?? []).find(
             // eslint-disable-next-line no-shadow
-            (title) => title?.type === 'text',
+            (item) => item?.type === 'text',
           )?.plain_text ?? ''
         ).trim(),
         // .replace(/\./g, "%2E"), // or try &#46; reference: https://stackoverflow.com/questions/4938900/how-to-encode-periods-for-urls-in-javascript

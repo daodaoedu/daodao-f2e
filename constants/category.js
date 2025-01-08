@@ -252,28 +252,6 @@ export const NAV_LINK = [
   // },
 ];
 
-export const MARATHON_LINKS = [
-  {
-    name: '活動詳情',
-    link: '/learning-marathon#marathon-intro',
-  },
-  {
-    name: '活動公告（未公開）',
-    link: '/marathon-announcement',
-    disabled: true
-  },
-  {
-    name: '學習計畫分享區（未公開）',
-    link: '/marathon-sharing',
-    disabled: true
-  },
-  {
-    name: '成果分享（未公開）',
-    link: '/project-sharing',
-    disabled: true,
-  },
-];
-
 export const NAV_LINK_MOBILE = [
   {
     name: '找資源',
@@ -324,13 +302,6 @@ export const NAV_LINK_MOBILE = [
   //   name: '找學習空間',
   //   link: 'https://www.facebook.com/groups/2237666046370459',
   // },
-];
-
-export const USER_LINK = [
-  { name: '個人資料', id: 'person-setting' },
-  { name: '我的揪團', id: 'my-group' },
-  { name: '帳號設定', id: 'account-setting' },
-  { name: '學習馬拉松', id: 'my-marathon' },
 ];
 
 export const FOOTER_LINK = [

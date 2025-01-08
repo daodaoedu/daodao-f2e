@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-import { usePromotion } from '@/contexts/Promotion';
+import { useNavigation } from '@/contexts/Navigation';
 
 export const StyledStepperBar = styled(Box)`
   background-color: #FFF;
@@ -16,7 +16,8 @@ export const StyledStepperBar = styled(Box)`
   gap: 20px;
   box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12);
   position: sticky;
-  z-index: 20;
+  z-index: 99;
+  top: ${(props) => (props.showPromotionBar ? '108px' : '64px')};
   width: 100%;
   left: 0;
 
@@ -59,10 +60,10 @@ export const StyledStepperBar = styled(Box)`
 `;
 
 export default function StepperBar({ currentStep }) {
-  const { height } = usePromotion();
+  const { showPromotionBar } = useNavigation();
 
   return (
-    <StyledStepperBar top={height}>
+    <StyledStepperBar showPromotionBar={showPromotionBar}>
       <div className="top">
         <h2>申請參加學習馬拉松</h2>
       </div>

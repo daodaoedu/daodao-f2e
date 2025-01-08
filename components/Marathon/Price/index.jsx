@@ -438,7 +438,7 @@ export default function Price() {
         退費標準
       </Typography>
       <StyledList>
-        需符合以下四項要求
+        需符合以下三項要求
         <ol>
           <li>
             工作坊、學習小組會議、團體諮詢及 1對1 諮詢，加總不得請假超過5小時。
