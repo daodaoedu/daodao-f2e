@@ -225,7 +225,7 @@ export default function Faq() {
         歡迎填寫團報表單，我們將協助促成！
         <Link
           href="https://forms.gle/BZ24JnTxid4y7CCV6"
-          className={cn("block text-base font-medium p-2.5 rounded-lg text-basic-400 transition-colors duration-300")}
+          className={cn("block text-sm font-normal p-2.5 rounded-lg text-basic-400 transition-colors duration-300")}
         >
           https://forms.gle/BZ24JnTxid4y7CCV6
         </Link>
@@ -233,12 +233,12 @@ export default function Faq() {
       <Accordion
         title="有哪些機會可以獲得課程費用優惠折抵呢？"
       >
-        參加說明會、轉分享貼文等方式都可獲得優惠，優惠活動請參考折價券申請表單：
+        前五名提交申請、參加說明會、轉分享貼文等方式都可獲得優惠，優惠活動請參考折價券申請表單：
         <Link
-          href="https://forms.gle/BZ24JnTxid4y7CCV6"
-          className={cn("block text-base font-medium p-2.5 rounded-lg text-basic-400 transition-colors duration-300")}
+          href="https://forms.gle/9Pfa9Q5d27m1JEpUA"
+          className={cn("block text-sm font-normal p-2.5 rounded-lg text-basic-400 transition-colors duration-300")}
         >
-          https://forms.gle/9Pfa9Q5d27m1JEpUA （折抵金額無上限）
+          https://forms.gle/9Pfa9Q5d27m1JEpUA （折抵金額無上限，，但計畫一、計畫二皆只能各折抵一次，例如同時在 IG、FB分享，只能折抵一次。參加兩場說明會，只能折抵一次。）
         </Link>
       </Accordion>
     </StyledGroup>
