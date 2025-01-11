@@ -41,6 +41,12 @@ runs:
           COLOR=9868950
         fi
 
+        DESCRIPTION="${{ inputs.DESCRIPTION }}"
+        DESCRIPTION="${DESCRIPTION//\"/\\\"}"
+        DESCRIPTION="${DESCRIPTION//$'\r\n'/\\n}"
+        DESCRIPTION="${DESCRIPTION//$'\n'/\\n}"
+        DESCRIPTION="${DESCRIPTION//$'\r'/\\n}"
+
         PAYLOAD=$(cat <<EOF
         {
           "avatar_url": "https://raw.githubusercontent.com/daodaoedu/daodao-f2e/main/public/daodao-logo.webp",
@@ -53,7 +59,7 @@ runs:
                 "icon_url": "${{ inputs.AUTHOR_ICON_URL }}"
               },
               "title": "${{ inputs.TITLE }}",
-              "description": "${{ inputs.DESCRIPTION }}",
+              "description": "$DESCRIPTION",
               "color": $COLOR
             }
           ]
