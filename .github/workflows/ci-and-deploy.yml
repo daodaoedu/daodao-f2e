@@ -87,6 +87,8 @@ jobs:
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.BOT_PAT }}
 
       - name: Cache dependencies
         id: cache
@@ -127,6 +129,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.BOT_PAT }}
 
       - name: Send Lint Failed Notification
         if: ${{ needs.lint.result == 'failure' }}
@@ -135,7 +139,7 @@ jobs:
           TYPE: failure
           TITLE: "❌ Lint Failed"
           DESCRIPTION: "PR Link: [PR #${{ github.event.number }}](${{ env.PR_URL }})"
-          DISCORD_WEBHOOK_URL: ${{ secrets.SANDBOX_DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       - name: Send Build and Deploy Failed Notification
         if: ${{ needs.build_and_deploy.result == 'failure' }}
@@ -144,7 +148,7 @@ jobs:
           TYPE: failure
           TITLE: "❌ Build and Deploy Failed"
           DESCRIPTION: "PR Link: [PR #${{ github.event.number }}](${{ env.PR_URL }})"
-          DISCORD_WEBHOOK_URL: ${{ secrets.SANDBOX_DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       - name: Send Build Succeeded Notification
         if: ${{ needs.build_and_deploy.result == 'success' }}
@@ -153,4 +157,4 @@ jobs:
           TYPE: success
           TITLE: "✅ Build Succeeded"
           DESCRIPTION: "Preview URL: ${{ needs.build_and_deploy.outputs.preview-url }}\\nEnvironment: ${{ needs.build_and_deploy.outputs.deploy-env }}"
-          DISCORD_WEBHOOK_URL: ${{ secrets.SANDBOX_DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
