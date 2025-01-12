@@ -211,7 +211,6 @@ export default function ConfirmForm({
   setCurrentStep,
   currentStep,
 }) {
-  const [/** hasClickSubmitButton */, setHasClickSubmitButton] = useState(false);
   const reduxDispatch = useDispatch();
   const marathonState = useSelector((state) => { return state.marathon; });
   const userState = useSelector((state) => { return state.user; });
@@ -279,6 +278,7 @@ export default function ConfirmForm({
       userId: userState._id,
       status: 'Complete'
     };
+
     if (marathonState._id) {
       reduxDispatch(updateMarathonProfile(token, marathonState._id, submitData));
       localStorage.removeItem('newMarathon');
@@ -287,7 +287,6 @@ export default function ConfirmForm({
       reduxDispatch(createMarathonProfileByToken(token, submitData));
       localStorage.removeItem('newMarathon');
     }
-    setHasClickSubmitButton(true);
   };
 
   useEffect(() => {
