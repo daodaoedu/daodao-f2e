@@ -88,10 +88,12 @@ export default function MarathonForm({
 
   const validators = {
     required: (value) => {
-      return value.trim().length > 0;
+      return ((typeof value === "string") && (value.trim().length > 0));
     },
     allMilestonesNameRequired: (value, milestonesLength) => {
-      const names = value.filter((milestone) => milestone?.name.trim().length > 0);
+      const names = value.filter((milestone) =>
+        typeof milestone?.name === 'string' && milestone?.name?.trim().length > 0
+      );
       return names.length === milestonesLength;
     }
   };
