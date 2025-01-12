@@ -19,6 +19,10 @@ import {
   StyledMobileEditButton,
 } from './Detail.styled';
 import ShareButtonGroup from './ShareButtonGroup';
+import classNames from 'classnames';
+
+console.log(classNames);
+
 
 function GroupDetail({ id, source, isLoading }) {
   const router = useRouter();
