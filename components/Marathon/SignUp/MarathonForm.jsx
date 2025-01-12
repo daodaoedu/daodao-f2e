@@ -201,7 +201,7 @@ export default function MarathonForm({
             break;
           default:
             input = newMarathon[name];
-          break;
+            break;
         }
         const validationPassed = validate(input);
 
