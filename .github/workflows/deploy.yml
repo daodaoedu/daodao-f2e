@@ -74,20 +74,20 @@ jobs:
           git add .
           git diff --cached --quiet || echo "changes=true" >> $GITHUB_OUTPUT
 
-      - name: Commit lint Changes
-        if: steps.lint.outputs.changes == 'true'
-        run: |
-          git commit -m "chore: format code"
-          git push
-
       - name: Send Error Notification
-        if: failure()
+        if: steps.lint.conclusion == 'failure'
         uses: ./.github/actions/notification
         with:
           TYPE: failure
           TITLE: "❌ Lint Failed"
-          DESCRIPTION: "Branch: ${{ env.BRANCH_NAME }}\\n\\n${{ steps.lint.outputs.lint_error }}"
+          DESCRIPTION: "Branch: ${{ env.BRANCH_NAME }}\n\n${{ steps.lint.outputs.lint_error }}"
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Commit lint Changes
+        if: steps.lint.conclusion == 'success' && steps.lint.outputs.changes == 'true'
+        run: |
+          git commit -m "chore: format code"
+          git push
 
   build_and_deploy:
     name: Build and Deploy to Cloudflare

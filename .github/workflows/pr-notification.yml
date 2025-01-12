@@ -24,7 +24,7 @@ jobs:
         with:
           TYPE: info
           TITLE: "🔔 ${{ env.TITLE }}"
-          DESCRIPTION: "${{ env.PR_LINK }}\\n\\n${{ env.DESCRIPTION }}"
+          DESCRIPTION: "${{ env.PR_LINK }}\n\n${{ env.DESCRIPTION }}"
           AUTHOR_NAME: ${{ github.event.pull_request.user.name || github.event.pull_request.user.login }}
           AUTHOR_URL: ${{ github.event.pull_request.user.html_url }}
           AUTHOR_ICON_URL: ${{ github.event.pull_request.user.avatar_url }}
