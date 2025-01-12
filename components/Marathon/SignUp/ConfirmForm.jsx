@@ -514,7 +514,7 @@ export default function ConfirmForm({
           variant="contained"
           onClick={onSubmit}
         >
-          提交申請
+          {marathonState._id ? '更新報名資料' : '提交申請'}
         </StyledButton>
       </StyledButtonGroup>
     </>
