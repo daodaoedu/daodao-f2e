@@ -61,7 +61,6 @@ jobs:
 
       - name: lint
         id: lint
-        continue-on-error: true
         run: |
           if ! yarn lint; then
             ERROR_MSG=$(yarn lint 2>&1)
@@ -76,7 +75,7 @@ jobs:
           git diff --cached --quiet || echo "changes=true" >> $GITHUB_OUTPUT
 
       - name: Commit lint Changes
-        if: success() && steps.lint.outputs.changes == 'true'
+        if: steps.lint.outputs.changes == 'true'
         run: |
           git commit -m "chore: format code"
           git push
