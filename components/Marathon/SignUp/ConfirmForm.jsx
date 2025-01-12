@@ -293,7 +293,6 @@ export default function ConfirmForm({
     switch (marathonState.apiStateWithType) {
       case 'updateMarathonProfileSuccess': {
         toast.success('更新成功');
-        router.push('/learning-marathon/success');
         break;
       }
       case 'createMarathonProfileByTokenSuccess': {
