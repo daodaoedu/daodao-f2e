@@ -1,7 +1,8 @@
 name: PR Notification
 
 on:
-  pull_request:
+  pull_request_target:
+    types: [opened, reopened, edited]
     branches: "**"
 
 env:
@@ -15,9 +16,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.BOT_PAT }}
+      - name: Git checkout
+        uses: actions/checkout@v4
 
       - name: Send PR Notification
         uses: ./.github/actions/notification
