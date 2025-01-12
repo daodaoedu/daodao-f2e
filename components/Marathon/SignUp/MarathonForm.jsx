@@ -88,10 +88,12 @@ export default function MarathonForm({
 
   const validators = {
     required: (value) => {
-      return value.trim().length > 0;
+      return ((typeof value === "string") && (value.trim().length > 0));
     },
     allMilestonesNameRequired: (value, milestonesLength) => {
-      const names = value.filter((milestone) => milestone?.name.trim().length > 0);
+      const names = value.filter((milestone) =>
+        typeof milestone?.name === 'string' && milestone?.name?.trim().length > 0
+      );
       return names.length === milestonesLength;
     }
   };
@@ -199,7 +201,7 @@ export default function MarathonForm({
             break;
           default:
             input = newMarathon[name];
-          break;
+            break;
         }
         const validationPassed = validate(input);
 
@@ -235,10 +237,10 @@ export default function MarathonForm({
     const isValid = handleValidateAll();
     if (!isValid) {
       toast.error('請修正錯誤');
-    } else {
-      reduxDispatch(updateNewMarathon(newMarathon));
-      setCurrentStep(currentStep + 1);
+      return;
     }
+    reduxDispatch(updateNewMarathon(newMarathon));
+    setCurrentStep(currentStep + 1);
   };
 
   const onPrevStep = () => {
