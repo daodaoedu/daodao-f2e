@@ -237,10 +237,10 @@ export default function MarathonForm({
     const isValid = handleValidateAll();
     if (!isValid) {
       toast.error('請修正錯誤');
-    } else {
-      reduxDispatch(updateNewMarathon(newMarathon));
-      setCurrentStep(currentStep + 1);
+      return;
     }
+    reduxDispatch(updateNewMarathon(newMarathon));
+    setCurrentStep(currentStep + 1);
   };
 
   const onPrevStep = () => {
