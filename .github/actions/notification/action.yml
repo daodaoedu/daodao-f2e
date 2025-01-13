@@ -44,9 +44,9 @@ runs:
           COLOR=9868950
         fi
 
-        DESCRIPTION="${{ inputs.DESCRIPTION }}"
-        DESCRIPTION="${DESCRIPTION//'\r\n'/'\n'}"
-        DESCRIPTION="${DESCRIPTION//'\r'/'\n'}"
+        DESCRIPTION=${{ env.DESCRIPTION }}
+        DESCRIPTION=${DESCRIPTION//'\r\n'/'\n'}
+        DESCRIPTION=${DESCRIPTION//'\r'/'\n'}
 
         PAYLOAD=$(cat <<EOF
         {

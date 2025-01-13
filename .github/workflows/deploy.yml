@@ -13,7 +13,6 @@ on:
 
 env:
   BRANCH_NAME: ${{ github.ref_name }}
-  IS_PROD: ${{ github.ref_name == 'prod' }}
 
 jobs:
   init:
@@ -117,7 +116,7 @@ jobs:
       - name: Build
         run: yarn pages:build
         env:
-          NEXT_PUBLIC_API_URL: ${{ env.IS_PROD && secrets.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL_DEV }}
+          NEXT_PUBLIC_API_URL: ${{ github.ref_name == 'prod' && secrets.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL_DEV }}
 
       - name: Deploy to Cloudflare
         id: deploy
@@ -129,7 +128,7 @@ jobs:
           command: pages deploy --branch=${{ env.BRANCH_NAME }}
 
     outputs:
-      preview-url: ${{ env.IS_PROD && 'https://www.daoedu.tw/' || steps.deploy.outputs.pages-deployment-alias-url }}
+      preview-url: ${{ github.ref_name == 'prod' && 'https://www.daoedu.tw/' || steps.deploy.outputs.pages-deployment-alias-url }}
       cmd-output: ${{ steps.deploy.outputs.command-output }}
 
   send_result:
