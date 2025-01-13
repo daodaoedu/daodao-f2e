@@ -6,7 +6,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import EastIcon from '@mui/icons-material/East';
 import { BASE_URL } from "@/constants/common";
-import classNames from 'classnames';
+import { cn } from '@/utils/cn';
 import dayjs from 'dayjs';
 import { ISOToWeekday } from '@/components/Marathon/SignUp/dateMap';
 import { EDUCATION_STEP, ROLE } from '@/constants/member';
@@ -17,7 +17,7 @@ import ShareButtonGroup from '@/components/Group/detail/ShareButtonGroup';
 const Panel = ({ children, className = "" }) => {
   return (
     <div className={
-      classNames('w-full sm:w-[750px] mx-auto rounded-2xl p-10', className)
+      cn('w-full sm:w-[750px] mx-auto rounded-2xl p-10', className)
     }
     >
       {children}
