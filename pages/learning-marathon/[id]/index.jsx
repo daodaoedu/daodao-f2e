@@ -24,10 +24,10 @@ const Panel = ({ children, className = "" }) => {
     </div>
   );
 };
-const Title = ({ title, loading = true }) => {
+const Title = ({ title, isLoading = true }) => {
   return (
     <>
-      {loading ?
+      {isLoading ?
         (
           <Skeleton animation="wave" width="60%" height="28px" />) :
         (
@@ -46,10 +46,10 @@ const Divider = () => {
   );
 };
 
-const Description = ({ description, loading = true }) => {
+const Description = ({ description, isLoading = true }) => {
   return (
     <>
-      {loading ? (
+      {isLoading ? (
         <Skeleton animation="wave" width="80%" height="28px" />
       ) : (
         <p className="body-md font-sans">{description}</p>
@@ -58,10 +58,10 @@ const Description = ({ description, loading = true }) => {
   );
 };
 
-const Tags = ({ tags, loading = true }) => {
+const Tags = ({ tags, isLoading = true }) => {
   return (
     <>
-      {loading ? (
+      {isLoading ? (
         <Skeleton animation="wave" width="30%" height="28px" />
       ) : (
         <div className="flex flex-row gap-2 mb-2">
@@ -76,10 +76,10 @@ const Tags = ({ tags, loading = true }) => {
   );
 };
 
-const FakeInput = ({ value, loading = true }) => {
+const FakeInput = ({ value, isLoading = true }) => {
   return (
     <>
-      {loading ? (
+      {isLoading ? (
         <Skeleton animation="wave" width="80%" height="45px" />
       ) : (
         <div
@@ -94,12 +94,12 @@ const FakeInput = ({ value, loading = true }) => {
   );
 };
 
-const FakeDateSelector = ({ title, value, type = "date", loading = true }) => {
+const FakeDateSelector = ({ title, value, type = "date", isLoading = true }) => {
   return (
     <>
       <span className="text-sm text-basic-400 pl-1">{title}</span>
       {
-        loading ? (
+        isLoading ? (
           <Skeleton animation="wave" width="100%" height="45px" />
         ) : (
           <div className="w-full flex flex-row items-center justify-between py-3 px-4 border border-solid border-basic-200 rounded-lg">
@@ -187,7 +187,7 @@ const LearningMarathonProfile = () => {
   const biweeklyMilestonesLength = 11;
   const { id } = router.query;
   const [loadedUrl, setLoadedUrl] = useState(false);
-  const [fullUrl, setfullUrl] = useState('');
+  const [fullUrl, setFullUrl] = useState('');
 
   // states for marathon profile
   const [data, setData] = useState({});
@@ -210,7 +210,7 @@ const LearningMarathonProfile = () => {
   useEffect(() => {
     if ((typeof window !== 'undefined') && !loadedUrl) {
       const currentUrl = window.location.origin + router.asPath;
-      setfullUrl(currentUrl);
+      setFullUrl(currentUrl);
       setLoadedUrl(true);
     }
   }, [router]);
@@ -403,33 +403,33 @@ const LearningMarathonProfile = () => {
       </Panel>
 
       <Panel className="mb-4 bg-white">
-        <Title title="計畫簡述" loading={loadingMarathon} />
-        <Description description={data.description} loading={loadingMarathon} />
+        <Title title="計畫簡述" isLoading={loadingMarathon} />
+        <Description description={data.description} isLoading={loadingMarathon} />
         <Divider />
-        <Title title="學習動機" loading={loadingMarathon} />
+        <Title title="學習動機" isLoading={loadingMarathon} />
         {
           data.motivation?.tags.length && (
-            <Tags tags={data.motivation.tags} loading={loadingMarathon} />
+            <Tags tags={data.motivation.tags} isLoading={loadingMarathon} />
           )
         }
-        <Description description={data.motivation?.description} loading={loadingMarathon} />
+        <Description description={data.motivation?.description} isLoading={loadingMarathon} />
         <Divider />
-        <Title title="學習目標" loading={loadingMarathon} />
-        <Description description={data.goals} loading={loadingMarathon} />
+        <Title title="學習目標" isLoading={loadingMarathon} />
+        <Description description={data.goals} isLoading={loadingMarathon} />
         <Divider />
-        <Title title="學習內容" loading={loadingMarathon} />
-        <Description description={data.content} loading={loadingMarathon} />
+        <Title title="學習內容" isLoading={loadingMarathon} />
+        <Description description={data.content} isLoading={loadingMarathon} />
         <Divider />
-        <Title title="學習方法與策略" loading={loadingMarathon} />
+        <Title title="學習方法與策略" isLoading={loadingMarathon} />
         {
           data.strategies?.tags.length && (
-            <Tags tags={data.strategies.tags} loading={loadingMarathon} />
+            <Tags tags={data.strategies.tags} isLoading={loadingMarathon} />
           )
         }
-        <Description description={data.strategies?.description} loading={loadingMarathon} />
+        <Description description={data.strategies?.description} isLoading={loadingMarathon} />
         <Divider />
-        <Title title="學習資源" loading={loadingMarathon} />
-        <FakeInput value={data.resources} loading={loadingMarathon} />
+        <Title title="學習資源" isLoading={loadingMarathon} />
+        <FakeInput value={data.resources} isLoading={loadingMarathon} />
       </Panel>
 
       <Panel className="mb-4 p-[30px] bg-white">
@@ -438,15 +438,15 @@ const LearningMarathonProfile = () => {
         </h3>
         <div className="w-full flex flex-col sm:flex-row items-start gap-2 sm:gap-[10px] mb-5">
           <div className="w-full sm:w-auto">
-            <FakeDateSelector title="開始日期" value={startDate} type="date" loading={loadingMarathon} />
+            <FakeDateSelector title="開始日期" value={startDate} type="date" isLoading={loadingMarathon} />
           </div>
 
           <div className="w-full sm:w-auto">
-            <FakeDateSelector title="結束日期" value={endDate} type="date" loading={loadingMarathon} />
+            <FakeDateSelector title="結束日期" value={endDate} type="date" isLoading={loadingMarathon} />
           </div>
 
           <div className="w-full sm:w-auto">
-            <FakeDateSelector title="頻率" value={frequency} type="frequency" loading={loadingMarathon} />
+            <FakeDateSelector title="頻率" value={frequency} type="frequency" isLoading={loadingMarathon} />
           </div>
         </div>
 
@@ -506,13 +506,13 @@ const LearningMarathonProfile = () => {
       </Panel>
 
       <Panel className="bg-white">
-        <Title title="學習成果" loading={loadingMarathon} />
+        <Title title="學習成果" isLoading={loadingMarathon} />
         {
           (data.outcomes?.tags.length) && (
-            <Tags tags={data.outcomes.tags} loading={loadingMarathon} />
+            <Tags tags={data.outcomes.tags} isLoading={loadingMarathon} />
           )
         }
-        <Description description={data.outcomes?.description} loading={loadingMarathon} />
+        <Description description={data.outcomes?.description} isLoading={loadingMarathon} />
       </Panel>
     </Box>
   );
