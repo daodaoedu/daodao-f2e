@@ -25,17 +25,12 @@ const Panel = ({ children, className = "" }) => {
   );
 };
 const Title = ({ title, isLoading = true }) => {
-  return (
-    <>
-      {isLoading ?
-        (
-          <Skeleton animation="wave" width="60%" height="28px" />) :
-        (
-          <h3 className="text-basic-500 body-md font-medium mb-2 font-sans">
-            {title}
-          </h3>
-        )}
-    </>
+  return isLoading ? (
+    <Skeleton animation="wave" width="60%" height="28px" />
+  ) : (
+    <h3 className="text-basic-500 body-md font-medium mb-2 font-sans">
+      {title}
+    </h3>
   );
 };
 const Divider = () => {
@@ -45,80 +40,69 @@ const Divider = () => {
 };
 
 const Description = ({ description, isLoading = true }) => {
-  return (
-    <>
-      {isLoading ? (
-        <Skeleton animation="wave" width="80%" height="28px" />
-      ) : (
-        <p className="body-md font-sans">{description}</p>
-      )}
-    </>
+  return isLoading ? (
+    <Skeleton animation="wave" width="80%" height="28px" />
+  ) : (
+    <p className="body-md font-sans">{description}</p>
   );
 };
 
 const Tags = ({ tags, isLoading = true }) => {
-  return (
-    <>
-      {isLoading ? (
-        <Skeleton animation="wave" width="30%" height="28px" />
-      ) : (
-        <div className="flex flex-row gap-2 mb-2">
-          {tags.map((tag, /* _i */) => {
-            return (
-              <span key={tag} className="text-sm text-[#2D3648] px-2 bg-primary-lightest rounded-[4px] py-[2px] font-sans">{tag}</span>
-            );
-          })}
-        </div>
-      )}
-    </>
+  return isLoading ? (
+    <Skeleton animation="wave" width="30%" height="28px" />
+  ) : (
+    <div className="flex flex-row gap-2 mb-2">
+      {tags.map((tag, /* _i */) => {
+        return (
+          <span key={tag} className="text-sm text-[#2D3648] px-2 bg-primary-lightest rounded-[4px] py-[2px] font-sans">{tag}</span>
+        );
+      })}
+    </div>
   );
 };
 
 const FakeInput = ({ value, isLoading = true }) => {
-  return (
-    <>
-      {isLoading ? (
-        <Skeleton animation="wave" width="80%" height="45px" />
-      ) : (
-        <div
-          className="py-3 px-4
-          border border-solid border-basic-200
-          rounded-lg font-sans"
-        >
-          {value}
-        </div>
-      )}
-    </>
+  return isLoading ? (
+    <Skeleton animation="wave" width="80%" height="45px" />
+  ) : (
+    <div
+      className="py-3 px-4
+      border border-solid border-basic-200
+      rounded-lg font-sans"
+    >
+      {value}
+    </div>
   );
 };
 
 const FakeDateSelector = ({ title, value, type = "date", isLoading = true }) => {
+  const skeletonContent = (
+    <Skeleton animation="wave" width="100%" height="45px" />
+  );
+
+  const content = (
+    <div className="w-full flex flex-row items-center justify-between py-3 px-4 border border-solid border-basic-200 rounded-lg">
+      <p className="mr-5 text-basic-300">{value}</p>
+      {type === "date" ? (
+        <CalendarTodayIcon
+          className="text-basic-300"
+          sx={{
+            width: '18px',
+            height: '18px'
+          }}
+        />
+      ) : (
+        <ExpandMoreIcon
+          className="text-basic-300"
+        />
+      )
+      }
+    </div>
+  );
   return (
     <>
       <span className="text-sm text-basic-400 pl-1">{title}</span>
-      {
-        isLoading ? (
-          <Skeleton animation="wave" width="100%" height="45px" />
-        ) : (
-          <div className="w-full flex flex-row items-center justify-between py-3 px-4 border border-solid border-basic-200 rounded-lg">
-            <p className="mr-5 text-basic-300">{value}</p>
-            {type === "date" ? (
-              <CalendarTodayIcon
-                className="text-basic-300"
-                sx={{
-                  width: '18px',
-                  height: '18px'
-                }}
-              />
-            ) : (
-              <ExpandMoreIcon
-                className="text-basic-300"
-              />
-            )
-            }
-          </div>
-        )
-      }
+      { isLoading ? skeletonContent : content }
     </>
   );
 };
