@@ -187,11 +187,7 @@ const LearningMarathonProfile = () => {
 
   // set url for social share
   useEffect(() => {
-    if ((typeof window !== 'undefined') && !loadedUrl) {
-      const currentUrl = window.location.origin + router.asPath;
-      setFullUrl(currentUrl);
-      setLoadedUrl(true);
-    }
+    setFullUrl(window.location.href);
   }, [router]);
 
   // set data for showing marathon profile
