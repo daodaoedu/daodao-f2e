@@ -40,9 +40,7 @@ const Title = ({ title, isLoading = true }) => {
 };
 const Divider = () => {
   return (
-    <>
-      <hr className="my-5 border-basic-100" />
-    </>
+    <hr className="my-5 border-basic-100" />
   );
 };
 
@@ -129,25 +127,23 @@ const SubMilestone = ({ subMilestone, index }) => {
     return ISOToWeekday(isoDate);
   });
   return (
-    <>
-      <div className="w-full bg-white rounded-lg py-3 px-4">
-        <p className="mb-2">
-          {`${index + 1}. `}{subMilestone.name}
+    <div className="w-full bg-white rounded-lg py-3 px-4">
+      <p className="mb-2">
+        {`${index + 1}. `}{subMilestone.name}
+      </p>
+      <div className="flex flex-row items-center justify-start">
+        <CalendarTodayIcon
+          className="text-basic-300 mr-[5px]"
+          sx={{
+            width: '16px',
+            height: '16px'
+          }}
+        />
+        <p className="font-sans text-basic-300 text-xs font-light">
+          {weekDay.join(', ')}
         </p>
-        <div className="flex flex-row items-center justify-start">
-          <CalendarTodayIcon
-            className="text-basic-300 mr-[5px]"
-            sx={{
-              width: '16px',
-              height: '16px'
-            }}
-          />
-          <p className="font-sans text-basic-300 text-xs font-light">
-            {weekDay.join(', ')}
-          </p>
-        </div>
       </div>
-    </>
+    </div>
   );
 };
 const LearningMarathonProfile = () => {
@@ -186,7 +182,6 @@ const LearningMarathonProfile = () => {
 
   const biweeklyMilestonesLength = 11;
   const { id } = router.query;
-  const [loadedUrl, setLoadedUrl] = useState(false);
   const [fullUrl, setFullUrl] = useState('');
 
   // states for marathon profile
