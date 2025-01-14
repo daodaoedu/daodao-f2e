@@ -102,7 +102,7 @@ const FakeDateSelector = ({ title, value, type = "date", isLoading = true }) => 
   return (
     <>
       <span className="text-sm text-basic-400 pl-1">{title}</span>
-      { isLoading ? skeletonContent : content }
+      {isLoading ? skeletonContent : content}
     </>
   );
 };
@@ -443,8 +443,8 @@ const LearningMarathonProfile = () => {
                       className="w-full flex flex-col justify-start items-start gap-2 rounded-xl bg-basic-100 p-[10px]"
                     >
                       <div className="w-full flex flex-row items-center justify-between">
-                        <div className="inline-block py-[5px] px-5 text-white bg-primary-base body-sm rounded-[20px]">
-                          第{weeks[index]}週
+                        <div className="py-[5px] px-5 text-white bg-primary-base rounded-[20px]">
+                          <span className="font-sans body-sm">第{weeks[index]}週</span>
                         </div>
                         <div className="flex flex-row items-center gap-1 pr-1">
                           <p className="text-basic-300">{dayjs(milestone.startDate).format('YYYY/MM/DD')}</p>
