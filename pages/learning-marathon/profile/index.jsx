@@ -13,6 +13,7 @@ import { EDUCATION_STEP, ROLE } from '@/constants/member';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import ShareButtonGroup from '@/components/Group/detail/ShareButtonGroup';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 
 const Panel = ({ children, className = "" }) => {
   return (
@@ -307,7 +308,16 @@ const LearningMarathonProfile = () => {
       className="px-4 py-5 sm:py-[50px]"
     >
       <SEOConfig data={SEOData} />
-
+      <Panel className="mb-4 p-0">
+        <button
+          type="button"
+          onClick={() => router.push('/profile?id=my-marathon')}
+          className="flex flex-row items-center justify-start text-basic-400 font-sans body-sm"
+        >
+          <NavigateBeforeIcon />
+          返回
+        </button>
+      </Panel>
       <Panel className="mb-4 p-[10px] flex flex-col gap-2 justify-start items-start">
         <div className="w-full flex flex-row justify-between">
           <div className="py-1 px-[10px] flex flex-row items-center justify-center gap-1 rounded-[4px] bg-primary-lightest">
