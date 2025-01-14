@@ -42,9 +42,7 @@ export default function MarathonCard({ marathon }) {
   };
   const handleClickDetail = () => {
     setAnchorEl(null);
-    window.localStorage.setItem('fromProfilePage', 'click_detail');
-    reduxDispatch(fetchMarathonProfileById(marathon._id));
-    router.push('/learning-marathon/signup');
+    router.push(`/learning-marathon/profile?id=${marathon._id}`);
   };
   return (
     <StyledGroupCard>
