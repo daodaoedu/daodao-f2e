@@ -266,7 +266,11 @@ const LearningMarathonProfile = () => {
             const roleZh = ROLE.find((option) => {
               return option.value === result.roleList[0];
             });
-            setRole(roleZh.label);
+            if (roleZh) {
+              setRole(roleZh.label);
+            } else {
+              setRole('暫無資料');
+            }
           } else {
             setRole('暫無資料');
           }
@@ -276,7 +280,11 @@ const LearningMarathonProfile = () => {
             const eduZh = EDUCATION_STEP.find((option) => {
               return option.value === result.educationStage;
             });
-            setEduStep(eduZh.label);
+            if (eduZh) {
+              setEduStep(eduZh.label);
+            } else {
+              setEduStep('暫無資料');
+            }
           } else {
             setEduStep('暫無資料');
           }
