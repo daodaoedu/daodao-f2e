@@ -55,7 +55,7 @@ const StyledBannerButton = styled(Button)`
 
   @media (max-width: 767px) {
     &.MuiButton-root {
-      top: calc(100vw / 1.434);
+      top: calc(100vw / 1.25);
     }
   }
 `;

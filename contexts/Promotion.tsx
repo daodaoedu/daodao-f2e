@@ -46,7 +46,7 @@ enum PromotionType {
 const promotionConfigs = {
   [PromotionType.LearningMarathon]: {
     texts: [
-      "✨「島島盃 -  2025 春季學習馬拉松」開跑啦！1/19 截止申請！✨",
+      "✨「島島盃 -  2025 春季學習馬拉松」開跑啦！1/24 截止申請！✨",
       "✨參加學習馬拉松，一起為自己重新打造喜歡的學習生活吧！✨",
       "✨申請學習馬拉松，即可試用最新個人化功能輔助學習唷！✨",
     ],
