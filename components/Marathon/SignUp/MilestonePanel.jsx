@@ -122,6 +122,17 @@ export default function MilestonePanel({
 
   const handleDeleteSubMilestone = (deletedItem) => {
     const newSubMilestones = (milestone.subMilestones).filter((item) => {
+      /*
+        if is submitted subMilestone,
+        match deleted subMilestone with item._id
+      */
+      if (item._id) {
+        return (item._id !== deletedItem._id);
+      }
+      /*
+        if not submitted subMilestone,
+        match deleted subMilestone with item._tempId
+      */
       return (item._tempId !== deletedItem._tempId);
     });
     onChange({
@@ -132,6 +143,17 @@ export default function MilestonePanel({
 
   const handleEditSubMilestone = (newItem) => {
     const newSubMilestones = (milestone.subMilestones).map((item) => {
+      /*
+        if is submitted subMilestone,
+        match edited subMilestone with item._id
+      */
+      if (item._id) {
+        return (newItem._id === item._id) ? newItem : item;
+      }
+      /*
+        if not submitted subMilestone,
+        match edited subMilestone with item._tempId
+      */
       return (newItem._tempId === item._tempId) ? newItem : item;
     });
     onChange({
