@@ -349,6 +349,11 @@ export const FOOTER_LINK = [
     link: '/group',
     target: '_self',
   },
+    {
+    name: '找故事',
+    link: 'https://blog.daoedu.tw',
+    target: '_blank',
+  },
   // {
   //   name: '找活動',
   //   link: '/activities',
