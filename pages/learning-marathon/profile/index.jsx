@@ -183,6 +183,7 @@ const LearningMarathonProfile = () => {
   const [user, setUser] = useState({});
   const [role, setRole] = useState(null);
   const [eduStep, setEduStep] = useState(null);
+  const [locations, setLocations] = useState(null);
   const [location, setLocation] = useState(null);
   const [loadingUser, setLoadingUser] = useState(false);
 
@@ -290,14 +291,8 @@ const LearningMarathonProfile = () => {
           }
 
           if (result.location) {
-            if (result.location.includes('@')) {
-              setLocation(location.replace('台灣', '').split('@').join(' '));
-            }
-            if (result.location === '國外') {
-              setLocation('國外');
-            }
-          } else {
-            setLocation('暫無資料');
+            setLocation(result.location);
+            setLocations(result.location.split('@'));
           }
 
           setLoadingUser(false);
@@ -382,14 +377,26 @@ const LearningMarathonProfile = () => {
               <p className="body-sm text-basic-300 font-sans">{role}</p>
             </div>
             <div className="mb-auto flex flex-row items-center gap-1 sm:mr-[30px]">
-              <LocationOnOutlinedIcon
-                className="text-basic-400"
-                sx={{
-                  width: '16px',
-                  height: '16px'
-                }}
-              />
-              <span className="text-basic-400">{location}</span>
+              {location && (
+                <>
+                  <LocationOnOutlinedIcon
+                    className="text-basic-400"
+                    sx={{
+                      width: '16px',
+                      height: '16px'
+                    }}
+                  />
+                  <span className="text-basic-400">{location
+                    ? location.length >= 2
+                      ? locations
+                          .join('')
+                          .replace('台灣', '')
+                          .replace('null', '')
+                      : locations.join('')
+                    : '-'}
+                  </span>
+                </>
+              )}
             </div>
           </>
         )}
