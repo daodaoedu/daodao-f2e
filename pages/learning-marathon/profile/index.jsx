@@ -14,6 +14,24 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import ShareButtonGroup from '@/components/Group/detail/ShareButtonGroup';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import { z } from 'zod';
+
+const idSchema = z.string().regex(/^\d+$/).max(10);
+
+function validateIdWithZod(id) {
+  try {
+    const result = idSchema.parse(id);
+    return {
+      isValid: true,
+      value: result
+    };
+  } catch (error) {
+    return {
+      isValid: false,
+      error
+    };
+  }
+}
 
 const Panel = ({ children, className = "" }) => {
   return (
@@ -195,6 +213,12 @@ const LearningMarathonProfile = () => {
   // set data for showing marathon profile
   useEffect(() => {
     if (id) {
+      // validate id before fetching
+      const validation = validateIdWithZod(id);
+      if (!validation.isValid) {
+        router.push('/');
+        return;
+      }
       const fetchMarathonData = async () => {
         try {
           setLoadingMarathon(true);
