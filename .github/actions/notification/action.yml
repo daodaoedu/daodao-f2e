@@ -30,6 +30,9 @@ runs:
   steps:
     - name: Send Discord Notification
       shell: bash
+      env:
+        TITLE: ${{ toJson(inputs.TITLE) }}
+        DESCRIPTION: ${{ toJson(inputs.DESCRIPTION) }}
       run: |
         if [ "${{ inputs.TYPE }}" == "success" ]; then
           COLOR=5763207
@@ -52,8 +55,8 @@ runs:
                 "url": "${{ inputs.AUTHOR_URL }}",
                 "icon_url": "${{ inputs.AUTHOR_ICON_URL }}"
               },
-              "title": "${{ inputs.TITLE }}",
-              "description": "${{ inputs.DESCRIPTION }}",
+              "title": ${{ env.TITLE }},
+              "description": ${{ env.DESCRIPTION }},
               "color": $COLOR
             }
           ]
