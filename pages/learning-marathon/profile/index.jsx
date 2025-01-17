@@ -16,7 +16,7 @@ import ShareButtonGroup from '@/components/Group/detail/ShareButtonGroup';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import { z } from 'zod';
 
-const idSchema = z.string().regex(/^\d+$/).max(10);
+const idSchema = z.string().regex(/^[0-9a-fA-F]{24}$/);
 
 function validateIdWithZod(id) {
   try {
