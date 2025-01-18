@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
+import { encodePathname } from '@/utils/url';
 import Tags from './Tags';
 import LogoImage from './LogoImage';
 import Contributors from './Contributors';
@@ -92,7 +93,7 @@ const Item = ({ data, queryTags }) => {
   );
 
   // const link = useMemo(() => data?.properties["連結"]?.url ?? "", [data]);
-  const link = useMemo(() => `/resource/${title}`, [title]);
+  const link = useMemo(() => `/resource/${encodePathname(title)}`, [title]);
 
   return (
     <ItemWrapper>
