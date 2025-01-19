@@ -6,6 +6,7 @@ import {
 } from '@/constants/member';
 import moment from 'moment';
 import { mapToTable } from '@/utils/helper';
+import { AREA_DELIMITER, TAIWAN_OPTION, AREAS } from '@/constants/areas';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PartnerCardAvator from './PartnerCardAvator';
 import PartnerCardDescription from './PartnerCardDescription';
@@ -26,6 +27,7 @@ import {
 const WANT_TO_DO_WITH_PARTNER_TABLE = mapToTable(WANT_TO_DO_WITH_PARTNER);
 const ROLELIST = mapToTable(ROLE);
 const EDUCATION_STAGE_TABLE = mapToTable(EDUCATION);
+const AREAS_TABLE = mapToTable(AREAS);
 
 function PartnerCard({
   image,
@@ -44,7 +46,7 @@ function PartnerCard({
 
   const role = roleList.length > 0 && ROLELIST[roleList[0]];
   const edu = educationStage && EDUCATION_STAGE_TABLE[educationStage];
-  const locations = location && location.split('@');
+  const locations = location && location.split(AREA_DELIMITER).map((item) => AREAS_TABLE[item] ?? item);
 
   return (
     <StyledCard>
@@ -74,7 +76,7 @@ function PartnerCard({
                     ? location.length >= 2
                       ? locations
                           .join('')
-                          .replace('台灣', '')
+                          .replace(TAIWAN_OPTION.value, '')
                           .replace('null', '')
                       : locations.join('')
                     : '-'}

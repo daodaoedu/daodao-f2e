@@ -6,6 +6,8 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { RiInstagramFill } from 'react-icons/ri';
 import { FaFacebook, FaLine, FaDiscord } from 'react-icons/fa';
+import { AREA_DELIMITER, AREAS, TAIWAN_OPTION } from '@/constants/areas';
+import { mapToTable } from '@/utils/helper';
 import DropdownMenu from './Dropdown';
 import SocialMediaItem from './SocialMediaItem';
 import AvatorComponent from './Avator';
@@ -20,6 +22,8 @@ import {
   StyledProfileTag,
   StyledProfileTitle,
 } from './UserCard.styled';
+
+const AREAS_TABLE = mapToTable(AREAS);
 
 const BottonEdit = {
   color: '#536166',
@@ -49,7 +53,7 @@ function UserCard({
   updatedDate,
 }) {
   const router = useRouter();
-  const locations = location && location.split('@');
+  const locations = location && location.split(AREA_DELIMITER).map((item) => AREAS_TABLE[item] ?? item);
 
   return (
     <StyledProfileWrapper>
@@ -83,7 +87,7 @@ function UserCard({
             <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />
             {location
               ? location.length >= 2
-                ? locations.join('').replace('台灣', '').replaceAll('null', '')
+                ? locations.join('').replace(TAIWAN_OPTION.value, '').replaceAll('null', '')
                 : locations.join('')
               : '-'}
           </StyledProfileLocation>

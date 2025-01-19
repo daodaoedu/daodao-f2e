@@ -15,6 +15,10 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import ShareButtonGroup from '@/components/Group/detail/ShareButtonGroup';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import { z } from 'zod';
+import { AREA_DELIMITER, AREAS, TAIWAN_OPTION } from '@/constants/areas';
+import { mapToTable } from '@/utils/helper';
+
+const AREAS_TABLE = mapToTable(AREAS);
 
 const idSchema = z.string().regex(/^[0-9a-fA-F]{24}$/);
 
@@ -316,7 +320,7 @@ const LearningMarathonProfile = () => {
 
           if (result.location) {
             setLocation(result.location);
-            setLocations(result.location.split('@'));
+            setLocations(result.location.split(AREA_DELIMITER).map((item) => AREAS_TABLE[item] ?? item));
           }
 
           setLoadingUser(false);
@@ -414,7 +418,7 @@ const LearningMarathonProfile = () => {
                     ? location.length >= 2
                       ? locations
                           .join('')
-                          .replace('台灣', '')
+                          .replace(TAIWAN_OPTION.value, '')
                           .replace('null', '')
                       : locations.join('')
                     : '-'}

@@ -18,6 +18,8 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import { useAuthDispatch } from '@/contexts/Auth';
+import { AREA_DELIMITER, AREAS } from '@/constants/areas';
+import { mapToTable } from '@/utils/helper';
 
 import {
   StyledSection,
@@ -26,6 +28,8 @@ import {
   StyledGroup
 } from './Edit.styled';
 import MilestoneGroup from './MilestoneGroup';
+
+const AREAS_TABLE = mapToTable(AREAS);
 
 const StyledMarathonTitleSection = styled(Box)`
   padding: 10px;
@@ -241,8 +245,9 @@ export default function ConfirmForm({
       let userEdu = userState?.educationStage;
 
       if (userState?.location?.length > 1) {
-        if (userState?.location.includes('@')) {
-          userLocation = userState?.location.split('@')[1];
+        if (userState?.location.includes(AREA_DELIMITER)) {
+          const city = userState?.location.split(AREA_DELIMITER)[1];
+          userLocation = AREAS_TABLE[city] ?? city;
         } else {
           userLocation = userState?.location;
         }

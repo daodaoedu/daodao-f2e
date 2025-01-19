@@ -1651,5 +1651,6 @@ export const TAIWAN_DISTRICT = [
 
 export const ABROAD_OPTION = { value: 'abroad', label: '國外' };
 export const TAIWAN_OPTION = { value: 'taiwan', label: '台灣' };
+export const AREA_DELIMITER = '@';
 
 export const COUNTRIES = [ABROAD_OPTION, TAIWAN_OPTION];

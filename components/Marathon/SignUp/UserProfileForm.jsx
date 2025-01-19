@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TAIWAN_DISTRICT, COUNTRIES } from '@/constants/areas';
+import { TAIWAN_DISTRICT, COUNTRIES, AREA_DELIMITER, TAIWAN_OPTION } from '@/constants/areas';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import { useSearchParams } from 'next/navigation';
@@ -125,7 +125,7 @@ export default function UserProfileForm({
           onChangeHandler({ key: 'birthDay', value: parsedDate });
         } else if (key === 'location') {
           onChangeHandler({ key, value });
-          const [country, city, district] = value.split('@');
+          const [country, city, district] = value.split(AREA_DELIMITER);
           onChangeHandler({ key: 'country', value: country || null });
           onChangeHandler({ key: 'city', value: city || null });
           onChangeHandler({ key: 'district', value: district || null });
@@ -325,7 +325,7 @@ export default function UserProfileForm({
               </MenuItem>
             ))}
           </Select>
-          {(userState.country === '台灣' || userState.country === 'tw') && (
+          {(userState.country === TAIWAN_OPTION.value) && (
             <Grid container columnSpacing={1}>
               <Grid item xs={12} sm={6}>
                 <Select

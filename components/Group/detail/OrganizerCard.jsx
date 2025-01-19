@@ -6,6 +6,10 @@ import { EDUCATION, ROLE } from '@/constants/member';
 import locationSvg from '@/public/assets/icons/location.svg';
 import Chip from '@/shared/components/Chip';
 import MarkdownEditor from '@/shared/components/MarkdownEditor';
+import { ABROAD_OPTION, AREA_DELIMITER, AREAS, TAIWAN_OPTION } from '@/constants/areas';
+import { mapToTable } from '@/utils/helper';
+
+const AREAS_TABLE = mapToTable(AREAS);
 
 const StyledHeader = styled.div`
   display: flex;
@@ -80,9 +84,9 @@ function OrganizerCard({ data = {}, isLoading }) {
     ROLE.find(({ key }) => data?.user?.roleList?.includes(key))?.label ||
     '暫無資料';
   const location =
-    data?.user?.location === 'tw'
-      ? '台灣'
-      : data?.user?.location.replace('台灣', '').split('@').join(' ');
+    data?.user?.location === ABROAD_OPTION.value
+      ? ABROAD_OPTION.label
+      : data.user.location.replace(TAIWAN_OPTION.value, '').split(AREA_DELIMITER).map((item) => AREAS_TABLE[item] ?? item).join(' ');
 
   return (
     <>

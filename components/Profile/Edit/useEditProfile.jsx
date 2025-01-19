@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { useReducer, useRef, useState } from 'react';
 import { z } from 'zod';
 import { useAuthDispatch } from '@/contexts/Auth';
+import { ABROAD_OPTION, AREA_DELIMITER, TAIWAN_OPTION } from '@/constants/areas';
 
 const initialState = {
   name: '',
@@ -15,7 +16,7 @@ const initialState = {
   discord: '',
   line: '',
   educationStage: '-1',
-  location: '台灣',
+  location: TAIWAN_OPTION.value,
   tagList: [],
   selfIntroduction: '',
   share: '',
@@ -212,7 +213,7 @@ const useEditProfile = () => {
       wantToDoList,
       educationStage,
       location:
-        country === '國外' ? country : [country, city, district].join('@'),
+        country === ABROAD_OPTION.value ? country : [country, city, district].join(AREA_DELIMITER),
       tagList,
       selfIntroduction,
       share,
