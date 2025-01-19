@@ -273,8 +273,8 @@ function EditPage() {
                 <MenuItem disabled value="-1">
                   <em>請選擇居住地</em>
                 </MenuItem>
-                {COUNTRIES.map(({ name, label }) => (
-                  <MenuItem key={name} value={name}>
+                {COUNTRIES.map(({ value, label }) => (
+                  <MenuItem key={value} value={value}>
                     {label}
                   </MenuItem>
                 ))}
