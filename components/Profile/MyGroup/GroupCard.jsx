@@ -10,6 +10,8 @@ import emptyCoverImg from '@/public/assets/empty-cover.png';
 import useMutation from '@/hooks/useMutation';
 import { timeDuration } from '@/utils/date';
 import MarkdownEditor from '@/shared/components/MarkdownEditor';
+import { AREAS, ONLINE_OPTION, TBD_OPTION } from '@/constants/areas';
+import { mapToTable } from '@/utils/helper';
 import {
   StyledAreas,
   StyledContainer,
@@ -23,6 +25,8 @@ import {
   StyledMenuItem,
   StyledImageWrapper,
 } from './GroupCard.styled';
+
+const AREA_TABLE = mapToTable(AREAS.concat(TBD_OPTION, ONLINE_OPTION));
 
 function GroupCard({
   _id,
@@ -73,8 +77,10 @@ function GroupCard({
     apiDeleteGroup.mutate();
   };
 
-  const formatToString = (data, defaultValue = '') =>
-    Array.isArray(data) && data.length ? data.join('、') : data || defaultValue;
+  const formatToString = (mapping, data, defaultValue = '') =>
+    Array.isArray(data) && data.length
+      ? data.map((item) => mapping[item] ?? item).join('、')
+      : mapping[data] ?? data ?? defaultValue;
 
   return (
     <>
@@ -97,7 +103,7 @@ function GroupCard({
           </StyledText>
           <StyledAreas>
             <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />
-            <StyledText>{formatToString(area, '待討論')}</StyledText>
+            <StyledText>{formatToString(AREA_TABLE, area, TBD_OPTION.value)}</StyledText>
           </StyledAreas>
           <StyledFooter>
             <StyledTime>{timeDuration(updatedDate)}</StyledTime>

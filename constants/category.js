@@ -62,151 +62,75 @@ export const SEARCH_TAGS = {
 export const CATEGORIES = [
   {
     key: 'language',
+    value: 'language',
     label: '語言與文學',
-    value: '語言與文學',
+    image: 'https://i.imgur.com/YgvrDCz.png',
   },
   {
     key: 'math',
+    value: 'math',
     label: '數學與邏輯',
-    value: '數學與邏輯',
+    image: 'https://i.imgur.com/kXKWrmA.png',
   },
   {
-    key: 'comsci',
+    key: 'computer-science',
+    value: 'computer-science',
     label: '資訊與工程',
-    value: '資訊與工程',
+    image: 'https://i.imgur.com/sIJeYIp.png',
   },
   {
     key: 'humanity',
+    value: 'humanity',
     label: '人文社會',
-    value: '人文社會',
+    image: 'https://i.imgur.com/Ea2cmzs.png',
   },
   {
-    key: 'natusci',
+    key: 'nature-science',
+    value: 'nature-science',
     label: '自然科學',
-    value: '自然科學',
+    image: 'https://i.imgur.com/jSaZ7AF.png',
   },
   {
     key: 'art',
+    value: 'art',
     label: '藝術',
-    value: '藝術',
+    image: 'https://i.imgur.com/GvJ1ddz.png',
   },
   {
     key: 'education',
+    value: 'education',
     label: '教育',
-    value: '教育',
+    image: 'https://i.imgur.com/M21rIig.png',
   },
   {
     key: 'life',
+    value: 'life',
     label: '生活',
-    value: '生活',
+    image: 'https://i.imgur.com/AQIxl4v.png',
   },
   {
     key: 'health',
+    value: 'health',
     label: '運動/心理/醫學',
-    value: '運動/心理/醫學',
+    image: 'https://i.imgur.com/QuuxALA.png',
   },
   {
     key: 'business',
+    value: 'business',
     label: '商業與社會創新',
-    value: '商業與社會創新',
+    image: 'https://i.imgur.com/ZVewhol.png',
   },
   {
-    key: 'multires',
+    key: 'diversity',
+    value: 'diversity',
     label: '綜合型學習資源',
-    value: '綜合型學習資源',
+    image: 'https://i.imgur.com/rFNVZy8.png',
   },
   {
     key: 'learningtools',
+    value: 'learningtools',
     label: '學習/教學工具',
-    value: '學習/教學工具',
-  },
-];
-
-// 學習教育工具：線上教學, 視訊軟體, 數位學習, 提案軟體
-
-export const CATEGORY_ID = {
-  language: 'da015b1a389b43cda9f01876294064e0',
-  math: '3280294e76f04a7da209fe7aeb74da8b',
-  comsci: 'f4eacf180d5747659be504e5c36394a4',
-  natusci: 'c150ccabb6904be8998c5f570ddfbf6b',
-  humanity: '99a2093948bd4ea4bef2d195c9611829',
-  art: 'a95e102660984949b54ed4d454d6ee71',
-  education: '9899ec31e6b64c80890a729a438c5c82',
-  life: 'e958a830c3aa4f2ab181c68eb68eec91',
-  health: '1a547d664bd147d7b4da7cc23fa68f45',
-  business: 'd014e00881b94985862c284af7397862',
-  multires: '0d1bbefdc8e94bb09c96eabe239834a8',
-};
-
-export const CATEGORY_NAME = {
-  language: '語言與文學',
-  math: '數學與邏輯',
-  comsci: '資訊與工程',
-  natusci: '自然科學',
-  humanity: '人文社會',
-  art: '藝術',
-  education: '教育',
-  life: '生活',
-  health: '運動/心理/醫學',
-  business: '商業與社會創新',
-  multires: '綜合型學習資源',
-};
-
-export const CATEGORY_LINK = [
-  {
-    title: '語言與文學',
-    link: '/category/language',
-    image: '/assets/images/cat1.jpeg',
-  },
-  {
-    title: '數學與邏輯',
-    link: '/category/math',
-    image: '/assets/images/cat2.jpeg',
-  },
-  {
-    title: '資訊與工程',
-    link: '/category/comsci',
-    image: '/assets/images/cat3.jpeg',
-  },
-  {
-    title: '自然科學',
-    link: '/category/natusci',
-    image: '/assets/images/cat4.jpeg',
-  },
-  {
-    title: '人文社會',
-    link: '/category/humanity',
-    image: '/assets/images/cat5.jpeg',
-  },
-  {
-    title: '藝術',
-    link: '/category/art',
-    image: '/assets/images/cat6.jpeg',
-  },
-  {
-    title: '教育',
-    link: '/category/education',
-    image: '/assets/images/cat7.jpeg',
-  },
-  {
-    title: '生活',
-    link: '/category/life',
-    image: '/assets/images/cat8.jpeg',
-  },
-  {
-    title: '運動/心理/醫學',
-    link: '/category/health',
-    image: '/assets/images/cat9.jpeg',
-  },
-  {
-    title: '商業與社會創新',
-    link: '/category/business',
-    image: '/assets/images/cat10.jpeg',
-  },
-  {
-    title: '綜合型學習資源',
-    link: '/category/multires',
-    image: '/assets/images/cat11.jpeg',
+    image: 'https://i.imgur.com/qxhYvEI.png',
   },
 ];
 
@@ -260,70 +184,18 @@ export const MARATHON_LINKS = [
   {
     name: '活動公告（未公開）',
     link: '/marathon-announcement',
-    disabled: true
+    disabled: true,
   },
   {
     name: '學習計畫分享區（未公開）',
     link: '/marathon-sharing',
-    disabled: true
+    disabled: true,
   },
   {
     name: '成果分享（未公開）',
     link: '/project-sharing',
     disabled: true,
   },
-];
-
-export const NAV_LINK_MOBILE = [
-  {
-    name: '找資源',
-    link: '/search',
-    target: '_self',
-  },
-  {
-    name: '找夥伴',
-    link: '/partner',
-    target: '_self',
-  },
-  {
-    name: '找揪團',
-    link: '/group',
-    target: '_self',
-  },
-  // {
-  //   name: '找活動',
-  //   link: '/activities',
-  //   target: '_self',
-  // },
-  // {
-  //   name: '找故事',
-  //   link: 'https://blog.daoedu.tw',
-  //   target: '_blank',
-  // },
-  // {
-  //   name: '找場域',
-  //   link: '/locations',
-  //   target: '_self',
-  // },
-  // {
-  //   name: '新增資源',
-  //   link: '/contribute/resource',
-  //   target: '_self',
-  // },
-  // {
-  //   name: '關於島島',
-  //   link: '/about',
-  //   target: '_self',
-  // },
-  {
-    name: '加入社群',
-    link: '/join',
-    target: '_self',
-  },
-  // {
-  //   name: '找學習空間',
-  //   link: 'https://www.facebook.com/groups/2237666046370459',
-  // },
 ];
 
 export const USER_LINK = [
@@ -349,7 +221,7 @@ export const FOOTER_LINK = [
     link: '/group',
     target: '_self',
   },
-    {
+  {
     name: '找故事',
     link: 'https://blog.daoedu.tw',
     target: '_blank',
@@ -386,4 +258,18 @@ export const FOOTER_LINK = [
   //   name: '找學習空間',
   //   link: 'https://www.facebook.com/groups/2237666046370459',
   // },
+];
+
+export const OTHER_OPTION = { label: '其他', value: 'other' };
+
+export const ACTIVITY_CATEGORIES = [
+  { label: '讀書會', value: 'study_group' },
+  { label: '工作坊', value: 'workshop' },
+  { label: '專案', value: 'project' },
+  { label: '競賽', value: 'competition' },
+  { label: '活動', value: 'event' },
+  { label: '社團', value: 'club' },
+  { label: '課程', value: 'course' },
+  { label: '實習', value: 'internship' },
+  OTHER_OPTION,
 ];

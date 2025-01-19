@@ -106,16 +106,18 @@ const SelectedCategory = () => {
         <ul ref={categoryListRef} onScroll={updateScrollButtonVisibility}>
           <li>
             <Chip
-              value="全部"
+              label="全部"
+              value="all"
               isActive={currentCategories.length === 0}
               onClick={() => pushState('category')}
             />
           </li>
-          {CATEGORIES.map(({ key, value }) => (
+          {CATEGORIES.map(({ key, value, label }) => (
             <li key={key}>
               <Chip
+                label={label}
                 value={value}
-                isActive={currentCategories.includes(value)}
+                isActive={currentCategories.includes(label)}
                 onClick={handleClickCategory}
               />
             </li>

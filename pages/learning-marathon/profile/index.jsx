@@ -9,12 +9,16 @@ import { BASE_URL } from "@/constants/common";
 import { cn } from '@/utils/cn';
 import dayjs from 'dayjs';
 import { ISOToWeekday } from '@/components/Marathon/SignUp/dateMap';
-import { EDUCATION_STEP, ROLE } from '@/constants/member';
+import { EDUCATION, ROLE } from '@/constants/member';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import ShareButtonGroup from '@/components/Group/detail/ShareButtonGroup';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import { z } from 'zod';
+import { AREA_DELIMITER, AREAS, TAIWAN_OPTION } from '@/constants/areas';
+import { mapToTable } from '@/utils/helper';
+
+const AREAS_TABLE = mapToTable(AREAS);
 
 const idSchema = z.string().regex(/^[0-9a-fA-F]{24}$/);
 
@@ -302,7 +306,7 @@ const LearningMarathonProfile = () => {
 
           // set user edu stage
           if (result.educationStage) {
-            const eduZh = EDUCATION_STEP.find((option) => {
+            const eduZh = EDUCATION.find((option) => {
               return option.value === result.educationStage;
             });
             if (eduZh) {
@@ -316,7 +320,7 @@ const LearningMarathonProfile = () => {
 
           if (result.location) {
             setLocation(result.location);
-            setLocations(result.location.split('@'));
+            setLocations(result.location.split(AREA_DELIMITER).map((item) => AREAS_TABLE[item] ?? item));
           }
 
           setLoadingUser(false);
@@ -414,7 +418,7 @@ const LearningMarathonProfile = () => {
                     ? location.length >= 2
                       ? locations
                           .join('')
-                          .replace('台灣', '')
+                          .replace(TAIWAN_OPTION.value, '')
                           .replace('null', '')
                       : locations.join('')
                     : '-'}

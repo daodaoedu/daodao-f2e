@@ -8,7 +8,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import {
   WANT_TO_DO_WITH_PARTNER,
   ROLE,
-  EDUCATION_STAGE,
+  EDUCATION,
 } from '@/constants/member';
 import { mapToTable } from '@/utils/helper';
 import SEOConfig from '@/shared/components/SEO';
@@ -52,7 +52,7 @@ const BottonEdit = {
 };
 const WANT_TO_DO_WITH_PARTNER_TABLE = mapToTable(WANT_TO_DO_WITH_PARTNER);
 const ROLE_LIST = mapToTable(ROLE);
-const EDUCATION_STAGE_TABLE = mapToTable(EDUCATION_STAGE);
+const EDUCATION_STAGE_TABLE = mapToTable(EDUCATION);
 
 const Profile = ({
   _id,

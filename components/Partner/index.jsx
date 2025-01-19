@@ -2,9 +2,9 @@ import { useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Box, Button } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { TAIWAN_DISTRICT } from '@/constants/areas';
+import { ABROAD_OPTION, TAIWAN_DISTRICT } from '@/constants/areas';
 import { fetchPartners } from '@/redux/actions/partners';
-import { EDUCATION_STEP, ROLE } from '@/constants/member';
+import { EDUCATION, ROLE } from '@/constants/member';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
 import PartnerList from './PartnerList';
@@ -25,7 +25,7 @@ const _compose =
 const _map = (arr, key) => arr.map((item) => item[key]);
 const mapValues = (values, mapFn) => values.map(mapFn).join(',');
 
-const createObjFromArrary = (arr, keyProp = 'label', valueProp = 'label') => {
+const createObjFromArray = (arr, keyProp = 'label', valueProp = 'label') => {
   return arr.reduce(
     (obj, item) => ({
       ...obj,
@@ -35,13 +35,14 @@ const createObjFromArrary = (arr, keyProp = 'label', valueProp = 'label') => {
   );
 };
 
-const AREAS = TAIWAN_DISTRICT.map(({ name }) => ({
-  name,
+const AREAS = TAIWAN_DISTRICT.map(({ name, value }) => ({
   label: name,
-})).concat([{ name: '國外', label: '國外' }]);
+  value,
+})).concat(ABROAD_OPTION);
 
-const eduObj = createObjFromArrary(EDUCATION_STEP, 'label', 'key');
-const roleObj = createObjFromArrary(ROLE, 'label', 'key');
+const eduObj = createObjFromArray(EDUCATION, 'label', 'key');
+const roleObj = createObjFromArray(ROLE, 'label', 'key');
+const areaObj = createObjFromArray(AREAS, 'label', 'value');
 
 function Partner() {
   const dispatch = useDispatch();
@@ -56,8 +57,8 @@ function Partner() {
 
   // constants
   const keySelections = {
-    area: _map(AREAS, 'name'),
-    edu: _map(EDUCATION_STEP, 'label'),
+    area: _map(AREAS, 'label'),
+    edu: _map(EDUCATION, 'label'),
     role: _map(ROLE, 'label'),
     tag: tags,
     q: 'PASS_STRING',
@@ -85,7 +86,7 @@ function Partner() {
       search,
     }),
     (arg) => [
-      findValues(arg, 'area').join(','),
+      mapValues(findValues(arg, 'area'), (item) => areaObj[item]),
       mapValues(findValues(arg, 'edu'), (item) => eduObj[item]),
       mapValues(findValues(arg, 'role'), (item) => roleObj[item]),
       findValues(arg, 'tag').join(','),
