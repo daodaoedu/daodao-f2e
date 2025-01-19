@@ -343,8 +343,8 @@ export default function UserProfileForm({
                   <MenuItem disabled value="-1">
                     <em>縣市</em>
                   </MenuItem>
-                  {TAIWAN_DISTRICT.map(({ name }) => (
-                    <MenuItem key={name} value={name}>
+                  {TAIWAN_DISTRICT.map(({ name, value }) => (
+                    <MenuItem key={value} value={value}>
                       {name}
                     </MenuItem>
                   ))}
@@ -367,7 +367,7 @@ export default function UserProfileForm({
                     <em>鄉鎮市區</em>
                   </MenuItem>
                   {TAIWAN_DISTRICT.find(
-                    ({ name }) => name === userState.city,
+                    ({ value }) => value === userState.city,
                   )?.districts.map(({ name, zip }) => (
                     <MenuItem key={zip} value={name}>
                       {name}

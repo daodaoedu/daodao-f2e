@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Box, Button } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { TAIWAN_DISTRICT } from '@/constants/areas';
+import { ABROAD_OPTION, TAIWAN_DISTRICT } from '@/constants/areas';
 import { fetchPartners } from '@/redux/actions/partners';
 import { EDUCATION, ROLE } from '@/constants/member';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
@@ -38,7 +38,7 @@ const createObjFromArrary = (arr, keyProp = 'label', valueProp = 'label') => {
 const AREAS = TAIWAN_DISTRICT.map(({ name }) => ({
   name,
   label: name,
-})).concat([{ name: '國外', label: '國外' }]);
+})).concat(ABROAD_OPTION);
 
 const eduObj = createObjFromArrary(EDUCATION, 'label', 'key');
 const roleObj = createObjFromArrary(ROLE, 'label', 'key');

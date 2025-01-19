@@ -86,6 +86,7 @@ export const TAIWAN_DISTRICT = [
         name: '文山區',
       },
     ],
+    value: 'taipei_city',
     name: '臺北市',
   },
   {
@@ -119,6 +120,7 @@ export const TAIWAN_DISTRICT = [
         name: '七堵區',
       },
     ],
+    value: 'keelung_city',
     name: '基隆市',
   },
   {
@@ -240,6 +242,7 @@ export const TAIWAN_DISTRICT = [
         name: '石門區',
       },
     ],
+    value: 'new_taipei_city',
     name: '新北市',
   },
   {
@@ -261,6 +264,7 @@ export const TAIWAN_DISTRICT = [
         name: '東引鄉',
       },
     ],
+    value: 'lienchiang_county',
     name: '連江縣',
   },
   {
@@ -314,6 +318,7 @@ export const TAIWAN_DISTRICT = [
         name: '南澳鄉',
       },
     ],
+    value: 'yilan_county',
     name: '宜蘭縣',
   },
   {
@@ -331,6 +336,7 @@ export const TAIWAN_DISTRICT = [
         name: '香山區',
       },
     ],
+    value: 'hsinchu_city',
     name: '新竹市',
   },
   {
@@ -388,6 +394,7 @@ export const TAIWAN_DISTRICT = [
         name: '峨眉鄉',
       },
     ],
+    value: 'hsinchu_county',
     name: '新竹縣',
   },
   {
@@ -445,6 +452,7 @@ export const TAIWAN_DISTRICT = [
         name: '蘆竹區',
       },
     ],
+    value: 'taoyuan_city',
     name: '桃園市',
   },
   {
@@ -522,6 +530,7 @@ export const TAIWAN_DISTRICT = [
         name: '卓蘭鎮',
       },
     ],
+    value: 'miaoli_county',
     name: '苗栗縣',
   },
   {
@@ -643,6 +652,7 @@ export const TAIWAN_DISTRICT = [
         name: '大安區',
       },
     ],
+    value: 'taichung_city',
     name: '臺中市',
   },
   {
@@ -752,6 +762,7 @@ export const TAIWAN_DISTRICT = [
         name: '二水鄉',
       },
     ],
+    value: 'changhua_county',
     name: '彰化縣',
   },
   {
@@ -809,6 +820,7 @@ export const TAIWAN_DISTRICT = [
         name: '鹿谷鄉',
       },
     ],
+    value: 'nantou_county',
     name: '南投縣',
   },
   {
@@ -822,6 +834,7 @@ export const TAIWAN_DISTRICT = [
         name: '東區',
       },
     ],
+    value: 'chiayi_city',
     name: '嘉義市',
   },
   {
@@ -899,6 +912,7 @@ export const TAIWAN_DISTRICT = [
         name: '布袋鎮',
       },
     ],
+    value: 'chiayi_county',
     name: '嘉義縣',
   },
   {
@@ -984,6 +998,7 @@ export const TAIWAN_DISTRICT = [
         name: '元長鄉',
       },
     ],
+    value: 'yunlin_county',
     name: '雲林縣',
   },
   {
@@ -1137,6 +1152,7 @@ export const TAIWAN_DISTRICT = [
         name: '安定區',
       },
     ],
+    value: 'tainan_city',
     name: '臺南市',
   },
   {
@@ -1302,20 +1318,8 @@ export const TAIWAN_DISTRICT = [
         name: '茄萣區',
       },
     ],
+    value: 'kaohsiung_city',
     name: '高雄市',
-  },
-  {
-    districts: [
-      {
-        zip: '817',
-        name: '東沙群島',
-      },
-      {
-        zip: '819',
-        name: '南沙群島',
-      },
-    ],
-    name: '南海島',
   },
   {
     districts: [
@@ -1344,6 +1348,7 @@ export const TAIWAN_DISTRICT = [
         name: '湖西鄉',
       },
     ],
+    value: 'penghu_county',
     name: '澎湖縣',
   },
   {
@@ -1373,6 +1378,7 @@ export const TAIWAN_DISTRICT = [
         name: '烏坵鄉',
       },
     ],
+    value: 'kinmen_county',
     name: '金門縣',
   },
   {
@@ -1510,6 +1516,7 @@ export const TAIWAN_DISTRICT = [
         name: '滿州鄉',
       },
     ],
+    value: 'pingtung_county',
     name: '屏東縣',
   },
   {
@@ -1579,6 +1586,7 @@ export const TAIWAN_DISTRICT = [
         name: '達仁鄉',
       },
     ],
+    value: 'taitung_county',
     name: '臺東縣',
   },
   {
@@ -1636,6 +1644,7 @@ export const TAIWAN_DISTRICT = [
         name: '富里鄉',
       },
     ],
+    value: 'hualien_county',
     name: '花蓮縣',
   },
 ];
