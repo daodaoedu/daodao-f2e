@@ -15,14 +15,14 @@ import JoinCooperate from './JoinCooperate';
 const StyledBannerButton = styled(Button)`
   &.MuiButton-root {
     position: absolute;
-    top: calc(100vw / 3.6);
+    top: calc(100vw / 3.65);
     left: 50%;
     transform: translate(-50%);
     border-radius: 40px;
     background: #FFA10B;
     display: flex;
-    width: 250px;
-    height: 50px;
+    width: 220px;
+    height: 40px;
     padding: 5px 20px;
     justify-content: center;
     align-items: center;
@@ -45,8 +45,12 @@ const StyledBannerButton = styled(Button)`
   }
 
   @media (max-width: 767px) {
+
     &.MuiButton-root {
-      top: calc(100vw / 1.434);
+      font-size: 14px;
+      width: 180px;
+      height: 50px;
+      top: calc(100vw / 1.2);
     }
   }
 `;

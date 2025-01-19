@@ -353,7 +353,7 @@ const LearningMarathonProfile = () => {
               sx={{ width: '8px', height: '8px' }}
             />
             <span className="text-primary-base font-sans text-xs font-medium">
-              徵件計畫
+              學習馬拉松
             </span>
           </div>
           {
