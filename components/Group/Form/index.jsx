@@ -7,7 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import DeprecatedButton from '@/shared/components/DeprecatedButton';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import { ACTIVITY_CATEGORY, OTHER_OPTION } from '@/constants/category';
+import { ACTIVITY_CATEGORIES, OTHER_OPTION } from '@/constants/category';
 import { ProtectedComponent } from '@/contexts/Auth';
 import StyledPaper from '../Paper.styled';
 import {
@@ -105,7 +105,7 @@ export default function GroupForm({
             }}
             control={control}
             value={values.activityCategory}
-            options={ACTIVITY_CATEGORY}
+            options={ACTIVITY_CATEGORIES}
           />
           <Fields.Select
             label="學習領域"

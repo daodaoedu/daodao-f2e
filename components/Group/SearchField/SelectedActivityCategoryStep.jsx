@@ -1,6 +1,6 @@
 import Select from '@/shared/components/Select';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
-import { ACTIVITY_CATEGORY } from '@/constants/category';
+import { ACTIVITY_CATEGORIES } from '@/constants/category';
 
 export default function SelectedActivityCategoryStep() {
   const QUERY_KEY = 'activityCategory';
@@ -15,13 +15,13 @@ export default function SelectedActivityCategoryStep() {
       multiple
       value={getSearchParams(QUERY_KEY)}
       onChange={handleChange}
-      items={ACTIVITY_CATEGORY}
+      items={ACTIVITY_CATEGORIES}
       itemLabel="label"
       itemValue="label"
       renderValue={(selected) =>
         selected.length === 0
           ? '揪團類型'
-          : ACTIVITY_CATEGORY
+          : ACTIVITY_CATEGORIES
               .filter((item) => selected.includes(item.value))
               .map((item) => item.label)
               .join('、')

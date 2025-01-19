@@ -262,7 +262,7 @@ export const FOOTER_LINK = [
 
 export const OTHER_OPTION = { label: '其他', value: 'other' };
 
-export const ACTIVITY_CATEGORY = [
+export const ACTIVITY_CATEGORIES = [
   { label: '讀書會', value: 'study_group' },
   { label: '工作坊', value: 'workshop' },
   { label: '專案', value: 'project' },

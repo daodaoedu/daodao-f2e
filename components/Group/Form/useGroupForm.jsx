@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { useRef, useState } from 'react';
 import { ZodType, z } from 'zod';
 import { useSnackbar } from '@/contexts/Snackbar';
-import { ACTIVITY_CATEGORY, CATEGORIES, OTHER_OPTION } from '@/constants/category';
+import { ACTIVITY_CATEGORIES, CATEGORIES, OTHER_OPTION } from '@/constants/category';
 import { AREAS, ONLINE_OPTION, TBD_OPTION } from '@/constants/areas';
 import { EDUCATION } from '@/constants/member';
 import { BASE_URL } from '@/constants/common';
@@ -44,7 +44,7 @@ const rules = {
   photoURL: z.string().or(z.instanceof(Blob)),
   photoAlt: z.string(),
   activityCategory: z.array(
-    z.enum(ACTIVITY_CATEGORY.map(({ value }) => value)),
+    z.enum(ACTIVITY_CATEGORIES.map(({ value }) => value)),
   ),
   category: z
     .array(z.enum(categoriesOptions.map(({ value }) => value)))
