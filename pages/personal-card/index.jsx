@@ -12,7 +12,6 @@ import MyGroup from '@/components/PersonalCard/MyGroup';
 import MyResource from '@/components/PersonalCard/MyResource';
 import MyNote from '@/components/PersonalCard/MyNote';
 import MyMarathon from '@/components/PersonalCard/MyMarathon';
-import AccountSetting from '@/components/PersonalCard/Accountsetting';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 const StyledTab = styled(Tab)(({ isActive, mobileScreen }) => ({
