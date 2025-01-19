@@ -18,6 +18,8 @@ export default function SelectedAreas() {
       value={getSearchParams(QUERY_KEY)}
       onChange={handleChange}
       items={areaOptions}
+      itemValue="label"
+      itemLabel="label"
       renderValue={(selected) =>
         selected.length === 0 ? '地點' : selected.join('、')
       }

@@ -86,7 +86,7 @@ function OrganizerCard({ data = {}, isLoading }) {
   const location =
     data?.user?.location === ABROAD_OPTION.value
       ? ABROAD_OPTION.label
-      : data.user.location.replace(TAIWAN_OPTION.value, '').split(AREA_DELIMITER).map((item) => AREAS_TABLE[item] ?? item).join(' ');
+      : data?.user?.location.replace(TAIWAN_OPTION.value, '').split(AREA_DELIMITER).map((item) => AREAS_TABLE[item] ?? item).join(' ');
 
   return (
     <>

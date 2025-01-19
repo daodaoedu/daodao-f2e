@@ -17,7 +17,7 @@ export default function SelectedActivityCategoryStep() {
       onChange={handleChange}
       items={ACTIVITY_CATEGORY}
       itemLabel="label"
-      itemValue="value"
+      itemValue="label"
       renderValue={(selected) =>
         selected.length === 0
           ? '揪團類型'

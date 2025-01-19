@@ -19,10 +19,10 @@ function* getGroupItems() {
 
   const urlSearchParams = new URLSearchParams({ pageSize });
   const searchParamsConfigs = {
-    area: [AREAS.concat(ONLINE_OPTION, TBD_OPTION), 'label'],
-    category: [CATEGORIES, 'label'],
-    activityCategory: [ACTIVITY_CATEGORY, 'value'],
-    partnerEducationStep: [EDUCATION, 'label'],
+    area: [AREAS.concat(ONLINE_OPTION, TBD_OPTION), 'label', 'value'],
+    category: [CATEGORIES, 'label', 'value'],
+    activityCategory: [ACTIVITY_CATEGORY, 'label', 'value'],
+    partnerEducationStep: [EDUCATION, 'label', 'value'],
     isGrouping: true,
     search: true,
   };
@@ -34,16 +34,20 @@ function* getGroupItems() {
     if (!searchParam || !config) return;
 
     if (Array.isArray(config)) {
-      const [options, optionKey] = config;
+      const [options, optionKey, valueKey] = config;
 
       urlSearchParams.append(
         key,
         searchParam
-          .split(',')
-          .filter((item) =>
-            options.some((_option) => _option[optionKey] === item),
+          .split(",")
+          .map(
+            (item) =>
+              options.find((_option) => _option[optionKey] === item)?.[
+                valueKey ?? optionKey
+              ]
           )
-          .join(','),
+          .filter(Boolean)
+          .join(",")
       );
     } else {
       urlSearchParams.append(key, searchParam);
