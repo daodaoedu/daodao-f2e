@@ -259,3 +259,15 @@ export const FOOTER_LINK = [
   //   link: 'https://www.facebook.com/groups/2237666046370459',
   // },
 ];
+
+export const ACTIVITY_CATEGORY = [
+  { label: '讀書會', value: 'study_group' },
+  { label: '工作坊', value: 'workshop' },
+  { label: '專案', value: 'project' },
+  { label: '競賽', value: 'competition' },
+  { label: '活動', value: 'event' },
+  { label: '社團', value: 'club' },
+  { label: '課程', value: 'course' },
+  { label: '實習', value: 'internship' },
+  { label: '其他', value: 'other' },
+];
