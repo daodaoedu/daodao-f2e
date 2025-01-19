@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { useRef, useState } from 'react';
 import { ZodType, z } from 'zod';
 import { useSnackbar } from '@/contexts/Snackbar';
-import { ACTIVITY_CATEGORY, CATEGORIES } from '@/constants/category';
+import { ACTIVITY_CATEGORY, CATEGORIES, OTHER_OPTION } from '@/constants/category';
 import { AREAS, ONLINE_OPTION, TBD_OPTION } from '@/constants/areas';
 import { EDUCATION } from '@/constants/member';
 import { BASE_URL } from '@/constants/common';
@@ -20,10 +20,10 @@ const INITIAL_VALUES = {
   originPhotoURL: '',
   photoURL: '',
   photoAlt: '',
-  activityCategory: ['其他'],
+  activityCategory: [OTHER_OPTION.value],
   category: [],
   participator: '',
-  area: ['待討論'],
+  area: [TBD_OPTION.value],
   time: '',
   partnerStyle: '',
   partnerEducationStep: [],
@@ -61,7 +61,7 @@ const rules = {
     .max(50, '請勿輸入超過 50 字')
     .min(1, '請輸入想找的夥伴類型'),
   partnerEducationStep: z
-    .array(z.enum(eduOptions.map(({ label }) => label)))
+    .array(z.enum(eduOptions.map(({ value }) => value)))
     .min(1, '請選擇適合的教育階段'),
   motivation: z.string().max(50, '請勿輸入超過 50 字').min(1, '請輸入揪團動機'),
   content: z

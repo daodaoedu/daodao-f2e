@@ -184,12 +184,12 @@ export const MARATHON_LINKS = [
   {
     name: '活動公告（未公開）',
     link: '/marathon-announcement',
-    disabled: true
+    disabled: true,
   },
   {
     name: '學習計畫分享區（未公開）',
     link: '/marathon-sharing',
-    disabled: true
+    disabled: true,
   },
   {
     name: '成果分享（未公開）',
@@ -221,7 +221,7 @@ export const FOOTER_LINK = [
     link: '/group',
     target: '_self',
   },
-    {
+  {
     name: '找故事',
     link: 'https://blog.daoedu.tw',
     target: '_blank',
@@ -260,6 +260,8 @@ export const FOOTER_LINK = [
   // },
 ];
 
+export const OTHER_OPTION = { label: '其他', value: 'other' };
+
 export const ACTIVITY_CATEGORY = [
   { label: '讀書會', value: 'study_group' },
   { label: '工作坊', value: 'workshop' },
@@ -269,5 +271,5 @@ export const ACTIVITY_CATEGORY = [
   { label: '社團', value: 'club' },
   { label: '課程', value: 'course' },
   { label: '實習', value: 'internship' },
-  { label: '其他', value: 'other' },
+  OTHER_OPTION,
 ];
