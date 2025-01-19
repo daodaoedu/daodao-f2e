@@ -7,7 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import DeprecatedButton from '@/shared/components/DeprecatedButton';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import { activityCategoryList } from '@/constants/activityCategory';
+import { ACTIVITY_CATEGORIES, OTHER_OPTION } from '@/constants/category';
 import { ProtectedComponent } from '@/contexts/Auth';
 import StyledPaper from '../Paper.styled';
 import {
@@ -95,17 +95,17 @@ export default function GroupForm({
             label="揪團類型"
             name="activityCategory"
             transformCheckboxValues={(action, value, activityCategory) => {
-              if (action === 'add' && value === '其他') {
-                return ['其他'];
+              if (action === 'add' && value === OTHER_OPTION.value) {
+                return [OTHER_OPTION.value];
               }
               if (action === 'remove' && !activityCategory.length) {
-                return ['其他'];
+                return [OTHER_OPTION.value];
               }
-              return activityCategory.filter((item) => item !== '其他');
+              return activityCategory.filter((item) => item !== OTHER_OPTION.value);
             }}
             control={control}
             value={values.activityCategory}
-            options={activityCategoryList}
+            options={ACTIVITY_CATEGORIES}
           />
           <Fields.Select
             label="學習領域"

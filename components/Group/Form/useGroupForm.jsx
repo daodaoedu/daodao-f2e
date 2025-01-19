@@ -2,22 +2,16 @@ import dayjs from 'dayjs';
 import { useRef, useState } from 'react';
 import { ZodType, z } from 'zod';
 import { useSnackbar } from '@/contexts/Snackbar';
-import { CATEGORIES } from '@/constants/category';
-import { AREAS } from '@/constants/areas';
-import { EDUCATION_STEP } from '@/constants/member';
+import { ACTIVITY_CATEGORIES, CATEGORIES, OTHER_OPTION } from '@/constants/category';
+import { AREAS, ONLINE_OPTION, TBD_OPTION } from '@/constants/areas';
+import { EDUCATION } from '@/constants/member';
 import { BASE_URL } from '@/constants/common';
-import { activityCategoryList } from '@/constants/activityCategory';
 import useLeaveConfirm from '@/hooks/useLeaveConfirm';
 import { useAuth } from '@/contexts/Auth';
 
-const _eduOptions = EDUCATION_STEP.filter(
-  (edu) => !['master', 'doctor', 'other'].includes(edu.value),
-);
-_eduOptions.push({ key: 'noLimit', value: 'noLimit', label: '不設限' });
-
 export const categoriesOptions = CATEGORIES;
-export const areasOptions = AREAS.filter((area) => area.label !== '線上');
-export const eduOptions = _eduOptions;
+export const areasOptions = AREAS;
+export const eduOptions = EDUCATION;
 
 const INITIAL_VALUES = {
   userId: '',
@@ -26,10 +20,10 @@ const INITIAL_VALUES = {
   originPhotoURL: '',
   photoURL: '',
   photoAlt: '',
-  activityCategory: ['其他'],
+  activityCategory: [OTHER_OPTION.value],
   category: [],
   participator: '',
-  area: ['待討論'],
+  area: [TBD_OPTION.value],
   time: '',
   partnerStyle: '',
   partnerEducationStep: [],
@@ -50,7 +44,7 @@ const rules = {
   photoURL: z.string().or(z.instanceof(Blob)),
   photoAlt: z.string(),
   activityCategory: z.array(
-    z.enum(activityCategoryList.map(({ value }) => value)),
+    z.enum(ACTIVITY_CATEGORIES.map(({ value }) => value)),
   ),
   category: z
     .array(z.enum(categoriesOptions.map(({ value }) => value)))
@@ -59,7 +53,7 @@ const rules = {
     .string()
     .regex(/^(100|[1-9]\d|[1-9])$/, '請輸入整數，需大於 0，不可超過 100'),
   area: z
-    .array(z.enum(AREAS.concat({ label: '待討論' }).map(({ label }) => label)))
+    .array(z.enum(AREAS.concat(ONLINE_OPTION, TBD_OPTION).map(({ value }) => value)))
     .min(1, '請選擇地點'),
   time: z.string().max(50, '請勿輸入超過 50 字'),
   partnerStyle: z
@@ -67,7 +61,7 @@ const rules = {
     .max(50, '請勿輸入超過 50 字')
     .min(1, '請輸入想找的夥伴類型'),
   partnerEducationStep: z
-    .array(z.enum(eduOptions.map(({ label }) => label)))
+    .array(z.enum(eduOptions.map(({ value }) => value)))
     .min(1, '請選擇適合的教育階段'),
   motivation: z.string().max(50, '請勿輸入超過 50 字').min(1, '請輸入揪團動機'),
   content: z

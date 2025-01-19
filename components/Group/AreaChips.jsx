@@ -17,7 +17,7 @@ const AreaChips = () => {
   const currentArea = useMemo(
     () =>
       getSearchParams('area').filter((area) =>
-        AREAS.find(({ name }) => name === area),
+        AREAS.find(({ value }) => value === area),
       ),
     [getSearchParams],
   );

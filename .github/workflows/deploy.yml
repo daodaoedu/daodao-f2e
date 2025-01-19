@@ -9,6 +9,7 @@ on:
     branches:
       - "prod"
       - "dev"
+      - "feat/v2"
   workflow_dispatch:
 
 env:

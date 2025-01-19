@@ -4,13 +4,13 @@ import toast from 'react-hot-toast';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
-import { TAIWAN_DISTRICT, COUNTRIES } from '@/constants/areas';
+import { TAIWAN_DISTRICT, COUNTRIES, AREA_DELIMITER, TAIWAN_OPTION } from '@/constants/areas';
 import { useAuth } from '@/contexts/Auth';
 
 import {
   GENDER,
   ROLE,
-  EDUCATION_STAGE,
+  EDUCATION,
   WANT_TO_DO_WITH_PARTNER,
 } from '@/constants/member';
 
@@ -82,7 +82,7 @@ function EditPage() {
           onChangeHandler({ key: 'birthDay', value: parsedDate });
         } else if (key === 'location') {
           onChangeHandler({ key, value });
-          const [country, city, district] = value.split('@');
+          const [country, city, district] = value.split(AREA_DELIMITER);
           onChangeHandler({ key: 'country', value: country || null });
           onChangeHandler({ key: 'city', value: city || null });
           onChangeHandler({ key: 'district', value: district || null });
@@ -249,7 +249,7 @@ function EditPage() {
                 <MenuItem disabled>
                   <em>請選擇您目前的教育階段</em>
                 </MenuItem>
-                {EDUCATION_STAGE.map(({ label, value }) => (
+                {EDUCATION.map(({ label, value }) => (
                   <MenuItem key={value} value={value}>
                     {label}
                   </MenuItem>
@@ -273,13 +273,13 @@ function EditPage() {
                 <MenuItem disabled value="-1">
                   <em>請選擇居住地</em>
                 </MenuItem>
-                {COUNTRIES.map(({ name, label }) => (
-                  <MenuItem key={name} value={name}>
+                {COUNTRIES.map(({ value, label }) => (
+                  <MenuItem key={value} value={value}>
                     {label}
                   </MenuItem>
                 ))}
               </Select>
-              {(userState.country === '台灣' || userState.country === 'tw') && (
+              {userState.country === TAIWAN_OPTION.value && (
                 <Grid container columnSpacing={1}>
                   <Grid item xs="12" sm="6">
                     <Select
@@ -297,8 +297,8 @@ function EditPage() {
                       <MenuItem disabled value="-1">
                         <em>縣市</em>
                       </MenuItem>
-                      {TAIWAN_DISTRICT.map(({ name }) => (
-                        <MenuItem key={name} value={name}>
+                      {TAIWAN_DISTRICT.map(({ name, value }) => (
+                        <MenuItem key={value} value={value}>
                           {name}
                         </MenuItem>
                       ))}
@@ -321,7 +321,7 @@ function EditPage() {
                         <em>鄉鎮市區</em>
                       </MenuItem>
                       {TAIWAN_DISTRICT.find(
-                        ({ name }) => name === userState.city,
+                        ({ value }) => value === userState.city,
                       )?.districts.map(({ name, zip }) => (
                         <MenuItem key={zip} value={name}>
                           {name}

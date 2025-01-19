@@ -3,6 +3,10 @@ import Image from '@/shared/components/Image';
 import { timeDuration } from '@/utils/date';
 import emptyCoverWithBackgroundImg from '@/public/assets/empty-cover-with-background.png';
 import MarkdownEditor from '@/shared/components/MarkdownEditor';
+import { AREAS, ONLINE_OPTION, TBD_OPTION } from '@/constants/areas';
+import { CATEGORIES } from '@/constants/category';
+import { EDUCATION } from '@/constants/member';
+import { mapToTable } from '@/utils/helper';
 import {
   StyledAreas,
   StyledContainer,
@@ -14,6 +18,10 @@ import {
   StyledTitle,
   StyledStatus,
 } from './GroupCard.styled';
+
+const CATEGORY_TABLE = mapToTable(CATEGORIES);
+const AREA_TABLE = mapToTable(AREAS.concat(TBD_OPTION, ONLINE_OPTION));
+const EDU_TABLE = mapToTable(EDUCATION);
 
 function GroupCard({
   _id,
@@ -27,8 +35,10 @@ function GroupCard({
   isGrouping,
   updatedDate,
 }) {
-  const formatToString = (data, defaultValue = '') =>
-    Array.isArray(data) && data.length ? data.join('、') : data || defaultValue;
+  const formatToString = (mapping, data, defaultValue = '') =>
+    Array.isArray(data) && data.length
+      ? data.map((item) => mapping[item] ?? item).join('、')
+      : mapping[data] ?? data ?? defaultValue;
 
   return (
     <StyledGroupCard href={`/group/detail?id=${_id}`}>
@@ -41,11 +51,11 @@ function GroupCard({
         <StyledInfo>
           <StyledText>
             <StyledLabel>學習領域</StyledLabel>
-            <span>{formatToString(category, '不拘')}</span>
+            <span>{formatToString(CATEGORY_TABLE, category, '不拘')}</span>
           </StyledText>
           <StyledText>
             <StyledLabel>適合階段</StyledLabel>
-            <span>{formatToString(partnerEducationStep, '皆可')}</span>
+            <span>{formatToString(EDU_TABLE, partnerEducationStep, '皆可')}</span>
           </StyledText>
         </StyledInfo>
         <StyledText lineClamp="2" fontSize="14px" style={{ height: '42px' }}>
@@ -59,7 +69,7 @@ function GroupCard({
         <StyledAreas>
           <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />
           <StyledText color="#92989A">
-            {formatToString(area, '待討論')}
+            {formatToString(AREA_TABLE, area, TBD_OPTION.value)}
           </StyledText>
         </StyledAreas>
         <StyledFooter>
