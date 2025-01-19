@@ -119,9 +119,9 @@ export default function ManageLayout({ children }) {
     {
       id: 'intro',
       tabLabel: '個人名片',
-      isDisabled: true,
+      isDisabled: false,
       onClick: () => {
-        router.push('/manage/intro');
+        router.push('/personal-card/my-card');
       }
     },
     {
