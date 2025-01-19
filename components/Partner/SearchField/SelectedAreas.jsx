@@ -2,6 +2,11 @@ import Select from '@/shared/components/Select';
 import { ABROAD_OPTION, TAIWAN_DISTRICT } from '@/constants/areas';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
+const AREAS = TAIWAN_DISTRICT.map(({ name, value }) => ({
+  label: name,
+  value,
+})).concat(ABROAD_OPTION);
+
 export default function SelectedAreas() {
   const QUERY_KEY = 'area';
   const [getSearchParams, pushState] = useSearchParamsManager();
@@ -10,17 +15,14 @@ export default function SelectedAreas() {
     pushState(QUERY_KEY, value.toString());
   };
 
-  const AREAS = TAIWAN_DISTRICT.map(({ name }) => ({
-    name,
-    label: name,
-  })).concat(ABROAD_OPTION);
-
   return (
     <Select
       multiple
       value={getSearchParams(QUERY_KEY)}
       onChange={handleChange}
       items={AREAS}
+      itemValue="label"
+      itemLabel="label"
       renderValue={(selected) =>
         selected.length === 0 ? '地區' : selected.join('、')
       }

@@ -25,7 +25,7 @@ const _compose =
 const _map = (arr, key) => arr.map((item) => item[key]);
 const mapValues = (values, mapFn) => values.map(mapFn).join(',');
 
-const createObjFromArrary = (arr, keyProp = 'label', valueProp = 'label') => {
+const createObjFromArray = (arr, keyProp = 'label', valueProp = 'label') => {
   return arr.reduce(
     (obj, item) => ({
       ...obj,
@@ -35,13 +35,14 @@ const createObjFromArrary = (arr, keyProp = 'label', valueProp = 'label') => {
   );
 };
 
-const AREAS = TAIWAN_DISTRICT.map(({ name }) => ({
-  name,
+const AREAS = TAIWAN_DISTRICT.map(({ name, value }) => ({
   label: name,
+  value,
 })).concat(ABROAD_OPTION);
 
-const eduObj = createObjFromArrary(EDUCATION, 'label', 'key');
-const roleObj = createObjFromArrary(ROLE, 'label', 'key');
+const eduObj = createObjFromArray(EDUCATION, 'label', 'key');
+const roleObj = createObjFromArray(ROLE, 'label', 'key');
+const areaObj = createObjFromArray(AREAS, 'label', 'value');
 
 function Partner() {
   const dispatch = useDispatch();
@@ -56,7 +57,7 @@ function Partner() {
 
   // constants
   const keySelections = {
-    area: _map(AREAS, 'name'),
+    area: _map(AREAS, 'label'),
     edu: _map(EDUCATION, 'label'),
     role: _map(ROLE, 'label'),
     tag: tags,
@@ -85,7 +86,7 @@ function Partner() {
       search,
     }),
     (arg) => [
-      findValues(arg, 'area').join(','),
+      mapValues(findValues(arg, 'area'), (item) => areaObj[item]),
       mapValues(findValues(arg, 'edu'), (item) => eduObj[item]),
       mapValues(findValues(arg, 'role'), (item) => roleObj[item]),
       findValues(arg, 'tag').join(','),
