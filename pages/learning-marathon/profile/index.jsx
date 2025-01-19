@@ -9,7 +9,7 @@ import { BASE_URL } from "@/constants/common";
 import { cn } from '@/utils/cn';
 import dayjs from 'dayjs';
 import { ISOToWeekday } from '@/components/Marathon/SignUp/dateMap';
-import { EDUCATION_STEP, ROLE } from '@/constants/member';
+import { EDUCATION, ROLE } from '@/constants/member';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import ShareButtonGroup from '@/components/Group/detail/ShareButtonGroup';
@@ -302,7 +302,7 @@ const LearningMarathonProfile = () => {
 
           // set user edu stage
           if (result.educationStage) {
-            const eduZh = EDUCATION_STEP.find((option) => {
+            const eduZh = EDUCATION.find((option) => {
               return option.value === result.educationStage;
             });
             if (eduZh) {

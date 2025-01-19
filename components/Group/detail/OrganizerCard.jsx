@@ -2,7 +2,7 @@ import Link from 'next/link';
 import styled from '@emotion/styled';
 import Skeleton from '@mui/material/Skeleton';
 import Avatar from '@mui/material/Avatar';
-import { EDUCATION_STEP, ROLE } from '@/constants/member';
+import { EDUCATION, ROLE } from '@/constants/member';
 import locationSvg from '@/public/assets/icons/location.svg';
 import Chip from '@/shared/components/Chip';
 import MarkdownEditor from '@/shared/components/MarkdownEditor';
@@ -74,7 +74,7 @@ const StyledTags = styled.div`
 
 function OrganizerCard({ data = {}, isLoading }) {
   const educationStage =
-    EDUCATION_STEP.find(({ key }) => key === data?.user?.educationStage)
+    EDUCATION.find(({ key }) => key === data?.user?.educationStage)
       ?.label || '暫無資料';
   const role =
     ROLE.find(({ key }) => data?.user?.roleList?.includes(key))?.label ||

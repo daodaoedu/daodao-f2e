@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { EDUCATION_STEP, ROLE } from '@/constants/member';
+import { EDUCATION, ROLE } from '@/constants/member';
 import toast from 'react-hot-toast';
 import { initialState as reduxInitMarathonState } from '@/redux/reducers/marathon';
 import { useRouter } from 'next/router';
@@ -253,7 +253,7 @@ export default function ConfirmForm({
       }
 
       if (userState?.educationStage) {
-        userEdu = EDUCATION_STEP.find((item) => item.key === userState.educationStage)?.label;
+        userEdu = EDUCATION.find((item) => item.key === userState.educationStage)?.label;
       }
       setUser({
         name: userState.name,

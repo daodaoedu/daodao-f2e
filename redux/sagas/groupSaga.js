@@ -1,7 +1,7 @@
 import { put, takeLatest, select } from 'redux-saga/effects';
 import { AREAS } from '@/constants/areas';
 import { CATEGORIES } from '@/constants/category';
-import { EDUCATION_STEP } from '@/constants/member';
+import { EDUCATION } from '@/constants/member';
 import { activityCategoryList } from '@/constants/activityCategory';
 import req from '@/utils/request';
 
@@ -23,7 +23,7 @@ function* getGroupItems() {
     area: [AREAS, 'label'],
     category: [CATEGORIES, 'label'],
     activityCategory: [activityCategoryList, 'value'],
-    partnerEducationStep: [EDUCATION_STEP, 'label'],
+    partnerEducationStep: [EDUCATION, 'label'],
     isGrouping: true,
     search: true,
   };

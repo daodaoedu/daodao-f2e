@@ -4,7 +4,7 @@ import { Box, Button } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { TAIWAN_DISTRICT } from '@/constants/areas';
 import { fetchPartners } from '@/redux/actions/partners';
-import { EDUCATION_STEP, ROLE } from '@/constants/member';
+import { EDUCATION, ROLE } from '@/constants/member';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
 import PartnerList from './PartnerList';
@@ -40,7 +40,7 @@ const AREAS = TAIWAN_DISTRICT.map(({ name }) => ({
   label: name,
 })).concat([{ name: '國外', label: '國外' }]);
 
-const eduObj = createObjFromArrary(EDUCATION_STEP, 'label', 'key');
+const eduObj = createObjFromArrary(EDUCATION, 'label', 'key');
 const roleObj = createObjFromArrary(ROLE, 'label', 'key');
 
 function Partner() {
@@ -57,7 +57,7 @@ function Partner() {
   // constants
   const keySelections = {
     area: _map(AREAS, 'name'),
-    edu: _map(EDUCATION_STEP, 'label'),
+    edu: _map(EDUCATION, 'label'),
     role: _map(ROLE, 'label'),
     tag: tags,
     q: 'PASS_STRING',

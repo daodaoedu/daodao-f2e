@@ -12,7 +12,7 @@ import { useAuthDispatch } from '@/contexts/Auth';
 import {
   GENDER,
   ROLE,
-  EDUCATION_STAGE,
+  EDUCATION,
   WANT_TO_DO_WITH_PARTNER,
 } from '@/constants/member';
 
@@ -295,7 +295,7 @@ export default function UserProfileForm({
             <MenuItem disabled>
               <em>請選擇您目前的教育階段</em>
             </MenuItem>
-            {EDUCATION_STAGE.map(({ label, value }) => (
+            {EDUCATION.map(({ label, value }) => (
               <MenuItem key={value} value={value}>
                 {label}
               </MenuItem>

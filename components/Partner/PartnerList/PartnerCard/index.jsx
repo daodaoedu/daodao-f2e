@@ -2,7 +2,7 @@ import { Box } from '@mui/material';
 import {
   WANT_TO_DO_WITH_PARTNER,
   ROLE,
-  EDUCATION_STAGE,
+  EDUCATION,
 } from '@/constants/member';
 import moment from 'moment';
 import { mapToTable } from '@/utils/helper';
@@ -25,7 +25,7 @@ import {
 
 const WANT_TO_DO_WITH_PARTNER_TABLE = mapToTable(WANT_TO_DO_WITH_PARTNER);
 const ROLELIST = mapToTable(ROLE);
-const EDUCATION_STAGE_TABLE = mapToTable(EDUCATION_STAGE);
+const EDUCATION_STAGE_TABLE = mapToTable(EDUCATION);
 
 function PartnerCard({
   image,

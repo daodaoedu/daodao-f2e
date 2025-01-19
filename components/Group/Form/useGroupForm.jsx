@@ -4,20 +4,15 @@ import { ZodType, z } from 'zod';
 import { useSnackbar } from '@/contexts/Snackbar';
 import { CATEGORIES } from '@/constants/category';
 import { AREAS } from '@/constants/areas';
-import { EDUCATION_STEP } from '@/constants/member';
+import { EDUCATION } from '@/constants/member';
 import { BASE_URL } from '@/constants/common';
 import { activityCategoryList } from '@/constants/activityCategory';
 import useLeaveConfirm from '@/hooks/useLeaveConfirm';
 import { useAuth } from '@/contexts/Auth';
 
-const _eduOptions = EDUCATION_STEP.filter(
-  (edu) => !['master', 'doctor', 'other'].includes(edu.value),
-);
-_eduOptions.push({ key: 'noLimit', value: 'noLimit', label: '不設限' });
-
 export const categoriesOptions = CATEGORIES;
 export const areasOptions = AREAS.filter((area) => area.label !== '線上');
-export const eduOptions = _eduOptions;
+export const eduOptions = EDUCATION;
 
 const INITIAL_VALUES = {
   userId: '',
