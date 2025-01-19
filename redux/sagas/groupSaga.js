@@ -1,5 +1,5 @@
 import { put, takeLatest, select } from 'redux-saga/effects';
-import { AREAS } from '@/constants/areas';
+import { AREAS, ONLINE_OPTION, TBD_OPTION } from '@/constants/areas';
 import { CATEGORIES } from '@/constants/category';
 import { EDUCATION } from '@/constants/member';
 import { activityCategoryList } from '@/constants/activityCategory';
@@ -20,7 +20,7 @@ function* getGroupItems() {
 
   const urlSearchParams = new URLSearchParams({ pageSize });
   const searchParamsConfigs = {
-    area: [AREAS, 'label'],
+    area: [AREAS.concat(ONLINE_OPTION, TBD_OPTION), 'label'],
     category: [CATEGORIES, 'label'],
     activityCategory: [activityCategoryList, 'value'],
     partnerEducationStep: [EDUCATION, 'label'],

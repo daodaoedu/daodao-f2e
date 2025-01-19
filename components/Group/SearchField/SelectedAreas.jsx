@@ -1,8 +1,8 @@
 import Select from '@/shared/components/Select';
-import { AREAS } from '@/constants/areas';
+import { AREAS, ONLINE_OPTION, TBD_OPTION } from '@/constants/areas';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
-const AREAS_WITH_TBD = AREAS.concat({ name: '待討論', label: '待討論' });
+const areaOptions = AREAS.concat(ONLINE_OPTION, TBD_OPTION);
 
 export default function SelectedAreas() {
   const QUERY_KEY = 'area';
@@ -17,7 +17,7 @@ export default function SelectedAreas() {
       multiple
       value={getSearchParams(QUERY_KEY)}
       onChange={handleChange}
-      items={AREAS_WITH_TBD}
+      items={areaOptions}
       renderValue={(selected) =>
         selected.length === 0 ? '地點' : selected.join('、')
       }

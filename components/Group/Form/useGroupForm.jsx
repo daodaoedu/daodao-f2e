@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { ZodType, z } from 'zod';
 import { useSnackbar } from '@/contexts/Snackbar';
 import { CATEGORIES } from '@/constants/category';
-import { AREAS } from '@/constants/areas';
+import { AREAS, ONLINE_OPTION, TBD_OPTION } from '@/constants/areas';
 import { EDUCATION } from '@/constants/member';
 import { BASE_URL } from '@/constants/common';
 import { activityCategoryList } from '@/constants/activityCategory';
@@ -11,7 +11,7 @@ import useLeaveConfirm from '@/hooks/useLeaveConfirm';
 import { useAuth } from '@/contexts/Auth';
 
 export const categoriesOptions = CATEGORIES;
-export const areasOptions = AREAS.filter((area) => area.label !== '線上');
+export const areasOptions = AREAS;
 export const eduOptions = EDUCATION;
 
 const INITIAL_VALUES = {
@@ -54,7 +54,7 @@ const rules = {
     .string()
     .regex(/^(100|[1-9]\d|[1-9])$/, '請輸入整數，需大於 0，不可超過 100'),
   area: z
-    .array(z.enum(AREAS.concat({ label: '待討論' }).map(({ label }) => label)))
+    .array(z.enum(AREAS.concat(ONLINE_OPTION, TBD_OPTION).map(({ value }) => value)))
     .min(1, '請選擇地點'),
   time: z.string().max(50, '請勿輸入超過 50 字'),
   partnerStyle: z
