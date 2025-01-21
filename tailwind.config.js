@@ -72,6 +72,7 @@ module.exports = {
           [`.body-${size}`]: {
             fontSize: bodyFontSizes[index][1],
             lineHeight: "140%",
+            fontWeight: "500",
             [`@media (min-width: ${theme("screens.md")})`]: {
               fontSize: bodyFontSizes[index][0],
             },
