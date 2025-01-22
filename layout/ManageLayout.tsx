@@ -9,8 +9,8 @@ export default function ManageLayout({ children }: React.PropsWithChildren) {
   return (
     <DefaultLayout>
       <div className="bg-primary-palest">
-        <div className="flex p-4 pt-12 gap-10 max-w-6xl mx-auto min-h-screen-with-padding-top">
-          <div className="basis-80">
+        <div className="flex p-4 pt-5 pb-12 lg:pt-12 gap-10 max-w-6xl mx-auto min-h-screen-with-padding-top">
+          <div className="basis-80 hidden lg:block">
             <Sidebar>
               <Sidebar.Link href="/manage" isActive={pathname === '/manage'}>
                 我的小島
