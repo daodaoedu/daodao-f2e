@@ -8,6 +8,8 @@ import GoBackButton
 import { ProtectedComponent } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import More from '@/components/Projects/More';
 
 const Projects = () => {
   const maxProjects = 3;
@@ -128,11 +130,17 @@ const Projects = () => {
                         >
                           {getProjectType(project.eventId)}
                         </p>
-                        <div>
+                        <div className="flex flex-row justify-between">
                           <p className="bg-primary-lightest py-[3px] px-[10px] rounded-[4px] inline-flex flex-row gap-1 items-center text-primary-base body-sm">
                             <CircleIcon className="text-primary-base max-w-2 max-h-2" />
                             <span className="font-sans text-xs font-bold leading-[140%]">{project.isPublic ? '公開' : '不公開'}</span>
                           </p>
+                          {/* <div className=""> */}
+                            <More
+                              // className=""
+                              projectId={project._id}
+                            />
+                          {/* </div> */}
                         </div>
                       </div>
                     </div>
