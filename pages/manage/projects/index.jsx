@@ -135,12 +135,7 @@ const Projects = () => {
                             <CircleIcon className="text-primary-base max-w-2 max-h-2" />
                             <span className="font-sans text-xs font-bold leading-[140%]">{project.isPublic ? '公開' : '不公開'}</span>
                           </p>
-                          {/* <div className=""> */}
-                            <More
-                              // className=""
-                              projectId={project._id}
-                            />
-                          {/* </div> */}
+                          <More projectId={project._id} />
                         </div>
                       </div>
                     </div>
