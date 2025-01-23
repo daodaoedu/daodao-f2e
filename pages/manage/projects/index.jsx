@@ -8,7 +8,6 @@ import GoBackButton
 import { ProtectedComponent } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import More from '@/components/Projects/More';
 
 const Projects = () => {
