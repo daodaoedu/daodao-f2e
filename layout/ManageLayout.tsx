@@ -16,9 +16,8 @@ export default function ManageLayout({ children }: React.PropsWithChildren) {
                 我的小島
               </Sidebar.Link>
               <Sidebar.Link
-                href="/manage/project"
-                isActive={pathname === '/manage/project'}
-                isDisabled
+                href="/manage/projects"
+                isActive={pathname === '/manage/projects'}
               >
                 我的學習計畫
               </Sidebar.Link>
