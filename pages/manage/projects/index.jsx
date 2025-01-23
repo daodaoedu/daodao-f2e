@@ -9,6 +9,7 @@ import { ProtectedComponent } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
 import More from '@/components/Projects/More';
+import Button from '@/shared/components/Button';
 
 const Projects = () => {
   const maxProjects = 3;
@@ -73,13 +74,13 @@ const Projects = () => {
                 options={options}
                 className="max-w-[200px]"
               />
-              <button
-                type="button"
-                className="flex-shrink-0 py-[5px] px-5 rounded-[20px] bg-primary-lighter text-white font-sans text-base font-normal hover:bg-primary-lighter"
+              <Button
                 disabled
+                variant="solid"
+                className="hover:cursor-pointer"
               >
                 新增計畫
-              </button>
+              </Button>
             </div>
             {
               !isAddedPermitted && (
