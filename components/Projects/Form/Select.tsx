@@ -35,9 +35,9 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
 
   return (
     <div className={cn(
-        "relative inline-block w-full",
-        className
-      )}
+      "relative inline-block w-full",
+      className
+    )}
     >
       <button
         disabled={isDisabled}
@@ -45,7 +45,7 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           'block w-full px-4 py-2 text-left',
-          'rounded-lg shadow-sm',
+          'rounded-lg shadow-sm flex flex-row items-center justify-between',
           'focus:outline-none focus:ring-0 focus:ring-primary-base',
           isDisabled ?
             'text-white bg-primary-lighter'
@@ -54,7 +54,7 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
         )}
       >
         {selectedLabel}
-        <span className="absolute right-4 top-1/2 transform -translate-y-1/2">
+        <span>
           <KeyboardArrowDownIcon
             className={cn(
               "w-5 h-5",
@@ -76,18 +76,24 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
           "max-h-64 opacity-100 scale-y-100"
           :
           "max-h-0 opacity-0 scale-y-95"
-        )}
+      )}
       >
         {options.map((option) => (
           <li
             key={option.value}
-            onClick={() => handleSelect(option.label)}
-            className={cn(
-              "px-4 py-2 rounded-[5px] text-basic-400",
-              "hover:bg-primary-lightest hover:cursor-pointer"
-            )}
+            className="px-0"
           >
-            {option.label}
+            <button
+              type="button"
+              className={cn(
+                "w-full px-2 py-2 rounded-[5px] text-basic-400 text-left",
+                "hover:bg-primary-lightest hover:cursor-pointer",
+                "focus:bg-primary-lightest focus:ring-0 focus:outline-none"
+              )}
+              onClick={() => handleSelect(option.label)}
+            >
+              {option.label}
+            </button>
           </li>
         ))}
       </ul>
