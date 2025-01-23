@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import Select from '@/components/Projects/Form/Select';
 import AccessDenied from '@/shared/components/AccessDenied';
 import GoBackButton
@@ -59,6 +60,14 @@ const Projects = () => {
                 id: 'island'
               }
             })}
+            icon={
+              (
+                <KeyboardArrowLeftIcon
+                  className="
+                  text-basic-400
+                  group-hover:text-primary-base"
+                />
+              )}
             buttonText="返回 我的小島"
           />
           <h2 className="heading-md text-basic-400">學習計畫</h2>
