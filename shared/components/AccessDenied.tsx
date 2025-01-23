@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import AccessDeniedImg from '@/public/assets/projects/access-denied.png';
-import Button from "../../components/Projects/Form/Button";
+import Button from "@/shared/components/Button";
 
 const AccessDenied = () => {
   const router = useRouter();
@@ -12,11 +12,11 @@ const AccessDenied = () => {
       rounded-2xl"
     >
       <p className="
-      font-sans
+        font-sans
       text-basic-400
-      text-sm
-      font-bold
-      leading-[140%]
+        text-sm
+        font-bold
+        leading-[140%]
       "
       >
         這裡目前只開放給
@@ -33,19 +33,19 @@ const AccessDenied = () => {
       <div className="w-full flex flex-col gap-3 justify-center md:flex-row">
         <Button
           id="editMyCardButton"
-          onClick={() => router.push('/')}
-          buttonText="編輯個人名片"
-          buttonStyle="outline"
-        />
+          onClick={() => router.push('/manage/mycard')}
+          variant="outline"
+          color="primary"
+        >
+          編輯個人名片
+        </Button>
         <Button
           id="findResourcesButton"
-          onClick={() => router.push('/')}
-          buttonText="尋找學習資源"
-          buttonStyle="default"
-          style={{
-            boxShadow: '0px 4px 10px 0px rgba(89, 182, 178, 0.5)'
-          }}
-        />
+          variant="solid"
+          onClick={() => router.push('/resources')}
+        >
+          查看學習資源
+        </Button>
       </div>
     </div>
   );
