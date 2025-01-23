@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { cn } from '@/utils/cn';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 /**
  * @typedef {Object} Option
@@ -50,25 +51,15 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
       >
         {selectedLabel}
         <span className="absolute right-4 top-1/2 transform -translate-y-1/2">
-          <svg
+          <KeyboardArrowDownIcon
             className={`
-              w-5 h-5 transition-transform ease-linear 
-              ${isOpen ? 'rotate-180' : ''}
+              w-5 h-5 transition-transform ease-linear transform 
+              ${isOpen ? 'rotate-180' : 'rotate-0'}
               ${isDisabled ? 'text-white' : 'text-gray-400'}
             `}
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
+          />
         </span>
+
       </button>
       <ul className={`absolute left-0 mt-2 w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden transition-all duration-300 ease-in transform p-[10px]
         ${isOpen ?
