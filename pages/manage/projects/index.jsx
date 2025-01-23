@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import Select from '@/components/Projects/Form/Select';
-import AccessDenied from '@/components/Projects/AccessDenied';
+import AccessDenied from '@/shared/components/AccessDenied';
 import GoBackButton
   from '@/components/Projects/GoBackButton';
 import { ProtectedComponent } from '@/contexts/Auth';

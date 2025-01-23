@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import AccessDeniedImg from '@/public/assets/projects/access-denied.png';
-import Button from "./Form/Button";
+import Button from "../../components/Projects/Form/Button";
 
 const AccessDenied = () => {
   const router = useRouter();
