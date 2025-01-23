@@ -17,7 +17,7 @@ const Projects = () => {
   const userState = useSelector((state) => state.user);
   const projects = Array.isArray(userState.marathons) ? userState.marathons : [];
   const isEditPermitted = Boolean(projects.length);
-  const isAddedPermitted = projects.length >= maxProjects;
+  const isAddedDenied = projects.length >= maxProjects;
   const options = [
     { value: "all", label: "全部計畫" },
     { value: "learning-marathon", label: "學習馬拉松" },
@@ -68,7 +68,7 @@ const Projects = () => {
                 className="max-w-[200px]"
               />
               <Button
-                disabled
+                isDisabled={isAddedDenied}
                 variant="solid"
                 className="hover:cursor-pointer"
               >
@@ -76,7 +76,7 @@ const Projects = () => {
               </Button>
             </div>
             {
-              !isAddedPermitted && (
+              isAddedDenied && (
                 <p className="font-sans font-normal text-[#FF9526]">
                   島上空間有限，計畫滿三個就不能再增加了{`><`}
                 </p>
