@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
@@ -15,14 +14,14 @@ import Button from '@/shared/components/Button';
 const Projects = () => {
   const maxProjects = 3;
   const router = useRouter();
-  const [isEditPermitted, setIsEditPermitted] = useState(false);
-  const [isAddedPermitted, setIsAddedPermitted] = useState(true);
   const userState = useSelector((state) => state.user);
+  const projects = Array.isArray(userState.marathons) ? userState.marathons : null;
+  const isEditPermitted = Boolean(projects.length);
+  const isAddedPermitted = projects.length >= maxProjects;
   const options = [
     { value: "all", label: "全部計畫" },
     { value: "learning-marathon", label: "學習馬拉松" },
   ];
-  const [projects, setProjects] = useState([]);
   const getProjectType = (eventId) => {
     switch (eventId) {
       case "2025S1":
@@ -31,21 +30,6 @@ const Projects = () => {
         return "學習計畫";
     }
   };
-
-  useEffect(() => {
-    if (userState._id) {
-      if (userState.marathons.length) {
-        setProjects(userState.marathons);
-        setIsEditPermitted(true);
-      }
-    }
-  }, [userState]);
-
-  useEffect(() => {
-    if (projects.length > (maxProjects - 1)) {
-      setIsAddedPermitted(false);
-    }
-  }, [projects]);
 
   return (
     <ProtectedComponent>
