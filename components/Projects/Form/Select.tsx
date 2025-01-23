@@ -20,17 +20,17 @@ interface SelectProps {
 }
 
 const Select = ({ options, className, isDisabled = false }: SelectProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedLabel, setSelectedLabel] = useState("全部計畫");
+  const handleSelect = (label: string) => {
+    setSelectedLabel(label);
+    setIsOpen(false);
+  };
+
   if (!options.length) {
     console.error('no option');
     return false;
   }
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState("全部計畫");
-  const handleSelect = (value: string, label: string) => {
-    setSelectedValue(label);
-    setIsOpen(false);
-    console.log("Selected:", value);
-  };
 
   return (
     <div className={cn(`relative inline-block w-full`, className)}>
@@ -48,7 +48,7 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
             'text-basic-400 bg-primary-lightest '}
         `}
       >
-        {selectedValue}
+        {selectedLabel}
         <span className="absolute right-4 top-1/2 transform -translate-y-1/2">
           <svg
             className={`
@@ -80,7 +80,7 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
         {options.map((option) => (
           <li
             key={option.value}
-            onClick={() => handleSelect(option.value, option.label)}
+            onClick={() => handleSelect(option.label)}
             className="px-4 py-2 rounded-[5px]
               text-basic-400
               hover:bg-primary-lightest
