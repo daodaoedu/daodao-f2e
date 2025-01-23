@@ -1,21 +1,12 @@
-import { useState, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 import Sidebar from '@/shared/components/Sidebar';
 import DefaultLayout from './DefaultLayout';
 
 export default function ProjectLayout({ children }: React.PropsWithChildren) {
-  const [projectId, setProjectId] = useState(null);
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const id = searchParams.get('id');
-  useEffect(() => {
-    if (id) {
-      setProjectId(projectId);
-    } else {
-      setProjectId(null);
-    }
-  }, [id]);
+  const projectId = searchParams.get('id');
   return (
     <DefaultLayout>
       <div className="bg-primary-palest">
