@@ -15,7 +15,7 @@ const Projects = () => {
   const maxProjects = 3;
   const router = useRouter();
   const userState = useSelector((state) => state.user);
-  const projects = Array.isArray(userState.marathons) ? userState.marathons : null;
+  const projects = Array.isArray(userState.marathons) ? userState.marathons : [];
   const isEditPermitted = Boolean(projects.length);
   const isAddedPermitted = projects.length >= maxProjects;
   const options = [
