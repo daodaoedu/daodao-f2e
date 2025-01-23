@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
 import { ToggleProvider, useToggle } from '@/contexts/Toggle';
 import { cn } from '@/utils/cn';
+import useClickOutside from '@/hooks/useClickOutside';
 import Button, { ButtonProps } from './Button';
 
 interface DropdownProps {
@@ -9,26 +9,8 @@ interface DropdownProps {
 }
 
 function DropdownContent({ as: Component = 'div', children }: DropdownProps) {
-  const { isOpen, setIsOpen } = useToggle();
-  const ref = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (
-        e.target instanceof HTMLElement &&
-        ref.current?.contains?.(e.target)
-      ) {
-        return;
-      }
-      setIsOpen(false);
-    };
-    if (isOpen) {
-      window.addEventListener('click', handleClick);
-    }
-    return () => {
-      window.removeEventListener('click', handleClick);
-    };
-  }, [isOpen]);
+  const { setIsOpen } = useToggle();
+  const { ref } = useClickOutside({ setState: setIsOpen });
 
   return (
     <Component ref={ref} className="relative">
