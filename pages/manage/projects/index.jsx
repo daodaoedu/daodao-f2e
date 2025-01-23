@@ -10,6 +10,7 @@ import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
 import More from '@/components/Projects/More';
 import Button from '@/shared/components/Button';
+import { cn } from '@/utils/cn';
 
 const Projects = () => {
   const maxProjects = 3;
@@ -56,7 +57,10 @@ const Projects = () => {
           />
           <h2 className="heading-md text-basic-400">學習計畫</h2>
           <div
-            className="w-full flex flex-col justify-between bg-white rounded-xl py-3 px-6"
+            className={cn(
+              "w-full flex flex-col justify-between bg-white rounded-xl",
+              "py-3 px-3 md:px-6")
+            }
             style={{
               boxShadow: '0px 4px 10px 0px rgba(196, 194, 193, 0.40)'
             }}
@@ -70,7 +74,7 @@ const Projects = () => {
               <Button
                 isDisabled={isAddedDenied}
                 variant="solid"
-                className="hover:cursor-pointer"
+                className="hover:cursor-pointer flex-shrink-0"
               >
                 新增計畫
               </Button>
