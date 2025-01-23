@@ -34,48 +34,58 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
   }
 
   return (
-    <div className={cn(`relative inline-block w-full`, className)}>
+    <div className={cn(
+        "relative inline-block w-full",
+        className
+      )}
+    >
       <button
         disabled={isDisabled}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`
-          block w-full px-4 py-2 text-left
-          rounded-lg shadow-sm 
-          focus:outline-none focus:ring-0 focus:ring-primary-base
-          ${isDisabled ?
+        className={cn(
+          'block w-full px-4 py-2 text-left',
+          'rounded-lg shadow-sm',
+          'focus:outline-none focus:ring-0 focus:ring-primary-base',
+          isDisabled ?
             'text-white bg-primary-lighter'
             :
-            'text-basic-400 bg-primary-lightest '}
-        `}
+            'text-basic-400 bg-primary-lightest'
+        )}
       >
         {selectedLabel}
         <span className="absolute right-4 top-1/2 transform -translate-y-1/2">
           <KeyboardArrowDownIcon
-            className={`
-              w-5 h-5 transition-transform ease-linear transform 
-              ${isOpen ? 'rotate-180' : 'rotate-0'}
-              ${isDisabled ? 'text-white' : 'text-gray-400'}
-            `}
+            className={cn(
+              "w-5 h-5",
+              "transform transition-transform ease-linear",
+              isOpen ? "rotate-180" : "rotate-0",
+              isDisabled ? "text-white" : "text-gray-400",
+            )}
           />
         </span>
 
       </button>
-      <ul className={`absolute left-0 mt-2 w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden transition-all duration-300 ease-in transform p-[10px]
-        ${isOpen ?
+      <ul className={cn(
+        "absolute left-0",
+        "w-full mt-2 p-[10px] overflow-hidden bg-white",
+        "border border-gray-300",
+        "transition-all duration-300 ease-in transform",
+        "rounded-md shadow-lg",
+        isOpen ?
           "max-h-64 opacity-100 scale-y-100"
           :
-          "max-h-0 opacity-0 scale-y-95"}`
-      }
+          "max-h-0 opacity-0 scale-y-95"
+        )}
       >
         {options.map((option) => (
           <li
             key={option.value}
             onClick={() => handleSelect(option.label)}
-            className="px-4 py-2 rounded-[5px]
-              text-basic-400
-              hover:bg-primary-lightest
-              cursor-pointer"
+            className={cn(
+              "px-4 py-2 rounded-[5px] text-basic-400",
+              "hover:bg-primary-lightest hover:cursor-pointer"
+            )}
           >
             {option.label}
           </li>
