@@ -54,7 +54,7 @@ function Button({
         variant === ButtonVariantEnum.Outline && [
           'rounded-full border border-solid transition-colors',
           color === ButtonColorEnum.Primary &&
-            'border-primary-base text-basic-400 hover:bg-primary hover:text-basic-white',
+            'border-primary-base text-primary-base hover:bg-primary-base hover:text-basic-white',
           color === ButtonColorEnum.White &&
             'border-basic-white text-basic-white hover:bg-basic-white hover:text-primary-base',
         ],

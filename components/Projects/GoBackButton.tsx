@@ -1,5 +1,5 @@
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { cn } from '@/utils/cn';
+import React from 'react';
 
 /**
  * Button component for rendering customizable buttons.
@@ -15,6 +15,8 @@ import { cn } from '@/utils/cn';
  *  - The text displayed on the button.
  * @param {string} [className]
  *  - Optional custom classes to apply to the button (uses Tailwind CSS).
+ * @param {React.ReactNode} [icon]
+ *  - Optional custom icon to apply on the button. Typically, a MUI Icon component.
  * @param {() => void} onClick
  *  - Function to call when the button is clicked.
  * @returns {JSX.Element} The button element.
@@ -22,6 +24,7 @@ import { cn } from '@/utils/cn';
 
 interface ButtonProps {
   id: string,
+  icon?: React.ReactNode,
   buttonText: string;
   className?: string;
   onClick: () => void;
@@ -32,6 +35,7 @@ const GoBackButton = ({
   className = "",
   id = "",
   onClick = () => { },
+  icon = null,
 }: ButtonProps
 ) => {
   return (
@@ -40,12 +44,12 @@ const GoBackButton = ({
       name={id}
       type="button"
       onClick={onClick}
-      className={cn(`flex flex-row items-center group`, className)}
+      className={cn(
+        "flex flex-row items-center group",
+        className
+      )}
     >
-      <KeyboardArrowLeftIcon className="
-      text-basic-400
-      group-hover:text-primary-base"
-      />
+      {icon && icon}
       <span className="
       text-basic-400 font-sans text-sm font-normal
       group-hover:text-primary-base"

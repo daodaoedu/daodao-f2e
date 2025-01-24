@@ -1,27 +1,28 @@
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import Select from '@/components/Projects/Form/Select';
-import AccessDenied from '@/components/Projects/AccessDenied';
+import AccessDenied from '@/shared/components/AccessDenied';
 import GoBackButton
   from '@/components/Projects/GoBackButton';
 import { ProtectedComponent } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import More from '@/components/Projects/More';
+import Button from '@/shared/components/Button';
+import { cn } from '@/utils/cn';
 
 const Projects = () => {
   const maxProjects = 3;
   const router = useRouter();
-  const [isEditPermitted, setIsEditPermitted] = useState(false);
-  const [isAddedPermitted, setIsAddedPermitted] = useState(true);
   const userState = useSelector((state) => state.user);
+  const projects = Array.isArray(userState.marathons) ? userState.marathons : [];
+  const isEditPermitted = Boolean(projects.length);
+  const isAddedDenied = projects.length >= maxProjects;
   const options = [
     { value: "all", label: "全部計畫" },
     { value: "learning-marathon", label: "學習馬拉松" },
   ];
-  const [projects, setProjects] = useState([]);
   const getProjectType = (eventId) => {
     switch (eventId) {
       case "2025S1":
@@ -30,21 +31,6 @@ const Projects = () => {
         return "學習計畫";
     }
   };
-
-  useEffect(() => {
-    if (userState._id) {
-      if (userState.marathons.length) {
-        setProjects(userState.marathons);
-        setIsEditPermitted(true);
-      }
-    }
-  }, [userState]);
-
-  useEffect(() => {
-    if (projects.length > (maxProjects - 1)) {
-      setIsAddedPermitted(false);
-    }
-  }, [projects]);
 
   return (
     <ProtectedComponent>
@@ -59,11 +45,22 @@ const Projects = () => {
                 id: 'island'
               }
             })}
+            icon={
+              (
+                <KeyboardArrowLeftIcon
+                  className="
+                  text-basic-400
+                  group-hover:text-primary-base"
+                />
+              )}
             buttonText="返回 我的小島"
           />
           <h2 className="heading-md text-basic-400">學習計畫</h2>
           <div
-            className="w-full flex flex-col justify-between bg-white rounded-xl py-3 px-6"
+            className={cn(
+              "w-full flex flex-col justify-between bg-white rounded-xl",
+              "py-3 px-3 md:px-6")
+            }
             style={{
               boxShadow: '0px 4px 10px 0px rgba(196, 194, 193, 0.40)'
             }}
@@ -74,16 +71,16 @@ const Projects = () => {
                 options={options}
                 className="max-w-[200px]"
               />
-              <button
-                type="button"
-                className="flex-shrink-0 py-[5px] px-5 rounded-[20px] bg-primary-lighter text-white font-sans text-base font-normal hover:bg-primary-lighter"
-                disabled
+              <Button
+                isDisabled={isAddedDenied}
+                variant="solid"
+                className="hover:cursor-pointer flex-shrink-0"
               >
                 新增計畫
-              </button>
+              </Button>
             </div>
             {
-              !isAddedPermitted && (
+              isAddedDenied && (
                 <p className="font-sans font-normal text-[#FF9526]">
                   島上空間有限，計畫滿三個就不能再增加了{`><`}
                 </p>
@@ -135,12 +132,7 @@ const Projects = () => {
                             <CircleIcon className="text-primary-base max-w-2 max-h-2" />
                             <span className="font-sans text-xs font-bold leading-[140%]">{project.isPublic ? '公開' : '不公開'}</span>
                           </p>
-                          {/* <div className=""> */}
-                            <More
-                              // className=""
-                              projectId={project._id}
-                            />
-                          {/* </div> */}
+                          <More projectId={project._id} />
                         </div>
                       </div>
                     </div>
