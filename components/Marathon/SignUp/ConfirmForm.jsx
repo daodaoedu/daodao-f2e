@@ -268,6 +268,12 @@ export default function ConfirmForm({
     }
   }, [userState, openLoginModal]);
   const onSubmit = async () => {
+    const isSignupEnabled = false;
+
+    if (!isSignupEnabled) {
+      alert('申請已截止');
+      return;
+    }
     if (!marathonState) {
       console.error('no data to submit');
       return;
