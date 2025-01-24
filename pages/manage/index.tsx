@@ -72,7 +72,7 @@ const Calendar = ({ date, onChange }: CalendarProps) => {
           className="p-0 flex items-center gap-3"
           onClick={() => setIsOpen(!isOpen)}
         >
-          <PiCalendarBlankBold className="size-5" />
+          <PiCalendarBlankBold className="size-5 pointer-events-none" />
           <div className="heading-sm text-basic-500">
             {date?.format('YYYY/MM/DD')}（{date?.format('dd')}）任務
           </div>
