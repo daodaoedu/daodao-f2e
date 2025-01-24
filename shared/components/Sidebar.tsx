@@ -92,7 +92,37 @@ function SidebarLink({
   );
 }
 
+interface SidebarItemProps
+  extends React.HTMLAttributes<HTMLDivElement> {
+  isActive?: boolean;
+  isDisabled?: boolean;
+}
+
+function SidebarItem({
+  children,
+  className,
+  isActive,
+  isDisabled,
+  ...props
+}: SidebarItemProps) {
+  return (
+    <div
+      className={cn(
+        defaultClass,
+        isActive && activeClass,
+        isDisabled && disableClass,
+        "w-full p-0",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
 Sidebar.Button = SidebarButton;
 Sidebar.Link = SidebarLink;
+Sidebar.Item = SidebarItem;
 
 export default Sidebar;
