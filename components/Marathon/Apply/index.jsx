@@ -183,8 +183,9 @@ export default function Apply() {
           <StyledDateCard className="time">
             <StyledDateGroup>
               <div className="date">01/24</div>
-              <div className="weekday"><span>日</span></div>
+              <div className="weekday"><span>五</span></div>
             </StyledDateGroup>
+            <StyledTime component="p" sx={{ lineBreak: 'none' }}>23:59</StyledTime>
           </StyledDateCard>
           <StyledContent>
             申請截止
