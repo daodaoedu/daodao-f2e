@@ -295,6 +295,12 @@ const LearningMarathon = () => {
   );
 
   const handleClickSignupButton = () => {
+    const isSignupEnabled = false;
+
+    if (!isSignupEnabled) {
+      alert('申請已截止');
+      return;
+    }
     logEvent('Learning Marathon', 'Signup Button Clicked', {
       user_logged_in: isLoggedIn,
       user_temporary: isTemporary

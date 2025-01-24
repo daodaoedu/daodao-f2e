@@ -234,6 +234,12 @@ export default function MarathonForm({
   };
 
   const onNextStep = () => {
+    const isSignupEnabled = false;
+
+    if (!isSignupEnabled) {
+      alert('申請已截止');
+      return;
+    }
     const isValid = handleValidateAll();
     if (!isValid) {
       toast.error('請修正錯誤');
