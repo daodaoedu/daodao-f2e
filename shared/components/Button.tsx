@@ -1,5 +1,14 @@
 import { useRef } from 'react';
 import { cn } from '@/utils/cn';
+import dynamic from 'next/dynamic';
+
+const FaAngleLeft = dynamic(() =>
+  import('react-icons/fa6').then((mod) => mod.FaAngleLeft)
+);
+
+const icons = {
+  FaAngleLeft,
+};
 
 export enum ButtonColorEnum {
   Primary = 'primary',
@@ -33,6 +42,8 @@ export interface ButtonProps
   animation?: ButtonAnimationEnum | `${ButtonAnimationEnum}`;
   isDisabled?: boolean;
   isSubmit?: boolean;
+  prefixIcon?: keyof typeof icons;
+  suffixIcon?: keyof typeof icons;
 }
 
 function Button({
@@ -45,9 +56,13 @@ function Button({
   isDisabled = false,
   isSubmit = false,
   onClick,
+  prefixIcon,
+  suffixIcon,
   ...props
 }: ButtonProps) {
   const rippleRef = useRef<HTMLDivElement>(null);
+  const PrefixIcon = prefixIcon && icons[prefixIcon];
+  const SuffixIcon = suffixIcon && icons[suffixIcon];
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (animation === ButtonAnimationEnum.None) {
@@ -73,7 +88,8 @@ function Button({
     <button
       type={isSubmit ? 'submit' : 'button'}
       className={cn(
-        'relative overflow-hidden rounded-md',
+        'relative overflow-hidden rounded-md text-basic-400',
+        (prefixIcon || suffixIcon) && 'flex items-center gap-0.5',
         variant === ButtonVariantEnum.Solid && [
           'rounded-full transition-[box-shadow,color,background-color]',
           color === ButtonColorEnum.Primary &&
@@ -99,7 +115,13 @@ function Button({
       onClick={handleClick}
       {...props}
     >
+      {PrefixIcon && (
+        <PrefixIcon className={cn(size === ButtonSizeEnum.Small && 'size-4')} />
+      )}
       {children}
+      {SuffixIcon && (
+        <SuffixIcon className={cn(size === ButtonSizeEnum.Small && 'size-4')} />
+      )}
       {animation !== ButtonAnimationEnum.None && (
         <div ref={rippleRef} className="absolute inset-0 pointer-events-none" />
       )}
