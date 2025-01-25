@@ -116,11 +116,15 @@ function Button({
       {...props}
     >
       {PrefixIcon && (
-        <PrefixIcon className={cn(size === ButtonSizeEnum.Small && 'size-4')} />
+        <div className={cn(size === ButtonSizeEnum.Small && 'size-4')}>
+          <PrefixIcon className={cn(size === ButtonSizeEnum.Small && 'size-4')} />
+        </div>
       )}
       {children}
       {SuffixIcon && (
-        <SuffixIcon className={cn(size === ButtonSizeEnum.Small && 'size-4')} />
+        <div className={cn(size === ButtonSizeEnum.Small && 'size-4')}>
+          <SuffixIcon className={cn(size === ButtonSizeEnum.Small && 'size-4')} />
+        </div>
       )}
       {animation !== ButtonAnimationEnum.None && (
         <div ref={rippleRef} className="absolute inset-0 pointer-events-none" />
