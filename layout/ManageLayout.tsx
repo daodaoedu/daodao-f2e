@@ -22,9 +22,8 @@ export default function ManageLayout({ children }: React.PropsWithChildren) {
                 我的學習計畫
               </Sidebar.Link>
               <Sidebar.Link
-                href="/manage/intro"
-                isActive={pathname === '/manage/intro'}
-                isDisabled
+                href="/personal-card/my-card"
+                isActive={pathname === '/personal-card/my-card'}
               >
                 個人名片
               </Sidebar.Link>
