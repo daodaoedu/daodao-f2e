@@ -28,11 +28,11 @@ export default function ManageLayout({ children }: React.PropsWithChildren) {
                 個人名片
               </Sidebar.Link>
               <Collapse>
-                <Sidebar.Button className="w-full p-0">
+                <Sidebar.Item>
                   <Collapse.Toggle className="w-full px-10 py-2" withIcon>
                     百寶箱
                   </Collapse.Toggle>
-                </Sidebar.Button>
+                </Sidebar.Item>
                 <Collapse.List className="*:my-2 *:aria-hidden:my-0">
                   <Collapse.Item>
                     <Sidebar.Link

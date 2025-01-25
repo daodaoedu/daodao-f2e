@@ -9,7 +9,7 @@ import {
 
 function DefaultLayoutContent({ children }: React.PropsWithChildren) {
   const headerRef = useRef<HTMLDivElement>(null);
-  const { height, showPromotionBar, setHeight } = usePromotion();
+  const { showPromotionBar, setHeight } = usePromotion();
   const prevShowPromotionBar = useRef<boolean | null>(null);
 
   useEffect(() => {
@@ -41,12 +41,7 @@ function DefaultLayoutContent({ children }: React.PropsWithChildren) {
       <Header ref={headerRef}>
         <PromotionBar />
       </Header>
-      <main
-        className="min-h-screen-with-padding-top"
-        style={{ paddingTop: `${height}px` }}
-      >
-        {children}
-      </main>
+      <main className="min-h-screen-with-padding-top">{children}</main>
     </>
   );
 }

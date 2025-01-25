@@ -150,6 +150,21 @@ module.exports = {
             },
           },
         },
+        [`.animate-button-ripple`]: {
+          animation:
+            'button-ripple var(--animation-duration, 500ms) var(--animation-delay, 0ms) forwards cubic-bezier(0, 0, 0.2, 1)',
+          '@keyframes button-ripple': {
+            '0%': { transform: 'translate(-50%, -50%) scale(0)', opacity: 1 },
+            '75%': {
+              transform: 'translate(-50%, -50%) scale(4)',
+              opacity: 0.2,
+            },
+            '100%': {
+              transform: 'translate(-50%, -50%) scale(6)',
+              opacity: 0,
+            },
+          },
+        },
       });
       addUtilities({
         [`.animate-slide-x-in`]: {
@@ -174,9 +189,10 @@ module.exports = {
       });
       addUtilities({
         ['.min-h-screen-with-padding-top']: {
-          minHeight: 'calc(100vh - var(--padding-top, 0px))'
-        }
-      })
+          paddingTop: 'var(--padding-top, 0px)',
+          minHeight: 'calc(100vh - var(--padding-top, 0px))',
+        },
+      });
     }),
   ],
 };

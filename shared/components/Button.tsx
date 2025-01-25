@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { cn } from '@/utils/cn';
 
 export enum ButtonColorEnum {
@@ -16,6 +17,11 @@ export enum ButtonSizeEnum {
   Medium = 'md',
 }
 
+export enum ButtonAnimationEnum {
+  Ripple = 'ripple',
+  None = 'none',
+}
+
 export interface ButtonProps
   extends Omit<
     React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -24,6 +30,7 @@ export interface ButtonProps
   variant?: ButtonVariantEnum | `${ButtonVariantEnum}`;
   color?: ButtonColorEnum | `${ButtonColorEnum}`;
   size?: ButtonSizeEnum | `${ButtonSizeEnum}`;
+  animation?: ButtonAnimationEnum | `${ButtonAnimationEnum}`;
   isDisabled?: boolean;
   isSubmit?: boolean;
 }
@@ -34,14 +41,39 @@ function Button({
   variant,
   color = ButtonColorEnum.Primary,
   size = ButtonSizeEnum.Medium,
+  animation = ButtonAnimationEnum.Ripple,
   isDisabled = false,
   isSubmit = false,
+  onClick,
   ...props
 }: ButtonProps) {
+  const rippleRef = useRef<HTMLDivElement>(null);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (animation === ButtonAnimationEnum.None) {
+      onClick?.(e);
+      return;
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ripple = document.createElement('span');
+    onClick?.(e);
+    ripple.className = cn(
+      'absolute size-10 rounded-full bg-basic-black/10 animate-button-ripple',
+      variant === ButtonVariantEnum.Solid &&
+        color !== ButtonColorEnum.White &&
+        'bg-basic-white/40'
+    );
+    ripple.style.top = `${((e.clientY - rect.top) / rect.height) * 100}%`;
+    ripple.style.left = `${((e.clientX - rect.left) / rect.width) * 100}%`;
+    rippleRef.current?.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 1000);
+  };
+
   return (
     <button
       type={isSubmit ? 'submit' : 'button'}
       className={cn(
+        'relative overflow-hidden rounded-md',
         variant === ButtonVariantEnum.Solid && [
           'rounded-full transition-[box-shadow,color,background-color]',
           color === ButtonColorEnum.Primary &&
@@ -64,9 +96,13 @@ function Button({
         className
       )}
       disabled={isDisabled}
+      onClick={handleClick}
       {...props}
     >
       {children}
+      {animation !== ButtonAnimationEnum.None && (
+        <div ref={rippleRef} className="absolute inset-0 pointer-events-none" />
+      )}
     </button>
   );
 }
