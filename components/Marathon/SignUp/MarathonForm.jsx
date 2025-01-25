@@ -234,7 +234,7 @@ export default function MarathonForm({
   };
 
   const onNextStep = () => {
-    const isSignupEnabled = false;
+    const isSignupEnabled = true;
 
     if (!isSignupEnabled) {
       alert('申請已截止');

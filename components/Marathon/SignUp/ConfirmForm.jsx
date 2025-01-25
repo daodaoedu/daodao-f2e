@@ -268,7 +268,7 @@ export default function ConfirmForm({
     }
   }, [userState, openLoginModal]);
   const onSubmit = async () => {
-    const isSignupEnabled = false;
+    const isSignupEnabled = true;
 
     if (!isSignupEnabled) {
       alert('申請已截止');
