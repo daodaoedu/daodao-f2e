@@ -67,9 +67,9 @@ const Calendar = ({ date, onChange }: CalendarProps) => {
 
   return (
     <div ref={ref} className="relative">
-      <div className="mb-6 px-4 py-3.5 flex items-center justify-between bg-white rounded-xl shadow-lg shadow-basic-200/40">
+      <div className="mb-6 pl-1 pr-3 py-2 flex items-center justify-between bg-white rounded-xl shadow-lg shadow-basic-200/40">
         <Button
-          className="p-0 flex items-center gap-3"
+          className="px-3 py-2.5 flex items-center gap-3"
           onClick={() => setIsOpen(!isOpen)}
         >
           <PiCalendarBlankBold className="size-5 pointer-events-none" />
@@ -77,19 +77,19 @@ const Calendar = ({ date, onChange }: CalendarProps) => {
             {date?.format('YYYY/MM/DD')}（{date?.format('dd')}）任務
           </div>
         </Button>
-        <div className="flex items-center gap-2.5">
-          <Button className="p-0 body-lg text-basic-400" onClick={handleToday}>
+        <div className="flex items-center gap-0.5">
+          <Button className="px-1 py-2 body-lg text-basic-400" onClick={handleToday}>
             今日
           </Button>
           <Button
-            className="p-0"
+            className="p-1"
             isDisabled={date.isBefore(MIN_DATE) || date.isSame(MIN_DATE, 'day')}
             onClick={() => onChange(date.subtract(1, 'day'))}
           >
             <CiCircleChevLeft className="size-8 text-basic-400" />
           </Button>
           <Button
-            className="p-0"
+            className="p-1"
             isDisabled={date.isAfter(MAX_DATE) || date.isSame(MAX_DATE, 'day')}
             onClick={() => onChange(date.add(1, 'day'))}
           >
