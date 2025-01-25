@@ -20,7 +20,8 @@ function DefaultLayoutContent({ children }: React.PropsWithChildren) {
 
       setHeight(headerOffset);
       if (root instanceof HTMLElement) {
-        root.style.scrollPaddingTop = `${headerOffset + 80}px`;
+        root.style.setProperty('--padding-top', `${headerOffset}px`);
+        root.style.setProperty('scroll-padding-top', `${headerOffset + 80}px`);
       }
     };
 
@@ -40,7 +41,10 @@ function DefaultLayoutContent({ children }: React.PropsWithChildren) {
       <Header ref={headerRef}>
         <PromotionBar />
       </Header>
-      <main className="min-h-screen" style={{ paddingTop: `${height}px` }}>
+      <main
+        className="min-h-screen-with-padding-top"
+        style={{ paddingTop: `${height}px` }}
+      >
         {children}
       </main>
     </>

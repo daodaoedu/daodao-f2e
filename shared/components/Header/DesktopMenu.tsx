@@ -53,7 +53,13 @@ function DesktopMenu() {
           </Dropdown.List>
         </Dropdown>
         {auth.isLoggedIn ? (
-          <div className="flex items-center">
+          <div className="flex items-center gap-3.5">
+            <Link
+              href="/manage"
+              className="px-2 py-5 text-basic-white body-md font-bold"
+            >
+              我的小島
+            </Link>
             <Dropdown as="nav">
               <Dropdown.Toggle>
                 <img

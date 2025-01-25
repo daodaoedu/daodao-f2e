@@ -21,6 +21,7 @@ module.exports = {
     extend: {
       colors: {
         primary: {
+          palest: "#F3FCFC",
           lightest: "#DEF5F5",
           lighter: "#89DAD7",
           base: "#16B9B3",
@@ -71,6 +72,7 @@ module.exports = {
           [`.body-${size}`]: {
             fontSize: bodyFontSizes[index][1],
             lineHeight: "140%",
+            fontWeight: "500",
             [`@media (min-width: ${theme("screens.md")})`]: {
               fontSize: bodyFontSizes[index][0],
             },
@@ -170,6 +172,11 @@ module.exports = {
           },
         },
       });
+      addUtilities({
+        ['.min-h-screen-with-padding-top']: {
+          minHeight: 'calc(100vh - var(--padding-top, 0px))'
+        }
+      })
     }),
   ],
 };
