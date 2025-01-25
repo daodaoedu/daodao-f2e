@@ -189,9 +189,10 @@ module.exports = {
       });
       addUtilities({
         ['.min-h-screen-with-padding-top']: {
-          minHeight: 'calc(100vh - var(--padding-top, 0px))'
-        }
-      })
+          paddingTop: 'var(--padding-top, 0px)',
+          minHeight: 'calc(100vh - var(--padding-top, 0px))',
+        },
+      });
     }),
   ],
 };
