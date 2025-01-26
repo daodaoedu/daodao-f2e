@@ -7,7 +7,7 @@ import Image from '@/shared/components/Image';
 
 const ClassCard = () => {
   return (
-    <Link href="/manage/classrooms/detail" className="block bg-basic-white rounded-lg">
+    <Link href="/manage/classrooms/reviews" className="block bg-basic-white rounded-lg">
       <div className="rounded-lg overflow-hidden">
         <Image src="" alt="" />
       </div>
