@@ -6,8 +6,13 @@ const FaAngleLeft = dynamic(() =>
   import('react-icons/fa6').then((mod) => mod.FaAngleLeft)
 );
 
+const FaArrowRight = dynamic(() =>
+  import('react-icons/fa6').then((mod) => mod.FaArrowRight)
+);
+
 const icons = {
   FaAngleLeft,
+  FaArrowRight,
 };
 
 export enum ButtonColorEnum {
