@@ -4,11 +4,19 @@ import { cn } from '@/utils/cn';
 interface CollapseProps {
   as?: React.ElementType;
   children: React.ReactNode;
+  defaultOpen?: boolean;
 }
 
-function Collapse({ as: Root = 'div', children }: CollapseProps) {
+function Collapse({
+  as: Root = 'div',
+  children,
+  defaultOpen,
+}: CollapseProps) {
   return (
-    <ToggleProvider>
+    <ToggleProvider
+      key={defaultOpen ? 'open' : 'close'}
+      defaultEnabled={defaultOpen}
+    >
       <Root className="relative">{children}</Root>
     </ToggleProvider>
   );

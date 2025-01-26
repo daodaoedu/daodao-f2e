@@ -124,9 +124,10 @@ interface ProjectProps {
   href: string;
   title: string;
   children: React.ReactNode;
+  defaultOpen?: boolean;
 }
 
-const Project = ({ href, title, children }: ProjectProps) => {
+const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
   const childrenElements = useMemo(
     () =>
       Children.map(children, (child) => ({ child, id: crypto.randomUUID() })),
@@ -142,7 +143,7 @@ const Project = ({ href, title, children }: ProjectProps) => {
         'after:bg-primary-base after:rounded-full after:z-10'
       )}
     >
-      <Collapse>
+      <Collapse defaultOpen={defaultOpen}>
         <Collapse.Toggle className="w-full px-3 py-2 justify-between" withIcon>
           <Link
             href={href}
@@ -223,7 +224,11 @@ const Manage = () => {
       <SEOConfig data={SEOData} />
       <Header />
       <Calendar date={date} onChange={setDate} />
-      <Project title="學習計畫名稱一" href="/manage#1">
+      <Project title="學習計畫名稱一" href="/manage#1" defaultOpen>
+        <div>第一週</div>
+        <div>第三週</div>
+      </Project>
+      <Project title="學習計畫名稱二" href="/manage#2">
         <div>第一週</div>
         <div>第三週</div>
       </Project>
