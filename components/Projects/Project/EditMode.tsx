@@ -1,0 +1,189 @@
+import { Project } from '@/components/Projects/Project/projectType';
+import Button from '@/shared/components/Button';
+import { Panel } from '@/components/Projects/Project/Shared';
+import InputField from "@/components/Projects/Form/InputField";
+
+interface EditModeProps {
+  project: Partial<Project>;
+  onClickCancel: () => void;
+  onClickUpdate: () => void;
+  onChangeInput: (
+    event:
+      React.ChangeEvent<HTMLInputElement> |
+      React.ChangeEvent<HTMLTextAreaElement> |
+      React.ChangeEvent<HTMLSelectElement>
+  ) => void;
+}
+
+const EditMode = ({
+  project,
+  onClickCancel,
+  onClickUpdate,
+  onChangeInput
+}: EditModeProps) => {
+  const handleClickCancel = onClickCancel;
+  const handleClickUpdate = onClickUpdate;
+  const handleChangeInput = onChangeInput;
+  return (
+    <div className="flex flex-col gap-6 md:gap-4">
+      <Panel className="bg-white flex flex-col gap-5">
+        <h2 className="text-basic-400 font-sans heading-md">學習計畫</h2>
+        <p className="text-basic-400 font-sans text-sm">
+          計劃內容在報名截止日前皆可修改。<br />
+          入選公告後，所有入選者及報名者亦可持續修改學習計劃
+        </p>
+        <InputField>
+          <InputField.Label htmlFor="title" isRequired>學習計畫標題</InputField.Label>
+          <InputField.Input
+            id="title"
+            name="title"
+            value={project?.title}
+            onChange={handleChangeInput}
+          />
+        </InputField>
+
+        <InputField>
+          <InputField.Label
+            htmlFor="description"
+            isRequired
+          >
+            計畫簡述
+          </InputField.Label>
+          <InputField.Description>
+            請摘要學習計畫。包含你為什麼想做此計畫？你的目標是什麼呢？預計如何達成？
+          </InputField.Description>
+          <InputField.TextArea
+            id="description"
+            name="description"
+            value={project?.description}
+            onChange={handleChangeInput}
+          />
+        </InputField>
+
+        <InputField>
+          <InputField.Label
+            htmlFor="motivation_description"
+            isRequired
+          >
+            學習動機
+          </InputField.Label>
+          <InputField.Description>
+            為什麼會想啟動這個學習計畫？受到哪些經歷、刺激、啟發，包含相關生活、學習等經驗。
+          </InputField.Description>
+          <InputField.TextArea
+            id="motivation_description"
+            name="motivation_description"
+            value={project?.motivation?.description}
+            onChange={handleChangeInput}
+            placeholder="範例：因為同學常常說我很好笑，很適合把生活日常做成影片，我也發現自己對做影片、當Youtuber有興趣，所以想要嘗試累積作品，並開一個 Youtuber 頻道。"
+          />
+        </InputField>
+
+        <InputField>
+          <InputField.Label
+            htmlFor="goals"
+            isRequired
+          >
+            學習目標
+          </InputField.Label>
+          <InputField.Description>
+            你希望學習後獲得什麼收穫？例如知識或技能的習得，又或者態度或習慣的改變。
+          </InputField.Description>
+          <InputField.TextArea
+            id="goals"
+            value={project?.goals}
+            name="goals"
+            onChange={handleChangeInput}
+            placeholder="範例：
+能收集並分析搞笑風格的 Youtuber
+能拍攝畫面穩定、清晰且具專業感的影片"
+          />
+        </InputField>
+
+        <InputField>
+          <InputField.Label
+            htmlFor="content"
+            isRequired
+          >
+            學習內容
+          </InputField.Label>
+          <InputField.Description>
+            依據你的學習目標，你具體會學哪些內容呢？例如特定的知識、技能、思維、習慣等。
+          </InputField.Description>
+          <InputField.TextArea
+            id="content"
+            name="content"
+            onChange={handleChangeInput}
+            value={project?.content}
+            placeholder="範例：
+內容規劃與創意發想（定位、主題、腳本）
+基礎拍攝技術（攝影設備、燈光、語音）
+影片剪輯與後製（剪輯軟體、配樂）"
+          />
+        </InputField>
+
+        <InputField>
+          <InputField.Label htmlFor="strategies_description" isRequired>
+            學習方法與策略
+          </InputField.Label>
+          <InputField.Description>
+            你會如何學習？請先勾選預計的學習方法，並敘述各種學習方法會如何相互搭配。此外，你會如何在過程中使用什麼方式紀錄你的學習呢？例如文字筆記以部落格文章做分享等。
+          </InputField.Description>
+          <InputField.TextArea
+            id="strategies_description"
+            name="strategies_description"
+            value={project?.strategies?.description}
+            onChange={handleChangeInput}
+            placeholder="範例：
+內容規劃與創意發想（定位、主題、腳本）
+基礎拍攝技術（攝影設備、燈光、語音）
+影片剪輯與後製（剪輯軟體、配樂）"
+          />
+        </InputField>
+
+        <InputField>
+          <InputField.Label
+            htmlFor="resources"
+            isRequired
+          >
+            學習資源
+          </InputField.Label>
+          <InputField.Description>
+            你會使用哪些資源呢？包含網路資源的連結、書籍名稱、人／組織、社群、活動／課程、學習工具等，請至少附上名稱與相關連結
+          </InputField.Description>
+          <InputField.Input
+            id="resources"
+            name="resources"
+            onChange={handleChangeInput}
+            value={project?.resources}
+            placeholder="範例：YouTube 創作者的實用資源"
+          />
+        </InputField>
+
+      </Panel>
+
+      <Panel className="
+        p-0 md:p-0
+        flex flex-col justify-center items-center gap-6
+        md:flex-row md:gap-3"
+      >
+        <Button
+          variant="outline"
+          onClick={handleClickCancel}
+          className="w-[272px] max-w-full"
+        >
+          取消編輯
+        </Button>
+        <Button
+          variant="solid"
+          onClick={handleClickUpdate}
+          className="w-[272px] max-w-full"
+        >
+          發佈修改
+        </Button>
+      </Panel>
+    </div>
+  );
+};
+
+export default EditMode;
