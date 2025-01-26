@@ -200,6 +200,7 @@ export const MARATHON_LINKS = [
 
 export const USER_LINK = [
   { name: '帳號設定', id: 'account-setting' },
+  { name: '個人化推薦', id: 'personalized-recommendations' },
   { name: '島島幣', id: 'daodao-coin' },
 ];
 

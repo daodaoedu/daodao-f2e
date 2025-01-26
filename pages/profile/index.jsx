@@ -59,6 +59,10 @@ const ProfilePage = () => {
       view: <AccountSetting />,
     },
     {
+      id: 'personalized-recommendations',
+      tabLabel: '個人化推薦',
+    },
+    {
       id: 'daodao-coin',
       tabLabel: '島島幣',
     }
