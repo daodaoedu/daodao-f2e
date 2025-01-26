@@ -26,7 +26,7 @@ function DesktopMenu() {
           <Dropdown.Toggle
             className={cn(
               "my-4 py-1.5 pl-3 pr-1 font-bold rounded-lg transition-colors",
-              "text-basic-white bg-transparent",
+              "text-basic-white hover:text-basic-white bg-transparent",
               "aria-pressed:text-primary-base aria-pressed:bg-primary-lightest"
             )}
             withIcon
@@ -61,7 +61,7 @@ function DesktopMenu() {
               我的小島
             </Link>
             <Dropdown as="nav">
-              <Dropdown.Toggle>
+              <Dropdown.Toggle animation="none">
                 <img
                   src={auth.user.photoURL}
                   alt={auth.user.name}
