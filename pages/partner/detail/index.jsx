@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
 
-import Profile from '@/components/Profile';
+import PersonalCard from '@/components/PersonalCard';
 import {
   clearPartnerState,
   fetchPartnerById,
@@ -35,7 +35,7 @@ const PartnerDetailPage = () => {
   }, [partnerId]);
 
   return (
-    <Profile
+    <PersonalCard
       {...partner}
       isLoading={!partner}
       isMe={partner?.email === user?.email}
