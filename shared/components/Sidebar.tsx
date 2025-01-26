@@ -42,7 +42,7 @@ function Sidebar({ children, className }: SidebarProps) {
   return (
     <div
       className={cn(
-        'p-0 whitespace-nowrap overflow-x-auto',
+        'p-0 whitespace-nowrap overflow-x-auto h-max',
         'bg-white rounded-lg shadow-lg shadow-basic-400/10',
         'md:p-2 md:shadow-none',
         className
