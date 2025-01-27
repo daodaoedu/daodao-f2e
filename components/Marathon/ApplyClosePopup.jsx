@@ -49,7 +49,7 @@ const ApplyClosePopup = forwardRef((props, ref) => {
         <div className="space-y-3 mt-4">
           <button
             type="button"
-            className="w-full bg-teal-500 hover:bg-teal-600 text-white p-4 rounded-full text-base font-medium"
+            className="w-full bg-primary-base hover:bg-teal-600 hover:shadow-[0px_4px_10px_0px_rgba(89,182,178,0.50)] text-white p-4 rounded-full text-base font-medium"
             onClick={handleWaitingListClick}
           >
             {popupContent.waitingListButton}
@@ -57,7 +57,7 @@ const ApplyClosePopup = forwardRef((props, ref) => {
 
           <button
             type="button"
-            className="w-full bg-white hover:bg-gray-50 text-teal-500 p-4 rounded-full text-base font-medium border border-[#16B9B3]"
+            className="w-full bg-white hover:bg-gray-50 hover:shadow-[0px_4px_10px_0px_rgba(89,182,178,0.50)] text-teal-500 p-4 rounded-full text-base font-medium border border-[#16B9B3] transition-shadow "
             onClick={() => setIsVisible(false)}
           >
             {popupContent.closeButton}
