@@ -5,9 +5,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
-import { AiOutlineEye, AiOutlineMore } from 'react-icons/ai';
 import { CiCircleChevRight, CiCircleChevLeft } from 'react-icons/ci';
-import { FaArrowRight } from 'react-icons/fa6';
 import { GoArrowUpRight } from 'react-icons/go';
 import { PiCalendarBlankBold } from 'react-icons/pi';
 import ManageLayout from '@/layout/ManageLayout';
@@ -16,6 +14,7 @@ import SEOConfig from '@/shared/components/SEO';
 import Dropdown from '@/shared/components/Dropdown';
 import Button from '@/shared/components/Button';
 import Collapse from '@/shared/components/Collapse';
+import ReviewCard from '@/components/Review/Card';
 import { cn } from '@/utils/cn';
 import 'dayjs/locale/zh-tw';
 
@@ -73,12 +72,12 @@ const Calendar = ({ date, onChange }: CalendarProps) => {
           onClick={() => setIsOpen(!isOpen)}
         >
           <PiCalendarBlankBold className="size-5 pointer-events-none" />
-          <div className="heading-sm text-basic-500">
+          <div className="heading-sm">
             {date?.format('YYYY/MM/DD')}（{date?.format('dd')}）任務
           </div>
         </Button>
         <div className="flex items-center gap-0.5">
-          <Button className="px-1 py-2 body-lg text-basic-400" onClick={handleToday}>
+          <Button className="px-1 py-2 body-lg" onClick={handleToday}>
             今日
           </Button>
           <Button
@@ -86,14 +85,14 @@ const Calendar = ({ date, onChange }: CalendarProps) => {
             isDisabled={date.isBefore(MIN_DATE) || date.isSame(MIN_DATE, 'day')}
             onClick={() => onChange(date.subtract(1, 'day'))}
           >
-            <CiCircleChevLeft className="size-8 text-basic-400" />
+            <CiCircleChevLeft className="size-8" />
           </Button>
           <Button
             className="p-1"
             isDisabled={date.isAfter(MAX_DATE) || date.isSame(MAX_DATE, 'day')}
             onClick={() => onChange(date.add(1, 'day'))}
           >
-            <CiCircleChevRight className="size-8 text-basic-400" />
+            <CiCircleChevRight className="size-8" />
           </Button>
         </div>
       </div>
@@ -124,9 +123,10 @@ interface ProjectProps {
   href: string;
   title: string;
   children: React.ReactNode;
+  defaultOpen?: boolean;
 }
 
-const Project = ({ href, title, children }: ProjectProps) => {
+const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
   const childrenElements = useMemo(
     () =>
       Children.map(children, (child) => ({ child, id: crypto.randomUUID() })),
@@ -142,7 +142,7 @@ const Project = ({ href, title, children }: ProjectProps) => {
         'after:bg-primary-base after:rounded-full after:z-10'
       )}
     >
-      <Collapse>
+      <Collapse defaultOpen={defaultOpen}>
         <Collapse.Toggle className="w-full px-3 py-2 justify-between" withIcon>
           <Link
             href={href}
@@ -161,41 +161,6 @@ const Project = ({ href, title, children }: ProjectProps) => {
             ))}
         </Collapse.List>
       </Collapse>
-    </div>
-  );
-};
-
-const Review = () => {
-  return (
-    <div className="p-10 bg-white rounded-2xl">
-      <div className="mb-5 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="px-5 py-2 body-sm bg-primary-base rounded-full text-white">
-            覆盤二
-          </div>
-          <div className="body-md text-basic-500">學習計畫一</div>
-          <div className="body-md text-primary-base">第五週</div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div>填寫日期 2024/12/11</div>
-          <Button className="p-0">
-            <AiOutlineEye className="size-5" />
-          </Button>
-          <Button className="p-0">
-            <AiOutlineMore className="size-5" />
-          </Button>
-        </div>
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <p className="body-lg text-basic-500">這段時間的整體心情....</p>
-          <div className="p-2 bg-basic-100 rounded">😊 開心</div>
-        </div>
-        <div className="flex items-center gap-1 body-md text-basic-300">
-          更多
-          <FaArrowRight />
-        </div>
-      </div>
     </div>
   );
 };
@@ -223,11 +188,15 @@ const Manage = () => {
       <SEOConfig data={SEOData} />
       <Header />
       <Calendar date={date} onChange={setDate} />
-      <Project title="學習計畫名稱一" href="/manage#1">
+      <Project title="學習計畫名稱一" href="/manage#1" defaultOpen>
         <div>第一週</div>
         <div>第三週</div>
       </Project>
-      <Review />
+      <Project title="學習計畫名稱二" href="/manage#2">
+        <div>第一週</div>
+        <div>第三週</div>
+      </Project>
+      <ReviewCard />
     </LocalizationProvider>
   );
 };

@@ -6,8 +6,13 @@ const FaAngleLeft = dynamic(() =>
   import('react-icons/fa6').then((mod) => mod.FaAngleLeft)
 );
 
+const FaArrowRight = dynamic(() =>
+  import('react-icons/fa6').then((mod) => mod.FaArrowRight)
+);
+
 const icons = {
   FaAngleLeft,
+  FaArrowRight,
 };
 
 export enum ButtonColorEnum {
@@ -88,16 +93,16 @@ function Button({
     <button
       type={isSubmit ? 'submit' : 'button'}
       className={cn(
-        'relative overflow-hidden rounded-md text-basic-400',
+        'relative overflow-hidden rounded-md text-basic-400 hover:text-primary-base',
         (prefixIcon || suffixIcon) && 'flex items-center gap-0.5',
         variant === ButtonVariantEnum.Solid && [
           'rounded-full transition-[box-shadow,color,background-color]',
           color === ButtonColorEnum.Primary &&
-            'bg-primary-base text-basic-white hover:shadow-lg hover:shadow-primary-base/20',
+            'bg-primary-base text-basic-white hover:shadow-lg hover:shadow-primary-base/20 hover:text-basic-white',
           color === ButtonColorEnum.Tips &&
-            'bg-tips text-basic-white hover:shadow-lg hover:shadow-tips/20',
+            'bg-tips text-basic-white hover:shadow-lg hover:shadow-tips/20 hover:text-basic-white',
           color === ButtonColorEnum.White &&
-            'bg-basic-white text-primary-darker shadow-lg shadow-basic-200/40 hover:bg-primary-lightest',
+            'bg-basic-white text-primary-darker shadow-lg shadow-basic-200/40 hover:bg-primary-lightest hover:text-basic-white',
         ],
         variant === ButtonVariantEnum.Outline && [
           'rounded-full border border-solid transition-colors',
@@ -116,11 +121,15 @@ function Button({
       {...props}
     >
       {PrefixIcon && (
-        <PrefixIcon className={cn(size === ButtonSizeEnum.Small && 'size-4')} />
+        <div className={cn(size === ButtonSizeEnum.Small && 'size-4')}>
+          <PrefixIcon className={cn(size === ButtonSizeEnum.Small && 'size-4')} />
+        </div>
       )}
       {children}
       {SuffixIcon && (
-        <SuffixIcon className={cn(size === ButtonSizeEnum.Small && 'size-4')} />
+        <div className={cn(size === ButtonSizeEnum.Small && 'size-4')}>
+          <SuffixIcon className={cn(size === ButtonSizeEnum.Small && 'size-4')} />
+        </div>
       )}
       {animation !== ButtonAnimationEnum.None && (
         <div ref={rippleRef} className="absolute inset-0 pointer-events-none" />

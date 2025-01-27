@@ -9,8 +9,8 @@ interface DropdownProps {
 }
 
 function DropdownContent({ as: Component = 'div', children }: DropdownProps) {
-  const { setIsOpen } = useToggle();
-  const { ref } = useClickOutside({ setState: setIsOpen });
+  const [, setState] = useToggle();
+  const { ref } = useClickOutside({ setState });
 
   return (
     <Component ref={ref} className="relative">
@@ -40,7 +40,7 @@ function Toggle({
   onClick,
   ...props
 }: DropdownToggleProps) {
-  const { isOpen, setIsOpen } = useToggle({
+  const [isOpen, setIsOpen] = useToggle({
     errorMessage: 'Dropdown.Toggle must be used within an Dropdown',
   });
 
@@ -77,7 +77,7 @@ interface DropdownListProps {
 }
 
 function List({ children, className }: DropdownListProps) {
-  const { isOpen } = useToggle({
+  const [isOpen] = useToggle({
     errorMessage: 'Dropdown.List must be used within an Dropdown',
   });
 

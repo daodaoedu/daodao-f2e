@@ -196,6 +196,21 @@ module.exports = {
           minHeight: 'calc(100vh - var(--padding-top, 0px))',
         },
       });
+      addUtilities({
+        ['.vertical-separator-left']: {
+          position: 'relative',
+          '&:before': {
+            content: '""',
+            position: 'absolute',
+            top: '50%',
+            right: '100%',
+            width: '1px',
+            height: '16px',
+            backgroundColor: theme('colors.basic.200'),
+            transform: 'translateY(-50%)',
+          }
+        },
+      });
     }),
   ],
 };
