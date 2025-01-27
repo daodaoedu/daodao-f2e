@@ -10,8 +10,8 @@ export default function ProjectLayout({ children }: React.PropsWithChildren) {
   return (
     <DefaultLayout>
       <div className="bg-primary-palest">
-        <div className="flex p-4 pt-12 gap-10 max-w-6xl mx-auto min-h-screen-with-padding-top">
-          <div className="basis-80">
+        <div className="flex p-4 py-5 md:py-12 gap-10 max-w-6xl mx-auto min-h-screen-with-padding-top flex-col md:flex-row">
+          <div className="md:basis-80">
             <Sidebar>
               <Sidebar.Link
                 href={projectId ? `/manage/project?id=${projectId}` : '/manage/projects'}

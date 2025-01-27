@@ -8,14 +8,14 @@ interface SidebarProps {
 
 function Sidebar({ children, className }: SidebarProps) {
   return (
-    <div className={cn('flex flex-col gap-2 p-2 w-full bg-white rounded-lg', className)}>
+    <div className={cn('overflow-x-scroll flex flex-row md:flex-col gap-2 p-2 w-full bg-white rounded-lg', className)}>
       {children}
     </div>
   );
 }
 
 const defaultClass = cn(
-  'block p-2 px-10 rounded-lg transition-colors cursor-pointer',
+  'flex flex-shrink-0 p-2 lg:px-10 rounded-lg transition-colors cursor-pointer',
   'text-left text-basic-400 body-lg',
   'hover:text-primary-base hover:bg-primary-lightest hover:font-bold'
 );
