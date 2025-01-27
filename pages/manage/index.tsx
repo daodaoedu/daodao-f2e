@@ -5,9 +5,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
-import { AiOutlineEye, AiOutlineMore } from 'react-icons/ai';
 import { CiCircleChevRight, CiCircleChevLeft } from 'react-icons/ci';
-import { FaArrowRight } from 'react-icons/fa6';
 import { GoArrowUpRight } from 'react-icons/go';
 import { PiCalendarBlankBold } from 'react-icons/pi';
 import ManageLayout from '@/layout/ManageLayout';
@@ -16,6 +14,7 @@ import SEOConfig from '@/shared/components/SEO';
 import Dropdown from '@/shared/components/Dropdown';
 import Button from '@/shared/components/Button';
 import Collapse from '@/shared/components/Collapse';
+import ReviewCard from '@/components/Review/Card';
 import { cn } from '@/utils/cn';
 import 'dayjs/locale/zh-tw';
 
@@ -166,41 +165,6 @@ const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
   );
 };
 
-const Review = () => {
-  return (
-    <div className="p-10 bg-white rounded-2xl">
-      <div className="mb-5 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="px-5 py-2 body-sm bg-primary-base rounded-full text-white">
-            覆盤二
-          </div>
-          <div className="body-md text-basic-500">學習計畫一</div>
-          <div className="body-md text-primary-base">第五週</div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div>填寫日期 2024/12/11</div>
-          <Button className="p-0">
-            <AiOutlineEye className="size-5" />
-          </Button>
-          <Button className="p-0">
-            <AiOutlineMore className="size-5" />
-          </Button>
-        </div>
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <p className="body-lg text-basic-500">這段時間的整體心情....</p>
-          <div className="p-2 bg-basic-100 rounded">😊 開心</div>
-        </div>
-        <div className="flex items-center gap-1 body-md text-basic-300">
-          更多
-          <FaArrowRight />
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const Manage = () => {
   const [date, setDate] = useState<Dayjs>(dayjs().startOf('day'));
   const pathname = usePathname();
@@ -232,7 +196,7 @@ const Manage = () => {
         <div>第一週</div>
         <div>第三週</div>
       </Project>
-      <Review />
+      <ReviewCard />
     </LocalizationProvider>
   );
 };
