@@ -1,5 +1,4 @@
 import { useState, forwardRef, useImperativeHandle } from 'react';
-import Image from "next/image";
 
 const ApplyClosePopup = forwardRef((props, ref) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -35,7 +34,7 @@ const ApplyClosePopup = forwardRef((props, ref) => {
         </div>
 
         <div className="relative h-64 w-full">
-          <Image
+          <img
             src="/assets/marathon-apply-close.png"
             alt="Registration closed illustration"
             fill
