@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { MARATHON_LINKS, NAV_LINK, USER_LINK } from "@/constants/category";
-import { useAuth, useAuthDispatch } from "@/contexts/Auth";
-import { cn } from "@/utils/cn";
-import Collapse from "../Collapse";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
+import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import { cn } from '@/utils/cn';
+import Collapse from '../Collapse';
 
 function MobileMenu() {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
@@ -12,9 +12,9 @@ function MobileMenu() {
 
   useEffect(() => {
     if (isOpenMenu) {
-      document.body.classList.add("overflow-y-hidden");
+      document.body.classList.add('overflow-y-hidden');
     } else {
-      document.body.classList.remove("overflow-y-hidden");
+      document.body.classList.remove('overflow-y-hidden');
     }
   }, [isOpenMenu]);
 
@@ -28,28 +28,31 @@ function MobileMenu() {
       >
         <div
           className={cn(
-            "w-6 h-0.5 bg-basic-white transition-transform origin-top-right pointer-events-none",
-            isOpenMenu ? "-rotate-45" : "rotate-0"
+            'w-6 h-0.5 bg-basic-white transition-transform origin-top-right pointer-events-none',
+            isOpenMenu ? '-rotate-45' : 'rotate-0'
           )}
         />
         <div
           className={cn(
-            "w-6 h-0.5 bg-basic-white transition-[transform,opacity] origin-left pointer-events-none",
+            'w-6 h-0.5 bg-basic-white transition-[transform,opacity] origin-left pointer-events-none',
             isOpenMenu
-              ? "translate-x-full opacity-0"
-              : "translate-x-0 opacity-100"
+              ? 'translate-x-full opacity-0'
+              : 'translate-x-0 opacity-100'
           )}
         />
         <div
           className={cn(
-            "w-6 h-0.5 bg-basic-white transition-transform origin-bottom-right pointer-events-none",
-            isOpenMenu ? "rotate-45" : "rotate-0"
+            'w-6 h-0.5 bg-basic-white transition-transform origin-bottom-right pointer-events-none',
+            isOpenMenu ? 'rotate-45' : 'rotate-0'
           )}
         />
       </button>
       <div
-        className="absolute top-full inset-x-0 bg-basic-white transition-[height] overflow-auto"
-        style={{ height: isOpenMenu ? "calc(100vh - 194px)" : "0" }}
+        className={cn(
+          'absolute top-full inset-x-0 bg-basic-white transition-[min-height] overflow-auto h-0',
+          'data-[is-open=true]:min-h-screen-without-padding-top data-[is-open=false]:min-h-0'
+        )}
+        data-is-open={isOpenMenu}
       >
         <div className="flex flex-col">
           <nav>

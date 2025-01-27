@@ -1,8 +1,8 @@
-import Link from "next/link";
-import { MARATHON_LINKS, NAV_LINK, USER_LINK } from "@/constants/category";
-import { useAuth, useAuthDispatch } from "@/contexts/Auth";
-import { cn } from "@/utils/cn";
-import Dropdown from "../Dropdown";
+import Link from 'next/link';
+import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
+import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import { cn } from '@/utils/cn';
+import Dropdown from '../Dropdown';
 
 function DesktopMenu() {
   const auth = useAuth();
@@ -25,9 +25,9 @@ function DesktopMenu() {
         <Dropdown as="nav">
           <Dropdown.Toggle
             className={cn(
-              "my-4 py-1.5 pl-3 pr-1 font-bold rounded-lg transition-colors",
-              "text-basic-white hover:text-basic-white bg-transparent",
-              "aria-pressed:text-primary-base aria-pressed:bg-primary-lightest"
+              'my-4 py-1.5 pl-3 pr-1 font-bold rounded-lg transition-colors',
+              'text-basic-white hover:text-basic-white bg-transparent',
+              'aria-pressed:text-primary-base aria-pressed:bg-primary-lightest'
             )}
             withIcon
           >
@@ -61,7 +61,7 @@ function DesktopMenu() {
               我的小島
             </Link>
             <Dropdown as="nav">
-              <Dropdown.Toggle animation="none">
+              <Dropdown.Toggle animation="none" className="p-0">
                 <img
                   src={auth.user.photoURL}
                   alt={auth.user.name}
