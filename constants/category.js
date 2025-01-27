@@ -199,10 +199,9 @@ export const MARATHON_LINKS = [
 ];
 
 export const USER_LINK = [
-  { name: '個人資料', id: 'person-setting' },
-  { name: '我的揪團', id: 'my-group' },
   { name: '帳號設定', id: 'account-setting' },
-  { name: '學習馬拉松', id: 'my-marathon' },
+  { name: '個人化推薦', id: 'personalized-recommendations' },
+  { name: '島島幣', id: 'daodao-coin' },
 ];
 
 export const FOOTER_LINK = [

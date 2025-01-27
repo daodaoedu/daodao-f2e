@@ -5,11 +5,8 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import { ProtectedComponent, useAuth } from '@/contexts/Auth';
-import Edit from '@/components/Profile/Edit';
+import { ProtectedComponent } from '@/contexts/Auth';
 import SEOConfig from '@/shared/components/SEO';
-import MyGroup from '@/components/Profile/MyGroup';
-import MyMarathon from '@/components/Profile/MyMarathon';
 import AccountSetting from '@/components/Profile/Accountsetting';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -55,27 +52,19 @@ function a11yProps(index) {
 const ProfilePage = () => {
   const router = useRouter();
   const mobileScreen = useMediaQuery('(max-width: 767px)');
-  const { user } = useAuth();
   const tabs = [
-    {
-      id: 'person-setting',
-      tabLabel: '個人資料編輯',
-      view: <Edit />,
-    },
-    {
-      id: 'my-group',
-      tabLabel: '我的揪團',
-      view: <MyGroup title="我的揪團" userId={user?._id} />,
-    },
     {
       id: 'account-setting',
       tabLabel: '帳號設定',
       view: <AccountSetting />,
     },
     {
-      id: 'my-marathon',
-      tabLabel: '學習馬拉松',
-      view: <MyMarathon title="我的學習馬拉松" userId={user?._id} />
+      id: 'personalized-recommendations',
+      tabLabel: '個人化推薦',
+    },
+    {
+      id: 'daodao-coin',
+      tabLabel: '島島幣',
     }
   ];
 
