@@ -5,8 +5,12 @@ import { cn } from '@/utils/cn';
 const useSmoothIntoView = <T extends HTMLElement>() => {
   const ref = useRef<T>(null);
   useEffect(() => {
-    if (!ref.current || window.innerWidth > 767) return;
-    ref.current.scrollIntoView();
+    const timeout = setTimeout(() => {
+      if (!ref.current || window.innerWidth > 1023) return;
+      ref.current.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+
+    return () => clearTimeout(timeout);
   }, []);
   return ref;
 };
@@ -25,7 +29,7 @@ function Sidebar({ children, className }: SidebarProps) {
       if (!wrapperRef.current) {
         return;
       }
-      if (window.innerWidth > 767) {
+      if (window.innerWidth > 1023) {
         setContentWidth(0);
         return;
       }
@@ -44,14 +48,14 @@ function Sidebar({ children, className }: SidebarProps) {
       className={cn(
         'p-0 whitespace-nowrap overflow-x-auto h-max',
         'bg-white rounded-lg shadow-lg shadow-basic-400/10',
-        'md:p-2 md:shadow-none',
+        'lg:p-2 lg:shadow-none',
         className
       )}
     >
       <div
         ref={wrapperRef}
         className={cn(
-          'flex gap-px md:flex-col md:gap-2 md:w-full',
+          'flex gap-px lg:flex-col lg:gap-2 lg:w-full',
           '*:grow *:shrink-0 *:basis-[var(--content-width)]'
         )}
         style={{ '--content-width': `${contentWidth}px` } as CSSProperties}
@@ -64,10 +68,10 @@ function Sidebar({ children, className }: SidebarProps) {
 
 const defaultClass = cn(
   'relative block p-2 px-10 rounded-lg transition-colors cursor-pointer',
-  'text-center md:text-left text-basic-400 body-lg',
-  'md:hover:text-primary-base md:hover:bg-primary-lightest md:hover:font-bold',
+  'text-center lg:text-left text-basic-400 body-lg',
+  'lg:hover:text-primary-base lg:hover:bg-primary-lightest lg:hover:font-bold',
   'vertical-separator-left first:before:hidden data-[active=true]:before:hidden',
-  '[&[data-active="true"]_+_*]:before:hidden md:before:hidden'
+  '[&[data-active="true"]_+_*]:before:hidden lg:before:hidden'
 );
 const activeClass =
   'text-primary-base bg-primary-lightest font-bold cursor-default';
