@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { EDUCATION_STEP, ROLE } from '@/constants/member';
 import toast from 'react-hot-toast';
@@ -26,6 +26,7 @@ import {
   StyledGroup
 } from './Edit.styled';
 import MilestoneGroup from './MilestoneGroup';
+import ApplyClosePopup from '../ApplyClosePopup';
 
 const StyledMarathonTitleSection = styled(Box)`
   padding: 10px;
@@ -225,6 +226,7 @@ export default function ConfirmForm({
     education: "",
     avatar: ""
   });
+  const popupRef = useRef(null);
 
   const onPrevStep = () => {
     setCurrentStep(currentStep - 1);
@@ -268,11 +270,13 @@ export default function ConfirmForm({
     }
   }, [userState, openLoginModal]);
   const onSubmit = async () => {
-    const isSignupEnabled = true;
+    const isSignupEnabled = false;
 
     if (!isSignupEnabled) {
-      alert('申請已截止');
+      popupRef.current.showPopup();
       return;
+    } else {
+      popupRef.current.hidePopup();
     }
     if (!marathonState) {
       console.error('no data to submit');
@@ -523,6 +527,9 @@ export default function ConfirmForm({
           {marathonState._id ? '更新報名資料' : '提交申請'}
         </StyledButton>
       </StyledButtonGroup>
+      <ApplyClosePopup
+        ref={popupRef}
+      />
     </>
   );
 }

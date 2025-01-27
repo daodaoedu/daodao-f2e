@@ -1,4 +1,4 @@
-import { useState, useEffect, useReducer } from 'react';
+import { useState, useEffect, useReducer, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import {
@@ -26,6 +26,7 @@ import {
 } from './Edit.styled';
 import MultiSelectDropdown from './MultiSelectDropdown';
 import PricingForm from './PricingForm';
+import ApplyClosePopup from '../ApplyClosePopup';
 
 const marathonFormReducer = (state, action) => {
   const { key, value } = action.payload;
@@ -76,6 +77,7 @@ export default function MarathonForm({
   const reduxDispatch = useDispatch();
   const [hasLoaded, setHasLoaded] = useState(false);
   const [errors, setErrors] = useState({});
+  const popupRef = useRef(null);
   const marathonState = useSelector((state) => { return state.marathon; });
   const localStorgeStored = window.localStorage.getItem('newMarathon');
   const editingMarathon = localStorgeStored ? JSON.parse(localStorgeStored) : null;
@@ -234,11 +236,13 @@ export default function MarathonForm({
   };
 
   const onNextStep = () => {
-    const isSignupEnabled = true;
+    const isSignupEnabled = false;
 
     if (!isSignupEnabled) {
-      alert('申請已截止');
+      popupRef.current.showPopup();
       return;
+    } else {
+      popupRef.current.hidePopup();
     }
     const isValid = handleValidateAll();
     if (!isValid) {
@@ -685,6 +689,9 @@ export default function MarathonForm({
           下一步
         </StyledButton>
       </StyledButtonGroup>
+      <ApplyClosePopup
+        ref={popupRef}
+      />
     </>
 
   );
