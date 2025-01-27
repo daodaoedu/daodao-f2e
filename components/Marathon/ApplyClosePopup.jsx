@@ -5,13 +5,18 @@ const ApplyClosePopup = forwardRef((props, ref) => {
 
   const popupContent = {
     title: '活動申請已截止',
-    description: '本次活動申請已截止，歡迎關注下次時間。',
-    content: '預計是7月初開放申請，8月底申請截止，歡迎追蹤社群媒體與訂閱電子報，接收最新訊息。',
+    description: '本次活動申請已截止，但您仍可以加入排隊名單',
+    content: '預計7月初開放申請，8月底申請截止。加入排隊清單後，我們會在下次開放申請時第一時間通知您。同時也歡迎追蹤社群媒體，接收最新活動訊息。',
+    waitingListButton: '加入排隊清單',
+    closeButton: '稍後再說'
+  };
+
+  const handleWaitingListClick = () => {
+    window.open('https://daoda.kit.com/marathon', '_blank');
   };
 
   useImperativeHandle(ref, () => ({
     showPopup: () => {
-      console.log('showPopup called');
       setIsVisible(true);
     },
     hidePopup: () => {
@@ -20,14 +25,13 @@ const ApplyClosePopup = forwardRef((props, ref) => {
   }));
 
   if (!isVisible) return null;
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center">
       <div className="w-full max-w-[400px] bg-white p-6 rounded-2xl shadow-lg">
         <div className="space-y-4 text-center">
           <h1 className="text-2xl font-bold text-gray-800">{popupContent.title}</h1>
-
           <p className="text-gray-600 leading-relaxed">{popupContent.description}</p>
-
           <p className="text-gray-600 leading-relaxed">
             {popupContent.content}
           </p>
@@ -42,13 +46,21 @@ const ApplyClosePopup = forwardRef((props, ref) => {
           />
         </div>
 
-        <div className="mr-10 ml-10">
+        <div className="space-y-3 mt-4">
           <button
             type="button"
-            className="w-full bg-teal-500 hover:bg-teal-600 text-white p-4  rounded-full text-base font-medium"
+            className="w-full bg-teal-500 hover:bg-teal-600 text-white p-4 rounded-full text-base font-medium"
+            onClick={handleWaitingListClick}
+          >
+            {popupContent.waitingListButton}
+          </button>
+
+          <button
+            type="button"
+            className="w-full bg-white hover:bg-gray-50 text-teal-500 p-4 rounded-full text-base font-medium border border-[#16B9B3]"
             onClick={() => setIsVisible(false)}
           >
-            關閉
+            {popupContent.closeButton}
           </button>
         </div>
       </div>
