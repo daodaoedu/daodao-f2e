@@ -57,7 +57,7 @@ const ApplyClosePopup = forwardRef((props, ref) => {
 
           <button
             type="button"
-            className="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 p-4 rounded-full text-base font-medium"
+            className="w-full bg-white hover:bg-gray-50 text-teal-500 p-4 rounded-full text-base font-medium border border-[#16B9B3]"
             onClick={() => setIsVisible(false)}
           >
             {popupContent.closeButton}
