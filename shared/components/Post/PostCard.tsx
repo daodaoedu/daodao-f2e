@@ -14,7 +14,7 @@ interface PostCardProps {
 
 function PostCard({ className, children }: PostCardProps) {
   return (
-    <div className={cn('bg-basic-white rounded-2xl p-10', className)}>
+    <div className={cn('bg-basic-white rounded-2xl p-3 md:p-10', className)}>
       {children}
     </div>
   );
@@ -38,7 +38,7 @@ function PostCardHeader({
   isLocked,
 }: PostCardHeaderProps) {
   return (
-    <header className="mb-5 flex items-center justify-between">
+    <header className="mb-5 flex flex-col md:flex-row md:items-center justify-between gap-3">
       <div className="flex items-center gap-4">
         {tag && (
           <div className="px-5 py-2 body-sm bg-primary-base rounded-full text-white">
@@ -79,13 +79,21 @@ function PostCardHeader({
   );
 }
 
-function PostCardMoreActions() {
+interface PostCardFooterProps {
+  onMoreClick?: () => void;
+  detailLink?: string;
+}
+
+function PostCardFooter({ onMoreClick, detailLink }: PostCardFooterProps) {
   return (
     <footer className="flex items-center justify-between">
       <Button
+        as="link"
+        href={detailLink}
         size="sm"
         className="gap-1 px-2 -ml-2 text-basic-300"
         suffixIcon="FaArrowRight"
+        onClick={onMoreClick}
       >
         更多
       </Button>
@@ -104,6 +112,6 @@ function PostCardMoreActions() {
 }
 
 PostCard.Header = PostCardHeader;
-PostCard.MoreActions = PostCardMoreActions;
+PostCard.Footer = PostCardFooter;
 
 export default PostCard;

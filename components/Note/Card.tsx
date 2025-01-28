@@ -3,9 +3,10 @@ import PostCard from '@/shared/components/Post/PostCard';
 
 interface NoteCardProps {
   className?: string;
+  detailLink?: string;
 }
 
-function NoteCard({ className }: NoteCardProps) {
+function NoteCard({ className, detailLink }: NoteCardProps) {
   return (
     <PostCard className={className}>
       <PostCard.Header
@@ -24,7 +25,7 @@ function NoteCard({ className }: NoteCardProps) {
         </p>
         <Image src="" alt="" height="300px" />
       </div>
-      <PostCard.MoreActions />
+      <PostCard.Footer detailLink={detailLink} />
     </PostCard>
   );
 }

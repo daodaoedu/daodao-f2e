@@ -2,7 +2,7 @@ import ProjectLayout from '@/layout/ProjectLayout';
 import Button from '@/shared/components/Button';
 import ReviewCard from '@/components/Review/Card';
 
-const Project = () => {
+const ReviewPage = () => {
   return (
     <>
       <div className="mb-6 flex items-center justify-between body-md">
@@ -14,11 +14,11 @@ const Project = () => {
           新增覆盤
         </Button>
       </div>
-      <ReviewCard />
+      <ReviewCard detailLink="/manage/project/review/detail?id=1" />
     </>
   );
 };
 
-Project.getLayout = ProjectLayout;
+ReviewPage.getLayout = ProjectLayout;
 
-export default Project;
+export default ReviewPage;
