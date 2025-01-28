@@ -81,18 +81,15 @@ function PostCardHeader({
 
 interface PostCardFooterProps {
   onMoreClick?: () => void;
-  postDetailLink?: string;
+  detailLink?: string;
 }
 
-function PostCardFooter({
-  onMoreClick,
-  postDetailLink,
-}: PostCardFooterProps) {
+function PostCardFooter({ onMoreClick, detailLink }: PostCardFooterProps) {
   return (
     <footer className="flex items-center justify-between">
       <Button
         as="link"
-        href={postDetailLink}
+        href={detailLink}
         size="sm"
         className="gap-1 px-2 -ml-2 text-basic-300"
         suffixIcon="FaArrowRight"

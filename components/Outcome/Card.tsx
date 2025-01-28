@@ -25,7 +25,7 @@ function OutcomeCard({ className, detailLink }: OutcomeCardProps) {
         </p>
         <Image src="" alt="" height="300px" />
       </div>
-      <PostCard.Footer postDetailLink={detailLink} />
+      <PostCard.Footer detailLink={detailLink} />
     </PostCard>
   );
 }
