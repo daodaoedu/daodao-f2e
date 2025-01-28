@@ -38,7 +38,7 @@ function PostCardHeader({
   isLocked,
 }: PostCardHeaderProps) {
   return (
-    <header className="mb-5 flex items-center justify-between">
+    <header className="mb-5 flex flex-col md:flex-row md:items-center justify-between gap-3">
       <div className="flex items-center gap-4">
         {tag && (
           <div className="px-5 py-2 body-sm bg-primary-base rounded-full text-white">
