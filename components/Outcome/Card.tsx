@@ -3,9 +3,10 @@ import PostCard from '@/shared/components/Post/PostCard';
 
 interface OutcomeCardProps {
   className?: string;
+  detailLink?: string;
 }
 
-function OutcomeCard({ className }: OutcomeCardProps) {
+function OutcomeCard({ className, detailLink }: OutcomeCardProps) {
   return (
     <PostCard className={className}>
       <PostCard.Header
@@ -24,7 +25,7 @@ function OutcomeCard({ className }: OutcomeCardProps) {
         </p>
         <Image src="" alt="" height="300px" />
       </div>
-      <PostCard.Footer />
+      <PostCard.Footer postDetailLink={detailLink} />
     </PostCard>
   );
 }
