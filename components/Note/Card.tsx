@@ -24,7 +24,7 @@ function NoteCard({ className }: NoteCardProps) {
         </p>
         <Image src="" alt="" height="300px" />
       </div>
-      <PostCard.MoreActions />
+      <PostCard.Footer />
     </PostCard>
   );
 }

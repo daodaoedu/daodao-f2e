@@ -79,13 +79,24 @@ function PostCardHeader({
   );
 }
 
-function PostCardMoreActions() {
+interface PostCardFooterProps {
+  onMoreClick?: () => void;
+  postDetailLink?: string;
+}
+
+function PostCardFooter({
+  onMoreClick,
+  postDetailLink,
+}: PostCardFooterProps) {
   return (
     <footer className="flex items-center justify-between">
       <Button
+        as="link"
+        href={postDetailLink}
         size="sm"
         className="gap-1 px-2 -ml-2 text-basic-300"
         suffixIcon="FaArrowRight"
+        onClick={onMoreClick}
       >
         更多
       </Button>
@@ -104,6 +115,6 @@ function PostCardMoreActions() {
 }
 
 PostCard.Header = PostCardHeader;
-PostCard.MoreActions = PostCardMoreActions;
+PostCard.Footer = PostCardFooter;
 
 export default PostCard;

@@ -24,7 +24,7 @@ function OutcomeCard({ className }: OutcomeCardProps) {
         </p>
         <Image src="" alt="" height="300px" />
       </div>
-      <PostCard.MoreActions />
+      <PostCard.Footer />
     </PostCard>
   );
 }

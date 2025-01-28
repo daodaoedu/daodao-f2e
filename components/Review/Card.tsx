@@ -16,7 +16,7 @@ function ReviewCard() {
         <p className="body-lg text-basic-500">這段時間的整體心情....</p>
         <div className="p-2 bg-basic-100 rounded">😊 開心</div>
       </div>
-      <PostCard.MoreActions />
+      <PostCard.Footer />
     </PostCard>
   );
 }
