@@ -14,7 +14,7 @@ interface PostCardProps {
 
 function PostCard({ className, children }: PostCardProps) {
   return (
-    <div className={cn('bg-basic-white rounded-2xl p-10', className)}>
+    <div className={cn('bg-basic-white rounded-2xl p-3 md:p-10', className)}>
       {children}
     </div>
   );

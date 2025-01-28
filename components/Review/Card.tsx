@@ -1,6 +1,10 @@
 import PostCard from '@/shared/components/Post/PostCard';
 
-function ReviewCard() {
+interface ReviewCardProps {
+  detailLink: string;
+}
+
+function ReviewCard({ detailLink }: ReviewCardProps) {
   return (
     <PostCard>
       <PostCard.Header
@@ -11,12 +15,11 @@ function ReviewCard() {
         viewCount={100}
         isLocked={false}
       />
-
       <div className="mb-3.5 flex items-center gap-3">
         <p className="body-lg text-basic-500">這段時間的整體心情....</p>
         <div className="p-2 bg-basic-100 rounded">😊 開心</div>
       </div>
-      <PostCard.Footer />
+      <PostCard.Footer detailLink={detailLink} />
     </PostCard>
   );
 }
