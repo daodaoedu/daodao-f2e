@@ -196,7 +196,7 @@ const Manage = () => {
         <div>第一週</div>
         <div>第三週</div>
       </Project>
-      <ReviewCard />
+      <ReviewCard detailLink="/manage/project/review/detail?id=1" />
     </LocalizationProvider>
   );
 };
