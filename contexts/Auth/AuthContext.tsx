@@ -336,21 +336,22 @@ export const ProtectedComponent = ({
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (requiresLogin) {
+    if (requiresLogin && !token) {
       timer = setTimeout(() => {
         opened.current = true;
         openLoginModal();
       }, 1000);
     }
     return () => clearTimeout(timer);
-  }, [requiresLogin, openLoginModal]);
+  }, [requiresLogin, token, openLoginModal]);
 
   useEffect(() => {
     if (
       redirectOnCancel &&
       !isOpenLoginModal &&
       opened.current &&
-      requiresLogin
+      requiresLogin &&
+      !token
     ) {
       router.replace(redirectOnCancel);
     }
@@ -359,6 +360,7 @@ export const ProtectedComponent = ({
     isOpenLoginModal,
     opened.current,
     requiresLogin,
+    token,
     router.replace,
   ]);
 
