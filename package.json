@@ -79,6 +79,7 @@
     "@cloudflare/next-on-pages": "^1.13.7",
     "@emotion/babel-plugin": "^11.9.2",
     "@next/eslint-plugin-next": "^13.2.1",
+    "@svgr/webpack": "^8.1.0",
     "@tailwindcss/typography": "^0.5.15",
     "@types/chrome": "^0.0.206",
     "@types/react-dom": "^19.0.2",
