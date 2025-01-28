@@ -3,6 +3,7 @@ import { AiOutlineMore } from 'react-icons/ai';
 import { MdLockOutline } from 'react-icons/md';
 import Image from '@/shared/components/Image';
 import { timeDuration } from '@/utils/date';
+import { cn } from '@/utils/cn';
 import Button from '../Button';
 import Collapse from '../Collapse';
 
@@ -10,6 +11,7 @@ interface CommentCardProps {
   avatar?: string;
   name?: string;
   tag?: string;
+  className?: string;
   content?: string;
   children?: React.ReactNode;
 }
@@ -20,9 +22,10 @@ function CommentCard({
   tag,
   content,
   children,
+  className,
 }: CommentCardProps) {
   return (
-    <div className="bg-white body-sm">
+    <div className={cn('bg-white body-sm', className)}>
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Image
@@ -60,15 +63,15 @@ function CommentCard({
       {children && (
         <Collapse>
           <Collapse.Toggle
-            className="flex-row-reverse gap-2 text-primary-base"
+            className="-mx-1 flex-row-reverse gap-2 text-primary-base"
             withIcon
           >
             <div>1 則回覆</div>
             <Image
               src={avatar}
               alt={`${name}'s avatar`}
-              width="30px"
-              height="30px"
+              width="20px"
+              height="20px"
               borderRadius="9999px"
             />
           </Collapse.Toggle>

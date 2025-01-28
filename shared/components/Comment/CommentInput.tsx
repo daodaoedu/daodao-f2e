@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import Image from '@/shared/components/Image';
+import { cn } from '@/utils/cn';
 
 interface CommentInputProps {
   placeholder?: string;
+  className?: string;
   onSubmit?: (content: string) => void;
 }
 
 function CommentInput({
   placeholder = '你的想法...',
+  className,
   onSubmit,
 }: CommentInputProps) {
   const [content, setContent] = useState('');
@@ -21,7 +24,7 @@ function CommentInput({
   };
 
   return (
-    <div className="body-sm">
+    <div className={cn('body-sm', className)}>
       <div className="mb-2 flex items-center gap-2">
         <Image
           src=""
