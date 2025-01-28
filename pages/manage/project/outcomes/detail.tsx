@@ -1,5 +1,5 @@
 import OutcomeDetail from '@/components/Outcome/Detail';
-import OutcomeLayout from '@/layout/OutcomeLayout';
+import ProjectLayout from '@/layout/ProjectLayout';
 
 const OutcomeDetailPage = () => {
   return (
@@ -9,6 +9,8 @@ const OutcomeDetailPage = () => {
   );
 };
 
-OutcomeDetailPage.getLayout = OutcomeLayout;
+OutcomeDetailPage.getLayout = ({ children }: React.PropsWithChildren) => (
+  <ProjectLayout activeTabType="outcomes">{children}</ProjectLayout>
+);
 
 export default OutcomeDetailPage;

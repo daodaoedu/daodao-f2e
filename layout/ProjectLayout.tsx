@@ -1,7 +1,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { AiOutlineEye, AiOutlineMore } from 'react-icons/ai';
-import { MdLockOpen } from "react-icons/md";
-import { GoBookmark } from "react-icons/go";
+import { MdLockOpen } from 'react-icons/md';
+import { GoBookmark } from 'react-icons/go';
 
 import { ProtectedComponent } from '@/contexts/Auth';
 import Button from '@/shared/components/Button';
@@ -10,11 +10,38 @@ import Image from '@/shared/components/Image';
 import Sidebar from '@/shared/components/Sidebar';
 import DefaultLayout from './DefaultLayout';
 
-export default function ProjectLayout({ children }: React.PropsWithChildren) {
+const tabConfigs = {
+  outcomes: {
+    backText: '返回 學習成果',
+    backPath: '/manage/project/outcomes',
+  },
+  notes: {
+    backText: '返回 便利貼',
+    backPath: '/manage/project/notes',
+  },
+  review: {
+    backText: '返回 覆盤',
+    backPath: '/manage/project/review',
+  },
+};
+
+interface ProjectLayoutProps {
+  children: React.ReactNode;
+  activeTabType?: keyof typeof tabConfigs;
+}
+
+export default function ProjectLayout({
+  children,
+  activeTabType,
+}: ProjectLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const projectId = searchParams.get('id');
+  const activeTab = activeTabType ? tabConfigs[activeTabType] : undefined;
+  const activeTabPath = activeTab?.backPath ?? pathname;
+  const backPath = activeTab?.backPath ?? '/manage/projects';
+  const backText = activeTab?.backText ?? '返回 學習計畫';
 
   return (
     <DefaultLayout>
@@ -30,9 +57,9 @@ export default function ProjectLayout({ children }: React.PropsWithChildren) {
                   size="sm"
                   className="px-0 mb-6 lg:mb-3"
                   prefixIcon="FaAngleLeft"
-                  onClick={() => router.push('/manage/projects')}
+                  onClick={() => router.push(backPath)}
                 >
-                  返回 學習計畫
+                  {backText}
                 </Button>
               </div>
               <Sidebar className="mb-6 lg:mb-0 basis-full -order-1 lg:order-none lg:basis-80">
@@ -42,31 +69,31 @@ export default function ProjectLayout({ children }: React.PropsWithChildren) {
                       ? `/manage/project?id=${projectId}`
                       : '/manage/projects'
                   }
-                  isActive={pathname === '/manage/project'}
+                  isActive={activeTabPath === '/manage/project'}
                 >
                   學習計畫
                 </Sidebar.Link>
                 <Sidebar.Link
                   href="/manage/project/milestones"
-                  isActive={pathname === '/manage/project/milestones'}
+                  isActive={activeTabPath === '/manage/project/milestones'}
                 >
                   學習里程碑
                 </Sidebar.Link>
                 <Sidebar.Link
                   href="/manage/project/outcomes"
-                  isActive={pathname === '/manage/project/outcomes'}
+                  isActive={activeTabPath === '/manage/project/outcomes'}
                 >
                   學習成果
                 </Sidebar.Link>
                 <Sidebar.Link
                   href="/manage/project/notes"
-                  isActive={pathname === '/manage/project/notes'}
+                  isActive={activeTabPath === '/manage/project/notes'}
                 >
                   便利貼
                 </Sidebar.Link>
                 <Sidebar.Link
                   href="/manage/project/review"
-                  isActive={pathname === '/manage/project/review'}
+                  isActive={activeTabPath === '/manage/project/review'}
                 >
                   覆盤
                 </Sidebar.Link>

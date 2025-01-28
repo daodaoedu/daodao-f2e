@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import Modal from '@/shared/components/Modal';
 import PostCard from '@/shared/components/Post/PostCard';
 import Button from '@/shared/components/Button';
@@ -21,7 +22,7 @@ function OutcomeCreate({ isOpen, onClose }: OutcomeCreateProps) {
           title="學習計畫一"
           subtitle="第三週"
           tag="成果一"
-          date="2025/01/01"
+          date={dayjs().format('YYYY/MM/DD')}
         />
       </PostCard>
       <textarea
