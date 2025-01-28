@@ -10,9 +10,15 @@ const FaArrowRight = dynamic(() =>
   import('react-icons/fa6').then((mod) => mod.FaArrowRight)
 );
 
+const Shell = dynamic(() => import('@/public/assets/icons/shell.svg'));
+
+const Comment = dynamic(() => import('@/public/assets/icons/comment.svg'));
+
 const icons = {
+  Comment,
   FaAngleLeft,
   FaArrowRight,
+  Shell,
 };
 
 export enum ButtonColorEnum {
@@ -122,13 +128,17 @@ function Button({
     >
       {PrefixIcon && (
         <div className={cn(size === ButtonSizeEnum.Small && 'size-4')}>
-          <PrefixIcon className={cn(size === ButtonSizeEnum.Small && 'size-4')} />
+          <PrefixIcon
+            className={cn(size === ButtonSizeEnum.Small && 'size-4')}
+          />
         </div>
       )}
       {children}
       {SuffixIcon && (
         <div className={cn(size === ButtonSizeEnum.Small && 'size-4')}>
-          <SuffixIcon className={cn(size === ButtonSizeEnum.Small && 'size-4')} />
+          <SuffixIcon
+            className={cn(size === ButtonSizeEnum.Small && 'size-4')}
+          />
         </div>
       )}
       {animation !== ButtonAnimationEnum.None && (

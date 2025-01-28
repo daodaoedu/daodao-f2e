@@ -12,8 +12,32 @@ const config = {
   images: {
     domains: ['imgur.com', 'images.unsplash.com', 'lh3.googleusercontent.com'],
   },
-  webpack: (config) => {
+  webpack: (config, options) => {
     const experiments = { ...config.experiments, topLevelAwait: true };
+
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: [
+        options.defaultLoaders.babel,
+        {
+          loader: '@svgr/webpack',
+          options: {
+            babel: false,
+            svgoConfig: {
+              plugins: [
+                {
+                  name: 'convertColors',
+                  params: {
+                    currentColor: true,
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    });
+
     return Object.assign(config, { experiments });
   },
   env: {

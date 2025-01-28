@@ -51,7 +51,7 @@ export default function LoginModal({
       onClose={onClose}
     >
       <div className="my-6">
-        <div className="mx-auto">
+        <div className="mx-auto w-max">
           <Image
             src="https://imgur.com/EADd1UD.png"
             alt="login"
