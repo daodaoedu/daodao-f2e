@@ -1,4 +1,4 @@
-import ClassroomLayout from '@/layout/ClassroomLayout';
+import getClassroomLayout from '@/layout/ClassroomLayout';
 
 const ClassroomDetail = () => {
   return (
@@ -12,15 +12,13 @@ const ClassroomDetail = () => {
       </div>
       <ul>
         <li>
-          <div className="p-3 bg-basic-white">
-            學生
-          </div>
+          <div className="p-3 bg-basic-white">學生</div>
         </li>
       </ul>
     </>
   );
 };
 
-ClassroomDetail.getLayout = ClassroomLayout;
+ClassroomDetail.getLayout = getClassroomLayout;
 
 export default ClassroomDetail;

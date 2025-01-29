@@ -1,4 +1,4 @@
-import ProjectLayout from '@/layout/ProjectLayout';
+import getProjectLayout from '@/layout/ProjectLayout';
 import ReviewDetail from '@/components/Review/Detail';
 
 const ReviewPage = () => {
@@ -6,6 +6,6 @@ const ReviewPage = () => {
 };
 
 ReviewPage.getLayout = (page: React.ReactElement) =>
-  ProjectLayout(page, 'review');
+  getProjectLayout(page, 'review');
 
 export default ReviewPage;

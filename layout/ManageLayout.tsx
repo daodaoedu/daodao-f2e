@@ -3,9 +3,9 @@ import Sidebar from '@/shared/components/Sidebar';
 import Collapse from '@/shared/components/Collapse';
 import Container from '@/shared/components/Container';
 import { ProtectedComponent } from '@/contexts/Auth';
-import DefaultLayout from './DefaultLayout';
+import getDefaultLayout from './DefaultLayout';
 
-function ManageLayoutContent({ children }: React.PropsWithChildren) {
+function ManageLayout({ children }: React.PropsWithChildren) {
   const pathname = usePathname();
 
   return (
@@ -83,6 +83,6 @@ function ManageLayoutContent({ children }: React.PropsWithChildren) {
   );
 }
 
-export default function ManageLayout(page: React.ReactElement) {
-  return DefaultLayout(<ManageLayoutContent>{page}</ManageLayoutContent>);
+export default function getManageLayout(page: React.ReactElement) {
+  return getDefaultLayout(<ManageLayout>{page}</ManageLayout>);
 }

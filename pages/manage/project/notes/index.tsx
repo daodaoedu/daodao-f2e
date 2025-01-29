@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import NoteCard from '@/components/Note/Card';
-import ProjectLayout from '@/layout/ProjectLayout';
+import getProjectLayout from '@/layout/ProjectLayout';
 import Button from '@/shared/components/Button';
 import NoteCreate from '@/components/Note/Create';
 
@@ -34,6 +34,6 @@ const NotesPage = () => {
   );
 };
 
-NotesPage.getLayout = ProjectLayout;
+NotesPage.getLayout = getProjectLayout;
 
 export default NotesPage;

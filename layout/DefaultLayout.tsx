@@ -46,15 +46,17 @@ function DefaultLayoutContent({ children }: React.PropsWithChildren) {
   );
 }
 
-function DefaultLayout(page: React.ReactElement) {
+function DefaultLayout({ children }: React.PropsWithChildren) {
   return (
     <>
       <PromotionProvider>
-        <DefaultLayoutContent>{page}</DefaultLayoutContent>
+        <DefaultLayoutContent>{children}</DefaultLayoutContent>
       </PromotionProvider>
       <Footer />
     </>
   );
 }
 
-export default DefaultLayout;
+export default function getDefaultLayout(page: React.ReactElement) {
+  return <DefaultLayout>{page}</DefaultLayout>;
+}

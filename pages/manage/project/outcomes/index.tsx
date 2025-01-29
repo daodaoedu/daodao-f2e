@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import OutcomeCard from '@/components/Outcome/Card';
-import ProjectLayout from '@/layout/ProjectLayout';
+import getProjectLayout from '@/layout/ProjectLayout';
 import Button from '@/shared/components/Button';
 import OutcomeCreate from '@/components/Outcome/Create';
 
@@ -29,14 +29,11 @@ const OutcomesPage = () => {
           />
         </li>
       </ul>
-      <OutcomeCreate
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-      />
+      <OutcomeCreate isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </>
   );
 };
 
-OutcomesPage.getLayout = ProjectLayout;
+OutcomesPage.getLayout = getProjectLayout;
 
 export default OutcomesPage;

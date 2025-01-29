@@ -1,5 +1,5 @@
 import OutcomeDetail from '@/components/Outcome/Detail';
-import ProjectLayout from '@/layout/ProjectLayout';
+import getProjectLayout from '@/layout/ProjectLayout';
 
 const OutcomeDetailPage = () => {
   return (
@@ -10,6 +10,6 @@ const OutcomeDetailPage = () => {
 };
 
 OutcomeDetailPage.getLayout = (page: React.ReactElement) =>
-  ProjectLayout(page, 'outcomes');
+  getProjectLayout(page, 'outcomes');
 
 export default OutcomeDetailPage;

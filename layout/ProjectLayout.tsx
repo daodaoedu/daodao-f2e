@@ -8,7 +8,7 @@ import Button from '@/shared/components/Button';
 import Container from '@/shared/components/Container';
 import Image from '@/shared/components/Image';
 import Sidebar from '@/shared/components/Sidebar';
-import DefaultLayout from './DefaultLayout';
+import getDefaultLayout from './DefaultLayout';
 
 const tabConfigs = {
   outcomes: {
@@ -30,10 +30,7 @@ interface ProjectLayoutContentProps {
   activeTabType?: keyof typeof tabConfigs;
 }
 
-function ProjectLayoutContent({
-  children,
-  activeTabType,
-}: ProjectLayoutContentProps) {
+function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -143,13 +140,11 @@ function ProjectLayoutContent({
   );
 }
 
-export default function ProjectLayout(
+export default function getProjectLayout(
   page: React.ReactElement,
   activeTabType?: keyof typeof tabConfigs
 ) {
-  return DefaultLayout(
-    <ProjectLayoutContent activeTabType={activeTabType}>
-      {page}
-    </ProjectLayoutContent>
+  return getDefaultLayout(
+    <ProjectLayout activeTabType={activeTabType}>{page}</ProjectLayout>
   );
 }

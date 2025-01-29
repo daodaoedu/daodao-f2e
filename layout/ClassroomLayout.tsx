@@ -3,9 +3,9 @@ import Button from '@/shared/components/Button';
 import Container from '@/shared/components/Container';
 import Sidebar from '@/shared/components/Sidebar';
 import { ProtectedComponent } from '@/contexts/Auth';
-import DefaultLayout from './DefaultLayout';
+import getDefaultLayout from './DefaultLayout';
 
-function ClassroomLayoutContent({ children }: React.PropsWithChildren) {
+function ClassroomLayout({ children }: React.PropsWithChildren) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -46,6 +46,6 @@ function ClassroomLayoutContent({ children }: React.PropsWithChildren) {
   );
 }
 
-export default function ClassroomLayout(page: React.ReactElement) {
-  return DefaultLayout(<ClassroomLayoutContent>{page}</ClassroomLayoutContent>);
+export default function getClassroomLayout(page: React.ReactElement) {
+  return getDefaultLayout(<ClassroomLayout>{page}</ClassroomLayout>);
 }

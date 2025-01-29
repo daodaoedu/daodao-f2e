@@ -8,7 +8,7 @@ import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
 import { CiCircleChevRight, CiCircleChevLeft } from 'react-icons/ci';
 import { GoArrowUpRight } from 'react-icons/go';
 import { PiCalendarBlankBold } from 'react-icons/pi';
-import ManageLayout from '@/layout/ManageLayout';
+import getManageLayout from '@/layout/ManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
 import SEOConfig from '@/shared/components/SEO';
 import Dropdown from '@/shared/components/Dropdown';
@@ -210,6 +210,6 @@ const Manage = () => {
   );
 };
 
-Manage.getLayout = ManageLayout;
+Manage.getLayout = getManageLayout;
 
 export default Manage;
