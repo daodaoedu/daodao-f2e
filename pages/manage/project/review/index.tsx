@@ -5,10 +5,10 @@ import ReviewCard from '@/components/Review/Card';
 const ReviewPage = () => {
   return (
     <>
-      <div className="mb-6 flex items-center justify-between body-md">
-        <div className="flex items-center gap-1">
+      <div className="mb-6 flex items-end sm:items-center justify-between body-md">
+        <div className="flex flex-col items-start sm:flex-row sm:items-center gap-1">
           <div className="text-basic-500">覆盤（04 週/22週)</div>
-          <Button className="px-2 text-primary-base">覆盤設定</Button>
+          <Button className="px-2 -ml-2 sm:ml-0 text-primary-base">覆盤設定</Button>
         </div>
         <Button variant="solid" color="primary">
           新增覆盤

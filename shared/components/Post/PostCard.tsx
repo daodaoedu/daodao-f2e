@@ -41,39 +41,43 @@ function PostCardHeader({
     <header className="mb-5 flex flex-col md:flex-row md:items-center justify-between gap-3">
       <div className="flex items-center gap-4">
         {tag && (
-          <div className="px-5 py-2 body-sm bg-primary-base rounded-full text-white">
+          <div className="px-5 py-2 body-sm bg-primary-base rounded-full text-white whitespace-nowrap">
             {tag}
           </div>
         )}
         <div className="body-md text-basic-500">{title}</div>
         {subtitle && (
-          <div className="body-md text-primary-base">{subtitle}</div>
+          <div className="body-md text-primary-base whitespace-nowrap">
+            {subtitle}
+          </div>
         )}
       </div>
-      <div className="flex items-center gap-2 text-basic-300">
+      <div className="flex items-center justify-between md:justify-start gap-2 text-basic-300">
         {date && <time>{dayjs(date).format('YYYY/MM/DD')}</time>}
-        {typeof viewCount === 'number' && (
-          <div className="flex items-center gap-0.5">
-            <AiOutlineEye className="size-5" />
-            <div>{viewCount}</div>
-          </div>
-        )}
-        {isLocked === false ? (
-          <div className="flex items-center gap-0.5">
-            <MdLockOpen className="size-5" />
-            <div>公開</div>
-          </div>
-        ) : (
-          isLocked && (
+        <div className="flex items-center gap-2">
+          {typeof viewCount === 'number' && (
             <div className="flex items-center gap-0.5">
-              <MdLockOutline className="size-5" />
-              <div>不公開</div>
+              <AiOutlineEye className="size-5" />
+              <div>{viewCount}</div>
             </div>
-          )
-        )}
-        <Button className="p-0">
-          <AiOutlineMore className="size-5" />
-        </Button>
+          )}
+          {isLocked === false ? (
+            <div className="flex items-center gap-0.5">
+              <MdLockOpen className="size-5" />
+              <div className="hidden sm:block">公開</div>
+            </div>
+          ) : (
+            isLocked && (
+              <div className="flex items-center gap-0.5">
+                <MdLockOutline className="size-5" />
+                <div className="hidden sm:block">不公開</div>
+              </div>
+            )
+          )}
+          <Button className="p-0">
+            <AiOutlineMore className="size-5" />
+          </Button>
+        </div>
       </div>
     </header>
   );
@@ -111,7 +115,28 @@ function PostCardFooter({ onMoreClick, detailLink }: PostCardFooterProps) {
   );
 }
 
+interface PostCardRewardProps {
+  shellCount?: number;
+  userName?: string;
+}
+
+function PostCardReward({ shellCount, userName }: PostCardRewardProps) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between">
+      <Button prefixIcon="Shell" className="px-2">
+        {shellCount}
+      </Button>
+      {userName && (
+        <p className="pl-2 body-sm font-normal text-basic-400">
+          給予一個或以上的貝殼，讓 {userName} 更有動力吧！
+        </p>
+      )}
+    </div>
+  );
+}
+
 PostCard.Header = PostCardHeader;
 PostCard.Footer = PostCardFooter;
+PostCard.Reward = PostCardReward;
 
 export default PostCard;

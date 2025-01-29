@@ -1,4 +1,3 @@
-import Button from '@/shared/components/Button';
 import CommentInput from '@/shared/components/Comment/CommentInput';
 import Comment from '@/public/assets/icons/comment.svg';
 import Image from '@/shared/components/Image';
@@ -29,12 +28,7 @@ function OutcomeDetail({ className }: OutcomeDetailProps) {
         <Image src="" alt="" height="300px" />
       </div>
       <hr className="mb-4 h-px bg-basic-100" />
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <Button prefixIcon="Shell" className="px-2 -ml-2" />
-        <p className="body-sm text-basic-400">
-          給予一個或以上的貝殼，讓 用戶A 更有動力吧！
-        </p>
-      </div>
+      <PostCard.Reward shellCount={5} userName="用戶A" />
       <CommentInput className="px-4 py-6 border-b border-solid border-basic-200" />
       <div className="my-2 flex items-center gap-0.5 body-md text-basic-500">
         <Comment />
