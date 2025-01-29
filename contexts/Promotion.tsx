@@ -107,7 +107,7 @@ export function PromotionBar() {
         <Link
           href={link}
           className={cn(
-            "block cursor-pointer animate-fade-in animate-duration-500 p-2.5",
+            "block cursor-pointer animate-fade-in animate-duration-500 px-14 py-2.5",
             isFadingOut && "animate-fade-out"
           )}
         >
