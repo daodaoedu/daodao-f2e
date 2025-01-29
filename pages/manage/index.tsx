@@ -8,7 +8,7 @@ import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
 import { CiCircleChevRight, CiCircleChevLeft } from 'react-icons/ci';
 import { GoArrowUpRight } from 'react-icons/go';
 import { PiCalendarBlankBold } from 'react-icons/pi';
-import ManageLayout from '@/layout/ManageLayout';
+import getManageLayout from '@/layout/ManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
 import SEOConfig from '@/shared/components/SEO';
 import Dropdown from '@/shared/components/Dropdown';
@@ -40,17 +40,14 @@ const Header = () => {
   );
 };
 
-// const MIN_DATE = dayjs(new Date('2025-02-09'));
-// const MAX_DATE = dayjs(new Date('2025-07-12'));
-const MIN_DATE = dayjs().startOf('day').subtract(5, 'day');
-const MAX_DATE = dayjs().startOf('day').add(5, 'day');
-
 interface CalendarProps {
   date: Dayjs;
+  maxDate?: Dayjs;
+  minDate?: Dayjs;
   onChange: (date: Dayjs) => void;
 }
 
-const Calendar = ({ date, onChange }: CalendarProps) => {
+const Calendar = ({ date, maxDate, minDate, onChange }: CalendarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { ref } = useClickOutside<HTMLDivElement>({ setState: setIsOpen });
 
@@ -66,7 +63,7 @@ const Calendar = ({ date, onChange }: CalendarProps) => {
 
   return (
     <div ref={ref} className="relative">
-      <div className="mb-6 pl-1 pr-3 py-2 flex items-center justify-between bg-white rounded-xl shadow-lg shadow-basic-200/40">
+      <div className="mb-6 pl-1 pr-3 py-2 flex flex-col sm:flex-row sm:items-center justify-between bg-white rounded-xl shadow-lg shadow-basic-200/40">
         <Button
           className="px-3 py-2.5 flex items-center gap-3"
           onClick={() => setIsOpen(!isOpen)}
@@ -76,24 +73,26 @@ const Calendar = ({ date, onChange }: CalendarProps) => {
             {date?.format('YYYY/MM/DD')}（{date?.format('dd')}）任務
           </div>
         </Button>
-        <div className="flex items-center gap-0.5">
-          <Button className="px-1 py-2 body-lg" onClick={handleToday}>
+        <div className="flex items-center justify-between sm:justify-start gap-0.5">
+          <Button className="px-3 py-2 sm:px-1 body-lg" onClick={handleToday}>
             今日
           </Button>
-          <Button
-            className="p-1"
-            isDisabled={date.isBefore(MIN_DATE) || date.isSame(MIN_DATE, 'day')}
-            onClick={() => onChange(date.subtract(1, 'day'))}
-          >
-            <CiCircleChevLeft className="size-8" />
-          </Button>
-          <Button
-            className="p-1"
-            isDisabled={date.isAfter(MAX_DATE) || date.isSame(MAX_DATE, 'day')}
-            onClick={() => onChange(date.add(1, 'day'))}
-          >
-            <CiCircleChevRight className="size-8" />
-          </Button>
+          <div>
+            <Button
+              className="p-1"
+              isDisabled={date.isBefore(minDate) || date.isSame(minDate, 'day')}
+              onClick={() => onChange(date.subtract(1, 'day'))}
+            >
+              <CiCircleChevLeft className="size-8" />
+            </Button>
+            <Button
+              className="p-1"
+              isDisabled={date.isAfter(maxDate) || date.isSame(maxDate, 'day')}
+              onClick={() => onChange(date.add(1, 'day'))}
+            >
+              <CiCircleChevRight className="size-8" />
+            </Button>
+          </div>
         </div>
       </div>
       <div
@@ -108,8 +107,8 @@ const Calendar = ({ date, onChange }: CalendarProps) => {
           date={date}
           onChange={handleChange}
           views={['day']}
-          minDate={MIN_DATE}
-          maxDate={MAX_DATE}
+          minDate={minDate}
+          maxDate={maxDate}
           classes={{
             root: '[&_.Mui-selected]:!text-basic-white',
           }}
@@ -169,6 +168,11 @@ const Manage = () => {
   const [date, setDate] = useState<Dayjs>(dayjs().startOf('day'));
   const pathname = usePathname();
 
+  // const MIN_DATE = dayjs(new Date('2025-02-09'));
+  // const MAX_DATE = dayjs(new Date('2025-07-12'));
+  const MIN_DATE = dayjs().startOf('day').subtract(5, 'day');
+  const MAX_DATE = dayjs().startOf('day').add(5, 'day');
+
   const SEOData = useMemo(
     () => ({
       title: '我的小島｜島島阿學',
@@ -187,7 +191,12 @@ const Manage = () => {
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
       <SEOConfig data={SEOData} />
       <Header />
-      <Calendar date={date} onChange={setDate} />
+      <Calendar
+        date={date}
+        onChange={setDate}
+        maxDate={MAX_DATE}
+        minDate={MIN_DATE}
+      />
       <Project title="學習計畫名稱一" href="/manage#1" defaultOpen>
         <div>第一週</div>
         <div>第三週</div>
@@ -201,6 +210,6 @@ const Manage = () => {
   );
 };
 
-Manage.getLayout = ManageLayout;
+Manage.getLayout = getManageLayout;
 
 export default Manage;

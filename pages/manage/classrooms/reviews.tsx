@@ -1,6 +1,6 @@
 import { AiOutlineMore } from 'react-icons/ai';
 import Button from '@/shared/components/Button';
-import ClassroomLayout from '@/layout/ClassroomLayout';
+import getClassroomLayout from '@/layout/ClassroomLayout';
 import { useState } from 'react';
 import { cn } from '@/utils/cn';
 
@@ -60,7 +60,11 @@ const ClassroomDetail = () => {
                 <div>已繳交：2</div>
                 <div>未繳交：20</div>
               </div>
-              <Button size="sm" className="gap-1 px-3" suffixIcon="FaArrowRight">
+              <Button
+                size="sm"
+                className="gap-1 px-3"
+                suffixIcon="FaArrowRight"
+              >
                 更多
               </Button>
             </div>
@@ -71,6 +75,6 @@ const ClassroomDetail = () => {
   );
 };
 
-ClassroomDetail.getLayout = ClassroomLayout;
+ClassroomDetail.getLayout = getClassroomLayout;
 
 export default ClassroomDetail;

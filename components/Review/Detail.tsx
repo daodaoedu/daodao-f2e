@@ -1,7 +1,6 @@
 import { useId } from 'react';
 import Comment from '@/public/assets/icons/comment.svg';
 import PostCard from '@/shared/components/Post/PostCard';
-import Button from '@/shared/components/Button';
 import CommentInput from '@/shared/components/Comment/CommentInput';
 import CommentCard from '@/shared/components/Comment/CommentCard';
 import { cn } from '@/utils/cn';
@@ -150,10 +149,7 @@ function ReviewDetail() {
           </div>
         </li>
       </ul>
-      <div className="flex items-center justify-between">
-        <Button prefixIcon="Shell" className="px-2">5</Button>
-        <p className="body-sm font-normal text-basic-400">給予一個或以上的貝殼，讓 用戶A 更有動力吧！</p>
-      </div>
+      <PostCard.Reward shellCount={5} userName="用戶A" />
       <CommentInput className="px-4 py-6 border-b border-solid border-basic-200" />
       <div className="my-2 flex items-center gap-0.5 body-md text-basic-500">
         <Comment />

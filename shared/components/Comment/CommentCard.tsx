@@ -25,7 +25,7 @@ function CommentCard({
   className,
 }: CommentCardProps) {
   return (
-    <div className={cn('bg-white body-sm', className)}>
+    <div className={cn('bg-white body-sm font-normal', className)}>
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Image
@@ -44,7 +44,7 @@ function CommentCard({
         </div>
         <div className="flex items-center gap-3 text-basic-300">
           <time>{timeDuration(dayjs())}</time>
-          <div className="flex items-center gap-0.5">
+          <div className="hidden sm:flex items-center gap-0.5">
             <MdLockOutline />
             <span>不公開</span>
           </div>

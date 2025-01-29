@@ -1,5 +1,5 @@
 import NoteDetail from '@/components/Note/Detail';
-import ProjectLayout from '@/layout/ProjectLayout';
+import getProjectLayout from '@/layout/ProjectLayout';
 
 const NoteDetailPage = () => {
   return (
@@ -9,8 +9,7 @@ const NoteDetailPage = () => {
   );
 };
 
-NoteDetailPage.getLayout = ({ children }: React.PropsWithChildren) => (
-  <ProjectLayout activeTabType="notes">{children}</ProjectLayout>
-);
+NoteDetailPage.getLayout = (page: React.ReactElement) =>
+  getProjectLayout(page, 'notes');
 
 export default NoteDetailPage;

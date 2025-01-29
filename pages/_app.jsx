@@ -20,7 +20,7 @@ import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
 import { checkLoginValidity } from '@/redux/actions/user';
 import { getReminderStorage } from '@/utils/storage';
-import DefaultLayout from '@/layout/DefaultLayout';
+import getDefaultLayout from '@/layout/DefaultLayout';
 import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
@@ -43,7 +43,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   const isEnv = useMemo(() => process.env.NODE_ENV === 'development', []);
   const { isComplete, isLoggedIn } = useAuth();
   const [openModalType, setOpenModalType] = useState(null);
-  const Layout = Component?.getLayout || DefaultLayout;
+  const getLayout = Component?.getLayout || getDefaultLayout;
   const isVerified = searchParams.get("isVerified");
 
   const handleClose = () => {
@@ -144,9 +144,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
           )
         }
       </Modal>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      {getLayout(<Component {...pageProps} />)}
     </ThemeProvider>
   );
 };

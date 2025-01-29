@@ -8,7 +8,7 @@ function ReviewCard({ detailLink }: ReviewCardProps) {
   return (
     <PostCard>
       <PostCard.Header
-        title="學習計畫一"
+        title="學習計畫可以很多很多的字一"
         subtitle="第五週"
         tag="覆盤二"
         date="2024/12/11"

@@ -57,4 +57,6 @@ function DefaultLayout({ children }: React.PropsWithChildren) {
   );
 }
 
-export default DefaultLayout;
+export default function getDefaultLayout(page: React.ReactElement) {
+  return <DefaultLayout>{page}</DefaultLayout>;
+}

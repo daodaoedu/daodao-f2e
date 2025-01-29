@@ -1,4 +1,4 @@
-import ProjectLayout from '@/layout/ProjectLayout';
+import getProjectLayout from '@/layout/ProjectLayout';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/projectType';
 import { useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
@@ -183,5 +183,6 @@ const ProjectPage = () => {
   );
 };
 
-ProjectPage.getLayout = ProjectLayout;
+ProjectPage.getLayout = getProjectLayout;
+
 export default ProjectPage;
