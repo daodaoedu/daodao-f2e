@@ -9,8 +9,7 @@ const OutcomeDetailPage = () => {
   );
 };
 
-OutcomeDetailPage.getLayout = ({ children }: React.PropsWithChildren) => (
-  <ProjectLayout activeTabType="outcomes">{children}</ProjectLayout>
-);
+OutcomeDetailPage.getLayout = (page: React.ReactElement) =>
+  ProjectLayout(page, 'outcomes');
 
 export default OutcomeDetailPage;

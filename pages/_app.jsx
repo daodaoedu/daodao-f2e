@@ -43,7 +43,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   const isEnv = useMemo(() => process.env.NODE_ENV === 'development', []);
   const { isComplete, isLoggedIn } = useAuth();
   const [openModalType, setOpenModalType] = useState(null);
-  const Layout = Component?.getLayout || DefaultLayout;
+  const getLayout = Component?.getLayout || DefaultLayout;
   const isVerified = searchParams.get("isVerified");
 
   const handleClose = () => {
@@ -144,9 +144,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
           )
         }
       </Modal>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      {getLayout(<Component {...pageProps} />)}
     </ThemeProvider>
   );
 };

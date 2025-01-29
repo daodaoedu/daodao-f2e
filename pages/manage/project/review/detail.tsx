@@ -5,8 +5,7 @@ const ReviewPage = () => {
   return <ReviewDetail />;
 };
 
-ReviewPage.getLayout = ({ children }: React.PropsWithChildren) => {
-  return <ProjectLayout activeTabType="review">{children}</ProjectLayout>;
-};
+ReviewPage.getLayout = (page: React.ReactElement) =>
+  ProjectLayout(page, 'review');
 
 export default ReviewPage;

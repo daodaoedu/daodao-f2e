@@ -46,11 +46,11 @@ function DefaultLayoutContent({ children }: React.PropsWithChildren) {
   );
 }
 
-function DefaultLayout({ children }: React.PropsWithChildren) {
+function DefaultLayout(page: React.ReactElement) {
   return (
     <>
       <PromotionProvider>
-        <DefaultLayoutContent>{children}</DefaultLayoutContent>
+        <DefaultLayoutContent>{page}</DefaultLayoutContent>
       </PromotionProvider>
       <Footer />
     </>

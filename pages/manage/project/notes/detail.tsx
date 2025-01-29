@@ -9,8 +9,7 @@ const NoteDetailPage = () => {
   );
 };
 
-NoteDetailPage.getLayout = ({ children }: React.PropsWithChildren) => (
-  <ProjectLayout activeTabType="notes">{children}</ProjectLayout>
-);
+NoteDetailPage.getLayout = (page: React.ReactElement) =>
+  ProjectLayout(page, 'notes');
 
 export default NoteDetailPage;
