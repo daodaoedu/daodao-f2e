@@ -364,11 +364,11 @@ export const FOOTER_LINK = [
   //   link: '/locations',
   //   target: '_self',
   // },
-  {
-    name: '加入社群',
-    link: '/join',
-    target: '_self',
-  },
+  // {
+  //   name: '加入社群',
+  //   link: '/join',
+  //   target: '_self',
+  // },
   // {
   //   name: '隱私權政策',
   //   link: '/terms/privacypolicy',

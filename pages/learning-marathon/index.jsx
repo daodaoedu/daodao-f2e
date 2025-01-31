@@ -21,6 +21,7 @@ import { cn } from '@/utils/cn';
 import Banner from '@/components/Banner';
 import { logEvent } from '@/utils/analytics';
 import ApplyClosePopup from '@/components/Marathon/ApplyClosePopup';
+import config from '@/constants/config';
 
 const StyledBannerButton = styled(Button)`
   &.MuiButton-root {
@@ -297,9 +298,7 @@ const LearningMarathon = () => {
   );
 
   const handleClickSignupButton = () => {
-    const isSignupEnabled = false;
-
-    if (!isSignupEnabled) {
+    if (!config.isMarathonApplyEnabled) {
       popupRef.current.showPopup();
       return;
     } else {
