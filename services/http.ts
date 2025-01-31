@@ -23,10 +23,19 @@ const defaultConfig = {
   contentType: RequestContentType.JSON,
 };
 
+export class HttpError extends Error {
+  constructor(public status: number, public data: unknown) {
+    super(`http status: ${status}\n data: ${JSON.stringify(data, null, 2)}`);
+    this.name = "HttpError";
+    this.status = status;
+    this.data = data;
+  }
+}
+
 const createUrl = (
   pathname: string,
   method: RequestMethod,
-  source: Record<string, any> = {}
+  source: Record<string, unknown> = {}
 ) => {
   const url = `${BASE_URL}${pathname}`;
 
@@ -48,7 +57,7 @@ const createHttp =
   (method: RequestMethod) =>
   async <R = void>(
     pathname: string,
-    source?: Record<string, any>,
+    source?: Record<string, unknown>,
     { contentType } = defaultConfig
   ): Promise<R> => {
     const token = getTokenStorage().get();
@@ -89,10 +98,7 @@ const createHttp =
     } catch (error) {
       if (error instanceof Response) {
         const errorData = await error.json();
-        throw {
-          status: error.status,
-          data: errorData,
-        };
+        throw new HttpError(error.status, errorData);
       }
       throw error;
     }

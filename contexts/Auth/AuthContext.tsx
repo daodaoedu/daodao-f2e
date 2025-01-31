@@ -12,6 +12,7 @@ import useSWR, { SWRConfig } from "swr";
 import { useDispatch } from "react-redux";
 
 import { fetchUserByToken, userLogout } from "@/redux/actions/user";
+import { HttpError } from "@/services/http";
 import {
   getRedirectionStorage,
   getReminderStorage,
@@ -212,8 +213,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
     };
   }, [state.loginStatus, state.user, dispatch]);
 
-  const handleError = (error?: { status?: number }) => {
-    if (error?.status === 401) {
+  const handleError = (error: HttpError) => {
+    if (error.status === 401) {
       authDispatch.logout();
     }
   };

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import http from "./http";
+import http from "../http";
 
 export interface IUser {
   _id: string;
