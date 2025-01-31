@@ -17,7 +17,7 @@ function OutcomeCreate({ isOpen, onClose }: OutcomeCreateProps) {
       onClose={onClose}
       hasCloseButton
     >
-      <PostCard className="p-0">
+      <PostCard className="p-0 md:p-0">
         <PostCard.Header
           title="學習計畫一"
           subtitle="第三週"
