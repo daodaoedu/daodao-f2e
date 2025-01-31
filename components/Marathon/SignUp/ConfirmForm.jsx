@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import { useAuthDispatch } from '@/contexts/Auth';
 
+import config from '@/constants/config';
 import {
   StyledSection,
   StyledButtonGroup,
@@ -270,9 +271,7 @@ export default function ConfirmForm({
     }
   }, [userState, openLoginModal]);
   const onSubmit = async () => {
-    const isSignupEnabled = false;
-
-    if (!isSignupEnabled) {
+    if (!config.isMarathonApplyEnabled) {
       popupRef.current.showPopup();
       return;
     } else {

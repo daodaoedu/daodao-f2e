@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 
+import config from '@/constants/config';
 import MilestoneGroup from './MilestoneGroup';
 import {
   StyledGroup,
@@ -236,9 +237,7 @@ export default function MarathonForm({
   };
 
   const onNextStep = () => {
-    const isSignupEnabled = false;
-
-    if (!isSignupEnabled) {
+    if (!config.isMarathonApplyEnabled) {
       popupRef.current.showPopup();
       return;
     } else {
