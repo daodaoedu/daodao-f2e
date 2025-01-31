@@ -74,6 +74,19 @@ const iconListConfig = [
   },
 ];
 
+const socialConfig = [
+  {
+    name: '訂閱電子報',
+    link: 'https://daoda.kit.com/newsletter',
+    target: '_self',
+  },
+  {
+    name: '加入社群',
+    link: '/join',
+    target: '_self',
+  },
+];
+
 const SubFooter = () => {
   return (
     <MainFooterWrapper>
@@ -87,6 +100,7 @@ const SubFooter = () => {
         {/* 連結 */}
         <IntroList title="關於島島阿學" list={aboutDaoConfig} />
         <IntroList title="找資源" list={FOOTER_LINK} />
+        <IntroList title="訂閱電子報" list={socialConfig} />
       </BlockWrapper>
       <BlockWrapper>
         {/* 追蹤島島 */}
