@@ -5,9 +5,9 @@ import styled from '@emotion/styled';
 import { Divider, Typography } from '@mui/material';
 import SEOConfig from '@/shared/components/SEO';
 
-import checkIconSvg from '@/public/assets/icons/check_icon.svg';
-import discordIconSvg from '@/public/assets/icons/discord_icon.svg';
-import facebookIconSvg from '@/public/assets/icons/facebook_icon.svg';
+import CheckIconSvg from '@/public/assets/icons/check_icon.svg';
+import DiscordIconSvg from '@/public/assets/icons/discord_icon.svg';
+import FacebookIconSvg from '@/public/assets/icons/facebook_icon.svg';
 
 const Wrapper = styled.div`
   background: #f3fcfc;
@@ -159,7 +159,7 @@ function JoinPage() {
             <PaperItem>
               <PaperLink href="https://discord.gg/2NbQ7cu6jH" target="_blank">
                 <PaperLinkHeader>
-                  <img src={discordIconSvg.src} alt="discord" />
+                  <DiscordIconSvg />
                   <Typography variant="h3" fontSize={16} marginBottom={1.25}>
                     <span>Discord：</span>
                     <span>即時交流社群</span>
@@ -168,7 +168,7 @@ function JoinPage() {
                 <ul>
                   {discordCheckList.map((message) => (
                     <CheckItem key={message}>
-                      <img src={checkIconSvg.src} alt="check" />
+                      <CheckIconSvg />
                       <Typography variant="body2" fontSize={12} color="#536166">
                         {message}
                       </Typography>
@@ -183,7 +183,7 @@ function JoinPage() {
                 target="_blank"
               >
                 <PaperLinkHeader>
-                  <img src={facebookIconSvg.src} alt="facebook" />
+                  <FacebookIconSvg />
                   <Typography variant="h3" fontSize={16} marginBottom={1.25}>
                     <span>Facebook：</span>
                     <span>島島阿學－學習資源島</span>
@@ -192,7 +192,7 @@ function JoinPage() {
                 <ul>
                   {facebookCheckList.map((message) => (
                     <CheckItem key={message}>
-                      <img src={checkIconSvg.src} alt="check" />
+                      <CheckIconSvg />
                       <Typography variant="body2" fontSize={12} color="#536166">
                         {message}
                       </Typography>

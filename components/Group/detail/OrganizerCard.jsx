@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import Skeleton from '@mui/material/Skeleton';
 import Avatar from '@mui/material/Avatar';
 import { EDUCATION, ROLE } from '@/constants/member';
-import locationSvg from '@/public/assets/icons/location.svg';
+import LocationSvg from '@/public/assets/icons/location.svg';
 import Chip from '@/shared/components/Chip';
 import MarkdownEditor from '@/shared/components/MarkdownEditor';
 import { ABROAD_OPTION, AREA_DELIMITER, AREAS, TAIWAN_OPTION } from '@/constants/areas';
@@ -121,7 +121,7 @@ function OrganizerCard({ data = {}, isLoading }) {
           </StyledFlex>
         </Link>
         <StyledText style={{ alignSelf: 'flex-start', gap: 1 }}>
-          <img src={locationSvg.src} alt="location icon" />
+          <LocationSvg />
           {isLoading ? <Skeleton width={48} animation="wave" /> : location}
         </StyledText>
       </StyledHeader>

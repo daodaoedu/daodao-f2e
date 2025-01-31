@@ -1,13 +1,13 @@
 import styled from '@emotion/styled';
 import Skeleton from '@mui/material/Skeleton';
-import bachelorCapSvg from '@/public/assets/icons/bachelorCap.svg';
-import activityCategorySvg from '@/public/assets/icons/activityCategory.svg';
-import categorySvg from '@/public/assets/icons/category.svg';
-import clockSvg from '@/public/assets/icons/clock.svg';
-import locationSvg from '@/public/assets/icons/location.svg';
-import personSvg from '@/public/assets/icons/person.svg';
-import outcomeSvg from '@/public/assets/icons/outcome_icon.svg';
-import motivationSvg from '@/public/assets/icons/motivation_icon.svg';
+import BachelorCapSvg from '@/public/assets/icons/bachelorCap.svg';
+import ActivityCategorySvg from '@/public/assets/icons/activityCategory.svg';
+import CategorySvg from '@/public/assets/icons/category.svg';
+import ClockSvg from '@/public/assets/icons/clock.svg';
+import LocationSvg from '@/public/assets/icons/location.svg';
+import PersonSvg from '@/public/assets/icons/person.svg';
+import OutcomeSvg from '@/public/assets/icons/outcome_icon.svg';
+import MotivationSvg from '@/public/assets/icons/motivation_icon.svg';
 import { CATEGORIES, ACTIVITY_CATEGORIES } from '@/constants/category';
 import { EDUCATION } from '@/constants/member';
 import { mapToTable } from '@/utils/helper';
@@ -69,50 +69,50 @@ const format = (value, mapping = {}) =>
 const labels = [
   {
     key: 'category',
-    icon: categorySvg.src,
+    Icon: CategorySvg,
     text: '學習領域',
     mapping: CATEGORY_TABLE,
   },
   {
     key: 'activityCategory',
-    icon: activityCategorySvg.src,
+    Icon: ActivityCategorySvg,
     text: '揪團類型',
     mapping: ACTIVITY_CATEGORY_TABLE,
   },
   {
     key: 'area',
-    icon: locationSvg.src,
+    Icon: LocationSvg,
     text: '地點',
     mapping: AREA_TABLE,
   },
-  { key: 'time', icon: clockSvg.src, text: '時間' },
-  { key: 'participator', icon: personSvg.src, text: '徵求人數' },
-  { key: 'partnerStyle', icon: personSvg.src, text: '想找的夥伴' },
+  { key: 'time', Icon: ClockSvg, text: '時間' },
+  { key: 'participator', Icon: PersonSvg, text: '徵求人數' },
+  { key: 'partnerStyle', Icon: PersonSvg, text: '想找的夥伴' },
   {
     key: 'partnerEducationStep',
-    icon: bachelorCapSvg.src,
+    Icon: BachelorCapSvg,
     text: '適合的教育階段',
     mapping: EDU_TABLE,
   },
   {
     key: 'motivation',
-    icon: motivationSvg.src,
+    Icon: MotivationSvg,
     text: '揪團動機',
   },
   {
     key: 'outcome',
-    icon: outcomeSvg.src,
+    Icon: OutcomeSvg,
     text: '期待成果',
   },
 ];
 
 function TeamInfoCard({ data = {}, isLoading }) {
   return labels.map(
-    ({ key, icon, text, mapping }) =>
+    ({ key, Icon, text, mapping }) =>
       data[key] && (
         <StyledItem key={key}>
           <h3>
-            <img src={icon} alt={`${text} icon`} />
+            <Icon />
             {text}
           </h3>
           <p>{isLoading ? <Skeleton animation="wave" /> : format(data[key], mapping)}</p>
