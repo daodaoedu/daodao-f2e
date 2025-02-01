@@ -19,12 +19,12 @@ import {
   getTokenStorage,
 } from "@/utils/storage";
 import {
-  createUserProfile,
-  createUserProfileSchema,
-  fetchUserProfile,
+  createUser,
+  createUserSchema,
+  getUserMe,
   IUser,
-  updateUserProfile,
-  updateUserProfileSchema,
+  updateUser,
+  updateUserSchema,
 } from "@/services/users";
 
 import LoginModal from "./LoginModal";
@@ -180,18 +180,18 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
         switch (state.loginStatus) {
           case LoginStatus.TEMPORARY: {
-            const request = createUserProfileSchema.parse(input);
-            const { token, user } = await createUserProfile(request);
+            const request = createUserSchema.parse(input);
+            const { token, user } = await createUser(request);
             setToken(token);
             dispatch({ type: ActionTypes.UPDATE_USER, payload: user });
             break;
           }
           case LoginStatus.PERMANENT: {
-            const request = updateUserProfileSchema.parse({
+            const request = updateUserSchema.parse({
               ...state.user,
               ...input,
             });
-            const payload = await updateUserProfile(request);
+            const payload = await updateUser(request);
             dispatch({ type: ActionTypes.UPDATE_USER, payload });
             break;
           }
@@ -220,8 +220,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
   };
 
   useSWR(
-    state.token ? [fetchUserProfile.name, state.token] : null,
-    fetchUserProfile,
+    state.token ? [getUserMe.name, state.token] : null,
+    getUserMe,
     {
       onSuccess: authDispatch.login,
       onError: handleError,
