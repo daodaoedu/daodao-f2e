@@ -124,7 +124,7 @@ export default function useGroupForm(defaultValue) {
 
   const removePhoto = (url) => {
     const pathArray = url.split('/');
-    fetch(`${BASE_URL}/image/${pathArray[pathArray.length - 1]}`, {
+    fetch(`${BASE_URL}/images/${pathArray[pathArray.length - 1]}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ export default function useGroupForm(defaultValue) {
       formData.append('file', newPhoto);
 
       try {
-        const response = await fetch(`${BASE_URL}/image`, {
+        const response = await fetch(`${BASE_URL}/images`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,

@@ -13,7 +13,7 @@ function EditGroupPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { id } = router.query;
-  const { data, isFetching } = useFetch(`/activity/${id}`, {
+  const { data, isFetching } = useFetch(`/circles/${id}`, {
     enabled: !!id,
   });
   const source = {
@@ -35,7 +35,7 @@ function EditGroupPage() {
     [router?.asPath],
   );
 
-  const { mutate, isLoading } = useMutation(`/activity/${id}`, {
+  const { mutate, isLoading } = useMutation(`/circles/${id}`, {
     method: 'PUT',
     onSuccess: () => {
       pushSnackbar({ message: '已發布修改' });

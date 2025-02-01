@@ -45,7 +45,7 @@ function ContactButton({
   const handleClose = () => {
     setOpen(false);
   };
-  const { mutate } = useMutation(`/email`, {
+  const { mutate } = useMutation(`/emails`, {
     method: 'POST',
     onSuccess: () => {
       handleClose();

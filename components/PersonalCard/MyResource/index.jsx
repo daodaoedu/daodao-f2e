@@ -25,7 +25,7 @@ const StyledGroupsWrapper = styled.div`
 
 const MyResource = ({ title, sx, userId }) => {
   const [response, setResponse] = useState(null);
-  const { isFetching } = useFetch(`/activity/user/${userId}`, {
+  const { isFetching } = useFetch(`/circles/user/${userId}`, {
     enabled: !!userId,
     onSuccess: setResponse,
   });

@@ -168,6 +168,7 @@ function MobileMenu() {
           >
             {navList.map((navItem) => (
               <Button
+                key={navItem.type}
                 className={cn(
                   'relative flex-1 flex items-center justify-center gap-1.5 py-2',
                   'after:content-[""] after:absolute after:bottom-0 after:left-0',

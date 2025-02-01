@@ -1,5 +1,7 @@
-import { z } from "zod";
-import http from "../http";
+import { z } from 'zod';
+import generateService from '../serviceGenerator';
+
+const userService = generateService('users');
 
 export interface IUser {
   _id: string;
@@ -30,12 +32,12 @@ export interface IUser {
   };
 }
 
-export const fetchUserProfile = async () => {
-  const response = await http.get<{ data: IUser | null }>("/user/me");
+export const getUserMe = async () => {
+  const response = await userService.get<{ data: IUser | null }>('me');
   return response.data;
 };
 
-export const createUserProfileSchema = z.object({
+export const createUserSchema = z.object({
   birthDay: z.string(),
   gender: z.string(),
   roleList: z.array(z.string()),
@@ -44,28 +46,27 @@ export const createUserProfileSchema = z.object({
   isSendEmail: z.boolean().optional(),
 });
 
-export type CreateUserProfile = z.infer<typeof createUserProfileSchema>;
+export type CreateUserRequest = z.infer<typeof createUserSchema>;
 
-export const createUserProfile = (user: CreateUserProfile) => {
-  return http.post<{ user: IUser; token: string }>(
-    "/user",
-    user
-  );
+export const createUser = (user: CreateUserRequest) => {
+  return userService.post<{ user: IUser; token: string }>('', user);
 };
 
-export const updateUserProfileSchema = z.object({
-  id: z.string().optional(),
+export const updateUserSchema = z.object({
+  id: z.string(),
   email: z.string().optional(),
   name: z.string().optional(),
   birthDay: z.string().optional(),
   gender: z.string().optional(),
   roleList: z.array(z.string()).optional(),
-  contactList: z.object({
-    instagram: z.string().optional(),
-    facebook: z.string().optional(),
-    discord: z.string().optional(),
-    line: z.string().optional(),
-  }).optional(),
+  contactList: z
+    .object({
+      instagram: z.string().optional(),
+      facebook: z.string().optional(),
+      discord: z.string().optional(),
+      line: z.string().optional(),
+    })
+    .optional(),
   wantToDoList: z.array(z.string()).optional(),
   educationStage: z.string().optional(),
   location: z.string().optional(),
@@ -76,9 +77,9 @@ export const updateUserProfileSchema = z.object({
   isOpenProfile: z.boolean().optional(),
 });
 
-export type UpdateUserProfile = z.infer<typeof updateUserProfileSchema>;
+export type UpdateUserRequest = z.infer<typeof updateUserSchema>;
 
-export const updateUserProfile = async (user: UpdateUserProfile) => {
-  const response = await http.put<{ data: IUser }>(`/user/${user.id}`, user);
+export const updateUser = async (user: UpdateUserRequest) => {
+  const response = await userService.put<{ data: IUser }>(user.id, user);
   return response.data;
 };
