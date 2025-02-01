@@ -1,9 +1,13 @@
+import { isServer } from "./helper";
+
 export default function getShareApi({
   title = '',
   text = '',
   url = '',
   hashtag = '',
 }) {
+  if (isServer) return {};
+
   const openInNewTab = (_url) => () => window.open(_url, '_blank');
 
   const nativeShare = () => {

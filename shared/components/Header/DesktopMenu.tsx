@@ -14,7 +14,11 @@ function DesktopMenu() {
         <ul className="flex items-center gap-1">
           {NAV_LINK.map(({ link, name, target }) => (
             <li key={name}>
-              <Link href={link} target={target} className="block p-5 font-bold">
+              <Link
+                href={link}
+                target={target}
+                className="block p-5 font-bold text-basic-white"
+              >
                 {name}
               </Link>
             </li>

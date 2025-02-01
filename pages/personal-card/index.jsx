@@ -13,6 +13,7 @@ import MyResource from '@/components/PersonalCard/MyResource';
 import MyNote from '@/components/PersonalCard/MyNote';
 import MyMarathon from '@/components/PersonalCard/MyMarathon';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { isServer } from '@/utils/helper';
 
 const StyledTab = styled(Tab)(({ isActive, mobileScreen }) => ({
   width: `${mobileScreen ? '33%' : '100%'}`,
@@ -90,6 +91,7 @@ const PersonalCardPage = () => {
   ];
 
   const [value, setValue] = useState(() => {
+    if (isServer) return 0;
     const id = new URLSearchParams(location.search).get('id');
     const tabIndex = tabs.findIndex((tab) => tab.id === id);
     if (tabIndex > -1) return tabIndex;

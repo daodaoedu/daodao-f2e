@@ -7,6 +7,7 @@ import EastIcon from '@mui/icons-material/East';
 import Image from '@/shared/components/Image';
 import Modal from '@/shared/components/Modal';
 import { cn } from '@/utils/cn';
+import { isServer } from '@/utils/helper';
 
 const mentors = [
   {
@@ -205,6 +206,7 @@ const Mentors = () => {
   const [touchStartX, setTouchStartX] = useState(null);
   const timer = useRef(null);
   const { translateX, isEnd } = useMemo(() => {
+    if (isServer) return { translateX: 0, isEnd: false };
     const mentorsWidth = mentorsRef.current?.scrollWidth;
     const currentTranslateX = currentMentor * 301;
     if (window.innerWidth + currentTranslateX > mentorsWidth) {

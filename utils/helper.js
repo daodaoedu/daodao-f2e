@@ -3,3 +3,5 @@ export const mapToTable = (map = []) =>
     (acc, item) => ({ ...acc, [item.key ?? item.value]: item.label }),
     {}
   );
+
+export const isServer = typeof window === 'undefined';
