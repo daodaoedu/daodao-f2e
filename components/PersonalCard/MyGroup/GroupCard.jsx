@@ -42,13 +42,13 @@ function GroupCard({
   const [anchorEl, setAnchorEl] = useState(null);
   const isEnabledMutation = user?._id === userId;
 
-  const apiUpdateGrouping = useMutation(`/activity/${_id}`, {
+  const apiUpdateGrouping = useMutation(`/circles/${_id}`, {
     method: 'PUT',
     enabled: isEnabledMutation,
     onSuccess: onUpdateGrouping,
   });
 
-  const apiDeleteGroup = useMutation(`/activity/${_id}`, {
+  const apiDeleteGroup = useMutation(`/circles/${_id}`, {
     method: 'DELETE',
     enabled: isEnabledMutation,
     onSuccess: onDeleteGroup,

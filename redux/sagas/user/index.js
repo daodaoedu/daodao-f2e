@@ -42,7 +42,7 @@ function* createUserProfile(action) {
   const { user } = action.payload;
 
   try {
-    const URL = `${BASE_URL}/user`;
+    const URL = `${BASE_URL}/users`;
 
     // if success => status: 201, token, user
     const result = yield req(URL, {
@@ -65,7 +65,7 @@ function* createUserProfile(action) {
 function* updateUserProfile(action) {
   const { user } = action.payload;
   try {
-    const URL = `${BASE_URL}/user/${user.id}`;
+    const URL = `${BASE_URL}/users/${user.id}`;
 
     const result = yield req(URL, {
       method: 'PUT',
@@ -87,7 +87,7 @@ function* updateUserProfile(action) {
 function* fetchUserById(action) {
   const { id, token } = action.payload;
   try {
-    const URL = `${BASE_URL}/user/${id}`;
+    const URL = `${BASE_URL}/users/${id}`;
     const result = yield req(URL, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -112,7 +112,7 @@ function* fetchUserById(action) {
 // fetch user data by token
 function* fetchUserByToken(action) {
   const token = action.payload?.token;
-  const URL = `${BASE_URL}/user/me`;
+  const URL = `${BASE_URL}/users/me`;
   try {
     const result = yield call(req, URL, {
       method: "GET",
@@ -122,7 +122,7 @@ function* fetchUserByToken(action) {
     });
 
     if (result.data && result.data._id) {
-      const marathonResponse = yield call(req, `${BASE_URL}/marathon?userId=${result.data._id}`);
+      const marathonResponse = yield call(req, `${BASE_URL}/marathons?userId=${result.data._id}`);
       yield put({
         type: "FETCH_USER_BY_TOKEN_SUCCESS",
         payload: result.data && {

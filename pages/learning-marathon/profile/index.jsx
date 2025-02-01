@@ -226,7 +226,7 @@ const LearningMarathonProfile = () => {
       const fetchMarathonData = async () => {
         try {
           setLoadingMarathon(true);
-          const response = await fetch(`${BASE_URL}/marathon/${id}`);
+          const response = await fetch(`${BASE_URL}/marathons/${id}`);
 
           // check: if response 200
           if (!response.ok) {
@@ -268,7 +268,7 @@ const LearningMarathonProfile = () => {
       const fetchUserData = async () => {
         try {
           setLoadingUser(true);
-          const response = await fetch(`${BASE_URL}/user/${data.userId}`);
+          const response = await fetch(`${BASE_URL}/users/${data.userId}`);
 
           // check: if response 200
           if (!response.ok) {

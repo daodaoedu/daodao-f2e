@@ -22,7 +22,7 @@ function CreateGroupPage() {
     [router?.asPath],
   );
 
-  const { mutate, isLoading } = useMutation('/activity', {
+  const { mutate, isLoading } = useMutation('/circles', {
     method: 'POST',
     onSuccess: () => {
       pushSnackbar({ message: '已成功發布揪團' });
