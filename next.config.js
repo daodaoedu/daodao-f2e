@@ -19,22 +19,7 @@ const config = {
       test: /\.svg$/,
       use: [
         options.defaultLoaders.babel,
-        {
-          loader: '@svgr/webpack',
-          options: {
-            babel: false,
-            svgoConfig: {
-              plugins: [
-                {
-                  name: 'convertColors',
-                  params: {
-                    currentColor: true,
-                  },
-                },
-              ],
-            },
-          },
-        },
+        '@svgr/webpack',
       ],
     });
 
