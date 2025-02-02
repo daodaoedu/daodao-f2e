@@ -15,7 +15,7 @@ import ViewMode from '@/components/Projects/Project/ViewMode';
 type ProjectResponse = {
   data: Project
 };
-const idSchema = z.string().regex(/^[0-9a-fA-F]{24}$/);
+const idSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 
 function validateIdWithZod(id: string) {
   try {
