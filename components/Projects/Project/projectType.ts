@@ -1,5 +1,5 @@
 export interface Project {
-  _id: string;
+  id: string;
   title: string;
   description: string;
   updatedDate: string;
@@ -10,13 +10,14 @@ export interface Project {
   content: string;
   strategy: string[];
   strategyDescription: string;
-  resources: string;
+  resourceName: string[];
+  resourceUrl: string[];
   outcome: string[];
   outcomeDescription: string;
 }
 
 export const DEFAULT_PROJECT: Project = {
-  _id: "",
+  id: "",
   title: "",
   description: "",
   updatedDate: "",
@@ -27,7 +28,8 @@ export const DEFAULT_PROJECT: Project = {
   content: "",
   strategy: [],
   strategyDescription: "",
-  resources: "",
+  resourceName: [],
+  resourceUrl: [],
   outcome: [],
   outcomeDescription: "",
 };

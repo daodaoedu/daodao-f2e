@@ -20,7 +20,7 @@ interface ViewModeProps {
 const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
   const handleOnClickEdit = onClick;
   return (
-    <div className="flex flex-col gap-6 md:gap-4 md:relative">
+    <div className="flex flex-col gap-6 md:gap-4 md:relative max-w-full">
 
       {
         isLgScreen &&
@@ -45,7 +45,7 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
         <Title title="學習動機" />
         {
           project?.motivation?.length && (
-            <Tags tags={project?.motivation} />
+            <Tags category="motivation_tags" tags={project?.motivation} />
           )
         }
         <Description description={project?.motivationDescription || ""} />
@@ -59,20 +59,37 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
         <Title title="學習方法與策略" />
         {
           project?.strategy?.length && (
-            <Tags tags={project?.strategy} />
+            <Tags category="strategy_tags" tags={project?.strategy} />
           )
         }
         <Description description={project?.strategyDescription || ""} />
-        <Divider />
-        <Title title="學習資源" />
-        <FakeInput value={project?.resources || ""} />
+        {
+          project?.resourceName?.length && (
+            <>
+              <Divider />
+              <Title title="學習資源" />
+              <div className="flex flex-col gap-2">
+                {
+                  project?.resourceName?.map((name, index) => {
+                    return (
+                      <FakeInput
+                        key={`resource-${name}-${index}` as string}
+                        value={name || ""}
+                      />
+                    );
+                  })
+                }
+              </div>
+            </>
+          )
+        }
       </Panel>
 
       <Panel className="bg-white">
         <h3 className="body-md font-medium mb-5">學習成果及呈現方式 *</h3>
         {
           (project?.outcome?.length) && (
-            <Tags tags={project?.outcome} />
+            <Tags category="outcome_tags" tags={project?.outcome} />
           )
         }
         <Description description={project?.outcomeDescription || ""} />
@@ -85,7 +102,7 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
           <Button
             prefixIcon="MdOutlineEdit"
             variant="outline"
-            className="py-[5px]"
+            className="w-full max-w-[272px] py-[5px] justify-center mx-auto"
             onClick={handleOnClickEdit}
           >
             編輯
