@@ -11,6 +11,10 @@ const FaArrowRight = dynamic(() =>
   import('react-icons/fa6').then((mod) => mod.FaArrowRight)
 );
 
+const MdOutlineEdit = dynamic(() =>
+  import('react-icons/md').then((mod) => mod.MdOutlineEdit)
+);
+
 const Shell = dynamic(() => import('@/public/assets/icons/shell.svg'));
 
 const Comment = dynamic(() => import('@/public/assets/icons/comment.svg'));
@@ -20,6 +24,7 @@ const icons = {
   FaAngleLeft,
   FaArrowRight,
   Shell,
+  MdOutlineEdit,
 };
 
 enum ButtonColorEnum {
