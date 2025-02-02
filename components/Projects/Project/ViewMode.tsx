@@ -21,15 +21,23 @@ interface ViewModeProps {
 const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
   const handleOnClickEdit = onClick;
   return (
-    <div className="flex flex-col gap-6 md:gap-4">
-      <Panel>
-        <div>
-          {
-            isLgScreen &&
-            <EditFormButton onClick={handleOnClickEdit} />
-          }
-        </div>
-      </Panel>
+    <div className="flex flex-col gap-6 md:gap-4 md:relative">
+
+      {
+        isLgScreen &&
+        (
+          <div className="absolute right-0 -top-[60px]">
+            <Button
+              prefixIcon="MdOutlineEdit"
+              className="py-[5px]"
+              variant="outline"
+              onClick={handleOnClickEdit}
+            >
+              編輯
+            </Button>
+          </div>
+        )
+      }
 
       <Panel className=" bg-white">
         <Title title="計畫簡述" />
@@ -74,8 +82,16 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
       </Panel>
 
       {
-        !isLgScreen &&
-        <EditFormButton onClick={handleOnClickEdit} />
+        !isLgScreen && (
+          <Button
+            prefixIcon="MdOutlineEdit"
+            variant="outline"
+            className="py-[5px]"
+            onClick={handleOnClickEdit}
+          >
+            編輯
+          </Button>
+        )
       }
     </div>
   );
