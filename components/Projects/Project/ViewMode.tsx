@@ -44,25 +44,25 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
         <Divider />
         <Title title="學習動機" />
         {
-          project?.motivation?.tags.length && (
-            <Tags tags={project?.motivation.tags} />
+          project?.motivation?.length && (
+            <Tags tags={project?.motivation} />
           )
         }
-        <Description description={project?.motivation?.description || ""} />
+        <Description description={project?.motivationDescription || ""} />
         <Divider />
         <Title title="學習目標" />
-        <Description description={project?.goals || ""} />
+        <Description description={project?.goal || ""} />
         <Divider />
         <Title title="學習內容" />
         <Description description={project?.content || ""} />
         <Divider />
         <Title title="學習方法與策略" />
         {
-          project?.strategies?.tags?.length && (
-            <Tags tags={project?.strategies?.tags} />
+          project?.strategy?.length && (
+            <Tags tags={project?.strategy} />
           )
         }
-        <Description description={project?.strategies?.description || ""} />
+        <Description description={project?.strategyDescription || ""} />
         <Divider />
         <Title title="學習資源" />
         <FakeInput value={project?.resources || ""} />
@@ -71,11 +71,11 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
       <Panel className="bg-white">
         <h3 className="body-md font-medium mb-5">學習成果及呈現方式 *</h3>
         {
-          (project?.outcomes?.tags?.length) && (
-            <Tags tags={project?.outcomes?.tags} />
+          (project?.outcome?.length) && (
+            <Tags tags={project?.outcome} />
           )
         }
-        <Description description={project?.outcomes?.description || ""} />
+        <Description description={project?.outcomeDescription || ""} />
         <Divider />
         <p className="bg-basic-100 py-1 px-[10px] rounded-[4px] inline-block text-basic-500 body-sm">{project?.isPublic ? '公開' : '不公開'}</p>
       </Panel>

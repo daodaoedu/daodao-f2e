@@ -4,21 +4,15 @@ export interface Project {
   description: string;
   updatedDate: string;
   isPublic: boolean;
-  motivation: {
-    tags: string[];
-    description: string;
-  },
-  goals: string;
+  motivation: string[];
+  motivationDescription: string;
+  goal: string;
   content: string;
-  strategies: {
-    tags: string[];
-    description: string;
-  },
+  strategy: string[];
+  strategyDescription: string;
   resources: string;
-  outcomes: {
-    tags: string[];
-    description: string
-  }
+  outcome: string[];
+  outcomeDescription: string;
 }
 
 export const DEFAULT_PROJECT: Project = {
@@ -27,19 +21,13 @@ export const DEFAULT_PROJECT: Project = {
   description: "",
   updatedDate: "",
   isPublic: false,
-  motivation: {
-    tags: [],
-    description: "",
-  },
-  goals: "",
+  motivation: [],
+  motivationDescription: "",
+  goal: "",
   content: "",
-  strategies: {
-    tags: [],
-    description: "",
-  },
+  strategy: [],
+  strategyDescription: "",
   resources: "",
-  outcomes: {
-    tags: [],
-    description: ""
-  }
+  outcome: [],
+  outcomeDescription: "",
 };
