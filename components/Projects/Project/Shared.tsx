@@ -26,7 +26,7 @@ interface PanelProps {
 export const Panel = ({ children, className = "" }: PanelProps) => {
   return (
     <div className={cn(
-      "w-full max-w-full sm:w-[750px] mx-auto rounded-2xl px-4 py-8 md:p-10",
+      "w-full max-w-full sm:w-full mx-auto rounded-2xl px-4 py-8 md:p-10",
       className
     )}
     >
