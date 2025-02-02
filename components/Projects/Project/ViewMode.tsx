@@ -1,10 +1,7 @@
 import { Project } from '@/components/Projects/Project/projectType';
-import { IUser } from '@/services/users';
-import dayjs from "dayjs";
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockIcon from '@mui/icons-material/Lock';
-
-import { ROLE } from '@/constants/member';
+import Button from '@/shared/components/Button';
 import {
   Panel,
   Title,
@@ -14,23 +11,6 @@ import {
   FakeInput,
   EditFormButton
 } from '@/components/Projects/Project/Shared';
-
-const Visibility = ({ isPublic }: {
-  isPublic: boolean | undefined
-}) => {
-  const text = isPublic ? "公開" : "不公開";
-  const icon = isPublic ?
-    <LockOpenIcon className="max-w-4" />
-    :
-    <LockIcon className="max-w-4" />;
-
-  return (
-    <div className="text-basic-300 text-sm font-sans flex items-center gap-[2px]">
-      {icon}
-      <span>{text}</span>
-    </div>
-  );
-};
 
 interface ViewModeProps {
   project: Partial<Project>;
