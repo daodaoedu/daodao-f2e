@@ -1,7 +1,9 @@
 import { Project } from '@/components/Projects/Project/projectType';
 import Button from '@/shared/components/Button';
 import { Panel } from '@/components/Projects/Project/Shared';
-import InputField from "@/components/Projects/Form/InputField";
+import InputField from '@/components/Projects/Form/InputField';
+import MultiSelectDropdown from '@/components/Projects/Form/MultiSelectDropDown';
+import { MOTIVATION_MAP, STRATEGY_MAP, OUTCOME_MAP } from '@/constants/project';
 
 interface EditModeProps {
   project: Partial<Project>;
@@ -13,17 +15,32 @@ interface EditModeProps {
       React.ChangeEvent<HTMLTextAreaElement> |
       React.ChangeEvent<HTMLSelectElement>
   ) => void;
+  onChangeSelected: (name: string, value: string[]) => void;
+  onChangeResourceName: (value: string[]) => void;
 }
 
 const EditMode = ({
   project,
   onClickCancel,
   onClickUpdate,
-  onChangeInput
+  onChangeInput,
+  onChangeSelected,
+  onChangeResourceName,
 }: EditModeProps) => {
   const handleClickCancel = onClickCancel;
   const handleClickUpdate = onClickUpdate;
   const handleChangeInput = onChangeInput;
+
+  // TODO: squash handleChangeSelected and handleChangeResourceName
+  const handleChangeSelected = onChangeSelected;
+  const handleChangeResourceName = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const { resourceName } = project;
+    const { value } = e.target;
+    const newResourceName: string[] = resourceName || [];
+    newResourceName[index] = value;
+    onChangeResourceName(newResourceName);
+  };
+
   return (
     <div className="flex flex-col gap-6 md:gap-4">
       <Panel className="bg-white flex flex-col gap-5">
@@ -62,7 +79,7 @@ const EditMode = ({
 
         <InputField>
           <InputField.Label
-            htmlFor="motivation_description"
+            htmlFor="motivationDescription"
             isRequired
           >
             學習動機
@@ -70,10 +87,17 @@ const EditMode = ({
           <InputField.Description>
             為什麼會想啟動這個學習計畫？受到哪些經歷、刺激、啟發，包含相關生活、學習等經驗。
           </InputField.Description>
+          <MultiSelectDropdown
+            placeholder="請選擇學習動機"
+            listItems={MOTIVATION_MAP}
+            name="motivation"
+            onChange={handleChangeSelected}
+            selectedItems={project?.motivation || []}
+          />
           <InputField.TextArea
-            id="motivation_description"
-            name="motivation_description"
-            value={project?.motivation?.description}
+            id="motivationDescription"
+            name="motivationDescription"
+            value={project?.motivationDescription}
             onChange={handleChangeInput}
             placeholder="範例：因為同學常常說我很好笑，很適合把生活日常做成影片，我也發現自己對做影片、當Youtuber有興趣，所以想要嘗試累積作品，並開一個 Youtuber 頻道。"
           />
@@ -81,7 +105,7 @@ const EditMode = ({
 
         <InputField>
           <InputField.Label
-            htmlFor="goals"
+            htmlFor="goal"
             isRequired
           >
             學習目標
@@ -90,9 +114,9 @@ const EditMode = ({
             你希望學習後獲得什麼收穫？例如知識或技能的習得，又或者態度或習慣的改變。
           </InputField.Description>
           <InputField.TextArea
-            id="goals"
-            value={project?.goals}
-            name="goals"
+            id="goal"
+            value={project?.goal}
+            name="goal"
             onChange={handleChangeInput}
             placeholder="範例：
 能收集並分析搞笑風格的 Youtuber
@@ -123,16 +147,23 @@ const EditMode = ({
         </InputField>
 
         <InputField>
-          <InputField.Label htmlFor="strategies_description" isRequired>
+          <InputField.Label htmlFor="strategyDescription" isRequired>
             學習方法與策略
           </InputField.Label>
+          <MultiSelectDropdown
+            placeholder="請選擇學習方法與策略"
+            listItems={STRATEGY_MAP}
+            name="strategy"
+            onChange={handleChangeSelected}
+            selectedItems={project?.strategy || []}
+          />
           <InputField.Description>
             你會如何學習？請先勾選預計的學習方法，並敘述各種學習方法會如何相互搭配。此外，你會如何在過程中使用什麼方式紀錄你的學習呢？例如文字筆記以部落格文章做分享等。
           </InputField.Description>
           <InputField.TextArea
-            id="strategies_description"
-            name="strategies_description"
-            value={project?.strategies?.description}
+            id="strategyDescription"
+            name="strategyDescription"
+            value={project?.strategyDescription}
             onChange={handleChangeInput}
             placeholder="範例：
 內容規劃與創意發想（定位、主題、腳本）
@@ -151,17 +182,53 @@ const EditMode = ({
           <InputField.Description>
             你會使用哪些資源呢？包含網路資源的連結、書籍名稱、人／組織、社群、活動／課程、學習工具等，請至少附上名稱與相關連結
           </InputField.Description>
-          <InputField.Input
-            id="resources"
-            name="resources"
-            onChange={handleChangeInput}
-            value={project?.resources}
-            placeholder="範例：YouTube 創作者的實用資源"
-          />
+          {
+            project?.resourceName?.length && (
+              project.resourceName.map((name, index) => {
+                return (
+                  <InputField.Input
+                    key={`resource-${name}-${index}` as string}
+                    id={`resource-${name}-${index}`}
+                    name={`resource-${name}-${index}`}
+                    onChange={(e) => handleChangeResourceName(e, index)}
+                    value={name}
+                    placeholder="範例：YouTube 創作者的實用資源"
+                  />
+                );
+              })
+            )
+          }
         </InputField>
 
       </Panel>
 
+      <Panel className="bg-white">
+        <InputField>
+          <InputField.Label htmlFor="outcomeDescription" isRequired>
+            學習成果及呈現方式
+          </InputField.Label>
+          <MultiSelectDropdown
+            placeholder="請選擇學習成果及呈現方式"
+            listItems={OUTCOME_MAP}
+            name="outcome"
+            onChange={handleChangeSelected}
+            selectedItems={project?.outcome || []}
+          />
+          <InputField.Description>
+            你最終會用何種方式統整與呈現你所有學習收穫呢？
+          </InputField.Description>
+          <InputField.TextArea
+            id="outcomeDescription"
+            name="outcomeDescription"
+            value={project?.outcomeDescription}
+            onChange={handleChangeInput}
+            placeholder="範例：
+內容規劃與創意發想（定位、主題、腳本）
+基礎拍攝技術（攝影設備、燈光、語音）
+影片剪輯與後製（剪輯軟體、配樂）"
+          />
+        </InputField>
+      </Panel>
       <Panel className="
         p-0 md:p-0
         flex flex-col justify-center items-center gap-6

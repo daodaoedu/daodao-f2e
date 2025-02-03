@@ -1,36 +1,14 @@
 import getProjectLayout from '@/layout/ProjectLayout';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/projectType';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
 import { Skeleton, useMediaQuery } from "@mui/material";
-import { BASE_URL } from "@/constants/common";
-import { z } from 'zod';
 
-import { ProtectedComponent, useAuth } from '@/contexts/Auth';
-import toast from 'react-hot-toast';
+import { ProtectedComponent } from '@/contexts/Auth';
+import { useProject } from '@/contexts/Project';
 import EditMode from '@/components/Projects/Project/EditMode';
 import ViewMode from '@/components/Projects/Project/ViewMode';
-
-type ProjectResponse = {
-  data: Project
-};
-const idSchema = z.string().regex(/^[0-9a-fA-F]{24}$/);
-
-function validateIdWithZod(id: string) {
-  try {
-    const result = idSchema.parse(id);
-    return {
-      isValid: true,
-      value: result
-    };
-  } catch (error) {
-    return {
-      isValid: false,
-      error
-    };
-  }
-}
 
 const ProjectPage = () => {
   const router = useRouter();
@@ -68,11 +46,8 @@ const ProjectPage = () => {
     }),
     [router?.asPath],
   );
-  const { user } = useAuth();
-  const { id } = router.query;
-  const [project, setProject] = useState<Partial<Project>>(DEFAULT_PROJECT);
-  const [formData, setFormData] = useState<Partial<Project>>(DEFAULT_PROJECT);
-  const [isLoading, setIsLoading] = useState(true);
+  const { project, isLoading, dispatchProject } = useProject();
+  const [formData, setFormData] = useState<Partial<Project>>(project);
   const [isEditing, setIsEditing] = useState(false);
 
   const handleOnClickEdit = () => {
@@ -87,7 +62,7 @@ const ProjectPage = () => {
   };
 
   const handleOnClickUpdate = () => {
-    console.log('update', formData);
+    dispatchProject(formData);
   };
 
   const handleChangeInput = (
@@ -103,43 +78,19 @@ const ProjectPage = () => {
     });
   };
 
-  useEffect(() => {
-    if (!router.isReady || !user?._id) return;
+  const handleChangeSelected = (name: string, value: string[]) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
-    if (!id) {
-      toast.error('喔噢！找不到這則學習檔案');
-      router.push('/manage/projects');
-      return;
-    }
-    const projectId = Array.isArray(id) ? id[0] : id;
-    const validation = validateIdWithZod(projectId);
-    if (!validation.isValid) return;
-
-    const fetchProjectData = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/marathon/${projectId}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const responseData: ProjectResponse = await response.json();
-        if (!responseData || !responseData.data) {
-          throw new Error('Invalid response structure');
-        }
-
-        // json parse response data
-        const result = responseData.data;
-
-        // set marathon data
-        setProject(result);
-        setFormData(result);
-      } catch (error) {
-        console.error('error fetching data', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchProjectData();
-  }, [id, user, router]);
+  const handleChangeResourceName = (value: string[]) => {
+    setFormData({
+      ...formData,
+      resourceName: value
+    });
+  };
 
   return (
     <ProtectedComponent>
@@ -168,11 +119,12 @@ const ProjectPage = () => {
               onClickCancel={handleOnClickCancel}
               onClickUpdate={handleOnClickUpdate}
               onChangeInput={handleChangeInput}
+              onChangeSelected={handleChangeSelected}
+              onChangeResourceName={handleChangeResourceName}
             />
           ) : (
             <ViewMode
               project={project}
-              user={user}
               isLgScreen={isLgScreen}
               onClick={handleOnClickEdit}
             />
@@ -183,6 +135,7 @@ const ProjectPage = () => {
   );
 };
 
-ProjectPage.getLayout = getProjectLayout;
+ProjectPage.getLayout = (page: React.ReactElement) =>
+  getProjectLayout(page, undefined);
 
 export default ProjectPage;

@@ -2,6 +2,7 @@ import z from "zod";
 import { cn } from "@/utils/cn";
 import Button from "@/shared/components/Button";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { MOTIVATION_MAP, STRATEGY_MAP, OUTCOME_MAP } from "@/constants/project";
 
 const idSchema = z.string().regex(/^[0-9a-fA-F]{24}$/);
 export const validateIdWithZod = (id: string) => {
@@ -26,7 +27,7 @@ interface PanelProps {
 export const Panel = ({ children, className = "" }: PanelProps) => {
   return (
     <div className={cn(
-      "w-full max-w-full sm:w-[750px] mx-auto rounded-2xl px-4 py-8 md:p-10",
+      "w-full max-w-full sm:w-full mx-auto rounded-2xl px-4 py-8 md:p-10",
       className
     )}
     >
@@ -58,16 +59,40 @@ export const Description = ({ description }: {
   );
 };
 
-export const Tags = ({ tags }: {
+export const Tags = ({ category, tags }: {
+  category: string | null;
   tags: string[];
 }) => {
+  let tagsMap: {label:string, value:string}[] = [];
+  switch (category) {
+    case "motivation_tags":
+      tagsMap = MOTIVATION_MAP;
+      break;
+    case "strategy_tags":
+      tagsMap = STRATEGY_MAP;
+      break;
+    case "outcome_tags":
+      tagsMap = OUTCOME_MAP;
+      break;
+    default:
+      break;
+  }
   return (
-    <div className="flex flex-row gap-2 mb-2">
-      {tags.map((tag: string) => {
-        return (
-          <span key={tag} className="text-sm text-[#2D3648] px-2 bg-primary-lightest rounded-[4px] py-[2px] font-sans">{tag}</span>
-        );
-      })}
+    <div className="flex flex-row gap-2 mb-2 flex-wrap">
+      {
+        category && (
+          tags.map((tag: string) => {
+            const label = tagsMap.filter((item) => {
+              return item.value === tag;
+            })[0]?.label;
+            return (
+              <span key={tag} className="text-sm text-[#2D3648] px-2 bg-primary-lightest rounded-[4px] py-[2px] font-sans">
+                {label || tag}
+              </span>
+            );
+          })
+        )
+      }
     </div>
   );
 };
@@ -77,7 +102,7 @@ export const FakeInput = ({ value }: {
 }) => {
   return (
     <div
-      className="py-3 px-4
+      className="py-3 px-4 hover:cursor-default
       border border-solid border-basic-200
       rounded-lg font-sans"
     >

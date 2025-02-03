@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { AiOutlineEye, AiOutlineMore } from 'react-icons/ai';
 import { MdLockOpen } from 'react-icons/md';
@@ -8,7 +9,26 @@ import Button from '@/shared/components/Button';
 import Container from '@/shared/components/Container';
 import Image from '@/shared/components/Image';
 import Sidebar from '@/shared/components/Sidebar';
+import { z } from 'zod';
+import { ProjectProvider, useProject } from '@/contexts/Project';
 import getDefaultLayout from './DefaultLayout';
+
+const idSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+
+function validateIdWithZod(id: string) {
+  try {
+    const result = idSchema.parse(id);
+    return {
+      isValid: true,
+      value: result
+    };
+  } catch (error) {
+    return {
+      isValid: false,
+      error
+    };
+  }
+}
 
 const tabConfigs = {
   outcomes: {
@@ -39,6 +59,15 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
   const activeTabPath = activeTab?.backPath ?? pathname;
   const backPath = activeTab?.backPath ?? '/manage/projects';
   const backText = activeTab?.backText ?? '返回 學習計畫';
+  const { project, fetchProject } = useProject();
+
+  // TODO: move fetchProject to page /manage/projects
+  useEffect(() => {
+    if (!projectId) return;
+    const validation = validateIdWithZod(projectId);
+    if (!validation.isValid) return;
+    fetchProject(projectId);
+  }, [projectId]);
 
   return (
     <ProtectedComponent redirectOnCancel="/">
@@ -91,11 +120,11 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
                 覆盤
               </Sidebar.Link>
             </Sidebar>
-            <div className="flex-1">
+            <div className="basis-full max-w-full lg:flex-1">
               <header className="mb-6">
                 <div className="mb-3 flex flex-col lg:flex-row justify-between lg:items-center gap-y-3">
                   <h1 className="heading-md text-basic-500">
-                    學習計畫主題名稱
+                    { project?.title || '學習計畫主題名稱' }
                   </h1>
                   <div className="flex items-center justify-between lg:justify-end gap-2 text-basic-300">
                     <time>2025/01/26</time>
@@ -142,9 +171,11 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
 
 export default function getProjectLayout(
   page: React.ReactElement,
-  activeTabType?: keyof typeof tabConfigs
+  activeTabType?: keyof typeof tabConfigs,
 ) {
   return getDefaultLayout(
-    <ProjectLayout activeTabType={activeTabType}>{page}</ProjectLayout>
+    <ProjectProvider>
+      <ProjectLayout activeTabType={activeTabType}>{page}</ProjectLayout>
+    </ProjectProvider>
   );
 }
