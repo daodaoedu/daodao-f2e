@@ -33,7 +33,7 @@ const EditMode = ({
 
   // TODO: squash handleChangeSelected and handleChangeResourceName
   const handleChangeSelected = onChangeSelected;
-  const handleChangeResourceName = (e: React.ChangeEvent<HTMLSelectElement>, index: number) => {
+  const handleChangeResourceName = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const { resourceName } = project;
     const { value } = e.target;
     const newResourceName: string[] = resourceName || [];
