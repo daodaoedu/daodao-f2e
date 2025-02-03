@@ -6,8 +6,8 @@ import { getTokenStorage } from "@/utils/storage";
 interface ProjectContext {
   project: Project;
   isLoading: boolean;
-  useFetchProject: (projectId: string) => void;
-  useDispatchProject: (newData: Partial<Project>) => void;
+  fetchProject: (projectId: string) => void;
+  dispatchProject: (newData: Partial<Project>) => void;
 }
 const ProjectContext = createContext<ProjectContext | null>(null);
 
@@ -18,7 +18,7 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
   const [project, setProject] = useState(DEFAULT_PROJECT);
   const [isLoading, setIsLoading] = useState(false);
 
-  const useFetchProject = async (projectId: string) => {
+  const fetchProject = async (projectId: string) => {
     try {
       const response = await fetch(`${BASE_URL}/projects/${projectId}`);
 
@@ -39,7 +39,7 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
       setIsLoading(false);
     }
   };
-  const useDispatchProject = async (newData: Partial<Project>) => {
+  const dispatchProject = async (newData: Partial<Project>) => {
     try {
       const token = getTokenStorage().get();
       console.log('token', token);
@@ -81,8 +81,8 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
       value={{
         project,
         isLoading,
-        useDispatchProject,
-        useFetchProject,
+        dispatchProject,
+        fetchProject,
       }}
     >
       {children}

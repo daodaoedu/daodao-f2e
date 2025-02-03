@@ -46,7 +46,7 @@ const ProjectPage = () => {
     }),
     [router?.asPath],
   );
-  const { project, isLoading, useDispatchProject } = useProject();
+  const { project, isLoading, dispatchProject } = useProject();
   const [formData, setFormData] = useState<Partial<Project>>(project);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -62,7 +62,7 @@ const ProjectPage = () => {
   };
 
   const handleOnClickUpdate = () => {
-    useDispatchProject(formData);
+    dispatchProject(formData);
   };
 
   const handleChangeInput = (

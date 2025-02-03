@@ -59,14 +59,14 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
   const activeTabPath = activeTab?.backPath ?? pathname;
   const backPath = activeTab?.backPath ?? '/manage/projects';
   const backText = activeTab?.backText ?? '返回 學習計畫';
-  const { project, useFetchProject } = useProject();
+  const { project, fetchProject } = useProject();
 
-  // TODO: move useFetchProject to page /manage/projects
+  // TODO: move fetchProject to page /manage/projects
   useEffect(() => {
     if (!projectId) return;
     const validation = validateIdWithZod(projectId);
     if (!validation.isValid) return;
-    useFetchProject(projectId);
+    fetchProject(projectId);
   }, [projectId]);
 
   return (
