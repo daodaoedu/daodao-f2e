@@ -1,6 +1,4 @@
 import { Project } from '@/components/Projects/Project/projectType';
-import LockOpenIcon from '@mui/icons-material/LockOpen';
-import LockIcon from '@mui/icons-material/Lock';
 import Button from '@/shared/components/Button';
 import {
   Panel,
