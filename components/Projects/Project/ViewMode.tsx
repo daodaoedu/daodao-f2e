@@ -7,6 +7,7 @@ import {
   Description,
   Divider,
   FakeInput,
+  FakeCheckBox,
 } from '@/components/Projects/Project/Shared';
 
 interface ViewModeProps {
@@ -92,7 +93,10 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
         }
         <Description description={project?.outcomeDescription || ""} />
         <Divider />
-        <p className="bg-basic-100 py-1 px-[10px] rounded-[4px] inline-block text-basic-500 body-sm">{project?.isPublic ? '公開' : '不公開'}</p>
+        <FakeCheckBox
+          isChecked={project?.isPublic}
+          text="是否公開給所有人看到"
+        />
       </Panel>
 
       {
