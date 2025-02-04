@@ -63,7 +63,7 @@ export const Tags = ({ category, tags }: {
   category: string | null;
   tags: string[];
 }) => {
-  let tagsMap: {label:string, value:string}[] = [];
+  let tagsMap: { label: string, value: string }[] = [];
   switch (category) {
     case "motivation_tags":
       tagsMap = MOTIVATION_MAP;
