@@ -188,7 +188,7 @@ const EditMode = ({
               project.resourceName.map((name, index) => {
                 return (
                   <InputField.Input
-                    key={`resource-${name}-${index}` as string}
+                    key={index} // TODOS: Use uuid to generate key
                     id={`resource-${name}-${index}`}
                     name={`resource-${name}-${index}`}
                     onChange={(e) => handleChangeResourceName(e, index)}
