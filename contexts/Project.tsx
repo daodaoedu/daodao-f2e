@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/projectType';
+import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { BASE_URL } from "@/constants/common";
 import { getTokenStorage } from "@/utils/storage";
 

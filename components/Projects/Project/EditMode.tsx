@@ -1,4 +1,4 @@
-import { Project } from '@/components/Projects/Project/projectType';
+import { Project } from '@/components/Projects/Project/type';
 import Button from '@/shared/components/Button';
 import { Panel } from '@/components/Projects/Project/Shared';
 import InputField from '@/components/Projects/Form/InputField';

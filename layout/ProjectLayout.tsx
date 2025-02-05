@@ -96,7 +96,11 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
                 學習計畫
               </Sidebar.Link>
               <Sidebar.Link
-                href="/manage/project/milestones"
+                href={
+                  projectId
+                    ? `/manage/project/milestones?id=${projectId}`
+                    : '/manage/project/milestones'
+                }
                 isActive={activeTabPath === '/manage/project/milestones'}
               >
                 學習里程碑

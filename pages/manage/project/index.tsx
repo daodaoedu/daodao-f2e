@@ -1,5 +1,5 @@
 import getProjectLayout from '@/layout/ProjectLayout';
-import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/projectType';
+import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
