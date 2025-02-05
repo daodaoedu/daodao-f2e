@@ -1,9 +1,10 @@
-import { Project } from '@/components/Projects/Project/projectType';
+import { Project } from '@/components/Projects/Project/type';
 import Button from '@/shared/components/Button';
 import { Panel } from '@/components/Projects/Project/Shared';
 import InputField from '@/components/Projects/Form/InputField';
 import MultiSelectDropdown from '@/components/Projects/Form/MultiSelectDropDown';
 import { MOTIVATION_MAP, STRATEGY_MAP, OUTCOME_MAP } from '@/constants/project';
+import { FaCheck } from "react-icons/fa6";
 
 interface EditModeProps {
   project: Partial<Project>;
@@ -187,7 +188,7 @@ const EditMode = ({
               project.resourceName.map((name, index) => {
                 return (
                   <InputField.Input
-                    key={`resource-${name}-${index}` as string}
+                    key={index} // TODOS: Use uuid to generate key
                     id={`resource-${name}-${index}`}
                     name={`resource-${name}-${index}`}
                     onChange={(e) => handleChangeResourceName(e, index)}
@@ -200,6 +201,32 @@ const EditMode = ({
           }
         </InputField>
 
+        <div className="flex flex-row">
+          <label htmlFor="isPublic" className="flex flex-row justify-center items-center gap-[5px] hover:cursor-pointer">
+            <input
+              type="checkbox"
+              name="isPublic"
+              id="isPublic"
+              className="peer hidden"
+              checked={project?.isPublic}
+              onChange={handleChangeInput}
+            />
+            <p className="
+              w-[18px] h-[18px] p-[2px] rounded-[4px] m-[1px]
+              flex items-center justify-center
+              bg-white text-basic-400 border-2 border-solid border-basic-400
+              peer-checked:bg-primary-base
+              peer-checked:text-white
+                peer-checked:border-primary-base
+              "
+            >
+              <FaCheck />
+            </p>
+            <p className="text-basic-500">
+              公開學習計畫
+            </p>
+          </label>
+        </div>
       </Panel>
 
       <Panel className="bg-white">

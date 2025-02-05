@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { AiOutlineEye, AiOutlineMore } from 'react-icons/ai';
-import { MdLockOpen } from 'react-icons/md';
+import { MdLockOpen, MdLock } from 'react-icons/md';
 import { GoBookmark } from 'react-icons/go';
 
 import { ProtectedComponent } from '@/contexts/Auth';
@@ -96,7 +96,11 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
                 學習計畫
               </Sidebar.Link>
               <Sidebar.Link
-                href="/manage/project/milestones"
+                href={
+                  projectId
+                    ? `/manage/project/milestones?id=${projectId}`
+                    : '/manage/project/milestones'
+                }
                 isActive={activeTabPath === '/manage/project/milestones'}
               >
                 學習里程碑
@@ -134,8 +138,8 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
                         <span>9999</span>
                       </div>
                       <div className="flex items-center gap-0.5">
-                        <MdLockOpen />
-                        <span>公開</span>
+                        {project?.isPublic ? <MdLockOpen /> : <MdLock /> }
+                        <span>{project?.isPublic ? '公開' : '不公開'}</span>
                       </div>
                       <div className="flex items-center gap-0.5">
                         <GoBookmark />

@@ -1,5 +1,5 @@
 import getProjectLayout from '@/layout/ProjectLayout';
-import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/projectType';
+import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
@@ -9,6 +9,7 @@ import { ProtectedComponent } from '@/contexts/Auth';
 import { useProject } from '@/contexts/Project';
 import EditMode from '@/components/Projects/Project/EditMode';
 import ViewMode from '@/components/Projects/Project/ViewMode';
+import toast from 'react-hot-toast';
 
 const ProjectPage = () => {
   const router = useRouter();
@@ -46,7 +47,7 @@ const ProjectPage = () => {
     }),
     [router?.asPath],
   );
-  const { project, isLoading, dispatchProject } = useProject();
+  const { project, dispatchProject, isFetching } = useProject();
   const [formData, setFormData] = useState<Partial<Project>>(project);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -61,8 +62,14 @@ const ProjectPage = () => {
     setIsEditing(false);
   };
 
-  const handleOnClickUpdate = () => {
-    dispatchProject(formData);
+  const handleOnClickUpdate = async () => {
+    const success = await dispatchProject(formData);
+    if (success) {
+      toast.success('更新成功');
+      setIsEditing(false);
+    } else {
+      toast.error('更新失敗，請稍後再試');
+    }
   };
 
   const handleChangeInput = (
@@ -71,7 +78,12 @@ const ProjectPage = () => {
       React.ChangeEvent<HTMLTextAreaElement> |
       React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const { name, value } = event.target;
+    const { name, type } = event.target;
+    const value = type === 'checkbox' ?
+      (event.target as HTMLInputElement).checked
+      :
+      event.target.value;
+
     setFormData({
       ...formData,
       [name]: value
@@ -94,10 +106,10 @@ const ProjectPage = () => {
 
   return (
     <ProtectedComponent>
-      <div className="">
+      <div>
         <SEOConfig data={SEOData} />
         {
-          isLoading ? (
+          isFetching ? (
             <>
               <Skeleton
                 variant="rectangular"

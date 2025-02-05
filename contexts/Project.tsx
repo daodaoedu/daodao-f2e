@@ -1,13 +1,14 @@
 import React, { createContext, useContext, useState } from "react";
-import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/projectType';
+import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { BASE_URL } from "@/constants/common";
 import { getTokenStorage } from "@/utils/storage";
 
 interface ProjectContext {
   project: Project;
-  isLoading: boolean;
+  isFetching: boolean;
+  isUpdating: boolean;
   fetchProject: (projectId: string) => void;
-  dispatchProject: (newData: Partial<Project>) => void;
+  dispatchProject: (newData: Partial<Project>) => Promise<boolean>;
 }
 const ProjectContext = createContext<ProjectContext | null>(null);
 
@@ -16,9 +17,11 @@ interface ProjectContextProviderProps {
 }
 export function ProjectProvider({ children }: ProjectContextProviderProps) {
   const [project, setProject] = useState(DEFAULT_PROJECT);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [isUpdating, setIsUpdateing] = useState(false);
 
   const fetchProject = async (projectId: string) => {
+    setIsFetching(true);
     try {
       const response = await fetch(`${BASE_URL}/projects/${projectId}`);
 
@@ -36,14 +39,15 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
     } catch (error) {
       console.error('error fetching data', error);
     } finally {
-      setIsLoading(false);
+      setIsFetching(false);
     }
   };
-  const dispatchProject = async (newData: Partial<Project>) => {
+  const dispatchProject = async (newData: Partial<Project>): Promise<boolean> => {
+    setIsUpdateing(true);
     try {
       const token = getTokenStorage().get();
-      console.log('token', token);
-      if (!token || !project?.id) return;
+
+      if (!token || !project?.id) return false;
 
       const response = await fetch(`${BASE_URL}/projects/${project.id}`, {
         method: 'PUT',
@@ -63,24 +67,24 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
         throw new Error('Invalid response structure');
       }
 
-      // json parse response data
       const result = responseData;
 
-      // set marathon data
       setProject(result);
+      return true;
     } catch (error) {
       console.error('error fetching data', error);
+      return false;
     } finally {
-      setIsLoading(false);
+      setIsUpdateing(false);
     }
-    setProject((prev) => ({ ...prev, ...newData }));
   };
 
   return (
     <ProjectContext.Provider
       value={{
         project,
-        isLoading,
+        isFetching,
+        isUpdating,
         dispatchProject,
         fetchProject,
       }}
