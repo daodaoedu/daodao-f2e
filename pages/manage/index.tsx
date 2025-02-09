@@ -14,7 +14,7 @@ import SEOConfig from '@/shared/components/SEO';
 import Dropdown from '@/shared/components/Dropdown';
 import Button from '@/shared/components/Button';
 import Collapse from '@/shared/components/Collapse';
-import ReviewCard from '@/components/Review/Card';
+// import ReviewCard from '@/components/Review/Card';
 import { cn } from '@/utils/cn';
 import 'dayjs/locale/zh-tw';
 
@@ -205,7 +205,7 @@ const Manage = () => {
         <div>第一週</div>
         <div>第三週</div>
       </Project>
-      <ReviewCard detailLink="/manage/project/review/detail?id=1" />
+      {/* <ReviewCard detailLink="/manage/project/review/detail?id=1" /> */}
     </LocalizationProvider>
   );
 };
