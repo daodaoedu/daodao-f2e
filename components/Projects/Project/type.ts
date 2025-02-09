@@ -1,3 +1,9 @@
+interface User {
+  id: string;
+  name: string;
+  _id: string;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -8,12 +14,14 @@ export interface Project {
   motivationDescription: string;
   goal: string;
   content: string;
+  createdAt: string;
   strategy: string[];
   strategyDescription: string;
   resourceName: string[];
   resourceUrl: string[];
   outcome: string[];
   outcomeDescription: string;
+  user: User;
 }
 
 export const DEFAULT_PROJECT: Project = {
@@ -26,10 +34,16 @@ export const DEFAULT_PROJECT: Project = {
   motivationDescription: "",
   goal: "",
   content: "",
+  createdAt: "",
   strategy: [],
   strategyDescription: "",
   resourceName: [],
   resourceUrl: [],
   outcome: [],
   outcomeDescription: "",
+  user: {
+    id: "",
+    name: "",
+    _id: "",
+  },
 };

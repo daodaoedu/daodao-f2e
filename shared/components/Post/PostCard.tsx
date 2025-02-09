@@ -1,8 +1,10 @@
-import { AiOutlineEye, AiOutlineMore } from 'react-icons/ai';
+import { useEffect, useRef, useState } from 'react';
+import { AiOutlineEye } from 'react-icons/ai';
 import { MdLockOpen, MdLockOutline } from 'react-icons/md';
 import dayjs from 'dayjs';
 
 import Button from '@/shared/components/Button';
+import Dropdown from '@/shared/components/Dropdown';
 import Shell from '@/public/assets/icons/shell.svg';
 import Comment from '@/public/assets/icons/comment.svg';
 import { cn } from '@/utils/cn';
@@ -20,14 +22,25 @@ function PostCard({ className, children }: PostCardProps) {
   );
 }
 
-interface PostCardHeaderProps {
+interface BasePostCardHeaderProps {
   title: string;
   subtitle?: string;
   tag?: string;
   date?: string;
   viewCount?: number;
   isLocked?: boolean;
+  dropdownItems?: {
+    key: string;
+    children: React.ReactNode;
+    className?: string;
+  }[];
 }
+
+type PostCardHeaderProps = BasePostCardHeaderProps &
+  (
+    | { isEditable: true; onTitleChange?: (title: string) => void }
+    | { isEditable?: false; onTitleChange?: never }
+  );
 
 function PostCardHeader({
   title,
@@ -36,16 +49,78 @@ function PostCardHeader({
   date,
   viewCount,
   isLocked,
+  isEditable,
+  dropdownItems,
+  onTitleChange,
 }: PostCardHeaderProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const prevTitleRef = useRef(title);
+  const [maxWidth, setMaxWidth] = useState(0);
+  const [titleWidth, setTitleWidth] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const wrapperWidth = wrapperRef.current?.clientWidth ?? 0;
+      const actionsWidth = wrapperRef.current?.children[1].clientWidth ?? 0;
+
+      setMaxWidth(
+        wrapperWidth > actionsWidth
+          ? wrapperWidth - actionsWidth - 12
+          : wrapperWidth
+      );
+      setTitleWidth(titleRef.current?.clientWidth ?? 0);
+    };
+
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (prevTitleRef.current !== title) {
+      setTitleWidth(titleRef.current?.clientWidth ?? 0);
+      prevTitleRef.current = title;
+    }
+  }, [title]);
+
   return (
-    <header className="mb-5 flex flex-col md:flex-row md:items-center justify-between gap-3">
-      <div className="flex items-center gap-4">
+    <header
+      ref={wrapperRef}
+      className="mb-5 flex flex-col md:flex-row md:items-center justify-between gap-3"
+    >
+      <div
+        className="flex items-center gap-4"
+        style={{ maxWidth: `${maxWidth}px` }}
+      >
         {tag && (
           <div className="px-5 py-2 body-sm bg-primary-base rounded-full text-white whitespace-nowrap">
             {tag}
           </div>
         )}
-        <div className="body-md text-basic-500">{title}</div>
+        <div className="body-md text-basic-500 shrink overflow-hidden">
+          <h2
+            ref={titleRef}
+            className={cn('truncate', isEditable && 'invisible absolute')}
+            {...(isEditable && { 'aria-hidden': true })}
+          >
+            {title}
+          </h2>
+          {isEditable && (
+            <input
+              type="text"
+              className="outline-none flex-1"
+              style={{
+                width: `${Math.min(maxWidth, Math.max(titleWidth, 16))}px`,
+              }}
+              value={title}
+              onChange={(e) => onTitleChange?.(e.target.value)}
+            />
+          )}
+        </div>
         {subtitle && (
           <div className="body-md text-primary-base whitespace-nowrap">
             {subtitle}
@@ -74,9 +149,24 @@ function PostCardHeader({
               </div>
             )
           )}
-          <Button className="p-0">
-            <AiOutlineMore className="size-5" />
-          </Button>
+          <Dropdown>
+            <Dropdown.Toggle
+              className="-m-1 p-1"
+              size="sm"
+              prefixIcon="AiOutlineMore"
+            />
+            <Dropdown.List className="top-full right-0 -mr-2 mt-2 z-20">
+              {Array.isArray(dropdownItems) &&
+                dropdownItems.map((item) => (
+                  <Dropdown.Item
+                    key={item.key}
+                    className={cn('text-nowrap', item.className)}
+                  >
+                    {item.children}
+                  </Dropdown.Item>
+                ))}
+            </Dropdown.List>
+          </Dropdown>
         </div>
       </div>
     </header>
@@ -104,11 +194,11 @@ function PostCardFooter({ onMoreClick, detailLink }: PostCardFooterProps) {
       <div className="flex items-center gap-3 text-basic-black">
         <div className="flex items-center gap-0.5">
           <Shell className="size-5" />
-          <div>5</div>
+          {/* <div>5</div> */}
         </div>
         <div className="flex items-center gap-0.5">
           <Comment className="size-5" />
-          <div>1</div>
+          {/* <div>1</div> */}
         </div>
       </div>
     </footer>

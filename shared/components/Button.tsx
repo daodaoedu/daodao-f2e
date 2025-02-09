@@ -15,6 +15,10 @@ const MdOutlineEdit = dynamic(() =>
   import('react-icons/md').then((mod) => mod.MdOutlineEdit)
 );
 
+const AiOutlineMore = dynamic(() =>
+  import('react-icons/ai').then((mod) => mod.AiOutlineMore)
+);
+
 const Shell = dynamic(() => import('@/public/assets/icons/shell.svg'));
 
 const Comment = dynamic(() => import('@/public/assets/icons/comment.svg'));
@@ -25,12 +29,14 @@ const icons = {
   FaArrowRight,
   Shell,
   MdOutlineEdit,
+  AiOutlineMore,
 };
 
 enum ButtonColorEnum {
   Primary = 'primary',
   Secondary = 'secondary',
   Tips = 'tips',
+  Alert = 'alert',
   White = 'white',
 }
 
@@ -137,8 +143,10 @@ function Button<AS extends 'button' | 'link' = 'button'>({
           'bg-primary-lightest text-primary-base hover:shadow-lg hover:shadow-primary-lightest/40 hover:text-primary-base',
         color === ButtonColorEnum.Tips &&
           'bg-tips text-basic-white hover:shadow-lg hover:shadow-tips/20 hover:text-basic-white',
+        color === ButtonColorEnum.Alert &&
+          'bg-alert text-basic-white hover:shadow-lg hover:shadow-alert/20 hover:text-basic-white',
         color === ButtonColorEnum.White &&
-          'bg-basic-white text-primary-darker shadow-lg shadow-basic-200/40 hover:bg-primary-lightest hover:text-basic-white',
+          'bg-basic-white text-primary-darker shadow-lg shadow-basic-200/40 hover:bg-primary-lightest hover:text-primary-darker',
       ],
       variant === ButtonVariantEnum.Outline && [
         'rounded-full border border-solid transition-colors',
@@ -155,21 +163,20 @@ function Button<AS extends 'button' | 'link' = 'button'>({
     onClick: handleClick,
   };
 
+  const iconSize = size === ButtonSizeEnum.Small ? 'size-4' : 'size-5';
+  const iconClassName = cn('pointer-events-none', iconSize);
+
   const content = (
     <>
       {PrefixIcon && (
-        <div className={cn(size === ButtonSizeEnum.Small && 'size-4')}>
-          <PrefixIcon
-            className={cn(size === ButtonSizeEnum.Small && 'size-4')}
-          />
+        <div className={iconClassName}>
+          <PrefixIcon className={iconClassName} />
         </div>
       )}
       {children}
       {SuffixIcon && (
-        <div className={cn(size === ButtonSizeEnum.Small && 'size-4')}>
-          <SuffixIcon
-            className={cn(size === ButtonSizeEnum.Small && 'size-4')}
-          />
+        <div className={iconClassName}>
+          <SuffixIcon className={iconClassName} />
         </div>
       )}
       {animation !== ButtonAnimationEnum.None && (

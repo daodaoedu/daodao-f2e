@@ -43,7 +43,7 @@ function CommentCard({
           </div>
         </div>
         <div className="flex items-center gap-3 text-basic-300">
-          <time>{timeDuration(dayjs())}</time>
+          <time>{timeDuration(dayjs('2025-02-07'))}</time>
           <div className="hidden sm:flex items-center gap-0.5">
             <MdLockOutline />
             <span>不公開</span>

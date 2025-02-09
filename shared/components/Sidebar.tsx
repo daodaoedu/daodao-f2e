@@ -7,6 +7,7 @@ const useSmoothIntoView = <T extends HTMLElement>() => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!ref.current || window.innerWidth > 1023) return;
+      if (ref.current.dataset.active !== 'true') return;
       ref.current.scrollIntoView({ behavior: 'smooth' });
     }, 100);
 

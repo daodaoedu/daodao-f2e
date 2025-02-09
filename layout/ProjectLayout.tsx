@@ -1,6 +1,8 @@
+import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { AiOutlineEye, AiOutlineMore } from 'react-icons/ai';
+import dayjs from 'dayjs';
+import { AiOutlineEye } from 'react-icons/ai';
 import { MdLockOpen, MdLock } from 'react-icons/md';
 import { GoBookmark } from 'react-icons/go';
 
@@ -13,41 +15,41 @@ import { z } from 'zod';
 import { ProjectProvider, useProject } from '@/contexts/Project';
 import getDefaultLayout from './DefaultLayout';
 
-const idSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+const idSchema = z.string().uuid();
 
 function validateIdWithZod(id: string) {
   try {
     const result = idSchema.parse(id);
     return {
       isValid: true,
-      value: result
+      value: result,
     };
   } catch (error) {
     return {
       isValid: false,
-      error
+      error,
     };
   }
 }
 
-const tabConfigs = {
+const tabConfigs = (projectId: string) => ({
   outcomes: {
     backText: '返回 學習成果',
-    backPath: '/manage/project/outcomes',
+    backPath: `/manage/project/outcomes?id=${projectId}`,
   },
   notes: {
     backText: '返回 便利貼',
-    backPath: '/manage/project/notes',
+    backPath: `/manage/project/notes?id=${projectId}`,
   },
   review: {
     backText: '返回 覆盤',
-    backPath: '/manage/project/review',
+    backPath: `/manage/project/review?id=${projectId}`,
   },
-};
+});
 
 interface ProjectLayoutContentProps {
   children: React.ReactNode;
-  activeTabType?: keyof typeof tabConfigs;
+  activeTabType?: keyof ReturnType<typeof tabConfigs>;
 }
 
 function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
@@ -55,7 +57,10 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const projectId = searchParams.get('id');
-  const activeTab = activeTabType ? tabConfigs[activeTabType] : undefined;
+  const activeTab =
+    activeTabType && projectId
+      ? tabConfigs(projectId)[activeTabType]
+      : undefined;
   const activeTabPath = activeTab?.backPath ?? pathname;
   const backPath = activeTab?.backPath ?? '/manage/projects';
   const backText = activeTab?.backText ?? '返回 學習計畫';
@@ -106,32 +111,34 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
                 學習里程碑
               </Sidebar.Link>
               <Sidebar.Link
-                href="/manage/project/outcomes"
-                isActive={activeTabPath === '/manage/project/outcomes'}
+                href={`/manage/project/outcomes?id=${projectId}`}
+                isActive={activeTabPath.startsWith('/manage/project/outcomes')}
               >
                 學習成果
               </Sidebar.Link>
               <Sidebar.Link
-                href="/manage/project/notes"
-                isActive={activeTabPath === '/manage/project/notes'}
+                href={`/manage/project/notes?id=${projectId}`}
+                isActive={activeTabPath.startsWith('/manage/project/notes')}
               >
                 便利貼
               </Sidebar.Link>
               <Sidebar.Link
-                href="/manage/project/review"
-                isActive={activeTabPath === '/manage/project/review'}
+                href={`/manage/project/review?id=${projectId}`}
+                isActive={activeTabPath.startsWith('/manage/project/review')}
               >
                 覆盤
               </Sidebar.Link>
             </Sidebar>
-            <div className="basis-full max-w-full lg:flex-1">
+            <div className="basis-full max-w-full lg:flex-1 lg:max-w-[min(760px,100%-360px)]">
               <header className="mb-6">
                 <div className="mb-3 flex flex-col lg:flex-row justify-between lg:items-center gap-y-3">
                   <h1 className="heading-md text-basic-500">
-                    { project?.title || '學習計畫主題名稱' }
+                    {project?.title || '學習計畫主題名稱'}
                   </h1>
                   <div className="flex items-center justify-between lg:justify-end gap-2 text-basic-300">
-                    <time>2025/01/26</time>
+                    <time>
+                      {dayjs(project?.createdAt).format('YYYY/MM/DD')}
+                    </time>
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-0.5">
                         <AiOutlineEye />
@@ -145,9 +152,12 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
                         <GoBookmark />
                         <span>2</span>
                       </div>
-                      <Button className="p-0">
-                        <AiOutlineMore />
-                      </Button>
+                      <Button
+                        className="-m-1 p-1"
+                        size="sm"
+                        prefixIcon="AiOutlineMore"
+                        onClick={() => toast.error('功能尚未開放')}
+                      />
                     </div>
                   </div>
                 </div>
@@ -155,7 +165,7 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
                   <div className="rounded-full overflow-hidden *:!block">
                     <Image src="" alt="" width="40px" height="40px" />
                   </div>
-                  <div className="text-basic-400">用戶Ａ</div>
+                  <div className="text-basic-400">{project?.user?.name}</div>
                   <div className="px-2.5 py-0.5 text-basic-500 bg-basic-100 rounded">
                     學生
                   </div>
@@ -175,7 +185,7 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
 
 export default function getProjectLayout(
   page: React.ReactElement,
-  activeTabType?: keyof typeof tabConfigs,
+  activeTabType?: keyof ReturnType<typeof tabConfigs>
 ) {
   return getDefaultLayout(
     <ProjectProvider>

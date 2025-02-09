@@ -63,3 +63,11 @@ export const OUTCOME_MAP: OutcomeMap[] = [
   { label: '參與競賽', value: 'participating_in_competitions' },
   { label: '其他', value: 'others' }
 ];
+
+export const EMOJI_OPTIONS = [
+  { value: 'happy', label: '開心', emoji: '😊' },
+  { value: 'calm', label: '平靜', emoji: '😌' },
+  { value: 'anxious', label: '焦慮', emoji: '😟' },
+  { value: 'tired', label: '疲憊', emoji: '😫' },
+  { value: 'frustrated', label: '沮喪', emoji: '😤' },
+];

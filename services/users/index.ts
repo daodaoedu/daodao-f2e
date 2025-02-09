@@ -1,7 +1,22 @@
 import { z } from 'zod';
-import generateService from '../serviceGenerator';
+import { fetcher, mutations } from '../httpClient';
 
-const userService = generateService('users');
+export const usersEndpoint = '/users';
+
+interface GetUserEndpointOptions {
+  isMe?: boolean;
+  id?: string;
+}
+
+export const getUserEndpoint = ({ isMe, id }: GetUserEndpointOptions = {}) => {
+  if (isMe) {
+    return `${usersEndpoint}/me`;
+  }
+  if (id) {
+    return `${usersEndpoint}/${id}`;
+  }
+  return usersEndpoint;
+};
 
 export interface IUser {
   _id: string;
@@ -33,7 +48,9 @@ export interface IUser {
 }
 
 export const getUserMe = async () => {
-  const response = await userService.get<{ data: IUser | null }>('me');
+  const response = await fetcher<{ data: IUser | null }>([
+    getUserEndpoint({ isMe: true }),
+  ]);
   return response.data;
 };
 
@@ -49,7 +66,10 @@ export const createUserSchema = z.object({
 export type CreateUserRequest = z.infer<typeof createUserSchema>;
 
 export const createUser = (user: CreateUserRequest) => {
-  return userService.post<{ user: IUser; token: string }>('', user);
+  return mutations.post<{ user: IUser; token: string }>(
+    getUserEndpoint(),
+    user
+  );
 };
 
 export const updateUserSchema = z.object({
@@ -80,6 +100,9 @@ export const updateUserSchema = z.object({
 export type UpdateUserRequest = z.infer<typeof updateUserSchema>;
 
 export const updateUser = async (user: UpdateUserRequest) => {
-  const response = await userService.put<{ data: IUser }>(user.id, user);
+  const response = await mutations.put<{ data: IUser }>(
+    getUserEndpoint({ id: user.id }),
+    user
+  );
   return response.data;
 };

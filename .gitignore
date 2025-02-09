@@ -41,5 +41,6 @@ yarn-error.log*
 /public/workbox-*.js
 /public/workbox-*.js.map
 
+.yarn
 .wrangler
 certificates
