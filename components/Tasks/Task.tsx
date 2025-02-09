@@ -1,27 +1,28 @@
 import { useState } from 'react';
 import { FaCheck } from "react-icons/fa6";
-import dayjs from "dayjs";
 import { cn } from "@/utils/cn";
-import { useProject } from "@/contexts/Project";
 import { useMilestones } from '@/contexts/Milestones/index';
-import { Task as TaskType, DEFAULT_TASK } from "@/contexts/Milestones/type";
+import { Task as TaskType } from "@/contexts/Milestones/type";
 
 import toast from 'react-hot-toast';
 
 import { MdSend, MdClose, MdEdit, MdDelete } from "react-icons/md";
 
 interface TaskProps {
+  projectId : string;
+  milestoneId: number;
   task: TaskType;
 }
 const Task = ({
+  projectId,
+  milestoneId,
   task,
 }: TaskProps) => {
-  const { project } = useProject();
   const { dispatchTask, deleteTask } = useMilestones();
   const [isEditing, setIsEditing] = useState(false);
   const [newTask, setNewTask] = useState<TaskType>(task);
   const handleClickUpdate = async () => {
-    const success = await dispatchTask(project.id, newTask);
+    const success = await dispatchTask(projectId, milestoneId, newTask);
     if (success) {
       toast.success('任務更新成功');
       setIsEditing(false);
@@ -51,7 +52,7 @@ const Task = ({
     React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, checked } = event.target;
-    const success = await dispatchTask(project.id, {
+    const success = await dispatchTask(projectId, milestoneId, {
       ...newTask,
       [name]: checked
     });
@@ -68,7 +69,7 @@ const Task = ({
   };
 
   const handleClickDelete = async () => {
-    const success = await deleteTask(project.id, task);
+    const success = await deleteTask(projectId, milestoneId, task);
     if (success) {
       toast.success('任務刪除成功');
     } else {

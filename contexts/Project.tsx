@@ -8,6 +8,7 @@ interface ProjectContext {
   isFetching: boolean;
   isUpdating: boolean;
   fetchProject: (projectId: string) => void;
+  fetchMyProject: () => void;
   dispatchProject: (newData: Partial<Project>) => Promise<boolean>;
 }
 const ProjectContext = createContext<ProjectContext | null>(null);
@@ -25,6 +26,36 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
     try {
       const response = await fetch(`${BASE_URL}/projects/${projectId}`);
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const responseData: Project = await response.json();
+
+      if (!responseData) {
+        throw new Error('Invalid response structure');
+      }
+
+      const result = responseData;
+      setProject(result);
+    } catch (error) {
+      console.error('error fetching data', error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+  const fetchMyProject = async () => {
+    setIsFetching(true);
+    try {
+      const token = getTokenStorage().get();
+      if (!token ) return false;
+
+      const response = await fetch(`${BASE_URL}/projects/me`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -87,6 +118,7 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
         isUpdating,
         dispatchProject,
         fetchProject,
+        fetchMyProject
       }}
     >
       {children}

@@ -1,17 +1,16 @@
 import getProjectLayout from '@/layout/ProjectLayout';
 
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
 
 import { Skeleton, useMediaQuery } from "@mui/material";
 import { validateIdWithZod, Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
-import Milestone from '@/components/Milestones/Milestone';
-import Task from '@/components/Tasks/Task';
 
 import { ProtectedComponent } from '@/contexts/Auth';
 import { useProject } from '@/contexts/Project';
 import { MilestonesProvider, useMilestones } from '@/contexts/Milestones/index';
+import MilestoneItem from '@/components/Milestones/MilestoneItem';
 
 interface MilestonesContentProps {
   SEOData: {
@@ -76,31 +75,15 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
                   milestones.length && (
                     milestones
                       .sort((a, b) => a.week - b.week)
-                      .map((milestone) => {
-                        return (
-                          <div
-                            key={milestone.id}
-                            className="p-[10px] bg-basic-100 flex flex-col gap-2"
-                          >
-                            <Milestone
-                              milestone={milestone}
-                              isLgScreen={isLgScreen}
-                            />
-                            {
-                              milestone.Tasks?.length > 0 && (
-                                milestone.Tasks.map((task) => {
-                                  return (
-                                    <Task
-                                      key={task.id}
-                                      task={task}
-                                    />
-                                  );
-                                })
-                              )
-                            }
-                          </div>
-                        );
-                      })
+                      .map((milestone) => (
+                        <MilestoneItem
+                          key={milestone.id}
+                          milestone={milestone}
+                          isLgScreen={isLgScreen}
+                          projectId={projectId}
+                        />
+                      )
+                      )
                   )
                 }
               </div>
