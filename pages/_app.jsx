@@ -18,6 +18,7 @@ import Image from "@/shared/components/Image";
 import Modal from '@/shared/components/Modal';
 import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
+import { fetcher } from '@/services/httpClient';
 import { checkLoginValidity } from '@/redux/actions/user';
 import { getReminderStorage } from '@/utils/storage';
 import getDefaultLayout from '@/layout/DefaultLayout';
@@ -32,6 +33,7 @@ const persistor = persistStore(store);
 const swrConfig = {
   revalidateOnFocus: false,
   errorRetryCount: 0,
+  fetcher,
 };
 
 const ThemeComponentWrap = ({ pageProps, Component }) => {

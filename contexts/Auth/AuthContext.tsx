@@ -6,18 +6,18 @@ import {
   useMemo,
   useReducer,
   useRef,
-} from "react";
-import { useRouter, usePathname } from "next/navigation";
-import useSWR, { SWRConfig } from "swr";
-import { useDispatch } from "react-redux";
+} from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import useSWR, { SWRConfig } from 'swr';
+import { useDispatch } from 'react-redux';
 
-import { fetchUserByToken, userLogout } from "@/redux/actions/user";
-import { HttpError } from "@/services/serviceGenerator";
+import { fetchUserByToken, userLogout } from '@/redux/actions/user';
+import { HttpError } from '@/services/httpClient';
 import {
   getRedirectionStorage,
   getReminderStorage,
   getTokenStorage,
-} from "@/utils/storage";
+} from '@/utils/storage';
 import {
   createUser,
   createUserSchema,
@@ -25,18 +25,18 @@ import {
   IUser,
   updateUser,
   updateUserSchema,
-} from "@/services/users";
+} from '@/services/users';
 
-import LoginModal from "./LoginModal";
+import LoginModal from './LoginModal';
 import {
   AuthState,
   AuthDispatch,
   Action,
   ActionTypes,
   LoginStatus,
-} from "./type";
+} from './type';
 
-const LOGIN_TYPE = "login-type";
+const LOGIN_TYPE = 'login-type';
 
 const initialState: AuthState = {
   isComplete: false,
@@ -46,7 +46,7 @@ const initialState: AuthState = {
   loginStatus: LoginStatus.EMPTY,
   token: null,
   user: null,
-  redirectUrl: "",
+  redirectUrl: '',
 };
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -55,7 +55,7 @@ const AuthDispatchContext = createContext<AuthDispatch | null>(null);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
@@ -63,27 +63,27 @@ export const useAuth = () => {
 export const useAuthDispatch = () => {
   const context = useContext(AuthDispatchContext);
   if (!context) {
-    throw new Error("useAuthDispatch must be used within an AuthProvider");
+    throw new Error('useAuthDispatch must be used within an AuthProvider');
   }
   return context;
 };
 
-const checkIsComplete = (data: AuthState["user"]) => {
+const checkIsComplete = (data: AuthState['user']) => {
   if (!data) return false;
 
-  const hasAnySocialCode = Object.values(data.contactList || "{}").some(
+  const hasAnySocialCode = Object.values(data.contactList || '{}').some(
     (socialCode) => Boolean(socialCode)
   );
   if (!hasAnySocialCode) return false;
 
   const keys = [
-    "name",
-    "birthDay",
-    "gender",
-    "roleList",
-    "wantToDoList",
-    "tagList",
-    "selfIntroduction",
+    'name',
+    'birthDay',
+    'gender',
+    'roleList',
+    'wantToDoList',
+    'tagList',
+    'selfIntroduction',
   ] as const;
 
   return keys.every((key) =>
@@ -97,14 +97,14 @@ const authReducer = (state: AuthState, action: Action): AuthState => {
       return {
         ...initialState,
         isOpenLoginModal: true,
-        redirectUrl: action.payload || "",
+        redirectUrl: action.payload || '',
       };
     }
     case ActionTypes.CLOSE_LOGIN_MODAL: {
       return {
         ...state,
         isOpenLoginModal: false,
-        redirectUrl: "",
+        redirectUrl: '',
       };
     }
     case ActionTypes.SET_TOKEN: {
@@ -202,7 +202,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       },
       openLoginModal: (payload) => {
         logout();
-        if (typeof payload === "string") {
+        if (typeof payload === 'string') {
           getRedirectionStorage().set(payload);
         }
         dispatch({ type: ActionTypes.OPEN_LOGIN_MODAL, payload });
@@ -219,14 +219,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   };
 
-  useSWR(
-    state.token ? [getUserMe.name, state.token] : null,
-    getUserMe,
-    {
-      onSuccess: authDispatch.login,
-      onError: handleError,
-    }
-  );
+  useSWR(state.token ? [getUserMe.name, state.token] : null, getUserMe, {
+    onSuccess: authDispatch.login,
+    onError: handleError,
+  });
 
   useEffect(() => {
     const handleToken = (token?: string) => {
@@ -248,7 +244,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       }
     };
     const removeLoginListener = () => {
-      window.removeEventListener("message", receiveMessage, false);
+      window.removeEventListener('message', receiveMessage, false);
     };
 
     handleToken(getTokenStorage().get());
@@ -256,7 +252,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (state.loginStatus === LoginStatus.PERMANENT) {
       removeLoginListener();
     } else {
-      window.addEventListener("message", receiveMessage, false);
+      window.addEventListener('message', receiveMessage, false);
     }
 
     return removeLoginListener;
@@ -273,14 +269,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
         const redirectUrl = state.redirectUrl || getRedirectionStorage().get();
         getReminderStorage().remove();
         authDispatch.closeLoginModal();
-        router.replace(redirectUrl || "/signin");
+        router.replace(redirectUrl || '/signin');
         break;
       }
       case LoginStatus.PERMANENT: {
         const redirectUrl = state.redirectUrl || getRedirectionStorage().get();
         const reminder = getReminderStorage().get();
         getReminderStorage().set(
-          typeof reminder === "number" ? reminder + 1 : 1
+          typeof reminder === 'number' ? reminder + 1 : 1
         );
         authDispatch.closeLoginModal();
         if (redirectUrl) router.replace(redirectUrl);
@@ -300,7 +296,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     const redirectionStorage = getRedirectionStorage();
     const redirection = redirectionStorage.get();
 
-    if (redirection?.split("?")[0] === pathname) {
+    if (redirection?.split('?')[0] === pathname) {
       redirectionStorage.remove();
     }
   }, [pathname]);
@@ -308,7 +304,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
   return (
     <AuthContext.Provider value={state}>
       <AuthDispatchContext.Provider value={authDispatch}>
-        <SWRConfig value={{ onError: handleError }}>{children}</SWRConfig>
+        <SWRConfig value={(props) => ({ ...props, onError: handleError })}>
+          {children}
+        </SWRConfig>
         <LoginModal
           isOpen={state.isOpenLoginModal}
           keepMounted={!state.isLoggedIn}
