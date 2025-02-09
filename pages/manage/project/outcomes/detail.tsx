@@ -50,7 +50,7 @@ const OutcomeDetailPage = () => {
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
       />
 
-      {outcome && outcomeId && (
+      {outcome && (
         <EditModal
           id={outcomeId}
           projectId={projectId}
@@ -65,7 +65,7 @@ const OutcomeDetailPage = () => {
         />
       )}
 
-      {outcome && outcomeId && (
+      {outcome && (
         <ConfirmModal
           title="確認刪除成果"
           confirmText="確認刪除"

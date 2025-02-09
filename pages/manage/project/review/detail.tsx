@@ -50,7 +50,7 @@ const ReviewPage = () => {
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
       />
 
-      {review && reviewId && (
+      {review && (
         <UpdateModal
           projectId={projectId}
           projectTitle={project?.title}
@@ -65,7 +65,7 @@ const ReviewPage = () => {
         />
       )}
 
-      {review && reviewId && (
+      {review && (
         <ConfirmModal
           title="確認刪除覆盤"
           confirmText="確認刪除"

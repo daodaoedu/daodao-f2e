@@ -28,11 +28,11 @@ const NoteDetailPage = () => {
     projectId,
     noteId,
     onUpdated: () => {
-      toast.success('覆盤更新成功');
+      toast.success('便利貼更新成功');
       setModalType(null);
     },
     onDeleted: () => {
-      toast.success('覆盤刪除成功');
+      toast.success('便利貼刪除成功');
       router.replace(`/manage/project/notes?id=${projectId}`);
     },
   });
@@ -49,7 +49,7 @@ const NoteDetailPage = () => {
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
       />
 
-      {note && noteId && (
+      {note && (
         <EditModal
           id={noteId}
           projectId={projectId}
@@ -64,9 +64,9 @@ const NoteDetailPage = () => {
         />
       )}
 
-      {note && noteId && (
+      {note && (
         <ConfirmModal
-          title="確認刪除覆盤"
+          title="確認刪除便利貼"
           confirmText="確認刪除"
           confirmColor="alert"
           isOpen={modalType === ModalTypeEnum.Delete}
