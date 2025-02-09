@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import Select from '@/components/Projects/Form/Select';
 import AccessDenied from '@/shared/components/AccessDenied';
@@ -8,6 +8,7 @@ import GoBackButton
 import { ProtectedComponent } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
+import { useProjectQuery } from '@/hooks/api/project';
 import More from '@/components/Projects/More';
 import Button from '@/shared/components/Button';
 import { cn } from '@/utils/cn';
@@ -15,8 +16,10 @@ import { cn } from '@/utils/cn';
 const Projects = () => {
   const maxProjects = 3;
   const router = useRouter();
-  const userState = useSelector((state) => state.user);
-  const projects = Array.isArray(userState.marathons) ? userState.marathons : [];
+  // const userState = useSelector((state) => state.user);
+  const { data } = useProjectQuery({ isMe: true });
+  // const projects = Array.isArray(userState.marathons) ? userState.marathons : [];
+  const projects = Array.isArray(data) ? data : [];
   const isEditPermitted = Boolean(projects.length);
   const isAddedDenied = projects.length >= maxProjects;
   const options = [
@@ -132,7 +135,7 @@ const Projects = () => {
                             <CircleIcon className="text-primary-base max-w-2 max-h-2" />
                             <span className="font-sans text-xs font-bold leading-[140%]">{project.isPublic ? '公開' : '不公開'}</span>
                           </p>
-                          <More projectId={project._id} />
+                          <More projectId={project.id} />
                         </div>
                       </div>
                     </div>
