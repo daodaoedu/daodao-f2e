@@ -1,29 +1,58 @@
+import dayjs from 'dayjs';
 import Image from '@/shared/components/Image';
 import PostCard from '@/shared/components/Post/PostCard';
+import { ProjectOutcomeSchema } from '@/services/project/outcomes';
+import numberToChineseNumber from '@/utils/numberToChineseNumber';
+import Button from '@/shared/components/Button';
 
 interface OutcomeCardProps {
+  data: ProjectOutcomeSchema;
   className?: string;
   detailLink?: string;
+  onEditClick?: () => void;
+  onDeleteClick?: () => void;
 }
 
-function OutcomeCard({ className, detailLink }: OutcomeCardProps) {
+function OutcomeCard({
+  data,
+  className,
+  detailLink,
+  onEditClick,
+  onDeleteClick,
+}: OutcomeCardProps) {
   return (
     <PostCard className={className}>
       <PostCard.Header
-        title="學習計畫一"
-        subtitle="第五週"
+        title={data.title}
+        subtitle={`第${numberToChineseNumber(data.week)}週`}
         tag="成果一"
-        date="2024/12/11"
-        viewCount={100}
-        isLocked={false}
+        date={dayjs(data.date).format('YYYY/MM/DD')}
+        dropdownItems={[
+          {
+            key: 'edit',
+            children: (
+              <Button size="sm" onClick={onEditClick}>
+                編輯
+              </Button>
+            ),
+          },
+          {
+            key: 'delete',
+            children: (
+              <Button size="sm" onClick={onDeleteClick}>
+                刪除
+              </Button>
+            ),
+          },
+        ]}
       />
       <div className="mb-3 body-sm text-basic-500">
-        <p className="mb-3">
-          因為對剪影片和當 Youtuber 有興趣，我預計會研究搞笑型 Youtuber
-          的影片腳本與剪輯方式、拍攝我日常生活及練習剪輯，並建立 Youtube
-          頻道上傳影片。希望能藉此了解如何當一位 Youtuber。
+        <p className="mb-3 whitespace-pre-wrap min-h-12 max-h-48 overflow-hidden">
+          {data.description}
         </p>
-        <Image src="" alt="" height="300px" />
+        {data.img_url && (
+          <Image src={data.img_url} alt={data.title} height="300px" />
+        )}
       </div>
       <PostCard.Footer detailLink={detailLink} />
     </PostCard>
