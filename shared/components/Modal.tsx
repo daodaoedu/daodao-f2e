@@ -82,7 +82,7 @@ function Modal({
       <Portal rootId={modalId}>
         <div
           className={cn(
-            'fixed inset-0 z-[9999] flex items-center justify-center',
+            'fixed inset-0 z-[99] flex items-center justify-center',
             'transition-opacity opacity-0 pointer-events-none ease-in duration-200',
             isInitialized && [
               isOpen

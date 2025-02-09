@@ -29,7 +29,7 @@ function Dropdown({ as, children }: DropdownProps) {
 
 interface DropdownToggleProps extends ButtonProps {
   className?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   withIcon?: boolean;
 }
 
