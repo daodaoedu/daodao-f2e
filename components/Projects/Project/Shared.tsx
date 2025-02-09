@@ -3,6 +3,7 @@ import { cn } from "@/utils/cn";
 import Button from "@/shared/components/Button";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { MOTIVATION_MAP, STRATEGY_MAP, OUTCOME_MAP } from "@/constants/project";
+import { FaCheck } from "react-icons/fa6";
 
 const idSchema = z.string().regex(/^[0-9a-fA-F]{24}$/);
 export const validateIdWithZod = (id: string) => {
@@ -45,6 +46,7 @@ export const Title = ({ title }: {
     </h3>
   );
 };
+
 export const Divider = () => {
   return (
     <hr className="my-5 border-basic-100" />
@@ -63,7 +65,7 @@ export const Tags = ({ category, tags }: {
   category: string | null;
   tags: string[];
 }) => {
-  let tagsMap: {label:string, value:string}[] = [];
+  let tagsMap: { label: string, value: string }[] = [];
   switch (category) {
     case "motivation_tags":
       tagsMap = MOTIVATION_MAP;
@@ -107,6 +109,32 @@ export const FakeInput = ({ value }: {
       rounded-lg font-sans"
     >
       {value}
+    </div>
+  );
+};
+
+export const FakeCheckBox = ({ isChecked, text }: {
+  isChecked: boolean | undefined,
+  text: string
+}) => {
+  return (
+    <div className="flex flex-row">
+      <div className="flex flex-row justify-center items-center gap-[5px] hover:cursor-pointer">
+        <p className={cn(
+          "w-[18px] h-[18px] p-[2px] rounded-[4px] m-[1px]",
+          "flex items-center justify-center border-2 border-solid",
+          isChecked ?
+            "bg-primary-base border-primary-base text-white"
+            :
+            "bg-white border-basic-400 text-basic-400"
+        )}
+        >
+          <FaCheck />
+        </p>
+        <p className="text-basic-500">
+          {text}
+        </p>
+      </div>
     </div>
   );
 };
