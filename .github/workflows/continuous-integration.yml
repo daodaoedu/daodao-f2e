@@ -6,10 +6,8 @@ concurrency:
 
 on:
   pull_request_target:
-    types: [opened, reopened, edited]
     branches:
       - "**"
-      - "!dependabot/**"
   workflow_dispatch:
 
 env:
@@ -38,8 +36,8 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
 
-  lint:
-    name: Lint
+  check:
+    name: TypeScript Check
     runs-on: ubuntu-latest
     needs: init
 
@@ -60,8 +58,51 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
 
-      - name: lint
+      - name: TypeScript Check
+        id: check
+        run: |
+          if ! yarn ts:check; then
+            ERROR_MSG=$(yarn ts:check 2>&1)
+            echo "check_error<<EOF" >> $GITHUB_OUTPUT
+            echo "$ERROR_MSG" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: Send TypeScript Error Notification
+        if: steps.check.outcome == 'failure'
+        uses: ./.github/actions/notification
+        with:
+          TYPE: failure
+          TITLE: "❌ TypeScript Error"
+          DESCRIPTION: "Branch: ${{ env.BRANCH_NAME }}\n\n${{ steps.check.outputs.check_error }}"
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+  lint:
+    name: ESLint Check
+    runs-on: ubuntu-latest
+    needs: init
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            ~/.cache/Cypress
+          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+      - name: ESLint Check
         id: lint
+        continue-on-error: true
         run: |
           if ! yarn lint; then
             ERROR_MSG=$(yarn lint 2>&1)
@@ -75,17 +116,23 @@ jobs:
           git add .
           git diff --cached --quiet || echo "changes=true" >> $GITHUB_OUTPUT
 
-      - name: Send Error Notification
-        if: steps.lint.conclusion == 'failure'
+      - name: Send ESLint Error Notification
+        if: steps.lint.outcome == 'failure'
         uses: ./.github/actions/notification
         with:
           TYPE: failure
           TITLE: "❌ Lint Failed"
           DESCRIPTION: "Branch: ${{ env.BRANCH_NAME }}\n\n${{ steps.lint.outputs.lint_error }}"
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      
+      - name: Check on failure
+        if: steps.lint.outcome == 'failure'
+        run: |
+          echo "Lint failed"
+          exit 1
 
       - name: Commit lint Changes
-        if: steps.lint.conclusion == 'success' && steps.lint.outputs.changes == 'true'
+        if: steps.lint.outcome == 'success' && steps.lint.outputs.changes == 'true'
         run: |
           git commit -m "chore: format code"
           git push

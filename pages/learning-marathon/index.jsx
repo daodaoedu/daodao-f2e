@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
@@ -20,6 +20,8 @@ import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import Banner from '@/components/Banner';
 import { logEvent } from '@/utils/analytics';
+import ApplyClosePopup from '@/components/Marathon/ApplyClosePopup';
+import config from '@/constants/config';
 
 const StyledBannerButton = styled(Button)`
   &.MuiButton-root {
@@ -261,6 +263,7 @@ const List = ({ className, children }) => (
 const LearningMarathon = () => {
   const { openLoginModal } = useAuthDispatch();
   const { isLoggedIn, isTemporary } = useAuth();
+  const popupRef = useRef(null);
   const router = useRouter();
   const SEOData = useMemo(
     () => ({
@@ -295,6 +298,13 @@ const LearningMarathon = () => {
   );
 
   const handleClickSignupButton = () => {
+    if (!config.isMarathonApplyEnabled) {
+      popupRef.current.showPopup();
+      return;
+    } else {
+      popupRef.current.hidePopup();
+    }
+
     logEvent('Learning Marathon', 'Signup Button Clicked', {
       user_logged_in: isLoggedIn,
       user_temporary: isTemporary
@@ -502,8 +512,12 @@ const LearningMarathon = () => {
           青醒人共生文化智庫<br />
           財團法人開放文化基金會
         </p>
-        <p>
+        <p className="mb-5">
           以上計畫細則主辦單位保留最終修改權利。
+        </p>
+        <p>
+          群島共創有限公司<br />
+          統一編號：00134721
         </p>
       </Section>
 
@@ -514,6 +528,9 @@ const LearningMarathon = () => {
           立即申請
         </StyledSignUpButton>
       </Section>
+      <ApplyClosePopup
+        ref={popupRef}
+      />
     </>
   );
 };

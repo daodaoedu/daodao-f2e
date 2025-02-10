@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { EDUCATION, ROLE } from '@/constants/member';
 import toast from 'react-hot-toast';
@@ -21,6 +21,7 @@ import { useAuthDispatch } from '@/contexts/Auth';
 import { AREA_DELIMITER, AREAS } from '@/constants/areas';
 import { mapToTable } from '@/utils/helper';
 
+import config from '@/constants/config';
 import {
   StyledSection,
   StyledButtonGroup,
@@ -28,6 +29,7 @@ import {
   StyledGroup
 } from './Edit.styled';
 import MilestoneGroup from './MilestoneGroup';
+import ApplyClosePopup from '../ApplyClosePopup';
 
 const AREAS_TABLE = mapToTable(AREAS);
 
@@ -229,6 +231,7 @@ export default function ConfirmForm({
     education: "",
     avatar: ""
   });
+  const popupRef = useRef(null);
 
   const onPrevStep = () => {
     setCurrentStep(currentStep - 1);
@@ -273,6 +276,12 @@ export default function ConfirmForm({
     }
   }, [userState, openLoginModal]);
   const onSubmit = async () => {
+    if (!config.isMarathonApplyEnabled) {
+      popupRef.current.showPopup();
+      return;
+    } else {
+      popupRef.current.hidePopup();
+    }
     if (!marathonState) {
       console.error('no data to submit');
       return;
@@ -522,6 +531,9 @@ export default function ConfirmForm({
           {marathonState._id ? '更新報名資料' : '提交申請'}
         </StyledButton>
       </StyledButtonGroup>
+      <ApplyClosePopup
+        ref={popupRef}
+      />
     </>
   );
 }
