@@ -149,9 +149,9 @@ const TaskCreate = ({
                 "w-6 h-6 rounded-sm",
                 "flex items-center justify-center",
                 "bg-basic-200 text-basic-300 hover:bg-primary-base hover:text-white"
-              )}            
+              )}
             >
-              <MdClose/>
+              <MdClose />
             </button>
             <button
               type="button"
@@ -161,7 +161,7 @@ const TaskCreate = ({
                 "w-6 h-6 rounded-sm",
                 "flex items-center justify-center",
                 "bg-basic-200 text-basic-300 hover:bg-primary-base hover:text-white"
-              )}            
+              )}
             >
               <MdSend />
             </button>
