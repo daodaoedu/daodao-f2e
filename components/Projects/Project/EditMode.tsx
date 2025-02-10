@@ -186,7 +186,7 @@ const EditMode = ({
           {
             project?.resourceName?.length && (
               project.resourceName.map((name, index) => {
-                const resourceId = `${name}-${Date.now()}-${index}`;
+                const resourceId = crypto.randomUUID();
                 return (
                   <InputField.Input
                     key={resourceId}

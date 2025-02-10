@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import Select from '@/components/Projects/Form/Select';
 import AccessDenied from '@/shared/components/AccessDenied';
@@ -14,79 +15,8 @@ import { cn } from '@/utils/cn';
 const Projects = () => {
   const maxProjects = 3;
   const router = useRouter();
-  const projects = [
-    {
-      id: "1179b1b0-48ac-480f-ae5f-4297d80aad97",
-      userId: 2,
-      imgUrl: "https://example.com/image.jpg",
-      title: "學習 React 和 Node.js 全端開發",
-      description: "透過實作專案來學習現代網頁開發技術",
-      motivation: [
-        "interest_and_passion",
-        "career_development",
-        "self_challenge"
-      ],
-      motivationDescription: "希望能夠成為全端工程師，並且製作有意義的專案",
-      goal: "完成一個完整的全端專案",
-      content: "將學習 React、Node.js、Express、PostgreSQL 等技術，並實作一個社群平台",
-      strategy: [
-        "watching_videos",
-        "doing_projects",
-        "joining_communities"
-      ],
-      strategyDescription: "結合線上課程和實作專案的方式學習",
-      resourceName: [
-        "Udemy React 課程",
-        "Node.js 官方文檔",
-        "PostgreSQL 教學"
-      ],
-      resourceUrl: [
-        "https://udemy.com/course/react",
-        "https://nodejs.org/docs",
-        "https://postgresql.org/docs"
-      ],
-      outcome: [
-        "building_websites",
-        "managing_social_media"
-      ],
-      outcomeDescription: "預期能夠獨立開發和部署全端應用",
-      isPublic: true,
-      status: "Not Started",
-      startDate: "2024-03-20",
-      endDate: "2024-06-20",
-      interval: 12,
-      createdAt: "2025-02-05T15:23:51.132Z",
-      updatedAt: "2025-02-05T15:23:51.132Z",
-      version: 1,
-      user: {
-        id: 2,
-        name: "小許",
-        _id: "ef7a58e5-b39f-4cc1-980b-d77eb0e02648"
-      },
-      milestones: [
-        {
-          id: 312,
-          week: 1,
-          name: "React",
-          description: "學習 React 核心概念",
-          startDate: "2024-03-20",
-          endDate: "2024-03-27",
-          isCompleted: false,
-          tasks: []
-        },
-        {
-          id: 313,
-          week: 2,
-          name: "Node.js 基礎",
-          description: "學習 Node.js 和 Express",
-          startDate: "2024-03-28",
-          endDate: "2024-04-04",
-          isCompleted: false,
-          tasks: []
-        }
-      ]
-    }
-  ];
+  const userState = useSelector((state) => state.user);
+  const projects = Array.isArray(userState.marathons) ? userState.marathons : [];
   const isEditPermitted = Boolean(projects.length);
   const isAddedDenied = projects.length >= maxProjects;
   const options = [

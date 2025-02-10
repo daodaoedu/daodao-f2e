@@ -1,26 +1,23 @@
 import { useState } from 'react';
 import { MdClose, MdSend, MdCalendarToday, MdKeyboardArrowDown } from 'react-icons/md';
 import { useMilestones } from '@/contexts/Milestones/index';
+import { cn } from "@/utils/cn";
+
+const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const dayMap: { [key: string]: string } = {
-  週一: 'Monday',
-  週二: 'Tuesday',
-  週三: 'Wednesday',
-  週四: 'Thursday',
-  週五: 'Friday',
-  週六: 'Saturday',
-  週日: 'Sunday'
+  Monday: '週一',
+  Tuesday: '週二',
+  Wednesday: '週三',
+  Thursday: '週四',
+  Friday: '週五',
+  Saturday: '週六',
+  Sunday: '週日'
 };
-
-const ZH_WEEK_DAY_MAP = ['週一', '週二', '週三', '週四', '週五', '週六', '週日'];
-
-function weekdayToISO(zhDay: string): string {
-  return dayMap[zhDay];
-}
 
 interface CreateProps {
   index: number;
-  projectId : string;
+  projectId: string;
   milestoneId: number;
   onCancel: () => void;
 }
@@ -44,7 +41,7 @@ const TaskCreate = ({
     days_of_week: [],
     is_completed: false,
   });
-  const { createTask } = useMilestones();
+  const { createTask, fetchMilestones } = useMilestones();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,6 +56,7 @@ const TaskCreate = ({
 
   const handleSubmit = () => {
     createTask(projectId, milestoneId, newTask);
+    fetchMilestones(projectId);
     onCancel();
   };
 
@@ -72,90 +70,103 @@ const TaskCreate = ({
   };
 
   return (
-    <div className="flex items-center justify-start gap-2.5 w-full p-3 rounded-lg border border-gray-custom bg-white focus-within:border-primary focus-within:p-3 max-md:grid max-md:grid-areas-[content_buttons;date_date] max-md:grid-cols-[1fr_auto]">
-      <div className="flex-grow flex items-center gap-2.5 grid-area-[content]">
-        <span className="text-sm text-text-primary w-5 text-center shrink-0">
-          {`${index + 1}.`}
-        </span>
-        <input
-          type="text"
-          placeholder="任務名稱"
-          onChange={handleChangeName}
-          value={newTask.name}
-          className="w-full p-0 text-sm border-none focus:ring-0 placeholder:text-gray-400"
-        />
-      </div>
+    <div className="ml-5 p-[10px] md:py-3 md:px-4 rounded-lg bg-white">
+      <div className="flex flex-row items-center justify-between">
+        <div className="w-full flex flex-col md:flex-row items-center  md:justify-between gap-1">
+          <div className="w-full flex justify-between">
+            <span className="text-sm text-text-primary w-5 text-center shrink-0">
+              {`${index + 1}.`}
+            </span>
+            <input
+              type="text"
+              placeholder="任務名稱"
+              onChange={handleChangeName}
+              value={newTask.name}
+              className={cn(
+                "font-sans text-sm text-basic-400",
+                "w-full rounded-md px-3 py-2 border border-solid border-basic-200"
+              )}
+            />
+          </div>
+          <div className="relative w-full mt-2 md:mt-0 md:ml-2 md:w-auto">
+            <div
+              role="button"
+              tabIndex={0}
+              className="flex items-center gap-2 text-sm text-text-secondary cursor-pointer"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  setIsDropdownOpen(!isDropdownOpen);
+                }
+              }}
+            >
+              <MdCalendarToday className="w-4 h-4 text-[#92989A]" />
+              <div className="relative w-[150px]">
+                <div className="flex items-center justify-between">
+                  <span className="truncate">
+                    {newTask.days_of_week.length > 0
+                      ? newTask.days_of_week
+                        .map((enDay) => dayMap[enDay])
+                        .join('、')
+                      : '選擇日期'}
+                  </span>
+                  <MdKeyboardArrowDown className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </div>
 
-      <div className="grid-area-[date] relative">
-        <div
-          role="button"
-          tabIndex={0}
-          className="flex items-center gap-2 text-sm text-text-secondary cursor-pointer"
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              setIsDropdownOpen(!isDropdownOpen);
-            }
-          }}
-        >
-          <MdCalendarToday className="w-4 h-4 text-[#92989A]" />
-          <div className="relative w-[150px]">
-            <div className="flex items-center justify-between">
-              <span className="truncate">
-                {newTask.days_of_week.length > 0
-                  ? newTask.days_of_week
-                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    .map((isoDay) => Object.entries(dayMap).find(([_zhDay, iso]) => iso === isoDay)?.[0])
-                    .join('、')
-                  : '選擇日期'}
-              </span>
-              <MdKeyboardArrowDown className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-            </div>
-
-            {isDropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-10 max-h-40 overflow-y-auto">
-                {ZH_WEEK_DAY_MAP.map((zhDay) => (
-                  <div
-                    role="option"
-                    tabIndex={0}
-                    key={zhDay}
-                    aria-selected={newTask.days_of_week.includes(weekdayToISO(zhDay))}
-                    onClick={() => handleDaySelect(weekdayToISO(zhDay))}
-                    onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleDaySelect(weekdayToISO(zhDay));
-                    }
-                  }}
-                    className={`p-2 mb-1 mx-1 rounded cursor-pointer ${
-                    newTask.days_of_week.includes(weekdayToISO(zhDay))
-                      ? 'bg-selected-bg text-text-primary'
-                      : 'bg-transparent hover:bg-gray-100'
-                  }`}
-                  >
-                    {zhDay}
+                {isDropdownOpen && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-10 max-h-40 overflow-y-auto">
+                    {WEEKDAYS.map((day) => (
+                      <div
+                        role="option"
+                        tabIndex={0}
+                        key={day}
+                        aria-selected={newTask.days_of_week.includes(day)}
+                        onClick={() => handleDaySelect(day)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            handleDaySelect(day);
+                          }
+                        }}
+                        className={`p-2 mb-1 mx-1 rounded cursor-pointer ${newTask.days_of_week.includes(day)
+                          ? 'bg-selected-bg text-text-primary'
+                          : 'bg-transparent hover:bg-gray-100'
+                          }`}
+                      >
+                        {dayMap[day]}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            )}
+            </div>
+          </div>
+          <div className="flex flex-row gap-1 ml-auto">
+            <button
+              type="button"
+              onClick={onCancel}
+              className={cn(
+                "shrink-0 font-sans text-lg",
+                "w-6 h-6 rounded-sm",
+                "flex items-center justify-center",
+                "bg-basic-200 text-basic-300 hover:bg-primary-base hover:text-white"
+              )}            
+            >
+              <MdClose/>
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className={cn(
+                "shrink-0 font-sans text-lg",
+                "w-6 h-6 rounded-sm",
+                "flex items-center justify-center",
+                "bg-basic-200 text-basic-300 hover:bg-primary-base hover:text-white"
+              )}            
+            >
+              <MdSend />
+            </button>
           </div>
         </div>
-      </div>
-
-      <div className="flex items-center gap-2.5 grid-area-[buttons]">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="w-6 h-6 bg-gray-custom hover:bg-secondary opacity-50 rounded flex items-center justify-center transition-colors"
-        >
-          <MdClose className="w-4.5 h-4.5" />
-        </button>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          className="w-6 h-6 bg-gray-custom hover:bg-secondary opacity-50 rounded flex items-center justify-center transition-colors"
-        >
-          <MdSend className="w-4.5 h-4.5" />
-        </button>
       </div>
     </div>
   );
