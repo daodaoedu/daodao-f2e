@@ -99,7 +99,7 @@ const Projects = () => {
                 projects.map((project) => {
                   return (
                     <div
-                      key={project._id}
+                      key={project.id}
                       className="
                       w-full md:w-1/3
                       rounded-[10px]

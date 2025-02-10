@@ -186,11 +186,12 @@ const EditMode = ({
           {
             project?.resourceName?.length && (
               project.resourceName.map((name, index) => {
+                const resourceId = crypto.randomUUID();
                 return (
                   <InputField.Input
-                    key={index} // TODOS: Use uuid to generate key
-                    id={`resource-${name}-${index}`}
-                    name={`resource-${name}-${index}`}
+                    key={resourceId}
+                    id={`resource-${resourceId}`}
+                    name={`resource-${resourceId}`}
                     onChange={(e) => handleChangeResourceName(e, index)}
                     value={name}
                     placeholder="範例：YouTube 創作者的實用資源"

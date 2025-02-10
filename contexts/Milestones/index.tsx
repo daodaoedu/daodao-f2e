@@ -12,9 +12,9 @@ interface MilestonesContext {
   isUpdating: boolean;
   fetchMilestones: (projectId: string) => void;
   dispatchMilestone: (projectId: string, newMilestone: Partial<Milestone>) => Promise<boolean>;
-  dispatchTask: (prjectId: string, newTask: Partial<Task>) => Promise<boolean>;
-  deleteTask: (prjectId: string, newTask: Partial<Task>) => Promise<boolean>;
-  createTask: (prjectId: string, newTask: Partial<Task>) => Promise<boolean>;
+  dispatchTask: (prjectId: string, milestoneId: number,newTask: Partial<Task>) => Promise<boolean>;
+  deleteTask: (prjectId: string, milestoneId: number,newTask: Partial<Task>) => Promise<boolean>;
+  createTask: (prjectId: string,milestoneId: number, newTask: Partial<Task>) => Promise<boolean>;
 }
 const ProjectContext = createContext<MilestonesContext | null>(null);
 
@@ -43,8 +43,10 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
 
       const result = responseData;
       setMilestones(result);
+      return result;
     } catch (error) {
       console.error('error fetching data', error);
+      return [];
     } finally {
       setIsFetching(false);
     }
@@ -90,20 +92,21 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
   };
 
   // create new task
-  // update single task
-  const createTask = async (projectId: string, newTask: Partial<Task>): Promise<boolean> => {
+  const createTask = async (projectId: string,milestoneId: number, newTask: Partial<Task>): Promise<boolean> => {
     setIsUpdateing(true);
     try {
       const token = getTokenStorage().get();
 
-      if (!token || !newTask?.id) return false;
 
-      const response = await fetch(`${BASE_URL}/projects/${projectId}/milestones/${newTask.milestone_id}/tasks`, {
+      if (!token) return false;
+
+      const response = await fetch(`${BASE_URL}/projects/${projectId}/milestones/${milestoneId}/tasks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({ ...newTask })
       });
 
       if (!response.ok) {
@@ -137,14 +140,14 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
   };
 
   // update single task
-  const dispatchTask = async (projectId: string, newTask: Partial<Task>): Promise<boolean> => {
+  const dispatchTask = async (projectId: string, milestoneId: number,newTask: Partial<Task>): Promise<boolean> => {
     setIsUpdateing(true);
     try {
       const token = getTokenStorage().get();
 
       if (!token || !newTask?.id) return false;
 
-      const response = await fetch(`${BASE_URL}/projects/${projectId}/milestones/${newTask.milestone_id}/tasks/${newTask.id}`, {
+      const response = await fetch(`${BASE_URL}/projects/${projectId}/milestones/${milestoneId}/tasks/${newTask.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -189,14 +192,14 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
   };
 
   // delete single task
-  const deleteTask = async (projectId: string, newTask: Partial<Task>): Promise<boolean> => {
+  const deleteTask = async (projectId: string, milestoneId: number,newTask: Partial<Task>): Promise<boolean> => {
     setIsUpdateing(true);
     try {
       const token = getTokenStorage().get();
 
       if (!token || !newTask?.id) return false;
 
-      const response = await fetch(`${BASE_URL}/projects/${projectId}/tasks/${newTask.id}`, {
+      const response = await fetch(`${BASE_URL}/projects/${projectId}/milestones/${milestoneId}/tasks/${newTask.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

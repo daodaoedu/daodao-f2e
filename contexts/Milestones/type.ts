@@ -1,23 +1,23 @@
 export interface Task {
-  id: string,
+  id: number,
   name: string,
   description: string,
   days_of_week: string[],
   is_completed: boolean,
-  milestone_id: string,
+  milestone_id: number,
 }
 
 export const DEFAULT_TASK: Task = {
-  id: "",
+  id: 0,
   name: "",
   description: "",
   days_of_week: [],
   is_completed: false,
-  milestone_id: ""
+  milestone_id: 0
 };
 
 export interface Milestone {
-  id: "",
+  id: number,
   project_id: "",
   week: number,
   name: string,
@@ -34,7 +34,7 @@ export interface Milestone {
 }
 
 export const DEFAULT_MILESTONE: Milestone = {
-  id: "",
+  id: 0,
   project_id: "",
   week: 1,
   name: "",
