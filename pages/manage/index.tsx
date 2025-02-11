@@ -10,11 +10,16 @@ import { GoArrowUpRight } from 'react-icons/go';
 import { PiCalendarBlankBold } from 'react-icons/pi';
 import getManageLayout from '@/layout/ManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
+import { useProjectReviewQuery } from '@/hooks/api/review';
+import { useProjectQuery } from '@/hooks/api/project';
 import SEOConfig from '@/shared/components/SEO';
 import Dropdown from '@/shared/components/Dropdown';
 import Button from '@/shared/components/Button';
 import Collapse from '@/shared/components/Collapse';
-// import ReviewCard from '@/components/Review/Card';
+import ReviewCard from '@/components/Review/Card';
+import MilestoneItem from '@/components/Milestones/MilestoneItem';
+import { MilestonesProvider } from '@/contexts/Milestones';
+import { ProjectProvider } from '@/contexts/Project';
 import { cn } from '@/utils/cn';
 import 'dayjs/locale/zh-tw';
 
@@ -31,7 +36,7 @@ const Header = () => {
         <Dropdown.List className="top-full left-0 -mt-1 z-20">
           <Dropdown.Item className="rounded-lg text-nowrap hover:bg-primary-lightest">
             <div className="p-2 text-basic-300 cursor-not-allowed">
-              新增啥？
+              學習計畫
             </div>
           </Dropdown.Item>
         </Dropdown.List>
@@ -164,14 +169,31 @@ const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
   );
 };
 
+const ReviewCardList = () => {
+  const { data } = useProjectReviewQuery();
+
+  return (
+    <ul>
+      {data?.map((review) => (
+        <li key={review.id}>
+          <ReviewCard
+            data={review}
+            detailLink="/manage/project/review/detail?id=1"
+          />
+        </li>
+      ))}
+    </ul>
+  );
+};
+
 const Manage = () => {
   const [date, setDate] = useState<Dayjs>(dayjs().startOf('day'));
   const pathname = usePathname();
+  const { data: projects } = useProjectQuery({ isMe: true });
+  const { data: reviews } = useProjectReviewQuery(projects?.[0]?.id);
 
-  // const MIN_DATE = dayjs(new Date('2025-02-09'));
-  // const MAX_DATE = dayjs(new Date('2025-07-12'));
-  const MIN_DATE = dayjs().startOf('day').subtract(5, 'day');
-  const MAX_DATE = dayjs().startOf('day').add(5, 'day');
+  const MIN_DATE = dayjs(new Date('2025-02-09'));
+  const MAX_DATE = dayjs(new Date('2025-07-12'));
 
   const SEOData = useMemo(
     () => ({
@@ -197,19 +219,48 @@ const Manage = () => {
         maxDate={MAX_DATE}
         minDate={MIN_DATE}
       />
-      <Project title="學習計畫名稱一" href="/manage#1" defaultOpen>
-        <div>第一週</div>
-        <div>第三週</div>
-      </Project>
-      <Project title="學習計畫名稱二" href="/manage#2">
-        <div>第一週</div>
-        <div>第三週</div>
-      </Project>
-      {/* <ReviewCard detailLink="/manage/project/review/detail?id=1" /> */}
+      <ul>
+        {Array.isArray(projects) &&
+          projects.map((project, index) => (
+            <li key={project.id}>
+              <Project
+                title={project.title}
+                href={`/manage/project?id=${project.id}`}
+                defaultOpen={index === 0}
+              >
+                {project?.milestones?.map((milestone) => (
+                  <MilestoneItem
+                    key={milestone.id}
+                    milestone={milestone}
+                    isLgScreen={false}
+                    projectId={project.id}
+                  />
+                ))}
+              </Project>
+            </li>
+          ))}
+      </ul>
+
+      <ul>
+        {Array.isArray(reviews) &&
+          reviews.map((review) => (
+            <li key={review.id}>
+              <ReviewCard
+                data={review}
+                detailLink="/manage/project/review/detail?id=1"
+              />
+            </li>
+          ))}
+      </ul>
     </LocalizationProvider>
   );
 };
 
-Manage.getLayout = getManageLayout;
+Manage.getLayout = (page: React.ReactElement) =>
+  getManageLayout(
+    <ProjectProvider>
+      <MilestonesProvider>{page}</MilestonesProvider>
+    </ProjectProvider>
+  );
 
 export default Manage;
