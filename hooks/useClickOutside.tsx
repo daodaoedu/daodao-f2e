@@ -16,7 +16,7 @@ export default function useClickOutside<T extends HTMLElement>({
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (
-        e.target instanceof HTMLElement &&
+        (e.target instanceof HTMLElement || e.target instanceof SVGElement) &&
         ref.current?.contains?.(e.target)
       ) {
         return;
