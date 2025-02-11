@@ -1,3 +1,5 @@
+import { Milestone } from "@/contexts/Milestones/type";
+
 interface User {
   id: string;
   name: string;
@@ -22,6 +24,7 @@ export interface Project {
   outcome: string[];
   outcomeDescription: string;
   user: User;
+  milestones: Milestone[];
 }
 
 export const DEFAULT_PROJECT: Project = {
@@ -46,4 +49,5 @@ export const DEFAULT_PROJECT: Project = {
     name: "",
     _id: "",
   },
+  milestones: [],
 };
