@@ -198,7 +198,13 @@ function MobileMenu() {
           {navType === NavType.Profile && (
             <ProfileMenu onClose={() => setIsOpenMenu(false)} />
           )}
-          <div className="fixed bottom-0 left-0 right-0 flex bg-basic-white">
+          <div
+            className={cn(
+              'fixed bottom-0 left-0 right-0 flex bg-basic-white',
+              'transition-opacity opacity-0 pointer-events-none',
+              isOpenMenu && 'opacity-100 pointer-events-auto'
+            )}
+          >
             {auth.isLoggedIn ? (
               <Button
                 className="flex-1 px-4 pb-6 text-left"
