@@ -188,7 +188,7 @@ const Sidebar = ({ onClickSignupButton }) => {
 const Nav = () => {
   const navItems = [
     { label: '活動詳情', href: '#', active: true },
-    { label: '活動公告', href: '/marathon-announcement', disabled: true },
+    { label: '活動公告', href: 'learning-marathon/announcements' },
     { label: '學習計畫分享區', href: '/marathon-sharing', disabled: true, external: true },
     { label: '成果發表', href: '#', disabled: true },
   ];

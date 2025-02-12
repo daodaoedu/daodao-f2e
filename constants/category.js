@@ -182,9 +182,8 @@ export const MARATHON_LINKS = [
     link: '/learning-marathon#marathon-intro',
   },
   {
-    name: '活動公告（未公開）',
-    link: '/marathon-announcement',
-    disabled: true,
+    name: '活動公告',
+    link: '/learning-marathon/announcements',
   },
   {
     name: '學習計畫分享區（未公開）',
