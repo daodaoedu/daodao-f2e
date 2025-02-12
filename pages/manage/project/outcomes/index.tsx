@@ -92,7 +92,7 @@ const OutcomesPage = () => {
         ))}
       </ul>
 
-      {project && project && (
+      {project && (
         <CreateModal
           isOpen={modalType === ModalTypeEnum.Edit}
           onClose={() => setModalType(null)}
