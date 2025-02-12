@@ -2,6 +2,12 @@ const isDev = process.env.NODE_ENV === 'development';
 
 const withPWA = require('next-pwa')({
   dest: 'public',
+  buildExcludes: [
+    /build-manifest\.json$/,
+    /react-loadable-manifest\.json$/,
+    /dynamic-css-manifest\.json$/,
+    /font-manifest\.json$/
+  ]
 });
 
 /** @type {import('next').NextConfig} */
