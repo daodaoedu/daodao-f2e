@@ -7,7 +7,7 @@ import Button from '@/shared/components/Button';
 import CreateModal from '@/components/Outcome/Modals/CreateModal';
 import UpdateModal from '@/components/Outcome/Modals/UpdateModal';
 import ConfirmModal from '@/shared/components/Confirm';
-import { useProjectQuery } from '@/hooks/api/project';
+import { useProjectMutation } from '@/hooks/api/project';
 import {
   useProjectOutcomeQuery,
   useProjectOutcomeMutation,
@@ -23,7 +23,7 @@ const OutcomesPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [outcomeId, setOutcomeId] = useState<number | undefined>(undefined);
-  const { data: project } = useProjectQuery({ projectId });
+  const { data: project } = useProjectMutation(projectId);
 
   const { data: detail, mutate } = useProjectOutcomeMutation({
     projectId,
@@ -104,7 +104,7 @@ const OutcomesPage = () => {
         />
       )}
 
-      {detail && outcomeId && (
+      {detail && outcomeId && project && (
         <UpdateModal
           key={outcomeId}
           id={outcomeId}
