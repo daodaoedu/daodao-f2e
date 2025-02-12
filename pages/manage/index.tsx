@@ -169,23 +169,6 @@ const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
   );
 };
 
-const ReviewCardList = () => {
-  const { data } = useProjectReviewQuery();
-
-  return (
-    <ul>
-      {data?.map((review) => (
-        <li key={review.id}>
-          <ReviewCard
-            data={review}
-            detailLink="/manage/project/review/detail?id=1"
-          />
-        </li>
-      ))}
-    </ul>
-  );
-};
-
 const Manage = () => {
   const [date, setDate] = useState<Dayjs>(dayjs().startOf('day'));
   const pathname = usePathname();
