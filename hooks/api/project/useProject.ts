@@ -10,7 +10,7 @@ import {
   UpdateProjectRequest,
 } from '@/services/project';
 
-export default function useProjectMutation(projectId?: string) {
+export default function useProject(projectId?: string) {
   const { mutate, ...swr } = useSWR<Project>(
     projectId ? getProjectEndpoint({ projectId }) : null
   );

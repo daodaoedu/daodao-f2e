@@ -4,23 +4,23 @@ import {
   ProjectNoteSchema,
 } from '@/services/project/notes';
 
-import useProjectNoteMutation from './useNoteMutation';
+import useProjectNote from './useProjectNote';
 
-interface UseProjectNoteQueryOptions {
+interface UseProjectNoteListOptions {
   onCreated?: () => void;
   onUpdated?: () => void;
   onDeleted?: () => void;
 }
 
-export default function useProjectNoteQuery(
+export default function useProjectNoteList(
   projectId?: string,
-  options?: UseProjectNoteQueryOptions
+  options?: UseProjectNoteListOptions
 ) {
   const swrKey = projectId ? getProjectNoteEndpoint({ projectId }) : null;
 
   const { mutate, ...swr } = useSWR<ProjectNoteSchema[]>(swrKey);
 
-  const mutations = useProjectNoteMutation({
+  const mutations = useProjectNote({
     mutateKey: swrKey,
     ...options,
   });

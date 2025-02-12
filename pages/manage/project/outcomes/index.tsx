@@ -7,11 +7,11 @@ import Button from '@/shared/components/Button';
 import CreateModal from '@/components/Outcome/Modals/CreateModal';
 import UpdateModal from '@/components/Outcome/Modals/UpdateModal';
 import ConfirmModal from '@/shared/components/Confirm';
-import { useProjectMutation } from '@/hooks/api/project';
 import {
-  useProjectOutcomeQuery,
-  useProjectOutcomeMutation,
-} from '@/hooks/api/outcome';
+  useProject,
+  useProjectOutcome,
+  useProjectOutcomeList,
+} from '@/hooks/api/project';
 
 enum ModalTypeEnum {
   Edit = 'edit',
@@ -23,9 +23,9 @@ const OutcomesPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [outcomeId, setOutcomeId] = useState<number | undefined>(undefined);
-  const { data: project } = useProjectMutation(projectId);
+  const { data: project } = useProject(projectId);
 
-  const { data: detail, mutate } = useProjectOutcomeMutation({
+  const { data: detail, mutate } = useProjectOutcome({
     projectId,
     outcomeId,
   });
@@ -35,7 +35,7 @@ const OutcomesPage = () => {
     create,
     update,
     remove,
-  } = useProjectOutcomeQuery(projectId, {
+  } = useProjectOutcomeList(projectId, {
     onCreated: () => {
       toast.success('新增學習成果成功');
       setModalType(null);

@@ -11,7 +11,7 @@ import {
   updateProjectReview,
 } from '@/services/project/reviews';
 
-interface UseProjectReviewMutationOptions {
+interface UseProjectReviewOptions {
   projectId?: string;
   reviewId?: number;
   mutateKey?: string | null;
@@ -20,14 +20,14 @@ interface UseProjectReviewMutationOptions {
   onDeleted?: () => void;
 }
 
-export default function useProjectReviewMutation({
+export default function useProjectReview({
   projectId,
   reviewId,
   mutateKey,
   onCreated,
   onUpdated,
   onDeleted,
-}: UseProjectReviewMutationOptions) {
+}: UseProjectReviewOptions) {
   const swrKey =
     projectId && reviewId
       ? getProjectReviewEndpoint({ projectId, reviewId })

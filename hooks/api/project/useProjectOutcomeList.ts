@@ -4,23 +4,23 @@ import {
   ProjectOutcomeSchema,
 } from '@/services/project/outcomes';
 
-import useProjectOutcomeMutation from './useOutcomeMutation';
+import useProjectOutcome from './useProjectOutcome';
 
-interface UseProjectOutcomeQueryOptions {
+interface UseProjectOutcomeListOptions {
   onCreated?: () => void;
   onUpdated?: () => void;
   onDeleted?: () => void;
 }
 
-export default function useProjectOutcomeQuery(
+export default function useProjectOutcomeList(
   projectId?: string,
-  options?: UseProjectOutcomeQueryOptions
+  options?: UseProjectOutcomeListOptions
 ) {
   const swrKey = projectId ? getProjectOutcomeEndpoint({ projectId }) : null;
 
   const { mutate, ...swr } = useSWR<ProjectOutcomeSchema[]>(swrKey);
 
-  const mutations = useProjectOutcomeMutation({
+  const mutations = useProjectOutcome({
     mutateKey: swrKey,
     ...options,
   });
