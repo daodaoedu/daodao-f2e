@@ -3,7 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import NoteDetail from '@/components/Note/Detail';
 import getProjectLayout from '@/layout/ProjectLayout';
-import { useProjectQuery } from '@/hooks/api/project';
+import { useProjectMutation } from '@/hooks/api/project';
 import { useProjectNoteMutation } from '@/hooks/api/note';
 import ConfirmModal from '@/shared/components/Confirm';
 import EditModal from '@/components/Note/Modals/UpdateModal';
@@ -19,7 +19,7 @@ const NoteDetailPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const noteId = parseInt(searchParams.get('noteId') ?? '0', 10);
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const { data: project } = useProjectQuery({ projectId });
+  const { data: project } = useProjectMutation(projectId);
   const {
     data: note,
     update,
@@ -49,11 +49,11 @@ const NoteDetailPage = () => {
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
       />
 
-      {note && (
+      {note && project && (
         <EditModal
           id={noteId}
           projectId={projectId}
-          projectTitle={project?.title}
+          projectTitle={project.title}
           defaultValues={note}
           week={note.week}
           createdAt={note.date}

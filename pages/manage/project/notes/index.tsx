@@ -7,7 +7,7 @@ import Button from '@/shared/components/Button';
 import CreateModal from '@/components/Note/Modals/CreateModal';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';
 import ConfirmModal from '@/shared/components/Confirm';
-import { useProjectQuery } from '@/hooks/api/project';
+import { useProjectMutation } from '@/hooks/api/project';
 import { useProjectNoteMutation, useProjectNoteQuery } from '@/hooks/api/note';
 
 enum ModalTypeEnum {
@@ -21,7 +21,7 @@ const NotesPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [noteId, setNoteId] = useState<number | undefined>(undefined);
-  const { data: project } = useProjectQuery({ projectId });
+  const { data: project } = useProjectMutation(projectId);
 
   const { data: detail, mutate } = useProjectNoteMutation({
     projectId,
@@ -102,7 +102,7 @@ const NotesPage = () => {
         />
       )}
 
-      {detail && noteId && (
+      {detail && noteId && project && (
         <UpdateModal
           key={noteId}
           id={noteId}

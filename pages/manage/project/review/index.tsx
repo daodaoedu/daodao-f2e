@@ -10,7 +10,7 @@ import {
   useProjectReviewMutation,
   useProjectReviewQuery,
 } from '@/hooks/api/review';
-import { useProjectQuery } from '@/hooks/api/project';
+import { useProjectMutation } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 
 enum ModalTypeEnum {
@@ -24,7 +24,7 @@ const ReviewPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [reviewId, setReviewId] = useState<number | undefined>(undefined);
-  const { data: project } = useProjectQuery({ projectId });
+  const { data: project } = useProjectMutation(projectId);
 
   const { data: detail, mutate } = useProjectReviewMutation({
     projectId,
@@ -111,10 +111,10 @@ const ReviewPage = () => {
         />
       )}
 
-      {detail && reviewId && (
+      {detail && reviewId && project && (
         <UpdateModal
           projectId={projectId}
-          projectTitle={project?.title}
+          projectTitle={project.title}
           reviewId={reviewId}
           defaultValues={detail}
           week={detail.week}

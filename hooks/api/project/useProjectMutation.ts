@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import useSWR from 'swr';
+import { Project } from '@/components/Projects/Project/type';
 import {
   createProject,
   CreateProjectRequest,
@@ -10,7 +11,7 @@ import {
 } from '@/services/project';
 
 export default function useProjectMutation(projectId?: string) {
-  const { mutate, ...swr } = useSWR(
+  const { mutate, ...swr } = useSWR<Project>(
     projectId ? getProjectEndpoint({ projectId }) : null
   );
 
