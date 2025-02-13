@@ -3,8 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import NoteDetail from '@/components/Note/Detail';
 import getProjectLayout from '@/layout/ProjectLayout';
-import { useProjectMutation } from '@/hooks/api/project';
-import { useProjectNoteMutation } from '@/hooks/api/note';
+import { useProject, useProjectNote } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 import EditModal from '@/components/Note/Modals/UpdateModal';
 
@@ -19,12 +18,12 @@ const NoteDetailPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const noteId = parseInt(searchParams.get('noteId') ?? '0', 10);
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const { data: project } = useProjectMutation(projectId);
+  const { data: project } = useProject(projectId);
   const {
     data: note,
     update,
     remove,
-  } = useProjectNoteMutation({
+  } = useProjectNote({
     projectId,
     noteId,
     onUpdated: () => {

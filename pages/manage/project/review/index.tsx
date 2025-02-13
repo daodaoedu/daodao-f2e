@@ -7,10 +7,10 @@ import ReviewCard from '@/components/Review/Card';
 import CreateModal from '@/components/Review/Modals/CreateModal';
 import UpdateModal from '@/components/Review/Modals/UpdateModal';
 import {
-  useProjectReviewMutation,
-  useProjectReviewQuery,
-} from '@/hooks/api/review';
-import { useProjectMutation } from '@/hooks/api/project';
+  useProject,
+  useProjectReview,
+  useProjectReviewList,
+} from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 
 enum ModalTypeEnum {
@@ -24,9 +24,9 @@ const ReviewPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [reviewId, setReviewId] = useState<number | undefined>(undefined);
-  const { data: project } = useProjectMutation(projectId);
+  const { data: project } = useProject(projectId);
 
-  const { data: detail, mutate } = useProjectReviewMutation({
+  const { data: detail, mutate } = useProjectReview({
     projectId,
     reviewId,
   });
@@ -36,7 +36,7 @@ const ReviewPage = () => {
     create,
     update,
     remove,
-  } = useProjectReviewQuery(projectId, {
+  } = useProjectReviewList(projectId, {
     onCreated: () => {
       toast.success('新增覆盤成功');
       setModalType(null);

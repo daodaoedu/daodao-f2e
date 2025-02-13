@@ -11,7 +11,7 @@ import {
   updateProjectNote,
 } from '@/services/project/notes';
 
-interface UseProjectNoteMutationOptions {
+interface UseProjectNoteOptions {
   projectId?: string;
   noteId?: number;
   mutateKey?: string | null;
@@ -20,25 +20,22 @@ interface UseProjectNoteMutationOptions {
   onDeleted?: () => void;
 }
 
-export default function useProjectNoteMutation({
+export default function useProjectNote({
   projectId,
   noteId,
   mutateKey,
   onCreated,
   onUpdated,
   onDeleted,
-}: UseProjectNoteMutationOptions) {
+}: UseProjectNoteOptions) {
   const swrKey =
-    projectId && noteId
-      ? getProjectNoteEndpoint({ projectId, noteId })
-      : null;
+    projectId && noteId ? getProjectNoteEndpoint({ projectId, noteId }) : null;
 
   const { data, ...swr } = useSWR<ProjectNoteSchema>(swrKey);
 
   const create = useSWRMutation(
     swrKey ?? mutateKey,
-    (url, { arg }: { arg: CreateProjectNoteRequest }) =>
-      createProjectNote(arg),
+    (url, { arg }: { arg: CreateProjectNoteRequest }) => createProjectNote(arg),
     {
       onSuccess: onCreated,
       onError: () => {
@@ -49,8 +46,7 @@ export default function useProjectNoteMutation({
 
   const update = useSWRMutation(
     swrKey ?? mutateKey,
-    (url, { arg }: { arg: UpdateProjectNoteRequest }) =>
-      updateProjectNote(arg),
+    (url, { arg }: { arg: UpdateProjectNoteRequest }) => updateProjectNote(arg),
     {
       onSuccess: onUpdated,
       onError: () => {

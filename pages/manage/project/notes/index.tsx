@@ -7,8 +7,11 @@ import Button from '@/shared/components/Button';
 import CreateModal from '@/components/Note/Modals/CreateModal';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';
 import ConfirmModal from '@/shared/components/Confirm';
-import { useProjectMutation } from '@/hooks/api/project';
-import { useProjectNoteMutation, useProjectNoteQuery } from '@/hooks/api/note';
+import {
+  useProject,
+  useProjectNote,
+  useProjectNoteList,
+} from '@/hooks/api/project';
 
 enum ModalTypeEnum {
   Create = 'create',
@@ -21,9 +24,9 @@ const NotesPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [noteId, setNoteId] = useState<number | undefined>(undefined);
-  const { data: project } = useProjectMutation(projectId);
+  const { data: project } = useProject(projectId);
 
-  const { data: detail, mutate } = useProjectNoteMutation({
+  const { data: detail, mutate } = useProjectNote({
     projectId,
     noteId,
   });
@@ -33,7 +36,7 @@ const NotesPage = () => {
     create,
     update,
     remove,
-  } = useProjectNoteQuery(projectId, {
+  } = useProjectNoteList(projectId, {
     onCreated: () => {
       toast.success('新增便利貼成功');
       setModalType(null);

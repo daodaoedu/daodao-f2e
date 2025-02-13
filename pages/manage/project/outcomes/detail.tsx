@@ -3,8 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import OutcomeDetail from '@/components/Outcome/Detail';
 import getProjectLayout from '@/layout/ProjectLayout';
-import { useProjectMutation } from '@/hooks/api/project';
-import { useProjectOutcomeMutation } from '@/hooks/api/outcome';
+import { useProject, useProjectOutcome } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 import EditModal from '@/components/Outcome/Modals/UpdateModal';
 
@@ -19,12 +18,12 @@ const OutcomeDetailPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const outcomeId = parseInt(searchParams.get('outcomeId') ?? '0', 10);
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const { data: project } = useProjectMutation(projectId);
+  const { data: project } = useProject(projectId);
   const {
     data: outcome,
     update,
     remove,
-  } = useProjectOutcomeMutation({
+  } = useProjectOutcome({
     projectId,
     outcomeId,
     onUpdated: () => {

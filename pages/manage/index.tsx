@@ -10,8 +10,7 @@ import { GoArrowUpRight } from 'react-icons/go';
 import { PiCalendarBlankBold } from 'react-icons/pi';
 import getManageLayout from '@/layout/ManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
-import { useProjectReviewQuery } from '@/hooks/api/review';
-import { useProjectQuery } from '@/hooks/api/project';
+import { useProjectReviewList, useProjectList } from '@/hooks/api/project';
 import SEOConfig from '@/shared/components/SEO';
 import Dropdown from '@/shared/components/Dropdown';
 import Button from '@/shared/components/Button';
@@ -172,8 +171,8 @@ const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
 const Manage = () => {
   const [date, setDate] = useState<Dayjs>(dayjs().startOf('day'));
   const pathname = usePathname();
-  const { data: projects } = useProjectQuery({ isMe: true });
-  const { data: reviews } = useProjectReviewQuery(projects?.[0]?.id);
+  const { data: projects } = useProjectList({ isMe: true });
+  const { data: reviews } = useProjectReviewList(projects?.[0]?.id);
 
   const MIN_DATE = dayjs(new Date('2025-02-09'));
   const MAX_DATE = dayjs(new Date('2025-07-12'));
