@@ -23,21 +23,21 @@ const projectReviewSchema = z.object({
   title: z.string(),
   week: z.number(),
   mood: z.string(),
-  mood_description: z.string(),
-  stress_level: z.number(),
-  learning_review: z.number(),
-  learning_feedback: z.string(),
-  adjustment_plan: z.string(),
-  created_at: z.string().datetime(),
-  updated_at: z.string().datetime(),
+  moodDescription: z.string(),
+  stressLevel: z.number(),
+  learningReview: z.number(),
+  learningFeedback: z.string(),
+  adjustmentPlan: z.string(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
 });
 
 export type ProjectReviewSchema = z.infer<typeof projectReviewSchema>;
 
 export const createProjectReviewSchema = projectReviewSchema.omit({
   id: true,
-  created_at: true,
-  updated_at: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export type CreateProjectReviewRequest = z.infer<
@@ -55,8 +55,8 @@ export const createProjectReview = ({
 };
 
 export const updateProjectReviewSchema = projectReviewSchema.omit({
-  created_at: true,
-  updated_at: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export type UpdateProjectReviewRequest = z.infer<

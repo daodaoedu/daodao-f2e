@@ -54,9 +54,9 @@ function ReviewForm({
       projectId,
       title: projectTitle,
       week,
-      mood_description: '',
-      learning_feedback: '',
-      adjustment_plan: '',
+      moodDescription: '',
+      learningFeedback: '',
+      adjustmentPlan: '',
       ...defaultValues,
     },
   });
@@ -94,7 +94,7 @@ function ReviewForm({
                     'w-full px-4 py-2 resize-none body-sm',
                     'border border-solid border-basic-200 rounded-lg'
                   )}
-                  {...methods.register('mood_description')}
+                  {...methods.register('moodDescription')}
                 />
               </div>
             </li>
@@ -103,7 +103,7 @@ function ReviewForm({
               <div className="-ml-6">
                 <RadioGroup
                   type="tenPoint"
-                  name="stress_level"
+                  name="stressLevel"
                   control={methods.control}
                 />
               </div>
@@ -115,18 +115,18 @@ function ReviewForm({
                 <div className="mb-4">
                   <RadioGroup
                     type="tenPoint"
-                    name="learning_review"
+                    name="learningReview"
                     control={methods.control}
                   />
                 </div>
                 <p className="mb-4">這段時間，我的收穫與困難...</p>
                 <textarea
-                  placeholder="例如: 有哪些收獲，包含學習、人際互動、身心狀況等，或是目前遇到的困難"
+                  placeholder="例如: 有哪些收獲，包含學習、人際互動、身心狀況等，或是目前遇到的困難"
                   className={cn(
                     'w-full h-24 px-4 py-3 resize-none body-sm',
                     'border border-solid border-basic-200 rounded-lg'
                   )}
-                  {...methods.register('learning_feedback')}
+                  {...methods.register('learningFeedback')}
                 />
               </div>
             </li>
@@ -140,7 +140,7 @@ function ReviewForm({
                     'w-full h-24 px-4 py-3 resize-none body-sm',
                     'border border-solid border-basic-200 rounded-lg'
                   )}
-                  {...methods.register('adjustment_plan')}
+                  {...methods.register('adjustmentPlan')}
                 />
               </div>
             </li>

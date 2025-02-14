@@ -122,7 +122,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
 
       const newMilestones = milestones.map((m) => {
         if (m.id === result.milestone_id) {
-          const newTasks = [...m.Tasks, result];
+          const newTasks = [...m.tasks, result];
           return { ...m, tasks: newTasks };
         } else {
           return m;
@@ -171,11 +171,11 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
       const result = responseData.task;
       const newMilestones = milestones.map((m) => {
         if (m.id === result.milestone_id) {
-          const newTasks = m.Tasks.map((t) => {
+          const newTasks = m.tasks.map((t) => {
             return t.id === result.id ? result : t;
           });
           console.log('newTask', newTasks);
-          return { ...m, Tasks: [...newTasks] };
+          return { ...m, tasks: [...newTasks] };
         } else {
           return m;
         }
@@ -221,7 +221,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
 
       const newMilestones = milestones.map((m) => {
         if (m.id === result.milestone_id) {
-          const newTasks = m.Tasks.filter((t) => {
+          const newTasks = m.tasks.filter((t) => {
             return t.id !== result.id;
           });
           console.log({ ...m, tasks: newTasks });

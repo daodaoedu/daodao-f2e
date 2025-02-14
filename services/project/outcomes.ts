@@ -24,7 +24,7 @@ const projectOutcomeSchema = z.object({
   week: z.number(),
   date: z.string().date(),
   description: z.string(),
-  img_url: z.string().nullable(),
+  imgUrl: z.string().nullable(),
 });
 
 export type ProjectOutcomeSchema = z.infer<typeof projectOutcomeSchema>;

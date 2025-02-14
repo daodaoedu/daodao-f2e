@@ -219,7 +219,7 @@ const Manage = () => {
 
   const currentReviews = useMemo(() => {
     if (!Array.isArray(reviews)) return [];
-    return reviews.filter((review) => date.isSame(review.created_at));
+    return reviews.filter((review) => date.isSame(review.createdAt));
   }, [reviews, date]);
 
   const SEOData = useMemo(

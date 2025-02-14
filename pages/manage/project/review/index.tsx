@@ -119,7 +119,7 @@ const ReviewPage = () => {
           reviewId={reviewId}
           defaultValues={detail}
           week={detail.week}
-          createdAt={detail.created_at}
+          createdAt={detail.createdAt}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
           onSubmit={update.trigger}

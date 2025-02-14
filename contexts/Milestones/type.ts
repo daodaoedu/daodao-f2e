@@ -32,7 +32,7 @@ export interface Milestone {
   updated_at: string,
   createdAt: string,
   updatedAt: string,
-  Tasks: Task[]
+  tasks: Task[]
 }
 
 export const DEFAULT_MILESTONE: Milestone = {
@@ -49,5 +49,5 @@ export const DEFAULT_MILESTONE: Milestone = {
   updated_at: "2025-02-04T15:17:35.846Z",
   createdAt: "2025-02-04T15:17:35.846Z",
   updatedAt: "2025-02-04T15:17:35.846Z",
-  Tasks: []
+  tasks: []
 };

@@ -26,7 +26,7 @@ function ReviewDetail({ data, onEditClick, onDeleteClick }: ReviewDetailProps) {
         title={data.title}
         subtitle={`第${numberToChineseNumber(data.week)}週`}
         tag="覆盤"
-        date={dayjs(data.created_at).format('YYYY/MM/DD')}
+        date={dayjs(data.createdAt).format('YYYY/MM/DD')}
         dropdownItems={[
           {
             key: 'edit',
@@ -54,7 +54,7 @@ function ReviewDetail({ data, onEditClick, onDeleteClick }: ReviewDetailProps) {
               <RadioGroup type="emoji" name="mood" value={data.mood} />
             </div>
             <p className="mb-2">其他</p>
-            <p>{data.mood_description}</p>
+            <p>{data.moodDescription}</p>
           </div>
         </li>
         <li className="mb-8">
@@ -63,7 +63,7 @@ function ReviewDetail({ data, onEditClick, onDeleteClick }: ReviewDetailProps) {
             <RadioGroup
               type="tenPoint"
               name="pressure"
-              value={data.stress_level}
+              value={data.stressLevel}
             />
           </div>
         </li>
@@ -75,18 +75,18 @@ function ReviewDetail({ data, onEditClick, onDeleteClick }: ReviewDetailProps) {
               <RadioGroup
                 type="tenPoint"
                 name="learning"
-                value={data.learning_review}
+                value={data.learningReview}
               />
             </div>
             <p className="mb-4">這段時間，我的收穫與困難...</p>
-            <p className="mb-4">{data.learning_feedback}</p>
+            <p className="mb-4">{data.learningFeedback}</p>
           </div>
         </li>
         <li className="mb-5">
           <h3 className="mb-4 heading-sm">調整與規劃：</h3>
           <div className="-ml-6 pb-5 border-b border-solid border-basic-100">
             <p className="mb-4">為了更好的學習狀態，我會...</p>
-            <p>{data.adjustment_plan}</p>
+            <p>{data.adjustmentPlan}</p>
           </div>
         </li>
       </ul>

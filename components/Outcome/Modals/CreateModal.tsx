@@ -39,7 +39,7 @@ function CreateModal({
       date: dayjs().format('YYYY-MM-DD'),
       week,
       description: '',
-      img_url: null,
+      imgUrl: null,
     },
   });
 

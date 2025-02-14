@@ -46,7 +46,7 @@ function UpdateModal({
       date: dayjs(createdAt).format('YYYY-MM-DD'),
       week,
       description: '',
-      img_url: null,
+      imgUrl: null,
       ...defaultValues,
     },
   });
