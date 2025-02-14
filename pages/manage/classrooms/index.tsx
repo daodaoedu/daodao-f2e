@@ -60,14 +60,8 @@ const Classrooms = () => {
         >
           返回 我的小島
         </Button>
-        <h1 className="mb-6 heading-md">我的教室</h1>
+        <h1 className="mb-6 heading-md">導師工作室</h1>
         <ul className="grid grid-cols-3 gap-4">
-          <li>
-            <ClassCard />
-          </li>
-          <li>
-            <ClassCard />
-          </li>
           <li>
             <ClassCard />
           </li>
