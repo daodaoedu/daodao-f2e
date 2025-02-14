@@ -37,9 +37,9 @@ const Projects = () => {
 
   return (
     <ProtectedComponent>
-      <div className="bg-[#F3FCFC] md:py-8">
-        <div className="w-full p-4 bg-[#F3FCFC]
-          md:w-[860px] mx-auto box-border flex flex-col gap-6"
+      <div className="bg-[#F3FCFC] md:py-8 min-h-screen-without-padding-top">
+        <div className="w-full p-4
+          md:max-w-[860px] mx-auto box-border flex flex-col gap-6"
         >
           <GoBackButton
             onClick={() => router.push({
