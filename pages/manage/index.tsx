@@ -8,6 +8,8 @@ import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
 import { CiCircleChevRight, CiCircleChevLeft } from 'react-icons/ci';
 import { GoArrowUpRight } from 'react-icons/go';
 import { PiCalendarBlankBold } from 'react-icons/pi';
+
+import config from '@/constants/config';
 import getManageLayout from '@/layout/ManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
 import { useProjectReviewList, useProjectList } from '@/hooks/api/project';
@@ -24,10 +26,35 @@ import 'dayjs/locale/zh-tw';
 
 dayjs.locale('zh-tw');
 
+const HEADER_TITLES = [
+  '今天的每一小步，都在建立你的學習動能！',
+  '每個挑戰都讓自己更強大！',
+  '你一定可以的 - 看看你已經走了多遠！',
+  '今日的努力，就是明日的能力！',
+  '用自己的步調學習，才能學得更持久',
+  '今天想精進哪一件小事呢？',
+  '保持好奇心，就能有新發現！',
+  '每次練習都在重塑你的腦力！',
+  '選擇自己的學習路徑，是你的超能力！',
+  '慶祝進步，而不只是完美！',
+  '準備好開始今天的學習冒險了嗎？',
+  '你的學習旅程是獨一無二的 - 好好把握！',
+  '小小的進步累積成大大的成就！',
+  '今天會發現關於自己的什麼新事物呢？',
+  '你的努力塑造你的能力！',
+  '學習是你的旅程 - 決定自己的步調！',
+  '每個面對的挑戰都使你更強大！',
+  '讓好奇心當你的指南針吧！',
+  '今日的練習，造就明日的專業！',
+  '你正在建立受用一生的能力！',
+];
+
 const Header = () => {
   return (
     <div className="mb-6 p-2 flex items-center justify-between">
-      <h2 className="heading-sm text-basic-500">星期一也認真的你真棒！</h2>
+      <h2 className="heading-sm text-basic-500">
+        {HEADER_TITLES[dayjs().get('hour') % HEADER_TITLES.length]}
+      </h2>
       <Dropdown>
         <Dropdown.Toggle variant="solid" className="mb-1" withIcon>
           新增
@@ -174,8 +201,26 @@ const Manage = () => {
   const { data: projects } = useProjectList({ isMe: true });
   const { data: reviews } = useProjectReviewList(projects?.[0]?.id);
 
-  const MIN_DATE = dayjs(new Date('2025-02-09'));
-  const MAX_DATE = dayjs(new Date('2025-07-12'));
+  const currentProjects = useMemo(() => {
+    if (!Array.isArray(projects)) return [];
+    return projects.map((project) => ({
+      ...project,
+      milestones:
+        project?.milestones?.filter((milestone) =>
+          date.isBetween(
+            dayjs(milestone.startDate),
+            dayjs(milestone.endDate),
+            'day',
+            '[]'
+          )
+        ) ?? [],
+    }));
+  }, [projects, date]);
+
+  const currentReviews = useMemo(() => {
+    if (!Array.isArray(reviews)) return [];
+    return reviews.filter((review) => date.isSame(review.created_at));
+  }, [reviews, date]);
 
   const SEOData = useMemo(
     () => ({
@@ -198,41 +243,39 @@ const Manage = () => {
       <Calendar
         date={date}
         onChange={setDate}
-        maxDate={MAX_DATE}
-        minDate={MIN_DATE}
+        maxDate={config.marathonEndDate}
+        minDate={config.marathonStartDate}
       />
       <ul>
-        {Array.isArray(projects) &&
-          projects.map((project, index) => (
-            <li key={project.id}>
-              <Project
-                title={project.title}
-                href={`/manage/project?id=${project.id}`}
-                defaultOpen={index === 0}
-              >
-                {project?.milestones?.map((milestone) => (
-                  <MilestoneItem
-                    key={milestone.id}
-                    milestone={milestone}
-                    isLgScreen={false}
-                    projectId={project.id}
-                  />
-                ))}
-              </Project>
-            </li>
-          ))}
+        {currentProjects.map((project, index) => (
+          <li key={project.id}>
+            <Project
+              title={project.title}
+              href={`/manage/project?id=${project.id}`}
+              defaultOpen={index === 0}
+            >
+              {project.milestones.map((milestone) => (
+                <MilestoneItem
+                  key={milestone.id}
+                  milestone={milestone}
+                  isLgScreen={false}
+                  projectId={project.id}
+                />
+              ))}
+            </Project>
+          </li>
+        ))}
       </ul>
 
       <ul>
-        {Array.isArray(reviews) &&
-          reviews.map((review) => (
-            <li key={review.id}>
-              <ReviewCard
-                data={review}
-                detailLink="/manage/project/review/detail?id=1"
-              />
-            </li>
-          ))}
+        {currentReviews.map((review) => (
+          <li key={review.id}>
+            <ReviewCard
+              data={review}
+              detailLink="/manage/project/review/detail?id=1"
+            />
+          </li>
+        ))}
       </ul>
     </LocalizationProvider>
   );
