@@ -25,7 +25,7 @@ function ReviewDetail({ data, onEditClick, onDeleteClick }: ReviewDetailProps) {
       <PostCard.Header
         title={data.title}
         subtitle={`第${numberToChineseNumber(data.week)}週`}
-        tag="覆盤二"
+        tag="覆盤"
         date={dayjs(data.created_at).format('YYYY/MM/DD')}
         dropdownItems={[
           {

@@ -64,7 +64,7 @@ function UpdateModal({
           <PostCard.Header
             title={methods.watch('title')}
             subtitle={`第${numberToChineseNumber(week)}週`}
-            tag="成果一"
+            tag="成果"
             date={dayjs(createdAt).format('YYYY/MM/DD')}
             onTitleChange={(title) =>
               methods.setValue('title', title || projectTitle)

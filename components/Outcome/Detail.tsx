@@ -29,7 +29,7 @@ function OutcomeDetail({
       <PostCard.Header
         title={data.title}
         subtitle={`第${numberToChineseNumber(data.week)}週`}
-        tag="成果一"
+        tag="成果"
         date={dayjs(data.date).format('YYYY/MM/DD')}
         dropdownItems={[
           {

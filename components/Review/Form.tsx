@@ -67,14 +67,14 @@ function ReviewForm({
         <PostCard.Header
           title={methods.watch('title')}
           subtitle={`第${numberToChineseNumber(week)}週`}
-          tag="覆盤二"
+          tag="覆盤"
           date={dayjs(createdAt).format('YYYY/MM/DD')}
           onTitleChange={(title) =>
             methods.setValue('title', title || projectTitle)
           }
           isEditable
         />
-        <div className="relative max-h-96 overflow-y-auto">
+        <div className="relative">
           <ul className="ml-8 list-decimal marker:heading-sm body-md font-normal">
             <li className="mb-8">
               <h3 className="mb-4 heading-sm">這段時間的整體心情：</h3>
