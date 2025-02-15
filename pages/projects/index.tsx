@@ -127,10 +127,6 @@ const PageProjectsEvents = () => {
   const [projects, setProjects] = useState<ProjectType[]>([]);
   const router = useRouter();
   const pathname = usePathname();
-  const validateEventId = (eventId: string) => {
-    const regex = /^\d{4}S\d{1}$/;
-    return regex.test(eventId);
-  };
   const fetchProjects = async () => {
     try {
       setIsFetchingProjects(true);
@@ -158,13 +154,7 @@ const PageProjectsEvents = () => {
   };
   useEffect(() => {
     if (router && pathname) {
-      const eventId = pathname.split('/projects/')[1];
-      if (eventId && validateEventId(eventId)) {
-        // TODO: send eventId into fetchProjects to filter data
-        fetchProjects();
-      } else {
-        toast.error('哦噢，找不到這些學習計畫，請稍後再試');
-      }
+      fetchProjects();
     }
   }, [router, pathname]);
 
