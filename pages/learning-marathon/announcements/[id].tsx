@@ -3,18 +3,11 @@ import React from 'react';
 import Nav from '@/components/Marathon/Nav';
 
 import { useRouter } from 'next/router';
-
-const TagList = ({ tags }: { tags: string[] }) => {
-  return (
-    <div className="flex gap-2">
-      {[...tags].map((tag: string) => (
-        <div className="px-2.5 py-[3px] text-xs text-basic-400 bg-primary-lightest rounded-[13px]">
-          {tag}
-        </div>
-      ))}
-    </div>
-  );
-};
+import pageNotFound from '@/pages/404';
+import {
+  AnnouncementDetail,
+  AnnouncementList,
+} from '@/components/Marathon/Announcement';
 
 const sampleAnnouncementItem = {
   author: '島小編',
@@ -33,7 +26,7 @@ const sampleAnnouncementItem = {
     `島島盃 2025 春季學習馬拉松，將以學習者的自我需求出發設計學習計畫，開啟一趟自我導向學習馬拉松，往哪跑？怎麼跑？跑多快？終點在哪由你決定，島島阿學陪你一起跑。
 邀請你一起「為自己重新打造喜歡的學習生活」，把自主學習變成一種生活方式，並在彼此陪伴下，成就自我與他人。`,
   ].map((content, index) => [content, index]),
-  cover: 'https://fakeimg.pl/800x400/',
+  coverImageUrl: 'https://fakeimg.pl/800x400/',
   id: '1',
   title:
     '【島主公告】「為什麼想做的事總是跑不起來？」，別擔心，島島盃引導師、AI、社群陪你跑五個月，跑向屬於自己的終點！',
@@ -41,6 +34,7 @@ const sampleAnnouncementItem = {
   times: '2025 / 01 / 05',
 };
 
+/** @todo Replace this with actual data */
 const announcementItems = Array(5)
   .fill(sampleAnnouncementItem)
   .map((item, index) => ({
@@ -48,43 +42,14 @@ const announcementItems = Array(5)
     id: `${index + +item.id}`,
   }));
 
-const AnnouncementList = ({
-  currentPageId,
-}: {
-  currentPageId: string | string[] | undefined;
-}) => {
-  return (
-    <div className="flex flex-col gap-3 my-6">
-      {announcementItems
-        .filter(({ id }) => id !== currentPageId)
-        .filter((_, index) => index < 3)
-        .map(({ id, tags, times, title }) => (
-          <Link
-            href={`/learning-marathon/announcements/${id}`}
-            key={id}
-            className="text-start p-6 bg-white shadow-md shadow-basic-black/10 rounded-[10px] flex flex-col gap-3"
-          >
-            <h4 className="text-basic-400 body-sm font-normal">
-              {[id, title].join(' - ')}
-            </h4>
-            <div className="flex justify-between">
-              <TagList tags={tags} />
-              <p className="text-basic-300 body-sm">{times}</p>
-            </div>
-          </Link>
-        ))}
-    </div>
-  );
-};
-
 const Announcement = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { author, contents, tags, times, title } = announcementItems.find(
-    (item) => item.id === id
-  ) || {
-    tags: [],
-  };
+  const target = announcementItems.find((item) => item.id === id);
+  if (target === undefined) return pageNotFound();
+
+  const items = announcementItems.filter((item) => item.id !== id).slice(0, 3);
+
   return (
     <>
       <Nav activeTab="活動公告" />
@@ -98,35 +63,14 @@ const Announcement = () => {
             >
               {`< 返回`}
             </Link>
-            <div className="bg-white h-fit p-6">
-              <TagList tags={tags} />
 
-              <h1 className="text-4xl text-basic-500 font-semibold p-6">
-                {title}
-              </h1>
-
-              <p className="text-basic-300 body-sm">
-                {[times, author].join(' ・ ')}
-              </p>
-
-              <img
-                src="https://fakeimg.pl/800x400/"
-                alt="cover"
-                className="object-cover w-full h-[400px]"
-              />
-
-              {contents.map(([content, index]: [string, number]) => (
-                <p key={index} className="text-basic-500 body-sm p-2">
-                  {content}
-                </p>
-              ))}
-            </div>
+            <AnnouncementDetail item={target} />
           </div>
         </div>
 
         <div className="box pt-[72px] mx-auto w-[750px]">
           <h3 className="heading-md text-basic-500">其他公告</h3>
-          <AnnouncementList currentPageId={id} />
+          <AnnouncementList items={items} />
         </div>
       </div>
     </>
