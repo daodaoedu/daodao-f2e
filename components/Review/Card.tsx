@@ -1,6 +1,6 @@
 import { EMOJI_OPTIONS } from '@/constants/project';
 import { ProjectReviewSchema } from '@/services/project/reviews';
-import PostPreviewCard from '@/shared/components/Post/PostPreviewCard';
+import PostPreviewCard, { BasePostData } from '@/shared/components/Post/PostPreviewCard';
 
 interface ReviewCardProps {
   data: ProjectReviewSchema;
@@ -15,6 +15,12 @@ function ReviewCard({
   onEditClick,
   onDeleteClick,
 }: ReviewCardProps) {
+  const reviewData: BasePostData = {
+    title: data.title,
+    week: data.week,
+    date: data.createdAt,
+  };
+
   const emojiOption = EMOJI_OPTIONS.find(
     (option) => option.value === data.mood
   );
@@ -30,7 +36,7 @@ function ReviewCard({
 
   return (
     <PostPreviewCard
-      data={data}
+      data={reviewData}
       tag="覆盤"
       detailLink={detailLink}
       onEditClick={onEditClick}

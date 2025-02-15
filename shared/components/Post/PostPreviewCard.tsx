@@ -6,8 +6,7 @@ import numberToChineseNumber from '@/utils/numberToChineseNumber';
 export interface BasePostData {
   title: string;
   week: number;
-  createdAt?: string;
-  date?: string;
+  date: string;
 }
 
 export interface PostPreviewCardProps<T extends BasePostData> {
@@ -29,7 +28,24 @@ function PostPreviewCard<T extends BasePostData>({
   onDeleteClick,
   renderContent,
 }: PostPreviewCardProps<T>) {
-  const displayDate = data.date || data.createdAt;
+  const dropdownItems = [
+    {
+      key: 'edit',
+      children: (
+        <Button size="sm" onClick={onEditClick}>
+          編輯
+        </Button>
+      ),
+    },
+    {
+      key: 'delete',
+      children: (
+        <Button size="sm" onClick={onDeleteClick}>
+          刪除
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <PostCard className={className}>
@@ -37,25 +53,8 @@ function PostPreviewCard<T extends BasePostData>({
         title={data.title}
         subtitle={`第${numberToChineseNumber(data.week)}週`}
         tag={tag}
-        date={displayDate ? dayjs(displayDate).format('YYYY/MM/DD') : undefined}
-        dropdownItems={[
-          {
-            key: 'edit',
-            children: (
-              <Button size="sm" onClick={onEditClick}>
-                編輯
-              </Button>
-            ),
-          },
-          {
-            key: 'delete',
-            children: (
-              <Button size="sm" onClick={onDeleteClick}>
-                刪除
-              </Button>
-            ),
-          },
-        ]}
+        date={dayjs(data.date).format('YYYY/MM/DD')}
+        dropdownItems={dropdownItems}
       />
       {renderContent(data)}
       <PostCard.Footer detailLink={detailLink} />
