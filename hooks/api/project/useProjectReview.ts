@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import {
   CreateProjectReviewRequest,
@@ -33,6 +33,7 @@ export default function useProjectReview({
       ? getProjectReviewEndpoint({ projectId, reviewId })
       : null;
 
+  const config = useSWRConfig();
   const { data, ...swr } = useSWR<ProjectReviewSchema>(swrKey);
 
   const create = useSWRMutation(
@@ -41,7 +42,8 @@ export default function useProjectReview({
       createProjectReview(arg),
     {
       onSuccess: onCreated,
-      onError: () => {
+      onError: (error, key) => {
+        config.onError?.(error, key, config);
         toast.error('新增覆盤失敗');
       },
     }
@@ -53,7 +55,8 @@ export default function useProjectReview({
       updateProjectReview(arg),
     {
       onSuccess: onUpdated,
-      onError: () => {
+      onError: (error, key) => {
+        config.onError?.(error, key, config);
         toast.error('更新覆盤失敗');
       },
     }
@@ -65,7 +68,8 @@ export default function useProjectReview({
       deleteProjectReview(arg.projectId, arg.reviewId),
     {
       onSuccess: onDeleted,
-      onError: () => {
+      onError: (error, key) => {
+        config.onError?.(error, key, config);
         toast.error('刪除覆盤失敗');
       },
     }

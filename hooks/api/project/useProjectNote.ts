@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import {
   CreateProjectNoteRequest,
@@ -31,6 +31,7 @@ export default function useProjectNote({
   const swrKey =
     projectId && noteId ? getProjectNoteEndpoint({ projectId, noteId }) : null;
 
+  const config = useSWRConfig();
   const { data, ...swr } = useSWR<ProjectNoteSchema>(swrKey);
 
   const create = useSWRMutation(
@@ -38,7 +39,8 @@ export default function useProjectNote({
     (url, { arg }: { arg: CreateProjectNoteRequest }) => createProjectNote(arg),
     {
       onSuccess: onCreated,
-      onError: () => {
+      onError: (error, key) => {
+        config.onError?.(error, key, config);
         toast.error('新增便利貼失敗');
       },
     }
@@ -49,7 +51,8 @@ export default function useProjectNote({
     (url, { arg }: { arg: UpdateProjectNoteRequest }) => updateProjectNote(arg),
     {
       onSuccess: onUpdated,
-      onError: () => {
+      onError: (error, key) => {
+        config.onError?.(error, key, config);
         toast.error('更新便利貼失敗');
       },
     }
@@ -61,7 +64,8 @@ export default function useProjectNote({
       deleteProjectNote(arg.projectId, arg.noteId),
     {
       onSuccess: onDeleted,
-      onError: () => {
+      onError: (error, key) => {
+        config.onError?.(error, key, config);
         toast.error('刪除便利貼失敗');
       },
     }
