@@ -189,6 +189,7 @@ export const MARATHON_LINKS = [
     name: '學習計畫分享區（未公開）',
     link: '/marathon-sharing',
     disabled: true,
+    external: true,
   },
   {
     name: '成果分享（未公開）',
