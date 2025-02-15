@@ -6,6 +6,10 @@ import { Project as ProjectType } from "@/components/Projects/Project/type";
 import { Skeleton } from '@mui/material';
 import { cn } from '@/utils/cn';
 import EmptyImg from '@/public/assets/images/empty.png';
+import dayjs from 'dayjs';
+import { AiOutlineEye } from 'react-icons/ai';
+import { MdMoreVert } from 'react-icons/md';
+import ReportMenu from '@/shared/components/ReportMenu';
 
 const Tabs = () => {
   const [active, setActive] = useState('project_shared');
@@ -75,33 +79,30 @@ const ProjectList = ({ projects }: ProjectListProps) => {
               key={project.id}
               data-projectId={project.id}
             >
-              <div className="flex flex-col gap-1 justify-start items-start md:flex-row md:justify-between md:items-center">
+              <div className="w-full flex flex-col gap-1 justify-start items-start md:flex-row md:justify-between md:items-center">
                 <h3 className="font-sans font-bold text-basic-500 text-lg leading-normal">{project.title}</h3>
                 <div className="
                   ml-auto
                   flex flex-row justify-start items-center gap-2"
                 >
-                  {/* TODO: append project startDate here after data ready */}
-                  {/* <span className="
+                  <span className="
                       font-sans
                     text-basic-300
                       text-sm leading-normal
                     "
                   >
-                    {dayjs(project.startDate).format('YYYY/MM/DD')}
-                  </span> */}
+                    {dayjs(project.updatedDate).format('YYYY/MM/DD')}
+                  </span>
 
-                  {/* TODO: append project pv here after data ready */}
-                  {/* <span className="
+                  <span className="
                     flex flex-row items-center justify-start gap-1
                     font-sans text-basic-300 text-base leading-normal"
                   >
                     <AiOutlineEye />
                     9999
-                  </span> */}
+                  </span>
 
-                  {/* TODO: append showMore button here after /project/detail page ready */}
-                  {/* <span className="text-basic-300"><MdMoreVert /></span> */}
+                  <ReportMenu />
                 </div>
               </div>
               <div>
