@@ -1,6 +1,6 @@
 import Modal from '@/shared/components/Modal';
 import { CreateProjectReviewRequest } from '@/services/project/reviews';
-
+import config from '@/constants/config';
 import ReviewForm from '../Form';
 
 interface CreateModalProps {
@@ -8,7 +8,6 @@ interface CreateModalProps {
   projectTitle: string;
   isLoading: boolean;
   isOpen: boolean;
-  week: number;
   onClose: () => void;
   onSubmit: (data: CreateProjectReviewRequest) => void;
 }
@@ -19,7 +18,6 @@ export default function CreateModal({
   isLoading,
   isOpen,
   onClose,
-  week,
   onSubmit,
 }: CreateModalProps) {
   return (
@@ -33,7 +31,7 @@ export default function CreateModal({
       <ReviewForm
         projectId={projectId}
         projectTitle={projectTitle}
-        week={week}
+        week={config.getWeekNumber()}
         onSubmit={onSubmit}
         isLoading={isLoading}
       />

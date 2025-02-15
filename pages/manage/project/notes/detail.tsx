@@ -5,7 +5,7 @@ import NoteDetail from '@/components/Note/Detail';
 import getProjectLayout from '@/layout/ProjectLayout';
 import { useProject, useProjectNote } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
-import EditModal from '@/components/Note/Modals/UpdateModal';
+import UpdateModal from '@/components/Note/Modals/UpdateModal';
 
 enum ModalTypeEnum {
   Update = 'update',
@@ -49,7 +49,7 @@ const NoteDetailPage = () => {
       />
 
       {note && project && (
-        <EditModal
+        <UpdateModal
           id={noteId}
           projectId={projectId}
           projectTitle={project.title}
@@ -63,17 +63,15 @@ const NoteDetailPage = () => {
         />
       )}
 
-      {note && (
-        <ConfirmModal
-          title="確認刪除便利貼"
-          confirmText="確認刪除"
-          confirmColor="alert"
-          isOpen={modalType === ModalTypeEnum.Delete}
-          onClose={() => setModalType(null)}
-          onConfirm={() => remove.trigger({ projectId, noteId })}
-          isLoading={remove.isMutating}
-        />
-      )}
+      <ConfirmModal
+        title="確認刪除便利貼"
+        confirmText="確認刪除"
+        confirmColor="alert"
+        isOpen={modalType === ModalTypeEnum.Delete}
+        onClose={() => setModalType(null)}
+        onConfirm={() => remove.trigger({ projectId, noteId })}
+        isLoading={remove.isMutating}
+      />
     </div>
   );
 };

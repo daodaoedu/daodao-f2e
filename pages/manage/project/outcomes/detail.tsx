@@ -64,17 +64,15 @@ const OutcomeDetailPage = () => {
         />
       )}
 
-      {outcome && (
-        <ConfirmModal
-          title="確認刪除成果"
-          confirmText="確認刪除"
-          confirmColor="alert"
-          isOpen={modalType === ModalTypeEnum.Delete}
-          onClose={() => setModalType(null)}
-          onConfirm={() => remove.trigger({ projectId, outcomeId })}
-          isLoading={remove.isMutating}
-        />
-      )}
+      <ConfirmModal
+        title="確認刪除成果"
+        confirmText="確認刪除"
+        confirmColor="alert"
+        isOpen={modalType === ModalTypeEnum.Delete}
+        onClose={() => setModalType(null)}
+        onConfirm={() => remove.trigger({ projectId, outcomeId })}
+        isLoading={remove.isMutating}
+      />
     </div>
   );
 };

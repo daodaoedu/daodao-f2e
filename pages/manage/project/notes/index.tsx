@@ -12,7 +12,6 @@ import {
   useProjectNote,
   useProjectNoteList,
 } from '@/hooks/api/project';
-import config from '@/constants/config';
 
 enum ModalTypeEnum {
   Create = 'create',
@@ -100,7 +99,6 @@ const NotesPage = () => {
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
-          week={config.getWeekNumber()}
           isLoading={create.isMutating}
           onSubmit={create.trigger}
         />
