@@ -1,0 +1,66 @@
+import dayjs from 'dayjs';
+import Button from '@/shared/components/Button';
+import PostCard from '@/shared/components/Post/PostCard';
+import numberToChineseNumber from '@/utils/numberToChineseNumber';
+
+export interface BasePostData {
+  title: string;
+  week: number;
+  createdAt?: string;
+  date?: string;
+}
+
+export interface PostPreviewCardProps<T extends BasePostData> {
+  data: T;
+  tag: string;
+  className?: string;
+  detailLink?: string;
+  onEditClick?: () => void;
+  onDeleteClick?: () => void;
+  renderContent: (data: T) => React.ReactNode;
+}
+
+function PostPreviewCard<T extends BasePostData>({
+  data,
+  tag,
+  className,
+  detailLink,
+  onEditClick,
+  onDeleteClick,
+  renderContent,
+}: PostPreviewCardProps<T>) {
+  const displayDate = data.date || data.createdAt;
+
+  return (
+    <PostCard className={className}>
+      <PostCard.Header
+        title={data.title}
+        subtitle={`第${numberToChineseNumber(data.week)}週`}
+        tag={tag}
+        date={displayDate ? dayjs(displayDate).format('YYYY/MM/DD') : undefined}
+        dropdownItems={[
+          {
+            key: 'edit',
+            children: (
+              <Button size="sm" onClick={onEditClick}>
+                編輯
+              </Button>
+            ),
+          },
+          {
+            key: 'delete',
+            children: (
+              <Button size="sm" onClick={onDeleteClick}>
+                刪除
+              </Button>
+            ),
+          },
+        ]}
+      />
+      {renderContent(data)}
+      <PostCard.Footer detailLink={detailLink} />
+    </PostCard>
+  );
+}
+
+export default PostPreviewCard;

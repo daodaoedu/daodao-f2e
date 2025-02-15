@@ -1,9 +1,6 @@
-import dayjs from 'dayjs';
 import Image from '@/shared/components/Image';
-import PostCard from '@/shared/components/Post/PostCard';
 import { ProjectOutcomeSchema } from '@/services/project/outcomes';
-import numberToChineseNumber from '@/utils/numberToChineseNumber';
-import Button from '@/shared/components/Button';
+import PostPreviewCard from '@/shared/components/Post/PostPreviewCard';
 
 interface OutcomeCardProps {
   data: ProjectOutcomeSchema;
@@ -20,42 +17,27 @@ function OutcomeCard({
   onEditClick,
   onDeleteClick,
 }: OutcomeCardProps) {
+  const renderContent = (outcomeData: ProjectOutcomeSchema) => (
+    <div className="mb-3 body-sm text-basic-500">
+      <p className="mb-3 whitespace-pre-wrap min-h-12 max-h-48 overflow-hidden">
+        {outcomeData.description}
+      </p>
+      {outcomeData.imgUrl && (
+        <Image src={outcomeData.imgUrl} alt={outcomeData.title} height="300px" />
+      )}
+    </div>
+  );
+
   return (
-    <PostCard className={className}>
-      <PostCard.Header
-        title={data.title}
-        subtitle={`第${numberToChineseNumber(data.week)}週`}
-        tag="成果"
-        date={dayjs(data.date).format('YYYY/MM/DD')}
-        dropdownItems={[
-          {
-            key: 'edit',
-            children: (
-              <Button size="sm" onClick={onEditClick}>
-                編輯
-              </Button>
-            ),
-          },
-          {
-            key: 'delete',
-            children: (
-              <Button size="sm" onClick={onDeleteClick}>
-                刪除
-              </Button>
-            ),
-          },
-        ]}
-      />
-      <div className="mb-3 body-sm text-basic-500">
-        <p className="mb-3 whitespace-pre-wrap min-h-12 max-h-48 overflow-hidden">
-          {data.description}
-        </p>
-        {data.imgUrl && (
-          <Image src={data.imgUrl} alt={data.title} height="300px" />
-        )}
-      </div>
-      <PostCard.Footer detailLink={detailLink} />
-    </PostCard>
+    <PostPreviewCard
+      data={data}
+      tag="成果"
+      className={className}
+      detailLink={detailLink}
+      onEditClick={onEditClick}
+      onDeleteClick={onDeleteClick}
+      renderContent={renderContent}
+    />
   );
 }
 

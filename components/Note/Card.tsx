@@ -1,9 +1,6 @@
-import dayjs from 'dayjs';
 import Image from '@/shared/components/Image';
-import Button from '@/shared/components/Button';
-import PostCard from '@/shared/components/Post/PostCard';
 import { ProjectNoteSchema } from '@/services/project/notes';
-import numberToChineseNumber from '@/utils/numberToChineseNumber';
+import PostPreviewCard from '@/shared/components/Post/PostPreviewCard';
 
 interface NoteCardProps {
   data: ProjectNoteSchema;
@@ -20,42 +17,27 @@ function NoteCard({
   onEditClick,
   onDeleteClick,
 }: NoteCardProps) {
+  const renderContent = (noteData: ProjectNoteSchema) => (
+    <div className="mb-3 body-sm text-basic-500">
+      <p className="mb-3 whitespace-pre-wrap min-h-12 max-h-48 overflow-hidden">
+        {noteData.description}
+      </p>
+      {noteData.imgUrl && (
+        <Image src={noteData.imgUrl} alt={noteData.title} height="300px" />
+      )}
+    </div>
+  );
+
   return (
-    <PostCard className={className}>
-      <PostCard.Header
-        title={data.title}
-        subtitle={`第${numberToChineseNumber(data.week)}週`}
-        tag="便利貼"
-        date={dayjs(data.date).format('YYYY/MM/DD')}
-        dropdownItems={[
-          {
-            key: 'edit',
-            children: (
-              <Button size="sm" onClick={onEditClick}>
-                編輯
-              </Button>
-            ),
-          },
-          {
-            key: 'delete',
-            children: (
-              <Button size="sm" onClick={onDeleteClick}>
-                刪除
-              </Button>
-            ),
-          },
-        ]}
-      />
-      <div className="mb-3 body-sm text-basic-500">
-        <p className="mb-3 whitespace-pre-wrap min-h-12 max-h-48 overflow-hidden">
-          {data.description}
-        </p>
-        {data.imgUrl && (
-          <Image src={data.imgUrl} alt={data.title} height="300px" />
-        )}
-      </div>
-      <PostCard.Footer detailLink={detailLink} />
-    </PostCard>
+    <PostPreviewCard
+      data={data}
+      tag="便利貼"
+      className={className}
+      detailLink={detailLink}
+      onEditClick={onEditClick}
+      onDeleteClick={onDeleteClick}
+      renderContent={renderContent}
+    />
   );
 }
 
