@@ -22,6 +22,7 @@ import Banner from '@/components/Banner';
 import { logEvent } from '@/utils/analytics';
 import ApplyClosePopup from '@/components/Marathon/ApplyClosePopup';
 import config from '@/constants/config';
+import { MARATHON_LINKS } from '@/constants/category';
 
 const StyledBannerButton = styled(Button)`
   &.MuiButton-root {
@@ -186,12 +187,13 @@ const Sidebar = ({ onClickSignupButton }) => {
 };
 
 const Nav = () => {
-  const navItems = [
-    { label: '活動詳情', href: '#', active: true },
-    { label: '活動公告', href: 'learning-marathon/announcements' },
-    { label: '學習計畫分享區', href: '/marathon-sharing', disabled: true, external: true },
-    { label: '成果發表', href: '#', disabled: true },
-  ];
+  const navItems = MARATHON_LINKS.map((item) => ({
+    label: item.name,
+    href: item.link,
+    active: item.name === '活動詳情',
+    disabled: item.disabled,
+    external: item.external,
+  }));
 
   const [showShadow, setShowShadow] = useState(false);
   const { height } = usePromotion();
