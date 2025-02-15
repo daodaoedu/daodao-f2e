@@ -105,15 +105,13 @@ const ProjectList = ({ projects }: ProjectListProps) => {
                 </div>
               </div>
               <div>
-                {project.description.split(/\r?\n/).map((line) => (
-                  <p
-                    key={line.split('')[0]}
-                    className="mb-2 text-base text-basic-300 font-sans leading-[1.4]"
-                  >
-                    {line}
-                    {index < project.description.split(/\r?\n/).length - 1 && <br />}
-                  </p>
-                ))}
+                <p
+                  className="
+                    whitespace-pre-wrap
+                    text-base text-basic-300 font-sans leading-[1.4]"
+                >
+                  {project.description}
+                </p>
               </div>
             </div>
           );
@@ -170,22 +168,23 @@ const PageProjectsEvents = () => {
         <div className="rounded-[20px] overflow-hidden bg-white">
           <Tabs />
           {
-            isFetchingProjects ?
+            isFetchingProjects && (
               <Skeleton animation="wave" width="95%" height="200px" className="mx-auto" />
-              :
-              projects.length > 0 ?
-                <ProjectList projects={projects} />
-                :
-                (
-                  <div className="bg-white flex flex-col items-center justify-center p-4 md:p-8">
-                    <img
-                      src={EmptyImg.src}
-                      alt="no project"
-                      className="w-[150px]"
-                    />
-                    <p className="font-sans text-base leading-normal text-basic-500">這裡還沒有東西喔！</p>
-                  </div>
-                )
+            )
+          }
+          { Array.isArray(projects) && projects.length > 0
+            ? <ProjectList projects={projects} />
+            :
+            (
+              <div className="bg-white flex flex-col items-center justify-center p-4 md:p-8">
+                <img
+                  src={EmptyImg.src}
+                  alt="no project"
+                  className="w-[150px]"
+                />
+                <p className="font-sans text-base leading-normal text-basic-500">這裡還沒有東西喔！</p>
+              </div>
+            )
           }
         </div>
       </div>
