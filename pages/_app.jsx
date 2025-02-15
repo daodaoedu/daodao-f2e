@@ -217,6 +217,7 @@ const App = ({ Component, pageProps }) => {
           title="島島阿學多元學習資源"
           href="https://www.daoedu.tw/rss/feed.xml"
         />
+        <link rel="manifest" href="/manifest.json" />
       </Head>
 
       <Provider store={store}>
