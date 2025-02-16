@@ -136,7 +136,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
                   className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-primary-base text-white hover:bg-primary-darker"
                   onClick={() => {
                     handleClose();
-                    router.replace('/profile');
+                    router.replace('/personal-card');
                   }}
                 >
                   想，填寫資料
