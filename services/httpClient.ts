@@ -62,13 +62,13 @@ const serializeNestedObject = <T extends URLSearchParams | FormData>(
   Object.entries(source || {}).forEach(([key, value]) => {
     if (value === '' || value == null) return;
 
-    const keyWithPrefix = `${prefix}${key}.`;
+    const keyWithPrefix = `${prefix}${key}`;
     if (isValidValue(value)) {
       append(keyWithPrefix)(value);
     } else if (Array.isArray(value)) {
-      value.forEach(append(`${keyWithPrefix}[]`));
+      value.forEach(append(`${keyWithPrefix}.`));
     } else if (isObject(value)) {
-      serializeNestedObject(value, formattedData, keyWithPrefix);
+      serializeNestedObject(value, formattedData, `${keyWithPrefix}.`);
     }
   });
 
