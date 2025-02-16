@@ -7,12 +7,12 @@ import { GoArrowUpRight } from 'react-icons/go';
 import { cn } from '@/utils/cn';
 
 const Nav = ({ activeTab }: { activeTab: string }) => {
+  const { height } = usePromotion();
+
   const navItems = MARATHON_LINKS.map((item) => ({
     ...item,
     active: item.name === activeTab,
   }));
-
-  const { height } = usePromotion();
 
   return (
     <nav
