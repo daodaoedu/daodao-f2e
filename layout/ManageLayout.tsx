@@ -71,8 +71,9 @@ function ManageLayout({ children }: React.PropsWithChildren) {
               <Sidebar.Link
                 href="/manage/classrooms"
                 isActive={pathname === '/manage/classrooms'}
+                isDisabled
               >
-                我的教室
+                導師工作室
               </Sidebar.Link>
             </Sidebar>
           </div>

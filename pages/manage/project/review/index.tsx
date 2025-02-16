@@ -12,6 +12,7 @@ import {
   useProjectReviewList,
 } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
+import config from '@/constants/config';
 
 enum ModalTypeEnum {
   Create = 'create',
@@ -103,7 +104,7 @@ const ReviewPage = () => {
         <CreateModal
           projectId={projectId}
           projectTitle={project.title}
-          week={1}
+          week={config.getWeekNumber()}
           isOpen={modalType === ModalTypeEnum.Create}
           onClose={() => setModalType(null)}
           onSubmit={create.trigger}
@@ -118,7 +119,7 @@ const ReviewPage = () => {
           reviewId={reviewId}
           defaultValues={detail}
           week={detail.week}
-          createdAt={detail.created_at}
+          createdAt={detail.createdAt}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
           onSubmit={update.trigger}

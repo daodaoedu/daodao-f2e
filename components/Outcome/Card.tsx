@@ -25,7 +25,7 @@ function OutcomeCard({
       <PostCard.Header
         title={data.title}
         subtitle={`第${numberToChineseNumber(data.week)}週`}
-        tag="成果一"
+        tag="成果"
         date={dayjs(data.date).format('YYYY/MM/DD')}
         dropdownItems={[
           {
@@ -50,8 +50,8 @@ function OutcomeCard({
         <p className="mb-3 whitespace-pre-wrap min-h-12 max-h-48 overflow-hidden">
           {data.description}
         </p>
-        {data.img_url && (
-          <Image src={data.img_url} alt={data.title} height="300px" />
+        {data.imgUrl && (
+          <Image src={data.imgUrl} alt={data.title} height="300px" />
         )}
       </div>
       <PostCard.Footer detailLink={detailLink} />

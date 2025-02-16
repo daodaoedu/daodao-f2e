@@ -52,8 +52,8 @@ function NoteDetail({
       />
       <div className="mb-4 body-sm text-basic-500">
         <p className="mb-3 whitespace-pre-wrap">{data.description}</p>
-        {data.img_url && (
-          <Image src={data.img_url} alt={data.title} height="300px" />
+        {data.imgUrl && (
+          <Image src={data.imgUrl} alt={data.title} height="300px" />
         )}
       </div>
       <hr className="mb-4 h-px bg-basic-100" />

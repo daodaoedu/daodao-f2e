@@ -72,17 +72,34 @@ function Modal({
         onClose?.();
       }
     };
-    window.addEventListener('keyup', handleWindowKeyUp);
+
+    if (isOpen) {
+      window.addEventListener('keyup', handleWindowKeyUp);
+    }
 
     return () => window.removeEventListener('keyup', handleWindowKeyUp);
-  }, [onClose]);
+  }, [isOpen, onClose]);
 
   return (
     (!removeDOM || keepMounted) && (
       <Portal rootId={modalId}>
+        <button
+          type="button"
+          className={cn(
+            'fixed inset-0 z-[98] pointer-events-none border-none cursor-default',
+            isInitialized && [
+              isOpen
+                ? 'pointer-events-auto animate-fade-in bg-black/50'
+                : 'animate-fade-out',
+            ]
+          )}
+          onClick={hasCloseButton ? undefined : onClose}
+          onKeyUp={hasCloseButton ? undefined : handleKeyUp}
+          tabIndex={hasCloseButton ? -1 : undefined}
+        />
         <div
           className={cn(
-            'fixed inset-0 z-[99] flex items-center justify-center',
+            'fixed inset-0 z-[99] flex overflow-y-auto',
             'transition-opacity opacity-0 pointer-events-none ease-in duration-200',
             isInitialized && [
               isOpen
@@ -91,21 +108,18 @@ function Modal({
             ]
           )}
         >
-          <button
-            type="button"
-            className="absolute inset-0 bg-black/50 border-none cursor-default"
-            onClick={hasCloseButton ? undefined : onClose}
-            onKeyUp={hasCloseButton ? undefined : handleKeyUp}
-            tabIndex={hasCloseButton ? -1 : undefined}
-          />
           <dialog
             open={!removeDOM}
             className={cn(
-              'fixed -bottom-4 p-10 w-full rounded-lg bg-white',
+              'fixed -bottom-4 p-10 w-full max-h-[80%]',
+              'rounded-lg bg-white overflow-x-hidden',
               'transition-transform translate-y-full ease-in duration-200',
-              size === ModalSize.Small && 'sm:bottom-auto sm:max-w-96',
-              size === ModalSize.Medium && 'md:bottom-auto md:max-w-screen-md',
-              size === ModalSize.Large && 'lg:bottom-auto lg:max-w-screen-lg',
+              size === ModalSize.Small &&
+                'sm:relative sm:bottom-auto sm:top-12 sm:max-w-96 sm:max-h-none',
+              size === ModalSize.Medium &&
+                'md:relative md:bottom-auto md:top-12 md:max-w-screen-md md:max-h-none',
+              size === ModalSize.Large &&
+                'lg:relative lg:bottom-auto lg:top-12 lg:max-w-screen-lg lg:max-h-none',
               isOpen ? 'animate-slide-y-in' : 'animate-slide-y-out',
               className
             )}

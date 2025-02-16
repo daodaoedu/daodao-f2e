@@ -22,13 +22,13 @@ const MilestoneItem = ({
     <div className="p-[10px] bg-basic-100 flex flex-col gap-2">
       <Milestone milestone={milestone} isLgScreen={isLgScreen} />
       <TaskList
-        tasks={milestone.Tasks || []}
+        tasks={milestone.tasks || []}
         projectId={projectId}
         milestoneId={milestone.id}
       />
       {isEditing && (
         <TaskCreate
-          index={milestone.Tasks?.length || 0}
+          index={milestone.tasks?.length || 0}
           projectId={projectId}
           milestoneId={milestone.id}
           onCancel={() => setIsEditing(false)}
