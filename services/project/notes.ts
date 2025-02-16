@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { mutations } from '../httpClient';
 import { projectEndpoint } from './index';
+import { uploadImage } from '../images';
 
 interface GetProjectNoteListKeyOptions {
   projectId: string;
@@ -25,6 +26,7 @@ const projectNoteSchema = z.object({
   date: z.string().date(),
   description: z.string(),
   imgUrl: z.string().nullable(),
+  imgFile: z.instanceof(File).nullable(),
 });
 
 export type ProjectNoteSchema = z.infer<typeof projectNoteSchema>;
@@ -35,23 +37,45 @@ export const createProjectNoteSchema = projectNoteSchema.omit({
 
 export type CreateProjectNoteRequest = z.infer<typeof createProjectNoteSchema>;
 
-export const createProjectNote = ({
+export const createProjectNote = async ({
   projectId,
+  imgFile,
   ...note
 }: CreateProjectNoteRequest) => {
-  return mutations.post(getProjectNoteEndpoint({ projectId }), note);
+  let newUrl: string | null = null;
+
+  if (imgFile) {
+    const { url } = await uploadImage({ file: imgFile });
+    newUrl = url;
+  }
+
+  return mutations.post(getProjectNoteEndpoint({ projectId }), {
+    ...note,
+    imgUrl: newUrl,
+  });
 };
 
 export const updateProjectNoteSchema = projectNoteSchema;
 
 export type UpdateProjectNoteRequest = z.infer<typeof updateProjectNoteSchema>;
 
-export const updateProjectNote = ({
+export const updateProjectNote = async ({
   id,
   projectId,
+  imgFile,
   ...note
 }: UpdateProjectNoteRequest) => {
-  return mutations.put(getProjectNoteEndpoint({ projectId, noteId: id }), note);
+  let newUrl: string | null = null;
+
+  if (imgFile) {
+    const { url } = await uploadImage({ file: imgFile });
+    newUrl = url;
+  }
+
+  return mutations.put(getProjectNoteEndpoint({ projectId, noteId: id }), {
+    ...note,
+    imgUrl: newUrl,
+  });
 };
 
 export const deleteProjectNote = (projectId: string, noteId: number) => {

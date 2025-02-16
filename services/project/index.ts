@@ -43,8 +43,8 @@ const createProjectSchema = baseProjectSchema;
 
 export type CreateProjectRequest = z.infer<typeof createProjectSchema>;
 
-export const createProject = ({ ...project }: CreateProjectRequest) => {
-  return mutations.post<Project>(getProjectEndpoint(), project);
+export const createProject = (request: CreateProjectRequest) => {
+  return mutations.post<Project>(getProjectEndpoint(), request);
 };
 
 const updateProjectSchema = baseProjectSchema.extend({

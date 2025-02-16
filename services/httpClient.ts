@@ -15,7 +15,7 @@ enum RequestMethod {
   DELETE = 'DELETE',
 }
 
-enum RequestContentType {
+export enum RequestContentType {
   JSON = 'application/json',
   FormData = 'multipart/form-data',
 }
@@ -63,12 +63,12 @@ const serializeNestedObject = <T extends URLSearchParams | FormData>(
     if (value === '' || value == null) return;
 
     const keyWithPrefix = `${prefix}${key}.`;
-    if (isObject(value)) {
-      serializeNestedObject(value, formattedData, keyWithPrefix);
+    if (isValidValue(value)) {
+      append(keyWithPrefix)(value);
     } else if (Array.isArray(value)) {
       value.forEach(append(`${keyWithPrefix}[]`));
-    } else if (isValidValue(value)) {
-      append(keyWithPrefix)(value);
+    } else if (isObject(value)) {
+      serializeNestedObject(value, formattedData, keyWithPrefix);
     }
   });
 
@@ -159,8 +159,12 @@ export const fetcher = <R = void>(params: FetcherParams): Promise<R> => {
 
 const createMutation =
   (method: RequestMethod) =>
-  <R = void>(pathname: string, source?: Record<string, unknown>): Promise<R> =>
-    http<R>({ pathname, source, method });
+  <R = void>(
+    pathname: string,
+    source?: Record<string, unknown>,
+    contentType = RequestContentType.JSON
+  ): Promise<R> =>
+    http<R>({ pathname, source, method, contentType });
 
 export const mutations = {
   post: createMutation(RequestMethod.POST),

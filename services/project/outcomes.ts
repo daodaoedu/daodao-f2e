@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { mutations } from '../httpClient';
 import { projectEndpoint } from './index';
+import { uploadImage } from '../images';
 
 interface GetProjectOutcomeEndpointOptions {
   projectId: string;
@@ -25,6 +26,7 @@ const projectOutcomeSchema = z.object({
   date: z.string().date(),
   description: z.string(),
   imgUrl: z.string().nullable(),
+  imgFile: z.instanceof(File).nullable(),
 });
 
 export type ProjectOutcomeSchema = z.infer<typeof projectOutcomeSchema>;
@@ -37,11 +39,22 @@ export type CreateProjectOutcomeRequest = z.infer<
   typeof createProjectOutcomeSchema
 >;
 
-export const createProjectOutcome = ({
+export const createProjectOutcome = async ({
   projectId,
+  imgFile,
   ...outcome
 }: CreateProjectOutcomeRequest) => {
-  return mutations.post(getProjectOutcomeEndpoint({ projectId }), outcome);
+  let newUrl: string | null = null;
+
+  if (imgFile) {
+    const { url } = await uploadImage({ file: imgFile });
+    newUrl = url;
+  }
+
+  return mutations.post(getProjectOutcomeEndpoint({ projectId }), {
+    ...outcome,
+    imgUrl: newUrl,
+  });
 };
 
 export const updateProjectOutcomeSchema = projectOutcomeSchema;
@@ -50,14 +63,25 @@ export type UpdateProjectOutcomeRequest = z.infer<
   typeof updateProjectOutcomeSchema
 >;
 
-export const updateProjectOutcome = ({
+export const updateProjectOutcome = async ({
   projectId,
   id,
+  imgFile,
   ...outcome
 }: UpdateProjectOutcomeRequest) => {
+  let newUrl: string | null = null;
+
+  if (imgFile) {
+    const { url } = await uploadImage({ file: imgFile });
+    newUrl = url;
+  }
+
   return mutations.put(
     getProjectOutcomeEndpoint({ projectId, outcomeId: id }),
-    outcome
+    {
+      ...outcome,
+      imgUrl: newUrl,
+    }
   );
 };
 
