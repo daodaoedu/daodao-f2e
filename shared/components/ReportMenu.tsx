@@ -39,7 +39,7 @@ const ReportMenu = () => {
         >
           <button
             type="button"
-            onClick={() => window.open('https://forms.gle/NkVbDWC3eXk4P4gv7', '_blank')}
+            onClick={() => window.open('https://forms.gle/NkVbDWC3eXk4P4gv7', '_blank', 'noopener')}
             className="w-full text-left px-4 py-2 text-basic-500 hover:bg-basic-100 transition"
           >
             檢舉
