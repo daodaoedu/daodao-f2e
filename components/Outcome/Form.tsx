@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,6 +13,8 @@ import {
   updateProjectOutcomeSchema,
 } from '@/services/project/outcomes';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
+import Image from '@/shared/components/Image';
+import Upload from '@/shared/components/Upload';
 
 interface BaseOutcomeFormProps {
   projectId: string;
@@ -38,6 +41,10 @@ function OutcomeForm({
   isLoading,
   onSubmit,
 }: OutcomeFormProps) {
+  const [previewImage, setPreviewImage] = useState<string | null>(
+    defaultValues?.imgUrl ?? null
+  );
+
   const methods = useForm<
     typeof id extends never
       ? CreateProjectOutcomeRequest
@@ -80,13 +87,24 @@ function OutcomeForm({
         {...methods.register('description')}
       />
       <div className="px-2">
-        <Button
+        {previewImage && (
+          <div className="mb-4">
+            <Image
+              src={previewImage}
+              alt="preview"
+              width="100%"
+              height="100%"
+            />
+          </div>
+        )}
+        <Upload
           variant="solid"
           color="secondary"
-          onClick={() => toast.error('尚未開放')}
+          onPreviewChange={([preview]) => setPreviewImage(preview)}
+          onFilesChange={([file]) => methods.setValue('imgFile', file)}
         >
-          加入圖片
-        </Button>
+          {previewImage ? '更換圖片' : '加入圖片'}
+        </Upload>
       </div>
       <div className="flex justify-end gap-5">
         <Button

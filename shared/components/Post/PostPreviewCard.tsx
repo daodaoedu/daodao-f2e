@@ -32,7 +32,11 @@ function PostPreviewCard<T extends BasePostData>({
     {
       key: 'edit',
       children: (
-        <Button size="sm" onClick={onEditClick}>
+        <Button
+          size="sm"
+          className="hover:bg-primary-lightest"
+          onClick={onEditClick}
+        >
           編輯
         </Button>
       ),
@@ -40,7 +44,11 @@ function PostPreviewCard<T extends BasePostData>({
     {
       key: 'delete',
       children: (
-        <Button size="sm" onClick={onDeleteClick}>
+        <Button
+          size="sm"
+          className="hover:bg-primary-lightest"
+          onClick={onDeleteClick}
+        >
           刪除
         </Button>
       ),
