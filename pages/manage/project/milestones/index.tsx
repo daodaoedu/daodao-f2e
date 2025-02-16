@@ -37,6 +37,43 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
     fetchMilestones(projectId);
   }, [projectId]);
 
+    const completedMilestonesCount = useMemo(() => {
+      return milestones.filter(m => m.isCompleted).length;
+    }, [milestones]);
+  
+    const progressValue = useMemo(() => {
+      return milestones.length > 0
+        ? Math.round((completedMilestonesCount / milestones.length) * 100)
+        : 0;
+    }, [completedMilestonesCount, milestones]);
+  
+    const allTasks = useMemo(() => {
+      return milestones.reduce((acc, milestone) => {
+        return [...acc, ...(milestone.tasks || [])];
+      }, [] as any[]);
+    }, [milestones]);
+  
+    const remainingTasksCount = useMemo(() => {
+      return allTasks.filter(task => !task.isCompleted).length;
+    }, [allTasks]);
+  
+    const planDeadline = useMemo(() => {
+      if (milestones.length === 0) return null;
+      const endDates = milestones
+        .map(m => new Date(m.endDate!))
+        .map(date => date.getTime());
+      const maxTime = Math.max(...endDates);
+      return new Date(maxTime);
+    }, [milestones]);
+  
+    const daysRemaining = useMemo(() => {
+      if (!planDeadline) return 0;
+      const today = new Date();
+      const diffMs = planDeadline.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+      return diffDays > 0 ? diffDays : 0;
+    }, [planDeadline]);
+
   return (
     <div>
       <SEOConfig data={SEOData} />
@@ -61,15 +98,13 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
           <>
             <Panel className="bg-white mb-6 md:py-6 flex flex-col gap-3 md:gap-5">
               <Title title="學習里程碑進度" className="mb-0" />
-              <ProgressBar progress={50} />
-              <p className="font-sans text-sm md:text-base text-basic-300">還剩 30 天可以完成剩下的 4 個任務，加油！</p>
+              <ProgressBar progress={progressValue} />
+              <p className="font-sans text-sm md:text-base text-basic-300">
+                還剩 {daysRemaining} 天可以完成剩下的 {remainingTasksCount} 個任務，加油！
+              </p>
             </Panel>
             <Panel className="bg-white">
               <Title title="學習里程碑 *" />
-              <p className="font-sans text-sm md:text-base text-basic-300 mb-2">
-                請依據時間與精力設定里程碑（入選後時程表須包含每兩週需繳交的學習任務）
-              </p>
-
               <div className="flex flex-col gap-3">
                 {
                   milestones.length && (

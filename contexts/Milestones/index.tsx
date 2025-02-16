@@ -121,7 +121,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
       const result = responseData;
 
       const newMilestones = milestones.map((m) => {
-        if (m.id === result.milestone_id) {
+        if (m.id === result.milestoneId) {
           const newTasks = [...m.tasks, result];
           return { ...m, tasks: newTasks };
         } else {
@@ -170,7 +170,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
 
       const result = responseData.task;
       const newMilestones = milestones.map((m) => {
-        if (m.id === result.milestone_id) {
+        if (m.id === result.milestoneId) {
           const newTasks = m.tasks.map((t) => {
             return t.id === result.id ? result : t;
           });
@@ -220,7 +220,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
       const result = responseData;
 
       const newMilestones = milestones.map((m) => {
-        if (m.id === result.milestone_id) {
+        if (m.id === result.milestoneId) {
           const newTasks = m.tasks.filter((t) => {
             return t.id !== result.id;
           });
