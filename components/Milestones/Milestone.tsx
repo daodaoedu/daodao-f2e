@@ -87,9 +87,9 @@ const Milestone = ({
           flex flex-row items-center gap-[3px]
           font-sans text-sm text-basic-300"
         >
-          <p>{milestone.start_date || dayjs().format('YYYY/MM/DD')}</p>
+          <p>{milestone.startDate ? dayjs(milestone.startDate).format('YYYY/MM/DD') : dayjs().format('YYYY/MM/DD')}</p>
           <FaArrowRight className="text-basic-300" />
-          <p>{milestone.end_date || dayjs().format('YYYY/MM/DD')}</p>
+          <p>{milestone.endDate ? dayjs(milestone.endDate).format('YYYY/MM/DD') : dayjs().format('YYYY/MM/DD')}</p>
         </div>
       </div>
       <div className="flex flex-row items-center justify-between">
@@ -137,16 +137,16 @@ const Milestone = ({
           ) : (
             <div className="flex flex-row w-full justify-start gap-1">
               <label
-                htmlFor={`is_completed_${milestone.id}`}
+                htmlFor={`isCompleted_${milestone.id}`}
                 className="
                 flex flex-row justify-center items-center gap-[5px] hover:cursor-pointer w-full basis-0"
               >
                 <input
                   type="checkbox"
-                  name="is_completed"
-                  id={`is_completed_${milestone.id}`}
+                  name="isCompleted"
+                  id={`isCompleted_${milestone.id}`}
                   className="peer hidden"
-                  checked={milestone.is_completed}
+                  checked={milestone.isCompleted}
                   onChange={handleCheckCompleted}
                 />
                 <p className="
@@ -158,7 +158,7 @@ const Milestone = ({
                   peer-checked:border-primary-base
                 "
                 >
-                  {milestone.is_completed && <FaCheck />}
+                  {milestone.isCompleted && <FaCheck />}
                 </p>
               </label>
               <p className="w-full">{milestone.name}</p>

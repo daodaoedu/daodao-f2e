@@ -1,16 +1,16 @@
 import getProjectLayout from '@/layout/ProjectLayout';
-
 import { useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
-
 import { Skeleton, useMediaQuery } from "@mui/material";
 import { validateIdWithZod, Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
-
 import { ProtectedComponent } from '@/contexts/Auth';
 import { useProject } from '@/contexts/Project';
 import { MilestonesProvider, useMilestones } from '@/contexts/Milestones/index';
 import MilestoneItem from '@/components/Milestones/MilestoneItem';
+import { Task } from '@/contexts/Milestones/type';
+import dayjs from 'dayjs';
+import { z } from 'zod';
 
 interface MilestonesContentProps {
   SEOData: {
@@ -37,6 +37,49 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
     fetchMilestones(projectId);
   }, [projectId]);
 
+    const completedMilestonesCount = useMemo(() => {
+      return milestones.filter(m => m.isCompleted).length;
+    }, [milestones]);
+  
+    const progressValue = useMemo(() => {
+      return milestones.length > 0
+        ? Math.round((completedMilestonesCount / milestones.length) * 100)
+        : 0;
+    }, [completedMilestonesCount, milestones]);
+  
+    const allTasks = useMemo(() => {
+      return milestones.reduce((acc, milestone) => {
+        return [...acc, ...(milestone.tasks || [])];
+      }, [] as Task[]);
+    }, [milestones]);
+  
+    const remainingTasksCount = useMemo(() => {
+      return allTasks.filter(task => !task.isCompleted).length;
+    }, [allTasks]);
+  
+    const planDeadline = useMemo(() => {
+      if (milestones.length === 0) return null;
+      const endDates = milestones
+        .filter(m => m.endDate !== undefined)
+        .map(m => new Date(m.endDate ?? ''))
+        .map(date => date.getTime());
+      const maxTime = Math.max(...endDates);
+      return new Date(maxTime);
+    }, [milestones]);
+  
+
+    const daysRemaining = useMemo(() => {
+      // 利用 zod 檢查 planDeadline 是否為有效日期
+      if (!z.date().safeParse(planDeadline).success) return 0;
+      
+      const deadline = dayjs(planDeadline);
+      // 如果今天已經超過 deadline，則回傳 0
+      if (dayjs().isAfter(deadline)) return 0;
+      
+      // 計算 deadline 與今天之間相差的天數
+      return deadline.diff(dayjs(), 'day');
+    }, [planDeadline]);
+
   return (
     <div>
       <SEOConfig data={SEOData} />
@@ -61,15 +104,13 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
           <>
             <Panel className="bg-white mb-6 md:py-6 flex flex-col gap-3 md:gap-5">
               <Title title="學習里程碑進度" className="mb-0" />
-              <ProgressBar progress={50} />
-              <p className="font-sans text-sm md:text-base text-basic-300">還剩 30 天可以完成剩下的 4 個任務，加油！</p>
+              <ProgressBar progress={progressValue} />
+              <p className="font-sans text-sm md:text-base text-basic-300">
+                還剩 {daysRemaining} 天可以完成剩下的 {remainingTasksCount} 個任務，加油！
+              </p>
             </Panel>
             <Panel className="bg-white">
               <Title title="學習里程碑 *" />
-              <p className="font-sans text-sm md:text-base text-basic-300 mb-2">
-                請依據時間與精力設定里程碑（入選後時程表須包含每兩週需繳交的學習任務）
-              </p>
-
               <div className="flex flex-col gap-3">
                 {
                   milestones.length && (
