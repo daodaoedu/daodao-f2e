@@ -22,7 +22,7 @@ export enum RoleEnum {
   /** 訪客 */
   Visitor = 1,
   /** 一般使用者 */
-  User,
+  // User,//暫時註解，等DB資料更新完再解開
   /** 馬拉松申請者 */
   MarathonApplicant,
   /** 馬拉松參與者 */
