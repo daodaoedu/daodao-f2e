@@ -171,17 +171,21 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
       const result = responseData.task;
       const newMilestones = milestones.map((m) => {
         if (m.id === result.milestoneId) {
-          const newTasks = m.tasks.map((t) => {
-            return t.id === result.id ? result : t;
-          });
-          console.log('newTask', newTasks);
-          return { ...m, tasks: [...newTasks] };
-        } else {
-          return m;
+          const taskIndex = m.tasks.findIndex(t => t.id === result.id);
+          if (taskIndex === -1) return m;
+          
+          const newTasks = [...m.tasks];
+          newTasks[taskIndex] = result;
+          
+          return {
+            ...m,
+            tasks: newTasks
+          };
         }
+        return m;
       });
-      console.log('newMilestones', newMilestones);
-      setMilestones(() => [...newMilestones]);
+
+      setMilestones(newMilestones);
       return true;
     } catch (error) {
       console.error('error fetching data', error);

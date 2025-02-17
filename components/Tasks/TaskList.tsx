@@ -2,6 +2,7 @@ import {
     Task as TaskType
   } from '@/contexts/Milestones/type';
 import Task from './Task';
+import React from 'react';
 
 const TaskList = ({
     tasks,
@@ -28,4 +29,6 @@ const TaskList = ({
     );
   };
 
-  export default TaskList;
+export default React.memo(TaskList, (prevProps, nextProps) => {
+  return JSON.stringify(prevProps.tasks) === JSON.stringify(nextProps.tasks);
+});

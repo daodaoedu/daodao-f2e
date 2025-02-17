@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { FaCheck } from "react-icons/fa6";
 import { cn } from "@/utils/cn";
 import { useMilestones } from '@/contexts/Milestones/index';
@@ -276,4 +276,6 @@ const Task = ({
   );
 };
 
-export default Task;
+export default React.memo(Task, (prevProps, nextProps) => {
+  return JSON.stringify(prevProps.task) === JSON.stringify(nextProps.task);
+});
