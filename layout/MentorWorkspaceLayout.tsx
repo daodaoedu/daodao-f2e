@@ -5,7 +5,7 @@ import Sidebar from '@/shared/components/Sidebar';
 import { ProtectedComponent } from '@/contexts/Auth';
 import getDefaultLayout from './DefaultLayout';
 
-function ClassroomLayout({ children }: React.PropsWithChildren) {
+function MentorWorkspaceLayout({ children }: React.PropsWithChildren) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -19,21 +19,21 @@ function ClassroomLayout({ children }: React.PropsWithChildren) {
                 size="sm"
                 className="px-0 mb-6 lg:mb-3"
                 prefixIcon="FaAngleLeft"
-                onClick={() => router.push('/manage/classrooms')}
+                onClick={() => router.push('/manage/mentor-workspace')}
               >
                 返回 導師工作室
               </Button>
             </div>
             <Sidebar className="mb-6 lg:mb-0 basis-full -order-1 lg:order-none lg:basis-80">
               <Sidebar.Link
-                href="/manage/classrooms/reviews"
-                isActive={pathname === '/manage/classrooms/reviews'}
+                href="/manage/mentor-workspace/reviews"
+                isActive={pathname === '/manage/mentor-workspace/reviews'}
               >
                 復盤
               </Sidebar.Link>
               <Sidebar.Link
-                href="/manage/classrooms/students"
-                isActive={pathname === '/manage/classrooms/students'}
+                href="/manage/mentor-workspace/students"
+                isActive={pathname === '/manage/mentor-workspace/students'}
               >
                 我的學生
               </Sidebar.Link>
@@ -46,6 +46,6 @@ function ClassroomLayout({ children }: React.PropsWithChildren) {
   );
 }
 
-export default function getClassroomLayout(page: React.ReactElement) {
-  return getDefaultLayout(<ClassroomLayout>{page}</ClassroomLayout>);
+export default function getMentorWorkspaceLayout(page: React.ReactElement) {
+  return getDefaultLayout(<MentorWorkspaceLayout>{page}</MentorWorkspaceLayout>);
 }

@@ -39,7 +39,7 @@ function EditGroupPage() {
     method: 'PUT',
     onSuccess: () => {
       pushSnackbar({ message: '已發布修改' });
-      router.replace('/profile?id=my-group');
+      router.replace('/personal-card/my-card');
     },
   });
 

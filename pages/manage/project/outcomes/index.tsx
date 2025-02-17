@@ -12,7 +12,6 @@ import {
   useProjectOutcome,
   useProjectOutcomeList,
 } from '@/hooks/api/project';
-import config from '@/constants/config';
 
 enum ModalTypeEnum {
   Edit = 'edit',
@@ -99,7 +98,6 @@ const OutcomesPage = () => {
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
-          week={config.getWeekNumber()}
           isLoading={create.isMutating}
           onSubmit={create.trigger}
         />

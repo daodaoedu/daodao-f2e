@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import {
   CreateProjectOutcomeRequest,
@@ -33,6 +33,7 @@ export default function useProjectOutcome({
       ? getProjectOutcomeEndpoint({ projectId, outcomeId })
       : null;
 
+  const config = useSWRConfig();
   const { data, ...swr } = useSWR<ProjectOutcomeSchema>(swrKey);
 
   const create = useSWRMutation(
@@ -41,7 +42,8 @@ export default function useProjectOutcome({
       createProjectOutcome(arg),
     {
       onSuccess: onCreated,
-      onError: () => {
+      onError: (error, key) => {
+        config.onError?.(error, key, config);
         toast.error('新增學習成果失敗');
       },
     }
@@ -53,7 +55,8 @@ export default function useProjectOutcome({
       updateProjectOutcome(arg),
     {
       onSuccess: onUpdated,
-      onError: () => {
+      onError: (error, key) => {
+        config.onError?.(error, key, config);
         toast.error('更新學習成果失敗');
       },
     }
@@ -65,7 +68,8 @@ export default function useProjectOutcome({
       deleteProjectOutcome(arg.projectId, arg.outcomeId),
     {
       onSuccess: onDeleted,
-      onError: () => {
+      onError: (error, key) => {
+        config.onError?.(error, key, config);
         toast.error('刪除學習成果失敗');
       },
     }

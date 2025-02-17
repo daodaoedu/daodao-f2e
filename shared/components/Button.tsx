@@ -19,6 +19,10 @@ const AiOutlineMore = dynamic(() =>
   import('react-icons/ai').then((mod) => mod.AiOutlineMore)
 );
 
+const AiOutlineClose = dynamic(() =>
+  import('react-icons/ai').then((mod) => mod.AiOutlineClose)
+);
+
 const Shell = dynamic(() => import('@/public/assets/icons/shell.svg'));
 
 const Comment = dynamic(() => import('@/public/assets/icons/comment.svg'));
@@ -30,6 +34,7 @@ const icons = {
   Shell,
   MdOutlineEdit,
   AiOutlineMore,
+  AiOutlineClose,
 };
 
 enum ButtonColorEnum {

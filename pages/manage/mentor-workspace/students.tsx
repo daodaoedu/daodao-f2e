@@ -1,6 +1,6 @@
-import getClassroomLayout from '@/layout/ClassroomLayout';
+import getMentorWorkspaceLayout from '@/layout/MentorWorkspaceLayout';
 
-const ClassroomDetail = () => {
+const MentorWorkspaceStudents = () => {
   return (
     <>
       <h1 className="mb-6 heading-md">學習馬拉松</h1>
@@ -19,6 +19,6 @@ const ClassroomDetail = () => {
   );
 };
 
-ClassroomDetail.getLayout = getClassroomLayout;
+MentorWorkspaceStudents.getLayout = getMentorWorkspaceLayout;
 
-export default ClassroomDetail;
+export default MentorWorkspaceStudents;

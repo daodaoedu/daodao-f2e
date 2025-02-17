@@ -136,7 +136,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
                   className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-primary-base text-white hover:bg-primary-darker"
                   onClick={() => {
                     handleClose();
-                    router.replace('/profile');
+                    router.replace('/personal-card');
                   }}
                 >
                   想，填寫資料
@@ -217,6 +217,7 @@ const App = ({ Component, pageProps }) => {
           title="島島阿學多元學習資源"
           href="https://www.daoedu.tw/rss/feed.xml"
         />
+        <link rel="manifest" href="/manifest.json" />
       </Head>
 
       <Provider store={store}>

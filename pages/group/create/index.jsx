@@ -26,7 +26,7 @@ function CreateGroupPage() {
     method: 'POST',
     onSuccess: () => {
       pushSnackbar({ message: '已成功發布揪團' });
-      router.replace('/profile?id=my-group');
+      router.replace('/personal-card/my-card');
     },
   });
 
