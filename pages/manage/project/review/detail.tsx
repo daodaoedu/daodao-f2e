@@ -3,9 +3,8 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import getProjectLayout from '@/layout/ProjectLayout';
 import ReviewDetail from '@/components/Review/Detail';
-import { useProjectReviewMutation } from '@/hooks/api/review';
 import UpdateModal from '@/components/Review/Modals/UpdateModal';
-import { useProjectQuery } from '@/hooks/api/project';
+import { useProject, useProjectReview } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 
 enum ModalTypeEnum {
@@ -19,12 +18,12 @@ const ReviewPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const reviewId = parseInt(searchParams.get('reviewId') ?? '0', 10);
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const { data: project } = useProjectQuery({ projectId });
+  const { data: project } = useProject(projectId);
   const {
     data: review,
     update,
     remove,
-  } = useProjectReviewMutation({
+  } = useProjectReview({
     projectId,
     reviewId,
     onUpdated: () => {
@@ -50,14 +49,14 @@ const ReviewPage = () => {
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
       />
 
-      {review && (
+      {review && project && (
         <UpdateModal
           projectId={projectId}
-          projectTitle={project?.title}
+          projectTitle={project.title}
           reviewId={reviewId}
           defaultValues={review}
           week={review.week}
-          createdAt={review.created_at}
+          createdAt={review.createdAt}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
           onSubmit={update.trigger}

@@ -1,23 +1,23 @@
 import useSWR from 'swr';
 import { getProjectReviewEndpoint, ProjectReviewSchema } from '@/services/project/reviews';
 
-import useProjectReviewMutation from './useReviewMutation';
+import useProjectReview from './useProjectReview';
 
-interface UseProjectReviewQueryOptions {
+interface UseProjectReviewListOptions {
   onCreated?: () => void;
   onUpdated?: () => void;
   onDeleted?: () => void;
 }
 
-export default function useProjectReviewQuery(
+export default function useProjectReviewList(
   projectId?: string,
-  options?: UseProjectReviewQueryOptions
+  options?: UseProjectReviewListOptions
 ) {
   const swrKey = projectId ? getProjectReviewEndpoint({ projectId }) : null;
 
   const { mutate, ...swr } = useSWR<ProjectReviewSchema[]>(swrKey);
 
-  const mutations = useProjectReviewMutation({
+  const mutations = useProjectReview({
     mutateKey: swrKey,
     ...options,
   });

@@ -11,7 +11,7 @@ import {
   updateProjectOutcome,
 } from '@/services/project/outcomes';
 
-interface UseProjectOutcomeMutationOptions {
+interface UseProjectOutcomeOptions {
   projectId?: string;
   outcomeId?: number;
   mutateKey?: string | null;
@@ -20,14 +20,14 @@ interface UseProjectOutcomeMutationOptions {
   onDeleted?: () => void;
 }
 
-export default function useProjectOutcomeMutation({
+export default function useProjectOutcome({
   projectId,
   outcomeId,
   mutateKey,
   onCreated,
   onUpdated,
   onDeleted,
-}: UseProjectOutcomeMutationOptions) {
+}: UseProjectOutcomeOptions) {
   const swrKey =
     projectId && outcomeId
       ? getProjectOutcomeEndpoint({ projectId, outcomeId })

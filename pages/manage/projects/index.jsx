@@ -8,7 +8,7 @@ import GoBackButton
 import { ProtectedComponent } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
-import { useProjectQuery } from '@/hooks/api/project';
+import { useProjectList } from '@/hooks/api/project';
 import More from '@/components/Projects/More';
 import Button from '@/shared/components/Button';
 import { cn } from '@/utils/cn';
@@ -17,7 +17,7 @@ const Projects = () => {
   const maxProjects = 3;
   const router = useRouter();
   // const userState = useSelector((state) => state.user);
-  const { data } = useProjectQuery({ isMe: true });
+  const { data } = useProjectList({ isMe: true });
   // const projects = Array.isArray(userState.marathons) ? userState.marathons : [];
   const projects = Array.isArray(data) ? data : [];
   const isEditPermitted = Boolean(projects.length);
@@ -37,9 +37,9 @@ const Projects = () => {
 
   return (
     <ProtectedComponent>
-      <div className="bg-[#F3FCFC] md:py-8">
-        <div className="w-full p-4 bg-[#F3FCFC]
-          md:w-[860px] mx-auto box-border flex flex-col gap-6"
+      <div className="bg-[#F3FCFC] md:py-8 min-h-screen-without-padding-top">
+        <div className="w-full p-4
+          md:max-w-[860px] mx-auto box-border flex flex-col gap-6"
         >
           <GoBackButton
             onClick={() => router.push({

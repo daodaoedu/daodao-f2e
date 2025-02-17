@@ -3,8 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import OutcomeDetail from '@/components/Outcome/Detail';
 import getProjectLayout from '@/layout/ProjectLayout';
-import { useProjectQuery } from '@/hooks/api/project';
-import { useProjectOutcomeMutation } from '@/hooks/api/outcome';
+import { useProject, useProjectOutcome } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 import EditModal from '@/components/Outcome/Modals/UpdateModal';
 
@@ -19,12 +18,12 @@ const OutcomeDetailPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const outcomeId = parseInt(searchParams.get('outcomeId') ?? '0', 10);
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const { data: project } = useProjectQuery({ projectId });
+  const { data: project } = useProject(projectId);
   const {
     data: outcome,
     update,
     remove,
-  } = useProjectOutcomeMutation({
+  } = useProjectOutcome({
     projectId,
     outcomeId,
     onUpdated: () => {
@@ -50,11 +49,11 @@ const OutcomeDetailPage = () => {
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
       />
 
-      {outcome && (
+      {outcome && project && (
         <EditModal
           id={outcomeId}
           projectId={projectId}
-          projectTitle={project?.title}
+          projectTitle={project.title}
           defaultValues={outcome}
           week={outcome.week}
           createdAt={outcome.date}

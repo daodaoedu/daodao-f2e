@@ -191,36 +191,44 @@ function MobileMenu() {
             ))}
           </div>
         )}
-        <div className="flex-1 flex flex-col justify-between">
+        <div className="flex-1 flex flex-col pb-20">
           {navType === NavType.Explore && (
             <ExploreMenu onClose={() => setIsOpenMenu(false)} />
           )}
           {navType === NavType.Profile && (
             <ProfileMenu onClose={() => setIsOpenMenu(false)} />
           )}
-          {auth.isLoggedIn ? (
-            <Button
-              className="px-4 pb-6 text-left"
-              onClick={() => {
-                authDispatch.logout();
-                setIsOpenMenu(false);
-              }}
-            >
-              登出
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              color="primary"
-              className="m-4"
-              onClick={() => {
-                authDispatch.openLoginModal();
-                setIsOpenMenu(false);
-              }}
-            >
-              登入
-            </Button>
-          )}
+          <div
+            className={cn(
+              'fixed bottom-0 left-0 right-0 flex bg-basic-white',
+              'transition-opacity opacity-0 pointer-events-none',
+              isOpenMenu && 'opacity-100 pointer-events-auto'
+            )}
+          >
+            {auth.isLoggedIn ? (
+              <Button
+                className="flex-1 px-4 pb-6 text-left"
+                onClick={() => {
+                  authDispatch.logout();
+                  setIsOpenMenu(false);
+                }}
+              >
+                登出
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                color="primary"
+                className="flex-1 m-4"
+                onClick={() => {
+                  authDispatch.openLoginModal();
+                  setIsOpenMenu(false);
+                }}
+              >
+                登入
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </>

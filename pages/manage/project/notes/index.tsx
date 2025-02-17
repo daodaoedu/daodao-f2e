@@ -7,8 +7,12 @@ import Button from '@/shared/components/Button';
 import CreateModal from '@/components/Note/Modals/CreateModal';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';
 import ConfirmModal from '@/shared/components/Confirm';
-import { useProjectQuery } from '@/hooks/api/project';
-import { useProjectNoteMutation, useProjectNoteQuery } from '@/hooks/api/note';
+import {
+  useProject,
+  useProjectNote,
+  useProjectNoteList,
+} from '@/hooks/api/project';
+import config from '@/constants/config';
 
 enum ModalTypeEnum {
   Create = 'create',
@@ -21,9 +25,9 @@ const NotesPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [noteId, setNoteId] = useState<number | undefined>(undefined);
-  const { data: project } = useProjectQuery({ projectId });
+  const { data: project } = useProject(projectId);
 
-  const { data: detail, mutate } = useProjectNoteMutation({
+  const { data: detail, mutate } = useProjectNote({
     projectId,
     noteId,
   });
@@ -33,7 +37,7 @@ const NotesPage = () => {
     create,
     update,
     remove,
-  } = useProjectNoteQuery(projectId, {
+  } = useProjectNoteList(projectId, {
     onCreated: () => {
       toast.success('新增便利貼成功');
       setModalType(null);
@@ -96,13 +100,13 @@ const NotesPage = () => {
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
-          week={1}
+          week={config.getWeekNumber()}
           isLoading={create.isMutating}
           onSubmit={create.trigger}
         />
       )}
 
-      {detail && noteId && (
+      {detail && noteId && project && (
         <UpdateModal
           key={noteId}
           id={noteId}
@@ -110,7 +114,7 @@ const NotesPage = () => {
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
-          week={detail.week || 1}
+          week={detail.week}
           createdAt={detail.date}
           isLoading={update.isMutating}
           defaultValues={detail}

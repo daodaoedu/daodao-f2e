@@ -21,7 +21,7 @@ function ClassroomLayout({ children }: React.PropsWithChildren) {
                 prefixIcon="FaAngleLeft"
                 onClick={() => router.push('/manage/classrooms')}
               >
-                返回 我的教室
+                返回 導師工作室
               </Button>
             </div>
             <Sidebar className="mb-6 lg:mb-0 basis-full -order-1 lg:order-none lg:basis-80">

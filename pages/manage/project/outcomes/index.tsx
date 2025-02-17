@@ -7,11 +7,12 @@ import Button from '@/shared/components/Button';
 import CreateModal from '@/components/Outcome/Modals/CreateModal';
 import UpdateModal from '@/components/Outcome/Modals/UpdateModal';
 import ConfirmModal from '@/shared/components/Confirm';
-import { useProjectQuery } from '@/hooks/api/project';
 import {
-  useProjectOutcomeQuery,
-  useProjectOutcomeMutation,
-} from '@/hooks/api/outcome';
+  useProject,
+  useProjectOutcome,
+  useProjectOutcomeList,
+} from '@/hooks/api/project';
+import config from '@/constants/config';
 
 enum ModalTypeEnum {
   Edit = 'edit',
@@ -23,9 +24,9 @@ const OutcomesPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [outcomeId, setOutcomeId] = useState<number | undefined>(undefined);
-  const { data: project } = useProjectQuery({ projectId });
+  const { data: project } = useProject(projectId);
 
-  const { data: detail, mutate } = useProjectOutcomeMutation({
+  const { data: detail, mutate } = useProjectOutcome({
     projectId,
     outcomeId,
   });
@@ -35,7 +36,7 @@ const OutcomesPage = () => {
     create,
     update,
     remove,
-  } = useProjectOutcomeQuery(projectId, {
+  } = useProjectOutcomeList(projectId, {
     onCreated: () => {
       toast.success('新增學習成果成功');
       setModalType(null);
@@ -98,13 +99,13 @@ const OutcomesPage = () => {
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
-          week={1}
+          week={config.getWeekNumber()}
           isLoading={create.isMutating}
           onSubmit={create.trigger}
         />
       )}
 
-      {detail && outcomeId && (
+      {detail && outcomeId && project && (
         <UpdateModal
           key={outcomeId}
           id={outcomeId}
@@ -112,7 +113,7 @@ const OutcomesPage = () => {
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
-          week={detail.week || 1}
+          week={detail.week}
           createdAt={detail.date}
           isLoading={update.isMutating}
           defaultValues={detail}

@@ -27,8 +27,8 @@ function ReviewCard({
       <PostCard.Header
         title={data.title}
         subtitle={`第${numberToChineseNumber(data.week)}週`}
-        tag="覆盤二"
-        date={dayjs(data.created_at).format('YYYY/MM/DD')}
+        tag="覆盤"
+        date={dayjs(data.createdAt).format('YYYY/MM/DD')}
         dropdownItems={[
           {
             key: 'edit',

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Project } from '@/components/Projects/Project/type';
 import { mutations } from '../httpClient';
 
 export const projectEndpoint = '/projects';
@@ -43,7 +44,7 @@ const createProjectSchema = baseProjectSchema;
 export type CreateProjectRequest = z.infer<typeof createProjectSchema>;
 
 export const createProject = ({ ...project }: CreateProjectRequest) => {
-  return mutations.post(getProjectEndpoint(), project);
+  return mutations.post<Project>(getProjectEndpoint(), project);
 };
 
 const updateProjectSchema = baseProjectSchema.extend({
@@ -56,7 +57,7 @@ export const updateProject = ({
   projectId,
   ...project
 }: UpdateProjectRequest) => {
-  return mutations.put(getProjectEndpoint({ projectId }), project);
+  return mutations.put<Project>(getProjectEndpoint({ projectId }), project);
 };
 
 export const deleteProject = (projectId: string) => {

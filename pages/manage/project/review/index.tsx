@@ -7,11 +7,12 @@ import ReviewCard from '@/components/Review/Card';
 import CreateModal from '@/components/Review/Modals/CreateModal';
 import UpdateModal from '@/components/Review/Modals/UpdateModal';
 import {
-  useProjectReviewMutation,
-  useProjectReviewQuery,
-} from '@/hooks/api/review';
-import { useProjectQuery } from '@/hooks/api/project';
+  useProject,
+  useProjectReview,
+  useProjectReviewList,
+} from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
+import config from '@/constants/config';
 
 enum ModalTypeEnum {
   Create = 'create',
@@ -24,9 +25,9 @@ const ReviewPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [reviewId, setReviewId] = useState<number | undefined>(undefined);
-  const { data: project } = useProjectQuery({ projectId });
+  const { data: project } = useProject(projectId);
 
-  const { data: detail, mutate } = useProjectReviewMutation({
+  const { data: detail, mutate } = useProjectReview({
     projectId,
     reviewId,
   });
@@ -36,7 +37,7 @@ const ReviewPage = () => {
     create,
     update,
     remove,
-  } = useProjectReviewQuery(projectId, {
+  } = useProjectReviewList(projectId, {
     onCreated: () => {
       toast.success('新增覆盤成功');
       setModalType(null);
@@ -103,7 +104,7 @@ const ReviewPage = () => {
         <CreateModal
           projectId={projectId}
           projectTitle={project.title}
-          week={1}
+          week={config.getWeekNumber()}
           isOpen={modalType === ModalTypeEnum.Create}
           onClose={() => setModalType(null)}
           onSubmit={create.trigger}
@@ -111,14 +112,14 @@ const ReviewPage = () => {
         />
       )}
 
-      {detail && reviewId && (
+      {detail && reviewId && project && (
         <UpdateModal
           projectId={projectId}
-          projectTitle={project?.title}
+          projectTitle={project.title}
           reviewId={reviewId}
           defaultValues={detail}
           week={detail.week}
-          createdAt={detail.created_at}
+          createdAt={detail.createdAt}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
           onSubmit={update.trigger}
