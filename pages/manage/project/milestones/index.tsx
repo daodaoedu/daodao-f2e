@@ -38,44 +38,43 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
   }, [projectId]);
 
     const completedMilestonesCount = useMemo(() => {
-      return milestones.filter(m => m.isCompleted).length;
+      return milestones.filter((m) => m.isCompleted).length;
     }, [milestones]);
-  
+
     const progressValue = useMemo(() => {
       return milestones.length > 0
         ? Math.round((completedMilestonesCount / milestones.length) * 100)
         : 0;
     }, [completedMilestonesCount, milestones]);
-  
+
     const allTasks = useMemo(() => {
       return milestones.reduce((acc, milestone) => {
         return [...acc, ...(milestone.tasks || [])];
       }, [] as Task[]);
     }, [milestones]);
-  
+
     const remainingTasksCount = useMemo(() => {
-      return allTasks.filter(task => !task.isCompleted).length;
+      return allTasks.filter((task) => !task.isCompleted).length;
     }, [allTasks]);
-  
+
     const planDeadline = useMemo(() => {
       if (milestones.length === 0) return null;
       const endDates = milestones
-        .filter(m => m.endDate !== undefined)
-        .map(m => new Date(m.endDate ?? ''))
-        .map(date => date.getTime());
+        .filter((m) => m.endDate !== undefined)
+        .map((m) => new Date(m.endDate ?? ''))
+        .map((date) => date.getTime());
       const maxTime = Math.max(...endDates);
       return new Date(maxTime);
     }, [milestones]);
-  
 
     const daysRemaining = useMemo(() => {
       // 利用 zod 檢查 planDeadline 是否為有效日期
       if (!z.date().safeParse(planDeadline).success) return 0;
-      
+
       const deadline = dayjs(planDeadline);
       // 如果今天已經超過 deadline，則回傳 0
       if (dayjs().isAfter(deadline)) return 0;
-      
+
       // 計算 deadline 與今天之間相差的天數
       return deadline.diff(dayjs(), 'day');
     }, [planDeadline]);
