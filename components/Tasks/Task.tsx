@@ -65,18 +65,15 @@ const Task = ({
     setIsEditing(false);
   };
 
-  const handleCheckCompleted = async (event:
-    React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleCheckCompleted = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = event.target;
     const success = await dispatchTask(projectId, milestoneId, {
-      ...newTask,
+      ...task,
       [name]: checked
     });
 
     if (success) {
       toast.success('任務更新成功');
-      fetchMilestones(projectId);
     } else {
       toast.error('任務更新失敗，請稍後再試');
     }
@@ -99,7 +96,7 @@ const Task = ({
   const handleDaySelect = (day: string) => {
     setNewTask((prev) => ({
       ...prev,
-      days_of_week: prev.daysOfWeek?.includes(day)
+      daysOfWeek: prev.daysOfWeek?.includes(day)
         ? prev.daysOfWeek.filter((d) => d !== day)
         : [...(prev.daysOfWeek || []), day]
     }));
@@ -206,14 +203,14 @@ const Task = ({
             <div className="flex flex-col w-full">
               <div className="flex flex-row w-full justify-start gap-1">
                 <label
-                  htmlFor={`is_completed_${task.id}`}
+                  htmlFor={`isCompleted_${task.id}`}
                   className="
                   flex flex-row justify-center items-center gap-[5px] hover:cursor-pointer w-full basis-0"
                 >
                   <input
                     type="checkbox"
-                    name="is_completed"
-                    id={`is_completed_${task.id}`}
+                    name="isCompleted"
+                    id={`isCompleted_${task.id}`}
                     className="peer hidden"
                     checked={task.isCompleted}
                     onChange={handleCheckCompleted}

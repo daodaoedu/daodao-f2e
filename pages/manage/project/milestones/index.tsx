@@ -1,16 +1,16 @@
 import getProjectLayout from '@/layout/ProjectLayout';
-
 import { useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
-
 import { Skeleton, useMediaQuery } from "@mui/material";
 import { validateIdWithZod, Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
-
 import { ProtectedComponent } from '@/contexts/Auth';
 import { useProject } from '@/contexts/Project';
 import { MilestonesProvider, useMilestones } from '@/contexts/Milestones/index';
 import MilestoneItem from '@/components/Milestones/MilestoneItem';
+import { Task } from '@/contexts/Milestones/type';
+import dayjs from 'dayjs';
+import { z } from 'zod';
 
 interface MilestonesContentProps {
   SEOData: {
@@ -50,7 +50,7 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
     const allTasks = useMemo(() => {
       return milestones.reduce((acc, milestone) => {
         return [...acc, ...(milestone.tasks || [])];
-      }, [] as any[]);
+      }, [] as Task[]);
     }, [milestones]);
   
     const remainingTasksCount = useMemo(() => {
@@ -60,18 +60,24 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
     const planDeadline = useMemo(() => {
       if (milestones.length === 0) return null;
       const endDates = milestones
-        .map(m => new Date(m.endDate!))
+        .filter(m => m.endDate !== undefined)
+        .map(m => new Date(m.endDate ?? ''))
         .map(date => date.getTime());
       const maxTime = Math.max(...endDates);
       return new Date(maxTime);
     }, [milestones]);
   
+
     const daysRemaining = useMemo(() => {
-      if (!planDeadline) return 0;
-      const today = new Date();
-      const diffMs = planDeadline.getTime() - today.getTime();
-      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      return diffDays > 0 ? diffDays : 0;
+      // 利用 zod 檢查 planDeadline 是否為有效日期
+      if (!z.date().safeParse(planDeadline).success) return 0;
+      
+      const deadline = dayjs(planDeadline);
+      // 如果今天已經超過 deadline，則回傳 0
+      if (dayjs().isAfter(deadline)) return 0;
+      
+      // 計算 deadline 與今天之間相差的天數
+      return deadline.diff(dayjs(), 'day');
     }, [planDeadline]);
 
   return (

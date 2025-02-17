@@ -1,8 +1,8 @@
+import React, { useMemo } from 'react';
 import {
     Task as TaskType
   } from '@/contexts/Milestones/type';
 import Task from './Task';
-import React from 'react';
 
 const TaskList = ({
     tasks,
@@ -13,10 +13,13 @@ const TaskList = ({
     projectId: string;
     milestoneId: number;
   }) => {
+
+    const sortedTasks = useMemo(() => {
+      return [...tasks].sort((a, b) => a.id - b.id);
+    }, [tasks]);
     return (
       <>
-        {tasks
-          .sort((a, b) => a.id - b.id)
+        {sortedTasks
           .map((task) => (
             <Task
               key={task.id}
