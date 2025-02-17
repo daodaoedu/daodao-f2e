@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { RoleEnum, useAuth } from '@/contexts/Auth';
+import { RoleEnum, useAuth, ProtectedComponent } from '@/contexts/Auth';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import Select from '@/components/Projects/Form/Select';
 import AccessDenied from '@/shared/components/AccessDenied';
 import GoBackButton
   from '@/components/Projects/GoBackButton';
-import { ProtectedComponent } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
 import { useProjectList } from '@/hooks/api/project';
