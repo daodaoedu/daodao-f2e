@@ -14,14 +14,16 @@ const TaskList = ({
   }) => {
     return (
       <>
-        {tasks.map((task) => (
-          <Task
-            key={task.id}
-            projectId={projectId}
-            milestoneId={milestoneId}
-            task={task}
-          />
-        ))}
+        {tasks
+          .sort((a, b) => a.id - b.id)
+          .map((task) => (
+            <Task
+              key={task.id}
+              projectId={projectId}
+              milestoneId={milestoneId}
+              task={task}
+            />
+          ))}
       </>
     );
   };
