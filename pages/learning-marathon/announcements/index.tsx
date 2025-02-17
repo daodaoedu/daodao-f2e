@@ -26,21 +26,23 @@ const Announcements = () => {
       <Nav activeTab="活動公告" />
 
       <div className="bg-[#EEF9F9] min-h-[85dvh]">
-        <div className="box pt-[72px] mx-auto w-[750px]">
+        <div className="pt-[72px] px-4 mx-auto max-w-[750px]">
           <h3 className="heading-md text-basic-500">活動公告</h3>
           <AnnouncementList items={announcementItems} />
 
-          <div className="flex justify-center">
-            <Button
-              className=""
-              variant="solid"
-              color="primary"
-              size="md"
-              onClick={() => logEvent('click', 'show_more_announcement')}
-            >
-              顯示更多
-            </Button>
-          </div>
+          {announcementItems.length > 5 && (
+            <div className="flex justify-center">
+              <Button
+                className=""
+                variant="solid"
+                color="primary"
+                size="md"
+                onClick={() => logEvent('click', 'show_more_announcement')}
+              >
+                顯示更多
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </>

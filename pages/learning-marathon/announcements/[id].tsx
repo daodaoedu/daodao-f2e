@@ -56,7 +56,7 @@ const Announcement = () => {
 
       <div className="bg-[#EEF9F9] min-h-[85dvh]">
         <div className="">
-          <div className="mx-auto w-[750px]">
+          <div className="mx-auto px-4 max-w-[750px]">
             <Link
               href="/learning-marathon/announcements"
               className="block p-6 w-fit text-black body-sm font-medium"
@@ -68,7 +68,7 @@ const Announcement = () => {
           </div>
         </div>
 
-        <div className="box pt-[72px] mx-auto w-[750px]">
+        <div className="pt-[72px] px-4 mx-auto max-w-[750px]">
           <h3 className="heading-md text-basic-500">其他公告</h3>
           <AnnouncementList items={items} />
         </div>
