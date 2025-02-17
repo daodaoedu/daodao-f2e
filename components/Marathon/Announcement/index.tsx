@@ -35,8 +35,10 @@ const AnnouncementList = ({ items }: { items: AnnouncementItem[] }) => {
           <h4 className="text-basic-400 body-sm font-normal">
             {`${id} - ${title}`}
           </h4>
-          <div className="flex justify-between">
-            <TagList tags={tags} />
+          <div className="flex justify-between flex-wrap">
+            <div className="md:w-full">
+              <TagList tags={tags} />
+            </div>
             <p className="text-basic-300 body-sm">{times}</p>
           </div>
         </Link>
