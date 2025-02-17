@@ -33,7 +33,7 @@ const AccessDenied = () => {
       <div className="w-full flex flex-col gap-3 justify-center md:flex-row">
         <Button
           id="editMyCardButton"
-          onClick={() => router.push('/manage/mycard')}
+          onClick={() => router.push('/personal-card/my-card')}
           variant="outline"
           color="primary"
         >
