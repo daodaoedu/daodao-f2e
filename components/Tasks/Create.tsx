@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MdClose, MdSend, MdCalendarToday, MdKeyboardArrowDown } from 'react-icons/md';
 import { useMilestones } from '@/contexts/Milestones/index';
 import { cn } from "@/utils/cn";
+import toast from 'react-hot-toast';
 
 const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -54,10 +55,15 @@ const TaskCreate = ({
   //   setNewMilestone((prev) => ({ ...prev, dates: values }));
   // };
 
-  const handleSubmit = () => {
-    createTask(projectId, milestoneId, newTask);
-    fetchMilestones(projectId);
-    onCancel();
+  const handleSubmit = async () => {
+    const success = await createTask(projectId, milestoneId, newTask);
+    if (success) {
+      toast.success('任務新增成功');
+      fetchMilestones(projectId);
+      onCancel();
+    } else {
+      toast.error('任務新增失敗，請稍後再試');
+    }
   };
 
   const handleDaySelect = (day: string) => {
