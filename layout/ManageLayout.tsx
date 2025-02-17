@@ -1,12 +1,19 @@
+import { useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import Sidebar from '@/shared/components/Sidebar';
 import Collapse from '@/shared/components/Collapse';
 import Container from '@/shared/components/Container';
-import { ProtectedComponent } from '@/contexts/Auth';
+import { ProtectedComponent, RoleEnum, useAuth } from '@/contexts/Auth';
 import getDefaultLayout from './DefaultLayout';
 
 function ManageLayout({ children }: React.PropsWithChildren) {
+  const { user } = useAuth();
   const pathname = usePathname();
+
+  const canVisitMentorWorkspace = useMemo(() => {
+    const permissions = [RoleEnum.Mentor, RoleEnum.Admin, RoleEnum.SuperAdmin];
+    return user ? permissions.includes(user.role) : false;
+  }, [user]);
 
   return (
     <ProtectedComponent redirectOnCancel="/">
@@ -68,13 +75,15 @@ function ManageLayout({ children }: React.PropsWithChildren) {
                   </Collapse.Item>
                 </Collapse.List>
               </Collapse>
-              <Sidebar.Link
-                href="/manage/classrooms"
-                isActive={pathname === '/manage/classrooms'}
-                isDisabled
-              >
-                導師工作室
-              </Sidebar.Link>
+              {canVisitMentorWorkspace && (
+                <Sidebar.Link
+                  href="/manage/mentor-workspace"
+                  isActive={pathname === '/manage/mentor-workspace'}
+                  isDisabled={user?.role !== RoleEnum.Mentor}
+                >
+                  導師工作室
+                </Sidebar.Link>
+              )}
             </Sidebar>
           </div>
           <div className="flex-1">{children}</div>

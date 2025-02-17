@@ -1,10 +1,10 @@
 import { AiOutlineMore } from 'react-icons/ai';
 import Button from '@/shared/components/Button';
-import getClassroomLayout from '@/layout/ClassroomLayout';
+import getMentorWorkspaceLayout from '@/layout/MentorWorkspaceLayout';
 import { useState } from 'react';
 import { cn } from '@/utils/cn';
 
-const ClassroomDetail = () => {
+const MentorWorkspaceReviews = () => {
   const [activeTab, setActiveTab] = useState(11);
 
   const tabs = [
@@ -75,6 +75,6 @@ const ClassroomDetail = () => {
   );
 };
 
-ClassroomDetail.getLayout = getClassroomLayout;
+MentorWorkspaceReviews.getLayout = getMentorWorkspaceLayout;
 
-export default ClassroomDetail;
+export default MentorWorkspaceReviews;

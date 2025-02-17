@@ -5,9 +5,9 @@ import Button from '@/shared/components/Button';
 import Container from '@/shared/components/Container';
 import Image from '@/shared/components/Image';
 
-const ClassCard = () => {
+const MentorWorkspaceCard = () => {
   return (
-    <Link href="/manage/classrooms/reviews" className="block bg-basic-white rounded-lg">
+    <Link href="/manage/mentor-workspace/reviews" className="block bg-basic-white rounded-lg">
       <div className="rounded-lg overflow-hidden">
         <Image src="" alt="" />
       </div>
@@ -46,7 +46,7 @@ const ClassCard = () => {
   );
 };
 
-const Classrooms = () => {
+const MentorWorkspace = () => {
   const router = useRouter();
 
   return (
@@ -63,7 +63,7 @@ const Classrooms = () => {
         <h1 className="mb-6 heading-md">導師工作室</h1>
         <ul className="grid grid-cols-3 gap-4">
           <li>
-            <ClassCard />
+            <MentorWorkspaceCard />
           </li>
         </ul>
       </div>
@@ -71,4 +71,4 @@ const Classrooms = () => {
   );
 };
 
-export default Classrooms;
+export default MentorWorkspace;
