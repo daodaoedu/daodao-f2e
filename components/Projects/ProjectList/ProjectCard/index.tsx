@@ -1,7 +1,6 @@
 import { Project as ProjectType } from '@/components/Projects/Project/type';
 import { cn } from '@/utils/cn';
 import ProjectUserInfoBar from './ProjectUserInfoBar';
-import ProjectStatus from './ProjectStatus';
 import ProjectHeader from './ProjectHeader';
 
 interface ProjectCardProps {
@@ -31,13 +30,13 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       </div>
       <div className="w-full flex flex-col gap-2 md:flex-row align-center justify-between">
         <ProjectUserInfoBar user={project.user} />
-        <ProjectStatus
+        {/* <ProjectStatus
           status={{
             favorites: 5,
             shells: 5,
             comments: 3
           }}
-        />
+        /> */}
       </div>
     </div>
   );
