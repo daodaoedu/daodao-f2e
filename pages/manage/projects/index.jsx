@@ -1,27 +1,36 @@
+import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-// import { useSelector } from 'react-redux';
+import { RoleEnum, useAuth, ProtectedComponent } from '@/contexts/Auth';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import Select from '@/components/Projects/Form/Select';
 import AccessDenied from '@/shared/components/AccessDenied';
 import GoBackButton
   from '@/components/Projects/GoBackButton';
-import { ProtectedComponent } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
 import { useProjectList } from '@/hooks/api/project';
 import More from '@/components/Projects/More';
 import Button from '@/shared/components/Button';
 import { cn } from '@/utils/cn';
+import toast from 'react-hot-toast';
 
 const Projects = () => {
   const maxProjects = 3;
   const router = useRouter();
-  // const userState = useSelector((state) => state.user);
+  const { user } = useAuth();
   const { data } = useProjectList({ isMe: true });
-  // const projects = Array.isArray(userState.marathons) ? userState.marathons : [];
   const projects = Array.isArray(data) ? data : [];
-  const isEditPermitted = Boolean(projects.length);
   const isAddedDenied = projects.length >= maxProjects;
+  const isEditPermitted = useMemo(() => {
+    const permissions = [
+      RoleEnum.MarathonApplicant,
+      RoleEnum.MarathonParticipant,
+      RoleEnum.Mentor,
+      RoleEnum.Admin,
+      RoleEnum.SuperAdmin,
+    ];
+    return user ? permissions.includes(user?.role) : false;
+  }, [user]);
   const options = [
     { value: "all", label: "全部計畫" },
     { value: "learning-marathon", label: "學習馬拉松" },
@@ -76,6 +85,7 @@ const Projects = () => {
               />
               <Button
                 isDisabled={isAddedDenied}
+                onClick={() => toast.error('功能尚未開放')}
                 variant="solid"
                 className="hover:cursor-pointer flex-shrink-0"
               >
