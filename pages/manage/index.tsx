@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { Children, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
@@ -14,11 +15,13 @@ import getManageLayout from '@/layout/ManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
 import { useProjectReviewList, useProjectList } from '@/hooks/api/project';
 import SEOConfig from '@/shared/components/SEO';
-import Dropdown from '@/shared/components/Dropdown';
+import AccessDenied from '@/shared/components/AccessDenied';
 import Button from '@/shared/components/Button';
 import Collapse from '@/shared/components/Collapse';
+import Dropdown from '@/shared/components/Dropdown';
 import ReviewCard from '@/components/Review/Card';
 import MilestoneItem from '@/components/Milestones/MilestoneItem';
+import { RoleEnum, useAuth } from '@/contexts/Auth';
 import { MilestonesProvider } from '@/contexts/Milestones';
 import { ProjectProvider } from '@/contexts/Project';
 import { cn } from '@/utils/cn';
@@ -59,11 +62,14 @@ const Header = () => {
         <Dropdown.Toggle variant="solid" className="mb-1" withIcon>
           新增
         </Dropdown.Toggle>
-        <Dropdown.List className="top-full left-0 -mt-1 z-20">
-          <Dropdown.Item className="rounded-lg text-nowrap hover:bg-primary-lightest">
-            <div className="p-2 text-basic-300 cursor-not-allowed">
+        <Dropdown.List className="top-full right-0 z-20">
+          <Dropdown.Item className="rounded-lg text-nowrap">
+            <Button
+              className="hover:bg-primary-lightest"
+              onClick={() => toast.error('功能尚未開放')}
+            >
               學習計畫
-            </div>
+            </Button>
           </Dropdown.Item>
         </Dropdown.List>
       </Dropdown>
@@ -195,9 +201,7 @@ const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
   );
 };
 
-const Manage = () => {
-  const [date, setDate] = useState<Dayjs>(dayjs().startOf('day'));
-  const pathname = usePathname();
+const Main = ({ date }: { date: Dayjs }) => {
   const { data: projects } = useProjectList({ isMe: true });
   const { data: reviews } = useProjectReviewList(projects?.[0]?.id);
 
@@ -222,30 +226,8 @@ const Manage = () => {
     return reviews.filter((review) => date.isSame(review.createdAt));
   }, [reviews, date]);
 
-  const SEOData = useMemo(
-    () => ({
-      title: '我的小島｜島島阿學',
-      description:
-        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-      keywords: '島島阿學',
-      author: '島島阿學',
-      copyright: '島島阿學',
-      imgLink: 'https://www.daoedu.tw/preview.webp',
-      link: `${process.env.HOSTNAME}${pathname}`,
-    }),
-    [pathname]
-  );
-
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
-      <SEOConfig data={SEOData} />
-      <Header />
-      <Calendar
-        date={date}
-        onChange={setDate}
-        maxDate={config.marathonEndDate}
-        minDate={config.marathonStartDate}
-      />
+    <>
       <ul>
         {currentProjects.map((project, index) => (
           <li key={project.id}>
@@ -277,6 +259,50 @@ const Manage = () => {
           </li>
         ))}
       </ul>
+    </>
+  );
+};
+
+const Manage = () => {
+  const [date, setDate] = useState<Dayjs>(dayjs().startOf('day'));
+  const { user } = useAuth();
+  const pathname = usePathname();
+  const canManage = useMemo(() => {
+    const permissions = [
+      RoleEnum.MarathonApplicant,
+      RoleEnum.MarathonParticipant,
+      RoleEnum.Mentor,
+      RoleEnum.Admin,
+      RoleEnum.SuperAdmin,
+    ];
+    return user ? permissions.includes(user?.role) : false;
+  }, [user]);
+
+  const SEOData = useMemo(
+    () => ({
+      title: '我的小島｜島島阿學',
+      description:
+        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
+      keywords: '島島阿學',
+      author: '島島阿學',
+      copyright: '島島阿學',
+      imgLink: 'https://www.daoedu.tw/preview.webp',
+      link: `${process.env.HOSTNAME}${pathname}`,
+    }),
+    [pathname]
+  );
+
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
+      <SEOConfig data={SEOData} />
+      <Header />
+      <Calendar
+        date={date}
+        onChange={setDate}
+        maxDate={config.marathonEndDate}
+        minDate={config.marathonStartDate}
+      />
+      {canManage ? <Main date={date} /> : <AccessDenied />}
     </LocalizationProvider>
   );
 };

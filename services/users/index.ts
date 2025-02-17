@@ -18,6 +18,23 @@ export const getUserEndpoint = ({ isMe, id }: GetUserEndpointOptions = {}) => {
   return usersEndpoint;
 };
 
+export enum RoleEnum {
+  /** 訪客 */
+  Visitor = 1,
+  /** 一般使用者 */
+  User,
+  /** 馬拉松申請者 */
+  MarathonApplicant,
+  /** 馬拉松參與者 */
+  MarathonParticipant,
+  /** 導師 */
+  Mentor,
+  /** 管理者 */
+  Admin,
+  /** 超級管理者 */
+  SuperAdmin
+}
+
 export interface IUser {
   _id: string;
   birthDay: string;
@@ -34,6 +51,7 @@ export interface IUser {
   location: string;
   roleList: string[];
   selfIntroduction: string;
+  role: RoleEnum;
   share: string;
   tagList: string[];
   wantToDoList: string[];
