@@ -276,6 +276,4 @@ const Task = ({
   );
 };
 
-export default React.memo(Task, (prevProps, nextProps) => {
-  return JSON.stringify(prevProps.task) === JSON.stringify(nextProps.task);
-});
+export default Task;
