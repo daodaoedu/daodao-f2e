@@ -99,9 +99,9 @@ const Task = ({
   const handleDaySelect = (day: string) => {
     setNewTask((prev) => ({
       ...prev,
-      days_of_week: prev.days_of_week?.includes(day)
-        ? prev.days_of_week.filter((d) => d !== day)
-        : [...(prev.days_of_week || []), day]
+      days_of_week: prev.daysOfWeek?.includes(day)
+        ? prev.daysOfWeek.filter((d) => d !== day)
+        : [...(prev.daysOfWeek || []), day]
     }));
   };
 
@@ -138,8 +138,8 @@ const Task = ({
                   <div className="relative w-[150px]">
                     <div className="flex items-center justify-between">
                       <span className="truncate">
-                        {newTask.days_of_week?.length > 0
-                          ? newTask.days_of_week
+                        {newTask.daysOfWeek?.length > 0
+                          ? newTask.daysOfWeek
                             .map((enDay) => dayMap[enDay])
                             .join('、')
                           : '選擇日期'}
@@ -154,7 +154,7 @@ const Task = ({
                             role="option"
                             tabIndex={0}
                             key={day}
-                            aria-selected={newTask.days_of_week?.includes(day)}
+                            aria-selected={newTask.daysOfWeek?.includes(day)}
                             onClick={() => handleDaySelect(day)}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter' || e.key === ' ') {
@@ -162,7 +162,7 @@ const Task = ({
                               }
                             }}
                             className={`p-2 mb-1 mx-1 rounded cursor-pointer ${
-                              newTask.days_of_week?.includes(day)
+                              newTask.daysOfWeek?.includes(day)
                                 ? 'bg-selected-bg text-text-primary'
                                 : 'bg-transparent hover:bg-gray-100'
                             }`}
@@ -215,7 +215,7 @@ const Task = ({
                     name="is_completed"
                     id={`is_completed_${task.id}`}
                     className="peer hidden"
-                    checked={task.is_completed}
+                    checked={task.isCompleted}
                     onChange={handleCheckCompleted}
                   />
                   <p className="
@@ -227,7 +227,7 @@ const Task = ({
                     peer-checked:border-primary-base
                   "
                   >
-                    {task.is_completed && <FaCheck />}
+                    {task.isCompleted && <FaCheck />}
                   </p>
                 </label>
                 <p className="w-full">{task.name || ""}</p>
@@ -258,11 +258,11 @@ const Task = ({
                   </button>
                 </div>
               </div>
-              {task.days_of_week?.length > 0 && (
+              {task.daysOfWeek?.length > 0 && (
                 <div className="flex items-center gap-1 mt-1 ml-7 text-sm text-text-secondary">
                   <MdCalendarToday className="w-4 h-4 text-[#92989A] shrink-0" />
                   <span>
-                    {task.days_of_week
+                    {task.daysOfWeek
                       ?.map((enDay) => dayMap[enDay])
                       ?.join('、') ?? ''}
                   </span>
