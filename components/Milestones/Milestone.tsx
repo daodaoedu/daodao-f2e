@@ -87,9 +87,9 @@ const Milestone = ({
           flex flex-row items-center gap-[3px]
           font-sans text-sm text-basic-300"
         >
-          <p>{milestone.start_date || dayjs().format('YYYY/MM/DD')}</p>
+          <p>{milestone.startDate || dayjs().format('YYYY/MM/DD')}</p>
           <FaArrowRight className="text-basic-300" />
-          <p>{milestone.end_date || dayjs().format('YYYY/MM/DD')}</p>
+          <p>{milestone.endDate || dayjs().format('YYYY/MM/DD')}</p>
         </div>
       </div>
       <div className="flex flex-row items-center justify-between">
@@ -146,7 +146,7 @@ const Milestone = ({
                   name="is_completed"
                   id={`is_completed_${milestone.id}`}
                   className="peer hidden"
-                  checked={milestone.is_completed}
+                  checked={milestone.isCompleted}
                   onChange={handleCheckCompleted}
                 />
                 <p className="
@@ -158,7 +158,7 @@ const Milestone = ({
                   peer-checked:border-primary-base
                 "
                 >
-                  {milestone.is_completed && <FaCheck />}
+                  {milestone.isCompleted && <FaCheck />}
                 </p>
               </label>
               <p className="w-full">{milestone.name}</p>
