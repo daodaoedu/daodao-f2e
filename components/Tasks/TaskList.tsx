@@ -13,7 +13,6 @@ const TaskList = ({
     projectId: string;
     milestoneId: number;
   }) => {
-
     const sortedTasks = useMemo(() => {
       return [...tasks].sort((a, b) => a.id - b.id);
     }, [tasks]);
