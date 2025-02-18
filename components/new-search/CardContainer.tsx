@@ -73,7 +73,7 @@ export const CardContainer = (props: CardContainerProps) => {
     return () => {
       observer.disconnect(); // 清除所有監聽
     };
-  }, [JSON.stringify(children)]);
+  }, [children]);
 
   return (
     <section className={className}>
