@@ -96,7 +96,8 @@ export const CardContainer = (props: CardContainerProps) => {
         {/* 頁面選取行為 */}
         {type === "select" && (
           <div className="flex items-center justify-center gap-1">
-            <Button
+            <button
+              type="button"
               className={cn(
                 "w-12 h-12 rounded-full flex items-center justify-center rotate-180",
                 isFirstInView
@@ -106,8 +107,9 @@ export const CardContainer = (props: CardContainerProps) => {
               onClick={(e) => onChangeSelectionIdx(e, "prev")}
             >
               <ArrowIcon color={isFirstInView ? "#92989A" : "#16B9B3"} />
-            </Button>
-            <Button
+            </button>
+            <button
+              type="button"
               className={cn(
                 "w-12 h-12 rounded-full flex items-center justify-center ",
                 isLastInView
@@ -117,7 +119,7 @@ export const CardContainer = (props: CardContainerProps) => {
               onClick={(e) => onChangeSelectionIdx(e, "next")}
             >
               <ArrowIcon color={isLastInView ? "#92989A" : "#16B9B3"} />
-            </Button>
+            </button>
           </div>
         )}
       </div>
