@@ -1,11 +1,11 @@
-import React from "react";
-import Button from "@/shared/components/Button";
-import Nav from "@/components/Marathon/Nav";
-import { AnnouncementList } from "@/components/Marathon/Announcement";
-import { logEvent } from "@/utils/analytics";
+import React from 'react';
+import Button from '@/shared/components/Button';
+import Nav from '@/components/Marathon/Nav';
+import { AnnouncementList } from '@/components/Marathon/Announcement';
+import { logEvent } from '@/utils/analytics';
 
 /** @todo Replace this with actual data */
-import { announcementItems } from "./fixtures";
+import { announcementItems } from './fixtures';
 
 const Announcements = () => {
   return (
@@ -24,7 +24,7 @@ const Announcements = () => {
                 variant="solid"
                 color="primary"
                 size="md"
-                onClick={() => logEvent("click", "show_more_announcement")}
+                onClick={() => logEvent('click', 'show_more_announcement')}
               >
                 顯示更多
               </Button>

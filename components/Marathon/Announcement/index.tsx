@@ -1,5 +1,5 @@
-import Link from "next/link";
-import MarkdownEditor from "@/shared/components/MarkdownEditor";
+import Link from 'next/link';
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 
 type AnnouncementItem = {
   id: string;
@@ -73,7 +73,7 @@ const AnnouncementDetail = ({ item }: { item: AnnouncementItem }) => {
 
       <h1 className="text-4xl text-basic-500 font-semibold p-6">{title}</h1>
 
-      <p className="text-basic-300 body-sm">{[times, author].join(" ・ ")}</p>
+      <p className="text-basic-300 body-sm">{[times, author].join(' ・ ')}</p>
 
       <ReadOnlyMarkdownEditor value={content} />
     </div>

@@ -1,16 +1,16 @@
-import Link from "next/link";
-import React from "react";
-import Nav from "@/components/Marathon/Nav";
+import Link from 'next/link';
+import React from 'react';
+import Nav from '@/components/Marathon/Nav';
 
-import { useRouter } from "next/router";
-import pageNotFound from "@/pages/404";
+import { useRouter } from 'next/router';
+import pageNotFound from '@/pages/404';
 import {
   AnnouncementDetail,
   AnnouncementList,
-} from "@/components/Marathon/Announcement";
+} from '@/components/Marathon/Announcement';
 
 /** @todo Replace this with actual data */
-import { announcementItems } from "./fixtures";
+import { announcementItems } from './fixtures';
 
 const Announcement = () => {
   const router = useRouter();
