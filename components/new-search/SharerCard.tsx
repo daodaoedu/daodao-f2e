@@ -37,9 +37,9 @@ export const SharerCard = (props: SharerCardProps) => {
           {userName}
         </div>
         {(order === 1 || order === 2) && (
-          <div className="absolute w-[2.25rem] h-[2.25rem] bg-white top-[0.75rem] left-[0.75rem] flex items-center justify-center rounded-full">
+          <div className="absolute w-9 h-9 bg-white top-3 left-3 flex items-center justify-center rounded-full">
             <CrownIcon
-              className="w-[1.5rem] h-[1.5rem]"
+              className="w-6 h-6"
               color={order === 1 ? "#FF9526" : "#8F8F8F"}
             />
           </div>
@@ -47,13 +47,13 @@ export const SharerCard = (props: SharerCardProps) => {
       </div>
 
       <div
-        className="p-[0.75rem_1.25rem] text-basic-500 text-[1.125rem] flex flex-col justify-between rounded-b-xl md:p-[1rem_1.5rem] md:h-[88px]"
+        className="p-[0.75rem_1.25rem] text-basic-500 text-lg flex flex-col justify-between rounded-b-xl md:p-[1rem_1.5rem] md:h-[5.5rem]"
         style={{ border: "1px solid #F3F3F3" }}
       >
-        <div className="flex items-center md:h-[1.5rem]">
-          <ShareResourceIcon className="w-[1.25rem] h-[1.25rem]" />
+        <div className="flex items-center md:h-6">
+          <ShareResourceIcon className="w-5 h-5" />
           <span
-            className="pr-[0.5rem] mx-[0.25rem]"
+            className="pr-2 mx-1"
             style={{ borderRight: "1px solid #DBDBDB" }}
           >
             分享資源
@@ -61,10 +61,10 @@ export const SharerCard = (props: SharerCardProps) => {
           <span className="text-primary-base font-bold">{sourceCount} 筆</span>
         </div>
 
-        <div className="flex items-center md:h-[1.5rem]">
-          <CommentIcon className="w-[1.25rem] h-[1.25rem]" />
+        <div className="flex items-center md:h-6">
+          <CommentIcon className="w-5 h-5" />
           <span
-            className="pr-[0.5rem] mx-[0.25rem]"
+            className="pr-2 mx-1"
             style={{ borderRight: "1px solid #DBDBDB" }}
           >
             分享心得

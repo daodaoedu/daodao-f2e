@@ -3,6 +3,7 @@ import { Children } from "react";
 
 import { cn } from "@/utils/cn";
 import ArrowIcon from "@/public/assets/icons/arrow.svg";
+import Button from "@/shared/components/Button";
 
 type CardContainerProps = {
   title: string;
@@ -70,15 +71,13 @@ export const CardContainer = (props: CardContainerProps) => {
     });
 
     return () => {
-      cardRefs.current.forEach((card) => {
-        if (card) observer.unobserve(card);
-      });
+      observer.disconnect(); // 清除所有監聽
     };
-  }, []);
+  }, [JSON.stringify(children)]);
 
   return (
     <section className={className}>
-      <div className="flex justify-between items-center mb-[1.5rem] md:mb-[2.5rem]">
+      <div className="flex justify-between items-center mb-6 md:mb-10">
         <div className="leading-[2.4rem] text-[1.5rem] font-bold text-basic-500">
           {title}
         </div>
@@ -86,7 +85,7 @@ export const CardContainer = (props: CardContainerProps) => {
         {/* 導向到全部頁面 */}
         {type === "all" && (
           <div
-            className="flex gap-[0.5rem] items-center justify-center leading-[1.875rem] text-[1.25rem] text-basic-300 font-[500]"
+            className="flex gap-2 items-center justify-center text-xl leading-[1.875rem] text-basic-300 font-medium"
             onClick={onClickRedirect}
           >
             {subtitle}
@@ -96,29 +95,29 @@ export const CardContainer = (props: CardContainerProps) => {
 
         {/* 頁面選取行為 */}
         {type === "select" && (
-          <div className="flex items-center justify-center gap-[0.25rem]">
-            <button
-              type="button"
+          <div className="flex items-center justify-center gap-1">
+            <Button
               className={cn(
-                "w-[3rem] h-[3rem] rounded-full flex items-center justify-center rotate-180",
-                isFirstInView ? "bg-basic-100" : "bg-white"
+                "w-12 h-12 rounded-full flex items-center justify-center rotate-180",
+                isFirstInView
+                  ? "bg-basic-100"
+                  : "bg-white border border-primary-lightest"
               )}
-              style={{ border: isFirstInView ? "none" : "1px solid #DEF5F5" }}
               onClick={(e) => onChangeSelectionIdx(e, "prev")}
             >
               <ArrowIcon color={isFirstInView ? "#92989A" : "#16B9B3"} />
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
               className={cn(
-                "w-[3rem] h-[3rem] rounded-full flex items-center justify-center",
-                isLastInView ? "bg-basic-100" : "bg-white"
+                "w-12 h-12 rounded-full flex items-center justify-center ",
+                isLastInView
+                  ? "bg-basic-100"
+                  : "bg-white border border-primary-lightest"
               )}
-              style={{ border: isLastInView ? "none" : "1px solid #DEF5F5" }}
               onClick={(e) => onChangeSelectionIdx(e, "next")}
             >
               <ArrowIcon color={isLastInView ? "#92989A" : "#16B9B3"} />
-            </button>
+            </Button>
           </div>
         )}
       </div>

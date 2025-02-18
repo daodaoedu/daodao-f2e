@@ -36,9 +36,9 @@ export const ResourceCard = (props: CardProps) => {
   } = props;
 
   return (
-    <section className="md:flex md:gap-[1rem]">
+    <section className="md:flex md:gap-4">
       {/* Card Image */}
-      <div className="relative w-full h-[15.875rem] mb-[0.75rem] md:w-[20rem] md:min-w-[30%] md:h-[15.0625rem]">
+      <div className="relative w-full h-[15.875rem] mb-3 md:w-80 md:min-w-[30%] md:h-[15.0625rem]">
         <Image
           src="https://s3-alpha-sig.figma.com/img/286e/253a/fca0a750bc8df12745627d8bcf1120e6?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=tQ2NPRHeQq3Uk-F5uBXhGkWRe0DO2pVQRbRYeAZvYOTxQoLflR3AlaJdLFJi2Qpw-7AkeAeYjcGrne-gkTP2ghhwYRlTGJb4w98CwMs98n0V6s~flgKEFsN5JcII2VTFBCvQhYnTmWQF6akvoX0hTSVgqs~jtuo6rMS5XcKQNm0RIqnxYxFe6jHEdCX2NtvfSTnEk4vkpNMRGXrTEdsf8w-gTOvWLYjpkT0rnSBdXVpfaXi64~bNnr8NHTPWST-L8yiCgXUicVI8YQnOEblZMSiOYCjMY4xYsGmc15KWJqxEKIWiP2FyOn6HzeBrVUUw5Iq3k-CWid7jO1spt2y-JA__"
           alt="img"
@@ -47,12 +47,12 @@ export const ResourceCard = (props: CardProps) => {
         />
 
         {/* Card Image Label */}
-        <div className=" absolute top-[0.75rem] left-[0.75rem] flex flex-wrap gap-[0.5rem]">
+        <div className=" absolute top-3 left-3 flex flex-wrap gap-2">
           {label.map((_label) => {
             return (
               <div
                 key={_label}
-                className="bg-tips text-[1rem] leading-[1.5rem] text-white rounded-lg h-[2rem] flex items-center gap-[0.25rem] px-[0.25rem]"
+                className="bg-tips text-base leading-[1.5rem] text-white rounded-lg h-8 flex items-center gap-1 px-1"
               >
                 <Hot />
                 {_label}
@@ -63,12 +63,12 @@ export const ResourceCard = (props: CardProps) => {
       </div>
 
       {/* Card Content */}
-      <section className="flex flex-col gap-[0.25rem]">
+      <section className="flex flex-col gap-1">
         {/* Card Info */}
-        <div className="flex justify-between items-center h-[2.25rem]">
+        <div className="flex justify-between items-center h-9">
           <div className="flex items-center text-[1.125rem] leading-[1.6875rem] text-basic-500">
             <div>{userAvatar}</div>
-            <div className="font-bold mr-[0.25rem] ml-[0.5rem]">{userName}</div>
+            <div className="font-bold mr-1 ml-[0.5rem]">{userName}</div>
             <div>{time}</div>
           </div>
           <More />
@@ -79,12 +79,12 @@ export const ResourceCard = (props: CardProps) => {
         </div>
 
         {/* Card Tags */}
-        <div className="flex gap-[0.25rem]">
+        <div className="flex gap-1">
           {tags.map((tag) => {
             return (
               <div
                 key={tag}
-                className="h-[2rem] w-[3.75rem] text-primary-base flex items-center justify-center rounded-2xl bg-white md:h-[1.8125rem]"
+                className="h-8 w-[3.75rem] text-primary-base flex items-center justify-center rounded-2xl bg-white md:h-[1.8125rem]"
                 style={{ border: "1px solid #16B9B3" }}
               >
                 <span className="font-bold">#</span>
@@ -94,29 +94,29 @@ export const ResourceCard = (props: CardProps) => {
           })}
         </div>
 
-        <div className="leading-[1.875rem] text-[1.25rem] line-clamp-2 md:line-clamp-3">
+        <div className="text-xl leading-[1.875rem] line-clamp-2 md:line-clamp-3">
           {content}
         </div>
 
         {/* Card bottom */}
-        <div className="text-[1.125rem] leading-[1.6875rem] flex items-center justify-between">
+        <div className="text-lg leading-[1.6875rem] flex items-center justify-between">
           <div className="flex">
             <div
-              className="flex mr-[0.5rem]"
+              className="flex mr-2"
               style={{ borderRight: "1px solid #DBDBDB" }}
             >
               <Group />
-              <div className="ml-[0.5rem] mr-[0.25rem]">適合</div>
+              <div className="ml-2 mr-1">適合</div>
             </div>
             <span className="text-primary-base">{level}</span>
           </div>
 
-          <div className="h-[2.1875rem] flex items-center justify-center gap-[0.75rem] leading-[1.6875rem] text-[1.125rem]">
-            <div className="flex items-center justify-center gap-[0.25rem]">
+          <div className="h-[2.1875rem] flex items-center justify-center gap-3 text-lg leading-[1.6875rem]">
+            <div className="flex items-center justify-center gap-1">
               <View />
               <div>{viewCount}</div>
             </div>
-            <div className="flex items-center justify-center gap-[0.25rem]">
+            <div className="flex items-center justify-center gap-1">
               <Comment />
               <div>{commentCount}</div>
             </div>
