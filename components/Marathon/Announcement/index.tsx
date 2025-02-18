@@ -68,7 +68,7 @@ const AnnouncementDetail = ({ item }: { item: AnnouncementItem }) => {
   const { author, content, tags, times, title } = item;
 
   return (
-    <div className="bg-white h-fit p-6 border-4 border-black">
+    <div className="bg-white h-fit p-6">
       <TagList tags={tags} />
 
       <h1 className="text-4xl text-basic-500 font-semibold p-6">{title}</h1>
