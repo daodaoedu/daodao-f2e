@@ -38,7 +38,7 @@ const Projects = () => {
   const getProjectType = (eventId) => {
     switch (eventId) {
       case "2025S1":
-        return "學習馬拉松";
+        return "2025春季盃學習馬拉松";
       default:
         return "學習計畫";
     }
@@ -110,11 +110,15 @@ const Projects = () => {
                   return (
                     <div
                       key={project.id}
-                      className="
-                      w-full md:w-1/3
-                      rounded-[10px]
-                      flex flex-col gap-[10px]
-                      bg-white"
+                      role="button"
+                      tabIndex={0}
+                      className="w-full md:w-1/3 rounded-[10px] flex flex-col gap-[10px] bg-white cursor-pointer"
+                      onClick={() => router.push(`/manage/project?id=${project.id}`)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          router.push(`/manage/project?id=${project.id}`);
+                        }
+                      }}
                       style={{
                         boxShadow: '0px 4px 10px 0px rgba(196, 194, 193, 0.40)'
                       }}

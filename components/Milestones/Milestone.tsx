@@ -79,7 +79,7 @@ const Milestone = ({
         </div>
         {isLgScreen && (
           <div className="md:ml-3 font-sans text-sm text-basic-300">
-            <span>50%</span>
+            {/* <span>50%</span> */}
           </div>
         )}
         <div className="
