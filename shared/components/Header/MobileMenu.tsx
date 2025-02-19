@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
+import { MARATHON_LINKS, NAV_LINK, USER_LINK, MenuItem } from '@/constants/category';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import Collapse from '../Collapse';
@@ -15,7 +15,7 @@ function ExploreMenu({ onClose }: OnCloseProps) {
     <div>
       <nav>
         <ul className="pt-2">
-          {NAV_LINK.map(({ link, name, target }) => (
+          {NAV_LINK.map(({ link, name, target }: MenuItem) => (
             <li key={name}>
               <Link
                 href={link}

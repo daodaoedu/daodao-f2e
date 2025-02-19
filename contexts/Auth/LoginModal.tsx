@@ -18,7 +18,7 @@ export default function LoginModal({
   onClose,
 }: LoginModalProps) {
   const [isOpenWindow, setIsOpenWindow] = useState(false);
-  const timer = useRef<NodeJS.Timeout>();
+  const timer = useRef<NodeJS.Timeout | null>(null);
 
   const handleOpenLoginWindow = () => {
     const popup = openWindowPopup({
