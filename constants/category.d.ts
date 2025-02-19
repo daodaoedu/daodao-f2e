@@ -16,8 +16,6 @@ declare module '@/constants/category' {
     id?: string;
   }
 
-  // 為 MARATHON_LINKS 提供型別
-  export const MARATHON_LINKS: MarathonLink[];
   export const SEARCH_TAGS: string[];  // 假設 SEARCH_TAGS 是字串陣列
   export const NAV_LINK: MenuItem[];  // 根據實際狀況定義型別
   export const USER_LINK: MenuItem[]; // 同上
