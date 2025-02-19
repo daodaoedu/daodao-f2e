@@ -5,7 +5,7 @@ import { AnnouncementList } from '@/components/Marathon/Announcement';
 import { logEvent } from '@/utils/analytics';
 
 /** @todo Replace this with actual data */
-import { announcementItems } from './fixtures';
+import { announcementItems } from '@/fixtures/marathon/announcements';
 
 const Announcements = () => {
   return (

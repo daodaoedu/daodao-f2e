@@ -10,7 +10,7 @@ import {
 } from '@/components/Marathon/Announcement';
 
 /** @todo Replace this with actual data */
-import { announcementItems } from './fixtures';
+import { announcementItems } from '@/fixtures/marathon/announcements';
 
 const Announcement = () => {
   const router = useRouter();
