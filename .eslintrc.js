@@ -7,7 +7,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["react", "import", "react-hooks", "@typescript-eslint", "next"],
+  plugins: ["react", "import", "react-hooks", "@typescript-eslint", "@next/next"],
   extends: ["airbnb", "plugin:@typescript-eslint/recommended"],
   env: {
     browser: true,
