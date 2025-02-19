@@ -35,6 +35,8 @@ jobs:
       # - name: Install dependencies
       #   if: steps.cache.outputs.cache-hit != 'true'
       #   run: yarn install --frozen-lockfile
+      - name: Clear node_modules
+        run: rm -rf node_modules
       - name: Install dependencies
         run: yarn install --force
 
@@ -59,6 +61,9 @@ jobs:
       # - name: Install dependencies
         # if: steps.cache.outputs.cache-hit != 'true'
         # run: yarn install --frozen-lockfile
+      - name: Clear node_modules
+        run: rm -rf node_modules
+        
       - name: Install dependencies
         run: yarn install --force
 
@@ -103,7 +108,9 @@ jobs:
       # - name: Install dependencies
         # if: steps.cache.outputs.cache-hit != 'true'
         # run: yarn install --frozen-lockfile
-
+      - name: Clear node_modules
+        run: rm -rf node_modules
+        
       - name: Install dependencies
         run: yarn install --force
 
