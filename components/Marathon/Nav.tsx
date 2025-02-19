@@ -16,7 +16,6 @@ const navItems = MARATHON_LINKS.map((item) => ({
   external: item.external ?? false,
 }));
 
-
   return (
     <nav
       className={cn(
