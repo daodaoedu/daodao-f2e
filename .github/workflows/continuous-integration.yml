@@ -33,7 +33,7 @@ jobs:
       #     key: deps-node-modules-${{ hashFiles('package.json', '**/yarn.lock') }}
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
+        # if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
 
   check:
@@ -55,7 +55,7 @@ jobs:
       #     key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
+        # if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
 
       - name: TypeScript Check
@@ -97,7 +97,7 @@ jobs:
       #     key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
+        # if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
 
       - name: ESLint Check
