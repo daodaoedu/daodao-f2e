@@ -28,8 +28,11 @@ export default function LoginModal({
       height: 632,
     });
     setIsOpenWindow(!!popup?.parent);
-    clearInterval(timer.current);
 
+    if (timer.current !== null) {
+      clearInterval(timer.current);
+    }
+    
     if (popup?.parent) {
       timer.current = setInterval(() => {
         setIsOpenWindow(!!popup.parent);
@@ -38,7 +41,7 @@ export default function LoginModal({
   };
 
   useEffect(() => {
-    if (!isOpenWindow) {
+    if (!isOpenWindow && timer.current !== null) {
       clearInterval(timer.current);
     }
   }, [isOpenWindow, timer.current]);
