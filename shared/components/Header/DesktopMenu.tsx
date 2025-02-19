@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { MARATHON_LINKS, NAV_LINK, USER_LINK, MenuItem } from '@/constants/category';
+import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
+import type { MenuItem } from '@/constants/category';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import Dropdown from '../Dropdown';
