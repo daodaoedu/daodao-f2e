@@ -16,7 +16,7 @@ const ProjectHeader = ({ project }: ProjectHeaderProps) => {
       </h3>
       <div className="ml-auto flex flex-row justify-start items-center gap-2">
         <span className="font-sans text-basic-300 text-sm leading-normal">
-          {dayjs(project.updatedDate).format('YYYY/MM/DD')}
+          {dayjs(project.updatedAt).format('YYYY/MM/DD')}
         </span>
 
         {/* <span className="flex flex-row items-center justify-start gap-1
