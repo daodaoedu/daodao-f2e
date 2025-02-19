@@ -9,10 +9,13 @@ import { cn } from '@/utils/cn';
 const Nav = ({ activeTab }: { activeTab: string }) => {
   const { height } = usePromotion();
 
-  const navItems = MARATHON_LINKS.map((item) => ({
-    ...item,
-    active: item.name === activeTab,
-  }));
+const navItems = MARATHON_LINKS.map((item) => ({
+  ...item,
+  active: item.name === activeTab,
+  disabled: item.disabled ?? false,
+  external: item.external ?? false,
+}));
+
 
   return (
     <nav
