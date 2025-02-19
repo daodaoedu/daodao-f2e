@@ -32,9 +32,11 @@ jobs:
       #       ~/.cache/Cypress
       #     key: deps-node-modules-${{ hashFiles('package.json', '**/yarn.lock') }}
 
+      # - name: Install dependencies
+      #   if: steps.cache.outputs.cache-hit != 'true'
+      #   run: yarn install --frozen-lockfile
       - name: Install dependencies
-        # if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        run: yarn install
 
   check:
     name: TypeScript Check
@@ -54,9 +56,11 @@ jobs:
       #       ~/.cache/Cypress
       #     key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Install dependencies
+      # - name: Install dependencies
         # if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        # run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: yarn install
 
       - name: TypeScript Check
         id: check
@@ -96,9 +100,12 @@ jobs:
       #       ~/.cache/Cypress
       #     key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Install dependencies
+      # - name: Install dependencies
         # if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        # run: yarn install --frozen-lockfile
+
+      - name: Install dependencies
+        run: yarn install
 
       - name: ESLint Check
         id: lint
