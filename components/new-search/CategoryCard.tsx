@@ -5,7 +5,8 @@ type CategoryCardProps = {
 };
 
 export const CategoryCard = (props: CategoryCardProps) => {
-  const { title, img } = props.category;
+  const { category } = props;
+  const { title, img } = category;
 
   return (
     <div className="relative h-[3.75rem] md:h-[6.25rem]" key={title}>

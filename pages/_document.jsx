@@ -1,6 +1,6 @@
-import React from 'react';
-import Document, { Html, Head, Main, NextScript } from 'next/document';
-import Script from 'next/script';
+import React from "react";
+import Document, { Html, Head, Main, NextScript } from "next/document";
+import Script from "next/script";
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -30,6 +30,7 @@ class MyDocument extends Document {
         <body>
           <Main />
           <NextScript />
+          {/* eslint-disable react/no-danger */}
           <noscript
             dangerouslySetInnerHTML={{
               __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TH83D3J"

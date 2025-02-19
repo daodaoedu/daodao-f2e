@@ -81,13 +81,16 @@ export const SearchHero = () => {
             </div>
           </div>
 
-          <button className="w-full h-10 text-[1.125rem] bg-primary-base text-white rounded-full flex items-center justify-center md:w-[7.75rem] md:mt-6">
+          <button
+            type="button"
+            className="w-full h-10 text-[1.125rem] bg-primary-base text-white rounded-full flex items-center justify-center md:w-[7.75rem] md:mt-6"
+          >
             + 分享資源
           </button>
         </div>
       </div>
 
-      {/* placeholder block - only desktop would be visible*/}
+      {/* placeholder block - only desktop would be visible */}
       <div className="hidden md:h-[19.0625rem] lg:block lg:min-w-[28.6875rem]" />
     </>
   );

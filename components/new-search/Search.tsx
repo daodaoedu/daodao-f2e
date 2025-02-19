@@ -22,7 +22,7 @@ export const NewSearch = () => {
         <SearchHero />
       </section>
 
-      {/* 熱門資源, 最新資源, 熱門分類*/}
+      {/* 熱門資源, 最新資源, 熱門分類 */}
       <section className="flex flex-col gap-11 p-[2.75rem_1.25rem] md:p-[3rem_7.5rem]">
         <CardContainer
           childWrapperClassName="flex flex-col gap-5"
@@ -63,7 +63,7 @@ export const NewSearch = () => {
           type="select"
           childWrapperClassName="flex gap-[1.4375rem] overflow-x-scroll pr-5 mr-[-1.25rem] md:pr-0 md:mr-0"
         >
-          {reflectionList.map((r, idx) => {
+          {reflectionList.map((r) => {
             return <ReflectionCard key={r} />;
           })}
         </CardContainer>
@@ -77,7 +77,7 @@ export const NewSearch = () => {
           childWrapperClassName="flex gap-[1.4375rem] overflow-x-scroll pr-5 mr-[-1.25rem] md:pr-0 md:mr-0"
         >
           {sharerList.map((s, idx) => {
-            return <SharerCard key={idx} order={idx + 1} />;
+            return <SharerCard key={s} order={idx + 1} />;
           })}
         </CardContainer>
       </section>
