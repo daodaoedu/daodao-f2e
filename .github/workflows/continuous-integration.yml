@@ -23,18 +23,22 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v4
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            ~/.cache/Cypress
-          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
+      # - name: Cache dependencies
+      #   id: cache
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       node_modules
+      #       ~/.cache/Cypress
+      #     key: deps-node-modules-${{ hashFiles('package.json', '**/yarn.lock') }}
 
+      # - name: Install dependencies
+      #   if: steps.cache.outputs.cache-hit != 'true'
+      #   run: yarn install --frozen-lockfile
+      - name: Clear node_modules
+        run: rm -rf node_modules
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        run: yarn install --force
 
   check:
     name: TypeScript Check
@@ -45,18 +49,23 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v4
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            ~/.cache/Cypress
-          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
+      # - name: Cache dependencies
+      #   id: cache
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       node_modules
+      #       ~/.cache/Cypress
+      #     key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
 
+      # - name: Install dependencies
+        # if: steps.cache.outputs.cache-hit != 'true'
+        # run: yarn install --frozen-lockfile
+      - name: Clear node_modules
+        run: rm -rf node_modules
+        
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        run: yarn install --force
 
       - name: TypeScript Check
         id: check
@@ -87,18 +96,23 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v4
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            ~/.cache/Cypress
-          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
+      # - name: Cache dependencies
+      #   id: cache
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       node_modules
+      #       ~/.cache/Cypress
+      #     key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
 
+      # - name: Install dependencies
+        # if: steps.cache.outputs.cache-hit != 'true'
+        # run: yarn install --frozen-lockfile
+      - name: Clear node_modules
+        run: rm -rf node_modules
+        
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        run: yarn install --force
 
       - name: ESLint Check
         id: lint
