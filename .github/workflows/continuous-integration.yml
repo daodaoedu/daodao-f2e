@@ -30,7 +30,7 @@ jobs:
           path: |
             node_modules
             ~/.cache/Cypress
-          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
+          key: deps-node-modules-${{ hashFiles('package.json', '**/yarn.lock') }}
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
