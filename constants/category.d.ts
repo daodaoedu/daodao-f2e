@@ -5,8 +5,8 @@ declare module '@/constants/category' {
   export interface MarathonLink {
     name: string;
     link: string;
-    disabled?: boolean;  // 可選屬性
-    external?: boolean;  // 可選屬性
+    disabled?: boolean; // 可選屬性
+    external?: boolean; // 可選屬性
   }
 
   // 為 MARATHON_LINKS 提供型別
