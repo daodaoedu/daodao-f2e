@@ -8,7 +8,7 @@ declare module '@/constants/category' {
     disabled?: boolean;
     external?: boolean;
   }[];
-  
+
   export interface MenuItem {
     link: string;
     name: string;
@@ -17,6 +17,6 @@ declare module '@/constants/category' {
   }
 
   export const SEARCH_TAGS: { [key: string]: string[] };
-  export const NAV_LINK: MenuItem[];  // 根據實際狀況定義型別
+  export const NAV_LINK: MenuItem[]; // 根據實際狀況定義型別
   export const USER_LINK: MenuItem[]; // 同上
 }
