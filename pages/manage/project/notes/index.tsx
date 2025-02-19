@@ -14,9 +14,9 @@ import {
 } from '@/hooks/api/project';
 
 enum ModalTypeEnum {
-  Create = 'create',
-  Update = 'update',
-  Delete = 'delete',
+  Create,
+  Update,
+  Delete,
 }
 
 const NotesPage = () => {

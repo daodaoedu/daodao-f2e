@@ -8,8 +8,8 @@ import { useProject, useProjectReview } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 
 enum ModalTypeEnum {
-  Update = 'update',
-  Delete = 'delete',
+  Update,
+  Delete,
 }
 
 const ReviewPage = () => {

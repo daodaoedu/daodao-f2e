@@ -8,8 +8,8 @@ import ConfirmModal from '@/shared/components/Confirm';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';
 
 enum ModalTypeEnum {
-  Update = 'update',
-  Delete = 'delete',
+  Update,
+  Delete,
 }
 
 const NoteDetailPage = () => {

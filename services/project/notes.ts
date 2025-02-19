@@ -26,7 +26,7 @@ const projectNoteSchema = z.object({
   date: z.string().date(),
   description: z.string(),
   imgUrl: z.string().nullable(),
-  imgFile: z.instanceof(File).nullable(),
+  imgFile: z.instanceof(File).nullable().optional(),
 });
 
 export type ProjectNoteSchema = z.infer<typeof projectNoteSchema>;

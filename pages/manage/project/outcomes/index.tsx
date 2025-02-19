@@ -14,8 +14,9 @@ import {
 } from '@/hooks/api/project';
 
 enum ModalTypeEnum {
-  Edit = 'edit',
-  Delete = 'delete',
+  Create,
+  Update,
+  Delete,
 }
 
 const OutcomesPage = () => {
@@ -64,7 +65,7 @@ const OutcomesPage = () => {
         <Button
           variant="solid"
           color="primary"
-          onClick={() => setModalType(ModalTypeEnum.Edit)}
+          onClick={() => setModalType(ModalTypeEnum.Update)}
         >
           新增成果
         </Button>
@@ -80,7 +81,7 @@ const OutcomesPage = () => {
               className="p-3 transition-shadow hover:shadow-basic-200/40 hover:shadow-lg"
               detailLink={`/manage/project/outcomes/detail?id=${projectId}&outcomeId=${outcome.id}`}
               onEditClick={() => {
-                setModalType(ModalTypeEnum.Edit);
+                setModalType(ModalTypeEnum.Update);
                 setOutcomeId(outcome.id);
               }}
               onDeleteClick={() => {
@@ -94,7 +95,7 @@ const OutcomesPage = () => {
 
       {project && (
         <CreateModal
-          isOpen={modalType === ModalTypeEnum.Edit}
+          isOpen={modalType === ModalTypeEnum.Create}
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
@@ -107,7 +108,7 @@ const OutcomesPage = () => {
         <UpdateModal
           key={outcomeId}
           id={outcomeId}
-          isOpen={modalType === ModalTypeEnum.Edit}
+          isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
