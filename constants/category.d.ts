@@ -2,12 +2,13 @@
 
 declare module '@/constants/category' {
   // 定義你需要的型別
-  export interface MarathonLink {
+  export const MARATHON_LINKS: {
     name: string;
     link: string;
-    disabled?: boolean; // 可選屬性
-    external?: boolean; // 可選屬性
-  }
+    disabled?: boolean;
+    external?: boolean;
+  }[];
+  
   export interface MenuItem {
     link: string;
     name: string;
@@ -18,6 +19,6 @@ declare module '@/constants/category' {
   // 為 MARATHON_LINKS 提供型別
   export const MARATHON_LINKS: MarathonLink[];
   export const SEARCH_TAGS: string[];  // 假設 SEARCH_TAGS 是字串陣列
-  export const NAV_LINK: any;  // 根據實際狀況定義型別
-  export const USER_LINK: any; // 同上
+  export const NAV_LINK: MenuItem[];  // 根據實際狀況定義型別
+  export const USER_LINK: MenuItem[]; // 同上
 }
