@@ -29,9 +29,9 @@ export const ReflectionCard = (props: ReflectionCardProps) => {
             {userName}
           </div>
           <div className="h-4 flex gap-1">
-            {[...Array(5)].map((_, idx) => (
+            {[1, 2, 3, 4, 5].map((unused, idx) => (
               <StarIcon
-                key={idx}
+                key={unused}
                 color={stars >= idx + 1 ? "#FF9526" : "#DBDBDB"}
               />
             ))}
@@ -41,7 +41,10 @@ export const ReflectionCard = (props: ReflectionCardProps) => {
       <div className="w-full line-clamp-3 text-[1.25rem] leading-[1.875rem] md:text-[1.125rem] md:leading-[1.6875rem]">
         {content}
       </div>
-      <button className="flex items-center justify-center gap-[0.3125rem] h-10 text-[1.125rem] leading-[1.6875rem] border border-primary-base rounded-full">
+      <button
+        type="button"
+        className="flex items-center justify-center gap-[0.3125rem] h-10 text-[1.125rem] leading-[1.6875rem] border border-primary-base rounded-full"
+      >
         <ShareIcon />
         <span className="max-w-[11.375rem] truncate">{buttonContent}</span>
       </button>

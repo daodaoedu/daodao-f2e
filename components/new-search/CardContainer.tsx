@@ -1,9 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { Children } from "react";
+import { useEffect, useRef, useState, Children } from "react";
 
 import { cn } from "@/utils/cn";
 import ArrowIcon from "@/public/assets/icons/arrow.svg";
-import Button from "@/shared/components/Button";
 
 type CardContainerProps = {
   title: string;
@@ -55,7 +53,7 @@ export const CardContainer = (props: CardContainerProps) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry, idx) => {
+        entries.forEach((entry) => {
           // 確保 cardRefs.current 只有存在才會被設定
           const _cardRefs = cardRefs.current.filter(Boolean);
           const index = _cardRefs.indexOf(entry.target as HTMLDivElement);
@@ -84,13 +82,14 @@ export const CardContainer = (props: CardContainerProps) => {
 
         {/* 導向到全部頁面 */}
         {type === "all" && (
-          <div
+          <button
+            type="button"
             className="flex gap-2 items-center justify-center text-xl leading-[1.875rem] text-basic-300 font-medium"
             onClick={onClickRedirect}
           >
             {subtitle}
             <ArrowIcon />
-          </div>
+          </button>
         )}
 
         {/* 頁面選取行為 */}
@@ -130,7 +129,7 @@ export const CardContainer = (props: CardContainerProps) => {
           Children.map(children, (child, idx) => {
             return (
               <div
-                key={idx}
+                key={JSON.stringify(child)}
                 ref={(el: HTMLDivElement | null) => {
                   cardRefs.current[idx] = el;
                 }}
