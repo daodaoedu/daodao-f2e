@@ -7,11 +7,7 @@ interface CollapseProps {
   defaultOpen?: boolean;
 }
 
-function Collapse({
-  as: Root = 'div',
-  children,
-  defaultOpen,
-}: CollapseProps) {
+function Collapse({ as: Root = 'div', children, defaultOpen }: CollapseProps) {
   return (
     <ToggleProvider
       key={defaultOpen ? 'open' : 'close'}
@@ -70,7 +66,7 @@ function List({ children, className }: CollapseListProps) {
       className={cn(
         'group transition-opacity',
         '*:grid *:transition-[grid-template-rows]',
-        '*:grid-rows-[1fr] *:aria-hidden:grid-rows-[0fr] [&>*>*]:overflow-hidden',
+        '*:grid-rows-[1fr] *:aria-hidden:grid-rows-[0fr] [&>*>*]:aria-hidden:overflow-hidden',
         className,
         isOpen ? 'opacity-100' : 'opacity-0'
       )}
@@ -89,7 +85,7 @@ interface CollapseItemProps {
 function Item({ children, className }: CollapseItemProps) {
   return (
     <li>
-      <div className={cn('overflow-hidden', className)}>{children}</div>
+      <div className={className}>{children}</div>
     </li>
   );
 }

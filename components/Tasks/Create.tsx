@@ -21,6 +21,7 @@ interface CreateProps {
   projectId: string;
   milestoneId: number;
   onCancel: () => void;
+  onRefreshData?: () => void;
 }
 
 interface TaskType {
@@ -34,7 +35,8 @@ const TaskCreate = ({
   index,
   projectId,
   milestoneId,
-  onCancel
+  onCancel,
+  onRefreshData,
 }: CreateProps) => {
   const [newTask, setNewTask] = useState<TaskType>({
     name: "",
@@ -61,6 +63,7 @@ const TaskCreate = ({
       toast.success('任務新增成功');
       fetchMilestones(projectId);
       onCancel();
+      onRefreshData?.();
     } else {
       toast.error('任務新增失敗，請稍後再試');
     }

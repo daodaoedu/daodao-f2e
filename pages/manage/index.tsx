@@ -202,7 +202,7 @@ const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
 };
 
 const Main = ({ date }: { date: Dayjs }) => {
-  const { data: projects } = useProjectList({ isMe: true });
+  const { data: projects, mutate } = useProjectList({ isMe: true });
   const { data: reviews } = useProjectReviewList(projects?.[0]?.id);
 
   const currentProjects = useMemo(() => {
@@ -242,6 +242,7 @@ const Main = ({ date }: { date: Dayjs }) => {
                   milestone={milestone}
                   isLgScreen={false}
                   projectId={project.id}
+                  onRefreshData={mutate}
                 />
               ))}
             </Project>

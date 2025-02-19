@@ -13,22 +13,28 @@ import { Milestone as MilestoneType } from "../../contexts/Milestones/type";
 import { numberToZh } from "./Shared";
 
 interface MilestoneProps {
+  projectId?: string;
   milestone: MilestoneType;
   isLgScreen?: boolean;
+  onRefreshData?: () => void;
 }
 const Milestone = ({
+  projectId,
   milestone,
   isLgScreen = false,
+  onRefreshData,
 }: MilestoneProps) => {
   const { project } = useProject();
   const { dispatchMilestone } = useMilestones();
   const [isEditing, setIsEditing] = useState(false);
   const [newMilestone, setNewMilestone] = useState<MilestoneType>(milestone);
+  const targetProjectId = projectId ?? project.id;
   const handleClickUpdate = async () => {
-    const success = await dispatchMilestone(project.id, newMilestone);
+    const success = await dispatchMilestone(targetProjectId, newMilestone);
     if (success) {
       toast.success('里程碑更新成功');
       setIsEditing(false);
+      onRefreshData?.();
     } else {
       toast.error('里程碑更新失敗，請稍後再試');
     }
@@ -55,13 +61,14 @@ const Milestone = ({
     React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, checked } = event.target;
-    const success = await dispatchMilestone(project.id, {
+    const success = await dispatchMilestone(targetProjectId, {
       ...newMilestone,
       [name]: checked
     });
 
     if (success) {
       toast.success('里程碑更新成功');
+      onRefreshData?.();
     } else {
       toast.error('里程碑更新失敗，請稍後再試');
     }

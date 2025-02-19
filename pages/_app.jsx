@@ -33,6 +33,7 @@ const persistor = persistStore(store);
 const swrConfig = {
   revalidateOnFocus: false,
   errorRetryCount: 0,
+  keepPreviousData: true,
   fetcher,
 };
 

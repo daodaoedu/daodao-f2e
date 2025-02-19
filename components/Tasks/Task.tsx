@@ -12,6 +12,7 @@ interface TaskProps {
   projectId : string;
   milestoneId: number;
   task: TaskType;
+  onRefreshData?: () => void;
 }
 
 const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -31,6 +32,7 @@ const Task = ({
   projectId,
   milestoneId,
   task,
+  onRefreshData,
 }: TaskProps) => {
   const { dispatchTask, deleteTask, fetchMilestones } = useMilestones();
   const [isEditing, setIsEditing] = useState(false);
@@ -43,6 +45,7 @@ const Task = ({
       toast.success('任務更新成功');
       setIsEditing(false);
       fetchMilestones(projectId);
+      onRefreshData?.();
     } else {
       toast.error('任務更新失敗，請稍後再試');
     }
@@ -74,6 +77,8 @@ const Task = ({
 
     if (success) {
       toast.success('任務更新成功');
+      fetchMilestones(projectId);
+      onRefreshData?.();
     } else {
       toast.error('任務更新失敗，請稍後再試');
     }
@@ -88,6 +93,7 @@ const Task = ({
     if (success) {
       toast.success('任務刪除成功');
       fetchMilestones(projectId);
+      onRefreshData?.();
     } else {
       toast.error('任務刪除失敗，請稍後再試');
     }

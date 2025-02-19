@@ -65,7 +65,7 @@ const OutcomesPage = () => {
         <Button
           variant="solid"
           color="primary"
-          onClick={() => setModalType(ModalTypeEnum.Update)}
+          onClick={() => setModalType(ModalTypeEnum.Create)}
         >
           新增成果
         </Button>
