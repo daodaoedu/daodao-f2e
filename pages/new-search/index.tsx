@@ -56,7 +56,7 @@ const SearchPage = () => {
           description:
             "「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
           // 有cats才能放
-          itemListElement: SEARCH_TAGS[category].map((tagName, index) => ({
+          itemListElement: SEARCH_TAGS[category].map((tagName: string, index: number) => ({
             "@type": "ListItem",
             position: index + 1,
             item: {
