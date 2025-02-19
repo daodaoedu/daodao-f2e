@@ -14,6 +14,7 @@ import Sidebar from '@/shared/components/Sidebar';
 import { z } from 'zod';
 import { ProjectProvider, useProject } from '@/contexts/Project';
 import getDefaultLayout from './DefaultLayout';
+import { ROLE } from '@/constants/member';
 
 const idSchema = z.string().uuid();
 
@@ -65,7 +66,17 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
   const backPath = activeTab?.backPath ?? '/manage/projects';
   const backText = activeTab?.backText ?? '返回 學習計畫';
   const { project, fetchProject } = useProject();
-
+  const zhRole = ROLE.find((r) => {
+    return r.value === project.user.roleList[0];
+  })?.label;
+  const getProjectType = (eventId:string) => {
+    switch (eventId) {
+      case "2025S1":
+        return "2025春季盃學習馬拉松";
+      default:
+        return "學習計畫";
+    }
+  };
   // TODO: move fetchProject to page /manage/projects
   useEffect(() => {
     if (!projectId) return;
@@ -137,21 +148,21 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
                   </h1>
                   <div className="flex items-center justify-between lg:justify-end gap-2 text-basic-300">
                     <time>
-                      {dayjs(project?.createdAt).format('YYYY/MM/DD')}
+                      {dayjs(project?.updatedAt).format('YYYY/MM/DD')}
                     </time>
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-0.5">
+                      {/* <div className="flex items-center gap-0.5">
                         <AiOutlineEye />
                         <span>9999</span>
-                      </div>
+                      </div> */}
                       <div className="flex items-center gap-0.5">
                         {project?.isPublic ? <MdLockOpen /> : <MdLock /> }
                         <span>{project?.isPublic ? '公開' : '不公開'}</span>
                       </div>
-                      <div className="flex items-center gap-0.5">
+                      {/* <div className="flex items-center gap-0.5">
                         <GoBookmark />
                         <span>2</span>
-                      </div>
+                      </div> */}
                       <Button
                         className="-m-1 p-1"
                         size="sm"
@@ -163,14 +174,14 @@ function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
                 </div>
                 <div className="flex items-center gap-2 body-sm">
                   <div className="rounded-full overflow-hidden *:!block">
-                    <Image src="" alt="" width="40px" height="40px" />
+                    <img src={project?.user?.photoURL} alt={project?.user?.name} width="40px" height="40px" />
                   </div>
                   <div className="text-basic-400">{project?.user?.name}</div>
                   <div className="px-2.5 py-0.5 text-basic-500 bg-basic-100 rounded">
-                    學生
+                    {zhRole}
                   </div>
                   <div className="px-2.5 py-0.5 text-basic-white bg-primary-lighter rounded">
-                    馬拉松入選
+                    {getProjectType(project.eventId)}
                   </div>
                 </div>
               </header>

@@ -186,16 +186,14 @@ export const MARATHON_LINKS = [
     link: '/learning-marathon/announcements',
   },
   {
-    name: '學習計畫分享區（未公開）',
-    link: '/marathon-sharing',
-    disabled: true,
-    external: true,
+    name: '學習計畫分享區',
+    link: '/projects',
   },
-  {
-    name: '成果分享（未公開）',
-    link: '/project-sharing',
-    disabled: true,
-  },
+  // {
+  //   name: '成果分享（未公開）',
+  //   link: '/project-sharing',
+  //   disabled: true,
+  // },
 ];
 
 export const USER_LINK = [
