@@ -14,6 +14,7 @@ import { mapToTable } from '@/utils/helper';
 import SEOConfig from '@/shared/components/SEO';
 import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
 import ContactButton from '@/shared/components/ContactButton';
+import { cn } from '@/utils/cn';
 import MyGroup from './MyGroup';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
@@ -93,19 +94,12 @@ const Profile = ({
   );
 
   return (
-    <Box
-      sx={{
-        background: 'linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'relative',
-        padding: '80px 30px',
-        '@media (max-width: 767px)': {
-          padding: '30px',
-        },
-      }}
+    <div
+      className={cn(
+        'relative min-h-screen-without-padding-top',
+        'p-8 md:py-20 bg-primary-palest',
+        'flex flex-col items-center',
+      )}
     >
       <SEOConfig data={SEOData} />
       <Box
@@ -232,7 +226,7 @@ const Profile = ({
           編輯
         </Button>
       )}
-    </Box>
+    </div>
   );
 };
 
