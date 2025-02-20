@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
 import type { MenuItem } from '@/constants/category';
+import { getManageSidebarItems } from '@/constants/sidebar';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import Collapse from '../Collapse';
@@ -62,19 +63,29 @@ function ExploreMenu({ onClose }: OnCloseProps) {
 function ProfileMenu({ onClose }: OnCloseProps) {
   const auth = useAuth();
 
+  const sidebarItems = useMemo(
+    () => getManageSidebarItems({ role: auth.user?.role }),
+    [auth.user?.role]
+  );
+
   return (
     auth.isLoggedIn && (
       <nav>
         <ul className="pt-2">
-          <li>
-            <Link
-              href="/manage"
-              className="block px-4 py-2 text-basic-400"
-              onClick={onClose}
-            >
-              我的小島
-            </Link>
-          </li>
+          {sidebarItems.map((item) =>
+            item.children ? null : (
+              <li key={item.label}>
+                <Link
+                  href={item.href}
+                  className="block px-4 py-2 text-basic-400"
+                  onClick={onClose}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            )
+          )}
+
           {USER_LINK.map(({ name, id }) => (
             <li key={name}>
               <Link
