@@ -149,15 +149,15 @@ function PostCardHeader({
               </div>
             )
           )}
-          <Dropdown>
-            <Dropdown.Toggle
-              className="-m-1 p-1"
-              size="sm"
-              prefixIcon="AiOutlineMore"
-            />
-            <Dropdown.List className="top-full right-0 -mr-2 mt-2 z-20">
-              {Array.isArray(dropdownItems) &&
-                dropdownItems.map((item) => (
+          {Array.isArray(dropdownItems) && dropdownItems.length > 0 && (
+            <Dropdown>
+              <Dropdown.Toggle
+                className="-m-1 p-1"
+                size="sm"
+                prefixIcon="AiOutlineMore"
+              />
+              <Dropdown.List className="top-full right-0 -mr-2 mt-2 z-20">
+                {dropdownItems.map((item) => (
                   <Dropdown.Item
                     key={item.key}
                     className={cn('text-nowrap', item.className)}
@@ -165,8 +165,9 @@ function PostCardHeader({
                     {item.children}
                   </Dropdown.Item>
                 ))}
-            </Dropdown.List>
-          </Dropdown>
+              </Dropdown.List>
+            </Dropdown>
+          )}
         </div>
       </div>
     </header>

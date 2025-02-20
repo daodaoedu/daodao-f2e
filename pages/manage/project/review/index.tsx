@@ -12,6 +12,7 @@ import {
   useProjectReviewList,
 } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
+import config from '@/constants/config';
 
 enum ModalTypeEnum {
   Create,
@@ -62,13 +63,9 @@ const ReviewPage = () => {
     <>
       <div className="mb-6 flex items-end sm:items-center justify-between body-md">
         <div className="flex flex-col items-start sm:flex-row sm:items-center gap-1">
-          <div className="text-basic-500">覆盤（04 週/22週）</div>
-          <Button
-            className="px-2 -ml-2 sm:ml-0 text-primary-base"
-            onClick={() => toast.error('功能尚未開放')}
-          >
-            覆盤設定
-          </Button>
+          <div className="text-basic-500">
+            覆盤（{config.getWeekNumber().toString().padStart(2, '0')} 週/22週）
+          </div>
         </div>
         <Button
           variant="solid"

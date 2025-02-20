@@ -1,4 +1,3 @@
-import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -147,13 +146,6 @@ function ReviewForm({
           </ul>
         </div>
         <div className="pt-5 flex justify-end gap-5">
-          <Button
-            color="primary"
-            isDisabled={isLoading}
-            onClick={() => toast.error('尚未開放')}
-          >
-            儲存草稿
-          </Button>
           <Button
             variant="solid"
             color="primary"

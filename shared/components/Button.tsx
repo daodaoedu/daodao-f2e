@@ -138,7 +138,7 @@ function Button<AS extends 'button' | 'link' = 'button'>({
 
   const sharedProps = {
     className: cn(
-      'relative overflow-hidden rounded-md text-basic-400 hover:text-primary-base',
+      'relative overflow-hidden rounded-md text-nowrap text-basic-400 hover:text-primary-base',
       (prefixIcon || suffixIcon) && 'flex items-center gap-0.5',
       variant === ButtonVariantEnum.Solid && [
         'rounded-full transition-[box-shadow,color,background-color]',
