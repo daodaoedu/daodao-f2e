@@ -63,21 +63,12 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
         }
         <Description description={project?.strategyDescription || ""} />
         {
-          project?.resourceName?.length && (
+          project?.resourceName && (
             <>
               <Divider />
               <Title title="學習資源" />
               <div className="flex flex-col gap-2">
-                {
-                  project?.resourceName?.map((name, index) => {
-                    return (
-                      <FakeInput
-                        key={`resource-${name}-${index}` as string}
-                        value={name || ""}
-                      />
-                    );
-                  })
-                }
+                <FakeInput value={project.resourceName || ""} />
               </div>
             </>
           )

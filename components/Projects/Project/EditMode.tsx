@@ -17,7 +17,7 @@ interface EditModeProps {
       React.ChangeEvent<HTMLSelectElement>
   ) => void;
   onChangeSelected: (name: string, value: string[]) => void;
-  onChangeResourceName: (value: string[]) => void;
+  onChangeResourceName: (value: string) => void;
 }
 
 const EditMode = ({
@@ -34,12 +34,8 @@ const EditMode = ({
 
   // TODO: squash handleChangeSelected and handleChangeResourceName
   const handleChangeSelected = onChangeSelected;
-  const handleChangeResourceName = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const { resourceName } = project;
-    const { value } = e.target;
-    const newResourceName: string[] = resourceName || [];
-    newResourceName[index] = value;
-    onChangeResourceName(newResourceName);
+  const handleChangeResourceName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChangeResourceName(e.target.value);
   };
 
   return (
@@ -184,20 +180,12 @@ const EditMode = ({
             你會使用哪些資源呢？包含網路資源的連結、書籍名稱、人／組織、社群、活動／課程、學習工具等，請至少附上名稱與相關連結
           </InputField.Description>
           {
-            project?.resourceName?.length && (
-              project.resourceName.map((name, index) => {
-                const resourceId = crypto.randomUUID();
-                return (
-                  <InputField.Input
-                    key={resourceId}
-                    id={`resource-${resourceId}`}
-                    name={`resource-${resourceId}`}
-                    onChange={(e) => handleChangeResourceName(e, index)}
-                    value={name}
-                    placeholder="範例：YouTube 創作者的實用資源"
-                  />
-                );
-              })
+            project?.resourceName && (
+              <InputField.Input
+                onChange={handleChangeResourceName}
+                value={project.resourceName}
+                placeholder="範例：YouTube 創作者的實用資源"
+              />
             )
           }
         </InputField>
