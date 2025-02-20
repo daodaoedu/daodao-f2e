@@ -8,8 +8,8 @@ import ConfirmModal from '@/shared/components/Confirm';
 import EditModal from '@/components/Outcome/Modals/UpdateModal';
 
 enum ModalTypeEnum {
-  Update = 'update',
-  Delete = 'delete',
+  Update,
+  Delete,
 }
 
 const OutcomeDetailPage = () => {

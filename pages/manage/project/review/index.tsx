@@ -14,9 +14,9 @@ import {
 import ConfirmModal from '@/shared/components/Confirm';
 
 enum ModalTypeEnum {
-  Create = 'create',
-  Update = 'update',
-  Delete = 'delete',
+  Create,
+  Update,
+  Delete,
 }
 
 const ReviewPage = () => {
