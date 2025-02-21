@@ -55,8 +55,8 @@ const Description = ({ children, className }: DescriptionProps) => {
 };
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  id: string;
-  name: string;
+  id?: string;
+  name?: string;
   className?: string;
 }
 const Input = ({

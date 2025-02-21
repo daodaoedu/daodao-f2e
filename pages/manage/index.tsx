@@ -202,7 +202,11 @@ const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
 };
 
 const Main = ({ date }: { date: Dayjs }) => {
-  const { data: projects, mutate } = useProjectList({ isMe: true });
+  const {
+    data: projects,
+    mutate,
+    isValidating,
+  } = useProjectList({ isMe: true });
   const { data: reviews } = useProjectReviewList(projects?.[0]?.id);
 
   const currentProjects = useMemo(() => {
@@ -230,7 +234,13 @@ const Main = ({ date }: { date: Dayjs }) => {
     <>
       <ul>
         {currentProjects.map((project, index) => (
-          <li key={project.id}>
+          <li
+            key={project.id}
+            className={cn(
+              'opacity-100 transition-opacity',
+              isValidating && 'opacity-60'
+            )}
+          >
             <Project
               title={project.title}
               href={`/manage/project?id=${project.id}`}

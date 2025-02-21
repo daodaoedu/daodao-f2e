@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from 'dayjs';
@@ -86,12 +85,24 @@ function NoteForm({
       />
       <div className="px-2">
         {previewImage && (
-          <div className="mb-4">
+          <div className="relative group mb-4">
             <Image
               src={previewImage}
               alt="preview"
               width="100%"
               height="100%"
+            />
+            <span className="absolute inset-0 bottom-1.5 group-hover:bg-basic-black/20 transition-colors rounded-lg" />
+            <Button
+              variant="solid"
+              color="alert"
+              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-2"
+              prefixIcon="AiOutlineClose"
+              onClick={() => {
+                methods.setValue("imgFile", null);
+                methods.setValue("imgUrl", null);
+                setPreviewImage(null);
+              }}
             />
           </div>
         )}
@@ -105,13 +116,6 @@ function NoteForm({
         </Upload>
       </div>
       <div className="flex justify-end gap-5">
-        <Button
-          className="text-primary-base"
-          isDisabled={isLoading}
-          onClick={() => toast.error('尚未開放')}
-        >
-          儲存草稿
-        </Button>
         <Button variant="solid" color="primary" isSubmit isDisabled={isLoading}>
           發布
         </Button>

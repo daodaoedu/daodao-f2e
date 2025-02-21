@@ -97,7 +97,7 @@ const ProjectPage = () => {
     });
   };
 
-  const handleChangeResourceName = (value: string[]) => {
+  const handleChangeResourceName = (value: string) => {
     setFormData({
       ...formData,
       resourceName: value

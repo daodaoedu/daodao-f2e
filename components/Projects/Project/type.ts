@@ -21,7 +21,7 @@ export interface Project {
   updatedAt: string;
   strategy: string[];
   strategyDescription: string;
-  resourceName: string[];
+  resourceName: string;
   resourceUrl: string[];
   outcome: string[];
   outcomeDescription: string;
@@ -43,7 +43,7 @@ export const DEFAULT_PROJECT: Project = {
   updatedAt: "",
   strategy: [],
   strategyDescription: "",
-  resourceName: [],
+  resourceName: "",
   resourceUrl: [],
   outcome: [],
   outcomeDescription: "",
