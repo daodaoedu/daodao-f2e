@@ -18,7 +18,7 @@ const NoteDetailPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const noteId = parseInt(searchParams.get('noteId') ?? '0', 10);
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const { data: project } = useProject(projectId);
+  const { data: project } = useProject({ id: projectId });
   const {
     data: note,
     update,
