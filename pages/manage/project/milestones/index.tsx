@@ -2,8 +2,13 @@ import getProjectLayout from '@/layout/ProjectLayout';
 import { useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
-import { Skeleton, useMediaQuery } from "@mui/material";
-import { validateIdWithZod, Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
+import { Skeleton, useMediaQuery } from '@mui/material';
+import {
+  validateIdWithZod,
+  Panel,
+  Title,
+  ProgressBar,
+} from '@/components/Milestones/Shared';
 import { ProtectedComponent } from '@/contexts/Auth';
 import { useProject } from '@/contexts/Project';
 import { MilestonesProvider, useMilestones } from '@/contexts/Milestones/index';
@@ -21,7 +26,7 @@ interface MilestonesContentProps {
     copyright: string;
     imgLink: string;
     link: string;
-  }
+  };
 }
 
 const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
@@ -37,100 +42,95 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
     fetchMilestones(projectId);
   }, [projectId]);
 
-    const completedMilestonesCount = useMemo(() => {
-      return milestones.filter((m) => m.isCompleted).length;
-    }, [milestones]);
+  const completedMilestonesCount = useMemo(() => {
+    return milestones.filter((m) => m.isCompleted).length;
+  }, [milestones]);
 
-    const progressValue = useMemo(() => {
-      return milestones.length > 0
-        ? Math.round((completedMilestonesCount / milestones.length) * 100)
-        : 0;
-    }, [completedMilestonesCount, milestones]);
+  const progressValue = useMemo(() => {
+    return milestones.length > 0
+      ? Math.round((completedMilestonesCount / milestones.length) * 100)
+      : 0;
+  }, [completedMilestonesCount, milestones]);
 
-    const allTasks = useMemo(() => {
-      return milestones.reduce((acc, milestone) => {
-        return [...acc, ...(milestone.tasks || [])];
-      }, [] as Task[]);
-    }, [milestones]);
+  const allTasks = useMemo(() => {
+    return milestones.reduce((acc, milestone) => {
+      return [...acc, ...(milestone.tasks || [])];
+    }, [] as Task[]);
+  }, [milestones]);
 
-    const remainingTasksCount = useMemo(() => {
-      return allTasks.filter((task) => !task.isCompleted).length;
-    }, [allTasks]);
+  const remainingTasksCount = useMemo(() => {
+    return allTasks.filter((task) => !task.isCompleted).length;
+  }, [allTasks]);
 
-    const planDeadline = useMemo(() => {
-      if (milestones.length === 0) return null;
-      const endDates = milestones
-        .filter((m) => m.endDate !== undefined)
-        .map((m) => new Date(m.endDate ?? ''))
-        .map((date) => date.getTime());
-      const maxTime = Math.max(...endDates);
-      return new Date(maxTime);
-    }, [milestones]);
+  const planDeadline = useMemo(() => {
+    if (milestones.length === 0) return null;
+    const endDates = milestones
+      .filter((m) => m.endDate !== undefined)
+      .map((m) => new Date(m.endDate ?? ''))
+      .map((date) => date.getTime());
+    const maxTime = Math.max(...endDates);
+    return new Date(maxTime);
+  }, [milestones]);
 
-    const daysRemaining = useMemo(() => {
-      // 利用 zod 檢查 planDeadline 是否為有效日期
-      if (!z.date().safeParse(planDeadline).success) return 0;
+  const daysRemaining = useMemo(() => {
+    // 利用 zod 檢查 planDeadline 是否為有效日期
+    if (!z.date().safeParse(planDeadline).success) return 0;
 
-      const deadline = dayjs(planDeadline);
-      // 如果今天已經超過 deadline，則回傳 0
-      if (dayjs().isAfter(deadline)) return 0;
+    const deadline = dayjs(planDeadline);
+    // 如果今天已經超過 deadline，則回傳 0
+    if (dayjs().isAfter(deadline)) return 0;
 
-      // 計算 deadline 與今天之間相差的天數
-      return deadline.diff(dayjs(), 'day');
-    }, [planDeadline]);
+    // 計算 deadline 與今天之間相差的天數
+    return deadline.diff(dayjs(), 'day');
+  }, [planDeadline]);
 
   return (
     <div>
       <SEOConfig data={SEOData} />
-      {
-        isFetching ? (
-          <>
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={120}
-              animation="wave"
-              className="mb-3"
-            />
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={300}
-              animation="wave"
-            />
-          </>
-        ) : (
-          <>
-            <Panel className="bg-white mb-6 md:py-6 flex flex-col gap-3 md:gap-5">
-              <Title title="學習里程碑進度" className="mb-0" />
-              <ProgressBar progress={progressValue} />
-              <p className="font-sans text-sm md:text-base text-basic-300">
-                還剩 {daysRemaining} 天可以完成剩下的 {remainingTasksCount} 個任務，加油！
-              </p>
-            </Panel>
-            <Panel className="bg-white">
-              <Title title="學習里程碑 *" />
-              <div className="flex flex-col gap-3">
-                {
-                  milestones.length && (
-                    milestones
-                      .sort((a, b) => a.week - b.week)
-                      .map((milestone) => (
-                        <MilestoneItem
-                          key={milestone.id}
-                          milestone={milestone}
-                          isLgScreen={isLgScreen}
-                          projectId={projectId}
-                        />
-                      )
-                      )
-                  )
-                }
-              </div>
-            </Panel>
-          </>
-        )
-      }
+      {isFetching ? (
+        <>
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={120}
+            animation="wave"
+            className="mb-3"
+          />
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={300}
+            animation="wave"
+          />
+        </>
+      ) : (
+        <>
+          <Panel className="bg-white mb-6 md:py-6 flex flex-col gap-3 md:gap-5">
+            <Title title="學習里程碑進度" className="mb-0" />
+            <ProgressBar progress={progressValue} />
+            <p className="font-sans text-sm md:text-base text-basic-300">
+              還剩 {daysRemaining} 天可以完成剩下的 {remainingTasksCount}{' '}
+              個任務，加油！
+            </p>
+          </Panel>
+          <Panel className="bg-white">
+            <Title title="學習里程碑 *" />
+            <div className="flex flex-col gap-3">
+              {milestones.length &&
+                milestones
+                  .sort((a, b) => a.week - b.week)
+                  .map((milestone) => (
+                    <MilestoneItem
+                      key={milestone.id}
+                      milestone={milestone}
+                      isLgScreen={isLgScreen}
+                      projectId={projectId}
+                    />
+                  ))}
+            </div>
+          </Panel>
+        </>
+      )}
     </div>
   );
 };
@@ -165,7 +165,7 @@ const MilestonesPage = () => {
         },
       ],
     }),
-    [router?.asPath],
+    [router?.asPath]
   );
 
   return (
