@@ -5,6 +5,12 @@ concurrency:
   cancel-in-progress: true
 
 on:
+  push:
+    branches:
+      - "**"
+      - "!prod"
+      - "!dev"
+      - "!feat/v2"
   pull_request_target:
     branches:
       - "**"
