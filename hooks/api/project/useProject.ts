@@ -10,9 +10,9 @@ import {
   UpdateProjectRequest,
 } from '@/services/project';
 
-export default function useProject(projectId?: string) {
+export default function useProject(id?: string) {
   const { mutate, ...swr } = useSWR<Project>(
-    projectId ? getProjectEndpoint({ projectId }) : null
+    id ? getProjectEndpoint({ id }) : null
   );
 
   const handleCreate = useCallback(
@@ -32,8 +32,8 @@ export default function useProject(projectId?: string) {
   );
 
   const handleDelete = useCallback(
-    async (_projectId: string) => {
-      await deleteProject(_projectId);
+    async (_id: string) => {
+      await deleteProject(_id);
       return mutate();
     },
     [mutate]
