@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Project as ProjectType } from '@/components/Projects/Project/type';
 import { cn } from '@/utils/cn';
 import ProjectUserInfoBar from './ProjectUserInfoBar';
@@ -9,7 +10,7 @@ interface ProjectCardProps {
 
 const ProjectCard = ({ project }: ProjectCardProps) => {
   return (
-    <a
+    <Link
       href={`/projects/detail?projectId=${project.id}`}
       className={cn(
         "p-4 md:py-8 md:px-10 flex flex-col gap-5 justify-start items-start",
@@ -39,7 +40,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           }}
         /> */}
       </div>
-    </a>
+    </Link>
   );
 };
 export default ProjectCard;
