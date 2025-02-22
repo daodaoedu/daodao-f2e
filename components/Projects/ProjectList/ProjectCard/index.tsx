@@ -9,7 +9,8 @@ interface ProjectCardProps {
 
 const ProjectCard = ({ project }: ProjectCardProps) => {
   return (
-    <div
+    <a
+      href={`/projects/detail?projectId=${project.id}`}
       className={cn(
         "p-4 md:py-8 md:px-10 flex flex-col gap-5 justify-start items-start",
         "border-[#EDF0F7] border-solid border-b-[1px]"
@@ -38,7 +39,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           }}
         /> */}
       </div>
-    </div>
+    </a>
   );
 };
 export default ProjectCard;
