@@ -58,7 +58,6 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
   const {
     data: milestones,
     isLoading,
-    isValidating,
     create,
     mutate,
   } = useProjectMilestoneList(project.id, {

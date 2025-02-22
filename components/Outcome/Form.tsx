@@ -41,7 +41,7 @@ function OutcomeForm({
   onSubmit,
 }: OutcomeFormProps) {
   const [previewImage, setPreviewImage] = useState<string | null>(
-    defaultValues?.imgUrl ?? null
+    defaultValues?.imgUrls?.[0] ?? null
   );
 
   const methods = useForm<
@@ -58,8 +58,8 @@ function OutcomeForm({
       title: projectTitle,
       date: dayjs(createdAt || undefined).format('YYYY-MM-DD'),
       week,
-      description: '',
-      imgUrl: null,
+      content: '',
+      imgUrls: [],
       ...defaultValues,
     },
   });
@@ -83,7 +83,7 @@ function OutcomeForm({
         placeholder="學習成果的提示文字
 例如：你的成果包含哪些內容？
 可以分享簡報、PDF檔案的連結，也可以分享影片連結，分享時記得設為公開喔～"
-        {...methods.register('description')}
+        {...methods.register('content')}
       />
       <div className="px-2">
         {previewImage && (
@@ -101,8 +101,8 @@ function OutcomeForm({
               className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-2"
               prefixIcon="AiOutlineClose"
               onClick={() => {
-                methods.setValue("imgFile", null);
-                methods.setValue("imgUrl", null);
+                methods.setValue("imgFiles", []);
+                methods.setValue("imgUrls", []);
                 setPreviewImage(null);
               }}
             />
@@ -112,7 +112,7 @@ function OutcomeForm({
           variant="solid"
           color="secondary"
           onPreviewChange={([preview]) => setPreviewImage(preview)}
-          onFilesChange={([file]) => methods.setValue('imgFile', file)}
+          onFilesChange={([file]) => methods.setValue('imgFiles', [file])}
         >
           {previewImage ? '更換圖片' : '加入圖片'}
         </Upload>

@@ -24,9 +24,13 @@ function NoteDetail({
       onDeleteClick={onDeleteClick}
       renderContent={(noteData) => (
         <div className="mb-4 body-sm text-basic-500">
-          <p className="mb-3 whitespace-pre-wrap">{noteData.description}</p>
-          {noteData.imgUrl && (
-            <Image src={noteData.imgUrl} alt={noteData.title} height="300px" />
+          <p className="mb-3 whitespace-pre-wrap">{noteData.content}</p>
+          {noteData.imgUrls && noteData.imgUrls.length > 0 && (
+            <Image
+              src={noteData.imgUrls[0]}
+              alt={noteData.title}
+              height="300px"
+            />
           )}
         </div>
       )}

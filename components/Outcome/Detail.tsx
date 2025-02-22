@@ -24,9 +24,13 @@ function OutcomeDetail({
       onDeleteClick={onDeleteClick}
       renderContent={(outcomeData) => (
         <div className="mb-4 body-sm text-basic-500">
-          <p className="mb-3 whitespace-pre-wrap">{outcomeData.description}</p>
-          {outcomeData.imgUrl && (
-            <Image src={outcomeData.imgUrl} alt={outcomeData.title} height="300px" />
+          <p className="mb-3 whitespace-pre-wrap">{outcomeData.content}</p>
+          {outcomeData.imgUrls && outcomeData.imgUrls.length > 0 && (
+            <Image
+              src={outcomeData.imgUrls[0]}
+              alt={outcomeData.title}
+              height="300px"
+            />
           )}
         </div>
       )}
