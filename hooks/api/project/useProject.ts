@@ -1,5 +1,6 @@
-import { useCallback } from 'react';
-import useSWR from 'swr';
+import toast from 'react-hot-toast';
+import useSWR, { useSWRConfig } from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { Project } from '@/components/Projects/Project/type';
 import {
   createProject,
@@ -10,40 +11,67 @@ import {
   UpdateProjectRequest,
 } from '@/services/project';
 
-export default function useProject(projectId?: string) {
-  const { mutate, ...swr } = useSWR<Project>(
-    projectId ? getProjectEndpoint({ projectId }) : null
+interface UseProjectOptions {
+  id?: string;
+  mutateKey?: string | null;
+  onCreated?: (data: Project) => void;
+  onUpdated?: (data: Project) => void;
+  onDeleted?: () => void;
+}
+
+export default function useProject({
+  id,
+  mutateKey,
+  onCreated,
+  onUpdated,
+  onDeleted,
+}: UseProjectOptions) {
+  const swrKey = id ? getProjectEndpoint({ id }) : null;
+
+  const config = useSWRConfig();
+  const { mutate, ...swr } = useSWR<Project>(swrKey);
+
+  const create = useSWRMutation(
+    swrKey ?? mutateKey,
+    (url, { arg }: { arg: CreateProjectRequest }) => createProject(arg),
+    {
+      onSuccess: onCreated,
+      onError: (error, key) => {
+        config.onError?.(error, key, config);
+        toast.error('新增計畫失敗');
+      },
+    }
   );
 
-  const handleCreate = useCallback(
-    async (project: CreateProjectRequest) => {
-      const projectData = await createProject(project);
-      return mutate(projectData);
-    },
-    [mutate]
+  const update = useSWRMutation(
+    swrKey ?? mutateKey,
+    (url, { arg }: { arg: UpdateProjectRequest }) => updateProject(arg),
+    {
+      onSuccess: onUpdated,
+      onError: (error, key) => {
+        config.onError?.(error, key, config);
+        toast.error('更新計畫失敗');
+      },
+    }
   );
 
-  const handleUpdate = useCallback(
-    async (project: UpdateProjectRequest) => {
-      const projectData = await updateProject(project);
-      return mutate(projectData);
-    },
-    [mutate]
-  );
-
-  const handleDelete = useCallback(
-    async (_projectId: string) => {
-      await deleteProject(_projectId);
-      return mutate();
-    },
-    [mutate]
+  const remove = useSWRMutation(
+    swrKey ?? mutateKey,
+    (url, { arg }: { arg: { id: string } }) => deleteProject(arg.id),
+    {
+      onSuccess: onDeleted,
+      onError: (error, key) => {
+        config.onError?.(error, key, config);
+        toast.error('刪除計畫失敗');
+      },
+    }
   );
 
   return {
     ...swr,
     mutate,
-    handleCreate,
-    handleUpdate,
-    handleDelete,
+    create,
+    update,
+    remove,
   };
 }

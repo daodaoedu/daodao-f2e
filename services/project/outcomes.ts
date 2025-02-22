@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { mutations } from '../httpClient';
-import { projectEndpoint } from './index';
 import { uploadImage } from '../images';
+
+const projectEndpoint = '/projects';
 
 interface GetProjectOutcomeEndpointOptions {
   projectId: string;
@@ -24,9 +25,10 @@ const projectOutcomeSchema = z.object({
   title: z.string(),
   week: z.number(),
   date: z.string().date(),
-  description: z.string(),
-  imgUrl: z.string().nullable(),
-  imgFile: z.instanceof(File).nullable().optional(),
+  content: z.string(),
+  imgUrls: z.array(z.string()).nullable(),
+  imgFiles: z.array(z.instanceof(File)).nullable().optional(),
+  videoUrls: z.array(z.string()).nullable(),
 });
 
 export type ProjectOutcomeSchema = z.infer<typeof projectOutcomeSchema>;
@@ -41,19 +43,19 @@ export type CreateProjectOutcomeRequest = z.infer<
 
 export const createProjectOutcome = async ({
   projectId,
-  imgFile,
+  imgFiles,
   ...outcome
 }: CreateProjectOutcomeRequest) => {
-  let newUrl: string | null = null;
+  const newUrls: string[] = [];
 
-  if (imgFile) {
-    const { url } = await uploadImage({ file: imgFile });
-    newUrl = url;
+  if (Array.isArray(imgFiles) && imgFiles.length > 0) {
+    const { url } = await uploadImage({ file: imgFiles[0] });
+    newUrls.push(url);
   }
 
   return mutations.post(getProjectOutcomeEndpoint({ projectId }), {
     ...outcome,
-    imgUrl: newUrl,
+    imgUrls: newUrls,
   });
 };
 
@@ -66,21 +68,21 @@ export type UpdateProjectOutcomeRequest = z.infer<
 export const updateProjectOutcome = async ({
   projectId,
   id,
-  imgFile,
+  imgFiles,
   ...outcome
 }: UpdateProjectOutcomeRequest) => {
-  let newUrl: string | null = null;
+  const newUrls: string[] = [];
 
-  if (imgFile) {
-    const { url } = await uploadImage({ file: imgFile });
-    newUrl = url;
+  if (Array.isArray(imgFiles) && imgFiles.length > 0) {
+    const { url } = await uploadImage({ file: imgFiles[0] });
+    newUrls.push(url);
   }
 
   return mutations.put(
     getProjectOutcomeEndpoint({ projectId, outcomeId: id }),
     {
       ...outcome,
-      imgUrl: newUrl,
+      imgUrls: newUrls,
     }
   );
 };

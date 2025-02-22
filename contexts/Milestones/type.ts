@@ -18,7 +18,7 @@ export const DEFAULT_TASK: Task = {
 
 export interface Milestone {
   id: number,
-  project_id: "",
+  projectId: string,
   week: number,
   name: string,
   description: string,
@@ -33,7 +33,7 @@ export interface Milestone {
 
 export const DEFAULT_MILESTONE: Milestone = {
   id: 0,
-  project_id: "",
+  projectId: "",
   week: 1,
   name: "",
   description: "",

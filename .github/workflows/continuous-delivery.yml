@@ -1,7 +1,7 @@
 name: Continuous Delivery
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
+  group: cd-${{ github.workflow }}-${{ github.head_ref }}
   cancel-in-progress: true
 
 on:
@@ -16,27 +16,6 @@ env:
   BRANCH_NAME: ${{ github.ref_name }}
 
 jobs:
-  init:
-    name: Initial Common Steps
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@v4
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            ~/.cache/Cypress
-          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
-
   continuous_integration:
     uses: ./.github/workflows/continuous-integration.yml
 

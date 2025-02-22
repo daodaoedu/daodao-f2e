@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { SWRConfig } from 'swr';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
@@ -26,9 +29,12 @@ import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
 import "@/shared/styles/global.css";
+import 'dayjs/locale/zh-tw';
 
 const store = storeFactory();
 const persistor = persistStore(store);
+
+dayjs.locale('zh-tw');
 
 const swrConfig = {
   revalidateOnFocus: false,
@@ -223,13 +229,15 @@ const App = ({ Component, pageProps }) => {
 
       <Provider store={store}>
         <PersistGate persistor={persistor}>
-          <SWRConfig value={swrConfig}>
-            <SnackbarProvider>
-              <AuthProvider>
-                <ThemeComponentWrap pageProps={pageProps} Component={Component} />
-              </AuthProvider>
-            </SnackbarProvider>
-          </SWRConfig>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
+            <SWRConfig value={swrConfig}>
+              <SnackbarProvider>
+                <AuthProvider>
+                  <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+                </AuthProvider>
+              </SnackbarProvider>
+            </SWRConfig>
+          </LocalizationProvider>
         </PersistGate>
       </Provider>
     </>

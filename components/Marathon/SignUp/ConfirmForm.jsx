@@ -21,7 +21,7 @@ import { useAuthDispatch } from '@/contexts/Auth';
 import { AREA_DELIMITER, AREAS } from '@/constants/areas';
 import { mapToTable } from '@/utils/helper';
 
-import config from '@/constants/config';
+import marathonConfig from '@/constants/marathon';
 import {
   StyledSection,
   StyledButtonGroup,
@@ -276,7 +276,7 @@ export default function ConfirmForm({
     }
   }, [userState, openLoginModal]);
   const onSubmit = async () => {
-    if (!config.isMarathonApplyEnabled) {
+    if (!marathonConfig.isMarathonApplyEnabled) {
       popupRef.current.showPopup();
       return;
     } else {

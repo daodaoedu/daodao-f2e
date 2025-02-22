@@ -21,7 +21,7 @@ const MilestoneItem = ({
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="p-[10px] bg-basic-100 flex flex-col gap-2">
+    <div className="p-2.5 bg-basic-100 flex flex-col gap-2">
       <Milestone
         projectId={projectId}
         milestone={milestone}

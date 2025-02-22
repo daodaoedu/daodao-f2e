@@ -24,7 +24,7 @@ const NotesPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [noteId, setNoteId] = useState<number | undefined>(undefined);
-  const { data: project } = useProject(projectId);
+  const { data: project } = useProject({ id: projectId });
 
   const { data: detail, mutate } = useProjectNote({
     projectId,

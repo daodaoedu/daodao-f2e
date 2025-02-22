@@ -12,7 +12,7 @@ import {
   useProjectReviewList,
 } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
-import config from '@/constants/config';
+import marathonConfig from '@/constants/marathon';
 
 enum ModalTypeEnum {
   Create,
@@ -25,7 +25,7 @@ const ReviewPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [reviewId, setReviewId] = useState<number | undefined>(undefined);
-  const { data: project } = useProject(projectId);
+  const { data: project } = useProject({ id: projectId });
 
   const { data: detail, mutate } = useProjectReview({
     projectId,
@@ -64,7 +64,7 @@ const ReviewPage = () => {
       <div className="mb-6 flex items-end sm:items-center justify-between body-md">
         <div className="flex flex-col items-start sm:flex-row sm:items-center gap-1">
           <div className="text-basic-500">
-            覆盤（{config.getWeekNumber().toString().padStart(2, '0')} 週/22週）
+            覆盤（{marathonConfig.getWeekNumber().toString().padStart(2, '0')} 週/22週）
           </div>
         </div>
         <Button

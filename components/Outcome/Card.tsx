@@ -20,10 +20,14 @@ function OutcomeCard({
   const renderContent = (outcomeData: ProjectOutcomeSchema) => (
     <div className="mb-3 body-sm text-basic-500">
       <p className="mb-3 whitespace-pre-wrap min-h-12 max-h-48 overflow-hidden">
-        {outcomeData.description}
+        {outcomeData.content}
       </p>
-      {outcomeData.imgUrl && (
-        <Image src={outcomeData.imgUrl} alt={outcomeData.title} height="300px" />
+      {outcomeData.imgUrls && outcomeData.imgUrls.length > 0 && (
+        <Image
+          src={outcomeData.imgUrls[0]}
+          alt={outcomeData.title}
+          height="300px"
+        />
       )}
     </div>
   );

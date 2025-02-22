@@ -18,7 +18,7 @@ const ReviewPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const reviewId = parseInt(searchParams.get('reviewId') ?? '0', 10);
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const { data: project } = useProject(projectId);
+  const { data: project } = useProject({ id: projectId });
   const {
     data: review,
     update,

@@ -41,7 +41,7 @@ function NoteForm({
   onSubmit,
 }: NoteFormProps) {
   const [previewImage, setPreviewImage] = useState<string | null>(
-    defaultValues?.imgUrl ?? null
+    defaultValues?.imgUrls?.[0] ?? null
   );
 
   const methods = useForm<
@@ -58,8 +58,8 @@ function NoteForm({
       title: projectTitle,
       date: dayjs(createdAt || undefined).format('YYYY-MM-DD'),
       week,
-      description: '',
-      imgUrl: null,
+      content: '',
+      imgUrls: [],
       ...defaultValues,
     },
   });
@@ -81,7 +81,7 @@ function NoteForm({
       <textarea
         className="w-full h-80 px-2 py-1 body-sm focus-within:outline-none resize-none"
         placeholder="請填寫便利貼內容"
-        {...methods.register('description')}
+        {...methods.register('content')}
       />
       <div className="px-2">
         {previewImage && (
@@ -99,8 +99,8 @@ function NoteForm({
               className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-2"
               prefixIcon="AiOutlineClose"
               onClick={() => {
-                methods.setValue("imgFile", null);
-                methods.setValue("imgUrl", null);
+                methods.setValue("imgFiles", []);
+                methods.setValue("imgUrls", []);
                 setPreviewImage(null);
               }}
             />
@@ -110,7 +110,7 @@ function NoteForm({
           variant="solid"
           color="secondary"
           onPreviewChange={([preview]) => setPreviewImage(preview)}
-          onFilesChange={([file]) => methods.setValue('imgFile', file)}
+          onFilesChange={([file]) => methods.setValue('imgFiles', [file])}
         >
           {previewImage ? '更換圖片' : '加入圖片'}
         </Upload>

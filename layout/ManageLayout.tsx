@@ -42,6 +42,7 @@ function ManageLayout({ children }: React.PropsWithChildren) {
                                 className="pl-14"
                                 href={child.href}
                                 isActive={pathname === child.href}
+                                isDisabled={child.isDisabled}
                               >
                                 {child.label}
                               </Sidebar.Link>

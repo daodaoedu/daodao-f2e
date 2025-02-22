@@ -179,15 +179,11 @@ const EditMode = ({
           <InputField.Description>
             你會使用哪些資源呢？包含網路資源的連結、書籍名稱、人／組織、社群、活動／課程、學習工具等，請至少附上名稱與相關連結
           </InputField.Description>
-          {
-            project?.resourceName && (
-              <InputField.Input
-                onChange={handleChangeResourceName}
-                value={project.resourceName}
-                placeholder="範例：YouTube 創作者的實用資源"
-              />
-            )
-          }
+          <InputField.Input
+            onChange={handleChangeResourceName}
+            value={project.resourceName || ''}
+            placeholder="範例：YouTube 創作者的實用資源"
+          />
         </InputField>
 
         <div className="flex flex-row">

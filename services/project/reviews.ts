@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { mutations } from '../httpClient';
-import { projectEndpoint } from './index';
+
+const projectEndpoint = '/projects';
 
 interface GetProjectReviewListKeyOptions {
   projectId: string;

@@ -20,10 +20,10 @@ function NoteCard({
   const renderContent = (noteData: ProjectNoteSchema) => (
     <div className="mb-3 body-sm text-basic-500">
       <p className="mb-3 whitespace-pre-wrap min-h-12 max-h-48 overflow-hidden">
-        {noteData.description}
+        {noteData.content}
       </p>
-      {noteData.imgUrl && (
-        <Image src={noteData.imgUrl} alt={noteData.title} height="300px" />
+      {noteData.imgUrls && noteData.imgUrls.length > 0 && (
+        <Image src={noteData.imgUrls[0]} alt={noteData.title} height="300px" />
       )}
     </div>
   );

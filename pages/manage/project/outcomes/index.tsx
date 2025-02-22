@@ -24,7 +24,7 @@ const OutcomesPage = () => {
   const projectId = searchParams.get('id') ?? undefined;
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [outcomeId, setOutcomeId] = useState<number | undefined>(undefined);
-  const { data: project } = useProject(projectId);
+  const { data: project } = useProject({ id: projectId });
 
   const { data: detail, mutate } = useProjectOutcome({
     projectId,

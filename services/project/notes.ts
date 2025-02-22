@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { mutations } from '../httpClient';
-import { projectEndpoint } from './index';
 import { uploadImage } from '../images';
+
+const projectEndpoint = '/projects';
 
 interface GetProjectNoteListKeyOptions {
   projectId: string;
@@ -24,9 +25,10 @@ const projectNoteSchema = z.object({
   title: z.string(),
   week: z.number(),
   date: z.string().date(),
-  description: z.string(),
-  imgUrl: z.string().nullable(),
-  imgFile: z.instanceof(File).nullable().optional(),
+  content: z.string(),
+  imgUrls: z.array(z.string()).nullable(),
+  imgFiles: z.array(z.instanceof(File)).nullable().optional(),
+  videoUrls: z.array(z.string()).nullable(),
 });
 
 export type ProjectNoteSchema = z.infer<typeof projectNoteSchema>;
@@ -39,13 +41,13 @@ export type CreateProjectNoteRequest = z.infer<typeof createProjectNoteSchema>;
 
 export const createProjectNote = async ({
   projectId,
-  imgFile,
+  imgFiles,
   ...note
 }: CreateProjectNoteRequest) => {
   let newUrl: string | null = null;
 
-  if (imgFile) {
-    const { url } = await uploadImage({ file: imgFile });
+  if (Array.isArray(imgFiles) && imgFiles.length === 1) {
+    const { url } = await uploadImage({ file: imgFiles[0] });
     newUrl = url;
   }
 
@@ -62,13 +64,13 @@ export type UpdateProjectNoteRequest = z.infer<typeof updateProjectNoteSchema>;
 export const updateProjectNote = async ({
   id,
   projectId,
-  imgFile,
+  imgFiles,
   ...note
 }: UpdateProjectNoteRequest) => {
   let newUrl: string | null = null;
 
-  if (imgFile) {
-    const { url } = await uploadImage({ file: imgFile });
+  if (Array.isArray(imgFiles) && imgFiles.length === 1) {
+    const { url } = await uploadImage({ file: imgFiles[0] });
     newUrl = url;
   }
 
