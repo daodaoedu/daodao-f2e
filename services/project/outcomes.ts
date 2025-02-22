@@ -28,7 +28,7 @@ const projectOutcomeSchema = z.object({
   content: z.string(),
   imgUrls: z.array(z.string()).nullable(),
   imgFiles: z.array(z.instanceof(File)).nullable().optional(),
-  videoUrls: z.array(z.string()).nullable(),
+  videoUrls: z.array(z.string()).nullable().optional(),
 });
 
 export type ProjectOutcomeSchema = z.infer<typeof projectOutcomeSchema>;
