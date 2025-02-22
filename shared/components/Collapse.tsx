@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { ToggleProvider, useToggle } from '@/contexts/Toggle';
 import { cn } from '@/utils/cn';
 
@@ -57,16 +58,32 @@ interface CollapseListProps {
 }
 
 function List({ children, className }: CollapseListProps) {
+  const [isOpened, setIsOpened] = useState(false);
   const [isOpen] = useToggle({
     errorMessage: 'Collapse.List must be used within a Collapse',
   });
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (isOpen) {
+      timer = setTimeout(() => {
+        setIsOpened(true);
+      }, 300);
+    } else {
+      setIsOpened(false);
+    }
+
+    return () => clearTimeout(timer);
+  }, [isOpen]);
 
   return (
     <ul
       className={cn(
         'group transition-opacity',
         '*:grid *:transition-[grid-template-rows]',
-        '*:grid-rows-[1fr] *:aria-hidden:grid-rows-[0fr] [&>*>*]:aria-hidden:overflow-hidden',
+        '*:grid-rows-[1fr] *:aria-hidden:grid-rows-[0fr]',
+        !isOpened && '[&>*>*]:overflow-hidden',
         className,
         isOpen ? 'opacity-100' : 'opacity-0'
       )}

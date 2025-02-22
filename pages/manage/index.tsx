@@ -1,7 +1,7 @@
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { Children, useMemo, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import dayjs, { Dayjs } from 'dayjs';
 import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
 import { CiCircleChevRight, CiCircleChevLeft } from 'react-icons/ci';
@@ -48,6 +48,65 @@ const HEADER_TITLES = [
 ];
 
 const Header = () => {
+  const router = useRouter();
+  const { data } = useProjectList({ isMe: true });
+  const maxProjects = 3;
+
+  const handleCreateProject = () => {
+    if (!data) {
+      toast.error('目前功能異常，請稍後再試');
+    } else if (data.length >= maxProjects) {
+      toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
+    } else {
+      router.push('/manage/project/create');
+    }
+  };
+
+  const projectActions = [
+    {
+      label: '新增計畫',
+      onClick: handleCreateProject,
+    },
+    {
+      label: '新增任務',
+      onClick: () => toast.error('功能尚未開放'),
+    },
+    {
+      label: '新增覆盤',
+      onClick: () => toast.error('功能尚未開放'),
+    },
+    {
+      label: '新增便利貼',
+      onClick: () => toast.error('功能尚未開放'),
+    },
+    {
+      label: '新增成果',
+      onClick: () => toast.error('功能尚未開放'),
+    },
+  ];
+
+  const userActions = [
+    {
+      label: '新增揪團',
+      onClick: () => toast.error('功能尚未開放'),
+    },
+    {
+      label: '新增資源',
+      onClick: () => toast.error('功能尚未開放'),
+    },
+  ];
+
+  const dropdownItems = [
+    {
+      label: '學習計畫',
+      actions: projectActions,
+    },
+    {
+      label: '學習馬拉松',
+      actions: userActions,
+    },
+  ];
+
   return (
     <div className="mb-6 p-2 flex items-center justify-between">
       <h2 className="heading-sm text-basic-500">
@@ -58,14 +117,33 @@ const Header = () => {
           新增
         </Dropdown.Toggle>
         <Dropdown.List className="top-full right-0 z-20">
-          <Dropdown.Item className="rounded-lg text-nowrap">
-            <Button
-              className="hover:bg-primary-lightest"
-              onClick={() => toast.error('功能尚未開放')}
+          {dropdownItems.map(({ label, actions }) => (
+            <Dropdown.Item
+              key={label}
+              className="min-w-60 rounded-lg text-nowrap"
             >
-              學習計畫
-            </Button>
-          </Dropdown.Item>
+              <Collapse>
+                <Collapse.Toggle
+                  className="w-full px-3 py-2 justify-between"
+                  withIcon
+                >
+                  {label}
+                </Collapse.Toggle>
+                <Collapse.List className="*:my-2 *:aria-hidden:my-0">
+                  {actions.map((action) => (
+                    <Collapse.Item key={action.label}>
+                      <Button
+                        className="w-full text-left hover:bg-primary-lightest"
+                        onClick={action.onClick}
+                      >
+                        {action.label}
+                      </Button>
+                    </Collapse.Item>
+                  ))}
+                </Collapse.List>
+              </Collapse>
+            </Dropdown.Item>
+          ))}
         </Dropdown.List>
       </Dropdown>
     </div>
