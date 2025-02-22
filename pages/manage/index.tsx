@@ -3,8 +3,6 @@ import Link from 'next/link';
 import { Children, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import dayjs, { Dayjs } from 'dayjs';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
 import { CiCircleChevRight, CiCircleChevLeft } from 'react-icons/ci';
 import { GoArrowUpRight } from 'react-icons/go';
@@ -25,9 +23,6 @@ import { RoleEnum, useAuth } from '@/contexts/Auth';
 import { MilestonesProvider } from '@/contexts/Milestones';
 import { ProjectProvider } from '@/contexts/Project';
 import { cn } from '@/utils/cn';
-import 'dayjs/locale/zh-tw';
-
-dayjs.locale('zh-tw');
 
 const HEADER_TITLES = [
   '今天的每一小步，都在建立你的學習動能！',
@@ -304,7 +299,7 @@ const Manage = () => {
   );
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
+    <>
       <SEOConfig data={SEOData} />
       <Header />
       <Calendar
@@ -314,7 +309,7 @@ const Manage = () => {
         minDate={config.marathonStartDate}
       />
       {canManage ? <Main date={date} /> : <AccessDenied />}
-    </LocalizationProvider>
+    </>
   );
 };
 
