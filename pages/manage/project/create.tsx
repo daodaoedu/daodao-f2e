@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 
@@ -7,7 +7,7 @@ import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import Container from '@/shared/components/Container';
 import EditMode from '@/components/Projects/Project/EditMode';
 import SEOConfig from '@/shared/components/SEO';
-import { useProject } from '@/hooks/api/project';
+import { useProjectList } from '@/hooks/api/project';
 import { createProjectSchema } from '@/services/project';
 
 const ProjectPage = () => {
@@ -45,26 +45,22 @@ const ProjectPage = () => {
     [router?.asPath]
   );
   const [formData, setFormData] = useState<Partial<Project>>(DEFAULT_PROJECT);
-  const { handleCreate } = useProject();
+  const maxProjects = 3;
+  const { data: projects, create } = useProjectList({
+    isMe: true,
+    onCreated: (data) => {
+      toast.success('新增成功');
+      router.push(`/manage/project?id=${data.id}`);
+    },
+  });
 
   const handleOnClickCancel = () => {
     setFormData(DEFAULT_PROJECT);
   };
 
   const handleSubmit = async () => {
-    try {
-      const project = createProjectSchema.parse(formData);
-      const data = await handleCreate(project);
-      if (!data?.id) {
-        toast.error('新增失敗，請稍後再試');
-        return;
-      }
-      toast.success('新增成功');
-      router.push(`/manage/project?id=${data.id}`);
-    } catch (error) {
-      console.error(error);
-      toast.error('新增失敗，請稍後再試');
-    }
+    const project = createProjectSchema.parse(formData);
+    await create.trigger(project);
   };
 
   const handleChangeInput = (
@@ -99,23 +95,29 @@ const ProjectPage = () => {
     });
   };
 
+  useEffect(() => {
+    if (projects && projects.length >= maxProjects) {
+      toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
+      router.replace('/manage/projects');
+    }
+  }, [projects, maxProjects, router]);
+
   return (
     <ProtectedComponent>
       <SEOConfig data={SEOData} />
 
-      <Container
-        className="flex justify-center pb-12 px-4"
-        autoMinHeight
-      >
+      <Container className="flex justify-center pb-12 px-4" autoMinHeight>
         <div className="max-w-3xl">
-          <EditMode
-            project={formData}
-            onClickCancel={handleOnClickCancel}
-            onClickUpdate={handleSubmit}
-            onChangeInput={handleChangeInput}
-            onChangeSelected={handleChangeSelected}
-            onChangeResourceName={handleChangeResourceName}
-          />
+          {Array.isArray(projects) && projects.length < maxProjects && (
+            <EditMode
+              project={formData}
+              onClickCancel={handleOnClickCancel}
+              onClickUpdate={handleSubmit}
+              onChangeInput={handleChangeInput}
+              onChangeSelected={handleChangeSelected}
+              onChangeResourceName={handleChangeResourceName}
+            />
+          )}
         </div>
       </Container>
     </ProtectedComponent>
