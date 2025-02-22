@@ -18,8 +18,8 @@ import Dropdown from '@/shared/components/Dropdown';
 import { MdMoreVert } from 'react-icons/md';
 import dayjs from 'dayjs';
 import { ROLE } from '@/constants/member';
+import z from 'zod';
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 interface UserInfoBarProps {
   user: {
     name: string,
@@ -85,7 +85,7 @@ const PageProjectDetail = () => {
     };
 
     if (projectId) {
-      if (UUID_REGEX.test(projectId)) {
+      if (z.string().uuid().safeParse(projectId).success) {
         fetchProject();
       } else {
         toast.error('找不到這個計劃');
@@ -157,7 +157,7 @@ const PageProjectDetail = () => {
                   <Divider />
                   <Title title="學習動機" />
                   {
-                    Array.isArray(project?.motivation) && project?.motivation?.length && (
+                    Array.isArray(project?.motivation) && project?.motivation?.length > 0 && (
                       <Tags category="motivation_tags" tags={project?.motivation} />
                     )
                   }
@@ -171,27 +171,20 @@ const PageProjectDetail = () => {
                   <Divider />
                   <Title title="學習方法與策略" />
                   {
-                    Array.isArray(project?.strategy) && project?.strategy?.length && (
+                    Array.isArray(project?.strategy) && project?.strategy?.length > 0 && (
                       <Tags category="strategy_tags" tags={project?.strategy} />
                     )
                   }
                   <Description description={project?.strategyDescription || ""} />
                   {
-                    project?.resourceName?.length && (
+                    project?.resourceName && (
                       <>
                         <Divider />
                         <Title title="學習資源" />
                         <div className="flex flex-col gap-2">
-                          {
-                            project?.resourceName?.map((name, index) => {
-                              return (
-                                <FakeInput
-                                  key={`resource-${name}-${index}` as string}
-                                  value={name || ""}
-                                />
-                              );
-                            })
-                          }
+                          <FakeInput
+                            value={project?.resourceName}
+                          />
                         </div>
                       </>
                     )
@@ -201,7 +194,7 @@ const PageProjectDetail = () => {
                 <Panel className="bg-white">
                   <h3 className="body-md font-medium mb-5">學習成果及呈現方式 *</h3>
                   {
-                    (Array.isArray(project?.outcome) && project?.outcome?.length) && (
+                    (Array.isArray(project?.outcome) && project?.outcome?.length > 0) && (
                       <Tags category="outcome_tags" tags={project?.outcome} />
                     )
                   }
