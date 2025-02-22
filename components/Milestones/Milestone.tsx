@@ -12,6 +12,8 @@ import { MdSend, MdClose, MdEdit } from "react-icons/md";
 import { Milestone as MilestoneType } from "../../contexts/Milestones/type";
 import { numberToZh } from "./Shared";
 
+const a = 1;
+
 interface MilestoneProps {
   projectId?: string;
   milestone: MilestoneType;

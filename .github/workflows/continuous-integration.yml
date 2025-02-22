@@ -109,8 +109,11 @@ jobs:
         continue-on-error: true
         run: |
           if ! ERROR_MSG=$(yarn lint 2>&1); then
-            echo "lint_error=$ERROR_MSG" >> $GITHUB_OUTPUT
-            exit 1
+              {
+                echo "lint_error<<EOF"
+                echo "$ERROR_MSG"
+                echo "EOF"
+              } >> $GITHUB_OUTPUT
           fi
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
