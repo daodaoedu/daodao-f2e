@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import { Project } from '@/components/Projects/Project/type';
+import { projectMilestoneSchema } from './milestone';
 import { mutations } from '../httpClient';
 
-export const projectEndpoint = '/projects';
+const projectEndpoint = '/projects';
 
 interface GetProjectKeyProps {
   isMe?: boolean;
@@ -27,31 +28,7 @@ const projectUserSchema = z.object({
   photoURL: z.string(),
 });
 
-const projectTaskSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  description: z.string(),
-  daysOfWeek: z.array(z.string()),
-  isCompleted: z.boolean(),
-  milestoneId: z.number(),
-});
-
-const projectMilestoneSchema = z.object({
-  id: z.number(),
-  project_id: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  week: z.number(),
-  name: z.string(),
-  description: z.string(),
-  startDate: z.string(),
-  endDate: z.string(),
-  isCompleted: z.boolean(),
-  isDeleted: z.boolean(),
-  tasks: z.array(projectTaskSchema),
-});
-
-const baseProjectSchema = z.object({
+export const projectSchema = z.object({
   id: z.string(),
   title: z.string(),
   createdDate: z.string(),
@@ -74,7 +51,9 @@ const baseProjectSchema = z.object({
   milestones: z.array(projectMilestoneSchema),
 });
 
-export const createProjectSchema = baseProjectSchema.omit({
+export type ProjectSchema = z.infer<typeof projectSchema>;
+
+export const createProjectSchema = projectSchema.omit({
   id: true,
   createdDate: true,
   updatedDate: true,
@@ -89,7 +68,7 @@ export const createProject = (request: CreateProjectRequest) => {
   return mutations.post<Project>(getProjectEndpoint(), request);
 };
 
-export const updateProjectSchema = baseProjectSchema.omit({
+export const updateProjectSchema = projectSchema.omit({
   createdDate: true,
   updatedDate: true,
   eventId: true,

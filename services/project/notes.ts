@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { mutations } from '../httpClient';
-import { projectEndpoint } from './index';
 import { uploadImage } from '../images';
+
+const projectEndpoint = '/projects';
 
 interface GetProjectNoteListKeyOptions {
   projectId: string;

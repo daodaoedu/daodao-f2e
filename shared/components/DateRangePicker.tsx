@@ -114,6 +114,7 @@ const DateRangePicker = ({
     return (
       <CustomPickersDay
         {...pickersDayProps}
+        key={pickersDayProps.key}
         disableMargin
         dayIsBetween={dayIsBetween}
         isFirstDay={isFirstDay}
