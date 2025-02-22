@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Cache dependencies
         id: cache
@@ -46,6 +48,8 @@ jobs:
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Cache dependencies
         id: cache
@@ -62,7 +66,15 @@ jobs:
 
       - name: TypeScript Check
         id: check
-        run: ERROR_MSG=$(yarn ts:check 2>&1) || (echo "check_error=$ERROR_MSG" >> $GITHUB_OUTPUT && exit 1)
+        run: |
+          if ! ERROR_MSG=$(yarn ts:check 2>&1); then
+              {
+                echo "check_error<<EOF"
+                echo "$ERROR_MSG"
+                echo "EOF"
+              } >> $GITHUB_OUTPUT
+              exit 1
+          fi
 
       - name: Send TypeScript Error Notification
         if: steps.check.outcome == 'failure' && env.IS_INTERNAL_PR == 'true'
@@ -90,6 +102,8 @@ jobs:
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Cache dependencies
         id: cache
@@ -114,6 +128,7 @@ jobs:
                 echo "$ERROR_MSG"
                 echo "EOF"
               } >> $GITHUB_OUTPUT
+              exit 1
           fi
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
