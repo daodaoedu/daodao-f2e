@@ -21,7 +21,7 @@ import { cn } from '@/utils/cn';
 import Banner from '@/components/Banner';
 import { logEvent } from '@/utils/analytics';
 import ApplyClosePopup from '@/components/Marathon/ApplyClosePopup';
-import config from '@/constants/config';
+import marathonConfig from '@/constants/marathon';
 import { MARATHON_LINKS } from '@/constants/category';
 
 const StyledBannerButton = styled(Button)`
@@ -300,7 +300,7 @@ const LearningMarathon = () => {
   );
 
   const handleClickSignupButton = () => {
-    if (!config.isMarathonApplyEnabled) {
+    if (!marathonConfig.isMarathonApplyEnabled) {
       popupRef.current.showPopup();
       return;
     } else {

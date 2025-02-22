@@ -1,6 +1,6 @@
 import Modal from '@/shared/components/Modal';
 import { CreateProjectNoteRequest } from '@/services/project/notes';
-import config from '@/constants/config';
+import marathonConfig from '@/constants/marathon';
 import NoteForm from '../Form';
 
 interface CreateModalProps {
@@ -31,7 +31,7 @@ function CreateModal({
       <NoteForm
         projectId={projectId}
         projectTitle={projectTitle}
-        week={config.getWeekNumber()}
+        week={marathonConfig.getWeekNumber()}
         isLoading={isLoading}
         onSubmit={onSubmit}
       />

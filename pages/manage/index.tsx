@@ -8,7 +8,7 @@ import { CiCircleChevRight, CiCircleChevLeft } from 'react-icons/ci';
 import { GoArrowUpRight } from 'react-icons/go';
 import { PiCalendarBlankBold } from 'react-icons/pi';
 
-import config from '@/constants/config';
+import marathonConfig from '@/constants/marathon';
 import getManageLayout from '@/layout/ManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
 import { useProjectReviewList, useProjectList } from '@/hooks/api/project';
@@ -305,8 +305,8 @@ const Manage = () => {
       <Calendar
         date={date}
         onChange={setDate}
-        maxDate={config.marathonEndDate}
-        minDate={config.marathonStartDate}
+        maxDate={marathonConfig.marathonEndDate}
+        minDate={marathonConfig.marathonStartDate}
       />
       {canManage ? <Main date={date} /> : <AccessDenied />}
     </>

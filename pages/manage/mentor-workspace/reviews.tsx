@@ -3,7 +3,7 @@ import Button from '@/shared/components/Button';
 import getMentorWorkspaceLayout from '@/layout/MentorWorkspaceLayout';
 import { useState } from 'react';
 import { cn } from '@/utils/cn';
-import config from '@/constants/config';
+import marathonConfig from '@/constants/marathon';
 
 const MentorWorkspaceReviews = () => {
   const [activeTab, setActiveTab] = useState(11);
@@ -19,7 +19,7 @@ const MentorWorkspaceReviews = () => {
       <div className="mb-6 flex items-center gap-3.5">
         <h2 className="heading-md">所有復盤</h2>
         <p className="vertical-separator-left before:bg-basic-300 pl-3 body-md text-basic-300">
-          共 22 週，已進行 {config.getWeekNumber()} 週
+          共 22 週，已進行 {marathonConfig.getWeekNumber()} 週
         </p>
       </div>
       <ul className="flex gap-5 mb-6 border-b border-solid border-basic-200">

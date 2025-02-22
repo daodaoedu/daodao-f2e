@@ -1,6 +1,6 @@
 import Modal from '@/shared/components/Modal';
 import { CreateProjectOutcomeRequest } from '@/services/project/outcomes';
-import config from '@/constants/config';
+import marathonConfig from '@/constants/marathon';
 import OutcomeForm from '../Form';
 
 interface CreateModalProps {
@@ -31,7 +31,7 @@ function CreateModal({
       <OutcomeForm
         projectId={projectId}
         projectTitle={projectTitle}
-        week={config.getWeekNumber()}
+        week={marathonConfig.getWeekNumber()}
         isLoading={isLoading}
         onSubmit={onSubmit}
       />

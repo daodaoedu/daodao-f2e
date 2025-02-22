@@ -1,6 +1,6 @@
 import Modal from '@/shared/components/Modal';
 import { CreateProjectReviewRequest } from '@/services/project/reviews';
-import config from '@/constants/config';
+import marathonConfig from '@/constants/marathon';
 import ReviewForm from '../Form';
 
 interface CreateModalProps {
@@ -31,7 +31,7 @@ export default function CreateModal({
       <ReviewForm
         projectId={projectId}
         projectTitle={projectTitle}
-        week={config.getWeekNumber()}
+        week={marathonConfig.getWeekNumber()}
         onSubmit={onSubmit}
         isLoading={isLoading}
       />
