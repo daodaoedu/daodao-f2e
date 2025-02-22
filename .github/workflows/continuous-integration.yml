@@ -5,13 +5,7 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  push:
-    branches:
-      - "**"
-      - "!prod"
-      - "!dev"
-      - "!feat/v2"
-  pull_request_target:
+  pull_request:
     branches:
       - "**"
   workflow_call:
@@ -20,6 +14,7 @@ on:
 env:
   PR_URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.number }}
   BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+  IS_INTERNAL_PR: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
 
 jobs:
   init:
@@ -70,7 +65,7 @@ jobs:
         run: ERROR_MSG=$(yarn ts:check 2>&1) || (echo "check_error=$ERROR_MSG" >> $GITHUB_OUTPUT && exit 1)
 
       - name: Send TypeScript Error Notification
-        if: steps.check.outcome == 'failure'
+        if: steps.check.outcome == 'failure' && env.IS_INTERNAL_PR == 'true'
         uses: ./.github/actions/notification
         with:
           TYPE: failure
@@ -123,7 +118,7 @@ jobs:
           git diff --cached --quiet || echo "changes=true" >> $GITHUB_OUTPUT
 
       - name: Send ESLint Error Notification
-        if: steps.lint.outcome == 'failure'
+        if: steps.lint.outcome == 'failure' && env.IS_INTERNAL_PR == 'true'
         uses: ./.github/actions/notification
         with:
           TYPE: failure
