@@ -7,11 +7,34 @@ import { Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
 import { ProtectedComponent } from '@/contexts/Auth';
 import { useProject } from '@/contexts/Project';
 import { MilestonesProvider } from '@/contexts/Milestones/index';
+import MilestoneForm from '@/components/Milestones/MilestoneForm';
 import MilestoneItem from '@/components/Milestones/MilestoneItem';
 import dayjs from 'dayjs';
 import DateRangePicker from '@/shared/components/DateRangePicker';
 import Button from '@/shared/components/Button';
 import useProjectMilestoneList from '@/hooks/api/project/useProjectMilestoneList';
+import { CreateProjectMilestoneRequest } from '@/services/project/milestone';
+
+interface GenerateDefaultMilestoneOptions {
+  projectId: string;
+  week: number;
+  startDate: dayjs.Dayjs;
+  endDate: dayjs.Dayjs;
+}
+
+const generateDefaultMilestone = (
+  options: GenerateDefaultMilestoneOptions
+): CreateProjectMilestoneRequest => {
+  return {
+    name: '',
+    description: '',
+    isCompleted: false,
+    week: options.week,
+    projectId: options.projectId,
+    startDate: options.startDate.format('YYYY/MM/DD'),
+    endDate: options.endDate.format('YYYY/MM/DD'),
+  };
+};
 
 interface MilestonesContentProps {
   SEOData: {
@@ -26,19 +49,26 @@ interface MilestonesContentProps {
 }
 
 const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
-  const { project } = useProject();
-  const {
-    data: milestones,
-    isLoading,
-    mutate,
-  } = useProjectMilestoneList(project.id);
-  const projectId = project.id;
-  const isLgScreen = useMediaQuery('(min-width: 767px)');
-  const isMarathonProject = !!project.eventId;
+  const [isCreating, setIsCreating] = useState(false);
   const [startDate, setStartDate] = useState(dayjs().startOf('day'));
   const [endDate, setEndDate] = useState(dayjs().endOf('day'));
   const [isHideCompleted, setIsHideCompleted] = useState(false);
   const [isAscending, setIsAscending] = useState(true);
+  const { project } = useProject();
+  const {
+    data: milestones,
+    isLoading,
+    isValidating,
+    create,
+    mutate,
+  } = useProjectMilestoneList(project.id, {
+    onCreated: () => {
+      setIsCreating(false);
+    },
+  });
+  const isLgScreen = useMediaQuery('(min-width: 767px)');
+  const projectId = project.id;
+  const isMarathonProject = !!project.eventId;
 
   const progressValue = useMemo(() => {
     if (!Array.isArray(milestones)) return 0;
@@ -134,12 +164,16 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
                     onEndDateChange={setEndDate}
                   />
                 </div>
-                <Button variant="solid" color="primary">
+                <Button
+                  variant="solid"
+                  color="primary"
+                  onClick={() => setIsCreating(true)}
+                >
                   新增學習里程碑
                 </Button>
               </div>
             )}
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-2 pb-2.5">
               <Button
                 variant="outline"
                 color="primary"
@@ -156,6 +190,21 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
               </Button>
             </div>
             <div className="flex flex-col gap-3">
+              {isCreating && (
+                <div className="p-2.5 bg-basic-100 flex flex-col gap-2">
+                  <MilestoneForm
+                    milestone={generateDefaultMilestone({
+                      projectId: project.id,
+                      startDate: dayjs().startOf('day'),
+                      endDate: dayjs().endOf('day'),
+                      week: 1,
+                    })}
+                    disabledChangeDate={isMarathonProject}
+                    onCancel={() => setIsCreating(false)}
+                    onSubmit={create.trigger}
+                  />
+                </div>
+              )}
               {sortedMilestones.map((milestone) => (
                 <MilestoneItem
                   key={milestone.id}
