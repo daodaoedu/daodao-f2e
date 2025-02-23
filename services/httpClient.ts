@@ -23,9 +23,9 @@ export enum RequestContentType {
 export class HttpError {
   status: number;
 
-  info: unknown;
+  info?: { message: string };
 
-  constructor(status: number, info: unknown) {
+  constructor(status: number, info?: { message: string }) {
     this.status = status;
     this.info = info;
   }

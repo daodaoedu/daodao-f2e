@@ -1,5 +1,4 @@
-import toast from 'react-hot-toast';
-import useSWR, { useSWRConfig } from 'swr';
+import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import {
   CreateProjectOutcomeRequest,
@@ -33,46 +32,27 @@ export default function useProjectOutcome({
       ? getProjectOutcomeEndpoint({ projectId, outcomeId })
       : null;
 
-  const config = useSWRConfig();
   const { data, ...swr } = useSWR<ProjectOutcomeSchema>(swrKey);
 
   const create = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: CreateProjectOutcomeRequest }) =>
       createProjectOutcome(arg),
-    {
-      onSuccess: onCreated,
-      onError: (error, key) => {
-        config.onError?.(error, key, config);
-        toast.error('新增學習成果失敗');
-      },
-    }
+    { onSuccess: onCreated }
   );
 
   const update = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: UpdateProjectOutcomeRequest }) =>
       updateProjectOutcome(arg),
-    {
-      onSuccess: onUpdated,
-      onError: (error, key) => {
-        config.onError?.(error, key, config);
-        toast.error('更新學習成果失敗');
-      },
-    }
+    { onSuccess: onUpdated }
   );
 
   const remove = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: { projectId: string; outcomeId: number } }) =>
       deleteProjectOutcome(arg.projectId, arg.outcomeId),
-    {
-      onSuccess: onDeleted,
-      onError: (error, key) => {
-        config.onError?.(error, key, config);
-        toast.error('刪除學習成果失敗');
-      },
-    }
+    { onSuccess: onDeleted }
   );
 
   return {

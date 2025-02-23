@@ -1,5 +1,4 @@
-import toast from 'react-hot-toast';
-import useSWR, { useSWRConfig } from 'swr';
+import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import {
   CreateProjectNoteRequest,
@@ -31,44 +30,25 @@ export default function useProjectNote({
   const swrKey =
     projectId && noteId ? getProjectNoteEndpoint({ projectId, noteId }) : null;
 
-  const config = useSWRConfig();
   const { data, ...swr } = useSWR<ProjectNoteSchema>(swrKey);
 
   const create = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: CreateProjectNoteRequest }) => createProjectNote(arg),
-    {
-      onSuccess: onCreated,
-      onError: (error, key) => {
-        config.onError?.(error, key, config);
-        toast.error('新增便利貼失敗');
-      },
-    }
+    { onSuccess: onCreated }
   );
 
   const update = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: UpdateProjectNoteRequest }) => updateProjectNote(arg),
-    {
-      onSuccess: onUpdated,
-      onError: (error, key) => {
-        config.onError?.(error, key, config);
-        toast.error('更新便利貼失敗');
-      },
-    }
+    { onSuccess: onUpdated }
   );
 
   const remove = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: { projectId: string; noteId: number } }) =>
       deleteProjectNote(arg.projectId, arg.noteId),
-    {
-      onSuccess: onDeleted,
-      onError: (error, key) => {
-        config.onError?.(error, key, config);
-        toast.error('刪除便利貼失敗');
-      },
-    }
+    { onSuccess: onDeleted }
   );
 
   return {

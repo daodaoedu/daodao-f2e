@@ -1,5 +1,4 @@
-import toast from 'react-hot-toast';
-import useSWR, { useSWRConfig } from 'swr';
+import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { Project } from '@/components/Projects/Project/type';
 import {
@@ -28,43 +27,24 @@ export default function useProject({
 }: UseProjectOptions) {
   const swrKey = id ? getProjectEndpoint({ id }) : null;
 
-  const config = useSWRConfig();
   const { mutate, ...swr } = useSWR<Project>(swrKey);
 
   const create = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: CreateProjectRequest }) => createProject(arg),
-    {
-      onSuccess: onCreated,
-      onError: (error, key) => {
-        config.onError?.(error, key, config);
-        toast.error('新增計畫失敗');
-      },
-    }
+    { onSuccess: onCreated }
   );
 
   const update = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: UpdateProjectRequest }) => updateProject(arg),
-    {
-      onSuccess: onUpdated,
-      onError: (error, key) => {
-        config.onError?.(error, key, config);
-        toast.error('更新計畫失敗');
-      },
-    }
+    { onSuccess: onUpdated }
   );
 
   const remove = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: { id: string } }) => deleteProject(arg.id),
-    {
-      onSuccess: onDeleted,
-      onError: (error, key) => {
-        config.onError?.(error, key, config);
-        toast.error('刪除計畫失敗');
-      },
-    }
+    { onSuccess: onDeleted }
   );
 
   return {
