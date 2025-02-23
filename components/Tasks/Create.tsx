@@ -27,8 +27,8 @@ interface CreateProps {
 interface TaskType {
   name: string,
   description: string,
-  days_of_week: string[],
-  is_completed: boolean,
+  daysOfWeek: string[],
+  isCompleted: boolean,
 }
 
 const TaskCreate = ({
@@ -41,8 +41,8 @@ const TaskCreate = ({
   const [newTask, setNewTask] = useState<TaskType>({
     name: "",
     description: "",
-    days_of_week: [],
-    is_completed: false,
+    daysOfWeek: [],
+    isCompleted: false,
   });
   const { createTask, fetchMilestones } = useMilestones();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -72,9 +72,9 @@ const TaskCreate = ({
   const handleDaySelect = (day: string) => {
     setNewTask((prev) => ({
       ...prev,
-      days_of_week: prev.days_of_week.includes(day)
-        ? prev.days_of_week.filter((d) => d !== day)
-        : [...prev.days_of_week, day]
+      daysOfWeek: prev.daysOfWeek.includes(day)
+        ? prev.daysOfWeek.filter((d) => d !== day)
+        : [...prev.daysOfWeek, day]
     }));
   };
 
@@ -113,8 +113,8 @@ const TaskCreate = ({
               <div className="relative w-[150px]">
                 <div className="flex items-center justify-between">
                   <span className="truncate">
-                    {newTask.days_of_week.length > 0
-                      ? newTask.days_of_week
+                    {newTask.daysOfWeek.length > 0
+                      ? newTask.daysOfWeek
                         .map((enDay) => dayMap[enDay])
                         .join('、')
                       : '選擇日期'}
@@ -129,14 +129,14 @@ const TaskCreate = ({
                         role="option"
                         tabIndex={0}
                         key={day}
-                        aria-selected={newTask.days_of_week.includes(day)}
+                        aria-selected={newTask.daysOfWeek.includes(day)}
                         onClick={() => handleDaySelect(day)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' || e.key === ' ') {
                             handleDaySelect(day);
                           }
                         }}
-                        className={`p-2 mb-1 mx-1 rounded cursor-pointer ${newTask.days_of_week.includes(day)
+                        className={`p-2 mb-1 mx-1 rounded cursor-pointer ${newTask.daysOfWeek.includes(day)
                           ? 'bg-selected-bg text-text-primary'
                           : 'bg-transparent hover:bg-gray-100'
                           }`}
