@@ -6,8 +6,8 @@ type AnnouncementItem = {
   author: string;
   content: string;
   title: string;
-  tags: string[];
-  times: string;
+  tag: string;
+  times: string
 };
 
 const ReadOnlyMarkdownEditor = ({ value }: { value: string }) => {
@@ -27,17 +27,15 @@ const ReadOnlyMarkdownEditor = ({ value }: { value: string }) => {
   );
 };
 
-const TagList = ({ tags }: { tags: string[] }) => {
+const Tag = ({ tag }: { tag: string }) => {
   return (
     <div className="flex gap-2">
-      {tags.map((tag: string) => (
         <div
           key={tag}
           className="px-2.5 py-[3px] text-xs text-basic-400 bg-primary-lightest rounded-[13px]"
         >
           {tag}
         </div>
-      ))}
     </div>
   );
 };
@@ -45,7 +43,7 @@ const TagList = ({ tags }: { tags: string[] }) => {
 const AnnouncementList = ({ items }: { items: AnnouncementItem[] }) => {
   return (
     <div className="flex flex-col gap-3 my-6">
-      {items.map(({ id, tags, times, title }) => (
+      {items.map(({ id, tag,times,title }) => (
         <Link
           href={`/learning-marathon/announcements/${id}`}
           key={id}
@@ -54,7 +52,7 @@ const AnnouncementList = ({ items }: { items: AnnouncementItem[] }) => {
           <h4 className="text-basic-400 body-sm font-normal">{title}</h4>
           <div className="flex justify-between flex-wrap">
             <div className="md:w-full">
-              <TagList tags={tags} />
+              <Tag tag={tag} />
             </div>
             <p className="text-basic-300 body-sm">{times}</p>
           </div>
@@ -65,11 +63,11 @@ const AnnouncementList = ({ items }: { items: AnnouncementItem[] }) => {
 };
 
 const AnnouncementDetail = ({ item }: { item: AnnouncementItem }) => {
-  const { author, content, tags, times, title } = item;
+  const { author, content, tag, times, title } = item;
 
   return (
     <div className="bg-white h-fit p-6">
-      <TagList tags={tags} />
+      <Tag tag={tag} />
 
       <h1 className="text-4xl text-basic-500 font-semibold p-6">{title}</h1>
 
