@@ -226,7 +226,7 @@ const LearningMarathonProfile = () => {
       const fetchMarathonData = async () => {
         try {
           setLoadingMarathon(true);
-          const response = await fetch(`${BASE_URL}/marathons/${id}`);
+          const response = await fetch(`${BASE_URL}/marathons/${encodeURIComponent(id)}`);
 
           // check: if response 200
           if (!response.ok) {
