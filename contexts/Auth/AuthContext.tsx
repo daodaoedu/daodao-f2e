@@ -7,6 +7,7 @@ import {
   useReducer,
   useRef,
 } from 'react';
+import toast from 'react-hot-toast';
 import { useRouter, usePathname } from 'next/navigation';
 import useSWR, { SWRConfig } from 'swr';
 import { useDispatch } from 'react-redux';
@@ -213,10 +214,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
     };
   }, [state.loginStatus, state.user, dispatch]);
 
-  const handleError = (error: HttpError) => {
-    if (error.status === 401) {
-      authDispatch.logout();
+  const handleError = (error: unknown) => {
+    if (error instanceof HttpError) {
+      if (error.status === 401) {
+        authDispatch.logout();
+      } else {
+        toast.error(error.info?.message ?? '發生錯誤');
+      }
+      return;
     }
+    toast.error('系統異常，請稍後再試');
   };
 
   useSWR(state.token ? [getUserMe.name, state.token] : null, getUserMe, {

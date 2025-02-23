@@ -44,16 +44,16 @@ export const createProjectNote = async ({
   imgFiles,
   ...note
 }: CreateProjectNoteRequest) => {
-  let newUrl: string | null = null;
+  const newUrls: string[] = [];
 
-  if (Array.isArray(imgFiles) && imgFiles.length === 1) {
+  if (Array.isArray(imgFiles) && imgFiles.length > 0) {
     const { url } = await uploadImage({ file: imgFiles[0] });
-    newUrl = url;
+    newUrls.push(url);
   }
 
   return mutations.post(getProjectNoteEndpoint({ projectId }), {
     ...note,
-    imgUrl: newUrl,
+    imgUrls: newUrls,
   });
 };
 
@@ -67,16 +67,16 @@ export const updateProjectNote = async ({
   imgFiles,
   ...note
 }: UpdateProjectNoteRequest) => {
-  let newUrl: string | null = null;
+  const newUrls: string[] = [];
 
-  if (Array.isArray(imgFiles) && imgFiles.length === 1) {
+  if (Array.isArray(imgFiles) && imgFiles.length > 0) {
     const { url } = await uploadImage({ file: imgFiles[0] });
-    newUrl = url;
+    newUrls.push(url);
   }
 
   return mutations.put(getProjectNoteEndpoint({ projectId, noteId: id }), {
     ...note,
-    imgUrl: newUrl,
+    imgUrls: newUrls,
   });
 };
 

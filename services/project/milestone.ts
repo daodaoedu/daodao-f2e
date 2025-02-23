@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { z } from 'zod';
 import { Project } from '@/components/Projects/Project/type';
 import { mutations } from '../httpClient';
@@ -45,13 +46,18 @@ export const projectMilestoneSchema = z.object({
 
 export type ProjectMilestoneSchema = z.infer<typeof projectMilestoneSchema>;
 
-export const createProjectMilestoneSchema = projectMilestoneSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  isDeleted: true,
-  tasks: true,
-});
+export const createProjectMilestoneSchema = projectMilestoneSchema
+  .omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+    isDeleted: true,
+    tasks: true,
+  })
+  .refine((data) => dayjs(data.startDate).isBefore(dayjs(data.endDate)), {
+    message: '結束日期必須晚於開始日期',
+    path: ['endDate'],
+  });
 
 export type CreateProjectMilestoneRequest = z.infer<
   typeof createProjectMilestoneSchema

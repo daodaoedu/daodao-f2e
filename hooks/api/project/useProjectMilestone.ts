@@ -1,5 +1,4 @@
-import toast from 'react-hot-toast';
-import useSWR, { useSWRConfig } from 'swr';
+import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import {
   CreateProjectMilestoneRequest,
@@ -33,46 +32,27 @@ export default function useProjectMilestone({
       ? getProjectMilestoneEndpoint({ projectId, milestoneId })
       : null;
 
-  const config = useSWRConfig();
   const { data, ...swr } = useSWR<ProjectMilestoneSchema>(swrKey);
 
   const create = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: CreateProjectMilestoneRequest }) =>
       createProjectMilestone(arg),
-    {
-      onSuccess: onCreated,
-      onError: (error, key) => {
-        config.onError?.(error, key, config);
-        toast.error('新增里程碑失敗');
-      },
-    }
+    { onSuccess: onCreated }
   );
 
   const update = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: UpdateProjectMilestoneRequest }) =>
       updateProjectMilestone(arg),
-    {
-      onSuccess: onUpdated,
-      onError: (error, key) => {
-        config.onError?.(error, key, config);
-        toast.error('更新里程碑失敗');
-      },
-    }
+    { onSuccess: onUpdated }
   );
 
   const remove = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: { projectId: string; milestoneId: number } }) =>
       deleteProjectMilestone(arg.projectId, arg.milestoneId),
-    {
-      onSuccess: onDeleted,
-      onError: (error, key) => {
-        config.onError?.(error, key, config);
-        toast.error('刪除里程碑失敗');
-      },
-    }
+    { onSuccess: onDeleted }
   );
 
   return {
