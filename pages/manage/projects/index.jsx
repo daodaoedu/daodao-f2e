@@ -45,7 +45,7 @@ const Projects = () => {
   };
 
   const handleCreateProject = () => {
-    toast.error('功能尚未開放')
+    toast.error('功能尚未開放');
     // if (isAddedDenied) {
     //   toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
     // } else {
