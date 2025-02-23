@@ -1,6 +1,6 @@
 import type {
-  CreateUserProfile,
-  UpdateUserProfile,
+  CreateUserRequest,
+  UpdateUserRequest,
   IUser,
 } from "@/services/users";
 
@@ -68,7 +68,7 @@ export type AuthDispatch = {
   [ActionTypes.CLOSE_LOGIN_MODAL]: () => void;
   [ActionTypes.SET_TOKEN]: (payload: string) => void;
   [ActionTypes.UPDATE_USER]: (
-    payload: CreateUserProfile | UpdateUserProfile
+    payload: CreateUserRequest | UpdateUserRequest
   ) => Promise<void>;
   [ActionTypes.LOGIN]: (payload: IUser | null) => void;
   [ActionTypes.LOGOUT]: () => void;

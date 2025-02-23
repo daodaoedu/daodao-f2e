@@ -68,10 +68,11 @@ function InternalMarkdownEditor(
   },
   ref
 ) {
+  const formattedValue = typeof value === 'string' ? value : '';
   const id = useId();
   const [error, setError] = useState(null);
   const checkLinkRef = useRef(null);
-  const markdown = useRef(value);
+  const markdown = useRef(formattedValue);
   const editorSelectors = 'markdown-editor';
   const pluginsSettings = useMemo(
     () =>
@@ -126,7 +127,7 @@ function InternalMarkdownEditor(
             'whitespace-pre-wrap'
           )}
         >
-          {value}
+          {formattedValue}
         </div>
       )}
       <MDXEditor

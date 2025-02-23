@@ -21,6 +21,7 @@ module.exports = {
     extend: {
       colors: {
         primary: {
+          palest: "#F3FCFC",
           lightest: "#DEF5F5",
           lighter: "#89DAD7",
           base: "#16B9B3",
@@ -71,6 +72,7 @@ module.exports = {
           [`.body-${size}`]: {
             fontSize: bodyFontSizes[index][1],
             lineHeight: "140%",
+            fontWeight: "500",
             [`@media (min-width: ${theme("screens.md")})`]: {
               fontSize: bodyFontSizes[index][0],
             },
@@ -148,6 +150,21 @@ module.exports = {
             },
           },
         },
+        [`.animate-button-ripple`]: {
+          animation:
+            'button-ripple var(--animation-duration, 500ms) var(--animation-delay, 0ms) forwards cubic-bezier(0, 0, 0.2, 1)',
+          '@keyframes button-ripple': {
+            '0%': { transform: 'translate(-50%, -50%) scale(0)', opacity: 1 },
+            '75%': {
+              transform: 'translate(-50%, -50%) scale(4)',
+              opacity: 0.2,
+            },
+            '100%': {
+              transform: 'translate(-50%, -50%) scale(6)',
+              opacity: 0,
+            },
+          },
+        },
       });
       addUtilities({
         [`.animate-slide-x-in`]: {
@@ -168,6 +185,30 @@ module.exports = {
             "50%": { transform: "translateY(-10px)" },
             "100%": { transform: "translateY(0)" },
           },
+        },
+      });
+      addUtilities({
+        ['.min-h-screen-with-padding-top']: {
+          paddingTop: 'var(--padding-top, 0px)',
+          minHeight: '100vh',
+        },
+        ['.min-h-screen-without-padding-top']: {
+          minHeight: 'calc(100vh - var(--padding-top, 0px))',
+        },
+      });
+      addUtilities({
+        ['.vertical-separator-left']: {
+          position: 'relative',
+          '&:before': {
+            content: '""',
+            position: 'absolute',
+            top: '50%',
+            right: '100%',
+            width: '1px',
+            height: '16px',
+            backgroundColor: theme('colors.basic.200'),
+            transform: 'translateY(-50%)',
+          }
         },
       });
     }),

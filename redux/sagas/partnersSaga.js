@@ -13,7 +13,7 @@ function* fetchPartnersResource(action) {
   }, startParams);
 
   try {
-    const URL = `${BASE_URL}/user?${queryStr}`;
+    const URL = `${BASE_URL}/users?${queryStr}`;
     const result = yield req(URL);
     yield put({
       type:
@@ -36,7 +36,7 @@ function* fetchPartnersResource(action) {
 function* fetchPartnerById(action) {
   const { id } = action.payload;
   try {
-    const URL = `${BASE_URL}/user/${id}`;
+    const URL = `${BASE_URL}/users/${id}`;
     const result = yield req(URL);
     yield put({
       type: 'FETCH_PARTNER_BY_ID_SUCCESS',
@@ -49,7 +49,7 @@ function* fetchPartnerById(action) {
 
 function* sendEmailToPartner(action) {
   try {
-    const URL = `${BASE_URL}/email`;
+    const URL = `${BASE_URL}/emails`;
     yield req(URL, {
       method: 'POST',
       body: JSON.stringify({
@@ -66,7 +66,7 @@ function* sendEmailToPartner(action) {
 
 function* fetchPartnerTags() {
   try {
-    const URL = `${BASE_URL}/tag`;
+    const URL = `${BASE_URL}/tags`;
     const result = yield fetch(URL).then((res) => res.json());
     yield put({ type: 'FETCH_PARTNER_TAGS_SUCCESS', payload: result });
   } catch (e) {

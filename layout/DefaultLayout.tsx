@@ -9,7 +9,7 @@ import {
 
 function DefaultLayoutContent({ children }: React.PropsWithChildren) {
   const headerRef = useRef<HTMLDivElement>(null);
-  const { height, showPromotionBar, setHeight } = usePromotion();
+  const { showPromotionBar, setHeight } = usePromotion();
   const prevShowPromotionBar = useRef<boolean | null>(null);
 
   useEffect(() => {
@@ -20,7 +20,8 @@ function DefaultLayoutContent({ children }: React.PropsWithChildren) {
 
       setHeight(headerOffset);
       if (root instanceof HTMLElement) {
-        root.style.scrollPaddingTop = `${headerOffset + 80}px`;
+        root.style.setProperty('--padding-top', `${headerOffset}px`);
+        root.style.setProperty('scroll-padding-top', `${headerOffset + 80}px`);
       }
     };
 
@@ -40,9 +41,7 @@ function DefaultLayoutContent({ children }: React.PropsWithChildren) {
       <Header ref={headerRef}>
         <PromotionBar />
       </Header>
-      <main className="min-h-screen" style={{ paddingTop: `${height}px` }}>
-        {children}
-      </main>
+      <main className="min-h-screen-with-padding-top">{children}</main>
     </>
   );
 }
@@ -58,4 +57,6 @@ function DefaultLayout({ children }: React.PropsWithChildren) {
   );
 }
 
-export default DefaultLayout;
+export default function getDefaultLayout(page: React.ReactElement) {
+  return <DefaultLayout>{page}</DefaultLayout>;
+}

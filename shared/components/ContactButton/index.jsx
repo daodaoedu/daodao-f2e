@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { Button } from '@mui/material';
 import { useAuth } from '@/contexts/Auth';
 import { ROLE } from '@/constants/member';
-import chatSvg from '@/public/assets/icons/chat.svg';
+import ChatSvg from '@/public/assets/icons/chat.svg';
 import useMutation from '@/hooks/useMutation';
 import { mapToTable } from '@/utils/helper';
 import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
@@ -45,7 +45,7 @@ function ContactButton({
   const handleClose = () => {
     setOpen(false);
   };
-  const { mutate } = useMutation(`/email`, {
+  const { mutate } = useMutation(`/emails`, {
     method: 'POST',
     onSuccess: () => {
       handleClose();
@@ -85,11 +85,7 @@ function ContactButton({
           className={className}
           onClick={() => setOpen(true)}
         >
-          <img
-            src={chatSvg.src}
-            alt="contact icon"
-            style={{ marginRight: '8px' }}
-          />
+          <ChatSvg className="mr-2" />
           {dialogTitle}
         </StyledButton>
       </InfoCompletionGuard>

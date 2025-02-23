@@ -1,0 +1,105 @@
+import dayjs from 'dayjs';
+import { z } from 'zod';
+import { Project } from '@/components/Projects/Project/type';
+import { mutations } from '../httpClient';
+
+const projectEndpoint = '/projects';
+
+interface GetProjectMilestoneKeyProps {
+  projectId: string;
+  milestoneId?: number;
+}
+
+export const getProjectMilestoneEndpoint = ({
+  projectId,
+  milestoneId,
+}: GetProjectMilestoneKeyProps) => {
+  if (milestoneId) {
+    return `${projectEndpoint}/${projectId}/milestones/${milestoneId}`;
+  }
+  return `${projectEndpoint}/${projectId}/milestones`;
+};
+
+const projectTaskSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string(),
+  daysOfWeek: z.array(z.string()),
+  isCompleted: z.boolean(),
+  milestoneId: z.number(),
+});
+
+export const projectMilestoneSchema = z.object({
+  id: z.number(),
+  projectId: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  week: z.number(),
+  name: z.string(),
+  description: z.string(),
+  startDate: z.string(),
+  endDate: z.string(),
+  isCompleted: z.boolean(),
+  isDeleted: z.boolean(),
+  tasks: z.array(projectTaskSchema),
+});
+
+export type ProjectMilestoneSchema = z.infer<typeof projectMilestoneSchema>;
+
+export const createProjectMilestoneSchema = projectMilestoneSchema
+  .omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+    isDeleted: true,
+    tasks: true,
+  })
+  .refine((data) => dayjs(data.startDate).isBefore(dayjs(data.endDate)), {
+    message: '結束日期必須晚於開始日期',
+    path: ['endDate'],
+  });
+
+export type CreateProjectMilestoneRequest = z.infer<
+  typeof createProjectMilestoneSchema
+>;
+
+export const createProjectMilestone = ({
+  projectId,
+  ...request
+}: CreateProjectMilestoneRequest) => {
+  return mutations.post<Project>(
+    getProjectMilestoneEndpoint({ projectId }),
+    request
+  );
+};
+
+export const updateProjectMilestoneSchema = projectMilestoneSchema.omit({
+  createdAt: true,
+  updatedAt: true,
+  isDeleted: true,
+  tasks: true,
+});
+
+export type UpdateProjectMilestoneRequest = z.infer<
+  typeof updateProjectMilestoneSchema
+>;
+
+export const updateProjectMilestone = ({
+  projectId,
+  id,
+  ...request
+}: UpdateProjectMilestoneRequest) => {
+  return mutations.put<Project>(
+    getProjectMilestoneEndpoint({ projectId, milestoneId: id }),
+    request
+  );
+};
+
+export const deleteProjectMilestone = (
+  projectId: string,
+  milestoneId: number
+) => {
+  return mutations.delete(
+    getProjectMilestoneEndpoint({ projectId, milestoneId })
+  );
+};

@@ -1,8 +1,9 @@
-import Link from "next/link";
-import { MARATHON_LINKS, NAV_LINK, USER_LINK } from "@/constants/category";
-import { useAuth, useAuthDispatch } from "@/contexts/Auth";
-import { cn } from "@/utils/cn";
-import Dropdown from "../Dropdown";
+import Link from 'next/link';
+import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
+import type { MenuItem } from '@/constants/category';
+import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import { cn } from '@/utils/cn';
+import Dropdown from '../Dropdown';
 
 function DesktopMenu() {
   const auth = useAuth();
@@ -12,9 +13,13 @@ function DesktopMenu() {
     <>
       <nav>
         <ul className="flex items-center gap-1">
-          {NAV_LINK.map(({ link, name, target }) => (
+          {NAV_LINK.map(({ link, name, target }: MenuItem) => (
             <li key={name}>
-              <Link href={link} target={target} className="block p-5 font-bold">
+              <Link
+                href={link}
+                target={target}
+                className="block p-5 font-bold text-basic-white"
+              >
                 {name}
               </Link>
             </li>
@@ -25,9 +30,9 @@ function DesktopMenu() {
         <Dropdown as="nav">
           <Dropdown.Toggle
             className={cn(
-              "my-4 py-1.5 pl-3 pr-1 font-bold rounded-lg transition-colors",
-              "text-basic-white bg-transparent",
-              "aria-pressed:text-primary-base aria-pressed:bg-primary-lightest"
+              'my-4 py-1.5 pl-3 pr-1 font-bold rounded-lg transition-colors',
+              'text-basic-white hover:text-basic-white bg-transparent',
+              'aria-pressed:text-primary-base aria-pressed:bg-primary-lightest'
             )}
             withIcon
           >
@@ -53,9 +58,15 @@ function DesktopMenu() {
           </Dropdown.List>
         </Dropdown>
         {auth.isLoggedIn ? (
-          <div className="flex items-center">
+          <div className="flex items-center gap-3.5">
+            <Link
+              href="/manage"
+              className="px-2 py-5 text-basic-white body-md font-bold"
+            >
+              我的小島
+            </Link>
             <Dropdown as="nav">
-              <Dropdown.Toggle>
+              <Dropdown.Toggle animation="none" className="p-0">
                 <img
                   src={auth.user.photoURL}
                   alt={auth.user.name}

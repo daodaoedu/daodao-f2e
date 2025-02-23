@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { SWRConfig } from 'swr';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
@@ -18,20 +21,26 @@ import Image from "@/shared/components/Image";
 import Modal from '@/shared/components/Modal';
 import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
+import { fetcher } from '@/services/httpClient';
 import { checkLoginValidity } from '@/redux/actions/user';
 import { getReminderStorage } from '@/utils/storage';
-import DefaultLayout from '@/layout/DefaultLayout';
+import getDefaultLayout from '@/layout/DefaultLayout';
 import { initGA, logPageView } from '../utils/analytics';
 import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
 import "@/shared/styles/global.css";
+import 'dayjs/locale/zh-tw';
 
 const store = storeFactory();
 const persistor = persistStore(store);
 
+dayjs.locale('zh-tw');
+
 const swrConfig = {
   revalidateOnFocus: false,
   errorRetryCount: 0,
+  keepPreviousData: true,
+  fetcher,
 };
 
 const ThemeComponentWrap = ({ pageProps, Component }) => {
@@ -43,7 +52,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   const isEnv = useMemo(() => process.env.NODE_ENV === 'development', []);
   const { isComplete, isLoggedIn } = useAuth();
   const [openModalType, setOpenModalType] = useState(null);
-  const Layout = Component?.getLayout || DefaultLayout;
+  const getLayout = Component?.getLayout || getDefaultLayout;
   const isVerified = searchParams.get("isVerified");
 
   const handleClose = () => {
@@ -134,7 +143,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
                   className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-primary-base text-white hover:bg-primary-darker"
                   onClick={() => {
                     handleClose();
-                    router.replace('/profile');
+                    router.replace('/personal-card');
                   }}
                 >
                   想，填寫資料
@@ -144,9 +153,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
           )
         }
       </Modal>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      {getLayout(<Component {...pageProps} />)}
     </ThemeProvider>
   );
 };
@@ -217,17 +224,20 @@ const App = ({ Component, pageProps }) => {
           title="島島阿學多元學習資源"
           href="https://www.daoedu.tw/rss/feed.xml"
         />
+        <link rel="manifest" href="/manifest.json" />
       </Head>
 
       <Provider store={store}>
         <PersistGate persistor={persistor}>
-          <SWRConfig value={swrConfig}>
-            <SnackbarProvider>
-              <AuthProvider>
-                <ThemeComponentWrap pageProps={pageProps} Component={Component} />
-              </AuthProvider>
-            </SnackbarProvider>
-          </SWRConfig>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
+            <SWRConfig value={swrConfig}>
+              <SnackbarProvider>
+                <AuthProvider>
+                  <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+                </AuthProvider>
+              </SnackbarProvider>
+            </SWRConfig>
+          </LocalizationProvider>
         </PersistGate>
       </Provider>
     </>

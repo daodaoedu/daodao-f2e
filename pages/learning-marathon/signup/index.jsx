@@ -13,6 +13,7 @@ import UserProfileForm from '@/components/Marathon/SignUp/UserProfileForm';
 import MarathonForm from '@/components/Marathon/SignUp/MarathonForm';
 import ConfirmForm from '@/components/Marathon/SignUp/ConfirmForm';
 import { ProtectedComponent } from '@/contexts/Auth';
+import { isServer } from '@/utils/helper';
 
 const FormWrapper = styled.form`
   padding: 50px 0;
@@ -74,7 +75,7 @@ const LearningMarathonSignUp = () => {
     [router?.asPath],
   );
   const [currentStep, setCurrentStep] = useState(0);
-  const fromProfilePage = window.localStorage.getItem('fromProfilePage');
+  const fromProfilePage = isServer ? null : window.localStorage.getItem('fromProfilePage');
   const marathonState = useSelector((state) => { return state.marathon; });
   if (fromProfilePage && marathonState._id) {
     if (fromProfilePage === 'click_edit') {

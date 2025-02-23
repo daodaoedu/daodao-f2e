@@ -1,20 +1,135 @@
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { MARATHON_LINKS, NAV_LINK, USER_LINK } from "@/constants/category";
-import { useAuth, useAuthDispatch } from "@/contexts/Auth";
-import { cn } from "@/utils/cn";
-import Collapse from "../Collapse";
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
+import type { MenuItem } from '@/constants/category';
+import { getManageSidebarItems } from '@/constants/sidebar';
+import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import { cn } from '@/utils/cn';
+import Collapse from '../Collapse';
+import Button from '../Button';
+
+interface OnCloseProps {
+  onClose: () => void;
+}
+
+function ExploreMenu({ onClose }: OnCloseProps) {
+  return (
+    <div>
+      <nav>
+        <ul className="pt-2">
+          {NAV_LINK.map(({ link, name, target }: MenuItem) => (
+            <li key={name}>
+              <Link
+                href={link}
+                target={target}
+                className="block px-4 py-2 text-basic-400"
+                onClick={onClose}
+              >
+                {name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <Collapse as="nav">
+        <Collapse.Toggle
+          className="py-2 px-4 flex items-center rounded-lg text-primary-base w-full"
+          withIcon
+        >
+          島島盃-春季學習馬拉松
+        </Collapse.Toggle>
+        <Collapse.List className="w-full">
+          {MARATHON_LINKS.map(({ name, link, disabled }) => (
+            <Collapse.Item key={name} className="*:px-10 *:leading-10">
+              {disabled ? (
+                <div className="text-basic-300 cursor-not-allowed">{name}</div>
+              ) : (
+                <Link
+                  href={link}
+                  className="block text-basic-400"
+                  onClick={onClose}
+                >
+                  {name}
+                </Link>
+              )}
+            </Collapse.Item>
+          ))}
+        </Collapse.List>
+      </Collapse>
+    </div>
+  );
+}
+
+function ProfileMenu({ onClose }: OnCloseProps) {
+  const auth = useAuth();
+
+  const sidebarItems = useMemo(
+    () => getManageSidebarItems({ role: auth.user?.role }),
+    [auth.user?.role]
+  );
+
+  return (
+    auth.isLoggedIn && (
+      <nav>
+        <ul className="pt-2">
+          {sidebarItems.map((item) =>
+            item.children ? null : (
+              <li key={item.label}>
+                <Link
+                  href={item.href}
+                  className="block px-4 py-2 text-basic-400"
+                  onClick={onClose}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            )
+          )}
+
+          {USER_LINK.map(({ name, id }) => (
+            <li key={name}>
+              <Link
+                href={`/profile?id=${id}`}
+                className="block px-4 py-2 text-basic-400"
+                onClick={onClose}
+              >
+                {name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )
+  );
+}
+
+enum NavType {
+  Explore = 'explore',
+  Profile = 'profile',
+}
 
 function MobileMenu() {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const auth = useAuth();
   const authDispatch = useAuthDispatch();
+  const [navType, setNavType] = useState<NavType>(NavType.Explore);
+
+  const navList = [
+    {
+      name: '探索',
+      type: NavType.Explore,
+    },
+    {
+      name: '關於我',
+      type: NavType.Profile,
+    },
+  ];
 
   useEffect(() => {
     if (isOpenMenu) {
-      document.body.classList.add("overflow-y-hidden");
+      document.body.classList.add('overflow-y-hidden');
     } else {
-      document.body.classList.remove("overflow-y-hidden");
+      document.body.classList.remove('overflow-y-hidden');
     }
   }, [isOpenMenu]);
 
@@ -28,126 +143,104 @@ function MobileMenu() {
       >
         <div
           className={cn(
-            "w-6 h-0.5 bg-basic-white transition-transform origin-top-right pointer-events-none",
-            isOpenMenu ? "-rotate-45" : "rotate-0"
+            'w-6 h-0.5 bg-basic-white transition-transform origin-top-right pointer-events-none',
+            isOpenMenu ? '-rotate-45' : 'rotate-0'
           )}
         />
         <div
           className={cn(
-            "w-6 h-0.5 bg-basic-white transition-[transform,opacity] origin-left pointer-events-none",
+            'w-6 h-0.5 bg-basic-white transition-[transform,opacity] origin-left pointer-events-none',
             isOpenMenu
-              ? "translate-x-full opacity-0"
-              : "translate-x-0 opacity-100"
+              ? 'translate-x-full opacity-0'
+              : 'translate-x-0 opacity-100'
           )}
         />
         <div
           className={cn(
-            "w-6 h-0.5 bg-basic-white transition-transform origin-bottom-right pointer-events-none",
-            isOpenMenu ? "rotate-45" : "rotate-0"
+            'w-6 h-0.5 bg-basic-white transition-transform origin-bottom-right pointer-events-none',
+            isOpenMenu ? 'rotate-45' : 'rotate-0'
           )}
         />
       </button>
       <div
-        className="absolute top-full inset-x-0 bg-basic-white transition-[height] overflow-auto"
-        style={{ height: isOpenMenu ? "calc(100vh - 194px)" : "0" }}
+        className={cn(
+          'absolute top-full inset-x-0 flex flex-col body-md',
+          'bg-basic-white transition-[min-height] overflow-auto h-0',
+          'data-[is-open=true]:min-h-screen-without-padding-top data-[is-open=false]:min-h-0'
+        )}
+        data-is-open={isOpenMenu}
       >
-        <div className="flex flex-col">
-          <nav>
-            <ul className="pt-2">
-              {NAV_LINK.map(({ link, name, target }) => (
-                <li key={name}>
-                  <Link
-                    href={link}
-                    target={target}
-                    className="block px-10 py-2 text-basic-400"
-                    onClick={() => setIsOpenMenu(false)}
-                  >
-                    {name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <Collapse as="nav">
-            <Collapse.Toggle
-              className="py-2 px-10 flex items-center rounded-lg text-primary-base w-full"
-              withIcon
-            >
-              島島盃-春季學習馬拉松
-            </Collapse.Toggle>
-            <Collapse.List className="w-full">
-              {MARATHON_LINKS.map(({ name, link, disabled }) => (
-                <Collapse.Item key={name} className="*:px-16 *:leading-10">
-                  {disabled ? (
-                    <div className="text-basic-300 cursor-not-allowed">
-                      {name}
-                    </div>
-                  ) : (
-                    <Link
-                      href={link}
-                      className="block text-basic-400"
-                      onClick={() => setIsOpenMenu(false)}
-                    >
-                      {name}
-                    </Link>
-                  )}
-                </Collapse.Item>
-              ))}
-            </Collapse.List>
-          </Collapse>
-          {auth.isLoggedIn ? (
-            <Collapse as="nav">
-              <Collapse.Toggle className="w-full mt-4" withIcon>
-                <div className="absolute top-0 left-0 border-x-[20px] mt-2 border-white border-solid w-full h-px bg-primary-lightest" />
-                <div className="py-2 pl-10 flex items-center gap-2">
+        {auth.isLoggedIn && (
+          <div
+            className={cn(
+              'relative flex mx-4 pt-1',
+              'after:content-[""] after:absolute after:bottom-0 after:left-0',
+              'after:w-full after:h-0.5 after:bg-basic-200 after:rounded-full'
+            )}
+          >
+            {navList.map((navItem) => (
+              <Button
+                key={navItem.type}
+                className={cn(
+                  'relative flex-1 flex items-center justify-center gap-1.5 py-2',
+                  'after:content-[""] after:absolute after:bottom-0 after:left-0',
+                  'after:w-full after:h-0.5 after:bg-basic-200 after:rounded-full after:z-10',
+                  navItem.type === navType && 'after:bg-primary-base'
+                )}
+                onClick={() => setNavType(navItem.type)}
+              >
+                {navItem.type === NavType.Profile && (
                   <img
                     src={auth.user.photoURL}
                     alt={auth.user.name}
-                    width="40"
-                    height="40"
+                    width="20"
+                    height="20"
                     className="rounded-full"
                   />
-                  <span className="text-basic-400">{auth.user.name}</span>
-                </div>
-              </Collapse.Toggle>
-              <Collapse.List>
-                {USER_LINK.map(({ name, id }) => (
-                  <Collapse.Item key={name}>
-                    <Link
-                      href={`/profile?id=${id}`}
-                      className="block px-16 py-2 text-basic-400"
-                      onClick={() => setIsOpenMenu(false)}
-                    >
-                      {name}
-                    </Link>
-                  </Collapse.Item>
-                ))}
-                <Collapse.Item>
-                  <button
-                    type="button"
-                    className="block text-left px-16 py-2 text-basic-400"
-                    onClick={() => {
-                      authDispatch.logout();
-                      setIsOpenMenu(false);
-                    }}
-                  >
-                    登出
-                  </button>
-                </Collapse.Item>
-              </Collapse.List>
-            </Collapse>
-          ) : (
-            <button
-              type="button"
-              className="text-basic-400 mx-4 mt-2 mb-4 py-1.5 flex-1 rounded-full border border-primary-base"
-              onClick={() => {
-                authDispatch.openLoginModal();
-                setIsOpenMenu(false);
-              }}
-            >
-              登入
-            </button>
+                )}
+                {navItem.name}
+              </Button>
+            ))}
+          </div>
+        )}
+        <div className="flex-1 flex flex-col pb-20">
+          {navType === NavType.Explore && (
+            <ExploreMenu onClose={() => setIsOpenMenu(false)} />
           )}
+          {navType === NavType.Profile && (
+            <ProfileMenu onClose={() => setIsOpenMenu(false)} />
+          )}
+          <div
+            className={cn(
+              'fixed bottom-0 left-0 right-0 flex bg-basic-white',
+              'transition-opacity opacity-0 pointer-events-none',
+              isOpenMenu && 'opacity-100 pointer-events-auto'
+            )}
+          >
+            {auth.isLoggedIn ? (
+              <Button
+                className="flex-1 px-4 pb-6 text-left"
+                onClick={() => {
+                  authDispatch.logout();
+                  setIsOpenMenu(false);
+                }}
+              >
+                登出
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                color="primary"
+                className="flex-1 m-4"
+                onClick={() => {
+                  authDispatch.openLoginModal();
+                  setIsOpenMenu(false);
+                }}
+              >
+                登入
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </>
