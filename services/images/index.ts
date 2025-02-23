@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { mutations, RequestContentType } from '../httpClient';
+import { HttpError, mutations, RequestContentType } from '../httpClient';
 
 export const imagesEndpoint = '/images';
 
@@ -13,6 +13,18 @@ const uploadImageSchema = z.object({
 export type UploadImageRequest = z.infer<typeof uploadImageSchema>;
 
 export const uploadImage = (request: UploadImageRequest) => {
+  const imageType = /image.*/;
+  const maxKB = 500;
+  const maxSize = maxKB * 1024;
+
+  if (!request.file.type.match(imageType)) {
+    throw new HttpError(400, { message: '僅支援上傳圖片唷！' });
+  }
+
+  if (request.file.size > maxSize) {
+    throw new HttpError(400, { message: `圖片最大限制 ${maxKB} KB` });
+  }
+
   return mutations.post<{ url: string }>(
     getImageEndpoint(),
     request,
