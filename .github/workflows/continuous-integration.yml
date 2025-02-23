@@ -1,18 +1,20 @@
 name: Continuous Integration
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
+  group: ci-${{ github.workflow }}-${{ github.head_ref }}
   cancel-in-progress: true
 
 on:
-  pull_request_target:
+  pull_request:
     branches:
       - "**"
+  workflow_call:
   workflow_dispatch:
 
 env:
   PR_URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.number }}
   BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+  IS_INTERNAL_PR: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
 
 jobs:
   init:
@@ -22,6 +24,8 @@ jobs:
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Cache dependencies
         id: cache
@@ -30,7 +34,7 @@ jobs:
           path: |
             node_modules
             ~/.cache/Cypress
-          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
+          key: deps-node-modules-${{ hashFiles('package.json', '**/yarn.lock') }}
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
@@ -44,6 +48,8 @@ jobs:
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Cache dependencies
         id: cache
@@ -61,22 +67,32 @@ jobs:
       - name: TypeScript Check
         id: check
         run: |
-          if ! yarn ts:check; then
-            ERROR_MSG=$(yarn ts:check 2>&1)
-            echo "check_error<<EOF" >> $GITHUB_OUTPUT
-            echo "$ERROR_MSG" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-            exit 1
+          if ! ERROR_MSG=$(yarn ts:check 2>&1); then
+              {
+                echo "check_error<<EOF"
+                echo "$ERROR_MSG"
+                echo "EOF"
+              } >> $GITHUB_OUTPUT
+              exit 1
           fi
 
       - name: Send TypeScript Error Notification
-        if: steps.check.outcome == 'failure'
+        if: steps.check.outcome == 'failure' && env.IS_INTERNAL_PR == 'true'
         uses: ./.github/actions/notification
         with:
           TYPE: failure
           TITLE: "❌ TypeScript Error"
           DESCRIPTION: "Branch: ${{ env.BRANCH_NAME }}\n\n${{ steps.check.outputs.check_error }}"
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Check on failure
+        if: steps.check.outcome == 'failure'
+        env:
+          CHECK_ERROR: ${{ steps.check.outputs.check_error }}
+        run: |
+          echo "❌ TypeScript Error"
+          echo $CHECK_ERROR
+          exit 1
 
   lint:
     name: ESLint Check
@@ -86,6 +102,8 @@ jobs:
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Cache dependencies
         id: cache
@@ -104,12 +122,13 @@ jobs:
         id: lint
         continue-on-error: true
         run: |
-          if ! yarn lint; then
-            ERROR_MSG=$(yarn lint 2>&1)
-            echo "lint_error<<EOF" >> $GITHUB_OUTPUT
-            echo "$ERROR_MSG" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-            exit 1
+          if ! ERROR_MSG=$(yarn lint 2>&1); then
+              {
+                echo "lint_error<<EOF"
+                echo "$ERROR_MSG"
+                echo "EOF"
+              } >> $GITHUB_OUTPUT
+              exit 1
           fi
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -117,18 +136,21 @@ jobs:
           git diff --cached --quiet || echo "changes=true" >> $GITHUB_OUTPUT
 
       - name: Send ESLint Error Notification
-        if: steps.lint.outcome == 'failure'
+        if: steps.lint.outcome == 'failure' && env.IS_INTERNAL_PR == 'true'
         uses: ./.github/actions/notification
         with:
           TYPE: failure
           TITLE: "❌ Lint Failed"
           DESCRIPTION: "Branch: ${{ env.BRANCH_NAME }}\n\n${{ steps.lint.outputs.lint_error }}"
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-      
+
       - name: Check on failure
         if: steps.lint.outcome == 'failure'
+        env:
+          LINT_ERROR: ${{ steps.lint.outputs.lint_error }}
         run: |
-          echo "Lint failed"
+          echo "❌ Lint Failed"
+          echo $LINT_ERROR
           exit 1
 
       - name: Commit lint Changes
@@ -136,4 +158,3 @@ jobs:
         run: |
           git commit -m "chore: format code"
           git push
-

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
-import { EDUCATION_STEP, ROLE } from '@/constants/member';
+import { EDUCATION, ROLE } from '@/constants/member';
 import toast from 'react-hot-toast';
 import { initialState as reduxInitMarathonState } from '@/redux/reducers/marathon';
 import { useRouter } from 'next/router';
@@ -18,8 +18,10 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import { useAuthDispatch } from '@/contexts/Auth';
+import { AREA_DELIMITER, AREAS } from '@/constants/areas';
+import { mapToTable } from '@/utils/helper';
 
-import config from '@/constants/config';
+import marathonConfig from '@/constants/marathon';
 import {
   StyledSection,
   StyledButtonGroup,
@@ -28,6 +30,8 @@ import {
 } from './Edit.styled';
 import MilestoneGroup from './MilestoneGroup';
 import ApplyClosePopup from '../ApplyClosePopup';
+
+const AREAS_TABLE = mapToTable(AREAS);
 
 const StyledMarathonTitleSection = styled(Box)`
   padding: 10px;
@@ -244,8 +248,9 @@ export default function ConfirmForm({
       let userEdu = userState?.educationStage;
 
       if (userState?.location?.length > 1) {
-        if (userState?.location.includes('@')) {
-          userLocation = userState?.location.split('@')[1];
+        if (userState?.location.includes(AREA_DELIMITER)) {
+          const city = userState?.location.split(AREA_DELIMITER)[1];
+          userLocation = AREAS_TABLE[city] ?? city;
         } else {
           userLocation = userState?.location;
         }
@@ -256,7 +261,7 @@ export default function ConfirmForm({
       }
 
       if (userState?.educationStage) {
-        userEdu = EDUCATION_STEP.find((item) => item.key === userState.educationStage)?.label;
+        userEdu = EDUCATION.find((item) => item.key === userState.educationStage)?.label;
       }
       setUser({
         name: userState.name,
@@ -271,7 +276,7 @@ export default function ConfirmForm({
     }
   }, [userState, openLoginModal]);
   const onSubmit = async () => {
-    if (!config.isMarathonApplyEnabled) {
+    if (!marathonConfig.isMarathonApplyEnabled) {
       popupRef.current.showPopup();
       return;
     } else {

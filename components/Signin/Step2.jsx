@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Box, Button, Typography, Skeleton } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { CATEGORIES } from '@/constants/member';
+import { CATEGORIES } from '@/constants/category';
 
 const ContentWrapper = styled.div`
   display: flex;

@@ -8,7 +8,7 @@ import useFetch from '@/hooks/useFetch';
 function GroupPage() {
   const router = useRouter();
   const { id } = router.query;
-  const { data, isFetching, isError } = useFetch(`/activity/${id}`, {
+  const { data, isFetching, isError } = useFetch(`/circles/${id}`, {
     enabled: !!id,
   });
   const source = {

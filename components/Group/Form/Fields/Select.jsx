@@ -1,6 +1,7 @@
 import FormControl from '@mui/material/FormControl';
 import MuiSelect from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import { mapToTable } from '@/utils/helper';
 
 export default function Select({
   id,
@@ -8,6 +9,7 @@ export default function Select({
   placeholder,
   options = [],
   itemLabel = 'label',
+  itemValue = 'value',
   fullWidth = true,
   multiple,
   sx,
@@ -16,11 +18,12 @@ export default function Select({
   value = [],
   error,
 }) {
-  const getValue = (any, key) => (typeof any === 'object' ? any[key] : any);
+  const mapping = mapToTable(options);
+  const getValue = (any, key) => (typeof any === 'object' && any ? any[key] : any);
   const renderValue = (selected) => {
     if (selected.length === 0) return placeholder;
-    if (Array.isArray(selected)) return selected.join('、');
-    return selected;
+    if (Array.isArray(selected)) return selected.map((item) => mapping[item] ?? item).join('、');
+    return mapping[selected] ?? selected;
   };
 
   return (
@@ -56,8 +59,8 @@ export default function Select({
         )}
         {options.map((item) => (
           <MenuItem
-            key={getValue(item, itemLabel)}
-            value={getValue(item, itemLabel)}
+            key={getValue(item, itemValue)}
+            value={getValue(item, itemValue)}
           >
             {getValue(item, itemLabel)}
           </MenuItem>

@@ -2,6 +2,12 @@ const isDev = process.env.NODE_ENV === 'development';
 
 const withPWA = require('next-pwa')({
   dest: 'public',
+  buildExcludes: [
+    /build-manifest\.json$/,
+    /react-loadable-manifest\.json$/,
+    /dynamic-css-manifest\.json$/,
+    /font-manifest\.json$/
+  ]
 });
 
 /** @type {import('next').NextConfig} */
@@ -12,8 +18,17 @@ const config = {
   images: {
     domains: ['imgur.com', 'images.unsplash.com', 'lh3.googleusercontent.com'],
   },
-  webpack: (config) => {
+  webpack: (config, options) => {
     const experiments = { ...config.experiments, topLevelAwait: true };
+
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: [
+        options.defaultLoaders.babel,
+        '@svgr/webpack',
+      ],
+    });
+
     return Object.assign(config, { experiments });
   },
   env: {

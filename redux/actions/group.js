@@ -5,7 +5,7 @@ export const SET_PAGE_SIZE = 'SET_PAGE_SIZE';
 export const SET_QUERY = 'SET_QUERY';
 export const GET_GROUP_ITEMS_SUCCESS = 'GET_GROUP_ITEMS_SUCCESS';
 export const GET_GROUP_ITEMS_FAILURE = 'GET_GROUP_ITEMS_FAILURE';
-export const GROUP_API_URL = `${BASE_URL}/activity`;
+export const GROUP_API_URL = `${BASE_URL}/circles`;
 
 export function setPageSize(pageSize) {
   return {

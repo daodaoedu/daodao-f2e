@@ -1,11 +1,8 @@
-import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  Checkbox,
   Button,
   Divider,
-  FormControlLabel,
 } from '@mui/material';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
@@ -34,25 +31,11 @@ const AccountSetting = () => {
   const router = useRouter();
   const authDispatch = useAuthDispatch();
   const { user } = useAuth();
-  const [isSubscribeEmail, setIsSubscribeEmail] = useState(false);
-
-  const onUpdateUser = (status) => {
-    const payload = {
-      id: user._id,
-      email: user.email,
-      isSubscribeEmail: status,
-    };
-    authDispatch.updateUser(payload);
-  };
 
   const logout = () => {
     authDispatch.logout();
     router.push('/');
   };
-
-  useEffect(() => {
-    setIsSubscribeEmail(user?.isSubscribeEmail || false);
-  }, [user]);
 
   return (
     <Box
@@ -111,22 +94,6 @@ const AccountSetting = () => {
             進行驗證
           </Button>
         </Box> */}
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <StyledTypographyStyle>電子報</StyledTypographyStyle>
-          <FormControlLabel
-            control={
-              // eslint-disable-next-line react/jsx-wrap-multilines
-              <Checkbox
-                checked={isSubscribeEmail}
-                onChange={(event) => {
-                  setIsSubscribeEmail(event.target.checked);
-                  onUpdateUser(event.target.checked);
-                }}
-              />
-            }
-            label="訂閱電子報與島島阿學的新資訊"
-          />
-        </Box>
         <Divider
           sx={{ width: '100%', color: '#000', margin: '30px 0', height: '2px' }}
         />

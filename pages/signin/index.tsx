@@ -66,7 +66,7 @@ function SignInPage() {
         }}
         onOk={() => {
           setOpen(false);
-          router.replace('/profile');
+          router.replace('/personal-card');
         }}
       />
     </ProtectedComponent>

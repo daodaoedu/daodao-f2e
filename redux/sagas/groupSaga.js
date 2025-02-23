@@ -1,8 +1,7 @@
 import { put, takeLatest, select } from 'redux-saga/effects';
-import { AREAS } from '@/constants/areas';
-import { CATEGORIES } from '@/constants/category';
-import { EDUCATION_STEP } from '@/constants/member';
-import { activityCategoryList } from '@/constants/activityCategory';
+import { AREAS, ONLINE_OPTION, TBD_OPTION } from '@/constants/areas';
+import { ACTIVITY_CATEGORIES, CATEGORIES } from '@/constants/category';
+import { EDUCATION } from '@/constants/member';
 import req from '@/utils/request';
 
 import {
@@ -20,10 +19,10 @@ function* getGroupItems() {
 
   const urlSearchParams = new URLSearchParams({ pageSize });
   const searchParamsConfigs = {
-    area: [AREAS, 'label'],
-    category: [CATEGORIES, 'label'],
-    activityCategory: [activityCategoryList, 'value'],
-    partnerEducationStep: [EDUCATION_STEP, 'label'],
+    area: [AREAS.concat(ONLINE_OPTION, TBD_OPTION), 'label', 'value'],
+    category: [CATEGORIES, 'label', 'value'],
+    activityCategory: [ACTIVITY_CATEGORIES, 'label', 'value'],
+    partnerEducationStep: [EDUCATION, 'label', 'value'],
     isGrouping: true,
     search: true,
   };
@@ -35,16 +34,20 @@ function* getGroupItems() {
     if (!searchParam || !config) return;
 
     if (Array.isArray(config)) {
-      const [options, optionKey] = config;
+      const [options, optionKey, valueKey] = config;
 
       urlSearchParams.append(
         key,
         searchParam
-          .split(',')
-          .filter((item) =>
-            options.some((_option) => _option[optionKey] === item),
+          .split(",")
+          .map(
+            (item) =>
+              options.find((_option) => _option[optionKey] === item)?.[
+                valueKey ?? optionKey
+              ]
           )
-          .join(','),
+          .filter(Boolean)
+          .join(",")
       );
     } else {
       urlSearchParams.append(key, searchParam);

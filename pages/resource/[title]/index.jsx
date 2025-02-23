@@ -2,6 +2,7 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import appendQuery from 'append-query';
+import { decodePathname, encodePathname } from '@/utils/url';
 import SEOConfig from '../../../shared/components/SEO';
 import Resource from '../../../components/Resource';
 
@@ -309,7 +310,7 @@ export const getStaticProps = async ({ params }) => {
           {
             property: '資源名稱',
             title: {
-              contains: title,
+              contains: decodePathname(title),
             },
           },
         ],
@@ -360,12 +361,12 @@ export const getStaticPaths = async () => {
 
     const batchPathList = (result?.payload?.results ?? []).map((item) => ({
       params: {
-        title: (
+        title: encodePathname(
           (item?.properties['資源名稱']?.title ?? []).find(
             // eslint-disable-next-line no-shadow
             (title) => title?.type === 'text',
           )?.plain_text ?? ''
-        ).trim(),
+        ),
         // .replace(/\./g, "%2E"), // or try &#46; reference: https://stackoverflow.com/questions/4938900/how-to-encode-periods-for-urls-in-javascript
       },
     }));

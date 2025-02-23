@@ -1,11 +1,14 @@
-import { createContext, useContext, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  Dispatch,
+  SetStateAction,
+} from 'react';
 
-interface ToggleContextType {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-}
-
-const ToggleContext = createContext<ToggleContextType | null>(null);
+const ToggleContext = createContext<
+  [boolean, Dispatch<SetStateAction<boolean>>] | null
+>(null);
 
 interface UseToggleProps {
   errorMessage?: string;
@@ -15,7 +18,7 @@ export const useToggle = ({ errorMessage }: UseToggleProps = {}) => {
   const context = useContext(ToggleContext);
   if (!context) {
     throw new Error(
-      errorMessage || "useToggle must be used within an ToggleProvider"
+      errorMessage || 'useToggle must be used within an ToggleProvider'
     );
   }
   return context;
@@ -23,18 +26,16 @@ export const useToggle = ({ errorMessage }: UseToggleProps = {}) => {
 
 interface ToggleProviderProps {
   children: React.ReactNode;
-  defaultOpen?: boolean;
+  defaultEnabled?: boolean;
 }
 
 export const ToggleProvider = ({
   children,
-  defaultOpen = false,
+  defaultEnabled = false,
 }: ToggleProviderProps) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const state = useState(defaultEnabled);
 
   return (
-    <ToggleContext.Provider value={{ isOpen, setIsOpen }}>
-      {children}
-    </ToggleContext.Provider>
+    <ToggleContext.Provider value={state}>{children}</ToggleContext.Provider>
   );
 };
