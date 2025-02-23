@@ -111,22 +111,6 @@ const AccountSetting = () => {
             進行驗證
           </Button>
         </Box> */}
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <StyledTypographyStyle>電子報</StyledTypographyStyle>
-          <FormControlLabel
-            control={
-              // eslint-disable-next-line react/jsx-wrap-multilines
-              <Checkbox
-                checked={isSubscribeEmail}
-                onChange={(event) => {
-                  setIsSubscribeEmail(event.target.checked);
-                  onUpdateUser(event.target.checked);
-                }}
-              />
-            }
-            label="訂閱電子報與島島阿學的新資訊"
-          />
-        </Box>
         <Divider
           sx={{ width: '100%', color: '#000', margin: '30px 0', height: '2px' }}
         />

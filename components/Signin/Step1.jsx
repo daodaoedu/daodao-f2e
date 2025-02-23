@@ -174,24 +174,6 @@ function Step1({ errors, onChangeHandler, userState = {}, onNext }) {
               </Box>
               <ErrorMessage errText={errors.roleList} />
             </StyledQuestionInput>
-            <FormControlLabel
-              sx={{
-                marginTop: '20px',
-              }}
-              control={
-                // eslint-disable-next-line react/jsx-wrap-multilines
-                <Checkbox
-                  checked={userState.isSubscribeEmail}
-                  onChange={(event) =>
-                    onChangeHandler({
-                      key: 'isSubscribeEmail',
-                      value: event.target.checked,
-                    })
-                  }
-                />
-              }
-              label="訂閱電子報與島島阿學的新資訊"
-            />
             <Button
               sx={{
                 width: '100%',
