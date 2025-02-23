@@ -42,6 +42,8 @@ interface DateRangePickerProps {
   endDate: Dayjs;
   maxDate?: Dayjs;
   minDate?: Dayjs;
+  disabledStartDate?: boolean;
+  disabledEndDate?: boolean;
   className?: string;
   onStartDateChange: (date: Dayjs) => void;
   onEndDateChange: (date: Dayjs) => void;
@@ -52,6 +54,8 @@ const DateRangePicker = ({
   endDate,
   maxDate,
   minDate,
+  disabledStartDate,
+  disabledEndDate,
   className,
   onStartDateChange,
   onEndDateChange,
@@ -86,10 +90,12 @@ const DateRangePicker = ({
 
   const handleChange = (date: Dayjs | null) => {
     if (!date) return;
-    if (modeRef.current === 'start') {
+    if (modeRef.current === 'start' && !disabledStartDate) {
       handleStartDateChange(date);
-    } else {
+    } else if (!disabledEndDate) {
       handleEndDateChange(date);
+    } else {
+      setIsOpen(false);
     }
   };
 

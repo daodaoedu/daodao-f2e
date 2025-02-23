@@ -13,27 +13,17 @@ import dayjs from 'dayjs';
 import DateRangePicker from '@/shared/components/DateRangePicker';
 import Button from '@/shared/components/Button';
 import useProjectMilestoneList from '@/hooks/api/project/useProjectMilestoneList';
-import { CreateProjectMilestoneRequest } from '@/services/project/milestone';
+import { ProjectMilestoneSchema } from '@/services/project/milestone';
+import { cn } from '@/utils/cn';
 
-interface GenerateDefaultMilestoneOptions {
-  projectId: string;
-  week: number;
-  startDate: dayjs.Dayjs;
-  endDate: dayjs.Dayjs;
-}
+const sortMilestones = (milestones: ProjectMilestoneSchema[]) => {
+  if (!Array.isArray(milestones)) return [];
 
-const generateDefaultMilestone = (
-  options: GenerateDefaultMilestoneOptions
-): CreateProjectMilestoneRequest => {
-  return {
-    name: '',
-    description: '',
-    isCompleted: false,
-    week: options.week,
-    projectId: options.projectId,
-    startDate: options.startDate.format('YYYY/MM/DD'),
-    endDate: options.endDate.format('YYYY/MM/DD'),
-  };
+  return milestones.sort((a, b) => {
+    const startDiff = dayjs(a.startDate).diff(dayjs(b.startDate), 'd');
+    if (startDiff !== 0) return startDiff;
+    return dayjs(a.endDate).diff(dayjs(b.endDate), 'd');
+  });
 };
 
 interface MilestonesContentProps {
@@ -51,13 +41,14 @@ interface MilestonesContentProps {
 const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
   const [isCreating, setIsCreating] = useState(false);
   const [startDate, setStartDate] = useState(dayjs().startOf('day'));
-  const [endDate, setEndDate] = useState(dayjs().endOf('day'));
+  const [endDate, setEndDate] = useState(dayjs().startOf('day').add(30, 'day'));
   const [isHideCompleted, setIsHideCompleted] = useState(false);
   const [isAscending, setIsAscending] = useState(true);
   const { project } = useProject();
   const {
     data: milestones,
     isLoading,
+    isValidating,
     create,
     mutate,
   } = useProjectMilestoneList(project.id, {
@@ -87,29 +78,85 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
       .filter((task) => !task.isCompleted).length;
   }, [milestones]);
 
-  const daysRemaining = useMemo(() => {
-    if (!Array.isArray(milestones)) return 0;
+  const milestoneStartDate = useMemo(() => {
+    if (!Array.isArray(milestones)) return null;
 
-    const deadline = milestones
-      .filter((m) => m.endDate && dayjs(m.endDate).isValid())
-      .reduce<dayjs.Dayjs | null>(
-        (d, m) => d && (d.isAfter(dayjs(m.endDate)) ? d : dayjs(m.endDate)),
-        null
-      );
-
-    if (!deadline || dayjs().isAfter(deadline)) return 0;
-
-    return deadline.diff(dayjs(), 'day');
+    return milestones.reduce<dayjs.Dayjs | null>(
+      (d, m) => (d && d.isBefore(dayjs(m.startDate)) ? d : dayjs(m.startDate)),
+      null
+    );
   }, [milestones]);
 
-  const sortedMilestones = useMemo(
-    () =>
-      Array.isArray(milestones)
-        ? milestones
-            .filter((m) => (isHideCompleted ? !m.isCompleted : true))
-            .sort((a, b) => (isAscending ? a.week - b.week : b.week - a.week))
-        : [],
-    [milestones, isAscending, isHideCompleted]
+  const milestoneEndDate = useMemo(() => {
+    if (!Array.isArray(milestones)) return null;
+
+    return milestones.reduce<dayjs.Dayjs | null>(
+      (d, m) => (d && d.isAfter(dayjs(m.endDate)) ? d : dayjs(m.endDate)),
+      null
+    );
+  }, [milestones]);
+
+  const milestoneEmptyDate = useMemo(() => {
+    if (!Array.isArray(milestones)) return dayjs().startOf('day');
+    const sortedData = sortMilestones(milestones);
+
+    if (sortedData.length === 0) {
+      return startDate;
+    }
+    if (sortedData.length === 1) {
+      return dayjs(sortedData[0].endDate).add(1, 'day');
+    }
+
+    let preEndDate = dayjs(sortedData[0].endDate);
+
+    for (let i = 1; i < sortedData.length; i += 1) {
+      const milestone = sortedData[i];
+      const currentStartDate = dayjs(milestone.startDate);
+
+      if (
+        currentStartDate.isAfter(preEndDate) &&
+        currentStartDate.diff(preEndDate, 'day') > 1
+      ) {
+        return preEndDate.add(1, 'day');
+      } else {
+        preEndDate = dayjs(milestone.endDate);
+      }
+    }
+    return endDate.add(1, 'day');
+  }, [startDate, endDate]);
+
+  const daysRemaining = useMemo(() => {
+    if (!milestoneEndDate || dayjs().isAfter(milestoneEndDate)) return 0;
+
+    return milestoneEndDate.diff(dayjs(), 'day');
+  }, [milestoneEndDate]);
+
+  const sortedMilestones = useMemo(() => {
+    if (!Array.isArray(milestones)) return [];
+
+    const sortedData = sortMilestones(
+      milestones.filter((m) => (isHideCompleted ? !m.isCompleted : true))
+    );
+
+    return isAscending ? sortedData : [...sortedData].reverse();
+  }, [milestones, isAscending, isHideCompleted]);
+
+  const defaultCreateMilestone = useMemo(
+    () => ({
+      name: '',
+      description: '',
+      isCompleted: false,
+      projectId: project.id,
+      startDate: milestoneEmptyDate.format('YYYY/MM/DD'),
+      endDate: milestoneEmptyDate
+        .add(1, 'day')
+        .endOf('week')
+        .format('YYYY/MM/DD'),
+      week: milestoneStartDate
+        ? milestoneEmptyDate.diff(milestoneStartDate, 'week') + 1
+        : 1,
+    }),
+    [project.id, milestoneStartDate, milestoneEmptyDate]
   );
 
   return (
@@ -156,8 +203,9 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
                 <div className="flex items-center gap-2">
                   <p>時間設定：</p>
                   <DateRangePicker
-                    startDate={startDate}
+                    startDate={milestoneStartDate ?? startDate}
                     endDate={endDate}
+                    disabledStartDate={!!milestoneStartDate}
                     minDate={dayjs().startOf('day')}
                     onStartDateChange={setStartDate}
                     onEndDateChange={setEndDate}
@@ -185,19 +233,19 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
                 color="primary"
                 onClick={() => setIsAscending(!isAscending)}
               >
-                {isAscending ? '新到舊' : '舊到新'}
+                {isAscending ? '舊到新' : '新到舊'}
               </Button>
             </div>
-            <div className="flex flex-col gap-3">
+            <div
+              className={cn(
+                'flex flex-col gap-3 transition-opacity',
+                isValidating && 'opacity-50'
+              )}
+            >
               {isCreating && (
                 <div className="p-2.5 bg-basic-100 flex flex-col gap-2">
                   <MilestoneForm
-                    milestone={generateDefaultMilestone({
-                      projectId: project.id,
-                      startDate: dayjs().startOf('day'),
-                      endDate: dayjs().endOf('day'),
-                      week: 1,
-                    })}
+                    milestone={defaultCreateMilestone}
                     disabledChangeDate={isMarathonProject}
                     onCancel={() => setIsCreating(false)}
                     onSubmit={create.trigger}

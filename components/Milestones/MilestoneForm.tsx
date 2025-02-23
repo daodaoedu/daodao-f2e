@@ -1,9 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { FaArrowRight } from 'react-icons/fa';
+import { ZodError } from 'zod';
+import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { cn } from '@/utils/cn';
 import { MdSend, MdClose } from 'react-icons/md';
-import { CreateProjectMilestoneRequest } from '@/services/project/milestone';
+import {
+  CreateProjectMilestoneRequest,
+  createProjectMilestoneSchema,
+} from '@/services/project/milestone';
 import Button from '@/shared/components/Button';
 import { numberToZh } from './Shared';
 
@@ -32,6 +37,19 @@ const MilestoneForm = ({
       ...milestone,
       [name]: value,
     });
+  };
+
+  const handleSubmit = () => {
+    try {
+      createProjectMilestoneSchema.parse(milestone);
+      onSubmit(milestone);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        toast.error(error.issues[0].message);
+      } else {
+        toast.error('發生錯誤');
+      }
+    }
   };
 
   useEffect(() => {
@@ -104,7 +122,7 @@ const MilestoneForm = ({
                 'flex items-center justify-center',
                 'bg-basic-200 text-basic-300 hover:bg-primary-base hover:text-white'
               )}
-              onClick={() => onSubmit(milestone)}
+              onClick={handleSubmit}
             >
               <MdSend />
             </button>
