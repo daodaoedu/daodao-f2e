@@ -30,12 +30,12 @@ const ReadOnlyMarkdownEditor = ({ value }: { value: string }) => {
 const Tag = ({ tag }: { tag: string }) => {
   return (
     <div className="flex gap-2">
-        <div
-          key={tag}
-          className="px-2.5 py-[3px] text-xs text-basic-400 bg-primary-lightest rounded-[13px]"
-        >
-          {tag}
-        </div>
+      <div
+        key={tag}
+        className="px-2.5 py-[3px] text-xs text-basic-400 bg-primary-lightest rounded-[13px]"
+      >
+        {tag}
+      </div>
     </div>
   );
 };
@@ -43,7 +43,7 @@ const Tag = ({ tag }: { tag: string }) => {
 const AnnouncementList = ({ items }: { items: AnnouncementItem[] }) => {
   return (
     <div className="flex flex-col gap-3 my-6">
-      {items.map(({ id, tag,times,title }) => (
+      {items.map(({ id, tag, times, title }) => (
         <Link
           href={`/learning-marathon/announcements/${id}`}
           key={id}

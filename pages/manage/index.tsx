@@ -1,7 +1,7 @@
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { Children, useMemo, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import dayjs, { Dayjs } from 'dayjs';
 import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
 import { CiCircleChevRight, CiCircleChevLeft } from 'react-icons/ci';
@@ -48,19 +48,19 @@ const HEADER_TITLES = [
 ];
 
 const Header = () => {
-  const router = useRouter();
-  const { data } = useProjectList({ isMe: true });
-  const maxProjects = 3;
+  // const router = useRouter();
+  // const { data } = useProjectList({ isMe: true });
+  // const maxProjects = 3;
 
-  const handleCreateProject = () => {
-    if (!data) {
-      toast.error('目前功能異常，請稍後再試');
-    } else if (data.length >= maxProjects) {
-      toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
-    } else {
-      router.push('/manage/project/create');
-    }
-  };
+  // const handleCreateProject = () => {
+  //   if (!data) {
+  //     toast.error('目前功能異常，請稍後再試');
+  //   } else if (data.length >= maxProjects) {
+  //     toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
+  //   } else {
+  //     router.push('/manage/project/create');
+  //   }
+  // };
 
   const projectActions = [
     {
@@ -102,7 +102,7 @@ const Header = () => {
       actions: projectActions,
     },
     {
-      label: '學習馬拉松',
+      label: '個人名片',
       actions: userActions,
     },
   ];
