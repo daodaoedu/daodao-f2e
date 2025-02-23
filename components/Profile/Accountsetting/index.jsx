@@ -1,11 +1,8 @@
-import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  Checkbox,
   Button,
   Divider,
-  FormControlLabel,
 } from '@mui/material';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
@@ -34,25 +31,11 @@ const AccountSetting = () => {
   const router = useRouter();
   const authDispatch = useAuthDispatch();
   const { user } = useAuth();
-  const [isSubscribeEmail, setIsSubscribeEmail] = useState(false);
-
-  const onUpdateUser = (status) => {
-    const payload = {
-      id: user._id,
-      email: user.email,
-      isSubscribeEmail: status,
-    };
-    authDispatch.updateUser(payload);
-  };
 
   const logout = () => {
     authDispatch.logout();
     router.push('/');
   };
-
-  useEffect(() => {
-    setIsSubscribeEmail(user?.isSubscribeEmail || false);
-  }, [user]);
 
   return (
     <Box
