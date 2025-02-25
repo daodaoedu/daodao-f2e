@@ -15,9 +15,8 @@ const NoteDetailPage = () => {
     noteId,
   });
 
-  console.log('NoteDetailPage', note);
   if (!projectId || !noteId) {
-    router.replace(`/project/notes?id=${projectId}`);
+    router.replace(`/projects/notes?id=${projectId}`);
     return null;
   }
   return (

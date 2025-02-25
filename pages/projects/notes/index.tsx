@@ -4,10 +4,15 @@ import getPublicProjectLayout from '@/layout/PublicProjectLayout';
 import {
   useProjectNoteList,
 } from '@/hooks/api/project';
+import { z } from 'zod';
 
 const NotesPage = () => {
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('projectId') ?? undefined;
+  const projectIdParam = searchParams.get('projectId');
+  const projectId =
+    projectIdParam && z.string().uuid().safeParse(projectIdParam).success
+      ? projectIdParam
+      : undefined;
 
   const {
     data: notes,
