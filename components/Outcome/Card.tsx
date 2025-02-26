@@ -27,6 +27,7 @@ function OutcomeCard({
           src={outcomeData.imgUrls[0]}
           alt={outcomeData.title}
           height="300px"
+          className="object-contain"
         />
       )}
     </div>

@@ -39,17 +39,17 @@ const ReviewPage = () => {
     remove,
   } = useProjectReviewList(projectId, {
     onCreated: () => {
-      toast.success('新增覆盤成功');
+      toast.success('新增成功');
       setModalType(null);
     },
     onUpdated: () => {
-      toast.success('覆盤更新成功');
+      toast.success('更新成功');
       setModalType(null);
       setReviewId(undefined);
       mutate();
     },
     onDeleted: () => {
-      toast.success('覆盤刪除成功');
+      toast.success('刪除成功');
       setModalType(null);
       setReviewId(undefined);
     },

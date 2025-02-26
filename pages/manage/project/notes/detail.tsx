@@ -6,6 +6,9 @@ import getProjectLayout from '@/layout/ProjectLayout';
 import { useProject, useProjectNote } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';
+import { useCommentList } from '@/hooks/api/comment';
+import { CommentType } from '@/services/comments';
+import { CommentData } from '@/shared/components/Comment/CommentInput';
 
 enum ModalTypeEnum {
   Update,
@@ -21,31 +24,73 @@ const NoteDetailPage = () => {
   const { data: project } = useProject({ id: projectId });
   const {
     data: note,
-    update,
-    remove,
+    update: updateNote,
+    remove: removeNote,
   } = useProjectNote({
     projectId,
     noteId,
     onUpdated: () => {
-      toast.success('便利貼更新成功');
+      toast.success('更新成功');
       setModalType(null);
     },
     onDeleted: () => {
-      toast.success('便利貼刪除成功');
+      toast.success('刪除成功');
       router.replace(`/manage/project/notes?id=${projectId}`);
     },
   });
+
+  const {
+    data: comments,
+    create: createComment,
+    update: updateComment,
+    remove: removeComment,
+  } = useCommentList({
+    targetType: CommentType.Note,
+    targetId: noteId,
+  });
+
+  const handleCreateComment = (data: CommentData) => {
+    createComment.trigger({
+      targetType: CommentType.Note,
+      targetId: noteId,
+      content: data.content,
+      parentId: data.parentId,
+      visibility: data.isPublic ? 'public' : 'private',
+    });
+  };
+
+  const handleUpdateComment = (data: CommentData) => {
+    if (!data.id) {
+      toast.error('留言不存在');
+      return;
+    }
+    updateComment.trigger({
+      id: data.id,
+      content: data.content,
+      visibility: data.isPublic ? 'public' : 'private',
+    });
+  };
+
+  const handleDeleteComment = (id: number) => {
+    removeComment.trigger({ id });
+  };
 
   if (!projectId || !noteId) {
     router.replace(`/manage/project/notes?id=${projectId}`);
     return null;
   }
+
   return (
     <div className="bg-basic-white rounded-2xl">
       <NoteDetail
         data={note}
+        comments={comments}
+        authorUser={project?.user}
         onEditClick={() => setModalType(ModalTypeEnum.Update)}
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
+        onCreateComment={handleCreateComment}
+        onUpdateComment={handleUpdateComment}
+        onDeleteComment={handleDeleteComment}
       />
 
       {note && project && (
@@ -58,8 +103,8 @@ const NoteDetailPage = () => {
           createdAt={note.date}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
-          onSubmit={update.trigger}
-          isLoading={update.isMutating}
+          onSubmit={updateNote.trigger}
+          isLoading={updateNote.isMutating}
         />
       )}
 
@@ -69,8 +114,8 @@ const NoteDetailPage = () => {
         confirmColor="alert"
         isOpen={modalType === ModalTypeEnum.Delete}
         onClose={() => setModalType(null)}
-        onConfirm={() => remove.trigger({ projectId, noteId })}
-        isLoading={remove.isMutating}
+        onConfirm={() => removeNote.trigger({ projectId, noteId })}
+        isLoading={removeNote.isMutating}
       />
     </div>
   );

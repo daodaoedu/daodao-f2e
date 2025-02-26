@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { mutations } from '../httpClient';
-import { uploadImage } from '../images';
+import { updateImage } from '../images';
 
 const projectEndpoint = '/projects';
 
@@ -42,18 +42,14 @@ export type CreateProjectNoteRequest = z.infer<typeof createProjectNoteSchema>;
 export const createProjectNote = async ({
   projectId,
   imgFiles,
+  imgUrls,
   ...note
 }: CreateProjectNoteRequest) => {
-  const newUrls: string[] = [];
-
-  if (Array.isArray(imgFiles) && imgFiles.length > 0) {
-    const { url } = await uploadImage({ file: imgFiles[0] });
-    newUrls.push(url);
-  }
+  const updatedImgUrls = await updateImage(imgFiles, imgUrls);
 
   return mutations.post(getProjectNoteEndpoint({ projectId }), {
     ...note,
-    imgUrls: newUrls,
+    imgUrls: updatedImgUrls,
   });
 };
 
@@ -65,18 +61,14 @@ export const updateProjectNote = async ({
   id,
   projectId,
   imgFiles,
+  imgUrls,
   ...note
 }: UpdateProjectNoteRequest) => {
-  const newUrls: string[] = [];
-
-  if (Array.isArray(imgFiles) && imgFiles.length > 0) {
-    const { url } = await uploadImage({ file: imgFiles[0] });
-    newUrls.push(url);
-  }
+  const updatedImgUrls = await updateImage(imgFiles, imgUrls);
 
   return mutations.put(getProjectNoteEndpoint({ projectId, noteId: id }), {
     ...note,
-    imgUrls: newUrls,
+    imgUrls: updatedImgUrls,
   });
 };
 

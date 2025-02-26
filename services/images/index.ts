@@ -32,6 +32,18 @@ export const uploadImage = (request: UploadImageRequest) => {
   );
 };
 
+export const updateImage = async (
+  imgFiles?: File[] | null,
+  imgUrls?: string[] | null
+) => {
+  if (Array.isArray(imgFiles) && imgFiles.length > 0) {
+    const { url } = await uploadImage({ file: imgFiles[0] });
+    return [url];
+  }
+
+  return imgUrls;
+};
+
 const deleteImageSchema = z.object({
   id: z.string(),
 });

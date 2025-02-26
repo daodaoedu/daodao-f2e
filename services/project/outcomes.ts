@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { mutations } from '../httpClient';
-import { uploadImage } from '../images';
+import { updateImage } from '../images';
 
 const projectEndpoint = '/projects';
 
@@ -44,18 +44,14 @@ export type CreateProjectOutcomeRequest = z.infer<
 export const createProjectOutcome = async ({
   projectId,
   imgFiles,
+  imgUrls,
   ...outcome
 }: CreateProjectOutcomeRequest) => {
-  const newUrls: string[] = [];
-
-  if (Array.isArray(imgFiles) && imgFiles.length > 0) {
-    const { url } = await uploadImage({ file: imgFiles[0] });
-    newUrls.push(url);
-  }
+  const updatedImgUrls = await updateImage(imgFiles, imgUrls);
 
   return mutations.post(getProjectOutcomeEndpoint({ projectId }), {
     ...outcome,
-    imgUrls: newUrls,
+    imgUrls: updatedImgUrls,
   });
 };
 
@@ -69,20 +65,16 @@ export const updateProjectOutcome = async ({
   projectId,
   id,
   imgFiles,
+  imgUrls,
   ...outcome
 }: UpdateProjectOutcomeRequest) => {
-  const newUrls: string[] = [];
-
-  if (Array.isArray(imgFiles) && imgFiles.length > 0) {
-    const { url } = await uploadImage({ file: imgFiles[0] });
-    newUrls.push(url);
-  }
+  const updatedImgUrls = await updateImage(imgFiles, imgUrls);
 
   return mutations.put(
     getProjectOutcomeEndpoint({ projectId, outcomeId: id }),
     {
       ...outcome,
-      imgUrls: newUrls,
+      imgUrls: updatedImgUrls,
     }
   );
 };
