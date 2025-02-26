@@ -81,8 +81,7 @@ function ProjectLayout({ children }: ProjectLayoutContentProps) {
               學習成果
             </Sidebar.Link>
             <Sidebar.Link
-              isDisabled
-              href={`/projects/notes/detail?projectId=${projectId}`}
+              href={`/projects/notes?projectId=${projectId}`}
               isActive={activeTabPath.startsWith('/projects/notes/detail')}
             >
               便利貼
