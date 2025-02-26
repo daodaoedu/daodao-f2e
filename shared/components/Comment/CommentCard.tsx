@@ -7,14 +7,14 @@ import { useAuth } from '@/contexts/Auth';
 import Image from '@/shared/components/Image';
 import { ROLE } from '@/constants/member';
 import { timeDuration } from '@/utils/date';
-import { CommentSchema } from '@/services/comments';
+import { CommentSchema, CommentVisibility } from '@/services/comments';
 import Button from '../Button';
 import Collapse from '../Collapse';
 import CommentInput, { CommentData } from './CommentInput';
 import Dropdown from '../Dropdown';
 
 interface CommentCardProps extends CommentSchema {
-  onCreate?: (data: CommentData) => void;
+  onCreate?: (data: Omit<CommentData, 'id'>) => void;
   onUpdate?: (data: CommentData) => void;
   onDelete?: (id: number) => void;
 }
@@ -42,7 +42,14 @@ function CommentCard({
         onUpdate && {
           key: 'toggleVisibility',
           children: isPublic ? '設為不公開' : '設為公開',
-          onClick: () => onUpdate({ id, content, isPublic: !isPublic }),
+          onClick: () =>
+            onUpdate({
+              id,
+              content,
+              visibility: isPublic
+                ? CommentVisibility.Private
+                : CommentVisibility.Public,
+            }),
         },
         onUpdate && {
           key: 'edit',
@@ -68,7 +75,7 @@ function CommentCard({
         },
       ];
 
-  const handleCreateComment = (data: CommentData) => {
+  const handleCreateComment = (data: Omit<CommentData, 'id'>) => {
     onCreate?.(data);
     setIsShowCommentInput(false);
   };

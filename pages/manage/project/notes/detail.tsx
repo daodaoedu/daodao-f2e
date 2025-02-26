@@ -8,7 +8,6 @@ import ConfirmModal from '@/shared/components/Confirm';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';
 import { useCommentList } from '@/hooks/api/comment';
 import { CommentType } from '@/services/comments';
-import { CommentData } from '@/shared/components/Comment/CommentInput';
 
 enum ModalTypeEnum {
   Update,
@@ -49,32 +48,6 @@ const NoteDetailPage = () => {
     targetId: noteId,
   });
 
-  const handleCreateComment = (data: CommentData) => {
-    createComment.trigger({
-      targetType: CommentType.Note,
-      targetId: noteId,
-      content: data.content,
-      parentId: data.parentId,
-      visibility: data.isPublic ? 'public' : 'private',
-    });
-  };
-
-  const handleUpdateComment = (data: CommentData) => {
-    if (!data.id) {
-      toast.error('留言不存在');
-      return;
-    }
-    updateComment.trigger({
-      id: data.id,
-      content: data.content,
-      visibility: data.isPublic ? 'public' : 'private',
-    });
-  };
-
-  const handleDeleteComment = (id: number) => {
-    removeComment.trigger({ id });
-  };
-
   if (!projectId || !noteId) {
     router.replace(`/manage/project/notes?id=${projectId}`);
     return null;
@@ -88,9 +61,9 @@ const NoteDetailPage = () => {
         authorUser={project?.user}
         onEditClick={() => setModalType(ModalTypeEnum.Update)}
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
-        onCreateComment={handleCreateComment}
-        onUpdateComment={handleUpdateComment}
-        onDeleteComment={handleDeleteComment}
+        onCreateComment={createComment.trigger}
+        onUpdateComment={updateComment.trigger}
+        onDeleteComment={removeComment.trigger}
       />
 
       {note && project && (
