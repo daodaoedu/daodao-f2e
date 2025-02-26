@@ -23,7 +23,12 @@ function NoteCard({
         {noteData.content}
       </p>
       {noteData.imgUrls && noteData.imgUrls.length > 0 && (
-        <Image src={noteData.imgUrls[0]} alt={noteData.title} height="300px" />
+        <Image
+          src={noteData.imgUrls[0]}
+          alt={noteData.title}
+          height="300px"
+          className="object-contain"
+        />
       )}
     </div>
   );

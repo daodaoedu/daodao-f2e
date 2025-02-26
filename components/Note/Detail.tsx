@@ -30,6 +30,7 @@ function NoteDetail({
               src={noteData.imgUrls[0]}
               alt={noteData.title}
               height="300px"
+              className="object-contain"
             />
           )}
         </div>
