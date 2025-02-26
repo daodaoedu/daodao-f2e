@@ -27,7 +27,7 @@ interface BasePostDetailCardProps<T extends BasePostDetailData> {
   onEditClick?: () => void;
   onDeleteClick?: () => void;
   renderContent: (data: T) => React.ReactNode;
-  onCreateComment?: (data: CommentData) => void;
+  onCreateComment?: (data: Omit<CommentData, 'id'>) => void;
   onUpdateComment?: (data: CommentData) => void;
   onDeleteComment?: (id: number) => void;
 }

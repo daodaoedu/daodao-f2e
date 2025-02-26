@@ -4,12 +4,13 @@ import Image from '@/shared/components/Image';
 import { cn } from '@/utils/cn';
 import { BaseUserSchema } from '@/services/users';
 import { ROLE } from '@/constants/member';
+import { CommentVisibility } from '@/services/comments';
 import Button from '../Button';
 
 export interface CommentData {
-  id?: number;
+  id: number;
   content: string;
-  isPublic: boolean;
+  visibility: CommentVisibility;
   parentId?: number;
 }
 
@@ -22,7 +23,7 @@ interface CommentInputProps {
   defaultContent?: string;
   defaultIsEditing?: boolean;
   defaultIsPublic?: boolean;
-  onSubmit: (data: CommentData) => void;
+  onSubmit: (data: Omit<CommentData, 'id'>) => void;
   onCancel?: () => void;
 }
 
@@ -46,7 +47,13 @@ function CommentInput({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (content.trim()) {
-      onSubmit?.({ content, isPublic, parentId });
+      onSubmit?.({
+        content,
+        visibility: isPublic
+          ? CommentVisibility.Public
+          : CommentVisibility.Private,
+        parentId,
+      });
       setContent('');
       setIsEditing(false);
     }

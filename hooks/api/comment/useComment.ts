@@ -35,15 +35,19 @@ export default function useComment({
   onUpdated,
   onDeleted,
 }: UseCommentOptions) {
-  const swrKey: CommentMutateKey = id && targetId
-    ? [getCommentEndpoint({ id }), { targetType, targetId }]
-    : null;
+  const swrKey: CommentMutateKey =
+    id && targetId
+      ? [getCommentEndpoint({ id }), { targetType, targetId }]
+      : null;
 
   const { mutate, ...swr } = useSWR<Comment>(swrKey);
 
   const create = useSWRMutation(
     swrKey ?? mutateKey,
-    (url, { arg }: { arg: CreateCommentRequest }) => {
+    (
+      url,
+      { arg }: { arg: Omit<CreateCommentRequest, 'targetType' | 'targetId'> }
+    ) => {
       if (!targetId) {
         throw new HttpError(400, { message: '目標不存在' });
       }
@@ -54,13 +58,16 @@ export default function useComment({
 
   const update = useSWRMutation(
     swrKey ?? mutateKey,
-    (url, { arg }: { arg: UpdateCommentRequest }) => updateComment({ ...arg }),
+    (
+      url,
+      { arg }: { arg: Omit<UpdateCommentRequest, 'targetType' | 'targetId'> }
+    ) => updateComment({ ...arg }),
     { onSuccess: onUpdated }
   );
 
   const remove = useSWRMutation(
     swrKey ?? mutateKey,
-    (url, { arg }: { arg: { id: number } }) => deleteComment(arg.id),
+    (url, { arg }: { arg: number }) => deleteComment(arg),
     { onSuccess: onDeleted }
   );
 

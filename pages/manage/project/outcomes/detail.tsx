@@ -6,6 +6,8 @@ import getProjectLayout from '@/layout/ProjectLayout';
 import { useProject, useProjectOutcome } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 import EditModal from '@/components/Outcome/Modals/UpdateModal';
+import { useCommentList } from '@/hooks/api/comment';
+import { CommentType } from '@/services/comments';
 
 enum ModalTypeEnum {
   Update,
@@ -21,8 +23,8 @@ const OutcomeDetailPage = () => {
   const { data: project } = useProject({ id: projectId });
   const {
     data: outcome,
-    update,
-    remove,
+    update: updateOutcome,
+    remove: removeOutcome,
   } = useProjectOutcome({
     projectId,
     outcomeId,
@@ -36,6 +38,16 @@ const OutcomeDetailPage = () => {
     },
   });
 
+  const {
+    data: comments,
+    create: createComment,
+    update: updateComment,
+    remove: removeComment,
+  } = useCommentList({
+    targetType: CommentType.Outcome,
+    targetId: outcomeId,
+  });
+
   if (!projectId || !outcomeId) {
     router.replace(`/manage/project/outcomes?id=${projectId}`);
     return null;
@@ -45,8 +57,13 @@ const OutcomeDetailPage = () => {
     <div className="bg-basic-white rounded-2xl">
       <OutcomeDetail
         data={outcome}
+        comments={comments}
+        authorUser={project?.user}
         onEditClick={() => setModalType(ModalTypeEnum.Update)}
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
+        onCreateComment={createComment.trigger}
+        onUpdateComment={updateComment.trigger}
+        onDeleteComment={removeComment.trigger}
       />
 
       {outcome && project && (
@@ -59,8 +76,8 @@ const OutcomeDetailPage = () => {
           createdAt={outcome.date}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
-          onSubmit={update.trigger}
-          isLoading={update.isMutating}
+          onSubmit={updateOutcome.trigger}
+          isLoading={updateOutcome.isMutating}
         />
       )}
 
@@ -70,8 +87,8 @@ const OutcomeDetailPage = () => {
         confirmColor="alert"
         isOpen={modalType === ModalTypeEnum.Delete}
         onClose={() => setModalType(null)}
-        onConfirm={() => remove.trigger({ projectId, outcomeId })}
-        isLoading={remove.isMutating}
+        onConfirm={() => removeOutcome.trigger({ projectId, outcomeId })}
+        isLoading={removeOutcome.isMutating}
       />
     </div>
   );

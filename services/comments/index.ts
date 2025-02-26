@@ -14,6 +14,11 @@ export enum CommentType {
   Review = 'review',
 }
 
+export enum CommentVisibility {
+  Public = 'public',
+  Private = 'private',
+}
+
 export const getCommentEndpoint = ({ id }: GetCommentKeyProps = {}) => {
   if (id) {
     return `${commentEndpoint}/${id}`;
@@ -24,7 +29,7 @@ export const getCommentEndpoint = ({ id }: GetCommentKeyProps = {}) => {
 const baseCommentSchema = z.object({
   id: z.number(),
   content: z.string(),
-  visibility: z.string(),
+  visibility: z.nativeEnum(CommentVisibility),
   parentId: z.number().nullable().optional(),
   user: baseUserSchema,
   createdAt: z.string(),

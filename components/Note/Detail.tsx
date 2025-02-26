@@ -12,8 +12,8 @@ interface NoteDetailProps {
   className?: string;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
-  onCreateComment?: (comment: CommentData) => void;
-  onUpdateComment?: (comment: CommentData) => void;
+  onCreateComment?: (comment: Omit<CommentData, 'id'>) => void;
+  onUpdateComment?: (comment: CommentData & { id: number }) => void;
   onDeleteComment?: (id: number) => void;
 }
 
