@@ -14,7 +14,7 @@ DaoDao 是一個使用現代前端技術開發的網站專案。本專案採用 
   - Redux Saga (逐步淘汰) - 舊有非同步處理
 - **UI 框架與樣式**: 
   - Tailwind CSS (主推) - 實用優先的 CSS 框架
-  - 自定義組件庫 - 基於 Tailwind 的手刻組件
+  - 自定義組件庫 - 基於 Tailwind 的手刻元件
   - Material-UI (MUI) v5 (逐步淘汰) - 舊有 UI 框架
   - Emotion (逐步淘汰) - 舊有 CSS-in-JS 方案
 - **開發語言**: TypeScript
@@ -130,9 +130,9 @@ daodao-f2e/
 
 - **`/components`**: React 組件庫
   - `common/`: 按鈕、輸入框等基礎組件（手刻）
-  - `ui/`: 複雜 UI 組件（手刻）
-  - `forms/`: 表單相關組件
-  - `layouts/`: 頁面布局組件
+  - `ui/`: 複雜 UI 元件（手刻）
+  - `forms/`: 表單相關元件
+  - `layouts/`: 頁面布局元件
 
 - **`/services`**: 後端服務整合
   - API 請求處理
@@ -142,7 +142,7 @@ daodao-f2e/
 #### 狀態管理
 
 - **`/contexts`**: React Context 定義（推薦使用）
-  - 用於組件樹內的狀態共享
+  - 用於元件內的狀態共享
   - 主要處理 UI 狀態和主題設置
   - 新功能優先使用 Context 實現
   - 目前已實現的 Context：
@@ -162,7 +162,7 @@ daodao-f2e/
   - `store/`: Redux store 配置
   - `actions/`: 定義狀態變更動作
   - `reducers/`: 處理狀態更新邏輯
-  - `sagas/`: 處理異步操作（逐步遷移至 SWR）
+  - `sagas/`: 處理非同步操作（逐步遷移至 SWR）
   - 注意：新功能不建議使用 Redux，優先使用 Context + SWR
 
 #### 工具和配置
@@ -204,15 +204,14 @@ daodao-f2e/
    - 功能開發：從 `dev` 分支建立功能分支 -> 開發 -> 合併回 `dev`
    - 緊急修復：從 `prod` 分支建立 hotfix 分支 -> 修復 -> 合併至 `prod` 和 `dev`
 
-3. **代碼風格**:
+3. **程式碼風格**:
    - 遵循 Airbnb ESLint 規範
-   - 使用 Prettier 進行代碼格式化
    - 組件樣式優先使用 Tailwind CSS 類名
    - 避免使用 CSS-in-JS，除非特殊情況
 
 4. **組件開發**:
-   - 共享組件放置在 `/shared` 目錄
-   - 頁面特定組件放置在對應的頁面目錄
+   - 共享元件放置在 `/shared` 目錄
+   - 頁面特定元件放置在對應的頁面目錄
    - 使用 TypeScript 類型定義
    - UI 組件開發規範：
      - 優先使用 Tailwind CSS 類名
@@ -420,7 +419,15 @@ jobs:
 
 ## 授權
 
-本專案採用 MIT 授權條款 - 詳見 [LICENSE](./license) 文件
+本專案採用 GNU Lesser General Public License v3.0 (LGPL-3.0) 授權條款 - 詳見 [LICENSE](./license) 文件
+
+LGPL-3.0 授權要點：
+- 允許將本軟體用於商業用途
+- 允許修改原始碼
+- 必須開放修改後的原始碼
+- 必須包含原作者的版權聲明
+- 修改後的軟體也必須使用 LGPL-3.0 授權
+- 不提供品質保證
 
 ## 貢獻指南
 
