@@ -27,11 +27,11 @@ const OutcomeDetailPage = () => {
     projectId,
     outcomeId,
     onUpdated: () => {
-      toast.success('覆盤更新成功');
+      toast.success('更新成功');
       setModalType(null);
     },
     onDeleted: () => {
-      toast.success('覆盤刪除成功');
+      toast.success('刪除成功');
       router.replace(`/manage/project/outcomes?id=${projectId}`);
     },
   });

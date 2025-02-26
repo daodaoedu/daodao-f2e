@@ -27,11 +27,11 @@ const NoteDetailPage = () => {
     projectId,
     noteId,
     onUpdated: () => {
-      toast.success('便利貼更新成功');
+      toast.success('更新成功');
       setModalType(null);
     },
     onDeleted: () => {
-      toast.success('便利貼刪除成功');
+      toast.success('刪除成功');
       router.replace(`/manage/project/notes?id=${projectId}`);
     },
   });
