@@ -6,23 +6,36 @@ import Button, { ButtonProps } from './Button';
 interface DropdownProps {
   as?: React.ElementType;
   children: React.ReactNode;
+  disableAutoClose?: boolean;
 }
 
-function DropdownContent({ as: Component = 'div', children }: DropdownProps) {
-  const [, setState] = useToggle();
+function DropdownContent({
+  as: Component = 'div',
+  children,
+  disableAutoClose = false,
+}: DropdownProps) {
+  const [state, setState] = useToggle();
   const { ref } = useClickOutside({ setState });
 
+  const handleClick = () => {
+    if (disableAutoClose) return;
+    if (!state) return;
+    setState(false);
+  };
+
   return (
-    <Component ref={ref} className="relative">
+    <Component ref={ref} className="relative" onClick={handleClick}>
       {children}
     </Component>
   );
 }
 
-function Dropdown({ as, children }: DropdownProps) {
+function Dropdown({ as, children, disableAutoClose }: DropdownProps) {
   return (
     <ToggleProvider>
-      <DropdownContent as={as}>{children}</DropdownContent>
+      <DropdownContent as={as} disableAutoClose={disableAutoClose}>
+        {children}
+      </DropdownContent>
     </ToggleProvider>
   );
 }

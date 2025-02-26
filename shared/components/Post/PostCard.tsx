@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AiOutlineEye } from 'react-icons/ai';
 import { MdLockOpen, MdLockOutline } from 'react-icons/md';
+import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 
 import Button from '@/shared/components/Button';
@@ -214,7 +215,7 @@ interface PostCardRewardProps {
 function PostCardReward({ shellCount, userName }: PostCardRewardProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-      <Button prefixIcon="Shell" className="px-2">
+      <Button prefixIcon="Shell" className="px-2" onClick={() => toast.error('感謝您的貝殼，但此功能尚未開放')}>
         {shellCount}
       </Button>
       {userName && (

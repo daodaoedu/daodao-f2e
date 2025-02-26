@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { Project } from '@/components/Projects/Project/type';
 import { projectMilestoneSchema } from './milestone';
 import { mutations } from '../httpClient';
+import { baseUserSchema } from '../users';
 
 const projectEndpoint = '/projects';
 
@@ -19,14 +20,6 @@ export const getProjectEndpoint = ({ isMe, id }: GetProjectKeyProps = {}) => {
   }
   return projectEndpoint;
 };
-
-const projectUserSchema = z.object({
-  _id: z.string(),
-  id: z.string(),
-  name: z.string(),
-  roleList: z.array(z.string()),
-  photoURL: z.string(),
-});
 
 export const projectSchema = z.object({
   id: z.string(),
@@ -47,7 +40,7 @@ export const projectSchema = z.object({
   outcomeDescription: z.string(),
   /** 馬拉松用的 ID */
   eventId: z.string().optional(),
-  user: projectUserSchema,
+  user: baseUserSchema,
   milestones: z.array(projectMilestoneSchema),
 });
 

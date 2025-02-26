@@ -1,14 +1,31 @@
 import PostDetailCard, { BasePostDetailData } from '@/shared/components/Post/PostDetailCard';
 import { ProjectReviewSchema } from '@/services/project/reviews';
+import { BaseUserSchema } from '@/services/users';
+import { CommentSchema } from '@/services/comments';
+import { CommentData } from '@/shared/components/Comment/CommentInput';
 import RadioGroup from './RadioGroup';
 
 interface ReviewDetailProps {
   data?: ProjectReviewSchema;
+  authorUser?: BaseUserSchema;
+  comments?: CommentSchema[];
   onEditClick?: () => void;
   onDeleteClick?: () => void;
+  onCreateComment?: (comment: Omit<CommentData, 'id'>) => void;
+  onUpdateComment?: (comment: CommentData & { id: number }) => void;
+  onDeleteComment?: (id: number) => void;
 }
 
-function ReviewDetail({ data, onEditClick, onDeleteClick }: ReviewDetailProps) {
+function ReviewDetail({
+  data,
+  authorUser,
+  comments,
+  onEditClick,
+  onDeleteClick,
+  onCreateComment,
+  onUpdateComment,
+  onDeleteComment,
+}: ReviewDetailProps) {
   if (!data) return null;
 
   const postData: BasePostDetailData = {
@@ -22,8 +39,13 @@ function ReviewDetail({ data, onEditClick, onDeleteClick }: ReviewDetailProps) {
     <PostDetailCard
       data={postData}
       tag="覆盤"
+      comments={comments}
+      authorUser={authorUser}
       onEditClick={onEditClick}
       onDeleteClick={onDeleteClick}
+      onCreateComment={onCreateComment}
+      onUpdateComment={onUpdateComment}
+      onDeleteComment={onDeleteComment}
       renderContent={() => (
         <ul className="ml-8 list-decimal marker:heading-sm body-md font-normal">
           <li className="mb-8">
