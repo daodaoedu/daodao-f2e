@@ -64,7 +64,7 @@ const PageProjectsEvents = () => {
     const fetchProjects = async () => {
       try {
         setIsFetchingProjects(true);
-        const response = await fetch(`${BASE_URL}/projects`);
+        const response = await fetch(`${BASE_URL}/projects/admin`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
