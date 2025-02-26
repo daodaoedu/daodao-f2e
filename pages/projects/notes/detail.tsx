@@ -28,7 +28,6 @@ const NoteDetailPage = () => {
   );
 };
 
-NoteDetailPage.getLayout = (page: React.ReactElement) =>
-    getPublicProjectLayout(page);
+NoteDetailPage.getLayout = getPublicProjectLayout;
 
 export default NoteDetailPage;

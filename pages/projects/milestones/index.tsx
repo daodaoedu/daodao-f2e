@@ -8,7 +8,7 @@ import { MilestonesProvider } from '@/contexts/Milestones';
 
 const ProjectMilestonesPage = () => {
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('projectId') ?? undefined;
+  const projectId = searchParams.get('id') ?? undefined;
   const {
     data: milestones,
     isLoading,

@@ -20,7 +20,7 @@ const ProjectDetailPage = () => {
   const [isFetchingProject, setIsFetchingProject] = useState(false);
   const [project, setProject] = useState<ProjectType>();
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('projectId') ?? undefined;
+  const projectId = searchParams.get('id') ?? undefined;
 
   useEffect(() => {
     const fetchProject = async () => {

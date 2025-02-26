@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 const NotesPage = () => {
   const searchParams = useSearchParams();
-  const projectIdParam = searchParams.get('projectId');
+  const projectIdParam = searchParams.get('id');
   const projectId =
     projectIdParam && z.string().uuid().safeParse(projectIdParam).success
       ? projectIdParam
