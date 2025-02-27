@@ -30,7 +30,7 @@ function CommentCard({
   onUpdate,
   onDelete,
 }: CommentCardProps) {
-  const { isLoggedIn, user } = useAuth();
+  const { user } = useAuth();
   const [isShowCommentInput, setIsShowCommentInput] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const role = ROLE.find((r) => r.value === commentUser?.roleList?.[0])?.label;
@@ -117,7 +117,7 @@ function CommentCard({
                   action && (
                     <Dropdown.Item key={action.key} className="text-nowrap">
                       <Button
-                        className="hover:bg-primary-palest"
+                        className="w-full hover:bg-primary-palest"
                         onClick={action.onClick}
                       >
                         {action.children}
@@ -132,7 +132,6 @@ function CommentCard({
       <div className="mb-2">
         {isEditing && onUpdate ? (
           <CommentInput
-            loginUser={commentUser}
             defaultContent={content}
             defaultIsEditing
             defaultIsPublic={isPublic}
@@ -144,7 +143,7 @@ function CommentCard({
             hideHeader
           />
         ) : (
-          <p>{content}</p>
+          <p className="whitespace-pre-wrap">{content}</p>
         )}
       </div>
       <div className="mb-2 flex items-center gap-2 text-basic-black">
@@ -153,14 +152,13 @@ function CommentCard({
           prefixIcon="Shell"
           onClick={() => toast.error('感謝您的貝殼，但此功能尚未開放')}
         />
-        {isLoggedIn && (
-          <Button
-            className="-m-2 p-2"
-            onClick={() => setIsShowCommentInput(true)}
-          >
-            回覆
-          </Button>
-        )}
+        <Button
+          className="-m-2 p-2"
+          onClick={() => setIsShowCommentInput(true)}
+          checkLogin
+        >
+          回覆
+        </Button>
       </div>
 
       {Array.isArray(replies) && replies.length > 0 && (
@@ -199,7 +197,6 @@ function CommentCard({
       {isShowCommentInput && (
         <CommentInput
           className="pb-4 pt-6"
-          loginUser={commentUser}
           parentId={id}
           defaultIsEditing
           onSubmit={handleCreateComment}

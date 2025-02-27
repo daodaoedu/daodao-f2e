@@ -6,8 +6,6 @@ import ReviewDetail from '@/components/Review/Detail';
 import UpdateModal from '@/components/Review/Modals/UpdateModal';
 import { useProject, useProjectReview } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
-import { useCommentList } from '@/hooks/api/comment';
-import { CommentType } from '@/services/comments';
 
 enum ModalTypeEnum {
   Update,
@@ -38,18 +36,7 @@ const ReviewPage = () => {
     },
   });
 
-  const {
-    data: comments,
-    create: createComment,
-    update: updateComment,
-    remove: removeComment,
-  } = useCommentList({
-    targetType: CommentType.Review,
-    targetId: reviewId,
-  });
-
   if (!projectId || !reviewId) {
-    router.replace(`/manage/project/review?id=${projectId}`);
     return null;
   }
 
@@ -57,13 +44,9 @@ const ReviewPage = () => {
     <>
       <ReviewDetail
         data={review}
-        comments={comments}
         authorUser={project?.user}
         onEditClick={() => setModalType(ModalTypeEnum.Update)}
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
-        onCreateComment={createComment.trigger}
-        onUpdateComment={updateComment.trigger}
-        onDeleteComment={removeComment.trigger}
       />
 
       {review && project && (
