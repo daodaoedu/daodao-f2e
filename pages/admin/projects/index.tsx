@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { BASE_URL } from "@/constants/common";
 import toast from 'react-hot-toast';
 import { Project as ProjectType } from "@/components/Projects/Project/type";
@@ -6,6 +6,8 @@ import { Skeleton } from '@mui/material';
 import { cn } from '@/utils/cn';
 import ProjectList from '@/components/Projects/ProjectList';
 import EmptyList from '@/components/Projects/ProjectList/EmptyList';
+import AccessDenied from '@/shared/components/AccessDenied';
+import { RoleEnum, useAuth } from '@/contexts/Auth';
 
 const tabList = [
   {
@@ -59,6 +61,15 @@ const Tabs = () => {
 const PageProjectsEvents = () => {
   const [isFetchingProjects, setIsFetchingProjects] = useState(false);
   const [projects, setProjects] = useState<ProjectType[]>([]);
+  const { user } = useAuth();
+  const canManage = useMemo(() => {
+    const permissions = [
+      RoleEnum.Mentor,
+      RoleEnum.Admin,
+      RoleEnum.SuperAdmin,
+    ];
+    return user ? permissions.includes(user?.role) : false;
+  }, [user]);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -86,28 +97,32 @@ const PageProjectsEvents = () => {
   }, []);
 
   return (
-    <div className="bg-[#EEF9F9]">
-      <div className="mx-auto w-[670px] max-w-full flex flex-col gap-6 px-4 py-8 md:py-28">
-        <div>
-          <h2 className="text-basic-500 heading-md">
-            學習計畫分享區
-          </h2>
+    <>
+      {canManage ? (
+        <div className="bg-[#EEF9F9]">
+          <div className="mx-auto w-[670px] max-w-full flex flex-col gap-6 px-4 py-8 md:py-28">
+            <div>
+              <h2 className="text-basic-500 heading-md">
+                學習計畫分享區
+              </h2>
+            </div>
+            <div className="rounded-[20px] overflow-hidden bg-white">
+              <Tabs />
+              {
+                isFetchingProjects && (
+                  <Skeleton animation="wave" width="95%" height="200px" className="mx-auto" />
+                )
+              }
+              {Array.isArray(projects) && projects.length > 0
+                ? <ProjectList projects={projects} />
+                : <EmptyList />
+              }
+            </div>
+          </div>
         </div>
-
-        <div className="rounded-[20px] overflow-hidden bg-white">
-          <Tabs />
-          {
-            isFetchingProjects && (
-              <Skeleton animation="wave" width="95%" height="200px" className="mx-auto" />
-            )
-          }
-          {Array.isArray(projects) && projects.length > 0
-            ? <ProjectList projects={projects} />
-            : <EmptyList />
-          }
-        </div>
-      </div>
-    </div>
+      )
+        : <AccessDenied />}
+    </>
   );
 };
 export default PageProjectsEvents;
