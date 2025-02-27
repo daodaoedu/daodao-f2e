@@ -99,11 +99,11 @@ function Modal({
         />
         <div
           className={cn(
-            'fixed inset-0 z-[99] flex overflow-y-auto',
-            'transition-opacity opacity-0 pointer-events-none ease-in duration-200',
+            'fixed inset-0 z-[99] flex overflow-y-auto pointer-events-none',
+            'transition-opacity opacity-0 ease-in duration-200',
             isInitialized && [
               isOpen
-                ? 'pointer-events-auto animate-fade-in'
+                ? 'animate-fade-in'
                 : 'animate-fade-out',
             ]
           )}
@@ -111,7 +111,7 @@ function Modal({
           <dialog
             open={!removeDOM}
             className={cn(
-              'fixed -bottom-4 p-10 w-full max-h-[80%]',
+              'fixed -bottom-4 p-10 w-full max-h-[80%] pointer-events-auto',
               'rounded-lg bg-white overflow-x-hidden',
               'transition-transform translate-y-full ease-in duration-200',
               size === ModalSize.Small &&
