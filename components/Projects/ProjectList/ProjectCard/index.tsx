@@ -10,7 +10,6 @@ interface ProjectCardProps {
 }
 
 const ProjectCard = ({ project, path }: ProjectCardProps) => {
-  console.log('ProjectCard', path);
 
   const pathroute = path === '/admin' ? '/admin/projects/detail' : '/projects/detail';
 

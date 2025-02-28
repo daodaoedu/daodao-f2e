@@ -7,7 +7,6 @@ interface ProjectListProps {
 }
 
 const ProjectList = ({ projects, path }: ProjectListProps) => {
-  console.log("ProjectList", path);
   return (
     projects.map((project) => {
       return (
