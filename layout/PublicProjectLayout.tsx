@@ -15,18 +15,42 @@ import { ProjectProvider, useProject } from '@/contexts/Project';
 import { ROLE } from '@/constants/member';
 import getDefaultLayout from './DefaultLayout';
 
+
+const tabConfigs = (projectId: string) => ({
+  outcomes: {
+    backText: '返回 學習成果',
+    backPath: `/projects/outcomes?id=${projectId}`,
+  },
+  notes: {
+    backText: '返回 便利貼',
+    backPath: `/projects/notes?id=${projectId}`,
+  },
+  review: {
+    backText: '返回 覆盤',
+    backPath: `/projects/reviews?id=${projectId}`,
+  },
+});
 interface ProjectLayoutContentProps {
   children: React.ReactNode;
+  activeTabType?: keyof ReturnType<typeof tabConfigs>;
 }
-
-function ProjectLayout({ children }: ProjectLayoutContentProps) {
+function ProjectLayout({ children ,activeTabType}: ProjectLayoutContentProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('projectId');
-  const activeTabPath = pathname;
-  const backPath = '/projects';
-  const backText = '返回 學習計畫分享區';
+  const projectId = searchParams.get('id');
+  const activeTab =
+    activeTabType && projectId
+      ? tabConfigs(projectId)[activeTabType]
+      : undefined;
+  const activeTabPath = activeTab?.backPath ?? pathname;
+  console.log('activeTabPath',activeTabPath);
+  const backPath = activeTab?.backPath ?? '/projects';
+  console.log('backPath',backPath);
+
+  const backText = activeTab?.backText ?? '返回 學習計畫分享區';
+  console.log('backText',backText);
+
   const { project, fetchProject } = useProject();
   const zhRole = ROLE.find((r) => {
     return r.value === project.user.roleList[0];
@@ -62,34 +86,32 @@ function ProjectLayout({ children }: ProjectLayoutContentProps) {
           </div>
           <Sidebar className="mb-6 lg:mb-0 basis-full -order-1 lg:order-none lg:basis-80">
             <Sidebar.Link
-              href={`/projects/detail?projectId=${projectId}`}
+              href={`/projects/detail?id=${projectId}`}
               isActive={activeTabPath.startsWith('/projects/detail')}
             >
               學習計畫
             </Sidebar.Link>
             <Sidebar.Link
-              href={`/projects/milestones?projectId=${projectId}`}
+              href={`/projects/milestones?id=${projectId}`}
               isActive={activeTabPath.startsWith('/projects/milestones')}
             >
               學習里程碑
             </Sidebar.Link>
             <Sidebar.Link
-              isDisabled
-              href={`/projects/outcomes?projectId=${projectId}`}
-              isActive={activeTabPath.startsWith('/projects/outcomes/detail')}
+              href={`/projects/outcomes?id=${projectId}`}
+              isActive={activeTabPath.startsWith('/projects/outcomes')}
             >
               學習成果
             </Sidebar.Link>
             <Sidebar.Link
-              href={`/projects/notes?projectId=${projectId}`}
-              isActive={activeTabPath.startsWith('/projects/notes/detail')}
+              href={`/projects/notes?id=${projectId}`}
+              isActive={activeTabPath.startsWith('/projects/notes')}
             >
               便利貼
             </Sidebar.Link>
             <Sidebar.Link
-              isDisabled
-              href={`/projects/review/detail?projectId=${projectId}`}
-              isActive={activeTabPath.startsWith('/projects/review/detail')}
+              href={`/projects/reviews?id=${projectId}`}
+              isActive={activeTabPath.startsWith('/projects/reviews')}
             >
               覆盤
             </Sidebar.Link>
