@@ -1,4 +1,4 @@
-import getPublicProjectLayout from '@/layout/PublicProjectLayout';
+import getAdminProjectLayout from '@/layout/AdminProjectLayout';
 import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@mui/material';
 import useProjectMilestoneList from '@/hooks/api/project/useProjectMilestoneList';
@@ -57,7 +57,7 @@ const ProjectMilestonesPage = () => {
   );
 };
 ProjectMilestonesPage.getLayout = (page: React.ReactElement) =>
-  getPublicProjectLayout(
+  getAdminProjectLayout(
     <MilestonesProvider>{page}</MilestonesProvider>
   );
 export default ProjectMilestonesPage;

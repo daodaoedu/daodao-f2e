@@ -1,6 +1,6 @@
 import { useSearchParams } from 'next/navigation';
 import NoteCard from '@/components/Note/Card';
-import getPublicProjectLayout from '@/layout/PublicProjectLayout';
+import getAdminProjectLayout from '@/layout/AdminProjectLayout';
 import {
   useProjectNoteList,
 } from '@/hooks/api/project';
@@ -33,7 +33,7 @@ const NotesPage = () => {
             <NoteCard
               data={note}
               className="p-3 transition-shadow hover:shadow-basic-200/40 hover:shadow-lg"
-              detailLink={`/projects/notes/detail?id=${projectId}&noteId=${note.id}`}
+              detailLink={`/admin/projects/notes/detail?id=${projectId}&noteId=${note.id}`}
             />
           </li>
         ))}
@@ -42,6 +42,6 @@ const NotesPage = () => {
   );
 };
 
-NotesPage.getLayout = getPublicProjectLayout;
+NotesPage.getLayout = getAdminProjectLayout;
 
 export default NotesPage;

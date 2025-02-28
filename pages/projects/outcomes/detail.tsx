@@ -1,35 +1,34 @@
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import OutcomeDetail from '@/components/Outcome/Detail';
 import getPublicProjectLayout from '@/layout/PublicProjectLayout';
-import ReviewDetail from '@/components/Review/Detail';
-import { useProjectReview } from '@/hooks/api/project';
+import { useProject, useProjectOutcome } from '@/hooks/api/project';
 
-const ReviewPage = () => {
-  const router = useRouter();
+const OutcomeDetailPage = () => {
   const searchParams = useSearchParams();
   const projectId = searchParams.get('id') ?? undefined;
-  const reviewId = parseInt(searchParams.get('reviewId') ?? '0', 10);
-
+  const outcomeId = parseInt(searchParams.get('outcomeId') ?? '0', 10);
+  const { data: project } = useProject({ id: projectId });
   const {
-    data: review,
-  } = useProjectReview({
+    data: outcome,
+  } = useProjectOutcome({
     projectId,
-    reviewId,
+    outcomeId,
   });
 
-  if (!projectId || !reviewId) {
-    router.replace(`/projects/review?id=${projectId}`);
+  if (!projectId || !outcomeId) {
     return null;
   }
 
   return (
-    <>
-      <ReviewDetail
-        data={review}
+    <div className="bg-basic-white rounded-2xl">
+      <OutcomeDetail
+        data={outcome}
+        authorUser={project?.user}
       />
-    </>
+    </div>
   );
 };
 
-ReviewPage.getLayout = getPublicProjectLayout;
+OutcomeDetailPage.getLayout = getPublicProjectLayout;
 
-export default ReviewPage;
+export default OutcomeDetailPage;

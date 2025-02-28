@@ -1,6 +1,6 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import NoteDetail from '@/components/Note/Detail';
-import getPublicProjectLayout from '@/layout/PublicProjectLayout';
+import getAdminProjectLayout from '@/layout/AdminProjectLayout';
 import { useProjectNote } from '@/hooks/api/project';
 
 const NoteDetailPage = () => {
@@ -16,7 +16,7 @@ const NoteDetailPage = () => {
   });
 
   if (!projectId || !noteId) {
-    router.replace(`/projects/notes?id=${projectId}`);
+    router.replace(`/admin/projects/notes?id=${projectId}`);
     return null;
   }
   return (
@@ -28,7 +28,6 @@ const NoteDetailPage = () => {
   );
 };
 
-NoteDetailPage.getLayout = (page: React.ReactElement) =>
-    getPublicProjectLayout(page);
+NoteDetailPage.getLayout = getAdminProjectLayout;
 
 export default NoteDetailPage;

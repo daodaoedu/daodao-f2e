@@ -45,7 +45,7 @@ function ProjectLayout({ children ,activeTabType}: ProjectLayoutContentProps) {
       : undefined;
   const activeTabPath = activeTab?.backPath ?? pathname;
   console.log('activeTabPath',activeTabPath);
-  const backPath = activeTab?.backPath ?? '/projects';
+  const backPath = activeTab?.backPath ?? '/admin/projects';
   console.log('backPath',backPath);
 
   const backText = activeTab?.backText ?? '返回 學習計畫分享區';
@@ -86,35 +86,35 @@ function ProjectLayout({ children ,activeTabType}: ProjectLayoutContentProps) {
           </div>
           <Sidebar className="mb-6 lg:mb-0 basis-full -order-1 lg:order-none lg:basis-80">
             <Sidebar.Link
-              href={`/projects/detail?id=${projectId}`}
-              isActive={activeTabPath.startsWith('/projects/detail')}
+              href={`/admin/projects/detail?id=${projectId}`}
+              isActive={activeTabPath.startsWith('/admin/projects/detail')}
             >
               學習計畫
             </Sidebar.Link>
             <Sidebar.Link
-              href={`/projects/milestones?id=${projectId}`}
-              isActive={activeTabPath.startsWith('/projects/milestones')}
+              href={`/admin/projects/milestones?id=${projectId}`}
+              isActive={activeTabPath.startsWith('/admin/projects/milestones')}
             >
               學習里程碑
             </Sidebar.Link>
             <Sidebar.Link
-              href={`/projects/outcomes?id=${projectId}`}
+              href={`/admin/projects/outcomes?id=${projectId}`}
               isActive={activeTabPath.startsWith('/projects/outcomes')}
             >
               學習成果
             </Sidebar.Link>
             <Sidebar.Link
-              href={`/projects/notes?id=${projectId}`}
-              isActive={activeTabPath.startsWith('/projects/notes')}
+              href={`/admin/projects/notes?id=${projectId}`}
+              isActive={activeTabPath.startsWith('/admin/projects/notes')}
             >
               便利貼
             </Sidebar.Link>
-            {/* <Sidebar.Link
-              href={`/projects/reviews?id=${projectId}`}
-              isActive={activeTabPath.startsWith('/projects/reviews')}
+            <Sidebar.Link
+              href={`/admin/projects/reviews?id=${projectId}`}
+              isActive={activeTabPath.startsWith('/admin/projects/reviews')}
             >
               覆盤
-            </Sidebar.Link> */}
+            </Sidebar.Link>
           </Sidebar>
           <div className="basis-full max-w-full lg:flex-1 lg:max-w-[min(760px,100%-360px)]">
             <header className="mb-6">
@@ -169,7 +169,7 @@ function ProjectLayout({ children ,activeTabType}: ProjectLayoutContentProps) {
   );
 }
 
-export default function getPublicProjectLayout(
+export default function getAdminProjectLayout(
   page: React.ReactElement,
 ) {
   return getDefaultLayout(
