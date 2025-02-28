@@ -1,17 +1,17 @@
 import { useSearchParams } from 'next/navigation';
+import OutcomeCard from '@/components/Outcome/Card';
 import getPublicProjectLayout from '@/layout/PublicProjectLayout';
-import ReviewCard from '@/components/Review/Card';
 import {
-  useProjectReviewList,
+  useProjectOutcomeList,
 } from '@/hooks/api/project';
-import marathonConfig from '@/constants/marathon';
 
-const ReviewPage = () => {
+const OutcomesPage = () => {
   const searchParams = useSearchParams();
   const projectId = searchParams.get('id') ?? undefined;
+
   const {
-    data: reviews
-  } = useProjectReviewList(projectId);
+    data: outcomes,
+  } = useProjectOutcomeList(projectId);
 
   if (!projectId) {
     return <div>專案不存在</div>;
@@ -19,29 +19,24 @@ const ReviewPage = () => {
 
   return (
     <>
-      <div className="mb-6 flex items-end sm:items-center justify-between body-md">
-        <div className="flex flex-col items-start sm:flex-row sm:items-center gap-1">
-          <div className="text-basic-500">
-            覆盤（{marathonConfig.getWeekNumber().toString().padStart(2, '0')} 週/22週）
-          </div>
-        </div>
-      </div>
-
-      <ul className="flex flex-col gap-6">
-        {Array.isArray(reviews) &&
-          reviews.map((review) => (
-            <li key={review.id}>
-              <ReviewCard
-                data={review}
-                detailLink={`/projects/review/detail?id=${projectId}&reviewId=${review.id}`}
-              />
-            </li>
-          ))}
+      <ul className="px-4 bg-basic-white flex flex-col rounded-2xl">
+        {outcomes?.map((outcome) => (
+          <li
+            key={outcome.id}
+            className="py-6 border-b last:border-b-0 border-solid border-basic-200"
+          >
+            <OutcomeCard
+              data={outcome}
+              className="p-3 transition-shadow hover:shadow-basic-200/40 hover:shadow-lg"
+              detailLink={`/projects/outcomes/detail?id=${projectId}&outcomeId=${outcome.id}`}
+            />
+          </li>
+        ))}
       </ul>
     </>
   );
 };
 
-ReviewPage.getLayout = getPublicProjectLayout;
+OutcomesPage.getLayout = getPublicProjectLayout;
 
-export default ReviewPage;
+export default OutcomesPage;

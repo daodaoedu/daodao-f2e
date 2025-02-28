@@ -109,12 +109,12 @@ function ProjectLayout({ children ,activeTabType}: ProjectLayoutContentProps) {
             >
               便利貼
             </Sidebar.Link>
-            <Sidebar.Link
+            {/* <Sidebar.Link
               href={`/projects/reviews?id=${projectId}`}
               isActive={activeTabPath.startsWith('/projects/reviews')}
             >
               覆盤
-            </Sidebar.Link>
+            </Sidebar.Link> */}
           </Sidebar>
           <div className="basis-full max-w-full lg:flex-1 lg:max-w-[min(760px,100%-360px)]">
             <header className="mb-6">
