@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import getPublicProjectLayout from '@/layout/PublicProjectLayout';
+import getAdminProjectLayout from '@/layout/AdminProjectLayout';
 import { Project as ProjectType } from '@/components/Projects/Project/type';
 import { BASE_URL } from '@/constants/common';
 import { useSearchParams } from 'next/navigation';
@@ -121,5 +121,5 @@ const ProjectDetailPage = () => {
     </>
   );
 };
-ProjectDetailPage.getLayout = getPublicProjectLayout;
+ProjectDetailPage.getLayout = getAdminProjectLayout;
 export default ProjectDetailPage;

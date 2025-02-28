@@ -1,5 +1,5 @@
 import { useSearchParams } from 'next/navigation';
-import getPublicProjectLayout from '@/layout/PublicProjectLayout';
+import getAdminProjectLayout from '@/layout/AdminProjectLayout';
 import ReviewCard from '@/components/Review/Card';
 import {
   useProjectReviewList,
@@ -35,16 +35,15 @@ const ReviewPage = () => {
             <li key={review.id}>
               <ReviewCard
                 data={review}
-                detailLink={`/projects/reviews/detail?id=${projectId}&reviewId=${review.id}`}
+                detailLink={`/admin/projects/reviews/detail?id=${projectId}&reviewId=${review.id}`}
               />
             </li>
           ))}
       </ul>
-
     </>
   );
 };
 
-ReviewPage.getLayout = getPublicProjectLayout;
+ReviewPage.getLayout = getAdminProjectLayout;
 
 export default ReviewPage;

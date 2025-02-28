@@ -1,10 +1,9 @@
-import { useRouter, useSearchParams } from 'next/navigation';
-import getPublicProjectLayout from '@/layout/PublicProjectLayout';
+import { useSearchParams } from 'next/navigation';
+import getAdminProjectLayout from '@/layout/AdminProjectLayout';
 import ReviewDetail from '@/components/Review/Detail';
 import { useProjectReview } from '@/hooks/api/project';
 
 const ReviewPage = () => {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const projectId = searchParams.get('id') ?? undefined;
   const reviewId = parseInt(searchParams.get('reviewId') ?? '0', 10);
@@ -16,7 +15,6 @@ const ReviewPage = () => {
   });
 
   if (!projectId || !reviewId) {
-    router.replace(`/projects/reviews?id=${projectId}`);
     return null;
   }
 
@@ -29,6 +27,6 @@ const ReviewPage = () => {
   );
 };
 
-ReviewPage.getLayout = getPublicProjectLayout;
+ReviewPage.getLayout = getAdminProjectLayout;
 
 export default ReviewPage;
