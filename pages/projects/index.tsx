@@ -102,7 +102,7 @@ const PageProjectsEvents = () => {
             )
           }
           {Array.isArray(projects) && projects.length > 0
-            ? <ProjectList projects={projects} />
+            ? <ProjectList projects={projects} path=""/>
             : <EmptyList />
           }
         </div>
