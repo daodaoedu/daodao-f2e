@@ -6,8 +6,6 @@ import getProjectLayout from '@/layout/ProjectLayout';
 import { useProject, useProjectNote } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';
-import { useCommentList } from '@/hooks/api/comment';
-import { CommentType } from '@/services/comments';
 
 enum ModalTypeEnum {
   Update,
@@ -38,18 +36,7 @@ const NoteDetailPage = () => {
     },
   });
 
-  const {
-    data: comments,
-    create: createComment,
-    update: updateComment,
-    remove: removeComment,
-  } = useCommentList({
-    targetType: CommentType.Note,
-    targetId: noteId,
-  });
-
   if (!projectId || !noteId) {
-    router.replace(`/manage/project/notes?id=${projectId}`);
     return null;
   }
 
@@ -57,13 +44,9 @@ const NoteDetailPage = () => {
     <div className="bg-basic-white rounded-2xl">
       <NoteDetail
         data={note}
-        comments={comments}
         authorUser={project?.user}
         onEditClick={() => setModalType(ModalTypeEnum.Update)}
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
-        onCreateComment={createComment.trigger}
-        onUpdateComment={updateComment.trigger}
-        onDeleteComment={removeComment.trigger}
       />
 
       {note && project && (

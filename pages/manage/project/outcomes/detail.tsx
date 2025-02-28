@@ -6,8 +6,6 @@ import getProjectLayout from '@/layout/ProjectLayout';
 import { useProject, useProjectOutcome } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 import EditModal from '@/components/Outcome/Modals/UpdateModal';
-import { useCommentList } from '@/hooks/api/comment';
-import { CommentType } from '@/services/comments';
 
 enum ModalTypeEnum {
   Update,
@@ -38,18 +36,7 @@ const OutcomeDetailPage = () => {
     },
   });
 
-  const {
-    data: comments,
-    create: createComment,
-    update: updateComment,
-    remove: removeComment,
-  } = useCommentList({
-    targetType: CommentType.Outcome,
-    targetId: outcomeId,
-  });
-
   if (!projectId || !outcomeId) {
-    router.replace(`/manage/project/outcomes?id=${projectId}`);
     return null;
   }
 
@@ -57,13 +44,9 @@ const OutcomeDetailPage = () => {
     <div className="bg-basic-white rounded-2xl">
       <OutcomeDetail
         data={outcome}
-        comments={comments}
         authorUser={project?.user}
         onEditClick={() => setModalType(ModalTypeEnum.Update)}
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
-        onCreateComment={createComment.trigger}
-        onUpdateComment={updateComment.trigger}
-        onDeleteComment={removeComment.trigger}
       />
 
       {outcome && project && (

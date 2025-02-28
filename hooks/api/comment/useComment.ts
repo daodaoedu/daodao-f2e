@@ -17,7 +17,7 @@ export type CommentMutateKey =
   | null;
 
 interface UseCommentOptions {
-  targetType: CommentType;
+  targetType?: CommentType;
   targetId?: number;
   id?: number;
   mutateKey?: CommentMutateKey;
@@ -25,6 +25,9 @@ interface UseCommentOptions {
   onUpdated?: (data: CommentSchema) => void;
   onDeleted?: () => void;
 }
+
+type CreateCommentArg = Omit<CreateCommentRequest, 'targetType' | 'targetId'>;
+type UpdateCommentArg = Omit<UpdateCommentRequest, 'targetType' | 'targetId'>;
 
 export default function useComment({
   targetType,
@@ -36,7 +39,7 @@ export default function useComment({
   onDeleted,
 }: UseCommentOptions) {
   const swrKey: CommentMutateKey =
-    id && targetId
+    id && targetId && targetType
       ? [getCommentEndpoint({ id }), { targetType, targetId }]
       : null;
 
@@ -44,11 +47,8 @@ export default function useComment({
 
   const create = useSWRMutation(
     swrKey ?? mutateKey,
-    (
-      url,
-      { arg }: { arg: Omit<CreateCommentRequest, 'targetType' | 'targetId'> }
-    ) => {
-      if (!targetId) {
+    (url, { arg }: { arg: CreateCommentArg }) => {
+      if (!targetId || !targetType) {
         throw new HttpError(400, { message: '目標不存在' });
       }
       return createComment({ ...arg, targetType, targetId });
@@ -58,10 +58,7 @@ export default function useComment({
 
   const update = useSWRMutation(
     swrKey ?? mutateKey,
-    (
-      url,
-      { arg }: { arg: Omit<UpdateCommentRequest, 'targetType' | 'targetId'> }
-    ) => updateComment({ ...arg }),
+    (url, { arg }: { arg: UpdateCommentArg }) => updateComment({ ...arg }),
     { onSuccess: onUpdated }
   );
 

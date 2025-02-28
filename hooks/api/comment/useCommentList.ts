@@ -8,7 +8,7 @@ import {
 import useComment, { CommentMutateKey } from './useComment';
 
 interface UseCommentListOptions {
-  targetType: CommentType;
+  targetType?: CommentType;
   targetId?: number;
   onCreated?: () => void;
   onUpdated?: () => void;
@@ -22,7 +22,7 @@ export default function useCommentList({
   onUpdated,
   onDeleted,
 }: UseCommentListOptions) {
-  const swrKey: CommentMutateKey = targetId
+  const swrKey: CommentMutateKey = targetId && targetType
     ? [getCommentEndpoint(), { targetType, targetId }]
     : null;
 

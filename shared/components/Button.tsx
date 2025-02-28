@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
+import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 
 const FaAngleLeft = dynamic(() =>
   import('react-icons/fa6').then((mod) => mod.FaAngleLeft)
@@ -70,6 +71,8 @@ interface BaseButtonProps {
   isDisabled?: boolean;
   prefixIcon?: keyof typeof icons;
   suffixIcon?: keyof typeof icons;
+  checkLogin?: boolean;
+  onCheckLoginFailed?: () => void;
 }
 
 export interface ButtonProps<AS extends 'button' | 'link' = 'button'>
@@ -102,14 +105,22 @@ function Button<AS extends 'button' | 'link' = 'button'>({
   prefixIcon,
   suffixIcon,
   href,
+  checkLogin = false,
   ...nativeButtonProps
 }: ButtonProps<AS>) {
+  const { isLoggedIn } = useAuth();
+  const { openLoginModal } = useAuthDispatch();
   const rippleRef = useRef<HTMLDivElement>(null);
   const PrefixIcon = prefixIcon && icons[prefixIcon];
   const SuffixIcon = suffixIcon && icons[suffixIcon];
 
   const handleClick = (e: React.MouseEvent<HTMLElement>) => {
     if (isDisabled) {
+      return;
+    }
+
+    if (checkLogin && !isLoggedIn) {
+      openLoginModal();
       return;
     }
 
