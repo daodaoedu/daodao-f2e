@@ -164,6 +164,7 @@ const MilestonesContent = () => {
     isLoading,
     create,
     update,
+    mutate,
   } = useProjectMilestoneList(project.id);
 
   const projectId = project.id;
@@ -192,8 +193,8 @@ const MilestonesContent = () => {
             {project && !isMarathonProject && (
               <>
                 {!isMarathonProject && (
-                  <div className="flex justify-between items-center gap-2 pb-2.5">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-col md:flex-row justify-between md:items-center gap-2 pb-2.5">
+                    <div className="flex flex-col md:flex-row md:items-center gap-2">
                       <p>時間設定：</p>
                       <DateRangePicker
                         startDate={startDate}
@@ -211,13 +212,14 @@ const MilestonesContent = () => {
                     <Button
                       variant="solid"
                       color="primary"
+                      className="w-full md:w-auto"
                       onClick={handleOpen}
                     >
                       新增學習里程碑
                     </Button>
                   </div>
                 )}
-                <div className="flex justify-between gap-2 pb-2.5">
+                <div className="flex flex-col md:flex-row justify-between gap-2 pb-2.5">
                   <div>
                     顯示：
                     {filterItems.map((item) => (
@@ -275,6 +277,7 @@ const MilestonesContent = () => {
                     endDate={endDate}
                     isEditable
                     onUpdate={update.trigger}
+                    onRefreshData={mutate}
                   />
                 ))}
             </div>

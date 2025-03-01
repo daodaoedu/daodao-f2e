@@ -256,7 +256,7 @@ function MilestoneCard(
           />
         </div>
         <div className="flex flex-row items-center justify-between">
-          <div className="w-full flex flex-col md:flex-row items-center  md:justify-between gap-1">
+          <div className="w-full flex items-center  md:justify-between gap-1">
             {isEditing ? (
               <input
                 type="text"

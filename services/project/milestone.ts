@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import dayjs from 'dayjs';
 import { mutations } from '../httpClient';
+import { projectTaskSchema } from './tasks';
 
 const projectEndpoint = '/projects';
 
@@ -18,15 +19,6 @@ export const getProjectMilestoneEndpoint = ({
   }
   return `${projectEndpoint}/${projectId}/milestones`;
 };
-
-const projectTaskSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  description: z.string(),
-  daysOfWeek: z.array(z.string()),
-  isCompleted: z.boolean(),
-  milestoneId: z.number(),
-});
 
 export const projectMilestoneSchema = z.object({
   id: z.number(),
@@ -61,6 +53,23 @@ export const sortMilestones = (milestones: ProjectMilestoneSchema[]) => {
   });
 };
 
+export const getMilestone = (
+  sortedData: ProjectMilestoneSchema[] | undefined,
+  id: number
+) => {
+  if (!Array.isArray(sortedData)) return null;
+
+  const index = sortedData.findIndex((milestone) => milestone.id === id);
+
+  if (index === -1) return null;
+
+  return {
+    index,
+    item: sortedData[index],
+    list: sortedData,
+  };
+};
+
 export const createProjectMilestoneSchema = projectMilestoneSchema.omit({
   id: true,
   createdAt: true,
@@ -77,10 +86,7 @@ export const createProjectMilestone = ({
   projectId,
   ...request
 }: CreateProjectMilestoneRequest) => {
-  return mutations.post(
-    getProjectMilestoneEndpoint({ projectId }),
-    request
-  );
+  return mutations.post(getProjectMilestoneEndpoint({ projectId }), request);
 };
 
 export const updateProjectMilestoneSchema = projectMilestoneSchema.omit({

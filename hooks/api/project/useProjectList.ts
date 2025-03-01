@@ -1,17 +1,18 @@
 import useSWR from 'swr';
-import { getProjectEndpoint } from '@/services/project';
-import { Project } from '@/components/Projects/Project/type';
+import { getProjectEndpoint, ProjectSchema } from '@/services/project';
 import {
   sortMilestones,
   UpdateProjectMilestoneRequest,
 } from '@/services/project/milestone';
+import { sortTasks, UpdateProjectTaskRequest } from '@/services/project/tasks';
 import useProject from './useProject';
 import useProjectMilestone from './useProjectMilestone';
+import useProjectTask from './useProjectTask';
 
 interface UseProjectListProps {
   isMe: boolean;
-  onCreated?: (data: Project) => void;
-  onUpdated?: (data: Project) => void;
+  onCreated?: (data: ProjectSchema) => void;
+  onUpdated?: (data: ProjectSchema) => void;
   onDeleted?: () => void;
 }
 
@@ -22,16 +23,17 @@ export default function useProjectList(
 ) {
   const swrKey = getProjectEndpoint({ isMe });
 
-  const { mutate, data, ...swr } = useSWR<Project[]>(swrKey);
+  const { mutate, data, ...swr } = useSWR<ProjectSchema[]>(swrKey);
 
   const sortedData =
     data &&
-    data.map((project) => {
-      return {
-        ...project,
-        milestones: sortMilestones(project.milestones),
-      };
-    });
+    data.map((project) => ({
+      ...project,
+      milestones: sortMilestones(project.milestones).map((milestone) => ({
+        ...milestone,
+        tasks: sortTasks(milestone.tasks),
+      })),
+    }));
 
   const mutations = useProject({
     mutateKey: swrKey,
@@ -40,7 +42,7 @@ export default function useProjectList(
     onDeleted,
   });
 
-  const handleMutate = (updateData: UpdateProjectMilestoneRequest) => {
+  const handleMilestones = (updateData: UpdateProjectMilestoneRequest) => {
     const updatedData = sortedData?.map((project) => {
       if (project.id !== updateData.projectId) {
         return project;
@@ -61,7 +63,39 @@ export default function useProjectList(
 
   const milestoneMutations = useProjectMilestone({
     mutateKey: swrKey,
-    mutate: handleMutate,
+    mutate: handleMilestones,
+  });
+
+  const handleTasks = (updateData: UpdateProjectTaskRequest) => {
+    const updatedData = sortedData?.map((project) => {
+      if (project.id !== updateData.projectId) {
+        return project;
+      }
+
+      const updatedMilestones = project.milestones.map((milestone) => {
+        if (milestone.id !== updateData.milestoneId) {
+          return milestone;
+        }
+
+        const updatedTasks = milestone.tasks.map((task) => {
+          if (task.id !== updateData.id) {
+            return task;
+          }
+
+          return { ...task, ...updateData };
+        });
+
+        return { ...milestone, tasks: updatedTasks };
+      });
+
+      return { ...project, milestones: updatedMilestones };
+    });
+    mutate(updatedData);
+  };
+
+  const taskMutations = useProjectTask({
+    mutateKey: swrKey,
+    mutate: handleTasks,
   });
 
   return {
@@ -70,5 +104,6 @@ export default function useProjectList(
     data: sortedData,
     mutate,
     milestoneMutations,
+    taskMutations,
   };
 }

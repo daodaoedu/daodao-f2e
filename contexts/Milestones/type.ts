@@ -5,6 +5,7 @@ export interface Task {
   daysOfWeek: string[],
   isCompleted: boolean,
   milestoneId: number,
+  position: number,
 }
 
 export const DEFAULT_TASK: Task = {
@@ -13,7 +14,8 @@ export const DEFAULT_TASK: Task = {
   description: "",
   daysOfWeek: [],
   isCompleted: false,
-  milestoneId: 0
+  milestoneId: 0,
+  position: 1000,
 };
 
 export interface Milestone {

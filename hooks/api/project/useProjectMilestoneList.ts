@@ -1,12 +1,15 @@
 import useSWR from 'swr';
 import {
+  getMilestone,
   getProjectMilestoneEndpoint,
   ProjectMilestoneSchema,
   sortMilestones,
   UpdateProjectMilestoneRequest,
 } from '@/services/project/milestone';
+import { getTask, UpdateProjectTaskRequest } from '@/services/project/tasks';
 
 import useProjectMilestone from './useProjectMilestone';
+import useProjectTask from './useProjectTask';
 
 interface UseProjectMilestoneListOptions {
   onCreated?: () => void;
@@ -24,21 +27,64 @@ export default function useProjectMilestoneList(
 
   const sortedData = data && sortMilestones(data);
 
-  const handleMutate = (updateData: UpdateProjectMilestoneRequest) => {
-    const updatedData = sortedData?.map((milestone) => {
-      if (milestone.id !== updateData.id) {
-        return milestone;
-      }
+  const handleMilestones = (updateData: UpdateProjectMilestoneRequest) => {
+    const milestone = getMilestone(sortedData, updateData.id);
 
-      return { ...milestone, ...updateData };
-    });
+    if (!milestone) return;
+
+    const updatedMilestone = {
+      ...milestone.item,
+      ...updateData,
+    };
+    const updatedData = [
+      ...milestone.list.slice(0, milestone.index),
+      updatedMilestone,
+      ...milestone.list.slice(milestone.index + 1),
+    ];
+
     mutate(updatedData);
   };
 
   const mutations = useProjectMilestone({
     mutateKey: swrKey,
-    mutate: handleMutate,
+    mutate: handleMilestones,
     ...options,
+  });
+
+  const handleTasks = (updateData: UpdateProjectTaskRequest) => {
+    const milestone = getMilestone(sortedData, updateData.milestoneId);
+
+    if (!milestone) return;
+
+    const task = getTask(milestone.item.tasks, updateData.id);
+
+    if (!task) return;
+
+    const updatedTask = {
+      ...task.item,
+      ...updateData,
+    };
+    const updatedTasks = [
+      ...milestone.item.tasks.slice(0, task.index),
+      updatedTask,
+      ...milestone.item.tasks.slice(task.index + 1),
+    ];
+    const updatedMilestone = {
+      ...milestone.item,
+      tasks: updatedTasks,
+    };
+    const updatedData = [
+      ...milestone.list.slice(0, milestone.index),
+      updatedMilestone,
+      ...milestone.list.slice(milestone.index + 1),
+    ];
+
+    mutate(updatedData);
+  };
+
+  const taskMutations = useProjectTask({
+    mutateKey: swrKey,
+    mutate: handleTasks,
   });
 
   return {
@@ -46,5 +92,6 @@ export default function useProjectMilestoneList(
     ...swr,
     data: sortedData,
     mutate,
+    taskMutations,
   };
 }
