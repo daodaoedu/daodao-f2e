@@ -3,7 +3,7 @@ import { cn } from '@/utils/cn';
 import useClickOutside from '@/hooks/useClickOutside';
 import Button, { ButtonProps } from './Button';
 
-interface DropdownProps {
+interface DropdownContentProps {
   as?: React.ElementType;
   children: React.ReactNode;
   disableAutoClose?: boolean;
@@ -13,14 +13,14 @@ function DropdownContent({
   as: Component = 'div',
   children,
   disableAutoClose = false,
-}: DropdownProps) {
-  const [state, setState] = useToggle();
-  const { ref } = useClickOutside({ setState });
+}: DropdownContentProps) {
+  const { isOpen, setIsOpen } = useToggle();
+  const { ref } = useClickOutside({ setState: setIsOpen });
 
   const handleClick = () => {
     if (disableAutoClose) return;
-    if (!state) return;
-    setState(false);
+    if (!isOpen) return;
+    setIsOpen(false);
   };
 
   return (
@@ -30,17 +30,22 @@ function DropdownContent({
   );
 }
 
-function Dropdown({ as, children, disableAutoClose }: DropdownProps) {
+interface DropdownProps extends Omit<DropdownContentProps, 'disableAutoClose'> {
+  isOpen?: boolean;
+  onChange?: (isEnabled: boolean) => void;
+}
+
+function Dropdown({ as, children, isOpen, onChange }: DropdownProps) {
   return (
-    <ToggleProvider>
-      <DropdownContent as={as} disableAutoClose={disableAutoClose}>
+    <ToggleProvider isEnabled={isOpen} onChange={onChange}>
+      <DropdownContent as={as} disableAutoClose={!!onChange}>
         {children}
       </DropdownContent>
     </ToggleProvider>
   );
 }
 
-interface DropdownToggleProps extends ButtonProps {
+interface DropdownToggleProps extends Omit<ButtonProps, 'as'> {
   className?: string;
   children?: React.ReactNode;
   withIcon?: boolean;
@@ -53,17 +58,20 @@ function Toggle({
   onClick,
   ...props
 }: DropdownToggleProps) {
-  const [isOpen, setIsOpen] = useToggle({
+  const { isOpen, setIsOpen, setTriggerDom } = useToggle({
     errorMessage: 'Dropdown.Toggle must be used within an Dropdown',
   });
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (
+    e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
+  ) => {
     setIsOpen(!isOpen);
-    onClick?.(e);
+    onClick?.(e as React.MouseEvent<HTMLButtonElement>);
   };
 
   return (
     <Button
+      ref={(el) => setTriggerDom(el)}
       className={cn('flex items-center', withIcon && 'pl-6 pr-4', className)}
       aria-pressed={isOpen}
       onClick={handleClick}
@@ -90,17 +98,21 @@ interface DropdownListProps {
 }
 
 function List({ children, className }: DropdownListProps) {
-  const [isOpen] = useToggle({
+  const { isOpen, anchorPoint, setWrapperDom } = useToggle({
     errorMessage: 'Dropdown.List must be used within an Dropdown',
   });
+  const isOnTop = anchorPoint?.top;
 
   return (
     <ul
+      ref={(el) => setWrapperDom(el)}
       className={cn(
-        'group absolute p-2 rounded-lg shadow-lg bg-white transition-[transform,opacity] origin-top',
+        'group fixed p-2 z-30 rounded-lg shadow-lg bg-white transition-[transform,opacity]',
         className,
+        isOnTop ? 'origin-top' : 'origin-bottom',
         isOpen ? 'opacity-100 scale-y-100' : 'opacity-30 scale-y-0'
       )}
+      style={anchorPoint}
       aria-hidden={!isOpen}
     >
       {children}

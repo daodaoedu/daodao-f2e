@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { forwardRef, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
@@ -93,23 +93,26 @@ export interface ButtonProps<AS extends 'button' | 'link' = 'button'>
   ) => void;
 }
 
-function Button<AS extends 'button' | 'link' = 'button'>({
-  as,
-  children,
-  className,
-  variant,
-  color,
-  size = ButtonSizeEnum.Medium,
-  animation = ButtonAnimationEnum.Ripple,
-  isDisabled = false,
-  isSubmit,
-  onClick,
-  prefixIcon,
-  suffixIcon,
-  href,
-  checkLogin = false,
-  ...nativeButtonProps
-}: ButtonProps<AS>) {
+function Button<AS extends 'button' | 'link' = 'button'>(
+  {
+    as,
+    children,
+    className,
+    variant,
+    color,
+    size = ButtonSizeEnum.Medium,
+    animation = ButtonAnimationEnum.Ripple,
+    isDisabled = false,
+    isSubmit,
+    onClick,
+    prefixIcon,
+    suffixIcon,
+    href,
+    checkLogin = false,
+    ...nativeButtonProps
+  }: ButtonProps<AS>,
+  ref: React.Ref<HTMLButtonElement>
+) {
   const { isLoggedIn } = useAuth();
   const { openLoginModal } = useAuthDispatch();
   const rippleRef = useRef<HTMLDivElement>(null);
@@ -214,6 +217,7 @@ function Button<AS extends 'button' | 'link' = 'button'>({
 
   return (
     <button
+      ref={ref}
       type={isSubmit ? 'submit' : 'button'}
       disabled={isDisabled}
       {...sharedProps}
@@ -224,4 +228,4 @@ function Button<AS extends 'button' | 'link' = 'button'>({
   );
 }
 
-export default Button;
+export default forwardRef(Button);

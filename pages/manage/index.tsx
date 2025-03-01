@@ -121,7 +121,7 @@ const Header = () => {
         >
           新增
         </Dropdown.Toggle>
-        <Dropdown.List className="top-full right-0 z-20">
+        <Dropdown.List className="z-20">
           {dropdownItems.map(({ label, actions }) => (
             <Dropdown.Item
               key={label}
@@ -311,7 +311,7 @@ const Main = ({ date }: { date: Dayjs }) => {
             >
               {Array.isArray(project?.milestones) &&
                 project.milestones.map((milestone) => (
-                  <div className="mb-2 last-of-type:mb-0">
+                  <div key={milestone.id} className="mb-2 last-of-type:mb-0">
                     <MilestoneItem
                       key={milestone.id}
                       milestone={milestone}

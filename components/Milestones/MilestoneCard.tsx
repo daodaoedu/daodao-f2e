@@ -66,7 +66,7 @@ function MilestoneCard(
   const [isEditing, setIsEditing] = useState(defaultEditing);
   const [isLoading, setIsLoading] = useState(false);
   const preEditingStateRef = useRef(!isEditing);
-console.log(milestones);
+
   const index = useMemo(
     () =>
       Array.isArray(milestones)

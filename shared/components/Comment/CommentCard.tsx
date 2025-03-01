@@ -111,7 +111,7 @@ function CommentCard({
             <Dropdown.Toggle className="-m-2 p-2">
               <AiOutlineMore />
             </Dropdown.Toggle>
-            <Dropdown.List className="top-full right-0 z-20 p-1">
+            <Dropdown.List className="z-20 p-1">
               {actions.map(
                 (action) =>
                   action && (
