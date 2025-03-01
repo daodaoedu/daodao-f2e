@@ -1,5 +1,4 @@
-import dayjs from 'dayjs';
-import getPublicProjectLayout from '@/layout/PublicProjectLayout';
+import getAdminProjectLayout from '@/layout/AdminProjectLayout';
 import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@mui/material';
 import useProjectMilestoneList from '@/hooks/api/project/useProjectMilestoneList';
@@ -38,12 +37,11 @@ const ProjectMilestonesPage = () => {
           {projectId && Array.isArray(milestones) && milestones.length > 0 ? (
             milestones
               .sort((a, b) => {
-                return dayjs(a.startDate).diff(dayjs(b.startDate));
+                return a.week - b.week;
               })
-              .map((milestone, index) => {
+              .map((milestone) => {
                 return (
                   <MilestoneItemView
-                    index={index}
                     milestone={milestone}
                     key={milestone.id}
                   />
@@ -59,7 +57,7 @@ const ProjectMilestonesPage = () => {
   );
 };
 ProjectMilestonesPage.getLayout = (page: React.ReactElement) =>
-  getPublicProjectLayout(
+  getAdminProjectLayout(
     <MilestonesProvider>{page}</MilestonesProvider>
   );
 export default ProjectMilestonesPage;

@@ -3,13 +3,14 @@ import ProjectCard from '@/components/Projects/ProjectList/ProjectCard';
 
 interface ProjectListProps {
   projects: ProjectType[];
+  path: string;
 }
 
-const ProjectList = ({ projects }: ProjectListProps) => {
+const ProjectList = ({ projects, path }: ProjectListProps) => {
   return (
     projects.map((project) => {
       return (
-        <ProjectCard project={project} key={project.id} />
+        <ProjectCard project={project} key={project.id} path={path} />
       );
     })
   );

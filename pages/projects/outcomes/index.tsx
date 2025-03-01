@@ -1,22 +1,17 @@
 import { useSearchParams } from 'next/navigation';
-import NoteCard from '@/components/Note/Card';
+import OutcomeCard from '@/components/Outcome/Card';
 import getPublicProjectLayout from '@/layout/PublicProjectLayout';
 import {
-  useProjectNoteList,
+  useProjectOutcomeList,
 } from '@/hooks/api/project';
-import { z } from 'zod';
 
-const NotesPage = () => {
+const OutcomesPage = () => {
   const searchParams = useSearchParams();
-  const projectIdParam = searchParams.get('id');
-  const projectId =
-    projectIdParam && z.string().uuid().safeParse(projectIdParam).success
-      ? projectIdParam
-      : undefined;
+  const projectId = searchParams.get('id') ?? undefined;
 
   const {
-    data: notes,
-  } = useProjectNoteList(projectId);
+    data: outcomes,
+  } = useProjectOutcomeList(projectId);
 
   if (!projectId) {
     return <div>專案不存在</div>;
@@ -25,15 +20,15 @@ const NotesPage = () => {
   return (
     <>
       <ul className="px-4 bg-basic-white flex flex-col rounded-2xl">
-        {notes?.map((note) => (
+        {outcomes?.map((outcome) => (
           <li
-            key={note.id}
+            key={outcome.id}
             className="py-6 border-b last:border-b-0 border-solid border-basic-200"
           >
-            <NoteCard
-              data={note}
+            <OutcomeCard
+              data={outcome}
               className="p-3 transition-shadow hover:shadow-basic-200/40 hover:shadow-lg"
-              detailLink={`/projects/notes/detail?id=${projectId}&noteId=${note.id}`}
+              detailLink={`/projects/outcomes/detail?id=${projectId}&outcomeId=${outcome.id}`}
             />
           </li>
         ))}
@@ -42,6 +37,6 @@ const NotesPage = () => {
   );
 };
 
-NotesPage.getLayout = getPublicProjectLayout;
+OutcomesPage.getLayout = getPublicProjectLayout;
 
-export default NotesPage;
+export default OutcomesPage;

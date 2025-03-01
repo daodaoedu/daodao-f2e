@@ -6,12 +6,15 @@ import ProjectHeader from './ProjectHeader';
 
 interface ProjectCardProps {
   project: ProjectType;
+  path: string;
 }
 
-const ProjectCard = ({ project }: ProjectCardProps) => {
+const ProjectCard = ({ project, path }: ProjectCardProps) => {
+  const pathroute = path === '/admin' ? '/admin/projects/detail' : '/projects/detail';
+
   return (
     <Link
-      href={`/projects/detail?projectId=${project.id}`}
+      href={`${pathroute}?id=${project.id}`}
       className={cn(
         "p-4 md:py-8 md:px-10 flex flex-col gap-5 justify-start items-start",
         "border-[#EDF0F7] border-solid border-b-[1px]"
