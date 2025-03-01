@@ -324,15 +324,17 @@ const Main = ({ date }: { date: Dayjs }) => {
               href={`/manage/project?id=${project.id}`}
               defaultOpen={index === 0}
             >
-              {project.milestones.map((milestone) => (
-                <MilestoneItem
-                  key={milestone.id}
-                  milestone={milestone}
-                  isLgScreen={false}
-                  projectId={project.id}
-                  onRefreshData={mutate}
-                />
-              ))}
+              {Array.isArray(project?.milestones) &&
+                project.milestones.map((milestone) => (
+                  <MilestoneItem
+                    key={milestone.id}
+                    milestone={milestone}
+                    milestones={project.milestones}
+                    projectId={project.id}
+                    onRefreshData={mutate}
+                    isEditable
+                  />
+                ))}
             </Project>
           </li>
         ))}

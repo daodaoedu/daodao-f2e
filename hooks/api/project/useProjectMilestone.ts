@@ -1,4 +1,4 @@
-import useSWR from 'swr';
+import useSWR, { KeyedMutator } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import {
   CreateProjectMilestoneRequest,
@@ -13,7 +13,9 @@ import {
 interface UseProjectMilestoneOptions {
   projectId?: string;
   milestoneId?: number;
+  list?: ProjectMilestoneSchema[];
   mutateKey?: string | null;
+  mutate?: KeyedMutator<ProjectMilestoneSchema[]>;
   onCreated?: () => void;
   onUpdated?: () => void;
   onDeleted?: () => void;
@@ -22,7 +24,9 @@ interface UseProjectMilestoneOptions {
 export default function useProjectMilestone({
   projectId,
   milestoneId,
+  list,
   mutateKey,
+  mutate,
   onCreated,
   onUpdated,
   onDeleted,
@@ -43,8 +47,30 @@ export default function useProjectMilestone({
 
   const update = useSWRMutation(
     swrKey ?? mutateKey,
-    (url, { arg }: { arg: UpdateProjectMilestoneRequest }) =>
-      updateProjectMilestone(arg),
+    async (url, { arg }: { arg: UpdateProjectMilestoneRequest }) => {
+      await updateProjectMilestone(arg);
+
+      if (!Array.isArray(list)) return;
+
+      const targetMilestoneIndex = list.findIndex(
+        (milestone) => milestone.id === arg.id
+      );
+
+      if (targetMilestoneIndex === -1) return;
+
+      mutate?.(
+        list.map((milestone, index) => {
+          if (index === targetMilestoneIndex) {
+            return {
+              ...milestone,
+              ...arg,
+            };
+          }
+
+          return milestone;
+        })
+      );
+    },
     { onSuccess: onUpdated }
   );
 

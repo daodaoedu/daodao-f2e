@@ -1,32 +1,47 @@
 import { useState } from 'react';
-import { Milestone as MilestoneType } from '@/contexts/Milestones/type';
+import dayjs from 'dayjs';
+import { CreateProjectMilestoneRequest, ProjectMilestoneSchema, UpdateProjectMilestoneRequest } from '@/services/project/milestone';
 import TaskList from '@/components/Tasks/TaskList';
-import Milestone from './Milestone';
+import MilestoneCard from './MilestoneCard';
 import TaskCreate from '../Tasks/Create';
 import TaskAdd from '../Tasks/Add';
 
 interface MilestoneItemProps {
-  milestone: MilestoneType;
-  isLgScreen: boolean;
   projectId: string;
+  startDate?: dayjs.Dayjs;
+  endDate?: dayjs.Dayjs;
+  isEditable?: boolean;
+  milestone: ProjectMilestoneSchema;
+  milestones: ProjectMilestoneSchema[];
+  onCreate?: (request: CreateProjectMilestoneRequest) => Promise<void>;
+  onUpdate?: (request: UpdateProjectMilestoneRequest) => Promise<void>;
   onRefreshData?: () => void;
 }
 
 const MilestoneItem = ({
-  milestone,
-  isLgScreen,
   projectId,
+  startDate,
+  endDate,
+  isEditable,
+  milestone,
+  milestones,
+  onCreate,
+  onUpdate,
   onRefreshData,
 }: MilestoneItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
     <div className="p-2.5 bg-basic-100 flex flex-col gap-2">
-      <Milestone
+      <MilestoneCard
         projectId={projectId}
         milestone={milestone}
-        isLgScreen={isLgScreen}
-        onRefreshData={onRefreshData}
+        milestones={milestones}
+        startDate={startDate}
+        endDate={endDate}
+        isEditable={isEditable}
+        onCreate={onCreate}
+        onUpdate={onUpdate}
       />
       <TaskList
         tasks={milestone.tasks || []}

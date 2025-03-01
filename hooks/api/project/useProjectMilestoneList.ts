@@ -18,16 +18,19 @@ export default function useProjectMilestoneList(
 ) {
   const swrKey = projectId ? getProjectMilestoneEndpoint({ projectId }) : null;
 
-  const { mutate, ...swr } = useSWR<ProjectMilestoneSchema[]>(swrKey);
+  const { mutate, data, ...swr } = useSWR<ProjectMilestoneSchema[]>(swrKey);
 
   const mutations = useProjectMilestone({
     mutateKey: swrKey,
+    mutate,
+    list: data,
     ...options,
   });
 
   return {
     ...mutations,
     ...swr,
+    data,
     mutate,
   };
 }

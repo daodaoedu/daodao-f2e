@@ -41,6 +41,7 @@ export const projectSchema = z.object({
   /** 馬拉松用的 ID */
   eventId: z.string().optional(),
   user: baseUserSchema,
+  version: z.number(),
   milestones: z.array(projectMilestoneSchema),
 });
 
@@ -53,6 +54,7 @@ export const createProjectSchema = projectSchema.omit({
   eventId: true,
   user: true,
   milestones: true,
+  version: true,
 });
 
 export type CreateProjectRequest = z.infer<typeof createProjectSchema>;

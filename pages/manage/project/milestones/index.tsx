@@ -1,65 +1,53 @@
 import getProjectLayout from '@/layout/ProjectLayout';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
-import { Skeleton, useMediaQuery } from '@mui/material';
-import { Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
+import { Skeleton } from '@mui/material';
+import {
+  Panel,
+  Title,
+  ProgressBar,
+  sortMilestones,
+} from '@/components/Milestones/Shared';
 import { ProtectedComponent } from '@/contexts/Auth';
 import { useProject } from '@/contexts/Project';
 import { MilestonesProvider } from '@/contexts/Milestones/index';
-import MilestoneForm from '@/components/Milestones/MilestoneForm';
+import MilestoneCard, {
+  MilestoneFormRef,
+} from '@/components/Milestones/MilestoneCard';
 import MilestoneItem from '@/components/Milestones/MilestoneItem';
 import dayjs from 'dayjs';
 import DateRangePicker from '@/shared/components/DateRangePicker';
 import Button from '@/shared/components/Button';
 import useProjectMilestoneList from '@/hooks/api/project/useProjectMilestoneList';
 import { ProjectMilestoneSchema } from '@/services/project/milestone';
-import { cn } from '@/utils/cn';
+import CalendarIcon from '@/public/assets/icons/calendar.svg';
 
-const sortMilestones = (milestones: ProjectMilestoneSchema[]) => {
-  if (!Array.isArray(milestones)) return [];
-
-  return milestones.sort((a, b) => {
-    const startDiff = dayjs(a.startDate).diff(dayjs(b.startDate), 'd');
-    if (startDiff !== 0) return startDiff;
-    return dayjs(a.endDate).diff(dayjs(b.endDate), 'd');
-  });
+const SkeletonMilestones = () => {
+  return (
+    <>
+      <Skeleton
+        variant="rectangular"
+        width="100%"
+        height={120}
+        animation="wave"
+        className="mb-3"
+      />
+      <Skeleton
+        variant="rectangular"
+        width="100%"
+        height={300}
+        animation="wave"
+      />
+    </>
+  );
 };
 
-interface MilestonesContentProps {
-  SEOData: {
-    title: string;
-    description: string;
-    keywords: string;
-    author: string;
-    copyright: string;
-    imgLink: string;
-    link: string;
-  };
+interface MilestonesProgressProps {
+  milestones?: ProjectMilestoneSchema[];
 }
 
-const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
-  const [isCreating, setIsCreating] = useState(false);
-  const [startDate, setStartDate] = useState(dayjs().startOf('day'));
-  const [endDate, setEndDate] = useState(dayjs().startOf('day').add(30, 'day'));
-  const [isHideCompleted, setIsHideCompleted] = useState(false);
-  const [isAscending, setIsAscending] = useState(true);
-  const { project } = useProject();
-  const {
-    data: milestones,
-    isLoading,
-    isValidating,
-    create,
-    mutate,
-  } = useProjectMilestoneList(project.id, {
-    onCreated: () => {
-      setIsCreating(false);
-    },
-  });
-  const isLgScreen = useMediaQuery('(min-width: 767px)');
-  const projectId = project.id;
-  const isMarathonProject = !!project.eventId;
-
+const MilestonesProgress = ({ milestones = [] }: MilestonesProgressProps) => {
   const progressValue = useMemo(() => {
     if (!Array.isArray(milestones)) return 0;
 
@@ -68,23 +56,6 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
 
     if (allCount === 0) return 0;
     return Math.round((completedCount / allCount) * 100);
-  }, [milestones]);
-
-  const remainingTasksCount = useMemo(() => {
-    if (!Array.isArray(milestones)) return 0;
-
-    return milestones
-      .flatMap((milestone) => [...milestone.tasks])
-      .filter((task) => !task.isCompleted).length;
-  }, [milestones]);
-
-  const milestoneStartDate = useMemo(() => {
-    if (!Array.isArray(milestones)) return null;
-
-    return milestones.reduce<dayjs.Dayjs | null>(
-      (d, m) => (d && d.isBefore(dayjs(m.startDate)) ? d : dayjs(m.startDate)),
-      null
-    );
   }, [milestones]);
 
   const milestoneEndDate = useMemo(() => {
@@ -96,171 +67,221 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
     );
   }, [milestones]);
 
-  const milestoneEmptyDate = useMemo(() => {
-    if (!Array.isArray(milestones)) return dayjs().startOf('day');
-    const sortedData = sortMilestones(milestones);
-
-    if (sortedData.length === 0) {
-      return startDate;
-    }
-    if (sortedData.length === 1) {
-      return dayjs(sortedData[0].endDate).add(1, 'day');
-    }
-
-    let preEndDate = dayjs(sortedData[0].endDate);
-
-    for (let i = 1; i < sortedData.length; i += 1) {
-      const milestone = sortedData[i];
-      const currentStartDate = dayjs(milestone.startDate);
-
-      if (
-        currentStartDate.isAfter(preEndDate) &&
-        currentStartDate.diff(preEndDate, 'day') > 1
-      ) {
-        return preEndDate.add(1, 'day');
-      } else {
-        preEndDate = dayjs(milestone.endDate);
-      }
-    }
-    return endDate.add(1, 'day');
-  }, [startDate, endDate]);
-
   const daysRemaining = useMemo(() => {
     if (!milestoneEndDate || dayjs().isAfter(milestoneEndDate)) return 0;
 
     return milestoneEndDate.diff(dayjs(), 'day');
   }, [milestoneEndDate]);
 
+  const remainingMilestonesCount = useMemo(() => {
+    if (!Array.isArray(milestones)) return 0;
+
+    return milestones.filter((m) => !m.isCompleted).length;
+  }, [milestones]);
+
+  const remainingTasksCount = useMemo(() => {
+    if (!Array.isArray(milestones)) return 0;
+
+    return milestones
+      .flatMap((milestone) => [...milestone.tasks])
+      .filter((task) => !task.isCompleted).length;
+  }, [milestones]);
+
+  return (
+    <Panel className="bg-white mb-6 md:py-6 flex flex-col gap-3 md:gap-5">
+      <Title title="學習里程碑進度" className="mb-0" />
+      {Array.isArray(milestones) && milestones.length > 0 ? (
+        <>
+          <ProgressBar progress={progressValue} />
+          <p className="font-sans text-sm md:text-base text-basic-300">
+            {remainingMilestonesCount === 0 ? (
+              <span>恭喜你完成所有學習里程碑！</span>
+            ) : (
+              <span>
+                還剩 {daysRemaining} 天可以完成剩下的
+                {remainingTasksCount ? (
+                  <span> {remainingTasksCount} 個任務</span>
+                ) : (
+                  <span> {remainingMilestonesCount} 個里程碑</span>
+                )}
+              </span>
+            )}
+          </p>
+        </>
+      ) : (
+        <p className="font-sans text-sm md:text-base text-basic-300">
+          趕快新增學習里程碑吧！
+        </p>
+      )}
+    </Panel>
+  );
+};
+
+enum FilterEnum {
+  All = 'all',
+  Completed = 'completed',
+  Incomplete = 'incomplete',
+}
+
+const filterItems = [
+  {
+    label: '全部',
+    value: FilterEnum.All,
+    fn: () => true,
+  },
+  {
+    label: '未完成',
+    value: FilterEnum.Incomplete,
+    fn: (milestone: ProjectMilestoneSchema) => !milestone.isCompleted,
+  },
+  {
+    label: '已完成',
+    value: FilterEnum.Completed,
+    fn: (milestone: ProjectMilestoneSchema) => milestone.isCompleted,
+  },
+];
+
+const useHandleShowForm = () => {
+  const [isCreating, setIsCreating] = useState(false);
+  const formRef = useRef<MilestoneFormRef>(null);
+
+  const handleOpen = () => {
+    setIsCreating(true);
+    formRef.current?.focus();
+  };
+
+  const handleClose = () => {
+    setIsCreating(false);
+  };
+
+  return { formRef, isCreating, handleOpen, handleClose };
+};
+
+const MilestonesContent = () => {
+  const { formRef, isCreating, handleOpen, handleClose } = useHandleShowForm();
+  const [startDate, setStartDate] = useState(dayjs().startOf('day'));
+  const [endDate, setEndDate] = useState(dayjs().startOf('day').add(30, 'day'));
+  const [filterType, setFilterType] = useState(FilterEnum.All);
+  const [isAscending, setIsAscending] = useState(true);
+  const { project } = useProject();
+  const {
+    data: milestones,
+    isLoading,
+    create,
+    update,
+  } = useProjectMilestoneList(project.id);
+
+  const projectId = project.id;
+  const isMarathonProject = !!project.eventId;
+
   const sortedMilestones = useMemo(() => {
     if (!Array.isArray(milestones)) return [];
 
-    const sortedData = sortMilestones(
-      milestones.filter((m) => (isHideCompleted ? !m.isCompleted : true))
-    );
+    const filterFn =
+      filterItems.find((item) => item.value === filterType)?.fn ?? (() => true);
+
+    const sortedData = sortMilestones(milestones.filter(filterFn));
 
     return isAscending ? sortedData : [...sortedData].reverse();
-  }, [milestones, isAscending, isHideCompleted]);
-
-  const defaultCreateMilestone = useMemo(
-    () => ({
-      name: '',
-      description: '',
-      isCompleted: false,
-      projectId: project.id,
-      startDate: milestoneEmptyDate.format('YYYY/MM/DD'),
-      endDate: milestoneEmptyDate
-        .add(1, 'day')
-        .endOf('week')
-        .format('YYYY/MM/DD'),
-      week: milestoneStartDate
-        ? milestoneEmptyDate.diff(milestoneStartDate, 'week') + 1
-        : 1,
-    }),
-    [project.id, milestoneStartDate, milestoneEmptyDate]
-  );
+  }, [milestones, isAscending, filterType]);
 
   return (
     <div>
-      <SEOConfig data={SEOData} />
       {isLoading ? (
-        <>
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={120}
-            animation="wave"
-            className="mb-3"
-          />
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={300}
-            animation="wave"
-          />
-        </>
+        <SkeletonMilestones />
       ) : (
         <>
-          <Panel className="bg-white mb-6 md:py-6 flex flex-col gap-3 md:gap-5">
-            <Title title="學習里程碑進度" className="mb-0" />
-            {sortedMilestones.length === 0 ? (
-              <p className="font-sans text-sm md:text-base text-basic-300">
-                趕快新增學習里程碑吧！
-              </p>
-            ) : (
-              <>
-                <ProgressBar progress={progressValue} />
-                <p className="font-sans text-sm md:text-base text-basic-300">
-                  還剩 {daysRemaining} 天可以完成剩下的 {remainingTasksCount}{' '}
-                  個任務，加油！
-                </p>
-              </>
-            )}
-          </Panel>
+          <MilestonesProgress milestones={milestones} />
           <Panel className="bg-white">
             <Title title="學習里程碑 *" />
-            {!isMarathonProject && (
-              <div className="flex justify-between items-center gap-2 pb-2.5">
-                <div className="flex items-center gap-2">
-                  <p>時間設定：</p>
-                  <DateRangePicker
-                    startDate={milestoneStartDate ?? startDate}
-                    endDate={endDate}
-                    disabledStartDate={!!milestoneStartDate}
-                    minDate={dayjs().startOf('day')}
-                    onStartDateChange={setStartDate}
-                    onEndDateChange={setEndDate}
-                  />
+            {project && !isMarathonProject && (
+              <>
+                {!isMarathonProject && (
+                  <div className="flex justify-between items-center gap-2 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <p>時間設定：</p>
+                      <DateRangePicker
+                        startDate={startDate}
+                        endDate={endDate}
+                        disabledStartDate={project.version === 2}
+                        afterIcon={
+                          <CalendarIcon className="w-4 h-4 text-primary-base" />
+                        }
+                        minDate={dayjs().startOf('day')}
+                        maxDate={dayjs().add(1, 'year')}
+                        onStartDateChange={setStartDate}
+                        onEndDateChange={setEndDate}
+                      />
+                    </div>
+                    <Button
+                      variant="solid"
+                      color="primary"
+                      onClick={handleOpen}
+                    >
+                      新增學習里程碑
+                    </Button>
+                  </div>
+                )}
+                <div className="flex justify-between gap-2 pb-2.5">
+                  <div>
+                    顯示：
+                    {filterItems.map((item) => (
+                      <Button
+                        key={item.value}
+                        variant={
+                          filterType === item.value ? 'solid' : 'outline'
+                        }
+                        color={filterType === item.value ? 'primary' : 'white'}
+                        className="rounded-lg px-2.5 mr-2"
+                        onClick={() => setFilterType(item.value)}
+                      >
+                        {item.label}
+                      </Button>
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="rounded-lg px-2.5"
+                    onClick={() => setIsAscending(!isAscending)}
+                  >
+                    {isAscending ? '舊到新' : '新到舊'}
+                  </Button>
                 </div>
-                <Button
-                  variant="solid"
-                  color="primary"
-                  onClick={() => setIsCreating(true)}
-                >
-                  新增學習里程碑
-                </Button>
-              </div>
+              </>
             )}
-            <div className="flex justify-end gap-2 pb-2.5">
-              <Button
-                variant="outline"
-                color="primary"
-                onClick={() => setIsHideCompleted(!isHideCompleted)}
-              >
-                {isHideCompleted ? '顯示所有任務' : '隱藏已完成任務'}
-              </Button>
-              <Button
-                variant="outline"
-                color="primary"
-                onClick={() => setIsAscending(!isAscending)}
-              >
-                {isAscending ? '舊到新' : '新到舊'}
-              </Button>
-            </div>
-            <div
-              className={cn(
-                'flex flex-col gap-3 transition-opacity',
-                isValidating && 'opacity-50'
-              )}
-            >
-              {isCreating && (
+            <div className="flex flex-col gap-3 transition-opacity">
+              {isCreating && Array.isArray(milestones) && (
                 <div className="p-2.5 bg-basic-100 flex flex-col gap-2">
-                  <MilestoneForm
-                    milestone={defaultCreateMilestone}
+                  <MilestoneCard
+                    ref={formRef}
+                    startDate={startDate}
+                    endDate={endDate}
+                    projectId={projectId}
                     disabledChangeDate={isMarathonProject}
-                    onCancel={() => setIsCreating(false)}
-                    onSubmit={create.trigger}
+                    milestones={milestones}
+                    isEditable
+                    defaultEditing
+                    onCancel={handleClose}
+                    onCreate={async (request) => {
+                      await create.trigger(request);
+                      handleClose();
+                    }}
                   />
                 </div>
               )}
-              {sortedMilestones.map((milestone) => (
-                <MilestoneItem
-                  key={milestone.id}
-                  milestone={milestone}
-                  isLgScreen={isLgScreen}
-                  projectId={projectId}
-                  onRefreshData={mutate}
-                />
-              ))}
+              {Array.isArray(milestones) &&
+                sortedMilestones.map((milestone) => (
+                  <MilestoneItem
+                    key={milestone.id}
+                    milestone={milestone}
+                    milestones={milestones}
+                    projectId={projectId}
+                    startDate={startDate}
+                    endDate={endDate}
+                    isEditable
+                    onUpdate={update.trigger}
+                  />
+                ))}
             </div>
           </Panel>
         </>
@@ -268,6 +289,7 @@ const MilestonesContent = ({ SEOData }: MilestonesContentProps) => {
     </div>
   );
 };
+
 const MilestonesPage = () => {
   const router = useRouter();
   const SEOData = useMemo(
@@ -305,12 +327,13 @@ const MilestonesPage = () => {
   return (
     <ProtectedComponent>
       <MilestonesProvider>
-        <MilestonesContent SEOData={SEOData} />
+        <SEOConfig data={SEOData} />
+        <MilestonesContent />
       </MilestonesProvider>
     </ProtectedComponent>
   );
 };
 
-MilestonesPage.getLayout = (page: React.ReactElement) => getProjectLayout(page);
+MilestonesPage.getLayout = getProjectLayout;
 
 export default MilestonesPage;

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import getPublicProjectLayout from '@/layout/PublicProjectLayout';
 import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@mui/material';
@@ -37,11 +38,12 @@ const ProjectMilestonesPage = () => {
           {projectId && Array.isArray(milestones) && milestones.length > 0 ? (
             milestones
               .sort((a, b) => {
-                return a.week - b.week;
+                return dayjs(a.startDate).diff(dayjs(b.startDate));
               })
-              .map((milestone) => {
+              .map((milestone, index) => {
                 return (
                   <MilestoneItemView
+                    index={index}
                     milestone={milestone}
                     key={milestone.id}
                   />

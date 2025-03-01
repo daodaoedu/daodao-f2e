@@ -1,5 +1,7 @@
+import dayjs from "dayjs";
 import z from "zod";
 import { cn } from "@/utils/cn";
+import { CreateProjectMilestoneRequest, ProjectMilestoneSchema } from "@/services/project/milestone";
 
 const idSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 
@@ -82,4 +84,78 @@ export const ProgressBar = ({ progress }: ProgressBarProps) => {
       <span className="font-sans text-sm ml-3 text-basic-300">{progress}%</span>
     </div>
   );
+};
+
+export const sortMilestones = (milestones: ProjectMilestoneSchema[]) => {
+  if (!Array.isArray(milestones)) return [];
+
+  return milestones.sort((a, b) => {
+    const startDiff = dayjs(a.startDate).diff(dayjs(b.startDate), 'd');
+    if (startDiff !== 0) return startDiff;
+    if (a.position !== b.position) return a.position - b.position;
+    return dayjs(a.endDate).diff(dayjs(b.endDate), 'd');
+  });
+};
+
+interface GetDefaultMilestoneProps {
+  projectId: string;
+  milestones: ProjectMilestoneSchema[];
+  startDate: dayjs.Dayjs;
+  endDate: dayjs.Dayjs;
+}
+
+export const getDefaultMilestone = ({
+  projectId,
+  milestones,
+  startDate,
+  endDate,
+}: GetDefaultMilestoneProps): CreateProjectMilestoneRequest => {
+  const sortedData = sortMilestones(milestones);
+
+  const calcMilestoneEmptyDate = () => {
+    if (sortedData.length === 0) {
+      return startDate;
+    }
+    if (sortedData.length === 1) {
+      return dayjs(sortedData[0].endDate).add(1, 'day');
+    }
+
+    let preEndDate = dayjs(sortedData[0].endDate);
+    let result = preEndDate.add(1, 'day');
+
+    for (let i = 1; i < sortedData.length; i += 1) {
+      const milestone = sortedData[i];
+      const currentStartDate = dayjs(milestone.startDate);
+
+      if (
+        currentStartDate.isAfter(preEndDate) &&
+        currentStartDate.diff(preEndDate, 'day') > 1
+      ) {
+        result = preEndDate.add(1, 'day');
+        break;
+      } else {
+        preEndDate = dayjs(milestone.endDate);
+      }
+    }
+
+    if (result.isAfter(endDate)) {
+      return endDate;
+    }
+
+    return result;
+  };
+
+  const calcStartDate = calcMilestoneEmptyDate();
+  const targetEndDate = calcStartDate.add(1, 'day').endOf('week');
+  const calcEndDate = targetEndDate.isAfter(endDate) ? endDate : targetEndDate;
+
+  return {
+    name: '',
+    description: '',
+    isCompleted: false,
+    projectId,
+    startDate: calcStartDate.format('YYYY/MM/DD'),
+    endDate: calcEndDate.format('YYYY/MM/DD'),
+    position: 1000,
+  };
 };
