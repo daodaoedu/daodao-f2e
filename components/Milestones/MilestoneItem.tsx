@@ -32,7 +32,7 @@ const MilestoneItem = ({
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="p-2.5 bg-basic-100 flex flex-col gap-2">
+    <div className="p-2.5 bg-basic-100 rounded-xl flex flex-col gap-2">
       <MilestoneCard
         projectId={projectId}
         milestone={milestone}

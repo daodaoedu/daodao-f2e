@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import dayjs from 'dayjs';
 import { mutations } from '../httpClient';
 
 const projectEndpoint = '/projects';
@@ -48,6 +49,17 @@ export const projectMilestoneSchema = z.object({
 });
 
 export type ProjectMilestoneSchema = z.infer<typeof projectMilestoneSchema>;
+
+export const sortMilestones = (milestones: ProjectMilestoneSchema[]) => {
+  if (!Array.isArray(milestones)) return [];
+
+  return milestones.sort((a, b) => {
+    const startDiff = dayjs(a.startDate).diff(dayjs(b.startDate), 'd');
+    if (startDiff !== 0) return startDiff;
+    if (a.position !== b.position) return a.position - b.position;
+    return dayjs(a.endDate).diff(dayjs(b.endDate), 'd');
+  });
+};
 
 export const createProjectMilestoneSchema = projectMilestoneSchema.omit({
   id: true,

@@ -26,7 +26,7 @@ import {
   updateProjectMilestoneSchema,
 } from '@/services/project/milestone';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { getDefaultMilestone, sortMilestones } from './Shared';
+import { getDefaultMilestone } from './Shared';
 
 interface MilestoneCardProps {
   projectId: string;
@@ -66,14 +66,13 @@ function MilestoneCard(
   const [isEditing, setIsEditing] = useState(defaultEditing);
   const [isLoading, setIsLoading] = useState(false);
   const preEditingStateRef = useRef(!isEditing);
-  const sortedMilestones = useMemo(
-    () => sortMilestones(Array.isArray(milestones) ? milestones : []),
-    [milestones]
-  );
-
+console.log(milestones);
   const index = useMemo(
-    () => sortedMilestones.findIndex((m) => m.id === milestone.id),
-    [sortedMilestones, milestone.id]
+    () =>
+      Array.isArray(milestones)
+        ? milestones.findIndex((m) => m.id === milestone.id)
+        : -1,
+    [milestones, milestone.id]
   );
 
   const schema = milestone.id

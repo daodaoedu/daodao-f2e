@@ -3,12 +3,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
 import { Skeleton } from '@mui/material';
-import {
-  Panel,
-  Title,
-  ProgressBar,
-  sortMilestones,
-} from '@/components/Milestones/Shared';
+import { Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
 import { ProtectedComponent } from '@/contexts/Auth';
 import { useProject } from '@/contexts/Project';
 import { MilestonesProvider } from '@/contexts/Milestones/index';
@@ -180,7 +175,7 @@ const MilestonesContent = () => {
     const filterFn =
       filterItems.find((item) => item.value === filterType)?.fn ?? (() => true);
 
-    const sortedData = sortMilestones(milestones.filter(filterFn));
+    const sortedData = milestones.filter(filterFn);
 
     return isAscending ? sortedData : [...sortedData].reverse();
   }, [milestones, isAscending, filterType]);

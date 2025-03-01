@@ -2,6 +2,8 @@ import useSWR from 'swr';
 import {
   getProjectMilestoneEndpoint,
   ProjectMilestoneSchema,
+  sortMilestones,
+  UpdateProjectMilestoneRequest,
 } from '@/services/project/milestone';
 
 import useProjectMilestone from './useProjectMilestone';
@@ -20,17 +22,29 @@ export default function useProjectMilestoneList(
 
   const { mutate, data, ...swr } = useSWR<ProjectMilestoneSchema[]>(swrKey);
 
+  const sortedData = data && sortMilestones(data);
+
+  const handleMutate = (updateData: UpdateProjectMilestoneRequest) => {
+    const updatedData = sortedData?.map((milestone) => {
+      if (milestone.id !== updateData.id) {
+        return milestone;
+      }
+
+      return { ...milestone, ...updateData };
+    });
+    mutate(updatedData);
+  };
+
   const mutations = useProjectMilestone({
     mutateKey: swrKey,
-    mutate,
-    list: data,
+    mutate: handleMutate,
     ...options,
   });
 
   return {
     ...mutations,
     ...swr,
-    data,
+    data: sortedData,
     mutate,
   };
 }

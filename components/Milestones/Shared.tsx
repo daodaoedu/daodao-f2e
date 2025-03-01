@@ -86,17 +86,6 @@ export const ProgressBar = ({ progress }: ProgressBarProps) => {
   );
 };
 
-export const sortMilestones = (milestones: ProjectMilestoneSchema[]) => {
-  if (!Array.isArray(milestones)) return [];
-
-  return milestones.sort((a, b) => {
-    const startDiff = dayjs(a.startDate).diff(dayjs(b.startDate), 'd');
-    if (startDiff !== 0) return startDiff;
-    if (a.position !== b.position) return a.position - b.position;
-    return dayjs(a.endDate).diff(dayjs(b.endDate), 'd');
-  });
-};
-
 interface GetDefaultMilestoneProps {
   projectId: string;
   milestones: ProjectMilestoneSchema[];
@@ -110,21 +99,19 @@ export const getDefaultMilestone = ({
   startDate,
   endDate,
 }: GetDefaultMilestoneProps): CreateProjectMilestoneRequest => {
-  const sortedData = sortMilestones(milestones);
-
   const calcMilestoneEmptyDate = () => {
-    if (sortedData.length === 0) {
+    if (milestones.length === 0) {
       return startDate;
     }
-    if (sortedData.length === 1) {
-      return dayjs(sortedData[0].endDate).add(1, 'day');
+    if (milestones.length === 1) {
+      return dayjs(milestones[0].endDate).add(1, 'day');
     }
 
-    let preEndDate = dayjs(sortedData[0].endDate);
+    let preEndDate = dayjs(milestones[0].endDate);
     let result = preEndDate.add(1, 'day');
 
-    for (let i = 1; i < sortedData.length; i += 1) {
-      const milestone = sortedData[i];
+    for (let i = 1; i < milestones.length; i += 1) {
+      const milestone = milestones[i];
       const currentStartDate = dayjs(milestone.startDate);
 
       if (
