@@ -85,6 +85,7 @@
     "@tailwindcss/typography": "^0.5.15",
     "@types/chrome": "^0.0.206",
     "@types/react-dom": "^19.0.2",
+    "@types/react-lazy-load-image-component": "^1.6.4",
     "@typescript-eslint/eslint-plugin": "6",
     "@typescript-eslint/parser": "6",
     "autoprefixer": "^10.4.20",

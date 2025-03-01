@@ -3,6 +3,7 @@ import { cn } from '@/utils/cn';
 import { isServer } from '@/utils/helper';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import Image from '../Image';
 
 const MobileMenu = dynamic(() => import('./MobileMenu'));
 const DesktopMenu = dynamic(() => import('./DesktopMenu'));
@@ -47,8 +48,13 @@ function Header(
           breakpoint === BREAKPOINT.MOBILE && 'pr-2'
         )}
       >
-        <Link href="/" className="block py-6">
-          <img src="/new-logo.png" alt="島島阿學" width="152" height="22" />
+        <Link href="/" className="block pt-6 pb-4">
+          <Image
+            src="/new-logo.png"
+            alt="島島阿學"
+            width="152"
+            height="22"
+          />
         </Link>
         {breakpoint === BREAKPOINT.MOBILE && <MobileMenu />}
         {breakpoint === BREAKPOINT.DESKTOP && <DesktopMenu />}
