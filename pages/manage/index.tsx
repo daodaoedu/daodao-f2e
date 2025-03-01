@@ -113,7 +113,12 @@ const Header = () => {
         {HEADER_TITLES[dayjs().get('hour') % HEADER_TITLES.length]}
       </h2>
       <Dropdown>
-        <Dropdown.Toggle variant="solid" className="mb-1" withIcon>
+        <Dropdown.Toggle
+          variant="solid"
+          color="primary"
+          className="mb-1"
+          withIcon
+        >
           新增
         </Dropdown.Toggle>
         <Dropdown.List className="top-full right-0 z-20">

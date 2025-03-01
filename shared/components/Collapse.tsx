@@ -30,12 +30,17 @@ function Toggle({ children, className, withIcon }: CollapseToggleProps) {
     errorMessage: 'Collapse.Toggle must be used within a Collapse',
   });
 
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setIsOpen(!isOpen);
+  };
+
   return (
     <button
       type="button"
       className={cn('flex items-center', className)}
       aria-pressed={isOpen}
-      onClick={() => setIsOpen(!isOpen)}
+      onClick={handleClick}
     >
       {children}
       {withIcon && (

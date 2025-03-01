@@ -42,6 +42,7 @@ const AccessDenied = () => {
         <Button
           id="findResourcesButton"
           variant="solid"
+          color="primary"
           onClick={() => router.push('/resources')}
         >
           查看學習資源

@@ -4,8 +4,6 @@ import { Dayjs } from 'dayjs';
 import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
 import { PickersDay, PickersDayProps } from '@mui/x-date-pickers';
 import SwapRightIcon from '@/public/assets/icons/swap-right.svg';
-import CalendarIcon from '@/public/assets/icons/calendar.svg';
-
 import useClickOutside from '@/hooks/useClickOutside';
 import { cn } from '@/utils/cn';
 
@@ -13,27 +11,44 @@ interface CustomPickerDayProps extends PickersDayProps<Dayjs> {
   dayIsBetween: boolean;
   isFirstDay: boolean;
   isLastDay: boolean;
+  isSunday: boolean;
+  isSaturday: boolean;
 }
 
 const CustomPickersDay = styled(PickersDay, {
   shouldForwardProp: (prop) =>
-    prop !== 'dayIsBetween' && prop !== 'isFirstDay' && prop !== 'isLastDay',
-})<CustomPickerDayProps>(({ theme, dayIsBetween, isFirstDay, isLastDay }) => ({
+    prop !== 'dayIsBetween' &&
+    prop !== 'isFirstDay' &&
+    prop !== 'isLastDay' &&
+    prop !== 'isSunday' &&
+    prop !== 'isSaturday',
+})<CustomPickerDayProps>(({ theme, dayIsBetween, isFirstDay, isLastDay, isSunday, isSaturday }) => ({
+  width: '40px',
   ...(dayIsBetween && {
     borderRadius: 0,
     backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white,
+    '&, &.Mui-disabled': {
+      color: theme.palette.common.white,
+    },
     '&:hover, &:focus': {
       backgroundColor: theme.palette.primary.dark,
     },
   }),
+  ...(isSunday && {
+    borderTopLeftRadius: '0.25rem',
+    borderBottomLeftRadius: '0.25rem',
+  }),
+  ...(isSaturday && {
+    borderTopRightRadius: '0.25rem',
+    borderBottomRightRadius: '0.25rem',
+  }),
   ...(isFirstDay && {
-    borderTopLeftRadius: '50%',
-    borderBottomLeftRadius: '50%',
+    borderTopLeftRadius: '1.25rem',
+    borderBottomLeftRadius: '1.25rem',
   }),
   ...(isLastDay && {
-    borderTopRightRadius: '50%',
-    borderBottomRightRadius: '50%',
+    borderTopRightRadius: '1.25rem',
+    borderBottomRightRadius: '1.25rem',
   }),
 })) as React.ComponentType<CustomPickerDayProps>;
 
@@ -42,9 +57,12 @@ interface DateRangePickerProps {
   endDate: Dayjs;
   maxDate?: Dayjs;
   minDate?: Dayjs;
+  separator?: React.ReactNode;
+  afterIcon?: React.ReactNode;
   disabledStartDate?: boolean;
   disabledEndDate?: boolean;
   className?: string;
+  calendarClassName?: string;
   onStartDateChange: (date: Dayjs) => void;
   onEndDateChange: (date: Dayjs) => void;
 }
@@ -54,9 +72,12 @@ const DateRangePicker = ({
   endDate,
   maxDate,
   minDate,
+  separator = <SwapRightIcon className="w-4 h-4 text-basic-black/25" />,
+  afterIcon,
   disabledStartDate,
   disabledEndDate,
   className,
+  calendarClassName,
   onStartDateChange,
   onEndDateChange,
 }: DateRangePickerProps) => {
@@ -64,6 +85,7 @@ const DateRangePicker = ({
   const modeRef = useRef<'start' | 'end'>('start');
   const { ref } = useClickOutside<HTMLDivElement>({ setState: setIsOpen });
   const prevStartDate = useRef(startDate);
+  const disabledChangeDate = disabledStartDate && disabledEndDate;
 
   const handleStartDateChange = (date: Dayjs) => {
     if (endDate.isBefore(date)) {
@@ -116,6 +138,8 @@ const DateRangePicker = ({
     const dayIsBetween = date.isBetween(startDate, endDate, null, '[]');
     const isFirstDay = date.isSame(startDate, 'day');
     const isLastDay = date.isSame(endDate, 'day');
+    const isSunday = date.day() === 0;
+    const isSaturday = date.day() === 6;
 
     return (
       <CustomPickersDay
@@ -125,6 +149,8 @@ const DateRangePicker = ({
         dayIsBetween={dayIsBetween}
         isFirstDay={isFirstDay}
         isLastDay={isLastDay}
+        isSunday={isSunday}
+        isSaturday={isSaturday}
       />
     );
   };
@@ -140,9 +166,9 @@ const DateRangePicker = ({
           )}
         >
           <span>{startDate.format('YYYY/MM/DD')}</span>
-          <SwapRightIcon className="w-4 h-4 text-basic-black/25" />
+          {separator}
           <span>{endDate.format('YYYY/MM/DD')}</span>
-          <CalendarIcon className="w-4 h-4 text-primary-base" />
+          {afterIcon}
         </div>
       </button>
       <div
@@ -150,7 +176,8 @@ const DateRangePicker = ({
           'absolute top-full mt-1 z-20',
           'bg-basic-white shadow-lg rounded-xl',
           'transition-[transform,opacity] origin-top',
-          isOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0'
+          isOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0',
+          calendarClassName
         )}
       >
         <CalendarPicker
@@ -159,7 +186,9 @@ const DateRangePicker = ({
           views={['day']}
           minDate={minDate}
           maxDate={maxDate}
+          disabled={disabledChangeDate}
           renderDay={renderWeekPickerDay}
+          disableHighlightToday
           classes={{
             root: '[&_.Mui-selected]:!text-basic-white',
           }}
