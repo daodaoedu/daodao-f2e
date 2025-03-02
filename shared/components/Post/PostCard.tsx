@@ -157,7 +157,7 @@ function PostCardHeader({
                 size="sm"
                 prefixIcon="AiOutlineMore"
               />
-              <Dropdown.List className="top-full right-0 -mr-2 mt-2 z-20">
+              <Dropdown.List className="-mr-2 mt-2 z-20">
                 {dropdownItems.map((item) => (
                   <Dropdown.Item
                     key={item.key}

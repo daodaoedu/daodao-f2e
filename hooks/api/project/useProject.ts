@@ -1,11 +1,11 @@
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { Project } from '@/components/Projects/Project/type';
 import {
   createProject,
   CreateProjectRequest,
   deleteProject,
   getProjectEndpoint,
+  ProjectSchema,
   updateProject,
   UpdateProjectRequest,
 } from '@/services/project';
@@ -13,8 +13,8 @@ import {
 interface UseProjectOptions {
   id?: string;
   mutateKey?: string | null;
-  onCreated?: (data: Project) => void;
-  onUpdated?: (data: Project) => void;
+  onCreated?: (data: ProjectSchema) => void;
+  onUpdated?: (data: ProjectSchema) => void;
   onDeleted?: () => void;
 }
 
@@ -27,7 +27,7 @@ export default function useProject({
 }: UseProjectOptions) {
   const swrKey = id ? getProjectEndpoint({ id }) : null;
 
-  const { mutate, ...swr } = useSWR<Project>(swrKey);
+  const { mutate, ...swr } = useSWR<ProjectSchema>(swrKey);
 
   const create = useSWRMutation(
     swrKey ?? mutateKey,

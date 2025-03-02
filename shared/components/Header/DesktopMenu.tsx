@@ -38,7 +38,7 @@ function DesktopMenu() {
           >
             島島盃-春季學習馬拉松
           </Dropdown.Toggle>
-          <Dropdown.List className="top-full left-0 -mt-1">
+          <Dropdown.List className="mt-1">
             {MARATHON_LINKS.map(({ name, link, disabled }) => (
               <Dropdown.Item
                 key={name}
@@ -75,7 +75,7 @@ function DesktopMenu() {
                   className="rounded-full"
                 />
               </Dropdown.Toggle>
-              <Dropdown.List className="top-full right-0 mt-2">
+              <Dropdown.List className="mt-2">
                 {USER_LINK.map(({ name, id }) => (
                   <Dropdown.Item
                     key={name}

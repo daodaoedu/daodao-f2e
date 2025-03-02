@@ -37,13 +37,14 @@ const ProjectMilestonesPage = () => {
           {projectId && Array.isArray(milestones) && milestones.length > 0 ? (
             milestones
               .sort((a, b) => {
-                return a.week - b.week;
+                return a.position - b.position;
               })
-              .map((milestone) => {
+              .map((milestone, index) => {
                 return (
                   <MilestoneItemView
                     milestone={milestone}
                     key={milestone.id}
+                    index={index}
                   />
                 );
               })

@@ -63,7 +63,7 @@ function ManageLayout({ children }: React.PropsWithChildren) {
               )}
             </Sidebar>
           </div>
-          <div className="flex-1">{children}</div>
+          <div className="basis-full max-w-full lg:flex-1 lg:max-w-[min(760px,100%-360px)]">{children}</div>
         </Container>
       </div>
     </ProtectedComponent>

@@ -2,20 +2,21 @@ import { FaArrowRight } from 'react-icons/fa';
 import dayjs from 'dayjs';
 import { cn } from '@/utils/cn';
 import { Milestone } from '@/contexts/Milestones/type';
-import { numberToZh } from './Shared';
 
 interface MilestoneViewProps {
+  index: number;
   milestone: Milestone;
 }
 
 const MilestoneView = ({
+  index,
   milestone,
 }: MilestoneViewProps) => {
   return (
     <div className="p-[10px] md:py-3 md:px-4 rounded-lg bg-white">
       <div className="flex flex-row items-center justify-beetween mb-[10px]">
         <div className="bg-primary-base text-white py-[5px] px-5 rounded-[20px] font-sans text-sm leading-[140%]">
-          第{numberToZh(milestone.week)}週
+          里程碑 {index + 1}
         </div>
         <div
           className="

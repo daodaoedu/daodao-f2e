@@ -4,47 +4,67 @@ import { Dayjs } from 'dayjs';
 import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
 import { PickersDay, PickersDayProps } from '@mui/x-date-pickers';
 import SwapRightIcon from '@/public/assets/icons/swap-right.svg';
-import CalendarIcon from '@/public/assets/icons/calendar.svg';
-
-import useClickOutside from '@/hooks/useClickOutside';
 import { cn } from '@/utils/cn';
+import Dropdown from './Dropdown';
 
 interface CustomPickerDayProps extends PickersDayProps<Dayjs> {
   dayIsBetween: boolean;
   isFirstDay: boolean;
   isLastDay: boolean;
+  isSunday: boolean;
+  isSaturday: boolean;
 }
 
 const CustomPickersDay = styled(PickersDay, {
   shouldForwardProp: (prop) =>
-    prop !== 'dayIsBetween' && prop !== 'isFirstDay' && prop !== 'isLastDay',
-})<CustomPickerDayProps>(({ theme, dayIsBetween, isFirstDay, isLastDay }) => ({
-  ...(dayIsBetween && {
-    borderRadius: 0,
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white,
-    '&:hover, &:focus': {
-      backgroundColor: theme.palette.primary.dark,
-    },
-  }),
-  ...(isFirstDay && {
-    borderTopLeftRadius: '50%',
-    borderBottomLeftRadius: '50%',
-  }),
-  ...(isLastDay && {
-    borderTopRightRadius: '50%',
-    borderBottomRightRadius: '50%',
-  }),
-})) as React.ComponentType<CustomPickerDayProps>;
+    prop !== 'dayIsBetween' &&
+    prop !== 'isFirstDay' &&
+    prop !== 'isLastDay' &&
+    prop !== 'isSunday' &&
+    prop !== 'isSaturday',
+})<CustomPickerDayProps>(
+  ({ theme, dayIsBetween, isFirstDay, isLastDay, isSunday, isSaturday }) => ({
+    width: '40px',
+    ...(dayIsBetween && {
+      borderRadius: 0,
+      backgroundColor: theme.palette.primary.main,
+      '&, &.Mui-disabled': {
+        color: theme.palette.common.white,
+      },
+      '&:hover, &:focus': {
+        backgroundColor: theme.palette.primary.dark,
+      },
+    }),
+    ...(isSunday && {
+      borderTopLeftRadius: '0.25rem',
+      borderBottomLeftRadius: '0.25rem',
+    }),
+    ...(isSaturday && {
+      borderTopRightRadius: '0.25rem',
+      borderBottomRightRadius: '0.25rem',
+    }),
+    ...(isFirstDay && {
+      borderTopLeftRadius: '1.25rem',
+      borderBottomLeftRadius: '1.25rem',
+    }),
+    ...(isLastDay && {
+      borderTopRightRadius: '1.25rem',
+      borderBottomRightRadius: '1.25rem',
+    }),
+  })
+) as React.ComponentType<CustomPickerDayProps>;
 
 interface DateRangePickerProps {
   startDate: Dayjs;
   endDate: Dayjs;
   maxDate?: Dayjs;
   minDate?: Dayjs;
+  separator?: React.ReactNode;
+  afterIcon?: React.ReactNode;
   disabledStartDate?: boolean;
   disabledEndDate?: boolean;
   className?: string;
+  calendarClassName?: string;
   onStartDateChange: (date: Dayjs) => void;
   onEndDateChange: (date: Dayjs) => void;
 }
@@ -54,16 +74,19 @@ const DateRangePicker = ({
   endDate,
   maxDate,
   minDate,
+  separator = <SwapRightIcon className="w-4 h-4 text-basic-black/25" />,
+  afterIcon,
   disabledStartDate,
   disabledEndDate,
   className,
+  calendarClassName,
   onStartDateChange,
   onEndDateChange,
 }: DateRangePickerProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const modeRef = useRef<'start' | 'end'>('start');
-  const { ref } = useClickOutside<HTMLDivElement>({ setState: setIsOpen });
   const prevStartDate = useRef(startDate);
+  const disabledChangeDate = disabledStartDate && disabledEndDate;
 
   const handleStartDateChange = (date: Dayjs) => {
     if (endDate.isBefore(date)) {
@@ -100,7 +123,7 @@ const DateRangePicker = ({
   };
 
   const handleToggle = () => {
-    setIsOpen((prev) => !prev);
+    setIsOpen(!isOpen);
     modeRef.current = 'start';
   };
 
@@ -116,6 +139,8 @@ const DateRangePicker = ({
     const dayIsBetween = date.isBetween(startDate, endDate, null, '[]');
     const isFirstDay = date.isSame(startDate, 'day');
     const isLastDay = date.isSame(endDate, 'day');
+    const isSunday = date.day() === 0;
+    const isSaturday = date.day() === 6;
 
     return (
       <CustomPickersDay
@@ -125,47 +150,45 @@ const DateRangePicker = ({
         dayIsBetween={dayIsBetween}
         isFirstDay={isFirstDay}
         isLastDay={isLastDay}
+        isSunday={isSunday}
+        isSaturday={isSaturday}
       />
     );
   };
 
   return (
-    <div ref={ref} className="relative">
-      <button type="button" onClick={handleToggle}>
-        <div
-          className={cn(
-            'flex items-center gap-3 px-4 py-3',
-            'border border-solid border-basic-200 rounded-lg',
-            className
-          )}
-        >
-          <span>{startDate.format('YYYY/MM/DD')}</span>
-          <SwapRightIcon className="w-4 h-4 text-basic-black/25" />
-          <span>{endDate.format('YYYY/MM/DD')}</span>
-          <CalendarIcon className="w-4 h-4 text-primary-base" />
-        </div>
-      </button>
-      <div
+    <Dropdown isOpen={isOpen} onChange={setIsOpen}>
+      <Dropdown.Toggle
         className={cn(
-          'absolute top-full mt-1 z-20',
-          'bg-basic-white shadow-lg rounded-xl',
-          'transition-[transform,opacity] origin-top',
-          isOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0'
+          'flex items-center gap-3 px-4 py-3',
+          'border border-solid border-basic-200 rounded-lg',
+          className
         )}
+        onClick={handleToggle}
       >
-        <CalendarPicker
-          date={startDate}
-          onChange={handleChange}
-          views={['day']}
-          minDate={minDate}
-          maxDate={maxDate}
-          renderDay={renderWeekPickerDay}
-          classes={{
-            root: '[&_.Mui-selected]:!text-basic-white',
-          }}
-        />
-      </div>
-    </div>
+        <span>{startDate.format('YYYY/MM/DD')}</span>
+        {separator}
+        <span>{endDate.format('YYYY/MM/DD')}</span>
+        {afterIcon}
+      </Dropdown.Toggle>
+      <Dropdown.List className={calendarClassName}>
+        <Dropdown.Item>
+          <CalendarPicker
+            date={startDate}
+            onChange={handleChange}
+            views={['day']}
+            minDate={minDate}
+            maxDate={maxDate}
+            disabled={disabledChangeDate}
+            renderDay={renderWeekPickerDay}
+            disableHighlightToday
+            classes={{
+              root: '[&_.Mui-selected]:!text-basic-white',
+            }}
+          />
+        </Dropdown.Item>
+      </Dropdown.List>
+    </Dropdown>
   );
 };
 

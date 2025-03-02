@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import Button, { ButtonProps } from './Button';
 
-interface UploadProps extends Omit<ButtonProps<'button'>, 'onChange'> {
+interface UploadProps extends Omit<ButtonProps<'button'>, 'onChange' | 'as'> {
   accept?: string;
   children?: React.ReactNode;
   validate?: (file: File[]) => boolean | Promise<boolean>;
@@ -40,8 +40,10 @@ function Upload({
     setUrls(objectUrls);
   };
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    onClick?.(e);
+  const handleClick = (
+    e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
+  ) => {
+    onClick?.(e as React.MouseEvent<HTMLButtonElement>);
     inputRef.current?.click();
   };
 

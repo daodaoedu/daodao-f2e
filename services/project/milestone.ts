@@ -1,7 +1,7 @@
-import dayjs from 'dayjs';
 import { z } from 'zod';
-import { Project } from '@/components/Projects/Project/type';
+import dayjs from 'dayjs';
 import { mutations } from '../httpClient';
+import { projectTaskSchema } from './tasks';
 
 const projectEndpoint = '/projects';
 
@@ -20,22 +20,18 @@ export const getProjectMilestoneEndpoint = ({
   return `${projectEndpoint}/${projectId}/milestones`;
 };
 
-const projectTaskSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  description: z.string(),
-  daysOfWeek: z.array(z.string()),
-  isCompleted: z.boolean(),
-  milestoneId: z.number(),
-});
-
 export const projectMilestoneSchema = z.object({
   id: z.number(),
   projectId: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  week: z.number(),
-  name: z.string(),
+  position: z
+    .number()
+    .optional()
+    .transform((val) =>
+      typeof val === 'number' && Number.isInteger(val) && val > 0 ? val : 1000
+    ),
+  name: z.string().min(1, '請輸入名稱'),
   description: z.string(),
   startDate: z.string(),
   endDate: z.string(),
@@ -46,18 +42,41 @@ export const projectMilestoneSchema = z.object({
 
 export type ProjectMilestoneSchema = z.infer<typeof projectMilestoneSchema>;
 
-export const createProjectMilestoneSchema = projectMilestoneSchema
-  .omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
-    isDeleted: true,
-    tasks: true,
-  })
-  .refine((data) => dayjs(data.startDate).isBefore(dayjs(data.endDate)), {
-    message: '結束日期必須晚於開始日期',
-    path: ['endDate'],
+export const sortMilestones = (milestones: ProjectMilestoneSchema[]) => {
+  if (!Array.isArray(milestones)) return [];
+
+  return milestones.sort((a, b) => {
+    const startDiff = dayjs(a.startDate).diff(dayjs(b.startDate), 'd');
+    if (startDiff !== 0) return startDiff;
+    if (a.position !== b.position) return a.position - b.position;
+    return dayjs(a.endDate).diff(dayjs(b.endDate), 'd');
   });
+};
+
+export const getMilestone = (
+  sortedData: ProjectMilestoneSchema[] | undefined,
+  id: number
+) => {
+  if (!Array.isArray(sortedData)) return null;
+
+  const index = sortedData.findIndex((milestone) => milestone.id === id);
+
+  if (index === -1) return null;
+
+  return {
+    index,
+    item: sortedData[index],
+    list: sortedData,
+  };
+};
+
+export const createProjectMilestoneSchema = projectMilestoneSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  isDeleted: true,
+  tasks: true,
+});
 
 export type CreateProjectMilestoneRequest = z.infer<
   typeof createProjectMilestoneSchema
@@ -67,10 +86,7 @@ export const createProjectMilestone = ({
   projectId,
   ...request
 }: CreateProjectMilestoneRequest) => {
-  return mutations.post<Project>(
-    getProjectMilestoneEndpoint({ projectId }),
-    request
-  );
+  return mutations.post(getProjectMilestoneEndpoint({ projectId }), request);
 };
 
 export const updateProjectMilestoneSchema = projectMilestoneSchema.omit({
@@ -89,7 +105,7 @@ export const updateProjectMilestone = ({
   id,
   ...request
 }: UpdateProjectMilestoneRequest) => {
-  return mutations.put<Project>(
+  return mutations.put(
     getProjectMilestoneEndpoint({ projectId, milestoneId: id }),
     request
   );

@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import Link from 'next/link';
-import { Children, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import dayjs, { Dayjs } from 'dayjs';
 import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
@@ -113,10 +113,15 @@ const Header = () => {
         {HEADER_TITLES[dayjs().get('hour') % HEADER_TITLES.length]}
       </h2>
       <Dropdown>
-        <Dropdown.Toggle variant="solid" className="mb-1" withIcon>
+        <Dropdown.Toggle
+          variant="solid"
+          color="primary"
+          className="mb-1"
+          withIcon
+        >
           新增
         </Dropdown.Toggle>
-        <Dropdown.List className="top-full right-0 z-20">
+        <Dropdown.List className="z-20">
           {dropdownItems.map(({ label, actions }) => (
             <Dropdown.Item
               key={label}
@@ -236,12 +241,6 @@ interface ProjectProps {
 }
 
 const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
-  const childrenElements = useMemo(
-    () =>
-      Children.map(children, (child) => ({ child, id: crypto.randomUUID() })),
-    [children]
-  );
-
   return (
     <div
       className={cn(
@@ -261,13 +260,8 @@ const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
             <GoArrowUpRight className="stroke-1" />
           </Link>
         </Collapse.Toggle>
-        <Collapse.List className="*:my-2 *:aria-hidden:my-0">
-          {Array.isArray(childrenElements) &&
-            childrenElements.map(({ child, id }) => (
-              <Collapse.Item key={id}>
-                <div className="p-2.5 bg-basic-100 rounded-xl">{child}</div>
-              </Collapse.Item>
-            ))}
+        <Collapse.List>
+          <Collapse.Item className="overflow-hidden">{children}</Collapse.Item>
         </Collapse.List>
       </Collapse>
     </div>
@@ -278,14 +272,16 @@ const Main = ({ date }: { date: Dayjs }) => {
   const {
     data: projects,
     mutate,
-    isValidating,
+    milestoneMutations,
   } = useProjectList({ isMe: true });
+
   const { data: reviews } = useProjectReviewList(projects?.[0]?.id);
 
   const currentProjects = useMemo(() => {
     if (!Array.isArray(projects)) return [];
     return projects.map((project) => ({
       ...project,
+      originalMilestones: project?.milestones,
       milestones:
         project?.milestones?.filter((milestone) =>
           date.isBetween(
@@ -307,27 +303,26 @@ const Main = ({ date }: { date: Dayjs }) => {
     <>
       <ul>
         {currentProjects.map((project, index) => (
-          <li
-            key={project.id}
-            className={cn(
-              'opacity-100 transition-opacity',
-              isValidating && 'opacity-60'
-            )}
-          >
+          <li key={project.id} className="opacity-100 transition-opacity">
             <Project
               title={project.title}
               href={`/manage/project?id=${project.id}`}
               defaultOpen={index === 0}
             >
-              {project.milestones.map((milestone) => (
-                <MilestoneItem
-                  key={milestone.id}
-                  milestone={milestone}
-                  isLgScreen={false}
-                  projectId={project.id}
-                  onRefreshData={mutate}
-                />
-              ))}
+              {Array.isArray(project?.milestones) &&
+                project.milestones.map((milestone) => (
+                  <div key={milestone.id} className="mb-2 last-of-type:mb-0">
+                    <MilestoneItem
+                      key={milestone.id}
+                      milestone={milestone}
+                      milestones={project.originalMilestones}
+                      projectId={project.id}
+                      onRefreshData={mutate}
+                      onUpdate={milestoneMutations.update.trigger}
+                      isEditable
+                    />
+                  </div>
+                ))}
             </Project>
           </li>
         ))}

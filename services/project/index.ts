@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { Project } from '@/components/Projects/Project/type';
 import { projectMilestoneSchema } from './milestone';
 import { mutations } from '../httpClient';
 import { baseUserSchema } from '../users';
@@ -41,6 +40,7 @@ export const projectSchema = z.object({
   /** 馬拉松用的 ID */
   eventId: z.string().optional(),
   user: baseUserSchema,
+  version: z.number(),
   milestones: z.array(projectMilestoneSchema),
 });
 
@@ -53,12 +53,13 @@ export const createProjectSchema = projectSchema.omit({
   eventId: true,
   user: true,
   milestones: true,
+  version: true,
 });
 
 export type CreateProjectRequest = z.infer<typeof createProjectSchema>;
 
 export const createProject = (request: CreateProjectRequest) => {
-  return mutations.post<Project>(getProjectEndpoint(), request);
+  return mutations.post<ProjectSchema>(getProjectEndpoint(), request);
 };
 
 export const updateProjectSchema = projectSchema.omit({
@@ -72,7 +73,7 @@ export const updateProjectSchema = projectSchema.omit({
 export type UpdateProjectRequest = z.infer<typeof updateProjectSchema>;
 
 export const updateProject = ({ id, ...project }: UpdateProjectRequest) => {
-  return mutations.put<Project>(getProjectEndpoint({ id }), project);
+  return mutations.put<ProjectSchema>(getProjectEndpoint({ id }), project);
 };
 
 export const deleteProject = (id: string) => {

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { forwardRef, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
@@ -43,6 +43,7 @@ enum ButtonColorEnum {
   Secondary = 'secondary',
   Tips = 'tips',
   Alert = 'alert',
+  Gray = 'gray',
   White = 'white',
 }
 
@@ -54,6 +55,7 @@ enum ButtonVariantEnum {
 enum ButtonSizeEnum {
   Small = 'sm',
   Medium = 'md',
+  Icon = 'icon',
 }
 
 enum ButtonAnimationEnum {
@@ -91,23 +93,26 @@ export interface ButtonProps<AS extends 'button' | 'link' = 'button'>
   ) => void;
 }
 
-function Button<AS extends 'button' | 'link' = 'button'>({
-  as,
-  children,
-  className,
-  variant,
-  color = ButtonColorEnum.Primary,
-  size = ButtonSizeEnum.Medium,
-  animation = ButtonAnimationEnum.Ripple,
-  isDisabled = false,
-  isSubmit,
-  onClick,
-  prefixIcon,
-  suffixIcon,
-  href,
-  checkLogin = false,
-  ...nativeButtonProps
-}: ButtonProps<AS>) {
+function Button<AS extends 'button' | 'link' = 'button'>(
+  {
+    as,
+    children,
+    className,
+    variant,
+    color,
+    size = ButtonSizeEnum.Medium,
+    animation = ButtonAnimationEnum.Ripple,
+    isDisabled = false,
+    isSubmit,
+    onClick,
+    prefixIcon,
+    suffixIcon,
+    href,
+    checkLogin = false,
+    ...nativeButtonProps
+  }: ButtonProps<AS>,
+  ref: React.Ref<HTMLButtonElement>
+) {
   const { isLoggedIn } = useAuth();
   const { openLoginModal } = useAuthDispatch();
   const rippleRef = useRef<HTMLDivElement>(null);
@@ -152,27 +157,28 @@ function Button<AS extends 'button' | 'link' = 'button'>({
       'relative overflow-hidden rounded-md text-nowrap text-basic-400 hover:text-primary-base',
       (prefixIcon || suffixIcon) && 'flex items-center gap-0.5',
       variant === ButtonVariantEnum.Solid && [
-        'rounded-full transition-[box-shadow,color,background-color]',
+        'rounded-full border border-solid transition-colors transition-[box-shadow,color,background-color]',
         color === ButtonColorEnum.Primary &&
-          'bg-primary-base text-basic-white hover:shadow-lg hover:shadow-primary-base/20 hover:text-basic-white',
+          'bg-primary-base border-primary-base text-basic-white hover:shadow-lg hover:shadow-primary-base/20 hover:text-basic-white',
         color === ButtonColorEnum.Secondary &&
-          'bg-primary-lightest text-primary-base hover:shadow-lg hover:shadow-primary-lightest/40 hover:text-primary-base',
+          'bg-primary-lightest border-primary-lightest text-primary-base hover:shadow-lg hover:shadow-primary-lightest/40 hover:text-primary-base',
         color === ButtonColorEnum.Tips &&
-          'bg-tips text-basic-white hover:shadow-lg hover:shadow-tips/20 hover:text-basic-white',
+          'bg-tips border-tips text-basic-white hover:shadow-lg hover:shadow-tips/20 hover:text-basic-white',
         color === ButtonColorEnum.Alert &&
-          'bg-alert text-basic-white hover:shadow-lg hover:shadow-alert/20 hover:text-basic-white',
+          'bg-alert border-alert text-basic-white hover:shadow-lg hover:shadow-alert/20 hover:text-basic-white',
+        color === ButtonColorEnum.Gray &&
+          'bg-basic-200 border-basic-200 text-basic-300 shadow-lg hover:bg-primary-base hover:border-primary-base hover:text-white',
         color === ButtonColorEnum.White &&
-          'bg-basic-white text-primary-darker shadow-lg shadow-basic-200/40 hover:bg-primary-lightest hover:text-primary-darker',
+          'bg-basic-white border-basic-white text-primary-darker shadow-lg shadow-basic-200/40 hover:bg-primary-lightest hover:text-primary-darker',
       ],
       variant === ButtonVariantEnum.Outline && [
         'rounded-full border border-solid transition-colors',
         color === ButtonColorEnum.Primary &&
           'border-primary-base text-primary-base hover:bg-primary-base hover:text-basic-white',
-        color === ButtonColorEnum.White &&
-          'border-basic-white text-basic-white hover:bg-basic-white hover:text-primary-base',
       ],
       size === ButtonSizeEnum.Small && 'py-1.5 px-5 body-sm',
       size === ButtonSizeEnum.Medium && 'py-2 px-5 body-md',
+      size === ButtonSizeEnum.Icon && 'size-6 flex items-center justify-center',
       isDisabled && 'opacity-50 shadow-none pointer-events-none',
       className
     ),
@@ -211,6 +217,7 @@ function Button<AS extends 'button' | 'link' = 'button'>({
 
   return (
     <button
+      ref={ref}
       type={isSubmit ? 'submit' : 'button'}
       disabled={isDisabled}
       {...sharedProps}
@@ -221,4 +228,4 @@ function Button<AS extends 'button' | 'link' = 'button'>({
   );
 }
 
-export default Button;
+export default forwardRef(Button);
