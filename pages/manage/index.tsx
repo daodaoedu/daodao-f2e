@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
@@ -48,7 +49,7 @@ const HEADER_TITLES = [
 ];
 
 const Header = () => {
-  // const router = useRouter();
+  const router = useRouter();
   // const { data } = useProjectList({ isMe: true });
   // const maxProjects = 3;
 
@@ -88,7 +89,7 @@ const Header = () => {
   const userActions = [
     {
       label: '新增揪團',
-      onClick: () => toast.error('功能尚未開放'),
+      onClick: () => router.push('/group/create'),
     },
     {
       label: '新增資源',

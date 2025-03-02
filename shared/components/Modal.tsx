@@ -10,7 +10,7 @@ enum ModalSize {
   Large = 'lg',
 }
 
-interface ModalProps {
+export interface ModalProps {
   isOpen: boolean;
   title?: string;
   size?: ModalSize | `${ModalSize}`;

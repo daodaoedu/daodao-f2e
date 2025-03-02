@@ -18,6 +18,8 @@ import { MdSend, MdClose, MdEdit } from 'react-icons/md';
 import Button from '@/shared/components/Button';
 import DateRangePicker from '@/shared/components/DateRangePicker';
 import Form from '@/shared/components/Form';
+import { useDialog } from '@/contexts/Dialog';
+import { useProject } from '@/hooks/api/project';
 import {
   CreateProjectMilestoneRequest,
   createProjectMilestoneSchema,
@@ -66,6 +68,16 @@ function MilestoneCard(
   const [isEditing, setIsEditing] = useState(defaultEditing);
   const [isLoading, setIsLoading] = useState(false);
   const preEditingStateRef = useRef(!isEditing);
+  const isCompleteAllTasks = useMemo(
+    () =>
+      Array.isArray(milestone.tasks)
+        ? milestone.tasks.every((task) => task.isCompleted)
+        : true,
+    [milestone.tasks]
+  );
+  const { data: project } = useProject({ id: projectId });
+
+  const { openDialog } = useDialog();
 
   const index = useMemo(
     () =>
@@ -140,10 +152,36 @@ function MilestoneCard(
 
     if (isLoading || !isEditable) return;
 
-    if (targetIsCompleted) {
-      console.log('targetIsCompleted');
-    } else {
-      console.log('targetIsNotCompleted');
+    if (!isCompleteAllTasks && targetIsCompleted) {
+      toast.error('請先完成所有子任務');
+      return;
+    }
+
+    if (targetIsCompleted && project?.version === 1) {
+      const result = await openDialog({
+        content:
+          '勾選後，計畫就視為開始，屆時將無法修改計畫的開始時間，是否繼續？',
+        onConfirm: () => {
+          methods.setValue('isCompleted', targetIsCompleted);
+        },
+      });
+
+      if (!result) {
+        return;
+      }
+    }
+
+    if (!targetIsCompleted) {
+      const result = await openDialog({
+        content: '取消勾選後，里程碑將會被視為未完成，是否繼續？',
+        onConfirm: () => {
+          methods.setValue('isCompleted', targetIsCompleted);
+        },
+      });
+
+      if (!result) {
+        return;
+      }
     }
 
     methods.setValue('isCompleted', targetIsCompleted);
