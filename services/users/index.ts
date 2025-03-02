@@ -35,7 +35,17 @@ export enum RoleEnum {
   SuperAdmin
 }
 
-export interface IUser {
+export const baseUserSchema = z.object({
+  _id: z.string(),
+  id: z.string(),
+  name: z.string(),
+  roleList: z.array(z.string()),
+  photoURL: z.string(),
+});
+
+export type BaseUserSchema = z.infer<typeof baseUserSchema>;
+
+export interface IUser extends BaseUserSchema {
   _id: string;
   birthDay: string;
   educationStage: string;

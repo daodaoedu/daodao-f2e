@@ -5,11 +5,14 @@ concurrency:
   cancel-in-progress: true
 
 on:
+  pull_request:
+    branches:
+      - "prod"
+      - "dev"
   push:
     branches:
       - "prod"
       - "dev"
-      - "feat/v2"
   workflow_dispatch:
 
 env:

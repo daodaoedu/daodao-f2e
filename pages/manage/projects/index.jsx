@@ -95,6 +95,7 @@ const Projects = () => {
               <Button
                 onClick={handleCreateProject}
                 variant="solid"
+                color="primary"
                 className="hover:cursor-pointer flex-shrink-0"
               >
                 新增計畫

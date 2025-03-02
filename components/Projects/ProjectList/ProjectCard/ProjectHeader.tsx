@@ -29,7 +29,7 @@ const ProjectHeader = ({ project }: ProjectHeaderProps) => {
           <Dropdown.Toggle variant="solid" className="flex flex-row items-center justify-center bg-white text-basic-300 hover:bg-basic-100 hover:text-basic-300 hover:shadow-none p-0 w-6 h-6 text-base">
             <MdMoreVert />
           </Dropdown.Toggle>
-          <Dropdown.List className="top-full left-0 z-20 p-0">
+          <Dropdown.List className="z-20 p-0">
             <Dropdown.Item className="rounded-lg text-nowrap">
               <Button
                 onClick={() => window.open('https://forms.gle/NkVbDWC3eXk4P4gv7', '_blank', 'noopener')}

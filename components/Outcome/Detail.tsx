@@ -1,9 +1,12 @@
 import Image from '@/shared/components/Image';
 import PostDetailCard from '@/shared/components/Post/PostDetailCard';
 import { ProjectOutcomeSchema } from '@/services/project/outcomes';
+import { BaseUserSchema } from '@/services/users';
+import { CommentType } from '@/services/comments';
 
 interface OutcomeDetailProps {
   data?: ProjectOutcomeSchema;
+  authorUser?: BaseUserSchema;
   className?: string;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
@@ -11,6 +14,7 @@ interface OutcomeDetailProps {
 
 function OutcomeDetail({
   data,
+  authorUser,
   className,
   onEditClick,
   onDeleteClick,
@@ -18,6 +22,8 @@ function OutcomeDetail({
   return (
     <PostDetailCard
       data={data}
+      targetType={CommentType.Outcome}
+      authorUser={authorUser}
       className={className}
       tag="成果"
       onEditClick={onEditClick}
@@ -30,6 +36,7 @@ function OutcomeDetail({
               src={outcomeData.imgUrls[0]}
               alt={outcomeData.title}
               height="300px"
+              className="object-contain"
             />
           )}
         </div>

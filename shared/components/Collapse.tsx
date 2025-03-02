@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { ToggleProvider, useToggle } from '@/contexts/Toggle';
 import { cn } from '@/utils/cn';
 
@@ -10,10 +9,7 @@ interface CollapseProps {
 
 function Collapse({ as: Root = 'div', children, defaultOpen }: CollapseProps) {
   return (
-    <ToggleProvider
-      key={defaultOpen ? 'open' : 'close'}
-      defaultEnabled={defaultOpen}
-    >
+    <ToggleProvider defaultEnabled={defaultOpen}>
       <Root className="relative">{children}</Root>
     </ToggleProvider>
   );
@@ -26,16 +22,21 @@ interface CollapseToggleProps {
 }
 
 function Toggle({ children, className, withIcon }: CollapseToggleProps) {
-  const [isOpen, setIsOpen] = useToggle({
+  const { isOpen, setIsOpen } = useToggle({
     errorMessage: 'Collapse.Toggle must be used within a Collapse',
   });
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setIsOpen(!isOpen);
+  };
 
   return (
     <button
       type="button"
       className={cn('flex items-center', className)}
       aria-pressed={isOpen}
-      onClick={() => setIsOpen(!isOpen)}
+      onClick={handleClick}
     >
       {children}
       {withIcon && (
@@ -58,24 +59,9 @@ interface CollapseListProps {
 }
 
 function List({ children, className }: CollapseListProps) {
-  const [isOpened, setIsOpened] = useState(false);
-  const [isOpen] = useToggle({
+  const { isOpen, isOpened } = useToggle({
     errorMessage: 'Collapse.List must be used within a Collapse',
   });
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-
-    if (isOpen) {
-      timer = setTimeout(() => {
-        setIsOpened(true);
-      }, 300);
-    } else {
-      setIsOpened(false);
-    }
-
-    return () => clearTimeout(timer);
-  }, [isOpen]);
 
   return (
     <ul

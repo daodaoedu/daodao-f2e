@@ -29,6 +29,7 @@ interface TaskType {
   description: string,
   daysOfWeek: string[],
   isCompleted: boolean,
+  position: number,
 }
 
 const TaskCreate = ({
@@ -43,6 +44,7 @@ const TaskCreate = ({
     description: "",
     daysOfWeek: [],
     isCompleted: false,
+    position: 1000,
   });
   const { createTask, fetchMilestones } = useMilestones();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

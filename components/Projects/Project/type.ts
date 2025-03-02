@@ -28,6 +28,7 @@ export interface Project {
   eventId: string;
   user: User;
   milestones: Milestone[];
+  version: number;
 }
 
 export const DEFAULT_PROJECT: Project = {
@@ -56,4 +57,5 @@ export const DEFAULT_PROJECT: Project = {
     roleList: []
   },
   milestones: [],
+  version: 1,
 };

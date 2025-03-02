@@ -64,7 +64,7 @@ const PageProjectsEvents = () => {
     const fetchProjects = async () => {
       try {
         setIsFetchingProjects(true);
-        const response = await fetch(`${BASE_URL}/projects`);
+        const response = await fetch(`${BASE_URL}/projects/public`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -102,7 +102,7 @@ const PageProjectsEvents = () => {
             )
           }
           {Array.isArray(projects) && projects.length > 0
-            ? <ProjectList projects={projects} />
+            ? <ProjectList projects={projects} path="" />
             : <EmptyList />
           }
         </div>

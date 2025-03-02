@@ -21,23 +21,22 @@ const OutcomeDetailPage = () => {
   const { data: project } = useProject({ id: projectId });
   const {
     data: outcome,
-    update,
-    remove,
+    update: updateOutcome,
+    remove: removeOutcome,
   } = useProjectOutcome({
     projectId,
     outcomeId,
     onUpdated: () => {
-      toast.success('覆盤更新成功');
+      toast.success('更新成功');
       setModalType(null);
     },
     onDeleted: () => {
-      toast.success('覆盤刪除成功');
+      toast.success('刪除成功');
       router.replace(`/manage/project/outcomes?id=${projectId}`);
     },
   });
 
   if (!projectId || !outcomeId) {
-    router.replace(`/manage/project/outcomes?id=${projectId}`);
     return null;
   }
 
@@ -45,6 +44,7 @@ const OutcomeDetailPage = () => {
     <div className="bg-basic-white rounded-2xl">
       <OutcomeDetail
         data={outcome}
+        authorUser={project?.user}
         onEditClick={() => setModalType(ModalTypeEnum.Update)}
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
       />
@@ -59,8 +59,8 @@ const OutcomeDetailPage = () => {
           createdAt={outcome.date}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
-          onSubmit={update.trigger}
-          isLoading={update.isMutating}
+          onSubmit={updateOutcome.trigger}
+          isLoading={updateOutcome.isMutating}
         />
       )}
 
@@ -70,8 +70,8 @@ const OutcomeDetailPage = () => {
         confirmColor="alert"
         isOpen={modalType === ModalTypeEnum.Delete}
         onClose={() => setModalType(null)}
-        onConfirm={() => remove.trigger({ projectId, outcomeId })}
-        isLoading={remove.isMutating}
+        onConfirm={() => removeOutcome.trigger({ projectId, outcomeId })}
+        isLoading={removeOutcome.isMutating}
       />
     </div>
   );

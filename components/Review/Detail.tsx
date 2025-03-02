@@ -1,14 +1,22 @@
 import PostDetailCard, { BasePostDetailData } from '@/shared/components/Post/PostDetailCard';
 import { ProjectReviewSchema } from '@/services/project/reviews';
+import { BaseUserSchema } from '@/services/users';
+import { CommentType } from '@/services/comments';
 import RadioGroup from './RadioGroup';
 
 interface ReviewDetailProps {
   data?: ProjectReviewSchema;
+  authorUser?: BaseUserSchema;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
 }
 
-function ReviewDetail({ data, onEditClick, onDeleteClick }: ReviewDetailProps) {
+function ReviewDetail({
+  data,
+  authorUser,
+  onEditClick,
+  onDeleteClick,
+}: ReviewDetailProps) {
   if (!data) return null;
 
   const postData: BasePostDetailData = {
@@ -21,7 +29,9 @@ function ReviewDetail({ data, onEditClick, onDeleteClick }: ReviewDetailProps) {
   return (
     <PostDetailCard
       data={postData}
+      targetType={CommentType.Review}
       tag="覆盤"
+      authorUser={authorUser}
       onEditClick={onEditClick}
       onDeleteClick={onDeleteClick}
       renderContent={() => (

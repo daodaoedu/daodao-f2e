@@ -21,23 +21,22 @@ const ReviewPage = () => {
   const { data: project } = useProject({ id: projectId });
   const {
     data: review,
-    update,
-    remove,
+    update: updateReview,
+    remove: removeReview,
   } = useProjectReview({
     projectId,
     reviewId,
     onUpdated: () => {
-      toast.success('覆盤更新成功');
+      toast.success('更新成功');
       setModalType(null);
     },
     onDeleted: () => {
-      toast.success('覆盤刪除成功');
+      toast.success('刪除成功');
       router.replace(`/manage/project/review?id=${projectId}`);
     },
   });
 
   if (!projectId || !reviewId) {
-    router.replace(`/manage/project/review?id=${projectId}`);
     return null;
   }
 
@@ -45,6 +44,7 @@ const ReviewPage = () => {
     <>
       <ReviewDetail
         data={review}
+        authorUser={project?.user}
         onEditClick={() => setModalType(ModalTypeEnum.Update)}
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
       />
@@ -59,8 +59,8 @@ const ReviewPage = () => {
           createdAt={review.createdAt}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
-          onSubmit={update.trigger}
-          isLoading={update.isMutating}
+          onSubmit={updateReview.trigger}
+          isLoading={updateReview.isMutating}
         />
       )}
 
@@ -71,8 +71,8 @@ const ReviewPage = () => {
           confirmColor="alert"
           isOpen={modalType === ModalTypeEnum.Delete}
           onClose={() => setModalType(null)}
-          onConfirm={() => remove.trigger({ projectId, reviewId })}
-          isLoading={remove.isMutating}
+          onConfirm={() => removeReview.trigger({ projectId, reviewId })}
+          isLoading={removeReview.isMutating}
         />
       )}
     </>

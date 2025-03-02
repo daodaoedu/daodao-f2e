@@ -1,11 +1,11 @@
 import dayjs from 'dayjs';
-import CommentInput from '@/shared/components/Comment/CommentInput';
-import Comment from '@/public/assets/icons/comment.svg';
 import PostCard from '@/shared/components/Post/PostCard';
 import Button from '@/shared/components/Button';
-import CommentCard from '@/shared/components/Comment/CommentCard';
-import FeatureOverlay from '@/shared/components/FeatureOverlay';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
+import { CommentType } from '@/services/comments';
+import { BaseUserSchema } from '@/services/users';
+import { useAuth } from '@/contexts/Auth';
+import CommentSection from '@/shared/components/Comment/CommentSection';
 
 export interface BasePostDetailData {
   id: number;
@@ -16,6 +16,10 @@ export interface BasePostDetailData {
 
 interface BasePostDetailCardProps<T extends BasePostDetailData> {
   data?: T;
+  /** 留言類型，不傳則不顯示留言功能 */
+  targetType?: CommentType;
+  /** 作者資訊，不傳則不顯示編輯、刪除功能 */
+  authorUser?: BaseUserSchema;
   className?: string;
   tag: string;
   onEditClick?: () => void;
@@ -25,38 +29,56 @@ interface BasePostDetailCardProps<T extends BasePostDetailData> {
 
 function PostDetailCard<T extends BasePostDetailData>({
   data,
+  targetType,
+  authorUser,
   className,
   tag,
   onEditClick,
   onDeleteClick,
   renderContent,
 }: BasePostDetailCardProps<T>) {
-  const dropdownItems = [
-    {
-      key: 'edit',
-      children: (
-        <Button
-          size="sm"
-          className="hover:bg-primary-lightest"
-          onClick={onEditClick}
-        >
-          編輯
-        </Button>
-      ),
-    },
-    {
-      key: 'delete',
-      children: (
-        <Button
-          size="sm"
-          className="hover:bg-primary-lightest"
-          onClick={onDeleteClick}
-        >
-          刪除
-        </Button>
-      ),
-    },
-  ];
+  const { user } = useAuth();
+  const isSelf = user?._id === authorUser?._id;
+
+  const dropdownItems = isSelf
+    ? [
+        {
+          key: 'edit',
+          children: (
+            <Button
+              size="sm"
+              className="hover:bg-primary-lightest"
+              onClick={onEditClick}
+            >
+              編輯
+            </Button>
+          ),
+        },
+        {
+          key: 'delete',
+          children: (
+            <Button
+              size="sm"
+              className="hover:bg-primary-lightest"
+              onClick={onDeleteClick}
+            >
+              刪除
+            </Button>
+          ),
+        },
+      ]
+    : [
+        {
+          key: 'report',
+          children: '檢舉',
+          onClick: () =>
+            window.open(
+              'https://forms.gle/NkVbDWC3eXk4P4gv7',
+              '_blank',
+              'noopener'
+            ),
+        },
+      ];
 
   if (!data) return null;
 
@@ -71,21 +93,10 @@ function PostDetailCard<T extends BasePostDetailData>({
       />
       {renderContent(data)}
       <hr className="mb-4 h-px bg-basic-100" />
-
-      <FeatureOverlay>
-        <PostCard.Reward userName="用戶A" />
-        <CommentInput className="px-4 py-6 border-b border-solid border-basic-200" />
-        <div className="my-2 flex items-center gap-0.5 body-md text-basic-500">
-          <Comment />
-          <span>回覆 (1)</span>
-        </div>
-        <CommentCard
-          avatar=""
-          className="px-8 py-6 border border-solid border-basic-200 rounded-lg"
-        >
-          <CommentCard avatar="" />
-        </CommentCard>
-      </FeatureOverlay>
+      <PostCard.Reward userName={authorUser?.name} />
+      {targetType && (
+        <CommentSection targetId={data.id} targetType={targetType} />
+      )}
     </PostCard>
   );
 }

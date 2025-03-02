@@ -38,17 +38,17 @@ const OutcomesPage = () => {
     remove,
   } = useProjectOutcomeList(projectId, {
     onCreated: () => {
-      toast.success('新增學習成果成功');
+      toast.success('新增成功');
       setModalType(null);
     },
     onUpdated: () => {
-      toast.success('覆盤更新成功');
+      toast.success('更新成功');
       setModalType(null);
       setOutcomeId(undefined);
       mutate();
     },
     onDeleted: () => {
-      toast.success('覆盤刪除成功');
+      toast.success('刪除成功');
       setModalType(null);
       setOutcomeId(undefined);
     },

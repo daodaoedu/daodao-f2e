@@ -1,9 +1,10 @@
+import { useState } from 'react';
 import Skeleton from '@mui/material/Skeleton';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import emptyCoverWithBackgroundImg from '@/public/assets/empty-cover-with-background.png';
-import { useState } from 'react';
+import { cn } from '@/utils/cn';
 
-const Loading = ({ height }) => (
+const Loading = ({ height }: { height: string }) => (
   <Skeleton
     variant="rectangular"
     height={height}
@@ -12,6 +13,18 @@ const Loading = ({ height }) => (
   />
 );
 
+type ImageProps = {
+  src: string;
+  alt: string;
+  width?: string;
+  height?: string;
+  background?: string;
+  borderRadius?: string;
+  className?: string;
+  wrapperClassName?: string;
+};
+
+/** TODO: background 與 borderRadius 未來逐步替換到 tailwind */
 const Image = ({
   src,
   alt,
@@ -19,7 +32,9 @@ const Image = ({
   height = '122px',
   background = 'transparent',
   borderRadius = '8px',
-}) => {
+  className,
+  wrapperClassName,
+}: ImageProps) => {
   const [isError, setIsError] = useState(false);
   return (
     <LazyLoadImage
@@ -28,9 +43,9 @@ const Image = ({
       width={width}
       height={height}
       effect="opacity"
+      className={cn('object-cover object-center', className)}
+      wrapperClassName={wrapperClassName}
       style={{
-        objectFit: 'cover',
-        objectPosition: 'center',
         borderRadius,
         background,
         height,

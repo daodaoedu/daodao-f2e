@@ -10,18 +10,17 @@ import toast from 'react-hot-toast';
 
 import { MdSend, MdClose, MdEdit } from "react-icons/md";
 import { Milestone as MilestoneType } from "../../contexts/Milestones/type";
-import { numberToZh } from "./Shared";
 
 interface MilestoneProps {
+  index: number;
   projectId?: string;
   milestone: MilestoneType;
-  isLgScreen?: boolean;
   onRefreshData?: () => void;
 }
 const Milestone = ({
+  index,
   projectId,
   milestone,
-  isLgScreen = false,
   onRefreshData,
 }: MilestoneProps) => {
   const { project } = useProject();
@@ -79,16 +78,16 @@ const Milestone = ({
   };
 
   return (
-    <div className="p-[10px] md:py-3 md:px-4 rounded-lg bg-white">
-      <div className="flex flex-row items-center justify-beetween mb-[10px]">
-        <div className="bg-primary-base text-white py-[5px] px-5 rounded-[20px] font-sans text-sm leading-[140%]">
-          第{numberToZh(milestone.week)}週
-        </div>
-        {isLgScreen && (
-          <div className="md:ml-3 font-sans text-sm text-basic-300">
-            {/* <span>50%</span> */}
+    <div className="p-2.5 md:py-3 md:px-4 rounded-lg bg-white">
+      <div className="flex flex-row items-center justify-between mb-2.5">
+        <div className="flex flex-row items-center gap-2.5">
+          <div className="text-primary-base body-sm">
+            里程碑 {index + 1}
           </div>
-        )}
+          <span className="hidden md:block ml-3 body-sm text-basic-300">
+            50%
+          </span>
+        </div>
         <div className="
           ml-auto
           flex flex-row items-center gap-[3px]

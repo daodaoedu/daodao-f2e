@@ -90,7 +90,8 @@ function NoteForm({
               src={previewImage}
               alt="preview"
               width="100%"
-              height="100%"
+              height="300px"
+              className="object-contain"
             />
             <span className="absolute inset-0 bottom-1.5 group-hover:bg-basic-black/20 transition-colors rounded-lg" />
             <Button

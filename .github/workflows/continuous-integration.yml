@@ -6,8 +6,9 @@ concurrency:
 
 on:
   pull_request:
-    branches:
-      - "**"
+    branches-ignore:
+      - "prod"
+      - "dev"
   workflow_call:
   workflow_dispatch:
 

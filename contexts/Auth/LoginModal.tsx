@@ -32,7 +32,7 @@ export default function LoginModal({
     if (timer.current !== null) {
       clearInterval(timer.current);
     }
-    
+
     if (popup?.parent) {
       timer.current = setInterval(() => {
         setIsOpenWindow(!!popup.parent);

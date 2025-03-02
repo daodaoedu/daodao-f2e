@@ -14,6 +14,7 @@ interface UseProjectMilestoneOptions {
   projectId?: string;
   milestoneId?: number;
   mutateKey?: string | null;
+  mutate?: (data: UpdateProjectMilestoneRequest) => void;
   onCreated?: () => void;
   onUpdated?: () => void;
   onDeleted?: () => void;
@@ -23,6 +24,7 @@ export default function useProjectMilestone({
   projectId,
   milestoneId,
   mutateKey,
+  mutate,
   onCreated,
   onUpdated,
   onDeleted,
@@ -43,8 +45,11 @@ export default function useProjectMilestone({
 
   const update = useSWRMutation(
     swrKey ?? mutateKey,
-    (url, { arg }: { arg: UpdateProjectMilestoneRequest }) =>
-      updateProjectMilestone(arg),
+    async (url, { arg }: { arg: UpdateProjectMilestoneRequest }) => {
+      await updateProjectMilestone(arg);
+
+      mutate?.(arg);
+    },
     { onSuccess: onUpdated }
   );
 

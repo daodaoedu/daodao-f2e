@@ -21,29 +21,30 @@ const NoteDetailPage = () => {
   const { data: project } = useProject({ id: projectId });
   const {
     data: note,
-    update,
-    remove,
+    update: updateNote,
+    remove: removeNote,
   } = useProjectNote({
     projectId,
     noteId,
     onUpdated: () => {
-      toast.success('便利貼更新成功');
+      toast.success('更新成功');
       setModalType(null);
     },
     onDeleted: () => {
-      toast.success('便利貼刪除成功');
+      toast.success('刪除成功');
       router.replace(`/manage/project/notes?id=${projectId}`);
     },
   });
 
   if (!projectId || !noteId) {
-    router.replace(`/manage/project/notes?id=${projectId}`);
     return null;
   }
+
   return (
     <div className="bg-basic-white rounded-2xl">
       <NoteDetail
         data={note}
+        authorUser={project?.user}
         onEditClick={() => setModalType(ModalTypeEnum.Update)}
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
       />
@@ -58,8 +59,8 @@ const NoteDetailPage = () => {
           createdAt={note.date}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
-          onSubmit={update.trigger}
-          isLoading={update.isMutating}
+          onSubmit={updateNote.trigger}
+          isLoading={updateNote.isMutating}
         />
       )}
 
@@ -69,8 +70,8 @@ const NoteDetailPage = () => {
         confirmColor="alert"
         isOpen={modalType === ModalTypeEnum.Delete}
         onClose={() => setModalType(null)}
-        onConfirm={() => remove.trigger({ projectId, noteId })}
-        isLoading={remove.isMutating}
+        onConfirm={() => removeNote.trigger({ projectId, noteId })}
+        isLoading={removeNote.isMutating}
       />
     </div>
   );
