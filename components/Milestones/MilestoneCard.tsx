@@ -68,13 +68,25 @@ function MilestoneCard(
   const [isEditing, setIsEditing] = useState(defaultEditing);
   const [isLoading, setIsLoading] = useState(false);
   const preEditingStateRef = useRef(!isEditing);
-  const isCompleteAllTasks = useMemo(
-    () =>
-      Array.isArray(milestone.tasks)
-        ? milestone.tasks.every((task) => task.isCompleted)
-        : true,
-    [milestone.tasks]
-  );
+  const tasksInfo = useMemo(() => {
+    if (!Array.isArray(milestone.tasks) || !milestone.tasks.length) {
+      return {
+        isCompleteAll: true,
+        progress: 100,
+      };
+    }
+    const totalCount = milestone.tasks.length;
+    const completeCount = milestone.tasks.filter(
+      (task) => task.isCompleted
+    ).length;
+    const isCompleteAll = completeCount === totalCount;
+    const progress = Math.round((completeCount / totalCount) * 100);
+
+    return {
+      isCompleteAll,
+      progress,
+    };
+  }, [milestone.tasks]);
   const { data: project } = useProject({ id: projectId });
 
   const { openDialog } = useDialog();
@@ -152,7 +164,7 @@ function MilestoneCard(
 
     if (isLoading || !isEditable) return;
 
-    if (!isCompleteAllTasks && targetIsCompleted) {
+    if (!tasksInfo.isCompleteAll && targetIsCompleted) {
       toast.error('請先完成所有子任務');
       return;
     }
@@ -258,7 +270,9 @@ function MilestoneCard(
             <div className="text-primary-base body-sm">
               里程碑 {index > -1 && index + 1}
             </div>
-            <span className="hidden ml-3 body-sm text-basic-300">TODO 50%</span>
+            <span className="hidden md:block ml-3 body-sm text-basic-300">
+              {tasksInfo.progress}%
+            </span>
           </div>
           <DateRangePicker
             startDate={

@@ -3,6 +3,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
 import { Skeleton } from '@mui/material';
+import { MdOutlineSort } from 'react-icons/md';
 import { Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
 import { ProtectedComponent } from '@/contexts/Auth';
 import { useProject } from '@/contexts/Project';
@@ -238,9 +239,10 @@ const MilestonesContent = () => {
                   </div>
                   <Button
                     variant="outline"
-                    className="rounded-lg px-2.5"
+                    className="rounded-lg px-2.5 flex items-center gap-2"
                     onClick={() => setIsAscending(!isAscending)}
                   >
+                    <MdOutlineSort className="size-6 text-primary-base" />
                     {isAscending ? '舊到新' : '新到舊'}
                   </Button>
                 </div>
