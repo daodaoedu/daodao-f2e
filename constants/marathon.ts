@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-const MARATHON_START_DATE = dayjs('2025-02-09').startOf('day');
+const MARATHON_START_DATE = dayjs('2025-02-10').startOf('day');
 const MARATHON_END_DATE = dayjs('2025-07-12').endOf('day');
 
 const marathonConfig = Object.freeze({

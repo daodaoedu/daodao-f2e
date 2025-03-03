@@ -138,7 +138,6 @@ export const getDefaultMilestone = ({
 
   return {
     name: '',
-    description: '',
     isCompleted: false,
     projectId,
     startDate: calcStartDate.format('YYYY/MM/DD'),
