@@ -1,4 +1,4 @@
-import { useState, useEffect, useId } from 'react';
+import { useState, useEffect, useId, useRef } from 'react';
 import { cn } from '@/utils/cn';
 import { AiOutlineClose } from 'react-icons/ai';
 import Portal from './Portal';
@@ -36,6 +36,7 @@ function Modal({
   onRemovedDOM,
 }: ModalProps) {
   const id = useId();
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const modalId = `modal-${id}`;
   const [removeDOM, setRemoveDOM] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -80,6 +81,25 @@ function Modal({
     return () => window.removeEventListener('keyup', handleWindowKeyUp);
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (isOpen) {
+      timer = setTimeout(() => {
+        console.log(dialogRef.current);
+        if (dialogRef.current) {
+          console.log(window.innerHeight - dialogRef.current.clientHeight);
+          dialogRef.current.style.setProperty(
+            '--dialog-top',
+            `max(calc(100dvh - ${dialogRef.current.clientHeight}px), 20dvh)`
+          );
+        }
+      }, 0);
+    }
+
+    return () => clearTimeout(timer);
+  }, [isOpen]);
+
   return (
     (!removeDOM || keepMounted) && (
       <Portal rootId={modalId}>
@@ -101,25 +121,21 @@ function Modal({
           className={cn(
             'fixed inset-0 z-[99] flex overflow-y-auto pointer-events-none',
             'transition-opacity opacity-0 ease-in duration-200',
-            isInitialized && [
-              isOpen
-                ? 'animate-fade-in'
-                : 'animate-fade-out',
-            ]
+            isInitialized && [isOpen ? 'animate-fade-in' : 'animate-fade-out']
           )}
         >
           <dialog
+            ref={dialogRef}
             open={!removeDOM}
             className={cn(
-              'fixed -bottom-4 p-10 w-full max-h-[80%] pointer-events-auto',
-              'rounded-lg bg-white overflow-x-hidden',
-              'transition-transform translate-y-full ease-in duration-200',
+              'relative top-[var(--dialog-top)] my-0 p-5 pb-20 w-full',
+              'bg-white rounded-lg pointer-events-auto',
               size === ModalSize.Small &&
-                'sm:relative sm:bottom-auto sm:top-12 sm:max-w-96 sm:max-h-none',
+                'sm:relative sm:top-12 sm:m-auto sm:p-10 sm:max-w-96',
               size === ModalSize.Medium &&
-                'md:relative md:bottom-auto md:top-12 md:max-w-screen-md md:max-h-none',
+                'md:relative md:top-12 md:m-auto md:p-10 md:max-w-screen-md',
               size === ModalSize.Large &&
-                'lg:relative lg:bottom-auto lg:top-12 lg:max-w-screen-lg lg:max-h-none',
+                'lg:relative lg:top-12 lg:m-auto lg:p-10 lg:max-w-screen-lg',
               isOpen ? 'animate-slide-y-in' : 'animate-slide-y-out',
               className
             )}
@@ -144,6 +160,14 @@ function Modal({
               </Button>
             )}
             {children}
+            <div
+              className={cn(
+                'absolute bottom-0 left-0 right-0 p-5 bg-white',
+                size === ModalSize.Small && 'sm:hidden',
+                size === ModalSize.Medium && 'md:hidden',
+                size === ModalSize.Large && 'lg:hidden'
+              )}
+            />
           </dialog>
         </div>
       </Portal>
