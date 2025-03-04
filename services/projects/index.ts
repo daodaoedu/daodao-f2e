@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { projectMilestoneSchema } from './milestone';
+import { projectMilestoneSchema } from './milestones';
 import { mutations } from '../httpClient';
 import { baseUserSchema } from '../users';
 

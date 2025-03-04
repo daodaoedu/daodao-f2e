@@ -5,8 +5,8 @@ import {
   ProjectMilestoneSchema,
   sortMilestones,
   UpdateProjectMilestoneRequest,
-} from '@/services/project/milestone';
-import { getTask, UpdateProjectTaskRequest } from '@/services/project/tasks';
+} from '@/services/projects/milestones';
+import { getTask, UpdateProjectTaskRequest } from '@/services/projects/tasks';
 
 import useProjectMilestone from './useProjectMilestone';
 import useProjectTask from './useProjectTask';

@@ -1,5 +1,5 @@
 import { EMOJI_OPTIONS } from '@/constants/project';
-import { ProjectReviewSchema } from '@/services/project/reviews';
+import { ProjectReviewSchema } from '@/services/projects/reviews';
 import PostPreviewCard, { BasePostData } from '@/shared/components/Post/PostPreviewCard';
 
 interface ReviewCardProps {

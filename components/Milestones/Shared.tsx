@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import z from "zod";
 import { cn } from "@/utils/cn";
-import { CreateProjectMilestoneRequest, ProjectMilestoneSchema } from "@/services/project/milestone";
+import { CreateProjectMilestoneRequest, ProjectMilestoneSchema } from "@/services/projects/milestones";
 
 const idSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 

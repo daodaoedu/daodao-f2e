@@ -16,7 +16,7 @@ import dayjs from 'dayjs';
 import DateRangePicker from '@/shared/components/DateRangePicker';
 import Button from '@/shared/components/Button';
 import useProjectMilestoneList from '@/hooks/api/project/useProjectMilestoneList';
-import { ProjectMilestoneSchema } from '@/services/project/milestone';
+import { ProjectMilestoneSchema } from '@/services/projects/milestones';
 import CalendarIcon from '@/public/assets/icons/calendar.svg';
 
 const SkeletonMilestones = () => {

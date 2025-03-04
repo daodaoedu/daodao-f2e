@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import {
   getProjectNoteEndpoint,
   ProjectNoteSchema,
-} from '@/services/project/notes';
+} from '@/services/projects/notes';
 
 import useProjectNote from './useProjectNote';
 

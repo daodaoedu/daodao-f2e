@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import {
   getProjectOutcomeEndpoint,
   ProjectOutcomeSchema,
-} from '@/services/project/outcomes';
+} from '@/services/projects/outcomes';
 
 import useProjectOutcome from './useProjectOutcome';
 

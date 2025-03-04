@@ -26,7 +26,7 @@ import {
   ProjectMilestoneSchema,
   UpdateProjectMilestoneRequest,
   updateProjectMilestoneSchema,
-} from '@/services/project/milestone';
+} from '@/services/projects/milestones';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getDefaultMilestone } from './Shared';
 
