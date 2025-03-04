@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
-import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import dayjs, { Dayjs } from 'dayjs';
@@ -242,6 +241,12 @@ interface ProjectProps {
 }
 
 const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(href, '_blank');
+  };
+
   return (
     <div
       className={cn(
@@ -253,13 +258,13 @@ const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
     >
       <Collapse defaultOpen={defaultOpen}>
         <Collapse.Toggle className="w-full px-3 py-2 justify-between" withIcon>
-          <Link
-            href={href}
+          <Button
             className="flex items-center gap-2 body-md text-basic-500"
+            onClick={handleClick}
           >
             {title}
             <GoArrowUpRight className="stroke-1" />
-          </Link>
+          </Button>
         </Collapse.Toggle>
         <Collapse.List>
           <Collapse.Item className="overflow-hidden">{children}</Collapse.Item>
