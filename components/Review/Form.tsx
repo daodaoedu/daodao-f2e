@@ -7,7 +7,7 @@ import {
   createProjectReviewSchema,
   UpdateProjectReviewRequest,
   updateProjectReviewSchema,
-} from '@/services/project/reviews';
+} from '@/services/projects/reviews';
 import Button from '@/shared/components/Button';
 import Form from '@/shared/components/Form';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';

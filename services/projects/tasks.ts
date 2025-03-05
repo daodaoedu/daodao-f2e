@@ -23,7 +23,6 @@ export const getProjectTaskEndpoint = ({
 export const projectTaskSchema = z.object({
   id: z.number(),
   name: z.string().min(1, '請輸入名稱'),
-  description: z.string(),
   daysOfWeek: z.array(z.string()),
   isCompleted: z.boolean(),
   milestoneId: z.number(),

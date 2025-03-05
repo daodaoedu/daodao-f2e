@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
-import { CreateProjectMilestoneRequest, ProjectMilestoneSchema, UpdateProjectMilestoneRequest } from '@/services/project/milestone';
+import {
+  CreateProjectMilestoneRequest,
+  ProjectMilestoneSchema,
+  UpdateProjectMilestoneRequest,
+} from '@/services/projects/milestones';
 import TaskList from '@/components/Tasks/TaskList';
+import Collapse from '@/shared/components/Collapse';
 import MilestoneCard from './MilestoneCard';
 import TaskCreate from '../Tasks/Create';
 import TaskAdd from '../Tasks/Add';
@@ -43,22 +48,33 @@ const MilestoneItem = ({
         onCreate={onCreate}
         onUpdate={onUpdate}
       />
-      <TaskList
-        tasks={milestone.tasks || []}
-        projectId={projectId}
-        milestoneId={milestone.id}
-        onRefreshData={onRefreshData}
-      />
-      {isEditing && (
-        <TaskCreate
-          index={milestone.tasks?.length || 0}
-          projectId={projectId}
-          milestoneId={milestone.id}
-          onCancel={() => setIsEditing(false)}
-          onRefreshData={onRefreshData}
-        />
-      )}
-      <TaskAdd setIsEditing={setIsEditing} />
+      <Collapse defaultOpen>
+        <Collapse.List>
+          <Collapse.Item>
+            <div className="pb-2 flex flex-col gap-2">
+              <TaskList
+                tasks={milestone.tasks || []}
+                projectId={projectId}
+                milestoneId={milestone.id}
+                onRefreshData={onRefreshData}
+              />
+            </div>
+          </Collapse.Item>
+        </Collapse.List>
+        {isEditing && (
+          <TaskCreate
+            index={milestone.tasks?.length || 0}
+            projectId={projectId}
+            milestoneId={milestone.id}
+            onCancel={() => setIsEditing(false)}
+            onRefreshData={onRefreshData}
+          />
+        )}
+        <TaskAdd setIsEditing={setIsEditing} />
+        <Collapse.Toggle withIcon className="w-full flex justify-center body-sm">
+          {(isOpen) => (isOpen ? '收合' : '展開')}
+        </Collapse.Toggle>
+      </Collapse>
     </div>
   );
 };

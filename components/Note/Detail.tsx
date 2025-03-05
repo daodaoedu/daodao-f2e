@@ -1,6 +1,6 @@
 import Image from '@/shared/components/Image';
 import PostDetailCard from '@/shared/components/Post/PostDetailCard';
-import { ProjectNoteSchema } from '@/services/project/notes';
+import { ProjectNoteSchema } from '@/services/projects/notes';
 import { BaseUserSchema } from '@/services/users';
 import { CommentType } from '@/services/comments';
 

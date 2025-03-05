@@ -16,7 +16,7 @@ function Collapse({ as: Root = 'div', children, defaultOpen }: CollapseProps) {
 }
 
 interface CollapseToggleProps {
-  children: React.ReactNode;
+  children: React.ReactNode | ((isOpen: boolean) => React.ReactNode);
   className?: string;
   withIcon?: boolean;
 }
@@ -38,7 +38,7 @@ function Toggle({ children, className, withIcon }: CollapseToggleProps) {
       aria-pressed={isOpen}
       onClick={handleClick}
     >
-      {children}
+      {typeof children === 'function' ? children(isOpen) : children}
       {withIcon && (
         <div
           className={cn(

@@ -8,7 +8,7 @@ import {
   ProjectSchema,
   updateProject,
   UpdateProjectRequest,
-} from '@/services/project';
+} from '@/services/projects';
 
 interface UseProjectOptions {
   id?: string;

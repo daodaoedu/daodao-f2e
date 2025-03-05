@@ -32,7 +32,6 @@ export const projectMilestoneSchema = z.object({
       typeof val === 'number' && Number.isInteger(val) && val > 0 ? val : 1000
     ),
   name: z.string().min(1, '請輸入名稱'),
-  description: z.string(),
   startDate: z.string(),
   endDate: z.string(),
   isCompleted: z.boolean(),

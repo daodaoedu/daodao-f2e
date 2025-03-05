@@ -8,7 +8,7 @@ import Container from '@/shared/components/Container';
 import EditMode from '@/components/Projects/Project/EditMode';
 import SEOConfig from '@/shared/components/SEO';
 import { useProjectList } from '@/hooks/api/project';
-import { createProjectSchema } from '@/services/project';
+import { createProjectSchema } from '@/services/projects';
 
 const ProjectPage = () => {
   const router = useRouter();

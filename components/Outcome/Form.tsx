@@ -10,7 +10,7 @@ import {
   createProjectOutcomeSchema,
   UpdateProjectOutcomeRequest,
   updateProjectOutcomeSchema,
-} from '@/services/project/outcomes';
+} from '@/services/projects/outcomes';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
 import Image from '@/shared/components/Image';
 import Upload from '@/shared/components/Upload';

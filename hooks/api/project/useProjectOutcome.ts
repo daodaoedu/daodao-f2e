@@ -8,7 +8,7 @@ import {
   deleteProjectOutcome,
   getProjectOutcomeEndpoint,
   updateProjectOutcome,
-} from '@/services/project/outcomes';
+} from '@/services/projects/outcomes';
 
 interface UseProjectOutcomeOptions {
   projectId?: string;
