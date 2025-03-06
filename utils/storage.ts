@@ -21,3 +21,4 @@ export const getRedirectionStorage = () => createStorage<string>('_r');
 export const getTrustWebsitesStorage = () => createStorage<string[]>('_trustWeb');
 export const getReminderStorage = () => createStorage<number>('_reminder');
 export const getMarathonErrorsStorage = () => createStorage('_marathonFormErrors');
+export const getDevOriginStorage = () => createStorage('_devOrigin');

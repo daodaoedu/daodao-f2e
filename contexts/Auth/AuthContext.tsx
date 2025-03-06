@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux';
 import { fetchUserByToken, userLogout } from '@/redux/actions/user';
 import { HttpError } from '@/services/httpClient';
 import {
+  getDevOriginStorage,
   getRedirectionStorage,
   getReminderStorage,
   getTokenStorage,
@@ -27,6 +28,7 @@ import {
   updateUser,
   updateUserSchema,
 } from '@/services/users';
+import { checkIsDevHost } from '@/utils/env';
 
 import LoginModal from './LoginModal';
 import {
@@ -378,17 +380,32 @@ export const ProtectedComponent = ({
 export const sendLoginEvent = (token: string) => {
   getTokenStorage().remove();
 
-  if (
-    window.opener &&
-    window.opener.location.origin === window.location.origin
-  ) {
-    window.opener.postMessage(
-      { type: LOGIN_TYPE, payload: { token } },
-      window.location.origin
-    );
-    window.close();
-    return true;
-  }
+  try {
+    if (
+      window.opener &&
+      window.opener.location.origin === window.location.origin
+    ) {
+      window.opener.postMessage(
+        { type: LOGIN_TYPE, payload: { token } },
+        window.location.origin
+      );
+      window.close();
+      return true;
+    }
 
-  return false;
+    return false;
+  } catch (e) {
+    if (e instanceof DOMException) {
+      // 非同源政策會拋出錯誤，只有開發分支與本地開發會有此情況
+      const isDevHost = checkIsDevHost();
+      const origin = getDevOriginStorage().get();
+
+      if (isDevHost && origin) {
+        getDevOriginStorage().remove();
+        window.location.href = `${origin}/auth/google?token=${token}`;
+      }
+      return true;
+    }
+    throw e;
+  }
 };
