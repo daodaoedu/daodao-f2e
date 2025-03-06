@@ -12,6 +12,7 @@ export enum CommentType {
   Note = 'note',
   Outcome = 'outcome',
   Review = 'review',
+  Idea = 'idea',
 }
 
 export enum CommentVisibility {
