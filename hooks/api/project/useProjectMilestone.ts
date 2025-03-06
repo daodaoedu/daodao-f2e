@@ -8,7 +8,7 @@ import {
   deleteProjectMilestone,
   getProjectMilestoneEndpoint,
   updateProjectMilestone,
-} from '@/services/project/milestone';
+} from '@/services/projects/milestones';
 
 interface UseProjectMilestoneOptions {
   projectId?: string;

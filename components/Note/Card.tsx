@@ -1,5 +1,5 @@
 import Image from '@/shared/components/Image';
-import { ProjectNoteSchema } from '@/services/project/notes';
+import { ProjectNoteSchema } from '@/services/projects/notes';
 import PostPreviewCard from '@/shared/components/Post/PostPreviewCard';
 
 interface NoteCardProps {

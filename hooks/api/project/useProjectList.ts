@@ -1,10 +1,10 @@
 import useSWR from 'swr';
-import { getProjectEndpoint, ProjectSchema } from '@/services/project';
+import { getProjectEndpoint, ProjectSchema } from '@/services/projects';
 import {
   sortMilestones,
   UpdateProjectMilestoneRequest,
-} from '@/services/project/milestone';
-import { sortTasks, UpdateProjectTaskRequest } from '@/services/project/tasks';
+} from '@/services/projects/milestones';
+import { sortTasks, UpdateProjectTaskRequest } from '@/services/projects/tasks';
 import useProject from './useProject';
 import useProjectMilestone from './useProjectMilestone';
 import useProjectTask from './useProjectTask';

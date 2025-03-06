@@ -1,5 +1,5 @@
 import Modal from '@/shared/components/Modal';
-import { UpdateProjectOutcomeRequest } from '@/services/project/outcomes';
+import { UpdateProjectOutcomeRequest } from '@/services/projects/outcomes';
 import OutcomeForm from '../Form';
 
 interface UpdateModalProps {

@@ -2,7 +2,7 @@ import Modal from '@/shared/components/Modal';
 import {
   UpdateProjectReviewRequest,
   ProjectReviewSchema,
-} from '@/services/project/reviews';
+} from '@/services/projects/reviews';
 
 import ReviewForm from '../Form';
 

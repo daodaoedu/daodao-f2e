@@ -1,5 +1,5 @@
 import Modal from '@/shared/components/Modal';
-import { UpdateProjectNoteRequest } from '@/services/project/notes';
+import { UpdateProjectNoteRequest } from '@/services/projects/notes';
 import NoteForm from '../Form';
 
 interface UpdateModalProps {

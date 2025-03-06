@@ -18,13 +18,15 @@ import { MdSend, MdClose, MdEdit } from 'react-icons/md';
 import Button from '@/shared/components/Button';
 import DateRangePicker from '@/shared/components/DateRangePicker';
 import Form from '@/shared/components/Form';
+import { useDialog } from '@/contexts/Dialog';
+import { useProject } from '@/hooks/api/project';
 import {
   CreateProjectMilestoneRequest,
   createProjectMilestoneSchema,
   ProjectMilestoneSchema,
   UpdateProjectMilestoneRequest,
   updateProjectMilestoneSchema,
-} from '@/services/project/milestone';
+} from '@/services/projects/milestones';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getDefaultMilestone } from './Shared';
 
@@ -66,6 +68,28 @@ function MilestoneCard(
   const [isEditing, setIsEditing] = useState(defaultEditing);
   const [isLoading, setIsLoading] = useState(false);
   const preEditingStateRef = useRef(!isEditing);
+  const tasksInfo = useMemo(() => {
+    if (!Array.isArray(milestone.tasks) || !milestone.tasks.length) {
+      return {
+        isCompleteAll: true,
+        progress: 100,
+      };
+    }
+    const totalCount = milestone.tasks.length;
+    const completeCount = milestone.tasks.filter(
+      (task) => task.isCompleted
+    ).length;
+    const isCompleteAll = completeCount === totalCount;
+    const progress = Math.round((completeCount / totalCount) * 100);
+
+    return {
+      isCompleteAll,
+      progress,
+    };
+  }, [milestone.tasks]);
+  const { data: project } = useProject({ id: projectId });
+
+  const { openDialog } = useDialog();
 
   const index = useMemo(
     () =>
@@ -140,10 +164,36 @@ function MilestoneCard(
 
     if (isLoading || !isEditable) return;
 
-    if (targetIsCompleted) {
-      console.log('targetIsCompleted');
-    } else {
-      console.log('targetIsNotCompleted');
+    if (!tasksInfo.isCompleteAll && targetIsCompleted) {
+      toast.error('請先完成所有子任務');
+      return;
+    }
+
+    if (targetIsCompleted && project?.version === 1) {
+      const result = await openDialog({
+        content:
+          '勾選後，計畫就視為開始，屆時將無法修改計畫的開始時間，是否繼續？',
+        onConfirm: () => {
+          methods.setValue('isCompleted', targetIsCompleted);
+        },
+      });
+
+      if (!result) {
+        return;
+      }
+    }
+
+    if (!targetIsCompleted) {
+      const result = await openDialog({
+        content: '取消勾選後，里程碑將會被視為未完成，是否繼續？',
+        onConfirm: () => {
+          methods.setValue('isCompleted', targetIsCompleted);
+        },
+      });
+
+      if (!result) {
+        return;
+      }
     }
 
     methods.setValue('isCompleted', targetIsCompleted);
@@ -220,7 +270,9 @@ function MilestoneCard(
             <div className="text-primary-base body-sm">
               里程碑 {index > -1 && index + 1}
             </div>
-            <span className="hidden ml-3 body-sm text-basic-300">TODO 50%</span>
+            <span className="hidden md:block ml-3 body-sm text-basic-300">
+              {tasksInfo.progress}%
+            </span>
           </div>
           <DateRangePicker
             startDate={

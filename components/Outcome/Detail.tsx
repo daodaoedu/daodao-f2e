@@ -1,6 +1,6 @@
 import Image from '@/shared/components/Image';
 import PostDetailCard from '@/shared/components/Post/PostDetailCard';
-import { ProjectOutcomeSchema } from '@/services/project/outcomes';
+import { ProjectOutcomeSchema } from '@/services/projects/outcomes';
 import { BaseUserSchema } from '@/services/users';
 import { CommentType } from '@/services/comments';
 

@@ -1,10 +1,10 @@
-import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useDispatch } from "react-redux";
-import { sendLoginEvent, useAuthDispatch } from "@/contexts/Auth";
-import { getRedirectionStorage } from "@/utils/storage";
-import { fetchUserByToken } from "@/redux/actions/user";
-import Image from "@/shared/components/Image";
+import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { sendLoginEvent, useAuthDispatch } from '@/contexts/Auth';
+import { getRedirectionStorage } from '@/utils/storage';
+import { fetchUserByToken } from '@/redux/actions/user';
+import Image from '@/shared/components/Image';
 
 export default function AuthCallbackPage() {
   // TODO: 待移除 redux，為了同步資訊
@@ -12,8 +12,8 @@ export default function AuthCallbackPage() {
   const authDispatch = useAuthDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
-  const isVerified = searchParams.get("isVerified");
+  const token = searchParams.get('token');
+  const isVerified = searchParams.get('isVerified');
 
   useEffect(() => {
     if (!token) return;
@@ -21,7 +21,7 @@ export default function AuthCallbackPage() {
 
     reduxDispatch(fetchUserByToken(token));
     authDispatch.setToken(token);
-    router.replace(getRedirectionStorage().get() || "/");
+    router.replace(getRedirectionStorage().get() || '/');
   }, [token, isVerified, router.replace]);
 
   return (

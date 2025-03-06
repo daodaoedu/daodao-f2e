@@ -8,7 +8,7 @@ import {
   deleteProjectNote,
   getProjectNoteEndpoint,
   updateProjectNote,
-} from '@/services/project/notes';
+} from '@/services/projects/notes';
 
 interface UseProjectNoteOptions {
   projectId?: string;

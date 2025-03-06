@@ -10,7 +10,7 @@ import {
   createProjectNoteSchema,
   UpdateProjectNoteRequest,
   updateProjectNoteSchema,
-} from '@/services/project/notes';
+} from '@/services/projects/notes';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
 import Upload from '@/shared/components/Upload';
 import Image from '@/shared/components/Image';

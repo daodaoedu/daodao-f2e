@@ -26,12 +26,6 @@ function MentorWorkspaceLayout({ children }: React.PropsWithChildren) {
             </div>
             <Sidebar className="mb-6 lg:mb-0 basis-full -order-1 lg:order-none lg:basis-80">
               <Sidebar.Link
-                href="/manage/mentor-workspace/reviews"
-                isActive={pathname === '/manage/mentor-workspace/reviews'}
-              >
-                復盤
-              </Sidebar.Link>
-              <Sidebar.Link
                 href="/manage/mentor-workspace/students"
                 isActive={pathname === '/manage/mentor-workspace/students'}
               >

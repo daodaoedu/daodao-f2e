@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { getProjectReviewEndpoint, ProjectReviewSchema } from '@/services/project/reviews';
+import { getProjectReviewEndpoint, ProjectReviewSchema } from '@/services/projects/reviews';
 
 import useProjectReview from './useProjectReview';
 

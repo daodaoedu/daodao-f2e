@@ -1,5 +1,5 @@
 import Modal from '@/shared/components/Modal';
-import { CreateProjectReviewRequest } from '@/services/project/reviews';
+import { CreateProjectReviewRequest } from '@/services/projects/reviews';
 import marathonConfig from '@/constants/marathon';
 import ReviewForm from '../Form';
 
