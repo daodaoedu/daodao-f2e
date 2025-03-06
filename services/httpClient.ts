@@ -1,11 +1,8 @@
 import { z } from 'zod';
 import { getTokenStorage } from '@/utils/storage';
+import { getBackendUrl } from '@/utils/env';
 
-const isDev = process.env.NODE_ENV === 'development';
-
-export const BASE_URL = isDev
-  ? '/dev-proxy-api'
-  : process.env.NEXT_PUBLIC_API_URL;
+export const BASE_URL = getBackendUrl();
 
 enum RequestMethod {
   GET = 'GET',
