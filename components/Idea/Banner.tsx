@@ -1,45 +1,26 @@
 import toast from 'react-hot-toast';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useState } from 'react';
 import Button from '@/shared/components/Button';
 import groupBannerImg from '@/public/assets/group-banner.png';
 import Image from '@/shared/components/Image';
 import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
 import CreateModal from '@/components/Idea/Modals/CreateModal';
-import UpdateModal from '@/components/Idea/Modals/UpdateModal';
-import ConfirmModal from '@/shared/components/Confirm';
-import useIdea from '@/hooks/api/ideas/useIdea';
 import useIdeaList from '@/hooks/api/ideas/useIdeaList';
 
 const Banner: React.FC = () => {
-  const router = useRouter();
-  const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const [ideaId, setIdeaId] = useState<string | undefined>(undefined);
-
   enum ModalTypeEnum {
     Create,
     Update,
     Delete,
 }
-const { data: idea, mutate } = useIdea({ ideaId });
+  const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
 
-    // 取得所有創意清單，並設定新增、編輯、刪除的回呼
-    const { data: ideas, create, update, remove } = useIdeaList({
+    // 取得所有創意清單，並設定新增
+    const { create } = useIdeaList({
       onCreated: () => {
           toast.success('新增成功');
           setModalType(null);
-      },
-      onUpdated: () => {
-          toast.success('更新成功');
-          setModalType(null);
-          setIdeaId(undefined);
-          mutate();
-      },
-      onDeleted: () => {
-          toast.success('刪除成功');
-          setModalType(null);
-          setIdeaId(undefined);
-      },
+      }
   });
   return (
     <div className="relative">
@@ -78,30 +59,6 @@ const { data: idea, mutate } = useIdea({ ideaId });
           onClose={() => setModalType(null)}
           isLoading={create.isMutating}
           onSubmit={create.trigger}
-        />
-      )}
-
-      {modalType === ModalTypeEnum.Update && idea && ideaId && (
-        <UpdateModal
-          key={ideaId}
-          id={ideaId}
-          isOpen={modalType === ModalTypeEnum.Update}
-          onClose={() => setModalType(null)}
-          defaultValues={idea}
-          isLoading={update.isMutating}
-          onSubmit={update.trigger}
-        />
-      )}
-
-      {ideaId && (
-        <ConfirmModal
-          title="確認刪除 Idea"
-          confirmText="確認刪除"
-          confirmColor="alert"
-          isOpen={modalType === ModalTypeEnum.Delete}
-          onClose={() => setModalType(null)}
-          onConfirm={() => remove.trigger({ ideaId })}
-          isLoading={remove.isMutating}
         />
       )}
     </div>

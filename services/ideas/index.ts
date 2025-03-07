@@ -4,13 +4,29 @@ import { updateImage } from '../images';
 
 const ideaEndpoint = '/ideas';
 
+function removeNumberSuffixStrict(id: string): string | null {
+  if (!id || typeof id !== 'string') {
+      return null;
+  }
+
+  // 使用正則表達式檢查是否以 -數字 結尾
+  const match = id.match(/_\d+$/);
+  if (!match) {
+      return id; // 如果沒有匹配到 -數字 結尾，返回原字符串
+  }
+
+  // 移除匹配到的部分
+  return id.substring(0, id.length - match[0].length);
+}
+
 interface GetIdeaKeyOptions {
   ideaId?: string;
 }
 
 export const getIdeaEndpoint = ({ ideaId }: GetIdeaKeyOptions = {}) => {
   if (ideaId) {
-    return `${ideaEndpoint}/${ideaId}`;
+
+    return `${ideaEndpoint}/${removeNumberSuffixStrict(ideaId)}`;
   }
   return ideaEndpoint;
 };
@@ -27,6 +43,7 @@ const ideaSchema = z.object({
   ideaResources: z
     .array(
       z.object({
+        id: z.number(),
         name: z.string(),
         url: z.string(),
       })

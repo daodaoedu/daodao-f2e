@@ -23,12 +23,12 @@ const Idea: React.FC = () => {
           <SearchField />
         </div>
         {/* 主要內容區塊 */}
-          <IdeaList />
+        <IdeaList />
       </div>
-      <More 
-        isMore={isMore} 
-        isLoading={isLoading} 
-        onLoadMore={onLoadMore} 
+      <More
+        isMore={isMore}
+        isLoading={isLoading}
+        onLoadMore={onLoadMore}
       />
     </div>
   );

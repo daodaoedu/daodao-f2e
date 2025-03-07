@@ -1,6 +1,8 @@
+import Link from 'next/link';
 import Image from '@/shared/components/Image';
 import PostPreviewCard from '@/shared/components/Post/PostPreviewCard';
 import { IdeaSchema } from '@/services/ideas';
+import { MdLink } from "react-icons/md";
 
 interface IdeaCardProps {
   data: IdeaSchema;
@@ -17,6 +19,7 @@ function IdeaCard({
   onEditClick,
   onDeleteClick,
 }: IdeaCardProps) {
+  console.log('IdeaCard', data);
 
   const renderContent = (ideaData: IdeaSchema) => (
     <div className="mb-3 body-sm text-basic-500">
@@ -28,25 +31,27 @@ function IdeaCard({
           src={ideaData.imageUrls[0]}
           alt={ideaData.title}
           className="w-full h-auto object-contain"
-          />
+        />
       )}
-            {ideaData.ideaResources && ideaData.ideaResources.length > 0 && (
+      {ideaData.ideaResources && ideaData.ideaResources.length > 0 && (
         <div className="mt-3">
-          <h4 className="font-bold mb-2">學習資源</h4>
-          <ul className="list-disc pl-5">
-            {ideaData.ideaResources.map((resource, index) => (
-              <li key={index} className="mb-1">
-                <a
-                  href={resource.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary-500 hover:underline"
-                >
-                  {resource.name}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <h4 className="mb-2 text-basic-500 font-sans font-medium text-[16px] leading-[150%]">
+            學習資源
+          </h4>
+          {ideaData.ideaResources.map((resource) => (
+            <div key={resource.id} className="rounded-lg p-2 mt-2 mb-2 border border-solid border-[#DBDBDB]">
+              <Link
+                href={resource.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-basic-500 hover:underdivne  p-2 flex justify-between items-center gap-1"
+              >
+                {resource.name}
+                <MdLink size={18} color="#92989A" />
+
+              </Link>
+            </div>
+          ))}
         </div>
       )}
     </div>

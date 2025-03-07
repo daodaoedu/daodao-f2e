@@ -19,33 +19,75 @@ function AddResourceForm({ onConfirm, onCancel }: AddResourceFormProps) {
     <div className="p-2 border rounded mb-2">
       <h3 className="font-semibold mb-2">新增資源</h3>
       <div className="mb-2">
-        <label className="block text-sm mb-1">資源名稱</label>
-        <input
-          type="text"
-          className="border px-2 py-1 rounded w-full"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        <label htmlFor="resource-name" className="block text-sm mb-1">資源名稱
+          <input
+            id="resource-name"
+            type="text"
+            className="
+          border
+          px-2 py-1
+          rounded-lg
+          w-full
+          pr-8
+          border-basic-200
+
+          /* 滑鼠懸停時的邊框顏色 */
+          hover:border-primary-base
+
+          /* 聚焦（focus）時的邊框 & 外圈 */
+          focus:outline-none
+          focus:border-primary-base
+          focus:ring-1
+          focus:ring-primary-base
+        "
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </label>
       </div>
       <div className="mb-2">
-        <label className="block text-sm mb-1">資源連結</label>
-        <input
-          type="text"
-          className="border px-2 py-1 rounded w-full"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-        />
+        <label htmlFor="resource-url" className="block text-sm mb-1">資源連結
+          <input
+            id="resource-url"
+            type="text"
+            className="
+          border
+          px-2 py-1
+          rounded-lg
+          w-full
+          pr-8
+          border-basic-200
+
+          /* 滑鼠懸停時的邊框顏色 */
+          hover:border-primary-base
+
+          /* 聚焦（focus）時的邊框 & 外圈 */
+          focus:outline-none
+          focus:border-primary-base
+          focus:ring-1
+          focus:ring-primary-base
+        "
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+          />
+        </label>
       </div>
       <div className="flex justify-end gap-2">
-        <Button variant="solid" color="alert" onClick={onCancel}>
+        <Button
+          variant="outline"
+          color="primary"
+          size="sm"
+          onClick={onCancel}
+        >
           取消
         </Button>
         <Button
           variant="solid"
           color="primary"
+          size="sm"
           onClick={() => onConfirm({ name, url })}
         >
-          完成
+          加入
         </Button>
       </div>
     </div>
