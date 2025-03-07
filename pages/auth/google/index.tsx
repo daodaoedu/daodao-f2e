@@ -1,13 +1,9 @@
 import { useLayoutEffect } from 'react';
-import { checkIsDevHost, getBackendUrl } from '@/utils/env';
-import { getDevOriginStorage } from '@/utils/storage';
+import { redirectToAuth } from '@/contexts/Auth';
 
 function AuthCallbackPage() {
   useLayoutEffect(() => {
-    if (checkIsDevHost()) {
-      getDevOriginStorage().set(window.location.origin);
-    }
-    window.location.href = `${getBackendUrl()}/auth/google`;
+    redirectToAuth();
   }, []);
 
   return null;
