@@ -3,7 +3,6 @@ import Button from '@/shared/components/Button';
 
 interface MoreProps {
   isMore: boolean;
-  isLoading: boolean;
   onLoadMore: () => void;
 }
 

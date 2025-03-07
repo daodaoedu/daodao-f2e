@@ -13,8 +13,8 @@ import {
 import Upload from '@/shared/components/Upload';
 import Image from '@/shared/components/Image';
 import { MdLink, MdDelete } from "react-icons/md";
-import AddResourceForm from './AddResourceForm'; // <— 這就是剛才的小表單
 import { v4 as uuidv4 } from 'uuid';
+import AddResourceForm from './AddResourceForm'; // <— 這就是剛才的小表單
 
 // 分別為建立與更新模式定義 Props
 interface IdeaFormCreateProps {

@@ -19,7 +19,6 @@ function IdeaCard({
   onEditClick,
   onDeleteClick,
 }: IdeaCardProps) {
-
   const renderContent = (ideaData: IdeaSchema) => (
     <div className="mb-3 body-sm text-basic-500">
       <p className="mb-3 whitespace-pre-wrap min-h-12 max-h-48 overflow-hidden">

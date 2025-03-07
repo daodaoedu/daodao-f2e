@@ -7,7 +7,6 @@ import More from './More';
 const Idea: React.FC = () => {
   // Define the necessary state or props for More component
   const isMore = true; // Set this based on your logic
-  const isLoading = false; // Set this based on your loading state
   const onLoadMore = () => {
     // Define your load more logic here
   };
@@ -26,7 +25,6 @@ const Idea: React.FC = () => {
       </div>
       <More
         isMore={isMore}
-        isLoading={isLoading}
         onLoadMore={onLoadMore}
       />
     </div>
