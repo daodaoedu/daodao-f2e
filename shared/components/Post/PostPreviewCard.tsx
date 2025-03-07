@@ -5,8 +5,8 @@ import numberToChineseNumber from '@/utils/numberToChineseNumber';
 
 export interface BasePostData {
   title: string;
-  week: number;
-  date: string;
+  week?: number;
+  date?: string;
 }
 
 export interface PostPreviewCardProps<T extends BasePostData> {
@@ -59,7 +59,7 @@ function PostPreviewCard<T extends BasePostData>({
     <PostCard className={className}>
       <PostCard.Header
         title={data.title}
-        subtitle={`第${numberToChineseNumber(data.week)}週`}
+        subtitle={data.week !== undefined ? `第${numberToChineseNumber(data.week)}週` : ''}
         tag={tag}
         date={dayjs(data.date).format('YYYY/MM/DD')}
         dropdownItems={dropdownItems}

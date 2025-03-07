@@ -10,8 +10,8 @@ import CommentSection from '@/shared/components/Comment/CommentSection';
 export interface BasePostDetailData {
   id: number;
   title: string;
-  week: number;
-  date: string;
+  week?: number;
+  date?: string;
 }
 
 interface BasePostDetailCardProps<T extends BasePostDetailData> {
@@ -86,7 +86,7 @@ function PostDetailCard<T extends BasePostDetailData>({
     <PostCard className={className}>
       <PostCard.Header
         title={data.title}
-        subtitle={`第${numberToChineseNumber(data.week)}週`}
+        subtitle={data.week !== undefined ? `第${numberToChineseNumber(data.week)}週` : ''}
         tag={tag}
         date={dayjs(data.date).format('YYYY/MM/DD')}
         dropdownItems={dropdownItems}

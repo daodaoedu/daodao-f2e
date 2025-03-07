@@ -150,6 +150,11 @@ export const NAV_LINK = [
     link: '/group',
     target: '_self',
   },
+  {
+    name: '找想法',
+    link: '/ideas',
+    target: '_self',
+  },
   // {
   //   name: '找活動',
   //   link: '/activities',
@@ -216,6 +221,11 @@ export const FOOTER_LINK = [
   {
     name: '找揪團',
     link: '/group',
+    target: '_self',
+  },
+  {
+    name: '找想法',
+    link: '/ideas',
     target: '_self',
   },
   {
