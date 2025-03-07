@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
-import type { MenuItem } from '@/constants/category';
 import { getManageSidebarItems } from '@/constants/sidebar';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
@@ -17,7 +16,7 @@ function ExploreMenu({ onClose }: OnCloseProps) {
     <div>
       <nav>
         <ul className="pt-2">
-          {NAV_LINK.map(({ link, name, target }: MenuItem) => (
+          {NAV_LINK.map(({ link, name, target }) => (
             <li key={name}>
               <Link
                 href={link}
@@ -39,19 +38,15 @@ function ExploreMenu({ onClose }: OnCloseProps) {
           島島盃-春季學習馬拉松
         </Collapse.Toggle>
         <Collapse.List className="w-full">
-          {MARATHON_LINKS.map(({ name, link, disabled }) => (
+          {MARATHON_LINKS.map(({ name, link }) => (
             <Collapse.Item key={name} className="*:px-10 *:leading-10">
-              {disabled ? (
-                <div className="text-basic-300 cursor-not-allowed">{name}</div>
-              ) : (
-                <Link
-                  href={link}
-                  className="block text-basic-400"
-                  onClick={onClose}
-                >
-                  {name}
-                </Link>
-              )}
+              <Link
+                href={link}
+                className="block text-basic-400"
+                onClick={onClose}
+              >
+                {name}
+              </Link>
             </Collapse.Item>
           ))}
         </Collapse.List>
