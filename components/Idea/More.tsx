@@ -7,7 +7,7 @@ interface MoreProps {
   onLoadMore: () => void;
 }
 
-const More: React.FC<MoreProps> = ({ isMore, isLoading, onLoadMore }) => {
+const More: React.FC<MoreProps> = ({ isMore, onLoadMore }) => {
   return (
     <div className="text-center pt-20 pb-24">
       {isMore && (

@@ -10,7 +10,6 @@ const Idea: React.FC = () => {
   const isLoading = false; // Set this based on your loading state
   const onLoadMore = () => {
     // Define your load more logic here
-    console.log("Load more ideas");
   };
 
   return (

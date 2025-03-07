@@ -15,7 +15,6 @@ const IdeaDetailPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const ideaId = searchParams.get('ideaId') ?? '';
-    console.log('IdeaDetailPage', ideaId);
     const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
 
     // 使用 useIdea hook 取得單筆 Idea 資料與 mutation 方法

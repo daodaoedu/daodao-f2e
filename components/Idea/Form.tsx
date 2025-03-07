@@ -14,6 +14,7 @@ import Upload from '@/shared/components/Upload';
 import Image from '@/shared/components/Image';
 import { MdLink, MdDelete } from "react-icons/md";
 import AddResourceForm from './AddResourceForm'; // <— 這就是剛才的小表單
+import { v4 as uuidv4 } from 'uuid';
 
 // 分別為建立與更新模式定義 Props
 interface IdeaFormCreateProps {
@@ -145,7 +146,7 @@ function IdeaForm({
             onConfirm={(data) => {
               // Ensure data has an id property
               const resourceData = {
-                id: Date.now(), // or any unique identifier logic
+                id: parseInt(uuidv4().replace(/\D/g, "").slice(0, 10), 10), // or any unique identifier logic
                 ...data,
               };
               append(resourceData);

@@ -19,7 +19,6 @@ function IdeaCard({
   onEditClick,
   onDeleteClick,
 }: IdeaCardProps) {
-  console.log('IdeaCard', data);
 
   const renderContent = (ideaData: IdeaSchema) => (
     <div className="mb-3 body-sm text-basic-500">
