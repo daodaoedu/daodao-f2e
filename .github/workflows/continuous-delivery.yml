@@ -9,6 +9,9 @@ on:
     branches:
       - "prod"
       - "dev"
+  pull_request:
+    branches:
+      - "**"
   workflow_dispatch:
 
 env:
