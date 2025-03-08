@@ -34,9 +34,9 @@ const ReviewPage = () => {
 
   const {
     data: reviews,
-    create,
-    update,
-    remove,
+    createMutation,
+    updateMutation,
+    deleteMutation,
   } = useProjectReviewList(projectId, {
     onCreated: () => {
       toast.success('新增成功');
@@ -102,8 +102,8 @@ const ReviewPage = () => {
           projectTitle={project.title}
           isOpen={modalType === ModalTypeEnum.Create}
           onClose={() => setModalType(null)}
-          onSubmit={create.trigger}
-          isLoading={create.isMutating}
+          onSubmit={createMutation.trigger}
+          isLoading={createMutation.isMutating}
         />
       )}
 
@@ -117,8 +117,8 @@ const ReviewPage = () => {
           createdAt={detail.createdAt}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
-          onSubmit={update.trigger}
-          isLoading={update.isMutating}
+          onSubmit={updateMutation.trigger}
+          isLoading={updateMutation.isMutating}
         />
       )}
 
@@ -129,8 +129,8 @@ const ReviewPage = () => {
           confirmColor="alert"
           isOpen={modalType === ModalTypeEnum.Delete}
           onClose={() => setModalType(null)}
-          onConfirm={() => remove.trigger({ projectId, reviewId })}
-          isLoading={remove.isMutating}
+          onConfirm={() => deleteMutation.trigger({ projectId, reviewId })}
+          isLoading={deleteMutation.isMutating}
         />
       )}
     </>

@@ -34,21 +34,21 @@ export default function useProjectReview({
 
   const { data, ...swr } = useSWR<ProjectReviewSchema>(swrKey);
 
-  const create = useSWRMutation(
+  const createMutation = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: CreateProjectReviewRequest }) =>
       createProjectReview(arg),
     { onSuccess: onCreated }
   );
 
-  const update = useSWRMutation(
+  const updateMutation = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: UpdateProjectReviewRequest }) =>
       updateProjectReview(arg),
     { onSuccess: onUpdated }
   );
 
-  const remove = useSWRMutation(
+  const deleteMutation = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: { projectId: string; reviewId: number } }) =>
       deleteProjectReview(arg.projectId, arg.reviewId),
@@ -58,8 +58,8 @@ export default function useProjectReview({
   return {
     ...swr,
     data,
-    create,
-    update,
-    remove,
+    createMutation,
+    updateMutation,
+    deleteMutation,
   };
 }

@@ -21,8 +21,8 @@ const ReviewPage = () => {
   const { data: project } = useProject({ id: projectId });
   const {
     data: review,
-    update: updateReview,
-    remove: removeReview,
+    updateMutation: updateReview,
+    deleteMutation: removeReview,
   } = useProjectReview({
     projectId,
     reviewId,

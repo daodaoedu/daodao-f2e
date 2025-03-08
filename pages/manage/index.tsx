@@ -22,7 +22,9 @@ import MilestoneItem from '@/components/Milestones/MilestoneItem';
 import { RoleEnum, useAuth } from '@/contexts/Auth';
 import { MilestonesProvider } from '@/contexts/Milestones';
 import { ProjectProvider } from '@/contexts/Project';
+import { SelectProjectModal } from '@/features/projects';
 import { cn } from '@/utils/cn';
+import ReviewForm from '@/components/Review/Form';
 
 const HEADER_TITLES = [
   '今天的每一小步，都在建立你的學習動能！',
@@ -47,8 +49,23 @@ const HEADER_TITLES = [
   '你正在建立受用一生的能力！',
 ];
 
+enum ModalType {
+  Task,
+  Review,
+  Note,
+  Outcome,
+}
+
 const Header = () => {
   const router = useRouter();
+  const [modalType, setModalType] = useState<ModalType | null>(null);
+  const [projectId, setProjectId] = useState<string | undefined>();
+  const { createMutation: createReview } = useProjectReviewList(projectId, {
+    onCreated: () => {
+      toast.success('新增成功');
+      setModalType(null);
+    },
+  });
   // const { data } = useProjectList({ isMe: true });
   // const maxProjects = 3;
 
@@ -69,19 +86,19 @@ const Header = () => {
     },
     {
       label: '新增任務',
-      onClick: () => toast.error('功能尚未開放'),
+      onClick: () => setModalType(ModalType.Task),
     },
     {
       label: '新增覆盤',
-      onClick: () => toast.error('功能尚未開放'),
+      onClick: () => setModalType(ModalType.Review),
     },
     {
       label: '新增便利貼',
-      onClick: () => toast.error('功能尚未開放'),
+      onClick: () => setModalType(ModalType.Note),
     },
     {
       label: '新增成果',
-      onClick: () => toast.error('功能尚未開放'),
+      onClick: () => setModalType(ModalType.Outcome),
     },
   ];
 
@@ -151,6 +168,24 @@ const Header = () => {
           ))}
         </Dropdown.List>
       </Dropdown>
+      <SelectProjectModal
+        isOpen={modalType !== null}
+        onClose={() => setModalType(null)}
+        onSelect={setProjectId}
+        renderContent={(project) => (
+          <>
+            {modalType === ModalType.Review && (
+              <ReviewForm
+                projectId={project.id}
+                projectTitle={project.title}
+                week={marathonConfig.getWeekNumber()}
+                onSubmit={createReview.trigger}
+                isLoading={createReview.isMutating}
+              />
+            )}
+          </>
+        )}
+      />
     </div>
   );
 };
@@ -336,7 +371,7 @@ const Main = ({ date }: { date: Dayjs }) => {
 
       <ul>
         {currentReviews.map((review) => (
-          <li key={review.id}>
+          <li key={review.id} className="mb-5">
             <ReviewCard
               data={review}
               detailLink="/manage/project/review/detail?id=1"
