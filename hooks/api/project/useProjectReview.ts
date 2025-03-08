@@ -8,7 +8,7 @@ import {
   deleteProjectReview,
   getProjectReviewEndpoint,
   updateProjectReview,
-} from '@/services/project/reviews';
+} from '@/services/projects/reviews';
 
 interface UseProjectReviewOptions {
   projectId?: string;

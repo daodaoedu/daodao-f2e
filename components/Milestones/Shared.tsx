@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import z from "zod";
 import { cn } from "@/utils/cn";
-import { CreateProjectMilestoneRequest, ProjectMilestoneSchema } from "@/services/project/milestone";
+import { CreateProjectMilestoneRequest, ProjectMilestoneSchema } from "@/services/projects/milestones";
 
 const idSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 
@@ -86,6 +86,52 @@ export const ProgressBar = ({ progress }: ProgressBarProps) => {
   );
 };
 
+const calcEndDate = (
+  startDate: dayjs.Dayjs,
+  endDate: dayjs.Dayjs,
+  days: number
+) => {
+  const targetEndDate = startDate.add(days, 'day');
+  return targetEndDate.isAfter(endDate) ? endDate : targetEndDate;
+};
+
+const calcEmptyDateRange = (
+  startDate: dayjs.Dayjs,
+  endDate: dayjs.Dayjs,
+  milestones: ProjectMilestoneSchema[]
+): [dayjs.Dayjs, dayjs.Dayjs] => {
+  if (milestones.length === 0) {
+    return [startDate, calcEndDate(startDate, endDate, 7)];
+  }
+  if (milestones.length === 1) {
+    const newStartDate = dayjs(milestones[0].endDate).add(1, 'day');
+    return [newStartDate, calcEndDate(newStartDate, endDate, 7)];
+  }
+
+  let latestEndDate = dayjs(milestones[0].endDate).add(1, 'day');
+
+  for (let i = 1; i < milestones.length; i += 1) {
+    const milestone = milestones[i];
+    const currentStartDate = dayjs(milestone.startDate);
+    const currentEndDate = dayjs(milestone.endDate).add(1, 'day');
+
+    if (
+      currentStartDate.isAfter(latestEndDate) &&
+      currentStartDate.diff(latestEndDate, 'day') > 1
+    ) {
+      break;
+    }
+
+    latestEndDate = currentEndDate.isAfter(latestEndDate)
+      ? currentEndDate
+      : latestEndDate;
+  }
+
+  const newStartDate = latestEndDate.isAfter(endDate) ? endDate : latestEndDate;
+
+  return [newStartDate, calcEndDate(newStartDate, endDate, 7)];
+};
+
 interface GetDefaultMilestoneProps {
   projectId: string;
   milestones: ProjectMilestoneSchema[];
@@ -99,50 +145,18 @@ export const getDefaultMilestone = ({
   startDate,
   endDate,
 }: GetDefaultMilestoneProps): CreateProjectMilestoneRequest => {
-  const calcMilestoneEmptyDate = () => {
-    if (milestones.length === 0) {
-      return startDate;
-    }
-    if (milestones.length === 1) {
-      return dayjs(milestones[0].endDate).add(1, 'day');
-    }
-
-    let preEndDate = dayjs(milestones[0].endDate);
-    let result = preEndDate.add(1, 'day');
-
-    for (let i = 1; i < milestones.length; i += 1) {
-      const milestone = milestones[i];
-      const currentStartDate = dayjs(milestone.startDate);
-
-      if (
-        currentStartDate.isAfter(preEndDate) &&
-        currentStartDate.diff(preEndDate, 'day') > 1
-      ) {
-        result = preEndDate.add(1, 'day');
-        break;
-      } else {
-        preEndDate = dayjs(milestone.endDate);
-      }
-    }
-
-    if (result.isAfter(endDate)) {
-      return endDate;
-    }
-
-    return result;
-  };
-
-  const calcStartDate = calcMilestoneEmptyDate();
-  const targetEndDate = calcStartDate.add(1, 'day').endOf('week');
-  const calcEndDate = targetEndDate.isAfter(endDate) ? endDate : targetEndDate;
+  const [newStartDate, newEndDate] = calcEmptyDateRange(
+    startDate,
+    endDate,
+    milestones
+  );
 
   return {
     name: '',
-    description: '',
     isCompleted: false,
     projectId,
-    startDate: calcStartDate.format('YYYY/MM/DD'),
-    endDate: calcEndDate.format('YYYY/MM/DD'),
+    startDate: newStartDate.format('YYYY/MM/DD'),
+    endDate: newEndDate.format('YYYY/MM/DD'),
     position: 1000,
   };
 };

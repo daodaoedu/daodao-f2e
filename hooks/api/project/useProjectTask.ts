@@ -6,7 +6,7 @@ import {
   createProjectTask,
   deleteProjectTask,
   updateProjectTask,
-} from '@/services/project/tasks';
+} from '@/services/projects/tasks';
 
 interface UseProjectTaskOptions {
   mutateKey?: string | null;

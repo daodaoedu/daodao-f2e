@@ -15,6 +15,7 @@ import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import { AuthProvider, useAuth } from '@/contexts/Auth';
 import SnackbarProvider from '@/contexts/Snackbar';
+import { DialogProvider } from '@/contexts/Dialog';
 import CompleteInfoReminderDialog from '@/shared/components/CompleteInfoReminderDialog';
 import GlobalStyle from '@/shared/styles/Global';
 import Image from "@/shared/components/Image";
@@ -40,6 +41,7 @@ const swrConfig = {
   revalidateOnFocus: false,
   errorRetryCount: 0,
   keepPreviousData: true,
+  revalidateIfStale: false,
   fetcher,
 };
 
@@ -233,7 +235,9 @@ const App = ({ Component, pageProps }) => {
             <SWRConfig value={swrConfig}>
               <SnackbarProvider>
                 <AuthProvider>
-                  <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+                  <DialogProvider>
+                    <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+                  </DialogProvider>
                 </AuthProvider>
               </SnackbarProvider>
             </SWRConfig>

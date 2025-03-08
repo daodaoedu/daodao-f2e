@@ -5,7 +5,6 @@ import {
   useEffect,
   useMemo,
   useReducer,
-  useRef,
 } from 'react';
 import toast from 'react-hot-toast';
 import { useRouter, usePathname } from 'next/navigation';
@@ -36,8 +35,7 @@ import {
   ActionTypes,
   LoginStatus,
 } from './type';
-
-const LOGIN_TYPE = 'login-type';
+import { registerLoginListener } from './utils';
 
 const initialState: AuthState = {
   isComplete: false,
@@ -232,37 +230,18 @@ export function AuthProvider({ children }: PropsWithChildren) {
   });
 
   useEffect(() => {
-    const handleToken = (token?: string) => {
-      if (!token) return;
+    const handleToken = (token: string) => {
       // TODO: 待移除 redux，為了同步資訊
       reduxDispatch(fetchUserByToken(token));
       authDispatch.setToken(token);
     };
 
-    const receiveMessage = (
-      event: MessageEvent<{
-        type: typeof LOGIN_TYPE;
-        payload: { token: string };
-      }>
-    ) => {
-      if (event.origin !== window.location.origin) return;
-      if (event.data.type === LOGIN_TYPE) {
-        handleToken(event.data.payload.token);
-      }
-    };
-    const removeLoginListener = () => {
-      window.removeEventListener('message', receiveMessage, false);
-    };
+    const unregisterLoginListener = registerLoginListener(
+      state.loginStatus,
+      handleToken
+    );
 
-    handleToken(getTokenStorage().get());
-
-    if (state.loginStatus === LoginStatus.PERMANENT) {
-      removeLoginListener();
-    } else {
-      window.addEventListener('message', receiveMessage, false);
-    }
-
-    return removeLoginListener;
+    return unregisterLoginListener;
   }, [
     state.loginStatus,
     authDispatch.setToken,
@@ -323,72 +302,3 @@ export function AuthProvider({ children }: PropsWithChildren) {
     </AuthContext.Provider>
   );
 }
-
-interface ProtectedComponentProps extends PropsWithChildren {
-  redirectOnCancel?: string;
-  onlyCheckToken?: boolean;
-}
-
-export const ProtectedComponent = ({
-  children,
-  redirectOnCancel,
-  onlyCheckToken = false,
-}: ProtectedComponentProps) => {
-  const router = useRouter();
-  const opened = useRef(false);
-  const { isLoggedIn, isOpenLoginModal, token } = useAuth();
-  const { openLoginModal } = useAuthDispatch();
-  const requiresLogin = onlyCheckToken ? !token : !isLoggedIn;
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (requiresLogin && !token) {
-      timer = setTimeout(() => {
-        opened.current = true;
-        openLoginModal();
-      }, 1000);
-    }
-    return () => clearTimeout(timer);
-  }, [requiresLogin, token, openLoginModal]);
-
-  useEffect(() => {
-    if (
-      redirectOnCancel &&
-      !isOpenLoginModal &&
-      opened.current &&
-      requiresLogin &&
-      !token
-    ) {
-      router.replace(redirectOnCancel);
-    }
-  }, [
-    redirectOnCancel,
-    isOpenLoginModal,
-    opened.current,
-    requiresLogin,
-    token,
-    router.replace,
-  ]);
-
-  if (requiresLogin) return <div className="h-screen w-screen" />;
-
-  return children;
-};
-
-export const sendLoginEvent = (token: string) => {
-  getTokenStorage().remove();
-
-  if (
-    window.opener &&
-    window.opener.location.origin === window.location.origin
-  ) {
-    window.opener.postMessage(
-      { type: LOGIN_TYPE, payload: { token } },
-      window.location.origin
-    );
-    window.close();
-    return true;
-  }
-
-  return false;
-};

@@ -1,7 +1,6 @@
 export interface Task {
   id: number,
   name: string,
-  description: string,
   daysOfWeek: string[],
   isCompleted: boolean,
   milestoneId: number,
@@ -11,7 +10,6 @@ export interface Task {
 export const DEFAULT_TASK: Task = {
   id: 0,
   name: "",
-  description: "",
   daysOfWeek: [],
   isCompleted: false,
   milestoneId: 0,
@@ -23,7 +21,6 @@ export interface Milestone {
   projectId: string,
   position: number,
   name: string,
-  description: string,
   startDate: string,
   endDate: string,
   isCompleted: boolean,
@@ -38,7 +35,6 @@ export const DEFAULT_MILESTONE: Milestone = {
   projectId: "",
   position: 1000,
   name: "",
-  description: "",
   startDate: "",
   endDate: "",
   isCompleted: false,

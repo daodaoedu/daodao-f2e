@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { BASE_URL } from "@/constants/common";
-import Image from "@/shared/components/Image";
-import Modal from "@/shared/components/Modal";
-import openWindowPopup from "@/utils/openWindowPopup";
-import { cn } from "@/utils/cn";
+import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import Image from '@/shared/components/Image';
+import Modal from '@/shared/components/Modal';
+import openWindowPopup from '@/utils/openWindowPopup';
+import { cn } from '@/utils/cn';
+import { checkIsDevHost, getBackendUrl, getFrontendUrl } from '@/utils/env';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -21,9 +21,10 @@ export default function LoginModal({
   const timer = useRef<NodeJS.Timeout | null>(null);
 
   const handleOpenLoginWindow = () => {
+    const baseUrl = checkIsDevHost() ? getFrontendUrl() : getBackendUrl();
     const popup = openWindowPopup({
-      url: `${BASE_URL}/auth/google`,
-      title: "login",
+      url: `${baseUrl}/auth/google?origin=${window.location.origin}`,
+      title: 'login',
       width: 400,
       height: 632,
     });
@@ -73,8 +74,8 @@ export default function LoginModal({
           <span className="flex gap-2 items-center justify-center">
             <span
               className={cn(
-                "w-4 h-4 rounded-full inline-block animate-spin",
-                "border-solid border-2 border-white/50 border-t-transparent"
+                'w-4 h-4 rounded-full inline-block animate-spin',
+                'border-solid border-2 border-white/50 border-t-transparent'
               )}
             />
             登入中...

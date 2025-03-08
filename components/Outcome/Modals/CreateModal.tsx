@@ -1,5 +1,5 @@
 import Modal from '@/shared/components/Modal';
-import { CreateProjectOutcomeRequest } from '@/services/project/outcomes';
+import { CreateProjectOutcomeRequest } from '@/services/projects/outcomes';
 import marathonConfig from '@/constants/marathon';
 import OutcomeForm from '../Form';
 

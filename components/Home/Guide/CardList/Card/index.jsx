@@ -1,7 +1,17 @@
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
+import { css, keyframes } from '@emotion/react';
 import { useRouter } from 'next/router';
-import { slideInUp } from '../../../../../shared/styles/animation';
+
+const slideInUp = keyframes`
+    0% {
+      opacity: 0;
+      transform: translateY(25%);
+    }
+    100% {
+      opacity: 1;
+      transform: none;
+    }
+`;
 
 const CardWrapper = styled.li`
   position: relative;

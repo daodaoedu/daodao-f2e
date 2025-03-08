@@ -54,6 +54,7 @@ function Header(
             alt="島島阿學"
             width="152"
             height="22"
+            className="max-h-[22px]"
           />
         </Link>
         {breakpoint === BREAKPOINT.MOBILE && <MobileMenu />}
