@@ -18,7 +18,8 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     if (!token) return;
 
-    sendLoginEvent(token).catch(() => {
+    sendLoginEvent(token).then((isSendOpener) => {
+      if (isSendOpener) return;
       reduxDispatch(fetchUserByToken(token));
       setToken(token);
       router.replace(getRedirectionStorage().get() || '/');

@@ -160,6 +160,7 @@ const MilestonesContent = () => {
   const [filterType, setFilterType] = useState(FilterEnum.All);
   const [isAscending, setIsAscending] = useState(true);
   const { project } = useProject();
+  const isInitial = useRef(false);
   const {
     data: milestones,
     isLoading,
@@ -183,7 +184,9 @@ const MilestonesContent = () => {
   }, [milestones, isAscending, filterType]);
 
   useEffect(() => {
-    if (Array.isArray(milestones)) {
+    if (Array.isArray(milestones) && !isInitial.current) {
+      isInitial.current = true;
+
       const milestoneStartDate = milestones[0].startDate;
       const milestoneEndDate = milestones.reduce(
         (compareEndDate, milestone) => {
@@ -199,7 +202,7 @@ const MilestonesContent = () => {
       setStartDate(dayjs(milestoneStartDate));
       setEndDate(dayjs(milestoneEndDate));
     }
-  }, [milestones]);
+  }, [milestones, isInitial]);
 
   return (
     <div>

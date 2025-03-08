@@ -10,6 +10,7 @@ import { LoginMessageEvent, LoginStatus } from './type';
 /**
  * 發送登入事件
  * @param token 登入 token
+ * @returns 是否發送登入事件到 opener 頁面
  */
 export const sendLoginEvent = async (token: string) => {
   getTokenStorage().remove();
@@ -24,10 +25,10 @@ export const sendLoginEvent = async (token: string) => {
         window.location.origin
       );
       window.close();
-      return;
+      return true;
     }
 
-    throw new Error('No opener');
+    return false;
   } catch (e) {
     if (e instanceof DOMException) {
       // 非同源政策會拋出錯誤，只有開發分支與本地開發會有此情況
@@ -38,7 +39,7 @@ export const sendLoginEvent = async (token: string) => {
         getDevOriginStorage().remove();
         window.location.href = `${origin}/auth/callback?token=${token}`;
       }
-      return;
+      return true;
     }
     throw e;
   }
