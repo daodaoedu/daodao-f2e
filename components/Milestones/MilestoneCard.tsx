@@ -270,9 +270,11 @@ function MilestoneCard(
             <div className="text-primary-base body-sm">
               里程碑 {index > -1 && index + 1}
             </div>
-            <span className="hidden md:block ml-3 body-sm text-basic-300">
-              {tasksInfo.progress}%
-            </span>
+            {index > -1 && (
+              <span className="hidden md:block ml-3 body-sm text-basic-300">
+                {tasksInfo.progress}%
+              </span>
+            )}
           </div>
           <DateRangePicker
             startDate={
@@ -294,7 +296,6 @@ function MilestoneCard(
               '-mx-1 px-1 py-0 gap-1.5 body-sm text-basic-300 rounded',
               !isEditing && 'cursor-default border-transparent'
             )}
-            calendarClassName="right-0"
             onStartDateChange={(d) => {
               methods.setValue('startDate', d.format('YYYY/MM/DD'), {
                 shouldDirty: true,

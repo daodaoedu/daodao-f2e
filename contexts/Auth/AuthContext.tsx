@@ -26,7 +26,6 @@ import {
   updateUser,
   updateUserSchema,
 } from '@/services/users';
-import { LOGIN_TYPE } from '@/utils/env';
 
 import LoginModal from './LoginModal';
 import {
@@ -36,6 +35,7 @@ import {
   ActionTypes,
   LoginStatus,
 } from './type';
+import { registerLoginListener } from './utils';
 
 const initialState: AuthState = {
   isComplete: false,
@@ -230,37 +230,18 @@ export function AuthProvider({ children }: PropsWithChildren) {
   });
 
   useEffect(() => {
-    const handleToken = (token?: string) => {
-      if (!token) return;
+    const handleToken = (token: string) => {
       // TODO: 待移除 redux，為了同步資訊
       reduxDispatch(fetchUserByToken(token));
       authDispatch.setToken(token);
     };
 
-    const receiveMessage = (
-      event: MessageEvent<{
-        type: typeof LOGIN_TYPE;
-        payload: { token: string };
-      }>
-    ) => {
-      if (event.origin !== window.location.origin) return;
-      if (event.data.type === LOGIN_TYPE) {
-        handleToken(event.data.payload.token);
-      }
-    };
-    const removeLoginListener = () => {
-      window.removeEventListener('message', receiveMessage, false);
-    };
+    const unregisterLoginListener = registerLoginListener(
+      state.loginStatus,
+      handleToken
+    );
 
-    handleToken(getTokenStorage().get());
-
-    if (state.loginStatus === LoginStatus.PERMANENT) {
-      removeLoginListener();
-    } else {
-      window.addEventListener('message', receiveMessage, false);
-    }
-
-    return removeLoginListener;
+    return unregisterLoginListener;
   }, [
     state.loginStatus,
     authDispatch.setToken,

@@ -1,5 +1,5 @@
 import getProjectLayout from '@/layout/ProjectLayout';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
 import { Skeleton } from '@mui/material';
@@ -160,6 +160,7 @@ const MilestonesContent = () => {
   const [filterType, setFilterType] = useState(FilterEnum.All);
   const [isAscending, setIsAscending] = useState(true);
   const { project } = useProject();
+  const isInitial = useRef(false);
   const {
     data: milestones,
     isLoading,
@@ -181,6 +182,27 @@ const MilestonesContent = () => {
 
     return isAscending ? sortedData : [...sortedData].reverse();
   }, [milestones, isAscending, filterType]);
+
+  useEffect(() => {
+    if (Array.isArray(milestones) && !isInitial.current) {
+      isInitial.current = true;
+
+      const milestoneStartDate = milestones[0].startDate;
+      const milestoneEndDate = milestones.reduce(
+        (compareEndDate, milestone) => {
+          const currentEndDate = dayjs(milestone.endDate);
+
+          return dayjs(compareEndDate).isAfter(currentEndDate)
+            ? compareEndDate
+            : currentEndDate;
+        },
+        dayjs(milestoneStartDate)
+      );
+
+      setStartDate(dayjs(milestoneStartDate));
+      setEndDate(dayjs(milestoneEndDate));
+    }
+  }, [milestones, isInitial]);
 
   return (
     <div>
@@ -205,7 +227,7 @@ const MilestonesContent = () => {
                           <CalendarIcon className="w-4 h-4 text-primary-base" />
                         }
                         minDate={dayjs().startOf('day')}
-                        maxDate={dayjs().add(1, 'year')}
+                        maxDate={startDate.add(1, 'year')}
                         onStartDateChange={setStartDate}
                         onEndDateChange={setEndDate}
                       />
