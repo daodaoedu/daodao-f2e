@@ -8,9 +8,11 @@ on:
   push:
     branches:
       - "prod"
+      - "dev"
   pull_request:
     branches:
       - "**"
+      - "!dev"
   workflow_dispatch:
 
 env:
