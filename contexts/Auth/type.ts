@@ -3,6 +3,7 @@ import type {
   UpdateUserRequest,
   IUser,
 } from "@/services/users";
+import { LOGIN_TYPE } from "@/utils/env";
 
 export enum LoginStatus {
   /** 未登入 */
@@ -73,3 +74,8 @@ export type AuthDispatch = {
   [ActionTypes.LOGIN]: (payload: IUser | null) => void;
   [ActionTypes.LOGOUT]: () => void;
 };
+
+export type LoginMessageEvent = MessageEvent<{
+  type: typeof LOGIN_TYPE;
+  payload: { token: string };
+}>;

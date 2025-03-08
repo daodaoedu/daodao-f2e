@@ -5,7 +5,6 @@ import {
   useEffect,
   useMemo,
   useReducer,
-  useRef,
 } from 'react';
 import toast from 'react-hot-toast';
 import { useRouter, usePathname } from 'next/navigation';
@@ -15,7 +14,6 @@ import { useDispatch } from 'react-redux';
 import { fetchUserByToken, userLogout } from '@/redux/actions/user';
 import { HttpError } from '@/services/httpClient';
 import {
-  getDevOriginStorage,
   getRedirectionStorage,
   getReminderStorage,
   getTokenStorage,
@@ -28,7 +26,7 @@ import {
   updateUser,
   updateUserSchema,
 } from '@/services/users';
-import { checkIsDevHost } from '@/utils/env';
+import { LOGIN_TYPE } from '@/utils/env';
 
 import LoginModal from './LoginModal';
 import {
@@ -38,8 +36,6 @@ import {
   ActionTypes,
   LoginStatus,
 } from './type';
-
-const LOGIN_TYPE = 'login-type';
 
 const initialState: AuthState = {
   isComplete: false,
@@ -325,87 +321,3 @@ export function AuthProvider({ children }: PropsWithChildren) {
     </AuthContext.Provider>
   );
 }
-
-interface ProtectedComponentProps extends PropsWithChildren {
-  redirectOnCancel?: string;
-  onlyCheckToken?: boolean;
-}
-
-export const ProtectedComponent = ({
-  children,
-  redirectOnCancel,
-  onlyCheckToken = false,
-}: ProtectedComponentProps) => {
-  const router = useRouter();
-  const opened = useRef(false);
-  const { isLoggedIn, isOpenLoginModal, token } = useAuth();
-  const { openLoginModal } = useAuthDispatch();
-  const requiresLogin = onlyCheckToken ? !token : !isLoggedIn;
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (requiresLogin && !token) {
-      timer = setTimeout(() => {
-        opened.current = true;
-        openLoginModal();
-      }, 1000);
-    }
-    return () => clearTimeout(timer);
-  }, [requiresLogin, token, openLoginModal]);
-
-  useEffect(() => {
-    if (
-      redirectOnCancel &&
-      !isOpenLoginModal &&
-      opened.current &&
-      requiresLogin &&
-      !token
-    ) {
-      router.replace(redirectOnCancel);
-    }
-  }, [
-    redirectOnCancel,
-    isOpenLoginModal,
-    opened.current,
-    requiresLogin,
-    token,
-    router.replace,
-  ]);
-
-  if (requiresLogin) return <div className="h-screen w-screen" />;
-
-  return children;
-};
-
-export const sendLoginEvent = (token: string) => {
-  getTokenStorage().remove();
-
-  try {
-    if (
-      window.opener &&
-      window.opener.location.origin === window.location.origin
-    ) {
-      window.opener.postMessage(
-        { type: LOGIN_TYPE, payload: { token } },
-        window.location.origin
-      );
-      window.close();
-      return true;
-    }
-
-    return false;
-  } catch (e) {
-    if (e instanceof DOMException) {
-      // 非同源政策會拋出錯誤，只有開發分支與本地開發會有此情況
-      const isDevHost = checkIsDevHost();
-      const origin = getDevOriginStorage().get();
-
-      if (isDevHost && origin) {
-        getDevOriginStorage().remove();
-        window.location.href = `${origin}/auth/google?token=${token}`;
-      }
-      return true;
-    }
-    throw e;
-  }
-};

@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
-import type { MenuItem } from '@/constants/category';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import Dropdown from '../Dropdown';
@@ -13,7 +12,7 @@ function DesktopMenu() {
     <>
       <nav>
         <ul className="flex items-center gap-1">
-          {NAV_LINK.map(({ link, name, target }: MenuItem) => (
+          {NAV_LINK.map(({ link, name, target }) => (
             <li key={name}>
               <Link
                 href={link}
@@ -39,20 +38,14 @@ function DesktopMenu() {
             島島盃-春季學習馬拉松
           </Dropdown.Toggle>
           <Dropdown.List className="mt-1">
-            {MARATHON_LINKS.map(({ name, link, disabled }) => (
+            {MARATHON_LINKS.map(({ name, link }) => (
               <Dropdown.Item
                 key={name}
                 className="rounded-lg text-nowrap hover:bg-primary-lightest"
               >
-                {disabled ? (
-                  <div className="p-2 text-basic-300 cursor-not-allowed">
-                    {name}
-                  </div>
-                ) : (
-                  <Link href={link} className="block p-2 text-basic-400">
-                    {name}
-                  </Link>
-                )}
+                <Link href={link} className="block p-2 text-basic-400">
+                  {name}
+                </Link>
               </Dropdown.Item>
             ))}
           </Dropdown.List>

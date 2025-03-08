@@ -223,7 +223,7 @@ const useEditProfile = () => {
     try {
       await authDispatch.updateUser(payload);
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
