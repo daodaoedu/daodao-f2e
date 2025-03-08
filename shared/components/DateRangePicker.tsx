@@ -89,6 +89,11 @@ const DateRangePicker = ({
   const disabledChangeDate = disabledStartDate && disabledEndDate;
 
   const handleStartDateChange = (date: Dayjs) => {
+    if (disabledEndDate) {
+      onStartDateChange(date);
+      setIsOpen(false);
+      return;
+    }
     if (endDate.isBefore(date)) {
       onEndDateChange(date);
       onStartDateChange(endDate);
@@ -100,7 +105,9 @@ const DateRangePicker = ({
   };
 
   const handleEndDateChange = (date: Dayjs) => {
-    if (prevStartDate.current.isAfter(date)) {
+    if (disabledStartDate) {
+      onEndDateChange(date);
+    } else if (prevStartDate.current.isAfter(date)) {
       onStartDateChange(date);
       onEndDateChange(prevStartDate.current);
     } else {
