@@ -33,9 +33,9 @@ const NotesPage = () => {
 
   const {
     data: notes,
-    create,
-    update,
-    remove,
+    createMutation,
+    updateMutation,
+    deleteMutation,
   } = useProjectNoteList(projectId, {
     onCreated: () => {
       toast.success('新增成功');
@@ -99,8 +99,8 @@ const NotesPage = () => {
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
-          isLoading={create.isMutating}
-          onSubmit={create.trigger}
+          isLoading={createMutation.isMutating}
+          onSubmit={createMutation.trigger}
         />
       )}
 
@@ -114,9 +114,9 @@ const NotesPage = () => {
           projectTitle={project.title}
           week={detail.week}
           createdAt={detail.date}
-          isLoading={update.isMutating}
+          isLoading={updateMutation.isMutating}
           defaultValues={detail}
-          onSubmit={update.trigger}
+          onSubmit={updateMutation.trigger}
         />
       )}
 
@@ -127,8 +127,8 @@ const NotesPage = () => {
           confirmColor="alert"
           isOpen={modalType === ModalTypeEnum.Delete}
           onClose={() => setModalType(null)}
-          onConfirm={() => remove.trigger({ projectId, noteId })}
-          isLoading={remove.isMutating}
+          onConfirm={() => deleteMutation.trigger({ projectId, noteId })}
+          isLoading={deleteMutation.isMutating}
         />
       )}
     </>

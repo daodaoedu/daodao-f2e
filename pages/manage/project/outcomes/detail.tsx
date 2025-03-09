@@ -21,8 +21,8 @@ const OutcomeDetailPage = () => {
   const { data: project } = useProject({ id: projectId });
   const {
     data: outcome,
-    update: updateOutcome,
-    remove: removeOutcome,
+    updateMutation: updateOutcome,
+    deleteMutation: removeOutcome,
   } = useProjectOutcome({
     projectId,
     outcomeId,

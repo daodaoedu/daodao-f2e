@@ -21,8 +21,8 @@ const NoteDetailPage = () => {
   const { data: project } = useProject({ id: projectId });
   const {
     data: note,
-    update: updateNote,
-    remove: removeNote,
+    updateMutation: updateNote,
+    deleteMutation: removeNote,
   } = useProjectNote({
     projectId,
     noteId,

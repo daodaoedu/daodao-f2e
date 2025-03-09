@@ -32,19 +32,19 @@ export default function useProjectNote({
 
   const { data, ...swr } = useSWR<ProjectNoteSchema>(swrKey);
 
-  const create = useSWRMutation(
+  const createMutation = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: CreateProjectNoteRequest }) => createProjectNote(arg),
     { onSuccess: onCreated }
   );
 
-  const update = useSWRMutation(
+  const updateMutation = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: UpdateProjectNoteRequest }) => updateProjectNote(arg),
     { onSuccess: onUpdated }
   );
 
-  const remove = useSWRMutation(
+  const deleteMutation = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: { projectId: string; noteId: number } }) =>
       deleteProjectNote(arg.projectId, arg.noteId),
@@ -54,8 +54,8 @@ export default function useProjectNote({
   return {
     ...swr,
     data,
-    create,
-    update,
-    remove,
+    createMutation,
+    updateMutation,
+    deleteMutation,
   };
 }

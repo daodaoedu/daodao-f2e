@@ -11,7 +11,12 @@ import { PiCalendarBlankBold } from 'react-icons/pi';
 import marathonConfig from '@/constants/marathon';
 import getManageLayout from '@/layout/ManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
-import { useProjectReviewList, useProjectList } from '@/hooks/api/project';
+import {
+  useProjectReviewList,
+  useProjectList,
+  useProjectNoteList,
+  useProjectOutcomeList,
+} from '@/hooks/api/project';
 import SEOConfig from '@/shared/components/SEO';
 import AccessDenied from '@/shared/components/AccessDenied';
 import Button from '@/shared/components/Button';
@@ -25,6 +30,8 @@ import { ProjectProvider } from '@/contexts/Project';
 import { SelectProjectModal } from '@/features/projects';
 import { cn } from '@/utils/cn';
 import ReviewForm from '@/components/Review/Form';
+import NoteForm from '@/components/Note/Form';
+import OutcomeForm from '@/components/Outcome/Form';
 
 const HEADER_TITLES = [
   '今天的每一小步，都在建立你的學習動能！',
@@ -60,11 +67,18 @@ const Header = () => {
   const router = useRouter();
   const [modalType, setModalType] = useState<ModalType | null>(null);
   const [projectId, setProjectId] = useState<string | undefined>();
+  const handleCreated = () => {
+    toast.success('新增成功');
+    setModalType(null);
+  };
   const { createMutation: createReview } = useProjectReviewList(projectId, {
-    onCreated: () => {
-      toast.success('新增成功');
-      setModalType(null);
-    },
+    onCreated: handleCreated,
+  });
+  const { createMutation: createNote } = useProjectNoteList(projectId, {
+    onCreated: handleCreated,
+  });
+  const { createMutation: createOutcome } = useProjectOutcomeList(projectId, {
+    onCreated: handleCreated,
   });
   // const { data } = useProjectList({ isMe: true });
   // const maxProjects = 3;
@@ -181,6 +195,24 @@ const Header = () => {
                 week={marathonConfig.getWeekNumber()}
                 onSubmit={createReview.trigger}
                 isLoading={createReview.isMutating}
+              />
+            )}
+            {modalType === ModalType.Note && (
+              <NoteForm
+                projectId={project.id}
+                projectTitle={project.title}
+                week={marathonConfig.getWeekNumber()}
+                onSubmit={createNote.trigger}
+                isLoading={createNote.isMutating}
+              />
+            )}
+            {modalType === ModalType.Outcome && (
+              <OutcomeForm
+                projectId={project.id}
+                projectTitle={project.title}
+                week={marathonConfig.getWeekNumber()}
+                onSubmit={createOutcome.trigger}
+                isLoading={createOutcome.isMutating}
               />
             )}
           </>

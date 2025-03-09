@@ -48,12 +48,12 @@ export default function SelectProjectModal({
   return (
     <Modal
       title={selectedProject ? undefined : '選擇計畫'}
-      size="lg"
+      size="md"
       isOpen={isOpen}
       onClose={onClose}
       className="lg:p-4"
       hasCloseButton
-      // onRemovedDOM={() => handleSelect(null)}
+      onRemovedDOM={() => handleSelect(null)}
     >
       <div className="mt-4">
         {selectedProject

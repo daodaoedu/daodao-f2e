@@ -34,21 +34,21 @@ export default function useProjectOutcome({
 
   const { data, ...swr } = useSWR<ProjectOutcomeSchema>(swrKey);
 
-  const create = useSWRMutation(
+  const createMutation = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: CreateProjectOutcomeRequest }) =>
       createProjectOutcome(arg),
     { onSuccess: onCreated }
   );
 
-  const update = useSWRMutation(
+  const updateMutation = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: UpdateProjectOutcomeRequest }) =>
       updateProjectOutcome(arg),
     { onSuccess: onUpdated }
   );
 
-  const remove = useSWRMutation(
+  const deleteMutation = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: { projectId: string; outcomeId: number } }) =>
       deleteProjectOutcome(arg.projectId, arg.outcomeId),
@@ -58,8 +58,8 @@ export default function useProjectOutcome({
   return {
     ...swr,
     data,
-    create,
-    update,
-    remove,
+    createMutation,
+    updateMutation,
+    deleteMutation,
   };
 }

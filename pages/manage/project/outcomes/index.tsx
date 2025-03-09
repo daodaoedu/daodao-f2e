@@ -33,9 +33,9 @@ const OutcomesPage = () => {
 
   const {
     data: outcomes,
-    create,
-    update,
-    remove,
+    createMutation,
+    updateMutation,
+    deleteMutation,
   } = useProjectOutcomeList(projectId, {
     onCreated: () => {
       toast.success('新增成功');
@@ -99,8 +99,8 @@ const OutcomesPage = () => {
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
-          isLoading={create.isMutating}
-          onSubmit={create.trigger}
+          isLoading={createMutation.isMutating}
+          onSubmit={createMutation.trigger}
         />
       )}
 
@@ -114,9 +114,9 @@ const OutcomesPage = () => {
           projectTitle={project.title}
           week={detail.week}
           createdAt={detail.date}
-          isLoading={update.isMutating}
+          isLoading={updateMutation.isMutating}
           defaultValues={detail}
-          onSubmit={update.trigger}
+          onSubmit={updateMutation.trigger}
         />
       )}
 
@@ -127,8 +127,8 @@ const OutcomesPage = () => {
           confirmColor="alert"
           isOpen={modalType === ModalTypeEnum.Delete}
           onClose={() => setModalType(null)}
-          onConfirm={() => remove.trigger({ projectId, outcomeId })}
-          isLoading={remove.isMutating}
+          onConfirm={() => deleteMutation.trigger({ projectId, outcomeId })}
+          isLoading={deleteMutation.isMutating}
         />
       )}
     </>
