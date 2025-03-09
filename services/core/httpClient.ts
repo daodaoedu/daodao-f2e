@@ -28,8 +28,8 @@ export class HttpError {
   }
 }
 
-const isObject = (arg: unknown): arg is Record<string, unknown> =>
-  z.object({}).safeParse(arg).success;
+const isRecord = (arg: unknown): arg is Record<string, unknown> =>
+  z.record(z.string(), z.unknown()).safeParse(arg).success;
 
 const validValueSchema = z.union([
   z.string(),
@@ -64,7 +64,7 @@ const serializeNestedObject = <T extends URLSearchParams | FormData>(
       append(keyWithPrefix)(value);
     } else if (Array.isArray(value)) {
       value.forEach(append(`${keyWithPrefix}.`));
-    } else if (isObject(value)) {
+    } else if (isRecord(value)) {
       serializeNestedObject(value, formattedData, `${keyWithPrefix}.`);
     }
   });
@@ -148,7 +148,7 @@ export type FetcherParams = string | [string, ...unknown[]];
 export const fetcher = <R = void>(params: FetcherParams): Promise<R> => {
   const [pathname, ...args] = Array.isArray(params) ? params : [params];
   const source = args
-    .filter(isObject)
+    .filter(isRecord)
     .reduce((acc, curr) => Object.assign(acc, curr), {});
 
   return http<R>({ pathname, source });

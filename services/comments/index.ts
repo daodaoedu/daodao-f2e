@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { mutations } from '../httpClient';
+import { mutations } from '../core';
 import { baseUserSchema } from '../users';
 
 const commentEndpoint = '/comments';

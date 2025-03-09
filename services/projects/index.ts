@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { projectMilestoneSchema } from './milestones';
-import { mutations } from '../httpClient';
+import { mutations } from '../core';
 import { baseUserSchema } from '../users';
 
 const projectEndpoint = '/projects';

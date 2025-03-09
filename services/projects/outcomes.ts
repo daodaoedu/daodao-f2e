@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { mutations } from '../httpClient';
+import { mutations } from '../core';
 import { updateImage } from '../images';
 
 const projectEndpoint = '/projects';

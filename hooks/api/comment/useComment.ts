@@ -10,7 +10,7 @@ import {
   CommentSchema,
   CommentType,
 } from '@/services/comments';
-import { HttpError } from '@/services/httpClient';
+import { HttpError } from '@/services/core';
 
 export type CommentMutateKey =
   | [string, { targetType: CommentType; targetId: number }]

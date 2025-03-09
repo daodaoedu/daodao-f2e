@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import dayjs from 'dayjs';
-import { mutations } from '../httpClient';
+import { mutations } from '../core';
 import { projectTaskSchema } from './tasks';
 
 const projectEndpoint = '/projects';

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { HttpError, mutations, RequestContentType } from '../httpClient';
+import { HttpError, mutations, RequestContentType } from '../core';
 
 export const imagesEndpoint = '/images';
 
