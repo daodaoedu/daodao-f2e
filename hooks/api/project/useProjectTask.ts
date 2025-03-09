@@ -23,13 +23,13 @@ export default function useProjectTask({
   onUpdated,
   onDeleted,
 }: UseProjectTaskOptions) {
-  const create = useSWRMutation(
+  const createMutation = useSWRMutation(
     mutateKey,
     (url, { arg }: { arg: CreateProjectTaskRequest }) => createProjectTask(arg),
     { onSuccess: onCreated }
   );
 
-  const update = useSWRMutation(
+  const updateMutation = useSWRMutation(
     mutateKey,
     async (url, { arg }: { arg: UpdateProjectTaskRequest }) => {
       await updateProjectTask(arg);
@@ -39,15 +39,15 @@ export default function useProjectTask({
     { onSuccess: onUpdated }
   );
 
-  const remove = useSWRMutation(
+  const deleteMutation = useSWRMutation(
     mutateKey,
     (url, { arg }: { arg: DeleteProjectTaskRequest }) => deleteProjectTask(arg),
     { onSuccess: onDeleted }
   );
 
   return {
-    create,
-    update,
-    remove,
+    createMutation,
+    updateMutation,
+    deleteMutation,
   };
 }

@@ -41,7 +41,6 @@ const swrConfig = {
   revalidateOnFocus: false,
   errorRetryCount: 0,
   keepPreviousData: true,
-  revalidateIfStale: false,
   fetcher,
 };
 

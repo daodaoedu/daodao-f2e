@@ -164,8 +164,8 @@ const MilestonesContent = () => {
   const {
     data: milestones,
     isLoading,
-    create,
-    update,
+    createMutation,
+    updateMutation,
     mutate,
   } = useProjectMilestoneList(project.id);
 
@@ -284,7 +284,7 @@ const MilestonesContent = () => {
                     defaultEditing
                     onCancel={handleClose}
                     onCreate={async (request) => {
-                      await create.trigger(request);
+                      await createMutation.trigger(request);
                       handleClose();
                     }}
                   />
@@ -300,7 +300,7 @@ const MilestonesContent = () => {
                     startDate={startDate}
                     endDate={endDate}
                     isEditable
-                    onUpdate={update.trigger}
+                    onUpdate={updateMutation.trigger}
                     onRefreshData={mutate}
                   />
                 ))}

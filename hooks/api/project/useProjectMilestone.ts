@@ -36,14 +36,14 @@ export default function useProjectMilestone({
 
   const { data, ...swr } = useSWR<ProjectMilestoneSchema>(swrKey);
 
-  const create = useSWRMutation(
+  const createMutation = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: CreateProjectMilestoneRequest }) =>
       createProjectMilestone(arg),
     { onSuccess: onCreated }
   );
 
-  const update = useSWRMutation(
+  const updateMutation = useSWRMutation(
     swrKey ?? mutateKey,
     async (url, { arg }: { arg: UpdateProjectMilestoneRequest }) => {
       await updateProjectMilestone(arg);
@@ -53,7 +53,7 @@ export default function useProjectMilestone({
     { onSuccess: onUpdated }
   );
 
-  const remove = useSWRMutation(
+  const deleteMutation = useSWRMutation(
     swrKey ?? mutateKey,
     (url, { arg }: { arg: { projectId: string; milestoneId: number } }) =>
       deleteProjectMilestone(arg.projectId, arg.milestoneId),
@@ -63,8 +63,8 @@ export default function useProjectMilestone({
   return {
     ...swr,
     data,
-    create,
-    update,
-    remove,
+    createMutation,
+    updateMutation,
+    deleteMutation,
   };
 }

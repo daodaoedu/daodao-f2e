@@ -100,7 +100,7 @@ const Header = () => {
     },
     {
       label: '新增任務',
-      onClick: () => setModalType(ModalType.Task),
+      onClick: () => toast.error('功能尚未開放'),
     },
     {
       label: '新增覆盤',
@@ -391,7 +391,7 @@ const Main = ({ date }: { date: Dayjs }) => {
                       milestones={project.originalMilestones}
                       projectId={project.id}
                       onRefreshData={mutate}
-                      onUpdate={milestoneMutations.update.trigger}
+                      onUpdate={milestoneMutations.updateMutation.trigger}
                       isEditable
                     />
                   </div>
