@@ -1,2 +1,3 @@
-export { default as useCommentService } from './hooks';
+export * from './api';
+export * from './hooks';
 export * from './schema';

@@ -16,7 +16,7 @@ import Dropdown from '../Dropdown';
 interface CommentCardProps extends CommentSchema {
   onCreate?: (data: Omit<CommentData, 'id'>) => void;
   onUpdate?: (data: CommentData) => void;
-  onDelete?: (id: number) => void;
+  onDelete?: (data: { id: number }) => void;
 }
 
 function CommentCard({
@@ -59,7 +59,7 @@ function CommentCard({
         onDelete && {
           key: 'delete',
           children: '刪除',
-          onClick: () => onDelete(id),
+          onClick: () => onDelete({ id }),
         },
       ]
     : [

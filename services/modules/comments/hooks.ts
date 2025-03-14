@@ -1,67 +1,32 @@
-import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { HttpError } from '@/services/core';
-import {
-  CommentType,
-  CommentSchema,
-  CreateCommentSchema,
-  UpdateCommentSchema,
-} from '@/services/modules/comments/schema';
 
-import generateCommentApi from './api';
+import commentAPI, { getCommentPathname, CommentSWRKey } from './api';
+import { CommentType, CommentSchema } from './schema';
 
-interface UseCommentListOptions {
-  targetType?: CommentType;
-  targetId?: number;
+interface UseCommentListProps {
+  targetType: CommentType;
+  targetId: number;
   disableSearch?: boolean;
-  onCreated?: () => void;
-  onUpdated?: () => void;
-  onDeleted?: () => void;
 }
 
-type CreateCommentArg = Omit<CreateCommentSchema, 'targetType' | 'targetId'>;
-type UpdateCommentArg = Omit<UpdateCommentSchema, 'targetType' | 'targetId'>;
-
-export default function useCommentService({
+export function useComments({
   targetType,
   targetId,
   disableSearch,
-  onCreated,
-  onUpdated,
-  onDeleted,
-}: UseCommentListOptions) {
-  const commentApi = useMemo(generateCommentApi, []);
-
-  const swrKey =
-    targetId && targetType
-      ? [commentApi.getEndpoint(), { targetType, targetId }]
-      : null;
+}: UseCommentListProps) {
+  const swrKey: CommentSWRKey = [
+    getCommentPathname(),
+    { targetType, targetId },
+  ];
 
   const swr = useSWR<CommentSchema[]>(disableSearch ? null : swrKey);
 
-  const createMutation = useSWRMutation(
-    swrKey,
-    (_, { arg }: { arg: CreateCommentArg }) => {
-      if (!targetId || !targetType) {
-        throw new HttpError(400, { message: '目標不存在' });
-      }
-      return commentApi.create({ ...arg, targetType, targetId });
-    },
-    { onSuccess: onCreated }
-  );
+  const createMutation = useSWRMutation(swrKey, commentAPI.create);
 
-  const updateMutation = useSWRMutation(
-    swrKey,
-    (_, { arg }: { arg: UpdateCommentArg }) => commentApi.update(arg),
-    { onSuccess: onUpdated }
-  );
+  const updateMutation = useSWRMutation(swrKey, commentAPI.update);
 
-  const deleteMutation = useSWRMutation(
-    swrKey,
-    (_, { arg }: { arg: number }) => commentApi.delete(arg),
-    { onSuccess: onDeleted }
-  );
+  const deleteMutation = useSWRMutation(swrKey, commentAPI.delete);
 
   return {
     ...swr,

@@ -1,5 +1,5 @@
 import Comment from '@/public/assets/icons/comment.svg';
-import { useCommentService, CommentType } from '@/services/modules/comments';
+import { useComments, CommentType } from '@/services/modules/comments';
 import CommentInput from './CommentInput';
 import CommentCard from './CommentCard';
 
@@ -14,7 +14,7 @@ function CommentSection({ targetId, targetType }: CommentSectionProps) {
     createMutation,
     updateMutation,
     deleteMutation,
-  } = useCommentService({
+  } = useComments({
     targetType,
     targetId,
   });
