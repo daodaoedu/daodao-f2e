@@ -7,11 +7,12 @@ import Button from '@/shared/components/Button';
 import CreateModal from '@/components/Note/Modals/CreateModal';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';
 import ConfirmModal from '@/shared/components/Confirm';
-import { useProject } from '@/services/modules/projects';
 import {
+  useProject,
   useProjectNote,
-  useProjectNoteList,
-} from '@/hooks/api/project';
+  useProjectNoteMutation,
+  useProjectNotes,
+} from '@/services/modules/projects';
 
 enum ModalTypeEnum {
   Create,
@@ -26,33 +27,35 @@ const NotesPage = () => {
   const [noteId, setNoteId] = useState<number | undefined>(undefined);
   const { data: project } = useProject(projectId);
 
-  const { data: detail, mutate } = useProjectNote({
-    projectId: projectId ?? undefined,
+  const { data: notes, mutate } = useProjectNotes(projectId);
+
+  const { data: detail } = useProjectNote({
+    projectId,
     noteId,
   });
 
-  const {
-    data: notes,
-    createMutation,
-    updateMutation,
-    deleteMutation,
-  } = useProjectNoteList(projectId ?? undefined, {
-    onCreated: () => {
-      toast.success('新增成功');
-      setModalType(null);
-    },
-    onUpdated: () => {
-      toast.success('更新成功');
-      setModalType(null);
-      setNoteId(undefined);
-      mutate();
-    },
-    onDeleted: () => {
-      toast.success('刪除成功');
-      setModalType(null);
-      setNoteId(undefined);
-    },
-  });
+  const { createMutation, updateMutation, deleteMutation } =
+    useProjectNoteMutation({
+      projectId,
+      noteId,
+      onCreated: () => {
+        toast.success('新增成功');
+        setModalType(null);
+        mutate();
+      },
+      onUpdated: () => {
+        toast.success('更新成功');
+        setModalType(null);
+        setNoteId(undefined);
+        mutate();
+      },
+      onDeleted: () => {
+        toast.success('刪除成功');
+        setModalType(null);
+        setNoteId(undefined);
+        mutate();
+      },
+    });
 
   if (!projectId) {
     return <div>專案不存在</div>;

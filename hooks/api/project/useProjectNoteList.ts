@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import {
-  getProjectNoteEndpoint,
+  getProjectNotePathname,
   ProjectNoteSchema,
 } from '@/services/projects/notes';
 
@@ -16,7 +16,7 @@ export default function useProjectNoteList(
   projectId?: string,
   options?: UseProjectNoteListOptions
 ) {
-  const swrKey = projectId ? getProjectNoteEndpoint({ projectId }) : null;
+  const swrKey = projectId ? getProjectNotePathname({ projectId }) : null;
 
   const { mutate, ...swr } = useSWR<ProjectNoteSchema[]>(swrKey);
 

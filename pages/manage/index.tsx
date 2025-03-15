@@ -13,7 +13,6 @@ import getManageLayout from '@/layout/ManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
 import {
   useProjectReviewList,
-  useProjectNoteList,
   useProjectOutcomeList,
 } from '@/hooks/api/project';
 import SEOConfig from '@/shared/components/SEO';
@@ -34,6 +33,7 @@ import OutcomeForm from '@/components/Outcome/Form';
 import {
   useMyProjects,
   useProjectMilestoneMutation,
+  useProjectNoteMutation,
 } from '@/services/modules/projects';
 
 const HEADER_TITLES = [
@@ -77,7 +77,8 @@ const Header = () => {
   const { createMutation: createReview } = useProjectReviewList(projectId, {
     onCreated: handleCreated,
   });
-  const { createMutation: createNote } = useProjectNoteList(projectId, {
+  const { createMutation: createNote } = useProjectNoteMutation({
+    projectId,
     onCreated: handleCreated,
   });
   const { createMutation: createOutcome } = useProjectOutcomeList(projectId, {

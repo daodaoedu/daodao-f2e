@@ -1,10 +1,14 @@
+import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import NoteDetail from '@/components/Note/Detail';
 import getProjectLayout from '@/layout/ProjectLayout';
-import { useProject } from '@/services/modules/projects';
-import { useProjectNote } from '@/hooks/api/project';
+import {
+  useProject,
+  useProjectNote,
+  useProjectNoteMutation,
+} from '@/services/modules/projects';
 import ConfirmModal from '@/shared/components/Confirm';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';
 
@@ -17,15 +21,16 @@ const NoteDetailPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const projectId = searchParams.get('id');
-  const noteId = parseInt(searchParams.get('noteId') ?? '0', 10);
+  const noteId = z.number().safeParse(searchParams.get('noteId')).data;
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const { data: project } = useProject(projectId);
-  const {
-    data: note,
-    updateMutation: updateNote,
-    deleteMutation: removeNote,
-  } = useProjectNote({
-    projectId: projectId ?? undefined,
+  const { data: note } = useProjectNote({
+    projectId,
+    noteId,
+  });
+
+  const { updateMutation, deleteMutation } = useProjectNoteMutation({
+    projectId,
     noteId,
     onUpdated: () => {
       toast.success('更新成功');
@@ -37,7 +42,7 @@ const NoteDetailPage = () => {
     },
   });
 
-  if (!projectId || !noteId) {
+  if (!projectId || noteId == null) {
     return null;
   }
 
@@ -60,8 +65,8 @@ const NoteDetailPage = () => {
           createdAt={note.date}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
-          onSubmit={updateNote.trigger}
-          isLoading={updateNote.isMutating}
+          onSubmit={updateMutation.trigger}
+          isLoading={updateMutation.isMutating}
         />
       )}
 
@@ -71,8 +76,8 @@ const NoteDetailPage = () => {
         confirmColor="alert"
         isOpen={modalType === ModalTypeEnum.Delete}
         onClose={() => setModalType(null)}
-        onConfirm={() => removeNote.trigger({ projectId, noteId })}
-        isLoading={removeNote.isMutating}
+        onConfirm={() => deleteMutation.trigger({ projectId, noteId })}
+        isLoading={deleteMutation.isMutating}
       />
     </div>
   );

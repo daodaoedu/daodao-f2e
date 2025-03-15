@@ -1,12 +1,12 @@
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import {
-  CreateProjectNoteRequest,
+  CreateProjectNoteSchema,
   ProjectNoteSchema,
-  UpdateProjectNoteRequest,
+  UpdateProjectNoteSchema,
   createProjectNote,
   deleteProjectNote,
-  getProjectNoteEndpoint,
+  getProjectNotePathname,
   updateProjectNote,
 } from '@/services/projects/notes';
 
@@ -28,19 +28,19 @@ export default function useProjectNote({
   onDeleted,
 }: UseProjectNoteOptions) {
   const swrKey =
-    projectId && noteId ? getProjectNoteEndpoint({ projectId, noteId }) : null;
+    projectId && noteId ? getProjectNotePathname({ projectId, noteId }) : null;
 
   const { data, ...swr } = useSWR<ProjectNoteSchema>(swrKey);
 
   const createMutation = useSWRMutation(
     swrKey ?? mutateKey,
-    (url, { arg }: { arg: CreateProjectNoteRequest }) => createProjectNote(arg),
+    (url, { arg }: { arg: CreateProjectNoteSchema }) => createProjectNote(arg),
     { onSuccess: onCreated }
   );
 
   const updateMutation = useSWRMutation(
     swrKey ?? mutateKey,
-    (url, { arg }: { arg: UpdateProjectNoteRequest }) => updateProjectNote(arg),
+    (url, { arg }: { arg: UpdateProjectNoteSchema }) => updateProjectNote(arg),
     { onSuccess: onUpdated }
   );
 

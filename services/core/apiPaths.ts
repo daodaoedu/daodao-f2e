@@ -1,4 +1,4 @@
-type PathIdType = number | string;
+type PathIdType = number | string | null;
 
 class PathBuilder {
   private path: string = '';
@@ -11,8 +11,8 @@ class PathBuilder {
     return this.path;
   }
 
-  private generatePath(path: string, id?: PathIdType | null): PathBuilder {
-    if (id) {
+  private generatePath(path: string, id?: PathIdType): PathBuilder {
+    if (id != null && !Number.isNaN(id)) {
       return new PathBuilder(
         `${this.path}/${path}/${encodeURIComponent(id.toString())}`
       );

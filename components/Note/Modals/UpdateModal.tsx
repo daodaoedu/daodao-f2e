@@ -1,5 +1,5 @@
 import Modal from '@/shared/components/Modal';
-import { UpdateProjectNoteRequest } from '@/services/projects/notes';
+import { UpdateProjectNoteSchema } from '@/services/projects/notes';
 import NoteForm from '../Form';
 
 interface UpdateModalProps {
@@ -11,8 +11,8 @@ interface UpdateModalProps {
   week: number;
   createdAt?: string;
   isLoading: boolean;
-  defaultValues?: UpdateProjectNoteRequest;
-  onSubmit: (data: UpdateProjectNoteRequest) => void;
+  defaultValues?: UpdateProjectNoteSchema;
+  onSubmit: (data: UpdateProjectNoteSchema) => void;
 }
 
 function UpdateModal({

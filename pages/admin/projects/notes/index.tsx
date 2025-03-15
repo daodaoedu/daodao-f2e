@@ -1,22 +1,14 @@
+import { z } from 'zod';
 import { useSearchParams } from 'next/navigation';
 import NoteCard from '@/components/Note/Card';
 import getAdminProjectLayout from '@/layout/AdminProjectLayout';
-import {
-  useProjectNoteList,
-} from '@/hooks/api/project';
-import { z } from 'zod';
+import { useProjectNotes } from '@/services/modules/projects';
 
 const NotesPage = () => {
   const searchParams = useSearchParams();
-  const projectIdParam = searchParams.get('id');
-  const projectId =
-    projectIdParam && z.string().uuid().safeParse(projectIdParam).success
-      ? projectIdParam
-      : undefined;
+  const projectId = z.string().uuid().safeParse(searchParams.get('id')).data;
 
-  const {
-    data: notes,
-  } = useProjectNoteList(projectId);
+  const { data: notes } = useProjectNotes(projectId);
 
   if (!projectId) {
     return <div>專案不存在</div>;

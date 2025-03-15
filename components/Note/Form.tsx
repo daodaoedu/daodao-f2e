@@ -6,9 +6,9 @@ import PostCard from '@/shared/components/Post/PostCard';
 import Button from '@/shared/components/Button';
 import Form from '@/shared/components/Form';
 import {
-  CreateProjectNoteRequest,
+  CreateProjectNoteSchema,
   createProjectNoteSchema,
-  UpdateProjectNoteRequest,
+  UpdateProjectNoteSchema,
   updateProjectNoteSchema,
 } from '@/services/projects/notes';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
@@ -21,13 +21,13 @@ interface BaseNoteFormProps {
   week: number;
   createdAt?: string;
   isLoading: boolean;
-  defaultValues?: UpdateProjectNoteRequest;
+  defaultValues?: UpdateProjectNoteSchema;
 }
 
 type NoteFormProps = BaseNoteFormProps &
   (
-    | { id: number; onSubmit: (data: UpdateProjectNoteRequest) => void }
-    | { id?: never; onSubmit: (data: CreateProjectNoteRequest) => void }
+    | { id: number; onSubmit: (data: UpdateProjectNoteSchema) => void }
+    | { id?: never; onSubmit: (data: CreateProjectNoteSchema) => void }
   );
 
 function NoteForm({
@@ -46,8 +46,8 @@ function NoteForm({
 
   const methods = useForm<
     typeof id extends never
-      ? CreateProjectNoteRequest
-      : UpdateProjectNoteRequest
+      ? CreateProjectNoteSchema
+      : UpdateProjectNoteSchema
   >({
     resolver: zodResolver(
       id ? updateProjectNoteSchema : createProjectNoteSchema

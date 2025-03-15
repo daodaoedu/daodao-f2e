@@ -9,7 +9,7 @@ interface GetProjectNoteListKeyOptions {
   noteId?: number;
 }
 
-export const getProjectNoteEndpoint = ({
+export const getProjectNotePathname = ({
   projectId,
   noteId,
 }: GetProjectNoteListKeyOptions) => {
@@ -37,17 +37,17 @@ export const createProjectNoteSchema = projectNoteSchema.omit({
   id: true,
 });
 
-export type CreateProjectNoteRequest = z.infer<typeof createProjectNoteSchema>;
+export type CreateProjectNoteSchema = z.infer<typeof createProjectNoteSchema>;
 
 export const createProjectNote = async ({
   projectId,
   imgFiles,
   imgUrls,
   ...note
-}: CreateProjectNoteRequest) => {
+}: CreateProjectNoteSchema) => {
   const updatedImgUrls = await updateImage(imgFiles, imgUrls);
 
-  return mutations.post(getProjectNoteEndpoint({ projectId }), {
+  return mutations.post(getProjectNotePathname({ projectId }), {
     ...note,
     imgUrls: updatedImgUrls,
   });
@@ -55,7 +55,7 @@ export const createProjectNote = async ({
 
 export const updateProjectNoteSchema = projectNoteSchema;
 
-export type UpdateProjectNoteRequest = z.infer<typeof updateProjectNoteSchema>;
+export type UpdateProjectNoteSchema = z.infer<typeof updateProjectNoteSchema>;
 
 export const updateProjectNote = async ({
   id,
@@ -63,15 +63,15 @@ export const updateProjectNote = async ({
   imgFiles,
   imgUrls,
   ...note
-}: UpdateProjectNoteRequest) => {
+}: UpdateProjectNoteSchema) => {
   const updatedImgUrls = await updateImage(imgFiles, imgUrls);
 
-  return mutations.put(getProjectNoteEndpoint({ projectId, noteId: id }), {
+  return mutations.put(getProjectNotePathname({ projectId, noteId: id }), {
     ...note,
     imgUrls: updatedImgUrls,
   });
 };
 
 export const deleteProjectNote = (projectId: string, noteId: number) => {
-  return mutations.delete(getProjectNoteEndpoint({ projectId, noteId }));
+  return mutations.delete(getProjectNotePathname({ projectId, noteId }));
 };
