@@ -39,6 +39,10 @@ class PathBuilder {
   tasks(id?: PathIdType): PathBuilder {
     return this.generatePath('tasks', id);
   }
+
+  images(id?: PathIdType): PathBuilder {
+    return this.generatePath('images', id);
+  }
 }
 
 export const apiPaths = new PathBuilder();

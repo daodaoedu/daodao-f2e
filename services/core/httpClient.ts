@@ -32,7 +32,7 @@ const isRecord = (arg: unknown): arg is Record<string, unknown> =>
   z.record(z.string(), z.unknown()).safeParse(arg).success;
 
 const validValueSchema = z.union([
-  z.string(),
+  z.string().min(1),
   z.number(),
   z.boolean(),
   z.instanceof(Blob),
@@ -43,34 +43,32 @@ type ValidValueType = z.infer<typeof validValueSchema>;
 const isValidValue = (value: unknown): value is ValidValueType =>
   validValueSchema.safeParse(value).success;
 
-const serializeNestedObject = <T extends URLSearchParams | FormData>(
-  source: Record<string, unknown>,
-  formattedData: T,
-  prefix = ''
-) => {
-  const append = (key: string) => (value: ValidValueType) => {
-    if (formattedData instanceof URLSearchParams) {
-      formattedData.append(key, encodeURIComponent(String(value)));
-    } else if (typeof value === 'string' || value instanceof Blob) {
-      formattedData.append(key, value);
+const serialize =
+  <T extends URLSearchParams | FormData>(
+    formattedData: T,
+    keys: string[] = []
+  ) =>
+  (source: unknown) => {
+    const append = (key: string) => (value: ValidValueType) => {
+      if (formattedData instanceof URLSearchParams) {
+        formattedData.append(key, encodeURIComponent(String(value)));
+      } else if (typeof value === 'string' || value instanceof Blob) {
+        formattedData.append(key, value);
+      }
+    };
+
+    if (isValidValue(source)) {
+      append(keys.join('.'))(source);
+    } else if (Array.isArray(source)) {
+      source.forEach(serialize(formattedData, keys));
+    } else if (isRecord(source)) {
+      Object.entries(source || {}).forEach(([key, value]) => {
+        serialize(formattedData, keys.concat(key))(value);
+      });
     }
+
+    return formattedData;
   };
-
-  Object.entries(source || {}).forEach(([key, value]) => {
-    if (value === '' || value == null) return;
-
-    const keyWithPrefix = `${prefix}${key}`;
-    if (isValidValue(value)) {
-      append(keyWithPrefix)(value);
-    } else if (Array.isArray(value)) {
-      value.forEach(append(`${keyWithPrefix}.`));
-    } else if (isRecord(value)) {
-      serializeNestedObject(value, formattedData, `${keyWithPrefix}.`);
-    }
-  });
-
-  return formattedData;
-};
 
 const createUrl = (
   pathname: string,
@@ -83,7 +81,7 @@ const createUrl = (
 
   const urlSearchParams = new URLSearchParams();
 
-  return `${url}?${serializeNestedObject(source, urlSearchParams).toString()}`;
+  return `${url}?${serialize(urlSearchParams)(source)}`;
 };
 
 const createBody = (
@@ -101,7 +99,7 @@ const createBody = (
 
   if (contentType === RequestContentType.FormData) {
     const formData = new FormData();
-    return serializeNestedObject(source, formData);
+    return serialize(formData)(source);
   }
 
   return undefined;

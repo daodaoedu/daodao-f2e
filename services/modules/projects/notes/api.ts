@@ -6,6 +6,7 @@ import {
   ProjectNoteSchema,
   UpdateProjectNoteSchema,
 } from './schema';
+import { uploadImages } from '../../images';
 
 export type ProjectNoteSWRKey = string;
 
@@ -39,20 +40,25 @@ interface ProjectNoteAPIType {
 }
 
 const projectNoteAPI: ProjectNoteAPIType = {
-  create: (_, { arg: { projectId, ...arg } }) =>
-    mutations.post<ProjectNoteSchema>(
+  create: async (_, { arg: { projectId, imgFiles, imgUrls, ...arg } }) => {
+    const updatedImgUrls = await uploadImages(imgFiles, imgUrls);
+
+    return mutations.post<ProjectNoteSchema>(
       getProjectNotePathname({ projectId }),
-      arg
-    ),
+      { ...arg, imgUrls: updatedImgUrls }
+    );
+  },
 
-  update: (_, { arg: { projectId, id, ...arg } }) =>
-    mutations.put<ProjectNoteSchema>(
+  update: async (_, { arg: { projectId, id, imgFiles, imgUrls, ...arg } }) => {
+    const updatedImgUrls = await uploadImages(imgFiles, imgUrls);
+
+    return mutations.put<ProjectNoteSchema>(
       getProjectNotePathname({ projectId, noteId: id }),
-      arg
-    ),
+      { ...arg, imgUrls: updatedImgUrls }
+    );
+  },
 
-  delete: (_, { arg }) =>
-    mutations.delete<void>(getProjectNotePathname(arg)),
+  delete: (_, { arg }) => mutations.delete<void>(getProjectNotePathname(arg)),
 };
 
 export default projectNoteAPI;
