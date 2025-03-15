@@ -31,14 +31,16 @@ function NoteDetail({
       renderContent={(noteData) => (
         <div className="mb-4 body-sm text-basic-500">
           <p className="mb-3 whitespace-pre-wrap">{noteData.content}</p>
-          {noteData.imgUrls && noteData.imgUrls.length > 0 && (
-            <Image
-              src={noteData.imgUrls[0]}
-              alt={noteData.title}
-              height="300px"
-              className="object-contain"
-            />
-          )}
+          {Array.isArray(noteData.imgUrls) &&
+            noteData.imgUrls.map((imgUrl) => (
+              <Image
+                key={imgUrl}
+                src={imgUrl}
+                alt={noteData.title}
+                height="300px"
+                className="object-contain"
+              />
+            ))}
         </div>
       )}
     />

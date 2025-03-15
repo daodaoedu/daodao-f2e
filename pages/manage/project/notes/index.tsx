@@ -24,7 +24,7 @@ const NotesPage = () => {
   const searchParams = useSearchParams();
   const projectId = searchParams.get('id');
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const [noteId, setNoteId] = useState<number | undefined>(undefined);
+  const [noteId, setNoteId] = useState<number | null>(null);
   const { data: project } = useProject(projectId);
 
   const { data: notes, mutate } = useProjectNotes(projectId);
@@ -46,13 +46,13 @@ const NotesPage = () => {
       onUpdated: () => {
         toast.success('更新成功');
         setModalType(null);
-        setNoteId(undefined);
+        setNoteId(null);
         mutate();
       },
       onDeleted: () => {
         toast.success('刪除成功');
         setModalType(null);
-        setNoteId(undefined);
+        setNoteId(null);
         mutate();
       },
     });

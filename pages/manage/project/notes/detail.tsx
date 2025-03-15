@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -9,6 +8,7 @@ import {
   useProjectNote,
   useProjectNoteMutation,
 } from '@/services/modules/projects';
+import { parseParamsToNumber } from '@/services/core';
 import ConfirmModal from '@/shared/components/Confirm';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';
 
@@ -21,7 +21,7 @@ const NoteDetailPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const projectId = searchParams.get('id');
-  const noteId = z.number().safeParse(searchParams.get('noteId')).data;
+  const noteId = parseParamsToNumber(searchParams.get('noteId'));
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const { data: project } = useProject(projectId);
   const { data: note } = useProjectNote({

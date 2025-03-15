@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from 'dayjs';
@@ -13,7 +14,7 @@ import {
 } from '@/services/projects/outcomes';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
 import Image from '@/shared/components/Image';
-import Upload from '@/shared/components/Upload';
+import Upload, { ImageDataType } from '@/shared/components/Upload';
 
 interface BaseOutcomeFormProps {
   projectId: string;
@@ -40,8 +41,12 @@ function OutcomeForm({
   isLoading,
   onSubmit,
 }: OutcomeFormProps) {
-  const [previewImage, setPreviewImage] = useState<string | null>(
-    defaultValues?.imgUrls?.[0] ?? null
+  const [images, setImages] = useState<ImageDataType[]>(
+    () =>
+      defaultValues?.imgUrls?.map((imgUrl) => ({
+        url: imgUrl,
+        id: crypto.randomUUID(),
+      })) ?? []
   );
 
   const methods = useForm<
@@ -63,6 +68,34 @@ function OutcomeForm({
       ...defaultValues,
     },
   });
+
+  const handleImageChange = (files: ImageDataType[]) => {
+    const updatedImages = [...images, ...files];
+    if (updatedImages.length > 5) {
+      toast.error('最多只能上傳5張圖片');
+      return;
+    }
+    setImages(updatedImages);
+  };
+
+  const handleDeleteImage = (uuid: string) => {
+    setImages(images.filter((img) => img.id !== uuid));
+  };
+
+  useEffect(() => {
+    methods.setValue(
+      'imgUrls',
+      images
+        .filter((image) => image.url.startsWith('http'))
+        .map((image) => image.url)
+    );
+    methods.setValue(
+      'imgFiles',
+      images
+        .filter((image): image is Required<ImageDataType> => !!image.file)
+        .map((image) => image.file)
+    );
+  }, [methods.setValue, images]);
 
   return (
     <Form methods={methods} onSubmit={onSubmit}>
@@ -86,36 +119,33 @@ function OutcomeForm({
         {...methods.register('content')}
       />
       <div className="px-2">
-        {previewImage && (
-          <div className="relative group mb-4">
-            <Image
-              src={previewImage}
-              alt="preview"
-              width="100%"
-              height="300px"
-              className="object-contain"
-            />
-            <span className="absolute inset-0 bottom-1.5 group-hover:bg-basic-black/20 transition-colors rounded-lg" />
-            <Button
-              variant="solid"
-              color="alert"
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-2"
-              prefixIcon="AiOutlineClose"
-              onClick={() => {
-                methods.setValue("imgFiles", []);
-                methods.setValue("imgUrls", []);
-                setPreviewImage(null);
-              }}
-            />
-          </div>
-        )}
+        {Array.isArray(images) &&
+          images.map((image) => (
+            <div key={image.id} className="relative group mb-4">
+              <Image
+                src={image.url}
+                alt="preview"
+                width="100%"
+                height="300px"
+                className="object-contain"
+              />
+              <span className="absolute inset-0 bottom-1.5 group-hover:bg-basic-black/20 transition-colors rounded-lg" />
+              <Button
+                variant="solid"
+                color="alert"
+                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-2"
+                prefixIcon="AiOutlineClose"
+                onClick={() => handleDeleteImage(image.id)}
+              />
+            </div>
+          ))}
         <Upload
           variant="solid"
           color="secondary"
-          onPreviewsChange={([preview]) => setPreviewImage(preview)}
-          onFilesChange={([file]) => methods.setValue('imgFiles', [file])}
+          onChange={handleImageChange}
+          multiple
         >
-          {previewImage ? '更換圖片' : '加入圖片'}
+          加入圖片
         </Upload>
       </div>
       <div className="flex justify-end gap-5">

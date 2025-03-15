@@ -31,14 +31,16 @@ function OutcomeDetail({
       renderContent={(outcomeData) => (
         <div className="mb-4 body-sm text-basic-500">
           <p className="mb-3 whitespace-pre-wrap">{outcomeData.content}</p>
-          {outcomeData.imgUrls && outcomeData.imgUrls.length > 0 && (
-            <Image
-              src={outcomeData.imgUrls[0]}
-              alt={outcomeData.title}
-              height="300px"
-              className="object-contain"
-            />
-          )}
+          {Array.isArray(outcomeData.imgUrls) &&
+            outcomeData.imgUrls.map((imgUrl) => (
+              <Image
+                key={imgUrl}
+                src={imgUrl}
+                alt={outcomeData.title}
+                height="300px"
+                className="object-contain"
+              />
+            ))}
         </div>
       )}
     />

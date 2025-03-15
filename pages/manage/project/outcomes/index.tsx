@@ -7,11 +7,12 @@ import Button from '@/shared/components/Button';
 import CreateModal from '@/components/Outcome/Modals/CreateModal';
 import UpdateModal from '@/components/Outcome/Modals/UpdateModal';
 import ConfirmModal from '@/shared/components/Confirm';
-import { useProject } from '@/services/modules/projects';
 import {
+  useProject,
   useProjectOutcome,
-  useProjectOutcomeList,
-} from '@/hooks/api/project';
+  useProjectOutcomeMutation,
+  useProjectOutcomes,
+} from '@/services/modules/projects';
 
 enum ModalTypeEnum {
   Create,
@@ -23,36 +24,38 @@ const OutcomesPage = () => {
   const searchParams = useSearchParams();
   const projectId = searchParams.get('id');
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const [outcomeId, setOutcomeId] = useState<number | undefined>(undefined);
+  const [outcomeId, setOutcomeId] = useState<number | null>(null);
   const { data: project } = useProject(projectId);
 
-  const { data: detail, mutate } = useProjectOutcome({
-    projectId: projectId ?? undefined,
+  const { data: outcomes, mutate } = useProjectOutcomes(projectId);
+
+  const { data: detail } = useProjectOutcome({
+    projectId,
     outcomeId,
   });
 
-  const {
-    data: outcomes,
-    createMutation,
-    updateMutation,
-    deleteMutation,
-  } = useProjectOutcomeList(projectId ?? undefined, {
-    onCreated: () => {
-      toast.success('新增成功');
-      setModalType(null);
-    },
-    onUpdated: () => {
-      toast.success('更新成功');
-      setModalType(null);
-      setOutcomeId(undefined);
-      mutate();
-    },
-    onDeleted: () => {
-      toast.success('刪除成功');
-      setModalType(null);
-      setOutcomeId(undefined);
-    },
-  });
+  const { createMutation, updateMutation, deleteMutation } =
+    useProjectOutcomeMutation({
+      projectId,
+      outcomeId,
+      onCreated: () => {
+        toast.success('新增成功');
+        setModalType(null);
+        mutate();
+      },
+      onUpdated: () => {
+        toast.success('更新成功');
+        setModalType(null);
+        setOutcomeId(null);
+        mutate();
+      },
+      onDeleted: () => {
+        toast.success('刪除成功');
+        setModalType(null);
+        setOutcomeId(null);
+        mutate();
+      },
+    });
 
   if (!projectId) {
     return <div>專案不存在</div>;

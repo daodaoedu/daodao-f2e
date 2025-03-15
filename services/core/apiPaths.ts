@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 type PathIdType = number | string | null;
 
 class PathBuilder {
@@ -43,6 +45,21 @@ class PathBuilder {
   images(id?: PathIdType): PathBuilder {
     return this.generatePath('images', id);
   }
+
+  outcomes(id?: PathIdType): PathBuilder {
+    return this.generatePath('outcomes', id);
+  }
 }
 
 export const apiPaths = new PathBuilder();
+
+export const parseParamsToNumber = (searchParams?: string | null) => {
+  if (searchParams == null) return null;
+
+  return z
+    .number()
+    .int()
+    .or(z.string().regex(/^\d*$/))
+    .transform((val) => parseInt(val.toString(), 10))
+    .safeParse(searchParams).data;
+};

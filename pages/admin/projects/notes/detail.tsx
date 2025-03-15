@@ -1,14 +1,14 @@
-import { z } from 'zod';
 import { useRouter, useSearchParams } from 'next/navigation';
 import NoteDetail from '@/components/Note/Detail';
 import getAdminProjectLayout from '@/layout/AdminProjectLayout';
 import { useProjectNote } from '@/services/modules/projects';
+import { parseParamsToNumber } from '@/services/core';
 
 const NoteDetailPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const projectId = searchParams.get('id');
-  const noteId = z.number().safeParse(searchParams.get('noteId')).data;
+  const noteId = parseParamsToNumber(searchParams.get('noteId'));
 
   const { data: note } = useProjectNote({
     projectId,
