@@ -11,10 +11,6 @@ import { PiCalendarBlankBold } from 'react-icons/pi';
 import marathonConfig from '@/constants/marathon';
 import getManageLayout from '@/layout/ManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
-import {
-  useProjectReviewList,
-  useProjectOutcomeList,
-} from '@/hooks/api/project';
 import SEOConfig from '@/shared/components/SEO';
 import AccessDenied from '@/shared/components/AccessDenied';
 import Button from '@/shared/components/Button';
@@ -34,6 +30,9 @@ import {
   useMyProjects,
   useProjectMilestoneMutation,
   useProjectNoteMutation,
+  useProjectOutcomeMutation,
+  useProjectReviewMutation,
+  useProjectReviews,
 } from '@/services/modules/projects';
 
 const HEADER_TITLES = [
@@ -74,14 +73,16 @@ const Header = () => {
     toast.success('新增成功');
     setModalType(null);
   };
-  const { createMutation: createReview } = useProjectReviewList(projectId, {
+  const { createMutation: createReview } = useProjectReviewMutation({
+    projectId,
     onCreated: handleCreated,
   });
   const { createMutation: createNote } = useProjectNoteMutation({
     projectId,
     onCreated: handleCreated,
   });
-  const { createMutation: createOutcome } = useProjectOutcomeList(projectId, {
+  const { createMutation: createOutcome } = useProjectOutcomeMutation({
+    projectId,
     onCreated: handleCreated,
   });
   // const { data } = useProjectList({ isMe: true });
@@ -350,7 +351,7 @@ const Main = ({ date }: { date: Dayjs }) => {
 
   const { updateMutation } = useProjectMilestoneMutation();
 
-  const { data: reviews } = useProjectReviewList(projects?.[0]?.id);
+  const { data: reviews } = useProjectReviews(projects?.[0]?.id);
 
   const currentProjects = useMemo(() => {
     if (!Array.isArray(projects)) return [];

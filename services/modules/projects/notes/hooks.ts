@@ -39,7 +39,7 @@ export function useProjectNoteMutation({
 }: UseProjectNoteMutationProps = {}) {
   const swrKey = projectId
     ? getProjectNotePathname({ projectId, noteId })
-    : getProjectPathname({ isMe: true });
+    : getProjectPathname();
 
   const createMutation = useSWRMutation(swrKey, projectNoteAPI.create, {
     onSuccess: onCreated,

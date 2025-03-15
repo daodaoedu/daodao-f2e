@@ -6,11 +6,12 @@ import Button from '@/shared/components/Button';
 import ReviewCard from '@/components/Review/Card';
 import CreateModal from '@/components/Review/Modals/CreateModal';
 import UpdateModal from '@/components/Review/Modals/UpdateModal';
-import { useProject } from '@/services/modules/projects';
 import {
+  useProject,
   useProjectReview,
-  useProjectReviewList,
-} from '@/hooks/api/project';
+  useProjectReviews,
+  useProjectReviewMutation,
+} from '@/services/modules/projects';
 import ConfirmModal from '@/shared/components/Confirm';
 import marathonConfig from '@/constants/marathon';
 
@@ -27,33 +28,33 @@ const ReviewPage = () => {
   const [reviewId, setReviewId] = useState<number | undefined>(undefined);
   const { data: project } = useProject(projectId);
 
-  const { data: detail, mutate } = useProjectReview({
-    projectId: projectId ?? undefined,
+  const { data: reviews, mutate } = useProjectReviews(projectId);
+
+  const { data: detail } = useProjectReview({
+    projectId,
     reviewId,
   });
 
-  const {
-    data: reviews,
-    createMutation,
-    updateMutation,
-    deleteMutation,
-  } = useProjectReviewList(projectId ?? undefined, {
-    onCreated: () => {
-      toast.success('新增成功');
-      setModalType(null);
-    },
-    onUpdated: () => {
-      toast.success('更新成功');
-      setModalType(null);
-      setReviewId(undefined);
-      mutate();
-    },
-    onDeleted: () => {
-      toast.success('刪除成功');
-      setModalType(null);
-      setReviewId(undefined);
-    },
-  });
+  const { createMutation, updateMutation, deleteMutation } =
+    useProjectReviewMutation({
+      projectId,
+      reviewId,
+      onCreated: () => {
+        toast.success('新增成功');
+        setModalType(null);
+      },
+      onUpdated: () => {
+        toast.success('更新成功');
+        setModalType(null);
+        setReviewId(undefined);
+        mutate();
+      },
+      onDeleted: () => {
+        toast.success('刪除成功');
+        setModalType(null);
+        setReviewId(undefined);
+      },
+    });
 
   if (!projectId) {
     return <div>專案不存在</div>;
@@ -64,7 +65,8 @@ const ReviewPage = () => {
       <div className="mb-6 flex items-end sm:items-center justify-between body-md">
         <div className="flex flex-col items-start sm:flex-row sm:items-center gap-1">
           <div className="text-basic-500">
-            覆盤（{marathonConfig.getWeekNumber().toString().padStart(2, '0')} 週/22週）
+            覆盤（{marathonConfig.getWeekNumber().toString().padStart(2, '0')}{' '}
+            週/22週）
           </div>
         </div>
         <Button

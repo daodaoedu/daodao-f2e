@@ -42,7 +42,7 @@ export function useProjectOutcomeMutation({
 }: UseProjectOutcomeMutationProps = {}) {
   const swrKey = projectId
     ? getProjectOutcomePathname({ projectId, outcomeId })
-    : getProjectPathname({ isMe: true });
+    : getProjectPathname();
 
   const createMutation = useSWRMutation(swrKey, projectOutcomeAPI.create, {
     onSuccess: onCreated,
