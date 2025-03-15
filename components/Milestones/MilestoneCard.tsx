@@ -19,14 +19,14 @@ import Button from '@/shared/components/Button';
 import DateRangePicker from '@/shared/components/DateRangePicker';
 import Form from '@/shared/components/Form';
 import { useDialog } from '@/contexts/Dialog';
-import { useProject } from '@/services/modules/projects';
 import {
+  useProject,
   CreateProjectMilestoneSchema,
   createProjectMilestoneSchema,
   ProjectMilestoneSchema,
   UpdateProjectMilestoneSchema,
   updateProjectMilestoneSchema,
-} from '@/services/projects/milestones';
+} from '@/services/modules/projects';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getDefaultMilestone } from './Shared';
 

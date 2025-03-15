@@ -1,5 +1,5 @@
 import Modal from '@/shared/components/Modal';
-import { CreateProjectNoteSchema } from '@/services/projects/notes';
+import { CreateProjectNoteSchema } from '@/services/modules/projects';
 import marathonConfig from '@/constants/marathon';
 import NoteForm from '../Form';
 

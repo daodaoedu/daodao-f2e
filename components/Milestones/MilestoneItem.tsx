@@ -4,7 +4,7 @@ import {
   CreateProjectMilestoneSchema,
   ProjectMilestoneSchema,
   UpdateProjectMilestoneSchema,
-} from '@/services/projects/milestones';
+} from '@/services/modules/projects';
 import TaskList from '@/components/Tasks/TaskList';
 import Collapse from '@/shared/components/Collapse';
 import MilestoneCard from './MilestoneCard';

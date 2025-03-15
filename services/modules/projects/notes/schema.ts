@@ -14,12 +14,10 @@ const projectNoteSchema = z.object({
 
 export type ProjectNoteSchema = z.infer<typeof projectNoteSchema>;
 
-export const createProjectNoteSchema = projectNoteSchema.omit({
-  id: true,
-});
+export const createProjectNoteSchema = projectNoteSchema.omit({ id: true });
 
-export type CreateProjectNoteRequest = z.infer<typeof createProjectNoteSchema>;
+export type CreateProjectNoteSchema = z.infer<typeof createProjectNoteSchema>;
 
 export const updateProjectNoteSchema = projectNoteSchema;
 
-export type UpdateProjectNoteRequest = z.infer<typeof updateProjectNoteSchema>;
+export type UpdateProjectNoteSchema = z.infer<typeof updateProjectNoteSchema>;

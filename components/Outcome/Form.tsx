@@ -112,7 +112,7 @@ function OutcomeForm({
         <Upload
           variant="solid"
           color="secondary"
-          onPreviewChange={([preview]) => setPreviewImage(preview)}
+          onPreviewsChange={([preview]) => setPreviewImage(preview)}
           onFilesChange={([file]) => methods.setValue('imgFiles', [file])}
         >
           {previewImage ? '更換圖片' : '加入圖片'}

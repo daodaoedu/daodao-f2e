@@ -2,9 +2,9 @@ import { MutationFetcher } from 'swr/mutation';
 import { apiPaths, mutations } from '@/services/core';
 
 import {
-  CreateProjectNoteRequest,
+  CreateProjectNoteSchema,
   ProjectNoteSchema,
-  UpdateProjectNoteRequest,
+  UpdateProjectNoteSchema,
 } from './schema';
 
 export type ProjectNoteSWRKey = string;
@@ -24,12 +24,12 @@ interface ProjectNoteAPIType {
   create: MutationFetcher<
     ProjectNoteSchema,
     ProjectNoteSWRKey,
-    CreateProjectNoteRequest
+    CreateProjectNoteSchema
   >;
   update: MutationFetcher<
     ProjectNoteSchema,
     ProjectNoteSWRKey,
-    UpdateProjectNoteRequest
+    UpdateProjectNoteSchema
   >;
   delete: MutationFetcher<
     void,
