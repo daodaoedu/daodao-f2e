@@ -39,7 +39,7 @@ function Upload({
     const parsed = validate.safeParse({ files });
 
     if (parsed.error) {
-      parsed.error.issues.map((issue) => toast.error(issue.message));
+      toast.error(parsed.error.issues[0].message);
       return;
     }
     const objectUrls = files.map(URL.createObjectURL);

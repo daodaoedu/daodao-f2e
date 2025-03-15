@@ -5,7 +5,6 @@ import {
   useId,
   useImperativeHandle,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import { SubmitErrorHandler, useForm } from 'react-hook-form';
@@ -34,7 +33,7 @@ interface MilestoneCardProps {
   projectId: string;
   startDate?: dayjs.Dayjs;
   endDate?: dayjs.Dayjs;
-  milestone?: Partial<ProjectMilestoneSchema>;
+  milestone?: ProjectMilestoneSchema;
   milestones?: ProjectMilestoneSchema[];
   disabledChangeDate?: boolean;
   isEditable?: boolean;
@@ -53,7 +52,7 @@ function MilestoneCard(
     projectId,
     startDate,
     endDate,
-    milestone = {},
+    milestone,
     milestones = [],
     disabledChangeDate,
     isEditable = false,
@@ -67,9 +66,11 @@ function MilestoneCard(
   const elementId = useId();
   const [isEditing, setIsEditing] = useState(defaultEditing);
   const [isLoading, setIsLoading] = useState(false);
-  const preMilestoneRef = useRef<Partial<ProjectMilestoneSchema>>(milestone);
+  const { openDialog } = useDialog();
+  const { data: project } = useProject(projectId);
+
   const tasksInfo = useMemo(() => {
-    if (!Array.isArray(milestone.tasks) || !milestone.tasks.length) {
+    if (!Array.isArray(milestone?.tasks) || !milestone?.tasks.length) {
       return {
         isCompleteAll: true,
         progress: 100,
@@ -86,41 +87,52 @@ function MilestoneCard(
       isCompleteAll,
       progress,
     };
-  }, [milestone.tasks]);
-  const { data: project } = useProject(projectId);
-
-  const { openDialog } = useDialog();
+  }, [milestone?.tasks]);
 
   const index = useMemo(
     () =>
       Array.isArray(milestones)
-        ? milestones.findIndex((m) => m.id === milestone.id)
+        ? milestones.findIndex((m) => m.id === milestone?.id)
         : -1,
-    [milestones, milestone.id]
+    [milestones, milestone?.id]
   );
 
-  const schema = milestone.id
+  const schema = milestone?.id
     ? updateProjectMilestoneSchema
     : createProjectMilestoneSchema;
 
+  const values = useMemo(
+    () => (milestone ? { ...milestone, projectId } : undefined),
+    [milestone, projectId]
+  );
+
   const methods = useForm<
-    typeof milestone.id extends undefined
+    typeof milestone extends undefined
       ? CreateProjectMilestoneSchema
       : UpdateProjectMilestoneSchema
-  >({ resolver: zodResolver(schema) });
+  >({
+    resolver: zodResolver(schema),
+    values,
+    defaultValues: getDefaultMilestone({
+      projectId,
+      milestones: Array.isArray(milestones) ? milestones : [],
+      startDate: startDate || dayjs(),
+      endDate: endDate || dayjs(),
+    }),
+  });
 
   const handleCancel = () => {
     setIsEditing(false);
     onCancel?.();
   };
 
-  const isCompleted = methods.watch('isCompleted') ?? milestone.isCompleted;
+  const isCompleted = methods.watch('isCompleted') ?? milestone?.isCompleted;
 
   const checkDiff = (data: UpdateProjectMilestoneSchema) => {
     const checkKeys = ['startDate', 'endDate', 'name'] as const;
 
     return checkKeys.some((key) => {
-      return data[key] !== milestone[key];
+      return data[key] !== milestone?.[key];
     });
   };
 
@@ -145,22 +157,20 @@ function MilestoneCard(
         setIsLoading(true);
         await onCreate?.(createRequest.data);
       }
+      setIsEditing(false);
     } finally {
       setIsLoading(false);
-      setIsEditing(false);
     }
   };
 
   const handleError: SubmitErrorHandler<
     CreateProjectMilestoneSchema | UpdateProjectMilestoneSchema
   > = (error) => {
-    Object.values(error).forEach((value) => {
-      toast.error(value.message || '發生錯誤');
-    });
+    toast.error(Object.values(error)[0]?.message || '發生錯誤');
   };
 
   const handleComplete = async () => {
-    const targetIsCompleted = !milestone.isCompleted;
+    const targetIsCompleted = !milestone?.isCompleted;
 
     if (isLoading || !isEditable) return;
 
@@ -221,42 +231,8 @@ function MilestoneCard(
   }));
 
   useEffect(() => {
-    if (preMilestoneRef.current === milestone) return;
-
-    preMilestoneRef.current = milestone;
-
-    const defaultValues = getDefaultMilestone({
-      projectId,
-      milestones: Array.isArray(milestones) ? milestones : [],
-      startDate: startDate || dayjs(),
-      endDate: endDate || dayjs(),
-    });
-
-    Object.entries({ ...defaultValues, ...milestone }).forEach(
-      ([key, value]) => {
-        const passKey = schema.keyof().safeParse(key).data;
-
-        if (!passKey) return;
-
-        const result = schema.shape[passKey].safeParse(value);
-
-        if (result.success) {
-          methods.setValue(passKey, result.data);
-        }
-      }
-    );
-
     if (isEditing) handleFocus();
-  }, [
-    isEditing,
-    milestone,
-    projectId,
-    startDate,
-    endDate,
-    milestones,
-    methods,
-    handleFocus,
-  ]);
+  }, [isEditing, handleFocus]);
 
   return (
     <Form methods={methods} onSubmit={handleSubmit} onError={handleError}>
@@ -281,12 +257,12 @@ function MilestoneCard(
             startDate={
               isEditing
                 ? dayjs(methods.watch('startDate'))
-                : dayjs(milestone.startDate)
+                : dayjs(milestone?.startDate)
             }
             endDate={
               isEditing
                 ? dayjs(methods.watch('endDate'))
-                : dayjs(milestone.endDate)
+                : dayjs(milestone?.endDate)
             }
             minDate={startDate}
             maxDate={endDate}
@@ -309,88 +285,86 @@ function MilestoneCard(
             }}
           />
         </div>
-        <div className="flex flex-row items-center justify-between">
-          <div className="w-full flex items-center  md:justify-between gap-1">
-            {isEditing ? (
-              <input
-                type="text"
+        <div className="w-full flex items-center md:justify-between gap-1">
+          {isEditing ? (
+            <input
+              type="text"
+              className={cn(
+                '-m-px font-sans body-sm text-basic-400',
+                'w-full rounded-md px-6 py-2 border border-solid border-basic-200',
+                'focus:outline-none focus:ring-0 focus:border-primary-base'
+              )}
+              {...methods.register('name')}
+            />
+          ) : (
+            <>
+              <label
+                htmlFor={`${elementId}-${milestone?.id}`}
                 className={cn(
-                  '-m-px font-sans body-sm text-basic-400',
-                  'w-full rounded-md px-6 py-2 border border-solid border-basic-200',
-                  'focus:outline-none focus:ring-0 focus:border-primary-base'
+                  'flex flex-row justify-center items-center gap-1.5 hover:cursor-pointer w-full basis-0',
+                  !isEditable && 'pointer-events-none'
                 )}
-                {...methods.register('name')}
-              />
-            ) : (
-              <>
-                <label
-                  htmlFor={`${elementId}-${milestone.id}`}
+              >
+                <input
+                  type="checkbox"
+                  id={`${elementId}-${milestone?.id}`}
+                  className="peer hidden"
+                  checked={isCompleted}
+                  onChange={handleComplete}
+                />
+                <p
                   className={cn(
-                    'flex flex-row justify-center items-center gap-1.5 hover:cursor-pointer w-full basis-0',
-                    !isEditable && 'pointer-events-none'
+                    'w-[18px] h-[18px] p-[2px] rounded-[4px] m-[1px]',
+                    'flex items-center justify-center',
+                    'bg-white text-basic-400 border-2 border-solid border-basic-400',
+                    'peer-checked:bg-primary-base',
+                    'peer-checked:text-white',
+                    'peer-checked:border-primary-base',
+                    !isEditable && 'opacity-80'
                   )}
                 >
-                  <input
-                    type="checkbox"
-                    id={`${elementId}-${milestone.id}`}
-                    className="peer hidden"
-                    checked={isCompleted}
-                    onChange={handleComplete}
-                  />
-                  <p
-                    className={cn(
-                      'w-[18px] h-[18px] p-[2px] rounded-[4px] m-[1px]',
-                      'flex items-center justify-center',
-                      'bg-white text-basic-400 border-2 border-solid border-basic-400',
-                      'peer-checked:bg-primary-base',
-                      'peer-checked:text-white',
-                      'peer-checked:border-primary-base',
-                      !isEditable && 'opacity-80'
-                    )}
-                  >
-                    {isCompleted && <FaCheck />}
-                  </p>
-                </label>
-                <p className="font-sans py-2 body-sm text-basic-400 truncate">
-                  {milestone.name}
+                  {isCompleted && <FaCheck />}
                 </p>
-              </>
-            )}
-            <div className="flex flex-row gap-1 ml-auto">
-              {isEditing && (
-                <>
-                  <Button
-                    className="rounded-sm text-lg"
-                    variant="solid"
-                    color="gray"
-                    size="icon"
-                    onClick={handleCancel}
-                  >
-                    <MdClose />
-                  </Button>
-                  <Button
-                    className="rounded-sm text-lg"
-                    variant="solid"
-                    color="gray"
-                    size="icon"
-                    isSubmit
-                  >
-                    <MdSend />
-                  </Button>
-                </>
-              )}
-              {!isEditing && isEditable && (
+              </label>
+              <p className="font-sans py-2 body-sm text-basic-400 truncate">
+                {milestone?.name}
+              </p>
+            </>
+          )}
+          <div className="flex flex-row gap-1 ml-auto">
+            {isEditing && (
+              <>
                 <Button
                   className="rounded-sm text-lg"
                   variant="solid"
                   color="gray"
                   size="icon"
-                  onClick={() => setIsEditing(true)}
+                  onClick={handleCancel}
                 >
-                  <MdEdit />
+                  <MdClose />
                 </Button>
-              )}
-            </div>
+                <Button
+                  className="rounded-sm text-lg"
+                  variant="solid"
+                  color="gray"
+                  size="icon"
+                  isSubmit
+                >
+                  <MdSend />
+                </Button>
+              </>
+            )}
+            {!isEditing && isEditable && (
+              <Button
+                className="rounded-sm text-lg"
+                variant="solid"
+                color="gray"
+                size="icon"
+                onClick={() => setIsEditing(true)}
+              >
+                <MdEdit />
+              </Button>
+            )}
           </div>
         </div>
       </div>

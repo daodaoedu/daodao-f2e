@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import dayjs from 'dayjs';
 import { projectTaskSchema } from '../tasks';
 
 export const projectMilestoneSchema = z.object({
@@ -22,24 +23,45 @@ export const projectMilestoneSchema = z.object({
 
 export type ProjectMilestoneSchema = z.infer<typeof projectMilestoneSchema>;
 
-export const createProjectMilestoneSchema = projectMilestoneSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  isDeleted: true,
-  tasks: true,
-});
+const validateDateRange = (
+  startDate: string,
+  endDate: string,
+  ctx: z.RefinementCtx
+) => {
+  if (dayjs(endDate).diff(dayjs(startDate), 'day') <= 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: '時間間隔不能小於 1 天',
+    });
+  }
+};
+
+export const createProjectMilestoneSchema = projectMilestoneSchema
+  .omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+    isDeleted: true,
+    tasks: true,
+  })
+  .superRefine((data, ctx) =>
+    validateDateRange(data.startDate, data.endDate, ctx)
+  );
 
 export type CreateProjectMilestoneSchema = z.infer<
   typeof createProjectMilestoneSchema
 >;
 
-export const updateProjectMilestoneSchema = projectMilestoneSchema.omit({
-  createdAt: true,
-  updatedAt: true,
-  isDeleted: true,
-  tasks: true,
-});
+export const updateProjectMilestoneSchema = projectMilestoneSchema
+  .omit({
+    createdAt: true,
+    updatedAt: true,
+    isDeleted: true,
+    tasks: true,
+  })
+  .superRefine((data, ctx) =>
+    validateDateRange(data.startDate, data.endDate, ctx)
+  );
 
 export type UpdateProjectMilestoneSchema = z.infer<
   typeof updateProjectMilestoneSchema
