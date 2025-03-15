@@ -1,8 +1,8 @@
 import useSWRMutation from 'swr/mutation';
 import {
-  CreateProjectTaskRequest,
-  DeleteProjectTaskRequest,
-  UpdateProjectTaskRequest,
+  CreateProjectTaskSchema,
+  DeleteProjectTaskSchema,
+  UpdateProjectTaskSchema,
   createProjectTask,
   deleteProjectTask,
   updateProjectTask,
@@ -10,12 +10,13 @@ import {
 
 interface UseProjectTaskOptions {
   mutateKey?: string | null;
-  mutate?: (data: UpdateProjectTaskRequest) => void;
+  mutate?: (data: UpdateProjectTaskSchema) => void;
   onCreated?: () => void;
   onUpdated?: () => void;
   onDeleted?: () => void;
 }
 
+/** @deprecated */
 export default function useProjectTask({
   mutateKey,
   mutate,
@@ -25,13 +26,13 @@ export default function useProjectTask({
 }: UseProjectTaskOptions) {
   const createMutation = useSWRMutation(
     mutateKey,
-    (url, { arg }: { arg: CreateProjectTaskRequest }) => createProjectTask(arg),
+    (url, { arg }: { arg: CreateProjectTaskSchema }) => createProjectTask(arg),
     { onSuccess: onCreated }
   );
 
   const updateMutation = useSWRMutation(
     mutateKey,
-    async (url, { arg }: { arg: UpdateProjectTaskRequest }) => {
+    async (url, { arg }: { arg: UpdateProjectTaskSchema }) => {
       await updateProjectTask(arg);
 
       mutate?.(arg);
@@ -41,7 +42,7 @@ export default function useProjectTask({
 
   const deleteMutation = useSWRMutation(
     mutateKey,
-    (url, { arg }: { arg: DeleteProjectTaskRequest }) => deleteProjectTask(arg),
+    (url, { arg }: { arg: DeleteProjectTaskSchema }) => deleteProjectTask(arg),
     { onSuccess: onDeleted }
   );
 

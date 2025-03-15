@@ -3,7 +3,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import OutcomeDetail from '@/components/Outcome/Detail';
 import getProjectLayout from '@/layout/ProjectLayout';
-import { useProject, useProjectOutcome } from '@/hooks/api/project';
+import { useProject } from '@/services/modules/projects';
+import { useProjectOutcome } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 import EditModal from '@/components/Outcome/Modals/UpdateModal';
 
@@ -15,16 +16,16 @@ enum ModalTypeEnum {
 const OutcomeDetailPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('id') ?? undefined;
+  const projectId = searchParams.get('id');
   const outcomeId = parseInt(searchParams.get('outcomeId') ?? '0', 10);
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const { data: project } = useProject({ id: projectId });
+  const { data: project } = useProject(projectId);
   const {
     data: outcome,
     updateMutation: updateOutcome,
     deleteMutation: removeOutcome,
   } = useProjectOutcome({
-    projectId,
+    projectId: projectId ?? undefined,
     outcomeId,
     onUpdated: () => {
       toast.success('更新成功');

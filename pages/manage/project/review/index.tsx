@@ -6,8 +6,8 @@ import Button from '@/shared/components/Button';
 import ReviewCard from '@/components/Review/Card';
 import CreateModal from '@/components/Review/Modals/CreateModal';
 import UpdateModal from '@/components/Review/Modals/UpdateModal';
+import { useProject } from '@/services/modules/projects';
 import {
-  useProject,
   useProjectReview,
   useProjectReviewList,
 } from '@/hooks/api/project';
@@ -22,13 +22,13 @@ enum ModalTypeEnum {
 
 const ReviewPage = () => {
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('id') ?? undefined;
+  const projectId = searchParams.get('id');
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [reviewId, setReviewId] = useState<number | undefined>(undefined);
-  const { data: project } = useProject({ id: projectId });
+  const { data: project } = useProject(projectId);
 
   const { data: detail, mutate } = useProjectReview({
-    projectId,
+    projectId: projectId ?? undefined,
     reviewId,
   });
 
@@ -37,7 +37,7 @@ const ReviewPage = () => {
     createMutation,
     updateMutation,
     deleteMutation,
-  } = useProjectReviewList(projectId, {
+  } = useProjectReviewList(projectId ?? undefined, {
     onCreated: () => {
       toast.success('新增成功');
       setModalType(null);

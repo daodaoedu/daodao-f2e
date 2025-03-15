@@ -1,12 +1,12 @@
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import {
-  CreateProjectMilestoneRequest,
+  CreateProjectMilestoneSchema,
   ProjectMilestoneSchema,
-  UpdateProjectMilestoneRequest,
+  UpdateProjectMilestoneSchema,
   createProjectMilestone,
   deleteProjectMilestone,
-  getProjectMilestoneEndpoint,
+  getProjectMilestonePathname,
   updateProjectMilestone,
 } from '@/services/projects/milestones';
 
@@ -14,12 +14,13 @@ interface UseProjectMilestoneOptions {
   projectId?: string;
   milestoneId?: number;
   mutateKey?: string | null;
-  mutate?: (data: UpdateProjectMilestoneRequest) => void;
+  mutate?: (data: UpdateProjectMilestoneSchema) => void;
   onCreated?: () => void;
   onUpdated?: () => void;
   onDeleted?: () => void;
 }
 
+/** @deprecated */
 export default function useProjectMilestone({
   projectId,
   milestoneId,
@@ -31,21 +32,21 @@ export default function useProjectMilestone({
 }: UseProjectMilestoneOptions) {
   const swrKey =
     projectId && milestoneId
-      ? getProjectMilestoneEndpoint({ projectId, milestoneId })
+      ? getProjectMilestonePathname({ projectId, milestoneId })
       : null;
 
   const { data, ...swr } = useSWR<ProjectMilestoneSchema>(swrKey);
 
   const createMutation = useSWRMutation(
     swrKey ?? mutateKey,
-    (url, { arg }: { arg: CreateProjectMilestoneRequest }) =>
+    (url, { arg }: { arg: CreateProjectMilestoneSchema }) =>
       createProjectMilestone(arg),
     { onSuccess: onCreated }
   );
 
   const updateMutation = useSWRMutation(
     swrKey ?? mutateKey,
-    async (url, { arg }: { arg: UpdateProjectMilestoneRequest }) => {
+    async (url, { arg }: { arg: UpdateProjectMilestoneSchema }) => {
       await updateProjectMilestone(arg);
 
       mutate?.(arg);

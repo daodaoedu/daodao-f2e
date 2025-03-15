@@ -10,7 +10,7 @@ interface GetProjectMilestoneKeyProps {
   milestoneId?: number;
 }
 
-export const getProjectMilestoneEndpoint = ({
+export const getProjectMilestonePathname = ({
   projectId,
   milestoneId,
 }: GetProjectMilestoneKeyProps) => {
@@ -77,15 +77,15 @@ export const createProjectMilestoneSchema = projectMilestoneSchema.omit({
   tasks: true,
 });
 
-export type CreateProjectMilestoneRequest = z.infer<
+export type CreateProjectMilestoneSchema = z.infer<
   typeof createProjectMilestoneSchema
 >;
 
 export const createProjectMilestone = ({
   projectId,
   ...request
-}: CreateProjectMilestoneRequest) => {
-  return mutations.post(getProjectMilestoneEndpoint({ projectId }), request);
+}: CreateProjectMilestoneSchema) => {
+  return mutations.post(getProjectMilestonePathname({ projectId }), request);
 };
 
 export const updateProjectMilestoneSchema = projectMilestoneSchema.omit({
@@ -95,7 +95,7 @@ export const updateProjectMilestoneSchema = projectMilestoneSchema.omit({
   tasks: true,
 });
 
-export type UpdateProjectMilestoneRequest = z.infer<
+export type UpdateProjectMilestoneSchema = z.infer<
   typeof updateProjectMilestoneSchema
 >;
 
@@ -103,9 +103,9 @@ export const updateProjectMilestone = ({
   projectId,
   id,
   ...request
-}: UpdateProjectMilestoneRequest) => {
+}: UpdateProjectMilestoneSchema) => {
   return mutations.put(
-    getProjectMilestoneEndpoint({ projectId, milestoneId: id }),
+    getProjectMilestonePathname({ projectId, milestoneId: id }),
     request
   );
 };
@@ -115,6 +115,6 @@ export const deleteProjectMilestone = (
   milestoneId: number
 ) => {
   return mutations.delete(
-    getProjectMilestoneEndpoint({ projectId, milestoneId })
+    getProjectMilestonePathname({ projectId, milestoneId })
   );
 };

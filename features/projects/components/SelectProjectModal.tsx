@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
-import { useProjectList } from '@/hooks/api/project';
+import { useMyProjects } from '@/services/modules/projects';
 import { ProjectSchema } from '@/services/projects';
 import Button from '@/shared/components/Button';
 import Modal from '@/shared/components/Modal';
@@ -19,7 +19,7 @@ export default function SelectProjectModal({
   onClose,
   onSelect,
 }: SelectProjectModalProps) {
-  const { data: projects } = useProjectList({ isMe: true });
+  const { data: projects } = useMyProjects();
   const [selectedProject, setSelectedProject] = useState<ProjectSchema | null>(
     null
   );

@@ -1,10 +1,10 @@
 import useSWR from 'swr';
-import { getProjectEndpoint, ProjectSchema } from '@/services/projects';
+import { getProjectPathname, ProjectSchema } from '@/services/projects';
 import {
   sortMilestones,
-  UpdateProjectMilestoneRequest,
+  UpdateProjectMilestoneSchema,
 } from '@/services/projects/milestones';
-import { sortTasks, UpdateProjectTaskRequest } from '@/services/projects/tasks';
+import { sortTasks, UpdateProjectTaskSchema } from '@/services/projects/tasks';
 import useProject from './useProject';
 import useProjectMilestone from './useProjectMilestone';
 import useProjectTask from './useProjectTask';
@@ -16,12 +16,13 @@ interface UseProjectListProps {
   onDeleted?: () => void;
 }
 
+/** @deprecated */
 export default function useProjectList(
   { isMe, onCreated, onUpdated, onDeleted }: UseProjectListProps = {
     isMe: false,
   }
 ) {
-  const swrKey = getProjectEndpoint({ isMe });
+  const swrKey = getProjectPathname({ isMe });
 
   const { mutate, data, ...swr } = useSWR<ProjectSchema[]>(swrKey);
 
@@ -42,7 +43,7 @@ export default function useProjectList(
     onDeleted,
   });
 
-  const handleMilestones = (updateData: UpdateProjectMilestoneRequest) => {
+  const handleMilestones = (updateData: UpdateProjectMilestoneSchema) => {
     const updatedData = sortedData?.map((project) => {
       if (project.id !== updateData.projectId) {
         return project;
@@ -66,7 +67,7 @@ export default function useProjectList(
     mutate: handleMilestones,
   });
 
-  const handleTasks = (updateData: UpdateProjectTaskRequest) => {
+  const handleTasks = (updateData: UpdateProjectTaskSchema) => {
     const updatedData = sortedData?.map((project) => {
       if (project.id !== updateData.projectId) {
         return project;

@@ -7,8 +7,8 @@ import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import Container from '@/shared/components/Container';
 import EditMode from '@/components/Projects/Project/EditMode';
 import SEOConfig from '@/shared/components/SEO';
-import { useProjectList } from '@/hooks/api/project';
 import { createProjectSchema } from '@/services/projects';
+import { useMyProjects, useProjectMutation } from '@/services/modules/projects';
 
 const ProjectPage = () => {
   const router = useRouter();
@@ -26,11 +26,15 @@ const ProjectPage = () => {
   );
   const [formData, setFormData] = useState<Partial<Project>>(DEFAULT_PROJECT);
   const maxProjects = 3;
-  const { data: projects, create } = useProjectList({
-    isMe: true,
+  const { data: projects } = useMyProjects();
+  const { createMutation } = useProjectMutation({
     onCreated: (data) => {
-      toast.success('新增成功');
-      router.push(`/manage/project?id=${data.id}`);
+      if (data?.id) {
+        toast.success('新增成功');
+        router.push(`/manage/project?id=${data.id}`);
+      } else {
+        toast.error('系統異常，請稍後再試');
+      }
     },
   });
 
@@ -40,7 +44,7 @@ const ProjectPage = () => {
 
   const handleSubmit = async () => {
     const project = createProjectSchema.parse(formData);
-    await create.trigger(project);
+    await createMutation.trigger(project);
   };
 
   const handleChangeInput = (

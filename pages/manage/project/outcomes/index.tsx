@@ -7,8 +7,8 @@ import Button from '@/shared/components/Button';
 import CreateModal from '@/components/Outcome/Modals/CreateModal';
 import UpdateModal from '@/components/Outcome/Modals/UpdateModal';
 import ConfirmModal from '@/shared/components/Confirm';
+import { useProject } from '@/services/modules/projects';
 import {
-  useProject,
   useProjectOutcome,
   useProjectOutcomeList,
 } from '@/hooks/api/project';
@@ -21,13 +21,13 @@ enum ModalTypeEnum {
 
 const OutcomesPage = () => {
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('id') ?? undefined;
+  const projectId = searchParams.get('id');
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [outcomeId, setOutcomeId] = useState<number | undefined>(undefined);
-  const { data: project } = useProject({ id: projectId });
+  const { data: project } = useProject(projectId);
 
   const { data: detail, mutate } = useProjectOutcome({
-    projectId,
+    projectId: projectId ?? undefined,
     outcomeId,
   });
 
@@ -36,7 +36,7 @@ const OutcomesPage = () => {
     createMutation,
     updateMutation,
     deleteMutation,
-  } = useProjectOutcomeList(projectId, {
+  } = useProjectOutcomeList(projectId ?? undefined, {
     onCreated: () => {
       toast.success('新增成功');
       setModalType(null);

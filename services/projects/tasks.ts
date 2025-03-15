@@ -9,7 +9,7 @@ interface GetProjectMilestoneKeyProps {
   taskId?: number;
 }
 
-export const getProjectTaskEndpoint = ({
+export const getProjectTaskPathname = ({
   projectId,
   milestoneId,
   taskId,
@@ -61,31 +61,31 @@ export const createProjectTaskSchema = projectTaskSchema.omit({
   id: true,
 });
 
-export type CreateProjectTaskRequest = z.infer<typeof createProjectTaskSchema>;
+export type CreateProjectTaskSchema = z.infer<typeof createProjectTaskSchema>;
 
 export const createProjectTask = ({
   projectId,
   milestoneId,
   ...request
-}: CreateProjectTaskRequest) => {
+}: CreateProjectTaskSchema) => {
   return mutations.post(
-    getProjectTaskEndpoint({ projectId, milestoneId }),
+    getProjectTaskPathname({ projectId, milestoneId }),
     request
   );
 };
 
 export const updateProjectTaskSchema = projectTaskSchema;
 
-export type UpdateProjectTaskRequest = z.infer<typeof updateProjectTaskSchema>;
+export type UpdateProjectTaskSchema = z.infer<typeof updateProjectTaskSchema>;
 
 export const updateProjectTask = ({
   projectId,
   milestoneId,
   id,
   ...request
-}: UpdateProjectTaskRequest) => {
+}: UpdateProjectTaskSchema) => {
   return mutations.put(
-    getProjectTaskEndpoint({ projectId, milestoneId, taskId: id }),
+    getProjectTaskPathname({ projectId, milestoneId, taskId: id }),
     request
   );
 };
@@ -96,14 +96,14 @@ export const deleteProjectTaskSchema = projectTaskSchema.pick({
   projectId: true,
 });
 
-export type DeleteProjectTaskRequest = z.infer<typeof deleteProjectTaskSchema>;
+export type DeleteProjectTaskSchema = z.infer<typeof deleteProjectTaskSchema>;
 
 export const deleteProjectTask = ({
   id,
   projectId,
   milestoneId,
-}: DeleteProjectTaskRequest) => {
+}: DeleteProjectTaskSchema) => {
   return mutations.delete(
-    getProjectTaskEndpoint({ projectId, milestoneId, taskId: id })
+    getProjectTaskPathname({ projectId, milestoneId, taskId: id })
   );
 };

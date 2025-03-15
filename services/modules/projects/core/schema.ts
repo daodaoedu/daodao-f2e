@@ -1,24 +1,6 @@
 import { z } from 'zod';
-import { projectMilestoneSchema } from './milestones';
-import { mutations } from '../core';
-import { baseUserSchema } from '../users';
-
-const projectEndpoint = '/projects';
-
-interface GetProjectKeyProps {
-  isMe?: boolean;
-  id?: string;
-}
-
-export const getProjectPathname = ({ isMe, id }: GetProjectKeyProps = {}) => {
-  if (isMe) {
-    return `${projectEndpoint}/me`;
-  }
-  if (id) {
-    return `${projectEndpoint}/${id}`;
-  }
-  return projectEndpoint;
-};
+import { projectMilestoneSchema } from '../milestones';
+import { baseUserSchema } from '../../users';
 
 export const projectSchema = z.object({
   id: z.string(),
@@ -58,10 +40,6 @@ export const createProjectSchema = projectSchema.omit({
 
 export type CreateProjectSchema = z.infer<typeof createProjectSchema>;
 
-export const createProject = (request: CreateProjectSchema) => {
-  return mutations.post<ProjectSchema>(getProjectPathname(), request);
-};
-
 export const updateProjectSchema = projectSchema.omit({
   createdDate: true,
   updatedDate: true,
@@ -71,11 +49,3 @@ export const updateProjectSchema = projectSchema.omit({
 });
 
 export type UpdateProjectSchema = z.infer<typeof updateProjectSchema>;
-
-export const updateProject = ({ id, ...project }: UpdateProjectSchema) => {
-  return mutations.put<ProjectSchema>(getProjectPathname({ id }), project);
-};
-
-export const deleteProject = (id: string) => {
-  return mutations.delete(getProjectPathname({ id }));
-};

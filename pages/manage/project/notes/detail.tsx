@@ -3,7 +3,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import NoteDetail from '@/components/Note/Detail';
 import getProjectLayout from '@/layout/ProjectLayout';
-import { useProject, useProjectNote } from '@/hooks/api/project';
+import { useProject } from '@/services/modules/projects';
+import { useProjectNote } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';
 
@@ -15,16 +16,16 @@ enum ModalTypeEnum {
 const NoteDetailPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('id') ?? undefined;
+  const projectId = searchParams.get('id');
   const noteId = parseInt(searchParams.get('noteId') ?? '0', 10);
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const { data: project } = useProject({ id: projectId });
+  const { data: project } = useProject(projectId);
   const {
     data: note,
     updateMutation: updateNote,
     deleteMutation: removeNote,
   } = useProjectNote({
-    projectId,
+    projectId: projectId ?? undefined,
     noteId,
     onUpdated: () => {
       toast.success('更新成功');

@@ -15,7 +15,10 @@ import MilestoneItem from '@/components/Milestones/MilestoneItem';
 import dayjs from 'dayjs';
 import DateRangePicker from '@/shared/components/DateRangePicker';
 import Button from '@/shared/components/Button';
-import useProjectMilestoneList from '@/hooks/api/project/useProjectMilestoneList';
+import {
+  useProjectMilestoneMutation,
+  useProjectMilestones,
+} from '@/services/modules/projects';
 import { ProjectMilestoneSchema } from '@/services/projects/milestones';
 import CalendarIcon from '@/public/assets/icons/calendar.svg';
 
@@ -161,13 +164,17 @@ const MilestonesContent = () => {
   const [isAscending, setIsAscending] = useState(true);
   const { project } = useProject();
   const isInitial = useRef(false);
+
   const {
     data: milestones,
     isLoading,
-    createMutation,
-    updateMutation,
     mutate,
-  } = useProjectMilestoneList(project.id);
+  } = useProjectMilestones(project.id);
+
+  const { createMutation, updateMutation } = useProjectMilestoneMutation({
+    projectId: project.id,
+    updateMilestoneCache: mutate,
+  });
 
   const projectId = project.id;
   const isMarathonProject = !!project.eventId;

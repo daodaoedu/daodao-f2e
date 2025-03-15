@@ -2,12 +2,12 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import {
   createProject,
-  CreateProjectRequest,
+  CreateProjectSchema,
   deleteProject,
-  getProjectEndpoint,
+  getProjectPathname,
   ProjectSchema,
   updateProject,
-  UpdateProjectRequest,
+  UpdateProjectSchema,
 } from '@/services/projects';
 
 interface UseProjectOptions {
@@ -18,6 +18,7 @@ interface UseProjectOptions {
   onDeleted?: () => void;
 }
 
+/** @deprecated */
 export default function useProject({
   id,
   mutateKey,
@@ -25,19 +26,19 @@ export default function useProject({
   onUpdated,
   onDeleted,
 }: UseProjectOptions) {
-  const swrKey = id ? getProjectEndpoint({ id }) : null;
+  const swrKey = id ? getProjectPathname({ id }) : null;
 
   const { mutate, ...swr } = useSWR<ProjectSchema>(swrKey);
 
   const create = useSWRMutation(
     swrKey ?? mutateKey,
-    (url, { arg }: { arg: CreateProjectRequest }) => createProject(arg),
+    (url, { arg }: { arg: CreateProjectSchema }) => createProject(arg),
     { onSuccess: onCreated }
   );
 
   const update = useSWRMutation(
     swrKey ?? mutateKey,
-    (url, { arg }: { arg: UpdateProjectRequest }) => updateProject(arg),
+    (url, { arg }: { arg: UpdateProjectSchema }) => updateProject(arg),
     { onSuccess: onUpdated }
   );
 

@@ -11,8 +11,8 @@ class PathBuilder {
     return this.path;
   }
 
-  private generatePath(path: string, id?: PathIdType): PathBuilder {
-    if (id !== undefined) {
+  private generatePath(path: string, id?: PathIdType | null): PathBuilder {
+    if (id) {
       return new PathBuilder(
         `${this.path}/${path}/${encodeURIComponent(id.toString())}`
       );

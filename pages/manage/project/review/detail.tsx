@@ -4,7 +4,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import getProjectLayout from '@/layout/ProjectLayout';
 import ReviewDetail from '@/components/Review/Detail';
 import UpdateModal from '@/components/Review/Modals/UpdateModal';
-import { useProject, useProjectReview } from '@/hooks/api/project';
+import { useProject } from '@/services/modules/projects';
+import { useProjectReview } from '@/hooks/api/project';
 import ConfirmModal from '@/shared/components/Confirm';
 
 enum ModalTypeEnum {
@@ -15,16 +16,16 @@ enum ModalTypeEnum {
 const ReviewPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('id') ?? undefined;
+  const projectId = searchParams.get('id');
   const reviewId = parseInt(searchParams.get('reviewId') ?? '0', 10);
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const { data: project } = useProject({ id: projectId });
+  const { data: project } = useProject(projectId);
   const {
     data: review,
     updateMutation: updateReview,
     deleteMutation: removeReview,
   } = useProjectReview({
-    projectId,
+    projectId: projectId ?? undefined,
     reviewId,
     onUpdated: () => {
       toast.success('更新成功');

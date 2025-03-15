@@ -13,7 +13,6 @@ import getManageLayout from '@/layout/ManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
 import {
   useProjectReviewList,
-  useProjectList,
   useProjectNoteList,
   useProjectOutcomeList,
 } from '@/hooks/api/project';
@@ -32,6 +31,10 @@ import { cn } from '@/utils/cn';
 import ReviewForm from '@/components/Review/Form';
 import NoteForm from '@/components/Note/Form';
 import OutcomeForm from '@/components/Outcome/Form';
+import {
+  useMyProjects,
+  useProjectMilestoneMutation,
+} from '@/services/modules/projects';
 
 const HEADER_TITLES = [
   '今天的每一小步，都在建立你的學習動能！',
@@ -342,11 +345,9 @@ const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
 };
 
 const Main = ({ date }: { date: Dayjs }) => {
-  const {
-    data: projects,
-    mutate,
-    milestoneMutations,
-  } = useProjectList({ isMe: true });
+  const { data: projects, mutate } = useMyProjects();
+
+  const { updateMutation } = useProjectMilestoneMutation();
 
   const { data: reviews } = useProjectReviewList(projects?.[0]?.id);
 
@@ -391,7 +392,7 @@ const Main = ({ date }: { date: Dayjs }) => {
                       milestones={project.originalMilestones}
                       projectId={project.id}
                       onRefreshData={mutate}
-                      onUpdate={milestoneMutations.updateMutation.trigger}
+                      onUpdate={updateMutation.trigger}
                       isEditable
                     />
                   </div>

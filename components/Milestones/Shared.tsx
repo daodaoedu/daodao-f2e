@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import z from "zod";
 import { cn } from "@/utils/cn";
-import { CreateProjectMilestoneRequest, ProjectMilestoneSchema } from "@/services/projects/milestones";
+import { CreateProjectMilestoneSchema, ProjectMilestoneSchema } from "@/services/projects/milestones";
 
 const idSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 
@@ -144,7 +144,7 @@ export const getDefaultMilestone = ({
   milestones,
   startDate,
   endDate,
-}: GetDefaultMilestoneProps): CreateProjectMilestoneRequest => {
+}: GetDefaultMilestoneProps): CreateProjectMilestoneSchema => {
   const [newStartDate, newEndDate] = calcEmptyDateRange(
     startDate,
     endDate,

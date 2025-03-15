@@ -19,12 +19,12 @@ import Button from '@/shared/components/Button';
 import DateRangePicker from '@/shared/components/DateRangePicker';
 import Form from '@/shared/components/Form';
 import { useDialog } from '@/contexts/Dialog';
-import { useProject } from '@/hooks/api/project';
+import { useProject } from '@/services/modules/projects';
 import {
-  CreateProjectMilestoneRequest,
+  CreateProjectMilestoneSchema,
   createProjectMilestoneSchema,
   ProjectMilestoneSchema,
-  UpdateProjectMilestoneRequest,
+  UpdateProjectMilestoneSchema,
   updateProjectMilestoneSchema,
 } from '@/services/projects/milestones';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -40,8 +40,8 @@ interface MilestoneCardProps {
   isEditable?: boolean;
   defaultEditing?: boolean;
   onCancel?: () => void;
-  onCreate?: (request: CreateProjectMilestoneRequest) => Promise<void>;
-  onUpdate?: (request: UpdateProjectMilestoneRequest) => Promise<void>;
+  onCreate?: (request: CreateProjectMilestoneSchema) => void | Promise<void>;
+  onUpdate?: (request: UpdateProjectMilestoneSchema) => void | Promise<void>;
 }
 
 export interface MilestoneFormRef {
@@ -67,7 +67,7 @@ function MilestoneCard(
   const elementId = useId();
   const [isEditing, setIsEditing] = useState(defaultEditing);
   const [isLoading, setIsLoading] = useState(false);
-  const preEditingStateRef = useRef(!isEditing);
+  const preMilestoneRef = useRef<Partial<ProjectMilestoneSchema>>(milestone);
   const tasksInfo = useMemo(() => {
     if (!Array.isArray(milestone.tasks) || !milestone.tasks.length) {
       return {
@@ -87,7 +87,7 @@ function MilestoneCard(
       progress,
     };
   }, [milestone.tasks]);
-  const { data: project } = useProject({ id: projectId });
+  const { data: project } = useProject(projectId);
 
   const { openDialog } = useDialog();
 
@@ -105,8 +105,8 @@ function MilestoneCard(
 
   const methods = useForm<
     typeof milestone.id extends undefined
-      ? CreateProjectMilestoneRequest
-      : UpdateProjectMilestoneRequest
+      ? CreateProjectMilestoneSchema
+      : UpdateProjectMilestoneSchema
   >({ resolver: zodResolver(schema) });
 
   const handleCancel = () => {
@@ -116,7 +116,7 @@ function MilestoneCard(
 
   const isCompleted = methods.watch('isCompleted') ?? milestone.isCompleted;
 
-  const checkDiff = (data: UpdateProjectMilestoneRequest) => {
+  const checkDiff = (data: UpdateProjectMilestoneSchema) => {
     const checkKeys = ['startDate', 'endDate', 'name'] as const;
 
     return checkKeys.some((key) => {
@@ -125,7 +125,7 @@ function MilestoneCard(
   };
 
   const handleSubmit = async (
-    data: CreateProjectMilestoneRequest | UpdateProjectMilestoneRequest
+    data: CreateProjectMilestoneSchema | UpdateProjectMilestoneSchema
   ) => {
     const updateRequest = updateProjectMilestoneSchema.safeParse(data);
     const createRequest = createProjectMilestoneSchema.safeParse(data);
@@ -152,7 +152,7 @@ function MilestoneCard(
   };
 
   const handleError: SubmitErrorHandler<
-    CreateProjectMilestoneRequest | UpdateProjectMilestoneRequest
+    CreateProjectMilestoneSchema | UpdateProjectMilestoneSchema
   > = (error) => {
     Object.values(error).forEach((value) => {
       toast.error(value.message || '發生錯誤');
@@ -221,31 +221,32 @@ function MilestoneCard(
   }));
 
   useEffect(() => {
-    if (isEditing !== preEditingStateRef.current) {
-      const defaultValues = getDefaultMilestone({
-        projectId,
-        milestones: Array.isArray(milestones) ? milestones : [],
-        startDate: startDate || dayjs(),
-        endDate: endDate || dayjs(),
-      });
+    if (preMilestoneRef.current === milestone) return;
 
-      Object.entries({ ...defaultValues, ...milestone }).forEach(
-        ([key, value]) => {
-          const passKey = schema.keyof().safeParse(key).data;
+    preMilestoneRef.current = milestone;
 
-          if (!passKey) return;
+    const defaultValues = getDefaultMilestone({
+      projectId,
+      milestones: Array.isArray(milestones) ? milestones : [],
+      startDate: startDate || dayjs(),
+      endDate: endDate || dayjs(),
+    });
 
-          const result = schema.shape[passKey].safeParse(value);
+    Object.entries({ ...defaultValues, ...milestone }).forEach(
+      ([key, value]) => {
+        const passKey = schema.keyof().safeParse(key).data;
 
-          if (result.success) {
-            methods.setValue(passKey, result.data);
-          }
+        if (!passKey) return;
+
+        const result = schema.shape[passKey].safeParse(value);
+
+        if (result.success) {
+          methods.setValue(passKey, result.data);
         }
-      );
+      }
+    );
 
-      handleFocus();
-      preEditingStateRef.current = isEditing;
-    }
+    if (isEditing) handleFocus();
   }, [
     isEditing,
     milestone,

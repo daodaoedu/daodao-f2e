@@ -1,12 +1,12 @@
 import useSWR from 'swr';
 import {
   getMilestone,
-  getProjectMilestoneEndpoint,
+  getProjectMilestonePathname,
   ProjectMilestoneSchema,
   sortMilestones,
-  UpdateProjectMilestoneRequest,
+  UpdateProjectMilestoneSchema,
 } from '@/services/projects/milestones';
-import { getTask, UpdateProjectTaskRequest } from '@/services/projects/tasks';
+import { getTask, UpdateProjectTaskSchema } from '@/services/projects/tasks';
 
 import useProjectMilestone from './useProjectMilestone';
 import useProjectTask from './useProjectTask';
@@ -17,17 +17,18 @@ interface UseProjectMilestoneListOptions {
   onDeleted?: () => void;
 }
 
+/** @deprecated */
 export default function useProjectMilestoneList(
   projectId?: string,
   options?: UseProjectMilestoneListOptions
 ) {
-  const swrKey = projectId ? getProjectMilestoneEndpoint({ projectId }) : null;
+  const swrKey = projectId ? getProjectMilestonePathname({ projectId }) : null;
 
   const { mutate, data, ...swr } = useSWR<ProjectMilestoneSchema[]>(swrKey);
 
   const sortedData = data && sortMilestones(data);
 
-  const handleMilestones = (updateData: UpdateProjectMilestoneRequest) => {
+  const handleMilestones = (updateData: UpdateProjectMilestoneSchema) => {
     const milestone = getMilestone(sortedData, updateData.id);
 
     if (!milestone) return;
@@ -51,7 +52,7 @@ export default function useProjectMilestoneList(
     ...options,
   });
 
-  const handleTasks = (updateData: UpdateProjectTaskRequest) => {
+  const handleTasks = (updateData: UpdateProjectTaskSchema) => {
     const milestone = getMilestone(sortedData, updateData.milestoneId);
 
     if (!milestone) return;

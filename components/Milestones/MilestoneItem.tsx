@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import {
-  CreateProjectMilestoneRequest,
+  CreateProjectMilestoneSchema,
   ProjectMilestoneSchema,
-  UpdateProjectMilestoneRequest,
+  UpdateProjectMilestoneSchema,
 } from '@/services/projects/milestones';
 import TaskList from '@/components/Tasks/TaskList';
 import Collapse from '@/shared/components/Collapse';
@@ -18,8 +18,8 @@ interface MilestoneItemProps {
   isEditable?: boolean;
   milestone: ProjectMilestoneSchema;
   milestones: ProjectMilestoneSchema[];
-  onCreate?: (request: CreateProjectMilestoneRequest) => Promise<void>;
-  onUpdate?: (request: UpdateProjectMilestoneRequest) => Promise<void>;
+  onCreate?: (request: CreateProjectMilestoneSchema) => void;
+  onUpdate?: (request: UpdateProjectMilestoneSchema) => void;
   onRefreshData?: () => void;
 }
 
