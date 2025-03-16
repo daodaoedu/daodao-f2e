@@ -1,8 +1,8 @@
 import Image from '@/shared/components/Image';
 import PostDetailCard from '@/shared/components/Post/PostDetailCard';
-import { ProjectOutcomeSchema } from '@/services/projects/outcomes';
+import { ProjectOutcomeSchema } from '@/services/modules/projects';
 import { BaseUserSchema } from '@/services/users';
-import { CommentType } from '@/services/comments';
+import { CommentType } from '@/services/modules/comments';
 
 interface OutcomeDetailProps {
   data?: ProjectOutcomeSchema;

@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
-import { useMyProjects } from '@/services/modules/projects';
-import { ProjectSchema } from '@/services/projects';
+import { ProjectSchema, useMyProjects } from '@/services/modules/projects';
 import Button from '@/shared/components/Button';
 import Modal from '@/shared/components/Modal';
 

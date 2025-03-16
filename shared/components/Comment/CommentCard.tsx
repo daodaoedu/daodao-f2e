@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/Auth';
 import Image from '@/shared/components/Image';
 import { ROLE } from '@/constants/member';
 import { timeDuration } from '@/utils/date';
-import { CommentSchema, CommentVisibility } from '@/services/comments';
+import { CommentSchema, CommentVisibility } from '@/services/modules/comments';
 import Button from '../Button';
 import Collapse from '../Collapse';
 import CommentInput, { CommentData } from './CommentInput';

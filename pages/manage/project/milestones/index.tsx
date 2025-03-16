@@ -16,10 +16,10 @@ import dayjs from 'dayjs';
 import DateRangePicker from '@/shared/components/DateRangePicker';
 import Button from '@/shared/components/Button';
 import {
+  ProjectMilestoneSchema,
   useProjectMilestoneMutation,
   useProjectMilestones,
 } from '@/services/modules/projects';
-import { ProjectMilestoneSchema } from '@/services/projects/milestones';
 import CalendarIcon from '@/public/assets/icons/calendar.svg';
 
 const SkeletonMilestones = () => {

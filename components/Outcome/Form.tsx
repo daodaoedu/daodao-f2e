@@ -7,11 +7,11 @@ import PostCard from '@/shared/components/Post/PostCard';
 import Button from '@/shared/components/Button';
 import Form from '@/shared/components/Form';
 import {
-  CreateProjectOutcomeRequest,
+  CreateProjectOutcomeSchema,
   createProjectOutcomeSchema,
-  UpdateProjectOutcomeRequest,
+  UpdateProjectOutcomeSchema,
   updateProjectOutcomeSchema,
-} from '@/services/projects/outcomes';
+} from '@/services/modules/projects';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
 import Image from '@/shared/components/Image';
 import Upload, { ImageDataType } from '@/shared/components/Upload';
@@ -22,13 +22,13 @@ interface BaseOutcomeFormProps {
   week: number;
   createdAt?: string;
   isLoading: boolean;
-  defaultValues?: UpdateProjectOutcomeRequest;
+  defaultValues?: UpdateProjectOutcomeSchema;
 }
 
 type OutcomeFormProps = BaseOutcomeFormProps &
   (
-    | { id: number; onSubmit: (data: UpdateProjectOutcomeRequest) => void }
-    | { id?: never; onSubmit: (data: CreateProjectOutcomeRequest) => void }
+    | { id: number; onSubmit: (data: UpdateProjectOutcomeSchema) => void }
+    | { id?: never; onSubmit: (data: CreateProjectOutcomeSchema) => void }
   );
 
 function OutcomeForm({
@@ -51,8 +51,8 @@ function OutcomeForm({
 
   const methods = useForm<
     typeof id extends never
-      ? CreateProjectOutcomeRequest
-      : UpdateProjectOutcomeRequest
+      ? CreateProjectOutcomeSchema
+      : UpdateProjectOutcomeSchema
   >({
     resolver: zodResolver(
       id ? updateProjectOutcomeSchema : createProjectOutcomeSchema

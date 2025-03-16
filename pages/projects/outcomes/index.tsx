@@ -1,17 +1,13 @@
 import { useSearchParams } from 'next/navigation';
 import OutcomeCard from '@/components/Outcome/Card';
 import getPublicProjectLayout from '@/layout/PublicProjectLayout';
-import {
-  useProjectOutcomeList,
-} from '@/hooks/api/project';
+import { useProjectOutcomes } from '@/services/modules/projects';
 
 const OutcomesPage = () => {
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('id') ?? undefined;
+  const projectId = searchParams.get('id');
 
-  const {
-    data: outcomes,
-  } = useProjectOutcomeList(projectId);
+  const { data: outcomes } = useProjectOutcomes(projectId);
 
   if (!projectId) {
     return <div>專案不存在</div>;

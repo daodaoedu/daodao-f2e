@@ -3,8 +3,8 @@ import Image from '@/shared/components/Image';
 import PostDetailCard from '@/shared/components/Post/PostDetailCard';
 import { IdeaSchema } from '@/services/ideas';
 import { BaseUserSchema } from '@/services/users';
-import { CommentType } from '@/services/comments';
 import { MdLink } from "react-icons/md";
+import { CommentType } from '@/services/modules/comments';
 
 interface IdeaDetailProps {
     data?: IdeaSchema;

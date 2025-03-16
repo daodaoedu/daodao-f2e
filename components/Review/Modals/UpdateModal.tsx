@@ -1,8 +1,8 @@
 import Modal from '@/shared/components/Modal';
 import {
-  UpdateProjectReviewRequest,
+  UpdateProjectReviewSchema,
   ProjectReviewSchema,
-} from '@/services/projects/reviews';
+} from '@/services/modules/projects';
 
 import ReviewForm from '../Form';
 
@@ -16,7 +16,7 @@ interface UpdateModalProps {
   isLoading: boolean;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: UpdateProjectReviewRequest) => void;
+  onSubmit: (data: UpdateProjectReviewSchema) => void;
 }
 
 export default function UpdateModal({

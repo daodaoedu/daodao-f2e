@@ -4,7 +4,7 @@ import { cn } from '@/utils/cn';
 import {
   CreateProjectMilestoneSchema,
   ProjectMilestoneSchema,
-} from '@/services/projects/milestones';
+} from '@/services/modules/projects';
 
 const idSchema = z
   .string()

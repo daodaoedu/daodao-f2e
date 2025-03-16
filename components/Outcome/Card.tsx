@@ -1,5 +1,5 @@
 import Image from '@/shared/components/Image';
-import { ProjectOutcomeSchema } from '@/services/projects/outcomes';
+import { ProjectOutcomeSchema } from '@/services/modules/projects';
 import PostPreviewCard from '@/shared/components/Post/PostPreviewCard';
 
 interface OutcomeCardProps {

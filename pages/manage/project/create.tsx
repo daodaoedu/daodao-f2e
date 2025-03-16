@@ -7,8 +7,7 @@ import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import Container from '@/shared/components/Container';
 import EditMode from '@/components/Projects/Project/EditMode';
 import SEOConfig from '@/shared/components/SEO';
-import { createProjectSchema } from '@/services/projects';
-import { useMyProjects, useProjectMutation } from '@/services/modules/projects';
+import { createProjectSchema, useMyProjects, useProjectMutation } from '@/services/modules/projects';
 
 const ProjectPage = () => {
   const router = useRouter();
