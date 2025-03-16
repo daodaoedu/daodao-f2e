@@ -1,5 +1,5 @@
 import Modal from '@/shared/components/Modal';
-import { UpdateProjectOutcomeRequest } from '@/services/projects/outcomes';
+import { UpdateProjectOutcomeSchema } from '@/services/modules/projects';
 import OutcomeForm from '../Form';
 
 interface UpdateModalProps {
@@ -11,8 +11,8 @@ interface UpdateModalProps {
   week: number;
   createdAt?: string;
   isLoading: boolean;
-  defaultValues?: UpdateProjectOutcomeRequest;
-  onSubmit: (data: UpdateProjectOutcomeRequest) => void;
+  defaultValues?: UpdateProjectOutcomeSchema;
+  onSubmit: (data: UpdateProjectOutcomeSchema) => void;
 }
 
 function UpdateModal({

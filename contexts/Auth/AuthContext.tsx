@@ -12,7 +12,7 @@ import useSWR, { SWRConfig } from 'swr';
 import { useDispatch } from 'react-redux';
 
 import { fetchUserByToken, userLogout } from '@/redux/actions/user';
-import { HttpError } from '@/services/httpClient';
+import { HttpError } from '@/services/core';
 import {
   getRedirectionStorage,
   getReminderStorage,

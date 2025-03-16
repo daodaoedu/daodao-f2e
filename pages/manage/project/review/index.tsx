@@ -9,8 +9,9 @@ import UpdateModal from '@/components/Review/Modals/UpdateModal';
 import {
   useProject,
   useProjectReview,
-  useProjectReviewList,
-} from '@/hooks/api/project';
+  useProjectReviews,
+  useProjectReviewMutation,
+} from '@/services/modules/projects';
 import ConfirmModal from '@/shared/components/Confirm';
 import marathonConfig from '@/constants/marathon';
 
@@ -22,38 +23,38 @@ enum ModalTypeEnum {
 
 const ReviewPage = () => {
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('id') ?? undefined;
+  const projectId = searchParams.get('id');
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [reviewId, setReviewId] = useState<number | undefined>(undefined);
-  const { data: project } = useProject({ id: projectId });
+  const { data: project } = useProject(projectId);
 
-  const { data: detail, mutate } = useProjectReview({
+  const { data: reviews, mutate } = useProjectReviews(projectId);
+
+  const { data: detail } = useProjectReview({
     projectId,
     reviewId,
   });
 
-  const {
-    data: reviews,
-    create,
-    update,
-    remove,
-  } = useProjectReviewList(projectId, {
-    onCreated: () => {
-      toast.success('新增成功');
-      setModalType(null);
-    },
-    onUpdated: () => {
-      toast.success('更新成功');
-      setModalType(null);
-      setReviewId(undefined);
-      mutate();
-    },
-    onDeleted: () => {
-      toast.success('刪除成功');
-      setModalType(null);
-      setReviewId(undefined);
-    },
-  });
+  const { createMutation, updateMutation, deleteMutation } =
+    useProjectReviewMutation({
+      projectId,
+      reviewId,
+      onCreated: () => {
+        toast.success('新增成功');
+        setModalType(null);
+      },
+      onUpdated: () => {
+        toast.success('更新成功');
+        setModalType(null);
+        setReviewId(undefined);
+        mutate();
+      },
+      onDeleted: () => {
+        toast.success('刪除成功');
+        setModalType(null);
+        setReviewId(undefined);
+      },
+    });
 
   if (!projectId) {
     return <div>專案不存在</div>;
@@ -64,7 +65,8 @@ const ReviewPage = () => {
       <div className="mb-6 flex items-end sm:items-center justify-between body-md">
         <div className="flex flex-col items-start sm:flex-row sm:items-center gap-1">
           <div className="text-basic-500">
-            覆盤（{marathonConfig.getWeekNumber().toString().padStart(2, '0')} 週/22週）
+            覆盤（{marathonConfig.getWeekNumber().toString().padStart(2, '0')}{' '}
+            週/22週）
           </div>
         </div>
         <Button
@@ -102,8 +104,8 @@ const ReviewPage = () => {
           projectTitle={project.title}
           isOpen={modalType === ModalTypeEnum.Create}
           onClose={() => setModalType(null)}
-          onSubmit={create.trigger}
-          isLoading={create.isMutating}
+          onSubmit={createMutation.trigger}
+          isLoading={createMutation.isMutating}
         />
       )}
 
@@ -117,8 +119,8 @@ const ReviewPage = () => {
           createdAt={detail.createdAt}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
-          onSubmit={update.trigger}
-          isLoading={update.isMutating}
+          onSubmit={updateMutation.trigger}
+          isLoading={updateMutation.isMutating}
         />
       )}
 
@@ -129,8 +131,8 @@ const ReviewPage = () => {
           confirmColor="alert"
           isOpen={modalType === ModalTypeEnum.Delete}
           onClose={() => setModalType(null)}
-          onConfirm={() => remove.trigger({ projectId, reviewId })}
-          isLoading={remove.isMutating}
+          onConfirm={() => deleteMutation.trigger({ projectId, reviewId })}
+          isLoading={deleteMutation.isMutating}
         />
       )}
     </>

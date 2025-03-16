@@ -22,7 +22,7 @@ import Image from "@/shared/components/Image";
 import Modal from '@/shared/components/Modal';
 import themeFactory from '@/shared/styles/themeFactory';
 import storeFactory from '@/redux/store';
-import { fetcher } from '@/services/httpClient';
+import { fetcher } from '@/services/core';
 import { checkLoginValidity } from '@/redux/actions/user';
 import { getReminderStorage } from '@/utils/storage';
 import getDefaultLayout from '@/layout/DefaultLayout';
@@ -41,7 +41,6 @@ const swrConfig = {
   revalidateOnFocus: false,
   errorRetryCount: 0,
   keepPreviousData: true,
-  revalidateIfStale: false,
   fetcher,
 };
 

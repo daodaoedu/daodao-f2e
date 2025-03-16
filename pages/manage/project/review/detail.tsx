@@ -4,8 +4,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import getProjectLayout from '@/layout/ProjectLayout';
 import ReviewDetail from '@/components/Review/Detail';
 import UpdateModal from '@/components/Review/Modals/UpdateModal';
-import { useProject, useProjectReview } from '@/hooks/api/project';
+import {
+  useProject,
+  useProjectReview,
+  useProjectReviewMutation,
+} from '@/services/modules/projects';
 import ConfirmModal from '@/shared/components/Confirm';
+import { parseParamsToNumber } from '@/services/core';
 
 enum ModalTypeEnum {
   Update,
@@ -15,16 +20,18 @@ enum ModalTypeEnum {
 const ReviewPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('id') ?? undefined;
-  const reviewId = parseInt(searchParams.get('reviewId') ?? '0', 10);
+  const projectId = searchParams.get('id');
+  const reviewId = parseParamsToNumber(searchParams.get('reviewId'));
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const { data: project } = useProject({ id: projectId });
-  const {
-    data: review,
-    update: updateReview,
-    remove: removeReview,
-  } = useProjectReview({
+  const { data: project } = useProject(projectId);
+
+  const { data: review } = useProjectReview({
     projectId,
+    reviewId,
+  });
+
+  const { updateMutation, deleteMutation } = useProjectReviewMutation({
+    projectId: projectId ?? undefined,
     reviewId,
     onUpdated: () => {
       toast.success('更新成功');
@@ -36,7 +43,7 @@ const ReviewPage = () => {
     },
   });
 
-  if (!projectId || !reviewId) {
+  if (!projectId || reviewId == null) {
     return null;
   }
 
@@ -59,8 +66,8 @@ const ReviewPage = () => {
           createdAt={review.createdAt}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
-          onSubmit={updateReview.trigger}
-          isLoading={updateReview.isMutating}
+          onSubmit={updateMutation.trigger}
+          isLoading={updateMutation.isMutating}
         />
       )}
 
@@ -71,8 +78,8 @@ const ReviewPage = () => {
           confirmColor="alert"
           isOpen={modalType === ModalTypeEnum.Delete}
           onClose={() => setModalType(null)}
-          onConfirm={() => removeReview.trigger({ projectId, reviewId })}
-          isLoading={removeReview.isMutating}
+          onConfirm={() => deleteMutation.trigger({ projectId, reviewId })}
+          isLoading={deleteMutation.isMutating}
         />
       )}
     </>

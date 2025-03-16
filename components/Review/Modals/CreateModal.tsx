@@ -1,5 +1,5 @@
 import Modal from '@/shared/components/Modal';
-import { CreateProjectReviewRequest } from '@/services/projects/reviews';
+import { CreateProjectReviewSchema } from '@/services/modules/projects';
 import marathonConfig from '@/constants/marathon';
 import ReviewForm from '../Form';
 
@@ -9,7 +9,7 @@ interface CreateModalProps {
   isLoading: boolean;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: CreateProjectReviewRequest) => void;
+  onSubmit: (data: CreateProjectReviewSchema) => void;
 }
 
 export default function CreateModal({
