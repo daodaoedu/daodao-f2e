@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import {
-  CreateProjectMilestoneRequest,
+  CreateProjectMilestoneSchema,
   ProjectMilestoneSchema,
-  UpdateProjectMilestoneRequest,
-} from '@/services/projects/milestones';
-import TaskList from '@/components/Tasks/TaskList';
+  UpdateProjectMilestoneSchema,
+} from '@/services/modules/projects';
+import { cn } from '@/utils/cn';
 import Collapse from '@/shared/components/Collapse';
 import MilestoneCard from './MilestoneCard';
 import TaskCreate from '../Tasks/Create';
 import TaskAdd from '../Tasks/Add';
+import Task from '../Tasks/Task';
 
 interface MilestoneItemProps {
   projectId: string;
@@ -18,8 +19,8 @@ interface MilestoneItemProps {
   isEditable?: boolean;
   milestone: ProjectMilestoneSchema;
   milestones: ProjectMilestoneSchema[];
-  onCreate?: (request: CreateProjectMilestoneRequest) => Promise<void>;
-  onUpdate?: (request: UpdateProjectMilestoneRequest) => Promise<void>;
+  onCreate?: (request: CreateProjectMilestoneSchema) => void;
+  onUpdate?: (request: UpdateProjectMilestoneSchema) => void;
   onRefreshData?: () => void;
 }
 
@@ -50,14 +51,18 @@ const MilestoneItem = ({
       />
       <Collapse defaultOpen>
         <Collapse.List>
-          <Collapse.Item>
+          {/* TODO: 要調整裡面的下拉選單後再開啟 */}
+          <Collapse.Item className={cn(false && "w-full overflow-hidden")}>
             <div className="pb-2 flex flex-col gap-2">
-              <TaskList
-                tasks={milestone.tasks || []}
-                projectId={projectId}
-                milestoneId={milestone.id}
-                onRefreshData={onRefreshData}
-              />
+              {milestone.tasks?.map((task) => (
+                <Task
+                  key={task.id}
+                  projectId={projectId}
+                  milestoneId={milestone.id}
+                  task={task}
+                  onRefreshData={onRefreshData}
+                />
+              ))}
             </div>
           </Collapse.Item>
         </Collapse.List>
@@ -71,7 +76,10 @@ const MilestoneItem = ({
           />
         )}
         <TaskAdd setIsEditing={setIsEditing} />
-        <Collapse.Toggle withIcon className="w-full flex justify-center body-sm">
+        <Collapse.Toggle
+          withIcon
+          className="w-full flex justify-center body-sm"
+        >
           {(isOpen) => (isOpen ? '收合' : '展開')}
         </Collapse.Toggle>
       </Collapse>

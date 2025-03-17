@@ -122,8 +122,12 @@ export const ToggleProvider = ({
     };
     handleScroll();
     window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, [wrapperDom, triggerDom]);
 
   return (

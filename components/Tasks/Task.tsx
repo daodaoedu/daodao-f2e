@@ -113,14 +113,14 @@ const Task = ({
       <div className="flex flex-row items-center justify-between">
         {
           isEditing ? (
-            <div className="w-full flex flex-col md:flex-row items-center  md:justify-between gap-1">
+            <div className="flex-1 flex flex-col md:flex-row items-center  md:justify-between gap-1">
               <input
                 type="text"
                 name="name"
                 id="name"
                 className={cn(
-                  "font-sans text-sm text-basic-400",
-                  "w-full rounded-md px-3 py-2 border border-solid border-basic-200"
+                  "-m-px font-sans text-sm text-basic-400",
+                  "w-full rounded-md pl-6 py-2 border border-solid border-basic-200"
                 )}
                 value={newTask.name || ""}
                 onChange={handleChangeInput}
@@ -206,8 +206,8 @@ const Task = ({
               </div>
             </div>
           ) : (
-            <div className="flex flex-col w-full">
-              <div className="flex flex-row w-full justify-start gap-1">
+            <div className="w-full">
+              <div className="w-full flex items-center gap-1 overflow-hidden">
                 <label
                   htmlFor={`isCompleted_${task.id}`}
                   className="
@@ -233,7 +233,7 @@ const Task = ({
                     {task.isCompleted && <FaCheck />}
                   </p>
                 </label>
-                <p className="w-full">{task.name || ""}</p>
+                <p className="font-sans flex-1 py-2 body-sm text-basic-400 truncate">{task.name || ""}</p>
                 <div className="flex flex-row gap-1 ml-auto">
                   <button
                     type="button"

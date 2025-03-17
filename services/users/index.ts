@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { fetcher, mutations } from '../httpClient';
+import { fetcher, mutations } from '../core';
 
 export const usersEndpoint = '/users';
 

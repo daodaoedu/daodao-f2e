@@ -1,18 +1,15 @@
 import getAdminProjectLayout from '@/layout/AdminProjectLayout';
 import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@mui/material';
-import useProjectMilestoneList from '@/hooks/api/project/useProjectMilestoneList';
+import { useProjectMilestones } from '@/services/modules/projects';
 import EmptyList from '@/components/Projects/ProjectList/EmptyList';
 import MilestoneItemView from '@/components/Milestones/MilestoneItemView';
 import { MilestonesProvider } from '@/contexts/Milestones';
 
 const ProjectMilestonesPage = () => {
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('id') ?? undefined;
-  const {
-    data: milestones,
-    isLoading,
-  } = useProjectMilestoneList(projectId);
+  const projectId = searchParams.get('id');
+  const { data: milestones, isLoading } = useProjectMilestones(projectId);
 
   return (
     <div className="w-[750px] max-w-full mx-auto">
@@ -52,13 +49,10 @@ const ProjectMilestonesPage = () => {
             <EmptyList />
           )}
         </div>
-      )
-    }
+      )}
     </div>
   );
 };
 ProjectMilestonesPage.getLayout = (page: React.ReactElement) =>
-  getAdminProjectLayout(
-    <MilestonesProvider>{page}</MilestonesProvider>
-  );
+  getAdminProjectLayout(<MilestonesProvider>{page}</MilestonesProvider>);
 export default ProjectMilestonesPage;

@@ -15,8 +15,11 @@ import MilestoneItem from '@/components/Milestones/MilestoneItem';
 import dayjs from 'dayjs';
 import DateRangePicker from '@/shared/components/DateRangePicker';
 import Button from '@/shared/components/Button';
-import useProjectMilestoneList from '@/hooks/api/project/useProjectMilestoneList';
-import { ProjectMilestoneSchema } from '@/services/projects/milestones';
+import {
+  ProjectMilestoneSchema,
+  useProjectMilestoneMutation,
+  useProjectMilestones,
+} from '@/services/modules/projects';
 import CalendarIcon from '@/public/assets/icons/calendar.svg';
 
 const SkeletonMilestones = () => {
@@ -161,13 +164,17 @@ const MilestonesContent = () => {
   const [isAscending, setIsAscending] = useState(true);
   const { project } = useProject();
   const isInitial = useRef(false);
+
   const {
     data: milestones,
     isLoading,
-    create,
-    update,
     mutate,
-  } = useProjectMilestoneList(project.id);
+  } = useProjectMilestones(project.id);
+
+  const { createMutation, updateMutation } = useProjectMilestoneMutation({
+    projectId: project.id,
+    updateMilestoneCache: mutate,
+  });
 
   const projectId = project.id;
   const isMarathonProject = !!project.eventId;
@@ -284,7 +291,7 @@ const MilestonesContent = () => {
                     defaultEditing
                     onCancel={handleClose}
                     onCreate={async (request) => {
-                      await create.trigger(request);
+                      await createMutation.trigger(request);
                       handleClose();
                     }}
                   />
@@ -300,7 +307,7 @@ const MilestonesContent = () => {
                     startDate={startDate}
                     endDate={endDate}
                     isEditable
-                    onUpdate={update.trigger}
+                    onUpdate={updateMutation.trigger}
                     onRefreshData={mutate}
                   />
                 ))}

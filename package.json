@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 443 --experimental-https",
+    "dev": "next dev -p 5438",
     "dev-https": "node server.js",
     "static": "serve out",
     "build": "next build",
