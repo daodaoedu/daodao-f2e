@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar, Plus, Check } from 'lucide-react';
-import { colors, getUnitType, contentTypeOptions } from '../../constants';
-import { PathInfo } from '../../types';
+import { colors, getUnitType, contentTypeOptions } from '@/constants/light-path';
+import { PathInfo } from '../../../services/ligtht-path';
 
 interface MainDashboardProps {
   pathInfo: PathInfo;

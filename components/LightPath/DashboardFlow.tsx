@@ -7,8 +7,7 @@ import Confetti from './Confetti';
 import CelebrationMessage from './CelebrationMessage';
 // 標記未使用的導入
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { colors } from '../constants';
-import { PathInfo, CheckInEntry, DashboardView } from '../types';
+import { PathInfo, CheckInEntry, DashboardView } from '../../services/ligtht-path';
 
 interface DashboardFlowProps {
   pathInfo: PathInfo;

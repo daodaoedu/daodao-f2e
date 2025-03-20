@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
-import SetupFlow from './components/SetupFlow';
-import DashboardFlow from './components/DashboardFlow';
-import { PathInfo, CheckInEntry, MainView, DashboardView, MotivationType } from './types';
+import SetupFlow from '../../components/LightPath/SetupFlow';
+import DashboardFlow from '../../components/LightPath/DashboardFlow';
+import { PathInfo, CheckInEntry, MainView, DashboardView, MotivationType } from '../../services/ligtht-path';
 
 const LightPath: React.FC = () => {
   // 主視圖狀態 - 控制顯示應用的哪一部分

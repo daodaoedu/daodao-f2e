@@ -1,6 +1,6 @@
 import React from 'react';
-import { colors, contentTypeOptions, motivationOptions } from '../../constants';
-import { PathInfo } from '../../types';
+import { colors, contentTypeOptions, motivationOptions } from '@/constants/light-path';
+import { PathInfo } from '../../../services/ligtht-path';
 
 interface StepThreeProps {
   pathInfo: PathInfo;

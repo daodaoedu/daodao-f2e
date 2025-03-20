@@ -2,8 +2,8 @@ import React from 'react';
 import { ArrowLeft, Check } from 'lucide-react';
 // 標記未使用的導入
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { colors, contentTypeOptions } from '../constants';
-import { PathInfo } from '../types';
+import { colors, contentTypeOptions } from '@/constants/light-path';
+import { PathInfo } from '../../services/ligtht-path';
 import StepOne from './setup/StepOne';
 import StepTwo from './setup/StepTwo';
 import StepThree from './setup/StepThree';

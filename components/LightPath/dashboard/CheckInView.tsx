@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { colors, getUnitType } from '../../constants';
-import { PathInfo } from '../../types';
+import { colors, getUnitType } from '@/constants/light-path';
+import { PathInfo } from '../../../services/ligtht-path';
 
 interface CheckInViewProps {
   pathInfo: PathInfo;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { colors } from '../../constants';
-import { PathInfo, CheckInEntry } from '../../types';
+import { colors } from '@/constants/light-path';
+import { PathInfo, CheckInEntry } from '../../../services/ligtht-path';
 
 interface HistoryViewProps {
   checkInHistory: CheckInEntry[];

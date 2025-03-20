@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 // 第一個 import 不使用的变量
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { v4 as uuidv4 } from 'uuid';
-import { colors } from '../constants';
+import { colors } from '@/constants/light-path';
 
 interface ConfettiProps {
   active: boolean;
