@@ -1,6 +1,7 @@
 import Image from '@/shared/components/Image';
 import { ProjectOutcomeSchema } from '@/services/modules/projects';
 import PostPreviewCard from '@/shared/components/Post/PostPreviewCard';
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 
 interface OutcomeCardProps {
   data: ProjectOutcomeSchema;
@@ -19,9 +20,11 @@ function OutcomeCard({
 }: OutcomeCardProps) {
   const renderContent = (outcomeData: ProjectOutcomeSchema) => (
     <div className="mb-3 body-sm text-basic-500">
-      <p className="mb-3 whitespace-pre-wrap min-h-12 max-h-48 overflow-hidden">
-        {outcomeData.content}
-      </p>
+      <MarkdownEditor
+        className="mb-3 min-h-12 max-h-48 overflow-hidden"
+        readOnly
+        value={outcomeData.content}
+      />
       {outcomeData.imgUrls && outcomeData.imgUrls.length > 0 && (
         <Image
           src={outcomeData.imgUrls[0]}
