@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/utils/cn';
-import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
 import { useDialogue, DialogueStyle } from './DialogueContext';
 
@@ -45,12 +44,12 @@ const DialogueGuide: React.FC = () => {
 
     // 如果正在提交或沒有輸入則返回
     if (isSubmitting || !userInput.trim()) return;
-    
+
     // 設置提交中狀態
     setIsSubmitting(true);
-    
+
     const currentInput = userInput.trim();
-    
+
     // 先清空輸入框，避免連續提交
     setUserInput('');
 
@@ -70,7 +69,7 @@ const DialogueGuide: React.FC = () => {
         sender: 'ai',
         style: dialogueStyle
       });
-      
+
       // 重設提交狀態
       setIsSubmitting(false);
     }, 500);
@@ -85,7 +84,7 @@ const DialogueGuide: React.FC = () => {
         // 只滾動到可見範圍，不強制置頂
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
       }, 100);
-      
+
       return () => clearTimeout(timer);
     }
   }, [messages.length]);
@@ -136,7 +135,7 @@ const DialogueGuide: React.FC = () => {
             >
               {msg.content}
             </div>
-            
+
             {msg.sender === 'user' && (
               <div className="w-8 h-8 flex-shrink-0 rounded-full bg-basic-500 flex items-center justify-center text-white ml-2 self-end shadow-sm">
                 <span className="text-xs">你</span>
