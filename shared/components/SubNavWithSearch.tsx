@@ -100,8 +100,8 @@ function SubNavWithSearch({ type, onCategorySelect }: SubNavProps) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="absolute right-0 top-0 h-full px-3 text-gray-500 hover:text-primary-base"
               >
                 <FiSearch className="w-5 h-5" />

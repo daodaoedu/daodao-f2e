@@ -1,7 +1,7 @@
 import React from 'react';
-import Connect from '../../components/Connect';
 import SEOConfig from '@/shared/components/SEO';
 import { useRouter } from 'next/router';
+import Connect from '../../components/Connect';
 
 export default function ConnectPage() {
   const router = useRouter();

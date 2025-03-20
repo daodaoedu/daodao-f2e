@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Idea {
   title: string;
@@ -8,6 +9,7 @@ interface Idea {
 }
 
 const IdeasContent: FC = () => {
+  const uniqueId = uuidv4();
   const ideas: Idea[] = [
     {
       title: "如何更有效地進行深度閱讀？",
@@ -35,8 +37,8 @@ const IdeasContent: FC = () => {
       <p className="text-lg text-gray-600 mb-8">探索社群成員分享的各種學習想法與心得</p>
 
       <div className="space-y-6">
-        {ideas.map((idea, index) => (
-          <div key={index} className="bg-white rounded-xl shadow-md p-6">
+        {ideas.map((idea) => (
+          <div key={uniqueId} className="bg-white rounded-xl shadow-md p-6">
             <h2 className="text-xl font-bold mb-3">{idea.title}</h2>
             <p className="text-gray-600 mb-4">{idea.content}</p>
             <div className="flex items-center text-sm text-gray-500">

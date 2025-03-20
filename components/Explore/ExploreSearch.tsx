@@ -24,8 +24,8 @@ const ExploreSearch: FC = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="bg-primary-base text-white px-5 py-3 rounded-full font-medium hover:bg-primary-darker transition-colors"
         >
           搜尋

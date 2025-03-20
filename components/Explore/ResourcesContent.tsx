@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Resource {
   title: string;
@@ -8,6 +9,8 @@ interface Resource {
 }
 
 const ResourcesContent: FC = () => {
+    const uniqueId = uuidv4();
+
   const resources: Resource[] = [
     {
       title: "Coursera 線上課程平台",
@@ -35,8 +38,8 @@ const ResourcesContent: FC = () => {
       <p className="text-lg text-gray-600 mb-8">探索各類學習資源，助你更有效地學習</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {resources.map((resource, index) => (
-          <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden">
+        {resources.map((resource) => (
+          <div key={uniqueId} className="bg-white rounded-xl shadow-md overflow-hidden">
             <div className="p-6">
               <h2 className="text-xl font-bold mb-2">{resource.title}</h2>
               <p className="text-gray-600 mb-4">{resource.description}</p>

@@ -1,5 +1,8 @@
-import React, { FC } from 'react';
+import React, { FC, lazy, Suspense } from 'react';
 import styles from '@/styles/explore.module.css';
+
+// 動態導入 ProjectsComponent
+const ProjectsComponent = lazy(() => import('@/pages/projects'));
 
 interface ProjectsContentProps {
   onProjectClick: (projectId: string) => void;
@@ -13,14 +16,12 @@ const ProjectsContent: FC<ProjectsContentProps> = ({ onProjectClick }) => {
 
       {/* 引入 Projects 頁面的內容，但包裝在 div 內以保持樣式絕密性 */}
       <div className={`${styles['projects-container']} ${styles['dynamic-content-container']}`}>
-        {/* 動態導入 ProjectsComponent */}
-        {React.createElement(
-          require('@/pages/projects').default,
-          {
-            path: "/explore",
-            onProjectClick: onProjectClick
-          }
-        )}
+        <Suspense fallback={<div>載入中...</div>}>
+          <ProjectsComponent
+            path="/explore"
+            onProjectClick={onProjectClick}
+          />
+        </Suspense>
       </div>
     </div>
   );

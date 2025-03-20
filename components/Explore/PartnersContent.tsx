@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Partner {
   title: string;
@@ -8,6 +9,7 @@ interface Partner {
 }
 
 const PartnersContent: FC = () => {
+  const uniqueId = uuidv4();
   const partners: Partner[] = [
     {
       title: "英語學習小組",
@@ -35,8 +37,8 @@ const PartnersContent: FC = () => {
       <p className="text-lg text-gray-600 mb-8">尋找學習夥伴，互相督促，共同進步</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {partners.map((partner, index) => (
-          <div key={index} className="bg-white rounded-xl shadow-md p-6">
+        {partners.map((partner) => (
+          <div key={uniqueId} className="bg-white rounded-xl shadow-md p-6">
             <h2 className="text-xl font-bold mb-3">{partner.title}</h2>
             <p className="text-gray-600 mb-4">{partner.description}</p>
             <div className="flex items-center text-sm text-gray-500 mb-4">

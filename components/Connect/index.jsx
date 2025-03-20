@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { GoGraph, GoRocket, GoPeople } from 'react-icons/go';
+import Button from '@/shared/components/Button';
+import { v4 as uuidv4 } from 'uuid';
 
 function Connect() {
   const router = useRouter();
   const [connectTab, setConnectTab] = useState('circles');
-  
+  const uniqueId = uuidv4();
+
   // 使用島島阿學的現有配色方案
   const colors = {
-    primary: '#16B9B3',     // primary.base
-    secondary: '#FF9526',   // tips
-    accent: '#86C84A',      // success
-    dark: '#293A3D',        // basic.500
-    light: '#F3FCFC',       // primary.palest
+    primary: '#16B9B3', // primary.base
+    secondary: '#FF9526', // tips
+    accent: '#86C84A', // success
+    dark: '#293A3D', // basic.500
+    light: '#F3FCFC', // primary.palest
   };
 
   // 學習圈組資料
@@ -72,32 +75,32 @@ function Connect() {
       <div className="bg-white rounded-lg shadow p-4">
         {/* 子導航標籤 */}
         <div className="flex space-x-4 border-b mb-6">
-          <button 
+          <Button
             className={`px-3 py-2 ${connectTab === 'circles' ? 'border-b-2 font-medium' : ''}`}
-            style={{ 
+            style={{
               borderColor: connectTab === 'circles' ? colors.primary : 'transparent',
               color: connectTab === 'circles' ? colors.primary : 'rgb(75, 85, 99)'
             }}
             onClick={() => setConnectTab('circles')}
           >
             圈組 Circles
-          </button>
-          <button 
+          </Button>
+          <Button
             className={`px-3 py-2 ${connectTab === 'events' ? 'border-b-2 font-medium' : ''}`}
-            style={{ 
+            style={{
               borderColor: connectTab === 'events' ? colors.primary : 'transparent',
               color: connectTab === 'events' ? colors.primary : 'rgb(75, 85, 99)'
             }}
             onClick={() => setConnectTab('events')}
           >
             活動 Events
-          </button>
+          </Button>
         </div>
-        
+
         {connectTab === 'circles' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {LEARNING_CIRCLES.map((circle, index) => (
-              <div key={index} className="border rounded-lg overflow-hidden hover:shadow-md transition-all">
+            {LEARNING_CIRCLES.map((circle) => (
+              <div key={circle.id} className="border rounded-lg overflow-hidden hover:shadow-md transition-all">
                 <div className="h-24 relative" style={{ background: circle.color }}>
                   <div className="absolute bottom-0 left-0 w-full p-3 text-white font-bold">
                     {circle.title}
@@ -111,20 +114,27 @@ function Connect() {
                   <p className="text-gray-600 text-sm mb-4">
                     {circle.description}
                   </p>
-                  <button className="w-full py-2 rounded-md text-sm" 
-                          style={{ backgroundColor: `${colors.primary}15`, color: colors.primary }}
-                          onClick={() => router.push('/group')}>
+                  <Button
+                    as="button"
+                    onClick={() => router.push('/group')}
+                    className="w-full"
+                    variant="outline"
+                    color="primary"
+                    size="sm"
+                  >
                     加入圈組
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
-            
+
             <div className="border border-dashed rounded-lg p-4 flex flex-col items-center justify-center">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center mb-2"
-                  style={{ backgroundColor: colors.light + '30', color: colors.primary }}>
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center mb-2"
+                style={{ backgroundColor: `${colors.light}30`, color: colors.primary }}
+              >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </div>
               <p className="font-bold mb-1">創建新圈組</p>
@@ -134,13 +144,15 @@ function Connect() {
             </div>
           </div>
         )}
-        
+
         {connectTab === 'events' && (
           <div className="space-y-4">
-            {RECENT_EVENTS.map((event, index) => (
-              <div key={index} className="border rounded-lg p-4 flex items-center">
-                <div className="p-2 rounded mr-4 text-center" 
-                    style={{ backgroundColor: `${colors.primary}15` }}>
+            {RECENT_EVENTS.map((event) => (
+              <div key={uniqueId} className="border rounded-lg p-4 flex items-center">
+                <div
+                  className="p-2 rounded mr-4 text-center"
+                  style={{ backgroundColor: `${colors.primary}15` }}
+                >
                   <div className="text-xs" style={{ color: colors.primary }}>{event.date.split('/')[1]}月</div>
                   <div className="text-lg font-bold" style={{ color: colors.primary }}>{event.date.split('/')[2]}</div>
                 </div>
@@ -148,19 +160,27 @@ function Connect() {
                   <h4 className="font-bold mb-1">{event.title}</h4>
                   <p className="text-xs text-gray-500">{event.time} • {event.type}</p>
                 </div>
-                <button className="px-3 py-1 rounded border text-sm"
-                        onClick={() => router.push('/activities')}>報名</button>
+                <Button
+                  as="button"
+                  onClick={() => router.push('/activities')}
+                  variant="outline"
+                  color="primary"
+                  size="sm"
+                >報名
+                </Button>
               </div>
             ))}
-            
+
             <div className="text-center mt-6">
-              <button 
-                className="px-4 py-2 rounded-lg text-white"
-                style={{ backgroundColor: colors.primary }}
+              <Button
+                as="button"
                 onClick={() => router.push('/activities/create')}
+                variant="solid"
+                color="primary"
+                size="md"
               >
                 建立活動
-              </button>
+              </Button>
             </div>
           </div>
         )}

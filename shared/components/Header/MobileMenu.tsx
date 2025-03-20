@@ -20,8 +20,8 @@ function ExploreMenu({ onClose }: OnCloseProps) {
   return (
     <div>
       {/* 添加搜索框 */}
-      <HeaderSearch mobileMode={true} />
-      
+      <HeaderSearch mobileMode />
+
       <nav>
         <ul className="pt-2">
           {NAV_LINK.map(({ link, name, target, children, section }) => (

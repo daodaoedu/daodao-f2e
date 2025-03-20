@@ -28,7 +28,7 @@ function DesktopMenu() {
       </nav>
       <div className="flex items-center gap-3.5">
         <HeaderSearch className="mr-2" />
-        
+
         <Dropdown as="nav">
           <Dropdown.Toggle
             className={cn(

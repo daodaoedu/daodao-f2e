@@ -24,8 +24,8 @@ const HeaderSearch: React.FC<HeaderSearchProps> = ({ className, mobileMode = fal
 
   if (mobileMode) {
     return (
-      <form 
-        onSubmit={handleSearch} 
+      <form
+        onSubmit={handleSearch}
         className={cn("w-full px-4 py-2", className)}
       >
         <div className="relative flex w-full">
@@ -38,8 +38,8 @@ const HeaderSearch: React.FC<HeaderSearchProps> = ({ className, mobileMode = fal
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="absolute right-0 top-0 h-full px-3 text-basic-400 hover:text-primary-base"
           >
             <FiSearch className="w-5 h-5" />
@@ -50,23 +50,24 @@ const HeaderSearch: React.FC<HeaderSearchProps> = ({ className, mobileMode = fal
   }
 
   return (
-    <form 
-      onSubmit={handleSearch} 
+    <form
+      onSubmit={handleSearch}
       className={cn("relative", className)}
     >
       <div className={cn(
         "flex items-center h-10 rounded-full transition-all",
-        isFocused 
-          ? "w-64 bg-white" 
+        isFocused
+          ? "w-64 bg-white"
           : "w-10 bg-transparent hover:bg-primary-darker"
-      )}>
+      )}
+      >
         <input
           type="text"
           placeholder="搜尋學習資源、計畫或揪團..."
           className={cn(
             "h-full border-none outline-none bg-transparent",
-            isFocused 
-              ? "pl-4 pr-10 w-full text-basic-400" 
+            isFocused
+              ? "pl-4 pr-10 w-full text-basic-400"
               : "w-0"
           )}
           ref={inputRef}
@@ -79,23 +80,21 @@ const HeaderSearch: React.FC<HeaderSearchProps> = ({ className, mobileMode = fal
             }
         }}
         />
-        <button 
-          type="button" 
+        <button
+          type="button"
           onClick={(e) => {
             if (!isFocused) {
               e.preventDefault();
               setIsFocused(true);
               setTimeout(() => inputRef.current?.focus(), 10);
-            } else {
-              if (searchQuery.trim()) {
+            } else if (searchQuery.trim()) {
                 handleSearch(e as unknown as React.FormEvent);
               }
-            }
           }}
           className={cn(
             "h-full aspect-square flex items-center justify-center",
-            isFocused 
-              ? "absolute right-0 text-basic-400" 
+            isFocused
+              ? "absolute right-0 text-basic-400"
               : "text-white"
           )}
         >

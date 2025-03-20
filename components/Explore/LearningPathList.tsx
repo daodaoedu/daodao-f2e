@@ -1,5 +1,7 @@
 import React, { FC } from 'react';
 import { useRouter } from 'next/router';
+import Button from '@/shared/components/Button';
+import { v4 as uuidv4 } from 'uuid';
 import { colors } from './index';
 
 interface PopularPlan {
@@ -13,7 +15,8 @@ interface PopularPlan {
 
 const LearningPathList: FC = () => {
   const router = useRouter();
-  
+  const uniqueId = uuidv4();
+
   // 熱門學習計畫資料
   const POPULAR_PLANS: PopularPlan[] = [
     {
@@ -42,29 +45,42 @@ const LearningPathList: FC = () => {
     }
   ];
 
+  const handlePlanClick = (index: number) => {
+    router.push(`/learning-plan/${index}`);
+  };
+
   return (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-2xl font-bold text-gray-800">熱門學習路徑</h3>
-        <button 
+        <Button
           className="text-base text-primary-base hover:text-primary-darker transition-colors"
-          onClick={() => router.push('/learning-plan')}>
+          onClick={() => router.push('/learning-plan')}
+        >
           查看全部
-        </button>
+        </Button>
       </div>
-      
+
       <div className="grid grid-cols-1 gap-4">
         {POPULAR_PLANS.map((plan, index) => (
-          <div 
-            key={index} 
-            className="border rounded-lg p-4 hover:shadow-md transition-all bg-white cursor-pointer"
-            onClick={() => router.push(`/learning-plan/${index}`)} // 假設有一個動態路由
+          <div
+            key={uniqueId}
+            className="border rounded-lg p-4 hover:shadow-md transition-all bg-white"
+            role="button"
+            tabIndex={0}
+            onClick={() => handlePlanClick(index)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handlePlanClick(index);
+              }
+            }}
+            aria-label={`查看學習路徑：${plan.title}`}
           >
             <div className="flex">
               <div className="w-16 h-16 rounded-lg mr-4 bg-primary-palest flex items-center justify-center">
-                <img 
-                  src={plan.avatar} 
-                  alt={plan.title} 
+                <img
+                  src={plan.avatar}
+                  alt={plan.title}
                   className="w-10 h-10 object-contain"
                 />
               </div>
@@ -75,8 +91,10 @@ const LearningPathList: FC = () => {
                   <span className="text-sm px-2 py-0.5 rounded-full bg-primary-palest text-primary-base">
                     學習路徑
                   </span>
-                  <span className="text-sm px-2 py-0.5 rounded-full" 
-                        style={{ backgroundColor: `${colors.secondary}15`, color: colors.secondary }}>
+                  <span
+                    className="text-sm px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: `${colors.secondary}15`, color: colors.secondary }}
+                  >
                     初學者
                   </span>
                 </div>

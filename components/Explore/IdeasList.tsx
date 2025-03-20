@@ -1,5 +1,7 @@
 import React, { FC } from 'react';
 import { useRouter } from 'next/router';
+import Button from '@/shared/components/Button';
+import { v4 as uuidv4 } from 'uuid';
 
 interface IdeaPost {
   avatar: string;
@@ -12,7 +14,7 @@ interface IdeaPost {
 
 const IdeasList: FC = () => {
   const router = useRouter();
-  
+  const uniqueId = uuidv4();
   const IDEAS: IdeaPost[] = [
     {
       avatar: "",
@@ -32,22 +34,35 @@ const IdeasList: FC = () => {
     }
   ];
 
+  const handleIdeaClick = (index: number) => {
+    router.push(`/ideas/${index}`);
+  };
+
   return (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-2xl font-bold text-gray-800">最新想法</h3>
-        <button 
+        <Button
           className="text-base text-primary-base hover:text-primary-darker transition-colors"
-          onClick={() => router.push('/ideas')}>
+          onClick={() => router.push('/ideas')}
+        >
           查看全部
-        </button>
+        </Button>
       </div>
-      
+
       {IDEAS.map((idea, index) => (
-        <div 
-          key={index} 
-          className={`border rounded-lg p-4 hover:shadow-md transition-all bg-white cursor-pointer ${index > 0 ? 'mt-4' : ''}`}
-          onClick={() => router.push(`/ideas/${index}`)} // 假設有一個動態路由
+        <div
+          key={uniqueId}
+          className={`border rounded-lg p-4 hover:shadow-md transition-all bg-white ${index > 0 ? 'mt-4' : ''}`}
+          role="button"
+          tabIndex={0}
+          onClick={() => handleIdeaClick(index)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleIdeaClick(index);
+            }
+          }}
+          aria-label={`閱讀想法：${idea.title}`}
         >
           <div className="flex">
             <div className="w-10 h-10 rounded-full flex items-center justify-center mr-3 text-sm bg-primary-palest text-primary-base">

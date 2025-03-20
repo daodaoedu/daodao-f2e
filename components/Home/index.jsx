@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { GoArrowUpRight, GoCheckCircle, GoRocket, GoPeople, GoGraph, GoBook, GoHeart, GoFlame, GoStar } from 'react-icons/go';
-import { FiSearch, FiArrowRight } from 'react-icons/fi';
+import { FiArrowRight } from 'react-icons/fi';
 
 function Home() {
   const router = useRouter();

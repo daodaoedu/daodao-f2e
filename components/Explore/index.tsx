@@ -1,7 +1,8 @@
 import React, { useState, useEffect, FC } from 'react';
 import { useRouter } from 'next/router';
-// SubNavWithSearch 已移除
+import dynamic from 'next/dynamic';
 import styles from '@/styles/explore.module.css';
+import Button from '@/shared/components/Button';
 
 // 導入所有子組件
 import {
@@ -15,13 +16,18 @@ import {
   PartnersContent
 } from './components';
 
+// 動態導入項目詳情頁組件
+const DynamicProjectDetail = dynamic(() => import('@/pages/projects/detail'), {
+  loading: () => <div>正在載入學習計畫詳情...</div>
+});
+
 // 配色方案
 export const colors = {
-  primary: '#16B9B3',     // primary.base
-  secondary: '#FF9526',   // tips
-  accent: '#86C84A',      // success
-  dark: '#293A3D',        // basic.500
-  light: '#F3FCFC',       // primary.palest
+  primary: '#16B9B3', // primary.base
+  secondary: '#FF9526', // tips
+  accent: '#86C84A', // success
+  dark: '#293A3D', // basic.500
+  light: '#F3FCFC', // primary.palest
 };
 
 const ExplorePage: FC = () => {
@@ -47,7 +53,7 @@ const ExplorePage: FC = () => {
         setSelectedCategory(null);
         setSelectedProjectId(null);
       }
-      
+
       // 如果有 tab 參數，設置子頁籤
       if (tab) {
         setSubTab(tab as string);
@@ -57,7 +63,7 @@ const ExplorePage: FC = () => {
 
   const handleCategorySelect = (path: string) => {
     console.log('handleCategorySelect called with path:', path);
-    
+
     // 防止事件沖突，使用非同步執行
     setTimeout(() => {
       // 更新狀態
@@ -116,7 +122,7 @@ const ExplorePage: FC = () => {
   const handleSubTabChange = (tab: string) => {
     console.log('handleSubTabChange called with tab:', tab);
     setSubTab(tab);
-    
+
     // 更新URL
     router.push({
       pathname: '/explore',
@@ -135,10 +141,9 @@ const ExplorePage: FC = () => {
           // 新的探索首頁設計
           <div className="container mx-auto px-4 py-8">
             <ExploreBanner />
-            <SubTabs 
-              activeTab={subTab} 
-              onTabChange={handleSubTabChange} 
-              onCategorySelect={handleCategorySelect}
+            <SubTabs
+              activeTab={subTab}
+              onTabChange={handleSubTabChange}
             />
             {/* 根據選中的標籤顯示不同內容 */}
             <div className="mt-8">
@@ -150,19 +155,19 @@ const ExplorePage: FC = () => {
                   </div>
                 </div>
               )}
-              
+
               {subTab === 'paths' && (
                 <div>
                   <LearningPathList />
                 </div>
               )}
-              
+
               {subTab === 'ideas' && (
                 <div>
                   <IdeasList />
                 </div>
               )}
-              
+
               {subTab === 'following' && (
                 <div>
                   <p className="text-gray-600">您關注的內容將在這裡顯示</p>
@@ -175,8 +180,7 @@ const ExplorePage: FC = () => {
           <div className="container mx-auto px-4 py-8">
             {/* 添加返回按鈕 */}
             <div className="mb-6">
-              <button
-                type="button"
+              <Button
                 onClick={selectedCategory === '/project-detail' ?
                   () => handleCategorySelect('/projects') : backToExplore}
                 className="flex items-center text-primary-base hover:underline"
@@ -185,7 +189,7 @@ const ExplorePage: FC = () => {
                   <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
                 </svg>
                 {selectedCategory === '/project-detail' ? '返回學習計畫列表' : '返回探索首頁'}
-              </button>
+              </Button>
             </div>
 
             {selectedCategory === '/projects' && (
@@ -197,10 +201,7 @@ const ExplorePage: FC = () => {
                 <h1 className="text-3xl font-bold mb-6">學習計畫詳情</h1>
                 <div className={`${styles['project-detail-container']} ${styles['dynamic-content-container']}`}>
                   {/* 使用動態導入的 ProjectDetailComponent */}
-                  {React.createElement(
-                    require('@/pages/projects/detail').default,
-                    { projectId: selectedProjectId, inExplore: true }
-                  )}
+                  <DynamicProjectDetail projectId={selectedProjectId} inExplore />
                 </div>
               </div>
             )}
