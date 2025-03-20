@@ -20,6 +20,7 @@ const DialogueGuide: React.FC = () => {
   } = useDialogue();
 
   const [userInput, setUserInput] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
   // 模擬 AI 回覆生成邏輯
@@ -36,39 +37,63 @@ const DialogueGuide: React.FC = () => {
 
   // 處理用戶輸入
   const handleSubmit = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+    // 防止重複提交
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
-    if (!userInput.trim()) return;
+    // 如果正在提交或沒有輸入則返回
+    if (isSubmitting || !userInput.trim()) return;
+    
+    // 設置提交中狀態
+    setIsSubmitting(true);
+    
+    const currentInput = userInput.trim();
+    
+    // 先清空輸入框，避免連續提交
+    setUserInput('');
 
     // 添加用戶消息
     addMessage({
-      content: userInput,
+      content: currentInput,
       sender: 'user'
     });
 
     // 生成 AI 回覆
-    const response = generateAIResponse(userInput);
+    const response = generateAIResponse(currentInput);
 
-    // 添加 AI 消息
-    addMessage({
-      content: response,
-      sender: 'ai',
-      style: dialogueStyle
-    });
-
-    // 清空輸入
-    setUserInput('');
+    // 使用 setTimeout 稍微延遲 AI 回覆，模擬真實對話
+    setTimeout(() => {
+      addMessage({
+        content: response,
+        sender: 'ai',
+        style: dialogueStyle
+      });
+      
+      // 重設提交狀態
+      setIsSubmitting(false);
+    }, 500);
   };
 
-  // 自動滾動到底部
+  // 更溫和的自動滾動實現
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    // 只有當有新消息時才滾動
+    if (messages.length > 0) {
+      // 用 setTimeout 延遲滾動，避免干擾用戶體驗
+      const timer = setTimeout(() => {
+        // 只滾動到可見範圍，不強制置頂
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [messages.length]);
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-md border border-gray-200">
+    <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden flex flex-col" style={{ height: '650px' }}>
       {/* 對話風格選擇區 */}
-      <div className="flex justify-center space-x-2 p-4 border-b">
+      <div className="flex justify-center space-x-2 p-4 bg-primary-lightest border-b border-primary-lightest">
         {Object.entries(STYLE_MAP).map(([style, { label, color }]) => (
           <button
             type="button"
@@ -87,7 +112,7 @@ const DialogueGuide: React.FC = () => {
       </div>
 
       {/* 對話區域 */}
-      <div className="h-[600px] overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-basic-100">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -96,16 +121,27 @@ const DialogueGuide: React.FC = () => {
               msg.sender === 'user' ? 'justify-end' : 'justify-start'
             )}
           >
+            {msg.sender === 'ai' && (
+              <div className="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-r from-primary-base to-primary-darker flex items-center justify-center text-white mr-2 self-end shadow-sm">
+                AI
+              </div>
+            )}
             <div
               className={cn(
-                "max-w-[70%] p-3 rounded-lg text-sm",
+                "max-w-[70%] p-3 rounded-lg text-sm shadow-sm",
                 msg.sender === 'user'
-                  ? 'bg-primary-100 text-primary-base'
-                  : 'bg-gray-100 text-gray-700'
+                  ? 'bg-primary-base text-white font-medium ml-auto rounded-tr-none'
+                  : 'bg-white text-basic-500 border border-basic-200 rounded-tl-none'
               )}
             >
               {msg.content}
             </div>
+            
+            {msg.sender === 'user' && (
+              <div className="w-8 h-8 flex-shrink-0 rounded-full bg-basic-500 flex items-center justify-center text-white ml-2 self-end shadow-sm">
+                <span className="text-xs">你</span>
+              </div>
+            )}
           </div>
         ))}
         <div ref={messagesEndRef} />
@@ -114,22 +150,21 @@ const DialogueGuide: React.FC = () => {
       {/* 輸入區域 */}
       <form
         onSubmit={handleSubmit}
-        className="p-4 border-t flex items-center space-x-2"
+        className="p-4 border-t border-basic-200 flex items-center space-x-2 bg-white flex-shrink-0"
       >
         <input
           type="text"
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
           placeholder="在此輸入你的想法..."
-          className="flex-grow p-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-base"
+          className="flex-grow p-3 bg-basic-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary-base shadow-sm border-none"
         />
-        <IconButton
+        <button
           type="submit"
-          color="primary"
-          size="small"
+          className="p-2 rounded-full bg-primary-base text-white hover:bg-primary-darker transition-colors"
         >
-          <SendIcon />
-        </IconButton>
+          <SendIcon fontSize="small" />
+        </button>
       </form>
     </div>
   );
