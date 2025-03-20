@@ -130,6 +130,14 @@ const Header = () => {
       label: '新增資源',
       onClick: () => toast.error('功能尚未開放'),
     },
+    {
+      label: '個人檔案',
+      onClick: () => router.push('/personal-card/my-card'),
+    },
+    {
+      label: '管理個人名片',
+      onClick: () => router.push('/manage/business-card'),
+    },
   ];
 
   const dropdownItems = [

@@ -34,8 +34,12 @@ export const getManageSidebarItems = ({
       href: '/manage/projects',
     },
     {
-      label: '個人名片',
+      label: '個人檔案',
       href: '/personal-card/my-card',
+    },
+    {
+      label: '個人名片',
+      href: '/manage/business-card',
     },
     {
       label: '百寶箱',
@@ -56,6 +60,18 @@ export const getManageSidebarItems = ({
           isDisabled: true,
         },
       ],
+    },
+    {
+      label: '人脈資源庫',
+      href: '/manage/people-resources',
+    },
+    {
+      label: '學習資源庫',
+      href: '/manage/learning-resources',
+    },
+    {
+      label: 'AI引導師',
+      href: '/manage/ai-dialogue',
     },
   ];
 
