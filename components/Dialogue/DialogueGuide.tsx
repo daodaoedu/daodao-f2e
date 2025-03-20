@@ -23,15 +23,19 @@ const DialogueGuide: React.FC = () => {
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
   // 模擬 AI 回覆生成邏輯
-  const generateAIResponse = (userMessage: string) => {
-    const styleResponses = {
-      encouraging: `很棒的觀點！讓我們一起深入探索 "${userMessage}"。`,
-      analytical: `讓我們系統性地分析 "${userMessage}" 的各個面向。`,
-      challenging: `你確定 "${userMessage}" 就是問題的核心嗎？`,
-      supportive: `我理解你在 "${userMessage}" 中遇到的困難，我們可以一起找解決方案。`
-    };
-
-    return styleResponses[dialogueStyle];
+  const generateAIResponse = (userMessage: string): string => {
+    switch (dialogueStyle) {
+      case 'encouraging':
+        return `很棒的觀點！讓我們一起深入探索 "${userMessage}"。`;
+      case 'analytical':
+        return `讓我們系統性地分析 "${userMessage}" 的各個面向。`;
+      case 'challenging':
+        return `你確定 "${userMessage}" 就是問題的核心嗎？`;
+      case 'supportive':
+        return `我理解你在 "${userMessage}" 中遇到的困難，我們可以一起找解決方案。`;
+      default:
+        return `讓我們來探討 "${userMessage}"。`;
+    }
   };
 
   // 處理用戶輸入
@@ -77,16 +81,18 @@ const DialogueGuide: React.FC = () => {
 
   // 更溫和的自動滾動實現
   useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
     // 只有當有新消息時才滾動
     if (messages.length > 0) {
       // 用 setTimeout 延遲滾動，避免干擾用戶體驗
-      const timer = setTimeout(() => {
+      timer = setTimeout(() => {
         // 只滾動到可見範圍，不強制置頂
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
       }, 100);
-
-      return () => clearTimeout(timer);
     }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [messages.length]);
 
   return (
