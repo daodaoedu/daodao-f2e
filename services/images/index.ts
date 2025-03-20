@@ -1,16 +1,16 @@
 import { z } from 'zod';
-import { HttpError, mutations, RequestContentType } from '../httpClient';
+import { HttpError, mutations, RequestContentType } from '../core';
 
 export const imagesEndpoint = '/images';
 
 const getImageEndpoint = (id?: string) =>
   id ? `${imagesEndpoint}/${id}` : imagesEndpoint;
 
-const uploadImageSchema = z.object({
+export const uploadImageSchemaV1 = z.object({
   file: z.instanceof(File),
 });
 
-export type UploadImageRequest = z.infer<typeof uploadImageSchema>;
+export type UploadImageRequest = z.infer<typeof uploadImageSchemaV1>;
 
 export const uploadImage = (request: UploadImageRequest) => {
   const imageType = /image.*/;
@@ -44,11 +44,11 @@ export const updateImage = async (
   return imgUrls;
 };
 
-const deleteImageSchema = z.object({
+export const deleteImageSchemaV1 = z.object({
   id: z.string(),
 });
 
-export type DeleteImageRequest = z.infer<typeof deleteImageSchema>;
+export type DeleteImageRequest = z.infer<typeof deleteImageSchemaV1>;
 
 export const deleteImage = (request: DeleteImageRequest) => {
   return mutations.delete(getImageEndpoint(request.id));

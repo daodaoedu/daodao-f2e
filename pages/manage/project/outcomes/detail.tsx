@@ -3,7 +3,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import OutcomeDetail from '@/components/Outcome/Detail';
 import getProjectLayout from '@/layout/ProjectLayout';
-import { useProject, useProjectOutcome } from '@/hooks/api/project';
+import {
+  useProject,
+  useProjectOutcome,
+  useProjectOutcomeMutation,
+} from '@/services/modules/projects';
+import { parseParamsToNumber } from '@/services/core';
 import ConfirmModal from '@/shared/components/Confirm';
 import EditModal from '@/components/Outcome/Modals/UpdateModal';
 
@@ -15,15 +20,16 @@ enum ModalTypeEnum {
 const OutcomeDetailPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('id') ?? undefined;
-  const outcomeId = parseInt(searchParams.get('outcomeId') ?? '0', 10);
+  const projectId = searchParams.get('id');
+  const outcomeId = parseParamsToNumber(searchParams.get('outcomeId'));
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const { data: project } = useProject({ id: projectId });
-  const {
-    data: outcome,
-    update: updateOutcome,
-    remove: removeOutcome,
-  } = useProjectOutcome({
+  const { data: project } = useProject(projectId);
+  const { data: outcome } = useProjectOutcome({
+    projectId,
+    outcomeId,
+  });
+
+  const { updateMutation, deleteMutation } = useProjectOutcomeMutation({
     projectId,
     outcomeId,
     onUpdated: () => {
@@ -36,7 +42,7 @@ const OutcomeDetailPage = () => {
     },
   });
 
-  if (!projectId || !outcomeId) {
+  if (!projectId || outcomeId == null) {
     return null;
   }
 
@@ -59,8 +65,8 @@ const OutcomeDetailPage = () => {
           createdAt={outcome.date}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
-          onSubmit={updateOutcome.trigger}
-          isLoading={updateOutcome.isMutating}
+          onSubmit={updateMutation.trigger}
+          isLoading={updateMutation.isMutating}
         />
       )}
 
@@ -70,8 +76,8 @@ const OutcomeDetailPage = () => {
         confirmColor="alert"
         isOpen={modalType === ModalTypeEnum.Delete}
         onClose={() => setModalType(null)}
-        onConfirm={() => removeOutcome.trigger({ projectId, outcomeId })}
-        isLoading={removeOutcome.isMutating}
+        onConfirm={() => deleteMutation.trigger({ projectId, outcomeId })}
+        isLoading={deleteMutation.isMutating}
       />
     </div>
   );

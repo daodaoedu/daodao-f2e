@@ -11,7 +11,6 @@ import { PiCalendarBlankBold } from 'react-icons/pi';
 import marathonConfig from '@/constants/marathon';
 import getManageLayout from '@/layout/ManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
-import { useProjectReviewList, useProjectList } from '@/hooks/api/project';
 import SEOConfig from '@/shared/components/SEO';
 import AccessDenied from '@/shared/components/AccessDenied';
 import Button from '@/shared/components/Button';
@@ -22,7 +21,19 @@ import MilestoneItem from '@/components/Milestones/MilestoneItem';
 import { RoleEnum, useAuth } from '@/contexts/Auth';
 import { MilestonesProvider } from '@/contexts/Milestones';
 import { ProjectProvider } from '@/contexts/Project';
+import { SelectProjectModal } from '@/features/projects';
 import { cn } from '@/utils/cn';
+import ReviewForm from '@/components/Review/Form';
+import NoteForm from '@/components/Note/Form';
+import OutcomeForm from '@/components/Outcome/Form';
+import {
+  useMyProjects,
+  useProjectMilestoneMutation,
+  useProjectNoteMutation,
+  useProjectOutcomeMutation,
+  useProjectReviewMutation,
+  useProjectReviews,
+} from '@/services/modules/projects';
 
 const HEADER_TITLES = [
   '今天的每一小步，都在建立你的學習動能！',
@@ -47,8 +58,33 @@ const HEADER_TITLES = [
   '你正在建立受用一生的能力！',
 ];
 
+enum ModalType {
+  Task,
+  Review,
+  Note,
+  Outcome,
+}
+
 const Header = () => {
   const router = useRouter();
+  const [modalType, setModalType] = useState<ModalType | null>(null);
+  const [projectId, setProjectId] = useState<string | undefined>();
+  const handleCreated = () => {
+    toast.success('新增成功');
+    setModalType(null);
+  };
+  const { createMutation: createReview } = useProjectReviewMutation({
+    projectId,
+    onCreated: handleCreated,
+  });
+  const { createMutation: createNote } = useProjectNoteMutation({
+    projectId,
+    onCreated: handleCreated,
+  });
+  const { createMutation: createOutcome } = useProjectOutcomeMutation({
+    projectId,
+    onCreated: handleCreated,
+  });
   // const { data } = useProjectList({ isMe: true });
   // const maxProjects = 3;
 
@@ -73,15 +109,15 @@ const Header = () => {
     },
     {
       label: '新增覆盤',
-      onClick: () => toast.error('功能尚未開放'),
+      onClick: () => setModalType(ModalType.Review),
     },
     {
       label: '新增便利貼',
-      onClick: () => toast.error('功能尚未開放'),
+      onClick: () => setModalType(ModalType.Note),
     },
     {
       label: '新增成果',
-      onClick: () => toast.error('功能尚未開放'),
+      onClick: () => setModalType(ModalType.Outcome),
     },
   ];
 
@@ -151,6 +187,42 @@ const Header = () => {
           ))}
         </Dropdown.List>
       </Dropdown>
+      <SelectProjectModal
+        isOpen={modalType !== null}
+        onClose={() => setModalType(null)}
+        onSelect={setProjectId}
+        renderContent={(project) => (
+          <>
+            {modalType === ModalType.Review && (
+              <ReviewForm
+                projectId={project.id}
+                projectTitle={project.title}
+                week={marathonConfig.getWeekNumber()}
+                onSubmit={createReview.trigger}
+                isLoading={createReview.isMutating}
+              />
+            )}
+            {modalType === ModalType.Note && (
+              <NoteForm
+                projectId={project.id}
+                projectTitle={project.title}
+                week={marathonConfig.getWeekNumber()}
+                onSubmit={createNote.trigger}
+                isLoading={createNote.isMutating}
+              />
+            )}
+            {modalType === ModalType.Outcome && (
+              <OutcomeForm
+                projectId={project.id}
+                projectTitle={project.title}
+                week={marathonConfig.getWeekNumber()}
+                onSubmit={createOutcome.trigger}
+                isLoading={createOutcome.isMutating}
+              />
+            )}
+          </>
+        )}
+      />
     </div>
   );
 };
@@ -275,13 +347,11 @@ const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
 };
 
 const Main = ({ date }: { date: Dayjs }) => {
-  const {
-    data: projects,
-    mutate,
-    milestoneMutations,
-  } = useProjectList({ isMe: true });
+  const { data: projects, mutate } = useMyProjects();
 
-  const { data: reviews } = useProjectReviewList(projects?.[0]?.id);
+  const { updateMutation } = useProjectMilestoneMutation();
+
+  const { data: reviews } = useProjectReviews(projects?.[0]?.id);
 
   const currentProjects = useMemo(() => {
     if (!Array.isArray(projects)) return [];
@@ -324,7 +394,7 @@ const Main = ({ date }: { date: Dayjs }) => {
                       milestones={project.originalMilestones}
                       projectId={project.id}
                       onRefreshData={mutate}
-                      onUpdate={milestoneMutations.update.trigger}
+                      onUpdate={updateMutation.trigger}
                       isEditable
                     />
                   </div>
@@ -336,7 +406,7 @@ const Main = ({ date }: { date: Dayjs }) => {
 
       <ul>
         {currentReviews.map((review) => (
-          <li key={review.id}>
+          <li key={review.id} className="mb-5">
             <ReviewCard
               data={review}
               detailLink="/manage/project/review/detail?id=1"

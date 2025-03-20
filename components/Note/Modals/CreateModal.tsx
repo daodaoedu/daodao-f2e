@@ -1,5 +1,5 @@
 import Modal from '@/shared/components/Modal';
-import { CreateProjectNoteRequest } from '@/services/projects/notes';
+import { CreateProjectNoteSchema } from '@/services/modules/projects';
 import marathonConfig from '@/constants/marathon';
 import NoteForm from '../Form';
 
@@ -9,7 +9,7 @@ interface CreateModalProps {
   projectId: string;
   projectTitle: string;
   isLoading: boolean;
-  onSubmit: (data: CreateProjectNoteRequest) => void;
+  onSubmit: (data: CreateProjectNoteSchema) => void;
 }
 
 function CreateModal({

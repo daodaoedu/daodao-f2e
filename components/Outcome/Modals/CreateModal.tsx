@@ -1,5 +1,5 @@
 import Modal from '@/shared/components/Modal';
-import { CreateProjectOutcomeRequest } from '@/services/projects/outcomes';
+import { CreateProjectOutcomeSchema } from '@/services/modules/projects';
 import marathonConfig from '@/constants/marathon';
 import OutcomeForm from '../Form';
 
@@ -9,7 +9,7 @@ interface CreateModalProps {
   projectId: string;
   projectTitle: string;
   isLoading: boolean;
-  onSubmit: (data: CreateProjectOutcomeRequest) => void;
+  onSubmit: (data: CreateProjectOutcomeSchema) => void;
 }
 
 function CreateModal({

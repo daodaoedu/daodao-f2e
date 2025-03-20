@@ -31,14 +31,15 @@ export const processPayment = (
     // 模擬網絡延遲
     setTimeout(() => {
       // 模擬驗證邏輯：假設只有特定卡號後四碼為刻意失敗的測試案例
-      const cardLastFour = paymentData.cardNumber.replace(/\s/g, '').slice(-4);
+      const cardNumber = paymentData.cardNumber.replace(/\s/g, '');
+      const isValidCard = luhnCheck(cardNumber); // Implement or use a library for Luhn check
 
-      // 假設卡號以 0000 結尾的會支付失敗
-      if (cardLastFour === '0000') {
+      if (!isValidCard) {
         resolve({
           success: false,
-          message: '支付失敗：信用卡授權被拒',
+          message: '支付失敗：信用卡號碼無效',
         });
+      } else if (cardLastFour === '0000') {
       } else {
         // 生成假的交易 ID
         const transactionId = `TXN${Math.random().toString(36).substring(2, 10).toUpperCase()}`;

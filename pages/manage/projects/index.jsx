@@ -8,7 +8,7 @@ import GoBackButton
   from '@/components/Projects/GoBackButton';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
-import { useProjectList } from '@/hooks/api/project';
+import { useMyProjects } from '@/services/modules/projects';
 import More from '@/components/Projects/More';
 import Button from '@/shared/components/Button';
 import { cn } from '@/utils/cn';
@@ -18,7 +18,7 @@ const Projects = () => {
   const maxProjects = 3;
   const router = useRouter();
   const { user } = useAuth();
-  const { data } = useProjectList({ isMe: true });
+  const { data } = useMyProjects();
   const projects = Array.isArray(data) ? data : [];
   const isAddedDenied = projects.length >= maxProjects;
   const isEditPermitted = useMemo(() => {

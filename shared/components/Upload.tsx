@@ -1,23 +1,34 @@
+import toast from 'react-hot-toast';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { uploadImagesSchema } from '@/services/modules/images';
 import Button, { ButtonProps } from './Button';
+
+export interface ImageDataType {
+  id: string;
+  file?: File;
+  url: string;
+}
 
 interface UploadProps extends Omit<ButtonProps<'button'>, 'onChange' | 'as'> {
   accept?: string;
   children?: React.ReactNode;
-  validate?: (file: File[]) => boolean | Promise<boolean>;
-  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  maxCount?: number;
+  multiple?: boolean;
+  validate?: typeof uploadImagesSchema;
+  onChange?: (files: ImageDataType[], e: ChangeEvent<HTMLInputElement>) => void;
   onFilesChange?: (files: File[]) => void;
-  onPreviewChange?: (previewList: string[]) => void;
+  onPreviewsChange?: (previewList: string[]) => void;
 }
 
 function Upload({
   accept = 'image/*',
   children,
-  validate,
+  multiple = false,
+  validate = uploadImagesSchema,
   onChange,
   onClick,
   onFilesChange,
-  onPreviewChange,
+  onPreviewsChange,
   ...props
 }: UploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -25,18 +36,24 @@ function Upload({
 
   const handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
+    const parsed = validate.safeParse({ files });
 
-    if (validate) {
-      const isValid = await validate(files);
-
-      if (!isValid) return;
+    if (parsed.error) {
+      toast.error(parsed.error.issues[0].message);
+      return;
     }
-
     const objectUrls = files.map(URL.createObjectURL);
 
-    onChange?.(e);
+    onChange?.(
+      files.map((file, index) => ({
+        file,
+        url: objectUrls[index],
+        id: crypto.randomUUID(),
+      })),
+      e
+    );
     onFilesChange?.(files);
-    onPreviewChange?.(objectUrls);
+    onPreviewsChange?.(objectUrls);
     setUrls(objectUrls);
   };
 
@@ -58,6 +75,7 @@ function Upload({
         type="file"
         className="hidden"
         accept={accept}
+        multiple={multiple}
         onChange={handleChange}
       />
       <Button

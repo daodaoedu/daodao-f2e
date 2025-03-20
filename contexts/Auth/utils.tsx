@@ -5,8 +5,14 @@ import {
   LOGIN_TYPE,
 } from '@/utils/env';
 import { getDevOriginStorage, getTokenStorage } from '@/utils/storage';
+import { LoginMessageEvent, LoginStatus } from './type';
 
-export const sendLoginEvent = (token: string) => {
+/**
+ * 發送登入事件
+ * @param token 登入 token
+ * @returns 是否發送登入事件到 opener 頁面
+ */
+export const sendLoginEvent = async (token: string) => {
   getTokenStorage().remove();
 
   try {
@@ -31,7 +37,7 @@ export const sendLoginEvent = (token: string) => {
 
       if (isDevHost && origin) {
         getDevOriginStorage().remove();
-        window.location.href = `${origin}/auth/google?token=${token}`;
+        window.location.href = `${origin}/auth/callback?token=${token}`;
       }
       return true;
     }
@@ -39,6 +45,47 @@ export const sendLoginEvent = (token: string) => {
   }
 };
 
+/**
+ * 註冊登入事件
+ * @param loginStatus 登入狀態
+ * @param callback 登入事件回調
+ * @returns 註銷登入事件
+ */
+export const registerLoginListener = (
+  loginStatus: LoginStatus,
+  callback: (token: string) => void
+) => {
+  const receiveMessage = (event: LoginMessageEvent) => {
+    if (event.origin !== window.location.origin) {
+      return;
+    }
+    if (event.data.type === LOGIN_TYPE) {
+      const { token } = event.data.payload;
+
+      if (token) callback(token);
+    }
+  };
+
+  const unregisterLoginListener = () => {
+    window.removeEventListener('message', receiveMessage, false);
+  };
+
+  const token = getTokenStorage().get();
+
+  if (token) callback(token);
+
+  if (loginStatus === LoginStatus.PERMANENT) {
+    unregisterLoginListener();
+  } else {
+    window.addEventListener('message', receiveMessage, false);
+  }
+
+  return unregisterLoginListener;
+};
+
+/**
+ * 主要是針對開發環境使用的，重定向到登入頁面
+ */
 export const redirectToAuth = () => {
   const isDevHost = checkIsDevHost();
   const frontendUrl = getFrontendUrl();

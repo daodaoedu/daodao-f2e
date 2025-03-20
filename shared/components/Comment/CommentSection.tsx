@@ -1,6 +1,5 @@
 import Comment from '@/public/assets/icons/comment.svg';
-import { useCommentList } from '@/hooks/api/comment';
-import { CommentType } from '@/services/comments';
+import { useComments, CommentType } from '@/services/modules/comments';
 import CommentInput from './CommentInput';
 import CommentCard from './CommentCard';
 
@@ -12,10 +11,10 @@ interface CommentSectionProps {
 function CommentSection({ targetId, targetType }: CommentSectionProps) {
   const {
     data: comments,
-    create: createComment,
-    update: updateComment,
-    remove: removeComment,
-  } = useCommentList({
+    createMutation,
+    updateMutation,
+    deleteMutation,
+  } = useComments({
     targetType,
     targetId,
   });
@@ -24,7 +23,7 @@ function CommentSection({ targetId, targetType }: CommentSectionProps) {
     <>
       <CommentInput
         className="px-4 pb-4 pt-6"
-        onSubmit={createComment.trigger}
+        onSubmit={createMutation.trigger}
       />
       {Array.isArray(comments) && comments.length > 0 && (
         <>
@@ -37,9 +36,9 @@ function CommentSection({ targetId, targetType }: CommentSectionProps) {
               {comments.map((comment) => (
                 <CommentCard
                   key={comment.id}
-                  onCreate={createComment.trigger}
-                  onUpdate={updateComment.trigger}
-                  onDelete={removeComment.trigger}
+                  onCreate={createMutation.trigger}
+                  onUpdate={updateMutation.trigger}
+                  onDelete={deleteMutation.trigger}
                   {...comment}
                 />
               ))}

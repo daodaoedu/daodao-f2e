@@ -3,11 +3,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import PostCard from '@/shared/components/Post/PostCard';
 import {
-  CreateProjectReviewRequest,
+  CreateProjectReviewSchema,
   createProjectReviewSchema,
-  UpdateProjectReviewRequest,
+  UpdateProjectReviewSchema,
   updateProjectReviewSchema,
-} from '@/services/projects/reviews';
+} from '@/services/modules/projects';
 import Button from '@/shared/components/Button';
 import Form from '@/shared/components/Form';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
@@ -21,13 +21,13 @@ interface BaseReviewFormProps {
   week: number;
   createdAt?: string;
   isLoading: boolean;
-  defaultValues?: UpdateProjectReviewRequest;
+  defaultValues?: UpdateProjectReviewSchema;
 }
 
 type ReviewFormProps = BaseReviewFormProps &
   (
-    | { id: number; onSubmit: (data: UpdateProjectReviewRequest) => void }
-    | { id?: never; onSubmit: (data: CreateProjectReviewRequest) => void }
+    | { id: number; onSubmit: (data: UpdateProjectReviewSchema) => void }
+    | { id?: never; onSubmit: (data: CreateProjectReviewSchema) => void }
   );
 
 function ReviewForm({
@@ -42,8 +42,8 @@ function ReviewForm({
 }: ReviewFormProps) {
   const methods = useForm<
     typeof id extends never
-      ? CreateProjectReviewRequest
-      : UpdateProjectReviewRequest
+      ? CreateProjectReviewSchema
+      : UpdateProjectReviewSchema
   >({
     resolver: zodResolver(
       id ? updateProjectReviewSchema : createProjectReviewSchema

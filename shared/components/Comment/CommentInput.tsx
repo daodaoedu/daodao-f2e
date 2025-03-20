@@ -3,8 +3,8 @@ import { MdLockOpen, MdLockOutline } from 'react-icons/md';
 import Image from '@/shared/components/Image';
 import { ROLE } from '@/constants/member';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
-import { CommentVisibility } from '@/services/comments';
 import { cn } from '@/utils/cn';
+import { CommentVisibility } from '@/services/modules/comments';
 import Button from '../Button';
 import Textarea from '../Textarea';
 
