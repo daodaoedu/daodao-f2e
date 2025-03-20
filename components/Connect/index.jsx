@@ -67,102 +67,105 @@ function Connect() {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto bg-white rounded-lg shadow p-4">
-      {/* 子導航標籤 */}
-      <div className="flex space-x-4 border-b mb-6">
-        <button 
-          className={`px-3 py-2 ${connectTab === 'circles' ? 'border-b-2 font-medium' : ''}`}
-          style={{ 
-            borderColor: connectTab === 'circles' ? colors.primary : 'transparent',
-            color: connectTab === 'circles' ? colors.primary : 'rgb(75, 85, 99)'
-          }}
-          onClick={() => setConnectTab('circles')}
-        >
-          圈組 Circles
-        </button>
-        <button 
-          className={`px-3 py-2 ${connectTab === 'events' ? 'border-b-2 font-medium' : ''}`}
-          style={{ 
-            borderColor: connectTab === 'events' ? colors.primary : 'transparent',
-            color: connectTab === 'events' ? colors.primary : 'rgb(75, 85, 99)'
-          }}
-          onClick={() => setConnectTab('events')}
-        >
-          活動 Events
-        </button>
+    <>
+      <h1 className="text-2xl font-bold mb-6 text-center">連結社群</h1>
+      <div className="bg-white rounded-lg shadow p-4">
+        {/* 子導航標籤 */}
+        <div className="flex space-x-4 border-b mb-6">
+          <button 
+            className={`px-3 py-2 ${connectTab === 'circles' ? 'border-b-2 font-medium' : ''}`}
+            style={{ 
+              borderColor: connectTab === 'circles' ? colors.primary : 'transparent',
+              color: connectTab === 'circles' ? colors.primary : 'rgb(75, 85, 99)'
+            }}
+            onClick={() => setConnectTab('circles')}
+          >
+            圈組 Circles
+          </button>
+          <button 
+            className={`px-3 py-2 ${connectTab === 'events' ? 'border-b-2 font-medium' : ''}`}
+            style={{ 
+              borderColor: connectTab === 'events' ? colors.primary : 'transparent',
+              color: connectTab === 'events' ? colors.primary : 'rgb(75, 85, 99)'
+            }}
+            onClick={() => setConnectTab('events')}
+          >
+            活動 Events
+          </button>
+        </div>
+        
+        {connectTab === 'circles' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {LEARNING_CIRCLES.map((circle, index) => (
+              <div key={index} className="border rounded-lg overflow-hidden hover:shadow-md transition-all">
+                <div className="h-24 relative" style={{ background: circle.color }}>
+                  <div className="absolute bottom-0 left-0 w-full p-3 text-white font-bold">
+                    {circle.title}
+                  </div>
+                </div>
+                <div className="p-4">
+                  <div className="flex justify-between text-sm mb-3">
+                    <span>{circle.members} 成員</span>
+                    <span style={{ color: circle.activityColor }}>{circle.activity}活躍度</span>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-4">
+                    {circle.description}
+                  </p>
+                  <button className="w-full py-2 rounded-md text-sm" 
+                          style={{ backgroundColor: `${colors.primary}15`, color: colors.primary }}
+                          onClick={() => router.push('/group')}>
+                    加入圈組
+                  </button>
+                </div>
+              </div>
+            ))}
+            
+            <div className="border border-dashed rounded-lg p-4 flex flex-col items-center justify-center">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mb-2"
+                  style={{ backgroundColor: colors.light + '30', color: colors.primary }}>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+              </div>
+              <p className="font-bold mb-1">創建新圈組</p>
+              <p className="text-gray-600 text-sm text-center">
+                圍繞任何主題開始您自己的學習社群
+              </p>
+            </div>
+          </div>
+        )}
+        
+        {connectTab === 'events' && (
+          <div className="space-y-4">
+            {RECENT_EVENTS.map((event, index) => (
+              <div key={index} className="border rounded-lg p-4 flex items-center">
+                <div className="p-2 rounded mr-4 text-center" 
+                    style={{ backgroundColor: `${colors.primary}15` }}>
+                  <div className="text-xs" style={{ color: colors.primary }}>{event.date.split('/')[1]}月</div>
+                  <div className="text-lg font-bold" style={{ color: colors.primary }}>{event.date.split('/')[2]}</div>
+                </div>
+                <div className="flex-grow">
+                  <h4 className="font-bold mb-1">{event.title}</h4>
+                  <p className="text-xs text-gray-500">{event.time} • {event.type}</p>
+                </div>
+                <button className="px-3 py-1 rounded border text-sm"
+                        onClick={() => router.push('/activities')}>報名</button>
+              </div>
+            ))}
+            
+            <div className="text-center mt-6">
+              <button 
+                className="px-4 py-2 rounded-lg text-white"
+                style={{ backgroundColor: colors.primary }}
+                onClick={() => router.push('/activities/create')}
+              >
+                建立活動
+              </button>
+            </div>
+          </div>
+        )}
       </div>
-      
-      {connectTab === 'circles' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {LEARNING_CIRCLES.map((circle, index) => (
-            <div key={index} className="border rounded-lg overflow-hidden hover:shadow-md transition-all">
-              <div className="h-24 relative" style={{ background: circle.color }}>
-                <div className="absolute bottom-0 left-0 w-full p-3 text-white font-bold">
-                  {circle.title}
-                </div>
-              </div>
-              <div className="p-4">
-                <div className="flex justify-between text-sm mb-3">
-                  <span>{circle.members} 成員</span>
-                  <span style={{ color: circle.activityColor }}>{circle.activity}活躍度</span>
-                </div>
-                <p className="text-gray-600 text-sm mb-4">
-                  {circle.description}
-                </p>
-                <button className="w-full py-2 rounded-md text-sm" 
-                        style={{ backgroundColor: `${colors.primary}15`, color: colors.primary }}
-                        onClick={() => router.push('/group')}>
-                  加入圈組
-                </button>
-              </div>
-            </div>
-          ))}
-          
-          <div className="border border-dashed rounded-lg p-4 flex flex-col items-center justify-center">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center mb-2"
-                style={{ backgroundColor: colors.light + '30', color: colors.primary }}>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-            </div>
-            <p className="font-bold mb-1">創建新圈組</p>
-            <p className="text-gray-600 text-sm text-center">
-              圍繞任何主題開始您自己的學習社群
-            </p>
-          </div>
-        </div>
-      )}
-      
-      {connectTab === 'events' && (
-        <div className="space-y-4">
-          {RECENT_EVENTS.map((event, index) => (
-            <div key={index} className="border rounded-lg p-4 flex items-center">
-              <div className="p-2 rounded mr-4 text-center" 
-                  style={{ backgroundColor: `${colors.primary}15` }}>
-                <div className="text-xs" style={{ color: colors.primary }}>{event.date.split('/')[1]}月</div>
-                <div className="text-lg font-bold" style={{ color: colors.primary }}>{event.date.split('/')[2]}</div>
-              </div>
-              <div className="flex-grow">
-                <h4 className="font-bold mb-1">{event.title}</h4>
-                <p className="text-xs text-gray-500">{event.time} • {event.type}</p>
-              </div>
-              <button className="px-3 py-1 rounded border text-sm"
-                      onClick={() => router.push('/activities')}>報名</button>
-            </div>
-          ))}
-          
-          <div className="text-center mt-6">
-            <button 
-              className="px-4 py-2 rounded-lg text-white"
-              style={{ backgroundColor: colors.primary }}
-              onClick={() => router.push('/activities/create')}
-            >
-              建立活動
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
 }
 
