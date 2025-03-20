@@ -136,49 +136,100 @@ export const CATEGORIES = [
 
 export const NAV_LINK = [
   {
-    name: '找資源',
-    link: '/search',
+    name: '探索',
+    link: '/explore',
     target: '_self',
+    section: 'explore',
+    children: [
+      {
+        name: '學習計畫',
+        link: '/projects',
+        target: '_self',
+      },
+      {
+        name: '學習想法',
+        link: '/ideas',
+        target: '_self',
+      },
+      {
+        name: '找資源',
+        link: '/search',
+        target: '_self',
+      },
+      {
+        name: '找夥伴',
+        link: '/partner',
+        target: '_self',
+      },
+    ]
   },
   {
-    name: '找夥伴',
-    link: '/partner',
+    name: '交流',
+    link: '/exchange',
     target: '_self',
+    section: 'exchange',
+    children: [
+      {
+        name: '揪團活動',
+        link: '/group',
+        target: '_self',
+      },
+      {
+        name: '近期活動',
+        link: '/activities',
+        target: '_self',
+      },
+      {
+        name: '加入社群',
+        link: '/join',
+        target: '_self',
+      },
+    ]
+  },
+];
+
+// 探索頁面的子導航選項
+export const EXPLORE_SUBNAV = [
+  {
+    name: '全部',
+    path: '/explore',
   },
   {
-    name: '找揪團',
-    link: '/group',
-    target: '_self',
+    name: '學習計畫',
+    path: '/projects',
   },
   {
-    name: '找想法',
-    link: '/ideas',
-    target: '_self',
+    name: '學習想法',
+    path: '/ideas',
   },
-  // {
-  //   name: '找活動',
-  //   link: '/activities',
-  //   target: '_self',
-  // },
-  // {
-  //   name: '找故事',
-  //   link: 'https://blog.daoedu.tw',
-  //   target: '_blank',
-  // },
-  // {
-  //   name: '找場域',
-  //   link: '/locations',
-  //   target: '_self',
-  // },
   {
-    name: '加入社群',
-    link: '/join',
-    target: '_self',
+    name: '學習資源',
+    path: '/search',
   },
-  // {
-  //   name: '找學習空間',
-  //   link: 'https://www.facebook.com/groups/2237666046370459',
-  // },
+  {
+    name: '學習夥伴',
+    path: '/partner',
+  },
+];
+
+// 交流頁面的子導航選項
+export const EXCHANGE_SUBNAV = [
+  {
+    name: '全部',
+    path: '/exchange',
+  },
+  {
+    name: '揪團活動',
+    path: '/group',
+  },
+  {
+    name: '近期活動',
+    path: '/activities',
+  },
+  {
+    name: '社群交流',
+    path: '/join',
+  },
 ];
 
 export const MARATHON_LINKS = [

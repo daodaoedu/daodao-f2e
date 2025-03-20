@@ -56,7 +56,12 @@ const Tabs = () => {
   );
 };
 
-const PageProjectsEvents = () => {
+interface PageProjectsEventsProps {
+  path?: string;
+  onProjectClick?: (projectId: string) => void;
+}
+
+const PageProjectsEvents = ({ path = "", onProjectClick }: PageProjectsEventsProps) => {
   const [isFetchingProjects, setIsFetchingProjects] = useState(false);
   const [projects, setProjects] = useState<ProjectType[]>([]);
 
@@ -102,7 +107,7 @@ const PageProjectsEvents = () => {
             )
           }
           {Array.isArray(projects) && projects.length > 0
-            ? <ProjectList projects={projects} path="" />
+            ? <ProjectList projects={projects} path={path} onProjectClick={onProjectClick} />
             : <EmptyList />
           }
         </div>

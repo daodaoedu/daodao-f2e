@@ -1,0 +1,68 @@
+/* Join Us Page Styles */
+.pageWrapper {
+  background-color: #ffffff;
+  min-height: calc(100vh - var(--padding-top, 0px) - 270px);
+}
+
+.coloredBackground {
+  background-color: #F4FDFC;
+}
+
+.textCenter {
+  text-align: center;
+}
+
+.sectionTitle {
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #295E5C;
+}
+
+.roleCard {
+  box-shadow: 0px 4px 10px rgba(89, 182, 178, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.roleCard:hover {
+  transform: translateY(-5px);
+}
+
+.roleImage {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #DEF5F5;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.ctaSection {
+  background-color: #1F4645;
+  color: white;
+  border-radius: 12px;
+  padding: 3rem;
+  margin-top: 2.5rem;
+  text-align: center;
+}
+
+.ctaButton {
+  background-color: #FFFFFF;
+  color: #1F4645;
+  font-weight: bold;
+  border-radius: 20px;
+  padding: 0.5rem 1.25rem;
+  margin-top: 1rem;
+}
+
+.ctaButton:hover {
+  background-color: #DEF5F5;
+}
+
+@media (max-width: 768px) {
+  .ctaSection {
+    padding: 2rem 1rem;
+  }
+}

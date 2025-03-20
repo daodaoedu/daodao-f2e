@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
 import { getManageSidebarItems } from '@/constants/sidebar';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
@@ -12,20 +13,71 @@ interface OnCloseProps {
 }
 
 function ExploreMenu({ onClose }: OnCloseProps) {
+  const router = useRouter();
+  const currentPath = router.pathname;
+
   return (
     <div>
       <nav>
         <ul className="pt-2">
-          {NAV_LINK.map(({ link, name, target }) => (
+          {NAV_LINK.map(({ link, name, target, children, section }) => (
             <li key={name}>
-              <Link
-                href={link}
-                target={target}
-                className="block px-4 py-2 text-basic-400"
-                onClick={onClose}
-              >
-                {name}
-              </Link>
+              {children ? (
+                <Collapse
+                  as="nav"
+                  defaultOpen={currentPath.includes(section)}
+                >
+                  <div className="flex items-center">
+                    <Link
+                      href={link}
+                      className="py-2 px-4 flex items-center rounded-lg font-semibold text-basic-400"
+                      onClick={onClose}
+                    >
+                      {name}
+                    </Link>
+                    <Collapse.Toggle
+                      className="py-2 px-2 flex items-center rounded-lg font-semibold"
+                      withIcon
+                    >
+                      <span className="sr-only">展開子選單</span>
+                    </Collapse.Toggle>
+                  </div>
+                  <Collapse.List className="w-full">
+                    {children.map((child) => (
+                      <Collapse.Item
+                        key={child.name}
+                        className={cn(
+                          "*:px-10 *:leading-10",
+                          currentPath === child.link && "bg-primary-lightest"
+                        )}
+                      >
+                        <Link
+                          href={child.link}
+                          target={child.target}
+                          className={cn(
+                            "block",
+                            currentPath === child.link
+                              ? "text-primary-base font-medium"
+                              : "text-basic-400"
+                          )}
+                          onClick={onClose}
+                        >
+                          {child.name}
+                        </Link>
+                      </Collapse.Item>
+                    ))}
+                  </Collapse.List>
+                </Collapse>
+              ) : (
+                <Link
+                  href={link}
+                  target={target}
+                  className="block px-4 py-2 text-basic-400"
+                  onClick={onClose}
+                >
+                  {name}
+                </Link>
+              )}
             </li>
           ))}
         </ul>
@@ -184,7 +236,7 @@ function MobileMenu() {
                 )}
                 onClick={() => setNavType(navItem.type)}
               >
-                {navItem.type === NavType.Profile && (
+                {navItem.type === NavType.Profile && auth.user && (
                   <img
                     src={auth.user.photoURL}
                     alt={auth.user.name}
