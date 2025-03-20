@@ -165,9 +165,9 @@ export const NAV_LINK = [
   },
   {
     name: '交流',
-    link: '/exchange',
+    link: '/connect',
     target: '_self',
-    section: 'exchange',
+    section: 'connect',
     children: [
       {
         name: '揪團活動',

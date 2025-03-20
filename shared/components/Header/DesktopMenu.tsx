@@ -3,6 +3,7 @@ import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import Dropdown from '../Dropdown';
+import HeaderSearch from './HeaderSearch';
 
 function DesktopMenu() {
   const auth = useAuth();
@@ -26,6 +27,8 @@ function DesktopMenu() {
         </ul>
       </nav>
       <div className="flex items-center gap-3.5">
+        <HeaderSearch className="mr-2" />
+        
         <Dropdown as="nav">
           <Dropdown.Toggle
             className={cn(

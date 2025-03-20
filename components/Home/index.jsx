@@ -94,7 +94,7 @@ function Home() {
           <p className="text-lg md:text-xl max-w-3xl mx-auto mb-8">
             連結多元學習資源、創建個人化學習計畫、加入志同道合的學習社群，讓自主學習成為一種生活方式
           </p>
-          <div className="flex flex-wrap justify-center gap-4 mb-10">
+          <div className="flex flex-wrap justify-center gap-4">
             <button
               type="button"
               onClick={() => router.push('/projects')}
@@ -108,19 +108,6 @@ function Home() {
               className="px-6 py-3 bg-white border border-primary-base rounded-full text-primary-base font-medium flex items-center gap-2 hover:bg-primary-palest transition-colors"
             >
               加入社群 <GoPeople className="text-xl" />
-            </button>
-          </div>
-          <div className="max-w-3xl mx-auto bg-white p-1 rounded-full flex shadow">
-            <div className="flex-1 pl-5 flex items-center text-basic-400">
-              <FiSearch className="mr-2" />
-              <input
-                type="text"
-                placeholder="搜尋學習資源、計畫或揪團..."
-                className="bg-transparent border-none outline-none w-full py-3 placeholder-basic-400/70 text-basic-400"
-              />
-            </div>
-            <button type="button" className="bg-primary-base text-white px-5 py-3 rounded-full font-medium hover:bg-primary-dark transition-colors">
-              搜尋
             </button>
           </div>
         </div>

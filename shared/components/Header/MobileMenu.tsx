@@ -7,6 +7,7 @@ import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import Collapse from '../Collapse';
 import Button from '../Button';
+import HeaderSearch from './HeaderSearch';
 
 interface OnCloseProps {
   onClose: () => void;
@@ -18,6 +19,9 @@ function ExploreMenu({ onClose }: OnCloseProps) {
 
   return (
     <div>
+      {/* 添加搜索框 */}
+      <HeaderSearch mobileMode={true} />
+      
       <nav>
         <ul className="pt-2">
           {NAV_LINK.map(({ link, name, target, children, section }) => (

@@ -51,3 +51,80 @@
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
+
+/* 導航標籤樣式 */
+.tab-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.25rem;
+}
+
+.tab-button {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+
+.tab-button-active {
+  background-color: rgba(22, 185, 179, 0.15);
+  color: #16B9B3;
+}
+
+.tab-button-inactive {
+  background-color: rgb(243, 244, 246);
+  color: rgb(75, 85, 99);
+}
+
+/* 卡片樣式 */
+.card {
+  border-radius: 0.5rem;
+  border: 1px solid rgb(229, 231, 235);
+  padding: 1rem;
+  background-color: white;
+  transition: all 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+/* 分類按鈕樣式 - 現在收錄在SubTabs組件中 */
+.category-button {
+  /* 保留樣式方便將來重用 */
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: white;
+  border: 1px solid rgb(229, 231, 235);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.category-button:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+.category-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background-color: #F3FCFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+/* Banner 樣式 */
+.banner {
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  color: white;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #16B9B3, #293A3D);
+}
