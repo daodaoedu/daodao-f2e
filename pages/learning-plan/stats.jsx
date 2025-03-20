@@ -116,6 +116,7 @@ const LearningStatsPage = () => {
     const completedTasks = plans.reduce((sum, plan) =>
       sum + plan.tasks.filter((task) => task.completed).length, 0
     );
+
   // 從本地儲存讀取數據
   useEffect(() => {
     if (typeof window !== 'undefined') {
