@@ -4,7 +4,7 @@ import { DialogueProvider } from '@/components/Dialogue/DialogueContext';
 import DialogueGuide from '@/components/Dialogue/DialogueGuide';
 import GoBackButton from '@/components/Projects/GoBackButton';
 import { useRouter } from 'next/router';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import { MdChevronLeft } from 'react-icons/md';
 
 const AIDialoguePage: NextPage = () => {
   const router = useRouter();
@@ -19,10 +19,10 @@ const AIDialoguePage: NextPage = () => {
         <GoBackButton
           id="go-back"
           buttonText="返回"
-          icon={<ChevronLeftIcon className="mr-1 text-basic-400 group-hover:text-primary-base" />}
+          icon={<MdChevronLeft className="mr-1 text-basic-400 group-hover:text-primary-base" />}
           onClick={handleGoBack}
         />
-        <h1 className="text-2xl font-bold ml-4">AI 智能對話引導系統</h1>
+        <h1 className="text-2xl font-bold ml-4">AI 對話引導系統</h1>
       </div>
 
       <DialogueProvider>

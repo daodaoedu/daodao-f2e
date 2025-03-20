@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/utils/cn';
-import SendIcon from '@mui/icons-material/Send';
+import { MdSend } from 'react-icons/md';
 import { useDialogue, DialogueStyle } from './DialogueContext';
 
 const STYLE_MAP = {
-  encouraging: { label: '鼓勵型', color: 'bg-primary-200 text-primary-base' },
-  analytical: { label: '分析型', color: 'bg-blue-200 text-blue-700' },
-  challenging: { label: '挑戰型', color: 'bg-red-200 text-red-700' },
-  supportive: { label: '支持型', color: 'bg-green-200 text-green-700' }
+  encouraging: { label: '鼓勵型', color: 'bg-primary-palest text-primary-base border border-primary-lighter hover:bg-primary-lightest' },
+  analytical: { label: '分析型', color: 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100' },
+  challenging: { label: '挑戰型', color: 'bg-red-50 text-alert border border-red-200 hover:bg-red-100' },
+  supportive: { label: '支持型', color: 'bg-purple-50 text-purple-600 border border-purple-200 hover:bg-purple-100' }
 };
 
 const DialogueGuide: React.FC = () => {
@@ -92,17 +92,17 @@ const DialogueGuide: React.FC = () => {
   return (
     <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden flex flex-col" style={{ height: '650px' }}>
       {/* 對話風格選擇區 */}
-      <div className="flex justify-center space-x-2 p-4 bg-primary-lightest border-b border-primary-lightest">
+      <div className="flex justify-center space-x-2 p-4 bg-primary-palest border-b border-primary-lightest sticky top-0 z-10">
         {Object.entries(STYLE_MAP).map(([style, { label, color }]) => (
           <button
             type="button"
             key={style}
             onClick={() => changeDialogueStyle(style as DialogueStyle)}
             className={cn(
-              "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+              "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm",
               dialogueStyle === style
                 ? color
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-white text-basic-300 hover:bg-basic-100 border border-basic-200"
             )}
           >
             {label}
@@ -111,7 +111,7 @@ const DialogueGuide: React.FC = () => {
       </div>
 
       {/* 對話區域 */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-basic-100">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-primary-palest">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -121,7 +121,7 @@ const DialogueGuide: React.FC = () => {
             )}
           >
             {msg.sender === 'ai' && (
-              <div className="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-r from-primary-base to-primary-darker flex items-center justify-center text-white mr-2 self-end shadow-sm">
+              <div className="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-b from-primary-lighter to-primary-base flex items-center justify-center text-white mr-2 self-end shadow-sm">
                 AI
               </div>
             )}
@@ -156,13 +156,13 @@ const DialogueGuide: React.FC = () => {
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
           placeholder="在此輸入你的想法..."
-          className="flex-grow p-3 bg-basic-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary-base shadow-sm border-none"
+          className="flex-grow p-3 bg-white rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-primary-base shadow-sm border border-basic-200"
         />
         <button
           type="submit"
-          className="p-2 rounded-full bg-primary-base text-white hover:bg-primary-darker transition-colors"
+          className="p-2 rounded-full bg-primary-base text-white hover:bg-primary-darker transition-colors shadow-sm"
         >
-          <SendIcon fontSize="small" />
+          <MdSend size={20} />
         </button>
       </form>
     </div>
