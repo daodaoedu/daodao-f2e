@@ -4,7 +4,7 @@ import { PathInfo } from '../../types';
 
 interface StepOneProps {
   pathInfo: PathInfo;
-  handlePathInfoChange: (field: keyof PathInfo, value: any) => void;
+  handlePathInfoChange: (field: keyof PathInfo, value: string | number) => void;
   handleNextStep: () => void;
 }
 
@@ -28,63 +28,71 @@ const StepOne: React.FC<StepOneProps> = ({
       <div className="p-4 pt-0">
         <div className="space-y-4">
           <div>
-            <label htmlFor="pathTitle" className="block text-sm font-medium text-gray-700 mb-1">路徑標題</label>
-            <input
-              id="pathTitle"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
-              style={{ borderColor: colors.primary }}
-              placeholder="例如：閱讀《原子習慣》或《30天瑜伽挑戰》"
-              value={pathInfo.title}
-              onChange={(e) => handlePathInfoChange('title', e.target.value)}
-            />
+            <label htmlFor="pathTitle" className="block text-sm font-medium text-gray-700 mb-1">
+              路徑標題
+              <input
+                id="pathTitle"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+                style={{ borderColor: colors.primary }}
+                placeholder="例如：閱讀《原子習慣》或《30天瑜伽挑戰》"
+                value={pathInfo.title}
+                onChange={(e) => handlePathInfoChange('title', e.target.value)}
+              />
+            </label>
             <p className="text-xs text-gray-500 mt-1">
               提示：讓它具體且有激勵性
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">這個路徑是關於什麼類型的內容？</label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
-              {contentTypeOptions.map((option) => {
-                const Icon = option.icon;
-                return (
-                  <div
-                    key={option.id}
-                    className="flex items-center p-3 border rounded-lg cursor-pointer"
-                    style={{
-                      borderColor: pathInfo.contentType === option.id ? colors.primary : '#e5e5e5',
-                      backgroundColor: pathInfo.contentType === option.id ? `${colors.primary}10` : 'white'
-                    }}
-                    onClick={() => handlePathInfoChange('contentType', option.id)}
-                  >
+            <fieldset className="block mb-1">
+              <legend className="text-sm font-medium text-gray-700">這個路徑是關於什麼類型的內容？</legend>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
+                {contentTypeOptions.map((option) => {
+                  const Icon = option.icon;
+                  return (
                     <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center mr-3"
+                      key={option.id}
+                      className="flex items-center p-3 border rounded-lg cursor-pointer"
                       style={{
-                        backgroundColor: pathInfo.contentType === option.id ? colors.primary : '#f1f1f1',
-                        color: pathInfo.contentType === option.id ? 'white' : '#888'
+                        borderColor: pathInfo.contentType === option.id ? colors.primary : '#e5e5e5',
+                        backgroundColor: pathInfo.contentType === option.id ? `${colors.primary}10` : 'white'
                       }}
+                      onClick={() => handlePathInfoChange('contentType', option.id)}
+                      onKeyDown={(e) => e.key === 'Enter' && handlePathInfoChange('contentType', option.id)}
+                      role="button"
+                      tabIndex={0}
                     >
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p
-                        className="font-medium"
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center mr-3"
                         style={{
-                          color: pathInfo.contentType === option.id ? colors.primary : '#555'
+                          backgroundColor: pathInfo.contentType === option.id ? colors.primary : '#f1f1f1',
+                          color: pathInfo.contentType === option.id ? 'white' : '#888'
                         }}
                       >
-                        {option.label}
-                      </p>
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p
+                          className="font-medium"
+                          style={{
+                            color: pathInfo.contentType === option.id ? colors.primary : '#555'
+                          }}
+                        >
+                          {option.label}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            </fieldset>
           </div>
         </div>
       </div>
       <div className="p-4 pt-0 flex justify-end">
         <button
+          type="button"
           className="rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 py-2 px-4 text-sm text-white"
           style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
           onClick={handleNextStep}

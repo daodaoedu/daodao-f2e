@@ -6,36 +6,6 @@ import { FiSearch, FiArrowRight } from 'react-icons/fi';
 function Home() {
   const router = useRouter();
 
-  const EXPLORE_ACTIONS = [
-    {
-      title: '學習計畫',
-      description: '瀏覽大家的學習計畫、吸收多元學習經驗，或分享你的學習歷程，啟發他人',
-      link: '/projects',
-      buttonText: '探索學習計畫'
-    },
-    {
-      title: '學習想法',
-      description: '發現各種學習心得與想法，獲取寶貴的經驗分享與學習靈感',
-      link: '/ideas',
-      buttonText: '探索學習想法'
-    }
-  ];
-
-  const EXCHANGE_ACTIONS = [
-    {
-      title: '揪團活動',
-      description: '瀏覽或加入各種學習揪團，與志同道合的夥伴一起學習成長',
-      link: '/group',
-      buttonText: '探索揪團'
-    },
-    {
-      title: '近期活動',
-      description: '查看並報名參加最新的線上、線下學習活動與工作坊',
-      link: '/activities',
-      buttonText: '瀏覽活動'
-    }
-  ];
-
   const POPULAR_PLANS = [
     {
       title: "網頁開發入門 60 天挑戰",
@@ -126,12 +96,14 @@ function Home() {
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-10">
             <button
+              type="button"
               onClick={() => router.push('/projects')}
               className="px-6 py-3 bg-primary-base hover:bg-primary-dark transition-colors rounded-full text-white font-medium flex items-center gap-2"
             >
               探索學習計畫 <GoArrowUpRight className="text-xl" />
             </button>
             <button
+              type="button"
               onClick={() => router.push('/join')}
               className="px-6 py-3 bg-white border border-primary-base rounded-full text-primary-base font-medium flex items-center gap-2 hover:bg-primary-palest transition-colors"
             >
@@ -147,7 +119,7 @@ function Home() {
                 className="bg-transparent border-none outline-none w-full py-3 placeholder-basic-400/70 text-basic-400"
               />
             </div>
-            <button className="bg-primary-base text-white px-5 py-3 rounded-full font-medium hover:bg-primary-dark transition-colors">
+            <button type="button" className="bg-primary-base text-white px-5 py-3 rounded-full font-medium hover:bg-primary-dark transition-colors">
               搜尋
             </button>
           </div>
@@ -175,6 +147,7 @@ function Home() {
               <h3 className="text-xl font-bold mb-3 text-gray-800">探索學習資源</h3>
               <p className="text-gray-600 mb-4">瀏覽豐富的學習資源庫，從各領域找到適合你的學習材料</p>
               <button
+                type="button"
                 onClick={() => router.push('/search')}
                 className="text-primary-base flex items-center gap-1 font-medium hover:text-primary-dark"
               >
@@ -189,6 +162,7 @@ function Home() {
               <h3 className="text-xl font-bold mb-3 text-gray-800">建立學習計畫</h3>
               <p className="text-gray-600 mb-4">創建個人化學習路徑，設定目標、追蹤進度、記錄成長歷程</p>
               <button
+                type="button"
                 onClick={() => router.push('/projects')}
                 className="text-primary-base flex items-center gap-1 font-medium hover:text-primary-dark"
               >
@@ -203,6 +177,7 @@ function Home() {
               <h3 className="text-xl font-bold mb-3 text-gray-800">加入學習社群</h3>
               <p className="text-gray-600 mb-4">與志同道合的夥伴交流討論、組隊學習、獲得支持和激勵</p>
               <button
+                type="button"
                 onClick={() => router.push('/group')}
                 className="text-primary-base flex items-center gap-1 font-medium hover:text-primary-dark"
               >
@@ -217,6 +192,7 @@ function Home() {
               <h3 className="text-xl font-bold mb-3 text-gray-800">參與學習活動</h3>
               <p className="text-gray-600 mb-4">報名線上/實體工作坊、讀書會、工作坊，擴展你的學習視野</p>
               <button
+                type="button"
                 onClick={() => router.push('/activities')}
                 className="text-primary-base flex items-center gap-1 font-medium hover:text-primary-dark"
               >
@@ -241,8 +217,8 @@ function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            {POPULAR_PLANS.map((plan, index) => (
-              <div key={index} className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            {POPULAR_PLANS.map((plan) => (
+              <div key={plan.title} className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 <div className={`h-2 w-full ${plan.color}`} />
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-4 text-gray-800">{plan.title}</h3>
@@ -270,6 +246,7 @@ function Home() {
                   </div>
 
                   <button
+                    type="button"
                     onClick={() => router.push('/projects')}
                     className="flex items-center text-primary-base font-medium hover:text-primary-dark transition-colors"
                   >
@@ -282,6 +259,7 @@ function Home() {
 
           <div className="text-center">
             <button
+              type="button"
               onClick={() => router.push('/projects')}
               className="inline-flex items-center gap-2 px-6 py-3 border border-primary-base text-primary-base font-medium rounded-full hover:bg-primary-palest transition-colors"
             >
@@ -305,8 +283,8 @@ function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            {RECENT_EVENTS.map((event, index) => (
-              <div key={index} className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            {RECENT_EVENTS.map((event) => (
+              <div key={event.title} className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 <div className="p-6">
                   <div className="flex justify-between items-center mb-5">
                     <div className={`w-12 h-12 rounded-lg ${event.color} text-white flex items-center justify-center`}>
@@ -330,6 +308,7 @@ function Home() {
                   </p>
 
                   <button
+                    type="button"
                     onClick={() => router.push('/activities')}
                     className="flex items-center text-primary-base font-medium hover:text-primary-dark transition-colors"
                   >
@@ -342,6 +321,7 @@ function Home() {
 
           <div className="text-center">
             <button
+              type="button"
               onClick={() => router.push('/activities')}
               className="inline-flex items-center gap-2 px-6 py-3 border border-primary-base text-primary-base font-medium rounded-full hover:bg-primary-palest transition-colors"
             >
@@ -365,8 +345,8 @@ function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((testimonial, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 shadow-md relative">
+            {TESTIMONIALS.map((testimonial) => (
+              <div key={testimonial.name} className="bg-white rounded-xl p-6 shadow-md relative">
                 <div className="absolute top-4 left-6 text-4xl text-primary-palest opacity-60">❝</div>
                 <p className="text-gray-600 italic mb-6 relative z-10">{testimonial.quote}</p>
                 <div className="flex items-center">
@@ -469,6 +449,7 @@ function Home() {
               </ul>
 
               <button
+                type="button"
                 onClick={() => router.push('/register')}
                 className="mt-8 px-6 py-3 bg-primary-base hover:bg-primary-dark rounded-full text-white font-medium flex items-center gap-2 transition-colors"
               >
@@ -495,6 +476,7 @@ function Home() {
             加入島島阿學，與上萬名學習者一起成長，發掘你未知的潛能與可能性
           </p>
           <button
+            type="button"
             onClick={() => router.push('/register')}
             className="px-7 py-3 bg-white text-primary-base rounded-full font-medium text-lg hover:bg-gray-100 transition-colors shadow-md"
           >

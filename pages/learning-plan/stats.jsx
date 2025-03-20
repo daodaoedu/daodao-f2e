@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { ArrowBack, Timeline, BarChart, CheckCircle, CalendarToday, Favorite } from '@mui/icons-material';
+import { ArrowBack, Timeline, BarChart, CheckCircle, CalendarToday, Favorite, Add } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import { useAuth } from '@/contexts/Auth';
 import SEOConfig from '@/shared/components/SEO';
@@ -74,9 +74,16 @@ const ProgressBar = ({ label, value, color = 'primary-base' }) => {
   );
 };
 
+// 獲取星期名稱
+const getDayName = (day) => {
+  const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+  return days[day];
+};
+
 // 主組件
 const LearningStatsPage = () => {
   const router = useRouter();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { isLoggedIn } = useAuth();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -96,6 +103,19 @@ const LearningStatsPage = () => {
     weeklyActivity: []
   });
 
+    // 計算統計指標
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const calculateStats = () => {
+    // 基本統計
+    const totalPlans = plans.length;
+    const completedPlans = plans.filter((plan) =>
+      plan.tasks.length > 0 && plan.tasks.every((task) => task.completed)
+    ).length;
+
+    const totalTasks = plans.reduce((sum, plan) => sum + plan.tasks.length, 0);
+    const completedTasks = plans.reduce((sum, plan) =>
+      sum + plan.tasks.filter((task) => task.completed).length, 0
+    );
   // 從本地儲存讀取數據
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -127,19 +147,6 @@ const LearningStatsPage = () => {
     }
   }, [plans]);
 
-  // 計算所有統計指標
-  const calculateStats = () => {
-    // 基本統計
-    const totalPlans = plans.length;
-    const completedPlans = plans.filter((plan) =>
-      plan.tasks.length > 0 && plan.tasks.every((task) => task.completed)
-    ).length;
-
-    const totalTasks = plans.reduce((sum, plan) => sum + plan.tasks.length, 0);
-    const completedTasks = plans.reduce((sum, plan) =>
-      sum + plan.tasks.filter((task) => task.completed).length, 0
-    );
-
     // 打卡統計
     let allCheckIns = [];
     plans.forEach((plan) => {
@@ -165,12 +172,12 @@ const LearningStatsPage = () => {
 
       if (isRecent) {
         currentStreak = 1;
-        for (let i = 1; i < checkInDates.length; i++) {
+        for (let i = 1; i < checkInDates.length; i += 1) {
           const currentDate = dayjs(checkInDates[i - 1]);
           const prevDate = dayjs(checkInDates[i]);
 
           if (currentDate.diff(prevDate, 'day') === 1) {
-            currentStreak++;
+            currentStreak += 1;
           } else {
             break;
           }
@@ -182,12 +189,12 @@ const LearningStatsPage = () => {
     let longestStreak = 0;
     let currentCount = 1;
 
-    for (let i = 1; i < checkInDates.length; i++) {
+    for (let i = 1; i < checkInDates.length; i += 1) {
       const currentDate = dayjs(checkInDates[i - 1]);
       const prevDate = dayjs(checkInDates[i]);
 
       if (currentDate.diff(prevDate, 'day') === 1) {
-        currentCount++;
+        currentCount += 1;
       } else {
         longestStreak = Math.max(longestStreak, currentCount);
         currentCount = 1;
@@ -202,7 +209,7 @@ const LearningStatsPage = () => {
 
     checkInDates.forEach((date) => {
       const day = dayjs(date).day();
-      dayCount[day]++;
+      dayCount[day] += 1;
     });
 
     plans.forEach((plan) => {
@@ -210,7 +217,7 @@ const LearningStatsPage = () => {
         typeCount[plan.type] = { count: 0, completed: 0, total: 0 };
       }
 
-      typeCount[plan.type].count++;
+      typeCount[plan.type].count += 1;
 
       // 計算每種類型的任務完成情況
       const typeTasks = plan.tasks.length;
@@ -246,7 +253,7 @@ const LearningStatsPage = () => {
     const weeklyActivity = [];
     const today = dayjs().startOf('day');
 
-    for (let i = 6; i >= 0; i--) {
+    for (let i = 6; i >= 0; i -= 1) {
       const date = today.subtract(i, 'day');
       const dateStr = date.format('YYYY-MM-DD');
       const count = checkInDates.filter((d) => d === dateStr).length;
@@ -266,19 +273,13 @@ const LearningStatsPage = () => {
       totalCheckIns,
       currentStreak,
       longestStreak,
-      mostActiveDay: getDayName(parseInt(mostActiveDay)),
+      mostActiveDay: getDayName(parseInt(mostActiveDay, 10)),
       mostActiveType,
       typeStats,
       averageCompletionRate,
       mostRecentCheckIn,
       weeklyActivity
     });
-  };
-
-  // 獲取星期名稱
-  const getDayName = (day) => {
-    const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
-    return days[day];
   };
 
   // SEO 資料
@@ -418,8 +419,8 @@ const LearningStatsPage = () => {
                   <div className="mt-6">
                     <div className="text-sm font-medium text-basic-400 mb-2">最近一週活動</div>
                     <div className="grid grid-cols-7 gap-1 mt-2">
-                      {stats.weeklyActivity.map((day, index) => (
-                        <div key={index} className="flex flex-col items-center">
+                      {stats.weeklyActivity.map((day) => (
+                        <div key={`${day.date}-${day.count}`} className="flex flex-col items-center">
                           <div className="text-xs text-basic-300">{day.day}</div>
                           <div className="text-xs text-basic-300 mb-1">{day.date}</div>
                           <div

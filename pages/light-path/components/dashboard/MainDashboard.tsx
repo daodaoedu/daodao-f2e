@@ -18,8 +18,8 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 }) => {
   // 計算進度百分比的輔助函數
   const progressPercentage = (): number => {
-    const current = parseInt(pathInfo.currentProgress) || 0;
-    const total = parseInt(pathInfo.totalAmount) || 1;
+    const current = parseInt(pathInfo.currentProgress, 10) || 0;
+    const total = parseInt(pathInfo.totalAmount, 10) || 1;
     return Math.min(100, Math.round((current / total) * 100));
   };
 
@@ -128,6 +128,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
               <div className="flex space-x-3">
                 <button
+                  type="button"
                   onClick={handleCheckin}
                   className="flex-1 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 py-2 px-4 text-sm text-white"
                   style={{
@@ -139,6 +140,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                   打卡
                 </button>
                 <button
+                  type="button"
                   onClick={handleViewHistory}
                   className="flex items-center justify-center shadow-sm hover:shadow transition-shadow rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 py-2 px-4 text-sm border"
                   style={{
@@ -214,6 +216,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
       <div className="mt-6 text-center">
         <button
+          type="button"
           className="text-sm text-gray-500 hover:text-gray-700"
           onClick={resetDemo}
         >

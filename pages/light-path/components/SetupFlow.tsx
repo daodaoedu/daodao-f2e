@@ -1,5 +1,7 @@
 import React from 'react';
 import { ArrowLeft, Check } from 'lucide-react';
+// 標記未使用的導入
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { colors, contentTypeOptions } from '../constants';
 import { PathInfo } from '../types';
 import StepOne from './setup/StepOne';
@@ -11,7 +13,7 @@ import CelebrationMessage from './CelebrationMessage';
 interface SetupFlowProps {
   setupStep: number;
   pathInfo: PathInfo;
-  handlePathInfoChange: (field: keyof PathInfo, value: any) => void;
+  handlePathInfoChange: (field: keyof PathInfo, value: string | number | boolean | string[]) => void;
   handleNextStep: () => void;
   handlePreviousStep: () => void;
   handleCreatePath: () => void;
@@ -35,14 +37,15 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
       <Confetti active={showConfetti} />
 
       {/* 慶祝訊息 */}
-      <CelebrationMessage 
-        message={celebrationMessage} 
-        isVisible={!!celebrationMessage} 
+      <CelebrationMessage
+        message={celebrationMessage}
+        isVisible={!!celebrationMessage}
       />
 
       {/* 帶有返回按鈕的頁眉 */}
       {setupStep > 1 && setupStep < 4 && (
         <button
+          type="button"
           className="flex items-center text-gray-600 mb-4 hover:text-gray-900"
           onClick={handlePreviousStep}
         >

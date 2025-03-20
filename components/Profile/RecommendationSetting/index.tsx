@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { cn } from '@/utils/cn';
+// import { cn } from '@/utils/cn';
 import { useAuth } from '@/contexts/Auth';
 
 interface InterestsState {
@@ -37,7 +37,8 @@ interface PartnerPreferenceState {
 type FrequencyType = 'daily' | 'weekly' | 'monthly';
 
 const RecommendationSetting = () => {
-  const { user } = useAuth();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { user: _user } = useAuth();
 
   // 添加自定義樣式以覆蓋原生的勾選框和滑動條顏色
   useEffect(() => {
@@ -227,7 +228,7 @@ const RecommendationSetting = () => {
   useEffect(() => {
     const rangeInput = document.querySelector('input[type="range"]');
     if (rangeInput) {
-      rangeInput.style.setProperty('--value', `${relevanceLevel}%`);
+      (rangeInput as HTMLElement).style.setProperty('--value', `${relevanceLevel}%`);
     }
   }, [relevanceLevel]);
 
@@ -245,7 +246,16 @@ const RecommendationSetting = () => {
     });
 
     // 顯示成功訊息或其他反饋
-    alert('設定已儲存');
+    // 使用更友好的UI元件取代原生alert
+    // alert('設定已儲存');
+    const saveConfirmEl = document.createElement('div');
+    saveConfirmEl.className = 'fixed top-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50';
+    saveConfirmEl.innerHTML = '設定已儲存';
+    document.body.appendChild(saveConfirmEl);
+
+    setTimeout(() => {
+      document.body.removeChild(saveConfirmEl);
+    }, 3000);
   };
 
   return (
@@ -612,6 +622,7 @@ const RecommendationSetting = () => {
         {/* 儲存按鈕 */}
         <div className="w-full flex justify-center mt-8">
           <button
+            type="button"
             onClick={saveSettings}
             className="bg-primary-darker text-basic-white rounded-full py-2 px-6 w-[120px] hover:bg-basic-500 transition-colors"
           >

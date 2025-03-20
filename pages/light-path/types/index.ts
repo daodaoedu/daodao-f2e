@@ -33,7 +33,7 @@ export interface CheckInEntry {
 export interface ContentTypeOption {
   id: ContentType;
   label: string;
-  icon: ComponentType<any>;
+  icon: ComponentType<{className?: string}>;
 }
 
 export interface MotivationOption {

@@ -22,6 +22,18 @@ const DialogueGuide: React.FC = () => {
   const [userInput, setUserInput] = useState('');
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
+  // 模擬 AI 回覆生成邏輯
+  const generateAIResponse = (userMessage: string) => {
+    const styleResponses = {
+      encouraging: `很棒的觀點！讓我們一起深入探索 "${userMessage}"。`,
+      analytical: `讓我們系統性地分析 "${userMessage}" 的各個面向。`,
+      challenging: `你確定 "${userMessage}" 就是問題的核心嗎？`,
+      supportive: `我理解你在 "${userMessage}" 中遇到的困難，我們可以一起找解決方案。`
+    };
+
+    return styleResponses[dialogueStyle];
+  };
+
   // 處理用戶輸入
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -48,18 +60,6 @@ const DialogueGuide: React.FC = () => {
     setUserInput('');
   };
 
-  // 模擬 AI 回覆生成邏輯
-  const generateAIResponse = (userMessage: string) => {
-    const styleResponses = {
-      encouraging: `很棒的觀點！讓我們一起深入探索 "${userMessage}"。`,
-      analytical: `讓我們系統性地分析 "${userMessage}" 的各個面向。`,
-      challenging: `你確定 "${userMessage}" 就是問題的核心嗎？`,
-      supportive: `我理解你在 "${userMessage}" 中遇到的困難，我們可以一起找解決方案。`
-    };
-
-    return styleResponses[dialogueStyle];
-  };
-
   // 自動滾動到底部
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -71,6 +71,7 @@ const DialogueGuide: React.FC = () => {
       <div className="flex justify-center space-x-2 p-4 border-b">
         {Object.entries(STYLE_MAP).map(([style, { label, color }]) => (
           <button
+            type="button"
             key={style}
             onClick={() => changeDialogueStyle(style as DialogueStyle)}
             className={cn(
@@ -87,9 +88,9 @@ const DialogueGuide: React.FC = () => {
 
       {/* 對話區域 */}
       <div className="h-[600px] overflow-y-auto p-4 space-y-4">
-        {messages.map((msg, index) => (
+        {messages.map((msg) => (
           <div
-            key={index}
+            key={msg.id}
             className={cn(
               "flex w-full",
               msg.sender === 'user' ? 'justify-end' : 'justify-start'

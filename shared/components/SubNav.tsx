@@ -38,9 +38,9 @@ function SubNav({ type, onCategorySelect }: SubNavProps) {
             }
             return (
               type === 'explore' && item.path !== '/explore' ? (
-                <a
+                <button
+                  type="button"
                   key={item.name}
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     if (onCategorySelect) {
@@ -59,7 +59,7 @@ function SubNav({ type, onCategorySelect }: SubNavProps) {
                   )}
                 >
                   {item.name}
-                </a>
+                </button>
               ) : (
                 <Link
                   key={item.name}

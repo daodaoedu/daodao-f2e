@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import Image from 'next/image';
 import styled from '@emotion/styled';
 import { Typography, Box, Container, Grid, Paper, Button } from '@mui/material';
+import { v4 as uuidv4 } from 'uuid';
 
 import SEOConfig from '@/shared/components/SEO';
 
@@ -261,6 +261,7 @@ function JoinUsPage() {
     }),
     [router?.asPath],
   );
+  const uniqueId = uuidv4();
 
   return (
     <PageWrapper>
@@ -303,7 +304,7 @@ function JoinUsPage() {
 
             <Grid container spacing={3}>
               {roles.map((role, index) => (
-                <Grid item xs={12} md={4} key={index}>
+                <Grid item xs={12} md={4} key={uniqueId}>
                   <RoleCard>
                     <RoleImageContainer>
                       <RoleImage>
@@ -323,8 +324,8 @@ function JoinUsPage() {
                       任務
                     </RoleSectionTitle>
                     <Box component="ul" sx={{ pl: 3, mt: 0 }}>
-                      {role.tasks.map((task, taskIndex) => (
-                        <Box component="li" key={taskIndex} mb={1}>
+                      {role.tasks.map((task) => (
+                        <Box component="li" key={uniqueId} mb={1}>
                           <Typography variant="body2" color="#011416">
                             {task}
                           </Typography>
@@ -336,8 +337,8 @@ function JoinUsPage() {
                       回饋與獎勵
                     </RoleSectionTitle>
                     <Box component="ul" sx={{ pl: 3, mt: 0 }}>
-                      {role.rewards.map((reward, rewardIndex) => (
-                        <Box component="li" key={rewardIndex} mb={1}>
+                      {role.rewards.map((reward) => (
+                        <Box component="li" key={uniqueId} mb={1}>
                           <Typography variant="body2" color="#011416">
                             {reward}
                           </Typography>
@@ -362,8 +363,8 @@ function JoinUsPage() {
                   島島幣用途
                 </SectionTitle>
                 <Box component="ul" sx={{ pl: 3 }}>
-                  {tokenUsages.map((usage, index) => (
-                    <Box component="li" key={index} mb={1}>
+                  {tokenUsages.map((usage) => (
+                    <Box component="li" key={uniqueId} mb={1}>
                       <Typography variant="body1" color="#011416">
                         {usage}
                       </Typography>
@@ -398,8 +399,8 @@ function JoinUsPage() {
               其他回饋內容
             </SectionTitle>
             <Grid container spacing={3}>
-              {otherBenefits.map((benefit, index) => (
-                <Grid item xs={12} md={4} key={index}>
+              {otherBenefits.map((benefit) => (
+                <Grid item xs={12} md={4} key={uniqueId}>
                   <RewardCard>
                     <RewardHeader>
                       <Box
@@ -442,7 +443,7 @@ function JoinUsPage() {
               <CtaButton
                 variant="contained"
                 href="https://forms.gle/sD8XVFsfvPBH9Lqm7"
-                target="_blank"
+                {...{ target: "_blank" }}
                 size="large"
               >
                 填寫申請表單

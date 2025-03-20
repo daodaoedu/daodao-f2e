@@ -1,4 +1,7 @@
 import React, { useEffect } from 'react';
+// 第一個 import 不使用的变量
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { v4 as uuidv4 } from 'uuid';
 import { colors } from '../constants';
 
 interface ConfettiProps {
@@ -7,40 +10,42 @@ interface ConfettiProps {
 
 const Confetti: React.FC<ConfettiProps> = ({ active }) => {
   useEffect(() => {
+    // 如果不活躍則返回
+    if (!active) return () => {};
+
     // 創建一個全局動畫樣式
-    if (active) {
-      const styleEl = document.createElement('style');
-      styleEl.setAttribute('id', 'confetti-animation-style');
-      styleEl.innerHTML = `
-        @keyframes fall {
-          0% {
-            transform: translateY(0) rotate(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(100vh) rotate(360deg);
-            opacity: 0;
-          }
+    const styleEl = document.createElement('style');
+    styleEl.setAttribute('id', 'confetti-animation-style');
+    styleEl.innerHTML = `
+      @keyframes fall {
+        0% {
+          transform: translateY(0) rotate(0deg);
+          opacity: 1;
         }
-      `;
-      document.head.appendChild(styleEl);
-      
-      // 清理函式
-      return () => {
-        const existingStyle = document.getElementById('confetti-animation-style');
-        if (existingStyle) {
-          document.head.removeChild(existingStyle);
+        100% {
+          transform: translateY(100vh) rotate(360deg);
+          opacity: 0;
         }
-      };
-    }
+      }
+    `;
+    document.head.appendChild(styleEl);
+
+    // 清理函式
+    return () => {
+      const existingStyle = document.getElementById('confetti-animation-style');
+      if (existingStyle) {
+        document.head.removeChild(existingStyle);
+      }
+    };
   }, [active]);
 
   if (!active) return null;
+  const uniqueId = uuidv4();
 
   // 生成紙屑碎片
-  const pieces = Array(100).fill(0).map((_, i) => {
+  const pieces = Array(100).fill(0).map(() => {
     const left = Math.random() * 100;
-    const top = Math.random() * 100;
+    // 刪除未使用的 top 屬性
     const size = Math.random() * 10 + 5;
     const duration = Math.random() * 1 + 2;
     const delay = Math.random() * 0.5;
@@ -57,7 +62,7 @@ const Confetti: React.FC<ConfettiProps> = ({ active }) => {
 
     return (
       <div
-        key={i}
+        key={`confetti-${uniqueId}`}
         className={`absolute ${shape}`}
         style={{
           left: `${left}%`,

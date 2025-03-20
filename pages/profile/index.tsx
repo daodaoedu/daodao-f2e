@@ -118,6 +118,7 @@ const ProfilePage = () => {
           <div className={isMobile ? "flex overflow-x-auto" : "flex flex-col"}>
             {tabs.map((tab, index) => (
               <button
+                type="button"
                 key={tab.id}
                 onClick={() => handleChange(index)}
                 className={cn(
@@ -126,7 +127,6 @@ const ProfilePage = () => {
                   value === index && "bg-[#DEF5F5] text-[#16B9B3]",
                   isMobile ? "w-1/3" : "w-full"
                 )}
-                aria-selected={value === index}
                 id={`vertical-tab-${index}`}
                 aria-controls={`vertical-tabpanel-${index}`}
               >

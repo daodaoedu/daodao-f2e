@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { Skeleton, CircularProgress } from '@mui/material';
-import { ArrowBack, CheckCircle, RadioButtonUnchecked, EventNote, CalendarToday, Delete, Add } from '@mui/icons-material';
+import { Skeleton } from '@mui/material';
+import { ArrowBack, CheckCircle, RadioButtonUnchecked, EventNote, CalendarToday } from '@mui/icons-material';
 import { useAuth } from '@/contexts/Auth';
 import SEOConfig from '@/shared/components/SEO';
 import getDefaultLayout from '@/layout/DefaultLayout';
@@ -16,6 +16,7 @@ const Task = ({ task, planId, onCompleteTask, onCheckIn }) => {
       <div className="flex items-start justify-between">
         <div className="flex items-start">
           <button
+            type="button"
             onClick={() => onCompleteTask(planId, task.id)}
             className="mr-2 mt-1"
           >
@@ -62,6 +63,7 @@ const Task = ({ task, planId, onCompleteTask, onCheckIn }) => {
         </div>
 
         <button
+          type="button"
           onClick={() => onCheckIn(planId, task.id)}
           className="flex items-center gap-1 px-3 py-1 bg-[#EEF9F9] text-[#16b9b3] rounded-full hover:bg-primary-lightest transition-colors"
         >
@@ -116,12 +118,14 @@ const CheckInDialog = ({ isOpen, onClose, onSave, note, setNote }) => {
 
         <div className="flex justify-end gap-2">
           <button
+            type="button"
             onClick={onClose}
             className="px-4 py-2 border border-basic-200 rounded text-basic-400"
           >
             取消
           </button>
           <button
+            type="button"
             onClick={onSave}
             className="px-4 py-2 bg-primary-base text-white rounded hover:bg-primary-darker"
           >
@@ -137,7 +141,8 @@ const CheckInDialog = ({ isOpen, onClose, onSave, note, setNote }) => {
 const LearningPlanDetailPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { isLoggedIn } = useAuth();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { isLoggedIn: _isLoggedIn } = useAuth();
   const [plan, setPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
@@ -213,13 +218,13 @@ const LearningPlanDetailPage = () => {
 
     // 計算連續天數
     let streak = 1;
-    for (let i = 1; i < allDates.length; i++) {
+    for (let i = 1; i < allDates.length; i += 1) {
       const currentDate = dayjs(allDates[i - 1]);
       const prevDate = dayjs(allDates[i]);
 
       // 如果日期差距為1天，連續天數+1
       if (currentDate.diff(prevDate, 'day') === 1) {
-        streak++;
+        streak += 1;
       } else {
         break;
       }

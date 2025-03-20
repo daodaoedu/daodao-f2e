@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { Container, Skeleton } from '@mui/material';
+import { Skeleton } from '@mui/material';
 import { AddCircleOutline } from '@mui/icons-material';
 import { useAuth } from '@/contexts/Auth';
 import SEOConfig from '@/shared/components/SEO';
@@ -115,6 +115,7 @@ const EmptyList = ({ onCreateClick }) => {
         <p className="text-basic-300">創建你的第一個學習計劃，開始記錄學習進度</p>
       </div>
       <button
+        type="button"
         onClick={onCreateClick}
         className="flex items-center gap-2 px-6 py-2 bg-primary-base text-white rounded-full hover:bg-primary-darker transition-colors"
       >
@@ -198,6 +199,7 @@ const LearningPlanPage = () => {
                 統計報告
               </Link>
               <button
+                type="button"
                 onClick={handleCreateClick}
                 className="flex items-center gap-2 px-4 py-2 bg-primary-base text-white rounded-full hover:bg-primary-darker transition-colors"
               >

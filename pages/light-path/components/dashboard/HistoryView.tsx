@@ -17,6 +17,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
   return (
     <div className="max-w-md mx-auto p-4">
       <button
+        type="button"
         className="flex items-center text-gray-600 mb-4 hover:text-gray-900"
         onClick={handleBackToDashboard}
       >
@@ -35,7 +36,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
           <div className="space-y-4">
             {checkInHistory.map((entry, index) => (
               <div
-                key={index}
+                key={`checkin-${entry.date}`}
                 className="p-3 border rounded-lg"
                 style={{
                   backgroundColor: index === 0 ? `${colors.background}20` : 'white',
@@ -57,6 +58,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
 
             <div className="flex justify-center mt-4">
               <button
+                type="button"
                 className="rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 py-1 px-3 text-sm border"
                 style={{
                   borderColor: colors.primary,

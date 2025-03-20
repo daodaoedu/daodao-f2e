@@ -24,14 +24,15 @@ const CheckInView: React.FC<CheckInViewProps> = ({
 }) => {
   // 計算進度百分比的輔助函數
   const progressPercentage = (): number => {
-    const current = parseInt(pathInfo.currentProgress) || 0;
-    const total = parseInt(pathInfo.totalAmount) || 1;
+    const current = parseInt(pathInfo.currentProgress, 10) || 0;
+    const total = parseInt(pathInfo.totalAmount, 10) || 1;
     return Math.min(100, Math.round((current / total) * 100));
   };
 
   return (
     <div className="max-w-md mx-auto p-4">
       <button
+        type="button"
         className="flex items-center text-gray-600 mb-4 hover:text-gray-900"
         onClick={handleBackToDashboard}
       >
@@ -73,32 +74,36 @@ const CheckInView: React.FC<CheckInViewProps> = ({
 
             {/* 更新進度 */}
             <div>
-              <label htmlFor="newProgress" className="block text-sm font-medium text-gray-700 mb-1">更新進度至</label>
-              <div className="flex items-center mt-2">
-                <input
-                  id="newProgress"
-                  type="number"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 mr-2"
-                  style={{ borderColor: colors.primary }}
-                  value={newProgress}
-                  onChange={(e) => setNewProgress(parseInt(e.target.value) || 0)}
-                />
-                <span className="text-sm text-gray-500">/ {pathInfo.totalAmount} {getUnitType(pathInfo.contentType)}</span>
-              </div>
+              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="newProgress">
+                更新進度至
+                <div className="flex items-center mt-2">
+                  <input
+                    id="newProgress"
+                    type="number"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 mr-2"
+                    style={{ borderColor: colors.primary }}
+                    value={newProgress}
+                    onChange={(e) => setNewProgress(parseInt(e.target.value, 10) || 0)}
+                  />
+                  <span className="text-sm text-gray-500">/ {pathInfo.totalAmount} {getUnitType(pathInfo.contentType)}</span>
+                </div>
+              </label>
             </div>
 
             {/* 添加簡短筆記 */}
             <div>
-              <label htmlFor="checkInNote" className="block text-sm font-medium text-gray-700 mb-1">添加筆記（可選）</label>
-              <textarea
-                id="checkInNote"
-                className="w-full mt-1 p-2 border rounded-md"
-                style={{ borderColor: colors.primary }}
-                rows={3}
-                placeholder="今天你學到了什麼？有什麼有趣的見解嗎？"
-                value={checkInNote}
-                onChange={(e) => setCheckInNote(e.target.value)}
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="checkInNote">
+                添加筆記（可選）
+                <textarea
+                  id="checkInNote"
+                  className="w-full mt-1 p-2 border rounded-md"
+                  style={{ borderColor: colors.primary }}
+                  rows={3}
+                  placeholder="今天你學到了什麼？有什麼有趣的見解嗎？"
+                  value={checkInNote}
+                  onChange={(e) => setCheckInNote(e.target.value)}
+                />
+              </label>
               <p className="text-xs text-gray-500 mt-1">
                 你的筆記將被保存到打卡歷史記錄中
               </p>
@@ -117,6 +122,7 @@ const CheckInView: React.FC<CheckInViewProps> = ({
         </div>
         <div className="p-4 pt-0 flex justify-end">
           <button
+            type="button"
             className="rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 py-2 px-4 text-sm text-white"
             style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
             onClick={handleSaveCheckin}

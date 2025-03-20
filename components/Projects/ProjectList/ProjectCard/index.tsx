@@ -17,7 +17,7 @@ const ProjectCard = ({ project, path, onProjectClick }: ProjectCardProps) => {
     ? '/admin/projects/detail'
     : (path === '/explore' ? '/explore/project-detail' : '/projects/detail');
 
-  const handleClick = (e) => {
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
     if (path === '/explore') {
       e.preventDefault();
 

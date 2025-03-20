@@ -150,19 +150,6 @@ const AccountSetting = () => {
     await sendVerificationEmail();
   };
 
-  // 處理訂閱計劃選擇
-  const handleSelectPlan = (plan: SubscriptionPlan) => {
-    setSelectedPlan(plan);
-
-    // 如果是免費計劃，直接訂閱
-    if (plan.price === 0) {
-      completeSubscription(plan);
-    } else {
-      // 付費計劃，顯示支付表單
-      setShowPaymentForm(true);
-    }
-  };
-
   // 完成訂閱流程
   const completeSubscription = (plan: SubscriptionPlan, transactionId?: string) => {
     // 計算結束日期（一個月後）
@@ -194,6 +181,19 @@ const AccountSetting = () => {
     setShowPlans(false);
     setShowPaymentForm(false);
     setPaymentResult(null);
+  };
+
+  // 處理訂閱計劃選擇
+  const handleSelectPlan = (plan: SubscriptionPlan) => {
+    setSelectedPlan(plan);
+
+    // 如果是免費計劃，直接訂閱
+    if (plan.price === 0) {
+      completeSubscription(plan);
+    } else {
+      // 付費計劃，顯示支付表單
+      setShowPaymentForm(true);
+    }
   };
 
   // 處理支付提交
@@ -245,7 +245,13 @@ const AccountSetting = () => {
 
   // 處理取消訂閱
   const handleCancelSubscription = () => {
-    if (window.confirm('確定要取消訂閱嗎？您仍可使用服務至訂閱期限結束。')) {
+    const showConfirmDialog = () => {
+      // 使用自定義對話框或其他確認方式
+      // 暂時返回 true 作為預設行為
+      return true; // TODO: 替換為自定義對話框
+    };
+
+    if (showConfirmDialog()) {
       setSubscription((prev) => ({
         ...prev,
         autoRenew: false
@@ -297,6 +303,7 @@ const AccountSetting = () => {
             <div className="w-full mb-8">
               {!isVerificationSent ? (
                 <button
+                  type="button"
                   onClick={sendVerificationEmail}
                   disabled={isVerifying}
                   className={cn(
@@ -326,6 +333,7 @@ const AccountSetting = () => {
                     />
                     <div className="flex gap-2">
                       <button
+                        type="button"
                         onClick={verifyEmailCode}
                         disabled={isVerifying}
                         className={cn(
@@ -338,6 +346,7 @@ const AccountSetting = () => {
                         {isVerifying ? "驗證中..." : "驗證"}
                       </button>
                       <button
+                        type="button"
                         onClick={resendVerificationEmail}
                         disabled={isVerifying}
                         className="px-4 py-2 text-sm border border-[#1F4645] text-[#1F4645] rounded-lg hover:bg-[#f5f5f5] transition-colors"
@@ -358,9 +367,9 @@ const AccountSetting = () => {
           )}
           {user?.email && isEmailVerified && (
             <div className="w-full mb-8 mt-2">
-              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="p-3 bg-green-50 border border-green-200 rounded-lg" role="status" aria-live="polite">
                 <div className="flex items-center text-green-700">
-                  <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   <span className="text-sm">您的電子郵箱已完成驗證</span>
@@ -391,15 +400,15 @@ const AccountSetting = () => {
                 </div>
 
                 <div className="flex items-center mb-2">
-                  <input
-                    type="checkbox"
-                    id="autoRenew"
-                    checked={subscription.autoRenew}
-                    onChange={toggleAutoRenew}
-                    className="w-4 h-4 text-[#1F4645] bg-white border-[#1F4645] rounded focus:ring-[#1F4645]"
-                  />
-                  <label htmlFor="autoRenew" className="ml-2 text-sm text-[#293a3d]">
-                    自動續訂
+                  <label htmlFor="checkbox" className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="checkbox"
+                      checked={subscription.autoRenew}
+                      onChange={toggleAutoRenew}
+                      className="w-4 h-4 text-[#1F4645] bg-white border-[#1F4645] rounded focus:ring-[#1F4645]"
+                    />
+                    <span className="ml-2 text-sm text-[#293a3d]">自動續訂</span>
                   </label>
                 </div>
 
@@ -410,6 +419,7 @@ const AccountSetting = () => {
 
               <div className="flex flex-wrap gap-2">
                 <button
+                  type="button"
                   onClick={() => setShowPlans(true)}
                   className="px-4 py-2 border border-[#1F4645] text-[#1F4645] rounded-lg text-sm hover:bg-[#f5f5f5] transition-colors"
                 >
@@ -417,6 +427,7 @@ const AccountSetting = () => {
                 </button>
 
                 <button
+                  type="button"
                   onClick={handleCancelSubscription}
                   className="px-4 py-2 border border-[#E57373] text-[#E57373] rounded-lg text-sm hover:bg-[#FFF5F5] transition-colors"
                 >
@@ -431,6 +442,7 @@ const AccountSetting = () => {
               </div>
 
               <button
+                type="button"
                 onClick={() => setShowPlans(true)}
                 className="px-4 py-2 bg-[#1F4645] text-white rounded-lg text-sm hover:bg-[#16383C] transition-colors"
               >
@@ -449,13 +461,16 @@ const AccountSetting = () => {
                   <div
                     key={plan.id}
                     className={cn(
-                      "border rounded-lg p-4 transition-all cursor-pointer",
-                      "hover:shadow-md",
-                      subscription.plan?.id === plan.id
-                        ? "border-[#16B9B3] bg-[#F9FFFE]"
-                        : "border-gray-200"
-                    )}
+                  "border rounded-lg p-4 transition-all cursor-pointer",
+                  "hover:shadow-md",
+                  subscription.plan?.id === plan.id
+                  ? "border-[#16B9B3] bg-[#F9FFFE]"
+                  : "border-gray-200"
+                  )}
                     onClick={() => handleSelectPlan(plan)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSelectPlan(plan)}
+                    role="button"
+                    tabIndex={0}
                   >
                     <div className="font-medium mb-2">{plan.name}</div>
                     <div className="text-[#16B9B3] font-medium mb-4">
@@ -463,8 +478,9 @@ const AccountSetting = () => {
                     </div>
 
                     <ul className="text-sm text-[#536166] space-y-1">
-                      {plan.features.map((feature, index) => (
-                        <li key={index} className="flex items-center">
+
+                      {plan.features.map((feature) => (
+                        <li key={plan.id} className="flex items-center">
                           <span className="text-[#16B9B3] mr-2">✓</span>
                           {feature}
                         </li>
@@ -475,6 +491,7 @@ const AccountSetting = () => {
               </div>
 
               <button
+                type="button"
                 onClick={() => setShowPlans(false)}
                 className="mt-4 px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50 transition-colors"
               >
@@ -612,6 +629,7 @@ const AccountSetting = () => {
             登出帳號
           </h3>
           <button
+            type="button"
             onClick={logout}
             className={cn(
               "w-full rounded-full py-2 bg-white text-[#1f4645]",

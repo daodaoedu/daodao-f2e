@@ -5,6 +5,8 @@ import CheckInView from './dashboard/CheckInView';
 import HistoryView from './dashboard/HistoryView';
 import Confetti from './Confetti';
 import CelebrationMessage from './CelebrationMessage';
+// 標記未使用的導入
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { colors } from '../constants';
 import { PathInfo, CheckInEntry, DashboardView } from '../types';
 
@@ -51,9 +53,9 @@ const DashboardFlow: React.FC<DashboardFlowProps> = ({
       <Confetti active={showConfetti} />
 
       {/* 慶祝訊息 */}
-      <CelebrationMessage 
-        message={celebrationMessage} 
-        isVisible={!!celebrationMessage} 
+      <CelebrationMessage
+        message={celebrationMessage}
+        isVisible={!!celebrationMessage}
       />
 
       {dashboardView === 'main' && (

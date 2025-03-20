@@ -55,7 +55,7 @@ export const processPayment = (
 };
 
 // 獲取支付歷史記錄
-export const getPaymentHistory = (userId: string): Promise<PaymentRecord[]> => {
+export const getPaymentHistory = (): Promise<PaymentRecord[]> => {
   // 這裡應該從 API 獲取真實數據，現在返回模擬數據
   return Promise.resolve([]);
 };

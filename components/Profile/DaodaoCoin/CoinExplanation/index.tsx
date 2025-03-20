@@ -76,6 +76,7 @@ const CoinExplanation = () => {
       {/* 標題區 */}
       <div className="flex items-center mb-6">
         <button
+          type="button"
           onClick={() => router.back()}
           className="mr-3 p-2 hover:bg-gray-100 rounded-full transition-colors"
         >
@@ -108,8 +109,8 @@ const CoinExplanation = () => {
       <div className="mb-8">
         <h3 className="text-xl font-medium text-[#1F4645] mb-4">如何獲取島島幣</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {earnMethods.map((method, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+          {earnMethods.map((method) => (
+            <div key={method.title} className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
               <div className="flex items-center mb-2">
                 <div className="w-10 h-10 bg-[#E6F7F7] rounded-full flex items-center justify-center text-[#16B9B3]">
                   {method.icon}
@@ -188,8 +189,8 @@ const CoinExplanation = () => {
         <h3 className="text-xl font-medium text-[#1F4645] mb-4">島島幣使用規則</h3>
         <div className="bg-[#F9FFFE] border border-[#DEF5F5] rounded-lg p-5">
           <ul className="space-y-3">
-            {coinRules.map((rule, index) => (
-              <li key={index} className="flex">
+            {coinRules.map((rule) => (
+              <li key={rule} className="flex">
                 <span className="mr-2 text-[#16B9B3]">•</span>
                 <span className="text-[#536166]">{rule}</span>
               </li>
@@ -201,6 +202,7 @@ const CoinExplanation = () => {
       {/* 返回兌換頁面按鈕 */}
       <div className="flex justify-center mt-8">
         <button
+          type="button"
           onClick={() => router.back()}
           className="px-6 py-2 bg-[#1F4645] text-white rounded-full hover:bg-[#293a3d] transition-colors"
         >

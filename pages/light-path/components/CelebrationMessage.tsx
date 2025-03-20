@@ -18,10 +18,10 @@ const CelebrationMessage: React.FC<CelebrationMessageProps> = ({ message, isVisi
         boxShadow: `0 15px 30px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05)`,
       }}
     >
-      <div 
+      <div
         className="absolute top-0 left-0 w-full h-1 rounded-t-xl"
-        style={{ 
-          background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})` 
+        style={{
+          background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`
         }}
       />
       <h3
@@ -38,7 +38,8 @@ const CelebrationMessage: React.FC<CelebrationMessageProps> = ({ message, isVisi
         .animate-fadeIn {
           animation: fadeIn 0.5s ease forwards;
         }
-      `}</style>
+      `}
+      </style>
     </div>
   );
 };

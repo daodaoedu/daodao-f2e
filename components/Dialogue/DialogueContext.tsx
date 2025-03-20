@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { cn } from '@/utils/cn';
 
 // 對話風格類型
 export type DialogueStyle = 'encouraging' | 'analytical' | 'challenging' | 'supportive';

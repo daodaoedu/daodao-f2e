@@ -5,7 +5,7 @@ import { PathInfo } from '../../types';
 
 interface StepTwoProps {
   pathInfo: PathInfo;
-  handlePathInfoChange: (field: keyof PathInfo, value: any) => void;
+  handlePathInfoChange: (field: keyof PathInfo, value: string | number) => void;
   handleNextStep: () => void;
 }
 
@@ -16,8 +16,8 @@ const StepTwo: React.FC<StepTwoProps> = ({
 }) => {
   // 計算進度百分比的輔助函數
   const progressPercentage = (): number => {
-    const current = parseInt(pathInfo.currentProgress) || 0;
-    const total = parseInt(pathInfo.totalAmount) || 1;
+    const current = parseInt(pathInfo.currentProgress, 10) || 0;
+    const total = parseInt(pathInfo.totalAmount, 10) || 1;
     return Math.min(100, Math.round((current / total) * 100));
   };
 
@@ -36,42 +36,46 @@ const StepTwo: React.FC<StepTwoProps> = ({
       <div className="p-4 pt-0">
         <div className="space-y-4">
           <div>
-            <label htmlFor="totalAmount" className="block text-sm font-medium text-gray-700 mb-1">總數量</label>
-            <input
-              id="totalAmount"
-              type="number"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
-              style={{ borderColor: colors.primary }}
-              placeholder={pathInfo.contentType === 'custom' ? "例如：30天" : "例如：100"}
-              value={pathInfo.totalAmount}
-              onChange={(e) => handlePathInfoChange('totalAmount', e.target.value)}
-            />
+            <label htmlFor="totalAmount" className="block text-sm font-medium text-gray-700 mb-1">
+              總數量
+              <input
+                id="totalAmount"
+                type="number"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+                style={{ borderColor: colors.primary }}
+                placeholder={pathInfo.contentType === 'custom' ? "例如：30天" : "例如：100"}
+                value={pathInfo.totalAmount}
+                onChange={(e) => handlePathInfoChange('totalAmount', e.target.value)}
+              />
+            </label>
             <p className="text-xs text-gray-500 mt-1">
               {pathInfo.contentType === 'custom'
                 ? "這個挑戰會持續多少天？"
                 : pathInfo.contentType === 'book'
-                ? "這本書有多少頁？"
-                : pathInfo.contentType === 'video'
-                ? "有多少個影片或課程？"
-                : pathInfo.contentType === 'podcast'
-                ? "你將會聽多少集？"
-                : pathInfo.contentType === 'articles'
-                ? "你將閱讀多少篇文章？"
-                : "你總共要完成多少單元？"}
+                  ? "這本書有多少頁？"
+                  : pathInfo.contentType === 'video'
+                    ? "有多少個影片或課程？"
+                    : pathInfo.contentType === 'podcast'
+                      ? "你將會聽多少集？"
+                      : pathInfo.contentType === 'articles'
+                        ? "你將閱讀多少篇文章？"
+                        : "你總共要完成多少單元？"}
             </p>
           </div>
 
           <div>
-            <label htmlFor="currentProgress" className="block text-sm font-medium text-gray-700 mb-1">起始點（可選）</label>
-            <input
-              id="currentProgress"
-              type="number"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
-              style={{ borderColor: colors.primary }}
-              placeholder="例如：0"
-              value={pathInfo.currentProgress}
-              onChange={(e) => handlePathInfoChange('currentProgress', e.target.value)}
-            />
+            <label htmlFor="currentProgress" className="block text-sm font-medium text-gray-700 mb-1">
+              起始點（可選）
+              <input
+                id="currentProgress"
+                type="number"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+                style={{ borderColor: colors.primary }}
+                placeholder="例如：0"
+                value={pathInfo.currentProgress}
+                onChange={(e) => handlePathInfoChange('currentProgress', e.target.value)}
+              />
+            </label>
             <p className="text-xs text-gray-500 mt-1">
               如果你已經開始了，輸入你已完成的量
             </p>
@@ -79,7 +83,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 
           <div className="pt-2">
             <div className="flex justify-between mb-1">
-              <label className="block text-sm font-medium text-gray-700">起始進度</label>
+              <span className="block text-sm font-medium text-gray-700">起始進度</span>
             </div>
             <div className="p-4 bg-gray-50 rounded-lg border">
               <div className="flex justify-between text-sm mb-1">
@@ -115,6 +119,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
       </div>
       <div className="p-4 pt-0 flex justify-end">
         <button
+          type="button"
           className="rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 py-2 px-4 text-sm text-white"
           style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
           onClick={handleNextStep}

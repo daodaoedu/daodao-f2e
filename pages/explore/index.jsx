@@ -95,6 +95,7 @@ function ExplorePage() {
                 <h2 className="text-xl font-bold mb-3">熱門學習計畫</h2>
                 <p className="text-gray-600 mb-4">查看社群中最受歡迎的學習計畫，獲取靈感與指導</p>
                 <button
+                  type="button"
                   onClick={() => handleCategorySelect('/projects')}
                   className="text-blue-500 font-medium flex items-center"
                 >
@@ -109,6 +110,7 @@ function ExplorePage() {
                 <h2 className="text-xl font-bold mb-3">精選學習資源</h2>
                 <p className="text-gray-600 mb-4">探索各種優質學習資源，提升你的學習效率與深度</p>
                 <button
+                  type="button"
                   onClick={() => handleCategorySelect('/search')}
                   className="text-blue-500 font-medium flex items-center"
                 >
@@ -123,6 +125,7 @@ function ExplorePage() {
                 <h2 className="text-xl font-bold mb-3">學習想法分享</h2>
                 <p className="text-gray-600 mb-4">閱讀其他學習者的心得體會與想法，獲取靈感</p>
                 <button
+                  type="button"
                   onClick={() => handleCategorySelect('/ideas')}
                   className="text-blue-500 font-medium flex items-center"
                 >
@@ -140,6 +143,7 @@ function ExplorePage() {
             {/* 添加返回按鈕 */}
             <div className="mb-6">
               <button
+                type="button"
                 onClick={selectedCategory === '/project-detail' ?
                   () => handleCategorySelect('/projects') : backToExplore}
                 className="flex items-center text-primary-base hover:underline"
@@ -161,22 +165,22 @@ function ExplorePage() {
                   <ProjectsComponent
                     path="/explore"
                     onProjectClick={(projectId) => {
-                  // 當點擊項目時，更新 URL 和狀態
-                  setSelectedProjectId(projectId);
-                  setSelectedCategory('/project-detail');
-                  router.push(
-                    {
-                      pathname: '/explore',
-                      query: { category: 'project-detail', id: projectId }
-                    },
-                    undefined,
-                    { shallow: true }
-                  ).then(() => {
-                    console.log(`Project detail view loaded for ID: ${projectId}`);
-                  }).catch((err) => {
-                    console.error('Failed to load project detail:', err);
-                  });
-                }}
+                      // 當點擊項目時，更新 URL 和狀態
+                      setSelectedProjectId(projectId);
+                      setSelectedCategory('/project-detail');
+                      router.push(
+                        {
+                          pathname: '/explore',
+                          query: { category: 'project-detail', id: projectId }
+                        },
+                        undefined,
+                        { shallow: true }
+                      ).then(() => {
+                        console.log(`Project detail view loaded for ID: ${projectId}`);
+                      }).catch((err) => {
+                        console.error('Failed to load project detail:', err);
+                      });
+                    }}
                   />
                 </div>
               </div>
@@ -285,7 +289,7 @@ function ExplorePage() {
                       <span className="mr-3">人數：4/6</span>
                       <span>時間：每週二四六晚上8點</span>
                     </div>
-                    <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">申請加入</button>
+                    <button type="button" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">申請加入</button>
                   </div>
 
                   <div className="bg-white rounded-xl shadow-md p-6">
@@ -295,7 +299,7 @@ function ExplorePage() {
                       <span className="mr-3">人數：1/2</span>
                       <span>時間：彈性安排</span>
                     </div>
-                    <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">申請加入</button>
+                    <button type="button" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">申請加入</button>
                   </div>
 
                   <div className="bg-white rounded-xl shadow-md p-6">
@@ -305,7 +309,7 @@ function ExplorePage() {
                       <span className="mr-3">人數：5/10</span>
                       <span>時間：每月最後一個週六</span>
                     </div>
-                    <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">申請加入</button>
+                    <button type="button" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">申請加入</button>
                   </div>
                 </div>
               </div>

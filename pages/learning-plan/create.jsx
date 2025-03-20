@@ -9,13 +9,13 @@ import getDefaultLayout from '@/layout/DefaultLayout';
 import { cn } from '@/utils/cn';
 
 // 日期選擇組件
-const DateSelector = ({ label, value, onChange, minDate }) => {
+const DateSelector = ({ label, value, onChange }) => {
   const dateValue = value ? dayjs(value) : null;
 
   // 產生年份選項
   const years = [];
   const currentYear = dayjs().year();
-  for (let i = currentYear - 1; i <= currentYear + 5; i++) {
+  for (let i = currentYear - 1; i <= currentYear + 5; i += 1) {
     years.push(i);
   }
 
@@ -43,19 +43,19 @@ const DateSelector = ({ label, value, onChange, minDate }) => {
   const days = [];
   if (dateValue) {
     const daysInMonth = getDaysInMonth(dateValue.year(), dateValue.month() + 1);
-    for (let i = 1; i <= daysInMonth; i++) {
+    for (let i = 1; i <= daysInMonth; i += 1) {
       days.push(i);
     }
   }
 
   const handleYearChange = (e) => {
-    const newYear = parseInt(e.target.value);
+    const newYear = parseInt(e.target.value, 10);
     const newDate = dateValue.year(newYear);
     onChange(newDate);
   };
 
   const handleMonthChange = (e) => {
-    const newMonth = parseInt(e.target.value) - 1; // dayjs 月份從 0 開始
+    const newMonth = parseInt(e.target.value, 10) - 1; // dayjs 月份從 0 開始
     let newDate = dateValue.month(newMonth);
 
     // 檢查日期是否超過當月天數
@@ -68,16 +68,17 @@ const DateSelector = ({ label, value, onChange, minDate }) => {
   };
 
   const handleDayChange = (e) => {
-    const newDay = parseInt(e.target.value);
+    const newDay = parseInt(e.target.value, 10);
     const newDate = dateValue.date(newDay);
     onChange(newDate);
   };
 
   return (
     <div className="mb-6">
-      <label className="block text-basic-400 font-medium mb-2">{label}</label>
+      <label htmlFor={`${label.toLowerCase().replace(/\s/g, '-')}`} className="block text-basic-400 font-medium mb-2">{label}</label>
       <div className="flex gap-2">
         <select
+          id={`${label.toLowerCase().replace(/\s/g, '-')}-year`}
           value={dateValue ? dateValue.year() : ''}
           onChange={handleYearChange}
           className="p-2 border border-basic-200 rounded-lg flex-1"
@@ -88,6 +89,7 @@ const DateSelector = ({ label, value, onChange, minDate }) => {
         </select>
 
         <select
+          id={`${label.toLowerCase().replace(/\s/g, '-')}-month`}
           value={dateValue ? dateValue.month() + 1 : ''}
           onChange={handleMonthChange}
           className="p-2 border border-basic-200 rounded-lg flex-1"
@@ -98,6 +100,7 @@ const DateSelector = ({ label, value, onChange, minDate }) => {
         </select>
 
         <select
+          id={`${label.toLowerCase().replace(/\s/g, '-')}-day`}
           value={dateValue ? dateValue.date() : ''}
           onChange={handleDayChange}
           className="p-2 border border-basic-200 rounded-lg flex-1"
@@ -290,43 +293,52 @@ const CreateLearningPlanPage = () => {
               <h2 className="text-lg font-bold text-basic-500 mb-4">基本資訊</h2>
 
               <div className="mb-6">
-                <label className="block text-basic-400 font-medium mb-2">計劃名稱 <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => handleFormChange('title', e.target.value)}
-                  className={cn(
-                    "w-full p-3 border rounded-lg",
-                    errors.title ? "border-red-500" : "border-basic-200"
-                  )}
-                  placeholder="例如：JavaScript 基礎學習計劃"
-                />
+                <label htmlFor="plan-title" className="block text-basic-400 font-medium mb-2">
+                  計劃名稱 <span className="text-red-500">*</span>
+                  <input
+                    id="plan-title"
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => handleFormChange('title', e.target.value)}
+                    className={cn(
+                      "w-full p-3 border rounded-lg",
+                      errors.title ? "border-red-500" : "border-basic-200"
+                    )}
+                    placeholder="例如：JavaScript 基礎學習計劃"
+                  />
+                </label>
                 {errors.title && (
                   <p className="text-red-500 text-sm mt-1">{errors.title}</p>
                 )}
               </div>
 
               <div className="mb-6">
-                <label className="block text-basic-400 font-medium mb-2">計劃類型</label>
-                <select
-                  value={formData.type}
-                  onChange={(e) => handleFormChange('type', e.target.value)}
-                  className="w-full p-3 border border-basic-200 rounded-lg"
-                >
-                  {planTypes.map((type) => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
+                <label htmlFor="plan-type" className="block text-basic-400 font-medium mb-2">
+                  計劃類型
+                  <select
+                    id="plan-type"
+                    value={formData.type}
+                    onChange={(e) => handleFormChange('type', e.target.value)}
+                    className="w-full p-3 border border-basic-200 rounded-lg"
+                  >
+                    {planTypes.map((type) => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </label>
               </div>
 
               <div className="mb-6">
-                <label className="block text-basic-400 font-medium mb-2">計劃描述</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => handleFormChange('description', e.target.value)}
-                  className="w-full p-3 border border-basic-200 rounded-lg min-h-[120px]"
-                  placeholder="描述你的學習計劃目標和內容..."
-                />
+                <label htmlFor="plan-description" className="block text-basic-400 font-medium mb-2">
+                  計劃描述
+                  <textarea
+                    id="plan-description"
+                    value={formData.description}
+                    onChange={(e) => handleFormChange('description', e.target.value)}
+                    className="w-full p-3 border border-basic-200 rounded-lg min-h-[120px]"
+                    placeholder="描述你的學習計劃目標和內容..."
+                  />
+                </label>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -340,7 +352,7 @@ const CreateLearningPlanPage = () => {
                   label="結束日期"
                   value={formData.endDate}
                   onChange={(value) => handleFormChange('endDate', value)}
-                  minDate={formData.startDate}
+                  _minDate={formData.startDate}
                 />
               </div>
             </div>
@@ -349,35 +361,36 @@ const CreateLearningPlanPage = () => {
               <h2 className="text-lg font-bold text-basic-500 mb-4">任務清單</h2>
 
               <div className="mb-6">
-                <label className="block text-basic-400 font-medium mb-2">
+                <label htmlFor="new-task" className="block text-basic-400 font-medium mb-2">
                   添加任務 <span className="text-red-500">*</span>
+                  <div className="flex gap-2">
+                    <input
+                      id="new-task"
+                      type="text"
+                      value={newTask}
+                      onChange={(e) => setNewTask(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddTask();
+                        }
+                      }}
+                      className={cn(
+                        "flex-1 p-3 border rounded-lg",
+                        errors.tasks ? "border-red-500" : "border-basic-200"
+                      )}
+                      placeholder="輸入任務內容..."
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddTask}
+                      className="px-4 py-2 bg-primary-base text-white rounded-lg hover:bg-primary-darker flex items-center gap-1"
+                    >
+                      <Add fontSize="small" />
+                      <span>添加</span>
+                    </button>
+                  </div>
                 </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newTask}
-                    onChange={(e) => setNewTask(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAddTask();
-                      }
-                    }}
-                    className={cn(
-                      "flex-1 p-3 border rounded-lg",
-                      errors.tasks ? "border-red-500" : "border-basic-200"
-                    )}
-                    placeholder="輸入任務內容..."
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddTask}
-                    className="px-4 py-2 bg-primary-base text-white rounded-lg hover:bg-primary-darker flex items-center gap-1"
-                  >
-                    <Add fontSize="small" />
-                    <span>添加</span>
-                  </button>
-                </div>
                 {errors.tasks && (
                   <p className="text-red-500 text-sm mt-1">{errors.tasks}</p>
                 )}

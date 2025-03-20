@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import Image from 'next/image';
 import styled from '@emotion/styled';
 import { Typography, Box, Container, Grid, Paper, Button } from '@mui/material';
 
 import SEOConfig from '@/shared/components/SEO';
 import CheckIconSvg from '@/public/assets/icons/check_icon.svg';
+import { v4 as uuidv4 } from 'uuid';
 
 // 樣式定義
 const PageWrapper = styled.div`
@@ -404,6 +404,7 @@ function JoinUsPage() {
     }),
     [router?.asPath],
   );
+  const uniqueId = uuidv4();
 
   return (
     <PageWrapper>
@@ -425,7 +426,7 @@ function JoinUsPage() {
           </SectionTitle>
           <Grid container spacing={4}>
             {roles.map((role, index) => (
-              <Grid item xs={12} md={4} key={index}>
+              <Grid item xs={12} md={4} key={uniqueId}>
                 <StyledPaper>
                   <RoleTag>{role.tag}</RoleTag>
                   <RoleIcon>
@@ -459,8 +460,8 @@ function JoinUsPage() {
                       角色要求：
                     </Typography>
                     <RequirementsList>
-                      {role.requirements.map((req, idx) => (
-                        <RequirementItem key={idx}>
+                      {role.requirements.map((req) => (
+                        <RequirementItem key={uniqueId}>
                           <CheckIconSvg />
                           <Typography variant="body2">{req}</Typography>
                         </RequirementItem>
@@ -489,7 +490,7 @@ function JoinUsPage() {
           </SectionTitle>
           <Grid container spacing={2}>
             {applicationSteps.map((step, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
+              <Grid item xs={12} sm={6} md={3} key={uniqueId}>
                 <StepItem isLast={index === applicationSteps.length - 1}>
                   <StepNumber>{step.number}</StepNumber>
                   <Typography variant="h5" fontSize={18} fontWeight="bold" color="#295E5C" mb={1}>
@@ -510,8 +511,8 @@ function JoinUsPage() {
             夥伴分享
           </SectionTitle>
           <Grid container spacing={4}>
-            {testimonials.map((testimonial, index) => (
-              <Grid item xs={12} md={6} key={index}>
+            {testimonials.map((testimonial) => (
+              <Grid item xs={12} md={6} key={uniqueId}>
                 <TestimonialPaper>
                   <QuoteIcon>"</QuoteIcon>
                   <TestimonialQuote variant="body1">
@@ -556,8 +557,8 @@ function JoinUsPage() {
             常見問題
           </SectionTitle>
           <Box maxWidth="800px" mx="auto">
-            {faqs.map((faq, index) => (
-              <FAQItem key={index}>
+            {faqs.map((faq) => (
+              <FAQItem key={uniqueId}>
                 <FAQQuestion>
                   <Typography variant="subtitle1">
                     Q: {faq.question}

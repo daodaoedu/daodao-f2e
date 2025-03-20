@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import SetupFlow from './components/SetupFlow';
 import DashboardFlow from './components/DashboardFlow';
-import { PathInfo, CheckInEntry, MainView, DashboardView } from './types';
+import { PathInfo, CheckInEntry, MainView, DashboardView, MotivationType } from './types';
 
 const LightPath: React.FC = () => {
   // 主視圖狀態 - 控制顯示應用的哪一部分
@@ -45,10 +45,31 @@ const LightPath: React.FC = () => {
   ]);
 
   // 處理設置流程中的輸入變化
-  const handlePathInfoChange = (field: keyof PathInfo, value: any) => {
-    setPathInfo({
-      ...pathInfo,
-      [field]: value
+  const handlePathInfoChange = (field: keyof PathInfo, value: string | number | boolean | string[]) => {
+    setPathInfo((prev) => {
+      if (field === 'isPublic' || field === 'reminderEnabled') {
+        return { ...prev, [field]: typeof value === 'boolean' ? value : prev[field] };
+      }
+      if (field === 'streak') {
+        return { ...prev, [field]: typeof value === 'number' ? value : prev[field] };
+      }
+      if (field === 'motivationType') {
+        let motivationValue: MotivationType = prev[field]; // 預設保持原值
+        if (typeof value === 'string') {
+          // 檢查 value 是否符合 MotivationType
+          const validMotivations: MotivationType[] = ['career', 'personal', 'project', 'required', 'other', ''];
+          motivationValue = validMotivations.includes(value as MotivationType) ? (value as MotivationType) : '';
+        } else if (Array.isArray(value)) {
+          // 如果是 string[]，取第一個有效值或轉為字串
+          const firstValue = value[0];
+          const validMotivations: MotivationType[] = ['career', 'personal', 'project', 'required', 'other', ''];
+          motivationValue = firstValue && validMotivations.includes(firstValue as MotivationType)
+            ? (firstValue as MotivationType)
+            : '';
+        }
+        return { ...prev, [field]: motivationValue };
+      }
+      return { ...prev, [field]: value };
     });
   };
 
@@ -80,8 +101,7 @@ const LightPath: React.FC = () => {
       setDashboardView('main');
 
       // 設置初始newProgress值
-      setNewProgress(parseInt(pathInfo.currentProgress) || 0);
-
+      setNewProgress(parseInt(pathInfo.currentProgress, 10) || 0);
       // 轉場後隱藏紙屑
       setTimeout(() => {
         setShowConfetti(false);
@@ -93,7 +113,7 @@ const LightPath: React.FC = () => {
   // 儀表板導航
   const handleCheckin = () => {
     setDashboardView('checkin');
-    setNewProgress(parseInt(pathInfo.currentProgress) + 1);
+    setNewProgress(parseInt(pathInfo.currentProgress, 10) + 1);
   };
 
   const handleViewHistory = () => {
