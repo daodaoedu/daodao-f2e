@@ -1,8 +1,8 @@
 import Image from '@/shared/components/Image';
 import PostDetailCard from '@/shared/components/Post/PostDetailCard';
-import { ProjectOutcomeSchema } from '@/services/projects/outcomes';
+import { ProjectOutcomeSchema } from '@/services/modules/projects';
 import { BaseUserSchema } from '@/services/users';
-import { CommentType } from '@/services/comments';
+import { CommentType } from '@/services/modules/comments';
 
 interface OutcomeDetailProps {
   data?: ProjectOutcomeSchema;
@@ -31,14 +31,16 @@ function OutcomeDetail({
       renderContent={(outcomeData) => (
         <div className="mb-4 body-sm text-basic-500">
           <p className="mb-3 whitespace-pre-wrap">{outcomeData.content}</p>
-          {outcomeData.imgUrls && outcomeData.imgUrls.length > 0 && (
-            <Image
-              src={outcomeData.imgUrls[0]}
-              alt={outcomeData.title}
-              height="300px"
-              className="object-contain"
-            />
-          )}
+          {Array.isArray(outcomeData.imgUrls) &&
+            outcomeData.imgUrls.map((imgUrl) => (
+              <Image
+                key={imgUrl}
+                src={imgUrl}
+                alt={outcomeData.title}
+                height="300px"
+                className="object-contain"
+              />
+            ))}
         </div>
       )}
     />

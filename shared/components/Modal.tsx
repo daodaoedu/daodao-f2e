@@ -12,7 +12,7 @@ enum ModalSize {
 
 export interface ModalProps {
   isOpen: boolean;
-  title?: string;
+  title?: React.ReactNode;
   size?: ModalSize | `${ModalSize}`;
   hasCloseButton?: boolean;
   children: React.ReactNode;
@@ -86,9 +86,7 @@ function Modal({
 
     if (isOpen) {
       timer = setTimeout(() => {
-        console.log(dialogRef.current);
         if (dialogRef.current) {
-          console.log(window.innerHeight - dialogRef.current.clientHeight);
           dialogRef.current.style.setProperty(
             '--dialog-top',
             `max(calc(100dvh - ${dialogRef.current.clientHeight}px), 20dvh)`
@@ -128,7 +126,7 @@ function Modal({
             ref={dialogRef}
             open={!removeDOM}
             className={cn(
-              'relative top-[var(--dialog-top)] my-0 p-5 pb-20 w-full',
+              'relative top-[var(--dialog-top)] my-0 p-5 w-full',
               'bg-white rounded-lg pointer-events-auto',
               size === ModalSize.Small &&
                 'sm:relative sm:top-12 sm:m-auto sm:p-10 sm:max-w-96',
@@ -162,7 +160,7 @@ function Modal({
             {children}
             <div
               className={cn(
-                'absolute bottom-0 left-0 right-0 p-5 bg-white',
+                'absolute -bottom-1 left-0 right-0 h-3 bg-white',
                 size === ModalSize.Small && 'sm:hidden',
                 size === ModalSize.Medium && 'md:hidden',
                 size === ModalSize.Large && 'lg:hidden'

@@ -1,7 +1,9 @@
-import PostDetailCard, { BasePostDetailData } from '@/shared/components/Post/PostDetailCard';
-import { ProjectReviewSchema } from '@/services/projects/reviews';
+import PostDetailCard, {
+  BasePostDetailData,
+} from '@/shared/components/Post/PostDetailCard';
+import { ProjectReviewSchema } from '@/services/modules/projects';
 import { BaseUserSchema } from '@/services/users';
-import { CommentType } from '@/services/comments';
+import { CommentType } from '@/services/modules/comments';
 import RadioGroup from './RadioGroup';
 
 interface ReviewDetailProps {

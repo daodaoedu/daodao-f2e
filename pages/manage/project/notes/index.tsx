@@ -10,8 +10,9 @@ import ConfirmModal from '@/shared/components/Confirm';
 import {
   useProject,
   useProjectNote,
-  useProjectNoteList,
-} from '@/hooks/api/project';
+  useProjectNoteMutation,
+  useProjectNotes,
+} from '@/services/modules/projects';
 
 enum ModalTypeEnum {
   Create,
@@ -21,38 +22,40 @@ enum ModalTypeEnum {
 
 const NotesPage = () => {
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('id') ?? undefined;
+  const projectId = searchParams.get('id');
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
-  const [noteId, setNoteId] = useState<number | undefined>(undefined);
-  const { data: project } = useProject({ id: projectId });
+  const [noteId, setNoteId] = useState<number | null>(null);
+  const { data: project } = useProject(projectId);
 
-  const { data: detail, mutate } = useProjectNote({
+  const { data: notes, mutate } = useProjectNotes(projectId);
+
+  const { data: detail } = useProjectNote({
     projectId,
     noteId,
   });
 
-  const {
-    data: notes,
-    create,
-    update,
-    remove,
-  } = useProjectNoteList(projectId, {
-    onCreated: () => {
-      toast.success('新增成功');
-      setModalType(null);
-    },
-    onUpdated: () => {
-      toast.success('更新成功');
-      setModalType(null);
-      setNoteId(undefined);
-      mutate();
-    },
-    onDeleted: () => {
-      toast.success('刪除成功');
-      setModalType(null);
-      setNoteId(undefined);
-    },
-  });
+  const { createMutation, updateMutation, deleteMutation } =
+    useProjectNoteMutation({
+      projectId,
+      noteId,
+      onCreated: () => {
+        toast.success('新增成功');
+        setModalType(null);
+        mutate();
+      },
+      onUpdated: () => {
+        toast.success('更新成功');
+        setModalType(null);
+        setNoteId(null);
+        mutate();
+      },
+      onDeleted: () => {
+        toast.success('刪除成功');
+        setModalType(null);
+        setNoteId(null);
+        mutate();
+      },
+    });
 
   if (!projectId) {
     return <div>專案不存在</div>;
@@ -99,8 +102,8 @@ const NotesPage = () => {
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
-          isLoading={create.isMutating}
-          onSubmit={create.trigger}
+          isLoading={createMutation.isMutating}
+          onSubmit={createMutation.trigger}
         />
       )}
 
@@ -114,9 +117,9 @@ const NotesPage = () => {
           projectTitle={project.title}
           week={detail.week}
           createdAt={detail.date}
-          isLoading={update.isMutating}
+          isLoading={updateMutation.isMutating}
           defaultValues={detail}
-          onSubmit={update.trigger}
+          onSubmit={updateMutation.trigger}
         />
       )}
 
@@ -127,8 +130,8 @@ const NotesPage = () => {
           confirmColor="alert"
           isOpen={modalType === ModalTypeEnum.Delete}
           onClose={() => setModalType(null)}
-          onConfirm={() => remove.trigger({ projectId, noteId })}
-          isLoading={remove.isMutating}
+          onConfirm={() => deleteMutation.trigger({ projectId, noteId })}
+          isLoading={deleteMutation.isMutating}
         />
       )}
     </>
