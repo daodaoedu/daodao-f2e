@@ -127,10 +127,6 @@ jobs:
               } >> $GITHUB_OUTPUT
               exit 1
           fi
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git diff --cached --quiet || echo "changes=true" >> $GITHUB_OUTPUT
 
       - name: Send ESLint Error Notification
         if: steps.lint.outcome == 'failure' && env.IS_INTERNAL_PR == 'true'
@@ -149,9 +145,3 @@ jobs:
           echo "❌ Lint Failed"
           echo $LINT_ERROR
           exit 1
-
-      - name: Commit lint Changes
-        if: steps.lint.outcome == 'success' && steps.lint.outputs.changes == 'true'
-        run: |
-          git commit -m "chore: format code"
-          git push

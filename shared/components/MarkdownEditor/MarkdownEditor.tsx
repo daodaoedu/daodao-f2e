@@ -53,6 +53,22 @@ const generatePluginsSettings = ({ diffMarkdown = '' }) => ({
   toolbar: toolbarPlugin({ toolbarContents }),
 });
 
+interface MarkdownEditorProps {
+  readOnly?: boolean;
+  hasHeadings?: boolean;
+  value?: string;
+  placeholder?: string;
+  rootClassName?: string;
+  className?: string;
+  editorClassName?: string;
+  onChange?: (value: string) => void;
+  suppressLinkDefaultPrevent?: boolean;
+  disabledProse?: boolean;
+}
+
+type CheckLinkRef = { check: (href: string) => void };
+type EditorError = { error: string; source: string };
+
 function InternalMarkdownEditor(
   {
     readOnly = false,
@@ -65,18 +81,20 @@ function InternalMarkdownEditor(
     onChange,
     suppressLinkDefaultPrevent = false,
     disabledProse = false,
-  },
-  ref
+  }: MarkdownEditorProps,
+  ref: React.Ref<React.ComponentRef<typeof MDXEditor>>
 ) {
   const formattedValue = typeof value === 'string' ? value : '';
   const id = useId();
-  const [error, setError] = useState(null);
-  const checkLinkRef = useRef(null);
+  const [error, setError] = useState<EditorError | null>(null);
+  const checkLinkRef = useRef<CheckLinkRef>(null);
   const markdown = useRef(formattedValue);
   const editorSelectors = 'markdown-editor';
   const pluginsSettings = useMemo(
     () =>
-      Object.entries(generatePluginsSettings({ diffMarkdown: markdown.current }))
+      Object.entries(
+        generatePluginsSettings({ diffMarkdown: markdown.current })
+      )
         .filter(([key]) => {
           if (readOnly) {
             return key !== 'toolbar';
@@ -91,9 +109,11 @@ function InternalMarkdownEditor(
   );
 
   useEffect(() => {
-    const editor = document.getElementById(id).querySelector(`.${editorSelectors}`);
+    const editor = document
+      .getElementById(id)
+      ?.querySelector(`.${editorSelectors}`);
 
-    const handleClick = (e) => {
+    const handleClick = (e: Event) => {
       if (suppressLinkDefaultPrevent) {
         return;
       }
@@ -103,19 +123,21 @@ function InternalMarkdownEditor(
         return;
       }
 
-      let { target } = e;
-      while (target.tagName !== 'A') {
-        if (editor === target) break;
-        target = target.parentElement;
+      let dom = e.target as HTMLAnchorElement;
+      while (dom?.tagName !== 'A') {
+        if (editor === dom) break;
+        dom = dom?.parentElement as HTMLAnchorElement;
       }
-      if (target.tagName === 'A') {
+      if (dom?.tagName === 'A') {
         e.preventDefault();
-        checkLinkRef.current?.check(target.href);
+        checkLinkRef.current?.check(dom.href);
       }
     };
 
-    editor.addEventListener('click', handleClick);
-    return () => editor.removeEventListener('click', handleClick);
+    editor?.addEventListener('click', handleClick);
+    return () => {
+      editor?.removeEventListener('click', handleClick);
+    };
   }, []);
 
   return (
@@ -149,9 +171,15 @@ function InternalMarkdownEditor(
         plugins={pluginsSettings}
         translation={(keyString, defaultText, interpolations) => {
           const keys = keyString.split('.');
-          const text = keys.reduce((acc, key) => acc?.[key], zhTW);
+          // 等 i18n 完成後，在調整
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          const text: unknown = keys.reduce((acc, key) => acc?.[key], zhTW);
           return typeof text === 'string'
-            ? text.replace(/{{([^{}]+)}}/g, (_, p1) => interpolations?.[p1] || '')
+            ? text.replace(
+                /{{([^{}]+)}}/g,
+                (_, p1) => interpolations?.[p1] || ''
+              )
             : defaultText;
         }}
       />
