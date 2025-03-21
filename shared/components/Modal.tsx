@@ -82,21 +82,27 @@ function Modal({
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    const observer = new ResizeObserver((entries) => {
+      entries.forEach((entry) => {
+        const { height } = entry.contentRect;
 
-    if (isOpen) {
-      timer = setTimeout(() => {
-        if (dialogRef.current) {
-          dialogRef.current.style.setProperty(
+        if (height > 0) {
+          (entry.target as HTMLElement).style.setProperty(
             '--dialog-top',
-            `max(calc(100dvh - ${dialogRef.current.clientHeight}px), 20dvh)`
+            `max(calc(100dvh - ${height + 48}px), 20dvh)`
           );
         }
-      }, 0);
+      });
+    });
+
+    if (!removeDOM && dialogRef.current) {
+      observer.observe(dialogRef.current);
     }
 
-    return () => clearTimeout(timer);
-  }, [isOpen]);
+    return () => {
+      observer.disconnect();
+    };
+  }, [removeDOM]);
 
   return (
     (!removeDOM || keepMounted) && (
@@ -160,7 +166,7 @@ function Modal({
             {children}
             <div
               className={cn(
-                'absolute -bottom-1 left-0 right-0 h-3 bg-white',
+                'absolute -bottom-3 left-0 right-0 h-4 bg-white',
                 size === ModalSize.Small && 'sm:hidden',
                 size === ModalSize.Medium && 'md:hidden',
                 size === ModalSize.Large && 'lg:hidden'
