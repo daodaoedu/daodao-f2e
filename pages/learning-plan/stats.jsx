@@ -103,21 +103,7 @@ const LearningStatsPage = () => {
     weeklyActivity: []
   });
 
-    // 計算統計指標
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const calculateStats = () => {
-    // 基本統計
-    const totalPlans = plans.length;
-    const completedPlans = plans.filter((plan) =>
-      plan.tasks.length > 0 && plan.tasks.every((task) => task.completed)
-    ).length;
-
-    const totalTasks = plans.reduce((sum, plan) => sum + plan.tasks.length, 0);
-    const completedTasks = plans.reduce((sum, plan) =>
-      sum + plan.tasks.filter((task) => task.completed).length, 0
-    );
-
-  // 從本地儲存讀取數據
+    // 從本地儲存讀取數據
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedPlans = localStorage.getItem('learning-plans');
@@ -144,9 +130,17 @@ const LearningStatsPage = () => {
   // 計算統計資料
   useEffect(() => {
     if (plans.length > 0) {
-      calculateStats();
-    }
-  }, [plans]);
+      // 計算統計指標
+      // 基本統計
+      const totalPlans = plans.length;
+      const completedPlans = plans.filter((plan) =>
+        plan.tasks.length > 0 && plan.tasks.every((task) => task.completed)
+      ).length;
+
+      const totalTasks = plans.reduce((sum, plan) => sum + plan.tasks.length, 0);
+      const completedTasks = plans.reduce((sum, plan) =>
+        sum + plan.tasks.filter((task) => task.completed).length, 0
+      );
 
     // 打卡統計
     let allCheckIns = [];
@@ -281,7 +275,8 @@ const LearningStatsPage = () => {
       mostRecentCheckIn,
       weeklyActivity
     });
-  };
+    }
+  }, [plans]);
 
   // SEO 資料
   const SEOData = {
