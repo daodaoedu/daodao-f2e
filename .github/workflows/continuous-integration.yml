@@ -5,6 +5,12 @@ concurrency:
   cancel-in-progress: true
 
 on:
+  pull_request:
+    branches:
+      - 'prod'
+    types:
+      - opened
+
   workflow_call:
   workflow_dispatch:
 
@@ -31,7 +37,7 @@ jobs:
           path: |
             node_modules
             ~/.cache/Cypress
-          key: deps-node-modules-${{ hashFiles('package.json', '**/yarn.lock') }}
+          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'

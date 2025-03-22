@@ -7,11 +7,18 @@ concurrency:
 on:
   push:
     branches:
-      - "prod"
+      - 'prod'
+      - 'dev'
+
   pull_request:
     branches:
-      - "**"
-      - "!prod"
+      - '**'
+      - '!prod'
+    types:
+      - opened
+      - synchronize
+      - reopened
+
   workflow_dispatch:
 
 env:
@@ -79,8 +86,8 @@ jobs:
         uses: ./.github/actions/notification
         with:
           TYPE: failure
-          TITLE: "❌ Build and Deploy Failed"
-          DESCRIPTION: "${{ needs.build_and_deploy.outputs.cmd-output }}"
+          TITLE: '❌ Build and Deploy Failed'
+          DESCRIPTION: '${{ needs.build_and_deploy.outputs.cmd-output }}'
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       - name: Send Build Succeeded Notification
@@ -88,6 +95,6 @@ jobs:
         uses: ./.github/actions/notification
         with:
           TYPE: success
-          TITLE: "✅ Build Succeeded"
-          DESCRIPTION: "Preview URL: ${{ needs.build_and_deploy.outputs.preview-url }}"
+          TITLE: '✅ Build Succeeded'
+          DESCRIPTION: 'Preview URL: ${{ needs.build_and_deploy.outputs.preview-url }}'
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
