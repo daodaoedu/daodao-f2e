@@ -1,17 +1,25 @@
+import toast from 'react-hot-toast';
 import React, { useState } from 'react';
 import { FaCheck } from "react-icons/fa6";
+import {
+  MdSend,
+  MdClose,
+  MdEdit,
+  MdDelete,
+  MdCalendarToday,
+} from "react-icons/md";
 import { cn } from "@/utils/cn";
 import { useMilestones } from '@/contexts/Milestones/index';
 import { Task as TaskType } from "@/contexts/Milestones/type";
-
-import toast from 'react-hot-toast';
-
-import { MdSend, MdClose, MdEdit, MdDelete, MdCalendarToday, MdKeyboardArrowDown } from "react-icons/md";
+import Button from '@/shared/components/Button';
+import Dropdown from '@/shared/components/Dropdown';
 
 interface TaskProps {
-  projectId : string;
+  index?: number;
+  projectId: string;
   milestoneId: number;
-  task: TaskType;
+  task?: TaskType;
+  onCancel?: () => void;
   onRefreshData?: () => void;
 }
 
@@ -28,26 +36,40 @@ const dayMap: { [key: string]: string } = {
   Sunday: '週日'
 };
 
+const DEFAULT_TASK: Omit<TaskType, 'id'> = {
+  name: "",
+  daysOfWeek: [],
+  isCompleted: false,
+  position: 1000,
+  milestoneId: 0,
+};
+
 const Task = ({
+  index,
   projectId,
   milestoneId,
   task,
+  onCancel,
   onRefreshData,
 }: TaskProps) => {
-  const { dispatchTask, deleteTask, fetchMilestones } = useMilestones();
+  const isCreating = !task;
+  const { createTask, dispatchTask, deleteTask, fetchMilestones } = useMilestones();
   const [isEditing, setIsEditing] = useState(false);
-  const [newTask, setNewTask] = useState<TaskType>(task);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [newTask, setNewTask] = useState<Omit<TaskType, 'id'>>(task ?? DEFAULT_TASK);
 
   const handleClickUpdate = async () => {
-    const success = await dispatchTask(projectId, milestoneId, newTask);
+    const success = isCreating
+      ? await createTask(projectId, milestoneId, newTask)
+      : await dispatchTask(projectId, milestoneId, newTask);
+
     if (success) {
-      toast.success('任務更新成功');
+      toast.success(isCreating ? '任務新增成功' : '任務更新成功');
       setIsEditing(false);
       fetchMilestones(projectId);
+      onCancel?.();
       onRefreshData?.();
     } else {
-      toast.error('任務更新失敗，請稍後再試');
+      toast.error(isCreating ? '任務新增失敗，請稍後再試' : '任務更新失敗，請稍後再試');
     }
   };
 
@@ -64,7 +86,8 @@ const Task = ({
 
   const handleClickCancel = () => {
     // TODO: add popup to let user confirm discard editing message
-    setNewTask(task);
+    setNewTask(task ?? DEFAULT_TASK);
+    onCancel?.();
     setIsEditing(false);
   };
 
@@ -89,6 +112,8 @@ const Task = ({
   };
 
   const handleClickDelete = async () => {
+    if (isCreating) return;
+
     const success = await deleteTask(projectId, milestoneId, task);
     if (success) {
       toast.success('任務刪除成功');
@@ -112,33 +137,28 @@ const Task = ({
     <div className="ml-5 p-[10px] md:py-3 md:px-4 rounded-lg bg-white">
       <div className="flex flex-row items-center justify-between">
         {
-          isEditing ? (
+          isCreating || isEditing ? (
             <div className="flex-1 flex flex-col md:flex-row items-center  md:justify-between gap-1">
+              {typeof index === 'number' && (
+                <span className="text-sm text-text-primary w-5 text-center shrink-0">
+                  {`${index + 1}.`}
+                </span>
+              )}
               <input
                 type="text"
                 name="name"
                 id="name"
                 className={cn(
                   "-m-px font-sans text-sm text-basic-400",
-                  "w-full rounded-md pl-6 py-2 border border-solid border-basic-200"
+                  "w-full rounded-md pl-6 pr-2 py-2 border border-solid border-basic-200"
                 )}
                 value={newTask.name || ""}
                 onChange={handleChangeInput}
               />
-              <div className="relative w-full mt-2 md:mt-0 md:ml-2 md:w-auto">
-                <div
-                  role="button"
-                  tabIndex={0}
-                  className="flex items-center gap-2 text-sm text-text-secondary cursor-pointer"
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      setIsDropdownOpen(!isDropdownOpen);
-                    }
-                  }}
-                >
-                  <MdCalendarToday className="w-4 h-4 text-[#92989A]" />
-                  <div className="relative w-[150px]">
+              <Dropdown>
+                <Dropdown.Toggle className="px-2" withIcon>
+                  <MdCalendarToday className="w-4 h-4 text-basic-300" />
+                  <div className="ml-2 w-28">
                     <div className="flex items-center justify-between">
                       <span className="truncate">
                         {newTask.daysOfWeek?.length > 0
@@ -147,37 +167,28 @@ const Task = ({
                             .join('、')
                           : '選擇日期'}
                       </span>
-                      <MdKeyboardArrowDown className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                     </div>
-
-                    {isDropdownOpen && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-10 max-h-40 overflow-y-auto">
-                        {WEEKDAYS.map((day) => (
-                          <div
-                            role="option"
-                            tabIndex={0}
-                            key={day}
-                            aria-selected={newTask.daysOfWeek?.includes(day)}
-                            onClick={() => handleDaySelect(day)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                handleDaySelect(day);
-                              }
-                            }}
-                            className={`p-2 mb-1 mx-1 rounded cursor-pointer ${
-                              newTask.daysOfWeek?.includes(day)
-                                ? 'bg-selected-bg text-text-primary'
-                                : 'bg-transparent hover:bg-gray-100'
-                            }`}
-                          >
-                            {dayMap[day]}
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
-                </div>
-              </div>
+                </Dropdown.Toggle>
+
+                <Dropdown.List>
+                  {WEEKDAYS.map((day) => (
+                    <Dropdown.Item key={day}>
+                      <Button
+                        aria-selected={newTask.daysOfWeek?.includes(day)}
+                        onClick={() => handleDaySelect(day)}
+                        className={cn(
+                          'my-0.5',
+                          newTask.daysOfWeek?.includes(day) &&
+                            'bg-primary-lightest text-primary-base'
+                        )}
+                      >
+                        {dayMap[day]}
+                      </Button>
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.List>
+              </Dropdown>
               <div className="flex flex-row gap-1 ml-auto">
                 <button
                   type="button"
