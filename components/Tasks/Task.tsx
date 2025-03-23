@@ -13,6 +13,7 @@ import { useMilestones } from '@/contexts/Milestones/index';
 import { Task as TaskType } from "@/contexts/Milestones/type";
 import Button from '@/shared/components/Button';
 import Dropdown from '@/shared/components/Dropdown';
+import { useDialog } from '@/contexts/Dialog';
 
 interface TaskProps {
   index?: number;
@@ -56,6 +57,7 @@ const Task = ({
   const { createTask, dispatchTask, deleteTask, fetchMilestones } = useMilestones();
   const [isEditing, setIsEditing] = useState(false);
   const [newTask, setNewTask] = useState<Omit<TaskType, 'id'>>(task ?? DEFAULT_TASK);
+  const { openDialog } = useDialog();
 
   const handleClickUpdate = async () => {
     const success = isCreating
@@ -84,11 +86,23 @@ const Task = ({
     });
   };
 
-  const handleClickCancel = () => {
-    // TODO: add popup to let user confirm discard editing message
-    setNewTask(task ?? DEFAULT_TASK);
-    onCancel?.();
-    setIsEditing(false);
+  const handleClickCancel = async () => {
+    if (task === newTask) {
+      onCancel?.();
+      setIsEditing(false);
+      return;
+    }
+
+    const result = await openDialog({
+      title: '取消編輯',
+      content: '取消編輯後，會恢復原本的任務，確定要取消嗎？',
+    });
+
+    if (result) {
+      setNewTask(task ?? DEFAULT_TASK);
+      onCancel?.();
+      setIsEditing(false);
+    }
   };
 
   const handleCheckCompleted = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,13 +128,22 @@ const Task = ({
   const handleClickDelete = async () => {
     if (isCreating) return;
 
-    const success = await deleteTask(projectId, milestoneId, task);
-    if (success) {
-      toast.success('任務刪除成功');
-      fetchMilestones(projectId);
-      onRefreshData?.();
-    } else {
-      toast.error('任務刪除失敗，請稍後再試');
+    const result = await openDialog({
+      title: '刪除任務',
+      content: '刪除後無法恢復，確定要刪除嗎？',
+      confirmText: '確定',
+      cancelText: '取消',
+    });
+
+    if (result) {
+      const success = await deleteTask(projectId, milestoneId, task);
+      if (success) {
+        toast.success('任務刪除成功');
+        fetchMilestones(projectId);
+        onRefreshData?.();
+      } else {
+        toast.error('任務刪除失敗，請稍後再試');
+      }
     }
   };
 
