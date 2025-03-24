@@ -1,7 +1,8 @@
 import toast from 'react-hot-toast';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import NoteDetail from '@/components/Note/Detail';
+import SEOConfig from '@/shared/components/SEO';
 import getProjectLayout from '@/layout/ProjectLayout';
 import {
   useProject,
@@ -42,12 +43,28 @@ const NoteDetailPage = () => {
     },
   });
 
+  const SEOData = useMemo(
+    () => ({
+      title: `${note?.title} 便利貼｜島島阿學`,
+      description:
+        note?.content?.substring(0, 150) ||
+        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
+      keywords: '島島阿學',
+      author: '島島阿學',
+      copyright: '島島阿學',
+      imgLink: 'https://www.daoedu.tw/preview.webp',
+      link: `${process.env.HOSTNAME}/manage/project/notes?id=${projectId}&noteId=${noteId}`,
+    }),
+    [note?.title, note?.content, projectId, noteId]
+  );
+
   if (!projectId || noteId == null) {
     return null;
   }
 
   return (
     <div className="bg-basic-white rounded-2xl">
+      <SEOConfig data={SEOData} />
       <NoteDetail
         data={note}
         authorUser={project?.user}

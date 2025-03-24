@@ -1,10 +1,11 @@
 import toast from 'react-hot-toast';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import getProjectLayout from '@/layout/ProjectLayout';
 import Button from '@/shared/components/Button';
 import ReviewCard from '@/components/Review/Card';
 import CreateModal from '@/components/Review/Modals/CreateModal';
+import SEOConfig from '@/shared/components/SEO';
 import UpdateModal from '@/components/Review/Modals/UpdateModal';
 import {
   useProject,
@@ -56,12 +57,28 @@ const ReviewPage = () => {
       },
     });
 
+  const SEOData = useMemo(
+    () => ({
+      title: `${project?.title} 覆盤｜島島阿學`,
+      description:
+        project?.description?.substring(0, 150) ||
+        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
+      keywords: '島島阿學',
+      author: '島島阿學',
+      copyright: '島島阿學',
+      imgLink: 'https://www.daoedu.tw/preview.webp',
+      link: `${process.env.HOSTNAME}/manage/project/review?id=${projectId}`,
+    }),
+    [project?.title, project?.description, projectId]
+  );
+
   if (!projectId) {
     return <div>專案不存在</div>;
   }
 
   return (
     <>
+      <SEOConfig data={SEOData} />
       <div className="mb-6 flex items-end sm:items-center justify-between body-md">
         <div className="flex flex-col items-start sm:flex-row sm:items-center gap-1">
           <div className="text-basic-500">
