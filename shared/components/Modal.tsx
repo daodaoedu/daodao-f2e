@@ -1,4 +1,4 @@
-import { useState, useEffect, useId, useRef } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { cn } from '@/utils/cn';
 import { AiOutlineClose } from 'react-icons/ai';
 import Portal from './Portal';
@@ -36,7 +36,9 @@ function Modal({
   onRemovedDOM,
 }: ModalProps) {
   const id = useId();
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const [dialogElement, setDialogElement] = useState<HTMLDialogElement | null>(
+    null
+  );
   const modalId = `modal-${id}`;
   const [removeDOM, setRemoveDOM] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -82,21 +84,26 @@ function Modal({
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    const mobileSpacing = 56;
+    const observer = new ResizeObserver((entries) => {
+      entries.forEach((entry) => {
+        const { height } = entry.contentRect;
 
-    if (isOpen) {
-      timer = setTimeout(() => {
-        if (dialogRef.current) {
-          dialogRef.current.style.setProperty(
-            '--dialog-top',
-            `max(calc(100dvh - ${dialogRef.current.clientHeight}px), 20dvh)`
-          );
-        }
-      }, 0);
+        dialogElement?.style.setProperty(
+          '--dialog-top',
+          `max(calc(100dvh - ${height + mobileSpacing}px), 20dvh)`
+        );
+      });
+    });
+
+    if (dialogElement) {
+      observer.observe(dialogElement);
     }
 
-    return () => clearTimeout(timer);
-  }, [isOpen]);
+    return () => {
+      observer.disconnect();
+    };
+  }, [dialogElement]);
 
   return (
     (!removeDOM || keepMounted) && (
@@ -123,7 +130,7 @@ function Modal({
           )}
         >
           <dialog
-            ref={dialogRef}
+            ref={setDialogElement}
             open={!removeDOM}
             className={cn(
               'relative top-[var(--dialog-top)] my-0 p-5 w-full',
@@ -160,7 +167,7 @@ function Modal({
             {children}
             <div
               className={cn(
-                'absolute -bottom-1 left-0 right-0 h-3 bg-white',
+                'absolute -bottom-4 left-0 right-0 h-6 bg-white',
                 size === ModalSize.Small && 'sm:hidden',
                 size === ModalSize.Medium && 'md:hidden',
                 size === ModalSize.Large && 'lg:hidden'

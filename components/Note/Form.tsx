@@ -14,6 +14,7 @@ import {
 } from '@/services/modules/projects';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
 import Upload, { ImageDataType } from '@/shared/components/Upload';
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 import Image from '@/shared/components/Image';
 
 interface BaseNoteFormProps {
@@ -109,10 +110,14 @@ function NoteForm({
           isEditable
         />
       </PostCard>
-      <textarea
-        className="w-full h-80 px-2 py-1 body-sm focus-within:outline-none resize-none"
+      <MarkdownEditor
+        rootClassName="p-px mb-2 bg-basic-200 rounded-md"
+        className="bg-white rounded-md"
+        editorClassName="min-h-80"
+        ref={(element) => methods.register('content').ref(element)}
+        value={methods.watch('content')}
         placeholder="請填寫便利貼內容"
-        {...methods.register('content')}
+        onChange={(markdown) => methods.setValue('content', markdown)}
       />
       <div className="px-2">
         {Array.isArray(images) &&

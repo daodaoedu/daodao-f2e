@@ -4,6 +4,7 @@ import PostDetailCard, {
 import { ProjectReviewSchema } from '@/services/modules/projects';
 import { BaseUserSchema } from '@/services/users';
 import { CommentType } from '@/services/modules/comments';
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 import RadioGroup from './RadioGroup';
 
 interface ReviewDetailProps {
@@ -70,14 +71,14 @@ function ReviewDetail({
                 />
               </div>
               <p className="mb-4">這段時間，我的收穫與困難...</p>
-              <p className="mb-4">{data.learningFeedback}</p>
+              <MarkdownEditor className="mb-4" readOnly value={data.learningFeedback} />
             </div>
           </li>
           <li className="mb-5">
             <h3 className="mb-4 heading-sm">調整與規劃：</h3>
             <div className="-ml-6 pb-5 border-b border-solid border-basic-100">
               <p className="mb-4">為了更好的學習狀態，我會...</p>
-              <p>{data.adjustmentPlan}</p>
+              <MarkdownEditor readOnly value={data.adjustmentPlan} />
             </div>
           </li>
         </ul>
