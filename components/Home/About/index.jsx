@@ -111,12 +111,12 @@ const About = () => {
               豐富的學習類別
             </Typography>
             <Box sx={{ margin: '10px 0' }}>
-              {CATEGORIES.map(({ key, value }) => (
+              {CATEGORIES.map(({ key, value, label }) => (
                 <Chip
                   key={key}
-                  label={value}
+                  label={label}
                   value={value}
-                  onClick={() => router.push(`/search?cats=${value}`)}
+                  onClick={() => router.push(`/search?cats=${label}`)}
                   sx={{
                     backgroundColor: COLOR_TABLE.green,
                     opacity: '60%',
