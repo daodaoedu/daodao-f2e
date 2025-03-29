@@ -28,6 +28,7 @@ const RelatedResources = ({ title, searchScheme }) => {
   const { relatedResources, isLoading } = useSelector(
     (state) => state?.resource,
   );
+
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -87,7 +88,7 @@ const RelatedResources = ({ title, searchScheme }) => {
       <h2>{title}</h2>
       <Marquee gradientWidth={20} delay={1} pauseOnHover>
         <CardListWrapper>
-          {relatedResources.map(({ created_time, properties }) => (
+          {relatedResources.map(({ created_time, properties, id }) => (
             <Card
               key={created_time}
               image={
@@ -103,6 +104,7 @@ const RelatedResources = ({ title, searchScheme }) => {
                   (item) => item?.type === 'text',
                 )?.plain_text ?? ''
               ).slice(0, 40)}
+              id={id}
             />
           ))}
         </CardListWrapper>

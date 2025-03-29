@@ -71,12 +71,12 @@ const FooterWrapper = styled.div`
   }
 `;
 
-const Card = ({ image, title, desc }) => {
+const Card = ({ image, title, desc, id }) => {
   return (
     <Tooltip title={desc}>
       <CardWrapper
         onClick={() =>
-          open(`https://www.daoedu.tw/resource/${title}`, '_target')
+          open(`https://www.daoedu.tw/resource/${id}`, '_target')
         }
       >
         <HeaderWrapper>
