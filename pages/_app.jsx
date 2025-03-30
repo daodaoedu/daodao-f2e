@@ -27,7 +27,6 @@ import { checkLoginValidity } from '@/redux/actions/user';
 import { getReminderStorage } from '@/utils/storage';
 import getDefaultLayout from '@/layout/DefaultLayout';
 import { initGA, logPageView } from '../utils/analytics';
-import Mode from '../shared/components/Mode';
 import 'regenerator-runtime/runtime'; // Speech.js
 import "@/shared/styles/global.css";
 import 'dayjs/locale/zh-tw';
@@ -50,7 +49,6 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   const router = useRouter();
   const mode = useSelector((state) => state?.theme?.mode ?? 'light');
   const theme = useMemo(() => themeFactory(mode), [mode]);
-  const isEnv = useMemo(() => process.env.NODE_ENV === 'development', []);
   const { isComplete, isLoggedIn } = useAuth();
   const [openModalType, setOpenModalType] = useState(null);
   const getLayout = Component?.getLayout || getDefaultLayout;
@@ -96,7 +94,6 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
           },
         }}
       />
-      {isEnv && <Mode />}
       <CompleteInfoReminderDialog isOpen={openModalType === "completeInfoReminder"} onClose={handleClose} />
       <Modal
         isOpen={openModalType === 'verifiedSuccess' && isLoggedIn}
