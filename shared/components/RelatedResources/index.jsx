@@ -1,10 +1,7 @@
-import React, { useEffect } from 'react';
 import styled from '@emotion/styled';
-import { useRouter } from 'next/router';
 import { Skeleton } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
 import Marquee from 'react-fast-marquee';
-import { loadRelatedResources } from '../../../redux/actions/resource';
+import { useRelatedResources } from '@/services/modules/notion';
 import Card from './Card';
 
 const RelatedResourcesWrapper = styled.div`
@@ -25,18 +22,7 @@ const CardListWrapper = styled.ul`
 `;
 
 const RelatedResources = ({ title, searchScheme }) => {
-  const { relatedResources, isLoading } = useSelector(
-    (state) => state?.resource,
-  );
-
-  const dispatch = useDispatch();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (router.isReady) {
-      dispatch(loadRelatedResources(searchScheme));
-    }
-  }, [dispatch, router.isReady, searchScheme]);
+  const { data, isLoading } = useRelatedResources(searchScheme);
 
   if (isLoading) {
     return (
@@ -88,7 +74,7 @@ const RelatedResources = ({ title, searchScheme }) => {
       <h2>{title}</h2>
       <Marquee gradientWidth={20} delay={1} pauseOnHover>
         <CardListWrapper>
-          {relatedResources.map(({ created_time, properties, id }) => (
+          {Array.isArray(data?.results) && data.results.map(({ created_time, properties, id }) => (
             <Card
               key={created_time}
               image={
