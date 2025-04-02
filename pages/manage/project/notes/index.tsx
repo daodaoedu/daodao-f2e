@@ -1,7 +1,7 @@
 import toast from 'react-hot-toast';
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import NoteCard from '@/components/Note/Card';
+import { ContentCard } from '@/features/projects';
 import getProjectLayout from '@/layout/ProjectLayout';
 import Button from '@/shared/components/Button';
 import SEOConfig from '@/shared/components/SEO';
@@ -96,7 +96,8 @@ const NotesPage = () => {
             key={note.id}
             className="py-6 border-b last:border-b-0 border-solid border-basic-200"
           >
-            <NoteCard
+            <ContentCard
+              type="note"
               data={note}
               className="p-3 transition-shadow hover:shadow-basic-200/40 hover:shadow-lg"
               detailLink={`/manage/project/notes/detail?id=${projectId}&noteId=${note.id}`}

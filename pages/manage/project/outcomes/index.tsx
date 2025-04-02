@@ -2,7 +2,7 @@ import toast from 'react-hot-toast';
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import SEOConfig from '@/shared/components/SEO';
-import OutcomeCard from '@/components/Outcome/Card';
+import { ContentCard } from '@/features/projects';
 import getProjectLayout from '@/layout/ProjectLayout';
 import Button from '@/shared/components/Button';
 import CreateModal from '@/components/Outcome/Modals/CreateModal';
@@ -96,7 +96,8 @@ const OutcomesPage = () => {
             key={outcome.id}
             className="py-6 border-b last:border-b-0 border-solid border-basic-200"
           >
-            <OutcomeCard
+            <ContentCard
+              type="outcome"
               data={outcome}
               className="p-3 transition-shadow hover:shadow-basic-200/40 hover:shadow-lg"
               detailLink={`/manage/project/outcomes/detail?id=${projectId}&outcomeId=${outcome.id}`}
