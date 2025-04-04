@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { Box } from '@mui/material';
-import { useAuth } from '@/contexts/Auth';
+import { ProtectedComponent, useAuth } from '@/contexts/Auth';
 import { useSnackbar } from '@/contexts/Snackbar';
 import useFetch from '@/hooks/useFetch';
 import useMutation from '@/hooks/useMutation';
@@ -44,16 +44,15 @@ function EditGroupPage() {
   });
 
   useEffect(() => {
-    if (!user?._id) router.push('/login');
-    if (isFetching || !source?.userId) return;
-    if (source.userId !== user._id) router.replace(`/group/detail?id=${id}`);
+    if (isFetching || !source?.user?.externalId) return;
+    if (source.user.externalId !== user?._id) router.replace(`/group/detail?id=${id}`);
   }, [user, source, isFetching, id]);
 
   return (
-    <>
+    <ProtectedComponent>
       <SEOConfig data={SEOData} />
       <Box minHeight="60vh">
-        {source?.userId && (
+        {source?.user?.externalId && (
           <GroupForm
             defaultValues={source}
             isLoading={isLoading}
@@ -61,7 +60,7 @@ function EditGroupPage() {
           />
         )}
       </Box>
-    </>
+    </ProtectedComponent>
   );
 }
 

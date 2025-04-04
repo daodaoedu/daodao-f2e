@@ -22,6 +22,10 @@ class PathBuilder {
     return new PathBuilder(`${this.path}/${path}`);
   }
 
+  circles(id?: PathIdType): PathBuilder {
+    return this.generatePath('circles', id);
+  }
+
   comments(id?: PathIdType): PathBuilder {
     return this.generatePath('comments', id);
   }
