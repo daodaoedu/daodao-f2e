@@ -54,7 +54,7 @@ function Partner() {
     area: _map(AREAS, 'label'),
     edu: _map(EDUCATION, 'label'),
     role: _map(ROLE, 'label'),
-    tag: tags,
+    tag: Array.isArray(tags) ? tags : [],
     q: 'PASS_STRING',
   };
 

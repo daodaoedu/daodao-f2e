@@ -48,7 +48,9 @@ export default function ProtectedComponent({
     router.replace,
   ]);
 
-  if (requiresLogin) return <div className="h-screen w-screen" />;
+  if (requiresLogin) {
+    return <div className="h-screen w-screen bg-basic-white" />;
+  }
 
   return children;
 }

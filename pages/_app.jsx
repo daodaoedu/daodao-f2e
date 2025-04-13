@@ -6,7 +6,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
-import { Provider, useDispatch, useSelector } from 'react-redux';
+import { Provider, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { useSearchParams } from 'next/navigation';
 import Script from 'next/script';
@@ -47,8 +47,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const mode = useSelector((state) => state?.theme?.mode ?? 'light');
-  const theme = useMemo(() => themeFactory(mode), [mode]);
+  const theme = useMemo(() => themeFactory('light'), []);
   const { isComplete, isLoggedIn } = useAuth();
   const [openModalType, setOpenModalType] = useState(null);
   const getLayout = Component?.getLayout || getDefaultLayout;

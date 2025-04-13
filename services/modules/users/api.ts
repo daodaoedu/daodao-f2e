@@ -17,12 +17,14 @@ interface GetUserPathnameProps {
 }
 
 export const getUserPathname = ({ id, isMe }: GetUserPathnameProps = {}) =>
-  isMe || id
-    ? apiPaths.users(isMe ? 'me' : id).toString()
-    : apiPaths.users().toString();
+  apiPaths.users(isMe ? 'me' : id).toString();
 
 interface UserAPIType {
-  create: MutationFetcher<{ user: IUser; token: string }, UserSWRKey, CreateUserRequest>;
+  create: MutationFetcher<
+    { user: IUser; token: string },
+    UserSWRKey,
+    CreateUserRequest
+  >;
   update: MutationFetcher<IUser, UserSWRKey, UpdateUserRequest>;
 }
 

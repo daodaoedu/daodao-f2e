@@ -1,7 +1,6 @@
 import { useMemo, useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -13,6 +12,7 @@ import UserProfileForm from '@/components/Marathon/SignUp/UserProfileForm';
 import MarathonForm from '@/components/Marathon/SignUp/MarathonForm';
 import ConfirmForm from '@/components/Marathon/SignUp/ConfirmForm';
 import { ProtectedComponent } from '@/contexts/Auth';
+import { useMarathon } from '@/services/modules/marathons';
 import { isServer } from '@/utils/helper';
 
 const FormWrapper = styled.form`
@@ -76,7 +76,7 @@ const LearningMarathonSignUp = () => {
   );
   const [currentStep, setCurrentStep] = useState(0);
   const fromProfilePage = isServer ? null : window.localStorage.getItem('fromProfilePage');
-  const marathonState = useSelector((state) => { return state.marathon; });
+  const { data: marathonState = {} } = useMarathon();
   if (fromProfilePage && marathonState._id) {
     if (fromProfilePage === 'click_edit') {
       window.localStorage.removeItem('fromProfilePage');

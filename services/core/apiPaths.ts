@@ -65,6 +65,10 @@ class PathBuilder {
   tags(id?: PathIdType): PathBuilder {
     return this.generatePath('tags', id);
   }
+
+  marathons(id?: PathIdType): PathBuilder {
+    return this.generatePath('marathons', id);
+  }
 }
 
 export const apiPaths = new PathBuilder();
