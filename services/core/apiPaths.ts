@@ -57,6 +57,14 @@ class PathBuilder {
   reviews(id?: PathIdType): PathBuilder {
     return this.generatePath('reviews', id);
   }
+
+  users(id?: PathIdType): PathBuilder {
+    return this.generatePath('users', id);
+  }
+
+  tags(id?: PathIdType): PathBuilder {
+    return this.generatePath('tags', id);
+  }
 }
 
 export const apiPaths = new PathBuilder();

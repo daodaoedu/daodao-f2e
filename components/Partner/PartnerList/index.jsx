@@ -1,17 +1,14 @@
 import { Fragment } from 'react';
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Grid, Box } from '@mui/material';
 import PartnerCard from './PartnerCard';
 import PartnerSkeltonCard from './PartnerCard/PartnerSkeltonCard';
 
-function PartnerList() {
+function PartnerList({ items }) {
   const router = useRouter();
 
-  const partners = useSelector((state) => state.partners);
-
-  const lists = partners.items || [];
+  const partners = Array.isArray(items) ? items : [];
   const mobileScreen = useMediaQuery('(max-width: 900px)');
 
   return (
@@ -25,14 +22,14 @@ function PartnerList() {
         alignItems: 'center',
       }}
     >
-      {lists.length === 0 ? (
+      {partners.length === 0 ? (
         <PartnerSkeltonCard
           number={mobileScreen ? 2 : 4}
           mobileScreen={mobileScreen}
         />
       ) : (
         <>
-          {lists.map((item, idx) => (
+          {partners.map((item, idx) => (
             <Fragment key={`${item._id}`}>
               <Grid
                 onClick={() => router.push(`partner/detail?id=${item._id}`)}
@@ -56,7 +53,7 @@ function PartnerList() {
               </Grid>
               {!mobileScreen &&
                 (idx + 1) % 2 === 0 &&
-                idx + 1 !== lists.length && (
+                idx + 1 !== partners.length && (
                   <Grid item xs={12} py="12px">
                     <Box height={1} width="100%" border="1px solid #E5E5E5" />
                   </Grid>

@@ -8,7 +8,7 @@ import {
 } from 'react';
 import toast from 'react-hot-toast';
 import { useRouter, usePathname } from 'next/navigation';
-import useSWR, { SWRConfig } from 'swr';
+import { SWRConfig } from 'swr';
 import { useDispatch } from 'react-redux';
 
 import { fetchUserByToken, userLogout } from '@/redux/actions/user';
@@ -19,13 +19,12 @@ import {
   getTokenStorage,
 } from '@/utils/storage';
 import {
-  createUser,
+  userAPI,
   createUserSchema,
-  getUserMe,
   IUser,
-  updateUser,
   updateUserSchema,
-} from '@/services/users';
+  useUserMe,
+} from '@/services/modules/users';
 
 import LoginModal from './LoginModal';
 import {
@@ -179,18 +178,18 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
         switch (state.loginStatus) {
           case LoginStatus.TEMPORARY: {
-            const request = createUserSchema.parse(input);
-            const { token, user } = await createUser(request);
+            const arg = createUserSchema.parse(input);
+            const { token, user } = await userAPI.create('', { arg });
             setToken(token);
             dispatch({ type: ActionTypes.UPDATE_USER, payload: user });
             break;
           }
           case LoginStatus.PERMANENT: {
-            const request = updateUserSchema.parse({
+            const arg = updateUserSchema.parse({
               ...state.user,
               ...input,
             });
-            const payload = await updateUser(request);
+            const payload = await userAPI.update('', { arg });
             dispatch({ type: ActionTypes.UPDATE_USER, payload });
             break;
           }
@@ -224,7 +223,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
     toast.error('系統異常，請稍後再試');
   };
 
-  useSWR(state.token ? [getUserMe.name, state.token] : null, getUserMe, {
+  useUserMe({
+    token: state.token,
     onSuccess: authDispatch.login,
     onError: handleError,
   });

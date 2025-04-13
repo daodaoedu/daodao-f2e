@@ -1,11 +1,11 @@
-import { useEffect, useMemo } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useMemo } from 'react';
 import { Box, Button } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { ABROAD_OPTION, TAIWAN_DISTRICT } from '@/constants/areas';
-import { fetchPartners } from '@/redux/actions/partners';
 import { EDUCATION, ROLE } from '@/constants/member';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
+import { useUsers } from '@/services/modules/users';
+import { useTags } from '@/services/modules/tags';
 
 import PartnerList from './PartnerList';
 import SearchField from './SearchField';
@@ -20,8 +20,8 @@ import {
 // utils
 const _compose =
   (...fns) =>
-  (x) =>
-    fns.reduceRight((v, f) => f(v), x);
+    (x) =>
+      fns.reduceRight((v, f) => f(v), x);
 const _map = (arr, key) => arr.map((item) => item[key]);
 const mapValues = (values, mapFn) => values.map(mapFn).join(',');
 
@@ -45,15 +45,9 @@ const roleObj = createObjFromArray(ROLE, 'label', 'key');
 const areaObj = createObjFromArray(AREAS, 'label', 'value');
 
 function Partner() {
-  const dispatch = useDispatch();
   const mobileScreen = useMediaQuery('(max-width: 767px)');
 
-  // main data - partner and tag
-  const {
-    items: partnerItems,
-    pagination,
-    tags,
-  } = useSelector((state) => state.partners);
+  const { data: tags } = useTags();
 
   // constants
   const keySelections = {
@@ -63,8 +57,6 @@ function Partner() {
     tag: tags,
     q: 'PASS_STRING',
   };
-
-  const { page: current = 1, totalPages } = pagination;
 
   // queryStr
   const [getSearchParams, , generateParamsItems] = useSearchParamsManager();
@@ -94,13 +86,7 @@ function Partner() {
     ],
   );
 
-  const handleFetchData = (page = 1) => {
-    dispatch(fetchPartners({ page, ...prepareData(searchParamsItems) }));
-  };
-
-  useEffect(() => {
-    handleFetchData();
-  }, [getSearchParams]);
+  const { data: partnerItems, hasMore, setSize } = useUsers(prepareData(searchParamsItems));
 
   return (
     <>
@@ -114,9 +100,9 @@ function Partner() {
             paramsKey={['area', 'role', 'edu', 'tag', 'q']}
             paramsKeyOptions={keySelections}
           />
-          <PartnerList />
+          <PartnerList items={partnerItems} />
         </StyledContent>
-        {partnerItems && partnerItems.length > 0 && current < totalPages && (
+        {partnerItems && partnerItems.length > 0 && hasMore && (
           <Box
             sx={
               mobileScreen
@@ -125,7 +111,7 @@ function Partner() {
             }
           >
             <Button
-              onClick={() => handleFetchData(current + 1)}
+              onClick={() => setSize((pre) => pre + 1)}
               variant="outlined"
               sx={{
                 fontSize: '16px',

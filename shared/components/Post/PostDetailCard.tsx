@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import PostCard from '@/shared/components/Post/PostCard';
 import Button from '@/shared/components/Button';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
-import { BaseUserSchema } from '@/services/users';
+import { BaseUserSchema } from '@/services/modules/users';
 import { useAuth } from '@/contexts/Auth';
 import CommentSection from '@/shared/components/Comment/CommentSection';
 import { CommentType } from '@/services/modules/comments';
