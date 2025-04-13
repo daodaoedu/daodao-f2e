@@ -56,15 +56,15 @@ function Modal({
       'min-h-svh',
       'overflow-y-hidden',
       'pointer-events-none',
-      'bg-black/30',
     ];
     const rootClassNames = [
-      'scale-95',
-      '-translate-y-[1.5%]',
+      'scale-[var(--scale)]',
+      'translate-y-4',
       'rounded-lg',
       'overflow-hidden',
     ];
-    const { scrollY } = window;
+    const { scrollY, innerWidth } = window;
+    const { scrollHeight } = document.body;
     const rootElement = document.getElementById('__next');
     let timer: NodeJS.Timeout;
 
@@ -85,10 +85,20 @@ function Modal({
 
     if (isOpen) {
       document.body.style.setProperty('top', `${scrollY * -1}px`);
-      document.body.classList.add(...bodyClassNames);
+      document.body.style.setProperty(
+        '--scale',
+        `${(innerWidth - 32) / innerWidth}`
+      );
+      document.body.style.setProperty(
+        '--origin',
+        `50% ${(scrollY / scrollHeight) * 100}%`
+      );
+      document.body.classList.add('!bg-basic-black', ...bodyClassNames);
       if (checkIsDrawer()) {
         rootElement?.classList.add(
+          'bg-basic-white',
           'transition-[transform,border-radius]',
+          'origin-[var(--origin)]',
           'duration-500',
           ...rootClassNames
         );
@@ -99,11 +109,14 @@ function Modal({
       timer = setTimeout(() => {
         setRemoveDOM(true);
         onRemovedDOM?.();
+        document.body.classList.remove('!bg-basic-black');
+        rootElement?.classList.remove('bg-basic-white');
       }, 500);
     }
 
     return () => {
       document.body.style.removeProperty('top');
+      document.body.style.removeProperty('--scale');
       document.body.classList.remove(...bodyClassNames);
       rootElement?.classList.remove(...rootClassNames);
 
@@ -169,8 +182,8 @@ function Modal({
             type="button"
             className={cn(
               'fixed inset-0 pointer-events-none border-none cursor-default',
-              'bg-black/60 duration-500',
               isInitialized && [
+                'bg-black/60 duration-500',
                 isOpen
                   ? 'pointer-events-auto animate-fade-in'
                   : 'animate-fade-out',
