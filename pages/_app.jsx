@@ -6,13 +6,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
-import { Provider, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import Head from 'next/head';
-import { persistStore } from 'redux-persist';
-import { PersistGate } from 'redux-persist/integration/react';
 import { AuthProvider, useAuth } from '@/contexts/Auth';
 import SnackbarProvider from '@/contexts/Snackbar';
 import { DialogProvider } from '@/contexts/Dialog';
@@ -21,18 +18,13 @@ import GlobalStyle from '@/shared/styles/Global';
 import Image from "@/shared/components/Image";
 import Modal from '@/shared/components/Modal';
 import themeFactory from '@/shared/styles/themeFactory';
-import storeFactory from '@/redux/store';
 import { fetcher } from '@/services/core';
-import { checkLoginValidity } from '@/redux/actions/user';
 import { getReminderStorage } from '@/utils/storage';
 import getDefaultLayout from '@/layout/DefaultLayout';
 import { initGA, logPageView } from '../utils/analytics';
 import 'regenerator-runtime/runtime'; // Speech.js
 import "@/shared/styles/global.css";
 import 'dayjs/locale/zh-tw';
-
-const store = storeFactory();
-const persistor = persistStore(store);
 
 dayjs.locale('zh-tw');
 
@@ -44,7 +36,6 @@ const swrConfig = {
 };
 
 const ThemeComponentWrap = ({ pageProps, Component }) => {
-  const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const router = useRouter();
   const theme = useMemo(() => themeFactory('light'), []);
@@ -57,10 +48,6 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
     setOpenModalType(null);
     getReminderStorage().remove();
   };
-
-  useEffect(() => {
-    dispatch(checkLoginValidity());
-  }, []);
 
   useEffect(() => {
     if (isVerified) {
@@ -224,21 +211,17 @@ const App = ({ Component, pageProps }) => {
         <link rel="manifest" href="/manifest.json" />
       </Head>
 
-      <Provider store={store}>
-        <PersistGate persistor={persistor}>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
-            <SWRConfig value={swrConfig}>
-              <SnackbarProvider>
-                <AuthProvider>
-                  <DialogProvider>
-                    <ThemeComponentWrap pageProps={pageProps} Component={Component} />
-                  </DialogProvider>
-                </AuthProvider>
-              </SnackbarProvider>
-            </SWRConfig>
-          </LocalizationProvider>
-        </PersistGate>
-      </Provider>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
+        <SWRConfig value={swrConfig}>
+          <SnackbarProvider>
+            <AuthProvider>
+              <DialogProvider>
+                <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+              </DialogProvider>
+            </AuthProvider>
+          </SnackbarProvider>
+        </SWRConfig>
+      </LocalizationProvider>
     </>
   );
 };

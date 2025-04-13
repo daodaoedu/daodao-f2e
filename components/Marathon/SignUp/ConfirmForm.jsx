@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { EDUCATION, ROLE } from '@/constants/member';
 import toast from 'react-hot-toast';
-import { initialState as reduxInitMarathonState } from '@/redux/reducers/marathon';
 import { useRouter } from 'next/router';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import {
@@ -216,7 +215,6 @@ export default function ConfirmForm({
   const { data: marathonState = {} } = useMarathon();
   const { user: userState } = useAuth();
   const { createMutation, updateMutation } = useMarathonMutation();
-  const [/** newMarathon */, setNewMarathon] = useState(reduxInitMarathonState);
   const router = useRouter();
   const { openLoginModal } = useAuthDispatch();
   const [user, setUser] = useState({
@@ -231,10 +229,6 @@ export default function ConfirmForm({
   const onPrevStep = () => {
     setCurrentStep(currentStep - 1);
   };
-
-  useEffect(() => {
-    setNewMarathon(marathonState);
-  }, []);
 
   useEffect(() => {
     if (userState._id) {

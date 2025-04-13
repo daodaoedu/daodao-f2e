@@ -1,6 +1,5 @@
 import { useState, useEffect, useReducer, useRef } from 'react';
 import toast from 'react-hot-toast';
-import { initialState as reduxInitMarathonState } from '@/redux/reducers/marathon';
 import { getMarathonErrorsStorage } from '@/utils/storage';
 
 import {
@@ -80,8 +79,8 @@ export default function MarathonForm({
   const editingMarathon = localStorgeStored ? JSON.parse(localStorgeStored) : null;
 
   const initialState = () => {
-    // 優先使用編輯中的資料，其次使用暫存在 marathonState 的資料，最後使用 reduxInit 預設模板
-    return editingMarathon || marathonState || reduxInitMarathonState;
+    // 優先使用編輯中的資料，其次使用暫存在 marathonState 的資料，最後使用空物件
+    return editingMarathon || marathonState || {};
   };
   const [newMarathon, setNewMarathon] = useReducer(marathonFormReducer, initialState());
 
