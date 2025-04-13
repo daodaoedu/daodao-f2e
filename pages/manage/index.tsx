@@ -68,10 +68,11 @@ enum ModalType {
 const Header = () => {
   const router = useRouter();
   const [modalType, setModalType] = useState<ModalType | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const [projectId, setProjectId] = useState<string | undefined>();
   const handleCreated = () => {
     toast.success('新增成功');
-    setModalType(null);
+    setIsOpen(false);
   };
   const { createMutation: createReview } = useProjectReviewMutation({
     projectId,
@@ -98,6 +99,11 @@ const Header = () => {
   //   }
   // };
 
+  const handleOpenModal = (_modalType: ModalType) => {
+    setIsOpen(true);
+    setModalType(_modalType);
+  };
+
   const projectActions = [
     {
       label: '新增計畫',
@@ -109,15 +115,15 @@ const Header = () => {
     },
     {
       label: '新增覆盤',
-      onClick: () => setModalType(ModalType.Review),
+      onClick: () => handleOpenModal(ModalType.Review),
     },
     {
       label: '新增便利貼',
-      onClick: () => setModalType(ModalType.Note),
+      onClick: () => handleOpenModal(ModalType.Note),
     },
     {
       label: '新增成果',
-      onClick: () => setModalType(ModalType.Outcome),
+      onClick: () => handleOpenModal(ModalType.Outcome),
     },
   ];
 
@@ -145,7 +151,7 @@ const Header = () => {
 
   return (
     <div className="mb-6 p-2 flex items-center justify-between">
-      <h2 className="heading-sm text-basic-500">
+      <h2 className="heading-sm text-basic-500 pr-2 text-balance">
         {HEADER_TITLES[dayjs().get('hour') % HEADER_TITLES.length]}
       </h2>
       <Dropdown>
@@ -188,9 +194,10 @@ const Header = () => {
         </Dropdown.List>
       </Dropdown>
       <SelectProjectModal
-        isOpen={modalType !== null}
-        onClose={() => setModalType(null)}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
         onSelect={setProjectId}
+        onRemovedDOM={() => setModalType(null)}
         renderContent={(project) => (
           <>
             {modalType === ModalType.Review && (
