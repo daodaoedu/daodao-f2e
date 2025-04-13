@@ -1,12 +1,12 @@
-import { z } from 'zod';
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { ContentCard } from '@/features/projects';
 import getPublicProjectLayout from '@/layout/PublicProjectLayout';
 import { useProjectNotes } from '@/services/modules/projects';
+import { parseToString } from '@/services/core';
 
 const NotesPage = () => {
-  const searchParams = useSearchParams();
-  const projectId = z.string().uuid().safeParse(searchParams.get('id')).data;
+  const { query } = useRouter();
+  const projectId = parseToString(query.id);
 
   const { data: notes } = useProjectNotes(projectId);
 

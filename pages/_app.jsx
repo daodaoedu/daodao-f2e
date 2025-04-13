@@ -7,7 +7,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
 import { useRouter } from 'next/router';
-import { useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import Head from 'next/head';
 import { AuthProvider, useAuth } from '@/contexts/Auth';
@@ -18,7 +17,7 @@ import GlobalStyle from '@/shared/styles/Global';
 import Image from "@/shared/components/Image";
 import Modal from '@/shared/components/Modal';
 import themeFactory from '@/shared/styles/themeFactory';
-import { fetcher } from '@/services/core';
+import { fetcher, parseToString } from '@/services/core';
 import { getReminderStorage } from '@/utils/storage';
 import getDefaultLayout from '@/layout/DefaultLayout';
 import { initGA, logPageView } from '../utils/analytics';
@@ -36,13 +35,13 @@ const swrConfig = {
 };
 
 const ThemeComponentWrap = ({ pageProps, Component }) => {
-  const searchParams = useSearchParams();
   const router = useRouter();
+  const { query } = router;
   const theme = useMemo(() => themeFactory('light'), []);
   const { isComplete, isLoggedIn } = useAuth();
   const [openModalType, setOpenModalType] = useState(null);
   const getLayout = Component?.getLayout || getDefaultLayout;
-  const isVerified = searchParams.get("isVerified");
+  const isVerified = parseToString(query.isVerified);
 
   const handleClose = () => {
     setOpenModalType(null);

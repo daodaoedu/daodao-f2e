@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 import { useMemo, useState } from 'react';
-import { usePathname } from 'next/navigation';
 import dayjs, { Dayjs } from 'dayjs';
 import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
 import { CiCircleChevRight, CiCircleChevLeft } from 'react-icons/ci';
@@ -428,7 +427,7 @@ const Main = ({ date }: { date: Dayjs }) => {
 const Manage = () => {
   const [date, setDate] = useState<Dayjs>(dayjs().startOf('day'));
   const { user } = useAuth();
-  const pathname = usePathname();
+  const { pathname } = useRouter();
   const canManage = useMemo(() => {
     const permissions = [
       RoleEnum.MarathonApplicant,

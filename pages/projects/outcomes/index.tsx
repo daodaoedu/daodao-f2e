@@ -1,11 +1,12 @@
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { ContentCard } from '@/features/projects';
 import getPublicProjectLayout from '@/layout/PublicProjectLayout';
 import { useProjectOutcomes } from '@/services/modules/projects';
+import { parseToString } from '@/services/core';
 
 const OutcomesPage = () => {
-  const searchParams = useSearchParams();
-  const projectId = searchParams.get('id');
+  const { query } = useRouter();
+  const projectId = parseToString(query.id);
 
   const { data: outcomes } = useProjectOutcomes(projectId);
 

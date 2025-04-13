@@ -2,8 +2,6 @@ import Link from 'next/link';
 import React from 'react';
 import { usePromotion } from '@/contexts/Promotion';
 import { MARATHON_LINKS } from '@/constants/category';
-import { GoArrowUpRight } from 'react-icons/go';
-
 import { cn } from '@/utils/cn';
 
 const Nav = ({ activeTab }: { activeTab: string }) => {
@@ -26,8 +24,6 @@ const Nav = ({ activeTab }: { activeTab: string }) => {
           <li key={name} className="shrink-0">
             <Link
               href={link}
-              target={external ? '_blank' : '_self'}
-              rel={external ? 'noopener noreferrer' : ''}
               className={cn(
                 'relative p-4 flex items-center gap-1 text-primary-base body-sm font-medium text-nowrap',
                 active &&
@@ -35,7 +31,6 @@ const Nav = ({ activeTab }: { activeTab: string }) => {
               )}
             >
               {name}
-              {external && <GoArrowUpRight className="size-4" />}
             </Link>
           </li>
         ))}

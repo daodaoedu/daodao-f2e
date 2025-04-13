@@ -7,7 +7,7 @@ import {
   useReducer,
 } from 'react';
 import toast from 'react-hot-toast';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { SWRConfig } from 'swr';
 
 import { HttpError } from '@/services/core';
@@ -142,7 +142,7 @@ const authReducer = (state: AuthState, action: Action): AuthState => {
 export function AuthProvider({ children }: PropsWithChildren) {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const router = useRouter();
-  const pathname = usePathname();
+  const { pathname } = router;
 
   const authDispatch = useMemo<AuthDispatch>(() => {
     const setToken = (payload: string) => {

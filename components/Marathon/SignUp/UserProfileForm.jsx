@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { TAIWAN_DISTRICT, COUNTRIES, AREA_DELIMITER, TAIWAN_OPTION } from '@/constants/areas';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import {
@@ -51,8 +51,8 @@ export default function UserProfileForm({
   const authDispatch = useAuthDispatch();
   const mobileScreen = useMediaQuery('(max-width: 767px)');
   const [isSetting, setIsSetting] = useState(false);
-  const searchParams = useSearchParams();
-  const check = searchParams.get('check');
+  const { query } = useRouter();
+  const { check } = query;
   const [hasClickNextStep, setHasClickNextStep] = useState(false);
   const [hasUpdateAuthContext, setHasUpdateAuthContext] = useState(false);
   const {

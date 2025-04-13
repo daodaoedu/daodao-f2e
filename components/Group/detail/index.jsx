@@ -1,4 +1,4 @@
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';

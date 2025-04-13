@@ -73,13 +73,23 @@ class PathBuilder {
 
 export const apiPaths = new PathBuilder();
 
-export const parseParamsToNumber = (searchParams?: string | null) => {
-  if (searchParams == null) return null;
+export const parseToString = (input?: unknown) => {
+  try {
+    return z.string().parse(input);
+  } catch {
+    return null;
+  }
+};
 
-  return z
-    .number()
-    .int()
-    .or(z.string().regex(/^\d*$/))
-    .transform((val) => parseInt(val.toString(), 10))
-    .safeParse(searchParams).data;
+export const parseToNumber = (input?: unknown) => {
+  try {
+    return z
+      .number()
+      .int()
+      .or(z.string().regex(/^\d*$/))
+      .transform((val) => parseInt(val.toString(), 10))
+      .parse(input);
+  } catch {
+    return null;
+  }
 };

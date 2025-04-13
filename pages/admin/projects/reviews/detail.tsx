@@ -1,13 +1,13 @@
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import getAdminProjectLayout from '@/layout/AdminProjectLayout';
 import ReviewDetail from '@/components/Review/Detail';
 import { useProjectReview } from '@/services/modules/projects';
-import { parseParamsToNumber } from '@/services/core';
+import { parseToNumber, parseToString } from '@/services/core';
 
 const ReviewPage = () => {
-  const searchParams = useSearchParams();
-  const projectId = searchParams.get('id') ?? undefined;
-  const reviewId = parseParamsToNumber(searchParams.get('reviewId'));
+  const { query } = useRouter();
+  const projectId = parseToString(query.id);
+  const reviewId = parseToNumber(query.reviewId);
   const { data: review } = useProjectReview({
     projectId,
     reviewId,
