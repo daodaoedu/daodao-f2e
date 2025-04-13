@@ -44,15 +44,15 @@ function EditGroupPage() {
   });
 
   useEffect(() => {
-    if (isFetching || !source?.user?.externalId) return;
-    if (source.user.externalId !== user?._id) router.replace(`/group/detail?id=${id}`);
+    if (isFetching || !source?.user?.userId) return;
+    if (source.user.userId !== user?._id) router.replace(`/group/detail?id=${id}`);
   }, [user, source, isFetching, id]);
 
   return (
     <ProtectedComponent>
       <SEOConfig data={SEOData} />
       <Box minHeight="60vh">
-        {source?.user?.externalId && (
+        {source?.user?.userId && (
           <GroupForm
             defaultValues={source}
             isLoading={isLoading}

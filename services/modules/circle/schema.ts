@@ -15,7 +15,7 @@ export type CircleQuerySchema = z.infer<typeof circleQuerySchema>;
 export const userSchema = z
   .object({
     email: z.string(),
-    externalId: z.string(),
+    userId: z.string(),
   })
   .extend(baseUserSchema.shape);
 

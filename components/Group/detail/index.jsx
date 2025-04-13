@@ -23,7 +23,7 @@ import ShareButtonGroup from './ShareButtonGroup';
 function GroupDetail({ id, source, isLoading }) {
   const router = useRouter();
   const { user } = useAuth();
-  const isMyGroup = source?.user?.externalId === user?._id && !!user?._id;
+  const isMyGroup = source?.user?.userId === user?._id && !!user?._id;
 
   return (
     <Box sx={{ background: '#f3fcfc', pb: '48px' }}>
