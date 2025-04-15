@@ -2,14 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { EDUCATION, ROLE } from '@/constants/member';
 import toast from 'react-hot-toast';
-import { initialState as reduxInitMarathonState } from '@/redux/reducers/marathon';
 import { useRouter } from 'next/router';
-import { useDispatch, useSelector } from 'react-redux';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import {
-  createMarathonProfileByToken,
-  updateMarathonProfile,
-} from '@/redux/actions/marathon';
 import {
   Box,
   Typography,
@@ -17,8 +11,9 @@ import {
   Radio,
   FormControlLabel,
 } from '@mui/material';
-import { useAuthDispatch } from '@/contexts/Auth';
+import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { AREA_DELIMITER, AREAS } from '@/constants/areas';
+import { useMarathon, useMarathonMutation } from '@/services/modules/marathons';
 import { mapToTable } from '@/utils/helper';
 
 import marathonConfig from '@/constants/marathon';
@@ -217,11 +212,9 @@ export default function ConfirmForm({
   setCurrentStep,
   currentStep,
 }) {
-  const reduxDispatch = useDispatch();
-  const marathonState = useSelector((state) => { return state.marathon; });
-  const userState = useSelector((state) => { return state.user; });
-  const token = useSelector((state) => { return state.user.token; });
-  const [/** newMarathon */, setNewMarathon] = useState(reduxInitMarathonState);
+  const { data: marathonState = {} } = useMarathon();
+  const { user: userState } = useAuth();
+  const { createMutation, updateMutation } = useMarathonMutation();
   const router = useRouter();
   const { openLoginModal } = useAuthDispatch();
   const [user, setUser] = useState({
@@ -236,10 +229,6 @@ export default function ConfirmForm({
   const onPrevStep = () => {
     setCurrentStep(currentStep - 1);
   };
-
-  useEffect(() => {
-    setNewMarathon(marathonState);
-  }, []);
 
   useEffect(() => {
     if (userState._id) {
@@ -294,11 +283,11 @@ export default function ConfirmForm({
     };
 
     if (marathonState._id) {
-      reduxDispatch(updateMarathonProfile(token, marathonState._id, submitData));
+      updateMutation.trigger({ id: marathonState._id, ...submitData });
       localStorage.removeItem('newMarathon');
     } else {
       // if first time signup, create profile
-      reduxDispatch(createMarathonProfileByToken(token, submitData));
+      createMutation.trigger(submitData);
       localStorage.removeItem('newMarathon');
     }
   };

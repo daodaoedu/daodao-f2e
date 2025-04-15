@@ -1,20 +1,17 @@
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
-import { AiOutlineEye } from 'react-icons/ai';
 import { MdLockOpen, MdLock } from 'react-icons/md';
-import { GoBookmark } from 'react-icons/go';
 
 import Button from '@/shared/components/Button';
 import Container from '@/shared/components/Container';
-import Image from '@/shared/components/Image';
 import Sidebar from '@/shared/components/Sidebar';
 import { z } from 'zod';
 import { ProjectProvider, useProject } from '@/contexts/Project';
 import { ROLE } from '@/constants/member';
+import { parseToString } from '@/services/core';
 import getDefaultLayout from './DefaultLayout';
-
 
 const tabConfigs = (projectId: string) => ({
   outcomes: {
@@ -34,22 +31,18 @@ interface ProjectLayoutContentProps {
   children: React.ReactNode;
   activeTabType?: keyof ReturnType<typeof tabConfigs>;
 }
-function ProjectLayout({ children ,activeTabType}: ProjectLayoutContentProps) {
+function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const projectId = searchParams.get('id');
+  const { pathname } = router;
+  const { query } = router;
+  const projectId = parseToString(query.id);
   const activeTab =
     activeTabType && projectId
       ? tabConfigs(projectId)[activeTabType]
       : undefined;
   const activeTabPath = activeTab?.backPath ?? pathname;
-  console.log('activeTabPath',activeTabPath);
   const backPath = activeTab?.backPath ?? '/admin/projects';
-  console.log('backPath',backPath);
-
   const backText = activeTab?.backText ?? '返回 學習計畫分享區';
-  console.log('backText',backText);
 
   const { project, fetchProject } = useProject();
   const zhRole = ROLE.find((r) => {

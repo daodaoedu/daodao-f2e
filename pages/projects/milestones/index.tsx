@@ -1,15 +1,16 @@
 import dayjs from 'dayjs';
 import getPublicProjectLayout from '@/layout/PublicProjectLayout';
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { Skeleton } from '@mui/material';
 import { useProjectMilestones } from '@/services/modules/projects';
 import EmptyList from '@/components/Projects/ProjectList/EmptyList';
 import MilestoneItemView from '@/components/Milestones/MilestoneItemView';
 import { MilestonesProvider } from '@/contexts/Milestones';
+import { parseToString } from '@/services/core';
 
 const ProjectMilestonesPage = () => {
-  const searchParams = useSearchParams();
-  const projectId = searchParams.get('id');
+  const { query } = useRouter();
+  const projectId = parseToString(query.id);
   const { data: milestones, isLoading } = useProjectMilestones(projectId);
 
   return (

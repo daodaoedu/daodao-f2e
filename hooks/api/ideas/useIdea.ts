@@ -11,7 +11,7 @@ import {
 } from '@/services/ideas';
 
 interface UseIdeaOptions {
-  ideaId?: string;
+  ideaId?: string | null;
   mutateKey?: string | null;
   onCreated?: () => void;
   onUpdated?: () => void;

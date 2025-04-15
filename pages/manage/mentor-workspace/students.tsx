@@ -1,4 +1,4 @@
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import Image from '@/shared/components/Image';
@@ -8,6 +8,7 @@ import { ParticipantSchema } from '@/services/mentors/marathons';
 import LocationSvg from '@/public/assets/icons/location.svg';
 import { EDUCATION, ROLE, WANT_TO_DO_WITH_PARTNER } from '@/constants/member';
 import { timeDuration } from '@/utils/date';
+import { parseToString } from '@/services/core';
 
 const ParticipantCard = ({
   participant,
@@ -107,8 +108,8 @@ const ParticipantCard = ({
 };
 
 const MentorWorkspaceStudents = () => {
-  const searchParams = useSearchParams();
-  const marathonId = searchParams.get('marathonId') ?? undefined;
+  const { query } = useRouter();
+  const marathonId = parseToString(query.marathonId);
   const { data: marathonParticipantList } = useMentorMarathonParticipant({
     marathonId,
   });

@@ -1,14 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
-import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import {
+  useMetaInstagramPost,
+  useMetaInstagramStory,
+} from '@/services/modules/metaPosts';
+
 import ImageCardList from './ImageCardList';
 import StoryCardList from './StoryCardList';
-
-import {
-  getFacebookGroupPost,
-  getInstagramPost,
-  getInstagramStory,
-} from '../../../redux/actions/shared';
 
 const GuideWrapper = styled.div`
   width: 90%;
@@ -30,32 +28,8 @@ const GuideWrapper = styled.div`
 `;
 
 const Guide = () => {
-  const dispatch = useDispatch();
-  const {
-    instagramPosts,
-    instagramStories,
-    isLoadingInstagramPosts,
-    isLoadingInstagramStories,
-  } = useSelector(({ shared }) => {
-    return {
-      groupPosts: shared?.groupPosts,
-      // fanpagesPosts: shared?.fanpagesPosts,
-      instagramPosts: shared?.instagramPosts.filter(
-        (item) => item?.media_type === 'IMAGE',
-      ),
-      instagramStories: shared?.instagramStories,
-      // isLoadingFanpagesPosts: shared?.isLoadingFanpagesPosts,
-      isLoadingGroupPosts: shared?.isLoadingGroupPosts,
-      isLoadingInstagramPosts: shared?.isLoadingInstagramPosts,
-      isLoadingInstagramStories: shared?.isLoadingInstagramStories,
-    };
-  }, shallowEqual);
-
-  useEffect(() => {
-    dispatch(getFacebookGroupPost(7));
-    dispatch(getInstagramPost());
-    dispatch(getInstagramStory());
-  }, [dispatch]);
+  const { data: instagramPosts = [], isLoading: isLoadingInstagramPosts } = useMetaInstagramPost();
+  const { data: instagramStories = [], isLoading: isLoadingInstagramStories } = useMetaInstagramStory();
 
   return (
     <GuideWrapper>

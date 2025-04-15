@@ -1,8 +1,8 @@
 import toast from 'react-hot-toast';
 import { useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
-import OutcomeCard from '@/components/Outcome/Card';
+import { ContentCard } from '@/features/projects';
 import getProjectLayout from '@/layout/ProjectLayout';
 import Button from '@/shared/components/Button';
 import CreateModal from '@/components/Outcome/Modals/CreateModal';
@@ -14,6 +14,7 @@ import {
   useProjectOutcomeMutation,
   useProjectOutcomes,
 } from '@/services/modules/projects';
+import { parseToString } from '@/services/core';
 
 enum ModalTypeEnum {
   Create,
@@ -22,8 +23,8 @@ enum ModalTypeEnum {
 }
 
 const OutcomesPage = () => {
-  const searchParams = useSearchParams();
-  const projectId = searchParams.get('id');
+  const { query } = useRouter();
+  const projectId = parseToString(query.id);
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [outcomeId, setOutcomeId] = useState<number | null>(null);
   const { data: project } = useProject(projectId);
@@ -96,7 +97,8 @@ const OutcomesPage = () => {
             key={outcome.id}
             className="py-6 border-b last:border-b-0 border-solid border-basic-200"
           >
-            <OutcomeCard
+            <ContentCard
+              type="outcome"
               data={outcome}
               className="p-3 transition-shadow hover:shadow-basic-200/40 hover:shadow-lg"
               detailLink={`/manage/project/outcomes/detail?id=${projectId}&outcomeId=${outcome.id}`}

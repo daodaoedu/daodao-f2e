@@ -1,13 +1,13 @@
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import OutcomeDetail from '@/components/Outcome/Detail';
 import getAdminProjectLayout from '@/layout/AdminProjectLayout';
 import { useProject, useProjectOutcome } from '@/services/modules/projects';
-import { parseParamsToNumber } from '@/services/core';
+import { parseToNumber, parseToString } from '@/services/core';
 
 const OutcomeDetailPage = () => {
-  const searchParams = useSearchParams();
-  const projectId = searchParams.get('id');
-  const outcomeId = parseParamsToNumber(searchParams.get('outcomeId'));
+  const { query } = useRouter();
+  const projectId = parseToString(query.id);
+  const outcomeId = parseToNumber(query.outcomeId);
   const { data: project } = useProject(projectId);
   const { data: outcome } = useProjectOutcome({
     projectId,

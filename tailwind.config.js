@@ -106,11 +106,11 @@ module.exports = {
         });
       });
       addUtilities({
-        [`.animate-distance-from-right`]: {
-          "--animation-distance": `100%`,
+        ['.animate-distance-100dvh']: {
+          '--animation-distance': '100dvh',
         },
-        [`.animate-distance-from-left`]: {
-          "--animation-distance": `-100%`,
+        ['.-animate-distance-full']: {
+          '--animation-distance': '-100%',
         },
       });
       addUtilities({
@@ -124,7 +124,8 @@ module.exports = {
         },
         [`.animate-fade-out`]: {
           animation:
-            "fade-out var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards ease-in-out",
+            "fade-out var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards",
+          animationTimingFunction: "cubic-bezier(0.32,0.72,0,1)",
           "@keyframes fade-out": {
             "0%": { opacity: 1 },
             "100%": { opacity: 0 },
@@ -134,7 +135,8 @@ module.exports = {
       addUtilities({
         [`.animate-slide-y-in`]: {
           animation:
-            "slide-y-in var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards ease-in-out",
+            "slide-y-in var(--animation-duration, 200ms) var(--animation-delay, 0ms) forwards",
+          animationTimingFunction: "cubic-bezier(0.32,0.72,0,1)",
           "@keyframes slide-y-in": {
             "0%": { transform: "translateY(var(--animation-distance, 100%))" },
             "100%": { transform: "translateY(0)" },

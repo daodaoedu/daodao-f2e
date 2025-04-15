@@ -1,4 +1,4 @@
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import Button from '@/shared/components/Button';
 import Container from '@/shared/components/Container';
 import Sidebar from '@/shared/components/Sidebar';
@@ -7,7 +7,7 @@ import getDefaultLayout from './DefaultLayout';
 
 function MentorWorkspaceLayout({ children }: React.PropsWithChildren) {
   const router = useRouter();
-  const pathname = usePathname();
+  const { pathname } = router;
 
   return (
     <ProtectedComponent redirectOnCancel="/">

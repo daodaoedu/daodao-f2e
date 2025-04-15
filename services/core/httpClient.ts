@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { getTokenStorage } from '@/utils/storage';
 import { getBackendUrl } from '@/utils/env';
 
+export const V1_BASE_URL = 'https://api.daoedu.tw';
 export const BASE_URL = getBackendUrl();
 
 enum RequestMethod {
@@ -151,6 +152,12 @@ export const fetcher = <R = void>(params: FetcherParams): Promise<R> => {
 
   return http<R>({ pathname, source });
 };
+
+export const fetcherV1 = <R = void>(
+  params: FetcherParams,
+  options: RequestInit = {}
+): Promise<R> =>
+  fetch(`${V1_BASE_URL}${params}`, options).then((res) => res.json());
 
 const createMutation =
   (method: RequestMethod) =>

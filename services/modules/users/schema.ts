@@ -27,6 +27,16 @@ export const baseUserSchema = z.object({
 
 export type BaseUserSchema = z.infer<typeof baseUserSchema>;
 
+export const userQuerySchema = z.object({
+  educationStage: z.string().optional(),
+  roleList: z.string().optional(),
+  location: z.string().optional(),
+  tag: z.string().optional(),
+  search: z.string().optional(),
+});
+
+export type UserQuerySchema = z.infer<typeof userQuerySchema>;
+
 export interface IUser extends BaseUserSchema {
   _id: string;
   birthDay: string;

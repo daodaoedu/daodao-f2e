@@ -1,14 +1,14 @@
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import NoteDetail from '@/components/Note/Detail';
 import getAdminProjectLayout from '@/layout/AdminProjectLayout';
 import { useProjectNote } from '@/services/modules/projects';
-import { parseParamsToNumber } from '@/services/core';
+import { parseToNumber, parseToString } from '@/services/core';
 
 const NoteDetailPage = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const projectId = searchParams.get('id');
-  const noteId = parseParamsToNumber(searchParams.get('noteId'));
+  const { query } = router;
+  const projectId = parseToString(query.id);
+  const noteId = parseToNumber(query.noteId);
 
   const { data: note } = useProjectNote({
     projectId,
@@ -16,9 +16,9 @@ const NoteDetailPage = () => {
   });
 
   if (!projectId || noteId == null) {
-    router.replace(`/admin/projects/notes?id=${projectId}`);
     return null;
   }
+
   return (
     <div className="bg-basic-white rounded-2xl">
       <NoteDetail data={note} />

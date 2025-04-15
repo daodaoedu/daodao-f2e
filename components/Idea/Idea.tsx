@@ -15,7 +15,7 @@ const Idea: React.FC = () => {
     <div className="bg-[#f3fcfc]">
       <Banner />
       {/* Container: 原 StyledContainer 改用 Tailwind 調整寬度與間距 */}
-      <div className="relative mt-[70px] mx-auto w-full lg:px-0 rounded-2xl" style={{ maxWidth: window.innerWidth < 1024 ? (window.innerWidth < 800 ? '100%' : '768px') : '924px' }}>
+      <div className="relative mt-[70px] mx-auto w-full lg:px-0 rounded-2xl">
         {/* Paper 區塊：背景白色、陰影與內間距 */}
         <div className="bg-white shadow p-1 rounded-2xl">
           <SearchField />

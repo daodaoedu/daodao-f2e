@@ -1,4 +1,4 @@
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -23,7 +23,7 @@ import ShareButtonGroup from './ShareButtonGroup';
 function GroupDetail({ id, source, isLoading }) {
   const router = useRouter();
   const { user } = useAuth();
-  const isMyGroup = source?.userId === user?._id && !!user?._id;
+  const isMyGroup = source?.user?.userId === user?._id && !!user?._id;
 
   return (
     <Box sx={{ background: '#f3fcfc', pb: '48px' }}>
