@@ -38,7 +38,14 @@ export function useUsers(query: UserQuerySchema, pageSize = 10) {
 }
 
 export function useUser(id?: string) {
-  return useSWR<IUser>(id ? getUserPathname({ id }) : null);
+  const { data, ...swr } = useSWR<{ data: IUser[] }>(
+    id ? getUserPathname({ id }) : null
+  );
+
+  return {
+    ...swr,
+    data: data?.data?.[0],
+  };
 }
 
 export function useUserMe({ token, onSuccess, onError }: UserMeQueryParams) {
