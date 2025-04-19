@@ -5,7 +5,7 @@ import {
 } from '@/services/mentors/marathons';
 
 interface UseMentorMarathonParticipantListProps {
-  marathonId?: string;
+  marathonId?: string | null;
 }
 
 export default function useMentorMarathonParticipant({

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 import useProfileValidation from '@/components/Signin/useValidation';
 import { ProtectedComponent, useAuthDispatch } from '@/contexts/Auth';

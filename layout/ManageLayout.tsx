@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/router';
 import Sidebar from '@/shared/components/Sidebar';
 import Collapse from '@/shared/components/Collapse';
 import Container from '@/shared/components/Container';
@@ -9,7 +9,7 @@ import getDefaultLayout from './DefaultLayout';
 
 function ManageLayout({ children }: React.PropsWithChildren) {
   const { user } = useAuth();
-  const pathname = usePathname();
+  const { pathname } = useRouter();
 
   const sidebarItems = useMemo(
     () => getManageSidebarItems({ role: user?.role }),

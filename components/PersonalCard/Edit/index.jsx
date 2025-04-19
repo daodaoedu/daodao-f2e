@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
 import { TAIWAN_DISTRICT, COUNTRIES } from '@/constants/areas';
 import { useAuth } from '@/contexts/Auth';
 
@@ -29,6 +28,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import TagEditor from '@/shared/components/TagEditor';
 import MarkdownEditor from '@/shared/components/MarkdownEditor';
+import { useTags } from '@/services/modules/tags';
 import ErrorMessage from './ErrorMessage';
 
 import TheAvator from './TheAvator';
@@ -66,7 +66,7 @@ function EditPage() {
   } = useEditProfile();
 
   const { user, token, isComplete } = useAuth();
-  const { tags } = useSelector((state) => state.partners);
+  const { data: tags } = useTags();
 
   useEffect(() => {
     if (user?._id) {

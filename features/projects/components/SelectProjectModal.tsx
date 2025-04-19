@@ -10,6 +10,7 @@ interface SelectProjectModalProps {
   renderContent: (project: ProjectSchema) => React.ReactNode;
   onClose: () => void;
   onSelect: (id: string | undefined) => void;
+  onRemovedDOM: () => void;
 }
 
 export default function SelectProjectModal({
@@ -17,6 +18,7 @@ export default function SelectProjectModal({
   renderContent,
   onClose,
   onSelect,
+  onRemovedDOM,
 }: SelectProjectModalProps) {
   const { data: projects } = useMyProjects();
   const [selectedProject, setSelectedProject] = useState<ProjectSchema | null>(
@@ -30,6 +32,11 @@ export default function SelectProjectModal({
     },
     [onSelect]
   );
+
+  const handleRemovedDOM = useCallback(() => {
+    setSelectedProject(null);
+    onRemovedDOM();
+  }, [onRemovedDOM]);
 
   useEffect(() => {
     if (!Array.isArray(projects) || !isOpen) return;
@@ -52,7 +59,7 @@ export default function SelectProjectModal({
       onClose={onClose}
       className="lg:p-4"
       hasCloseButton
-      onRemovedDOM={() => handleSelect(null)}
+      onRemovedDOM={handleRemovedDOM}
     >
       <div className="mt-4">
         {selectedProject

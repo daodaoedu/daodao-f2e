@@ -115,7 +115,7 @@ function OutcomeForm({
       <MarkdownEditor
         rootClassName="p-px mb-2 bg-basic-200 rounded-md"
         className="bg-white rounded-md"
-        editorClassName="min-h-80"
+        editorClassName="min-h-80 max-w-full"
         ref={(element) => methods.register('content').ref(element)}
         value={methods.watch('content')}
         placeholder="請填寫學習成果"

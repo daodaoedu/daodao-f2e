@@ -57,7 +57,7 @@ const Banner = ({ children }) => {
         <div
           className={cn(
             "absolute top-[39%] -left-[2.8%] w-[18%] aspect-[271/404]",
-            "-translate-x-full animate-slide-x-in animate-distance-from-left animate-duration-1100 animate-delay-500",
+            "-translate-x-full animate-slide-x-in -animate-distance-full animate-duration-1100 animate-delay-500",
           )}
         >
           <Image
@@ -70,7 +70,7 @@ const Banner = ({ children }) => {
         <div
           className={cn(
             "absolute top-[33%] -right-[1.6%] w-[18%] aspect-[256/351]",
-            "translate-x-full animate-slide-x-in animate-distance-from-right animate-duration-1100 animate-delay-1100",
+            "translate-x-full animate-slide-x-in animate-duration-1100 animate-delay-1100",
           )}
         >
           <Image

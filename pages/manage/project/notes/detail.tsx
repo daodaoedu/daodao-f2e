@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import NoteDetail from '@/components/Note/Detail';
 import SEOConfig from '@/shared/components/SEO';
@@ -9,7 +9,7 @@ import {
   useProjectNote,
   useProjectNoteMutation,
 } from '@/services/modules/projects';
-import { parseParamsToNumber } from '@/services/core';
+import { parseToNumber, parseToString } from '@/services/core';
 import ConfirmModal from '@/shared/components/Confirm';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';
 
@@ -20,9 +20,9 @@ enum ModalTypeEnum {
 
 const NoteDetailPage = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const projectId = searchParams.get('id');
-  const noteId = parseParamsToNumber(searchParams.get('noteId'));
+  const { query } = router;
+  const projectId = parseToString(query.id);
+  const noteId = parseToNumber(query.noteId);
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const { data: project } = useProject(projectId);
   const { data: note } = useProjectNote({

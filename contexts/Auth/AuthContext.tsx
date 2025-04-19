@@ -7,11 +7,9 @@ import {
   useReducer,
 } from 'react';
 import toast from 'react-hot-toast';
-import { useRouter, usePathname } from 'next/navigation';
-import useSWR, { SWRConfig } from 'swr';
-import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/router';
+import { SWRConfig } from 'swr';
 
-import { fetchUserByToken, userLogout } from '@/redux/actions/user';
 import { HttpError } from '@/services/core';
 import {
   getRedirectionStorage,
@@ -19,13 +17,11 @@ import {
   getTokenStorage,
 } from '@/utils/storage';
 import {
-  createUser,
+  userAPI,
   createUserSchema,
-  getUserMe,
-  IUser,
-  updateUser,
   updateUserSchema,
-} from '@/services/users';
+  useUserMe,
+} from '@/services/modules/users';
 
 import LoginModal from './LoginModal';
 import {
@@ -146,10 +142,7 @@ const authReducer = (state: AuthState, action: Action): AuthState => {
 export function AuthProvider({ children }: PropsWithChildren) {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const router = useRouter();
-  const pathname = usePathname();
-
-  // TODO: 待移除 redux，為了同步資訊
-  const reduxDispatch = useDispatch();
+  const { pathname } = router;
 
   const authDispatch = useMemo<AuthDispatch>(() => {
     const setToken = (payload: string) => {
@@ -157,8 +150,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
       dispatch({ type: ActionTypes.SET_TOKEN, payload });
     };
     const logout = () => {
-      // TODO: 待移除 localStorage.clear，目前只是為了讓 redux 同步登出的暫解
-      reduxDispatch(userLogout());
       getTokenStorage().remove();
       getRedirectionStorage().remove();
       dispatch({ type: ActionTypes.LOGOUT });
@@ -170,27 +161,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
         dispatch({ type: ActionTypes.LOGIN, payload });
       },
       updateUser: async (input) => {
-        // TODO: remove after removed redux
-        if ((input as unknown as { _id: string })?._id) {
-          setToken((input as unknown as { token: string })?.token);
-          dispatch({ type: ActionTypes.UPDATE_USER, payload: input as IUser });
-          return;
-        }
-
         switch (state.loginStatus) {
           case LoginStatus.TEMPORARY: {
-            const request = createUserSchema.parse(input);
-            const { token, user } = await createUser(request);
+            const arg = createUserSchema.parse(input);
+            const { token, user } = await userAPI.create('', { arg });
             setToken(token);
             dispatch({ type: ActionTypes.UPDATE_USER, payload: user });
             break;
           }
           case LoginStatus.PERMANENT: {
-            const request = updateUserSchema.parse({
+            const arg = updateUserSchema.parse({
               ...state.user,
               ...input,
             });
-            const payload = await updateUser(request);
+            const payload = await userAPI.update('', { arg });
             dispatch({ type: ActionTypes.UPDATE_USER, payload });
             break;
           }
@@ -224,15 +208,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     toast.error('系統異常，請稍後再試');
   };
 
-  useSWR(state.token ? [getUserMe.name, state.token] : null, getUserMe, {
+  useUserMe({
+    token: state.token,
     onSuccess: authDispatch.login,
     onError: handleError,
   });
 
   useEffect(() => {
     const handleToken = (token: string) => {
-      // TODO: 待移除 redux，為了同步資訊
-      reduxDispatch(fetchUserByToken(token));
       authDispatch.setToken(token);
     };
 
@@ -242,12 +225,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     );
 
     return unregisterLoginListener;
-  }, [
-    state.loginStatus,
-    authDispatch.setToken,
-    authDispatch.logout,
-    reduxDispatch,
-  ]);
+  }, [state.loginStatus, authDispatch.setToken, authDispatch.logout]);
 
   useEffect(() => {
     switch (state.loginStatus) {

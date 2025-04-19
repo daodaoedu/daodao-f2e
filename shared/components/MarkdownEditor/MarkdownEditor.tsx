@@ -20,6 +20,7 @@ import {
   Separator,
   InsertImage,
   imagePlugin,
+  MDXEditorMethods,
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import { cn } from '@/utils/cn';
@@ -69,6 +70,11 @@ interface MarkdownEditorProps {
 type CheckLinkRef = { check: (href: string) => void };
 type EditorError = { error: string; source: string };
 
+const moreSpaceRegex = /(\n)?( {2} +)/g;
+
+const replaceSpace = (value: string) =>
+  value.replace(moreSpaceRegex, (_, p1, p2) => `${p1 ?? ''}&#x20;${p2}`);
+
 function InternalMarkdownEditor(
   {
     readOnly = false,
@@ -82,18 +88,19 @@ function InternalMarkdownEditor(
     suppressLinkDefaultPrevent = false,
     disabledProse = false,
   }: MarkdownEditorProps,
-  ref: React.Ref<React.ComponentRef<typeof MDXEditor>>
+  ref: React.ForwardedRef<MDXEditorMethods>
 ) {
   const formattedValue = typeof value === 'string' ? value : '';
   const id = useId();
   const [error, setError] = useState<EditorError | null>(null);
+  const editorRef = useRef<MDXEditorMethods>(null);
   const checkLinkRef = useRef<CheckLinkRef>(null);
-  const markdown = useRef(formattedValue);
+  const markdownRef = useRef(replaceSpace(formattedValue));
   const editorSelectors = 'markdown-editor';
   const pluginsSettings = useMemo(
     () =>
       Object.entries(
-        generatePluginsSettings({ diffMarkdown: markdown.current })
+        generatePluginsSettings({ diffMarkdown: markdownRef.current })
       )
         .filter(([key]) => {
           if (readOnly) {
@@ -105,8 +112,15 @@ function InternalMarkdownEditor(
           return true;
         })
         .map(([, plugin]) => plugin),
-    [markdown.current]
+    [markdownRef.current]
   );
+
+  const renderKey = useMemo(() => {
+    if (!readOnly) return 'withToolbar';
+    if (formattedValue === markdownRef.current) return 'readOnly';
+    markdownRef.current = formattedValue;
+    return crypto.randomUUID();
+  }, [readOnly, formattedValue]);
 
   useEffect(() => {
     const editor = document
@@ -140,6 +154,25 @@ function InternalMarkdownEditor(
     };
   }, []);
 
+  useEffect(() => {
+    const handleCheckMoreSpace = () => {
+      const sourceEditor = document
+        .getElementById(id)
+        ?.querySelector('.mdxeditor-source-editor');
+
+      if (sourceEditor) return;
+      editorRef.current?.setMarkdown(replaceSpace(formattedValue));
+    };
+
+    if (moreSpaceRegex.test(formattedValue)) {
+      window.addEventListener('click', handleCheckMoreSpace);
+    }
+
+    return () => {
+      window.removeEventListener('click', handleCheckMoreSpace);
+    };
+  }, [formattedValue]);
+
   return (
     <div id={id} className={rootClassName}>
       {error && readOnly && (
@@ -153,10 +186,15 @@ function InternalMarkdownEditor(
         </div>
       )}
       <MDXEditor
-        key={readOnly ? 'readOnly' : 'withToolbar'}
-        ref={ref}
+        key={renderKey}
+        ref={(el) => {
+          editorRef.current = el;
+          if (typeof ref === 'function') {
+            ref(el);
+          }
+        }}
         readOnly={readOnly}
-        markdown={markdown.current}
+        markdown={markdownRef.current}
         onChange={onChange}
         placeholder={placeholder}
         suppressHtmlProcessing

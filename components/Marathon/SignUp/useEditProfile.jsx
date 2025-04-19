@@ -1,9 +1,8 @@
 import dayjs from 'dayjs';
 import { useReducer, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { updateUser, createUser } from '@/redux/actions/user';
 import { z } from 'zod';
 import { ABROAD_OPTION, AREA_DELIMITER, TAIWAN_OPTION } from '@/constants/areas';
+import { userAPI } from '@/services/modules/users';
 
 const initialState = {
   name: '',
@@ -113,7 +112,6 @@ const userReducer = (state, payload) => {
 };
 
 const useEditProfile = () => {
-  const reduxDispatch = useDispatch();
   const [userState, stateDispatch] = useReducer(userReducer, initialState);
   const [errors, setErrors] = useState({});
   const refs = useRef({});
@@ -232,9 +230,9 @@ const useEditProfile = () => {
 
     // TODO: replace with authDispatch
     if (type === 'update') {
-      reduxDispatch(updateUser(payload));
+      userAPI.update(payload);
     } else if (type === 'create') {
-      reduxDispatch(createUser(payload));
+      userAPI.create(payload);
     }
     return true;
   };

@@ -1,7 +1,7 @@
 import Image from '@/shared/components/Image';
 import PostDetailCard from '@/shared/components/Post/PostDetailCard';
 import { ProjectNoteSchema } from '@/services/modules/projects';
-import { BaseUserSchema } from '@/services/users';
+import { BaseUserSchema } from '@/services/modules/users';
 import { CommentType } from '@/services/modules/comments';
 import MarkdownEditor from '@/shared/components/MarkdownEditor';
 

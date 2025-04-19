@@ -1,10 +1,5 @@
 import { useState, useEffect, useReducer, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import {
-  updateNewMarathon
-} from '@/redux/actions/marathon';
-import { initialState as reduxInitMarathonState } from '@/redux/reducers/marathon';
 import { getMarathonErrorsStorage } from '@/utils/storage';
 
 import {
@@ -14,6 +9,7 @@ import {
   Checkbox,
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
+import { useMarathon } from '@/services/modules/marathons';
 
 import marathonConfig from '@/constants/marathon';
 import MilestoneGroup from './MilestoneGroup';
@@ -75,17 +71,16 @@ export default function MarathonForm({
   setCurrentStep,
   currentStep,
 }) {
-  const reduxDispatch = useDispatch();
   const [hasLoaded, setHasLoaded] = useState(false);
   const [errors, setErrors] = useState({});
   const popupRef = useRef(null);
-  const marathonState = useSelector((state) => { return state.marathon; });
+  const { data: marathonState = {} } = useMarathon();
   const localStorgeStored = window.localStorage.getItem('newMarathon');
   const editingMarathon = localStorgeStored ? JSON.parse(localStorgeStored) : null;
 
   const initialState = () => {
-    // 優先使用編輯中的資料，其次使用暫存在 marathonState 的資料，最後使用 reduxInit 預設模板
-    return editingMarathon || marathonState || reduxInitMarathonState;
+    // 優先使用編輯中的資料，其次使用暫存在 marathonState 的資料，最後使用空物件
+    return editingMarathon || marathonState || {};
   };
   const [newMarathon, setNewMarathon] = useReducer(marathonFormReducer, initialState());
 
@@ -248,12 +243,10 @@ export default function MarathonForm({
       toast.error('請修正錯誤');
       return;
     }
-    reduxDispatch(updateNewMarathon(newMarathon));
     setCurrentStep(currentStep + 1);
   };
 
   const onPrevStep = () => {
-    reduxDispatch(updateNewMarathon(newMarathon));
     setCurrentStep(currentStep - 1);
   };
 

@@ -51,7 +51,8 @@ const rules = {
     .min(1, '請選擇學習領域'),
   participator: z
     .string()
-    .regex(/^(100|[1-9]\d|[1-9])$/, '請輸入整數，需大於 0，不可超過 100'),
+    .regex(/^(100|[1-9]\d|[1-9])$/, '請輸入整數，需大於 0，不可超過 100')
+    .or(z.number()),
   area: z
     .array(z.enum(AREAS.concat(ONLINE_OPTION, TBD_OPTION).map(({ value }) => value)))
     .min(1, '請選擇地點'),

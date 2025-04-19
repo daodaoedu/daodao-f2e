@@ -1,10 +1,7 @@
-import { useEffect, Fragment } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { Fragment } from 'react';
 import styled from '@emotion/styled';
 import Button from '@mui/material/Button';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import useSearchParamsManager from '@/hooks/useSearchParamsManager';
-import { setQuery } from '@/redux/actions/group';
 import Image from '@/shared/components/Image';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import errorCoverImg from '@/public/assets/contacterror.png';
@@ -127,18 +124,10 @@ function SkeletonItems({ isMobileScreen, isPadScreen, isDeskTopScreen }) {
   });
 }
 
-function GroupList() {
-  const dispatch = useDispatch();
-  const [getSearchParams] = useSearchParamsManager();
-  const { items, isLoading, isError } = useSelector((state) => state.group);
-
+function GroupList({ items, isLoading, isError, onRefetch }) {
   const isMobileScreen = useMediaQuery('(max-width: 560px)');
   const isPadScreen = useMediaQuery('(max-width: 767px)') && !isMobileScreen;
   const isDeskTopScreen = !isPadScreen;
-
-  useEffect(() => {
-    dispatch(setQuery(getSearchParams()));
-  }, [getSearchParams]);
 
   return (
     <StyledGroupList>
@@ -174,7 +163,7 @@ function GroupList() {
               borderRadius: '20px',
               padding: '6px 48px',
             }}
-            onClick={() => dispatch(setQuery(getSearchParams()))}
+            onClick={onRefetch}
           >
             重新載入
           </Button>

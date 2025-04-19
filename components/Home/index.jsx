@@ -1,4 +1,4 @@
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import React, { useRef } from 'react';
 import styled from '@emotion/styled';
 import { Button, Divider } from '@mui/material';

@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { useDispatch } from 'react-redux';
-import { fetchMarathonProfileById } from '@/redux/actions/marathon';
 import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
 import Image from '@/shared/components/Image';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
@@ -25,7 +23,6 @@ export default function MarathonCard({ marathon }) {
   const { title, isPublic } = marathon;
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState(null);
-  const reduxDispatch = useDispatch();
   const handleMenu = (event) => {
     event.preventDefault();
     setAnchorEl(event.currentTarget);
@@ -37,7 +34,6 @@ export default function MarathonCard({ marathon }) {
   const handleClickEdit = () => {
     setAnchorEl(null);
     window.localStorage.setItem('fromProfilePage', 'click_edit');
-    reduxDispatch(fetchMarathonProfileById(marathon._id));
     router.push('/learning-marathon/signup');
   };
   const handleClickDetail = () => {

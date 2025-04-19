@@ -1,5 +1,7 @@
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
+import { useCircles } from '@/services/modules/circle';
+import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 import AreaChips from './AreaChips';
 import Banner from './Banner';
 import SearchField from './SearchField';
@@ -24,6 +26,9 @@ const StyledContainer = styled.div`
 `;
 
 function Group() {
+  const [getSearchParams] = useSearchParamsManager();
+  const { data, isLoading, isError, hasMore, mutate, setSize } = useCircles(getSearchParams());
+
   return (
     <Box sx={{ background: '#f3fcfc' }}>
       <Banner />
@@ -34,10 +39,19 @@ function Group() {
         </StyledPaper>
         <StyledPaper as="main" sx={{ marginTop: '24px' }}>
           <AreaChips />
-          <GroupList />
+          <GroupList
+            items={data}
+            isLoading={isLoading}
+            isError={isError}
+            onRefetch={mutate}
+          />
         </StyledPaper>
       </StyledContainer>
-      <More />
+      <More
+        hasMore={hasMore}
+        isLoading={isLoading}
+        onLoadMore={() => setSize((prev) => prev + 1)}
+      />
     </Box>
   );
 }
