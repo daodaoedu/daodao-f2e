@@ -1,6 +1,5 @@
 import z from 'zod';
 import { useState, useEffect } from 'react';
-import { NextPage } from 'next';
 import getPublicProjectLayout from '@/layout/PublicProjectLayout';
 import { Project as ProjectType } from '@/components/Projects/Project/type';
 import { BASE_URL } from '@/constants/common';
@@ -18,17 +17,7 @@ import {
 } from '@/components/Projects/Project/Shared';
 import { parseToString } from '@/services/core';
 
-interface ProjectDetailPageProps {
-  projectId?: string;
-  inExplore?: boolean;
-}
-
-// 定義 NextPageWithLayout 擴展 NextPage 類型
-type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: React.ReactElement) => React.ReactNode
-}
-
-const ProjectDetailPage: NextPageWithLayout<ProjectDetailPageProps> = ({ projectId: propProjectId }) => {
+const ProjectDetailPage = () => {
   const [isFetchingProject, setIsFetchingProject] = useState(false);
   const [project, setProject] = useState<ProjectType>();
   const { query } = useRouter();
@@ -133,6 +122,5 @@ const ProjectDetailPage: NextPageWithLayout<ProjectDetailPageProps> = ({ project
     </>
   );
 };
-
 ProjectDetailPage.getLayout = getPublicProjectLayout;
 export default ProjectDetailPage;
