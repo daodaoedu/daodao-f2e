@@ -40,7 +40,7 @@
     "feed": "^4.2.2",
     "konva": "^7.0.0",
     "localforage": "^1.10.0",
-    "lucide-react": "^0.483.0",
+    "lucide-react": "^0.503.0",
     "moment": "^2.29.4",
     "next": "^15.1.6",
     "next-pwa": "^5.6.0",

@@ -16,8 +16,12 @@ import {
   PartnersContent
 } from './components';
 
+interface ProjectDetailProps {
+  projectId: string;
+  inExplore?: boolean;
+}
 // 動態導入項目詳情頁組件
-const DynamicProjectDetail = dynamic(() => import('@/pages/projects/detail'), {
+const DynamicProjectDetail = dynamic<ProjectDetailProps>(() => import('@/pages/projects/detail'), {
   loading: () => <div>正在載入學習計畫詳情...</div>
 });
 
