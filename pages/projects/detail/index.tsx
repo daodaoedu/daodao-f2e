@@ -1,9 +1,10 @@
+import z from 'zod';
 import { useState, useEffect } from 'react';
 import { NextPage } from 'next';
 import getPublicProjectLayout from '@/layout/PublicProjectLayout';
 import { Project as ProjectType } from '@/components/Projects/Project/type';
 import { BASE_URL } from '@/constants/common';
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 import { Skeleton } from '@mui/material';
 import {
@@ -15,7 +16,7 @@ import {
   FakeInput,
   FakeCheckBox,
 } from '@/components/Projects/Project/Shared';
-import z from 'zod';
+import { parseToString } from '@/services/core';
 
 interface ProjectDetailPageProps {
   projectId?: string;
@@ -30,9 +31,8 @@ type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
 const ProjectDetailPage: NextPageWithLayout<ProjectDetailPageProps> = ({ projectId: propProjectId }) => {
   const [isFetchingProject, setIsFetchingProject] = useState(false);
   const [project, setProject] = useState<ProjectType>();
-  const searchParams = useSearchParams();
-  // 優先使用 prop 中傳入的 projectId，其次使用 URL 查詢參數中的 id
-  const projectId = propProjectId || searchParams.get('id') || undefined;
+  const { query } = useRouter();
+  const projectId = parseToString(query.id);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -62,7 +62,7 @@ const ProjectDetailPage: NextPageWithLayout<ProjectDetailPageProps> = ({ project
         toast.error('找不到這個計劃');
       }
     }
-  }, [searchParams, propProjectId]);
+  }, [projectId]);
 
   return (
     <>

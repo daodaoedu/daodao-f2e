@@ -14,6 +14,7 @@ import {
 } from '@/services/modules/projects';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
 import Image from '@/shared/components/Image';
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 import Upload, { ImageDataType } from '@/shared/components/Upload';
 
 interface BaseOutcomeFormProps {
@@ -111,12 +112,14 @@ function OutcomeForm({
           isEditable
         />
       </PostCard>
-      <textarea
-        className="w-full h-80 px-2 py-1 body-sm focus-within:outline-none resize-none"
-        placeholder="學習成果的提示文字
-例如：你的成果包含哪些內容？
-可以分享簡報、PDF檔案的連結，也可以分享影片連結，分享時記得設為公開喔～"
-        {...methods.register('content')}
+      <MarkdownEditor
+        rootClassName="p-px mb-2 bg-basic-200 rounded-md"
+        className="bg-white rounded-md"
+        editorClassName="min-h-80 max-w-full"
+        ref={(element) => methods.register('content').ref(element)}
+        value={methods.watch('content')}
+        placeholder="請填寫學習成果"
+        onChange={(markdown) => methods.setValue('content', markdown)}
       />
       <div className="px-2">
         {Array.isArray(images) &&

@@ -3,7 +3,7 @@ export const LOGIN_TYPE = 'DAODAO-LOGIN-TYPE';
 export const checkIsDev = () => process.env.NODE_ENV === 'development';
 
 export const getBackendUrl = () =>
-  checkIsDev() ? '/dev-proxy-api' : process.env.NEXT_PUBLIC_API_URL;
+  checkIsDev() ? '/dev-proxy-api' : process.env.NEXT_PUBLIC_API_URL ?? '';
 
 export const checkIsDevHost = () =>
   window.location.hostname.endsWith('localhost') ||

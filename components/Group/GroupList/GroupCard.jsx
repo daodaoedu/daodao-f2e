@@ -69,7 +69,7 @@ function GroupCard({
         <StyledAreas>
           <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />
           <StyledText color="#92989A">
-            {formatToString(AREA_TABLE, area, TBD_OPTION.value)}
+            {formatToString(AREA_TABLE, area, TBD_OPTION.label)}
           </StyledText>
         </StyledAreas>
         <StyledFooter>

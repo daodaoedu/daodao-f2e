@@ -1,8 +1,9 @@
 import Image from '@/shared/components/Image';
 import PostDetailCard from '@/shared/components/Post/PostDetailCard';
 import { ProjectOutcomeSchema } from '@/services/modules/projects';
-import { BaseUserSchema } from '@/services/users';
+import { BaseUserSchema } from '@/services/modules/users';
 import { CommentType } from '@/services/modules/comments';
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 
 interface OutcomeDetailProps {
   data?: ProjectOutcomeSchema;
@@ -30,7 +31,7 @@ function OutcomeDetail({
       onDeleteClick={onDeleteClick}
       renderContent={(outcomeData) => (
         <div className="mb-4 body-sm text-basic-500">
-          <p className="mb-3 whitespace-pre-wrap">{outcomeData.content}</p>
+          <MarkdownEditor className="mb-3" readOnly value={outcomeData.content} />
           {Array.isArray(outcomeData.imgUrls) &&
             outcomeData.imgUrls.map((imgUrl) => (
               <Image

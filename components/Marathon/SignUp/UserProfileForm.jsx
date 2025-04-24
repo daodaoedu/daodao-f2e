@@ -2,13 +2,9 @@ import { useState, useEffect } from 'react';
 import { TAIWAN_DISTRICT, COUNTRIES, AREA_DELIMITER, TAIWAN_OPTION } from '@/constants/areas';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  fetchMarathonProfileByUserEvent
-} from "@/redux/actions/marathon";
-import { useAuthDispatch } from '@/contexts/Auth';
+import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import {
   GENDER,
   ROLE,
@@ -28,6 +24,7 @@ import {
 } from '@mui/material';
 
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import { useMarathonByUserEvent } from '@/services/modules/marathons';
 import Fields from '@/components/Group/Form/Fields';
 import useEditProfile from './useEditProfile';
 import ErrorMessage from './ErrorMessage';
@@ -52,13 +49,11 @@ export default function UserProfileForm({
   setCurrentStep,
 }) {
   const authDispatch = useAuthDispatch();
-  const reduxDispatch = useDispatch();
   const mobileScreen = useMediaQuery('(max-width: 767px)');
   const [isSetting, setIsSetting] = useState(false);
-  const searchParams = useSearchParams();
-  const check = searchParams.get('check');
+  const { query } = useRouter();
+  const { check } = query;
   const [hasClickNextStep, setHasClickNextStep] = useState(false);
-  const [hasGetLatestMarathon, setHasGetLatestMarathon] = useState(false);
   const [hasUpdateAuthContext, setHasUpdateAuthContext] = useState(false);
   const {
     userState,
@@ -68,8 +63,8 @@ export default function UserProfileForm({
     setRef,
   } = useEditProfile();
 
-  const user = useSelector((state) => state.user);
-  const marathonState = useSelector((state) => state.marathon);
+  const { data: user } = useAuth();
+  const { data: marathonState } = useMarathonByUserEvent(user._id, "2025S1");
   const onUpdateUser = async () => {
     const resultStatus = await onEditSubmit({
       id: user._id,
@@ -134,10 +129,6 @@ export default function UserProfileForm({
         }
       });
       setIsSetting(true);
-      if (!hasGetLatestMarathon) {
-        reduxDispatch(fetchMarathonProfileByUserEvent(user._id, "2025S1"));
-        setHasGetLatestMarathon(true);
-      }
       if (!hasUpdateAuthContext) {
         authDispatch.updateUser(user);
         setHasUpdateAuthContext(true);

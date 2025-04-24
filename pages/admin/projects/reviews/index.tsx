@@ -1,12 +1,13 @@
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import getAdminProjectLayout from '@/layout/AdminProjectLayout';
 import ReviewCard from '@/components/Review/Card';
 import { useProjectReviews } from '@/services/modules/projects';
 import marathonConfig from '@/constants/marathon';
+import { parseToString } from '@/services/core';
 
 const ReviewPage = () => {
-  const searchParams = useSearchParams();
-  const projectId = searchParams.get('id') ?? undefined;
+  const { query } = useRouter();
+  const projectId = parseToString(query.id);
 
   const { data: reviews } = useProjectReviews(projectId);
 

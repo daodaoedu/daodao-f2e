@@ -1,8 +1,9 @@
 import Image from '@/shared/components/Image';
 import PostDetailCard from '@/shared/components/Post/PostDetailCard';
 import { ProjectNoteSchema } from '@/services/modules/projects';
-import { BaseUserSchema } from '@/services/users';
+import { BaseUserSchema } from '@/services/modules/users';
 import { CommentType } from '@/services/modules/comments';
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 
 interface NoteDetailProps {
   data?: ProjectNoteSchema;
@@ -30,7 +31,7 @@ function NoteDetail({
       onDeleteClick={onDeleteClick}
       renderContent={(noteData) => (
         <div className="mb-4 body-sm text-basic-500">
-          <p className="mb-3 whitespace-pre-wrap">{noteData.content}</p>
+          <MarkdownEditor className="mb-3" readOnly value={noteData.content} />
           {Array.isArray(noteData.imgUrls) &&
             noteData.imgUrls.map((imgUrl) => (
               <Image

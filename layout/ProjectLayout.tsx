@@ -1,20 +1,18 @@
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
+import { z } from 'zod';
 import dayjs from 'dayjs';
-import { AiOutlineEye } from 'react-icons/ai';
 import { MdLockOpen, MdLock } from 'react-icons/md';
-import { GoBookmark } from 'react-icons/go';
 
 import { ProtectedComponent } from '@/contexts/Auth';
 import Button from '@/shared/components/Button';
 import Container from '@/shared/components/Container';
-import Image from '@/shared/components/Image';
 import Sidebar from '@/shared/components/Sidebar';
-import { z } from 'zod';
 import { ProjectProvider, useProject } from '@/contexts/Project';
-import getDefaultLayout from './DefaultLayout';
 import { ROLE } from '@/constants/member';
+import { parseToString } from '@/services/core';
+import getDefaultLayout from './DefaultLayout';
 
 const idSchema = z.string().uuid();
 
@@ -55,9 +53,9 @@ interface ProjectLayoutContentProps {
 
 function ProjectLayout({ children, activeTabType }: ProjectLayoutContentProps) {
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const projectId = searchParams.get('id');
+  const { pathname } = router;
+  const { query } = router;
+  const projectId = parseToString(query.id);
   const activeTab =
     activeTabType && projectId
       ? tabConfigs(projectId)[activeTabType]

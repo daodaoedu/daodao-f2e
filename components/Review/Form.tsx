@@ -10,6 +10,7 @@ import {
 } from '@/services/modules/projects';
 import Button from '@/shared/components/Button';
 import Form from '@/shared/components/Form';
+import MarkdownEditor from '@/shared/components/MarkdownEditor';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
 import { cn } from '@/utils/cn';
 
@@ -119,13 +120,14 @@ function ReviewForm({
                   />
                 </div>
                 <p className="mb-4">這段時間，我的收穫與困難...</p>
-                <textarea
+                <MarkdownEditor
+                  rootClassName="p-px mb-2 bg-basic-200 rounded-md"
+                  className="bg-white rounded-md"
+                  editorClassName="min-h-24"
+                  ref={(element) => methods.register('learningFeedback').ref(element)}
+                  value={methods.watch('learningFeedback')}
                   placeholder="例如: 有哪些收獲，包含學習、人際互動、身心狀況等，或是目前遇到的困難"
-                  className={cn(
-                    'w-full h-24 px-4 py-3 resize-none body-sm',
-                    'border border-solid border-basic-200 rounded-lg'
-                  )}
-                  {...methods.register('learningFeedback')}
+                  onChange={(markdown) => methods.setValue('learningFeedback', markdown)}
                 />
               </div>
             </li>
@@ -133,13 +135,14 @@ function ReviewForm({
               <h3 className="mb-4 heading-sm">調整與規劃：</h3>
               <div className="-ml-6">
                 <p className="mb-4">為了更好的學習狀態，我會...</p>
-                <textarea
+                <MarkdownEditor
+                  rootClassName="p-px mb-2 bg-basic-200 rounded-md"
+                  className="bg-white rounded-md"
+                  editorClassName="min-h-24"
+                  ref={(element) => methods.register('adjustmentPlan').ref(element)}
+                  value={methods.watch('adjustmentPlan')}
                   placeholder="例如：打算如何克服目前的挑戰，例如在身心、學習環境、方法、資源方面 ，希望獲得何種支持"
-                  className={cn(
-                    'w-full h-24 px-4 py-3 resize-none body-sm',
-                    'border border-solid border-basic-200 rounded-lg'
-                  )}
-                  {...methods.register('adjustmentPlan')}
+                  onChange={(markdown) => methods.setValue('adjustmentPlan', markdown)}
                 />
               </div>
             </li>

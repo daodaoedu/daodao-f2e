@@ -3,9 +3,9 @@ import { useRouter } from 'next/router';
 import { RoleEnum, useAuth, ProtectedComponent } from '@/contexts/Auth';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import Select from '@/components/Projects/Form/Select';
+import SEOConfig from '@/shared/components/SEO';
 import AccessDenied from '@/shared/components/AccessDenied';
-import GoBackButton
-  from '@/components/Projects/GoBackButton';
+import GoBackButton from '@/components/Projects/GoBackButton';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
 import { useMyProjects } from '@/services/modules/projects';
@@ -53,8 +53,23 @@ const Projects = () => {
     // }
   };
 
+  const SEOData = useMemo(
+    () => ({
+      title: '學習計畫｜島島阿學',
+      description:
+        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
+      keywords: '島島阿學',
+      author: '島島阿學',
+      copyright: '島島阿學',
+      imgLink: 'https://www.daoedu.tw/preview.webp',
+      link: `${process.env.HOSTNAME}/manage/projects`,
+    }),
+    []
+  );
+
   return (
     <ProtectedComponent>
+      <SEOConfig data={SEOData} />
       <div className="bg-[#F3FCFC] md:py-8 min-h-screen-without-padding-top">
         <div className="w-full p-4
           md:max-w-[860px] mx-auto box-border flex flex-col gap-6"

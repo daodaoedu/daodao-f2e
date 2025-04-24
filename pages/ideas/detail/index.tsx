@@ -1,10 +1,11 @@
 import toast from 'react-hot-toast';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import IdeaDetail from '@/components/Idea/Detail';
 import useIdea from '@/hooks/api/ideas/useIdea';
 import ConfirmModal from '@/shared/components/Confirm';
 import UpdateModal from '@/components/Idea/Modals/UpdateModal';
+import { parseToString } from '@/services/core';
 
 enum ModalTypeEnum {
     Update,
@@ -13,8 +14,8 @@ enum ModalTypeEnum {
 
 const IdeaDetailPage = () => {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const ideaId = searchParams.get('ideaId') ?? '';
+    const { query } = router;
+    const ideaId = parseToString(query.ideaId);
     const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
 
     // 使用 useIdea hook 取得單筆 Idea 資料與 mutation 方法

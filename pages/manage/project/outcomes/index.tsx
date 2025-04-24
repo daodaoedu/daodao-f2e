@@ -1,7 +1,8 @@
 import toast from 'react-hot-toast';
-import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import OutcomeCard from '@/components/Outcome/Card';
+import { useMemo, useState } from 'react';
+import { useRouter } from 'next/router';
+import SEOConfig from '@/shared/components/SEO';
+import { ContentCard } from '@/features/projects';
 import getProjectLayout from '@/layout/ProjectLayout';
 import Button from '@/shared/components/Button';
 import CreateModal from '@/components/Outcome/Modals/CreateModal';
@@ -13,6 +14,7 @@ import {
   useProjectOutcomeMutation,
   useProjectOutcomes,
 } from '@/services/modules/projects';
+import { parseToString } from '@/services/core';
 
 enum ModalTypeEnum {
   Create,
@@ -21,8 +23,8 @@ enum ModalTypeEnum {
 }
 
 const OutcomesPage = () => {
-  const searchParams = useSearchParams();
-  const projectId = searchParams.get('id');
+  const { query } = useRouter();
+  const projectId = parseToString(query.id);
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [outcomeId, setOutcomeId] = useState<number | null>(null);
   const { data: project } = useProject(projectId);
@@ -57,12 +59,28 @@ const OutcomesPage = () => {
       },
     });
 
+  const SEOData = useMemo(
+    () => ({
+      title: `${project?.title} 學習成果｜島島阿學`,
+      description:
+        project?.description?.substring(0, 150) ||
+        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
+      keywords: '島島阿學',
+      author: '島島阿學',
+      copyright: '島島阿學',
+      imgLink: 'https://www.daoedu.tw/preview.webp',
+      link: `${process.env.HOSTNAME}/manage/project/outcomes?id=${projectId}`,
+    }),
+    [project?.title, project?.description, projectId]
+  );
+
   if (!projectId) {
     return <div>專案不存在</div>;
   }
 
   return (
     <>
+      <SEOConfig data={SEOData} />
       <div className="mb-6 flex items-center justify-between body-md">
         <div className="text-basic-500">學習成果 ({outcomes?.length ?? 0})</div>
         <Button
@@ -79,7 +97,8 @@ const OutcomesPage = () => {
             key={outcome.id}
             className="py-6 border-b last:border-b-0 border-solid border-basic-200"
           >
-            <OutcomeCard
+            <ContentCard
+              type="outcome"
               data={outcome}
               className="p-3 transition-shadow hover:shadow-basic-200/40 hover:shadow-lg"
               detailLink={`/manage/project/outcomes/detail?id=${projectId}&outcomeId=${outcome.id}`}

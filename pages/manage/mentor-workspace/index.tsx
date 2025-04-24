@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import Button from '@/shared/components/Button';
 import Container from '@/shared/components/Container';
 import Image from '@/shared/components/Image';
