@@ -33,6 +33,7 @@ import {
   useProjectReviewMutation,
   useProjectReviews,
 } from '@/services/modules/projects';
+import { MAX_PROJECTS } from '@/constants/project';
 
 const HEADER_TITLES = [
   '今天的每一小步，都在建立你的學習動能！',
@@ -85,18 +86,17 @@ const Header = () => {
     projectId,
     onCreated: handleCreated,
   });
-  // const { data } = useProjectList({ isMe: true });
-  // const maxProjects = 3;
+  const { data: projects } = useMyProjects();
 
-  // const handleCreateProject = () => {
-  //   if (!data) {
-  //     toast.error('目前功能異常，請稍後再試');
-  //   } else if (data.length >= maxProjects) {
-  //     toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
-  //   } else {
-  //     router.push('/manage/project/create');
-  //   }
-  // };
+  const handleCreateProject = () => {
+    if (!Array.isArray(projects)) {
+      toast.error('目前功能異常，請稍後再試');
+    } else if (projects.length >= MAX_PROJECTS) {
+      toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
+    } else {
+      router.push('/manage/project/create');
+    }
+  };
 
   const handleOpenModal = (_modalType: ModalType) => {
     setIsOpen(true);
@@ -106,7 +106,7 @@ const Header = () => {
   const projectActions = [
     {
       label: '新增計畫',
-      onClick: () => toast.error('功能尚未開放'),
+      onClick: handleCreateProject,
     },
     {
       label: '新增任務',

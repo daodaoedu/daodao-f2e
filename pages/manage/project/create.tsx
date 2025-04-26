@@ -8,6 +8,7 @@ import Container from '@/shared/components/Container';
 import EditMode from '@/components/Projects/Project/EditMode';
 import SEOConfig from '@/shared/components/SEO';
 import { createProjectSchema, useMyProjects, useProjectMutation } from '@/services/modules/projects';
+import { MAX_PROJECTS } from '@/constants/project';
 
 const ProjectPage = () => {
   const router = useRouter();
@@ -24,7 +25,6 @@ const ProjectPage = () => {
     [router?.asPath]
   );
   const [formData, setFormData] = useState<Partial<Project>>(DEFAULT_PROJECT);
-  const maxProjects = 3;
   const { data: projects } = useMyProjects();
   const { createMutation } = useProjectMutation({
     onCreated: (data) => {
@@ -79,11 +79,11 @@ const ProjectPage = () => {
   };
 
   useEffect(() => {
-    if (projects && projects.length >= maxProjects) {
+    if (projects && projects.length >= MAX_PROJECTS) {
       toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
       router.replace('/manage/projects');
     }
-  }, [projects, maxProjects, router]);
+  }, [projects, router]);
 
   return (
     <ProtectedComponent>
@@ -91,7 +91,7 @@ const ProjectPage = () => {
 
       <Container className="flex justify-center pb-12 px-4" autoMinHeight>
         <div className="max-w-3xl">
-          {Array.isArray(projects) && projects.length < maxProjects && (
+          {Array.isArray(projects) && projects.length < MAX_PROJECTS && (
             <EditMode
               project={formData}
               onClickCancel={handleOnClickCancel}

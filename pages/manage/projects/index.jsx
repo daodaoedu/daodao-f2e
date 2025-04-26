@@ -13,14 +13,14 @@ import More from '@/components/Projects/More';
 import Button from '@/shared/components/Button';
 import { cn } from '@/utils/cn';
 import toast from 'react-hot-toast';
+import { MAX_PROJECTS } from '@/constants/project';
 
 const Projects = () => {
-  const maxProjects = 3;
   const router = useRouter();
   const { user } = useAuth();
   const { data } = useMyProjects();
   const projects = Array.isArray(data) ? data : [];
-  const isAddedDenied = projects.length >= maxProjects;
+  const isAddedDenied = projects.length >= MAX_PROJECTS;
   const isEditPermitted = useMemo(() => {
     const permissions = [
       RoleEnum.MarathonApplicant,
@@ -45,12 +45,11 @@ const Projects = () => {
   };
 
   const handleCreateProject = () => {
-    toast.error('功能尚未開放');
-    // if (isAddedDenied) {
-    //   toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
-    // } else {
-    //   router.push('/manage/project/create');
-    // }
+    if (isAddedDenied) {
+      toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
+    } else {
+      router.push('/manage/project/create');
+    }
   };
 
   const SEOData = useMemo(

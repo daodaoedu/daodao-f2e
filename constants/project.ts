@@ -1,3 +1,5 @@
+export const MAX_PROJECTS = 3;
+
 interface MotivationMap {
   label: string;
   value: string;
