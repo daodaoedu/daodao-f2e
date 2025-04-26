@@ -34,7 +34,8 @@ export const getMarathonErrorsStorage = () =>
   createStorage('_marathonFormErrors');
 
 /** 獲取用於存儲開發環境來源地址的 localStorage */
-export const getDevOriginStorage = () => createStorage<string>('_devOrigin');
+export const getDevOriginStorage = () =>
+  createStorage<string | null>('_devOrigin');
 
 /** 獲取用於存儲是否提醒用戶里程碑拖拽會改變日期的 localStorage */
 export const getIsCheckDragMilestoneStorage = () =>

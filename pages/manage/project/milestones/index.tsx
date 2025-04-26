@@ -11,7 +11,7 @@ import { MilestonesProvider } from '@/contexts/Milestones/index';
 import MilestoneCard, {
   MilestoneFormRef,
 } from '@/components/Milestones/MilestoneCard';
-import MilestoneItem from '@/components/Milestones/MilestoneItem';
+import DraggableMilestones from '@/components/Milestones/DraggableMilestones';
 import dayjs from 'dayjs';
 import DateRangePicker from '@/shared/components/DateRangePicker';
 import Button from '@/shared/components/Button';
@@ -297,20 +297,19 @@ const MilestonesContent = () => {
                   />
                 </div>
               )}
-              {Array.isArray(milestones) &&
-                sortedMilestones.map((milestone) => (
-                  <MilestoneItem
-                    key={milestone.id}
-                    milestone={milestone}
-                    milestones={milestones}
-                    projectId={projectId}
-                    startDate={startDate}
-                    endDate={endDate}
-                    isEditable
-                    onUpdate={updateMutation.trigger}
-                    onRefreshData={mutate}
-                  />
-                ))}
+              {Array.isArray(sortedMilestones) && (
+                <DraggableMilestones
+                  milestones={sortedMilestones}
+                  projectId={projectId}
+                  startDate={startDate}
+                  endDate={endDate}
+                  isAscending={isAscending}
+                  onUpdate={updateMutation.trigger}
+                  onReorder={updateMutation.trigger}
+                  onRefreshData={mutate}
+                  isEditable
+                />
+              )}
             </div>
           </Panel>
         </>
