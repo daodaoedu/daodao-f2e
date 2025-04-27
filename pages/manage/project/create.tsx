@@ -8,7 +8,7 @@ import Container from '@/shared/components/Container';
 import EditMode from '@/components/Projects/Project/EditMode';
 import SEOConfig from '@/shared/components/SEO';
 import { createProjectSchema, useMyProjects, useProjectMutation } from '@/services/modules/projects';
-import { MAX_PROJECTS } from '@/constants/project';
+import { ENABLE_CREATE_PROJECT, MAX_PROJECTS } from '@/constants/project';
 
 const ProjectPage = () => {
   const router = useRouter();
@@ -79,6 +79,12 @@ const ProjectPage = () => {
   };
 
   useEffect(() => {
+    if (!ENABLE_CREATE_PROJECT) {
+      toast.error('目前功能尚未開放');
+      router.replace('/manage/projects');
+      return;
+    }
+
     if (projects && projects.length >= MAX_PROJECTS) {
       toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
       router.replace('/manage/projects');

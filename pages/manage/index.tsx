@@ -34,7 +34,7 @@ import {
   useProjectReviewMutation,
   useProjectReviews,
 } from '@/services/modules/projects';
-import { MAX_PROJECTS } from '@/constants/project';
+import { ENABLE_CREATE_PROJECT, MAX_PROJECTS } from '@/constants/project';
 import Image from '@/shared/components/Image';
 
 const HEADER_TITLES = [
@@ -91,6 +91,11 @@ const Header = () => {
   const { data: projects } = useMyProjects();
 
   const handleCreateProject = () => {
+    if (!ENABLE_CREATE_PROJECT) {
+      toast.error('目前功能尚未開放');
+      return;
+    }
+
     if (!Array.isArray(projects)) {
       toast.error('目前功能異常，請稍後再試');
     } else if (projects.length >= MAX_PROJECTS) {

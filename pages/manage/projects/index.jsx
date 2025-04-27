@@ -13,7 +13,7 @@ import More from '@/components/Projects/More';
 import Button from '@/shared/components/Button';
 import { cn } from '@/utils/cn';
 import toast from 'react-hot-toast';
-import { MAX_PROJECTS } from '@/constants/project';
+import { ENABLE_CREATE_PROJECT, MAX_PROJECTS } from '@/constants/project';
 
 const Projects = () => {
   const router = useRouter();
@@ -45,6 +45,11 @@ const Projects = () => {
   };
 
   const handleCreateProject = () => {
+    if (!ENABLE_CREATE_PROJECT) {
+      toast.error('目前功能尚未開放');
+      return;
+    }
+
     if (isAddedDenied) {
       toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
     } else {
