@@ -90,15 +90,10 @@ export const useDraggableContainer = <T>({
             newIndex
           );
 
-          setItems(newItems);
-          try {
-            // 如果 onReorder 返回 false，則不更新內部狀態
-            const result = await onReorder?.(updatedItem);
-            if (result === false) {
-              setItems(items);
-            }
-          } catch {
-            setItems(items);
+          // 如果 onReorder 返回 false，則不更新內部狀態
+          const result = await onReorder?.(updatedItem);
+          if (result !== false) {
+            setItems(newItems);
           }
         }
       }
