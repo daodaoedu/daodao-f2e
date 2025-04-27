@@ -25,6 +25,7 @@ import { cn } from '@/utils/cn';
 import ReviewForm from '@/components/Review/Form';
 import NoteForm from '@/components/Note/Form';
 import OutcomeForm from '@/components/Outcome/Form';
+import AccessDeniedImg from '@/public/assets/projects/access-denied.png';
 import {
   useMyProjects,
   useProjectMilestoneMutation,
@@ -34,6 +35,7 @@ import {
   useProjectReviews,
 } from '@/services/modules/projects';
 import { MAX_PROJECTS } from '@/constants/project';
+import Image from '@/shared/components/Image';
 
 const HEADER_TITLES = [
   '今天的每一小步，都在建立你的學習動能！',
@@ -352,14 +354,40 @@ const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
   );
 };
 
+const TodayReviews = ({
+  projectId,
+  date,
+}: {
+  projectId: string;
+  date: Dayjs;
+}) => {
+  const { data: reviews } = useProjectReviews(projectId);
+
+  const todayReviews = useMemo(() => {
+    if (!Array.isArray(reviews)) return [];
+    return reviews.filter((review) => date.isSame(review.createdAt));
+  }, [reviews, date]);
+
+  return (
+    <ul>
+      {todayReviews.map((review) => (
+        <li key={review.id} className="mb-5">
+          <ReviewCard
+            data={review}
+            detailLink={`/manage/project/review/detail?id=${projectId}&reviewId=${review.id}`}
+          />
+        </li>
+      ))}
+    </ul>
+  );
+};
+
 const Main = ({ date }: { date: Dayjs }) => {
   const { data: projects, mutate } = useMyProjects();
 
   const { updateMutation } = useProjectMilestoneMutation();
 
-  const { data: reviews } = useProjectReviews(projects?.[0]?.id);
-
-  const currentProjects = useMemo(() => {
+  const todayProjects = useMemo(() => {
     if (!Array.isArray(projects)) return [];
     return projects.map((project) => ({
       ...project,
@@ -376,15 +404,10 @@ const Main = ({ date }: { date: Dayjs }) => {
     }));
   }, [projects, date]);
 
-  const currentReviews = useMemo(() => {
-    if (!Array.isArray(reviews)) return [];
-    return reviews.filter((review) => date.isSame(review.createdAt));
-  }, [reviews, date]);
-
   return (
     <>
       <ul>
-        {currentProjects.map((project, index) => (
+        {todayProjects.map((project, index) => (
           <li key={project.id} className="opacity-100 transition-opacity">
             <Project
               title={project.title}
@@ -392,6 +415,7 @@ const Main = ({ date }: { date: Dayjs }) => {
               defaultOpen={index === 0}
             >
               {Array.isArray(project?.milestones) &&
+              project.milestones.length ? (
                 project.milestones.map((milestone) => (
                   <div key={milestone.id} className="mb-2 last-of-type:mb-0">
                     <MilestoneItem
@@ -404,22 +428,27 @@ const Main = ({ date }: { date: Dayjs }) => {
                       isEditable
                     />
                   </div>
-                ))}
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center">
+                  <div>{date.format('YYYY/MM/DD')} 沒有里程碑</div>
+                  <Image
+                    src={AccessDeniedImg.src}
+                    alt="沒有里程碑"
+                    height="320px"
+                    className="object-contain h-80"
+                  />
+                </div>
+              )}
             </Project>
           </li>
         ))}
       </ul>
 
-      <ul>
-        {currentReviews.map((review) => (
-          <li key={review.id} className="mb-5">
-            <ReviewCard
-              data={review}
-              detailLink="/manage/project/review/detail?id=1"
-            />
-          </li>
+      {Array.isArray(projects) &&
+        projects.map((project) => (
+          <TodayReviews key={project.id} projectId={project.id} date={date} />
         ))}
-      </ul>
     </>
   );
 };
