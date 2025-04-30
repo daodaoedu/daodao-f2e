@@ -78,6 +78,7 @@ export const useDraggableContainer = <T>({
         const newIndex = items.findIndex(findItemById(over.id));
 
         if (oldIndex !== -1 && newIndex !== -1) {
+          const oldItems = items.concat();
           const newItems = arrayMove(items, oldIndex, newIndex);
           const currentItem = items[oldIndex];
           const overItem = items[newIndex];
@@ -90,10 +91,16 @@ export const useDraggableContainer = <T>({
             newIndex
           );
 
-          // 如果 onReorder 返回 false，則不更新內部狀態
-          const result = await onReorder?.(updatedItem);
-          if (result !== false) {
-            setItems(newItems);
+          setItems(newItems);
+
+          try {
+            // 如果 onReorder 返回 false，則恢復舊的項目
+            const result = await onReorder?.(updatedItem);
+            if (result === false) {
+              setItems(oldItems);
+            }
+          } catch {
+            setItems(oldItems);
           }
         }
       }
