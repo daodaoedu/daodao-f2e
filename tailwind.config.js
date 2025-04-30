@@ -10,6 +10,7 @@ module.exports = {
   content: [
     "./components/**/*.{jsx,tsx}",
     "./contexts/**/*.{jsx,tsx}",
+    "./features/**/*.{jsx,tsx}",
     "./layout/**/*.{jsx,tsx}",
     "./pages/**/*.{jsx,tsx}",
     "./shared/**/*.{jsx,tsx}",
