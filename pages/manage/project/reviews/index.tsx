@@ -102,7 +102,7 @@ const ReviewPage = () => {
             <li key={review.id}>
               <ReviewCard
                 data={review}
-                detailLink={`/manage/project/review/detail?id=${projectId}&reviewId=${review.id}`}
+                detailLink={`/manage/project/reviews/detail?id=${projectId}&reviewId=${review.id}`}
                 onEditClick={() => {
                   setReviewId(review.id);
                   setModalType(ModalTypeEnum.Update);

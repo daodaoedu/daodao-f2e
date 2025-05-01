@@ -379,7 +379,7 @@ const TodayReviews = ({
         <li key={review.id} className="mb-5">
           <ReviewCard
             data={review}
-            detailLink={`/manage/project/review/detail?id=${projectId}&reviewId=${review.id}`}
+            detailLink={`/manage/project/reviews/detail?id=${projectId}&reviewId=${review.id}`}
           />
         </li>
       ))}
