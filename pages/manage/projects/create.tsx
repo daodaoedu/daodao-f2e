@@ -30,7 +30,7 @@ const ProjectPage = () => {
     onCreated: (data) => {
       if (data?.id) {
         toast.success('新增成功');
-        router.push(`/manage/project?id=${data.id}`);
+        router.push(`/manage/projects/detail?id=${data.id}`);
       } else {
         toast.error('系統異常，請稍後再試');
       }

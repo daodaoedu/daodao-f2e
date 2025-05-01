@@ -40,7 +40,7 @@ const ReviewPage = () => {
     },
     onDeleted: () => {
       toast.success('刪除成功');
-      router.replace(`/manage/project/review?id=${projectId}`);
+      router.replace(`/manage/projects/review?id=${projectId}`);
     },
   });
 
@@ -54,7 +54,7 @@ const ReviewPage = () => {
       author: '島島阿學',
       copyright: '島島阿學',
       imgLink: 'https://www.daoedu.tw/preview.webp',
-      link: `${process.env.HOSTNAME}/manage/project/review?id=${projectId}&reviewId=${reviewId}`,
+      link: `${process.env.HOSTNAME}/manage/projects/review?id=${projectId}&reviewId=${reviewId}`,
     }),
     [review?.title, review?.adjustmentPlan, projectId, reviewId]
   );

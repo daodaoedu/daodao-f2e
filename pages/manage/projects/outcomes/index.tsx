@@ -69,7 +69,7 @@ const OutcomesPage = () => {
       author: '島島阿學',
       copyright: '島島阿學',
       imgLink: 'https://www.daoedu.tw/preview.webp',
-      link: `${process.env.HOSTNAME}/manage/project/outcomes?id=${projectId}`,
+      link: `${process.env.HOSTNAME}/manage/projects/outcomes?id=${projectId}`,
     }),
     [project?.title, project?.description, projectId]
   );
@@ -101,7 +101,7 @@ const OutcomesPage = () => {
               type="outcome"
               data={outcome}
               className="p-3 transition-shadow hover:shadow-basic-200/40 hover:shadow-lg"
-              detailLink={`/manage/project/outcomes/detail?id=${projectId}&outcomeId=${outcome.id}`}
+              detailLink={`/manage/projects/outcomes/detail?id=${projectId}&outcomeId=${outcome.id}`}
               onEditClick={() => {
                 setModalType(ModalTypeEnum.Update);
                 setOutcomeId(outcome.id);

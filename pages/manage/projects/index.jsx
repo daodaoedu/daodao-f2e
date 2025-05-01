@@ -53,7 +53,7 @@ const Projects = () => {
     if (isAddedDenied) {
       toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
     } else {
-      router.push('/manage/project/create');
+      router.push('/manage/projects/create');
     }
   };
 
@@ -141,10 +141,10 @@ const Projects = () => {
                       role="button"
                       tabIndex={0}
                       className="w-full md:w-1/3 rounded-[10px] flex flex-col gap-[10px] bg-white cursor-pointer"
-                      onClick={() => router.push(`/manage/project?id=${project.id}`)}
+                      onClick={() => router.push(`/manage/projects/detail?id=${project.id}`)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
-                          router.push(`/manage/project?id=${project.id}`);
+                          router.push(`/manage/projects/detail?id=${project.id}`);
                         }
                       }}
                       style={{

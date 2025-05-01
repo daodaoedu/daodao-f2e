@@ -101,7 +101,7 @@ const Header = () => {
     } else if (projects.length >= MAX_PROJECTS) {
       toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
     } else {
-      router.push('/manage/project/create');
+      router.push('/manage/projects/create');
     }
   };
 
@@ -379,7 +379,7 @@ const TodayReviews = ({
         <li key={review.id} className="mb-5">
           <ReviewCard
             data={review}
-            detailLink={`/manage/project/reviews/detail?id=${projectId}&reviewId=${review.id}`}
+            detailLink={`/manage/projects/reviews/detail?id=${projectId}&reviewId=${review.id}`}
           />
         </li>
       ))}
@@ -416,7 +416,7 @@ const Main = ({ date }: { date: Dayjs }) => {
           <li key={project.id} className="opacity-100 transition-opacity">
             <Project
               title={project.title}
-              href={`/manage/project?id=${project.id}`}
+              href={`/manage/projects/detail?id=${project.id}`}
               defaultOpen={index === 0}
             >
               {Array.isArray(project?.milestones) &&
