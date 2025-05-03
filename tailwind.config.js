@@ -8,11 +8,12 @@ module.exports = {
     hoverOnlyWhenSupported: true,
   },
   content: [
-    "./components/**/*.{jsx,tsx}",
-    "./contexts/**/*.{jsx,tsx}",
-    "./layout/**/*.{jsx,tsx}",
-    "./pages/**/*.{jsx,tsx}",
-    "./shared/**/*.{jsx,tsx}",
+    './components/**/*.{js,jsx,ts,tsx}',
+    './contexts/**/*.{js,jsx,ts,tsx}',
+    './features/**/*.{js,jsx,ts,tsx}',
+    './layout/**/*.{js,jsx,ts,tsx}',
+    './pages/**/*.{js,jsx,ts,tsx}',
+    './shared/**/*.{js,jsx,ts,tsx}',
   ],
   theme: {
     fontFamily: {

@@ -45,7 +45,7 @@ export default function More({ projectId }: MoreProps) {
       >
         <MenuItem
           component="a"
-          href={`/manage/project?id=${projectId}`}
+          href={`/manage/projects/detail?id=${projectId}`}
           target="_blank"
           sx={{ minWidth: '146px' }}
           onClick={handleClose}

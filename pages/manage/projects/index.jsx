@@ -13,14 +13,14 @@ import More from '@/components/Projects/More';
 import Button from '@/shared/components/Button';
 import { cn } from '@/utils/cn';
 import toast from 'react-hot-toast';
+import { ENABLE_CREATE_PROJECT, MAX_PROJECTS } from '@/constants/project';
 
 const Projects = () => {
-  const maxProjects = 3;
   const router = useRouter();
   const { user } = useAuth();
   const { data } = useMyProjects();
   const projects = Array.isArray(data) ? data : [];
-  const isAddedDenied = projects.length >= maxProjects;
+  const isAddedDenied = projects.length >= MAX_PROJECTS;
   const isEditPermitted = useMemo(() => {
     const permissions = [
       RoleEnum.MarathonApplicant,
@@ -45,12 +45,16 @@ const Projects = () => {
   };
 
   const handleCreateProject = () => {
-    toast.error('功能尚未開放');
-    // if (isAddedDenied) {
-    //   toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
-    // } else {
-    //   router.push('/manage/project/create');
-    // }
+    if (!ENABLE_CREATE_PROJECT) {
+      toast.error('目前功能尚未開放');
+      return;
+    }
+
+    if (isAddedDenied) {
+      toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
+    } else {
+      router.push('/manage/projects/create');
+    }
   };
 
   const SEOData = useMemo(
@@ -137,10 +141,10 @@ const Projects = () => {
                       role="button"
                       tabIndex={0}
                       className="w-full md:w-1/3 rounded-[10px] flex flex-col gap-[10px] bg-white cursor-pointer"
-                      onClick={() => router.push(`/manage/project?id=${project.id}`)}
+                      onClick={() => router.push(`/manage/projects/detail?id=${project.id}`)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
-                          router.push(`/manage/project?id=${project.id}`);
+                          router.push(`/manage/projects/detail?id=${project.id}`);
                         }
                       }}
                       style={{

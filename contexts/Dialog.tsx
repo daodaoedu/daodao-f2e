@@ -68,15 +68,18 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
         handleCloseDialog();
         props.onCancel?.();
       };
-      setDialogs((prev) => [
-        ...prev,
-        {
-          ...props,
-          onConfirm: proxyOnConfirm,
-          onCancel: proxyOnCancel,
-        },
-      ]);
-      handleToggleDialog();
+      const newDialog = {
+        ...props,
+        onConfirm: proxyOnConfirm,
+        onCancel: proxyOnCancel,
+      };
+
+      if (Array.isArray(dialogs) && dialogs.length > 0) {
+        setDialogs((prev) => [...prev, newDialog]);
+      } else {
+        setIsOpen(true);
+        setCurrentDialog(newDialog);
+      }
     });
   };
 

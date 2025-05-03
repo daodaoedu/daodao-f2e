@@ -5,11 +5,13 @@ import {
   CreateProjectMilestoneSchema,
   ProjectMilestoneSchema,
   UpdateProjectMilestoneSchema,
+  ProjectTaskSchema,
 } from '@/services/modules/projects';
 import Button from '@/shared/components/Button';
 import Collapse from '@/shared/components/Collapse';
 import MilestoneCard from './MilestoneCard';
 import Task from '../Tasks/Task';
+import DraggableTasks from '../Tasks/DraggableTasks';
 
 interface MilestoneItemProps {
   projectId: string;
@@ -21,6 +23,7 @@ interface MilestoneItemProps {
   onCreate?: (request: CreateProjectMilestoneSchema) => void;
   onUpdate?: (request: UpdateProjectMilestoneSchema) => void;
   onRefreshData?: () => void;
+  onReorderTask?: (task: ProjectTaskSchema) => void;
 }
 
 const MilestoneItem = ({
@@ -33,6 +36,7 @@ const MilestoneItem = ({
   onCreate,
   onUpdate,
   onRefreshData,
+  onReorderTask,
 }: MilestoneItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -51,29 +55,24 @@ const MilestoneItem = ({
       <Collapse defaultOpen>
         <Collapse.List className="flex flex-col gap-2">
           <Collapse.Item className="w-full overflow-hidden">
-            <div className="flex flex-col gap-2">
-              {milestone.tasks?.map((task) => (
-                <Task
-                  key={task.id}
-                  projectId={projectId}
-                  milestoneId={milestone.id}
-                  task={task}
-                  onRefreshData={onRefreshData}
-                />
-              ))}
-            </div>
+            <DraggableTasks
+              tasks={milestone.tasks}
+              projectId={projectId}
+              milestoneId={milestone.id}
+              onRefreshData={onRefreshData}
+              onReorderTask={onReorderTask}
+            />
           </Collapse.Item>
           <Collapse.Item>
-            {isEditing && (
+            {isEditing ? (
               <Task
-                index={milestone.tasks?.length || 0}
+                index={(milestone.tasks || []).length}
                 projectId={projectId}
                 milestoneId={milestone.id}
                 onCancel={() => setIsEditing(false)}
                 onRefreshData={onRefreshData}
               />
-            )}
-            {!isEditing && (
+            ) : (
               <div className="flex justify-end">
                 <Button
                   onClick={() => setIsEditing(true)}
