@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import getAdminProjectLayout from '@/layout/AdminProjectLayout';
+import { getAdminProjectLayout } from '@/layout/features/getProjectLayout';
 import ReviewCard from '@/components/Review/Card';
 import { useProjectReviews } from '@/services/modules/projects';
 import marathonConfig from '@/constants/marathon';

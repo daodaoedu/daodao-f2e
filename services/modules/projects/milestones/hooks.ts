@@ -51,7 +51,7 @@ export function useProjectMilestoneMutation({
   const handleMilestones = (updateData: UpdateProjectMilestoneSchema) => {
     updateMilestoneCache?.((prevMilestones) => {
       const milestone = getMilestone(prevMilestones, updateData.id);
-      console.log('milestone', milestone, updateData.id);
+
       if (!milestone) return prevMilestones;
 
       const updatedMilestone = {

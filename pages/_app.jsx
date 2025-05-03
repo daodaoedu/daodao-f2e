@@ -19,7 +19,7 @@ import Modal from '@/shared/components/Modal';
 import themeFactory from '@/shared/styles/themeFactory';
 import { fetcher, parseToString } from '@/services/core';
 import { getReminderStorage } from '@/utils/storage';
-import getDefaultLayout from '@/layout/DefaultLayout';
+import getBaseLayout from '@/layout/core/getBaseLayout';
 import { initGA, logPageView } from '../utils/analytics';
 import 'regenerator-runtime/runtime'; // Speech.js
 import "@/shared/styles/global.css";
@@ -40,7 +40,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   const theme = useMemo(() => themeFactory('light'), []);
   const { isComplete, isLoggedIn } = useAuth();
   const [openModalType, setOpenModalType] = useState(null);
-  const getLayout = Component?.getLayout || getDefaultLayout;
+  const getLayout = Component?.getLayout || getBaseLayout;
   const isVerified = parseToString(query.isVerified);
 
   const handleClose = () => {

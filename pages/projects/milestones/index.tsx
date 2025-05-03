@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import getPublicProjectLayout from '@/layout/PublicProjectLayout';
+import { getPublicProjectLayout } from '@/layout/features/getProjectLayout';
 import { useRouter } from 'next/router';
 import { Skeleton } from '@mui/material';
 import { useProjectMilestones } from '@/services/modules/projects';

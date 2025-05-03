@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import getAdminProjectLayout from '@/layout/AdminProjectLayout';
+import { getAdminProjectLayout } from '@/layout/features/getProjectLayout';
 import ReviewDetail from '@/components/Review/Detail';
 import { useProjectReview } from '@/services/modules/projects';
 import { parseToNumber, parseToString } from '@/services/core';

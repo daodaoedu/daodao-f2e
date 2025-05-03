@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { ContentCard } from '@/features/projects';
-import getPublicProjectLayout from '@/layout/PublicProjectLayout';
+import { getPublicProjectLayout } from '@/layout/features/getProjectLayout';
 import { useProjectNotes } from '@/services/modules/projects';
 import { parseToString } from '@/services/core';
 
