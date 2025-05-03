@@ -1,7 +1,7 @@
 import { toast } from 'react-hot-toast';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import getProjectLayout from '@/layout/ProjectLayout';
+import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import SEOConfig from '@/shared/components/SEO';
 import ReviewDetail from '@/components/Review/Detail';
 import UpdateModal from '@/components/Review/Modals/UpdateModal';
@@ -104,7 +104,6 @@ const ReviewPage = () => {
   );
 };
 
-ReviewPage.getLayout = (page: React.ReactElement) =>
-  getProjectLayout(page, 'review');
+ReviewPage.getLayout = getManageProjectLayout;
 
 export default ReviewPage;

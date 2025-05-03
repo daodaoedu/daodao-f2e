@@ -2,7 +2,7 @@ import toast from 'react-hot-toast';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { ContentCard } from '@/features/projects';
-import getProjectLayout from '@/layout/ProjectLayout';
+import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import Button from '@/shared/components/Button';
 import SEOConfig from '@/shared/components/SEO';
 import CreateModal from '@/components/Note/Modals/CreateModal';
@@ -157,6 +157,6 @@ const NotesPage = () => {
   );
 };
 
-NotesPage.getLayout = getProjectLayout;
+NotesPage.getLayout = getManageProjectLayout;
 
 export default NotesPage;

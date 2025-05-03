@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import OutcomeDetail from '@/components/Outcome/Detail';
-import getAdminProjectLayout from '@/layout/AdminProjectLayout';
+import { getAdminProjectLayout } from '@/layout/features/getProjectLayout';
 import { useProject, useProjectOutcome } from '@/services/modules/projects';
 import { parseToNumber, parseToString } from '@/services/core';
 

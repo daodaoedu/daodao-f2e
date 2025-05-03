@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
 import { ContentCard } from '@/features/projects';
-import getProjectLayout from '@/layout/ProjectLayout';
+import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import Button from '@/shared/components/Button';
 import CreateModal from '@/components/Outcome/Modals/CreateModal';
 import UpdateModal from '@/components/Outcome/Modals/UpdateModal';
@@ -157,6 +157,6 @@ const OutcomesPage = () => {
   );
 };
 
-OutcomesPage.getLayout = getProjectLayout;
+OutcomesPage.getLayout = getManageProjectLayout;
 
 export default OutcomesPage;

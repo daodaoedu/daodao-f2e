@@ -1,11 +1,10 @@
-import getProjectLayout from '@/layout/ProjectLayout';
+import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
-import { Skeleton, useMediaQuery } from "@mui/material";
+import { Skeleton, useMediaQuery } from '@mui/material';
 
-import { ProtectedComponent } from '@/contexts/Auth';
 import { useProject } from '@/contexts/Project';
 import EditMode from '@/components/Projects/Project/EditMode';
 import ViewMode from '@/components/Projects/Project/ViewMode';
@@ -45,7 +44,7 @@ const ProjectPage = () => {
         },
       ],
     }),
-    [router?.asPath],
+    [router?.asPath]
   );
   const { project, dispatchProject, isFetching } = useProject();
   const [formData, setFormData] = useState<Partial<Project>>(project);
@@ -74,19 +73,19 @@ const ProjectPage = () => {
 
   const handleChangeInput = (
     event:
-      React.ChangeEvent<HTMLInputElement> |
-      React.ChangeEvent<HTMLTextAreaElement> |
-      React.ChangeEvent<HTMLSelectElement>
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
+      | React.ChangeEvent<HTMLSelectElement>
   ) => {
     const { name, type } = event.target;
-    const value = type === 'checkbox' ?
-      (event.target as HTMLInputElement).checked
-      :
-      event.target.value;
+    const value =
+      type === 'checkbox'
+        ? (event.target as HTMLInputElement).checked
+        : event.target.value;
 
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -100,54 +99,49 @@ const ProjectPage = () => {
   const handleChangeResourceName = (value: string) => {
     setFormData({
       ...formData,
-      resourceName: value
+      resourceName: value,
     });
   };
 
   return (
-    <ProtectedComponent>
-      <div>
-        <SEOConfig data={SEOData} />
-        {
-          isFetching ? (
-            <>
-              <Skeleton
-                variant="rectangular"
-                width="100%"
-                height={120}
-                animation="wave"
-                className="mb-3"
-              />
-              <Skeleton
-                variant="rectangular"
-                width="100%"
-                height={300}
-                animation="wave"
-              />
-            </>
-          ) : isEditing ? (
-            <EditMode
-              project={formData}
-              onClickCancel={handleOnClickCancel}
-              onClickUpdate={handleOnClickUpdate}
-              onChangeInput={handleChangeInput}
-              onChangeSelected={handleChangeSelected}
-              onChangeResourceName={handleChangeResourceName}
-            />
-          ) : (
-            <ViewMode
-              project={project}
-              isLgScreen={isLgScreen}
-              onClick={handleOnClickEdit}
-            />
-          )
-        }
-      </div>
-    </ProtectedComponent>
+    <div>
+      <SEOConfig data={SEOData} />
+      {isFetching ? (
+        <>
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={120}
+            animation="wave"
+            className="mb-3"
+          />
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={300}
+            animation="wave"
+          />
+        </>
+      ) : isEditing ? (
+        <EditMode
+          project={formData}
+          onClickCancel={handleOnClickCancel}
+          onClickUpdate={handleOnClickUpdate}
+          onChangeInput={handleChangeInput}
+          onChangeSelected={handleChangeSelected}
+          onChangeResourceName={handleChangeResourceName}
+        />
+      ) : (
+        <ViewMode
+          project={project}
+          isLgScreen={isLgScreen}
+          onClick={handleOnClickEdit}
+        />
+      )}
+    </div>
   );
 };
 
-ProjectPage.getLayout = (page: React.ReactElement) =>
-  getProjectLayout(page, undefined);
+ProjectPage.getLayout = getManageProjectLayout;
 
 export default ProjectPage;

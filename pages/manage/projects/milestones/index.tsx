@@ -1,11 +1,10 @@
-import getProjectLayout from '@/layout/ProjectLayout';
+import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
 import { Skeleton } from '@mui/material';
 import { MdOutlineSort } from 'react-icons/md';
 import { Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
-import { ProtectedComponent } from '@/contexts/Auth';
 import { useProject } from '@/contexts/Project';
 import { MilestonesProvider } from '@/contexts/Milestones/index';
 import MilestoneCard, {
@@ -353,15 +352,13 @@ const MilestonesPage = () => {
   );
 
   return (
-    <ProtectedComponent>
-      <MilestonesProvider>
-        <SEOConfig data={SEOData} />
-        <MilestonesContent />
-      </MilestonesProvider>
-    </ProtectedComponent>
+    <MilestonesProvider>
+      <SEOConfig data={SEOData} />
+      <MilestonesContent />
+    </MilestonesProvider>
   );
 };
 
-MilestonesPage.getLayout = getProjectLayout;
+MilestonesPage.getLayout = getManageProjectLayout;
 
 export default MilestonesPage;

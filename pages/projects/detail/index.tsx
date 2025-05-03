@@ -1,6 +1,6 @@
 import z from 'zod';
 import { useState, useEffect } from 'react';
-import getPublicProjectLayout from '@/layout/PublicProjectLayout';
+import { getPublicProjectLayout } from '@/layout/features/getProjectLayout';
 import { Project as ProjectType } from '@/components/Projects/Project/type';
 import { BASE_URL } from '@/constants/common';
 import { useRouter } from 'next/router';

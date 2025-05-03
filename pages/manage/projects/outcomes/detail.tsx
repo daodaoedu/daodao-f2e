@@ -2,7 +2,7 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import OutcomeDetail from '@/components/Outcome/Detail';
-import getProjectLayout from '@/layout/ProjectLayout';
+import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import SEOConfig from '@/shared/components/SEO';
 import {
   useProject,
@@ -100,7 +100,6 @@ const OutcomeDetailPage = () => {
   );
 };
 
-OutcomeDetailPage.getLayout = (page: React.ReactElement) =>
-  getProjectLayout(page, 'outcomes');
+OutcomeDetailPage.getLayout = getManageProjectLayout;
 
 export default OutcomeDetailPage;

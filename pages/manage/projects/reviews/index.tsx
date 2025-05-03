@@ -1,7 +1,7 @@
 import toast from 'react-hot-toast';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import getProjectLayout from '@/layout/ProjectLayout';
+import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import Button from '@/shared/components/Button';
 import ReviewCard from '@/components/Review/Card';
 import CreateModal from '@/components/Review/Modals/CreateModal';
@@ -157,6 +157,6 @@ const ReviewPage = () => {
   );
 };
 
-ReviewPage.getLayout = getProjectLayout;
+ReviewPage.getLayout = getManageProjectLayout;
 
 export default ReviewPage;

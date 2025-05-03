@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import NoteDetail from '@/components/Note/Detail';
 import SEOConfig from '@/shared/components/SEO';
-import getProjectLayout from '@/layout/ProjectLayout';
+import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import {
   useProject,
   useProjectNote,
@@ -100,7 +100,6 @@ const NoteDetailPage = () => {
   );
 };
 
-NoteDetailPage.getLayout = (page: React.ReactElement) =>
-  getProjectLayout(page, 'notes');
+NoteDetailPage.getLayout = getManageProjectLayout;
 
 export default NoteDetailPage;
