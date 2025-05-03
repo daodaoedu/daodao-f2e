@@ -8,7 +8,7 @@ import { GoArrowUpRight } from 'react-icons/go';
 import { PiCalendarBlankBold } from 'react-icons/pi';
 
 import marathonConfig from '@/constants/marathon';
-import getManageLayout from '@/layout/ManageLayout';
+import getManageLayout from '@/layout/features/getManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
 import SEOConfig from '@/shared/components/SEO';
 import AccessDenied from '@/shared/components/AccessDenied';
@@ -18,8 +18,6 @@ import Dropdown from '@/shared/components/Dropdown';
 import ReviewCard from '@/components/Review/Card';
 import MilestoneItem from '@/components/Milestones/MilestoneItem';
 import { RoleEnum, useAuth } from '@/contexts/Auth';
-import { MilestonesProvider } from '@/contexts/Milestones';
-import { ProjectProvider } from '@/contexts/Project';
 import { SelectProjectModal } from '@/features/projects';
 import { cn } from '@/utils/cn';
 import ReviewForm from '@/components/Review/Form';
@@ -502,11 +500,6 @@ const Manage = () => {
   );
 };
 
-Manage.getLayout = (page: React.ReactElement) =>
-  getManageLayout(
-    <ProjectProvider>
-      <MilestonesProvider>{page}</MilestonesProvider>
-    </ProjectProvider>
-  );
+Manage.getLayout = getManageLayout;
 
 export default Manage;
