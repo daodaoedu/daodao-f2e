@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
-import { getManageSidebarItems } from '@/constants/sidebar';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import { getManageSidebarItems } from '@/layout/features/getManageLayout';
+import Collapse from '@/shared/components/Collapse';
+import Button from '@/shared/components/Button';
 import { cn } from '@/utils/cn';
-import Collapse from '../Collapse';
-import Button from '../Button';
 
 interface OnCloseProps {
   onClose: () => void;
@@ -57,10 +58,12 @@ function ExploreMenu({ onClose }: OnCloseProps) {
 
 function ProfileMenu({ onClose }: OnCloseProps) {
   const auth = useAuth();
+  const { pathname } = useRouter();
+  const role = auth.user?.role;
 
   const sidebarItems = useMemo(
-    () => getManageSidebarItems({ role: auth.user?.role }),
-    [auth.user?.role]
+    () => getManageSidebarItems({ role, pathname }),
+    [role, pathname]
   );
 
   return (

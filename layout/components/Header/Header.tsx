@@ -3,7 +3,7 @@ import { cn } from '@/utils/cn';
 import { isServer } from '@/utils/helper';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import Image from '../Image';
+import Image from '../../../shared/components/Image';
 
 const MobileMenu = dynamic(() => import('./MobileMenu'));
 const DesktopMenu = dynamic(() => import('./DesktopMenu'));

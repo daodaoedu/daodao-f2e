@@ -1,13 +1,13 @@
-import React, { useRef, useEffect } from "react";
-import Header from "@/shared/components/Header";
-import Footer from "@/shared/components/Footer_v2";
+import React, { useRef, useEffect } from 'react';
+import Header from '@/layout/components/Header';
+import Footer from '@/layout/components/Footer';
 import {
   PromotionBar,
   PromotionProvider,
   usePromotion,
-} from "@/contexts/Promotion";
+} from '@/contexts/Promotion';
 
-function DefaultLayoutContent({ children }: React.PropsWithChildren) {
+function BaseLayout({ children }: React.PropsWithChildren) {
   const headerRef = useRef<HTMLDivElement>(null);
   const { showPromotionBar, setHeight } = usePromotion();
   const prevShowPromotionBar = useRef<boolean | null>(null);
@@ -16,7 +16,7 @@ function DefaultLayoutContent({ children }: React.PropsWithChildren) {
     const handleScrollPaddingTop = () => {
       if (!headerRef.current) return;
       const headerOffset = headerRef.current.offsetHeight;
-      const root = document.querySelector(":root");
+      const root = document.querySelector(':root');
 
       setHeight(headerOffset);
       if (root instanceof HTMLElement) {
@@ -30,9 +30,9 @@ function DefaultLayoutContent({ children }: React.PropsWithChildren) {
       prevShowPromotionBar.current = showPromotionBar;
     }
 
-    window.addEventListener("resize", handleScrollPaddingTop);
+    window.addEventListener('resize', handleScrollPaddingTop);
     return () => {
-      window.removeEventListener("resize", handleScrollPaddingTop);
+      window.removeEventListener('resize', handleScrollPaddingTop);
     };
   }, [headerRef.current, showPromotionBar]);
 
@@ -42,21 +42,18 @@ function DefaultLayoutContent({ children }: React.PropsWithChildren) {
         <PromotionBar />
       </Header>
       <main className="min-h-screen-with-padding-top">{children}</main>
-    </>
-  );
-}
-
-function DefaultLayout({ children }: React.PropsWithChildren) {
-  return (
-    <>
-      <PromotionProvider>
-        <DefaultLayoutContent>{children}</DefaultLayoutContent>
-      </PromotionProvider>
       <Footer />
     </>
   );
 }
 
-export default function getDefaultLayout(page: React.ReactElement) {
-  return <DefaultLayout>{page}</DefaultLayout>;
+/**
+ * 預設的基礎佈局，包含 Header 、 PromotionBar 和 Footer
+ */
+export default function getBaseLayout(page: React.ReactElement) {
+  return (
+    <PromotionProvider>
+      <BaseLayout>{page}</BaseLayout>
+    </PromotionProvider>
+  );
 }

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
-import Dropdown from '../Dropdown';
+import Dropdown from '../../../shared/components/Dropdown';
 
 function DesktopMenu() {
   const auth = useAuth();
