@@ -6,7 +6,11 @@ import { ProjectTaskSchema } from './tasks';
 export const sortTasks = (tasks: ProjectTaskSchema[]) => {
   if (!Array.isArray(tasks)) return [];
 
-  return tasks.concat().sort((a, b) => a.position - b.position);
+  return tasks.concat().sort((a, b) => {
+    const diff = a.position - b.position;
+    if (diff !== 0) return diff;
+    return a.id - b.id;
+  });
 };
 
 export const getTask = (sortedData: ProjectTaskSchema[], id: number) => {

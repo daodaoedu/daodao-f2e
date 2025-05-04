@@ -1,4 +1,4 @@
-import getAdminProjectLayout from '@/layout/AdminProjectLayout';
+import { getAdminProjectLayout } from '@/layout/features/getProjectLayout';
 import { useRouter } from 'next/router';
 import { Skeleton } from '@mui/material';
 import { useProjectMilestones } from '@/services/modules/projects';

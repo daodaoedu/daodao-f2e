@@ -1,3 +1,7 @@
+export const MAX_PROJECTS = 3;
+
+export const ENABLE_CREATE_PROJECT = false;
+
 interface MotivationMap {
   label: string;
   value: string;

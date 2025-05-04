@@ -35,6 +35,10 @@ function ContentCard<T extends ContentCardData>({
 }: ContentCardProps<T>) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [showGradient, setShowGradient] = useState(false);
+  const previewContent =
+    data.content.length <= 100
+      ? data.content
+      : `${data.content.slice(0, 100)}...`;
 
   useEffect(() => {
     const checkHeight = () => {
@@ -65,7 +69,7 @@ function ContentCard<T extends ContentCardData>({
             <MarkdownEditor
               editorClassName="max-w-full"
               readOnly
-              value={data.content}
+              value={previewContent}
             />
             {showGradient && (
               <div className="absolute inset-0 bg-gradient-to-b from-transparent from-70% to-white pointer-events-none" />
