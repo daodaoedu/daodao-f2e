@@ -190,7 +190,7 @@ const MilestonesContent = () => {
   }, [milestones, isAscending, filterType]);
 
   useEffect(() => {
-    if (Array.isArray(milestones) && !isInitial.current) {
+    if (milestones?.length && !isInitial.current) {
       isInitial.current = true;
 
       const milestoneStartDate = milestones[0].startDate;
