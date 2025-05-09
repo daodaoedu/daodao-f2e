@@ -190,24 +190,23 @@ const MilestonesContent = () => {
   }, [milestones, isAscending, filterType]);
 
   useEffect(() => {
-    if (Array.isArray(milestones) && !isInitial.current) {
-      isInitial.current = true;
+    if (!milestones?.length || isInitial.current) return;
+    isInitial.current = true;
 
-      const milestoneStartDate = milestones[0].startDate;
-      const milestoneEndDate = milestones.reduce(
-        (compareEndDate, milestone) => {
-          const currentEndDate = dayjs(milestone.endDate);
+    const milestoneStartDate = dayjs(milestones[0].startDate);
+    const milestoneEndDate = milestones.reduce(
+      (compareEndDate, milestone) => {
+        const currentEndDate = dayjs(milestone.endDate);
 
-          return dayjs(compareEndDate).isAfter(currentEndDate)
-            ? compareEndDate
-            : currentEndDate;
-        },
-        dayjs(milestoneStartDate)
-      );
+        return compareEndDate.isAfter(currentEndDate)
+          ? compareEndDate
+          : currentEndDate;
+      },
+      milestoneStartDate
+    );
 
-      setStartDate(dayjs(milestoneStartDate));
-      setEndDate(dayjs(milestoneEndDate));
-    }
+    setStartDate(milestoneStartDate);
+    setEndDate(milestoneEndDate);
   }, [milestones, isInitial]);
 
   return (
@@ -277,8 +276,8 @@ const MilestonesContent = () => {
               </>
             )}
             <div className="flex flex-col gap-3 transition-opacity">
-              {isCreating && Array.isArray(milestones) && (
-                <div className="p-2.5 bg-basic-100 flex flex-col gap-2">
+              {isCreating && (
+                <div className="p-2.5 bg-basic-100 flex flex-col gap-2 rounded-xl">
                   <MilestoneCard
                     ref={formRef}
                     startDate={startDate}

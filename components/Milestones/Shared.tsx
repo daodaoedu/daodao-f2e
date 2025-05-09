@@ -127,8 +127,15 @@ const calcEmptyDateRange = (
     return [startDate, calcEndDate(startDate, endDate, 7)];
   }
   if (milestones.length === 1) {
-    const newStartDate = dayjs(milestones[0].endDate).add(1, 'day');
-    return [newStartDate, calcEndDate(newStartDate, endDate, 7)];
+    const [milestone] = milestones;
+    const newStartDate = dayjs(milestone.endDate).add(1, 'day');
+    const newEndDate = calcEndDate(newStartDate, endDate, 7);
+    return [
+      newStartDate,
+      newEndDate.isAfter(newStartDate)
+        ? newEndDate
+        : newStartDate.add(1, 'day'),
+    ];
   }
 
   let latestEndDate = dayjs(milestones[0].endDate).add(1, 'day');
