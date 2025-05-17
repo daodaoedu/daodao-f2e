@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 
@@ -9,19 +9,12 @@ import EditMode from '@/components/Projects/Project/EditMode';
 import SEOConfig from '@/shared/components/SEO';
 import {
   createProjectSchema,
-  useMyProjects,
   useProjectMutation,
 } from '@/services/modules/projects';
-import {
-  MARATHON_ACCESS_MESSAGE,
-  MAX_PROJECTS,
-  PROJECT_LIMIT_MESSAGE,
-} from '@/constants/project';
-import { useMarathonAccess } from '@/features/projects';
+import { useCreateProject } from '@/features/projects';
 
 const ProjectPage = () => {
   const router = useRouter();
-  const hasMarathonAccess = useMarathonAccess();
 
   const SEOData = useMemo(
     () => ({
@@ -35,7 +28,6 @@ const ProjectPage = () => {
     [router?.asPath]
   );
   const [formData, setFormData] = useState<Partial<Project>>(DEFAULT_PROJECT);
-  const { data: projects } = useMyProjects();
   const { createMutation } = useProjectMutation({
     onCreated: (data) => {
       if (data?.id) {
@@ -88,18 +80,7 @@ const ProjectPage = () => {
     });
   };
 
-  useEffect(() => {
-    if (!hasMarathonAccess) {
-      toast.error(MARATHON_ACCESS_MESSAGE);
-      router.replace('/manage/projects');
-      return;
-    }
-
-    if (projects && projects.length >= MAX_PROJECTS) {
-      toast.error(PROJECT_LIMIT_MESSAGE);
-      router.replace('/manage/projects');
-    }
-  }, [projects, router]);
+  const { canCreateProject } = useCreateProject();
 
   return (
     <ProtectedComponent>
@@ -107,7 +88,7 @@ const ProjectPage = () => {
 
       <Container className="flex justify-center pb-12 px-4" autoMinHeight>
         <div className="max-w-3xl">
-          {Array.isArray(projects) && projects.length < MAX_PROJECTS && (
+          {canCreateProject && (
             <EditMode
               project={formData}
               onClickCancel={handleOnClickCancel}

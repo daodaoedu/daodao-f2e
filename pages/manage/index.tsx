@@ -19,7 +19,7 @@ import MilestoneItem from '@/components/Milestones/MilestoneItem';
 import {
   SelectProjectModal,
   MarathonAccess,
-  useMarathonAccess,
+  EmptyProject,
 } from '@/features/projects';
 import { cn } from '@/utils/cn';
 import ReviewForm from '@/components/Review/Form';
@@ -34,12 +34,8 @@ import {
   useProjectReviewMutation,
   useProjectReviews,
 } from '@/services/modules/projects';
-import {
-  MARATHON_ACCESS_MESSAGE,
-  MAX_PROJECTS,
-  PROJECT_LIMIT_MESSAGE,
-} from '@/constants/project';
 import Image from '@/shared/components/Image';
+import useCreateProject from '@/features/projects/hooks/useCreateProject';
 
 const HEADER_TITLES = [
   '今天的每一小步，都在建立你的學習動能！',
@@ -76,7 +72,6 @@ const Header = () => {
   const [modalType, setModalType] = useState<ModalType | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [projectId, setProjectId] = useState<string | undefined>();
-  const hasMarathonAccess = useMarathonAccess();
   const handleCreated = () => {
     toast.success('新增成功');
     setIsOpen(false);
@@ -93,22 +88,8 @@ const Header = () => {
     projectId,
     onCreated: handleCreated,
   });
-  const { data: projects } = useMyProjects();
 
-  const handleCreateProject = () => {
-    if (!hasMarathonAccess) {
-      toast.error(MARATHON_ACCESS_MESSAGE);
-      return;
-    }
-
-    if (!Array.isArray(projects)) {
-      toast.error('目前功能異常，請稍後再試');
-    } else if (projects.length >= MAX_PROJECTS) {
-      toast.error(PROJECT_LIMIT_MESSAGE);
-    } else {
-      router.push('/manage/projects/create');
-    }
-  };
+  const { handleCreateProject } = useCreateProject();
 
   const handleOpenModal = (_modalType: ModalType) => {
     setIsOpen(true);
@@ -327,18 +308,26 @@ interface ProjectProps {
   href: string;
   title: string;
   children: React.ReactNode;
+  percentage?: number;
   defaultOpen?: boolean;
 }
 
-const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
+const Project = ({
+  href,
+  title,
+  children,
+  percentage,
+  defaultOpen,
+}: ProjectProps) => {
   return (
     <div
       className={cn(
         'relative mb-6 px-3 py-4 bg-white rounded-2xl',
         'after:content-[""] after:absolute after:top-0 after:left-3',
-        'after:h-[5px] after:w-2/5 md:after:w-1/2',
+        'after:h-[5px] after:w-[calc(var(--percentage)-24px)]',
         'after:bg-primary-base after:rounded-full after:z-10'
       )}
+      style={{ '--percentage': `${percentage}%` } as React.CSSProperties}
     >
       <Collapse defaultOpen={defaultOpen}>
         <Collapse.Toggle className="w-full px-3 py-2 justify-between" withIcon>
@@ -413,42 +402,55 @@ const Main = ({ date }: { date: Dayjs }) => {
   return (
     <>
       <ul>
-        {todayProjects.map((project, index) => (
-          <li key={project.id} className="opacity-100 transition-opacity">
-            <Project
-              title={project.title}
-              href={`/manage/projects/detail?id=${project.id}`}
-              defaultOpen={index === 0}
-            >
-              {Array.isArray(project?.milestones) &&
-              project.milestones.length ? (
-                project.milestones.map((milestone) => (
-                  <div key={milestone.id} className="mb-2 last-of-type:mb-0">
-                    <MilestoneItem
-                      key={milestone.id}
-                      milestone={milestone}
-                      milestones={project.originalMilestones}
-                      projectId={project.id}
-                      onRefreshData={mutate}
-                      onUpdate={updateMutation.trigger}
-                      isEditable
+        {todayProjects.length ? (
+          todayProjects.map((project, index) => (
+            <li key={project.id} className="opacity-100 transition-opacity">
+              <Project
+                title={project.title}
+                href={`/manage/projects/detail?id=${project.id}`}
+                defaultOpen={index === 0}
+                percentage={
+                  Array.isArray(project?.originalMilestones) &&
+                  project.originalMilestones.length
+                    ? (project.originalMilestones.filter((m) => m.isCompleted)
+                        .length /
+                        project.originalMilestones.length) *
+                      100
+                    : 0
+                }
+              >
+                {Array.isArray(project?.milestones) &&
+                project.milestones.length ? (
+                  project.milestones.map((milestone) => (
+                    <div key={milestone.id} className="mb-2 last-of-type:mb-0">
+                      <MilestoneItem
+                        key={milestone.id}
+                        milestone={milestone}
+                        milestones={project.originalMilestones}
+                        projectId={project.id}
+                        onRefreshData={mutate}
+                        onUpdate={updateMutation.trigger}
+                        isEditable
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center justify-center">
+                    <div>{date.format('YYYY/MM/DD')} 沒有里程碑</div>
+                    <Image
+                      src={AccessDeniedImg.src}
+                      alt="沒有里程碑"
+                      height="320px"
+                      className="object-contain h-80"
                     />
                   </div>
-                ))
-              ) : (
-                <div className="flex flex-col items-center justify-center">
-                  <div>{date.format('YYYY/MM/DD')} 沒有里程碑</div>
-                  <Image
-                    src={AccessDeniedImg.src}
-                    alt="沒有里程碑"
-                    height="320px"
-                    className="object-contain h-80"
-                  />
-                </div>
-              )}
-            </Project>
-          </li>
-        ))}
+                )}
+              </Project>
+            </li>
+          ))
+        ) : (
+          <EmptyProject />
+        )}
       </ul>
 
       {Array.isArray(projects) &&

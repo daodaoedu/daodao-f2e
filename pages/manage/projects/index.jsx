@@ -11,15 +11,13 @@ import { useMyProjects } from '@/services/modules/projects';
 import More from '@/components/Projects/More';
 import Button from '@/shared/components/Button';
 import { cn } from '@/utils/cn';
-import toast from 'react-hot-toast';
-import { MARATHON_ACCESS_MESSAGE, MAX_PROJECTS, PROJECT_LIMIT_MESSAGE } from '@/constants/project';
-import { MarathonAccess, useMarathonAccess } from '@/features/projects';
+import { MarathonAccess, useMarathonAccess, EmptyProject } from '@/features/projects';
+import useCreateProject from '@/features/projects/hooks/useCreateProject';
 
 const Projects = () => {
   const router = useRouter();
   const { data } = useMyProjects();
   const projects = Array.isArray(data) ? data : [];
-  const isAddedDenied = projects.length >= MAX_PROJECTS;
   const hasMarathonAccess = useMarathonAccess();
   const options = [
     { value: "all", label: "全部計畫" },
@@ -34,18 +32,7 @@ const Projects = () => {
     }
   };
 
-  const handleCreateProject = () => {
-    if (!hasMarathonAccess) {
-      toast.error(MARATHON_ACCESS_MESSAGE);
-      return;
-    }
-
-    if (isAddedDenied) {
-      toast.error(PROJECT_LIMIT_MESSAGE);
-    } else {
-      router.push('/manage/projects/create');
-    }
-  };
+  const { isAddedDenied, handleCreateProject, projectLimitMessage } = useCreateProject();
 
   const SEOData = useMemo(
     () => ({
@@ -108,12 +95,13 @@ const Projects = () => {
             {
               isAddedDenied && (
                 <p className="font-sans font-normal text-[#FF9526]">
-                  島上空間有限，計畫滿三個就不能再增加了{`><`}
+                  {projectLimitMessage}
                 </p>
               )
             }
           </div>
           <MarathonAccess>
+            {projects?.length === 0 && <EmptyProject />}
             <div className="
               flex flex-col md:flex-row
               gap-5"

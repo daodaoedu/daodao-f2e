@@ -1,11 +1,3 @@
-export const MAX_PROJECTS = 3;
-
-export const MARATHON_ACCESS_MESSAGE =
-  '目前功能只開放給\n春季學習馬拉松的夥伴使用喔～';
-
-export const PROJECT_LIMIT_MESSAGE =
-  '島上空間有限，\n計畫滿三個就不能再增加了><';
-
 interface MotivationMap {
   label: string;
   value: string;
