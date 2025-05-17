@@ -9,7 +9,7 @@ import {
 
 function BaseLayout({ children }: React.PropsWithChildren) {
   const headerRef = useRef<HTMLDivElement>(null);
-  const { showPromotionBar, setHeight } = usePromotion();
+  const { isShowPromotionBar, setHeight } = usePromotion();
   const prevShowPromotionBar = useRef<boolean | null>(null);
 
   useEffect(() => {
@@ -18,23 +18,23 @@ function BaseLayout({ children }: React.PropsWithChildren) {
       const headerOffset = headerRef.current.offsetHeight;
       const root = document.querySelector(':root');
 
-      setHeight(headerOffset);
+      setHeight(Math.floor(headerOffset - 1));
       if (root instanceof HTMLElement) {
         root.style.setProperty('--padding-top', `${headerOffset}px`);
         root.style.setProperty('scroll-padding-top', `${headerOffset + 80}px`);
       }
     };
 
-    if (prevShowPromotionBar.current !== showPromotionBar) {
+    if (prevShowPromotionBar.current !== isShowPromotionBar) {
       handleScrollPaddingTop();
-      prevShowPromotionBar.current = showPromotionBar;
+      prevShowPromotionBar.current = isShowPromotionBar;
     }
 
     window.addEventListener('resize', handleScrollPaddingTop);
     return () => {
       window.removeEventListener('resize', handleScrollPaddingTop);
     };
-  }, [headerRef.current, showPromotionBar]);
+  }, [headerRef.current, isShowPromotionBar]);
 
   return (
     <>
