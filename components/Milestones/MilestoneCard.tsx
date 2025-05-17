@@ -39,8 +39,8 @@ interface MilestoneCardProps {
   isEditable?: boolean;
   defaultEditing?: boolean;
   onCancel?: () => void;
-  onCreate?: (request: CreateProjectMilestoneSchema) => void | Promise<void>;
-  onUpdate?: (request: UpdateProjectMilestoneSchema) => void | Promise<void>;
+  onCreate?: (request: CreateProjectMilestoneSchema) => void;
+  onUpdate?: (request: UpdateProjectMilestoneSchema) => void;
 }
 
 export interface MilestoneFormRef {

@@ -20,6 +20,7 @@ import {
   SelectProjectModal,
   MarathonAccess,
   EmptyProject,
+  useMilestonesDateRange,
 } from '@/features/projects';
 import { cn } from '@/utils/cn';
 import ReviewForm from '@/components/Review/Form';
@@ -36,6 +37,7 @@ import {
 } from '@/services/modules/projects';
 import Image from '@/shared/components/Image';
 import useCreateProject from '@/features/projects/hooks/useCreateProject';
+import MilestoneCard from '@/components/Milestones/MilestoneCard';
 
 const HEADER_TITLES = [
   '今天的每一小步，都在建立你的學習動能！',
@@ -76,6 +78,11 @@ const Header = () => {
     toast.success('新增成功');
     setIsOpen(false);
   };
+  const { createMutation } = useProjectMilestoneMutation({
+    projectId,
+    onCreated: handleCreated,
+  });
+
   const { createMutation: createReview } = useProjectReviewMutation({
     projectId,
     onCreated: handleCreated,
@@ -90,6 +97,7 @@ const Header = () => {
   });
 
   const { handleCreateProject } = useCreateProject();
+  const milestonesDateRange = useMilestonesDateRange(projectId);
 
   const handleOpenModal = (_modalType: ModalType) => {
     setIsOpen(true);
@@ -102,8 +110,8 @@ const Header = () => {
       onClick: handleCreateProject,
     },
     {
-      label: '新增任務',
-      onClick: () => toast.error('功能尚未開放'),
+      label: '新增里程碑',
+      onClick: () => handleOpenModal(ModalType.Task),
     },
     {
       label: '新增覆盤',
@@ -192,6 +200,19 @@ const Header = () => {
         onRemovedDOM={() => setModalType(null)}
         renderContent={(project) => (
           <>
+            {modalType === ModalType.Task && (
+              <MilestoneCard
+                minDate={milestonesDateRange.minDate}
+                maxDate={milestonesDateRange.maxDate}
+                projectId={project.id}
+                disabledChangeDate={!!project.eventId}
+                milestones={project.milestones}
+                isEditable
+                defaultEditing
+                onCancel={() => setIsOpen(false)}
+                onCreate={createMutation.trigger}
+              />
+            )}
             {modalType === ModalType.Review && (
               <ReviewForm
                 projectId={project.id}
@@ -323,8 +344,9 @@ const Project = ({
     <div
       className={cn(
         'relative mb-6 px-3 py-4 bg-white rounded-2xl',
-        'after:content-[""] after:absolute after:top-0 after:left-3',
-        'after:h-[5px] after:w-[calc(var(--percentage)-24px)]',
+        'after:content-[""] after:absolute after:top-0 after:left-3 after:right-3',
+        'after:h-[5px] after:transition-transform after:origin-left',
+        'after:scale-x-[var(--percentage)]',
         'after:bg-primary-base after:rounded-full after:z-10'
       )}
       style={{ '--percentage': `${percentage}%` } as React.CSSProperties}

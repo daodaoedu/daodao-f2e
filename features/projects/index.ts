@@ -5,3 +5,4 @@ export { default as SelectProjectModal } from './components/SelectProjectModal';
 
 export { default as useCreateProject } from './hooks/useCreateProject';
 export { default as useMarathonAccess } from './hooks/useMarathonAccess';
+export { default as useMilestonesDateRange } from './hooks/useMilestonesDateRange';
