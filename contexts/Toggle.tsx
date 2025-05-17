@@ -53,25 +53,34 @@ export const ToggleProvider = ({
   isEnabled,
   onChange,
 }: ToggleProviderProps) => {
-  const [isOpen, setIsOpen] = useState(defaultEnabled);
+  const [isInternalOpen, setIsInternalOpen] = useState(defaultEnabled);
   const [isOpened, setIsOpened] = useState(!defaultEnabled);
   const [wrapperDom, setWrapperDom] = useState<HTMLElement | null>(null);
   const [triggerDom, setTriggerDom] = useState<HTMLElement | null>(null);
   const [anchorPoint, setAnchorPoint] = useState<AnchorPoint | undefined>(
     undefined
   );
+  const isControlled = typeof isEnabled === 'boolean';
+  const isOpen = isControlled ? isEnabled : isInternalOpen;
 
-  const value = useMemo(
-    () => ({
-      isOpen: isEnabled ?? isOpen,
+  const value = useMemo(() => {
+    const handleIsOpen = (_isOpen: boolean) => {
+      if (onChange) {
+        onChange(_isOpen);
+      }
+      if (!isControlled) {
+        setIsInternalOpen(_isOpen);
+      }
+    };
+    return {
+      isOpen,
       isOpened,
       anchorPoint,
-      setIsOpen: onChange ?? setIsOpen,
+      setIsOpen: handleIsOpen,
       setWrapperDom,
       setTriggerDom,
-    }),
-    [isOpen, isOpened, isEnabled, anchorPoint, onChange]
-  );
+    };
+  }, [isOpen, isOpened, isControlled, isEnabled, anchorPoint, onChange]);
 
   useLayoutEffect(() => {
     let timer: NodeJS.Timeout;
