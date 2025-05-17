@@ -271,7 +271,7 @@ function MilestoneCard(
             separator={<FaArrowRight className="text-basic-300" />}
             className={cn(
               '-mx-1 px-1 py-0 gap-1.5 body-sm text-basic-300 rounded',
-              !isEditing && 'cursor-default border-transparent'
+              !isEditing && 'disabled:text-basic-300'
             )}
             onStartDateChange={(d) => {
               methods.setValue('startDate', d.format('YYYY/MM/DD'), {
