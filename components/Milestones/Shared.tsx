@@ -110,31 +110,29 @@ export const ProgressBar = ({ progress }: ProgressBarProps) => {
 };
 
 const calcEndDate = (
-  startDate: dayjs.Dayjs,
-  endDate: dayjs.Dayjs,
+  minDate: dayjs.Dayjs,
+  maxDate: dayjs.Dayjs,
   days: number
 ) => {
-  const targetEndDate = startDate.add(days, 'day');
-  return targetEndDate.isAfter(endDate) ? endDate : targetEndDate;
+  const endDate = minDate.add(days, 'day');
+  return endDate.isAfter(maxDate) ? maxDate : endDate;
 };
 
 const calcEmptyDateRange = (
-  startDate: dayjs.Dayjs,
-  endDate: dayjs.Dayjs,
+  minDate: dayjs.Dayjs,
+  maxDate: dayjs.Dayjs,
   milestones: ProjectMilestoneSchema[]
 ): [dayjs.Dayjs, dayjs.Dayjs] => {
   if (milestones.length === 0) {
-    return [startDate, calcEndDate(startDate, endDate, 7)];
+    return [minDate, calcEndDate(minDate, maxDate, 7)];
   }
   if (milestones.length === 1) {
     const [milestone] = milestones;
-    const newStartDate = dayjs(milestone.endDate).add(1, 'day');
-    const newEndDate = calcEndDate(newStartDate, endDate, 7);
+    const startDate = dayjs(milestone.endDate).add(1, 'day');
+    const endDate = calcEndDate(startDate, maxDate, 7);
     return [
-      newStartDate,
-      newEndDate.isAfter(newStartDate)
-        ? newEndDate
-        : newStartDate.add(1, 'day'),
+      startDate,
+      endDate.isAfter(startDate) ? endDate : startDate.add(1, 'day'),
     ];
   }
 
@@ -157,29 +155,29 @@ const calcEmptyDateRange = (
       : latestEndDate;
   }
 
-  const newStartDate = latestEndDate.isAfter(endDate)
-    ? endDate.subtract(1, 'day')
+  const startDate = latestEndDate.isAfter(maxDate)
+    ? maxDate.subtract(1, 'day')
     : latestEndDate;
 
-  return [newStartDate, calcEndDate(newStartDate, endDate, 7)];
+  return [startDate, calcEndDate(startDate, maxDate, 7)];
 };
 
 interface GetDefaultMilestoneProps {
   projectId: string;
   milestones: ProjectMilestoneSchema[];
-  startDate: dayjs.Dayjs;
-  endDate: dayjs.Dayjs;
+  minDate: dayjs.Dayjs;
+  maxDate: dayjs.Dayjs;
 }
 
 export const getDefaultMilestone = ({
   projectId,
   milestones,
-  startDate,
-  endDate,
+  minDate,
+  maxDate,
 }: GetDefaultMilestoneProps): CreateProjectMilestoneSchema => {
-  const [newStartDate, newEndDate] = calcEmptyDateRange(
-    startDate,
-    endDate,
+  const [startDate, endDate] = calcEmptyDateRange(
+    minDate,
+    maxDate,
     milestones
   );
 
@@ -187,8 +185,8 @@ export const getDefaultMilestone = ({
     name: '',
     isCompleted: false,
     projectId,
-    startDate: newStartDate.format('YYYY/MM/DD'),
-    endDate: newEndDate.format('YYYY/MM/DD'),
+    startDate: startDate.format('YYYY/MM/DD'),
+    endDate: endDate.format('YYYY/MM/DD'),
     position: 1000,
   };
 };

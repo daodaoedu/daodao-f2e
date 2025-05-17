@@ -24,8 +24,8 @@ const MemoMilestoneItem = memo(MilestoneItem);
 interface DraggableMilestonesProps {
   milestones: ProjectMilestoneSchema[];
   projectId: string;
-  startDate?: dayjs.Dayjs;
-  endDate?: dayjs.Dayjs;
+  minDate?: dayjs.Dayjs;
+  maxDate?: dayjs.Dayjs;
   isEditable?: boolean;
   isAscending?: boolean;
   onRefreshData?: () => void;
@@ -37,8 +37,8 @@ interface DraggableMilestonesProps {
 const DraggableMilestones = ({
   milestones,
   projectId,
-  startDate,
-  endDate,
+  minDate,
+  maxDate,
   isEditable = false,
   isAscending,
   onUpdate,
@@ -135,8 +135,8 @@ const DraggableMilestones = ({
                 milestone={milestone}
                 milestones={items}
                 projectId={projectId}
-                startDate={startDate}
-                endDate={endDate}
+                minDate={minDate}
+                maxDate={maxDate}
                 isEditable={isEditable}
                 onUpdate={onUpdate}
                 onRefreshData={onRefreshData}
@@ -160,8 +160,8 @@ const DraggableMilestones = ({
               milestone={activeItem}
               milestones={items}
               projectId={projectId}
-              startDate={startDate}
-              endDate={endDate}
+              minDate={minDate}
+              maxDate={maxDate}
               isEditable={isEditable}
               onUpdate={onUpdate}
               onRefreshData={onRefreshData}

@@ -15,8 +15,8 @@ import DraggableTasks from '../Tasks/DraggableTasks';
 
 interface MilestoneItemProps {
   projectId: string;
-  startDate?: dayjs.Dayjs;
-  endDate?: dayjs.Dayjs;
+  minDate?: dayjs.Dayjs;
+  maxDate?: dayjs.Dayjs;
   isEditable?: boolean;
   milestone: ProjectMilestoneSchema;
   milestones: ProjectMilestoneSchema[];
@@ -28,8 +28,8 @@ interface MilestoneItemProps {
 
 const MilestoneItem = ({
   projectId,
-  startDate,
-  endDate,
+  minDate,
+  maxDate,
   isEditable,
   milestone,
   milestones,
@@ -46,8 +46,8 @@ const MilestoneItem = ({
         projectId={projectId}
         milestone={milestone}
         milestones={milestones}
-        startDate={startDate}
-        endDate={endDate}
+        minDate={minDate}
+        maxDate={maxDate}
         isEditable={isEditable}
         onCreate={onCreate}
         onUpdate={onUpdate}

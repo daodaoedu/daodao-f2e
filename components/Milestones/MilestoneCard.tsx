@@ -31,8 +31,8 @@ import { getDefaultMilestone } from './Shared';
 
 interface MilestoneCardProps {
   projectId: string;
-  startDate?: dayjs.Dayjs;
-  endDate?: dayjs.Dayjs;
+  minDate?: dayjs.Dayjs;
+  maxDate?: dayjs.Dayjs;
   milestone?: ProjectMilestoneSchema;
   milestones?: ProjectMilestoneSchema[];
   disabledChangeDate?: boolean;
@@ -50,8 +50,8 @@ export interface MilestoneFormRef {
 function MilestoneCard(
   {
     projectId,
-    startDate,
-    endDate,
+    minDate,
+    maxDate,
     milestone,
     milestones = [],
     disabledChangeDate,
@@ -116,8 +116,8 @@ function MilestoneCard(
     defaultValues: getDefaultMilestone({
       projectId,
       milestones: Array.isArray(milestones) ? milestones : [],
-      startDate: startDate || dayjs(),
-      endDate: endDate || dayjs(),
+      minDate: minDate || dayjs(),
+      maxDate: maxDate || dayjs(),
     }),
   });
 
@@ -264,8 +264,8 @@ function MilestoneCard(
                 ? dayjs(methods.watch('endDate'))
                 : dayjs(milestone?.endDate)
             }
-            minDate={startDate}
-            maxDate={endDate}
+            minDate={minDate}
+            maxDate={maxDate}
             disabledStartDate={disabledChangeDate || !isEditing}
             disabledEndDate={disabledChangeDate || !isEditing}
             separator={<FaArrowRight className="text-basic-300" />}
