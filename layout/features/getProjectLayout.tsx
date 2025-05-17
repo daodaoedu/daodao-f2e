@@ -5,6 +5,7 @@ import { RoleEnum, useAuth } from '@/contexts/Auth';
 import { ProjectProvider } from '@/contexts/Project';
 import Sidebar, { SidebarItemType } from '@/layout/components/Sidebar';
 import { useProject } from '@/services/modules/projects';
+import NotExist from '@/shared/components/NotExist';
 import ProjectHeader from '../components/ProjectHeader';
 import getBaseLayout from '../core/getBaseLayout';
 import getPrivateLayout from '../core/getPrivateLayout';
@@ -130,16 +131,12 @@ function ProjectLayout({ children, type }: ProjectLayoutProps) {
     id: projectId,
   });
 
-  if (!canVisit) {
-    return <div>You are not authorized to visit this project</div>;
-  }
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (!project) {
-    return <div>Project not found</div>;
+  if (!canVisit || !project) {
+    return <NotExist />;
   }
 
   return (
