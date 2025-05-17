@@ -85,6 +85,7 @@ export interface ButtonProps<AS extends 'button' | 'link' = 'button'>
     > {
   as?: AS;
   href?: AS extends 'link' ? string : never;
+  target?: AS extends 'link' ? React.HTMLAttributeAnchorTarget : never;
   isSubmit?: AS extends 'button' ? boolean : never;
   onClick?: (
     e: AS extends 'button'
@@ -108,6 +109,7 @@ function Button<AS extends 'button' | 'link' = 'button'>(
     prefixIcon,
     suffixIcon,
     href,
+    target,
     checkLogin = false,
     ...nativeButtonProps
   }: ButtonProps<AS>,
@@ -209,7 +211,7 @@ function Button<AS extends 'button' | 'link' = 'button'>(
 
   if (as === 'link' && href) {
     return (
-      <Link href={href} {...sharedProps}>
+      <Link href={href} target={target} {...sharedProps}>
         {content}
       </Link>
     );

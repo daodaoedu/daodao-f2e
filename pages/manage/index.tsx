@@ -11,14 +11,16 @@ import marathonConfig from '@/constants/marathon';
 import getManageLayout from '@/layout/features/getManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
 import SEOConfig from '@/shared/components/SEO';
-import AccessDenied from '@/shared/components/AccessDenied';
 import Button from '@/shared/components/Button';
 import Collapse from '@/shared/components/Collapse';
 import Dropdown from '@/shared/components/Dropdown';
 import ReviewCard from '@/components/Review/Card';
 import MilestoneItem from '@/components/Milestones/MilestoneItem';
-import { RoleEnum, useAuth } from '@/contexts/Auth';
-import { SelectProjectModal } from '@/features/projects';
+import {
+  SelectProjectModal,
+  MarathonAccess,
+  useMarathonAccess,
+} from '@/features/projects';
 import { cn } from '@/utils/cn';
 import ReviewForm from '@/components/Review/Form';
 import NoteForm from '@/components/Note/Form';
@@ -32,7 +34,11 @@ import {
   useProjectReviewMutation,
   useProjectReviews,
 } from '@/services/modules/projects';
-import { ENABLE_CREATE_PROJECT, MAX_PROJECTS } from '@/constants/project';
+import {
+  MARATHON_ACCESS_MESSAGE,
+  MAX_PROJECTS,
+  PROJECT_LIMIT_MESSAGE,
+} from '@/constants/project';
 import Image from '@/shared/components/Image';
 
 const HEADER_TITLES = [
@@ -70,6 +76,7 @@ const Header = () => {
   const [modalType, setModalType] = useState<ModalType | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [projectId, setProjectId] = useState<string | undefined>();
+  const hasMarathonAccess = useMarathonAccess();
   const handleCreated = () => {
     toast.success('新增成功');
     setIsOpen(false);
@@ -89,15 +96,15 @@ const Header = () => {
   const { data: projects } = useMyProjects();
 
   const handleCreateProject = () => {
-    if (!ENABLE_CREATE_PROJECT) {
-      toast.error('目前功能尚未開放');
+    if (!hasMarathonAccess) {
+      toast.error(MARATHON_ACCESS_MESSAGE);
       return;
     }
 
     if (!Array.isArray(projects)) {
       toast.error('目前功能異常，請稍後再試');
     } else if (projects.length >= MAX_PROJECTS) {
-      toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
+      toast.error(PROJECT_LIMIT_MESSAGE);
     } else {
       router.push('/manage/projects/create');
     }
@@ -324,12 +331,6 @@ interface ProjectProps {
 }
 
 const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
-  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    window.open(href, '_blank');
-  };
-
   return (
     <div
       className={cn(
@@ -342,8 +343,10 @@ const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
       <Collapse defaultOpen={defaultOpen}>
         <Collapse.Toggle className="w-full px-3 py-2 justify-between" withIcon>
           <Button
+            as="link"
+            href={href}
+            target="_blank"
             className="flex items-center gap-2 body-md text-basic-500"
-            onClick={handleClick}
           >
             {title}
             <GoArrowUpRight className="stroke-1" />
@@ -458,18 +461,7 @@ const Main = ({ date }: { date: Dayjs }) => {
 
 const Manage = () => {
   const [date, setDate] = useState<Dayjs>(dayjs().startOf('day'));
-  const { user } = useAuth();
   const { pathname } = useRouter();
-  const canManage = useMemo(() => {
-    const permissions = [
-      RoleEnum.MarathonApplicant,
-      RoleEnum.MarathonParticipant,
-      RoleEnum.Mentor,
-      RoleEnum.Admin,
-      RoleEnum.SuperAdmin,
-    ];
-    return user ? permissions.includes(user?.role) : false;
-  }, [user]);
 
   const SEOData = useMemo(
     () => ({
@@ -495,7 +487,9 @@ const Manage = () => {
         maxDate={marathonConfig.marathonEndDate}
         minDate={marathonConfig.marathonStartDate}
       />
-      {canManage ? <Main date={date} /> : <AccessDenied />}
+      <MarathonAccess>
+        <Main date={date} />
+      </MarathonAccess>
     </>
   );
 };

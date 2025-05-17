@@ -7,11 +7,21 @@ import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import Container from '@/shared/components/Container';
 import EditMode from '@/components/Projects/Project/EditMode';
 import SEOConfig from '@/shared/components/SEO';
-import { createProjectSchema, useMyProjects, useProjectMutation } from '@/services/modules/projects';
-import { ENABLE_CREATE_PROJECT, MAX_PROJECTS } from '@/constants/project';
+import {
+  createProjectSchema,
+  useMyProjects,
+  useProjectMutation,
+} from '@/services/modules/projects';
+import {
+  MARATHON_ACCESS_MESSAGE,
+  MAX_PROJECTS,
+  PROJECT_LIMIT_MESSAGE,
+} from '@/constants/project';
+import { useMarathonAccess } from '@/features/projects';
 
 const ProjectPage = () => {
   const router = useRouter();
+  const hasMarathonAccess = useMarathonAccess();
 
   const SEOData = useMemo(
     () => ({
@@ -79,14 +89,14 @@ const ProjectPage = () => {
   };
 
   useEffect(() => {
-    if (!ENABLE_CREATE_PROJECT) {
-      toast.error('目前功能尚未開放');
+    if (!hasMarathonAccess) {
+      toast.error(MARATHON_ACCESS_MESSAGE);
       router.replace('/manage/projects');
       return;
     }
 
     if (projects && projects.length >= MAX_PROJECTS) {
-      toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
+      toast.error(PROJECT_LIMIT_MESSAGE);
       router.replace('/manage/projects');
     }
   }, [projects, router]);

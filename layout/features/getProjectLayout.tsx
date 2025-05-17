@@ -155,7 +155,7 @@ function ProjectLayout({ children, type }: ProjectLayoutProps) {
   );
 }
 
-function getProjectLayout(type: ProjectType = ProjectType.Public) {
+function getProjectLayout(type: ProjectType) {
   if (type === ProjectType.Public) {
     return (page: React.ReactElement) =>
       getBaseLayout(
