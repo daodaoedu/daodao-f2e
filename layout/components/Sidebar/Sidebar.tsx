@@ -1,8 +1,11 @@
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Button from '@/shared/components/Button';
 import Container from '@/shared/components/Container';
 import SidebarWrapper from '@/layout/components/Sidebar/SidebarWrapper';
 import Collapse from '@/shared/components/Collapse';
+import { usePromotion } from '@/contexts/Promotion';
+import { cn } from '@/utils/cn';
 import SidebarItem from './SidebarItem';
 import SidebarLink from './SidebarLink';
 import { SidebarItemType } from './type';
@@ -33,7 +36,17 @@ export default function SidebarLayout({
   backPath = '/',
   backText = '返回',
 }: SidebarLayoutProps) {
+  const { height } = usePromotion();
   const router = useRouter();
+  const [hasSticky, setHasSticky] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setHasSticky(window.scrollY > 0);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <div className="bg-primary-palest">
@@ -53,7 +66,15 @@ export default function SidebarLayout({
           )}
 
           {Array.isArray(items) && items.length > 0 && (
-            <SidebarWrapper className="mb-6 lg:mb-0 basis-full -order-1 lg:order-none lg:basis-80">
+            <SidebarWrapper
+              className={cn(
+                'sticky z-20 transition-transform',
+                'top-[var(--sidebar-top)] mb-6 basis-full -order-1',
+                'lg:top-[calc(var(--sidebar-top)+24px)] lg:mb-0 lg:basis-80 lg:order-none',
+                hasSticky && 'max-lg:scale-110'
+              )}
+              style={{ '--sidebar-top': `${height}px` } as React.CSSProperties}
+            >
               {items.map((item) =>
                 item.children ? (
                   <Collapse key={item.label}>
