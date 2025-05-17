@@ -13,6 +13,7 @@ interface AnchorPoint {
   right: string | undefined;
   top: string | undefined;
   bottom: string | undefined;
+  zIndex: number;
 }
 
 interface ToggleContextType {
@@ -38,6 +39,20 @@ export const useToggle = ({ errorMessage }: UseToggleProps = {}) => {
     );
   }
   return context;
+};
+
+const getMaxZIndex = (element: HTMLElement) => {
+  let maxZIndex = 30;
+  let current: HTMLElement | null = element;
+  while (current) {
+    const zIndex = window.getComputedStyle(current).getPropertyValue('z-index');
+    maxZIndex = Math.max(
+      maxZIndex,
+      Number.isNaN(parseInt(zIndex, 10)) ? 0 : parseInt(zIndex, 10)
+    );
+    current = current.parentElement;
+  }
+  return maxZIndex;
 };
 
 interface ToggleProviderProps {
@@ -104,6 +119,7 @@ export const ToggleProvider = ({
 
       const wrapperBox = wrapperDom.getBoundingClientRect();
       const triggerBox = triggerDom.getBoundingClientRect();
+      const maxZIndex = getMaxZIndex(triggerDom);
 
       if (!wrapperBox || !triggerBox) {
         return;
@@ -127,6 +143,7 @@ export const ToggleProvider = ({
         right: calcPX(!isOnLeft && screenWidth - anchorX - triggerBox.width),
         top: calcPX(isOnTop && anchorY),
         bottom: calcPX(!isOnTop && screenHeight - triggerBox.top),
+        zIndex: maxZIndex,
       });
     };
     handleScroll();
