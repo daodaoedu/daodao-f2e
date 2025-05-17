@@ -13,6 +13,7 @@ interface AnchorPoint {
   right: string | undefined;
   top: string | undefined;
   bottom: string | undefined;
+  zIndex: number;
 }
 
 interface ToggleContextType {
@@ -40,6 +41,20 @@ export const useToggle = ({ errorMessage }: UseToggleProps = {}) => {
   return context;
 };
 
+const getMaxZIndex = (element: HTMLElement) => {
+  let maxZIndex = 30;
+  let current: HTMLElement | null = element;
+  while (current) {
+    const zIndex = window.getComputedStyle(current).getPropertyValue('z-index');
+    maxZIndex = Math.max(
+      maxZIndex,
+      Number.isNaN(parseInt(zIndex, 10)) ? 0 : parseInt(zIndex, 10)
+    );
+    current = current.parentElement;
+  }
+  return maxZIndex;
+};
+
 interface ToggleProviderProps {
   children: React.ReactNode;
   defaultEnabled?: boolean;
@@ -53,25 +68,34 @@ export const ToggleProvider = ({
   isEnabled,
   onChange,
 }: ToggleProviderProps) => {
-  const [isOpen, setIsOpen] = useState(defaultEnabled);
+  const [isInternalOpen, setIsInternalOpen] = useState(defaultEnabled);
   const [isOpened, setIsOpened] = useState(!defaultEnabled);
   const [wrapperDom, setWrapperDom] = useState<HTMLElement | null>(null);
   const [triggerDom, setTriggerDom] = useState<HTMLElement | null>(null);
   const [anchorPoint, setAnchorPoint] = useState<AnchorPoint | undefined>(
     undefined
   );
+  const isControlled = typeof isEnabled === 'boolean';
+  const isOpen = isControlled ? isEnabled : isInternalOpen;
 
-  const value = useMemo(
-    () => ({
-      isOpen: isEnabled ?? isOpen,
+  const value = useMemo(() => {
+    const handleIsOpen = (_isOpen: boolean) => {
+      if (onChange) {
+        onChange(_isOpen);
+      }
+      if (!isControlled) {
+        setIsInternalOpen(_isOpen);
+      }
+    };
+    return {
+      isOpen,
       isOpened,
       anchorPoint,
-      setIsOpen: onChange ?? setIsOpen,
+      setIsOpen: handleIsOpen,
       setWrapperDom,
       setTriggerDom,
-    }),
-    [isOpen, isOpened, isEnabled, anchorPoint, onChange]
-  );
+    };
+  }, [isOpen, isOpened, isControlled, isEnabled, anchorPoint, onChange]);
 
   useLayoutEffect(() => {
     let timer: NodeJS.Timeout;
@@ -95,6 +119,7 @@ export const ToggleProvider = ({
 
       const wrapperBox = wrapperDom.getBoundingClientRect();
       const triggerBox = triggerDom.getBoundingClientRect();
+      const maxZIndex = getMaxZIndex(triggerDom);
 
       if (!wrapperBox || !triggerBox) {
         return;
@@ -118,6 +143,7 @@ export const ToggleProvider = ({
         right: calcPX(!isOnLeft && screenWidth - anchorX - triggerBox.width),
         top: calcPX(isOnTop && anchorY),
         bottom: calcPX(!isOnTop && screenHeight - triggerBox.top),
+        zIndex: maxZIndex,
       });
     };
     handleScroll();

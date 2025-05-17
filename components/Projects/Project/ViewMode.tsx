@@ -43,7 +43,7 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
         <Divider />
         <Title title="學習動機" />
         {
-          project?.motivation?.length && (
+          Array.isArray(project?.motivation) && project?.motivation?.length > 0 && (
             <Tags category="motivation_tags" tags={project?.motivation} />
           )
         }
@@ -57,7 +57,7 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
         <Divider />
         <Title title="學習方法與策略" />
         {
-          project?.strategy?.length && (
+          Array.isArray(project?.strategy) && project?.strategy?.length > 0 && (
             <Tags category="strategy_tags" tags={project?.strategy} />
           )
         }
@@ -78,7 +78,7 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
       <Panel className="bg-white">
         <h3 className="body-md font-medium mb-5">學習成果及呈現方式 *</h3>
         {
-          (project?.outcome?.length) && (
+          Array.isArray(project?.outcome) && project?.outcome?.length > 0 && (
             <Tags category="outcome_tags" tags={project?.outcome} />
           )
         }

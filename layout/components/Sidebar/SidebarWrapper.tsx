@@ -4,22 +4,24 @@ import { cn } from '@/utils/cn';
 interface SidebarWrapperProps {
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-function SidebarWrapper({ children, className }: SidebarWrapperProps) {
+function SidebarWrapper({ children, className, style }: SidebarWrapperProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [contentWidth, setContentWidth] = useState(0);
 
   useEffect(() => {
     const handleResize = () => {
-      if (!wrapperRef.current) {
+      const wrapperElement = wrapperRef.current;
+      if (!wrapperElement) {
         return;
       }
       if (window.innerWidth > 1023) {
         setContentWidth(0);
         return;
       }
-      const widths = Array.from(wrapperRef.current.children).map(
+      const widths = Array.from(wrapperElement.children).map(
         (el) => el.clientWidth
       );
       setContentWidth(Math.max(...widths));
@@ -27,7 +29,7 @@ function SidebarWrapper({ children, className }: SidebarWrapperProps) {
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [wrapperRef]);
+  }, []);
 
   return (
     <div
@@ -37,6 +39,7 @@ function SidebarWrapper({ children, className }: SidebarWrapperProps) {
         'lg:p-2 lg:shadow-none',
         className
       )}
+      style={style}
     >
       <div
         ref={wrapperRef}

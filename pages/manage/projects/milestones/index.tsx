@@ -1,5 +1,5 @@
 import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
 import { Skeleton } from '@mui/material';
@@ -19,7 +19,7 @@ import {
   useProjectMilestoneMutation,
   useProjectMilestones,
 } from '@/services/modules/projects';
-import CalendarIcon from '@/public/assets/icons/calendar.svg';
+import { useMilestonesDateRange } from '@/features/projects';
 
 const SkeletonMilestones = () => {
   return (
@@ -157,18 +157,17 @@ const useHandleShowForm = () => {
 
 const MilestonesContent = () => {
   const { formRef, isCreating, handleOpen, handleClose } = useHandleShowForm();
-  const [startDate, setStartDate] = useState(dayjs().startOf('day'));
-  const [endDate, setEndDate] = useState(dayjs().startOf('day').add(30, 'day'));
   const [filterType, setFilterType] = useState(FilterEnum.All);
   const [isAscending, setIsAscending] = useState(true);
   const { project } = useProject();
-  const isInitial = useRef(false);
 
   const {
     data: milestones,
     isLoading,
     mutate,
   } = useProjectMilestones(project.id);
+
+  const milestonesDateRange = useMilestonesDateRange(project.id);
 
   const { createMutation, updateMutation } = useProjectMilestoneMutation({
     projectId: project.id,
@@ -189,26 +188,6 @@ const MilestonesContent = () => {
     return isAscending ? sortedData : [...sortedData].reverse();
   }, [milestones, isAscending, filterType]);
 
-  useEffect(() => {
-    if (!milestones?.length || isInitial.current) return;
-    isInitial.current = true;
-
-    const milestoneStartDate = dayjs(milestones[0].startDate);
-    const milestoneEndDate = milestones.reduce(
-      (compareEndDate, milestone) => {
-        const currentEndDate = dayjs(milestone.endDate);
-
-        return compareEndDate.isAfter(currentEndDate)
-          ? compareEndDate
-          : currentEndDate;
-      },
-      milestoneStartDate
-    );
-
-    setStartDate(milestoneStartDate);
-    setEndDate(milestoneEndDate);
-  }, [milestones, isInitial]);
-
   return (
     <div>
       {isLoading ? (
@@ -223,18 +202,13 @@ const MilestonesContent = () => {
                 {!isMarathonProject && (
                   <div className="flex flex-col md:flex-row justify-between md:items-center gap-2 pb-2.5">
                     <div className="flex flex-col md:flex-row md:items-center gap-2">
-                      <p>時間設定：</p>
+                      <p>時間：</p>
                       <DateRangePicker
-                        startDate={startDate}
-                        endDate={endDate}
-                        disabledStartDate={project.version === 2}
-                        afterIcon={
-                          <CalendarIcon className="w-4 h-4 text-primary-base" />
-                        }
-                        minDate={dayjs().startOf('day')}
-                        maxDate={startDate.add(1, 'year')}
-                        onStartDateChange={setStartDate}
-                        onEndDateChange={setEndDate}
+                        startDate={milestonesDateRange.startDate ?? dayjs()}
+                        endDate={milestonesDateRange.endDate ?? dayjs()}
+                        disabledStartDate
+                        disabledEndDate
+                        className="-mx-3 p-2"
                       />
                     </div>
                     <Button
@@ -280,8 +254,8 @@ const MilestonesContent = () => {
                 <div className="p-2.5 bg-basic-100 flex flex-col gap-2 rounded-xl">
                   <MilestoneCard
                     ref={formRef}
-                    startDate={startDate}
-                    endDate={endDate}
+                    minDate={milestonesDateRange.minDate}
+                    maxDate={milestonesDateRange.maxDate}
                     projectId={projectId}
                     disabledChangeDate={isMarathonProject}
                     milestones={milestones}
@@ -299,8 +273,8 @@ const MilestonesContent = () => {
                 <DraggableMilestones
                   milestones={sortedMilestones}
                   projectId={projectId}
-                  startDate={startDate}
-                  endDate={endDate}
+                  minDate={milestonesDateRange.minDate}
+                  maxDate={milestonesDateRange.maxDate}
                   isAscending={isAscending}
                   onUpdate={updateMutation.trigger}
                   onReorder={updateMutation.trigger}

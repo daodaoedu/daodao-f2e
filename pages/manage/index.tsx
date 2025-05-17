@@ -11,14 +11,17 @@ import marathonConfig from '@/constants/marathon';
 import getManageLayout from '@/layout/features/getManageLayout';
 import useClickOutside from '@/hooks/useClickOutside';
 import SEOConfig from '@/shared/components/SEO';
-import AccessDenied from '@/shared/components/AccessDenied';
 import Button from '@/shared/components/Button';
 import Collapse from '@/shared/components/Collapse';
 import Dropdown from '@/shared/components/Dropdown';
 import ReviewCard from '@/components/Review/Card';
 import MilestoneItem from '@/components/Milestones/MilestoneItem';
-import { RoleEnum, useAuth } from '@/contexts/Auth';
-import { SelectProjectModal } from '@/features/projects';
+import {
+  SelectProjectModal,
+  MarathonAccess,
+  EmptyProject,
+  useMilestonesDateRange,
+} from '@/features/projects';
 import { cn } from '@/utils/cn';
 import ReviewForm from '@/components/Review/Form';
 import NoteForm from '@/components/Note/Form';
@@ -32,8 +35,9 @@ import {
   useProjectReviewMutation,
   useProjectReviews,
 } from '@/services/modules/projects';
-import { ENABLE_CREATE_PROJECT, MAX_PROJECTS } from '@/constants/project';
 import Image from '@/shared/components/Image';
+import useCreateProject from '@/features/projects/hooks/useCreateProject';
+import MilestoneCard from '@/components/Milestones/MilestoneCard';
 
 const HEADER_TITLES = [
   '今天的每一小步，都在建立你的學習動能！',
@@ -74,6 +78,11 @@ const Header = () => {
     toast.success('新增成功');
     setIsOpen(false);
   };
+  const { createMutation } = useProjectMilestoneMutation({
+    projectId,
+    onCreated: handleCreated,
+  });
+
   const { createMutation: createReview } = useProjectReviewMutation({
     projectId,
     onCreated: handleCreated,
@@ -86,22 +95,9 @@ const Header = () => {
     projectId,
     onCreated: handleCreated,
   });
-  const { data: projects } = useMyProjects();
 
-  const handleCreateProject = () => {
-    if (!ENABLE_CREATE_PROJECT) {
-      toast.error('目前功能尚未開放');
-      return;
-    }
-
-    if (!Array.isArray(projects)) {
-      toast.error('目前功能異常，請稍後再試');
-    } else if (projects.length >= MAX_PROJECTS) {
-      toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
-    } else {
-      router.push('/manage/projects/create');
-    }
-  };
+  const { handleCreateProject } = useCreateProject();
+  const milestonesDateRange = useMilestonesDateRange(projectId);
 
   const handleOpenModal = (_modalType: ModalType) => {
     setIsOpen(true);
@@ -114,8 +110,8 @@ const Header = () => {
       onClick: handleCreateProject,
     },
     {
-      label: '新增任務',
-      onClick: () => toast.error('功能尚未開放'),
+      label: '新增里程碑',
+      onClick: () => handleOpenModal(ModalType.Task),
     },
     {
       label: '新增覆盤',
@@ -204,6 +200,19 @@ const Header = () => {
         onRemovedDOM={() => setModalType(null)}
         renderContent={(project) => (
           <>
+            {modalType === ModalType.Task && (
+              <MilestoneCard
+                minDate={milestonesDateRange.minDate}
+                maxDate={milestonesDateRange.maxDate}
+                projectId={project.id}
+                disabledChangeDate={!!project.eventId}
+                milestones={project.milestones}
+                isEditable
+                defaultEditing
+                onCancel={() => setIsOpen(false)}
+                onCreate={createMutation.trigger}
+              />
+            )}
             {modalType === ModalType.Review && (
               <ReviewForm
                 projectId={project.id}
@@ -320,30 +329,35 @@ interface ProjectProps {
   href: string;
   title: string;
   children: React.ReactNode;
+  percentage?: number;
   defaultOpen?: boolean;
 }
 
-const Project = ({ href, title, children, defaultOpen }: ProjectProps) => {
-  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    window.open(href, '_blank');
-  };
-
+const Project = ({
+  href,
+  title,
+  children,
+  percentage,
+  defaultOpen,
+}: ProjectProps) => {
   return (
     <div
       className={cn(
         'relative mb-6 px-3 py-4 bg-white rounded-2xl',
-        'after:content-[""] after:absolute after:top-0 after:left-3',
-        'after:h-[5px] after:w-2/5 md:after:w-1/2',
+        'after:content-[""] after:absolute after:top-0 after:left-3 after:right-3',
+        'after:h-[5px] after:transition-transform after:origin-left',
+        'after:scale-x-[var(--percentage)]',
         'after:bg-primary-base after:rounded-full after:z-10'
       )}
+      style={{ '--percentage': `${percentage}%` } as React.CSSProperties}
     >
       <Collapse defaultOpen={defaultOpen}>
         <Collapse.Toggle className="w-full px-3 py-2 justify-between" withIcon>
           <Button
+            as="link"
+            href={href}
+            target="_blank"
             className="flex items-center gap-2 body-md text-basic-500"
-            onClick={handleClick}
           >
             {title}
             <GoArrowUpRight className="stroke-1" />
@@ -410,42 +424,55 @@ const Main = ({ date }: { date: Dayjs }) => {
   return (
     <>
       <ul>
-        {todayProjects.map((project, index) => (
-          <li key={project.id} className="opacity-100 transition-opacity">
-            <Project
-              title={project.title}
-              href={`/manage/projects/detail?id=${project.id}`}
-              defaultOpen={index === 0}
-            >
-              {Array.isArray(project?.milestones) &&
-              project.milestones.length ? (
-                project.milestones.map((milestone) => (
-                  <div key={milestone.id} className="mb-2 last-of-type:mb-0">
-                    <MilestoneItem
-                      key={milestone.id}
-                      milestone={milestone}
-                      milestones={project.originalMilestones}
-                      projectId={project.id}
-                      onRefreshData={mutate}
-                      onUpdate={updateMutation.trigger}
-                      isEditable
+        {todayProjects.length ? (
+          todayProjects.map((project, index) => (
+            <li key={project.id} className="opacity-100 transition-opacity">
+              <Project
+                title={project.title}
+                href={`/manage/projects/detail?id=${project.id}`}
+                defaultOpen={index === 0}
+                percentage={
+                  Array.isArray(project?.originalMilestones) &&
+                  project.originalMilestones.length
+                    ? (project.originalMilestones.filter((m) => m.isCompleted)
+                        .length /
+                        project.originalMilestones.length) *
+                      100
+                    : 0
+                }
+              >
+                {Array.isArray(project?.milestones) &&
+                project.milestones.length ? (
+                  project.milestones.map((milestone) => (
+                    <div key={milestone.id} className="mb-2 last-of-type:mb-0">
+                      <MilestoneItem
+                        key={milestone.id}
+                        milestone={milestone}
+                        milestones={project.originalMilestones}
+                        projectId={project.id}
+                        onRefreshData={mutate}
+                        onUpdate={updateMutation.trigger}
+                        isEditable
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center justify-center">
+                    <div>{date.format('YYYY/MM/DD')} 沒有里程碑</div>
+                    <Image
+                      src={AccessDeniedImg.src}
+                      alt="沒有里程碑"
+                      height="320px"
+                      className="object-contain h-80"
                     />
                   </div>
-                ))
-              ) : (
-                <div className="flex flex-col items-center justify-center">
-                  <div>{date.format('YYYY/MM/DD')} 沒有里程碑</div>
-                  <Image
-                    src={AccessDeniedImg.src}
-                    alt="沒有里程碑"
-                    height="320px"
-                    className="object-contain h-80"
-                  />
-                </div>
-              )}
-            </Project>
-          </li>
-        ))}
+                )}
+              </Project>
+            </li>
+          ))
+        ) : (
+          <EmptyProject />
+        )}
       </ul>
 
       {Array.isArray(projects) &&
@@ -458,18 +485,7 @@ const Main = ({ date }: { date: Dayjs }) => {
 
 const Manage = () => {
   const [date, setDate] = useState<Dayjs>(dayjs().startOf('day'));
-  const { user } = useAuth();
   const { pathname } = useRouter();
-  const canManage = useMemo(() => {
-    const permissions = [
-      RoleEnum.MarathonApplicant,
-      RoleEnum.MarathonParticipant,
-      RoleEnum.Mentor,
-      RoleEnum.Admin,
-      RoleEnum.SuperAdmin,
-    ];
-    return user ? permissions.includes(user?.role) : false;
-  }, [user]);
 
   const SEOData = useMemo(
     () => ({
@@ -495,7 +511,9 @@ const Manage = () => {
         maxDate={marathonConfig.marathonEndDate}
         minDate={marathonConfig.marathonStartDate}
       />
-      {canManage ? <Main date={date} /> : <AccessDenied />}
+      <MarathonAccess>
+        <Main date={date} />
+      </MarathonAccess>
     </>
   );
 };

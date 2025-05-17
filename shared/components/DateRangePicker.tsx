@@ -65,8 +65,8 @@ interface DateRangePickerProps {
   disabledEndDate?: boolean;
   className?: string;
   calendarClassName?: string;
-  onStartDateChange: (date: Dayjs) => void;
-  onEndDateChange: (date: Dayjs) => void;
+  onStartDateChange?: (date: Dayjs) => void;
+  onEndDateChange?: (date: Dayjs) => void;
 }
 
 const DateRangePicker = ({
@@ -90,15 +90,15 @@ const DateRangePicker = ({
 
   const handleStartDateChange = (date: Dayjs) => {
     if (disabledEndDate) {
-      onStartDateChange(date);
+      onStartDateChange?.(date);
       setIsOpen(false);
       return;
     }
     if (endDate.isBefore(date)) {
-      onEndDateChange(date);
-      onStartDateChange(endDate);
+      onEndDateChange?.(date);
+      onStartDateChange?.(endDate);
     } else {
-      onStartDateChange(date);
+      onStartDateChange?.(date);
     }
     prevStartDate.current = date;
     modeRef.current = 'end';
@@ -106,13 +106,13 @@ const DateRangePicker = ({
 
   const handleEndDateChange = (date: Dayjs) => {
     if (disabledStartDate) {
-      onEndDateChange(date);
+      onEndDateChange?.(date);
     } else if (prevStartDate.current.isAfter(date)) {
-      onStartDateChange(date);
-      onEndDateChange(prevStartDate.current);
+      onStartDateChange?.(date);
+      onEndDateChange?.(prevStartDate.current);
     } else {
-      onStartDateChange(prevStartDate.current);
-      onEndDateChange(date);
+      onStartDateChange?.(prevStartDate.current);
+      onEndDateChange?.(date);
     }
     setIsOpen(false);
     modeRef.current = 'start';
@@ -130,6 +130,7 @@ const DateRangePicker = ({
   };
 
   const handleToggle = () => {
+    if (disabledChangeDate) return;
     setIsOpen(!isOpen);
     modeRef.current = 'start';
   };
@@ -169,8 +170,12 @@ const DateRangePicker = ({
         className={cn(
           'flex items-center gap-3 px-4 py-3',
           'border border-solid border-basic-200 rounded-lg',
+          disabledChangeDate &&
+            'cursor-default border-transparent disabled:text-basic-400 disabled:opacity-100',
           className
         )}
+        animation={disabledChangeDate ? 'none' : 'ripple'}
+        isDisabled={disabledChangeDate}
         onClick={handleToggle}
       >
         <span>{startDate.format('YYYY/MM/DD')}</span>

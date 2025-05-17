@@ -198,14 +198,16 @@ function Modal({
             open={!removeDOM}
             className={cn(
               'relative top-[var(--dialog-top)] my-0 p-5 w-full rounded-lg bg-white',
-              'pointer-events-auto animate-distance-100dvh duration-500',
+              'pointer-events-auto animate-distance-100dvh duration-500 transition-opacity',
               size === ModalSize.Small &&
                 'sm:relative sm:top-12 sm:m-auto sm:p-10 sm:max-w-96',
               size === ModalSize.Medium &&
                 'md:relative md:top-12 md:m-auto md:p-10 md:max-w-screen-md',
               size === ModalSize.Large &&
                 'lg:relative lg:top-12 lg:m-auto lg:p-10 lg:max-w-screen-lg',
-              isOpen ? 'animate-slide-y-in' : 'animate-slide-y-out',
+              isOpen
+                ? 'animate-slide-y-in opacity-100 pointer-events-auto'
+                : 'animate-slide-y-out opacity-0 pointer-events-none',
               className
             )}
             aria-labelledby={title ? modalId : undefined}

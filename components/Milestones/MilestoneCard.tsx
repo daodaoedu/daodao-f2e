@@ -31,16 +31,16 @@ import { getDefaultMilestone } from './Shared';
 
 interface MilestoneCardProps {
   projectId: string;
-  startDate?: dayjs.Dayjs;
-  endDate?: dayjs.Dayjs;
+  minDate?: dayjs.Dayjs;
+  maxDate?: dayjs.Dayjs;
   milestone?: ProjectMilestoneSchema;
   milestones?: ProjectMilestoneSchema[];
   disabledChangeDate?: boolean;
   isEditable?: boolean;
   defaultEditing?: boolean;
   onCancel?: () => void;
-  onCreate?: (request: CreateProjectMilestoneSchema) => void | Promise<void>;
-  onUpdate?: (request: UpdateProjectMilestoneSchema) => void | Promise<void>;
+  onCreate?: (request: CreateProjectMilestoneSchema) => void;
+  onUpdate?: (request: UpdateProjectMilestoneSchema) => void;
 }
 
 export interface MilestoneFormRef {
@@ -50,8 +50,8 @@ export interface MilestoneFormRef {
 function MilestoneCard(
   {
     projectId,
-    startDate,
-    endDate,
+    minDate,
+    maxDate,
     milestone,
     milestones = [],
     disabledChangeDate,
@@ -116,8 +116,8 @@ function MilestoneCard(
     defaultValues: getDefaultMilestone({
       projectId,
       milestones: Array.isArray(milestones) ? milestones : [],
-      startDate: startDate || dayjs(),
-      endDate: endDate || dayjs(),
+      minDate: minDate || dayjs(),
+      maxDate: maxDate || dayjs(),
     }),
   });
 
@@ -264,14 +264,14 @@ function MilestoneCard(
                 ? dayjs(methods.watch('endDate'))
                 : dayjs(milestone?.endDate)
             }
-            minDate={startDate}
-            maxDate={endDate}
+            minDate={minDate}
+            maxDate={maxDate}
             disabledStartDate={disabledChangeDate || !isEditing}
             disabledEndDate={disabledChangeDate || !isEditing}
             separator={<FaArrowRight className="text-basic-300" />}
             className={cn(
               '-mx-1 px-1 py-0 gap-1.5 body-sm text-basic-300 rounded',
-              !isEditing && 'cursor-default border-transparent'
+              !isEditing && 'disabled:text-basic-300'
             )}
             onStartDateChange={(d) => {
               methods.setValue('startDate', d.format('YYYY/MM/DD'), {

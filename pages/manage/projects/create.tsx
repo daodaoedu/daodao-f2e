@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 
@@ -7,8 +7,11 @@ import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import Container from '@/shared/components/Container';
 import EditMode from '@/components/Projects/Project/EditMode';
 import SEOConfig from '@/shared/components/SEO';
-import { createProjectSchema, useMyProjects, useProjectMutation } from '@/services/modules/projects';
-import { ENABLE_CREATE_PROJECT, MAX_PROJECTS } from '@/constants/project';
+import {
+  createProjectSchema,
+  useProjectMutation,
+} from '@/services/modules/projects';
+import { useCreateProject } from '@/features/projects';
 
 const ProjectPage = () => {
   const router = useRouter();
@@ -25,7 +28,6 @@ const ProjectPage = () => {
     [router?.asPath]
   );
   const [formData, setFormData] = useState<Partial<Project>>(DEFAULT_PROJECT);
-  const { data: projects } = useMyProjects();
   const { createMutation } = useProjectMutation({
     onCreated: (data) => {
       if (data?.id) {
@@ -78,18 +80,7 @@ const ProjectPage = () => {
     });
   };
 
-  useEffect(() => {
-    if (!ENABLE_CREATE_PROJECT) {
-      toast.error('目前功能尚未開放');
-      router.replace('/manage/projects');
-      return;
-    }
-
-    if (projects && projects.length >= MAX_PROJECTS) {
-      toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
-      router.replace('/manage/projects');
-    }
-  }, [projects, router]);
+  const { canCreateProject } = useCreateProject();
 
   return (
     <ProtectedComponent>
@@ -97,7 +88,7 @@ const ProjectPage = () => {
 
       <Container className="flex justify-center pb-12 px-4" autoMinHeight>
         <div className="max-w-3xl">
-          {Array.isArray(projects) && projects.length < MAX_PROJECTS && (
+          {canCreateProject && (
             <EditMode
               project={formData}
               onClickCancel={handleOnClickCancel}

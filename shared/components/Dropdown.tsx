@@ -1,7 +1,9 @@
+import { useId } from 'react';
 import { ToggleProvider, useToggle } from '@/contexts/Toggle';
 import { cn } from '@/utils/cn';
 import useClickOutside from '@/hooks/useClickOutside';
 import Button, { ButtonProps } from './Button';
+import Portal from './Portal';
 
 interface DropdownContentProps {
   as?: React.ElementType;
@@ -98,25 +100,29 @@ interface DropdownListProps {
 }
 
 function List({ children, className }: DropdownListProps) {
+  const id = useId();
+  const rootId = `dropdown-list-${id}`;
   const { isOpen, anchorPoint, setWrapperDom } = useToggle({
     errorMessage: 'Dropdown.List must be used within an Dropdown',
   });
   const isOnTop = anchorPoint?.top;
 
   return (
-    <ul
-      ref={(el) => setWrapperDom(el)}
-      className={cn(
-        'group fixed p-2 z-30 rounded-lg shadow-lg bg-white transition-[transform,opacity]',
-        className,
-        isOnTop ? 'origin-top' : 'origin-bottom',
-        isOpen ? 'opacity-100 scale-y-100' : 'opacity-30 scale-y-0'
-      )}
-      style={anchorPoint}
-      aria-hidden={!isOpen}
-    >
-      {children}
-    </ul>
+    <Portal rootId={rootId}>
+      <ul
+        ref={(el) => setWrapperDom(el)}
+        className={cn(
+          'group fixed p-2 rounded-lg shadow-lg bg-white transition-[transform,opacity]',
+          className,
+          isOnTop ? 'origin-top' : 'origin-bottom',
+          isOpen ? 'opacity-100 scale-y-100' : 'opacity-30 scale-y-0'
+        )}
+        style={anchorPoint}
+        aria-hidden={!isOpen}
+      >
+        {children}
+      </ul>
+    </Portal>
   );
 }
 
