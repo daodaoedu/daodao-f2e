@@ -79,12 +79,7 @@ const Projects = () => {
           md:max-w-[860px] mx-auto box-border flex flex-col gap-6"
         >
           <GoBackButton
-            onClick={() => router.push({
-              pathname: '/manage',
-              query: {
-                id: 'island'
-              }
-            })}
+            onClick={() => router.push('/manage')}
             icon={
               (
                 <KeyboardArrowLeftIcon
