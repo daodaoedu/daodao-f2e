@@ -4,18 +4,33 @@ import ArrowIcon from '@/public/assets/icons/arrow.svg';
 import { isServer } from '@/utils/helper';
 import { cn } from '@/utils/cn';
 
-const useCarouselTouch = (onNext: () => void, onPrev: () => void) => {
-  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+type PointerEventType =
+  | React.TouchEvent<HTMLDivElement>
+  | React.MouseEvent<HTMLDivElement>;
 
-  const handleTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
-    setTouchStartX(e.touches[0].clientX);
+const useCarouselPointer = (onNext: () => void, onPrev: () => void) => {
+  const [startX, setStartX] = useState<number | null>(null);
+  const minSwipeDistance = 50;
+
+  const handlePointStart = (e: PointerEventType) => {
+    if ('touches' in e) {
+      setStartX(e.touches[0].clientX);
+    } else {
+      setStartX(e.clientX);
+    }
   };
 
-  const handleTouchMove: React.TouchEventHandler<HTMLDivElement> = (e) => {
-    if (!touchStartX) return;
-    const touchMoveX = e.touches[0].clientX;
-    const deltaX = touchMoveX - touchStartX;
-    const minSwipeDistance = 50;
+  const handlePointMove = (e: PointerEventType) => {
+    if (!startX) return;
+
+    let currentX: number;
+    if ('touches' in e) {
+      currentX = e.touches[0].clientX;
+    } else {
+      currentX = e.clientX;
+    }
+
+    const deltaX = currentX - startX;
 
     if (Math.abs(deltaX) > minSwipeDistance) {
       if (deltaX < 0) {
@@ -23,15 +38,15 @@ const useCarouselTouch = (onNext: () => void, onPrev: () => void) => {
       } else {
         onPrev();
       }
-      setTouchStartX(null); // 避免多次觸發
+      setStartX(null); // 避免多次觸發
     }
   };
 
-  const handleTouchEnd = () => {
-    setTouchStartX(null);
+  const handlePointEnd = () => {
+    setStartX(null);
   };
 
-  return { handleTouchStart, handleTouchMove, handleTouchEnd };
+  return { handlePointStart, handlePointMove, handlePointEnd };
 };
 
 interface CarouselProps<T> {
@@ -101,8 +116,8 @@ export default function Carousel<T>({
     }
   };
 
-  const { handleTouchStart, handleTouchMove, handleTouchEnd } =
-    useCarouselTouch(handleNext, handlePrev);
+  const { handlePointStart, handlePointMove, handlePointEnd } =
+    useCarouselPointer(handleNext, handlePrev);
 
   useEffect(() => {
     const wrapperElement = wrapperRef.current;
@@ -117,12 +132,7 @@ export default function Carousel<T>({
   }, [items]);
 
   return (
-    <div
-      role="region"
-      aria-roledescription="carousel"
-      aria-label={title}
-      onKeyDown={handleKeyDown}
-    >
+    <div>
       <div className="px-6 lg:px-60 flex justify-between items-center">
         <h2 className="heading-md text-basic-500" id={titleId}>
           {title}
@@ -155,10 +165,17 @@ export default function Carousel<T>({
         </div>
       </div>
       <div
+        role="region"
+        aria-roledescription="carousel"
+        aria-label={title}
         className="mt-9 overflow-x-hidden select-none"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        onKeyDown={handleKeyDown}
+        onMouseDown={handlePointStart}
+        onMouseMove={handlePointMove}
+        onMouseUp={handlePointEnd}
+        onTouchStart={handlePointStart}
+        onTouchMove={handlePointMove}
+        onTouchEnd={handlePointEnd}
         aria-live="polite"
       >
         <ul
