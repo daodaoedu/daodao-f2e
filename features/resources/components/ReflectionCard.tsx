@@ -1,6 +1,6 @@
-import DefaultAvatarIcon from "@/public/assets/icons/default-avatar.svg";
-import StarIcon from "@/public/assets/icons/star.svg";
-import ShareIcon from "@/public/assets/icons/share.svg";
+import DefaultAvatarIcon from '@/public/assets/icons/default-avatar.svg';
+import StarIcon from '@/public/assets/icons/star.svg';
+import ShareIcon from '@/public/assets/icons/share.svg';
 
 type ReflectionCardProps = {
   userName?: string;
@@ -10,13 +10,13 @@ type ReflectionCardProps = {
   buttonContent?: string;
 };
 
-export const ReflectionCard = (props: ReflectionCardProps) => {
+export default function ReflectionCard(props: ReflectionCardProps) {
   const {
-    userName = "小許",
+    userName = '小許',
     userAvatar = <DefaultAvatarIcon className="scale-150 origin-top-left" />,
     stars = 4,
-    content = "學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得",
-    buttonContent = " 自然語言處理 Naturalewqeqwe",
+    content = '學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得',
+    buttonContent = ' 自然語言處理 Naturalewqeqwe',
   } = props;
 
   return (
@@ -32,7 +32,7 @@ export const ReflectionCard = (props: ReflectionCardProps) => {
             {[1, 2, 3, 4, 5].map((unused, idx) => (
               <StarIcon
                 key={unused}
-                color={stars >= idx + 1 ? "#FF9526" : "#DBDBDB"}
+                color={stars >= idx + 1 ? '#FF9526' : '#DBDBDB'}
               />
             ))}
           </div>
@@ -50,4 +50,4 @@ export const ReflectionCard = (props: ReflectionCardProps) => {
       </button>
     </div>
   );
-};
+}

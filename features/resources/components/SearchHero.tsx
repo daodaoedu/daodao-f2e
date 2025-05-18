@@ -1,10 +1,10 @@
-import Image from "@/shared/components/Image";
-import LensIcon from "@/public/assets/icons/lens.svg";
-import { useRef } from "react";
+import { useRef } from 'react';
+import Image from '@/shared/components/Image';
+import LensIcon from '@/public/assets/icons/lens.svg';
+import { SEARCH_TAGS } from '@/constants/category';
+import Button from '@/shared/components/Button';
 
-export const SearchHero = () => {
-  const tagList = [1, 2, 3, 4, 5, 6, 7];
-
+export default function SearchHero() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onClickFocus = () => {
@@ -27,7 +27,7 @@ export const SearchHero = () => {
           className="h-full w-[calc(100%+1px)] absolute top-0 right-0 hidden md:block"
           style={{
             background:
-              "linear-gradient(270.27deg, rgba(243, 252, 252, 0) 16.33%, #F3FCFC 96.08%), rgba(22, 185, 179, 0.3)",
+              'linear-gradient(270.27deg, rgba(243, 252, 252, 0) 16.33%, #F3FCFC 96.08%), rgba(22, 185, 179, 0.3)',
           }}
         />
       </div>
@@ -65,28 +65,23 @@ export const SearchHero = () => {
               熱門標籤
             </div>
             <div className="flex flex-wrap gap-1 m-[0.5rem_0_1.25rem_0] md:m-[0_0_0_0.75rem] md:gap-2">
-              {tagList.map((item) => {
+              {SEARCH_TAGS['全部'].map((item) => {
                 return (
-                  <div
+                  <button
                     key={item}
-                    className="h-8 w-[3.75rem] text-primary-base flex items-center justify-center rounded-2xl bg-white md:h-[1.8125rem]"
-                    // border-[1px] border-primary-base 沒用
-                    style={{ border: "1px solid #16B9B3" }}
+                    className="px-3 py-1 text-primary-base bg-white border border-solid border-primary-base rounded-full"
                   >
                     <span className="font-bold">#</span>
                     {item}
-                  </div>
+                  </button>
                 );
               })}
             </div>
           </div>
 
-          <button
-            type="button"
-            className="w-full h-10 text-[1.125rem] bg-primary-base text-white rounded-full flex items-center justify-center md:w-[7.75rem] md:mt-6"
-          >
+          <Button variant="solid" color="primary" className="w-max mt-6">
             + 分享資源
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -94,4 +89,4 @@ export const SearchHero = () => {
       <div className="hidden md:h-[19.0625rem] lg:block lg:min-w-[28.6875rem]" />
     </>
   );
-};
+}

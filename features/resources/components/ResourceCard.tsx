@@ -1,11 +1,11 @@
-import Image from "@/shared/components/Image";
+import Image from '@/shared/components/Image';
 
-import Hot from "@/public/assets/icons/hot.svg";
-import Group from "@/public/assets/icons/group.svg";
-import View from "@/public/assets/icons/view.svg";
-import Comment from "@/public/assets/icons/comment.svg";
-import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
-import More from "@/public/assets/icons/more.svg";
+import Hot from '@/public/assets/icons/hot.svg';
+import Group from '@/public/assets/icons/group.svg';
+import View from '@/public/assets/icons/view.svg';
+import Comment from '@/public/assets/icons/comment.svg';
+import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
+import More from '@/public/assets/icons/more.svg';
 
 // Props 需要對應真實資料
 type CardProps = {
@@ -21,16 +21,16 @@ type CardProps = {
   commentCount?: number;
 };
 
-export const ResourceCard = (props: CardProps) => {
+export default function ResourceCard(props: CardProps) {
   const {
-    userName = "小許",
+    userName = '小許',
     userAvatar = <DefaultAvatar />,
-    time = "2024.12.10",
-    title = "自然語言處理 Natural Language Progress",
-    content = "資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹",
-    tags = ["1", "2", "3"],
-    label = ["熱門", "最新", "人工智慧"],
-    level = "初級",
+    time = '2024.12.10',
+    title = '自然語言處理 Natural Language Progress',
+    content = '資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹',
+    tags = ['1', '2', '3'],
+    label = ['熱門', '最新', '人工智慧'],
+    level = '初級',
     viewCount = 9999,
     commentCount = 12,
   } = props;
@@ -85,7 +85,7 @@ export const ResourceCard = (props: CardProps) => {
               <div
                 key={tag}
                 className="h-8 w-[3.75rem] text-primary-base flex items-center justify-center rounded-2xl bg-white md:h-[1.8125rem]"
-                style={{ border: "1px solid #16B9B3" }}
+                style={{ border: '1px solid #16B9B3' }}
               >
                 <span className="font-bold">#</span>
                 {tag}
@@ -103,7 +103,7 @@ export const ResourceCard = (props: CardProps) => {
           <div className="flex">
             <div
               className="flex mr-2"
-              style={{ borderRight: "1px solid #DBDBDB" }}
+              style={{ borderRight: '1px solid #DBDBDB' }}
             >
               <Group />
               <div className="ml-2 mr-1">適合</div>
@@ -125,4 +125,4 @@ export const ResourceCard = (props: CardProps) => {
       </section>
     </section>
   );
-};
+}

@@ -1,18 +1,18 @@
-import { CategoryList } from "@/constants/search";
+import { CategoryList } from '@/constants/search';
 
-import { SearchHero } from "@/components/new-search/SearchHero";
-import { CardContainer } from "@/components/new-search/CardContainer";
-import { ResourceCard } from "@/components/new-search/ResourceCard";
-import { CategoryCard } from "@/components/new-search/CategoryCard";
-import { ReflectionCard } from "@/components/new-search/ReflectionCard";
-import { SharerCard } from "@/components/new-search/SharerCard";
+import CardContainer from './CardContainer';
+import CategoryCard from './CategoryCard';
+import ResourceCard from './ResourceCard';
+import ReflectionCard from './ReflectionCard';
+import SharerCard from './SharerCard';
+import SearchHero from './SearchHero';
 
-export const NewSearch = () => {
+export default function Search() {
   const reflectionList = [1, 2, 3, 4, 5, 6, 7];
   const sharerList = [1, 2, 3, 4, 5, 6];
 
   const onClickResources = () => {
-    console.log("all resources");
+    console.log('all resources');
   };
 
   return (
@@ -63,9 +63,9 @@ export const NewSearch = () => {
           type="select"
           childWrapperClassName="flex gap-[1.4375rem] overflow-x-scroll pr-5 mr-[-1.25rem] md:pr-0 md:mr-0"
         >
-          {reflectionList.map((r) => {
-            return <ReflectionCard key={r} />;
-          })}
+          {reflectionList.map((r) => (
+            <ReflectionCard key={r} />
+          ))}
         </CardContainer>
       </section>
 
@@ -76,11 +76,11 @@ export const NewSearch = () => {
           type="select"
           childWrapperClassName="flex gap-[1.4375rem] overflow-x-scroll pr-5 mr-[-1.25rem] md:pr-0 md:mr-0"
         >
-          {sharerList.map((s, idx) => {
-            return <SharerCard key={s} order={idx + 1} />;
-          })}
+          {sharerList.map((s, idx) => (
+            <SharerCard key={s} order={idx + 1} />
+          ))}
         </CardContainer>
       </section>
     </>
   );
-};
+}

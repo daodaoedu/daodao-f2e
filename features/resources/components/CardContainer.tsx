@@ -1,23 +1,23 @@
-import { useEffect, useRef, useState, Children } from "react";
+import { useEffect, useRef, useState, Children } from 'react';
 
-import { cn } from "@/utils/cn";
-import ArrowIcon from "@/public/assets/icons/arrow.svg";
+import { cn } from '@/utils/cn';
+import ArrowIcon from '@/public/assets/icons/arrow.svg';
 
 type CardContainerProps = {
   title: string;
   children: React.ReactNode;
   className?: string;
   childWrapperClassName?: string;
-  type?: "all" | "select";
+  type?: 'all' | 'select';
   subtitle?: string;
   onClickRedirect?: () => void;
 };
 
-export const CardContainer = (props: CardContainerProps) => {
+export default function CardContainer(props: CardContainerProps) {
   const {
-    className = "",
-    childWrapperClassName = "",
-    type = "all",
+    className = '',
+    childWrapperClassName = '',
+    type = 'all',
     title,
     subtitle,
     onClickRedirect,
@@ -32,20 +32,20 @@ export const CardContainer = (props: CardContainerProps) => {
 
   const onChangeSelectionIdx = (
     e: React.MouseEvent,
-    direction: "prev" | "next"
+    direction: 'prev' | 'next'
   ) => {
     e.preventDefault();
 
-    let newIdx = direction === "prev" ? curIdx - 1 : curIdx + 1;
+    let newIdx = direction === 'prev' ? curIdx - 1 : curIdx + 1;
     if (newIdx < 0) newIdx = 0;
     if (newIdx >= cardRefs.current.length) newIdx = cardRefs.current.length - 1;
 
     setCurIdx(newIdx);
 
     cardRefs.current[newIdx]?.scrollIntoView({
-      behavior: "smooth",
-      inline: "start", // 對齊左邊
-      block: "nearest", // 最近的邊緣
+      behavior: 'smooth',
+      inline: 'start', // 對齊左邊
+      block: 'nearest', // 最近的邊緣
     });
   };
 
@@ -81,7 +81,7 @@ export const CardContainer = (props: CardContainerProps) => {
         </div>
 
         {/* 導向到全部頁面 */}
-        {type === "all" && (
+        {type === 'all' && (
           <button
             type="button"
             className="flex gap-2 items-center justify-center text-xl leading-[1.875rem] text-basic-300 font-medium"
@@ -93,52 +93,49 @@ export const CardContainer = (props: CardContainerProps) => {
         )}
 
         {/* 頁面選取行為 */}
-        {type === "select" && (
+        {type === 'select' && (
           <div className="flex items-center justify-center gap-1">
             <button
               type="button"
               className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center rotate-180",
+                'w-12 h-12 rounded-full flex items-center justify-center rotate-180',
                 isFirstInView
-                  ? "bg-basic-100"
-                  : "bg-white border border-primary-lightest"
+                  ? 'bg-basic-100'
+                  : 'bg-white border border-primary-lightest'
               )}
-              onClick={(e) => onChangeSelectionIdx(e, "prev")}
+              onClick={(e) => onChangeSelectionIdx(e, 'prev')}
             >
-              <ArrowIcon color={isFirstInView ? "#92989A" : "#16B9B3"} />
+              <ArrowIcon color={isFirstInView ? '#92989A' : '#16B9B3'} />
             </button>
             <button
               type="button"
               className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center ",
+                'w-12 h-12 rounded-full flex items-center justify-center ',
                 isLastInView
-                  ? "bg-basic-100"
-                  : "bg-white border border-primary-lightest"
+                  ? 'bg-basic-100'
+                  : 'bg-white border border-primary-lightest'
               )}
-              onClick={(e) => onChangeSelectionIdx(e, "next")}
+              onClick={(e) => onChangeSelectionIdx(e, 'next')}
             >
-              <ArrowIcon color={isLastInView ? "#92989A" : "#16B9B3"} />
+              <ArrowIcon color={isLastInView ? '#92989A' : '#16B9B3'} />
             </button>
           </div>
         )}
       </div>
 
       <div className={childWrapperClassName}>
-        {type === "all" && children}
-        {type === "select" &&
-          Children.map(children, (child, idx) => {
-            return (
-              <div
-                key={JSON.stringify(child)}
-                ref={(el: HTMLDivElement | null) => {
-                  cardRefs.current[idx] = el;
-                }}
-              >
-                {child}
-              </div>
-            );
-          })}
+        {type === 'all' && children}
+        {type === 'select' &&
+          Children.map(children, (child, idx) => (
+            <div
+              ref={(el: HTMLDivElement | null) => {
+                cardRefs.current[idx] = el;
+              }}
+            >
+              {child}
+            </div>
+          ))}
       </div>
     </section>
   );
-};
+}

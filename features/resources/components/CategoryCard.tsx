@@ -1,10 +1,10 @@
-import Image from "@/shared/components/Image";
+import Image from '@/shared/components/Image';
 
 type CategoryCardProps = {
   category: { title: string; img: string };
 };
 
-export const CategoryCard = (props: CategoryCardProps) => {
+export default function CategoryCard(props: CategoryCardProps) {
   const { category } = props;
   const { title, img } = category;
 
@@ -16,4 +16,4 @@ export const CategoryCard = (props: CategoryCardProps) => {
       </div>
     </div>
   );
-};
+}
