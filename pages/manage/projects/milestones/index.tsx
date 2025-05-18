@@ -201,7 +201,7 @@ const MilestonesContent = () => {
               <>
                 {!isMarathonProject && (
                   <div className="flex flex-col md:flex-row justify-between md:items-center gap-2 pb-2.5">
-                    <div className="flex flex-col md:flex-row md:items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <p>時間：</p>
                       <DateRangePicker
                         startDate={milestonesDateRange.startDate ?? dayjs()}

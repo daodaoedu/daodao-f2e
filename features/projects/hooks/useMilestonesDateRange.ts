@@ -1,13 +1,15 @@
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
-import { useProjectMilestones } from '@/services/modules/projects';
+import { useProject, useProjectMilestones } from '@/services/modules/projects';
 
 export default function useMilestonesDateRange(projectId?: string) {
+  const { data: project } = useProject(projectId);
   const { data: milestones } = useProjectMilestones(projectId);
 
   return useMemo(() => {
     if (!milestones?.length) return {};
 
+    const isVersion2 = project?.version === 2;
     const milestoneStartDate = dayjs(milestones[0].startDate);
     const milestoneEndDate = milestones.reduce((compareEndDate, milestone) => {
       const currentEndDate = dayjs(milestone.endDate);
@@ -21,7 +23,9 @@ export default function useMilestonesDateRange(projectId?: string) {
       startDate: milestoneStartDate,
       endDate: milestoneEndDate,
       maxDate: milestoneStartDate.add(1, 'year'),
-      minDate: milestoneEndDate.subtract(1, 'year'),
+      minDate: isVersion2
+        ? milestoneStartDate
+        : milestoneEndDate.subtract(1, 'year'),
     };
-  }, [milestones]);
+  }, [milestones, project]);
 }
