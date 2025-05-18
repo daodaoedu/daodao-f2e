@@ -2,21 +2,9 @@ import { useMemo } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import useSWR from 'swr';
 
-import { fetcherV1 } from '@/services/core';
 import { bodyHandler } from '@/utils/notion';
-import { NotionDatabaseResultSchema } from './schema';
-
-interface SearchResultsQuery {
-  q?: string;
-  tags?: string | string[];
-  cats?: string | string[];
-  ages?: string | string[];
-  fee?: string;
-}
-
-const getPayloadData = <T>(data: { payload: T }) => {
-  return data.payload;
-};
+import { NotionDatabaseResultSchema, SearchResultsQuery } from './schema';
+import { getNotionDatabase, notionPath } from './api';
 
 export function useSearchResults(query: SearchResultsQuery) {
   const { data, ...rest } = useSWRInfinite<NotionDatabaseResultSchema>(
@@ -24,18 +12,11 @@ export function useSearchResults(query: SearchResultsQuery) {
       if (previousPageData && !previousPageData.results) return null;
 
       if (!previousPageData?.results && pageIndex === 0) {
-        return ['/notion/databases', bodyHandler(query)];
+        return [notionPath, bodyHandler(query)];
       }
-      return [
-        '/notion/databases',
-        bodyHandler(query, previousPageData?.next_cursor),
-      ];
+      return [notionPath, bodyHandler(query, previousPageData?.next_cursor)];
     },
-    ([url, queryParams]) =>
-      fetcherV1<{ payload: NotionDatabaseResultSchema }>(url, {
-        method: 'POST',
-        body: JSON.stringify(queryParams),
-      }).then(getPayloadData),
+    ([, queryParams]) => getNotionDatabase(queryParams as SearchResultsQuery),
     { revalidateFirstPage: false }
   );
 
@@ -51,21 +32,12 @@ export function useSearchResults(query: SearchResultsQuery) {
   return { data, searchResults, hasMore, nextCursor, ...rest };
 }
 
-interface RelatedResourcesQuery {
-  filter: unknown;
-  page_size: number;
-}
-
-export function useRelatedResources(params: RelatedResourcesQuery) {
+export function useRelatedResources(params: SearchResultsQuery) {
   const { data = [], ...rest } = useSWR<NotionDatabaseResultSchema>(
     ['/notion/databases', params],
     {
       revalidateIfStale: false,
-      fetcher: ([url, queryParams]) =>
-        fetcherV1<{ payload: NotionDatabaseResultSchema }>(url, {
-          method: 'POST',
-          body: JSON.stringify(queryParams),
-        }).then(getPayloadData),
+      fetcher: () => getNotionDatabase(params),
     }
   );
 

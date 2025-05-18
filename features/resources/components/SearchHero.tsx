@@ -12,7 +12,7 @@ export default function SearchHero() {
   };
 
   return (
-    <>
+    <section className="relative bg-primary-palest min-h-[17.125rem] md:p-[3rem_7.5rem] md:flex">
       {/* 圖片 */}
       <div className=" relative h-[17.3125rem] md:absolute md:right-0 md:h-full md:object-cover md:z-0 md:mt-[-3rem] lg:absolute lg:right-0 lg:h-full lg:object-cover lg:z-0 lg:mt-[-3rem] ">
         <Image
@@ -87,6 +87,6 @@ export default function SearchHero() {
 
       {/* placeholder block - only desktop would be visible */}
       <div className="hidden md:h-[19.0625rem] lg:block lg:min-w-[28.6875rem]" />
-    </>
+    </section>
   );
 }
