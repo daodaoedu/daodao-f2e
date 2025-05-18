@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import Image from "@/shared/components/Image";
+import Image from '@/shared/components/Image';
 
-import ShareResourceIcon from "@/public/assets/icons/share-resource.svg";
-import CommentIcon from "@/public/assets/icons/comment.svg";
-import CrownIcon from "@/public/assets/icons/crown.svg";
+import ShareResourceIcon from '@/public/assets/icons/share-resource.svg';
+import CommentIcon from '@/public/assets/icons/comment.svg';
+import CrownIcon from '@/public/assets/icons/crown.svg';
 
 type SharerCardProps = {
   userName?: string;
@@ -14,10 +14,10 @@ type SharerCardProps = {
   order: number;
 };
 
-export const SharerCard = (props: SharerCardProps) => {
+export default function SharerCard(props: SharerCardProps) {
   const {
-    userName = "小許",
-    userImg = "https://fakeimg.pl/282/",
+    userName = '小許',
+    userImg = 'https://fakeimg.pl/282/',
     sourceCount = 80,
     reflectionCount = 20,
     order = 1,
@@ -40,7 +40,7 @@ export const SharerCard = (props: SharerCardProps) => {
           <div className="absolute w-9 h-9 bg-white top-3 left-3 flex items-center justify-center rounded-full">
             <CrownIcon
               className="w-6 h-6"
-              color={order === 1 ? "#FF9526" : "#8F8F8F"}
+              color={order === 1 ? '#FF9526' : '#8F8F8F'}
             />
           </div>
         )}
@@ -48,13 +48,13 @@ export const SharerCard = (props: SharerCardProps) => {
 
       <div
         className="p-[0.75rem_1.25rem] text-basic-500 text-lg flex flex-col justify-between rounded-b-xl md:p-[1rem_1.5rem] md:h-[5.5rem]"
-        style={{ border: "1px solid #F3F3F3" }}
+        style={{ border: '1px solid #F3F3F3' }}
       >
         <div className="flex items-center md:h-6">
           <ShareResourceIcon className="w-5 h-5" />
           <span
             className="pr-2 mx-1"
-            style={{ borderRight: "1px solid #DBDBDB" }}
+            style={{ borderRight: '1px solid #DBDBDB' }}
           >
             分享資源
           </span>
@@ -65,7 +65,7 @@ export const SharerCard = (props: SharerCardProps) => {
           <CommentIcon className="w-5 h-5" />
           <span
             className="pr-2 mx-1"
-            style={{ borderRight: "1px solid #DBDBDB" }}
+            style={{ borderRight: '1px solid #DBDBDB' }}
           >
             分享心得
           </span>
@@ -76,4 +76,4 @@ export const SharerCard = (props: SharerCardProps) => {
       </div>
     </section>
   );
-};
+}

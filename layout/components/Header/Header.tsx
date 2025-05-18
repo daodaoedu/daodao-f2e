@@ -3,6 +3,7 @@ import { cn } from '@/utils/cn';
 import { isServer } from '@/utils/helper';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { usePromotion } from '@/contexts/Promotion';
 import Image from '../../../shared/components/Image';
 
 const MobileMenu = dynamic(() => import('./MobileMenu'));
@@ -26,6 +27,7 @@ function Header(
   ref: React.Ref<HTMLDivElement>
 ) {
   const [breakpoint, setBreakpoint] = useState<BREAKPOINT>(calculateBreakpoint);
+  const { isShowShadow } = usePromotion();
 
   useEffect(() => {
     const handleResize = () => {
@@ -39,7 +41,10 @@ function Header(
   return (
     <div
       ref={ref}
-      className="fixed top-0 inset-x-0 z-30 shadow-md shadow-basic-black/25"
+      className={cn(
+        'fixed top-0 inset-x-0 z-30',
+        isShowShadow && 'shadow-md shadow-basic-black/25'
+      )}
     >
       {children}
       <header

@@ -1,5 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
-import { CiCircleChevRight, CiCircleChevLeft } from "react-icons/ci";
+import { useMemo, useState } from 'react';
 import { IoClose } from "react-icons/io5";
 import { FaLinkedin, FaMedium, FaResearchgate, FaSquareFacebook, FaSquareThreads } from "react-icons/fa6";
 import { IconButton } from '@mui/material';
@@ -7,7 +6,7 @@ import EastIcon from '@mui/icons-material/East';
 import Image from '@/shared/components/Image';
 import Modal from '@/shared/components/Modal';
 import { cn } from '@/utils/cn';
-import { isServer } from '@/utils/helper';
+import Carousel from '@/shared/components/Carousel';
 
 const mentors = [
   {
@@ -199,21 +198,8 @@ const Tag = ({ text, className }) => (
 );
 
 const Mentors = () => {
-  const [currentMentor, setCurrentMentor] = useState(0);
-  const mentorsRef = useRef(null);
   const [activeMentorName, setActiveMentorName] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [touchStartX, setTouchStartX] = useState(null);
-  const timer = useRef(null);
-  const { translateX, isEnd } = useMemo(() => {
-    if (isServer) return { translateX: 0, isEnd: false };
-    const mentorsWidth = mentorsRef.current?.scrollWidth;
-    const currentTranslateX = currentMentor * 301;
-    if (window.innerWidth + currentTranslateX > mentorsWidth) {
-      return { translateX: mentorsWidth - window.innerWidth + 16, isEnd: true };
-    }
-    return { translateX: currentTranslateX, isEnd: false };
-  }, [currentMentor]);
 
   const socialIcons = {
     linkedin: <FaLinkedin className="size-5" />,
@@ -225,29 +211,6 @@ const Mentors = () => {
 
   const activeMentor = useMemo(() => mentors.find((mentor) => mentor.name === activeMentorName), [activeMentorName]);
 
-  const checkTimer = () => {
-    if (timer.current) return true;
-    timer.current = true;
-    setTimeout(() => {
-      timer.current = false;
-    }, 300);
-    return false;
-  };
-
-  const handleNextMentor = () => {
-    if (checkTimer()) return;
-    if (!isEnd) {
-      setCurrentMentor((prev) => prev + 1);
-    }
-  };
-
-  const handlePrevMentor = () => {
-    if (checkTimer()) return;
-    if (currentMentor > 0) {
-      setCurrentMentor((prev) => prev - 1);
-    }
-  };
-
   const handleOpenModal = (name) => {
     setActiveMentorName(name);
     setIsOpen(true);
@@ -257,74 +220,36 @@ const Mentors = () => {
     setIsOpen(false);
   };
 
-  const handleTouchStart = (e) => {
-    setTouchStartX(e.touches[0].clientX);
-  };
-
-  const handleTouchMove = (e) => {
-    const touchMoveX = e.touches[0].clientX;
-    const deltaX = touchMoveX - touchStartX;
-    if (Math.abs(deltaX) > 50) {
-      if (deltaX < 0) {
-        handleNextMentor();
-      } else {
-        handlePrevMentor();
-      }
-    }
-  };
-
-  const handleTouchEnd = () => {
-    setTouchStartX(null);
-  };
-
   return (
     <>
-      <div className="px-6 lg:px-60 flex justify-between items-center">
-        <h2 className="heading-md text-basic-500" id="marathon-mentor">引導師介紹</h2>
-        <div className="flex gap-2">
-          <IconButton size="large" onClick={handlePrevMentor} disabled={currentMentor === 0}>
-            <CiCircleChevLeft className="size-8" />
-          </IconButton>
-          <IconButton size="large" onClick={handleNextMentor} disabled={isEnd}>
-            <CiCircleChevRight className="size-8" />
-          </IconButton>
-        </div>
-      </div>
-      <div
-        className="mt-9 overflow-x-hidden select-none"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div
-          ref={mentorsRef}
-          className="flex gap-4 px-6 lg:pl-60 transition-transform duration-300"
-          style={{ transform: `translateX(-${translateX}px)` }}
-        >
-          {mentors.map((mentor) => (
-            <MentorCard
-              key={mentor.name}
-              mentor={mentor}
-              className="cursor-pointer group"
-              onClick={() => handleOpenModal(mentor.name)}
-            >
-              <div className="absolute bottom-0 left-0 right-0 pt-4">
-                <div className="flex gap-2 px-3">
-                  {mentor.tags.slice(0, 1).map((tag, index) => (
-                    <Tag
-                      key={tag}
-                      text={tag}
-                      className={index === 0 && "shrink-0"}
-                    />
-                  ))}
-                </div>
-                <div className="heading-md text-white text-start mt-2 px-3 pb-3">{mentor.title} | {mentor.name}</div>
-                <div className="bg-white flex justify-end items-center text-gray-400 px-3 py-2 gap-1 group-hover:text-primary-base">more <EastIcon className="!text-[16px]" /></div>
+      <Carousel
+        title="引導師介紹"
+        titleId="marathon-mentor"
+        items={mentors}
+        renderKey={(mentor) => mentor.name}
+        renderItem={(mentor) => (
+          <MentorCard
+            key={mentor.name}
+            mentor={mentor}
+            className="cursor-pointer group"
+            onClick={() => handleOpenModal(mentor.name)}
+          >
+            <div className="absolute bottom-0 left-0 right-0 pt-4">
+              <div className="flex gap-2 px-3">
+                {mentor.tags.slice(0, 1).map((tag, index) => (
+                  <Tag
+                    key={tag}
+                    text={tag}
+                    className={index === 0 && "shrink-0"}
+                  />
+                ))}
               </div>
-            </MentorCard>
-          ))}
-        </div>
-      </div>
+              <div className="heading-md text-white text-start mt-2 px-3 pb-3">{mentor.title} | {mentor.name}</div>
+              <div className="bg-white flex justify-end items-center text-gray-400 px-3 py-2 gap-1 group-hover:text-primary-base">more <EastIcon className="!text-[16px]" /></div>
+            </div>
+          </MentorCard>
+        )}
+      />
 
       <Modal
         isOpen={isOpen}

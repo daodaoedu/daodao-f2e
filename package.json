@@ -65,6 +65,7 @@
     "react-speech-recognition": "^3.8.2",
     "react-typed": "^1.2.0",
     "regenerator-runtime": "^0.13.9",
+    "schema-dts": "^1.1.5",
     "swr": "^2.2.5",
     "tailwind-merge": "^2.5.4",
     "use-image": "^1.0.10",

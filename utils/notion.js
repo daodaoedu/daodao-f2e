@@ -33,8 +33,8 @@ export const searchTypeHandler = (type) => {
 };
 
 export const bodyHandler = (query, nextCursor, pageSize = 100) => {
-  const { q, tags, cats, ages, fee } = query;
-  let body = {
+  const { q, tags, cats, ages, fee, filter, page_size } = query;
+  const body = {
     filter: {
       and: [],
     },
@@ -155,6 +155,14 @@ export const bodyHandler = (query, nextCursor, pageSize = 100) => {
         equals: feeQuery,
       },
     });
+  }
+
+  if (filter) {
+    Object.assign(body, { filter });
+  }
+
+  if (page_size) {
+    Object.assign(body, { page_size });
   }
 
   return body;

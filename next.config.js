@@ -1,4 +1,5 @@
 const isDev = process.env.NODE_ENV === 'development';
+const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 const withPWA = require('next-pwa')({
   dest: 'public',
@@ -6,8 +7,8 @@ const withPWA = require('next-pwa')({
     /build-manifest\.json$/,
     /react-loadable-manifest\.json$/,
     /dynamic-css-manifest\.json$/,
-    /font-manifest\.json$/
-  ]
+    /font-manifest\.json$/,
+  ],
 });
 
 /** @type {import('next').NextConfig} */
@@ -23,10 +24,7 @@ const config = {
 
     config.module.rules.push({
       test: /\.svg$/,
-      use: [
-        options.defaultLoaders.babel,
-        '@svgr/webpack',
-      ],
+      use: [options.defaultLoaders.babel, '@svgr/webpack'],
     });
 
     return Object.assign(config, { experiments });
@@ -40,7 +38,7 @@ const config = {
           return [
             {
               source: '/dev-proxy-api/:path*',
-              destination: `${process.env.NEXT_PUBLIC_API_URL ?? ''}/:path*`,
+              destination: `${apiUrl}/:path*`,
             },
           ];
         },

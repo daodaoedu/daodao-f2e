@@ -36,14 +36,17 @@ export default function SidebarLayout({
   backPath = '/',
   backText = '返回',
 }: SidebarLayoutProps) {
-  const { height } = usePromotion();
+  const { height, setIsShowShadow } = usePromotion();
   const router = useRouter();
   const [hasSticky, setHasSticky] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
-      setHasSticky(window.scrollY > 0);
+      const isSticky = window.scrollY > 0;
+      setHasSticky(isSticky);
+      setIsShowShadow(window.innerWidth > 1024 ? true : !isSticky);
     };
+    handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
