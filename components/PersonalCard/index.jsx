@@ -101,7 +101,7 @@ const Profile = ({
         'flex flex-col items-center',
       )}
     >
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Box
         sx={{
           width: '720px',

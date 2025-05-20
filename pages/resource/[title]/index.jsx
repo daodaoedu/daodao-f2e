@@ -72,7 +72,7 @@ const ResourcePage = ({ data = {} }) => {
       copyright: '島島阿學',
       imgLink: image ?? 'https://www.daoedu.tw/preview.webp',
       link: `${process.env.HOSTNAME}${router?.asPath}`,
-      structuredData: [
+      jsonLd: [
         {
           '@context': 'https://schema.org/',
           '@type': 'Dataset',
@@ -104,7 +104,7 @@ const ResourcePage = ({ data = {} }) => {
   );
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Resource
         data={data}
         title={title}

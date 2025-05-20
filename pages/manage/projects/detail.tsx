@@ -1,8 +1,7 @@
 import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { useMemo, useState } from 'react';
-import { useRouter } from 'next/router';
-import SEOConfig, { SEODataType } from '@/shared/components/SEO';
+import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
 import { Skeleton, useMediaQuery } from '@mui/material';
 
 import { useProject } from '@/contexts/Project';
@@ -11,43 +10,31 @@ import ViewMode from '@/components/Projects/Project/ViewMode';
 import toast from 'react-hot-toast';
 
 const ProjectPage = () => {
-  const router = useRouter();
-
   // same with tailwind lg:
   const isLgScreen = useMediaQuery('(min-width: 767px)');
-  const SEOData = useMemo<SEODataType>(
+  const jsonLd = useMemo<JsonLdType>(
     () => ({
-      title: '島島盃 - 2025 春季學習馬拉松｜多元學習資源平台｜島島阿學',
-      description:
-        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-      keywords: '島島阿學',
-      author: '島島阿學',
-      copyright: '島島阿學',
-      imgLink: 'https://www.daoedu.tw/preview.webp',
-      link: `${process.env.HOSTNAME}${router?.asPath}`,
-      structuredData: {
-        '@context': 'https://schema.org',
-        '@graph': [
-          {
-            '@context': 'https://schema.org',
-            '@type': 'WebSite',
-            url: 'https://www.daoedu.tw',
-            potentialAction: {
-              '@type': 'SearchAction',
-              'query-input': 'required name=q',
-              target: 'https://www.daoedu.tw/search?q={q}',
-            },
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          url: 'https://www.daoedu.tw',
+          potentialAction: {
+            '@type': 'SearchAction',
+            'query-input': 'required name=q',
+            target: 'https://www.daoedu.tw/search?q={q}',
           },
-          {
-            '@context': 'https://schema.org',
-            '@type': 'Organization',
-            url: 'https://www.daoedu.tw',
-            logo: 'https://www.daoedu.tw/favicon-112.png',
-          },
-        ],
-      },
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          url: 'https://www.daoedu.tw',
+          logo: 'https://www.daoedu.tw/favicon-112.png',
+        },
+      ],
     }),
-    [router?.asPath]
+    []
   );
   const { project, dispatchProject, isFetching } = useProject();
   const [formData, setFormData] = useState<Partial<Project>>(project);
@@ -108,7 +95,11 @@ const ProjectPage = () => {
 
   return (
     <div>
-      <SEOConfig data={SEOData} />
+      <SEOConfig
+        title="島島盃 - 2025 春季學習馬拉松｜多元學習資源平台｜島島阿學"
+        description="「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。"
+        jsonLd={jsonLd}
+      />
       {isFetching ? (
         <>
           <Skeleton

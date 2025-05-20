@@ -21,7 +21,7 @@ const LocationsPage = () => {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Locations />
     </>
   );

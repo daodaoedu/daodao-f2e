@@ -1,116 +1,86 @@
+import type { WithContext, Thing, WebSite, Graph } from 'schema-dts';
 import React from 'react';
 import Head from 'next/head';
-import type { WithContext, Thing, Graph } from 'schema-dts';
+import { useRouter } from 'next/router';
 
 /**
  * Schema.org 常用類型參考指南
  * @see https://support.google.com/webmasters/answer/9012289#enhancements&zippy=%2C強化項目-amp複合式搜尋結果
  *
- * ---
- *
- * 1. 內容與創意作品類型 (CreativeWork)
+ * 不需要每個頁面都添加 WebSite 的 jsonLd，只需針對頁面添加適合的 jsonLd
  *
  * | 類型 | 說明 |
  * | ---- | ---- |
  * | Article | 文章、新聞內容 |
- * | BlogPosting | 部落格文章 |
- * | WebPage | 網頁內容 |
  * | Course | 課程內容 |
- * | Tutorial | 教程 |
  * | Book | 書籍 |
  * | Review | 評論 |
  * | VideoObject | 影片 |
  * | AudioObject | 音頻 |
- *
- * 2. 事件類型 (Event)
- *
- * | 類型 | 說明 |
- * | ---- | ---- |
  * | Event | 基本事件 |
  * | CourseInstance | 課程實例 |
  * | EducationEvent | 教育相關事件 |
  * | BusinessEvent | 商業事件 |
  * | SocialEvent | 社交活動 |
- *
- * 3. 組織與商業類型 (Organization)
- *
- * | 類型 | 說明 |
- * | ---- | ---- |
  * | Organization | 組織機構 |
- * | LocalBusiness | 本地商家 |
  * | Store | 商店 |
  * | School | 學校 |
- * | Corporation | 企業 |
- *
- * 4. 人物類型 (Person)
- *
- * | 類型 | 說明 |
- * | ---- | ---- |
- * | Person | 人物信息 |
- *
- * 5. 地點類型 (Place)
- *
- * | 類型 | 說明 |
- * | ---- | ---- |
+ * | Person | 人 |
  * | Place | 地點 |
- * | LocalBusiness | 可同時作為地點和組織 |
- *
- * 6. 產品與服務類型 (Product)
- *
- * | 類型 | 說明 |
- * | ---- | ---- |
  * | Product | 產品 |
  * | Offer | 商品報價 |
  * | Service | 服務 |
- *
- * 7. 集合類型 (Collection)
- *
- * | 類型 | 說明 |
- * | ---- | ---- |
  * | ItemList | 項目列表 |
  * | BreadcrumbList | 麵包屑導航 |
  * | FAQPage | 常見問題解答頁面 |
  * | CollectionPage | 收藏頁面 |
  * | SearchResultsPage | 搜索結果頁面 |
- *
- * 8. 特殊用途類型 (Special)
- *
- * | 類型 | 說明 |
- * | ---- | ---- |
  * | WebSite | 整個網站的信息 |
- * | SoftwareApplication | 軟件應用 |
  * | HowTo | 操作指南 |
  * | Question | 問題 |
  * | Answer | 回答 |
  */
-export type SEODataType<T extends Thing = Thing> = {
+export type JsonLdType = WithContext<Thing> | Graph;
+
+interface SEOProps {
   title: string;
   description?: string;
-  keywords?: string;
+  keywords?: string | string[];
   author?: string;
   copyright?: string;
   imgLink?: string;
   link?: string;
-  structuredData?: WithContext<T> | Graph;
+  jsonLd?: WithContext<Thing> | Graph;
   themeColor?: string;
-};
-
-interface SEOProps<T extends Thing = Thing> {
-  data: SEODataType<T>;
 }
 
-export default function SEO<T extends Thing = Thing>({ data }: SEOProps<T>) {
-  const {
-    title,
-    description,
-    keywords,
-    author,
-    copyright,
-    imgLink,
-    link,
-    structuredData,
-    themeColor = '#16b9b3',
-  } = data;
+const defaultJsonLd: WithContext<WebSite> = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: '島島阿學',
+  url: 'https://www.daoedu.tw',
+  inLanguage: 'zh-TW',
+};
+
+export default function SEO({
+  title,
+  description = '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
+  link: originLink,
+  keywords: originKeywords = '島島阿學',
+  author = '島島阿學',
+  copyright = '島島阿學',
+  imgLink = 'https://www.daoedu.tw/preview.webp',
+  jsonLd = defaultJsonLd,
+  themeColor = '#16b9b3',
+}: SEOProps) {
+  const router = useRouter();
+
+  const link = originLink ?? `${process.env.HOSTNAME}${router?.asPath}`;
+
+  const keywords =
+    typeof originKeywords === 'string'
+      ? originKeywords
+      : originKeywords?.join(', ');
 
   return (
     <Head>
@@ -163,15 +133,10 @@ export default function SEO<T extends Thing = Thing>({ data }: SEOProps<T>) {
 
       <meta name="theme-color" itemProp="theme-color" content={themeColor} />
 
-      {structuredData && (
-        <script
-          key="ld+JSON"
-          type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData, null, 2),
-          }}
-        />
+      {typeof jsonLd === 'object' && jsonLd && (
+        <script type="application/ld+json">
+          {JSON.stringify(jsonLd, null, 2)}
+        </script>
       )}
     </Head>
   );
