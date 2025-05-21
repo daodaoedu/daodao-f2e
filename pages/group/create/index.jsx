@@ -32,7 +32,7 @@ function CreateGroupPage() {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <GroupForm mode="create" isLoading={isLoading} onSubmit={mutate} />
     </>
   );

@@ -64,7 +64,7 @@ const NoteDetailPage = () => {
 
   return (
     <div className="bg-basic-white rounded-2xl">
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <NoteDetail
         data={note}
         authorUser={project?.user}

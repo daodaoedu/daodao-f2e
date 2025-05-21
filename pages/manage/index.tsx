@@ -503,7 +503,7 @@ const Manage = () => {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Header />
       <Calendar
         date={date}

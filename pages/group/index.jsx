@@ -21,7 +21,7 @@ function GroupPage() {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Group />
     </>
   );

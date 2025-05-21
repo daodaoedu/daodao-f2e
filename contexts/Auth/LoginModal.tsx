@@ -4,7 +4,7 @@ import Image from '@/shared/components/Image';
 import Modal from '@/shared/components/Modal';
 import openWindowPopup from '@/utils/openWindowPopup';
 import { cn } from '@/utils/cn';
-import { checkIsDevHost, getBackendUrl, getFrontendUrl } from '@/utils/env';
+import env from '@/utils/env';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -21,7 +21,7 @@ export default function LoginModal({
   const timer = useRef<NodeJS.Timeout | null>(null);
 
   const handleOpenLoginWindow = () => {
-    const baseUrl = checkIsDevHost() ? getFrontendUrl() : getBackendUrl();
+    const baseUrl = env.isDevHost ? env.frontendUrl : env.apiUrl;
     const popup = openWindowPopup({
       url: `${baseUrl}/auth/google?origin=${window.location.origin}`,
       title: 'login',

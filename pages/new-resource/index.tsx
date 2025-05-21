@@ -1,5 +1,5 @@
 import type { InferGetStaticPropsType, GetStaticProps } from 'next';
-import SEOConfig, { SEODataType } from '@/shared/components/SEO';
+import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
 import { CATEGORIES } from '@/constants/category';
 import {
   CardContainer,
@@ -9,90 +9,73 @@ import {
   SearchHero,
   SharerCard,
 } from '@/features/resources';
-import { getNotionDatabase, NotionDatabaseResultSchema } from '@/services/modules/notion';
-import { env } from '@/utils/env';
+import {
+  getNotionDatabase,
+  NotionDatabaseResultSchema,
+} from '@/services/modules/notion';
 
 export const getStaticProps = (async () => {
   const data = await getNotionDatabase({
     page_size: 4,
   });
 
-  const seo: SEODataType = {
-    title: '多元學習資源列表｜島島阿學',
-    description:
-      '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-    keywords: '島島阿學',
-    author: '島島阿學',
-    copyright: '島島阿學',
-    imgLink: 'https://www.daoedu.tw/preview.webp',
-    link: `${env.hostname}/new-resource`,
-    structuredData: {
-      '@context': 'https://schema.org',
-      '@graph': [
-        {
-          '@type': 'ItemList',
-          name: `學習資源列表`,
-          description:
-            '「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-          itemListElement: data.results?.map((result, index) => ({
-            '@type': 'ListItem',
-            position: index + 1,
-            item: {
-              '@type': 'Course',
-              '@id': result.id,
-              name: result.properties['資源名稱']?.title[0]?.plain_text ?? '',
-              description:
-                result.properties['介紹']?.rich_text[0]?.plain_text ?? '',
-              url: `https://www.daoedu.tw/resource/${result.id}`,
-              image: result.properties['縮圖']?.files[0]?.external?.url ?? '',
-              educationalLevel: result.properties['年齡層']?.multi_select.map(
-                (age) => age.name
-              ),
-              educationalUse: result.properties['領域名稱']?.multi_select.map(
-                (cat) => cat.name
-              ),
-              provider: {
-                '@type': 'Person',
-                name:
-                  result.properties['創建者']?.multi_select[0]?.name ??
-                  '島島阿學',
-              },
-              offers: {
-                '@type': 'Offer',
-                category: result.properties['費用']?.select?.name ?? '',
-                price: result.properties['費用']?.select?.name ?? '',
-                priceCurrency: 'TWD',
-              },
-              hasCourseInstance: {
-                '@type': 'CourseInstance',
-                courseMode: 'Online',
-                courseWorkload: 'PT30M',
-              },
+  const jsonLd: JsonLdType = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'ItemList',
+        name: `學習資源列表`,
+        description:
+          '「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
+        itemListElement: data.results?.map((result, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          item: {
+            '@type': 'Course',
+            '@id': result.id,
+            name: result.properties['資源名稱']?.title[0]?.plain_text ?? '',
+            description:
+              result.properties['介紹']?.rich_text[0]?.plain_text ?? '',
+            url: `https://www.daoedu.tw/resource/${result.id}`,
+            image: result.properties['縮圖']?.files[0]?.external?.url ?? '',
+            educationalLevel: result.properties['年齡層']?.multi_select.map(
+              (age) => age.name
+            ),
+            educationalUse: result.properties['領域名稱']?.multi_select.map(
+              (cat) => cat.name
+            ),
+            provider: {
+              '@type': 'Person',
+              name:
+                result.properties['創建者']?.multi_select[0]?.name ??
+                '島島阿學',
             },
-          })),
-        },
-        {
-          '@type': 'WebSite',
-          url: 'https://www.daoedu.tw/new-resource',
-          potentialAction: {
-            '@type': 'SearchAction',
-            query: 'required name=q',
-            target: 'https://www.daoedu.tw/new-resource?q={q}',
+            offers: {
+              '@type': 'Offer',
+              category: result.properties['費用']?.select?.name ?? '',
+              price: result.properties['費用']?.select?.name ?? '',
+              priceCurrency: 'TWD',
+            },
+            hasCourseInstance: {
+              '@type': 'CourseInstance',
+              courseMode: 'Online',
+              courseWorkload: 'PT30M',
+            },
           },
-        },
-      ],
-    },
+        })),
+      },
+    ],
   };
 
-  return { props: { data, seo } };
+  return { props: { data, jsonLd } };
 }) satisfies GetStaticProps<{
   data: NotionDatabaseResultSchema;
-  seo: SEODataType;
+  jsonLd: JsonLdType;
 }>;
 
 const SearchPage = ({
   data,
-  seo,
+  jsonLd,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
   console.log('data', data);
   const reflectionList = [1, 2, 3, 4, 5, 6, 7];
@@ -100,7 +83,7 @@ const SearchPage = ({
 
   return (
     <>
-      <SEOConfig data={seo} />
+      <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
       {/* 找資源 banner */}
       <SearchHero />
 

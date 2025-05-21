@@ -57,7 +57,7 @@ const SearchPage = () => {
       copyright: '島島阿學',
       imgLink: 'https://www.daoedu.tw/preview.webp',
       link: `${process.env.HOSTNAME}${router?.asPath}`,
-      structuredData: [
+      jsonLd: [
         {
           '@context': 'https://schema.org',
           '@type': 'Course',
@@ -101,7 +101,7 @@ const SearchPage = () => {
   );
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <SearchPageWrapper>
         <Search title={title} />
       </SearchPageWrapper>

@@ -53,7 +53,7 @@ const LearningMarathonSignUp = () => {
       copyright: '島島阿學',
       imgLink: 'https://www.daoedu.tw/preview.webp',
       link: `${process.env.HOSTNAME}${router?.asPath}`,
-      structuredData: [
+      jsonLd: [
         {
           '@context': 'https://schema.org',
           '@type': 'WebSite',
@@ -97,7 +97,7 @@ const LearningMarathonSignUp = () => {
     <>
       <StepperBar currentStep={currentStep} />
       <ProtectedComponent redirectOnCancel="/learning-marathon" onlyCheckToken>
-        <SEOConfig data={SEOData} />
+        <SEOConfig {...SEOData} />
         <FormWrapper sx={{
           background: 'linear-gradient(0deg, #F3FCFC 0%, #F3FCFC 100%), #F7F8FA'
         }}

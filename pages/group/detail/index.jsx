@@ -31,7 +31,7 @@ function GroupPage() {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       {(id || isFetching) && !isError ? (
         <GroupDetail id={id} source={source} isLoading={isFetching} />
       ) : (

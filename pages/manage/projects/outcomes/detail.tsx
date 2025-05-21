@@ -64,7 +64,7 @@ const OutcomeDetailPage = () => {
 
   return (
     <div className="bg-basic-white rounded-2xl">
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <OutcomeDetail
         data={outcome}
         authorUser={project?.user}
