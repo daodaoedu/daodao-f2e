@@ -1,6 +1,6 @@
 export const LOGIN_TYPE = 'DAODAO-LOGIN-TYPE';
 
-export const getEnv = () => {
+export default function getEnv() {
   const mode = process.env.NODE_ENV;
   const devDomain = process.env.NEXT_PUBLIC_DEV_URL ?? '';
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
@@ -21,6 +21,4 @@ export const getEnv = () => {
     isServerSide,
     mode,
   };
-};
-
-export default getEnv();
+}
