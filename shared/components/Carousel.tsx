@@ -51,16 +51,22 @@ const useCarouselPointer = (onNext: () => void, onPrev: () => void) => {
 
 interface CarouselProps<T> {
   title: string;
-  titleId: string;
+  titleId?: string;
   items: T[];
+  titleClassName?: string;
+  headerClassName?: string;
+  wrapperClassName?: string;
   renderKey: (item: T) => React.Key;
-  renderItem: (item: T) => React.ReactNode;
+  renderItem: (item: T, index: number) => React.ReactNode;
 }
 
 export default function Carousel<T>({
   title,
   titleId,
   items,
+  titleClassName,
+  headerClassName,
+  wrapperClassName,
   renderKey,
   renderItem,
 }: CarouselProps<T>) {
@@ -133,8 +139,11 @@ export default function Carousel<T>({
 
   return (
     <div>
-      <div className="px-6 lg:px-60 flex justify-between items-center">
-        <h2 className="heading-md text-basic-500" id={titleId}>
+      <div className={cn('flex justify-between items-center', headerClassName)}>
+        <h2
+          className={cn('heading-md text-basic-500', titleClassName)}
+          id={titleId}
+        >
           {title}
         </h2>
         <div className="flex gap-2">
@@ -180,12 +189,15 @@ export default function Carousel<T>({
       >
         <ul
           ref={wrapperRef}
-          className="flex gap-4 px-6 lg:pl-60 transition-transform duration-300"
+          className={cn(
+            'flex gap-4 transition-transform duration-300',
+            wrapperClassName
+          )}
           style={{ transform: `translateX(-${slideOffset}px)` }}
         >
           {items.map((item, index) => (
             <li key={renderKey(item)} aria-current={currentIndex === index}>
-              {renderItem(item)}
+              {renderItem(item, index)}
             </li>
           ))}
         </ul>

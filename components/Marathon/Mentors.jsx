@@ -226,6 +226,8 @@ const Mentors = () => {
         title="引導師介紹"
         titleId="marathon-mentor"
         items={mentors}
+        headerClassName="px-6 lg:px-60"
+        wrapperClassName="px-6 lg:pl-60 "
         renderKey={(mentor) => mentor.name}
         renderItem={(mentor) => (
           <MentorCard

@@ -14,6 +14,7 @@ import {
   NotionDatabaseResultSchema,
 } from '@/services/modules/notion';
 import JsonLdFactory from '@/utils/jsonLd';
+import Carousel from '@/shared/components/Carousel';
 
 export const getStaticProps = (async () => {
   const data = await getNotionDatabase({
@@ -149,28 +150,24 @@ const SearchPage = ({
 
       {/* 熱門心得 */}
       <section className="flex flex-col gap-11 p-[2.75rem_1.25rem] md:p-[3rem_7.5rem] bg-primary-palest">
-        <CardContainer
+        <Carousel
           title="熱門心得"
-          type="select"
-          childWrapperClassName="flex gap-[1.4375rem] overflow-x-scroll pr-5 mr-[-1.25rem] md:pr-0 md:mr-0"
-        >
-          {reflectionList.map((r) => (
-            <ReflectionCard key={r} />
-          ))}
-        </CardContainer>
+          items={reflectionList}
+          titleClassName="text-2xl"
+          renderKey={(mentor) => mentor}
+          renderItem={(mentor) => <ReflectionCard key={mentor} />}
+        />
       </section>
 
       {/* 活躍分享者 */}
       <section className="flex flex-col gap-11 p-[2.75rem_1.25rem] md:p-[3rem_7.5rem]">
-        <CardContainer
+        <Carousel
           title="活躍分享者"
-          type="select"
-          childWrapperClassName="flex gap-[1.4375rem] overflow-x-scroll pr-5 mr-[-1.25rem] md:pr-0 md:mr-0"
-        >
-          {sharerList.map((s, idx) => (
-            <SharerCard key={s} order={idx + 1} />
-          ))}
-        </CardContainer>
+          items={sharerList}
+          titleClassName="text-2xl"
+          renderKey={(sharer) => sharer}
+          renderItem={(sharer, index) => <SharerCard key={sharer} order={index + 1} />}
+        />
       </section>
     </>
   );
