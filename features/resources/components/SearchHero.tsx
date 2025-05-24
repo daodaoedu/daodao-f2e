@@ -69,7 +69,8 @@ export default function SearchHero() {
                 return (
                   <button
                     key={item}
-                    className="px-3 py-1 text-primary-base bg-white border border-solid border-primary-base rounded-full"
+                    type="button"
+                    className="px-3 py-0.5 text-primary-base bg-white border border-solid border-primary-base rounded-full"
                   >
                     <span className="font-bold">#</span>
                     {item}
