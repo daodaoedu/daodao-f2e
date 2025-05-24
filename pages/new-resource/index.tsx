@@ -13,59 +13,50 @@ import {
   getNotionDatabase,
   NotionDatabaseResultSchema,
 } from '@/services/modules/notion';
+import JsonLdFactory from '@/utils/jsonLd';
 
 export const getStaticProps = (async () => {
   const data = await getNotionDatabase({
     page_size: 4,
   });
 
-  const jsonLd: JsonLdType = {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'ItemList',
-        name: `學習資源列表`,
-        description:
-          '「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-        itemListElement: data.results?.map((result, index) => ({
-          '@type': 'ListItem',
-          position: index + 1,
-          item: {
-            '@type': 'Course',
-            '@id': result.id,
-            name: result.properties['資源名稱']?.title[0]?.plain_text ?? '',
-            description:
-              result.properties['介紹']?.rich_text[0]?.plain_text ?? '',
-            url: `https://www.daoedu.tw/resource/${result.id}`,
-            image: result.properties['縮圖']?.files[0]?.external?.url ?? '',
-            educationalLevel: result.properties['年齡層']?.multi_select.map(
-              (age) => age.name
-            ),
-            educationalUse: result.properties['領域名稱']?.multi_select.map(
-              (cat) => cat.name
-            ),
-            provider: {
-              '@type': 'Person',
-              name:
-                result.properties['創建者']?.multi_select[0]?.name ??
-                '島島阿學',
-            },
-            offers: {
-              '@type': 'Offer',
-              category: result.properties['費用']?.select?.name ?? '',
-              price: result.properties['費用']?.select?.name ?? '',
-              priceCurrency: 'TWD',
-            },
-            hasCourseInstance: {
-              '@type': 'CourseInstance',
-              courseMode: 'Online',
-              courseWorkload: 'PT30M',
-            },
-          },
-        })),
-      },
-    ],
-  };
+  const coursesJsonLd = data.results?.map((result) =>
+    JsonLdFactory.createCourseBuilder()
+      .setId(result.id)
+      .setName(result.properties['資源名稱']?.title[0]?.plain_text ?? '')
+      .setDescription(result.properties['介紹']?.rich_text[0]?.plain_text ?? '')
+      .setUrl(`https://www.daoedu.tw/resource/${result.id}`)
+      .setImage(result.properties['縮圖']?.files[0]?.external?.url ?? '')
+      .setEducationalLevel(
+        result.properties['年齡層']?.multi_select.map((age) => age.name)
+      )
+      .setEducationalUse(
+        result.properties['領域名稱']?.multi_select.map((cat) => cat.name)
+      )
+      .setProvider(
+        'Person',
+        result.properties['創建者']?.multi_select[0]?.name ?? '島島阿學'
+      )
+      .setOffers({
+        category: result.properties['費用']?.select?.name ?? '',
+        price: result.properties['費用']?.select?.name ?? '',
+        priceCurrency: 'TWD',
+      })
+      .setHasCourseInstance({
+        courseMode: 'Online',
+        courseWorkload: 'PT30M',
+      })
+      .build()
+  );
+
+  const jsonLd = JsonLdFactory.createGraph([
+    JsonLdFactory.createItemListBuilder()
+      .setName('學習資源列表')
+      .setDescription(
+        '「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。'
+      )
+      .setItems(coursesJsonLd),
+  ]);
 
   return { props: { data, jsonLd } };
 }) satisfies GetStaticProps<{
@@ -94,8 +85,27 @@ const SearchPage = ({
           title="熱門資源"
           subtitle="探索 所有資源"
         >
-          <ResourceCard />
-          <ResourceCard />
+          {data.results?.slice(2).map((resource) => (
+            <ResourceCard
+              key={resource.id}
+              title={
+                resource.properties['資源名稱']?.title[0]?.plain_text ?? ''
+              }
+              content={
+                resource.properties['介紹']?.rich_text[0]?.plain_text ?? ''
+              }
+              tags={resource.properties['領域名稱']?.multi_select.map(
+                (cat) => cat.name
+              )}
+              userName={
+                resource.properties['創建者']?.multi_select[0]?.name ?? ''
+              }
+              coverImageUrl={resource.properties['縮圖']?.files[0].name ?? ''}
+              time={resource.created_time}
+              level={resource.properties['年齡層']?.multi_select[0]?.name ?? ''}
+              commentCount={0}
+            />
+          ))}
         </CardContainer>
 
         <CardContainer
@@ -103,8 +113,27 @@ const SearchPage = ({
           title="最新資源"
           subtitle="探索 所有資源"
         >
-          <ResourceCard />
-          <ResourceCard />
+          {data.results?.slice(0, 2).map((resource) => (
+            <ResourceCard
+              key={resource.id}
+              title={
+                resource.properties['資源名稱']?.title[0]?.plain_text ?? ''
+              }
+              content={
+                resource.properties['介紹']?.rich_text[0]?.plain_text ?? ''
+              }
+              tags={resource.properties['領域名稱']?.multi_select.map(
+                (cat) => cat.name
+              )}
+              userName={
+                resource.properties['創建者']?.multi_select[0]?.name ?? ''
+              }
+              coverImageUrl={resource.properties['縮圖']?.files[0].name ?? ''}
+              time={resource.created_time}
+              level={resource.properties['年齡層']?.multi_select[0]?.name ?? ''}
+              commentCount={0}
+            />
+          ))}
         </CardContainer>
 
         <CardContainer
