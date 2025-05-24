@@ -195,29 +195,31 @@ const Nav = () => {
     external: item.external,
   }));
 
-  const [showShadow, setShowShadow] = useState(false);
-  const { height } = usePromotion();
+  const [isShowNavShadow, setIsShowNavShadow] = useState(false);
+  const { height, setIsShowShadow: setIsShowHeaderShadow } = usePromotion();
 
   useEffect(() => {
     const bannerHeight = document.querySelector('main')?.children?.[0]?.offsetHeight || 0;
     const handleScroll = () => {
-      if (window.scrollY > bannerHeight - height) {
-        setShowShadow(true);
+      if (window.scrollY > bannerHeight) {
+        setIsShowNavShadow(true);
+        setIsShowHeaderShadow(false);
       } else {
-        setShowShadow(false);
+        setIsShowNavShadow(false);
+        setIsShowHeaderShadow(true);
       }
     };
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [height]);
+  }, []);
 
   return (
     <nav
       className={cn(
         "sticky z-10 bg-basic-100 text-nowrap overflow-x-auto transition-shadow duration-300",
-        showShadow && "shadow-md shadow-basic-black/10"
+        isShowNavShadow && "shadow-md shadow-basic-black/10"
       )}
       style={{ top: `${height}px` }}
     >

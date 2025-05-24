@@ -3,6 +3,7 @@ import Image from '@/shared/components/Image';
 import LensIcon from '@/public/assets/icons/lens.svg';
 import { SEARCH_TAGS } from '@/constants/category';
 import Button from '@/shared/components/Button';
+import SectionTitle from './SectionTitle';
 
 export default function SearchHero() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -35,9 +36,7 @@ export default function SearchHero() {
       {/* 搜尋欄 標籤 分享資源 */}
       <div className="relative p-5 pb-11 flex flex-col gap-5 md:p-0 md:gap-6">
         <div>
-          <div className="h-[2.8125rem] font-bold text-lg leading-[2.8rem] text-basic-black md:text-4xl md:leading-[3.6rem] md:h-[3.625rem]">
-            找資源
-          </div>
+          <SectionTitle as="h1" title="找資源" />
 
           <div className="text-basic-500 text-5 mt-2 md:text-[1.125rem] md:mt-3">
             藉由他人真實的資源使用經驗，找到真正適合自己的學習資源，透過個人化推薦系統，幫助每位學習者在龐大的學習資源中，快速找到最適合自己的內容！

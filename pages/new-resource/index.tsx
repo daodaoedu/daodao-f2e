@@ -2,19 +2,37 @@ import type { InferGetStaticPropsType, GetStaticProps } from 'next';
 import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
 import { CATEGORIES } from '@/constants/category';
 import {
-  CardContainer,
   CategoryCard,
   ReflectionCard,
   ResourceCard,
   SearchHero,
+  SectionTitle,
   SharerCard,
 } from '@/features/resources';
 import {
   getNotionDatabase,
   NotionDatabaseResultSchema,
 } from '@/services/modules/notion';
-import JsonLdFactory from '@/utils/jsonLd';
 import Carousel from '@/shared/components/Carousel';
+import JsonLdFactory from '@/utils/jsonLd';
+import { cn } from '@/utils/cn';
+import Button from '@/shared/components/Button';
+
+const Section = ({
+  className,
+  children,
+}: React.PropsWithChildren<{ className?: string }>) => {
+  return (
+    <section
+      className={cn(
+        'flex flex-col gap-11 p-[2.75rem_1.25rem] md:p-[3rem_7.5rem]',
+        className
+      )}
+    >
+      {children}
+    </section>
+  );
+};
 
 export const getStaticProps = (async () => {
   const data = await getNotionDatabase({
@@ -65,11 +83,10 @@ export const getStaticProps = (async () => {
   jsonLd: JsonLdType;
 }>;
 
-const SearchPage = ({
+export default function ResourcePage({
   data,
   jsonLd,
-}: InferGetStaticPropsType<typeof getStaticProps>) => {
-  console.log('data', data);
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   const reflectionList = [1, 2, 3, 4, 5, 6, 7];
   const sharerList = [1, 2, 3, 4, 5, 6];
 
@@ -80,76 +97,104 @@ const SearchPage = ({
       <SearchHero />
 
       {/* 熱門資源, 最新資源, 熱門分類 */}
-      <section className="flex flex-col gap-11 p-[2.75rem_1.25rem] md:p-[3rem_7.5rem]">
-        <CardContainer
-          childWrapperClassName="flex flex-col gap-5"
-          title="熱門資源"
-          subtitle="探索 所有資源"
-        >
-          {data.results?.slice(2).map((resource) => (
-            <ResourceCard
-              key={resource.id}
-              title={
-                resource.properties['資源名稱']?.title[0]?.plain_text ?? ''
-              }
-              content={
-                resource.properties['介紹']?.rich_text[0]?.plain_text ?? ''
-              }
-              tags={resource.properties['領域名稱']?.multi_select.map(
-                (cat) => cat.name
-              )}
-              userName={
-                resource.properties['創建者']?.multi_select[0]?.name ?? ''
-              }
-              coverImageUrl={resource.properties['縮圖']?.files[0].name ?? ''}
-              time={resource.created_time}
-              level={resource.properties['年齡層']?.multi_select[0]?.name ?? ''}
-              commentCount={0}
-            />
-          ))}
-        </CardContainer>
+      <Section>
+        <div>
+          <SectionTitle title="熱門資源">
+            <Button
+              as="link"
+              href="/new-resource"
+              className="body-lg font-medium text-basic-300"
+              suffixIcon="Arrow"
+            >
+              探索 所有資源
+            </Button>
+          </SectionTitle>
+          <div className="flex flex-col gap-5">
+            {data.results?.slice(2).map((resource) => (
+              <ResourceCard
+                key={resource.id}
+                title={
+                  resource.properties['資源名稱']?.title[0]?.plain_text ?? ''
+                }
+                content={
+                  resource.properties['介紹']?.rich_text[0]?.plain_text ?? ''
+                }
+                tags={resource.properties['領域名稱']?.multi_select.map(
+                  (cat) => cat.name
+                )}
+                userName={
+                  resource.properties['創建者']?.multi_select[0]?.name ?? ''
+                }
+                coverImageUrl={resource.properties['縮圖']?.files[0].name ?? ''}
+                time={resource.created_time}
+                level={
+                  resource.properties['年齡層']?.multi_select[0]?.name ?? ''
+                }
+                commentCount={0}
+              />
+            ))}
+          </div>
+        </div>
 
-        <CardContainer
-          childWrapperClassName="flex flex-col gap-5"
-          title="最新資源"
-          subtitle="探索 所有資源"
-        >
-          {data.results?.slice(0, 2).map((resource) => (
-            <ResourceCard
-              key={resource.id}
-              title={
-                resource.properties['資源名稱']?.title[0]?.plain_text ?? ''
-              }
-              content={
-                resource.properties['介紹']?.rich_text[0]?.plain_text ?? ''
-              }
-              tags={resource.properties['領域名稱']?.multi_select.map(
-                (cat) => cat.name
-              )}
-              userName={
-                resource.properties['創建者']?.multi_select[0]?.name ?? ''
-              }
-              coverImageUrl={resource.properties['縮圖']?.files[0].name ?? ''}
-              time={resource.created_time}
-              level={resource.properties['年齡層']?.multi_select[0]?.name ?? ''}
-              commentCount={0}
-            />
-          ))}
-        </CardContainer>
+        <div>
+          <SectionTitle title="最新資源">
+            <Button
+              as="link"
+              href="/new-resource"
+              className="body-lg font-medium text-basic-300"
+              suffixIcon="Arrow"
+            >
+              探索 所有資源
+            </Button>
+          </SectionTitle>
+          <div className="flex flex-col gap-5">
+            {data.results?.slice(0, 2).map((resource) => (
+              <ResourceCard
+                key={resource.id}
+                title={
+                  resource.properties['資源名稱']?.title[0]?.plain_text ?? ''
+                }
+                content={
+                  resource.properties['介紹']?.rich_text[0]?.plain_text ?? ''
+                }
+                tags={resource.properties['領域名稱']?.multi_select.map(
+                  (cat) => cat.name
+                )}
+                userName={
+                  resource.properties['創建者']?.multi_select[0]?.name ?? ''
+                }
+                coverImageUrl={resource.properties['縮圖']?.files[0].name ?? ''}
+                time={resource.created_time}
+                level={
+                  resource.properties['年齡層']?.multi_select[0]?.name ?? ''
+                }
+                commentCount={0}
+              />
+            ))}
+          </div>
+        </div>
 
-        <CardContainer
-          childWrapperClassName="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 lg:gap-[1rem_1.5rem]"
-          title="熱門分類"
-          subtitle="探索 所有分類"
-        >
-          {CATEGORIES.slice(0, 8).map((category) => (
-            <CategoryCard key={category.key} category={category} />
-          ))}
-        </CardContainer>
-      </section>
+        <div>
+          <SectionTitle title="熱門分類">
+            <Button
+              as="link"
+              href="/new-resource/categories"
+              className="body-lg font-medium text-basic-300"
+              suffixIcon="Arrow"
+            >
+              探索 所有分類
+            </Button>
+          </SectionTitle>
+          <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 lg:gap-[1rem_1.5rem]">
+            {CATEGORIES.slice(0, 8).map((category) => (
+              <CategoryCard key={category.key} category={category} />
+            ))}
+          </div>
+        </div>
+      </Section>
 
       {/* 熱門心得 */}
-      <section className="flex flex-col gap-11 p-[2.75rem_1.25rem] md:p-[3rem_7.5rem] bg-primary-palest">
+      <Section className="bg-primary-palest">
         <Carousel
           title="熱門心得"
           items={reflectionList}
@@ -157,20 +202,20 @@ const SearchPage = ({
           renderKey={(mentor) => mentor}
           renderItem={(mentor) => <ReflectionCard key={mentor} />}
         />
-      </section>
+      </Section>
 
       {/* 活躍分享者 */}
-      <section className="flex flex-col gap-11 p-[2.75rem_1.25rem] md:p-[3rem_7.5rem]">
+      <Section>
         <Carousel
           title="活躍分享者"
           items={sharerList}
           titleClassName="text-2xl"
           renderKey={(sharer) => sharer}
-          renderItem={(sharer, index) => <SharerCard key={sharer} order={index + 1} />}
+          renderItem={(sharer, index) => (
+            <SharerCard key={sharer} order={index + 1} />
+          )}
         />
-      </section>
+      </Section>
     </>
   );
-};
-
-export default SearchPage;
+}

@@ -28,6 +28,8 @@ const Shell = dynamic(() => import('@/public/assets/icons/shell.svg'));
 
 const Comment = dynamic(() => import('@/public/assets/icons/comment.svg'));
 
+const Arrow = dynamic(() => import('@/public/assets/icons/arrow.svg'));
+
 const icons = {
   Comment,
   FaAngleLeft,
@@ -36,6 +38,7 @@ const icons = {
   MdOutlineEdit,
   AiOutlineMore,
   AiOutlineClose,
+  Arrow,
 };
 
 enum ButtonColorEnum {
