@@ -4,11 +4,13 @@ import Button from '@/shared/components/Button';
 import Container from '@/shared/components/Container';
 import SidebarWrapper from '@/layout/components/Sidebar/SidebarWrapper';
 import Collapse from '@/shared/components/Collapse';
+import Dropdown from '@/shared/components/Dropdown';
 import { usePromotion } from '@/contexts/Promotion';
+import useBreakpoint from '@/hooks/useBreakpoint';
 import { cn } from '@/utils/cn';
+import { SidebarCollapseType, SidebarItemType } from './type';
 import SidebarItem from './SidebarItem';
 import SidebarLink from './SidebarLink';
-import { SidebarItemType } from './type';
 
 export interface SidebarLayoutProps extends React.PropsWithChildren {
   /**
@@ -28,6 +30,65 @@ export interface SidebarLayoutProps extends React.PropsWithChildren {
    */
   backText?: string;
 }
+
+const SidebarCollapse = ({ item }: { item: SidebarCollapseType }) => {
+  const { isDesktop, isMobile } = useBreakpoint();
+
+  return (
+    <SidebarItem>
+      {isDesktop && (
+        <Collapse key={item.label}>
+          <Collapse.Toggle className="w-full px-10 py-2" withIcon>
+            {item.label}
+          </Collapse.Toggle>
+          <Collapse.List className="*:my-2 *:aria-hidden:my-0">
+            {item.children.map(
+              (child) =>
+                child.href && (
+                  <Collapse.Item key={child.href}>
+                    <SidebarLink
+                      className="pl-14"
+                      href={child.href}
+                      isActive={child.isActive}
+                      isDisabled={child.isDisabled}
+                    >
+                      {child.label}
+                    </SidebarLink>
+                  </Collapse.Item>
+                )
+            )}
+          </Collapse.List>
+        </Collapse>
+      )}
+      {isMobile && (
+        <Dropdown>
+          <Dropdown.Toggle
+            className="w-full px-10 pr-2 pl-8 flex justify-center"
+            withIcon
+          >
+            {item.label}
+          </Dropdown.Toggle>
+          <Dropdown.List className="z-20 p-0">
+            {item.children.map(
+              (child) =>
+                child.href && (
+                  <Dropdown.Item key={child.href}>
+                    <SidebarLink
+                      href={child.href}
+                      isActive={child.isActive}
+                      isDisabled={child.isDisabled}
+                    >
+                      {child.label}
+                    </SidebarLink>
+                  </Dropdown.Item>
+                )
+            )}
+          </Dropdown.List>
+        </Dropdown>
+      )}
+    </SidebarItem>
+  );
+};
 
 export default function SidebarLayout({
   children,
@@ -80,30 +141,7 @@ export default function SidebarLayout({
             >
               {items.map((item) =>
                 item.children ? (
-                  <Collapse key={item.label}>
-                    <SidebarItem>
-                      <Collapse.Toggle className="w-full px-10 py-2" withIcon>
-                        {item.label}
-                      </Collapse.Toggle>
-                    </SidebarItem>
-                    <Collapse.List className="*:my-2 *:aria-hidden:my-0">
-                      {item.children.map(
-                        (child) =>
-                          child.href && (
-                            <Collapse.Item key={child.href}>
-                              <SidebarLink
-                                className="pl-14"
-                                href={child.href}
-                                isActive={child.isActive}
-                                isDisabled={child.isDisabled}
-                              >
-                                {child.label}
-                              </SidebarLink>
-                            </Collapse.Item>
-                          )
-                      )}
-                    </Collapse.List>
-                  </Collapse>
+                  <SidebarCollapse key={item.label} item={item} />
                 ) : (
                   <SidebarLink
                     key={item.href}
