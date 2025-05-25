@@ -4,7 +4,7 @@ import { CATEGORIES } from '@/constants/category';
 import {
   CategoryCard,
   ReflectionCard,
-  ResourceCard,
+  ResourceContainer,
   SearchHero,
   SectionTitle,
   SharerCard,
@@ -109,31 +109,7 @@ export default function ResourcePage({
               探索 所有資源
             </Button>
           </SectionTitle>
-          <div className="flex flex-col gap-5">
-            {data.results?.slice(2).map((resource) => (
-              <ResourceCard
-                key={resource.id}
-                title={
-                  resource.properties['資源名稱']?.title[0]?.plain_text ?? ''
-                }
-                content={
-                  resource.properties['介紹']?.rich_text[0]?.plain_text ?? ''
-                }
-                tags={resource.properties['領域名稱']?.multi_select.map(
-                  (cat) => cat.name
-                )}
-                userName={
-                  resource.properties['創建者']?.multi_select[0]?.name ?? ''
-                }
-                coverImageUrl={resource.properties['縮圖']?.files[0].name ?? ''}
-                time={resource.created_time}
-                level={
-                  resource.properties['年齡層']?.multi_select[0]?.name ?? ''
-                }
-                commentCount={0}
-              />
-            ))}
-          </div>
+          <ResourceContainer data={data.results?.slice(2)} />
         </div>
 
         <div>
@@ -147,31 +123,7 @@ export default function ResourcePage({
               探索 所有資源
             </Button>
           </SectionTitle>
-          <div className="flex flex-col gap-5">
-            {data.results?.slice(0, 2).map((resource) => (
-              <ResourceCard
-                key={resource.id}
-                title={
-                  resource.properties['資源名稱']?.title[0]?.plain_text ?? ''
-                }
-                content={
-                  resource.properties['介紹']?.rich_text[0]?.plain_text ?? ''
-                }
-                tags={resource.properties['領域名稱']?.multi_select.map(
-                  (cat) => cat.name
-                )}
-                userName={
-                  resource.properties['創建者']?.multi_select[0]?.name ?? ''
-                }
-                coverImageUrl={resource.properties['縮圖']?.files[0].name ?? ''}
-                time={resource.created_time}
-                level={
-                  resource.properties['年齡層']?.multi_select[0]?.name ?? ''
-                }
-                commentCount={0}
-              />
-            ))}
-          </div>
+          <ResourceContainer data={data.results?.slice(0, 2)} />
         </div>
 
         <div>
