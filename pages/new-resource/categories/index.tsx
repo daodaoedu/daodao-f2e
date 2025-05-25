@@ -1,9 +1,8 @@
 import type { InferGetStaticPropsType, GetStaticProps } from 'next';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
-import { CATEGORIES } from '@/constants/category';
 import {
-  CategoryCard,
+  CategoriesContainer,
   ResourceContainer,
   SectionTitle,
 } from '@/features/resources';
@@ -140,11 +139,7 @@ export default function ResourceCategoriesPage({
       </Section>
 
       <Section ref={section2Ref}>
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6 lg:gap-[1rem_1.5rem]">
-          {CATEGORIES.map((category) => (
-            <CategoryCard key={category.key} category={category} size="sm" />
-          ))}
-        </div>
+        <CategoriesContainer size="sm" />
       </Section>
 
       <Section className="px-0 md:px-0">

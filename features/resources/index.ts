@@ -1,3 +1,4 @@
+export { default as CategoriesContainer } from './components/CategoriesContainer';
 export { default as CategoryCard } from './components/CategoryCard';
 export { default as ReflectionCard } from './components/ReflectionCard';
 export { default as ResourceCard } from './components/ResourceCard';

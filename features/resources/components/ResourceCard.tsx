@@ -32,7 +32,7 @@ export default function ResourceCard(props: CardProps) {
     content = '資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹',
     coverImageUrl = '',
     tags = ['1', '2', '3'],
-    label = ['熱門', '最新', '人工智慧'],
+    label = ['最新'],
     level = '初級',
     viewCount = '尚未計算',
     commentCount = 12,
@@ -41,7 +41,7 @@ export default function ResourceCard(props: CardProps) {
   return (
     <section className="md:flex md:gap-4">
       {/* Card Image */}
-      <div className="relative w-80 aspect-[320/241]">
+      <div className="relative md:basis-80 aspect-[320/241]">
         <Image
           src={coverImageUrl}
           alt={title}
@@ -68,16 +68,16 @@ export default function ResourceCard(props: CardProps) {
       </div>
 
       {/* Card Content */}
-      <section className="flex flex-col gap-2 flex-1">
+      <section className="flex flex-col gap-2 w-[calc(100%-20rem)]">
         {/* Card Info */}
         <div className="flex justify-between items-center h-9">
-          <div className="flex items-center text-[1.125rem] leading-[1.6875rem] text-basic-500">
+          <div className="flex items-center body-md text-basic-500">
             <div>{userAvatar}</div>
             <div className="font-bold mr-1 ml-[0.5rem]">{userName}</div>
           </div>
         </div>
 
-        <div className="h-[2.1875rem] text-[1.375rem] font-bold text-basic-black truncate">
+        <div className="heading-md text-basic-black truncate">
           {title}
         </div>
 

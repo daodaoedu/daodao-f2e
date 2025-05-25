@@ -1,8 +1,7 @@
 import type { InferGetStaticPropsType, GetStaticProps } from 'next';
 import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
-import { CATEGORIES } from '@/constants/category';
 import {
-  CategoryCard,
+  CategoriesContainer,
   ReflectionCard,
   ResourceContainer,
   SearchHero,
@@ -137,11 +136,7 @@ export default function ResourcePage({
               探索 所有分類
             </Button>
           </SectionTitle>
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 lg:gap-[1rem_1.5rem]">
-            {CATEGORIES.slice(0, 8).map((category) => (
-              <CategoryCard key={category.key} category={category} />
-            ))}
-          </div>
+          <CategoriesContainer length={8} />
         </div>
       </Section>
 
