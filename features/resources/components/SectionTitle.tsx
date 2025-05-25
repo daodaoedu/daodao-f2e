@@ -14,7 +14,10 @@ function SectionTitle(
 ) {
   if (as === 'h1') {
     return (
-      <h1 ref={ref} className="heading-lg leading-relaxed text-basic-black">
+      <h1
+        ref={ref}
+        className={cn('heading-lg leading-relaxed text-basic-black', className)}
+      >
         {title}
       </h1>
     );

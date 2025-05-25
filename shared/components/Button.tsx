@@ -75,7 +75,9 @@ interface BaseButtonProps {
   animation?: ButtonAnimationEnum | `${ButtonAnimationEnum}`;
   isDisabled?: boolean;
   prefixIcon?: keyof typeof icons;
+  prefixIconClassName?: string;
   suffixIcon?: keyof typeof icons;
+  suffixIconClassName?: string;
   checkLogin?: boolean;
   onCheckLoginFailed?: () => void;
 }
@@ -110,7 +112,9 @@ function Button<AS extends 'button' | 'link' = 'button'>(
     isSubmit,
     onClick,
     prefixIcon,
+    prefixIconClassName,
     suffixIcon,
+    suffixIconClassName,
     href,
     target,
     checkLogin = false,
@@ -196,13 +200,13 @@ function Button<AS extends 'button' | 'link' = 'button'>(
   const content = (
     <>
       {PrefixIcon && (
-        <div className={iconClassName}>
+        <div className={cn(iconClassName, prefixIconClassName)}>
           <PrefixIcon className={iconClassName} />
         </div>
       )}
       {children}
       {SuffixIcon && (
-        <div className={iconClassName}>
+        <div className={cn(iconClassName, suffixIconClassName)}>
           <SuffixIcon className={iconClassName} />
         </div>
       )}

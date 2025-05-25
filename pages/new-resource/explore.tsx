@@ -1,22 +1,18 @@
 import type { InferGetStaticPropsType, GetStaticProps } from 'next';
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState, useCallback } from 'react';
 import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
-import { CATEGORIES } from '@/constants/category';
-import {
-  CategoryCard,
-  ResourceContainer,
-  SectionTitle,
-} from '@/features/resources';
+import { ResourceContainer, SectionTitle } from '@/features/resources';
 import {
   getNotionDatabase,
   NotionDatabaseResultSchema,
 } from '@/services/modules/notion';
 import JsonLdFactory from '@/utils/jsonLd';
 import { cn } from '@/utils/cn';
-import ArrowIcon from '@/public/assets/icons/arrow.svg';
 import LensIcon from '@/public/assets/icons/lens.svg';
 import Button from '@/shared/components/Button';
 import { usePromotion } from '@/contexts/Promotion';
+import useSearchParamsManager from '@/hooks/useSearchParamsManager';
+import useDebounce from '@/hooks/useDebounce';
 
 type SectionProps = {
   as?: 'section' | 'div';
@@ -27,10 +23,7 @@ type SectionProps = {
 const Section = forwardRef<HTMLDivElement, SectionProps>(
   ({ as: Component = 'section', className, children }, ref) => {
     return (
-      <Component
-        ref={ref}
-        className={cn('pb-11 px-5 md:pb-12 md:px-24', className)}
-      >
+      <Component ref={ref} className={className}>
         {children}
       </Component>
     );
@@ -91,24 +84,37 @@ export default function ResourceCategoriesPage({
   jsonLd,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const section1Ref = useRef<HTMLDivElement>(null);
-  const section2Ref = useRef<HTMLDivElement>(null);
-  const sectionTitleRef = useRef<HTMLHeadingElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [isShowNavShadow, setIsShowNavShadow] = useState(false);
+  const { height, setIsShowShadow: setIsShowHeaderShadow } = usePromotion();
+  const [getSearchParams, pushState] = useSearchParamsManager();
+  const searchParams = getSearchParams();
+  const keyword = searchParams?.q;
 
   const onClickFocus = () => {
     inputRef.current?.focus();
   };
-  const [isShowNavShadow, setIsShowNavShadow] = useState(false);
-  const { height, setIsShowShadow: setIsShowHeaderShadow } = usePromotion();
+
+  // 使用 useCallback 確保函數引用穩定
+  const updateSearchQuery = useCallback(
+    (value: string) => {
+      pushState('q', value);
+    },
+    [pushState]
+  );
+
+  // 使用 debounce 處理搜尋更新
+  const debouncedUpdateSearch = useDebounce(updateSearchQuery, 500);
+
+  const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    debouncedUpdateSearch(e.target.value);
+  };
 
   useEffect(() => {
     const getHeightByRef = (ref: React.RefObject<HTMLElement | null>) => {
       return ref.current?.offsetHeight ?? 0;
     };
-    const allHeight =
-      getHeightByRef(section1Ref) +
-      getHeightByRef(section2Ref) +
-      getHeightByRef(sectionTitleRef);
+    const allHeight = getHeightByRef(headerRef);
 
     const handleScroll = () => {
       if (window.scrollY > allHeight) {
@@ -128,32 +134,24 @@ export default function ResourceCategoriesPage({
   return (
     <>
       <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
-      <Section ref={section1Ref} as="div" className="pt-12">
-        <div className="mb-3 flex items-center gap-2 text-basic-400">
-          <Button as="link" href="/new-resource" className="px-2 -mx-2">
-            找資源
-          </Button>
-          <ArrowIcon />
-          <span>所有分類</span>
-        </div>
-        <SectionTitle as="h1" title="所有分類" />
-      </Section>
-
-      <Section ref={section2Ref}>
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6 lg:gap-[1rem_1.5rem]">
-          {CATEGORIES.map((category) => (
-            <CategoryCard key={category.key} category={category} size="sm" />
-          ))}
-        </div>
-      </Section>
-
-      <Section className="px-0 md:px-0">
+      <Section ref={headerRef} as="div" className="pt-12 px-5 md:px-24">
+        <Button
+          as="link"
+          href="/new-resource"
+          prefixIcon="Arrow"
+          prefixIconClassName="rotate-180"
+          className="mb-3 px-2 -mx-2"
+        >
+          返回
+        </Button>
         <SectionTitle
-          ref={sectionTitleRef}
+          as="h1"
           title="所有資源"
-          className="pb-0 px-5 md:pb-0 md:px-24"
+          className={cn(keyword && 'hidden')}
         />
+      </Section>
 
+      <Section className="pb-11 md:pb-12">
         <div
           className={cn(
             'sticky z-20 flex justify-between bg-basic-white py-5 px-5 md:py-6 md:px-24',
@@ -172,6 +170,7 @@ export default function ResourceCategoriesPage({
               type="search"
               placeholder="想找什麼資源..."
               className="h-10 w-full rounded-lg border-[#DBDBDB] border flex items-center justify-center p-[0_1rem_0_2.75rem]"
+              onChange={handleChangeSearch}
             />
           </div>
           <div className="flex gap-3">
@@ -184,7 +183,23 @@ export default function ResourceCategoriesPage({
           </div>
         </div>
 
+        {keyword && (
+          <div className="text-basic-500 body-sm px-5 pb-6 md:px-24">
+            "{keyword}" 共搜尋到{' '}
+            <span className="text-primary-base font-bold">
+              {data.results?.length}
+            </span>{' '}
+            筆
+          </div>
+        )}
+
         <ResourceContainer data={data.results} className="px-5 md:px-24" />
+
+        <div className="flex justify-center px-5 pt-6 md:px-24">
+          <Button variant="solid" color="primary" size="sm">
+            查看更多
+          </Button>
+        </div>
       </Section>
     </>
   );

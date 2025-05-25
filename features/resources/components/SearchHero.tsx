@@ -51,7 +51,7 @@ export default function SearchHero() {
           />
           <input
             ref={inputRef}
-            type="text"
+            type="search"
             placeholder="想找什麼資源..."
             className="h-10 w-full rounded-lg border-[#DBDBDB] border flex items-center justify-center p-[0_1rem_0_2.75rem]"
           />

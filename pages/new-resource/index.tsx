@@ -102,7 +102,7 @@ export default function ResourcePage({
           <SectionTitle title="熱門資源">
             <Button
               as="link"
-              href="/new-resource"
+              href="/new-resource/explore"
               className="body-lg font-medium text-basic-300"
               suffixIcon="Arrow"
             >
@@ -116,7 +116,7 @@ export default function ResourcePage({
           <SectionTitle title="最新資源">
             <Button
               as="link"
-              href="/new-resource"
+              href="/new-resource/explore"
               className="body-lg font-medium text-basic-300"
               suffixIcon="Arrow"
             >
