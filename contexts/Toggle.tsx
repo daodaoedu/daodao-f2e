@@ -7,6 +7,7 @@ import {
   useMemo,
   useLayoutEffect,
 } from 'react';
+import useControlledState from '@/hooks/useControlledState';
 
 interface AnchorPoint {
   left: string | undefined;
@@ -68,34 +69,29 @@ export const ToggleProvider = ({
   isEnabled,
   onChange,
 }: ToggleProviderProps) => {
-  const [isInternalOpen, setIsInternalOpen] = useState(defaultEnabled);
+  const [isOpen, setIsOpen] = useControlledState(
+    defaultEnabled,
+    isEnabled,
+    onChange
+  );
   const [isOpened, setIsOpened] = useState(!defaultEnabled);
   const [wrapperDom, setWrapperDom] = useState<HTMLElement | null>(null);
   const [triggerDom, setTriggerDom] = useState<HTMLElement | null>(null);
   const [anchorPoint, setAnchorPoint] = useState<AnchorPoint | undefined>(
     undefined
   );
-  const isControlled = typeof isEnabled === 'boolean';
-  const isOpen = isControlled ? isEnabled : isInternalOpen;
 
-  const value = useMemo(() => {
-    const handleIsOpen = (_isOpen: boolean) => {
-      if (onChange) {
-        onChange(_isOpen);
-      }
-      if (!isControlled) {
-        setIsInternalOpen(_isOpen);
-      }
-    };
-    return {
+  const value = useMemo(
+    () => ({
       isOpen,
       isOpened,
       anchorPoint,
-      setIsOpen: handleIsOpen,
+      setIsOpen,
       setWrapperDom,
       setTriggerDom,
-    };
-  }, [isOpen, isOpened, isControlled, isEnabled, anchorPoint, onChange]);
+    }),
+    [isOpen, isOpened, isEnabled, anchorPoint, setIsOpen]
+  );
 
   useLayoutEffect(() => {
     let timer: NodeJS.Timeout;

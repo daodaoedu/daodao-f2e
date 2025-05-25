@@ -68,7 +68,7 @@ export default function ResourceCard(props: CardProps) {
       </div>
 
       {/* Card Content */}
-      <section className="flex flex-col gap-2 w-[calc(100%-20rem)]">
+      <section className="flex flex-col gap-2 md:w-[calc(100%-20rem)]">
         {/* Card Info */}
         <div className="flex justify-between items-center h-9">
           <div className="flex items-center body-md text-basic-500">
