@@ -4,7 +4,7 @@ import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
 import {
   CategoriesContainer,
   ResourceContainer,
-  SectionTitle,
+  ResourceBanner,
 } from '@/features/resources';
 import {
   getNotionDatabase,
@@ -16,6 +16,8 @@ import ArrowIcon from '@/public/assets/icons/arrow.svg';
 import LensIcon from '@/public/assets/icons/lens.svg';
 import Button from '@/shared/components/Button';
 import { usePromotion } from '@/contexts/Promotion';
+import { CATEGORIES, SEARCH_TAGS } from '@/constants/category';
+import { parseToArray } from '@/services/core';
 
 type SectionProps = {
   as?: 'section' | 'div';
@@ -36,7 +38,31 @@ const Section = forwardRef<HTMLDivElement, SectionProps>(
   }
 );
 
-export const getStaticProps = (async () => {
+export const getStaticPaths = async () => {
+  const paths = CATEGORIES.flatMap((category) => [
+    {
+      params: {
+        categories: [category.label],
+      },
+    },
+    ...SEARCH_TAGS[category.label].map((tag) => ({
+      params: {
+        categories: [category.label, tag],
+      },
+    })),
+  ]);
+
+  return {
+    paths,
+    fallback: false,
+  };
+};
+
+export const getStaticProps = (async (context) => {
+  const categories = parseToArray<keyof typeof SEARCH_TAGS>(
+    context.params?.categories
+  );
+
   const data = await getNotionDatabase({
     page_size: 16,
   });
@@ -79,20 +105,22 @@ export const getStaticProps = (async () => {
       .setItems(coursesJsonLd),
   ]);
 
-  return { props: { data, jsonLd } };
+  return { props: { data, jsonLd, categories } };
 }) satisfies GetStaticProps<{
   data: NotionDatabaseResultSchema;
   jsonLd: JsonLdType;
+  categories: string[] | null;
 }>;
 
 export default function ResourceCategoriesPage({
   data,
   jsonLd,
+  categories,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const inputRef = useRef<HTMLInputElement>(null);
   const section1Ref = useRef<HTMLDivElement>(null);
   const section2Ref = useRef<HTMLDivElement>(null);
-  const sectionTitleRef = useRef<HTMLHeadingElement>(null);
+  const section3Ref = useRef<HTMLDivElement>(null);
 
   const onClickFocus = () => {
     inputRef.current?.focus();
@@ -107,7 +135,7 @@ export default function ResourceCategoriesPage({
     const allHeight =
       getHeightByRef(section1Ref) +
       getHeightByRef(section2Ref) +
-      getHeightByRef(sectionTitleRef);
+      getHeightByRef(section3Ref);
 
     const handleScroll = () => {
       if (window.scrollY > allHeight) {
@@ -127,28 +155,54 @@ export default function ResourceCategoriesPage({
   return (
     <>
       <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
-      <Section ref={section1Ref} as="div" className="pt-12">
+      <Section ref={section1Ref} as="div" className="pt-12 pb-6 md:pb-6">
         <div className="mb-3 flex items-center gap-2 text-basic-400">
           <Button as="link" href="/new-resource" className="px-2 -mx-2">
             找資源
           </Button>
           <ArrowIcon />
-          <span>所有分類</span>
+          <Button
+            as="link"
+            href="/new-resource/categories"
+            className="px-2 -mx-2"
+          >
+            所有分類
+          </Button>
+          <ArrowIcon />
+          {categories?.length === 1 && <span>{categories[0]}</span>}
+          {categories?.length === 2 && (
+            <>
+              <Button
+                as="link"
+                href={`/new-resource/categories/${categories[0]}`}
+                className="px-2 -mx-2"
+              >
+                {categories[0]}
+              </Button>
+              <ArrowIcon />
+              <span>{categories[1]}</span>
+            </>
+          )}
         </div>
-        <SectionTitle as="h1" title="所有分類" />
       </Section>
 
-      <Section ref={section2Ref}>
-        <CategoriesContainer size="sm" />
+      <Section ref={section2Ref} className="pb-10 md:pb-10">
+        <ResourceBanner
+          size="md"
+          title={categories?.[categories?.length - 1] ?? ''}
+          content="測試資料"
+          image=""
+          length={data.results?.length}
+        />
       </Section>
+
+      {Array.isArray(categories) && categories.length === 1 && (
+        <Section ref={section3Ref} className="pb-6 md:pb-6">
+          <CategoriesContainer size="sm" selectedCategories={categories} />
+        </Section>
+      )}
 
       <Section className="px-0 md:px-0">
-        <SectionTitle
-          ref={sectionTitleRef}
-          title="所有資源"
-          className="pb-0 px-5 md:pb-0 md:px-24"
-        />
-
         <div
           className={cn(
             'sticky z-20 flex justify-between bg-basic-white py-5 px-5 md:py-6 md:px-24',

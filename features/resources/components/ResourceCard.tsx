@@ -25,18 +25,25 @@ type CardProps = {
 
 export default function ResourceCard(props: CardProps) {
   const {
-    userName = '小許',
+    userName,
     userAvatar = <DefaultAvatar />,
-    time = '2024.12.10',
-    title = '自然語言處理 Natural Language Progress',
-    content = '資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹資源介紹',
+    time,
+    title = '',
+    content = '',
     coverImageUrl = '',
-    tags = ['1', '2', '3'],
-    label = ['最新'],
+    tags = [],
+    label = [],
     level = '初級',
     viewCount = '尚未計算',
     commentCount = 12,
   } = props;
+
+  const isNewResource = dayjs(time).isBetween(
+    dayjs(),
+    dayjs().subtract(1, 'month')
+  );
+
+  const labels = isNewResource ? ['近期新增', ...label] : label;
 
   return (
     <section className="md:flex md:gap-4">
@@ -53,7 +60,7 @@ export default function ResourceCard(props: CardProps) {
 
         {/* Card Image Label */}
         <div className=" absolute top-3 left-3 flex flex-wrap gap-2">
-          {label.map((_label) => {
+          {labels.map((_label) => {
             return (
               <div
                 key={_label}
@@ -77,9 +84,7 @@ export default function ResourceCard(props: CardProps) {
           </div>
         </div>
 
-        <div className="heading-md text-basic-black truncate">
-          {title}
-        </div>
+        <div className="heading-md text-basic-black truncate">{title}</div>
 
         {/* Card Tags */}
         <div className="flex gap-1">

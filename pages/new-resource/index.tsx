@@ -4,7 +4,7 @@ import {
   CategoriesContainer,
   ReflectionCard,
   ResourceContainer,
-  SearchHero,
+  ResourceBanner,
   SectionTitle,
   SharerCard,
 } from '@/features/resources';
@@ -16,6 +16,7 @@ import Carousel from '@/shared/components/Carousel';
 import JsonLdFactory from '@/utils/jsonLd';
 import { cn } from '@/utils/cn';
 import Button from '@/shared/components/Button';
+import { SEARCH_TAGS } from '@/constants/category';
 
 const Section = ({
   className,
@@ -24,7 +25,7 @@ const Section = ({
   return (
     <section
       className={cn(
-        'flex flex-col gap-11 p-[2.75rem_1.25rem] md:p-[3rem_7.5rem]',
+        'flex flex-col gap-11 px-5 py-11 md:px-24 md:py-12',
         className
       )}
     >
@@ -93,7 +94,12 @@ export default function ResourcePage({
     <>
       <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
       {/* 找資源 banner */}
-      <SearchHero />
+      <ResourceBanner
+        title="找資源"
+        content="藉由他人真實的資源使用經驗，找到真正適合自己的學習資源，透過個人化推薦系統，幫助每位學習者在龐大的學習資源中，快速找到最適合自己的內容！"
+        image=""
+        hotTags={SEARCH_TAGS['全部']}
+      />
 
       {/* 熱門資源, 最新資源, 熱門分類 */}
       <Section>
