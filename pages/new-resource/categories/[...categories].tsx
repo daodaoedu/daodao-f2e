@@ -1,5 +1,4 @@
 import type { InferGetStaticPropsType, GetStaticProps } from 'next';
-import { forwardRef, useEffect, useRef, useState } from 'react';
 import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
 import {
   CategoriesContainer,
@@ -15,9 +14,9 @@ import JsonLdFactory from '@/utils/jsonLd';
 import { cn } from '@/utils/cn';
 import ArrowIcon from '@/public/assets/icons/arrow.svg';
 import Button from '@/shared/components/Button';
-import { usePromotion } from '@/contexts/Promotion';
 import { CATEGORIES, SEARCH_TAGS } from '@/constants/category';
 import { parseToArray } from '@/services/core';
+import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
 
 type SectionProps = {
   as?: 'section' | 'div';
@@ -25,18 +24,17 @@ type SectionProps = {
   children: React.ReactNode;
 };
 
-const Section = forwardRef<HTMLDivElement, SectionProps>(
-  ({ as: Component = 'section', className, children }, ref) => {
-    return (
-      <Component
-        ref={ref}
-        className={cn('pb-11 px-5 md:pb-12 md:px-24', className)}
-      >
-        {children}
-      </Component>
-    );
-  }
-);
+const Section = ({
+  as: Component = 'section',
+  className,
+  children,
+}: SectionProps) => {
+  return (
+    <Component className={cn('pb-11 px-5 md:pb-12 md:px-24', className)}>
+      {children}
+    </Component>
+  );
+};
 
 export const getStaticPaths = async () => {
   const paths = CATEGORIES.flatMap((category) => [
@@ -117,41 +115,12 @@ export default function ResourceCategoriesPage({
   jsonLd,
   categories,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const section1Ref = useRef<HTMLDivElement>(null);
-  const section2Ref = useRef<HTMLDivElement>(null);
-  const section3Ref = useRef<HTMLDivElement>(null);
-
-  const [isShowNavShadow, setIsShowNavShadow] = useState(false);
-  const { height, setIsShowShadow: setIsShowHeaderShadow } = usePromotion();
-
-  useEffect(() => {
-    const getHeightByRef = (ref: React.RefObject<HTMLElement | null>) => {
-      return ref.current?.offsetHeight ?? 0;
-    };
-    const allHeight =
-      getHeightByRef(section1Ref) +
-      getHeightByRef(section2Ref) +
-      getHeightByRef(section3Ref);
-
-    const handleScroll = () => {
-      if (window.scrollY > allHeight) {
-        setIsShowNavShadow(true);
-        setIsShowHeaderShadow(false);
-      } else {
-        setIsShowNavShadow(false);
-        setIsShowHeaderShadow(true);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [height]);
+  const { height, isShowShadow, TriggerElement } = useShadowToggleOnScroll();
 
   return (
     <>
       <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
-      <Section ref={section1Ref} as="div" className="pt-12 pb-6 md:pb-6">
+      <Section as="div" className="pt-12 pb-6 md:pb-6">
         <div className="mb-3 flex items-center gap-2 text-basic-400">
           <Button as="link" href="/new-resource" className="px-2 -mx-2">
             找資源
@@ -182,7 +151,7 @@ export default function ResourceCategoriesPage({
         </div>
       </Section>
 
-      <Section ref={section2Ref} className="pb-10 md:pb-10">
+      <Section className="pb-10 md:pb-10">
         <ResourceBanner
           size="md"
           title={categories?.[categories?.length - 1] ?? ''}
@@ -192,17 +161,14 @@ export default function ResourceCategoriesPage({
         />
       </Section>
 
-      {Array.isArray(categories) && categories.length === 1 && (
-        <Section ref={section3Ref} className="pb-6 md:pb-6">
-          <CategoriesContainer size="sm" selectedCategories={categories} />
-        </Section>
-      )}
+      <CategoriesContainer size="sm" selectedCategories={categories} />
 
       <Section className="px-0 md:px-0">
+        <TriggerElement />
         <div
           className={cn(
             'sticky z-20 flex justify-between bg-basic-white py-5 px-5 md:py-6 md:px-24',
-            isShowNavShadow && 'shadow-md shadow-basic-black/10'
+            isShowShadow && 'shadow-md shadow-basic-black/10'
           )}
           style={{ top: `${height}px` }}
         >

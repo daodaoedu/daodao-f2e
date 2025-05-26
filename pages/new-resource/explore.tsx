@@ -1,5 +1,5 @@
 import type { InferGetStaticPropsType, GetStaticProps } from 'next';
-import { forwardRef, useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
 import {
   ResourceContainer,
@@ -13,9 +13,9 @@ import {
 import JsonLdFactory from '@/utils/jsonLd';
 import { cn } from '@/utils/cn';
 import Button from '@/shared/components/Button';
-import { usePromotion } from '@/contexts/Promotion';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 import useDebounce from '@/hooks/useDebounce';
+import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
 
 type SectionProps = {
   as?: 'section' | 'div';
@@ -23,15 +23,13 @@ type SectionProps = {
   children: React.ReactNode;
 };
 
-const Section = forwardRef<HTMLDivElement, SectionProps>(
-  ({ as: Component = 'section', className, children }, ref) => {
-    return (
-      <Component ref={ref} className={className}>
-        {children}
-      </Component>
-    );
-  }
-);
+const Section = ({
+  as: Component = 'section',
+  className,
+  children,
+}: SectionProps) => {
+  return <Component className={className}>{children}</Component>;
+};
 
 export const getStaticProps = (async () => {
   const data = await getNotionDatabase({
@@ -86,14 +84,11 @@ export default function ResourceCategoriesPage({
   data,
   jsonLd,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const headerRef = useRef<HTMLDivElement>(null);
-  const [isShowNavShadow, setIsShowNavShadow] = useState(false);
-  const { height, setIsShowShadow: setIsShowHeaderShadow } = usePromotion();
+  const { height, isShowShadow, TriggerElement } = useShadowToggleOnScroll();
   const [getSearchParams, pushState] = useSearchParamsManager();
   const searchParams = getSearchParams();
   const keyword = searchParams?.q;
 
-  // 使用 useCallback 確保函數引用穩定
   const updateSearchQuery = useCallback(
     (value: string) => {
       pushState('q', value);
@@ -101,34 +96,12 @@ export default function ResourceCategoriesPage({
     [pushState]
   );
 
-  // 使用 debounce 處理搜尋更新
   const debouncedUpdateSearch = useDebounce(updateSearchQuery, 500);
-
-  useEffect(() => {
-    const getHeightByRef = (ref: React.RefObject<HTMLElement | null>) => {
-      return ref.current?.offsetHeight ?? 0;
-    };
-    const allHeight = getHeightByRef(headerRef);
-
-    const handleScroll = () => {
-      if (window.scrollY > allHeight) {
-        setIsShowNavShadow(true);
-        setIsShowHeaderShadow(false);
-      } else {
-        setIsShowNavShadow(false);
-        setIsShowHeaderShadow(true);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [height]);
 
   return (
     <>
       <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
-      <Section ref={headerRef} as="div" className="pt-12 px-5 md:px-24">
+      <Section as="div" className="pt-12 px-5 md:px-24">
         <Button
           as="link"
           href="/new-resource"
@@ -146,10 +119,11 @@ export default function ResourceCategoriesPage({
       </Section>
 
       <Section className="pb-11 md:pb-12">
+        <TriggerElement />
         <div
           className={cn(
             'sticky z-20 flex justify-between bg-basic-white py-5 px-5 md:py-6 md:px-24',
-            isShowNavShadow && 'shadow-md shadow-basic-black/10'
+            isShowShadow && 'shadow-md shadow-basic-black/10'
           )}
           style={{ top: `${height}px` }}
         >

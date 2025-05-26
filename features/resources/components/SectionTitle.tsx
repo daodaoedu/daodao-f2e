@@ -1,5 +1,4 @@
 import { cn } from '@/utils/cn';
-import { forwardRef } from 'react';
 
 interface SectionTitleProps {
   title: string;
@@ -8,14 +7,15 @@ interface SectionTitleProps {
   children?: React.ReactNode;
 }
 
-function SectionTitle(
-  { as = 'h2', title, className, children }: SectionTitleProps,
-  ref: React.Ref<HTMLHeadingElement>
-) {
+export default function SectionTitle({
+  as = 'h2',
+  title,
+  className,
+  children,
+}: SectionTitleProps) {
   if (as === 'h1') {
     return (
       <h1
-        ref={ref}
         className={cn('heading-lg leading-relaxed text-basic-black', className)}
       >
         {title}
@@ -30,15 +30,10 @@ function SectionTitle(
         className
       )}
     >
-      <h2
-        ref={ref}
-        className="leading-[2.4rem] text-[1.5rem] font-bold text-basic-500"
-      >
+      <h2 className="leading-[2.4rem] text-[1.5rem] font-bold text-basic-500">
         {title}
       </h2>
       {children}
     </div>
   );
 }
-
-export default forwardRef(SectionTitle);
