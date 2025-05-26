@@ -5,6 +5,7 @@ import {
   CategoriesContainer,
   ResourceContainer,
   ResourceBanner,
+  SearchInput,
 } from '@/features/resources';
 import {
   getNotionDatabase,
@@ -13,7 +14,6 @@ import {
 import JsonLdFactory from '@/utils/jsonLd';
 import { cn } from '@/utils/cn';
 import ArrowIcon from '@/public/assets/icons/arrow.svg';
-import LensIcon from '@/public/assets/icons/lens.svg';
 import Button from '@/shared/components/Button';
 import { usePromotion } from '@/contexts/Promotion';
 import { CATEGORIES, SEARCH_TAGS } from '@/constants/category';
@@ -117,14 +117,10 @@ export default function ResourceCategoriesPage({
   jsonLd,
   categories,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const section1Ref = useRef<HTMLDivElement>(null);
   const section2Ref = useRef<HTMLDivElement>(null);
   const section3Ref = useRef<HTMLDivElement>(null);
 
-  const onClickFocus = () => {
-    inputRef.current?.focus();
-  };
   const [isShowNavShadow, setIsShowNavShadow] = useState(false);
   const { height, setIsShowShadow: setIsShowHeaderShadow } = usePromotion();
 
@@ -210,19 +206,7 @@ export default function ResourceCategoriesPage({
           )}
           style={{ top: `${height}px` }}
         >
-          {/* 搜尋欄 */}
-          <div className="basis-1/2 relative">
-            <LensIcon
-              className="absolute top-[0.625rem] left-4"
-              onClick={onClickFocus}
-            />
-            <input
-              ref={inputRef}
-              type="search"
-              placeholder="想找什麼資源..."
-              className="h-10 w-full rounded-lg border-[#DBDBDB] border flex items-center justify-center p-[0_1rem_0_2.75rem]"
-            />
-          </div>
+          <SearchInput onChange={console.log} />
           <div className="flex gap-3">
             <Button variant="outline" size="sm" color="primary">
               篩選

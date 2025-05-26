@@ -1,14 +1,17 @@
 import type { InferGetStaticPropsType, GetStaticProps } from 'next';
 import { forwardRef, useEffect, useRef, useState, useCallback } from 'react';
 import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
-import { ResourceContainer, SectionTitle } from '@/features/resources';
+import {
+  ResourceContainer,
+  SearchInput,
+  SectionTitle,
+} from '@/features/resources';
 import {
   getNotionDatabase,
   NotionDatabaseResultSchema,
 } from '@/services/modules/notion';
 import JsonLdFactory from '@/utils/jsonLd';
 import { cn } from '@/utils/cn';
-import LensIcon from '@/public/assets/icons/lens.svg';
 import Button from '@/shared/components/Button';
 import { usePromotion } from '@/contexts/Promotion';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
@@ -83,17 +86,12 @@ export default function ResourceCategoriesPage({
   data,
   jsonLd,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const [isShowNavShadow, setIsShowNavShadow] = useState(false);
   const { height, setIsShowShadow: setIsShowHeaderShadow } = usePromotion();
   const [getSearchParams, pushState] = useSearchParamsManager();
   const searchParams = getSearchParams();
   const keyword = searchParams?.q;
-
-  const onClickFocus = () => {
-    inputRef.current?.focus();
-  };
 
   // 使用 useCallback 確保函數引用穩定
   const updateSearchQuery = useCallback(
@@ -105,10 +103,6 @@ export default function ResourceCategoriesPage({
 
   // 使用 debounce 處理搜尋更新
   const debouncedUpdateSearch = useDebounce(updateSearchQuery, 500);
-
-  const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    debouncedUpdateSearch(e.target.value);
-  };
 
   useEffect(() => {
     const getHeightByRef = (ref: React.RefObject<HTMLElement | null>) => {
@@ -159,20 +153,7 @@ export default function ResourceCategoriesPage({
           )}
           style={{ top: `${height}px` }}
         >
-          {/* 搜尋欄 */}
-          <div className="basis-1/2 relative">
-            <LensIcon
-              className="absolute top-[0.625rem] left-4"
-              onClick={onClickFocus}
-            />
-            <input
-              ref={inputRef}
-              type="search"
-              placeholder="想找什麼資源..."
-              className="h-10 w-full rounded-lg border-[#DBDBDB] border flex items-center justify-center p-[0_1rem_0_2.75rem]"
-              onChange={handleChangeSearch}
-            />
-          </div>
+          <SearchInput onChange={debouncedUpdateSearch} />
           <div className="flex gap-3">
             <Button variant="outline" size="sm" color="primary">
               篩選
