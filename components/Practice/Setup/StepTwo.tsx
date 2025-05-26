@@ -73,7 +73,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                 type="range"
                 min="7"
                 max="30"
-                className="w-full border-0 focus:ring-0 focus:outline-none" 
+                className="w-full border-0 focus:ring-0 focus:outline-none"
                 style={{
                   accentColor: colors.primary
                 }}
