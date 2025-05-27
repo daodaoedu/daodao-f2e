@@ -4,7 +4,7 @@ import {
   CategoriesContainer,
   ResourceContainer,
   ResourceBanner,
-  SearchInput,
+  SearchForm,
 } from '@/features/resources';
 import {
   getNotionDatabase,
@@ -16,7 +16,6 @@ import ArrowIcon from '@/public/assets/icons/arrow.svg';
 import Button from '@/shared/components/Button';
 import { CATEGORIES, SEARCH_TAGS } from '@/constants/category';
 import { parseToArray } from '@/services/core';
-import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
 
 type SectionProps = {
   as?: 'section' | 'div';
@@ -30,9 +29,7 @@ const Section = ({
   children,
 }: SectionProps) => {
   return (
-    <Component className={cn('pb-11 px-5 md:pb-12 md:px-24', className)}>
-      {children}
-    </Component>
+    <Component className={cn('px-5 md:px-24', className)}>{children}</Component>
   );
 };
 
@@ -115,13 +112,11 @@ export default function ResourceCategoriesPage({
   jsonLd,
   categories,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const { height, isShowShadow, TriggerElement } = useShadowToggleOnScroll();
-
   return (
     <>
       <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
-      <Section as="div" className="pt-12 pb-6 md:pb-6">
-        <div className="mb-3 flex items-center gap-2 text-basic-400">
+      <Section as="div" className="pt-8 mb-3 md:pt-12 md:mb-6">
+        <div className="flex items-center gap-2 text-basic-400">
           <Button as="link" href="/new-resource" className="px-2 -mx-2">
             找資源
           </Button>
@@ -151,7 +146,7 @@ export default function ResourceCategoriesPage({
         </div>
       </Section>
 
-      <Section className="pb-10 md:pb-10">
+      <Section className="pb-10">
         <ResourceBanner
           size="md"
           title={categories?.[categories?.length - 1] ?? ''}
@@ -161,31 +156,16 @@ export default function ResourceCategoriesPage({
         />
       </Section>
 
-      <CategoriesContainer size="sm" selectedCategories={categories} />
+      <Section>
+        <CategoriesContainer size="sm" selectedCategories={categories} />
+      </Section>
 
       <Section className="px-0 md:px-0">
-        <TriggerElement />
-        <div
-          className={cn(
-            'sticky z-20 flex justify-between bg-basic-white py-5 px-5 md:py-6 md:px-24',
-            isShowShadow && 'shadow-md shadow-basic-black/10'
-          )}
-          style={{ top: `${height}px` }}
-        >
-          <SearchInput onChange={console.log} />
-          <div className="flex gap-3">
-            <Button variant="outline" size="sm" color="primary">
-              篩選
-            </Button>
-            <Button variant="outline" size="sm" color="primary">
-              最熱門
-            </Button>
-          </div>
-        </div>
+        <SearchForm />
 
         <ResourceContainer data={data.results} className="px-5 md:px-24" />
 
-        <div className="flex justify-center px-5 pt-6 md:px-24">
+        <div className="flex justify-center px-5 py-6 md:px-24">
           <Button variant="solid" color="primary" size="sm">
             查看更多
           </Button>

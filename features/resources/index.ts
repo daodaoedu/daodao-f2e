@@ -4,6 +4,6 @@ export { default as ReflectionCard } from './components/ReflectionCard';
 export { default as ResourceBanner } from './components/ResourceBanner';
 export { default as ResourceCard } from './components/ResourceCard';
 export { default as ResourceContainer } from './components/ResourceContainer';
-export { default as SearchInput } from './components/SearchInput';
+export { default as SearchForm } from './components/SearchIForm';
 export { default as SectionTitle } from './components/SectionTitle';
 export { default as SharerCard } from './components/SharerCard';

@@ -3,7 +3,7 @@ import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
 import {
   CategoriesContainer,
   ResourceContainer,
-  SearchInput,
+  SearchForm,
   SectionTitle,
 } from '@/features/resources';
 import {
@@ -14,7 +14,6 @@ import JsonLdFactory from '@/utils/jsonLd';
 import { cn } from '@/utils/cn';
 import ArrowIcon from '@/public/assets/icons/arrow.svg';
 import Button from '@/shared/components/Button';
-import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
 
 type SectionProps = {
   as?: 'section' | 'div';
@@ -87,8 +86,6 @@ export default function ResourceCategoriesPage({
   data,
   jsonLd,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const { height, isShowShadow, TriggerElement } = useShadowToggleOnScroll();
-
   return (
     <>
       <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
@@ -110,25 +107,7 @@ export default function ResourceCategoriesPage({
       <Section className="relative px-0 md:px-0">
         <SectionTitle title="所有資源" className="pb-0 px-5 md:pb-0 md:px-24" />
 
-        <TriggerElement />
-
-        <div
-          className={cn(
-            'sticky z-20 flex justify-between bg-basic-white py-5 px-5 md:py-6 md:px-24',
-            isShowShadow && 'shadow-md shadow-basic-black/10'
-          )}
-          style={{ top: `${height}px` }}
-        >
-          <SearchInput onChange={console.log} />
-          <div className="flex gap-3">
-            <Button variant="outline" size="sm" color="primary">
-              篩選
-            </Button>
-            <Button variant="outline" size="sm" color="primary">
-              最熱門
-            </Button>
-          </div>
-        </div>
+        <SearchForm />
 
         <ResourceContainer data={data.results} className="px-5 md:px-24" />
 

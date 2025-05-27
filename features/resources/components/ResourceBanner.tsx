@@ -34,26 +34,29 @@ export default function ResourceBanner({
   return (
     <section
       className={cn(
-        'relative bg-primary-palest p-5 md:py-12 md:px-24 md:flex',
+        'relative bg-primary-palest md:py-12 md:px-24 md:flex',
         isMediumSize && 'rounded-xl overflow-hidden md:px-10'
       )}
     >
       {/* 圖片 */}
-      <div className="relative h-[17.3125rem] md:absolute md:right-0 md:h-full md:object-cover md:z-0 md:mt-[-3rem] lg:absolute lg:right-0 lg:h-full lg:object-cover lg:z-0 lg:mt-[-3rem] ">
-        <Image src={image} alt={title} borderRadius="0" height="inherit" />
+      <div className="relative aspect-video md:aspect-auto md:absolute md:top-0 md:right-0 md:h-full md:object-cover">
+        <Image
+          src={image}
+          alt={title}
+          borderRadius="0"
+          height="100%"
+          className="object-cover"
+          wrapperClassName="!block"
+        />
 
         <div className="absolute inset-0 w-full h-full bg-primary-base opacity-30 block md:hidden" />
         <div
-          className="h-full w-[calc(100%+1px)] absolute top-0 right-0 bg-[linear-gradient(270.27deg,_rgba(243,252,252,0)_16.33%,_#F3FCFC_96.08%),_rgba(22,185,179,0.3)] hidden md:block"
-          style={{
-            background:
-              'linear-gradient(270.27deg, rgba(243, 252, 252, 0) 16.33%, #F3FCFC 96.08%), rgba(22, 185, 179, 0.3)',
-          }}
+          className="h-full w-[calc(100%+1px)] absolute top-0 right-0 bg-gradient-primary-palest hidden md:block"
         />
       </div>
 
       {/* 搜尋欄 標籤 分享資源 */}
-      <div className="relative p-5 pb-11 md:w-3/5 flex flex-col gap-5 md:p-0 md:gap-6">
+      <div className="relative p-5 pb-11 lg:w-3/5 flex flex-col gap-5 md:p-0 md:gap-6">
         <div>
           <SectionTitle as={isMediumSize ? 'h2' : 'h1'} title={title} />
 
@@ -81,11 +84,11 @@ export default function ResourceBanner({
         <div className="flex flex-col">
           {/* 標籤 */}
           {isLargeSize && Array.isArray(hotTags) && hotTags.length > 0 && (
-            <div className="flex flex-col md:flex-row md:items-center">
+            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-5 md:mb-6">
               <div className="text-nowrap min-w-[4.5rem] h-[1.875rem] text-xl font-bold md:text-lg md:leading-[1.6875rem] md:h-[1.6875rem]">
                 熱門標籤
               </div>
-              <div className="flex flex-wrap gap-1 m-[0.5rem_0_1.25rem_0] md:m-[0_0_0_0.75rem] md:gap-2">
+              <div className="flex flex-wrap gap-1 md:gap-2">
                 {SEARCH_TAGS['全部'].map((item) => {
                   return (
                     <button
@@ -103,14 +106,14 @@ export default function ResourceBanner({
           )}
 
           {isMediumSize && typeof length === 'number' && (
-            <div className="flex flex-col md:flex-row md:items-center">
+            <div className="flex flex-col md:flex-row md:items-center mb-6">
               <div className="body-lg">
                 共 <span className="font-bold">{length}</span> 筆資源
               </div>
             </div>
           )}
 
-          <Button variant="solid" color="primary" className="w-max mt-6">
+          <Button variant="solid" color="primary" className="md:w-max">
             + 分享資源
           </Button>
         </div>

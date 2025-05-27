@@ -108,7 +108,7 @@ export default function ResourcePage({
             <Button
               as="link"
               href="/new-resource/explore"
-              className="body-lg font-medium text-basic-300"
+              className="-mx-2 px-2 body-lg font-medium text-basic-300"
               suffixIcon="Arrow"
             >
               探索 所有資源
@@ -122,7 +122,7 @@ export default function ResourcePage({
             <Button
               as="link"
               href="/new-resource/explore"
-              className="body-lg font-medium text-basic-300"
+              className="-mx-2 px-2 body-lg font-medium text-basic-300"
               suffixIcon="Arrow"
             >
               探索 所有資源
@@ -136,13 +136,13 @@ export default function ResourcePage({
             <Button
               as="link"
               href="/new-resource/categories"
-              className="body-lg font-medium text-basic-300"
+              className="-mx-2 px-2 body-lg font-medium text-basic-300"
               suffixIcon="Arrow"
             >
               探索 所有分類
             </Button>
           </SectionTitle>
-          <CategoriesContainer length={8} />
+          <CategoriesContainer maxLength={8} />
         </div>
       </Section>
 

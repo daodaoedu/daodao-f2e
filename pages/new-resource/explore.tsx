@@ -1,9 +1,8 @@
 import type { InferGetStaticPropsType, GetStaticProps } from 'next';
-import { useCallback } from 'react';
 import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
 import {
   ResourceContainer,
-  SearchInput,
+  SearchForm,
   SectionTitle,
 } from '@/features/resources';
 import {
@@ -14,8 +13,6 @@ import JsonLdFactory from '@/utils/jsonLd';
 import { cn } from '@/utils/cn';
 import Button from '@/shared/components/Button';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
-import useDebounce from '@/hooks/useDebounce';
-import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
 
 type SectionProps = {
   as?: 'section' | 'div';
@@ -84,19 +81,9 @@ export default function ResourceCategoriesPage({
   data,
   jsonLd,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const { height, isShowShadow, TriggerElement } = useShadowToggleOnScroll();
-  const [getSearchParams, pushState] = useSearchParamsManager();
+  const [getSearchParams] = useSearchParamsManager();
   const searchParams = getSearchParams();
   const keyword = searchParams?.q;
-
-  const updateSearchQuery = useCallback(
-    (value: string) => {
-      pushState('q', value);
-    },
-    [pushState]
-  );
-
-  const debouncedUpdateSearch = useDebounce(updateSearchQuery, 500);
 
   return (
     <>
@@ -119,24 +106,7 @@ export default function ResourceCategoriesPage({
       </Section>
 
       <Section className="pb-11 md:pb-12">
-        <TriggerElement />
-        <div
-          className={cn(
-            'sticky z-20 flex justify-between bg-basic-white py-5 px-5 md:py-6 md:px-24',
-            isShowShadow && 'shadow-md shadow-basic-black/10'
-          )}
-          style={{ top: `${height}px` }}
-        >
-          <SearchInput onChange={debouncedUpdateSearch} />
-          <div className="flex gap-3">
-            <Button variant="outline" size="sm" color="primary">
-              篩選
-            </Button>
-            <Button variant="outline" size="sm" color="primary">
-              最熱門
-            </Button>
-          </div>
-        </div>
+        <SearchForm />
 
         {keyword && (
           <div className="text-basic-500 body-sm px-5 pb-6 md:px-24">
