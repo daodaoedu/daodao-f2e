@@ -1,7 +1,6 @@
 import { useRef } from 'react';
 import Image from '@/shared/components/Image';
 import LensIcon from '@/public/assets/icons/lens.svg';
-import { SEARCH_TAGS } from '@/constants/category';
 import Button from '@/shared/components/Button';
 import { cn } from '@/utils/cn';
 import SectionTitle from './SectionTitle';
@@ -50,9 +49,7 @@ export default function ResourceBanner({
         />
 
         <div className="absolute inset-0 w-full h-full bg-primary-base opacity-30 block md:hidden" />
-        <div
-          className="h-full w-[calc(100%+1px)] absolute top-0 right-0 bg-gradient-primary-palest hidden md:block"
-        />
+        <div className="h-full w-[calc(100%+1px)] absolute top-0 right-0 bg-gradient-primary-palest hidden md:block" />
       </div>
 
       {/* 搜尋欄 標籤 分享資源 */}
@@ -89,15 +86,15 @@ export default function ResourceBanner({
                 熱門標籤
               </div>
               <div className="flex flex-wrap gap-1 md:gap-2">
-                {SEARCH_TAGS['全部'].map((item) => {
+                {hotTags.map((tag) => {
                   return (
                     <button
-                      key={item}
+                      key={tag}
                       type="button"
                       className="px-3 py-0.5 text-primary-base bg-white border border-solid border-primary-base rounded-full"
                     >
                       <span className="font-bold">#</span>
-                      {item}
+                      {tag}
                     </button>
                   );
                 })}

@@ -19,12 +19,12 @@ const SearchField = () => {
   const router = useRouter();
   return (
     <TagsWrapper>
-      {SEARCH_TAGS['全部'].map((text) => (
-        <li key={text}>
+      {SEARCH_TAGS.all.map(({ value, label }) => (
+        <li key={value}>
           <Chip
-            onClick={() => router.push(`/search?tags=${text}`)}
-            label={text}
-            value={text}
+            onClick={() => router.push(`/search?tags=${value}`)}
+            label={label}
+            value={value}
             sx={{
               backgroundColor: '#fff',
               opacity: '80%',

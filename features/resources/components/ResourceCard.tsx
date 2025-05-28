@@ -40,8 +40,8 @@ export default function ResourceCard(props: CardProps) {
   } = props;
 
   const isNewResource = dayjs(time).isBetween(
-    dayjs(),
-    dayjs().subtract(1, 'month')
+    dayjs().subtract(1, 'month'),
+    dayjs()
   );
 
   const labels = isNewResource ? ['近期新增', ...label] : label;

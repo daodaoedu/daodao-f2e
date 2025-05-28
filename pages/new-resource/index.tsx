@@ -98,7 +98,7 @@ export default function ResourcePage({
         title="找資源"
         content="藉由他人真實的資源使用經驗，找到真正適合自己的學習資源，透過個人化推薦系統，幫助每位學習者在龐大的學習資源中，快速找到最適合自己的內容！"
         image=""
-        hotTags={SEARCH_TAGS['全部']}
+        hotTags={SEARCH_TAGS.all.map(({ label }) => label)}
       />
 
       {/* 熱門資源, 最新資源, 熱門分類 */}
@@ -142,7 +142,7 @@ export default function ResourcePage({
               探索 所有分類
             </Button>
           </SectionTitle>
-          <CategoriesContainer maxLength={8} />
+          <CategoriesContainer maxLength={8} disabledCollapse />
         </div>
       </Section>
 

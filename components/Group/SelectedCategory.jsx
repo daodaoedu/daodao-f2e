@@ -112,8 +112,8 @@ const SelectedCategory = () => {
               onClick={() => pushState('category')}
             />
           </li>
-          {CATEGORIES.map(({ key, value, label }) => (
-            <li key={key}>
+          {CATEGORIES.map(({ value, label }) => (
+            <li key={value}>
               <Chip
                 label={label}
                 value={value}

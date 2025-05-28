@@ -16,6 +16,7 @@ import ArrowIcon from '@/public/assets/icons/arrow.svg';
 import Button from '@/shared/components/Button';
 import { CATEGORIES, SEARCH_TAGS } from '@/constants/category';
 import { parseToArray } from '@/services/core';
+import { useMemo } from 'react';
 
 type SectionProps = {
   as?: 'section' | 'div';
@@ -37,12 +38,12 @@ export const getStaticPaths = async () => {
   const paths = CATEGORIES.flatMap((category) => [
     {
       params: {
-        categories: [category.label],
+        categories: [category.value],
       },
     },
-    ...SEARCH_TAGS[category.label].map((tag) => ({
+    ...(SEARCH_TAGS[category.value] ?? []).map((tag) => ({
       params: {
-        categories: [category.label, tag],
+        categories: [category.value, tag.value],
       },
     })),
   ]);
@@ -112,6 +113,22 @@ export default function ResourceCategoriesPage({
   jsonLd,
   categories,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
+  const categoriesData = useMemo(() => {
+    if (!Array.isArray(categories) || categories.length === 0) return [];
+
+    const category = CATEGORIES.find((c) => c.value === categories[0]);
+
+    if (!category) return [];
+
+    const tag = SEARCH_TAGS[category.value]?.find(
+      (t) => t.value === categories[1]
+    );
+
+    if (!tag) return [category];
+
+    return [category, tag];
+  }, [categories]);
+
   return (
     <>
       <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
@@ -129,18 +146,20 @@ export default function ResourceCategoriesPage({
             所有分類
           </Button>
           <ArrowIcon />
-          {categories?.length === 1 && <span>{categories[0]}</span>}
-          {categories?.length === 2 && (
+          {categoriesData?.length === 1 && (
+            <span>{categoriesData[0].label}</span>
+          )}
+          {categoriesData?.length === 2 && (
             <>
               <Button
                 as="link"
-                href={`/new-resource/categories/${categories[0]}`}
+                href={`/new-resource/categories/${categoriesData[0].value}`}
                 className="px-2 -mx-2"
               >
-                {categories[0]}
+                {categoriesData[0].label}
               </Button>
               <ArrowIcon />
-              <span>{categories[1]}</span>
+              <span>{categoriesData[1].label}</span>
             </>
           )}
         </div>
@@ -149,7 +168,7 @@ export default function ResourceCategoriesPage({
       <Section className="pb-10">
         <ResourceBanner
           size="md"
-          title={categories?.[categories?.length - 1] ?? ''}
+          title={categoriesData[0].label}
           content="測試資料"
           image=""
           length={data.results?.length}

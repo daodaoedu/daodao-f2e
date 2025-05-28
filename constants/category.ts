@@ -1,139 +1,161 @@
-export const CATEGORIES = [
+export interface ICategory {
+  value: string;
+  label: string;
+  image?: string;
+}
+
+export const CATEGORIES: ICategory[] = [
   {
-    key: 'language',
     value: 'language',
     label: '語言與文學',
     image: 'https://i.imgur.com/YgvrDCz.png',
   },
   {
-    key: 'math',
     value: 'math',
     label: '數學與邏輯',
     image: 'https://i.imgur.com/kXKWrmA.png',
   },
   {
-    key: 'computer-science',
     value: 'computer-science',
     label: '資訊與工程',
     image: 'https://i.imgur.com/sIJeYIp.png',
   },
   {
-    key: 'humanity',
     value: 'humanity',
     label: '人文社會',
     image: 'https://i.imgur.com/Ea2cmzs.png',
   },
   {
-    key: 'nature-science',
     value: 'nature-science',
     label: '自然科學',
     image: 'https://i.imgur.com/jSaZ7AF.png',
   },
   {
-    key: 'art',
     value: 'art',
     label: '藝術',
     image: 'https://i.imgur.com/GvJ1ddz.png',
   },
   {
-    key: 'education',
     value: 'education',
     label: '教育',
     image: 'https://i.imgur.com/M21rIig.png',
   },
   {
-    key: 'life',
     value: 'life',
     label: '生活',
     image: 'https://i.imgur.com/AQIxl4v.png',
   },
   {
-    key: 'health',
     value: 'health',
     label: '運動/心理/醫學',
     image: 'https://i.imgur.com/QuuxALA.png',
   },
   {
-    key: 'business',
     value: 'business',
     label: '商業與社會創新',
     image: 'https://i.imgur.com/ZVewhol.png',
   },
   {
-    key: 'diversity',
     value: 'diversity',
     label: '綜合型學習資源',
     image: 'https://i.imgur.com/rFNVZy8.png',
   },
   {
-    key: 'learningtools',
     value: 'learningtools',
     label: '學習/教學工具',
     image: 'https://i.imgur.com/qxhYvEI.png',
   },
-] as const;
+];
 
-export const SEARCH_TAGS: {
-  [key in (typeof CATEGORIES)[number]['label'] | '全部']: string[];
-} = {
-  全部: ['英語', '心理學', '數學', '設計', '教育創新', '日文', '生命教育'],
-  語言與文學: [
-    '中文',
-    '英語',
-    '有聲書',
-    '聽力',
-    '單字',
-    '閱讀',
-    '多語言型學習資源',
-    '口說',
-    '寫作',
-    '日文',
+export const SEARCH_TAGS: Record<string, ICategory[]> = {
+  all: [
+    { value: 'english', label: '英語' },
+    { value: 'psychology', label: '心理學' },
+    { value: 'math', label: '數學' },
+    { value: 'design', label: '設計' },
+    { value: 'education', label: '教育創新' },
+    { value: 'japanese', label: '日文' },
+    { value: 'life', label: '生命教育' },
   ],
-  數學與邏輯: ['數學', '邏輯'],
-  資訊與工程: ['程式設計'],
-  人文社會: [
-    '歷史',
-    '文化',
-    '法律',
-    '政治',
-    '經濟',
-    '國際情勢',
-    '社會議題',
-    '哲學',
+  language: [
+    { value: 'chinese', label: '中文' },
+    { value: 'english', label: '英語' },
+    { value: 'audio-book', label: '有聲書' },
+    { value: 'listening', label: '聽力' },
+    { value: 'vocabulary', label: '單字' },
+    { value: 'reading', label: '閱讀' },
+    { value: 'multilingual', label: '多語言型學習資源' },
+    { value: 'speaking', label: '口說' },
+    { value: 'writing', label: '寫作' },
+    { value: 'japanese', label: '日文' },
   ],
-  自然科學: ['物理', '化學', '生物', '地科', '動畫'],
-  藝術: [
-    '圖片素材',
-    '設計',
-    '排版素材',
-    '戲劇',
-    '繪畫',
-    '音樂',
-    '藝文資訊',
-    '攝影',
+  math: [
+    { value: 'math', label: '數學' },
+    { value: 'logic', label: '邏輯' },
   ],
-  教育: [
-    '實驗教育',
-    '自主學習',
-    '民主教育',
-    '生涯探索',
-    '升學資訊',
-    '教學方法',
-    '教育創新',
+  'computer-science': [{ value: 'programming', label: '程式設計' }],
+  humanity: [
+    { value: 'history', label: '歷史' },
+    { value: 'culture', label: '文化' },
+    { value: 'law', label: '法律' },
+    { value: 'politics', label: '政治' },
+    { value: 'economy', label: '經濟' },
+    { value: 'international-situation', label: '國際情勢' },
+    { value: 'social-issues', label: '社會議題' },
+    { value: 'philosophy', label: '哲學' },
   ],
-  生活: ['烘焙烹飪', '食農', '媒體', '旅遊', '攝影'],
-  '運動/心理/醫學': [
-    '運動',
-    '心理學',
-    '醫學',
-    '輔導',
-    '自我成長',
-    '諮商',
-    '生命教育',
+  'nature-science': [
+    { value: 'physics', label: '物理' },
+    { value: 'chemistry', label: '化學' },
+    { value: 'biology', label: '生物' },
+    { value: 'geology', label: '地科' },
+    { value: 'animation', label: '動畫' },
   ],
-  商業與社會創新: ['投資理財', '公關行銷', '社會創新', '人力資源'],
-  綜合型學習資源: ['MOOC', '多元學習類型', '學科類型'],
-  '學習/教學工具': ['線上教學', '視訊軟體', '數位學習', '提案軟體'],
+  art: [
+    { value: 'image-material', label: '圖片素材' },
+    { value: 'design', label: '設計' },
+    { value: 'layout-material', label: '排版素材' },
+    { value: 'theater', label: '戲劇' },
+    { value: 'drawing', label: '繪畫' },
+    { value: 'music', label: '音樂' },
+    { value: 'art-information', label: '藝文資訊' },
+    { value: 'photography', label: '攝影' },
+  ],
+  education: [
+    { value: 'experimental-education', label: '實驗教育' },
+    { value: 'self-learning', label: '自主學習' },
+    { value: 'democratic-education', label: '民主教育' },
+    { value: 'career-exploration', label: '生涯探索' },
+    { value: 'college-admission-information', label: '升學資訊' },
+    { value: 'teaching-methods', label: '教學方法' },
+    { value: 'education-innovation', label: '教育創新' },
+  ],
+  life: [
+    { value: 'cooking', label: '烘焙烹飪' },
+    { value: 'food-agriculture', label: '食農' },
+    { value: 'media', label: '媒體' },
+    { value: 'travel', label: '旅遊' },
+    { value: 'photography', label: '攝影' },
+  ],
+  health: [
+    { value: 'sports', label: '運動' },
+    { value: 'psychology', label: '心理學' },
+    { value: 'medicine', label: '醫學' },
+    { value: 'guidance', label: '輔導' },
+  ],
+  business: [
+    { value: 'investment', label: '投資理財' },
+    { value: 'public-relations', label: '公關行銷' },
+    { value: 'social-innovation', label: '社會創新' },
+    { value: 'human-resources', label: '人力資源' },
+  ],
+  diversity: [
+    { value: 'mooc', label: 'MOOC' },
+    { value: 'online-teaching', label: '線上教學' },
+    { value: 'video-software', label: '視訊軟體' },
+    { value: 'digital-learning', label: '數位學習' },
+    { value: 'proposal-software', label: '提案軟體' },
+  ],
 };
 
 export const NAV_LINK = [

@@ -10,7 +10,8 @@ interface CategoriesContainerProps {
   className?: string;
   size?: 'sm' | 'md';
   maxLength?: number;
-  selectedCategories?: (keyof typeof SEARCH_TAGS)[] | null;
+  selectedCategories?: string[] | null;
+  disabledCollapse?: boolean;
 }
 
 export default function CategoriesContainer({
@@ -18,6 +19,7 @@ export default function CategoriesContainer({
   size = 'md',
   maxLength = CATEGORIES.length,
   selectedCategories,
+  disabledCollapse = false,
 }: CategoriesContainerProps) {
   const [isShowAll, setIsShowAll] = useState(false);
   const { isMobile } = useBreakpoint();
@@ -32,12 +34,7 @@ export default function CategoriesContainer({
       return CATEGORIES;
     }
     if (selectedCategories.length === 1) {
-      return SEARCH_TAGS[selectedCategories[0]].map((tag) => ({
-        key: tag,
-        value: tag,
-        label: tag,
-        image: '',
-      }));
+      return SEARCH_TAGS[selectedCategories[0]];
     }
     return null;
   };
@@ -50,7 +47,7 @@ export default function CategoriesContainer({
 
   const categoryLength = Array.isArray(categories) ? categories.length : 0;
 
-  const isEnableShowAllButton = categoryLength > 6 && isMobile;
+  const isEnableShowAllButton = categoryLength > 6 && isMobile && !disabledCollapse;
 
   const categoriesWrapperStyle = useMemo<
     React.CSSProperties | undefined
@@ -67,7 +64,7 @@ export default function CategoriesContainer({
       return { maxHeight: rows * categoryCardHeight + gap * (rows - 1) };
     }
     return { maxHeight: 3 * categoryCardHeight + gap * 2 };
-  }, [isEnableShowAllButton, isShowAll, categoryLength]);
+  }, [isEnableShowAllButton, isShowAll, categoryLength, disabledCollapse]);
 
   return (
     Array.isArray(categories) && (
@@ -83,7 +80,11 @@ export default function CategoriesContainer({
           style={categoriesWrapperStyle}
         >
           {categories.slice(0, maxLength).map((category) => (
-            <CategoryCard key={category.key} category={category} size={size} />
+            <CategoryCard
+              key={category.value}
+              category={category}
+              size={size}
+            />
           ))}
         </div>
         {isEnableShowAllButton && (
