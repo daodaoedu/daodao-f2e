@@ -56,7 +56,7 @@ export class SearchResultsPageBuilder extends JsonLdBuilder<SearchResultsPage> {
     this.data.mainContentOfPage = {
       '@type': 'WebPageElement',
       isPartOf: {
-        '@id': this.data['@id'] || '',
+        '@id': this.data['@id'] ?? '',
       },
       about: {
         '@type': 'Thing',

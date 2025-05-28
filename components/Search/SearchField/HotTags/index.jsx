@@ -39,8 +39,8 @@ const Tags = ({ queryList }) => {
     >
       <Whatshot sx={{ color: 'red' }} />
       <TagsWrapper>
-        {hotTags.map((value) => (
-          <Item key={`${value}`} title={value} />
+        {hotTags.map(({ value, label }) => (
+          <Item key={value} title={label} />
         ))}
       </TagsWrapper>
     </Box>
