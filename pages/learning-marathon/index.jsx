@@ -23,6 +23,7 @@ import { logEvent } from '@/utils/analytics';
 import ApplyClosePopup from '@/components/Marathon/ApplyClosePopup';
 import marathonConfig from '@/constants/marathon';
 import { MARATHON_LINKS } from '@/constants/category';
+import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
 
 const StyledBannerButton = styled(Button)`
   &.MuiButton-root {
@@ -194,35 +195,17 @@ const Nav = () => {
     disabled: item.disabled,
     external: item.external,
   }));
-
-  const [isShowNavShadow, setIsShowNavShadow] = useState(false);
-  const { height, setIsShowShadow: setIsShowHeaderShadow } = usePromotion();
-
-  useEffect(() => {
-    const bannerHeight = document.querySelector('main')?.children?.[0]?.offsetHeight || 0;
-    const handleScroll = () => {
-      if (window.scrollY > bannerHeight) {
-        setIsShowNavShadow(true);
-        setIsShowHeaderShadow(false);
-      } else {
-        setIsShowNavShadow(false);
-        setIsShowHeaderShadow(true);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+  const { isShowShadow, height, TriggerElement } = useShadowToggleOnScroll();
 
   return (
     <nav
       className={cn(
         "sticky z-10 bg-basic-100 text-nowrap overflow-x-auto transition-shadow duration-300",
-        isShowNavShadow && "shadow-md shadow-basic-black/10"
+        isShowShadow && "shadow-md shadow-basic-black/10"
       )}
       style={{ top: `${height}px` }}
     >
+      <TriggerElement />
       <ul className="max-w-[750px] mx-auto flex justify-between gap-4">
         {navItems.map((item) => (
           <li key={item.label} className="shrink-0">
