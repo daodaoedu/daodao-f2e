@@ -2,17 +2,25 @@
 import React from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { PracticeProvider, usePractice } from '../../../contexts/PracticeContext';
-import DashboardFlow from '../../../components/Practice/Dashboard/DashboardFlow';
+import { usePracticeDetail } from '@/features/practice/hooks';
+import DashboardFlow from '@/features/practice/components/Dashboard/DashboardFlow';
 
-const PracticeDetailContent: React.FC = () => {
+const PracticeDetailPage: React.FC = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { getPractice } = usePractice();
 
-  const practice = getPractice(id as string);
+  // 使用自製 hook 取代 context
+  const { practice, loading, error } = usePracticeDetail(id as string);
 
-  if (!practice) {
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-primary-palest flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-base" />
+      </div>
+    );
+  }
+
+  if (error || !practice) {
     return (
       <div className="min-h-screen bg-primary-palest flex items-center justify-center">
         <div className="text-center">
@@ -42,14 +50,6 @@ const PracticeDetailContent: React.FC = () => {
         onBack={() => router.push('/practice')}
       />
     </>
-  );
-};
-
-const PracticeDetailPage: React.FC = () => {
-  return (
-    <PracticeProvider>
-      <PracticeDetailContent />
-    </PracticeProvider>
   );
 };
 

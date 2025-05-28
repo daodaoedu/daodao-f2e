@@ -2,19 +2,29 @@
 import React from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { IoArrowBackOutline as ArrowLeft } from 'react-icons/io5';
-import { PracticeProvider, usePractice } from '../../../contexts/PracticeContext';
-import EditForm from '../../../components/Practice/Edit/EditForm';
-import { MotivationType, ReminderFrequency, UpdatePracticeInput } from '../../../services/practice/types';
+import { ArrowLeft } from 'lucide-react';
+import { usePracticeDetail } from '@/features/practice/hooks';
+import { usePractices } from '@/services/modules/practice/hooks';
+import EditForm from '@/features/practice/components/Edit/EditForm';
+import { MotivationType, ReminderFrequency, UpdatePracticeInput } from '@/services/modules/practice';
 
-const EditPracticeContent: React.FC = () => {
+const EditPracticePage: React.FC = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { getPractice, updatePractice } = usePractice();
 
-  const practice = getPractice(id as string);
+  // 使用自製 hooks 取代 context
+  const { practice, loading, error } = usePracticeDetail(id as string);
+  const { updatePractice } = usePractices();
 
-  if (!practice) {
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-primary-palest flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-base" />
+      </div>
+    );
+  }
+
+  if (error || !practice) {
     return (
       <div className="min-h-screen bg-primary-palest flex items-center justify-center">
         <div className="text-center">
@@ -36,8 +46,8 @@ const EditPracticeContent: React.FC = () => {
     try {
       await updatePractice(practice.id, updates);
       router.push(`/practice/${practice.id}`);
-    } catch (error) {
-      console.error('更新失敗:', error);
+    } catch (err) {
+      console.error('更新失敗:', err);
     }
   };
 
@@ -110,10 +120,10 @@ const EditPracticeContent: React.FC = () => {
                       description: practice.description ?? '',
                       totalAmount: practice.totalAmount ?? 1,
                       targetDate: practice.targetDate ?? '',
-                      motivationType: practice.motivationType ?? MotivationType.PERSONAL,
+                      motivationType: practice.motivationType ?? 'personal' as MotivationType,
                       customMotivation: practice.customMotivation ?? '',
                       reminderEnabled: practice.reminderEnabled ?? false,
-                      reminderFrequency: practice.reminderFrequency ?? ReminderFrequency.DAILY,
+                      reminderFrequency: practice.reminderFrequency ?? 'daily' as ReminderFrequency,
                       smallGoals: practice.smallGoals ?? [],
                       resources: practice.resources ?? []
                     });
@@ -128,14 +138,6 @@ const EditPracticeContent: React.FC = () => {
         </div>
       </div>
     </>
-  );
-};
-
-const EditPracticePage: React.FC = () => {
-  return (
-    <PracticeProvider>
-      <EditPracticeContent />
-    </PracticeProvider>
   );
 };
 

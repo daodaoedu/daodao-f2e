@@ -2,8 +2,7 @@
 import React from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import SetupFlow from '@/components/Practice/Setup/SetupFlow';
-import { PracticeProvider } from '@/contexts/PracticeContext';
+import SetupFlow from '@/features/practice/components/Setup/SetupFlow';
 
 const CreatePracticePage: React.FC = () => {
   const router = useRouter();
@@ -19,7 +18,7 @@ const CreatePracticePage: React.FC = () => {
   };
 
   return (
-    <PracticeProvider>
+    <>
       <Head>
         <title>建立新實踐 - 主題實踐</title>
         <meta name="description" content="建立你的學習實踐計劃" />
@@ -29,7 +28,7 @@ const CreatePracticePage: React.FC = () => {
         onComplete={handleComplete}
         onCancel={handleCancel}
       />
-    </PracticeProvider>
+    </>
   );
 };
 

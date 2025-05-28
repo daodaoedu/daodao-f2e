@@ -1,10 +1,10 @@
 import {
-  IoBookOutline as BookOpen,
-  IoVideocamOutline as Video,
-  IoDocumentTextOutline as FileText,
-  IoHeadsetOutline as Headphones,
-  IoAddCircleOutline as PlusCircle
-} from 'react-icons/io5';
+  Book,
+  Video,
+  FileText,
+  Headphones,
+  Plus
+} from 'lucide-react';
 
 // 自定義色彩方案 - 匹配專案配色
 export const colors = {
@@ -27,13 +27,13 @@ export const motivationOptions = [
   { id: 'other', label: '其他...' }
 ];
 
-// 內容類型選項
+// 內容類型選項 - 使用 string 型別以確保相容性
 export const contentTypeOptions = [
-  { id: 'book', label: '書籍', icon: BookOpen },
-  { id: 'video', label: '影片課程', icon: Video },
-  { id: 'articles', label: '文章', icon: FileText },
-  { id: 'podcast', label: 'Podcast', icon: Headphones },
-  { id: 'custom', label: '自定義', icon: PlusCircle }
+  { id: 'book' as const, label: '書籍', icon: Book },
+  { id: 'video' as const, label: '影片課程', icon: Video },
+  { id: 'articles' as const, label: '文章', icon: FileText },
+  { id: 'podcast' as const, label: 'Podcast', icon: Headphones },
+  { id: 'custom' as const, label: '自定義', icon: Plus }
 ];
 
 // 根據內容類型獲取單位類型
