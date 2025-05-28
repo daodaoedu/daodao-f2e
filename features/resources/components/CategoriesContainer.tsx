@@ -41,7 +41,7 @@ export default function CategoriesContainer({
 
   const hasSubCategories =
     Array.isArray(selectedCategories) &&
-    SEARCH_TAGS[selectedCategories[0]].length > 1;
+    SEARCH_TAGS[selectedCategories[0]]?.length > 1;
 
   const categories = getCategories();
 

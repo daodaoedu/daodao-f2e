@@ -156,6 +156,7 @@ export const SEARCH_TAGS: Record<string, ICategory[]> = {
     { value: 'digital-learning', label: '數位學習' },
     { value: 'proposal-software', label: '提案軟體' },
   ],
+  learningtools: [],
 };
 
 export const NAV_LINK = [
