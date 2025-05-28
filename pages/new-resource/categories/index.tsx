@@ -2,6 +2,7 @@ import type { InferGetStaticPropsType, GetStaticProps } from 'next';
 import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
 import {
   CategoriesContainer,
+  createResourceJsonLd,
   ResourceContainer,
   SearchForm,
   SectionTitle,
@@ -38,41 +39,11 @@ export const getStaticProps = (async () => {
     page_size: 16,
   });
 
-  const coursesJsonLd = data.results?.slice(0, 4).map((result) =>
-    JsonLdFactory.createCourseBuilder()
-      .setId(result.id)
-      .setName(result.properties['資源名稱']?.title[0]?.plain_text ?? '')
-      .setDescription(result.properties['介紹']?.rich_text[0]?.plain_text ?? '')
-      .setUrl(`https://www.daoedu.tw/resource/${result.id}`)
-      .setImage(result.properties['縮圖']?.files[0]?.external?.url ?? '')
-      .setEducationalLevel(
-        result.properties['年齡層']?.multi_select.map((age) => age.name)
-      )
-      .setEducationalUse(
-        result.properties['領域名稱']?.multi_select.map((cat) => cat.name)
-      )
-      .setProvider(
-        'Person',
-        result.properties['創建者']?.multi_select[0]?.name ?? '島島阿學'
-      )
-      .setOffers({
-        category: result.properties['費用']?.select?.name ?? '',
-        price: result.properties['費用']?.select?.name ?? '',
-        priceCurrency: 'TWD',
-      })
-      .setHasCourseInstance({
-        courseMode: 'Online',
-        courseWorkload: 'PT30M',
-      })
-      .build()
-  );
+  const coursesJsonLd = data.results?.slice(0, 4).map(createResourceJsonLd);
 
   const jsonLd = JsonLdFactory.createGraph([
     JsonLdFactory.createItemListBuilder()
-      .setName('學習資源列表')
-      .setDescription(
-        '「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。'
-      )
+      .setName('所有分類')
       .setItems(coursesJsonLd),
   ]);
 
@@ -88,7 +59,7 @@ export default function ResourceCategoriesPage({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <>
-      <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
+      <SEOConfig title="所有分類｜島島阿學" jsonLd={jsonLd} />
       <Section as="div" className="pt-12">
         <div className="mb-3 flex items-center gap-2 text-basic-400">
           <Button as="link" href="/new-resource" className="px-2 -mx-2">

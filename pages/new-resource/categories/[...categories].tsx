@@ -5,6 +5,8 @@ import {
   ResourceContainer,
   ResourceBanner,
   SearchForm,
+  getCategories,
+  createResourceJsonLd,
 } from '@/features/resources';
 import {
   getNotionDatabase,
@@ -16,7 +18,7 @@ import ArrowIcon from '@/public/assets/icons/arrow.svg';
 import Button from '@/shared/components/Button';
 import { CATEGORIES, SEARCH_TAGS } from '@/constants/category';
 import { parseToArray } from '@/services/core';
-import { useMemo } from 'react';
+import { Categories } from '@/features/resources/utils/getCategories';
 
 type SectionProps = {
   as?: 'section' | 'div';
@@ -55,83 +57,43 @@ export const getStaticPaths = async () => {
 };
 
 export const getStaticProps = (async (context) => {
-  const categories = parseToArray<keyof typeof SEARCH_TAGS>(
-    context.params?.categories
+  const categories = getCategories(
+    parseToArray<keyof typeof SEARCH_TAGS>(context.params?.categories)
   );
+
+  const title = categories?.[1]?.label ?? categories?.[0]?.label ?? '暫無分類';
 
   const data = await getNotionDatabase({
     page_size: 16,
   });
 
-  const coursesJsonLd = data.results?.slice(0, 4).map((result) =>
-    JsonLdFactory.createCourseBuilder()
-      .setId(result.id)
-      .setName(result.properties['資源名稱']?.title[0]?.plain_text ?? '')
-      .setDescription(result.properties['介紹']?.rich_text[0]?.plain_text ?? '')
-      .setUrl(`https://www.daoedu.tw/resource/${result.id}`)
-      .setImage(result.properties['縮圖']?.files[0]?.external?.url ?? '')
-      .setEducationalLevel(
-        result.properties['年齡層']?.multi_select.map((age) => age.name)
-      )
-      .setEducationalUse(
-        result.properties['領域名稱']?.multi_select.map((cat) => cat.name)
-      )
-      .setProvider(
-        'Person',
-        result.properties['創建者']?.multi_select[0]?.name ?? '島島阿學'
-      )
-      .setOffers({
-        category: result.properties['費用']?.select?.name ?? '',
-        price: result.properties['費用']?.select?.name ?? '',
-        priceCurrency: 'TWD',
-      })
-      .setHasCourseInstance({
-        courseMode: 'Online',
-        courseWorkload: 'PT30M',
-      })
-      .build()
-  );
+  const coursesJsonLd = data.results?.slice(0, 4).map(createResourceJsonLd);
 
   const jsonLd = JsonLdFactory.createGraph([
     JsonLdFactory.createItemListBuilder()
-      .setName('學習資源列表')
-      .setDescription(
-        '「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。'
-      )
+      .setName(`${title}學習資源列表`)
       .setItems(coursesJsonLd),
   ]);
 
-  return { props: { data, jsonLd, categories } };
+  return { props: { data, jsonLd, categories, title } };
 }) satisfies GetStaticProps<{
   data: NotionDatabaseResultSchema;
   jsonLd: JsonLdType;
-  categories: string[] | null;
+  categories: Categories;
+  title: string;
 }>;
 
 export default function ResourceCategoriesPage({
   data,
   jsonLd,
   categories,
+  title,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const categoriesData = useMemo(() => {
-    if (!Array.isArray(categories) || categories.length === 0) return [];
-
-    const category = CATEGORIES.find((c) => c.value === categories[0]);
-
-    if (!category) return [];
-
-    const tag = SEARCH_TAGS[category.value]?.find(
-      (t) => t.value === categories[1]
-    );
-
-    if (!tag) return [category];
-
-    return [category, tag];
-  }, [categories]);
+  if (!categories) return null;
 
   return (
     <>
-      <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
+      <SEOConfig title={`${title}學習資源列表｜島島阿學`} jsonLd={jsonLd} />
       <Section as="div" className="pt-8 mb-3 md:pt-12 md:mb-6">
         <div className="flex items-center gap-2 text-basic-400">
           <Button as="link" href="/new-resource" className="px-2 -mx-2">
@@ -146,20 +108,18 @@ export default function ResourceCategoriesPage({
             所有分類
           </Button>
           <ArrowIcon />
-          {categoriesData?.length === 1 && (
-            <span>{categoriesData[0].label}</span>
-          )}
-          {categoriesData?.length === 2 && (
+          {categories?.length === 1 && <span>{categories[0].label}</span>}
+          {categories?.length === 2 && (
             <>
               <Button
                 as="link"
-                href={`/new-resource/categories/${categoriesData[0].value}`}
+                href={`/new-resource/categories/${categories[0].value}`}
                 className="px-2 -mx-2"
               >
-                {categoriesData[0].label}
+                {categories[0].label}
               </Button>
               <ArrowIcon />
-              <span>{categoriesData[1].label}</span>
+              <span>{categories[1].label}</span>
             </>
           )}
         </div>
@@ -168,7 +128,7 @@ export default function ResourceCategoriesPage({
       <Section className="pb-10">
         <ResourceBanner
           size="md"
-          title={categoriesData[0].label}
+          title={categories[0].label}
           content="測試資料"
           image=""
           length={data.results?.length}
@@ -176,7 +136,10 @@ export default function ResourceCategoriesPage({
       </Section>
 
       <Section>
-        <CategoriesContainer size="sm" selectedCategories={categories} />
+        <CategoriesContainer
+          size="sm"
+          selectedCategories={categories.map((c) => c.value)}
+        />
       </Section>
 
       <Section className="px-0 md:px-0">

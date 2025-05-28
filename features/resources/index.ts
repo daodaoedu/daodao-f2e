@@ -7,3 +7,5 @@ export { default as ResourceContainer } from './components/ResourceContainer';
 export { default as SearchForm } from './components/SearchIForm';
 export { default as SectionTitle } from './components/SectionTitle';
 export { default as SharerCard } from './components/SharerCard';
+export { default as createResourceJsonLd } from './utils/createResourceJsonLd';
+export { default as getCategories } from './utils/getCategories';
