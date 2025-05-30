@@ -2,9 +2,10 @@ import { useMemo } from 'react';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { MdLockOpen, MdLock } from 'react-icons/md';
+import { AiOutlineMore } from 'react-icons/ai';
 import { ROLE } from '@/constants/member';
 import { ProjectSchema } from '@/services/modules/projects';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 
 interface ProjectHeaderProps {
   project: ProjectSchema;
@@ -46,11 +47,12 @@ export default function ProjectHeader({ project }: ProjectHeaderProps) {
           <span>2</span>
         </div> */}
             <Button
-              className="-m-1 p-1"
-              size="sm"
-              prefixIcon="AiOutlineMore"
+              size="icon"
+              variant="ghost"
               onClick={() => toast.error('功能尚未開放')}
-            />
+            >
+              <AiOutlineMore />
+            </Button>
           </div>
         </div>
       </div>

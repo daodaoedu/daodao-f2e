@@ -11,7 +11,7 @@ import {
 import { cn } from "@/utils/cn";
 import { useMilestones } from '@/contexts/Milestones/index';
 import { Task as TaskType } from "@/contexts/Milestones/type";
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import Dropdown from '@/shared/components/Dropdown';
 import { useDialog } from '@/contexts/Dialog';
 
@@ -198,6 +198,7 @@ const Task = ({
                   {WEEKDAYS.map((day) => (
                     <Dropdown.Item key={day}>
                       <Button
+                        variant="ghost"
                         aria-selected={newTask.daysOfWeek?.includes(day)}
                         onClick={() => handleDaySelect(day)}
                         className={cn(

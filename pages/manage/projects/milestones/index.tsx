@@ -13,7 +13,7 @@ import MilestoneCard, {
 import DraggableMilestones from '@/components/Milestones/DraggableMilestones';
 import dayjs from 'dayjs';
 import DateRangePicker from '@/shared/components/DateRangePicker';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import {
   ProjectMilestoneSchema,
   useProjectMilestoneMutation,
@@ -212,8 +212,7 @@ const MilestonesContent = () => {
                       />
                     </div>
                     <Button
-                      variant="solid"
-                      color="primary"
+                      variant="default"
                       className="w-full md:w-auto"
                       onClick={handleOpen}
                     >
@@ -228,9 +227,8 @@ const MilestonesContent = () => {
                       <Button
                         key={item.value}
                         variant={
-                          filterType === item.value ? 'solid' : 'outline'
+                          filterType === item.value ? "default" : "outline"
                         }
-                        color={filterType === item.value ? 'primary' : 'white'}
                         className="rounded-lg px-2.5 mr-2"
                         onClick={() => setFilterType(item.value)}
                       >
@@ -240,10 +238,10 @@ const MilestonesContent = () => {
                   </div>
                   <Button
                     variant="outline"
-                    className="rounded-lg px-2.5 flex items-center gap-2"
+                    className="group rounded-lg px-2.5 flex items-center gap-2"
                     onClick={() => setIsAscending(!isAscending)}
                   >
-                    <MdOutlineSort className="size-6 text-primary-base" />
+                    <MdOutlineSort className="size-6 text-primary-base group-hover:text-current" />
                     {isAscending ? '舊到新' : '新到舊'}
                   </Button>
                 </div>

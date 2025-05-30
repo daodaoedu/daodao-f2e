@@ -175,7 +175,7 @@ const DateRangePicker = ({
           className
         )}
         animation={disabledChangeDate ? 'none' : 'ripple'}
-        isDisabled={disabledChangeDate}
+        disabled={disabledChangeDate}
         onClick={handleToggle}
       >
         <span>{startDate.format('YYYY/MM/DD')}</span>

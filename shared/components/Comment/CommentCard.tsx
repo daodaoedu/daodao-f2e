@@ -8,7 +8,8 @@ import Image from '@/shared/components/Image';
 import { ROLE } from '@/constants/member';
 import { timeDuration } from '@/utils/date';
 import { CommentSchema, CommentVisibility } from '@/services/modules/comments';
-import Button from '../Button';
+import { Button } from '@/components/ui/button';
+import Shell from '@/public/assets/icons/shell.svg';
 import Collapse from '../Collapse';
 import CommentInput, { CommentData } from './CommentInput';
 import Dropdown from '../Dropdown';
@@ -117,6 +118,7 @@ function CommentCard({
                   action && (
                     <Dropdown.Item key={action.key} className="text-nowrap">
                       <Button
+                        variant="ghost"
                         className="w-full hover:bg-primary-palest"
                         onClick={action.onClick}
                       >
@@ -148,14 +150,16 @@ function CommentCard({
       </div>
       <div className="mb-2 flex items-center gap-2 text-basic-black">
         <Button
+          variant="ghost"
           className="p-0"
-          prefixIcon="Shell"
           onClick={() => toast.error('感謝您的貝殼，但此功能尚未開放')}
-        />
+        >
+          <Shell />
+        </Button>
         <Button
+          variant="ghost"
           className="-m-2 p-2"
           onClick={() => setIsShowCommentInput(true)}
-          checkLogin
         >
           回覆
         </Button>

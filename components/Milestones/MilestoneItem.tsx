@@ -7,7 +7,7 @@ import {
   UpdateProjectMilestoneSchema,
   ProjectTaskSchema,
 } from '@/services/modules/projects';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import Collapse from '@/shared/components/Collapse';
 import MilestoneCard from './MilestoneCard';
 import Task from '../Tasks/Task';
@@ -76,6 +76,7 @@ const MilestoneItem = ({
               <div className="flex justify-end">
                 <Button
                   onClick={() => setIsEditing(true)}
+                  variant="ghost"
                   className="flex items-center gap-2 py-0 body-sm"
                 >
                   <MdAdd className="w-5 h-5" />

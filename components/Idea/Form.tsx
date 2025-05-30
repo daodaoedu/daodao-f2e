@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import PostCard from '@/shared/components/Post/PostCard';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import Form from '@/shared/components/Form';
 import {
   CreateIdeaRequest,
@@ -12,7 +12,7 @@ import {
 } from '@/services/ideas';
 import Upload from '@/shared/components/Upload';
 import Image from '@/shared/components/Image';
-import { MdLink, MdDelete } from "react-icons/md";
+import { MdLink, MdDelete, MdClose } from "react-icons/md";
 import { v4 as uuidv4 } from 'uuid';
 import AddResourceForm from './AddResourceForm'; // <— 這就是剛才的小表單
 
@@ -111,20 +111,19 @@ function IdeaForm({
             />
             <span className="absolute inset-0 bottom-1.5 group-hover:bg-basic-black/20 transition-colors rounded-lg" />
             <Button
-              variant="solid"
-              color="alert"
+              variant="alert"
               className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-2"
-              prefixIcon="AiOutlineClose"
               onClick={() => {
                 methods.setValue('imageUrls', []);
                 setPreviewImage(null);
               }}
-            />
+            >
+              <MdClose />
+            </Button>
           </div>
         )}
         <Upload
-          variant="solid"
-          color="secondary"
+          variant="secondary"
           onPreviewsChange={([preview]) => setPreviewImage(preview)}
           onFilesChange={([file]) => methods.setValue('imageFiles', [file])}
         >
@@ -156,8 +155,7 @@ function IdeaForm({
           />
         ) : (
           <Button
-            variant="solid"
-            color="secondary"
+            variant="secondary"
             onClick={() => setIsAddingResource(true)}
           >
             新增資源
@@ -219,7 +217,7 @@ function IdeaForm({
         ))}
       </div>
       <div className="flex justify-end gap-5 mt-4">
-        <Button variant="solid" color="primary" isSubmit isDisabled={isLoading}>
+        <Button variant="default" type="submit" disabled={isLoading}>
           發布
         </Button>
       </div>

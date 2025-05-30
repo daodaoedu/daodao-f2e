@@ -1,6 +1,7 @@
 import AccessDeniedImg from '@/public/assets/projects/access-denied.png';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
+import Link from 'next/link';
 import useMarathonAccess from '../hooks/useMarathonAccess';
 
 export default function MarathonAccess({ children }: React.PropsWithChildren) {
@@ -35,15 +36,17 @@ export default function MarathonAccess({ children }: React.PropsWithChildren) {
       <p className="font-sans text-basic-400 body-md">你可以⋯</p>
       <div className="w-full flex flex-col gap-3 justify-center md:flex-row">
         <Button
-          as="link"
-          href="/personal-card/my-card"
+          asChild
           variant="outline"
-          color="primary"
         >
-          編輯個人名片
+          <Link href="/personal-card/my-card">
+            編輯個人名片
+          </Link>
         </Button>
-        <Button as="link" href="/resources" variant="solid" color="primary">
-          查看學習資源
+        <Button asChild variant="default">
+          <Link href="/resources">
+            查看學習資源
+          </Link>
         </Button>
       </div>
     </div>

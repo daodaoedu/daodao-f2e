@@ -5,7 +5,7 @@ import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { getManageSidebarItems } from '@/layout/features/getManageLayout';
 import Collapse from '@/shared/components/Collapse';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
 
 interface OnCloseProps {
@@ -179,6 +179,7 @@ function MobileMenu() {
             {navList.map((navItem) => (
               <Button
                 key={navItem.type}
+                variant="ghost"
                 className={cn(
                   'relative flex-1 flex items-center justify-center gap-1.5 py-2',
                   'after:content-[""] after:absolute after:bottom-0 after:left-0',
@@ -217,6 +218,7 @@ function MobileMenu() {
           >
             {auth.isLoggedIn ? (
               <Button
+                variant="ghost"
                 className="flex-1 px-4 pb-6 text-left"
                 onClick={() => {
                   authDispatch.logout();
@@ -228,7 +230,6 @@ function MobileMenu() {
             ) : (
               <Button
                 variant="outline"
-                color="primary"
                 className="flex-1 m-4"
                 onClick={() => {
                   authDispatch.openLoginModal();

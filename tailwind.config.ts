@@ -41,7 +41,6 @@ export default {
           white: '#FFFFFF',
           black: '#011416',
         },
-        alert: '#EF5364',
         tips: '#FF9526',
         success: '#86C84A',
         background: 'hsl(var(--background))',
@@ -66,9 +65,9 @@ export default {
           DEFAULT: 'hsl(var(--accent))',
           foreground: 'hsl(var(--accent-foreground))',
         },
-        destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+        alert: {
+          DEFAULT: 'hsl(var(--alert))',
+          foreground: 'hsl(var(--alert-foreground))',
         },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

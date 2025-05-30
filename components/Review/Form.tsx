@@ -8,7 +8,7 @@ import {
   UpdateProjectReviewSchema,
   updateProjectReviewSchema,
 } from '@/services/modules/projects';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import Form from '@/shared/components/Form';
 import MarkdownEditor from '@/shared/components/MarkdownEditor';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
@@ -150,10 +150,9 @@ function ReviewForm({
         </div>
         <div className="pt-5 flex justify-end gap-5">
           <Button
-            variant="solid"
-            color="primary"
-            isSubmit
-            isDisabled={isLoading}
+            variant="default"
+            type="submit"
+            disabled={isLoading}
           >
             發布覆盤
           </Button>

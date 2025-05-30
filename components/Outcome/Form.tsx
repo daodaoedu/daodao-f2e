@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from 'dayjs';
 import PostCard from '@/shared/components/Post/PostCard';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import Form from '@/shared/components/Form';
 import {
   CreateProjectOutcomeSchema,
@@ -16,6 +16,7 @@ import numberToChineseNumber from '@/utils/numberToChineseNumber';
 import Image from '@/shared/components/Image';
 import MarkdownEditor from '@/shared/components/MarkdownEditor';
 import Upload, { ImageDataType } from '@/shared/components/Upload';
+import { MdClose } from 'react-icons/md';
 
 interface BaseOutcomeFormProps {
   projectId: string;
@@ -134,17 +135,16 @@ function OutcomeForm({
               />
               <span className="absolute inset-0 bottom-1.5 group-hover:bg-basic-black/20 transition-colors rounded-lg" />
               <Button
-                variant="solid"
-                color="alert"
+                variant="alert"
                 className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-2"
-                prefixIcon="AiOutlineClose"
                 onClick={() => handleDeleteImage(image.id)}
-              />
+              >
+                <MdClose />
+              </Button>
             </div>
           ))}
         <Upload
-          variant="solid"
-          color="secondary"
+          variant="secondary"
           onChange={handleImageChange}
           multiple
         >
@@ -152,7 +152,7 @@ function OutcomeForm({
         </Upload>
       </div>
       <div className="flex justify-end gap-5">
-        <Button variant="solid" color="primary" isSubmit isDisabled={isLoading}>
+        <Button variant="default" type="submit" disabled={isLoading}>
           發布
         </Button>
       </div>

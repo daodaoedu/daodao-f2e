@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 
 interface ResourceData {
   name: string;
@@ -75,15 +75,13 @@ function AddResourceForm({ onConfirm, onCancel }: AddResourceFormProps) {
       <div className="flex justify-end gap-2">
         <Button
           variant="outline"
-          color="primary"
           size="sm"
           onClick={onCancel}
         >
           取消
         </Button>
         <Button
-          variant="solid"
-          color="primary"
+          variant="default"
           size="sm"
           onClick={() => onConfirm({ name, url })}
         >

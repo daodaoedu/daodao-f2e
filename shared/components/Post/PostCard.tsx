@@ -1,14 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
-import { AiOutlineEye } from 'react-icons/ai';
-import { MdLockOpen, MdLockOutline } from 'react-icons/md';
-import toast from 'react-hot-toast';
-import dayjs from 'dayjs';
+import { useEffect, useRef, useState } from "react";
+import { AiOutlineEye, AiOutlineMore } from "react-icons/ai";
+import { MdLockOpen, MdLockOutline } from "react-icons/md";
+import { FaArrowRight } from "react-icons/fa";
+import toast from "react-hot-toast";
+import dayjs from "dayjs";
 
-import Button from '@/shared/components/Button';
-import Dropdown from '@/shared/components/Dropdown';
-import Shell from '@/public/assets/icons/shell.svg';
-import Comment from '@/public/assets/icons/comment.svg';
-import { cn } from '@/utils/cn';
+import { Button } from "@/components/ui/button";
+import Dropdown from "@/shared/components/Dropdown";
+import Shell from "@/public/assets/icons/shell.svg";
+import Comment from "@/public/assets/icons/comment.svg";
+import { cn } from "@/utils/cn";
 
 interface PostCardProps {
   className?: string;
@@ -17,7 +18,7 @@ interface PostCardProps {
 
 function PostCard({ className, children }: PostCardProps) {
   return (
-    <div className={cn('bg-basic-white rounded-2xl p-3 md:p-10', className)}>
+    <div className={cn("bg-basic-white rounded-2xl p-3 md:p-10", className)}>
       {children}
     </div>
   );
@@ -75,9 +76,9 @@ function PostCardHeader({
 
     handleResize();
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -105,8 +106,8 @@ function PostCardHeader({
         <div className="body-md text-basic-500 shrink overflow-hidden">
           <h2
             ref={titleRef}
-            className={cn('truncate', isEditable && 'invisible absolute')}
-            {...(isEditable && { 'aria-hidden': true })}
+            className={cn("truncate", isEditable && "invisible absolute")}
+            {...(isEditable && { "aria-hidden": true })}
           >
             {title}
           </h2>
@@ -129,9 +130,9 @@ function PostCardHeader({
         )}
       </div>
       <div className="flex items-center justify-between md:justify-start gap-2 text-basic-300">
-        {date && <time>{dayjs(date).format('YYYY/MM/DD')}</time>}
+        {date && <time>{dayjs(date).format("YYYY/MM/DD")}</time>}
         <div className="flex items-center gap-2">
-          {typeof viewCount === 'number' && (
+          {typeof viewCount === "number" && (
             <div className="flex items-center gap-0.5">
               <AiOutlineEye className="size-5" />
               <div>{viewCount}</div>
@@ -152,16 +153,14 @@ function PostCardHeader({
           )}
           {Array.isArray(dropdownItems) && dropdownItems.length > 0 && (
             <Dropdown>
-              <Dropdown.Toggle
-                className="-m-1 p-1"
-                size="sm"
-                prefixIcon="AiOutlineMore"
-              />
+              <Dropdown.Toggle className="-m-1 p-1" size="sm">
+                <AiOutlineMore />
+              </Dropdown.Toggle>
               <Dropdown.List className="-mr-2 mt-2 z-20">
                 {dropdownItems.map((item) => (
                   <Dropdown.Item
                     key={item.key}
-                    className={cn('text-nowrap', item.className)}
+                    className={cn("text-nowrap", item.className)}
                   >
                     {item.children}
                   </Dropdown.Item>
@@ -184,14 +183,23 @@ function PostCardFooter({ onMoreClick, detailLink }: PostCardFooterProps) {
   return (
     <footer className="flex items-center justify-between">
       <Button
-        as="link"
-        href={detailLink}
+        asChild
         size="sm"
+        variant="ghost"
         className="gap-1 px-2 -ml-2 text-basic-300"
-        suffixIcon="FaArrowRight"
         onClick={onMoreClick}
       >
-        更多
+        {detailLink ? (
+          <a href={detailLink}>
+            更多
+            <FaArrowRight />
+          </a>
+        ) : (
+          <>
+            更多
+            <FaArrowRight />
+          </>
+        )}
       </Button>
       <div className="flex items-center gap-3 text-basic-black">
         <div className="flex items-center gap-0.5">
@@ -215,7 +223,12 @@ interface PostCardRewardProps {
 function PostCardReward({ shellCount, userName }: PostCardRewardProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-      <Button prefixIcon="Shell" className="px-2" onClick={() => toast.error('感謝您的貝殼，但此功能尚未開放')}>
+      <Button
+        variant="ghost"
+        className="px-2"
+        onClick={() => toast.error("感謝您的貝殼，但此功能尚未開放")}
+      >
+        <Shell className="size-5" />
         {shellCount}
       </Button>
       {userName && (

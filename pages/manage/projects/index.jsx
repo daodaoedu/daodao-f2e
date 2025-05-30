@@ -9,7 +9,7 @@ import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
 import { useMyProjects } from '@/services/modules/projects';
 import More from '@/components/Projects/More';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
 import { MarathonAccess, useMarathonAccess, EmptyProject } from '@/features/projects';
 import useCreateProject from '@/features/projects/hooks/useCreateProject';
@@ -85,8 +85,7 @@ const Projects = () => {
               />
               <Button
                 onClick={handleCreateProject}
-                variant="solid"
-                color="primary"
+                variant="default"
                 className="hover:cursor-pointer flex-shrink-0"
               >
                 新增計畫

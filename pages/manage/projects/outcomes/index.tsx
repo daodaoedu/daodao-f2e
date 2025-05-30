@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
 import { ContentCard } from '@/features/projects';
 import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import CreateModal from '@/components/Outcome/Modals/CreateModal';
 import UpdateModal from '@/components/Outcome/Modals/UpdateModal';
 import ConfirmModal from '@/shared/components/Confirm';
@@ -84,8 +84,7 @@ const OutcomesPage = () => {
       <div className="mb-6 flex items-center justify-between body-md">
         <div className="text-basic-500">學習成果 ({outcomes?.length ?? 0})</div>
         <Button
-          variant="solid"
-          color="primary"
+          variant="default"
           onClick={() => setModalType(ModalTypeEnum.Create)}
         >
           新增成果

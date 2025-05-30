@@ -14,7 +14,7 @@ import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { cn } from '@/utils/cn';
 import { MdSend, MdClose, MdEdit } from 'react-icons/md';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import DateRangePicker from '@/shared/components/DateRangePicker';
 import Form from '@/shared/components/Form';
 import { useDialog } from '@/contexts/Dialog';
@@ -336,8 +336,7 @@ function MilestoneCard(
               <>
                 <Button
                   className="rounded-sm text-lg"
-                  variant="solid"
-                  color="gray"
+                  variant="gray"
                   size="icon"
                   onClick={handleCancel}
                 >
@@ -345,10 +344,9 @@ function MilestoneCard(
                 </Button>
                 <Button
                   className="rounded-sm text-lg"
-                  variant="solid"
-                  color="gray"
+                  variant="gray"
                   size="icon"
-                  isSubmit
+                  type="submit"
                 >
                   <MdSend />
                 </Button>
@@ -357,8 +355,7 @@ function MilestoneCard(
             {!isEditing && isEditable && (
               <Button
                 className="rounded-sm text-lg"
-                variant="solid"
-                color="gray"
+                variant="gray"
                 size="icon"
                 onClick={() => setIsEditing(true)}
               >

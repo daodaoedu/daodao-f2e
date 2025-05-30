@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
+import { FaAngleLeft } from 'react-icons/fa';
 import Container from '@/shared/components/Container';
 import SidebarWrapper from '@/layout/components/Sidebar/SidebarWrapper';
 import Collapse from '@/shared/components/Collapse';
@@ -60,9 +61,10 @@ export default function SidebarLayout({
               <Button
                 size="sm"
                 className="px-0 mb-6 lg:mb-3"
-                prefixIcon="FaAngleLeft"
+                variant="ghost"
                 onClick={() => router.push(backPath)}
               >
+                <FaAngleLeft />
                 {backText}
               </Button>
             </div>

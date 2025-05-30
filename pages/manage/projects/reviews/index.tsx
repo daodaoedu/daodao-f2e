@@ -2,7 +2,7 @@ import toast from 'react-hot-toast';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import ReviewCard from '@/components/Review/Card';
 import CreateModal from '@/components/Review/Modals/CreateModal';
 import SEOConfig from '@/shared/components/SEO';
@@ -88,8 +88,7 @@ const ReviewPage = () => {
           </div>
         </div>
         <Button
-          variant="solid"
-          color="primary"
+          variant="default"
           onClick={() => setModalType(ModalTypeEnum.Create)}
         >
           新增覆盤

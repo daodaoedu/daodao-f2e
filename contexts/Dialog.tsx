@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from 'react';
-import Button, { ButtonProps } from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import Modal, { ModalProps } from '@/shared/components/Modal';
 import { cn } from '@/utils/cn';
 
@@ -7,9 +7,9 @@ interface DialogProps
   extends Omit<ModalProps, 'isOpen' | 'onClose' | 'children'> {
   content: React.ReactNode;
   cancelText?: string;
-  cancelBtnProps?: Omit<ButtonProps, 'onClick'>;
+  cancelBtnProps?: Omit<React.ComponentPropsWithoutRef<typeof Button>, 'onClick'>;
   confirmText?: string;
-  confirmBtnProps?: Omit<ButtonProps, 'onClick'>;
+  confirmBtnProps?: Omit<React.ComponentPropsWithoutRef<typeof Button>, 'onClick'>;
   onCancel?: () => void;
   onConfirm?: () => void;
 }
@@ -96,8 +96,7 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
         {content}
         <div className="flex w-full gap-2 mt-6">
           <Button
-            variant="solid"
-            color="white"
+            variant="secondary"
             {...cancelBtnProps}
             className={cn('flex-1', cancelBtnProps?.className)}
             onClick={onCancel}
@@ -105,8 +104,7 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
             {cancelText ?? '關閉'}
           </Button>
           <Button
-            variant="solid"
-            color="primary"
+            variant="default"
             {...confirmBtnProps}
             className={cn('flex-1', confirmBtnProps?.className)}
             onClick={onConfirm}

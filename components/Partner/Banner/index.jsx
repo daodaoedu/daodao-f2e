@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { Box } from '@mui/material';
-import DeprecatedButton from '@/shared/components/DeprecatedButton';
+import { Button } from '@/components/ui/button';
 import Image from '@/shared/components/Image';
 import partnerImg from '@/public/assets/partner-banner.png';
 import { useAuth } from '@/contexts/Auth';
@@ -71,7 +71,7 @@ const Banner = () => {
         <p>想找到一起交流的學習夥伴嗎</p>
         <p>註冊加入會員，並填寫個人資料，你的資訊就會刊登在頁面上囉！</p>
         {!isLoggedIn && (
-          <DeprecatedButton onClick={() => router.push('/login')}>註冊找夥伴</DeprecatedButton>
+          <Button className="mt-10" size="lg" onClick={() => router.push('/login')}>註冊找夥伴</Button>
         )}
       </StyledContent>
 

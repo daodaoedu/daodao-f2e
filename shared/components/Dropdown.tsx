@@ -2,7 +2,7 @@ import { useId } from 'react';
 import { ToggleProvider, useToggle } from '@/contexts/Toggle';
 import { cn } from '@/utils/cn';
 import useClickOutside from '@/hooks/useClickOutside';
-import Button, { ButtonProps } from './Button';
+import { Button, ButtonProps } from '@/components/ui/button';
 import Portal from './Portal';
 
 interface DropdownContentProps {
@@ -47,10 +47,12 @@ function Dropdown({ as, children, isOpen, onChange }: DropdownProps) {
   );
 }
 
-interface DropdownToggleProps extends Omit<ButtonProps, 'as'> {
+interface DropdownToggleProps extends ButtonProps {
   className?: string;
   children?: React.ReactNode;
   withIcon?: boolean;
+  variant?: React.ComponentPropsWithoutRef<typeof Button>['variant'];
+  size?: React.ComponentPropsWithoutRef<typeof Button>['size'];
 }
 
 function Toggle({
@@ -58,6 +60,8 @@ function Toggle({
   children,
   withIcon,
   onClick,
+  variant = 'ghost',
+  size,
   ...props
 }: DropdownToggleProps) {
   const { isOpen, setIsOpen, setTriggerDom } = useToggle({
@@ -65,10 +69,10 @@ function Toggle({
   });
 
   const handleClick = (
-    e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
+    e: React.MouseEvent<HTMLButtonElement>
   ) => {
     setIsOpen(!isOpen);
-    onClick?.(e as React.MouseEvent<HTMLButtonElement>);
+    onClick?.(e);
   };
 
   return (
@@ -77,6 +81,8 @@ function Toggle({
       className={cn('flex items-center', withIcon && 'pl-6 pr-4', className)}
       aria-pressed={isOpen}
       onClick={handleClick}
+      variant={variant}
+      size={size}
       {...props}
     >
       {children}

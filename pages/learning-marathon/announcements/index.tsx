@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import Nav from '@/components/Marathon/Nav';
 import { AnnouncementList } from '@/components/Marathon/Announcement';
 import { logEvent } from '@/utils/analytics';
@@ -21,9 +21,7 @@ const Announcements = () => {
             <div className="flex justify-center">
               <Button
                 className=""
-                variant="solid"
-                color="primary"
-                size="md"
+                variant="default"
                 onClick={() => logEvent('click', 'show_more_announcement')}
               >
                 顯示更多

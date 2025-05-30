@@ -1,5 +1,6 @@
 import { Project } from '@/components/Projects/Project/type';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
+import { MdOutlineEdit } from 'react-icons/md';
 import {
   Panel,
   Title,
@@ -26,11 +27,11 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
         (
           <div className="absolute right-0 -top-[60px]">
             <Button
-              prefixIcon="MdOutlineEdit"
-              className="py-[5px]"
               variant="outline"
+              className="py-[5px]"
               onClick={handleOnClickEdit}
             >
+              <MdOutlineEdit />
               編輯
             </Button>
           </div>
@@ -93,11 +94,11 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
       {
         !isLgScreen && (
           <Button
-            prefixIcon="MdOutlineEdit"
             variant="outline"
             className="w-full max-w-[272px] py-[5px] justify-center mx-auto"
             onClick={handleOnClickEdit}
           >
+            <MdOutlineEdit />
             編輯
           </Button>
         )

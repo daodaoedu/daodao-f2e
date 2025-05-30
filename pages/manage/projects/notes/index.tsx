@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { ContentCard } from '@/features/projects';
 import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import SEOConfig from '@/shared/components/SEO';
 import CreateModal from '@/components/Note/Modals/CreateModal';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';
@@ -84,8 +84,7 @@ const NotesPage = () => {
       <div className="mb-6 flex items-center justify-between body-md">
         <div className="text-basic-500">便利貼 ({notes?.length || 0})</div>
         <Button
-          variant="solid"
-          color="primary"
+          variant="default"
           onClick={() => setModalType(ModalTypeEnum.Create)}
         >
           新增便利貼

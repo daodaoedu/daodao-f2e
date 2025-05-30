@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import { useState } from 'react';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import groupBannerImg from '@/public/assets/group-banner.png';
 import Image from '@/shared/components/Image';
 import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
@@ -44,8 +44,7 @@ const Banner: React.FC = () => {
         </p>
         <InfoCompletionGuard>
           <Button
-            variant="solid"
-            color="primary"
+            variant="default"
             className="mt-4"
             onClick={() => setModalType(ModalTypeEnum.Create)}
           >
