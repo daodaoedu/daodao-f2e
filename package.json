@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "postinstall": "husky",
     "dev": "next dev -p 5438",
     "dev-https": "node server.js",
     "static": "serve out",
