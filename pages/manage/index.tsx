@@ -13,7 +13,6 @@ import getManageLayout from "@/layout/features/getManageLayout";
 import useClickOutside from "@/hooks/useClickOutside";
 import SEOConfig from "@/shared/components/SEO";
 import { Button } from "@/components/ui/button";
-import Collapse from "@/shared/components/Collapse";
 import Dropdown from "@/shared/components/Dropdown";
 import ReviewCard from "@/components/Review/Card";
 import MilestoneItem from "@/components/Milestones/MilestoneItem";
@@ -39,6 +38,17 @@ import {
 import Image from "@/shared/components/Image";
 import useCreateProject from "@/features/projects/hooks/useCreateProject";
 import MilestoneCard from "@/components/Milestones/MilestoneCard";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionContent,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const HEADER_TITLES = [
   "今天的每一小步，都在建立你的學習動能！",
@@ -160,33 +170,34 @@ const Header = () => {
           新增
         </Dropdown.Toggle>
         <Dropdown.List className="z-20">
-          {dropdownItems.map(({ label, actions }) => (
-            <Dropdown.Item
-              key={label}
-              className="min-w-60 rounded-lg text-nowrap"
-            >
-              <Collapse>
-                <Collapse.Toggle
-                  className="w-full px-3 py-2 justify-between"
-                  withIcon
-                >
-                  {label}
-                </Collapse.Toggle>
-                <Collapse.List className="*:my-2 *:aria-hidden:my-0">
-                  {actions.map((action) => (
-                    <Collapse.Item key={action.label}>
-                      <Button
-                        className="w-full text-left hover:bg-primary-lightest"
-                        onClick={action.onClick}
-                      >
-                        {action.label}
-                      </Button>
-                    </Collapse.Item>
-                  ))}
-                </Collapse.List>
-              </Collapse>
-            </Dropdown.Item>
-          ))}
+          <Dropdown.Item className="min-w-60 rounded-lg text-nowrap">
+            <Accordion type="single" collapsible>
+              {dropdownItems.map(({ label, actions }) => (
+                <AccordionItem key={label} value={label}>
+                  <AccordionTrigger
+                    className="w-full px-3 py-2 justify-between"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {label}
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="flex flex-col">
+                      {actions.map((action) => (
+                        <Button
+                          key={action.label}
+                          variant="ghost"
+                          className="w-full justify-start ps-6"
+                          onClick={action.onClick}
+                        >
+                          {action.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </Dropdown.Item>
         </Dropdown.List>
       </Dropdown>
       <SelectProjectModal
@@ -354,8 +365,11 @@ const Project = ({
       )}
       style={{ "--percentage": `${percentage}%` } as React.CSSProperties}
     >
-      <Collapse defaultOpen={defaultOpen}>
-        <Collapse.Toggle className="w-full px-3 py-2 justify-between" withIcon>
+      <Collapsible defaultOpen={defaultOpen}>
+        <CollapsibleTrigger
+          className="w-full px-3 py-2 justify-between"
+          withIcon
+        >
           <Link
             href={href}
             target="_blank"
@@ -364,11 +378,9 @@ const Project = ({
             {title}
             <GoArrowUpRight className="stroke-1" />
           </Link>
-        </Collapse.Toggle>
-        <Collapse.List>
-          <Collapse.Item className="overflow-hidden">{children}</Collapse.Item>
-        </Collapse.List>
-      </Collapse>
+        </CollapsibleTrigger>
+        <CollapsibleContent>{children}</CollapsibleContent>
+      </Collapsible>
     </div>
   );
 };
