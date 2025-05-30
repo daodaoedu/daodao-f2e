@@ -2,11 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import { AiOutlineEye, AiOutlineMore } from "react-icons/ai";
 import { MdLockOpen, MdLockOutline } from "react-icons/md";
 import { FaArrowRight } from "react-icons/fa";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 
 import { Button } from "@/components/ui/button";
-import Dropdown from "@/shared/components/Dropdown";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Shell from "@/public/assets/icons/shell.svg";
 import Comment from "@/public/assets/icons/comment.svg";
 import { cn } from "@/utils/cn";
@@ -152,21 +158,22 @@ function PostCardHeader({
             )
           )}
           {Array.isArray(dropdownItems) && dropdownItems.length > 0 && (
-            <Dropdown>
-              <Dropdown.Toggle className="-m-1 p-1" size="sm">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="-m-1 p-1">
                 <AiOutlineMore />
-              </Dropdown.Toggle>
-              <Dropdown.List className="-mr-2 mt-2 z-20">
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="-mr-2 mt-2 z-20">
                 {dropdownItems.map((item) => (
-                  <Dropdown.Item
+                  <DropdownMenuItem
                     key={item.key}
-                    className={cn("text-nowrap", item.className)}
+                    className={cn("text-nowrap w-full", item.className)}
+                    asChild
                   >
                     {item.children}
-                  </Dropdown.Item>
+                  </DropdownMenuItem>
                 ))}
-              </Dropdown.List>
-            </Dropdown>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>
@@ -182,25 +189,20 @@ interface PostCardFooterProps {
 function PostCardFooter({ onMoreClick, detailLink }: PostCardFooterProps) {
   return (
     <footer className="flex items-center justify-between">
-      <Button
-        asChild
-        size="sm"
-        variant="ghost"
-        className="gap-1 px-2 -ml-2 text-basic-300"
-        onClick={onMoreClick}
-      >
-        {detailLink ? (
-          <a href={detailLink}>
+      {detailLink && (
+        <Button
+          asChild
+          size="sm"
+          variant="ghost"
+          className="gap-1 px-2 -ml-2 text-basic-300"
+          onClick={onMoreClick}
+        >
+          <Link href={detailLink}>
             更多
             <FaArrowRight />
-          </a>
-        ) : (
-          <>
-            更多
-            <FaArrowRight />
-          </>
-        )}
-      </Button>
+          </Link>
+        </Button>
+      )}
       <div className="flex items-center gap-3 text-basic-black">
         <div className="flex items-center gap-0.5">
           <Shell className="size-5" />

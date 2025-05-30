@@ -15,8 +15,13 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import CommentInput, { CommentData } from "./CommentInput";
-import Dropdown from "../Dropdown";
 
 interface CommentCardProps extends CommentSchema {
   onCreate?: (data: Omit<CommentData, "id">) => void;
@@ -112,15 +117,15 @@ function CommentCard({
             <span>{visibility === "public" ? "公開" : "不公開"}</span>
           </div>
 
-          <Dropdown>
-            <Dropdown.Toggle className="-m-2 p-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="-m-2 p-2">
               <AiOutlineMore />
-            </Dropdown.Toggle>
-            <Dropdown.List className="z-20 p-1">
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="z-20 p-1">
               {actions.map(
                 (action) =>
                   action && (
-                    <Dropdown.Item key={action.key} className="text-nowrap">
+                    <DropdownMenuItem key={action.key} className="text-nowrap">
                       <Button
                         variant="ghost"
                         className="w-full hover:bg-primary-palest"
@@ -128,11 +133,11 @@ function CommentCard({
                       >
                         {action.children}
                       </Button>
-                    </Dropdown.Item>
+                    </DropdownMenuItem>
                   )
               )}
-            </Dropdown.List>
-          </Dropdown>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       <div className="mb-2">

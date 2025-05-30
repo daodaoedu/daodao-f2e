@@ -13,7 +13,6 @@ import getManageLayout from "@/layout/features/getManageLayout";
 import useClickOutside from "@/hooks/useClickOutside";
 import SEOConfig from "@/shared/components/SEO";
 import { Button } from "@/components/ui/button";
-import Dropdown from "@/shared/components/Dropdown";
 import ReviewCard from "@/components/Review/Card";
 import MilestoneItem from "@/components/Milestones/MilestoneItem";
 import {
@@ -49,6 +48,13 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 const HEADER_TITLES = [
   "今天的每一小步，都在建立你的學習動能！",
@@ -165,15 +171,27 @@ const Header = () => {
       <h2 className="heading-sm text-basic-500 pr-2 text-balance">
         {HEADER_TITLES[dayjs().get("hour") % HEADER_TITLES.length]}
       </h2>
-      <Dropdown>
-        <Dropdown.Toggle variant="default" className="mb-1" withIcon>
-          新增
-        </Dropdown.Toggle>
-        <Dropdown.List className="z-20">
-          <Dropdown.Item className="min-w-60 rounded-lg text-nowrap">
-            <Accordion type="single" collapsible>
-              {dropdownItems.map(({ label, actions }) => (
-                <AccordionItem key={label} value={label}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="default"
+            className="mb-1 [&[data-state=open]>svg]:rotate-180"
+          >
+            新增
+            <ChevronDown className="size-4 transition-transform" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="z-20">
+          <Accordion type="single" collapsible>
+            {dropdownItems.map(({ label, actions }) => (
+              <DropdownMenuItem
+                key={label}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <AccordionItem
+                  value={label}
+                  className="min-w-60 rounded-lg text-nowrap"
+                >
                   <AccordionTrigger
                     className="w-full px-3 py-2 justify-between"
                     onClick={(e) => e.stopPropagation()}
@@ -195,11 +213,11 @@ const Header = () => {
                     </div>
                   </AccordionContent>
                 </AccordionItem>
-              ))}
-            </Accordion>
-          </Dropdown.Item>
-        </Dropdown.List>
-      </Dropdown>
+              </DropdownMenuItem>
+            ))}
+          </Accordion>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <SelectProjectModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}

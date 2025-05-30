@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
@@ -98,6 +98,25 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       setTimeout(() => ripple.remove(), 1000);
     };
 
+    const rippleElement = (
+      <div
+        key="ripple"
+        ref={rippleRef}
+        className="absolute inset-0 pointer-events-none rounded-[inherit] overflow-hidden"
+      />
+    );
+
+    const childElement = React.isValidElement<React.PropsWithChildren>(
+      children
+    ) ? (
+      React.cloneElement(children, {}, [children.props.children, rippleElement])
+    ) : (
+      <>
+        {children}
+        {rippleElement}
+      </>
+    );
+
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
@@ -106,15 +125,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled}
         {...props}
       >
-        <>
-          {children}
-          {animation !== ButtonAnimationEnum.None && (
-            <div
-              ref={rippleRef}
-              className="absolute inset-0 pointer-events-none rounded-[inherit] overflow-hidden"
-            />
-          )}
-        </>
+        {childElement}
       </Comp>
     );
   }
