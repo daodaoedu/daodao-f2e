@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { ContentCard } from '@/features/projects';
 import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import SEOConfig from '@/shared/components/SEO';
 import CreateModal from '@/components/Note/Modals/CreateModal';
 import UpdateModal from '@/components/Note/Modals/UpdateModal';

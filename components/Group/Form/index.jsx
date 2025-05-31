@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Switch from '@mui/material/Switch';
 import CircularProgress from '@mui/material/CircularProgress';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { ACTIVITY_CATEGORIES, OTHER_OPTION } from '@/constants/category';

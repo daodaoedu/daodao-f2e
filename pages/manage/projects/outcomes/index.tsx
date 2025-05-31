@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import SEOConfig from '@/shared/components/SEO';
 import { ContentCard } from '@/features/projects';
 import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import CreateModal from '@/components/Outcome/Modals/CreateModal';
 import UpdateModal from '@/components/Outcome/Modals/UpdateModal';
 import ConfirmModal from '@/shared/components/Confirm';

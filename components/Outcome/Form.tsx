@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from 'dayjs';
 import PostCard from '@/shared/components/Post/PostCard';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import Form from '@/shared/components/Form';
 import {
   CreateProjectOutcomeSchema,

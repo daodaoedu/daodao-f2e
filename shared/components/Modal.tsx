@@ -1,7 +1,7 @@
 import { useState, useEffect, useId } from 'react';
 import { cn } from '@/utils/cn';
 import { AiOutlineClose } from 'react-icons/ai';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import Portal from './Portal';
 
 enum ModalSize {

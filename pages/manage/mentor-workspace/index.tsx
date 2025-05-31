@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FaAngleLeft } from 'react-icons/fa6';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import Container from '@/shared/components/Container';
 import Image from '@/shared/components/Image';
 import { useMentorMarathonList } from '@/hooks/api/mentor';

@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import PostCard from '@/shared/components/Post/PostCard';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
 import { BaseUserSchema } from '@/services/modules/users';
 import { useAuth } from '@/contexts/Auth';

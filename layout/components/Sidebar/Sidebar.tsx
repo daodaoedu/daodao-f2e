@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/atoms/button";
 import { FaAngleLeft } from "react-icons/fa";
 import Container from "@/shared/components/Container";
 import SidebarWrapper from "@/layout/components/Sidebar/SidebarWrapper";
@@ -9,7 +9,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/components/atoms/accordion";
 import { usePromotion } from "@/contexts/Promotion";
 import { cn } from "@/utils/cn";
 import SidebarItem from "./SidebarItem";

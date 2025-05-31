@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { ProjectSchema, useMyProjects } from '@/services/modules/projects';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import Modal from '@/shared/components/Modal';
 
 interface SelectProjectModalProps {

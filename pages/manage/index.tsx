@@ -12,7 +12,7 @@ import marathonConfig from "@/constants/marathon";
 import getManageLayout from "@/layout/features/getManageLayout";
 import useClickOutside from "@/hooks/useClickOutside";
 import SEOConfig from "@/shared/components/SEO";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/atoms/button";
 import ReviewCard from "@/components/Review/Card";
 import MilestoneItem from "@/components/Milestones/MilestoneItem";
 import {
@@ -42,18 +42,18 @@ import {
   AccordionItem,
   AccordionContent,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/components/atoms/accordion";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from "@/components/atoms/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/atoms/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 
 const HEADER_TITLES = [

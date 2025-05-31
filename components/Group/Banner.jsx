@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import groupBannerImg from '@/public/assets/group-banner.png';
 import Image from '@/shared/components/Image';
 import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';

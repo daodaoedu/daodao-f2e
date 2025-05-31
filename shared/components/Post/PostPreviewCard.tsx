@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import PostCard from '@/shared/components/Post/PostCard';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
 

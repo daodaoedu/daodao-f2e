@@ -9,7 +9,7 @@ import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
 import { useMyProjects } from '@/services/modules/projects';
 import More from '@/components/Projects/More';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import { cn } from '@/utils/cn';
 import { MarathonAccess, useMarathonAccess, EmptyProject } from '@/features/projects';
 import useCreateProject from '@/features/projects/hooks/useCreateProject';

@@ -11,13 +11,13 @@ import {
 import { cn } from "@/utils/cn";
 import { useMilestones } from "@/contexts/Milestones/index";
 import { Task as TaskType } from "@/contexts/Milestones/type";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/atoms/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/atoms/dropdown-menu";
 import { useDialog } from "@/contexts/Dialog";
 
 interface TaskProps {

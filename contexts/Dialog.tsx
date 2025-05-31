@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import Modal, { ModalProps } from '@/shared/components/Modal';
 import { cn } from '@/utils/cn';
 

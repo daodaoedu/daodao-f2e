@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import Image from '@/shared/components/Image';
 import LensIcon from '@/public/assets/icons/lens.svg';
 import { SEARCH_TAGS } from '@/constants/category';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 
 export default function SearchHero() {
   const inputRef = useRef<HTMLInputElement>(null);

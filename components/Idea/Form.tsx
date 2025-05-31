@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import PostCard from '@/shared/components/Post/PostCard';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import Form from '@/shared/components/Form';
 import {
   CreateIdeaRequest,

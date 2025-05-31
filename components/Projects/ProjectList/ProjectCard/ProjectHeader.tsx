@@ -1,7 +1,7 @@
 import { Project as ProjectType } from '@/components/Projects/Project/type';
 import dayjs from "dayjs";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/atoms/dropdown-menu';
+import { Button } from '@/components/atoms/button';
 import { MdMoreVert } from 'react-icons/md';
 
 interface ProjectHeaderProps {

@@ -8,7 +8,7 @@ import {
   UpdateProjectReviewSchema,
   updateProjectReviewSchema,
 } from '@/services/modules/projects';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import Form from '@/shared/components/Form';
 import MarkdownEditor from '@/shared/components/MarkdownEditor';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';

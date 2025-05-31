@@ -1,5 +1,5 @@
 import Modal from '@/shared/components/Modal';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 
 interface ConfirmModalProps {
   title: string;

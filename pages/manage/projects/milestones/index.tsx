@@ -13,7 +13,7 @@ import MilestoneCard, {
 import DraggableMilestones from '@/components/Milestones/DraggableMilestones';
 import dayjs from 'dayjs';
 import DateRangePicker from '@/shared/components/DateRangePicker';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import {
   ProjectMilestoneSchema,
   useProjectMilestoneMutation,

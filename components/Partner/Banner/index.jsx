@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { Box } from '@mui/material';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 import Image from '@/shared/components/Image';
 import partnerImg from '@/public/assets/partner-banner.png';
 import { useAuth } from '@/contexts/Auth';

@@ -7,7 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/atoms/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 
 function DesktopMenu() {
@@ -49,10 +49,9 @@ function DesktopMenu() {
               <DropdownMenuItem
                 key={name}
                 className="rounded-lg text-nowrap hover:bg-primary-lightest"
+                asChild
               >
-                <Link href={link} className="block p-2 text-basic-400">
-                  {name}
-                </Link>
+                <Link href={link}>{name}</Link>
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>

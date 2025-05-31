@@ -5,7 +5,7 @@ import { MdLockOpen, MdLock } from 'react-icons/md';
 import { AiOutlineMore } from 'react-icons/ai';
 import { ROLE } from '@/constants/member';
 import { ProjectSchema } from '@/services/modules/projects';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/button';
 
 interface ProjectHeaderProps {
   project: ProjectSchema;
