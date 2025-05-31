@@ -6,18 +6,19 @@ import {
   useImperativeHandle,
   useMemo,
   useState,
-} from 'react';
-import { SubmitErrorHandler, useForm } from 'react-hook-form';
-import { FaArrowRight } from 'react-icons/fa';
-import { FaCheck } from 'react-icons/fa6';
-import toast from 'react-hot-toast';
-import dayjs from 'dayjs';
-import { cn } from '@/utils/cn';
-import { MdSend, MdClose, MdEdit } from 'react-icons/md';
-import { Button } from '@/components/atoms/button';
-import DateRangePicker from '@/shared/components/DateRangePicker';
-import Form from '@/shared/components/Form';
-import { useDialog } from '@/contexts/Dialog';
+} from "react";
+import { SubmitErrorHandler, useForm } from "react-hook-form";
+import { FaArrowRight } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa6";
+import toast from "react-hot-toast";
+import dayjs from "dayjs";
+import { DateRange } from "react-day-picker";
+import { format, toDate, isValid } from "date-fns";
+import { cn } from "@/utils/cn";
+import { MdSend, MdClose, MdEdit } from "react-icons/md";
+import { Button } from "@/components/atoms/button";
+import Form from "@/shared/components/Form";
+import { useDialog } from "@/contexts/Dialog";
 import {
   useProject,
   CreateProjectMilestoneSchema,
@@ -25,9 +26,10 @@ import {
   ProjectMilestoneSchema,
   UpdateProjectMilestoneSchema,
   updateProjectMilestoneSchema,
-} from '@/services/modules/projects';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { getDefaultMilestone } from './Shared';
+} from "@/services/modules/projects";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DatePickerWithRange } from "@/components/molecules/date-picker";
+import { getDefaultMilestone } from "./Shared";
 
 interface MilestoneCardProps {
   projectId: string;
@@ -126,10 +128,10 @@ function MilestoneCard(
     onCancel?.();
   };
 
-  const isCompleted = methods.watch('isCompleted') ?? milestone?.isCompleted;
+  const isCompleted = methods.watch("isCompleted") ?? milestone?.isCompleted;
 
   const checkDiff = (data: UpdateProjectMilestoneSchema) => {
-    const checkKeys = ['startDate', 'endDate', 'name'] as const;
+    const checkKeys = ["startDate", "endDate", "name"] as const;
 
     return checkKeys.some((key) => {
       return data[key] !== milestone?.[key];
@@ -166,7 +168,7 @@ function MilestoneCard(
   const handleError: SubmitErrorHandler<
     CreateProjectMilestoneSchema | UpdateProjectMilestoneSchema
   > = (error) => {
-    toast.error(Object.values(error)[0]?.message || '發生錯誤');
+    toast.error(Object.values(error)[0]?.message || "發生錯誤");
   };
 
   const handleComplete = async () => {
@@ -175,16 +177,16 @@ function MilestoneCard(
     if (isLoading || !isEditable) return;
 
     if (!tasksInfo.isCompleteAll && targetIsCompleted) {
-      toast.error('請先完成所有子任務');
+      toast.error("請先完成所有子任務");
       return;
     }
 
     if (targetIsCompleted && project?.version === 1) {
       const result = await openDialog({
         content:
-          '勾選後，計畫就視為開始，屆時將無法修改計畫的開始時間，是否繼續？',
+          "勾選後，計畫就視為開始，屆時將無法修改計畫的開始時間，是否繼續？",
         onConfirm: () => {
-          methods.setValue('isCompleted', targetIsCompleted);
+          methods.setValue("isCompleted", targetIsCompleted);
         },
       });
 
@@ -195,9 +197,9 @@ function MilestoneCard(
 
     if (!targetIsCompleted) {
       const result = await openDialog({
-        content: '取消勾選後，里程碑將會被視為未完成，是否繼續？',
+        content: "取消勾選後，里程碑將會被視為未完成，是否繼續？",
         onConfirm: () => {
-          methods.setValue('isCompleted', targetIsCompleted);
+          methods.setValue("isCompleted", targetIsCompleted);
         },
       });
 
@@ -206,7 +208,7 @@ function MilestoneCard(
       }
     }
 
-    methods.setValue('isCompleted', targetIsCompleted);
+    methods.setValue("isCompleted", targetIsCompleted);
 
     const updateRequest = updateProjectMilestoneSchema.safeParse(
       methods.getValues()
@@ -222,8 +224,33 @@ function MilestoneCard(
     }
   };
 
+  const date = useMemo<DateRange>(() => {
+    const formatValue = (d?: string) => {
+      if (!d) return undefined;
+      const parsed = toDate(d);
+      return isValid(parsed) ? parsed : undefined;
+    };
+
+    if (isEditing) {
+      return {
+        from: formatValue(methods.watch("startDate")),
+        to: formatValue(methods.watch("endDate")),
+      };
+    }
+    return {
+      from: formatValue(milestone?.startDate),
+      to: formatValue(milestone?.endDate),
+    };
+  }, [
+    isEditing,
+    methods.watch("startDate"),
+    methods.watch("endDate"),
+    milestone?.startDate,
+    milestone?.endDate,
+  ]);
+
   const handleFocus = useCallback(() => {
-    methods.setFocus('name');
+    methods.setFocus("name");
   }, [methods]);
 
   useImperativeHandle(ref, () => ({
@@ -238,8 +265,8 @@ function MilestoneCard(
     <Form methods={methods} onSubmit={handleSubmit} onError={handleError}>
       <div
         className={cn(
-          'p-2.5 md:py-3 md:px-4 rounded-lg bg-white',
-          isLoading && 'opacity-80'
+          "p-2.5 md:py-3 md:px-4 rounded-lg bg-white",
+          isLoading && "opacity-80"
         )}
       >
         <div className="flex items-center justify-between mb-2.5">
@@ -253,35 +280,31 @@ function MilestoneCard(
               </span>
             )}
           </div>
-          <DateRangePicker
-            startDate={
-              isEditing
-                ? dayjs(methods.watch('startDate'))
-                : dayjs(milestone?.startDate)
-            }
-            endDate={
-              isEditing
-                ? dayjs(methods.watch('endDate'))
-                : dayjs(milestone?.endDate)
-            }
-            minDate={minDate}
-            maxDate={maxDate}
-            disabledStartDate={disabledChangeDate || !isEditing}
-            disabledEndDate={disabledChangeDate || !isEditing}
-            separator={<FaArrowRight className="text-basic-300" />}
+          <DatePickerWithRange
+            date={date}
+            fromDate={minDate?.toDate()}
+            toDate={maxDate?.toDate()}
             className={cn(
-              '-mx-1 px-1 py-0 gap-1.5 body-sm text-basic-300 rounded',
-              !isEditing && 'disabled:text-basic-300'
+              "p-1 min-w-40 h-6 gap-1.5 body-sm text-basic-300 rounded",
+              !isEditing && "disabled:text-basic-300"
             )}
-            onStartDateChange={(d) => {
-              methods.setValue('startDate', d.format('YYYY/MM/DD'), {
-                shouldDirty: true,
-              });
-            }}
-            onEndDateChange={(d) => {
-              methods.setValue('endDate', d.format('YYYY/MM/DD'), {
-                shouldDirty: true,
-              });
+            disabled={disabledChangeDate || !isEditing}
+            separator={<FaArrowRight className="text-basic-300" />}
+            onChange={(d) => {
+              methods.setValue(
+                "startDate",
+                d?.from ? format(d.from, "yyyy/MM/dd") : undefined,
+                {
+                  shouldDirty: true,
+                }
+              );
+              methods.setValue(
+                "endDate",
+                d?.to ? format(d.to, "yyyy/MM/dd") : undefined,
+                {
+                  shouldDirty: true,
+                }
+              );
             }}
           />
         </div>
@@ -290,19 +313,19 @@ function MilestoneCard(
             <input
               type="text"
               className={cn(
-                '-m-px font-sans body-sm text-basic-400',
-                'w-full rounded-md px-6 py-2 border border-solid border-basic-200',
-                'focus:outline-none focus:ring-0 focus:border-primary-base'
+                "-m-px font-sans body-sm text-basic-400",
+                "w-full rounded-md px-6 py-2 border border-solid border-basic-200",
+                "focus:outline-none focus:ring-0 focus:border-primary-base"
               )}
-              {...methods.register('name')}
+              {...methods.register("name")}
             />
           ) : (
             <>
               <label
                 htmlFor={`${elementId}-${milestone?.id}`}
                 className={cn(
-                  'flex flex-row justify-center items-center gap-1.5 hover:cursor-pointer w-full basis-0',
-                  !isEditable && 'pointer-events-none'
+                  "flex flex-row justify-center items-center gap-1.5 hover:cursor-pointer w-full basis-0",
+                  !isEditable && "pointer-events-none"
                 )}
               >
                 <input
@@ -314,13 +337,13 @@ function MilestoneCard(
                 />
                 <p
                   className={cn(
-                    'w-[18px] h-[18px] p-[2px] rounded-[4px] m-[1px]',
-                    'flex items-center justify-center',
-                    'bg-white text-basic-400 border-2 border-solid border-basic-400',
-                    'peer-checked:bg-primary-base',
-                    'peer-checked:text-white',
-                    'peer-checked:border-primary-base',
-                    !isEditable && 'opacity-80'
+                    "w-[18px] h-[18px] p-[2px] rounded-[4px] m-[1px]",
+                    "flex items-center justify-center",
+                    "bg-white text-basic-400 border-2 border-solid border-basic-400",
+                    "peer-checked:bg-primary-base",
+                    "peer-checked:text-white",
+                    "peer-checked:border-primary-base",
+                    !isEditable && "opacity-80"
                   )}
                 >
                   {isCompleted && <FaCheck />}

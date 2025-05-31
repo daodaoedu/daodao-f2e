@@ -12,13 +12,14 @@ import MilestoneCard, {
 } from '@/components/Milestones/MilestoneCard';
 import DraggableMilestones from '@/components/Milestones/DraggableMilestones';
 import dayjs from 'dayjs';
-import DateRangePicker from '@/shared/components/DateRangePicker';
+import { DatePickerWithRange } from '@/components/molecules/date-picker';
 import { Button } from '@/components/atoms/button';
 import {
   ProjectMilestoneSchema,
   useProjectMilestoneMutation,
   useProjectMilestones,
 } from '@/services/modules/projects';
+import SwapRightIcon from "@/public/assets/icons/swap-right.svg";
 import { useMilestonesDateRange } from '@/features/projects';
 
 const SkeletonMilestones = () => {
@@ -188,6 +189,13 @@ const MilestonesContent = () => {
     return isAscending ? sortedData : [...sortedData].reverse();
   }, [milestones, isAscending, filterType]);
 
+  const date = useMemo(() => {
+    return {
+      from: milestonesDateRange.startDate?.toDate(),
+      to: milestonesDateRange.endDate?.toDate(),
+    };
+  }, [milestonesDateRange]);
+
   return (
     <div>
       {isLoading ? (
@@ -203,12 +211,11 @@ const MilestonesContent = () => {
                   <div className="flex flex-col md:flex-row justify-between md:items-center gap-2 pb-2.5">
                     <div className="flex items-center gap-2">
                       <p>時間：</p>
-                      <DateRangePicker
-                        startDate={milestonesDateRange.startDate ?? dayjs()}
-                        endDate={milestonesDateRange.endDate ?? dayjs()}
-                        disabledStartDate
-                        disabledEndDate
+                      <DatePickerWithRange
+                        date={date}
+                        separator={<SwapRightIcon className="w-4 h-4 text-basic-black/25" />}
                         className="-mx-3 p-2"
+                        disabled
                       />
                     </div>
                     <Button
