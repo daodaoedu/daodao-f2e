@@ -1,18 +1,18 @@
-import { z } from 'zod';
-import { mutations } from '../core';
-import { updateImage } from '../images';
+import { z } from "zod";
+import { mutations } from "@/utils/http";
+import { uploadImages } from "../images";
 
-const ideaEndpoint = '/ideas';
+const ideaEndpoint = "/ideas";
 
 function removeNumberSuffixStrict(id: string): string | null {
-  if (!id || typeof id !== 'string') {
-      return null;
+  if (!id || typeof id !== "string") {
+    return null;
   }
 
   // 使用正則表達式檢查是否以 -數字 結尾
   const match = id.match(/_\d+$/);
   if (!match) {
-      return id; // 如果沒有匹配到 -數字 結尾，返回原字符串
+    return id; // 如果沒有匹配到 -數字 結尾，返回原字符串
   }
 
   // 移除匹配到的部分
@@ -25,7 +25,6 @@ interface GetIdeaKeyOptions {
 
 export const getIdeaEndpoint = ({ ideaId }: GetIdeaKeyOptions = {}) => {
   if (ideaId) {
-
     return `${ideaEndpoint}/${removeNumberSuffixStrict(ideaId)}`;
   }
   return ideaEndpoint;
@@ -66,9 +65,11 @@ export const createIdea = async ({
   ...idea
 }: CreateIdeaRequest) => {
   // 處理圖片上傳
-  const updatedImageUrls = await updateImage(imageFiles, imageUrls);
+  const updatedImageUrls = await uploadImages(imageFiles, imageUrls);
   // 若有影片檔案，處理影片上傳；否則保留原 video_urls
-  const updatedVideoUrls = videoFiles ? await updateImage(videoFiles, videoUrls) : videoUrls;
+  const updatedVideoUrls = videoFiles
+    ? await uploadImages(videoFiles, videoUrls)
+    : videoUrls;
 
   return mutations.post(getIdeaEndpoint(), {
     ...idea,
@@ -88,8 +89,10 @@ export const updateIdea = async ({
   videoUrls,
   ...idea
 }: UpdateIdeaRequest) => {
-  const updatedImageUrls = await updateImage(imageFiles, imageUrls);
-  const updatedVideoUrls = videoFiles ? await updateImage(videoFiles, videoUrls) : videoUrls;
+  const updatedImageUrls = await uploadImages(imageFiles, imageUrls);
+  const updatedVideoUrls = videoFiles
+    ? await uploadImages(videoFiles, videoUrls)
+    : videoUrls;
 
   return mutations.put(getIdeaEndpoint({ ideaId: id }), {
     ...idea,

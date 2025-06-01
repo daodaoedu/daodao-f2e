@@ -4,7 +4,7 @@ import {
   getProjectNotePathname,
   projectNoteAPI,
   refetchProjectNote,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 import marathonConfig from "@/constants/marathon";
 import NoteForm from "./NoteForm";
 

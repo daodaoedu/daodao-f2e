@@ -11,11 +11,11 @@ import {
 import {
   getNotionDatabase,
   NotionDatabaseResultSchema,
-} from "@/services/modules/notion";
+} from "@/services/notion";
 import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";
 import { CATEGORIES, SEARCH_TAGS } from "@/constants/category";
-import { parseToArray } from "@/services/core";
+import { parseToArray } from "@/utils/helper";
 import { Categories } from "@/features/resources/utils/getCategories";
 import { Button } from "@/components/atoms/button";
 import {

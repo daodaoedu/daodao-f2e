@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { parseToString } from '@/services/core';
+import { parseToString } from '@/utils/helper';
 import { RoleEnum, useAuth } from '@/contexts/Auth';
 import { ProjectProvider } from '@/contexts/Project';
 import Sidebar, { SidebarItemType } from '@/layout/components/Sidebar';
-import { useProject } from '@/services/modules/projects';
+import { useProject } from '@/services/projects';
 import NotExist from '@/shared/components/NotExist';
 import ProjectHeader from '../components/ProjectHeader';
 import getBaseLayout from '../core/getBaseLayout';

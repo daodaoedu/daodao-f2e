@@ -28,7 +28,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import TagEditor from '@/shared/components/TagEditor';
 import MarkdownEditor from '@/shared/components/MarkdownEditor';
-import { useTags } from '@/services/modules/tags';
+import { useTags } from '@/services/tags';
 import ErrorMessage from './ErrorMessage';
 
 import TheAvator from './TheAvator';

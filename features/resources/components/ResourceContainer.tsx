@@ -1,4 +1,4 @@
-import { NotionDatabaseResultSchema } from '@/services/modules/notion';
+import { NotionDatabaseResultSchema } from '@/services/notion';
 import { cn } from '@/utils/cn';
 import ResourceCard from './ResourceCard';
 

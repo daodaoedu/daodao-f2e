@@ -9,7 +9,7 @@ import { Form } from "@/components/atoms/form";
 import {
   projectOutcomeFormSchema,
   ProjectOutcomeFormSchema,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 import numberToChineseNumber from "@/utils/numberToChineseNumber";
 import Image from "@/shared/components/Image";
 import MarkdownEditor from "@/shared/components/MarkdownEditor";

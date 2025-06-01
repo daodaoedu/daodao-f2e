@@ -6,7 +6,7 @@ import {
   getProjectReviewPathname,
   projectReviewAPI,
   refetchProjectReview,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 
 import ReviewForm from "./ReviewForm";
 

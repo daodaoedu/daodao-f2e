@@ -6,7 +6,7 @@ import {
   projectNoteAPI,
   ProjectNoteSchema,
   refetchProjectNote,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 import NoteForm from "./NoteForm";
 
 interface NoteUpdateModalProps {

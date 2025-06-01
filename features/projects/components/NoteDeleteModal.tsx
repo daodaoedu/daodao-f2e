@@ -4,7 +4,7 @@ import {
   getProjectNotePathname,
   projectNoteAPI,
   refetchProjectNote,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 
 interface NoteDeleteModalProps {
   projectId: string;

@@ -6,7 +6,7 @@ import { useProjectMilestones } from '@/features/projects/hooks/milestone';
 import EmptyList from '@/components/Projects/ProjectList/EmptyList';
 import MilestoneItemView from '@/components/Milestones/MilestoneItemView';
 import { MilestonesProvider } from '@/contexts/Milestones';
-import { parseToString } from '@/services/core';
+import { parseToString } from '@/utils/helper';
 
 const ProjectMilestonesPage = () => {
   const { query } = useRouter();

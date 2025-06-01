@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router';
 import { ContentCard } from '@/features/projects';
 import { getPublicProjectLayout } from '@/layout/features/getProjectLayout';
-import { useProjectNotes } from '@/services/modules/projects';
-import { parseToString } from '@/services/core';
+import { useProjectNotes } from '@/services/projects';
+import { parseToString } from '@/utils/helper';
 
 const NotesPage = () => {
   const { query } = useRouter();

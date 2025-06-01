@@ -10,7 +10,7 @@ import {
 import {
   getNotionDatabase,
   NotionDatabaseResultSchema,
-} from "@/services/modules/notion";
+} from "@/services/notion";
 import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/atoms/button";

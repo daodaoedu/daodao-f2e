@@ -1,4 +1,4 @@
-import { parseToArray } from '@/services/core';
+import { parseToArray } from '@/utils/helper';
 import { CATEGORIES, ICategory, SEARCH_TAGS } from '@/constants/category';
 
 export type Categories = [ICategory, ICategory] | [ICategory] | null;

@@ -7,7 +7,7 @@ import SEOConfig from '@/shared/components/SEO';
 import GoBackButton from '@/components/Projects/GoBackButton';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
-import { useMyProjects } from '@/services/modules/projects';
+import { useMyProjects } from '@/services/projects';
 import More from '@/components/Projects/More';
 import { Button } from '@/components/atoms/button';
 import { cn } from '@/utils/cn';

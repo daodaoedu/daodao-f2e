@@ -6,7 +6,7 @@ import {
   projectOutcomeAPI,
   ProjectOutcomeSchema,
   refetchProjectOutcome,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 import OutcomeForm from "./OutcomeForm";
 
 interface OutcomeUpdateModalProps {
