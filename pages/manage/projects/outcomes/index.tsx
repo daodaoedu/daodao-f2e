@@ -10,12 +10,12 @@ import {
 } from "@/features/projects";
 import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
 import { Button } from "@/components/atoms/button";
-import { useProject } from "@/services/modules/projects";
+import { useProject } from "@/services/projects";
 import {
   useProjectOutcome,
   useProjectOutcomes,
 } from "@/features/projects/hooks/outcome";
-import { parseToString } from "@/services/core";
+import { parseToString } from "@/utils/helper";
 
 enum ModalTypeEnum {
   Create,

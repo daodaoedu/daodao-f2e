@@ -1,7 +1,7 @@
 import toast from 'react-hot-toast';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { useMyProjects } from '@/services/modules/projects';
+import { useMyProjects } from '@/services/projects';
 import useMarathonAccess from './useMarathonAccess';
 
 const MAX_PROJECTS = 3;

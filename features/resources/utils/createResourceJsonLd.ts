@@ -1,5 +1,5 @@
 import JsonLdFactory from '@/utils/jsonLd';
-import { NotionPageSchema } from '@/services/modules/notion';
+import { NotionPageSchema } from '@/services/notion';
 
 export default function createResourceJsonLd(result: NotionPageSchema) {
   return JsonLdFactory.createCourseBuilder()

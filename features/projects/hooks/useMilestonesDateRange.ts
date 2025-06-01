@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { useMemo } from "react";
-import { useProject } from "@/services/modules/projects";
+import { useProject } from "@/services/projects";
 import { useProjectMilestones } from "./milestone";
 
 export default function useMilestonesDateRange(projectId?: string) {

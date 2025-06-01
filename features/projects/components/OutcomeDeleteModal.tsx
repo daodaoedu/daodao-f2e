@@ -4,7 +4,7 @@ import {
   getProjectOutcomePathname,
   projectOutcomeAPI,
   refetchProjectOutcome,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 
 interface OutcomeDeleteModalProps {
   projectId: string;

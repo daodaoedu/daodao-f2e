@@ -2,7 +2,7 @@ import type {
   CreateUserRequest,
   UpdateUserRequest,
   IUser,
-} from "@/services/modules/users";
+} from "@/services/users";
 import { LOGIN_TYPE } from "@/utils/env";
 
 export enum LoginStatus {

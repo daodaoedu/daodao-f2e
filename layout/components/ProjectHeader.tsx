@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { MdLockOpen, MdLock } from 'react-icons/md';
 import { AiOutlineMore } from 'react-icons/ai';
 import { ROLE } from '@/constants/member';
-import { ProjectSchema } from '@/services/modules/projects';
+import { ProjectSchema } from '@/services/projects';
 import { Button } from '@/components/atoms/button';
 
 interface ProjectHeaderProps {

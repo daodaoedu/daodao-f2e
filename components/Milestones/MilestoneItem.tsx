@@ -5,7 +5,7 @@ import {
   ProjectMilestoneSchema,
   ProjectMilestoneFormSchema,
   ProjectTaskSchema,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 import {
   Collapsible,
   CollapsibleContent,

@@ -14,7 +14,7 @@ import {
 import {
   getNotionDatabase,
   NotionDatabaseResultSchema,
-} from "@/services/modules/notion";
+} from "@/services/notion";
 import Carousel from "@/shared/components/Carousel";
 import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";

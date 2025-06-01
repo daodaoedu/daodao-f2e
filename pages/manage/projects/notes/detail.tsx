@@ -8,8 +8,8 @@ import {
   useProject,
   useProjectNote,
   useProjectNoteMutation,
-} from "@/services/modules/projects";
-import { parseToNumber, parseToString } from "@/services/core";
+} from "@/services/projects";
+import { parseToNumber, parseToString } from "@/utils/helper";
 import ConfirmModal from "@/shared/components/Confirm";
 
 enum ModalTypeEnum {

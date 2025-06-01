@@ -4,9 +4,9 @@ import { useMemo, useState } from "react";
 import OutcomeDetail from "@/features/projects/components/OutcomeDetail";
 import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
 import SEOConfig from "@/shared/components/SEO";
-import { useProject } from "@/services/modules/projects";
+import { useProject } from "@/services/projects";
 import { useProjectOutcome } from "@/features/projects/hooks/outcome";
-import { parseToNumber, parseToString } from "@/services/core";
+import { parseToNumber, parseToString } from "@/utils/helper";
 import { OutcomeDeleteModal, OutcomeUpdateModal } from "@/features/projects";
 
 enum ModalTypeEnum {

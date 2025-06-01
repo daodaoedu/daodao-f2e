@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { BASE_URL } from "@/constants/common";
 import { getTokenStorage } from "@/utils/storage";
-import { parseToString } from "@/services/core";
+import { parseToString } from "@/utils/helper";
 
 interface ProjectContext {
   project: Project;

@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import {
   useMetaInstagramPost,
   useMetaInstagramStory,
-} from '@/services/modules/metaPosts';
+} from '@/services/metaPosts';
 
 import ImageCardList from './ImageCardList';
 import StoryCardList from './StoryCardList';
