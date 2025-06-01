@@ -1,5 +1,4 @@
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
-import Link from "next/link";
 import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
 import {
   CategoriesContainer,
@@ -14,8 +13,15 @@ import {
 } from "@/services/modules/notion";
 import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";
-import ArrowIcon from "@/public/assets/icons/arrow.svg";
 import { Button } from "@/components/atoms/button";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/atoms/breadcrumb";
 
 type SectionProps = {
   as?: "section" | "div";
@@ -58,17 +64,28 @@ export default function ResourceCategoriesPage({
   data,
   jsonLd,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
+  const basePath = "/new-resource";
+
   return (
     <>
       <SEOConfig title="所有分類｜島島阿學" jsonLd={jsonLd} />
       <Section as="div" className="pt-12">
-        <div className="mb-3 flex items-center gap-2 text-basic-400">
-          <Button variant="link" className="px-2 -mx-2">
-            <Link href="/new-resource">找資源</Link>
-          </Button>
-          <ArrowIcon />
-          <span>所有分類</span>
-        </div>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href={basePath}>找資源</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href={`${basePath}/categories`}>
+                所有分類
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbItem>
+              <BreadcrumbPage>所有分類</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <SectionTitle as="h1" title="所有分類" />
       </Section>
 

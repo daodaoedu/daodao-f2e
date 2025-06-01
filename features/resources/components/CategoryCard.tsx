@@ -38,7 +38,7 @@ export default function CategoryCard(props: CategoryCardProps) {
       />
       <div
         className={cn(
-          'absolute inset-0 w-full p-2 bg-primary-base bg-opacity-50',
+          'absolute inset-0 w-full p-2 bg-primary-base/50',
           'flex items-center justify-center text-xl font-bold text-white',
           'group-hover:scale-110 transition-transform text-center text-balance'
         )}
