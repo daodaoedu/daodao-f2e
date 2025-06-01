@@ -122,7 +122,7 @@ const PersonalCardPage = () => {
 
   return (
     <ProtectedComponent>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Box
         sx={{
           display: 'flex',

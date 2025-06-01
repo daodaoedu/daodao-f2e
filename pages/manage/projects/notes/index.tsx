@@ -58,7 +58,7 @@ const NotesPage = () => {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <div className="mb-6 flex items-center justify-between body-md">
         <div className="text-basic-500">便利貼 ({notes?.length ?? 0})</div>
         <Button

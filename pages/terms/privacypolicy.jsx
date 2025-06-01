@@ -21,7 +21,7 @@ const TermsPrivacyPolicyPage = () => {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <TermsPrivacyPolicy />
     </>
   );

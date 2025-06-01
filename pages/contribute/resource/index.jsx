@@ -21,7 +21,7 @@ const ContributeResourcePage = () => {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <ContributeResource />
     </>
   );

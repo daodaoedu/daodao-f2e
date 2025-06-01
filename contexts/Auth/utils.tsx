@@ -1,9 +1,4 @@
-import {
-  checkIsDevHost,
-  getBackendUrl,
-  getFrontendUrl,
-  LOGIN_TYPE,
-} from '@/utils/env';
+import getEnv, { LOGIN_TYPE } from '@/utils/env';
 import { getDevOriginStorage, getTokenStorage } from '@/utils/storage';
 import { LoginMessageEvent, LoginStatus } from './type';
 
@@ -32,7 +27,7 @@ export const sendLoginEvent = async (token: string) => {
   } catch (e) {
     if (e instanceof DOMException) {
       // 非同源政策會拋出錯誤，只有開發分支與本地開發會有此情況
-      const isDevHost = checkIsDevHost();
+      const { isDevHost } = getEnv();
       const origin = getDevOriginStorage().get();
 
       if (isDevHost && origin) {
@@ -87,9 +82,7 @@ export const registerLoginListener = (
  * 主要是針對開發環境使用的，重定向到登入頁面
  */
 export const redirectToAuth = () => {
-  const isDevHost = checkIsDevHost();
-  const frontendUrl = getFrontendUrl();
-  const backendUrl = getBackendUrl();
+  const { isDevHost, frontendUrl, apiUrl } = getEnv();
   const currentUrl = window.location.origin;
 
   if (isDevHost && frontendUrl !== currentUrl) {
@@ -97,6 +90,6 @@ export const redirectToAuth = () => {
   } else if (frontendUrl === currentUrl) {
     const searchParams = new URLSearchParams(window.location.search);
     getDevOriginStorage().set(searchParams.get('origin'));
-    window.location.href = `${backendUrl}/auth/google`;
+    window.location.href = `${apiUrl}/auth/google`;
   }
 };

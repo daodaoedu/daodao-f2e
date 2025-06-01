@@ -50,7 +50,7 @@ function EditGroupPage() {
 
   return (
     <ProtectedComponent>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Box minHeight="60vh">
         {source?.user?.userId && (
           <GroupForm

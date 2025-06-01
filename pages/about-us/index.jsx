@@ -13,7 +13,7 @@ const AboutPage = () => {
       copyright: '島島阿學',
       imgLink: 'https://www.daoedu.tw/preview.webp',
       link: `${process.env.HOSTNAME}/about`,
-      structuredData: {
+      jsonLd: {
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
         mainEntity: [
@@ -49,7 +49,7 @@ const AboutPage = () => {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <About />
     </>
   );

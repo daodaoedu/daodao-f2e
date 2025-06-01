@@ -84,7 +84,7 @@ const ProjectPage = () => {
 
   return (
     <ProtectedComponent>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
 
       <Container className="flex justify-center pb-12 px-4" autoMinHeight>
         <div className="max-w-3xl">

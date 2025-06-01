@@ -58,7 +58,7 @@ const OutcomesPage = () => {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <div className="mb-6 flex items-center justify-between body-md">
         <div className="text-basic-500">學習成果 ({outcomes?.length ?? 0})</div>
         <Button

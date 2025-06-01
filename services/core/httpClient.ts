@@ -1,9 +1,9 @@
-import { z } from "zod";
-import { getTokenStorage } from "@/utils/storage";
-import { getBackendUrl } from "@/utils/env";
+import { z } from 'zod';
+import { getTokenStorage } from '@/utils/storage';
+import getEnv from '@/utils/env';
 
-export const V1_BASE_URL = "https://api.daoedu.tw";
-export const BASE_URL = getBackendUrl();
+export const V1_BASE_URL = 'https://api.daoedu.tw';
+export const BASE_URL = getEnv().apiUrl;
 
 enum RequestMethod {
   GET = "GET",

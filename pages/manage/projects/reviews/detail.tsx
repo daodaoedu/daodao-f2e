@@ -48,7 +48,7 @@ const ReviewPage = () => {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
 
       <ReviewDetail
         data={review}

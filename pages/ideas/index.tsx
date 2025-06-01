@@ -18,7 +18,7 @@ const IdeaPage: React.FC = () => {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Idea />
     </>
   );

@@ -21,7 +21,7 @@ const TermsIPRPage = () => {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <TermsIPR />
     </>
   );

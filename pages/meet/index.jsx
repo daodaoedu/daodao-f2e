@@ -68,7 +68,7 @@ const MeetPage = () => {
   return (
     <>
       <Script src="https://meet.jit.si/external_api.js" />
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Box sx={{ minHeight: '100vh' }}>
         <JitsiMeeting
           // roomName={generateRoomName()}

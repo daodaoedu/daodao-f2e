@@ -50,7 +50,7 @@ const Projects = () => {
 
   return (
     <ProtectedComponent>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <div className="bg-[#F3FCFC] md:py-8 min-h-screen-without-padding-top">
         <div className="w-full p-4
           md:max-w-[860px] mx-auto box-border flex flex-col gap-6"
