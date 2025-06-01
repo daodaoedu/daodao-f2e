@@ -1,10 +1,10 @@
 import useSWR, { KeyedMutator } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import projectMilestoneAPI, { getProjectMilestonePathname } from './api';
-import { ProjectMilestoneSchema, UpdateProjectMilestoneSchema } from './schema';
-import { getProjectPathname } from '../core';
-import { getMilestone, sortMilestones } from '../utils';
+import { projectMilestoneAPI, getProjectMilestonePathname } from '@/services/modules/projects/milestones/api';
+import { ProjectMilestoneSchema, ProjectMilestoneFormSchema } from '@/services/modules/projects/milestones/schema';
+import { getProjectPathname } from '@/services/modules/projects/core';
+import { sortMilestones } from '@/services/modules/projects/utils';
 
 export function useProjectMilestones(projectId?: string | null) {
   const swr = useSWR<ProjectMilestoneSchema[]>(
@@ -27,7 +27,7 @@ interface UseProjectMilestoneMutationProps {
 
 export function useProjectMilestoneMutation({
   projectId,
-  updateMilestoneCache,
+  // updateMilestoneCache,
   onCreated,
   onUpdated,
   onDeleted,
@@ -48,31 +48,31 @@ export function useProjectMilestoneMutation({
     onSuccess: onDeleted,
   });
 
-  const handleMilestones = (updateData: UpdateProjectMilestoneSchema) => {
-    updateMilestoneCache?.((prevMilestones) => {
-      const milestone = getMilestone(prevMilestones, updateData.id);
+  // const handleMilestones = (updateData: ProjectMilestoneFormSchema) => {
+  //   updateMilestoneCache?.((prevMilestones) => {
+  //     const milestone = getMilestone(prevMilestones, updateData.id);
 
-      if (!milestone) return prevMilestones;
+  //     if (!milestone) return prevMilestones;
 
-      const updatedMilestone = {
-        ...milestone.item,
-        ...updateData,
-      };
+  //     const updatedMilestone = {
+  //       ...milestone.item,
+  //       ...updateData,
+  //     };
 
-      return [
-        ...milestone.list.slice(0, milestone.index),
-        updatedMilestone,
-        ...milestone.list.slice(milestone.index + 1),
-      ];
-    });
-  };
+  //     return [
+  //       ...milestone.list.slice(0, milestone.index),
+  //       updatedMilestone,
+  //       ...milestone.list.slice(milestone.index + 1),
+  //     ];
+  //   });
+  // };
 
   return {
     createMutation,
     updateMutation: {
       ...updateMutation,
-      trigger: (updateData: UpdateProjectMilestoneSchema) => {
-        handleMilestones(updateData);
+      trigger: (updateData: ProjectMilestoneFormSchema) => {
+        // handleMilestones(updateData);
         return updateMutation.trigger(updateData);
       },
     },

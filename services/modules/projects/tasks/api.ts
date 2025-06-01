@@ -1,11 +1,11 @@
-import { MutationFetcher } from 'swr/mutation';
-import { apiPaths, mutations } from '@/services/core';
+import { MutationFetcher } from "swr/mutation";
+import { mutations, parseToString } from "@/services/core";
 
 import {
   CreateProjectTaskSchema,
   ProjectTaskSchema,
   UpdateProjectTaskSchema,
-} from './schema';
+} from "./schema";
 
 export type ProjectTaskSWRKey = string;
 
@@ -19,8 +19,17 @@ export const getProjectTaskPathname = ({
   projectId,
   milestoneId,
   taskId,
-}: GetProjectTaskPathnameProps) =>
-  apiPaths.projects(projectId).milestones(milestoneId).tasks(taskId).toString();
+}: GetProjectTaskPathnameProps) => {
+  const pathname = `/projects/${parseToString(
+    projectId
+  )}/milestones/${parseToString(milestoneId)}/tasks`;
+
+  if (taskId) {
+    return `${pathname}/${parseToString(taskId)}`;
+  }
+
+  return pathname;
+};
 
 interface ProjectTaskAPIType {
   create: MutationFetcher<

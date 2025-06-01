@@ -10,7 +10,7 @@ import dayjs from "dayjs";
 import { useDialog } from "@/contexts/Dialog";
 import {
   ProjectMilestoneSchema,
-  UpdateProjectMilestoneSchema,
+  ProjectMilestoneFormSchema,
   ProjectTaskSchema,
 } from "@/services/modules/projects";
 import { getIsCheckDragMilestoneStorage } from "@/utils/storage";
@@ -33,7 +33,7 @@ interface DraggableMilestonesProps {
   onRefreshData?: () => void;
   onReorder?: (milestones: ProjectMilestoneSchema) => void;
   onReorderTask?: (task: ProjectTaskSchema) => void;
-  onUpdate?: (request: UpdateProjectMilestoneSchema) => void;
+  onUpdate?: (request: ProjectMilestoneFormSchema) => void;
 }
 
 const DraggableMilestones = ({

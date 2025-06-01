@@ -5,7 +5,7 @@ import { ProjectReviewSchema } from '@/services/modules/projects';
 import { BaseUserSchema } from '@/services/modules/users';
 import { CommentType } from '@/services/modules/comments';
 import MarkdownEditor from '@/shared/components/MarkdownEditor';
-import RadioGroup from './RadioGroup';
+import RadioGroup from './ReviewRadioGroup';
 
 interface ReviewDetailProps {
   data?: ProjectReviewSchema;

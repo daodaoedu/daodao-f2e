@@ -31,8 +31,6 @@ export const projectMilestoneSchema = z.object({
   tasks: z.array(projectTaskSchema),
 });
 
-export type ProjectMilestoneSchema = z.infer<typeof projectMilestoneSchema>;
-
 const validateDateRange = (
   startDate: string | undefined,
   endDate: string | undefined,
@@ -53,7 +51,7 @@ const validateDateRange = (
   }
 };
 
-export const createProjectMilestoneSchema = projectMilestoneSchema
+export const projectMilestoneFormSchema = projectMilestoneSchema
   .omit({
     id: true,
     createdAt: true,
@@ -65,21 +63,7 @@ export const createProjectMilestoneSchema = projectMilestoneSchema
     validateDateRange(data.startDate, data.endDate, ctx)
   );
 
-export type CreateProjectMilestoneSchema = z.infer<
-  typeof createProjectMilestoneSchema
->;
-
-export const updateProjectMilestoneSchema = projectMilestoneSchema
-  .omit({
-    createdAt: true,
-    updatedAt: true,
-    isDeleted: true,
-    tasks: true,
-  })
-  .superRefine((data, ctx) =>
-    validateDateRange(data.startDate, data.endDate, ctx)
-  );
-
-export type UpdateProjectMilestoneSchema = z.infer<
-  typeof updateProjectMilestoneSchema
+export type ProjectMilestoneSchema = z.infer<typeof projectMilestoneSchema>;
+export type ProjectMilestoneFormSchema = z.infer<
+  typeof projectMilestoneFormSchema
 >;

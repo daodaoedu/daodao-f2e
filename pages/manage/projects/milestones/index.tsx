@@ -1,26 +1,26 @@
-import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
-import { useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
-import SEOConfig, { SEODataType } from '@/shared/components/SEO';
-import { Skeleton } from '@mui/material';
-import { MdOutlineSort } from 'react-icons/md';
-import { Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
-import { useProject } from '@/contexts/Project';
-import { MilestonesProvider } from '@/contexts/Milestones/index';
+import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
+import { useMemo, useRef, useState } from "react";
+import { useRouter } from "next/router";
+import SEOConfig, { SEODataType } from "@/shared/components/SEO";
+import { Skeleton } from "@mui/material";
+import { MdOutlineSort } from "react-icons/md";
+import { Panel, Title, ProgressBar } from "@/components/Milestones/Shared";
+import { useProject } from "@/contexts/Project";
+import { MilestonesProvider } from "@/contexts/Milestones/index";
 import MilestoneCard, {
   MilestoneFormRef,
-} from '@/components/Milestones/MilestoneCard';
-import DraggableMilestones from '@/components/Milestones/DraggableMilestones';
-import dayjs from 'dayjs';
-import { DatePickerWithRange } from '@/components/molecules/date-picker';
-import { Button } from '@/components/atoms/button';
+} from "@/components/Milestones/MilestoneCard";
+import DraggableMilestones from "@/components/Milestones/DraggableMilestones";
+import dayjs from "dayjs";
+import { DatePickerWithRange } from "@/components/molecules/date-picker";
+import { Button } from "@/components/atoms/button";
+import { ProjectMilestoneSchema } from "@/services/modules/projects";
+import SwapRightIcon from "@/public/assets/icons/swap-right.svg";
+import { useMilestonesDateRange } from "@/features/projects";
 import {
-  ProjectMilestoneSchema,
   useProjectMilestoneMutation,
   useProjectMilestones,
-} from '@/services/modules/projects';
-import SwapRightIcon from "@/public/assets/icons/swap-right.svg";
-import { useMilestonesDateRange } from '@/features/projects';
+} from "@/features/projects/hooks/milestone";
 
 const SkeletonMilestones = () => {
   return (
@@ -69,7 +69,7 @@ const MilestonesProgress = ({ milestones = [] }: MilestonesProgressProps) => {
   const daysRemaining = useMemo(() => {
     if (!milestoneEndDate || dayjs().isAfter(milestoneEndDate)) return 0;
 
-    return milestoneEndDate.diff(dayjs(), 'day');
+    return milestoneEndDate.diff(dayjs(), "day");
   }, [milestoneEndDate]);
 
   const remainingMilestonesCount = useMemo(() => {
@@ -117,24 +117,24 @@ const MilestonesProgress = ({ milestones = [] }: MilestonesProgressProps) => {
 };
 
 enum FilterEnum {
-  All = 'all',
-  Completed = 'completed',
-  Incomplete = 'incomplete',
+  All = "all",
+  Completed = "completed",
+  Incomplete = "incomplete",
 }
 
 const filterItems = [
   {
-    label: '全部',
+    label: "全部",
     value: FilterEnum.All,
     fn: () => true,
   },
   {
-    label: '未完成',
+    label: "未完成",
     value: FilterEnum.Incomplete,
     fn: (milestone: ProjectMilestoneSchema) => !milestone.isCompleted,
   },
   {
-    label: '已完成',
+    label: "已完成",
     value: FilterEnum.Completed,
     fn: (milestone: ProjectMilestoneSchema) => milestone.isCompleted,
   },
@@ -213,7 +213,9 @@ const MilestonesContent = () => {
                       <p>時間：</p>
                       <DatePickerWithRange
                         date={date}
-                        separator={<SwapRightIcon className="w-4 h-4 text-basic-black/25" />}
+                        separator={
+                          <SwapRightIcon className="w-4 h-4 text-basic-black/25" />
+                        }
                         className="-mx-3 p-2"
                         disabled
                       />
@@ -249,7 +251,7 @@ const MilestonesContent = () => {
                     onClick={() => setIsAscending(!isAscending)}
                   >
                     <MdOutlineSort className="size-6 text-primary-base group-hover:text-current" />
-                    {isAscending ? '舊到新' : '新到舊'}
+                    {isAscending ? "舊到新" : "新到舊"}
                   </Button>
                 </div>
               </>
@@ -299,32 +301,32 @@ const MilestonesPage = () => {
   const router = useRouter();
   const SEOData = useMemo<SEODataType>(
     () => ({
-      title: '島島盃 - 2025 春季學習馬拉松｜多元學習資源平台｜島島阿學',
+      title: "島島盃 - 2025 春季學習馬拉松｜多元學習資源平台｜島島阿學",
       description:
-        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-      keywords: '島島阿學',
-      author: '島島阿學',
-      copyright: '島島阿學',
-      imgLink: 'https://www.daoedu.tw/preview.webp',
+        "「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
+      keywords: "島島阿學",
+      author: "島島阿學",
+      copyright: "島島阿學",
+      imgLink: "https://www.daoedu.tw/preview.webp",
       link: `${process.env.HOSTNAME}${router?.asPath}`,
       structuredData: {
-        '@context': 'https://schema.org',
-        '@graph': [
+        "@context": "https://schema.org",
+        "@graph": [
           {
-            '@context': 'https://schema.org',
-            '@type': 'WebSite',
-            url: 'https://www.daoedu.tw',
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            url: "https://www.daoedu.tw",
             potentialAction: {
-              '@type': 'SearchAction',
-              'query-input': 'required name=q',
-              target: 'https://www.daoedu.tw/search?q={q}',
+              "@type": "SearchAction",
+              "query-input": "required name=q",
+              target: "https://www.daoedu.tw/search?q={q}",
             },
           },
           {
-            '@context': 'https://schema.org',
-            '@type': 'Organization',
-            url: 'https://www.daoedu.tw',
-            logo: 'https://www.daoedu.tw/favicon-112.png',
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            url: "https://www.daoedu.tw",
+            logo: "https://www.daoedu.tw/favicon-112.png",
           },
         ],
       },

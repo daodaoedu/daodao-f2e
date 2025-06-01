@@ -2,9 +2,8 @@ import { useState } from "react";
 import dayjs from "dayjs";
 import { MdAdd } from "react-icons/md";
 import {
-  CreateProjectMilestoneSchema,
   ProjectMilestoneSchema,
-  UpdateProjectMilestoneSchema,
+  ProjectMilestoneFormSchema,
   ProjectTaskSchema,
 } from "@/services/modules/projects";
 import {
@@ -25,8 +24,8 @@ interface MilestoneItemProps {
   isEditable?: boolean;
   milestone: ProjectMilestoneSchema;
   milestones: ProjectMilestoneSchema[];
-  onCreate?: (request: CreateProjectMilestoneSchema) => void;
-  onUpdate?: (request: UpdateProjectMilestoneSchema) => void;
+  onCreate?: (request: ProjectMilestoneFormSchema) => void;
+  onUpdate?: (request: ProjectMilestoneFormSchema) => void;
   onRefreshData?: () => void;
   onReorderTask?: (task: ProjectTaskSchema) => void;
 }

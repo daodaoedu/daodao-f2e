@@ -17,15 +17,13 @@ import { format, toDate, isValid } from "date-fns";
 import { cn } from "@/utils/cn";
 import { MdSend, MdClose, MdEdit } from "react-icons/md";
 import { Button } from "@/components/atoms/button";
-import Form from "@/shared/components/Form";
+import { Form } from "@/components/atoms/form";
 import { useDialog } from "@/contexts/Dialog";
 import {
   useProject,
-  CreateProjectMilestoneSchema,
-  createProjectMilestoneSchema,
   ProjectMilestoneSchema,
-  UpdateProjectMilestoneSchema,
-  updateProjectMilestoneSchema,
+  ProjectMilestoneFormSchema,
+  projectMilestoneFormSchema,
 } from "@/services/modules/projects";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DatePickerWithRange } from "@/components/molecules/date-picker";
@@ -41,8 +39,8 @@ interface MilestoneCardProps {
   isEditable?: boolean;
   defaultEditing?: boolean;
   onCancel?: () => void;
-  onCreate?: (request: CreateProjectMilestoneSchema) => void | Promise<unknown>;
-  onUpdate?: (request: UpdateProjectMilestoneSchema) => void | Promise<unknown>;
+  onCreate?: (request: ProjectMilestoneFormSchema) => void | Promise<unknown>;
+  onUpdate?: (request: ProjectMilestoneFormSchema) => void | Promise<unknown>;
 }
 
 export interface MilestoneFormRef {
@@ -99,21 +97,13 @@ function MilestoneCard(
     [milestones, milestone?.id]
   );
 
-  const schema = milestone?.id
-    ? updateProjectMilestoneSchema
-    : createProjectMilestoneSchema;
-
   const values = useMemo(
     () => (milestone ? { ...milestone, projectId } : undefined),
     [milestone, projectId]
   );
 
-  const methods = useForm<
-    typeof milestone extends undefined
-      ? CreateProjectMilestoneSchema
-      : UpdateProjectMilestoneSchema
-  >({
-    resolver: zodResolver(schema),
+  const methods = useForm({
+    resolver: zodResolver(projectMilestoneFormSchema),
     values,
     defaultValues: getDefaultMilestone({
       projectId,
@@ -130,7 +120,7 @@ function MilestoneCard(
 
   const isCompleted = methods.watch("isCompleted") ?? milestone?.isCompleted;
 
-  const checkDiff = (data: UpdateProjectMilestoneSchema) => {
+  const checkDiff = (data: ProjectMilestoneFormSchema) => {
     const checkKeys = ["startDate", "endDate", "name"] as const;
 
     return checkKeys.some((key) => {
@@ -138,26 +128,25 @@ function MilestoneCard(
     });
   };
 
-  const handleSubmit = async (
-    data: CreateProjectMilestoneSchema | UpdateProjectMilestoneSchema
-  ) => {
-    const updateRequest = updateProjectMilestoneSchema.safeParse(data);
-    const createRequest = createProjectMilestoneSchema.safeParse(data);
+  const handleSubmit = async (data: ProjectMilestoneFormSchema) => {
+    const requestDate = projectMilestoneFormSchema.safeParse(data);
 
     if (isLoading) return;
 
     try {
-      if (updateRequest.success) {
-        if (!checkDiff(updateRequest.data)) {
+      if (requestDate.success) {
+        if (!checkDiff(requestDate.data)) {
           handleCancel();
           return;
         }
 
         setIsLoading(true);
-        await onUpdate?.(updateRequest.data);
-      } else if (createRequest.success) {
-        setIsLoading(true);
-        await onCreate?.(createRequest.data);
+
+        if (milestone?.id) {
+          await onUpdate?.(requestDate.data);
+        } else {
+          await onCreate?.(requestDate.data);
+        }
       }
       setIsEditing(false);
     } finally {
@@ -165,9 +154,9 @@ function MilestoneCard(
     }
   };
 
-  const handleError: SubmitErrorHandler<
-    CreateProjectMilestoneSchema | UpdateProjectMilestoneSchema
-  > = (error) => {
+  const handleError: SubmitErrorHandler<ProjectMilestoneFormSchema> = (
+    error
+  ) => {
     toast.error(Object.values(error)[0]?.message || "發生錯誤");
   };
 
@@ -210,7 +199,7 @@ function MilestoneCard(
 
     methods.setValue("isCompleted", targetIsCompleted);
 
-    const updateRequest = updateProjectMilestoneSchema.safeParse(
+    const updateRequest = projectMilestoneFormSchema.safeParse(
       methods.getValues()
     );
 
@@ -262,132 +251,134 @@ function MilestoneCard(
   }, [isEditing, handleFocus]);
 
   return (
-    <Form methods={methods} onSubmit={handleSubmit} onError={handleError}>
-      <div
-        className={cn(
-          "p-2.5 md:py-3 md:px-4 rounded-lg bg-white",
-          isLoading && "opacity-80"
-        )}
-      >
-        <div className="flex items-center justify-between mb-2.5">
-          <div className="flex items-center">
-            <div className="text-primary-base body-sm">
-              里程碑 {index > -1 && index + 1}
-            </div>
-            {index > -1 && (
-              <span className="hidden md:block ml-3 body-sm text-basic-300">
-                {tasksInfo.progress}%
-              </span>
-            )}
-          </div>
-          <DatePickerWithRange
-            date={date}
-            fromDate={minDate?.toDate()}
-            toDate={maxDate?.toDate()}
-            className={cn(
-              "p-1 min-w-40 h-6 gap-1.5 body-sm text-basic-300 rounded",
-              !isEditing && "disabled:text-basic-300"
-            )}
-            disabled={disabledChangeDate || !isEditing}
-            separator={<FaArrowRight className="text-basic-300" />}
-            onChange={(d) => {
-              methods.setValue(
-                "startDate",
-                d?.from ? format(d.from, "yyyy/MM/dd") : undefined,
-                {
-                  shouldDirty: true,
-                }
-              );
-              methods.setValue(
-                "endDate",
-                d?.to ? format(d.to, "yyyy/MM/dd") : undefined,
-                {
-                  shouldDirty: true,
-                }
-              );
-            }}
-          />
-        </div>
-        <div className="w-full flex items-center md:justify-between gap-1">
-          {isEditing ? (
-            <input
-              type="text"
-              className={cn(
-                "-m-px font-sans body-sm text-basic-400",
-                "w-full rounded-md px-6 py-2 border border-solid border-basic-200",
-                "focus:outline-none focus:ring-0 focus:border-primary-base"
+    <Form {...methods}>
+      <form onSubmit={methods.handleSubmit(handleSubmit, handleError)}>
+        <div
+          className={cn(
+            "p-2.5 md:py-3 md:px-4 rounded-lg bg-white",
+            isLoading && "opacity-80"
+          )}
+        >
+          <div className="flex items-center justify-between mb-2.5">
+            <div className="flex items-center">
+              <div className="text-primary-base body-sm">
+                里程碑 {index > -1 && index + 1}
+              </div>
+              {index > -1 && (
+                <span className="hidden md:block ml-3 body-sm text-basic-300">
+                  {tasksInfo.progress}%
+                </span>
               )}
-              {...methods.register("name")}
+            </div>
+            <DatePickerWithRange
+              date={date}
+              fromDate={minDate?.toDate()}
+              toDate={maxDate?.toDate()}
+              className={cn(
+                "p-1 min-w-40 h-6 gap-1.5 body-sm text-basic-300 rounded",
+                !isEditing && "disabled:text-basic-300"
+              )}
+              disabled={disabledChangeDate || !isEditing}
+              separator={<FaArrowRight className="text-basic-300" />}
+              onChange={(d) => {
+                methods.setValue(
+                  "startDate",
+                  d?.from ? format(d.from, "yyyy/MM/dd") : undefined,
+                  {
+                    shouldDirty: true,
+                  }
+                );
+                methods.setValue(
+                  "endDate",
+                  d?.to ? format(d.to, "yyyy/MM/dd") : undefined,
+                  {
+                    shouldDirty: true,
+                  }
+                );
+              }}
             />
-          ) : (
-            <>
-              <label
-                htmlFor={`${elementId}-${milestone?.id}`}
+          </div>
+          <div className="w-full flex items-center md:justify-between gap-1">
+            {isEditing ? (
+              <input
+                type="text"
                 className={cn(
-                  "flex flex-row justify-center items-center gap-1.5 hover:cursor-pointer w-full basis-0",
-                  !isEditable && "pointer-events-none"
+                  "-m-px font-sans body-sm text-basic-400",
+                  "w-full rounded-md px-6 py-2 border border-solid border-basic-200",
+                  "focus:outline-none focus:ring-0 focus:border-primary-base"
                 )}
-              >
-                <input
-                  type="checkbox"
-                  id={`${elementId}-${milestone?.id}`}
-                  className="peer hidden"
-                  checked={isCompleted}
-                  onChange={handleComplete}
-                />
-                <p
+                {...methods.register("name")}
+              />
+            ) : (
+              <>
+                <label
+                  htmlFor={`${elementId}-${milestone?.id}`}
                   className={cn(
-                    "w-[18px] h-[18px] p-[2px] rounded-[4px] m-[1px]",
-                    "flex items-center justify-center",
-                    "bg-white text-basic-400 border-2 border-solid border-basic-400",
-                    "peer-checked:bg-primary-base",
-                    "peer-checked:text-white",
-                    "peer-checked:border-primary-base",
-                    !isEditable && "opacity-80"
+                    "flex flex-row justify-center items-center gap-1.5 hover:cursor-pointer w-full basis-0",
+                    !isEditable && "pointer-events-none"
                   )}
                 >
-                  {isCompleted && <FaCheck />}
+                  <input
+                    type="checkbox"
+                    id={`${elementId}-${milestone?.id}`}
+                    className="peer hidden"
+                    checked={isCompleted}
+                    onChange={handleComplete}
+                  />
+                  <p
+                    className={cn(
+                      "w-[18px] h-[18px] p-[2px] rounded-[4px] m-[1px]",
+                      "flex items-center justify-center",
+                      "bg-white text-basic-400 border-2 border-solid border-basic-400",
+                      "peer-checked:bg-primary-base",
+                      "peer-checked:text-white",
+                      "peer-checked:border-primary-base",
+                      !isEditable && "opacity-80"
+                    )}
+                  >
+                    {isCompleted && <FaCheck />}
+                  </p>
+                </label>
+                <p className="font-sans py-2 body-sm text-basic-400 truncate">
+                  {milestone?.name}
                 </p>
-              </label>
-              <p className="font-sans py-2 body-sm text-basic-400 truncate">
-                {milestone?.name}
-              </p>
-            </>
-          )}
-          <div className="flex flex-row gap-1 ml-auto">
-            {isEditing && (
-              <>
-                <Button
-                  className="rounded-sm text-lg"
-                  variant="gray"
-                  size="icon"
-                  onClick={handleCancel}
-                >
-                  <MdClose />
-                </Button>
-                <Button
-                  className="rounded-sm text-lg"
-                  variant="gray"
-                  size="icon"
-                  type="submit"
-                >
-                  <MdSend />
-                </Button>
               </>
             )}
-            {!isEditing && isEditable && (
-              <Button
-                className="rounded-sm text-lg"
-                variant="gray"
-                size="icon"
-                onClick={() => setIsEditing(true)}
-              >
-                <MdEdit />
-              </Button>
-            )}
+            <div className="flex flex-row gap-1 ml-auto">
+              {isEditing && (
+                <>
+                  <Button
+                    className="rounded-sm text-lg"
+                    variant="gray"
+                    size="icon"
+                    onClick={handleCancel}
+                  >
+                    <MdClose />
+                  </Button>
+                  <Button
+                    className="rounded-sm text-lg"
+                    variant="gray"
+                    size="icon"
+                    type="submit"
+                  >
+                    <MdSend />
+                  </Button>
+                </>
+              )}
+              {!isEditing && isEditable && (
+                <Button
+                  className="rounded-sm text-lg"
+                  variant="gray"
+                  size="icon"
+                  onClick={() => setIsEditing(true)}
+                >
+                  <MdEdit />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      </form>
     </Form>
   );
 }

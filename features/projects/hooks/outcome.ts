@@ -1,9 +1,12 @@
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import projectOutcomeAPI, { getProjectOutcomePathname } from './api';
-import { ProjectOutcomeSchema } from './schema';
-import { getProjectPathname } from '../core';
+import {
+  projectOutcomeAPI,
+  getProjectOutcomePathname,
+} from "@/services/modules/projects/outcomes/api";
+import { ProjectOutcomeSchema } from "@/services/modules/projects/outcomes/schema";
+import { getProjectPathname } from "@/services/modules/projects/core";
 
 export function useProjectOutcomes(projectId?: string | null) {
   return useSWR<ProjectOutcomeSchema[]>(

@@ -13,26 +13,22 @@ import getManageLayout from "@/layout/features/getManageLayout";
 import useClickOutside from "@/hooks/useClickOutside";
 import SEOConfig from "@/shared/components/SEO";
 import { Button } from "@/components/atoms/button";
-import ReviewCard from "@/components/Review/Card";
 import MilestoneItem from "@/components/Milestones/MilestoneItem";
 import {
   SelectProjectModal,
   MarathonAccess,
   EmptyProject,
   useMilestonesDateRange,
+  ReviewForm,
+  ReviewCard,
+  NoteForm,
 } from "@/features/projects";
 import { cn } from "@/utils/cn";
-import ReviewForm from "@/components/Review/Form";
-import NoteForm from "@/components/Note/Form";
-import OutcomeForm from "@/components/Outcome/Form";
+import OutcomeForm from "@/features/projects/components/OutcomeForm";
 import AccessDeniedImg from "@/public/assets/projects/access-denied.png";
 import {
   useMyProjects,
-  useProjectMilestoneMutation,
   useProjectNoteMutation,
-  useProjectOutcomeMutation,
-  useProjectReviewMutation,
-  useProjectReviews,
 } from "@/services/modules/projects";
 import Image from "@/shared/components/Image";
 import useCreateProject from "@/features/projects/hooks/useCreateProject";
@@ -55,6 +51,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/atoms/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import {
+  useProjectReviewList,
+  useProjectReviewMutation,
+} from "@/features/projects/hooks/review";
+import { useProjectOutcomeMutation } from "@/features/projects/hooks/outcome";
+import { useProjectMilestoneMutation } from "@/features/projects/hooks/milestone";
 
 const HEADER_TITLES = [
   "今天的每一小步，都在建立你的學習動能！",
@@ -240,7 +242,6 @@ const Header = () => {
             )}
             {modalType === ModalType.Review && (
               <ReviewForm
-                projectId={project.id}
                 projectTitle={project.title}
                 week={marathonConfig.getWeekNumber()}
                 onSubmit={createReview.trigger}
@@ -249,7 +250,6 @@ const Header = () => {
             )}
             {modalType === ModalType.Note && (
               <NoteForm
-                projectId={project.id}
                 projectTitle={project.title}
                 week={marathonConfig.getWeekNumber()}
                 onSubmit={createNote.trigger}
@@ -258,7 +258,6 @@ const Header = () => {
             )}
             {modalType === ModalType.Outcome && (
               <OutcomeForm
-                projectId={project.id}
                 projectTitle={project.title}
                 week={marathonConfig.getWeekNumber()}
                 onSubmit={createOutcome.trigger}
@@ -410,7 +409,7 @@ const TodayReviews = ({
   projectId: string;
   date: Dayjs;
 }) => {
-  const { data: reviews } = useProjectReviews(projectId);
+  const { data: reviews } = useProjectReviewList(projectId);
 
   const todayReviews = useMemo(() => {
     if (!Array.isArray(reviews)) return [];

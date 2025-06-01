@@ -1,9 +1,9 @@
-import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
+import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
 
-import projectNoteAPI, { getProjectNotePathname } from './api';
-import { ProjectNoteSchema } from './schema';
-import { getProjectPathname } from '../core';
+import { projectNoteAPI, getProjectNotePathname } from "./api";
+import { ProjectNoteSchema } from "./schema";
+import { getProjectPathname } from "../core";
 
 export function useProjectNotes(projectId?: string | null) {
   return useSWR<ProjectNoteSchema[]>(
@@ -18,7 +18,7 @@ interface UseProjectNoteProps {
 
 export function useProjectNote({ projectId, noteId }: UseProjectNoteProps) {
   return useSWR<ProjectNoteSchema>(
-    projectId && typeof noteId === 'number'
+    projectId && typeof noteId === "number"
       ? getProjectNotePathname({ projectId, noteId })
       : null
   );
