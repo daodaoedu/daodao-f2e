@@ -1,8 +1,14 @@
-import Link from 'next/link';
-import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
-import { useAuth, useAuthDispatch } from '@/contexts/Auth';
-import { cn } from '@/utils/cn';
-import Dropdown from '../../../shared/components/Dropdown';
+import Link from "next/link";
+import { MARATHON_LINKS, NAV_LINK, USER_LINK } from "@/constants/category";
+import { useAuth, useAuthDispatch } from "@/contexts/Auth";
+import { cn } from "@/utils/cn";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/atoms/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 function DesktopMenu() {
   const auth = useAuth();
@@ -25,41 +31,41 @@ function DesktopMenu() {
           ))}
         </ul>
       </nav>
-      <div className="flex items-center gap-3.5">
-        <Dropdown as="nav">
-          <Dropdown.Toggle
+      <nav className="flex items-center gap-3.5">
+        <DropdownMenu>
+          <DropdownMenuTrigger
             className={cn(
-              'my-4 py-1.5 pl-3 pr-1 font-bold rounded-lg transition-colors',
-              'text-basic-white hover:text-basic-white bg-transparent',
-              'aria-pressed:text-primary-base aria-pressed:bg-primary-lightest'
+              "my-4 py-1.5 pl-3 pr-1 flex items-center gap-1",
+              "font-bold rounded-lg text-basic-white bg-transparent",
+              "data-[state=open]:text-primary-base data-[state=open]:bg-primary-lightest",
+              "transition-colors [&[data-state=open]>svg]:rotate-180"
             )}
-            withIcon
           >
             島島盃-春季學習馬拉松
-          </Dropdown.Toggle>
-          <Dropdown.List className="mt-1">
+            <ChevronDown className="size-4 transition-transform" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="mt-1">
             {MARATHON_LINKS.map(({ name, link }) => (
-              <Dropdown.Item
+              <DropdownMenuItem
                 key={name}
                 className="rounded-lg text-nowrap hover:bg-primary-lightest"
+                asChild
               >
-                <Link href={link} className="block p-2 text-basic-400">
-                  {name}
-                </Link>
-              </Dropdown.Item>
+                <Link href={link}>{name}</Link>
+              </DropdownMenuItem>
             ))}
-          </Dropdown.List>
-        </Dropdown>
+          </DropdownMenuContent>
+        </DropdownMenu>
         {auth.isLoggedIn ? (
-          <div className="flex items-center gap-3.5">
+          <nav className="flex items-center gap-3.5">
             <Link
               href="/manage"
               className="px-2 py-5 text-basic-white body-md font-bold"
             >
               我的小島
             </Link>
-            <Dropdown as="nav">
-              <Dropdown.Toggle animation="none" className="p-0">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="p-0">
                 <img
                   src={auth.user.photoURL}
                   alt={auth.user.name}
@@ -67,12 +73,13 @@ function DesktopMenu() {
                   height="40"
                   className="rounded-full"
                 />
-              </Dropdown.Toggle>
-              <Dropdown.List className="mt-2">
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="mt-2">
                 {USER_LINK.map(({ name, id }) => (
-                  <Dropdown.Item
+                  <DropdownMenuItem
                     key={name}
                     className="rounded-lg text-nowrap hover:bg-primary-lightest"
+                    asChild
                   >
                     <Link
                       href={`/profile?id=${id}`}
@@ -80,9 +87,12 @@ function DesktopMenu() {
                     >
                       {name}
                     </Link>
-                  </Dropdown.Item>
+                  </DropdownMenuItem>
                 ))}
-                <Dropdown.Item className="rounded-lg text-nowrap hover:bg-primary-lightest">
+                <DropdownMenuItem
+                  className="rounded-lg text-nowrap hover:bg-primary-lightest"
+                  asChild
+                >
                   <button
                     type="button"
                     className="block p-2 text-basic-400"
@@ -90,10 +100,10 @@ function DesktopMenu() {
                   >
                     登出
                   </button>
-                </Dropdown.Item>
-              </Dropdown.List>
-            </Dropdown>
-          </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </nav>
         ) : (
           <button
             type="button"
@@ -103,7 +113,7 @@ function DesktopMenu() {
             登入
           </button>
         )}
-      </div>
+      </nav>
     </>
   );
 }

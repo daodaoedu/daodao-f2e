@@ -12,18 +12,10 @@ const projectOutcomeSchema = z.object({
   videoUrls: z.array(z.string()).nullable().optional(),
 });
 
-export type ProjectOutcomeSchema = z.infer<typeof projectOutcomeSchema>;
-
-export const createProjectOutcomeSchema = projectOutcomeSchema.omit({
+export const projectOutcomeFormSchema = projectOutcomeSchema.omit({
   id: true,
+  projectId: true,
 });
 
-export type CreateProjectOutcomeSchema = z.infer<
-  typeof createProjectOutcomeSchema
->;
-
-export const updateProjectOutcomeSchema = projectOutcomeSchema;
-
-export type UpdateProjectOutcomeSchema = z.infer<
-  typeof updateProjectOutcomeSchema
->;
+export type ProjectOutcomeSchema = z.infer<typeof projectOutcomeSchema>;
+export type ProjectOutcomeFormSchema = z.infer<typeof projectOutcomeFormSchema>;

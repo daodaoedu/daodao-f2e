@@ -1,0 +1,147 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# UI 元件庫遷移規則 (UI Library Migration Rules)
+
+## 遷移概述 (Migration Overview)
+
+本專案正在從 Material-UI (MUI) 遷移到 shadcn/ui，並配合使用 Tailwind CSS 進行樣式設計。此規則定義了在開發過程中應該使用和避免使用的技術棧。
+
+## 禁用的套件和技術 (Deprecated Packages & Technologies)
+
+### ❌ 不要再使用 (Do NOT Use)
+
+#### 1. Material-UI (MUI) 相關套件
+```typescript
+// ❌ 避免使用這些 import
+import { Button, TextField, Box, Typography } from '@mui/material'
+import { styled } from '@mui/material/styles'
+import { ThemeProvider } from '@mui/material/styles'
+import { useTheme } from '@mui/material/styles'
+```
+
+#### 2. Emotion CSS-in-JS
+```typescript
+// ❌ 避免使用 emotion
+import styled from '@emotion/styled'
+import { css } from '@emotion/react'
+import { Global } from '@emotion/react'
+```
+
+#### 3. Day.js 日期處理
+```typescript
+// ❌ 避免使用 dayjs
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+```
+
+#### 4. 其他需要淘汰的樣式方案
+- CSS Modules
+- Styled Components
+- 內聯樣式 (inline styles)
+
+## 推薦使用的技術棧 (Recommended Technology Stack)
+
+### ✅ 應該使用 (Should Use)
+
+#### 1. shadcn/ui + Radix UI 元件
+```typescript
+// ✅ 正確的 shadcn/ui 元件使用方式
+import { Button } from '@/components/atoms/button'
+import { Input } from '@/components/atoms/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/atoms/select'
+```
+
+#### 2. date-fns 日期處理
+```typescript
+// ✅ 使用 date-fns 進行日期操作
+import { format, parseISO, addDays, startOfDay, endOfDay } from 'date-fns'
+import { zhTW } from 'date-fns/locale'
+
+// 範例使用
+const formattedDate = format(new Date(), 'yyyy-MM-dd', { locale: zhTW })
+const parsedDate = parseISO('2024-01-15')
+```
+
+#### 3. Tailwind CSS 樣式設計
+```typescript
+// ✅ 使用 Tailwind CSS classes
+<div className="flex items-center justify-between p-4 bg-white border rounded-lg shadow-sm">
+  <h2 className="text-lg font-semibold text-gray-900">標題</h2>
+  <Button className="bg-blue-600 hover:bg-blue-700">操作</Button>
+</div>
+```
+
+#### 4. Lucide React 圖示
+```typescript
+// ✅ 使用 Lucide React 圖示
+import { Search, Plus, Edit, Trash2, ChevronDown } from 'lucide-react'
+
+<Button>
+  <Plus className="h-4 w-4 mr-2" />
+  新增項目
+</Button>
+```
+
+## 最佳實踐 (Best Practices)
+
+### 1. 元件使用規範
+```typescript
+// ✅ 良好的 shadcn/ui 元件使用方式
+import { Button } from '@/components/atoms/button'
+import { cn } from '@/utils/cn'
+
+const MyComponent = ({ className, variant = 'default', ...props }) => {
+  return (
+    <Button
+      className={cn('custom-styles', className)}
+      variant={variant}
+      {...props}
+    >
+      按鈕文字
+    </Button>
+  )
+}
+```
+
+### 2. 樣式設計規範
+```typescript
+// ✅ 使用 Tailwind 進行響應式設計
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {/* 內容 */}
+</div>
+
+// ✅ 使用 cn 函數合併樣式
+import { cn } from '@/utils/cn'
+
+<div className={cn(
+  'base-styles',
+  isActive && 'active-styles',
+  className
+)}>
+  {/* 內容 */}
+</div>
+```
+
+### 3. 主題和設計系統
+- 遵循 [tailwind.config.ts](mdc:tailwind.config.ts) 中定義的設計 token
+- 使用 CSS 變數進行主題切換 (參考 [shared/styles/global.css](mdc:shared/styles/global.css))
+- 保持設計一致性，避免使用任意值 (arbitrary values)
+
+### 4. 輔助功能 (Accessibility)
+```typescript
+// ✅ shadcn/ui 元件本身已包含良好的 a11y 支援
+<Dialog>
+  <DialogTrigger asChild>
+    <Button>開啟對話框</Button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>對話框標題</DialogTitle>
+    </DialogHeader>
+    {/* 內容 */}
+  </DialogContent>
+</Dialog>
+```

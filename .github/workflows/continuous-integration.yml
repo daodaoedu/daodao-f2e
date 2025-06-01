@@ -18,6 +18,7 @@ env:
   PR_URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.number }}
   BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
   IS_INTERNAL_PR: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+  HUSKY: 0
 
 jobs:
   init:

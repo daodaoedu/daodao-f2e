@@ -1,11 +1,11 @@
-import { MutationFetcher } from 'swr/mutation';
-import { apiPaths, mutations } from '@/services/core';
+import { MutationFetcher } from "swr/mutation";
+import { mutations, parseToString } from "@/services/core";
 
 import {
   ProjectSchema,
   CreateProjectSchema,
   UpdateProjectSchema,
-} from './schema';
+} from "./schema";
 
 export type ProjectSWRKey = string;
 
@@ -18,13 +18,16 @@ export const getProjectPathname = ({
   id,
   isMe,
 }: GetProjectPathnameProps = {}) => {
+  const pathname = "/projects";
+
   if (id) {
-    return apiPaths.projects(id).toString();
+    return `${pathname}/${parseToString(id)}`;
   }
   if (isMe) {
-    return apiPaths.projects('me').toString();
+    return `${pathname}/me`;
   }
-  return apiPaths.projects().toString();
+
+  return pathname;
 };
 
 interface ProjectAPIType {

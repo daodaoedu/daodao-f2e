@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/atoms/button';
 
 interface MoreProps {
   isMore: boolean;
@@ -11,6 +11,7 @@ const More: React.FC<MoreProps> = ({ isMore, onLoadMore }) => {
     <div className="text-center pt-20 pb-24">
       {isMore && (
         <Button
+          variant="outline"
           className="text-[16px] text-[#536166] border border-[#16B9B3] rounded-[20px] py-[6px] px-[48px] disabled:opacity-50"
           onClick={onLoadMore}
         >

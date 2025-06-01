@@ -1,6 +1,6 @@
-import { z } from 'zod';
-import dayjs from 'dayjs';
-import { projectTaskSchema } from '../tasks';
+import { z } from "zod";
+import dayjs from "dayjs";
+import { projectTaskSchema } from "../tasks";
 
 export const projectMilestoneSchema = z.object({
   id: z.number(),
@@ -11,32 +11,47 @@ export const projectMilestoneSchema = z.object({
     .number()
     .optional()
     .transform((val) =>
-      typeof val === 'number' && Number.isInteger(val) && val > 0 ? val : 1000
+      typeof val === "number" && Number.isInteger(val) && val > 0 ? val : 1000
     ),
-  name: z.string().min(1, '請輸入名稱'),
-  startDate: z.string(),
-  endDate: z.string(),
+  name: z.string().min(1, "請輸入名稱"),
+  startDate: z
+    .string()
+    .optional()
+    .refine((val) => val !== undefined && dayjs(val).isValid(), {
+      message: "請輸入有效的日期",
+    }),
+  endDate: z
+    .string()
+    .optional()
+    .refine((val) => val !== undefined && dayjs(val).isValid(), {
+      message: "請輸入有效的日期",
+    }),
   isCompleted: z.boolean(),
   isDeleted: z.boolean(),
   tasks: z.array(projectTaskSchema),
 });
 
-export type ProjectMilestoneSchema = z.infer<typeof projectMilestoneSchema>;
-
 const validateDateRange = (
-  startDate: string,
-  endDate: string,
+  startDate: string | undefined,
+  endDate: string | undefined,
   ctx: z.RefinementCtx
 ) => {
-  if (dayjs(endDate).diff(dayjs(startDate), 'day') <= 0) {
+  if (!startDate || !endDate) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: '時間間隔不能小於 1 天',
+      message: "請輸入日期",
+    });
+    return;
+  }
+  if (dayjs(endDate).diff(dayjs(startDate), "day") <= 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "時間間隔不能小於 1 天",
     });
   }
 };
 
-export const createProjectMilestoneSchema = projectMilestoneSchema
+export const projectMilestoneFormSchema = projectMilestoneSchema
   .omit({
     id: true,
     createdAt: true,
@@ -48,21 +63,7 @@ export const createProjectMilestoneSchema = projectMilestoneSchema
     validateDateRange(data.startDate, data.endDate, ctx)
   );
 
-export type CreateProjectMilestoneSchema = z.infer<
-  typeof createProjectMilestoneSchema
->;
-
-export const updateProjectMilestoneSchema = projectMilestoneSchema
-  .omit({
-    createdAt: true,
-    updatedAt: true,
-    isDeleted: true,
-    tasks: true,
-  })
-  .superRefine((data, ctx) =>
-    validateDateRange(data.startDate, data.endDate, ctx)
-  );
-
-export type UpdateProjectMilestoneSchema = z.infer<
-  typeof updateProjectMilestoneSchema
+export type ProjectMilestoneSchema = z.infer<typeof projectMilestoneSchema>;
+export type ProjectMilestoneFormSchema = z.infer<
+  typeof projectMilestoneFormSchema
 >;

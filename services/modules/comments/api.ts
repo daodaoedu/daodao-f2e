@@ -1,12 +1,12 @@
-import type { MutationFetcher } from 'swr/mutation';
+import type { MutationFetcher } from "swr/mutation";
 
-import { apiPaths, mutations } from '@/services/core';
+import { mutations, parseToString } from "@/services/core";
 import {
   CommentType,
   CommentSchema,
   CreateCommentSchema,
   UpdateCommentSchema,
-} from './schema';
+} from "./schema";
 
 export type CommentSWRKey = [
   string,
@@ -18,13 +18,13 @@ interface GetCommentPathnameProps {
 }
 
 export const getCommentPathname = ({ id }: GetCommentPathnameProps = {}) =>
-  apiPaths.comments(id).toString();
+  id ? `/comments/${parseToString(id)}` : "/comments";
 
 interface CommentAPIType {
   create: MutationFetcher<
     CommentSchema,
     CommentSWRKey,
-    Omit<CreateCommentSchema, 'targetType' | 'targetId'>
+    Omit<CreateCommentSchema, "targetType" | "targetId">
   >;
   update: MutationFetcher<CommentSchema, CommentSWRKey, UpdateCommentSchema>;
   delete: MutationFetcher<void, CommentSWRKey, { id: number }>;

@@ -1,20 +1,21 @@
-import toast from 'react-hot-toast';
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/router';
-import { ContentCard } from '@/features/projects';
-import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
-import Button from '@/shared/components/Button';
-import SEOConfig from '@/shared/components/SEO';
-import CreateModal from '@/components/Note/Modals/CreateModal';
-import UpdateModal from '@/components/Note/Modals/UpdateModal';
-import ConfirmModal from '@/shared/components/Confirm';
+import toast from "react-hot-toast";
+import { useMemo, useState } from "react";
+import { useRouter } from "next/router";
+import { parseToString } from "@/services/core";
+import SEOConfig from "@/shared/components/SEO";
+import {
+  ContentCard,
+  NoteCreateModal,
+  NoteDeleteModal,
+  NoteUpdateModal,
+} from "@/features/projects";
+import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
+import { Button } from "@/components/atoms/button";
 import {
   useProject,
   useProjectNote,
-  useProjectNoteMutation,
   useProjectNotes,
-} from '@/services/modules/projects';
-import { parseToString } from '@/services/core';
+} from "@/services/modules/projects";
 
 enum ModalTypeEnum {
   Create,
@@ -29,46 +30,23 @@ const NotesPage = () => {
   const [noteId, setNoteId] = useState<number | null>(null);
   const { data: project } = useProject(projectId);
 
-  const { data: notes, mutate } = useProjectNotes(projectId);
+  const { data: notes } = useProjectNotes(projectId);
 
   const { data: detail } = useProjectNote({
     projectId,
     noteId,
   });
 
-  const { createMutation, updateMutation, deleteMutation } =
-    useProjectNoteMutation({
-      projectId,
-      noteId,
-      onCreated: () => {
-        toast.success('新增成功');
-        setModalType(null);
-        mutate();
-      },
-      onUpdated: () => {
-        toast.success('更新成功');
-        setModalType(null);
-        setNoteId(null);
-        mutate();
-      },
-      onDeleted: () => {
-        toast.success('刪除成功');
-        setModalType(null);
-        setNoteId(null);
-        mutate();
-      },
-    });
-
   const SEOData = useMemo(
     () => ({
       title: `${project?.title} 便利貼｜島島阿學`,
       description:
         project?.description?.substring(0, 150) ||
-        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-      keywords: '島島阿學',
-      author: '島島阿學',
-      copyright: '島島阿學',
-      imgLink: 'https://www.daoedu.tw/preview.webp',
+        "「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
+      keywords: "島島阿學",
+      author: "島島阿學",
+      copyright: "島島阿學",
+      imgLink: "https://www.daoedu.tw/preview.webp",
       link: `${process.env.HOSTNAME}/manage/projects/notes?id=${projectId}`,
     }),
     [project?.title, project?.description, projectId]
@@ -82,10 +60,9 @@ const NotesPage = () => {
     <>
       <SEOConfig {...SEOData} />
       <div className="mb-6 flex items-center justify-between body-md">
-        <div className="text-basic-500">便利貼 ({notes?.length || 0})</div>
+        <div className="text-basic-500">便利貼 ({notes?.length ?? 0})</div>
         <Button
-          variant="solid"
-          color="primary"
+          variant="default"
           onClick={() => setModalType(ModalTypeEnum.Create)}
         >
           新增便利貼
@@ -116,41 +93,45 @@ const NotesPage = () => {
       </ul>
 
       {project && (
-        <CreateModal
+        <NoteCreateModal
           isOpen={modalType === ModalTypeEnum.Create}
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
-          isLoading={createMutation.isMutating}
-          onSubmit={createMutation.trigger}
+          onSuccess={() => {
+            toast.success("新增成功");
+            setModalType(null);
+          }}
         />
       )}
 
       {detail && noteId && project && (
-        <UpdateModal
+        <NoteUpdateModal
           key={noteId}
-          id={noteId}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
-          week={detail.week}
-          createdAt={detail.date}
-          isLoading={updateMutation.isMutating}
-          defaultValues={detail}
-          onSubmit={updateMutation.trigger}
+          noteId={noteId}
+          onSuccess={() => {
+            toast.success("更新成功");
+            setModalType(null);
+            setNoteId(null);
+          }}
         />
       )}
 
       {noteId && (
-        <ConfirmModal
-          title="確認刪除便利貼"
-          confirmText="確認刪除"
-          confirmColor="alert"
+        <NoteDeleteModal
           isOpen={modalType === ModalTypeEnum.Delete}
+          projectId={projectId}
+          noteId={noteId}
           onClose={() => setModalType(null)}
-          onConfirm={() => deleteMutation.trigger({ projectId, noteId })}
-          isLoading={deleteMutation.isMutating}
+          onSuccess={() => {
+            toast.success("刪除成功");
+            setModalType(null);
+            setNoteId(null);
+          }}
         />
       )}
     </>

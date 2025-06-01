@@ -1,6 +1,7 @@
 import AccessDeniedImg from '@/public/assets/projects/access-denied.png';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/atoms/button';
 import { cn } from '@/utils/cn';
+import Link from 'next/link';
 
 export default function EmptyProject() {
   return (
@@ -22,20 +23,20 @@ export default function EmptyProject() {
       <p className="font-sans text-basic-400 body-md">你可以⋯</p>
       <div className="w-full flex flex-col gap-3 justify-center md:flex-row">
         <Button
-          as="link"
-          href="/personal-card/my-card"
+          asChild
           variant="outline"
-          color="primary"
         >
-          編輯名片
+          <Link href="/personal-card/my-card">
+            編輯名片
+          </Link>
         </Button>
         <Button
-          as="link"
-          href="/manage/projects/create"
-          variant="solid"
-          color="primary"
+          asChild
+          variant="default"
         >
-          新增計畫
+          <Link href="/manage/projects/create">
+            新增計畫
+          </Link>
         </Button>
       </div>
     </div>

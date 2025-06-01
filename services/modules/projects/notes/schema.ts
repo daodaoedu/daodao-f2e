@@ -12,12 +12,10 @@ const projectNoteSchema = z.object({
   videoUrls: z.array(z.string()).nullable().optional(),
 });
 
+export const projectNoteFormSchema = projectNoteSchema.omit({
+  id: true,
+  projectId: true,
+});
+
 export type ProjectNoteSchema = z.infer<typeof projectNoteSchema>;
-
-export const createProjectNoteSchema = projectNoteSchema.omit({ id: true });
-
-export type CreateProjectNoteSchema = z.infer<typeof createProjectNoteSchema>;
-
-export const updateProjectNoteSchema = projectNoteSchema;
-
-export type UpdateProjectNoteSchema = z.infer<typeof updateProjectNoteSchema>;
+export type ProjectNoteFormSchema = z.infer<typeof projectNoteFormSchema>;

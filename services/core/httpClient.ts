@@ -6,16 +6,16 @@ export const V1_BASE_URL = 'https://api.daoedu.tw';
 export const BASE_URL = getEnv().apiUrl;
 
 enum RequestMethod {
-  GET = 'GET',
-  POST = 'POST',
-  PUT = 'PUT',
-  PATCH = 'PATCH',
-  DELETE = 'DELETE',
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  PATCH = "PATCH",
+  DELETE = "DELETE",
 }
 
 export enum RequestContentType {
-  JSON = 'application/json',
-  FormData = 'multipart/form-data',
+  JSON = "application/json",
+  FormData = "multipart/form-data",
 }
 
 export class HttpError {
@@ -53,13 +53,13 @@ const serialize =
     const append = (key: string) => (value: ValidValueType) => {
       if (formattedData instanceof URLSearchParams) {
         formattedData.append(key, encodeURIComponent(String(value)));
-      } else if (typeof value === 'string' || value instanceof Blob) {
+      } else if (typeof value === "string" || value instanceof Blob) {
         formattedData.append(key, value);
       }
     };
 
     if (isValidValue(source)) {
-      append(keys.join('.'))(source);
+      append(keys.join("."))(source);
     } else if (Array.isArray(source)) {
       source.forEach(serialize(formattedData, keys));
     } else if (isRecord(source)) {
@@ -125,11 +125,11 @@ const http = async <R = void>({
   const headers = new Headers();
 
   if (token) {
-    headers.append('Authorization', `Bearer ${token}`);
+    headers.append("Authorization", `Bearer ${token}`);
   }
 
   if (contentType === RequestContentType.JSON) {
-    headers.append('Content-Type', contentType);
+    headers.append("Content-Type", contentType);
   }
 
   const response = await fetch(url, { method, headers, body });
@@ -146,9 +146,7 @@ export type FetcherParams = string | [string, ...unknown[]];
 
 export const fetcher = <R = void>(params: FetcherParams): Promise<R> => {
   const [pathname, ...args] = Array.isArray(params) ? params : [params];
-  const source = args
-    .filter(isRecord)
-    .reduce((acc, curr) => Object.assign(acc, curr), {});
+  const source = args.filter(isRecord).reduce(Object.assign, {});
 
   return http<R>({ pathname, source });
 };
@@ -159,14 +157,21 @@ export const fetcherV1 = <R = void>(
 ): Promise<R> =>
   fetch(`${V1_BASE_URL}${params}`, options).then((res) => res.json());
 
+const getArg = (source: unknown): Record<string, unknown> => {
+  if (isRecord(source) && isRecord(source.arg)) {
+    return source.arg;
+  }
+  return {};
+};
+
 const createMutation =
   (method: RequestMethod) =>
   <R = void>(
     pathname: string,
-    source?: Record<string, unknown>,
+    source?: unknown,
     contentType = RequestContentType.JSON
   ): Promise<R> =>
-    http<R>({ pathname, source, method, contentType });
+    http<R>({ pathname, source: getArg(source), method, contentType });
 
 export const mutations = {
   post: createMutation(RequestMethod.POST),
