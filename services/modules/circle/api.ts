@@ -1,7 +1,7 @@
-import { MutationFetcher } from 'swr/mutation';
-import { apiPaths, mutations } from '@/services/core';
+import { MutationFetcher } from "swr/mutation";
+import { mutations, parseToString } from "@/services/core";
 
-import { CircleSchema, CreateCircleSchema, UpdateCircleSchema } from './schema';
+import { CircleSchema, CreateCircleSchema, UpdateCircleSchema } from "./schema";
 
 export type CircleSWRKey = string;
 
@@ -10,7 +10,7 @@ interface GetCirclePathnameProps {
 }
 
 export const getCirclePathname = ({ id }: GetCirclePathnameProps = {}) =>
-  id ? apiPaths.circles(id).toString() : apiPaths.circles().toString();
+  id ? `/circles/${parseToString(id)}` : "/circles";
 
 interface CircleAPIType {
   create: MutationFetcher<CircleSchema, CircleSWRKey, CreateCircleSchema>;

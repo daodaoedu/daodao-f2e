@@ -1,6 +1,6 @@
 import z from "zod";
 import { cn } from "@/utils/cn";
-import Button from "@/shared/components/Button";
+import { Button } from "@/components/atoms/button";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { MOTIVATION_MAP, STRATEGY_MAP, OUTCOME_MAP } from "@/constants/project";
 import { FaCheck } from "react-icons/fa6";

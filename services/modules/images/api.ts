@@ -1,14 +1,19 @@
-import { ZodError } from 'zod';
+import { ZodError } from "zod";
 import {
   HttpError,
   mutations,
+  parseToString,
   RequestContentType,
-  apiPaths,
-} from '@/services/core';
+} from "@/services/core";
 
-import { uploadImagesSchema, UploadImagesSchema } from './schema';
+import { uploadImagesSchema, UploadImagesSchema } from "./schema";
 
-const getImageEndpoint = (id?: string) => apiPaths.images(id).toString();
+interface GetImageEndpointProps {
+  id?: string;
+}
+
+const getImageEndpoint = ({ id }: GetImageEndpointProps = {}) =>
+  id ? `/images/${parseToString(id)}` : "/images";
 
 interface ImageType {
   url: string;
@@ -29,7 +34,7 @@ export const imageAPI: ImageAPIType = {
       const request = uploadImagesSchema.parse(source);
 
       return mutations.post(
-        getImageEndpoint('multiple'),
+        getImageEndpoint({ id: "multiple" }),
         request,
         RequestContentType.FormData
       );
@@ -38,11 +43,11 @@ export const imageAPI: ImageAPIType = {
         throw new HttpError(400, { message: error.issues[0].message });
       }
       throw new HttpError(400, {
-        message: '圖片上傳失敗，請稍後再試！',
+        message: "圖片上傳失敗，請稍後再試！",
       });
     }
   },
-  delete: (id) => mutations.delete(getImageEndpoint(id)),
+  delete: (id) => mutations.delete(getImageEndpoint({ id })),
 };
 
 export const uploadImages = async (

@@ -1,12 +1,10 @@
-import { MutationFetcher } from 'swr/mutation';
-import { apiPaths, mutations } from '@/services/core';
+import { mutate } from "swr";
+import { MutationFetcher } from "swr/mutation";
+import { mutations, parseToString } from "@/services/core";
 
-import {
-  CreateProjectNoteSchema,
-  ProjectNoteSchema,
-  UpdateProjectNoteSchema,
-} from './schema';
-import { uploadImages } from '../../images';
+import { ProjectNoteSchema, ProjectNoteFormSchema } from "./schema";
+import { uploadImages } from "../../images";
+import { getProjectPathname } from "../core";
 
 export type ProjectNoteSWRKey = string;
 
@@ -18,47 +16,47 @@ interface GetProjectNotePathnameProps {
 export const getProjectNotePathname = ({
   projectId,
   noteId,
-}: GetProjectNotePathnameProps) =>
-  apiPaths.projects(projectId).notes(noteId).toString();
+}: GetProjectNotePathnameProps) => {
+  const pathname = `/projects/${parseToString(projectId)}/notes`;
 
-interface ProjectNoteAPIType {
-  create: MutationFetcher<
-    ProjectNoteSchema,
-    ProjectNoteSWRKey,
-    CreateProjectNoteSchema
-  >;
-  update: MutationFetcher<
-    ProjectNoteSchema,
-    ProjectNoteSWRKey,
-    UpdateProjectNoteSchema
-  >;
-  delete: MutationFetcher<
-    void,
-    ProjectNoteSWRKey,
-    Required<GetProjectNotePathnameProps>
-  >;
-}
+  if (noteId) {
+    return `${pathname}/${parseToString(noteId)}`;
+  }
 
-const projectNoteAPI: ProjectNoteAPIType = {
-  create: async (_, { arg: { projectId, imgFiles, imgUrls, ...arg } }) => {
-    const updatedImgUrls = await uploadImages(imgFiles, imgUrls);
-
-    return mutations.post<ProjectNoteSchema>(
-      getProjectNotePathname({ projectId }),
-      { ...arg, imgUrls: updatedImgUrls }
-    );
-  },
-
-  update: async (_, { arg: { projectId, id, imgFiles, imgUrls, ...arg } }) => {
-    const updatedImgUrls = await uploadImages(imgFiles, imgUrls);
-
-    return mutations.put<ProjectNoteSchema>(
-      getProjectNotePathname({ projectId, noteId: id }),
-      { ...arg, imgUrls: updatedImgUrls }
-    );
-  },
-
-  delete: (_, { arg }) => mutations.delete<void>(getProjectNotePathname(arg)),
+  return pathname;
 };
 
-export default projectNoteAPI;
+export const refetchProjectNote = async () => {
+  await mutate((key: unknown) => {
+    const pathname = Array.isArray(key) ? key[0] : key;
+    return pathname.startsWith(getProjectPathname());
+  });
+};
+
+interface ProjectNoteAPIType {
+  create: MutationFetcher<ProjectNoteSchema, string, ProjectNoteFormSchema>;
+  update: MutationFetcher<ProjectNoteSchema, string, ProjectNoteFormSchema>;
+  delete: MutationFetcher<void, string>;
+}
+
+export const projectNoteAPI: ProjectNoteAPIType = {
+  create: async (url, { arg: { imgFiles, imgUrls, ...arg } }) => {
+    const updatedImgUrls = await uploadImages(imgFiles, imgUrls);
+
+    return mutations.post(url, {
+      ...arg,
+      imgUrls: updatedImgUrls,
+    });
+  },
+
+  update: async (url, { arg: { imgFiles, imgUrls, ...arg } }) => {
+    const updatedImgUrls = await uploadImages(imgFiles, imgUrls);
+
+    return mutations.put(url, {
+      ...arg,
+      imgUrls: updatedImgUrls,
+    });
+  },
+
+  delete: mutations.delete,
+};

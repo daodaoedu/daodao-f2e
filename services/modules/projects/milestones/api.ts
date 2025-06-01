@@ -1,13 +1,9 @@
-import { MutationFetcher } from 'swr/mutation';
-import { apiPaths, mutations } from '@/services/core';
+import { mutate } from "swr";
+import { MutationFetcher } from "swr/mutation";
+import { mutations, parseToString } from "@/services/core";
 
-import {
-  CreateProjectMilestoneSchema,
-  ProjectMilestoneSchema,
-  UpdateProjectMilestoneSchema,
-} from './schema';
-
-export type ProjectMilestoneSWRKey = string;
+import { ProjectMilestoneSchema, ProjectMilestoneFormSchema } from "./schema";
+import { getProjectPathname } from "../core";
 
 interface GetProjectMilestonePathnameProps {
   projectId: string;
@@ -17,42 +13,39 @@ interface GetProjectMilestonePathnameProps {
 export const getProjectMilestonePathname = ({
   projectId,
   milestoneId,
-}: GetProjectMilestonePathnameProps) =>
-  apiPaths.projects(projectId).milestones(milestoneId).toString();
+}: GetProjectMilestonePathnameProps) => {
+  const pathname = `/projects/${parseToString(projectId)}/milestones`;
+
+  if (milestoneId) {
+    return `${pathname}/${parseToString(milestoneId)}`;
+  }
+
+  return pathname;
+};
+
+export const refetchProjectMilestone = async () => {
+  await mutate((key: unknown) => {
+    const pathname = Array.isArray(key) ? key[0] : key;
+    return pathname.startsWith(getProjectPathname());
+  });
+};
 
 interface ProjectMilestoneAPIType {
   create: MutationFetcher<
     ProjectMilestoneSchema,
-    ProjectMilestoneSWRKey,
-    CreateProjectMilestoneSchema
+    string,
+    ProjectMilestoneFormSchema
   >;
   update: MutationFetcher<
     ProjectMilestoneSchema,
-    ProjectMilestoneSWRKey,
-    UpdateProjectMilestoneSchema
+    string,
+    ProjectMilestoneFormSchema
   >;
-  delete: MutationFetcher<
-    void,
-    ProjectMilestoneSWRKey,
-    Required<GetProjectMilestonePathnameProps>
-  >;
+  delete: MutationFetcher<void, string>;
 }
 
-const projectMilestoneAPI: ProjectMilestoneAPIType = {
-  create: (_, { arg: { projectId, ...arg } }) =>
-    mutations.post<ProjectMilestoneSchema>(
-      getProjectMilestonePathname({ projectId }),
-      arg
-    ),
-
-  update: (_, { arg: { projectId, id, ...arg } }) =>
-    mutations.put<ProjectMilestoneSchema>(
-      getProjectMilestonePathname({ projectId, milestoneId: id }),
-      arg
-    ),
-
-  delete: (_, { arg }) =>
-    mutations.delete<void>(getProjectMilestonePathname(arg)),
+export const projectMilestoneAPI: ProjectMilestoneAPIType = {
+  create: mutations.post,
+  update: mutations.put,
+  delete: mutations.delete,
 };
-
-export default projectMilestoneAPI;

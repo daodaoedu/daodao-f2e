@@ -41,7 +41,7 @@ function BaseLayout({ children }: React.PropsWithChildren) {
       <Header ref={headerRef}>
         <PromotionBar />
       </Header>
-      <main className="min-h-screen-with-padding-top">{children}</main>
+      <main className="min-h-screen-with-padding-top bg-white">{children}</main>
       <Footer />
     </>
   );

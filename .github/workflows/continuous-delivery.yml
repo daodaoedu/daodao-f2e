@@ -24,6 +24,7 @@ on:
 env:
   BRANCH_NAME: ${{ github.ref_name }}
   PROD_URL: 'https://www.daoedu.tw/'
+  HUSKY: 0
 
 jobs:
   continuous_integration:

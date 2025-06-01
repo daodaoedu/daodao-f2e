@@ -1,20 +1,21 @@
-import toast from 'react-hot-toast';
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/router';
-import SEOConfig from '@/shared/components/SEO';
-import { ContentCard } from '@/features/projects';
-import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
-import Button from '@/shared/components/Button';
-import CreateModal from '@/components/Outcome/Modals/CreateModal';
-import UpdateModal from '@/components/Outcome/Modals/UpdateModal';
-import ConfirmModal from '@/shared/components/Confirm';
+import toast from "react-hot-toast";
+import { useMemo, useState } from "react";
+import { useRouter } from "next/router";
+import SEOConfig from "@/shared/components/SEO";
 import {
-  useProject,
+  ContentCard,
+  OutcomeCreateModal,
+  OutcomeDeleteModal,
+  OutcomeUpdateModal,
+} from "@/features/projects";
+import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
+import { Button } from "@/components/atoms/button";
+import { useProject } from "@/services/modules/projects";
+import {
   useProjectOutcome,
-  useProjectOutcomeMutation,
   useProjectOutcomes,
-} from '@/services/modules/projects';
-import { parseToString } from '@/services/core';
+} from "@/features/projects/hooks/outcome";
+import { parseToString } from "@/services/core";
 
 enum ModalTypeEnum {
   Create,
@@ -29,46 +30,23 @@ const OutcomesPage = () => {
   const [outcomeId, setOutcomeId] = useState<number | null>(null);
   const { data: project } = useProject(projectId);
 
-  const { data: outcomes, mutate } = useProjectOutcomes(projectId);
+  const { data: outcomes } = useProjectOutcomes(projectId);
 
   const { data: detail } = useProjectOutcome({
     projectId,
     outcomeId,
   });
 
-  const { createMutation, updateMutation, deleteMutation } =
-    useProjectOutcomeMutation({
-      projectId,
-      outcomeId,
-      onCreated: () => {
-        toast.success('新增成功');
-        setModalType(null);
-        mutate();
-      },
-      onUpdated: () => {
-        toast.success('更新成功');
-        setModalType(null);
-        setOutcomeId(null);
-        mutate();
-      },
-      onDeleted: () => {
-        toast.success('刪除成功');
-        setModalType(null);
-        setOutcomeId(null);
-        mutate();
-      },
-    });
-
   const SEOData = useMemo(
     () => ({
       title: `${project?.title} 學習成果｜島島阿學`,
       description:
         project?.description?.substring(0, 150) ||
-        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-      keywords: '島島阿學',
-      author: '島島阿學',
-      copyright: '島島阿學',
-      imgLink: 'https://www.daoedu.tw/preview.webp',
+        "「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
+      keywords: "島島阿學",
+      author: "島島阿學",
+      copyright: "島島阿學",
+      imgLink: "https://www.daoedu.tw/preview.webp",
       link: `${process.env.HOSTNAME}/manage/projects/outcomes?id=${projectId}`,
     }),
     [project?.title, project?.description, projectId]
@@ -84,8 +62,7 @@ const OutcomesPage = () => {
       <div className="mb-6 flex items-center justify-between body-md">
         <div className="text-basic-500">學習成果 ({outcomes?.length ?? 0})</div>
         <Button
-          variant="solid"
-          color="primary"
+          variant="default"
           onClick={() => setModalType(ModalTypeEnum.Create)}
         >
           新增成果
@@ -116,41 +93,45 @@ const OutcomesPage = () => {
       </ul>
 
       {project && (
-        <CreateModal
+        <OutcomeCreateModal
           isOpen={modalType === ModalTypeEnum.Create}
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
-          isLoading={createMutation.isMutating}
-          onSubmit={createMutation.trigger}
+          onSuccess={() => {
+            toast.success("新增成功");
+            setModalType(null);
+          }}
         />
       )}
 
       {detail && outcomeId && project && (
-        <UpdateModal
+        <OutcomeUpdateModal
           key={outcomeId}
-          id={outcomeId}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
           projectId={projectId}
           projectTitle={project.title}
-          week={detail.week}
-          createdAt={detail.date}
-          isLoading={updateMutation.isMutating}
-          defaultValues={detail}
-          onSubmit={updateMutation.trigger}
+          outcomeId={outcomeId}
+          onSuccess={() => {
+            toast.success("更新成功");
+            setModalType(null);
+            setOutcomeId(null);
+          }}
         />
       )}
 
       {outcomeId && (
-        <ConfirmModal
-          title="確認刪除學習成果"
-          confirmText="確認刪除"
-          confirmColor="alert"
+        <OutcomeDeleteModal
           isOpen={modalType === ModalTypeEnum.Delete}
+          projectId={projectId}
+          outcomeId={outcomeId}
           onClose={() => setModalType(null)}
-          onConfirm={() => deleteMutation.trigger({ projectId, outcomeId })}
-          isLoading={deleteMutation.isMutating}
+          onSuccess={() => {
+            toast.success("刪除成功");
+            setModalType(null);
+            setOutcomeId(null);
+          }}
         />
       )}
     </>

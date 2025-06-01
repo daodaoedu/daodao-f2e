@@ -32,7 +32,7 @@ function SidebarWrapper({ children, className, style }: SidebarWrapperProps) {
   }, []);
 
   return (
-    <div
+    <nav
       className={cn(
         'p-0 whitespace-nowrap overflow-x-auto h-max',
         'bg-white rounded-lg shadow-lg shadow-basic-400/10',
@@ -51,7 +51,7 @@ function SidebarWrapper({ children, className, style }: SidebarWrapperProps) {
       >
         {children}
       </div>
-    </div>
+    </nav>
   );
 }
 

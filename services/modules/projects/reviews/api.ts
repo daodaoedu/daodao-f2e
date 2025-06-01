@@ -1,13 +1,9 @@
-import { MutationFetcher } from 'swr/mutation';
-import { apiPaths, mutations } from '@/services/core';
+import { mutate } from "swr";
+import { MutationFetcher } from "swr/mutation";
+import { mutations, parseToString } from "@/services/core";
 
-import {
-  CreateProjectReviewSchema,
-  ProjectReviewSchema,
-  UpdateProjectReviewSchema,
-} from './schema';
-
-export type ProjectReviewSWRKey = string;
+import { ProjectReviewFormSchema, ProjectReviewSchema } from "./schema";
+import { getProjectPathname } from "../core";
 
 interface GetProjectReviewPathnameProps {
   projectId: string;
@@ -17,41 +13,31 @@ interface GetProjectReviewPathnameProps {
 export const getProjectReviewPathname = ({
   projectId,
   reviewId,
-}: GetProjectReviewPathnameProps) =>
-  apiPaths.projects(projectId).reviews(reviewId).toString();
+}: GetProjectReviewPathnameProps) => {
+  const pathname = `/projects/${parseToString(projectId)}/reviews`;
 
-interface ProjectReviewAPIType {
-  create: MutationFetcher<
-    ProjectReviewSchema,
-    ProjectReviewSWRKey,
-    CreateProjectReviewSchema
-  >;
-  update: MutationFetcher<
-    ProjectReviewSchema,
-    ProjectReviewSWRKey,
-    UpdateProjectReviewSchema
-  >;
-  delete: MutationFetcher<
-    void,
-    ProjectReviewSWRKey,
-    Required<GetProjectReviewPathnameProps>
-  >;
-}
+  if (reviewId) {
+    return `${pathname}/${parseToString(reviewId)}`;
+  }
 
-const projectReviewAPI: ProjectReviewAPIType = {
-  create: (_, { arg: { projectId, ...arg } }) =>
-    mutations.post<ProjectReviewSchema>(
-      getProjectReviewPathname({ projectId }),
-      arg
-    ),
-
-  update: (_, { arg: { projectId, id, ...arg } }) =>
-    mutations.put<ProjectReviewSchema>(
-      getProjectReviewPathname({ projectId, reviewId: id }),
-      arg
-    ),
-
-  delete: (_, { arg }) => mutations.delete<void>(getProjectReviewPathname(arg)),
+  return pathname;
 };
 
-export default projectReviewAPI;
+export const refetchProjectReview = async () => {
+  await mutate((key: unknown) => {
+    const pathname = Array.isArray(key) ? key[0] : key;
+    return pathname.startsWith(getProjectPathname());
+  });
+};
+
+interface ProjectReviewAPIType {
+  create: MutationFetcher<ProjectReviewSchema, string, ProjectReviewFormSchema>;
+  update: MutationFetcher<ProjectReviewSchema, string, ProjectReviewFormSchema>;
+  delete: MutationFetcher<void, string>;
+}
+
+export const projectReviewAPI: ProjectReviewAPIType = {
+  create: mutations.post,
+  update: mutations.put,
+  delete: mutations.delete,
+};

@@ -1,8 +1,8 @@
 import { useState, useEffect, useId } from 'react';
 import { cn } from '@/utils/cn';
 import { AiOutlineClose } from 'react-icons/ai';
+import { Button } from '@/components/atoms/button';
 import Portal from './Portal';
-import Button from './Button';
 
 enum ModalSize {
   Small = 'sm',
@@ -223,6 +223,7 @@ function Modal({
             )}
             {hasCloseButton && (
               <Button
+                variant="ghost"
                 className="absolute top-2 right-3 px-3 py-2"
                 onClick={onClose}
                 onKeyUp={handleKeyUp}

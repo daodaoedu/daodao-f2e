@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 const projectReviewSchema = z.object({
   id: z.number(),
@@ -15,23 +15,12 @@ const projectReviewSchema = z.object({
   updatedAt: z.string().datetime(),
 });
 
-export type ProjectReviewSchema = z.infer<typeof projectReviewSchema>;
-
-export const createProjectReviewSchema = projectReviewSchema.omit({
+export const projectReviewFormSchema = projectReviewSchema.omit({
   id: true,
+  projectId: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export type CreateProjectReviewSchema = z.infer<
-  typeof createProjectReviewSchema
->;
-
-export const updateProjectReviewSchema = projectReviewSchema.omit({
-  createdAt: true,
-  updatedAt: true,
-});
-
-export type UpdateProjectReviewSchema = z.infer<
-  typeof updateProjectReviewSchema
->;
+export type ProjectReviewSchema = z.infer<typeof projectReviewSchema>;
+export type ProjectReviewFormSchema = z.infer<typeof projectReviewFormSchema>;

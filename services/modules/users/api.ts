@@ -1,5 +1,5 @@
 import { MutationFetcher } from 'swr/mutation';
-import { apiPaths, mutations } from '@/services/core';
+import { mutations, parseToString } from '@/services/core';
 
 import { CreateUserRequest, IUser, UpdateUserRequest } from './schema';
 
@@ -16,8 +16,19 @@ interface GetUserPathnameProps {
   isMe?: boolean;
 }
 
-export const getUserPathname = ({ id, isMe }: GetUserPathnameProps = {}) =>
-  apiPaths.users(isMe ? 'me' : id).toString();
+export const getUserPathname = ({ id, isMe }: GetUserPathnameProps = {}) => {
+  const pathname = "/users";
+
+  if (id) {
+    return `${pathname}/${parseToString(id)}`;
+  }
+
+  if (isMe) {
+    return `${pathname}/me`;
+  }
+
+  return pathname;
+};
 
 interface UserAPIType {
   create: MutationFetcher<
