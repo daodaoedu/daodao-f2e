@@ -1,12 +1,12 @@
-import { useRef } from 'react';
-import Image from '@/shared/components/Image';
-import LensIcon from '@/public/assets/icons/lens.svg';
-import Button from '@/shared/components/Button';
-import { cn } from '@/utils/cn';
-import SectionTitle from './SectionTitle';
+import { useRef } from "react";
+import Image from "@/shared/components/Image";
+import LensIcon from "@/public/assets/icons/lens.svg";
+import { Button } from "@/components/atoms/button";
+import { cn } from "@/utils/cn";
+import SectionTitle from "./SectionTitle";
 
 interface ResourceBannerProps {
-  size?: 'md' | 'lg';
+  size?: "md" | "lg";
   title: string;
   content: string;
   image: string;
@@ -15,7 +15,7 @@ interface ResourceBannerProps {
 }
 
 export default function ResourceBanner({
-  size = 'lg',
+  size = "lg",
   title,
   content,
   image,
@@ -23,8 +23,8 @@ export default function ResourceBanner({
   length,
 }: ResourceBannerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const isMediumSize = size === 'md';
-  const isLargeSize = size === 'lg';
+  const isMediumSize = size === "md";
+  const isLargeSize = size === "lg";
 
   const onClickFocus = () => {
     inputRef.current?.focus();
@@ -33,8 +33,8 @@ export default function ResourceBanner({
   return (
     <section
       className={cn(
-        'relative bg-primary-palest md:py-12 md:px-24 md:flex',
-        isMediumSize && 'rounded-xl overflow-hidden md:px-10'
+        "relative bg-primary-palest md:py-12 md:px-24 md:flex",
+        isMediumSize && "rounded-xl overflow-hidden md:px-10"
       )}
     >
       {/* 圖片 */}
@@ -55,7 +55,7 @@ export default function ResourceBanner({
       {/* 搜尋欄 標籤 分享資源 */}
       <div className="relative p-5 pb-11 lg:w-3/5 flex flex-col gap-5 md:p-0 md:gap-6">
         <div>
-          <SectionTitle as={isMediumSize ? 'h2' : 'h1'} title={title} />
+          <SectionTitle as={isMediumSize ? "h2" : "h1"} title={title} />
 
           <div className="text-basic-500 text-5 mt-2 md:text-[1.125rem] md:mt-3">
             {content}
@@ -102,7 +102,7 @@ export default function ResourceBanner({
             </div>
           )}
 
-          {isMediumSize && typeof length === 'number' && (
+          {isMediumSize && typeof length === "number" && (
             <div className="flex flex-col md:flex-row md:items-center mb-6">
               <div className="body-lg">
                 共 <span className="font-bold">{length}</span> 筆資源
@@ -110,9 +110,7 @@ export default function ResourceBanner({
             </div>
           )}
 
-          <Button variant="solid" color="primary" className="md:w-max">
-            + 分享資源
-          </Button>
+          <Button className="md:w-max">+ 分享資源</Button>
         </div>
       </div>
     </section>

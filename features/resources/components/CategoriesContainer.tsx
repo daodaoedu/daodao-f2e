@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { CATEGORIES, SEARCH_TAGS } from '@/constants/category';
 import useBreakpoint from '@/hooks/useBreakpoint';
 import { cn } from '@/utils/cn';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/atoms/button';
 import CategoryCard from './CategoryCard';
 import SectionTitle from './SectionTitle';
 

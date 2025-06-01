@@ -2,7 +2,7 @@ import { useCallback, useRef } from 'react';
 import LensIcon from '@/public/assets/icons/lens.svg';
 import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
 import { cn } from '@/utils/cn';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/atoms/button';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 import useDebounce from '@/hooks/useDebounce';
 

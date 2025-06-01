@@ -1,34 +1,35 @@
-import type { InferGetStaticPropsType, GetStaticProps } from 'next';
-import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
+import type { InferGetStaticPropsType, GetStaticProps } from "next";
+import Link from "next/link";
+import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
 import {
   CategoriesContainer,
   createResourceJsonLd,
   ResourceContainer,
   SearchForm,
   SectionTitle,
-} from '@/features/resources';
+} from "@/features/resources";
 import {
   getNotionDatabase,
   NotionDatabaseResultSchema,
-} from '@/services/modules/notion';
-import JsonLdFactory from '@/utils/jsonLd';
-import { cn } from '@/utils/cn';
-import ArrowIcon from '@/public/assets/icons/arrow.svg';
-import Button from '@/shared/components/Button';
+} from "@/services/modules/notion";
+import JsonLdFactory from "@/utils/jsonLd";
+import { cn } from "@/utils/cn";
+import ArrowIcon from "@/public/assets/icons/arrow.svg";
+import { Button } from "@/components/atoms/button";
 
 type SectionProps = {
-  as?: 'section' | 'div';
+  as?: "section" | "div";
   className?: string;
   children: React.ReactNode;
 };
 
 const Section = ({
-  as: Component = 'section',
+  as: Component = "section",
   className,
   children,
 }: SectionProps) => {
   return (
-    <Component className={cn('pb-11 px-5 md:pb-12 md:px-24', className)}>
+    <Component className={cn("pb-11 px-5 md:pb-12 md:px-24", className)}>
       {children}
     </Component>
   );
@@ -43,7 +44,7 @@ export const getStaticProps = (async () => {
 
   const jsonLd = JsonLdFactory.createGraph([
     JsonLdFactory.createItemListBuilder()
-      .setName('所有分類')
+      .setName("所有分類")
       .setItems(coursesJsonLd),
   ]);
 
@@ -62,8 +63,8 @@ export default function ResourceCategoriesPage({
       <SEOConfig title="所有分類｜島島阿學" jsonLd={jsonLd} />
       <Section as="div" className="pt-12">
         <div className="mb-3 flex items-center gap-2 text-basic-400">
-          <Button as="link" href="/new-resource" className="px-2 -mx-2">
-            找資源
+          <Button variant="link" className="px-2 -mx-2">
+            <Link href="/new-resource">找資源</Link>
           </Button>
           <ArrowIcon />
           <span>所有分類</span>
@@ -83,9 +84,7 @@ export default function ResourceCategoriesPage({
         <ResourceContainer data={data.results} className="px-5 md:px-24" />
 
         <div className="flex justify-center px-5 pt-6 md:px-24">
-          <Button variant="solid" color="primary" size="sm">
-            查看更多
-          </Button>
+          <Button size="sm">查看更多</Button>
         </div>
       </Section>
     </>

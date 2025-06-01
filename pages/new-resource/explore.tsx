@@ -1,28 +1,30 @@
-import type { InferGetStaticPropsType, GetStaticProps } from 'next';
-import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
+import type { InferGetStaticPropsType, GetStaticProps } from "next";
+import Link from "next/link";
+import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
+import { ChevronLeftIcon } from "lucide-react";
 import {
   createResourceJsonLd,
   ResourceContainer,
   SearchForm,
   SectionTitle,
-} from '@/features/resources';
+} from "@/features/resources";
 import {
   getNotionDatabase,
   NotionDatabaseResultSchema,
-} from '@/services/modules/notion';
-import JsonLdFactory from '@/utils/jsonLd';
-import { cn } from '@/utils/cn';
-import Button from '@/shared/components/Button';
-import useSearchParamsManager from '@/hooks/useSearchParamsManager';
+} from "@/services/modules/notion";
+import JsonLdFactory from "@/utils/jsonLd";
+import { cn } from "@/utils/cn";
+import useSearchParamsManager from "@/hooks/useSearchParamsManager";
+import { Button } from "@/components/atoms/button";
 
 type SectionProps = {
-  as?: 'section' | 'div';
+  as?: "section" | "div";
   className?: string;
   children: React.ReactNode;
 };
 
 const Section = ({
-  as: Component = 'section',
+  as: Component = "section",
   className,
   children,
 }: SectionProps) => {
@@ -38,7 +40,7 @@ export const getStaticProps = (async () => {
 
   const jsonLd = JsonLdFactory.createGraph([
     JsonLdFactory.createItemListBuilder()
-      .setName('探索所有資源')
+      .setName("探索所有資源")
       .setItems(coursesJsonLd),
   ]);
 
@@ -60,19 +62,16 @@ export default function ResourceCategoriesPage({
     <>
       <SEOConfig title="探索所有資源｜島島阿學" jsonLd={jsonLd} />
       <Section as="div" className="pt-12 px-5 md:px-24">
-        <Button
-          as="link"
-          href="/new-resource"
-          prefixIcon="Arrow"
-          prefixIconClassName="rotate-180"
-          className="mb-3 px-2 -mx-2"
-        >
-          返回
+        <Button variant="link" className="mb-3 px-2 -mx-2" asChild>
+          <Link href="/new-resource">
+            <ChevronLeftIcon className="w-4 h-4" />
+            返回
+          </Link>
         </Button>
         <SectionTitle
           as="h1"
           title="所有資源"
-          className={cn(keyword && 'hidden')}
+          className={cn(keyword && "hidden")}
         />
       </Section>
 
@@ -81,10 +80,10 @@ export default function ResourceCategoriesPage({
 
         {keyword && (
           <div className="text-basic-500 body-sm px-5 pb-6 md:px-24">
-            "{keyword}" 共搜尋到{' '}
+            "{keyword}" 共搜尋到{" "}
             <span className="text-primary-base font-bold">
               {data.results?.length}
-            </span>{' '}
+            </span>{" "}
             筆
           </div>
         )}
@@ -92,9 +91,7 @@ export default function ResourceCategoriesPage({
         <ResourceContainer data={data.results} className="px-5 md:px-24" />
 
         <div className="flex justify-center px-5 pt-6 md:px-24">
-          <Button variant="solid" color="primary" size="sm">
-            查看更多
-          </Button>
+          <Button size="sm">查看更多</Button>
         </div>
       </Section>
     </>

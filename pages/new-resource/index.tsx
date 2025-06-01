@@ -1,5 +1,7 @@
-import type { InferGetStaticPropsType, GetStaticProps } from 'next';
-import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
+import type { InferGetStaticPropsType, GetStaticProps } from "next";
+import Link from "next/link";
+import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
+import { ChevronRightIcon } from "lucide-react";
 import {
   CategoriesContainer,
   ReflectionCard,
@@ -8,16 +10,16 @@ import {
   SectionTitle,
   SharerCard,
   createResourceJsonLd,
-} from '@/features/resources';
+} from "@/features/resources";
 import {
   getNotionDatabase,
   NotionDatabaseResultSchema,
-} from '@/services/modules/notion';
-import Carousel from '@/shared/components/Carousel';
-import JsonLdFactory from '@/utils/jsonLd';
-import { cn } from '@/utils/cn';
-import Button from '@/shared/components/Button';
-import { SEARCH_TAGS } from '@/constants/category';
+} from "@/services/modules/notion";
+import Carousel from "@/shared/components/Carousel";
+import JsonLdFactory from "@/utils/jsonLd";
+import { cn } from "@/utils/cn";
+import { SEARCH_TAGS } from "@/constants/category";
+import { Button } from "@/components/atoms/button";
 
 const Section = ({
   className,
@@ -26,7 +28,7 @@ const Section = ({
   return (
     <section
       className={cn(
-        'flex flex-col gap-11 px-5 py-11 md:px-24 md:py-12',
+        "flex flex-col gap-11 px-5 py-11 md:px-24 md:py-12",
         className
       )}
     >
@@ -44,7 +46,7 @@ export const getStaticProps = (async () => {
 
   const jsonLd = JsonLdFactory.createGraph([
     JsonLdFactory.createItemListBuilder()
-      .setName('多元學習資源列表')
+      .setName("多元學習資源列表")
       .setItems(coursesJsonLd),
   ]);
 
@@ -77,12 +79,15 @@ export default function ResourcePage({
         <div>
           <SectionTitle title="熱門資源">
             <Button
-              as="link"
-              href="/new-resource/explore"
-              className="-mx-2 px-2 body-lg font-medium text-basic-300"
-              suffixIcon="Arrow"
+              variant="link"
+              className="-mx-2 px-2 body-lg font-medium text-basic-300 gap-0.5"
+              size="lg"
+              asChild
             >
-              探索 所有資源
+              <Link href="/new-resource/explore">
+                探索 所有資源
+                <ChevronRightIcon className="w-4 h-4" />
+              </Link>
             </Button>
           </SectionTitle>
           <ResourceContainer data={data.results?.slice(2)} />
@@ -91,12 +96,14 @@ export default function ResourcePage({
         <div>
           <SectionTitle title="最新資源">
             <Button
-              as="link"
-              href="/new-resource/explore"
-              className="-mx-2 px-2 body-lg font-medium text-basic-300"
-              suffixIcon="Arrow"
+              variant="link"
+              className="-mx-2 px-2 body-lg font-medium text-basic-300 gap-0.5"
+              asChild
             >
-              探索 所有資源
+              <Link href="/new-resource/explore">
+                探索 所有資源
+                <ChevronRightIcon className="w-4 h-4" />
+              </Link>
             </Button>
           </SectionTitle>
           <ResourceContainer data={data.results?.slice(0, 2)} />
@@ -105,12 +112,14 @@ export default function ResourcePage({
         <div>
           <SectionTitle title="熱門分類">
             <Button
-              as="link"
-              href="/new-resource/categories"
-              className="-mx-2 px-2 body-lg font-medium text-basic-300"
-              suffixIcon="Arrow"
+              variant="link"
+              className="-mx-2 px-2 body-lg font-medium text-basic-300 gap-0.5"
+              asChild
             >
-              探索 所有分類
+              <Link href="/new-resource/categories">
+                探索 所有分類
+                <ChevronRightIcon className="w-4 h-4" />
+              </Link>
             </Button>
           </SectionTitle>
           <CategoriesContainer maxLength={8} disabledCollapse />

@@ -1,5 +1,6 @@
-import type { InferGetStaticPropsType, GetStaticProps } from 'next';
-import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
+import type { InferGetStaticPropsType, GetStaticProps } from "next";
+import Link from "next/link";
+import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
 import {
   CategoriesContainer,
   ResourceContainer,
@@ -7,32 +8,32 @@ import {
   SearchForm,
   getCategories,
   createResourceJsonLd,
-} from '@/features/resources';
+} from "@/features/resources";
 import {
   getNotionDatabase,
   NotionDatabaseResultSchema,
-} from '@/services/modules/notion';
-import JsonLdFactory from '@/utils/jsonLd';
-import { cn } from '@/utils/cn';
-import ArrowIcon from '@/public/assets/icons/arrow.svg';
-import Button from '@/shared/components/Button';
-import { CATEGORIES, SEARCH_TAGS } from '@/constants/category';
-import { parseToArray } from '@/services/core';
-import { Categories } from '@/features/resources/utils/getCategories';
+} from "@/services/modules/notion";
+import JsonLdFactory from "@/utils/jsonLd";
+import { cn } from "@/utils/cn";
+import ArrowIcon from "@/public/assets/icons/arrow.svg";
+import { CATEGORIES, SEARCH_TAGS } from "@/constants/category";
+import { parseToArray } from "@/services/core";
+import { Categories } from "@/features/resources/utils/getCategories";
+import { Button } from "@/components/atoms/button";
 
 type SectionProps = {
-  as?: 'section' | 'div';
+  as?: "section" | "div";
   className?: string;
   children: React.ReactNode;
 };
 
 const Section = ({
-  as: Component = 'section',
+  as: Component = "section",
   className,
   children,
 }: SectionProps) => {
   return (
-    <Component className={cn('px-5 md:px-24', className)}>{children}</Component>
+    <Component className={cn("px-5 md:px-24", className)}>{children}</Component>
   );
 };
 
@@ -61,7 +62,7 @@ export const getStaticProps = (async (context) => {
     parseToArray<keyof typeof SEARCH_TAGS>(context.params?.categories)
   );
 
-  const title = categories?.[1]?.label ?? categories?.[0]?.label ?? '暫無分類';
+  const title = categories?.[1]?.label ?? categories?.[0]?.label ?? "暫無分類";
 
   const data = await getNotionDatabase({
     page_size: 16,
@@ -96,27 +97,21 @@ export default function ResourceCategoriesPage({
       <SEOConfig title={`${title}學習資源列表｜島島阿學`} jsonLd={jsonLd} />
       <Section as="div" className="pt-8 mb-3 md:pt-12 md:mb-6">
         <div className="flex items-center gap-2 text-basic-400">
-          <Button as="link" href="/new-resource" className="px-2 -mx-2">
-            找資源
+          <Button variant="link" className="px-2 -mx-2" asChild>
+            <Link href="/new-resource">找資源</Link>
           </Button>
           <ArrowIcon />
-          <Button
-            as="link"
-            href="/new-resource/categories"
-            className="px-2 -mx-2"
-          >
-            所有分類
+          <Button variant="link" className="px-2 -mx-2" asChild>
+            <Link href="/new-resource/categories">所有分類</Link>
           </Button>
           <ArrowIcon />
           {categories?.length === 1 && <span>{categories[0].label}</span>}
           {categories?.length === 2 && (
             <>
-              <Button
-                as="link"
-                href={`/new-resource/categories/${categories[0].value}`}
-                className="px-2 -mx-2"
-              >
-                {categories[0].label}
+              <Button variant="link" className="px-2 -mx-2" asChild>
+                <Link href={`/new-resource/categories/${categories[0].value}`}>
+                  {categories[0].label}
+                </Link>
               </Button>
               <ArrowIcon />
               <span>{categories[1].label}</span>
@@ -148,9 +143,7 @@ export default function ResourceCategoriesPage({
         <ResourceContainer data={data.results} className="px-5 md:px-24" />
 
         <div className="flex justify-center px-5 py-6 md:px-24">
-          <Button variant="solid" color="primary" size="sm">
-            查看更多
-          </Button>
+          <Button size="sm">查看更多</Button>
         </div>
       </Section>
     </>

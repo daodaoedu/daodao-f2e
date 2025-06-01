@@ -11,7 +11,7 @@ const buttonVariants = cva(
     // Display
     "relative inline-flex items-center justify-center gap-2",
     // Text & Space
-    "whitespace-nowrap body-sm font-medium",
+    "whitespace-nowrap body-md font-medium",
     // Visual Style
     "transition-[color,background-color,box-shadow] rounded-full",
     // Interaction
@@ -36,8 +36,8 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-9 px-4 py-2",
-        sm: "h-8 px-3",
-        lg: "h-10 px-8 body-md",
+        sm: "h-8 px-3 body-sm",
+        lg: "h-10 px-8 body-lg",
         icon: "h-9 w-9",
       },
     },
@@ -109,7 +109,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const childElement = React.isValidElement<React.PropsWithChildren>(
       children
     ) ? (
-      React.cloneElement(children, {}, [children.props.children, rippleElement])
+      React.cloneElement(children, children.props, [
+        children.props.children,
+        rippleElement,
+      ])
     ) : (
       <>
         {children}

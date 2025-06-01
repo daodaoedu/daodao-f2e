@@ -30,3 +30,13 @@ export const parseToNumber = (input?: unknown) => {
     return null;
   }
 };
+
+export const parseToArray = <T extends string | number>(
+  input?: unknown
+): T[] | null => {
+  try {
+    return Array.isArray(input) ? input : [input];
+  } catch {
+    return null;
+  }
+};
