@@ -1,23 +1,25 @@
-import { memo, useCallback, useMemo } from 'react';
-import { DndContext, DragOverlay, closestCenter } from '@dnd-kit/core';
+import { memo, useCallback, useMemo } from "react";
+import { DndContext, DragOverlay, closestCenter } from "@dnd-kit/core";
+import { toDate } from "date-fns";
 import {
   SortableContext,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import dayjs from 'dayjs';
-import { useDialog } from '@/contexts/Dialog';
+} from "@dnd-kit/sortable";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import dayjs from "dayjs";
+import { useDialog } from "@/contexts/Dialog";
 import {
   ProjectMilestoneSchema,
-  UpdateProjectMilestoneSchema,
+  ProjectMilestoneFormSchema,
   ProjectTaskSchema,
-} from '@/services/modules/projects';
-import { getIsCheckDragMilestoneStorage } from '@/utils/storage';
-import { useDraggableSensors } from '@/hooks/useDraggableSensors';
-import { useDraggableContainer } from '@/hooks/useDraggableContainer';
-import DraggableItem from '@/shared/components/DraggableItem';
-import DateRangePicker from '@/shared/components/DateRangePicker';
-import MilestoneItem from './MilestoneItem';
+} from "@/services/modules/projects";
+import { getIsCheckDragMilestoneStorage } from "@/utils/storage";
+import { useDraggableSensors } from "@/hooks/useDraggableSensors";
+import { useDraggableContainer } from "@/hooks/useDraggableContainer";
+import DraggableItem from "@/shared/components/DraggableItem";
+import { DatePickerWithRange } from "@/components/molecules/date-picker";
+import SwapRightIcon from "@/public/assets/icons/swap-right.svg";
+import MilestoneItem from "./MilestoneItem";
 
 const MemoMilestoneItem = memo(MilestoneItem);
 
@@ -31,7 +33,7 @@ interface DraggableMilestonesProps {
   onRefreshData?: () => void;
   onReorder?: (milestones: ProjectMilestoneSchema) => void;
   onReorderTask?: (task: ProjectTaskSchema) => void;
-  onUpdate?: (request: UpdateProjectMilestoneSchema) => void;
+  onUpdate?: (request: ProjectMilestoneFormSchema) => void;
 }
 
 const DraggableMilestones = ({
@@ -59,18 +61,18 @@ const DraggableMilestones = ({
     ) => {
       const dayDiff = dayjs(_overItem.startDate).diff(
         dayjs(_activeItem.startDate),
-        'day'
+        "day"
       );
       const isDown = dayDiff === 0 ? newIndex > oldIndex : dayDiff > 0;
       const positionOffset = isAscending ? 1 : -1;
 
       return {
         startDate: dayjs(_activeItem.startDate)
-          .add(dayDiff, 'day')
-          .format('YYYY/MM/DD'),
+          .add(dayDiff, "day")
+          .format("YYYY/MM/DD"),
         endDate: dayjs(_activeItem.endDate)
-          .add(dayDiff, 'day')
-          .format('YYYY/MM/DD'),
+          .add(dayDiff, "day")
+          .format("YYYY/MM/DD"),
         position: isDown
           ? _overItem.position + positionOffset
           : _overItem.position - positionOffset,
@@ -100,7 +102,7 @@ const DraggableMilestones = ({
 
       if (!isCheckDragMilestone) {
         const result = await openDialog({
-          content: '拖拽里程碑會改變日期，確定要繼續嗎？',
+          content: "拖拽里程碑會改變日期，確定要繼續嗎？",
         });
 
         if (!result) return false;
@@ -113,8 +115,14 @@ const DraggableMilestones = ({
   });
 
   const previewNewDate = useMemo(() => {
-    if (!activeItem || !overItem) return null;
-    return calculateDatePosition(activeItem, overItem, 0, 0);
+    if (!activeItem || !overItem) return undefined;
+    const { startDate, endDate } = calculateDatePosition(
+      activeItem,
+      overItem,
+      0,
+      0
+    );
+    return { from: toDate(startDate), to: toDate(endDate) };
   }, [activeItem, overItem]);
 
   return (
@@ -151,9 +159,9 @@ const DraggableMilestones = ({
       <DragOverlay>
         {activeItem && (
           <div className="relative opacity-90 w-full">
-            <DateRangePicker
-              startDate={dayjs(previewNewDate?.startDate)}
-              endDate={dayjs(previewNewDate?.endDate)}
+            <DatePickerWithRange
+              date={previewNewDate}
+              separator={<SwapRightIcon className="w-4 h-4 text-basic-black/25" />}
               className="absolute -top-12 left-0 bg-basic-white"
             />
             <MilestoneItem

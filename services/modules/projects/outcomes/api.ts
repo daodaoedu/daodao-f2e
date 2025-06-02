@@ -1,14 +1,10 @@
-import { MutationFetcher } from 'swr/mutation';
-import { apiPaths, mutations } from '@/services/core';
+import { mutate } from "swr";
+import { MutationFetcher } from "swr/mutation";
+import { mutations, parseToString } from "@/services/core";
 
-import {
-  CreateProjectOutcomeSchema,
-  ProjectOutcomeSchema,
-  UpdateProjectOutcomeSchema,
-} from './schema';
-import { uploadImages } from '../../images';
-
-export type ProjectOutcomeSWRKey = string;
+import { ProjectOutcomeSchema, ProjectOutcomeFormSchema } from "./schema";
+import { uploadImages } from "../../images";
+import { getProjectPathname } from "../core";
 
 interface GetProjectOutcomePathnameProps {
   projectId: string;
@@ -18,47 +14,55 @@ interface GetProjectOutcomePathnameProps {
 export const getProjectOutcomePathname = ({
   projectId,
   outcomeId,
-}: GetProjectOutcomePathnameProps) =>
-  apiPaths.projects(projectId).outcomes(outcomeId).toString();
+}: GetProjectOutcomePathnameProps) => {
+  const pathname = `/projects/${parseToString(projectId)}/outcomes`;
+
+  if (outcomeId) {
+    return `${pathname}/${parseToString(outcomeId)}`;
+  }
+
+  return pathname;
+};
+
+export const refetchProjectOutcome = async () => {
+  await mutate((key: unknown) => {
+    const pathname = Array.isArray(key) ? key[0] : key;
+    return pathname.startsWith(getProjectPathname());
+  });
+};
 
 interface ProjectOutcomeAPIType {
   create: MutationFetcher<
     ProjectOutcomeSchema,
-    ProjectOutcomeSWRKey,
-    CreateProjectOutcomeSchema
+    string,
+    ProjectOutcomeFormSchema
   >;
   update: MutationFetcher<
     ProjectOutcomeSchema,
-    ProjectOutcomeSWRKey,
-    UpdateProjectOutcomeSchema
+    string,
+    ProjectOutcomeFormSchema
   >;
-  delete: MutationFetcher<
-    void,
-    ProjectOutcomeSWRKey,
-    Required<GetProjectOutcomePathnameProps>
-  >;
+  delete: MutationFetcher<void, string>;
 }
 
-const projectOutcomeAPI: ProjectOutcomeAPIType = {
-  create: async (_, { arg: { projectId, imgFiles, imgUrls, ...arg } }) => {
+export const projectOutcomeAPI: ProjectOutcomeAPIType = {
+  create: async (url, { arg: { imgFiles, imgUrls, ...arg } }) => {
     const updatedImgUrls = await uploadImages(imgFiles, imgUrls);
 
-    return mutations.post<ProjectOutcomeSchema>(
-      getProjectOutcomePathname({ projectId }),
-      { ...arg, imgUrls: updatedImgUrls }
-    );
+    return mutations.post(url, {
+      ...arg,
+      imgUrls: updatedImgUrls,
+    });
   },
 
-  update: async (_, { arg: { projectId, id, imgFiles, imgUrls, ...arg } }) => {
+  update: async (url, { arg: { imgFiles, imgUrls, ...arg } }) => {
     const updatedImgUrls = await uploadImages(imgFiles, imgUrls);
 
-    return mutations.put<ProjectOutcomeSchema>(
-      getProjectOutcomePathname({ projectId, outcomeId: id }),
-      { ...arg, imgUrls: updatedImgUrls }
-    );
+    return mutations.put(url, {
+      ...arg,
+      imgUrls: updatedImgUrls,
+    });
   },
 
-  delete: (_, { arg }) => mutations.delete<void>(getProjectOutcomePathname(arg)),
+  delete: mutations.delete,
 };
-
-export default projectOutcomeAPI;

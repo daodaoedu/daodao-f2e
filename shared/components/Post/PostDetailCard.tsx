@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import PostCard from '@/shared/components/Post/PostCard';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/atoms/button';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
 import { BaseUserSchema } from '@/services/modules/users';
 import { useAuth } from '@/contexts/Auth';
@@ -47,6 +47,7 @@ function PostDetailCard<T extends BasePostDetailData>({
           children: (
             <Button
               size="sm"
+              variant="ghost"
               className="hover:bg-primary-lightest"
               onClick={onEditClick}
             >
@@ -59,6 +60,7 @@ function PostDetailCard<T extends BasePostDetailData>({
           children: (
             <Button
               size="sm"
+              variant="ghost"
               className="hover:bg-primary-lightest"
               onClick={onDeleteClick}
             >

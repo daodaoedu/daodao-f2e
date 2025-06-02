@@ -1,0 +1,97 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 專案重構規則 (Project Refactoring Rules)
+
+## 重構目標架構 (Target Architecture)
+
+本專案正在進行重構，目標是建立清晰的資料夾結構和依賴關係。以下是重構完成後的預期架構：
+
+```
+- components/
+    - atoms      # 原子級元件 (最小單位的 UI 元件)
+    - molecules  # 分子級元件 (由多個原子組成)
+    - organisms  # 有機體級元件 (複雜的 UI 組件)
+- constants     # 全域常數
+- contexts      # React Context (共用狀態管理)
+- features      # 功能模組 (包含商業邏輯相關的 components, hooks, contexts 與 utils)
+- hooks         # 共用的自訂 hooks
+- layout        # 版面配置元件
+- pages         # 頁面元件 (僅負責組裝，不包含過多邏輯)
+- public        # 靜態資源
+- services      # 外部服務串接相關
+    - core      # 核心功能
+    - modules   # 各功能模組的 API
+- utils         # 工具函數
+```
+
+## 核心依賴原則 (Dependency Principles)
+
+### 1. Services 層級規則
+- **modules 不互相依賴**: [services/modules](mdc:services/modules) 下的各模組應保持獨立
+- 專注於後端 API 串接、資料結構定義和驗證規則
+- 參考現有結構: [services/modules/projects](mdc:services/modules/projects), [services/modules/users](mdc:services/modules/users)
+
+### 2. Features 層級規則
+- **features 之間不互相依賴**: [features](mdc:features) 下的各功能模組應保持獨立，避免導致循環依賴
+- 包含與商業邏輯相關的元件和 hooks
+- 每個 feature 應該是自包含的功能單元
+- 現有範例: [features/projects](mdc:features/projects), [features/resources](mdc:features/resources)
+
+### 3. Components 層級規則
+- **共用性原則**: [components](mdc:components) 下的元件應該是可重用的
+- atoms: 最基礎的 UI 元件 (Button, Input, Icon 等)
+- molecules: 由多個 atoms 組成的元件 (SearchField, Card 等)
+- organisms: 複雜的 UI 組件 (Header, Footer, List 等)
+- 避免在共用元件中包含特定的商業邏輯
+
+### 4. Pages 層級規則
+- **組裝職責**: [pages](mdc:pages) 僅負責組裝各種元件
+- 不應包含過多的商業邏輯
+- 商業邏輯應委託給 features 或 hooks
+- 保持 pages 的簡潔性和可讀性
+
+### 5. Hooks 和 Contexts 規則
+- **共用性**: [hooks](mdc:hooks) 和 [contexts](mdc:contexts) 應該是跨功能使用的
+- 功能特定的 hooks 應放在對應的 features 中
+- 現有範例: [hooks/useControlledState](mdc:hooks/useControlledState), [contexts/Auth](mdc:contexts/Auth)
+
+## 重構指導原則
+
+### 檔案移動規則
+1. **商業邏輯元件** → 移動到對應的 `features/` 目錄
+2. **可重用元件** → 移動到 `components/atoms|molecules|organisms/`
+3. **API 相關檔案** → 移動到 `services/modules/`
+4. **共用 hooks** → 保留在 `hooks/`，功能特定的移到 `features/`
+5. **共用 contexts** → 保留在 `contexts/`，功能特定的移到 `features/`
+6. **共用 utils** → 保留在 `utils/`，功能特定的移到 `features/`
+
+### import 規則
+```typescript
+// ✅ 正確的 import 方向
+import { Button } from '@/components/atoms/Button'
+import { useAuth } from '@/contexts/Auth'
+import { projectService } from '@/services/modules/projects'
+import { useProjects } from '@/features/projects'
+
+// ❌ 避免的 import 方向
+// features 之間互相依賴
+import { useResources } from '@/features/resources' // 在 features/projects 中
+
+// services modules 之間互相依賴
+import { uploadImages } from '@/services/modules/image' // 在 services/modules/outcome 中
+```
+
+### 程式碼品質要求
+- 使用 TypeScript 進行類型定義，避免使用 `any`，必須明確定義型別
+- 遵循 ESLint 規則: [.eslintrc.js](mdc:.eslintrc.js)
+- 使用 shadcn/ui 進行元件實作
+- 使用 Tailwind CSS 進行樣式設計: [tailwind.config.ts](mdc:tailwind.config.ts)
+- 遵循 React 最佳實踐和 hooks 規則
+
+### UI 元件庫遷移要求
+- **禁止使用**: Material-UI (MUI)、emotion、dayjs、react-icons
+- **必須使用**: shadcn/ui + Radix UI 元件、date-fns、Tailwind CSS、自定義 icon、Lucide React 圖示
+- 詳細遷移規範請參考: [UI 元件庫遷移規則](mdc:.cursor/rules/ui-migration-rules.mdc)

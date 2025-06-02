@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import Image from '@/shared/components/Image';
 import LensIcon from '@/public/assets/icons/lens.svg';
 import { SEARCH_TAGS } from '@/constants/category';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/atoms/button';
 
 export default function SearchHero() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -69,6 +69,7 @@ export default function SearchHero() {
                 return (
                   <button
                     key={item}
+                    type="button"
                     className="px-3 py-1 text-primary-base bg-white border border-solid border-primary-base rounded-full"
                   >
                     <span className="font-bold">#</span>
@@ -79,7 +80,7 @@ export default function SearchHero() {
             </div>
           </div>
 
-          <Button variant="solid" color="primary" className="w-max mt-6">
+          <Button variant="default" className="w-max mt-6">
             + 分享資源
           </Button>
         </div>

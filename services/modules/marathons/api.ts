@@ -1,12 +1,12 @@
-import { MutationFetcher } from 'swr/mutation';
-import { apiPaths, mutations } from '@/services/core';
+import { MutationFetcher } from "swr/mutation";
+import { mutations, parseToString } from "@/services/core";
 
 import {
   MarathonSchema,
   CreateMarathonSchema,
   UpdateMarathonSchema,
   MarathonQuerySchema,
-} from './schema';
+} from "./schema";
 
 export type MarathonSWRKey = string | [string, MarathonQuerySchema];
 
@@ -15,7 +15,7 @@ interface GetMarathonPathnameProps {
 }
 
 export const getMarathonPathname = ({ id }: GetMarathonPathnameProps = {}) =>
-  apiPaths.marathons(id).toString();
+  id ? `/marathons/${parseToString(id)}` : "/marathons";
 
 interface MarathonAPIType {
   create: MutationFetcher<MarathonSchema, MarathonSWRKey, CreateMarathonSchema>;

@@ -5,7 +5,7 @@ import { ROLE } from '@/constants/member';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import { CommentVisibility } from '@/services/modules/comments';
-import Button from '../Button';
+import { Button } from '@/components/atoms/button';
 import Textarea from '../Textarea';
 
 export interface CommentData {
@@ -98,6 +98,7 @@ function CommentInput({
             <Button
               className="-mb-1 mt-1 p-1"
               size="sm"
+              variant="ghost"
               onClick={() => setIsPublic(!isPublic)}
             >
               {isPublic ? (
@@ -127,19 +128,17 @@ function CommentInput({
         {isEditing && (
           <div className="mt-2 flex items-center justify-end gap-2">
             <Button
-              variant="outline"
-              color="primary"
+              variant="secondary"
               size="sm"
               onClick={handleCancel}
             >
               取消
             </Button>
             <Button
-              variant="solid"
-              color="primary"
+              variant="default"
               size="sm"
-              isSubmit
-              isDisabled={!content.trim()}
+              type="submit"
+              disabled={!content.trim()}
             >
               送出
             </Button>

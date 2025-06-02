@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Box from '@mui/material/Box';
 import nobodyLandGif from '@/public/assets/nobody-land.gif';
-import DeprecatedButton from '@/shared/components/DeprecatedButton';
+import { Button } from '@/components/atoms/button';
 import StyledPaper from '../Paper.styled';
 import { StyledContainer } from './Detail.styled';
 
@@ -31,9 +31,9 @@ function EmptyGroup() {
           </Box>
         </StyledPaper>
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <DeprecatedButton component={Link} href="/group">
-            前往揪團頁
-          </DeprecatedButton>
+          <Button className="mt-10" size="lg" asChild>
+            <Link href="/group" replace>前往揪團頁</Link>
+          </Button>
         </Box>
       </StyledContainer>
     </Box>
