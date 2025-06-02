@@ -80,7 +80,7 @@ export default function ResourcePage({
           <SectionTitle title="熱門資源">
             <Button
               variant="link"
-              className="-mx-2 px-2 body-lg font-medium text-basic-300 gap-0.5"
+              className="-mx-2 px-2 body-lg font-medium text-basic-300"
               size="lg"
               asChild
             >
@@ -97,7 +97,7 @@ export default function ResourcePage({
           <SectionTitle title="最新資源">
             <Button
               variant="link"
-              className="-mx-2 px-2 body-lg font-medium text-basic-300 gap-0.5"
+              className="-mx-2 px-2 body-lg font-medium text-basic-300"
               asChild
             >
               <Link href="/new-resource/explore">
@@ -113,7 +113,7 @@ export default function ResourcePage({
           <SectionTitle title="熱門分類">
             <Button
               variant="link"
-              className="-mx-2 px-2 body-lg font-medium text-basic-300 gap-0.5"
+              className="-mx-2 px-2 body-lg font-medium text-basic-300"
               asChild
             >
               <Link href="/new-resource/categories">

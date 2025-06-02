@@ -62,7 +62,7 @@ export default function ResourceCategoriesPage({
     <>
       <SEOConfig title="探索所有資源｜島島阿學" jsonLd={jsonLd} />
       <Section as="div" className="pt-12 px-5 md:px-24">
-        <Button variant="link" className="mb-3 px-2 -mx-2" asChild>
+        <Button variant="link" className="mb-3 px-2 -mx-2 text-basic-300" asChild>
           <Link href="/new-resource">
             <ChevronLeftIcon className="w-4 h-4" />
             返回
@@ -91,7 +91,7 @@ export default function ResourceCategoriesPage({
         <ResourceContainer data={data.results} className="px-5 md:px-24" />
 
         <div className="flex justify-center px-5 pt-6 md:px-24">
-          <Button size="sm">查看更多</Button>
+          <Button>查看更多</Button>
         </div>
       </Section>
     </>

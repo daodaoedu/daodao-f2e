@@ -70,17 +70,12 @@ export default function ResourceCategoriesPage({
     <>
       <SEOConfig title="所有分類｜島島阿學" jsonLd={jsonLd} />
       <Section as="div" className="pt-12">
-        <Breadcrumb>
+        <Breadcrumb className="mb-3">
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink href={basePath}>找資源</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href={`${basePath}/categories`}>
-                所有分類
-              </BreadcrumbLink>
-            </BreadcrumbItem>
             <BreadcrumbItem>
               <BreadcrumbPage>所有分類</BreadcrumbPage>
             </BreadcrumbItem>
@@ -101,7 +96,7 @@ export default function ResourceCategoriesPage({
         <ResourceContainer data={data.results} className="px-5 md:px-24" />
 
         <div className="flex justify-center px-5 pt-6 md:px-24">
-          <Button size="sm">查看更多</Button>
+          <Button>查看更多</Button>
         </div>
       </Section>
     </>

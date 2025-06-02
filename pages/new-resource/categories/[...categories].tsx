@@ -173,7 +173,7 @@ export default function ResourceCategoriesPage({
         <ResourceContainer data={data.results} className="px-5 md:px-24" />
 
         <div className="flex justify-center px-5 py-6 md:px-24">
-          <Button size="sm">查看更多</Button>
+          <Button>查看更多</Button>
         </div>
       </Section>
     </>
