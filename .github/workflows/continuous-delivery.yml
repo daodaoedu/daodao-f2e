@@ -64,8 +64,8 @@ jobs:
         id: deploy
         uses: cloudflare/wrangler-action@v3
         env:
-          has_secret: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' && secrets.GITHUB_TOKEN != '' }}
-        if: ${{ env.has_secret == 'true' }}
+          HAS_SECRETS: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' && secrets.GITHUB_TOKEN != '' }}
+        if: ${{ env.HAS_SECRETS == 'true' }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_and_deploy
     env:
-      has-webhook: ${{ secrets.DISCORD_WEBHOOK_URL != '' }}
+      HAS_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL != '' }}
     if: always()
 
     steps:
@@ -89,7 +89,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Send Build and Deploy Failed Notification
-        if: ${{ needs.build_and_deploy.result == 'failure' && env.has-webhook == 'true' }}
+        if: ${{ needs.build_and_deploy.result == 'failure' && env.HAS_WEBHOOK == 'true' }}
         uses: ./.github/actions/notification
         with:
           TYPE: failure
@@ -98,7 +98,7 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       - name: Send Build Succeeded Notification
-        if: ${{ needs.build_and_deploy.result == 'success' && env.has-webhook == 'true' }}
+        if: ${{ needs.build_and_deploy.result == 'success' && env.HAS_WEBHOOK == 'true' }}
         uses: ./.github/actions/notification
         with:
           TYPE: success

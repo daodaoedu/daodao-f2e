@@ -64,10 +64,11 @@ runs:
         EOF
         )
 
-        response=$(curl -s -w "\n%{http_code}" -H "Content-Type: application/json" \
+        response=$(curl -s -w "\n%{http_code}" \
+          "${{ inputs.DISCORD_WEBHOOK_URL }}" \
+          -H "Content-Type: application/json" \
           -X POST \
-          -d "$PAYLOAD" \
-          ${{ inputs.DISCORD_WEBHOOK_URL }})
+          -d "$PAYLOAD")
 
         status_code=$(echo "$response" | tail -n1)
         response_body=$(echo "$response" | sed '$d')
