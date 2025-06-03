@@ -21,11 +21,11 @@ const DashboardFlow: React.FC<DashboardFlowProps> = ({
   const [showConfetti, setShowConfetti] = useState(false);
   const [celebrationMessage, setCelebrationMessage] = useState('');
 
-  // 處理簽到成功
+  // 處理打卡成功
   const handleCheckInSuccess = () => {
     // 顯示慶祝動畫
     setShowConfetti(true);
-    setCelebrationMessage('🎉 簽到成功！繼續保持學習的好習慣！');
+    setCelebrationMessage('🎉 打卡成功！繼續保持學習的好習慣！');
 
     // 返回主儀表板
     setCurrentView('main');
@@ -45,9 +45,9 @@ const DashboardFlow: React.FC<DashboardFlowProps> = ({
   const getPageTitle = () => {
     switch (currentView) {
       case 'checkin':
-        return '學習簽到';
+        return '學習打卡';
       case 'history':
-        return '簽到歷史';
+        return '打卡歷史';
       default:
         return practice.title;
     }

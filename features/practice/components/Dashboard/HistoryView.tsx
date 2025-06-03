@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowLeft, Calendar, TrendingUp, Target } from 'lucide-react';
 import { Practice } from '@/services/modules/practice/schema';
 import { CheckInService } from '@/services/modules/practice/checkIn';
+import { Button } from '@/components/atoms/button';
 
 interface HistoryViewProps {
   practice: Practice;
@@ -20,14 +21,14 @@ const HistoryView: React.FC<HistoryViewProps> = ({
     <div className="min-h-screen bg-primary-palest">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 返回按鈕 */}
-        <button
+        <Button
+          variant="ghost"
           onClick={onBack}
-          type="button"
           className="flex items-center text-basic-600 hover:text-basic-800 mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           <span>返回儀表板</span>
-        </button>
+        </Button>
 
         {/* 標題區域 */}
         <div className="mb-8">

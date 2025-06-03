@@ -7,6 +7,7 @@ import { usePracticeDetail } from '@/features/practice/hooks';
 import { usePractices } from '@/services/modules/practice/hooks';
 import EditForm from '@/features/practice/components/Edit/EditForm';
 import { MotivationType, ReminderFrequency, UpdatePracticeInput } from '@/services/modules/practice';
+import { Button } from '@/components/atoms/button';
 
 const EditPracticePage: React.FC = () => {
   const router = useRouter();
@@ -30,13 +31,11 @@ const EditPracticePage: React.FC = () => {
         <div className="text-center">
           <h2 className="heading-lg text-basic-black mb-2">找不到實踐</h2>
           <p className="body-md text-basic-600 mb-4">該實踐可能已被刪除或不存在</p>
-          <button
-            type="button"
+          <Button
             onClick={() => router.push('/practice')}
-            className="px-4 py-2 bg-primary-base text-white rounded-lg hover:bg-primary-darker transition-colors"
           >
             返回列表
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -59,26 +58,26 @@ const EditPracticePage: React.FC = () => {
     <>
       <Head>
         <title>編輯 {practice.title} - 主題實踐</title>
-        <meta name="description" content={`編輯您的「${practice.title}」學習實踐`} />
+        <meta name="description" content={`編輯您的「${practice.title}」主題實踐`} />
       </Head>
 
-      <div className="min-h-screen bg-primary-palest">
+      <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* 返回按鈕 */}
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={handleCancel}
-            className="flex items-center text-basic-600 hover:text-basic-800 mb-6 transition-colors"
+            className="flex items-center text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             <span>返回實踐詳情</span>
-          </button>
+          </Button>
 
           {/* 編輯表單 */}
-          <div className="bg-white rounded-lg shadow-sm border border-basic-200 overflow-hidden">
-            <div className="p-6 border-b border-basic-200">
-              <h1 className="heading-xl text-basic-black">編輯實踐</h1>
-              <p className="body-md text-basic-600 mt-1">修改您的學習實踐設定</p>
+          <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+            <div className="p-6 border-b border-border">
+              <h1 className="text-2xl font-bold text-foreground">編輯實踐</h1>
+              <p className="text-sm text-muted-foreground mt-1">修改您的主題實踐設定</p>
             </div>
 
             <div className="p-6">
@@ -103,17 +102,15 @@ const EditPracticePage: React.FC = () => {
               />
             </div>
 
-            <div className="p-6 border-t border-basic-200 bg-basic-50">
+            <div className="p-6 border-t border-border bg-muted/50">
               <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
                   onClick={handleCancel}
-                  className="px-4 py-2 text-basic-600 hover:text-basic-700 hover:bg-basic-100 rounded-lg transition-colors body-sm"
                 >
                   取消
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
                   onClick={() => {
                     handleSave({
                       title: practice.title ?? '',
@@ -128,10 +125,9 @@ const EditPracticePage: React.FC = () => {
                       resources: practice.resources ?? []
                     });
                   }}
-                  className="px-6 py-2 bg-primary-base text-white rounded-lg hover:bg-primary-darker transition-colors body-sm font-medium"
                 >
                   儲存變更
-                </button>
+                </Button>
               </div>
             </div>
           </div>

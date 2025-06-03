@@ -101,6 +101,14 @@ export const practiceSchema = z.object({
   smallGoals: z.array(smallGoalSchema).default([]),
   resources: z.array(resourceSchema).default([]),
   checkIns: z.array(checkInRecordSchema).default([]),
+  tags: z.array(z.string()).default([]),
+  // 新增：每日目標設定
+  dailyGoal: z.object({
+    type: z.enum(['time', 'completion']).default('time'),
+    timeMinutes: z.number().optional(),
+    amount: z.number().optional(),
+    unit: z.string().optional()
+  }).optional(),
   createdAt: z.string(),
   updatedAt: z.string()
 });
@@ -131,7 +139,15 @@ export const createPracticeSchema = z.object({
       description: z.string().max(500, '描述不可超過 500 字').optional(),
       order: z.number().min(0, '排序必須大於等於 0')
     })
-  ).default([])
+  ).default([]),
+  tags: z.array(z.string()).default([]),
+  // 新增：每日目標設定
+  dailyGoal: z.object({
+    type: z.enum(['time', 'completion']).default('time'),
+    timeMinutes: z.number().optional(),
+    amount: z.number().optional(),
+    unit: z.string().optional()
+  }).optional()
 });
 
 export const updatePracticeSchema = z.object({
@@ -145,7 +161,14 @@ export const updatePracticeSchema = z.object({
   reminderFrequency: reminderFrequencySchema.optional(),
   status: practiceStatusSchema.optional(),
   smallGoals: z.array(smallGoalSchema).optional(),
-  resources: z.array(resourceSchema).optional()
+  resources: z.array(resourceSchema).optional(),
+  tags: z.array(z.string()).optional(),
+  dailyGoal: z.object({
+    type: z.enum(['time', 'completion']).default('time'),
+    timeMinutes: z.number().optional(),
+    amount: z.number().optional(),
+    unit: z.string().optional()
+  }).optional()
 });
 
 export const checkInInputSchema = z.object({

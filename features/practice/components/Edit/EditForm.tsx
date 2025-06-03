@@ -1,6 +1,13 @@
 import React from 'react';
 import { Plus, X, Target, BookOpen, Link as LinkIcon } from 'lucide-react';
 import { Practice, Resource, ResourceType } from '@/services/modules/practice';
+import { Button } from '@/components/atoms/button';
+import { Input } from '@/components/atoms/input';
+import { Textarea } from '@/components/atoms/textarea';
+import { Label } from '@/components/atoms/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/atoms/select';
+import { Checkbox } from '@/components/atoms/checkbox';
+import { cn } from '@/utils/cn';
 
 interface EditFormProps {
   formData: Partial<Practice>;
@@ -117,14 +124,6 @@ const EditForm: React.FC<EditFormProps> = ({
     { value: 'custom', label: '🎯 自定義', unit: '項' }
   ];
 
-  // 動機類型選項
-  const motivationOptions = [
-    { value: 'career', label: '💼 職業發展' },
-    { value: 'personal', label: '🌱 個人興趣' },
-    { value: 'project', label: '🚀 專案需求' },
-    { value: 'required', label: '📖 必修課程' },
-    { value: 'other', label: '🎯 其他' }
-  ];
 
   const currentContentType = contentTypeOptions.find((option) => option.value === practice.contentType);
 
@@ -138,47 +137,42 @@ const EditForm: React.FC<EditFormProps> = ({
         </div>
 
         {/* 標題 */}
-        <div>
-          <label className="block body-sm font-medium text-basic-700 mb-2">
+        <div className="space-y-2">
+          <Label htmlFor="title">
             標題 <span className="text-alert">*</span>
-          </label>
-          <input
-            type="text"
+          </Label>
+          <Input
+            id="title"
             value={formData.title || ''}
             onChange={(e) => handleFieldChange('title', e.target.value)}
             placeholder="輸入實踐標題"
-            className={`w-full px-3 py-2 border rounded-lg body-md focus:outline-none focus:ring-2 focus:ring-primary-base focus:border-transparent ${
-              errors.title ? 'border-alert' : 'border-basic-300'
-            }`}
+            className={cn(errors.title && "border-alert focus:ring-alert")}
           />
           {errors.title && (
-            <p className="mt-1 body-sm text-alert">{errors.title}</p>
+            <p className="body-sm text-alert">{errors.title}</p>
           )}
         </div>
 
         {/* 描述 */}
-        <div>
-          <label className="block body-sm font-medium text-basic-700 mb-2">
-            描述
-          </label>
-          <textarea
+        <div className="space-y-2">
+          <Label htmlFor="description">描述</Label>
+          <Textarea
+            id="description"
             value={formData.description || ''}
             onChange={(e) => handleFieldChange('description', e.target.value)}
             placeholder="描述你的學習目標和計劃..."
             rows={3}
-            className="w-full px-3 py-2 border border-basic-300 rounded-lg body-md focus:outline-none focus:ring-2 focus:ring-primary-base focus:border-transparent resize-none"
+            className="resize-none"
           />
         </div>
 
         {/* 內容類型（只顯示，不可編輯） */}
-        <div>
-          <label className="block body-sm font-medium text-basic-700 mb-2">
-            內容類型
-          </label>
-          <div className="px-3 py-2 bg-basic-100 border border-basic-300 rounded-lg body-md text-basic-600">
+        <div className="space-y-2">
+          <Label>內容類型</Label>
+          <div className="px-3 py-2 bg-muted border border-input rounded-md body-sm text-muted-foreground">
             {currentContentType?.label || practice.contentType}
           </div>
-          <p className="mt-1 body-sm text-basic-500">內容類型在建立後無法修改</p>
+          <p className="body-sm text-muted-foreground">內容類型在建立後無法修改</p>
         </div>
       </div>
 
@@ -191,46 +185,45 @@ const EditForm: React.FC<EditFormProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 總量 */}
-          <div>
-            <label className="block body-sm font-medium text-basic-700 mb-2">
+          <div className="space-y-2">
+            <Label htmlFor="totalAmount">
               總量 <span className="text-alert">*</span>
-            </label>
+            </Label>
             <div className="relative">
-              <input
+              <Input
+                id="totalAmount"
                 type="number"
                 value={formData.totalAmount || ''}
                 onChange={(e) => handleFieldChange('totalAmount', parseInt(e.target.value, 10) || 0)}
                 placeholder="輸入總量"
                 min="1"
                 max="10000"
-                className={`w-full px-3 py-2 border rounded-lg body-md focus:outline-none focus:ring-2 focus:ring-primary-base focus:border-transparent ${
-                  errors.totalAmount ? 'border-alert' : 'border-basic-300'
-                }`}
+                className={cn(
+                  "pr-12",
+                  errors.totalAmount && "border-alert focus:ring-alert"
+                )}
               />
-              <span className="absolute right-3 top-2 body-md text-basic-500">
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 body-sm text-muted-foreground">
                 {currentContentType?.unit || '項'}
               </span>
             </div>
             {errors.totalAmount && (
-              <p className="mt-1 body-sm text-alert">{errors.totalAmount}</p>
+              <p className="body-sm text-alert">{errors.totalAmount}</p>
             )}
           </div>
 
           {/* 目標日期 */}
-          <div>
-            <label className="block body-sm font-medium text-basic-700 mb-2">
-              目標完成日期
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="targetDate">目標完成日期</Label>
+            <Input
+              id="targetDate"
               type="date"
               value={formData.targetDate || ''}
               onChange={(e) => handleFieldChange('targetDate', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg body-md focus:outline-none focus:ring-2 focus:ring-primary-base focus:border-transparent ${
-                errors.targetDate ? 'border-alert' : 'border-basic-300'
-              }`}
+              className={cn(errors.targetDate && "border-alert focus:ring-alert")}
             />
             {errors.targetDate && (
-              <p className="mt-1 body-sm text-alert">{errors.targetDate}</p>
+              <p className="body-sm text-alert">{errors.targetDate}</p>
             )}
           </div>
         </div>
@@ -240,52 +233,54 @@ const EditForm: React.FC<EditFormProps> = ({
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="heading-md text-basic-black">小目標</h3>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={addGoal}
             disabled={(formData.smallGoals || []).length >= 3}
-            className="flex items-center space-x-2 px-3 py-1 text-primary-base hover:text-primary-darker disabled:text-basic-400 disabled:cursor-not-allowed transition-colors body-sm"
           >
-            <Plus className="h-4 w-4" />
-            <span>新增目標</span>
-          </button>
+            <Plus className="h-4 w-4 mr-2" />
+            新增目標
+          </Button>
         </div>
 
         <div className="space-y-3">
           {(formData.smallGoals || []).map((goal, index) => (
             <div key={goal.id} className="flex items-center space-x-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-primary-base text-white rounded-full flex items-center justify-center body-sm font-medium">
+              <span className="flex-shrink-0 w-6 h-6 bg-primary-base text-primary-foreground rounded-full flex items-center justify-center body-sm font-medium">
                 {index + 1}
               </span>
-              <input
-                type="text"
+              <Input
                 value={goal.content}
                 onChange={(e) => handleGoalChange(goal.id, e.target.value)}
                 placeholder={`小目標 ${index + 1}`}
-                className="flex-1 px-3 py-2 border border-basic-300 rounded-lg body-md focus:outline-none focus:ring-2 focus:ring-primary-base focus:border-transparent"
+                className="flex-1"
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => removeGoal(goal.id)}
-                className="flex-shrink-0 p-1 text-basic-400 hover:text-alert transition-colors"
+                className="text-muted-foreground hover:text-alert p-2"
               >
                 <X className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           ))}
         </div>
 
         {(formData.smallGoals || []).length === 0 && (
-          <div className="text-center py-8 border-2 border-dashed border-basic-200 rounded-lg">
-            <p className="body-md text-basic-500 mb-3">尚未設定小目標</p>
-            <button
+          <div className="text-center py-8 border-2 border-dashed border-border rounded-lg">
+            <p className="body-md text-muted-foreground mb-3">尚未設定小目標</p>
+            <Button
               type="button"
+              variant="ghost"
               onClick={addGoal}
-              className="flex items-center space-x-2 mx-auto px-4 py-2 text-primary-base hover:text-primary-darker transition-colors body-sm"
             >
-              <Plus className="h-4 w-4" />
-              <span>新增第一個目標</span>
-            </button>
+              <Plus className="h-4 w-4 mr-2" />
+              新增第一個目標
+            </Button>
           </div>
         )}
       </div>
@@ -297,134 +292,63 @@ const EditForm: React.FC<EditFormProps> = ({
             <LinkIcon className="h-5 w-5 text-primary-base" />
             <h3 className="heading-md text-basic-black">學習資源</h3>
           </div>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={addResource}
             disabled={(formData.resources || []).length >= 5}
-            className="flex items-center space-x-2 px-3 py-1 text-primary-base hover:text-primary-darker disabled:text-basic-400 disabled:cursor-not-allowed transition-colors body-sm"
           >
-            <Plus className="h-4 w-4" />
-            <span>新增資源</span>
-          </button>
+            <Plus className="h-4 w-4 mr-2" />
+            新增資源
+          </Button>
         </div>
 
         <div className="space-y-4">
           {(formData.resources || []).map((resource, index) => (
-            <div key={resource.id} className="border border-basic-200 rounded-lg p-4">
+            <div key={resource.id} className="border border-border rounded-lg p-4">
               <div className="flex items-start space-x-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-secondary text-white rounded-full flex items-center justify-center body-sm font-medium mt-1">
+                <span className="flex-shrink-0 w-6 h-6 bg-secondary text-secondary-foreground rounded-full flex items-center justify-center body-sm font-medium mt-2">
                   {index + 1}
                 </span>
                 <div className="flex-1 space-y-3">
-                  <input
-                    type="text"
+                  <Input
                     value={resource.name}
                     onChange={(e) => handleResourceChange(resource.id, 'name', e.target.value)}
                     placeholder="資源名稱"
-                    className="w-full px-3 py-2 border border-basic-300 rounded-lg body-md focus:outline-none focus:ring-2 focus:ring-primary-base focus:border-transparent"
                   />
-                  <input
+                  <Input
                     type="url"
                     value={resource.url || ''}
                     onChange={(e) => handleResourceChange(resource.id, 'url', e.target.value)}
                     placeholder="資源連結（選填）"
-                    className="w-full px-3 py-2 border border-basic-300 rounded-lg body-md focus:outline-none focus:ring-2 focus:ring-primary-base focus:border-transparent"
                   />
                 </div>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => removeResource(resource.id)}
-                  className="flex-shrink-0 p-1 text-basic-400 hover:text-alert transition-colors mt-1"
+                  className="text-muted-foreground hover:text-alert p-2 mt-1"
                 >
                   <X className="h-4 w-4" />
-                </button>
+                </Button>
               </div>
             </div>
           ))}
         </div>
 
         {(formData.resources || []).length === 0 && (
-          <div className="text-center py-8 border-2 border-dashed border-basic-200 rounded-lg">
-            <p className="body-md text-basic-500 mb-3">尚未添加學習資源</p>
-            <button
+          <div className="text-center py-8 border-2 border-dashed border-border rounded-lg">
+            <p className="body-md text-muted-foreground mb-3">尚未添加學習資源</p>
+            <Button
               type="button"
+              variant="ghost"
               onClick={addResource}
-              className="flex items-center space-x-2 mx-auto px-4 py-2 text-primary-base hover:text-primary-darker transition-colors body-sm"
             >
-              <Plus className="h-4 w-4" />
-              <span>新增第一個資源</span>
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* 動機和提醒設定 */}
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* 動機類型 */}
-          <div>
-            <label className="block body-sm font-medium text-basic-700 mb-2">
-              學習動機
-            </label>
-            <select
-              value={formData.motivationType || ''}
-              onChange={(e) => handleFieldChange('motivationType', e.target.value)}
-              className="w-full px-3 py-2 border border-basic-300 rounded-lg body-md focus:outline-none focus:ring-2 focus:ring-primary-base focus:border-transparent"
-            >
-              <option value="">請選擇動機</option>
-              {motivationOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 提醒設定 */}
-          <div>
-            <label className="block body-sm font-medium text-basic-700 mb-2">
-              提醒設定
-            </label>
-            <div className="space-y-3">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={formData.reminderEnabled || false}
-                  onChange={(e) => handleFieldChange('reminderEnabled', e.target.checked)}
-                  className="rounded border-basic-300 text-primary-base focus:ring-primary-base"
-                />
-                <span className="body-md text-basic-700">啟用提醒通知</span>
-              </label>
-
-              {formData.reminderEnabled && (
-                <select
-                  value={formData.reminderFrequency || 'daily'}
-                  onChange={(e) => handleFieldChange('reminderFrequency', e.target.value)}
-                  className="w-full px-3 py-2 border border-basic-300 rounded-lg body-md focus:outline-none focus:ring-2 focus:ring-primary-base focus:border-transparent"
-                >
-                  <option value="daily">每日</option>
-                  <option value="every-other-day">隔日</option>
-                  <option value="twice-weekly">每週兩次</option>
-                  <option value="weekly">每週</option>
-                </select>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* 自定義動機 */}
-        {formData.motivationType === 'other' && (
-          <div>
-            <label className="block body-sm font-medium text-basic-700 mb-2">
-              請說明您的學習動機
-            </label>
-            <textarea
-              value={formData.customMotivation || ''}
-              onChange={(e) => handleFieldChange('customMotivation', e.target.value)}
-              placeholder="描述您的學習動機..."
-              rows={3}
-              className="w-full px-3 py-2 border border-basic-300 rounded-lg body-md focus:outline-none focus:ring-2 focus:ring-primary-base focus:border-transparent resize-none"
-            />
+              <Plus className="h-4 w-4 mr-2" />
+              新增第一個資源
+            </Button>
           </div>
         )}
       </div>

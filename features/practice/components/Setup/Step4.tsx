@@ -2,6 +2,7 @@ import React from 'react';
 import { Check, Calendar, Target, BookOpen, Bell, Users } from 'lucide-react';
 import { colors, contentTypeOptions, getUnitType } from '@/constants/practice';
 import { PathInfo } from '@/services/modules/practice/schema';
+import { Button } from '@/components/atoms/button';
 
 interface StepFivePreviewProps {
   pathInfo: PathInfo;
@@ -9,29 +10,52 @@ interface StepFivePreviewProps {
   // 新增的資料
   smallGoals: Array<{id: number, content: string}>;
   resources: Array<{id: number, name: string, url: string}>;
+  // 新增：目標設定相關的狀態
+  dailyGoalType?: string;
+  dailyGoalTime?: number;
+  dailyGoalPages?: number;
+  customUnit?: string;
+  // 新增：標籤
+  selectedTags?: string[];
 }
 
 const StepFivePreview: React.FC<StepFivePreviewProps> = ({
   pathInfo,
   handleCreatePath,
   smallGoals,
-  resources
+  resources,
+  dailyGoalType = 'time',
+  dailyGoalTime = 30,
+  dailyGoalPages = 10,
+  customUnit = '頁',
+  selectedTags = []
 }) => {
-  // 計算進度百分比
-  const progressPercentage = (): number => {
-    const current = parseInt(pathInfo.currentProgress, 10) || 0;
-    const total = parseInt(pathInfo.totalAmount, 10) || 1;
-    return Math.min(100, Math.round((current / total) * 100));
+  // 格式化目標顯示
+  const formatGoalDisplay = (): string => {
+    if (dailyGoalType === 'time') {
+      return `每次 ${dailyGoalTime} 分鐘`;
+    } else {
+      return `每次 ${dailyGoalPages} ${customUnit}`;
+    }
   };
 
-  // 計算目標日期距今天數
-  const getDaysUntilTarget = (): number => {
-    if (!pathInfo.targetDate) return 0;
-    const today = new Date();
-    const target = new Date(pathInfo.targetDate);
-    const diffTime = target.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return Math.max(0, diffDays);
+  // 取得日期範圍格式字串
+  const getDateRange = (): string => {
+    if (!pathInfo.targetDate) return '未設定日期';
+    
+    const startDate = new Date(pathInfo.targetDate);
+    const endDate = new Date(startDate);
+    const practiceDays = parseInt(pathInfo.totalAmount, 10) || 7;
+    endDate.setDate(startDate.getDate() + practiceDays);
+    
+    const formatDate = (date: Date): string => {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      return `${year}/${month}/${day}`;
+    };
+    
+    return `${formatDate(startDate)}-${formatDate(endDate)}`;
   };
 
   return (
@@ -42,9 +66,6 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
           <span className="text-sm text-gray-500">主題實踐</span>
         </div>
         <h3 className="text-lg font-semibold" style={{ color: colors.dark }}>預覽確認</h3>
-        <p className="text-sm text-gray-500 mt-1">
-          檢查你的主題實踐設定，確認無誤後即可開始學習之旅
-        </p>
       </div>
 
       <div className="p-4 pt-0">
@@ -65,13 +86,7 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
                     </span>
                     <span className="mx-2">•</span>
                     <Calendar className="h-4 w-4 mr-1" />
-                    <span>{getDaysUntilTarget()} 天後完成</span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm text-gray-500">完成度</div>
-                  <div className="text-xl font-bold" style={{ color: colors.primary }}>
-                    {progressPercentage()}%
+                    <span>{getDateRange()}</span>
                   </div>
                 </div>
               </div>
@@ -79,26 +94,50 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
 
             {/* 主題實踐詳細資訊 */}
             <div className="p-4">
-              {/* 小目標 */}
+              {/* 實踐行動 */}
               {smallGoals.length > 0 && (
                 <div className="mb-4">
                   <h4 className="text-sm font-medium mb-2 flex items-center">
                     <Target className="h-4 w-4 mr-1" style={{ color: colors.primary }} />
-                    小目標
+                    我要進行實踐的是
+                    <div className="ml-2 flex-1">
+                      {smallGoals.map((goal, index) => (
+                        <span 
+                          key={goal.id} 
+                          className="underline decoration-2"
+                          style={{ textDecorationColor: colors.primary }}
+                        >
+                          {goal.content}
+                          {index < smallGoals.length - 1 && ', '}
+                        </span>
+                      ))}
+                    </div>
                   </h4>
-                  <div className="space-y-2">
-                    {smallGoals.map((goal) => (
-                      <div
-                        key={goal.id}
-                        className="flex items-center p-2 rounded-md"
-                        style={{ backgroundColor: `${colors.primary}10` }}
+                </div>
+              )}
+
+              {/* 標籤顯示 */}
+              {selectedTags.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium mb-2 flex items-center">
+                    <div className="w-4 h-4 mr-1 flex items-center justify-center">
+                      <span className="text-xs" style={{ color: colors.primary }}>#</span>
+                    </div>
+                    標籤
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2 py-1 rounded-full text-xs font-medium"
+                        style={{ 
+                          backgroundColor: `${colors.primary}15`,
+                          color: colors.primary,
+                          border: `1px solid ${colors.primary}30`
+                        }}
                       >
-                        <div
-                          className="w-2 h-2 rounded-full mr-2"
-                          style={{ backgroundColor: colors.primary }}
-                        />
-                        <span className="text-sm">{goal.content}</span>
-                      </div>
+                        {tag}
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -107,42 +146,27 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
               {/* 進度資訊 */}
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="p-3 bg-gray-50 rounded-md">
-                  <div className="text-xs text-gray-500 mb-1">目前進度</div>
+                  <div className="text-xs text-gray-500 mb-1">實踐天數</div>
                   <div className="font-semibold">
-                    {pathInfo.currentProgress} / {pathInfo.totalAmount} {getUnitType(pathInfo.contentType)}
+                    {pathInfo.totalAmount} 天
                   </div>
                 </div>
 
                 <div className="p-3 bg-gray-50 rounded-md">
-                  <div className="text-xs text-gray-500 mb-1">目標日期</div>
+                  <div className="text-xs text-gray-500 mb-1">實踐目標</div>
                   <div className="font-semibold">
-                    {pathInfo.targetDate ? new Date(pathInfo.targetDate).toLocaleDateString('zh-TW') : '未設定'}
+                    {formatGoalDisplay()}
                   </div>
                 </div>
               </div>
 
-              {/* 進度條 */}
-              <div className="mb-4">
-                <div className="flex justify-between text-xs text-gray-500 mb-1">
-                  <span>學習進度</span>
-                  <span>{pathInfo.currentProgress}/{pathInfo.totalAmount}</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="h-2 rounded-full transition-all duration-300"
-                    style={{
-                      width: `${progressPercentage()}%`,
-                      backgroundColor: colors.primary
-                    }}
-                  />
-                </div>
-              </div>
 
-              {/* 學習資源 */}
+
+              {/* 資源 */}
               <div className="mb-4">
                 <h4 className="text-sm font-medium mb-2 flex items-center">
                   <BookOpen className="h-4 w-4 mr-1" style={{ color: colors.primary }} />
-                  學習資源 ({resources.length})
+                  資源 ({resources.length})
                 </h4>
 
                 {resources.length > 0 ? (
@@ -163,86 +187,36 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
                   </div>
                 ) : (
                   <div className="text-center py-2 text-xs text-gray-500 bg-gray-50 rounded-md">
-                    尚未添加學習資源
+                    新增資源將能幫助有相同興趣的島友們
                   </div>
                 )}
               </div>
-
-              {/* 提醒設定 */}
-              <div className="mb-4">
-                <h4 className="text-sm font-medium mb-2 flex items-center">
-                  <Bell className="h-4 w-4 mr-1" style={{ color: colors.primary }} />
-                  提醒設定
-                </h4>
-                <div className="p-2 bg-gray-50 rounded-md text-sm">
-                  {pathInfo.reminderEnabled ? (
-                    <div className="flex items-center text-green-600">
-                      <Check className="h-4 w-4 mr-1" />
-                      <span>
-                        已啟用 - {
-                          pathInfo.reminderFrequency === 'daily' ? '每日提醒' :
-                          pathInfo.reminderFrequency === 'weekly' ? '每週提醒' :
-                          pathInfo.reminderFrequency === 'every-other-day' ? '每兩天一次' :
-                          pathInfo.reminderFrequency === 'twice-weekly' ? '每週兩次' :
-                          '自訂頻率'
-                        }
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="text-gray-500">未啟用提醒</div>
-                  )}
-                </div>
-              </div>
-
-              {/* 其他設定 */}
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="flex items-center">
-                  <Users className="h-4 w-4 mr-1" style={{ color: pathInfo.isPublic ? colors.primary : '#gray' }} />
-                  <span className={pathInfo.isPublic ? 'text-green-600' : 'text-gray-500'}>
-                    {pathInfo.isPublic ? '公開分享' : '私人學習'}
-                  </span>
-                </div>
-              </div>
-
-              {/* 動機描述 */}
-              {(pathInfo.motivationType || pathInfo.customMotivation) && (
-                <div
-                  className="mt-4 p-3 rounded-lg border-l-4"
-                  style={{ backgroundColor: `${colors.secondary}15`, borderColor: colors.secondary }}
-                >
-                  <h4 className="text-sm font-medium mb-1">學習動機</h4>
-                  <p className="text-sm text-gray-700">
-                    {pathInfo.customMotivation || '為了個人成長而學習'}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
 
           {/* 準備開始提示 */}
           <div className="p-4 rounded-lg text-center" style={{ backgroundColor: `${colors.primary}05`, border: `1px solid ${colors.primary}30` }}>
             <div className="text-lg font-semibold mb-2" style={{ color: colors.primary }}>
-              🚀 準備好開始你的學習之旅了嗎？
+              🚀 準備好開始你的主題實踐了嗎？
             </div>
             <p className="text-sm text-gray-600 mb-3">
-              點擊「開始主題實踐」後，你就可以開始追蹤進度、打卡學習，並與你的目標更近一步！
+              點擊「開始主題實踐」後，你就可以開始追蹤進度、打卡，與目標更近一步！
             </p>
             <div className="text-xs text-gray-500">
-              💡 小提醒：你隨時可以在學習過程中調整設定
+              💡 小提醒：你隨時可以在實踐過程中調整設定
             </div>
           </div>
         </div>
       </div>
 
       <div className="p-4 pt-0 flex justify-end">
-        <button
-          type="button"
-          className="rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 py-3 px-6 text-base text-white"
-          style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
+        <Button
           onClick={handleCreatePath}
+          size="lg"
+          className="text-base"
         >
           🎯 開始主題實踐
-        </button>
+        </Button>
       </div>
     </div>
   );

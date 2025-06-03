@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
-import dayjs from 'dayjs';
+import { format, parseISO, addDays, startOfDay, endOfDay, formatDistanceToNow, differenceInDays, isAfter, isBefore, isSameDay, subDays } from 'date-fns';
+import { zhTW } from 'date-fns/locale';
 import { Practice, ContentType, PracticeStatus, CheckInRecord, MoodType, ResourceType } from './schema';
 import { z } from 'zod';
 
@@ -94,6 +95,30 @@ export function getStatusColor(status: PracticeStatus): string {
   return colors[status] || '#92989A';
 }
 
+export function getStatusColorClass(status: PracticeStatus): string {
+  const colorClasses: Record<PracticeStatus, string> = {
+    'draft': 'text-basic-300',
+    'active': 'text-primary-base',
+    'paused': 'text-tips',
+    'completed': 'text-success',
+    'archived': 'text-basic-400'
+  };
+  
+  return colorClasses[status] || 'text-basic-300';
+}
+
+export function getStatusBgClass(status: PracticeStatus): string {
+  const bgClasses: Record<PracticeStatus, string> = {
+    'draft': 'bg-basic-300',
+    'active': 'bg-primary-base',
+    'paused': 'bg-tips',
+    'completed': 'bg-success',
+    'archived': 'bg-basic-400'
+  };
+  
+  return bgClasses[status] || 'bg-basic-300';
+}
+
 export function canCheckIn(practice: Practice): boolean {
   return practice.status === 'active' && practice.currentProgress < practice.totalAmount;
 }
@@ -132,12 +157,12 @@ export function sortPractices(
         bValue = b.title.toLowerCase();
         break;
       case 'createdAt':
-        aValue = dayjs(a.createdAt);
-        bValue = dayjs(b.createdAt);
+        aValue = new Date(a.createdAt);
+        bValue = new Date(b.createdAt);
         break;
       case 'updatedAt':
-        aValue = dayjs(a.updatedAt);
-        bValue = dayjs(b.updatedAt);
+        aValue = new Date(a.updatedAt);
+        bValue = new Date(b.updatedAt);
         break;
       case 'progress':
         aValue = calculateProgress(a.currentProgress, a.totalAmount);
@@ -151,8 +176,10 @@ export function sortPractices(
         return 0;
     }
 
-    if (dayjs.isDayjs(aValue) && dayjs.isDayjs(bValue)) {
-      return sortOrder === 'asc' ? aValue.diff(bValue) : bValue.diff(aValue);
+    if (aValue instanceof Date && bValue instanceof Date) {
+      return sortOrder === 'asc' 
+        ? aValue.getTime() - bValue.getTime() 
+        : bValue.getTime() - aValue.getTime();
     }
 
     if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
@@ -166,27 +193,35 @@ export function sortPractices(
 // ==================== 日期處理 ====================
 
 export function formatDate(date: string | Date): string {
-  return dayjs(date).format('YYYY年MM月DD日');
+  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  return format(dateObj, 'yyyy年MM月dd日', { locale: zhTW });
 }
 
 export function formatTime(date: string | Date): string {
-  return dayjs(date).format('HH:mm');
+  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  return format(dateObj, 'HH:mm');
 }
 
 export function formatDateTime(date: string | Date): string {
-  return dayjs(date).format('YYYY年MM月DD日 HH:mm');
+  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  return format(dateObj, 'yyyy年MM月dd日 HH:mm', { locale: zhTW });
 }
 
 export function isToday(date: string | Date): boolean {
-  return dayjs(date).isSame(dayjs(), 'day');
+  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  return isSameDay(dateObj, new Date());
 }
 
 export function daysBetween(date1: string | Date, date2: string | Date): number {
-  return Math.abs(dayjs(date2).diff(dayjs(date1), 'day'));
+  const date1Obj = typeof date1 === 'string' ? parseISO(date1) : date1;
+  const date2Obj = typeof date2 === 'string' ? parseISO(date2) : date2;
+  return Math.abs(differenceInDays(date2Obj, date1Obj));
 }
 
 export function isConsecutiveDay(lastDate: string | Date, currentDate: string | Date): boolean {
-  return dayjs(currentDate).diff(dayjs(lastDate), 'day') === 1;
+  const lastDateObj = typeof lastDate === 'string' ? parseISO(lastDate) : lastDate;
+  const currentDateObj = typeof currentDate === 'string' ? parseISO(currentDate) : currentDate;
+  return differenceInDays(currentDateObj, lastDateObj) === 1;
 }
 
 // ==================== 進度計算增強 ====================
@@ -223,24 +258,24 @@ export function calculateStreak(
 ): number {
   const practiceCheckIns = checkIns
     .filter(c => c.practiceId === practiceId)
-    .sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf());
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   if (practiceCheckIns.length === 0) return 0;
 
   let streak = 0;
-  let checkDate = dayjs(currentDate).startOf('day');
+  let checkDate = startOfDay(currentDate);
 
   for (const checkIn of practiceCheckIns) {
-    const checkinDate = dayjs(checkIn.date).startOf('day');
+    const checkinDate = startOfDay(parseISO(checkIn.date));
 
-    if (checkinDate.isSame(checkDate)) {
+    if (isSameDay(checkinDate, checkDate)) {
       streak++;
-      checkDate = checkDate.subtract(1, 'day');
-    } else if (checkinDate.isBefore(checkDate)) {
-      const daysDiff = checkDate.diff(checkinDate, 'day');
+      checkDate = subDays(checkDate, 1);
+    } else if (isBefore(checkinDate, checkDate)) {
+      const daysDiff = differenceInDays(checkDate, checkinDate);
       if (daysDiff === 1) {
         streak++;
-        checkDate = checkinDate.subtract(1, 'day');
+        checkDate = subDays(checkinDate, 1);
       } else {
         break;
       }
@@ -282,10 +317,10 @@ export function validateStartDate(date: string): string | null {
     startDateValidationSchema.parse(date);
     
     // 額外檢查是否為過去的日期
-    const selectedDate = dayjs(date);
-    const today = dayjs().startOf('day');
+    const selectedDate = parseISO(date);
+    const today = startOfDay(new Date());
     
-    if (selectedDate.isBefore(today)) {
+    if (isBefore(selectedDate, today)) {
       return '開始日期不能是過去的日期';
     }
     
@@ -336,18 +371,18 @@ export function calculateDailyAverage(checkIns: CheckInRecord[], practiceId: str
 }
 
 export function getRecentActivity(checkIns: CheckInRecord[], practiceId: string, days: number = 7): CheckInRecord[] {
-  const cutoffDate = dayjs().subtract(days, 'day');
+  const cutoffDate = subDays(new Date(), days);
 
   return checkIns
-    .filter(c => c.practiceId === practiceId && dayjs(c.date).isAfter(cutoffDate))
-    .sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf());
+    .filter(c => c.practiceId === practiceId && isAfter(parseISO(c.date), cutoffDate))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 export function getMostActiveDay(checkIns: CheckInRecord[]): string {
   const dayCount: { [key: string]: number } = {};
 
   checkIns.forEach(checkIn => {
-    const day = dayjs(checkIn.date).format('dddd');
+    const day = format(parseISO(checkIn.date), 'EEEE', { locale: zhTW });
     dayCount[day] = (dayCount[day] || 0) + 1;
   });
 
@@ -418,7 +453,8 @@ export function pathInfoToPractice(pathInfo: any, smallGoals: any[], resources: 
       type: 'website' as ResourceType,
       order: index
     })),
-    checkIns: []
+    checkIns: [],
+    tags: []
   };
 }
 
@@ -494,12 +530,12 @@ export interface MotivationOption {
 // ==================== CheckIn 服務工具 ====================
 
 export function hasCheckedInToday(practice: Practice): boolean {
-  const today = dayjs().format('YYYY-MM-DD');
+  const today = format(new Date(), 'yyyy-MM-dd');
   return practice.checkIns?.some(checkIn => checkIn.date === today) || false;
 }
 
 export function getTodayCheckIn(practice: Practice): CheckInRecord | undefined {
-  const today = dayjs().format('YYYY-MM-DD');
+  const today = format(new Date(), 'yyyy-MM-dd');
   return practice.checkIns?.find(checkIn => checkIn.date === today);
 }
 

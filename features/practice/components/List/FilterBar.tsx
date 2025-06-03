@@ -1,7 +1,17 @@
 import React from 'react';
-import { Filter, X, ChevronDown } from 'lucide-react';
+import { Filter, X } from 'lucide-react';
 import { PracticeFilter, PracticeStatus, ContentType } from '@/services/modules/practice/schema';
 import { getContentTypeLabel, getStatusLabel } from '@/services/modules/practice/utils';
+import { Button } from '@/components/atoms/button';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem
+} from '@/components/atoms/dropdown-menu';
+import { Badge } from '@/components/atoms/badge';
 
 interface FilterBarProps {
   filter: PracticeFilter;
@@ -18,16 +28,13 @@ const FilterBar: React.FC<FilterBarProps> = ({
   totalCount,
   filteredCount
 }) => {
-  const [showStatusFilter, setShowStatusFilter] = React.useState(false);
-  const [showContentTypeFilter, setShowContentTypeFilter] = React.useState(false);
-  const [showSortOptions, setShowSortOptions] = React.useState(false);
-
   const statusOptions: PracticeStatus[] = [
     'active',
     'paused',
     'completed',
     'archived'
   ];
+  
   const contentTypeOptions: ContentType[] = [
     'book',
     'video',
@@ -50,27 +57,26 @@ const FilterBar: React.FC<FilterBarProps> = ({
     filter.searchTerm?.trim()
   );
 
-  const handleStatusToggle = (status: PracticeStatus) => {
+  const handleStatusToggle = (status: PracticeStatus, checked: boolean) => {
     const currentStatus = filter.status || [];
-    const newStatus = currentStatus.includes(status)
-      ? currentStatus.filter((s) => s !== status)
-      : [...currentStatus, status];
+    const newStatus = checked
+      ? [...currentStatus, status]
+      : currentStatus.filter((s) => s !== status);
 
     onFilterChange({ status: newStatus.length > 0 ? newStatus : undefined });
   };
 
-  const handleContentTypeToggle = (contentType: ContentType) => {
+  const handleContentTypeToggle = (contentType: ContentType, checked: boolean) => {
     const currentTypes = filter.contentType || [];
-    const newTypes = currentTypes.includes(contentType)
-      ? currentTypes.filter((t) => t !== contentType)
-      : [...currentTypes, contentType];
+    const newTypes = checked
+      ? [...currentTypes, contentType]
+      : currentTypes.filter((t) => t !== contentType);
 
     onFilterChange({ contentType: newTypes.length > 0 ? newTypes : undefined });
   };
 
   const handleSortChange = (sortBy: PracticeFilter['sortBy']) => {
     onFilterChange({ sortBy });
-    setShowSortOptions(false);
   };
 
   const handleSortOrderToggle = () => {
@@ -79,207 +85,160 @@ const FilterBar: React.FC<FilterBarProps> = ({
     });
   };
 
+  const removeStatusFilter = (status: PracticeStatus) => {
+    const newStatus = (filter.status || []).filter(s => s !== status);
+    onFilterChange({ status: newStatus.length > 0 ? newStatus : undefined });
+  };
+
+  const removeContentTypeFilter = (contentType: ContentType) => {
+    const newTypes = (filter.contentType || []).filter(t => t !== contentType);
+    onFilterChange({ contentType: newTypes.length > 0 ? newTypes : undefined });
+  };
+
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-4">
+    <div className="p-3 sm:p-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-2 sm:space-y-0">
         <div className="flex items-center space-x-2">
-          <Filter className="h-5 w-5 text-basic-400" />
-          <h3 className="heading-sm text-basic-black">篩選器</h3>
+          <Filter className="h-5 w-5 text-muted-foreground" />
+          <h3 className="text-lg font-semibold text-foreground">篩選器</h3>
           {hasActiveFilters && (
-            <span className="bg-primary-lightest text-primary-base text-xs px-2 py-1 rounded-full">
-              已套用
-            </span>
+            <Badge variant="secondary">已套用</Badge>
           )}
         </div>
 
-        <div className="flex items-center space-x-4">
-          <span className="body-sm text-basic-400">
+        <div className="flex flex-col xs:flex-row xs:items-center space-y-2 xs:space-y-0 xs:space-x-4">
+          <span className="text-sm text-muted-foreground">
             顯示 {filteredCount} / {totalCount} 項實踐
           </span>
 
           {hasActiveFilters && (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={onResetFilter}
-              className="flex items-center space-x-1 body-sm text-alert hover:text-red-600"
+              className="text-destructive hover:text-destructive self-start xs:self-auto"
             >
-              <X className="h-4 w-4" />
-              <span>清除篩選</span>
-            </button>
+              <X className="h-4 w-4 mr-1" />
+              清除篩選
+            </Button>
           )}
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-4">
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setShowStatusFilter(!showStatusFilter)}
-            className={`flex items-center space-x-2 px-3 py-2 border rounded-md body-sm transition-colors ${
-              filter.status?.length
-                ? 'border-primary-base bg-primary-lightest text-primary-darker'
-                : 'border-basic-200 bg-white text-basic-500 hover:bg-basic-100'
-            }`}
-          >
-            <span>狀態</span>
-            {filter.status?.length && (
-              <span className="bg-primary-base text-white text-xs px-1.5 py-0.5 rounded-full">
-                {filter.status.length}
-              </span>
-            )}
-            <ChevronDown className="h-4 w-4" />
-          </button>
+      <div className="flex flex-wrap gap-2 sm:gap-4">
+        {/* 狀態篩選 */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="w-full xs:w-auto">
+                狀態
+                {filter.status?.length && (
+                  <Badge variant="default" className="ml-2 h-5 min-w-5 p-0 text-xs">
+                    {filter.status.length}
+                  </Badge>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            {statusOptions.map((status) => (
+              <DropdownMenuCheckboxItem
+                key={status}
+                checked={filter.status?.includes(status) || false}
+                onCheckedChange={(checked) => handleStatusToggle(status, checked)}
+              >
+                {getStatusLabel(status)}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+            </DropdownMenu>
 
-          {showStatusFilter && (
-            <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-basic-200 rounded-md shadow-lg z-10">
-              <div className="p-2">
-                {statusOptions.map((status) => (
-                  <label key={status} className="flex items-center space-x-2 p-2 hover:bg-basic-100 rounded cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={filter.status?.includes(status) || false}
-                      onChange={() => handleStatusToggle(status)}
-                      className="rounded border-basic-300 text-primary-base focus:ring-primary-base"
-                    />
-                    <span className="body-sm text-basic-500">
-                      {getStatusLabel(status)}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
+        {/* 內容類型篩選 */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="w-full xs:w-auto">
+                類型
+                {filter.contentType?.length && (
+                  <Badge variant="default" className="ml-2 h-5 min-w-5 p-0 text-xs">
+                    {filter.contentType.length}
+                  </Badge>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            {contentTypeOptions.map((contentType) => (
+              <DropdownMenuCheckboxItem
+                key={contentType}
+                checked={filter.contentType?.includes(contentType) || false}
+                onCheckedChange={(checked) => handleContentTypeToggle(contentType, checked)}
+              >
+                {getContentTypeLabel(contentType)}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* 排序選項 */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="w-full xs:w-auto">
+                <span className="hidden sm:inline">排序：</span>
+                <span className="sm:hidden">排序</span>
+                <span className="hidden lg:inline">{sortOptions.find((opt) => opt.value === filter.sortBy)?.label}</span>
+              </Button>
+            </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            {sortOptions.map((option) => (
+              <DropdownMenuItem
+                key={option.value}
+                onClick={() => handleSortChange(option.value as PracticeFilter['sortBy'])}
+                className={filter.sortBy === option.value ? 'bg-accent' : ''}
+              >
+                {option.label}
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleSortOrderToggle}>
+              {filter.sortOrder === 'asc' ? '升序排列' : '降序排列'}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setShowContentTypeFilter(!showContentTypeFilter)}
-            className={`flex items-center space-x-2 px-3 py-2 border rounded-md body-sm transition-colors ${
-              filter.contentType?.length
-                ? 'border-primary-base bg-primary-lightest text-primary-darker'
-                : 'border-basic-200 bg-white text-basic-500 hover:bg-basic-100'
-            }`}
-          >
-            <span>類型</span>
-            {filter.contentType?.length && (
-              <span className="bg-primary-base text-white text-xs px-1.5 py-0.5 rounded-full">
-                {filter.contentType.length}
-              </span>
-            )}
-            <ChevronDown className="h-4 w-4" />
-          </button>
-
-          {showContentTypeFilter && (
-            <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-basic-200 rounded-md shadow-lg z-10">
-              <div className="p-2">
-                {contentTypeOptions.map((contentType) => (
-                  <label key={contentType} className="flex items-center space-x-2 p-2 hover:bg-basic-100 rounded cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={filter.contentType?.includes(contentType) || false}
-                      onChange={() => handleContentTypeToggle(contentType)}
-                      className="rounded border-basic-300 text-primary-base focus:ring-primary-base"
-                    />
-                    <span className="body-sm text-basic-500">
-                      {getContentTypeLabel(contentType)}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setShowSortOptions(!showSortOptions)}
-            className="flex items-center space-x-2 px-3 py-2 border border-basic-200 bg-white text-basic-500 hover:bg-basic-100 rounded-md body-sm transition-colors"
-          >
-            <span>排序</span>
-            <span className="text-xs text-basic-400">
-              {sortOptions.find((opt) => opt.value === filter.sortBy)?.label}
-            </span>
-            <ChevronDown className="h-4 w-4" />
-          </button>
-
-          {showSortOptions && (
-            <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-basic-200 rounded-md shadow-lg z-10">
-              <div className="p-2">
-                {sortOptions.map((option) => (
-                  <button
-                    type="button"
-                    key={option.value}
-                    onClick={() => handleSortChange(option.value as PracticeFilter['sortBy'])}
-                    className={`w-full text-left p-2 body-sm rounded hover:bg-basic-100 ${
-                      filter.sortBy === option.value ? 'bg-primary-lightest text-primary-darker' : 'text-basic-500'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-
-                <div className="border-t border-basic-200 mt-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={handleSortOrderToggle}
-                    className="w-full text-left p-2 body-sm text-basic-500 hover:bg-basic-100 rounded"
-                  >
-                    {filter.sortOrder === 'asc' ? '升序排列' : '降序排列'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
+      {/* 已套用的篩選標籤 */}
       {hasActiveFilters && (
         <div className="mt-4 flex flex-wrap gap-2">
           {filter.status?.map((status) => (
-            <span
+            <Badge
               key={status}
-              className="inline-flex items-center space-x-1 bg-primary-lightest text-primary-darker text-xs px-2 py-1 rounded-full"
+              variant="secondary"
+              className="cursor-pointer hover:bg-secondary/80"
+              onClick={() => removeStatusFilter(status)}
             >
-              <span>{getStatusLabel(status)}</span>
-              <button
-                type="button"
-                onClick={() => handleStatusToggle(status)}
-                className="hover:bg-primary-lighter rounded-full p-0.5"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </span>
+              {getStatusLabel(status)}
+              <X className="h-3 w-3 ml-1" />
+            </Badge>
           ))}
 
           {filter.contentType?.map((contentType) => (
-            <span
+            <Badge
               key={contentType}
-              className="inline-flex items-center space-x-1 bg-success text-white text-xs px-2 py-1 rounded-full"
+              variant="default"
+              className="cursor-pointer hover:bg-primary/80"
+              onClick={() => removeContentTypeFilter(contentType)}
             >
-              <span>{getContentTypeLabel(contentType)}</span>
-              <button
-                type="button"
-                onClick={() => handleContentTypeToggle(contentType)}
-                className="hover:bg-green-600 rounded-full p-0.5"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </span>
+              {getContentTypeLabel(contentType)}
+              <X className="h-3 w-3 ml-1" />
+            </Badge>
           ))}
 
           {filter.searchTerm && (
-            <span className="inline-flex items-center space-x-1 bg-tips text-white text-xs px-2 py-1 rounded-full">
-              <span>搜尋: "{filter.searchTerm}"</span>
-              <button
-                type="button"
-                onClick={() => onFilterChange({ searchTerm: '' })}
-                className="hover:bg-orange-600 rounded-full p-0.5"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </span>
+            <Badge
+              variant="outline"
+              className="cursor-pointer hover:bg-muted"
+              onClick={() => onFilterChange({ searchTerm: '' })}
+            >
+              搜尋: "{filter.searchTerm}"
+              <X className="h-3 w-3 ml-1" />
+            </Badge>
           )}
         </div>
       )}

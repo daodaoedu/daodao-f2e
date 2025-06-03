@@ -43,7 +43,9 @@ export class PracticeStorage {
         ...practice,
         smallGoals: practice.smallGoals || [],
         resources: practice.resources || [],
-        checkIns: practice.checkIns || []
+        checkIns: practice.checkIns || [],
+        tags: practice.tags || [],
+        dailyGoal: practice.dailyGoal || undefined
       }));
     } catch (error) {
       console.error('Error loading practices:', error);
@@ -184,7 +186,8 @@ export class PracticeStorage {
         practice.title.toLowerCase().includes(term) ||
         (practice.description && practice.description.toLowerCase().includes(term)) ||
         practice.smallGoals.some(goal => goal.content.toLowerCase().includes(term)) ||
-        practice.resources.some(resource => resource.name.toLowerCase().includes(term))
+        practice.resources.some(resource => resource.name.toLowerCase().includes(term)) ||
+        (practice.tags && practice.tags.some(tag => tag.toLowerCase().includes(term)))
       );
     }
 

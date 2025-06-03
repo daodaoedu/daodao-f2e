@@ -6,7 +6,7 @@ interface ProgressBarProps {
   total: number;
   unit?: string;
   className?: string;
-  color?: string;
+  variant?: 'default' | 'success' | 'warning' | 'danger';
   showPercentage?: boolean;
   showNumbers?: boolean;
   size?: 'sm' | 'md' | 'lg';
@@ -18,7 +18,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   total,
   unit = '',
   className = '',
-  color = '#16b9b3',
+  variant = 'default',
   showPercentage = true,
   showNumbers = true,
   size = 'md',
@@ -42,14 +42,24 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     }
   };
 
+  const getVariantClasses = () => {
+    switch (variant) {
+      case 'success': return 'bg-success';
+      case 'warning': return 'bg-tips';
+      case 'danger': return 'bg-alert';
+      default: return 'bg-primary-base';
+    }
+  };
+
   const sizeClasses = getSizeClasses();
   const textSizeClasses = getTextSizeClasses();
+  const variantClasses = getVariantClasses();
 
   return (
     <div className={className}>
       {(showNumbers || showPercentage) && (
         <div className={cn(
-          'flex items-center justify-between mb-2 text-gray-600',
+          'flex items-center justify-between mb-2 text-basic-400',
           textSizeClasses
         )}
         >
@@ -67,7 +77,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       )}
 
       <div className={cn(
-        'w-full bg-gray-200 rounded-full overflow-hidden',
+        'w-full bg-basic-200 rounded-full overflow-hidden',
         sizeClasses
       )}
       >
@@ -75,17 +85,15 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
           className={cn(
             'rounded-full transition-all duration-500 ease-out',
             sizeClasses,
+            variantClasses,
             animated && 'animate-pulse'
           )}
-          style={{
-            width: `${percentage}%`,
-            backgroundColor: color
-          }}
+          style={{ width: `${percentage}%` }}
         />
       </div>
 
       {percentage === 100 && (
-        <div className="mt-1 text-xs text-green-600 font-medium">
+        <div className="mt-1 text-xs text-success font-medium">
           🎉 已完成！
         </div>
       )}
@@ -93,4 +101,5 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   );
 };
 
-export default ProgressBar;
+export { ProgressBar };
+export type { ProgressBarProps };

@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { colors } from '@/constants/practice';
 
 interface ConfettiProps {
   active: boolean;
@@ -47,7 +46,8 @@ const Confetti: React.FC<ConfettiProps> = ({ active }) => {
     const duration = Math.random() * 1 + 2;
     const delay = Math.random() * 0.5;
 
-    const colorOptions = [colors.primary, colors.secondary, colors.accent, colors.background];
+    // 使用專案配色方案
+    const colorOptions = ['#16B9B3', '#FF9526', '#86C84A', '#295E5C']; // primary-base, tips, success, primary-darker
     const color = colorOptions[Math.floor(Math.random() * colorOptions.length)];
 
     const shapeType = Math.floor(Math.random() * 3);

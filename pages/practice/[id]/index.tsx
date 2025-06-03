@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { usePracticeDetail } from '@/features/practice/hooks';
 import DashboardFlow from '@/features/practice/components/Dashboard/DashboardFlow';
+import { Button } from '@/components/atoms/button';
 
 const PracticeDetailPage: React.FC = () => {
   const router = useRouter();
@@ -14,25 +15,23 @@ const PracticeDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-primary-palest flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-base" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
   }
 
   if (error || !practice) {
     return (
-      <div className="min-h-screen bg-primary-palest flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h2 className="heading-lg text-basic-black mb-2">找不到實踐</h2>
-          <p className="body-md text-basic-600 mb-4">該實踐可能已被刪除或不存在</p>
-          <button
-            type="button"
+          <h2 className="text-2xl font-bold text-foreground mb-2">找不到實踐</h2>
+          <p className="text-base text-muted-foreground mb-4">該實踐可能已被刪除或不存在</p>
+          <Button
             onClick={() => router.push('/practice')}
-            className="px-4 py-2 bg-primary-base text-white rounded-lg hover:bg-primary-darker transition-colors"
           >
             返回列表
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -42,7 +41,7 @@ const PracticeDetailPage: React.FC = () => {
     <>
       <Head>
         <title>{practice.title} - 主題實踐</title>
-        <meta name="description" content={`查看和管理您的「${practice.title}」學習實踐`} />
+        <meta name="description" content={`查看和管理您的「${practice.title}」主題實踐`} />
       </Head>
 
       <DashboardFlow

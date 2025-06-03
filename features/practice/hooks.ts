@@ -54,7 +54,7 @@ export function usePracticeManager() {
   }, []);
 
   // 轉換 PathInfo 為 CreatePracticeInput
-  const pathInfoToPractice = useCallback((pathInfo: any, smallGoals: any[], resources: any[]): CreatePracticeInput => {
+  const pathInfoToPractice = useCallback((pathInfo: any, smallGoals: any[], resources: any[], tags: string[] = [], dailyGoalConfig: any = null): CreatePracticeInput => {
     const contentTypeMap: Record<string, ContentType> = {
       'book': 'book' as ContentType,
       'video': 'video' as ContentType,
@@ -91,12 +91,14 @@ export function usePracticeManager() {
         url: resource.url,
         type: 'website' as ResourceType,
         order: index
-      }))
+      })),
+      tags: tags,
+      dailyGoal: dailyGoalConfig
     };
   }, []);
 
-  const createPracticeFromPathInfo = useCallback(async (pathInfo: any, smallGoals: any[], resources: any[]) => {
-    const practiceData = pathInfoToPractice(pathInfo, smallGoals, resources);
+  const createPracticeFromPathInfo = useCallback(async (pathInfo: any, smallGoals: any[], resources: any[], tags: string[] = [], dailyGoalConfig: any = null) => {
+    const practiceData = pathInfoToPractice(pathInfo, smallGoals, resources, tags, dailyGoalConfig);
     const practice = await createPractice(practiceData);
     return practice.id;
   }, [createPractice, pathInfoToPractice]);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Plus, Grid3x3, List, Download, Upload, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/atoms/button';
 
 // 使用新的 hooks
 import { usePracticeManager } from '@/features/practice/hooks';
@@ -115,18 +116,17 @@ const PracticeListPage: React.FC = () => {
 
   const renderViewModeButton = (mode: 'grid' | 'list', Icon: React.ComponentType<{ className: string }>) => {
     const isActive = viewMode === mode;
-    const buttonClass = isActive
-      ? 'bg-primary-base text-white'
-      : 'text-basic-400 hover:text-basic-500 hover:bg-basic-100';
 
     return (
-      <button
-        type="button"
+      <Button
+        variant={isActive ? "default" : "ghost"}
+        size="sm"
         onClick={() => setViewMode(mode)}
-        className={`p-2 transition-colors ${buttonClass}`}
+        className="h-8 w-8 p-0"
       >
         <Icon className="h-4 w-4" />
-      </button>
+        <span className="sr-only">{mode === 'grid' ? '格子檢視' : '清單檢視'}</span>
+      </Button>
     );
   };
 
@@ -134,31 +134,30 @@ const PracticeListPage: React.FC = () => {
     if (practices.length === 0) {
       return (
         <div className="max-w-md mx-auto">
-          <h3 className="heading-md text-basic-500 mb-2">尚未建立任何實踐</h3>
-          <p className="body-md text-basic-400 mb-6">開始你的第一個學習實踐吧！</p>
-          <button
-            type="button"
+          <h3 className="text-lg font-semibold text-muted-foreground mb-2">尚未建立任何實踐</h3>
+          <p className="text-base text-muted-foreground mb-6">開始你的第一個學習實踐吧！</p>
+          <Button
             onClick={handleCreateNew}
-            className="inline-flex items-center space-x-2 px-6 py-3 bg-primary-base text-white rounded-lg hover:bg-primary-darker transition-colors body-md font-medium"
+            className="inline-flex items-center space-x-2"
           >
             <Plus className="h-5 w-5" />
             <span>建立第一個實踐</span>
-          </button>
+          </Button>
         </div>
       );
     }
 
     return (
       <div className="max-w-md mx-auto">
-        <h3 className="heading-md text-basic-500 mb-2">沒有找到符合條件的實踐</h3>
-        <p className="body-md text-basic-400 mb-4">請調整搜尋條件或篩選器</p>
-        <button
-          type="button"
+        <h3 className="text-lg font-semibold text-muted-foreground mb-2">沒有找到符合條件的實踐</h3>
+        <p className="text-base text-muted-foreground mb-4">請調整搜尋條件或篩選器</p>
+        <Button
+          variant="link"
           onClick={resetFilter}
-          className="text-primary-base hover:text-primary-darker body-md"
+          className="p-0 h-auto text-primary"
         >
           清除所有篩選
-        </button>
+        </Button>
       </div>
     );
   };
@@ -192,11 +191,11 @@ const PracticeListPage: React.FC = () => {
     }
 
     const gridClass = viewMode === 'grid'
-      ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+      ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
       : 'grid-cols-1';
 
     return (
-      <div className={`grid gap-6 ${gridClass}`}>
+      <div className={`grid gap-4 sm:gap-6 ${gridClass}`}>
         {filteredPractices.map((practice) => (
           <PracticeCard
             key={practice.id}
@@ -220,69 +219,75 @@ const PracticeListPage: React.FC = () => {
       </Head>
 
       <main>
-        <div className="min-h-screen-without-padding-top bg-primary-palest">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-4">
-                  <h1 className="heading-lg text-basic-black">主題實踐</h1>
-                  <div className="hidden sm:flex items-center space-x-4 body-sm text-basic-400">
+        <div className="min-h-screen-without-padding-top bg-background">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
+            <div className="mb-6 sm:mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-4 sm:space-y-0">
+                <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                  <h1 className="text-2xl font-bold text-foreground">主題實踐</h1>
+                  <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                     <span>總計: {stats.total}</span>
                     <span>進行中: {stats.active}</span>
-                    <span>已完成: {stats.completed}</span>
+                    <span className="hidden xs:inline">已完成: {stats.completed}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-col xs:flex-row items-stretch xs:items-center space-y-2 xs:space-y-0 xs:space-x-3">
                   <div className="flex items-center border border-basic-200 rounded-lg overflow-hidden">
                     {renderViewModeButton('grid', Grid3x3)}
                     {renderViewModeButton('list', List)}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleExportData}
-                    className="p-2 text-basic-400 hover:text-basic-500 border border-basic-200 rounded-lg hover:bg-basic-100 transition-colors"
-                    title="匯出資料"
-                  >
-                    <Download className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleExportData}
+                      className="h-8 w-8 p-0"
+                      title="匯出資料"
+                    >
+                      <Download className="h-4 w-4" />
+                      <span className="sr-only">匯出資料</span>
+                    </Button>
 
-                  <button
-                    type="button"
-                    onClick={handleImportData}
-                    className="p-2 text-basic-400 hover:text-basic-500 border border-basic-200 rounded-lg hover:bg-basic-100 transition-colors"
-                    title="匯入資料"
-                  >
-                    <Upload className="h-4 w-4" />
-                  </button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleImportData}
+                      className="h-8 w-8 p-0"
+                      title="匯入資料"
+                    >
+                      <Upload className="h-4 w-4" />
+                      <span className="sr-only">匯入資料</span>
+                    </Button>
+                  </div>
 
-                  <button
-                    type="button"
+                  <Button
                     onClick={handleCreateNew}
-                    className="flex items-center space-x-2 px-4 py-2 bg-primary-base text-white rounded-lg hover:bg-primary-darker transition-colors body-sm font-medium"
+                    className="flex items-center justify-center space-x-2"
                   >
                     <Plus className="h-4 w-4" />
-                    <span>建立實踐</span>
-                  </button>
+                    <span className="hidden xs:inline">建立實踐</span>
+                    <span className="xs:hidden">建立</span>
+                  </Button>
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow-sm border border-basic-200 p-4 mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="heading-sm text-basic-black">搜尋實踐</h3>
-                  <span className="body-sm text-basic-400">快速找到您的學習項目</span>
+              <div className="bg-card rounded-lg shadow-sm border border-border p-3 sm:p-4 mb-4 sm:mb-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg font-semibold text-foreground">搜尋實踐</h3>
+                  <span className="text-sm text-muted-foreground">快速找到您的學習項目</span>
                 </div>
                 <SearchInput
                   value={filter.searchTerm || ''}
                   onChange={(value) => updateFilter({ searchTerm: value })}
                   placeholder="輸入關鍵字搜尋實踐項目、小目標或學習資源..."
-                  className="w-full max-w-2xl"
+                  className="w-full"
                 />
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-basic-200 mb-6">
+            <div className="bg-card rounded-lg shadow-sm border border-border mb-4 sm:mb-6">
               <FilterBar
                 filter={filter}
                 onFilterChange={updateFilter}

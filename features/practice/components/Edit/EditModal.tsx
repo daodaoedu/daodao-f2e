@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Save, AlertCircle } from 'lucide-react';
 import { Practice } from '@/services/modules/practice/schema';
 import EditForm from './EditForm';
+import { Button } from '@/components/atoms/button';
 
 interface EditModalProps {
   practice: Practice | null;
@@ -106,14 +107,15 @@ const EditModal: React.FC<EditModalProps> = ({
         {/* 標題列 */}
         <div className="flex items-center justify-between p-6 border-b border-basic-200">
           <h2 className="heading-lg text-basic-black">編輯實踐</h2>
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleClose}
             disabled={saving}
             className="p-2 text-basic-400 hover:text-basic-600 hover:bg-basic-100 rounded-lg transition-colors disabled:opacity-50"
           >
             <X className="h-5 w-5" />
-          </button>
+          </Button>
         </div>
 
         {/* 錯誤訊息 */}
@@ -136,19 +138,18 @@ const EditModal: React.FC<EditModalProps> = ({
 
         {/* 操作按鈕 */}
         <div className="flex items-center justify-end space-x-3 p-6 border-t border-basic-200 bg-basic-50">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={handleClose}
             disabled={saving}
             className="px-4 py-2 text-basic-600 hover:text-basic-700 hover:bg-basic-100 rounded-lg transition-colors body-sm disabled:opacity-50"
           >
             取消
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
             onClick={handleSave}
             disabled={saving || loading}
-            className="flex items-center space-x-2 px-6 py-2 bg-primary-base text-white rounded-lg hover:bg-primary-darker transition-colors body-sm font-medium disabled:opacity-50"
+            className="flex items-center space-x-2 px-6 py-2 body-sm font-medium"
           >
             {saving ? (
               <>
@@ -161,7 +162,7 @@ const EditModal: React.FC<EditModalProps> = ({
                 <span>儲存變更</span>
               </>
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { ArrowLeft, Check } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { usePracticeManager } from '@/features/practice/hooks';
 import Step1 from './Step1';
@@ -34,7 +33,6 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
   const { createPracticeFromPathInfo } = usePracticeManager();
 
   const [setupStep, setSetupStep] = useState(1);
-  const [hoveredStep, setHoveredStep] = useState<number | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const [pathInfo, setPathInfo] = useState<PathInfo>({
@@ -57,9 +55,19 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
   const [smallGoals, setSmallGoals] = useState<SmallGoal[]>([]);
   const [newSmallGoal, setNewSmallGoal] = useState('');
 
+  // 新增：標籤相關狀態
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [customTag, setCustomTag] = useState('');
+
   const [resources, setResources] = useState<Resource[]>([]);
   const [newResourceName, setNewResourceName] = useState('');
   const [newResourceUrl, setNewResourceUrl] = useState('');
+
+  // 新增：目標設定相關狀態
+  const [dailyGoalType, setDailyGoalType] = useState<string>('time');
+  const [dailyGoalTime, setDailyGoalTime] = useState<number>(30);
+  const [dailyGoalPages, setDailyGoalPages] = useState<number>(10);
+  const [customUnit, setCustomUnit] = useState<string>('頁');
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [celebrationMessage, setCelebrationMessage] = useState('');
@@ -132,6 +140,25 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
     setSmallGoals((prev) => prev.filter((goal) => goal.id !== id));
   }, []);
 
+  // 標籤相關函數
+  const addTag = useCallback((tag: string) => {
+    const trimmedTag = tag.trim();
+    if (trimmedTag && !selectedTags.includes(trimmedTag) && selectedTags.length < 8) {
+      setSelectedTags((prev) => [...prev, trimmedTag]);
+    }
+  }, [selectedTags]);
+
+  const removeTag = useCallback((tagToRemove: string) => {
+    setSelectedTags((prev) => prev.filter((tag) => tag !== tagToRemove));
+  }, []);
+
+  const addCustomTag = useCallback(() => {
+    if (customTag.trim()) {
+      addTag(customTag);
+      setCustomTag('');
+    }
+  }, [customTag, addTag]);
+
   const addResource = useCallback(() => {
     if (newResourceName.trim() && resources.length < 5) {
       const newResource: Resource = {
@@ -172,9 +199,17 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
 
     try {
       setShowConfetti(true);
-      setCelebrationMessage('🎉 恭喜你建立了主題實踐！開始你的學習之旅！');
+      setCelebrationMessage('🎉 你的主題實踐之旅，現在正式啟動！');
 
-      const practiceId = await createPracticeFromPathInfo(pathInfo, smallGoals, resources);
+      // 準備每日目標設定
+      const dailyGoalConfig = {
+        type: dailyGoalType,
+        timeMinutes: dailyGoalType === 'time' ? dailyGoalTime : undefined,
+        amount: dailyGoalType === 'completion' ? dailyGoalPages : undefined,
+        unit: dailyGoalType === 'completion' ? customUnit : undefined
+      };
+
+      const practiceId = await createPracticeFromPathInfo(pathInfo, smallGoals, resources, selectedTags, dailyGoalConfig);
 
       setTimeout(() => {
         setShowConfetti(false);
@@ -202,74 +237,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
     }
   }, [onCancel, router]);
 
-  const steps = [
-    { step: 1, label: '基本設定' },
-    { step: 2, label: '進度目標' },
-    { step: 3, label: '學習資源' },
-    { step: 4, label: '預覽確認' }
-  ];
 
-  const renderStepIndicator = () => {
-    return (
-      <div className="w-full flex justify-center mb-8">
-        <div className="flex items-center max-w-md w-full">
-          {steps.map((stepInfo, index) => {
-            const isActive = stepInfo.step === setupStep;
-            const isCompleted = stepInfo.step < setupStep;
-
-            let stepBgColor = '#f1f1f1';
-            let stepTextColor = '#aaa';
-            let stepBorder = 'none';
-
-            if (isActive) {
-              stepBgColor = '#16b9b3';
-              stepTextColor = 'white';
-            } else if (isCompleted) {
-              stepBgColor = '#16b9b320';
-              stepTextColor = '#16b9b3';
-              stepBorder = '1px solid #16b9b3';
-            }
-
-            return (
-              <React.Fragment key={stepInfo.step}>
-                <div className="flex flex-col items-center">
-                  <div
-                    className="relative w-8 h-8 rounded-full flex items-center justify-center font-medium transition-colors"
-                    style={{
-                      backgroundColor: stepBgColor,
-                      color: stepTextColor,
-                      border: stepBorder
-                    }}
-                    onMouseEnter={() => setHoveredStep(stepInfo.step)}
-                    onMouseLeave={() => setHoveredStep(null)}
-                  >
-                    {isCompleted ? <Check className="h-4 w-4" /> : stepInfo.step}
-
-                    {hoveredStep === stepInfo.step && (
-                      <div className="absolute top-10 bg-basic-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
-                        {stepInfo.label}
-                      </div>
-                    )}
-                  </div>
-                  <div className="mt-2 text-xs text-center text-basic-600 whitespace-nowrap">
-                    {stepInfo.label}
-                  </div>
-                </div>
-                {index < steps.length - 1 && (
-                  <div
-                    className="h-1 flex-1 mx-4 transition-colors"
-                    style={{
-                      backgroundColor: isCompleted ? '#16b9b3' : '#f1f1f1'
-                    }}
-                  />
-                )}
-              </React.Fragment>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
 
   const renderStepContent = () => {
     const stepProps = {
@@ -289,6 +257,12 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
             setNewSmallGoal={setNewSmallGoal}
             addSmallGoal={addSmallGoal}
             removeSmallGoal={removeSmallGoal}
+            selectedTags={selectedTags}
+            customTag={customTag}
+            setCustomTag={setCustomTag}
+            addTag={addTag}
+            removeTag={removeTag}
+            addCustomTag={addCustomTag}
           />
         );
       case 2:
@@ -297,6 +271,14 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
             {...stepProps}
             handleNextStep={handleNextStep}
             handlePreviousStep={handlePreviousStep}
+            dailyGoalType={dailyGoalType}
+            setDailyGoalType={setDailyGoalType}
+            dailyGoalTime={dailyGoalTime}
+            setDailyGoalTime={setDailyGoalTime}
+            dailyGoalPages={dailyGoalPages}
+            setDailyGoalPages={setDailyGoalPages}
+            customUnit={customUnit}
+            setCustomUnit={setCustomUnit}
           />
         );
       case 3:
@@ -320,6 +302,11 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
             handleCreatePath={handleCreatePath}
             smallGoals={smallGoals}
             resources={resources}
+            dailyGoalType={dailyGoalType}
+            dailyGoalTime={dailyGoalTime}
+            dailyGoalPages={dailyGoalPages}
+            customUnit={customUnit}
+            selectedTags={selectedTags}
           />
         );
       default:
@@ -328,7 +315,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-primary-palest">
+    <div className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-4 py-8">
         <Confetti active={showConfetti} />
 
@@ -337,31 +324,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
           isVisible={!!celebrationMessage}
         />
 
-        {setupStep > 1 && setupStep <= 4 && (
-          <button
-            type="button"
-            className="flex items-center text-basic-600 hover:text-basic-800 mb-6 transition-colors"
-            onClick={handlePreviousStep}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            <span>返回上一步</span>
-          </button>
-        )}
-
-        <div className="flex justify-between items-center mb-6">
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="text-basic-500 hover:text-basic-700 body-sm transition-colors"
-          >
-            取消建立
-          </button>
-          <span className="body-sm text-basic-500">步驟 {setupStep} / {steps.length}</span>
-        </div>
-
-        {renderStepIndicator()}
-
-        <div className="bg-white rounded-lg shadow-sm border border-basic-200 overflow-hidden">
+        <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
           {renderStepContent()}
         </div>
       </div>

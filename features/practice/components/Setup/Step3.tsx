@@ -1,9 +1,13 @@
 import React from 'react';
 import { Plus, X } from 'lucide-react';
-import { colors } from '@/constants/practice';
+import { Button } from '@/components/atoms/button';
+import { Input } from '@/components/atoms/input';
+import { Label } from '@/components/atoms/label';
+import { cn } from '@/utils/cn';
 
 interface Step3Props {
   handleNextStep: () => void;
+  handlePrevStep?: () => void;
   validationErrors?: Record<string, string>;
   resources: Array<{id: number; name: string; url: string}>;
   newResourceName: string;
@@ -16,6 +20,7 @@ interface Step3Props {
 
 const Step3: React.FC<Step3Props> = ({
   handleNextStep,
+  handlePrevStep,
   validationErrors = {},
   resources,
   newResourceName,
@@ -26,148 +31,128 @@ const Step3: React.FC<Step3Props> = ({
   removeResource
 }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="p-4">
+    <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+      <div className="p-6">
         <div className="flex items-center mb-2">
-          <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: colors.primary }} />
-          <span className="text-sm text-gray-500">主題實踐</span>
+          <div className="w-2 h-2 rounded-full mr-2 bg-primary" />
+          <span className="text-sm text-muted-foreground">主題實踐</span>
         </div>
-        <h3 className="text-lg font-semibold" style={{ color: colors.dark }}>你的學習資源</h3>
-        <p className="text-sm text-gray-500 mt-1">
-          新增可能會用的資源，例如書籍、Podcast、影片
+        <h3 className="text-2xl font-bold text-foreground">實踐資源</h3>
+        <p className="text-sm text-muted-foreground mt-1">
+          新增實踐中可能會用的資源，例如書籍、Podcast或...
         </p>
       </div>
 
-      <div className="p-4 pt-0">
-        <div className="space-y-4">
-          <div className="p-3 rounded-md" style={{ backgroundColor: `${colors.background}20` }}>
-            <p className="text-sm" style={{ color: colors.dark }}>
-              💡 添加學習資源可以幫助你更好地組織和追蹤學習材料
-            </p>
-          </div>
-
-          <div className="border rounded-md p-4">
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="text-sm font-medium text-gray-700">添加資源</h4>
-              <span className="text-xs text-gray-500">{resources.length}/5</span>
+      <div className="p-6 pt-0">
+        <div className="space-y-6">
+          <div className="border border-border rounded-lg p-4">
+            <div className="flex justify-between items-center mb-4">
+              <Label className="text-sm font-medium text-foreground">添加資源</Label>
+              <span className="text-xs text-muted-foreground">{resources.length}/5</span>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  資源名稱 <span className="text-red-500">*</span>
-                </label>
-                <input
+                <Label className="block text-xs font-medium text-foreground mb-2">
+                  資源名稱 <span className="text-destructive">*</span>
+                </Label>
+                <Input
                   type="text"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
-                  style={{ borderColor: colors.primary }}
                   placeholder="例如：原子習慣、How to Learn Faster podcast"
                   value={newResourceName}
                   onChange={(e) => setNewResourceName(e.target.value)}
+                  className={cn(validationErrors.resourceName && "border-destructive")}
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <Label className="block text-xs font-medium text-foreground mb-2">
                   資源連結
-                </label>
-                <input
+                </Label>
+                <Input
                   type="url"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
-                  style={{ borderColor: colors.primary }}
                   placeholder="https://..."
                   value={newResourceUrl}
                   onChange={(e) => setNewResourceUrl(e.target.value)}
+                  className={cn(validationErrors.resourceUrl && "border-destructive")}
                 />
               </div>
 
               <div className="pt-2">
-                <button
-                  type="button"
-                  className={`px-4 py-2 rounded-md text-white text-sm flex items-center ${
-                    !newResourceName.trim() || resources.length >= 5
-                      ? 'bg-gray-300 cursor-not-allowed'
-                      : 'hover:opacity-90'
-                  }`}
-                  style={{
-                    backgroundColor: !newResourceName.trim() || resources.length >= 5
-                      ? '#d1d5db'
-                      : colors.primary
-                  }}
+                <Button
                   onClick={addResource}
                   disabled={!newResourceName.trim() || resources.length >= 5}
+                  className="flex items-center"
                 >
-                  <Plus className="h-4 w-4 mr-1" />
+                  <Plus className="h-4 w-4 mr-2" />
                   添加資源
-                </button>
+                </Button>
 
                 {validationErrors.resources && (
-                  <p className="mt-2 text-sm text-red-500">{validationErrors.resources}</p>
+                  <p className="mt-2 text-sm text-destructive">{validationErrors.resources}</p>
                 )}
               </div>
             </div>
           </div>
 
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">已添加的資源</h4>
+            <Label className="text-sm font-medium text-foreground mb-3 block">已添加的資源</Label>
 
             {resources.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {resources.map((resource) => (
-                  <div key={resource.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                  <div key={resource.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border border-border">
                     <div className="flex-1">
-                      <div className="font-medium text-sm">{resource.name}</div>
+                      <div className="font-medium text-sm text-foreground">{resource.name}</div>
                       {resource.url && (
                         <a
                           href={resource.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs hover:underline"
-                          style={{ color: colors.primary }}
+                          className="text-xs text-primary hover:underline"
                         >
                           {resource.url}
                         </a>
                       )}
                     </div>
-                    <button
-                      type="button"
-                      className="text-red-500 hover:text-red-700 ml-2"
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => removeResource(resource.id)}
+                      className="text-destructive hover:text-destructive ml-3 p-2"
                     >
                       <X className="h-4 w-4" />
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-6 text-gray-500 bg-gray-50 rounded-md">
+              <div className="text-center py-8 text-muted-foreground bg-muted/50 rounded-lg border border-border">
                 <p className="text-sm">尚未添加任何資源</p>
-                <p className="text-xs mt-1">添加學習資源來更好地組織你的學習材料</p>
               </div>
             )}
           </div>
 
-          <div
-            className="p-3 rounded-lg border-l-4"
-            style={{ backgroundColor: `${colors.secondary}15`, borderColor: colors.secondary }}
-          >
-            <p className="text-sm" style={{ color: colors.dark }}>
-              <span className="font-medium">學習建議：</span>
-              將相關的學習資源集中管理，可以提高學習效率並減少尋找資料的時間。
+          <div className="p-4 rounded-lg border border-primary/20 bg-primary/5">
+            <p className="text-sm text-center text-foreground">
+              ✨你的資源分享將能幫助有相同興趣的島友們
             </p>
           </div>
         </div>
       </div>
 
-      <div className="p-4 pt-0 flex justify-end">
-        <button
-          type="button"
-          className="rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 py-2 px-4 text-sm text-white"
-          style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
+      <div className="p-6 pt-0 flex justify-between">
+        <Button
+          variant="outline"
+          onClick={handlePrevStep}
+        >
+          上一步
+        </Button>
+        <Button
           onClick={handleNextStep}
         >
-          繼續
-        </button>
+          下一步
+        </Button>
       </div>
     </div>
   );

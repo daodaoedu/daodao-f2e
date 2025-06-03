@@ -11,9 +11,9 @@ const buttonVariants = cva(
     // Display
     "relative inline-flex items-center justify-center gap-2",
     // Text & Space
-    "whitespace-nowrap body-sm font-medium",
+    "whitespace-nowrap text-sm font-medium",
     // Visual Style
-    "transition-[color,background-color,box-shadow] rounded-full",
+    "transition-[color,background-color,box-shadow] rounded-lg",
     // Interaction
     "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
     "disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none",
@@ -25,6 +25,8 @@ const buttonVariants = cva(
       variant: {
         default:
           "bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/50 hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         alert: "bg-alert text-alert-foreground shadow-sm hover:bg-alert/90",
         outline:
           "border border-primary bg-background shadow-sm hover:bg-primary hover:text-primary-foreground",

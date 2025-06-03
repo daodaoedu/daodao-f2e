@@ -75,6 +75,8 @@ const practiceAPI: PracticeAPIType = {
         order: resource.order
       })) || [],
       checkIns: [],
+      tags: validatedArg.tags || [],
+      dailyGoal: validatedArg.dailyGoal,
       createdAt: now,
       updatedAt: now
     };

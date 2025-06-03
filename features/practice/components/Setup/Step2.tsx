@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
-import { colors } from '@/constants/practice';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { zhTW } from 'date-fns/locale';
 import { PathInfo } from '@/services/modules/practice/schema';
+import { Button } from '@/components/atoms/button';
+import { Input } from '@/components/atoms/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/atoms/select';
+import { RadioGroup, RadioGroupItem } from '@/components/atoms/radio-group';
+import { Label } from '@/components/atoms/label';
+import { Textarea } from '@/components/atoms/textarea';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/atoms/popover';
+import { Calendar } from '@/components/atoms/calendar';
+import { cn } from '@/utils/cn';
 
 interface StepTwoProps {
   pathInfo: PathInfo;
@@ -8,6 +19,15 @@ interface StepTwoProps {
   handleNextStep: () => void;
   handlePreviousStep?: () => void;
   validationErrors?: Record<string, string>;
+  // 新增：目標設定相關
+  dailyGoalType: string;
+  setDailyGoalType: (type: string) => void;
+  dailyGoalTime: number;
+  setDailyGoalTime: (time: number) => void;
+  dailyGoalPages: number;
+  setDailyGoalPages: (pages: number) => void;
+  customUnit: string;
+  setCustomUnit: (unit: string) => void;
 }
 
 const StepTwo: React.FC<StepTwoProps> = ({
@@ -15,253 +35,442 @@ const StepTwo: React.FC<StepTwoProps> = ({
   handlePathInfoChange,
   handleNextStep,
   handlePreviousStep,
-  validationErrors = {}
+  validationErrors = {},
+  dailyGoalType,
+  setDailyGoalType,
+  dailyGoalTime,
+  setDailyGoalTime,
+  dailyGoalPages,
+  setDailyGoalPages,
+  customUnit,
+  setCustomUnit
 }) => {
   const practiceDays = parseInt(pathInfo.totalAmount, 10) || 7;
-  const [dailyGoalType, setDailyGoalType] = useState<string>('time');
-  const [dailyGoalTime, setDailyGoalTime] = useState<number>(30);
-  const [dailyGoalPages, setDailyGoalPages] = useState<number>(10);
-  const [customUnit, setCustomUnit] = useState<string>('');
+  const [practiceGoal, setPracticeGoal] = useState<string>('');
+  const [frequencyRange, setFrequencyRange] = useState<[number, number]>([3, 4]);
+  const [draggedThumb, setDraggedThumb] = useState<'min' | 'max' | null>(null);
+  const [startDate, setStartDate] = useState<Date | undefined>(
+    pathInfo.targetDate ? new Date(pathInfo.targetDate) : undefined
+  );
 
   const setPracticeDays = (days: number) => {
     handlePathInfoChange('totalAmount', days.toString());
   };
 
+  // Handle range slider changes
+  const handleRangeChange = (newRange: [number, number]) => {
+    setFrequencyRange(newRange);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="p-4">
-        <div className="flex items-center mb-2">
-          <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: colors.primary }} />
-          <span className="text-sm text-gray-500">主題實踐</span>
+    <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+      {/* Header */}
+      <div className="p-6">
+        <div className="flex items-center mb-4">
+          <div className="w-2 h-2 rounded-full bg-primary mr-2" />
+          <span className="text-sm text-muted-foreground">主題實踐</span>
         </div>
-        <h3 className="text-lg font-semibold" style={{ color: colors.dark }}>時間規劃</h3>
-        <p className="text-sm text-gray-500 mt-1">
+        <h2 className="text-2xl font-bold text-foreground mb-2">實踐時間和目標</h2>
+        <p className="text-sm text-muted-foreground mb-8">
           設定你的學習時間和每日目標
         </p>
       </div>
 
-      <div className="p-4 pt-0">
-        <div className="space-y-4">
-          {/* Date Selection */}
+      {/* Main Content */}
+      <div className="p-6 pt-0">
+        <div className="space-y-8">
+          {/* Practice Duration Slider */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              開始日期 <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="date"
-              className={`px-3 py-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-opacity-50 ${validationErrors.targetDate ? 'border-red-500' : ''
-                }`}
-              style={{
-                borderColor: validationErrors.targetDate ? '#ef4444' : colors.primary
-              }}
-              value={pathInfo.targetDate}
-              min={new Date().toISOString().split('T')[0]}
-              onChange={(e) => handlePathInfoChange('targetDate', e.target.value)}
-            />
-            {validationErrors.targetDate && (
-              <p className="mt-1 text-sm text-red-500">{validationErrors.targetDate}</p>
-            )}
+            <Label className="block text-sm font-medium text-foreground mb-4">
+              實踐時間 <span className="text-destructive">*</span>
+            </Label>
+            
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xl font-bold text-primary">{practiceDays} 天</span>
+              </div>
+              
+              <div className="relative">
+                <input
+                  type="range"
+                  min="7"
+                  max="30"
+                  value={practiceDays}
+                  onChange={(e) => setPracticeDays(parseInt(e.target.value, 10))}
+                  className="w-full h-2 bg-basic-200 rounded-lg appearance-none cursor-pointer slider"
+                  style={{
+                    background: `linear-gradient(to right, hsl(var(--primary)) 0%, hsl(var(--primary)) ${((practiceDays - 7) / (30 - 7)) * 100}%, hsl(var(--muted)) ${((practiceDays - 7) / (30 - 7)) * 100}%, hsl(var(--muted)) 100%)`
+                  }}
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                  <span>7天</span>
+                  <span>14天</span>
+                  <span>21天</span>
+                  <span>30天</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Practice Duration */}
+          {/* Date Inputs */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              實踐時間 <span className="text-red-500">*</span>
-            </label>
-            <div className="flex items-center mb-2">
-              <input
-                type="range"
-                min="7"
-                max="30"
-                className="w-full border-0 focus:ring-0 focus:outline-none"
-                style={{
-                  accentColor: colors.primary
-                }}
-                value={practiceDays}
-                onChange={(e) => setPracticeDays(parseInt(e.target.value, 10))}
-              />
-              <span className="ml-3 font-medium text-lg min-w-16 text-center" style={{ color: colors.primary }}>
-                {practiceDays} 天
-              </span>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="block text-sm font-medium text-foreground mb-2">
+                  開始日期 <span className="text-destructive">*</span>
+                </Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full px-4 py-3 border-2 rounded-lg justify-start text-left font-normal h-auto",
+                        !startDate && "text-muted-foreground",
+                        validationErrors.targetDate 
+                          ? "border-destructive focus:border-destructive focus:ring-destructive" 
+                          : "border-border hover:border-primary focus:border-primary"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate ? (
+                        format(startDate, "yyyy 年 M 月 d 日", { locale: zhTW })
+                      ) : (
+                        <span>選擇開始日期</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={(date) => {
+                        setStartDate(date);
+                        if (date) {
+                          handlePathInfoChange('targetDate', date.toISOString().split('T')[0]);
+                        }
+                      }}
+                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                {validationErrors.targetDate && (
+                  <p className="mt-1 text-sm text-destructive">{validationErrors.targetDate}</p>
+                )}
+              </div>
+              
+              <div>
+                <Label className="block text-sm font-medium text-foreground mb-2">
+                  結束日期
+                </Label>
+                <div className="w-full px-4 py-3 bg-muted border-2 border-border rounded-lg text-muted-foreground flex items-center">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {(() => {
+                    if (!startDate) return '請先選擇開始日期';
+                    const endDate = new Date(startDate);
+                    endDate.setDate(startDate.getDate() + practiceDays);
+                    return format(endDate, "yyyy 年 M 月 d 日", { locale: zhTW });
+                  })()}
+                </div>
+              </div>
             </div>
-            <div className="flex justify-between text-xs text-gray-500 px-1">
-              <span>7天</span>
-              <span>14天</span>
-              <span>21天</span>
-              <span>30天</span>
-            </div>
+          </div>
 
-            {/* End Date Display */}
-            <div className="mt-2 p-3 rounded-md text-sm" style={{ backgroundColor: `${colors.primary}10` }}>
-              <span className="text-gray-600">結束日期：</span>
-              <span className="font-medium" style={{ color: colors.dark }}>
-                {(() => {
-                  if (!pathInfo.targetDate) return '請先選擇開始日期';
-                  const startDate = new Date(pathInfo.targetDate);
-                  const endDate = new Date(startDate);
-                  endDate.setDate(startDate.getDate() + practiceDays - 1);
-                  return endDate.toLocaleDateString('zh-TW', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  });
-                })()}
-              </span>
+          {/* Practice Action Section */}
+          <div>
+            <Label className="block text-sm font-medium text-foreground mb-4">
+              實踐行動 <span className="text-destructive">*</span>
+            </Label>
+            
+            <div className="relative">
+              <div className="text-lg text-foreground mb-4 leading-relaxed">
+                我要在這
+                <span className="inline-flex items-center bg-primary/5 text-primary px-1.5 py-0.5 rounded font-semibold mx-1">
+                  {practiceDays}天
+                </span>
+                要進行實踐是
+              </div>
+              
+              <div className="relative">
+                <Textarea
+                  value={practiceGoal}
+                  onChange={(e) => setPracticeGoal(e.target.value)}
+                  placeholder="例如：每週至少看書2小時"
+                  className="w-full px-4 py-3 border-2 border-border rounded-lg resize-none focus:ring-2 focus:ring-primary focus:border-primary text-foreground bg-background placeholder-muted-foreground"
+                  rows={2}
+                  maxLength={50}
+                  style={{ 
+                    fontSize: '16px',
+                    lineHeight: '1.5'
+                  }}
+                />
+                
+                {/* Character counter */}
+                <div className="absolute bottom-3 right-3 text-sm text-muted-foreground bg-background px-2 py-1 rounded">
+                  {practiceGoal.length}/50
+                </div>
+              </div>
             </div>
+          </div>
 
-            <p className="text-xs text-gray-500 mt-2">
-              建議選擇7-30天的時間範圍，短期目標更容易堅持完成。研究表明形成一個新習慣通常需要至少21天。
-            </p>
+          {/* Weekly Frequency Section */}
+          <div>
+            <Label className="block text-sm font-medium text-foreground mb-4">
+              每週節奏 <span className="text-destructive">*</span>
+            </Label>
+            
+            <div className="space-y-6">
+              {/* Description at top */}
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground mb-2">拖曳設定彈性實踐</p>
+              </div>
+
+              {/* Dual Range Slider */}
+              <div className="px-4">
+                <div className="flex justify-between text-xs text-muted-foreground mb-2">
+                  <span>輕鬆</span>
+                  <span className="text-primary font-medium">平衡</span>
+                  <span>積極</span>
+                </div>
+                
+                <div className="relative mb-6">
+                  {/* Slider track */}
+                  <div className="h-2 bg-muted rounded-full relative">
+                    {/* Active range track */}
+                    <div 
+                      className="h-2 rounded-full transition-all duration-300 absolute"
+                      style={{ 
+                        backgroundColor: 'hsl(var(--primary))',
+                        left: `${((frequencyRange[0] - 2) / 4) * 100}%`,
+                        width: `${((frequencyRange[1] - frequencyRange[0]) / 4) * 100}%`
+                      }}
+                    />
+                    
+                    {/* Minimum thumb */}
+                    <div 
+                      className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-6 h-6 bg-white border-2 rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 ${
+                        draggedThumb === 'min' ? 'scale-110' : ''
+                      }`}
+                      style={{ 
+                        borderColor: 'hsl(var(--primary))',
+                        left: `${((frequencyRange[0] - 2) / 4) * 100}%`,
+                        boxShadow: draggedThumb === 'min' ? '0 0 0 4px hsl(var(--primary) / 0.3)' : undefined
+                      }}
+                      onMouseDown={(e) => {
+                        setDraggedThumb('min');
+                        const startX = e.clientX;
+                        const startValue = frequencyRange[0];
+                        
+                        const handleMouseMove = (e: MouseEvent) => {
+                          const deltaX = e.clientX - startX;
+                          const deltaValue = Math.round((deltaX / 200) * 4);
+                          const newMin = Math.max(2, Math.min(startValue + deltaValue, frequencyRange[1]));
+                          handleRangeChange([newMin, frequencyRange[1]]);
+                        };
+                        
+                        const handleMouseUp = () => {
+                          setDraggedThumb(null);
+                          document.removeEventListener('mousemove', handleMouseMove);
+                          document.removeEventListener('mouseup', handleMouseUp);
+                        };
+                        
+                        document.addEventListener('mousemove', handleMouseMove);
+                        document.addEventListener('mouseup', handleMouseUp);
+                      }}
+                    />
+                    
+                    {/* Maximum thumb */}
+                    <div 
+                      className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-6 h-6 bg-white border-2 rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 ${
+                        draggedThumb === 'max' ? 'scale-110' : ''
+                      }`}
+                      style={{ 
+                        borderColor: 'hsl(var(--primary))',
+                        left: `${((frequencyRange[1] - 2) / 4) * 100}%`,
+                        boxShadow: draggedThumb === 'max' ? '0 0 0 4px hsl(var(--primary) / 0.3)' : undefined
+                      }}
+                      onMouseDown={(e) => {
+                        setDraggedThumb('max');
+                        const startX = e.clientX;
+                        const startValue = frequencyRange[1];
+                        
+                        const handleMouseMove = (e: MouseEvent) => {
+                          const deltaX = e.clientX - startX;
+                          const deltaValue = Math.round((deltaX / 200) * 4);
+                          const newMax = Math.max(frequencyRange[0], Math.min(6, startValue + deltaValue));
+                          handleRangeChange([frequencyRange[0], newMax]);
+                        };
+                        
+                        const handleMouseUp = () => {
+                          setDraggedThumb(null);
+                          document.removeEventListener('mousemove', handleMouseMove);
+                          document.removeEventListener('mouseup', handleMouseUp);
+                        };
+                        
+                        document.addEventListener('mousemove', handleMouseMove);
+                        document.addEventListener('mouseup', handleMouseUp);
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Frequency markers */}
+                  <div className="flex justify-between mt-6">
+                    {[2, 3, 4, 5, 6].map((freq) => (
+                      <Button
+                        key={freq}
+                        variant={freq >= frequencyRange[0] && freq <= frequencyRange[1] ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                          if (freq <= frequencyRange[0]) {
+                            handleRangeChange([freq, Math.max(freq, frequencyRange[1])]);
+                          } else if (freq >= frequencyRange[1]) {
+                            handleRangeChange([Math.min(freq, frequencyRange[0]), freq]);
+                          } else {
+                            handleRangeChange([freq, freq]);
+                          }
+                        }}
+                        className="w-8 h-8 p-0 text-xs font-medium"
+                      >
+                        {freq}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="text-center space-y-2">
+                <div className="text-sm text-foreground font-medium">
+                  {frequencyRange[0] === frequencyRange[1] 
+                    ? `每週固定 ${frequencyRange[0]} 次`
+                    : `每週至少 ${frequencyRange[0]} 次，最多 ${frequencyRange[1]} 次`}
+                </div>
+                <div className="text-xs font-medium text-primary">
+                  {frequencyRange[1] - frequencyRange[0] === 0 
+                    ? "無彈性，但規律穩定" 
+                    : frequencyRange[1] - frequencyRange[0] === 1 
+                    ? "小幅彈性，易於調整"
+                    : frequencyRange[1] - frequencyRange[0] === 2 
+                    ? "中等彈性，易於調整"
+                    : "高度彈性，最大自由度"}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Daily Goal */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              每日實踐目標 <span className="text-red-500">*</span>
-            </label>
-            <div className="flex space-x-4 mb-3">
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="timeGoal"
-                  name="goalType"
-                  checked={dailyGoalType === 'time'}
-                  onChange={() => setDailyGoalType('time')}
-                  className="mr-2"
-                  style={{ accentColor: colors.primary }}
-                />
-                <label htmlFor="timeGoal">按時間</label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="pagesGoal"
-                  name="goalType"
-                  checked={dailyGoalType === 'pages'}
-                  onChange={() => setDailyGoalType('pages')}
-                  className="mr-2"
-                  style={{ accentColor: colors.primary }}
-                />
-                <label htmlFor="pagesGoal">按完成量</label>
-              </div>
-            </div>
-
-            {dailyGoalType === 'time' ? (
-              <div className="flex items-center p-3 rounded-md" style={{ backgroundColor: `${colors.primary}10` }}>
-                <span>每天完成</span>
-                <select
-                  className="mx-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50"
-                  style={{ borderColor: colors.primary }}
-                  value={dailyGoalTime}
-                  onChange={(e) => setDailyGoalTime(parseInt(e.target.value, 10))}
-                >
-                  <option value="15">15 分鐘</option>
-                  <option value="30">30 分鐘</option>
-                  <option value="45">45 分鐘</option>
-                  <option value="60">1 小時</option>
-                  <option value="90">1.5 小時</option>
-                  <option value="120">2 小時</option>
-                </select>
-                <span>的學習</span>
-              </div>
-            ) : (
-              <div className="flex items-center p-3 rounded-md" style={{ backgroundColor: `${colors.primary}10` }}>
-                <span>每天完成</span>
-                <input
-                  type="number"
-                  min="1"
-                  className="mx-2 p-2 w-16 border rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50"
-                  style={{ borderColor: colors.primary }}
-                  value={dailyGoalPages}
-                  onChange={(e) => setDailyGoalPages(parseInt(e.target.value, 10))}
-                />
-                <input
-                  type="text"
-                  className="p-2 w-24 border rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50"
-                  style={{ borderColor: colors.primary }}
-                  placeholder="自訂單位"
-                  value={customUnit}
-                  onChange={(e) => setCustomUnit(e.target.value)}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Reminder Settings */}
-          <div className="border-t pt-4 mt-4">
-            <h3 className="text-md font-medium text-gray-700 mb-3">提醒設定</h3>
-
-            {/* Frequency Selection */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                提醒頻率
-              </label>
-              <select
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50"
-                style={{ borderColor: colors.primary }}
-                defaultValue="daily"
+            <Label className="block text-sm font-medium text-foreground mb-4">
+              每日實踐目標 <span className="text-destructive">*</span>
+            </Label>
+            
+            <div className="space-y-4">
+              {/* Goal Type Selection */}
+              <RadioGroup 
+                value={dailyGoalType} 
+                onValueChange={setDailyGoalType}
+                className="flex items-center space-x-6"
               >
-                <option value="daily">每日提醒</option>
-                <option value="weekdays">週一至週五</option>
-                <option value="weekends">週末</option>
-                <option value="custom">自訂天數</option>
-              </select>
-            </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="time" id="time" />
+                  <Label htmlFor="time" className="text-sm font-medium text-foreground">按時間</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="completion" id="completion" />
+                  <Label htmlFor="completion" className="text-sm font-medium text-foreground">按完成量</Label>
+                </div>
+              </RadioGroup>
 
-            {/* Time Selection */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                提醒時間
-              </label>
-              <select
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50"
-                style={{ borderColor: colors.primary }}
-                defaultValue="evening"
-              >
-                <option value="morning">早上 8:00</option>
-                <option value="noon">中午 12:00</option>
-                <option value="evening">晚上 8:00</option>
-                <option value="custom">自訂時間</option>
-              </select>
-            </div>
+              {/* Time-based option */}
+              {dailyGoalType === 'time' && (
+                <div className="mt-6">
+                  <div className="flex items-center text-lg text-foreground mb-4">
+                    <span>每次進行</span>
+                    <Select value={dailyGoalTime.toString()} onValueChange={(value) => setDailyGoalTime(parseInt(value))}>
+                      <SelectTrigger className="mx-3 w-32 border-2 border-border focus:ring-2 focus:ring-primary focus:border-primary">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="15">15 分鐘</SelectItem>
+                        <SelectItem value="30">30 分鐘</SelectItem>
+                        <SelectItem value="45">45 分鐘</SelectItem>
+                        <SelectItem value="60">60 分鐘</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
 
-            {/* Reminder Message */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                提醒訊息
-              </label>
-              <textarea
-                className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50"
-                style={{ borderColor: colors.primary }}
-                rows={2}
-                placeholder="例如：該來學習了！堅持就是勝利！"
-                defaultValue="該來學習了！今天也要加油！💪"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                自訂提醒訊息可以增加個人動力，研究顯示正面的自我鼓勵能有效提高學習堅持度
-              </p>
+              {/* Completion-based option */}
+              {dailyGoalType === 'completion' && (
+                <div className="mt-6">
+                  <div className="flex items-center text-lg text-foreground mb-4">
+                    <span>每次完成</span>
+                    <Input
+                      type="number"
+                      value={dailyGoalPages}
+                      onChange={(e) => setDailyGoalPages(parseInt(e.target.value) || 0)}
+                      className="mx-3 w-20 px-3 py-2 border-2 border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-center"
+                      min="1"
+                      max="999"
+                    />
+                    <Input
+                      type="text"
+                      value={customUnit}
+                      onChange={(e) => setCustomUnit(e.target.value)}
+                      placeholder="自訂單位"
+                      className="px-3 py-2 border-2 border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary w-32"
+                      maxLength={10}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="p-4 pt-0 flex justify-end">
-        <button
-          type="button"
-          className="px-4 py-2 border text-gray-700 rounded-md hover:bg-gray-50 mr-3"
+      {/* Navigation Buttons */}
+      <div className="p-6 pt-0 flex justify-between">
+        <Button 
+          variant="outline" 
           onClick={handlePreviousStep}
         >
-          返回
-        </button>
-        <button
-          type="button"
-          className="px-4 py-2 text-white rounded-md hover:opacity-90"
-          style={{ backgroundColor: colors.primary }}
+          上一步
+        </Button>
+        <Button 
           onClick={handleNextStep}
+          disabled={!startDate || !practiceDays || !practiceGoal.trim() || !frequencyRange || !dailyGoalType || 
+            (dailyGoalType === 'time' && !dailyGoalTime) || 
+            (dailyGoalType === 'completion' && (!dailyGoalPages || !customUnit))}
         >
           下一步
-        </button>
+        </Button>
       </div>
+
+      {/* Custom Slider Styles */}
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #16B9B3;
+          cursor: pointer;
+          border: 2px solid #ffffff;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider::-moz-range-thumb {
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #16B9B3;
+          cursor: pointer;
+          border: 2px solid #ffffff;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+      `}</style>
     </div>
   );
 };
