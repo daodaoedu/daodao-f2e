@@ -29,53 +29,60 @@ runs:
 
   steps:
     - name: Send Discord Notification
-      shell: bash
+      uses: actions/github-script@v7
       env:
-        TITLE: ${{ toJson(inputs.TITLE) }}
-        DESCRIPTION: ${{ toJson(inputs.DESCRIPTION) }}
-      run: |
-        if [ "${{ inputs.TYPE }}" == "success" ]; then
-          COLOR=5763207
-        elif [ "${{ inputs.TYPE }}" == "failure" ]; then
-          COLOR=15548997
-        elif [ "${{ inputs.TYPE }}" == "info" ]; then
-          COLOR=1752301
-        else
-          COLOR=9868950
-        fi
+        TITLE: ${{ inputs.TITLE }}
+        DESCRIPTION: ${{ inputs.DESCRIPTION }}
+        TYPE: ${{ inputs.TYPE }}
+        AUTHOR_NAME: ${{ inputs.AUTHOR_NAME }}
+        AUTHOR_URL: ${{ inputs.AUTHOR_URL }}
+        AUTHOR_ICON_URL: ${{ inputs.AUTHOR_ICON_URL }}
+        DISCORD_WEBHOOK_URL: ${{ inputs.DISCORD_WEBHOOK_URL }}
+      with:
+        script: |
+          const { tsImport } = await import(
+            '${{ github.workspace }}/node_modules/tsx/dist/esm/api/index.cjs'
+          );
 
-        PAYLOAD=$(cat <<EOF
-        {
-          "avatar_url": "https://raw.githubusercontent.com/daodaoedu/daodao-f2e/main/public/daodao-logo.webp",
-          "username": "島島阿學",
-          "embeds": [
-            {
-              "author": {
-                "name": "${{ inputs.AUTHOR_NAME }}",
-                "url": "${{ inputs.AUTHOR_URL }}",
-                "icon_url": "${{ inputs.AUTHOR_ICON_URL }}"
-              },
-              "title": ${{ env.TITLE }},
-              "description": ${{ env.DESCRIPTION }},
-              "color": $COLOR
+          const moduleResult = await tsImport(
+            './utils/createDiscordNotificationRequest.ts',
+            '${{ github.workspace }}/'
+          );
+
+          const discordNotificationRequest = moduleResult.default.default({
+            title: process.env.TITLE,
+            description: process.env.DESCRIPTION,
+            authorName: process.env.AUTHOR_NAME,
+            authorUrl: process.env.AUTHOR_URL,
+            authorIconUrl: process.env.AUTHOR_ICON_URL,
+            type: process.env.TYPE
+          });
+
+          const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+          
+          if (!webhookUrl || webhookUrl.trim() === '') {
+            console.error('Discord webhook URL is missing or empty');
+            return;
+          }
+
+          try {
+            new URL(webhookUrl);
+          } catch (urlError) {
+            console.error('Invalid Discord webhook URL:', urlError.message);
+            return;
+          }
+
+          try {
+            const response = await fetch(
+              webhookUrl,
+              discordNotificationRequest
+            );
+
+            if (!response.ok) {
+              console.error(`Failed to send Discord notification: ${response.statusText}`);
+              return;
             }
-          ]
-        }
-        EOF
-        )
-
-        response=$(curl -s -w "\n%{http_code}" \
-          "${{ inputs.DISCORD_WEBHOOK_URL }}" \
-          -H "Content-Type: application/json" \
-          -X POST \
-          -d "$PAYLOAD")
-
-        status_code=$(echo "$response" | tail -n1)
-        response_body=$(echo "$response" | sed '$d')
-
-        if [ "$status_code" -ge 400 ]; then
-          echo "Error sending Discord notification"
-          echo "Status code: $status_code"
-          echo "Response: $response_body"
-          exit 1
-        fi
+          } catch (error) {
+            console.error(error);
+            throw error;
+          }
