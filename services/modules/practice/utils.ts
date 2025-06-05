@@ -2,9 +2,9 @@ import { v4 as uuid } from 'uuid';
 import { format, parseISO, startOfDay, differenceInDays, isAfter, isBefore, isSameDay, subDays } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
 import { z } from 'zod';
-import { Practice, ContentType, PracticeStatus, CheckInRecord, ResourceType, MotivationType, ReminderFrequency } from './schema';
+import { Practice, ContentType, PracticeStatus, CheckInRecord } from './schema';
 
-// 驗證 schema (用於向後相容)
+// 驗證 schema
 const startDateValidationSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '請輸入有效的日期格式 YYYY-MM-DD');
 const smallGoalValidationSchema = z.string().min(1, '請輸入目標內容').max(200, '目標內容不可超過 200 字');
 const resourceValidationSchema = z.object({
@@ -24,13 +24,13 @@ export function generateCheckInId(): string {
   return `checkin_${generateId()}`;
 }
 
-// 進度計算
+// ==================== 進度計算 ====================
 export function calculateProgress(current: number, total: number): number {
   if (total === 0) return 0;
   return Math.min(Math.round((current / total) * 100), 100);
 }
 
-// 內容類型工具
+// ==================== 內容類型工具 ====================
 export function getContentTypeLabel(contentType: ContentType): string {
   const labels: Record<ContentType, string> = {
     book: '書籍',
@@ -70,7 +70,7 @@ export function getContentTypeIcon(contentType: ContentType): string {
   return icons[contentType] || '📝';
 }
 
-// 狀態工具
+// ==================== 狀態工具 ====================
 export function getStatusLabel(status: PracticeStatus): string {
   const labels: Record<PracticeStatus, string> = {
     draft: '草稿',
@@ -127,7 +127,7 @@ export function shouldShowInActiveList(practice: Practice): boolean {
   return practice.status === 'active' || practice.status === 'paused';
 }
 
-// 搜尋和篩選工具
+// ==================== 搜尋和篩選工具 ====================
 export function searchPractices(practices: Practice[], searchTerm: string): Practice[] {
   if (!searchTerm.trim()) return practices;
 
@@ -251,40 +251,58 @@ export function estimatedDaysToComplete(
 
 // ==================== 連續天數計算 ====================
 
+// 注意：連續天數計算現在統一由 CheckInService 處理
+// 此函數保留作為向後相容接口，但建議直接使用 CheckInService.calculateStreak()
 export function calculateStreak(
   checkIns: CheckInRecord[],
   practiceId: string,
   currentDate: Date = new Date()
 ): number {
-  const practiceCheckIns = checkIns
-    .filter((c) => c.practiceId === practiceId)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const practiceCheckIns = checkIns.filter((c) => c.practiceId === practiceId);
 
   if (practiceCheckIns.length === 0) return 0;
 
+  // 按日期排序（最新的在前）
+  const sortedCheckIns = [...practiceCheckIns].sort((a, b) =>
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
+  const today = startOfDay(currentDate);
   let streak = 0;
-  let checkDate = startOfDay(currentDate);
+  let expectedDate = today;
 
-  practiceCheckIns.forEach((checkIn) => {
-    const checkinDate = startOfDay(parseISO(checkIn.date));
+  // 檢查是否有今日簽到
+  const todayString = format(today, 'yyyy-MM-dd');
+  const hasCheckedInToday = sortedCheckIns.some((checkIn) => checkIn.date === todayString);
 
-    if (isSameDay(checkinDate, checkDate)) {
+  // 如果今天還沒簽到，從昨天開始算
+  if (!hasCheckedInToday) {
+    expectedDate = subDays(expectedDate, 1);
+  }
+
+  // 使用 while 循環替代 for...of 循環
+  let index = 0;
+  while (index < sortedCheckIns.length) {
+    const checkIn = sortedCheckIns[index];
+    const checkInDate = startOfDay(parseISO(checkIn.date));
+
+    if (isSameDay(checkInDate, expectedDate)) {
       streak += 1;
-      checkDate = subDays(checkDate, 1);
-    } else if (isBefore(checkinDate, checkDate)) {
-      const daysDiff = differenceInDays(checkDate, checkinDate);
+      expectedDate = subDays(expectedDate, 1);
+    } else if (isBefore(checkInDate, expectedDate)) {
+      const daysDiff = differenceInDays(expectedDate, checkInDate);
       if (daysDiff === 1) {
+        // 只相差一天，繼續累積
         streak += 1;
-        checkDate = subDays(checkinDate, 1);
+        expectedDate = subDays(checkInDate, 1);
       } else {
-        // 中斷迴圈 - 使用 return 代替 break
-
+        // 相差超過一天，連續中斷，提早退出
+        break;
       }
-    } else {
-      // 中斷迴圈
-
     }
-  });
+    // 如果簽到日期比預期的晚，繼續檢查下一個記錄
+    index += 1;
+  }
 
   return streak;
 }
@@ -422,6 +440,71 @@ export function practiceToListItem(practice: Practice) {
   };
 }
 
+// 通用的 PathInfo 轉換函數，支持完整的參數
+export function pathInfoToCreatePracticeInput(
+  pathInfo: Record<string, unknown>,
+  smallGoals: Array<{content: string}>,
+  resources: Array<{name: string, url: string}>,
+  tags: string[] = [],
+  dailyGoalConfig: Record<string, unknown> | null = null
+): import('./schema').CreatePracticeInput {
+  const contentTypeMap: Record<string, ContentType> = {
+    book: 'book',
+    video: 'video',
+    articles: 'articles',
+    podcast: 'podcast',
+    course: 'course',
+    custom: 'custom'
+  };
+
+  const reminderFrequencyMap: Record<string, import('./schema').ReminderFrequency> = {
+    daily: 'daily',
+    'every-other-day': 'every-other-day',
+    'twice-weekly': 'twice-weekly',
+    weekly: 'weekly'
+  };
+
+  const motivationTypeMap: Record<string, import('./schema').MotivationType> = {
+    career: 'career',
+    personal: 'personal',
+    project: 'project',
+    required: 'required',
+    other: 'other'
+  };
+
+  return {
+    title: String(pathInfo.title || ''),
+    description: pathInfo.notes ? String(pathInfo.notes) : undefined,
+    contentType: contentTypeMap[String(pathInfo.contentType)] || 'custom',
+    totalAmount: parseInt(String(pathInfo.totalAmount), 10) || 1,
+    targetDate: pathInfo.targetDate ? String(pathInfo.targetDate) : undefined,
+    motivationType: pathInfo.motivationType ? motivationTypeMap[String(pathInfo.motivationType)] : undefined,
+    customMotivation: pathInfo.customMotivation ? String(pathInfo.customMotivation) : undefined,
+    reminderEnabled: Boolean(pathInfo.reminderEnabled),
+    reminderFrequency: reminderFrequencyMap[String(pathInfo.reminderFrequency)] || 'daily',
+    smallGoals: smallGoals.map((goal, index) => ({
+      content: goal.content,
+      isCompleted: false,
+      order: index
+    })),
+    resources: resources.map((resource, index) => ({
+      name: resource.name,
+      url: resource.url,
+      type: 'website' as import('./schema').ResourceType,
+      order: index
+    })),
+    tags,
+    dailyGoal: dailyGoalConfig && typeof dailyGoalConfig === 'object' ? dailyGoalConfig as {
+      type: 'time' | 'completion';
+      timeMinutes?: number;
+      amount?: number;
+      unit?: string;
+    } : undefined
+  };
+}
+
+// 舊版相容函數，保留為向後相容性（但標記為過期）
+// @deprecated 使用 pathInfoToCreatePracticeInput 代替
 export function pathInfoToPractice(pathInfo: Record<string, unknown>, smallGoals: Array<{content: string}>, resources: Array<{name: string, url: string}>): Omit<Practice, 'id' | 'createdAt' | 'updatedAt'> {
   const now = new Date().toISOString();
 
@@ -437,15 +520,15 @@ export function pathInfoToPractice(pathInfo: Record<string, unknown>, smallGoals
     status: 'active' as PracticeStatus,
     motivationType: String(pathInfo.motivationType) ? (
       ['career', 'personal', 'project', 'required', 'other'].includes(String(pathInfo.motivationType))
-        ? String(pathInfo.motivationType) as MotivationType
-        : 'personal' as MotivationType
-    ) : 'personal' as MotivationType,
+        ? String(pathInfo.motivationType) as import('./schema').MotivationType
+        : 'personal' as import('./schema').MotivationType
+    ) : 'personal' as import('./schema').MotivationType,
     customMotivation: pathInfo.customMotivation ? String(pathInfo.customMotivation) : undefined,
     isPublic: Boolean(pathInfo.isPublic),
     reminderEnabled: Boolean(pathInfo.reminderEnabled),
     reminderFrequency: ['daily', 'every-other-day', 'twice-weekly', 'weekly'].includes(String(pathInfo.reminderFrequency))
-      ? String(pathInfo.reminderFrequency) as ReminderFrequency
-      : 'daily' as ReminderFrequency,
+      ? String(pathInfo.reminderFrequency) as import('./schema').ReminderFrequency
+      : 'daily' as import('./schema').ReminderFrequency,
     streak: Number(pathInfo.streak) || 0,
     lastCheckinDate: pathInfo.lastStreakDate ? String(pathInfo.lastStreakDate) : undefined,
     smallGoals: smallGoals.map((goal, index) => ({
@@ -458,7 +541,7 @@ export function pathInfoToPractice(pathInfo: Record<string, unknown>, smallGoals
       id: generateId(),
       name: resource.name,
       url: resource.url || undefined,
-      type: 'website' as ResourceType,
+      type: 'website' as import('./schema').ResourceType,
       order: index
     })),
     checkIns: [],
@@ -488,10 +571,6 @@ export function formatDataForExport(practices: Practice[], checkIns: CheckInReco
 }
 
 // ==================== 向後相容性工具 ====================
-
-// 支持舊版的 MainView 和 DashboardView 類型
-export type MainView = 'setup' | 'dashboard' | 'list';
-export type DashboardView = 'main' | 'checkin' | 'history';
 
 // 向後相容的字串型別
 export type ContentTypeString = 'book' | 'video' | 'articles' | 'podcast' | 'course' | 'custom';
@@ -523,6 +602,10 @@ export interface CheckInEntry {
   note: string;
 }
 
+// 支持舊版的 MainView 和 DashboardView 類型
+export type MainView = 'setup' | 'dashboard' | 'list';
+export type DashboardView = 'main' | 'checkin' | 'history';
+
 // 支持舊版的 ContentTypeOption 和 MotivationOption
 export interface ContentTypeOption {
   id: ContentTypeString;
@@ -533,77 +616,4 @@ export interface ContentTypeOption {
 export interface MotivationOption {
   id: MotivationTypeString;
   label: string;
-}
-
-// ==================== CheckIn 服務工具 ====================
-
-export function hasCheckedInToday(practice: Practice): boolean {
-  const today = format(new Date(), 'yyyy-MM-dd');
-  return practice.checkIns?.some((checkIn) => checkIn.date === today) || false;
-}
-
-export function getTodayCheckIn(practice: Practice): CheckInRecord | undefined {
-  const today = format(new Date(), 'yyyy-MM-dd');
-  return practice.checkIns?.find((checkIn) => checkIn.date === today);
-}
-
-export function checkMilestones(newStreak: number, oldStreak: number): string[] {
-  const milestones = [
-    { days: 3, message: '🔥 建立習慣中！連續3天簽到' },
-    { days: 7, message: '⭐ 一週堅持！你很棒' },
-    { days: 14, message: '💪 兩週不間斷！習慣正在養成' },
-    { days: 21, message: '💎 習慣養成！連續21天的努力' },
-    { days: 30, message: '🏆 一個月達成！你是真正的學習者' },
-    { days: 50, message: '🌟 50天里程碑！持續的力量' },
-    { days: 100, message: '👑 百日成就！你已經成為習慣大師' }
-  ];
-
-  const achievements: string[] = [];
-
-  milestones.forEach((milestone) => {
-    if (newStreak >= milestone.days && oldStreak < milestone.days) {
-      achievements.push(milestone.message);
-    }
-  });
-
-  return achievements;
-}
-
-export function getCheckInSuggestions(practice: Practice): string[] {
-  const suggestions: string[] = [];
-  const checkIns = practice.checkIns || [];
-
-  // 基於歷史資料給建議
-  if (checkIns.length > 0) {
-    const recentCheckIns = checkIns.slice(-7); // 最近7次簽到
-    const averageRecent = recentCheckIns.reduce((sum, c) => sum + c.progress, 0) / recentCheckIns.length;
-    const totalAverage = calculateDailyAverage(checkIns, practice.id);
-
-    if (averageRecent < totalAverage * 0.8) {
-      suggestions.push('💡 最近進度有所放緩，建議調整學習計畫或休息一下');
-    }
-
-    const lastWeekCheckIns = getRecentActivity(checkIns, practice.id, 7).length;
-    if (lastWeekCheckIns < 3) {
-      suggestions.push('⏰ 本週簽到較少，試著設定固定的學習時間');
-    }
-  }
-
-  // 進度建議
-  const progressRatio = practice.currentProgress / practice.totalAmount;
-  if (progressRatio > 0.8) {
-    suggestions.push('🎉 快要完成了！保持最後的衝刺');
-  } else if (progressRatio < 0.2 && checkIns.length > 10) {
-    suggestions.push('🎯 進度較慢，考慮重新評估目標或調整學習方法');
-  }
-
-  // 連續天數建議
-  const currentStreak = practice.streak;
-  if (currentStreak === 0 && checkIns.length > 0) {
-    suggestions.push('🔄 重新開始學習旅程，每一天都是新的開始');
-  } else if (currentStreak >= 7) {
-    suggestions.push('🔥 連續簽到表現優秀！保持這個節奏');
-  }
-
-  return suggestions;
 }

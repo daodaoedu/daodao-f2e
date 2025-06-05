@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { CheckCircle, Edit, X, ArrowLeft, Bookmark, ExternalLink, Plus } from 'lucide-react';
+import { useRouter } from 'next/router';
+import {
+  CheckCircle,
+  Edit,
+  X,
+  ArrowLeft,
+  Bookmark,
+  ExternalLink,
+  Plus
+} from 'lucide-react';
 import { Practice } from '@/services/modules/practice/schema';
 import { CheckInService } from '@/services/modules/practice/checkIn';
 import { Button } from '@/components/atoms/button';
@@ -19,13 +28,17 @@ interface ToastProps {
 }
 
 const Toast: React.FC<ToastProps> = ({ visible, message, onClose }) => {
-  if (!visible) return null;
+  if (!visible || !message) return null;
 
   return (
     <div className="fixed bottom-4 right-4 bg-success text-white px-4 py-2 rounded-lg shadow-lg flex items-center z-50 animate-slide-up">
       <CheckCircle className="h-4 w-4 mr-2" />
       {message}
-      <button onClick={onClose} className="ml-3 text-white hover:text-basic-200" type="button">
+      <button
+        onClick={onClose}
+        className="ml-3 text-white hover:text-basic-200"
+        type="button"
+      >
         <X className="h-4 w-4" />
       </button>
     </div>
@@ -37,10 +50,31 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
   onCheckIn,
   onBack
 }) => {
+  const router = useRouter();
+  const [toastMessage, setToastMessage] = useState<string>('');
   const [showToast, setShowToast] = useState(false);
 
+  // 顯示 Toast 通知
+  const showToastNotification = (message: string) => {
+    setToastMessage(message);
+    setShowToast(true);
+    // 3 秒後自動隱藏
+    setTimeout(() => {
+      setShowToast(false);
+      setToastMessage('');
+    }, 3000);
+  };
+
+  // 關閉 Toast
+  const handleCloseToast = () => {
+    setShowToast(false);
+    setToastMessage('');
+  };
+
   // 計算進度百分比
-  const progressPercentage = Math.round((practice.currentProgress / practice.totalAmount) * 100);
+  const progressPercentage = Math.round(
+    (practice.currentProgress / practice.totalAmount) * 100
+  );
 
   // 獲取簽到統計
   const stats = CheckInService.getCheckInStats(practice);
@@ -110,6 +144,18 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
     }
   };
 
+  // 導航到編輯頁面
+  const handleEdit = () => {
+    router.push(`/practice/${practice.id}/edit`);
+    showToastNotification('📋 正在跳轉到編輯頁面...');
+  };
+
+  // 導航到編輯頁面的資源管理區域
+  const handleManageResources = () => {
+    router.push(`/practice/${practice.id}/edit#resources`);
+    showToastNotification('📋 正在跳轉到資源管理...');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -130,7 +176,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <div className="flex items-center space-x-3 mb-2">
-                  <h1 className="text-2xl font-bold text-foreground">{practice.title}</h1>
+                  <h1 className="text-2xl font-bold text-foreground">
+                    {practice.title}
+                  </h1>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
                     {practice.status === 'active' ? '進行中' :
                       practice.status === 'completed' ? '已完成' :
@@ -139,7 +187,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 </div>
 
                 {practice.description && (
-                  <p className="text-base text-muted-foreground mb-3">{practice.description}</p>
+                  <p className="text-base text-muted-foreground mb-3">
+                    {practice.description}
+                  </p>
                 )}
 
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
@@ -150,13 +200,13 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                       year: 'numeric',
                       month: 'numeric',
                       day: 'numeric'
-                    }).replace(/\//g, '/')}
+                    })}
                     {practice.targetDate && (
-                      `-${new Date(practice.targetDate).toLocaleDateString('zh-TW', {
+                      ` - ${new Date(practice.targetDate).toLocaleDateString('zh-TW', {
                         year: 'numeric',
                         month: 'numeric',
                         day: 'numeric'
-                      }).replace(/\//g, '/')}`
+                      })}`
                     )}
                   </span>
                 </div>
@@ -175,7 +225,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
+                onClick={handleEdit}
                 className="p-2 text-muted-foreground hover:text-foreground rounded-lg"
+                title="編輯實踐"
               >
                 <Edit className="h-5 w-5" />
               </Button>
@@ -200,7 +252,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
             {/* 統計數據 */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 bg-primary/5 rounded-lg">
-                <div className="text-xl font-bold text-primary">{practice.currentProgress} / {practice.totalAmount} {practice.unit}</div>
+                <div className="text-xl font-bold text-primary">
+                  {practice.currentProgress} / {practice.totalAmount} {practice.unit}
+                </div>
                 <div className="text-sm text-muted-foreground">已完成</div>
               </div>
 
@@ -212,7 +266,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
               </div>
 
               <div className="text-center p-4 bg-green-50 rounded-lg">
-                <div className="text-xl font-bold text-green-600">{stats.totalCheckIns}</div>
+                <div className="text-xl font-bold text-green-600">
+                  {stats.totalCheckIns}
+                </div>
                 <div className="text-sm text-muted-foreground">打卡次數</div>
               </div>
 
@@ -242,7 +298,8 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                     style={{
                       width: `${practice.smallGoals.length > 0
                         ? (practice.smallGoals.filter((g) => g.isCompleted).length / practice.smallGoals.length) * 100
-                        : 0}%`
+                        : 0
+                      }%`
                     }}
                   />
                 </div>
@@ -258,7 +315,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 <h3 className="text-lg font-semibold text-foreground mb-3">打卡</h3>
                 {canCheckIn ? (
                   <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground">準備好記錄今天的學習進度了嗎？</p>
+                    <p className="text-sm text-muted-foreground">
+                      準備好記錄今天的學習進度了嗎？
+                    </p>
                     <Button
                       onClick={onCheckIn}
                       className="flex items-center justify-center space-x-2"
@@ -307,7 +366,10 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 {practice.checkIns.length > 0 ? (
                   <div className="max-h-80 overflow-y-auto space-y-2">
                     {practice.checkIns.map((checkIn, index) => (
-                      <div key={checkIn.id || index} className="flex items-center space-x-3 py-3 border-b border-border last:border-b-0">
+                      <div
+                        key={checkIn.id || index}
+                        className="flex items-center space-x-3 py-3 border-b border-border last:border-b-0"
+                      >
                         <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
                         <div className="flex-1">
                           <p className="text-sm text-foreground">
@@ -336,7 +398,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 ) : (
                   <div className="text-center py-8">
                     <p className="text-sm text-muted-foreground">還沒有打卡記錄</p>
-                    <p className="text-xs text-muted-foreground mt-1">開始你的第一次打卡吧！</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      開始你的第一次打卡吧！
+                    </p>
                   </div>
                 )}
               </div>
@@ -350,7 +414,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 <h3 className="heading-md text-basic-black">學習資源</h3>
                 <Button
                   variant="link"
+                  onClick={handleManageResources}
                   className="text-sm text-primary hover:text-primary/80"
+                  title="編輯和管理學習資源"
                 >
                   管理資源
                 </Button>
@@ -400,7 +466,10 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
             <h3 className="text-lg font-semibold text-foreground mb-4">📈 學習建議</h3>
             <div className="space-y-2">
               {CheckInService.getCheckInSuggestions(practice).map((suggestion) => (
-                <div key={suggestion} className="text-sm text-foreground p-3 bg-accent/50 rounded-lg">
+                <div
+                  key={suggestion}
+                  className="text-sm text-foreground p-3 bg-accent/50 rounded-lg"
+                >
                   {suggestion}
                 </div>
               ))}
@@ -410,11 +479,13 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
       </div>
 
       {/* Toast 通知 */}
-      <Toast
-        visible={showToast}
-        message=""
-        onClose={() => setShowToast(false)}
-      />
+      {toastMessage && (
+        <Toast
+          visible={showToast}
+          message={toastMessage}
+          onClose={handleCloseToast}
+        />
+      )}
     </div>
   );
 };

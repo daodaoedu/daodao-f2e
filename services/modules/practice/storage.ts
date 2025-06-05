@@ -1,6 +1,5 @@
 import {
   Practice,
-  CheckInRecord,
   PracticeFilter,
   PracticeStats
 } from './schema';
@@ -8,7 +7,6 @@ import {
 // 本地儲存鍵
 const STORAGE_KEYS = {
   PRACTICES: 'practices',
-  CHECK_INS: 'check_ins',
   SETTINGS: 'practice_settings'
 } as const;
 
@@ -105,72 +103,6 @@ export class PracticeStorage {
     return true;
   }
 
-  // ==================== 簽到記錄管理 ====================
-
-  static async getAllCheckIns(): Promise<CheckInRecord[]> {
-    try {
-      if (typeof window === 'undefined') {
-        return [];
-      }
-
-      const stored = localStorage.getItem(STORAGE_KEYS.CHECK_INS);
-      return stored ? JSON.parse(stored) : [];
-    } catch (error) {
-      console.error('Error loading check-ins:', error);
-      return [];
-    }
-  }
-
-  static async saveCheckIns(checkIns: CheckInRecord[]): Promise<void> {
-    try {
-      if (typeof window === 'undefined') {
-        return;
-      }
-
-      localStorage.setItem(STORAGE_KEYS.CHECK_INS, JSON.stringify(checkIns));
-    } catch (error) {
-      console.error('Error saving check-ins:', error);
-      throw new Error('儲存簽到記錄失敗');
-    }
-  }
-
-  static async getCheckInsByPracticeId(practiceId: string): Promise<CheckInRecord[]> {
-    const checkIns = await this.getAllCheckIns();
-    return checkIns.filter((checkIn) => checkIn.practiceId === practiceId);
-  }
-
-  static async addCheckIn(checkIn: CheckInRecord): Promise<CheckInRecord> {
-    const checkIns = await this.getAllCheckIns();
-    checkIns.push(checkIn);
-    await this.saveCheckIns(checkIns);
-    return checkIn;
-  }
-
-  static async updateCheckIn(id: string, updates: Partial<CheckInRecord>): Promise<CheckInRecord | null> {
-    const checkIns = await this.getAllCheckIns();
-    const index = checkIns.findIndex((c) => c.id === id);
-
-    if (index === -1) {
-      return null;
-    }
-
-    checkIns[index] = { ...checkIns[index], ...updates };
-    await this.saveCheckIns(checkIns);
-    return checkIns[index];
-  }
-
-  static async deleteCheckIn(id: string): Promise<boolean> {
-    const checkIns = await this.getAllCheckIns();
-    const filteredCheckIns = checkIns.filter((c) => c.id !== id);
-
-    if (filteredCheckIns.length === checkIns.length) {
-      return false;
-    }
-
-    await this.saveCheckIns(filteredCheckIns);
-    return true;
-  }
-
   // ==================== 篩選和查詢 ====================
 
   static async filterPractices(filter: PracticeFilter): Promise<Practice[]> {
@@ -257,7 +189,6 @@ export class PracticeStorage {
 
   static async getPracticeStats(): Promise<PracticeStats> {
     const practices = await this.getAllPractices();
-    const checkIns = await this.getAllCheckIns();
 
     const stats: PracticeStats = {
       total: practices.length,
@@ -265,7 +196,7 @@ export class PracticeStorage {
       completed: practices.filter((p) => p.status === 'completed').length,
       paused: practices.filter((p) => p.status === 'paused').length,
       archived: practices.filter((p) => p.status === 'archived').length,
-      totalCheckIns: checkIns.length,
+      totalCheckIns: practices.reduce((sum, p) => sum + (p.checkIns?.length || 0), 0),
       longestStreak: practices.reduce((max, p) => Math.max(max, p.streak), 0),
       averageProgress: practices.length > 0
         ? practices.reduce((sum, p) => sum + ((p.currentProgress / p.totalAmount) * 100), 0) / practices.length
@@ -281,7 +212,6 @@ export class PracticeStorage {
     }
 
     localStorage.removeItem(STORAGE_KEYS.PRACTICES);
-    localStorage.removeItem(STORAGE_KEYS.CHECK_INS);
     localStorage.removeItem(STORAGE_KEYS.SETTINGS);
   }
 

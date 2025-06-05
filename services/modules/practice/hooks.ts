@@ -1,85 +1,93 @@
-import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
-import { useCallback, useMemo } from 'react';
-import { Practice, PracticeFilter, PracticeStats, CreatePracticeInput, UpdatePracticeInput, CheckInInput } from './schema';
+import useSWR, { mutate } from 'swr';
+import { PracticeStorage } from './storage';
+import { CheckInService } from './checkIn';
 import practiceAPI, { getPracticePathname } from './api';
-import { searchPractices, sortPractices, calculateProgress } from './utils';
+import type {
+  Practice,
+  PracticeFilter,
+  PracticeStats,
+  CreatePracticeInput,
+  UpdatePracticeInput,
+  CheckInInput,
+  CheckInRecord
+} from './schema';
 
-// SWR Fetcher
-const fetcher = async (): Promise<Practice[]> => {
-  const { PracticeStorage } = await import('./storage');
-  return PracticeStorage.load();
-};
+// ==================== 主要的 Practice Hooks ====================
 
-// 主要的 Practice Hook
+// 獲取所有實踐的 Hook
 export function usePractices() {
-  const { data: practices = [], error, isLoading, mutate } = useSWR(
+  const { data: practices = [], error, isLoading } = useSWR(
     getPracticePathname(),
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false
-    }
+    () => PracticeStorage.getAllPractices()
   );
 
-  const createMutation = useSWRMutation(getPracticePathname(), practiceAPI.create);
-  const updateMutation = useSWRMutation(getPracticePathname(), practiceAPI.update);
-  const deleteMutation = useSWRMutation(getPracticePathname(), practiceAPI.delete);
-  const checkInMutation = useSWRMutation(getPracticePathname(), practiceAPI.checkIn);
-  const exportMutation = useSWRMutation(getPracticePathname(), practiceAPI.exportData);
-  const importMutation = useSWRMutation(getPracticePathname(), practiceAPI.importData);
+  const { data: stats } = useSWR(
+    'practice-stats',
+    () => PracticeStorage.getPracticeStats()
+  );
 
-  const createPractice = useCallback(async (input: CreatePracticeInput) => {
-    const practice = await createMutation.trigger(input);
-    await mutate();
-    return practice;
-  }, [createMutation, mutate]);
+  // 建立實踐
+  const createPractice = async (input: CreatePracticeInput) => {
+    const result = await practiceAPI.create(getPracticePathname(), { arg: input });
+    mutate(getPracticePathname());
+    mutate('practice-stats');
+    return result;
+  };
 
-  const updatePractice = useCallback(async (id: string, updates: UpdatePracticeInput) => {
-    const practice = await updateMutation.trigger({ id, ...updates });
-    await mutate();
-    return practice;
-  }, [updateMutation, mutate]);
+  // 更新實踐
+  const updatePractice = async (id: string, updates: UpdatePracticeInput) => {
+    const result = await practiceAPI.update(getPracticePathname(), { arg: { id, ...updates } });
+    mutate(getPracticePathname());
+    mutate('practice-stats');
+    return result;
+  };
 
-  const deletePractice = useCallback(async (id: string) => {
-    await deleteMutation.trigger({ id });
-    await mutate();
-  }, [deleteMutation, mutate]);
+  // 刪除實踐
+  const deletePractice = async (id: string) => {
+    await practiceAPI.delete(getPracticePathname(), { arg: { id } });
+    mutate(getPracticePathname());
+    mutate('practice-stats');
+  };
 
-  const checkIn = useCallback(async (input: CheckInInput) => {
-    const checkInRecord = await checkInMutation.trigger(input);
-    await mutate();
-    return checkInRecord;
-  }, [checkInMutation, mutate]);
+  // 簽到
+  const checkIn = async (input: CheckInInput) => {
+    const result = await practiceAPI.checkIn(getPracticePathname(), { arg: input });
+    mutate(getPracticePathname());
+    mutate('practice-stats');
+    return result;
+  };
 
-  const exportData = useCallback(async () => {
-    return exportMutation.trigger();
-  }, [exportMutation]);
+  // 匯出資料
+  const exportData = async () => {
+    return practiceAPI.exportData('export-practices', { arg: undefined });
+  };
 
-  const importData = useCallback(async (data: string) => {
-    await importMutation.trigger({ data });
-    await mutate();
-  }, [importMutation, mutate]);
+  // 匯入資料
+  const importData = async (data: string) => {
+    const result = await practiceAPI.importData(getPracticePathname(), { arg: { data } });
+    mutate(getPracticePathname());
+    mutate('practice-stats');
+    return result;
+  };
 
-  // 計算統計資料
-  const stats: PracticeStats = useMemo(() => {
-    return {
-      total: practices.length,
-      active: practices.filter((p) => p.status === 'active').length,
-      completed: practices.filter((p) => p.status === 'completed').length,
-      paused: practices.filter((p) => p.status === 'paused').length,
-      archived: practices.filter((p) => p.status === 'archived').length,
-      totalCheckIns: practices.reduce((sum, p) => sum + (p.checkIns?.length || 0), 0),
-      longestStreak: Math.max(0, ...practices.map((p) => p.streak)),
-      averageProgress: practices.length > 0
-        ? Math.round(practices.reduce((sum, p) => sum + calculateProgress(p.currentProgress, p.totalAmount), 0) / practices.length)
-        : 0
-    };
-  }, [practices]);
+  // 重新載入實踐
+  const refreshPractices = () => {
+    mutate(getPracticePathname());
+    mutate('practice-stats');
+  };
 
   return {
     practices,
-    stats,
+    stats: stats || {
+      total: 0,
+      active: 0,
+      completed: 0,
+      paused: 0,
+      archived: 0,
+      totalCheckIns: 0,
+      longestStreak: 0,
+      averageProgress: 0
+    },
     loading: isLoading,
     error: error?.message,
     createPractice,
@@ -88,98 +96,201 @@ export function usePractices() {
     checkIn,
     exportData,
     importData,
-    refreshPractices: mutate
+    refreshPractices
   };
 }
 
-// 篩選的 Practice Hook
-export function useFilteredPractices(filter: PracticeFilter) {
-  const { practices } = usePractices();
+// ==================== 單個實踐的 Hook ====================
 
-  return useMemo(() => {
-    let filtered = [...practices];
-
-    // 搜尋過濾
-    if (filter.searchTerm) {
-      filtered = searchPractices(filtered, filter.searchTerm);
-    }
-
-    // 狀態過濾
-    if (filter.status && filter.status.length > 0) {
-      filtered = filtered.filter((practice) => filter.status!.includes(practice.status));
-    }
-
-    // 內容類型過濾
-    if (filter.contentType && filter.contentType.length > 0) {
-      filtered = filtered.filter((practice) => filter.contentType!.includes(practice.contentType));
-    }
-
-    // 動機類型過濾
-    if (filter.motivationType && filter.motivationType.length > 0) {
-      filtered = filtered.filter((practice) =>
-        practice.motivationType && filter.motivationType!.includes(practice.motivationType)
-      );
-    }
-
-    // 排序
-    if (filter.sortBy) {
-      filtered = sortPractices(filtered, filter.sortBy, filter.sortOrder);
-    }
-
-    return filtered;
-  }, [practices, filter]);
-}
-
-// 單個 Practice Hook
 export function usePractice(id: string | undefined) {
-  const { practices, updatePractice, deletePractice, checkIn } = usePractices();
+  const { data: practice, error, isLoading } = useSWR(
+    id ? getPracticePathname({ id }) : null,
+    () => {
+      if (!id) return null;
+      return PracticeStorage.getPracticeById(id);
+    }
+  );
 
-  const practice = useMemo(() => {
-    return id ? practices.find((p) => p.id === id) : undefined;
-  }, [practices, id]);
-
-  const stats = useMemo(() => {
-    if (!practice) return null;
-
-    const checkIns = practice.checkIns || [];
-
-    return {
-      practice,
-      checkIns,
-      totalCheckIns: checkIns.length,
-      completionRate: calculateProgress(practice.currentProgress, practice.totalAmount),
-      streak: practice.streak,
-      isCompleted: practice.currentProgress >= practice.totalAmount,
-      canCheckInToday: !checkIns.some((c) => {
-        const today = new Date().toISOString().split('T')[0];
-        return c.date === today;
-      })
-    };
-  }, [practice]);
+  const stats = practice ? {
+    canCheckInToday: !CheckInService.hasCheckedInToday(practice),
+    todayCheckIn: CheckInService.getTodayCheckIn(practice),
+    checkInStats: CheckInService.getCheckInStats(practice),
+    suggestions: CheckInService.getCheckInSuggestions(practice)
+  } : undefined;
 
   return {
     practice,
     stats,
-    updatePractice,
-    deletePractice,
-    checkIn
+    loading: isLoading,
+    error: error?.message
   };
 }
 
-// 活躍的 Practice Hook
-export function useActivePractices() {
-  const { practices } = usePractices();
+// ==================== 篩選實踐的 Hook ====================
 
-  return useMemo(() => {
-    return practices.filter((p) => p.status === 'active');
-  }, [practices]);
+export function useFilteredPractices(filter: PracticeFilter) {
+  const { data: filteredPractices = [], error, isLoading } = useSWR(
+    ['filtered-practices', filter],
+    () => PracticeStorage.filterPractices(filter)
+  );
+
+  return {
+    practices: filteredPractices,
+    loading: isLoading,
+    error: error?.message
+  };
 }
 
-// Check-in 歷史 Hook
+// ==================== 活躍實踐的 Hook ====================
+
+export function useActivePractices() {
+  const activeFilter: PracticeFilter = {
+    status: ['active'],
+    sortBy: 'updatedAt',
+    sortOrder: 'desc'
+  };
+
+  const { data: activePractices = [], error, isLoading } = useSWR(
+    'active-practices',
+    () => PracticeStorage.filterPractices(activeFilter)
+  );
+
+  return {
+    practices: activePractices,
+    loading: isLoading,
+    error: error?.message
+  };
+}
+
+// ==================== 簽到歷史的 Hook ====================
+
 export function useCheckInHistory(practiceId: string | undefined) {
+  const { data: practice } = useSWR(
+    practiceId ? getPracticePathname({ id: practiceId }) : null,
+    () => {
+      if (!practiceId) return null;
+      return PracticeStorage.getPracticeById(practiceId);
+    }
+  );
+
+  const checkInHistory = practice ? CheckInService.formatCheckInHistory(practice) : [];
+
+  return {
+    checkIns: checkInHistory,
+    practice
+  };
+}
+
+// ==================== 統計資料的 Hook ====================
+
+export function usePracticeStats() {
+  const { data: stats, error, isLoading } = useSWR(
+    'practice-stats',
+    () => PracticeStorage.getPracticeStats()
+  );
+
+  return {
+    stats: stats || {
+      total: 0,
+      active: 0,
+      completed: 0,
+      paused: 0,
+      archived: 0,
+      totalCheckIns: 0,
+      longestStreak: 0,
+      averageProgress: 0
+    },
+    loading: isLoading,
+    error: error?.message
+  };
+}
+
+// ==================== 進度計算的 Hook ====================
+
+export function usePracticeProgress(practiceId: string | undefined) {
   const { practice } = usePractice(practiceId);
 
-  return useMemo(() => {
-    return practice?.checkIns || [];
-  }, [practice]);
+  if (!practice) {
+    return {
+      current: 0,
+      total: 0,
+      percentage: 0,
+      isCompleted: false,
+      remaining: 0
+    };
+  }
+
+  const percentage = practice.totalAmount > 0
+    ? Math.min(Math.round((practice.currentProgress / practice.totalAmount) * 100), 100)
+    : 0;
+
+  return {
+    current: practice.currentProgress,
+    total: practice.totalAmount,
+    percentage,
+    isCompleted: practice.currentProgress >= practice.totalAmount,
+    remaining: Math.max(practice.totalAmount - practice.currentProgress, 0)
+  };
 }
+
+// ==================== 簽到檢查的 Hook ====================
+
+export function useCanCheckInToday(practiceId: string | undefined) {
+  const { stats } = usePractice(practiceId);
+  return stats?.canCheckInToday ?? false;
+}
+
+// ==================== 連續天數的 Hook ====================
+
+export function usePracticeStreak(practiceId: string | undefined) {
+  const { practice } = usePractice(practiceId);
+  return practice?.streak ?? 0;
+}
+
+// ==================== 更新單個實踐的便利 Hook ====================
+
+export function usePracticeUpdater(practiceId: string | undefined) {
+  const updatePractice = async (updates: UpdatePracticeInput) => {
+    if (!practiceId) return undefined;
+    const result = await practiceAPI.update(getPracticePathname(), { arg: { id: practiceId, ...updates } });
+    mutate(getPracticePathname({ id: practiceId }));
+    mutate(getPracticePathname());
+    mutate('practice-stats');
+    return result;
+  };
+
+  const deletePractice = async () => {
+    if (!practiceId) return undefined;
+    await practiceAPI.delete(getPracticePathname(), { arg: { id: practiceId } });
+    mutate(getPracticePathname());
+    mutate('practice-stats');
+    return undefined;
+  };
+
+  const checkIn = async (input: CheckInInput) => {
+    if (!practiceId) return undefined;
+    const result = await practiceAPI.checkIn(getPracticePathname(), { arg: input });
+    mutate(getPracticePathname({ id: practiceId }));
+    mutate(getPracticePathname());
+    mutate('practice-stats');
+    return result;
+  };
+
+  return {
+    updatePractice: practiceId ? updatePractice : undefined,
+    deletePractice: practiceId ? deletePractice : undefined,
+    checkIn: practiceId ? checkIn : undefined
+  };
+}
+
+// ==================== 型別匯出 ====================
+
+export type {
+  Practice,
+  PracticeFilter,
+  PracticeStats,
+  CreatePracticeInput,
+  UpdatePracticeInput,
+  CheckInInput,
+  CheckInRecord
+};

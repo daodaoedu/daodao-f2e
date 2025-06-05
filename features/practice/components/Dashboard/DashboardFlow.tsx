@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import { Practice } from '@/services/modules/practice/schema';
 import { DashboardView } from '@/services/modules/practice';
-import MainDashboard from './MainDashboard';
-import CheckInView from './CheckInView';
-import HistoryView from './HistoryView';
-import Confetti from '../Shared/Confetti';
-import CelebrationMessage from '../Shared/CelebrationMessage';
+import MainDashboard from '@/features/practice/components/Dashboard/MainDashboard';
+import CheckInView from '@/features/practice/components/Dashboard/CheckInView';
+import HistoryView from '@/features/practice/components/Dashboard/HistoryView';
+import Confetti from '@/features/practice/components/Shared/Confetti';
+import CelebrationMessage from '@/features/practice/components/Shared/CelebrationMessage';
 
 interface DashboardFlowProps {
   practice: Practice;

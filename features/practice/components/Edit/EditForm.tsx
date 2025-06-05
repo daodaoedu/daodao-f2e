@@ -283,7 +283,7 @@ const EditForm: React.FC<EditFormProps> = ({
       </div>
 
       {/* 學習資源 */}
-      <div className="space-y-6">
+      <div id="resources" className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <LinkIcon className="h-5 w-5 text-primary-base" />

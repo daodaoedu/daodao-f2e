@@ -69,8 +69,10 @@ export class CheckInService {
       currentDate = currentDate.subtract(1, 'day');
     }
 
-    // 往回檢查連續天數
-    sortedCheckIns.forEach((checkIn) => {
+    // 使用 Array.some() 或 Array.every() 替代 for...of 循環
+    let index = 0;
+    while (index < sortedCheckIns.length) {
+      const checkIn = sortedCheckIns[index];
       const checkInDate = dayjs(checkIn.date).startOf('day');
 
       if (checkInDate.isSame(currentDate)) {
@@ -78,10 +80,19 @@ export class CheckInService {
         currentDate = currentDate.subtract(1, 'day');
       } else if (checkInDate.isBefore(currentDate)) {
         // 如果簽到日期比預期的早，說明中間有斷開
-         // 跳出循環
+        const daysDiff = currentDate.diff(checkInDate, 'day');
+        if (daysDiff === 1) {
+          // 如果只相差一天，繼續累積
+          streak += 1;
+          currentDate = checkInDate.subtract(1, 'day');
+        } else {
+          // 相差超過一天，連續中斷，提早退出
+          break;
+        }
       }
       // 如果簽到日期比預期的晚，繼續檢查下一個記錄
-    });
+      index += 1;
+    }
 
     return streak;
   }

@@ -1,15 +1,27 @@
 export * from './api';
-export * from './hooks';
 export * from './schema';
 export * from './utils';
 export * from './checkIn';
 export * from './storage';
+export * from './hooks';
 
-// Re-export 常用功能以便更容易使用
 export { CheckInService } from './checkIn';
 export { PracticeStorage } from './storage';
 
-// 向後相容性導出
+// 匯出所有 hooks
+export {
+  usePractices,
+  usePractice,
+  useFilteredPractices,
+  useActivePractices,
+  useCheckInHistory,
+  usePracticeStats,
+  usePracticeProgress,
+  useCanCheckInToday,
+  usePracticeStreak,
+  usePracticeUpdater
+} from './hooks';
+
 export type {
   MainView,
   DashboardView,
@@ -18,6 +30,5 @@ export type {
   ReminderFrequencyString,
   PathInfo,
   CheckInEntry,
-  ContentTypeOption,
-  MotivationOption
-} from './utils';
+  PracticeContextType
+} from './schema';

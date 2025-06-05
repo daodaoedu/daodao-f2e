@@ -196,7 +196,7 @@ const PracticeListPage: React.FC = () => {
 
     return (
       <div className={`grid gap-4 sm:gap-6 ${gridClass}`}>
-        {filteredPractices.map((practice) => (
+        {filteredPractices.map((practice: Practice) => (
           <PracticeCard
             key={practice.id}
             practice={practice}

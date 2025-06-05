@@ -1,12 +1,11 @@
 // 編輯實踐頁面
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ArrowLeft } from 'lucide-react';
-import { usePracticeDetail } from '@/features/practice/hooks';
-import { usePractices } from '@/services/modules/practice/hooks';
+import { usePracticeDetail, usePracticeManager } from '@/features/practice/hooks';
 import EditForm from '@/features/practice/components/Edit/EditForm';
-import { MotivationType, ReminderFrequency, UpdatePracticeInput } from '@/services/modules/practice';
+import { MotivationType, ReminderFrequency, UpdatePracticeInput, Practice } from '@/services/modules/practice';
 import { Button } from '@/components/atoms/button';
 
 const EditPracticePage: React.FC = () => {
@@ -15,7 +14,42 @@ const EditPracticePage: React.FC = () => {
 
   // 使用自製 hooks 取代 context
   const { practice, loading, error } = usePracticeDetail(id as string);
-  const { updatePractice } = usePractices();
+  const { updatePractice } = usePracticeManager();
+
+  // 表單狀態管理
+  const [formData, setFormData] = useState<Partial<Practice>>({});
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // 當 practice 載入完成時初始化表單資料
+  useEffect(() => {
+    if (practice) {
+      setFormData({
+        title: practice.title,
+        description: practice.description,
+        totalAmount: practice.totalAmount,
+        targetDate: practice.targetDate,
+        motivationType: practice.motivationType,
+        customMotivation: practice.customMotivation,
+        reminderEnabled: practice.reminderEnabled,
+        reminderFrequency: practice.reminderFrequency,
+        smallGoals: practice.smallGoals || [],
+        resources: practice.resources || []
+      });
+    }
+  }, [practice]);
+
+  // 處理錯點導航
+  useEffect(() => {
+    if (router.asPath.includes('#') && practice) {
+      const hash = router.asPath.split('#')[1];
+      setTimeout(() => {
+        const element = document.getElementById(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100); // 稍微延遲以確保元素已渲染
+    }
+  }, [router.asPath, practice]);
 
   if (loading) {
     return (
@@ -41,12 +75,63 @@ const EditPracticePage: React.FC = () => {
     );
   }
 
-  const handleSave = async (updates: UpdatePracticeInput) => {
+  // 表單資料變更處理
+  const handleFormChange = (updatedData: Partial<Practice>) => {
+    setFormData(updatedData);
+    // 清除相關錯誤
+    setFormErrors({});
+  };
+
+  // 驗證表單資料
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!formData.title?.trim()) {
+      errors.title = '請輸入標題';
+    }
+
+    if (!formData.totalAmount || formData.totalAmount < 1) {
+      errors.totalAmount = '請輸入有效的總量';
+    }
+
+    if (formData.targetDate) {
+      const targetDate = new Date(formData.targetDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (targetDate < today) {
+        errors.targetDate = '目標日期不能早於今天';
+      }
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSave = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
     try {
-      await updatePractice(practice.id, updates);
-      router.push(`/practice/${practice.id}`);
+      const updates: UpdatePracticeInput = {
+        title: formData.title ?? '',
+        description: formData.description ?? '',
+        totalAmount: formData.totalAmount ?? 1,
+        targetDate: formData.targetDate ?? '',
+        motivationType: formData.motivationType ?? 'personal' as MotivationType,
+        customMotivation: formData.customMotivation ?? '',
+        reminderEnabled: formData.reminderEnabled ?? false,
+        reminderFrequency: formData.reminderFrequency ?? 'daily' as ReminderFrequency,
+        smallGoals: formData.smallGoals ?? [],
+        resources: formData.resources ?? []
+      };
+
+      await updatePractice(practice!.id, updates);
+      router.push(`/practice/${practice!.id}`);
     } catch (err) {
       console.error('更新失敗:', err);
+      setFormErrors({ general: '儲存失敗，請稍後再試' });
     }
   };
 
@@ -82,24 +167,16 @@ const EditPracticePage: React.FC = () => {
 
             <div className="p-6">
               <EditForm
-                formData={{
-                  title: practice.title,
-                  description: practice.description,
-                  totalAmount: practice.totalAmount,
-                  targetDate: practice.targetDate,
-                  motivationType: practice.motivationType,
-                  customMotivation: practice.customMotivation,
-                  reminderEnabled: practice.reminderEnabled,
-                  reminderFrequency: practice.reminderFrequency,
-                  smallGoals: practice.smallGoals,
-                  resources: practice.resources
-                }}
-                onChange={() => {
-                  // 這裡可以添加即時預覽功能
-                }}
-                errors={{}}
+                formData={formData}
+                onChange={handleFormChange}
+                errors={formErrors}
                 practice={practice}
               />
+              {formErrors.general && (
+                <div className="mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                  <p className="body-sm text-destructive">{formErrors.general}</p>
+                </div>
+              )}
             </div>
 
             <div className="p-6 border-t border-border bg-muted/50">
@@ -111,20 +188,7 @@ const EditPracticePage: React.FC = () => {
                   取消
                 </Button>
                 <Button
-                  onClick={() => {
-                    handleSave({
-                      title: practice.title ?? '',
-                      description: practice.description ?? '',
-                      totalAmount: practice.totalAmount ?? 1,
-                      targetDate: practice.targetDate ?? '',
-                      motivationType: practice.motivationType ?? 'personal' as MotivationType,
-                      customMotivation: practice.customMotivation ?? '',
-                      reminderEnabled: practice.reminderEnabled ?? false,
-                      reminderFrequency: practice.reminderFrequency ?? 'daily' as ReminderFrequency,
-                      smallGoals: practice.smallGoals ?? [],
-                      resources: practice.resources ?? []
-                    });
-                  }}
+                  onClick={handleSave}
                 >
                   儲存變更
                 </Button>

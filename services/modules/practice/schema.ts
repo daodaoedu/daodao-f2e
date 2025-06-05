@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// 列舉型別的 zod schema
+// ==================== 列舉型別的 zod schema ====================
 export const contentTypeSchema = z.enum([
   'book',
   'video',
@@ -49,7 +49,56 @@ export const moodTypeSchema = z.enum([
   'difficult'
 ]);
 
-// 基礎 schema
+// ==================== 實際的列舉值（可以作為值使用） ====================
+export const ContentType = {
+  BOOK: 'book' as const,
+  VIDEO: 'video' as const,
+  ARTICLES: 'articles' as const,
+  PODCAST: 'podcast' as const,
+  COURSE: 'course' as const,
+  CUSTOM: 'custom' as const
+} as const;
+
+export const PracticeStatus = {
+  DRAFT: 'draft' as const,
+  ACTIVE: 'active' as const,
+  PAUSED: 'paused' as const,
+  COMPLETED: 'completed' as const,
+  ARCHIVED: 'archived' as const
+} as const;
+
+export const MotivationType = {
+  CAREER: 'career' as const,
+  PERSONAL: 'personal' as const,
+  PROJECT: 'project' as const,
+  REQUIRED: 'required' as const,
+  OTHER: 'other' as const
+} as const;
+
+export const ReminderFrequency = {
+  DAILY: 'daily' as const,
+  EVERY_OTHER_DAY: 'every-other-day' as const,
+  TWICE_WEEKLY: 'twice-weekly' as const,
+  WEEKLY: 'weekly' as const
+} as const;
+
+export const ResourceType = {
+  WEBSITE: 'website' as const,
+  DOCUMENT: 'document' as const,
+  VIDEO: 'video' as const,
+  TOOL: 'tool' as const,
+  REFERENCE: 'reference' as const
+} as const;
+
+export const MoodType = {
+  EXCELLENT: 'excellent' as const,
+  GOOD: 'good' as const,
+  AVERAGE: 'average' as const,
+  CHALLENGING: 'challenging' as const,
+  DIFFICULT: 'difficult' as const
+} as const;
+
+// ==================== 基礎 schema ====================
 export const smallGoalSchema = z.object({
   id: z.string(),
   content: z.string().min(1, '請輸入目標內容').max(200, '目標內容不可超過 200 字'),
@@ -79,7 +128,7 @@ export const checkInRecordSchema = z.object({
   createdAt: z.string()
 });
 
-// 主要實踐 schema
+// ==================== 主要實踐 schema ====================
 export const practiceSchema = z.object({
   id: z.string(),
   title: z.string().min(1, '請輸入標題').max(100, '標題不可超過 100 字'),
@@ -102,7 +151,7 @@ export const practiceSchema = z.object({
   resources: z.array(resourceSchema).default([]),
   checkIns: z.array(checkInRecordSchema).default([]),
   tags: z.array(z.string()).default([]),
-  // 新增：每日目標設定
+  // 每日目標設定
   dailyGoal: z.object({
     type: z.enum(['time', 'completion']).default('time'),
     timeMinutes: z.number().optional(),
@@ -113,7 +162,7 @@ export const practiceSchema = z.object({
   updatedAt: z.string()
 });
 
-// 操作相關 schema
+// ==================== 操作相關 schema ====================
 export const createPracticeSchema = z.object({
   title: z.string().min(1, '請輸入標題').max(100, '標題不可超過 100 字'),
   description: z.string().max(2000, '描述不可超過 2000 字').optional(),
@@ -141,7 +190,7 @@ export const createPracticeSchema = z.object({
     })
   ).default([]),
   tags: z.array(z.string()).default([]),
-  // 新增：每日目標設定
+  // 每日目標設定
   dailyGoal: z.object({
     type: z.enum(['time', 'completion']).default('time'),
     timeMinutes: z.number().optional(),
@@ -179,7 +228,7 @@ export const checkInInputSchema = z.object({
   tags: z.array(z.string()).default([])
 });
 
-// 篩選相關 schema
+// ==================== 篩選相關 schema ====================
 export const practiceFilterSchema = z.object({
   searchTerm: z.string().optional(),
   status: z.array(practiceStatusSchema).optional(),
@@ -193,7 +242,7 @@ export const practiceFilterSchema = z.object({
   sortOrder: z.enum(['asc', 'desc']).default('desc')
 });
 
-// 統計相關 schema
+// ==================== 統計相關 schema ====================
 export const practiceStatsSchema = z.object({
   total: z.number().min(0, '總數必須大於等於 0'),
   active: z.number().min(0, '進行中數量必須大於等於 0'),
@@ -205,7 +254,7 @@ export const practiceStatsSchema = z.object({
   averageProgress: z.number().min(0, '平均進度必須大於等於 0').max(100, '平均進度不可超過 100')
 });
 
-// 匯出資料相關 schema
+// ==================== 匯出資料相關 schema ====================
 export const exportDataSchema = z.object({
   version: z.string(),
   exportDate: z.string(),
@@ -213,14 +262,14 @@ export const exportDataSchema = z.object({
   stats: practiceStatsSchema
 });
 
-// 驗證結果 schema
+// ==================== 驗證結果 schema ====================
 export const validationResultSchema = z.object({
   isValid: z.boolean(),
   errors: z.array(z.string()),
   warnings: z.array(z.string())
 });
 
-// 向後相容的字串型別 schema
+// ==================== 向後相容的字串型別 schema ====================
 export const pathInfoSchema = z.object({
   title: z.string().min(1, '請輸入標題'),
   contentType: z.enum(['book', 'video', 'articles', 'podcast', 'course', 'custom']),
@@ -245,7 +294,7 @@ export const checkInEntrySchema = z.object({
   note: z.string()
 });
 
-// 型別匯出
+// ==================== 從 Zod schema 推導的主要型別 ====================
 export type ContentType = z.infer<typeof contentTypeSchema>;
 export type PracticeStatus = z.infer<typeof practiceStatusSchema>;
 export type MotivationType = z.infer<typeof motivationTypeSchema>;
@@ -270,7 +319,53 @@ export type ValidationResult = z.infer<typeof validationResultSchema>;
 export type PathInfo = z.infer<typeof pathInfoSchema>;
 export type CheckInEntry = z.infer<typeof checkInEntrySchema>;
 
-// 向後相容的字串型別
+// ==================== 向後相容的字串型別 ====================
 export type ContentTypeString = z.infer<typeof contentTypeSchema>;
 export type MotivationTypeString = z.infer<typeof motivationTypeSchema> | '';
 export type ReminderFrequencyString = z.infer<typeof reminderFrequencySchema>;
+
+// ==================== 附加型別定義====================
+// UI 視圖型別
+export type MainView = 'setup' | 'dashboard' | 'list';
+export type DashboardView = 'main' | 'checkin' | 'history';
+
+// Context 型別定義
+export interface PracticeContextType {
+  // 狀態
+  practices: Practice[];
+  currentPractice: Practice | null;
+  filter: PracticeFilter;
+  stats: PracticeStats;
+  loading: boolean;
+  error?: string;
+
+  // 操作方法
+  createPractice: (input: CreatePracticeInput) => Promise<Practice>;
+  updatePractice: (id: string, input: UpdatePracticeInput) => Promise<Practice>;
+  deletePractice: (id: string) => Promise<void>;
+  checkIn: (input: CheckInInput) => Promise<CheckInRecord>;
+
+  // 查詢方法
+  getPractice: (id: string) => Practice | undefined;
+  getCheckInHistory: (practiceId: string) => CheckInRecord[];
+
+  // 篩選和搜尋
+  setFilter: (filter: Partial<PracticeFilter>) => void;
+  resetFilter: () => void;
+
+  // 資料管理
+  exportData: () => string;
+  importData: (data: string) => Promise<void>;
+
+  // 工具方法
+  calculateStreak: (practiceId: string) => number;
+  getProgress: (practiceId: string) => number;
+  canCheckInToday: (practiceId: string) => boolean;
+
+  // 便利方法
+  createPracticeFromPathInfo: (
+    pathInfo: Record<string, unknown>,
+    smallGoals: Array<{content: string}>,
+    resources: Array<{name: string, url: string}>
+  ) => Promise<string>;
+}

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle, Heart, Frown, Minus as Meh, Smile, Star, Plus, X } from 'lucide-react';
 import { Practice, MoodType, CheckInInput } from '@/services/modules/practice/schema';
-import { usePractices } from '@/services/modules/practice/hooks';
 import { CheckInService } from '@/services/modules/practice';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
 import { Textarea } from '@/components/atoms/textarea';
 import { Label } from '@/components/atoms/label';
+import { usePracticeManager } from '@/features/practice/hooks';
 
 interface CheckInViewProps {
   practice: Practice;
@@ -19,7 +19,7 @@ const CheckInView: React.FC<CheckInViewProps> = ({
   onBack,
   onSuccess
 }) => {
-  const { checkIn } = usePractices();
+  const { checkIn } = usePracticeManager();
 
   const [progress, setProgress] = useState<number>(1);
   const [note, setNote] = useState<string>('');
