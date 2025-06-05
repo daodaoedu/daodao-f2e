@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "sitemap": "next-sitemap",
-    "lint": "eslint \"{pages,components,shared,constants}/**/*.{ts,tsx,js,jsx}\" --fix",
+    "lint": "eslint \"{pages,components,features,shared,constants,contexts,hooks,services,utils,layout}/**/*.{ts,tsx,js,jsx}\" --fix",
     "ts:check": "tsc --noEmit --incremental false",
     "pages:build": "npx @cloudflare/next-on-pages",
     "preview": "npm run pages:build && wrangler pages dev",

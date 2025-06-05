@@ -36,7 +36,6 @@ module.exports = {
       "error",
       { devDependencies: ["./*.ts"] },
     ],
-    "jsx-a11y/label-has-associated-control": "off",
     "@typescript-eslint/no-require-imports": "error",
     "@typescript-eslint/no-shadow": "error",
     "no-shadow": "off",
