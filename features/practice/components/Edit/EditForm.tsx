@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, X, Target, BookOpen, Link as LinkIcon } from 'lucide-react';
-import { Practice, Resource, ResourceType } from '@/services/modules/practice';
+import { Practice, Resource, ResourceType } from '@/features/practice';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
 import { Textarea } from '@/components/atoms/textarea';

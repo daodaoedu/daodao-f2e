@@ -12,6 +12,7 @@ import {
 import { Practice } from '@/services/modules/practice/schema';
 import { CheckInService } from '@/services/modules/practice/checkIn';
 import { Button } from '@/components/atoms/button';
+import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
 import TagList from '../Shared/TagList';
 
 interface MainDashboardProps {
@@ -53,6 +54,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
   const router = useRouter();
   const [toastMessage, setToastMessage] = useState<string>('');
   const [showToast, setShowToast] = useState(false);
+  const { scrollToTop } = useScrollToTop();
 
   // 顯示 Toast 通知
   const showToastNotification = (message: string) => {
@@ -146,13 +148,17 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
   // 導航到編輯頁面
   const handleEdit = () => {
-    router.push(`/practice/${practice.id}/edit`);
+    router.push(`/practice/${practice.id}/edit`).then(() => {
+      scrollToTop('auto');
+    });
     showToastNotification('📋 正在跳轉到編輯頁面...');
   };
 
   // 導航到編輯頁面的資源管理區域
   const handleManageResources = () => {
-    router.push(`/practice/${practice.id}/edit#resources`);
+    router.push(`/practice/${practice.id}/edit#resources`).then(() => {
+      scrollToTop('auto');
+    });
     showToastNotification('📋 正在跳轉到資源管理...');
   };
 

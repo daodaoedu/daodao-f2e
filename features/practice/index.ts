@@ -4,3 +4,22 @@ export * from './hooks';
 // 導出組件
 export { default as TagList } from './components/Shared/TagList';
 export type { TagListProps } from './components/Shared/TagList';
+
+// 導出所有類型
+export type {
+  Practice,
+  PracticeFilter,
+  PracticeStats,
+  CreatePracticeInput,
+  UpdatePracticeInput,
+  CheckInInput,
+  CheckInRecord,
+  MotivationType,
+  ReminderFrequency,
+  Resource,
+  ResourceType,
+  DashboardView
+} from '@/services/modules/practice/schema';
+
+// 導出服務
+export { CheckInService } from '@/services/modules/practice/checkIn';

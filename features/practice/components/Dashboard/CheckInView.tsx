@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle, Heart, Frown, Minus as Meh, Smile, Star, Plus, X } from 'lucide-react';
 import { Practice, MoodType, CheckInInput } from '@/services/modules/practice/schema';
-import { CheckInService } from '@/services/modules/practice';
+import { CheckInService } from '@/features/practice';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
 import { Textarea } from '@/components/atoms/textarea';
 import { Label } from '@/components/atoms/label';
 import { usePracticeManager } from '@/features/practice/hooks';
+import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
 
 interface CheckInViewProps {
   practice: Practice;
@@ -20,6 +21,7 @@ const CheckInView: React.FC<CheckInViewProps> = ({
   onSuccess
 }) => {
   const { checkIn } = usePracticeManager();
+  const { scrollToTop } = useScrollToTop();
 
   const [progress, setProgress] = useState<number>(1);
   const [note, setNote] = useState<string>('');
@@ -97,8 +99,12 @@ const CheckInView: React.FC<CheckInViewProps> = ({
 
       // 打卡成功，顯示成功訊息
       if (onSuccess) {
+        // 滾動到頂部
+        scrollToTop('smooth');
         onSuccess();
       } else {
+        // 滾動到頂部
+        scrollToTop('smooth');
         onBack();
       }
     } catch (error) {

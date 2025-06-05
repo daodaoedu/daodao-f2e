@@ -5,10 +5,14 @@ import { useRouter } from 'next/router';
 import { usePracticeDetail } from '@/features/practice/hooks';
 import DashboardFlow from '@/features/practice/components/Dashboard/DashboardFlow';
 import { Button } from '@/components/atoms/button';
+import { useScrollToTopOnMount } from '@/features/practice/hooks/useScrollToTop';
 
 const PracticeDetailPage: React.FC = () => {
   const router = useRouter();
   const { id } = router.query;
+
+  // 在頁面載入時滾動到頂部
+  useScrollToTopOnMount();
 
   // 使用自製 hook 取代 context
   const { practice, loading, error } = usePracticeDetail(id as string);

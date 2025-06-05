@@ -4,6 +4,7 @@ import { usePracticeManager } from '@/features/practice/hooks';
 import Confetti from '@/features/practice/components/Shared/Confetti';
 import CelebrationMessage from '@/features/practice/components/Shared/CelebrationMessage';
 import { PathInfo } from '@/services/modules/practice/schema';
+import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
 import Step1 from './Step1';
 import Step2 from './Step2';
 import Step3 from './Step3';
@@ -30,6 +31,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
 }) => {
   const router = useRouter();
   const { createPracticeFromPathInfo } = usePracticeManager();
+  const { scrollToTop } = useScrollToTop();
 
   const [setupStep, setSetupStep] = useState(1);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -180,14 +182,16 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
       return;
     }
 
+    scrollToTop('smooth');
     setValidationErrors({});
     setSetupStep((prev) => Math.min(prev + 1, 4));
-  }, [validateCurrentStep]);
+  }, [validateCurrentStep, scrollToTop]);
 
   const handlePreviousStep = useCallback(() => {
+    scrollToTop('smooth');
     setValidationErrors({});
     setSetupStep((prev) => Math.max(prev - 1, 1));
-  }, []);
+  }, [scrollToTop]);
 
   const handleCreatePath = useCallback(async () => {
     if (!pathInfo.title.trim()) {

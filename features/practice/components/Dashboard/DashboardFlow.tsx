@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 import { Practice } from '@/services/modules/practice/schema';
-import { DashboardView } from '@/services/modules/practice';
+import { DashboardView } from '@/features/practice';
 import MainDashboard from '@/features/practice/components/Dashboard/MainDashboard';
 import CheckInView from '@/features/practice/components/Dashboard/CheckInView';
 import HistoryView from '@/features/practice/components/Dashboard/HistoryView';
 import Confetti from '@/features/practice/components/Shared/Confetti';
 import CelebrationMessage from '@/features/practice/components/Shared/CelebrationMessage';
+import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
 
 interface DashboardFlowProps {
   practice: Practice;
@@ -20,6 +21,7 @@ const DashboardFlow: React.FC<DashboardFlowProps> = ({
   const [currentView, setCurrentView] = useState<DashboardView>('main');
   const [showConfetti, setShowConfetti] = useState(false);
   const [celebrationMessage, setCelebrationMessage] = useState('');
+  const { scrollToTop } = useScrollToTop();
 
   // 處理打卡成功
   const handleCheckInSuccess = () => {
@@ -27,7 +29,8 @@ const DashboardFlow: React.FC<DashboardFlowProps> = ({
     setShowConfetti(true);
     setCelebrationMessage('🎉 打卡成功！繼續保持學習的好習慣！');
 
-    // 返回主儀表板
+    // 滾動到頂部並返回主儀表板
+    scrollToTop('smooth');
     setCurrentView('main');
 
     // 3秒後隱藏慶祝訊息
@@ -39,6 +42,8 @@ const DashboardFlow: React.FC<DashboardFlowProps> = ({
 
   // 處理視圖切換
   const handleViewChange = (view: DashboardView) => {
+    // 在切換視圖時滾動到頂部
+    scrollToTop('smooth');
     setCurrentView(view);
   };
 

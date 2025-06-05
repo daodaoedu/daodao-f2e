@@ -1,14 +1,11 @@
 import { useState, useCallback } from 'react';
 import {
-  usePractices,
-  useFilteredPractices,
-  usePractice,
-  useActivePractices,
-  useCheckInHistory,
+  type PracticeFilter,
+  type CreatePracticeInput
 } from '@/services/modules/practice';
-import type { PracticeFilter, CreatePracticeInput } from '@/services/modules/practice';
+import { usePractices } from './usePractices';
+import { useFilteredPractices } from './useFilteredPractices';
 
-// 主要的 Practice 管理 Hook
 export function usePracticeManager() {
   const [filter, setFilter] = useState<PracticeFilter>({
     searchTerm: '',
@@ -93,64 +90,4 @@ export function usePracticeManager() {
   };
 }
 
-// 單個 Practice Hook
-export function usePracticeDetail(id: string | undefined) {
-  const { loading, error } = usePractices();
-  const practiceData = usePractice(id);
-
-  return {
-    ...practiceData,
-    loading,
-    error
-  };
-}
-
-// 活躍 Practice Hook
-export function useActivePracticeList() {
-  const { practices } = useActivePractices();
-  return practices;
-}
-
-// Check-in 歷史 Hook
-export function usePracticeCheckInHistory(practiceId: string | undefined) {
-  return useCheckInHistory(practiceId);
-}
-
-// 進度計算 Hook
-export function usePracticeProgress(practiceId: string | undefined) {
-  const { practice } = usePractice(practiceId);
-
-  if (!practice) {
-    return {
-      current: 0,
-      total: 0,
-      percentage: 0,
-      isCompleted: false,
-      remaining: 0
-    };
-  }
-
-  const percentage = practice.totalAmount > 0
-    ? Math.min(Math.round((practice.currentProgress / practice.totalAmount) * 100), 100)
-    : 0;
-
-  return {
-    current: practice.currentProgress,
-    total: practice.totalAmount,
-    percentage,
-    isCompleted: practice.currentProgress >= practice.totalAmount,
-    remaining: Math.max(practice.totalAmount - practice.currentProgress, 0)
-  };
-}
-
-// 檢查今日是否可簽到 Hook
-export function useCanCheckInToday(practiceId: string | undefined) {
-  const { stats } = usePractice(practiceId);
-  return stats?.canCheckInToday ?? false;
-}
-
-// 連續天數 Hook
-export function usePracticeStreak(practiceId: string | undefined) {
-  const { practice } = usePractice(practiceId);
-  return practice?.streak ?? 0;
-}
+export type UsePracticeManagerResult = ReturnType<typeof usePracticeManager>;

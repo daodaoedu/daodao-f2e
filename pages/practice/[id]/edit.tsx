@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { ArrowLeft } from 'lucide-react';
 import { usePracticeDetail, usePracticeManager } from '@/features/practice/hooks';
 import EditForm from '@/features/practice/components/Edit/EditForm';
-import { MotivationType, ReminderFrequency, UpdatePracticeInput, Practice } from '@/services/modules/practice';
+import { MotivationType, ReminderFrequency, UpdatePracticeInput, Practice } from '@/features/practice';
 import { Button } from '@/components/atoms/button';
 
 const EditPracticePage: React.FC = () => {

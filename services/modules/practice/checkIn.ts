@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import dayjs from 'dayjs';
+import { format, parseISO, startOfDay, subDays, isAfter, isBefore, isSameDay, differenceInDays } from 'date-fns';
+import { zhTW } from 'date-fns/locale';
 import { Practice, CheckInRecord, CheckInInput, MoodType } from './schema';
 import { getRecentActivity } from './utils';
 
@@ -34,13 +35,13 @@ export class CheckInService {
 
   // 檢查今日是否已簽到
   static hasCheckedInToday(practice: Practice): boolean {
-    const today = dayjs().format('YYYY-MM-DD');
+    const today = format(new Date(), 'yyyy-MM-dd');
     return practice.checkIns?.some((checkIn) => checkIn.date === today) || false;
   }
 
   // 取得今日簽到記錄
   static getTodayCheckIn(practice: Practice): CheckInRecord | undefined {
-    const today = dayjs().format('YYYY-MM-DD');
+    const today = format(new Date(), 'yyyy-MM-dd');
     return practice.checkIns?.find((checkIn) => checkIn.date === today);
   }
 
@@ -51,40 +52,42 @@ export class CheckInService {
     }
 
     // 按日期排序（最新的在前）
-    const sortedCheckIns = [...practice.checkIns].sort((a, b) =>
-      dayjs(b.date).valueOf() - dayjs(a.date).valueOf()
-    );
+    const sortedCheckIns = [...practice.checkIns].sort((a, b) => {
+      const dateA = parseISO(a.date);
+      const dateB = parseISO(b.date);
+      return dateB.getTime() - dateA.getTime();
+    });
 
-    const today = dayjs().startOf('day');
+    const today = startOfDay(new Date());
 
     let streak = 0;
-    let currentDate = dayjs(today);
+    let currentDate = today;
 
     // 檢查是否有今日簽到
-    const todayString = today.format('YYYY-MM-DD');
+    const todayString = format(today, 'yyyy-MM-dd');
     const hasCheckedInToday = sortedCheckIns.some((checkIn) => checkIn.date === todayString);
 
     // 如果今天還沒簽到，從昨天開始算
     if (!hasCheckedInToday) {
-      currentDate = currentDate.subtract(1, 'day');
+      currentDate = subDays(currentDate, 1);
     }
 
     // 使用 Array.some() 或 Array.every() 替代 for...of 循環
     let index = 0;
     while (index < sortedCheckIns.length) {
       const checkIn = sortedCheckIns[index];
-      const checkInDate = dayjs(checkIn.date).startOf('day');
+      const checkInDate = startOfDay(parseISO(checkIn.date));
 
-      if (checkInDate.isSame(currentDate)) {
+      if (isSameDay(checkInDate, currentDate)) {
         streak += 1;
-        currentDate = currentDate.subtract(1, 'day');
-      } else if (checkInDate.isBefore(currentDate)) {
+        currentDate = subDays(currentDate, 1);
+      } else if (isBefore(checkInDate, currentDate)) {
         // 如果簽到日期比預期的早，說明中間有斷開
-        const daysDiff = currentDate.diff(checkInDate, 'day');
+        const daysDiff = differenceInDays(currentDate, checkInDate);
         if (daysDiff === 1) {
           // 如果只相差一天，繼續累積
           streak += 1;
-          currentDate = checkInDate.subtract(1, 'day');
+          currentDate = subDays(checkInDate, 1);
         } else {
           // 相差超過一天，連續中斷，提早退出
           break;
@@ -175,12 +178,12 @@ export class CheckInService {
     const weeklyProgress: number[] = [];
     let i = 3;
     while (i >= 0) {
-      const weekStart = dayjs().subtract((i + 1) * 7, 'day');
-      const weekEnd = dayjs().subtract(i * 7, 'day');
+      const weekStart = subDays(new Date(), (i + 1) * 7);
+      const weekEnd = subDays(new Date(), i * 7);
 
       const weekCheckIns = checkIns.filter((checkIn) => {
-        const checkInDate = dayjs(checkIn.date);
-        return checkInDate.isAfter(weekStart) && checkInDate.isBefore(weekEnd);
+        const checkInDate = parseISO(checkIn.date);
+        return isAfter(checkInDate, weekStart) && isBefore(checkInDate, weekEnd);
       });
 
       const weekProgress = weekCheckIns.reduce((sum, checkIn) => sum + checkIn.progress, 0);
@@ -296,8 +299,8 @@ export class CheckInService {
     isRecent: boolean;
   }> {
     const checkIns = practice.checkIns || [];
-    const today = dayjs().format('YYYY-MM-DD');
-    const threeDaysAgo = dayjs().subtract(3, 'day');
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const threeDaysAgo = subDays(new Date(), 3);
 
     const moodEmojis: Record<MoodType, string> = {
       excellent: '😄',
@@ -308,7 +311,11 @@ export class CheckInService {
     };
 
     return checkIns
-      .sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
+      .sort((a, b) => {
+        const dateA = parseISO(a.date);
+        const dateB = parseISO(b.date);
+        return dateB.getTime() - dateA.getTime();
+      })
       .map((checkIn) => ({
         date: checkIn.date,
         displayDate: this.formatDisplayDate(checkIn.date),
@@ -319,22 +326,22 @@ export class CheckInService {
         moodEmoji: checkIn.mood ? moodEmojis[checkIn.mood] : undefined,
         tags: checkIn.tags || [],
         isToday: checkIn.date === today,
-        isRecent: dayjs(checkIn.date).isAfter(threeDaysAgo)
+        isRecent: isAfter(parseISO(checkIn.date), threeDaysAgo)
       }));
   }
 
   // 格式化顯示日期
   private static formatDisplayDate(dateString: string): string {
-    const date = dayjs(dateString);
-    const today = dayjs();
-    const yesterday = today.subtract(1, 'day');
+    const date = parseISO(dateString);
+    const today = startOfDay(new Date());
+    const yesterday = subDays(today, 1);
 
-    if (date.isSame(today, 'day')) {
+    if (isSameDay(date, today)) {
       return '今天';
-    } else if (date.isSame(yesterday, 'day')) {
+    } else if (isSameDay(date, yesterday)) {
       return '昨天';
     } else {
-      return date.format('MM月DD日 dddd');
+      return format(date, 'MM月dd日 EEEE', { locale: zhTW });
     }
   }
 
