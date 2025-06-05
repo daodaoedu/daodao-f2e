@@ -25,7 +25,6 @@ interface GetIdeaKeyOptions {
 
 export const getIdeaEndpoint = ({ ideaId }: GetIdeaKeyOptions = {}) => {
   if (ideaId) {
-
     return `${ideaEndpoint}/${removeNumberSuffixStrict(ideaId)}`;
   }
   return ideaEndpoint;

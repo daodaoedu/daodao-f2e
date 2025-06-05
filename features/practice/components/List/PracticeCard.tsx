@@ -17,7 +17,6 @@ import { Practice, ContentType } from '@/services/modules/practice/schema';
 import {
   calculateProgress,
   getContentTypeLabel,
-  getStatusLabel,
   canCheckIn
 } from '@/services/modules/practice/utils';
 import { ProgressBar } from '@/components/atoms/progress-bar';
@@ -133,16 +132,18 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
                 <DropdownMenuItem onClick={(e) => {
                   e.stopPropagation();
                   onView?.(practice);
-                }}>
+                }}
+                >
                   <Eye className="h-4 w-4" />
                   <span>查看詳情</span>
                 </DropdownMenuItem>
-                
+
                 {canDoCheckIn && onCheckIn && (
                   <DropdownMenuItem onClick={(e) => {
                     e.stopPropagation();
                     onCheckIn(practice);
-                  }}>
+                  }}
+                  >
                     <Flame className="h-4 w-4" />
                     <span>今日打卡</span>
                   </DropdownMenuItem>
@@ -152,7 +153,8 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
                   <DropdownMenuItem onClick={(e) => {
                     e.stopPropagation();
                     onEdit(practice);
-                  }}>
+                  }}
+                  >
                     <Edit3 className="h-4 w-4" />
                     <span>編輯實踐</span>
                   </DropdownMenuItem>
@@ -187,10 +189,10 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
         {/* 標籤顯示 */}
         {practice.tags && practice.tags.length > 0 && (
           <div className="mt-2">
-            <TagList 
-              tags={practice.tags} 
-              maxDisplay={3} 
-              showIcon={false} 
+            <TagList
+              tags={practice.tags}
+              maxDisplay={3}
+              showIcon={false}
               className=""
             />
           </div>
@@ -209,7 +211,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
 
       <div className="px-3 sm:px-4 py-2 sm:py-3 bg-muted/50 rounded-b-lg">
         <div className="flex items-center justify-between">
-          <StatusBadge 
+          <StatusBadge
             status={getStatusVariant()}
             size="sm"
           />
@@ -225,15 +227,15 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
             <div className="flex items-center space-x-1">
               <Calendar className="h-3 w-3" />
               <span className="hidden sm:inline">
-                {formatDistanceToNow(new Date(practice.updatedAt), { 
-                  addSuffix: true, 
-                  locale: zhTW 
+                {formatDistanceToNow(new Date(practice.updatedAt), {
+                  addSuffix: true,
+                  locale: zhTW
                 })}
               </span>
               <span className="sm:hidden">
-                {formatDistanceToNow(new Date(practice.updatedAt), { 
-                  addSuffix: false, 
-                  locale: zhTW 
+                {formatDistanceToNow(new Date(practice.updatedAt), {
+                  addSuffix: false,
+                  locale: zhTW
                 })}
               </span>
             </div>

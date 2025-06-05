@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, CheckCircle, Edit, X, ArrowLeft, Bookmark, ExternalLink, Plus } from 'lucide-react';
+import { CheckCircle, Edit, X, ArrowLeft, Bookmark, ExternalLink, Plus } from 'lucide-react';
 import { Practice } from '@/services/modules/practice/schema';
 import { CheckInService } from '@/services/modules/practice/checkIn';
 import { Button } from '@/components/atoms/button';
@@ -8,7 +8,6 @@ import TagList from '../Shared/TagList';
 interface MainDashboardProps {
   practice: Practice;
   onCheckIn: () => void;
-  onViewHistory: () => void;
   onBack: () => void;
 }
 
@@ -36,11 +35,9 @@ const Toast: React.FC<ToastProps> = ({ visible, message, onClose }) => {
 const MainDashboard: React.FC<MainDashboardProps> = ({
   practice,
   onCheckIn,
-  onViewHistory,
   onBack
 }) => {
   const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
 
   // 計算進度百分比
   const progressPercentage = Math.round((practice.currentProgress / practice.totalAmount) * 100);
@@ -69,14 +66,6 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
     });
   };
 
-  // 處理小目標切換
-  const handleGoalToggle = () => {
-    // TODO: 實現小目標切換邏輯
-    setToastMessage('小目標狀態已更新！');
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
-  };
-
   // 獲取內容類型標籤
   const getContentTypeLabel = () => {
     const typeMap: Record<string, string> = {
@@ -95,15 +84,15 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
     if (!practice.dailyGoal) {
       return '--';
     }
-    
+
     const { type, timeMinutes, amount, unit } = practice.dailyGoal;
-    
+
     if (type === 'time' && timeMinutes) {
       return `${timeMinutes} 分鐘`;
     } else if (type === 'completion' && amount && unit) {
       return `${amount} ${unit}`;
     }
-    
+
     return '--';
   };
 
@@ -144,8 +133,8 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                   <h1 className="text-2xl font-bold text-foreground">{practice.title}</h1>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
                     {practice.status === 'active' ? '進行中' :
-                     practice.status === 'completed' ? '已完成' :
-                     practice.status === 'paused' ? '暫停' : '草稿'}
+                      practice.status === 'completed' ? '已完成' :
+                        practice.status === 'paused' ? '暫停' : '草稿'}
                   </span>
                 </div>
 
@@ -244,16 +233,16 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">完成進度</span>
                   <span className="text-primary font-medium">
-                    {practice.smallGoals.filter(g => g.isCompleted).length} / {practice.smallGoals.length} 個目標
+                    {practice.smallGoals.filter((g) => g.isCompleted).length} / {practice.smallGoals.length} 個目標
                   </span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2 mt-2">
                   <div
                     className="h-2 rounded-full bg-primary transition-all duration-500"
-                    style={{ 
-                      width: `${practice.smallGoals.length > 0 
-                        ? (practice.smallGoals.filter(g => g.isCompleted).length / practice.smallGoals.length) * 100 
-                        : 0}%` 
+                    style={{
+                      width: `${practice.smallGoals.length > 0
+                        ? (practice.smallGoals.filter((g) => g.isCompleted).length / practice.smallGoals.length) * 100
+                        : 0}%`
                     }}
                   />
                 </div>
@@ -314,24 +303,29 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                     <span>{formatLastCheckIn()}</span>
                   </div>
                 </div>
-                
+
                 {practice.checkIns.length > 0 ? (
                   <div className="max-h-80 overflow-y-auto space-y-2">
                     {practice.checkIns.map((checkIn, index) => (
                       <div key={checkIn.id || index} className="flex items-center space-x-3 py-3 border-b border-border last:border-b-0">
-                        <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
                         <div className="flex-1">
                           <p className="text-sm text-foreground">
-                            我在 <span className="text-green-600 font-medium">
+                            我在{' '}
+                            <span className="text-green-600 font-medium">
                               {new Date(checkIn.date).toLocaleDateString('zh-TW', {
                                 month: 'numeric',
                                 day: 'numeric'
                               })}
-                            </span> 實踐 <span className="text-primary font-medium">
+                            </span>{' '}
+                            實踐{' '}
+                            <span className="text-primary font-medium">
                               {practice.title}
-                            </span> <span className="text-muted-foreground">
+                            </span>{' '}
+                            <span className="text-muted-foreground">
                               {checkIn.progress}
-                            </span> <span className="text-muted-foreground">
+                            </span>{' '}
+                            <span className="text-muted-foreground">
                               ({practice.unit})
                             </span>
                           </p>
@@ -348,7 +342,6 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
               </div>
             </div>
           </div>
-
 
           {/* 學習資源區域 */}
           {practice.resources.length > 0 && (
@@ -419,7 +412,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
       {/* Toast 通知 */}
       <Toast
         visible={showToast}
-        message={toastMessage}
+        message=""
         onClose={() => setShowToast(false)}
       />
     </div>

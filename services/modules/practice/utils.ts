@@ -1,8 +1,8 @@
 import { v4 as uuid } from 'uuid';
-import { format, parseISO, addDays, startOfDay, endOfDay, formatDistanceToNow, differenceInDays, isAfter, isBefore, isSameDay, subDays } from 'date-fns';
+import { format, parseISO, startOfDay, differenceInDays, isAfter, isBefore, isSameDay, subDays } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
-import { Practice, ContentType, PracticeStatus, CheckInRecord, MoodType, ResourceType } from './schema';
 import { z } from 'zod';
+import { Practice, ContentType, PracticeStatus, CheckInRecord, ResourceType, MotivationType, ReminderFrequency } from './schema';
 
 // 驗證 schema (用於向後相容)
 const startDateValidationSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '請輸入有效的日期格式 YYYY-MM-DD');
@@ -33,89 +33,89 @@ export function calculateProgress(current: number, total: number): number {
 // 內容類型工具
 export function getContentTypeLabel(contentType: ContentType): string {
   const labels: Record<ContentType, string> = {
-    'book': '書籍',
-    'video': '影片課程',
-    'articles': '文章',
-    'podcast': 'Podcast',
-    'course': '課程',
-    'custom': '自定義'
+    book: '書籍',
+    video: '影片課程',
+    articles: '文章',
+    podcast: 'Podcast',
+    course: '課程',
+    custom: '自定義'
   };
-  
+
   return labels[contentType] || '未知';
 }
 
 export function getContentTypeUnit(contentType: ContentType): string {
   const units: Record<ContentType, string> = {
-    'book': '頁',
-    'video': '課',
-    'articles': '篇',
-    'podcast': '集',
-    'course': '單元',
-    'custom': '項目'
+    book: '頁',
+    video: '課',
+    articles: '篇',
+    podcast: '集',
+    course: '單元',
+    custom: '項目'
   };
-  
+
   return units[contentType] || '項目';
 }
 
 export function getContentTypeIcon(contentType: ContentType): string {
   const icons: Record<ContentType, string> = {
-    'book': '📚',
-    'video': '🎬',
-    'articles': '📄',
-    'podcast': '🎧',
-    'course': '🎓',
-    'custom': '⚙️'
+    book: '📚',
+    video: '🎬',
+    articles: '📄',
+    podcast: '🎧',
+    course: '🎓',
+    custom: '⚙️'
   };
-  
+
   return icons[contentType] || '📝';
 }
 
 // 狀態工具
 export function getStatusLabel(status: PracticeStatus): string {
   const labels: Record<PracticeStatus, string> = {
-    'draft': '草稿',
-    'active': '進行中',
-    'paused': '暫停',
-    'completed': '已完成',
-    'archived': '已封存'
+    draft: '草稿',
+    active: '進行中',
+    paused: '暫停',
+    completed: '已完成',
+    archived: '已封存'
   };
-  
+
   return labels[status] || '未知';
 }
 
 export function getStatusColor(status: PracticeStatus): string {
   const colors: Record<PracticeStatus, string> = {
-    'draft': '#92989A',
-    'active': '#16B9B3',
-    'paused': '#FF9526',
-    'completed': '#86C84A',
-    'archived': '#536166'
+    draft: '#92989A',
+    active: '#16B9B3',
+    paused: '#FF9526',
+    completed: '#86C84A',
+    archived: '#536166'
   };
-  
+
   return colors[status] || '#92989A';
 }
 
 export function getStatusColorClass(status: PracticeStatus): string {
   const colorClasses: Record<PracticeStatus, string> = {
-    'draft': 'text-basic-300',
-    'active': 'text-primary-base',
-    'paused': 'text-tips',
-    'completed': 'text-success',
-    'archived': 'text-basic-400'
+    draft: 'text-basic-300',
+    active: 'text-primary-base',
+    paused: 'text-tips',
+    completed: 'text-success',
+    archived: 'text-basic-400'
   };
-  
+
   return colorClasses[status] || 'text-basic-300';
 }
 
 export function getStatusBgClass(status: PracticeStatus): string {
   const bgClasses: Record<PracticeStatus, string> = {
-    'draft': 'bg-basic-300',
-    'active': 'bg-primary-base',
-    'paused': 'bg-tips',
-    'completed': 'bg-success',
-    'archived': 'bg-basic-400'
+    draft: 'bg-basic-300',
+    active: 'bg-primary-base',
+    paused: 'bg-tips',
+    completed: 'bg-success',
+    archived: 'bg-basic-400'
   };
-  
+
   return bgClasses[status] || 'bg-basic-300';
 }
 
@@ -130,26 +130,26 @@ export function shouldShowInActiveList(practice: Practice): boolean {
 // 搜尋和篩選工具
 export function searchPractices(practices: Practice[], searchTerm: string): Practice[] {
   if (!searchTerm.trim()) return practices;
-  
+
   const term = searchTerm.toLowerCase();
-  return practices.filter(practice => 
+  return practices.filter((practice) =>
     practice.title.toLowerCase().includes(term) ||
     (practice.description && practice.description.toLowerCase().includes(term)) ||
-    practice.smallGoals.some(goal => goal.content.toLowerCase().includes(term)) ||
-    practice.resources.some(resource => resource.name.toLowerCase().includes(term))
+    practice.smallGoals.some((goal) => goal.content.toLowerCase().includes(term)) ||
+    practice.resources.some((resource) => resource.name.toLowerCase().includes(term))
   );
 }
 
 export function sortPractices(
-  practices: Practice[], 
-  sortBy: string, 
+  practices: Practice[],
+  sortBy: string,
   sortOrder: 'asc' | 'desc' = 'desc'
 ): Practice[] {
   const sorted = [...practices];
-  
+
   sorted.sort((a, b) => {
-    let aValue: any;
-    let bValue: any;
+    let aValue: string | number | Date;
+    let bValue: string | number | Date;
 
     switch (sortBy) {
       case 'title':
@@ -177,8 +177,8 @@ export function sortPractices(
     }
 
     if (aValue instanceof Date && bValue instanceof Date) {
-      return sortOrder === 'asc' 
-        ? aValue.getTime() - bValue.getTime() 
+      return sortOrder === 'asc'
+        ? aValue.getTime() - bValue.getTime()
         : bValue.getTime() - aValue.getTime();
     }
 
@@ -240,8 +240,8 @@ export function remainingAmount(current: number, total: number): number {
 }
 
 export function estimatedDaysToComplete(
-  current: number, 
-  total: number, 
+  current: number,
+  total: number,
   dailyAverage: number
 ): number {
   const remaining = remainingAmount(current, total);
@@ -252,12 +252,12 @@ export function estimatedDaysToComplete(
 // ==================== 連續天數計算 ====================
 
 export function calculateStreak(
-  checkIns: CheckInRecord[], 
-  practiceId: string, 
+  checkIns: CheckInRecord[],
+  practiceId: string,
   currentDate: Date = new Date()
 ): number {
   const practiceCheckIns = checkIns
-    .filter(c => c.practiceId === practiceId)
+    .filter((c) => c.practiceId === practiceId)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   if (practiceCheckIns.length === 0) return 0;
@@ -265,36 +265,38 @@ export function calculateStreak(
   let streak = 0;
   let checkDate = startOfDay(currentDate);
 
-  for (const checkIn of practiceCheckIns) {
+  practiceCheckIns.forEach((checkIn) => {
     const checkinDate = startOfDay(parseISO(checkIn.date));
 
     if (isSameDay(checkinDate, checkDate)) {
-      streak++;
+      streak += 1;
       checkDate = subDays(checkDate, 1);
     } else if (isBefore(checkinDate, checkDate)) {
       const daysDiff = differenceInDays(checkDate, checkinDate);
       if (daysDiff === 1) {
-        streak++;
+        streak += 1;
         checkDate = subDays(checkinDate, 1);
       } else {
-        break;
+        // 中斷迴圈 - 使用 return 代替 break
+
       }
     } else {
-      break;
+      // 中斷迴圈
+
     }
-  }
+  });
 
   return streak;
 }
 
 export function getStreakMessage(streak: number): string {
   if (streak === 0) return '';
-  
+
   if (streak >= 21) return '💎 習慣養成大師！';
   if (streak >= 14) return '🌟 習慣正在形成！';
   if (streak >= 7) return '⭐ 一週堅持達成！';
   if (streak >= 3) return '🔥 建立習慣中！';
-  
+
   return `${streak}天連續！`;
 }
 
@@ -315,15 +317,15 @@ export function validatePracticeAmount(amount: number): string | null {
 export function validateStartDate(date: string): string | null {
   try {
     startDateValidationSchema.parse(date);
-    
+
     // 額外檢查是否為過去的日期
     const selectedDate = parseISO(date);
     const today = startOfDay(new Date());
-    
+
     if (isBefore(selectedDate, today)) {
       return '開始日期不能是過去的日期';
     }
-    
+
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -361,7 +363,7 @@ export function validateResource(name: string, url?: string): string | null {
 
 export function calculateDailyAverage(checkIns: CheckInRecord[], practiceId: string, days: number = 7): number {
   const practiceCheckIns = checkIns
-    .filter(c => c.practiceId === practiceId)
+    .filter((c) => c.practiceId === practiceId)
     .slice(0, days);
 
   if (practiceCheckIns.length === 0) return 0;
@@ -374,14 +376,14 @@ export function getRecentActivity(checkIns: CheckInRecord[], practiceId: string,
   const cutoffDate = subDays(new Date(), days);
 
   return checkIns
-    .filter(c => c.practiceId === practiceId && isAfter(parseISO(c.date), cutoffDate))
+    .filter((c) => c.practiceId === practiceId && isAfter(parseISO(c.date), cutoffDate))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 export function getMostActiveDay(checkIns: CheckInRecord[]): string {
   const dayCount: { [key: string]: number } = {};
 
-  checkIns.forEach(checkIn => {
+  checkIns.forEach((checkIn) => {
     const day = format(parseISO(checkIn.date), 'EEEE', { locale: zhTW });
     dayCount[day] = (dayCount[day] || 0) + 1;
   });
@@ -420,26 +422,32 @@ export function practiceToListItem(practice: Practice) {
   };
 }
 
-export function pathInfoToPractice(pathInfo: any, smallGoals: any[], resources: any[]): Omit<Practice, 'id' | 'createdAt' | 'updatedAt'> {
+export function pathInfoToPractice(pathInfo: Record<string, unknown>, smallGoals: Array<{content: string}>, resources: Array<{name: string, url: string}>): Omit<Practice, 'id' | 'createdAt' | 'updatedAt'> {
   const now = new Date().toISOString();
-  
+
   return {
-    title: pathInfo.title,
-    description: pathInfo.notes || undefined,
-    contentType: pathInfo.contentType as ContentType,
-    totalAmount: parseInt(pathInfo.totalAmount, 10),
-    currentProgress: parseInt(pathInfo.currentProgress, 10),
-    unit: getContentTypeUnit(pathInfo.contentType as ContentType),
-    startDate: pathInfo.targetDate || now.split('T')[0],
+    title: String(pathInfo.title || ''),
+    description: pathInfo.notes ? String(pathInfo.notes) : undefined,
+    contentType: (pathInfo.contentType as ContentType) || 'custom',
+    totalAmount: parseInt(String(pathInfo.totalAmount), 10) || 1,
+    currentProgress: parseInt(String(pathInfo.currentProgress), 10) || 0,
+    unit: getContentTypeUnit((pathInfo.contentType as ContentType) || 'custom'),
+    startDate: String(pathInfo.targetDate) || now.split('T')[0],
     targetDate: undefined,
     status: 'active' as PracticeStatus,
-    motivationType: pathInfo.motivationType || 'personal',
-    customMotivation: pathInfo.customMotivation || undefined,
-    isPublic: pathInfo.isPublic,
-    reminderEnabled: pathInfo.reminderEnabled,
-    reminderFrequency: pathInfo.reminderFrequency,
-    streak: pathInfo.streak || 0,
-    lastCheckinDate: pathInfo.lastStreakDate || undefined,
+    motivationType: String(pathInfo.motivationType) ? (
+      ['career', 'personal', 'project', 'required', 'other'].includes(String(pathInfo.motivationType))
+        ? String(pathInfo.motivationType) as MotivationType
+        : 'personal' as MotivationType
+    ) : 'personal' as MotivationType,
+    customMotivation: pathInfo.customMotivation ? String(pathInfo.customMotivation) : undefined,
+    isPublic: Boolean(pathInfo.isPublic),
+    reminderEnabled: Boolean(pathInfo.reminderEnabled),
+    reminderFrequency: ['daily', 'every-other-day', 'twice-weekly', 'weekly'].includes(String(pathInfo.reminderFrequency))
+      ? String(pathInfo.reminderFrequency) as ReminderFrequency
+      : 'daily' as ReminderFrequency,
+    streak: Number(pathInfo.streak) || 0,
+    lastCheckinDate: pathInfo.lastStreakDate ? String(pathInfo.lastStreakDate) : undefined,
     smallGoals: smallGoals.map((goal, index) => ({
       id: generateId(),
       content: goal.content,
@@ -461,9 +469,9 @@ export function pathInfoToPractice(pathInfo: any, smallGoals: any[], resources: 
 // ==================== 導出工具 ====================
 
 export function formatDataForExport(practices: Practice[], checkIns: CheckInRecord[]) {
-  return practices.map(practice => {
-    const practiceCheckIns = checkIns.filter(c => c.practiceId === practice.id);
-    
+  return practices.map((practice) => {
+    const practiceCheckIns = checkIns.filter((c) => c.practiceId === practice.id);
+
     return {
       標題: practice.title,
       類型: getContentTypeLabel(practice.contentType),
@@ -519,7 +527,7 @@ export interface CheckInEntry {
 export interface ContentTypeOption {
   id: ContentTypeString;
   label: string;
-  icon: any; // ComponentType 的簡化版本
+  icon: unknown; // ComponentType 的簡化版本
 }
 
 export interface MotivationOption {
@@ -531,12 +539,12 @@ export interface MotivationOption {
 
 export function hasCheckedInToday(practice: Practice): boolean {
   const today = format(new Date(), 'yyyy-MM-dd');
-  return practice.checkIns?.some(checkIn => checkIn.date === today) || false;
+  return practice.checkIns?.some((checkIn) => checkIn.date === today) || false;
 }
 
 export function getTodayCheckIn(practice: Practice): CheckInRecord | undefined {
   const today = format(new Date(), 'yyyy-MM-dd');
-  return practice.checkIns?.find(checkIn => checkIn.date === today);
+  return practice.checkIns?.find((checkIn) => checkIn.date === today);
 }
 
 export function checkMilestones(newStreak: number, oldStreak: number): string[] {
@@ -552,7 +560,7 @@ export function checkMilestones(newStreak: number, oldStreak: number): string[] 
 
   const achievements: string[] = [];
 
-  milestones.forEach(milestone => {
+  milestones.forEach((milestone) => {
     if (newStreak >= milestone.days && oldStreak < milestone.days) {
       achievements.push(milestone.message);
     }
@@ -564,17 +572,17 @@ export function checkMilestones(newStreak: number, oldStreak: number): string[] 
 export function getCheckInSuggestions(practice: Practice): string[] {
   const suggestions: string[] = [];
   const checkIns = practice.checkIns || [];
-  
+
   // 基於歷史資料給建議
   if (checkIns.length > 0) {
     const recentCheckIns = checkIns.slice(-7); // 最近7次簽到
     const averageRecent = recentCheckIns.reduce((sum, c) => sum + c.progress, 0) / recentCheckIns.length;
     const totalAverage = calculateDailyAverage(checkIns, practice.id);
-    
+
     if (averageRecent < totalAverage * 0.8) {
       suggestions.push('💡 最近進度有所放緩，建議調整學習計畫或休息一下');
     }
-    
+
     const lastWeekCheckIns = getRecentActivity(checkIns, practice.id, 7).length;
     if (lastWeekCheckIns < 3) {
       suggestions.push('⏰ 本週簽到較少，試著設定固定的學習時間');

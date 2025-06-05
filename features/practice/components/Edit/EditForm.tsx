@@ -5,8 +5,6 @@ import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
 import { Textarea } from '@/components/atoms/textarea';
 import { Label } from '@/components/atoms/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/atoms/select';
-import { Checkbox } from '@/components/atoms/checkbox';
 import { cn } from '@/utils/cn';
 
 interface EditFormProps {
@@ -123,7 +121,6 @@ const EditForm: React.FC<EditFormProps> = ({
     { value: 'course', label: '🎓 課程', unit: '堂' },
     { value: 'custom', label: '🎯 自定義', unit: '項' }
   ];
-
 
   const currentContentType = contentTypeOptions.find((option) => option.value === practice.contentType);
 

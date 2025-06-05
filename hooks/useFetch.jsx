@@ -13,14 +13,14 @@ const useFetch = (url, { enabled = true, initialValue, onSuccess } = {}) => {
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) return undefined;
 
     const endpoint = url.startsWith('http') ? url : `${BASE_URL}${url}`;
     const headers = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     };
-    const requestData = { headers }
+    const requestData = { headers };
     let pass = true;
 
     setIsFetching(true);
@@ -31,7 +31,7 @@ const useFetch = (url, { enabled = true, initialValue, onSuccess } = {}) => {
         if (res.status < 300) return res.json();
         if (res.status === 401) {
           authDispatch.logout();
-          router.replace('/login')
+          router.replace('/login');
         }
         throw res;
       })

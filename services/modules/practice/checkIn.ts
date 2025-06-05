@@ -1,7 +1,7 @@
-import { Practice, CheckInRecord, CheckInInput, MoodType } from './schema';
 import { z } from 'zod';
 import dayjs from 'dayjs';
-import { generateId, calculateDailyAverage, getRecentActivity } from './utils';
+import { Practice, CheckInRecord, CheckInInput, MoodType } from './schema';
+import { getRecentActivity } from './utils';
 
 // 簽到輸入驗證 schema
 const checkInInputValidationSchema = z.object({
@@ -35,13 +35,13 @@ export class CheckInService {
   // 檢查今日是否已簽到
   static hasCheckedInToday(practice: Practice): boolean {
     const today = dayjs().format('YYYY-MM-DD');
-    return practice.checkIns?.some(checkIn => checkIn.date === today) || false;
+    return practice.checkIns?.some((checkIn) => checkIn.date === today) || false;
   }
 
   // 取得今日簽到記錄
   static getTodayCheckIn(practice: Practice): CheckInRecord | undefined {
     const today = dayjs().format('YYYY-MM-DD');
-    return practice.checkIns?.find(checkIn => checkIn.date === today);
+    return practice.checkIns?.find((checkIn) => checkIn.date === today);
   }
 
   // 計算連續天數
@@ -51,18 +51,18 @@ export class CheckInService {
     }
 
     // 按日期排序（最新的在前）
-    const sortedCheckIns = [...practice.checkIns].sort((a, b) => 
+    const sortedCheckIns = [...practice.checkIns].sort((a, b) =>
       dayjs(b.date).valueOf() - dayjs(a.date).valueOf()
     );
 
     const today = dayjs().startOf('day');
-    
+
     let streak = 0;
     let currentDate = dayjs(today);
 
     // 檢查是否有今日簽到
     const todayString = today.format('YYYY-MM-DD');
-    let hasCheckedInToday = sortedCheckIns.some(checkIn => checkIn.date === todayString);
+    const hasCheckedInToday = sortedCheckIns.some((checkIn) => checkIn.date === todayString);
 
     // 如果今天還沒簽到，從昨天開始算
     if (!hasCheckedInToday) {
@@ -70,18 +70,18 @@ export class CheckInService {
     }
 
     // 往回檢查連續天數
-    for (const checkIn of sortedCheckIns) {
+    sortedCheckIns.forEach((checkIn) => {
       const checkInDate = dayjs(checkIn.date).startOf('day');
 
       if (checkInDate.isSame(currentDate)) {
-        streak++;
+        streak += 1;
         currentDate = currentDate.subtract(1, 'day');
       } else if (checkInDate.isBefore(currentDate)) {
         // 如果簽到日期比預期的早，說明中間有斷開
-        break;
+         // 跳出循環
       }
       // 如果簽到日期比預期的晚，繼續檢查下一個記錄
-    }
+    });
 
     return streak;
   }
@@ -100,7 +100,7 @@ export class CheckInService {
 
     const achievements: string[] = [];
 
-    milestones.forEach(milestone => {
+    milestones.forEach((milestone) => {
       if (newStreak >= milestone.days && oldStreak < milestone.days) {
         achievements.push(milestone.message);
       }
@@ -118,7 +118,7 @@ export class CheckInService {
     weeklyProgress: number[];
   } {
     const checkIns = practice.checkIns || [];
-    
+
     if (checkIns.length === 0) {
       return {
         totalCheckIns: 0,
@@ -154,25 +154,27 @@ export class CheckInService {
       difficult: 0
     };
 
-    checkIns.forEach(checkIn => {
+    checkIns.forEach((checkIn) => {
       if (checkIn.mood) {
-        moodDistribution[checkIn.mood]++;
+        moodDistribution[checkIn.mood] += 1;
       }
     });
 
     // 最近4週的進度趨勢
     const weeklyProgress: number[] = [];
-    for (let i = 3; i >= 0; i--) {
+    let i = 3;
+    while (i >= 0) {
       const weekStart = dayjs().subtract((i + 1) * 7, 'day');
       const weekEnd = dayjs().subtract(i * 7, 'day');
 
-      const weekCheckIns = checkIns.filter(checkIn => {
+      const weekCheckIns = checkIns.filter((checkIn) => {
         const checkInDate = dayjs(checkIn.date);
         return checkInDate.isAfter(weekStart) && checkInDate.isBefore(weekEnd);
       });
 
       const weekProgress = weekCheckIns.reduce((sum, checkIn) => sum + checkIn.progress, 0);
       weeklyProgress.push(weekProgress);
+      i -= 1;
     }
 
     return {
@@ -189,20 +191,20 @@ export class CheckInService {
     const suggestions: string[] = [];
     const checkIns = practice.checkIns || [];
     const stats = this.getCheckInStats(practice);
-    
+
     // 基於歷史資料給建議
     if (checkIns.length > 0) {
       const recentCheckIns = checkIns.slice(-7); // 最近7次簽到
       const averageRecent = recentCheckIns.reduce((sum, c) => sum + c.progress, 0) / recentCheckIns.length;
-      
+
       if (averageRecent < stats.averageProgress * 0.8) {
         suggestions.push('💡 最近進度有所放緩，建議調整學習計畫或休息一下');
       }
-      
+
       if (stats.lastWeekCheckIns < 3) {
         suggestions.push('⏰ 本週簽到較少，試著設定固定的學習時間');
       }
-      
+
       // 心情建議
       const negativeRatio = (stats.moodDistribution.challenging + stats.moodDistribution.difficult) / stats.totalCheckIns;
       if (negativeRatio > 0.5) {
@@ -241,7 +243,7 @@ export class CheckInService {
       checkInInputValidationSchema.parse(input);
     } catch (zodError) {
       if (zodError instanceof z.ZodError) {
-        zodError.errors.forEach(error => {
+        zodError.errors.forEach((error) => {
           errors.push(error.message);
         });
       }
@@ -296,7 +298,7 @@ export class CheckInService {
 
     return checkIns
       .sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
-      .map(checkIn => ({
+      .map((checkIn) => ({
         date: checkIn.date,
         displayDate: this.formatDisplayDate(checkIn.date),
         progress: checkIn.progress,
@@ -340,7 +342,7 @@ export class CheckInService {
     if (stats.totalCheckIns > 0) {
       const dominantMood = Object.entries(stats.moodDistribution)
         .reduce((a, b) => a[1] > b[1] ? a : b)[0] as MoodType;
-      
+
       const moodLabels: Record<MoodType, string> = {
         excellent: '優秀',
         good: '良好',

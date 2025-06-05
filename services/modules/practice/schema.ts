@@ -3,7 +3,7 @@ import { z } from 'zod';
 // 列舉型別的 zod schema
 export const contentTypeSchema = z.enum([
   'book',
-  'video', 
+  'video',
   'articles',
   'podcast',
   'course',
@@ -12,7 +12,7 @@ export const contentTypeSchema = z.enum([
 
 export const practiceStatusSchema = z.enum([
   'draft',
-  'active', 
+  'active',
   'paused',
   'completed',
   'archived'
@@ -21,7 +21,7 @@ export const practiceStatusSchema = z.enum([
 export const motivationTypeSchema = z.enum([
   'career',
   'personal',
-  'project', 
+  'project',
   'required',
   'other'
 ]);

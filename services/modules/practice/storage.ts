@@ -1,11 +1,8 @@
-import { 
-  Practice, 
-  CheckInRecord, 
-  PracticeFilter, 
-  PracticeStats,
-  type ContentType,
-  type PracticeStatus,
-  type MotivationType
+import {
+  Practice,
+  CheckInRecord,
+  PracticeFilter,
+  PracticeStats
 } from './schema';
 
 // 本地儲存鍵
@@ -26,20 +23,20 @@ interface PracticeSettings {
 // 儲存服務類
 export class PracticeStorage {
   // ==================== 實踐管理 ====================
-  
+
   static async getAllPractices(): Promise<Practice[]> {
     try {
       if (typeof window === 'undefined') {
         return [];
       }
-      
+
       const stored = localStorage.getItem(STORAGE_KEYS.PRACTICES);
       if (!stored) {
         return [];
       }
-      
+
       const practices = JSON.parse(stored) as Practice[];
-      return practices.map(practice => ({
+      return practices.map((practice) => ({
         ...practice,
         smallGoals: practice.smallGoals || [],
         resources: practice.resources || [],
@@ -58,7 +55,7 @@ export class PracticeStorage {
       if (typeof window === 'undefined') {
         return;
       }
-      
+
       localStorage.setItem(STORAGE_KEYS.PRACTICES, JSON.stringify(practices));
     } catch (error) {
       console.error('Error saving practices:', error);
@@ -68,7 +65,7 @@ export class PracticeStorage {
 
   static async getPracticeById(id: string): Promise<Practice | null> {
     const practices = await this.getAllPractices();
-    return practices.find(p => p.id === id) || null;
+    return practices.find((p) => p.id === id) || null;
   }
 
   static async createPractice(practice: Practice): Promise<Practice> {
@@ -80,8 +77,8 @@ export class PracticeStorage {
 
   static async updatePractice(id: string, updates: Partial<Practice>): Promise<Practice | null> {
     const practices = await this.getAllPractices();
-    const index = practices.findIndex(p => p.id === id);
-    
+    const index = practices.findIndex((p) => p.id === id);
+
     if (index === -1) {
       return null;
     }
@@ -98,8 +95,8 @@ export class PracticeStorage {
 
   static async deletePractice(id: string): Promise<boolean> {
     const practices = await this.getAllPractices();
-    const filteredPractices = practices.filter(p => p.id !== id);
-    
+    const filteredPractices = practices.filter((p) => p.id !== id);
+
     if (filteredPractices.length === practices.length) {
       return false; // 沒有找到要刪除的實踐
     }
@@ -109,13 +106,13 @@ export class PracticeStorage {
   }
 
   // ==================== 簽到記錄管理 ====================
-  
+
   static async getAllCheckIns(): Promise<CheckInRecord[]> {
     try {
       if (typeof window === 'undefined') {
         return [];
       }
-      
+
       const stored = localStorage.getItem(STORAGE_KEYS.CHECK_INS);
       return stored ? JSON.parse(stored) : [];
     } catch (error) {
@@ -129,7 +126,7 @@ export class PracticeStorage {
       if (typeof window === 'undefined') {
         return;
       }
-      
+
       localStorage.setItem(STORAGE_KEYS.CHECK_INS, JSON.stringify(checkIns));
     } catch (error) {
       console.error('Error saving check-ins:', error);
@@ -139,7 +136,7 @@ export class PracticeStorage {
 
   static async getCheckInsByPracticeId(practiceId: string): Promise<CheckInRecord[]> {
     const checkIns = await this.getAllCheckIns();
-    return checkIns.filter(checkIn => checkIn.practiceId === practiceId);
+    return checkIns.filter((checkIn) => checkIn.practiceId === practiceId);
   }
 
   static async addCheckIn(checkIn: CheckInRecord): Promise<CheckInRecord> {
@@ -151,8 +148,8 @@ export class PracticeStorage {
 
   static async updateCheckIn(id: string, updates: Partial<CheckInRecord>): Promise<CheckInRecord | null> {
     const checkIns = await this.getAllCheckIns();
-    const index = checkIns.findIndex(c => c.id === id);
-    
+    const index = checkIns.findIndex((c) => c.id === id);
+
     if (index === -1) {
       return null;
     }
@@ -164,8 +161,8 @@ export class PracticeStorage {
 
   static async deleteCheckIn(id: string): Promise<boolean> {
     const checkIns = await this.getAllCheckIns();
-    const filteredCheckIns = checkIns.filter(c => c.id !== id);
-    
+    const filteredCheckIns = checkIns.filter((c) => c.id !== id);
+
     if (filteredCheckIns.length === checkIns.length) {
       return false;
     }
@@ -175,35 +172,35 @@ export class PracticeStorage {
   }
 
   // ==================== 篩選和查詢 ====================
-  
+
   static async filterPractices(filter: PracticeFilter): Promise<Practice[]> {
     let practices = await this.getAllPractices();
 
     // 搜尋關鍵字
     if (filter.searchTerm) {
       const term = filter.searchTerm.toLowerCase();
-      practices = practices.filter(practice => 
+      practices = practices.filter((practice) =>
         practice.title.toLowerCase().includes(term) ||
         (practice.description && practice.description.toLowerCase().includes(term)) ||
-        practice.smallGoals.some(goal => goal.content.toLowerCase().includes(term)) ||
-        practice.resources.some(resource => resource.name.toLowerCase().includes(term)) ||
-        (practice.tags && practice.tags.some(tag => tag.toLowerCase().includes(term)))
+        practice.smallGoals.some((goal) => goal.content.toLowerCase().includes(term)) ||
+        practice.resources.some((resource) => resource.name.toLowerCase().includes(term)) ||
+        (practice.tags && practice.tags.some((tag) => tag.toLowerCase().includes(term)))
       );
     }
 
     // 狀態篩選
     if (filter.status && filter.status.length > 0) {
-      practices = practices.filter(practice => filter.status!.includes(practice.status));
+      practices = practices.filter((practice) => filter.status!.includes(practice.status));
     }
 
     // 內容類型篩選
     if (filter.contentType && filter.contentType.length > 0) {
-      practices = practices.filter(practice => filter.contentType!.includes(practice.contentType));
+      practices = practices.filter((practice) => filter.contentType!.includes(practice.contentType));
     }
 
     // 動機類型篩選
     if (filter.motivationType && filter.motivationType.length > 0) {
-      practices = practices.filter(practice => 
+      practices = practices.filter((practice) =>
         practice.motivationType && filter.motivationType!.includes(practice.motivationType)
       );
     }
@@ -211,18 +208,18 @@ export class PracticeStorage {
     // 日期範圍篩選
     if (filter.dateRange) {
       if (filter.dateRange.start) {
-        practices = practices.filter(practice => practice.createdAt >= filter.dateRange!.start!);
+        practices = practices.filter((practice) => practice.createdAt >= filter.dateRange!.start!);
       }
       if (filter.dateRange.end) {
-        practices = practices.filter(practice => practice.createdAt <= filter.dateRange!.end!);
+        practices = practices.filter((practice) => practice.createdAt <= filter.dateRange!.end!);
       }
     }
 
     // 排序
     if (filter.sortBy) {
       practices.sort((a, b) => {
-        let aValue: any;
-        let bValue: any;
+        let aValue: number;
+        let bValue: number;
 
         switch (filter.sortBy) {
           case 'createdAt':
@@ -257,21 +254,21 @@ export class PracticeStorage {
   }
 
   // ==================== 統計資料 ====================
-  
+
   static async getPracticeStats(): Promise<PracticeStats> {
     const practices = await this.getAllPractices();
     const checkIns = await this.getAllCheckIns();
 
     const stats: PracticeStats = {
       total: practices.length,
-      active: practices.filter(p => p.status === 'active').length,
-      completed: practices.filter(p => p.status === 'completed').length,
-      paused: practices.filter(p => p.status === 'paused').length,
-      archived: practices.filter(p => p.status === 'archived').length,
+      active: practices.filter((p) => p.status === 'active').length,
+      completed: practices.filter((p) => p.status === 'completed').length,
+      paused: practices.filter((p) => p.status === 'paused').length,
+      archived: practices.filter((p) => p.status === 'archived').length,
       totalCheckIns: checkIns.length,
       longestStreak: practices.reduce((max, p) => Math.max(max, p.streak), 0),
-      averageProgress: practices.length > 0 
-        ? practices.reduce((sum, p) => sum + (p.currentProgress / p.totalAmount * 100), 0) / practices.length
+      averageProgress: practices.length > 0
+        ? practices.reduce((sum, p) => sum + ((p.currentProgress / p.totalAmount) * 100), 0) / practices.length
         : 0
     };
 
@@ -282,25 +279,25 @@ export class PracticeStorage {
     if (typeof window === 'undefined') {
       return;
     }
-    
+
     localStorage.removeItem(STORAGE_KEYS.PRACTICES);
     localStorage.removeItem(STORAGE_KEYS.CHECK_INS);
     localStorage.removeItem(STORAGE_KEYS.SETTINGS);
   }
 
   // ==================== 設定管理 ====================
-  
+
   static async getSettings(): Promise<PracticeSettings> {
     try {
       if (typeof window === 'undefined') {
         return this.getDefaultSettings();
       }
-      
+
       const stored = localStorage.getItem(STORAGE_KEYS.SETTINGS);
       if (!stored) {
         return this.getDefaultSettings();
       }
-      
+
       return { ...this.getDefaultSettings(), ...JSON.parse(stored) };
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -313,7 +310,7 @@ export class PracticeStorage {
       if (typeof window === 'undefined') {
         return;
       }
-      
+
       const currentSettings = await this.getSettings();
       const updatedSettings = { ...currentSettings, ...settings };
       localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updatedSettings));
@@ -339,14 +336,14 @@ export class PracticeStorage {
       practices,
       stats: {
         total: practices.length,
-        active: practices.filter(p => p.status === 'active').length,
-        completed: practices.filter(p => p.status === 'completed').length,
-        paused: practices.filter(p => p.status === 'paused').length,
-        archived: practices.filter(p => p.status === 'archived').length,
+        active: practices.filter((p) => p.status === 'active').length,
+        completed: practices.filter((p) => p.status === 'completed').length,
+        paused: practices.filter((p) => p.status === 'paused').length,
+        archived: practices.filter((p) => p.status === 'archived').length,
         totalCheckIns: practices.reduce((sum, p) => sum + (p.checkIns?.length || 0), 0),
-        longestStreak: Math.max(0, ...practices.map(p => p.streak)),
-        averageProgress: practices.length > 0 
-          ? practices.reduce((sum, p) => sum + (p.currentProgress / p.totalAmount * 100), 0) / practices.length
+        longestStreak: Math.max(0, ...practices.map((p) => p.streak)),
+        averageProgress: practices.length > 0
+          ? practices.reduce((sum, p) => sum + ((p.currentProgress / p.totalAmount) * 100), 0) / practices.length
           : 0
       }
     };
@@ -357,7 +354,7 @@ export class PracticeStorage {
     try {
       const data = JSON.parse(dataString);
       return data.practices || [];
-    } catch (error) {
+    } catch {
       throw new Error('匯入資料格式錯誤');
     }
   }

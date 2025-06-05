@@ -84,12 +84,12 @@ const StepTwo: React.FC<StepTwoProps> = ({
             <Label className="block text-sm font-medium text-foreground mb-4">
               實踐時間 <span className="text-destructive">*</span>
             </Label>
-            
+
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xl font-bold text-primary">{practiceDays} 天</span>
               </div>
-              
+
               <div className="relative">
                 <input
                   type="range"
@@ -126,8 +126,8 @@ const StepTwo: React.FC<StepTwoProps> = ({
                       className={cn(
                         "w-full px-4 py-3 border-2 rounded-lg justify-start text-left font-normal h-auto",
                         !startDate && "text-muted-foreground",
-                        validationErrors.targetDate 
-                          ? "border-destructive focus:border-destructive focus:ring-destructive" 
+                        validationErrors.targetDate
+                          ? "border-destructive focus:border-destructive focus:ring-destructive"
                           : "border-border hover:border-primary focus:border-primary"
                       )}
                     >
@@ -158,7 +158,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                   <p className="mt-1 text-sm text-destructive">{validationErrors.targetDate}</p>
                 )}
               </div>
-              
+
               <div>
                 <Label className="block text-sm font-medium text-foreground mb-2">
                   結束日期
@@ -181,7 +181,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
             <Label className="block text-sm font-medium text-foreground mb-4">
               實踐行動 <span className="text-destructive">*</span>
             </Label>
-            
+
             <div className="relative">
               <div className="text-lg text-foreground mb-4 leading-relaxed">
                 我要在這
@@ -190,7 +190,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                 </span>
                 要進行實踐是
               </div>
-              
+
               <div className="relative">
                 <Textarea
                   value={practiceGoal}
@@ -199,12 +199,12 @@ const StepTwo: React.FC<StepTwoProps> = ({
                   className="w-full px-4 py-3 border-2 border-border rounded-lg resize-none focus:ring-2 focus:ring-primary focus:border-primary text-foreground bg-background placeholder-muted-foreground"
                   rows={2}
                   maxLength={50}
-                  style={{ 
+                  style={{
                     fontSize: '16px',
                     lineHeight: '1.5'
                   }}
                 />
-                
+
                 {/* Character counter */}
                 <div className="absolute bottom-3 right-3 text-sm text-muted-foreground bg-background px-2 py-1 rounded">
                   {practiceGoal.length}/50
@@ -218,7 +218,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
             <Label className="block text-sm font-medium text-foreground mb-4">
               每週節奏 <span className="text-destructive">*</span>
             </Label>
-            
+
             <div className="space-y-6">
               {/* Description at top */}
               <div className="text-center">
@@ -232,87 +232,103 @@ const StepTwo: React.FC<StepTwoProps> = ({
                   <span className="text-primary font-medium">平衡</span>
                   <span>積極</span>
                 </div>
-                
+
                 <div className="relative mb-6">
                   {/* Slider track */}
                   <div className="h-2 bg-muted rounded-full relative">
                     {/* Active range track */}
-                    <div 
+                    <div
                       className="h-2 rounded-full transition-all duration-300 absolute"
-                      style={{ 
+                      style={{
                         backgroundColor: 'hsl(var(--primary))',
                         left: `${((frequencyRange[0] - 2) / 4) * 100}%`,
                         width: `${((frequencyRange[1] - frequencyRange[0]) / 4) * 100}%`
                       }}
                     />
-                    
+
                     {/* Minimum thumb */}
-                    <div 
+                    <div
                       className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-6 h-6 bg-white border-2 rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 ${
                         draggedThumb === 'min' ? 'scale-110' : ''
                       }`}
-                      style={{ 
+                      style={{
                         borderColor: 'hsl(var(--primary))',
                         left: `${((frequencyRange[0] - 2) / 4) * 100}%`,
                         boxShadow: draggedThumb === 'min' ? '0 0 0 4px hsl(var(--primary) / 0.3)' : undefined
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setDraggedThumb('min');
+                        }
                       }}
                       onMouseDown={(e) => {
                         setDraggedThumb('min');
                         const startX = e.clientX;
                         const startValue = frequencyRange[0];
-                        
-                        const handleMouseMove = (e: MouseEvent) => {
-                          const deltaX = e.clientX - startX;
+
+                        const handleMouseMove = (event: MouseEvent) => {
+                          const deltaX = event.clientX - startX;
                           const deltaValue = Math.round((deltaX / 200) * 4);
                           const newMin = Math.max(2, Math.min(startValue + deltaValue, frequencyRange[1]));
                           handleRangeChange([newMin, frequencyRange[1]]);
                         };
-                        
+
                         const handleMouseUp = () => {
                           setDraggedThumb(null);
                           document.removeEventListener('mousemove', handleMouseMove);
                           document.removeEventListener('mouseup', handleMouseUp);
                         };
-                        
+
                         document.addEventListener('mousemove', handleMouseMove);
                         document.addEventListener('mouseup', handleMouseUp);
                       }}
                     />
-                    
+
                     {/* Maximum thumb */}
-                    <div 
+                    <div
                       className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-6 h-6 bg-white border-2 rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 ${
                         draggedThumb === 'max' ? 'scale-110' : ''
                       }`}
-                      style={{ 
+                      style={{
                         borderColor: 'hsl(var(--primary))',
                         left: `${((frequencyRange[1] - 2) / 4) * 100}%`,
                         boxShadow: draggedThumb === 'max' ? '0 0 0 4px hsl(var(--primary) / 0.3)' : undefined
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setDraggedThumb('max');
+                        }
                       }}
                       onMouseDown={(e) => {
                         setDraggedThumb('max');
                         const startX = e.clientX;
                         const startValue = frequencyRange[1];
-                        
-                        const handleMouseMove = (e: MouseEvent) => {
-                          const deltaX = e.clientX - startX;
+
+                        const handleMouseMove = (event: MouseEvent) => {
+                          const deltaX = event.clientX - startX;
                           const deltaValue = Math.round((deltaX / 200) * 4);
                           const newMax = Math.max(frequencyRange[0], Math.min(6, startValue + deltaValue));
                           handleRangeChange([frequencyRange[0], newMax]);
                         };
-                        
+
                         const handleMouseUp = () => {
                           setDraggedThumb(null);
                           document.removeEventListener('mousemove', handleMouseMove);
                           document.removeEventListener('mouseup', handleMouseUp);
                         };
-                        
+
                         document.addEventListener('mousemove', handleMouseMove);
                         document.addEventListener('mouseup', handleMouseUp);
                       }}
                     />
                   </div>
-                  
+
                   {/* Frequency markers */}
                   <div className="flex justify-between mt-6">
                     {[2, 3, 4, 5, 6].map((freq) => (
@@ -341,16 +357,16 @@ const StepTwo: React.FC<StepTwoProps> = ({
               {/* Description */}
               <div className="text-center space-y-2">
                 <div className="text-sm text-foreground font-medium">
-                  {frequencyRange[0] === frequencyRange[1] 
+                  {frequencyRange[0] === frequencyRange[1]
                     ? `每週固定 ${frequencyRange[0]} 次`
                     : `每週至少 ${frequencyRange[0]} 次，最多 ${frequencyRange[1]} 次`}
                 </div>
                 <div className="text-xs font-medium text-primary">
-                  {frequencyRange[1] - frequencyRange[0] === 0 
-                    ? "無彈性，但規律穩定" 
-                    : frequencyRange[1] - frequencyRange[0] === 1 
+                  {frequencyRange[1] - frequencyRange[0] === 0
+                    ? "無彈性，但規律穩定"
+                    : frequencyRange[1] - frequencyRange[0] === 1
                     ? "小幅彈性，易於調整"
-                    : frequencyRange[1] - frequencyRange[0] === 2 
+                    : frequencyRange[1] - frequencyRange[0] === 2
                     ? "中等彈性，易於調整"
                     : "高度彈性，最大自由度"}
                 </div>
@@ -363,11 +379,11 @@ const StepTwo: React.FC<StepTwoProps> = ({
             <Label className="block text-sm font-medium text-foreground mb-4">
               每日實踐目標 <span className="text-destructive">*</span>
             </Label>
-            
+
             <div className="space-y-4">
               {/* Goal Type Selection */}
-              <RadioGroup 
-                value={dailyGoalType} 
+              <RadioGroup
+                value={dailyGoalType}
                 onValueChange={setDailyGoalType}
                 className="flex items-center space-x-6"
               >
@@ -386,7 +402,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                 <div className="mt-6">
                   <div className="flex items-center text-lg text-foreground mb-4">
                     <span>每次進行</span>
-                    <Select value={dailyGoalTime.toString()} onValueChange={(value) => setDailyGoalTime(parseInt(value))}>
+                    <Select value={dailyGoalTime.toString()} onValueChange={(value) => setDailyGoalTime(parseInt(value, 10))}>
                       <SelectTrigger className="mx-3 w-32 border-2 border-border focus:ring-2 focus:ring-primary focus:border-primary">
                         <SelectValue />
                       </SelectTrigger>
@@ -409,7 +425,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                     <Input
                       type="number"
                       value={dailyGoalPages}
-                      onChange={(e) => setDailyGoalPages(parseInt(e.target.value) || 0)}
+                      onChange={(e) => setDailyGoalPages(parseInt(e.target.value, 10) || 0)}
                       className="mx-3 w-20 px-3 py-2 border-2 border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-center"
                       min="1"
                       max="999"
@@ -432,16 +448,16 @@ const StepTwo: React.FC<StepTwoProps> = ({
 
       {/* Navigation Buttons */}
       <div className="p-6 pt-0 flex justify-between">
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={handlePreviousStep}
         >
           上一步
         </Button>
-        <Button 
+        <Button
           onClick={handleNextStep}
-          disabled={!startDate || !practiceDays || !practiceGoal.trim() || !frequencyRange || !dailyGoalType || 
-            (dailyGoalType === 'time' && !dailyGoalTime) || 
+          disabled={!startDate || !practiceDays || !practiceGoal.trim() || !frequencyRange || !dailyGoalType ||
+            (dailyGoalType === 'time' && !dailyGoalTime) ||
             (dailyGoalType === 'completion' && (!dailyGoalPages || !customUnit))}
         >
           下一步
@@ -470,7 +486,8 @@ const StepTwo: React.FC<StepTwoProps> = ({
           border: 2px solid #ffffff;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
-      `}</style>
+      `}
+      </style>
     </div>
   );
 };

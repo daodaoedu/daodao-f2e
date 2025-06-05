@@ -7,22 +7,22 @@ const getTagColor = (tag: string): string => {
   // 預設標籤配色 - 使用專案配色方案
   const tagColors: Record<string, string> = {
     // 分類標籤
-    '學習': 'bg-primary-base/10 text-primary-darker',
-    '技能': 'bg-success/10 text-success',
-    '工作': 'bg-basic-300/20 text-basic-500',
-    '興趣': 'bg-tips/10 text-tips',
-    '健康': 'bg-success/20 text-success',
-    '創作': 'bg-tips/20 text-tips',
+    學習: 'bg-primary-base/10 text-primary-darker',
+    技能: 'bg-success/10 text-success',
+    工作: 'bg-basic-300/20 text-basic-500',
+    興趣: 'bg-tips/10 text-tips',
+    健康: 'bg-success/20 text-success',
+    創作: 'bg-tips/20 text-tips',
     // 難度標籤
-    '初學': 'bg-success/10 text-success',
-    '進階': 'bg-tips/10 text-tips',
-    '專家': 'bg-alert/10 text-alert',
+    初學: 'bg-success/10 text-success',
+    進階: 'bg-tips/10 text-tips',
+    專家: 'bg-alert/10 text-alert',
     // 時長標籤
-    '短期': 'bg-primary-lighter/20 text-primary-base',
-    '中期': 'bg-basic-200/50 text-basic-400',
-    '長期': 'bg-basic-300/30 text-basic-500'
+    短期: 'bg-primary-lighter/20 text-primary-base',
+    中期: 'bg-basic-200/50 text-basic-400',
+    長期: 'bg-basic-300/30 text-basic-500'
   };
-  
+
   return tagColors[tag] || 'bg-basic-100 text-basic-400';
 };
 
@@ -33,11 +33,11 @@ interface TagListProps {
   className?: string;
 }
 
-const TagList: React.FC<TagListProps> = ({ 
-  tags, 
+const TagList: React.FC<TagListProps> = ({
+  tags,
   maxDisplay = 5,
   showIcon = true,
-  className = '' 
+  className = ''
 }) => {
   if (!tags || tags.length === 0) {
     return null;
@@ -52,9 +52,9 @@ const TagList: React.FC<TagListProps> = ({
         <Hash className="h-4 w-4 text-basic-400 flex-shrink-0" />
       )}
       <div className="flex flex-wrap items-center gap-1">
-        {displayTags.map((tag, index) => (
+        {displayTags.map((tag) => (
           <span
-            key={index}
+            key={tag}
             className={cn(
               "px-2 py-1 rounded-full text-xs font-medium transition-colors",
               getTagColor(tag)

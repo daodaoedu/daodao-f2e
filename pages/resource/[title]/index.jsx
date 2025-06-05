@@ -42,13 +42,19 @@ const ResourcePage = ({ data = {} }) => {
 
   const feeTags = useMemo(
     () =>
-      data?.properties['費用']?.select
+      data?.properties && data?.properties['費用']?.select
         ? [data?.properties['費用']?.select]
         : [],
-    [data],
+    [data?.properties],
   );
 
-  const videoLink = useMemo(() => data?.properties['影片']?.url, [data]);
+  const videoLink = useMemo(
+    () =>
+      data?.properties && data?.properties['影片']
+        ? data?.properties['影片']?.url
+        : '',
+    [data?.properties],
+  );
 
   const link = useMemo(
     () =>
@@ -86,7 +92,7 @@ const ResourcePage = ({ data = {} }) => {
             data?.properties['連結'] &&
             data?.properties['連結']?.url,
           isAccessibleForFree: !(
-            data?.properties['費用']?.select?.name === '需付費'
+            data?.properties && data?.properties['費用']?.select?.name === '需付費'
           ),
           creator: { '@type': 'Organization', name: '島島阿學' },
           // distribution: [

@@ -2,7 +2,6 @@ import useSWR from 'swr';
 import { getIdeaEndpoint, IdeaSchema } from '@/services/ideas';
 import useIdea from './useIdea';
 
-
 interface IdeaListResponse {
   data: IdeaSchema[];
   page: number;
@@ -19,7 +18,7 @@ interface UseIdeaListOptions {
 
 export default function useIdeaList(options?: UseIdeaListOptions) {
   const swrKey = getIdeaEndpoint();
-  const { mutate,data, ...swr } = useSWR<IdeaListResponse>(swrKey);
+  const { mutate, data, ...swr } = useSWR<IdeaListResponse>(swrKey);
   const mutations = useIdea({
     mutateKey: swrKey,
     ...options,

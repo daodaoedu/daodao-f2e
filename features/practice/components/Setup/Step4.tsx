@@ -1,6 +1,6 @@
 import React from 'react';
-import { Check, Calendar, Target, BookOpen, Bell, Users } from 'lucide-react';
-import { colors, contentTypeOptions, getUnitType } from '@/constants/practice';
+import { Calendar, Target, BookOpen } from 'lucide-react';
+import { colors, contentTypeOptions } from '@/constants/practice';
 import { PathInfo } from '@/services/modules/practice/schema';
 import { Button } from '@/components/atoms/button';
 
@@ -42,19 +42,19 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
   // 取得日期範圍格式字串
   const getDateRange = (): string => {
     if (!pathInfo.targetDate) return '未設定日期';
-    
+
     const startDate = new Date(pathInfo.targetDate);
     const endDate = new Date(startDate);
     const practiceDays = parseInt(pathInfo.totalAmount, 10) || 7;
     endDate.setDate(startDate.getDate() + practiceDays);
-    
+
     const formatDate = (date: Date): string => {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
       return `${year}/${month}/${day}`;
     };
-    
+
     return `${formatDate(startDate)}-${formatDate(endDate)}`;
   };
 
@@ -102,8 +102,8 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
                     我要進行實踐的是
                     <div className="ml-2 flex-1">
                       {smallGoals.map((goal, index) => (
-                        <span 
-                          key={goal.id} 
+                        <span
+                          key={goal.id}
                           className="underline decoration-2"
                           style={{ textDecorationColor: colors.primary }}
                         >
@@ -130,7 +130,7 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
                       <span
                         key={tag}
                         className="px-2 py-1 rounded-full text-xs font-medium"
-                        style={{ 
+                        style={{
                           backgroundColor: `${colors.primary}15`,
                           color: colors.primary,
                           border: `1px solid ${colors.primary}30`
@@ -159,8 +159,6 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
                   </div>
                 </div>
               </div>
-
-
 
               {/* 資源 */}
               <div className="mb-4">

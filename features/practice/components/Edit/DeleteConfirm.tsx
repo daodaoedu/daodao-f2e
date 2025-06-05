@@ -4,7 +4,6 @@ import { AlertTriangle, X } from 'lucide-react';
 import { Practice } from '@/services/modules/practice/schema';
 import { Button } from '@/components/atoms/button';
 import { Badge } from '@/components/atoms/badge';
-import { cn } from '@/utils/cn';
 
 interface DeleteConfirmProps {
   practice: Practice | null;
@@ -81,7 +80,7 @@ const DeleteConfirm: React.FC<DeleteConfirmProps> = ({
                 )}
               </div>
             </div>
-            
+
             {/* 警告訊息 */}
             <div className="space-y-2 text-center">
               <p className="text-sm text-muted-foreground">

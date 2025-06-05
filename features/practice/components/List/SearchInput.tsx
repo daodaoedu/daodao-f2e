@@ -34,7 +34,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
         <Search className={cn(
           'absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors',
           focused ? 'text-primary' : 'text-muted-foreground'
-        )} />
+        )}
+        />
 
         {/* 輸入框 */}
         <Input

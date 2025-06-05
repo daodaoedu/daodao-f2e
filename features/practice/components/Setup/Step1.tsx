@@ -55,7 +55,7 @@ const Step1: React.FC<Step1Props> = ({
           給你的主題實踐一個清晰的名稱
         </p>
       </div>
-      
+
       <div className="px-6 pb-6 space-y-6">
         {/* 標題輸入 */}
         <div className="space-y-2">
@@ -84,7 +84,7 @@ const Step1: React.FC<Step1Props> = ({
               const Icon = option.icon;
               const isSelected = pathInfo.contentType === option.id;
               const hasError = validationErrors.contentType;
-              
+
               return (
                 <div
                   key={option.id}
@@ -102,8 +102,8 @@ const Step1: React.FC<Step1Props> = ({
                   <div
                     className={cn(
                       "w-8 h-8 rounded-full flex items-center justify-center mr-3",
-                      isSelected 
-                        ? "bg-primary text-primary-foreground" 
+                      isSelected
+                        ? "bg-primary text-primary-foreground"
                         : "bg-muted text-muted-foreground"
                     )}
                   >
@@ -113,7 +113,8 @@ const Step1: React.FC<Step1Props> = ({
                     <p className={cn(
                       "font-medium",
                       isSelected ? "text-primary" : "text-foreground"
-                    )}>
+                    )}
+                    >
                       {option.label}
                     </p>
                   </div>
@@ -154,8 +155,8 @@ const Step1: React.FC<Step1Props> = ({
                     className={cn(
                       "px-3 py-1 h-auto text-xs font-medium transition-all",
                       tag.color,
-                      selectedTags.includes(tag.label) 
-                        ? "opacity-50 cursor-not-allowed" 
+                      selectedTags.includes(tag.label)
+                        ? "opacity-50 cursor-not-allowed"
                         : "hover:scale-105 cursor-pointer",
                       selectedTags.length >= 8 && !selectedTags.includes(tag.label) && "opacity-30 cursor-not-allowed"
                     )}
@@ -180,8 +181,8 @@ const Step1: React.FC<Step1Props> = ({
                     className={cn(
                       "px-3 py-1 h-auto text-xs font-medium transition-all",
                       tag.color,
-                      selectedTags.includes(tag.label) 
-                        ? "opacity-50 cursor-not-allowed" 
+                      selectedTags.includes(tag.label)
+                        ? "opacity-50 cursor-not-allowed"
                         : "hover:scale-105 cursor-pointer",
                       selectedTags.length >= 8 && !selectedTags.includes(tag.label) && "opacity-30 cursor-not-allowed"
                     )}
@@ -206,8 +207,8 @@ const Step1: React.FC<Step1Props> = ({
                     className={cn(
                       "px-3 py-1 h-auto text-xs font-medium transition-all",
                       tag.color,
-                      selectedTags.includes(tag.label) 
-                        ? "opacity-50 cursor-not-allowed" 
+                      selectedTags.includes(tag.label)
+                        ? "opacity-50 cursor-not-allowed"
                         : "hover:scale-105 cursor-pointer",
                       selectedTags.length >= 8 && !selectedTags.includes(tag.label) && "opacity-30 cursor-not-allowed"
                     )}
@@ -334,7 +335,7 @@ const Step1: React.FC<Step1Props> = ({
           </div>
         </div>
       </div>
-      
+
       <div className="px-6 py-4 border-t border-border flex justify-end">
         <Button
           onClick={handleNextStep}

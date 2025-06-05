@@ -3,7 +3,7 @@ import { Filter, X } from 'lucide-react';
 import { PracticeFilter, PracticeStatus, ContentType } from '@/services/modules/practice/schema';
 import { getContentTypeLabel, getStatusLabel } from '@/services/modules/practice/utils';
 import { Button } from '@/components/atoms/button';
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -34,7 +34,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
     'completed',
     'archived'
   ];
-  
+
   const contentTypeOptions: ContentType[] = [
     'book',
     'video',
@@ -86,12 +86,12 @@ const FilterBar: React.FC<FilterBarProps> = ({
   };
 
   const removeStatusFilter = (status: PracticeStatus) => {
-    const newStatus = (filter.status || []).filter(s => s !== status);
+    const newStatus = (filter.status || []).filter((s) => s !== status);
     onFilterChange({ status: newStatus.length > 0 ? newStatus : undefined });
   };
 
   const removeContentTypeFilter = (contentType: ContentType) => {
-    const newTypes = (filter.contentType || []).filter(t => t !== contentType);
+    const newTypes = (filter.contentType || []).filter((t) => t !== contentType);
     onFilterChange({ contentType: newTypes.length > 0 ? newTypes : undefined });
   };
 
@@ -127,17 +127,17 @@ const FilterBar: React.FC<FilterBarProps> = ({
 
       <div className="flex flex-wrap gap-2 sm:gap-4">
         {/* 狀態篩選 */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="w-full xs:w-auto">
-                狀態
-                {filter.status?.length && (
-                  <Badge variant="default" className="ml-2 h-5 min-w-5 p-0 text-xs">
-                    {filter.status.length}
-                  </Badge>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="w-full xs:w-auto">
+              狀態
+              {filter.status?.length && (
+              <Badge variant="default" className="ml-2 h-5 min-w-5 p-0 text-xs">
+                {filter.status.length}
+              </Badge>
                 )}
-              </Button>
-            </DropdownMenuTrigger>
+            </Button>
+          </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
             {statusOptions.map((status) => (
               <DropdownMenuCheckboxItem
@@ -149,20 +149,20 @@ const FilterBar: React.FC<FilterBarProps> = ({
               </DropdownMenuCheckboxItem>
             ))}
           </DropdownMenuContent>
-            </DropdownMenu>
+        </DropdownMenu>
 
         {/* 內容類型篩選 */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="w-full xs:w-auto">
-                類型
-                {filter.contentType?.length && (
-                  <Badge variant="default" className="ml-2 h-5 min-w-5 p-0 text-xs">
-                    {filter.contentType.length}
-                  </Badge>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="w-full xs:w-auto">
+              類型
+              {filter.contentType?.length && (
+              <Badge variant="default" className="ml-2 h-5 min-w-5 p-0 text-xs">
+                {filter.contentType.length}
+              </Badge>
                 )}
-              </Button>
-            </DropdownMenuTrigger>
+            </Button>
+          </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
             {contentTypeOptions.map((contentType) => (
               <DropdownMenuCheckboxItem
@@ -177,14 +177,14 @@ const FilterBar: React.FC<FilterBarProps> = ({
         </DropdownMenu>
 
         {/* 排序選項 */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="w-full xs:w-auto">
-                <span className="hidden sm:inline">排序：</span>
-                <span className="sm:hidden">排序</span>
-                <span className="hidden lg:inline">{sortOptions.find((opt) => opt.value === filter.sortBy)?.label}</span>
-              </Button>
-            </DropdownMenuTrigger>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="w-full xs:w-auto">
+              <span className="hidden sm:inline">排序：</span>
+              <span className="sm:hidden">排序</span>
+              <span className="hidden lg:inline">{sortOptions.find((opt) => opt.value === filter.sortBy)?.label}</span>
+            </Button>
+          </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
             {sortOptions.map((option) => (
               <DropdownMenuItem
@@ -200,8 +200,8 @@ const FilterBar: React.FC<FilterBarProps> = ({
               {filter.sortOrder === 'asc' ? '升序排列' : '降序排列'}
             </DropdownMenuItem>
           </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        </DropdownMenu>
+      </div>
 
       {/* 已套用的篩選標籤 */}
       {hasActiveFilters && (

@@ -27,7 +27,7 @@ const CheckInView: React.FC<CheckInViewProps> = ({
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState<string>('');
   const [submitting, setSubmitting] = useState<boolean>(false);
-  const [errors, setErrors] = useState<string[]>([])
+  const [errors, setErrors] = useState<string[]>([]);
 
   // 檢查是否可以打卡
   const canCheckIn = !CheckInService.hasCheckedInToday(practice);
@@ -45,7 +45,6 @@ const CheckInView: React.FC<CheckInViewProps> = ({
   const suggestedTags = ['閱讀', '筆記', '練習', '複習', '新概念', '困難', '有趣', '完成章節'];
 
   // 計算進度百分比
-  const currentProgressPercentage = Math.round((practice.currentProgress / practice.totalAmount) * 100);
   const newProgressPercentage = Math.round(((practice.currentProgress + progress) / practice.totalAmount) * 100);
 
   // 處理標籤添加

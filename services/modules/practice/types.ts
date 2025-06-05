@@ -234,24 +234,24 @@ export interface PracticeContextType {
   updatePractice: (id: string, input: UpdatePracticeInput) => Promise<Practice>;
   deletePractice: (id: string) => Promise<void>;
   checkIn: (input: CheckInInput) => Promise<CheckInRecord>;
-  
+
   // 查詢方法
   getPractice: (id: string) => Practice | undefined;
   getCheckInHistory: (practiceId: string) => CheckInRecord[];
-  
+
   // 篩選和搜尋
   setFilter: (filter: Partial<PracticeFilter>) => void;
   resetFilter: () => void;
-  
+
   // 資料管理
   exportData: () => string;
   importData: (data: string) => Promise<void>;
-  
+
   // 工具方法
   calculateStreak: (practiceId: string) => number;
   getProgress: (practiceId: string) => number;
   canCheckInToday: (practiceId: string) => boolean;
 
   // 便利方法（向後相容）
-  createPracticeFromPathInfo: (pathInfo: any, smallGoals: any[], resources: any[]) => Promise<string>;
+  createPracticeFromPathInfo: (pathInfo: Record<string, unknown>, smallGoals: Array<{content: string}>, resources: Array<{name: string, url: string}>) => Promise<string>;
 }

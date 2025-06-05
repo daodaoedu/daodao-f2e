@@ -1,13 +1,14 @@
 import { useState, useCallback } from 'react';
-import { 
-  usePractices, 
-  useFilteredPractices, 
+import {
+  usePractices,
+  useFilteredPractices,
   usePractice,
   useActivePractices,
   useCheckInHistory,
   ContentType,
   ResourceType,
-  ReminderFrequency
+  ReminderFrequency,
+  MotivationType
 } from '@/services/modules/practice';
 import type { PracticeFilter, CreatePracticeInput } from '@/services/modules/practice';
 
@@ -39,7 +40,7 @@ export function usePracticeManager() {
   const filteredPractices = useFilteredPractices(filter);
 
   const updateFilter = useCallback((newFilter: Partial<PracticeFilter>) => {
-    setFilter(prev => ({ ...prev, ...newFilter }));
+    setFilter((prev) => ({ ...prev, ...newFilter }));
   }, []);
 
   const resetFilter = useCallback(() => {
@@ -54,33 +55,41 @@ export function usePracticeManager() {
   }, []);
 
   // 轉換 PathInfo 為 CreatePracticeInput
-  const pathInfoToPractice = useCallback((pathInfo: any, smallGoals: any[], resources: any[], tags: string[] = [], dailyGoalConfig: any = null): CreatePracticeInput => {
+  const pathInfoToPractice = useCallback((pathInfo: Record<string, unknown>, smallGoals: Array<{content: string}>, resources: Array<{name: string, url: string}>, tags: string[] = [], dailyGoalConfig: Record<string, unknown> | null = null): CreatePracticeInput => {
     const contentTypeMap: Record<string, ContentType> = {
-      'book': 'book' as ContentType,
-      'video': 'video' as ContentType,
-      'articles': 'articles' as ContentType,
-      'podcast': 'podcast' as ContentType,
-      'course': 'course' as ContentType,
-      'custom': 'custom' as ContentType
+      book: 'book' as ContentType,
+      video: 'video' as ContentType,
+      articles: 'articles' as ContentType,
+      podcast: 'podcast' as ContentType,
+      course: 'course' as ContentType,
+      custom: 'custom' as ContentType
     };
 
     const reminderFrequencyMap: Record<string, ReminderFrequency> = {
-      'daily': 'daily' as ReminderFrequency,
+      daily: 'daily' as ReminderFrequency,
       'every-other-day': 'every-other-day' as ReminderFrequency,
       'twice-weekly': 'twice-weekly' as ReminderFrequency,
-      'weekly': 'weekly' as ReminderFrequency
+      weekly: 'weekly' as ReminderFrequency
+    };
+
+    const motivationTypeMap: Record<string, MotivationType> = {
+      career: 'career' as MotivationType,
+      personal: 'personal' as MotivationType,
+      project: 'project' as MotivationType,
+      required: 'required' as MotivationType,
+      other: 'other' as MotivationType
     };
 
     return {
-      title: pathInfo.title,
-      description: pathInfo.notes || undefined,
-      contentType: contentTypeMap[pathInfo.contentType] || 'custom' as ContentType,
-      totalAmount: parseInt(pathInfo.totalAmount, 10) || 1,
-      targetDate: pathInfo.targetDate || undefined,
-      motivationType: pathInfo.motivationType || undefined,
-      customMotivation: pathInfo.customMotivation || undefined,
-      reminderEnabled: pathInfo.reminderEnabled || false,
-      reminderFrequency: reminderFrequencyMap[pathInfo.reminderFrequency] || 'daily' as ReminderFrequency,
+      title: String(pathInfo.title || ''),
+      description: pathInfo.notes ? String(pathInfo.notes) : undefined,
+      contentType: contentTypeMap[String(pathInfo.contentType)] || 'custom' as ContentType,
+      totalAmount: parseInt(String(pathInfo.totalAmount), 10) || 1,
+      targetDate: pathInfo.targetDate ? String(pathInfo.targetDate) : undefined,
+      motivationType: pathInfo.motivationType ? motivationTypeMap[String(pathInfo.motivationType)] : undefined,
+      customMotivation: pathInfo.customMotivation ? String(pathInfo.customMotivation) : undefined,
+      reminderEnabled: Boolean(pathInfo.reminderEnabled),
+      reminderFrequency: reminderFrequencyMap[String(pathInfo.reminderFrequency)] || 'daily' as ReminderFrequency,
       smallGoals: smallGoals.map((goal, index) => ({
         content: goal.content,
         isCompleted: false,
@@ -92,12 +101,17 @@ export function usePracticeManager() {
         type: 'website' as ResourceType,
         order: index
       })),
-      tags: tags,
-      dailyGoal: dailyGoalConfig
+      tags,
+      dailyGoal: dailyGoalConfig && typeof dailyGoalConfig === 'object' ? dailyGoalConfig as {
+        type: 'time' | 'completion';
+        timeMinutes?: number;
+        amount?: number;
+        unit?: string;
+      } : undefined
     };
   }, []);
 
-  const createPracticeFromPathInfo = useCallback(async (pathInfo: any, smallGoals: any[], resources: any[], tags: string[] = [], dailyGoalConfig: any = null) => {
+  const createPracticeFromPathInfo = useCallback(async (pathInfo: Record<string, unknown>, smallGoals: Array<{content: string}>, resources: Array<{name: string, url: string}>, tags: string[] = [], dailyGoalConfig: Record<string, unknown> | null = null) => {
     const practiceData = pathInfoToPractice(pathInfo, smallGoals, resources, tags, dailyGoalConfig);
     const practice = await createPractice(practiceData);
     return practice.id;
@@ -117,11 +131,11 @@ export function usePracticeManager() {
     updatePractice,
     deletePractice,
     checkIn,
-    
+
     // 篩選和搜尋
     updateFilter,
     resetFilter,
-    
+
     // 資料管理
     exportData,
     importData,
@@ -136,7 +150,7 @@ export function usePracticeManager() {
 export function usePracticeDetail(id: string | undefined) {
   const { loading, error } = usePractices();
   const practiceData = usePractice(id);
-  
+
   return {
     ...practiceData,
     loading,
@@ -157,7 +171,7 @@ export function usePracticeCheckInHistory(practiceId: string | undefined) {
 // 進度計算 Hook
 export function usePracticeProgress(practiceId: string | undefined) {
   const { practice } = usePractice(practiceId);
-  
+
   if (!practice) {
     return {
       current: 0,
@@ -168,7 +182,7 @@ export function usePracticeProgress(practiceId: string | undefined) {
     };
   }
 
-  const percentage = practice.totalAmount > 0 
+  const percentage = practice.totalAmount > 0
     ? Math.min(Math.round((practice.currentProgress / practice.totalAmount) * 100), 100)
     : 0;
 

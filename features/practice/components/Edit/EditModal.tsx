@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, AlertCircle } from 'lucide-react';
 import { Practice } from '@/services/modules/practice/schema';
-import EditForm from './EditForm';
 import { Button } from '@/components/atoms/button';
+import EditForm from './EditForm';
 
 interface EditModalProps {
   practice: Practice | null;

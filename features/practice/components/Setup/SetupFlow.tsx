@@ -1,13 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { usePracticeManager } from '@/features/practice/hooks';
+import Confetti from '@/features/practice/components/Shared/Confetti';
+import CelebrationMessage from '@/features/practice/components/Shared/CelebrationMessage';
+import { PathInfo } from '@/services/modules/practice/schema';
 import Step1 from './Step1';
 import Step2 from './Step2';
 import Step3 from './Step3';
 import Step4 from './Step4';
-import Confetti from '@/features/practice/components/Shared/Confetti';
-import CelebrationMessage from '@/features/practice/components/Shared/CelebrationMessage';
-import { PathInfo } from '@/services/modules/practice/schema';
 
 interface SetupFlowProps {
   onComplete?: (practiceId: string) => void;
@@ -26,8 +26,7 @@ interface Resource {
 }
 
 const SetupFlow: React.FC<SetupFlowProps> = ({
-  onComplete,
-  onCancel
+  onComplete
 }) => {
   const router = useRouter();
   const { createPracticeFromPathInfo } = usePracticeManager();
@@ -228,16 +227,6 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
       setCelebrationMessage('');
     }
   }, [pathInfo, smallGoals, resources, createPracticeFromPathInfo, onComplete, router]);
-
-  const handleCancel = useCallback(() => {
-    if (onCancel) {
-      onCancel();
-    } else {
-      router.push('/practice');
-    }
-  }, [onCancel, router]);
-
-
 
   const renderStepContent = () => {
     const stepProps = {

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
+import { Practice } from '@/services/modules/practice/schema';
+import { DashboardView } from '@/services/modules/practice';
 import MainDashboard from './MainDashboard';
 import CheckInView from './CheckInView';
 import HistoryView from './HistoryView';
 import Confetti from '../Shared/Confetti';
 import CelebrationMessage from '../Shared/CelebrationMessage';
-import { Practice } from '@/services/modules/practice/schema';
-import { DashboardView } from '@/services/modules/practice';
 
 interface DashboardFlowProps {
   practice: Practice;
@@ -86,7 +86,6 @@ const DashboardFlow: React.FC<DashboardFlowProps> = ({
           <MainDashboard
             practice={practice}
             onCheckIn={() => handleViewChange('checkin')}
-            onViewHistory={() => handleViewChange('history')}
             onBack={onBack}
           />
         )}
