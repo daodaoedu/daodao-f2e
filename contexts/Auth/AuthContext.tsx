@@ -273,7 +273,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
         </SWRConfig>
         <LoginModal
           isOpen={state.isOpenLoginModal}
-          keepMounted={!state.isLoggedIn}
           onClose={authDispatch.closeLoginModal}
         />
       </AuthDispatchContext.Provider>

@@ -1,5 +1,5 @@
 import useSWRMutation from "swr/mutation";
-import Modal from "@/shared/components/Modal";
+import ResponsiveModal, { ResponsiveModalSize } from "@/components/molecules/responsive-modal";
 import {
   getProjectOutcomePathname,
   projectOutcomeAPI,
@@ -35,10 +35,9 @@ export default function OutcomeCreateModal({
   );
 
   return (
-    <Modal
-      size="md"
-      className="rounded-2xl"
-      isOpen={isOpen}
+    <ResponsiveModal
+      size={ResponsiveModalSize.Medium}
+      open={isOpen}
       onClose={onClose}
       hasCloseButton
     >
@@ -48,6 +47,6 @@ export default function OutcomeCreateModal({
         onSubmit={createMutation.trigger}
         isLoading={createMutation.isMutating}
       />
-    </Modal>
+    </ResponsiveModal>
   );
 }

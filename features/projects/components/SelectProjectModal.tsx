@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { ProjectSchema, useMyProjects } from '@/services/projects';
 import { Button } from '@/components/atoms/button';
-import Modal from '@/shared/components/Modal';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/molecules/responsive-modal';
 
 interface SelectProjectModalProps {
   isOpen: boolean;
@@ -33,10 +33,13 @@ export default function SelectProjectModal({
     [onSelect]
   );
 
-  const handleRemovedDOM = useCallback(() => {
-    setSelectedProject(null);
-    onRemovedDOM();
-  }, [onRemovedDOM]);
+  const handleCloseModal = useCallback(() => {
+    onClose();
+    setTimeout(() => {
+      setSelectedProject(null);
+      onRemovedDOM();
+    }, 500);
+  }, [onClose, onRemovedDOM]);
 
   useEffect(() => {
     if (!Array.isArray(projects) || !isOpen) return;
@@ -52,14 +55,12 @@ export default function SelectProjectModal({
   }, [isOpen, selectedProject, projects, onClose, handleSelect]);
 
   return (
-    <Modal
+    <ResponsiveModal
       title={selectedProject ? undefined : '選擇計畫'}
-      size="md"
-      isOpen={isOpen}
-      onClose={onClose}
-      className="lg:p-4"
+      size={ResponsiveModalSize.Medium}
+      open={isOpen}
+      onClose={handleCloseModal}
       hasCloseButton
-      onRemovedDOM={handleRemovedDOM}
     >
       <div className="mt-4">
         {selectedProject
@@ -81,6 +82,6 @@ export default function SelectProjectModal({
               </Button>
             ))}
       </div>
-    </Modal>
+    </ResponsiveModal>
   );
 }

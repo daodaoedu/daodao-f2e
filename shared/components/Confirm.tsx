@@ -1,4 +1,4 @@
-import Modal from '@/shared/components/Modal';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/molecules/responsive-modal';
 import { Button } from '@/components/atoms/button';
 
 interface ConfirmModalProps {
@@ -25,12 +25,11 @@ export default function ConfirmModal({
   onConfirm,
 }: ConfirmModalProps) {
   return (
-    <Modal
-      size="sm"
-      className="rounded-2xl"
-      title={title}
-      isOpen={isOpen}
+    <ResponsiveModal
+      size={ResponsiveModalSize.Small}
+      open={isOpen}
       onClose={onClose}
+      title={title}
       hasCloseButton
     >
       {children}
@@ -53,6 +52,6 @@ export default function ConfirmModal({
           </Button>
         )}
       </div>
-    </Modal>
+    </ResponsiveModal>
   );
 }

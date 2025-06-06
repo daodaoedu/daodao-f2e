@@ -1,4 +1,4 @@
-import Modal from '@/shared/components/Modal';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/molecules/responsive-modal';
 import { UpdateIdeaRequest } from '@/services/ideas';
 import IdeaForm from '../Form';
 
@@ -20,14 +20,19 @@ function UpdateModal({
   onSubmit,
 }: UpdateModalProps) {
   return (
-    <Modal size="md" className="rounded-2xl" isOpen={isOpen} onClose={onClose} hasCloseButton>
+    <ResponsiveModal
+      size={ResponsiveModalSize.Medium}
+      open={isOpen}
+      onClose={onClose}
+      hasCloseButton
+    >
       <IdeaForm
         id={id}
         isLoading={isLoading}
         defaultValues={defaultValues}
         onSubmit={onSubmit}
       />
-    </Modal>
+    </ResponsiveModal>
   );
 }
 

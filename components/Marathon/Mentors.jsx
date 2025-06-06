@@ -1,10 +1,8 @@
 import { useMemo, useState } from 'react';
-import { IoClose } from "react-icons/io5";
 import { FaLinkedin, FaMedium, FaResearchgate, FaSquareFacebook, FaSquareThreads } from "react-icons/fa6";
-import { IconButton } from '@mui/material';
 import EastIcon from '@mui/icons-material/East';
 import Image from '@/shared/components/Image';
-import Modal from '@/shared/components/Modal';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/molecules/responsive-modal';
 import { cn } from '@/utils/cn';
 import Carousel from '@/shared/components/Carousel';
 
@@ -253,61 +251,56 @@ const Mentors = () => {
         )}
       />
 
-      <Modal
-        isOpen={isOpen}
+      <ResponsiveModal
+        open={isOpen}
         onClose={handleCloseModal}
-        className="p-6 pt-11 sm:max-w-[570px]"
-        onRemovedDOM={() => setActiveMentorName('')}
+        hasCloseButton
+        size={ResponsiveModalSize.Medium}
       >
-        <IconButton className="!absolute !top-0 !right-1 !p-2" onClick={handleCloseModal}>
-          <IoClose className="size-6" />
-        </IconButton>
-        <div className="max-h-[80vh] overflow-y-auto">
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <picture>
-              <MentorCard mentor={activeMentor} className="w-full md:w-[200px] cursor-default pointer-events-none" />
-            </picture>
-            <div>
-              <div className="heading-md text-basic-500 mb-3">{activeMentor?.title} | {activeMentor?.name}</div>
-              <div className="flex flex-col gap-2 items-start mb-3">
-                {activeMentor?.tags.map((tag) => (
-                  <Tag key={tag} text={tag} className="max-w-72 text-wrap" />
-                ))}
-              </div>
-              <div className="flex flex-col gap-2.5 items-start">
-                {Object.keys(activeMentor?.social || {}).map((key) => (
-                  <a
-                    key={key}
-                    className="body-sm text-primary-base flex items-center gap-1"
-                    href={activeMentor?.social[key]?.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {socialIcons[key]}
-                    {activeMentor?.social[key]?.text}
-                  </a>
-                ))}
-              </div>
+        <div className="flex flex-col md:flex-row gap-4 mb-4">
+          <picture>
+            <MentorCard mentor={activeMentor} className="w-full md:w-[200px] cursor-default pointer-events-none" />
+          </picture>
+          <div className="flex-1">
+            <div className="heading-md text-basic-500 mb-3">{activeMentor?.title} | {activeMentor?.name}</div>
+            <div className="flex flex-col gap-2 items-start mb-3">
+              {activeMentor?.tags.map((tag) => (
+                <Tag key={tag} text={tag} className="text-wrap" />
+              ))}
+            </div>
+            <div className="flex flex-col gap-2.5 items-start">
+              {Object.keys(activeMentor?.social || {}).map((key) => (
+                <a
+                  key={key}
+                  className="body-sm text-primary-base flex items-center gap-1"
+                  href={activeMentor?.social[key]?.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {socialIcons[key]}
+                  {activeMentor?.social[key]?.text}
+                </a>
+              ))}
             </div>
           </div>
-          <section className="mb-4">
-            {activeMentor?.experiences?.length > 0 && (
-              <>
-                <h3 className="body-md font-bold text-basic-400 mb-2">經歷</h3>
-                <ul>
-                  {activeMentor?.experiences.map((experience) => (
-                    <li key={experience} className="body-sm text-basic-400">{experience}</li>
-                  ))}
-                </ul>
-              </>
-            )}
-          </section>
-          <section>
-            <h3 className="body-md font-bold text-basic-400 mb-2">自我介紹</h3>
-            <p className="body-sm text-basic-400 whitespace-pre-wrap">{activeMentor?.introduction}</p>
-          </section>
         </div>
-      </Modal>
+        <section className="mb-4">
+          {activeMentor?.experiences?.length > 0 && (
+            <>
+              <h3 className="body-md font-bold text-basic-400 mb-2">經歷</h3>
+              <ul>
+                {activeMentor?.experiences.map((experience) => (
+                  <li key={experience} className="body-sm text-basic-400">{experience}</li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
+        <section>
+          <h3 className="body-md font-bold text-basic-400 mb-2">自我介紹</h3>
+          <p className="body-sm text-basic-400 whitespace-pre-wrap">{activeMentor?.introduction}</p>
+        </section>
+      </ResponsiveModal>
     </>
   );
 };
