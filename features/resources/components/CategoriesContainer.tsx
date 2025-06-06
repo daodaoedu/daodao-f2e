@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { CATEGORIES, SEARCH_TAGS } from '@/constants/category';
-import useBreakpoint from '@/hooks/useBreakpoint';
+import useMediaQuery from '@/hooks/useMediaQuery';
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/atoms/button';
 import CategoryCard from './CategoryCard';
@@ -22,7 +22,7 @@ export default function CategoriesContainer({
   disabledCollapse = false,
 }: CategoriesContainerProps) {
   const [isShowAll, setIsShowAll] = useState(false);
-  const { isMobile } = useBreakpoint();
+  const { screens } = useMediaQuery();
 
   const columnsClassNames = {
     sm: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6',
@@ -47,7 +47,7 @@ export default function CategoriesContainer({
 
   const categoryLength = Array.isArray(categories) ? categories.length : 0;
 
-  const isEnableShowAllButton = categoryLength > 6 && isMobile && !disabledCollapse;
+  const isEnableShowAllButton = categoryLength > 6 && !screens.lg && !disabledCollapse;
 
   const categoriesWrapperStyle = useMemo<
     React.CSSProperties | undefined
