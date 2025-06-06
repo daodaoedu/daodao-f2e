@@ -20,7 +20,7 @@ const useFetch = (url, { enabled = true, initialValue, onSuccess } = {}) => {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     };
-    const requestData = { headers }
+    const requestData = { headers };
     let pass = true;
 
     setIsFetching(true);
@@ -31,7 +31,7 @@ const useFetch = (url, { enabled = true, initialValue, onSuccess } = {}) => {
         if (res.status < 300) return res.json();
         if (res.status === 401) {
           authDispatch.logout();
-          router.replace('/login')
+          router.replace('/login');
         }
         throw res;
       })
@@ -39,6 +39,7 @@ const useFetch = (url, { enabled = true, initialValue, onSuccess } = {}) => {
       .catch(() => setIsError(true))
       .finally(() => setIsFetching(false));
 
+    // eslint-disable-next-line consistent-return
     return () => {
       pass = false;
     };

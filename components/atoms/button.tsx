@@ -76,7 +76,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const rippleRef = React.useRef<HTMLDivElement>(null);
+    const [isMounted, setIsMounted] = React.useState(false);
     const Comp = asChild ? Slot : "button";
+
+    // Avoid hydration mismatch by only adding ripple effect after mount
+    React.useEffect(() => {
+      setIsMounted(true);
+    }, []);
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (disabled) {
@@ -85,9 +91,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
       onClick?.(e);
 
-      if (animation === ButtonAnimationEnum.None) {
+      // Only create ripple effect on client side after mount
+      if (!isMounted || animation === ButtonAnimationEnum.None) {
         return;
       }
+
       const rect = e.currentTarget.getBoundingClientRect();
       const ripple = document.createElement("span");
       ripple.className =
@@ -98,13 +106,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       setTimeout(() => ripple.remove(), 1000);
     };
 
-    const rippleElement = (
+    // Only render ripple container after mount to avoid hydration mismatch
+    const rippleElement = isMounted ? (
       <div
         key="ripple"
         ref={rippleRef}
         className="absolute inset-0 pointer-events-none rounded-[inherit] overflow-hidden"
       />
-    );
+    ) : null;
 
     const childElement = React.isValidElement<React.PropsWithChildren>(
       children
