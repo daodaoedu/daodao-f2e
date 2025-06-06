@@ -4,7 +4,7 @@ import EastIcon from '@mui/icons-material/East';
 import Image from '@/shared/components/Image';
 import ResponsiveModal, { ResponsiveModalSize } from '@/components/molecules/responsive-modal';
 import { cn } from '@/utils/cn';
-import Carousel from '@/shared/components/Carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/atoms/carousel';
 
 const mentors = [
   {
@@ -220,36 +220,46 @@ const Mentors = () => {
 
   return (
     <>
-      <Carousel
-        title="引導師介紹"
-        titleId="marathon-mentor"
-        items={mentors}
-        headerClassName="px-6 lg:px-60"
-        wrapperClassName="px-6 lg:pl-60 "
-        renderKey={(mentor) => mentor.name}
-        renderItem={(mentor) => (
-          <MentorCard
-            key={mentor.name}
-            mentor={mentor}
-            className="cursor-pointer group"
-            onClick={() => handleOpenModal(mentor.name)}
-          >
-            <div className="absolute bottom-0 left-0 right-0 pt-4">
-              <div className="flex gap-2 px-3">
-                {mentor.tags.slice(0, 1).map((tag, index) => (
-                  <Tag
-                    key={tag}
-                    text={tag}
-                    className={index === 0 && "shrink-0"}
-                  />
-                ))}
-              </div>
-              <div className="heading-md text-white text-start mt-2 px-3 pb-3">{mentor.title} | {mentor.name}</div>
-              <div className="bg-white flex justify-end items-center text-gray-400 px-3 py-2 gap-1 group-hover:text-primary-base">more <EastIcon className="!text-[16px]" /></div>
+      <div className="mb-9">
+        <Carousel className="mx-6 lg:ml-60" opts={{ align: 'start' }}>
+          <div className="flex justify-between items-center lg:mr-60">
+            <h2 className="heading-md text-basic-500" id="marathon-mentor">
+              引導師介紹
+            </h2>
+            <div className="flex gap-2">
+              <CarouselPrevious className="static translate-y-0 mx-1" />
+              <CarouselNext className="static translate-y-0 mx-1" />
             </div>
-          </MentorCard>
-        )}
-      />
+          </div>
+          <div className="mt-9">
+            <CarouselContent>
+              {mentors.map((mentor) => (
+                <CarouselItem key={mentor.name} className="basis-auto">
+                  <MentorCard
+                    mentor={mentor}
+                    className="cursor-pointer group"
+                    onClick={() => handleOpenModal(mentor.name)}
+                  >
+                    <div className="absolute bottom-0 left-0 right-0 pt-4">
+                      <div className="flex gap-2 px-3">
+                        {mentor.tags.slice(0, 1).map((tag, index) => (
+                          <Tag
+                            key={tag}
+                            text={tag}
+                            className={index === 0 && "shrink-0"}
+                          />
+                        ))}
+                      </div>
+                      <div className="heading-md text-white text-start mt-2 px-3 pb-3">{mentor.title} | {mentor.name}</div>
+                      <div className="bg-white flex justify-end items-center text-gray-400 px-3 py-2 gap-1 group-hover:text-primary-base">more <EastIcon className="!text-[16px]" /></div>
+                    </div>
+                  </MentorCard>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </div>
+        </Carousel>
+      </div>
 
       <ResponsiveModal
         open={isOpen}

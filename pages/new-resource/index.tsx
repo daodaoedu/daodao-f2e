@@ -15,7 +15,13 @@ import {
   getNotionDatabase,
   NotionDatabaseResultSchema,
 } from "@/services/notion";
-import Carousel from "@/shared/components/Carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/atoms/carousel";
 import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";
 import { SEARCH_TAGS } from "@/constants/category";
@@ -128,26 +134,42 @@ export default function ResourcePage({
 
       {/* 熱門心得 */}
       <Section className="bg-primary-palest">
-        <Carousel
-          title="熱門心得"
-          items={reflectionList}
-          titleClassName="text-2xl"
-          renderKey={(mentor) => mentor}
-          renderItem={(mentor) => <ReflectionCard key={mentor} />}
-        />
+        <Carousel opts={{ loop: true }}>
+          <div className="flex justify-between items-center mb-9">
+            <h2 className="text-2xl font-medium text-basic-500">熱門心得</h2>
+            <div className="flex gap-2">
+              <CarouselPrevious className="static translate-y-0 mx-1" />
+              <CarouselNext className="static translate-y-0 mx-1" />
+            </div>
+          </div>
+          <CarouselContent>
+            {reflectionList.map((item) => (
+              <CarouselItem key={item} className="basis-auto">
+                <ReflectionCard />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
       </Section>
 
       {/* 活躍分享者 */}
       <Section>
-        <Carousel
-          title="活躍分享者"
-          items={sharerList}
-          titleClassName="text-2xl"
-          renderKey={(sharer) => sharer}
-          renderItem={(sharer, index) => (
-            <SharerCard key={sharer} order={index + 1} />
-          )}
-        />
+        <Carousel opts={{ loop: true }}>
+          <div className="flex justify-between items-center mb-9">
+            <h2 className="text-2xl font-medium text-basic-500">活躍分享者</h2>
+            <div className="flex gap-2">
+              <CarouselPrevious className="static translate-y-0 mx-1" />
+              <CarouselNext className="static translate-y-0 mx-1" />
+            </div>
+          </div>
+          <CarouselContent>
+            {sharerList.map((item, index) => (
+              <CarouselItem key={item} className="basis-auto">
+                <SharerCard order={index + 1} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
       </Section>
     </>
   );

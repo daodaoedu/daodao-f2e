@@ -20,7 +20,7 @@ export default function ReflectionCard(props: ReflectionCardProps) {
   } = props;
 
   return (
-    <div className="min-w-[17.625rem] bg-white rounded-xl p-[1.25rem] flex flex-col gap-3 md:p-6 md:gap-4">
+    <div className="w-[17.625rem] bg-white rounded-xl p-[1.25rem] flex flex-col gap-3 md:p-6 md:gap-4">
       <div className="flex gap-2">
         <div className="w-12 h-12">{userAvatar}</div>
 
