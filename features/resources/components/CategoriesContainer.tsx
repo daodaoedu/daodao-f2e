@@ -1,14 +1,14 @@
-import { useMemo, useState } from 'react';
-import { CATEGORIES, SEARCH_TAGS } from '@/constants/category';
-import useMediaQuery from '@/hooks/useMediaQuery';
-import { cn } from '@/utils/cn';
-import { Button } from '@/components/atoms/button';
-import CategoryCard from './CategoryCard';
-import SectionTitle from './SectionTitle';
+import { useMemo, useState } from "react";
+import { CATEGORIES, SEARCH_TAGS } from "@/constants/category";
+import useMediaQuery from "@/hooks/useMediaQuery";
+import { cn } from "@/utils/cn";
+import { Button } from "@/components/atoms/button";
+import CategoryCard from "./CategoryCard";
+import SectionTitle from "./SectionTitle";
 
 interface CategoriesContainerProps {
   className?: string;
-  size?: 'sm' | 'md';
+  size?: "sm" | "md";
   maxLength?: number;
   selectedCategories?: string[] | null;
   disabledCollapse?: boolean;
@@ -16,7 +16,7 @@ interface CategoriesContainerProps {
 
 export default function CategoriesContainer({
   className,
-  size = 'md',
+  size = "md",
   maxLength = CATEGORIES.length,
   selectedCategories,
   disabledCollapse = false,
@@ -25,8 +25,8 @@ export default function CategoriesContainer({
   const { screens } = useMediaQuery();
 
   const columnsClassNames = {
-    sm: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6',
-    md: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
+    sm: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6",
+    md: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
   };
 
   const getCategories = () => {
@@ -47,7 +47,8 @@ export default function CategoriesContainer({
 
   const categoryLength = Array.isArray(categories) ? categories.length : 0;
 
-  const isEnableShowAllButton = categoryLength > 6 && !screens.lg && !disabledCollapse;
+  const isEnableShowAllButton =
+    categoryLength > 6 && !(screens.lg || screens.md) && !disabledCollapse;
 
   const categoriesWrapperStyle = useMemo<
     React.CSSProperties | undefined
@@ -72,8 +73,8 @@ export default function CategoriesContainer({
         {hasSubCategories && <SectionTitle title="子分類" />}
         <div
           className={cn(
-            'grid gap-x-2 gap-y-4 md:gap-6',
-            'transition-[max-height] overflow-hidden duration-300',
+            "grid gap-x-2 gap-y-4 md:gap-6",
+            "transition-[max-height] overflow-hidden duration-300",
             columnsClassNames[size],
             className
           )}
@@ -94,7 +95,7 @@ export default function CategoriesContainer({
             className="w-full mt-3"
             onClick={() => setIsShowAll(!isShowAll)}
           >
-            {isShowAll ? '收合' : '展開更多'}
+            {isShowAll ? "收合" : "展開更多"}
           </Button>
         )}
       </div>
