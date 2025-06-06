@@ -4,7 +4,7 @@ import {
   CategoriesContainer,
   createResourceJsonLd,
   ResourceContainer,
-  SearchForm,
+  ResourceSearchBar,
   SectionTitle,
 } from "@/features/resources";
 import {
@@ -91,7 +91,7 @@ export default function ResourceCategoriesPage({
       <Section className="relative px-0 md:px-0">
         <SectionTitle title="所有資源" className="pb-0 px-5 md:pb-0 md:px-24" />
 
-        <SearchForm />
+        <ResourceSearchBar />
 
         <ResourceContainer data={data.results} className="px-5 md:px-24" />
 

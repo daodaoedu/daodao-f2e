@@ -5,7 +5,7 @@ import { ChevronLeftIcon } from "lucide-react";
 import {
   createResourceJsonLd,
   ResourceContainer,
-  SearchForm,
+  ResourceSearchBar,
   SectionTitle,
 } from "@/features/resources";
 import {
@@ -76,7 +76,7 @@ export default function ResourceCategoriesPage({
       </Section>
 
       <Section className="pb-11 md:pb-12">
-        <SearchForm />
+        <ResourceSearchBar />
 
         {keyword && (
           <div className="text-basic-500 body-sm px-5 pb-6 md:px-24">

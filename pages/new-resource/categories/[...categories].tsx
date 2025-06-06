@@ -4,7 +4,7 @@ import {
   CategoriesContainer,
   ResourceContainer,
   ResourceBanner,
-  SearchForm,
+  ResourceSearchBar,
   getCategories,
   createResourceJsonLd,
 } from "@/features/resources";
@@ -168,7 +168,7 @@ export default function ResourceCategoriesPage({
       </Section>
 
       <Section className="px-0 md:px-0">
-        <SearchForm />
+        <ResourceSearchBar />
 
         <ResourceContainer data={data.results} className="px-5 md:px-24" />
 

@@ -4,7 +4,7 @@ export { default as ReflectionCard } from './components/ReflectionCard';
 export { default as ResourceBanner } from './components/ResourceBanner';
 export { default as ResourceCard } from './components/ResourceCard';
 export { default as ResourceContainer } from './components/ResourceContainer';
-export { default as SearchForm } from './components/SearchIForm';
+export { default as ResourceSearchBar } from './components/ResourceSearchBar';
 export { default as SectionTitle } from './components/SectionTitle';
 export { default as SharerCard } from './components/SharerCard';
 export { default as createResourceJsonLd } from './utils/createResourceJsonLd';
