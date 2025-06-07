@@ -85,6 +85,60 @@ import { Search, Plus, Edit, Trash2, ChevronDown } from 'lucide-react'
 </Button>
 ```
 
+#### 5. React Hook Form + Zod 表單處理
+```typescript
+// ✅ 使用 React Hook Form 和 Zod 進行表單處理
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/atoms/form";
+
+// 使用從 services 導入的 schema
+import { 
+  resourceSearchParamsSchema,
+  ResourceSearchParamsSchema 
+} from "@/services/resources/core/schema";
+
+// 使用已定義的 schema 初始化表單
+const form = useForm({
+  resolver: zodResolver(resourceSearchParamsSchema),
+  defaultValues: {
+    resourceType: "",
+    cost: "",
+    targetAudience: "",
+    tags: ""
+  },
+});
+
+// 表單元件
+<Form {...form}>
+  <form onSubmit={form.handleSubmit(onSubmit)}>
+    <FormField
+      control={form.control}
+      name="resourceType"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>資源類型</FormLabel>
+          <FormControl>
+            <Input placeholder="請選擇資源類型" {...field} />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+    {/* 更多表單欄位... */}
+    <Button type="submit">送出</Button>
+  </form>
+</Form>
+```
+
 ## 最佳實踐 (Best Practices)
 
 ### 1. 元件使用規範
@@ -144,4 +198,75 @@ import { cn } from '@/utils/cn'
     {/* 內容 */}
   </DialogContent>
 </Dialog>
+```
+
+### 5. 表單元件使用規範
+- 使用 React Hook Form 管理表單狀態
+- 使用 Zod 進行表單驗證
+- 使用 shadcn/ui 的表單元件進行一致性呈現
+- 參考 [features/resources/components/ResourceSearchForm.tsx](mdc:features/resources/components/ResourceSearchForm.tsx) 實作
+
+#### 服務層 Schema 與表單集成
+在實作表單時，應直接使用從 services 層導入的 schema 定義：
+
+```typescript
+// ✅ 從 services 層導入 schema 並與表單集成
+import {
+  ResourceSearchParamsSchema,
+  resourceSearchParamsSchema,
+} from "@/services/resources/core/schema";
+
+interface SearchFormProps {
+  onFilter: (filters: ResourceSearchParamsSchema) => void;
+  onClose: () => void;
+  filters?: Partial<ResourceSearchParamsSchema>;
+}
+
+export default function ResourceSearchForm({
+  onFilter,
+  onClose,
+  filters,
+}: SearchFormProps) {
+  const form = useForm({
+    resolver: zodResolver(resourceSearchParamsSchema),
+    values: filters,
+  });
+
+  function onSubmit(data: ResourceSearchParamsSchema) {
+    onFilter(data);
+    onClose();
+  }
+  
+  // 表單內容...
+}
+```
+
+#### 複合元件的表單實作
+對於複雜的表單欄位，應建立自定義的表單控制元件，並確保它們與 React Hook Form 集成：
+
+```typescript
+// ✅ 為 checkbox 類型欄位實作的自定義表單控制元件
+<FormField
+  control={form.control}
+  name="resourceType"
+  render={({ field }) => (
+    <FormItem>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+        {resourceTypes.map((type) => (
+          <CheckboxItem
+            key={type.id}
+            label={type.label}
+            isChecked={!!field.value?.split(",").includes(type.id)}
+            onChange={(checked) =>
+              handleCheckboxChange(field, type.id, checked)
+            }
+            hasTooltip
+            tooltipContent={getResourceTypeDescription(type.id)}
+          />
+        ))}
+      </div>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
 ```
