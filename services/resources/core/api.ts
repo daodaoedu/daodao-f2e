@@ -1,14 +1,15 @@
 import { MutationFetcher } from "swr/mutation";
-import { parseToString } from "@/utils/helper";
-import { mutations } from "@/utils/http";
+import { parseToNumber, parseToString } from "@/utils/helper";
+import { fetcher, mutations } from "@/utils/http";
 
 import {
   CreateResourceFormSchema,
   UpdateResourceFormSchema,
   ResourceMutationResponseSchema,
+  ResourceListResponseSchema,
+  ResourceDetailResponseSchema,
 } from "./schema";
-
-export type ResourceSWRKey = string;
+import { mockResourceList } from "../mock";
 
 interface GetResourcePathnameProps {
   id?: number;
@@ -25,28 +26,36 @@ export const getResourcePathname = ({ id }: GetResourcePathnameProps = {}) => {
 };
 
 interface ResourceAPIType {
+  read: (resourceId: string) => Promise<ResourceDetailResponseSchema>;
+  readList: () => Promise<ResourceListResponseSchema>;
   create: MutationFetcher<
     ResourceMutationResponseSchema,
-    ResourceSWRKey,
+    string,
     CreateResourceFormSchema
   >;
   update: MutationFetcher<
     ResourceMutationResponseSchema,
-    ResourceSWRKey,
+    string,
     UpdateResourceFormSchema
   >;
-  delete: MutationFetcher<void, ResourceSWRKey, { id: number }>;
+  delete: MutationFetcher<void, string, { id: number }>;
 }
 
 export const resourceAPI: ResourceAPIType = {
-  create: (_, { arg }) =>
-    mutations.post<ResourceMutationResponseSchema>(getResourcePathname(), arg),
-
-  update: (_, { arg: { id, ...arg } }) =>
-    mutations.put<ResourceMutationResponseSchema>(
-      getResourcePathname({ id }),
-      arg
+  read: (resourceId) => {
+    const id = parseToNumber(resourceId);
+    if (typeof id !== "number") {
+      throw new Error("Invalid resource id");
+    }
+    return fetcher<ResourceDetailResponseSchema>(
+      getResourcePathname({ id })
+    ).catch(() => mockResourceList.resources[0]);
+  },
+  readList: () =>
+    fetcher<ResourceListResponseSchema>(getResourcePathname()).catch(
+      () => mockResourceList
     ),
-
-  delete: (_, { arg }) => mutations.delete<void>(getResourcePathname(arg)),
+  create: mutations.post,
+  update: mutations.put,
+  delete: mutations.delete,
 };
