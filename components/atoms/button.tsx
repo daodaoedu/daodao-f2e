@@ -27,7 +27,7 @@ const buttonVariants = cva(
           "bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/50 hover:bg-primary/90",
         alert: "bg-alert text-alert-foreground shadow-sm hover:bg-alert/90",
         outline:
-          "border border-primary bg-background shadow-sm hover:bg-primary hover:text-primary-foreground",
+          "border border-primary bg-background shadow-sm hover:bg-primary hover:text-primary-foreground [&_svg]:hover:text-primary-foreground",
         secondary:
           "bg-secondary text-secondary-foreground shadow-lg hover:bg-primary-lightest",
         ghost: "hover:text-primary",
@@ -35,9 +35,9 @@ const buttonVariants = cva(
         gray: "bg-basic-200 border-basic-200 text-basic-300 shadow-lg hover:bg-primary-base hover:border-primary-base hover:text-white",
       },
       size: {
-        default: "h-9 px-4 py-2",
+        default: "h-9 px-5 py-2",
         sm: "h-8 px-3 body-sm",
-        lg: "h-10 px-8 body-lg",
+        lg: "h-10 px-5 body-lg",
         icon: "h-9 w-9",
       },
     },

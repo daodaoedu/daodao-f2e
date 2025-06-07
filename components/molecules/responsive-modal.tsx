@@ -28,6 +28,8 @@ export interface ResponsiveModalProps {
   footer?: React.ReactNode;
   hasCloseButton?: boolean;
   size?: DialogContentSize | `${DialogContentSize}`;
+  className?: string;
+  titleClassName?: string;
 }
 
 export const ResponsiveModalSize = DialogContentSize;
@@ -41,6 +43,8 @@ export const ResponsiveModal = ({
   footer,
   hasCloseButton,
   size = DialogContentSize.Small,
+  className,
+  titleClassName,
 }: ResponsiveModalProps) => {
   const { screens } = useMediaQuery();
   const isDialog =
@@ -55,10 +59,14 @@ export const ResponsiveModal = ({
   if (isDialog) {
     return (
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent hasCloseButton={hasCloseButton} size={size}>
+        <DialogContent
+          hasCloseButton={hasCloseButton}
+          size={size}
+          className={className}
+        >
           {title && (
             <DialogHeader>
-              <DialogTitle>{title}</DialogTitle>
+              <DialogTitle className={titleClassName}>{title}</DialogTitle>
               {description && (
                 <DialogDescription>{description}</DialogDescription>
               )}
@@ -73,10 +81,10 @@ export const ResponsiveModal = ({
 
   return (
     <Drawer open={open} onOpenChange={handleOpenChange}>
-      <DrawerContent>
+      <DrawerContent className={className}>
         {title && (
           <DrawerHeader>
-            <DrawerTitle>{title}</DrawerTitle>
+            <DrawerTitle className={titleClassName}>{title}</DrawerTitle>
             {description && (
               <DrawerDescription>{description}</DrawerDescription>
             )}
