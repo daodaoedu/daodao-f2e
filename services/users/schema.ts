@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { baseUserSchema } from '../_shared/schema';
 
 export enum RoleEnum {
   /** 訪客 */
@@ -16,14 +17,6 @@ export enum RoleEnum {
   /** 超級管理者 */
   SuperAdmin
 }
-
-export const baseUserSchema = z.object({
-  _id: z.string(),
-  id: z.string(),
-  name: z.string(),
-  roleList: z.array(z.string()),
-  photoURL: z.string(),
-});
 
 export type BaseUserSchema = z.infer<typeof baseUserSchema>;
 

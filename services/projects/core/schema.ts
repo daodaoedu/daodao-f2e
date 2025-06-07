@@ -1,6 +1,6 @@
 import { z } from 'zod';
+import { baseUserSchema } from '../../_shared/schema';
 import { projectMilestoneSchema } from '../milestones';
-import { baseUserSchema } from '../../users';
 
 export const projectSchema = z.object({
   id: z.string(),

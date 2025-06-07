@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { baseUserSchema } from '../users';
+import { baseUserSchema } from '../_shared/schema';
 
 export const circleQuerySchema = z.object({
   area: z.array(z.string()).optional(),
