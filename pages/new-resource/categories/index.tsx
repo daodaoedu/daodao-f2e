@@ -1,19 +1,14 @@
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
+import { SWRConfig } from "swr";
 import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
 import {
   CategoriesContainer,
   createResourceJsonLd,
-  ResourceContainer,
-  ResourceSearchBar,
+  ResourceExplorer,
   SectionTitle,
 } from "@/features/resources";
-import {
-  getNotionDatabase,
-  NotionDatabaseResultSchema,
-} from "@/services/notion";
 import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";
-import { Button } from "@/components/atoms/button";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -22,6 +17,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/atoms/breadcrumb";
+import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
 
 type SectionProps = {
   as?: "section" | "div";
@@ -42,32 +38,36 @@ const Section = ({
 };
 
 export const getStaticProps = (async () => {
-  const data = await getNotionDatabase({
-    page_size: 16,
-  });
+  try {
+    const data = await resourceAPI.readList();
 
-  const coursesJsonLd = data.results?.slice(0, 4).map(createResourceJsonLd);
+    const coursesJsonLd = data.resources.slice(0, 4).map(createResourceJsonLd);
 
-  const jsonLd = JsonLdFactory.createGraph([
-    JsonLdFactory.createItemListBuilder()
-      .setName("所有分類")
-      .setItems(coursesJsonLd),
-  ]);
+    const jsonLd = JsonLdFactory.createGraph([
+      JsonLdFactory.createItemListBuilder()
+        .setName("所有分類")
+        .setItems(coursesJsonLd),
+    ]);
 
-  return { props: { data, jsonLd } };
+    return {
+      props: { fallback: { "/new-resource/categories": data }, jsonLd },
+    };
+  } catch {
+    return { props: { fallback: undefined, jsonLd: undefined } };
+  }
 }) satisfies GetStaticProps<{
-  data: NotionDatabaseResultSchema;
-  jsonLd: JsonLdType;
+  fallback: Record<string, ResourceListResponseSchema> | undefined;
+  jsonLd: JsonLdType | undefined;
 }>;
 
 export default function ResourceCategoriesPage({
-  data,
+  fallback,
   jsonLd,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const basePath = "/new-resource";
 
   return (
-    <>
+    <SWRConfig value={{ fallback }}>
       <SEOConfig title="所有分類｜島島阿學" jsonLd={jsonLd} />
       <Section as="div" className="pt-12">
         <Breadcrumb className="mb-3">
@@ -91,14 +91,8 @@ export default function ResourceCategoriesPage({
       <Section className="relative px-0 md:px-0">
         <SectionTitle title="所有資源" className="pb-0 px-5 md:pb-0 md:px-24" />
 
-        <ResourceSearchBar />
-
-        <ResourceContainer data={data.results} className="px-5 md:px-24" />
-
-        <div className="flex justify-center px-5 pt-6 md:px-24">
-          <Button>查看更多</Button>
-        </div>
+        <ResourceExplorer />
       </Section>
-    </>
+    </SWRConfig>
   );
 }

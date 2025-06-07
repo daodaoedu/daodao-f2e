@@ -4,6 +4,7 @@ export { default as ReflectionCard } from "./ReflectionCard";
 export { default as ResourceBanner } from "./ResourceBanner";
 export { default as ResourceCard } from "./ResourceCard";
 export { default as ResourceContainer } from "./ResourceContainer";
+export { default as ResourceExplorer } from "./ResourceExplorer";
 export { default as ResourceSearchBar } from "./ResourceSearchBar";
 export { default as SectionTitle } from "./SectionTitle";
 export { default as SharerCard } from "./SharerCard";

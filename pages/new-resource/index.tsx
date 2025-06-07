@@ -12,10 +12,6 @@ import {
   createResourceJsonLd,
 } from "@/features/resources";
 import {
-  getNotionDatabase,
-  NotionDatabaseResultSchema,
-} from "@/services/notion";
-import {
   Carousel,
   CarouselContent,
   CarouselItem,
@@ -26,6 +22,7 @@ import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";
 import { SEARCH_TAGS } from "@/constants/category";
 import { Button } from "@/components/atoms/button";
+import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
 
 const Section = ({
   className,
@@ -44,22 +41,24 @@ const Section = ({
 };
 
 export const getStaticProps = (async () => {
-  const data = await getNotionDatabase({
-    page_size: 4,
-  });
+  try {
+    const data = await resourceAPI.readList();
 
-  const coursesJsonLd = data.results?.map(createResourceJsonLd);
+    const coursesJsonLd = data.resources.slice(0, 4).map(createResourceJsonLd);
 
-  const jsonLd = JsonLdFactory.createGraph([
-    JsonLdFactory.createItemListBuilder()
-      .setName("多元學習資源列表")
-      .setItems(coursesJsonLd),
-  ]);
+    const jsonLd = JsonLdFactory.createGraph([
+      JsonLdFactory.createItemListBuilder()
+        .setName("多元學習資源列表")
+        .setItems(coursesJsonLd),
+    ]);
 
-  return { props: { data, jsonLd } };
+    return { props: { data, jsonLd } };
+  } catch {
+    return { props: { data: undefined, jsonLd: undefined } };
+  }
 }) satisfies GetStaticProps<{
-  data: NotionDatabaseResultSchema;
-  jsonLd: JsonLdType;
+  data: ResourceListResponseSchema | undefined;
+  jsonLd: JsonLdType | undefined;
 }>;
 
 export default function ResourcePage({
@@ -96,7 +95,7 @@ export default function ResourcePage({
               </Link>
             </Button>
           </SectionTitle>
-          <ResourceContainer data={data.results?.slice(2)} />
+          <ResourceContainer data={data?.resources.slice(2, 4) ?? []} />
         </div>
 
         <div>
@@ -112,7 +111,7 @@ export default function ResourcePage({
               </Link>
             </Button>
           </SectionTitle>
-          <ResourceContainer data={data.results?.slice(0, 2)} />
+          <ResourceContainer data={data?.resources.slice(0, 2) ?? []} />
         </div>
 
         <div>

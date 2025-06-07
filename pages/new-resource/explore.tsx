@@ -1,21 +1,18 @@
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
+import { SWRConfig } from "swr";
 import Link from "next/link";
 import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
 import { ChevronLeftIcon } from "lucide-react";
 import {
   createResourceJsonLd,
-  ResourceContainer,
-  ResourceSearchBar,
+  ResourceExplorer,
   SectionTitle,
 } from "@/features/resources";
-import {
-  getNotionDatabase,
-  NotionDatabaseResultSchema,
-} from "@/services/notion";
 import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";
 import useSearchParamsManager from "@/hooks/useSearchParamsManager";
 import { Button } from "@/components/atoms/button";
+import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
 
 type SectionProps = {
   as?: "section" | "div";
@@ -32,26 +29,35 @@ const Section = ({
 };
 
 export const getStaticProps = (async () => {
-  const data = await getNotionDatabase({
-    page_size: 16,
-  });
+  try {
+    const data = await resourceAPI.readList();
 
-  const coursesJsonLd = data.results?.slice(0, 4).map(createResourceJsonLd);
+    const coursesJsonLd = data.resources.slice(0, 4).map(createResourceJsonLd);
 
-  const jsonLd = JsonLdFactory.createGraph([
-    JsonLdFactory.createItemListBuilder()
-      .setName("探索所有資源")
-      .setItems(coursesJsonLd),
-  ]);
+    const jsonLd = JsonLdFactory.createGraph([
+      JsonLdFactory.createItemListBuilder()
+        .setName("探索所有資源")
+        .setItems(coursesJsonLd),
+    ]);
 
-  return { props: { data, jsonLd } };
+    return {
+      props: {
+        fallback: {
+          "/new-resource/explore": data,
+        },
+        jsonLd,
+      },
+    };
+  } catch {
+    return { props: { fallback: undefined, jsonLd: undefined } };
+  }
 }) satisfies GetStaticProps<{
-  data: NotionDatabaseResultSchema;
-  jsonLd: JsonLdType;
+  fallback: Record<string, ResourceListResponseSchema> | undefined;
+  jsonLd: JsonLdType | undefined;
 }>;
 
 export default function ResourceCategoriesPage({
-  data,
+  fallback,
   jsonLd,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [getSearchParams] = useSearchParamsManager();
@@ -59,10 +65,14 @@ export default function ResourceCategoriesPage({
   const keyword = searchParams?.q;
 
   return (
-    <>
+    <SWRConfig value={{ fallback }}>
       <SEOConfig title="探索所有資源｜島島阿學" jsonLd={jsonLd} />
       <Section as="div" className="pt-12 px-5 md:px-24">
-        <Button variant="link" className="mb-3 px-2 -mx-2 text-basic-300" asChild>
+        <Button
+          variant="link"
+          className="mb-3 px-2 -mx-2 text-basic-300"
+          asChild
+        >
           <Link href="/new-resource">
             <ChevronLeftIcon className="w-4 h-4" />
             返回
@@ -76,24 +86,8 @@ export default function ResourceCategoriesPage({
       </Section>
 
       <Section className="pb-11 md:pb-12">
-        <ResourceSearchBar />
-
-        {keyword && (
-          <div className="text-basic-500 body-sm px-5 pb-6 md:px-24">
-            "{keyword}" 共搜尋到{" "}
-            <span className="text-primary-base font-bold">
-              {data.results?.length}
-            </span>{" "}
-            筆
-          </div>
-        )}
-
-        <ResourceContainer data={data.results} className="px-5 md:px-24" />
-
-        <div className="flex justify-center px-5 pt-6 md:px-24">
-          <Button>查看更多</Button>
-        </div>
+        <ResourceExplorer />
       </Section>
-    </>
+    </SWRConfig>
   );
 }

@@ -1,44 +1,37 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogContentSize,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/atoms/dialog";
+import ResponsiveModal, {
+  ResponsiveModalSize,
+} from "@/components/molecules/responsive-modal";
+import { ResourceSearchParamsSchema } from "@/services/resources/core/schema";
 import ResourceSearchForm from "./ResourceSearchForm";
-
-interface FilterState {
-  resourceTypes: string[];
-  feeTypes: string[];
-  levelTypes: string[];
-  durationTypes: string[];
-}
 
 interface SearchModalProps {
   open: boolean;
   onClose: () => void;
-  onFilter: (filters: FilterState) => void;
-  initialFilters?: FilterState;
+  onFilter: (filters: ResourceSearchParamsSchema) => void;
+  filters?: Partial<ResourceSearchParamsSchema>;
 }
 
 export default function ResourceSearchModal({
   open,
   onClose,
   onFilter,
-  initialFilters,
+  filters,
 }: SearchModalProps) {
   return (
-    <Dialog open={open} onOpenChange={(_open) => !_open && onClose()}>
-      <DialogContent size={DialogContentSize.Medium} hasCloseButton>
-        <DialogHeader>
-          <DialogTitle className="text-left">篩選</DialogTitle>
-        </DialogHeader>
-        <ResourceSearchForm
-          onFilter={onFilter}
-          onClose={onClose}
-          initialFilters={initialFilters}
-        />
-      </DialogContent>
-    </Dialog>
+    <ResponsiveModal
+      open={open}
+      onClose={onClose}
+      size={ResponsiveModalSize.Large}
+      hasCloseButton
+      className="bg-primary-palest"
+      title="篩選"
+      titleClassName="font-bold text-left text-[1.75rem] text-basic-500"
+    >
+      <ResourceSearchForm
+        onFilter={onFilter}
+        onClose={onClose}
+        filters={filters}
+      />
+    </ResponsiveModal>
   );
 }

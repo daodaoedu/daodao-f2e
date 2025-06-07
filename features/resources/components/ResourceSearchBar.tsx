@@ -1,39 +1,32 @@
-import { useCallback, useRef, useState } from "react";
-import LensIcon from "@/public/assets/icons/lens.svg";
+import { useEffect, useRef, useState } from "react";
+import {
+  SlidersHorizontalIcon,
+  ChartNoAxesColumnDecreasingIcon,
+} from "lucide-react";
 import useShadowToggleOnScroll from "@/hooks/useShadowToggleOnScroll";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/atoms/button";
-import useSearchParamsManager from "@/hooks/useSearchParamsManager";
+import SearchInput from "@/components/molecules/search-input";
 import useDebounce from "@/hooks/useDebounce";
+import { ResourceSearchParamsSchema } from "@/services/resources/core/schema";
 import ResourceSearchModal from "./ResourceSearchModal";
 
-interface FilterState {
-  resourceTypes: string[];
-  feeTypes: string[];
-  levelTypes: string[];
-  durationTypes: string[];
+interface ResourceSearchBarProps {
+  filters?: ResourceSearchParamsSchema;
+  onFilter: (filter: ResourceSearchParamsSchema) => void;
 }
 
-export default function ResourceSearchBar() {
+export default function ResourceSearchBar({
+  filters,
+  onFilter,
+}: ResourceSearchBarProps) {
+  const [query, setQuery] = useState(filters?.query ?? "");
+  const prevQueryRef = useRef(query);
+  const prevFiltersQueryRef = useRef(filters?.query);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { height, isShowShadow, TriggerElement } = useShadowToggleOnScroll();
-  const [getSearchParams, pushState] = useSearchParamsManager();
-  const searchParams = getSearchParams();
 
-  const updateSearchQuery = useCallback(
-    (value: string) => {
-      pushState("q", value);
-    },
-    [pushState]
-  );
-
-  const debouncedUpdateSearch = useDebounce(updateSearchQuery, 500);
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const onClickFocus = () => {
-    inputRef.current?.focus();
-  };
+  const debouncedUpdateSearch = useDebounce(onFilter, 500);
 
   const handleOpenFilter = () => {
     setIsFilterOpen(true);
@@ -43,39 +36,22 @@ export default function ResourceSearchBar() {
     setIsFilterOpen(false);
   };
 
-  const handleFilter = (filters: FilterState) => {
-    if (filters.resourceTypes.length > 0) {
-      pushState("resourceTypes", filters.resourceTypes.join(","));
-    } else {
-      pushState("resourceTypes", "");
+  useEffect(() => {
+    if (query !== prevQueryRef.current) {
+      debouncedUpdateSearch({ query });
     }
+    prevQueryRef.current = query;
+  }, [query, debouncedUpdateSearch]);
 
-    if (filters.feeTypes.length > 0) {
-      pushState("feeTypes", filters.feeTypes.join(","));
-    } else {
-      pushState("feeTypes", "");
+  useEffect(() => {
+    if (
+      filters?.query !== prevFiltersQueryRef.current &&
+      filters?.query !== query
+    ) {
+      setQuery(filters?.query ?? "");
     }
-
-    if (filters.levelTypes.length > 0) {
-      pushState("levelTypes", filters.levelTypes.join(","));
-    } else {
-      pushState("levelTypes", "");
-    }
-
-    if (filters.durationTypes.length > 0) {
-      pushState("durationTypes", filters.durationTypes.join(","));
-    } else {
-      pushState("durationTypes", "");
-    }
-  };
-
-  // 從 URL 參數中解析當前的篩選狀態
-  const initialFilters: FilterState = {
-    resourceTypes: searchParams.resourceTypes ? searchParams.resourceTypes.split(",") : [],
-    feeTypes: searchParams.feeTypes ? searchParams.feeTypes.split(",") : [],
-    levelTypes: searchParams.levelTypes ? searchParams.levelTypes.split(",") : [],
-    durationTypes: searchParams.durationTypes ? searchParams.durationTypes.split(",") : []
-  };
+    prevFiltersQueryRef.current = filters?.query;
+  }, [query, filters?.query]);
 
   return (
     <>
@@ -87,30 +63,24 @@ export default function ResourceSearchBar() {
         )}
         style={{ top: `${height}px` }}
       >
-        <div className="basis-1/2 relative">
-          <LensIcon
-            className="absolute top-[0.625rem] left-4"
-            onClick={onClickFocus}
-          />
-          <input
-            ref={inputRef}
-            type="search"
-            placeholder="想找什麼資源..."
-            className="h-10 w-full rounded-lg border-[#DBDBDB] border flex items-center justify-center p-[0_1rem_0_2.75rem]"
-            onChange={(e) => debouncedUpdateSearch(e.target.value)}
-            defaultValue={searchParams.q || ""}
-          />
-        </div>
+        <SearchInput
+          className="w-1/2"
+          // value={query}
+          // onChange={setQuery}
+          placeholder="想找什麼資源..."
+        />
         <div className="flex gap-3 justify-end">
           <Button
             variant="outline"
-            size="sm"
+            size="lg"
             color="primary"
             onClick={handleOpenFilter}
           >
+            <SlidersHorizontalIcon className="size-4 text-primary-base" />
             篩選
           </Button>
-          <Button variant="outline" size="sm" color="primary">
+          <Button variant="outline" size="lg" color="primary">
+            <ChartNoAxesColumnDecreasingIcon className="size-4 rotate-90 text-primary-base" />
             最熱門
           </Button>
         </div>
@@ -119,8 +89,8 @@ export default function ResourceSearchBar() {
       <ResourceSearchModal
         open={isFilterOpen}
         onClose={handleCloseFilter}
-        onFilter={handleFilter}
-        initialFilters={initialFilters}
+        onFilter={onFilter}
+        filters={filters}
       />
     </>
   );

@@ -3,19 +3,19 @@ import useSWRMutation, { SWRMutationConfiguration } from "swr/mutation";
 
 import {
   getResourcePathname,
+  refetchResource,
   resourceAPI,
   ResourceListResponseSchema,
   ResourceDetailResponseSchema,
   ResourceMutationResponseSchema,
-  refetchResource,
+  ResourceSearchParamsSchema,
 } from "@/services/resources";
+import { mockResourceList } from "@/services/resources/mock";
 
-// 獲取資源列表的 hook
-export function useResources() {
-  return useSWR<ResourceListResponseSchema>(getResourcePathname());
+export function useResourceList(filter: ResourceSearchParamsSchema) {
+  return useSWR<ResourceListResponseSchema>([getResourcePathname(), filter], () => mockResourceList);
 }
 
-// 獲取單個資源的 hook
 export function useResource(id?: number | null) {
   return useSWR<ResourceDetailResponseSchema>(
     id ? getResourcePathname({ id }) : null

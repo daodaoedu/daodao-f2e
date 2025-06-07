@@ -1,26 +1,26 @@
 import JsonLdFactory from '@/utils/jsonLd';
-import { NotionPageSchema } from '@/services/notion';
+import { ResourceSchema } from '@/services/resources';
 
-export default function createResourceJsonLd(result: NotionPageSchema) {
+export default function createResourceJsonLd(result: ResourceSchema) {
   return JsonLdFactory.createCourseBuilder()
-    .setId(result.id)
-    .setName(result.properties['資源名稱']?.title[0]?.plain_text ?? '')
-    .setDescription(result.properties['介紹']?.rich_text[0]?.plain_text ?? '')
+    .setId(`https://www.daoedu.tw/resource/${result.id}`)
+    .setName(result.resourceName)
+    .setDescription(result.description)
     .setUrl(`https://www.daoedu.tw/resource/${result.id}`)
-    .setImage(result.properties['縮圖']?.files[0]?.external?.url ?? '')
+    .setImage(result.resourceImgUrl ?? '')
     .setEducationalLevel(
-      result.properties['年齡層']?.multi_select.map((age) => age.name)
+      result.targetAudience.split(',').map((age) => age.trim())
     )
     .setEducationalUse(
-      result.properties['領域名稱']?.multi_select.map((cat) => cat.name)
+      result.majorCategory.split(',').map((cat) => cat.trim())
     )
     .setProvider(
       'Person',
-      result.properties['創建者']?.multi_select[0]?.name ?? '島島阿學'
+      result.user.name ?? '島島阿學'
     )
     .setOffers({
-      category: result.properties['費用']?.select?.name ?? '',
-      price: result.properties['費用']?.select?.name ?? '',
+      category: result.cost ?? '',
+      price: result.cost ?? '',
       priceCurrency: 'TWD',
     })
     .setHasCourseInstance({

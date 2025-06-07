@@ -1,318 +1,320 @@
-import { useState, useEffect } from "react";
+import { ReactNode } from "react";
+import { InfoIcon, CheckIcon } from "lucide-react";
 import { Button } from "@/components/atoms/button";
 import { Checkbox } from "@/components/atoms/checkbox";
-
-interface ResourceType {
-  id: string;
-  label: string;
-}
-
-interface FeeType {
-  id: string;
-  label: string;
-}
-
-interface LevelType {
-  id: string;
-  label: string;
-}
-
-interface DurationType {
-  id: string;
-  label: string;
-}
-
-interface FilterState {
-  resourceTypes: string[];
-  feeTypes: string[];
-  levelTypes: string[];
-  durationTypes: string[];
-}
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ControllerRenderProps, useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/atoms/form";
+import {
+  ResourceSearchParamsSchema,
+  resourceSearchParamsSchema,
+} from "@/services/resources/core/schema";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/atoms/tooltip";
+import {
+  durationTypes,
+  costTypes,
+  targetAudienceTypes,
+  resourceTypes,
+} from "../constants";
 
 interface SearchFormProps {
-  onFilter: (filters: FilterState) => void;
+  onFilter: (filters: ResourceSearchParamsSchema) => void;
   onClose: () => void;
-  initialFilters?: FilterState;
+  filters?: Partial<ResourceSearchParamsSchema>;
 }
+
+interface FormSectionProps {
+  title: string;
+  onClear: () => void;
+  children: ReactNode;
+}
+
+const FormSection = ({ title, onClear, children }: FormSectionProps) => (
+  <div className="space-y-4">
+    <div className="flex items-center justify-between">
+      <h3 className="body-md font-bold text-lg">{title}</h3>
+      <Button
+        type="button"
+        onClick={onClear}
+        variant="ghost"
+        size="sm"
+        className="h-7 text-gray-500 hover:text-gray-700"
+      >
+        清除
+      </Button>
+    </div>
+    {children}
+  </div>
+);
+
+interface CheckboxItemProps {
+  label: string;
+  isChecked: boolean;
+  onChange: (checked: boolean) => void;
+  tooltipContent?: string;
+  hasTooltip?: boolean;
+}
+
+const CheckboxItem = ({
+  label,
+  isChecked,
+  onChange,
+  tooltipContent,
+  hasTooltip = false,
+}: CheckboxItemProps) => (
+  <FormItem className="flex items-center border border-solid border-basic-200 rounded-lg relative gap-2">
+    <FormLabel className="cursor-pointer flex-1 m-0 p-3 flex items-center gap-2">
+      <FormControl>
+        <Checkbox checked={isChecked} onCheckedChange={onChange} />
+      </FormControl>
+      {label}
+      {hasTooltip && tooltipContent && (
+        <Tooltip>
+          <TooltipTrigger className="ml-auto" asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-5 text-basic-200 hover:text-basic-300"
+              aria-label={`關於${label}的資訊`}
+            >
+              <InfoIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="bg-white text-gray-800 border shadow-md p-2">
+            {tooltipContent}
+          </TooltipContent>
+        </Tooltip>
+      )}
+    </FormLabel>
+  </FormItem>
+);
 
 export default function ResourceSearchForm({
   onFilter,
   onClose,
-  initialFilters,
+  filters,
 }: SearchFormProps) {
-  const [selectedResourceTypes, setSelectedResourceTypes] = useState<string[]>(
-    initialFilters?.resourceTypes || []
-  );
-  const [selectedFeeTypes, setSelectedFeeTypes] = useState<string[]>(
-    initialFilters?.feeTypes || []
-  );
-  const [selectedLevelTypes, setSelectedLevelTypes] = useState<string[]>(
-    initialFilters?.levelTypes || []
-  );
-  const [selectedDurationTypes, setSelectedDurationTypes] = useState<string[]>(
-    initialFilters?.durationTypes || []
-  );
+  const form = useForm({
+    resolver: zodResolver(resourceSearchParamsSchema),
+    values: filters,
+  });
 
-  // 當 initialFilters 變更時更新狀態
-  useEffect(() => {
-    if (initialFilters) {
-      setSelectedResourceTypes(initialFilters.resourceTypes || []);
-      setSelectedFeeTypes(initialFilters.feeTypes || []);
-      setSelectedLevelTypes(initialFilters.levelTypes || []);
-      setSelectedDurationTypes(initialFilters.durationTypes || []);
-    }
-  }, [initialFilters]);
-
-  const resourceTypes: ResourceType[] = [
-    { id: "learning-platform", label: "學習平台/APP" },
-    { id: "learning-tool", label: "學習工具" },
-    { id: "book", label: "書籍/文章" },
-    { id: "video", label: "影片" },
-    { id: "podcast", label: "Podcast" },
-    { id: "workshop", label: "工作坊與課程" },
-    { id: "certificate", label: "專業證書與認證課程" },
-    { id: "online-course", label: "如 Coursera、Udemy、edX" },
-  ];
-
-  const feeTypes: FeeType[] = [
-    { id: "free", label: "免費" },
-    { id: "partially-free", label: "部分免費" },
-    { id: "paid", label: "付費" },
-  ];
-
-  const levelTypes: LevelType[] = [
-    { id: "beginner", label: "初學" },
-    { id: "intermediate", label: "進階" },
-    { id: "expert", label: "專家" },
-  ];
-
-  const durationTypes: DurationType[] = [
-    { id: "under-1-hour", label: "1 小時以下" },
-    { id: "1-24-hours", label: "1 小時 ~ 24 小時" },
-    { id: "1-day-to-1-week", label: "1 天 ~ 1 周" },
-    { id: "1-4-weeks", label: "1 周 ~ 4 周" },
-    { id: "over-4-weeks", label: "4 周以上" },
-  ];
-
-  const handleResourceTypeChange = (id: string) => {
-    setSelectedResourceTypes((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+  const handleClear = (
+    type: "resourceType" | "cost" | "targetAudience" | "tags"
+  ) => {
+    form.setValue(type, "");
   };
 
-  const handleFeeTypeChange = (id: string) => {
-    setSelectedFeeTypes((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
-  const handleLevelTypeChange = (id: string) => {
-    setSelectedLevelTypes((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
-  const handleDurationTypeChange = (id: string) => {
-    setSelectedDurationTypes((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
-  const handleClearResourceTypes = () => {
-    setSelectedResourceTypes([]);
-  };
-
-  const handleClearFeeTypes = () => {
-    setSelectedFeeTypes([]);
-  };
-
-  const handleClearLevelTypes = () => {
-    setSelectedLevelTypes([]);
-  };
-
-  const handleClearDurationTypes = () => {
-    setSelectedDurationTypes([]);
-  };
-
-  const handleConfirm = () => {
-    onFilter({
-      resourceTypes: selectedResourceTypes,
-      feeTypes: selectedFeeTypes,
-      levelTypes: selectedLevelTypes,
-      durationTypes: selectedDurationTypes,
-    });
+  function onSubmit(data: ResourceSearchParamsSchema) {
+    onFilter(data);
     onClose();
+  }
+
+  const handleCheckboxChange = (
+    field: ControllerRenderProps<
+      ResourceSearchParamsSchema,
+      "cost" | "resourceType" | "targetAudience" | "tags"
+    >,
+    itemId: string,
+    checked: boolean
+  ) => {
+    if (checked) {
+      field.onChange(field.value ? `${field.value},${itemId}` : itemId);
+    } else {
+      const updatedValue = (field.value ?? "")
+        .split(",")
+        .filter((value) => value !== itemId)
+        .join(",");
+
+      field.onChange(updatedValue);
+    }
+  };
+
+  const getResourceTypeDescription = (id: string) => {
+    switch (id) {
+      case "learning-platform":
+        return "專門用於學習的平台或應用程式，提供多種課程和學習資源";
+      case "learning-tool":
+        return "輔助學習的工具，如筆記軟體、繪圖工具等";
+      case "book":
+        return "包含紙本書籍、電子書、文章或其他文字形式的學習資源";
+      case "video":
+        return "包含教學視頻、講座錄影等影片形式的學習資源";
+      case "podcast":
+        return "以音頻形式提供的學習內容和討論";
+      case "workshop":
+        return "實體或線上的工作坊、講座和課程";
+      case "certificate":
+        return "可獲得專業認證的課程或學習計劃";
+      case "online-course":
+        return "各大線上學習平台提供的系統性課程";
+      default:
+        return "資源類型";
+    }
+  };
+
+  const getTargetAudienceDescription = (id: string) => {
+    switch (id) {
+      case "beginner":
+        return "適合剛開始學習，沒有相關基礎知識的人";
+      case "intermediate":
+        return "適合已有基礎知識，想要進一步深入學習的人";
+      case "expert":
+        return "適合已有相當程度專業知識，想要精進特定領域的人";
+      default:
+        return "適合對象";
+    }
   };
 
   return (
-    <div className="space-y-6">
-      {/* 資源類型 */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-medium text-lg">資源類型</h3>
-          <button
-            type="button"
-            onClick={handleClearResourceTypes}
-            className="text-sm text-gray-500 hover:text-gray-700"
-          >
-            清除
-          </button>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
-          {resourceTypes.map((type) => (
-            <div
-              key={type.id}
-              className="flex items-center border rounded-lg p-3 relative"
+    <TooltipProvider>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="space-y-6 bg-white p-6 rounded-xl">
+            {/* 資源類型 */}
+            <FormSection
+              title="資源類型"
+              onClear={() => handleClear("resourceType")}
             >
-              <Checkbox
-                id={`resource-${type.id}`}
-                checked={selectedResourceTypes.includes(type.id)}
-                onCheckedChange={() => handleResourceTypeChange(type.id)}
-                className="mr-2"
+              <FormField
+                control={form.control}
+                name="resourceType"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                      {resourceTypes.map((type) => (
+                        <CheckboxItem
+                          key={type.id}
+                          label={type.label}
+                          isChecked={
+                            !!field.value?.split(",").includes(type.id)
+                          }
+                          onChange={(checked) =>
+                            handleCheckboxChange(field, type.id, checked)
+                          }
+                          hasTooltip
+                          tooltipContent={getResourceTypeDescription(type.id)}
+                        />
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <label
-                htmlFor={`resource-${type.id}`}
-                className="cursor-pointer flex-1"
-              >
-                {type.label}
-              </label>
-              <button
-                type="button"
-                className="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 absolute right-2"
-                aria-label={`關於${type.label}的資訊`}
-              >
-                <span className="text-sm rounded-full border border-gray-300 w-4 h-4 flex items-center justify-center">
-                  i
-                </span>
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+            </FormSection>
 
-      {/* 費用 */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-medium text-lg">費用</h3>
-          <button
-            type="button"
-            onClick={handleClearFeeTypes}
-            className="text-sm text-gray-500 hover:text-gray-700"
-          >
-            清除
-          </button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          {feeTypes.map((type) => (
-            <div
-              key={type.id}
-              className="flex items-center border rounded-lg p-3"
+            {/* 費用 */}
+            <FormSection title="費用" onClear={() => handleClear("cost")}>
+              <FormField
+                control={form.control}
+                name="cost"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      {costTypes.map((type) => (
+                        <CheckboxItem
+                          key={type.id}
+                          label={type.label}
+                          isChecked={
+                            !!field.value?.split(",").includes(type.id)
+                          }
+                          onChange={(checked) =>
+                            handleCheckboxChange(field, type.id, checked)
+                          }
+                        />
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </FormSection>
+
+            {/* 適合對象 */}
+            <FormSection
+              title="適合"
+              onClear={() => handleClear("targetAudience")}
             >
-              <Checkbox
-                id={`fee-${type.id}`}
-                checked={selectedFeeTypes.includes(type.id)}
-                onCheckedChange={() => handleFeeTypeChange(type.id)}
-                className="mr-2"
+              <FormField
+                control={form.control}
+                name="targetAudience"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      {targetAudienceTypes.map((type) => (
+                        <CheckboxItem
+                          key={type.id}
+                          label={type.label}
+                          isChecked={
+                            !!field.value?.split(",").includes(type.id)
+                          }
+                          onChange={(checked) =>
+                            handleCheckboxChange(field, type.id, checked)
+                          }
+                          hasTooltip
+                          tooltipContent={getTargetAudienceDescription(type.id)}
+                        />
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <label
-                htmlFor={`fee-${type.id}`}
-                className="cursor-pointer flex-1"
-              >
-                {type.label}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
+            </FormSection>
 
-      {/* 適合 */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-medium text-lg">適合</h3>
-          <button
-            type="button"
-            onClick={handleClearLevelTypes}
-            className="text-sm text-gray-500 hover:text-gray-700"
-          >
-            清除
-          </button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          {levelTypes.map((type) => (
-            <div
-              key={type.id}
-              className="flex items-center border rounded-lg p-3 relative"
+            {/* 所需學習時間 */}
+            <FormSection
+              title="所需學習時間"
+              onClear={() => handleClear("tags")}
             >
-              <Checkbox
-                id={`level-${type.id}`}
-                checked={selectedLevelTypes.includes(type.id)}
-                onCheckedChange={() => handleLevelTypeChange(type.id)}
-                className="mr-2"
+              <FormField
+                control={form.control}
+                name="tags"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                      {durationTypes.map((item) => (
+                        <CheckboxItem
+                          key={item.id}
+                          label={item.label}
+                          isChecked={
+                            !!field.value?.split(",").includes(item.id)
+                          }
+                          onChange={(checked) =>
+                            handleCheckboxChange(field, item.id, checked)
+                          }
+                        />
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <label
-                htmlFor={`level-${type.id}`}
-                className="cursor-pointer flex-1"
-              >
-                {type.label}
-              </label>
-              <button
-                type="button"
-                className="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 absolute right-2"
-                aria-label={`關於${type.label}的資訊`}
-              >
-                <span className="text-sm rounded-full border border-gray-300 w-4 h-4 flex items-center justify-center">
-                  i
-                </span>
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+            </FormSection>
+          </div>
 
-      {/* 所需學習時間 */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-medium text-lg">所需學習時間</h3>
-          <button
-            type="button"
-            onClick={handleClearDurationTypes}
-            className="text-sm text-gray-500 hover:text-gray-700"
-          >
-            清除
-          </button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          {durationTypes.map((type) => (
-            <div
-              key={type.id}
-              className="flex items-center border rounded-lg p-3"
-            >
-              <Checkbox
-                id={`duration-${type.id}`}
-                checked={selectedDurationTypes.includes(type.id)}
-                onCheckedChange={() => handleDurationTypeChange(type.id)}
-                className="mr-2"
-              />
-              <label
-                htmlFor={`duration-${type.id}`}
-                className="cursor-pointer flex-1"
-              >
-                {type.label}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 確認按鈕 */}
-      <div className="flex justify-center mt-6">
-        <Button
-          onClick={handleConfirm}
-          className="bg-teal-500 hover:bg-teal-600 text-white px-10 py-2 rounded-full"
-        >
-          確認
-        </Button>
-      </div>
-    </div>
+          {/* 確認按鈕 */}
+          <div className="flex justify-center mt-6">
+            <Button type="submit">
+              <CheckIcon size={20} />
+              確認
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </TooltipProvider>
   );
 }
