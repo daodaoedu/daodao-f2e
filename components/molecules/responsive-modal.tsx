@@ -50,7 +50,7 @@ export const ResponsiveModal = ({
   const isDialog =
     (size === DialogContentSize.Large && screens.lg) ||
     (size === DialogContentSize.Medium && screens.md) ||
-    (size === DialogContentSize.Small && screens.xs);
+    (size === DialogContentSize.Small && screens.sm);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) onClose();
