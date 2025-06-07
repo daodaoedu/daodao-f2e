@@ -1,10 +1,15 @@
 import { z } from "zod";
 
 export const parseToString = (input?: unknown, isEncode = true) => {
+  const schema = z
+    .string()
+    .or(z.number())
+    .or(z.boolean())
+    .transform((val) => val.toString());
   try {
     return isEncode
-      ? encodeURIComponent(z.string().parse(input))
-      : z.string().parse(input);
+      ? encodeURIComponent(schema.parse(input))
+      : schema.parse(input);
   } catch {
     return null;
   }
