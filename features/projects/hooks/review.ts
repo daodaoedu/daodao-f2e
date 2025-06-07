@@ -4,8 +4,8 @@ import useSWRMutation from "swr/mutation";
 import {
   projectReviewAPI,
   getProjectReviewPathname,
-} from "@/services/modules/projects/reviews/api";
-import { ProjectReviewSchema } from "@/services/modules/projects/reviews/schema";
+} from "@/services/projects/reviews/api";
+import { ProjectReviewSchema } from "@/services/projects/reviews/schema";
 
 export function useProjectReviewList(projectId?: string | null) {
   return useSWR<ProjectReviewSchema[]>(

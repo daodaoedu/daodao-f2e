@@ -125,9 +125,9 @@ const SelectedCategory = () => {
             },
           }}
         />
-        {CATEGORIES.map(({ key, label }) => (
+        {CATEGORIES.map(({ value, label }) => (
           <CatChip
-            key={key}
+            key={value}
             value={label}
             onClickCategory={onClickCategory}
             isCurrentSelectAllCats={isCurrentSelectAllCats}

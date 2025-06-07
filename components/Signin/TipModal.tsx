@@ -1,6 +1,5 @@
-import { useId } from "react";
 import Image from "@/shared/components/Image";
-import Modal from "@/shared/components/Modal";
+import ResponsiveModal from "@/components/molecules/responsive-modal";
 
 interface TipModalProps {
   isOpen: boolean;
@@ -9,22 +8,9 @@ interface TipModalProps {
 }
 
 function TipModal({ isOpen, onClose, onOk }: Readonly<TipModalProps>) {
-  const id = useId();
-  const describedby = `tip-modal-${id}`;
-
   return (
-    <Modal
-      keepMounted
-      isOpen={isOpen}
-      onClose={onClose}
-      className="sm:max-w-[440px]"
-      title="帳號註冊成功！"
-      describedby={describedby}
-    >
-      <p
-        id={describedby}
-        className="mt-2 mb-6 text-center text-basic-400 body-sm"
-      >
+    <ResponsiveModal open={isOpen} onClose={onClose} title="帳號註冊成功！">
+      <p className="mt-2 mb-6 text-center text-basic-400 body-sm">
         記得到信箱確認收到帳號驗證信件，並點選驗證Email按鈕，如果沒有看到信件，可以到垃圾桶確認。
       </p>
       <Image
@@ -53,7 +39,7 @@ function TipModal({ isOpen, onClose, onOk }: Readonly<TipModalProps>) {
           想，填寫資料
         </button>
       </div>
-    </Modal>
+    </ResponsiveModal>
   );
 }
 

@@ -10,10 +10,10 @@ import {
   ReviewUpdateModal,
 } from "@/features/projects";
 import SEOConfig from "@/shared/components/SEO";
-import { useProject } from "@/services/modules/projects";
+import { useProject } from "@/services/projects";
 import { useProjectReview, useProjectReviewList } from "@/features/projects/hooks/review";
 import marathonConfig from "@/constants/marathon";
-import { parseToString } from "@/services/core";
+import { parseToString } from "@/utils/helper";
 
 enum ModalTypeEnum {
   Create,

@@ -38,7 +38,7 @@ const Image = ({
   const [isError, setIsError] = useState(false);
   return (
     <LazyLoadImage
-      src={isError ? emptyCoverWithBackgroundImg.src : src}
+      src={isError || !src ? emptyCoverWithBackgroundImg.src : src}
       alt={alt}
       width={width}
       height={height}

@@ -15,9 +15,10 @@ import { DialogProvider } from '@/contexts/Dialog';
 import CompleteInfoReminderDialog from '@/shared/components/CompleteInfoReminderDialog';
 import GlobalStyle from '@/shared/styles/Global';
 import Image from "@/shared/components/Image";
-import Modal from '@/shared/components/Modal';
+import ResponsiveModal from '@/components/molecules/responsive-modal';
 import themeFactory from '@/shared/styles/themeFactory';
-import { fetcher, parseToString } from '@/services/core';
+import { fetcher } from '@/utils/http';
+import { parseToString } from '@/utils/helper';
 import { getReminderStorage } from '@/utils/storage';
 import getBaseLayout from '@/layout/core/getBaseLayout';
 import { initGA, logPageView } from '../utils/analytics';
@@ -80,62 +81,65 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
         }}
       />
       <CompleteInfoReminderDialog isOpen={openModalType === "completeInfoReminder"} onClose={handleClose} />
-      <Modal
-        isOpen={openModalType === 'verifiedSuccess' && isLoggedIn}
+      <ResponsiveModal
+        open={openModalType === 'verifiedSuccess' && isLoggedIn}
         onClose={handleClose}
         title="驗證成功"
-        describedby="verifiedSuccess"
       >
-        <Image
-          src="/assets/illustration.png"
-          alt="verified-success"
-          width="300"
-          height="289"
-        />
-        {
-          isComplete ? (
-            <>
-              <p id="verifiedSuccess" className="mb-6 text-center text-basic-400 body-sm">
-                帳號已驗證成功，快來體驗平台的特色功能！
-              </p>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-primary-base text-white hover:bg-primary-darker"
-                  onClick={handleClose}
-                >
-                  開始探索
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <p id="verifiedSuccess" className="mb-6 text-center text-basic-400 body-sm">
-                我們會公開你的<strong className="font-bold">個人檔案</strong>，填寫完整的資料，才能讓其他夥伴們更了解你喔！
-              </p>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-white text-primary-darker hover:bg-basic-100"
-                  onClick={handleClose}
-                >
-                  暫時不需要
-                </button>
-                <button
-                  type="button"
-                  className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-primary-base text-white hover:bg-primary-darker"
-                  onClick={() => {
-                    handleClose();
-                    router.replace('/personal-card');
-                  }}
-                >
-                  想，填寫資料
-                </button>
-              </div>
-            </>
-          )
-        }
-      </Modal>
+        <div className="p-4">
+          <div className="mx-auto w-max">
+            <Image
+              src="/assets/illustration.png"
+              alt="verified-success"
+              width="300"
+              height="289"
+            />
+          </div>
+          {
+            isComplete ? (
+              <>
+                <p className="mb-6 text-center text-basic-400 body-sm">
+                  帳號已驗證成功，快來體驗平台的特色功能！
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-primary-base text-white hover:bg-primary-darker"
+                    onClick={handleClose}
+                  >
+                    開始探索
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="mb-6 text-center text-basic-400 body-sm">
+                  我們會公開你的<strong className="font-bold">個人檔案</strong>，填寫完整的資料，才能讓其他夥伴們更了解你喔！
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-white text-primary-darker hover:bg-basic-100"
+                    onClick={handleClose}
+                  >
+                    暫時不需要
+                  </button>
+                  <button
+                    type="button"
+                    className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-primary-base text-white hover:bg-primary-darker"
+                    onClick={() => {
+                      handleClose();
+                      router.replace('/personal-card');
+                    }}
+                  >
+                    想，填寫資料
+                  </button>
+                </div>
+              </>
+            )
+          }
+        </div>
+      </ResponsiveModal>
       {getLayout(<Component {...pageProps} />)}
     </ThemeProvider>
   );

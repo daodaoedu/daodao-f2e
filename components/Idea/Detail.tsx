@@ -2,9 +2,9 @@ import Link from 'next/link';
 import Image from '@/shared/components/Image';
 import PostDetailCard from '@/shared/components/Post/PostDetailCard';
 import { IdeaSchema } from '@/services/ideas';
-import { BaseUserSchema } from '@/services/modules/users';
+import { BaseUserSchema } from '@/services/users';
 import { MdLink } from "react-icons/md";
-import { CommentType } from '@/services/modules/comments';
+import { CommentType } from '@/services/comments';
 
 interface IdeaDetailProps {
     data?: IdeaSchema;

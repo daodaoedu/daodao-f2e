@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { useTags } from '@/services/modules/tags';
+import { useTags } from '@/services/tags';
 import SearchInput from './SearchInput';
 import SelectedAreas from './SelectedAreas';
 import SelectedEducationStep from './SelectedEducationStep';

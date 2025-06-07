@@ -1,23 +1,28 @@
 export const LOGIN_TYPE = 'DAODAO-LOGIN-TYPE';
 
 export default function getEnv() {
-  const mode = process.env.NODE_ENV;
-  const devDomain = process.env.NEXT_PUBLIC_DEV_URL ?? '';
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
+  const devDomain = process.env.NEXT_PUBLIC_DEV_URL ?? '';
+  const hostname = process.env.HOSTNAME ?? '';
+  const mode = process.env.NODE_ENV;
+
   const isServerSide = typeof window === 'undefined';
-  const hostname = isServerSide
-    ? process.env.HOSTNAME ?? ''
-    : window.location.hostname;
+  const isDev = mode === 'development';
+
+  const isDevHost = isServerSide
+    ? isDev
+    : window.location.hostname.endsWith('localhost') ||
+      window.location.hostname.endsWith(
+        devDomain.replace(/https?:\/\/dev\./g, '')
+      );
 
   return {
     apiUrl,
     devDomain,
-    frontendUrl: isServerSide ? devDomain : window.location.origin,
+    frontendUrl: isDevHost ? devDomain : hostname,
     isClientSide: !isServerSide,
-    isDev: mode === 'development',
-    isDevHost:
-      hostname.endsWith('localhost') ||
-      hostname?.endsWith(devDomain.replace(/https?:\/\/dev\./g, '')),
+    isDev,
+    isDevHost,
     isServerSide,
     mode,
   };

@@ -1,9 +1,9 @@
 import PostDetailCard, {
   BasePostDetailData,
 } from '@/shared/components/Post/PostDetailCard';
-import { ProjectReviewSchema } from '@/services/modules/projects';
-import { BaseUserSchema } from '@/services/modules/users';
-import { CommentType } from '@/services/modules/comments';
+import { ProjectReviewSchema } from '@/services/projects';
+import { BaseUserSchema } from '@/services/users';
+import { CommentType } from '@/services/comments';
 import MarkdownEditor from '@/shared/components/MarkdownEditor';
 import RadioGroup from './ReviewRadioGroup';
 

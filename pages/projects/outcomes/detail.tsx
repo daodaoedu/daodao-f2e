@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 import OutcomeDetail from "@/features/projects/components/OutcomeDetail";
 import { getPublicProjectLayout } from "@/layout/features/getProjectLayout";
-import { useProject } from "@/services/modules/projects";
+import { useProject } from "@/services/projects";
 import { useProjectOutcome } from "@/features/projects/hooks/outcome";
-import { parseToNumber, parseToString } from "@/services/core";
+import { parseToNumber, parseToString } from "@/utils/helper";
 
 const OutcomeDetailPage = () => {
   const { query } = useRouter();

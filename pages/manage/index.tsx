@@ -29,7 +29,7 @@ import AccessDeniedImg from "@/public/assets/projects/access-denied.png";
 import {
   useMyProjects,
   useProjectNoteMutation,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 import Image from "@/shared/components/Image";
 import useCreateProject from "@/features/projects/hooks/useCreateProject";
 import MilestoneCard from "@/components/Milestones/MilestoneCard";

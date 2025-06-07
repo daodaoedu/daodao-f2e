@@ -1,12 +1,10 @@
 import { useMemo, useState } from 'react';
-import { IoClose } from "react-icons/io5";
 import { FaLinkedin, FaMedium, FaResearchgate, FaSquareFacebook, FaSquareThreads } from "react-icons/fa6";
-import { IconButton } from '@mui/material';
 import EastIcon from '@mui/icons-material/East';
 import Image from '@/shared/components/Image';
-import Modal from '@/shared/components/Modal';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/molecules/responsive-modal';
 import { cn } from '@/utils/cn';
-import Carousel from '@/shared/components/Carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/atoms/carousel';
 
 const mentors = [
   {
@@ -222,90 +220,97 @@ const Mentors = () => {
 
   return (
     <>
-      <Carousel
-        title="引導師介紹"
-        titleId="marathon-mentor"
-        items={mentors}
-        renderKey={(mentor) => mentor.name}
-        renderItem={(mentor) => (
-          <MentorCard
-            key={mentor.name}
-            mentor={mentor}
-            className="cursor-pointer group"
-            onClick={() => handleOpenModal(mentor.name)}
-          >
-            <div className="absolute bottom-0 left-0 right-0 pt-4">
-              <div className="flex gap-2 px-3">
-                {mentor.tags.slice(0, 1).map((tag, index) => (
-                  <Tag
-                    key={tag}
-                    text={tag}
-                    className={index === 0 && "shrink-0"}
-                  />
-                ))}
-              </div>
-              <div className="heading-md text-white text-start mt-2 px-3 pb-3">{mentor.title} | {mentor.name}</div>
-              <div className="bg-white flex justify-end items-center text-gray-400 px-3 py-2 gap-1 group-hover:text-primary-base">more <EastIcon className="!text-[16px]" /></div>
-            </div>
-          </MentorCard>
-        )}
-      />
-
-      <Modal
-        isOpen={isOpen}
-        onClose={handleCloseModal}
-        className="p-6 pt-11 sm:max-w-[570px]"
-        onRemovedDOM={() => setActiveMentorName('')}
-      >
-        <IconButton className="!absolute !top-0 !right-1 !p-2" onClick={handleCloseModal}>
-          <IoClose className="size-6" />
-        </IconButton>
-        <div className="max-h-[80vh] overflow-y-auto">
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <picture>
-              <MentorCard mentor={activeMentor} className="w-full md:w-[200px] cursor-default pointer-events-none" />
-            </picture>
-            <div>
-              <div className="heading-md text-basic-500 mb-3">{activeMentor?.title} | {activeMentor?.name}</div>
-              <div className="flex flex-col gap-2 items-start mb-3">
-                {activeMentor?.tags.map((tag) => (
-                  <Tag key={tag} text={tag} className="max-w-72 text-wrap" />
-                ))}
-              </div>
-              <div className="flex flex-col gap-2.5 items-start">
-                {Object.keys(activeMentor?.social || {}).map((key) => (
-                  <a
-                    key={key}
-                    className="body-sm text-primary-base flex items-center gap-1"
-                    href={activeMentor?.social[key]?.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {socialIcons[key]}
-                    {activeMentor?.social[key]?.text}
-                  </a>
-                ))}
-              </div>
+      <div className="mb-9">
+        <Carousel className="mx-6 lg:ml-60" opts={{ align: 'start' }}>
+          <div className="flex justify-between items-center lg:mr-60">
+            <h2 className="heading-md text-basic-500" id="marathon-mentor">
+              引導師介紹
+            </h2>
+            <div className="flex gap-2">
+              <CarouselPrevious className="static translate-y-0 mx-1" />
+              <CarouselNext className="static translate-y-0 mx-1" />
             </div>
           </div>
-          <section className="mb-4">
-            {activeMentor?.experiences?.length > 0 && (
-              <>
-                <h3 className="body-md font-bold text-basic-400 mb-2">經歷</h3>
-                <ul>
-                  {activeMentor?.experiences.map((experience) => (
-                    <li key={experience} className="body-sm text-basic-400">{experience}</li>
-                  ))}
-                </ul>
-              </>
-            )}
-          </section>
-          <section>
-            <h3 className="body-md font-bold text-basic-400 mb-2">自我介紹</h3>
-            <p className="body-sm text-basic-400 whitespace-pre-wrap">{activeMentor?.introduction}</p>
-          </section>
+          <div className="mt-9">
+            <CarouselContent>
+              {mentors.map((mentor) => (
+                <CarouselItem key={mentor.name} className="basis-auto">
+                  <MentorCard
+                    mentor={mentor}
+                    className="cursor-pointer group"
+                    onClick={() => handleOpenModal(mentor.name)}
+                  >
+                    <div className="absolute bottom-0 left-0 right-0 pt-4">
+                      <div className="flex gap-2 px-3">
+                        {mentor.tags.slice(0, 1).map((tag, index) => (
+                          <Tag
+                            key={tag}
+                            text={tag}
+                            className={index === 0 && "shrink-0"}
+                          />
+                        ))}
+                      </div>
+                      <div className="heading-md text-white text-start mt-2 px-3 pb-3">{mentor.title} | {mentor.name}</div>
+                      <div className="bg-white flex justify-end items-center text-gray-400 px-3 py-2 gap-1 group-hover:text-primary-base">more <EastIcon className="!text-[16px]" /></div>
+                    </div>
+                  </MentorCard>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </div>
+        </Carousel>
+      </div>
+
+      <ResponsiveModal
+        open={isOpen}
+        onClose={handleCloseModal}
+        hasCloseButton
+        size={ResponsiveModalSize.Medium}
+      >
+        <div className="flex flex-col md:flex-row gap-4 mb-4">
+          <picture>
+            <MentorCard mentor={activeMentor} className="w-full md:w-[200px] cursor-default pointer-events-none" />
+          </picture>
+          <div className="flex-1">
+            <div className="heading-md text-basic-500 mb-3">{activeMentor?.title} | {activeMentor?.name}</div>
+            <div className="flex flex-col gap-2 items-start mb-3">
+              {activeMentor?.tags.map((tag) => (
+                <Tag key={tag} text={tag} className="text-wrap" />
+              ))}
+            </div>
+            <div className="flex flex-col gap-2.5 items-start">
+              {Object.keys(activeMentor?.social || {}).map((key) => (
+                <a
+                  key={key}
+                  className="body-sm text-primary-base flex items-center gap-1"
+                  href={activeMentor?.social[key]?.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {socialIcons[key]}
+                  {activeMentor?.social[key]?.text}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
-      </Modal>
+        <section className="mb-4">
+          {activeMentor?.experiences?.length > 0 && (
+            <>
+              <h3 className="body-md font-bold text-basic-400 mb-2">經歷</h3>
+              <ul>
+                {activeMentor?.experiences.map((experience) => (
+                  <li key={experience} className="body-sm text-basic-400">{experience}</li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
+        <section>
+          <h3 className="body-md font-bold text-basic-400 mb-2">自我介紹</h3>
+          <p className="body-sm text-basic-400 whitespace-pre-wrap">{activeMentor?.introduction}</p>
+        </section>
+      </ResponsiveModal>
     </>
   );
 };

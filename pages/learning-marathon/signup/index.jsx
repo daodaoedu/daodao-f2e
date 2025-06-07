@@ -12,7 +12,7 @@ import UserProfileForm from '@/components/Marathon/SignUp/UserProfileForm';
 import MarathonForm from '@/components/Marathon/SignUp/MarathonForm';
 import ConfirmForm from '@/components/Marathon/SignUp/ConfirmForm';
 import { ProtectedComponent } from '@/contexts/Auth';
-import { useMarathon } from '@/services/modules/marathons';
+import { useMarathon } from '@/services/marathons';
 import { isServer } from '@/utils/helper';
 
 const FormWrapper = styled.form`
