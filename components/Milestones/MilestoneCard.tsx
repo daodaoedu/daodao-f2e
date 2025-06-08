@@ -24,7 +24,7 @@ import {
   ProjectMilestoneSchema,
   ProjectMilestoneFormSchema,
   projectMilestoneFormSchema,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DatePickerWithRange } from "@/components/molecules/date-picker";
 import { getDefaultMilestone } from "./Shared";

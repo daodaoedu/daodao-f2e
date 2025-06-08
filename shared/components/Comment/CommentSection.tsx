@@ -1,5 +1,5 @@
 import Comment from '@/public/assets/icons/comment.svg';
-import { useComments, CommentType } from '@/services/modules/comments';
+import { useComments, CommentType } from '@/services/comments';
 import CommentInput from './CommentInput';
 import CommentCard from './CommentCard';
 

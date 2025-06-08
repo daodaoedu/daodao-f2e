@@ -5,7 +5,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { ProjectTaskSchema } from '@/services/modules/projects';
+import { ProjectTaskSchema } from '@/services/projects';
 import { useMilestones } from '@/contexts/Milestones';
 import { useDraggableContainer } from '@/hooks/useDraggableContainer';
 import { useDraggableSensors } from '@/hooks/useDraggableSensors';

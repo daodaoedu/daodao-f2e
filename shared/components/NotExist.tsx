@@ -77,9 +77,9 @@ export default function NotExist() {
             豐富的學習類別
           </Typography>
           <Box sx={{ margin: '10px 0' }}>
-            {CATEGORIES.map(({ key, label }) => (
+            {CATEGORIES.map(({ value, label }) => (
               <Chip
-                key={key}
+                key={value}
                 label={label}
                 component="a"
                 href={`/search?cats=${label}`}

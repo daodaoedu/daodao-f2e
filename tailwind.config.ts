@@ -206,6 +206,12 @@ export default {
           },
         });
       });
+      addComponents({
+        ".bg-gradient-primary-palest": {
+          background:
+            "linear-gradient(270.27deg, rgba(243, 252, 252, 0) 16.33%, #F3FCFC 96.08%), rgba(22, 185, 179, 0.3)",
+        },
+      });
       addUtilities({
         ".animate-distance-100dvh": {
           "--animation-distance": "100dvh",

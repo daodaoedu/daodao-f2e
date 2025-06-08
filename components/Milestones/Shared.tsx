@@ -4,7 +4,7 @@ import { cn } from "@/utils/cn";
 import {
   ProjectMilestoneFormSchema,
   ProjectMilestoneSchema,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 
 const idSchema = z
   .string()

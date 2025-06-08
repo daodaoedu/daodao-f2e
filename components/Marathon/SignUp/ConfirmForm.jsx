@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { AREA_DELIMITER, AREAS } from '@/constants/areas';
-import { useMarathon, useMarathonMutation } from '@/services/modules/marathons';
+import { useMarathon, useMarathonMutation } from '@/services/marathons';
 import { mapToTable } from '@/utils/helper';
 
 import marathonConfig from '@/constants/marathon';

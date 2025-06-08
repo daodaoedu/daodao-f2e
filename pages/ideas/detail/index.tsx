@@ -1,12 +1,12 @@
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import ConfirmModal from '@/shared/components/Confirm';
-import { parseToString } from '@/services/core';
+import { parseToString } from '@/utils/helper';
 import { IdeaDetail } from '@/features/ideas/components';
 import { useIdea } from '@/features/ideas/hooks';
 import { UpdateModal } from '@/features/ideas/components/Modals';
 import { IdeasProvider } from '@/features/ideas/contexts';
+import ConfirmModal from '@/shared/components/Confirm';
 
 enum ModalTypeEnum {
     Update,

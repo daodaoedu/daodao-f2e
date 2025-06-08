@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/router";
-import { parseToString } from "@/services/core";
+import { parseToString } from "@/utils/helper";
 import SEOConfig from "@/shared/components/SEO";
 import {
   ContentCard,
@@ -15,7 +15,7 @@ import {
   useProject,
   useProjectNote,
   useProjectNotes,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 
 enum ModalTypeEnum {
   Create,

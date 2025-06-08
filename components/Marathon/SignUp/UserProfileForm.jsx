@@ -24,7 +24,7 @@ import {
 } from '@mui/material';
 
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-import { useMarathonByUserEvent } from '@/services/modules/marathons';
+import { useMarathonByUserEvent } from '@/services/marathons';
 import Fields from '@/components/Group/Form/Fields';
 import useEditProfile from './useEditProfile';
 import ErrorMessage from './ErrorMessage';

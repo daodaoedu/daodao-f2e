@@ -1,8 +1,8 @@
 import { useRouter } from "next/router";
 import { NoteDetail } from "@/features/projects";
 import { getPublicProjectLayout } from "@/layout/features/getProjectLayout";
-import { useProjectNote } from "@/services/modules/projects";
-import { parseToNumber, parseToString } from "@/services/core";
+import { useProjectNote } from "@/services/projects";
+import { parseToNumber, parseToString } from "@/utils/helper";
 
 const NoteDetailPage = () => {
   const router = useRouter();

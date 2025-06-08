@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { uploadImagesSchema } from '@/services/modules/images';
+import { uploadImagesSchema } from '@/services/images';
 import { Button, type ButtonProps } from '@/components/atoms/button';
 
 export interface ImageDataType {
