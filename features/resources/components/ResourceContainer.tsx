@@ -37,6 +37,7 @@ function ResourceContainer({
       {safeData.map((resource) => (
         <ResourceCard
           key={resource.id}
+          id={resource.id}
           title={resource.resourceName}
           content={resource.description}
           tags={resource.tags}
