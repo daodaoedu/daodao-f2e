@@ -26,7 +26,7 @@ export const getResourcePathname = ({ id }: GetResourcePathnameProps = {}) => {
 };
 
 interface ResourceAPIType {
-  read: (resourceId: string) => Promise<ResourceDetailResponseSchema>;
+  read: (resourceId: number) => Promise<ResourceDetailResponseSchema>;
   readList: () => Promise<ResourceListResponseSchema>;
   create: MutationFetcher<
     ResourceMutationResponseSchema,

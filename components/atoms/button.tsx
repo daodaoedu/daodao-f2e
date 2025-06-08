@@ -13,7 +13,7 @@ const buttonVariants = cva(
     // Text & Space
     "whitespace-nowrap body-md font-medium",
     // Visual Style
-    "transition-[color,background-color,box-shadow] rounded-full",
+    "transition-[color,background-color,box-shadow] rounded-full overflow-hidden",
     // Interaction
     "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
     "disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none",
@@ -33,11 +33,13 @@ const buttonVariants = cva(
         ghost: "hover:text-primary",
         link: "text-primary underline-offset-4 hover:underline",
         gray: "bg-basic-200 border-basic-200 text-basic-300 shadow-lg hover:bg-primary-base hover:border-primary-base hover:text-white",
+        light:
+          "border border-basic-200 bg-background shadow-sm hover:border-primary-base hover:text-primary-base",
       },
       size: {
         default: "h-9 px-5 py-2",
         sm: "h-8 px-3 body-sm",
-        lg: "h-10 px-5 body-lg",
+        lg: "h-10 px-5",
         icon: "h-9 w-9",
       },
     },
@@ -65,9 +67,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     {
       className,
       variant,
-      size = "lg",
+      size,
       asChild = false,
-      children,
       disabled,
       animation = ButtonAnimationEnum.Ripple,
       onClick,
@@ -75,7 +76,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const rippleRef = React.useRef<HTMLDivElement>(null);
     const Comp = asChild ? Slot : "button";
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -90,35 +90,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       }
       const rect = e.currentTarget.getBoundingClientRect();
       const ripple = document.createElement("span");
+
       ripple.className =
         "absolute size-10 rounded-full bg-black/30 animate-button-ripple";
       ripple.style.top = `${((e.clientY - rect.top) / rect.height) * 100}%`;
       ripple.style.left = `${((e.clientX - rect.left) / rect.width) * 100}%`;
-      rippleRef.current?.appendChild(ripple);
+      e.currentTarget?.appendChild(ripple);
       setTimeout(() => ripple.remove(), 1000);
     };
-
-    const rippleElement = (
-      <div
-        key="ripple"
-        ref={rippleRef}
-        className="absolute inset-0 pointer-events-none rounded-[inherit] overflow-hidden"
-      />
-    );
-
-    const childElement = React.isValidElement<React.PropsWithChildren>(
-      children
-    ) ? (
-      React.cloneElement(children, children.props, [
-        children.props.children,
-        rippleElement,
-      ])
-    ) : (
-      <>
-        {children}
-        {rippleElement}
-      </>
-    );
 
     return (
       <Comp
@@ -127,9 +106,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         onClick={handleClick}
         disabled={disabled}
         {...props}
-      >
-        {childElement}
-      </Comp>
+      />
     );
   }
 );
