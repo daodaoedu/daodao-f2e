@@ -13,7 +13,7 @@ import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";
 import { CATEGORIES, SEARCH_TAGS } from "@/constants/category";
 import { parseToArray } from "@/utils/helper";
-import { Categories } from "@/features/resources/utils/getCategories";
+import { CategoriesType } from "@/features/resources/utils/getCategories";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -70,9 +70,7 @@ export const getStaticProps = (async (context) => {
   try {
     const data = await resourceAPI.readList();
 
-    const coursesJsonLd = data.resources
-      .slice(0, 4)
-      .map(createResourceJsonLd);
+    const coursesJsonLd = data.resources.slice(0, 4).map(createResourceJsonLd);
 
     const jsonLd = JsonLdFactory.createGraph([
       JsonLdFactory.createItemListBuilder()
@@ -105,7 +103,7 @@ export const getStaticProps = (async (context) => {
 }) satisfies GetStaticProps<{
   fallback: Record<string, ResourceListResponseSchema> | undefined;
   jsonLd: JsonLdType | undefined;
-  categories: Categories;
+  categories: CategoriesType;
   title: string;
   totalEstimate: number;
 }>;
@@ -188,7 +186,7 @@ export default function ResourceCategoriesPage({
       </Section>
 
       <Section className="px-0 md:px-0">
-        <ResourceExplorer />
+        <ResourceExplorer categories={categories} parentDataCount={32} />
       </Section>
     </SWRConfig>
   );

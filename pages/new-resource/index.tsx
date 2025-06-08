@@ -133,7 +133,7 @@ export default function ResourcePage({
 
       {/* 熱門心得 */}
       <Section className="bg-primary-palest">
-        <Carousel opts={{ loop: true }}>
+        <Carousel opts={{ loop: true, align: "start" }}>
           <div className="flex justify-between items-center mb-9">
             <h2 className="text-2xl font-medium text-basic-500">熱門心得</h2>
             <div className="flex gap-2">
@@ -143,7 +143,10 @@ export default function ResourcePage({
           </div>
           <CarouselContent>
             {reflectionList.map((item) => (
-              <CarouselItem key={item} className="basis-auto">
+              <CarouselItem
+                key={item}
+                className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+              >
                 <ReflectionCard />
               </CarouselItem>
             ))}
@@ -153,7 +156,7 @@ export default function ResourcePage({
 
       {/* 活躍分享者 */}
       <Section>
-        <Carousel opts={{ loop: true }}>
+        <Carousel opts={{ loop: true, align: "start" }}>
           <div className="flex justify-between items-center mb-9">
             <h2 className="text-2xl font-medium text-basic-500">活躍分享者</h2>
             <div className="flex gap-2">
@@ -163,7 +166,10 @@ export default function ResourcePage({
           </div>
           <CarouselContent>
             {sharerList.map((item, index) => (
-              <CarouselItem key={item} className="basis-auto">
+              <CarouselItem
+                key={item}
+                className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+              >
                 <SharerCard order={index + 1} />
               </CarouselItem>
             ))}

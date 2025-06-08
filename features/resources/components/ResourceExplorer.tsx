@@ -4,8 +4,17 @@ import useQueryState from "@/hooks/useQueryState";
 import ResourceSearchBar from "./ResourceSearchBar";
 import ResourceContainer from "./ResourceContainer";
 import { useResourceList } from "../hooks";
+import { CategoriesType } from "../utils/getCategories";
 
-export default function ResourceExplorer() {
+interface ResourceExplorerProps {
+  categories?: CategoriesType;
+  parentDataCount?: number;
+}
+
+export default function ResourceExplorer({
+  categories,
+  parentDataCount,
+}: ResourceExplorerProps) {
   const [filters, setFilters] = useQueryState(resourceSearchParamsSchema);
   const { data: resourcesData } = useResourceList(filters);
 
@@ -25,11 +34,13 @@ export default function ResourceExplorer() {
 
       <ResourceContainer
         data={resourcesData?.resources ?? []}
+        categories={categories}
+        parentDataCount={parentDataCount}
         className="px-5 md:px-24"
       />
 
-      <div className="flex justify-center px-5 pt-6 md:px-24">
-        <Button>查看更多</Button>
+      <div className="flex justify-center px-5 pt-6 mb-16 md:px-24">
+        <Button size="lg">查看更多</Button>
       </div>
     </div>
   );

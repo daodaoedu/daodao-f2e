@@ -5,8 +5,10 @@ import Image from '@/shared/components/Image';
 import ShareResourceIcon from '@/public/assets/icons/share-resource.svg';
 import CommentIcon from '@/public/assets/icons/comment.svg';
 import CrownIcon from '@/public/assets/icons/crown.svg';
+import { cn } from '@/utils/cn';
 
 type SharerCardProps = {
+  className?: string;
   userName?: string;
   userImg?: string;
   sourceCount?: number;
@@ -16,6 +18,7 @@ type SharerCardProps = {
 
 export default function SharerCard(props: SharerCardProps) {
   const {
+    className,
     userName = '小許',
     userImg = 'https://fakeimg.pl/282/',
     sourceCount = 80,
@@ -24,8 +27,8 @@ export default function SharerCard(props: SharerCardProps) {
   } = props;
 
   return (
-    <section className="w-[17.625rem] rounded-xl">
-      <div className="relative w-full h-[17.625rem]">
+    <div className={cn("rounded-xl", className)}>
+      <div className="relative h-[17.625rem]">
         <Image
           height="inherit"
           src={userImg}
@@ -74,6 +77,6 @@ export default function SharerCard(props: SharerCardProps) {
           </span>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

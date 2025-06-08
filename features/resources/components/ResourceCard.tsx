@@ -1,5 +1,6 @@
 import Image from '@/shared/components/Image';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/atoms/avatar';
 import Hot from '@/public/assets/icons/hot.svg';
 import Group from '@/public/assets/icons/group.svg';
 import View from '@/public/assets/icons/view.svg';
@@ -27,7 +28,7 @@ type CardProps = {
 export default function ResourceCard(props: CardProps) {
   const {
     userName,
-    userAvatar = <DefaultAvatar />,
+    userAvatar,
     time,
     title = '',
     content = '',
@@ -80,7 +81,12 @@ export default function ResourceCard(props: CardProps) {
         {/* Card Info */}
         <div className="flex justify-between items-center h-9">
           <div className="flex items-center body-md text-basic-500">
-            <div>{userAvatar}</div>
+            <Avatar>
+              <AvatarImage src={userAvatar ?? ''} />
+              <AvatarFallback>
+                <DefaultAvatar />
+              </AvatarFallback>
+            </Avatar>
             <div className="font-bold mr-1 ml-[0.5rem]">{userName}</div>
           </div>
         </div>
