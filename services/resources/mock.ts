@@ -6,7 +6,7 @@ export const mockResourceList = {
       resourceUrl: "https://recycle.rethinktw.org/",
       resourceImgUrl: "https://i.imgur.com/hWt9pbi.jpeg",
       description: "RE-THINK的目標就是解決台灣爆量的垃圾問題，身為本土最具社群號召力的環保團體，我們從2013年開始，RE-THINK帶領超過3萬群眾在全台灣淨灘。在全台海灘撿越久的垃圾，才發現牽連到的問題越多。所以，我們製作《海廢圖鑑》，用最ㄎㄧㄤ的方式把全台灣的海洋廢棄物搜集成網站，讓大家重新認識海洋廢棄物。但光了解海廢還不夠，我們生活中每天都製造了源源不絕的垃圾，其中更有不少垃圾沒有妥善被處理。於是讓大家懂分、懂丟的《回收大百科》就這麼誕生了！",
-      introVideoUrl: null,
+      introVideoUrl: "https://www.youtube.com/embed/4n66brdz1GY?si=afNRjAb0endaKIxG",
       resourceType: "工具/操作",
       targetAudience: "學齡前,國小,國高中,大學以上",
       learningDuration: "不限",
@@ -30,7 +30,24 @@ export const mockResourceList = {
       },
       createdAt: "2025-05-01T02:47:00.000Z",
       updatedAt: "2025-05-01T02:55:00.000Z",
-      tags: ["環境保護", "垃圾", "回收", "永續發展"]
+      tags: ["環境保護", "垃圾", "回收", "永續發展"],
+      recentReviews: [
+        {
+          id: 1,
+          title: "這個資源真的很好用，我已經用了好幾年了，每次使用都覺得很滿意。",
+          avgRating: 5,
+          likesCount: 10,
+          status: "active",
+          createdAt: "2025-05-01T02:47:00.000Z",
+          user: {
+            _id: "user1",
+            id: "user1",
+            name: "Tiff",
+            roleList: ["user", "contributor"],
+            photoURL: "https://i.imgur.com/avatars/tiff.jpg"
+          }
+        }
+      ]
     },
     {
       id: 2,

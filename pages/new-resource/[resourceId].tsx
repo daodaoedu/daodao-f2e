@@ -2,7 +2,16 @@ import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
-import { Clock, Share2, Globe, Ellipsis, Mail, Plus } from "lucide-react";
+import {
+  Clock,
+  Share2,
+  Globe,
+  Ellipsis,
+  Mail,
+  Plus,
+  Star,
+  Check,
+} from "lucide-react";
 
 import { resourceAPI } from "@/services/resources/core/api";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
@@ -27,6 +36,14 @@ import {
 } from "@/components/atoms/breadcrumb";
 import { parseToNumber } from "@/utils/helper";
 import NotExist from "@/shared/components/NotExist";
+import CommentSection from "@/shared/components/Comment/CommentSection";
+import { CommentType } from "@/services/comments";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/atoms/collapsible";
+import { cn } from "@/utils/cn";
 
 export const getServerSideProps = (async (context) => {
   const resourceId = parseToNumber(context.params?.resourceId);
@@ -55,6 +72,30 @@ export const getServerSideProps = (async (context) => {
   resource?: ResourceDetailResponseSchema;
   notFound?: boolean;
 }>;
+
+// 星級評分組件
+const StarRating = ({ rating }: { rating: number }) => {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating - fullStars >= 0.5;
+  const maxStars = 5;
+  return (
+    <div className="flex">
+      {Array.from({ length: maxStars }, (_, i) => (
+        <Star
+          key={`star-${rating}-${i}`}
+          size={16}
+          className={`${
+            i < fullStars
+              ? "text-yellow-400 fill-yellow-400"
+              : i === fullStars && hasHalfStar
+              ? "text-yellow-400"
+              : "text-gray-300"
+          }`}
+        />
+      ))}
+    </div>
+  );
+};
 
 export default function ResourceDetail({
   resource,
@@ -163,9 +204,9 @@ export default function ResourceDetail({
           </div>
         </div>
 
-        <div className="pt-4 bg-white shadow rounded-xl">
+        <div className="bg-white shadow rounded-xl">
           <Tabs defaultValue="introduction">
-            <TabsList className="flex gap-12 px-12 border-b border-solid border-basic-200">
+            <TabsList>
               <TabsTrigger value="introduction" className="basis-1/3">
                 介紹
               </TabsTrigger>
@@ -177,21 +218,25 @@ export default function ResourceDetail({
               </TabsTrigger>
             </TabsList>
 
+            <Separator />
+
             <TabsContent value="introduction" className="p-10">
               <div className="mb-10">{resource.description}</div>
-              <div className="mb-10 aspect-[1120/633]">
-                <iframe
-                  className="w-full h-full rounded-lg"
-                  width="560"
-                  height="315"
-                  src="https://www.youtube.com/embed/4n66brdz1GY?si=afNRjAb0endaKIxG"
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                />
-              </div>
+              {resource.introVideoUrl && (
+                <div className="mb-10 aspect-[1120/633]">
+                  <iframe
+                    className="w-full h-full rounded-lg"
+                    width="560"
+                    height="315"
+                    src={resource.introVideoUrl}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                </div>
+              )}
               <div className="flex items-center gap-6">
                 <p>
                   分享時間
@@ -225,45 +270,154 @@ export default function ResourceDetail({
             <TabsContent value="reviews" className="p-10">
               <div className="flex flex-col items-center gap-10">
                 {resource.recentReviews && resource.recentReviews.length > 0 ? (
-                  <div className="space-y-6">
+                  <div className="space-y-10 w-full">
                     {resource.recentReviews.map(
                       (review: RecentResourceReviewSchema) => (
-                        <div key={review.id} className="border rounded-lg p-4">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <Avatar>
-                                <AvatarImage src={review.user.photoURL || ""} />
-                                <AvatarFallback>
-                                  {review.user.name.slice(0, 2)}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <p className="font-medium">
-                                  {review.user.name}
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                  {format(
-                                    new Date(review.createdAt),
-                                    "yyyy-MM-dd"
-                                  )}
-                                </p>
+                        <Collapsible
+                          key={review.id}
+                          className="bg-primary-palest rounded-lg"
+                        >
+                          <header className="flex mb-10 pt-10 px-10">
+                            <Avatar className="mt-1 mr-3 size-12">
+                              <AvatarImage src={resource.user.photoURL || ""} />
+                              <AvatarFallback className="text-xl">
+                                {resource.user.name.slice(0, 2)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="flex items-center">
+                                <h2 className="body-md font-bold">
+                                  使用者名稱
+                                </h2>
+                                <Badge
+                                  className="body-sm ml-3 px-2 rounded"
+                                  variant="gray"
+                                >
+                                  身份
+                                </Badge>
+                              </div>
+                              <StarRating rating={review.avgRating} />
+                            </div>
+                          </header>
+                          <section className="mb-10 px-10">
+                            <div className="mb-6 flex flex-col gap-4">
+                              <h3 className="body-lg font-bold">內容特色</h3>
+                              <div className="flex mt-1 body-sm gap-2.5">
+                                {["結構清晰", "實用導向", "觀念完整"].map(
+                                  (item) => (
+                                    <Badge>
+                                      <Check
+                                        size={20}
+                                        className="-my-1 mr-1 rounded-full border-2 border-basic-white"
+                                      />
+                                      {item}
+                                    </Badge>
+                                  )
+                                )}
                               </div>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <span className="text-yellow-500 font-medium">
-                                {review.avgRating}
-                              </span>
-                              <span className="text-gray-500">/5</span>
+                            <div className="mb-6">
+                              <h3 className="body-lg font-bold">心得</h3>
+                              <div className="text-gray-700 whitespace-pre-line mb-4">
+                                <p>{review.title}</p>
+                              </div>
                             </div>
+                            <CollapsibleContent>
+                              <div className="mb-6 flex flex-col gap-4">
+                                <h3 className="body-lg font-bold">怎麼使用</h3>
+                                <div className="ml-6">
+                                  <h4 className="mb-3 body-md font-bold">
+                                    時間運用方式
+                                  </h4>
+                                  <p>每天學習 1-2 小時</p>
+                                </div>
+                                <div className="ml-6">
+                                  <h4 className="mb-3 body-md font-bold">
+                                    是否搭配運用資源
+                                  </h4>
+                                  <p>是，搭配線上課程</p>
+                                </div>
+                              </div>
+                              <div className="flex flex-col gap-6">
+                                <div className="flex items-center gap-3">
+                                  <h3 className="body-lg font-bold">
+                                    改變思維方式
+                                  </h3>
+                                  <StarRating rating={4} />
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <h3 className="body-lg font-bold">
+                                    實際解決問題
+                                  </h3>
+                                  <StarRating rating={4} />
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <h3 className="body-lg font-bold">
+                                    獲得新觀點
+                                  </h3>
+                                  <StarRating rating={4} />
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <h3 className="body-lg font-bold">
+                                    達成具體目標
+                                  </h3>
+                                  <StarRating rating={4} />
+                                </div>
+                              </div>
+                            </CollapsibleContent>
+                          </section>
+
+                          <footer className="flex items-center gap-6 body-md text-basic-500 font-medium px-10">
+                            <div>
+                              分享時間
+                              <time
+                                className="pl-2 text-basic-400 font-normal"
+                                dateTime={new Date(
+                                  review.createdAt
+                                ).toISOString()}
+                              >
+                                {format(
+                                  new Date(review.createdAt),
+                                  "yyyy.MM.dd HH:mm:ss"
+                                )}
+                              </time>
+                            </div>
+                            <div>
+                              更新時間
+                              <time
+                                className="pl-2 text-basic-400 font-normal"
+                                dateTime={new Date(
+                                  "2025-05-02T02:47:00.000Z"
+                                ).toISOString()}
+                              >
+                                {format(
+                                  new Date("2025-05-02T02:47:00.000Z"),
+                                  "yyyy.MM.dd HH:mm:ss"
+                                )}
+                              </time>
+                            </div>
+                          </footer>
+
+                          <div className="px-5">
+                            <CommentSection
+                              targetId={review.id}
+                              targetType={CommentType.ResourceReview}
+                            />
                           </div>
-                          <h3 className="font-medium mb-2">{review.title}</h3>
-                          {/* review.content might not be available in the recent reviews schema */}
-                          <p className="text-gray-700 whitespace-pre-line">
-                            {/* We would need to fetch the full review to get the content */}
-                            {/* Placeholder text */}
-                            查看完整心得...
-                          </p>
-                        </div>
+
+                          <CollapsibleTrigger
+                            className={cn(
+                              "w-full flex flex-row-reverse justify-center gap-1 mt-10 p-3",
+                              "body-md bg-primary-lightest rounded-b-lg",
+                              "[&>div:first-of-type]:data-[state=open]:hidden",
+                              "[&>div:last-of-type]:data-[state=closed]:hidden"
+                            )}
+                            withIcon
+                          >
+                            <div>展開</div>
+                            <div>收合</div>
+                          </CollapsibleTrigger>
+                        </Collapsible>
                       )
                     )}
                   </div>
