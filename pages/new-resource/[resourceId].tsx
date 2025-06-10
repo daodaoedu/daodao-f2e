@@ -13,6 +13,7 @@ import {
   Check,
 } from "lucide-react";
 
+import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
 import { resourceAPI } from "@/services/resources/core/api";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
 import { RecentResourceReviewSchema } from "@/services/resources/reviews/schema";
@@ -281,20 +282,22 @@ export default function ResourceDetail({
                             <Avatar className="mt-1 mr-3 size-12">
                               <AvatarImage src={resource.user.photoURL || ""} />
                               <AvatarFallback className="text-xl">
-                                {resource.user.name.slice(0, 2)}
+                                <DefaultAvatar />
                               </AvatarFallback>
                             </Avatar>
                             <div>
                               <div className="flex items-center">
                                 <h2 className="body-md font-bold">
-                                  使用者名稱
+                                  {review.user.name}
                                 </h2>
-                                <Badge
-                                  className="body-sm ml-3 px-2 rounded"
-                                  variant="gray"
-                                >
-                                  身份
-                                </Badge>
+                                {review.user.roleList.length > 0 && (
+                                  <Badge
+                                    className="body-sm ml-3 px-2 rounded"
+                                    variant="gray"
+                                  >
+                                    {review.user.roleList[0]}
+                                  </Badge>
+                                )}
                               </div>
                               <StarRating rating={review.avgRating} />
                             </div>
@@ -303,17 +306,16 @@ export default function ResourceDetail({
                             <div className="mb-6 flex flex-col gap-4">
                               <h3 className="body-lg font-bold">內容特色</h3>
                               <div className="flex mt-1 body-sm gap-2.5">
-                                {["結構清晰", "實用導向", "觀念完整"].map(
-                                  (item) => (
+                                {Array.isArray(review.tags) &&
+                                  review.tags.map((tag) => (
                                     <Badge>
                                       <Check
                                         size={20}
                                         className="-my-1 mr-1 rounded-full border-2 border-basic-white"
                                       />
-                                      {item}
+                                      {tag}
                                     </Badge>
-                                  )
-                                )}
+                                  ))}
                               </div>
                             </div>
                             <div className="mb-6">
@@ -442,7 +444,7 @@ export default function ResourceDetail({
                     <Avatar className="mt-1 mr-3 size-12">
                       <AvatarImage src={resource.user.photoURL || ""} />
                       <AvatarFallback className="text-xl">
-                        {resource.user.name.slice(0, 2)}
+                        <DefaultAvatar />
                       </AvatarFallback>
                     </Avatar>
                     <div>

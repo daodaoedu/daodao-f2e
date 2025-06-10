@@ -39,6 +39,7 @@ export const mockResourceList = {
           likesCount: 10,
           status: "active",
           createdAt: "2025-05-01T02:47:00.000Z",
+          tags: ["結構清晰", "實用導向", "觀念完整"],
           user: {
             _id: "user1",
             id: "user1",

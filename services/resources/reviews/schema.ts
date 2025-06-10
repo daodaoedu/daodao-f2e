@@ -32,14 +32,13 @@ export const resourceReviewSchema = z.object({
 });
 
 // 用於資源詳情頁面顯示的簡化評論結構
-export const recentResourceReviewSchema = z.object({
-  id: z.number(),
-  title: z.string(),
-  avgRating: z.number(),
-  likesCount: z.number(),
-  status: z.string(),
-  createdAt: z.string().datetime(),
-  user: baseUserSchema,
+export const recentResourceReviewSchema = resourceReviewSchema.omit({
+  overallImpact: true,
+  changeMindset: true,
+  solveProblems: true,
+  gainPerspectives: true,
+  achieveGoals: true,
+  experienceData: true,
 });
 
 export const resourceReviewListResponseSchema = z.object({
@@ -82,18 +81,10 @@ export const resourceReviewResponseSchema = z.object({
   review: resourceReviewSchema,
 });
 
-export const resourceReviewSearchParamsSchema = z.object({
-  cursor: z.string().optional(),
-  limit: z.number().min(1).max(100).optional(),
-  sort: z.enum(["createdAt", "updatedAt", "rating", "viewCount"]).optional(),
-  order: z.enum(["desc", "asc"]).optional(),
-});
-
 export type ResourceReviewSchema = z.infer<typeof resourceReviewSchema>;
 export type ResourceReviewListResponseSchema = z.infer<typeof resourceReviewListResponseSchema>;
 export type CreateResourceReviewFormSchema = z.infer<typeof createResourceReviewFormSchema>;
 export type UpdateResourceReviewFormSchema = z.infer<typeof updateResourceReviewFormSchema>;
 export type ResourceReviewResponseSchema = z.infer<typeof resourceReviewResponseSchema>;
-export type ResourceReviewSearchParamsSchema = z.infer<typeof resourceReviewSearchParamsSchema>;
 export type ResourceReviewExperienceDataSchema = z.infer<typeof resourceReviewExperienceDataSchema>;
 export type RecentResourceReviewSchema = z.infer<typeof recentResourceReviewSchema>;
