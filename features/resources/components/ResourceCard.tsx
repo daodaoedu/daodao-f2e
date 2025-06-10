@@ -105,7 +105,7 @@ export default function ResourceCard(props: CardProps) {
           </div>
         </div>
 
-        <div className="heading-md text-basic-black truncate">{title}</div>
+        <div className="heading-sm text-basic-black truncate">{title}</div>
 
         {/* Card Tags */}
         <div className="flex gap-1 flex-wrap">

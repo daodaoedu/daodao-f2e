@@ -2,18 +2,12 @@ import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
-import {
-  Clock,
-  Share2,
-  Globe,
-  Ellipsis,
-  Mail,
-  Plus,
-  Star,
-  Check,
-} from "lucide-react";
+import { Share2, Globe, Ellipsis, Mail, Plus, Star, Check } from "lucide-react";
 
 import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
+import GroupSvg from "@/public/assets/icons/group.svg";
+import BoxSvg from "@/public/assets/icons/box.svg";
+import VideoSvg from "@/public/assets/icons/video.svg";
 import { resourceAPI } from "@/services/resources/core/api";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
 import { RecentResourceReviewSchema } from "@/services/resources/reviews/schema";
@@ -107,8 +101,8 @@ export default function ResourceDetail({
 
   return (
     <div className="bg-primary-palest min-h-screen">
-      <div className="container mx-auto px-4 pt-2 pb-12">
-        <Breadcrumb>
+      <div className="container mx-auto px-4 pb-12 pt-11 md:pt-12">
+        <Breadcrumb className="mb-5 md:mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink href="/find-resource">找資源</BreadcrumbLink>
@@ -135,11 +129,10 @@ export default function ResourceDetail({
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-
-        <div className="p-10 bg-white shadow-md rounded-xl mt-4 mb-12 flex flex-col md:flex-row gap-8">
+        <div className="p-10 bg-white shadow-md rounded-xl mt-4 mb-11 flex flex-col md:mb-12 md:flex-row gap-8">
           <div className="flex-1 flex flex-col justify-between">
             <div>
-              <h1 className="text-2xl font-bold mb-4">
+              <h1 className="heading-lg font-bold mb-4">
                 {resource.resourceName}
               </h1>
 
@@ -152,28 +145,29 @@ export default function ResourceDetail({
               </div>
 
               <div className="flex flex-wrap gap-x-6 gap-y-4 mb-6 text-sm text-gray-600">
-                <div className="flex items-center gap-1">
-                  <span className="font-medium">適合</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium flex items-center gap-2">
+                    <GroupSvg />
+                    適合
+                  </span>
                   <Separator orientation="vertical" />
                   <span className="text-primary">
                     {resource.targetAudience}
                   </span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="font-medium">資源類型</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium flex items-center gap-2">
+                    <BoxSvg />
+                    資源類型
+                  </span>
                   <Separator orientation="vertical" />
                   <span className="text-primary">{resource.resourceType}</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4 text-gray-500" />
-                  <span className="font-medium">所需學習時間</span>
-                  <Separator orientation="vertical" />
-                  <span className="text-primary">
-                    {resource.learningDuration || "12 小時"}
+                <div className="flex items-center gap-2">
+                  <span className="font-medium flex items-center gap-2">
+                    <VideoSvg />
+                    影片時長
                   </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="font-medium">影片時長</span>
                   <Separator orientation="vertical" />
                   <span className="text-basic-400">08 小時 24 分</span>
                 </div>
@@ -204,7 +198,6 @@ export default function ResourceDetail({
             />
           </div>
         </div>
-
         <div className="bg-white shadow rounded-xl">
           <Tabs defaultValue="introduction">
             <TabsList>
@@ -501,6 +494,13 @@ export default function ResourceDetail({
               </div>
             </TabsContent>
           </Tabs>
+        </div>
+        <h3 className="heading-lg mt-12">留言</h3>
+        <div className="-mx-4">
+          <CommentSection
+            targetId={resource.id}
+            targetType={CommentType.Resource}
+          />
         </div>
       </div>
     </div>

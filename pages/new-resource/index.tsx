@@ -85,7 +85,7 @@ export default function ResourcePage({
           <SectionTitle title="熱門資源">
             <Button
               variant="link"
-              className="-mx-2 px-2 body-lg font-medium text-basic-300"
+              className="-mx-2 px-2 heading-md font-medium text-basic-300"
               size="lg"
               asChild
             >
