@@ -8,6 +8,8 @@ import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
 import GroupSvg from "@/public/assets/icons/group.svg";
 import BoxSvg from "@/public/assets/icons/box.svg";
 import VideoSvg from "@/public/assets/icons/video.svg";
+import CommentSvg from "@/public/assets/icons/comment.svg";
+import ShellSvg from "@/public/assets/icons/shell.svg";
 import { resourceAPI } from "@/services/resources/core/api";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
 import { RecentResourceReviewSchema } from "@/services/resources/reviews/schema";
@@ -231,33 +233,17 @@ export default function ResourceDetail({
                   />
                 </div>
               )}
-              <div className="flex items-center gap-6">
-                <p>
-                  分享時間
-                  <time
-                    className="pl-2"
-                    dateTime={new Date(resource.createdAt).toISOString()}
-                  >
-                    {format(
-                      new Date(resource.createdAt),
-                      "yyyy.MM.dd HH:mm:ss"
-                    )}
-                  </time>
-                </p>
-                {resource.updatedAt && (
-                  <p>
-                    更新時間
-                    <time
-                      className="pl-2"
-                      dateTime={new Date(resource.updatedAt).toISOString()}
-                    >
-                      {format(
-                        new Date(resource.updatedAt),
-                        "yyyy.MM.dd HH:mm:ss"
-                      )}
-                    </time>
-                  </p>
-                )}
+              <div className="flex justify-end items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <ShellSvg />
+                  <span>{resource.favoriteCount}</span>
+                </div>
+                <time>
+                  {format(
+                    new Date(resource.updatedAt ?? resource.createdAt),
+                    "yyyy/MM/dd"
+                  )}
+                </time>
               </div>
             </TabsContent>
 
@@ -362,34 +348,27 @@ export default function ResourceDetail({
                             </CollapsibleContent>
                           </section>
 
-                          <footer className="flex items-center gap-6 body-md text-basic-500 font-medium px-10">
-                            <div>
-                              分享時間
-                              <time
-                                className="pl-2 text-basic-400 font-normal"
-                                dateTime={new Date(
-                                  review.createdAt
-                                ).toISOString()}
-                              >
-                                {format(
-                                  new Date(review.createdAt),
-                                  "yyyy.MM.dd HH:mm:ss"
-                                )}
-                              </time>
+                          <footer className="flex justify-between items-center gap-2 px-10 text-basic-300">
+                            <div className="flex items-center gap-2">
+                              <CommentSvg />
+                              <span>{review.helpfulCount}</span>
                             </div>
-                            <div>
-                              更新時間
-                              <time
-                                className="pl-2 text-basic-400 font-normal"
-                                dateTime={new Date(
-                                  "2025-05-02T02:47:00.000Z"
-                                ).toISOString()}
-                              >
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2">
+                                <ShellSvg />
+                                <span>{review.likesCount}</span>
+                              </div>
+                              <time>
                                 {format(
-                                  new Date("2025-05-02T02:47:00.000Z"),
-                                  "yyyy.MM.dd HH:mm:ss"
+                                  new Date(
+                                    review.updatedAt ?? review.createdAt
+                                  ),
+                                  "yyyy/MM/dd"
                                 )}
                               </time>
+                              <Button variant="light" size="icon">
+                                <Ellipsis size={16} />
+                              </Button>
                             </div>
                           </footer>
 
@@ -403,7 +382,7 @@ export default function ResourceDetail({
                           <CollapsibleTrigger
                             className={cn(
                               "w-full flex flex-row-reverse justify-center gap-1 mt-10 p-3",
-                              "body-md rounded-b-lg bg-primary-lightest hover:bg-primary-lightest/80",
+                              "body-md rounded-b-lg bg-primary-lightest hover:bg-primary-lightest/80"
                             )}
                             withIcon
                             expandLabel="展開"
