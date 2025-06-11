@@ -214,7 +214,7 @@ export default function ResourceDetail({
 
             <Separator />
 
-            <TabsContent value="introduction" className="p-10">
+            <TabsContent value="introduction">
               <div className="mb-10">{resource.description}</div>
               {resource.introVideoUrl && (
                 <div className="mb-10 aspect-[1120/633]">
@@ -261,7 +261,7 @@ export default function ResourceDetail({
               </div>
             </TabsContent>
 
-            <TabsContent value="reviews" className="p-10">
+            <TabsContent value="reviews">
               <div className="flex flex-col items-center gap-10">
                 {resource.recentReviews && resource.recentReviews.length > 0 ? (
                   <div className="space-y-10 w-full">
@@ -278,7 +278,7 @@ export default function ResourceDetail({
                                 <DefaultAvatar />
                               </AvatarFallback>
                             </Avatar>
-                            <div>
+                            <div className="flex flex-col gap-1">
                               <div className="flex items-center">
                                 <h2 className="body-md font-bold">
                                   {review.user.name}
@@ -403,15 +403,12 @@ export default function ResourceDetail({
                           <CollapsibleTrigger
                             className={cn(
                               "w-full flex flex-row-reverse justify-center gap-1 mt-10 p-3",
-                              "body-md bg-primary-lightest rounded-b-lg",
-                              "[&>div:first-of-type]:data-[state=open]:hidden",
-                              "[&>div:last-of-type]:data-[state=closed]:hidden"
+                              "body-md rounded-b-lg bg-primary-lightest hover:bg-primary-lightest/80",
                             )}
                             withIcon
-                          >
-                            <div>展開</div>
-                            <div>收合</div>
-                          </CollapsibleTrigger>
+                            expandLabel="展開"
+                            collapseLabel="收合"
+                          />
                         </Collapsible>
                       )
                     )}
@@ -428,7 +425,7 @@ export default function ResourceDetail({
               </div>
             </TabsContent>
 
-            <TabsContent value="contributor" className="p-10">
+            <TabsContent value="contributor">
               <div className="bg-primary-palest p-10 rounded-lg">
                 <h2 className="mb-10 heading-md">關於分享者</h2>
 
