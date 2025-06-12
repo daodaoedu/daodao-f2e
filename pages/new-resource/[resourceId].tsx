@@ -2,7 +2,7 @@ import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
-import { Share2, Globe, Ellipsis, Mail, Plus, Star, Check } from "lucide-react";
+import { Share2, Globe, Ellipsis, Mail, Plus, Check } from "lucide-react";
 
 import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
 import GroupSvg from "@/public/assets/icons/group.svg";
@@ -40,6 +40,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/atoms/collapsible";
+import { Rating } from "@/components/atoms/rating";
 import { cn } from "@/utils/cn";
 
 export const getServerSideProps = (async (context) => {
@@ -69,30 +70,6 @@ export const getServerSideProps = (async (context) => {
   resource?: ResourceDetailResponseSchema;
   notFound?: boolean;
 }>;
-
-// 星級評分組件
-const StarRating = ({ rating }: { rating: number }) => {
-  const fullStars = Math.floor(rating);
-  const hasHalfStar = rating - fullStars >= 0.5;
-  const maxStars = 5;
-  return (
-    <div className="flex">
-      {Array.from({ length: maxStars }, (_, i) => (
-        <Star
-          key={`star-${rating}-${i}`}
-          size={16}
-          className={`${
-            i < fullStars
-              ? "text-yellow-400 fill-yellow-400"
-              : i === fullStars && hasHalfStar
-              ? "text-yellow-400"
-              : "text-gray-300"
-          }`}
-        />
-      ))}
-    </div>
-  );
-};
 
 export default function ResourceDetail({
   resource,
@@ -278,7 +255,7 @@ export default function ResourceDetail({
                                   </Badge>
                                 )}
                               </div>
-                              <StarRating rating={review.avgRating} />
+                              <Rating value={review.avgRating} />
                             </div>
                           </header>
                           <section className="mb-10 px-10">
@@ -324,25 +301,25 @@ export default function ResourceDetail({
                                   <h3 className="body-lg font-bold">
                                     改變思維方式
                                   </h3>
-                                  <StarRating rating={4} />
+                                  <Rating value={4} />
                                 </div>
                                 <div className="flex items-center gap-3">
                                   <h3 className="body-lg font-bold">
                                     實際解決問題
                                   </h3>
-                                  <StarRating rating={4} />
+                                  <Rating value={4} />
                                 </div>
                                 <div className="flex items-center gap-3">
                                   <h3 className="body-lg font-bold">
                                     獲得新觀點
                                   </h3>
-                                  <StarRating rating={4} />
+                                  <Rating value={4} />
                                 </div>
                                 <div className="flex items-center gap-3">
                                   <h3 className="body-lg font-bold">
                                     達成具體目標
                                   </h3>
-                                  <StarRating rating={4} />
+                                  <Rating value={4} />
                                 </div>
                               </div>
                             </CollapsibleContent>
