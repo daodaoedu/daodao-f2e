@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { InfoIcon, CheckIcon } from "lucide-react";
-import { Button } from "@/components/atoms/button";
-import { Checkbox } from "@/components/atoms/checkbox";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ControllerRenderProps, useForm } from "react-hook-form";
 import {
@@ -11,7 +11,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/atoms/form";
+} from "@/components/ui/form";
 import {
   ResourceSearchParamsSchema,
   resourceSearchParamsSchema,
@@ -21,7 +21,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/atoms/tooltip";
+} from "@/components/ui/tooltip";
 import {
   durationTypes,
   costTypes,

@@ -5,7 +5,7 @@ import { ROLE } from '@/constants/member';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import { CommentVisibility } from '@/services/comments';
-import { Button } from '@/components/atoms/button';
+import { Button } from '@/components/ui/button';
 import Textarea from '../Textarea';
 
 export interface CommentData {

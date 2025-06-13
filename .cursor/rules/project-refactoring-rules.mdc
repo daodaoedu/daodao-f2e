@@ -11,9 +11,7 @@ alwaysApply: true
 
 ```
 - components/
-    - atoms      # 原子級元件 (最小單位的 UI 元件)
-    - molecules  # 分子級元件 (由多個原子組成)
-    - organisms  # 有機體級元件 (複雜的 UI 組件)
+    - ui        # 所有共用元件
 - constants     # 全域常數
 - contexts      # React Context (共用狀態管理)
 - features      # 功能模組 (包含商業邏輯相關的 components, hooks, contexts 與 utils)
@@ -42,9 +40,7 @@ alwaysApply: true
 
 ### 3. Components 層級規則
 - **共用性原則**: [components](mdc:components) 下的元件應該是可重用的
-- atoms: 最基礎的 UI 元件 (Button, Input, Icon 等)
-- molecules: 由多個 atoms 組成的元件 (SearchField, Card 等)
-- organisms: 複雜的 UI 組件 (Header, Footer, List 等)
+- ui: 所有共用的 UI 元件
 - 避免在共用元件中包含特定的商業邏輯
 
 ### 4. Pages 層級規則
@@ -62,7 +58,7 @@ alwaysApply: true
 
 ### 檔案移動規則
 1. **商業邏輯元件** → 移動到對應的 `features/` 目錄
-2. **可重用元件** → 移動到 `components/atoms|molecules|organisms/`
+2. **可重用元件** → 移動到 `components/ui/`
 3. **API 相關檔案** → 移動到 `services/`
 4. **共用 hooks** → 保留在 `hooks/`，功能特定的移到 `features/`
 5. **共用 contexts** → 保留在 `contexts/`，功能特定的移到 `features/`
@@ -71,7 +67,7 @@ alwaysApply: true
 ### import 規則
 ```typescript
 // ✅ 正確的 import 方向
-import { Button } from '@/components/atoms/button'
+import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/Auth'
 import { resourceAPI } from '@/services/resources'
 import { useProjects } from '@/features/projects'

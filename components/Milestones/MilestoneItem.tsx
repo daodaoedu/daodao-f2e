@@ -10,8 +10,8 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/atoms/collapsible";
-import { Button } from "@/components/atoms/button";
+} from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
 import MilestoneCard from "./MilestoneCard";
 import Task from "../Tasks/Task";

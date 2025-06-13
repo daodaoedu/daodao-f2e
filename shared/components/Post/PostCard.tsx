@@ -6,13 +6,13 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/atoms/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import Shell from "@/public/assets/icons/shell.svg";
 import Comment from "@/public/assets/icons/comment.svg";
 import { cn } from "@/utils/cn";

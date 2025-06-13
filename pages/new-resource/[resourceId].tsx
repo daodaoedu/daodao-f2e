@@ -11,14 +11,14 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/atoms/breadcrumb";
+} from "@/components/ui/breadcrumb";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/components/atoms/tabs";
-import { Separator } from "@/components/atoms/separator";
+} from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import NotExist from "@/shared/components/NotExist";
 import CommentSection from "@/shared/components/Comment/CommentSection";
 import { parseToNumber } from "@/utils/helper";

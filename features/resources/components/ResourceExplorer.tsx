@@ -1,4 +1,4 @@
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import { resourceSearchParamsSchema } from "@/services/resources";
 import useQueryState from "@/hooks/useQueryState";
 import ResourceSearchBar from "./ResourceSearchBar";

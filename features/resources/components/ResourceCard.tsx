@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "@/shared/components/Image";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Hot from "@/public/assets/icons/hot.svg";
 import Group from "@/public/assets/icons/group.svg";
 import View from "@/public/assets/icons/view.svg";
@@ -14,8 +14,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/atoms/dropdown-menu";
-import { Button } from "@/components/atoms/button";
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 // Props 需要對應真實資料
 type CardProps = {

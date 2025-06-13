@@ -11,7 +11,7 @@ import {
 import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";
 import useSearchParamsManager from "@/hooks/useSearchParamsManager";
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
 
 type SectionProps = {

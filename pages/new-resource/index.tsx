@@ -17,11 +17,11 @@ import {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-} from "@/components/atoms/carousel";
+} from "@/components/ui/carousel";
 import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";
 import { SEARCH_TAGS } from "@/constants/category";
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
 
 const Section = ({

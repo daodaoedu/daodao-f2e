@@ -1,7 +1,7 @@
 import React from "react";
 import { Plus } from "lucide-react";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import ResourceReviewCard from "./ResourceReviewCard";
 
 interface ResourceReviewListProps {

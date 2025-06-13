@@ -5,8 +5,8 @@ import {
 } from "lucide-react";
 import useShadowToggleOnScroll from "@/hooks/useShadowToggleOnScroll";
 import { cn } from "@/utils/cn";
-import { Button } from "@/components/atoms/button";
-import SearchInput from "@/components/molecules/search-input";
+import { Button } from "@/components/ui/button";
+import SearchInput from "@/components/ui/search-input";
 import useDebounce from "@/hooks/useDebounce";
 import { ResourceSearchParamsSchema } from "@/services/resources/core/schema";
 import ResourceSearchModal from "./ResourceSearchModal";

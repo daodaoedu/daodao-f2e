@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import ResponsiveModal, {
   ResponsiveModalProps,
-} from "@/components/molecules/responsive-modal";
+} from "@/components/ui/responsive-modal";
 import { cn } from "@/utils/cn";
 
 interface DialogProps

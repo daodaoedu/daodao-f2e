@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { ProjectSchema, useMyProjects } from '@/services/projects';
-import { Button } from '@/components/atoms/button';
-import ResponsiveModal, { ResponsiveModalSize } from '@/components/molecules/responsive-modal';
+import { Button } from '@/components/ui/button';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
 
 interface SelectProjectModalProps {
   isOpen: boolean;

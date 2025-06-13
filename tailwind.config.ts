@@ -18,6 +18,22 @@ export default {
     "./shared/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
+    container: {
+      center: true,
+      screens: {
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1200px",
+      },
+      padding: {
+        DEFAULT: "1rem",
+        sm: "1.5rem",
+        md: "2rem",
+        lg: "2.5rem",
+        xl: "3rem",
+      },
+    },
     fontFamily: {
       sans: ["Noto Sans TC", ...defaultTheme.fontFamily.sans],
     },

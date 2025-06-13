@@ -16,7 +16,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/atoms/breadcrumb";
+} from "@/components/ui/breadcrumb";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
 
 type SectionProps = {
