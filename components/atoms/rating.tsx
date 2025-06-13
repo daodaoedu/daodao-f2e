@@ -1,176 +1,252 @@
+"use client";
+
 import * as React from "react";
 import { Star, LucideProps } from "lucide-react";
 
 import { cn } from "@/utils/cn";
 
+type MouseEventHandler = React.MouseEventHandler<HTMLSpanElement>;
+
 const ratingVariants = {
   default: {
-    full: "text-foreground",
-    empty: "text-muted-foreground",
+    full: "fill-current text-tips",
+    empty: "fill-current text-basic-200",
   },
-  destructive: {
-    full: "text-red-500",
-    empty: "text-red-200",
-  },
-  yellow: {
-    full: "text-yellow-500",
-    empty: "text-yellow-200",
+  alert: {
+    full: "fill-current text-alert",
+    empty: "fill-current text-basic-200",
   },
 };
 
-interface PartialIconProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  fillPercentage: number;
+const DEFAULT_PRECISION = 0.5;
+const DEFAULT_MAX_STARS = 5;
+const DEFAULT_STAR_SIZE = 20;
+const DEFAULT_ICON = <Star className="px-0.5" />;
+
+const checkPrecision = (precision: number) => {
+  if (precision <= 0 || precision > 1) {
+    console.error("Precision must be greater than 0 and less than 1");
+    return false;
+  }
+  return true;
+};
+
+const createRatingCalculator = (precision: number) => {
+  return (event: React.MouseEvent<HTMLSpanElement>) => {
+    const { left, width } = event.currentTarget.getBoundingClientRect();
+    if (width === 0 || !checkPrecision(precision)) return null;
+    const x = event.clientX - left;
+    const fillRatio = x / width;
+    const position = parseInt(event.currentTarget.dataset.position ?? "", 10);
+
+    return position + Math.ceil(fillRatio / precision) * precision - 1;
+  };
+};
+
+interface RatingIconProps
+  extends Omit<
+    React.HTMLAttributes<HTMLDivElement>,
+    "onClick" | "onMouseMove"
+  > {
+  fillRatio: number;
   size: number;
   variant?: keyof typeof ratingVariants;
   value: number;
-  index: number;
+  position: number;
+  name?: string;
   readOnly?: boolean;
+  disabled?: boolean;
+  precision: number;
   Icon: React.ReactElement<LucideProps>;
-  onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  onMouseEnter?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onClick?: MouseEventHandler;
+  onMouseMove?: MouseEventHandler;
+  onMouseLeave?: MouseEventHandler;
 }
 
-const PartialIcon = ({
-  fillPercentage,
+const RatingIcon = ({
+  fillRatio,
   size,
   variant = "default",
   value,
-  index,
+  position,
+  name,
   readOnly = false,
+  disabled = false,
+  precision,
   Icon,
   onClick,
-  onMouseEnter,
+  onMouseMove,
+  onMouseLeave,
   ...props
-}: PartialIconProps) => {
-  const Comp = readOnly ? "span" : "button";
-  const ref = React.useRef<HTMLButtonElement>(null);
-  const emptyIcon = React.cloneElement(Icon, {
-    size,
-    className: cn("fill-transparent", ratingVariants[variant].empty),
-  });
-  const fullIcon = React.cloneElement(Icon, {
-    size,
-    className: cn("fill-current", ratingVariants[variant].full),
-  });
+}: RatingIconProps) => {
+  const Comp = readOnly ? "span" : "label";
+  const id = React.useId();
+  const ratingIconId = `rating-icon-${id}`;
+  const ref = React.useRef<HTMLDivElement>(null);
+  const isPartiallyFilled = position >= value && value > position - 1;
+  const isInteractive = !readOnly && !disabled;
+  const tabIndex = isInteractive && isPartiallyFilled ? 0 : undefined;
+
+  const icons = React.useMemo(() => {
+    const emptyIcon = React.cloneElement(Icon, {
+      size,
+      className: cn(ratingVariants[variant].empty, Icon.props.className),
+      "aria-hidden": "true",
+    });
+    const fullIcon = React.cloneElement(Icon, {
+      size,
+      className: cn(ratingVariants[variant].full, Icon.props.className),
+      "aria-hidden": "true",
+    });
+    return { emptyIcon, fullIcon };
+  }, [Icon, size, variant]);
+
+  const ratingPoints = React.useMemo(() => {
+    if (!checkPrecision(precision)) return [];
+
+    const pointsCount = Math.floor(1 / precision);
+    return Array.from({ length: pointsCount }).map(
+      (_, i) => (i + 1) * precision + position - 1
+    );
+  }, [precision, position]);
 
   React.useEffect(() => {
-    const prevIndex = index - 1;
     if (value === 0) {
       ref.current?.parentElement?.focus();
-    }
-    if (value > prevIndex && value <= index) {
+    } else if (isPartiallyFilled) {
       ref.current?.focus();
     }
-  }, [index, value]);
+  }, [position, value, isPartiallyFilled]);
 
   return (
-    <Comp
+    <span
       ref={ref}
-      type={Comp === "button" ? "button" : undefined}
       className={cn(
-        "px-0.5 relative inline-block",
-        !readOnly && "hover:scale-125"
+        "relative",
+        isInteractive && "transition-transform hover:scale-110",
+        disabled && "opacity-50 cursor-not-allowed"
       )}
-      onClick={readOnly ? undefined : onClick}
-      onMouseEnter={readOnly ? undefined : onMouseEnter}
       {...props}
-      data-icon-index={index}
+      data-position={position}
+      tabIndex={tabIndex}
+      onClick={!readOnly ? onClick : undefined}
+      onMouseMove={!readOnly ? onMouseMove : undefined}
+      onMouseLeave={!readOnly ? onMouseLeave : undefined}
+      aria-disabled={disabled}
+      aria-hidden={readOnly}
     >
-      {fillPercentage === 1 ? fullIcon : emptyIcon}
-      {fillPercentage < 1 && (
-        <div
-          className="absolute top-0 overflow-hidden"
-          style={{ width: `calc(${fillPercentage * 100}% - 2px)` }}
-        >
-          {fullIcon}
-        </div>
-      )}
-    </Comp>
-  );
-};
+      {ratingPoints.map((ratingPoint, index) => {
+        const isPartialPoint = ratingPoint % 1 !== 0;
+        const shouldShowFilled = fillRatio + position - 1 >= ratingPoint;
+        const partialWidth = `${precision * (index + 1) * 100}%`;
+        const isChecked = value === ratingPoint;
+        const width =
+          isPartialPoint && shouldShowFilled ? partialWidth : undefined;
 
-const calculateFillPercentage = (
-  event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  iconIndex: string,
-  precision: number
-) => {
-  const rect = event.currentTarget.getBoundingClientRect();
-  const width = event.currentTarget.clientWidth;
-  const index = parseFloat(iconIndex) - 1;
-  const x = event.pageX - rect.left;
-  const fillPercentage = x / width;
-  return precision === 0
-    ? index + fillPercentage
-    : index + Math.ceil(fillPercentage / precision) * precision;
+        return (
+          <React.Fragment key={ratingPoint}>
+            <Comp
+              htmlFor={`${ratingIconId}-${ratingPoint}`}
+              aria-label={`${ratingPoint} Stars`}
+              className={cn(
+                "[&_svg]:pointer-events-none",
+                isPartialPoint && "absolute top-0 left-0 overflow-hidden",
+                isInteractive && "cursor-pointer"
+              )}
+              style={{ width }}
+            >
+              {!isPartialPoint && !shouldShowFilled && icons.emptyIcon}
+              {shouldShowFilled && icons.fullIcon}
+            </Comp>
+            {!readOnly && (
+              <input
+                type="radio"
+                id={`${ratingIconId}-${ratingPoint}`}
+                name={name}
+                value={ratingPoint}
+                className="sr-only"
+                tabIndex={-1}
+                disabled={disabled}
+                checked={isChecked}
+                onClick={(e) => e.stopPropagation()}
+              />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </span>
+  );
 };
 
 interface RatingProps
   extends Omit<React.ButtonHTMLAttributes<HTMLDivElement>, "onChange"> {
   value: number;
+  name?: string;
   max?: number;
   size?: number;
   Icon?: React.ReactElement<LucideProps>;
   variant?: keyof typeof ratingVariants;
   readOnly?: boolean;
+  disabled?: boolean;
   precision?: number;
   onChange?: (value: number) => void;
+  onHover?: (value: number) => void;
 }
 
 const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
   (
     {
       value,
-      max = 5,
-      size = 20,
-      Icon = <Star />,
+      name,
+      max = DEFAULT_MAX_STARS,
+      size = DEFAULT_STAR_SIZE,
+      Icon = DEFAULT_ICON,
       variant = "default",
       className,
       readOnly = false,
-      precision = 0.5,
+      disabled = false,
+      precision = DEFAULT_PRECISION,
       onChange,
+      onHover,
       ...props
     },
     ref
   ) => {
-    const [hoveredStar, setHoveredStar] = React.useState<number | null>(null);
+    const id = React.useId();
+    const ratingName = name ?? `rating-${id}`;
+    const [hoveredValue, setHoveredValue] = React.useState<number | null>(null);
+    const isInteractive = !readOnly && !disabled;
 
-    const handleMouseMoveIcon = React.useCallback(
-      (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        const { iconIndex } = event.currentTarget.dataset;
-        if (readOnly) return;
-        if (iconIndex) {
-          const fillPercentage = calculateFillPercentage(
-            event,
-            iconIndex,
-            precision
-          );
-          setHoveredStar(fillPercentage);
-        }
-      },
-      [readOnly, precision, setHoveredStar]
+    const getRatingPoint = React.useMemo(
+      () => createRatingCalculator(precision),
+      [precision]
     );
 
-    const handleClickIcon = React.useCallback(
-      (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        if (readOnly) return;
-        const { iconIndex } = event.currentTarget.dataset;
-        if (iconIndex) {
-          const fillPercentage = calculateFillPercentage(
-            event,
-            iconIndex,
-            precision
-          );
-          setHoveredStar(null);
-          onChange?.(fillPercentage === value ? 0 : fillPercentage);
-        }
+    const handleMouseMove = React.useCallback<MouseEventHandler>(
+      (event) => {
+        if (!isInteractive) return;
+        const point = getRatingPoint(event);
+        if (point === null) return;
+        onHover?.(point);
+        setHoveredValue(point);
       },
-      [readOnly, value, precision, onChange]
+      [isInteractive, onHover, getRatingPoint]
     );
 
-    const handleKeyDown = React.useCallback(
-      (event: React.KeyboardEvent<HTMLDivElement>) => {
-        if (readOnly) return;
+    const handleClick = React.useCallback<MouseEventHandler>(
+      (event) => {
+        if (!isInteractive) return;
+        const point = getRatingPoint(event);
+        if (point === null) return;
+        setHoveredValue(null);
+        onChange?.(point === value ? 0 : point);
+      },
+      [isInteractive, value, onChange, getRatingPoint]
+    );
+
+    const handleKeyDown = React.useCallback<React.KeyboardEventHandler>(
+      (event) => {
+        if (!isInteractive) return;
         switch (event.key) {
           case "ArrowRight":
           case "ArrowUp":
@@ -194,54 +270,62 @@ const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
             break;
         }
       },
-      [readOnly, value, onChange, max, precision]
+      [isInteractive, value, max, precision, onChange]
     );
 
     const stars = React.useMemo(() => {
-      // clamp rating to 0-max
-      const clampedRating = Math.max(0, Math.min(hoveredStar ?? value, max));
+      const displayValue = hoveredValue ?? value;
+      const clampedRating = Math.max(0, Math.min(displayValue, max));
 
       return Array.from({ length: max }, (_, index) => {
         const position = index + 1;
 
         // full star
         if (position <= clampedRating) {
-          return { position, fillPercentage: 1 };
+          return { position, fillRatio: 1 };
         }
 
         // partial star
         if (position <= Math.ceil(clampedRating)) {
           const partialFill = clampedRating % 1;
-          return { position, fillPercentage: partialFill };
+          return { position, fillRatio: partialFill };
         }
 
         // empty star
-        return { position, fillPercentage: 0 };
+        return { position, fillRatio: 0 };
       });
-    }, [hoveredStar, value, max]);
+    }, [hoveredValue, value, max]);
 
     return (
       <div
         ref={ref}
-        role="group"
-        className={cn("flex items-center", className)}
-        onMouseLeave={() => setHoveredStar(null)}
-        onKeyDown={handleKeyDown}
-        tabIndex={readOnly ? -1 : 0}
+        role={!readOnly ? "radiogroup" : "img"}
+        onKeyDown={!readOnly ? handleKeyDown : undefined}
+        tabIndex={!readOnly && value === 0 ? 0 : undefined}
+        className={cn("flex", className)}
+        aria-label={readOnly ? `${value} stars` : "Rating"}
+        aria-valuemin={0}
+        aria-valuemax={max}
+        aria-valuenow={value}
+        aria-valuetext={`${value} of ${max} stars`}
         {...props}
       >
-        {stars.map(({ position, fillPercentage }) => (
-          <PartialIcon
+        {stars.map(({ position, fillRatio }) => (
+          <RatingIcon
             key={position}
-            fillPercentage={fillPercentage}
+            fillRatio={fillRatio}
             size={size}
+            name={ratingName}
             variant={variant}
             value={value}
-            index={position}
+            position={position}
             readOnly={readOnly}
+            disabled={disabled}
+            precision={precision}
             Icon={Icon}
-            onClick={handleClickIcon}
-            onMouseMove={handleMouseMoveIcon}
+            onClick={handleClick}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => setHoveredValue(null)}
           />
         ))}
       </div>

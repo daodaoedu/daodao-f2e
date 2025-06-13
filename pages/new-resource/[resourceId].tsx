@@ -211,7 +211,7 @@ export default function ResourceDetail({
                 </div>
               )}
               <div className="flex justify-end items-center gap-4">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <ShellSvg />
                   <span>{resource.favoriteCount}</span>
                 </div>
@@ -255,7 +255,7 @@ export default function ResourceDetail({
                                   </Badge>
                                 )}
                               </div>
-                              <Rating value={review.avgRating} />
+                              <Rating readOnly value={review.avgRating} />
                             </div>
                           </header>
                           <section className="mb-10 px-10">
@@ -301,25 +301,25 @@ export default function ResourceDetail({
                                   <h3 className="body-lg font-bold">
                                     改變思維方式
                                   </h3>
-                                  <Rating value={4} />
+                                  <Rating readOnly value={4} />
                                 </div>
                                 <div className="flex items-center gap-3">
                                   <h3 className="body-lg font-bold">
                                     實際解決問題
                                   </h3>
-                                  <Rating value={4} />
+                                  <Rating readOnly value={4} />
                                 </div>
                                 <div className="flex items-center gap-3">
                                   <h3 className="body-lg font-bold">
                                     獲得新觀點
                                   </h3>
-                                  <Rating value={4} />
+                                  <Rating readOnly value={4} />
                                 </div>
                                 <div className="flex items-center gap-3">
                                   <h3 className="body-lg font-bold">
                                     達成具體目標
                                   </h3>
-                                  <Rating value={4} />
+                                  <Rating readOnly value={4} />
                                 </div>
                               </div>
                             </CollapsibleContent>
@@ -330,8 +330,8 @@ export default function ResourceDetail({
                               <CommentSvg />
                               <span>{review.helpfulCount}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-1">
                                 <ShellSvg />
                                 <span>{review.likesCount}</span>
                               </div>
