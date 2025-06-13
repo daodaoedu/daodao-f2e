@@ -8,3 +8,8 @@ export { default as ResourceExplorer } from "./ResourceExplorer";
 export { default as ResourceSearchBar } from "./ResourceSearchBar";
 export { default as SectionTitle } from "./SectionTitle";
 export { default as SharerCard } from "./SharerCard";
+export { default as ResourceDetail } from "./ResourceDetail";
+export { default as ResourceIntroduction } from "./ResourceIntroduction";
+export { default as ResourceReviewCard } from "./ResourceReviewCard";
+export { default as ResourceReviewList } from "./ResourceReviewList";
+export { default as ContributorInfo } from "./ContributorInfo";
