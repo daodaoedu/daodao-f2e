@@ -31,18 +31,6 @@ const checkPrecision = (precision: number) => {
   return true;
 };
 
-const createRatingCalculator = (precision: number) => {
-  return (event: React.MouseEvent<HTMLSpanElement>) => {
-    const { left, width } = event.currentTarget.getBoundingClientRect();
-    if (width === 0 || !checkPrecision(precision)) return null;
-    const x = event.clientX - left;
-    const fillRatio = x / width;
-    const position = parseInt(event.currentTarget.dataset.position ?? "", 10);
-
-    return position + Math.ceil(fillRatio / precision) * precision - 1;
-  };
-};
-
 interface RatingIconProps
   extends Omit<
     React.HTMLAttributes<HTMLDivElement>,
@@ -217,8 +205,19 @@ const Rating = React.forwardRef<HTMLDivElement, RatingProps>(
     const [hoveredValue, setHoveredValue] = React.useState<number | null>(null);
     const isInteractive = !readOnly && !disabled;
 
-    const getRatingPoint = React.useMemo(
-      () => createRatingCalculator(precision),
+    const getRatingPoint = React.useCallback(
+      (event: React.MouseEvent<HTMLSpanElement>) => {
+        const { left, width } = event.currentTarget.getBoundingClientRect();
+        if (width === 0 || !checkPrecision(precision)) return null;
+        const x = event.clientX - left;
+        const fillRatio = x / width;
+        const position = parseInt(
+          event.currentTarget.dataset.position ?? "",
+          10
+        );
+
+        return position + Math.ceil(fillRatio / precision) * precision - 1;
+      },
       [precision]
     );
 

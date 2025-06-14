@@ -47,7 +47,7 @@ export const Background = ({
   return (
     <Comp
       className={cn(
-        "min-h-screen-without-padding-top",
+        "min-h-screen-without-padding-top pt-12",
         backgroundVariants[variant],
         className
       )}
