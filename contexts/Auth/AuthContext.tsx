@@ -5,17 +5,17 @@ import {
   useEffect,
   useMemo,
   useReducer,
-} from 'react';
-import toast from 'react-hot-toast';
-import { useRouter } from 'next/router';
-import { SWRConfig } from 'swr';
+} from "react";
+import toast from "react-hot-toast";
+import { useRouter } from "next/router";
+import { SWRConfig } from "swr";
 
 import { HttpError } from '@/services/core';
 import {
   getRedirectionStorage,
   getReminderStorage,
   getTokenStorage,
-} from '@/utils/storage';
+} from "@/utils/storage";
 import {
   userAPI,
   createUserSchema,
@@ -23,15 +23,15 @@ import {
   useUserMe,
 } from '@/services/modules/users';
 
-import LoginModal from './LoginModal';
+import LoginModal from "./LoginModal";
 import {
   AuthState,
   AuthDispatch,
   Action,
   ActionTypes,
   LoginStatus,
-} from './type';
-import { registerLoginListener } from './utils';
+} from "./type";
+import { registerLoginListener } from "./utils";
 
 const initialState: AuthState = {
   isComplete: false,
@@ -41,7 +41,7 @@ const initialState: AuthState = {
   loginStatus: LoginStatus.EMPTY,
   token: null,
   user: null,
-  redirectUrl: '',
+  redirectUrl: "",
 };
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -50,7 +50,7 @@ const AuthDispatchContext = createContext<AuthDispatch | null>(null);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -58,27 +58,27 @@ export const useAuth = () => {
 export const useAuthDispatch = () => {
   const context = useContext(AuthDispatchContext);
   if (!context) {
-    throw new Error('useAuthDispatch must be used within an AuthProvider');
+    throw new Error("useAuthDispatch must be used within an AuthProvider");
   }
   return context;
 };
 
-const checkIsComplete = (data: AuthState['user']) => {
+const checkIsComplete = (data: AuthState["user"]) => {
   if (!data) return false;
 
-  const hasAnySocialCode = Object.values(data.contactList || '{}').some(
+  const hasAnySocialCode = Object.values(data.contactList || "{}").some(
     (socialCode) => Boolean(socialCode)
   );
   if (!hasAnySocialCode) return false;
 
   const keys = [
-    'name',
-    'birthDay',
-    'gender',
-    'roleList',
-    'wantToDoList',
-    'tagList',
-    'selfIntroduction',
+    "name",
+    "birthDay",
+    "gender",
+    "roleList",
+    "wantToDoList",
+    "tagList",
+    "selfIntroduction",
   ] as const;
 
   return keys.every((key) =>
@@ -92,14 +92,14 @@ const authReducer = (state: AuthState, action: Action): AuthState => {
       return {
         ...initialState,
         isOpenLoginModal: true,
-        redirectUrl: action.payload || '',
+        redirectUrl: action.payload || "",
       };
     }
     case ActionTypes.CLOSE_LOGIN_MODAL: {
       return {
         ...state,
         isOpenLoginModal: false,
-        redirectUrl: '',
+        redirectUrl: "",
       };
     }
     case ActionTypes.SET_TOKEN: {
@@ -164,7 +164,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         switch (state.loginStatus) {
           case LoginStatus.TEMPORARY: {
             const arg = createUserSchema.parse(input);
-            const { token, user } = await userAPI.create('', { arg });
+            const { token, user } = await userAPI.create("", { arg });
             setToken(token);
             dispatch({ type: ActionTypes.UPDATE_USER, payload: user });
             break;
@@ -174,7 +174,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
               ...state.user,
               ...input,
             });
-            const payload = await userAPI.update('', { arg });
+            const payload = await userAPI.update("", { arg });
             dispatch({ type: ActionTypes.UPDATE_USER, payload });
             break;
           }
@@ -185,7 +185,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       },
       openLoginModal: (payload) => {
         logout();
-        if (typeof payload === 'string') {
+        if (typeof payload === "string") {
           getRedirectionStorage().set(payload);
         }
         dispatch({ type: ActionTypes.OPEN_LOGIN_MODAL, payload });
@@ -201,11 +201,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
       if (error.status === 401) {
         authDispatch.logout();
       } else {
-        toast.error(error.info?.message ?? '發生錯誤');
+        toast.error(error.info?.message ?? "發生錯誤");
       }
       return;
     }
-    toast.error('系統異常，請稍後再試');
+    toast.error("系統異常，請稍後再試");
   };
 
   useUserMe({
@@ -230,17 +230,21 @@ export function AuthProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     switch (state.loginStatus) {
       case LoginStatus.TEMPORARY: {
+        const signinPath = "/signin";
         const redirectUrl = state.redirectUrl || getRedirectionStorage().get();
         getReminderStorage().remove();
+        if ([redirectUrl, signinPath].includes(pathname)) {
+          break;
+        }
         authDispatch.closeLoginModal();
-        router.replace(redirectUrl || '/signin');
+        router.replace(redirectUrl || signinPath);
         break;
       }
       case LoginStatus.PERMANENT: {
         const redirectUrl = state.redirectUrl || getRedirectionStorage().get();
         const reminder = getReminderStorage().get();
         getReminderStorage().set(
-          typeof reminder === 'number' ? reminder + 1 : 1
+          typeof reminder === "number" ? reminder + 1 : 1
         );
         authDispatch.closeLoginModal();
         if (redirectUrl) router.replace(redirectUrl);
@@ -250,6 +254,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         break;
     }
   }, [
+    pathname,
     state.loginStatus,
     state.redirectUrl,
     router.replace,
@@ -260,7 +265,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     const redirectionStorage = getRedirectionStorage();
     const redirection = redirectionStorage.get();
 
-    if (redirection?.split('?')[0] === pathname) {
+    if (redirection?.split("?")[0] === pathname) {
       redirectionStorage.remove();
     }
   }, [pathname]);
