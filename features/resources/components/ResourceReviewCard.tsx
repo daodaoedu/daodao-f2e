@@ -17,6 +17,7 @@ import {
 import CommentSection from "@/shared/components/Comment/CommentSection";
 import { CommentType } from "@/services/comments";
 import { cn } from "@/utils/cn";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 
 interface ResourceReviewCardProps {
   review: RecentResourceReviewSchema;
@@ -65,7 +66,11 @@ export default function ResourceReviewCard({
         <div className="mb-6">
           <h3 className="body-lg font-bold">心得</h3>
           <div className="text-gray-700 whitespace-pre-line mb-4">
-            <p>{review.title}</p>
+            <MarkdownEditor
+              value={review.content}
+              readOnly
+              className="mb-10"
+            />
           </div>
         </div>
         <CollapsibleContent>

@@ -38,13 +38,13 @@ function ResourceContainer({
         <ResourceCard
           key={resource.id}
           id={resource.id}
-          title={resource.resourceName}
+          title={resource.name}
           content={resource.description}
           tags={resource.tags}
           userName={resource.user.name}
-          coverImageUrl={resource.resourceImgUrl ?? undefined}
+          coverImageUrl={resource.imageUrl ?? undefined}
           time={resource.createdAt}
-          level={resource.targetAudience}
+          level={resource.level}
           commentCount={resource.reviewCount}
           userAvatar={resource.user.photoURL}
           viewCount={resource.viewCount.toString()}

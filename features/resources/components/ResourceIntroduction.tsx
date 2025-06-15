@@ -2,6 +2,7 @@ import React from "react";
 import { format } from "date-fns";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
 import ShellSvg from "@/public/assets/icons/shell.svg";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 
 interface ResourceIntroductionProps {
   resource: ResourceDetailResponseSchema;
@@ -12,14 +13,18 @@ export default function ResourceIntroduction({
 }: ResourceIntroductionProps) {
   return (
     <>
-      <div className="mb-10">{resource.description}</div>
-      {resource.introVideoUrl && (
+      <MarkdownEditor
+        value={resource.description}
+        readOnly
+        className="mb-10"
+      />
+      {resource.videoUrl && (
         <div className="mb-10 aspect-[1120/633]">
           <iframe
             className="w-full h-full rounded-lg"
             width="560"
             height="315"
-            src={resource.introVideoUrl}
+            src={resource.videoUrl}
             title="YouTube video player"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

@@ -305,7 +305,7 @@ export default function CreateResourcePage() {
                         </FormControl>
                         <SelectContent>
                           {resourceTypes.map((type) => (
-                            <SelectItem key={type.id} value={type.id}>
+                            <SelectItem key={type.value} value={type.value}>
                               {type.label}
                             </SelectItem>
                           ))}
@@ -373,7 +373,7 @@ export default function CreateResourcePage() {
                         </FormControl>
                         <SelectContent>
                           {costTypes.map((type) => (
-                            <SelectItem key={type.id} value={type.id}>
+                            <SelectItem key={type.value} value={type.value}>
                               {type.label}
                             </SelectItem>
                           ))}
@@ -401,7 +401,7 @@ export default function CreateResourcePage() {
                         </FormControl>
                         <SelectContent>
                           {targetAudienceTypes.map((type) => (
-                            <SelectItem key={type.id} value={type.id}>
+                            <SelectItem key={type.value} value={type.value}>
                               {type.label}
                             </SelectItem>
                           ))}

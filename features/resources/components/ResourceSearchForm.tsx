@@ -22,12 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  durationTypes,
-  costTypes,
-  targetAudienceTypes,
-  resourceTypes,
-} from "../constants";
+import { costTypes, targetAudienceTypes, resourceTypes } from "../constants";
 
 interface SearchFormProps {
   onFilter: (filters: ResourceSearchParamsSchema) => void;
@@ -113,7 +108,7 @@ export default function ResourceSearchForm({
   });
 
   const handleClear = (
-    type: "resourceType" | "cost" | "targetAudience" | "tags"
+    type: "type" | "cost" | "level" | "tags"
   ) => {
     form.setValue(type, "");
   };
@@ -126,7 +121,7 @@ export default function ResourceSearchForm({
   const handleCheckboxChange = (
     field: ControllerRenderProps<
       ResourceSearchParamsSchema,
-      "cost" | "resourceType" | "targetAudience" | "tags"
+      "cost" | "type" | "level" | "tags"
     >,
     itemId: string,
     checked: boolean
@@ -187,26 +182,26 @@ export default function ResourceSearchForm({
             {/* 資源類型 */}
             <FormSection
               title="資源類型"
-              onClear={() => handleClear("resourceType")}
+              onClear={() => handleClear("type")}
             >
               <FormField
                 control={form.control}
-                name="resourceType"
+                name="type"
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                       {resourceTypes.map((type) => (
                         <CheckboxItem
-                          key={type.id}
+                          key={type.value}
                           label={type.label}
                           isChecked={
-                            !!field.value?.split(",").includes(type.id)
+                            !!field.value?.split(",").includes(type.value)
                           }
                           onChange={(checked) =>
-                            handleCheckboxChange(field, type.id, checked)
+                            handleCheckboxChange(field, type.value, checked)
                           }
                           hasTooltip
-                          tooltipContent={getResourceTypeDescription(type.id)}
+                          tooltipContent={getResourceTypeDescription(type.value)}
                         />
                       ))}
                     </div>
@@ -226,13 +221,13 @@ export default function ResourceSearchForm({
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                       {costTypes.map((type) => (
                         <CheckboxItem
-                          key={type.id}
+                          key={type.value}
                           label={type.label}
                           isChecked={
-                            !!field.value?.split(",").includes(type.id)
+                            !!field.value?.split(",").includes(type.value)
                           }
                           onChange={(checked) =>
-                            handleCheckboxChange(field, type.id, checked)
+                            handleCheckboxChange(field, type.value, checked)
                           }
                         />
                       ))}
@@ -246,56 +241,26 @@ export default function ResourceSearchForm({
             {/* 適合對象 */}
             <FormSection
               title="適合"
-              onClear={() => handleClear("targetAudience")}
+              onClear={() => handleClear("level")}
             >
               <FormField
                 control={form.control}
-                name="targetAudience"
+                name="level"
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                       {targetAudienceTypes.map((type) => (
                         <CheckboxItem
-                          key={type.id}
+                          key={type.value}
                           label={type.label}
                           isChecked={
-                            !!field.value?.split(",").includes(type.id)
+                            !!field.value?.split(",").includes(type.value)
                           }
                           onChange={(checked) =>
-                            handleCheckboxChange(field, type.id, checked)
+                            handleCheckboxChange(field, type.value, checked)
                           }
                           hasTooltip
-                          tooltipContent={getTargetAudienceDescription(type.id)}
-                        />
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </FormSection>
-
-            {/* 所需學習時間 */}
-            <FormSection
-              title="所需學習時間"
-              onClear={() => handleClear("tags")}
-            >
-              <FormField
-                control={form.control}
-                name="tags"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                      {durationTypes.map((item) => (
-                        <CheckboxItem
-                          key={item.id}
-                          label={item.label}
-                          isChecked={
-                            !!field.value?.split(",").includes(item.id)
-                          }
-                          onChange={(checked) =>
-                            handleCheckboxChange(field, item.id, checked)
-                          }
+                          tooltipContent={getTargetAudienceDescription(type.value)}
                         />
                       ))}
                     </div>

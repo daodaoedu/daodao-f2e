@@ -18,7 +18,7 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
     <div className="p-10 bg-white shadow-md rounded-xl mt-4 mb-11 flex flex-col md:mb-12 md:flex-row gap-8">
       <div className="flex-1 flex flex-col justify-between">
         <div>
-          <h1 className="heading-lg font-bold mb-4">{resource.resourceName}</h1>
+          <h1 className="heading-lg font-bold mb-4">{resource.name}</h1>
 
           <div className="flex flex-wrap gap-2 mb-4">
             {resource.tags.map((tag) => (
@@ -35,7 +35,7 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
                 適合
               </span>
               <Separator orientation="vertical" />
-              <span className="text-primary">{resource.targetAudience}</span>
+              <span className="text-primary">{resource.level}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-medium flex items-center gap-2">
@@ -43,7 +43,7 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
                 資源類型
               </span>
               <Separator orientation="vertical" />
-              <span className="text-primary">{resource.resourceType}</span>
+              <span className="text-primary">{resource.type}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-medium flex items-center gap-2">
@@ -72,8 +72,8 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
 
       <div className="relative md:basis-80 aspect-[320/241] rounded-lg overflow-hidden">
         <Image
-          src={resource.resourceImgUrl ?? ""}
-          alt={resource.resourceName}
+          src={resource.imageUrl ?? ""}
+          alt={resource.name}
           className="object-cover"
           fill
           priority

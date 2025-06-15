@@ -36,6 +36,34 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Rating } from "@/components/ui/rating";
+import { MultipleSelector, Option } from "@/components/ui/multiple-selector";
+
+const resourceUsageOptions: Option[] = [
+  {
+    value: "withOnlineCourses",
+    label: "是，搭配線上課程",
+  },
+  {
+    value: "withBooks",
+    label: "是，搭配相關書籍",
+  },
+  {
+    value: "withOtherTools",
+    label: "是，搭配相關工具",
+  },
+  {
+    value: "withCommunity",
+    label: "是，參與了社群或討論",
+  },
+  {
+    value: "onlyThisResource",
+    label: "否，僅使用該資源",
+  },
+  {
+    value: "notApplicableResource",
+    label: "不適用",
+  },
+];
 
 export default function ReviewResourcePage() {
   const router = useRouter();
@@ -382,48 +410,25 @@ export default function ReviewResourcePage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>能否搭配運用資源</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={Object.keys(field.value).join(",")}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="請先選擇主分類" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {[
-                                {
-                                  id: "withOnlineCourses",
-                                  label: "是，搭配線上課程",
-                                },
-                                {
-                                  id: "withBooks",
-                                  label: "是，搭配相關書籍",
-                                },
-                                {
-                                  id: "withOtherTools",
-                                  label: "是，搭配相關工具",
-                                },
-                                {
-                                  id: "withCommunity",
-                                  label: "是，參與了社群或討論",
-                                },
-                                {
-                                  id: "onlyThisResource",
-                                  label: "否，僅使用該資源",
-                                },
-                                {
-                                  id: "notApplicableResource",
-                                  label: "不適用",
-                                },
-                              ].map((item) => (
-                                <SelectItem key={item.id} value={item.id}>
-                                  {item.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <MultipleSelector
+                            defaultOptions={resourceUsageOptions}
+                            onChange={(options) =>
+                              field.onChange(
+                                options.reduce((acc, option) => {
+                                  acc[option.value] = true;
+                                  return acc;
+                                }, {} as Record<string, boolean>)
+                              )
+                            }
+                            value={Object.entries(field.value)
+                              .map(([key, value]) =>
+                                resourceUsageOptions.find(
+                                  (option) => option.value === key && value
+                                )
+                              )
+                              .filter((option) => option !== undefined)}
+                            emptyIndicator="沒資料"
+                          />
                           <FormMessage />
                         </FormItem>
                       )}
