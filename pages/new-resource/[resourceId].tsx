@@ -98,7 +98,7 @@ export default function ResourceDetailPage({
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>{resource.resourceName}</BreadcrumbPage>
+              <BreadcrumbPage>{resource.name}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

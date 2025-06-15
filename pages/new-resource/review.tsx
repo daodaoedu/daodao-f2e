@@ -44,20 +44,31 @@ export default function ReviewResourcePage() {
   const form = useForm<CreateResourceReviewFormSchema>({
     resolver: zodResolver(createResourceReviewFormSchema),
     defaultValues: {
-      title: "",
       content: "",
       overallImpact: 0,
       changeMindset: 0,
       solveProblems: 0,
       gainPerspectives: 0,
       achieveGoals: 0,
-      experienceData: {
-        contentFeatures: [],
-        timeUsage: "",
-        suitableFor: [],
-        timeInvested: "",
-        learningMethod: "",
-        difficultyLevel: "",
+      timeUsage: "",
+      contentFeatures: {
+        wellStructured: false,
+        practiceFocused: false,
+        wellRoundedConcepts: false,
+        thoughtProvoking: false,
+        progressiveLearning: false,
+        problemBased: false,
+        realWorldExamples: false,
+        interactive: false,
+        visuallyRich: false,
+      },
+      resourceUsage: {
+        withOtherTools: false,
+        withCommunity: false,
+        withOnlineCourses: false,
+        withBooks: false,
+        onlyThisResource: false,
+        notApplicableResource: false,
       },
       tags: [],
     },
@@ -253,36 +264,56 @@ export default function ReviewResourcePage() {
 
                 <FormField
                   control={form.control}
-                  name="experienceData.contentFeatures"
+                  name="contentFeatures"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel required>內容特色</FormLabel>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
-                        {[
-                          { id: "結構清晰", label: "結構清晰" },
-                          { id: "實用導向", label: "實用導向" },
-                          { id: "觀念完整", label: "觀念完整" },
-                          { id: "靈感啟發", label: "靈感啟發" },
-                          { id: "問題導向", label: "問題導向" },
-                          { id: "具體案例", label: "具體案例" },
-                          { id: "圖文並茂", label: "圖文並茂" },
-                        ].map((item) => (
+                        {(
+                          [
+                            { id: "wellStructured", label: "結構清晰" },
+                            {
+                              id: "practiceFocused",
+                              label: "實用導向",
+                            },
+                            {
+                              id: "wellRoundedConcepts",
+                              label: "觀念完整",
+                            },
+                            {
+                              id: "thoughtProvoking",
+                              label: "靈感啟發",
+                            },
+                            { id: "progressiveLearning", label: "循序漸進" },
+                            { id: "problemBased", label: "問題導向" },
+                            { id: "realWorldExamples", label: "具體案例" },
+                            { id: "interactive", label: "具互動性" },
+                            { id: "visuallyRich", label: "圖文並茂" },
+                          ] as const
+                        ).map((item) => (
                           <FormItem
                             key={item.id}
                             className="flex items-center border border-solid border-basic-200 rounded-lg relative gap-2 m-0"
                           >
-                            <FormLabel className="cursor-pointer flex-1 m-0 p-3 flex items-center gap-2" htmlFor={item.id}>
+                            <FormLabel
+                              className="cursor-pointer flex-1 m-0 p-3 flex items-center gap-2"
+                              htmlFor={item.id}
+                            >
                               <FormControl>
                                 <Checkbox
                                   id={item.id}
-                                  checked={field.value.includes(item.id)}
+                                  checked={field.value[item.id] ?? false}
                                   onCheckedChange={(checked) => {
                                     if (checked) {
-                                      field.onChange([...field.value, item.id]);
+                                      field.onChange({
+                                        ...field.value,
+                                        [item.id]: true,
+                                      });
                                     } else {
-                                      field.onChange(
-                                        field.value.filter((id) => id !== item.id)
-                                      );
+                                      field.onChange({
+                                        ...field.value,
+                                        [item.id]: false,
+                                      });
                                     }
                                   }}
                                 />
@@ -302,7 +333,7 @@ export default function ReviewResourcePage() {
                   <div className="ml-6 mb-6 space-y-6">
                     <FormField
                       control={form.control}
-                      name="experienceData.timeUsage"
+                      name="timeUsage"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>時間運用方式</FormLabel>
@@ -316,9 +347,28 @@ export default function ReviewResourcePage() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="language">
-                                語言與文學
-                              </SelectItem>
+                              {[
+                                {
+                                  id: "daily",
+                                  label: "每天學習 1-2 小時",
+                                },
+                                {
+                                  id: "weekly",
+                                  label: "每週集中學習幾天",
+                                },
+                                {
+                                  id: "fragmented",
+                                  label: "利用碎片時間學習",
+                                },
+                                {
+                                  id: "notApplicable",
+                                  label: "不適用",
+                                },
+                              ].map((item) => (
+                                <SelectItem key={item.id} value={item.id}>
+                                  {item.label}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -328,13 +378,13 @@ export default function ReviewResourcePage() {
 
                     <FormField
                       control={form.control}
-                      name="experienceData.suitableFor"
+                      name="resourceUsage"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>能否搭配運用資源</FormLabel>
                           <Select
                             onValueChange={field.onChange}
-                            defaultValue={field.value.join(",")}
+                            defaultValue={Object.keys(field.value).join(",")}
                           >
                             <FormControl>
                               <SelectTrigger>
@@ -342,17 +392,36 @@ export default function ReviewResourcePage() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="programming">
-                                程式設計
-                              </SelectItem>
-                              <SelectItem value="ai">人工智慧</SelectItem>
-                              <SelectItem value="data_science">
-                                資料科學
-                              </SelectItem>
-                              <SelectItem value="web_dev">網頁開發</SelectItem>
-                              <SelectItem value="app_dev">
-                                應用程式開發
-                              </SelectItem>
+                              {[
+                                {
+                                  id: "withOnlineCourses",
+                                  label: "是，搭配線上課程",
+                                },
+                                {
+                                  id: "withBooks",
+                                  label: "是，搭配相關書籍",
+                                },
+                                {
+                                  id: "withOtherTools",
+                                  label: "是，搭配相關工具",
+                                },
+                                {
+                                  id: "withCommunity",
+                                  label: "是，參與了社群或討論",
+                                },
+                                {
+                                  id: "onlyThisResource",
+                                  label: "否，僅使用該資源",
+                                },
+                                {
+                                  id: "notApplicableResource",
+                                  label: "不適用",
+                                },
+                              ].map((item) => (
+                                <SelectItem key={item.id} value={item.id}>
+                                  {item.label}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                           <FormMessage />

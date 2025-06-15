@@ -51,15 +51,14 @@ export default function CreateResourcePage() {
   const form = useForm<CreateResourceFormSchema>({
     resolver: zodResolver(createResourceFormSchema),
     defaultValues: {
-      resourceName: "",
-      resourceUrl: "",
-      resourceImgUrl: "",
+      name: "",
+      url: "",
+      imageUrl: "",
       description: "",
-      introVideoUrl: "",
-      resourceType: "",
-      targetAudience: "",
+      videoUrl: "",
+      type: "",
+      level: "",
       cost: "",
-      language: "",
       majorCategory: "",
       subCategory: "",
       tags: [],
@@ -120,7 +119,7 @@ export default function CreateResourcePage() {
                   <div className="flex-[5] space-y-6">
                     <FormField
                       control={form.control}
-                      name="resourceName"
+                      name="name"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel required>資源名稱</FormLabel>
@@ -137,7 +136,7 @@ export default function CreateResourcePage() {
 
                     <FormField
                       control={form.control}
-                      name="resourceUrl"
+                      name="url"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel required>資源連結</FormLabel>
@@ -174,7 +173,7 @@ export default function CreateResourcePage() {
 
                 <FormField
                   control={form.control}
-                  name="introVideoUrl"
+                  name="videoUrl"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>介紹影片</FormLabel>
@@ -291,7 +290,7 @@ export default function CreateResourcePage() {
 
                 <FormField
                   control={form.control}
-                  name="resourceType"
+                  name="type"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel required>資源類型</FormLabel>
@@ -387,7 +386,7 @@ export default function CreateResourcePage() {
 
                 <FormField
                   control={form.control}
-                  name="targetAudience"
+                  name="level"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel required>適合</FormLabel>
