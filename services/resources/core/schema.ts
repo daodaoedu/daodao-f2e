@@ -3,24 +3,24 @@ import { baseUserSchema, cursorsSchema } from "@/services/_shared/schema";
 import {
   resourceReviewSchema,
   recentResourceReviewSchema,
-  createResourceReviewFormSchema,
-  updateResourceReviewFormSchema,
+  resourceReviewFormSchema,
 } from "../reviews/schema";
 
 // 自定義 HTTPS URL 驗證
 const httpsUrl = z
   .string()
-  .url()
+  .url({ message: "請輸入正確的網址" })
   .refine((url) => url.startsWith("https://"), {
-    message: "URL 必須以 https:// 開頭",
+    message: "網址必須 https:// 開頭",
   });
 
 export const resourceSchema = z.object({
   id: z.number(),
   name: z.string().min(1, "請輸入資源名稱"),
   url: httpsUrl,
-  imageUrl: httpsUrl.optional().nullable(),
-  description: z.string(),
+  // imageUrl: httpsUrl.optional().nullable(),
+  imageUrl: httpsUrl.optional().nullable().or(z.string()),
+  description: z.string().min(1, "請輸入資源描述"),
   videoUrl: httpsUrl.optional().nullable(),
   type: z.string(),
   level: z.string(),
@@ -48,36 +48,23 @@ export const resourceDetailResponseSchema = resourceSchema.extend({
   recentReviews: z.array(recentResourceReviewSchema).optional(),
 });
 
-export const createResourceFormSchema = z.object({
-  name: z.string().min(1, "請輸入資源名稱"),
-  url: httpsUrl,
-  imageUrl: httpsUrl.optional(),
-  description: z.string().min(1, "請輸入資源描述"),
-  videoUrl: httpsUrl.optional(),
-  type: z.string(),
-  level: z.string(),
-  cost: z.string(),
-  majorCategory: z.string(),
-  subCategory: z.string(),
-  tags: z.array(z.string()),
-  review: createResourceReviewFormSchema.optional(),
-});
-
-export const updateResourceFormSchema = z.object({
-  id: z.number(),
-  name: z.string().min(1, "請輸入資源名稱").optional(),
-  url: httpsUrl.optional(),
-  imageUrl: httpsUrl.optional(),
-  description: z.string().min(1, "請輸入資源描述").optional(),
-  videoUrl: httpsUrl.optional(),
-  type: z.string().optional(),
-  level: z.string().optional(),
-  cost: z.string().optional(),
-  majorCategory: z.string().optional(),
-  subCategory: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  review: updateResourceReviewFormSchema.optional(),
-});
+export const resourceFormSchema = resourceSchema
+  .pick({
+    name: true,
+    url: true,
+    imageUrl: true,
+    description: true,
+    videoUrl: true,
+    type: true,
+    level: true,
+    cost: true,
+    majorCategory: true,
+    subCategory: true,
+    tags: true,
+  })
+  .extend({
+    review: resourceReviewFormSchema.optional(),
+  });
 
 export const resourceMutationResponseSchema = z.object({
   resource: resourceSchema,
@@ -108,9 +95,7 @@ export type ResourceDetailResponseSchema = z.infer<
   typeof resourceDetailResponseSchema
 >;
 
-export type CreateResourceFormSchema = z.infer<typeof createResourceFormSchema>;
-
-export type UpdateResourceFormSchema = z.infer<typeof updateResourceFormSchema>;
+export type ResourceFormSchema = z.infer<typeof resourceFormSchema>;
 
 export type ResourceMutationResponseSchema = z.infer<
   typeof resourceMutationResponseSchema

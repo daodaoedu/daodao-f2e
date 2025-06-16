@@ -25,11 +25,11 @@ export const resourceUsageSchema = z.object({
 export const resourceReviewSchema = z.object({
   id: z.number(),
   content: z.string().min(1, "請輸入心得內容"),
-  overallImpact: z.number().min(1).max(5),
-  changeMindset: z.number().min(1).max(5),
-  solveProblems: z.number().min(1).max(5),
-  gainPerspectives: z.number().min(1).max(5),
-  achieveGoals: z.number().min(1).max(5),
+  overallImpact: z.number().min(0.5).max(5),
+  changeMindset: z.number().min(0.5).max(5),
+  solveProblems: z.number().min(0.5).max(5),
+  gainPerspectives: z.number().min(0.5).max(5),
+  achieveGoals: z.number().min(0.5).max(5),
   avgRating: z.number(),
   timeUsage: z.string(),
   contentFeatures: contentFeaturesSchema.optional(),
@@ -41,19 +41,20 @@ export const resourceReviewSchema = z.object({
   resourceId: z.number(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime().optional(),
-  tags: z.array(z.string()),
 });
 
 // 用於資源詳情頁面顯示的簡化評論結構
-export const recentResourceReviewSchema = resourceReviewSchema.omit({
-  overallImpact: true,
-  changeMindset: true,
-  solveProblems: true,
-  gainPerspectives: true,
-  achieveGoals: true,
-  contentFeatures: true,
-  resourceUsage: true,
-  timeUsage: true,
+export const recentResourceReviewSchema = resourceReviewSchema.pick({
+  id: true,
+  content: true,
+  avgRating: true,
+  status: true,
+  likesCount: true,
+  helpfulCount: true,
+  user: true,
+  resourceId: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const resourceReviewListResponseSchema = z.object({
@@ -61,21 +62,17 @@ export const resourceReviewListResponseSchema = z.object({
   pagination: cursorsSchema,
 });
 
-export const createResourceReviewFormSchema = z.object({
-  content: z.string().min(1, "請輸入心得內容"),
-  overallImpact: z.number().min(1).max(5),
-  changeMindset: z.number().min(1).max(5),
-  solveProblems: z.number().min(1).max(5),
-  gainPerspectives: z.number().min(1).max(5),
-  achieveGoals: z.number().min(1).max(5),
-  timeUsage: z.string(),
-  contentFeatures: contentFeaturesSchema,
-  resourceUsage: resourceUsageSchema,
-  tags: z.array(z.string()),
+export const resourceReviewFormSchema = resourceReviewSchema.pick({
+  content: true,
+  overallImpact: true,
+  changeMindset: true,
+  solveProblems: true,
+  gainPerspectives: true,
+  achieveGoals: true,
+  timeUsage: true,
+  contentFeatures: true,
+  resourceUsage: true,
 });
-
-export const updateResourceReviewFormSchema =
-  createResourceReviewFormSchema.partial();
 
 export const resourceReviewResponseSchema = z.object({
   review: resourceReviewSchema,
@@ -87,12 +84,8 @@ export type ResourceReviewListResponseSchema = z.infer<
   typeof resourceReviewListResponseSchema
 >;
 
-export type CreateResourceReviewFormSchema = z.infer<
-  typeof createResourceReviewFormSchema
->;
-export type UpdateResourceReviewFormSchema = z.infer<
-  typeof updateResourceReviewFormSchema
->;
+export type ResourceReviewFormSchema = z.infer<typeof resourceReviewFormSchema>;
+
 export type ResourceReviewResponseSchema = z.infer<
   typeof resourceReviewResponseSchema
 >;

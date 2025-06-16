@@ -39,7 +39,6 @@ export const mockResource: ResourceDetailResponseSchema = {
       content: "這個資源真的很好用，我已經用了好幾年了，每次使用都覺得很滿意。",
       avgRating: 5,
       createdAt: "2025-05-01T02:47:00.000Z",
-      tags: ["結構清晰", "實用導向", "觀念完整"],
       user: {
         _id: "user1",
         id: "user1",
@@ -67,7 +66,6 @@ export const mockResourceReview: ResourceReviewSchema = {
     photoURL: "https://i.imgur.com/avatars/tiff.jpg",
   },
   createdAt: "2025-05-01T02:47:00.000Z",
-  tags: ["結構清晰", "實用導向", "觀念完整"],
   resourceId: 1,
   likesCount: 10,
   helpfulCount: 10,
