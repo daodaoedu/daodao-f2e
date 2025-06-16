@@ -51,14 +51,14 @@ export default function ResourceReviewCard({
         <div className="mb-6 flex flex-col gap-4">
           <h3 className="body-lg font-bold">內容特色</h3>
           <div className="flex mt-1 body-sm gap-2.5">
-            {Array.isArray(review.tags) &&
-              review.tags.map((tag) => (
-                <Badge key={tag}>
+            {Array.isArray(review.contentFeatures) &&
+              review.contentFeatures.map((feature) => (
+                <Badge key={feature}>
                   <Check
                     size={20}
                     className="-my-1 mr-1 rounded-full border-2 border-basic-white"
                   />
-                  {tag}
+                  {feature}
                 </Badge>
               ))}
           </div>

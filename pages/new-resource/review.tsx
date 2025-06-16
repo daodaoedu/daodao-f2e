@@ -25,8 +25,8 @@ import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { Progress } from "@/components/ui/progress";
 import { mutations } from "@/utils/http";
 import {
-  createResourceReviewFormSchema,
-  CreateResourceReviewFormSchema,
+  ResourceReviewFormSchema,
+  resourceReviewFormSchema,
 } from "@/services/resources/reviews/schema";
 import {
   Select,
@@ -36,41 +36,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Rating } from "@/components/ui/rating";
-import { MultipleSelector, Option } from "@/components/ui/multiple-selector";
-
-const resourceUsageOptions: Option[] = [
-  {
-    value: "withOnlineCourses",
-    label: "是，搭配線上課程",
-  },
-  {
-    value: "withBooks",
-    label: "是，搭配相關書籍",
-  },
-  {
-    value: "withOtherTools",
-    label: "是，搭配相關工具",
-  },
-  {
-    value: "withCommunity",
-    label: "是，參與了社群或討論",
-  },
-  {
-    value: "onlyThisResource",
-    label: "否，僅使用該資源",
-  },
-  {
-    value: "notApplicableResource",
-    label: "不適用",
-  },
-];
+import { MultipleSelector } from "@/components/ui/multiple-selector";
+import {
+  contentFeaturesOptions,
+  resourceUsageOptions,
+  timeUsageOptions,
+} from "@/features/resources";
 
 export default function ReviewResourcePage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<CreateResourceReviewFormSchema>({
-    resolver: zodResolver(createResourceReviewFormSchema),
+  const form = useForm<ResourceReviewFormSchema>({
+    resolver: zodResolver(resourceReviewFormSchema),
     defaultValues: {
       content: "",
       overallImpact: 0,
@@ -102,7 +80,7 @@ export default function ReviewResourcePage() {
     },
   });
 
-  const onSubmit = async (formData: CreateResourceReviewFormSchema) => {
+  const onSubmit = async (formData: ResourceReviewFormSchema) => {
     try {
       setIsSubmitting(true);
 
@@ -297,50 +275,33 @@ export default function ReviewResourcePage() {
                     <FormItem>
                       <FormLabel required>內容特色</FormLabel>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
-                        {(
-                          [
-                            { id: "wellStructured", label: "結構清晰" },
-                            {
-                              id: "practiceFocused",
-                              label: "實用導向",
-                            },
-                            {
-                              id: "wellRoundedConcepts",
-                              label: "觀念完整",
-                            },
-                            {
-                              id: "thoughtProvoking",
-                              label: "靈感啟發",
-                            },
-                            { id: "progressiveLearning", label: "循序漸進" },
-                            { id: "problemBased", label: "問題導向" },
-                            { id: "realWorldExamples", label: "具體案例" },
-                            { id: "interactive", label: "具互動性" },
-                            { id: "visuallyRich", label: "圖文並茂" },
-                          ] as const
-                        ).map((item) => (
+                        {contentFeaturesOptions.map((item) => (
                           <FormItem
-                            key={item.id}
+                            key={item.value}
                             className="flex items-center border border-solid border-basic-200 rounded-lg relative gap-2 m-0"
                           >
                             <FormLabel
-                              className="cursor-pointer flex-1 m-0 p-3 flex items-center gap-2"
-                              htmlFor={item.id}
+                              className="cursor-pointer flex-1 m-0 p-3 flex items-center gap-2 body-md font-normal"
+                              htmlFor={item.value}
                             >
                               <FormControl>
                                 <Checkbox
-                                  id={item.id}
-                                  checked={field.value[item.id] ?? false}
+                                  id={item.value}
+                                  checked={
+                                    field.value[
+                                      item.value as keyof typeof field.value
+                                    ] ?? false
+                                  }
                                   onCheckedChange={(checked) => {
                                     if (checked) {
                                       field.onChange({
                                         ...field.value,
-                                        [item.id]: true,
+                                        [item.value]: true,
                                       });
                                     } else {
                                       field.onChange({
                                         ...field.value,
-                                        [item.id]: false,
+                                        [item.value]: false,
                                       });
                                     }
                                   }}
@@ -375,25 +336,8 @@ export default function ReviewResourcePage() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {[
-                                {
-                                  id: "daily",
-                                  label: "每天學習 1-2 小時",
-                                },
-                                {
-                                  id: "weekly",
-                                  label: "每週集中學習幾天",
-                                },
-                                {
-                                  id: "fragmented",
-                                  label: "利用碎片時間學習",
-                                },
-                                {
-                                  id: "notApplicable",
-                                  label: "不適用",
-                                },
-                              ].map((item) => (
-                                <SelectItem key={item.id} value={item.id}>
+                              {timeUsageOptions.map((item) => (
+                                <SelectItem key={item.value} value={item.value}>
                                   {item.label}
                                 </SelectItem>
                               ))}
@@ -411,13 +355,13 @@ export default function ReviewResourcePage() {
                         <FormItem>
                           <FormLabel>能否搭配運用資源</FormLabel>
                           <MultipleSelector
-                            defaultOptions={resourceUsageOptions}
+                            options={resourceUsageOptions}
                             onChange={(options) =>
                               field.onChange(
                                 options.reduce((acc, option) => {
                                   acc[option.value] = true;
                                   return acc;
-                                }, {} as Record<string, boolean>)
+                                }, Object.fromEntries(Object.keys(field.value).map((key) => [key, false] as [string, boolean])))
                               )
                             }
                             value={Object.entries(field.value)

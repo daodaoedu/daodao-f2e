@@ -13,3 +13,6 @@ export { default as ResourceIntroduction } from "./ResourceIntroduction";
 export { default as ResourceReviewCard } from "./ResourceReviewCard";
 export { default as ResourceReviewList } from "./ResourceReviewList";
 export { default as ContributorInfo } from "./ContributorInfo";
+export { default as ResourceBasicInfoFields } from "./ResourceBasicInfoFields";
+export { default as ResourceCategorizationFields } from "./ResourceCategorizationFields";
+export { default as ResourceReviewFields } from "./ResourceReviewFields";

@@ -70,7 +70,7 @@ const CheckboxItem = ({
   hasTooltip = false,
 }: CheckboxItemProps) => (
   <FormItem className="flex items-center border border-solid border-basic-200 rounded-lg relative gap-2">
-    <FormLabel className="cursor-pointer flex-1 m-0 p-3 flex items-center gap-2">
+    <FormLabel className="cursor-pointer flex-1 m-0 p-3 flex items-center gap-2 body-md font-normal">
       <FormControl>
         <Checkbox checked={isChecked} onCheckedChange={onChange} />
       </FormControl>

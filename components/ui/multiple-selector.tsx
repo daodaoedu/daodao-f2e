@@ -157,7 +157,7 @@ const CommandEmpty = forwardRef<
   return (
     <div
       ref={forwardedRef}
-      className={cn("py-6 text-center text-sm", className)}
+      className={cn("py-4 text-center text-sm", className)}
       cmdk-empty=""
       role="presentation"
       {...props}
@@ -370,7 +370,7 @@ export const MultipleSelector = React.forwardRef<
             onChange?.(newOptions);
           }}
         >
-          {`Create "${inputValue}"`}
+          {`新增「${inputValue}」`}
         </CommandItem>
       );
 
@@ -431,7 +431,7 @@ export const MultipleSelector = React.forwardRef<
           commandProps?.onKeyDown?.(e);
         }}
         className={cn(
-          "h-auto overflow-visible bg-transparent",
+          "h-auto overflow-visible bg-transparent border border-solid border-basic-200",
           commandProps?.className
         )}
         shouldFilter={
@@ -445,9 +445,9 @@ export const MultipleSelector = React.forwardRef<
           role="textbox"
           tabIndex={0}
           className={cn(
-            "min-h-10 rounded-md border border-input text-base ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 md:text-sm",
+            "min-h-9 rounded-md border border-input text-base ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 md:body-sm",
             {
-              "px-3 py-2": selected.length !== 0,
+              "px-2 py-1": selected.length !== 0,
               "cursor-text": !disabled && selected.length !== 0,
             },
             className
@@ -535,7 +535,7 @@ export const MultipleSelector = React.forwardRef<
                 onChange?.(selected.filter((s) => s.fixed));
               }}
               className={cn(
-                "absolute ltr:right-0 rtl:left-0 h-6 w-6 p-0",
+                "absolute right-0 h-6 w-6 p-0",
                 (hideClearAllButton ||
                   disabled ||
                   selected.length < 1 ||
@@ -550,7 +550,7 @@ export const MultipleSelector = React.forwardRef<
         <div className="relative">
           {open && (
             <CommandList
-              className="absolute top-1 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in"
+              className="absolute top-1 z-50 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in"
               onMouseLeave={() => {
                 setOnScrollbar(false);
               }}

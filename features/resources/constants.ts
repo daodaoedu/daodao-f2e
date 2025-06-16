@@ -23,6 +23,25 @@ export const targetAudienceTypes: Option[] = [
   { value: "expert", label: "專家" },
 ];
 
+export const contentFeaturesOptions: Option[] = [
+  { value: "wellStructured", label: "結構清晰" },
+  { value: "practiceFocused", label: "實用導向" },
+  { value: "wellRoundedConcepts", label: "觀念完整" },
+  { value: "thoughtProvoking", label: "靈感啟發" },
+  { value: "progressiveLearning", label: "循序漸進" },
+  { value: "problemBased", label: "問題導向" },
+  { value: "realWorldExamples", label: "具體案例" },
+  { value: "interactive", label: "具互動性" },
+  { value: "visuallyRich", label: "圖文並茂" },
+];
+
+export const timeUsageOptions: Option[] = [
+  { value: "daily", label: "每天學習 1-2 小時" },
+  { value: "weekly", label: "每週集中學習幾天" },
+  { value: "fragmented", label: "利用碎片時間學習" },
+  { value: "notApplicable", label: "不適用" },
+];
+
 export const resourceUsageOptions: Option[] = [
   { value: "withOnlineCourses", label: "是，搭配線上課程" },
   { value: "withBooks", label: "是，搭配相關書籍" },
