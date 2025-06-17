@@ -134,7 +134,6 @@
     "husky": "^9.1.7",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
-    "tsx": "^4.19.4",
     "typescript": "5.7.2",
     "vercel": "^39.2.4"
   }
