@@ -1,7 +1,7 @@
 "use client";
 
 import type { AnyZodObject } from "zod";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +28,8 @@ import {
   ResourceReviewFields,
 } from "../components";
 import { useCreateResource } from "../hooks";
+
+const withoutReviewSchema = resourceFormSchema.omit({ review: true });
 
 export default function CreateResourceForm() {
   const router = useRouter();
@@ -72,7 +74,6 @@ export default function CreateResourceForm() {
       return ((total - errorCount) / total) * 50;
     };
 
-    const withoutReviewSchema = resourceFormSchema.omit({ review: true });
     const resourceProgress = getProgress(withoutReviewSchema, resourceValues);
     const reviewProgress = getProgress(
       resourceReviewFormSchema,
@@ -98,10 +99,7 @@ export default function CreateResourceForm() {
   };
 
   const handleNextStep = () => {
-    const schema = resourceFormSchema.omit({
-      review: true,
-    });
-    const parsed = schema.safeParse(resourceForm.getValues());
+    const parsed = withoutReviewSchema.safeParse(resourceForm.getValues());
     if (parsed.success) {
       setStep(step + 1);
       return;
@@ -116,6 +114,10 @@ export default function CreateResourceForm() {
     });
     resourceForm.setFocus(parsePath(errors[0].path));
   };
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [step]);
 
   return (
     <Background>
@@ -132,21 +134,18 @@ export default function CreateResourceForm() {
           onSubmit={resourceForm.handleSubmit((data) => createResource(data))}
           className="space-y-10"
         >
-          {step === 1 && (
-            <Container>
-              <Paper className="space-y-10">
-                <ResourceBasicInfoFields />
-                <ResourceCategorizationFields />
-              </Paper>
-            </Container>
-          )}
-          {step === 2 && (
-            <Container>
-              <Paper>
+          <Container>
+            <Paper className="space-y-10">
+              {step === 1 ? (
+                <>
+                  <ResourceBasicInfoFields />
+                  <ResourceCategorizationFields />
+                </>
+              ) : (
                 <ResourceReviewFields isReviewNested />
-              </Paper>
-            </Container>
-          )}
+              )}
+            </Paper>
+          </Container>
           <footer className="sticky bottom-0 bg-basic-white py-4 shadow-2xl shadow-basic-300 z-10">
             <Container className="flex items-center gap-10">
               <div className="flex-1 body-md space-y-3">
@@ -187,6 +186,7 @@ export default function CreateResourceForm() {
                 </Button>
                 {step === 1 ? (
                   <Button
+                    key="next"
                     size="lg"
                     type="button"
                     className="w-28"
@@ -198,6 +198,7 @@ export default function CreateResourceForm() {
                   </Button>
                 ) : (
                   <Button
+                    key="submit"
                     size="lg"
                     type="submit"
                     className="w-28"
