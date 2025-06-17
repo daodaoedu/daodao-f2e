@@ -55,6 +55,7 @@ export const recentResourceReviewSchema = resourceReviewSchema.pick({
   resourceId: true,
   createdAt: true,
   updatedAt: true,
+  contentFeatures: true,
 });
 
 export const resourceReviewListResponseSchema = z.object({

@@ -51,26 +51,24 @@ export default function ResourceReviewCard({
         <div className="mb-6 flex flex-col gap-4">
           <h3 className="body-lg font-bold">內容特色</h3>
           <div className="flex mt-1 body-sm gap-2.5">
-            {Array.isArray(review.contentFeatures) &&
-              review.contentFeatures.map((feature) => (
-                <Badge key={feature}>
-                  <Check
-                    size={20}
-                    className="-my-1 mr-1 rounded-full border-2 border-basic-white"
-                  />
-                  {feature}
-                </Badge>
-              ))}
+            {Object.entries(review.contentFeatures ?? {}).map(
+              ([feature, enabled]) =>
+                enabled ? (
+                  <Badge key={feature}>
+                    <Check
+                      size={20}
+                      className="-my-1 mr-1 rounded-full border-2 border-basic-white"
+                    />
+                    {feature}
+                  </Badge>
+                ) : null
+            )}
           </div>
         </div>
         <div className="mb-6">
           <h3 className="body-lg font-bold">心得</h3>
           <div className="text-gray-700 whitespace-pre-line mb-4">
-            <MarkdownEditor
-              value={review.content}
-              readOnly
-              className="mb-10"
-            />
+            <MarkdownEditor value={review.content} readOnly className="mb-10" />
           </div>
         </div>
         <CollapsibleContent>
