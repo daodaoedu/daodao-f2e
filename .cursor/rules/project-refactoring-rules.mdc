@@ -124,12 +124,12 @@ interface ResourceAPIType {
   create: MutationFetcher<
     ResourceMutationResponseSchema,
     string,
-    CreateResourceFormSchema
+    ResourceFormSchema
   >;
   update: MutationFetcher<
     ResourceMutationResponseSchema,
     string,
-    UpdateResourceFormSchema
+    ResourceFormSchema
   >;
   delete: MutationFetcher<void, string, { id: number }>;
 }
@@ -190,7 +190,7 @@ export const resourceListResponseSchema = z.object({
   }),
 });
 
-export const createResourceFormSchema = z.object({
+export const resourceFormSchema = z.object({
   resourceName: z.string().min(1, "請輸入資源名稱"),
   resourceUrl: httpsUrl,
   resourceImgUrl: httpsUrl.optional(),
@@ -200,7 +200,7 @@ export const createResourceFormSchema = z.object({
 // 類型導出
 export type ResourceSchema = z.infer<typeof resourceSchema>;
 export type ResourceListResponseSchema = z.infer<typeof resourceListResponseSchema>;
-export type CreateResourceFormSchema = z.infer<typeof createResourceFormSchema>;
+export type ResourceFormSchema = z.infer<typeof resourceFormSchema>;
 ```
 
 子模組的 schema 可以依賴核心模組，例如 [services/resources/reviews/schema.ts](mdc:services/resources/reviews/schema.ts)：
@@ -215,7 +215,7 @@ export const resourceReviewSchema = z.object({
   // 更多欄位...
 });
 
-export const createResourceReviewFormSchema = z.object({
+export const resourceReviewFormSchema = z.object({
   title: z.string().min(1, "請輸入心得標題"),
   content: z.string().min(1, "請輸入心得內容"),
   overallImpact: z.number().min(1).max(5),
@@ -224,5 +224,5 @@ export const createResourceReviewFormSchema = z.object({
 
 // 類型導出
 export type ResourceReviewSchema = z.infer<typeof resourceReviewSchema>;
-export type CreateResourceReviewFormSchema = z.infer<typeof createResourceReviewFormSchema>;
+export type ResourceReviewFormSchema = z.infer<typeof resourceReviewFormSchema>;
 ```
