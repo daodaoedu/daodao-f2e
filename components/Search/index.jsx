@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { Box, Divider } from '@mui/material';
-import { useSearchResults } from '@/services/modules/notion';
+import { useSearchResults } from '@/services/notion';
 import SearchResultList from './SearchResultList';
 import SearchField from './SearchField';
 import stringSanitizer from '../../utils/sanitizer';

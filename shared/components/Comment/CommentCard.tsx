@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/Auth";
 import Image from "@/shared/components/Image";
 import { ROLE } from "@/constants/member";
 import { timeDuration } from "@/utils/date";
-import { CommentSchema, CommentVisibility } from "@/services/modules/comments";
+import { CommentSchema, CommentVisibility } from "@/services/comments";
 import { Button } from "@/components/atoms/button";
 import Shell from "@/public/assets/icons/shell.svg";
 import {

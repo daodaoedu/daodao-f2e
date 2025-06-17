@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { ContentCard } from "@/features/projects";
 import { getAdminProjectLayout } from "@/layout/features/getProjectLayout";
 import { useProjectOutcomes } from "@/features/projects/hooks/outcome";
-import { parseToString } from "@/services/core";
+import { parseToString } from "@/utils/helper";
 
 const OutcomesPage = () => {
   const { query } = useRouter();

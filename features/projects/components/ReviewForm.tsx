@@ -5,7 +5,7 @@ import PostCard from "@/shared/components/Post/PostCard";
 import {
   projectReviewFormSchema,
   ProjectReviewFormSchema,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 import { Button } from "@/components/atoms/button";
 import { Form } from "@/components/atoms/form";
 import MarkdownEditor from "@/shared/components/MarkdownEditor";

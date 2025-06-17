@@ -1,12 +1,12 @@
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
-import Modal from "@/shared/components/Modal";
+import ResponsiveModal, { ResponsiveModalSize } from "@/components/molecules/responsive-modal";
 import {
   getProjectNotePathname,
   projectNoteAPI,
   ProjectNoteSchema,
   refetchProjectNote,
-} from "@/services/modules/projects";
+} from "@/services/projects";
 import NoteForm from "./NoteForm";
 
 interface NoteUpdateModalProps {
@@ -48,10 +48,9 @@ export default function NoteUpdateModal({
   if (!note) return null;
 
   return (
-    <Modal
-      size="md"
-      className="rounded-2xl"
-      isOpen={isOpen}
+    <ResponsiveModal
+      size={ResponsiveModalSize.Medium}
+      open={isOpen}
       onClose={onClose}
       hasCloseButton
     >
@@ -63,6 +62,6 @@ export default function NoteUpdateModal({
         isLoading={updateMutation.isMutating}
         onSubmit={updateMutation.trigger}
       />
-    </Modal>
+    </ResponsiveModal>
   );
 }

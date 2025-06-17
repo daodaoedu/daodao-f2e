@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 
 import PersonalCard from '@/components/PersonalCard';
 import { useAuth } from '@/contexts/Auth';
-import { useUser } from '@/services/modules/users';
+import { useUser } from '@/services/users';
 
 const PartnerDetailPage = () => {
   const router = useRouter();

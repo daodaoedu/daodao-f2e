@@ -1,22 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
-import Image from '@/shared/components/Image';
-import Modal from '@/shared/components/Modal';
-import openWindowPopup from '@/utils/openWindowPopup';
-import { cn } from '@/utils/cn';
-import getEnv from '@/utils/env';
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import Image from "@/shared/components/Image";
+import ResponsiveModal from "@/components/molecules/responsive-modal";
+import openWindowPopup from "@/utils/openWindowPopup";
+import { cn } from "@/utils/cn";
+import getEnv from "@/utils/env";
 
 interface LoginModalProps {
   isOpen: boolean;
-  keepMounted: boolean;
   onClose: () => void;
 }
 
-export default function LoginModal({
-  isOpen,
-  keepMounted,
-  onClose,
-}: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [isOpenWindow, setIsOpenWindow] = useState(false);
   const timer = useRef<NodeJS.Timeout | null>(null);
 
@@ -25,7 +20,7 @@ export default function LoginModal({
     const baseUrl = env.isDevHost ? env.frontendUrl : env.apiUrl;
     const popup = openWindowPopup({
       url: `${baseUrl}/auth/google?origin=${window.location.origin}`,
-      title: 'login',
+      title: "login",
       width: 400,
       height: 632,
     });
@@ -49,60 +44,59 @@ export default function LoginModal({
   }, [isOpenWindow, timer.current]);
 
   return (
-    <Modal
-      title="歡迎回來島島阿學！"
-      isOpen={isOpen}
-      keepMounted={keepMounted}
+    <ResponsiveModal
+      open={isOpen}
       onClose={onClose}
+      title="歡迎回來島島阿學！"
     >
-      <div className="my-6">
-        <div className="mx-auto w-max">
-          <Image
-            src="https://imgur.com/EADd1UD.png"
-            alt="login"
-            background="rgba(240, 240, 240, .8)"
-            height="233px"
-            width="300px"
-          />
+      <div className="mx-auto w-max">
+        <Image
+          src="https://imgur.com/EADd1UD.png"
+          alt="login"
+          background="rgba(240, 240, 240, .8)"
+          height="233px"
+          width="300px"
+        />
+      </div>
+      <div className="p-4">
+        <button
+          type="button"
+          className="w-full rounded-full bg-primary-base py-2 text-white hover:bg-primary-darker"
+          onClick={handleOpenLoginWindow}
+        >
+          {isOpenWindow ? (
+            <span className="flex gap-2 items-center justify-center">
+              <span
+                className={cn(
+                  "w-4 h-4 rounded-full inline-block animate-spin",
+                  "border-solid border-2 border-white/50 border-t-transparent"
+                )}
+              />
+              登入中...
+            </span>
+          ) : (
+            <span>Google 登入 / 註冊</span>
+          )}
+        </button>
+        <div className="text-center text-sm text-basic-400 text-balance mt-4">
+          註冊即代表您同意島島阿學的
+          <Link
+            href="/terms/privacypolicy"
+            target="_blank"
+            className="px-1 underline text-primary-base"
+          >
+            服務條款
+          </Link>
+          與
+          <Link
+            href="/terms/privacypolicy"
+            target="_blank"
+            className="px-1 underline text-primary-base"
+          >
+            隱私權政策
+          </Link>
         </div>
       </div>
-      <button
-        type="button"
-        className="w-full rounded-full bg-primary-base py-2 text-white hover:bg-primary-darker"
-        onClick={handleOpenLoginWindow}
-      >
-        {isOpenWindow ? (
-          <span className="flex gap-2 items-center justify-center">
-            <span
-              className={cn(
-                'w-4 h-4 rounded-full inline-block animate-spin',
-                'border-solid border-2 border-white/50 border-t-transparent'
-              )}
-            />
-            登入中...
-          </span>
-        ) : (
-          <span>Google 登入 / 註冊</span>
-        )}
-      </button>
-      <div className="mt-6 text-center text-sm text-basic-400 text-balance">
-        註冊即代表您同意島島阿學的
-        <Link
-          href="/terms/privacypolicy"
-          target="_blank"
-          className="px-1 underline text-primary-base"
-        >
-          服務條款
-        </Link>
-        與
-        <Link
-          href="/terms/privacypolicy"
-          target="_blank"
-          className="px-1 underline text-primary-base"
-        >
-          隱私權政策
-        </Link>
-      </div>
-    </Modal>
+    </ResponsiveModal>
   );
 }

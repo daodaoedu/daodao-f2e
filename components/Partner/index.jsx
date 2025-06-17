@@ -4,8 +4,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { ABROAD_OPTION, TAIWAN_DISTRICT } from '@/constants/areas';
 import { EDUCATION, ROLE } from '@/constants/member';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
-import { useUsers } from '@/services/modules/users';
-import { useTags } from '@/services/modules/tags';
+import { useUsers } from '@/services/users';
+import { useTags } from '@/services/tags';
 
 import PartnerList from './PartnerList';
 import SearchField from './SearchField';

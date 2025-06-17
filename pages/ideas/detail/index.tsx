@@ -5,7 +5,7 @@ import IdeaDetail from '@/components/Idea/Detail';
 import useIdea from '@/hooks/api/ideas/useIdea';
 import ConfirmModal from '@/shared/components/Confirm';
 import UpdateModal from '@/components/Idea/Modals/UpdateModal';
-import { parseToString } from '@/services/core';
+import { parseToString } from '@/utils/helper';
 
 enum ModalTypeEnum {
     Update,

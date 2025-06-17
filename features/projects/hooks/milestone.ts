@@ -1,10 +1,10 @@
 import useSWR, { KeyedMutator } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import { projectMilestoneAPI, getProjectMilestonePathname } from '@/services/modules/projects/milestones/api';
-import { ProjectMilestoneSchema, ProjectMilestoneFormSchema } from '@/services/modules/projects/milestones/schema';
-import { getProjectPathname } from '@/services/modules/projects/core';
-import { sortMilestones } from '@/services/modules/projects/utils';
+import { projectMilestoneAPI, getProjectMilestonePathname } from '@/services/projects/milestones/api';
+import { ProjectMilestoneSchema, ProjectMilestoneFormSchema } from '@/services/projects/milestones/schema';
+import { getProjectPathname } from '@/services/projects/core';
+import { sortMilestones } from '@/services/projects/utils';
 
 export function useProjectMilestones(projectId?: string | null) {
   const swr = useSWR<ProjectMilestoneSchema[]>(

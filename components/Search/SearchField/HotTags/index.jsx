@@ -26,7 +26,7 @@ const Tags = ({ queryList }) => {
   const hotTags =
     Array.isArray(queryList) && queryList.length > 0 && lastSelectedCat
       ? SEARCH_TAGS[lastSelectedCat]
-      : SEARCH_TAGS['全部'];
+      : SEARCH_TAGS.all;
   return (
     <Box
       sx={{
@@ -39,8 +39,8 @@ const Tags = ({ queryList }) => {
     >
       <Whatshot sx={{ color: 'red' }} />
       <TagsWrapper>
-        {hotTags.map((value) => (
-          <Item key={`${value}`} title={value} />
+        {hotTags.map(({ value, label }) => (
+          <Item key={value} title={label} />
         ))}
       </TagsWrapper>
     </Box>

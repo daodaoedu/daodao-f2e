@@ -65,16 +65,16 @@ const SearchPage = () => {
           description:
             '「島島阿學」盼能透過建立學習資源網絡，讓自主學習者能找到合適的成長方法，進而成為自己想成為的人，並從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
           // 有cats才能放
-          itemListElement: SEARCH_TAGS[router?.query?.cats ?? '語言與文學'].map(
-            (tagName, index) => ({
+          itemListElement: SEARCH_TAGS[router?.query?.cats ?? 'language'].map(
+            ({ label, value }, index) => ({
               '@type': 'ListItem',
               position: index + 1,
               item: {
                 '@id': `https://www.daoedu.tw/search?cats=${
-                  router?.query?.cats ?? '語言與文學'
-                }&tags=${tagName}`,
-                name: `${tagName}的${
-                  router?.query?.cats ?? '語言與文學'
+                  router?.query?.cats ?? 'language'
+                }&tags=${value}`,
+                name: `${label}的${
+                  router?.query?.cats ?? 'language'
                 }學習資源列表`,
               },
             }),

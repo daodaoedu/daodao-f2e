@@ -5,9 +5,9 @@ import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
 import SEOConfig from "@/shared/components/SEO";
 import ReviewDetail from "@/features/projects/components/ReviewDetail";
 import { ReviewDeleteModal, ReviewUpdateModal } from "@/features/projects";
-import { useProject } from "@/services/modules/projects";
+import { useProject } from "@/services/projects";
 import { useProjectReview } from "@/features/projects/hooks/review";
-import { parseToNumber, parseToString } from "@/services/core";
+import { parseToNumber, parseToString } from "@/utils/helper";
 
 enum ModalTypeEnum {
   Update,

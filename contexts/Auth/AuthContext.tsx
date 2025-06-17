@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import { SWRConfig } from 'swr';
 
-import { HttpError } from '@/services/core';
+import { HttpError } from '@/utils/http';
 import {
   getRedirectionStorage,
   getReminderStorage,
@@ -21,7 +21,7 @@ import {
   createUserSchema,
   updateUserSchema,
   useUserMe,
-} from '@/services/modules/users';
+} from '@/services/users';
 
 import LoginModal from './LoginModal';
 import {
@@ -273,7 +273,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
         </SWRConfig>
         <LoginModal
           isOpen={state.isOpenLoginModal}
-          keepMounted={!state.isLoggedIn}
           onClose={authDispatch.closeLoginModal}
         />
       </AuthDispatchContext.Provider>

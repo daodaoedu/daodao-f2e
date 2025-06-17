@@ -1,5 +1,5 @@
 import { useAuth } from '@/contexts/Auth';
-import { useMarathonByUserEvent } from '@/services/modules/marathons';
+import { useMarathonByUserEvent } from '@/services/marathons';
 
 import {
   Typography,

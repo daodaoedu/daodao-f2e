@@ -1,19 +1,50 @@
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { ICategory } from '@/constants/category';
 import Image from '@/shared/components/Image';
+import { cn } from '@/utils/cn';
 
 type CategoryCardProps = {
-  category: { key: string; value: string; label: string; image: string };
+  category: ICategory;
+  size?: 'sm' | 'md';
 };
 
+const CATEGORIES_BASE_PATH = '/new-resource/categories';
+
 export default function CategoryCard(props: CategoryCardProps) {
-  const { category } = props;
-  const { key, label, image } = category;
+  const { category, size = 'md' } = props;
+  const { value, label, image } = category;
+  const pathname = usePathname();
+
+  const currentPath = pathname.includes(CATEGORIES_BASE_PATH)
+    ? pathname
+    : CATEGORIES_BASE_PATH;
 
   return (
-    <div className="relative h-[3.75rem] md:h-[6.25rem]" key={key}>
-      <Image src={image} alt={label} borderRadius="0.5rem" height="inherit" />
-      <div className="absolute inset-0 w-full rounded-lg bg-primary-base bg-opacity-50 flex items-center justify-center text-xl leading-[1.875rem] font-bold text-white md:leading-[1.6875rem] md:font-bold">
+    <Link
+      key={value}
+      href={`${currentPath}/${value}`}
+      className={cn(
+        'group relative h-[3.75rem] rounded-lg overflow-hidden',
+        size === 'md' && 'md:h-[6.25rem]'
+      )}
+    >
+      <Image
+        src={image ?? ''}
+        alt={label}
+        borderRadius="0.5rem"
+        height="inherit"
+        className="group-hover:scale-110 transition-transform"
+      />
+      <div
+        className={cn(
+          'absolute inset-0 w-full p-2 bg-primary-base/50',
+          'flex items-center justify-center text-xl font-bold text-white',
+          'group-hover:scale-110 transition-transform text-center text-balance'
+        )}
+      >
         {label}
       </div>
-    </div>
+    </Link>
   );
 }

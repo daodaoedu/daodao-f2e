@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { useReducer, useRef, useState } from 'react';
 import { z } from 'zod';
 import { ABROAD_OPTION, AREA_DELIMITER, TAIWAN_OPTION } from '@/constants/areas';
-import { userAPI } from '@/services/modules/users';
+import { userAPI } from '@/services/users';
 
 const initialState = {
   name: '',

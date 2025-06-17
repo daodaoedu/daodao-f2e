@@ -22,17 +22,17 @@ alwaysApply: true
 - pages         # 頁面元件 (僅負責組裝，不包含過多邏輯)
 - public        # 靜態資源
 - services      # 外部服務串接相關
-    - core      # 核心功能
-    - modules   # 各功能模組的 API
+    - _shared   # 提供給 services 共用的 schema
+    - *         # 外部服務定義
 - utils         # 工具函數
 ```
 
 ## 核心依賴原則 (Dependency Principles)
 
 ### 1. Services 層級規則
-- **modules 不互相依賴**: [services/modules](mdc:services/modules) 下的各模組應保持獨立
+- **modules 不互相依賴**: [services](mdc:services) 下的各模組應保持獨立
 - 專注於後端 API 串接、資料結構定義和驗證規則
-- 參考現有結構: [services/modules/projects](mdc:services/modules/projects), [services/modules/users](mdc:services/modules/users)
+- 參考現有結構: [services/resources](mdc:services/resources)
 
 ### 2. Features 層級規則
 - **features 之間不互相依賴**: [features](mdc:features) 下的各功能模組應保持獨立，避免導致循環依賴
@@ -63,7 +63,7 @@ alwaysApply: true
 ### 檔案移動規則
 1. **商業邏輯元件** → 移動到對應的 `features/` 目錄
 2. **可重用元件** → 移動到 `components/atoms|molecules|organisms/`
-3. **API 相關檔案** → 移動到 `services/modules/`
+3. **API 相關檔案** → 移動到 `services/`
 4. **共用 hooks** → 保留在 `hooks/`，功能特定的移到 `features/`
 5. **共用 contexts** → 保留在 `contexts/`，功能特定的移到 `features/`
 6. **共用 utils** → 保留在 `utils/`，功能特定的移到 `features/`
@@ -71,17 +71,17 @@ alwaysApply: true
 ### import 規則
 ```typescript
 // ✅ 正確的 import 方向
-import { Button } from '@/components/atoms/Button'
+import { Button } from '@/components/atoms/button'
 import { useAuth } from '@/contexts/Auth'
-import { projectService } from '@/services/modules/projects'
+import { resourceAPI } from '@/services/resources'
 import { useProjects } from '@/features/projects'
 
 // ❌ 避免的 import 方向
 // features 之間互相依賴
 import { useResources } from '@/features/resources' // 在 features/projects 中
 
-// services modules 之間互相依賴
-import { uploadImages } from '@/services/modules/image' // 在 services/modules/outcome 中
+// services 之間互相依賴
+import { uploadImages } from '@/services/image' // 在 services/outcome 中
 ```
 
 ### 程式碼品質要求
@@ -95,3 +95,138 @@ import { uploadImages } from '@/services/modules/image' // 在 services/modules/
 - **禁止使用**: Material-UI (MUI)、emotion、dayjs、react-icons
 - **必須使用**: shadcn/ui + Radix UI 元件、date-fns、Tailwind CSS、自定義 icon、Lucide React 圖示
 - 詳細遷移規範請參考: [UI 元件庫遷移規則](mdc:.cursor/rules/ui-migration-rules.mdc)
+
+### Services API 與 Schema 定義規則
+- 每個服務模組應至少包含 core 資料夾，包含 API 介面、Schema 定義和通用邏輯
+- 使用 Zod 進行資料驗證和類型轉換
+- 參考實作: [services/resources](mdc:services/resources)
+
+#### 基本結構
+```
+services/
+  ├── _shared/           # 共用的 schema 定義
+  ├── resources/         # 資源服務模組
+  │   ├── core/          # 核心 API 和 schema
+  │   │   ├── api.ts     # API 介面定義
+  │   │   ├── schema.ts  # 資料結構定義
+  │   │   └── index.ts   # 導出檔案
+  │   ├── reviews/       # 子模組
+  │   └── index.ts       # 模組導出
+  └── [其他服務模組]/
+```
+
+#### API 定義規範
+- 使用 TypeScript 介面定義 API 行為
+- 明確定義返回類型與參數類型
+- 使用 SWR 或 SWR mutation 進行資料獲取
+- 參考以下實作 [services/resources/core/api.ts](mdc:services/resources/core/api.ts)：
+
+```typescript
+interface ResourceAPIType {
+  read: (resourceId: string) => Promise<ResourceDetailResponseSchema>;
+  readList: () => Promise<ResourceListResponseSchema>;
+  create: MutationFetcher<
+    ResourceMutationResponseSchema,
+    string,
+    CreateResourceFormSchema
+  >;
+  update: MutationFetcher<
+    ResourceMutationResponseSchema,
+    string,
+    UpdateResourceFormSchema
+  >;
+  delete: MutationFetcher<void, string, { id: number }>;
+}
+
+export const resourceAPI: ResourceAPIType = {
+  read: (resourceId) => {
+    const id = parseToNumber(resourceId);
+    if (typeof id !== "number") {
+      throw new Error("Invalid resource id");
+    }
+    return fetcher<ResourceDetailResponseSchema>(
+      getResourcePathname({ id })
+    ).catch(() => mockResourceList.resources[0]);
+  },
+  readList: () =>
+    fetcher<ResourceListResponseSchema>(getResourcePathname()).catch(
+      () => mockResourceList
+    ),
+  create: mutations.post,
+  update: mutations.put,
+  delete: mutations.delete,
+};
+```
+
+#### Schema 定義規範
+- 使用 Zod 定義資料驗證和轉換邏輯
+- 匯出 TypeScript 類型定義
+- 細分 Schema 為 request/response 形式
+- 參考以下實作 [services/resources/core/schema.ts](mdc:services/resources/core/schema.ts)：
+
+```typescript
+// 自定義 URL 驗證
+const httpsUrl = z.string().url().refine(
+  (url) => url.startsWith("https://"),
+  { message: "URL 必須以 https:// 開頭" }
+);
+
+// 核心資料模型定義
+export const resourceSchema = z.object({
+  id: z.number(),
+  resourceName: z.string().min(1, "請輸入資源名稱"),
+  resourceUrl: httpsUrl,
+  resourceImgUrl: httpsUrl.optional().nullable(),
+  description: z.string(),
+  // 更多欄位...
+});
+
+// 請求和響應模型
+export const resourceListResponseSchema = z.object({
+  resources: z.array(resourceSchema),
+  pagination: z.object({
+    limit: z.number(),
+    hasNext: z.boolean(),
+    hasPrev: z.boolean(),
+    nextCursor: z.string().nullable(),
+    prevCursor: z.string().nullable(),
+    totalEstimate: z.number(),
+  }),
+});
+
+export const createResourceFormSchema = z.object({
+  resourceName: z.string().min(1, "請輸入資源名稱"),
+  resourceUrl: httpsUrl,
+  resourceImgUrl: httpsUrl.optional(),
+  // 更多欄位...
+});
+
+// 類型導出
+export type ResourceSchema = z.infer<typeof resourceSchema>;
+export type ResourceListResponseSchema = z.infer<typeof resourceListResponseSchema>;
+export type CreateResourceFormSchema = z.infer<typeof createResourceFormSchema>;
+```
+
+子模組的 schema 可以依賴核心模組，例如 [services/resources/reviews/schema.ts](mdc:services/resources/reviews/schema.ts)：
+
+```typescript
+export const resourceReviewSchema = z.object({
+  id: z.number(),
+  title: z.string().min(1, "請輸入心得標題"),
+  content: z.string().min(1, "請輸入心得內容"),
+  overallImpact: z.number().min(1).max(5),
+  changeMindset: z.number().min(1).max(5),
+  // 更多欄位...
+});
+
+export const createResourceReviewFormSchema = z.object({
+  title: z.string().min(1, "請輸入心得標題"),
+  content: z.string().min(1, "請輸入心得內容"),
+  overallImpact: z.number().min(1).max(5),
+  // 更多欄位...
+});
+
+// 類型導出
+export type ResourceReviewSchema = z.infer<typeof resourceReviewSchema>;
+export type CreateResourceReviewFormSchema = z.infer<typeof createResourceReviewFormSchema>;
+```

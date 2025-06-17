@@ -10,7 +10,7 @@ import SEOConfig from '@/shared/components/SEO';
 import {
   createProjectSchema,
   useProjectMutation,
-} from '@/services/modules/projects';
+} from '@/services/projects';
 import { useCreateProject } from '@/features/projects';
 
 const ProjectPage = () => {
