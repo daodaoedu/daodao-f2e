@@ -1,32 +1,15 @@
-import type { IdeaSchema } from '@/services/modules/ideas/schema';
-
 // Re-export from services for convenience
 export type {
   IdeaSchema,
-  CreateIdeaSchema,
-  UpdateIdeaSchema,
+  CreateIdeaFormSchema,
+  UpdateIdeaFormSchema,
   DeleteIdeaSchema,
   IdeaResourceSchema,
-  IdeaQuerySchema,
+  IdeaSearchParamsSchema,
   IdeaListResponseSchema,
-} from '@/services/modules/ideas/schema';
+} from '@/services/ideas';
 
 // Feature-specific types for UI components
-export interface IdeaFormState {
-  isSubmitting: boolean;
-  isLoading: boolean;
-  error: string | null;
-  success: boolean;
-}
-
-export interface IdeaListState {
-  ideas: IdeaSchema[];
-  isLoading: boolean;
-  error: string | null;
-  hasMore: boolean;
-  total: number;
-}
-
 export interface IdeaFilters {
   search: string;
   selectedTags: string[];
@@ -42,6 +25,7 @@ export interface IdeaTag {
   count?: number;
 }
 
+// Future feature: Comments system
 export interface IdeaComment {
   id: string;
   content: string;
@@ -51,37 +35,4 @@ export interface IdeaComment {
     role?: string;
   };
   createdDate: string;
-}
-
-export interface IdeaDetailState {
-  idea: IdeaSchema | null;
-  comments: IdeaComment[];
-  isLoading: boolean;
-  error: string | null;
-  showComments: boolean;
-}
-
-// Form validation states
-export interface IdeaFormValidation {
-  title: {
-    isValid: boolean;
-    error?: string;
-  };
-  content: {
-    isValid: boolean;
-    error?: string;
-  };
-  resources: {
-    isValid: boolean;
-    errors?: Record<number, string>;
-  };
-}
-
-// UI interaction states
-export interface IdeaUIState {
-  isAddingResource: boolean;
-  editingResourceId: number | null;
-  showTagSuggestions: boolean;
-  selectedImageIndex: number;
-  showPreviewModal: boolean;
 }

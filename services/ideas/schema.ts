@@ -1,112 +1,166 @@
 import { z } from 'zod';
+import { baseUserSchema } from '@/services/_shared/schema';
 
-// Idea Resource Schema
+// 自定義 URL 驗證
+const httpsUrl = z.string().url().refine(
+  (url) => url.startsWith("https://"),
+  { message: "URL 必須以 https:// 開頭" }
+);
+
+// Idea Resource Schema - 想法相關資源
 export const ideaResourceSchema = z.object({
   name: z.string().min(1, '請輸入資源名稱'),
-  url: z.string().url('請輸入有效的網址格式'),
+  url: httpsUrl,
 });
 
 export type IdeaResourceSchema = z.infer<typeof ideaResourceSchema>;
 
-// Main Idea Schema
+// ========================================
+// 基礎實體類型 (Entity Types)
+// ========================================
+
+// 核心 Idea Schema - 完整的實體類型
 export const ideaSchema = z.object({
   id: z.string(),
-  title: z.string().min(1, '請輸入標題'),
-  content: z.string().min(1, '請輸入內容'),
-  authorId: z.string(),
-  authorName: z.string(),
-  authorAvatar: z.string().optional().default(''),
-  tags: z.array(z.string()).default([]),
-  imageUrls: z.array(z.string()).default([]),
-  videoUrls: z.array(z.string()).default([]),
-  visibility: z.enum(['public', 'private']).default('public'),
-  isLiked: z.boolean().default(false),
-  likeCount: z.number().default(0),
-  commentCount: z.number().default(0),
-  viewCount: z.number().default(0),
-  shareCount: z.number().default(0),
-  status: z.enum(['active', 'draft', 'archived']).default('active'),
+  content: z.string(),
+  user: baseUserSchema,
+  visibility: z.enum(['public', 'private']),
+  status: z.enum(['active', 'draft', 'archived']),
+  tags: z.array(z.string()),
+  imageUrls: z.array(z.string()),
+  videoUrls: z.array(z.string()),
+  ideaResources: z.array(ideaResourceSchema),
+  likeCount: z.number(),
+  commentCount: z.number(),
+  viewCount: z.number(),
+  shareCount: z.number(),
+  isLiked: z.boolean(),
   createdDate: z.string(),
   updatedDate: z.string(),
-  ideaResources: z.array(ideaResourceSchema).default([]),
 });
 
 export type IdeaSchema = z.infer<typeof ideaSchema>;
 
-// Create Idea Schema - 移除系統生成的欄位
-export const createIdeaSchema = ideaSchema.omit({
-  id: true,
-  authorId: true,
-  authorName: true,
-  authorAvatar: true,
-  isLiked: true,
-  likeCount: true,
-  commentCount: true,
-  viewCount: true,
-  shareCount: true,
-  status: true,
-  createdDate: true,
-  updatedDate: true,
-}).extend({
+// ========================================
+// 表單類型 (Form Types) - 前端專用
+// ========================================
+
+// 創建表單類型 (前端專用)
+export const createIdeaFormSchema = z.object({
+  content: z.string().min(1, '請輸入內容').max(5000, '內容不能超過5000字'),
+  visibility: z.enum(['public', 'private']),
+  tags: z.array(z.string()),
+  ideaResources: z.array(ideaResourceSchema),
   imageFiles: z.array(z.instanceof(File)).nullable().optional(),
   videoFiles: z.array(z.instanceof(File)).nullable().optional(),
 });
 
-export type CreateIdeaSchema = z.infer<typeof createIdeaSchema>;
+export type CreateIdeaFormSchema = z.infer<typeof createIdeaFormSchema>;
 
-// Update Idea Schema - 保留id但移除系統欄位
-export const updateIdeaSchema = ideaSchema.omit({
-  authorId: true,
-  authorName: true,
-  authorAvatar: true,
-  isLiked: true,
-  likeCount: true,
-  commentCount: true,
-  viewCount: true,
-  shareCount: true,
-  createdDate: true,
-  updatedDate: true,
-}).extend({
-  imageFiles: z.array(z.instanceof(File)).nullable().optional(),
-  videoFiles: z.array(z.instanceof(File)).nullable().optional(),
+// 更新表單類型 (前端專用)
+export const updateIdeaFormSchema = createIdeaFormSchema.extend({
+  id: z.string(),
+  status: z.enum(['active', 'draft', 'archived']).optional(),
 });
 
-export type UpdateIdeaSchema = z.infer<typeof updateIdeaSchema>;
+export type UpdateIdeaFormSchema = z.infer<typeof updateIdeaFormSchema>;
 
-// Delete Idea Schema - 只需要id
-export const deleteIdeaSchema = ideaSchema.pick({
-  id: true,
+// ========================================
+// API 請求/響應類型 (API Types)
+// ========================================
+
+// API 創建請求類型
+export const createIdeaRequestSchema = z.object({
+  content: z.string(),
+  visibility: z.enum(['public', 'private']),
+  tags: z.array(z.string()),
+  ideaResources: z.array(ideaResourceSchema),
+  imageUrls: z.array(z.string()), // 由檔案上傳轉換而來
+  videoUrls: z.array(z.string()),
+});
+
+export type CreateIdeaRequestSchema = z.infer<typeof createIdeaRequestSchema>;
+
+// API 更新請求類型
+export const updateIdeaRequestSchema = createIdeaRequestSchema.extend({
+  id: z.string(),
+  status: z.enum(['active', 'draft', 'archived']).optional(),
+});
+
+export type UpdateIdeaRequestSchema = z.infer<typeof updateIdeaRequestSchema>;
+
+// Delete Idea Schema
+export const deleteIdeaSchema = z.object({
+  id: z.string(),
 });
 
 export type DeleteIdeaSchema = z.infer<typeof deleteIdeaSchema>;
 
-// Idea Query Schema - 用於搜尋和篩選
-export const ideaQuerySchema = z.object({
-  page: z.number().min(1).optional().default(1),
-  pageSize: z.number().min(1).max(100).optional().default(10),
+// Idea Search Parameters Schema
+export const ideaSearchParamsSchema = z.object({
   search: z.string().optional(),
-  tags: z.array(z.string()).optional(),
+  tags: z.string().optional(), // 逗號分隔的標籤字串
   visibility: z.enum(['public', 'private', 'all']).optional().default('public'),
-  sortBy: z.enum(['createdDate', 'updatedDate', 'likeCount', 'title']).optional().default('createdDate'),
+  sortBy: z.enum(['createdDate', 'updatedDate', 'likeCount']).optional().default('createdDate'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
+  userId: z.string().optional(),
 });
 
-export type IdeaQuerySchema = z.infer<typeof ideaQuerySchema>;
+export type IdeaSearchParamsSchema = z.infer<typeof ideaSearchParamsSchema>;
 
 // Pagination Schema
 export const paginationSchema = z.object({
-  page: z.number(),
-  pageSize: z.number(),
-  totalCount: z.number(),
-  totalPages: z.number(),
+  page: z.number().min(1).default(1),
+  pageSize: z.number().min(1).max(100).default(20),
+  totalCount: z.number().min(0),
+  totalPages: z.number().min(0),
+  hasNext: z.boolean(),
+  hasPrev: z.boolean(),
 });
 
 export type PaginationSchema = z.infer<typeof paginationSchema>;
 
 // Idea List Response Schema
 export const ideaListResponseSchema = z.object({
-  data: z.array(ideaSchema),
+  ideas: z.array(ideaSchema),
   pagination: paginationSchema,
 });
 
 export type IdeaListResponseSchema = z.infer<typeof ideaListResponseSchema>;
+
+// Idea Detail Response Schema
+export const ideaDetailResponseSchema = ideaSchema;
+
+export type IdeaDetailResponseSchema = z.infer<typeof ideaDetailResponseSchema>;
+
+// Idea Mutation Response Schema
+export const ideaMutationResponseSchema = z.object({
+  success: z.boolean(),
+  data: ideaSchema.optional(),
+  message: z.string().optional(),
+});
+
+export type IdeaMutationResponseSchema = z.infer<typeof ideaMutationResponseSchema>;
+
+// JSON-LD 相關 Schema (用於 SEO)
+export const ideaJsonLdSchema = z.object({
+  "@type": z.literal("CreativeWork"),
+  name: z.string(),
+  description: z.string(),
+  author: z.object({
+    "@type": z.literal("Person"),
+    name: z.string(),
+    image: z.string().optional(),
+  }),
+  dateCreated: z.string(),
+  dateModified: z.string(),
+  interactionStatistic: z.array(z.object({
+    "@type": z.literal("InteractionCounter"),
+    interactionType: z.string(),
+    userInteractionCount: z.number(),
+  })).optional(),
+  keywords: z.array(z.string()).optional(),
+  url: z.string().url().optional(),
+});
+
+export type IdeaJsonLdSchema = z.infer<typeof ideaJsonLdSchema>;

@@ -1,8 +1,12 @@
 import { useCallback, useState, useEffect } from 'react';
 import useSWRMutation from 'swr/mutation';
-import { ideaAPI } from '@/services/modules/ideas';
-import type { IdeaSchema } from '@/services/modules/ideas';
-import { useIdeasContext } from '../contexts';
+import { IdeaSchema } from '@/services/ideas';
+import { useIdeasCache } from './useIdeasCache';
+import {
+  useIdeaSubmission,
+  useIdeaUpdateSubmission,
+  useIdeaDeletion
+} from './useIdeaSubmission';
 
 interface UseIdeaActionsOptions {
   onSuccess?: () => void;
@@ -14,9 +18,15 @@ interface ShareOptions {
 }
 
 interface UseIdeaActionsReturn {
+  // Create & Update
+  createIdea: ReturnType<typeof useIdeaSubmission>['submit'];
+  updateIdea: ReturnType<typeof useIdeaUpdateSubmission>['submit'];
+  isCreating: boolean;
+  isUpdating: boolean;
+
   // Delete
   deleteIdea: (id: string) => Promise<void>;
-  isDeletingIdea: boolean;
+  isDeleting: boolean;
 
   // Like/Unlike - 完整實現
   likeIdea: (id: string) => Promise<void>;
@@ -28,6 +38,9 @@ interface UseIdeaActionsReturn {
   // Share - 完整實現
   shareIdea: (id: string, options?: ShareOptions) => Promise<string>;
   isSharing: boolean;
+
+  // Progress tracking
+  uploadProgress: number;
 
   // Error state
   error: string | null;
@@ -57,16 +70,51 @@ const saveLikedIdeasToStorage = (likedIds: Set<string>): void => {
 };
 
 /**
- * 處理Ideas相關操作的Hook (刪除、點讚、分享等)
- * Phase 2: 完善實現所有功能
+ * 統一的想法操作介面 Hook
+ * 整合創建、更新、刪除、點讚、分享等所有操作
  */
 export const useIdeaActions = ({
   onSuccess,
   onError,
 }: UseIdeaActionsOptions = {}): UseIdeaActionsReturn => {
-  const { updateLocalIdea, deleteLocalIdea } = useIdeasContext();
+  const { updateIdeaInCache, removeIdeaFromCache } = useIdeasCache();
   const [likedIdeas, setLikedIdeas] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
+
+  // 使用新的分離式 hooks
+  const createSubmission = useIdeaSubmission({
+    onSuccess: () => {
+      setError(null);
+      onSuccess?.();
+    },
+    onError: (err) => {
+      setError(err.message);
+      onError?.(err);
+    },
+  });
+
+  const updateSubmission = useIdeaUpdateSubmission({
+    onSuccess: (updatedIdea) => {
+      updateIdeaInCache(updatedIdea);
+      setError(null);
+      onSuccess?.();
+    },
+    onError: (err) => {
+      setError(err.message);
+      onError?.(err);
+    },
+  });
+
+  const deletion = useIdeaDeletion({
+    onSuccess: () => {
+      setError(null);
+      onSuccess?.();
+    },
+    onError: (err) => {
+      setError(err.message);
+      onError?.(err);
+    },
+  });
 
   // 初始化點讚狀態
   useEffect(() => {
@@ -78,25 +126,7 @@ export const useIdeaActions = ({
     saveLikedIdeasToStorage(likedIdeas);
   }, [likedIdeas]);
 
-  // Delete mutation
-  const {
-    trigger: triggerDelete,
-    isMutating: isDeletingIdea,
-    error: deleteError,
-  } = useSWRMutation(
-    'delete-idea',
-    ideaAPI.delete,
-    {
-      onSuccess: () => {
-        setError(null);
-        onSuccess?.();
-      },
-      onError: (err) => {
-        setError(err.message || '刪除失敗');
-        onError?.(err);
-      },
-    }
-  );
+  // 刪除邏輯已整合到 deletion hook 中
 
   // Like mutation - 完整實現
   const {
@@ -137,12 +167,12 @@ export const useIdeaActions = ({
 
         // 更新想法的點讚計數 (樂觀更新)
         try {
-          updateLocalIdea({
+          updateIdeaInCache({
             id,
             likeCount: action === 'like' ? 1 : -1,
           } as IdeaSchema);
-        } catch (err) {
-          console.warn('無法更新本地想法計數:', err);
+        } catch (updateError) {
+          console.warn('無法更新本地想法計數:', updateError);
         }
 
         setError(null);
@@ -215,15 +245,15 @@ export const useIdeaActions = ({
   const deleteIdea = useCallback(async (id: string) => {
     try {
       // 先從本地狀態移除 (樂觀更新)
-      deleteLocalIdea(id);
+      removeIdeaFromCache(id);
 
-      // 再調用 API
-      await triggerDelete({ id });
+      // 使用新的刪除 hook
+      await deletion.submit(id);
     } catch (err) {
       console.error('Failed to delete idea:', err);
       throw err;
     }
-  }, [triggerDelete, deleteLocalIdea]);
+  }, [deletion.submit, removeIdeaFromCache]);
 
   const likeIdea = useCallback(async (id: string) => {
     try {
@@ -278,12 +308,19 @@ export const useIdeaActions = ({
     setError(null);
   }, []);
 
-  const combinedError = error || deleteError?.message || likeError?.message || shareError?.message || null;
+  const combinedError = error || likeError?.message || shareError?.message || null;
+  const uploadProgress = Math.max(createSubmission.uploadProgress, updateSubmission.uploadProgress);
 
   return {
+    // Create & Update
+    createIdea: createSubmission.submit,
+    updateIdea: updateSubmission.submit,
+    isCreating: createSubmission.isSubmitting,
+    isUpdating: updateSubmission.isSubmitting,
+
     // Delete
     deleteIdea,
-    isDeletingIdea,
+    isDeleting: deletion.isSubmitting,
 
     // Like/Unlike
     likeIdea,
@@ -295,6 +332,9 @@ export const useIdeaActions = ({
     // Share
     shareIdea,
     isSharing,
+
+    // Progress tracking
+    uploadProgress,
 
     // Error state
     error: combinedError,

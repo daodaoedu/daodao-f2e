@@ -76,38 +76,6 @@ export const truncateText = (text: string, maxLength: number): string => {
 };
 
 /**
- * 生成唯一ID
- */
-export const generateUniqueId = (): number => {
-  return parseInt(Date.now().toString().slice(-10), 10);
-};
-
-/**
- * 清理和格式化標籤
- */
-export const cleanTagName = (tagName: string): string => {
-  return tagName.trim().toLowerCase().replace(/\s+/g, '-');
-};
-
-/**
- * 檢查是否為圖片URL
- */
-export const isImageUrl = (url: string): boolean => {
-  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
-  const lowercaseUrl = url.toLowerCase();
-  return imageExtensions.some((ext) => lowercaseUrl.includes(ext));
-};
-
-/**
- * 計算閱讀時間（基於字數）
- */
-export const calculateReadingTime = (content: string): number => {
-  const wordsPerMinute = 200; // 平均閱讀速度
-  const wordCount = content.length / 2; // 中文字符估算
-  return Math.ceil(wordCount / wordsPerMinute);
-};
-
-/**
  * 根據可見性返回對應的標籤
  */
 export const getVisibilityLabel = (visibility: 'public' | 'private'): string => {
@@ -118,22 +86,15 @@ export const getVisibilityLabel = (visibility: 'public' | 'private'): string => 
  * 驗證Idea表單數據
  */
 export const validateIdeaForm = (data: {
-  title: string;
   content: string;
   ideaResources?: Array<{ name: string; url: string }>;
 }): { isValid: boolean; errors: Record<string, string> } => {
   const errors: Record<string, string> = {};
 
-  if (!data.title.trim()) {
-    errors.title = '請輸入標題';
-  } else if (data.title.length > 100) {
-    errors.title = '標題不能超過100個字符';
-  }
-
   if (!data.content.trim()) {
     errors.content = '請輸入內容';
-  } else if (data.content.length > 2000) {
-    errors.content = '內容不能超過2000個字符';
+  } else if (data.content.length > 5000) {
+    errors.content = '內容不能超過5000個字符';
   }
 
   // 驗證資源

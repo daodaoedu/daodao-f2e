@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
 import { Label } from '@/components/atoms/label';
@@ -10,105 +10,79 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import useSearchParamsManager from '@/hooks/useSearchParamsManager';
-import { useIdeasContext } from '../contexts';
-import { getTagCategoryClass } from '../utils';
-import type { IdeaTag } from '../types';
 
 interface SearchFieldProps {
+  value?: string;
   onSearch?: (query: string) => void;
+  onTagChange?: (tags: string[]) => void;
   className?: string;
   expanded?: boolean;
-  syncWithUrl?: boolean;
 }
 
+// 預設的熱門標籤
+const DEFAULT_TAGS = [
+  { id: '1', name: '程式設計', category: 'tech' },
+  { id: '2', name: '設計思維', category: 'design' },
+  { id: '3', name: '創業', category: 'business' },
+  { id: '4', name: '學習方法', category: 'education' },
+  { id: '5', name: '時間管理', category: 'productivity' },
+  { id: '6', name: '創意發想', category: 'creativity' },
+  { id: '7', name: '人工智慧', category: 'tech' },
+  { id: '8', name: '用戶體驗', category: 'design' },
+  { id: '9', name: '專案管理', category: 'business' },
+  { id: '10', name: '心理學', category: 'psychology' },
+];
+
 const SearchField: React.FC<SearchFieldProps> = ({
+  value = '',
   onSearch,
+  onTagChange,
   className = '',
   expanded = false,
-  syncWithUrl = true,
 }) => {
-  const {
-    state: contextState,
-    setSearch,
-    addTag,
-    removeTag,
-    clearTags,
-    toggleSearchExpanded
-  } = useIdeasContext();
-
-  const [getSearchParams, pushState] = useSearchParamsManager();
-
+  const [searchValue, setSearchValue] = useState(value);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [customTagInput, setCustomTagInput] = useState('');
   const [showTagSuggestions, setShowTagSuggestions] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(expanded);
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearch(value);
-    onSearch?.(value);
+  const handleSearchChange = useCallback((newValue: string) => {
+    setSearchValue(newValue);
+    onSearch?.(newValue);
+  }, [onSearch]);
 
-    // 同步到 URL 參數
-    if (syncWithUrl) {
-      pushState('search', value || '');
-    }
-  }, [setSearch, onSearch, syncWithUrl, pushState]);
-
-  // 初始化時從 URL 讀取搜尋參數
-  useEffect(() => {
-    if (!syncWithUrl) return;
-
-    const urlSearch = getSearchParams('search')?.[0] || '';
-    if (urlSearch && urlSearch !== contextState.filters.search) {
-      setSearch(urlSearch);
-    }
-
-    // 只在組件初次載入時讀取 URL 標籤
-    const urlTags = getSearchParams('tags') || [];
-    if (urlTags.length > 0 && contextState.selectedTags.length === 0) {
-      urlTags.forEach((tagName: string) => {
-        const existingTag = contextState.availableTags.find((t) => t.name === tagName);
-        if (existingTag) {
-          addTag(existingTag);
-        }
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [syncWithUrl]); // 只在 syncWithUrl 變化時執行
-
-  const handleTagClick = useCallback((tag: IdeaTag) => {
-    if (!contextState.selectedTags.find((t) => t.id === tag.id) && contextState.selectedTags.length < 3) {
-      addTag(tag);
-
-      // 同步標籤到 URL
-      if (syncWithUrl) {
-        const newTags = [...contextState.selectedTags, tag].map((t) => t.name);
-        pushState('tags', newTags.join(','));
-      }
+  const handleTagClick = useCallback((tagName: string) => {
+    if (!selectedTags.includes(tagName) && selectedTags.length < 3) {
+      const newTags = [...selectedTags, tagName];
+      setSelectedTags(newTags);
+      onTagChange?.(newTags);
     }
     setShowTagSuggestions(false);
-  }, [addTag, contextState.selectedTags, syncWithUrl, pushState]);
+  }, [selectedTags, onTagChange]);
+
+  const removeTag = useCallback((tagName: string) => {
+    const newTags = selectedTags.filter((tag) => tag !== tagName);
+    setSelectedTags(newTags);
+    onTagChange?.(newTags);
+  }, [selectedTags, onTagChange]);
 
   const createCustomTag = useCallback(() => {
-    if (customTagInput.trim() && contextState.selectedTags.length < 3) {
-      const newTag: IdeaTag = {
-        id: `custom_${Date.now()}`,
-        name: customTagInput.trim(),
-        category: 'custom',
-        count: 1
-      };
-
-      if (!contextState.selectedTags.find((t) => t.name.toLowerCase() === newTag.name.toLowerCase())) {
-        addTag(newTag);
+    if (customTagInput.trim() && selectedTags.length < 3) {
+      const newTagName = customTagInput.trim();
+      if (!selectedTags.includes(newTagName)) {
+        const newTags = [...selectedTags, newTagName];
+        setSelectedTags(newTags);
+        onTagChange?.(newTags);
         setCustomTagInput('');
         setShowTagSuggestions(false);
-
-        // 同步新標籤到 URL
-        if (syncWithUrl) {
-          const newTags = [...contextState.selectedTags, newTag].map((t) => t.name);
-          pushState('tags', newTags.join(','));
-        }
       }
     }
-  }, [customTagInput, addTag, contextState.selectedTags, syncWithUrl, pushState]);
+  }, [customTagInput, selectedTags, onTagChange]);
+
+  const clearAllTags = useCallback(() => {
+    setSelectedTags([]);
+    onTagChange?.([]);
+  }, [onTagChange]);
 
   const handleCustomTagKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -126,71 +100,52 @@ const SearchField: React.FC<SearchFieldProps> = ({
           <Input
             type="text"
             placeholder="搜尋想法、標籤或作者..."
-            value={contextState.filters.search}
+            value={searchValue}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-12 pr-12 py-3 text-lg border-none shadow-none focus:ring-0 bg-basic-100 hover:bg-white focus:bg-white transition-colors"
           />
           <Button
             variant="ghost"
             size="sm"
-            onClick={toggleSearchExpanded}
+            onClick={() => setIsExpanded(!isExpanded)}
             className="absolute right-2 top-1/2 transform -translate-y-1/2 text-basic-300 hover:text-primary-base"
           >
             <Filter className="h-4 w-4 mr-1" />
-            {contextState.isSearchExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </div>
       </div>
 
       {/* Expanded Filters */}
-      {(contextState.isSearchExpanded || expanded) && (
+      {isExpanded && (
         <div className="border-t border-basic-200 p-4 bg-basic-50">
           <div className="space-y-4">
             {/* Selected Tags */}
-            {contextState.selectedTags.length > 0 && (
+            {selectedTags.length > 0 && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label className="body-sm text-basic-500">已選標籤 ({contextState.selectedTags.length}/3)</Label>
+                  <Label className="text-sm text-basic-500">已選標籤 ({selectedTags.length}/3)</Label>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => {
-                      clearTags();
-
-                      // 清除 URL 中的標籤參數
-                      if (syncWithUrl) {
-                        pushState('tags', '');
-                      }
-                    }}
+                    onClick={clearAllTags}
                     className="text-xs text-basic-300 hover:text-red-500"
                   >
                     清除全部
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {contextState.selectedTags.map((tag) => (
+                  {selectedTags.map((tag) => (
                     <span
-                      key={tag.id}
-                      className={`inline-flex items-center px-3 py-1 rounded-full text-sm border transition-colors ${
-                        getTagCategoryClass(tag.category)
-                      }`}
+                      key={tag}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm border bg-primary-base/10 text-primary-darker border-primary-base/20"
                     >
                       <Hash className="h-3 w-3 mr-1" />
-                      {tag.name}
+                      {tag}
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          removeTag(tag.id);
-
-                          // 同步移除標籤到 URL
-                          if (syncWithUrl) {
-                            const remainingTags = contextState.selectedTags
-                              .filter((t) => t.id !== tag.id)
-                              .map((t) => t.name);
-                            pushState('tags', remainingTags.length > 0 ? remainingTags.join(',') : '');
-                          }
-                        }}
+                        onClick={() => removeTag(tag)}
                         className="ml-2 h-4 w-4 p-0 hover:text-red-500"
                       >
                         <X className="h-3 w-3" />
@@ -203,12 +158,12 @@ const SearchField: React.FC<SearchFieldProps> = ({
 
             {/* Tag Selection */}
             <div className="space-y-3">
-              <Label className="body-sm text-basic-500">
-                添加標籤 {contextState.selectedTags.length < 3 ? `(還可選 ${3 - contextState.selectedTags.length} 個)` : '(已達上限)'}
+              <Label className="text-sm text-basic-500">
+                添加標籤 {selectedTags.length < 3 ? `(還可選 ${3 - selectedTags.length} 個)` : '(已達上限)'}
               </Label>
 
               {/* Custom Tag Input */}
-              {contextState.selectedTags.length < 3 && (
+              {selectedTags.length < 3 && (
                 <div className="flex space-x-2">
                   <Input
                     type="text"
@@ -220,7 +175,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
                   />
                   <Button
                     onClick={createCustomTag}
-                    disabled={!customTagInput.trim() || contextState.selectedTags.length >= 3}
+                    disabled={!customTagInput.trim() || selectedTags.length >= 3}
                     size="sm"
                     className="bg-primary-base hover:bg-primary-darker text-white disabled:bg-basic-300"
                   >
@@ -245,16 +200,16 @@ const SearchField: React.FC<SearchFieldProps> = ({
               {showTagSuggestions && (
                 <div className="bg-white border border-basic-200 rounded-lg p-3 max-h-64 overflow-y-auto">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                    {contextState.availableTags.map((tag) => {
-                      const isSelected = contextState.selectedTags.find((t) => t.id === tag.id);
-                      const isDisabled = isSelected || contextState.selectedTags.length >= 3;
+                    {DEFAULT_TAGS.map((tag) => {
+                      const isSelected = selectedTags.includes(tag.name);
+                      const isDisabled = isSelected || selectedTags.length >= 3;
 
                       return (
                         <Button
                           key={tag.id}
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleTagClick(tag)}
+                          onClick={() => handleTagClick(tag.name)}
                           disabled={!!isDisabled}
                           className={`justify-start text-left p-2 h-auto ${
                             isSelected
@@ -269,7 +224,6 @@ const SearchField: React.FC<SearchFieldProps> = ({
                               <Hash className="h-3 w-3 mr-2" />
                               <span className="text-sm truncate">{tag.name}</span>
                             </div>
-                            <span className="text-xs text-basic-300 ml-2">{tag.count}</span>
                           </div>
                         </Button>
                       );
@@ -280,10 +234,10 @@ const SearchField: React.FC<SearchFieldProps> = ({
             </div>
 
             {/* Search Stats */}
-            {contextState.filters.search && (
+            {searchValue && (
               <div className="pt-3 border-t border-basic-200">
                 <p className="text-xs text-basic-400">
-                  搜尋關鍵字：<span className="font-medium text-basic-500">"{contextState.filters.search}"</span>
+                  搜尋關鍵字：<span className="font-medium text-basic-500">"{searchValue}"</span>
                 </p>
               </div>
             )}
