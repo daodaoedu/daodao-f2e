@@ -1,7 +1,14 @@
 "use client";
 
 import { toast } from "sonner";
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   BlockTypeSelect,
   BoldItalicUnderlineToggles,
@@ -140,6 +147,25 @@ export const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
       onChange?.(markdown);
     };
 
+    useImperativeHandle(
+      ref,
+      () => ({
+        focus: () => {
+          editorRef.current?.focus(() => {
+            markdownEditorWrapperRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+              inline: "center",
+            });
+          });
+        },
+        getMarkdown: () => editorRef.current?.getMarkdown() ?? "",
+        setMarkdown: (v) => editorRef.current?.setMarkdown(v),
+        insertMarkdown: (v) => editorRef.current?.insertMarkdown(v),
+      }),
+      []
+    );
+
     useEffect(() => {
       const editor = markdownEditorWrapperRef.current?.querySelector(
         `.${editorSelectors}`
@@ -211,12 +237,7 @@ export const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
         )}
         <MDXEditor
           key={renderKey}
-          ref={(el) => {
-            editorRef.current = el;
-            if (typeof ref === "function") {
-              ref(el);
-            }
-          }}
+          ref={editorRef}
           markdown={markdownRef.current}
           readOnly={readOnly}
           className={className}
