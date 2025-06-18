@@ -2,7 +2,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import ReviewCard from "@/features/projects/components/ReviewCard";
 import {
   ReviewCreateModal,

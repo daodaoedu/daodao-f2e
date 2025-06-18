@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import Image from "@/shared/components/Image";
 import LensIcon from "@/public/assets/icons/lens.svg";
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
 import SectionTitle from "./SectionTitle";
 

@@ -4,8 +4,7 @@ import { parseToString } from "@/utils/helper";
 import { mutations } from "@/utils/http";
 
 import {
-  CreateResourceReviewFormSchema,
-  UpdateResourceReviewFormSchema,
+  ResourceReviewFormSchema,
   ResourceReviewResponseSchema,
 } from "./schema";
 
@@ -44,12 +43,12 @@ interface ResourceReviewAPIType {
   create: MutationFetcher<
     ResourceReviewResponseSchema,
     ResourceReviewSWRKey,
-    CreateResourceReviewFormSchema
+    ResourceReviewFormSchema
   >;
   update: MutationFetcher<
     ResourceReviewResponseSchema,
     ResourceReviewSWRKey,
-    UpdateResourceReviewFormSchema
+    ResourceReviewFormSchema
   >;
   delete: MutationFetcher<void, ResourceReviewSWRKey>;
 }

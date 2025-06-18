@@ -12,7 +12,7 @@ import marathonConfig from "@/constants/marathon";
 import getManageLayout from "@/layout/features/getManageLayout";
 import useClickOutside from "@/hooks/useClickOutside";
 import SEOConfig from "@/shared/components/SEO";
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import MilestoneItem from "@/components/Milestones/MilestoneItem";
 import {
   SelectProjectModal,
@@ -38,18 +38,18 @@ import {
   AccordionItem,
   AccordionContent,
   AccordionTrigger,
-} from "@/components/atoms/accordion";
+} from "@/components/ui/accordion";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/atoms/collapsible";
+} from "@/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/atoms/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import {
   useProjectReviewList,

@@ -1,0 +1,33 @@
+import React from "react";
+import { Plus } from "lucide-react";
+import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
+import { Button } from "@/components/ui/button";
+import ResourceReviewCard from "./ResourceReviewCard";
+
+interface ResourceReviewListProps {
+  resource: ResourceDetailResponseSchema;
+}
+
+export default function ResourceReviewList({
+  resource,
+}: ResourceReviewListProps) {
+  return (
+    <div className="flex flex-col items-center gap-10">
+      {resource.recentReviews && resource.recentReviews.length > 0 ? (
+        <div className="space-y-10 w-full">
+          {resource.recentReviews.map((review) => (
+            <ResourceReviewCard key={review.id} review={review} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12 text-basic-400">
+          目前還沒有人留下心得，成為第一個吧！
+        </div>
+      )}
+      <Button size="lg">
+        <Plus size={15} />
+        分享心得
+      </Button>
+    </div>
+  );
+}

@@ -8,19 +8,19 @@ import Image from "@/shared/components/Image";
 import { ROLE } from "@/constants/member";
 import { timeDuration } from "@/utils/date";
 import { CommentSchema, CommentVisibility } from "@/services/comments";
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import Shell from "@/public/assets/icons/shell.svg";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/atoms/collapsible";
+} from "@/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/atoms/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import CommentInput, { CommentData } from "./CommentInput";
 
 interface CommentCardProps extends CommentSchema {

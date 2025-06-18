@@ -4,13 +4,12 @@ import useSWRMutation, { SWRMutationConfiguration } from "swr/mutation";
 import {
   getResourceReviewPathname,
   resourceReviewAPI,
-  ResourceReviewSchema,
   ResourceReviewListResponseSchema,
   ResourceReviewResponseSchema,
   refetchResourceReviews,
 } from "@/services/resources";
 
-export function useResourceReviews(resourceId?: number | null) {
+export function useResourceReviewList(resourceId?: number | null) {
   return useSWR<ResourceReviewListResponseSchema>(
     resourceId ? getResourceReviewPathname({ resourceId }) : null
   );
@@ -20,7 +19,7 @@ export function useResourceReview(
   resourceId?: number | null,
   reviewId?: number | null
 ) {
-  return useSWR<ResourceReviewSchema>(
+  return useSWR<ResourceReviewResponseSchema>(
     resourceId && typeof reviewId === "number"
       ? getResourceReviewPathname({ resourceId, reviewId })
       : null
@@ -31,7 +30,7 @@ type SWRMutationOptions<T = ResourceReviewResponseSchema> =
   SWRMutationConfiguration<T, Error, string | null>;
 
 export const useCreateResourceReview = (
-  resourceId: number,
+  resourceId: number | null,
   { onSuccess, ...options }: SWRMutationOptions = {}
 ) => {
   return useSWRMutation(
@@ -48,8 +47,8 @@ export const useCreateResourceReview = (
 };
 
 export const useUpdateResourceReview = (
-  resourceId: number,
-  reviewId: number,
+  resourceId: number | null,
+  reviewId?: number | null,
   { onSuccess, ...options }: SWRMutationOptions = {}
 ) => {
   return useSWRMutation(

@@ -10,13 +10,13 @@ import {
 } from "react-day-picker";
 
 import { cn } from "@/utils/cn";
-import { Button } from "@/components/atoms/button";
-import { Calendar } from "@/components/atoms/calendar";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/atoms/popover";
+} from "@/components/ui/popover";
 import useControlledState from "@/hooks/useControlledState";
 
 const defaultFormatStr = "yyyy/MM/dd";

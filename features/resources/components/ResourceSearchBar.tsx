@@ -5,8 +5,8 @@ import {
 } from "lucide-react";
 import useShadowToggleOnScroll from "@/hooks/useShadowToggleOnScroll";
 import { cn } from "@/utils/cn";
-import { Button } from "@/components/atoms/button";
-import SearchInput from "@/components/molecules/search-input";
+import { Button } from "@/components/ui/button";
+import SearchInput from "@/components/ui/search-input";
 import useDebounce from "@/hooks/useDebounce";
 import { ResourceSearchParamsSchema } from "@/services/resources/core/schema";
 import ResourceSearchModal from "./ResourceSearchModal";
@@ -22,7 +22,7 @@ export default function ResourceSearchBar({
 }: ResourceSearchBarProps) {
   const [query, setQuery] = useState(filters?.query ?? "");
   const prevQueryRef = useRef(query);
-  const prevFiltersQueryRef = useRef(filters?.query);
+  const isReady = useRef(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { height, isShowShadow, TriggerElement } = useShadowToggleOnScroll();
 
@@ -44,14 +44,11 @@ export default function ResourceSearchBar({
   }, [query, debouncedUpdateSearch]);
 
   useEffect(() => {
-    if (
-      filters?.query !== prevFiltersQueryRef.current &&
-      filters?.query !== query
-    ) {
+    if (!isReady.current && (filters?.query || query)) {
       setQuery(filters?.query ?? "");
+      isReady.current = true;
     }
-    prevFiltersQueryRef.current = filters?.query;
-  }, [query, filters?.query]);
+  }, [filters?.query, query]);
 
   return (
     <>
@@ -64,9 +61,9 @@ export default function ResourceSearchBar({
         style={{ top: `${height}px` }}
       >
         <SearchInput
-          className="w-1/2"
-          // value={query}
-          // onChange={setQuery}
+          className="w-full md:w-1/2"
+          value={query}
+          onChange={setQuery}
           placeholder="想找什麼資源..."
         />
         <div className="flex gap-3 justify-end">

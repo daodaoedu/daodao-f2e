@@ -1,4 +1,4 @@
-import ResponsiveModal, { ResponsiveModalSize } from '@/components/molecules/responsive-modal';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
 import { CreateIdeaRequest } from '@/services/ideas';
 import IdeaForm from '../Form';
 
