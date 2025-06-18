@@ -24,7 +24,7 @@ const formatQuery = <T extends z.ZodObject<z.ZodRawShape>>(
 };
 
 export default function useQueryState<T extends z.AnyZodObject>(schema: T) {
-  const { query, pathname, push } = useRouter();
+  const { query, push } = useRouter();
 
   const state = useMemo<z.infer<T>>(() => formatQuery(schema, query), [query]);
 
@@ -32,9 +32,11 @@ export default function useQueryState<T extends z.AnyZodObject>(schema: T) {
     (value: z.infer<T> | ((prevState: z.infer<T>) => z.infer<T>)) => {
       const newValue = typeof value === "function" ? value(state) : value;
       const newQuery = formatQuery(schema, newValue, true);
-      push({ pathname, query: newQuery }, undefined, { scroll: false });
+      push({ pathname: window.location.pathname, query: newQuery }, undefined, {
+        scroll: false,
+      });
     },
-    [state, pathname, push]
+    [state, push]
   );
 
   return [state, setState] as const;

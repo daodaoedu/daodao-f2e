@@ -1,7 +1,7 @@
 import toast from 'react-hot-toast';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { uploadImagesSchema } from '@/services/images';
-import { Button, type ButtonProps } from '@/components/atoms/button';
+import { Button, type ButtonProps } from '@/components/ui/button';
 
 export interface ImageDataType {
   id: string;

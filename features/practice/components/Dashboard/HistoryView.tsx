@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowLeft, Calendar, TrendingUp, Target } from 'lucide-react';
 import { Practice } from '@/services/practice/schema';
 import { CheckInService } from '@/services/practice/checkIn';
-import { Button } from '@/components/atoms/button';
+import { Button } from '@/components/ui/button';
 
 interface HistoryViewProps {
   practice: Practice;

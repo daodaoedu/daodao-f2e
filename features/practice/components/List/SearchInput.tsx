@@ -1,9 +1,9 @@
 // 搜尋輸入組件
 import React from 'react';
 import { Search, X } from 'lucide-react';
-import { Input } from '@/components/atoms/input';
-import { Button } from '@/components/atoms/button';
 import { cn } from '@/utils/cn';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface SearchInputProps {
   value: string;

@@ -1,11 +1,11 @@
 import React from 'react';
 import { Plus, X, Target, BookOpen, Link as LinkIcon } from 'lucide-react';
 import { Practice, Resource, ResourceType } from '@/features/practice';
-import { Button } from '@/components/atoms/button';
-import { Input } from '@/components/atoms/input';
-import { Textarea } from '@/components/atoms/textarea';
-import { Label } from '@/components/atoms/label';
 import { cn } from '@/utils/cn';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface EditFormProps {
   formData: Partial<Practice>;

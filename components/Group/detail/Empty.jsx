@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Box from '@mui/material/Box';
 import nobodyLandGif from '@/public/assets/nobody-land.gif';
-import { Button } from '@/components/atoms/button';
+import { Button } from '@/components/ui/button';
 import StyledPaper from '../Paper.styled';
 import { StyledContainer } from './Detail.styled';
 

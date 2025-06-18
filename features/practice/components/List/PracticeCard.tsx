@@ -19,17 +19,17 @@ import {
   getContentTypeLabel,
   canCheckIn,
  formatRelativeTime } from '@/services/practice/utils';
-import { ProgressBar } from '@/components/atoms/progress-bar';
-import { StatusBadge, StatusVariant } from '@/components/atoms/status-badge';
-import { Button } from '@/components/atoms/button';
+import { cn } from '@/utils/cn';
+import { ProgressBar } from '@/components/ui/progress-bar';
+import { StatusBadge, StatusVariant } from '@/components/ui/status-badge';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/atoms/dropdown-menu';
-import { cn } from '@/utils/cn';
+} from '@/components/ui/dropdown-menu';
 import TagList from '../Shared/TagList';
 
 interface PracticeCardProps {

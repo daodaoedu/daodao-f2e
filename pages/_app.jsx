@@ -15,7 +15,7 @@ import { DialogProvider } from '@/contexts/Dialog';
 import CompleteInfoReminderDialog from '@/shared/components/CompleteInfoReminderDialog';
 import GlobalStyle from '@/shared/styles/Global';
 import Image from "@/shared/components/Image";
-import ResponsiveModal from '@/components/molecules/responsive-modal';
+import ResponsiveModal from '@/components/ui/responsive-modal';
 import themeFactory from '@/shared/styles/themeFactory';
 import { fetcher } from '@/utils/http';
 import { parseToString } from '@/utils/helper';

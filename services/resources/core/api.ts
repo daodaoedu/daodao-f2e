@@ -3,8 +3,7 @@ import { parseToNumber, parseToString } from "@/utils/helper";
 import { fetcher, mutations } from "@/utils/http";
 
 import {
-  CreateResourceFormSchema,
-  UpdateResourceFormSchema,
+  ResourceFormSchema,
   ResourceMutationResponseSchema,
   ResourceListResponseSchema,
   ResourceDetailResponseSchema,
@@ -26,17 +25,17 @@ export const getResourcePathname = ({ id }: GetResourcePathnameProps = {}) => {
 };
 
 interface ResourceAPIType {
-  read: (resourceId: string) => Promise<ResourceDetailResponseSchema>;
+  read: (resourceId: number) => Promise<ResourceDetailResponseSchema>;
   readList: () => Promise<ResourceListResponseSchema>;
   create: MutationFetcher<
     ResourceMutationResponseSchema,
     string,
-    CreateResourceFormSchema
+    ResourceFormSchema
   >;
   update: MutationFetcher<
     ResourceMutationResponseSchema,
     string,
-    UpdateResourceFormSchema
+    ResourceFormSchema
   >;
   delete: MutationFetcher<void, string, { id: number }>;
 }

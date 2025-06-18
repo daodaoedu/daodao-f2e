@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar, Target, BookOpen } from 'lucide-react';
 import { colors, contentTypeOptions } from '@/constants/practice';
 import { PathInfo } from '@/services/practice/schema';
-import { Button } from '@/components/atoms/button';
+import { Button } from '@/components/ui/button';
 
 interface StepFivePreviewProps {
   pathInfo: PathInfo;

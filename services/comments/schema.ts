@@ -6,6 +6,8 @@ export enum CommentType {
   Outcome = 'outcome',
   Review = 'review',
   Idea = 'idea',
+  Resource = 'resource',
+  ResourceReview = 'resource-review',
 }
 
 export enum CommentVisibility {

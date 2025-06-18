@@ -1,6 +1,6 @@
 import ResponsiveModal, {
   ResponsiveModalSize,
-} from "@/components/molecules/responsive-modal";
+} from "@/components/ui/responsive-modal";
 import { ResourceSearchParamsSchema } from "@/services/resources/core/schema";
 import ResourceSearchForm from "./ResourceSearchForm";
 

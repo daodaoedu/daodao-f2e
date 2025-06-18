@@ -11,9 +11,9 @@ import {
 } from 'lucide-react';
 import { Practice } from '@/services/practice/schema';
 import { CheckInService } from '@/services/practice/checkIn';
-import { Button } from '@/components/atoms/button';
 import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
 import { formatSmartDate, formatDate } from '@/services/practice/utils';
+import { Button } from '@/components/ui/button';
 import TagList from '../Shared/TagList';
 
 interface MainDashboardProps {

@@ -3,16 +3,16 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
 import { PathInfo } from '@/services/practice/schema';
-import { Button } from '@/components/atoms/button';
-import { Input } from '@/components/atoms/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/atoms/select';
-import { RadioGroup, RadioGroupItem } from '@/components/atoms/radio-group';
-import { Label } from '@/components/atoms/label';
-import { Textarea } from '@/components/atoms/textarea';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/atoms/popover';
-import { Calendar } from '@/components/atoms/calendar';
 import { cn } from '@/utils/cn';
 import { formatDateISO } from '@/services/practice/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 
 interface StepTwoProps {
   pathInfo: PathInfo;

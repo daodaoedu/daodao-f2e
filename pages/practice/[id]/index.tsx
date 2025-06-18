@@ -4,8 +4,8 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { usePracticeDetail } from '@/features/practice/hooks';
 import DashboardFlow from '@/features/practice/components/Dashboard/DashboardFlow';
-import { Button } from '@/components/atoms/button';
 import { useScrollToTopOnMount } from '@/features/practice/hooks/useScrollToTop';
+import { Button } from '@/components/ui/button';
 
 const PracticeDetailPage: React.FC = () => {
   const router = useRouter();

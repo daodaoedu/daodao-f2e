@@ -2,8 +2,8 @@
 import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import { Practice } from '@/services/practice/schema';
-import { Button } from '@/components/atoms/button';
-import { Badge } from '@/components/atoms/badge';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface DeleteConfirmProps {
   practice: Practice | null;

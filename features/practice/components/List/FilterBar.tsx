@@ -2,7 +2,7 @@ import React from 'react';
 import { Filter, X } from 'lucide-react';
 import { PracticeFilter, PracticeStatus, ContentType } from '@/services/practice/schema';
 import { getContentTypeLabel, getStatusLabel } from '@/services/practice/utils';
-import { Button } from '@/components/atoms/button';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,8 +10,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuCheckboxItem
-} from '@/components/atoms/dropdown-menu';
-import { Badge } from '@/components/atoms/badge';
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 
 interface FilterBarProps {
   filter: PracticeFilter;

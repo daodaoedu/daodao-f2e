@@ -1,9 +1,9 @@
 import React from 'react';
 import { Plus, X } from 'lucide-react';
-import { Button } from '@/components/atoms/button';
-import { Input } from '@/components/atoms/input';
-import { Label } from '@/components/atoms/label';
 import { cn } from '@/utils/cn';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface Step3Props {
   handleNextStep: () => void;

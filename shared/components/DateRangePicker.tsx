@@ -9,7 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/atoms/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/utils/cn";
 
 interface CustomPickerDayProps extends PickersDayProps<Dayjs> {

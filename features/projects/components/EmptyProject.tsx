@@ -1,5 +1,5 @@
 import AccessDeniedImg from '@/public/assets/projects/access-denied.png';
-import { Button } from '@/components/atoms/button';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
 import Link from 'next/link';
 

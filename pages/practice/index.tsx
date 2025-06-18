@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Plus, Grid3x3, List, Download, Upload, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/atoms/button';
 
 // 使用新的 hooks
 import { usePracticeManager } from '@/features/practice/hooks';
@@ -15,6 +14,7 @@ import DeleteConfirm from '@/features/practice/components/Edit/DeleteConfirm';
 
 // 型別
 import { Practice } from '@/services/practice/schema';
+import { Button } from '@/components/ui/button';
 
 const PracticeListPage: React.FC = () => {
   const router = useRouter();

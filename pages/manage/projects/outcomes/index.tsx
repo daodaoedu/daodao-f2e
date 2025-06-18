@@ -9,7 +9,7 @@ import {
   OutcomeUpdateModal,
 } from "@/features/projects";
 import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import { useProject } from "@/services/projects";
 import {
   useProjectOutcome,
