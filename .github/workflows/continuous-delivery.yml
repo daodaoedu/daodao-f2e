@@ -23,9 +23,7 @@ on:
 
 env:
   BRANCH_NAME: ${{ github.ref_name }}
-  IS_INTERNAL_PR: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
   PROD_URL: "https://www.daoedu.tw/"
-  HAS_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL != '' }}
   HUSKY: 0
 
 jobs:
@@ -77,7 +75,7 @@ jobs:
           command: pages deploy --branch=${{ env.BRANCH_NAME }}
 
       - name: Send Build and Deploy Failed Notification
-        if: (steps.build.outcome == 'false' || steps.deploy.outcome == 'failure') && env.HAS_WEBHOOK == 'true'
+        if: (steps.build.outcome == 'false' || steps.deploy.outcome == 'failure')
         uses: ./.github/actions/notification
         with:
           TYPE: failure
@@ -95,7 +93,7 @@ jobs:
           exit 1
 
       - name: Send Build Succeeded Notification
-        if: steps.deploy.outcome == 'success' && env.HAS_WEBHOOK == 'true'
+        if: steps.deploy.outcome == 'success'
         uses: ./.github/actions/notification
         with:
           TYPE: success
