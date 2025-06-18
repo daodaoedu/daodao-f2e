@@ -40,26 +40,42 @@ runs:
         DISCORD_WEBHOOK_URL: ${{ inputs.DISCORD_WEBHOOK_URL }}
       with:
         script: |
-          const { tsImport } = await import(
-            '${{ github.workspace }}/node_modules/tsx/dist/esm/api/index.cjs'
-          );
+          const avatarUrl = "https://raw.githubusercontent.com/daodaoedu/daodao-f2e/main/public/daodao-logo.webp";
+          const username = "島島阿學";
+          const colors = {
+            success: 5763207,
+            failure: 15548997,
+            info: 1752301,
+            default: 9868950,
+          };
 
-          const moduleResult = await tsImport(
-            './utils/createDiscordNotificationRequest.ts',
-            '${{ github.workspace }}/'
-          );
+          const author = {
+            name: process.env.AUTHOR_NAME,
+            url: process.env.AUTHOR_URL,
+            icon_url: process.env.AUTHOR_ICON_URL,
+          };
 
-          const discordNotificationRequest = moduleResult.default.default({
+          const embed = {
+            author,
             title: process.env.TITLE,
             description: process.env.DESCRIPTION,
-            authorName: process.env.AUTHOR_NAME,
-            authorUrl: process.env.AUTHOR_URL,
-            authorIconUrl: process.env.AUTHOR_ICON_URL,
-            type: process.env.TYPE
-          });
+            color: colors[process.env.TYPE],
+          };
+
+          const payload = {
+            avatar_url: avatarUrl,
+            username,
+            embeds: [embed],
+          };
+
+          const discordNotificationRequest = {
+            headers: { "Content-Type": "application/json" },
+            method: "POST",
+            body: JSON.stringify(payload),
+          };
 
           const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-          
+
           if (!webhookUrl || webhookUrl.trim() === '') {
             console.error('Discord webhook URL is missing or empty');
             return;

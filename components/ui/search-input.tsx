@@ -1,8 +1,8 @@
 import { forwardRef } from "react";
 import { X, SearchIcon } from "lucide-react";
 import { cn } from "@/utils/cn";
-import { Input } from "@/components/atoms/input";
-import { Button } from "@/components/atoms/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import useControlledState from "@/hooks/useControlledState";
 
 interface SearchInputProps

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button } from '@/components/atoms/button';
+import { Button } from '@/components/ui/button';
 
 interface ResourceData {
   name: string;

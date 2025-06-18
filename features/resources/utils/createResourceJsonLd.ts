@@ -4,12 +4,12 @@ import { ResourceSchema } from '@/services/resources';
 export default function createResourceJsonLd(result: ResourceSchema) {
   return JsonLdFactory.createCourseBuilder()
     .setId(`https://www.daoedu.tw/resource/${result.id}`)
-    .setName(result.resourceName)
+    .setName(result.name)
     .setDescription(result.description)
     .setUrl(`https://www.daoedu.tw/resource/${result.id}`)
-    .setImage(result.resourceImgUrl ?? '')
+    .setImage(result.imageUrl ?? '')
     .setEducationalLevel(
-      result.targetAudience.split(',').map((age) => age.trim())
+      result.level.split(',').map((age) => age.trim())
     )
     .setEducationalUse(
       result.majorCategory.split(',').map((cat) => cat.trim())

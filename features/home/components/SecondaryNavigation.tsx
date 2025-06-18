@@ -1,5 +1,5 @@
-import { Button } from "@/components/atoms/button";
 import { cn } from "@/utils/cn";
+import { Button } from "@/components/ui/button";
 
 interface SecondaryNavigationProps {
   activeTab: string;

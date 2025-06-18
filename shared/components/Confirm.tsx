@@ -1,5 +1,5 @@
-import ResponsiveModal, { ResponsiveModalSize } from '@/components/molecules/responsive-modal';
-import { Button } from '@/components/atoms/button';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
+import { Button } from '@/components/ui/button';
 
 interface ConfirmModalProps {
   title: string;

@@ -1,9 +1,9 @@
 import { parseToArray } from '@/utils/helper';
 import { CATEGORIES, ICategory, SEARCH_TAGS } from '@/constants/category';
 
-export type Categories = [ICategory, ICategory] | [ICategory] | null;
+export type CategoriesType = [ICategory, ICategory] | [ICategory] | null;
 
-export default function getCategories(source: string[] | null): Categories {
+export default function getCategories(source: string[] | null): CategoriesType {
   const data = parseToArray<keyof typeof SEARCH_TAGS>(source);
   if (!Array.isArray(data) || data.length === 0) return null;
 

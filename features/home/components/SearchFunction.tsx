@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Search } from "lucide-react";
-import { Button } from "@/components/atoms/button";
-import { Input } from "@/components/atoms/input";
 import { cn } from "@/utils/cn";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface SearchFunctionProps {
   onSearch: (query: string) => void;

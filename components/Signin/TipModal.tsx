@@ -1,5 +1,5 @@
 import Image from "@/shared/components/Image";
-import ResponsiveModal from "@/components/molecules/responsive-modal";
+import ResponsiveModal from "@/components/ui/responsive-modal";
 
 interface TipModalProps {
   isOpen: boolean;

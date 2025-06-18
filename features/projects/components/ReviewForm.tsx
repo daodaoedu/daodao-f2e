@@ -6,8 +6,8 @@ import {
   projectReviewFormSchema,
   ProjectReviewFormSchema,
 } from "@/services/projects";
-import { Button } from "@/components/atoms/button";
-import { Form } from "@/components/atoms/form";
+import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
 import MarkdownEditor from "@/shared/components/MarkdownEditor";
 import numberToChineseNumber from "@/utils/numberToChineseNumber";
 import { cn } from "@/utils/cn";

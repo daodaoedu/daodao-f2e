@@ -8,7 +8,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogContentSize,
-} from "@/components/atoms/dialog";
+} from "@/components/ui/dialog";
 import {
   Drawer,
   DrawerContent,
@@ -16,7 +16,7 @@ import {
   DrawerTitle,
   DrawerDescription,
   DrawerFooter,
-} from "@/components/atoms/drawer";
+} from "@/components/ui/drawer";
 import useMediaQuery from "@/hooks/useMediaQuery";
 
 export interface ResponsiveModalProps {

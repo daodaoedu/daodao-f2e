@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/atoms/button';
+import { Button } from '@/components/ui/button';
 import Nav from '@/components/Marathon/Nav';
 import { AnnouncementList } from '@/components/Marathon/Announcement';
 import { logEvent } from '@/utils/analytics';

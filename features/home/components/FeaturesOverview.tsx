@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import { Section, Heading, Text } from "./index";
 
 interface FeaturesOverviewProps {

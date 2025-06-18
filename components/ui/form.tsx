@@ -11,7 +11,7 @@ import {
 } from "react-hook-form";
 
 import { cn } from "@/utils/cn";
-import { Label } from "@/components/atoms/label";
+import { Label } from "@/components/ui/label";
 
 const Form = FormProvider;
 
@@ -84,19 +84,32 @@ const FormItem = React.forwardRef<
 });
 FormItem.displayName = "FormItem";
 
+interface FormLabelProps
+  extends React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> {
+  required?: boolean;
+}
+
 const FormLabel = React.forwardRef<
   React.ComponentRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => {
+  FormLabelProps
+>(({ className, required, children, ...props }, ref) => {
   const { error, formItemId } = useFormField();
 
   return (
     <Label
       ref={ref}
-      className={cn(error && "text-destructive", className)}
+      className={cn(
+        "block mb-3 body-lg font-bold text-basic-500",
+        error && "text-destructive",
+        className
+      )}
       htmlFor={formItemId}
+      aria-required={required}
       {...props}
-    />
+    >
+      {children}
+      {required && <span className="text-alert ml-1">*</span>}
+    </Label>
   );
 });
 FormLabel.displayName = "FormLabel";
@@ -134,7 +147,7 @@ const FormDescription = React.forwardRef<
     <p
       ref={ref}
       id={formDescriptionId}
-      className={cn("text-[0.8rem] text-muted-foreground", className)}
+      className={cn("block mb-3 body-lg text-basic-500", className)}
       {...props}
     />
   );

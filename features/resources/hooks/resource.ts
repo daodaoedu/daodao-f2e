@@ -39,11 +39,11 @@ export const useCreateResource = ({
 };
 
 export const useUpdateResource = (
-  id: number,
+  id?: number | null,
   { onSuccess, ...options }: SWRMutationOptions = {}
 ) => {
   return useSWRMutation(
-    id ? getResourcePathname({ id }) : null,
+    typeof id === "number" ? getResourcePathname({ id }) : null,
     resourceAPI.update,
     {
       ...options,

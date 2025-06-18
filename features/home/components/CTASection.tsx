@@ -1,5 +1,5 @@
 import { ArrowRight, CheckCircle } from "lucide-react";
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import { Section, Heading } from "./index";
 
 interface CTASectionProps {

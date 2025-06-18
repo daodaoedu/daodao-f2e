@@ -1,5 +1,5 @@
 import { Project } from '@/components/Projects/Project/type';
-import { Button } from '@/components/atoms/button';
+import { Button } from '@/components/ui/button';
 import { MdOutlineEdit } from 'react-icons/md';
 import {
   Panel,

@@ -1,12 +1,12 @@
 import { ChevronDown } from "lucide-react";
-import { Button } from "@/components/atoms/button";
+import { cn } from "@/utils/cn";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/atoms/dropdown-menu";
-import { cn } from "@/utils/cn";
+} from "@/components/ui/dropdown-menu";
 
 interface ExploreTabsProps {
   activeTab: string;

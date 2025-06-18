@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react';
 import { FaLinkedin, FaMedium, FaResearchgate, FaSquareFacebook, FaSquareThreads } from "react-icons/fa6";
 import EastIcon from '@mui/icons-material/East';
 import Image from '@/shared/components/Image';
-import ResponsiveModal, { ResponsiveModalSize } from '@/components/molecules/responsive-modal';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
 import { cn } from '@/utils/cn';
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/atoms/carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 
 const mentors = [
   {

@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { MoreVertical, Shell, MessageCircle, Share2, User, Bookmark, Flag } from "lucide-react";
-import { Button } from "@/components/atoms/button";
-import { Card, CardContent } from "@/components/atoms/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/atoms/dropdown-menu";
-import { Badge } from "@/components/atoms/badge";
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 
 interface PlanCardProps {
   plan: {

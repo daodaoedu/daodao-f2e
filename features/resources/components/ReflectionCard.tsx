@@ -1,8 +1,10 @@
-import DefaultAvatarIcon from '@/public/assets/icons/default-avatar.svg';
-import StarIcon from '@/public/assets/icons/star.svg';
-import ShareIcon from '@/public/assets/icons/share.svg';
+import DefaultAvatarIcon from "@/public/assets/icons/default-avatar.svg";
+import StarIcon from "@/public/assets/icons/star.svg";
+import ShareIcon from "@/public/assets/icons/share.svg";
+import { cn } from "@/utils/cn";
 
 type ReflectionCardProps = {
+  className?: string;
   userName?: string;
   userAvatar?: string;
   stars?: number;
@@ -12,15 +14,21 @@ type ReflectionCardProps = {
 
 export default function ReflectionCard(props: ReflectionCardProps) {
   const {
-    userName = '小許',
+    className,
+    userName = "小許",
     userAvatar = <DefaultAvatarIcon className="scale-150 origin-top-left" />,
     stars = 4,
-    content = '學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得',
-    buttonContent = ' 自然語言處理 Naturalewqeqwe',
+    content = "學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得",
+    buttonContent = " 自然語言處理 Naturalewqeqwe",
   } = props;
 
   return (
-    <div className="w-[17.625rem] bg-white rounded-xl p-[1.25rem] flex flex-col gap-3 md:p-6 md:gap-4">
+    <div
+      className={cn(
+        "bg-white rounded-xl p-5 flex flex-col gap-3 md:p-6 md:gap-4",
+        className
+      )}
+    >
       <div className="flex gap-2">
         <div className="w-12 h-12">{userAvatar}</div>
 
@@ -32,7 +40,7 @@ export default function ReflectionCard(props: ReflectionCardProps) {
             {[1, 2, 3, 4, 5].map((unused, idx) => (
               <StarIcon
                 key={unused}
-                color={stars >= idx + 1 ? '#FF9526' : '#DBDBDB'}
+                color={stars >= idx + 1 ? "#FF9526" : "#DBDBDB"}
               />
             ))}
           </div>

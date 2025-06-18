@@ -7,7 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/atoms/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { SearchFunction } from "@/features/home/components/SearchFunction";
 

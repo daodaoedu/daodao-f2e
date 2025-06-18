@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import { Container } from "./components/Container";
 import { ExploreTabs } from "./components/ExploreTabs";
 import { IdeaCard } from "./components/IdeaCard";
