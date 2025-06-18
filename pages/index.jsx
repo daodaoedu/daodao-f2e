@@ -1,19 +1,10 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import dynamic from 'next/dynamic';
 import SEOConfig from '../shared/components/SEO';
-import Home from '../components/Home';
-import { isFeatureEnabled } from '../utils/featureFlags';
-
-// 動態載入新首頁組件
-const NewHome = dynamic(() => import('../features/home/NewHomePage'), {
-  loading: () => <div>Loading...</div>
-});
+import NewHome from '../features/home/NewHomePage';
 
 const HomePage = () => {
   const router = useRouter();
-  const [useNewHome, setUseNewHome] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   const SEOData = useMemo(
     () => ({
@@ -47,27 +38,10 @@ const HomePage = () => {
     [router?.asPath],
   );
 
-  useEffect(() => {
-    setUseNewHome(isFeatureEnabled('newHome'));
-    setIsLoading(false);
-  }, [router.asPath]);
-
-  // 顯示載入狀態
-  if (isLoading) {
-    return (
-      <>
-        <SEOConfig {...SEOData} />
-        <div className="min-h-screen bg-basic-100 flex items-center justify-center">
-          <div className="text-basic-400">Loading...</div>
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
       <SEOConfig {...SEOData} />
-      {useNewHome ? <NewHome /> : <Home />}
+      <NewHome />
     </>
   );
 };
