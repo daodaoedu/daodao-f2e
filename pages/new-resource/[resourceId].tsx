@@ -12,12 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import NotExist from "@/shared/components/NotExist";
 import CommentSection from "@/shared/components/Comment/CommentSection";
@@ -34,6 +29,8 @@ enum TabEnum {
   Reviews = "reviews",
   Contributor = "contributor",
 }
+
+export const runtime = "experimental-edge";
 
 export const getServerSideProps = (async (context) => {
   const resourceId = parseToNumber(context.params?.resourceId);
@@ -66,7 +63,9 @@ export const getServerSideProps = (async (context) => {
 export default function ResourceDetailPage({
   resource,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const [query, setQuery] = useQueryState(z.object({ tab: z.nativeEnum(TabEnum) }));
+  const [query, setQuery] = useQueryState(
+    z.object({ tab: z.nativeEnum(TabEnum) })
+  );
 
   if (!resource) {
     return <NotExist />;
