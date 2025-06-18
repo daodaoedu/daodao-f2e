@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Button } from '@/components/atoms/button';
 import {
   MoreHorizontal,
   Edit,
@@ -12,15 +11,16 @@ import {
 import Comment from '@/public/assets/icons/comment.svg';
 import Shell from '@/public/assets/icons/shell.svg';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
+import Image from '@/shared/components/Image';
+import type { IdeaSchema } from '@/services/ideas';
+import { ROLE } from '@/constants/member';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/atoms/dropdown-menu';
-import Image from '@/shared/components/Image';
-import type { IdeaSchema } from '@/services/ideas';
-import { ROLE } from '@/constants/member';
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 import { formatIdeaDate, truncateText } from '../utils';
 
 interface IdeaCardProps {

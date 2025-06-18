@@ -1,12 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { Button } from '@/components/atoms/button';
-import { Input } from '@/components/atoms/input';
 import {
   Search,
   Plus,
   RefreshCw,
   Loader2
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import IdeaCard from './IdeaCard';
 import { useIdeaSearch, useIdeaActions, useIdeasCache } from '../hooks';
 

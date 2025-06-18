@@ -18,6 +18,22 @@ export default {
     "./shared/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
+    container: {
+      center: true,
+      screens: {
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1200px",
+      },
+      padding: {
+        DEFAULT: "1rem",
+        sm: "1.5rem",
+        md: "2rem",
+        lg: "2.5rem",
+        xl: "3rem",
+      },
+    },
     fontFamily: {
       sans: ["Noto Sans TC", ...defaultTheme.fontFamily.sans],
     },
@@ -135,35 +151,37 @@ export default {
     /** Typography */
     typography,
     plugin(({ addComponents, addUtilities, theme }) => {
-      const sizes = ["lg", "md", "sm"];
       const headingFontSizes = [
-        ["2.25rem", "1.75rem"],
-        ["1.375rem", "1.375rem"],
-        ["1.125rem", "1.25rem"],
-      ];
+        ["xl", "2.25rem", "1.75rem"],
+        ["lg", "1.75rem", "1.5rem"],
+        ["md", "1.375rem", "1.375rem"],
+        ["sm", "1.125rem", "1.25rem"],
+      ] as const;
       const bodyFontSizes = [
-        ["1.125rem", "1.25rem"],
-        ["1rem", "1.125rem"],
-        ["0.875rem", "1rem"],
-      ];
-      sizes.forEach((size, index) => {
+        ["lg", "1.125rem", "1.25rem"],
+        ["md", "1rem", "1.125rem"],
+        ["sm", "0.875rem", "1rem"],
+      ] as const;
+      headingFontSizes.forEach(([size, desktopSize, mobileSize]) => {
         addComponents({
           [`.heading-${size}`]: {
-            fontSize: headingFontSizes[index][1],
+            fontSize: mobileSize,
             lineHeight: "140%",
             fontWeight: "bold",
             [`@media (min-width: ${theme("screens.md")})`]: {
-              fontSize: headingFontSizes[index][0],
+              fontSize: desktopSize,
             },
           },
         });
+      });
+      bodyFontSizes.forEach(([size, desktopSize, mobileSize]) => {
         addComponents({
           [`.body-${size}`]: {
-            fontSize: bodyFontSizes[index][1],
+            fontSize: mobileSize,
             lineHeight: "140%",
             fontWeight: "400",
             [`@media (min-width: ${theme("screens.md")})`]: {
-              fontSize: bodyFontSizes[index][0],
+              fontSize: desktopSize,
             },
           },
         });
@@ -263,10 +281,13 @@ export default {
           animation:
             "button-ripple var(--animation-duration, 500ms) var(--animation-delay, 0ms) forwards cubic-bezier(0, 0, 0.2, 1)",
           "@keyframes button-ripple": {
-            "0%": { transform: "translate(-50%, -50%) scale(0)", opacity: "1" },
-            "75%": {
+            "0%": {
+              transform: "translate(-50%, -50%) scale(0)",
+              opacity: "1",
+            },
+            "85%": {
               transform: "translate(-50%, -50%) scale(4)",
-              opacity: "0.2",
+              opacity: "0.1",
             },
             "100%": {
               transform: "translate(-50%, -50%) scale(6)",

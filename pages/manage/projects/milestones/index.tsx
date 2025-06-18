@@ -12,8 +12,8 @@ import MilestoneCard, {
 } from "@/components/Milestones/MilestoneCard";
 import DraggableMilestones from "@/components/Milestones/DraggableMilestones";
 import dayjs from "dayjs";
-import { DatePickerWithRange } from "@/components/molecules/date-picker";
-import { Button } from "@/components/atoms/button";
+import { DatePickerWithRange } from "@/components/ui/date-picker";
+import { Button } from "@/components/ui/button";
 import { ProjectMilestoneSchema } from "@/services/projects";
 import SwapRightIcon from "@/public/assets/icons/swap-right.svg";
 import { useMilestonesDateRange } from "@/features/projects";

@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { Container } from '@/components/atoms/container';
 import { cn } from '@/utils/cn';
+import { Container } from '@/components/ui/container';
 import IdeaList from './IdeaList';
 import IdeaCreateContainer from './IdeaCreateContainer';
 import IdeasErrorBoundary, { NetworkError, useNetworkRetry } from './ErrorBoundary';

@@ -49,9 +49,9 @@ import utc from 'dayjs/plugin/utc'
 #### 1. shadcn/ui + Radix UI 元件
 ```typescript
 // ✅ 正確的 shadcn/ui 元件使用方式
-import { Button } from '@/components/atoms/button'
-import { Input } from '@/components/atoms/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/atoms/select'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 ```
 
 #### 2. date-fns 日期處理
@@ -98,7 +98,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/atoms/form";
+} from "@/components/ui/form";
 
 // 使用從 services 導入的 schema
 import { 
@@ -144,7 +144,7 @@ const form = useForm({
 ### 1. 元件使用規範
 ```typescript
 // ✅ 良好的 shadcn/ui 元件使用方式
-import { Button } from '@/components/atoms/button'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/utils/cn'
 
 const MyComponent = ({ className, variant = 'default', ...props }) => {

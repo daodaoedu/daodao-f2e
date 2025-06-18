@@ -1,10 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useFieldArray } from 'react-hook-form';
-import { Button } from '@/components/atoms/button';
-import { Input } from '@/components/atoms/input';
-import { Textarea } from '@/components/atoms/textarea';
-import { Label } from '@/components/atoms/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/atoms/select';
 import {
   Image as ImageIcon,
   Hash,
@@ -22,6 +17,11 @@ import {
   useIdeaFormValidation,
   useUpdateIdeaFormValidation
 } from '@/features/ideas/hooks/useIdeaFormValidation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // 預設標籤
 const DEFAULT_TAGS = [

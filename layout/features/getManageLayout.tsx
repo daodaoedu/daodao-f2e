@@ -18,6 +18,9 @@ const getCanVisitMentorWorkspace = (role?: RoleEnum) => {
 const manageRoutes = {
   manage: '/manage',
   projects: '/manage/projects',
+  practices: '/manage/practices',
+  ideas: '/manage/ideas',
+  groups: '/manage/groups',
   myCard: '/personal-card/my-card',
   collections: '/manage/treasure/collections',
   footprints: '/manage/treasure/footprints',
@@ -43,7 +46,6 @@ export const getManageSidebarItems = ({
 
   const items: SidebarItemType[] = [
     genSidebarItem('我的小島', manageRoutes.manage),
-    genSidebarItem('我的學習計畫', manageRoutes.projects),
     genSidebarItem('個人名片', manageRoutes.myCard),
     {
       label: '百寶箱',
@@ -53,6 +55,10 @@ export const getManageSidebarItems = ({
         genSidebarItem('追蹤的夥伴', manageRoutes.following, true),
       ],
     },
+    genSidebarItem('學習計畫', manageRoutes.projects),
+    genSidebarItem('主題實踐', manageRoutes.practices),
+    genSidebarItem('想法', manageRoutes.ideas),
+    genSidebarItem('揪團', manageRoutes.groups),
   ];
 
   if (getCanVisitMentorWorkspace(role)) {

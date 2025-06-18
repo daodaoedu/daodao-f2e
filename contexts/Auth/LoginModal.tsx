@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "@/shared/components/Image";
-import ResponsiveModal from "@/components/molecules/responsive-modal";
+import ResponsiveModal from "@/components/ui/responsive-modal";
 import openWindowPopup from "@/utils/openWindowPopup";
 import { cn } from "@/utils/cn";
 import getEnv from "@/utils/env";

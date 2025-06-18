@@ -17,7 +17,7 @@ import { getIsCheckDragMilestoneStorage } from "@/utils/storage";
 import { useDraggableSensors } from "@/hooks/useDraggableSensors";
 import { useDraggableContainer } from "@/hooks/useDraggableContainer";
 import DraggableItem from "@/shared/components/DraggableItem";
-import { DatePickerWithRange } from "@/components/molecules/date-picker";
+import { DatePickerWithRange } from "@/components/ui/date-picker";
 import SwapRightIcon from "@/public/assets/icons/swap-right.svg";
 import MilestoneItem from "./MilestoneItem";
 

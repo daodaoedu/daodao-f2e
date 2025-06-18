@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { Button } from '@/components/atoms/button';
 import { ArrowLeft, FileText, Eye, Share2 } from 'lucide-react';
 import { parseToString } from '@/utils/helper';
 import { useIdea } from '@/features/ideas/hooks';
@@ -11,6 +10,7 @@ import Comment from '@/public/assets/icons/comment.svg';
 import Image from '@/shared/components/Image';
 import { ROLE } from '@/constants/member';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
+import { Button } from '@/components/ui/button';
 
 const IdeaDetailPage = () => {
   const router = useRouter();

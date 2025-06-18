@@ -16,8 +16,8 @@ import { DateRange } from "react-day-picker";
 import { format, toDate, isValid } from "date-fns";
 import { cn } from "@/utils/cn";
 import { MdSend, MdClose, MdEdit } from "react-icons/md";
-import { Button } from "@/components/atoms/button";
-import { Form } from "@/components/atoms/form";
+import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
 import { useDialog } from "@/contexts/Dialog";
 import {
   useProject,
@@ -26,7 +26,7 @@ import {
   projectMilestoneFormSchema,
 } from "@/services/projects";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DatePickerWithRange } from "@/components/molecules/date-picker";
+import { DatePickerWithRange } from "@/components/ui/date-picker";
 import { getDefaultMilestone } from "./Shared";
 
 interface MilestoneCardProps {

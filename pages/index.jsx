@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '../shared/components/SEO';
-import Home from '../components/Home';
+import NewHome from '../features/home/NewHomePage';
 
 const HomePage = () => {
   const router = useRouter();
+
   const SEOData = useMemo(
     () => ({
       title: '多元學習資源平台｜島島阿學',
@@ -40,7 +41,7 @@ const HomePage = () => {
   return (
     <>
       <SEOConfig {...SEOData} />
-      <Home />
+      <NewHome />
     </>
   );
 };
