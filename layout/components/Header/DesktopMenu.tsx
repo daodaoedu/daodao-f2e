@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MARATHON_LINKS, NAV_LINK, USER_LINK } from "@/constants/category";
+import { MARATHON_LINKS, NAV_LINK, LOGGED_OUT_NAV_LINK, LOGGED_IN_NAV_LINK, USER_LINK } from "@/constants/category";
 import { useAuth, useAuthDispatch } from "@/contexts/Auth";
 import { cn } from "@/utils/cn";
 import {
@@ -9,16 +9,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/atoms/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import { SearchFunction } from "@/features/home/components/SearchFunction";
 
 function DesktopMenu() {
   const auth = useAuth();
   const authDispatch = useAuthDispatch();
 
+  // 根據登入狀態選擇導航連結
+  const navigationLinks = auth.isLoggedIn ? LOGGED_IN_NAV_LINK : LOGGED_OUT_NAV_LINK;
+
+  const handleSearch = (query: string) => {
+    console.log('Search query:', query);
+    // TODO: 實現搜尋邏輯或導航到搜尋頁面
+  };
+
   return (
     <>
       <nav>
         <ul className="flex items-center gap-1">
-          {NAV_LINK.map(({ link, name, target }) => (
+          {navigationLinks.map(({ link, name, target }) => (
             <li key={name}>
               <Link
                 href={link}
@@ -58,6 +67,7 @@ function DesktopMenu() {
         </DropdownMenu>
         {auth.isLoggedIn ? (
           <nav className="flex items-center gap-3.5">
+            <SearchFunction onSearch={handleSearch} />
             <Link
               href="/manage"
               className="px-2 py-5 text-basic-white body-md font-bold"

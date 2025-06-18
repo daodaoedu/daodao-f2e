@@ -1,10 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 import SEOConfig from '../shared/components/SEO';
 import Home from '../components/Home';
 
+// 動態載入新首頁組件
+const NewHome = dynamic(() => import('../features/home/NewHomePage'), {
+  loading: () => <div>Loading...</div>
+});
+
 const HomePage = () => {
   const router = useRouter();
+  const [useNewHome, setUseNewHome] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
   const SEOData = useMemo(
     () => ({
       title: '多元學習資源平台｜島島阿學',
@@ -37,10 +46,43 @@ const HomePage = () => {
     [router?.asPath],
   );
 
+  useEffect(() => {
+    // 檢查環境變數、本地儲存和 URL 參數
+    const checkFeatureFlag = () => {
+      // 環境變數
+      const envEnabled = process.env.NEXT_PUBLIC_NEW_HOME_ENABLED === 'true';
+
+      // localStorage
+      const localEnabled = typeof window !== 'undefined' &&
+        localStorage.getItem('feature:newHome') === 'true';
+
+      // URL 參數
+      const urlEnabled = typeof window !== 'undefined' &&
+        new URLSearchParams(window.location.search).get('enable-newHome') === 'true';
+
+      return envEnabled || localEnabled || urlEnabled;
+    };
+
+    setUseNewHome(checkFeatureFlag());
+    setIsLoading(false);
+  }, [router.asPath]);
+
+  // 顯示載入狀態
+  if (isLoading) {
+    return (
+      <>
+        <SEOConfig {...SEOData} />
+        <div className="min-h-screen bg-basic-100 flex items-center justify-center">
+          <div className="text-basic-400">Loading...</div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <SEOConfig {...SEOData} />
-      <Home />
+      {useNewHome ? <NewHome /> : <Home />}
     </>
   );
 };
