@@ -1,5 +1,5 @@
 import { mutate } from 'swr';
-import { getPracticePathname } from '@/services/modules/practice/api';
+import { getPracticePathname } from '@/services/practice/api';
 
 // 全局快取更新函數
 export const invalidateAllCaches = (practiceId?: string) => {

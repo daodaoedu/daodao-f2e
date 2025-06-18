@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar, Target, BookOpen } from 'lucide-react';
 import { colors, contentTypeOptions } from '@/constants/practice';
-import { PathInfo } from '@/services/modules/practice/schema';
+import { PathInfo } from '@/services/practice/schema';
 import { Button } from '@/components/atoms/button';
 
 interface StepFivePreviewProps {
@@ -48,14 +48,14 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
     const practiceDays = parseInt(pathInfo.totalAmount, 10) || 7;
     endDate.setDate(startDate.getDate() + practiceDays);
 
-    const formatDate = (date: Date): string => {
+    const formatDateForRange = (date: Date): string => {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
       return `${year}/${month}/${day}`;
     };
 
-    return `${formatDate(startDate)}-${formatDate(endDate)}`;
+    return `${formatDateForRange(startDate)}-${formatDateForRange(endDate)}`;
   };
 
   return (

@@ -19,7 +19,7 @@ export type {
   Resource,
   ResourceType,
   DashboardView
-} from '@/services/modules/practice/schema';
+} from '@/services/practice/schema';
 
 // 導出服務
-export { CheckInService } from '@/services/modules/practice/checkIn';
+export { CheckInService } from '@/services/practice/checkIn';

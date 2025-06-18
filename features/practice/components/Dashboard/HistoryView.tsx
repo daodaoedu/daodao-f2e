@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowLeft, Calendar, TrendingUp, Target } from 'lucide-react';
-import { Practice } from '@/services/modules/practice/schema';
-import { CheckInService } from '@/services/modules/practice/checkIn';
+import { Practice } from '@/services/practice/schema';
+import { CheckInService } from '@/services/practice/checkIn';
 import { Button } from '@/components/atoms/button';
 
 interface HistoryViewProps {

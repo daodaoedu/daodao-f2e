@@ -1,7 +1,7 @@
 import useSWR from 'swr';
-import { PracticeStorage } from '@/services/modules/practice/storage';
-import practiceAPI, { getPracticePathname } from '@/services/modules/practice/api';
-import type { CreatePracticeInput, UpdatePracticeInput, CheckInInput } from '@/services/modules/practice/schema';
+import { PracticeStorage } from '@/services/practice/storage';
+import practiceAPI, { getPracticePathname } from '@/services/practice/api';
+import type { CreatePracticeInput, UpdatePracticeInput, CheckInInput } from '@/services/practice/schema';
 import { invalidateAllCaches } from './utils';
 
 // 獲取所有實踐的 Hook

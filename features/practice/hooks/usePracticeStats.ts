@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { PracticeStorage } from '@/services/modules/practice/storage';
+import { PracticeStorage } from '@/services/practice/storage';
 
 // 統計資料的 Hook
 export function usePracticeStats() {

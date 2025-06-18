@@ -13,12 +13,12 @@ import {
   MoreVertical,
   Eye
 } from 'lucide-react';
-import { Practice, ContentType } from '@/services/modules/practice/schema';
+import { Practice, ContentType } from '@/services/practice/schema';
 import {
   calculateProgress,
   getContentTypeLabel,
-  canCheckIn
-} from '@/services/modules/practice/utils';
+  canCheckIn,
+ formatRelativeTime } from '@/services/practice/utils';
 import { ProgressBar } from '@/components/atoms/progress-bar';
 import { StatusBadge, StatusVariant } from '@/components/atoms/status-badge';
 import { Button } from '@/components/atoms/button';
@@ -30,8 +30,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/atoms/dropdown-menu';
 import { cn } from '@/utils/cn';
-import { formatDistanceToNow } from 'date-fns';
-import { zhTW } from 'date-fns/locale';
 import TagList from '../Shared/TagList';
 
 interface PracticeCardProps {
@@ -226,17 +224,8 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
             )}
             <div className="flex items-center space-x-1">
               <Calendar className="h-3 w-3" />
-              <span className="hidden sm:inline">
-                {formatDistanceToNow(new Date(practice.updatedAt), {
-                  addSuffix: true,
-                  locale: zhTW
-                })}
-              </span>
-              <span className="sm:hidden">
-                {formatDistanceToNow(new Date(practice.updatedAt), {
-                  addSuffix: false,
-                  locale: zhTW
-                })}
+              <span>
+                {formatRelativeTime(practice.updatedAt)}
               </span>
             </div>
           </div>

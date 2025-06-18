@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import {
   type PracticeFilter,
   type CreatePracticeInput
-} from '@/services/modules/practice';
+} from '@/services/practice';
 import { usePractices } from './usePractices';
 import { useFilteredPractices } from './useFilteredPractices';
 
@@ -51,7 +51,7 @@ export function usePracticeManager() {
   const pathInfoToPractice = useCallback((pathInfo: Record<string, unknown>, smallGoals: Array<{content: string}>, resources: Array<{name: string, url: string}>, tags: string[] = [], dailyGoalConfig: Record<string, unknown> | null = null): CreatePracticeInput => {
     // 使用共享的轉換函數
     // eslint-disable-next-line @typescript-eslint/no-require-imports, global-require
-    const { pathInfoToCreatePracticeInput } = require('@/services/modules/practice/utils');
+    const { pathInfoToCreatePracticeInput } = require('@/services/practice/utils');
     return pathInfoToCreatePracticeInput(pathInfo, smallGoals, resources, tags, dailyGoalConfig);
   }, []);
 

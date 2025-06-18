@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
-import { PathInfo } from '@/services/modules/practice/schema';
+import { PathInfo } from '@/services/practice/schema';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/atoms/select';
@@ -12,6 +12,7 @@ import { Textarea } from '@/components/atoms/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/atoms/popover';
 import { Calendar } from '@/components/atoms/calendar';
 import { cn } from '@/utils/cn';
+import { formatDateISO } from '@/services/practice/utils';
 
 interface StepTwoProps {
   pathInfo: PathInfo;
@@ -146,7 +147,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                       onSelect={(date) => {
                         setStartDate(date);
                         if (date) {
-                          handlePathInfoChange('targetDate', date.toISOString().split('T')[0]);
+                          handlePathInfoChange('targetDate', formatDateISO(date));
                         }
                       }}
                       disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}

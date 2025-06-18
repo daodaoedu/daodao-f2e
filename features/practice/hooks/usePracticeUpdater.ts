@@ -1,5 +1,5 @@
-import practiceAPI, { getPracticePathname } from '@/services/modules/practice/api';
-import type { UpdatePracticeInput, CheckInInput } from '@/services/modules/practice/schema';
+import practiceAPI, { getPracticePathname } from '@/services/practice/api';
+import type { UpdatePracticeInput, CheckInInput } from '@/services/practice/schema';
 import { invalidateAllCaches } from './utils';
 
 // 更新單個實踐的便利 Hook

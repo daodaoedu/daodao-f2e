@@ -1,7 +1,7 @@
 // 刪除確認對話框組件
 import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
-import { Practice } from '@/services/modules/practice/schema';
+import { Practice } from '@/services/practice/schema';
 import { Button } from '@/components/atoms/button';
 import { Badge } from '@/components/atoms/badge';
 

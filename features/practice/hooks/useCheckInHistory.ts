@@ -1,6 +1,6 @@
 import useSWR from 'swr';
-import { PracticeStorage } from '@/services/modules/practice/storage';
-import { CheckInService } from '@/services/modules/practice/checkIn';
+import { PracticeStorage } from '@/services/practice/storage';
+import { CheckInService } from '@/services/practice/checkIn';
 
 // 簽到歷史的 Hook
 export function useCheckInHistory(practiceId: string | undefined) {

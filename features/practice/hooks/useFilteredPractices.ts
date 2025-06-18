@@ -1,6 +1,6 @@
 import useSWR from 'swr';
-import { PracticeStorage } from '@/services/modules/practice/storage';
-import type { PracticeFilter } from '@/services/modules/practice/schema';
+import { PracticeStorage } from '@/services/practice/storage';
+import type { PracticeFilter } from '@/services/practice/schema';
 
 // 篩選實踐的 Hook
 export function useFilteredPractices(filter: PracticeFilter) {

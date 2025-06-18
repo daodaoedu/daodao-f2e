@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle, Heart, Frown, Minus as Meh, Smile, Star, Plus, X } from 'lucide-react';
-import { Practice, MoodType, CheckInInput } from '@/services/modules/practice/schema';
+import { Practice, MoodType, CheckInInput } from '@/services/practice/schema';
 import { CheckInService } from '@/features/practice';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';

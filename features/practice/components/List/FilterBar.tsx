@@ -1,7 +1,7 @@
 import React from 'react';
 import { Filter, X } from 'lucide-react';
-import { PracticeFilter, PracticeStatus, ContentType } from '@/services/modules/practice/schema';
-import { getContentTypeLabel, getStatusLabel } from '@/services/modules/practice/utils';
+import { PracticeFilter, PracticeStatus, ContentType } from '@/services/practice/schema';
+import { getContentTypeLabel, getStatusLabel } from '@/services/practice/utils';
 import { Button } from '@/components/atoms/button';
 import {
   DropdownMenu,

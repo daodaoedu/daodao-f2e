@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
-import { Practice } from '@/services/modules/practice/schema';
+import { Practice } from '@/services/practice/schema';
 import { DashboardView } from '@/features/practice';
 import MainDashboard from '@/features/practice/components/Dashboard/MainDashboard';
 import CheckInView from '@/features/practice/components/Dashboard/CheckInView';

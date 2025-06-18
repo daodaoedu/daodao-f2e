@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { format, parseISO, startOfDay, subDays, isAfter, isBefore, isSameDay, differenceInDays } from 'date-fns';
+import { parseISO, startOfDay, subDays, isAfter, isBefore, isSameDay, differenceInDays, format } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
 import { Practice, CheckInRecord, CheckInInput, MoodType } from './schema';
-import { getRecentActivity } from './utils';
+import { getRecentActivity, generateCheckInId, getCurrentDateISO, getCurrentTimeISO } from './utils';
 
 // 簽到輸入驗證 schema
 const checkInInputValidationSchema = z.object({
@@ -17,17 +17,16 @@ const checkInInputValidationSchema = z.object({
 export class CheckInService {
   // 執行簽到
   static createCheckIn(practice: Practice, input: CheckInInput): CheckInRecord {
-    const now = new Date();
     const checkInRecord: CheckInRecord = {
-      id: `checkin_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: generateCheckInId(),
       practiceId: practice.id,
-      date: now.toISOString().split('T')[0], // YYYY-MM-DD 格式
+      date: getCurrentDateISO(),
       progress: input.progress,
       totalProgress: practice.currentProgress + input.progress,
       note: input.note || '',
       mood: input.mood,
       tags: input.tags || [],
-      createdAt: now.toISOString()
+      createdAt: getCurrentTimeISO()
     };
 
     return checkInRecord;
@@ -35,13 +34,13 @@ export class CheckInService {
 
   // 檢查今日是否已簽到
   static hasCheckedInToday(practice: Practice): boolean {
-    const today = format(new Date(), 'yyyy-MM-dd');
+    const today = getCurrentDateISO();
     return practice.checkIns?.some((checkIn) => checkIn.date === today) || false;
   }
 
   // 取得今日簽到記錄
   static getTodayCheckIn(practice: Practice): CheckInRecord | undefined {
-    const today = format(new Date(), 'yyyy-MM-dd');
+    const today = getCurrentDateISO();
     return practice.checkIns?.find((checkIn) => checkIn.date === today);
   }
 
@@ -64,7 +63,7 @@ export class CheckInService {
     let currentDate = today;
 
     // 檢查是否有今日簽到
-    const todayString = format(today, 'yyyy-MM-dd');
+    const todayString = getCurrentDateISO();
     const hasCheckedInToday = sortedCheckIns.some((checkIn) => checkIn.date === todayString);
 
     // 如果今天還沒簽到，從昨天開始算

@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { format, parseISO, startOfDay, differenceInDays, isAfter, isBefore, isSameDay, subDays } from 'date-fns';
+import { format, parseISO, startOfDay, differenceInDays, isAfter, isBefore, isSameDay, subDays, formatDistanceToNow, isValid } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
 import { z } from 'zod';
 import { Practice, ContentType, PracticeStatus, CheckInRecord } from './schema';
@@ -192,36 +192,176 @@ export function sortPractices(
 
 // ==================== 日期處理 ====================
 
+/**
+ * 安全地解析日期，統一處理字串和 Date 對象
+ */
+export function parseDate(date: string | Date): Date {
+  if (date instanceof Date) {
+    return isValid(date) ? date : new Date();
+  }
+
+  const parsed = parseISO(date);
+  return isValid(parsed) ? parsed : new Date();
+}
+
+/**
+ * 格式化日期為中文格式
+ */
 export function formatDate(date: string | Date): string {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  const dateObj = parseDate(date);
   return format(dateObj, 'yyyy年MM月dd日', { locale: zhTW });
 }
 
+/**
+ * 格式化時間
+ */
 export function formatTime(date: string | Date): string {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  const dateObj = parseDate(date);
   return format(dateObj, 'HH:mm');
 }
 
+/**
+ * 格式化日期時間
+ */
 export function formatDateTime(date: string | Date): string {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  const dateObj = parseDate(date);
   return format(dateObj, 'yyyy年MM月dd日 HH:mm', { locale: zhTW });
 }
 
+/**
+ * 格式化為 ISO 日期字串 (YYYY-MM-DD)
+ */
+export function formatDateISO(date: string | Date): string {
+  const dateObj = parseDate(date);
+  return format(dateObj, 'yyyy-MM-dd');
+}
+
+/**
+ * 格式化相對時間（中文）
+ */
+export function formatRelativeTime(date: string | Date): string {
+  const dateObj = parseDate(date);
+  return formatDistanceToNow(dateObj, {
+    locale: zhTW,
+    addSuffix: true
+  });
+}
+
+/**
+ * 智能日期顯示：今天/昨天/具體日期
+ */
+export function formatSmartDate(date: string | Date): string {
+  const dateObj = parseDate(date);
+  const today = startOfDay(new Date());
+  const targetDate = startOfDay(dateObj);
+
+  const diffDays = differenceInDays(today, targetDate);
+
+  if (diffDays === 0) return '今天';
+  if (diffDays === 1) return '昨天';
+  if (diffDays === -1) return '明天';
+
+  return formatDate(dateObj);
+}
+
+/**
+ * 檢查是否為今天
+ */
 export function isToday(date: string | Date): boolean {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  const dateObj = parseDate(date);
   return isSameDay(dateObj, new Date());
 }
 
+/**
+ * 計算兩個日期之間的天數差
+ */
 export function daysBetween(date1: string | Date, date2: string | Date): number {
-  const date1Obj = typeof date1 === 'string' ? parseISO(date1) : date1;
-  const date2Obj = typeof date2 === 'string' ? parseISO(date2) : date2;
+  const date1Obj = parseDate(date1);
+  const date2Obj = parseDate(date2);
   return Math.abs(differenceInDays(date2Obj, date1Obj));
 }
 
+/**
+ * 檢查兩個日期是否為連續天數
+ */
 export function isConsecutiveDay(lastDate: string | Date, currentDate: string | Date): boolean {
-  const lastDateObj = typeof lastDate === 'string' ? parseISO(lastDate) : lastDate;
-  const currentDateObj = typeof currentDate === 'string' ? parseISO(currentDate) : currentDate;
+  const lastDateObj = parseDate(lastDate);
+  const currentDateObj = parseDate(currentDate);
   return differenceInDays(currentDateObj, lastDateObj) === 1;
+}
+
+/**
+ * 獲取當前日期的 ISO 字串 (YYYY-MM-DD)
+ */
+export function getCurrentDateISO(): string {
+  return format(new Date(), 'yyyy-MM-dd');
+}
+
+/**
+ * 獲取當前時間的 ISO 字串
+ */
+export function getCurrentTimeISO(): string {
+  return new Date().toISOString();
+}
+
+/**
+ * 驗證日期字串格式 (YYYY-MM-DD)
+ */
+export function isValidDateFormat(dateString: string): boolean {
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!regex.test(dateString)) return false;
+
+  const date = parseISO(dateString);
+  return isValid(date);
+}
+
+// ==================== 時區處理 ====================
+
+/**
+ * 獲取使用者時區
+ */
+export function getUserTimezone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
+/**
+ * 格式化日期為使用者時區
+ */
+export function formatDateInUserTimezone(date: string | Date, formatStr: string = 'yyyy-MM-dd HH:mm'): string {
+  const dateObj = parseDate(date);
+  return format(dateObj, formatStr, { locale: zhTW });
+}
+
+/**
+ * 獲取 UTC 偏移量（分鐘）
+ */
+export function getTimezoneOffset(): number {
+  return new Date().getTimezoneOffset();
+}
+
+/**
+ * 將日期轉換為 UTC
+ */
+export function toUTC(date: string | Date): Date {
+  const dateObj = parseDate(date);
+  return new Date(dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000));
+}
+
+/**
+ * 將 UTC 日期轉換為地方時間
+ */
+export function fromUTC(utcDate: string | Date): Date {
+  const dateObj = parseDate(utcDate);
+  return new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000));
+}
+
+/**
+ * 檢查兩個日期是否在同一時區的同一天
+ */
+export function isSameDayInTimezone(date1: string | Date, date2: string | Date): boolean {
+  const d1 = startOfDay(parseDate(date1));
+  const d2 = startOfDay(parseDate(date2));
+  return isSameDay(d1, d2);
 }
 
 // ==================== 進度計算增強 ====================
@@ -336,8 +476,8 @@ export function validateStartDate(date: string): string | null {
   try {
     startDateValidationSchema.parse(date);
 
-    // 額外檢查是否為過去的日期
-    const selectedDate = parseISO(date);
+    // 額外檢查是否為過去的日期（使用統一的日期處理）
+    const selectedDate = parseDate(date);
     const today = startOfDay(new Date());
 
     if (isBefore(selectedDate, today)) {

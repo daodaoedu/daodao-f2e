@@ -9,10 +9,11 @@ import {
   ExternalLink,
   Plus
 } from 'lucide-react';
-import { Practice } from '@/services/modules/practice/schema';
-import { CheckInService } from '@/services/modules/practice/checkIn';
+import { Practice } from '@/services/practice/schema';
+import { CheckInService } from '@/services/practice/checkIn';
 import { Button } from '@/components/atoms/button';
 import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
+import { formatSmartDate, formatDate } from '@/services/practice/utils';
 import TagList from '../Shared/TagList';
 
 interface MainDashboardProps {
@@ -86,20 +87,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
   // 格式化最後打卡日期
   const formatLastCheckIn = () => {
     if (!practice.lastCheckinDate) return '尚未打卡';
-
-    const lastDate = new Date(practice.lastCheckinDate);
-    const today = new Date();
-    const diffTime = today.getTime() - lastDate.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return '今天';
-    if (diffDays === 1) return '昨天';
-    if (diffDays < 7) return `${diffDays} 天前`;
-
-    return lastDate.toLocaleDateString('zh-TW', {
-      month: 'long',
-      day: 'numeric'
-    });
+    return formatSmartDate(practice.lastCheckinDate);
   };
 
   // 獲取內容類型標籤
@@ -202,17 +190,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                   <span>{getContentTypeLabel()}</span>
                   <span>•</span>
                   <span>
-                    {new Date(practice.startDate).toLocaleDateString('zh-TW', {
-                      year: 'numeric',
-                      month: 'numeric',
-                      day: 'numeric'
-                    })}
+                    {formatDate(practice.startDate)}
                     {practice.targetDate && (
-                      ` - ${new Date(practice.targetDate).toLocaleDateString('zh-TW', {
-                        year: 'numeric',
-                        month: 'numeric',
-                        day: 'numeric'
-                      })}`
+                      ` - ${formatDate(practice.targetDate)}`
                     )}
                   </span>
                 </div>
@@ -381,10 +361,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                           <p className="text-sm text-foreground">
                             我在{' '}
                             <span className="text-green-600 font-medium">
-                              {new Date(checkIn.date).toLocaleDateString('zh-TW', {
-                                month: 'numeric',
-                                day: 'numeric'
-                              })}
+                              {formatSmartDate(checkIn.date)}
                             </span>{' '}
                             實踐{' '}
                             <span className="text-primary font-medium">

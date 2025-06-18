@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus, X, Hash } from 'lucide-react';
 import { contentTypeOptions, defaultTags } from '@/constants/practice';
-import { PathInfo } from '@/services/modules/practice/schema';
+import { PathInfo } from '@/services/practice/schema';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
 import { Label } from '@/components/atoms/label';

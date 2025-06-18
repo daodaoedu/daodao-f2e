@@ -20,4 +20,4 @@ export type {
   UpdatePracticeInput,
   CheckInInput,
   CheckInRecord
-} from '@/services/modules/practice/schema';
+} from '@/services/practice/schema';

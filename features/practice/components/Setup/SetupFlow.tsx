@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { usePracticeManager } from '@/features/practice/hooks';
 import Confetti from '@/features/practice/components/Shared/Confetti';
 import CelebrationMessage from '@/features/practice/components/Shared/CelebrationMessage';
-import { PathInfo } from '@/services/modules/practice/schema';
+import { PathInfo } from '@/services/practice/schema';
 import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
 import Step1 from './Step1';
 import Step2 from './Step2';

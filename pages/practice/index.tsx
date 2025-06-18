@@ -14,7 +14,7 @@ import SearchInput from '@/features/practice/components/List/SearchInput';
 import DeleteConfirm from '@/features/practice/components/Edit/DeleteConfirm';
 
 // 型別
-import { Practice } from '@/services/modules/practice/schema';
+import { Practice } from '@/services/practice/schema';
 
 const PracticeListPage: React.FC = () => {
   const router = useRouter();

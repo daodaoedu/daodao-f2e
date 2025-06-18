@@ -1,7 +1,7 @@
 import useSWR from 'swr';
-import { PracticeStorage } from '@/services/modules/practice/storage';
-import { CheckInService } from '@/services/modules/practice/checkIn';
-import { getPracticePathname } from '@/services/modules/practice/api';
+import { PracticeStorage } from '@/services/practice/storage';
+import { CheckInService } from '@/services/practice/checkIn';
+import { getPracticePathname } from '@/services/practice/api';
 
 // 獲取單個實踐的 Hook
 export function usePractice(id: string | undefined) {
