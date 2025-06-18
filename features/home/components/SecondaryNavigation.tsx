@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
 
@@ -7,6 +8,7 @@ interface SecondaryNavigationProps {
 }
 
 export function SecondaryNavigation({ activeTab, onTabChange }: SecondaryNavigationProps) {
+  const router = useRouter();
   const tabs = [
     { id: 'explore', label: '探索' },
     { id: 'community', label: '交流' },
@@ -14,8 +16,7 @@ export function SecondaryNavigation({ activeTab, onTabChange }: SecondaryNavigat
   ];
 
   const handleResourcesClick = () => {
-    // 直接導航到 /new-resource 頁面
-    window.location.href = '/new-resource';
+    router.push('/new-resource');
   };
 
   return (

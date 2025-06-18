@@ -8,7 +8,9 @@ import { PlanCard } from "./components/PlanCard";
 
 export function PersonalDashboard() {
   const [activeExploreTab, setActiveExploreTab] = useState('推薦');
-  const [searchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+   // TODO: Implement search functionality
+   console.log(setSearchQuery); // Temporary to avoid unused variable warning
   const [isSearching, setIsSearching] = useState(false);
 
   // Mock data - in real app would come from API

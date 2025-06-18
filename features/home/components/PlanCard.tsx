@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 
 interface PlanCardProps {
   plan: {
@@ -139,11 +140,8 @@ export function PlanCard({
 
         {/* Progress Bar */}
         <div className="mb-3 sm:mb-4">
-          <div className="w-full bg-basic-200 rounded-full h-2 relative">
-            <div
-              className="bg-indigo-500 h-2 rounded-full"
-              style={{ width: `${plan.progress}%` }}
-            />
+          <div className="w-full relative">
+            <Progress value={plan.progress} className="h-2" />
             <span className="absolute right-0 -top-6 text-xs text-basic-300 font-medium">
               {plan.progress}%
             </span>

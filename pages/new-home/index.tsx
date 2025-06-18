@@ -11,21 +11,21 @@ const NewHomePage: NextPage = () => {
   return (
     <>
       <SEOConfig
-        title="Cx�ǐs�\��?x"
-        description="�x��E�|���/���2e��}�8"
-        keywords="��?x,x�s�,�;x�,x�ǐ"
-        author="��?x"
-        copyright="��?x"
+        title="島島阿學學習社群"
+        description="台灣多元教育與學習資源平台"
+        keywords="島島阿學,學習,教育,社群,資源"
+        author="島島阿學"
+        copyright="島島阿學"
         imgLink="https://www.daoedu.tw/preview.webp"
       />
 
-      {/* Header N getBaseLayout �ՠe */}
+      {/* Header  getBaseLayout */}
       {isLoggedIn ? (
         <PersonalDashboard />
       ) : (
         <LandingPage onLogin={() => authDispatch.openLoginModal()} />
       )}
-      {/* Footer _N Layout �ՠe */}
+      {/* Footer Layout */}
     </>
   );
 };
