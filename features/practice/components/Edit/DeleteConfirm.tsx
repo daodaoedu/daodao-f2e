@@ -86,7 +86,7 @@ const DeleteConfirm: React.FC<DeleteConfirmProps> = ({
               <p className="text-sm text-muted-foreground">
                 此操作會將實踐移至回收桶，您可以在30天內恢復。
               </p>
-              <Badge variant="destructive" className="text-xs">
+              <Badge variant="default" className="text-xs">
                 30天後將永久刪除所有相關資料
               </Badge>
             </div>
