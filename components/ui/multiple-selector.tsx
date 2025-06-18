@@ -445,7 +445,7 @@ export const MultipleSelector = React.forwardRef<
           role="textbox"
           tabIndex={0}
           className={cn(
-            "min-h-9 rounded-md border border-input text-base ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 md:body-sm",
+            "min-h-9 rounded-md border border-input text-base ring-offset-background focus-within:ring-2 focus-within:ring-ring md:body-sm",
             {
               "px-2 py-1": selected.length !== 0,
               "cursor-text": !disabled && selected.length !== 0,
@@ -455,6 +455,19 @@ export const MultipleSelector = React.forwardRef<
           onClick={() => {
             if (disabled) return;
             inputRef?.current?.focus();
+          }}
+          onKeyDown={(e) => {
+            switch (e.key) {
+              case " ":
+              case "Enter":
+              case "ArrowUp":
+              case "ArrowDown":
+                if (disabled) return;
+                inputRef?.current?.focus();
+                break;
+              default:
+                break;
+            }
           }}
         >
           <div className="relative flex flex-wrap gap-1">
