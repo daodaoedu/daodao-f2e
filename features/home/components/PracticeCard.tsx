@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreVertical, Shell, MessageCircle, Share2, User, Bookmark, Flag } from "lucide-react";
+import { MoreVertical, Shell, MessageCircle, Share2, User, Bookmark, Flag, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -160,7 +160,7 @@ export function PracticeCard({
         {/* Streak and Status Row */}
         <div className="flex items-center justify-between mb-3 sm:mb-4">
           <div className="flex items-center space-x-1">
-            <span className="text-sm">🔥</span>
+            <Flame className="h-3 w-3 text-orange-500" />
             <span className="text-xs text-basic-300 font-medium">{practice.streak}天</span>
           </div>
           <Badge

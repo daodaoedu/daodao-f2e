@@ -13,7 +13,7 @@ const useFetch = (url, { enabled = true, initialValue, onSuccess } = {}) => {
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) return undefined;
 
     const endpoint = url.startsWith('http') ? url : `${BASE_URL}${url}`;
     const headers = {

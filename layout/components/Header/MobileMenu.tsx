@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { MARATHON_LINKS, NAV_LINK, LOGGED_OUT_NAV_LINK, LOGGED_IN_NAV_LINK, USER_LINK } from "@/constants/category";
+import { MARATHON_LINKS, LOGGED_OUT_NAV_LINK, LOGGED_IN_NAV_LINK, USER_LINK } from "@/constants/category";
 import { useAuth, useAuthDispatch } from "@/contexts/Auth";
 import { getManageSidebarItems } from "@/layout/features/getManageLayout";
 import {
@@ -18,8 +18,6 @@ interface OnCloseProps {
 
 function ExploreMenu({ onClose }: OnCloseProps) {
   const auth = useAuth();
-  
-  // 根據登入狀態選擇導航連結
   const navigationLinks = auth.isLoggedIn ? LOGGED_IN_NAV_LINK : LOGGED_OUT_NAV_LINK;
 
   return (

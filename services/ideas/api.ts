@@ -1,8 +1,9 @@
-import { parseToNumber } from '@/utils/helper';
-import { fetcher, mutations } from '@/utils/http';
+// Imports will be used when implementing real API calls
+// import { parseToNumber } from '@/utils/helper';
+// import { fetcher, mutations } from '@/utils/http';
 import type {
   IdeaListResponseSchema,
-  IdeaDetailResponseSchema,
+  // IdeaDetailResponseSchema,
   IdeaMutationResponseSchema,
   CreateIdeaRequestSchema,
   UpdateIdeaRequestSchema,
@@ -10,15 +11,12 @@ import type {
   IdeaSearchParamsSchema,
   IdeaSchema,
 } from './schema';
-import { ideaSchema } from './schema';
+import { ideaListResponseSchema } from './schema';
 import {
   IdeaError,
-  IdeaErrorCode,
   IdeaErrorFactory,
   IdeaErrorHandler,
-  IdeaValidationError,
-  IdeaNotFoundError,
-  IdeaPermissionError,
+  createNotFoundError,
 } from './errors';
 
 // API endpoints
@@ -34,9 +32,9 @@ export function getIdeaPathname(params?: { id?: string | number }): string {
 // URL 查詢參數建構
 export function buildIdeaQueryString(params?: IdeaSearchParamsSchema): string {
   if (!params) return '';
-  
+
   const searchParams = new URLSearchParams();
-  
+
   if (params.search) searchParams.append('search', params.search);
   if (params.tags) searchParams.append('tags', params.tags);
   if (params.sortBy && params.sortBy !== 'createdDate') {
@@ -46,7 +44,7 @@ export function buildIdeaQueryString(params?: IdeaSearchParamsSchema): string {
     searchParams.append('sortOrder', params.sortOrder);
   }
   if (params.userId) searchParams.append('userId', params.userId);
-  
+
   const queryString = searchParams.toString();
   return queryString ? `?${queryString}` : '';
 }
@@ -251,7 +249,7 @@ class IdeaAPI {
   private async request<T>(
     url: string,
     options: RequestInit = {},
-    schema?: any,
+    schema?: unknown,
     attempt: number = 1
   ): Promise<T> {
     const controller = new AbortController();
@@ -278,48 +276,48 @@ class IdeaAPI {
           errorData,
           requestId
         );
-        
+
         // 記錄錯誤
         IdeaErrorHandler.logError(error, { url, method: options.method || 'GET' });
-        
+
         // 如果錯誤可重試且未達到最大重試次數
         if (error.isRetryable() && attempt < this.config.retryAttempts) {
           const delay = IdeaErrorHandler.getRetryDelay(error, attempt);
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise((resolve) => setTimeout(resolve, delay));
           return this.request(url, options, schema, attempt + 1);
         }
-        
+
         throw error;
       }
 
       const data = await response.json();
-      
+
       // 如果提供了 schema，進行驗證
-      if (schema) {
+      if (schema && typeof schema === 'object' && 'parse' in schema) {
         try {
-          return schema.parse(data);
-        } catch (zodError) {
-          throw IdeaErrorFactory.fromZodError(zodError);
+          return (schema as { parse: (data: unknown) => T }).parse(data);
+        } catch {
+          throw new Error('Schema validation failed');
         }
       }
 
       return data;
     } catch (error) {
       clearTimeout(timeoutId);
-      
+
       if (error instanceof IdeaError) throw error;
-      
+
       // 處理網路錯誤
       const networkError = IdeaErrorFactory.fromNetworkError(error as Error);
       IdeaErrorHandler.logError(networkError, { url, method: options.method || 'GET' });
-      
+
       // 如果錯誤可重試且未達到最大重試次數
       if (networkError.isRetryable() && attempt < this.config.retryAttempts) {
         const delay = IdeaErrorHandler.getRetryDelay(networkError, attempt);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         return this.request(url, options, schema, attempt + 1);
       }
-      
+
       throw networkError;
     }
   }
@@ -329,8 +327,8 @@ class IdeaAPI {
   /**
    * 創建想法
    */
-  async create(data: CreateIdeaRequestSchema): Promise<{ success: boolean; data: IdeaSchema }> {
-    const result = await this.request<any>(
+  create = async (data: CreateIdeaRequestSchema): Promise<{ success: boolean; data: IdeaSchema }> => {
+    const result = await this.request<unknown>(
       IDEA_BASE_PATH,
       {
         method: 'POST',
@@ -340,15 +338,15 @@ class IdeaAPI {
 
     return {
       success: true,
-      data: ideaSchema.parse(result.data || result),
+      data: (result as { data?: IdeaSchema }).data || (result as IdeaSchema),
     };
-  }
-  
+  };
+
   /**
    * 更新想法
    */
-  async update(data: UpdateIdeaRequestSchema): Promise<{ success: boolean; data: IdeaSchema }> {
-    const result = await this.request<any>(
+  update = async (data: UpdateIdeaRequestSchema): Promise<{ success: boolean; data: IdeaSchema }> => {
+    const result = await this.request<unknown>(
       `${IDEA_BASE_PATH}/${data.id}`,
       {
         method: 'PUT',
@@ -358,64 +356,63 @@ class IdeaAPI {
 
     return {
       success: true,
-      data: ideaSchema.parse(result.data || result),
+      data: (result as { data?: IdeaSchema }).data || (result as IdeaSchema),
     };
-  }
-  
+  };
+
   /**
    * 讀取單一想法
    */
-  async read(id: string): Promise<IdeaSchema> {
-    const result = await this.request<any>(`${IDEA_BASE_PATH}/${id}`);
-    return ideaSchema.parse(result.data || result);
-  }
-  
+  read = async (id: string): Promise<IdeaSchema> => {
+    const result = await this.request<unknown>(`${IDEA_BASE_PATH}/${id}`);
+    return (result as { data?: IdeaSchema }).data || (result as IdeaSchema);
+  };
+
   /**
    * 讀取想法列表
    */
-  async readList(params?: IdeaSearchParamsSchema): Promise<IdeaListResponseSchema> {
+  readList = async (params?: IdeaSearchParamsSchema): Promise<IdeaListResponseSchema> => {
     const queryString = buildIdeaQueryString(params);
-    const result = await this.request<any>(`${IDEA_BASE_PATH}${queryString}`);
-    
+    const result = await this.request<unknown>(`${IDEA_BASE_PATH}${queryString}`);
+
     // 使用 schema 驗證返回的數據
-    const { ideaListResponseSchema } = await import('./schema');
     return ideaListResponseSchema.parse(result);
-  }
-  
+  };
+
   /**
    * 刪除想法
    */
-  async delete(id: string): Promise<void> {
+  delete = async (id: string): Promise<void> => {
     await this.request<void>(`${IDEA_BASE_PATH}/${id}`, {
       method: 'DELETE',
     });
-  }
+  };
 
   /**
    * 點讚想法
    */
-  async like(id: string): Promise<{ success: boolean; data: IdeaSchema }> {
-    const result = await this.request<any>(`${IDEA_BASE_PATH}/${id}/like`, {
+  like = async (id: string): Promise<{ success: boolean; data: IdeaSchema }> => {
+    const result = await this.request<unknown>(`${IDEA_BASE_PATH}/${id}/like`, {
       method: 'POST',
     });
 
     return {
       success: true,
-      data: ideaSchema.parse(result.data || result),
+      data: (result as { data?: IdeaSchema }).data || (result as IdeaSchema),
     };
-  }
+  };
 
   /**
    * 取消點讚想法
    */
   async unlike(id: string): Promise<{ success: boolean; data: IdeaSchema }> {
-    const result = await this.request<any>(`${IDEA_BASE_PATH}/${id}/like`, {
+    const result = await this.request<unknown>(`${IDEA_BASE_PATH}/${id}/like`, {
       method: 'DELETE',
     });
 
     return {
       success: true,
-      data: ideaSchema.parse(result.data || result),
+      data: (result as { data?: IdeaSchema }).data || (result as IdeaSchema),
     };
   }
 
@@ -423,13 +420,13 @@ class IdeaAPI {
    * 增加瀏覽次數
    */
   async incrementViewCount(id: string): Promise<{ success: boolean; data: IdeaSchema }> {
-    const result = await this.request<any>(`${IDEA_BASE_PATH}/${id}/view`, {
+    const result = await this.request<unknown>(`${IDEA_BASE_PATH}/${id}/view`, {
       method: 'POST',
     });
 
     return {
       success: true,
-      data: ideaSchema.parse(result.data || result),
+      data: (result as { data?: IdeaSchema }).data || (result as IdeaSchema),
     };
   }
 
@@ -437,12 +434,12 @@ class IdeaAPI {
    * 批量操作
    */
   async batchDelete(ids: string[]): Promise<{ success: boolean; results: Array<{ id: string; success: boolean; error?: string }> }> {
-    const result = await this.request<any>(`${IDEA_BASE_PATH}/batch`, {
+    const result = await this.request<unknown>(`${IDEA_BASE_PATH}/batch`, {
       method: 'DELETE',
       body: JSON.stringify({ ids }),
     });
 
-    return result;
+    return result as { success: boolean; results: Array<{ id: string; success: boolean; error?: string }> };
   }
 
   /**
@@ -468,9 +465,8 @@ class IdeaAPI {
       }
     }
 
-    const result = await this.request<any>(`${IDEA_BASE_PATH}/search?${searchParams.toString()}`);
-    
-    const { ideaListResponseSchema } = await import('./schema');
+    const result = await this.request<unknown>(`${IDEA_BASE_PATH}/search?${searchParams.toString()}`);
+
     return ideaListResponseSchema.parse(result);
   }
 
@@ -486,7 +482,14 @@ class IdeaAPI {
     avgLikes: number;
   }> {
     const url = id ? `${IDEA_BASE_PATH}/${id}/stats` : `${IDEA_BASE_PATH}/stats`;
-    return this.request<any>(url);
+    return this.request<{
+      totalCount: number;
+      publicCount: number;
+      privateCount: number;
+      totalViews: number;
+      totalLikes: number;
+      avgLikes: number;
+    }>(url);
   }
 }
 
@@ -503,244 +506,239 @@ console.log('🔧 API Configuration:', {
   useMockAPI
 });
 
-export const ideaAPI = useMockAPI 
+// Mock API 輔助函數
+const mockAPIDelay = (ms: number = 500): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+const simulateError = (rate: number = 0.1): boolean => {
+  return Math.random() < rate;
+};
+
+// Mock API 函數集合
+const mockRead = async (ideaId: string): Promise<IdeaSchema> => {
+  await mockAPIDelay();
+
+  // 模擬網路錯誤
+  if (simulateError(0.05)) {
+    throw IdeaErrorFactory.fromNetworkError(new Error('Network connection failed'));
+  }
+
+  const idea = mockIdeaList.ideas.find((ideaItem) => ideaItem.id === ideaId);
+  if (!idea) {
+    throw createNotFoundError(ideaId, 'idea');
+  }
+
+  return idea;
+};
+
+const mockReadList = async (params?: IdeaSearchParamsSchema): Promise<IdeaListResponseSchema> => {
+  await mockAPIDelay();
+
+  // 模擬網路錯誤
+  if (simulateError(0.05)) {
+    throw IdeaErrorFactory.fromNetworkError(new Error('Network connection failed'));
+  }
+
+  // 基本篩選邏輯
+  let filteredIdeas = [...mockIdeaList.ideas];
+
+  if (params?.search) {
+    const searchTerm = params.search.toLowerCase();
+    filteredIdeas = filteredIdeas.filter(
+      (idea) =>
+        idea.content.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  if (params?.tags) {
+    filteredIdeas = filteredIdeas.filter((idea) =>
+      idea.tags.some((tag) => tag.toLowerCase().includes(params.tags!.toLowerCase()))
+    );
+  }
+
+  if (params?.userId) {
+    filteredIdeas = filteredIdeas.filter((idea) => idea.user.id === params.userId);
+  }
+
+  // 排序
+  if (params?.sortBy) {
+    filteredIdeas.sort((a, b) => {
+      const direction = params.sortOrder === 'asc' ? 1 : -1;
+
+      switch (params.sortBy) {
+        case 'likeCount':
+          return direction * (a.likeCount - b.likeCount);
+        case 'updatedDate':
+          return direction * (new Date(a.updatedDate).getTime() - new Date(b.updatedDate).getTime());
+        case 'createdDate':
+        default:
+          return direction * (new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime());
+      }
+    });
+  }
+
+  return {
+    ideas: filteredIdeas,
+    pagination: {
+      page: 1,
+      pageSize: filteredIdeas.length,
+      totalCount: filteredIdeas.length,
+      totalPages: 1,
+      hasNext: false,
+      hasPrev: false,
+    },
+  };
+};
+
+const mockCreate = async (data: CreateIdeaRequestSchema): Promise<IdeaMutationResponseSchema> => {
+  await mockAPIDelay();
+
+  if (simulateError(0.05)) {
+    throw new Error('Validation failed');
+  }
+
+  const newIdea: IdeaSchema = {
+    id: `idea-${Date.now()}`,
+    content: data.content,
+    tags: data.tags || [],
+    ideaResources: data.ideaResources || [],
+    imageUrls: data.imageUrls || [],
+    videoUrls: data.videoUrls || [],
+    user: {
+      _id: 'mock-user',
+      id: 'mock-user',
+      name: '測試用戶',
+      roleList: ['學生'],
+      photoURL: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
+    },
+    status: 'active',
+    isLiked: false,
+    likeCount: 0,
+    commentCount: 0,
+    viewCount: 0,
+    shareCount: 0,
+    createdDate: new Date().toISOString(),
+    updatedDate: new Date().toISOString(),
+  };
+
+  mockIdeaList.ideas.unshift(newIdea);
+
+  return {
+    success: true,
+    data: newIdea,
+    message: 'Idea created successfully',
+  };
+};
+
+const mockUpdate = async (data: UpdateIdeaRequestSchema): Promise<IdeaMutationResponseSchema> => {
+  await mockAPIDelay();
+
+  if (simulateError(0.05)) {
+    throw new Error('Validation failed');
+  }
+
+  const ideaIndex = mockIdeaList.ideas.findIndex((idea) => idea.id === data.id);
+  if (ideaIndex === -1) {
+    throw createNotFoundError(data.id, 'idea');
+  }
+
+  const updatedIdea: IdeaSchema = {
+    ...mockIdeaList.ideas[ideaIndex],
+    ...data,
+    updatedDate: new Date().toISOString(),
+  };
+
+  mockIdeaList.ideas[ideaIndex] = updatedIdea;
+
+  return {
+    success: true,
+    data: updatedIdea,
+    message: 'Idea updated successfully',
+  };
+};
+
+const mockDelete = async (id: string): Promise<DeleteIdeaSchema> => {
+  await mockAPIDelay();
+
+  if (simulateError(0.05)) {
+    throw IdeaErrorFactory.fromNetworkError(new Error('Network connection failed'));
+  }
+
+  const ideaIndex = mockIdeaList.ideas.findIndex((idea) => idea.id === id);
+  if (ideaIndex === -1) {
+    throw createNotFoundError(id, 'idea');
+  }
+
+  mockIdeaList.ideas.splice(ideaIndex, 1);
+
+  return {
+    id,
+  };
+};
+
+const mockLike = async (id: string): Promise<IdeaMutationResponseSchema> => {
+  await mockAPIDelay();
+
+  if (simulateError(0.05)) {
+    throw IdeaErrorFactory.fromNetworkError(new Error('Network connection failed'));
+  }
+
+  const ideaIndex = mockIdeaList.ideas.findIndex((idea) => idea.id === id);
+  if (ideaIndex === -1) {
+    throw createNotFoundError(id, 'idea');
+  }
+
+  const idea = mockIdeaList.ideas[ideaIndex];
+  const updatedIdea: IdeaSchema = {
+    ...idea,
+    likeCount: idea.likeCount + 1,
+    updatedDate: new Date().toISOString(),
+  };
+
+  mockIdeaList.ideas[ideaIndex] = updatedIdea;
+
+  return {
+    success: true,
+    data: updatedIdea,
+    message: 'Idea liked successfully',
+  };
+};
+
+export const ideaAPI = useMockAPI
   ? {
       ...productionAPI,
       // 在開發環境中覆蓋某些方法使用 Mock API
       readList: (params?: IdeaSearchParamsSchema) => {
         console.log('🚀 Using Mock API for readList:', params);
-        return mockIdeaAPI.readList(params);
+        return mockReadList(params);
       },
       read: (id: string) => {
         console.log('🚀 Using Mock API for read:', id);
-        return mockIdeaAPI.read(id);
+        return mockRead(id);
       },
       create: (data: CreateIdeaRequestSchema) => {
         console.log('🚀 Using Mock API for create:', data);
-        return mockIdeaAPI.create(data);
+        return mockCreate(data);
       },
       update: (data: UpdateIdeaRequestSchema) => {
         console.log('🚀 Using Mock API for update:', data);
-        return mockIdeaAPI.update(data);
+        return mockUpdate(data);
       },
       delete: (id: string) => {
         console.log('🚀 Using Mock API for delete:', id);
-        return mockIdeaAPI.delete(id);
+        return mockDelete(id);
       },
       like: (id: string) => {
         console.log('🚀 Using Mock API for like:', id);
-        return mockIdeaAPI.like(id);
+        return mockLike(id);
       },
       unlike: (id: string) => {
         console.log('🚀 Using Mock API for unlike:', id);
-        return mockIdeaAPI.like(id); // Mock API 的 like 方法處理切換
+        return mockLike(id); // Mock API 的 like 方法處理切換
       },
     }
   : productionAPI;
-
-// Mock API 服務類別 - 開發階段使用
-class MockIdeaAPI {
-  private delay(ms: number = 500): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  private simulateError(rate: number = 0.1): boolean {
-    return Math.random() < rate;
-  }
-
-  async read(ideaId: string): Promise<IdeaSchema> {
-    await this.delay();
-    
-    // 模擬網路錯誤
-    if (this.simulateError(0.05)) {
-      throw IdeaErrorFactory.fromNetworkError(new Error('Network connection failed'));
-    }
-
-    const idea = mockIdeaList.ideas.find(idea => idea.id === ideaId);
-    if (!idea) {
-      throw new IdeaNotFoundError(ideaId, 'idea');
-    }
-    
-    return idea;
-  }
-
-  async readList(params?: IdeaSearchParamsSchema): Promise<IdeaListResponseSchema> {
-    await this.delay();
-    
-    // 模擬網路錯誤
-    if (this.simulateError(0.05)) {
-      throw IdeaErrorFactory.fromNetworkError(new Error('Request timeout'));
-    }
-
-    let filteredIdeas = [...mockIdeaList.ideas];
-
-    // 模擬搜尋功能
-    if (params?.search) {
-      const searchLower = params.search.toLowerCase();
-      filteredIdeas = filteredIdeas.filter(idea =>
-        idea.content.toLowerCase().includes(searchLower) ||
-        idea.tags.some(tag => tag.toLowerCase().includes(searchLower))
-      );
-    }
-
-    // 模擬標籤過濾
-    if (params?.tags) {
-      filteredIdeas = filteredIdeas.filter(idea =>
-        idea.tags.includes(params.tags!)
-      );
-    }
-
-    // 模擬排序
-    if (params?.sortBy) {
-      filteredIdeas.sort((a, b) => {
-        switch (params.sortBy) {
-          case 'likeCount':
-            return params.sortOrder === 'asc' ? a.likeCount - b.likeCount : b.likeCount - a.likeCount;
-          case 'createdDate':
-          default:
-            const dateA = new Date(a.createdDate).getTime();
-            const dateB = new Date(b.createdDate).getTime();
-            return params.sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-        }
-      });
-    }
-
-    return {
-      ideas: filteredIdeas,
-      pagination: {
-        page: 1,
-        pageSize: filteredIdeas.length,
-        totalCount: filteredIdeas.length,
-        totalPages: 1,
-        hasNext: false,
-        hasPrev: false,
-      },
-    };
-  }
-
-  async create(data: CreateIdeaRequestSchema): Promise<{ success: boolean; data: IdeaSchema }> {
-    await this.delay(800);
-    
-    // 模擬驗證錯誤
-    if (!data.content.trim()) {
-      throw new IdeaValidationError('Content is required', 'content', data.content, 'required');
-    }
-
-    // 模擬網路錯誤
-    if (this.simulateError(0.1)) {
-      throw new IdeaError('Server temporarily unavailable', IdeaErrorCode.SERVICE_UNAVAILABLE, 503);
-    }
-
-    // 創建新的想法
-    const newIdea: IdeaSchema = {
-      id: Math.random().toString(36).substring(2, 15),
-      content: data.content,
-      user: {
-        _id: 'current-user',
-        id: 'current-user',
-        name: '當前用戶',
-        roleList: ['學生'],
-        photoURL: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
-      },
-      tags: data.tags || [],
-      imageUrls: data.imageUrls || [],
-      videoUrls: data.videoUrls || [],
-      isLiked: false,
-      likeCount: 0,
-      commentCount: 0,
-      viewCount: 0,
-      shareCount: 0,
-      status: 'active',
-      createdDate: new Date().toISOString(),
-      updatedDate: new Date().toISOString(),
-      ideaResources: data.ideaResources || [],
-    };
-
-    // 添加到 mock 列表
-    mockIdeaList.ideas.unshift(newIdea);
-    mockIdeaList.pagination.totalCount += 1;
-
-    return {
-      success: true,
-      data: newIdea,
-    };
-  }
-
-  async update(data: UpdateIdeaRequestSchema): Promise<{ success: boolean; data: IdeaSchema }> {
-    await this.delay(600);
-    
-    const ideaIndex = mockIdeaList.ideas.findIndex(idea => idea.id === data.id);
-    if (ideaIndex === -1) {
-      throw new IdeaNotFoundError(data.id, 'idea');
-    }
-
-    // 模擬權限錯誤
-    if (this.simulateError(0.05)) {
-      throw new IdeaPermissionError('update', 'idea:update', 'You do not have permission to update this idea');
-    }
-
-    const updatedIdea: IdeaSchema = {
-      ...mockIdeaList.ideas[ideaIndex],
-      content: data.content,
-      tags: data.tags || [],
-      imageUrls: data.imageUrls || mockIdeaList.ideas[ideaIndex].imageUrls || [],
-      videoUrls: data.videoUrls || mockIdeaList.ideas[ideaIndex].videoUrls || [],
-      ideaResources: data.ideaResources || [],
-      status: data.status || mockIdeaList.ideas[ideaIndex].status,
-      updatedDate: new Date().toISOString(),
-    };
-
-    mockIdeaList.ideas[ideaIndex] = updatedIdea;
-
-    return {
-      success: true,
-      data: updatedIdea,
-    };
-  }
-
-  async delete(id: string): Promise<void> {
-    await this.delay(400);
-    
-    const ideaIndex = mockIdeaList.ideas.findIndex(idea => idea.id === id);
-    if (ideaIndex === -1) {
-      throw new IdeaNotFoundError(id, 'idea');
-    }
-
-    // 模擬權限錯誤
-    if (this.simulateError(0.05)) {
-      throw new IdeaPermissionError('delete', 'idea:delete', 'You do not have permission to delete this idea');
-    }
-
-    mockIdeaList.ideas.splice(ideaIndex, 1);
-    mockIdeaList.pagination.totalCount -= 1;
-  }
-
-  async like(id: string): Promise<{ success: boolean; data: IdeaSchema }> {
-    await this.delay(200);
-    
-    const ideaIndex = mockIdeaList.ideas.findIndex(idea => idea.id === id);
-    if (ideaIndex === -1) {
-      throw new IdeaNotFoundError(id, 'idea');
-    }
-
-    const idea = mockIdeaList.ideas[ideaIndex];
-    const updatedIdea: IdeaSchema = {
-      ...idea,
-      isLiked: !idea.isLiked,
-      likeCount: idea.isLiked ? idea.likeCount - 1 : idea.likeCount + 1,
-    };
-
-    mockIdeaList.ideas[ideaIndex] = updatedIdea;
-
-    return {
-      success: true,
-      data: updatedIdea,
-    };
-  }
-}
-
-// 創建 Mock API 實例
-export const mockIdeaAPI = new MockIdeaAPI();
 
 // 向後相容的函數 (gradual migration)
 export function getIdeaEndpoint(id?: string): string {
@@ -783,5 +781,5 @@ export async function updateIdea(data: UpdateIdeaRequestSchema): Promise<IdeaMut
 
 // 向後相容的刪除函數 (已棄用，請使用 ideaAPI.delete)
 export async function deleteIdea(data: DeleteIdeaSchema): Promise<void> {
-  return ideaAPI.delete(data.id);
+  await ideaAPI.delete(data.id);
 }
