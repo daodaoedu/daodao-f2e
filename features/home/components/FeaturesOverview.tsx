@@ -115,6 +115,7 @@ export function FeaturesOverview({ onGetStarted }: FeaturesOverviewProps) {
             className="text-basic-black mb-4 flex items-center justify-center"
           >
             <Sparkles className="h-6 w-6 mr-3 text-yellow-500" />
+
             更多功能持續進化中
           </Heading>
           <Text size="sm" className="text-basic-300">

@@ -18,8 +18,6 @@ interface OnCloseProps {
 
 function ExploreMenu({ onClose }: OnCloseProps) {
   const auth = useAuth();
-
-  // 根據登入狀態選擇導航連結
   const navigationLinks = auth.isLoggedIn ? LOGGED_IN_NAV_LINK : LOGGED_OUT_NAV_LINK;
 
   return (
