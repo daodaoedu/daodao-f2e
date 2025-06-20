@@ -58,7 +58,7 @@ export default function ResourceCard(props: CardProps) {
 
   return (
     <Link
-      href={`/new-resource/${id}`}
+      href={`/resource/${id}`}
       className="group flex flex-col gap-2 md:flex-row md:gap-4"
     >
       {/* Card Image */}

@@ -81,7 +81,7 @@ export const getStaticProps = (async (context) => {
     return {
       props: {
         fallback: {
-          [`/new-resource/categories/${categories?.join("/")}`]: data,
+          [`/resource/categories/${categories?.join("/")}`]: data,
         },
         jsonLd,
         categories,
@@ -115,8 +115,6 @@ export default function ResourceCategoriesPage({
   title,
   totalEstimate,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const basePath = "/new-resource";
-
   if (!categories) return null;
 
   return (
@@ -126,11 +124,11 @@ export default function ResourceCategoriesPage({
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href={basePath}>找資源</BreadcrumbLink>
+              <BreadcrumbLink href="/resource">找資源</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href={`${basePath}/categories`}>
+              <BreadcrumbLink href="/resource/categories">
                 所有分類
               </BreadcrumbLink>
             </BreadcrumbItem>
@@ -152,7 +150,7 @@ export default function ResourceCategoriesPage({
                   <Fragment key={category.value}>
                     <BreadcrumbItem>
                       <BreadcrumbLink
-                        href={`${basePath}/categories/${categories
+                        href={`/resource/categories/${categories
                           .slice(0, index + 1)
                           .map((c) => c.value)
                           .join("/")}`}

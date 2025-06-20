@@ -89,7 +89,7 @@ export default function ResourcePage({
               size="lg"
               asChild
             >
-              <Link href="/new-resource/explore">
+              <Link href="/resource/explore">
                 探索 所有資源
                 <ChevronRightIcon className="w-4 h-4" />
               </Link>
@@ -105,7 +105,7 @@ export default function ResourcePage({
               className="-mx-2 px-2 body-lg font-medium text-basic-300"
               asChild
             >
-              <Link href="/new-resource/explore">
+              <Link href="/resource/explore">
                 探索 所有資源
                 <ChevronRightIcon className="w-4 h-4" />
               </Link>
@@ -121,7 +121,7 @@ export default function ResourcePage({
               className="-mx-2 px-2 body-lg font-medium text-basic-300"
               asChild
             >
-              <Link href="/new-resource/categories">
+              <Link href="/resource/categories">
                 探索 所有分類
                 <ChevronRightIcon className="w-4 h-4" />
               </Link>

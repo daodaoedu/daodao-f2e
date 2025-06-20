@@ -80,7 +80,7 @@ function ResourceContainer({
             {parentCategoryHasData ? (
               <Button asChild size="lg">
                 <Link
-                  href={`/new-resource/categories/${parentCategory
+                  href={`/resource/categories/${parentCategory
                     .map((c) => c.value)
                     .join("/")}`}
                 >
@@ -95,7 +95,7 @@ function ResourceContainer({
                   {Array.from({ length: 5 }, (_, i) => i).map((key) => (
                     <Badge key={key} variant="outline" asChild>
                       <Link
-                        href={`/new-resource/categories/${categories
+                        href={`/resource/categories/${categories
                           ?.map((c) => c.value)
                           .join("/")}`}
                       >
