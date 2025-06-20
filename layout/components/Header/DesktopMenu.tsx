@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MARATHON_LINKS, NAV_LINK, LOGGED_OUT_NAV_LINK, LOGGED_IN_NAV_LINK, USER_LINK } from "@/constants/category";
+import { MARATHON_LINKS, LOGGED_OUT_NAV_LINK, LOGGED_IN_NAV_LINK, USER_LINK } from "@/constants/category";
 import { useAuth, useAuthDispatch } from "@/contexts/Auth";
 import { cn } from "@/utils/cn";
 import {
