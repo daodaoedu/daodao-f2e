@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  SearchIcon,
   SlidersHorizontalIcon,
   ChartNoAxesColumnDecreasingIcon,
 } from "lucide-react";
 import useShadowToggleOnScroll from "@/hooks/useShadowToggleOnScroll";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
-import SearchInput from "@/components/ui/search-input";
+import { Input } from "@/components/ui/input";
 import useDebounce from "@/hooks/useDebounce";
 import { ResourceSearchParamsSchema } from "@/services/resources/core/schema";
 import ResourceSearchModal from "./ResourceSearchModal";
@@ -60,10 +61,12 @@ export default function ResourceSearchBar({
         )}
         style={{ top: `${height}px` }}
       >
-        <SearchInput
-          className="w-full md:w-1/2"
+        <Input
+          prefixIcon={<SearchIcon />}
+          className="md:w-1/2"
           value={query}
-          onChange={setQuery}
+          hasClearButton
+          onValueChange={setQuery}
           placeholder="想找什麼資源..."
         />
         <div className="flex gap-3 justify-end">
