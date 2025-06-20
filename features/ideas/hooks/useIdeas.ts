@@ -60,7 +60,6 @@ export function useIdea(ideaId: string) {
 export function useIdeaSearch(initialParams?: IdeaSearchParamsSchema) {
   const [searchParams, setSearchParams] = useState<IdeaSearchParamsSchema>(
     initialParams ?? {
-      visibility: 'public',
       sortBy: 'createdDate',
       sortOrder: 'desc'
     }
@@ -74,7 +73,6 @@ export function useIdeaSearch(initialParams?: IdeaSearchParamsSchema) {
 
   const clearSearch = useCallback(() => {
     setSearchParams({
-      visibility: 'public',
       sortBy: 'createdDate',
       sortOrder: 'desc'
     });

@@ -39,9 +39,6 @@ export function buildIdeaQueryString(params?: IdeaSearchParamsSchema): string {
   
   if (params.search) searchParams.append('search', params.search);
   if (params.tags) searchParams.append('tags', params.tags);
-  if (params.visibility && params.visibility !== 'public') {
-    searchParams.append('visibility', params.visibility);
-  }
   if (params.sortBy && params.sortBy !== 'createdDate') {
     searchParams.append('sortBy', params.sortBy);
   }
@@ -70,7 +67,6 @@ const mockIdeaList: IdeaListResponseSchema = {
       tags: ['程式設計', '自學', '心得', 'JavaScript', '前端開發'],
       imageUrls: [],
       videoUrls: [],
-      visibility: 'public',
       isLiked: false,
       likeCount: 15,
       commentCount: 3,
@@ -103,7 +99,6 @@ const mockIdeaList: IdeaListResponseSchema = {
       tags: ['設計思維', '工作坊', '創新', 'UX設計', '用戶研究'],
       imageUrls: [],
       videoUrls: [],
-      visibility: 'public',
       isLiked: true,
       likeCount: 28,
       commentCount: 7,
@@ -132,7 +127,6 @@ const mockIdeaList: IdeaListResponseSchema = {
       tags: ['數據科學', '機器學習', '數學', 'AI', '統計學'],
       imageUrls: [],
       videoUrls: [],
-      visibility: 'public',
       isLiked: false,
       likeCount: 42,
       commentCount: 12,
@@ -165,7 +159,6 @@ const mockIdeaList: IdeaListResponseSchema = {
       tags: ['語言學習', '英文', '沉浸式學習', 'YouTube', 'Podcast'],
       imageUrls: [],
       videoUrls: [],
-      visibility: 'public',
       isLiked: true,
       likeCount: 19,
       commentCount: 5,
@@ -194,7 +187,6 @@ const mockIdeaList: IdeaListResponseSchema = {
       tags: ['創業', '產品開發', 'MVP', '用戶反饋', '失敗經驗'],
       imageUrls: [],
       videoUrls: [],
-      visibility: 'public',
       isLiked: false,
       likeCount: 67,
       commentCount: 23,
@@ -502,8 +494,7 @@ class IdeaAPI {
 const productionAPI = new IdeaAPI();
 
 // 環境感知的 API 實例 - 根據環境變數決定是否使用 Mock API
-const useMockAPI = process.env.NEXT_PUBLIC_USE_MOCK_API === 'true' || 
-                   (process.env.NODE_ENV === 'development' && !process.env.NEXT_PUBLIC_API_URL);
+const useMockAPI = 'true';
 
 console.log('🔧 API Configuration:', {
   NODE_ENV: process.env.NODE_ENV,
@@ -654,7 +645,6 @@ class MockIdeaAPI {
       tags: data.tags || [],
       imageUrls: data.imageUrls || [],
       videoUrls: data.videoUrls || [],
-      visibility: data.visibility,
       isLiked: false,
       likeCount: 0,
       commentCount: 0,
@@ -695,7 +685,6 @@ class MockIdeaAPI {
       tags: data.tags || [],
       imageUrls: data.imageUrls || mockIdeaList.ideas[ideaIndex].imageUrls || [],
       videoUrls: data.videoUrls || mockIdeaList.ideas[ideaIndex].videoUrls || [],
-      visibility: data.visibility,
       ideaResources: data.ideaResources || [],
       status: data.status || mockIdeaList.ideas[ideaIndex].status,
       updatedDate: new Date().toISOString(),

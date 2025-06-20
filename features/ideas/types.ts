@@ -13,7 +13,6 @@ export type {
 export interface IdeaFilters {
   search: string;
   selectedTags: string[];
-  visibility: 'public' | 'private' | 'all';
   sortBy: 'createdDate' | 'updatedDate' | 'likeCount' | 'title';
   sortOrder: 'asc' | 'desc';
 }

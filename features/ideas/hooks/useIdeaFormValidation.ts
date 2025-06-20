@@ -19,7 +19,6 @@ export function useIdeaFormValidation() {
     resolver: zodResolver(createIdeaFormSchema),
     defaultValues: {
       content: '',
-      visibility: 'public',
       tags: [],
       ideaResources: [],
     },
@@ -35,7 +34,6 @@ export function useUpdateIdeaFormValidation(defaultValues?: Partial<UpdateIdeaFo
     resolver: zodResolver(updateIdeaFormSchema),
     defaultValues: {
       content: '',
-      visibility: 'public',
       tags: [],
       ideaResources: [],
       ...defaultValues,
@@ -65,7 +63,6 @@ export function useIdeaFormValidationGeneric<T extends 'create' | 'update'>(
       resolver: zodResolver(createIdeaFormSchema),
       defaultValues: {
         content: '',
-        visibility: 'public',
         tags: [],
         ideaResources: [],
         ...defaultValues,
@@ -76,7 +73,6 @@ export function useIdeaFormValidationGeneric<T extends 'create' | 'update'>(
       resolver: zodResolver(updateIdeaFormSchema),
       defaultValues: {
         content: '',
-        visibility: 'public',
         tags: [],
         ideaResources: [],
         ...defaultValues,

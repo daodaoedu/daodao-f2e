@@ -76,13 +76,6 @@ export const truncateText = (text: string, maxLength: number): string => {
 };
 
 /**
- * 根據可見性返回對應的標籤
- */
-export const getVisibilityLabel = (visibility: 'public' | 'private'): string => {
-  return visibility === 'public' ? '公開' : '私人';
-};
-
-/**
  * 驗證Idea表單數據
  */
 export const validateIdeaForm = (data: {

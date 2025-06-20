@@ -21,7 +21,6 @@ export function formToCreateApiRequest(
 ): CreateIdeaRequestSchema {
   return {
     content: formData.content,
-    visibility: formData.visibility,
     tags: formData.tags,
     ideaResources: formData.ideaResources,
     imageUrls: uploadedImageUrls,
@@ -44,7 +43,6 @@ export function formToUpdateApiRequest(
   return {
     id: formData.id,
     content: formData.content,
-    visibility: formData.visibility,
     tags: formData.tags,
     ideaResources: formData.ideaResources,
     imageUrls: uploadedImageUrls,
@@ -70,7 +68,6 @@ export function apiResponseToIdea(apiData: unknown): IdeaSchema {
 export function ideaToFormDefaults(idea: IdeaSchema): Partial<CreateIdeaFormSchema> {
   return {
     content: idea.content,
-    visibility: idea.visibility,
     tags: idea.tags,
     ideaResources: idea.ideaResources,
     // 注意：imageFiles 和 videoFiles 是 File 物件，無法從 URL 轉換
@@ -87,7 +84,6 @@ export function ideaToUpdateFormDefaults(idea: IdeaSchema): Partial<UpdateIdeaFo
   return {
     id: idea.id,
     content: idea.content,
-    visibility: idea.visibility,
     tags: idea.tags,
     ideaResources: idea.ideaResources,
     status: idea.status,

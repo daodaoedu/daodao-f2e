@@ -24,7 +24,6 @@ export const ideaSchema = z.object({
   id: z.string(),
   content: z.string(),
   user: baseUserSchema,
-  visibility: z.enum(['public', 'private']),
   status: z.enum(['active', 'draft', 'archived']),
   tags: z.array(z.string()),
   imageUrls: z.array(z.string()),
@@ -48,7 +47,6 @@ export type IdeaSchema = z.infer<typeof ideaSchema>;
 // 創建表單類型 (前端專用)
 export const createIdeaFormSchema = z.object({
   content: z.string().min(1, '請輸入內容').max(5000, '內容不能超過5000字'),
-  visibility: z.enum(['public', 'private']),
   tags: z.array(z.string()),
   ideaResources: z.array(ideaResourceSchema),
   imageFiles: z.array(z.instanceof(File)).nullable().optional(),
@@ -72,7 +70,6 @@ export type UpdateIdeaFormSchema = z.infer<typeof updateIdeaFormSchema>;
 // API 創建請求類型
 export const createIdeaRequestSchema = z.object({
   content: z.string(),
-  visibility: z.enum(['public', 'private']),
   tags: z.array(z.string()),
   ideaResources: z.array(ideaResourceSchema),
   imageUrls: z.array(z.string()), // 由檔案上傳轉換而來
@@ -100,7 +97,6 @@ export type DeleteIdeaSchema = z.infer<typeof deleteIdeaSchema>;
 export const ideaSearchParamsSchema = z.object({
   search: z.string().optional(),
   tags: z.string().optional(), // 逗號分隔的標籤字串
-  visibility: z.enum(['public', 'private', 'all']).optional().default('public'),
   sortBy: z.enum(['createdDate', 'updatedDate', 'likeCount']).optional().default('createdDate'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
   userId: z.string().optional(),
