@@ -1,6 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { format, parseISO, startOfDay, differenceInDays, isAfter, isBefore, isSameDay, subDays, formatDistanceToNow, isValid } from 'date-fns';
-import { zhTW } from 'date-fns/locale';
+import { format, parseISO, startOfDay, differenceInDays, isAfter, isBefore, isSameDay, subDays, isValid } from 'date-fns';
 import { z } from 'zod';
 import { Practice, ContentType, PracticeStatus, CheckInRecord } from './schema';
 
@@ -9,7 +8,10 @@ const startDateValidationSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '請�
 const smallGoalValidationSchema = z.string().min(1, '請輸入目標內容').max(200, '目標內容不可超過 200 字');
 const resourceValidationSchema = z.object({
   name: z.string().min(1, '請輸入資源名稱').max(100, '資源名稱不可超過 100 字'),
-  url: z.string().url('請輸入有效的網址').optional().or(z.literal(''))
+  url: z.string().optional().refine(
+    (val) => !val || val === '' || /^https?:\/\/.+/.test(val),
+    { message: '請輸入有效的網址' }
+  )
 });
 
 export function generateId(): string {
@@ -31,14 +33,14 @@ export function calculateProgress(current: number, total: number): number {
 }
 
 // ==================== 內容類型工具 ====================
-export function getContentTypeLabel(contentType: ContentType): string {
+export function getContentTypeLabel(contentType: ContentType, customContentType?: string): string {
   const labels: Record<ContentType, string> = {
     book: '書籍',
     video: '影片課程',
     articles: '文章',
     podcast: 'Podcast',
     course: '課程',
-    custom: '自定義'
+    custom: customContentType || '自定義'
   };
 
   return labels[contentType] || '未知';
@@ -59,15 +61,15 @@ export function getContentTypeUnit(contentType: ContentType): string {
 
 export function getContentTypeIcon(contentType: ContentType): string {
   const icons: Record<ContentType, string> = {
-    book: '📚',
-    video: '🎬',
-    articles: '📄',
-    podcast: '🎧',
-    course: '🎓',
-    custom: '⚙️'
+    book: 'Book',
+    video: 'Video',
+    articles: 'FileText',
+    podcast: 'Headphones',
+    course: 'GraduationCap',
+    custom: 'Settings'
   };
 
-  return icons[contentType] || '📝';
+  return icons[contentType] || 'Book';
 }
 
 // ==================== 狀態工具 ====================
@@ -135,7 +137,7 @@ export function searchPractices(practices: Practice[], searchTerm: string): Prac
   return practices.filter((practice) =>
     practice.title.toLowerCase().includes(term) ||
     (practice.description && practice.description.toLowerCase().includes(term)) ||
-    practice.smallGoals.some((goal) => goal.content.toLowerCase().includes(term)) ||
+    (practice.practiceAction && practice.practiceAction.toLowerCase().includes(term)) ||
     practice.resources.some((resource) => resource.name.toLowerCase().includes(term))
   );
 }
@@ -205,11 +207,11 @@ export function parseDate(date: string | Date): Date {
 }
 
 /**
- * 格式化日期為中文格式
+ * 格式化日期為數字格式
  */
 export function formatDate(date: string | Date): string {
   const dateObj = parseDate(date);
-  return format(dateObj, 'yyyy年MM月dd日', { locale: zhTW });
+  return format(dateObj, 'yyyy/MM/dd');
 }
 
 /**
@@ -225,7 +227,7 @@ export function formatTime(date: string | Date): string {
  */
 export function formatDateTime(date: string | Date): string {
   const dateObj = parseDate(date);
-  return format(dateObj, 'yyyy年MM月dd日 HH:mm', { locale: zhTW });
+  return format(dateObj, 'yyyy/MM/dd HH:mm');
 }
 
 /**
@@ -237,18 +239,29 @@ export function formatDateISO(date: string | Date): string {
 }
 
 /**
- * 格式化相對時間（中文）
+ * 格式化相對時間（數字格式）
  */
 export function formatRelativeTime(date: string | Date): string {
   const dateObj = parseDate(date);
-  return formatDistanceToNow(dateObj, {
-    locale: zhTW,
-    addSuffix: true
-  });
+  const now = new Date();
+  const diff = now.getTime() - dateObj.getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor(diff / (1000 * 60));
+
+  if (days > 0) {
+    return `${days}d ago`;
+  } else if (hours > 0) {
+    return `${hours}h ago`;
+  } else if (minutes > 0) {
+    return `${minutes}m ago`;
+  } else {
+    return 'just now';
+  }
 }
 
 /**
- * 智能日期顯示：今天/昨天/具體日期
+ * 智能日期顯示：today/yesterday/具體日期
  */
 export function formatSmartDate(date: string | Date): string {
   const dateObj = parseDate(date);
@@ -257,9 +270,9 @@ export function formatSmartDate(date: string | Date): string {
 
   const diffDays = differenceInDays(today, targetDate);
 
-  if (diffDays === 0) return '今天';
-  if (diffDays === 1) return '昨天';
-  if (diffDays === -1) return '明天';
+  if (diffDays === 0) return 'today';
+  if (diffDays === 1) return 'yesterday';
+  if (diffDays === -1) return 'tomorrow';
 
   return formatDate(dateObj);
 }
@@ -329,7 +342,7 @@ export function getUserTimezone(): string {
  */
 export function formatDateInUserTimezone(date: string | Date, formatStr: string = 'yyyy-MM-dd HH:mm'): string {
   const dateObj = parseDate(date);
-  return format(dateObj, formatStr, { locale: zhTW });
+  return format(dateObj, formatStr);
 }
 
 /**
@@ -450,10 +463,10 @@ export function calculateStreak(
 export function getStreakMessage(streak: number): string {
   if (streak === 0) return '';
 
-  if (streak >= 21) return '💎 習慣養成大師！';
-  if (streak >= 14) return '🌟 習慣正在形成！';
-  if (streak >= 7) return '⭐ 一週堅持達成！';
-  if (streak >= 3) return '🔥 建立習慣中！';
+  if (streak >= 21) return '習慣養成大師！';
+  if (streak >= 14) return '習慣正在形成！';
+  if (streak >= 7) return '一週堅持達成！';
+  if (streak >= 3) return '建立習慣中！';
 
   return `${streak}天連續！`;
 }
@@ -542,7 +555,7 @@ export function getMostActiveDay(checkIns: CheckInRecord[]): string {
   const dayCount: { [key: string]: number } = {};
 
   checkIns.forEach((checkIn) => {
-    const day = format(parseISO(checkIn.date), 'EEEE', { locale: zhTW });
+    const day = format(parseISO(checkIn.date), 'EEEE'); // 移除中文 locale，使用英文星期
     dayCount[day] = (dayCount[day] || 0) + 1;
   });
 
@@ -583,7 +596,7 @@ export function practiceToListItem(practice: Practice) {
 // 通用的 PathInfo 轉換函數，支持完整的參數
 export function pathInfoToCreatePracticeInput(
   pathInfo: Record<string, unknown>,
-  smallGoals: Array<{content: string}>,
+  practiceAction: string,
   resources: Array<{name: string, url: string}>,
   tags: string[] = [],
   dailyGoalConfig: Record<string, unknown> | null = null
@@ -616,17 +629,14 @@ export function pathInfoToCreatePracticeInput(
     title: String(pathInfo.title || ''),
     description: pathInfo.notes ? String(pathInfo.notes) : undefined,
     contentType: contentTypeMap[String(pathInfo.contentType)] || 'custom',
+    customContentType: pathInfo.customContentType ? String(pathInfo.customContentType) : undefined,
     totalAmount: parseInt(String(pathInfo.totalAmount), 10) || 1,
     targetDate: pathInfo.targetDate ? String(pathInfo.targetDate) : undefined,
     motivationType: pathInfo.motivationType ? motivationTypeMap[String(pathInfo.motivationType)] : undefined,
     customMotivation: pathInfo.customMotivation ? String(pathInfo.customMotivation) : undefined,
     reminderEnabled: Boolean(pathInfo.reminderEnabled),
     reminderFrequency: reminderFrequencyMap[String(pathInfo.reminderFrequency)] || 'daily',
-    smallGoals: smallGoals.map((goal, index) => ({
-      content: goal.content,
-      isCompleted: false,
-      order: index
-    })),
+    practiceAction,
     resources: resources.map((resource, index) => ({
       name: resource.name,
       url: resource.url,
@@ -645,7 +655,7 @@ export function pathInfoToCreatePracticeInput(
 
 // 舊版相容函數，保留為向後相容性（但標記為過期）
 // @deprecated 使用 pathInfoToCreatePracticeInput 代替
-export function pathInfoToPractice(pathInfo: Record<string, unknown>, smallGoals: Array<{content: string}>, resources: Array<{name: string, url: string}>): Omit<Practice, 'id' | 'createdAt' | 'updatedAt'> {
+export function pathInfoToPractice(pathInfo: Record<string, unknown>, practiceAction: string, resources: Array<{name: string, url: string}>): Omit<Practice, 'id' | 'createdAt' | 'updatedAt'> {
   const now = new Date().toISOString();
 
   return {
@@ -671,12 +681,7 @@ export function pathInfoToPractice(pathInfo: Record<string, unknown>, smallGoals
       : 'daily' as import('./schema').ReminderFrequency,
     streak: Number(pathInfo.streak) || 0,
     lastCheckinDate: pathInfo.lastStreakDate ? String(pathInfo.lastStreakDate) : undefined,
-    smallGoals: smallGoals.map((goal, index) => ({
-      id: generateId(),
-      content: goal.content,
-      isCompleted: false,
-      order: index
-    })),
+    practiceAction,
     resources: resources.map((resource, index) => ({
       id: generateId(),
       name: resource.name,

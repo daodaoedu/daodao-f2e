@@ -6,6 +6,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
+import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';
@@ -84,6 +85,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
           },
         }}
       />
+      <SonnerToaster />
       <CompleteInfoReminderDialog isOpen={openModalType === "completeInfoReminder"} onClose={handleClose} />
       <ResponsiveModal
         open={openModalType === 'verifiedSuccess' && isLoggedIn}

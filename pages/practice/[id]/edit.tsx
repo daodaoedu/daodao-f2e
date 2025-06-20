@@ -7,6 +7,7 @@ import { usePracticeDetail, usePracticeManager } from '@/features/practice/hooks
 import EditForm from '@/features/practice/components/Edit/EditForm';
 import { MotivationType, ReminderFrequency, UpdatePracticeInput, Practice } from '@/features/practice';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const EditPracticePage: React.FC = () => {
   const router = useRouter();
@@ -19,6 +20,7 @@ const EditPracticePage: React.FC = () => {
   // 表單狀態管理
   const [formData, setFormData] = useState<Partial<Practice>>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
 
   // 當 practice 載入完成時初始化表單資料
   useEffect(() => {
@@ -32,7 +34,7 @@ const EditPracticePage: React.FC = () => {
         customMotivation: practice.customMotivation,
         reminderEnabled: practice.reminderEnabled,
         reminderFrequency: practice.reminderFrequency,
-        smallGoals: practice.smallGoals || [],
+        practiceAction: practice.practiceAction || '',
         resources: practice.resources || []
       });
     }
@@ -109,9 +111,19 @@ const EditPracticePage: React.FC = () => {
   };
 
   const handleSave = async () => {
-    if (!validateForm()) {
+    console.log('開始儲存...', { formData });
+
+    if (saving) {
+      console.log('正在儲存中，忽略重複點擊');
       return;
     }
+
+    if (!validateForm()) {
+      console.log('表單驗證失敗');
+      return;
+    }
+
+    setSaving(true);
 
     try {
       const updates: UpdatePracticeInput = {
@@ -123,15 +135,22 @@ const EditPracticePage: React.FC = () => {
         customMotivation: formData.customMotivation ?? '',
         reminderEnabled: formData.reminderEnabled ?? false,
         reminderFrequency: formData.reminderFrequency ?? 'daily' as ReminderFrequency,
-        smallGoals: formData.smallGoals ?? [],
+        practiceAction: formData.practiceAction ?? '',
         resources: formData.resources ?? []
       };
 
-      await updatePractice(practice!.id, updates);
+      console.log('準備更新:', { practiceId: practice!.id, updates });
+      const result = await updatePractice(practice!.id, updates);
+      console.log('更新成功:', result);
+
+      toast.success('實踐更新成功！');
       router.push(`/practice/${practice!.id}`);
     } catch (err) {
       console.error('更新失敗:', err);
+      toast.error('儲存失敗，請稍後再試');
       setFormErrors({ general: '儲存失敗，請稍後再試' });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -179,8 +198,8 @@ const EditPracticePage: React.FC = () => {
               )}
             </div>
 
-            <div className="p-6 border-t border-border bg-muted/50">
-              <div className="flex justify-end space-x-3">
+            <div className="p-6 ">
+              <div className="flex justify-between space-x-3">
                 <Button
                   variant="outline"
                   onClick={handleCancel}
@@ -188,9 +207,15 @@ const EditPracticePage: React.FC = () => {
                   取消
                 </Button>
                 <Button
-                  onClick={handleSave}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log('按鈕被點擊');
+                    handleSave();
+                  }}
+                  disabled={saving}
                 >
-                  儲存變更
+                  {saving ? '儲存中...' : '儲存變更'}
                 </Button>
               </div>
             </div>

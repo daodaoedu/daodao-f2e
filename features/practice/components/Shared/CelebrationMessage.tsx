@@ -18,7 +18,7 @@ const CelebrationMessage: React.FC<CelebrationMessageProps> = ({ message, isVisi
         "animate-fade-in animate-duration-500"
       )}
     >
-      <h3 className="heading-lg text-basic-black">
+      <h3 className="text-lg font-semibold text-basic-black">
         {message}
       </h3>
     </div>

@@ -36,11 +36,11 @@ const CheckInView: React.FC<CheckInViewProps> = ({
 
   // 心情選項
   const moodOptions = [
-    { value: 'excellent' as MoodType, label: '優秀', icon: Star, color: '#10b981', emoji: '😄' },
-    { value: 'good' as MoodType, label: '良好', icon: Smile, color: '#06b6d4', emoji: '😊' },
-    { value: 'average' as MoodType, label: '普通', icon: Meh, color: '#6b7280', emoji: '😐' },
-    { value: 'challenging' as MoodType, label: '有挑戰', icon: Heart, color: '#f59e0b', emoji: '😤' },
-    { value: 'difficult' as MoodType, label: '困難', icon: Frown, color: '#ef4444', emoji: '😰' }
+    { value: 'excellent' as MoodType, label: '優秀', icon: Star, color: '#10b981' },
+    { value: 'good' as MoodType, label: '良好', icon: Smile, color: '#06b6d4' },
+    { value: 'average' as MoodType, label: '普通', icon: Meh, color: '#6b7280' },
+    { value: 'challenging' as MoodType, label: '有挑戰', icon: Heart, color: '#f59e0b' },
+    { value: 'difficult' as MoodType, label: '困難', icon: Frown, color: '#ef4444' }
   ];
 
   // 常用標籤建議
@@ -145,7 +145,18 @@ const CheckInView: React.FC<CheckInViewProps> = ({
                   <div>總進度：{todayCheckIn.totalProgress}/{practice.totalAmount} {practice.unit}</div>
                   {todayCheckIn.note && <div>筆記：{todayCheckIn.note}</div>}
                   {todayCheckIn.mood && (
-                    <div>心情：{moodOptions.find((m) => m.value === todayCheckIn.mood)?.emoji} {moodOptions.find((m) => m.value === todayCheckIn.mood)?.label}</div>
+                    <div className="flex items-center gap-1">
+                      心情：
+                      {(() => {
+                        const moodOption = moodOptions.find((m) => m.value === todayCheckIn.mood);
+                        return (
+                          <>
+                            {moodOption?.icon && React.createElement(moodOption.icon, { className: "h-4 w-4" })}
+                            {moodOption?.label}
+                          </>
+                        );
+                      })()}
+                    </div>
                   )}
                 </div>
               </div>
@@ -215,9 +226,18 @@ const CheckInView: React.FC<CheckInViewProps> = ({
                 </span>
               </div>
               <div className="w-full bg-basic-200 rounded-full h-2">
-                <div
-                  className="h-2 rounded-full bg-success transition-all duration-300"
-                  style={{ width: `${newProgressPercentage}%` }}
+                <div className={`h-2 rounded-full bg-success transition-all duration-300 ${
+                  newProgressPercentage >= 100 ? 'w-full' :
+                  newProgressPercentage >= 90 ? 'w-[90%]' :
+                  newProgressPercentage >= 80 ? 'w-[80%]' :
+                  newProgressPercentage >= 70 ? 'w-[70%]' :
+                  newProgressPercentage >= 60 ? 'w-[60%]' :
+                  newProgressPercentage >= 50 ? 'w-1/2' :
+                  newProgressPercentage >= 40 ? 'w-[40%]' :
+                  newProgressPercentage >= 30 ? 'w-[30%]' :
+                  newProgressPercentage >= 20 ? 'w-1/5' :
+                  newProgressPercentage >= 10 ? 'w-[10%]' : 'w-[5%]'
+                }`}
                 />
               </div>
             </div>
@@ -237,13 +257,23 @@ const CheckInView: React.FC<CheckInViewProps> = ({
                     key={option.value}
                     variant="ghost"
                     onClick={() => setMood(option.value)}
-                    className={`p-3 rounded-lg border-2 transition-all text-center ${isSelected
+                    className={`p-2 rounded-lg border-2 transition-all text-center ${isSelected
                       ? 'border-primary-base bg-primary-palest'
                       : 'border-basic-200 hover:border-basic-300 hover:bg-basic-50'
                       }`}
                   >
-                    <div className="text-lg mb-1">{option.emoji}</div>
-                    <div className="body-xs text-basic-700">{option.label}</div>
+                    <div className="flex items-center justify-center gap-1">
+                      {React.createElement(option.icon, {
+                        className: `h-4 w-4 ${
+                          option.value === 'excellent' ? 'text-green-500' :
+                          option.value === 'good' ? 'text-cyan-500' :
+                          option.value === 'average' ? 'text-gray-500' :
+                          option.value === 'challenging' ? 'text-amber-500' :
+                          option.value === 'difficult' ? 'text-red-500' : 'text-gray-400'
+                        }`
+                      })}
+                      <span className="text-xs text-basic-700">{option.label}</span>
+                    </div>
                   </Button>
                 );
               })}

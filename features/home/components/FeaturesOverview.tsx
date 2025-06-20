@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Section, Heading, Text } from "./index";
 
@@ -114,7 +114,7 @@ export function FeaturesOverview({ onGetStarted }: FeaturesOverviewProps) {
             size="sm"
             className="text-basic-black mb-4 flex items-center justify-center"
           >
-            <span className="text-2xl mr-3">✨</span>
+            <Sparkles className="h-6 w-6 mr-3 text-yellow-500" />
             更多功能持續進化中
           </Heading>
           <Text size="sm" className="text-basic-300">

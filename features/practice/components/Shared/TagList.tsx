@@ -1,5 +1,4 @@
 import React from 'react';
-import { Hash } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 // 使用設計系統配色
@@ -29,14 +28,12 @@ const getTagColor = (tag: string): string => {
 interface TagListProps {
   tags: string[];
   maxDisplay?: number;
-  showIcon?: boolean;
   className?: string;
 }
 
 const TagList: React.FC<TagListProps> = ({
   tags,
   maxDisplay = 5,
-  showIcon = true,
   className = ''
 }) => {
   if (!tags || tags.length === 0) {
@@ -48,9 +45,7 @@ const TagList: React.FC<TagListProps> = ({
 
   return (
     <div className={cn("flex items-center space-x-2", className)}>
-      {showIcon && (
-        <Hash className="h-4 w-4 text-basic-400 flex-shrink-0" />
-      )}
+
       <div className="flex flex-wrap items-center gap-1">
         {displayTags.map((tag) => (
           <span

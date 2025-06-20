@@ -1,19 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/router';
 import {
   CheckCircle,
   Edit,
-  X,
   ArrowLeft,
-  Bookmark,
-  ExternalLink,
-  Plus
+  Plus,
+  Flame,
+  Book,
+  Video,
+  FileText,
+  Headphones,
+  GraduationCap,
+  Settings,
+  LinkIcon
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Practice } from '@/services/practice/schema';
 import { CheckInService } from '@/services/practice/checkIn';
 import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
 import { formatSmartDate, formatDate } from '@/services/practice/utils';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { Progress } from '@/components/ui/progress';
 import TagList from '../Shared/TagList';
 
 interface MainDashboardProps {
@@ -22,56 +30,17 @@ interface MainDashboardProps {
   onBack: () => void;
 }
 
-// Toast 通知組件
-interface ToastProps {
-  visible: boolean;
-  message: string;
-  onClose: () => void;
-}
-
-const Toast: React.FC<ToastProps> = ({ visible, message, onClose }) => {
-  if (!visible || !message) return null;
-
-  return (
-    <div className="fixed bottom-4 right-4 bg-success text-white px-4 py-2 rounded-lg shadow-lg flex items-center z-50 animate-slide-up">
-      <CheckCircle className="h-4 w-4 mr-2" />
-      {message}
-      <button
-        onClick={onClose}
-        className="ml-3 text-white hover:text-basic-200"
-        type="button"
-      >
-        <X className="h-4 w-4" />
-      </button>
-    </div>
-  );
-};
-
 const MainDashboard: React.FC<MainDashboardProps> = ({
   practice,
   onCheckIn,
   onBack
 }) => {
   const router = useRouter();
-  const [toastMessage, setToastMessage] = useState<string>('');
-  const [showToast, setShowToast] = useState(false);
   const { scrollToTop } = useScrollToTop();
 
   // 顯示 Toast 通知
   const showToastNotification = (message: string) => {
-    setToastMessage(message);
-    setShowToast(true);
-    // 3 秒後自動隱藏
-    setTimeout(() => {
-      setShowToast(false);
-      setToastMessage('');
-    }, 3000);
-  };
-
-  // 關閉 Toast
-  const handleCloseToast = () => {
-    setShowToast(false);
-    setToastMessage('');
+    toast.info(message);
   };
 
   // 計算進度百分比
@@ -90,17 +59,30 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
     return formatSmartDate(practice.lastCheckinDate);
   };
 
+  // 獲取內容類型圖標
+  const getContentTypeIcon = () => {
+    const iconMap: Record<string, React.ReactNode> = {
+      book: <Book className="h-4 w-4" />,
+      video: <Video className="h-4 w-4" />,
+      articles: <FileText className="h-4 w-4" />,
+      podcast: <Headphones className="h-4 w-4" />,
+      course: <GraduationCap className="h-4 w-4" />,
+      custom: <Settings className="h-4 w-4" />
+    };
+    return iconMap[practice.contentType] || <Book className="h-4 w-4" />;
+  };
+
   // 獲取內容類型標籤
   const getContentTypeLabel = () => {
     const typeMap: Record<string, string> = {
-      book: '📚 書籍',
-      video: '🎬 影片',
-      articles: '📄 文章',
-      podcast: '🎧 Podcast',
-      course: '🎓 課程',
-      custom: '🎯 自定義'
+      book: '書籍',
+      video: '影片',
+      articles: '文章',
+      podcast: 'Podcast',
+      course: '課程',
+      custom: practice.customContentType || '自定義'
     };
-    return typeMap[practice.contentType] || '📝 學習';
+    return typeMap[practice.contentType] || '學習';
   };
 
   // 獲取每日目標顯示
@@ -139,15 +121,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
     router.push(`/practice/${practice.id}/edit`).then(() => {
       scrollToTop('auto');
     });
-    showToastNotification('📋 正在跳轉到編輯頁面...');
-  };
-
-  // 導航到編輯頁面的資源管理區域
-  const handleManageResources = () => {
-    router.push(`/practice/${practice.id}/edit#resources`).then(() => {
-      scrollToTop('auto');
-    });
-    showToastNotification('📋 正在跳轉到資源管理...');
+    showToastNotification('正在跳轉到編輯頁面...');
   };
 
   return (
@@ -187,7 +161,10 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 )}
 
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                  <span>{getContentTypeLabel()}</span>
+                  <div className="flex items-center gap-1">
+                    {getContentTypeIcon()}
+                    <span>{getContentTypeLabel()}</span>
+                  </div>
                   <span>•</span>
                   <span>
                     {formatDate(practice.startDate)}
@@ -200,9 +177,6 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 {/* 標籤顯示 */}
                 {practice.tags && practice.tags.length > 0 && (
                   <div className="mt-3">
-                    <div className="mb-2 text-xs text-gray-500">
-                      實踐標籤 ({practice.tags.length}):
-                    </div>
                     <TagList tags={practice.tags} maxDisplay={6} />
                   </div>
                 )}
@@ -222,17 +196,15 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
           {/* 進度區域 */}
           <div className="p-6 border-b border-border">
-            <div className="mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-foreground font-medium">實踐進度</span>
-              </div>
-
-              <div className="w-full bg-muted rounded-full h-3">
-                <div
-                  className="h-3 rounded-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500"
-                  style={{ width: `${progressPercentage}%` }}
-                />
-              </div>
+            {/* Progress Bar */}
+            <div className="mb-3 sm:mb-4 relative">
+              <Progress
+                value={progressPercentage}
+                className="h-3"
+              />
+              <span className="absolute right-0 -top-7 text-lg text-basic-300 font-medium">
+                {progressPercentage}%
+              </span>
             </div>
 
             {/* 統計數據 */}
@@ -245,8 +217,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
               </div>
 
               <div className="text-center p-4 bg-orange-50 rounded-lg">
-                <div className="text-xl font-bold text-orange-500 flex items-center justify-center">
-                  🔥 {practice.streak}
+                <div className="text-xl font-bold text-orange-500 flex items-center justify-center gap-1">
+                  <Flame className="h-5 w-5" />
+                  {practice.streak}
                 </div>
                 <div className="text-sm text-muted-foreground">連續天數</div>
               </div>
@@ -267,28 +240,14 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
             </div>
           </div>
 
-          {/* 小目標區域 */}
-          {practice.smallGoals && practice.smallGoals.length > 0 && (
+          {/* 實踐行動區域 */}
+          {practice.practiceAction && (
             <div className="p-6 border-b border-border">
-              {/* 小目標統計 */}
-              <div className="mt-4 p-3 bg-primary/5 rounded-lg">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">完成進度</span>
-                  <span className="text-primary font-medium">
-                    {practice.smallGoals.filter((g) => g.isCompleted).length} / {practice.smallGoals.length} 個目標
-                  </span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2 mt-2">
-                  <div
-                    className="h-2 rounded-full bg-primary transition-all duration-500"
-                    style={{
-                      width: `${practice.smallGoals.length > 0
-                        ? (practice.smallGoals.filter((g) => g.isCompleted).length / practice.smallGoals.length) * 100
-                        : 0
-                      }%`
-                    }}
-                  />
-                </div>
+              <h3 className="ml-4 text-lg font-medium text-foreground mb-3 flex items-center">
+                實踐行動
+              </h3>
+              <div className="p-4 bg-primary/5 rounded-lg">
+                <p className="text-sm text-foreground">{practice.practiceAction}</p>
               </div>
             </div>
           )}
@@ -394,47 +353,33 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
           {practice.resources.length > 0 && (
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="heading-md text-basic-black">學習資源</h3>
-                <Button
-                  variant="link"
-                  onClick={handleManageResources}
-                  className="text-sm text-primary hover:text-primary/80"
-                  title="編輯和管理學習資源"
-                >
-                  管理資源
-                </Button>
+                <h3 className="heading-md text-basic-black">資源</h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {practice.resources.map((resource) => (
                   <div
                     key={resource.id}
-                    className="flex items-center justify-between p-3 bg-basic-50 rounded-lg border border-basic-200 hover:border-basic-300 transition-colors"
+                    className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-basic-200 hover:border-basic-300 transition-colors"
                   >
-                    <div className="flex items-center flex-1">
-                      <Bookmark className="h-4 w-4 text-basic-400 mr-3 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="body-sm font-medium text-basic-800 truncate">
-                          {resource.name}
-                        </div>
-                        {resource.description && (
-                          <div className="body-xs text-basic-600 truncate">
-                            {resource.description}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
                     {resource.url && (
-                      <a
+                      <Link
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center space-x-1 text-primary-base hover:text-primary-darker body-sm ml-3 flex-shrink-0"
                       >
-                        <span>開啟</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
+                        <div className="flex items-center flex-1">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mr-3">
+                            <LinkIcon className="h-4 w-4 text-primary" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="body-sm font-medium text-basic-800 truncate">
+                              {resource.name}
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
                     )}
                   </div>
                 ))}
@@ -443,32 +388,8 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
           )}
         </div>
 
-        {/* 學習建議 */}
-        {practice.checkIns.length > 0 && (
-          <div className="mt-6 bg-card rounded-lg shadow-sm border border-border p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">📈 學習建議</h3>
-            <div className="space-y-2">
-              {CheckInService.getCheckInSuggestions(practice).map((suggestion) => (
-                <div
-                  key={suggestion}
-                  className="text-sm text-foreground p-3 bg-accent/50 rounded-lg"
-                >
-                  {suggestion}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Toast 通知 */}
-      {toastMessage && (
-        <Toast
-          visible={showToast}
-          message={toastMessage}
-          onClose={handleCloseToast}
-        />
-      )}
     </div>
   );
 };

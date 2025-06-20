@@ -86,15 +86,34 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
             'rounded-full transition-all duration-500 ease-out',
             sizeClasses,
             variantClasses,
-            animated && 'animate-pulse'
+            animated && 'animate-pulse',
+            percentage >= 100 ? 'w-full' :
+            percentage >= 95 ? 'w-[95%]' :
+            percentage >= 90 ? 'w-[90%]' :
+            percentage >= 85 ? 'w-[85%]' :
+            percentage >= 80 ? 'w-[80%]' :
+            percentage >= 75 ? 'w-[75%]' :
+            percentage >= 70 ? 'w-[70%]' :
+            percentage >= 65 ? 'w-[65%]' :
+            percentage >= 60 ? 'w-[60%]' :
+            percentage >= 55 ? 'w-[55%]' :
+            percentage >= 50 ? 'w-1/2' :
+            percentage >= 45 ? 'w-[45%]' :
+            percentage >= 40 ? 'w-[40%]' :
+            percentage >= 35 ? 'w-[35%]' :
+            percentage >= 30 ? 'w-[30%]' :
+            percentage >= 25 ? 'w-1/4' :
+            percentage >= 20 ? 'w-1/5' :
+            percentage >= 15 ? 'w-[15%]' :
+            percentage >= 10 ? 'w-[10%]' :
+            percentage >= 5 ? 'w-[5%]' : 'w-0'
           )}
-          style={{ width: `${percentage}%` }}
         />
       </div>
 
       {percentage === 100 && (
         <div className="mt-1 text-xs text-success font-medium">
-          🎉 已完成！
+          已完成！
         </div>
       )}
     </div>

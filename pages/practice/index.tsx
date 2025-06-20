@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Plus, Grid3x3, List, Download, Upload, AlertCircle } from 'lucide-react';
+import { Plus, AlertCircle } from 'lucide-react';
 
 // 使用新的 hooks
 import { usePracticeManager } from '@/features/practice/hooks';
 
 // 組件
 import PracticeCard from '@/features/practice/components/List/PracticeCard';
-import FilterBar from '@/features/practice/components/List/FilterBar';
-import SearchInput from '@/features/practice/components/List/SearchInput';
+import LearningInsights from '@/features/practice/components/List/LearningInsights';
 import DeleteConfirm from '@/features/practice/components/Edit/DeleteConfirm';
 
 // 型別
@@ -20,19 +19,11 @@ const PracticeListPage: React.FC = () => {
   const router = useRouter();
   const {
     practices,
-    filteredPractices,
-    filter,
     stats,
     loading,
     error,
-    updateFilter,
-    resetFilter,
-    deletePractice,
-    exportData,
-    importData
+    deletePractice
   } = usePracticeManager();
-
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [practiceToDelete, setPracticeToDelete] = useState<Practice | null>(null);
@@ -40,10 +31,6 @@ const PracticeListPage: React.FC = () => {
 
   const handleCreateNew = () => {
     router.push('/practice/create');
-  };
-
-  const handlePracticeView = (practice: Practice) => {
-    router.push(`/practice/${practice.id}`);
   };
 
   const handlePracticeEdit = (practice: Practice) => {
@@ -79,57 +66,6 @@ const PracticeListPage: React.FC = () => {
     router.push(`/practice/${practice.id}`);
   };
 
-  const handleExportData = async () => {
-    try {
-      const data = await exportData();
-      const blob = new Blob([data], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `practice_data_${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('匯出失敗:', err);
-    }
-  };
-
-  const handleImportData = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        try {
-          const text = await file.text();
-          await importData(text);
-        } catch (err) {
-          console.error('匯入失敗:', err);
-        }
-      }
-    };
-    input.click();
-  };
-
-  const renderViewModeButton = (mode: 'grid' | 'list', Icon: React.ComponentType<{ className: string }>) => {
-    const isActive = viewMode === mode;
-
-    return (
-      <Button
-        variant={isActive ? "default" : "ghost"}
-        size="sm"
-        onClick={() => setViewMode(mode)}
-        className="h-8 w-8 p-0"
-      >
-        <Icon className="h-4 w-4" />
-        <span className="sr-only">{mode === 'grid' ? '格子檢視' : '清單檢視'}</span>
-      </Button>
-    );
-  };
-
   const renderEmptyState = () => {
     if (practices.length === 0) {
       return (
@@ -150,14 +86,7 @@ const PracticeListPage: React.FC = () => {
     return (
       <div className="max-w-md mx-auto">
         <h3 className="text-lg font-semibold text-muted-foreground mb-2">沒有找到符合條件的實踐</h3>
-        <p className="text-base text-muted-foreground mb-4">請調整搜尋條件或篩選器</p>
-        <Button
-          variant="link"
-          onClick={resetFilter}
-          className="p-0 h-auto text-primary"
-        >
-          清除所有篩選
-        </Button>
+        <p className="text-base text-muted-foreground mb-4">請調整搜尋條件</p>
       </div>
     );
   };
@@ -182,7 +111,7 @@ const PracticeListPage: React.FC = () => {
       );
     }
 
-    if (filteredPractices.length === 0) {
+    if (practices.length === 0) {
       return (
         <div className="text-center py-16">
           {renderEmptyState()}
@@ -190,17 +119,12 @@ const PracticeListPage: React.FC = () => {
       );
     }
 
-    const gridClass = viewMode === 'grid'
-      ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-      : 'grid-cols-1';
-
     return (
-      <div className={`grid gap-4 sm:gap-6 ${gridClass}`}>
-        {filteredPractices.map((practice: Practice) => (
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {practices.map((practice: Practice) => (
           <PracticeCard
             key={practice.id}
             practice={practice}
-            onView={handlePracticeView}
             onEdit={handlePracticeEdit}
             onDelete={handlePracticeDelete}
             onCheckIn={handlePracticeCheckIn}
@@ -232,70 +156,20 @@ const PracticeListPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-col xs:flex-row items-stretch xs:items-center space-y-2 xs:space-y-0 xs:space-x-3">
-                  <div className="flex items-center border border-basic-200 rounded-lg overflow-hidden">
-                    {renderViewModeButton('grid', Grid3x3)}
-                    {renderViewModeButton('list', List)}
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleExportData}
-                      className="h-8 w-8 p-0"
-                      title="匯出資料"
-                    >
-                      <Download className="h-4 w-4" />
-                      <span className="sr-only">匯出資料</span>
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleImportData}
-                      className="h-8 w-8 p-0"
-                      title="匯入資料"
-                    >
-                      <Upload className="h-4 w-4" />
-                      <span className="sr-only">匯入資料</span>
-                    </Button>
-                  </div>
-
-                  <Button
-                    onClick={handleCreateNew}
-                    className="flex items-center justify-center space-x-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    <span className="hidden xs:inline">建立實踐</span>
-                    <span className="xs:hidden">建立</span>
-                  </Button>
-                </div>
+                <Button
+                  onClick={handleCreateNew}
+                  className="flex items-center justify-center space-x-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden xs:inline">建立實踐</span>
+                  <span className="xs:hidden">建立</span>
+                </Button>
               </div>
 
-              <div className="bg-card rounded-lg shadow-sm border border-border p-3 sm:p-4 mb-4 sm:mb-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 space-y-2 sm:space-y-0">
-                  <h3 className="text-lg font-semibold text-foreground">搜尋實踐</h3>
-                  <span className="text-sm text-muted-foreground">快速找到您的學習項目</span>
-                </div>
-                <SearchInput
-                  value={filter.searchTerm || ''}
-                  onChange={(value) => updateFilter({ searchTerm: value })}
-                  placeholder="輸入關鍵字搜尋實踐項目、小目標或學習資源..."
-                  className="w-full"
-                />
-              </div>
             </div>
 
-            <div className="bg-card rounded-lg shadow-sm border border-border mb-4 sm:mb-6">
-              <FilterBar
-                filter={filter}
-                onFilterChange={updateFilter}
-                onResetFilter={resetFilter}
-                totalCount={practices.length}
-                filteredCount={filteredPractices.length}
-              />
-            </div>
+            {/* 學習洞察 */}
+            <LearningInsights practices={practices} />
 
             <div>
               {renderContent()}

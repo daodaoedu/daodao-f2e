@@ -99,18 +99,14 @@ export const MoodType = {
 } as const;
 
 // ==================== 基礎 schema ====================
-export const smallGoalSchema = z.object({
-  id: z.string(),
-  content: z.string().min(1, '請輸入目標內容').max(200, '目標內容不可超過 200 字'),
-  isCompleted: z.boolean().default(false),
-  completedAt: z.string().optional(),
-  order: z.number().min(0, '排序必須大於等於 0')
-});
 
 export const resourceSchema = z.object({
   id: z.string(),
   name: z.string().min(1, '請輸入資源名稱').max(100, '資源名稱不可超過 100 字'),
-  url: z.string().url('請輸入有效的網址').optional().or(z.literal('')),
+  url: z.string().optional().refine(
+    (val) => !val || val === '' || /^https?:\/\/.+/.test(val),
+    { message: '請輸入有效的網址' }
+  ),
   type: resourceTypeSchema,
   description: z.string().max(500, '描述不可超過 500 字').optional(),
   order: z.number().min(0, '排序必須大於等於 0')
@@ -134,6 +130,7 @@ export const practiceSchema = z.object({
   title: z.string().min(1, '請輸入標題').max(100, '標題不可超過 100 字'),
   description: z.string().max(2000, '描述不可超過 2000 字').optional(),
   contentType: contentTypeSchema,
+  customContentType: z.string().max(20, '自定義類型名稱不可超過 20 字').optional(),
   totalAmount: z.number().min(1, '總量必須大於 0').max(999999, '總量不可超過 999999'),
   currentProgress: z.number().min(0, '當前進度必須大於等於 0').default(0),
   unit: z.string().min(1, '請輸入單位').max(20, '單位不可超過 20 字'),
@@ -147,7 +144,7 @@ export const practiceSchema = z.object({
   reminderFrequency: reminderFrequencySchema.default('daily'),
   streak: z.number().min(0, '連續天數必須大於等於 0').default(0),
   lastCheckinDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '請輸入有效的日期格式 YYYY-MM-DD').optional(),
-  smallGoals: z.array(smallGoalSchema).default([]),
+  practiceAction: z.string().max(200, '實踐行動不可超過 200 字').optional(),
   resources: z.array(resourceSchema).default([]),
   checkIns: z.array(checkInRecordSchema).default([]),
   tags: z.array(z.string()).default([]),
@@ -167,23 +164,21 @@ export const createPracticeSchema = z.object({
   title: z.string().min(1, '請輸入標題').max(100, '標題不可超過 100 字'),
   description: z.string().max(2000, '描述不可超過 2000 字').optional(),
   contentType: contentTypeSchema,
+  customContentType: z.string().max(20, '自定義類型名稱不可超過 20 字').optional(),
   totalAmount: z.number().min(1, '總量必須大於 0').max(999999, '總量不可超過 999999'),
   targetDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '請輸入有效的目標日期格式 YYYY-MM-DD').optional(),
   motivationType: motivationTypeSchema.optional(),
   customMotivation: z.string().max(200, '自定義動機不可超過 200 字').optional(),
   reminderEnabled: z.boolean().default(false),
   reminderFrequency: reminderFrequencySchema.default('daily'),
-  smallGoals: z.array(
-    z.object({
-      content: z.string().min(1, '請輸入目標內容').max(200, '目標內容不可超過 200 字'),
-      isCompleted: z.boolean().default(false),
-      order: z.number().min(0, '排序必須大於等於 0')
-    })
-  ).default([]),
+  practiceAction: z.string().max(200, '實踐行動不可超過 200 字').optional(),
   resources: z.array(
     z.object({
       name: z.string().min(1, '請輸入資源名稱').max(100, '資源名稱不可超過 100 字'),
-      url: z.string().url('請輸入有效的網址').optional().or(z.literal('')),
+      url: z.string().optional().refine(
+    (val) => !val || val === '' || /^https?:\/\/.+/.test(val),
+    { message: '請輸入有效的網址' }
+  ),
       type: resourceTypeSchema,
       description: z.string().max(500, '描述不可超過 500 字').optional(),
       order: z.number().min(0, '排序必須大於等於 0')
@@ -202,6 +197,7 @@ export const createPracticeSchema = z.object({
 export const updatePracticeSchema = z.object({
   title: z.string().min(1, '請輸入標題').max(100, '標題不可超過 100 字').optional(),
   description: z.string().max(2000, '描述不可超過 2000 字').optional(),
+  customContentType: z.string().max(20, '自定義類型名稱不可超過 20 字').optional(),
   totalAmount: z.number().min(1, '總量必須大於 0').max(999999, '總量不可超過 999999').optional(),
   targetDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '請輸入有效的目標日期格式 YYYY-MM-DD').optional(),
   motivationType: motivationTypeSchema.optional(),
@@ -209,7 +205,7 @@ export const updatePracticeSchema = z.object({
   reminderEnabled: z.boolean().optional(),
   reminderFrequency: reminderFrequencySchema.optional(),
   status: practiceStatusSchema.optional(),
-  smallGoals: z.array(smallGoalSchema).optional(),
+  practiceAction: z.string().max(200, '實踐行動不可超過 200 字').optional(),
   resources: z.array(resourceSchema).optional(),
   tags: z.array(z.string()).optional(),
   dailyGoal: z.object({
@@ -273,6 +269,7 @@ export const validationResultSchema = z.object({
 export const pathInfoSchema = z.object({
   title: z.string().min(1, '請輸入標題'),
   contentType: z.enum(['book', 'video', 'articles', 'podcast', 'course', 'custom']),
+  customContentType: z.string().optional(),
   totalAmount: z.string().min(1, '請輸入總量'),
   currentProgress: z.string(),
   targetDate: z.string(),
@@ -302,7 +299,6 @@ export type ReminderFrequency = z.infer<typeof reminderFrequencySchema>;
 export type ResourceType = z.infer<typeof resourceTypeSchema>;
 export type MoodType = z.infer<typeof moodTypeSchema>;
 
-export type SmallGoal = z.infer<typeof smallGoalSchema>;
 export type Resource = z.infer<typeof resourceSchema>;
 export type CheckInRecord = z.infer<typeof checkInRecordSchema>;
 export type Practice = z.infer<typeof practiceSchema>;
@@ -365,7 +361,7 @@ export interface PracticeContextType {
   // 便利方法
   createPracticeFromPathInfo: (
     pathInfo: Record<string, unknown>,
-    smallGoals: Array<{content: string}>,
+    practiceAction: string,
     resources: Array<{name: string, url: string}>
   ) => Promise<string>;
 }

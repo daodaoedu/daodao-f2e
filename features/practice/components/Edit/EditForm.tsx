@@ -1,11 +1,20 @@
-import React from 'react';
-import { Plus, X, Target, BookOpen, Link as LinkIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, X, Target, BookOpen, Link as LinkIcon, Clock, BarChart, Book, Video, FileText, Headphones, GraduationCap, Settings, AlertCircle } from 'lucide-react';
 import { Practice, Resource, ResourceType } from '@/features/practice';
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { defaultTags } from '@/constants/practice';
 
 interface EditFormProps {
   formData: Partial<Practice>;
@@ -14,19 +23,13 @@ interface EditFormProps {
   practice: Practice;
 }
 
-interface SmallGoal {
-  id: string;
-  content: string;
-  isCompleted: boolean;
-  order: number;
-}
-
 const EditForm: React.FC<EditFormProps> = ({
   formData,
   onChange,
   errors,
   practice
 }) => {
+  const [resourceErrors, setResourceErrors] = useState<Record<string, { name?: string; url?: string }>>({});
   // 處理基本欄位變更
   const handleFieldChange = (field: keyof Practice, value: string | number | boolean) => {
     onChange({
@@ -35,42 +38,32 @@ const EditForm: React.FC<EditFormProps> = ({
     });
   };
 
-  // 處理小目標變更
-  const handleGoalChange = (goalId: string, newContent: string) => {
-    const updatedGoals = (formData.smallGoals || []).map((goal) =>
-      goal.id === goalId ? { ...goal, content: newContent } : goal
-    );
-    onChange({
-      ...formData,
-      smallGoals: updatedGoals
-    });
-  };
+  // 驗證單個資源欄位
+  const validateResourceField = (resourceId: string, field: 'name' | 'url', value: string) => {
+    let error = '';
 
-  // 新增小目標
-  const addGoal = () => {
-    const currentGoals = formData.smallGoals || [];
-    if (currentGoals.length >= 3) return;
+    if (field === 'name') {
+      if (!value.trim()) {
+        error = '請輸入資源名稱';
+      } else if (value.length > 100) {
+        error = '資源名稱不可超過 100 字';
+      }
+    } else if (field === 'url' && value.trim()) {
+      // 使用簡單的 URL 格式檢查
+      if (!/^https?:\/\/.+/.test(value)) {
+        error = '請輸入有效的網址';
+      }
+    }
 
-    const newGoal: SmallGoal = {
-      id: `goal_${Date.now()}`,
-      content: '',
-      isCompleted: false,
-      order: currentGoals.length
-    };
+    setResourceErrors((prev) => ({
+      ...prev,
+      [resourceId]: {
+        ...prev[resourceId],
+        [field]: error || undefined
+      }
+    }));
 
-    onChange({
-      ...formData,
-      smallGoals: [...currentGoals, newGoal]
-    });
-  };
-
-  // 刪除小目標
-  const removeGoal = (goalId: string) => {
-    const updatedGoals = (formData.smallGoals || []).filter((goal) => goal.id !== goalId);
-    onChange({
-      ...formData,
-      smallGoals: updatedGoals
-    });
+    return !error;
   };
 
   // 處理資源變更
@@ -82,6 +75,11 @@ const EditForm: React.FC<EditFormProps> = ({
       ...formData,
       resources: updatedResources
     });
+
+    // 如果之前有錯誤，即時驗證
+    if (resourceErrors[resourceId]?.[field]) {
+      validateResourceField(resourceId, field, value);
+    }
   };
 
   // 新增資源
@@ -112,14 +110,33 @@ const EditForm: React.FC<EditFormProps> = ({
     });
   };
 
+  // 處理標籤
+  const addTag = (tag: string) => {
+    const currentTags = formData.tags || [];
+    if (tag && !currentTags.includes(tag) && currentTags.length < 3) {
+      onChange({
+        ...formData,
+        tags: [...currentTags, tag]
+      });
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    const updatedTags = (formData.tags || []).filter((tag) => tag !== tagToRemove);
+    onChange({
+      ...formData,
+      tags: updatedTags
+    });
+  };
+
   // 內容類型選項
   const contentTypeOptions = [
-    { value: 'book', label: '📚 書籍', unit: '頁' },
-    { value: 'video', label: '🎬 影片', unit: '集' },
-    { value: 'articles', label: '📄 文章', unit: '篇' },
-    { value: 'podcast', label: '🎧 Podcast', unit: '集' },
-    { value: 'course', label: '🎓 課程', unit: '堂' },
-    { value: 'custom', label: '🎯 自定義', unit: '項' }
+    { value: 'book', label: '書籍', unit: '頁', icon: Book },
+    { value: 'video', label: '影片課程', unit: '集', icon: Video },
+    { value: 'articles', label: '文章', unit: '篇', icon: FileText },
+    { value: 'podcast', label: 'Podcast', unit: '集', icon: Headphones },
+    { value: 'course', label: '課程', unit: '堂', icon: GraduationCap },
+    { value: 'custom', label: '自定義', unit: '項', icon: Settings }
   ];
 
   const currentContentType = contentTypeOptions.find((option) => option.value === practice.contentType);
@@ -130,7 +147,7 @@ const EditForm: React.FC<EditFormProps> = ({
       <div className="space-y-6">
         <div className="flex items-center space-x-3 mb-4">
           <BookOpen className="h-5 w-5 text-primary-base" />
-          <h3 className="heading-md text-basic-black">基本資訊</h3>
+          <h3 className="heading-sm text-basic-black">基本資訊</h3>
         </div>
 
         {/* 標題 */}
@@ -150,34 +167,116 @@ const EditForm: React.FC<EditFormProps> = ({
           )}
         </div>
 
-        {/* 描述 */}
+        {/* 實踐類型（只顯示，不可編輯） */}
         <div className="space-y-2">
-          <Label htmlFor="description">描述</Label>
-          <Textarea
-            id="description"
-            value={formData.description || ''}
-            onChange={(e) => handleFieldChange('description', e.target.value)}
-            placeholder="描述你的學習目標和計劃..."
-            rows={3}
-            className="resize-none"
-          />
+          <Label>實踐類型</Label>
+          <div className="px-3 py-2 bg-muted border border-input rounded-md body-sm text-muted-foreground flex items-center gap-2">
+            {currentContentType?.icon && React.createElement(currentContentType.icon, { className: "h-4 w-4" })}
+            {practice.contentType === 'custom' ? practice.customContentType || '自定義' : (currentContentType?.label || practice.contentType)}
+          </div>
+          <p className="body-sm text-muted-foreground">實踐類型在建立後無法修改</p>
+        </div>
+      </div>
+
+      {/* 標籤設定 */}
+      <div className="space-y-6">
+        <div className="flex items-center space-x-3 mb-4">
+          <Label>標籤設定</Label>
+          <span className="text-sm text-muted-foreground">({(formData.tags || []).length}/3)</span>
         </div>
 
-        {/* 內容類型（只顯示，不可編輯） */}
-        <div className="space-y-2">
-          <Label>內容類型</Label>
-          <div className="px-3 py-2 bg-muted border border-input rounded-md body-sm text-muted-foreground">
-            {currentContentType?.label || practice.contentType}
+        {/* 標籤下拉選單 */}
+        <div className="space-y-3">
+          <div>
+            <Select
+              disabled={(formData.tags || []).length >= 3}
+              onValueChange={(value) => {
+                if (value && !(formData.tags || []).includes(value) && (formData.tags || []).length < 3) {
+                  addTag(value);
+                }
+              }}
+            >
+              <SelectTrigger className={cn(
+                (formData.tags || []).length >= 3 && "opacity-50 cursor-not-allowed"
+              )}
+              >
+                <SelectValue placeholder={(formData.tags || []).length >= 3 ? "已達到最多標籤數量" : "選擇標籤"} />
+              </SelectTrigger>
+              <SelectContent>
+                <div className="space-y-1">
+                  <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">分類標籤</p>
+                  {defaultTags.categories
+                    .filter((tag) => !(formData.tags || []).includes(tag.label))
+                    .map((tag) => (
+                      <SelectItem key={tag.id} value={tag.label}>
+                        <span className={cn("px-2 py-1 rounded text-xs font-medium", tag.color)}>
+                          {tag.label}
+                        </span>
+                      </SelectItem>
+                    ))
+                  }
+
+                  <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">難度標籤</p>
+                  {defaultTags.difficulty
+                    .filter((tag) => !(formData.tags || []).includes(tag.label))
+                    .map((tag) => (
+                      <SelectItem key={tag.id} value={tag.label}>
+                        <span className={cn("px-2 py-1 rounded text-xs font-medium", tag.color)}>
+                          {tag.label}
+                        </span>
+                      </SelectItem>
+                    ))
+                  }
+
+                  <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">時長標籤</p>
+                  {defaultTags.duration
+                    .filter((tag) => !(formData.tags || []).includes(tag.label))
+                    .map((tag) => (
+                      <SelectItem key={tag.id} value={tag.label}>
+                        <span className={cn("px-2 py-1 rounded text-xs font-medium", tag.color)}>
+                          {tag.label}
+                        </span>
+                      </SelectItem>
+                    ))
+                  }
+                </div>
+              </SelectContent>
+            </Select>
           </div>
-          <p className="body-sm text-muted-foreground">內容類型在建立後無法修改</p>
         </div>
+
+        {/* 已選標籤 */}
+        {(formData.tags || []).length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-foreground">已選標籤</p>
+            <div className="flex flex-wrap gap-2">
+              {(formData.tags || []).map((tag) => (
+                <div
+                  key={tag}
+                  className="flex items-center px-3 py-2 bg-primary/10 border border-primary/20 rounded-lg"
+                >
+                  <span className="text-sm font-medium text-primary mr-2">{tag}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeTag(tag)}
+                    className="text-primary hover:text-destructive p-0 h-auto w-auto"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 目標設定 */}
       <div className="space-y-6">
         <div className="flex items-center space-x-3 mb-4">
           <Target className="h-5 w-5 text-primary-base" />
-          <h3 className="heading-md text-basic-black">目標設定</h3>
+          <h3 className="heading-sm text-basic-black">目標設定</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -209,77 +308,139 @@ const EditForm: React.FC<EditFormProps> = ({
             )}
           </div>
 
-          {/* 目標日期 */}
+          {/* 開始日期 */}
           <div className="space-y-2">
-            <Label htmlFor="targetDate">目標完成日期</Label>
+            <Label htmlFor="startDate">開始日期</Label>
             <Input
-              id="targetDate"
+              id="startDate"
               type="date"
-              value={formData.targetDate || ''}
-              onChange={(e) => handleFieldChange('targetDate', e.target.value)}
-              className={cn(errors.targetDate && "border-alert focus:ring-alert")}
+              value={formData.startDate || ''}
+              onChange={(e) => handleFieldChange('startDate', e.target.value)}
+              className={cn(errors.startDate && "border-alert focus:ring-alert")}
             />
-            {errors.targetDate && (
-              <p className="body-sm text-alert">{errors.targetDate}</p>
+            {errors.startDate && (
+              <p className="body-sm text-alert">{errors.startDate}</p>
             )}
           </div>
         </div>
+
+        {/* 每日目標設定 */}
+        <div className="space-y-4 mt-6">
+          <Label>每次實踐目標</Label>
+          <RadioGroup
+            value={formData.dailyGoal?.type || 'time'}
+            onValueChange={(value) => {
+              onChange({
+                ...formData,
+                dailyGoal: {
+                  ...formData.dailyGoal,
+                  type: value as 'time' | 'completion'
+                }
+              });
+            }}
+            className="flex items-center space-x-6"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="time" id="time-edit" />
+              <Label htmlFor="time-edit" className="text-sm font-medium flex items-center">
+                <Clock className="h-4 w-4 mr-1" />
+                按時間
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="completion" id="completion-edit" />
+              <Label htmlFor="completion-edit" className="text-sm font-medium flex items-center">
+                <BarChart className="h-4 w-4 mr-1" />
+                按完成量
+              </Label>
+            </div>
+          </RadioGroup>
+
+          {/* 時間目標 */}
+          {formData.dailyGoal?.type === 'time' && (
+            <div className="space-y-2">
+              <Label htmlFor="dailyTime">每次進行</Label>
+              <div className="relative">
+                <Input
+                  id="dailyTime"
+                  type="number"
+                  value={formData.dailyGoal?.timeMinutes || 30}
+                  onChange={(e) => {
+                    onChange({
+                      ...formData,
+                      dailyGoal: {
+                        ...formData.dailyGoal,
+                        type: 'time',
+                        timeMinutes: parseInt(e.target.value, 10) || 30
+                      }
+                    });
+                  }}
+                  min="5"
+                  max="240"
+                  className="pr-12"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 body-sm text-muted-foreground">
+                  分鐘
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* 完成量目標 */}
+          {formData.dailyGoal?.type === 'completion' && (
+            <div className="space-y-2">
+              <Label htmlFor="dailyAmount">每次完成</Label>
+              <div className="relative">
+                <Input
+                  id="dailyAmount"
+                  type="number"
+                  value={formData.dailyGoal?.amount || 10}
+                  onChange={(e) => {
+                    onChange({
+                      ...formData,
+                      dailyGoal: {
+                        ...formData.dailyGoal,
+                        type: 'completion',
+                        amount: parseInt(e.target.value, 10) || 1,
+                        unit: formData.dailyGoal?.unit || currentContentType?.unit || '項'
+                      }
+                    });
+                  }}
+                  min="1"
+                  max="100"
+                  className="pr-12"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 body-sm text-muted-foreground">
+                  {formData.dailyGoal?.unit || currentContentType?.unit || '項'}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* 小目標 */}
+      {/* 實踐行動 */}
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h3 className="heading-md text-basic-black">小目標</h3>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={addGoal}
-            disabled={(formData.smallGoals || []).length >= 3}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            新增目標
-          </Button>
+        <div className="flex items-center space-x-3 mb-4">
+          <Target className="h-5 w-5 text-primary-base" />
+          <h3 className="heading-sm text-basic-black">實踐行動</h3>
         </div>
 
-        <div className="space-y-3">
-          {(formData.smallGoals || []).map((goal, index) => (
-            <div key={goal.id} className="flex items-center space-x-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-primary-base text-primary-foreground rounded-full flex items-center justify-center body-sm font-medium">
-                {index + 1}
-              </span>
-              <Input
-                value={goal.content}
-                onChange={(e) => handleGoalChange(goal.id, e.target.value)}
-                placeholder={`小目標 ${index + 1}`}
-                className="flex-1"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => removeGoal(goal.id)}
-                className="text-muted-foreground hover:text-alert p-2"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-        </div>
-
-        {(formData.smallGoals || []).length === 0 && (
-          <div className="text-center py-8 border-2 border-dashed border-border rounded-lg">
-            <p className="body-md text-muted-foreground mb-3">尚未設定小目標</p>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={addGoal}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              新增第一個目標
-            </Button>
+        <div className="space-y-2">
+          <Label htmlFor="practiceAction">描述你的實踐行動</Label>
+          <Textarea
+            id="practiceAction"
+            value={formData.practiceAction || ''}
+            onChange={(e) => handleFieldChange('practiceAction', e.target.value)}
+            placeholder="例如：每天閱讀30分鐘，並記錄學習筆記"
+            rows={3}
+            className="resize-none"
+            maxLength={200}
+          />
+          <div className="text-xs text-muted-foreground text-right">
+            {(formData.practiceAction || '').length}/200
           </div>
-        )}
+        </div>
       </div>
 
       {/* 學習資源 */}
@@ -287,7 +448,7 @@ const EditForm: React.FC<EditFormProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <LinkIcon className="h-5 w-5 text-primary-base" />
-            <h3 className="heading-md text-basic-black">學習資源</h3>
+            <h3 className="heading-sm text-basic-black">資源</h3>
           </div>
           <Button
             type="button"
@@ -309,17 +470,37 @@ const EditForm: React.FC<EditFormProps> = ({
                   {index + 1}
                 </span>
                 <div className="flex-1 space-y-3">
-                  <Input
-                    value={resource.name}
-                    onChange={(e) => handleResourceChange(resource.id, 'name', e.target.value)}
-                    placeholder="資源名稱"
-                  />
-                  <Input
-                    type="url"
-                    value={resource.url || ''}
-                    onChange={(e) => handleResourceChange(resource.id, 'url', e.target.value)}
-                    placeholder="資源連結（選填）"
-                  />
+                  <div>
+                    <Input
+                      value={resource.name}
+                      onChange={(e) => handleResourceChange(resource.id, 'name', e.target.value)}
+                      onBlur={(e) => validateResourceField(resource.id, 'name', e.target.value)}
+                      placeholder="資源名稱"
+                      className={cn(resourceErrors[resource.id]?.name && "border-destructive")}
+                    />
+                    {resourceErrors[resource.id]?.name && (
+                      <div className="flex items-center mt-1 text-xs text-destructive">
+                        <AlertCircle className="h-3 w-3 mr-1" />
+                        <span>{resourceErrors[resource.id].name}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <Input
+                      type="url"
+                      value={resource.url || ''}
+                      onChange={(e) => handleResourceChange(resource.id, 'url', e.target.value)}
+                      onBlur={(e) => validateResourceField(resource.id, 'url', e.target.value)}
+                      placeholder="資源連結（選填）"
+                      className={cn(resourceErrors[resource.id]?.url && "border-destructive")}
+                    />
+                    {resourceErrors[resource.id]?.url && (
+                      <div className="flex items-center mt-1 text-xs text-destructive">
+                        <AlertCircle className="h-3 w-3 mr-1" />
+                        <span>{resourceErrors[resource.id].url}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <Button
                   type="button"

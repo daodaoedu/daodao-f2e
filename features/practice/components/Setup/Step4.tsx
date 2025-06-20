@@ -1,14 +1,16 @@
 import React from 'react';
-import { Calendar, Target, BookOpen } from 'lucide-react';
-import { colors, contentTypeOptions } from '@/constants/practice';
+import { Target, BookOpen, LinkIcon } from 'lucide-react';
+import { contentTypeOptions } from '@/constants/practice';
 import { PathInfo } from '@/services/practice/schema';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 interface StepFivePreviewProps {
   pathInfo: PathInfo;
   handleCreatePath: () => void;
+  handlePrevStep?: () => void;
   // 新增的資料
-  smallGoals: Array<{id: number, content: string}>;
+  practiceAction: string;
   resources: Array<{id: number, name: string, url: string}>;
   // 新增：目標設定相關的狀態
   dailyGoalType?: string;
@@ -22,7 +24,8 @@ interface StepFivePreviewProps {
 const StepFivePreview: React.FC<StepFivePreviewProps> = ({
   pathInfo,
   handleCreatePath,
-  smallGoals,
+  handlePrevStep,
+  practiceAction,
   resources,
   dailyGoalType = 'time',
   dailyGoalTime = 30,
@@ -62,10 +65,10 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="p-4">
         <div className="flex items-center mb-2">
-          <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: colors.primary }} />
+          <div className="w-2 h-2 rounded-full mr-2 bg-primary" />
           <span className="text-sm text-gray-500">主題實踐</span>
         </div>
-        <h3 className="text-lg font-semibold" style={{ color: colors.dark }}>預覽確認</h3>
+        <h3 className="text-lg font-semibold text-gray-900">預覽確認</h3>
       </div>
 
       <div className="p-4 pt-0">
@@ -73,10 +76,10 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
           {/* 主題實踐概覽卡片 */}
           <div className="border rounded-lg overflow-hidden">
             {/* 主題實踐標題區域 */}
-            <div className="p-4" style={{ backgroundColor: `${colors.primary}10` }}>
+            <div className="p-4 bg-primary/10">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg" style={{ color: colors.dark }}>
+                  <h3 className="font-semibold text-lg text-gray-900">
                     {pathInfo.title || "我的主題實踐"}
                   </h3>
                   <div className="flex items-center mt-1 text-sm text-gray-600">
@@ -85,7 +88,6 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
                       {contentTypeOptions.find((option) => option.id === pathInfo.contentType)?.label || "書籍"}
                     </span>
                     <span className="mx-2">•</span>
-                    <Calendar className="h-4 w-4 mr-1" />
                     <span>{getDateRange()}</span>
                   </div>
                 </div>
@@ -93,48 +95,28 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
             </div>
 
             {/* 主題實踐詳細資訊 */}
-            <div className="p-4">
+            <div className="mt-3">
               {/* 實踐行動 */}
-              {smallGoals.length > 0 && (
+              {practiceAction && (
                 <div className="mb-4">
                   <h4 className="text-sm font-medium mb-2 flex items-center">
-                    <Target className="h-4 w-4 mr-1" style={{ color: colors.primary }} />
+                    <Target className="h-4 w-4 mr-1 text-primary" />
                     我要進行實踐的是
-                    <div className="ml-2 flex-1">
-                      {smallGoals.map((goal, index) => (
-                        <span
-                          key={goal.id}
-                          className="underline decoration-2"
-                          style={{ textDecorationColor: colors.primary }}
-                        >
-                          {goal.content}
-                          {index < smallGoals.length - 1 && ', '}
-                        </span>
-                      ))}
-                    </div>
                   </h4>
+                  <div className="p-3 bg-gray-50 rounded-md">
+                    <p className="text-sm text-gray-700">{practiceAction}</p>
+                  </div>
                 </div>
               )}
 
               {/* 標籤顯示 */}
               {selectedTags.length > 0 && (
                 <div className="mb-4">
-                  <h4 className="text-sm font-medium mb-2 flex items-center">
-                    <div className="w-4 h-4 mr-1 flex items-center justify-center">
-                      <span className="text-xs" style={{ color: colors.primary }}>#</span>
-                    </div>
-                    標籤
-                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedTags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-2 py-1 rounded-full text-xs font-medium"
-                        style={{
-                          backgroundColor: `${colors.primary}15`,
-                          color: colors.primary,
-                          border: `1px solid ${colors.primary}30`
-                        }}
+                        className="px-2 py-1 rounded-full text-xs font-medium bg-primary/5 text-primary border border-primary/20"
                       >
                         {tag}
                       </span>
@@ -163,18 +145,40 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
               {/* 資源 */}
               <div className="mb-4">
                 <h4 className="text-sm font-medium mb-2 flex items-center">
-                  <BookOpen className="h-4 w-4 mr-1" style={{ color: colors.primary }} />
+                  <BookOpen className="h-4 w-4 mr-1 text-primary" />
                   資源 ({resources.length})
                 </h4>
 
                 {resources.length > 0 ? (
                   <div className="space-y-2">
                     {resources.slice(0, 3).map((resource) => ( // 只顯示前3個
-                      <div key={resource.id} className="p-2 bg-gray-50 rounded-md">
-                        <div className="font-medium text-sm">{resource.name}</div>
-                        {resource.url && (
-                          <div className="text-xs text-gray-500 truncate">{resource.url}</div>
-                        )}
+                      <div key={resource.id} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                        {/* 資源圖示 */}
+                        <div className="flex-shrink-0 mr-3">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mr-3">
+                            <LinkIcon className="h-4 w-4 text-primary" />
+                          </div>
+                        </div>
+
+                        {/* 資源內容 */}
+                        <div className="flex-1 min-w-0">
+                          {resource.url ? (
+                            <Link
+                              href={resource.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="group block"
+                            >
+                              <div className="flex items-center font-medium text-sm group-hover:text-primary transition-colors text-gray-900">
+                                <span className="truncate">{resource.name}</span>
+                              </div>
+                            </Link>
+                          ) : (
+                            <div className="font-medium text-sm truncate text-gray-900">
+                              {resource.name}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ))}
                     {resources.length > 3 && (
@@ -193,27 +197,33 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
           </div>
 
           {/* 準備開始提示 */}
-          <div className="p-4 rounded-lg text-center" style={{ backgroundColor: `${colors.primary}05`, border: `1px solid ${colors.primary}30` }}>
-            <div className="text-lg font-semibold mb-2" style={{ color: colors.primary }}>
-              🚀 準備好開始你的主題實踐了嗎？
+          <div className="p-4 rounded-lg text-center bg-primary/5 border border-primary/20">
+            <div className="text-lg font-semibold mb-2 text-primary">
+              準備好開始你的主題實踐了嗎？
             </div>
             <p className="text-sm text-gray-600 mb-3">
               點擊「開始主題實踐」後，你就可以開始追蹤進度、打卡，與目標更近一步！
             </p>
             <div className="text-xs text-gray-500">
-              💡 小提醒：你隨時可以在實踐過程中調整設定
+              小提醒：你隨時可以在實踐過程中調整設定
             </div>
           </div>
         </div>
       </div>
 
-      <div className="p-4 pt-0 flex justify-end">
+      <div className="p-4 pt-0 flex justify-between">
+        <Button
+          variant="outline"
+          onClick={handlePrevStep}
+        >
+          上一步
+        </Button>
         <Button
           onClick={handleCreatePath}
           size="lg"
           className="text-base"
         >
-          🎯 開始主題實踐
+          開始主題實踐
         </Button>
       </div>
     </div>

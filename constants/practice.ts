@@ -3,6 +3,7 @@ import {
   Video,
   FileText,
   Headphones,
+  GraduationCap,
   Plus
 } from 'lucide-react';
 
@@ -33,6 +34,7 @@ export const contentTypeOptions = [
   { id: 'video' as const, label: '影片課程', icon: Video },
   { id: 'articles' as const, label: '文章', icon: FileText },
   { id: 'podcast' as const, label: 'Podcast', icon: Headphones },
+  { id: 'course' as const, label: '課程', icon: GraduationCap },
   { id: 'custom' as const, label: '自定義', icon: Plus }
 ];
 

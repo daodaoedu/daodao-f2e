@@ -48,15 +48,15 @@ export function usePracticeManager() {
   }, []);
 
   // 轉換 PathInfo 為 CreatePracticeInput
-  const pathInfoToPractice = useCallback((pathInfo: Record<string, unknown>, smallGoals: Array<{content: string}>, resources: Array<{name: string, url: string}>, tags: string[] = [], dailyGoalConfig: Record<string, unknown> | null = null): CreatePracticeInput => {
+  const pathInfoToPractice = useCallback((pathInfo: Record<string, unknown>, practiceAction: string, resources: Array<{name: string, url: string}>, tags: string[] = [], dailyGoalConfig: Record<string, unknown> | null = null): CreatePracticeInput => {
     // 使用共享的轉換函數
     // eslint-disable-next-line @typescript-eslint/no-require-imports, global-require
     const { pathInfoToCreatePracticeInput } = require('@/services/practice/utils');
-    return pathInfoToCreatePracticeInput(pathInfo, smallGoals, resources, tags, dailyGoalConfig);
+    return pathInfoToCreatePracticeInput(pathInfo, practiceAction, resources, tags, dailyGoalConfig);
   }, []);
 
-  const createPracticeFromPathInfo = useCallback(async (pathInfo: Record<string, unknown>, smallGoals: Array<{content: string}>, resources: Array<{name: string, url: string}>, tags: string[] = [], dailyGoalConfig: Record<string, unknown> | null = null) => {
-    const practiceData = pathInfoToPractice(pathInfo, smallGoals, resources, tags, dailyGoalConfig);
+  const createPracticeFromPathInfo = useCallback(async (pathInfo: Record<string, unknown>, practiceAction: string, resources: Array<{name: string, url: string}>, tags: string[] = [], dailyGoalConfig: Record<string, unknown> | null = null) => {
+    const practiceData = pathInfoToPractice(pathInfo, practiceAction, resources, tags, dailyGoalConfig);
     const practice = await createPractice(practiceData);
     return practice.id;
   }, [createPractice, pathInfoToPractice]);

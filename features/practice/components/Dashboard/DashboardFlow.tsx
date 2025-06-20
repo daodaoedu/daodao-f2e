@@ -27,7 +27,7 @@ const DashboardFlow: React.FC<DashboardFlowProps> = ({
   const handleCheckInSuccess = () => {
     // 顯示慶祝動畫
     setShowConfetti(true);
-    setCelebrationMessage('🎉 打卡成功！繼續保持學習的好習慣！');
+    setCelebrationMessage('打卡成功！繼續保持學習的好習慣！');
 
     // 滾動到頂部並返回主儀表板
     scrollToTop('smooth');

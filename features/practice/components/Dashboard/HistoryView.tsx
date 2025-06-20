@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Calendar, TrendingUp, Target } from 'lucide-react';
+import { ArrowLeft, Calendar, TrendingUp, Target, Flame } from 'lucide-react';
 import { Practice } from '@/services/practice/schema';
 import { CheckInService } from '@/services/practice/checkIn';
 import { Button } from '@/components/ui/button';
@@ -72,7 +72,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
 
           <div className="bg-white rounded-lg shadow-sm border border-basic-200 p-6">
             <div className="flex items-center">
-              <div className="text-3xl mr-3">🔥</div>
+              <Flame className="h-8 w-8 mr-3 text-orange-500" />
               <div>
                 <div className="heading-lg text-basic-black">{stats.lastWeekCheckIns}</div>
                 <div className="body-sm text-basic-600">本週簽到</div>

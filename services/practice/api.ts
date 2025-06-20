@@ -32,8 +32,17 @@ interface PracticeAPIType {
 // 模擬 API 調用，實際上使用 localStorage
 const practiceAPI: PracticeAPIType = {
   create: async (_, { arg }) => {
+    // 清理資源資料中的 URL 欄位
+    const processedArg = {
+      ...arg,
+      resources: arg.resources?.map((resource) => ({
+        ...resource,
+        url: resource.url === '' || resource.url === null ? undefined : resource.url
+      }))
+    };
+
     // 驗證輸入資料
-    const validatedArg = createPracticeSchema.parse(arg);
+    const validatedArg = createPracticeSchema.parse(processedArg);
 
     const { PracticeStorage } = await import('./storage');
     const { generateId } = await import('./utils');
@@ -44,6 +53,7 @@ const practiceAPI: PracticeAPIType = {
       title: validatedArg.title,
       description: validatedArg.description,
       contentType: validatedArg.contentType,
+      customContentType: validatedArg.customContentType,
       totalAmount: validatedArg.totalAmount,
       currentProgress: 0,
       unit: getContentTypeUnit(validatedArg.contentType),
@@ -57,13 +67,7 @@ const practiceAPI: PracticeAPIType = {
       reminderFrequency: validatedArg.reminderFrequency,
       streak: 0,
       lastCheckinDate: undefined,
-      smallGoals: validatedArg.smallGoals?.map((goal) => ({
-        id: generateId(),
-        content: goal.content,
-        isCompleted: goal.isCompleted,
-        order: goal.order,
-        completedAt: goal.isCompleted ? now : undefined
-      })) || [],
+      practiceAction: validatedArg.practiceAction || undefined,
       resources: validatedArg.resources?.map((resource) => ({
         id: generateId(),
         name: resource.name,
@@ -87,8 +91,17 @@ const practiceAPI: PracticeAPIType = {
   },
 
   update: async (_, { arg: { id, ...updates } }) => {
+    // 清理資源資料中的 URL 欄位
+    const processedUpdates = {
+      ...updates,
+      resources: updates.resources?.map((resource) => ({
+        ...resource,
+        url: resource.url === '' || resource.url === null ? undefined : resource.url
+      }))
+    };
+
     // 驗證輸入資料
-    const validatedUpdates = updatePracticeSchema.parse(updates);
+    const validatedUpdates = updatePracticeSchema.parse(processedUpdates);
 
     const { PracticeStorage } = await import('./storage');
 

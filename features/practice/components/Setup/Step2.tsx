@@ -29,6 +29,9 @@ interface StepTwoProps {
   setDailyGoalPages: (pages: number) => void;
   customUnit: string;
   setCustomUnit: (unit: string) => void;
+  // 實踐行動
+  practiceAction: string;
+  setPracticeAction: (action: string) => void;
 }
 
 const StepTwo: React.FC<StepTwoProps> = ({
@@ -44,10 +47,11 @@ const StepTwo: React.FC<StepTwoProps> = ({
   dailyGoalPages,
   setDailyGoalPages,
   customUnit,
-  setCustomUnit
+  setCustomUnit,
+  practiceAction,
+  setPracticeAction
 }) => {
   const practiceDays = parseInt(pathInfo.totalAmount, 10) || 7;
-  const [practiceGoal, setPracticeGoal] = useState<string>('');
   const [frequencyRange, setFrequencyRange] = useState<[number, number]>([3, 4]);
   const [draggedThumb, setDraggedThumb] = useState<'min' | 'max' | null>(null);
   const [startDate, setStartDate] = useState<Date | undefined>(
@@ -92,16 +96,25 @@ const StepTwo: React.FC<StepTwoProps> = ({
               </div>
 
               <div className="relative">
+                <div className="w-full h-2 bg-muted rounded-lg relative">
+                  <div className={`h-2 bg-primary rounded-lg transition-all duration-300 ${
+                    practiceDays <= 10 ? 'w-[13%]' :
+                    practiceDays <= 13 ? 'w-[26%]' :
+                    practiceDays <= 16 ? 'w-[39%]' :
+                    practiceDays <= 19 ? 'w-[52%]' :
+                    practiceDays <= 22 ? 'w-[65%]' :
+                    practiceDays <= 25 ? 'w-[78%]' :
+                    practiceDays <= 28 ? 'w-[91%]' : 'w-full'
+                  }`}
+                  />
+                </div>
                 <input
                   type="range"
                   min="7"
                   max="30"
                   value={practiceDays}
                   onChange={(e) => setPracticeDays(parseInt(e.target.value, 10))}
-                  className="w-full h-2 bg-basic-200 rounded-lg appearance-none cursor-pointer slider"
-                  style={{
-                    background: `linear-gradient(to right, hsl(var(--primary)) 0%, hsl(var(--primary)) ${((practiceDays - 7) / (30 - 7)) * 100}%, hsl(var(--muted)) ${((practiceDays - 7) / (30 - 7)) * 100}%, hsl(var(--muted)) 100%)`
-                  }}
+                  className="absolute top-0 w-full h-2 bg-transparent rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md"
                 />
                 <div className="flex justify-between text-xs text-muted-foreground mt-2">
                   <span>7天</span>
@@ -134,7 +147,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {startDate ? (
-                        format(startDate, "yyyy 年 M 月 d 日", { locale: zhTW })
+                        format(startDate, "yyyy / M / d ", { locale: zhTW })
                       ) : (
                         <span>選擇開始日期</span>
                       )}
@@ -170,7 +183,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                     if (!startDate) return '請先選擇開始日期';
                     const endDate = new Date(startDate);
                     endDate.setDate(startDate.getDate() + practiceDays);
-                    return format(endDate, "yyyy 年 M 月 d 日", { locale: zhTW });
+                    return format(endDate, "yyyy / M / d", { locale: zhTW });
                   })()}
                 </div>
               </div>
@@ -183,35 +196,28 @@ const StepTwo: React.FC<StepTwoProps> = ({
               實踐行動 <span className="text-destructive">*</span>
             </Label>
 
-            <div className="relative">
-              <div className="text-lg text-foreground mb-4 leading-relaxed">
-                我要在這
-                <span className="inline-flex items-center bg-primary/5 text-primary px-1.5 py-0.5 rounded font-semibold mx-1">
-                  {practiceDays}天
-                </span>
-                要進行實踐是
-              </div>
-
-              <div className="relative">
-                <Textarea
-                  value={practiceGoal}
-                  onChange={(e) => setPracticeGoal(e.target.value)}
-                  placeholder="例如：每週至少看書2小時"
-                  className="w-full px-4 py-3 border-2 border-border rounded-lg resize-none focus:ring-2 focus:ring-primary focus:border-primary text-foreground bg-background placeholder-muted-foreground"
-                  rows={2}
-                  maxLength={50}
-                  style={{
-                    fontSize: '16px',
-                    lineHeight: '1.5'
-                  }}
-                />
-
-                {/* Character counter */}
-                <div className="absolute bottom-3 right-3 text-sm text-muted-foreground bg-background px-2 py-1 rounded">
-                  {practiceGoal.length}/50
-                </div>
-              </div>
+            <div className="text-sm text-muted-foreground mb-4">
+              設定你想要實踐的具體行動
             </div>
+
+            <Textarea
+              value={practiceAction}
+              onChange={(e) => setPracticeAction(e.target.value)}
+              placeholder="例如：每天閱讀30分鐘，並記錄學習筆記"
+              className={cn(
+                "min-h-[80px] resize-none",
+                validationErrors.practiceAction && "border-destructive focus:ring-destructive"
+              )}
+              maxLength={200}
+            />
+            <div className="flex justify-between items-center mt-2">
+              <span className="text-xs text-muted-foreground">
+                {practiceAction.length}/200
+              </span>
+            </div>
+            {validationErrors.practiceAction && (
+              <p className="text-sm text-destructive mt-1">{validationErrors.practiceAction}</p>
+            )}
           </div>
 
           {/* Weekly Frequency Section */}
@@ -238,25 +244,31 @@ const StepTwo: React.FC<StepTwoProps> = ({
                   {/* Slider track */}
                   <div className="h-2 bg-muted rounded-full relative">
                     {/* Active range track */}
-                    <div
-                      className="h-2 rounded-full transition-all duration-300 absolute"
-                      style={{
-                        backgroundColor: 'hsl(var(--primary))',
-                        left: `${((frequencyRange[0] - 2) / 4) * 100}%`,
-                        width: `${((frequencyRange[1] - frequencyRange[0]) / 4) * 100}%`
-                      }}
+                    <div className={`h-2 bg-primary rounded-full transition-all duration-300 absolute ${
+                      frequencyRange[0] === 2 && frequencyRange[1] === 3 ? 'left-0 w-1/4' :
+                      frequencyRange[0] === 2 && frequencyRange[1] === 4 ? 'left-0 w-2/4' :
+                      frequencyRange[0] === 2 && frequencyRange[1] === 5 ? 'left-0 w-3/4' :
+                      frequencyRange[0] === 2 && frequencyRange[1] === 6 ? 'left-0 w-full' :
+                      frequencyRange[0] === 3 && frequencyRange[1] === 4 ? 'left-1/4 w-1/4' :
+                      frequencyRange[0] === 3 && frequencyRange[1] === 5 ? 'left-1/4 w-2/4' :
+                      frequencyRange[0] === 3 && frequencyRange[1] === 6 ? 'left-1/4 w-3/4' :
+                      frequencyRange[0] === 4 && frequencyRange[1] === 5 ? 'left-2/4 w-1/4' :
+                      frequencyRange[0] === 4 && frequencyRange[1] === 6 ? 'left-2/4 w-2/4' :
+                      frequencyRange[0] === 5 && frequencyRange[1] === 6 ? 'left-3/4 w-1/4' :
+                      'left-0 w-2/4'
+                    }`}
                     />
 
                     {/* Minimum thumb */}
                     <div
-                      className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-6 h-6 bg-white border-2 rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 ${
-                        draggedThumb === 'min' ? 'scale-110' : ''
+                      className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-6 h-6 bg-white border-2 border-primary rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 ${
+                        draggedThumb === 'min' ? 'scale-110 ring-4 ring-primary/30' : ''
+                      } ${
+                        frequencyRange[0] === 2 ? 'left-0' :
+                        frequencyRange[0] === 3 ? 'left-1/4' :
+                        frequencyRange[0] === 4 ? 'left-2/4' :
+                        frequencyRange[0] === 5 ? 'left-3/4' : 'left-full'
                       }`}
-                      style={{
-                        borderColor: 'hsl(var(--primary))',
-                        left: `${((frequencyRange[0] - 2) / 4) * 100}%`,
-                        boxShadow: draggedThumb === 'min' ? '0 0 0 4px hsl(var(--primary) / 0.3)' : undefined
-                      }}
                       role="button"
                       tabIndex={0}
                       onKeyDown={(e) => {
@@ -290,14 +302,14 @@ const StepTwo: React.FC<StepTwoProps> = ({
 
                     {/* Maximum thumb */}
                     <div
-                      className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-6 h-6 bg-white border-2 rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 ${
-                        draggedThumb === 'max' ? 'scale-110' : ''
+                      className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-6 h-6 bg-white border-2 border-primary rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 ${
+                        draggedThumb === 'max' ? 'scale-110 ring-4 ring-primary/30' : ''
+                      } ${
+                        frequencyRange[1] === 3 ? 'left-1/4' :
+                        frequencyRange[1] === 4 ? 'left-2/4' :
+                        frequencyRange[1] === 5 ? 'left-3/4' :
+                        frequencyRange[1] === 6 ? 'left-full' : 'left-2/4'
                       }`}
-                      style={{
-                        borderColor: 'hsl(var(--primary))',
-                        left: `${((frequencyRange[1] - 2) / 4) * 100}%`,
-                        boxShadow: draggedThumb === 'max' ? '0 0 0 4px hsl(var(--primary) / 0.3)' : undefined
-                      }}
                       role="button"
                       tabIndex={0}
                       onKeyDown={(e) => {
@@ -378,7 +390,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
           {/* Daily Goal */}
           <div>
             <Label className="block text-sm font-medium text-foreground mb-4">
-              每日實踐目標 <span className="text-destructive">*</span>
+              每次實踐目標 <span className="text-destructive">*</span>
             </Label>
 
             <div className="space-y-4">
@@ -421,24 +433,29 @@ const StepTwo: React.FC<StepTwoProps> = ({
               {/* Completion-based option */}
               {dailyGoalType === 'completion' && (
                 <div className="mt-6">
-                  <div className="flex items-center text-lg text-foreground mb-4">
-                    <span>每次完成</span>
-                    <Input
-                      type="number"
-                      value={dailyGoalPages}
-                      onChange={(e) => setDailyGoalPages(parseInt(e.target.value, 10) || 0)}
-                      className="mx-3 w-20 px-3 py-2 border-2 border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-center"
-                      min="1"
-                      max="999"
-                    />
-                    <Input
-                      type="text"
-                      value={customUnit}
-                      onChange={(e) => setCustomUnit(e.target.value)}
-                      placeholder="自訂單位"
-                      className="px-3 py-2 border-2 border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary w-32"
-                      maxLength={10}
-                    />
+                  <div className="space-y-4">
+                    <div className="flex items-center text-lg text-foreground">
+                      <span>每次完成</span>
+                      <Input
+                        type="number"
+                        value={dailyGoalPages}
+                        onChange={(e) => setDailyGoalPages(parseInt(e.target.value, 10) || 0)}
+                        className="mx-3 w-20 px-3 py-2 border-2 border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-center"
+                        min="1"
+                        max="999"
+                      />
+                      <Input
+                        type="text"
+                        value={customUnit}
+                        onChange={(e) => setCustomUnit(e.target.value)}
+                        placeholder="自訂單位"
+                        className="px-3 py-2 border-2 border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary w-32"
+                        maxLength={10}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      設定每次的完成量（1-999）和單位（最多10字）
+                    </p>
                   </div>
                 </div>
               )}
@@ -457,7 +474,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
         </Button>
         <Button
           onClick={handleNextStep}
-          disabled={!startDate || !practiceDays || !practiceGoal.trim() || !frequencyRange || !dailyGoalType ||
+          disabled={!startDate || !practiceDays || !practiceAction.trim() || !frequencyRange || !dailyGoalType ||
             (dailyGoalType === 'time' && !dailyGoalTime) ||
             (dailyGoalType === 'completion' && (!dailyGoalPages || !customUnit))}
         >
@@ -465,30 +482,6 @@ const StepTwo: React.FC<StepTwoProps> = ({
         </Button>
       </div>
 
-      {/* Custom Slider Styles */}
-      <style jsx>{`
-        .slider::-webkit-slider-thumb {
-          appearance: none;
-          height: 20px;
-          width: 20px;
-          border-radius: 50%;
-          background: #16B9B3;
-          cursor: pointer;
-          border: 2px solid #ffffff;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .slider::-moz-range-thumb {
-          height: 20px;
-          width: 20px;
-          border-radius: 50%;
-          background: #16B9B3;
-          cursor: pointer;
-          border: 2px solid #ffffff;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-      `}
-      </style>
     </div>
   );
 };

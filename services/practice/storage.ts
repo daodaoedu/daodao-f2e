@@ -36,7 +36,7 @@ export class PracticeStorage {
       const practices = JSON.parse(stored) as Practice[];
       return practices.map((practice) => ({
         ...practice,
-        smallGoals: practice.smallGoals || [],
+        practiceAction: practice.practiceAction || undefined,
         resources: practice.resources || [],
         checkIns: practice.checkIns || [],
         tags: practice.tags || [],
@@ -114,7 +114,7 @@ export class PracticeStorage {
       practices = practices.filter((practice) =>
         practice.title.toLowerCase().includes(term) ||
         (practice.description && practice.description.toLowerCase().includes(term)) ||
-        practice.smallGoals.some((goal) => goal.content.toLowerCase().includes(term)) ||
+        (practice.practiceAction && practice.practiceAction.toLowerCase().includes(term)) ||
         practice.resources.some((resource) => resource.name.toLowerCase().includes(term)) ||
         (practice.tags && practice.tags.some((tag) => tag.toLowerCase().includes(term)))
       );

@@ -15,11 +15,6 @@ interface SetupFlowProps {
   onCancel?: () => void;
 }
 
-interface SmallGoal {
-  id: number;
-  content: string;
-}
-
 interface Resource {
   id: number;
   name: string;
@@ -39,6 +34,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
   const [pathInfo, setPathInfo] = useState<PathInfo>({
     title: '',
     contentType: 'book',
+    customContentType: '',
     totalAmount: '7',
     currentProgress: '0',
     targetDate: '',
@@ -53,12 +49,12 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
     lastStreakDate: ''
   });
 
-  const [smallGoals, setSmallGoals] = useState<SmallGoal[]>([]);
-  const [newSmallGoal, setNewSmallGoal] = useState('');
-
   // 新增：標籤相關狀態
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [customTag, setCustomTag] = useState('');
+
+  // 實踐行動狀態
+  const [practiceAction, setPracticeAction] = useState<string>('');
 
   const [resources, setResources] = useState<Resource[]>([]);
   const [newResourceName, setNewResourceName] = useState('');
@@ -85,6 +81,10 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
 
       if (!pathInfo.contentType) {
         errors.contentType = '請選擇內容類型';
+      }
+
+      if (pathInfo.contentType === 'custom' && !pathInfo.customContentType?.trim()) {
+        errors.customContentType = '請輸入自定義類型名稱';
       }
     } else if (setupStep === 2) {
       if (!pathInfo.targetDate) {
@@ -126,25 +126,10 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
     }
   }, [validationErrors]);
 
-  const addSmallGoal = useCallback(() => {
-    if (newSmallGoal.trim() && smallGoals.length < 3) {
-      const newGoal: SmallGoal = {
-        id: Date.now(),
-        content: newSmallGoal.trim()
-      };
-      setSmallGoals((prev) => [...prev, newGoal]);
-      setNewSmallGoal('');
-    }
-  }, [newSmallGoal, smallGoals.length]);
-
-  const removeSmallGoal = useCallback((id: number) => {
-    setSmallGoals((prev) => prev.filter((goal) => goal.id !== id));
-  }, []);
-
   // 標籤相關函數
   const addTag = useCallback((tag: string) => {
     const trimmedTag = tag.trim();
-    if (trimmedTag && !selectedTags.includes(trimmedTag) && selectedTags.length < 8) {
+    if (trimmedTag && !selectedTags.includes(trimmedTag) && selectedTags.length < 3) {
       setSelectedTags((prev) => [...prev, trimmedTag]);
     }
   }, [selectedTags]);
@@ -202,7 +187,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
 
     try {
       setShowConfetti(true);
-      setCelebrationMessage('🎉 你的主題實踐之旅，現在正式啟動！');
+      setCelebrationMessage('你的主題實踐之旅，現在正式啟動！');
 
       // 準備每日目標設定
       const dailyGoalConfig = {
@@ -212,7 +197,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
         unit: dailyGoalType === 'completion' ? customUnit : undefined
       };
 
-      const practiceId = await createPracticeFromPathInfo(pathInfo, smallGoals, resources, selectedTags, dailyGoalConfig);
+      const practiceId = await createPracticeFromPathInfo(pathInfo, practiceAction, resources, selectedTags, dailyGoalConfig);
 
       setTimeout(() => {
         setShowConfetti(false);
@@ -230,7 +215,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
       setShowConfetti(false);
       setCelebrationMessage('');
     }
-  }, [pathInfo, smallGoals, resources, createPracticeFromPathInfo, onComplete, router]);
+  }, [pathInfo, practiceAction, resources, selectedTags, dailyGoalType, dailyGoalTime, dailyGoalPages, customUnit, createPracticeFromPathInfo, onComplete, router]);
 
   const renderStepContent = () => {
     const stepProps = {
@@ -245,11 +230,6 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
           <Step1
             {...stepProps}
             handleNextStep={handleNextStep}
-            smallGoals={smallGoals}
-            newSmallGoal={newSmallGoal}
-            setNewSmallGoal={setNewSmallGoal}
-            addSmallGoal={addSmallGoal}
-            removeSmallGoal={removeSmallGoal}
             selectedTags={selectedTags}
             customTag={customTag}
             setCustomTag={setCustomTag}
@@ -272,12 +252,15 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
             setDailyGoalPages={setDailyGoalPages}
             customUnit={customUnit}
             setCustomUnit={setCustomUnit}
+            practiceAction={practiceAction}
+            setPracticeAction={setPracticeAction}
           />
         );
       case 3:
         return (
           <Step3
             handleNextStep={handleNextStep}
+            handlePrevStep={handlePreviousStep}
             validationErrors={validationErrors}
             resources={resources}
             newResourceName={newResourceName}
@@ -293,7 +276,8 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
           <Step4
             pathInfo={pathInfo}
             handleCreatePath={handleCreatePath}
-            smallGoals={smallGoals}
+            handlePrevStep={handlePreviousStep}
+            practiceAction={practiceAction}
             resources={resources}
             dailyGoalType={dailyGoalType}
             dailyGoalTime={dailyGoalTime}

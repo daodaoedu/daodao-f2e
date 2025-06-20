@@ -1,23 +1,25 @@
 import React from 'react';
-import { Plus, X, Hash } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { contentTypeOptions, defaultTags } from '@/constants/practice';
 import { PathInfo } from '@/services/practice/schema';
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 
 interface Step1Props {
   pathInfo: PathInfo;
   handlePathInfoChange: (field: keyof PathInfo, value: string | number) => void;
   handleNextStep: () => void;
   validationErrors?: Record<string, string>;
-  smallGoals: Array<{id: number; content: string}>;
-  newSmallGoal: string;
-  setNewSmallGoal: (value: string) => void;
-  addSmallGoal: () => void;
-  removeSmallGoal: (id: number) => void;
-  // 新增：標籤相關
+  // 標籤相關
   selectedTags: string[];
   customTag: string;
   setCustomTag: (value: string) => void;
@@ -31,11 +33,6 @@ const Step1: React.FC<Step1Props> = ({
   handlePathInfoChange,
   handleNextStep,
   validationErrors = {},
-  smallGoals,
-  newSmallGoal,
-  setNewSmallGoal,
-  addSmallGoal,
-  removeSmallGoal,
   selectedTags,
   customTag,
   setCustomTag,
@@ -62,13 +59,19 @@ const Step1: React.FC<Step1Props> = ({
           <Label htmlFor="pathTitle">
             我想要... <span className="text-destructive">*</span>
           </Label>
-          <Input
-            id="pathTitle"
-            placeholder="例如：閱讀《原子習慣》或《30天瑜伽挑戰》"
-            value={pathInfo.title}
-            onChange={(e) => handlePathInfoChange('title', e.target.value)}
-            className={cn(validationErrors.title && "border-destructive focus:ring-destructive")}
-          />
+          <div className="relative">
+            <Input
+              id="pathTitle"
+              placeholder="例如：閱讀《原子習慣》或《30天瑜伽挑戰》"
+              value={pathInfo.title}
+              onChange={(e) => handlePathInfoChange('title', e.target.value)}
+              className={cn(validationErrors.title && "border-destructive focus:ring-destructive")}
+              maxLength={100}
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+              {pathInfo.title.length}/100
+            </span>
+          </div>
           {validationErrors.title && (
             <p className="text-sm text-destructive">{validationErrors.title}</p>
           )}
@@ -122,6 +125,30 @@ const Step1: React.FC<Step1Props> = ({
               );
             })}
           </div>
+
+          {/* 自定義類型輸入框 */}
+          {pathInfo.contentType === 'custom' && (
+            <div className="mt-3">
+              <Label htmlFor="customContentType">
+                自定義類型名稱 <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="customContentType"
+                placeholder="例如：運動、冥想、寫作..."
+                value={pathInfo.customContentType || ''}
+                onChange={(e) => handlePathInfoChange('customContentType', e.target.value)}
+                className={cn(validationErrors.customContentType && "border-destructive focus:ring-destructive")}
+                maxLength={20}
+              />
+              {validationErrors.customContentType && (
+                <p className="text-sm text-destructive mt-1">{validationErrors.customContentType}</p>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">
+                {(pathInfo.customContentType || '').length}/20
+              </p>
+            </div>
+          )}
+
           {validationErrors.contentType && (
             <p className="text-sm text-destructive">{validationErrors.contentType}</p>
           )}
@@ -130,121 +157,102 @@ const Step1: React.FC<Step1Props> = ({
         {/* 標籤設定 */}
         <div className="space-y-4 border-t border-border pt-6">
           <div className="flex items-center space-x-2">
-            <Hash className="h-4 w-4 text-primary" />
             <Label>標籤設定</Label>
-            <span className="text-sm text-muted-foreground">({selectedTags.length}/8)</span>
+            <span className="text-sm text-muted-foreground">({selectedTags.length}/3)</span>
           </div>
 
           <p className="text-sm text-muted-foreground">
-            選擇或自定義標籤，幫助你更好地分類和管理實踐
+            從預設標籤中選擇，或自定義標籤來分類你的實踐
           </p>
 
-          {/* 預設標籤 */}
+          {/* 標籤下拉選單 */}
           <div className="space-y-3">
             <div>
-              <p className="text-sm font-medium text-foreground mb-2">分類標籤</p>
-              <div className="flex flex-wrap gap-2">
-                {defaultTags.categories.map((tag) => (
-                  <Button
-                    key={tag.id}
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => addTag(tag.label)}
-                    disabled={selectedTags.includes(tag.label) || selectedTags.length >= 8}
-                    className={cn(
-                      "px-3 py-1 h-auto text-xs font-medium transition-all",
-                      tag.color,
-                      selectedTags.includes(tag.label)
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:scale-105 cursor-pointer",
-                      selectedTags.length >= 8 && !selectedTags.includes(tag.label) && "opacity-30 cursor-not-allowed"
-                    )}
-                  >
-                    {tag.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-foreground mb-2">難度標籤</p>
-              <div className="flex flex-wrap gap-2">
-                {defaultTags.difficulty.map((tag) => (
-                  <Button
-                    key={tag.id}
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => addTag(tag.label)}
-                    disabled={selectedTags.includes(tag.label) || selectedTags.length >= 8}
-                    className={cn(
-                      "px-3 py-1 h-auto text-xs font-medium transition-all",
-                      tag.color,
-                      selectedTags.includes(tag.label)
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:scale-105 cursor-pointer",
-                      selectedTags.length >= 8 && !selectedTags.includes(tag.label) && "opacity-30 cursor-not-allowed"
-                    )}
-                  >
-                    {tag.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-foreground mb-2">時長標籤</p>
-              <div className="flex flex-wrap gap-2">
-                {defaultTags.duration.map((tag) => (
-                  <Button
-                    key={tag.id}
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => addTag(tag.label)}
-                    disabled={selectedTags.includes(tag.label) || selectedTags.length >= 8}
-                    className={cn(
-                      "px-3 py-1 h-auto text-xs font-medium transition-all",
-                      tag.color,
-                      selectedTags.includes(tag.label)
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:scale-105 cursor-pointer",
-                      selectedTags.length >= 8 && !selectedTags.includes(tag.label) && "opacity-30 cursor-not-allowed"
-                    )}
-                  >
-                    {tag.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* 自定義標籤 */}
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">自定義標籤</p>
-            <div className="flex space-x-2">
-              <Input
-                className="flex-1"
-                placeholder="輸入自定義標籤"
-                value={customTag}
-                onChange={(e) => setCustomTag(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && customTag.trim()) {
-                    addCustomTag();
+              <p className="text-sm font-medium text-foreground mb-2">選擇標籤</p>
+              <Select
+                disabled={selectedTags.length >= 3}
+                onValueChange={(value) => {
+                  if (value && !selectedTags.includes(value) && selectedTags.length < 3) {
+                    addTag(value);
                   }
                 }}
-                maxLength={20}
-              />
-              <Button
-                type="button"
-                onClick={addCustomTag}
-                disabled={!customTag.trim() || selectedTags.length >= 8 || selectedTags.includes(customTag.trim())}
-                size="default"
               >
-                <Plus className="h-4 w-4" />
-              </Button>
+                <SelectTrigger className={cn(
+                  selectedTags.length >= 3 && "opacity-50 cursor-not-allowed"
+                )}
+                >
+                  <SelectValue placeholder={selectedTags.length >= 3 ? "已達到最多標籤數量" : "選擇標籤"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="space-y-1">
+                    <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">分類標籤</p>
+                    {defaultTags.categories
+                      .filter((tag) => !selectedTags.includes(tag.label))
+                      .map((tag) => (
+                        <SelectItem key={tag.id} value={tag.label}>
+                          <span className={cn("px-2 py-1 rounded text-xs font-medium", tag.color)}>
+                            {tag.label}
+                          </span>
+                        </SelectItem>
+                      ))
+                    }
+
+                    <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">難度標籤</p>
+                    {defaultTags.difficulty
+                      .filter((tag) => !selectedTags.includes(tag.label))
+                      .map((tag) => (
+                        <SelectItem key={tag.id} value={tag.label}>
+                          <span className={cn("px-2 py-1 rounded text-xs font-medium", tag.color)}>
+                            {tag.label}
+                          </span>
+                        </SelectItem>
+                      ))
+                    }
+
+                    <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">時長標籤</p>
+                    {defaultTags.duration
+                      .filter((tag) => !selectedTags.includes(tag.label))
+                      .map((tag) => (
+                        <SelectItem key={tag.id} value={tag.label}>
+                          <span className={cn("px-2 py-1 rounded text-xs font-medium", tag.color)}>
+                            {tag.label}
+                          </span>
+                        </SelectItem>
+                      ))
+                    }
+                  </div>
+                </SelectContent>
+              </Select>
             </div>
+
+            {/* 自定義標籤 */}
+            {selectedTags.length < 3 && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-foreground">自定義標籤</p>
+                <div className="flex space-x-2">
+                  <Input
+                    className="flex-1"
+                    placeholder="輸入自定義標籤"
+                    value={customTag}
+                    onChange={(e) => setCustomTag(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && customTag.trim()) {
+                        addCustomTag();
+                      }
+                    }}
+                    maxLength={20}
+                  />
+                  <Button
+                    type="button"
+                    onClick={addCustomTag}
+                    disabled={!customTag.trim() || selectedTags.length >= 3 || selectedTags.includes(customTag.trim())}
+                    size="default"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 已選標籤 */}
@@ -255,9 +263,9 @@ const Step1: React.FC<Step1Props> = ({
                 {selectedTags.map((tag) => (
                   <div
                     key={tag}
-                    className="flex items-center px-3 py-1 bg-primary/10 border border-primary/20 rounded-full"
+                    className="flex items-center px-3 py-2 bg-primary/10 border border-primary/20 rounded-lg"
                   >
-                    <span className="text-xs font-medium text-primary mr-2">{tag}</span>
+                    <span className="text-sm font-medium text-primary mr-2">{tag}</span>
                     <Button
                       type="button"
                       variant="ghost"
@@ -274,72 +282,16 @@ const Step1: React.FC<Step1Props> = ({
           )}
         </div>
 
-        {/* 小目標設定 */}
-        <div className="space-y-4 border-t border-border pt-6">
-          <div className="flex justify-between items-center">
-            <Label>設定你的小目標</Label>
-            <span className="body-sm text-muted-foreground">{smallGoals.length}/3</span>
-          </div>
-
-          <p className="text-sm text-muted-foreground">
-            設定具體可衡量的小目標，幫助你保持動力並追蹤進度
-          </p>
-
-          <div className="flex space-x-2">
-            <Input
-              className="flex-1"
-              placeholder="例如：完成5章內容、學習10個新概念"
-              value={newSmallGoal}
-              onChange={(e) => setNewSmallGoal(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && newSmallGoal.trim() && smallGoals.length < 3) {
-                  addSmallGoal();
-                }
-              }}
-            />
-            <Button
-              type="button"
-              onClick={addSmallGoal}
-              disabled={!newSmallGoal.trim() || smallGoals.length >= 3}
-              size="default"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="space-y-2">
-            {smallGoals.map((goal) => (
-              <div
-                key={goal.id}
-                className="flex items-center p-3 bg-primary/5 border border-primary/20 rounded-lg"
-              >
-                <div className="w-2 h-2 rounded-full mr-3 bg-primary" />
-                <span className="flex-1 text-sm">{goal.content}</span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeSmallGoal(goal.id)}
-                  className="text-muted-foreground hover:text-destructive p-1"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-
-            {smallGoals.length === 0 && (
-              <div className="text-center py-6 bg-muted rounded-lg">
-                <p className="text-sm text-muted-foreground">尚未添加任何小目標</p>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       <div className="px-6 py-4 border-t border-border flex justify-end">
         <Button
           onClick={handleNextStep}
-          disabled={!pathInfo.title.trim()}
+          disabled={
+            !pathInfo.title.trim() ||
+            !pathInfo.contentType ||
+            (pathInfo.contentType === 'custom' && !pathInfo.customContentType?.trim())
+          }
           className="min-w-20"
         >
           下一步

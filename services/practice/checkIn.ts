@@ -102,13 +102,13 @@ export class CheckInService {
   // 檢查是否達成里程碑
   static checkMilestones(newStreak: number, oldStreak: number): string[] {
     const milestones = [
-      { days: 3, message: '🔥 建立習慣中！連續3天簽到' },
-      { days: 7, message: '⭐ 一週堅持！你很棒' },
-      { days: 14, message: '💪 兩週不間斷！習慣正在養成' },
-      { days: 21, message: '💎 習慣養成！連續21天的努力' },
-      { days: 30, message: '🏆 一個月達成！你是真正的學習者' },
-      { days: 50, message: '🌟 50天里程碑！持續的力量' },
-      { days: 100, message: '👑 百日成就！你已經成為習慣大師' }
+      { days: 3, message: '建立習慣中！連續3天簽到', icon: 'flame' },
+      { days: 7, message: '一週堅持！你很棒', icon: 'star' },
+      { days: 14, message: '兩週不間斷！習慣正在養成', icon: 'zap' },
+      { days: 21, message: '習慣養成！連續21天的努力', icon: 'gem' },
+      { days: 30, message: '一個月達成！你是真正的學習者', icon: 'trophy' },
+      { days: 50, message: '50天里程碑！持續的力量', icon: 'sparkles' },
+      { days: 100, message: '百日成就！你已經成為習慣大師', icon: 'crown' }
     ];
 
     const achievements: string[] = [];
@@ -211,34 +211,34 @@ export class CheckInService {
       const averageRecent = recentCheckIns.reduce((sum, c) => sum + c.progress, 0) / recentCheckIns.length;
 
       if (averageRecent < stats.averageProgress * 0.8) {
-        suggestions.push('💡 最近進度有所放緩，建議調整學習計畫或休息一下');
+        suggestions.push('最近進度有所放緩，建議調整學習計畫或休息一下');
       }
 
       if (stats.lastWeekCheckIns < 3) {
-        suggestions.push('⏰ 本週簽到較少，試著設定固定的學習時間');
+        suggestions.push('本週簽到較少，試著設定固定的學習時間');
       }
 
       // 心情建議
       const negativeRatio = (stats.moodDistribution.challenging + stats.moodDistribution.difficult) / stats.totalCheckIns;
       if (negativeRatio > 0.5) {
-        suggestions.push('🌟 最近學習感覺有挑戰性，可以考慮降低目標或尋求幫助');
+        suggestions.push('最近學習感覺有挑戰性，可以考慮降低目標或尋求幫助');
       }
     }
 
     // 進度建議
     const progressRatio = practice.currentProgress / practice.totalAmount;
     if (progressRatio > 0.8) {
-      suggestions.push('🎉 快要完成了！保持最後的衝刺');
+      suggestions.push('快要完成了！保持最後的衝刺');
     } else if (progressRatio < 0.2 && checkIns.length > 10) {
-      suggestions.push('🎯 進度較慢，考慮重新評估目標或調整學習方法');
+      suggestions.push('進度較慢，考慮重新評估目標或調整學習方法');
     }
 
     // 連續天數建議
     const currentStreak = this.calculateStreak(practice);
     if (currentStreak === 0 && checkIns.length > 0) {
-      suggestions.push('🔄 重新開始學習旅程，每一天都是新的開始');
+      suggestions.push('重新開始學習旅程，每一天都是新的開始');
     } else if (currentStreak >= 7) {
-      suggestions.push('🔥 連續簽到表現優秀！保持這個節奏');
+      suggestions.push('連續簽到表現優秀！保持這個節奏');
     }
 
     return suggestions;
@@ -301,12 +301,12 @@ export class CheckInService {
     const today = format(new Date(), 'yyyy-MM-dd');
     const threeDaysAgo = subDays(new Date(), 3);
 
-    const moodEmojis: Record<MoodType, string> = {
-      excellent: '😄',
-      good: '😊',
-      average: '😐',
-      challenging: '😤',
-      difficult: '😰'
+    const moodLabels: Record<MoodType, string> = {
+      excellent: '極佳',
+      good: '良好',
+      average: '普通',
+      challenging: '有挑戰',
+      difficult: '困難'
     };
 
     return checkIns
@@ -322,7 +322,7 @@ export class CheckInService {
         totalProgress: checkIn.totalProgress,
         note: checkIn.note || '',
         mood: checkIn.mood,
-        moodEmoji: checkIn.mood ? moodEmojis[checkIn.mood] : undefined,
+        moodLabel: checkIn.mood ? moodLabels[checkIn.mood] : undefined,
         tags: checkIn.tags || [],
         isToday: checkIn.date === today,
         isRecent: isAfter(parseISO(checkIn.date), threeDaysAgo)
