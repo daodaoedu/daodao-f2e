@@ -14,19 +14,19 @@ import { Background, Container, Paper } from "@/components/ui/wrapper";
 import { BackButton } from "@/components/ui/back-button";
 import { Title } from "@/components/ui/typography";
 import { Progress } from "@/components/ui/progress";
-import {
-  resourceFormSchema,
-  ResourceFormSchema,
-  resourceReviewFormSchema,
-} from "@/services/resources";
-import { cn } from "@/utils/cn";
-
+import { ProtectedComponent } from "@/contexts/Auth";
 import {
   ResourceBasicInfoFields,
   ResourceCategorizationFields,
   ResourceReviewFields,
   useCreateResource,
 } from "@/features/resources";
+import {
+  resourceFormSchema,
+  ResourceFormSchema,
+  resourceReviewFormSchema,
+} from "@/services/resources";
+import { cn } from "@/utils/cn";
 
 const withoutReviewSchema = resourceFormSchema.omit({ review: true });
 
@@ -119,7 +119,7 @@ export default function CreateResourcePage() {
   }, [step]);
 
   return (
-    <>
+    <ProtectedComponent>
       <SEOConfig title="分享資源" />
       <Background>
         <Container>
@@ -215,6 +215,6 @@ export default function CreateResourcePage() {
           </form>
         </Form>
       </Background>
-    </>
+    </ProtectedComponent>
   );
 }

@@ -1,10 +1,49 @@
-import { useRouter } from 'next/router';
-import { PropsWithChildren, useEffect, useRef } from 'react';
-import { useAuth, useAuthDispatch } from './AuthContext';
+import { useRouter } from "next/router";
+import { PropsWithChildren, useEffect, useRef } from "react";
+import { Background, Container, Paper } from "@/components/ui/wrapper";
+import Image from "@/shared/components/Image";
+import { Button } from "@/components/ui/button";
+import { useAuth, useAuthDispatch } from "./AuthContext";
 
-const defaultLoadingComponent = (
-  <div className="h-screen w-screen bg-basic-white" />
-);
+const DefaultFallback = () => {
+  const router = useRouter();
+  const { openLoginModal } = useAuthDispatch();
+
+  return (
+    <Background>
+      <Container className="pb-5">
+        <Paper>
+          <h2 className="text-center text-3xl font-bold tracking-[0.08em] text-basic-400">
+            登入後即可使用完整功能
+          </h2>
+          <div className="flex justify-center items-center">
+            <Image
+              src="/assets/nobody-land.gif"
+              alt="nobody-land"
+              width="300"
+              height="300"
+            />
+          </div>
+          <div className="flex justify-center items-center gap-4">
+            <Button
+              onClick={() => router.back()}
+              variant="outline"
+              size="lg"
+              className="w-32"
+            >
+              返回
+            </Button>
+            <Button onClick={() => openLoginModal()} size="lg" className="w-32">
+              登入 / 註冊
+            </Button>
+          </div>
+        </Paper>
+      </Container>
+    </Background>
+  );
+};
+
+const defaultFallback = <DefaultFallback />;
 
 export interface ProtectedComponentProps extends PropsWithChildren {
   /**
@@ -16,10 +55,9 @@ export interface ProtectedComponentProps extends PropsWithChildren {
    */
   onlyCheckToken?: boolean;
   /**
-   * 當需要等待時的 fallback 元件
-   * 預設為一個全螢幕的白色區塊
+   * 未登入時顯示的 fallback 元件
    */
-  loadingComponent?: React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
 /**
@@ -28,11 +66,11 @@ export interface ProtectedComponentProps extends PropsWithChildren {
  * 可以選擇只檢查 token 或檢查是否已登錄
  * 預設為一個全螢幕的白色區塊
  */
-export default function ProtectedComponent({
+export function ProtectedComponent({
   children,
   redirectOnCancel,
   onlyCheckToken = false,
-  loadingComponent = defaultLoadingComponent,
+  fallback = defaultFallback,
 }: ProtectedComponentProps) {
   const router = useRouter();
   const opened = useRef(false);
@@ -71,7 +109,7 @@ export default function ProtectedComponent({
   ]);
 
   if (requiresLogin) {
-    return loadingComponent;
+    return fallback;
   }
 
   return children;
