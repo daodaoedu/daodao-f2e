@@ -9,14 +9,14 @@ import {
   refetchResourceReviews,
 } from "@/services/resources";
 
-export function useResourceReviewList(resourceId?: number | null) {
+export function useResourceReviewList(resourceId?: string | null) {
   return useSWR<ResourceReviewListResponseSchema>(
     resourceId ? getResourceReviewPathname({ resourceId }) : null
   );
 }
 
 export function useResourceReview(
-  resourceId?: number | null,
+  resourceId?: string | null,
   reviewId?: number | null
 ) {
   return useSWR<ResourceReviewResponseSchema>(
@@ -30,7 +30,7 @@ type SWRMutationOptions<T = ResourceReviewResponseSchema> =
   SWRMutationConfiguration<T, Error, string | null>;
 
 export const useCreateResourceReview = (
-  resourceId: number | null,
+  resourceId: string | null,
   { onSuccess, ...options }: SWRMutationOptions = {}
 ) => {
   return useSWRMutation(
@@ -47,7 +47,7 @@ export const useCreateResourceReview = (
 };
 
 export const useUpdateResourceReview = (
-  resourceId: number | null,
+  resourceId: string | null,
   reviewId?: number | null,
   { onSuccess, ...options }: SWRMutationOptions = {}
 ) => {
@@ -67,7 +67,7 @@ export const useUpdateResourceReview = (
 };
 
 export const useDeleteResourceReview = (
-  resourceId: number,
+  resourceId: string,
   reviewId: number,
   { onSuccess, ...options }: SWRMutationOptions<void> = {}
 ) => {
