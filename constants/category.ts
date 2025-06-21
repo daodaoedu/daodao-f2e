@@ -206,6 +206,38 @@ export const NAV_LINK = [
   // },
 ];
 
+// 新首頁導航連結
+export const LOGGED_OUT_NAV_LINK = [
+  {
+    name: '重新定義',
+    link: '/#features',
+    target: '_self',
+  },
+  {
+    name: '如何開始',
+    link: '/#how-it-works',
+    target: '_self',
+  },
+];
+
+export const LOGGED_IN_NAV_LINK = [
+  {
+    name: '探索',
+    link: '/#explore',
+    target: '_self',
+  },
+  {
+    name: '交流',
+    link: '/#community',
+    target: '_self',
+  },
+  {
+    name: '資源',
+    link: '/new-resource',
+    target: '_self',
+  },
+];
+
 export const MARATHON_LINKS = [
   {
     name: '活動詳情',

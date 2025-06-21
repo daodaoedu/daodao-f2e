@@ -6,6 +6,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
+import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';
@@ -21,6 +22,7 @@ import { fetcher } from '@/utils/http';
 import { parseToString } from '@/utils/helper';
 import { getReminderStorage } from '@/utils/storage';
 import getBaseLayout from '@/layout/core/getBaseLayout';
+import { useScrollOnRouteChange } from '@/features/practice/hooks/useScrollToTop';
 import { initGA, logPageView } from '../utils/analytics';
 import 'regenerator-runtime/runtime'; // Speech.js
 import "@/shared/styles/global.css";
@@ -43,6 +45,9 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   const [openModalType, setOpenModalType] = useState(null);
   const getLayout = Component?.getLayout || getBaseLayout;
   const isVerified = parseToString(query.isVerified);
+
+  // 使用滾動重置 hook
+  useScrollOnRouteChange();
 
   const handleClose = () => {
     setOpenModalType(null);
@@ -80,6 +85,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
           },
         }}
       />
+      <SonnerToaster />
       <CompleteInfoReminderDialog isOpen={openModalType === "completeInfoReminder"} onClose={handleClose} />
       <ResponsiveModal
         open={openModalType === 'verifiedSuccess' && isLoggedIn}

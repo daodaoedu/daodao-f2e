@@ -1,6 +1,7 @@
-import { EMOJI_OPTIONS } from '@/constants/project';
+import { MOOD_OPTIONS } from '@/constants/project';
 import { ProjectReviewSchema } from '@/services/projects';
 import PostPreviewCard, { BasePostData } from '@/shared/components/Post/PostPreviewCard';
+import { Smile, Heart, Zap, Moon, CloudRain } from 'lucide-react';
 
 interface ReviewCardProps {
   data: ProjectReviewSchema;
@@ -21,15 +22,28 @@ function ReviewCard({
     date: data.createdAt,
   };
 
-  const emojiOption = EMOJI_OPTIONS.find(
+  const moodOption = MOOD_OPTIONS.find(
     (option) => option.value === data.mood
   );
+
+  const getMoodIcon = (iconName: string) => {
+    const icons = {
+      Smile,
+      Heart,
+      Zap,
+      Moon,
+      CloudRain,
+    };
+    const IconComponent = icons[iconName as keyof typeof icons];
+    return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
+  };
 
   const renderContent = () => (
     <div className="mb-3.5 flex items-center gap-3">
       <p className="body-lg text-basic-500">這段時間的整體心情....</p>
-      <div className="p-2 bg-basic-100 rounded">
-        {emojiOption?.emoji} {emojiOption?.label}
+      <div className="p-2 bg-basic-100 rounded flex items-center gap-2">
+        {moodOption?.icon && getMoodIcon(moodOption.icon)}
+        {moodOption?.label}
       </div>
     </div>
   );

@@ -13,9 +13,9 @@ interface MilestonesContext {
   isUpdating: boolean;
   fetchMilestones: (projectId: string) => void;
   dispatchMilestone: (projectId: string, newMilestone: Partial<Milestone>) => Promise<boolean>;
-  dispatchTask: (prjectId: string, milestoneId: number,newTask: Partial<Task>) => Promise<boolean>;
-  deleteTask: (prjectId: string, milestoneId: number,newTask: Partial<Task>) => Promise<boolean>;
-  createTask: (prjectId: string,milestoneId: number, newTask: Partial<Task>) => Promise<boolean>;
+  dispatchTask: (prjectId: string, milestoneId: number, newTask: Partial<Task>) => Promise<boolean>;
+  deleteTask: (prjectId: string, milestoneId: number, newTask: Partial<Task>) => Promise<boolean>;
+  createTask: (prjectId: string, milestoneId: number, newTask: Partial<Task>) => Promise<boolean>;
 }
 const ProjectContext = createContext<MilestonesContext | null>(null);
 
@@ -86,7 +86,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
 
       const result = responseData;
       const newMilestones = milestones.map((m) => {
-        return m.id === result.id 
+        return m.id === result.id
           ? { ...result, tasks: m.tasks }
           : m;
       });
@@ -101,11 +101,10 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
   };
 
   // create new task
-  const createTask = async (projectId: string,milestoneId: number, newTask: Partial<Task>): Promise<boolean> => {
+  const createTask = async (projectId: string, milestoneId: number, newTask: Partial<Task>): Promise<boolean> => {
     setIsUpdateing(true);
     try {
       const token = getTokenStorage().get();
-
 
       if (!token) return false;
 
@@ -149,7 +148,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
   };
 
   // update single task
-  const dispatchTask = async (projectId: string, milestoneId: number,newTask: Partial<Task>): Promise<boolean> => {
+  const dispatchTask = async (projectId: string, milestoneId: number, newTask: Partial<Task>): Promise<boolean> => {
     setIsUpdateing(true);
     try {
       const token = getTokenStorage().get();
@@ -180,12 +179,12 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
       const result = responseData.task;
       const newMilestones = milestones.map((m) => {
         if (m.id === result.milestoneId) {
-          const taskIndex = m.tasks.findIndex(t => t.id === result.id);
+          const taskIndex = m.tasks.findIndex((t) => t.id === result.id);
           if (taskIndex === -1) return m;
-          
+
           const newTasks = [...m.tasks];
           newTasks[taskIndex] = result;
-          
+
           return {
             ...m,
             tasks: newTasks
@@ -205,7 +204,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
   };
 
   // delete single task
-  const deleteTask = async (projectId: string, milestoneId: number,newTask: Partial<Task>): Promise<boolean> => {
+  const deleteTask = async (projectId: string, milestoneId: number, newTask: Partial<Task>): Promise<boolean> => {
     setIsUpdateing(true);
     try {
       const token = getTokenStorage().get();

@@ -1,3 +1,25 @@
+@layer components {
+  /* 基本滾動行為設置 */
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply overflow-x-hidden;
+  }
+
+  .page-container {
+    @apply min-h-screen;
+  }
+
+  /* 滾動重置動畫 */
+  .scroll-reset {
+    @apply transition-all duration-300 ease-out;
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -79,5 +101,20 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Custom scrolling utilities */
+  .custom-scroll {
+    @apply scroll-smooth overflow-x-hidden;
+  }
+
+  .custom-page {
+    @apply min-h-screen;
+  }
+
+  .custom-scroll-reset {
+    @apply transform translate-y-0 opacity-100 transition-all duration-300 ease-out;
   }
 }

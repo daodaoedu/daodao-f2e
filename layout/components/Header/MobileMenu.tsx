@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { MARATHON_LINKS, NAV_LINK, USER_LINK } from "@/constants/category";
+import { MARATHON_LINKS, LOGGED_OUT_NAV_LINK, LOGGED_IN_NAV_LINK, USER_LINK } from "@/constants/category";
 import { useAuth, useAuthDispatch } from "@/contexts/Auth";
 import { getManageSidebarItems } from "@/layout/features/getManageLayout";
 import {
@@ -17,11 +17,14 @@ interface OnCloseProps {
 }
 
 function ExploreMenu({ onClose }: OnCloseProps) {
+  const auth = useAuth();
+  const navigationLinks = auth.isLoggedIn ? LOGGED_IN_NAV_LINK : LOGGED_OUT_NAV_LINK;
+
   return (
     <nav>
       <div>
         <ul className="pt-2">
-          {NAV_LINK.map(({ link, name, target }) => (
+          {navigationLinks.map(({ link, name, target }) => (
             <li key={name}>
               <Link
                 href={link}
@@ -35,26 +38,28 @@ function ExploreMenu({ onClose }: OnCloseProps) {
           ))}
         </ul>
       </div>
-      <Collapsible>
-        <CollapsibleTrigger
-          className="py-2 px-4 flex items-center rounded-lg text-primary-base w-full"
-          withIcon
-        >
-          島島盃-春季學習馬拉松
-        </CollapsibleTrigger>
-        <CollapsibleContent className="w-full">
-          {MARATHON_LINKS.map(({ name, link }) => (
-            <Link
-              key={name}
-              href={link}
-              className="block text-basic-400 px-10 leading-10"
-              onClick={onClose}
-            >
-              {name}
-            </Link>
-          ))}
-        </CollapsibleContent>
-      </Collapsible>
+      {auth.isLoggedIn && (
+        <Collapsible>
+          <CollapsibleTrigger
+            className="py-2 px-4 flex items-center rounded-lg text-primary-base w-full"
+            withIcon
+          >
+            島島盃-春季學習馬拉松
+          </CollapsibleTrigger>
+          <CollapsibleContent className="w-full">
+            {MARATHON_LINKS.map(({ name, link }) => (
+              <Link
+                key={name}
+                href={link}
+                className="block text-basic-400 px-10 leading-10"
+                onClick={onClose}
+              >
+                {name}
+              </Link>
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
     </nav>
   );
 }
@@ -206,11 +211,17 @@ function MobileMenu() {
           </div>
         )}
         <div className="flex-1 flex flex-col pb-20">
-          {navType === NavType.Explore && (
+          {auth.isLoggedIn ? (
+            <>
+              {navType === NavType.Explore && (
+                <ExploreMenu onClose={() => setIsOpenMenu(false)} />
+              )}
+              {navType === NavType.Profile && (
+                <ProfileMenu onClose={() => setIsOpenMenu(false)} />
+              )}
+            </>
+          ) : (
             <ExploreMenu onClose={() => setIsOpenMenu(false)} />
-          )}
-          {navType === NavType.Profile && (
-            <ProfileMenu onClose={() => setIsOpenMenu(false)} />
           )}
           <div
             className={cn(
@@ -221,8 +232,8 @@ function MobileMenu() {
           >
             {auth.isLoggedIn ? (
               <Button
-                variant="ghost"
-                className="flex-1 px-4 pb-6 justify-start"
+                variant="outline"
+                className="flex-1 m-4"
                 onClick={() => {
                   authDispatch.logout();
                   setIsOpenMenu(false);

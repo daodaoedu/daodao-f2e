@@ -16,6 +16,10 @@ const config = {
   reactStrictMode: false,
   staticPageGenerationTimeout: 600,
   transpilePackages: ['@mdxeditor/editor'],
+  // 確保頁面跳轉時自動滾動到頂部
+  experimental: {
+    scrollRestoration: true,
+  },
   images: {
     unoptimized: true,
     domains: ['imgur.com', 'images.unsplash.com', 'lh3.googleusercontent.com'],

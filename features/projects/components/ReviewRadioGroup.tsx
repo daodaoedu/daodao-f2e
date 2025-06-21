@@ -1,7 +1,8 @@
 import { useId } from 'react';
 import { Control, FieldValues, Path, useController } from 'react-hook-form';
-import { EMOJI_OPTIONS } from '@/constants/project';
+import { MOOD_OPTIONS } from '@/constants/project';
 import RadioBox from '@/shared/components/RadioBox';
+import { Smile, Heart, Zap, Moon, CloudRain } from 'lucide-react';
 
 type BaseRadioGroupProps<T extends FieldValues> = {
   type: 'emoji' | 'tenPoint';
@@ -28,16 +29,28 @@ function RadioGroupWithoutControl<T extends FieldValues>({
     };
   };
 
+  const getMoodIcon = (iconName: string) => {
+    const icons = {
+      Smile,
+      Heart,
+      Zap,
+      Moon,
+      CloudRain,
+    };
+    const IconComponent = icons[iconName as keyof typeof icons];
+    return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
+  };
+
   if (type === 'emoji') {
     return (
       <div className="flex gap-1">
-        {EMOJI_OPTIONS.map((option) => (
+        {MOOD_OPTIONS.map((option) => (
           <RadioBox
             key={option.value}
             className="pointer-events-none"
             {...getOptionProps(option.value)}
           >
-            <div className="text-center">{option.emoji}</div>
+            <div className="text-center">{getMoodIcon(option.icon)}</div>
             <div>{option.label}</div>
           </RadioBox>
         ))}
@@ -81,12 +94,24 @@ function RadioGroupWithControl<T extends FieldValues>({
     };
   };
 
+  const getMoodIcon = (iconName: string) => {
+    const icons = {
+      Smile,
+      Heart,
+      Zap,
+      Moon,
+      CloudRain,
+    };
+    const IconComponent = icons[iconName as keyof typeof icons];
+    return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
+  };
+
   if (type === 'emoji') {
     return (
       <div className="flex gap-1">
-        {EMOJI_OPTIONS.map((option) => (
+        {MOOD_OPTIONS.map((option) => (
           <RadioBox key={option.value} {...getOptionProps(option.value)}>
-            <div className="text-center">{option.emoji}</div>
+            <div className="text-center">{getMoodIcon(option.icon)}</div>
             <div>{option.label}</div>
           </RadioBox>
         ))}

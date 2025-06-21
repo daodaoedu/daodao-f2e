@@ -13,9 +13,9 @@ export const logPageView = () => {
 
 export const logEvent = (category = "", action = "", label = "", value = null) => {
   if (category && action) {
-    const eventParams = { 
-      category, 
-      action, 
+    const eventParams = {
+      category,
+      action,
       label
     };
 
