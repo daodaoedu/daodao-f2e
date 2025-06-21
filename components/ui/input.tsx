@@ -6,7 +6,7 @@ import useControlledState from "@/hooks/useControlledState";
 import { cn } from "@/utils/cn";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  value?: string;
+  value?: string | number;
   defaultValue?: string;
   placeholder?: string;
   prefixIcon?: React.ReactNode;
@@ -33,7 +33,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ) => {
     const [internalValue, setInternalValue] = useControlledState(
       defaultValue ?? "",
-      value,
+      value == null ? value : value.toString(),
       onValueChange
     );
 
@@ -42,10 +42,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = e.target.value;
-      setInternalValue(newValue);
+      setInternalValue(e.target.value);
       onChange?.(e);
-      onValueChange?.(newValue);
     };
 
     const iconClassName =
