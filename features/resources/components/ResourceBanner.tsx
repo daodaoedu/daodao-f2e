@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { useRef } from "react";
 import Image from "@/shared/components/Image";
 import LensIcon from "@/public/assets/icons/lens.svg";
-import { Button } from "@/components/ui/button";
+import { AuthButton } from "@/contexts/Auth";
 import { cn } from "@/utils/cn";
 import SectionTitle from "./SectionTitle";
 
@@ -110,7 +111,9 @@ export default function ResourceBanner({
             </div>
           )}
 
-          <Button className="md:w-max">+ 分享資源</Button>
+          <AuthButton className="md:w-max" size="lg" asChild>
+            <Link href="/resource/create">+ 分享資源</Link>
+          </AuthButton>
         </div>
       </div>
     </section>
