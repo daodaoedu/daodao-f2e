@@ -64,7 +64,7 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
           <Button size="lg">
             <Share2 size={16} />
           </Button>
-          <Button variant="light" size="icon">
+          <Button variant="default" size="icon">
             <Ellipsis size={16} />
           </Button>
         </div>

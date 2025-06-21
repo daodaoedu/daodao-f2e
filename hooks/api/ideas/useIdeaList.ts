@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { getIdeaEndpoint, IdeaSchema } from '@/services/ideas';
-import useIdea from './useIdea';
+import { useIdeaActions } from '@/features/ideas/hooks/useIdeaActions';
 
 interface IdeaListResponse {
   data: IdeaSchema[];
@@ -11,18 +11,14 @@ interface IdeaListResponse {
 }
 
 interface UseIdeaListOptions {
-  onCreated?: () => void;
-  onUpdated?: () => void;
-  onDeleted?: () => void;
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
 }
 
 export default function useIdeaList(options?: UseIdeaListOptions) {
   const swrKey = getIdeaEndpoint();
   const { mutate, data, ...swr } = useSWR<IdeaListResponse>(swrKey);
-  const mutations = useIdea({
-    mutateKey: swrKey,
-    ...options,
-  });
+  const mutations = useIdeaActions(options);
   return {
     ...mutations,
     ...swr,

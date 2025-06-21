@@ -120,7 +120,7 @@ export default function ResourceReviewCard({
               "yyyy/MM/dd"
             )}
           </time>
-          <Button variant="light" size="icon">
+          <Button variant="default" size="icon">
             <Ellipsis size={16} />
           </Button>
         </div>
