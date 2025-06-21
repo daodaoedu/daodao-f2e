@@ -58,6 +58,10 @@ export interface ProtectedComponentProps extends PropsWithChildren {
    * 未登入時顯示的 fallback 元件
    */
   fallback?: React.ReactNode;
+  /**
+   * 確認登入中顯示的 skeleton 元件
+   */
+  skeleton?: React.ReactNode;
 }
 
 /**
@@ -71,10 +75,11 @@ export function ProtectedComponent({
   redirectOnCancel,
   onlyCheckToken = false,
   fallback = defaultFallback,
+  skeleton = null,
 }: ProtectedComponentProps) {
   const router = useRouter();
   const opened = useRef(false);
-  const { isLoggedIn, isOpenLoginModal, token } = useAuth();
+  const { isLoggedIn, isOpenLoginModal, token, isLoading } = useAuth();
   const { openLoginModal } = useAuthDispatch();
   const requiresLogin = onlyCheckToken ? !token : !isLoggedIn;
 
@@ -107,6 +112,10 @@ export function ProtectedComponent({
     token,
     router.replace,
   ]);
+
+  if (isLoading) {
+    return skeleton;
+  }
 
   if (requiresLogin) {
     return fallback;

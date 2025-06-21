@@ -18,7 +18,7 @@ function BaseLayout({ children }: React.PropsWithChildren) {
         if (!headerRef.current) return;
         const headerOffset = headerRef.current.offsetHeight;
         const root = document.querySelector(':root');
-        console.log(headerOffset);
+
         setHeight(Math.floor(headerOffset - 1));
         if (root instanceof HTMLElement) {
           root.style.setProperty('--padding-top', `${headerOffset}px`);

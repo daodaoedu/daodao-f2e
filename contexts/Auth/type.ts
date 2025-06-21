@@ -16,6 +16,7 @@ export enum LoginStatus {
 
 interface CommonAuthState {
   isComplete: boolean;
+  isLoading: boolean;
   isOpenLoginModal: boolean;
   token: string | null;
   redirectUrl: string;
@@ -51,6 +52,7 @@ export enum ActionTypes {
   OPEN_LOGIN_MODAL = "openLoginModal",
   CLOSE_LOGIN_MODAL = "closeLoginModal",
   SET_TOKEN = "setToken",
+  SET_LOADING = "setLoading",
   UPDATE_USER = "updateUser",
   LOGIN = "login",
   LOGOUT = "logout",
@@ -60,6 +62,7 @@ export type Action =
   | { type: ActionTypes.OPEN_LOGIN_MODAL; payload?: string }
   | { type: ActionTypes.CLOSE_LOGIN_MODAL }
   | { type: ActionTypes.SET_TOKEN; payload: string }
+  | { type: ActionTypes.SET_LOADING; payload: boolean }
   | { type: ActionTypes.UPDATE_USER; payload: IUser }
   | { type: ActionTypes.LOGIN; payload: IUser | null }
   | { type: ActionTypes.LOGOUT };
@@ -68,6 +71,7 @@ export type AuthDispatch = {
   [ActionTypes.OPEN_LOGIN_MODAL]: (redirectUrl?: string) => void;
   [ActionTypes.CLOSE_LOGIN_MODAL]: () => void;
   [ActionTypes.SET_TOKEN]: (payload: string) => void;
+  [ActionTypes.SET_LOADING]: (payload: boolean) => void;
   [ActionTypes.UPDATE_USER]: (
     payload: CreateUserRequest | UpdateUserRequest
   ) => Promise<void>;

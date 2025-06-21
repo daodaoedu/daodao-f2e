@@ -37,6 +37,7 @@ const initialState: AuthState = {
   isComplete: false,
   isLoggedIn: false,
   isTemporary: false,
+  isLoading: true,
   isOpenLoginModal: false,
   loginStatus: LoginStatus.EMPTY,
   token: null,
@@ -102,6 +103,12 @@ const authReducer = (state: AuthState, action: Action): AuthState => {
         redirectUrl: "",
       };
     }
+    case ActionTypes.SET_LOADING: {
+      return {
+        ...state,
+        isLoading: action.payload,
+      };
+    }
     case ActionTypes.SET_TOKEN: {
       return {
         ...state,
@@ -156,6 +163,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
     };
     return {
       setToken,
+      setLoading: (payload) => {
+        dispatch({ type: ActionTypes.SET_LOADING, payload });
+      },
       logout,
       login: (payload) => {
         dispatch({ type: ActionTypes.LOGIN, payload });
@@ -208,11 +218,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
     toast.error("系統異常，請稍後再試");
   };
 
-  useUserMe({
+  const { isLoading } = useUserMe({
     token: state.token,
     onSuccess: authDispatch.login,
     onError: handleError,
   });
+
+  useEffect(() => {
+    if (state.isLoading !== isLoading) {
+      authDispatch.setLoading(isLoading);
+    }
+  }, [state.isLoading, isLoading]);
 
   useEffect(() => {
     const handleToken = (token: string) => {
