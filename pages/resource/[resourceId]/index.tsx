@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import NotExist from "@/shared/components/NotExist";
 import CommentSection from "@/shared/components/Comment/CommentSection";
-import { parseToNumber } from "@/utils/helper";
+import { parseToString } from "@/utils/helper";
 import {
   ResourceDetail,
   ResourceIntroduction,
@@ -33,10 +33,10 @@ enum TabEnum {
 export const runtime = "experimental-edge";
 
 export const getServerSideProps = (async (context) => {
-  const resourceId = parseToNumber(context.params?.resourceId);
+  const resourceId = parseToString(context.params?.resourceId);
 
   try {
-    if (typeof resourceId !== "number") {
+    if (!resourceId) {
       return {
         notFound: true,
       };
@@ -64,7 +64,9 @@ export default function ResourceDetailPage({
   resource,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [query, setQuery] = useQueryState(
-    z.object({ tab: z.nativeEnum(TabEnum) })
+    z.object({
+      tab: z.nativeEnum(TabEnum).optional().default(TabEnum.Introduction),
+    })
   );
 
   if (!resource) {
