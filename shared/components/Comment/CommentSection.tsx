@@ -4,7 +4,7 @@ import CommentInput from './CommentInput';
 import CommentCard from './CommentCard';
 
 interface CommentSectionProps {
-  targetId: number;
+  targetId: number | string;
   targetType: CommentType;
 }
 

@@ -5,7 +5,7 @@ import {
 import { ResourceReviewSchema } from "./reviews";
 
 export const mockResource: ResourceDetailResponseSchema = {
-  id: 1,
+  id: "1",
   name: "回收大百科",
   url: "https://recycle.rethinktw.org/",
   imageUrl: "https://i.imgur.com/hWt9pbi.jpeg",
@@ -100,7 +100,7 @@ export const mockResourceReview: ResourceReviewSchema = {
 export const mockResourceList: ResourceListResponseSchema = {
   resources: [
     {
-      id: 1,
+      id: "1",
       name: "回收大百科",
       url: "https://recycle.rethinktw.org/",
       imageUrl: "https://i.imgur.com/hWt9pbi.jpeg",
@@ -130,7 +130,7 @@ export const mockResourceList: ResourceListResponseSchema = {
       shareCount: 150,
     },
     {
-      id: 2,
+      id: "2",
       name: "海廢圖鑑",
       url: "https://oceantrash.rethinktw.org/",
       imageUrl: "https://i.imgur.com/8TWSSZB.jpeg",
@@ -159,7 +159,7 @@ export const mockResourceList: ResourceListResponseSchema = {
       shareCount: 0
     },
     {
-      id: 3,
+      id: "3",
       name: "社會創新相關工具（教育部資科司iLink計畫）",
       url: "https://www.ilink-hss.org/Toolkits",
       imageUrl: "https://i.imgur.com/WBEqjq6.png",
@@ -189,7 +189,7 @@ export const mockResourceList: ResourceListResponseSchema = {
       tags: ["社會創新", "社會設計", "設計思考", "服務設計", "UIUX"],
     },
     {
-      id: 4,
+      id: "4",
       name: "好數多",
       url: "https://lin.ee/G57Ujpg",
       imageUrl: "https://i.imgur.com/F1fPYDq.png",
@@ -219,7 +219,7 @@ export const mockResourceList: ResourceListResponseSchema = {
       tags: ["數學"],
     },
     {
-      id: 5,
+      id: "5",
       name: "友善校園學生事務與輔導工作資訊網",
       url: "https://friendlycampus.k12ea.gov.tw/Portal",
       imageUrl: "https://i.imgur.com/H5JZQC7.png",
@@ -249,7 +249,7 @@ export const mockResourceList: ResourceListResponseSchema = {
       tags: ["生涯探索", "社會議題", "生命教育", "諮商", "性別平等"],
     },
     {
-      id: 6,
+      id: "6",
       name: "台灣開放式課程平台",
       url: "https://www.tocec.org.tw/web/index.jsp",
       imageUrl: "https://i.imgur.com/JK8L32p.png",
@@ -279,7 +279,7 @@ export const mockResourceList: ResourceListResponseSchema = {
       tags: ["開放式課程", "自主學習", "線上教育", "高等教育"],
     },
     {
-      id: 7,
+      id: "7",
       name: "C語言教學資源",
       url: "https://programming.im.ncnu.edu.tw/C_index.html",
       imageUrl: "https://i.imgur.com/Pn2XQc7.jpeg",
@@ -309,7 +309,7 @@ export const mockResourceList: ResourceListResponseSchema = {
       tags: ["程式設計", "C語言", "資訊教育", "電腦科學"],
     },
     {
-      id: 8,
+      id: "8",
       name: "台灣生態教育資源網",
       url: "https://ecolearn.tw",
       imageUrl: "https://i.imgur.com/NMR5Tf7.jpeg",
@@ -339,7 +339,7 @@ export const mockResourceList: ResourceListResponseSchema = {
       tags: ["生態教育", "環境保護", "生物多樣性", "自然保育", "戶外教學"],
     },
     {
-      id: 9,
+      id: "9",
       name: "藝術治療資源庫",
       url: "https://artstherapy.org.tw",
       imageUrl: "https://i.imgur.com/L7PqTs4.jpeg",
@@ -369,7 +369,7 @@ export const mockResourceList: ResourceListResponseSchema = {
       tags: ["藝術治療", "心理健康", "表達性藝術", "創作治療", "心理諮商"],
     },
     {
-      id: 10,
+      id: "10",
       name: "科學實驗資源平台",
       url: "https://sciencelab.edu.tw",
       imageUrl: "https://i.imgur.com/XZ7YpQr.jpeg",

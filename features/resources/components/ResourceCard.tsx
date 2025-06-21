@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 
 // Props 需要對應真實資料
 type CardProps = {
-  id: number;
+  id: string;
   time?: string;
   userName?: string;
   userAvatar?: string | null;

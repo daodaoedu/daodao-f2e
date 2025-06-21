@@ -120,7 +120,7 @@ export default function CreateResourcePage() {
 
   return (
     <ProtectedComponent>
-      <SEOConfig title="分享資源" />
+      <SEOConfig title="新增分享資源" />
       <Background>
         <Container>
           <BackButton label="返回" />

@@ -21,7 +21,7 @@ import {
 import { useResource, useUpdateResource } from "../hooks";
 
 interface UpdateResourceFormProps {
-  resourceId: number | null;
+  resourceId: string | null;
 }
 
 export default function UpdateResourceForm({
