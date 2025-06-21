@@ -1,6 +1,8 @@
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 import { z } from "zod";
 import useQueryState from "@/hooks/useQueryState";
+import SEOConfig from "@/shared/components/SEO";
 import { CommentType } from "@/services/comments";
 import { resourceAPI } from "@/services/resources/core/api";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
@@ -16,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import NotExist from "@/shared/components/NotExist";
 import CommentSection from "@/shared/components/Comment/CommentSection";
+import { Container } from "@/components/ui/wrapper";
 import { parseToString } from "@/utils/helper";
 import {
   ResourceDetail,
@@ -63,6 +66,7 @@ export const getServerSideProps = (async (context) => {
 export default function ResourceDetailPage({
   resource,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const router = useRouter();
   const [query, setQuery] = useQueryState(
     z.object({
       tab: z.nativeEnum(TabEnum).optional().default(TabEnum.Introduction),
@@ -75,7 +79,11 @@ export default function ResourceDetailPage({
 
   return (
     <div className="bg-primary-palest min-h-screen">
-      <div className="container mx-auto px-4 pb-12 pt-11 md:pt-12">
+      <SEOConfig
+        title={`${resource.name} - 分享資源 | 島島阿學`}
+        description={resource.description}
+      />
+      <Container className="pb-12 pt-11 md:pt-12">
         <Breadcrumb className="mb-5 md:mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -130,7 +138,12 @@ export default function ResourceDetailPage({
             </TabsContent>
 
             <TabsContent value={TabEnum.Reviews}>
-              <ResourceReviewList resource={resource} />
+              <ResourceReviewList
+                resource={resource}
+                onCreateReview={() => {
+                  router.push(`/resource/${resource.id}/reviews/create`);
+                }}
+              />
             </TabsContent>
 
             <TabsContent value={TabEnum.Contributor}>
@@ -145,7 +158,7 @@ export default function ResourceDetailPage({
             targetType={CommentType.Resource}
           />
         </div>
-      </div>
+      </Container>
     </div>
   );
 }

@@ -11,7 +11,7 @@ export default function EditResourceReviewPage() {
 
   return (
     <ProtectedComponent>
-      <SEOConfig title="分享心得" />
+      <SEOConfig title="分享心得 | 島島阿學" />
       <ResourceReviewForm
         resourceId={resourceId}
         onSuccess={() => {

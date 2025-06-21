@@ -100,7 +100,7 @@ export default function ResourceReviewForm({
             <BackButton label="返回" />
 
             <Title as="h1" size="xl" className="mt-3 mb-10">
-              分享資源
+              分享心得
             </Title>
 
             <Paper>

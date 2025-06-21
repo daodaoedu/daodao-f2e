@@ -12,7 +12,7 @@ export default function EditResourceReviewPage() {
 
   return (
     <ProtectedComponent>
-      <SEOConfig title="編輯心得分享" />
+      <SEOConfig title="編輯心得分享 | 島島阿學" />
       <ResourceReviewForm
         resourceId={resourceId}
         reviewId={reviewId}
