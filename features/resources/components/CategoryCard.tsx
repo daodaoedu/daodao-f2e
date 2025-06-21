@@ -9,7 +9,7 @@ type CategoryCardProps = {
   size?: 'sm' | 'md';
 };
 
-const CATEGORIES_BASE_PATH = '/new-resource/categories';
+const CATEGORIES_BASE_PATH = '/resource/categories';
 
 export default function CategoryCard(props: CategoryCardProps) {
   const { category, size = 'md' } = props;

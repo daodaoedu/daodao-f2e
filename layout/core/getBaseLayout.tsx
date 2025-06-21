@@ -14,15 +14,17 @@ function BaseLayout({ children }: React.PropsWithChildren) {
 
   useEffect(() => {
     const handleScrollPaddingTop = () => {
-      if (!headerRef.current) return;
-      const headerOffset = headerRef.current.offsetHeight;
-      const root = document.querySelector(':root');
+      requestAnimationFrame(() => {
+        if (!headerRef.current) return;
+        const headerOffset = headerRef.current.offsetHeight;
+        const root = document.querySelector(':root');
 
-      setHeight(Math.floor(headerOffset - 1));
-      if (root instanceof HTMLElement) {
-        root.style.setProperty('--padding-top', `${headerOffset}px`);
-        root.style.setProperty('scroll-padding-top', `${headerOffset + 80}px`);
-      }
+        setHeight(Math.floor(headerOffset - 1));
+        if (root instanceof HTMLElement) {
+          root.style.setProperty('--padding-top', `${headerOffset}px`);
+          root.style.setProperty('scroll-padding-top', `${headerOffset + 80}px`);
+        }
+      });
     };
 
     if (prevShowPromotionBar.current !== isShowPromotionBar) {

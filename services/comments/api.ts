@@ -11,7 +11,7 @@ import {
 
 export type CommentSWRKey = [
   string,
-  { targetType: CommentType; targetId: number }
+  { targetType: CommentType; targetId: number | string }
 ];
 
 interface GetCommentPathnameProps {

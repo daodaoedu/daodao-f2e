@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
+import { Slot, Slottable } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/utils/cn";
@@ -13,7 +13,7 @@ const buttonVariants = cva(
     // Text & Space
     "whitespace-nowrap body-md font-medium",
     // Visual Style
-    "transition-[color,background-color,box-shadow] rounded-full overflow-hidden",
+    "transition-[color,background-color,box-shadow] rounded-full",
     // Interaction
     "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
     "disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none",
@@ -72,10 +72,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       animation = ButtonAnimationEnum.Ripple,
       onClick,
+      children,
       ...props
     },
     ref
   ) => {
+    const rippleRef = React.useRef<HTMLDivElement>(null);
     const Comp = asChild ? Slot : "button";
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -95,7 +97,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         "absolute size-10 rounded-full bg-black/30 animate-button-ripple";
       ripple.style.top = `${((e.clientY - rect.top) / rect.height) * 100}%`;
       ripple.style.left = `${((e.clientX - rect.left) / rect.width) * 100}%`;
-      e.currentTarget?.appendChild(ripple);
+      rippleRef.current?.appendChild(ripple);
       setTimeout(() => ripple.remove(), 1000);
     };
 
@@ -106,7 +108,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         onClick={handleClick}
         disabled={disabled}
         {...props}
-      />
+      >
+        <Slottable>{children}</Slottable>
+        <div
+          ref={rippleRef}
+          className="absolute inset-0 overflow-hidden pointer-events-none rounded-[inherit]"
+        />
+      </Comp>
     );
   }
 );

@@ -1,5 +1,5 @@
 import { MutationFetcher } from "swr/mutation";
-import { parseToNumber, parseToString } from "@/utils/helper";
+import { parseToString } from "@/utils/helper";
 import { fetcher, mutations } from "@/utils/http";
 
 import {
@@ -11,7 +11,7 @@ import {
 import { mockResourceList } from "../mock";
 
 interface GetResourcePathnameProps {
-  id?: number;
+  id?: string;
 }
 
 export const getResourcePathname = ({ id }: GetResourcePathnameProps = {}) => {
@@ -25,7 +25,7 @@ export const getResourcePathname = ({ id }: GetResourcePathnameProps = {}) => {
 };
 
 interface ResourceAPIType {
-  read: (resourceId: number) => Promise<ResourceDetailResponseSchema>;
+  read: (resourceId: string) => Promise<ResourceDetailResponseSchema>;
   readList: () => Promise<ResourceListResponseSchema>;
   create: MutationFetcher<
     ResourceMutationResponseSchema,
@@ -42,8 +42,8 @@ interface ResourceAPIType {
 
 export const resourceAPI: ResourceAPIType = {
   read: (resourceId) => {
-    const id = parseToNumber(resourceId);
-    if (typeof id !== "number") {
+    const id = parseToString(resourceId);
+    if (typeof id !== "string") {
       throw new Error("Invalid resource id");
     }
     return fetcher<ResourceDetailResponseSchema>(

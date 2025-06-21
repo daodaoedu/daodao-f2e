@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { Plus } from "lucide-react";
+import { Link2Icon, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { ResourceFormSchema } from "@/services/resources/core/schema";
 import { Text, Title } from "@/components/ui/typography";
-import { UploadFile } from "@/components/ui/upload-file";
+import { UploadImage } from "@/components/ui/upload-image";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
 
 type ResourceBasicInfoSchema = Pick<
@@ -38,10 +38,10 @@ export default function ResourceBasicInfoFields() {
         <div className="flex gap-6">
           <div className="flex-[2]">
             <FormLabel required>封面圖</FormLabel>
-            <UploadFile>
+            <UploadImage ratio={133 / 100}>
               <Plus size={24} />
               選擇封面
-            </UploadFile>
+            </UploadImage>
           </div>
 
           <div className="flex-[5] space-y-6">
@@ -112,11 +112,12 @@ export default function ResourceBasicInfoFields() {
                 <FormControl>
                   <Input
                     placeholder="複製 YouTube 影片網址"
+                    prefixIcon={<Link2Icon />}
                     {...field}
                     value={field.value ?? ""}
                   />
                 </FormControl>
-                <Button type="button" variant="outline">
+                <Button type="button" variant="outline" size="lg">
                   <Plus size={15} />
                   嵌入
                 </Button>

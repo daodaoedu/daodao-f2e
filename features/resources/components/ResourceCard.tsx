@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 
 // Props 需要對應真實資料
 type CardProps = {
-  id: number;
+  id: string;
   time?: string;
   userName?: string;
   userAvatar?: string | null;
@@ -58,7 +58,7 @@ export default function ResourceCard(props: CardProps) {
 
   return (
     <Link
-      href={`/new-resource/${id}`}
+      href={`/resource/${id}`}
       className="group flex flex-col gap-2 md:flex-row md:gap-4"
     >
       {/* Card Image */}

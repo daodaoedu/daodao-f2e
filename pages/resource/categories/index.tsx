@@ -1,17 +1,22 @@
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import { SWRConfig } from "swr";
-import Link from "next/link";
 import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
-import { ChevronLeftIcon } from "lucide-react";
 import {
+  CategoriesContainer,
   createResourceJsonLd,
   ResourceExplorer,
   SectionTitle,
 } from "@/features/resources";
 import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";
-import useSearchParamsManager from "@/hooks/useSearchParamsManager";
-import { Button } from "@/components/ui/button";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
 
 type SectionProps = {
@@ -25,7 +30,11 @@ const Section = ({
   className,
   children,
 }: SectionProps) => {
-  return <Component className={className}>{children}</Component>;
+  return (
+    <Component className={cn("pb-11 px-5 md:pb-12 md:px-24", className)}>
+      {children}
+    </Component>
+  );
 };
 
 export const getStaticProps = (async () => {
@@ -36,17 +45,12 @@ export const getStaticProps = (async () => {
 
     const jsonLd = JsonLdFactory.createGraph([
       JsonLdFactory.createItemListBuilder()
-        .setName("探索所有資源")
+        .setName("所有分類")
         .setItems(coursesJsonLd),
     ]);
 
     return {
-      props: {
-        fallback: {
-          "/new-resource/explore": data,
-        },
-        jsonLd,
-      },
+      props: { fallback: { "/resource/categories": data }, jsonLd },
     };
   } catch {
     return { props: { fallback: undefined, jsonLd: undefined } };
@@ -60,32 +64,31 @@ export default function ResourceCategoriesPage({
   fallback,
   jsonLd,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const [getSearchParams] = useSearchParamsManager();
-  const searchParams = getSearchParams();
-  const keyword = searchParams?.q;
-
   return (
     <SWRConfig value={{ fallback }}>
-      <SEOConfig title="探索所有資源｜島島阿學" jsonLd={jsonLd} />
-      <Section as="div" className="pt-12 px-5 md:px-24">
-        <Button
-          variant="link"
-          className="mb-3 px-2 -mx-2 text-basic-300"
-          asChild
-        >
-          <Link href="/new-resource">
-            <ChevronLeftIcon className="w-4 h-4" />
-            返回
-          </Link>
-        </Button>
-        <SectionTitle
-          as="h1"
-          title="所有資源"
-          className={cn(keyword && "hidden")}
-        />
+      <SEOConfig title="所有分類｜島島阿學" jsonLd={jsonLd} />
+      <Section as="div" className="pt-12">
+        <Breadcrumb className="mb-3">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/resource">找資源</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>所有分類</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <SectionTitle as="h1" title="所有分類" />
       </Section>
 
-      <Section className="pb-11 md:pb-12">
+      <Section>
+        <CategoriesContainer size="sm" />
+      </Section>
+
+      <Section className="relative px-0 md:px-0">
+        <SectionTitle title="所有資源" className="pb-0 px-5 md:pb-0 md:px-24" />
+
         <ResourceExplorer />
       </Section>
     </SWRConfig>

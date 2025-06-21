@@ -1,15 +1,17 @@
 import React from "react";
 import { Plus } from "lucide-react";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
-import { Button } from "@/components/ui/button";
+import { AuthButton } from "@/contexts/Auth";
 import ResourceReviewCard from "./ResourceReviewCard";
 
 interface ResourceReviewListProps {
   resource: ResourceDetailResponseSchema;
+  onCreateReview: () => void;
 }
 
 export default function ResourceReviewList({
   resource,
+  onCreateReview,
 }: ResourceReviewListProps) {
   return (
     <div className="flex flex-col items-center gap-10">
@@ -24,10 +26,10 @@ export default function ResourceReviewList({
           目前還沒有人留下心得，成為第一個吧！
         </div>
       )}
-      <Button size="lg">
+      <AuthButton size="lg" onClick={onCreateReview}>
         <Plus size={15} />
         分享心得
-      </Button>
+      </AuthButton>
     </div>
   );
 }

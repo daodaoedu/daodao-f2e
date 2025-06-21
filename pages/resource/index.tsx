@@ -85,11 +85,11 @@ export default function ResourcePage({
           <SectionTitle title="熱門資源">
             <Button
               variant="link"
-              className="-mx-2 px-2 heading-md font-medium text-basic-300"
+              className="-mx-2 px-2 body-md font-medium text-basic-300"
               size="lg"
               asChild
             >
-              <Link href="/new-resource/explore">
+              <Link href="/resource/explore">
                 探索 所有資源
                 <ChevronRightIcon className="w-4 h-4" />
               </Link>
@@ -102,10 +102,10 @@ export default function ResourcePage({
           <SectionTitle title="最新資源">
             <Button
               variant="link"
-              className="-mx-2 px-2 body-lg font-medium text-basic-300"
+              className="-mx-2 px-2 body-md font-medium text-basic-300"
               asChild
             >
-              <Link href="/new-resource/explore">
+              <Link href="/resource/explore">
                 探索 所有資源
                 <ChevronRightIcon className="w-4 h-4" />
               </Link>
@@ -118,10 +118,10 @@ export default function ResourcePage({
           <SectionTitle title="熱門分類">
             <Button
               variant="link"
-              className="-mx-2 px-2 body-lg font-medium text-basic-300"
+              className="-mx-2 px-2 body-md font-medium text-basic-300"
               asChild
             >
-              <Link href="/new-resource/categories">
+              <Link href="/resource/categories">
                 探索 所有分類
                 <ChevronRightIcon className="w-4 h-4" />
               </Link>

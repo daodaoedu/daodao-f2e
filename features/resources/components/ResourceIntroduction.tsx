@@ -12,14 +12,14 @@ export default function ResourceIntroduction({
   resource,
 }: ResourceIntroductionProps) {
   return (
-    <>
+    <div className="space-y-10">
       <MarkdownEditor
         value={resource.description}
         readOnly
-        className="mb-10"
+        disabledProse
       />
       {resource.videoUrl && (
-        <div className="mb-10 aspect-[1120/633]">
+        <div className="aspect-[1120/633]">
           <iframe
             className="w-full h-full rounded-lg"
             width="560"
@@ -45,6 +45,6 @@ export default function ResourceIntroduction({
           )}
         </time>
       </div>
-    </>
+    </div>
   );
 }

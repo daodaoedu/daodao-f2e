@@ -16,7 +16,7 @@ export function useResourceList(filter: ResourceSearchParamsSchema) {
   return useSWR<ResourceListResponseSchema>([getResourcePathname(), filter], () => mockResourceList);
 }
 
-export function useResource(id?: number | null) {
+export function useResource(id?: string | null) {
   return useSWR<ResourceDetailResponseSchema>(
     id ? getResourcePathname({ id }) : null
   );
@@ -39,11 +39,11 @@ export const useCreateResource = ({
 };
 
 export const useUpdateResource = (
-  id?: number | null,
+  id?: string | null,
   { onSuccess, ...options }: SWRMutationOptions = {}
 ) => {
   return useSWRMutation(
-    typeof id === "number" ? getResourcePathname({ id }) : null,
+    id ? getResourcePathname({ id }) : null,
     resourceAPI.update,
     {
       ...options,
@@ -56,7 +56,7 @@ export const useUpdateResource = (
 };
 
 export const useDeleteResource = (
-  id: number,
+  id: string,
   { onSuccess, ...options }: SWRMutationOptions<void> = {}
 ) => {
   return useSWRMutation(

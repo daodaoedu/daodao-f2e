@@ -1,5 +1,3 @@
-"use client";
-
 import type { AnyZodObject } from "zod";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
@@ -8,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { toast } from "sonner";
 
+import SEOConfig from "@/shared/components/SEO";
 import DocSvg from "@/public/assets/icons/doc.svg";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -15,6 +14,13 @@ import { Background, Container, Paper } from "@/components/ui/wrapper";
 import { BackButton } from "@/components/ui/back-button";
 import { Title } from "@/components/ui/typography";
 import { Progress } from "@/components/ui/progress";
+import { ProtectedComponent } from "@/contexts/Auth";
+import {
+  ResourceBasicInfoFields,
+  ResourceCategorizationFields,
+  ResourceReviewFields,
+  useCreateResource,
+} from "@/features/resources";
 import {
   resourceFormSchema,
   ResourceFormSchema,
@@ -22,16 +28,9 @@ import {
 } from "@/services/resources";
 import { cn } from "@/utils/cn";
 
-import {
-  ResourceBasicInfoFields,
-  ResourceCategorizationFields,
-  ResourceReviewFields,
-} from "../components";
-import { useCreateResource } from "../hooks";
-
 const withoutReviewSchema = resourceFormSchema.omit({ review: true });
 
-export default function CreateResourceForm() {
+export default function CreateResourcePage() {
   const router = useRouter();
 
   const [step, setStep] = useState(1);
@@ -120,99 +119,102 @@ export default function CreateResourceForm() {
   }, [step]);
 
   return (
-    <Background>
-      <Container>
-        <BackButton label="返回" />
+    <ProtectedComponent>
+      <SEOConfig title="新增分享資源" />
+      <Background>
+        <Container>
+          <BackButton label="返回" />
 
-        <Title as="h1" size="xl" className="mt-3 mb-10">
-          分享資源
-        </Title>
-      </Container>
+          <Title as="h1" size="xl" className="mt-3 mb-10">
+            分享資源
+          </Title>
+        </Container>
 
-      <Form {...resourceForm}>
-        <form
-          onSubmit={resourceForm.handleSubmit((data) => createResource(data))}
-          className="space-y-10"
-        >
-          <Container>
-            <Paper className="space-y-10">
-              {step === 1 ? (
-                <>
-                  <ResourceBasicInfoFields />
-                  <ResourceCategorizationFields />
-                </>
-              ) : (
-                <ResourceReviewFields isReviewNested />
-              )}
-            </Paper>
-          </Container>
-          <footer className="sticky bottom-0 bg-basic-white py-4 shadow-2xl shadow-basic-300 z-10">
-            <Container className="flex items-center gap-10">
-              <div className="flex-1 body-md space-y-3">
-                <div className="flex">
-                  <div className="flex-1">主要資訊</div>
-                  <div className="flex-1">心得</div>
-                </div>
-                <Progress
-                  value={progress}
-                  className={cn(
-                    "relative after:absolute after:top-0 after:left-1/2",
-                    "after:w-px after:h-full after:bg-primary-base"
-                  )}
-                />
-                <div className="body-sm">{helperText}</div>
-              </div>
-              <div className="flex justify-end gap-3 shrink-0">
-                <Button
-                  variant="outline"
-                  type="button"
-                  size="lg"
-                  disabled={isSubmitting}
-                  onClick={handlePrevStep}
-                  className={cn(step === 1 && "invisible")}
-                >
-                  <ArrowLeft size={16} />
-                  上一步
-                </Button>
-                <Button
-                  variant="outline"
-                  type="button"
-                  size="lg"
-                  disabled={isSubmitting}
-                  onClick={handleSaveDraft}
-                >
-                  <DocSvg className="size-4" />
-                  儲存草稿
-                </Button>
+        <Form {...resourceForm}>
+          <form
+            onSubmit={resourceForm.handleSubmit((data) => createResource(data))}
+            className="space-y-10"
+          >
+            <Container>
+              <Paper className="space-y-10">
                 {step === 1 ? (
-                  <Button
-                    key="next"
-                    size="lg"
-                    type="button"
-                    className="w-28"
-                    onClick={handleNextStep}
-                    disabled={isSubmitting}
-                  >
-                    <ArrowRight size={16} />
-                    下一步
-                  </Button>
+                  <>
+                    <ResourceBasicInfoFields />
+                    <ResourceCategorizationFields />
+                  </>
                 ) : (
-                  <Button
-                    key="submit"
-                    size="lg"
-                    type="submit"
-                    className="w-28"
-                    disabled={isSubmitting}
-                  >
-                    <Check size={16} />
-                    確認
-                  </Button>
+                  <ResourceReviewFields isReviewNested />
                 )}
-              </div>
+              </Paper>
             </Container>
-          </footer>
-        </form>
-      </Form>
-    </Background>
+            <footer className="sticky bottom-0 bg-basic-white py-4 shadow-2xl shadow-basic-300 z-10">
+              <Container className="flex items-center gap-10">
+                <div className="flex-1 body-md space-y-3">
+                  <div className="flex">
+                    <div className="flex-1">主要資訊</div>
+                    <div className="flex-1">心得</div>
+                  </div>
+                  <Progress
+                    value={progress}
+                    className={cn(
+                      "relative after:absolute after:top-0 after:left-1/2",
+                      "after:w-px after:h-full after:bg-primary-base"
+                    )}
+                  />
+                  <div className="body-sm">{helperText}</div>
+                </div>
+                <div className="flex justify-end gap-3 shrink-0">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    size="lg"
+                    disabled={isSubmitting}
+                    onClick={handlePrevStep}
+                    className={cn(step === 1 && "invisible")}
+                  >
+                    <ArrowLeft size={16} />
+                    上一步
+                  </Button>
+                  <Button
+                    variant="outline"
+                    type="button"
+                    size="lg"
+                    disabled={isSubmitting}
+                    onClick={handleSaveDraft}
+                  >
+                    <DocSvg className="size-4" />
+                    儲存草稿
+                  </Button>
+                  {step === 1 ? (
+                    <Button
+                      key="next"
+                      size="lg"
+                      type="button"
+                      className="w-28"
+                      onClick={handleNextStep}
+                      disabled={isSubmitting}
+                    >
+                      <ArrowRight size={16} />
+                      下一步
+                    </Button>
+                  ) : (
+                    <Button
+                      key="submit"
+                      size="lg"
+                      type="submit"
+                      className="w-28"
+                      disabled={isSubmitting}
+                    >
+                      <Check size={16} />
+                      確認
+                    </Button>
+                  )}
+                </div>
+              </Container>
+            </footer>
+          </form>
+        </Form>
+      </Background>
+    </ProtectedComponent>
   );
 }

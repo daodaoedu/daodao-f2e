@@ -37,7 +37,7 @@
     @apply text-basic-black;
   }
   .mdxeditor-popup-container.bg-white {
-    z-index: 99;
+    z-index: 50;
   }
   :root {
     scroll-behavior: smooth;

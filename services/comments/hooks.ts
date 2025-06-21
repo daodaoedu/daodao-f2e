@@ -6,7 +6,7 @@ import { CommentType, CommentSchema } from './schema';
 
 interface UseCommentListProps {
   targetType: CommentType;
-  targetId: number;
+  targetId: number | string;
   disableSearch?: boolean;
 }
 

@@ -11,7 +11,7 @@ import {
 export type ResourceReviewSWRKey = string;
 
 interface GetResourceReviewPathnameProps {
-  resourceId: number;
+  resourceId: string;
   reviewId?: number;
 }
 

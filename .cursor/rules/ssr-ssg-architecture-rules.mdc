@@ -31,7 +31,7 @@ alwaysApply: false
 ### 靜態網站生成 (Static Site Generation, SSG)
 
 #### 基本結構 
-參考 [pages/new-resource/categories/index.tsx](mdc:pages/new-resource/categories/index.tsx) 的實現：
+參考 [pages/resource/categories/index.tsx](mdc:pages/resource/categories/index.tsx) 的實現：
 
 ```tsx
 // 1. 引入必要的類型和組件
@@ -59,7 +59,7 @@ export const getStaticProps = (async () => {
     return {
       props: { 
         // 為 SWR 提供初始數據
-        fallback: { "/new-resource/categories": data }, 
+        fallback: { "/resource/categories": data }, 
         jsonLd 
       },
     };
@@ -93,7 +93,7 @@ export default function ResourceCategoriesPage({
 ```
 
 #### 動態路由 SSG
-參考 [pages/new-resource/categories/[...categories].tsx](mdc:pages/new-resource/categories/[...categories].tsx) 的實現：
+參考 [pages/resource/categories/[...categories].tsx](mdc:pages/resource/categories/[...categories].tsx) 的實現：
 
 ```tsx
 // 1. 定義靜態路徑
@@ -138,7 +138,7 @@ export const getStaticProps = (async (context) => {
       props: {
         // 為特定路徑提供初始數據
         fallback: {
-          [`/new-resource/categories/${categories?.join("/")}`]: data,
+          [`/resource/categories/${categories?.join("/")}`]: data,
         },
         jsonLd,
         categories,
@@ -258,7 +258,7 @@ export const getServerSideProps = async () => {
 ### 頁面組件結構 (Page Component Structure)
 
 #### 基本頁面結構
-參考 [pages/new-resource/index.tsx](mdc:pages/new-resource/index.tsx)：
+參考 [pages/resource/index.tsx](mdc:pages/resource/index.tsx)：
 
 ```tsx
 // 1. 定義頁面 Props 類型
@@ -286,7 +286,7 @@ export default function ResourcePage({
         <div>
           <SectionTitle title="熱門資源">
             <Button variant="link" asChild>
-              <Link href="/new-resource/explore">
+              <Link href="/resource/explore">
                 探索 所有資源
                 <ChevronRightIcon className="w-4 h-4" />
               </Link>
@@ -397,7 +397,7 @@ function ResourceExplorer() {
 
 以下頁面提供了 SSG/SSR 架構的完整參考實現：
 
-- 主頁: [pages/new-resource/index.tsx](mdc:pages/new-resource/index.tsx)
-- 類別頁: [pages/new-resource/categories/index.tsx](mdc:pages/new-resource/categories/index.tsx)
-- 動態路由: [pages/new-resource/categories/[...categories].tsx](mdc:pages/new-resource/categories/[...categories].tsx)
-- 探索頁: [pages/new-resource/explore.tsx](mdc:pages/new-resource/explore.tsx)
+- 主頁: [pages/resource/index.tsx](mdc:pages/resource/index.tsx)
+- 類別頁: [pages/resource/categories/index.tsx](mdc:pages/resource/categories/index.tsx)
+- 動態路由: [pages/resource/categories/[...categories].tsx](mdc:pages/resource/categories/[...categories].tsx)
+- 探索頁: [pages/resource/explore.tsx](mdc:pages/resource/explore.tsx)

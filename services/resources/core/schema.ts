@@ -15,11 +15,10 @@ const httpsUrl = z
   });
 
 export const resourceSchema = z.object({
-  id: z.number(),
+  id: z.string(),
   name: z.string().min(1, "請輸入資源名稱"),
   url: httpsUrl,
-  // imageUrl: httpsUrl.optional().nullable(),
-  imageUrl: httpsUrl.optional().nullable().or(z.string()),
+  imageUrl: httpsUrl.optional().nullable(),
   description: z.string().min(1, "請輸入資源描述"),
   videoUrl: httpsUrl.optional().nullable(),
   type: z.string(),

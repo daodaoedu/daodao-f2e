@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check } from "lucide-react";
@@ -16,25 +15,25 @@ import {
   ResourceReviewFormSchema,
   resourceReviewFormSchema,
 } from "@/services/resources/reviews/schema";
-import ResourceReviewFields from "../components/ResourceReviewFields";
+import ResourceReviewFields from "./ResourceReviewFields";
 import { useCreateResourceReview, useUpdateResourceReview } from "../hooks";
 
 interface ResourceReviewFormProps {
-  resourceId: number;
-  reviewId?: number;
+  resourceId: string | null;
+  reviewId?: number | null;
+  onSuccess?: () => void;
 }
 
 export default function ResourceReviewForm({
   resourceId,
   reviewId,
+  onSuccess,
 }: ResourceReviewFormProps) {
-  const router = useRouter();
-
   const { trigger: createResourceReview, isMutating: isCreating } =
     useCreateResourceReview(resourceId, {
       onSuccess: () => {
         toast.success("資源心得分享成功！");
-        router.push("/search");
+        onSuccess?.();
       },
     });
 
@@ -42,7 +41,7 @@ export default function ResourceReviewForm({
     useUpdateResourceReview(resourceId, reviewId, {
       onSuccess: () => {
         toast.success("資源心得更新成功！");
-        router.push("/search");
+        onSuccess?.();
       },
     });
 
@@ -101,7 +100,7 @@ export default function ResourceReviewForm({
             <BackButton label="返回" />
 
             <Title as="h1" size="xl" className="mt-3 mb-10">
-              分享資源
+              分享心得
             </Title>
 
             <Paper>
@@ -110,21 +109,23 @@ export default function ResourceReviewForm({
           </Container>
           <footer className="sticky bottom-0 bg-basic-white py-4 shadow-2xl shadow-basic-300 z-10">
             <Container className="flex justify-end items-center gap-10">
-              <div className="flex flex-1 body-md space-y-3">
+              <div className="flex flex-col flex-1 body-md space-y-3">
                 <div>心得</div>
                 <Progress value={1} />
                 <div className="body-sm">就快完成了</div>
               </div>
               <div className="flex gap-3 shrink-0">
-                <Button
-                  variant="outline"
-                  type="button"
-                  size="lg"
-                  disabled={isSubmitting}
-                >
-                  <DocSvg className="size-4" />
-                  儲存草稿
-                </Button>
+                {typeof reviewId !== "number" && (
+                  <Button
+                    variant="outline"
+                    type="button"
+                    size="lg"
+                    disabled={isSubmitting}
+                  >
+                    <DocSvg className="size-4" />
+                    儲存草稿
+                  </Button>
+                )}
                 <Button size="lg" type="submit" disabled={isSubmitting}>
                   <Check size={16} />
                   {isSubmitting ? "處理中..." : "完成"}

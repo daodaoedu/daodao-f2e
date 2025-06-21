@@ -68,7 +68,7 @@ export default function ResourceReviewCard({
         <div className="mb-6">
           <h3 className="body-lg font-bold">心得</h3>
           <div className="text-gray-700 whitespace-pre-line mb-4">
-            <MarkdownEditor value={review.content} readOnly className="mb-10" />
+            <MarkdownEditor value={review.content} readOnly />
           </div>
         </div>
         <CollapsibleContent>

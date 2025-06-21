@@ -16,3 +16,4 @@ export { default as ContributorInfo } from "./ContributorInfo";
 export { default as ResourceBasicInfoFields } from "./ResourceBasicInfoFields";
 export { default as ResourceCategorizationFields } from "./ResourceCategorizationFields";
 export { default as ResourceReviewFields } from "./ResourceReviewFields";
+export { default as ResourceReviewForm } from "./ResourceReviewForm";

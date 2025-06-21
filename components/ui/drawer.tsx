@@ -42,13 +42,15 @@ const DrawerContent = React.forwardRef<
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-50 mt-24 px-5 pb-5 flex h-auto flex-col rounded-t-[10px] border bg-background",
+        "fixed inset-x-0 bottom-0 z-50 mt-24 px-10 pb-5 flex h-auto flex-col rounded-t-[10px] border bg-background",
         className
       )}
       {...props}
     >
       <div className="mx-auto mt-4 mb-1 h-2 w-[100px] rounded-full bg-muted" />
-      <ScrollArea className="max-h-[85vh] overflow-auto">{children}</ScrollArea>
+      <ScrollArea className="max-h-[85vh] overflow-auto">
+        <div className="grid gap-4">{children}</div>
+      </ScrollArea>
     </DrawerPrimitive.Content>
   </DrawerPortal>
 ));
@@ -59,7 +61,7 @@ const DrawerHeader = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn("grid gap-1.5 p-4 text-center sm:text-left", className)}
+    className={cn("grid gap-1.5 text-center sm:text-left", className)}
     {...props}
   />
 );
