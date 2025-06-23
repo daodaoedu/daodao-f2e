@@ -1,0 +1,8 @@
+<svg width="300" height="150" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg" className="hidden">
+  <filter id="question-noise">
+    <feTurbulence type="turbulence" baseFrequency="0.85" />
+    <feColorMatrix in="colorNoise" type="matrix" values="2 2 2 0 0 2 2 2 0 0 2 2 2 0 0 0 0 0 1 0" />
+    <feComposite operator="in" in2="SourceGraphic" result="monoNoise" />
+    <feBlend in="SourceGraphic" in2="monoNoise" mode="multiply" />
+  </filter>
+</svg>
