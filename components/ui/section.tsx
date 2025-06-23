@@ -1,10 +1,9 @@
-import { cn } from "@/utils/cn";
-import { Container } from "./Container";
+import { cn } from '@/utils/cn';
+import { Container } from './wrapper';
 
 interface SectionProps {
   children: React.ReactNode;
   className?: string;
-  containerSize?: "sm" | "md" | "lg" | "xl" | "full";
   padding?: "none" | "sm" | "md" | "lg" | "xl";
   background?: "white" | "gray" | "primary" | "gradient";
   id?: string;
@@ -29,7 +28,6 @@ const sectionVariants = {
 export function Section({
   children,
   className,
-  containerSize = "xl",
   padding = "lg",
   background = "white",
   id
@@ -43,7 +41,7 @@ export function Section({
         className
       )}
     >
-      <Container size={containerSize}>
+      <Container>
         {children}
       </Container>
     </section>

@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
-import { SearchFunction } from "@/features/home/components/SearchFunction";
+import { SearchFunction } from "./SearchFunction";
 
 function DesktopMenu() {
   const auth = useAuth();
