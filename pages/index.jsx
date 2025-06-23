@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig from '../shared/components/SEO';
-import NewHome from '../features/home/NewHomePage';
+import Home from './home';
 
 const HomePage = () => {
   const router = useRouter();
@@ -41,7 +41,7 @@ const HomePage = () => {
   return (
     <>
       <SEOConfig {...SEOData} />
-      <NewHome />
+      <Home />
     </>
   );
 };

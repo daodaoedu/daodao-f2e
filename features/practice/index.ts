@@ -5,6 +5,10 @@ export * from './hooks';
 export { default as TagList } from './components/Shared/TagList';
 export type { TagListProps } from './components/Shared/TagList';
 
+// 導出首頁相關組件
+export { default as PracticeRecommendationSection } from './components/List/PracticeRecommendationSection';
+export { default as PracticeExploreSection } from './components/List/PracticeExploreSection';
+
 // 導出所有類型
 export type {
   Practice,

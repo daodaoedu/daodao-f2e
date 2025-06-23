@@ -154,3 +154,113 @@ The project uses a layout system in `layout/`:
 2. Use React Hook Form with zodResolver
 3. Use shadcn/ui form components
 4. Handle validation and submission properly
+
+## SSR/SSG Architecture
+
+### Next.js Rendering Strategy
+The project leverages Next.js's SSG/SSR capabilities with SWR for optimal performance:
+
+**Static Site Generation (SSG):**
+- Use `getStaticProps` for build-time data fetching
+- Generate static HTML for better SEO and performance
+- Provide initial data to SWR via `fallback` prop in `SWRConfig`
+- Use `getStaticPaths` for dynamic routes with pre-generated paths
+
+**Server-Side Rendering (SSR):**
+- Use `getServerSideProps` for pages requiring real-time data
+- Avoid SSR when SSG + client-side updates suffice
+
+**Cloudflare Pages Limitations:**
+- ISR (Incremental Static Regeneration) is NOT supported
+- Never use `revalidate` in `getStaticProps`
+- Use SSR or client-side updates for dynamic content
+
+### SSG Implementation Pattern
+```tsx
+export const getStaticProps = (async () => {
+  try {
+    const data = await resourceAPI.readList();
+    return {
+      props: { 
+        fallback: { "/api/key": data },
+        jsonLd: generateStructuredData(data)
+      },
+    };
+  } catch {
+    return { props: { fallback: undefined, jsonLd: undefined } };
+  }
+}) satisfies GetStaticProps;
+
+// In page component
+<SWRConfig value={{ fallback }}>
+  <ComponentUsingData />
+</SWRConfig>
+```
+
+### Data Flow Strategy
+1. **Build Time**: `getStaticProps` fetches initial data
+2. **Hydration**: SWR uses fallback data for immediate rendering  
+3. **Client**: SWR manages data fetching, caching, and revalidation
+4. **Updates**: Client-side mutations with SWR's `mutate`
+
+## Git Workflow
+
+### Commit Message Convention
+Follow AngularJS convention:
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix  
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code refactoring
+- `perf`: Performance improvements
+- `test`: Adding or modifying tests
+- `chore`: Build/tooling changes
+
+**Examples:**
+```bash
+feat(auth): add Google OAuth login
+fix(search): resolve pagination error
+refactor(user): restructure data processing logic
+```
+
+### Branch Strategy
+- `dev`: Development branch for feature integration
+- `prod`: Production branch for stable releases
+- Feature branches: `feature/feature-name`
+- Hotfix branches: `hotfix/fix-description`
+
+## Development Workflow
+
+### Quality Checks
+Run these commands before committing:
+```bash
+yarn ts:check    # TypeScript type checking
+yarn lint        # ESLint with auto-fix
+```
+
+### CI/CD Pipeline
+- **CI**: TypeScript checks + ESLint on PRs
+- **CD**: Auto-deploy to Cloudflare Pages on `dev`/`prod` push
+- **Notifications**: Discord integration for build status
+
+### Component Architecture Violations
+**Common Issues to Avoid:**
+1. Pages importing other pages directly
+2. Features depending on each other
+3. Shared components duplicated across features
+4. UI components not following atomic design
+
+**Page Component Rules:**
+- Pages should only orchestrate, not contain business logic
+- Use feature components for complex functionality
+- Avoid conditional rendering of completely different page content
+- Use routing for navigation, not component switching

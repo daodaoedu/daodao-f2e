@@ -8,3 +8,7 @@ export { default as IdeasErrorBoundary, NetworkError, useNetworkRetry } from './
 // Container components
 export { default as IdeaCreateContainer } from './IdeaCreateContainer';
 export { default as IdeaUpdateContainer } from './IdeaUpdateContainer';
+
+// Home page section components
+export { default as IdeasRecommendationSection } from './IdeasRecommendationSection';
+export { default as IdeasExploreSection } from './IdeasExploreSection';
