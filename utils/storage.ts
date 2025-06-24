@@ -1,3 +1,4 @@
+import { ResultType } from "@/features/daodao-test";
 import getEnv from "./env";
 
 const fn = () => undefined;
@@ -53,3 +54,7 @@ export const getDevOriginStorage = () =>
 /** 獲取用於存儲是否提醒用戶里程碑拖拽會改變日期的 localStorage */
 export const getIsCheckDragMilestoneStorage = () =>
   createStorage<boolean>("_isCheckDragMilestone");
+
+/** 獲取用於存儲使用者做島島測試的 sessionStorage */
+export const getDaodaoTestStorage = () =>
+  createStorage<ResultType>("_daodaoTest", StorageType.SessionStorage);
