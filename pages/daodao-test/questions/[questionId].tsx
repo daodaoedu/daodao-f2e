@@ -9,7 +9,7 @@ import RunnerSvg from "@/public/assets/icons/runner.svg";
 import QuestionNoiseSvg from "@/public/assets/daodao-test/question-noise.svg";
 import { cn } from "@/utils/cn";
 import {
-  AnswerValue,
+  AnswerKey,
   getDaodaoTestLayout,
   questionMap,
   useDaodaoTest,
@@ -37,6 +37,8 @@ export const getStaticProps = (async (context) => {
   questionId?: string | null;
 }>;
 
+const basePath = "/daodao-test/questions";
+
 export default function DaodaoTestQuestionPage({
   questionId,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
@@ -51,9 +53,8 @@ export default function DaodaoTestQuestionPage({
   const percent = currentStep * stepNumber;
   const selectedAnswer = result[question.id]?.selectedAnswer;
 
-  const handleSelectAnswer = (answer: AnswerValue) => {
+  const handleSelectAnswer = (answer: AnswerKey) => {
     selectAnswer(question.id, answer);
-    router.push(`/daodao-test/question/q${currentStep + 1}`);
   };
 
   return (
@@ -79,7 +80,7 @@ export default function DaodaoTestQuestionPage({
               currentStep === 1 && "hidden"
             )}
             onClick={() =>
-              router.push(`/daodao-test/question/q${currentStep - 1}`)
+              router.push(`${basePath}/q${currentStep - 1}`)
             }
             animation="none"
           >
@@ -93,10 +94,10 @@ export default function DaodaoTestQuestionPage({
               "sm:top-1/2 sm:-translate-y-1/2 sm:right-auto sm:left-full sm:size-20",
               "absolute z-20 p-0 flex-col gap-0 body-sm hover:text-black",
               "sm:bg-[radial-gradient(circle_at_center,#FFFFFF_0%,#FFFFFF00_70%)]",
-              !selectedAnswer && "hidden"
+              !selectedAnswer && currentStep < questionMap.size && "hidden"
             )}
             onClick={() =>
-              router.push(`/daodao-test/question/q${currentStep + 1}`)
+              router.push(`${basePath}/q${currentStep + 1}`)
             }
             animation="none"
           >
@@ -144,13 +145,13 @@ export default function DaodaoTestQuestionPage({
                   <Button
                     variant="light"
                     size="lg"
-                    key={`${question.id}-${answer.value}`}
+                    key={`${question.id}-${answer.key}`}
                     className={cn(
                       "text-sm",
-                      selectedAnswer === answer.value &&
+                      selectedAnswer === answer.key &&
                         "bg-[#545454] text-white hover:border-[#545454] hover:text-white"
                     )}
-                    onClick={() => handleSelectAnswer(answer.value)}
+                    onClick={() => handleSelectAnswer(answer.key)}
                   >
                     {answer.title}
                   </Button>
