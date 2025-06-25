@@ -132,7 +132,12 @@ export default function DaodaoTestResultPage() {
                   >
                     <RoleSvg />
                     <p className="flex gap-1">
-                      <span className="font-bold">{partnerTheme.title}</span>
+                      <span
+                        className="font-bold"
+                        style={{ color: partnerTheme.color }}
+                      >
+                        {partnerTheme.title}
+                      </span>
                       <span>{brief}</span>
                     </p>
                   </div>

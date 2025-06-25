@@ -141,7 +141,10 @@ export default function DaodaoTestResultDetailPage({
                       <div className="basis-1/2 bg-[var(--bg-color)] rounded-md p-3 flex flex-col items-center gap-2 body-sm">
                         <RoleSvg />
                         <p className="flex gap-1">
-                          <span className="font-bold">
+                          <span
+                            className="font-bold"
+                            style={{ color: partnerTheme.color }}
+                          >
                             {partnerTheme.title}
                           </span>
                           <span className="text-normal">{brief}</span>

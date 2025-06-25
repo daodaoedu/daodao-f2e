@@ -67,7 +67,7 @@ export const DaodaoTestProvider = ({ children }: React.PropsWithChildren) => {
       (acc, { selectedAnswer }, index) => {
         const question = questionMap.get(`q${index + 1}`);
         const answer = question?.answers.find(
-          (answer) => answer.key === selectedAnswer
+          ({ key }) => key === selectedAnswer
         );
         acc[selectedAnswer] += answer?.value ?? 0;
         return acc;
