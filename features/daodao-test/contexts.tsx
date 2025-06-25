@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import {
   createContext,
   useCallback,
@@ -8,16 +9,21 @@ import {
 } from "react";
 import { getDaodaoTestStorage } from "@/utils/storage";
 import {
-  AnswerValue,
-  isAnswerValue,
-  isQuestionId,
-  parseResult,
-  ResultType,
+  AnswerKey,
+  questionMap,
+  resultDetailMap,
+  ResultDetailType,
+  themeMap,
+  ThemeType,
 } from "./constants";
+import { isAnswerValue, isQuestionId, parseResult, ResultType } from "./utils";
 
 type DaodaoTestContextType = {
   result: ResultType;
-  selectAnswer: (questionId: string, answer: AnswerValue) => void;
+  resultTotal: Record<AnswerKey, number>;
+  detail?: ResultDetailType | null;
+  theme?: ThemeType | null;
+  selectAnswer: (questionId: string, answer: AnswerKey) => void;
 };
 
 export const DaodaoTestContext = createContext<DaodaoTestContextType | null>(
@@ -33,34 +39,77 @@ export const useDaodaoTest = () => {
 };
 
 export const DaodaoTestProvider = ({ children }: React.PropsWithChildren) => {
+  const router = useRouter();
   const [internalResult, setInternalResult] = useState<ResultType>({});
 
-  useEffect(() => {
-    const data = parseResult(getDaodaoTestStorage().get());
-    if (JSON.stringify(internalResult) !== JSON.stringify(data)) {
-      setInternalResult(data);
-    }
-  }, [internalResult]);
-
   const selectAnswer = useCallback(
-    (questionId: string, answer: AnswerValue) => {
+    (questionId: string, answer: AnswerKey) => {
       if (!isQuestionId(questionId) || !isAnswerValue(answer)) {
         return;
       }
+      const nextStep = parseInt(questionId.slice(1), 10) + 1;
       const newResult = {
         ...internalResult,
         [questionId]: { selectedAnswer: answer },
       };
       setInternalResult(newResult);
-      getDaodaoTestStorage().set(newResult);
+      if (nextStep > questionMap.size) {
+        router.push("/daodao-test/result");
+      } else {
+        router.push(`/daodao-test/questions/q${nextStep}`);
+      }
     },
-    [internalResult]
+    [internalResult, router.push]
   );
 
-  const value = useMemo(
-    () => ({ result: internalResult, selectAnswer }),
-    [internalResult, selectAnswer]
-  );
+  const value = useMemo(() => {
+    const resultTotal = Object.values(internalResult).reduce(
+      (acc, { selectedAnswer }, index) => {
+        const question = questionMap.get(`q${index + 1}`);
+        const answer = question?.answers.find(
+          (answer) => answer.key === selectedAnswer
+        );
+        acc[selectedAnswer] += answer?.value ?? 0;
+        return acc;
+      },
+      { A: 0, O: 0, L: 0, C: 0, D: 0 }
+    );
+
+    const resultId = Object.entries(resultTotal)
+      .sort((a, b) => b[1] - a[1])
+      .map(([key]) => key)[0]
+      .toLowerCase();
+
+    return {
+      result: internalResult,
+      resultTotal,
+      detail: resultDetailMap.get(resultId),
+      theme: themeMap.get(resultId),
+      selectAnswer,
+    };
+  }, [internalResult, selectAnswer]);
+
+  useEffect(() => {
+    const data = parseResult(getDaodaoTestStorage().get());
+    if (data) {
+      setInternalResult(data);
+    } else {
+      getDaodaoTestStorage().remove();
+    }
+  }, []);
+
+  useEffect(() => {
+    getDaodaoTestStorage().set(internalResult);
+  }, [internalResult]);
+
+  useEffect(() => {
+    if (
+      router.pathname === "/daodao-test" &&
+      Object.keys(internalResult).length !== 0
+    ) {
+      setInternalResult({});
+    }
+  }, [router.pathname, internalResult]);
 
   return (
     <DaodaoTestContext.Provider value={value}>
