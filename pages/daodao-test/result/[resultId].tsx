@@ -5,7 +5,6 @@ import Image from "next/image";
 import SEOConfig from "@/shared/components/SEO";
 import { Button } from "@/components/ui/button";
 import HorizontalLogoSvg from "@/public/horizontal-logo.svg";
-import { cn } from "@/utils/cn";
 import {
   getDaodaoTestLayout,
   resultDetailMap,
@@ -14,9 +13,10 @@ import {
   Title,
   ResultChart,
   useResultStyles,
+  Slogan,
+  List,
 } from "@/features/daodao-test";
 import { parseToString } from "@/utils/helper";
-import QuoteSvg from "@/public/assets/daodao-test/quote.svg";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { ProtectedComponent } from "@/contexts/Auth";
@@ -46,23 +46,20 @@ export const getStaticProps = (async (context) => {
 export default function DaodaoTestResultDetailPage({
   resultId,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const { resultTotal, detail } = useDaodaoTest();
+  const { analysis, hasAnalysis, detail } = useDaodaoTest();
   const resultDetail = resultDetailMap.get(resultId ?? "");
   const theme = themeMap.get(resultId ?? "");
-
+  const showSelfAnalysis = hasAnalysis && detail?.id === resultId;
   const { rootStyle } = useResultStyles(theme);
 
   if (!resultDetail || !theme) return null;
-
-  // 計算圖表資料，優先使用當前用戶的結果，否則使用主題預設值
-  const analysis = detail?.id === resultId ? resultTotal : theme.analysis;
 
   return (
     <ProtectedComponent>
       <SEOConfig title={`${theme.title} | 島島阿學`} />
       <div style={rootStyle}>
         <div className="relative max-w-[392px] mx-auto">
-          <main className="p-6 text-xs font-light text-basic-400">
+          <main className="p-6 text-xs text-basic-400">
             <header className="mb-1">
               <HorizontalLogoSvg className="h-[22px]" />
             </header>
@@ -101,20 +98,10 @@ export default function DaodaoTestResultDetailPage({
                 </AspectRatio>
               </div>
             </section>
-            <section
-              className={cn(
-                "relative mb-4 text-center text-[var(--color)] bg-white rounded-md py-1 px-3",
-                "before:content-[''] before:absolute before:-top-1 before:right-16",
-                "before:bg-gradient-to-br before:from-white before:from-60% before:to-60% before:to-white/0",
-                "before:size-3 before:rotate-45 before:skew-x-12 before:skew-y-12"
-              )}
-            >
-              <QuoteSvg className="absolute -left-2 -top-2.5 text-[var(--color)] opacity-50" />
-              {resultDetail.slogan}
-            </section>
+            <Slogan>{resultDetail.slogan}</Slogan>
             <div className="mb-6 space-y-4 bg-white rounded-md p-4">
               <ResultChart
-                analysis={analysis}
+                analysis={showSelfAnalysis ? analysis : theme.analysis}
                 color={theme.color}
                 className="aspect-[36/35] max-w-[158px] w-full mx-auto"
               />
@@ -124,11 +111,7 @@ export default function DaodaoTestResultDetailPage({
               </section>
               <section>
                 <Title>開墾方式</Title>
-                <ul className="list-disc pl-4">
-                  {resultDetail.learningStrategies.map((learningStrategy) => (
-                    <li key={learningStrategy}>{learningStrategy}</li>
-                  ))}
-                </ul>
+                <List data={resultDetail.learningStrategies} />
               </section>
               <section className="space-y-2">
                 <Title>群島好夥伴</Title>
@@ -157,11 +140,7 @@ export default function DaodaoTestResultDetailPage({
               </section>
               <section>
                 <Title>需要的支持</Title>
-                <ul className="list-disc pl-4">
-                  {resultDetail.supportNeeded.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+                <List data={resultDetail.supportNeeded} />
               </section>
               <section>
                 <Title>島嶼餐桌</Title>

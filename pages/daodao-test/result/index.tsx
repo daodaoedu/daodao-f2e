@@ -14,6 +14,8 @@ import {
   Title,
   ResultChart,
   useResultStyles,
+  Slogan,
+  List,
 } from "@/features/daodao-test";
 import FacebookSvg from "@/public/assets/daodao-test/socials-logos/facebook.svg";
 import LineSvg from "@/public/assets/daodao-test/socials-logos/line.svg";
@@ -21,17 +23,23 @@ import LinkedInSvg from "@/public/assets/daodao-test/socials-logos/linkedin.svg"
 import ShareWindowsSvg from "@/public/assets/daodao-test/socials-logos/share_windows.svg";
 import ThreadsSvg from "@/public/assets/daodao-test/socials-logos/threads.svg";
 import XSvg from "@/public/assets/daodao-test/socials-logos/x.svg";
-import QuoteSvg from "@/public/assets/daodao-test/quote.svg";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
+import { useMount } from "@/hooks/useMount";
 
 export default function DaodaoTestResultPage() {
   const router = useRouter();
-  const { detail, theme, resultTotal } = useDaodaoTest();
+  const { detail, theme, analysis, hasAnalysis } = useDaodaoTest();
 
   const { rootStyle } = useResultStyles(theme);
 
-  if (!detail || !theme) return null;
+  useMount(() => {
+    if (!hasAnalysis) {
+      router.replace("/daodao-test");
+    }
+  });
+
+  if (!hasAnalysis || !detail || !theme) return null;
 
   return (
     <>
@@ -71,31 +79,17 @@ export default function DaodaoTestResultPage() {
                 </AspectRatio>
               </div>
             </div>
-            <div
-              className={cn(
-                "relative mb-4 text-center text-[var(--color)] font-bold bg-white rounded-md py-1 px-3",
-                "before:content-[''] before:absolute before:-top-1 before:right-16",
-                "before:bg-gradient-to-br before:from-white before:from-60% before:to-60% before:to-white/0",
-                "before:size-3 before:rotate-45 before:skew-x-12 before:skew-y-12"
-              )}
-            >
-              <QuoteSvg className="absolute -left-2 -top-2.5 text-[var(--color)] opacity-50" />
-              {detail.slogan}
-            </div>
+            <Slogan>{detail.slogan}</Slogan>
             <div className="mb-4 flex gap-4">
               <div className="basis-[156px] my-2 flex flex-col gap-4">
                 <ResultChart
-                  analysis={resultTotal}
+                  analysis={analysis}
                   color={theme.color}
                   className="aspect-[36/35]"
                 />
                 <div>
                   <Title>島嶼餐桌</Title>
-                  <ul className="list-disc pl-4">
-                    {detail.islandDining.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
+                  <List data={detail.islandDining} />
                 </div>
               </div>
               <div className="flex-1 flex flex-col gap-4">
@@ -109,11 +103,7 @@ export default function DaodaoTestResultPage() {
                 </div>
                 <div>
                   <Title>開墾策略</Title>
-                  <ul className="list-disc pl-4">
-                    {detail.strategies.map((strategy) => (
-                      <li key={strategy}>{strategy}</li>
-                    ))}
-                  </ul>
+                  <List data={detail.strategies} />
                 </div>
               </div>
             </div>

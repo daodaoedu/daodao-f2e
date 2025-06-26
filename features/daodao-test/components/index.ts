@@ -1,2 +1,2 @@
-export { Title } from "./Title";
-export { ResultChart } from "./ResultChart";
+export * from "./Styled";
+export * from "./ResultChart";

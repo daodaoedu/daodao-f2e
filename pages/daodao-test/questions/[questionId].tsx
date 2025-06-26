@@ -59,6 +59,15 @@ export default function DaodaoTestQuestionPage({
   return (
     <>
       <SEOConfig title={`${question.title}｜島島阿學`} />
+      <style>
+        {`
+          @font-face {
+            font-family: "JejuHallasan";
+            font-display: swap;
+            src: url("https://db.onlinewebfonts.com/t/2da952d097bffd198ec0f0aa3fdd6804.woff2")format("woff2");
+          }
+        `}
+      </style>
       <div className="fixed h-dvh w-dvw overflow-hidden">
         <div
           className="absolute inset-0 transition-colors"
@@ -91,7 +100,7 @@ export default function DaodaoTestQuestionPage({
               "sm:top-1/2 sm:-translate-y-1/2 sm:right-auto sm:left-full sm:size-20",
               "absolute z-20 p-0 flex-col gap-0 body-sm hover:text-black",
               "sm:bg-[radial-gradient(circle_at_center,#FFFFFF_0%,#FFFFFF00_70%)]",
-              !selectedAnswer && currentStep < questionMap.size && "hidden"
+              !selectedAnswer && currentStep <= questionMap.size && "hidden"
             )}
             onClick={() => router.push(`${basePath}/q${currentStep + 1}`)}
             animation="none"

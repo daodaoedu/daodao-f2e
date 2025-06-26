@@ -20,9 +20,11 @@ import { isAnswerValue, isQuestionId, parseResult, ResultType } from "./utils";
 
 type DaodaoTestContextType = {
   result: ResultType;
-  resultTotal: Record<AnswerKey, number>;
+  analysis: Record<AnswerKey, number>;
+  hasAnalysis: boolean;
   detail?: ResultDetailType | null;
   theme?: ThemeType | null;
+  reset: () => void;
   selectAnswer: (questionId: string, answer: AnswerKey) => void;
 };
 
@@ -63,7 +65,7 @@ export const DaodaoTestProvider = ({ children }: React.PropsWithChildren) => {
   );
 
   const value = useMemo(() => {
-    const resultTotal = Object.values(internalResult).reduce(
+    const analysis = Object.values(internalResult).reduce(
       (acc, { selectedAnswer }, index) => {
         const question = questionMap.get(`q${index + 1}`);
         const answer = question?.answers.find(
@@ -75,16 +77,21 @@ export const DaodaoTestProvider = ({ children }: React.PropsWithChildren) => {
       { A: 0, O: 0, L: 0, C: 0, D: 0 }
     );
 
-    const resultId = Object.entries(resultTotal)
+    const resultId = Object.entries(analysis)
       .sort((a, b) => b[1] - a[1])
       .map(([key]) => key)[0]
       .toLowerCase();
 
     return {
       result: internalResult,
-      resultTotal,
+      analysis,
+      hasAnalysis: Object.values(analysis).some((v) => v > 0),
       detail: resultDetailMap.get(resultId),
       theme: themeMap.get(resultId),
+      reset: () => {
+        setInternalResult({});
+        getDaodaoTestStorage().remove();
+      },
       selectAnswer,
     };
   }, [internalResult, selectAnswer]);
@@ -101,15 +108,6 @@ export const DaodaoTestProvider = ({ children }: React.PropsWithChildren) => {
   useEffect(() => {
     getDaodaoTestStorage().set(internalResult);
   }, [internalResult]);
-
-  useEffect(() => {
-    if (
-      router.pathname === "/daodao-test" &&
-      Object.keys(internalResult).length !== 0
-    ) {
-      setInternalResult({});
-    }
-  }, [router.pathname, internalResult]);
 
   return (
     <DaodaoTestContext.Provider value={value}>

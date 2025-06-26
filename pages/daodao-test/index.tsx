@@ -5,9 +5,14 @@ import HorizontalLogoSvg from "@/public/horizontal-logo.svg";
 import question1Jpg from "@/public/assets/daodao-test/q1.jpg";
 import ResultNoisePng from "@/public/assets/daodao-test/result-noise.png";
 import { Button } from "@/components/ui/button";
-import { getDaodaoTestLayout } from "@/features/daodao-test";
+import { getDaodaoTestLayout, useDaodaoTest } from "@/features/daodao-test";
+import { useMount } from "@/hooks/useMount";
 
 export default function DaodaoTestPage() {
+  const { reset } = useDaodaoTest();
+
+  useMount(reset);
+
   return (
     <>
       <SEOConfig title="我有一個島，它叫... | 島島阿學" />
