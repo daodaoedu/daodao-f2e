@@ -21,7 +21,6 @@ const config = {
     scrollRestoration: true,
   },
   images: {
-    unoptimized: true,
     domains: ['imgur.com', 'images.unsplash.com', 'lh3.googleusercontent.com'],
   },
   webpack: (config, options) => {

@@ -75,7 +75,7 @@ export default function DaodaoTestResultPage() {
               </div>
               <div className="relative basis-44">
                 <AspectRatio ratio={9 / 7}>
-                  <Image src={theme.largeImg} alt={theme.title} fill />
+                  <Image src={theme.largeImg} alt={theme.title} fill priority />
                 </AspectRatio>
               </div>
             </div>

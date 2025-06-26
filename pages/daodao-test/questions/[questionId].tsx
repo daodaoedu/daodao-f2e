@@ -59,15 +59,6 @@ export default function DaodaoTestQuestionPage({
   return (
     <>
       <SEOConfig title={`${question.title}｜島島阿學`} />
-      <style>
-        {`
-          @font-face {
-            font-family: "JejuHallasan";
-            font-display: swap;
-            src: url("https://db.onlinewebfonts.com/t/2da952d097bffd198ec0f0aa3fdd6804.woff2")format("woff2");
-          }
-        `}
-      </style>
       <div className="fixed h-dvh w-dvw overflow-hidden">
         <div
           className="absolute inset-0 transition-colors"
@@ -129,10 +120,10 @@ export default function DaodaoTestQuestionPage({
             ))}
           </div>
           <div className="absolute w-full h-[calc(100dvh-288px)] blur-md">
-            <Image src={question.imageSrc} alt="Question 1" fill />
+            <Image src={question.imageSrc} alt="Question 1" fill quality={5} />
           </div>
           <div className="relative mx-auto aspect-[30/43] max-w-full max-h-[calc(100dvh-288px)]">
-            <Image src={question.imageSrc} alt="Question 1" fill />
+            <Image src={question.imageSrc} alt="Question 1" fill priority />
           </div>
           <div className="h-[288px] relative">
             <div className="absolute bottom-full inset-x-0 mx-6 mb-3 p-5 bg-basic-white/60">
