@@ -6,7 +6,6 @@ import SEOConfig from "@/shared/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import RunnerSvg from "@/public/assets/icons/runner.svg";
-import QuestionNoiseSvg from "@/public/assets/daodao-test/question-noise.svg";
 import { cn } from "@/utils/cn";
 import {
   AnswerKey,
@@ -79,9 +78,7 @@ export default function DaodaoTestQuestionPage({
               "sm:bg-[radial-gradient(circle_at_center,#FFFFFF_0%,#FFFFFF00_70%)]",
               currentStep === 1 && "hidden"
             )}
-            onClick={() =>
-              router.push(`${basePath}/q${currentStep - 1}`)
-            }
+            onClick={() => router.push(`${basePath}/q${currentStep - 1}`)}
             animation="none"
           >
             <ChevronLeftIcon size={20} />
@@ -96,9 +93,7 @@ export default function DaodaoTestQuestionPage({
               "sm:bg-[radial-gradient(circle_at_center,#FFFFFF_0%,#FFFFFF00_70%)]",
               !selectedAnswer && currentStep < questionMap.size && "hidden"
             )}
-            onClick={() =>
-              router.push(`${basePath}/q${currentStep + 1}`)
-            }
+            onClick={() => router.push(`${basePath}/q${currentStep + 1}`)}
             animation="none"
           >
             <ChevronRightIcon size={20} />
@@ -132,10 +127,10 @@ export default function DaodaoTestQuestionPage({
           </div>
           <div className="h-[288px] relative">
             <div className="absolute bottom-full inset-x-0 mx-6 mb-3 p-5 bg-basic-white/60">
-              <p className="text-[2.75rem] font-[JejuHallasan] leading-none tracking-widest">
+              <p className="text-[2.75rem] text-[#545454] font-[JejuHallasan] leading-none tracking-widest">
                 {question.id.toUpperCase()}.
               </p>
-              <p className="text-[1.125rem] font-bold tracking-widest">
+              <p className="text-[1.125rem] font-bold whitespace-pre-line">
                 {question.title}
               </p>
             </div>
@@ -161,7 +156,23 @@ export default function DaodaoTestQuestionPage({
           </div>
         </div>
       </div>
-      <QuestionNoiseSvg />
+      <svg
+        width="300"
+        height="150"
+        viewBox="0 0 300 150"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <filter id="question-noise">
+          <feTurbulence type="turbulence" baseFrequency="0.75" />
+          <feColorMatrix
+            in="colorNoise"
+            type="matrix"
+            values="1 1 1 0 0 1 1 1 0 0 1 1 1 0 0 0 0 0 1 0"
+          />
+          <feComposite operator="in" in2="SourceGraphic" result="monoNoise" />
+          <feBlend in="SourceGraphic" in2="monoNoise" mode="multiply" />
+        </filter>
+      </svg>
     </>
   );
 }

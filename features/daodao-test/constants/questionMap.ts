@@ -28,14 +28,14 @@ export type QuestionType = {
 // 初始反應 - 測量基本認知風格
 const q1: QuestionType = {
   id: "q1",
-  title: "睜開眼，你躺在陌生的沙灘上，下一步你會做什麼？",
+  title: "睜開眼，你躺在陌生的沙灘上，\n下一步你會做什麼？",
   backgroundColor: "#EAD8C2",
   imageSrc: question1Jpg.src,
   answers: [
-    { key: "L", value: 1, title: "撿起漂流物，改造一下看看能做什麼" },
+    { key: "L", value: 1, title: "改造漂流物當生存的萬用工具" },
     { key: "C", value: 1, title: "尋找其他人，了解情況" },
     { key: "A", value: 1, title: "搭個帳篷，立刻展開生存行動" },
-    { key: "D", value: 1, title: "研究地形，想想這島怎麼形成的" },
+    { key: "D", value: 1, title: "研究地形，思考如何生存" },
     { key: "O", value: 1, title: "畫出行動地圖，規劃接下來的每一步" },
   ],
 };
@@ -43,37 +43,37 @@ const q1: QuestionType = {
 // 面對未知 - 測量探索與分析能力
 const q2: QuestionType = {
   id: "q2",
-  title: "第一夜，叢林傳來奇怪的聲響，你會？",
+  title: "第一夜，\n叢林傳來奇怪的聲響，你會？",
   backgroundColor: "#519754",
   imageSrc: question2Jpg.src,
   answers: [
     { key: "O", value: 1.2, title: "列出可能來源，畫表分析對應方法" },
     { key: "L", value: 1.2, title: "把聲音當作靈感，寫首詩或畫張圖" },
-    { key: "D", value: 1.3, title: "記錄聲音特徵，推理是什麼發出的" },
+    { key: "D", value: 1.3, title: "記錄聲音特徵，推理是什麼發出" },
     { key: "A", value: 1.1, title: "想辦法利用聲音回應怪聲，觀察其反應" },
-    { key: "C", value: 1.0, title: "問問島民，有沒有聽過這聲音" },
+    { key: "C", value: 1.0, title: "找找附近有沒有島民可求助" },
   ],
 };
 
 // 社交互動 - 重點測量社交風格
 const q3: QuestionType = {
   id: "q3",
-  title: "在叢林中你遇到一群島民，他們圍觀你，你會？",
+  title: "起床後，你發現身旁有一群島民\n正在圍觀你，你會？",
   backgroundColor: "#18B8A7",
   imageSrc: question3Jpg.src,
   answers: [
     { key: "O", value: 1.1, title: "用圖表記錄他們的言行舉止，理出一套規律" },
-    { key: "A", value: 1.2, title: "立刻問：你們這裡有什麼需要幫忙的？" },
-    { key: "C", value: 1.4, title: "主動微笑打招呼，並同步觀察島民反應" },
-    { key: "D", value: 1.2, title: "觀察島民語言與表情，思考背後的原因" },
-    { key: "L", value: 1.1, title: "設計一個結合你文化與他們的遊戲" },
+    { key: "A", value: 1.2, title: "起身介紹自己並詢問該島資訊" },
+    { key: "C", value: 1.4, title: "開始聊天並加入島民的日常生活" },
+    { key: "D", value: 1.2, title: "對島民察言觀色並思考原因" },
+    { key: "L", value: 1.1, title: "思考彼此差異及合作的可能性" },
   ],
 };
 
 // 挑戰應對 - 測量學習策略偏好
 const q4: QuestionType = {
   id: "q4",
-  title: "島民熱情地邀請你參加島上舉辦的年度挑戰賽，你會？",
+  title: "島民熱情地邀請你參加\n島上舉辦的年度挑戰賽，你會？",
   backgroundColor: "#7CC8FE",
   imageSrc: question4Jpg.src,
   answers: [
@@ -88,7 +88,7 @@ const q4: QuestionType = {
 // 跨文化溝通 - 測量創意與合作能力
 const q5: QuestionType = {
   id: "q5",
-  title: "過了一個月，其他島的人到訪，彼此語言不同，你會？",
+  title: "過了一個月，其他島的人到訪，\n彼此語言不同，你會？",
   backgroundColor: "#3E8FED",
   imageSrc: question5Jpg.src,
   answers: [
@@ -103,7 +103,7 @@ const q5: QuestionType = {
 // 危機領導 - 重點測量行動力與系統思維
 const q6: QuestionType = {
   id: "q6",
-  title: "外交難題結束，暴風雨突然來襲，你想帶大家避難，你會怎麼做？",
+  title: "外交難題結束，暴風雨突然來襲，\n你想帶大家避難，你會怎麼做？",
   backgroundColor: "#E1FAFF",
   imageSrc: question6Jpg.src,
   answers: [
@@ -118,7 +118,7 @@ const q6: QuestionType = {
 // 價值選擇 - 測量深層偏好
 const q7: QuestionType = {
   id: "q7",
-  title: "島民為了感謝你帶大家避難，讓你挑一樣東西當作禮物，你會選？",
+  title: "島民為了感謝你帶大家避難，\n讓你挑一樣東西當作禮物，你會選？",
   backgroundColor: "#93D7FF",
   imageSrc: question7Jpg.src,
   answers: [
@@ -133,7 +133,7 @@ const q7: QuestionType = {
 // 未來規劃 - 重點測量思維模式
 const q8: QuestionType = {
   id: "q8",
-  title: "島民對你越來越依賴，甚至請你想像未來，你會？",
+  title: "島民對你越來越依賴，\n甚至請你想像未來，你會？",
   backgroundColor: "#519754",
   imageSrc: question8Jpg.src,
   answers: [
@@ -148,22 +148,22 @@ const q8: QuestionType = {
 // 探索態度 - 測量學習風格
 const q9: QuestionType = {
   id: "q9",
-  title: "預言後，天上突然掉下一個木箱，你會？",
+  title: "預言後，\n天上突然掉下一個木箱，你會？",
   backgroundColor: "#2C7EE9",
   imageSrc: question9Jpg.src,
   answers: [
     { key: "C", value: 1.2, title: "找大家一起打開，聽聽每個人的看法" },
-    { key: "L", value: 1.4, title: "把內容重新拼裝成一個新發明" },
-    { key: "D", value: 1.4, title: "仔細研究箱子的構造與符號" },
+    { key: "L", value: 1.4, title: "嘗試運用箱內物品創作出萬用法寶" },
+    { key: "D", value: 1.4, title: "仔細研究箱子的外型再評估是否打開" },
     { key: "A", value: 1.3, title: "直接打開並把東西拿來幫助島民" },
-    { key: "O", value: 1.3, title: "把裡面東西一樣樣分類記錄" },
+    { key: "O", value: 1.3, title: "把裡面東西一樣樣分類記錄與分配" },
   ],
 };
 
 // 自我認知 - 最直接的人格測量
 const q10: QuestionType = {
   id: "q10",
-  title: "你發現島民是來自各島的觀察員，你將被分到適合你的島！你覺得會是...？",
+  title: "你發現島民是來自各島的觀察員，你將被分到適合你的島！你覺得是...？",
   backgroundColor: "#9FD3C0",
   imageSrc: question10Jpg.src,
   answers: [
