@@ -9,7 +9,7 @@ import { ProtectedComponent } from '@/contexts/Auth';
 import SEOConfig from '@/shared/components/SEO';
 import AccountSetting from '@/components/Profile/Accountsetting';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { isServer } from '@/utils/helper';
+import getEnv from '@/utils/env';
 
 const StyledTab = styled(Tab)(({ isActive, mobileScreen }) => ({
   width: `${mobileScreen ? '33%' : '100%'}`,
@@ -70,7 +70,7 @@ const ProfilePage = () => {
   ];
 
   const [value, setValue] = useState(() => {
-    if (isServer) return 0;
+    if (getEnv().isServerSide) return 0;
     const id = new URLSearchParams(location.search).get('id');
     const tabIndex = tabs.findIndex((tab) => tab.id === id);
     if (tabIndex > -1) return tabIndex;

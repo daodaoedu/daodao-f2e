@@ -27,6 +27,8 @@ import XSvg from "@/public/assets/daodao-test/socials-logos/x.svg";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { useDialog } from "@/contexts/Dialog";
+import getShareAPI from "@/utils/getShareAPI";
+import getEnv from "@/utils/env";
 
 export default function DaodaoTestResultPage() {
   const router = useRouter();
@@ -35,6 +37,12 @@ export default function DaodaoTestResultPage() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const mainRef = useRef<HTMLDivElement>(null);
   const { openDialog } = useDialog();
+  const shareAPI = getShareAPI({
+    title: "我有一個島，它叫...",
+    text: "我有一個島，它叫...",
+    url: getEnv().isClientSide ? `${window.location.origin}/daodao-test` : "",
+    hashtag: "#島島阿學",
+  });
 
   const handleOpenDialog = () => {
     openDialog({
@@ -217,22 +225,52 @@ export default function DaodaoTestResultPage() {
               分享個人結果到
             </div>
             <div className="mb-4 mx-2 flex justify-between gap-2">
-              <Button variant="ghost" size="icon" className="size-12">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-12"
+                onClick={shareAPI.facebookShare}
+              >
                 <FacebookSvg />
               </Button>
-              <Button variant="ghost" size="icon" className="size-12">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-12"
+                onClick={shareAPI.threadsShare}
+              >
                 <ThreadsSvg />
               </Button>
-              <Button variant="ghost" size="icon" className="size-12">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-12"
+                onClick={shareAPI.linkedinShare}
+              >
                 <LinkedInSvg />
               </Button>
-              <Button variant="ghost" size="icon" className="size-12">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-12"
+                onClick={shareAPI.xShare}
+              >
                 <XSvg />
               </Button>
-              <Button variant="ghost" size="icon" className="size-12">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-12"
+                onClick={shareAPI.lineShare}
+              >
                 <LineSvg />
               </Button>
-              <Button variant="ghost" size="icon" className="size-12">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-12"
+                onClick={shareAPI.nativeShare}
+              >
                 <ShareWindowsSvg />
               </Button>
             </div>
