@@ -53,8 +53,10 @@ export const ResultChart = ({
           }}
         />
         <PolarRadiusAxis
-          domain={(dataRange) => [0, dataRange[1] + 1]}
-          tickCount={6}
+          domain={(dataRange) => [0, dataRange[1] + 0.5]}
+          tick={false}
+          axisLine={false}
+          tickCount={9}
         />
         <PolarGrid stroke="currentColor" className="last:fill-white/50" />
         <Radar
@@ -62,6 +64,7 @@ export const ResultChart = ({
           fill={`${color}33`}
           fillOpacity={0.6}
           stroke={color}
+          strokeLinejoin="round"
           strokeWidth={3}
         />
       </RadarChart>

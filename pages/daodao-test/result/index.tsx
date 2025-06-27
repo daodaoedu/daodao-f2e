@@ -252,15 +252,14 @@ export default function DaodaoTestResultPage() {
             >
               看深度分析
             </AuthButton>
-            <footer className="p-6 bg-white rounded-md flex flex-col items-center">
-              <h3 className="mb-3 body-lg font-bold">關於島島阿學</h3>
+            <footer className="p-5 bg-white rounded-md flex flex-col items-center">
               <VerticalLogoSvg />
-              <p className="my-6 body-sm text-center">
-                島島阿學以學習資源網站（找資源、找夥伴、找揪團）、社群、學習陪伴計劃等服務，協助學習者克服自主學習時方向不明、無法自律、無合適資源等困難，盼以科技輔助學習社群發展，
-                與學習者共創自主學習生態網絡。
+              <p className="my-6 text-sm text-center">
+                島島阿學是為「相信學習可以不一樣的人」所打造的學習行動平台。以教育科技與社群，匯集學習經驗、資源、人脈，以及打造個人化學習管理與展現系統，賦予每個人掌控學習旅程的能力。
+                這裡，是個人成長與集體智慧交會的所在
               </p>
               <Button className="w-full" size="lg" asChild>
-                <Link href="/">前往 島島阿學 自主學習資源平台</Link>
+                <Link href="/">前往 島島阿學</Link>
               </Button>
             </footer>
           </div>

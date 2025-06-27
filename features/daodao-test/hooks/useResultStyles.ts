@@ -11,10 +11,11 @@ export const useResultStyles = (theme?: Theme | null) => {
   const rootStyle = useMemo(
     () =>
       ({
-        backgroundImage: `url(${ResultNoisePng.src}), linear-gradient(${theme?.backgroundColor})`,
         "--bg-color": theme?.backgroundColor,
         "--color": theme?.color,
         "--secondary-color": theme?.secondaryColor,
+        "--bg-image": `url(${ResultNoisePng.src}) center / 393px 1352px repeat, linear-gradient(${theme?.backgroundColor})`,
+        background: "var(--bg-image)",
       } as React.CSSProperties),
     [theme]
   );

@@ -28,6 +28,52 @@ type DaodaoTestContextType = {
   selectAnswer: (questionId: string, answer: AnswerKey) => void;
 };
 
+const calculateAnalysis = (result: ResultType) => {
+  const initialScores: Record<AnswerKey, number> = {
+    A: 1,
+    O: 1,
+    L: 1,
+    C: 1,
+    D: 1,
+  };
+
+  if (Object.keys(result).length === 0) {
+    return { ...initialScores };
+  }
+
+  // 1. Calculate raw scores
+  const scores = Object.values(result).reduce(
+    (acc, { selectedAnswer }, index) => {
+      const question = questionMap.get(`q${index + 1}`);
+      const answer = question?.answers.find(
+        ({ key }) => key === selectedAnswer
+      );
+      acc[selectedAnswer] += answer?.value ?? 0;
+      return acc;
+    },
+    { ...initialScores }
+  );
+
+  // 2. Find max score and handle tie-breaking
+  const maxValue = Math.max(...Object.values(scores));
+  const tiedCategories = (Object.keys(scores) as AnswerKey[]).filter(
+    (key) => scores[key] === maxValue
+  );
+
+  if (tiedCategories.length > 1) {
+    const reversedAnswers = Object.values(result).reverse();
+    const lastAnswerAmongTied = reversedAnswers.find(({ selectedAnswer }) =>
+      tiedCategories.includes(selectedAnswer)
+    );
+
+    if (lastAnswerAmongTied) {
+      scores[lastAnswerAmongTied.selectedAnswer] += 1;
+    }
+  }
+
+  return scores;
+};
+
 export const DaodaoTestContext = createContext<DaodaoTestContextType | null>(
   null
 );
@@ -61,21 +107,11 @@ export const DaodaoTestProvider = ({ children }: React.PropsWithChildren) => {
         router.push(`/daodao-test/questions/q${nextStep}`);
       }
     },
-    [internalResult, router.push]
+    [internalResult, router]
   );
 
   const value = useMemo(() => {
-    const analysis = Object.values(internalResult).reduce(
-      (acc, { selectedAnswer }, index) => {
-        const question = questionMap.get(`q${index + 1}`);
-        const answer = question?.answers.find(
-          ({ key }) => key === selectedAnswer
-        );
-        acc[selectedAnswer] += answer?.value ?? 0;
-        return acc;
-      },
-      { A: 0, O: 0, L: 0, C: 0, D: 0 }
-    );
+    const analysis = calculateAnalysis(internalResult);
 
     const resultId = Object.entries(analysis)
       .sort((a, b) => b[1] - a[1])
@@ -85,7 +121,7 @@ export const DaodaoTestProvider = ({ children }: React.PropsWithChildren) => {
     return {
       result: internalResult,
       analysis,
-      hasAnalysis: Object.values(analysis).some((v) => v > 0),
+      hasAnalysis: questionMap.size === Object.keys(internalResult).length,
       detail: resultDetailMap.get(resultId),
       theme: themeMap.get(resultId),
       reset: () => {

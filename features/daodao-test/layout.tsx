@@ -12,6 +12,6 @@ export const getDaodaoTestLayout = (page: React.ReactElement) => (
       `}
     </style>
     {page}
-    <div className="font-[JejuHallasan] invisible">預載字體</div>
+    <div className="font-[JejuHallasan] invisible fixed -z-10">預載字體</div>
   </DaodaoTestProvider>
 );
