@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import SEOConfig from "@/shared/components/SEO";
@@ -25,7 +26,6 @@ import ThreadsSvg from "@/public/assets/daodao-test/socials-logos/threads.svg";
 import XSvg from "@/public/assets/daodao-test/socials-logos/x.svg";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
-import { useMount } from "@/hooks/useMount";
 
 export default function DaodaoTestResultPage() {
   const router = useRouter();
@@ -33,11 +33,14 @@ export default function DaodaoTestResultPage() {
 
   const { rootStyle } = useResultStyles(theme);
 
-  useMount(() => {
-    if (!hasAnalysis) {
-      router.replace("/daodao-test");
-    }
-  });
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!hasAnalysis) {
+        router.replace("/daodao-test");
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [hasAnalysis, router]);
 
   if (!hasAnalysis || !detail || !theme) return null;
 

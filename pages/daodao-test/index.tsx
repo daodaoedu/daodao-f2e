@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import SEOConfig from "@/shared/components/SEO";
@@ -6,12 +7,11 @@ import question1Jpg from "@/public/assets/daodao-test/q1.jpg";
 import ResultNoisePng from "@/public/assets/daodao-test/result-noise.png";
 import { Button } from "@/components/ui/button";
 import { getDaodaoTestLayout, useDaodaoTest } from "@/features/daodao-test";
-import { useMount } from "@/hooks/useMount";
 
 export default function DaodaoTestPage() {
   const { reset } = useDaodaoTest();
 
-  useMount(reset);
+  useEffect(reset, []);
 
   return (
     <>
