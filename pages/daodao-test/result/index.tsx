@@ -2,11 +2,11 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { toJpeg } from "html-to-image";
 import SEOConfig from "@/shared/components/SEO";
 import { Button } from "@/components/ui/button";
 import HorizontalLogoSvg from "@/public/horizontal-logo.svg";
 import VerticalLogoSvg from "@/public/vertical-logo.svg";
-import { cn } from "@/utils/cn";
 import { AuthButton } from "@/contexts/Auth";
 import {
   getDaodaoTestLayout,
@@ -26,12 +26,64 @@ import ThreadsSvg from "@/public/assets/daodao-test/socials-logos/threads.svg";
 import XSvg from "@/public/assets/daodao-test/socials-logos/x.svg";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
+import { useDialog } from "@/contexts/Dialog";
 
 export default function DaodaoTestResultPage() {
   const router = useRouter();
   const { detail, theme, analysis, hasAnalysis } = useDaodaoTest();
-
   const { rootStyle } = useResultStyles(theme);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
+  const { openDialog } = useDialog();
+
+  const handleOpenDialog = () => {
+    openDialog({
+      title: "下載分析結果",
+      content: theme && (
+        <div className="px-10">
+          <AspectRatio ratio={9 / 7}>
+            <Image src={theme.largeImg} alt={theme.title} fill />
+          </AspectRatio>
+        </div>
+      ),
+      cancelText: "取消",
+      confirmText: "下載",
+      onCancel: () => {
+        console.log("cancel");
+      },
+      onConfirm: async () => {
+        if (!mainRef.current || !theme) return;
+        const anchor = document.createElement("a");
+        try {
+          const dataUrl = await toJpeg(mainRef.current, {
+            quality: 0.95,
+          });
+          anchor.href = dataUrl;
+          anchor.download = `${theme.title}.jpeg`;
+          anchor.click();
+        } finally {
+          anchor.remove();
+        }
+      },
+    });
+  };
+
+  const handleTouchStart = () => {
+    timerRef.current = setTimeout(() => {
+      handleOpenDialog();
+    }, 1000);
+  };
+
+  const handleTouchEnd = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  const handleClick = () => {
+    handleOpenDialog();
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -49,105 +101,116 @@ export default function DaodaoTestResultPage() {
       <SEOConfig title={`${theme.title} | 島島阿學`} />
       <div style={rootStyle}>
         <div className="relative max-w-[392px] mx-auto">
-          <main className="p-6 text-xs text-basic-400">
-            <header className="mb-1">
-              <HorizontalLogoSvg className="h-[22px]" />
-            </header>
-            <div className="mb-4 flex items-center">
-              <div className="flex-1 flex flex-col gap-2">
-                <div>我有一個島，它叫...</div>
-                <div className="flex gap-1">
-                  <h1 className="heading-md leading-relaxed text-[var(--color)]">
-                    {theme.title}
-                  </h1>
-                  <div className="text-white size-7 flex items-center justify-center rounded-full rounded-bl-none bg-[var(--secondary-color)]">
-                    {detail.id.toUpperCase()}
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  {detail.tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="secondary"
-                      className="px-2 text-xs text-[var(--color)]"
-                    >
-                      #{tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-              <div className="relative basis-44">
-                <AspectRatio ratio={9 / 7}>
-                  <Image src={theme.largeImg} alt={theme.title} fill priority />
-                </AspectRatio>
-              </div>
-            </div>
-            <Slogan>{detail.slogan}</Slogan>
-            <div className="mb-4 flex gap-4">
-              <div className="basis-[156px] my-2 flex flex-col gap-4">
-                <ResultChart
-                  analysis={analysis}
-                  color={theme.color}
-                  className="aspect-[36/35]"
-                />
-                <div>
-                  <Title>島嶼餐桌</Title>
-                  <List data={detail.islandDining} />
-                </div>
-              </div>
-              <div className="flex-1 flex flex-col gap-4">
-                <div>
-                  <Title>島民特質</Title>
-                  <p>{detail.characteristics}</p>
-                </div>
-                <div>
-                  <Title>島上風景</Title>
-                  <p>{detail.scenery}</p>
-                </div>
-                <div>
-                  <Title>開墾策略</Title>
-                  <List data={detail.strategies} />
-                </div>
-              </div>
-            </div>
-            <div className="mb-2 font-bold text-base text-center">
-              適合一起學習的夥伴
-            </div>
-            <div className="flex gap-2">
-              {detail.partners.map(({ roleId, brief }) => {
-                const partnerTheme = themeMap.get(roleId);
-                const RoleSvg = partnerTheme?.smallImg;
-                if (!RoleSvg) return null;
-                return (
-                  <div
-                    key={roleId}
-                    className="basis-1/2 bg-white rounded-md p-3 flex flex-col items-center gap-2"
-                  >
-                    <RoleSvg />
-                    <p className="flex gap-1">
-                      <span
-                        className="font-bold"
-                        style={{ color: partnerTheme.color }}
-                      >
-                        {partnerTheme.title}
-                      </span>
-                      <span>{brief}</span>
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </main>
-          <div
-            className={cn(
-              "mb-4 relative font-bold text-center text-lg",
-              "before:content-[''] before:absolute before:inset-x-0 before:top-1/2 before:-translate-y-1/2",
-              "before:border before:border-dashed before:border-[var(--color)] before:opacity-50",
-              "after:content-['長按圖片已儲存結果'] after:text-[var(--color)] after:bg-[var(--bg-color)] after:px-3",
-              "after:absolute after:left-1/2 after:top-1/2 after:-translate-y-1/2 after:-translate-x-1/2"
-            )}
+          <button
+            type="button"
+            className="border-b border-dashed border-[var(--color)] sm:border"
+            onClick={handleClick}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
           >
-            長按圖片已儲存結果
+            <main
+              ref={mainRef}
+              className="p-6 pb-10 text-xs text-left text-basic-400 [background:var(--bg-image)]"
+            >
+              <header className="mb-1">
+                <HorizontalLogoSvg className="h-[22px]" />
+              </header>
+              <div className="mb-4 flex items-center">
+                <div className="flex-1 flex flex-col gap-2">
+                  <div>我有一個島，它叫...</div>
+                  <div className="flex gap-1">
+                    <h1 className="heading-md leading-relaxed text-[var(--color)]">
+                      {theme.title}
+                    </h1>
+                    <div className="text-white size-7 flex items-center justify-center rounded-full rounded-bl-none bg-[var(--secondary-color)]">
+                      {detail.id.toUpperCase()}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {detail.tags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="px-2 text-xs text-[var(--color)]"
+                      >
+                        #{tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <div className="relative basis-44">
+                  <AspectRatio ratio={9 / 7}>
+                    <Image
+                      src={theme.largeImg}
+                      alt={theme.title}
+                      fill
+                      priority
+                    />
+                  </AspectRatio>
+                </div>
+              </div>
+              <Slogan>{detail.slogan}</Slogan>
+              <div className="mb-4 flex gap-4">
+                <div className="basis-[156px] my-2 flex flex-col gap-4">
+                  <ResultChart
+                    analysis={analysis}
+                    color={theme.color}
+                    className="aspect-[36/35]"
+                  />
+                  <div>
+                    <Title>島嶼餐桌</Title>
+                    <List data={detail.islandDining} />
+                  </div>
+                </div>
+                <div className="flex-1 flex flex-col gap-4">
+                  <div>
+                    <Title>島民特質</Title>
+                    <p>{detail.characteristics}</p>
+                  </div>
+                  <div>
+                    <Title>島上風景</Title>
+                    <p>{detail.scenery}</p>
+                  </div>
+                  <div>
+                    <Title>開墾策略</Title>
+                    <List data={detail.strategies} />
+                  </div>
+                </div>
+              </div>
+              <div className="mb-2 font-bold text-base text-center">
+                適合一起學習的夥伴
+              </div>
+              <div className="flex gap-2">
+                {detail.partners.map(({ roleId, brief }) => {
+                  const partnerTheme = themeMap.get(roleId);
+                  const RoleSvg = partnerTheme?.smallImg;
+                  if (!RoleSvg) return null;
+                  return (
+                    <div
+                      key={roleId}
+                      className="basis-1/2 bg-white rounded-md p-3 flex flex-col items-center gap-2"
+                    >
+                      <RoleSvg />
+                      <p className="flex gap-1">
+                        <span
+                          className="font-bold"
+                          style={{ color: partnerTheme.color }}
+                        >
+                          {partnerTheme.title}
+                        </span>
+                        <span>{brief}</span>
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </main>
+          </button>
+          <div className="mb-4 relative -top-4 flex justify-center">
+            <div className="px-2 font-bold text-lg text-[var(--color)] bg-[var(--bg-color)]">
+              <span className="block sm:hidden">長按上方圖片以儲存結果</span>
+              <span className="hidden sm:block">點擊上方圖片以儲存結果</span>
+            </div>
           </div>
           <div className="px-6 pb-6">
             <div className="mb-3 font-bold body-md text-center">

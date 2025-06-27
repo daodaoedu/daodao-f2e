@@ -68,6 +68,7 @@
     "embla-carousel-react": "^8.6.0",
     "eslint-config-next": "^15.3.2",
     "feed": "^4.2.2",
+    "html-to-image": "^1.11.13",
     "konva": "^7.0.0",
     "lucide-react": "^0.522.0",
     "moment": "^2.29.4",

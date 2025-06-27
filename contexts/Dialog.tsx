@@ -96,7 +96,7 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const footer = (
-    <div className="flex w-full gap-2">
+    <div className="flex w-full gap-4">
       <Button
         variant="secondary"
         {...cancelBtnProps}
