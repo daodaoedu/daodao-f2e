@@ -1,8 +1,22 @@
+import type { FieldPath, FieldValues } from "react-hook-form";
 import * as React from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { Check } from "lucide-react";
 
 import { cn } from "@/utils/cn";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./form";
+import {
+  defaultRenderOption,
+  Option,
+  OptionProps,
+  OptionWithFormProps,
+} from "./option";
 
 const Checkbox = React.forwardRef<
   React.ComponentRef<typeof CheckboxPrimitive.Root>,
@@ -25,4 +39,62 @@ const Checkbox = React.forwardRef<
 ));
 Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
-export { Checkbox };
+const CheckboxWithForm = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  TOption extends OptionProps = OptionProps
+>({
+  options,
+  label,
+  required,
+  className,
+  renderOption = defaultRenderOption,
+  ...props
+}: OptionWithFormProps<TFieldValues, TName, TOption>) => {
+  return (
+    <FormField
+      {...props}
+      render={({ field }) => (
+        <FormItem className="flex flex-col gap-1">
+          {label && <FormLabel required={required}>{label}</FormLabel>}
+          <div className={className}>
+            {Array.isArray(options) &&
+              options.map((option) => (
+                <FormItem key={option.value}>
+                  <FormControl>
+                    <Checkbox
+                      className="sr-only"
+                      checked={field.value?.includes(option.value)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          field.onChange([
+                            ...(field?.value ?? []),
+                            option.value,
+                          ]);
+                        } else {
+                          field.onChange(
+                            field.value?.filter(
+                              (v: string) => v !== option.value
+                            )
+                          );
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  {renderOption({
+                    ...option,
+                    Option,
+                    isChecked: field.value?.includes(option.value),
+                  })}
+                </FormItem>
+              ))}
+          </div>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+CheckboxWithForm.displayName = "CheckboxWithForm";
+
+export { Checkbox, CheckboxWithForm };
