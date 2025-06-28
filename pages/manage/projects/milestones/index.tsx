@@ -12,7 +12,7 @@ import MilestoneCard, {
 } from "@/components/Milestones/MilestoneCard";
 import DraggableMilestones from "@/components/Milestones/DraggableMilestones";
 import dayjs from "dayjs";
-import { DatePickerWithRange } from "@/components/ui/date-picker";
+import { DateRangePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 import { ProjectMilestoneSchema } from "@/services/projects";
 import SwapRightIcon from "@/public/assets/icons/swap-right.svg";
@@ -211,8 +211,8 @@ const MilestonesContent = () => {
                   <div className="flex flex-col md:flex-row justify-between md:items-center gap-2 pb-2.5">
                     <div className="flex items-center gap-2">
                       <p>時間：</p>
-                      <DatePickerWithRange
-                        date={date}
+                      <DateRangePicker
+                        value={date}
                         separator={
                           <SwapRightIcon className="w-4 h-4 text-basic-black/25" />
                         }

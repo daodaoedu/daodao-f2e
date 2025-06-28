@@ -26,7 +26,7 @@ import {
   projectMilestoneFormSchema,
 } from "@/services/projects";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DatePickerWithRange } from "@/components/ui/date-picker";
+import { DateRangePicker } from "@/components/ui/date-picker";
 import { getDefaultMilestone } from "./Shared";
 
 interface MilestoneCardProps {
@@ -270,8 +270,8 @@ function MilestoneCard(
                 </span>
               )}
             </div>
-            <DatePickerWithRange
-              date={date}
+            <DateRangePicker
+              value={date}
               fromDate={minDate?.toDate()}
               toDate={maxDate?.toDate()}
               className={cn(
