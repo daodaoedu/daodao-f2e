@@ -1,14 +1,14 @@
 import { StaticImageData } from "next/image";
-import question1Jpg from "@/public/assets/daodao-test/q1.jpg";
-import question2Jpg from "@/public/assets/daodao-test/q2.jpg";
-import question3Jpg from "@/public/assets/daodao-test/q3.jpg";
-import question4Jpg from "@/public/assets/daodao-test/q4.jpg";
-import question5Jpg from "@/public/assets/daodao-test/q5.jpg";
-import question6Jpg from "@/public/assets/daodao-test/q6.jpg";
-import question7Jpg from "@/public/assets/daodao-test/q7.jpg";
-import question8Jpg from "@/public/assets/daodao-test/q8.jpg";
-import question9Jpg from "@/public/assets/daodao-test/q9.jpg";
-import question10Jpg from "@/public/assets/daodao-test/q10.jpg";
+import question1Jpg from "@/public/assets/daodao-test/q1.webp";
+import question2Jpg from "@/public/assets/daodao-test/q2.webp";
+import question3Jpg from "@/public/assets/daodao-test/q3.webp";
+import question4Jpg from "@/public/assets/daodao-test/q4.webp";
+import question5Jpg from "@/public/assets/daodao-test/q5.webp";
+import question6Jpg from "@/public/assets/daodao-test/q6.webp";
+import question7Jpg from "@/public/assets/daodao-test/q7.webp";
+import question8Jpg from "@/public/assets/daodao-test/q8.webp";
+import question9Jpg from "@/public/assets/daodao-test/q9.webp";
+import question10Jpg from "@/public/assets/daodao-test/q10.webp";
 
 export type AnswerKey = "L" | "C" | "A" | "D" | "O";
 

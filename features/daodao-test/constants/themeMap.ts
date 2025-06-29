@@ -1,9 +1,9 @@
 import { StaticImageData } from "next/image";
-import RoleDPng from "@/public/assets/daodao-test/role-d.png";
-import RoleAPng from "@/public/assets/daodao-test/role-a.png";
-import RoleCPng from "@/public/assets/daodao-test/role-c.png";
-import RoleLPng from "@/public/assets/daodao-test/role-l.png";
-import RoleOPng from "@/public/assets/daodao-test/role-o.png";
+import RoleDPng from "@/public/assets/daodao-test/role-d.webp";
+import RoleAPng from "@/public/assets/daodao-test/role-a.webp";
+import RoleCPng from "@/public/assets/daodao-test/role-c.webp";
+import RoleLPng from "@/public/assets/daodao-test/role-l.webp";
+import RoleOPng from "@/public/assets/daodao-test/role-o.webp";
 import DeepExplorerSvg from "@/public/assets/daodao-test/deep-explorer.svg";
 import ActiveShaperSvg from "@/public/assets/daodao-test/active-shaper.svg";
 import CommunityConnectorSvg from "@/public/assets/daodao-test/community-connector.svg";

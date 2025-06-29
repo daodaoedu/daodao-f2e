@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import SEOConfig from "@/shared/components/SEO";
 import HorizontalLogoSvg from "@/public/horizontal-logo.svg";
-import question1Jpg from "@/public/assets/daodao-test/q1.jpg";
+import question1Jpg from "@/public/assets/daodao-test/q1.webp";
 import ResultNoisePng from "@/public/assets/daodao-test/result-noise.png";
 import { Button } from "@/components/ui/button";
 import { getDaodaoTestLayout, useDaodaoTest } from "@/features/daodao-test";
