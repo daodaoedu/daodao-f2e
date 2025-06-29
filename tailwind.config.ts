@@ -38,6 +38,7 @@ export default {
       sans: ["Noto Sans TC", ...defaultTheme.fontFamily.sans],
     },
     keyframes: {
+      ...defaultTheme.keyframes,
       "collapsible-down": {
         from: {
           height: "0",
@@ -56,6 +57,7 @@ export default {
       },
     },
     animation: {
+      ...defaultTheme.animation,
       "collapsible-down": "collapsible-down 0.2s ease-out",
       "collapsible-up": "collapsible-up 0.2s ease-out",
     },
@@ -104,6 +106,10 @@ export default {
           foreground: "hsl(var(--accent-foreground))",
         },
         alert: {
+          DEFAULT: "hsl(var(--alert))",
+          foreground: "hsl(var(--alert-foreground))",
+        },
+        destructive: {
           DEFAULT: "hsl(var(--alert))",
           foreground: "hsl(var(--alert-foreground))",
         },

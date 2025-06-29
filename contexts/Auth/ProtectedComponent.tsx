@@ -3,6 +3,7 @@ import { PropsWithChildren } from "react";
 import { Background, Container, Paper } from "@/components/ui/wrapper";
 import Image from "@/shared/components/Image";
 import { Button } from "@/components/ui/button";
+import SEOConfig from "@/shared/components/SEO";
 import { useAuth, useAuthDispatch } from "./AuthContext";
 
 const DefaultFallback = () => {
@@ -11,6 +12,7 @@ const DefaultFallback = () => {
 
   return (
     <Background>
+      <SEOConfig title="登入後即可使用完整功能 | 島島阿學" />
       <Container className="pb-5">
         <Paper>
           <h2 className="text-center text-3xl font-bold tracking-[0.08em] text-basic-400">

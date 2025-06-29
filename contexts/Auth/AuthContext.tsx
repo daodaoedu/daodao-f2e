@@ -218,7 +218,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
           if (payload?.registerCallback) {
             payload.registerCallback();
           } else {
-            router.replace("/signin");
+            router.replace("/onboarding");
           }
         };
         logout();

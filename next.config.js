@@ -21,7 +21,7 @@ const config = {
     scrollRestoration: true,
   },
   images: {
-    domains: ['imgur.com', 'images.unsplash.com', 'lh3.googleusercontent.com'],
+    domains: ['imgur.com', 'i.imgur.com', 'images.unsplash.com', 'lh3.googleusercontent.com'],
   },
   webpack: (config, options) => {
     const experiments = { ...config.experiments, topLevelAwait: true };
