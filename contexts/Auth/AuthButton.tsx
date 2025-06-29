@@ -1,33 +1,29 @@
-import { useEffect, useRef } from "react";
 import { Button, type ButtonProps } from "@/components/ui/button";
 
 import { useAuth, useAuthDispatch } from "./AuthContext";
 
-type AuthButtonProps = ButtonProps;
+interface AuthButtonProps extends Omit<ButtonProps, "asChild"> {
+  registerCallback?: () => void;
+}
 
-export const AuthButton = ({ onClick, ...props }: AuthButtonProps) => {
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const isClickedRef = useRef(false);
+export const AuthButton = ({
+  onClick,
+  registerCallback,
+  ...props
+}: AuthButtonProps) => {
   const { isLoggedIn } = useAuth();
   const { openLoginModal } = useAuthDispatch();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (!isLoggedIn) {
-      event.preventDefault();
-      openLoginModal();
-      isClickedRef.current = true;
-      return;
+    if (isLoggedIn) {
+      onClick?.(event);
+    } else {
+      openLoginModal({
+        successCallback: () => onClick?.(event),
+        registerCallback,
+      });
     }
-
-    onClick?.(event);
   };
 
-  useEffect(() => {
-    if (isClickedRef.current && isLoggedIn) {
-      buttonRef.current?.click();
-      isClickedRef.current = false;
-    }
-  }, [isLoggedIn]);
-
-  return <Button ref={buttonRef} onClick={handleClick} {...props} />;
+  return <Button onClick={handleClick} {...props} />;
 };

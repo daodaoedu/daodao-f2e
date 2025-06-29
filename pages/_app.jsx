@@ -223,11 +223,11 @@ const App = ({ Component, pageProps }) => {
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
         <SWRConfig value={swrConfig}>
           <SnackbarProvider>
-            <AuthProvider>
-              <DialogProvider>
+            <DialogProvider>
+              <AuthProvider>
                 <ThemeComponentWrap pageProps={pageProps} Component={Component} />
-              </DialogProvider>
-            </AuthProvider>
+              </AuthProvider>
+            </DialogProvider>
           </SnackbarProvider>
         </SWRConfig>
       </LocalizationProvider>

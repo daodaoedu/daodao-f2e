@@ -21,12 +21,18 @@ interface DialogProps
     React.ComponentPropsWithoutRef<typeof Button>,
     "onClick"
   >;
+  disableFooter?: boolean;
   onCancel?: () => void;
   onConfirm?: () => void;
   className?: string;
 }
 
 interface DialogContextType {
+  /**
+   * 開啟對話框
+   * @param props 對話框的屬性
+   * @returns 對話框是否被確認
+   */
   openDialog: (props: DialogProps) => Promise<boolean>;
 }
 
@@ -52,6 +58,7 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
     confirmBtnProps,
     onCancel,
     onConfirm,
+    disableFooter,
     className,
     ...restDialogProps
   } = currentDialog || {};
@@ -95,7 +102,7 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const footer = (
+  const footer = disableFooter ? null : (
     <div className="flex w-full gap-4">
       <Button
         variant="secondary"
@@ -125,7 +132,7 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
         footer={footer}
         {...restDialogProps}
       >
-        <div className={cn("text-center p-4", className)}>{content}</div>
+        <div className={cn("text-center p-4 pb-0", className)}>{content}</div>
       </ResponsiveModal>
     </DialogContext.Provider>
   );

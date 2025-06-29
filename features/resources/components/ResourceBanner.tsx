@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { useRef } from "react";
+import { useRouter } from "next/router";
 import Image from "@/shared/components/Image";
 import LensIcon from "@/public/assets/icons/lens.svg";
 import { AuthButton } from "@/contexts/Auth";
@@ -24,6 +24,7 @@ export default function ResourceBanner({
   length,
 }: ResourceBannerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   const isMediumSize = size === "md";
   const isLargeSize = size === "lg";
 
@@ -111,8 +112,12 @@ export default function ResourceBanner({
             </div>
           )}
 
-          <AuthButton className="md:w-max" size="lg" asChild>
-            <Link href="/resource/create">+ 分享資源</Link>
+          <AuthButton
+            className="md:w-max"
+            size="lg"
+            onClick={() => router.push("/resource/create")}
+          >
+            + 分享資源
           </AuthButton>
         </div>
       </div>

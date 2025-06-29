@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { PropsWithChildren, useEffect, useRef } from "react";
+import { PropsWithChildren } from "react";
 import { Background, Container, Paper } from "@/components/ui/wrapper";
 import Image from "@/shared/components/Image";
 import { Button } from "@/components/ui/button";
@@ -47,10 +47,6 @@ const defaultFallback = <DefaultFallback />;
 
 export interface ProtectedComponentProps extends PropsWithChildren {
   /**
-   * 當需要重定向時的 URL
-   */
-  redirectOnCancel?: string;
-  /**
    * 是否只檢查 token
    */
   onlyCheckToken?: boolean;
@@ -72,48 +68,14 @@ export interface ProtectedComponentProps extends PropsWithChildren {
  */
 export function ProtectedComponent({
   children,
-  redirectOnCancel,
   onlyCheckToken = false,
   fallback = defaultFallback,
   skeleton = null,
 }: ProtectedComponentProps) {
-  const router = useRouter();
-  const opened = useRef(false);
-  const { isLoggedIn, isOpenLoginModal, token, isLoading } = useAuth();
-  const { openLoginModal } = useAuthDispatch();
+  const { isLoggedIn, token, isLoggingIn } = useAuth();
   const requiresLogin = onlyCheckToken ? !token : !isLoggedIn;
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (requiresLogin && !token) {
-      timer = setTimeout(() => {
-        opened.current = true;
-        openLoginModal();
-      }, 1000);
-    }
-    return () => clearTimeout(timer);
-  }, [requiresLogin, token, openLoginModal]);
-
-  useEffect(() => {
-    if (
-      redirectOnCancel &&
-      !isOpenLoginModal &&
-      opened.current &&
-      requiresLogin &&
-      !token
-    ) {
-      router.replace(redirectOnCancel);
-    }
-  }, [
-    redirectOnCancel,
-    isOpenLoginModal,
-    opened,
-    requiresLogin,
-    token,
-    router.replace,
-  ]);
-
-  if (isLoading) {
+  if (isLoggingIn) {
     return skeleton;
   }
 

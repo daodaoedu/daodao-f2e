@@ -5,10 +5,11 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useState,
 } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useRouter } from "next/router";
-import { SWRConfig } from "swr";
+import { mutate, SWRConfig } from "swr";
 
 import { HttpError } from "@/utils/http";
 import {
@@ -18,10 +19,10 @@ import {
 } from "@/utils/storage";
 import {
   userAPI,
-  createUserSchema,
-  updateUserSchema,
-  useUserMe,
+  createUserFormSchema,
+  updateUserFormSchema,
 } from "@/services/users";
+import { useUserMe } from "@/features/users";
 
 import LoginModal from "./LoginModal";
 import {
@@ -36,13 +37,12 @@ import { registerLoginListener } from "./utils";
 const initialState: AuthState = {
   isComplete: false,
   isLoggedIn: false,
+  isLoggingIn: true,
   isTemporary: false,
-  isLoading: true,
   isOpenLoginModal: false,
   loginStatus: LoginStatus.EMPTY,
   token: null,
   user: null,
-  redirectUrl: "",
 };
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -93,20 +93,18 @@ const authReducer = (state: AuthState, action: Action): AuthState => {
       return {
         ...initialState,
         isOpenLoginModal: true,
-        redirectUrl: action.payload || "",
       };
     }
     case ActionTypes.CLOSE_LOGIN_MODAL: {
       return {
         ...state,
         isOpenLoginModal: false,
-        redirectUrl: "",
       };
     }
     case ActionTypes.SET_LOADING: {
       return {
         ...state,
-        isLoading: action.payload,
+        isLoggingIn: action.payload,
       };
     }
     case ActionTypes.SET_TOKEN: {
@@ -148,6 +146,10 @@ const authReducer = (state: AuthState, action: Action): AuthState => {
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [state, dispatch] = useReducer(authReducer, initialState);
+  const [callbacks, setCallbacks] = useState({
+    successCallback: () => {},
+    registerCallback: () => {},
+  });
   const router = useRouter();
   const { pathname } = router;
 
@@ -160,6 +162,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       getTokenStorage().remove();
       getRedirectionStorage().remove();
       dispatch({ type: ActionTypes.LOGOUT });
+      mutate(() => true, undefined, { revalidate: false });
     };
     return {
       setToken,
@@ -169,18 +172,28 @@ export function AuthProvider({ children }: PropsWithChildren) {
       logout,
       login: (payload) => {
         dispatch({ type: ActionTypes.LOGIN, payload });
+        const reminderStorage = getReminderStorage();
+        const reminder = reminderStorage.get();
+        authDispatch.closeLoginModal();
+        if (payload) {
+          reminderStorage.set(typeof reminder === "number" ? reminder + 1 : 1);
+          callbacks.successCallback();
+        } else {
+          reminderStorage.remove();
+          callbacks.registerCallback();
+        }
       },
       updateUser: async (input) => {
         switch (state.loginStatus) {
           case LoginStatus.TEMPORARY: {
-            const arg = createUserSchema.parse(input);
+            const arg = createUserFormSchema.parse(input);
             const { token, user } = await userAPI.create("", { arg });
             setToken(token);
             dispatch({ type: ActionTypes.UPDATE_USER, payload: user });
             break;
           }
           case LoginStatus.PERMANENT: {
-            const arg = updateUserSchema.parse({
+            const arg = updateUserFormSchema.parse({
               ...state.user,
               ...input,
             });
@@ -194,17 +207,30 @@ export function AuthProvider({ children }: PropsWithChildren) {
         }
       },
       openLoginModal: (payload) => {
+        const redirectPathname = window.location.pathname;
+        const successCallback = () => {
+          if (payload?.successCallback) {
+            payload.successCallback();
+          } else {
+            router.replace(redirectPathname);
+          }
+        };
+        const registerCallback = () => {
+          if (payload?.registerCallback) {
+            payload.registerCallback();
+          } else {
+            router.replace("/signin");
+          }
+        };
         logout();
-        if (typeof payload === "string") {
-          getRedirectionStorage().set(payload);
-        }
-        dispatch({ type: ActionTypes.OPEN_LOGIN_MODAL, payload });
+        setCallbacks({ successCallback, registerCallback });
+        dispatch({ type: ActionTypes.OPEN_LOGIN_MODAL });
       },
       closeLoginModal: () => {
         dispatch({ type: ActionTypes.CLOSE_LOGIN_MODAL });
       },
     };
-  }, [state.loginStatus, state.user, dispatch]);
+  }, [state.loginStatus, state.user, callbacks, dispatch, router.replace]);
 
   const handleError = (error: unknown) => {
     if (error instanceof HttpError) {
@@ -225,10 +251,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
   });
 
   useEffect(() => {
-    if (state.isLoading !== isLoading) {
+    if (state.isLoggingIn !== isLoading) {
       authDispatch.setLoading(isLoading);
     }
-  }, [state.isLoading, isLoading]);
+  }, [state.isLoggingIn, isLoading]);
 
   useEffect(() => {
     const handleToken = (token: string) => {
@@ -242,40 +268,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     return unregisterLoginListener;
   }, [state.loginStatus, authDispatch.setToken, authDispatch.logout]);
-
-  useEffect(() => {
-    switch (state.loginStatus) {
-      case LoginStatus.TEMPORARY: {
-        const signinPath = "/signin";
-        const redirectUrl = state.redirectUrl || getRedirectionStorage().get();
-        getReminderStorage().remove();
-        if ([redirectUrl, signinPath].includes(pathname)) {
-          break;
-        }
-        authDispatch.closeLoginModal();
-        router.replace(redirectUrl || signinPath);
-        break;
-      }
-      case LoginStatus.PERMANENT: {
-        const redirectUrl = state.redirectUrl || getRedirectionStorage().get();
-        const reminder = getReminderStorage().get();
-        getReminderStorage().set(
-          typeof reminder === "number" ? reminder + 1 : 1
-        );
-        authDispatch.closeLoginModal();
-        if (redirectUrl) router.replace(redirectUrl);
-        break;
-      }
-      default:
-        break;
-    }
-  }, [
-    pathname,
-    state.loginStatus,
-    state.redirectUrl,
-    router.replace,
-    authDispatch.closeLoginModal,
-  ]);
 
   useEffect(() => {
     const redirectionStorage = getRedirectionStorage();

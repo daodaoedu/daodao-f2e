@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "@/shared/components/Image";
+import { Button } from "@/components/ui/button";
 import ResponsiveModal from "@/components/ui/responsive-modal";
 import openWindowPopup from "@/utils/openWindowPopup";
 import { cn } from "@/utils/cn";
@@ -59,9 +60,10 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         />
       </div>
       <div className="p-4">
-        <button
+        <Button
           type="button"
-          className="w-full rounded-full bg-primary-base py-2 text-white hover:bg-primary-darker"
+          className="w-full"
+          size="lg"
           onClick={handleOpenLoginWindow}
         >
           {isOpenWindow ? (
@@ -77,7 +79,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           ) : (
             <span>Google 登入 / 註冊</span>
           )}
-        </button>
+        </Button>
         <div className="text-center text-sm text-basic-400 text-balance mt-4">
           註冊即代表您同意島島阿學的
           <Link
