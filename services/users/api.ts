@@ -1,16 +1,14 @@
-import { MutationFetcher } from 'swr/mutation';
-import { mutations } from '@/utils/http';
-import { parseToString } from '@/utils/helper';
+import { mutate } from "swr";
+import { MutationFetcher } from "swr/mutation";
+import { mutations } from "@/utils/http";
+import { parseToString } from "@/utils/helper";
 
-import { CreateUserRequest, IUser, UpdateUserRequest } from './schema';
-
-export type UserSWRKey = string;
-
-export interface UserMeQueryParams {
-  token: string | null;
-  onSuccess?: (user: IUser) => void;
-  onError?: (error: Error) => void;
-}
+import {
+  CreateUserFormSchema,
+  UserSchema,
+  UpdateUserFormSchema,
+  CreateUserResponse,
+} from "./schema";
 
 interface GetUserPathnameProps {
   id?: string;
@@ -31,21 +29,23 @@ export const getUserPathname = ({ id, isMe }: GetUserPathnameProps = {}) => {
   return pathname;
 };
 
+export const refetchUsers = async () => {
+  await mutate((key: unknown) => {
+    const pathname = Array.isArray(key) ? key[0] : key;
+    return (
+      typeof pathname === "string" && pathname.startsWith(getUserPathname())
+    );
+  });
+};
+
 interface UserAPIType {
-  create: MutationFetcher<
-    { user: IUser; token: string },
-    UserSWRKey,
-    CreateUserRequest
-  >;
-  update: MutationFetcher<IUser, UserSWRKey, UpdateUserRequest>;
+  create: MutationFetcher<CreateUserResponse, string, CreateUserFormSchema>;
+  update: MutationFetcher<UserSchema, string, UpdateUserFormSchema>;
 }
 
 const userAPI: UserAPIType = {
-  create: (_, { arg }) =>
-    mutations.post<{ user: IUser; token: string }>(getUserPathname(), arg),
-
-  update: (_, { arg }) =>
-    mutations.put<IUser>(getUserPathname({ id: arg.id }), arg),
+  create: mutations.post,
+  update: mutations.put,
 };
 
 export default userAPI;

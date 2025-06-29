@@ -4,7 +4,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { ABROAD_OPTION, TAIWAN_DISTRICT } from '@/constants/areas';
 import { EDUCATION, ROLE } from '@/constants/member';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
-import { useUsers } from '@/services/users';
+import { useUserList } from '@/features/users';
 import { useTags } from '@/services/tags';
 
 import PartnerList from './PartnerList';
@@ -86,7 +86,7 @@ function Partner() {
     ],
   );
 
-  const { data: partnerItems, hasMore, setSize } = useUsers(prepareData(searchParamsItems));
+  const { data: partnerItems, hasMore, setSize } = useUserList(prepareData(searchParamsItems));
 
   return (
     <>

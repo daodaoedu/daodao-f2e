@@ -16,9 +16,11 @@ export default function AuthCallbackPage() {
     if (!token) return;
 
     sendLoginEvent(token).then((isSendOpener) => {
+      const redirectPathname = getRedirectionStorage().get();
+      getRedirectionStorage().remove();
       if (isSendOpener) return;
       setToken(token);
-      router.replace(getRedirectionStorage().get() || '/');
+      router.replace(redirectPathname ?? '/');
     });
   }, [token, isVerified, setToken, router.replace]);
 

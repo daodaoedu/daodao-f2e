@@ -33,8 +33,16 @@ export default function createStorage<T>(
 /** 獲取用於存儲用戶令牌的 localStorage */
 export const getTokenStorage = () => createStorage<string>("_token");
 
-/** 獲取用於存儲重定向URL的 localStorage */
-export const getRedirectionStorage = () => createStorage<string>("_r");
+/** 獲取用於存儲重定向 URL 的 localStorage，僅允許以 `/` 開頭的 pathname 字串 */
+export const getRedirectionStorage = () => {
+  const storage = createStorage<string>("_r");
+  const get = () => {
+    const value = storage.get();
+    if (value?.startsWith("/")) return value;
+    return undefined;
+  };
+  return { ...storage, get };
+};
 
 /** 獲取用於存儲外連結受信任網站列表的 localStorage */
 export const getTrustWebsitesStorage = () =>

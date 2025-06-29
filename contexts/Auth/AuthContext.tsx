@@ -151,7 +151,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
     registerCallback: () => {},
   });
   const router = useRouter();
-  const { pathname } = router;
 
   const authDispatch = useMemo<AuthDispatch>(() => {
     const setToken = (payload: string) => {
@@ -160,7 +159,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
     };
     const logout = () => {
       getTokenStorage().remove();
-      getRedirectionStorage().remove();
       dispatch({ type: ActionTypes.LOGOUT });
       mutate(() => true, undefined, { revalidate: false });
     };
@@ -212,6 +210,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
           if (payload?.successCallback) {
             payload.successCallback();
           } else {
+            getRedirectionStorage().set(redirectPathname);
             router.replace(redirectPathname);
           }
         };
@@ -268,15 +267,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     return unregisterLoginListener;
   }, [state.loginStatus, authDispatch.setToken, authDispatch.logout]);
-
-  useEffect(() => {
-    const redirectionStorage = getRedirectionStorage();
-    const redirection = redirectionStorage.get();
-
-    if (redirection?.split("?")[0] === pathname) {
-      redirectionStorage.remove();
-    }
-  }, [pathname]);
 
   return (
     <AuthContext.Provider value={state}>

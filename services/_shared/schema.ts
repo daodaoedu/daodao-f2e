@@ -3,8 +3,10 @@ import { z } from "zod";
 export const baseUserSchema = z.object({
   _id: z.string(),
   id: z.string(),
-  name: z.string(),
-  roleList: z.array(z.string()),
+  name: z.string().optional(),
+  roleList: z
+    .array(z.string(), { required_error: "請選擇角色" })
+    .min(1, "請選擇角色"),
   photoURL: z.string(),
 });
 
