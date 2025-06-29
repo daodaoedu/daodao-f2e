@@ -1,10 +1,13 @@
 import * as React from "react";
 import * as LabelPrimitive from "@radix-ui/react-label";
+import { ZodError, ZodSchema } from "zod";
 import { Slot } from "@radix-ui/react-slot";
 import {
   Controller,
   FormProvider,
+  Path,
   useFormContext,
+  UseFormReturn,
   type ControllerProps,
   type FieldPath,
   type FieldValues,
@@ -178,6 +181,39 @@ const FormMessage = React.forwardRef<
 });
 FormMessage.displayName = "FormMessage";
 
+interface ParseSchemaAutoFocusProps<
+  T extends FieldValues,
+  S extends ZodSchema
+> {
+  form: UseFormReturn<T>;
+  schema: S;
+  onSuccess?: () => void;
+  onError?: (errors: ZodError) => void;
+}
+
+function parseSchemaAutoFocus<T extends FieldValues, S extends ZodSchema>({
+  form,
+  schema,
+  onSuccess,
+  onError,
+}: ParseSchemaAutoFocusProps<T, S>) {
+  const parsed = schema.safeParse(form.getValues());
+  if (parsed.success) {
+    onSuccess?.();
+    return;
+  }
+  const { errors } = parsed.error;
+
+  const parsePath = (path: (string | number)[]) => path.join(".") as Path<T>;
+
+  form.clearErrors();
+  form.setFocus(parsePath(errors[0].path));
+  errors.forEach((error) => {
+    form.setError(parsePath(error.path), error);
+  });
+  onError?.(parsed.error);
+}
+
 export {
   useFormField,
   Form,
@@ -187,4 +223,5 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+  parseSchemaAutoFocus,
 };
