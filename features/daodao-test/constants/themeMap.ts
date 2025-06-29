@@ -1,3 +1,4 @@
+import { StaticImageData } from "next/image";
 import RoleDPng from "@/public/assets/daodao-test/role-d.png";
 import RoleAPng from "@/public/assets/daodao-test/role-a.png";
 import RoleCPng from "@/public/assets/daodao-test/role-c.png";
@@ -23,7 +24,7 @@ export type ThemeType = {
   backgroundColor: `#${string}`;
   color: `#${string}`;
   secondaryColor: `#${string}`;
-  largeImg: string;
+  largeImg: StaticImageData;
   smallImg: React.FC;
   analysis: AnalysisType;
 };
@@ -34,7 +35,7 @@ const deepExplorer: ThemeType = {
   backgroundColor: "#E9F3F5",
   color: "#48809A",
   secondaryColor: "#99ECFF",
-  largeImg: RoleDPng.src,
+  largeImg: RoleDPng,
   smallImg: DeepExplorerSvg,
   analysis: {
     D: 3.7,
@@ -51,7 +52,7 @@ const activeShaper: ThemeType = {
   backgroundColor: "#F5F0E9",
   color: "#9A6948",
   secondaryColor: "#FFA10B",
-  largeImg: RoleAPng.src,
+  largeImg: RoleAPng,
   smallImg: ActiveShaperSvg,
   analysis: {
     D: 2.5,
@@ -68,7 +69,7 @@ const orderBuilder: ThemeType = {
   backgroundColor: "#E9F5EE",
   color: "#489A95",
   secondaryColor: "#16B9B3",
-  largeImg: RoleOPng.src,
+  largeImg: RoleOPng,
   smallImg: OrderBuilderSvg,
   analysis: {
     D: 1.2,
@@ -85,7 +86,7 @@ const liquidIntegrator: ThemeType = {
   backgroundColor: "#F5EDE9",
   color: "#CB6738",
   secondaryColor: "#FF6E0B",
-  largeImg: RoleLPng.src,
+  largeImg: RoleLPng,
   smallImg: LiquidIntegratorSvg,
   analysis: {
     D: 1.4,
@@ -102,7 +103,7 @@ const communityConnector: ThemeType = {
   backgroundColor: "#F5F4E9",
   color: "#9D8242",
   secondaryColor: "#F9E41C",
-  largeImg: RoleCPng.src,
+  largeImg: RoleCPng,
   smallImg: CommunityConnectorSvg,
   analysis: {
     D: 1.8,

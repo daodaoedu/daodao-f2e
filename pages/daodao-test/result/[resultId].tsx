@@ -117,18 +117,15 @@ export default function DaodaoTestResultDetailPage({
                 <Title>群島好夥伴</Title>
                 {resultDetail.partners.map(({ roleId, brief, description }) => {
                   const partnerTheme = themeMap.get(roleId);
-                  const RoleSvg = partnerTheme?.smallImg;
-                  if (!RoleSvg) return null;
+                  if (!partnerTheme) return null;
+                  const { smallImg: SmallImg, title, color } = partnerTheme;
                   return (
                     <Fragment key={roleId}>
                       <div className="basis-1/2 bg-[var(--bg-color)] rounded-md p-3 flex flex-col items-center gap-2 body-sm">
-                        <RoleSvg />
+                        <SmallImg />
                         <p className="flex gap-1">
-                          <span
-                            className="font-bold"
-                            style={{ color: partnerTheme.color }}
-                          >
-                            {partnerTheme.title}
+                          <span className="font-bold" style={{ color }}>
+                            {title}
                           </span>
                           <span className="text-normal">{brief}</span>
                         </p>
@@ -161,7 +158,7 @@ export default function DaodaoTestResultDetailPage({
               <h2 className="heading-md mb-4">看更多分類</h2>
               <ul className="flex flex-wrap gap-4">
                 {Array.from(themeMap.values()).map(
-                  ({ id, title, color, smallImg: RoleSvg }) =>
+                  ({ id, title, color, smallImg: SmallImg }) =>
                     resultId !== id && (
                       <li key={id} className="flex-1 basis-1/3">
                         <Link
@@ -169,7 +166,7 @@ export default function DaodaoTestResultDetailPage({
                           style={{ color }}
                           href={`/daodao-test/result/${id}`}
                         >
-                          <RoleSvg />
+                          <SmallImg />
                           {title}
                         </Link>
                       </li>

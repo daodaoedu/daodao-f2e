@@ -22,7 +22,7 @@ export default function DaodaoTestPage() {
       />
       <main className="relative max-w-[392px] mx-auto h-dvh text-basic-400">
         <Image
-          src={question1Jpg.src}
+          src={question1Jpg}
           alt="島島阿學"
           className="-z-10 object-contain object-bottom"
           fill

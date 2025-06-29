@@ -191,20 +191,17 @@ export default function DaodaoTestResultPage() {
               <div className="flex gap-2">
                 {detail.partners.map(({ roleId, brief }) => {
                   const partnerTheme = themeMap.get(roleId);
-                  const RoleSvg = partnerTheme?.smallImg;
-                  if (!RoleSvg) return null;
+                  if (!partnerTheme) return null;
+                  const { smallImg: SmallImg, title, color } = partnerTheme;
                   return (
                     <div
                       key={roleId}
                       className="basis-1/2 bg-white rounded-md p-3 flex flex-col items-center gap-2"
                     >
-                      <RoleSvg />
+                      <SmallImg />
                       <p className="flex gap-1">
-                        <span
-                          className="font-bold"
-                          style={{ color: partnerTheme.color }}
-                        >
-                          {partnerTheme.title}
+                        <span className="font-bold" style={{ color }}>
+                          {title}
                         </span>
                         <span>{brief}</span>
                       </p>

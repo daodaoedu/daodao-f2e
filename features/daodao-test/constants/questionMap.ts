@@ -1,3 +1,4 @@
+import { StaticImageData } from "next/image";
 import question1Jpg from "@/public/assets/daodao-test/q1.jpg";
 import question2Jpg from "@/public/assets/daodao-test/q2.jpg";
 import question3Jpg from "@/public/assets/daodao-test/q3.jpg";
@@ -21,7 +22,7 @@ export type QuestionType = {
   id: string;
   title: string;
   backgroundColor: `#${string}`;
-  imageSrc: string;
+  image: StaticImageData;
   answers: [AnswerType, AnswerType, AnswerType, AnswerType, AnswerType];
 };
 
@@ -30,7 +31,7 @@ const q1: QuestionType = {
   id: "q1",
   title: "睜開眼，你躺在陌生的沙灘上，\n下一步你會做什麼？",
   backgroundColor: "#EAD8C2",
-  imageSrc: question1Jpg.src,
+  image: question1Jpg,
   answers: [
     { key: "L", value: 1, title: "改造漂流物當生存的萬用工具" },
     { key: "C", value: 1, title: "尋找其他人，了解情況" },
@@ -45,7 +46,7 @@ const q2: QuestionType = {
   id: "q2",
   title: "第一夜，\n叢林傳來奇怪的聲響，你會？",
   backgroundColor: "#519754",
-  imageSrc: question2Jpg.src,
+  image: question2Jpg,
   answers: [
     { key: "O", value: 1, title: "列出可能來源，畫表分析對應方法" },
     { key: "L", value: 1, title: "把聲音當作靈感，寫首詩或畫張圖" },
@@ -60,7 +61,7 @@ const q3: QuestionType = {
   id: "q3",
   title: "起床後，你發現身旁有一群島民\n正在圍觀你，你會？",
   backgroundColor: "#18B8A7",
-  imageSrc: question3Jpg.src,
+  image: question3Jpg,
   answers: [
     { key: "O", value: 1, title: "用圖表記錄他們的言行舉止，理出一套規律" },
     { key: "A", value: 1, title: "起身介紹自己並詢問該島資訊" },
@@ -75,7 +76,7 @@ const q4: QuestionType = {
   id: "q4",
   title: "島民熱情地邀請你參加\n島上舉辦的年度挑戰賽，你會？",
   backgroundColor: "#7CC8FE",
-  imageSrc: question4Jpg.src,
+  image: question4Jpg,
   answers: [
     { key: "C", value: 1, title: "找參加過的人聊聊，有沒有什麼建議" },
     { key: "O", value: 1, title: "拆解流程，一步步擬定應戰策略" },
@@ -90,7 +91,7 @@ const q5: QuestionType = {
   id: "q5",
   title: "過了一個月，其他島的人到訪，\n彼此語言不同，你會？",
   backgroundColor: "#3E8FED",
-  imageSrc: question5Jpg.src,
+  image: question5Jpg,
   answers: [
     { key: "L", value: 1, title: "創造一種圖文聲音結合的交流法" },
     { key: "D", value: 1, title: "分析他們的語音與動作，並推敲該島背景" },
@@ -105,7 +106,7 @@ const q6: QuestionType = {
   id: "q6",
   title: "外交難題結束，暴風雨突然來襲，\n你想帶大家避難，你會怎麼做？",
   backgroundColor: "#E1FAFF",
-  imageSrc: question6Jpg.src,
+  image: question6Jpg,
   answers: [
     { key: "A", value: 1, title: "馬上帶人行動，不多想，先保命！" },
     { key: "D", value: 1, title: "研判風勢與地形，找出安全地點" },
@@ -120,7 +121,7 @@ const q7: QuestionType = {
   id: "q7",
   title: "島民為了感謝你帶大家避難，\n讓你挑一樣東西當作禮物，你會選？",
   backgroundColor: "#93D7FF",
-  imageSrc: question7Jpg.src,
+  image: question7Jpg,
   answers: [
     { key: "O", value: 1, title: "一套用來規劃任務與整理資料的工具箱" },
     { key: "A", value: 1, title: "一份你可以立刻帶人實行的超強行動藍圖" },
@@ -135,7 +136,7 @@ const q8: QuestionType = {
   id: "q8",
   title: "島民對你越來越依賴，\n甚至請你想像未來，你會？",
   backgroundColor: "#519754",
-  imageSrc: question8Jpg.src,
+  image: question8Jpg,
   answers: [
     { key: "O", value: 1, title: "畫出未來發展計畫圖與可能流程" },
     { key: "D", value: 1, title: "根據過去的資料預測接下來的變化" },
@@ -150,7 +151,7 @@ const q9: QuestionType = {
   id: "q9",
   title: "預言後，\n天上突然掉下一個木箱，你會？",
   backgroundColor: "#2C7EE9",
-  imageSrc: question9Jpg.src,
+  image: question9Jpg,
   answers: [
     { key: "C", value: 1, title: "找大家一起打開，聽聽每個人的看法" },
     { key: "L", value: 1, title: "嘗試運用箱內物品創作出萬用法寶" },
@@ -165,7 +166,7 @@ const q10: QuestionType = {
   id: "q10",
   title: "你發現島民是來自各島的觀察員，你將被分到適合你的島！你覺得是...？",
   backgroundColor: "#9FD3C0",
-  imageSrc: question10Jpg.src,
+  image: question10Jpg,
   answers: [
     { key: "D", value: 1, title: "一座可以靜靜鑽研、慢慢想「為什麼」的島" },
     { key: "C", value: 1, title: "一座大家一起學習、交換想法的共學島" },

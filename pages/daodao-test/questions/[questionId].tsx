@@ -1,5 +1,4 @@
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
-import { useEffect } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { ChevronRightIcon, ChevronLeftIcon } from "lucide-react";
@@ -45,16 +44,6 @@ export default function DaodaoTestQuestionPage({
   const router = useRouter();
   const { result, selectAnswer } = useDaodaoTest();
   const question = questionMap.get(questionId ?? "");
-
-  useEffect(() => {
-    if (!questionId) return;
-    const nextQuestionId = parseInt(questionId.replace("q", ""), 10) + 1;
-    const nextQuestion = questionMap.get(`q${nextQuestionId}`);
-    if (nextQuestion) {
-      const img = document.createElement("img");
-      img.src = nextQuestion.imageSrc;
-    }
-  }, [questionId]);
 
   if (!question) return null;
 
@@ -132,8 +121,8 @@ export default function DaodaoTestQuestionPage({
           </div>
           <div className="absolute w-full h-[calc(100dvh-288px)] blur-md">
             <Image
-              key={question.imageSrc}
-              src={question.imageSrc}
+              key={question.title}
+              src={question.image}
               alt={question.title}
               fill
               priority
@@ -141,8 +130,8 @@ export default function DaodaoTestQuestionPage({
           </div>
           <div className="relative mx-auto aspect-[30/43] max-w-full max-h-[calc(100dvh-288px)]">
             <Image
-              key={question.imageSrc}
-              src={question.imageSrc}
+              key={question.title}
+              src={question.image}
               alt={question.title}
               fill
               priority
