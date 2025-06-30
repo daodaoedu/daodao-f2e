@@ -13,12 +13,15 @@ import {
 import { mockResourceList } from "@/services/resources/mock";
 
 export function useResourceList(filter: ResourceSearchParamsSchema) {
-  return useSWR<ResourceListResponseSchema>([getResourcePathname(), filter], () => mockResourceList);
+  return useSWR<ResourceListResponseSchema>(
+    [getResourcePathname(), filter],
+    () => mockResourceList
+  );
 }
 
-export function useResource(id?: string | null) {
+export function useResource(resourceId?: string | null) {
   return useSWR<ResourceDetailResponseSchema>(
-    id ? getResourcePathname({ id }) : null
+    resourceId ? getResourcePathname({ resourceId }) : null
   );
 }
 
@@ -39,11 +42,11 @@ export const useCreateResource = ({
 };
 
 export const useUpdateResource = (
-  id?: string | null,
+  resourceId?: string | null,
   { onSuccess, ...options }: SWRMutationOptions = {}
 ) => {
   return useSWRMutation(
-    id ? getResourcePathname({ id }) : null,
+    resourceId ? getResourcePathname({ resourceId }) : null,
     resourceAPI.update,
     {
       ...options,
@@ -56,11 +59,11 @@ export const useUpdateResource = (
 };
 
 export const useDeleteResource = (
-  id: string,
+  resourceId: string,
   { onSuccess, ...options }: SWRMutationOptions<void> = {}
 ) => {
   return useSWRMutation(
-    id ? getResourcePathname({ id }) : null,
+    resourceId ? getResourcePathname({ resourceId }) : null,
     resourceAPI.delete,
     {
       ...options,

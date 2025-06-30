@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { baseUserSchema } from "../_shared/schema";
 
 export enum RoleEnum {
   /** 訪客 */
@@ -18,8 +17,6 @@ export enum RoleEnum {
   SuperAdmin,
 }
 
-export type BaseUserSchema = z.infer<typeof baseUserSchema>;
-
 export const contactSchema = z
   .object({
     instagram: z.string(),
@@ -31,7 +28,17 @@ export const contactSchema = z
     message: "請至少填寫一個聯絡方式",
   });
 
-export const userSchema = baseUserSchema.extend({
+export const userSchema = z.object({
+  _id: z.string(),
+  id: z.number(),
+  name: z.string(),
+  roleList: z
+    .array(z.string(), { required_error: "請選擇角色" })
+    .min(1, "請選擇角色"),
+  photoURL: z
+    .string()
+    .nullable()
+    .transform((val) => val ?? ""),
   birthDay: z
     .string({ required_error: "請選擇生日" })
     .min(1, "請選擇生日")
@@ -58,6 +65,19 @@ export const userSchema = baseUserSchema.extend({
   updatedDate: z.string(),
   contactList: contactSchema,
 });
+
+export const baseUserSchema = userSchema
+  .pick({
+    _id: true,
+    id: true,
+    name: true,
+    photoURL: true,
+  })
+  .extend({
+    roleList: z.array(z.string()),
+  });
+
+export type BaseUserSchema = z.infer<typeof baseUserSchema>;
 
 export const createUserFormSchema = userSchema
   .pick({

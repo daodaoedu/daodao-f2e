@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { BaseUserSchema } from '../users';
+import type { BaseUserSchema } from '../_shared/schema';
 
 export enum CommentType {
   Note = 'note',
