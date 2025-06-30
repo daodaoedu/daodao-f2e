@@ -1,4 +1,4 @@
-import type { InferGetStaticPropsType, GetStaticProps } from "next";
+import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Link from "next/link";
 import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
 import { ChevronRightIcon } from "lucide-react";
@@ -19,52 +19,32 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import JsonLdFactory from "@/utils/jsonLd";
-import { cn } from "@/utils/cn";
 import { SEARCH_TAGS } from "@/constants/category";
 import { Button } from "@/components/ui/button";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
+import { Container } from "@/components/ui/wrapper";
 
-const Section = ({
-  className,
-  children,
-}: React.PropsWithChildren<{ className?: string }>) => {
-  return (
-    <section
-      className={cn(
-        "flex flex-col gap-11 px-5 py-11 md:px-24 md:py-12",
-        className
-      )}
-    >
-      {children}
-    </section>
-  );
-};
+export const runtime = "experimental-edge";
 
-export const getStaticProps = (async () => {
-  try {
-    const data = await resourceAPI.readList();
+export const getServerSideProps = (async () => {
+  const { data } = await resourceAPI.readList({ limit: 4 });
 
-    const coursesJsonLd = data.resources.slice(0, 4).map(createResourceJsonLd);
+  const jsonLd = JsonLdFactory.createGraph([
+    JsonLdFactory.createItemListBuilder()
+      .setName("多元學習資源列表")
+      .setItems(data.resources.map(createResourceJsonLd)),
+  ]);
 
-    const jsonLd = JsonLdFactory.createGraph([
-      JsonLdFactory.createItemListBuilder()
-        .setName("多元學習資源列表")
-        .setItems(coursesJsonLd),
-    ]);
-
-    return { props: { data, jsonLd } };
-  } catch {
-    return { props: { data: undefined, jsonLd: undefined } };
-  }
-}) satisfies GetStaticProps<{
-  data: ResourceListResponseSchema | undefined;
-  jsonLd: JsonLdType | undefined;
+  return { props: { data, jsonLd } };
+}) satisfies GetServerSideProps<{
+  data: ResourceListResponseSchema;
+  jsonLd: JsonLdType;
 }>;
 
 export default function ResourcePage({
   data,
   jsonLd,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const reflectionList = [1, 2, 3, 4, 5, 6, 7];
   const sharerList = [1, 2, 3, 4, 5, 6];
 
@@ -80,7 +60,7 @@ export default function ResourcePage({
       />
 
       {/* 熱門資源, 最新資源, 熱門分類 */}
-      <Section>
+      <Container className="space-y-11 py-12">
         <div>
           <SectionTitle title="熱門資源">
             <Button
@@ -129,10 +109,10 @@ export default function ResourcePage({
           </SectionTitle>
           <CategoriesContainer maxLength={8} disabledCollapse />
         </div>
-      </Section>
+      </Container>
 
       {/* 熱門心得 */}
-      <Section className="bg-primary-palest">
+      <Container className="bg-primary-palest space-y-11 py-12">
         <Carousel opts={{ loop: true, align: "start" }}>
           <div className="flex justify-between items-center mb-9">
             <h2 className="text-2xl font-medium text-basic-500">熱門心得</h2>
@@ -152,11 +132,11 @@ export default function ResourcePage({
             ))}
           </CarouselContent>
         </Carousel>
-      </Section>
+      </Container>
 
       {/* 活躍分享者 */}
-      <Section>
-        <Carousel opts={{ loop: true, align: "start" }}>
+      <Container className="space-y-11 py-12">
+        <Carousel opts={{ align: "start" }}>
           <div className="flex justify-between items-center mb-9">
             <h2 className="text-2xl font-medium text-basic-500">活躍分享者</h2>
             <div className="flex gap-2">
@@ -175,7 +155,7 @@ export default function ResourcePage({
             ))}
           </CarouselContent>
         </Carousel>
-      </Section>
+      </Container>
     </>
   );
 }

@@ -22,7 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { costTypes, targetAudienceTypes, resourceTypes } from "../constants";
+import { costTypeOptions, targetAudienceTypeOptions, resourceTypeOptions } from "../constants";
 
 interface SearchFormProps {
   onFilter: (filters: ResourceSearchParamsSchema) => void;
@@ -190,7 +190,7 @@ export default function ResourceSearchForm({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                      {resourceTypes.map((type) => (
+                      {resourceTypeOptions.map((type) => (
                         <CheckboxItem
                           key={type.value}
                           label={type.label}
@@ -219,7 +219,7 @@ export default function ResourceSearchForm({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                      {costTypes.map((type) => (
+                      {costTypeOptions.map((type) => (
                         <CheckboxItem
                           key={type.value}
                           label={type.label}
@@ -249,7 +249,7 @@ export default function ResourceSearchForm({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                      {targetAudienceTypes.map((type) => (
+                      {targetAudienceTypeOptions.map((type) => (
                         <CheckboxItem
                           key={type.value}
                           label={type.label}

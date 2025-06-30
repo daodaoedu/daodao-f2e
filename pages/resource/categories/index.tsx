@@ -1,4 +1,4 @@
-import type { InferGetStaticPropsType, GetStaticProps } from "next";
+import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { SWRConfig } from "swr";
 import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
 import {
@@ -8,7 +8,6 @@ import {
   SectionTitle,
 } from "@/features/resources";
 import JsonLdFactory from "@/utils/jsonLd";
-import { cn } from "@/utils/cn";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,56 +17,35 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
+import { Container } from "@/components/ui/wrapper";
 
-type SectionProps = {
-  as?: "section" | "div";
-  className?: string;
-  children: React.ReactNode;
-};
+export const runtime = "experimental-edge";
 
-const Section = ({
-  as: Component = "section",
-  className,
-  children,
-}: SectionProps) => {
-  return (
-    <Component className={cn("pb-11 px-5 md:pb-12 md:px-24", className)}>
-      {children}
-    </Component>
-  );
-};
+export const getServerSideProps = (async () => {
+  const { data } = await resourceAPI.readList({ limit: 4 });
 
-export const getStaticProps = (async () => {
-  try {
-    const data = await resourceAPI.readList();
+  const jsonLd = JsonLdFactory.createGraph([
+    JsonLdFactory.createItemListBuilder()
+      .setName("所有分類")
+      .setItems(data.resources.map(createResourceJsonLd)),
+  ]);
 
-    const coursesJsonLd = data.resources.slice(0, 4).map(createResourceJsonLd);
-
-    const jsonLd = JsonLdFactory.createGraph([
-      JsonLdFactory.createItemListBuilder()
-        .setName("所有分類")
-        .setItems(coursesJsonLd),
-    ]);
-
-    return {
-      props: { fallback: { "/resource/categories": data }, jsonLd },
-    };
-  } catch {
-    return { props: { fallback: undefined, jsonLd: undefined } };
-  }
-}) satisfies GetStaticProps<{
-  fallback: Record<string, ResourceListResponseSchema> | undefined;
-  jsonLd: JsonLdType | undefined;
+  return {
+    props: { fallback: { "/resource/categories": data }, jsonLd },
+  };
+}) satisfies GetServerSideProps<{
+  fallback: Record<string, ResourceListResponseSchema> | null;
+  jsonLd: JsonLdType | null;
 }>;
 
 export default function ResourceCategoriesPage({
   fallback,
   jsonLd,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <SWRConfig value={{ fallback }}>
       <SEOConfig title="所有分類｜島島阿學" jsonLd={jsonLd} />
-      <Section as="div" className="pt-12">
+      <Container className="pb-12 pt-12">
         <Breadcrumb className="mb-3">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -80,17 +58,17 @@ export default function ResourceCategoriesPage({
           </BreadcrumbList>
         </Breadcrumb>
         <SectionTitle as="h1" title="所有分類" />
-      </Section>
+      </Container>
 
-      <Section>
+      <Container className="pb-12">
         <CategoriesContainer size="sm" />
-      </Section>
+      </Container>
 
-      <Section className="relative px-0 md:px-0">
+      <Container className="pb-12 relative px-0 md:px-0">
         <SectionTitle title="所有資源" className="pb-0 px-5 md:pb-0 md:px-24" />
 
         <ResourceExplorer />
-      </Section>
+      </Container>
     </SWRConfig>
   );
 }

@@ -31,38 +31,30 @@ export const runtime = "experimental-edge";
 export const getServerSideProps = (async (context) => {
   const resourceId = parseToString(context.params?.resourceId);
 
-  try {
-    if (!resourceId) {
-      return {
-        notFound: true,
-      };
-    }
-
-    const resource = await resourceAPI.read(resourceId);
-
-    return {
-      props: {
-        resource,
-      },
-    };
-  } catch (error) {
-    console.error("Failed to fetch resource:", error);
+  if (!resourceId) {
     return {
       notFound: true,
     };
   }
+
+  const { data } = await resourceAPI.read(resourceId);
+
+  return {
+    props: {
+      data,
+    },
+  };
 }) satisfies GetServerSideProps<{
-  resource?: ResourceDetailResponseSchema;
-  notFound?: boolean;
+  data: ResourceDetailResponseSchema | null;
 }>;
 
 export default function EditResourcePage({
-  resource,
+  data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
 
   const { trigger: updateResource, isMutating: isSubmitting } =
-    useUpdateResource(resource.id, {
+    useUpdateResource(data.id, {
       onSuccess: () => {
         toast.success("資源分享成功！");
         router.push("/search");
@@ -74,7 +66,7 @@ export default function EditResourcePage({
     });
 
   const resourceForm = useForm<ResourceFormSchema>({
-    values: resource,
+    values: data,
     resolver: zodResolver(resourceFormSchema),
     defaultValues: {
       name: "",
@@ -91,8 +83,8 @@ export default function EditResourcePage({
     },
   });
 
-  const handleSubmit = ({ review, ...data }: ResourceFormSchema) => {
-    updateResource({ ...data, review });
+  const handleSubmit = ({ review, ...resource }: ResourceFormSchema) => {
+    updateResource({ ...resource, review });
   };
 
   return (

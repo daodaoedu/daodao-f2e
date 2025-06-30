@@ -41,12 +41,12 @@ function ResourceContainer({
           title={resource.name}
           content={resource.description}
           tags={resource.tags}
-          userName={resource.user.name}
+          userName={resource.user?.name}
           coverImageUrl={resource.imageUrl ?? undefined}
           time={resource.createdAt}
           level={resource.level}
           commentCount={resource.reviewCount}
-          userAvatar={resource.user.photoURL}
+          userAvatar={resource.user?.photoURL}
           viewCount={resource.viewCount.toString()}
         />
       ))}
