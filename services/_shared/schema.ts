@@ -10,10 +10,6 @@ export const paginationSchema = z.object({
 });
 
 export const cursorsSchema = z.object({
-  limit: z.number(),
-  hasNext: z.boolean(),
-  hasPrev: z.boolean(),
-  nextCursor: z.string().nullable(),
-  prevCursor: z.string().nullable(),
-  totalEstimate: z.number(),
+  next_cursor: z.string().nullable(),
+  has_more: z.boolean(),
 });
