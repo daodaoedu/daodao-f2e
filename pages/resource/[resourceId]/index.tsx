@@ -26,6 +26,7 @@ import {
   ResourceReviewList,
   ContributorInfo,
 } from "@/features/resources/components";
+import { parseCategoryHierarchy } from "@/features/resources";
 
 enum TabEnum {
   Introduction = "introduction",
@@ -71,6 +72,13 @@ export default function ResourceDetailPage({
     return <NotExist />;
   }
 
+  const [majorCategory, subCategory] = parseCategoryHierarchy([
+    data.majorCategory,
+    data.subCategory ?? "",
+  ]);
+
+  const baseCategoriesUrl = "/resource/categories";
+
   return (
     <div className="bg-primary-palest min-h-screen">
       <SEOConfig
@@ -81,22 +89,22 @@ export default function ResourceDetailPage({
         <Breadcrumb className="mb-5 md:mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/find-resource">找資源</BreadcrumbLink>
+              <BreadcrumbLink href="/resource">找資源</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink
-                href={`/find-resource?category=${data.majorCategory}`}
+                href={`${baseCategoriesUrl}/${majorCategory?.value}`}
               >
-                {data.majorCategory}
+                {majorCategory?.label}
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink
-                href={`/find-resource?category=${data.subCategory}`}
+                href={`${baseCategoriesUrl}/${majorCategory?.value}/${subCategory?.value}`}
               >
-                {data.subCategory}
+                {subCategory?.label}
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />

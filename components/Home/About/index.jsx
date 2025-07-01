@@ -116,7 +116,7 @@ const About = () => {
                   key={value}
                   label={label}
                   value={value}
-                  onClick={() => router.push(`/search?cats=${label}`)}
+                  onClick={() => router.push(`/resource/categories/${value}`)}
                   sx={{
                     backgroundColor: COLOR_TABLE.green,
                     opacity: '60%',

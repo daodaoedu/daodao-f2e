@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { resourceSearchParamsSchema } from "@/services/resources";
+import { ICategory } from "@/constants/category";
+import { Container } from "@/components/ui/wrapper";
 import useQueryState from "@/hooks/useQueryState";
 import ResourceSearchBar from "./ResourceSearchBar";
 import ResourceContainer from "./ResourceContainer";
 import { useResourceList } from "../hooks";
-import { CategoriesType } from "../utils/getCategories";
 
 interface ResourceExplorerProps {
-  categories?: CategoriesType;
+  categories?: ICategory[];
   parentDataCount?: number;
 }
 
@@ -32,12 +33,13 @@ export default function ResourceExplorer({
         </div>
       )}
 
-      <ResourceContainer
-        data={resourcesData?.resources ?? []}
-        categories={categories}
-        parentDataCount={parentDataCount}
-        className="px-5 md:px-24"
-      />
+      <Container className="pb-6">
+        <ResourceContainer
+          data={resourcesData}
+          categories={categories}
+          parentDataCount={parentDataCount}
+        />
+      </Container>
 
       <div className="flex justify-center px-5 pt-6 mb-16 md:px-24">
         <Button size="lg">查看更多</Button>

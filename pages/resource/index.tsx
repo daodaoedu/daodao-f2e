@@ -4,22 +4,13 @@ import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
 import { ChevronRightIcon } from "lucide-react";
 import {
   CategoriesContainer,
-  ReflectionCard,
   ResourceContainer,
   ResourceBanner,
   SectionTitle,
-  SharerCard,
   createResourceJsonLd,
 } from "@/features/resources";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselPrevious,
-  CarouselNext,
-} from "@/components/ui/carousel";
 import JsonLdFactory from "@/utils/jsonLd";
-import { SEARCH_TAGS } from "@/constants/category";
+import { HOT_TAGS } from "@/constants/category";
 import { Button } from "@/components/ui/button";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
 import { Container } from "@/components/ui/wrapper";
@@ -37,7 +28,7 @@ export const getServerSideProps = (async () => {
 
   return { props: { data, jsonLd } };
 }) satisfies GetServerSideProps<{
-  data: ResourceListResponseSchema;
+  data: ResourceListResponseSchema["data"];
   jsonLd: JsonLdType;
 }>;
 
@@ -45,9 +36,6 @@ export default function ResourcePage({
   data,
   jsonLd,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const reflectionList = [1, 2, 3, 4, 5, 6, 7];
-  const sharerList = [1, 2, 3, 4, 5, 6];
-
   return (
     <>
       <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
@@ -56,12 +44,12 @@ export default function ResourcePage({
         title="找資源"
         content="藉由他人真實的資源使用經驗，找到真正適合自己的學習資源，透過個人化推薦系統，幫助每位學習者在龐大的學習資源中，快速找到最適合自己的內容！"
         image=""
-        hotTags={SEARCH_TAGS.all.map(({ label }) => label)}
+        hotTags={HOT_TAGS}
       />
 
       {/* 熱門資源, 最新資源, 熱門分類 */}
       <Container className="space-y-11 py-12">
-        <div>
+        <section>
           <SectionTitle title="熱門資源">
             <Button
               variant="link"
@@ -76,9 +64,9 @@ export default function ResourcePage({
             </Button>
           </SectionTitle>
           <ResourceContainer data={data?.resources.slice(2, 4) ?? []} />
-        </div>
+        </section>
 
-        <div>
+        <section>
           <SectionTitle title="最新資源">
             <Button
               variant="link"
@@ -92,9 +80,9 @@ export default function ResourcePage({
             </Button>
           </SectionTitle>
           <ResourceContainer data={data?.resources.slice(0, 2) ?? []} />
-        </div>
+        </section>
 
-        <div>
+        <section>
           <SectionTitle title="熱門分類">
             <Button
               variant="link"
@@ -108,34 +96,36 @@ export default function ResourcePage({
             </Button>
           </SectionTitle>
           <CategoriesContainer maxLength={8} disabledCollapse />
-        </div>
+        </section>
       </Container>
 
       {/* 熱門心得 */}
-      <Container className="bg-primary-palest space-y-11 py-12">
-        <Carousel opts={{ loop: true, align: "start" }}>
-          <div className="flex justify-between items-center mb-9">
-            <h2 className="text-2xl font-medium text-basic-500">熱門心得</h2>
-            <div className="flex gap-2">
-              <CarouselPrevious className="static translate-y-0 mx-1" />
-              <CarouselNext className="static translate-y-0 mx-1" />
+      {/* <div className="bg-primary-palest py-12">
+        <Container>
+          <Carousel opts={{ loop: true, align: "start" }}>
+            <div className="flex justify-between items-center mb-9">
+              <h2 className="text-2xl font-medium text-basic-500">熱門心得</h2>
+              <div className="flex gap-2">
+                <CarouselPrevious className="static translate-y-0 mx-1" />
+                <CarouselNext className="static translate-y-0 mx-1" />
+              </div>
             </div>
-          </div>
-          <CarouselContent>
-            {reflectionList.map((item) => (
-              <CarouselItem
-                key={item}
-                className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
-              >
-                <ReflectionCard />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
-      </Container>
+            <CarouselContent>
+              {reflectionList.map((item) => (
+                <CarouselItem
+                  key={item}
+                  className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                >
+                  <ReflectionCard />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        </Container>
+      </div> */}
 
       {/* 活躍分享者 */}
-      <Container className="space-y-11 py-12">
+      {/* <Container className="py-12">
         <Carousel opts={{ align: "start" }}>
           <div className="flex justify-between items-center mb-9">
             <h2 className="text-2xl font-medium text-basic-500">活躍分享者</h2>
@@ -155,7 +145,7 @@ export default function ResourcePage({
             ))}
           </CarouselContent>
         </Carousel>
-      </Container>
+      </Container> */}
     </>
   );
 }

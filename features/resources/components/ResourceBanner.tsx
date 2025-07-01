@@ -1,9 +1,12 @@
 import { useRef } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import Image from "@/shared/components/Image";
 import LensIcon from "@/public/assets/icons/lens.svg";
+import { OptionProps } from "@/components/ui/option";
 import { AuthButton } from "@/contexts/Auth";
 import { cn } from "@/utils/cn";
+import { Badge } from "@/components/ui/badge";
 import SectionTitle from "./SectionTitle";
 
 interface ResourceBannerProps {
@@ -11,7 +14,7 @@ interface ResourceBannerProps {
   title: string;
   content: string;
   image: string;
-  hotTags?: string[];
+  hotTags?: OptionProps[];
   length?: number;
 }
 
@@ -88,16 +91,19 @@ export default function ResourceBanner({
                 熱門標籤
               </div>
               <div className="flex flex-wrap gap-1 md:gap-2">
-                {hotTags.map((tag) => {
+                {hotTags.map(({ label, value }) => {
                   return (
-                    <button
-                      key={tag}
-                      type="button"
-                      className="px-3 py-0.5 text-primary-base bg-white border border-solid border-primary-base rounded-full"
+                    <Badge
+                      key={value}
+                      variant="outline"
+                      className="px-3 py-0.5 text-primary-base"
+                      asChild
                     >
-                      <span className="font-bold">#</span>
-                      {tag}
-                    </button>
+                      <Link href={`/resource/categories/${value}`}>
+                        <span className="font-bold">#</span>
+                        {label}
+                      </Link>
+                    </Badge>
                   );
                 })}
               </div>

@@ -82,7 +82,7 @@ export default function NotExist() {
                 key={value}
                 label={label}
                 component="a"
-                href={`/search?cats=${label}`}
+                href={`/resource/categories/${value}`}
                 sx={{
                   backgroundColor: COLOR_TABLE.green,
                   opacity: '60%',

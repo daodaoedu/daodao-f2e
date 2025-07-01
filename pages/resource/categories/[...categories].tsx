@@ -5,14 +5,13 @@ import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
 import {
   CategoriesContainer,
   ResourceBanner,
-  getCategories,
+  parseCategoryHierarchy,
   createResourceJsonLd,
   ResourceExplorer,
 } from "@/features/resources";
 import JsonLdFactory from "@/utils/jsonLd";
-import { SEARCH_TAGS } from "@/constants/category";
+import { ICategory } from "@/constants/category";
 import { parseToArray } from "@/utils/helper";
-import { CategoriesType } from "@/features/resources/utils/getCategories";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -27,37 +26,60 @@ import { Container } from "@/components/ui/wrapper";
 export const runtime = "experimental-edge";
 
 export const getServerSideProps = (async (context) => {
-  const categories = getCategories(
-    parseToArray<keyof typeof SEARCH_TAGS>(context.params?.categories)
+  const [majorCategory, subCategory = null] = parseCategoryHierarchy(
+    parseToArray(context.params?.categories)
   );
 
-  const title = categories?.[1]?.label ?? categories?.[0]?.label ?? "暫無分類";
+  if (!majorCategory) {
+    return {
+      notFound: true,
+    };
+  }
 
-  const { data } = await resourceAPI.readList();
+  const title = subCategory?.label ?? majorCategory.label;
+  const fallbackUrl = subCategory?.value
+    ? `/resource/categories/${majorCategory.value}/${subCategory.value}`
+    : `/resource/categories/${majorCategory.value}`;
 
-  const coursesJsonLd = data.resources.slice(0, 4).map(createResourceJsonLd);
+  try {
+    const { data } = await resourceAPI.readList({
+      majorCategory: majorCategory.value,
+      subCategory: subCategory?.value,
+    });
 
-  const jsonLd = JsonLdFactory.createGraph([
-    JsonLdFactory.createItemListBuilder()
-      .setName(`${title}學習資源列表`)
-      .setItems(coursesJsonLd),
-  ]);
+    const jsonLd = JsonLdFactory.createGraph([
+      JsonLdFactory.createItemListBuilder()
+        .setName(`${title}學習資源列表`)
+        .setItems(data.resources.map(createResourceJsonLd)),
+    ]);
 
-  return {
-    props: {
-      fallback: {
-        [`/resource/categories/${categories?.join("/")}`]: data,
+    return {
+      props: {
+        fallback: {
+          [fallbackUrl]: data,
+        },
+        jsonLd,
+        majorCategory,
+        subCategory,
+        title,
+        totalEstimate: data.pagination.totalEstimate ?? 0,
       },
-      jsonLd,
-      categories,
-      title,
-      totalEstimate: data.pagination.totalEstimate,
-    },
-  };
+    };
+  } catch {
+    return {
+      props: {
+        title,
+        totalEstimate: 0,
+        majorCategory,
+        subCategory,
+      },
+    };
+  }
 }) satisfies GetServerSideProps<{
-  fallback: Record<string, ResourceListResponseSchema> | null;
-  jsonLd: JsonLdType | null;
-  categories: CategoriesType;
+  fallback?: Record<string, ResourceListResponseSchema["data"]>;
+  jsonLd?: JsonLdType;
+  majorCategory: ICategory;
+  subCategory: ICategory | null;
   title: string;
   totalEstimate: number;
 }>;
@@ -65,11 +87,14 @@ export const getServerSideProps = (async (context) => {
 export default function ResourceCategoriesPage({
   fallback,
   jsonLd,
-  categories,
+  majorCategory,
+  subCategory,
   title,
   totalEstimate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  if (!categories) return null;
+  const selectedCategories = [majorCategory, subCategory].filter(
+    (value) => value !== null
+  );
 
   return (
     <SWRConfig value={{ fallback }}>
@@ -88,34 +113,33 @@ export default function ResourceCategoriesPage({
             </BreadcrumbItem>
             <BreadcrumbSeparator />
 
-            {Array.isArray(categories) &&
-              categories.map((category, index) => {
-                const isLast = index === categories.length - 1;
+            {selectedCategories.map((category, index) => {
+              const isLast = index === selectedCategories.length - 1;
 
-                if (isLast) {
-                  return (
-                    <BreadcrumbItem key={category.value}>
-                      <BreadcrumbPage>{category.label}</BreadcrumbPage>
-                    </BreadcrumbItem>
-                  );
-                }
-
+              if (isLast) {
                 return (
-                  <Fragment key={category.value}>
-                    <BreadcrumbItem>
-                      <BreadcrumbLink
-                        href={`/resource/categories/${categories
-                          .slice(0, index + 1)
-                          .map((c) => c.value)
-                          .join("/")}`}
-                      >
-                        {category.label}
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                  </Fragment>
+                  <BreadcrumbItem key={category.value}>
+                    <BreadcrumbPage>{category.label}</BreadcrumbPage>
+                  </BreadcrumbItem>
                 );
-              })}
+              }
+
+              return (
+                <Fragment key={category.value}>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink
+                      href={`/resource/categories/${selectedCategories
+                        .slice(0, index + 1)
+                        .map((c) => c.value)
+                        .join("/")}`}
+                    >
+                      {category.label}
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                </Fragment>
+              );
+            })}
           </BreadcrumbList>
         </Breadcrumb>
       </Container>
@@ -123,8 +147,8 @@ export default function ResourceCategoriesPage({
       <Container className="pb-10">
         <ResourceBanner
           size="md"
-          title={categories[0].label}
-          content="測試資料"
+          title={subCategory?.label ?? majorCategory.label}
+          content=""
           image=""
           length={totalEstimate}
         />
@@ -133,13 +157,14 @@ export default function ResourceCategoriesPage({
       <Container>
         <CategoriesContainer
           size="sm"
-          selectedCategories={categories.map((c) => c.value)}
+          selectedCategories={selectedCategories}
         />
       </Container>
 
-      <Container className="px-0 md:px-0">
-        <ResourceExplorer categories={categories} parentDataCount={32} />
-      </Container>
+      <ResourceExplorer
+        categories={selectedCategories}
+        parentDataCount={0}
+      />
     </SWRConfig>
   );
 }

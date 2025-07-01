@@ -34,7 +34,7 @@ export const getServerSideProps = (async () => {
     props: { fallback: { "/resource/categories": data }, jsonLd },
   };
 }) satisfies GetServerSideProps<{
-  fallback: Record<string, ResourceListResponseSchema> | null;
+  fallback: Record<string, ResourceListResponseSchema["data"]> | null;
   jsonLd: JsonLdType | null;
 }>;
 
@@ -64,11 +64,11 @@ export default function ResourceCategoriesPage({
         <CategoriesContainer size="sm" />
       </Container>
 
-      <Container className="pb-12 relative px-0 md:px-0">
-        <SectionTitle title="所有資源" className="pb-0 px-5 md:pb-0 md:px-24" />
-
-        <ResourceExplorer />
+      <Container>
+        <SectionTitle title="所有資源" />
       </Container>
+
+      <ResourceExplorer />
     </SWRConfig>
   );
 }

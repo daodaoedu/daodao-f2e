@@ -1,8 +1,5 @@
 import { z } from "zod";
-import {
-  baseUserSchema,
-  cursorsSchema,
-} from "@/services/_shared/schema";
+import { baseUserSchema, cursorsSchema } from "@/services/_shared/schema";
 import {
   resourceReviewSchema,
   recentResourceReviewSchema,
@@ -46,7 +43,9 @@ export const resourceSchema = z.object({
 
 export const resourceListResponseSchema = z.object({
   resources: z.array(resourceSchema),
-  pagination: cursorsSchema,
+  pagination: cursorsSchema.extend({
+    totalEstimate: z.number(),
+  }),
 });
 
 export const resourceDetailResponseSchema = resourceSchema.extend({
@@ -92,9 +91,9 @@ export const resourceSearchParamsSchema = z.object({
 
 export type ResourceSchema = z.infer<typeof resourceSchema>;
 
-export type ResourceListResponseSchema = z.infer<
-  typeof resourceListResponseSchema
->;
+export type ResourceListResponseSchema = {
+  data: z.infer<typeof resourceListResponseSchema>;
+};
 
 export type ResourceDetailResponseSchema = z.infer<
   typeof resourceDetailResponseSchema

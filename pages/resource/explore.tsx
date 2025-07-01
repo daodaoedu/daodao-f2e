@@ -39,7 +39,7 @@ export const getServerSideProps = (async () => {
     return { props: { fallback: undefined, jsonLd: undefined } };
   }
 }) satisfies GetServerSideProps<{
-  fallback: Record<string, ResourceListResponseSchema> | undefined;
+  fallback: Record<string, ResourceListResponseSchema["data"]> | undefined;
   jsonLd: JsonLdType | undefined;
 }>;
 
@@ -54,7 +54,7 @@ export default function ResourceCategoriesPage({
   return (
     <SWRConfig value={{ fallback }}>
       <SEOConfig title="探索所有資源｜島島阿學" jsonLd={jsonLd} />
-      <Container className="pt-12 px-5 md:px-24">
+      <Container className="pt-12">
         <Button
           variant="link"
           className="mb-3 px-2 -mx-2 text-basic-300"
@@ -72,9 +72,7 @@ export default function ResourceCategoriesPage({
         />
       </Container>
 
-      <Container className="pb-11 md:pb-12">
-        <ResourceExplorer />
-      </Container>
+      <ResourceExplorer />
     </SWRConfig>
   );
 }

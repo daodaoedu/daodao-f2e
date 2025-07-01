@@ -61,23 +61,23 @@ export default function ResourceCard(props: CardProps) {
   return (
     <Link
       href={`/resource/${id}`}
-      className="group flex flex-col rounded gap-2 md:flex-row md:gap-4 transition-[transform,box-shadow] hover:scale-105 hover:shadow-lg"
+      className="group flex flex-col rounded-lg gap-2 md:flex-row md:gap-4 transition-[transform,box-shadow] hover:scale-[1.01] hover:shadow-lg"
     >
       {/* Card Image */}
       <div className="relative md:basis-80 aspect-[320/241]">
-        <div className="relative h-full overflow-hidden rounded-lg">
+        <div className="p-2 relative h-full overflow-hidden rounded-lg">
           <Image
             src={coverImageUrl}
             alt={title}
             borderRadius="0.5rem"
             height="100%"
-            className="object-cover group-hover:scale-110 transition-transform"
+            className="object-cover"
             wrapperClassName="!block"
           />
         </div>
 
         {/* Card Image Label */}
-        <div className=" absolute top-3 left-3 flex flex-wrap gap-2">
+        <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           {labels.map((_label) => {
             return (
               <div
@@ -93,7 +93,7 @@ export default function ResourceCard(props: CardProps) {
       </div>
 
       {/* Card Content */}
-      <section className="flex flex-col gap-2 md:w-[calc(100%-20rem)]">
+      <section className="flex flex-col gap-2 p-2 md:w-[calc(100%-20rem)]">
         {/* Card Info */}
         <div className="flex justify-between items-center h-9">
           <div className="flex items-center body-md text-basic-500">

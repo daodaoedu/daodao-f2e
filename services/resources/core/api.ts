@@ -35,10 +35,10 @@ export const refetchResource = async () => {
 };
 
 interface ResourceAPIType {
-  read: (resourceId: string) => Promise<{ data: ResourceDetailResponseSchema }>;
+  read: (resourceId: string) => Promise<ResourceDetailResponseSchema>;
   readList: (
     query?: ResourceSearchParamsSchema
-  ) => Promise<{ data: ResourceListResponseSchema }>;
+  ) => Promise<ResourceListResponseSchema>;
   create: MutationFetcher<
     ResourceMutationResponseSchema,
     string,

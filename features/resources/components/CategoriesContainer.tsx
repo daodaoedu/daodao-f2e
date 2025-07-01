@@ -1,16 +1,17 @@
 import { useMemo, useState } from "react";
-import { CATEGORIES, SEARCH_TAGS } from "@/constants/category";
+import { CATEGORIES, ICategory, SEARCH_TAGS } from "@/constants/category";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
 import CategoryCard from "./CategoryCard";
 import SectionTitle from "./SectionTitle";
+import { getCategories } from "../utils";
 
 interface CategoriesContainerProps {
   className?: string;
   size?: "sm" | "md";
   maxLength?: number;
-  selectedCategories?: string[] | null;
+  selectedCategories?: ICategory[];
   disabledCollapse?: boolean;
 }
 
@@ -29,21 +30,13 @@ export default function CategoriesContainer({
     md: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
   };
 
-  const getCategories = () => {
-    if (!Array.isArray(selectedCategories) || selectedCategories.length === 0) {
-      return CATEGORIES;
-    }
-    if (selectedCategories.length === 1) {
-      return SEARCH_TAGS[selectedCategories[0]];
-    }
-    return null;
-  };
+  const categories = getCategories(selectedCategories?.map((c) => c.value));
+  const [majorCategory] = categories;
 
   const hasSubCategories =
-    Array.isArray(selectedCategories) &&
-    SEARCH_TAGS[selectedCategories[0]]?.length > 1;
-
-  const categories = getCategories();
+    Array.isArray(categories) &&
+    selectedCategories &&
+    SEARCH_TAGS[majorCategory?.value]?.length > 1;
 
   const categoryLength = Array.isArray(categories) ? categories.length : 0;
 
