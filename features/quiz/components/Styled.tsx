@@ -1,5 +1,5 @@
 import { cn } from "@/utils/cn";
-import QuoteSvg from "@/public/assets/daodao-test/quote.svg";
+import QuoteSvg from "@/public/assets/quiz/quote.svg";
 
 interface TitleProps extends React.PropsWithChildren {
   className?: string;

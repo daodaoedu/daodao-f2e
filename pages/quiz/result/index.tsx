@@ -9,30 +9,30 @@ import HorizontalLogoSvg from "@/public/horizontal-logo.svg";
 import VerticalLogoSvg from "@/public/vertical-logo.svg";
 import { AuthButton } from "@/contexts/Auth";
 import {
-  getDaodaoTestLayout,
+  getQuizLayout,
   themeMap,
-  useDaodaoTest,
+  useQuiz,
   Title,
   ResultChart,
   useResultStyles,
   Slogan,
   List,
-} from "@/features/daodao-test";
-import FacebookSvg from "@/public/assets/daodao-test/socials-logos/facebook.svg";
-import LineSvg from "@/public/assets/daodao-test/socials-logos/line.svg";
-import LinkedInSvg from "@/public/assets/daodao-test/socials-logos/linkedin.svg";
-import ShareWindowsSvg from "@/public/assets/daodao-test/socials-logos/share_windows.svg";
-import ThreadsSvg from "@/public/assets/daodao-test/socials-logos/threads.svg";
-import XSvg from "@/public/assets/daodao-test/socials-logos/x.svg";
+} from "@/features/quiz";
+import FacebookSvg from "@/public/assets/quiz/socials-logos/facebook.svg";
+import LineSvg from "@/public/assets/quiz/socials-logos/line.svg";
+import LinkedInSvg from "@/public/assets/quiz/socials-logos/linkedin.svg";
+import ShareWindowsSvg from "@/public/assets/quiz/socials-logos/share_windows.svg";
+import ThreadsSvg from "@/public/assets/quiz/socials-logos/threads.svg";
+import XSvg from "@/public/assets/quiz/socials-logos/x.svg";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { useDialog } from "@/contexts/Dialog";
 import getShareAPI from "@/utils/getShareAPI";
 import getEnv from "@/utils/env";
 
-export default function DaodaoTestResultPage() {
+export default function QuizResultPage() {
   const router = useRouter();
-  const { detail, theme, analysis, hasAnalysis } = useDaodaoTest();
+  const { detail, theme, analysis, hasAnalysis } = useQuiz();
   const { rootStyle } = useResultStyles(theme);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -40,7 +40,7 @@ export default function DaodaoTestResultPage() {
   const shareAPI = getShareAPI({
     title: "我有一個島，它叫...",
     text: "我有一個島，它叫...",
-    url: getEnv().isClientSide ? `${window.location.origin}/daodao-test` : "",
+    url: getEnv().isClientSide ? `${window.location.origin}/quiz` : "",
     hashtag: "#島島阿學",
   });
 
@@ -96,7 +96,7 @@ export default function DaodaoTestResultPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!hasAnalysis) {
-        router.replace("/daodao-test");
+        router.replace("/quiz");
       }
     }, 1000);
     return () => clearTimeout(timer);
@@ -275,7 +275,7 @@ export default function DaodaoTestResultPage() {
               variant="outline"
               size="lg"
               className="block w-full mb-4 text-basic-400 border-basic-400 hover:bg-basic-400"
-              onClick={() => router.push("/daodao-test")}
+              onClick={() => router.push("/quiz")}
             >
               再玩一次
             </Button>
@@ -283,7 +283,7 @@ export default function DaodaoTestResultPage() {
               variant="outline"
               size="lg"
               className="block w-full mb-6 text-basic-400 border-basic-400 hover:bg-basic-400"
-              onClick={() => router.push(`/daodao-test/result/${detail.id}`)}
+              onClick={() => router.push(`/quiz/result/${detail.id}`)}
             >
               看深度分析
             </AuthButton>
@@ -304,4 +304,4 @@ export default function DaodaoTestResultPage() {
   );
 }
 
-DaodaoTestResultPage.getLayout = getDaodaoTestLayout;
+QuizResultPage.getLayout = getQuizLayout;

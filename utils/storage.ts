@@ -1,4 +1,4 @@
-import { ResultType } from "@/features/daodao-test";
+import { ResultType } from "@/features/quiz";
 import getEnv from "./env";
 
 const fn = () => undefined;
@@ -64,5 +64,5 @@ export const getIsCheckDragMilestoneStorage = () =>
   createStorage<boolean>("_isCheckDragMilestone");
 
 /** 獲取用於存儲使用者做島島測試的 sessionStorage */
-export const getDaodaoTestStorage = () =>
-  createStorage<ResultType>("_daodaoTest", StorageType.SessionStorage);
+export const getQuizStorage = () =>
+  createStorage<ResultType>("_quiz", StorageType.SessionStorage);

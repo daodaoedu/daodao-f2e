@@ -1,14 +1,14 @@
 import { StaticImageData } from "next/image";
-import RoleDPng from "@/public/assets/daodao-test/role-d.webp";
-import RoleAPng from "@/public/assets/daodao-test/role-a.webp";
-import RoleCPng from "@/public/assets/daodao-test/role-c.webp";
-import RoleLPng from "@/public/assets/daodao-test/role-l.webp";
-import RoleOPng from "@/public/assets/daodao-test/role-o.webp";
-import DeepExplorerSvg from "@/public/assets/daodao-test/deep-explorer.svg";
-import ActiveShaperSvg from "@/public/assets/daodao-test/active-shaper.svg";
-import CommunityConnectorSvg from "@/public/assets/daodao-test/community-connector.svg";
-import LiquidIntegratorSvg from "@/public/assets/daodao-test/liquid-integrator.svg";
-import OrderBuilderSvg from "@/public/assets/daodao-test/order-builder.svg";
+import RoleDPng from "@/public/assets/quiz/role-d.webp";
+import RoleAPng from "@/public/assets/quiz/role-a.webp";
+import RoleCPng from "@/public/assets/quiz/role-c.webp";
+import RoleLPng from "@/public/assets/quiz/role-l.webp";
+import RoleOPng from "@/public/assets/quiz/role-o.webp";
+import DeepExplorerSvg from "@/public/assets/quiz/deep-explorer.svg";
+import ActiveShaperSvg from "@/public/assets/quiz/active-shaper.svg";
+import CommunityConnectorSvg from "@/public/assets/quiz/community-connector.svg";
+import LiquidIntegratorSvg from "@/public/assets/quiz/liquid-integrator.svg";
+import OrderBuilderSvg from "@/public/assets/quiz/order-builder.svg";
 
 export type AnalysisType = {
   D: number;

@@ -9,10 +9,10 @@ import RunnerSvg from "@/public/assets/icons/runner.svg";
 import { cn } from "@/utils/cn";
 import {
   AnswerKey,
-  getDaodaoTestLayout,
+  getQuizLayout,
   questionMap,
-  useDaodaoTest,
-} from "@/features/daodao-test";
+  useQuiz,
+} from "@/features/quiz";
 import { parseToString } from "@/utils/helper";
 
 export const getStaticPaths = async () => {
@@ -36,13 +36,13 @@ export const getStaticProps = (async (context) => {
   questionId?: string | null;
 }>;
 
-const basePath = "/daodao-test/questions";
+const basePath = "/quiz/questions";
 
-export default function DaodaoTestQuestionPage({
+export default function QuizQuestionPage({
   questionId,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const router = useRouter();
-  const { result, selectAnswer } = useDaodaoTest();
+  const { result, selectAnswer } = useQuiz();
   const question = questionMap.get(questionId ?? "");
 
   if (!question) return null;
@@ -189,4 +189,4 @@ export default function DaodaoTestQuestionPage({
   );
 }
 
-DaodaoTestQuestionPage.getLayout = getDaodaoTestLayout;
+QuizQuestionPage.getLayout = getQuizLayout;

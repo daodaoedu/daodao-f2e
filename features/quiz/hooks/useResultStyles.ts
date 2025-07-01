@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import ResultNoisePng from "@/public/assets/daodao-test/result-noise.png";
+import ResultNoisePng from "@/public/assets/quiz/result-noise.png";
 
 interface Theme {
   backgroundColor: string;

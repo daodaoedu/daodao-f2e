@@ -1,7 +1,7 @@
-import { DaodaoTestProvider } from "./contexts";
+import { QuizProvider } from "./contexts";
 
-export const getDaodaoTestLayout = (page: React.ReactElement) => (
-  <DaodaoTestProvider>
+export const getQuizLayout = (page: React.ReactElement) => (
+  <QuizProvider>
     <style>
       {`
         @font-face {
@@ -13,5 +13,5 @@ export const getDaodaoTestLayout = (page: React.ReactElement) => (
     </style>
     {page}
     <div className="font-[JejuHallasan] invisible fixed -z-10">預載字體</div>
-  </DaodaoTestProvider>
+  </QuizProvider>
 );

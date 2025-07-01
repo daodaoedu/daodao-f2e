@@ -6,16 +6,16 @@ import SEOConfig from "@/shared/components/SEO";
 import { Button } from "@/components/ui/button";
 import HorizontalLogoSvg from "@/public/horizontal-logo.svg";
 import {
-  getDaodaoTestLayout,
+  getQuizLayout,
   resultDetailMap,
   themeMap,
-  useDaodaoTest,
+  useQuiz,
   Title,
   ResultChart,
   useResultStyles,
   Slogan,
   List,
-} from "@/features/daodao-test";
+} from "@/features/quiz";
 import { parseToString } from "@/utils/helper";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
@@ -43,10 +43,10 @@ export const getStaticProps = (async (context) => {
   resultId?: string | null;
 }>;
 
-export default function DaodaoTestResultDetailPage({
+export default function QuizResultDetailPage({
   resultId,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const { analysis, hasAnalysis, detail } = useDaodaoTest();
+  const { analysis, hasAnalysis, detail } = useQuiz();
   const resultDetail = resultDetailMap.get(resultId ?? "");
   const theme = themeMap.get(resultId ?? "");
   const showSelfAnalysis = hasAnalysis && detail?.id === resultId;
@@ -66,7 +66,7 @@ export default function DaodaoTestResultDetailPage({
             <BackButton
               label="返回結果頁"
               className="text-sm font-normal"
-              onClick={(router) => router.push("/daodao-test/result")}
+              onClick={(router) => router.push("/quiz/result")}
             />
             <h1 className="heading-md mb-3">群島全圖鑑</h1>
             <section className="mb-4 flex items-center">
@@ -164,7 +164,7 @@ export default function DaodaoTestResultDetailPage({
                         <Link
                           className="flex flex-col body-sm font-bold items-center gap-2 p-3 bg-white rounded-md"
                           style={{ color }}
-                          href={`/daodao-test/result/${id}`}
+                          href={`/quiz/result/${id}`}
                         >
                           <SmallImg />
                           {title}
@@ -181,4 +181,4 @@ export default function DaodaoTestResultDetailPage({
   );
 }
 
-DaodaoTestResultDetailPage.getLayout = getDaodaoTestLayout;
+QuizResultDetailPage.getLayout = getQuizLayout;

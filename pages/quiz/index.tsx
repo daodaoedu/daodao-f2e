@@ -3,13 +3,13 @@ import Link from "next/link";
 import Image from "next/image";
 import SEOConfig from "@/shared/components/SEO";
 import HorizontalLogoSvg from "@/public/horizontal-logo.svg";
-import question1Jpg from "@/public/assets/daodao-test/q1.webp";
-import ResultNoisePng from "@/public/assets/daodao-test/result-noise.png";
+import question1Jpg from "@/public/assets/quiz/q1.webp";
+import ResultNoisePng from "@/public/assets/quiz/result-noise.png";
 import { Button } from "@/components/ui/button";
-import { getDaodaoTestLayout, useDaodaoTest } from "@/features/daodao-test";
+import { getQuizLayout, useQuiz } from "@/features/quiz";
 
-export default function DaodaoTestPage() {
-  const { reset } = useDaodaoTest();
+export default function QuizPage() {
+  const { reset } = useQuiz();
 
   useEffect(reset, []);
 
@@ -65,11 +65,11 @@ export default function DaodaoTestPage() {
           size="lg"
           asChild
         >
-          <Link href="/daodao-test/questions/q1">開始測驗</Link>
+          <Link href="/quiz/questions/q1">開始測驗</Link>
         </Button>
       </main>
     </>
   );
 }
 
-DaodaoTestPage.getLayout = getDaodaoTestLayout;
+QuizPage.getLayout = getQuizLayout;

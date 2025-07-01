@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { getDaodaoTestStorage } from "@/utils/storage";
+import { getQuizStorage } from "@/utils/storage";
 import {
   AnswerKey,
   questionMap,
@@ -18,7 +18,7 @@ import {
 } from "./constants";
 import { isAnswerValue, isQuestionId, parseResult, ResultType } from "./utils";
 
-type DaodaoTestContextType = {
+type QuizContextType = {
   result: ResultType;
   analysis: Record<AnswerKey, number>;
   hasAnalysis: boolean;
@@ -74,19 +74,19 @@ const calculateAnalysis = (result: ResultType) => {
   return scores;
 };
 
-export const DaodaoTestContext = createContext<DaodaoTestContextType | null>(
+export const QuizContext = createContext<QuizContextType | null>(
   null
 );
 
-export const useDaodaoTest = () => {
-  const context = useContext(DaodaoTestContext);
+export const useQuiz = () => {
+  const context = useContext(QuizContext);
   if (!context) {
-    throw new Error("useDaodaoTest must be used within a DaodaoTestProvider");
+    throw new Error("useQuiz must be used within a QuizProvider");
   }
   return context;
 };
 
-export const DaodaoTestProvider = ({ children }: React.PropsWithChildren) => {
+export const QuizProvider = ({ children }: React.PropsWithChildren) => {
   const router = useRouter();
   const [internalResult, setInternalResult] = useState<ResultType>({});
 
@@ -102,9 +102,9 @@ export const DaodaoTestProvider = ({ children }: React.PropsWithChildren) => {
       };
       setInternalResult(newResult);
       if (nextStep > questionMap.size) {
-        router.push("/daodao-test/result");
+        router.push("/quiz/result");
       } else {
-        router.push(`/daodao-test/questions/q${nextStep}`);
+        router.push(`/quiz/questions/q${nextStep}`);
       }
     },
     [internalResult, router]
@@ -126,28 +126,28 @@ export const DaodaoTestProvider = ({ children }: React.PropsWithChildren) => {
       theme: themeMap.get(resultId),
       reset: () => {
         setInternalResult({});
-        getDaodaoTestStorage().remove();
+        getQuizStorage().remove();
       },
       selectAnswer,
     };
   }, [internalResult, selectAnswer]);
 
   useEffect(() => {
-    const data = parseResult(getDaodaoTestStorage().get());
+    const data = parseResult(getQuizStorage().get());
     if (data) {
       setInternalResult(data);
     } else {
-      getDaodaoTestStorage().remove();
+      getQuizStorage().remove();
     }
   }, []);
 
   useEffect(() => {
-    getDaodaoTestStorage().set(internalResult);
+    getQuizStorage().set(internalResult);
   }, [internalResult]);
 
   return (
-    <DaodaoTestContext.Provider value={value}>
+    <QuizContext.Provider value={value}>
       {children}
-    </DaodaoTestContext.Provider>
+    </QuizContext.Provider>
   );
 };
