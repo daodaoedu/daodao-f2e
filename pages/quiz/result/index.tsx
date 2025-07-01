@@ -29,12 +29,12 @@ import { Badge } from "@/components/ui/badge";
 import { useDialog } from "@/contexts/Dialog";
 import getShareAPI from "@/utils/getShareAPI";
 import getEnv from "@/utils/env";
+import { GACategory, logEvent } from "@/utils/analytics";
 
 export default function QuizResultPage() {
   const router = useRouter();
   const { detail, theme, analysis, hasAnalysis } = useQuiz();
   const { rootStyle } = useResultStyles(theme);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const mainRef = useRef<HTMLDivElement>(null);
   const { openDialog } = useDialog();
   const shareAPI = getShareAPI({
@@ -69,6 +69,7 @@ export default function QuizResultPage() {
           anchor.href = dataUrl;
           anchor.download = `${theme.title}.jpeg`;
           anchor.click();
+          logEvent(GACategory.User, "Download Result", `Theme: ${theme.title}`);
         } finally {
           anchor.remove();
         }
@@ -76,21 +77,14 @@ export default function QuizResultPage() {
     });
   };
 
-  const handleTouchStart = () => {
-    timerRef.current = setTimeout(() => {
-      handleOpenDialog();
-    }, 1000);
+  const handleReplay = () => {
+    logEvent(GACategory.User, "Replay Quiz");
+    router.push("/quiz");
   };
 
-  const handleTouchEnd = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-  };
-
-  const handleClick = () => {
-    handleOpenDialog();
+  const handleViewAnalysis = () => {
+    logEvent(GACategory.User, "View Quiz Analysis", `Detail ID: ${detail?.id}`);
+    router.push(`/quiz/result/${detail?.id}`);
   };
 
   useEffect(() => {
@@ -112,9 +106,7 @@ export default function QuizResultPage() {
           <button
             type="button"
             className="border-b border-dashed border-[var(--color)] sm:border"
-            onClick={handleClick}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
+            onClick={handleOpenDialog}
           >
             <main
               ref={mainRef}
@@ -275,7 +267,7 @@ export default function QuizResultPage() {
               variant="outline"
               size="lg"
               className="block w-full mb-4 text-basic-400 border-basic-400 hover:bg-basic-400"
-              onClick={() => router.push("/quiz")}
+              onClick={handleReplay}
             >
               再玩一次
             </Button>
@@ -283,7 +275,7 @@ export default function QuizResultPage() {
               variant="outline"
               size="lg"
               className="block w-full mb-6 text-basic-400 border-basic-400 hover:bg-basic-400"
-              onClick={() => router.push(`/quiz/result/${detail.id}`)}
+              onClick={handleViewAnalysis}
             >
               看深度分析
             </AuthButton>
