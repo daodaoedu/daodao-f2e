@@ -40,7 +40,7 @@ export const useCreateResourceReview = (
       ...options,
       onSuccess: (data, key, config) => {
         onSuccess?.(data, key, config);
-        refetchResourceReviews();
+        refetchResourceReviews(resourceId);
       },
     }
   );
@@ -60,7 +60,7 @@ export const useUpdateResourceReview = (
       ...options,
       onSuccess: (data, key, config) => {
         onSuccess?.(data, key, config);
-        refetchResourceReviews();
+        refetchResourceReviews(resourceId);
       },
     }
   );
@@ -80,7 +80,7 @@ export const useDeleteResourceReview = (
       ...options,
       onSuccess: (data, key, config) => {
         onSuccess?.(data, key, config);
-        refetchResourceReviews();
+        refetchResourceReviews(resourceId);
       },
     }
   );

@@ -29,10 +29,13 @@ export const getResourceReviewPathname = ({
   return pathname;
 };
 
-export const refetchResourceReviews = async (resourceId: string) => {
+export const refetchResourceReviews = async (resourceId: string | null) => {
   await mutate((key: unknown) => {
     const pathname = Array.isArray(key) ? key[0] : key;
-    return pathname.includes(getResourcePathname({ resourceId }));
+    if (resourceId) {
+      return pathname.includes(getResourcePathname({ resourceId }));
+    }
+    return pathname.includes(getResourcePathname());
   });
 };
 
