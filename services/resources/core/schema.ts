@@ -95,9 +95,9 @@ export type ResourceListResponseSchema = {
   data: z.infer<typeof resourceListResponseSchema>;
 };
 
-export type ResourceDetailResponseSchema = z.infer<
-  typeof resourceDetailResponseSchema
->;
+export type ResourceDetailResponseSchema = {
+  data: z.infer<typeof resourceDetailResponseSchema>;
+};
 
 export type ResourceFormSchema = z.infer<typeof resourceFormSchema>;
 

@@ -10,7 +10,7 @@ import BoxSvg from "@/public/assets/icons/box.svg";
 import VideoSvg from "@/public/assets/icons/video.svg";
 
 interface ResourceDetailProps {
-  resource: ResourceDetailResponseSchema;
+  resource: ResourceDetailResponseSchema["data"];
 }
 
 export default function ResourceDetail({ resource }: ResourceDetailProps) {

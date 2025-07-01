@@ -45,7 +45,7 @@ export const getServerSideProps = (async (context) => {
     },
   };
 }) satisfies GetServerSideProps<{
-  data: ResourceDetailResponseSchema | null;
+  data: ResourceDetailResponseSchema["data"] | null;
 }>;
 
 export default function EditResourcePage({

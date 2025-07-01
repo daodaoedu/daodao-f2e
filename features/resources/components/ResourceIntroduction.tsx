@@ -5,7 +5,7 @@ import ShellSvg from "@/public/assets/icons/shell.svg";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
 
 interface ResourceIntroductionProps {
-  resource: ResourceDetailResponseSchema;
+  resource: ResourceDetailResponseSchema["data"];
 }
 
 export default function ResourceIntroduction({

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
 
 interface ContributorInfoProps {
-  user: ResourceDetailResponseSchema["user"];
+  user: ResourceDetailResponseSchema["data"]["user"];
 }
 
 export default function ContributorInfo({ user }: ContributorInfoProps) {

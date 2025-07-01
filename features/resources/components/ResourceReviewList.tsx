@@ -5,7 +5,7 @@ import { AuthButton } from "@/contexts/Auth";
 import ResourceReviewCard from "./ResourceReviewCard";
 
 interface ResourceReviewListProps {
-  resource: ResourceDetailResponseSchema;
+  resource: ResourceDetailResponseSchema["data"];
   onCreateReview: () => void;
 }
 
