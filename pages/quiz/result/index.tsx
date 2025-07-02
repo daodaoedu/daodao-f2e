@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
@@ -36,6 +37,7 @@ export default function QuizResultPage() {
   const { detail, theme, analysis, hasAnalysis } = useQuiz();
   const { rootStyle } = useResultStyles(theme);
   const mainRef = useRef<HTMLDivElement>(null);
+  const cleanupRef = useRef<() => void>(() => {});
   const { openDialog } = useDialog();
   const shareAPI = getShareAPI({
     title: "我有一個島，它叫...",
@@ -63,13 +65,39 @@ export default function QuizResultPage() {
         if (!mainRef.current || !theme) return;
         const anchor = document.createElement("a");
         try {
+          // 確保所有圖片都載入完成
+          const images = mainRef.current.querySelectorAll("img");
+          await Promise.all(
+            Array.from(images).map((img) => {
+              if (img.complete) return Promise.resolve();
+              return new Promise<void>((resolve, reject) => {
+                const handleLoad = () => resolve();
+                const handleError = () => reject();
+                cleanupRef.current();
+                img.addEventListener("load", handleLoad);
+                img.addEventListener("error", handleError);
+                // 設定超時，避免無限等待
+                setTimeout(() => reject(new Error("Image load timeout")), 5000);
+                cleanupRef.current = () => {
+                  img.removeEventListener("load", handleLoad);
+                  img.removeEventListener("error", handleError);
+                };
+              });
+            })
+          );
+
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
           const dataUrl = await toJpeg(mainRef.current, {
             quality: 0.95,
+            pixelRatio: window.devicePixelRatio,
           });
           anchor.href = dataUrl;
           anchor.download = `${theme.title}.jpeg`;
           anchor.click();
           logEvent(GACategory.User, "Download Result", `Theme: ${theme.title}`);
+        } catch {
+          toast.error("下載圖片失敗");
         } finally {
           anchor.remove();
         }
@@ -93,7 +121,10 @@ export default function QuizResultPage() {
         router.replace("/quiz");
       }
     }, 1000);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      cleanupRef.current();
+    };
   }, [hasAnalysis, router]);
 
   if (!hasAnalysis || !detail || !theme) return null;
@@ -140,11 +171,15 @@ export default function QuizResultPage() {
                 </div>
                 <div className="relative basis-44">
                   <AspectRatio ratio={9 / 7}>
-                    <Image
-                      src={theme.largeImg}
+                    {/* 使用 img 標籤替代 Next.js Image 組件，避免 html-to-image 轉換問題 */}
+                    <img
+                      src={
+                        typeof theme.largeImg === "string"
+                          ? theme.largeImg
+                          : theme.largeImg.src
+                      }
                       alt={theme.title}
-                      fill
-                      priority
+                      className="w-full h-full object-cover"
                     />
                   </AspectRatio>
                 </div>
