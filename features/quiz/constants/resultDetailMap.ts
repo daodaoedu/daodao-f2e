@@ -20,6 +20,7 @@ export type ResultDetailType = {
   islandDining: string[];
   islandDiningDescription: string;
   recommendedResources: string;
+  recommendedResourceLinks: { text: string; link: string }[];
 };
 
 const resultDetailList: ResultDetailType[] = [
@@ -64,6 +65,16 @@ const resultDetailList: ResultDetailType[] = [
     islandDiningDescription: "草仔粿奶茶、鹹水雞，知識總是越嚼越香",
     recommendedResources:
       "推薦你系統思考 (Systems Thinking)，帶著有架構的方法滿足你深究事物本質的渴望。它帶你穿透表面的「事件」，看見其下的「模式」、驅動模式的「結構」（回饋迴圈），以及最底層的「心智模式」。這套框架讓你不再只解決症狀，而是能找到改變全局的關鍵槓桿點。《系統思考教案書第一章：擁抱複雜新世界》、《系統思考教案書第二章：系統動力學入門》by 楊逸帆（Adler Yang）將是你入門學習的好資源。",
+    recommendedResourceLinks: [
+      {
+        text: "《系統思考教案書第一章：擁抱複雜新世界》",
+        link: "https://www.researchgate.net/publication/362620988_xitongsikaojiaoanshudiyizhangyongbaofuzaxinshijie_Chapter_1_Embracing_the_World_of_Complexity_in_forthcoming_Systems_Dynamics_Handbook_for_K-12_Teachers",
+      },
+      {
+        text: "《系統思考教案書第二章：系統動力學入門》",
+        link: "https://www.researchgate.net/publication/362621191_xitongsikaojiaoanshudierzhangxitongdonglixuerumen_Chapter_2_A_Short_Introduction_of_Systems_Dynamics_in_forthcoming_Systems_Dynamics_Handbook_for_K-12_Teachers",
+      },
+    ],
   },
 
   {
@@ -107,6 +118,12 @@ const resultDetailList: ResultDetailType[] = [
     islandDiningDescription: "珍奶、雞排，經典組合讓你天天滿血",
     recommendedResources:
       "推薦你一個熱愛動手解決社會問題的公民科技社群：g0v 零時政府社群，g0v 有一萬多位熱血公民，自發性用科技協作，解決各式社會問題！他們的名言是「不要問為什麼沒有人做這個，先承認你就是那個沒有人」，與其抱怨，不然自己動手嘗試解決問題！歡迎加入 Nobody 的行列！",
+    recommendedResourceLinks: [
+      {
+        text: "g0v 零時政府社群",
+        link: "https://g0v.tw/",
+      },
+    ],
   },
 
   {
@@ -151,6 +168,12 @@ const resultDetailList: ResultDetailType[] = [
       "四季春珍波椰、肉粽，可以明確知道有哪些食材就給讚！",
     recommendedResources:
       "Notion 筆記軟體能滿足結構者「組織一切」的渴望。它能建立資料庫、關聯頁面與進度看板，將散亂的想法、筆記與專案，整合成一個彼此連結、一目了然的個人系統。這座專屬於你的知識庫，能將你的結構化天賦，發揮到淋漓盡致。還有很多筆記或專案管理工具等你去探索唷！",
+    recommendedResourceLinks: [
+      {
+        text: "Notion 筆記軟體",
+        link: "https://www.notion.com/templates/category/design-portfolio",
+      },
+    ],
   },
 
   {
@@ -194,6 +217,12 @@ const resultDetailList: ResultDetailType[] = [
       "烤糖蕎麥凍奶青、巧克力小籠包，越怪我越愛，意想不到的組合總是會迸出新滋味！",
     recommendedResources:
       "當你腦中充滿了跳躍的靈感與跨界的連結，推薦你卡片盒筆記法 (Zettelkasten)，它是為非線性思考而生的知識管理方法。它鼓勵你將每個靈感寫在一張獨立卡片上，並透過標籤與連結，讓知識點自然地串連成網。這能讓你的創意不再隨風而逝，而是在一個不斷增生的知識網絡中彼此碰撞，衍生出意想不到的深刻洞見。推薦你《卡片盒筆記：最高效思考筆記術，德國教授超強秘技，促進寫作、學習與思考，使你洞見源源不斷，成為專家》一書，作為入門資源。另外目前也有許多卡片盒筆記軟體可以使用，例如 Heptabase、Obsidian！",
+    recommendedResourceLinks: [
+      {
+        text: "《卡片盒筆記：最高效思考筆記術，德國教授超強秘技，促進寫作、學習與思考，使你洞見源源不斷，成為專家》by Sonke Ahrens",
+        link: "https://www.books.com.tw/products/0010922143?gad_source=1&gad_campaignid=22581294866&gbraid=0AAAAAD4DKPynyl6FAKKuBir4zoHgj1y5x&gclid=CjwKCAjwpMTCBhA-EiwA_-MsmTw1NKZMtNIi1770Xg3VwjFd_IQ1a-zI2HuLSHvsV94DJ36tp-VtjRoCeUYQAvD_BwE",
+      },
+    ],
   },
 
   {
@@ -238,6 +267,12 @@ const resultDetailList: ResultDetailType[] = [
       "地瓜球、高山烏龍茶，每一個都是快樂分享餐，與你分享的快樂勝過獨自擁有（要肥一起肥ＸＤ）",
     recommendedResources:
       "想讓一群人的對話自然發生、人人投入、且不僅止於漫談嗎？試試「開放空間技術 (Open Space Technology)」。這套方法沒有預設議程，由參與者現場決定最重要的討論主題，在聚焦討論主題的同時，也落實核心的「兩條腿法則」，賦予每個人自由移動的權利，確保所有討論都充滿能量。你的任務不再是控制，而是信任社群，讓重要的事自然發生。",
+    recommendedResourceLinks: [
+      {
+        text: "開放空間介紹與案例（by 開拓文教基金會）",
+        link: "https://openspacetaiwan.blogspot.com/#",
+      },
+    ],
   },
 ];
 

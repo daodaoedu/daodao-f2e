@@ -9,9 +9,7 @@ import {
   getQuizLayout,
   resultDetailMap,
   themeMap,
-  useQuiz,
   Title,
-  ResultChart,
   useResultStyles,
   Slogan,
   List,
@@ -21,6 +19,8 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { ProtectedComponent } from "@/contexts/Auth";
 import { BackButton } from "@/components/ui/back-button";
+import { SquareArrowOutUpRightIcon } from "lucide-react";
+import { cn } from "@/utils/cn";
 
 export const getStaticPaths = async () => {
   const paths = ["a", "c", "d", "l", "o"].map((resultId) => ({
@@ -46,10 +46,8 @@ export const getStaticProps = (async (context) => {
 export default function QuizResultDetailPage({
   resultId,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const { analysis, hasAnalysis, detail } = useQuiz();
   const resultDetail = resultDetailMap.get(resultId ?? "");
   const theme = themeMap.get(resultId ?? "");
-  const showSelfAnalysis = hasAnalysis && detail?.id === resultId;
   const { rootStyle } = useResultStyles(theme);
 
   if (!resultDetail || !theme) return null;
@@ -100,11 +98,6 @@ export default function QuizResultDetailPage({
             </section>
             <Slogan>{resultDetail.slogan}</Slogan>
             <div className="mb-6 space-y-4 bg-white rounded-md p-4">
-              <ResultChart
-                analysis={showSelfAnalysis ? analysis : theme.analysis}
-                color={theme.color}
-                className="aspect-[36/35] max-w-[158px] w-full mx-auto"
-              />
               <section>
                 <Title>島民特質</Title>
                 <p>{resultDetail.learningTraits}</p>
@@ -146,6 +139,29 @@ export default function QuizResultDetailPage({
               <section>
                 <Title>推薦資源</Title>
                 <p>{resultDetail.recommendedResources}</p>
+                <ul>
+                  {resultDetail.recommendedResourceLinks.map(
+                    ({ text, link }) => (
+                      <li key={text}>
+                        <Link
+                          href={link}
+                          className={cn(
+                            "flex justify-between items-start underline mt-2",
+                            "text-sm font-bold text-basic-400 w-full "
+                          )}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {text}
+                          <SquareArrowOutUpRightIcon
+                            size={20}
+                            className="text-primary-base shrink-0"
+                          />
+                        </Link>
+                      </li>
+                    )
+                  )}
+                </ul>
               </section>
               <Button className="w-full font-bold" size="lg">
                 生成主題實踐！開始行動！

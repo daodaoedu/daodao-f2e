@@ -317,8 +317,9 @@ export default function QuizResultPage() {
             <footer className="p-5 bg-white rounded-md flex flex-col items-center">
               <VerticalLogoSvg />
               <p className="my-6 text-sm text-center">
-                島島阿學是為「相信學習可以不一樣的人」所打造的學習行動平台。以教育科技與社群，匯集學習經驗、資源、人脈，以及打造個人化學習管理與展現系統，賦予每個人掌控學習旅程的能力。
-                這裡，是個人成長與集體智慧交會的所在
+                島島阿學是為「相信學習可以不一樣的人」所打造的學習平台。
+                以科技與社群，匯集學習經驗、資源、人脈，並提供個人化學習管理與技能展現的工具，賦予每個人掌握學習旅程的能力。
+                這裡，是個人成長與集體智慧交會的所在。
               </p>
               <Button className="w-full" size="lg" asChild>
                 <Link href="/">前往 島島阿學</Link>
