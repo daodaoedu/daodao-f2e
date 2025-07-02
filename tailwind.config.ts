@@ -206,6 +206,18 @@ export default {
       ];
       times.forEach((time) => {
         addUtilities({
+        ".scrollbar-hide": {
+          /* IE and Edge */
+          "-ms-overflow-style": "none",
+          /* Firefox */
+          "scrollbar-width": "none",
+          /* Safari and Chrome */
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+        },
+      });
+      addUtilities({
           [`.animate-delay-${time}`]: {
             "--animation-delay": `${time}ms`,
           },

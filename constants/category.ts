@@ -299,19 +299,19 @@ export const LOGGED_OUT_NAV_LINK = [
 
 export const LOGGED_IN_NAV_LINK = [
   {
-    name: "探索",
-    link: "/#explore",
-    target: "_self",
+    name: '探索',
+    link: '/explore',
+    target: '_self',
   },
   {
-    name: "交流",
-    link: "/#community",
-    target: "_self",
+    name: '交流',
+    link: '/community',
+    target: '_self',
   },
   {
-    name: "資源",
-    link: "/new-resource",
-    target: "_self",
+    name: '資源',
+    link: '/resource',
+    target: '_self',
   },
 ];
 

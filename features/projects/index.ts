@@ -22,3 +22,7 @@ export { default as SelectProjectModal } from "./components/SelectProjectModal";
 export { default as useCreateProject } from "./hooks/useCreateProject";
 export { default as useMarathonAccess } from "./hooks/useMarathonAccess";
 export { default as useMilestonesDateRange } from "./hooks/useMilestonesDateRange";
+
+// Export home page section components
+export { default as ProjectsRecommendationSection } from './components/ProjectsRecommendationSection';
+export { default as ProjectsExploreSection } from './components/ProjectsExploreSection';

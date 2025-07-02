@@ -39,6 +39,7 @@ const useFetch = (url, { enabled = true, initialValue, onSuccess } = {}) => {
       .catch(() => setIsError(true))
       .finally(() => setIsFetching(false));
 
+    // eslint-disable-next-line consistent-return
     return () => {
       pass = false;
     };

@@ -1,27 +1,25 @@
-import React, { useMemo } from 'react';
-import { useRouter } from 'next/router';
+import React from 'react';
 import SEOConfig from '@/shared/components/SEO';
-import Idea from '@/components/Idea/Idea';
+import { IdeasFeature } from '@/features/ideas';
 
-const IdeaPage: React.FC = () => {
-  const router = useRouter();
-  const SEOData = useMemo(() => ({
-    title: 'Idea Learning List｜島島阿學',
+const IdeasPage: React.FC = () => {
+  const seoData = {
+    title: 'Ideas Sharing Platform | 想法分享平台 | 島島阿學',
     description:
-      '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-    keywords: '島島阿學',
+      '分享你的學習洞察和創新想法，與島友們一起成長。「島島阿學」提供多元的學習資源網絡，讓自主學習者能找到合適的成長方法。',
+    keywords: '想法分享,創新思維,學習洞察,島島阿學,Ideas,Creative Thinking',
     author: '島島阿學',
     copyright: '島島阿學',
     imgLink: 'https://www.daoedu.tw/preview.webp',
-    link: `${process.env.HOSTNAME}${router?.asPath}`,
-  }), [router?.asPath]);
+    link: `${process.env.HOSTNAME}/ideas`,
+  };
 
   return (
     <>
-      <SEOConfig {...SEOData} />
-      <Idea />
+      <SEOConfig {...seoData} />
+      <IdeasFeature />
     </>
   );
 };
 
-export default IdeaPage;
+export default IdeasPage;
