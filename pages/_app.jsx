@@ -2,6 +2,7 @@ import { z } from 'zod';
 import React, { useEffect, useMemo } from 'react';
 import { SWRConfig } from 'swr';
 import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { ThemeProvider } from '@mui/material/styles';
@@ -28,6 +29,7 @@ import "@/shared/styles/global.css";
 import 'dayjs/locale/zh-tw';
 
 dayjs.locale('zh-tw');
+dayjs.extend(isBetween);
 
 const swrConfig = {
   revalidateOnFocus: false,
