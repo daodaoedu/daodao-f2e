@@ -49,7 +49,7 @@ export default function ResourceCategoriesPage({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [getSearchParams] = useSearchParamsManager();
   const searchParams = getSearchParams();
-  const keyword = searchParams?.q;
+  const keyword = searchParams?.query;
 
   return (
     <SWRConfig value={{ fallback }}>

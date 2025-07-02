@@ -33,11 +33,11 @@ export default function ResourceExplorer({
       <ResourceSearchBar filters={filters} onFilter={setFilters} />
 
       {filters.query && (
-        <div className="text-basic-500 body-sm px-5 pb-6 md:px-24">
+        <Container className="text-basic-500 body-sm pb-6">
           "{filters.query}" 共搜尋到
           <span className="mx-1 text-primary-base font-bold">{totalCount}</span>
           筆
-        </div>
+        </Container>
       )}
 
       <Container className="pb-6">

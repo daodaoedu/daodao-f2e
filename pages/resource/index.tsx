@@ -1,4 +1,5 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { useRouter } from "next/router";
 import Link from "next/link";
 import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
 import { ChevronRightIcon } from "lucide-react";
@@ -36,6 +37,8 @@ export default function ResourcePage({
   data,
   jsonLd,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const router = useRouter();
+
   return (
     <>
       <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
@@ -45,6 +48,9 @@ export default function ResourcePage({
         content="藉由他人真實的資源使用經驗，找到真正適合自己的學習資源，透過個人化推薦系統，幫助每位學習者在龐大的學習資源中，快速找到最適合自己的內容！"
         image=""
         hotTags={HOT_TAGS}
+        onSearch={(value) => {
+          router.push(`/resource/explore?query=${value}`);
+        }}
       />
 
       {/* 熱門資源, 最新資源, 熱門分類 */}

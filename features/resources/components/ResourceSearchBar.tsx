@@ -3,12 +3,12 @@ import {
   SearchIcon,
   SlidersHorizontalIcon,
   ChartNoAxesColumnDecreasingIcon,
+  SendHorizontalIcon,
 } from "lucide-react";
 import useShadowToggleOnScroll from "@/hooks/useShadowToggleOnScroll";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import useDebounce from "@/hooks/useDebounce";
 import { ResourceSearchParamsSchema } from "@/services/resources/core/schema";
 import { Container } from "@/components/ui/wrapper";
 import ResourceSearchModal from "./ResourceSearchModal";
@@ -28,8 +28,6 @@ export default function ResourceSearchBar({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { height, isShowShadow, TriggerElement } = useShadowToggleOnScroll();
 
-  const debouncedUpdateSearch = useDebounce(onFilter, 500);
-
   const handleOpenFilter = () => {
     setIsFilterOpen(true);
   };
@@ -40,10 +38,10 @@ export default function ResourceSearchBar({
 
   useEffect(() => {
     if (query !== prevQueryRef.current) {
-      debouncedUpdateSearch({ query });
+      onFilter({ query });
     }
     prevQueryRef.current = query;
-  }, [query, debouncedUpdateSearch]);
+  }, [query, onFilter]);
 
   useEffect(() => {
     if (!isReady.current && (filters?.query || query)) {
@@ -65,10 +63,10 @@ export default function ResourceSearchBar({
         <Container className="flex justify-between flex-col gap-4 md:flex-row">
           <Input
             prefixIcon={<SearchIcon />}
+            suffixIcon={(v) => v.length > 0 && <SendHorizontalIcon />}
             className="md:w-1/2"
-            value={query}
-            hasClearButton
-            onValueChange={setQuery}
+            defaultValue={query}
+            onSuffixIconClick={setQuery}
             placeholder="想找什麼資源..."
           />
           <div className="flex gap-3 justify-end">
