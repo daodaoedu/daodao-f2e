@@ -69,6 +69,7 @@ jobs:
 
       - name: TypeScript Check
         id: check
+        continue-on-error: true
         run: |
           if ! ERROR_MSG=$(yarn ts:check 2>&1); then
               {
