@@ -30,7 +30,7 @@ export const contactSchema = z
 
 export const userSchema = z.object({
   _id: z.string(),
-  id: z.number(),
+  id: z.string(),
   name: z.string(),
   roleList: z
     .array(z.string(), { required_error: "請選擇角色" })
