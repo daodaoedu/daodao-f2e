@@ -57,7 +57,7 @@ export default function EditResourcePage({
     useUpdateResource(data.id, {
       onSuccess: () => {
         toast.success("資源分享成功！");
-        router.push("/search");
+        router.push("/resource");
       },
       onError: (error) => {
         console.error("提交資源時發生錯誤:", error);

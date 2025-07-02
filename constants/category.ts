@@ -239,7 +239,7 @@ export const HOT_TAGS = [
 export const NAV_LINK = [
   {
     name: "找資源",
-    link: "/search",
+    link: "/resource",
     target: "_self",
   },
   {
@@ -344,7 +344,7 @@ export const USER_LINK = [
 export const FOOTER_LINK = [
   {
     name: "找資源",
-    link: "/search",
+    link: "/resource",
     target: "_self",
   },
   {

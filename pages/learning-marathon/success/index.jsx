@@ -158,7 +158,7 @@ const LearningMarathonSignUp = () => {
           </StyledButton>
           <StyledButton
             variant="contained"
-            onClick={() => router.push('/search')}
+            onClick={() => router.push('/resource')}
           >
             尋找學習資源
           </StyledButton>
