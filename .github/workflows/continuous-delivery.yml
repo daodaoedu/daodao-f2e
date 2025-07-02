@@ -58,16 +58,18 @@ jobs:
 
       - name: Build
         id: build
+        continue-on-error: true
         run: yarn pages:build
         env:
           NEXT_PUBLIC_API_URL: ${{ github.ref_name == 'prod' && secrets.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL_DEV }}
 
       - name: Deploy to Cloudflare
+        if: ${{ env.HAS_SECRETS == 'true' && steps.build.outcome == 'success' }}
         id: deploy
+        continue-on-error: true
         uses: cloudflare/wrangler-action@v3
         env:
           HAS_SECRETS: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' && secrets.GITHUB_TOKEN != '' }}
-        if: ${{ env.HAS_SECRETS == 'true' }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -75,7 +77,7 @@ jobs:
           command: pages deploy --branch=${{ env.BRANCH_NAME }}
 
       - name: Send Build and Deploy Failed Notification
-        if: (steps.build.outcome == 'false' || steps.deploy.outcome == 'failure')
+        if: (steps.build.outcome == 'failure' || steps.deploy.outcome == 'failure')
         uses: ./.github/actions/notification
         with:
           TYPE: failure
@@ -84,7 +86,7 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       - name: Check on failure
-        if: steps.build.outcome == 'false' || steps.deploy.outcome == 'failure'
+        if: steps.build.outcome == 'failure' || steps.deploy.outcome == 'failure'
         env:
           ERROR: ${{ steps.deploy.outputs.command-stderr }}
         run: |
