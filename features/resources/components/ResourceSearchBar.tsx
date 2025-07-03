@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import {
   SearchIcon,
   SlidersHorizontalIcon,
@@ -15,18 +15,20 @@ import ResourceSearchModal from "./ResourceSearchModal";
 
 interface ResourceSearchBarProps {
   filters?: ResourceSearchParamsSchema;
-  onFilter: (filter: ResourceSearchParamsSchema) => void;
+  onFilter: Dispatch<SetStateAction<ResourceSearchParamsSchema>>;
 }
 
 export default function ResourceSearchBar({
   filters,
   onFilter,
 }: ResourceSearchBarProps) {
-  const [query, setQuery] = useState(filters?.query ?? "");
-  const prevQueryRef = useRef(query);
-  const isReady = useRef(false);
+  const defaultQuery = filters?.query ?? "";
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { height, isShowShadow, TriggerElement } = useShadowToggleOnScroll();
+
+  const handleFilterChange = (filter: ResourceSearchParamsSchema) => {
+    onFilter((prev) => ({ ...prev, ...filter }));
+  };
 
   const handleOpenFilter = () => {
     setIsFilterOpen(true);
@@ -36,19 +38,11 @@ export default function ResourceSearchBar({
     setIsFilterOpen(false);
   };
 
-  useEffect(() => {
-    if (query !== prevQueryRef.current) {
-      onFilter({ query });
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+      handleFilterChange({ query: e.currentTarget.value });
     }
-    prevQueryRef.current = query;
-  }, [query, onFilter]);
-
-  useEffect(() => {
-    if (!isReady.current && (filters?.query || query)) {
-      setQuery(filters?.query ?? "");
-      isReady.current = true;
-    }
-  }, [filters?.query, query]);
+  };
 
   return (
     <>
@@ -62,11 +56,17 @@ export default function ResourceSearchBar({
       >
         <Container className="flex justify-between flex-col gap-4 md:flex-row">
           <Input
+            type="search"
             prefixIcon={<SearchIcon />}
-            suffixIcon={(v) => v.length > 0 && <SendHorizontalIcon />}
+            suffixIcon={(v) =>
+              (v.length > 0 || defaultQuery.length > 0) && (
+                <SendHorizontalIcon />
+              )
+            }
             className="md:w-1/2"
-            defaultValue={query}
-            onSuffixIconClick={setQuery}
+            defaultValue={defaultQuery}
+            onKeyDown={handleKeyDown}
+            onSuffixIconClick={(value) => handleFilterChange({ query: value })}
             placeholder="想找什麼資源..."
           />
           <div className="flex gap-3 justify-end">
@@ -90,7 +90,7 @@ export default function ResourceSearchBar({
       <ResourceSearchModal
         open={isFilterOpen}
         onClose={handleCloseFilter}
-        onFilter={onFilter}
+        onFilter={handleFilterChange}
         filters={filters}
       />
     </>

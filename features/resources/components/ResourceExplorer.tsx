@@ -21,6 +21,8 @@ export default function ResourceExplorer({
     data: resourcesData,
     hasMore,
     totalCount,
+    isLoading,
+    isValidating,
     setSize,
   } = useResourceList({
     ...filters,
@@ -42,6 +44,8 @@ export default function ResourceExplorer({
 
       <Container className="pb-6">
         <ResourceContainer
+          isLoading={isLoading}
+          isValidating={isValidating}
           data={resourcesData}
           categories={categories}
           parentDataCount={parentDataCount}

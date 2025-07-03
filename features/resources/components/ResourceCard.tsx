@@ -17,9 +17,28 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { targetAudienceTypeMap } from "../constants";
 
-// Props 需要對應真實資料
+export function ResourceCardSkeleton() {
+  return (
+    <div className="group flex flex-col rounded-lg gap-2 md:flex-row md:gap-4 transition-[transform,box-shadow] hover:scale-[1.01] hover:shadow-lg">
+      <div className="relative md:basis-80 aspect-[320/241]">
+        <div className="p-2 relative h-full overflow-hidden rounded-lg">
+          <Skeleton className="w-full h-full" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-2 p-2 md:w-[calc(100%-20rem)]">
+        <Skeleton className="size-8 rounded-full" />
+        <Skeleton className="h-6 w-1/2" />
+        <Skeleton className="h-6" />
+        <Skeleton className="h-6" />
+        <Skeleton className="h-6 w-1/3" />
+      </div>
+    </div>
+  );
+}
+
 type CardProps = {
   id: string;
   time?: string;

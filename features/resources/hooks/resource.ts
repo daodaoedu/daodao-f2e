@@ -32,7 +32,8 @@ export function useResourceList(filter: ResourceSearchParamsSchema) {
           cursor: previousPageData?.data.pagination?.next_cursor ?? undefined,
         },
       ];
-    }
+    },
+    { revalidateFirstPage: false }
   );
 
   const data = useMemo(

@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import { z } from "zod";
 
@@ -28,8 +28,8 @@ export default function useQueryState<T extends z.AnyZodObject>(schema: T) {
 
   const state = useMemo<z.infer<T>>(() => formatQuery(schema, query), [query]);
 
-  const setState = useCallback(
-    (value: z.infer<T> | ((prevState: z.infer<T>) => z.infer<T>)) => {
+  const setState = useCallback<Dispatch<SetStateAction<z.infer<T>>>>(
+    (value) => {
       const newValue = typeof value === "function" ? value(state) : value;
       const newQuery = formatQuery(schema, newValue, true);
       push({ pathname: window.location.pathname, query: newQuery }, undefined, {
