@@ -57,7 +57,7 @@ export default function QuizResultDetailPage({
       <SEOConfig title={`${theme.title} | 島島阿學`} />
       <div style={rootStyle}>
         <div className="relative max-w-[392px] mx-auto">
-          <main className="p-6 text-xs text-basic-400">
+          <main className="p-6 text-sm text-basic-400">
             <header className="mb-1">
               <HorizontalLogoSvg className="h-[22px]" />
             </header>
@@ -83,7 +83,7 @@ export default function QuizResultDetailPage({
                     <Badge
                       key={tag}
                       variant="secondary"
-                      className="px-2 text-xs text-[var(--color)]"
+                      className="px-2 text-sm text-[var(--color)]"
                     >
                       #{tag}
                     </Badge>
@@ -97,7 +97,7 @@ export default function QuizResultDetailPage({
               </div>
             </section>
             <Slogan>{resultDetail.slogan}</Slogan>
-            <div className="mb-6 space-y-4 bg-white rounded-md p-4">
+            <div className="mb-6 space-y-4 bg-white rounded-md p-4 text-base font-light">
               <section>
                 <Title>島民特質</Title>
                 <p>{resultDetail.learningTraits}</p>
@@ -147,7 +147,7 @@ export default function QuizResultDetailPage({
                           href={link}
                           className={cn(
                             "flex justify-between items-start underline mt-2",
-                            "text-sm font-bold text-basic-400 w-full "
+                            "text-base font-bold text-basic-400 w-full hover:text-primary-base"
                           )}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -164,21 +164,26 @@ export default function QuizResultDetailPage({
                 </ul>
               </section>
               <Button className="w-full font-bold" size="lg">
-                生成主題實踐！開始行動！
+                馬上開始一個小行動！
               </Button>
-              <Button variant="outline" className="w-full font-bold" size="lg">
-                找相同分類的夥伴
+              <Button
+                variant="outline"
+                className="w-full font-bold"
+                size="lg"
+                asChild
+              >
+                <Link href="/resource">先挖掘更多優質資源！</Link>
               </Button>
             </div>
             <footer>
-              <h2 className="heading-md mb-4">看更多分類</h2>
+              <h2 className="heading-md mb-4">認識群島好夥伴</h2>
               <ul className="flex flex-wrap gap-4">
                 {Array.from(themeMap.values()).map(
                   ({ id, title, color, smallImg: SmallImg }) =>
                     resultId !== id && (
                       <li key={id} className="flex-1 basis-1/3">
                         <Link
-                          className="flex flex-col body-sm font-bold items-center gap-2 p-3 bg-white rounded-md"
+                          className="flex flex-col body-base font-bold items-center gap-2 p-3 bg-white rounded-md"
                           style={{ color }}
                           href={`/quiz/result/${id}`}
                         >

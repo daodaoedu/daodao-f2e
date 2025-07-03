@@ -168,7 +168,6 @@ const ResetCSS = css`
     border-spacing: 0;
   }
   a {
-    color: rgba(255, 255, 255, 1);
     text-decoration: none;
   }
 `;

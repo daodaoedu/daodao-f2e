@@ -6,6 +6,7 @@ import Image from "next/image";
 import { toJpeg } from "html-to-image";
 import SEOConfig from "@/shared/components/SEO";
 import { Button } from "@/components/ui/button";
+import favicon112Png from "@/public/favicon-112.png";
 import HorizontalLogoSvg from "@/public/horizontal-logo.svg";
 import VerticalLogoSvg from "@/public/vertical-logo.svg";
 import { AuthButton } from "@/contexts/Auth";
@@ -141,7 +142,7 @@ export default function QuizResultPage() {
           >
             <main
               ref={mainRef}
-              className="p-6 pb-10 text-xs text-left text-basic-400 [background:var(--bg-image)]"
+              className="p-6 pb-10 text-sm text-left text-basic-400 [background:var(--bg-image)]"
             >
               <header className="mb-1">
                 <HorizontalLogoSvg className="h-[22px]" />
@@ -162,7 +163,7 @@ export default function QuizResultPage() {
                       <Badge
                         key={tag}
                         variant="secondary"
-                        className="px-2 text-xs text-[var(--color)]"
+                        className="px-2 text-sm text-[var(--color)]"
                       >
                         #{tag}
                       </Badge>
@@ -173,11 +174,7 @@ export default function QuizResultPage() {
                   <AspectRatio ratio={9 / 7}>
                     {/* 使用 img 標籤替代 Next.js Image 組件，避免 html-to-image 轉換問題 */}
                     <img
-                      src={
-                        typeof theme.largeImg === "string"
-                          ? theme.largeImg
-                          : theme.largeImg.src
-                      }
+                      src={theme.largeImg.src}
                       alt={theme.title}
                       className="w-full h-full object-cover"
                     />
@@ -185,31 +182,39 @@ export default function QuizResultPage() {
                 </div>
               </div>
               <Slogan>{detail.slogan}</Slogan>
-              <div className="mb-4 flex gap-4">
-                <div className="basis-[156px] my-2 flex flex-col gap-4">
+              <div className="relative mb-4 space-y-4 text-base font-light bg-white rounded-md p-4">
+                <div className="w-52 mx-auto">
                   <ResultChart
                     analysis={analysis}
                     color={theme.color}
                     className="aspect-[36/35]"
                   />
-                  <div>
-                    <Title>島嶼餐桌</Title>
-                    <List data={detail.islandDining} />
-                  </div>
                 </div>
-                <div className="flex-1 flex flex-col gap-4">
-                  <div>
-                    <Title>島民特質</Title>
-                    <p>{detail.characteristics}</p>
-                  </div>
-                  <div>
-                    <Title>島上風景</Title>
-                    <p>{detail.scenery}</p>
-                  </div>
-                  <div>
-                    <Title>開墾策略</Title>
-                    <List data={detail.strategies} />
-                  </div>
+                <div>
+                  <Title>島民特質</Title>
+                  <p>{detail.characteristics}</p>
+                </div>
+                <div>
+                  <Title>島上風景</Title>
+                  <p>{detail.scenery}</p>
+                </div>
+                <div>
+                  <Title>開墾策略</Title>
+                  <List data={detail.strategies} />
+                </div>
+                <div>
+                  <Title>島嶼餐桌</Title>
+                  <List data={detail.islandDining} />
+                </div>
+                {/* 使用 img 標籤替代 Next.js Image 組件，避免 html-to-image 轉換問題 */}
+                <div className="absolute bottom-4 right-4 opacity-20">
+                  <img
+                    src={favicon112Png.src}
+                    alt={theme.title}
+                    width={128}
+                    height={64}
+                    className="w-32 h-16 object-cover"
+                  />
                 </div>
               </div>
               <div className="mb-2 font-bold text-base text-center">
@@ -240,8 +245,7 @@ export default function QuizResultPage() {
           </button>
           <div className="mb-4 relative -top-4 flex justify-center">
             <div className="px-2 font-bold text-lg text-[var(--color)] bg-[var(--bg-color)]">
-              <span className="block sm:hidden">長按上方圖片以儲存結果</span>
-              <span className="hidden sm:block">點擊上方圖片以儲存結果</span>
+              點擊上方圖片以儲存結果
             </div>
           </div>
           <div className="px-6 pb-6">

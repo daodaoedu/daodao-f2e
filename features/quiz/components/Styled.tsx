@@ -36,7 +36,7 @@ export const Slogan = ({ children }: React.PropsWithChildren) => {
 
 export const List = ({ data }: { data: string[] }) => {
   return (
-    <ul className="list-disc pl-4">
+    <ul className="list-disc pl-6">
       {data.map((item) => (
         <li key={item}>{item}</li>
       ))}

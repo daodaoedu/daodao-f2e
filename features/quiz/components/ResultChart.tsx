@@ -42,7 +42,7 @@ export const ResultChart = ({
                 dx={index === 0 ? 0 : diffX}
                 dy={4}
                 textAnchor={textAnchor}
-                fontSize={10}
+                fontSize={12}
                 fontWeight={400}
                 fill="currentColor"
                 {...props}
