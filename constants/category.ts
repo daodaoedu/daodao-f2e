@@ -162,7 +162,7 @@ export const SEARCH_TAGS: Record<string, ICategory[]> = {
 export const NAV_LINK = [
   {
     name: '找資源',
-    link: '/search',
+    link: '/resource',
     target: '_self',
   },
   {

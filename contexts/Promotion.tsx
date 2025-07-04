@@ -43,12 +43,21 @@ export const PromotionProvider = ({ children }: React.PropsWithChildren) => {
 };
 
 enum PromotionType {
+  LearningQuiz,
   LearningMarathon,
   Donate,
   Questionnaire,
 }
 
 const promotionConfigs = {
+  [PromotionType.LearningQuiz]: {
+    texts: [
+      '🧭 找不到學習方向？快來做「群島風格測驗」，找出屬於你的學習小島！',
+      '🌱 完成測驗，立即獲得個人化建議與資源推薦，學習不再迷路！',
+      '🤝 找到你在學習路上的群島夥伴，一起解鎖適合的學習方法！',
+    ],
+    link: '/quiz',
+  },
   [PromotionType.LearningMarathon]: {
     texts: [
       '✨「島島盃 -  2025 春季學習馬拉松」開跑啦！1/24 截止申請！✨',
@@ -75,7 +84,7 @@ const promotionConfigs = {
   },
 };
 
-const { texts, link } = promotionConfigs[PromotionType.LearningMarathon];
+const { texts, link } = promotionConfigs[PromotionType.LearningQuiz];
 
 type NestCallback = (nextCallback: NestCallback) => void;
 
