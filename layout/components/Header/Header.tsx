@@ -1,35 +1,51 @@
-import { forwardRef } from "react";
-import { cn } from "@/utils/cn";
-import dynamic from "next/dynamic";
-import Link from "next/link";
-import { usePromotion } from "@/contexts/Promotion";
-import useMediaQuery from "@/hooks/useMediaQuery";
-import getEnv from "@/utils/env";
-import Image from "@/shared/components/Image";
+import { forwardRef, useEffect, useState } from 'react';
+import { cn } from '@/utils/cn';
+import { isServer } from '@/utils/helper';
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import Image from '../../../shared/components/Image';
 
-const MobileMenu = dynamic(() => import("./MobileMenu"));
-const DesktopMenu = dynamic(() => import("./DesktopMenu"));
+const MobileMenu = dynamic(() => import('./MobileMenu'));
+const DesktopMenu = dynamic(() => import('./DesktopMenu'));
+
+enum BREAKPOINT {
+  EMPTY,
+  MOBILE,
+  DESKTOP,
+}
+
+const calculateBreakpoint = () => {
+  if (isServer) {
+    return BREAKPOINT.EMPTY;
+  }
+  return window.innerWidth < 1024 ? BREAKPOINT.MOBILE : BREAKPOINT.DESKTOP;
+};
 
 function Header(
   { children }: React.PropsWithChildren,
   ref: React.Ref<HTMLDivElement>
 ) {
-  const { screens } = useMediaQuery();
-  const { isShowShadow } = usePromotion();
+  const [breakpoint, setBreakpoint] = useState<BREAKPOINT>(calculateBreakpoint);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setBreakpoint(calculateBreakpoint);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div
       ref={ref}
-      className={cn(
-        "fixed top-0 inset-x-0 z-30",
-        isShowShadow && "shadow-md shadow-basic-black/25"
-      )}
+      className="fixed top-0 inset-x-0 z-30 shadow-md shadow-basic-black/25"
     >
       {children}
       <header
         className={cn(
-          "relative flex items-center justify-between w-full px-4 body-md bg-primary-base",
-          !screens.lg && "pr-2"
+          'relative flex items-center justify-between w-full px-4 body-md bg-primary-base',
+          breakpoint === BREAKPOINT.MOBILE && 'pr-2'
         )}
       >
         <Link href="/" className="block pt-6 pb-4">
@@ -41,7 +57,8 @@ function Header(
             className="max-h-[22px]"
           />
         </Link>
-        {getEnv().isClientSide && (screens.lg ? <DesktopMenu /> : <MobileMenu />)}
+        {breakpoint === BREAKPOINT.MOBILE && <MobileMenu />}
+        {breakpoint === BREAKPOINT.DESKTOP && <DesktopMenu />}
       </header>
     </div>
   );

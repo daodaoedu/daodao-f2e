@@ -238,9 +238,9 @@ export const HOT_TAGS = [
 
 export const NAV_LINK = [
   {
-    name: "找資源",
-    link: "/resource",
-    target: "_self",
+    name: '找資源',
+    link: '/resource',
+    target: '_self',
   },
   {
     name: "找夥伴",
