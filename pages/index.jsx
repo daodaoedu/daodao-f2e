@@ -5,6 +5,7 @@ import Home from '../components/Home';
 
 const HomePage = () => {
   const router = useRouter();
+
   const SEOData = useMemo(
     () => ({
       title: '多元學習資源平台｜島島阿學',
@@ -15,31 +16,34 @@ const HomePage = () => {
       copyright: '島島阿學',
       imgLink: 'https://www.daoedu.tw/preview.webp',
       link: `${process.env.HOSTNAME}${router?.asPath}`,
-      structuredData: [
-        {
-          '@context': 'https://schema.org',
-          '@type': 'WebSite',
-          url: 'https://www.daoedu.tw',
-          potentialAction: {
-            '@type': 'SearchAction',
-            'query-input': 'required name=q',
-            target: 'https://www.daoedu.tw/search?q={q}',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            url: 'https://www.daoedu.tw',
+            potentialAction: {
+              '@type': 'SearchAction',
+              'query-input': 'required name=q',
+              target: 'https://www.daoedu.tw/search?q={q}',
+            },
           },
-        },
-        {
-          '@context': 'https://schema.org',
-          '@type': 'Organization',
-          url: 'https://www.daoedu.tw',
-          logo: 'https://www.daoedu.tw/favicon-112.png',
-        },
-      ],
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            url: 'https://www.daoedu.tw',
+            logo: 'https://www.daoedu.tw/favicon-112.png',
+          },
+        ],
+      }
     }),
     [router?.asPath],
   );
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Home />
     </>
   );

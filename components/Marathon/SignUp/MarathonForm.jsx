@@ -9,7 +9,7 @@ import {
   Checkbox,
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
-import { useMarathon } from '@/services/modules/marathons';
+import { useMarathon } from '@/services/marathons';
 
 import marathonConfig from '@/constants/marathon';
 import MilestoneGroup from './MilestoneGroup';

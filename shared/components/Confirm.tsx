@@ -1,5 +1,5 @@
-import Modal from '@/shared/components/Modal';
-import Button, { ButtonProps } from '@/shared/components/Button';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
+import { Button } from '@/components/ui/button';
 
 interface ConfirmModalProps {
   title: string;
@@ -8,7 +8,7 @@ interface ConfirmModalProps {
   children?: React.ReactNode;
   cancelText?: string;
   confirmText?: string;
-  confirmColor?: ButtonProps['color'];
+  confirmColor?: "default" | "alert";
   onClose: () => void;
   onConfirm?: () => void;
 }
@@ -20,24 +20,22 @@ export default function ConfirmModal({
   children,
   cancelText = '取消',
   confirmText = '確認',
-  confirmColor = 'primary',
+  confirmColor = 'default',
   onClose,
   onConfirm,
 }: ConfirmModalProps) {
   return (
-    <Modal
-      size="sm"
-      className="rounded-2xl"
-      title={title}
-      isOpen={isOpen}
+    <ResponsiveModal
+      size={ResponsiveModalSize.Small}
+      open={isOpen}
       onClose={onClose}
+      title={title}
       hasCloseButton
     >
       {children}
       <div className="mt-8 flex justify-center gap-4">
         <Button
-          variant="solid"
-          color="white"
+          variant="secondary"
           className="flex-1"
           onClick={onClose}
         >
@@ -45,16 +43,15 @@ export default function ConfirmModal({
         </Button>
         {onConfirm && (
           <Button
-            variant="solid"
-            color={confirmColor}
+            variant={confirmColor}
             className="flex-1"
             onClick={onConfirm}
-            isDisabled={isLoading}
+            disabled={isLoading}
           >
             {confirmText}
           </Button>
         )}
       </div>
-    </Modal>
+    </ResponsiveModal>
   );
 }

@@ -8,7 +8,8 @@ export default function useLeaveConfirm({
   const router = useRouter();
 
   useEffect(() => {
-    const handleRouteChange = (url) => {
+    const handleRouteChange = () => {
+      // eslint-disable-next-line no-alert
       if (!shouldConfirm || window.confirm(confirmMessage)) return;
       router.events.emit("routeChangeError");
       throw new Error(confirmMessage);

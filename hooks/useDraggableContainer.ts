@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import { DragStartEvent, DragEndEvent, DragOverEvent } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 
 // 標準的自動滾動配置
@@ -53,6 +53,7 @@ export const useDraggableContainer = <T>({
   onReorder,
 }: UseDraggableContainerProps<T>) => {
   const [activeId, setActiveId] = useState<string | number | null>(null);
+  const [overId, setOverId] = useState<string | number | null>(null);
   const [items, setItems] = useState<T[]>(() =>
     Array.isArray(initialItems) ? initialItems : []
   );
@@ -110,16 +111,27 @@ export const useDraggableContainer = <T>({
     [items, onReorder, getItemId, updateItem]
   );
 
+  const handleDragOver = useCallback((event: DragOverEvent) => {
+    setOverId(event?.over?.id ?? null);
+  }, []);
+
   const activeItem = activeId
     ? items.find((item) => getItemId(item) === activeId)
+    : null;
+
+  const overItem = overId
+    ? items.find((item) => getItemId(item) === overId)
     : null;
 
   return {
     items,
     activeId,
     activeItem,
+    overId,
+    overItem,
     handleDragStart,
     handleDragEnd,
+    handleDragOver,
     defaultAutoScroll,
   };
 };

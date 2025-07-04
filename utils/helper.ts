@@ -1,0 +1,59 @@
+import { z } from "zod";
+
+export const parseToString = (input?: unknown, isEncode = true) => {
+  const schema = z
+    .string()
+    .or(z.number())
+    .or(z.boolean())
+    .transform((val) => val.toString());
+  try {
+    return isEncode
+      ? encodeURIComponent(schema.parse(input))
+      : schema.parse(input);
+  } catch {
+    return null;
+  }
+};
+
+export const parseToUUID = (input?: unknown) => {
+  try {
+    return z.string().uuid().parse(input);
+  } catch {
+    return null;
+  }
+};
+
+export const parseToNumber = (input?: unknown) => {
+  try {
+    return z
+      .number()
+      .int()
+      .or(z.string().regex(/^\d*$/))
+      .transform((val) => parseInt(val.toString(), 10))
+      .parse(input);
+  } catch {
+    return null;
+  }
+};
+
+export const parseToArray = <T extends string | number>(
+  input?: unknown
+): T[] | null => {
+  try {
+    return Array.isArray(input) ? input : [input];
+  } catch {
+    return null;
+  }
+};
+
+interface MapItem {
+  key?: string;
+  value: string;
+  label: string;
+}
+
+export const mapToTable = (map: MapItem[] = []) =>
+  map.reduce(
+    (acc, item) => ({ ...acc, [item.key ?? item.value]: item.label }),
+    {}
+  );

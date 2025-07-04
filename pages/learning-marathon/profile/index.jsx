@@ -165,7 +165,7 @@ const LearningMarathonProfile = () => {
       copyright: '島島阿學',
       imgLink: 'https://www.daoedu.tw/preview.webp',
       link: `${process.env.HOSTNAME}${router?.asPath}`,
-      structuredData: [
+      jsonLd: [
         {
           '@context': 'https://schema.org',
           '@type': 'WebSite',
@@ -338,7 +338,7 @@ const LearningMarathonProfile = () => {
       }}
       className="px-4 py-5 sm:py-[50px]"
     >
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Panel className="mb-4 p-0">
         <button
           type="button"

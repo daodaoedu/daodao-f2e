@@ -1,18 +1,31 @@
 export const LOGIN_TYPE = 'DAODAO-LOGIN-TYPE';
 
-export const checkIsDev = () => process.env.NODE_ENV === 'development';
+export default function getEnv() {
+  const publicApiUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
+  const devDomain = process.env.NEXT_PUBLIC_DEV_URL ?? '';
+  const hostname = process.env.HOSTNAME ?? '';
+  const mode = process.env.NODE_ENV;
 
-export const getBackendUrl = () =>
-  checkIsDev() ? '/dev-proxy-api' : process.env.NEXT_PUBLIC_API_URL ?? '';
+  const isServerSide = typeof window === 'undefined';
+  const isDev = mode === 'development';
+  const devApiUrl = isServerSide ? publicApiUrl : '/dev-proxy-api';
+  const apiUrl = isDev ? devApiUrl : publicApiUrl;
 
-export const checkIsDevHost = () =>
-  window.location.hostname.endsWith('localhost') ||
-  window.location.hostname.endsWith(
-    process.env.NEXT_PUBLIC_DEV_HOST ?? 'daodao-notion-test.pages.dev'
-  );
+  const isDevHost = isServerSide
+    ? isDev
+    : window.location.hostname.endsWith('localhost') ||
+      window.location.hostname.endsWith(
+        devDomain.replace(/https?:\/\/dev\./g, '')
+      );
 
-export const getFrontendUrl = () =>
-  checkIsDevHost()
-    ? process.env.NEXT_PUBLIC_DEV_DOMAIN ??
-      'https://dev.daodao-notion-test.pages.dev'
-    : window.location.origin;
+  return {
+    apiUrl,
+    devDomain,
+    frontendUrl: isDevHost ? devDomain : hostname,
+    isClientSide: !isServerSide,
+    isDev,
+    isDevHost,
+    isServerSide,
+    mode,
+  };
+}

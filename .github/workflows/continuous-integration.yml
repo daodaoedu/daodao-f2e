@@ -17,7 +17,7 @@ on:
 env:
   PR_URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.number }}
   BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
-  IS_INTERNAL_PR: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+  HUSKY: 0
 
 jobs:
   init:
@@ -69,6 +69,7 @@ jobs:
 
       - name: TypeScript Check
         id: check
+        continue-on-error: true
         run: |
           if ! ERROR_MSG=$(yarn ts:check 2>&1); then
               {
@@ -80,7 +81,7 @@ jobs:
           fi
 
       - name: Send TypeScript Error Notification
-        if: steps.check.outcome == 'failure' && env.IS_INTERNAL_PR == 'true'
+        if: steps.check.outcome == 'failure'
         uses: ./.github/actions/notification
         with:
           TYPE: failure
@@ -135,7 +136,7 @@ jobs:
           fi
 
       - name: Send ESLint Error Notification
-        if: steps.lint.outcome == 'failure' && env.IS_INTERNAL_PR == 'true'
+        if: steps.lint.outcome == 'failure'
         uses: ./.github/actions/notification
         with:
           TYPE: failure

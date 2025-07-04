@@ -1,7 +1,3 @@
-export const MAX_PROJECTS = 3;
-
-export const ENABLE_CREATE_PROJECT = false;
-
 interface MotivationMap {
   label: string;
   value: string;
@@ -68,10 +64,10 @@ export const OUTCOME_MAP: OutcomeMap[] = [
   { label: '其他', value: 'others' }
 ];
 
-export const EMOJI_OPTIONS = [
-  { value: 'happy', label: '開心', emoji: '😊' },
-  { value: 'calm', label: '平靜', emoji: '😌' },
-  { value: 'anxious', label: '焦慮', emoji: '😟' },
-  { value: 'tired', label: '疲憊', emoji: '😫' },
-  { value: 'frustrated', label: '沮喪', emoji: '😤' },
+export const MOOD_OPTIONS = [
+  { value: 'happy', label: '開心', icon: 'Smile' },
+  { value: 'calm', label: '平靜', icon: 'Heart' },
+  { value: 'anxious', label: '焦慮', icon: 'Zap' },
+  { value: 'tired', label: '疲憊', icon: 'Moon' },
+  { value: 'frustrated', label: '沮喪', icon: 'CloudRain' },
 ];

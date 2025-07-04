@@ -23,6 +23,7 @@ import { logEvent } from '@/utils/analytics';
 import ApplyClosePopup from '@/components/Marathon/ApplyClosePopup';
 import marathonConfig from '@/constants/marathon';
 import { MARATHON_LINKS } from '@/constants/category';
+import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
 
 const StyledBannerButton = styled(Button)`
   &.MuiButton-root {
@@ -194,33 +195,17 @@ const Nav = () => {
     disabled: item.disabled,
     external: item.external,
   }));
-
-  const [showShadow, setShowShadow] = useState(false);
-  const { height } = usePromotion();
-
-  useEffect(() => {
-    const bannerHeight = document.querySelector('main')?.children?.[0]?.offsetHeight || 0;
-    const handleScroll = () => {
-      if (window.scrollY > bannerHeight - height) {
-        setShowShadow(true);
-      } else {
-        setShowShadow(false);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [height]);
+  const { isShowShadow, height, TriggerElement } = useShadowToggleOnScroll();
 
   return (
     <nav
       className={cn(
         "sticky z-10 bg-basic-100 text-nowrap overflow-x-auto transition-shadow duration-300",
-        showShadow && "shadow-md shadow-basic-black/10"
+        isShowShadow && "shadow-md shadow-basic-black/10"
       )}
       style={{ top: `${height}px` }}
     >
+      <TriggerElement />
       <ul className="max-w-[750px] mx-auto flex justify-between gap-4">
         {navItems.map((item) => (
           <li key={item.label} className="shrink-0">
@@ -277,7 +262,7 @@ const LearningMarathon = () => {
       copyright: '島島阿學',
       imgLink: 'https://www.daoedu.tw/preview.webp',
       link: `${process.env.HOSTNAME}${router?.asPath}`,
-      structuredData: [
+      jsonLd: [
         {
           '@context': 'https://schema.org',
           '@type': 'WebSite',
@@ -314,13 +299,13 @@ const LearningMarathon = () => {
     if (isLoggedIn || isTemporary) {
       router.push('/learning-marathon/signup');
     } else {
-      openLoginModal('/learning-marathon/signup');
+      openLoginModal({ registerCallback: () => router.push('/learning-marathon/signup') });
     }
   };
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Banner>
         <StyledBannerButton onClick={handleClickSignupButton}>
           立即申請

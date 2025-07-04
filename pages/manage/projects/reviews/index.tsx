@@ -1,21 +1,19 @@
-import toast from 'react-hot-toast';
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/router';
-import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
-import Button from '@/shared/components/Button';
-import ReviewCard from '@/components/Review/Card';
-import CreateModal from '@/components/Review/Modals/CreateModal';
-import SEOConfig from '@/shared/components/SEO';
-import UpdateModal from '@/components/Review/Modals/UpdateModal';
+import toast from "react-hot-toast";
+import { useMemo, useState } from "react";
+import { useRouter } from "next/router";
+import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
+import { Button } from "@/components/ui/button";
+import ReviewCard from "@/features/projects/components/ReviewCard";
 import {
-  useProject,
-  useProjectReview,
-  useProjectReviews,
-  useProjectReviewMutation,
-} from '@/services/modules/projects';
-import ConfirmModal from '@/shared/components/Confirm';
-import marathonConfig from '@/constants/marathon';
-import { parseToString } from '@/services/core';
+  ReviewCreateModal,
+  ReviewDeleteModal,
+  ReviewUpdateModal,
+} from "@/features/projects";
+import SEOConfig from "@/shared/components/SEO";
+import { useProject } from "@/services/projects";
+import { useProjectReview, useProjectReviewList } from "@/features/projects/hooks/review";
+import marathonConfig from "@/constants/marathon";
+import { parseToString } from "@/utils/helper";
 
 enum ModalTypeEnum {
   Create,
@@ -30,44 +28,23 @@ const ReviewPage = () => {
   const [reviewId, setReviewId] = useState<number | undefined>(undefined);
   const { data: project } = useProject(projectId);
 
-  const { data: reviews, mutate } = useProjectReviews(projectId);
+  const { data: reviews } = useProjectReviewList(projectId);
 
   const { data: detail } = useProjectReview({
     projectId,
     reviewId,
   });
 
-  const { createMutation, updateMutation, deleteMutation } =
-    useProjectReviewMutation({
-      projectId,
-      reviewId,
-      onCreated: () => {
-        toast.success('新增成功');
-        setModalType(null);
-      },
-      onUpdated: () => {
-        toast.success('更新成功');
-        setModalType(null);
-        setReviewId(undefined);
-        mutate();
-      },
-      onDeleted: () => {
-        toast.success('刪除成功');
-        setModalType(null);
-        setReviewId(undefined);
-      },
-    });
-
   const SEOData = useMemo(
     () => ({
       title: `${project?.title} 覆盤｜島島阿學`,
       description:
         project?.description?.substring(0, 150) ||
-        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-      keywords: '島島阿學',
-      author: '島島阿學',
-      copyright: '島島阿學',
-      imgLink: 'https://www.daoedu.tw/preview.webp',
+        "「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
+      keywords: "島島阿學",
+      author: "島島阿學",
+      copyright: "島島阿學",
+      imgLink: "https://www.daoedu.tw/preview.webp",
       link: `${process.env.HOSTNAME}/manage/projects/review?id=${projectId}`,
     }),
     [project?.title, project?.description, projectId]
@@ -79,17 +56,16 @@ const ReviewPage = () => {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <div className="mb-6 flex items-end sm:items-center justify-between body-md">
         <div className="flex flex-col items-start sm:flex-row sm:items-center gap-1">
           <div className="text-basic-500">
-            覆盤（{marathonConfig.getWeekNumber().toString().padStart(2, '0')}{' '}
+            覆盤（{marathonConfig.getWeekNumber().toString().padStart(2, "0")}{" "}
             週/22週）
           </div>
         </div>
         <Button
-          variant="solid"
-          color="primary"
+          variant="default"
           onClick={() => setModalType(ModalTypeEnum.Create)}
         >
           新增覆盤
@@ -117,40 +93,44 @@ const ReviewPage = () => {
       </ul>
 
       {project && (
-        <CreateModal
+        <ReviewCreateModal
           projectId={projectId}
           projectTitle={project.title}
           isOpen={modalType === ModalTypeEnum.Create}
           onClose={() => setModalType(null)}
-          onSubmit={createMutation.trigger}
-          isLoading={createMutation.isMutating}
+          onSuccess={() => {
+            toast.success("新增成功");
+            setModalType(null);
+          }}
         />
       )}
 
       {detail && reviewId && project && (
-        <UpdateModal
+        <ReviewUpdateModal
           projectId={projectId}
           projectTitle={project.title}
           reviewId={reviewId}
-          defaultValues={detail}
-          week={detail.week}
-          createdAt={detail.createdAt}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
-          onSubmit={updateMutation.trigger}
-          isLoading={updateMutation.isMutating}
+          onSuccess={() => {
+            toast.success("更新成功");
+            setModalType(null);
+            setReviewId(undefined);
+          }}
         />
       )}
 
       {reviewId && (
-        <ConfirmModal
-          title="確認刪除覆盤"
-          confirmText="確認刪除"
-          confirmColor="alert"
+        <ReviewDeleteModal
+          projectId={projectId}
+          reviewId={reviewId}
           isOpen={modalType === ModalTypeEnum.Delete}
           onClose={() => setModalType(null)}
-          onConfirm={() => deleteMutation.trigger({ projectId, reviewId })}
-          isLoading={deleteMutation.isMutating}
+          onSuccess={() => {
+            toast.success("刪除成功");
+            setModalType(null);
+            setReviewId(undefined);
+          }}
         />
       )}
     </>

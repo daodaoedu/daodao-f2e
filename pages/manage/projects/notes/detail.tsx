@@ -1,17 +1,16 @@
-import toast from 'react-hot-toast';
-import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
-import NoteDetail from '@/components/Note/Detail';
-import SEOConfig from '@/shared/components/SEO';
-import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
+import toast from "react-hot-toast";
+import { useRouter } from "next/router";
+import { useMemo, useState } from "react";
+import { NoteDetail, NoteUpdateModal } from "@/features/projects";
+import SEOConfig from "@/shared/components/SEO";
+import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
 import {
   useProject,
   useProjectNote,
   useProjectNoteMutation,
-} from '@/services/modules/projects';
-import { parseToNumber, parseToString } from '@/services/core';
-import ConfirmModal from '@/shared/components/Confirm';
-import UpdateModal from '@/components/Note/Modals/UpdateModal';
+} from "@/services/projects";
+import { parseToNumber, parseToString } from "@/utils/helper";
+import ConfirmModal from "@/shared/components/Confirm";
 
 enum ModalTypeEnum {
   Update,
@@ -30,15 +29,11 @@ const NoteDetailPage = () => {
     noteId,
   });
 
-  const { updateMutation, deleteMutation } = useProjectNoteMutation({
+  const { deleteMutation } = useProjectNoteMutation({
     projectId,
     noteId,
-    onUpdated: () => {
-      toast.success('更新成功');
-      setModalType(null);
-    },
     onDeleted: () => {
-      toast.success('刪除成功');
+      toast.success("刪除成功");
       router.replace(`/manage/projects/notes?id=${projectId}`);
     },
   });
@@ -48,11 +43,11 @@ const NoteDetailPage = () => {
       title: `${note?.title} 便利貼｜島島阿學`,
       description:
         note?.content?.substring(0, 150) ||
-        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-      keywords: '島島阿學',
-      author: '島島阿學',
-      copyright: '島島阿學',
-      imgLink: 'https://www.daoedu.tw/preview.webp',
+        "「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
+      keywords: "島島阿學",
+      author: "島島阿學",
+      copyright: "島島阿學",
+      imgLink: "https://www.daoedu.tw/preview.webp",
       link: `${process.env.HOSTNAME}/manage/projects/notes?id=${projectId}&noteId=${noteId}`,
     }),
     [note?.title, note?.content, projectId, noteId]
@@ -64,7 +59,7 @@ const NoteDetailPage = () => {
 
   return (
     <div className="bg-basic-white rounded-2xl">
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <NoteDetail
         data={note}
         authorUser={project?.user}
@@ -73,17 +68,16 @@ const NoteDetailPage = () => {
       />
 
       {note && project && (
-        <UpdateModal
-          id={noteId}
+        <NoteUpdateModal
+          noteId={noteId}
           projectId={projectId}
           projectTitle={project.title}
-          defaultValues={note}
-          week={note.week}
-          createdAt={note.date}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
-          onSubmit={updateMutation.trigger}
-          isLoading={updateMutation.isMutating}
+          onSuccess={() => {
+            toast.success("更新成功");
+            setModalType(null);
+          }}
         />
       )}
 

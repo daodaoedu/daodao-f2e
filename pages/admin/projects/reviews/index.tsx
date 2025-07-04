@@ -1,15 +1,15 @@
 import { useRouter } from 'next/router';
 import { getAdminProjectLayout } from '@/layout/features/getProjectLayout';
-import ReviewCard from '@/components/Review/Card';
-import { useProjectReviews } from '@/services/modules/projects';
+import ReviewCard from '@/features/projects/components/ReviewCard';
+import { useProjectReviewList } from '@/features/projects/hooks/review';
 import marathonConfig from '@/constants/marathon';
-import { parseToString } from '@/services/core';
+import { parseToString } from '@/utils/helper';
 
 const ReviewPage = () => {
   const { query } = useRouter();
   const projectId = parseToString(query.id);
 
-  const { data: reviews } = useProjectReviews(projectId);
+  const { data: reviews } = useProjectReviewList(projectId);
 
   if (!projectId) {
     return <div>專案不存在</div>;

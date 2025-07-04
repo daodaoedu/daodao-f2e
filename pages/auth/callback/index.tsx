@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { sendLoginEvent, useAuthDispatch } from '@/contexts/Auth';
 import { getRedirectionStorage } from '@/utils/storage';
 import Image from '@/shared/components/Image';
-import { parseToString } from '@/services/core';
+import { parseToString } from '@/utils/helper';
 
 export default function AuthCallbackPage() {
   const { setToken } = useAuthDispatch();
@@ -16,9 +16,11 @@ export default function AuthCallbackPage() {
     if (!token) return;
 
     sendLoginEvent(token).then((isSendOpener) => {
+      const redirectPathname = getRedirectionStorage().get();
+      getRedirectionStorage().remove();
       if (isSendOpener) return;
       setToken(token);
-      router.replace(getRedirectionStorage().get() || '/');
+      router.replace(redirectPathname ?? '/');
     });
   }, [token, isVerified, setToken, router.replace]);
 

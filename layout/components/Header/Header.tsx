@@ -1,9 +1,10 @@
 import { forwardRef, useEffect, useState } from 'react';
-import { cn } from '@/utils/cn';
-import { isServer } from '@/utils/helper';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import Image from '../../../shared/components/Image';
+import Image from 'next/image';
+import getEnv from '@/utils/env';
+import { cn } from '@/utils/cn';
+import newLogo from '@/public/new-logo.png';
 
 const MobileMenu = dynamic(() => import('./MobileMenu'));
 const DesktopMenu = dynamic(() => import('./DesktopMenu'));
@@ -15,7 +16,7 @@ enum BREAKPOINT {
 }
 
 const calculateBreakpoint = () => {
-  if (isServer) {
+  if (getEnv().isServerSide) {
     return BREAKPOINT.EMPTY;
   }
   return window.innerWidth < 1024 ? BREAKPOINT.MOBILE : BREAKPOINT.DESKTOP;
@@ -48,13 +49,13 @@ function Header(
           breakpoint === BREAKPOINT.MOBILE && 'pr-2'
         )}
       >
-        <Link href="/" className="block pt-6 pb-4">
+        <Link href="/" className="block py-5">
           <Image
-            src="/new-logo.png"
+            src={newLogo}
             alt="島島阿學"
-            width="152"
-            height="22"
-            className="max-h-[22px]"
+            width={152}
+            height={22}
+            priority
           />
         </Link>
         {breakpoint === BREAKPOINT.MOBILE && <MobileMenu />}

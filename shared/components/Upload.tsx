@@ -1,7 +1,7 @@
 import toast from 'react-hot-toast';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { uploadImagesSchema } from '@/services/modules/images';
-import Button, { ButtonProps } from './Button';
+import { uploadImagesSchema } from '@/services/images';
+import { Button, type ButtonProps } from '@/components/ui/button';
 
 export interface ImageDataType {
   id: string;
@@ -9,12 +9,13 @@ export interface ImageDataType {
   url: string;
 }
 
-interface UploadProps extends Omit<ButtonProps<'button'>, 'onChange' | 'as'> {
+interface UploadProps extends Omit<ButtonProps, 'onChange'> {
   accept?: string;
   children?: React.ReactNode;
   maxCount?: number;
   multiple?: boolean;
   validate?: typeof uploadImagesSchema;
+  variant?: ButtonProps['variant'];
   onChange?: (files: ImageDataType[], e: ChangeEvent<HTMLInputElement>) => void;
   onFilesChange?: (files: File[]) => void;
   onPreviewsChange?: (previewList: string[]) => void;
@@ -29,6 +30,7 @@ function Upload({
   onClick,
   onFilesChange,
   onPreviewsChange,
+  variant = 'secondary',
   ...props
 }: UploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -58,9 +60,9 @@ function Upload({
   };
 
   const handleClick = (
-    e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
+    e: React.MouseEvent<HTMLButtonElement>
   ) => {
-    onClick?.(e as React.MouseEvent<HTMLButtonElement>);
+    onClick?.(e);
     inputRef.current?.click();
   };
 
@@ -79,8 +81,7 @@ function Upload({
         onChange={handleChange}
       />
       <Button
-        variant="solid"
-        color="secondary"
+        variant={variant}
         onClick={handleClick}
         {...props}
       >

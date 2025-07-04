@@ -1,17 +1,13 @@
-import toast from 'react-hot-toast';
-import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
-import OutcomeDetail from '@/components/Outcome/Detail';
-import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
-import SEOConfig from '@/shared/components/SEO';
-import {
-  useProject,
-  useProjectOutcome,
-  useProjectOutcomeMutation,
-} from '@/services/modules/projects';
-import { parseToNumber, parseToString } from '@/services/core';
-import ConfirmModal from '@/shared/components/Confirm';
-import EditModal from '@/components/Outcome/Modals/UpdateModal';
+import toast from "react-hot-toast";
+import { useRouter } from "next/router";
+import { useMemo, useState } from "react";
+import OutcomeDetail from "@/features/projects/components/OutcomeDetail";
+import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
+import SEOConfig from "@/shared/components/SEO";
+import { useProject } from "@/services/projects";
+import { useProjectOutcome } from "@/features/projects/hooks/outcome";
+import { parseToNumber, parseToString } from "@/utils/helper";
+import { OutcomeDeleteModal, OutcomeUpdateModal } from "@/features/projects";
 
 enum ModalTypeEnum {
   Update,
@@ -30,29 +26,16 @@ const OutcomeDetailPage = () => {
     outcomeId,
   });
 
-  const { updateMutation, deleteMutation } = useProjectOutcomeMutation({
-    projectId,
-    outcomeId,
-    onUpdated: () => {
-      toast.success('更新成功');
-      setModalType(null);
-    },
-    onDeleted: () => {
-      toast.success('刪除成功');
-      router.replace(`/manage/projects/outcomes?id=${projectId}`);
-    },
-  });
-
   const SEOData = useMemo(
     () => ({
       title: `${outcome?.title} 學習成果｜島島阿學`,
       description:
         outcome?.content?.substring(0, 150) ||
-        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-      keywords: '島島阿學',
-      author: '島島阿學',
-      copyright: '島島阿學',
-      imgLink: 'https://www.daoedu.tw/preview.webp',
+        "「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
+      keywords: "島島阿學",
+      author: "島島阿學",
+      copyright: "島島阿學",
+      imgLink: "https://www.daoedu.tw/preview.webp",
       link: `${process.env.HOSTNAME}/manage/projects/outcomes?id=${projectId}&outcomeId=${outcomeId}`,
     }),
     [outcome?.title, outcome?.content, projectId, outcomeId]
@@ -64,7 +47,7 @@ const OutcomeDetailPage = () => {
 
   return (
     <div className="bg-basic-white rounded-2xl">
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <OutcomeDetail
         data={outcome}
         authorUser={project?.user}
@@ -73,28 +56,28 @@ const OutcomeDetailPage = () => {
       />
 
       {outcome && project && (
-        <EditModal
-          id={outcomeId}
+        <OutcomeUpdateModal
+          outcomeId={outcomeId}
           projectId={projectId}
           projectTitle={project.title}
-          defaultValues={outcome}
-          week={outcome.week}
-          createdAt={outcome.date}
           isOpen={modalType === ModalTypeEnum.Update}
           onClose={() => setModalType(null)}
-          onSubmit={updateMutation.trigger}
-          isLoading={updateMutation.isMutating}
+          onSuccess={() => {
+            toast.success("更新成功");
+            setModalType(null);
+          }}
         />
       )}
 
-      <ConfirmModal
-        title="確認刪除成果"
-        confirmText="確認刪除"
-        confirmColor="alert"
+      <OutcomeDeleteModal
+        projectId={projectId}
+        outcomeId={outcomeId}
         isOpen={modalType === ModalTypeEnum.Delete}
         onClose={() => setModalType(null)}
-        onConfirm={() => deleteMutation.trigger({ projectId, outcomeId })}
-        isLoading={deleteMutation.isMutating}
+        onSuccess={() => {
+          toast.success("刪除成功");
+          router.replace(`/manage/projects/outcomes?id=${projectId}`);
+        }}
       />
     </div>
   );

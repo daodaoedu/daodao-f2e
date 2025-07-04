@@ -2,7 +2,7 @@ import React from 'react';
 import styled from '@emotion/styled';
 import { Chip } from '@mui/material';
 import { useRouter } from 'next/router';
-import { SEARCH_TAGS } from '../../../../constants/category';
+import { HOT_TAGS } from '@/constants/category';
 
 const TagsWrapper = styled.ul`
   display: flex;
@@ -19,12 +19,12 @@ const SearchField = () => {
   const router = useRouter();
   return (
     <TagsWrapper>
-      {SEARCH_TAGS['全部'].map((text) => (
-        <li key={text}>
+      {HOT_TAGS.map(({ value, label }) => (
+        <li key={value}>
           <Chip
-            onClick={() => router.push(`/search?tags=${text}`)}
-            label={text}
-            value={text}
+            onClick={() => router.push(`/resource/categories/${value}`)}
+            label={label}
+            value={value}
             sx={{
               backgroundColor: '#fff',
               opacity: '80%',

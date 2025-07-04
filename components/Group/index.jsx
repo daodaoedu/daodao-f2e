@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
-import { useCircles } from '@/services/modules/circle';
+import { useCircles } from '@/services/circle';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 import AreaChips from './AreaChips';
 import Banner from './Banner';

@@ -1,7 +1,7 @@
 import { ToggleProvider, useToggle } from '@/contexts/Toggle';
 import { cn } from '@/utils/cn';
 import useClickOutside from '@/hooks/useClickOutside';
-import Button, { ButtonProps } from './Button';
+import Button, { ButtonProps } from '@/shared/components/Button';
 
 interface DropdownContentProps {
   as?: React.ElementType;

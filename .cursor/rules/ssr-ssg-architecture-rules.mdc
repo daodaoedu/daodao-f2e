@@ -1,0 +1,403 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Next.js SSR/SSG 架構最佳實踐 (Next.js SSR/SSG Architecture Best Practices)
+
+## 架構概述 (Architecture Overview)
+
+本專案使用 Next.js 的 SSG/SSR 功能進行頁面渲染，並搭配 SWR 進行客戶端數據管理，以提供最佳的使用者體驗和性能表現。本文檔定義了實現 SSG/SSR 的最佳實踐。
+
+## 基本原則 (Core Principles)
+
+### 1. 預渲染優先 (Pre-rendering First)
+- 優先使用 SSG 為靜態頁面生成 HTML，提高首次載入速度和 SEO 表現
+- 使用 SSR 處理需要即時數據的頁面
+- 在客戶端使用 SWR 進行數據更新和狀態管理
+
+### 2. 數據管理策略 (Data Management Strategy)
+- 服務端: 通過 `getStaticProps` 或 `getServerSideProps` 獲取初始數據
+- 客戶端: 使用 SWR 進行數據緩存、重新驗證和更新
+- 通過 `SWRConfig` 的 `fallback` 屬性提供初始數據
+
+### 3. 路由與頁面結構 (Routing and Page Structure)
+- 清晰的文件夾結構，反映 URL 路徑
+- 使用動態路由處理參數化路徑
+- 使用 `getStaticPaths` 預生成動態路由頁面
+
+## 實現指南 (Implementation Guidelines)
+
+### 靜態網站生成 (Static Site Generation, SSG)
+
+#### 基本結構 
+參考 [pages/resource/categories/index.tsx](mdc:pages/resource/categories/index.tsx) 的實現：
+
+```tsx
+// 1. 引入必要的類型和組件
+import type { InferGetStaticPropsType, GetStaticProps } from "next";
+import { SWRConfig } from "swr";
+import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
+import JsonLdFactory from "@/utils/jsonLd";
+import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
+
+// 2. 實現 getStaticProps 函數
+export const getStaticProps = (async () => {
+  try {
+    // 在構建時獲取數據
+    const data = await resourceAPI.readList();
+
+    // 處理 SEO 數據
+    const coursesJsonLd = data.resources.slice(0, 4).map(createResourceJsonLd);
+    const jsonLd = JsonLdFactory.createGraph([
+      JsonLdFactory.createItemListBuilder()
+        .setName("所有分類")
+        .setItems(coursesJsonLd),
+    ]);
+
+    // 返回構建時獲取的數據
+    return {
+      props: { 
+        // 為 SWR 提供初始數據
+        fallback: { "/resource/categories": data }, 
+        jsonLd 
+      },
+    };
+  } catch {
+    // 處理錯誤情況
+    return { props: { fallback: undefined, jsonLd: undefined } };
+  }
+}) satisfies GetStaticProps<{
+  fallback: Record<string, ResourceListResponseSchema> | undefined;
+  jsonLd: JsonLdType | undefined;
+}>;
+
+// 3. 頁面組件
+export default function ResourceCategoriesPage({
+  fallback,
+  jsonLd,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
+  return (
+    // 使用 SWRConfig 提供初始數據
+    <SWRConfig value={{ fallback }}>
+      {/* SEO 設置 */}
+      <SEOConfig title="所有分類｜島島阿學" jsonLd={jsonLd} />
+      
+      {/* 頁面內容 */}
+      <Section as="div" className="pt-12">
+        {/* ... */}
+      </Section>
+    </SWRConfig>
+  );
+}
+```
+
+#### 動態路由 SSG
+參考 [pages/resource/categories/[...categories].tsx](mdc:pages/resource/categories/[...categories].tsx) 的實現：
+
+```tsx
+// 1. 定義靜態路徑
+export const getStaticPaths = async () => {
+  // 生成所有可能的路徑組合
+  const paths = CATEGORIES.flatMap((category) => [
+    {
+      params: {
+        categories: [category.value],
+      },
+    },
+    ...(SEARCH_TAGS[category.value] ?? []).map((tag) => ({
+      params: {
+        categories: [category.value, tag.value],
+      },
+    })),
+  ]);
+
+  return {
+    paths,
+    fallback: false, // 不存在的路徑返回 404
+  };
+};
+
+// 2. 根據路徑參數獲取數據
+export const getStaticProps = (async (context) => {
+  // 從路徑參數解析類別
+  const categories = getCategories(
+    parseToArray<keyof typeof SEARCH_TAGS>(context.params?.categories)
+  );
+
+  // 獲取標題
+  const title = categories?.[1]?.label ?? categories?.[0]?.label ?? "暫無分類";
+
+  try {
+    // 獲取數據
+    const data = await resourceAPI.readList();
+    
+    // ... 處理 SEO 數據 ...
+
+    return {
+      props: {
+        // 為特定路徑提供初始數據
+        fallback: {
+          [`/resource/categories/${categories?.join("/")}`]: data,
+        },
+        jsonLd,
+        categories,
+        title,
+        totalEstimate: data.pagination.totalEstimate,
+      },
+    };
+  } catch {
+    // ... 處理錯誤 ...
+  }
+}) satisfies GetStaticProps<{
+  fallback: Record<string, ResourceListResponseSchema> | undefined;
+  jsonLd: JsonLdType | undefined;
+  categories: Categories;
+  title: string;
+  totalEstimate: number;
+}>;
+```
+
+### SWR 數據管理 (SWR Data Management)
+
+#### 使用 SWR 進行客戶端數據獲取
+將 SSG/SSR 獲取的數據與 SWR 集成：
+
+```tsx
+// 1. 在頁面中使用 SWRConfig 提供初始數據
+<SWRConfig value={{ fallback }}>
+  <ResourceExplorer />
+</SWRConfig>
+
+// 2. 在組件中使用 SWR 進行數據獲取
+function ResourceExplorer() {
+  // 使用與 getStaticProps 相同的 key
+  const { data, error, isLoading } = useResourceList();
+
+  if (isLoading) return <Skeleton />;
+  if (error) return <ErrorMessage />;
+
+  return (
+    <ResourceList resources={data.resources} />
+  );
+}
+```
+
+#### 自定義 Hooks 封裝數據邏輯
+在 features 層實現數據獲取邏輯：
+
+```tsx
+// features/resources/hooks/useResources.ts
+export function useResources(params?: ResourceSearchParamsSchema) {
+  // 已經在底層實作 fetcher 函數，params 變動會自動重新查詢 API
+  const { data, error, isLoading, mutate } = useSWR(
+    [getResourcePathname(), params],
+    {
+      dedupingInterval: 60000 // 1 分鐘內不重複獲取
+    }
+  );
+
+  return {
+    resources: data?.resources ?? [],
+    pagination: data?.pagination,
+    isLoading,
+    isError: !!error,
+    refresh: mutate
+  };
+}
+```
+
+### Cloudflare Pages 環境注意事項
+
+⚠️ **重要**: 本專案部署在 Cloudflare Pages 環境中，需要注意以下限制：
+
+#### 不支援增量靜態重新生成 (ISR)
+Cloudflare Pages 不支援 Next.js 的 ISR 功能（`revalidate` 選項）。請不要在 `getStaticProps` 中使用 `revalidate` 屬性：
+
+```tsx
+// ❌ 錯誤: 在 Cloudflare 環境中不要使用 ISR
+return {
+  props: { data },
+  revalidate: 3600 // 不要使用此選項
+};
+
+// ✅ 正確: 純靜態生成
+return {
+  props: { data }
+};
+```
+
+#### 替代方案
+當需要頻繁更新內容時，可以考慮以下方案：
+
+1. **完全靜態生成 + SWR 客戶端更新**:
+   - 構建時生成靜態頁面
+   - 客戶端使用 SWR 獲取最新數據
+   - 定期重新部署以更新靜態內容
+
+2. **使用 SSR 替代 ISR**:
+   - 對於需要實時數據的頁面，使用 `getServerSideProps` 而非 `getStaticProps`
+   - 注意: 這會增加服務器負載，應謹慎使用
+
+3. **Cloudflare 定時觸發器**:
+   - 使用 Cloudflare Workers 或 Cron Triggers 定期觸發重新構建
+   - 這可以實現類似 ISR 的效果，但需要額外的配置
+
+```tsx
+// ✅ 示例: 使用 SSR 替代 ISR
+export const getServerSideProps = async () => {
+  try {
+    const data = await resourceAPI.readList();
+    return { props: { data } };
+  } catch (error) {
+    return { props: { data: null, error: { message: "無法獲取資源數據" } } };
+  }
+};
+```
+
+### 頁面組件結構 (Page Component Structure)
+
+#### 基本頁面結構
+參考 [pages/resource/index.tsx](mdc:pages/resource/index.tsx)：
+
+```tsx
+// 1. 定義頁面 Props 類型
+type ResourcePageProps = InferGetStaticPropsType<typeof getStaticProps>;
+
+// 2. 頁面層只負責組裝，不包含業務邏輯
+export default function ResourcePage({
+  data,
+  jsonLd,
+}: ResourcePageProps) {
+  return (
+    <>
+      <SEOConfig title="多元學習資源列表｜島島阿學" jsonLd={jsonLd} />
+      
+      {/* 組裝頁面組件 */}
+      <ResourceBanner 
+        title="找資源" 
+        content="藉由他人真實的資源使用經驗，找到真正適合自己的學習資源..." 
+        image="" 
+        hotTags={SEARCH_TAGS.all.map(({ label }) => label)} 
+      />
+
+      <Section>
+        {/* 熱門資源 */}
+        <div>
+          <SectionTitle title="熱門資源">
+            <Button variant="link" asChild>
+              <Link href="/resource/explore">
+                探索 所有資源
+                <ChevronRightIcon className="w-4 h-4" />
+              </Link>
+            </Button>
+          </SectionTitle>
+          <ResourceContainer data={data?.resources.slice(2, 4) ?? []} />
+        </div>
+
+        {/* 更多區塊... */}
+      </Section>
+    </>
+  );
+}
+```
+
+## 最佳實踐模式 (Best Practices Patterns)
+
+### SEO 優化
+- 每個頁面提供適當的 `title` 和 `description`
+- 使用結構化數據 (JSON-LD) 增強搜索引擎理解
+- 確保頁面內容在 SSG/SSR 時已包含重要信息
+
+```tsx
+// 生成 JSON-LD 結構化數據
+const jsonLd = JsonLdFactory.createGraph([
+  JsonLdFactory.createItemListBuilder()
+    .setName("多元學習資源列表")
+    .setItems(coursesJsonLd),
+]);
+
+// 使用 SEO 組件
+<SEOConfig 
+  title="多元學習資源列表｜島島阿學" 
+  description="探索各類優質學習資源，找到最適合你的學習內容" 
+  jsonLd={jsonLd} 
+/>
+```
+
+### 錯誤處理
+在數據獲取時進行適當的錯誤處理：
+
+```tsx
+export const getStaticProps = async () => {
+  try {
+    const data = await resourceAPI.readList();
+    return { props: { data, error: null } };
+  } catch (error) {
+    // 1. 記錄錯誤
+    console.error("Failed to fetch resources:", error);
+    
+    // 2. 返回錯誤狀態供客戶端處理
+    return { 
+      props: { 
+        data: null, 
+        error: { message: "無法獲取資源數據" } 
+      } 
+    };
+  }
+};
+```
+
+### 狀態管理與 UI 互動
+將數據獲取邏輯與 UI 互動分離：
+
+```tsx
+// 1. 在 features 層實現數據獲取邏輯
+// features/resources/hooks/useResourceSearch.ts
+export function useResourceSearch(initialFilters?: ResourceSearchParamsSchema) {
+  const [filters, setFilters] = useState<ResourceSearchParamsSchema>(
+    initialFilters || {}
+  );
+  
+  const { resources, isLoading } = useResources(filters);
+  
+  const handleFilterChange = useCallback((newFilters: ResourceSearchParamsSchema) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  }, []);
+  
+  return {
+    resources,
+    filters,
+    isLoading,
+    handleFilterChange
+  };
+}
+
+// 2. 在組件中使用 hook
+function ResourceExplorer() {
+  const { resources, filters, isLoading, handleFilterChange } = useResourceSearch();
+  
+  return (
+    <>
+      <ResourceSearchForm 
+        onFilter={handleFilterChange}
+        initialValues={filters}
+      />
+      {isLoading ? (
+        <ResourceListSkeleton />
+      ) : (
+        <ResourceList resources={resources} />
+      )}
+    </>
+  );
+}
+```
+
+## 參考實現 (Reference Implementations)
+
+以下頁面提供了 SSG/SSR 架構的完整參考實現：
+
+- 主頁: [pages/resource/index.tsx](mdc:pages/resource/index.tsx)
+- 類別頁: [pages/resource/categories/index.tsx](mdc:pages/resource/categories/index.tsx)
+- 動態路由: [pages/resource/categories/[...categories].tsx](mdc:pages/resource/categories/[...categories].tsx)
+- 探索頁: [pages/resource/explore.tsx](mdc:pages/resource/explore.tsx)

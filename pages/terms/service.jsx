@@ -21,7 +21,7 @@ const TermsServicePage = () => {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <TermsService />
     </>
   );

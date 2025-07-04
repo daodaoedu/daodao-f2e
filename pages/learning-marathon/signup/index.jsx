@@ -12,8 +12,8 @@ import UserProfileForm from '@/components/Marathon/SignUp/UserProfileForm';
 import MarathonForm from '@/components/Marathon/SignUp/MarathonForm';
 import ConfirmForm from '@/components/Marathon/SignUp/ConfirmForm';
 import { ProtectedComponent } from '@/contexts/Auth';
-import { useMarathon } from '@/services/modules/marathons';
-import { isServer } from '@/utils/helper';
+import { useMarathon } from '@/services/marathons';
+import getEnv from '@/utils/env';
 
 const FormWrapper = styled.form`
   padding: 50px 0;
@@ -53,7 +53,7 @@ const LearningMarathonSignUp = () => {
       copyright: '島島阿學',
       imgLink: 'https://www.daoedu.tw/preview.webp',
       link: `${process.env.HOSTNAME}${router?.asPath}`,
-      structuredData: [
+      jsonLd: [
         {
           '@context': 'https://schema.org',
           '@type': 'WebSite',
@@ -75,7 +75,7 @@ const LearningMarathonSignUp = () => {
     [router?.asPath],
   );
   const [currentStep, setCurrentStep] = useState(0);
-  const fromProfilePage = isServer ? null : window.localStorage.getItem('fromProfilePage');
+  const fromProfilePage = getEnv().isServerSide ? null : window.localStorage.getItem('fromProfilePage');
   const { data: marathonState = {} } = useMarathon();
   if (fromProfilePage && marathonState._id) {
     if (fromProfilePage === 'click_edit') {
@@ -97,7 +97,7 @@ const LearningMarathonSignUp = () => {
     <>
       <StepperBar currentStep={currentStep} />
       <ProtectedComponent redirectOnCancel="/learning-marathon" onlyCheckToken>
-        <SEOConfig data={SEOData} />
+        <SEOConfig {...SEOData} />
         <FormWrapper sx={{
           background: 'linear-gradient(0deg, #F3FCFC 0%, #F3FCFC 100%), #F7F8FA'
         }}

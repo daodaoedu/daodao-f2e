@@ -78,7 +78,7 @@ const LearningMarathonSignUp = () => {
       copyright: '島島阿學',
       imgLink: 'https://www.daoedu.tw/preview.webp',
       link: `${process.env.HOSTNAME}${router?.asPath}`,
-      structuredData: [
+      jsonLd: [
         {
           '@context': 'https://schema.org',
           '@type': 'WebSite',
@@ -102,7 +102,7 @@ const LearningMarathonSignUp = () => {
 
   return (
     <Wrapper>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <StyledBar>
         <h2>申請參加島島盃學習馬拉松</h2>
       </StyledBar>
@@ -158,7 +158,7 @@ const LearningMarathonSignUp = () => {
           </StyledButton>
           <StyledButton
             variant="contained"
-            onClick={() => router.push('/search')}
+            onClick={() => router.push('/resource')}
           >
             尋找學習資源
           </StyledButton>

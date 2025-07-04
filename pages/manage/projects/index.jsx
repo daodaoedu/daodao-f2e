@@ -1,36 +1,24 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { RoleEnum, useAuth, ProtectedComponent } from '@/contexts/Auth';
+import { ProtectedComponent } from '@/contexts/Auth';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import Select from '@/components/Projects/Form/Select';
 import SEOConfig from '@/shared/components/SEO';
-import AccessDenied from '@/shared/components/AccessDenied';
 import GoBackButton from '@/components/Projects/GoBackButton';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';
-import { useMyProjects } from '@/services/modules/projects';
+import { useMyProjects } from '@/services/projects';
 import More from '@/components/Projects/More';
-import Button from '@/shared/components/Button';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
-import toast from 'react-hot-toast';
-import { ENABLE_CREATE_PROJECT, MAX_PROJECTS } from '@/constants/project';
+import { MarathonAccess, useMarathonAccess, EmptyProject } from '@/features/projects';
+import useCreateProject from '@/features/projects/hooks/useCreateProject';
 
 const Projects = () => {
   const router = useRouter();
-  const { user } = useAuth();
   const { data } = useMyProjects();
   const projects = Array.isArray(data) ? data : [];
-  const isAddedDenied = projects.length >= MAX_PROJECTS;
-  const isEditPermitted = useMemo(() => {
-    const permissions = [
-      RoleEnum.MarathonApplicant,
-      RoleEnum.MarathonParticipant,
-      RoleEnum.Mentor,
-      RoleEnum.Admin,
-      RoleEnum.SuperAdmin,
-    ];
-    return user ? permissions.includes(user?.role) : false;
-  }, [user]);
+  const hasMarathonAccess = useMarathonAccess();
   const options = [
     { value: "all", label: "全部計畫" },
     { value: "learning-marathon", label: "學習馬拉松" },
@@ -44,18 +32,7 @@ const Projects = () => {
     }
   };
 
-  const handleCreateProject = () => {
-    if (!ENABLE_CREATE_PROJECT) {
-      toast.error('目前功能尚未開放');
-      return;
-    }
-
-    if (isAddedDenied) {
-      toast.error('島上空間有限，\n計畫滿三個就不能再增加了><');
-    } else {
-      router.push('/manage/projects/create');
-    }
-  };
+  const { isAddedDenied, handleCreateProject, projectLimitMessage } = useCreateProject();
 
   const SEOData = useMemo(
     () => ({
@@ -73,18 +50,13 @@ const Projects = () => {
 
   return (
     <ProtectedComponent>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <div className="bg-[#F3FCFC] md:py-8 min-h-screen-without-padding-top">
         <div className="w-full p-4
           md:max-w-[860px] mx-auto box-border flex flex-col gap-6"
         >
           <GoBackButton
-            onClick={() => router.push({
-              pathname: '/manage',
-              query: {
-                id: 'island'
-              }
-            })}
+            onClick={() => router.push('/manage')}
             icon={
               (
                 <KeyboardArrowLeftIcon
@@ -107,14 +79,13 @@ const Projects = () => {
           >
             <div className="flex flex-row justify-between gap-3">
               <Select
-                isDisabled={!isEditPermitted}
+                isDisabled={!hasMarathonAccess}
                 options={options}
                 className="max-w-[200px]"
               />
               <Button
                 onClick={handleCreateProject}
-                variant="solid"
-                color="primary"
+                variant="default"
                 className="hover:cursor-pointer flex-shrink-0"
               >
                 新增計畫
@@ -123,12 +94,13 @@ const Projects = () => {
             {
               isAddedDenied && (
                 <p className="font-sans font-normal text-[#FF9526]">
-                  島上空間有限，計畫滿三個就不能再增加了{`><`}
+                  {projectLimitMessage}
                 </p>
               )
             }
           </div>
-          {isEditPermitted ? (
+          <MarathonAccess>
+            {projects?.length === 0 && <EmptyProject />}
             <div className="
               flex flex-col md:flex-row
               gap-5"
@@ -185,9 +157,7 @@ const Projects = () => {
                 })
               }
             </div>
-          ) :
-            (<AccessDenied />)
-          }
+          </MarathonAccess>
         </div>
       </div>
     </ProtectedComponent>

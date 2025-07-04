@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router';
 import { getAdminProjectLayout } from '@/layout/features/getProjectLayout';
-import ReviewDetail from '@/components/Review/Detail';
-import { useProjectReview } from '@/services/modules/projects';
-import { parseToNumber, parseToString } from '@/services/core';
+import ReviewDetail from '@/features/projects/components/ReviewDetail';
+import { useProjectReview } from '@/features/projects/hooks/review';
+import { parseToNumber, parseToString } from '@/utils/helper';
 
 const ReviewPage = () => {
   const { query } = useRouter();

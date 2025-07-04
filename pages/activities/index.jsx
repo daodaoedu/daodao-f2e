@@ -21,7 +21,7 @@ const ActivitiesPage = () => {
 
   return (
     <>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Activities />
     </>
   );

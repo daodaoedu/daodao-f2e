@@ -1,35 +1,39 @@
-import { useState } from 'react';
-import dayjs from 'dayjs';
-import { MdAdd } from 'react-icons/md';
+import { useState } from "react";
+import dayjs from "dayjs";
+import { MdAdd } from "react-icons/md";
 import {
-  CreateProjectMilestoneSchema,
   ProjectMilestoneSchema,
-  UpdateProjectMilestoneSchema,
+  ProjectMilestoneFormSchema,
   ProjectTaskSchema,
-} from '@/services/modules/projects';
-import Button from '@/shared/components/Button';
-import Collapse from '@/shared/components/Collapse';
-import MilestoneCard from './MilestoneCard';
-import Task from '../Tasks/Task';
-import DraggableTasks from '../Tasks/DraggableTasks';
+} from "@/services/projects";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/utils/cn";
+import MilestoneCard from "./MilestoneCard";
+import Task from "../Tasks/Task";
+import DraggableTasks from "../Tasks/DraggableTasks";
 
 interface MilestoneItemProps {
   projectId: string;
-  startDate?: dayjs.Dayjs;
-  endDate?: dayjs.Dayjs;
+  minDate?: dayjs.Dayjs;
+  maxDate?: dayjs.Dayjs;
   isEditable?: boolean;
   milestone: ProjectMilestoneSchema;
   milestones: ProjectMilestoneSchema[];
-  onCreate?: (request: CreateProjectMilestoneSchema) => void;
-  onUpdate?: (request: UpdateProjectMilestoneSchema) => void;
+  onCreate?: (request: ProjectMilestoneFormSchema) => void;
+  onUpdate?: (request: ProjectMilestoneFormSchema) => void;
   onRefreshData?: () => void;
   onReorderTask?: (task: ProjectTaskSchema) => void;
 }
 
 const MilestoneItem = ({
   projectId,
-  startDate,
-  endDate,
+  minDate,
+  maxDate,
   isEditable,
   milestone,
   milestones,
@@ -46,52 +50,54 @@ const MilestoneItem = ({
         projectId={projectId}
         milestone={milestone}
         milestones={milestones}
-        startDate={startDate}
-        endDate={endDate}
+        minDate={minDate}
+        maxDate={maxDate}
         isEditable={isEditable}
         onCreate={onCreate}
         onUpdate={onUpdate}
       />
-      <Collapse defaultOpen>
-        <Collapse.List className="flex flex-col gap-2">
-          <Collapse.Item className="w-full overflow-hidden">
-            <DraggableTasks
-              tasks={milestone.tasks}
+      <Collapsible>
+        <CollapsibleContent className="flex flex-col gap-2">
+          <DraggableTasks
+            tasks={milestone.tasks}
+            projectId={projectId}
+            milestoneId={milestone.id}
+            onRefreshData={onRefreshData}
+            onReorderTask={onReorderTask}
+          />
+          {isEditing ? (
+            <Task
+              index={(milestone.tasks || []).length}
               projectId={projectId}
               milestoneId={milestone.id}
+              onCancel={() => setIsEditing(false)}
               onRefreshData={onRefreshData}
-              onReorderTask={onReorderTask}
             />
-          </Collapse.Item>
-          <Collapse.Item>
-            {isEditing ? (
-              <Task
-                index={(milestone.tasks || []).length}
-                projectId={projectId}
-                milestoneId={milestone.id}
-                onCancel={() => setIsEditing(false)}
-                onRefreshData={onRefreshData}
-              />
-            ) : (
-              <div className="flex justify-end">
-                <Button
-                  onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2 py-0 body-sm"
-                >
-                  <MdAdd className="w-5 h-5" />
-                  <span>新增子任務</span>
-                </Button>
-              </div>
-            )}
-          </Collapse.Item>
-        </Collapse.List>
-        <Collapse.Toggle
+          ) : (
+            <div className="flex justify-end">
+              <Button
+                onClick={() => setIsEditing(true)}
+                variant="ghost"
+                className="flex items-center gap-2 py-0 body-sm"
+              >
+                <MdAdd className="w-5 h-5" />
+                <span>新增子任務</span>
+              </Button>
+            </div>
+          )}
+        </CollapsibleContent>
+        <CollapsibleTrigger
           withIcon
-          className="pt-1.5 w-full flex justify-center body-sm"
+          className={cn(
+            "pt-1.5 w-full flex justify-center body-sm",
+            "[&[data-state=open]>span:nth-child(1)]:hidden",
+            "[&[data-state=closed]>span:nth-child(2)]:hidden"
+          )}
         >
-          {(isOpen) => (isOpen ? '收合' : '展開')}
-        </Collapse.Toggle>
-      </Collapse>
+          <span>展開</span>
+          <span>收合</span>
+        </CollapsibleTrigger>
+      </Collapsible>
     </div>
   );
 };

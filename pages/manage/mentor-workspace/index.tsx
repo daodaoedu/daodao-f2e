@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Button from '@/shared/components/Button';
+import { FaAngleLeft } from 'react-icons/fa6';
+import { Button } from '@/components/ui/button';
 import Container from '@/shared/components/Container';
 import Image from '@/shared/components/Image';
 import { useMentorMarathonList } from '@/hooks/api/mentor';
@@ -70,10 +71,11 @@ const MentorWorkspace = () => {
       <div className="px-4 mx-auto max-w-4xl">
         <Button
           size="sm"
+          variant="ghost"
           className="px-0 mb-6"
-          prefixIcon="FaAngleLeft"
           onClick={() => router.push('/manage')}
         >
+          <FaAngleLeft />
           返回 我的小島
         </Button>
         <h1 className="mb-6 heading-md">導師工作室</h1>

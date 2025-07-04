@@ -1,0 +1,43 @@
+import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
+import { useRouter } from "next/router";
+import { z } from "zod";
+
+const formatQuery = <T extends z.ZodObject<z.ZodRawShape>>(
+  schema: T,
+  value: z.infer<T>,
+  skipFalsy = false
+) => {
+  const parsed = schema.safeParse(value);
+
+  if (parsed.error) {
+    console.error(parsed.error);
+  }
+
+  return Object.keys(schema.shape).reduce((acc, key) => {
+    const keySchema = schema.shape[key];
+    const parsedValue = keySchema.safeParse(value[key]);
+    if (parsedValue.success && (!skipFalsy || parsedValue.data)) {
+      Object.assign(acc, { [key]: parsedValue.data });
+    }
+    return acc;
+  }, {} as z.infer<T>);
+};
+
+export default function useQueryState<T extends z.AnyZodObject>(schema: T) {
+  const { query, push } = useRouter();
+
+  const state = useMemo<z.infer<T>>(() => formatQuery(schema, query), [query]);
+
+  const setState = useCallback<Dispatch<SetStateAction<z.infer<T>>>>(
+    (value) => {
+      const newValue = typeof value === "function" ? value(state) : value;
+      const newQuery = formatQuery(schema, newValue, true);
+      push({ pathname: window.location.pathname, query: newQuery }, undefined, {
+        scroll: false,
+      });
+    },
+    [state, push]
+  );
+
+  return [state, setState] as const;
+}

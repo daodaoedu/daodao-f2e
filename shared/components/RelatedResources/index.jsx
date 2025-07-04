@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Skeleton } from '@mui/material';
 import Marquee from 'react-fast-marquee';
-import { useRelatedResources } from '@/services/modules/notion';
+import { useRelatedResources } from '@/services/notion';
 import Card from './Card';
 
 const RelatedResourcesWrapper = styled.div`

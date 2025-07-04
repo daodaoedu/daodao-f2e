@@ -1,7 +1,7 @@
 import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
 import { Skeleton } from '@mui/material';
 import { MdOutlineSort } from 'react-icons/md';
 import { Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
@@ -9,17 +9,18 @@ import { useProject } from '@/contexts/Project';
 import { MilestonesProvider } from '@/contexts/Milestones/index';
 import MilestoneCard, {
   MilestoneFormRef,
-} from '@/components/Milestones/MilestoneCard';
-import DraggableMilestones from '@/components/Milestones/DraggableMilestones';
-import dayjs from 'dayjs';
-import DateRangePicker from '@/shared/components/DateRangePicker';
-import Button from '@/shared/components/Button';
+} from "@/components/Milestones/MilestoneCard";
+import DraggableMilestones from "@/components/Milestones/DraggableMilestones";
+import dayjs from "dayjs";
+import { DateRangePicker } from "@/components/ui/date-picker";
+import { Button } from "@/components/ui/button";
+import { ProjectMilestoneSchema } from "@/services/projects";
+import SwapRightIcon from "@/public/assets/icons/swap-right.svg";
+import { useMilestonesDateRange } from "@/features/projects";
 import {
-  ProjectMilestoneSchema,
   useProjectMilestoneMutation,
   useProjectMilestones,
-} from '@/services/modules/projects';
-import CalendarIcon from '@/public/assets/icons/calendar.svg';
+} from "@/features/projects/hooks/milestone";
 
 const SkeletonMilestones = () => {
   return (
@@ -68,7 +69,7 @@ const MilestonesProgress = ({ milestones = [] }: MilestonesProgressProps) => {
   const daysRemaining = useMemo(() => {
     if (!milestoneEndDate || dayjs().isAfter(milestoneEndDate)) return 0;
 
-    return milestoneEndDate.diff(dayjs(), 'day');
+    return milestoneEndDate.diff(dayjs(), "day");
   }, [milestoneEndDate]);
 
   const remainingMilestonesCount = useMemo(() => {
@@ -116,24 +117,24 @@ const MilestonesProgress = ({ milestones = [] }: MilestonesProgressProps) => {
 };
 
 enum FilterEnum {
-  All = 'all',
-  Completed = 'completed',
-  Incomplete = 'incomplete',
+  All = "all",
+  Completed = "completed",
+  Incomplete = "incomplete",
 }
 
 const filterItems = [
   {
-    label: '全部',
+    label: "全部",
     value: FilterEnum.All,
     fn: () => true,
   },
   {
-    label: '未完成',
+    label: "未完成",
     value: FilterEnum.Incomplete,
     fn: (milestone: ProjectMilestoneSchema) => !milestone.isCompleted,
   },
   {
-    label: '已完成',
+    label: "已完成",
     value: FilterEnum.Completed,
     fn: (milestone: ProjectMilestoneSchema) => milestone.isCompleted,
   },
@@ -157,18 +158,17 @@ const useHandleShowForm = () => {
 
 const MilestonesContent = () => {
   const { formRef, isCreating, handleOpen, handleClose } = useHandleShowForm();
-  const [startDate, setStartDate] = useState(dayjs().startOf('day'));
-  const [endDate, setEndDate] = useState(dayjs().startOf('day').add(30, 'day'));
   const [filterType, setFilterType] = useState(FilterEnum.All);
   const [isAscending, setIsAscending] = useState(true);
   const { project } = useProject();
-  const isInitial = useRef(false);
 
   const {
     data: milestones,
     isLoading,
     mutate,
   } = useProjectMilestones(project.id);
+
+  const milestonesDateRange = useMilestonesDateRange(project.id);
 
   const { createMutation, updateMutation } = useProjectMilestoneMutation({
     projectId: project.id,
@@ -189,25 +189,12 @@ const MilestonesContent = () => {
     return isAscending ? sortedData : [...sortedData].reverse();
   }, [milestones, isAscending, filterType]);
 
-  useEffect(() => {
-    if (!milestones?.length || isInitial.current) return;
-    isInitial.current = true;
-
-    const milestoneStartDate = dayjs(milestones[0].startDate);
-    const milestoneEndDate = milestones.reduce(
-      (compareEndDate, milestone) => {
-        const currentEndDate = dayjs(milestone.endDate);
-
-        return compareEndDate.isAfter(currentEndDate)
-          ? compareEndDate
-          : currentEndDate;
-      },
-      milestoneStartDate
-    );
-
-    setStartDate(milestoneStartDate);
-    setEndDate(milestoneEndDate);
-  }, [milestones, isInitial]);
+  const date = useMemo(() => {
+    return {
+      from: milestonesDateRange.startDate?.toDate(),
+      to: milestonesDateRange.endDate?.toDate(),
+    };
+  }, [milestonesDateRange]);
 
   return (
     <div>
@@ -222,24 +209,19 @@ const MilestonesContent = () => {
               <>
                 {!isMarathonProject && (
                   <div className="flex flex-col md:flex-row justify-between md:items-center gap-2 pb-2.5">
-                    <div className="flex flex-col md:flex-row md:items-center gap-2">
-                      <p>時間設定：</p>
+                    <div className="flex items-center gap-2">
+                      <p>時間：</p>
                       <DateRangePicker
-                        startDate={startDate}
-                        endDate={endDate}
-                        disabledStartDate={project.version === 2}
-                        afterIcon={
-                          <CalendarIcon className="w-4 h-4 text-primary-base" />
+                        value={date}
+                        separator={
+                          <SwapRightIcon className="w-4 h-4 text-basic-black/25" />
                         }
-                        minDate={dayjs().startOf('day')}
-                        maxDate={startDate.add(1, 'year')}
-                        onStartDateChange={setStartDate}
-                        onEndDateChange={setEndDate}
+                        className="-mx-3 p-2"
+                        disabled
                       />
                     </div>
                     <Button
-                      variant="solid"
-                      color="primary"
+                      variant="default"
                       className="w-full md:w-auto"
                       onClick={handleOpen}
                     >
@@ -254,9 +236,8 @@ const MilestonesContent = () => {
                       <Button
                         key={item.value}
                         variant={
-                          filterType === item.value ? 'solid' : 'outline'
+                          filterType === item.value ? "default" : "outline"
                         }
-                        color={filterType === item.value ? 'primary' : 'white'}
                         className="rounded-lg px-2.5 mr-2"
                         onClick={() => setFilterType(item.value)}
                       >
@@ -266,11 +247,11 @@ const MilestonesContent = () => {
                   </div>
                   <Button
                     variant="outline"
-                    className="rounded-lg px-2.5 flex items-center gap-2"
+                    className="group rounded-lg px-2.5 flex items-center gap-2"
                     onClick={() => setIsAscending(!isAscending)}
                   >
-                    <MdOutlineSort className="size-6 text-primary-base" />
-                    {isAscending ? '舊到新' : '新到舊'}
+                    <MdOutlineSort className="size-6 text-primary-base group-hover:text-current" />
+                    {isAscending ? "舊到新" : "新到舊"}
                   </Button>
                 </div>
               </>
@@ -280,8 +261,8 @@ const MilestonesContent = () => {
                 <div className="p-2.5 bg-basic-100 flex flex-col gap-2 rounded-xl">
                   <MilestoneCard
                     ref={formRef}
-                    startDate={startDate}
-                    endDate={endDate}
+                    minDate={milestonesDateRange.minDate}
+                    maxDate={milestonesDateRange.maxDate}
                     projectId={projectId}
                     disabledChangeDate={isMarathonProject}
                     milestones={milestones}
@@ -299,8 +280,8 @@ const MilestonesContent = () => {
                 <DraggableMilestones
                   milestones={sortedMilestones}
                   projectId={projectId}
-                  startDate={startDate}
-                  endDate={endDate}
+                  minDate={milestonesDateRange.minDate}
+                  maxDate={milestonesDateRange.maxDate}
                   isAscending={isAscending}
                   onUpdate={updateMutation.trigger}
                   onReorder={updateMutation.trigger}
@@ -318,17 +299,10 @@ const MilestonesContent = () => {
 
 const MilestonesPage = () => {
   const router = useRouter();
-  const SEOData = useMemo(
+  const jsonLd = useMemo<JsonLdType>(
     () => ({
-      title: '島島盃 - 2025 春季學習馬拉松｜多元學習資源平台｜島島阿學',
-      description:
-        '「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。',
-      keywords: '島島阿學',
-      author: '島島阿學',
-      copyright: '島島阿學',
-      imgLink: 'https://www.daoedu.tw/preview.webp',
-      link: `${process.env.HOSTNAME}${router?.asPath}`,
-      structuredData: [
+      '@context': 'https://schema.org',
+      '@graph': [
         {
           '@context': 'https://schema.org',
           '@type': 'WebSite',
@@ -352,7 +326,11 @@ const MilestonesPage = () => {
 
   return (
     <MilestonesProvider>
-      <SEOConfig data={SEOData} />
+      <SEOConfig
+        title="島島盃 - 2025 春季學習馬拉松｜多元學習資源平台｜島島阿學"
+        description="「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。"
+        jsonLd={jsonLd}
+      />
       <MilestonesContent />
     </MilestonesProvider>
   );

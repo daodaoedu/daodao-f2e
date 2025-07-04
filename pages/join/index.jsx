@@ -141,7 +141,7 @@ function JoinPage() {
 
   return (
     <Wrapper>
-      <SEOConfig data={SEOData} />
+      <SEOConfig {...SEOData} />
       <Container>
         <Paper>
           <PaperColumnCenter>
