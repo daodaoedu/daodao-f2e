@@ -29,7 +29,7 @@ export function useResourceList(filter: ResourceSearchParamsSchema) {
         resourcePathname,
         {
           ...filter,
-          cursor: previousPageData?.data.pagination?.next_cursor ?? undefined,
+          cursor: previousPageData?.data.pagination?.nextCursor ?? undefined,
         },
       ];
     },
@@ -42,8 +42,8 @@ export function useResourceList(filter: ResourceSearchParamsSchema) {
   );
 
   const lastData = swrInfinite.data?.[swrInfinite.data.length - 1];
-  const hasMore = lastData?.data.pagination?.has_more;
-  const nextCursor = lastData?.data.pagination?.next_cursor;
+  const hasMore = lastData?.data.pagination?.hasNext;
+  const nextCursor = lastData?.data.pagination?.nextCursor;
   const totalCount = lastData?.data.pagination?.totalEstimate ?? 0;
 
   return { ...swrInfinite, data, hasMore, nextCursor, totalCount };

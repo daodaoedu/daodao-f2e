@@ -43,9 +43,7 @@ export const resourceSchema = z.object({
 
 export const resourceListResponseSchema = z.object({
   resources: z.array(resourceSchema),
-  pagination: cursorsSchema.extend({
-    totalEstimate: z.number(),
-  }),
+  pagination: cursorsSchema,
 });
 
 export const resourceDetailResponseSchema = resourceSchema.extend({
