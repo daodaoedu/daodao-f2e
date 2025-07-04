@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useFormContext } from "react-hook-form";
 import {
   FormControl,
@@ -11,7 +12,6 @@ import {
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Text, Title } from "@/components/ui/typography";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import {
   ResourceFormSchema,
   ResourceReviewFormSchema,
@@ -30,6 +30,11 @@ import {
   resourceUsageOptions,
   timeUsageOptions,
 } from "@/features/resources";
+
+const MarkdownEditor = dynamic(
+  () => import("@/components/ui/markdown-editor"),
+  { ssr: false }
+);
 
 type ResourceReviewSchema = Pick<ResourceFormSchema, "review">;
 
