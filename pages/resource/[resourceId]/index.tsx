@@ -37,25 +37,23 @@ enum TabEnum {
 export const runtime = "experimental-edge";
 
 export const getServerSideProps = (async (context) => {
-  const resourceId = parseToString(context.params?.resourceId);
+  try {
+    const resourceId = parseToString(context.params?.resourceId);
 
-  if (!resourceId) {
+    if (!resourceId) {
+      return { notFound: true };
+    }
+
+    const { data } = await resourceAPI.read(resourceId);
+
     return {
-      props: {
-        data: null,
-      },
+      props: { data },
     };
+  } catch {
+    return { notFound: true };
   }
-
-  const { data } = await resourceAPI.read(resourceId);
-
-  return {
-    props: {
-      data,
-    },
-  };
 }) satisfies GetServerSideProps<{
-  data: ResourceDetailResponseSchema["data"] | null;
+  data: ResourceDetailResponseSchema["data"];
 }>;
 
 export default function ResourceDetailPage({

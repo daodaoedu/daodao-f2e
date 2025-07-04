@@ -36,11 +36,11 @@ export const getServerSideProps = (async () => {
       },
     };
   } catch {
-    return { props: { fallback: undefined, jsonLd: undefined } };
+    return { props: {} };
   }
 }) satisfies GetServerSideProps<{
-  fallback: Record<string, ResourceListResponseSchema["data"]> | undefined;
-  jsonLd: JsonLdType | undefined;
+  fallback?: Record<string, ResourceListResponseSchema["data"]>;
+  jsonLd?: JsonLdType;
 }>;
 
 export default function ResourceCategoriesPage({

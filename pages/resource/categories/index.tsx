@@ -22,20 +22,24 @@ import { Container } from "@/components/ui/wrapper";
 export const runtime = "experimental-edge";
 
 export const getServerSideProps = (async () => {
-  const { data } = await resourceAPI.readList({ limit: 4 });
+  try {
+    const { data } = await resourceAPI.readList({ limit: 4 });
 
-  const jsonLd = JsonLdFactory.createGraph([
-    JsonLdFactory.createItemListBuilder()
-      .setName("所有分類")
-      .setItems(data.resources.map(createResourceJsonLd)),
-  ]);
+    const jsonLd = JsonLdFactory.createGraph([
+      JsonLdFactory.createItemListBuilder()
+        .setName("所有分類")
+        .setItems(data.resources.map(createResourceJsonLd)),
+    ]);
 
-  return {
-    props: { fallback: { "/resource/categories": data }, jsonLd },
-  };
+    return {
+      props: { fallback: { "/resource/categories": data }, jsonLd },
+    };
+  } catch {
+    return { redirect: { destination: "/resource", permanent: false } };
+  }
 }) satisfies GetServerSideProps<{
-  fallback: Record<string, ResourceListResponseSchema["data"]> | null;
-  jsonLd: JsonLdType | null;
+  fallback: Record<string, ResourceListResponseSchema["data"]>;
+  jsonLd: JsonLdType;
 }>;
 
 export default function ResourceCategoriesPage({

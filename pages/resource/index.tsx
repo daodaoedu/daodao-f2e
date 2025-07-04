@@ -19,18 +19,23 @@ import { Container } from "@/components/ui/wrapper";
 export const runtime = "experimental-edge";
 
 export const getServerSideProps = (async () => {
-  const { data } = await resourceAPI.readList({ limit: 4 });
+  try {
+    const { data } = await resourceAPI.readList({ limit: 4 });
 
-  const jsonLd = JsonLdFactory.createGraph([
-    JsonLdFactory.createItemListBuilder()
-      .setName("多元學習資源列表")
-      .setItems(data.resources.map(createResourceJsonLd)),
-  ]);
+    const jsonLd = JsonLdFactory.createGraph([
+      JsonLdFactory.createItemListBuilder()
+        .setName("多元學習資源列表")
+        .setItems(data.resources.map(createResourceJsonLd)),
+    ]);
 
-  return { props: { data, jsonLd } };
+    return { props: { data, jsonLd } };
+  } catch (error) {
+    console.error(error);
+    return { props: {} };
+  }
 }) satisfies GetServerSideProps<{
-  data: ResourceListResponseSchema["data"];
-  jsonLd: JsonLdType;
+  data?: ResourceListResponseSchema["data"];
+  jsonLd?: JsonLdType;
 }>;
 
 export default function ResourcePage({

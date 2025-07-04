@@ -63,6 +63,7 @@ export const getServerSideProps = (async (context) => {
         subCategory,
         title,
         totalEstimate: data.pagination.totalEstimate ?? 0,
+        parentTotalEstimate: data.pagination.parentTotalEstimate ?? 0,
       },
     };
   } catch {
@@ -70,6 +71,7 @@ export const getServerSideProps = (async (context) => {
       props: {
         title,
         totalEstimate: 0,
+        parentTotalEstimate: 0,
         majorCategory,
         subCategory,
       },
@@ -82,6 +84,7 @@ export const getServerSideProps = (async (context) => {
   subCategory: ICategory | null;
   title: string;
   totalEstimate: number;
+  parentTotalEstimate: number;
 }>;
 
 export default function ResourceCategoriesPage({
@@ -91,6 +94,7 @@ export default function ResourceCategoriesPage({
   subCategory,
   title,
   totalEstimate,
+  parentTotalEstimate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const selectedCategories = [majorCategory, subCategory].filter(
     (value) => value !== null
@@ -163,7 +167,7 @@ export default function ResourceCategoriesPage({
 
       <ResourceExplorer
         categories={selectedCategories}
-        parentDataCount={0}
+        parentDataCount={parentTotalEstimate}
       />
     </SWRConfig>
   );
