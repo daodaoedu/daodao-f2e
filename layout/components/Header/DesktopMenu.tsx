@@ -1,33 +1,18 @@
-import Link from "next/link";
-import { MARATHON_LINKS, LOGGED_OUT_NAV_LINK, LOGGED_IN_NAV_LINK, USER_LINK } from "@/constants/category";
-import { useAuth, useAuthDispatch } from "@/contexts/Auth";
-import { cn } from "@/utils/cn";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
-import { SearchFunction } from "./SearchFunction";
+import Link from 'next/link';
+import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
+import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import { cn } from '@/utils/cn';
+import Dropdown from '@/shared/components/Dropdown';
 
 function DesktopMenu() {
   const auth = useAuth();
   const authDispatch = useAuthDispatch();
 
-  // 根據登入狀態選擇導航連結
-  const navigationLinks = auth.isLoggedIn ? LOGGED_IN_NAV_LINK : LOGGED_OUT_NAV_LINK;
-
-  const handleSearch = (query: string) => {
-    console.log('Search query:', query);
-    // TODO: 實現搜尋邏輯或導航到搜尋頁面
-  };
-
   return (
     <>
       <nav>
         <ul className="flex items-center gap-1">
-          {navigationLinks.map(({ link, name, target }) => (
+          {NAV_LINK.map(({ link, name, target }) => (
             <li key={name}>
               <Link
                 href={link}
@@ -40,42 +25,41 @@ function DesktopMenu() {
           ))}
         </ul>
       </nav>
-      <nav className="flex items-center gap-3.5">
-        <DropdownMenu>
-          <DropdownMenuTrigger
+      <div className="flex items-center gap-3.5">
+        <Dropdown as="nav">
+          <Dropdown.Toggle
             className={cn(
-              "my-4 py-1.5 pl-3 pr-1 flex items-center gap-1",
-              "font-bold rounded-lg text-basic-white bg-transparent",
-              "data-[state=open]:text-primary-base data-[state=open]:bg-primary-lightest",
-              "transition-colors [&[data-state=open]>svg]:rotate-180"
+              'my-4 py-1.5 pl-3 pr-1 font-bold rounded-lg transition-colors',
+              'text-basic-white hover:text-basic-white bg-transparent',
+              'aria-pressed:text-primary-base aria-pressed:bg-primary-lightest'
             )}
+            withIcon
           >
             島島盃-春季學習馬拉松
-            <ChevronDown className="size-4 transition-transform" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="mt-1">
+          </Dropdown.Toggle>
+          <Dropdown.List className="mt-1">
             {MARATHON_LINKS.map(({ name, link }) => (
-              <DropdownMenuItem
+              <Dropdown.Item
                 key={name}
                 className="rounded-lg text-nowrap hover:bg-primary-lightest"
-                asChild
               >
-                <Link href={link}>{name}</Link>
-              </DropdownMenuItem>
+                <Link href={link} className="block p-2 text-basic-400">
+                  {name}
+                </Link>
+              </Dropdown.Item>
             ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </Dropdown.List>
+        </Dropdown>
         {auth.isLoggedIn ? (
-          <nav className="flex items-center gap-3.5">
-            <SearchFunction onSearch={handleSearch} />
+          <div className="flex items-center gap-3.5">
             <Link
               href="/manage"
               className="px-2 py-5 text-basic-white body-md font-bold"
             >
               我的小島
             </Link>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="p-0">
+            <Dropdown as="nav">
+              <Dropdown.Toggle animation="none" className="p-0">
                 <img
                   src={auth.user.photoURL}
                   alt={auth.user.name}
@@ -83,13 +67,12 @@ function DesktopMenu() {
                   height="40"
                   className="rounded-full"
                 />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="mt-2">
+              </Dropdown.Toggle>
+              <Dropdown.List className="mt-2">
                 {USER_LINK.map(({ name, id }) => (
-                  <DropdownMenuItem
+                  <Dropdown.Item
                     key={name}
                     className="rounded-lg text-nowrap hover:bg-primary-lightest"
-                    asChild
                   >
                     <Link
                       href={`/profile?id=${id}`}
@@ -97,12 +80,9 @@ function DesktopMenu() {
                     >
                       {name}
                     </Link>
-                  </DropdownMenuItem>
+                  </Dropdown.Item>
                 ))}
-                <DropdownMenuItem
-                  className="rounded-lg text-nowrap hover:bg-primary-lightest"
-                  asChild
-                >
+                <Dropdown.Item className="rounded-lg text-nowrap hover:bg-primary-lightest">
                   <button
                     type="button"
                     className="block p-2 text-basic-400"
@@ -110,10 +90,10 @@ function DesktopMenu() {
                   >
                     登出
                   </button>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </nav>
+                </Dropdown.Item>
+              </Dropdown.List>
+            </Dropdown>
+          </div>
         ) : (
           <button
             type="button"
@@ -123,7 +103,7 @@ function DesktopMenu() {
             登入
           </button>
         )}
-      </nav>
+      </div>
     </>
   );
 }
