@@ -20,17 +20,16 @@ import {
   Slogan,
   List,
 } from "@/features/quiz";
-import FacebookSvg from "@/public/assets/quiz/socials-logos/facebook.svg";
-import LineSvg from "@/public/assets/quiz/socials-logos/line.svg";
-import LinkedInSvg from "@/public/assets/quiz/socials-logos/linkedin.svg";
-import ShareWindowsSvg from "@/public/assets/quiz/socials-logos/share_windows.svg";
-import ThreadsSvg from "@/public/assets/quiz/socials-logos/threads.svg";
-import XSvg from "@/public/assets/quiz/socials-logos/x.svg";
+import FacebookSvg from "@/public/assets/socials-logos/facebook.svg";
+import LineSvg from "@/public/assets/socials-logos/line.svg";
+import LinkedInSvg from "@/public/assets/socials-logos/linkedin.svg";
+import ShareWindowsSvg from "@/public/assets/socials-logos/share_windows.svg";
+import ThreadsSvg from "@/public/assets/socials-logos/threads.svg";
+import XSvg from "@/public/assets/socials-logos/x.svg";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { useDialog } from "@/contexts/Dialog";
 import getShareAPI from "@/utils/getShareAPI";
-import getEnv from "@/utils/env";
 import { GACategory, logEvent } from "@/utils/analytics";
 
 export default function QuizResultPage() {
@@ -41,9 +40,9 @@ export default function QuizResultPage() {
   const cleanupRef = useRef<() => void>(() => {});
   const { openDialog } = useDialog();
   const shareAPI = getShareAPI({
-    title: "我有一個島，它叫...",
-    text: "我有一個島，它叫...",
-    url: getEnv().isClientSide ? `${window.location.origin}/quiz` : "",
+    title: "【我有一個島，它叫＿島】學習風格測驗｜島島阿學",
+    text: "【我有一個島，它叫＿島】學習風格測驗｜島島阿學",
+    url: router.asPath,
     hashtag: "#島島阿學",
   });
 
@@ -252,7 +251,7 @@ export default function QuizResultPage() {
             <div className="mb-3 font-bold body-md text-center">
               分享個人結果到
             </div>
-            <div className="mb-4 mx-2 flex justify-between gap-2">
+            <div className="mb-4 mx-2 flex justify-between gap-2 text-basic-400">
               <Button
                 variant="ghost"
                 size="icon"

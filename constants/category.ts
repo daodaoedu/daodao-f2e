@@ -223,12 +223,12 @@ export const HOT_TAGS = [
     label: "自我成長",
   },
   {
-    value: getPathnameBySubCategory("career"),
-    label: "職涯",
+    value: getPathnameBySubCategory("social_innovation"),
+    label: "社會創新",
   },
   {
-    value: getPathnameBySubCategory("data_science_big_data"),
-    label: "資料科學與大數據",
+    value: getPathnameBySubCategory("investment"),
+    label: "投資理財",
   },
   {
     value: getPathnameBySubCategory("educational_innovation"),

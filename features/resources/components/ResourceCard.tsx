@@ -186,6 +186,7 @@ export default function ResourceCard(props: CardProps) {
                     href="https://forms.gle/NkVbDWC3eXk4P4gv7"
                     target="_blank"
                     className="block p-2"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     檢舉
                   </Link>

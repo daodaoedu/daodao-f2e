@@ -3,7 +3,7 @@ import { InfoIcon, CheckIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ControllerRenderProps, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -22,7 +22,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { costTypeOptions, targetAudienceTypeOptions, resourceTypeOptions } from "../constants";
+import {
+  costTypeOptions,
+  targetAudienceTypeOptions,
+  resourceTypeOptions,
+} from "../constants";
 
 interface SearchFormProps {
   onFilter: (filters: ResourceSearchParamsSchema) => void;
@@ -107,9 +111,7 @@ export default function ResourceSearchForm({
     values: filters,
   });
 
-  const handleClear = (
-    type: "type" | "cost" | "level" | "tags"
-  ) => {
+  const handleClear = (type: "type" | "cost" | "level" | "tags") => {
     form.setValue(type, "");
   };
 
@@ -117,26 +119,6 @@ export default function ResourceSearchForm({
     onFilter(data);
     onClose();
   }
-
-  const handleCheckboxChange = (
-    field: ControllerRenderProps<
-      ResourceSearchParamsSchema,
-      "cost" | "type" | "level" | "tags"
-    >,
-    itemId: string,
-    checked: boolean
-  ) => {
-    if (checked) {
-      field.onChange(field.value ? `${field.value},${itemId}` : itemId);
-    } else {
-      const updatedValue = (field.value ?? "")
-        .split(",")
-        .filter((value) => value !== itemId)
-        .join(",");
-
-      field.onChange(updatedValue);
-    }
-  };
 
   const getResourceTypeDescription = (id: string) => {
     switch (id) {
@@ -180,10 +162,7 @@ export default function ResourceSearchForm({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-6 bg-white p-6 rounded-xl">
             {/* 資源類型 */}
-            <FormSection
-              title="資源類型"
-              onClear={() => handleClear("type")}
-            >
+            <FormSection title="資源類型" onClear={() => handleClear("type")}>
               <FormField
                 control={form.control}
                 name="type"
@@ -194,14 +173,14 @@ export default function ResourceSearchForm({
                         <CheckboxItem
                           key={type.value}
                           label={type.label}
-                          isChecked={
-                            !!field.value?.split(",").includes(type.value)
-                          }
+                          isChecked={field.value === type.value}
                           onChange={(checked) =>
-                            handleCheckboxChange(field, type.value, checked)
+                            field.onChange(checked ? type.value : "")
                           }
                           hasTooltip
-                          tooltipContent={getResourceTypeDescription(type.value)}
+                          tooltipContent={getResourceTypeDescription(
+                            type.value
+                          )}
                         />
                       ))}
                     </div>
@@ -223,11 +202,9 @@ export default function ResourceSearchForm({
                         <CheckboxItem
                           key={type.value}
                           label={type.label}
-                          isChecked={
-                            !!field.value?.split(",").includes(type.value)
-                          }
+                          isChecked={field.value === type.value}
                           onChange={(checked) =>
-                            handleCheckboxChange(field, type.value, checked)
+                            field.onChange(checked ? type.value : "")
                           }
                         />
                       ))}
@@ -239,10 +216,7 @@ export default function ResourceSearchForm({
             </FormSection>
 
             {/* 適合對象 */}
-            <FormSection
-              title="適合"
-              onClear={() => handleClear("level")}
-            >
+            <FormSection title="適合" onClear={() => handleClear("level")}>
               <FormField
                 control={form.control}
                 name="level"
@@ -253,14 +227,14 @@ export default function ResourceSearchForm({
                         <CheckboxItem
                           key={type.value}
                           label={type.label}
-                          isChecked={
-                            !!field.value?.split(",").includes(type.value)
-                          }
+                          isChecked={field.value === type.value}
                           onChange={(checked) =>
-                            handleCheckboxChange(field, type.value, checked)
+                            field.onChange(checked ? type.value : "")
                           }
                           hasTooltip
-                          tooltipContent={getTargetAudienceDescription(type.value)}
+                          tooltipContent={getTargetAudienceDescription(
+                            type.value
+                          )}
                         />
                       ))}
                     </div>

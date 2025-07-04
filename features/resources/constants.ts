@@ -2,19 +2,19 @@ import { OptionProps } from "@/components/ui/option";
 import { createOptionMap } from "@/utils/option";
 
 export const resourceTypeOptions: OptionProps[] = [
-  { value: "learning-platform", label: "學習平台/APP" },
-  { value: "learning-tool", label: "學習工具" },
-  { value: "book", label: "書籍/文章" },
-  { value: "video", label: "影片" },
-  { value: "podcast", label: "Podcast" },
-  { value: "workshop", label: "工作坊與課程" },
-  { value: "certificate", label: "專業證書與認證課程" },
-  { value: "online-course", label: "如 Coursera、Udemy、edX" },
+  { value: "learning_platform_app", label: "學習平台/APP" },
+  { value: "learning_tools", label: "學習工具" },
+  { value: "books_articles", label: "書籍/文章" },
+  { value: "video_content", label: "影片" },
+  { value: "podcast_content", label: "Podcast" },
+  { value: "workshops_courses", label: "工作坊與課程" },
+  { value: "professional_certificates", label: "專業證書與認證課程" },
+  { value: "community_organization", label: "如 Coursera、Udemy、edX" },
 ];
 
 export const costTypeOptions: OptionProps[] = [
   { value: "free", label: "免費" },
-  { value: "partially-free", label: "部分免費" },
+  { value: "partial_free", label: "部分免費" },
   { value: "paid", label: "付費" },
 ];
 

@@ -163,8 +163,14 @@ export default function QuizResultDetailPage({
                   )}
                 </ul>
               </section>
-              <Button className="w-full font-bold" size="lg">
-                馬上開始一個小行動！
+              <Button className="w-full font-bold" size="lg" asChild>
+                <Link
+                  href="https://tally.so/r/w71dbZ"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  搶先體驗新功能測試
+                </Link>
               </Button>
               <Button
                 variant="outline"
@@ -172,7 +178,9 @@ export default function QuizResultDetailPage({
                 size="lg"
                 asChild
               >
-                <Link href="/resource">先挖掘更多優質資源！</Link>
+                <Link href="/resource" target="_blank">
+                  先挖掘更多優質資源！
+                </Link>
               </Button>
             </div>
             <footer>
