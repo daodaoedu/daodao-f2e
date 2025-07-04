@@ -1,4 +1,6 @@
+import { useMemo } from "react";
 import useSWR from "swr";
+import useSWRInfinite from "swr/infinite";
 import useSWRMutation, { SWRMutationConfiguration } from "swr/mutation";
 
 import {
@@ -10,15 +12,46 @@ import {
   ResourceMutationResponseSchema,
   ResourceSearchParamsSchema,
 } from "@/services/resources";
-import { mockResourceList } from "@/services/resources/mock";
 
 export function useResourceList(filter: ResourceSearchParamsSchema) {
-  return useSWR<ResourceListResponseSchema>([getResourcePathname(), filter], () => mockResourceList);
+  const resourcePathname = getResourcePathname();
+  const swrInfinite = useSWRInfinite<ResourceListResponseSchema>(
+    (
+      pageIndex,
+      previousPageData
+    ): [string, ResourceSearchParamsSchema] | null => {
+      if (previousPageData && !previousPageData.data.resources) return null;
+
+      if (!previousPageData?.data.resources && pageIndex === 0) {
+        return [resourcePathname, filter];
+      }
+      return [
+        resourcePathname,
+        {
+          ...filter,
+          cursor: previousPageData?.data.pagination?.nextCursor ?? undefined,
+        },
+      ];
+    },
+    { revalidateFirstPage: false }
+  );
+
+  const data = useMemo(
+    () => swrInfinite.data?.flatMap((page) => page.data.resources) ?? [],
+    [swrInfinite.data]
+  );
+
+  const lastData = swrInfinite.data?.[swrInfinite.data.length - 1];
+  const hasMore = lastData?.data.pagination?.hasNext;
+  const nextCursor = lastData?.data.pagination?.nextCursor;
+  const totalCount = lastData?.data.pagination?.totalEstimate ?? 0;
+
+  return { ...swrInfinite, data, hasMore, nextCursor, totalCount };
 }
 
-export function useResource(id?: string | null) {
+export function useResource(resourceId?: string | null) {
   return useSWR<ResourceDetailResponseSchema>(
-    id ? getResourcePathname({ id }) : null
+    resourceId ? getResourcePathname({ resourceId }) : null
   );
 }
 
@@ -39,11 +72,11 @@ export const useCreateResource = ({
 };
 
 export const useUpdateResource = (
-  id?: string | null,
+  resourceId?: string | null,
   { onSuccess, ...options }: SWRMutationOptions = {}
 ) => {
   return useSWRMutation(
-    id ? getResourcePathname({ id }) : null,
+    resourceId ? getResourcePathname({ resourceId }) : null,
     resourceAPI.update,
     {
       ...options,
@@ -56,11 +89,11 @@ export const useUpdateResource = (
 };
 
 export const useDeleteResource = (
-  id: string,
+  resourceId: string,
   { onSuccess, ...options }: SWRMutationOptions<void> = {}
 ) => {
   return useSWRMutation(
-    id ? getResourcePathname({ id }) : null,
+    resourceId ? getResourcePathname({ resourceId }) : null,
     resourceAPI.delete,
     {
       ...options,

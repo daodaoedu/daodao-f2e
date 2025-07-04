@@ -1,33 +1,21 @@
-@layer components {
-  /* 基本滾動行為設置 */
-  html {
-    @apply scroll-smooth;
-  }
-
-  body {
-    @apply overflow-x-hidden;
-  }
-
-  .page-container {
-    @apply min-h-screen;
-  }
-
-  /* 滾動重置動畫 */
-  .scroll-reset {
-    @apply transition-all duration-300 ease-out;
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap");
+
+.rdp-vhidden {
+  @apply hidden;
+}
 
 @layer base {
-  .prose li[role='checkbox'] {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  .prose li[role="checkbox"] {
     @apply indent-1 relative before:translate-y-1 after:absolute after:top-1/2 after:-translate-y-2/3 after:rotate-45;
   }
   .disabled-prose li {
@@ -92,29 +80,5 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-@layer utilities {
-  /* Custom scrolling utilities */
-  .custom-scroll {
-    @apply scroll-smooth overflow-x-hidden;
-  }
-
-  .custom-page {
-    @apply min-h-screen;
-  }
-
-  .custom-scroll-reset {
-    @apply transform translate-y-0 opacity-100 transition-all duration-300 ease-out;
   }
 }

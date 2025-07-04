@@ -13,25 +13,17 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/utils/cn";
+import { OptionProps } from "./option";
 
-export interface Option {
-  value: string;
-  label: string;
-  disable?: boolean;
-  /** fixed option that can't be removed. */
-  fixed?: boolean;
-  /** Group the options by providing key. */
-  [key: string]: string | boolean | undefined;
-}
 interface GroupOption {
-  [key: string]: Option[];
+  [key: string]: OptionProps[];
 }
 
 interface MultipleSelectorProps {
-  value?: Option[];
-  defaultOptions?: Option[];
+  value?: OptionProps[];
+  defaultOptions?: OptionProps[];
   /** manually controlled options */
-  options?: Option[];
+  options?: OptionProps[];
   placeholder?: string;
   /** Loading component. */
   loadingIndicator?: React.ReactNode;
@@ -45,14 +37,14 @@ interface MultipleSelectorProps {
    */
   triggerSearchOnFocus?: boolean;
   /** async search */
-  onSearch?: (value: string) => Promise<Option[]>;
+  onSearch?: (value: string) => Promise<OptionProps[]>;
   /**
    * sync search. This search will not showing loadingIndicator.
    * The rest props are the same as async search.
    * i.e.: creatable, groupBy, delay.
    */
-  onSearchSync?: (value: string) => Option[];
-  onChange?: (options: Option[]) => void;
+  onSearchSync?: (value: string) => OptionProps[];
+  onChange?: (options: OptionProps[]) => void;
   /** Limit the maximum number of selected options. */
   maxSelected?: number;
   /** When the number of selected options exceeds the limit, the onMaxSelected will be called. */
@@ -85,7 +77,7 @@ interface MultipleSelectorProps {
 }
 
 export interface MultipleSelectorRef {
-  selectedValue: Option[];
+  selectedValue: OptionProps[];
   input: HTMLInputElement;
   focus: () => void;
   reset: () => void;
@@ -105,7 +97,7 @@ export function useDebounce<T>(value: T, delay?: number): T {
   return debouncedValue;
 }
 
-function transToGroupOption(options: Option[], groupBy?: string) {
+function transToGroupOption(options: OptionProps[], groupBy?: string) {
   if (options.length === 0) {
     return {};
   }
@@ -126,7 +118,7 @@ function transToGroupOption(options: Option[], groupBy?: string) {
   return groupOption;
 }
 
-function removePickedOption(groupOption: GroupOption, picked: Option[]) {
+function removePickedOption(groupOption: GroupOption, picked: OptionProps[]) {
   return Object.entries(groupOption).reduce((acc, [key, value]) => {
     acc[key] = value.filter(
       (val) => !picked.find((p) => p.value === val.value)
@@ -205,7 +197,7 @@ export const MultipleSelector = React.forwardRef<
     const [isLoading, setIsLoading] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null); // Added this
 
-    const [selected, setSelected] = React.useState<Option[]>(value || []);
+    const [selected, setSelected] = React.useState<OptionProps[]>(value || []);
     const [options, setOptions] = React.useState<GroupOption>(
       transToGroupOption(arrayDefaultOptions, groupBy)
     );
@@ -236,7 +228,7 @@ export const MultipleSelector = React.forwardRef<
     };
 
     const handleUnselect = React.useCallback(
-      (option: Option) => {
+      (option: OptionProps) => {
         const newOptions = selected.filter((s) => s.value !== option.value);
         setSelected(newOptions);
         onChange?.(newOptions);

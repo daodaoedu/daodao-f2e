@@ -86,7 +86,7 @@ const moreSpaceRegex = /(\n)?( {2} +)/g;
 const replaceSpace = (value: string) =>
   value.replace(moreSpaceRegex, (_, p1, p2) => `${p1 ?? ""}&#x20;${p2}`);
 
-export const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
+const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
   (
     {
       readOnly = false,
@@ -276,3 +276,5 @@ export const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
     );
   }
 );
+
+export default MarkdownEditor;

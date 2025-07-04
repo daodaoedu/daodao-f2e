@@ -1,11 +1,21 @@
+"use client";
+
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker } from "react-day-picker";
+import { DayPicker, DropdownProps } from "react-day-picker";
 import { format } from "date-fns";
 import { zhTW } from "date-fns/locale";
 
-import { cn } from "@/utils/cn";
 import { buttonVariants } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/utils/cn";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
@@ -20,6 +30,8 @@ function Calendar({
       showOutsideDays={showOutsideDays}
       formatters={{
         formatCaption: (date) => format(date, "yyyy MMMM", { locale: zhTW }),
+        formatMonthCaption: (date) => format(date, "MMMM", { locale: zhTW }),
+        formatYearCaption: (date) => format(date, "yyyy", { locale: zhTW }),
       }}
       className={cn("p-3", className)}
       classNames={{
@@ -27,6 +39,7 @@ function Calendar({
         month: "space-y-4",
         caption: "flex justify-center pt-1 relative items-center",
         caption_label: "text-sm font-medium",
+        caption_dropdowns: "flex justify-center gap-1",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
           buttonVariants({ variant: "ghost" }),
@@ -63,6 +76,37 @@ function Calendar({
         ...classNames,
       }}
       components={{
+        Dropdown: ({ value, onChange, children }: DropdownProps) => {
+          const options = React.Children.toArray(
+            children
+          ) as React.ReactElement<React.HTMLProps<HTMLOptionElement>>[];
+          const selected = options.find((child) => child.props.value === value);
+          const handleChange = (newValue: string) => {
+            const changeEvent = {
+              target: { value: newValue },
+            } as React.ChangeEvent<HTMLSelectElement>;
+            onChange?.(changeEvent);
+          };
+          return (
+            <Select value={value?.toString()} onValueChange={handleChange}>
+              <SelectTrigger className="pr-1.5 focus:ring-0">
+                <SelectValue>{selected?.props?.children}</SelectValue>
+              </SelectTrigger>
+              <SelectContent position="popper">
+                <ScrollArea className="h-80">
+                  {options.map((option) => (
+                    <SelectItem
+                      key={option.props.value?.toString() ?? ""}
+                      value={option.props.value?.toString() ?? ""}
+                    >
+                      {option.props.children}
+                    </SelectItem>
+                  ))}
+                </ScrollArea>
+              </SelectContent>
+            </Select>
+          );
+        },
         IconLeft: (p) => (
           <ChevronLeft {...p} className={cn("h-4 w-4", p?.className)} />
         ),

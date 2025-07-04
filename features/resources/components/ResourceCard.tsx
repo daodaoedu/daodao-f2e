@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "@/shared/components/Image";
+import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Hot from "@/public/assets/icons/hot.svg";
 import Group from "@/public/assets/icons/group.svg";
@@ -16,8 +17,28 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { targetAudienceTypeMap } from "../constants";
 
-// Props 需要對應真實資料
+export function ResourceCardSkeleton() {
+  return (
+    <div className="group flex flex-col rounded-lg gap-2 md:flex-row md:gap-4 transition-[transform,box-shadow] hover:scale-[1.01] hover:shadow-lg">
+      <div className="relative md:basis-80 aspect-[320/241]">
+        <div className="p-2 relative h-full overflow-hidden rounded-lg">
+          <Skeleton className="w-full h-full" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-2 p-2 md:w-[calc(100%-20rem)]">
+        <Skeleton className="size-8 rounded-full" />
+        <Skeleton className="h-6 w-1/2" />
+        <Skeleton className="h-6" />
+        <Skeleton className="h-6" />
+        <Skeleton className="h-6 w-1/3" />
+      </div>
+    </div>
+  );
+}
+
 type CardProps = {
   id: string;
   time?: string;
@@ -59,23 +80,23 @@ export default function ResourceCard(props: CardProps) {
   return (
     <Link
       href={`/resource/${id}`}
-      className="group flex flex-col gap-2 md:flex-row md:gap-4"
+      className="group flex flex-col rounded-lg gap-2 md:flex-row md:gap-4 transition-[transform,box-shadow] hover:scale-[1.01] hover:shadow-lg"
     >
       {/* Card Image */}
       <div className="relative md:basis-80 aspect-[320/241]">
-        <div className="relative h-full overflow-hidden rounded-lg">
+        <div className="p-2 relative h-full overflow-hidden rounded-lg">
           <Image
             src={coverImageUrl}
             alt={title}
             borderRadius="0.5rem"
             height="100%"
-            className="object-cover group-hover:scale-110 transition-transform"
+            className="object-cover"
             wrapperClassName="!block"
           />
         </div>
 
         {/* Card Image Label */}
-        <div className=" absolute top-3 left-3 flex flex-wrap gap-2">
+        <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           {labels.map((_label) => {
             return (
               <div
@@ -91,7 +112,7 @@ export default function ResourceCard(props: CardProps) {
       </div>
 
       {/* Card Content */}
-      <section className="flex flex-col gap-2 md:w-[calc(100%-20rem)]">
+      <section className="flex flex-col gap-2 p-2 md:w-[calc(100%-20rem)]">
         {/* Card Info */}
         <div className="flex justify-between items-center h-9">
           <div className="flex items-center body-md text-basic-500">
@@ -105,7 +126,9 @@ export default function ResourceCard(props: CardProps) {
           </div>
         </div>
 
-        <div className="heading-sm text-basic-black truncate">{title}</div>
+        <div className="group-hover:text-primary-base heading-sm text-basic-black truncate">
+          {title}
+        </div>
 
         {/* Card Tags */}
         <div className="flex gap-1 flex-wrap">
@@ -134,7 +157,9 @@ export default function ResourceCard(props: CardProps) {
               <Group />
               <div className="ml-2 mr-1">適合</div>
             </div>
-            <span className="text-primary-base">{level}</span>
+            <span className="text-primary-base">
+              {targetAudienceTypeMap.get(level) ?? level}
+            </span>
           </div>
 
           <div className="flex items-center justify-between md:justify-center gap-3 body-md">
@@ -147,7 +172,7 @@ export default function ResourceCard(props: CardProps) {
                 <Comment />
                 <div>{commentCount}</div>
               </div>
-              <div>{time ? dayjs(time).format("YYYY.MM.DD") : ""}</div>
+              <div>{time ? format(time, "yyyy/MM/dd") : ""}</div>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -161,6 +186,7 @@ export default function ResourceCard(props: CardProps) {
                     href="https://forms.gle/NkVbDWC3eXk4P4gv7"
                     target="_blank"
                     className="block p-2"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     檢舉
                   </Link>

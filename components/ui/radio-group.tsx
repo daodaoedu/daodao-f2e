@@ -1,8 +1,22 @@
+import type { FieldPath, FieldValues } from "react-hook-form";
 import * as React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Circle } from "lucide-react";
 
 import { cn } from "@/utils/cn";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./form";
+import {
+  defaultRenderOption,
+  Option,
+  OptionProps,
+  OptionWithFormProps,
+} from "./option";
 
 const RadioGroup = React.forwardRef<
   React.ComponentRef<typeof RadioGroupPrimitive.Root>,
@@ -39,4 +53,54 @@ const RadioGroupItem = React.forwardRef<
 });
 RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;
 
-export { RadioGroup, RadioGroupItem };
+const RadioGroupWithForm = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  TOption extends OptionProps = OptionProps
+>({
+  options,
+  label,
+  required,
+  className,
+  renderOption = defaultRenderOption,
+  ...props
+}: OptionWithFormProps<TFieldValues, TName, TOption>) => {
+  return (
+    <FormField
+      {...props}
+      render={({ field }) => (
+        <FormItem className="flex flex-col gap-1">
+          {label && <FormLabel required={required}>{label}</FormLabel>}
+          <FormControl ref={field.ref}>
+            <RadioGroup
+              onValueChange={field.onChange}
+              value={field.value}
+              className={className}
+            >
+              {Array.isArray(options) &&
+                options.map((option) => (
+                  <FormItem key={option.value}>
+                    <FormControl>
+                      <RadioGroupItem
+                        className="sr-only"
+                        value={option.value}
+                      />
+                    </FormControl>
+                    {renderOption({
+                      ...option,
+                      Option,
+                      isChecked: field.value === option.value,
+                    })}
+                  </FormItem>
+                ))}
+            </RadioGroup>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+RadioGroupWithForm.displayName = "RadioGroupWithForm";
+
+export { RadioGroup, RadioGroupItem, RadioGroupWithForm };

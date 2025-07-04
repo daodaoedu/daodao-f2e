@@ -299,7 +299,7 @@ const LearningMarathon = () => {
     if (isLoggedIn || isTemporary) {
       router.push('/learning-marathon/signup');
     } else {
-      openLoginModal('/learning-marathon/signup');
+      openLoginModal({ registerCallback: () => router.push('/learning-marathon/signup') });
     }
   };
 

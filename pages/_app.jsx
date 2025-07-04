@@ -1,6 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { z } from 'zod';
+import React, { useEffect, useMemo } from 'react';
 import { SWRConfig } from 'swr';
 import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { ThemeProvider } from '@mui/material/styles';
@@ -13,22 +15,21 @@ import Head from 'next/head';
 import { AuthProvider, useAuth } from '@/contexts/Auth';
 import SnackbarProvider from '@/contexts/Snackbar';
 import { DialogProvider } from '@/contexts/Dialog';
-import CompleteInfoReminderDialog from '@/shared/components/CompleteInfoReminderDialog';
 import GlobalStyle from '@/shared/styles/Global';
-import Image from "@/shared/components/Image";
-import ResponsiveModal from '@/components/ui/responsive-modal';
 import themeFactory from '@/shared/styles/themeFactory';
+import useQueryState from '@/hooks/useQueryState';
 import { fetcher } from '@/utils/http';
-import { parseToString } from '@/utils/helper';
 import { getReminderStorage } from '@/utils/storage';
 import getBaseLayout from '@/layout/core/getBaseLayout';
 import { useScrollOnRouteChange } from '@/features/practice/hooks/useScrollToTop';
+import { useCompleteInfoReminder, useVerifiedSuccessDialog } from '@/features/users';
 import { initGA, logPageView } from '../utils/analytics';
 import 'regenerator-runtime/runtime'; // Speech.js
 import "@/shared/styles/global.css";
 import 'dayjs/locale/zh-tw';
 
 dayjs.locale('zh-tw');
+dayjs.extend(isBetween);
 
 const swrConfig = {
   revalidateOnFocus: false,
@@ -38,32 +39,32 @@ const swrConfig = {
 };
 
 const ThemeComponentWrap = ({ pageProps, Component }) => {
-  const router = useRouter();
-  const { query } = router;
   const theme = useMemo(() => themeFactory('light'), []);
   const { isComplete, isLoggedIn } = useAuth();
-  const [openModalType, setOpenModalType] = useState(null);
   const getLayout = Component?.getLayout || getBaseLayout;
-  const isVerified = parseToString(query.isVerified);
+  const openCompleteInfoReminderDialog = useCompleteInfoReminder();
+  const openVerifiedSuccessDialog = useVerifiedSuccessDialog();
+  const [queryState, setQueryState] = useQueryState(z.object({
+    isVerified: z.string().optional().transform((val) => val === 'true'),
+  }));
 
   // 使用滾動重置 hook
   useScrollOnRouteChange();
 
-  const handleClose = () => {
-    setOpenModalType(null);
-    getReminderStorage().remove();
-  };
-
   useEffect(() => {
-    if (isVerified) {
-      setOpenModalType("verifiedSuccess");
+    if (queryState.isVerified) {
+      openVerifiedSuccessDialog();
+      setQueryState({ isVerified: undefined });
       return;
     }
 
-    if (isLoggedIn && !isComplete && getReminderStorage().get() % 3 === 0) {
-      setOpenModalType("completeInfoReminder");
+    const isReminder = getReminderStorage().get() % 4 === 3;
+
+    if (isLoggedIn && !isComplete && isReminder) {
+      getReminderStorage().remove();
+      openCompleteInfoReminderDialog();
     }
-  }, [isVerified, isLoggedIn, isComplete]);
+  }, [queryState, isLoggedIn, isComplete, openCompleteInfoReminderDialog, openVerifiedSuccessDialog]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -86,66 +87,6 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
         }}
       />
       <SonnerToaster />
-      <CompleteInfoReminderDialog isOpen={openModalType === "completeInfoReminder"} onClose={handleClose} />
-      <ResponsiveModal
-        open={openModalType === 'verifiedSuccess' && isLoggedIn}
-        onClose={handleClose}
-        title="驗證成功"
-      >
-        <div className="p-4">
-          <div className="mx-auto w-max">
-            <Image
-              src="/assets/illustration.png"
-              alt="verified-success"
-              width="300"
-              height="289"
-            />
-          </div>
-          {
-            isComplete ? (
-              <>
-                <p className="mb-6 text-center text-basic-400 body-sm">
-                  帳號已驗證成功，快來體驗平台的特色功能！
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-primary-base text-white hover:bg-primary-darker"
-                    onClick={handleClose}
-                  >
-                    開始探索
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="mb-6 text-center text-basic-400 body-sm">
-                  我們會公開你的<strong className="font-bold">個人檔案</strong>，填寫完整的資料，才能讓其他夥伴們更了解你喔！
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-white text-primary-darker hover:bg-basic-100"
-                    onClick={handleClose}
-                  >
-                    暫時不需要
-                  </button>
-                  <button
-                    type="button"
-                    className="flex-1 py-2 shadow-lg transition-colors rounded-full bg-primary-base text-white hover:bg-primary-darker"
-                    onClick={() => {
-                      handleClose();
-                      router.replace('/personal-card');
-                    }}
-                  >
-                    想，填寫資料
-                  </button>
-                </div>
-              </>
-            )
-          }
-        </div>
-      </ResponsiveModal>
       {getLayout(<Component {...pageProps} />)}
     </ThemeProvider>
   );
@@ -223,11 +164,11 @@ const App = ({ Component, pageProps }) => {
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
         <SWRConfig value={swrConfig}>
           <SnackbarProvider>
-            <AuthProvider>
-              <DialogProvider>
+            <DialogProvider>
+              <AuthProvider>
                 <ThemeComponentWrap pageProps={pageProps} Component={Component} />
-              </DialogProvider>
-            </AuthProvider>
+              </AuthProvider>
+            </DialogProvider>
           </SnackbarProvider>
         </SWRConfig>
       </LocalizationProvider>

@@ -17,7 +17,7 @@ import { getIsCheckDragMilestoneStorage } from "@/utils/storage";
 import { useDraggableSensors } from "@/hooks/useDraggableSensors";
 import { useDraggableContainer } from "@/hooks/useDraggableContainer";
 import DraggableItem from "@/shared/components/DraggableItem";
-import { DatePickerWithRange } from "@/components/ui/date-picker";
+import { DateRangePicker } from "@/components/ui/date-picker";
 import SwapRightIcon from "@/public/assets/icons/swap-right.svg";
 import MilestoneItem from "./MilestoneItem";
 
@@ -159,8 +159,8 @@ const DraggableMilestones = ({
       <DragOverlay>
         {activeItem && (
           <div className="relative opacity-90 w-full">
-            <DatePickerWithRange
-              date={previewNewDate}
+            <DateRangePicker
+              value={previewNewDate}
               separator={<SwapRightIcon className="w-4 h-4 text-basic-black/25" />}
               className="absolute -top-12 left-0 bg-basic-white"
             />

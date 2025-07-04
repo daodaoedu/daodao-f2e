@@ -1,3 +1,4 @@
+import { mutate } from "swr";
 import { MutationFetcher } from "swr/mutation";
 import { parseToString } from "@/utils/helper";
 import { fetcher, mutations } from "@/utils/http";
@@ -7,26 +8,37 @@ import {
   ResourceMutationResponseSchema,
   ResourceListResponseSchema,
   ResourceDetailResponseSchema,
+  ResourceSearchParamsSchema,
 } from "./schema";
-import { mockResourceList } from "../mock";
 
 interface GetResourcePathnameProps {
-  id?: string;
+  resourceId?: string;
 }
 
-export const getResourcePathname = ({ id }: GetResourcePathnameProps = {}) => {
-  const pathname = "/resources";
+export const getResourcePathname = ({
+  resourceId,
+}: GetResourcePathnameProps = {}) => {
+  const pathname = "/api/v1/resources";
 
-  if (id) {
-    return `${pathname}/${parseToString(id)}`;
+  if (resourceId) {
+    return `${pathname}/${parseToString(resourceId)}`;
   }
 
   return pathname;
 };
 
+export const refetchResource = async () => {
+  await mutate((key: unknown) => {
+    const pathname = Array.isArray(key) ? key[0] : key;
+    return pathname.startsWith(getResourcePathname());
+  });
+};
+
 interface ResourceAPIType {
   read: (resourceId: string) => Promise<ResourceDetailResponseSchema>;
-  readList: () => Promise<ResourceListResponseSchema>;
+  readList: (
+    query?: ResourceSearchParamsSchema
+  ) => Promise<ResourceListResponseSchema>;
   create: MutationFetcher<
     ResourceMutationResponseSchema,
     string,
@@ -41,19 +53,8 @@ interface ResourceAPIType {
 }
 
 export const resourceAPI: ResourceAPIType = {
-  read: (resourceId) => {
-    const id = parseToString(resourceId);
-    if (typeof id !== "string") {
-      throw new Error("Invalid resource id");
-    }
-    return fetcher<ResourceDetailResponseSchema>(
-      getResourcePathname({ id })
-    ).catch(() => mockResourceList.resources[0]);
-  },
-  readList: () =>
-    fetcher<ResourceListResponseSchema>(getResourcePathname()).catch(
-      () => mockResourceList
-    ),
+  read: (resourceId) => fetcher(getResourcePathname({ resourceId })),
+  readList: (query) => fetcher([getResourcePathname(), query]),
   create: mutations.post,
   update: mutations.put,
   delete: mutations.delete,

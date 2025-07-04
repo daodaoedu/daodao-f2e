@@ -1,12 +1,6 @@
 import { z } from "zod";
 
-export const baseUserSchema = z.object({
-  _id: z.string(),
-  id: z.string(),
-  name: z.string(),
-  roleList: z.array(z.string()),
-  photoURL: z.string(),
-});
+export { baseUserSchema, type BaseUserSchema } from "../users/schema";
 
 export const paginationSchema = z.object({
   page: z.number(),
@@ -16,10 +10,11 @@ export const paginationSchema = z.object({
 });
 
 export const cursorsSchema = z.object({
-  limit: z.number(),
   hasNext: z.boolean(),
   hasPrev: z.boolean(),
+  limit: z.number(),
   nextCursor: z.string().nullable(),
+  parentTotalEstimate: z.number().nullable(),
   prevCursor: z.string().nullable(),
   totalEstimate: z.number(),
 });

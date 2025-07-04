@@ -1,33 +1,34 @@
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import {
   SearchIcon,
   SlidersHorizontalIcon,
   ChartNoAxesColumnDecreasingIcon,
+  SendHorizontalIcon,
 } from "lucide-react";
 import useShadowToggleOnScroll from "@/hooks/useShadowToggleOnScroll";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import useDebounce from "@/hooks/useDebounce";
 import { ResourceSearchParamsSchema } from "@/services/resources/core/schema";
+import { Container } from "@/components/ui/wrapper";
 import ResourceSearchModal from "./ResourceSearchModal";
 
 interface ResourceSearchBarProps {
   filters?: ResourceSearchParamsSchema;
-  onFilter: (filter: ResourceSearchParamsSchema) => void;
+  onFilter: Dispatch<SetStateAction<ResourceSearchParamsSchema>>;
 }
 
 export default function ResourceSearchBar({
   filters,
   onFilter,
 }: ResourceSearchBarProps) {
-  const [query, setQuery] = useState(filters?.query ?? "");
-  const prevQueryRef = useRef(query);
-  const isReady = useRef(false);
+  const defaultQuery = filters?.query ?? "";
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { height, isShowShadow, TriggerElement } = useShadowToggleOnScroll();
 
-  const debouncedUpdateSearch = useDebounce(onFilter, 500);
+  const handleFilterChange = (filter: ResourceSearchParamsSchema) => {
+    onFilter((prev) => ({ ...prev, ...filter }));
+  };
 
   const handleOpenFilter = () => {
     setIsFilterOpen(true);
@@ -37,59 +38,59 @@ export default function ResourceSearchBar({
     setIsFilterOpen(false);
   };
 
-  useEffect(() => {
-    if (query !== prevQueryRef.current) {
-      debouncedUpdateSearch({ query });
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+      handleFilterChange({ query: e.currentTarget.value });
     }
-    prevQueryRef.current = query;
-  }, [query, debouncedUpdateSearch]);
-
-  useEffect(() => {
-    if (!isReady.current && (filters?.query || query)) {
-      setQuery(filters?.query ?? "");
-      isReady.current = true;
-    }
-  }, [filters?.query, query]);
+  };
 
   return (
     <>
       <TriggerElement />
       <div
         className={cn(
-          "sticky z-20 flex justify-between bg-basic-white py-5 px-5 gap-6 flex-col md:flex-row md:py-6 md:px-24",
+          "sticky z-20 bg-basic-white py-5 gap-6 md:py-6",
           isShowShadow && "shadow-md shadow-basic-black/10"
         )}
         style={{ top: `${height}px` }}
       >
-        <Input
-          prefixIcon={<SearchIcon />}
-          className="md:w-1/2"
-          value={query}
-          hasClearButton
-          onValueChange={setQuery}
-          placeholder="想找什麼資源..."
-        />
-        <div className="flex gap-3 justify-end">
-          <Button
-            variant="outline"
-            size="lg"
-            color="primary"
-            onClick={handleOpenFilter}
-          >
-            <SlidersHorizontalIcon className="size-4 text-primary-base" />
-            篩選
-          </Button>
-          <Button variant="outline" size="lg" color="primary">
-            <ChartNoAxesColumnDecreasingIcon className="size-4 rotate-90 text-primary-base" />
-            最熱門
-          </Button>
-        </div>
+        <Container className="flex justify-between flex-col gap-4 md:flex-row">
+          <Input
+            type="search"
+            prefixIcon={<SearchIcon />}
+            suffixIcon={(v) =>
+              (v.length > 0 || defaultQuery.length > 0) && (
+                <SendHorizontalIcon />
+              )
+            }
+            className="md:w-1/2"
+            defaultValue={defaultQuery}
+            onKeyDown={handleKeyDown}
+            onSuffixIconClick={(value) => handleFilterChange({ query: value })}
+            placeholder="想找什麼資源..."
+          />
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outline"
+              size="lg"
+              color="primary"
+              onClick={handleOpenFilter}
+            >
+              <SlidersHorizontalIcon className="size-4 text-primary-base" />
+              篩選
+            </Button>
+            <Button variant="outline" size="lg" color="primary">
+              <ChartNoAxesColumnDecreasingIcon className="size-4 rotate-90 text-primary-base" />
+              最熱門
+            </Button>
+          </div>
+        </Container>
       </div>
 
       <ResourceSearchModal
         open={isFilterOpen}
         onClose={handleCloseFilter}
-        onFilter={onFilter}
+        onFilter={handleFilterChange}
         filters={filters}
       />
     </>

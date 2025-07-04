@@ -10,7 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Check, CloudUpload, Dice5Icon, Link2Icon } from "lucide-react";
+import { Check, CloudUpload, Dice5Icon, Link2Icon, X } from "lucide-react";
 import Image from "@/shared/components/Image";
 import { uploadImagesSchema } from "@/services/images";
 import { Button, type ButtonProps } from "@/components/ui/button";
@@ -206,7 +206,10 @@ export const UploadImage = forwardRef(
                     type="text"
                     placeholder="請輸入影像連結"
                     prefixIcon={<Link2Icon />}
-                    hasClearButton
+                    suffixIcon={<X />}
+                    onSuffixIconClick={() => {
+                      console.log("suffixIconClick");
+                    }}
                   />
                   <Button type="button" variant="outline" size="lg">
                     上傳

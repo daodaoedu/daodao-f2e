@@ -1,7 +1,7 @@
 import type {
-  CreateUserRequest,
-  UpdateUserRequest,
-  IUser,
+  CreateUserFormSchema,
+  UpdateUserFormSchema,
+  UserSchema,
 } from "@/services/users";
 import { LOGIN_TYPE } from "@/utils/env";
 
@@ -14,12 +14,16 @@ export enum LoginStatus {
   PERMANENT,
 }
 
+type Callbacks = {
+  successCallback?: () => void;
+  registerCallback?: () => void;
+};
+
 interface CommonAuthState {
   isComplete: boolean;
-  isLoading: boolean;
+  isLoggingIn: boolean;
   isOpenLoginModal: boolean;
   token: string | null;
-  redirectUrl: string;
 }
 
 interface EmptyLoginState extends CommonAuthState {
@@ -40,7 +44,7 @@ interface PermanentLoginState extends CommonAuthState {
   isLoggedIn: true;
   isTemporary: false;
   loginStatus: LoginStatus.PERMANENT;
-  user: IUser;
+  user: UserSchema;
 }
 
 export type AuthState =
@@ -59,23 +63,23 @@ export enum ActionTypes {
 }
 
 export type Action =
-  | { type: ActionTypes.OPEN_LOGIN_MODAL; payload?: string }
+  | { type: ActionTypes.OPEN_LOGIN_MODAL }
   | { type: ActionTypes.CLOSE_LOGIN_MODAL }
   | { type: ActionTypes.SET_TOKEN; payload: string }
   | { type: ActionTypes.SET_LOADING; payload: boolean }
-  | { type: ActionTypes.UPDATE_USER; payload: IUser }
-  | { type: ActionTypes.LOGIN; payload: IUser | null }
+  | { type: ActionTypes.UPDATE_USER; payload: UserSchema }
+  | { type: ActionTypes.LOGIN; payload: UserSchema | null }
   | { type: ActionTypes.LOGOUT };
 
 export type AuthDispatch = {
-  [ActionTypes.OPEN_LOGIN_MODAL]: (redirectUrl?: string) => void;
+  [ActionTypes.OPEN_LOGIN_MODAL]: (payload?: Callbacks) => void;
   [ActionTypes.CLOSE_LOGIN_MODAL]: () => void;
   [ActionTypes.SET_TOKEN]: (payload: string) => void;
   [ActionTypes.SET_LOADING]: (payload: boolean) => void;
   [ActionTypes.UPDATE_USER]: (
-    payload: CreateUserRequest | UpdateUserRequest
+    payload: CreateUserFormSchema | UpdateUserFormSchema
   ) => Promise<void>;
-  [ActionTypes.LOGIN]: (payload: IUser | null) => void;
+  [ActionTypes.LOGIN]: (payload: UserSchema | null) => void;
   [ActionTypes.LOGOUT]: () => void;
 };
 

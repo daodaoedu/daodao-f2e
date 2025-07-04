@@ -1,8 +1,8 @@
-import { z } from 'zod';
-import { getTokenStorage } from '@/utils/storage';
-import getEnv from '@/utils/env';
+import { z } from "zod";
+import { getTokenStorage } from "@/utils/storage";
+import getEnv from "@/utils/env";
 
-export const V1_BASE_URL = 'https://api.daoedu.tw';
+export const V1_BASE_URL = "https://api.daoedu.tw";
 export const BASE_URL = getEnv().apiUrl;
 
 enum RequestMethod {
@@ -65,7 +65,7 @@ const serialize =
   (source: unknown) => {
     const append = (key: string) => (value: ValidValueType) => {
       if (formattedData instanceof URLSearchParams) {
-        formattedData.append(key, encodeURIComponent(String(value)));
+        formattedData.append(key, value.toString());
       } else if (typeof value === "string" || value instanceof Blob) {
         formattedData.append(key, value);
       }
@@ -159,8 +159,9 @@ export type FetcherParams = string | [string, ...unknown[]];
 
 export const fetcher = <R = void>(params: FetcherParams): Promise<R> => {
   const [pathname, ...args] = Array.isArray(params) ? params : [params];
-  const source = args.filter(isRecord).reduce(Object.assign, {});
-
+  const source = args
+    .filter(isRecord)
+    .reduce((acc, curr) => ({ ...acc, ...curr }), {});
   return http<R>({ pathname, source });
 };
 
@@ -173,6 +174,9 @@ export const fetcherV1 = <R = void>(
 const getArg = (source: unknown): Record<string, unknown> => {
   if (isRecord(source) && isRecord(source.arg)) {
     return source.arg;
+  }
+  if (isRecord(source)) {
+    return source;
   }
   return {};
 };

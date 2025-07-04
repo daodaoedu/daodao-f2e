@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import SEOConfig from "@/shared/components/SEO";
 import DocSvg from "@/public/assets/icons/doc.svg";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import { Form, parseSchemaAutoFocus } from "@/components/ui/form";
 import { Background, Container, Paper } from "@/components/ui/wrapper";
 import { BackButton } from "@/components/ui/back-button";
 import { Title } from "@/components/ui/typography";
@@ -39,7 +39,7 @@ export default function CreateResourcePage() {
     useCreateResource({
       onSuccess: () => {
         toast.success("資源分享成功！");
-        router.push("/search");
+        router.push("/resource");
       },
       onError: (error) => {
         console.error("提交資源時發生錯誤:", error);
@@ -98,20 +98,13 @@ export default function CreateResourcePage() {
   };
 
   const handleNextStep = () => {
-    const parsed = withoutReviewSchema.safeParse(resourceForm.getValues());
-    if (parsed.success) {
-      setStep(step + 1);
-      return;
-    }
-    const { errors } = parsed.error;
-
-    const parsePath = (path: (string | number)[]) =>
-      path.join(".") as keyof ResourceFormSchema;
-
-    errors.forEach((error) => {
-      resourceForm.setError(parsePath(error.path), error);
+    parseSchemaAutoFocus({
+      form: resourceForm,
+      schema: withoutReviewSchema,
+      onSuccess: () => {
+        setStep(step + 1);
+      },
     });
-    resourceForm.setFocus(parsePath(errors[0].path));
   };
 
   useEffect(() => {

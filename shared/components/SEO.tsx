@@ -49,6 +49,8 @@ interface SEOProps {
   author?: string;
   copyright?: string;
   imgLink?: string;
+  imgWidth?: number;
+  imgHeight?: number;
   link?: string;
   jsonLd?: WithContext<Thing> | Graph;
   themeColor?: string;
@@ -70,6 +72,8 @@ export default function SEO({
   author = '島島阿學',
   copyright = '島島阿學',
   imgLink = 'https://www.daoedu.tw/preview.webp',
+  imgWidth = 1200,
+  imgHeight = 630,
   jsonLd = defaultJsonLd,
   themeColor = '#16b9b3',
 }: SEOProps) {
@@ -115,8 +119,8 @@ export default function SEO({
       {description && <meta property="og:description" content={description} />}
       {link && <meta property="og:url" content={link} />}
       {imgLink && <meta property="og:image" content={imgLink} />}
-      {imgLink && <meta property="og:image:width" content="1200" />}
-      {imgLink && <meta property="og:image:height" content="630" />}
+      {imgLink && <meta property="og:image:width" content={imgWidth.toString()} />}
+      {imgLink && <meta property="og:image:height" content={imgHeight.toString()} />}
 
       {/* Link relationship */}
       <link rel="author" href={link} />

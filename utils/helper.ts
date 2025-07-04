@@ -57,5 +57,3 @@ export const mapToTable = (map: MapItem[] = []) =>
     (acc, item) => ({ ...acc, [item.key ?? item.value]: item.label }),
     {}
   );
-
-export const isServer = typeof window === "undefined";

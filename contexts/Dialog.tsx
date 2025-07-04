@@ -1,16 +1,30 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { Button } from "@/components/ui/button";
 import ResponsiveModal, {
   ResponsiveModalProps,
 } from "@/components/ui/responsive-modal";
 import { cn } from "@/utils/cn";
 
+export interface DialogContentProps {
+  close: () => void;
+}
+
+export type RenderDialogContent = (
+  props: DialogContentProps
+) => React.ReactNode;
+
 interface DialogProps
   extends Omit<
     ResponsiveModalProps,
     "children" | "open" | "onClose" | "footer"
   > {
-  content: React.ReactNode;
+  content: React.ReactNode | RenderDialogContent;
   cancelText?: string;
   cancelBtnProps?: Omit<
     React.ComponentPropsWithoutRef<typeof Button>,
@@ -21,12 +35,18 @@ interface DialogProps
     React.ComponentPropsWithoutRef<typeof Button>,
     "onClick"
   >;
+  disableFooter?: boolean;
   onCancel?: () => void;
   onConfirm?: () => void;
   className?: string;
 }
 
 interface DialogContextType {
+  /**
+   * 開啟對話框
+   * @param props 對話框的屬性
+   * @returns 對話框是否被確認
+   */
   openDialog: (props: DialogProps) => Promise<boolean>;
 }
 
@@ -52,13 +72,14 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
     confirmBtnProps,
     onCancel,
     onConfirm,
+    disableFooter,
     className,
     ...restDialogProps
   } = currentDialog || {};
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = useCallback(() => {
     setIsOpen(false);
-  };
+  }, []);
 
   useEffect(() => {
     if (!isOpen && dialogs.length > 0) {
@@ -68,35 +89,38 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isOpen, dialogs]);
 
-  const openDialog = async (props: DialogProps) => {
-    return new Promise<boolean>((resolve) => {
-      const proxyOnConfirm = () => {
-        resolve(true);
-        handleCloseDialog();
-        props.onConfirm?.();
-      };
-      const proxyOnCancel = () => {
-        resolve(false);
-        handleCloseDialog();
-        props.onCancel?.();
-      };
-      const newDialog = {
-        ...props,
-        onConfirm: proxyOnConfirm,
-        onCancel: proxyOnCancel,
-      };
+  const openDialog = useCallback(
+    async (props: DialogProps) => {
+      return new Promise<boolean>((resolve) => {
+        const proxyOnConfirm = () => {
+          resolve(true);
+          handleCloseDialog();
+          props.onConfirm?.();
+        };
+        const proxyOnCancel = () => {
+          resolve(false);
+          handleCloseDialog();
+          props.onCancel?.();
+        };
+        const newDialog = {
+          ...props,
+          onConfirm: proxyOnConfirm,
+          onCancel: proxyOnCancel,
+        };
 
-      if (Array.isArray(dialogs) && dialogs.length > 0) {
-        setDialogs((prev) => [...prev, newDialog]);
-      } else {
-        setIsOpen(true);
-        setCurrentDialog(newDialog);
-      }
-    });
-  };
+        if (Array.isArray(dialogs) && dialogs.length > 0) {
+          setDialogs((prev) => [...prev, newDialog]);
+        } else {
+          setIsOpen(true);
+          setCurrentDialog(newDialog);
+        }
+      });
+    },
+    [dialogs, handleCloseDialog]
+  );
 
-  const footer = (
-    <div className="flex w-full gap-2">
+  const footer = disableFooter ? null : (
+    <div className="flex w-full gap-4">
       <Button
         variant="secondary"
         {...cancelBtnProps}
@@ -125,7 +149,11 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
         footer={footer}
         {...restDialogProps}
       >
-        <div className={cn("text-center p-4", className)}>{content}</div>
+        <div className={cn("text-center p-4 pb-0", className)}>
+          {typeof content === "function"
+            ? content({ close: handleCloseDialog })
+            : content}
+        </div>
       </ResponsiveModal>
     </DialogContext.Provider>
   );

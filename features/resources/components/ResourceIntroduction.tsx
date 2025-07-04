@@ -1,11 +1,16 @@
+import dynamic from "next/dynamic";
 import React from "react";
 import { format } from "date-fns";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
 import ShellSvg from "@/public/assets/icons/shell.svg";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
+
+const MarkdownEditor = dynamic(
+  () => import("@/components/ui/markdown-editor"),
+  { ssr: false }
+);
 
 interface ResourceIntroductionProps {
-  resource: ResourceDetailResponseSchema;
+  resource: ResourceDetailResponseSchema["data"];
 }
 
 export default function ResourceIntroduction({
@@ -13,11 +18,7 @@ export default function ResourceIntroduction({
 }: ResourceIntroductionProps) {
   return (
     <div className="space-y-10">
-      <MarkdownEditor
-        value={resource.description}
-        readOnly
-        disabledProse
-      />
+      <MarkdownEditor value={resource.description} readOnly disabledProse />
       {resource.videoUrl && (
         <div className="aspect-[1120/633]">
           <iframe
@@ -27,6 +28,7 @@ export default function ResourceIntroduction({
             src={resource.videoUrl}
             title="YouTube video player"
             frameBorder="0"
+            loading="lazy"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerPolicy="strict-origin-when-cross-origin"
             allowFullScreen

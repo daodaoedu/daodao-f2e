@@ -1,4 +1,4 @@
-import getShareApi from '@/utils/share';
+import getShareAPI from '@/utils/getShareAPI';
 import styled from '@emotion/styled';
 import IconButton from '@mui/material/IconButton';
 import {
@@ -23,14 +23,13 @@ const StyledShareButtonGroup = styled.div`
 
 export default function ShareButtonGroup({ title, text, url, hashtag }) {
   const {
-    hasNativeShare,
     nativeShare,
     facebookShare,
     lineShare,
     linkedinShare,
     threadsShare,
     xShare,
-  } = getShareApi({ title, text, url, hashtag });
+  } = getShareAPI({ title, text, url, hashtag });
 
   return (
     <StyledShareButtonGroup>
@@ -50,11 +49,9 @@ export default function ShareButtonGroup({ title, text, url, hashtag }) {
       <IconButton size="small" onClick={xShare}>
         <FaSquareXTwitter fill="#000" />
       </IconButton>
-      {hasNativeShare && (
-        <IconButton size="small" onClick={nativeShare}>
-          <FaShareFromSquare size={16} />
-        </IconButton>
-      )}
+      <IconButton size="small" onClick={nativeShare}>
+        <FaShareFromSquare size={16} />
+      </IconButton>
     </StyledShareButtonGroup>
   );
 }

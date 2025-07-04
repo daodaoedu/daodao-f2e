@@ -19,9 +19,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ResourceFormSchema } from "@/services/resources/core/schema";
 import {
-  resourceTypes,
-  costTypes,
-  targetAudienceTypes,
+  resourceTypeOptions,
+  costTypeOptions,
+  targetAudienceTypeOptions,
 } from "@/features/resources/constants";
 
 type ResourceCategorizationSchema = Pick<
@@ -69,12 +69,13 @@ export default function ResourceCategorizationFields() {
             <FormField
               control={form.control}
               name="subCategory"
-              render={({ field: { ref, onChange, ...field } }) => (
+              render={({ field: { ref, onChange, value, ...field } }) => (
                 <FormItem>
                   <FormLabel>子分類</FormLabel>
                   <Select
                     onValueChange={onChange}
                     disabled={!form.watch("majorCategory")}
+                    value={value ?? undefined}
                     {...field}
                   >
                     <FormControl>
@@ -124,7 +125,7 @@ export default function ResourceCategorizationFields() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {resourceTypes.map((type) => (
+                  {resourceTypeOptions.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       {type.label}
                     </SelectItem>
@@ -180,7 +181,7 @@ export default function ResourceCategorizationFields() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {costTypes.map((type) => (
+                  {costTypeOptions.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       {type.label}
                     </SelectItem>
@@ -205,7 +206,7 @@ export default function ResourceCategorizationFields() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {targetAudienceTypes.map((type) => (
+                  {targetAudienceTypeOptions.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       {type.label}
                     </SelectItem>

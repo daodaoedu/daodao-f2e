@@ -1,163 +1,240 @@
-export interface ICategory {
-  value: string;
-  label: string;
+import { OptionProps } from "@/components/ui/option";
+
+export interface ICategory extends OptionProps {
   image?: string;
 }
 
+export const CATEGORIES_VALUES = {
+  languages: "languages",
+  mathematical_logic: "mathematical_logic",
+  information_computer_science: "information_computer_science",
+  humanities_history_geography: "humanities_history_geography",
+  nature_environment: "nature_environment",
+  arts_design: "arts_design",
+  education_learning: "education_learning",
+  lifestyle: "lifestyle",
+  medicine_sports: "medicine_sports",
+  business_management_finance: "business_management_finance",
+  social_innovation_sustainability: "social_innovation_sustainability",
+  personal_development: "personal_development",
+};
+
 export const CATEGORIES: ICategory[] = [
   {
-    value: 'language',
-    label: '語言與文學',
-    image: 'https://i.imgur.com/YgvrDCz.png',
+    value: CATEGORIES_VALUES.languages,
+    label: "語言",
+    image: "https://i.imgur.com/YgvrDCz.png",
   },
   {
-    value: 'math',
-    label: '數學與邏輯',
-    image: 'https://i.imgur.com/kXKWrmA.png',
+    value: CATEGORIES_VALUES.mathematical_logic,
+    label: "數理邏輯",
+    image: "https://i.imgur.com/kXKWrmA.png",
   },
   {
-    value: 'computer-science',
-    label: '資訊與工程',
-    image: 'https://i.imgur.com/sIJeYIp.png',
+    value: CATEGORIES_VALUES.information_computer_science,
+    label: "資訊與電腦科學",
+    image: "https://i.imgur.com/sIJeYIp.png",
   },
   {
-    value: 'humanity',
-    label: '人文社會',
-    image: 'https://i.imgur.com/Ea2cmzs.png',
+    value: CATEGORIES_VALUES.humanities_history_geography,
+    label: "人文史地",
+    image: "https://i.imgur.com/Ea2cmzs.png",
   },
   {
-    value: 'nature-science',
-    label: '自然科學',
-    image: 'https://i.imgur.com/jSaZ7AF.png',
+    value: CATEGORIES_VALUES.nature_environment,
+    label: "自然與環境",
+    image: "https://i.imgur.com/jSaZ7AF.png",
   },
   {
-    value: 'art',
-    label: '藝術',
-    image: 'https://i.imgur.com/GvJ1ddz.png',
+    value: CATEGORIES_VALUES.arts_design,
+    label: "藝術與設計",
+    image: "https://i.imgur.com/GvJ1ddz.png",
   },
   {
-    value: 'education',
-    label: '教育',
-    image: 'https://i.imgur.com/M21rIig.png',
+    value: CATEGORIES_VALUES.education_learning,
+    label: "教育與學習",
+    image: "https://i.imgur.com/M21rIig.png",
   },
   {
-    value: 'life',
-    label: '生活',
-    image: 'https://i.imgur.com/AQIxl4v.png',
+    value: CATEGORIES_VALUES.lifestyle,
+    label: "生活品味",
+    image: "https://i.imgur.com/AQIxl4v.png",
   },
   {
-    value: 'health',
-    label: '運動/心理/醫學',
-    image: 'https://i.imgur.com/QuuxALA.png',
+    value: CATEGORIES_VALUES.medicine_sports,
+    label: "醫藥與運動",
+    image: "https://i.imgur.com/QuuxALA.png",
   },
   {
-    value: 'business',
-    label: '商業與社會創新',
-    image: 'https://i.imgur.com/ZVewhol.png',
+    value: CATEGORIES_VALUES.business_management_finance,
+    label: "商管與理財",
+    image: "https://i.imgur.com/ZVewhol.png",
   },
   {
-    value: 'diversity',
-    label: '綜合型學習資源',
-    image: 'https://i.imgur.com/rFNVZy8.png',
+    value: CATEGORIES_VALUES.social_innovation_sustainability,
+    label: "社會創新與永續",
+    image: "https://i.imgur.com/rFNVZy8.png",
   },
   {
-    value: 'learningtools',
-    label: '學習/教學工具',
-    image: 'https://i.imgur.com/qxhYvEI.png',
+    value: CATEGORIES_VALUES.personal_development,
+    label: "個人發展",
+    image: "https://i.imgur.com/qxhYvEI.png",
   },
 ];
 
 export const SEARCH_TAGS: Record<string, ICategory[]> = {
-  all: [
-    { value: 'english', label: '英語' },
-    { value: 'psychology', label: '心理學' },
-    { value: 'math', label: '數學' },
-    { value: 'design', label: '設計' },
-    { value: 'education', label: '教育創新' },
-    { value: 'japanese', label: '日文' },
-    { value: 'life', label: '生命教育' },
+  [CATEGORIES_VALUES.languages]: [
+    { value: "chinese", label: "中文" },
+    { value: "english", label: "英語" },
+    { value: "japanese", label: "日語" },
+    { value: "korean", label: "韓語" },
+    { value: "german", label: "德語" },
+    { value: "french", label: "法語" },
+    { value: "spanish", label: "西語" },
+    { value: "russian", label: "俄語" },
+    { value: "vietnamese", label: "越南語" },
+    { value: "indonesian", label: "印尼語" },
+    { value: "filipino", label: "菲律賓語" },
+    { value: "taiwanese", label: "台語" },
+    { value: "hakka", label: "客語" },
+    { value: "indigenous_languages", label: "原住民語" },
+    { value: "linguistics", label: "語言學" },
+    { value: "application_language", label: "應用語言" },
+    { value: "other_languages", label: "其他語言" },
   ],
-  language: [
-    { value: 'chinese', label: '中文' },
-    { value: 'english', label: '英語' },
-    { value: 'audio-book', label: '有聲書' },
-    { value: 'listening', label: '聽力' },
-    { value: 'vocabulary', label: '單字' },
-    { value: 'reading', label: '閱讀' },
-    { value: 'multilingual', label: '多語言型學習資源' },
-    { value: 'speaking', label: '口說' },
-    { value: 'writing', label: '寫作' },
-    { value: 'japanese', label: '日文' },
+  [CATEGORIES_VALUES.mathematical_logic]: [
+    { value: "mathematics", label: "數學" },
+    { value: "algebra", label: "代數" },
+    { value: "geometry", label: "幾何" },
+    { value: "trigonometry", label: "三角" },
+    { value: "statistical_probability", label: "統計機率" },
+    { value: "calculus", label: "微積分" },
+    { value: "applied_mathematics", label: "應用數學" },
+    { value: "logic", label: "邏輯" },
+    { value: "theory_calculation", label: "理論與計算" },
   ],
-  math: [
-    { value: 'math', label: '數學' },
-    { value: 'logic', label: '邏輯' },
+  [CATEGORIES_VALUES.information_computer_science]: [
+    { value: "computer_science", label: "計算機科學" },
+    { value: "programming_development", label: "程式設計與開發" },
+    { value: "artificial_intelligence", label: "人工智慧" },
+    { value: "data_science_big_data", label: "資料科學與大數據" },
+    { value: "network_information_security", label: "網路與資安" },
+    { value: "ar_vr", label: "AR/VR" },
+    { value: "internet_of_things_iot", label: "物聯網 IoT" },
+    { value: "robotics", label: "機器人技術" },
+    { value: "future_technology_trends", label: "未來科技與趨勢" },
   ],
-  'computer-science': [{ value: 'programming', label: '程式設計' }],
-  humanity: [
-    { value: 'history', label: '歷史' },
-    { value: 'culture', label: '文化' },
-    { value: 'law', label: '法律' },
-    { value: 'politics', label: '政治' },
-    { value: 'economy', label: '經濟' },
-    { value: 'international-situation', label: '國際情勢' },
-    { value: 'social-issues', label: '社會議題' },
-    { value: 'philosophy', label: '哲學' },
+  [CATEGORIES_VALUES.humanities_history_geography]: [
+    { value: "history", label: "歷史" },
+    { value: "geography", label: "地理" },
+    { value: "philosophy", label: "哲學" },
+    { value: "literature", label: "文學" },
+    { value: "religion", label: "宗教" },
+    { value: "culture", label: "文化" },
+    { value: "archeology", label: "考古" },
+    { value: "folk_culture", label: "民俗" },
   ],
-  'nature-science': [
-    { value: 'physics', label: '物理' },
-    { value: 'chemistry', label: '化學' },
-    { value: 'biology', label: '生物' },
-    { value: 'geology', label: '地科' },
-    { value: 'animation', label: '動畫' },
+  [CATEGORIES_VALUES.nature_environment]: [
+    { value: "earth_science", label: "地球科學" },
+    { value: "physics", label: "物理" },
+    { value: "biology", label: "生物" },
+    { value: "chemistry", label: "化學" },
+    { value: "environment", label: "環境" },
+    { value: "natural_resources_conservation", label: "自然資源與保育" },
+    { value: "agriculture", label: "農業" },
   ],
-  art: [
-    { value: 'image-material', label: '圖片素材' },
-    { value: 'design', label: '設計' },
-    { value: 'layout-material', label: '排版素材' },
-    { value: 'theater', label: '戲劇' },
-    { value: 'drawing', label: '繪畫' },
-    { value: 'music', label: '音樂' },
-    { value: 'art-information', label: '藝文資訊' },
-    { value: 'photography', label: '攝影' },
+  [CATEGORIES_VALUES.arts_design]: [
+    { value: "visual_communication", label: "視覺傳達設計" },
+    { value: "fine_arts", label: "美術" },
+    { value: "industrial_design", label: "工業設計" },
+    { value: "commercial_design", label: "商業設計" },
+    { value: "architecture_spatial_design", label: "建築與空間設計" },
+    { value: "fashion_apparel_design", label: "時尚與服裝設計" },
+    { value: "digital_media_design", label: "數位媒體設計" },
+    { value: "photography", label: "攝影" },
+    { value: "film_television", label: "影視" },
+    { value: "music", label: "音樂" },
+    { value: "performing_arts", label: "表演藝術" },
+    { value: "ux_ui", label: "UX/UI" },
+    { value: "design_thinking", label: "設計思考" },
   ],
-  education: [
-    { value: 'experimental-education', label: '實驗教育' },
-    { value: 'self-learning', label: '自主學習' },
-    { value: 'democratic-education', label: '民主教育' },
-    { value: 'career-exploration', label: '生涯探索' },
-    { value: 'college-admission-information', label: '升學資訊' },
-    { value: 'teaching-methods', label: '教學方法' },
-    { value: 'education-innovation', label: '教育創新' },
+  [CATEGORIES_VALUES.education_learning]: [
+    { value: "educational_innovation", label: "教育創新" },
+    { value: "experimental_education", label: "實驗教育" },
+    { value: "adult_education", label: "成人教育" },
+    { value: "early_childhood_education", label: "幼兒教育" },
+    { value: "elementary_education", label: "國小教育" },
+    { value: "secondary_education", label: "中學教育" },
+    { value: "higher_education", label: "高等教育" },
+    { value: "learning_science", label: "學習科學" },
   ],
-  life: [
-    { value: 'cooking', label: '烘焙烹飪' },
-    { value: 'food-agriculture', label: '食農' },
-    { value: 'media', label: '媒體' },
-    { value: 'travel', label: '旅遊' },
-    { value: 'photography', label: '攝影' },
+  [CATEGORIES_VALUES.lifestyle]: [
+    { value: "food_cooking", label: "美食烹飪" },
+    { value: "fashion_styling", label: "時尚穿搭" },
+    { value: "home_decoration", label: "家居裝飾" },
+    { value: "travel_leisure", label: "旅遊休閒" },
+    { value: "art_appreciation", label: "藝術鑑賞" },
+    { value: "collections_antiques", label: "收藏與古董" },
+    { value: "handicraft", label: "手工藝" },
   ],
-  health: [
-    { value: 'sports', label: '運動' },
-    { value: 'psychology', label: '心理學' },
-    { value: 'medicine', label: '醫學' },
-    { value: 'guidance', label: '輔導' },
+  [CATEGORIES_VALUES.medicine_sports]: [
+    { value: "nursing_health_care", label: "護理與健康照護" },
+    { value: "medicine", label: "醫學" },
+    { value: "pharmacy", label: "藥學" },
+    { value: "veterinary", label: "獸醫學" },
+    { value: "long_term_care", label: "長照" },
+    { value: "occupational_therapy", label: "職能治療" },
+    { value: "nutrition_diet", label: "營養與飲食" },
+    { value: "exercise_science_fitness", label: "運動科學與健身" },
+    { value: "sports_athletics", label: "運動與競技" },
   ],
-  business: [
-    { value: 'investment', label: '投資理財' },
-    { value: 'public-relations', label: '公關行銷' },
-    { value: 'social-innovation', label: '社會創新' },
-    { value: 'human-resources', label: '人力資源' },
+  [CATEGORIES_VALUES.business_management_finance]: [
+    { value: "investment", label: "投資理財" },
+    { value: "public-relations", label: "公關行銷" },
+    { value: "human-resources", label: "人力資源" },
   ],
-  diversity: [
-    { value: 'mooc', label: 'MOOC' },
-    { value: 'online-teaching', label: '線上教學' },
-    { value: 'video-software', label: '視訊軟體' },
-    { value: 'digital-learning', label: '數位學習' },
-    { value: 'proposal-software', label: '提案軟體' },
+  [CATEGORIES_VALUES.social_innovation_sustainability]: [
+    { value: "social_innovation", label: "社會創新" },
+    { value: "sustainable_development", label: "永續發展" },
+    { value: "social_responsibility", label: "社會責任" },
+    { value: "social_impact", label: "社會影響力" },
   ],
-  learningtools: [],
+  [CATEGORIES_VALUES.personal_development]: [
+    { value: "life_journey", label: "生涯" },
+    { value: "career", label: "職涯" },
+    { value: "self_improvement", label: "自我成長" },
+  ],
 };
+
+const getPathnameBySubCategory = (subCategoryValue: string) => {
+  const category = Object.entries(SEARCH_TAGS).find(([, tags]) =>
+    tags.some((tag) => tag.value === subCategoryValue)
+  );
+  return `${category?.[0] ?? ""}/${subCategoryValue}`;
+};
+
+export const HOT_TAGS = [
+  {
+    value: getPathnameBySubCategory("artificial_intelligence"),
+    label: "人工智慧",
+  },
+  {
+    value: getPathnameBySubCategory("self_improvement"),
+    label: "自我成長",
+  },
+  {
+    value: getPathnameBySubCategory("social_innovation"),
+    label: "社會創新",
+  },
+  {
+    value: getPathnameBySubCategory("investment"),
+    label: "投資理財",
+  },
+  {
+    value: getPathnameBySubCategory("educational_innovation"),
+    label: "教育創新",
+  },
+];
 
 export const NAV_LINK = [
   {
@@ -166,14 +243,14 @@ export const NAV_LINK = [
     target: '_self',
   },
   {
-    name: '找夥伴',
-    link: '/partner',
-    target: '_self',
+    name: "找夥伴",
+    link: "/partner",
+    target: "_self",
   },
   {
-    name: '找揪團',
-    link: '/group',
-    target: '_self',
+    name: "找揪團",
+    link: "/group",
+    target: "_self",
   },
   // {
   //   name: '找想法',
@@ -196,9 +273,9 @@ export const NAV_LINK = [
   //   target: '_self',
   // },
   {
-    name: '加入社群',
-    link: '/join',
-    target: '_self',
+    name: "加入社群",
+    link: "/join",
+    target: "_self",
   },
   // {
   //   name: '找學習空間',
@@ -209,14 +286,14 @@ export const NAV_LINK = [
 // 新首頁導航連結
 export const LOGGED_OUT_NAV_LINK = [
   {
-    name: '重新定義',
-    link: '/#features',
-    target: '_self',
+    name: "重新定義",
+    link: "/#features",
+    target: "_self",
   },
   {
-    name: '如何開始',
-    link: '/#how-it-works',
-    target: '_self',
+    name: "如何開始",
+    link: "/#how-it-works",
+    target: "_self",
   },
 ];
 
@@ -240,16 +317,16 @@ export const LOGGED_IN_NAV_LINK = [
 
 export const MARATHON_LINKS = [
   {
-    name: '活動詳情',
-    link: '/learning-marathon#marathon-intro',
+    name: "活動詳情",
+    link: "/learning-marathon#marathon-intro",
   },
   {
-    name: '活動公告',
-    link: '/learning-marathon/announcements',
+    name: "活動公告",
+    link: "/learning-marathon/announcements",
   },
   {
-    name: '學習計畫分享區',
-    link: '/projects',
+    name: "學習計畫分享區",
+    link: "/projects",
   },
   // {
   //   name: '成果分享（未公開）',
@@ -259,26 +336,26 @@ export const MARATHON_LINKS = [
 ];
 
 export const USER_LINK = [
-  { name: '帳號設定', id: 'account-setting' },
-  { name: '個人化推薦', id: 'personalized-recommendations' },
-  { name: '島島幣', id: 'daodao-coin' },
+  { name: "帳號設定", id: "account-setting" },
+  { name: "個人化推薦", id: "personalized-recommendations" },
+  { name: "島島幣", id: "daodao-coin" },
 ];
 
 export const FOOTER_LINK = [
   {
-    name: '找資源',
-    link: '/search',
-    target: '_self',
+    name: "找資源",
+    link: "/resource",
+    target: "_self",
   },
   {
-    name: '找夥伴',
-    link: '/partner',
-    target: '_self',
+    name: "找夥伴",
+    link: "/partner",
+    target: "_self",
   },
   {
-    name: '找揪團',
-    link: '/group',
-    target: '_self',
+    name: "找揪團",
+    link: "/group",
+    target: "_self",
   },
   // {
   //   name: '找想法',
@@ -286,9 +363,9 @@ export const FOOTER_LINK = [
   //   target: '_self',
   // },
   {
-    name: '找故事',
-    link: 'https://blog.daoedu.tw',
-    target: '_blank',
+    name: "找故事",
+    link: "https://blog.daoedu.tw",
+    target: "_blank",
   },
   // {
   //   name: '找活動',
@@ -324,16 +401,16 @@ export const FOOTER_LINK = [
   // },
 ];
 
-export const OTHER_OPTION = { label: '其他', value: 'other' };
+export const OTHER_OPTION = { label: "其他", value: "other" };
 
 export const ACTIVITY_CATEGORIES = [
-  { label: '讀書會', value: 'study_group' },
-  { label: '工作坊', value: 'workshop' },
-  { label: '專案', value: 'project' },
-  { label: '競賽', value: 'competition' },
-  { label: '活動', value: 'event' },
-  { label: '社團', value: 'club' },
-  { label: '課程', value: 'course' },
-  { label: '實習', value: 'internship' },
+  { label: "讀書會", value: "study_group" },
+  { label: "工作坊", value: "workshop" },
+  { label: "專案", value: "project" },
+  { label: "競賽", value: "competition" },
+  { label: "活動", value: "event" },
+  { label: "社團", value: "club" },
+  { label: "課程", value: "course" },
+  { label: "實習", value: "internship" },
   OTHER_OPTION,
 ];

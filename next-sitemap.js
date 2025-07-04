@@ -132,12 +132,12 @@ module.exports = {
         priority: 1.0,
         lastmod: new Date().toISOString(),
       },
-      {
-        loc: `/search`,
-        changefreq: 'daily',
-        priority: 1.0,
-        lastmod: new Date().toISOString(),
-      },
+      // {
+      //   loc: `/search`,
+      //   changefreq: 'daily',
+      //   priority: 1.0,
+      //   lastmod: new Date().toISOString(),
+      // },
       {
         loc: `/contribute/resource`,
         changefreq: 'daily',
@@ -169,14 +169,14 @@ module.exports = {
         lastmod: new Date().toISOString(),
       },
     ];
-    CATEGORIES.forEach(({ value }) => {
-      fields.push({
-        loc: `/search?cats=${value}`,
-        changefreq: 'daily',
-        priority: 0.7,
-        lastmod: new Date().toISOString(),
-      });
-    });
+    // CATEGORIES.forEach(({ value }) => {
+    //   fields.push({
+    //     loc: `/search?cats=${value}`,
+    //     changefreq: 'daily',
+    //     priority: 0.7,
+    //     lastmod: new Date().toISOString(),
+    //   });
+    // });
 
     let cursor;
     let body = {};

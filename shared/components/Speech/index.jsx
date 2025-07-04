@@ -101,7 +101,7 @@ const Speech = ({ lang, setIsSpeechMode }) => {
       setIsSpeechMode(false);
 
       router.push({
-        pathname: '/search',
+        pathname: '/resource',
         query: {
           ...query,
           q: transcript,

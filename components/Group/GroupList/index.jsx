@@ -170,7 +170,7 @@ function GroupList({ items, isLoading, isError, onRefetch }) {
         </StyledFullItem>
       ) : (
         !isLoading &&
-        items.length === 0 && (
+        items?.length === 0 && (
           <StyledFullItem>
             <Image
               alt="查無資料"

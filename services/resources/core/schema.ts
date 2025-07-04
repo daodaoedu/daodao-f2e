@@ -6,7 +6,6 @@ import {
   resourceReviewFormSchema,
 } from "../reviews/schema";
 
-// 自定義 HTTPS URL 驗證
 const httpsUrl = z
   .string()
   .url({ message: "請輸入正確的網址" })
@@ -31,11 +30,15 @@ export const resourceSchema = z.object({
   reviewCount: z.number(),
   avgRating: z.number().optional().nullable(),
   majorCategory: z.string(),
-  subCategory: z.string(),
-  user: baseUserSchema,
+  subCategory: z.string().optional().nullable(), // 資料有可能沒有 subCategory
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   tags: z.array(z.string()),
+  user: baseUserSchema.extend({
+    selfIntroduction: z.string(),
+    educationStage: z.string(),
+    tagList: z.array(z.string()),
+  }),
 });
 
 export const resourceListResponseSchema = z.object({
@@ -86,13 +89,13 @@ export const resourceSearchParamsSchema = z.object({
 
 export type ResourceSchema = z.infer<typeof resourceSchema>;
 
-export type ResourceListResponseSchema = z.infer<
-  typeof resourceListResponseSchema
->;
+export type ResourceListResponseSchema = {
+  data: z.infer<typeof resourceListResponseSchema>;
+};
 
-export type ResourceDetailResponseSchema = z.infer<
-  typeof resourceDetailResponseSchema
->;
+export type ResourceDetailResponseSchema = {
+  data: z.infer<typeof resourceDetailResponseSchema>;
+};
 
 export type ResourceFormSchema = z.infer<typeof resourceFormSchema>;
 

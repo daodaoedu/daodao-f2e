@@ -1,4 +1,4 @@
-import type { InferGetStaticPropsType, GetStaticProps } from "next";
+import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { SWRConfig } from "swr";
 import Link from "next/link";
 import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
@@ -13,31 +13,18 @@ import { cn } from "@/utils/cn";
 import useSearchParamsManager from "@/hooks/useSearchParamsManager";
 import { Button } from "@/components/ui/button";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
+import { Container } from "@/components/ui/wrapper";
 
-type SectionProps = {
-  as?: "section" | "div";
-  className?: string;
-  children: React.ReactNode;
-};
+export const runtime = "experimental-edge";
 
-const Section = ({
-  as: Component = "section",
-  className,
-  children,
-}: SectionProps) => {
-  return <Component className={className}>{children}</Component>;
-};
-
-export const getStaticProps = (async () => {
+export const getServerSideProps = (async () => {
   try {
-    const data = await resourceAPI.readList();
-
-    const coursesJsonLd = data.resources.slice(0, 4).map(createResourceJsonLd);
+    const { data } = await resourceAPI.readList({ limit: 4 });
 
     const jsonLd = JsonLdFactory.createGraph([
       JsonLdFactory.createItemListBuilder()
         .setName("探索所有資源")
-        .setItems(coursesJsonLd),
+        .setItems(data.resources.map(createResourceJsonLd)),
     ]);
 
     return {
@@ -49,25 +36,25 @@ export const getStaticProps = (async () => {
       },
     };
   } catch {
-    return { props: { fallback: undefined, jsonLd: undefined } };
+    return { props: {} };
   }
-}) satisfies GetStaticProps<{
-  fallback: Record<string, ResourceListResponseSchema> | undefined;
-  jsonLd: JsonLdType | undefined;
+}) satisfies GetServerSideProps<{
+  fallback?: Record<string, ResourceListResponseSchema["data"]>;
+  jsonLd?: JsonLdType;
 }>;
 
 export default function ResourceCategoriesPage({
   fallback,
   jsonLd,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [getSearchParams] = useSearchParamsManager();
   const searchParams = getSearchParams();
-  const keyword = searchParams?.q;
+  const keyword = searchParams?.query;
 
   return (
     <SWRConfig value={{ fallback }}>
       <SEOConfig title="探索所有資源｜島島阿學" jsonLd={jsonLd} />
-      <Section as="div" className="pt-12 px-5 md:px-24">
+      <Container className="pt-12">
         <Button
           variant="link"
           className="mb-3 px-2 -mx-2 text-basic-300"
@@ -83,11 +70,9 @@ export default function ResourceCategoriesPage({
           title="所有資源"
           className={cn(keyword && "hidden")}
         />
-      </Section>
+      </Container>
 
-      <Section className="pb-11 md:pb-12">
-        <ResourceExplorer />
-      </Section>
+      <ResourceExplorer />
     </SWRConfig>
   );
 }

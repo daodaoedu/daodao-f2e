@@ -26,6 +26,7 @@ import {
   ResourceReviewList,
   ContributorInfo,
 } from "@/features/resources/components";
+import { parseCategoryHierarchy } from "@/features/resources";
 
 enum TabEnum {
   Introduction = "introduction",
@@ -36,35 +37,27 @@ enum TabEnum {
 export const runtime = "experimental-edge";
 
 export const getServerSideProps = (async (context) => {
-  const resourceId = parseToString(context.params?.resourceId);
-
   try {
+    const resourceId = parseToString(context.params?.resourceId);
+
     if (!resourceId) {
-      return {
-        notFound: true,
-      };
+      return { notFound: true };
     }
 
-    const resource = await resourceAPI.read(resourceId);
+    const { data } = await resourceAPI.read(resourceId);
 
     return {
-      props: {
-        resource,
-      },
+      props: { data },
     };
-  } catch (error) {
-    console.error("Failed to fetch resource:", error);
-    return {
-      notFound: true,
-    };
+  } catch {
+    return { notFound: true };
   }
 }) satisfies GetServerSideProps<{
-  resource?: ResourceDetailResponseSchema;
-  notFound?: boolean;
+  data: ResourceDetailResponseSchema["data"];
 }>;
 
 export default function ResourceDetailPage({
-  resource,
+  data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const [query, setQuery] = useQueryState(
@@ -73,46 +66,53 @@ export default function ResourceDetailPage({
     })
   );
 
-  if (!resource) {
+  if (!data) {
     return <NotExist />;
   }
+
+  const [majorCategory, subCategory] = parseCategoryHierarchy([
+    data.majorCategory,
+    data.subCategory ?? "",
+  ]);
+
+  const baseCategoriesUrl = "/resource/categories";
 
   return (
     <div className="bg-primary-palest min-h-screen">
       <SEOConfig
-        title={`${resource.name} - 分享資源 | 島島阿學`}
-        description={resource.description}
+        title={`${data.name} - 分享資源 | 島島阿學`}
+        description={data.description}
       />
       <Container className="pb-12 pt-11 md:pt-12">
         <Breadcrumb className="mb-5 md:mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/find-resource">找資源</BreadcrumbLink>
+              <BreadcrumbLink href="/resource">找資源</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink
-                href={`/find-resource?category=${resource.majorCategory}`}
+                href={`${baseCategoriesUrl}/${majorCategory?.value}`}
               >
-                {resource.majorCategory}
+                {majorCategory?.label}
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink
-                href={`/find-resource?category=${resource.subCategory}`}
+                href={`${baseCategoriesUrl}/${majorCategory?.value}/${subCategory?.value}`}
               >
-                {resource.subCategory}
+                {subCategory?.label}
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>{resource.name}</BreadcrumbPage>
+              <BreadcrumbPage>{data.name}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
-        <ResourceDetail resource={resource} />
+        <ResourceDetail resource={data} />
 
         <div className="bg-white shadow rounded-xl">
           <Tabs
@@ -124,9 +124,13 @@ export default function ResourceDetailPage({
                 介紹
               </TabsTrigger>
               <TabsTrigger value={TabEnum.Reviews} className="basis-1/3">
-                心得 ({resource.reviewCount || 0})
+                心得 ({data.reviewCount || 0})
               </TabsTrigger>
-              <TabsTrigger value={TabEnum.Contributor} className="basis-1/3">
+              <TabsTrigger
+                value={TabEnum.Contributor}
+                className="basis-1/3"
+                disabled={!data.user?._id}
+              >
                 分享者資訊
               </TabsTrigger>
             </TabsList>
@@ -134,27 +138,27 @@ export default function ResourceDetailPage({
             <Separator />
 
             <TabsContent value={TabEnum.Introduction}>
-              <ResourceIntroduction resource={resource} />
+              <ResourceIntroduction resource={data} />
             </TabsContent>
 
             <TabsContent value={TabEnum.Reviews}>
               <ResourceReviewList
-                resource={resource}
+                resource={data}
                 onCreateReview={() => {
-                  router.push(`/resource/${resource.id}/reviews/create`);
+                  router.push(`/resource/${data.id}/reviews/create`);
                 }}
               />
             </TabsContent>
 
             <TabsContent value={TabEnum.Contributor}>
-              <ContributorInfo resource={resource} />
+              <ContributorInfo user={data.user} />
             </TabsContent>
           </Tabs>
         </div>
         <h3 className="heading-lg mt-12">留言</h3>
         <div className="-mx-4">
           <CommentSection
-            targetId={resource.id}
+            targetId={data.id}
             targetType={CommentType.Resource}
           />
         </div>

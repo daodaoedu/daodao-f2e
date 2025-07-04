@@ -7,6 +7,7 @@ import {
   ResourceReviewFormSchema,
   ResourceReviewResponseSchema,
 } from "./schema";
+import { getResourcePathname } from "../core";
 
 export type ResourceReviewSWRKey = string;
 
@@ -28,14 +29,13 @@ export const getResourceReviewPathname = ({
   return pathname;
 };
 
-export const refetchResourceReviews = async () => {
+export const refetchResourceReviews = async (resourceId: string | null) => {
   await mutate((key: unknown) => {
     const pathname = Array.isArray(key) ? key[0] : key;
-    return (
-      typeof pathname === "string" &&
-      pathname.includes("/resources/") &&
-      pathname.includes("/reviews")
-    );
+    if (resourceId) {
+      return pathname.includes(getResourcePathname({ resourceId }));
+    }
+    return pathname.includes(getResourcePathname());
   });
 };
 
