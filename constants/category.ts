@@ -219,10 +219,6 @@ export const HOT_TAGS = [
     label: "人工智慧",
   },
   {
-    value: getPathnameBySubCategory("self_improvement"),
-    label: "自我成長",
-  },
-  {
     value: getPathnameBySubCategory("social_innovation"),
     label: "社會創新",
   },
