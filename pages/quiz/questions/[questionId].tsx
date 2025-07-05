@@ -91,7 +91,7 @@ export default function QuizQuestionPage({
               "sm:top-1/2 sm:-translate-y-1/2 sm:right-auto sm:left-full sm:size-20",
               "absolute z-20 p-0 flex-col gap-0 body-sm hover:text-black",
               "sm:bg-[radial-gradient(circle_at_center,#FFFFFF_0%,#FFFFFF00_70%)]",
-              !selectedAnswer && currentStep <= questionMap.size && "hidden"
+              (!selectedAnswer || currentStep >= questionMap.size) && "hidden"
             )}
             onClick={() => router.push(`${basePath}/q${currentStep + 1}`)}
             animation="none"
