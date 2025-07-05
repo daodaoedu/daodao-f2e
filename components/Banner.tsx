@@ -14,7 +14,7 @@ const Banner = () => {
         preload="auto"
         className="absolute top-0 left-0 w-full h-full object-cover"
       >
-        <source src="/assets/daodao-banner.mov" type="video/mp4" />
+        <source src="/assets/daodao-banner.webm" type="video/webm" />
       </video>
       <div className="absolute inset-0 bg-black/30" />
 
