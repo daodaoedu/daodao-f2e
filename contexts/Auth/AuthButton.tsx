@@ -3,10 +3,11 @@ import { Button, type ButtonProps } from "@/components/ui/button";
 
 import { GACategory, logEvent } from "@/utils/analytics";
 import { useAuth, useAuthDispatch } from "./AuthContext";
+import { Callbacks } from "./type";
 
-interface AuthButtonProps extends Omit<ButtonProps, "asChild"> {
-  registerCallback?: () => void;
-}
+interface AuthButtonProps
+  extends Omit<ButtonProps, "asChild">,
+    Pick<Callbacks, "registerCallback"> {}
 
 export const AuthButton = ({
   onClick,
@@ -37,13 +38,17 @@ export const AuthButton = ({
           );
           onClick?.(event);
         },
-        registerCallback: () => {
+        registerCallback: (callback) => {
           logEvent(
             GACategory.User,
             "Register Start",
             `Button Text: ${buttonText}`
           );
-          registerCallback?.();
+          if (registerCallback) {
+            registerCallback(callback);
+          } else {
+            callback();
+          }
         },
       });
     }
