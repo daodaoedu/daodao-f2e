@@ -1,9 +1,10 @@
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
+import { toast } from "sonner";
 import { useRouter } from "next/router";
 import { z } from "zod";
 import useQueryState from "@/hooks/useQueryState";
 import SEOConfig from "@/shared/components/SEO";
-import { CommentType } from "@/services/comments";
+// import { CommentType } from "@/services/comments";
 import { resourceAPI } from "@/services/resources/core/api";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
 import {
@@ -17,7 +18,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import NotExist from "@/shared/components/NotExist";
-import CommentSection from "@/shared/components/Comment/CommentSection";
+// import CommentSection from "@/shared/components/Comment/CommentSection";
 import { Container } from "@/components/ui/wrapper";
 import { parseToString } from "@/utils/helper";
 import {
@@ -123,7 +124,12 @@ export default function ResourceDetailPage({
               <TabsTrigger value={TabEnum.Introduction} className="basis-1/3">
                 介紹
               </TabsTrigger>
-              <TabsTrigger value={TabEnum.Reviews} className="basis-1/3">
+              <TabsTrigger
+                value={TabEnum.Reviews}
+                className="basis-1/3"
+                onClick={() => toast.error("尚未開放心得分享功能")}
+                disabled
+              >
                 心得 ({data.reviewCount || 0})
               </TabsTrigger>
               <TabsTrigger
@@ -155,13 +161,13 @@ export default function ResourceDetailPage({
             </TabsContent>
           </Tabs>
         </div>
-        <h3 className="heading-lg mt-12">留言</h3>
+        {/* <h3 className="heading-lg mt-12">留言</h3>
         <div className="-mx-4">
           <CommentSection
             targetId={data.id}
             targetType={CommentType.Resource}
           />
-        </div>
+        </div> */}
       </Container>
     </div>
   );
