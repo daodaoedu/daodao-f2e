@@ -1,9 +1,9 @@
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 import Link from "next/link";
 import { SearchIcon, SendHorizontalIcon } from "lucide-react";
 import Image from "@/shared/components/Image";
 import { OptionProps } from "@/components/ui/option";
-import { AuthButton } from "@/contexts/Auth";
+// import { AuthButton } from "@/contexts/Auth";
 import { cn } from "@/utils/cn";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/wrapper";
@@ -29,7 +29,7 @@ export default function ResourceBanner({
   length,
   onSearch,
 }: ResourceBannerProps) {
-  const router = useRouter();
+  // const router = useRouter();
   const isMediumSize = size === "md";
   const isLargeSize = size === "lg";
 
@@ -112,13 +112,13 @@ export default function ResourceBanner({
               </div>
             )}
 
-            <AuthButton
+            {/* <AuthButton
               className="md:w-max"
               size="lg"
               onClick={() => router.push("/resource/create")}
             >
               + 分享資源
-            </AuthButton>
+            </AuthButton> */}
           </div>
         </div>
       </Container>
