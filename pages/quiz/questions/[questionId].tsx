@@ -128,7 +128,7 @@ export default function QuizQuestionPage({
               priority
             />
           </div>
-          <div className="relative mx-auto aspect-[30/43] max-w-full max-h-[calc(100dvh-288px)]">
+          <div className="relative mx-auto aspect-[30/43] max-h-[calc(100dvh-288px)]">
             <Image
               key={question.title}
               src={question.image}
