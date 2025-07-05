@@ -45,7 +45,7 @@ export default function QuizResultPage() {
   const shareAPI = getShareAPI({
     title: "【我有一個島，它叫＿島】學習風格測驗｜島島阿學",
     text: "【我有一個島，它叫＿島】學習風格測驗｜島島阿學",
-    url: router.asPath,
+    url: '/quiz',
     hashtag: "#島島阿學",
   });
 
