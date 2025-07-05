@@ -49,7 +49,7 @@ function Header(
           breakpoint === BREAKPOINT.MOBILE && 'pr-2'
         )}
       >
-        <Link href="/" className="block py-5">
+        <Link href="/" className="block py-6">
           <Image
             src={newLogo}
             alt="島島阿學"

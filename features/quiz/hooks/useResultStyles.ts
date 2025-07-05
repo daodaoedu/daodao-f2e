@@ -14,8 +14,11 @@ export const useResultStyles = (theme?: Theme | null) => {
         "--bg-color": theme?.backgroundColor,
         "--color": theme?.color,
         "--secondary-color": theme?.secondaryColor,
-        "--bg-image": `url(${ResultNoisePng.src}) center / 393px 1352px repeat, linear-gradient(${theme?.backgroundColor})`,
-        background: "var(--bg-image)",
+        backgroundImage: `url(${ResultNoisePng.src})`,
+        backgroundPosition: "center",
+        backgroundRepeat: "repeat",
+        backgroundSize: "393px 1352px",
+        backgroundColor: theme?.backgroundColor,
       } as React.CSSProperties),
     [theme]
   );

@@ -1,8 +1,7 @@
 import { toast } from "sonner";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
-import Image from "next/image";
 import { toJpeg } from "html-to-image";
 import SEOConfig from "@/shared/components/SEO";
 import { Button } from "@/components/ui/button";
@@ -28,82 +27,27 @@ import ThreadsSvg from "@/public/assets/socials-logos/threads.svg";
 import XSvg from "@/public/assets/socials-logos/x.svg";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
-import { useDialog } from "@/contexts/Dialog";
 import getShareAPI from "@/utils/getShareAPI";
 import { GACategory, logEvent } from "@/utils/analytics";
 
+interface ResultImg {
+  src: string;
+  width: number;
+  height: number;
+}
+
 export default function QuizResultPage() {
   const router = useRouter();
+  const [resultImg, setResultImg] = useState<ResultImg | null>(null);
   const { detail, theme, analysis, hasAnalysis } = useQuiz();
   const { rootStyle } = useResultStyles(theme);
   const mainRef = useRef<HTMLDivElement>(null);
-  const cleanupRef = useRef<() => void>(() => {});
-  const { openDialog } = useDialog();
   const shareAPI = getShareAPI({
     title: "【我有一個島，它叫＿島】學習風格測驗｜島島阿學",
     text: "【我有一個島，它叫＿島】學習風格測驗｜島島阿學",
-    url: router.asPath,
+    url: "/quiz",
     hashtag: "#島島阿學",
   });
-
-  const handleOpenDialog = () => {
-    openDialog({
-      title: "下載分析結果",
-      content: theme && (
-        <div className="px-10">
-          <AspectRatio ratio={9 / 7}>
-            <Image src={theme.largeImg} alt={theme.title} fill />
-          </AspectRatio>
-        </div>
-      ),
-      cancelText: "取消",
-      confirmText: "下載",
-      onCancel: () => {
-        console.log("cancel");
-      },
-      onConfirm: async () => {
-        if (!mainRef.current || !theme) return;
-        const anchor = document.createElement("a");
-        try {
-          // 確保所有圖片都載入完成
-          const images = mainRef.current.querySelectorAll("img");
-          await Promise.all(
-            Array.from(images).map((img) => {
-              if (img.complete) return Promise.resolve();
-              return new Promise<void>((resolve, reject) => {
-                const handleLoad = () => resolve();
-                const handleError = () => reject();
-                cleanupRef.current();
-                img.addEventListener("load", handleLoad);
-                img.addEventListener("error", handleError);
-                // 設定超時，避免無限等待
-                setTimeout(() => reject(new Error("Image load timeout")), 5000);
-                cleanupRef.current = () => {
-                  img.removeEventListener("load", handleLoad);
-                  img.removeEventListener("error", handleError);
-                };
-              });
-            })
-          );
-
-          await new Promise((resolve) => setTimeout(resolve, 100));
-
-          const dataUrl = await toJpeg(mainRef.current, {
-            quality: 0.95,
-            pixelRatio: window.devicePixelRatio,
-          });
-          anchor.href = dataUrl;
-          anchor.download = `${theme.title}.jpeg`;
-          anchor.click();
-          logEvent(GACategory.User, "Download Result", `Theme: ${theme.title}`);
-        } catch {
-          toast.error("下載圖片失敗");
-        } finally {
-          anchor.remove();
-        }
-      },
-    });
-  };
 
   const handleReplay = () => {
     logEvent(GACategory.User, "Replay Quiz");
@@ -115,6 +59,13 @@ export default function QuizResultPage() {
     router.push(`/quiz/result/${detail?.id}`);
   };
 
+  const handleImageContextMenu = () => {
+    if (!theme) return;
+    logEvent(GACategory.User, "Download Result", `Theme: ${theme.title}`);
+  };
+
+  const isLoading = !hasAnalysis || !detail || !theme;
+
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!hasAnalysis) {
@@ -123,25 +74,53 @@ export default function QuizResultPage() {
     }, 1000);
     return () => {
       clearTimeout(timer);
-      cleanupRef.current();
     };
   }, [hasAnalysis, router]);
 
-  if (!hasAnalysis || !detail || !theme) return null;
+  useEffect(() => {
+    const renderResultImg = async () => {
+      if (!mainRef.current || isLoading) return;
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        const dataUrl = await toJpeg(mainRef.current, {
+          quality: 0.95,
+          pixelRatio: window.devicePixelRatio,
+        });
+
+        setResultImg({
+          src: dataUrl,
+          width: mainRef.current.clientWidth - 2,
+          height: mainRef.current.clientHeight - 2,
+        });
+      } catch {
+        toast.error("圖片渲染失敗");
+      }
+    };
+
+    const handleResize = () => {
+      requestAnimationFrame(renderResultImg);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [isLoading]);
+
+  if (isLoading) return null;
 
   return (
     <>
       <SEOConfig title={`${theme.title} | 島島阿學`} />
       <div style={rootStyle}>
         <div className="relative max-w-[392px] mx-auto">
-          <button
-            type="button"
-            className="border-b border-dashed border-[var(--color)] sm:border"
-            onClick={handleOpenDialog}
-          >
+          <div className="relative border-b border-dashed border-[var(--color)] sm:border">
             <main
               ref={mainRef}
               className="p-6 pb-10 text-sm text-left text-basic-400 [background:var(--bg-image)]"
+              style={rootStyle}
             >
               <header className="mb-1">
                 <HorizontalLogoSvg className="h-[22px]" />
@@ -241,10 +220,21 @@ export default function QuizResultPage() {
                 })}
               </div>
             </main>
-          </button>
+            {resultImg && (
+              <img
+                src={resultImg.src}
+                alt={theme.title}
+                width={resultImg.width}
+                height={resultImg.height}
+                className="absolute inset-px object-cover"
+                onContextMenu={handleImageContextMenu}
+              />
+            )}
+          </div>
           <div className="mb-4 relative -top-4 flex justify-center">
             <div className="px-2 font-bold text-lg text-[var(--color)] bg-[var(--bg-color)]">
-              點擊上方圖片以儲存結果
+              <div className="hidden sm:block">右鍵上方圖片以儲存結果</div>
+              <div className="block sm:hidden">長按上方圖片以儲存結果</div>
             </div>
           </div>
           <div className="px-6 pb-6">

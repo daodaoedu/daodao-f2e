@@ -66,6 +66,7 @@ export const ResultChart = ({
           stroke={color}
           strokeLinejoin="round"
           strokeWidth={3}
+          animationDuration={0}
         />
       </RadarChart>
     </ChartContainer>
