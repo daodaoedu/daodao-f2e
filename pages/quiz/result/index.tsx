@@ -45,7 +45,7 @@ export default function QuizResultPage() {
   const shareAPI = getShareAPI({
     title: "【我有一個島，它叫＿島】學習風格測驗｜島島阿學",
     text: "【我有一個島，它叫＿島】學習風格測驗｜島島阿學",
-    url: '/quiz',
+    url: "/quiz",
     hashtag: "#島島阿學",
   });
 
@@ -120,6 +120,7 @@ export default function QuizResultPage() {
             <main
               ref={mainRef}
               className="p-6 pb-10 text-sm text-left text-basic-400 [background:var(--bg-image)]"
+              style={rootStyle}
             >
               <header className="mb-1">
                 <HorizontalLogoSvg className="h-[22px]" />
