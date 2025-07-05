@@ -14,9 +14,9 @@ export enum LoginStatus {
   PERMANENT,
 }
 
-type Callbacks = {
-  successCallback?: () => void;
-  registerCallback?: () => void;
+export type Callbacks = {
+  successCallback?: (callback: () => void) => void;
+  registerCallback?: (callback: () => void) => void;
 };
 
 interface CommonAuthState {

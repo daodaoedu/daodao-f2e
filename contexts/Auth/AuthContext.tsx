@@ -206,19 +206,27 @@ export function AuthProvider({ children }: PropsWithChildren) {
       },
       openLoginModal: (payload) => {
         const redirectPathname = window.location.pathname;
+
+        const defaultSuccessCallback = () => {
+          getRedirectionStorage().set(redirectPathname);
+          router.replace(redirectPathname);
+        };
+        const defaultRegisterCallback = () => {
+          router.replace("/onboarding");
+        };
+
         const successCallback = () => {
           if (payload?.successCallback) {
-            payload.successCallback();
+            payload.successCallback(defaultSuccessCallback);
           } else {
-            getRedirectionStorage().set(redirectPathname);
-            router.replace(redirectPathname);
+            defaultSuccessCallback();
           }
         };
         const registerCallback = () => {
           if (payload?.registerCallback) {
-            payload.registerCallback();
+            payload.registerCallback(defaultRegisterCallback);
           } else {
-            router.replace("/onboarding");
+            defaultRegisterCallback();
           }
         };
         logout();
