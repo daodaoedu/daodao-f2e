@@ -1,10 +1,10 @@
 import { useRouter } from "next/router";
 import { forwardRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import newLogo from "@/public/new-logo.png";
 import { usePromotion } from "@/contexts/Promotion";
 import { cn } from "@/utils/cn";
+import { Image } from "@/components/ui/image";
 import MobileMenu from "./MobileMenu";
 import DesktopMenu from "./DesktopMenu";
 
@@ -38,7 +38,7 @@ function Header(
             />
           </Link>
         </div>
-        <div className="hidden lg:flex items-center justify-between flex-[2.5]">
+        <div className="hidden lg:flex items-center justify-between flex-[3] xl:flex-[2]">
           <DesktopMenu />
         </div>
         <div className="lg:hidden">
