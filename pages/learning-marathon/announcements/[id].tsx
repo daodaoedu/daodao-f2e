@@ -9,8 +9,7 @@ import {
   AnnouncementList,
 } from '@/components/Marathon/Announcement';
 
-/** @todo Replace this with actual data */
-import { announcementItems } from '@/fixtures/marathon/announcements';
+import { announcementItems } from '@/features/marathon';
 
 const Announcement = () => {
   const router = useRouter();
