@@ -1,6 +1,6 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { SWRConfig } from "swr";
-import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
+import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
 import {
   CategoriesContainer,
   createResourceJsonLd,

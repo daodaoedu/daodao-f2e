@@ -2,7 +2,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { parseToString } from "@/utils/helper";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import {
   ContentCard,
   NoteCreateModal,

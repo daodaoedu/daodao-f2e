@@ -3,7 +3,7 @@ import { PropsWithChildren } from "react";
 import { Background, Container, Paper } from "@/components/ui/wrapper";
 import Image from "@/shared/components/Image";
 import { Button } from "@/components/ui/button";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import { useAuth, useAuthDispatch } from "./AuthContext";
 
 const DefaultFallback = () => {

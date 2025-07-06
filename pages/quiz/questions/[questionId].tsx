@@ -2,7 +2,7 @@ import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { ChevronRightIcon, ChevronLeftIcon } from "lucide-react";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import RunnerSvg from "@/public/assets/icons/runner.svg";

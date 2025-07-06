@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Check } from "lucide-react";
 import { toast } from "sonner";
 
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Background, Container, Paper } from "@/components/ui/wrapper";

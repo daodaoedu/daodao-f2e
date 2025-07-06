@@ -1,7 +1,7 @@
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { SWRConfig } from "swr";
 import Link from "next/link";
-import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
+import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
 import { ChevronLeftIcon } from "lucide-react";
 import {
   createResourceJsonLd,

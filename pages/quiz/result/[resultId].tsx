@@ -2,7 +2,7 @@ import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import { Fragment } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import { Button } from "@/components/ui/button";
 import HorizontalLogoSvg from "@/public/horizontal-logo.svg";
 import {

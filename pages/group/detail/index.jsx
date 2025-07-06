@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig from '@/components/SEOConfig';
 import GroupDetail from '@/components/Group/detail';
 import GroupEmpty from '@/components/Group/detail/Empty';
 import useFetch from '@/hooks/useFetch';

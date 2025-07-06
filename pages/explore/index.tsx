@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from 'next/router';
 import { Plus, Lightbulb, Target, BookOpen, ChevronDown, MoreVertical, Shell, MessageCircle, Share2, Link as LinkIcon, Bookmark, Flag, User, Flame } from 'lucide-react';
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig from '@/components/SEOConfig';
 import getPrivateLayout from '@/layout/core/getPrivateLayout';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";

@@ -1,7 +1,7 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { SWRConfig } from "swr";
 import { Fragment } from "react";
-import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
+import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
 import {
   CategoriesContainer,
   ResourceBanner,

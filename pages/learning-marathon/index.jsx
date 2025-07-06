@@ -2,7 +2,7 @@ import Link from 'next/link';
 import React, { useEffect, useMemo, useState, useRef } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig from '@/components/SEOConfig';
 import { usePromotion } from '@/contexts/Promotion';
 import { GoArrowUpRight } from "react-icons/go";
 import { FaAngleUp } from "react-icons/fa6";

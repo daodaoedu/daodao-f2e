@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/router";
 import { z } from "zod";
 import useQueryState from "@/hooks/useQueryState";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 // import { CommentType } from "@/services/comments";
 import { resourceAPI } from "@/services/resources/core/api";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";

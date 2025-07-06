@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import SEOConfig from '../../shared/components/SEO';
+import SEOConfig from '../../components/SEOConfig';
 import About from '../../components/About';
 
 const AboutPage = () => {

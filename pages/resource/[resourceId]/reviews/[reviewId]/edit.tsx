@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import { ProtectedComponent } from "@/contexts/Auth";
 import { ResourceReviewForm } from "@/features/resources";
 import { parseToNumber, parseToString } from "@/utils/helper";

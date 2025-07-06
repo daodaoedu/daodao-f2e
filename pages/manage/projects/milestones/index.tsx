@@ -1,7 +1,7 @@
 import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
+import SEOConfig, { JsonLdType } from '@/components/SEOConfig';
 import { Skeleton } from '@mui/material';
 import { MdOutlineSort } from 'react-icons/md';
 import { Panel, Title, ProgressBar } from '@/components/Milestones/Shared';

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import HorizontalLogoSvg from "@/public/horizontal-logo.svg";
 import question1Jpg from "@/public/assets/quiz/q1.webp";
 import ResultNoisePng from "@/public/assets/quiz/result-noise.png";

@@ -5,7 +5,7 @@ import { ProtectedComponent, useAuth } from '@/contexts/Auth';
 import { useSnackbar } from '@/contexts/Snackbar';
 import useFetch from '@/hooks/useFetch';
 import useMutation from '@/hooks/useMutation';
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig from '@/components/SEOConfig';
 import GroupForm from '@/components/Group/Form';
 
 function EditGroupPage() {

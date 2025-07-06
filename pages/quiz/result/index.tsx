@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { toJpeg } from "html-to-image";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import { Button } from "@/components/ui/button";
 import favicon112Png from "@/public/favicon-112.png";
 import HorizontalLogoSvg from "@/public/horizontal-logo.svg";

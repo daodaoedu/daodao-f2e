@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { ProtectedComponent } from '@/contexts/Auth';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import Select from '@/components/Projects/Form/Select';
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig from '@/components/SEOConfig';
 import GoBackButton from '@/components/Projects/GoBackButton';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import CircleIcon from '@mui/icons-material/Circle';

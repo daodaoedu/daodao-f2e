@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import SEOConfig from '../shared/components/SEO';
+import SEOConfig from '../components/SEOConfig';
 import Home from '../components/Home';
 
 const HomePage = () => {

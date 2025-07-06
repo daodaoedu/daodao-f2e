@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 
 import { Divider, Typography } from '@mui/material';
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig from '@/components/SEOConfig';
 
 import CheckIconSvg from '@/public/assets/icons/check_icon.svg';
 import DiscordIconSvg from '@/public/assets/icons/discord_icon.svg';

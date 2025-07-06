@@ -11,7 +11,7 @@ import Link from "next/link";
 import marathonConfig from "@/constants/marathon";
 import getManageLayout from "@/layout/features/getManageLayout";
 import useClickOutside from "@/hooks/useClickOutside";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import { Button } from "@/components/ui/button";
 import MilestoneItem from "@/components/Milestones/MilestoneItem";
 import {

@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { ProtectedComponent, useAuth } from '@/contexts/Auth';
 import Edit from '@/components/PersonalCard/Edit';
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig from '@/components/SEOConfig';
 import MyGroup from '@/components/PersonalCard/MyGroup';
 import MyResource from '@/components/PersonalCard/MyResource';
 import MyNote from '@/components/PersonalCard/MyNote';

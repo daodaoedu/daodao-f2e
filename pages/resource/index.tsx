@@ -2,7 +2,7 @@ import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { ChevronRightIcon } from "lucide-react";
-import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
+import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
 import ResourceBannerWebp from "@/public/assets/resource/banner.webp";
 import {
   CategoriesContainer,

@@ -1,6 +1,6 @@
 import { Sprout, Lightbulb, Heart, ArrowRight, Sparkles, CheckCircle } from 'lucide-react';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig from '@/components/SEOConfig';
 import getBaseLayout from '@/layout/core/getBaseLayout';
 
 // UI Components

@@ -15,7 +15,7 @@ import { CATEGORIES } from "@/constants/category";
 import { useCreateUser, useRegisterSuccessDialog } from "@/features/users";
 import { createUserFormSchema, CreateUserFormSchema } from "@/services/users";
 import { Button } from "@/components/ui/button";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 
 function OnboardingBaseInfoFields() {
   const form = useFormContext<CreateUserFormSchema>();
