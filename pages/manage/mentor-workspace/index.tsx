@@ -1,20 +1,20 @@
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { FaAngleLeft } from 'react-icons/fa6';
-import { Button } from '@/components/ui/button';
-import Container from '@/shared/components/Container';
-import Image from '@/shared/components/Image';
-import { useMentorMarathonList } from '@/hooks/api/mentor';
-import { MarathonSchema } from '@/services/mentors/marathons';
-import dayjs from 'dayjs';
+import useSWR from "swr";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { FaAngleLeft } from "react-icons/fa6";
+import { Button } from "@/components/ui/button";
+import Container from "@/shared/components/Container";
+import Image from "@/shared/components/Image";
+import { getMentorMarathonPathname, MarathonSchema } from "@/services/mentors";
+import dayjs from "dayjs";
 
 const MentorWorkspaceCard = ({ marathon }: { marathon: MarathonSchema }) => {
   const days = Math.min(
-    Math.max(0, dayjs().diff(dayjs(marathon.startDate), 'day')),
-    dayjs(marathon.endDate).diff(dayjs(marathon.startDate), 'day')
+    Math.max(0, dayjs().diff(dayjs(marathon.startDate), "day")),
+    dayjs(marathon.endDate).diff(dayjs(marathon.startDate), "day")
   );
   const progress =
-    (days / dayjs(marathon.endDate).diff(dayjs(marathon.startDate), 'day')) *
+    (days / dayjs(marathon.endDate).diff(dayjs(marathon.startDate), "day")) *
     100;
 
   return (
@@ -41,8 +41,8 @@ const MentorWorkspaceCard = ({ marathon }: { marathon: MarathonSchema }) => {
             <span className="text-xs font-medium text-basic-500">課堂時間</span>
             <span className="text-xs text-basic-400">|</span>
             <span className="text-xs text-basic-400">
-              {dayjs(marathon.startDate).format('YYYY/M/D')}~
-              {dayjs(marathon.endDate).format('YYYY/M/D')}
+              {dayjs(marathon.startDate).format("YYYY/M/D")}~
+              {dayjs(marathon.endDate).format("YYYY/M/D")}
             </span>
           </div>
         </div>
@@ -64,7 +64,9 @@ const MentorWorkspaceCard = ({ marathon }: { marathon: MarathonSchema }) => {
 
 const MentorWorkspace = () => {
   const router = useRouter();
-  const { data: marathonList } = useMentorMarathonList();
+  const { data: marathonList } = useSWR<MarathonSchema[]>(
+    getMentorMarathonPathname()
+  );
 
   return (
     <Container autoMinHeight>
@@ -73,7 +75,7 @@ const MentorWorkspace = () => {
           size="sm"
           variant="ghost"
           className="px-0 mb-6"
-          onClick={() => router.push('/manage')}
+          onClick={() => router.push("/manage")}
         >
           <FaAngleLeft />
           返回 我的小島

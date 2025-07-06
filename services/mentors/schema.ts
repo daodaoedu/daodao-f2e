@@ -1,19 +1,4 @@
-import { z } from 'zod';
-
-const mentorEndpoint = '/mentors';
-
-interface GetMentorMarathonKeyProps {
-  marathonId?: string;
-}
-
-export const getMentorMarathonEndpoint = ({
-  marathonId,
-}: GetMentorMarathonKeyProps = {}) => {
-  if (marathonId) {
-    return `${mentorEndpoint}/me/marathons/${marathonId}/participants`;
-  }
-  return `${mentorEndpoint}/me/marathons`;
-};
+import { z } from "zod";
 
 export const marathonSchema = z.object({
   id: z.string(),
@@ -23,8 +8,6 @@ export const marathonSchema = z.object({
   endDate: z.string(),
   participantCount: z.number(),
 });
-
-export type MarathonSchema = z.infer<typeof marathonSchema>;
 
 export const participantSchema = z.object({
   _id: z.string(),
@@ -41,8 +24,6 @@ export const participantSchema = z.object({
   projectTitle: z.string(),
 });
 
-export type ParticipantSchema = z.infer<typeof participantSchema>;
-
 export const marathonParticipantListSchema = z.object({
   id: z.string(),
   eventId: z.string(),
@@ -51,6 +32,10 @@ export const marathonParticipantListSchema = z.object({
   endDate: z.string(),
   participants: z.array(participantSchema),
 });
+
+export type MarathonSchema = z.infer<typeof marathonSchema>;
+
+export type ParticipantSchema = z.infer<typeof participantSchema>;
 
 export type MarathonParticipantListSchema = z.infer<
   typeof marathonParticipantListSchema
