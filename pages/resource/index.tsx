@@ -1,8 +1,9 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
 import { ChevronRightIcon } from "lucide-react";
+import SEOConfig, { JsonLdType } from "@/shared/components/SEO";
+import ResourceBannerWebp from "@/public/assets/resource/banner.webp";
 import {
   CategoriesContainer,
   ResourceContainer,
@@ -51,7 +52,7 @@ export default function ResourcePage({
       <ResourceBanner
         title="找資源"
         content="藉由他人真實的資源使用經驗，找到真正適合自己的學習資源，透過個人化推薦系統，幫助每位學習者在龐大的學習資源中，快速找到最適合自己的內容！"
-        image=""
+        image={ResourceBannerWebp}
         hotTags={HOT_TAGS}
         onSearch={(value) => {
           router.push(`/resource/explore?query=${value}`);
