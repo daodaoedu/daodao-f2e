@@ -11,12 +11,7 @@ export const Container = ({
   ...props
 }: WithAsChildProps) => {
   const Comp = asChild ? Slot : "div";
-  return (
-    <Comp
-      className={cn("container", className)}
-      {...props}
-    />
-  );
+  return <Comp className={cn("container", className)} {...props} />;
 };
 
 export const Paper = ({ asChild, className, ...props }: WithAsChildProps) => {
@@ -46,11 +41,7 @@ export const Background = ({
   const Comp = asChild ? Slot : "div";
   return (
     <Comp
-      className={cn(
-        "min-h-screen-without-padding-top pt-12",
-        backgroundVariants[variant],
-        className
-      )}
+      className={cn("pt-12", backgroundVariants[variant], className)}
       {...props}
     />
   );

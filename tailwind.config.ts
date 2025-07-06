@@ -324,15 +324,6 @@ export default {
         },
       });
       addUtilities({
-        ".min-h-screen-with-padding-top": {
-          paddingTop: "var(--padding-top, 0px)",
-          minHeight: "100vh",
-        },
-        ".min-h-screen-without-padding-top": {
-          minHeight: "calc(100vh - var(--padding-top, 0px))",
-        },
-      });
-      addUtilities({
         ".vertical-separator-left": {
           position: "relative",
           "&:before": {

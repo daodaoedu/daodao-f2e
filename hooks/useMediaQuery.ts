@@ -12,7 +12,9 @@ function useBaseMediaQuery(query: string) {
   useEffect(() => {
     const mediaQuery = window.matchMedia(query);
 
-    setIsAtLeast(mediaQuery.matches);
+    if (mediaQuery.matches) {
+      setIsAtLeast(mediaQuery.matches);
+    }
 
     const handleChange = (event: MediaQueryListEvent) => {
       setIsAtLeast(event.matches);
