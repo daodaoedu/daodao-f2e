@@ -36,7 +36,7 @@ export default function ResourceBanner({
   return (
     <section
       className={cn(
-        "relative bg-primary-palest lg:pb-12 lg:pt-28 lg:mt-12",
+        "relative bg-primary-palest lg:py-12",
         isMediumSize && "rounded-xl overflow-hidden lg:px-10"
       )}
     >

@@ -54,7 +54,7 @@ export default function ResourceCategoriesPage({
   return (
     <SWRConfig value={{ fallback }}>
       <SEOConfig title="探索所有資源｜島島阿學" jsonLd={jsonLd} />
-      <Container className="pt-36">
+      <Container className="pt-12">
         <Button
           variant="link"
           className="mb-3 px-2 -mx-2 text-basic-300"

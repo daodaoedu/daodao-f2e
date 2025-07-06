@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { ChevronRightIcon } from "lucide-react";
 import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
-import ResourceBannerWebp from "@/public/assets/resource/banner.webp";
+import resourceBannerWebp from "@/public/assets/resource/banner.webp";
 import {
   CategoriesContainer,
   ResourceContainer,
@@ -52,7 +52,7 @@ export default function ResourcePage({
       <ResourceBanner
         title="找資源"
         content="藉由他人真實的資源使用經驗，找到真正適合自己的學習資源，透過個人化推薦系統，幫助每位學習者在龐大的學習資源中，快速找到最適合自己的內容！"
-        image={ResourceBannerWebp}
+        image={resourceBannerWebp}
         hotTags={HOT_TAGS}
         onSearch={(value) => {
           router.push(`/resource/explore?query=${value}`);

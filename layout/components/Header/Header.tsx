@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { forwardRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,13 +13,16 @@ function Header(
   ref: React.Ref<HTMLDivElement>
 ) {
   const { isShowShadow } = usePromotion();
+  const { pathname } = useRouter();
+  const isFixed = pathname === "/";
 
   return (
     <div
       ref={ref}
       className={cn(
-        "fixed top-0 inset-x-0 z-30",
-        isShowShadow && "shadow-md shadow-basic-black/25"
+        "sticky top-0 inset-x-0 z-30",
+        isShowShadow && "shadow-md shadow-basic-black/25",
+        isFixed && "fixed"
       )}
     >
       {children}

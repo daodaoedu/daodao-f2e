@@ -84,7 +84,7 @@ export default function ResourceDetailPage({
         title={`${data.name} - 分享資源 | 島島阿學`}
         description={data.description}
       />
-      <Container className="pb-12 pt-40">
+      <Container className="py-12">
         <Breadcrumb className="mb-5 md:mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
