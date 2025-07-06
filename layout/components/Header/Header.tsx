@@ -2,6 +2,8 @@ import { forwardRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import newLogo from "@/public/new-logo.png";
+import { usePromotion } from "@/contexts/Promotion";
+import { cn } from "@/utils/cn";
 import MobileMenu from "./MobileMenu";
 import DesktopMenu from "./DesktopMenu";
 
@@ -9,10 +11,15 @@ function Header(
   { children }: React.PropsWithChildren,
   ref: React.Ref<HTMLDivElement>
 ) {
+  const { isShowShadow } = usePromotion();
+
   return (
     <div
       ref={ref}
-      className="fixed top-0 inset-x-0 z-30 shadow-md shadow-basic-black/25"
+      className={cn(
+        "fixed top-0 inset-x-0 z-30",
+        isShowShadow && "shadow-md shadow-basic-black/25"
+      )}
     >
       {children}
       <header className="relative flex items-center justify-between w-full px-4 body-md bg-primary-base">

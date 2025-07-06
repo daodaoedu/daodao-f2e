@@ -19,7 +19,7 @@ function BaseLayout({ children }: React.PropsWithChildren) {
         const headerOffset = headerRef.current.offsetHeight;
         const root = document.querySelector(':root');
 
-        setHeight(Math.floor(headerOffset - 1));
+        setHeight(Math.floor(headerOffset));
         if (root instanceof HTMLElement) {
           root.style.setProperty(
             'scroll-padding-top',

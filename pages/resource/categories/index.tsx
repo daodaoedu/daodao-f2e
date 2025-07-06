@@ -49,7 +49,7 @@ export default function ResourceCategoriesPage({
   return (
     <SWRConfig value={{ fallback }}>
       <SEOConfig title="所有分類｜島島阿學" jsonLd={jsonLd} />
-      <Container className="pb-12 pt-12">
+      <Container className="pb-12 pt-40">
         <Breadcrumb className="mb-3">
           <BreadcrumbList>
             <BreadcrumbItem>
