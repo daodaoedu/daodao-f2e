@@ -83,7 +83,7 @@ export default function QuizResultDetailPage({
                     <Badge
                       key={tag}
                       variant="secondary"
-                      className="px-2 text-sm text-[var(--color)]"
+                      className="px-2 text-xs text-[var(--color)]"
                     >
                       #{tag}
                     </Badge>
