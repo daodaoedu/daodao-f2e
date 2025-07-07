@@ -46,11 +46,13 @@ export const ResponsiveModal = ({
   className,
   titleClassName,
 }: ResponsiveModalProps) => {
-  const { screens } = useMediaQuery();
+  const isXSmall = useMediaQuery("isXSmall");
+  const isMedium = useMediaQuery("isMedium");
+  const isLarge = useMediaQuery("isLarge");
   const isDialog =
-    (size === DialogContentSize.Large && screens.lg) ||
-    (size === DialogContentSize.Medium && screens.md) ||
-    (size === DialogContentSize.Small && screens.sm);
+    (size === DialogContentSize.Large && isLarge) ||
+    (size === DialogContentSize.Medium && isMedium) ||
+    (size === DialogContentSize.Small && isXSmall);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) onClose();
