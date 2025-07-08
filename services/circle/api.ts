@@ -1,8 +1,15 @@
+import { mutate } from "swr";
 import { MutationFetcher } from "swr/mutation";
 import { parseToString } from "@/utils/helper";
-import { mutations } from "@/utils/http";
+import { fetcher, mutations } from "@/utils/http";
 
-import { CircleSchema, CreateCircleSchema, UpdateCircleSchema } from "./schema";
+import {
+  CircleDetailResponseSchema,
+  CircleFormSchema,
+  CircleListResponseSchema,
+  CircleSchema,
+  CircleSearchParamsSchema,
+} from "./schema";
 
 export type CircleSWRKey = string;
 
@@ -10,23 +17,37 @@ interface GetCirclePathnameProps {
   id?: string;
 }
 
-export const getCirclePathname = ({ id }: GetCirclePathnameProps = {}) =>
-  id ? `/circles/${parseToString(id)}` : "/circles";
+export const getCirclePathname = ({ id }: GetCirclePathnameProps = {}) => {
+  const pathname = "/circles";
 
-interface CircleAPIType {
-  create: MutationFetcher<CircleSchema, CircleSWRKey, CreateCircleSchema>;
-  update: MutationFetcher<CircleSchema, CircleSWRKey, UpdateCircleSchema>;
-  delete: MutationFetcher<void, CircleSWRKey, Required<GetCirclePathnameProps>>;
-}
+  if (id) {
+    return `${pathname}/${parseToString(id)}`;
+  }
 
-const circleAPI: CircleAPIType = {
-  create: (_, { arg }) =>
-    mutations.post<CircleSchema>(getCirclePathname(), arg),
-
-  update: (_, { arg: { _id: id, ...arg } }) =>
-    mutations.put<CircleSchema>(getCirclePathname({ id }), arg),
-
-  delete: (_, { arg }) => mutations.delete<void>(getCirclePathname(arg)),
+  return pathname;
 };
 
-export default circleAPI;
+export const refetchCircle = async () => {
+  await mutate((key: unknown) => {
+    const pathname = Array.isArray(key) ? key[0] : key;
+    return pathname.startsWith(getCirclePathname());
+  });
+};
+
+interface CircleAPIType {
+  read: (resourceId: string) => Promise<CircleDetailResponseSchema>;
+  readList: (
+    query?: CircleSearchParamsSchema
+  ) => Promise<CircleListResponseSchema>;
+  create: MutationFetcher<CircleSchema, string, CircleFormSchema>;
+  update: MutationFetcher<CircleSchema, string, CircleFormSchema>;
+  delete: MutationFetcher<void, string>;
+}
+
+export const circleAPI: CircleAPIType = {
+  read: (id) => fetcher(getCirclePathname({ id })),
+  readList: (query) => fetcher([getCirclePathname(), query]),
+  create: mutations.post,
+  update: mutations.put,
+  delete: mutations.delete,
+};

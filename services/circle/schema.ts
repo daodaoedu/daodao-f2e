@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { baseUserSchema } from "../_shared/schema";
+import { baseUserSchema, paginationSchema } from "../_shared/schema";
 
-export const circleQuerySchema = z.object({
+export const circleSearchParamsSchema = z.object({
   area: z.array(z.string()).optional(),
   category: z.array(z.string()).optional(),
   activityCategory: z.array(z.string()).optional(),
@@ -10,16 +10,14 @@ export const circleQuerySchema = z.object({
   search: z.string().optional(),
 });
 
-export type CircleQuerySchema = z.infer<typeof circleQuerySchema>;
-
 export const circleSchema = z.object({
-  _id: z.string().optional(),
+  _id: z.string(),
   user: baseUserSchema.extend({
     email: z.string(),
     userId: z.string(),
   }),
   title: z.string().min(1, "請輸入標題").max(50, "請勿輸入超過 50 字"),
-  photoURL: z.string().or(z.instanceof(Blob)),
+  photoURL: z.string(),
   photoAlt: z.string(),
   activityCategory: z.array(z.string()),
   category: z.array(z.string()).min(1, "請選擇學習領域"),
@@ -47,25 +45,26 @@ export const circleSchema = z.object({
   isGrouping: z.boolean(),
   createdDate: z.string().optional(),
   updatedDate: z.string().optional(),
-  /** @deprecated 不再使用，請使用 content 代替 */
-  description: z.string().optional(),
 });
 
-export type CircleSchema = z.infer<typeof circleSchema>;
+export const circleListResponseSchema = z
+  .object({
+    data: z.array(circleSchema),
+  })
+  .extend(paginationSchema.shape);
 
-export const createCircleSchema = circleSchema.omit({
+export const circleDetailResponseSchema = z.object({
+  data: z.array(circleSchema),
+});
+
+export const circleFormSchema = circleSchema.omit({
   _id: true,
   createdDate: true,
   updatedDate: true,
-  description: true,
 });
 
-export type CreateCircleSchema = z.infer<typeof createCircleSchema>;
-
-export const updateCircleSchema = circleSchema.omit({
-  createdDate: true,
-  updatedDate: true,
-  description: true,
-});
-
-export type UpdateCircleSchema = z.infer<typeof updateCircleSchema>;
+export type CircleSchema = z.infer<typeof circleSchema>;
+export type CircleFormSchema = z.infer<typeof circleFormSchema>;
+export type CircleListResponseSchema = z.infer<typeof circleListResponseSchema>;
+export type CircleDetailResponseSchema = z.infer<typeof circleDetailResponseSchema>;
+export type CircleSearchParamsSchema = z.infer<typeof circleSearchParamsSchema>;
