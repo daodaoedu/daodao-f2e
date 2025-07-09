@@ -22,10 +22,11 @@ export class VideoObjectBuilder extends JsonLdBuilder<VideoObject> {
   }
 
   setUploadDate(uploadDate: string | Date): this {
+    if (!uploadDate) return this;
     this.data.uploadDate =
-      typeof uploadDate === 'string'
-        ? uploadDate
-        : uploadDate.toISOString().split('T')[0];
+      uploadDate instanceof Date
+        ? uploadDate.toISOString().split("T")[0]
+        : uploadDate;
     return this;
   }
 
