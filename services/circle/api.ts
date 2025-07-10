@@ -10,6 +10,7 @@ import {
   CircleSchema,
   CircleSearchParamsSchema,
 } from "./schema";
+import { formatCircleData } from "./utils";
 
 export type CircleSWRKey = string;
 
@@ -45,8 +46,20 @@ interface CircleAPIType {
 }
 
 export const circleAPI: CircleAPIType = {
-  read: (id) => fetcher(getCirclePathname({ id })),
-  readList: (query) => fetcher([getCirclePathname(), query]),
+  read: (id) =>
+    fetcher<CircleDetailResponseSchema>(getCirclePathname({ id })).then(
+      (data) => ({
+        ...data,
+        data: data.data.map(formatCircleData),
+      })
+    ),
+  readList: (query) =>
+    fetcher<CircleListResponseSchema>([getCirclePathname(), query]).then(
+      (data) => ({
+        ...data,
+        data: data.data.map(formatCircleData),
+      })
+    ),
   create: mutations.post,
   update: mutations.put,
   delete: mutations.delete,

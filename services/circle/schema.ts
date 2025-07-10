@@ -1,13 +1,31 @@
 import { z } from "zod";
 import { baseUserSchema, paginationSchema } from "../_shared/schema";
 
+const arrayOrString = z
+  .array(z.string())
+  .or(z.string())
+  .optional()
+  .transform((value) => {
+    if (!value) return undefined;
+    return Array.isArray(value) ? value : [value];
+  });
+
 export const circleSearchParamsSchema = z.object({
-  area: z.array(z.string()).optional(),
-  category: z.array(z.string()).optional(),
-  activityCategory: z.array(z.string()).optional(),
-  partnerEducationStep: z.array(z.string()).optional(),
-  isGrouping: z.boolean().optional(),
+  area: arrayOrString,
+  category: arrayOrString,
+  activityCategory: arrayOrString,
+  partnerEducationStep: arrayOrString,
+  isGrouping: z
+    .boolean()
+    .or(z.string())
+    .optional()
+    .transform((value) => {
+      if (value?.toString() === "false") return false;
+      return undefined;
+    }),
   search: z.string().optional(),
+  page: z.number().optional(),
+  pageSize: z.number().optional(),
 });
 
 export const circleSchema = z.object({
@@ -43,8 +61,10 @@ export const circleSchema = z.object({
   isNeedDeadline: z.boolean(),
   tagList: z.array(z.string()),
   isGrouping: z.boolean(),
-  createdDate: z.string().optional(),
-  updatedDate: z.string().optional(),
+  createdDate: z.string(),
+  updatedDate: z.string(),
+  /** @deprecated 不再使用，請使用 content 代替 */
+  description: z.string().optional(),
 });
 
 export const circleListResponseSchema = z
@@ -66,5 +86,7 @@ export const circleFormSchema = circleSchema.omit({
 export type CircleSchema = z.infer<typeof circleSchema>;
 export type CircleFormSchema = z.infer<typeof circleFormSchema>;
 export type CircleListResponseSchema = z.infer<typeof circleListResponseSchema>;
-export type CircleDetailResponseSchema = z.infer<typeof circleDetailResponseSchema>;
+export type CircleDetailResponseSchema = z.infer<
+  typeof circleDetailResponseSchema
+>;
 export type CircleSearchParamsSchema = z.infer<typeof circleSearchParamsSchema>;
