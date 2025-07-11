@@ -158,37 +158,31 @@ export default {
     typography,
     plugin(({ addComponents, addUtilities, theme }) => {
       const headingFontSizes = [
-        ["xl", "2.25rem", "1.75rem"],
-        ["lg", "1.75rem", "1.5rem"],
-        ["md", "1.375rem", "1.375rem"],
-        ["sm", "1.125rem", "1.25rem"],
+        ["xl", "2.25rem"],
+        ["lg", "1.75rem"],
+        ["md", "1.375rem"],
+        ["sm", "1.125rem"],
       ] as const;
       const bodyFontSizes = [
-        ["lg", "1.125rem", "1.25rem"],
-        ["md", "1rem", "1.125rem"],
-        ["sm", "0.875rem", "1rem"],
+        ["lg", "1.125rem"],
+        ["md", "1rem"],
+        ["sm", "0.875rem"],
       ] as const;
-      headingFontSizes.forEach(([size, desktopSize, mobileSize]) => {
+      headingFontSizes.forEach(([size, fontSize]) => {
         addComponents({
           [`.heading-${size}`]: {
-            fontSize: mobileSize,
+            fontSize,
             lineHeight: "140%",
             fontWeight: "bold",
-            [`@media (min-width: ${theme("screens.md")})`]: {
-              fontSize: desktopSize,
-            },
           },
         });
       });
-      bodyFontSizes.forEach(([size, desktopSize, mobileSize]) => {
+      bodyFontSizes.forEach(([size, fontSize]) => {
         addComponents({
           [`.body-${size}`]: {
-            fontSize: mobileSize,
+            fontSize,
             lineHeight: "140%",
             fontWeight: "400",
-            [`@media (min-width: ${theme("screens.md")})`]: {
-              fontSize: desktopSize,
-            },
           },
         });
       });
