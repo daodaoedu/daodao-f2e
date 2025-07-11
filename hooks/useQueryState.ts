@@ -4,8 +4,7 @@ import { z } from "zod";
 
 const formatQuery = <T extends z.ZodObject<z.ZodRawShape>>(
   schema: T,
-  value: z.infer<T>,
-  skipFalsy = false
+  value: z.infer<T>
 ) => {
   const parsed = schema.safeParse(value);
 
@@ -16,7 +15,11 @@ const formatQuery = <T extends z.ZodObject<z.ZodRawShape>>(
   return Object.keys(schema.shape).reduce((acc, key) => {
     const keySchema = schema.shape[key];
     const parsedValue = keySchema.safeParse(value[key]);
-    if (parsedValue.success && (!skipFalsy || parsedValue.data)) {
+    if (
+      parsedValue.success &&
+      parsedValue.data != null &&
+      parsedValue.data !== ""
+    ) {
       Object.assign(acc, { [key]: parsedValue.data });
     }
     return acc;
@@ -31,7 +34,7 @@ export default function useQueryState<T extends z.AnyZodObject>(schema: T) {
   const setState = useCallback<Dispatch<SetStateAction<z.infer<T>>>>(
     (value) => {
       const newValue = typeof value === "function" ? value(state) : value;
-      const newQuery = formatQuery(schema, newValue, true);
+      const newQuery = formatQuery(schema, newValue);
       push({ pathname: window.location.pathname, query: newQuery }, undefined, {
         scroll: false,
       });
