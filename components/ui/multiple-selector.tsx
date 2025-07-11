@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/utils/cn";
 import { OptionProps } from "./option";
+import { Button } from "./button";
 
 interface GroupOption {
   [key: string]: OptionProps[];
@@ -177,7 +178,7 @@ export const MultipleSelector = React.forwardRef<
       emptyIndicator,
       maxSelected = Number.MAX_SAFE_INTEGER,
       onMaxSelected,
-      hidePlaceholderWhenSelected,
+      hidePlaceholderWhenSelected = true,
       disabled,
       groupBy,
       className,
@@ -462,95 +463,100 @@ export const MultipleSelector = React.forwardRef<
             }
           }}
         >
-          <div className="relative flex flex-wrap gap-1">
-            {selected.map((option) => {
-              return (
-                <Badge
-                  key={option.value}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              setSelected(selected.filter((s) => s.fixed));
+              onChange?.(selected.filter((s) => s.fixed));
+            }}
+            className={cn(
+              "float-right mt-1 mb-1.5 size-6",
+              (hideClearAllButton ||
+                disabled ||
+                selected.length < 1 ||
+                selected.filter((s) => s.fixed).length === selected.length) &&
+                "hidden"
+            )}
+          >
+            <X />
+          </Button>
+          {selected.map((option) => {
+            return (
+              <Badge
+                key={option.value}
+                variant="gray"
+                className={cn(
+                  "float-left m-0.5",
+                  "data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground",
+                  "data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground",
+                  badgeClassName
+                )}
+                data-fixed={option.fixed}
+                data-disabled={disabled || undefined}
+              >
+                {option.label}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
                   className={cn(
-                    "data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground",
-                    "data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground",
-                    badgeClassName
+                    "-m-1 ml-0 size-5 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                    (disabled || option.fixed) && "hidden"
                   )}
-                  data-fixed={option.fixed}
-                  data-disabled={disabled || undefined}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleUnselect(option);
+                    }
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onClick={() => handleUnselect(option)}
                 >
-                  {option.label}
-                  <button
-                    type="button"
-                    className={cn(
-                      "ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2",
-                      (disabled || option.fixed) && "hidden"
-                    )}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleUnselect(option);
-                      }
-                    }}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                    onClick={() => handleUnselect(option)}
-                  >
-                    <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
-                  </button>
-                </Badge>
-              );
-            })}
-            {/* Avoid having the "Search" Icon */}
-            <CommandPrimitive.Input
-              {...inputProps}
-              ref={inputRef}
-              value={inputValue}
-              disabled={disabled}
-              onValueChange={(_value) => {
-                setInputValue(_value);
-                inputProps?.onValueChange?.(_value);
-              }}
-              onBlur={(event) => {
-                if (!onScrollbar) {
-                  setOpen(false);
-                }
-                inputProps?.onBlur?.(event);
-              }}
-              onFocus={(event) => {
-                setOpen(true);
-                inputProps?.onFocus?.(event);
-              }}
-              placeholder={
-                hidePlaceholderWhenSelected && selected.length !== 0
-                  ? ""
-                  : placeholder
+                  <X className="size-4 text-muted-foreground hover:text-foreground" />
+                </Button>
+              </Badge>
+            );
+          })}
+          {/* Avoid having the "Search" Icon */}
+          <CommandPrimitive.Input
+            {...inputProps}
+            ref={inputRef}
+            value={inputValue}
+            disabled={disabled}
+            onValueChange={(_value) => {
+              setInputValue(_value);
+              inputProps?.onValueChange?.(_value);
+            }}
+            onBlur={(event) => {
+              if (!onScrollbar) {
+                setOpen(false);
               }
-              className={cn(
-                "flex-1 bg-transparent outline-none placeholder:text-muted-foreground",
-                {
-                  "w-full": hidePlaceholderWhenSelected,
-                  "px-3 py-2": selected.length === 0,
-                  "ml-1": selected.length !== 0,
-                },
-                inputProps?.className
-              )}
-            />
-            <button
-              type="button"
-              onClick={() => {
-                setSelected(selected.filter((s) => s.fixed));
-                onChange?.(selected.filter((s) => s.fixed));
-              }}
-              className={cn(
-                "absolute right-0 h-6 w-6 p-0",
-                (hideClearAllButton ||
-                  disabled ||
-                  selected.length < 1 ||
-                  selected.filter((s) => s.fixed).length === selected.length) &&
-                  "hidden"
-              )}
-            >
-              <X />
-            </button>
-          </div>
+              inputProps?.onBlur?.(event);
+            }}
+            onFocus={(event) => {
+              setOpen(true);
+              inputProps?.onFocus?.(event);
+            }}
+            placeholder={
+              hidePlaceholderWhenSelected && selected.length !== 0
+                ? ""
+                : placeholder
+            }
+            className={cn(
+              "float-left m-0.5 py-1 border border-transparent flex-1 bg-transparent outline-none placeholder:text-muted-foreground",
+              {
+                "w-0 focus:w-full":
+                  hidePlaceholderWhenSelected && selected.length !== 0,
+                "px-3 py-2": selected.length === 0,
+                "ml-1": selected.length !== 0,
+              },
+              inputProps?.className
+            )}
+          />
         </div>
         <div className="relative">
           {open && (

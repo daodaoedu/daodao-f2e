@@ -18,7 +18,7 @@ export const Paper = ({ asChild, className, ...props }: WithAsChildProps) => {
   const Comp = asChild ? Slot : "div";
   return (
     <Comp
-      className={cn("p-10 bg-white shadow-md rounded-xl", className)}
+      className={cn("p-4 md:p-10 bg-white shadow-md rounded-xl", className)}
       {...props}
     />
   );
