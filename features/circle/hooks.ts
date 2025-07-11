@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import useSWR from "swr";
-import useSWRInfinite from "swr/infinite";
+import useSWRInfinite, {
+  unstable_serialize as infinite_unstable_serialize,
+} from "swr/infinite";
 import useSWRMutation, { SWRMutationConfiguration } from "swr/mutation";
 
 import {
@@ -11,19 +13,29 @@ import {
   CircleSearchParamsSchema,
   CircleDetailResponseSchema,
   CircleListResponseSchema,
+  formatCircleData,
 } from "@/services/circle";
+
+export const getCircleInfiniteKey =
+  (query: CircleSearchParamsSchema, pageSize: number = 6) =>
+  (pageIndex: number, previousPageData: CircleListResponseSchema | null) => {
+    if (previousPageData && !previousPageData.data?.length) return null;
+    return [getCirclePathname(), { ...query, page: pageIndex + 1, pageSize }];
+  };
+
+export const getSerializeCircleInfiniteKey = (
+  query: CircleSearchParamsSchema,
+  pageSize: number = 6
+) => infinite_unstable_serialize(getCircleInfiniteKey(query, pageSize));
 
 export function useCircleList(query: CircleSearchParamsSchema, pageSize = 6) {
   const swr = useSWRInfinite<CircleListResponseSchema>(
-    (pageIndex, previousPageData) => {
-      if (previousPageData && !previousPageData.data?.length) return null;
-      return [getCirclePathname(), { ...query, page: pageIndex + 1, pageSize }];
-    },
+    getCircleInfiniteKey(query, pageSize),
     { revalidateFirstPage: false }
   );
 
   const data = useMemo<CircleSchema[]>(
-    () => swr.data?.flatMap((page) => page.data) ?? [],
+    () => swr.data?.flatMap?.((page) => page.data).map(formatCircleData) ?? [],
     [swr.data]
   );
 
@@ -47,7 +59,7 @@ export function useCircle(id?: string) {
 
   return {
     ...rest,
-    data: data?.data?.[0],
+    data: data?.data?.[0] ? formatCircleData(data.data[0]) : null,
   };
 }
 
