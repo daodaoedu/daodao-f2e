@@ -11,7 +11,7 @@ const DefaultFallback = () => {
   const { openLoginModal } = useAuthDispatch();
 
   return (
-    <Background>
+    <Background className="min-h-screen">
       <SEOConfig title="登入後即可使用完整功能 | 島島阿學" />
       <Container className="pb-5">
         <Paper>
