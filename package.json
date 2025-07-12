@@ -119,6 +119,7 @@
     "@types/chrome": "^0.0.206",
     "@types/react-dom": "^19.0.2",
     "@types/react-lazy-load-image-component": "^1.6.4",
+    "@types/react-speech-recognition": "^3.9.6",
     "@typescript-eslint/eslint-plugin": "^8.26.0",
     "@typescript-eslint/parser": "^8.26.0",
     "autoprefixer": "^10.4.20",
