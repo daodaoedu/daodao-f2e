@@ -4,7 +4,7 @@ import { SWRConfig } from "swr";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { MapPin, SearchIcon } from "lucide-react";
+import { MapPin, MicIcon, SearchIcon } from "lucide-react";
 import groupBannerWebp from "@/public/assets/circle/banner.webp";
 import emptyCoverPng from "@/public/assets/empty-cover.png";
 import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
@@ -39,6 +39,8 @@ import { cn } from "@/utils/cn";
 import { Skeleton } from "@/components/ui/skeleton";
 import JsonLdFactory from "@/utils/jsonLd";
 import useQueryState from "@/hooks/useQueryState";
+import useSpeech from "@/hooks/useSpeech";
+import { useEffect, useReducer } from "react";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/ui/markdown-editor"),
@@ -76,6 +78,8 @@ function Banner() {
 
 function SearchForm() {
   const [query, setQuery] = useQueryState(circleSearchParamsSchema);
+  const { openSpeech, closeSpeech, transcript } = useSpeech();
+  const [inputKey, forceUpdateInputKey] = useReducer((prev) => prev + 1, 0);
 
   const handleMultipleChange =
     (key: keyof CircleSearchParamsSchema) => (options: OptionProps[]) => {
@@ -93,17 +97,49 @@ function SearchForm() {
     }));
   };
 
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+
+    if (transcript) {
+      timeout = setTimeout(() => {
+        setQuery({ ...query, search: transcript });
+        forceUpdateInputKey();
+        closeSpeech();
+      }, 1000);
+    }
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [transcript, closeSpeech, setQuery, query]);
+
   return (
     <>
-      <Input
-        type="search"
-        name="search"
-        placeholder="想尋找甚麼類型的揪團呢？"
-        inputClassName="h-12"
-        defaultValue={query.search}
-        suffixIcon={<SearchIcon size={16} />}
-        onSuffixIconClick={(search) => setQuery({ ...query, search })}
-      />
+      <div className="relative">
+        <Input
+          key={inputKey}
+          type="search"
+          name="search"
+          placeholder="想尋找甚麼類型的揪團呢？"
+          inputClassName="rounded-full pr-24"
+          defaultValue={query.search}
+          suffixIcon={<SearchIcon size={16} />}
+          onSuffixIconClick={(search) => setQuery({ ...query, search })}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setQuery({ ...query, search: e.currentTarget.value });
+            }
+          }}
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-11 top-1/2 -translate-y-1/2 text-basic-300"
+          onClick={() => openSpeech({ language: "zh-TW" })}
+        >
+          <MicIcon size={20} />
+        </Button>
+      </div>
       <div className="flex flex-col items-center gap-2 md:flex-row">
         <MultipleSelector
           options={AREAS}

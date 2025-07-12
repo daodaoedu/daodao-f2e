@@ -55,7 +55,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     };
 
     const iconClassName =
-      "absolute top-1/2 -translate-y-1/2 [&>svg]:text-basic-300 [&>svg]:size-5";
+      "absolute top-1/2 -translate-y-1/2 text-basic-300 [&>svg]:size-5";
 
     return (
       <div className={cn("relative w-full", className)}>
