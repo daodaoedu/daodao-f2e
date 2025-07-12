@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
+import { Dispatch, SetStateAction, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/router";
 import { z } from "zod";
 
@@ -26,8 +26,35 @@ const formatQuery = <T extends z.ZodObject<z.ZodRawShape>>(
   }, {} as z.infer<T>);
 };
 
+const isSame = <T>(prev: T, next: T): boolean => {
+  if (Array.isArray(prev) && Array.isArray(next)) {
+    if (prev.length !== next.length) {
+      return false;
+    }
+    return prev.every((item, index) => isSame(item, next[index]));
+  }
+  if (Array.isArray(prev) || Array.isArray(next)) {
+    return false;
+  }
+  if (prev && next && typeof prev === "object" && typeof next === "object") {
+    if (Object.keys(prev).length !== Object.keys(next).length) {
+      return false;
+    }
+    return Object.keys(prev).every((key) => {
+      const prevValue = prev[key as keyof typeof prev];
+      const nextValue = next[key as keyof typeof next];
+      return isSame(prevValue, nextValue);
+    });
+  }
+  if (typeof prev === "number" && typeof next === "number") {
+    return Number.isNaN(prev) && Number.isNaN(next);
+  }
+  return prev === next;
+};
+
 export default function useQueryState<T extends z.AnyZodObject>(schema: T) {
-  const { query, push } = useRouter();
+  const { pathname, query, push } = useRouter();
+  const prevQuery = useRef<z.infer<T>>(query);
 
   const state = useMemo<z.infer<T>>(() => formatQuery(schema, query), [query]);
 
@@ -35,11 +62,14 @@ export default function useQueryState<T extends z.AnyZodObject>(schema: T) {
     (value) => {
       const newValue = typeof value === "function" ? value(state) : value;
       const newQuery = formatQuery(schema, newValue);
-      push({ pathname: window.location.pathname, query: newQuery }, undefined, {
-        scroll: false,
-      });
+      if (!isSame(prevQuery.current, newQuery)) {
+        push({ pathname, query: newQuery }, undefined, {
+          scroll: false,
+        });
+      }
+      prevQuery.current = newQuery;
     },
-    [state, push]
+    [state, pathname, push]
   );
 
   return [state, setState] as const;
