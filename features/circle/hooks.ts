@@ -52,14 +52,14 @@ export function useCircleList(query: CircleSearchParamsSchema, pageSize = 6) {
   };
 }
 
-export function useCircle(id?: string) {
+export function useCircle(id?: string | null) {
   const { data, ...rest } = useSWR<CircleDetailResponseSchema>(
     id ? getCirclePathname({ id }) : null
   );
 
   return {
     ...rest,
-    data: data?.data?.[0] ? formatCircleData(data.data[0]) : null,
+    data: data?.data?.[0] ? formatCircleData(data.data[0]) : undefined,
   };
 }
 
@@ -82,7 +82,7 @@ export const useCreateCircle = ({
   });
 };
 
-export const useUpdateResource = (
+export const useUpdateCircle = (
   id?: string | null,
   { onSuccess, ...options }: SWRMutationOptions = {}
 ) => {

@@ -50,7 +50,7 @@ export const circleSchema = z.object({
     .string()
     .regex(/^(100|[1-9]\d|[1-9])$/, "請輸入整數，需大於 0，不可超過 100")
     .or(z.number().min(1).max(100)),
-  area: z.array(z.string()).min(1, "請選擇地點"),
+  area: z.string().min(1, "請選擇地點"),
   time: z.string().max(50, "請勿輸入超過 50 字"),
   partnerStyle: z
     .string()
@@ -64,7 +64,7 @@ export const circleSchema = z.object({
     .max(2000, "請勿輸入超過 2000 字"),
   outcome: z.string().max(50, "請勿輸入超過 50 字").min(1, "請輸入期待成果"),
   notice: z.string().min(1, "請輸入注意事項").max(2000, "請勿輸入超過 2000 字"),
-  deadline: z.any(),
+  deadline: z.string().optional(),
   isNeedDeadline: z.boolean(),
   tagList: z.array(z.string()),
   isGrouping: z.boolean(),
@@ -86,6 +86,7 @@ export const circleDetailResponseSchema = z.object({
 
 export const circleFormSchema = circleSchema.omit({
   _id: true,
+  user: true,
   createdDate: true,
   updatedDate: true,
 });

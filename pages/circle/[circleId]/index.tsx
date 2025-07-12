@@ -35,7 +35,7 @@ import {
 import { Text, Title } from "@/components/ui/typography";
 import { EDUCATION, ROLE } from "@/constants/member";
 import { getOptionLabel, getOptionLabels } from "@/utils/option";
-import { AREAS } from "@/constants/areas";
+import { ALL_AREAS, AREAS, TBD_OPTION } from "@/constants/areas";
 import { ACTIVITY_CATEGORIES, CATEGORIES } from "@/constants/category";
 import { useAuth } from "@/contexts/Auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -95,7 +95,7 @@ export default function CircleDetailPage({
       key: "area",
       Icon: LocationSvg,
       title: "地點",
-      text: getOptionLabels(AREAS, data.area).join("、"),
+      text: getOptionLabel(ALL_AREAS, data.area, TBD_OPTION.label),
     },
     { key: "time", Icon: ClockSvg, title: "時間", text: data.time },
     {

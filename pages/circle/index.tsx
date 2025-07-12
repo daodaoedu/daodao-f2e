@@ -17,7 +17,7 @@ import {
 import { AuthButton } from "@/contexts/Auth";
 import { Text, Title } from "@/components/ui/typography";
 import { Background, Container, Paper } from "@/components/ui/wrapper";
-import { AREAS } from "@/constants/areas";
+import { ALL_AREAS, TBD_OPTION } from "@/constants/areas";
 import { Checkbox, Input, Label, Button } from "@/components/ui";
 import { ACTIVITY_CATEGORIES, CATEGORIES } from "@/constants/category";
 import { EDUCATION } from "@/constants/member";
@@ -41,6 +41,7 @@ import JsonLdFactory from "@/utils/jsonLd";
 import useQueryState from "@/hooks/useQueryState";
 import useSpeech from "@/hooks/useSpeech";
 import { useEffect, useReducer } from "react";
+import { getOptionLabel } from "@/utils/option";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/ui/markdown-editor"),
@@ -142,11 +143,11 @@ function SearchForm() {
       </div>
       <div className="flex flex-col items-center gap-2 md:flex-row">
         <MultipleSelector
-          options={AREAS}
+          options={ALL_AREAS}
           placeholder="地點"
           maxSelected={5}
           onMaxSelected={() => toast.error("最多選擇 5 個地點")}
-          value={formatOptions(query.area, AREAS)}
+          value={formatOptions(query.area, ALL_AREAS)}
           onChange={handleMultipleChange("area")}
         />
         <MultipleSelector
@@ -276,7 +277,9 @@ function CircleCard({ data }: { data: CircleSchema }) {
         </div>
         <div className="flex items-center text-xs gap-1">
           <MapPin size={16} className="text-basic-400" />
-          <p className="text-basic-300">{data.area || "待定"}</p>
+          <p className="text-basic-300">
+            {getOptionLabel(ALL_AREAS, data.area, TBD_OPTION.label)}
+          </p>
         </div>
         <div className="flex items-center justify-between">
           <time className="text-xs font-light text-basic-300">

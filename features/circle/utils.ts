@@ -7,9 +7,9 @@ export function createCircleJsonLd(result: CircleSchema) {
     .setName(result.title)
     .setDescription(result.content)
     .setUrl(`https://www.daoedu.tw/group/${result._id}`)
-    .setImage(result.photoURL ?? "")
-    .setLocation(result.area?.join?.(" ") ?? "")
+    .setImage(result.photoURL)
+    .setLocation(result.area)
     .setStartDate(result.createdDate)
-    .setEndDate(result.deadline)
+    .setEndDate(result.deadline ?? "")
     .build();
 }
