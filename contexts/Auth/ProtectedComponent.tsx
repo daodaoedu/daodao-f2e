@@ -62,6 +62,8 @@ export interface ProtectedComponentProps extends PropsWithChildren {
   skeleton?: React.ReactNode;
 }
 
+const defaultSkeleton = <div className="h-screen w-screen bg-white" />;
+
 /**
  * 保護元件
  * 用於保護頁面不被未授權的用戶訪問
@@ -72,7 +74,7 @@ export function ProtectedComponent({
   children,
   onlyCheckToken = false,
   fallback = defaultFallback,
-  skeleton = null,
+  skeleton = defaultSkeleton,
 }: ProtectedComponentProps) {
   const { isLoggedIn, token, isLoggingIn } = useAuth();
   const requiresLogin = onlyCheckToken ? !token : !isLoggedIn;

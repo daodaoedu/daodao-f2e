@@ -14,11 +14,7 @@ export const useSendEmail = ({ onSuccess }: SendEmailProps = {}) => {
 
   return useSWRMutation<void, Error, string, SendEmailSchema>(
     getEmailPathname(),
-    // (key, { arg }) => emailAPI.send(arg),
-    (key, { arg }) => {
-      console.log(arg);
-      return Promise.reject(new Error("test"));
-    },
+    (key, { arg }) => emailAPI.send(arg),
     {
       onSuccess: () => {
         openDialog({
