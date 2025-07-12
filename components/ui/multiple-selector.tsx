@@ -438,7 +438,7 @@ export const MultipleSelector = React.forwardRef<
           role="textbox"
           tabIndex={0}
           className={cn(
-            "min-h-9 rounded-md border border-input text-base ring-offset-background focus-within:ring-2 focus-within:ring-ring md:body-sm",
+            "min-h-[38px] rounded-md border border-input body-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring",
             {
               "px-2 py-1": selected.length !== 0,
               "cursor-text": !disabled && selected.length !== 0,
@@ -547,11 +547,11 @@ export const MultipleSelector = React.forwardRef<
                 : placeholder
             }
             className={cn(
-              "float-left m-0.5 py-1 border border-transparent flex-1 bg-transparent outline-none placeholder:text-muted-foreground",
+              "float-left border border-transparent flex-1 bg-transparent outline-none placeholder:text-muted-foreground",
               {
                 "w-0 focus:w-full":
                   hidePlaceholderWhenSelected && selected.length !== 0,
-                "px-3 py-2": selected.length === 0,
+                "px-3 py-2 min-h-[38px]": selected.length === 0,
                 "ml-1": selected.length !== 0,
               },
               inputProps?.className
