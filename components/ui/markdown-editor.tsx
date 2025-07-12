@@ -221,7 +221,10 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
       <div
         ref={markdownEditorWrapperRef}
         className={cn(
-          !readOnly && "border border-solid border-basic-200 rounded-lg",
+          !readOnly && [
+            "border border-solid border-basic-200 rounded-lg",
+            "ring-offset-background focus-within:ring-1 focus-within:ring-ring focus-within:ring-primary-base"
+          ],
           rootClassName
         )}
       >

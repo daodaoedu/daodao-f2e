@@ -438,7 +438,7 @@ export const MultipleSelector = React.forwardRef<
           role="textbox"
           tabIndex={0}
           className={cn(
-            "min-h-[38px] rounded-md border border-input body-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring",
+            "min-h-[38px] rounded-md border border-input body-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring focus-within:ring-primary-base",
             {
               "px-2 py-1": selected.length !== 0,
               "cursor-text": !disabled && selected.length !== 0,

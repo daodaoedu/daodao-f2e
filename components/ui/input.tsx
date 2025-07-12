@@ -81,7 +81,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "h-10 w-full rounded-lg border border-basic-200 bg-transparent",
             "flex items-center justify-center px-3 py-1 body-md transition-colors",
             "placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-primary-base",
             "disabled:cursor-not-allowed disabled:opacity-50",
             prefixIcon && "pl-11",
             suffixIcon && "pr-11",
