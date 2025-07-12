@@ -205,22 +205,19 @@ export function AuthProvider({ children }: PropsWithChildren) {
         }
       },
       openLoginModal: (payload) => {
-        const redirectPathname = window.location.pathname;
+        const currentPath = window.location.href.replace(
+          window.location.origin,
+          ""
+        );
 
-        const defaultSuccessCallback = () => {
-          getRedirectionStorage().set(redirectPathname);
-          router.replace(redirectPathname);
-        };
         const defaultRegisterCallback = () => {
           router.replace("/onboarding");
         };
 
-        const successCallback = () => {
-          if (payload?.successCallback) {
-            payload.successCallback(defaultSuccessCallback);
-          } else {
-            defaultSuccessCallback();
-          }
+        const successCallback = async () => {
+          getRedirectionStorage().set(currentPath);
+          await router.replace(currentPath);
+          payload?.successCallback?.();
         };
         const registerCallback = () => {
           if (payload?.registerCallback) {

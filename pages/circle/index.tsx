@@ -284,7 +284,7 @@ function CircleCard({ data }: { data: CircleSchema }) {
           </time>
           <Badge
             className={cn(
-              "rounded py-1 px-1.5 text-xs before:content-[''] before:block before:size-1.5 before:rounded-full before:mr-1.5",
+              "rounded py-1 px-1.5 font-bold text-xs before:content-[''] before:block before:size-1.5 before:rounded-full before:mr-1.5",
               data.isGrouping
                 ? "bg-primary-lightest text-primary-base before:bg-primary-base"
                 : "bg-basic-100 text-basic-300 before:bg-basic-300"

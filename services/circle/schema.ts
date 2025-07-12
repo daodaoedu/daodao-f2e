@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { baseUserSchema, paginationSchema } from "../_shared/schema";
+import { paginationSchema } from "../_shared/schema";
 
 const arrayOrString = z
   .array(z.string())
@@ -28,12 +28,19 @@ export const circleSearchParamsSchema = z.object({
   pageSize: z.number().optional(),
 });
 
+export const circleUserSchema = z.object({
+  educationStage: z.string().optional(),
+  email: z.string(),
+  location: z.string(),
+  name: z.string(),
+  photoURL: z.string(),
+  roleList: z.array(z.string()),
+  userId: z.string(),
+});
+
 export const circleSchema = z.object({
   _id: z.string(),
-  user: baseUserSchema.extend({
-    email: z.string(),
-    userId: z.string(),
-  }),
+  user: circleUserSchema,
   title: z.string().min(1, "請輸入標題").max(50, "請勿輸入超過 50 字"),
   photoURL: z.string(),
   photoAlt: z.string(),
