@@ -68,7 +68,7 @@ function Banner() {
             註冊並加入我們，然後創建你的活動，讓更多人一起參加！
           </Text>
         </div>
-        <AuthButton size="lg" onClick={() => router.push("/group/create")}>
+        <AuthButton size="lg" onClick={() => router.push("/circle/create")}>
           我想揪團
         </AuthButton>
       </Container>
@@ -212,7 +212,7 @@ function SearchForm() {
   );
 }
 
-function GroupCard({ data }: { data: CircleSchema }) {
+function CircleCard({ data }: { data: CircleSchema }) {
   const formatToString = (
     options: OptionProps[],
     values: string[],
@@ -232,7 +232,7 @@ function GroupCard({ data }: { data: CircleSchema }) {
         "relative block p-2 rounded-md bg-white text-basic-500 transition-[transform,box-shadow]",
         "hover:scale-105 hover:shadow-md hover:z-10"
       )}
-      href={`/group/detail?id=${data._id}`}
+      href={`/circle/${data._id}`}
     >
       <AspectRatio ratio={2 / 1} className="rounded overflow-hidden">
         <Image
@@ -298,7 +298,7 @@ function GroupCard({ data }: { data: CircleSchema }) {
   );
 }
 
-function SkeletonGroupCard() {
+function SkeletonCircleCard() {
   return (
     <div className="p-2">
       <AspectRatio ratio={2 / 1} className="rounded overflow-hidden">
@@ -335,7 +335,7 @@ function SkeletonGroupCard() {
   );
 }
 
-function GroupList() {
+function CircleList() {
   const isMedium = useMediaQuery("isMedium");
   const isLarge = useMediaQuery("isLarge");
   const [query] = useQueryState(circleSearchParamsSchema);
@@ -366,7 +366,7 @@ function GroupList() {
             data.filter(Boolean).map((circle, index) => (
               <li key={circle._id}>
                 <div className="m-0 md:m-4">
-                  <GroupCard data={circle} />
+                  <CircleCard data={circle} />
                 </div>
                 {shouldShowSeparator(index, data.length) && (
                   <Separator
@@ -383,7 +383,7 @@ function GroupList() {
                 .map((key) => (
                   <li key={key}>
                     <div className="m-0 md:m-4">
-                      <SkeletonGroupCard />
+                      <SkeletonCircleCard />
                     </div>
                   </li>
                 ))}
@@ -437,7 +437,7 @@ export const getServerSideProps = (async () => {
   jsonLd?: JsonLdType;
 }>;
 
-function GroupPage({
+function CircleListPage({
   fallback,
   jsonLd,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -450,11 +450,11 @@ function GroupPage({
           <Paper className="space-y-2 mb-6">
             <SearchForm />
           </Paper>
-          <GroupList />
+          <CircleList />
         </Container>
       </Background>
     </SWRConfig>
   );
 }
 
-export default GroupPage;
+export default CircleListPage;
