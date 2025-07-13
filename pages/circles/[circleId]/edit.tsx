@@ -3,9 +3,9 @@ import { useRouter } from "next/router";
 import SEOConfig from "@/components/SEOConfig";
 import { Background, Container } from "@/components/ui/wrapper";
 import { ProtectedComponent } from "@/contexts/Auth";
-import { CircleForm } from "@/features/circle";
+import { CircleForm } from "@/features/circles";
 import { parseToString } from "@/utils/helper";
-import { circleAPI, CircleSchema } from "@/services/circle";
+import { circleAPI, CircleSchema } from "@/services/circles";
 import { UserSchema } from "@/services/users";
 
 export const runtime = "experimental-edge";
@@ -39,7 +39,7 @@ export default function CircleEditPage({
   const checkUserAuthorized = (user: UserSchema) => {
     const isOwner = user._id === data.user.userId;
     if (!isOwner) {
-      router.replace(`/circle/${data._id}`);
+      router.replace(`/circles/${data._id}`);
     }
     return isOwner;
   };

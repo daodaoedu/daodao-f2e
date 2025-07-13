@@ -152,7 +152,7 @@ const Header = () => {
   const userActions = [
     {
       label: "新增揪團",
-      onClick: () => router.push("/group/create"),
+      onClick: () => router.push("/circles/create"),
     },
     {
       label: "新增資源",

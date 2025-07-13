@@ -31,7 +31,7 @@ import {
   CircleFormSchema,
   circleFormSchema,
   CircleSchema,
-} from "@/services/circle";
+} from "@/services/circles";
 import { useCreateCircle, useUpdateCircle } from "../hooks";
 
 type CircleFormProps = {

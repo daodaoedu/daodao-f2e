@@ -78,7 +78,7 @@ function GroupCard({
 
   return (
     <>
-      <StyledGroupCard href={`/group/detail?id=${_id}`}>
+      <StyledGroupCard href={`/circles/${_id}`}>
         <StyledImageWrapper>
           <Image
             alt={photoAlt || '未放封面'}
@@ -131,7 +131,7 @@ function GroupCard({
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <StyledMenuItem onClick={() => router.push(`/group/edit?id=${_id}`)}>
+        <StyledMenuItem onClick={() => router.push(`/circles/${_id}/edit`)}>
           編輯
         </StyledMenuItem>
         <StyledMenuItem onClick={handleGrouping}>

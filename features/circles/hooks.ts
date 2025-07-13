@@ -14,7 +14,7 @@ import {
   CircleDetailResponseSchema,
   CircleListResponseSchema,
   formatCircleData,
-} from "@/services/circle";
+} from "@/services/circles";
 
 export const getCircleInfiniteKey =
   (query: CircleSearchParamsSchema, pageSize: number = 6) =>

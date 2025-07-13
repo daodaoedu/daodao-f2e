@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import SEOConfig from "@/components/SEOConfig";
 import { Background, Container } from "@/components/ui/wrapper";
 import { ProtectedComponent } from "@/contexts/Auth";
-import { CircleForm } from "@/features/circle/components/CircleForm";
+import { CircleForm } from "@/features/circles/components/CircleForm";
 
 export default function CircleCreatePage() {
   const router = useRouter();

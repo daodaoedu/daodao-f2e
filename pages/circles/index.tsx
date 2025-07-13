@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { MapPin, MicIcon, SearchIcon } from "lucide-react";
-import groupBannerWebp from "@/public/assets/circle/banner.webp";
+import groupBannerWebp from "@/public/assets/circles/banner.webp";
 import emptyCoverPng from "@/public/assets/empty-cover.png";
 import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
 import useMediaQuery from "@/hooks/useMediaQuery";
@@ -13,7 +13,7 @@ import {
   createCircleJsonLd,
   getSerializeCircleInfiniteKey,
   useCircleList,
-} from "@/features/circle";
+} from "@/features/circles";
 import { AuthButton } from "@/contexts/Auth";
 import { Text, Title } from "@/components/ui/typography";
 import { Background, Container, Paper } from "@/components/ui/wrapper";
@@ -34,7 +34,7 @@ import {
   CircleSchema,
   CircleSearchParamsSchema,
   circleSearchParamsSchema,
-} from "@/services/circle";
+} from "@/services/circles";
 import { cn } from "@/utils/cn";
 import { Skeleton } from "@/components/ui/skeleton";
 import JsonLdFactory from "@/utils/jsonLd";
@@ -69,7 +69,7 @@ function Banner() {
             註冊並加入我們，然後創建你的活動，讓更多人一起參加！
           </Text>
         </div>
-        <AuthButton size="lg" onClick={() => router.push("/circle/create")}>
+        <AuthButton size="lg" onClick={() => router.push("/circles/create")}>
           我想揪團
         </AuthButton>
       </Container>
@@ -233,7 +233,7 @@ function CircleCard({ data }: { data: CircleSchema }) {
         "relative block p-2 rounded-md bg-white text-basic-500 transition-[transform,box-shadow]",
         "hover:scale-105 hover:shadow-md hover:z-10"
       )}
-      href={`/circle/${data._id}`}
+      href={`/circles/${data._id}`}
     >
       <AspectRatio ratio={2 / 1} className="rounded overflow-hidden">
         <Image

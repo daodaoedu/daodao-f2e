@@ -1,7 +1,7 @@
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import Link from "next/link";
 import SEOConfig from "@/components/SEOConfig";
-import { circleAPI, CircleSchema } from "@/services/circle";
+import { circleAPI, CircleSchema } from "@/services/circles";
 import { Background, Container, Paper } from "@/components/ui/wrapper";
 import { parseToString } from "@/utils/helper";
 import { BackButton } from "@/components/ui/back-button";
@@ -73,7 +73,7 @@ export default function CircleDetailPage({
   const { user } = useAuth();
   const shareAPI = getShareAPI({
     title: data.title,
-    url: `/circle/${data._id}`,
+    url: `/circles/${data._id}`,
   });
 
   const labels = [
@@ -179,7 +179,7 @@ export default function CircleDetailPage({
                 <DropdownMenuItem asChild>
                   {isOwnCircle ? (
                     <Link
-                      href={`/circle/${data._id}/edit`}
+                      href={`/circles/${data._id}/edit`}
                       className="block p-2"
                     >
                       編輯
