@@ -1,4 +1,4 @@
-import { FaArrowRight } from "react-icons/fa";
+import { ArrowRight } from "lucide-react";
 import dayjs from "dayjs";
 import { cn } from "@/utils/cn";
 import { Milestone } from "@/contexts/Milestones/type";
@@ -26,7 +26,7 @@ const MilestoneView = ({ index, milestone }: MilestoneViewProps) => {
               ? dayjs(milestone.startDate).format("YYYY/MM/DD")
               : dayjs().format("YYYY/MM/DD")}
           </p>
-          <FaArrowRight className="text-basic-300" />
+          <ArrowRight className="text-basic-300" />
           <p>
             {milestone.endDate
               ? dayjs(milestone.endDate).format("YYYY/MM/DD")

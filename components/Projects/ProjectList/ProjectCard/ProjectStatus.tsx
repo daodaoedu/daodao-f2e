@@ -1,6 +1,5 @@
 import ShellIcon from '@/public/assets/icons/shell.svg';
-import { MdOutlineBookmarkBorder as FavoritesIcon } from "react-icons/md";
-import { BiCommentDetail as CommentsIcon } from "react-icons/bi";
+import { Bookmark, MessageSquareText } from "lucide-react";
 
 enum StatusEnum {
  FAVORITES = 'favorites',
@@ -17,7 +16,7 @@ const ProjectStatus = ({ status }: ProjectCardStatus) => {
   const statusList = [
     {
       name: StatusEnum.FAVORITES,
-      icon: <FavoritesIcon />,
+      icon: <Bookmark />,
       value: status.favorites,
     },
     {
@@ -27,7 +26,7 @@ const ProjectStatus = ({ status }: ProjectCardStatus) => {
     },
     {
       name: StatusEnum.COMMENTS,
-      icon: <CommentsIcon />,
+      icon: <MessageSquareText />,
       value: status.comments
     }
   ];

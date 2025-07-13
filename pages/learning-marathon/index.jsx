@@ -4,8 +4,7 @@ import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/components/SEOConfig';
 import { usePromotion } from '@/contexts/Promotion';
-import { GoArrowUpRight } from "react-icons/go";
-import { FaAngleUp } from "react-icons/fa6";
+import { ArrowUpRight, ChevronUp } from 'lucide-react';
 
 import Button from '@mui/material/Button';
 import Participant from '@/components/Marathon/Participant';
@@ -178,7 +177,7 @@ const Sidebar = ({ onClickSignupButton }) => {
           className="bg-primary-base text-white rounded-full p-3 shadow-md shadow-primary-base"
           onClick={() => setIsOpenSidebar(!isOpenSidebar)}
         >
-          <FaAngleUp
+          <ChevronUp
             className={cn("text-white size-6 transition-transform duration-300", isOpenSidebar ? 'rotate-0' : '-rotate-180')}
           />
         </button>
@@ -224,7 +223,7 @@ const Nav = () => {
                 )}
               >
                 {item.label}
-                {item.external && <GoArrowUpRight className="size-4" />}
+                {item.external && <ArrowUpRight className="size-4" />}
               </Link>
             )}
           </li>

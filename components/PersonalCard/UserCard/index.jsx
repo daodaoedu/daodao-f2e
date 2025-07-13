@@ -4,8 +4,6 @@ import moment from 'moment';
 import { Box, Button } from '@mui/material';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { RiInstagramFill } from 'react-icons/ri';
-import { FaFacebook, FaLine, FaDiscord } from 'react-icons/fa';
 import DropdownMenu from './Dropdown';
 import SocialMediaItem from './SocialMediaItem';
 import AvatorComponent from './Avator';
@@ -116,7 +114,6 @@ function UserCard({
               tag="li"
               link={`https://www.instagram.com/${contactList.instagram}`}
               text={contactList.instagram}
-              iconComponent={<RiInstagramFill size="20px" />}
             />
           )}
           {!!contactList.facebook && (
@@ -124,18 +121,15 @@ function UserCard({
               tag="li"
               link={`https://www.facebook.com/${contactList.facebook}`}
               text={contactList.facebook}
-              iconComponent={<FaFacebook size="20px" />}
             />
           )}
           {!!contactList.line && (
             <li>
-              <FaLine size="20px" />
               <p>{contactList.line}</p>
             </li>
           )}
           {!!contactList.discord && (
             <li>
-              <FaDiscord size="20px" />
               <p>{contactList.discord}</p>
             </li>
           )}

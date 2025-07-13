@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
-import { MdLockOpen, MdLock } from 'react-icons/md';
-import { AiOutlineMore } from 'react-icons/ai';
+import { LockKeyholeOpen, LockKeyhole, EllipsisVertical } from 'lucide-react';
 import { ROLE } from '@/constants/member';
 import { ProjectSchema } from '@/services/projects';
 import { Button } from '@/components/ui/button';
@@ -39,7 +38,7 @@ export default function ProjectHeader({ project }: ProjectHeaderProps) {
           <span>9999</span>
         </div> */}
             <div className="flex items-center gap-0.5">
-              {project?.isPublic ? <MdLockOpen /> : <MdLock />}
+              {project?.isPublic ? <LockKeyholeOpen /> : <LockKeyhole />}
               <span>{project?.isPublic ? '公開' : '不公開'}</span>
             </div>
             {/* <div className="flex items-center gap-0.5">
@@ -51,7 +50,7 @@ export default function ProjectHeader({ project }: ProjectHeaderProps) {
               variant="ghost"
               onClick={() => toast.error('功能尚未開放')}
             >
-              <AiOutlineMore />
+              <EllipsisVertical />
             </Button>
           </div>
         </div>

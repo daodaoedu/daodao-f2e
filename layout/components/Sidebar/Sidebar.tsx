@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { FaAngleLeft } from "react-icons/fa";
 import Container from "@/shared/components/Container";
 import SidebarWrapper from "@/layout/components/Sidebar/SidebarWrapper";
 import {
@@ -69,7 +69,7 @@ export default function SidebarLayout({
                 variant="ghost"
                 onClick={() => router.push(backPath)}
               >
-                <FaAngleLeft />
+                <ChevronLeft />
                 {backText}
               </Button>
             </div>

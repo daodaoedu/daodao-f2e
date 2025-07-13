@@ -8,14 +8,12 @@ import {
   useState,
 } from "react";
 import { SubmitErrorHandler, useForm } from "react-hook-form";
-import { FaArrowRight } from "react-icons/fa";
-import { FaCheck } from "react-icons/fa6";
+import { ArrowRight, Check, SendHorizonal, X, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import { DateRange } from "react-day-picker";
 import { format, toDate, isValid } from "date-fns";
 import { cn } from "@/utils/cn";
-import { MdSend, MdClose, MdEdit } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useDialog } from "@/contexts/Dialog";
@@ -279,7 +277,7 @@ function MilestoneCard(
                 !isEditing && "disabled:text-basic-300"
               )}
               disabled={disabledChangeDate || !isEditing}
-              separator={<FaArrowRight className="text-basic-300" />}
+              separator={<ArrowRight className="text-basic-300" />}
               onChange={(d) => {
                 methods.setValue(
                   "startDate",
@@ -336,7 +334,7 @@ function MilestoneCard(
                       !isEditable && "opacity-80"
                     )}
                   >
-                    {isCompleted && <FaCheck />}
+                    {isCompleted && <Check />}
                   </p>
                 </label>
                 <p className="font-sans py-2 body-sm text-basic-400 truncate">
@@ -353,7 +351,7 @@ function MilestoneCard(
                     size="icon"
                     onClick={handleCancel}
                   >
-                    <MdClose />
+                    <X />
                   </Button>
                   <Button
                     className="rounded-sm text-lg"
@@ -361,7 +359,7 @@ function MilestoneCard(
                     size="icon"
                     type="submit"
                   >
-                    <MdSend />
+                    <SendHorizonal />
                   </Button>
                 </>
               )}
@@ -372,7 +370,7 @@ function MilestoneCard(
                   size="icon"
                   onClick={() => setIsEditing(true)}
                 >
-                  <MdEdit />
+                  <Pencil />
                 </Button>
               )}
             </div>

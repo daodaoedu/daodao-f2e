@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { MdDragIndicator } from 'react-icons/md';
+import { GripVertical } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/utils/cn';
@@ -56,7 +56,7 @@ const DraggableItem = ({
           aria-label="拖曳排序"
           title="長按可拖曳排序"
         >
-          <MdDragIndicator className="text-basic-300 h-5 w-5" />
+          <GripVertical className="text-basic-300 h-5 w-5" />
         </button>
         {children}
       </div>

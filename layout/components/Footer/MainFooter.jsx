@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { FaFacebook, FaInstagram } from 'react-icons/fa';
+import { Image } from '@/components/ui/image';
+import FacebookIconPng from '@/public/email/fecebook-icon.png';
+import InstagramIconPng from '@/public/email/instagram-icon.png';
 import IntroList from './IntroList';
 import IconList from './IconList';
 import { FOOTER_LINK } from '../../../constants/category';
@@ -63,12 +65,12 @@ const aboutDaoConfig = [
 
 const iconListConfig = [
   {
-    icon: <FaInstagram size="18" />,
+    icon: <Image src={InstagramIconPng} alt="instagram" width={18} height={18} />,
     link: 'https://www.instagram.com/daodao_edu/',
     alt: 'instagram',
   },
   {
-    icon: <FaFacebook size="18" />,
+    icon: <Image src={FacebookIconPng} alt="facebook" width={18} height={18} />,
     link: 'https://www.facebook.com/daodao.edu',
     alt: 'facebook',
   },

@@ -1,5 +1,5 @@
-import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { Box, Typography } from '@mui/material';
+import { CircleX } from 'lucide-react';
 
 const ErrorMessage = ({ errText }) => {
   return (
@@ -20,7 +20,7 @@ const ErrorMessage = ({ errText }) => {
           },
         }}
       >
-        <IoMdCloseCircleOutline size={20} />
+        <CircleX size={20} />
         <Typography as="p">{errText}</Typography>
       </Box>
     )

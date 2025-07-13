@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FaAngleLeft } from "react-icons/fa6";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Container from "@/shared/components/Container";
 import Image from "@/shared/components/Image";
@@ -77,7 +77,7 @@ const MentorWorkspace = () => {
           className="px-0 mb-6"
           onClick={() => router.push("/manage")}
         >
-          <FaAngleLeft />
+          <ChevronLeft />
           返回 我的小島
         </Button>
         <h1 className="mb-6 heading-md">導師工作室</h1>
