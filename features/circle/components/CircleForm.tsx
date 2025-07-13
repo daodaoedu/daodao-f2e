@@ -143,7 +143,8 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                   <FormLabel>活動圖片</FormLabel>
                   <FormControl>
                     <UploadImage
-                      ratio={16 / 9}
+                      ratio={2 / 1}
+                      value={field.value ? [field.value] : []}
                       onPreviewsChange={(previews: string[]) => {
                         field.onChange(previews[0]);
                       }}
