@@ -71,7 +71,7 @@ export const circleSchema = z.object({
   createdDate: z.string(),
   updatedDate: z.string(),
   /** @deprecated 不再使用，請使用 content 代替 */
-  description: z.string().optional(),
+  description: z.string().nullable().optional(),
 });
 
 export const circleListResponseSchema = z

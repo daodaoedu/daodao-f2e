@@ -6,6 +6,7 @@ import { ProtectedComponent } from "@/contexts/Auth";
 import { CircleForm } from "@/features/circle";
 import { parseToString } from "@/utils/helper";
 import { circleAPI, CircleSchema } from "@/services/circle";
+import { UserSchema } from "@/services/users";
 
 export const runtime = "experimental-edge";
 
@@ -35,8 +36,16 @@ export default function CircleEditPage({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
 
+  const checkUserAuthorized = (user: UserSchema) => {
+    const isOwner = user._id === data.user.userId;
+    if (!isOwner) {
+      router.replace(`/circle/${data._id}`);
+    }
+    return isOwner;
+  };
+
   return (
-    <ProtectedComponent>
+    <ProtectedComponent checkUserAuthorized={checkUserAuthorized}>
       <Background className="text-basic-400 min-h-screen">
         <SEOConfig title={`${data?.title}｜島島阿學`} />
         <Container className="pb-12 max-w-3xl">

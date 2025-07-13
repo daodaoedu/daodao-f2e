@@ -205,18 +205,21 @@ export function AuthProvider({ children }: PropsWithChildren) {
         }
       },
       openLoginModal: (payload) => {
-        const currentPath = window.location.href.replace(
-          window.location.origin,
-          ""
-        );
+        const getRelativeUrl = () =>
+          window.location.href.replace(window.location.origin, "");
+
+        const redirectPath = getRelativeUrl();
 
         const defaultRegisterCallback = () => {
           router.replace("/onboarding");
         };
 
         const successCallback = async () => {
-          getRedirectionStorage().set(currentPath);
-          await router.replace(currentPath);
+          const currentPath = getRelativeUrl();
+          getRedirectionStorage().set(redirectPath);
+          if (currentPath !== redirectPath) {
+            await router.replace(redirectPath);
+          }
           payload?.successCallback?.();
         };
         const registerCallback = () => {
