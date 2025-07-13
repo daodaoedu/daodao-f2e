@@ -12,8 +12,6 @@ import {
 } from "./schema";
 import { formatCircleData } from "./utils";
 
-export type CircleSWRKey = string;
-
 interface GetCirclePathnameProps {
   id?: string;
 }

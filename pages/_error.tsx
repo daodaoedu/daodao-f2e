@@ -1,7 +1,7 @@
 import NotExist from "@/shared/components/NotExist";
 
-function Error() {
+function ErrorPage() {
   return <NotExist />;
 }
 
-export default Error;
+export default ErrorPage;
