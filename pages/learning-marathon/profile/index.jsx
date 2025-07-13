@@ -12,7 +12,6 @@ import { ISOToWeekday } from '@/components/Marathon/SignUp/dateMap';
 import { EDUCATION, ROLE } from '@/constants/member';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import ShareButtonGroup from '@/components/Group/detail/ShareButtonGroup';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import { z } from 'zod';
 import { AREA_DELIMITER, AREAS, TAIWAN_OPTION } from '@/constants/areas';
@@ -189,7 +188,6 @@ const LearningMarathonProfile = () => {
 
   const biweeklyMilestonesLength = 11;
   const { id } = router.query;
-  const [fullUrl, setFullUrl] = useState('');
 
   // states for marathon profile
   const [data, setData] = useState({});
@@ -208,11 +206,6 @@ const LearningMarathonProfile = () => {
   const [locations, setLocations] = useState(null);
   const [location, setLocation] = useState(null);
   const [loadingUser, setLoadingUser] = useState(false);
-
-  // set url for social share
-  useEffect(() => {
-    setFullUrl(window.location.href);
-  }, [router]);
 
   // set data for showing marathon profile
   useEffect(() => {
@@ -360,18 +353,6 @@ const LearningMarathonProfile = () => {
               學習馬拉松
             </span>
           </div>
-          {
-            loadingMarathon ? (
-              <Skeleton animation="wave" width="80%" height="28px" />
-            ) : (
-              <ShareButtonGroup
-                title={data.title}
-                url={fullUrl}
-                hashtag={data.title}
-                text={data.description}
-              />
-            )
-          }
         </div>
         {
           loadingMarathon ? (

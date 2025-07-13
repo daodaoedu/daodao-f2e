@@ -1,5 +1,4 @@
 import { useState } from "react";
-import dayjs from "dayjs";
 import toast from "react-hot-toast";
 import { AiOutlineMore } from "react-icons/ai";
 import { MdLockOpen, MdLock } from "react-icons/md";
@@ -111,7 +110,7 @@ function CommentCard({
           </div>
         </div>
         <div className="flex items-center gap-3 text-basic-300">
-          <time>{timeDuration(dayjs(updatedAt))}</time>
+          <time>{timeDuration(updatedAt)}</time>
           <div className="hidden sm:flex items-center gap-0.5">
             {visibility === "public" ? <MdLockOpen /> : <MdLock />}
             <span>{visibility === "public" ? "公開" : "不公開"}</span>
