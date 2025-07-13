@@ -177,14 +177,22 @@ export default function CircleDetailPage({
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem asChild>
-                  <Link
-                    href="https://forms.gle/NkVbDWC3eXk4P4gv7"
-                    target="_blank"
-                    className="block p-2"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    檢舉
-                  </Link>
+                  {isOwnCircle ? (
+                    <Link
+                      href={`/circle/${data._id}/edit`}
+                      className="block p-2"
+                    >
+                      編輯
+                    </Link>
+                  ) : (
+                    <Link
+                      href="https://forms.gle/NkVbDWC3eXk4P4gv7"
+                      target="_blank"
+                      className="block p-2"
+                    >
+                      檢舉
+                    </Link>
+                  )}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
