@@ -97,6 +97,7 @@ export const UploadImage = forwardRef(
         errorRetryInterval: 1000,
       }
     );
+    const hasImage = urls.length > 0;
 
     const handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(e.target.files ?? []);
@@ -152,14 +153,14 @@ export const UploadImage = forwardRef(
             )}
             {...props}
           >
-            {urls && (
+            {hasImage && (
               <Image src={urls[0]} alt="upload" className="object-cover" fill />
             )}
             <span
               className={cn(
                 "absolute inset-0 flex justify-center items-center gap-2",
                 "text-primary-base hover:bg-primary-lightest/80 transition-opacity",
-                !urls ? "bg-primary-lightest" : "opacity-0 hover:opacity-100"
+                !hasImage ? "bg-primary-lightest" : "opacity-0 hover:opacity-100"
               )}
             >
               {children}
