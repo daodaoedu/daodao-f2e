@@ -25,7 +25,7 @@ import { EDUCATION } from "@/constants/member";
 import { AREAS, ONLINE_OPTION, TBD_OPTION } from "@/constants/areas";
 import { FormProvider, useForm } from "react-hook-form";
 import { Plus } from "lucide-react";
-import MarkdownEditor from "@/components/ui/markdown-editor";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CircleFormSchema,

@@ -2,7 +2,6 @@ import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { toast } from "sonner";
 import { SWRConfig } from "swr";
 import { useRouter } from "next/router";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { MapPin, MicIcon, SearchIcon } from "lucide-react";
 import groupBannerWebp from "@/public/assets/circles/banner.webp";
@@ -37,16 +36,13 @@ import {
 } from "@/services/circles";
 import { cn } from "@/utils/cn";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import JsonLdFactory from "@/utils/jsonLd";
 import useQueryState from "@/hooks/useQueryState";
 import useSpeech from "@/hooks/useSpeech";
 import { useEffect, useReducer } from "react";
 import { getOptionLabel } from "@/utils/option";
 
-const MarkdownEditor = dynamic(
-  () => import("@/components/ui/markdown-editor"),
-  { ssr: false }
-);
 
 function Banner() {
   const router = useRouter();

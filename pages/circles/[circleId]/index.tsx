@@ -40,7 +40,7 @@ import { ACTIVITY_CATEGORIES, CATEGORIES } from "@/constants/category";
 import { useAuth } from "@/contexts/Auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
-import MarkdownEditor from "@/components/ui/markdown-editor";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { timeDuration } from "@/utils/date";
 import { ContactModal, TargetUserType } from "@/features/email";
 

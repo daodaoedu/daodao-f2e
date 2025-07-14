@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useFormContext } from "react-hook-form";
 import { Link2Icon, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,11 +15,7 @@ import {
 import { ResourceFormSchema } from "@/services/resources/core/schema";
 import { Text, Title } from "@/components/ui/typography";
 import { UploadImage } from "@/components/ui/upload-image";
-
-const MarkdownEditor = dynamic(
-  () => import("@/components/ui/markdown-editor"),
-  { ssr: false }
-);
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 
 type ResourceBasicInfoSchema = Pick<
   ResourceFormSchema,
