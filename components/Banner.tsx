@@ -5,7 +5,7 @@ import { Text, Title } from "./ui/typography";
 
 const Banner = () => {
   return (
-    <div className="relative flex flex-col items-center justify-center bg-[#1c3c46] min-h-dvh text-center overflow-hidden p-4 sm:p-6 md:p-8">
+    <div className="relative flex flex-col items-center justify-center bg-[#1c3c46] min-h-svh text-center overflow-hidden p-4 sm:p-6 md:p-8">
       <video
         autoPlay
         muted
@@ -13,6 +13,7 @@ const Banner = () => {
         playsInline
         preload="auto"
         className="absolute top-0 left-0 w-full h-full object-cover"
+        poster="/assets/daodao-banner.webp"
       >
         <source src="/assets/daodao-banner.webm" type="video/webm" />
       </video>
