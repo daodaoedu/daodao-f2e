@@ -1,4 +1,4 @@
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import getManageLayout from "@/layout/features/getManageLayout";
 
 export default function IdeasPage() {

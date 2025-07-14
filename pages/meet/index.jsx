@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Script from 'next/script';
 import dynamic from 'next/dynamic';
 import { Box } from '@mui/material';
-import SEOConfig from '../../shared/components/SEO';
+import SEOConfig from '../../components/SEOConfig';
 // import { JitsiMeeting } from "@jitsi/react-sdk";
 
 const JitsiMeeting = dynamic(

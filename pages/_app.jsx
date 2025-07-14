@@ -21,7 +21,6 @@ import useQueryState from '@/hooks/useQueryState';
 import { fetcher } from '@/utils/http';
 import { getReminderStorage } from '@/utils/storage';
 import getBaseLayout from '@/layout/core/getBaseLayout';
-import { useScrollOnRouteChange } from '@/features/practice/hooks/useScrollToTop';
 import { useCompleteInfoReminder, useVerifiedSuccessDialog } from '@/features/users';
 import { initGA, logPageView } from '../utils/analytics';
 import 'regenerator-runtime/runtime'; // Speech.js
@@ -47,9 +46,6 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   const [queryState, setQueryState] = useQueryState(z.object({
     isVerified: z.string().optional().transform((val) => val === 'true'),
   }));
-
-  // 使用滾動重置 hook
-  useScrollOnRouteChange();
 
   useEffect(() => {
     if (queryState.isVerified) {

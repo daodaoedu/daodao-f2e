@@ -8,7 +8,7 @@ import {
 } from "@/services/projects";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import MarkdownEditor from "@/shared/components/MarkdownEditor";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import numberToChineseNumber from "@/utils/numberToChineseNumber";
 import { cn } from "@/utils/cn";
 

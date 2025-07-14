@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
-import SEOConfig from '../../shared/components/SEO';
+import SEOConfig from '../../components/SEOConfig';
 import Partner from '../../components/Partner';
 
 const Wrapper = styled.div`

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import dayjs from "dayjs";
-import { MdAdd } from "react-icons/md";
+import { Plus } from "lucide-react";
 import {
   ProjectMilestoneSchema,
   ProjectMilestoneFormSchema,
@@ -80,7 +80,7 @@ const MilestoneItem = ({
                 variant="ghost"
                 className="flex items-center gap-2 py-0 body-sm"
               >
-                <MdAdd className="w-5 h-5" />
+                <Plus className="w-5 h-5" />
                 <span>新增子任務</span>
               </Button>
             </div>

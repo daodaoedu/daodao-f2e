@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { FaLinkedin, FaMedium, FaResearchgate, FaSquareFacebook, FaSquareThreads } from "react-icons/fa6";
 import EastIcon from '@mui/icons-material/East';
 import Image from '@/shared/components/Image';
 import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
@@ -199,14 +198,6 @@ const Mentors = () => {
   const [activeMentorName, setActiveMentorName] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
-  const socialIcons = {
-    linkedin: <FaLinkedin className="size-5" />,
-    threads: <FaSquareThreads className="size-5" />,
-    facebook: <FaSquareFacebook className="size-5" />,
-    medium: <FaMedium className="size-5" />,
-    researchGate: <FaResearchgate className="size-5" />,
-  };
-
   const activeMentor = useMemo(() => mentors.find((mentor) => mentor.name === activeMentorName), [activeMentorName]);
 
   const handleOpenModal = (name) => {
@@ -287,7 +278,6 @@ const Mentors = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {socialIcons[key]}
                   {activeMentor?.social[key]?.text}
                 </a>
               ))}

@@ -5,7 +5,7 @@ import { Text, Title } from "./ui/typography";
 
 const Banner = () => {
   return (
-    <div className="relative flex flex-col items-center justify-center bg-[#1c3c46] min-h-screen-without-padding-top text-center overflow-hidden p-4 sm:p-6 md:p-8">
+    <div className="relative flex flex-col items-center justify-center bg-[#1c3c46] min-h-svh text-center overflow-hidden p-4 sm:p-6 md:p-8">
       <video
         autoPlay
         muted
@@ -13,12 +13,13 @@ const Banner = () => {
         playsInline
         preload="auto"
         className="absolute top-0 left-0 w-full h-full object-cover"
+        poster="/assets/daodao-banner.webp"
       >
-        <source src="/assets/daodao-banner.mov" type="video/mp4" />
+        <source src="/assets/daodao-banner.webm" type="video/webm" />
       </video>
       <div className="absolute inset-0 bg-black/30" />
 
-      <div className="relative z-10 flex flex-col items-center justify-center flex-grow w-full">
+      <div className="relative z-10 pt-28 flex flex-col items-center justify-center flex-grow w-full">
         <Title className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-white">
           找不到學習方向？
           <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 py-2">

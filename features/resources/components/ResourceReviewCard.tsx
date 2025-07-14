@@ -1,4 +1,3 @@
-import dynamic from "next/dynamic";
 import React from "react";
 import { format } from "date-fns";
 import { Check, Ellipsis } from "lucide-react";
@@ -16,13 +15,9 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import CommentSection from "@/shared/components/Comment/CommentSection";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { CommentType } from "@/services/comments";
 import { cn } from "@/utils/cn";
-
-const MarkdownEditor = dynamic(
-  () => import("@/components/ui/markdown-editor"),
-  { ssr: false }
-);
 
 interface ResourceReviewCardProps {
   review: RecentResourceReviewSchema;

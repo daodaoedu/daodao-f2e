@@ -1,7 +1,7 @@
-import Image from "next/image";
 import { useRouter } from "next/router";
 import { useDialog } from "@/contexts/Dialog";
 import { useCallback } from "react";
+import { Image } from "@/components/ui/image";
 import { useAuth } from "@/contexts/Auth";
 
 export const useRegisterSuccessDialog = () => {

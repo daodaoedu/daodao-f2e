@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MdLockOpen, MdLockOutline } from 'react-icons/md';
+import { LockKeyholeOpen, LockKeyhole } from 'lucide-react';
 import Image from '@/shared/components/Image';
 import { ROLE } from '@/constants/member';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
@@ -103,12 +103,12 @@ function CommentInput({
             >
               {isPublic ? (
                 <div className="flex items-center gap-1">
-                  <MdLockOpen />
+                  <LockKeyholeOpen />
                   <span>公開</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-1">
-                  <MdLockOutline />
+                  <LockKeyhole />
                   <span>私密</span>
                 </div>
               )}

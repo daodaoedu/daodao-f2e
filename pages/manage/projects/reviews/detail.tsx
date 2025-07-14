@@ -2,7 +2,7 @@ import { toast } from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import ReviewDetail from "@/features/projects/components/ReviewDetail";
 import { ReviewDeleteModal, ReviewUpdateModal } from "@/features/projects";
 import { useProject } from "@/services/projects";

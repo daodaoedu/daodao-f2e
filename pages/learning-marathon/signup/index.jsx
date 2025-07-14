@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig from '@/components/SEOConfig';
 
 import StepperBar from '@/components/Marathon/SignUp/StepperBar';
 import UserProfileForm from '@/components/Marathon/SignUp/UserProfileForm';

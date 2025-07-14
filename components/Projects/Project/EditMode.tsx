@@ -4,7 +4,7 @@ import { Panel } from '@/components/Projects/Project/Shared';
 import InputField from '@/components/Projects/Form/InputField';
 import MultiSelectDropdown from '@/components/Projects/Form/MultiSelectDropDown';
 import { MOTIVATION_MAP, STRATEGY_MAP, OUTCOME_MAP } from '@/constants/project';
-import { FaCheck } from "react-icons/fa6";
+import { Check } from "lucide-react";
 
 interface EditModeProps {
   project: Partial<Project>;
@@ -205,7 +205,7 @@ const EditMode = ({
                 peer-checked:border-primary-base
               "
             >
-              <FaCheck />
+              <Check />
             </p>
             <p className="text-basic-500">
               公開學習計畫

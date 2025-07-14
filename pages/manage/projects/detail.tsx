@@ -1,7 +1,7 @@
 import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { useMemo, useState } from 'react';
-import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
+import SEOConfig, { JsonLdType } from '@/components/SEOConfig';
 import { Skeleton, useMediaQuery } from '@mui/material';
 
 import { useProject } from '@/contexts/Project';

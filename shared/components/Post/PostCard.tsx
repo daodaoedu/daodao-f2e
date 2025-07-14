@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { AiOutlineEye, AiOutlineMore } from "react-icons/ai";
-import { MdLockOpen, MdLockOutline } from "react-icons/md";
-import { FaArrowRight } from "react-icons/fa";
+import {
+  ArrowRight,
+  Eye,
+  EllipsisVertical,
+  LockKeyholeOpen,
+  LockKeyhole,
+} from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
@@ -140,19 +144,19 @@ function PostCardHeader({
         <div className="flex items-center gap-2">
           {typeof viewCount === "number" && (
             <div className="flex items-center gap-0.5">
-              <AiOutlineEye className="size-5" />
+              <Eye className="size-5" />
               <div>{viewCount}</div>
             </div>
           )}
           {isLocked === false ? (
             <div className="flex items-center gap-0.5">
-              <MdLockOpen className="size-5" />
+              <LockKeyholeOpen className="size-5" />
               <div className="hidden sm:block">公開</div>
             </div>
           ) : (
             isLocked && (
               <div className="flex items-center gap-0.5">
-                <MdLockOutline className="size-5" />
+                <LockKeyhole className="size-5" />
                 <div className="hidden sm:block">不公開</div>
               </div>
             )
@@ -160,7 +164,7 @@ function PostCardHeader({
           {Array.isArray(dropdownItems) && dropdownItems.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger className="-m-1 p-1">
-                <AiOutlineMore />
+                <EllipsisVertical />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="-mr-2 mt-2 z-20">
                 {dropdownItems.map((item) => (
@@ -199,7 +203,7 @@ function PostCardFooter({ onMoreClick, detailLink }: PostCardFooterProps) {
         >
           <Link href={detailLink}>
             更多
-            <FaArrowRight />
+            <ArrowRight />
           </Link>
         </Button>
       )}

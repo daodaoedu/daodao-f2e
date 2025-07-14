@@ -23,7 +23,8 @@ export default function CategoriesContainer({
   disabledCollapse = false,
 }: CategoriesContainerProps) {
   const [isShowAll, setIsShowAll] = useState(false);
-  const { screens } = useMediaQuery();
+  const isMedium = useMediaQuery("isMedium");
+  const isLarge = useMediaQuery("isLarge");
 
   const columnsClassNames = {
     sm: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6",
@@ -41,7 +42,7 @@ export default function CategoriesContainer({
   const categoryLength = Array.isArray(categories) ? categories.length : 0;
 
   const isEnableShowAllButton =
-    categoryLength > 6 && !(screens.lg || screens.md) && !disabledCollapse;
+    categoryLength > 6 && !isLarge && !isMedium && !disabledCollapse;
 
   const categoriesWrapperStyle = useMemo<
     React.CSSProperties | undefined

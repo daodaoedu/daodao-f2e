@@ -1,6 +1,6 @@
 import { Project } from '@/components/Projects/Project/type';
 import { Button } from '@/components/ui/button';
-import { MdOutlineEdit } from 'react-icons/md';
+import { Pencil } from 'lucide-react';
 import {
   Panel,
   Title,
@@ -31,7 +31,7 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
               className="py-[5px]"
               onClick={handleOnClickEdit}
             >
-              <MdOutlineEdit />
+              <Pencil />
               編輯
             </Button>
           </div>
@@ -98,7 +98,7 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
             className="w-full max-w-[272px] py-[5px] justify-center mx-auto"
             onClick={handleOnClickEdit}
           >
-            <MdOutlineEdit />
+            <Pencil />
             編輯
           </Button>
         )

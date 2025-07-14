@@ -16,7 +16,7 @@ export default function CategoryCard(props: CategoryCardProps) {
   const { value, label, image } = category;
   const pathname = usePathname();
 
-  const currentPath = pathname.includes(CATEGORIES_BASE_PATH)
+  const currentPath = pathname?.includes(CATEGORIES_BASE_PATH)
     ? pathname
     : CATEGORIES_BASE_PATH;
 

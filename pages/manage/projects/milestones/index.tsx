@@ -1,9 +1,9 @@
 import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import SEOConfig, { JsonLdType } from '@/shared/components/SEO';
+import SEOConfig, { JsonLdType } from '@/components/SEOConfig';
 import { Skeleton } from '@mui/material';
-import { MdOutlineSort } from 'react-icons/md';
+import { AlignLeft } from 'lucide-react';
 import { Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
 import { useProject } from '@/contexts/Project';
 import { MilestonesProvider } from '@/contexts/Milestones/index';
@@ -250,7 +250,7 @@ const MilestonesContent = () => {
                     className="group rounded-lg px-2.5 flex items-center gap-2"
                     onClick={() => setIsAscending(!isAscending)}
                   >
-                    <MdOutlineSort className="size-6 text-primary-base group-hover:text-current" />
+                    <AlignLeft className="size-6 text-primary-base group-hover:text-current" />
                     {isAscending ? "舊到新" : "新到舊"}
                   </Button>
                 </div>

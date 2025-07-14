@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { toast } from "sonner";
 
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import DocSvg from "@/public/assets/icons/doc.svg";
 import { Button } from "@/components/ui/button";
 import { Form, parseSchemaAutoFocus } from "@/components/ui/form";

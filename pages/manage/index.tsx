@@ -3,15 +3,19 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { CalendarPicker } from "@mui/x-date-pickers/CalendarPicker";
-import { CiCircleChevRight, CiCircleChevLeft } from "react-icons/ci";
-import { GoArrowUpRight } from "react-icons/go";
-import { PiCalendarBlankBold } from "react-icons/pi";
+import {
+  ArrowUpRight,
+  CalendarIcon,
+  ChevronDown,
+  CircleChevronRight,
+  CircleChevronLeft,
+} from "lucide-react";
 import Link from "next/link";
 
 import marathonConfig from "@/constants/marathon";
 import getManageLayout from "@/layout/features/getManageLayout";
 import useClickOutside from "@/hooks/useClickOutside";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import { Button } from "@/components/ui/button";
 import MilestoneItem from "@/components/Milestones/MilestoneItem";
 import {
@@ -50,7 +54,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
 import {
   useProjectReviewList,
   useProjectReviewMutation,
@@ -149,7 +152,7 @@ const Header = () => {
   const userActions = [
     {
       label: "新增揪團",
-      onClick: () => router.push("/group/create"),
+      onClick: () => router.push("/circles/create"),
     },
     {
       label: "新增資源",
@@ -300,7 +303,7 @@ const Calendar = ({ date, maxDate, minDate, onChange }: CalendarProps) => {
           className="flex gap-2 text-basic-800 bg-basic-white px-2 body-md"
           onClick={() => setIsOpen(!isOpen)}
         >
-          <PiCalendarBlankBold className="size-6" />
+          <CalendarIcon className="size-6" />
           <div className="heading-sm">
             {date?.format("YYYY/MM/DD")}（{date?.format("dd")}）任務
           </div>
@@ -320,7 +323,7 @@ const Calendar = ({ date, maxDate, minDate, onChange }: CalendarProps) => {
               disabled={date.isBefore(minDate) || date.isSame(minDate, "day")}
               onClick={() => onChange(date.subtract(1, "day"))}
             >
-              <CiCircleChevLeft className="size-6" />
+              <CircleChevronLeft className="size-6" />
             </Button>
             <Button
               variant="ghost"
@@ -328,7 +331,7 @@ const Calendar = ({ date, maxDate, minDate, onChange }: CalendarProps) => {
               disabled={date.isAfter(maxDate) || date.isSame(maxDate, "day")}
               onClick={() => onChange(date.add(1, "day"))}
             >
-              <CiCircleChevRight className="size-6" />
+              <CircleChevronRight className="size-6" />
             </Button>
           </div>
         </div>
@@ -393,7 +396,7 @@ const Project = ({
             className="flex items-center gap-2 body-md text-basic-500"
           >
             {title}
-            <GoArrowUpRight className="stroke-1" />
+            <ArrowUpRight className="stroke-1" />
           </Link>
         </CollapsibleTrigger>
         <CollapsibleContent>{children}</CollapsibleContent>

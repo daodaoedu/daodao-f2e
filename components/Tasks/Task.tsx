@@ -1,13 +1,6 @@
 import toast from "react-hot-toast";
 import React, { useState } from "react";
-import { FaCheck } from "react-icons/fa6";
-import {
-  MdSend,
-  MdClose,
-  MdEdit,
-  MdDelete,
-  MdCalendarToday,
-} from "react-icons/md";
+import { Check, Calendar, SendHorizonal, X, Pencil, Trash } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useMilestones } from "@/contexts/Milestones/index";
 import { Task as TaskType } from "@/contexts/Milestones/type";
@@ -197,7 +190,7 @@ const Task = ({
             />
             <DropdownMenu>
               <DropdownMenuTrigger className="px-2">
-                <MdCalendarToday className="w-4 h-4 text-basic-300" />
+                <Calendar className="w-4 h-4 text-basic-300" />
                 <div className="ml-2 w-28">
                   <div className="flex items-center justify-between">
                     <span className="truncate">
@@ -241,7 +234,7 @@ const Task = ({
                 )}
                 onClick={handleClickCancel}
               >
-                <MdClose />
+                <X />
               </button>
               <button
                 type="button"
@@ -253,7 +246,7 @@ const Task = ({
                 )}
                 onClick={handleClickUpdate}
               >
-                <MdSend />
+                <SendHorizonal />
               </button>
             </div>
           </div>
@@ -283,7 +276,7 @@ const Task = ({
                     peer-checked:border-primary-base
                   "
                 >
-                  {task.isCompleted && <FaCheck />}
+                  {task.isCompleted && <Check />}
                 </p>
               </label>
               <p className="font-sans flex-1 py-2 body-sm text-basic-400 truncate">
@@ -300,7 +293,7 @@ const Task = ({
                   )}
                   onClick={handleClickDelete}
                 >
-                  <MdDelete />
+                  <Trash />
                 </button>
                 <button
                   type="button"
@@ -312,13 +305,13 @@ const Task = ({
                   )}
                   onClick={handleClickEdit}
                 >
-                  <MdEdit />
+                  <Pencil />
                 </button>
               </div>
             </div>
             {task.daysOfWeek?.length > 0 && (
               <div className="flex items-center gap-1 mt-1 ml-7 text-sm text-text-secondary">
-                <MdCalendarToday className="w-4 h-4 text-[#92989A] shrink-0" />
+                <Calendar className="w-4 h-4 text-[#92989A] shrink-0" />
                 <span>
                   {task.daysOfWeek?.map((enDay) => dayMap[enDay])?.join("、") ??
                     ""}

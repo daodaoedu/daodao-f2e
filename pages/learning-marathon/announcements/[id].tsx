@@ -3,20 +3,19 @@ import React from 'react';
 import Nav from '@/components/Marathon/Nav';
 
 import { useRouter } from 'next/router';
-import pageNotFound from '@/pages/404';
 import {
   AnnouncementDetail,
   AnnouncementList,
 } from '@/components/Marathon/Announcement';
 
-/** @todo Replace this with actual data */
-import { announcementItems } from '@/fixtures/marathon/announcements';
+import { announcementItems } from '@/features/marathon';
+import NotExist from "@/shared/components/NotExist";
 
 const Announcement = () => {
   const router = useRouter();
   const { id } = router.query;
   const target = announcementItems.find((item) => item.id === id);
-  if (target === undefined) return pageNotFound();
+  if (target === undefined) return <NotExist />;
 
   const items = announcementItems.filter((item) => item.id !== id).slice(0, 3);
 

@@ -1,43 +1,35 @@
 import { useEffect, useState } from "react";
 
-const BREAKPOINTS = {
-  sm: 640,
-  md: 768,
-  lg: 1024,
+const screens = {
+  isXSmall: "(min-width: 420px)",
+  isSmall: "(min-width: 640px)",
+  isMedium: "(min-width: 768px)",
+  isLarge: "(min-width: 1025px)",
 };
 
-function useBaseMediaQuery(query: string) {
-  const [isAtLeast, setIsAtLeast] = useState(false);
+type Breakpoint = keyof typeof screens;
+
+const useMediaQuery = (breakpoint: Breakpoint) => {
+  const [isMatch, setIsMatch] = useState(false);
 
   useEffect(() => {
+    const query = screens[breakpoint];
     const mediaQuery = window.matchMedia(query);
 
-    setIsAtLeast(mediaQuery.matches);
-
     const handleChange = (event: MediaQueryListEvent) => {
-      setIsAtLeast(event.matches);
+      setIsMatch(event.matches);
     };
+
+    setIsMatch(mediaQuery.matches);
 
     mediaQuery.addEventListener("change", handleChange);
 
     return () => {
       mediaQuery.removeEventListener("change", handleChange);
     };
-  }, [query]);
+  }, [breakpoint]);
 
-  return isAtLeast;
-}
+  return isMatch;
+};
 
-export default function useMediaQuery() {
-  const isAtLeastSm = useBaseMediaQuery(`(min-width: ${BREAKPOINTS.sm}px)`);
-  const isAtLeastMd = useBaseMediaQuery(`(min-width: ${BREAKPOINTS.md}px)`);
-  const isAtLeastLg = useBaseMediaQuery(`(min-width: ${BREAKPOINTS.lg}px)`);
-
-  return {
-    screens: {
-      sm: isAtLeastSm,
-      md: isAtLeastMd,
-      lg: isAtLeastLg,
-    },
-  };
-}
+export default useMediaQuery;

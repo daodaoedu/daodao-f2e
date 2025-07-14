@@ -1,16 +1,10 @@
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import styled from '@emotion/styled';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
-import MicIcon from '@mui/icons-material/Mic';
 import SearchIcon from '@mui/icons-material/Search';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
-
-const Speech = dynamic(import('@/shared/components/Speech'), {
-  ssr: false,
-});
 
 const SearchInputWrapper = styled(Paper)`
   width: 100%;
@@ -53,7 +47,6 @@ const InputBaseWrapper = styled(InputBase)(() => ({
 const SearchInput = () => {
   const [getSearchParams, pushState] = useSearchParamsManager();
   const [keyword, setKeyword] = useState('');
-  const [isSpeechMode, setIsSpeechMode] = useState(false);
   const currentKeyword = getSearchParams('q').toString();
 
   useEffect(() => {
@@ -79,15 +72,6 @@ const SearchInput = () => {
         placeholder="關鍵字搜尋"
         onChange={handleChange}
       />
-      {isSpeechMode && (
-        <Speech lang="zh-tw" setIsSpeechMode={setIsSpeechMode} />
-      )}
-      <IconButtonWrapper
-        aria-label="speech"
-        onClick={() => setIsSpeechMode(true)}
-      >
-        <MicIcon />
-      </IconButtonWrapper>
       <IconButtonWrapper aria-label="search" type="submit">
         <SearchIcon />
       </IconButtonWrapper>

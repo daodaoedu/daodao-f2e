@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { subYears } from "date-fns";
 import { useForm, useFormContext } from "react-hook-form";
@@ -14,8 +13,9 @@ import { DatePickerWithForm } from "@/components/ui/date-picker";
 import { CATEGORIES } from "@/constants/category";
 import { useCreateUser, useRegisterSuccessDialog } from "@/features/users";
 import { createUserFormSchema, CreateUserFormSchema } from "@/services/users";
+import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 
 function OnboardingBaseInfoFields() {
   const form = useFormContext<CreateUserFormSchema>();

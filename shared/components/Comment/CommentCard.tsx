@@ -1,8 +1,6 @@
 import { useState } from "react";
-import dayjs from "dayjs";
 import toast from "react-hot-toast";
-import { AiOutlineMore } from "react-icons/ai";
-import { MdLockOpen, MdLock } from "react-icons/md";
+import { LockKeyholeOpen, LockKeyhole, EllipsisVertical } from 'lucide-react';
 import { useAuth } from "@/contexts/Auth";
 import Image from "@/shared/components/Image";
 import { ROLE } from "@/constants/member";
@@ -111,15 +109,15 @@ function CommentCard({
           </div>
         </div>
         <div className="flex items-center gap-3 text-basic-300">
-          <time>{timeDuration(dayjs(updatedAt))}</time>
+          <time>{timeDuration(updatedAt)}</time>
           <div className="hidden sm:flex items-center gap-0.5">
-            {visibility === "public" ? <MdLockOpen /> : <MdLock />}
+            {visibility === "public" ? <LockKeyholeOpen /> : <LockKeyhole />}
             <span>{visibility === "public" ? "公開" : "不公開"}</span>
           </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger className="-m-2 p-2">
-              <AiOutlineMore />
+              <EllipsisVertical />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="z-20 p-1">
               {actions.map(

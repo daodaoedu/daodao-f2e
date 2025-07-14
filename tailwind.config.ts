@@ -13,6 +13,7 @@ export default {
     "./components/**/*.{js,jsx,ts,tsx}",
     "./contexts/**/*.{js,jsx,ts,tsx}",
     "./features/**/*.{js,jsx,ts,tsx}",
+    "./hooks/**/*.{js,jsx,ts,tsx}",
     "./layout/**/*.{js,jsx,ts,tsx}",
     "./pages/**/*.{js,jsx,ts,tsx}",
     "./shared/**/*.{js,jsx,ts,tsx}",
@@ -158,37 +159,31 @@ export default {
     typography,
     plugin(({ addComponents, addUtilities, theme }) => {
       const headingFontSizes = [
-        ["xl", "2.25rem", "1.75rem"],
-        ["lg", "1.75rem", "1.5rem"],
-        ["md", "1.375rem", "1.375rem"],
-        ["sm", "1.125rem", "1.25rem"],
+        ["xl", "2.25rem"],
+        ["lg", "1.75rem"],
+        ["md", "1.375rem"],
+        ["sm", "1.125rem"],
       ] as const;
       const bodyFontSizes = [
-        ["lg", "1.125rem", "1.25rem"],
-        ["md", "1rem", "1.125rem"],
-        ["sm", "0.875rem", "1rem"],
+        ["lg", "1.125rem"],
+        ["md", "1rem"],
+        ["sm", "0.875rem"],
       ] as const;
-      headingFontSizes.forEach(([size, desktopSize, mobileSize]) => {
+      headingFontSizes.forEach(([size, fontSize]) => {
         addComponents({
           [`.heading-${size}`]: {
-            fontSize: mobileSize,
+            fontSize,
             lineHeight: "140%",
             fontWeight: "bold",
-            [`@media (min-width: ${theme("screens.md")})`]: {
-              fontSize: desktopSize,
-            },
           },
         });
       });
-      bodyFontSizes.forEach(([size, desktopSize, mobileSize]) => {
+      bodyFontSizes.forEach(([size, fontSize]) => {
         addComponents({
           [`.body-${size}`]: {
-            fontSize: mobileSize,
+            fontSize,
             lineHeight: "140%",
             fontWeight: "400",
-            [`@media (min-width: ${theme("screens.md")})`]: {
-              fontSize: desktopSize,
-            },
           },
         });
       });
@@ -233,7 +228,7 @@ export default {
       addComponents({
         ".bg-gradient-primary-palest": {
           background:
-            "linear-gradient(270.27deg, rgba(243, 252, 252, 0) 16.33%, #F3FCFC 96.08%), rgba(22, 185, 179, 0.3)",
+            "linear-gradient(270deg, rgba(243, 252, 252, 0) 20%, #F3FCFC 88%), rgba(22, 185, 179, 0.3)",
         },
       });
       addUtilities({
@@ -321,15 +316,6 @@ export default {
             "50%": { transform: "translateY(-10px)" },
             "100%": { transform: "translateY(0)" },
           },
-        },
-      });
-      addUtilities({
-        ".min-h-screen-with-padding-top": {
-          paddingTop: "var(--padding-top, 0px)",
-          minHeight: "100vh",
-        },
-        ".min-h-screen-without-padding-top": {
-          minHeight: "calc(100vh - var(--padding-top, 0px))",
         },
       });
       addUtilities({

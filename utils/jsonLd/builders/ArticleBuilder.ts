@@ -23,18 +23,20 @@ export class ArticleBuilder extends JsonLdBuilder<Article> {
   }
 
   setDatePublished(datePublished: string | Date): this {
+    if (!datePublished) return this;
     this.data.datePublished =
-      typeof datePublished === 'string'
-        ? datePublished
-        : datePublished.toISOString();
+      datePublished instanceof Date
+        ? datePublished.toISOString()
+        : datePublished;
     return this;
   }
 
   setDateModified(dateModified: string | Date): this {
+    if (!dateModified) return this;
     this.data.dateModified =
-      typeof dateModified === 'string'
-        ? dateModified
-        : dateModified.toISOString();
+      dateModified instanceof Date
+        ? dateModified.toISOString()
+        : dateModified;
     return this;
   }
 }

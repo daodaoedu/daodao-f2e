@@ -1,4 +1,4 @@
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig from '@/components/SEOConfig';
 import getBaseLayout from '@/layout/core/getBaseLayout';
 import { Sparkles } from 'lucide-react';
 

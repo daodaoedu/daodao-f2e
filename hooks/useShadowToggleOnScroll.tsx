@@ -11,7 +11,7 @@ export default function useShadowToggleOnScroll() {
       window.requestAnimationFrame(() => {
         if (!elementRef.current) return;
         const top = elementRef.current.getBoundingClientRect().top ?? 0;
-        const shouldShowShadow = top - height < 0;
+        const shouldShowShadow = top - height <= 0;
 
         if (shouldShowShadow) {
           setIsShowShadow(true);

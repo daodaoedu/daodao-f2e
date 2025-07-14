@@ -11,7 +11,7 @@ import {
   EDUCATION,
 } from '@/constants/member';
 import { mapToTable } from '@/utils/helper';
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig from '@/components/SEOConfig';
 import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
 import ContactButton from '@/shared/components/ContactButton';
 import { cn } from '@/utils/cn';
