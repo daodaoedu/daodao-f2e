@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const screens = {
-  isXSmall: "(min-width: 384px)",
+  isXSmall: "(min-width: 420px)",
   isSmall: "(min-width: 640px)",
   isMedium: "(min-width: 768px)",
   isLarge: "(min-width: 1025px)",

@@ -95,7 +95,7 @@
     "react-speech-recognition": "^3.8.2",
     "react-typed": "^1.2.0",
     "recharts": "^2.15.4",
-    "regenerator-runtime": "^0.13.9",
+    "regenerator-runtime": "^0.14.1",
     "schema-dts": "^1.1.5",
     "sonner": "^2.0.5",
     "swr": "^2.2.5",

@@ -1,9 +1,10 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { useReducer } from "react";
 import { toast } from "sonner";
 import { SWRConfig } from "swr";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { MapPin, MicIcon, SearchIcon } from "lucide-react";
+import { MapPin, SearchIcon } from "lucide-react";
 import groupBannerWebp from "@/public/assets/circles/banner.webp";
 import emptyCoverPng from "@/public/assets/empty-cover.png";
 import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
@@ -39,10 +40,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import JsonLdFactory from "@/utils/jsonLd";
 import useQueryState from "@/hooks/useQueryState";
-import useSpeech from "@/hooks/useSpeech";
-import { useEffect, useReducer } from "react";
 import { getOptionLabel } from "@/utils/option";
-
+import { Speech } from "@/components/ui/speech";
 
 function Banner() {
   const router = useRouter();
@@ -75,7 +74,6 @@ function Banner() {
 
 function SearchForm() {
   const [query, setQuery] = useQueryState(circleSearchParamsSchema);
-  const { openSpeech, closeSpeech, transcript } = useSpeech();
   const [inputKey, forceUpdateInputKey] = useReducer((prev) => prev + 1, 0);
 
   const handleMultipleChange =
@@ -93,22 +91,6 @@ function SearchForm() {
       label: mapping.find(({ value }) => value === item)?.label ?? item,
     }));
   };
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-
-    if (transcript) {
-      timeout = setTimeout(() => {
-        setQuery({ ...query, search: transcript });
-        forceUpdateInputKey();
-        closeSpeech();
-      }, 1000);
-    }
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [transcript, closeSpeech, setQuery, query]);
 
   return (
     <>
@@ -128,14 +110,15 @@ function SearchForm() {
             }
           }}
         />
-        <Button
+        <Speech
           variant="ghost"
           size="icon"
           className="absolute right-11 top-1/2 -translate-y-1/2 text-basic-300"
-          onClick={() => openSpeech({ language: "zh-TW" })}
-        >
-          <MicIcon size={20} />
-        </Button>
+          onTranscriptEnd={(transcript) => {
+            setQuery({ ...query, search: transcript });
+            forceUpdateInputKey();
+          }}
+        />
       </div>
       <div className="flex flex-col items-center gap-2 md:flex-row">
         <MultipleSelector
