@@ -4,7 +4,7 @@ import PostDetailCard, {
 import { ProjectReviewSchema } from '@/services/projects';
 import { BaseUserSchema } from '@/services/users';
 import { CommentType } from '@/services/comments';
-import MarkdownEditor from '@/shared/components/MarkdownEditor';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import RadioGroup from './ReviewRadioGroup';
 
 interface ReviewDetailProps {

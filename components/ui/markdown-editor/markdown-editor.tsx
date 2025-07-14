@@ -34,9 +34,9 @@ import {
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import { cn } from "@/utils/cn";
-import zhTW from "@/shared/components/MarkdownEditor/locales/zh-tw";
-import { ImageDialog } from "@/shared/components/MarkdownEditor/ImageDialog";
+import zhTW from "@/components/ui/markdown-editor/locales/zh-tw";
 import CheckLink from "@/shared/components/CheckLink";
+import { ImageDialog } from "./ImageDialog";
 
 const toolbarContents = () => (
   <DiffSourceToggleWrapper>

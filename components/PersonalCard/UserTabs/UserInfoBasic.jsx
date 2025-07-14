@@ -1,4 +1,4 @@
-import MarkdownEditor from '@/shared/components/MarkdownEditor';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import { StyledPanelBox, StyledPanelText } from './UserTabs.styled';
 
 function UserInfoBasic({ description = '', wantToDoList = [], share = '' }) {

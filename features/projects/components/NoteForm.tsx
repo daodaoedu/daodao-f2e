@@ -13,7 +13,7 @@ import {
 } from "@/services/projects";
 import numberToChineseNumber from "@/utils/numberToChineseNumber";
 import Image from "@/shared/components/Image";
-import MarkdownEditor from "@/shared/components/MarkdownEditor";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import Upload, { ImageDataType } from "@/shared/components/Upload";
 
 interface NoteFormProps {

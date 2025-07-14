@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import useMutation from '@/hooks/useMutation';
 import { timeDuration } from '@/utils/date';
-import MarkdownEditor from '@/shared/components/MarkdownEditor';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import {
   StyledAreas,
   StyledContainer,
