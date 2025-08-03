@@ -38,10 +38,10 @@
 
 ### 環境要求 | Prerequisites  
 
-- Node.js 16.14.0 (建議使用 nvm 進行版本管理)  
+- Node.js 20.19.4 (建議使用 nvm 進行版本管理)  
 - Yarn 套件管理器  
 
-**Node.js 16.14.0 (Recommended: Use nvm for version management)**  
+**Node.js 20.19.4 (Recommended: Use nvm for version management)**  
 **Yarn package manager**  
 
 ### 安裝依賴 | Install Dependencies  
@@ -81,6 +81,28 @@ yarn build
 ```bash
 yarn static
 ```  
+
+### API 類型生成 | API Type Generation
+
+本專案使用 Orval 自動生成 API 類型定義：  
+**This project uses Orval to automatically generate API type definitions:**
+
+1. **同步 OpenAPI 規格 | Sync OpenAPI Specification**:  
+   - OpenAPI 規格檔案會透過 GitHub Actions 自動從後端專案同步  
+   - The OpenAPI specification file is automatically synced from the backend project via GitHub Actions  
+
+2. **生成 API 類型 | Generate API Types**:  
+```bash
+yarn generate:api
+```  
+
+3. **監控模式 | Watch Mode** (開發時使用):  
+```bash
+yarn generate:api:watch
+```  
+
+生成的類型檔案會放在 `services/generated/` 目錄下。  
+**Generated type files will be placed in the `services/generated/` directory.**
 
 ---
 
