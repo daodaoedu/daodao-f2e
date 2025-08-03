@@ -16,6 +16,7 @@ module.exports = {
   },
   ignorePatterns: [
     "*.config.js",
+    "*.config.ts",
     ".eslintrc.js",
     "next-sitemap.js",
     "server.js",
