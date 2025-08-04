@@ -20,6 +20,7 @@ module.exports = {
     ".eslintrc.js",
     "next-sitemap.js",
     "server.js",
+    "services/generated",
   ],
   settings: {
     "import/resolver": {
