@@ -1,0 +1,1618 @@
+openapi: 3.0.0
+info:
+  title: DaoDao 學習平台 API
+  version: 1.0.0
+  description: |
+    DaoDao 學習平台的完整 RESTful API，提供用戶管理、資源管理、專案管理、社群功能等服務。
+    
+    ## 功能特色
+    - 🔐 JWT 身份驗證
+    - 📚 資源管理與評價
+    - 💡 想法分享
+    - 🏃 專案馬拉松
+    - 👥 社群功能
+    - 🏷️ 標籤系統
+    
+    ## 認證說明
+    大部分 API 需要 JWT Token 認證，請在 Header 中加入：
+    ```
+    Authorization: Bearer <your_jwt_token>
+    ```
+    
+  contact:
+    name: DaoDao 開發團隊
+    email: support@daodao.com
+    url: https://daoedu.tw
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://daoedu.tw/terms
+
+servers:
+  - url: https://server.daoedu.tw/api/v1
+    description: 開發環境
+  - url: https://dao-server.daoedu.tw/api/v1
+    description: 生產環境
+  - url: http://localhost:3000/api/v1
+    description: 本地開發環境
+
+tags:
+  - name: System
+    description: 系統狀態和資訊相關操作
+    x-order: 1
+  - name: Auth
+    description: 身份驗證和授權相關操作
+    x-order: 2
+  - name: Users
+    description: 用戶管理相關操作
+    x-order: 3
+  - name: Resources
+    description: 資源管理相關操作
+    x-order: 4
+  - name: Resource Reviews
+    description: 資源評價和心得相關操作
+    x-order: 5
+  - name: Tags
+    description: 標籤管理相關操作
+    x-order: 6
+  - name: Ideas
+    description: 想法分享相關操作
+    x-order: 7
+  - name: Projects
+    description: 專案管理相關操作
+    x-order: 8
+  - name: Marathon
+    description: 專案馬拉松相關操作
+    x-order: 9
+  - name: Community
+    description: 社群功能相關操作
+    x-order: 10
+  - name: Me
+    description: 個人資料相關操作
+    x-order: 11
+
+paths:
+  # System endpoints
+  /api/v1/health:
+    get:
+      tags: [System]
+      summary: 健康檢查
+      description: 檢查 API 服務狀態
+      responses:
+        '200':
+          description: 服務正常
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/v1/api-docs:
+    get:
+      tags: [System]
+      summary: API 文件
+      description: 取得 Swagger API 文件頁面
+      responses:
+        '200':
+          description: 成功返回 API 文件頁面
+          content:
+            text/html:
+              schema:
+                type: string
+
+  # Auth endpoints
+  /api/v1/auth/google:
+    get:
+      tags: [Auth]
+      summary: Google OAuth 登入
+      description: 使用 Google OAuth 進行身份驗證
+      responses:
+        '302':
+          description: 重定向到 Google OAuth 頁面
+
+  /api/v1/auth/google/callback:
+    get:
+      tags: [Auth]
+      summary: Google OAuth 回調
+      description: Google OAuth 認證後的回調處理
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Google OAuth 授權碼
+      responses:
+        '302':
+          description: 認證成功，重定向到前端
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/v1/auth/logout:
+    post:
+      tags: [Auth]
+      summary: 登出
+      description: 用戶登出系統
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 登出成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  # Resource endpoints
+  /api/v1/resources:
+    get:
+      tags: [Resources]
+      summary: 取得資源列表
+      description: 取得分頁的資源列表，支援篩選和排序
+      parameters:
+        - $ref: '#/components/parameters/cursorParam'
+        - $ref: '#/components/parameters/resourceLimitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/orderParam'
+        - name: type
+          in: query
+          schema:
+            type: string
+          description: 資源類型篩選
+        - name: cost
+          in: query
+          schema:
+            type: string
+            enum: [free, part, payment]
+          description: 費用類型篩選
+        - name: level
+          in: query
+          schema:
+            type: string
+            enum: [beginner, intermediate, advanced, all_levels]
+          description: 難度等級篩選
+      responses:
+        '200':
+          description: 成功取得資源列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    post:
+      tags: [Resources]
+      summary: 創建新資源
+      description: 創建一個新的學習資源
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateResourceRequest'
+      responses:
+        '201':
+          description: 資源創建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/resources/{id}:
+    get:
+      tags: [Resources]
+      summary: 取得單一資源
+      description: 根據 ID 取得特定資源的詳細資訊
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: 成功取得資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Resources]
+      summary: 更新資源
+      description: 更新指定 ID 的資源資訊
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateResourceRequest'
+      responses:
+        '200':
+          description: 資源更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Resources]
+      summary: 刪除資源
+      description: 軟刪除指定 ID 的資源
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: 資源刪除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Resource Review endpoints
+  /api/v1/resources/{resourceId}/reviews:
+    get:
+      tags: [Resource Reviews]
+      summary: 取得資源評價列表
+      description: 取得指定資源的評價列表
+      parameters:
+        - $ref: '#/components/parameters/resourceIdParam'
+        - $ref: '#/components/parameters/cursorParam'
+        - $ref: '#/components/parameters/reviewLimitParam'
+      responses:
+        '200':
+          description: 成功取得評價列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewListResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags: [Resource Reviews]
+      summary: 創建資源評價
+      description: 為指定資源創建新的評價
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/resourceIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReviewRequest'
+      responses:
+        '201':
+          description: 評價創建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 用戶已對此資源進行過評價
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/reviews/{id}:
+    get:
+      tags: [Resource Reviews]
+      summary: 取得單一評價
+      description: 根據 ID 取得特定評價的詳細資訊
+      parameters:
+        - $ref: '#/components/parameters/reviewIdParam'
+      responses:
+        '200':
+          description: 成功取得評價
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Resource Reviews]
+      summary: 更新評價
+      description: 更新指定 ID 的評價內容
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/reviewIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReviewRequest'
+      responses:
+        '200':
+          description: 評價更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Resource Reviews]
+      summary: 刪除評價
+      description: 軟刪除指定 ID 的評價
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/reviewIdParam'
+      responses:
+        '200':
+          description: 評價刪除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Tag endpoints
+  /api/v1/tags:
+    get:
+      tags: [Tags]
+      summary: 取得標籤列表
+      description: 取得所有可用的標籤列表
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: 搜尋標籤名稱
+        - $ref: '#/components/parameters/limitParam'
+      responses:
+        '200':
+          description: 成功取得標籤列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagListResponse'
+
+    post:
+      tags: [Tags]
+      summary: 創建新標籤
+      description: 創建一個新的標籤
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTagRequest'
+      responses:
+        '201':
+          description: 標籤創建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: 標籤名稱已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # Ideas endpoints
+  /api/v1/ideas:
+    get:
+      tags: [Ideas]
+      summary: 取得想法列表
+      description: 取得分頁的想法列表
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/cursorParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/orderParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, archived]
+          description: 想法狀態篩選
+      responses:
+        '200':
+          description: 成功取得想法列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdeaListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags: [Ideas]
+      summary: 創建新想法
+      description: 創建一個新的想法
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIdeaRequest'
+      responses:
+        '201':
+          description: 想法創建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdeaResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/ideas/{id}:
+    get:
+      tags: [Ideas]
+      summary: 取得單一想法
+      description: 根據 ID 取得特定想法的詳細資訊
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: 成功取得想法
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdeaResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Ideas]
+      summary: 更新想法
+      description: 更新指定 ID 的想法內容
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateIdeaRequest'
+      responses:
+        '200':
+          description: 想法更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdeaResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Ideas]
+      summary: 刪除想法
+      description: 軟刪除指定 ID 的想法
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: 想法刪除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Me endpoints
+  /api/v1/me/profile:
+    get:
+      tags: [Me]
+      summary: 取得個人資料
+      description: 取得當前用戶的個人資料
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功取得個人資料
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    put:
+      tags: [Me]
+      summary: 更新個人資料
+      description: 更新當前用戶的個人資料
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserProfileRequest'
+      responses:
+        '200':
+          description: 個人資料更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/me/resources:
+    get:
+      tags: [Me]
+      summary: 取得我的資源
+      description: 取得當前用戶創建的資源列表
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/cursorParam'
+        - $ref: '#/components/parameters/resourceLimitParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, deleted]
+          description: 資源狀態篩選
+      responses:
+        '200':
+          description: 成功取得我的資源列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/me/reviews:
+    get:
+      tags: [Me]
+      summary: 取得我的評價
+      description: 取得當前用戶發表的評價列表
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/cursorParam'
+        - $ref: '#/components/parameters/reviewLimitParam'
+      responses:
+        '200':
+          description: 成功取得我的評價列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 使用 JWT Token 進行身份驗證
+
+  parameters:
+    idParam:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: 資源的唯一識別碼 (UUID)
+      example: "123e4567-e89b-12d3-a456-426614174000"
+
+    reviewIdParam:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        pattern: '^[1-9]\d*$'
+      description: 評論的唯一識別碼（字串格式的數字）
+      example: "1"
+
+    resourceIdParam:
+      in: path
+      name: resourceId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: 資源的唯一識別碼 (UUID)
+      example: "123e4567-e89b-12d3-a456-426614174000"
+
+    cursorParam:
+      in: query
+      name: cursor
+      required: false
+      schema:
+        type: string
+      description: 游標，用於游標分頁
+
+    limitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: 每頁返回的記錄數
+
+    resourceLimitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 20
+        default: 5
+      description: 每頁返回的資源數
+
+    reviewLimitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 10
+        default: 2
+      description: 每頁返回的評論數
+
+    sortParam:
+      in: query
+      name: sort
+      required: false
+      schema:
+        type: string
+        enum: [id, name, created_at, updated_at]
+      description: 排序欄位
+
+    orderParam:
+      in: query
+      name: order
+      required: false
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+      description: 排序方向
+
+  responses:
+    BadRequest:
+      description: 請求參數錯誤
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: 未授權，需要登入
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Forbidden:
+      description: 禁止訪問，權限不足
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: 資源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalServerError:
+      description: 服務器內部錯誤
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    # Common schemas
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "操作成功"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: "VALIDATION_ERROR"
+            message:
+              type: string
+              example: "請求參數驗證失敗"
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                  message:
+                    type: string
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "ok"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+        version:
+          type: string
+          example: "1.0.0"
+        database:
+          type: object
+          properties:
+            postgresql:
+              type: string
+              example: "connected"
+            mongodb:
+              type: string
+              example: "connected"
+            redis:
+              type: string
+              example: "connected"
+
+    PaginationMeta:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 100
+        limit:
+          type: integer
+          example: 20
+        cursor:
+          type: string
+          nullable: true
+          example: "eyJpZCI6MTAsImNyZWF0ZWRfYXQiOiIyMDIzLTEyLTAxVDEwOjAwOjAwWiJ9"
+        hasNext:
+          type: boolean
+          example: true
+
+    # Resource schemas
+    Resource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          example: "TypeScript 完全攻略"
+        url:
+          type: string
+          format: uri
+          example: "https://example.com/typescript-guide"
+        imageUrl:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://example.com/images/typescript.jpg"
+        description:
+          type: string
+          example: "一個完整的 TypeScript 學習資源"
+        videoUrl:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://youtube.com/watch?v=example"
+        type:
+          type: string
+          example: "線上課程"
+        cost:
+          type: string
+          enum: [free, part, payment]
+          example: "free"
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced, all_levels]
+          example: "intermediate"
+        status:
+          type: string
+          enum: [active, deleted]
+          example: "active"
+        majorCategory:
+          $ref: '#/components/schemas/Category'
+        subCategory:
+          $ref: '#/components/schemas/Category'
+        createdBy:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "程式設計"
+        description:
+          type: string
+          nullable: true
+          example: "程式設計相關資源"
+
+    CreateResourceRequest:
+      type: object
+      required:
+        - name
+        - url
+        - description
+        - type
+        - cost
+        - level
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: "TypeScript 完全攻略"
+        url:
+          type: string
+          format: uri
+          maxLength: 1000
+          example: "https://example.com/typescript-guide"
+        imageUrl:
+          type: string
+          format: uri
+          maxLength: 1000
+          nullable: true
+          example: "https://example.com/images/typescript.jpg"
+        description:
+          type: string
+          minLength: 1
+          example: "一個完整的 TypeScript 學習資源"
+        videoUrl:
+          type: string
+          format: uri
+          maxLength: 1000
+          nullable: true
+          example: "https://youtube.com/watch?v=example"
+        type:
+          type: string
+          maxLength: 100
+          example: "線上課程"
+        cost:
+          type: string
+          enum: [free, part, payment]
+          example: "free"
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced, all_levels]
+          default: "all_levels"
+          example: "intermediate"
+        majorCategoryId:
+          type: integer
+          nullable: true
+          example: 1
+        subCategoryId:
+          type: integer
+          nullable: true
+          example: 2
+
+    UpdateResourceRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: "TypeScript 完全攻略 (更新版)"
+        url:
+          type: string
+          format: uri
+          maxLength: 1000
+          example: "https://example.com/typescript-guide-v2"
+        imageUrl:
+          type: string
+          format: uri
+          maxLength: 1000
+          nullable: true
+          example: "https://example.com/images/typescript-v2.jpg"
+        description:
+          type: string
+          minLength: 1
+          example: "更新後的 TypeScript 學習資源"
+        videoUrl:
+          type: string
+          format: uri
+          maxLength: 1000
+          nullable: true
+          example: "https://youtube.com/watch?v=example-v2"
+        type:
+          type: string
+          maxLength: 100
+          example: "線上課程"
+        cost:
+          type: string
+          enum: [free, part, payment]
+          example: "part"
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced, all_levels]
+          example: "advanced"
+        majorCategoryId:
+          type: integer
+          nullable: true
+          example: 1
+        subCategoryId:
+          type: integer
+          nullable: true
+          example: 3
+
+    ResourceResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Resource'
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    ResourceListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Resource'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    # Resource Review schemas
+    ResourceReview:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        resourceId:
+          type: integer
+          example: 1
+        scores:
+          type: object
+          properties:
+            impact:
+              type: number
+              format: float
+              minimum: 1.0
+              maximum: 5.0
+              example: 4.5
+            mindset:
+              type: number
+              format: float
+              minimum: 1.0
+              maximum: 5.0
+              example: 4.0
+            problems:
+              type: number
+              format: float
+              minimum: 1.0
+              maximum: 5.0
+              example: 3.5
+            perspectives:
+              type: number
+              format: float
+              minimum: 1.0
+              maximum: 5.0
+              example: 4.2
+            goals:
+              type: number
+              format: float
+              minimum: 1.0
+              maximum: 5.0
+              example: 4.8
+        content:
+          type: string
+          example: "這個資源非常實用，幫助我快速掌握了 TypeScript 的核心概念。"
+        characteristics:
+          type: object
+          properties:
+            wellStructured:
+              type: boolean
+              example: true
+            practiceFocused:
+              type: boolean
+              example: true
+            wellRoundedConcepts:
+              type: boolean
+              example: false
+            thoughtProvoking:
+              type: boolean
+              example: true
+            progressiveLearning:
+              type: boolean
+              example: true
+            problemBased:
+              type: boolean
+              example: false
+            realWorldExamples:
+              type: boolean
+              example: true
+            interactive:
+              type: boolean
+              example: false
+            visuallyRich:
+              type: boolean
+              example: true
+        timeUsage:
+          type: string
+          nullable: true
+          example: "每日1-2小時"
+        usageContext:
+          type: object
+          properties:
+            withOnlineCourses:
+              type: boolean
+              example: true
+            withBooks:
+              type: boolean
+              example: false
+            withOtherTools:
+              type: boolean
+              example: true
+            withCommunity:
+              type: boolean
+              example: false
+            onlyThisResource:
+              type: boolean
+              example: false
+            notApplicableResource:
+              type: boolean
+              example: false
+        status:
+          type: string
+          enum: [published, deleted]
+          example: "published"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    CreateReviewRequest:
+      type: object
+      required:
+        - scoreImpact
+        - scoreMindset
+        - scoreProblems
+        - scorePerspectives
+        - scoreGoals
+        - content
+      properties:
+        scoreImpact:
+          type: number
+          format: float
+          minimum: 1.0
+          maximum: 5.0
+          example: 4.5
+        scoreMindset:
+          type: number
+          format: float
+          minimum: 1.0
+          maximum: 5.0
+          example: 4.0
+        scoreProblems:
+          type: number
+          format: float
+          minimum: 1.0
+          maximum: 5.0
+          example: 3.5
+        scorePerspectives:
+          type: number
+          format: float
+          minimum: 1.0
+          maximum: 5.0
+          example: 4.2
+        scoreGoals:
+          type: number
+          format: float
+          minimum: 1.0
+          maximum: 5.0
+          example: 4.8
+        content:
+          type: string
+          minLength: 1
+          example: "這個資源非常實用，幫助我快速掌握了 TypeScript 的核心概念。"
+        wellStructured:
+          type: boolean
+          default: false
+          example: true
+        practiceFocused:
+          type: boolean
+          default: false
+          example: true
+        wellRoundedConcepts:
+          type: boolean
+          default: false
+          example: false
+        thoughtProvoking:
+          type: boolean
+          default: false
+          example: true
+        progressiveLearning:
+          type: boolean
+          default: false
+          example: true
+        problemBased:
+          type: boolean
+          default: false
+          example: false
+        realWorldExamples:
+          type: boolean
+          default: false
+          example: true
+        interactive:
+          type: boolean
+          default: false
+          example: false
+        visuallyRich:
+          type: boolean
+          default: false
+          example: true
+        timeUsage:
+          type: string
+          maxLength: 30
+          nullable: true
+          example: "每日1-2小時"
+        withOnlineCourses:
+          type: boolean
+          default: false
+          example: true
+        withBooks:
+          type: boolean
+          default: false
+          example: false
+        withOtherTools:
+          type: boolean
+          default: false
+          example: true
+        withCommunity:
+          type: boolean
+          default: false
+          example: false
+        onlyThisResource:
+          type: boolean
+          default: false
+          example: false
+        notApplicableResource:
+          type: boolean
+          default: false
+          example: false
+
+    UpdateReviewRequest:
+      $ref: '#/components/schemas/CreateReviewRequest'
+
+    ReviewResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/ResourceReview'
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    ReviewListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceReview'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    # Tag schemas
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "TypeScript"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    CreateTagRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "TypeScript"
+
+    TagResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Tag'
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    TagListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    # Idea schemas
+    Idea:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        userId:
+          type: integer
+          example: 1
+        content:
+          type: string
+          example: "想要建立一個 TypeScript 學習小組"
+        status:
+          type: string
+          enum: [active, archived]
+          example: "active"
+        hasResources:
+          type: boolean
+          example: false
+        version:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    CreateIdeaRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          minLength: 1
+          example: "想要建立一個 TypeScript 學習小組"
+        hasResources:
+          type: boolean
+          default: false
+          example: false
+
+    UpdateIdeaRequest:
+      type: object
+      properties:
+        content:
+          type: string
+          minLength: 1
+          example: "想要建立一個進階 TypeScript 學習小組"
+        status:
+          type: string
+          enum: [active, archived]
+          example: "active"
+        hasResources:
+          type: boolean
+          example: true
+
+    IdeaResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Idea'
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    IdeaListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Idea'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    # User schemas
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        mongoId:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        nickname:
+          type: string
+          nullable: true
+          example: "DaoDao學習者"
+        gender:
+          type: string
+          enum: [male, female, other]
+          nullable: true
+          example: "other"
+        language:
+          type: string
+          nullable: true
+          example: "zh-TW"
+        educationStage:
+          type: string
+          enum: [university, high, other]
+          nullable: true
+          example: "university"
+        tagList:
+          type: array
+          items:
+            type: string
+          example: ["TypeScript", "學習", "程式設計"]
+        isOpenLocation:
+          type: boolean
+          nullable: true
+          example: true
+        isOpenProfile:
+          type: boolean
+          nullable: true
+          example: true
+        birthDate:
+          type: string
+          format: date
+          nullable: true
+          example: "1990-01-01"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+
+    UpdateUserProfileRequest:
+      type: object
+      properties:
+        nickname:
+          type: string
+          maxLength: 255
+          nullable: true
+          example: "新的暱稱"
+        gender:
+          type: string
+          enum: [male, female, other]
+          nullable: true
+          example: "other"
+        language:
+          type: string
+          maxLength: 255
+          nullable: true
+          example: "zh-TW"
+        educationStage:
+          type: string
+          enum: [university, high, other]
+          nullable: true
+          example: "university"
+        tagList:
+          type: array
+          items:
+            type: string
+          example: ["TypeScript", "學習", "程式設計", "新技能"]
+        isOpenLocation:
+          type: boolean
+          nullable: true
+          example: false
+        isOpenProfile:
+          type: boolean
+          nullable: true
+          example: true
+        birthDate:
+          type: string
+          format: date
+          nullable: true
+          example: "1990-01-01"
+
+    UserProfileResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/UserProfile'
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
