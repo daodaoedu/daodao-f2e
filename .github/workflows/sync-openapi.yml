@@ -55,7 +55,6 @@ jobs:
       - name: Generate API Types
         if: steps.check_changes.outputs.changes == 'true'
         run: |
-          yarn install --frozen-lockfile
-          yarn generate:api
+          npx orval
           git add services/generated
           git diff --cached --quiet || (git commit -m "chore: update generated API types" && git push)
