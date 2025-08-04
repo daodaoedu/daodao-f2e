@@ -34,7 +34,9 @@ jobs:
       - name: Fetch OpenAPI
         run: |
           gh api repos/daodaoedu/daodao-server/contents/openapi.yaml \
-            --jq '.content' | base64 -d > services/openapi.yaml
+            --method GET \
+            --jq '.content' \
+            -f ref=dev | base64 -d > services/openapi.yaml
 
       - name: Check for changes
         id: check_changes
