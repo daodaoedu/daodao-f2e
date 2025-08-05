@@ -17,7 +17,7 @@ export interface FetcherConfig {
   url: string;
   method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   params?: Record<string, string | number | boolean>;
-  data?: Record<string, unknown> | unknown[];
+  data?: unknown;
   headers?: Record<string, string>;
 }
 
