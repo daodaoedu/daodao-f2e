@@ -6,7 +6,7 @@ export default defineConfig({
       target: "./services/openapi.yaml",
     },
     output: {
-      mode: "split",
+      mode: "tags",
       target: "services/generated",
       schemas: "services/generated/schemas",
       client: "swr",
