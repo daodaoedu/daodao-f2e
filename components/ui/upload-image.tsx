@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 import { Check, CloudUpload, Dice5Icon, Link2Icon, X } from "lucide-react";
-import Image from "@/shared/components/Image";
+import { Image } from "@/components/ui/image";
 import { uploadImagesSchema } from "@/services/images";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -57,6 +57,7 @@ interface UploadFileProps extends Omit<ButtonProps, "onChange"> {
   ratio?: number;
   height?: number;
   schema?: typeof uploadImagesSchema;
+  value?: string[];
   onChange?: (files: ImageDataType[], e: ChangeEvent<HTMLInputElement>) => void;
   onFilesChange?: (files: File[]) => void;
   onPreviewsChange?: (previewList: string[]) => void;
@@ -71,6 +72,7 @@ export const UploadImage = forwardRef(
       ratio = 4 / 3,
       height = 360,
       schema = uploadImagesSchema,
+      value,
       onChange,
       onClick,
       onFilesChange,
@@ -81,7 +83,7 @@ export const UploadImage = forwardRef(
   ) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const imageWrapperRef = useRef<HTMLDivElement>(null);
-    const [urls, setUrls] = useState<string[]>([]);
+    const [urls, setUrls] = useState<string[]>(value ?? []);
     const [isOpen, setIsOpen] = useState(false);
     const [tab, setTab] = useState(TabEnum.Upload);
     const [random, dispatchRandom] = useReducer((state) => state + 1, 0);
@@ -95,6 +97,7 @@ export const UploadImage = forwardRef(
         errorRetryInterval: 1000,
       }
     );
+    const hasImage = urls.length > 0;
 
     const handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(e.target.files ?? []);
@@ -145,13 +148,23 @@ export const UploadImage = forwardRef(
             variant="ghost"
             onClick={() => setIsOpen(true)}
             className={cn(
-              "flex items-center gap-2 w-full h-full rounded-lg",
-              "bg-primary-lightest text-primary-base hover:bg-primary-lightest/60",
+              "relative w-full h-full rounded-lg overflow-hidden",
               "border border-dashed border-primary-base"
             )}
             {...props}
           >
-            {children}
+            {hasImage && (
+              <Image src={urls[0]} alt="upload" className="object-cover" fill />
+            )}
+            <span
+              className={cn(
+                "absolute inset-0 flex justify-center items-center gap-2",
+                "text-primary-base hover:bg-primary-lightest/80 transition-opacity",
+                !hasImage ? "bg-primary-lightest" : "opacity-0 hover:opacity-100"
+              )}
+            >
+              {children}
+            </span>
           </Button>
         </AspectRatio>
         <ResponsiveModal
@@ -165,7 +178,7 @@ export const UploadImage = forwardRef(
           <Tabs
             defaultValue={TabEnum.Upload}
             className="bg-basic-white rounded-lg"
-            onValueChange={(value) => setTab(value as TabEnum)}
+            onValueChange={(_tab) => setTab(_tab as TabEnum)}
           >
             <TabsList>
               <TabsTrigger value={TabEnum.Upload} className="basis-1/2">
@@ -241,8 +254,8 @@ export const UploadImage = forwardRef(
                   <Image
                     src={data}
                     alt="random"
-                    width={`${height * ratio}px`}
-                    height={`${height}px`}
+                    width={height * ratio}
+                    height={height}
                   />
                 )}
               </div>

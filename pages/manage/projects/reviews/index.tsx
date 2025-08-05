@@ -9,7 +9,7 @@ import {
   ReviewDeleteModal,
   ReviewUpdateModal,
 } from "@/features/projects";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import { useProject } from "@/services/projects";
 import { useProjectReview, useProjectReviewList } from "@/features/projects/hooks/review";
 import marathonConfig from "@/constants/marathon";

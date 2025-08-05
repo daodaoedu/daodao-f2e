@@ -1,42 +1,7 @@
 import { forwardRef, useRef } from 'react';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
-
-const FaAngleLeft = dynamic(() =>
-  import('react-icons/fa6').then((mod) => mod.FaAngleLeft)
-);
-
-const FaArrowRight = dynamic(() =>
-  import('react-icons/fa6').then((mod) => mod.FaArrowRight)
-);
-
-const MdOutlineEdit = dynamic(() =>
-  import('react-icons/md').then((mod) => mod.MdOutlineEdit)
-);
-
-const AiOutlineMore = dynamic(() =>
-  import('react-icons/ai').then((mod) => mod.AiOutlineMore)
-);
-
-const AiOutlineClose = dynamic(() =>
-  import('react-icons/ai').then((mod) => mod.AiOutlineClose)
-);
-
-const Shell = dynamic(() => import('@/public/assets/icons/shell.svg'));
-
-const Comment = dynamic(() => import('@/public/assets/icons/comment.svg'));
-
-const icons = {
-  Comment,
-  FaAngleLeft,
-  FaArrowRight,
-  Shell,
-  MdOutlineEdit,
-  AiOutlineMore,
-  AiOutlineClose,
-};
 
 enum ButtonColorEnum {
   Primary = 'primary',
@@ -71,8 +36,6 @@ interface BaseButtonProps {
   size?: ButtonSizeEnum | `${ButtonSizeEnum}`;
   animation?: ButtonAnimationEnum | `${ButtonAnimationEnum}`;
   isDisabled?: boolean;
-  prefixIcon?: keyof typeof icons;
-  suffixIcon?: keyof typeof icons;
   checkLogin?: boolean;
   onCheckLoginFailed?: () => void;
 }
@@ -105,8 +68,6 @@ function Button<AS extends 'button' | 'link' = 'button'>(
     isDisabled = false,
     isSubmit,
     onClick,
-    prefixIcon,
-    suffixIcon,
     href,
     checkLogin = false,
     ...nativeButtonProps
@@ -116,8 +77,6 @@ function Button<AS extends 'button' | 'link' = 'button'>(
   const { isLoggedIn } = useAuth();
   const { openLoginModal } = useAuthDispatch();
   const rippleRef = useRef<HTMLDivElement>(null);
-  const PrefixIcon = prefixIcon && icons[prefixIcon];
-  const SuffixIcon = suffixIcon && icons[suffixIcon];
 
   const handleClick = (e: React.MouseEvent<HTMLElement>) => {
     if (isDisabled) {
@@ -155,7 +114,6 @@ function Button<AS extends 'button' | 'link' = 'button'>(
   const sharedProps = {
     className: cn(
       'relative overflow-hidden rounded-md text-nowrap text-basic-400 hover:text-primary-base',
-      (prefixIcon || suffixIcon) && 'flex items-center gap-0.5',
       variant === ButtonVariantEnum.Solid && [
         'rounded-full border border-solid transition-colors transition-[box-shadow,color,background-color]',
         color === ButtonColorEnum.Primary &&
@@ -185,22 +143,9 @@ function Button<AS extends 'button' | 'link' = 'button'>(
     onClick: handleClick,
   };
 
-  const iconSize = size === ButtonSizeEnum.Small ? 'size-4' : 'size-5';
-  const iconClassName = cn('pointer-events-none', iconSize);
-
   const content = (
     <>
-      {PrefixIcon && (
-        <div className={iconClassName}>
-          <PrefixIcon className={iconClassName} />
-        </div>
-      )}
       {children}
-      {SuffixIcon && (
-        <div className={iconClassName}>
-          <SuffixIcon className={iconClassName} />
-        </div>
-      )}
       {animation !== ButtonAnimationEnum.None && (
         <div ref={rippleRef} className="absolute inset-0 pointer-events-none" />
       )}

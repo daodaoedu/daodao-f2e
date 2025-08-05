@@ -1,5 +1,5 @@
 import React from 'react';
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig from '@/components/SEOConfig';
 import { IdeasFeature } from '@/features/ideas';
 
 const IdeasPage: React.FC = () => {

@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/router";
 import { z } from "zod";
 import useQueryState from "@/hooks/useQueryState";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 // import { CommentType } from "@/services/comments";
 import { resourceAPI } from "@/services/resources/core/api";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
@@ -84,7 +84,7 @@ export default function ResourceDetailPage({
         title={`${data.name} - 分享資源 | 島島阿學`}
         description={data.description}
       />
-      <Container className="pb-12 pt-11 md:pt-12">
+      <Container className="py-12">
         <Breadcrumb className="mb-5 md:mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>

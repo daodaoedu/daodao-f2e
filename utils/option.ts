@@ -5,7 +5,9 @@ import { OptionProps } from "@/components/ui/option";
  * @param options - 選項陣列
  * @returns value 到 label 的映射物件
  */
-export const createOptionMap = (options: OptionProps[]): Map<string, string> => {
+export const createOptionMap = (
+  options: OptionProps[]
+): Map<string, string> => {
   const map = new Map<string, string>();
   options.forEach((option) => {
     map.set(option.value, option.label);
@@ -25,6 +27,9 @@ export const getOptionLabel = (
   value: string,
   defaultLabel: string = ""
 ): string => {
+  if (!Array.isArray(options)) {
+    return defaultLabel;
+  }
   const map = createOptionMap(options);
   return map.get(value) ?? defaultLabel;
 };
@@ -33,14 +38,17 @@ export const getOptionLabel = (
  * 根據多個 value 從選項陣列中找到對應的 labels
  * @param options - 選項陣列
  * @param values - 要查找的值陣列
- * @param defaultLabel - 當找不到時的預設標籤，預設為空字串
+ * @param defaultLabels - 當找不到時的預設標籤，預設為空字串
  * @returns 對應的 labels 陣列
  */
 export const getOptionLabels = (
   options: OptionProps[],
   values: string[],
-  defaultLabel: string = ""
+  defaultLabels: string[] = []
 ): string[] => {
+  if (!Array.isArray(options) || !Array.isArray(values)) {
+    return defaultLabels ?? [];
+  }
   const map = createOptionMap(options);
-  return values.map((value) => map.get(value) ?? defaultLabel);
+  return values.map((value) => map.get(value) ?? "").filter(Boolean);
 };

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import MarkdownEditor from '@/shared/components/MarkdownEditor';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
 
 type AnnouncementItem = {
   id: string;

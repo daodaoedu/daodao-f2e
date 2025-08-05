@@ -1,12 +1,12 @@
 import Link from "next/link";
 import React from "react";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import { Share2, Globe, Ellipsis } from "lucide-react";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Image } from "@/components/ui/image";
 import GroupSvg from "@/public/assets/icons/group.svg";
 import BoxSvg from "@/public/assets/icons/box.svg";
 import {

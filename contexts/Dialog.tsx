@@ -4,6 +4,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
 } from "react";
 import { Button } from "@/components/ui/button";
 import ResponsiveModal, {
@@ -48,6 +49,11 @@ interface DialogContextType {
    * @returns 對話框是否被確認
    */
   openDialog: (props: DialogProps) => Promise<boolean>;
+
+  /**
+   * 關閉當前對話框
+   */
+  closeDialog: () => void;
 }
 
 export const DialogContext = createContext<DialogContextType | null>(null);
@@ -140,8 +146,16 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
     </div>
   );
 
+  const value = useMemo<DialogContextType>(
+    () => ({
+      openDialog,
+      closeDialog: handleCloseDialog,
+    }),
+    [openDialog, handleCloseDialog]
+  );
+
   return (
-    <DialogContext.Provider value={{ openDialog }}>
+    <DialogContext.Provider value={value}>
       {children}
       <ResponsiveModal
         open={isOpen}

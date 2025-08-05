@@ -1,8 +1,6 @@
-import { FaCheck } from "react-icons/fa6";
+import { Check, Calendar } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { Task as TaskType } from "@/contexts/Milestones/type";
-
-import { MdCalendarToday } from "react-icons/md";
 
 interface TaskViewProps {
   task: TaskType;
@@ -41,14 +39,14 @@ const TaskView = ({
                   "bg-white text-basic-400 border-basic-400"
               )}
               >
-                {task.isCompleted && <FaCheck />}
+                {task.isCompleted && <Check />}
               </p>
             </div>
             <p className="w-full">{task.name || ""}</p>
           </div>
           {task.daysOfWeek?.length > 0 && (
             <div className="flex items-center gap-1 mt-1 ml-7 text-sm text-text-secondary">
-              <MdCalendarToday className="w-4 h-4 text-[#92989A] shrink-0" />
+              <Calendar className="w-4 h-4 text-[#92989A] shrink-0" />
               <span>
                 {task.daysOfWeek
                   ?.map((enDay) => dayMap[enDay])

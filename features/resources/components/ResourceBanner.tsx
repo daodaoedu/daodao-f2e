@@ -1,20 +1,21 @@
 // import { useRouter } from "next/router";
 import Link from "next/link";
+import { StaticImageData } from "next/image";
 import { SearchIcon, SendHorizontalIcon } from "lucide-react";
-import Image from "@/shared/components/Image";
 import { OptionProps } from "@/components/ui/option";
 // import { AuthButton } from "@/contexts/Auth";
 import { cn } from "@/utils/cn";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/wrapper";
 import { Input } from "@/components/ui";
+import { Image } from "@/components/ui/image";
 import SectionTitle from "./SectionTitle";
 
 interface ResourceBannerProps {
   size?: "md" | "lg";
   title: string;
   content: string;
-  image: string;
+  image: string | StaticImageData;
   hotTags?: OptionProps[];
   length?: number;
   onSearch?: (value: string) => void;
@@ -36,28 +37,26 @@ export default function ResourceBanner({
   return (
     <section
       className={cn(
-        "relative bg-primary-palest md:py-12",
-        isMediumSize && "rounded-xl overflow-hidden md:px-10"
+        "relative bg-primary-palest lg:py-12",
+        isMediumSize && "rounded-xl overflow-hidden lg:px-10"
       )}
     >
       {/* 圖片 */}
-      <div className="relative aspect-video md:aspect-auto md:absolute md:top-0 md:right-0 md:h-full md:object-cover">
-        <Image
-          src={image}
-          alt={title}
-          borderRadius="0"
-          height="100%"
-          className="object-cover"
-          wrapperClassName="!block"
-        />
+      <div
+        className={cn(
+          "relative aspect-video overflow-hidden",
+          "lg:aspect-auto lg:w-1/2 lg:absolute lg:top-0 lg:right-0 lg:h-full lg:object-cover"
+        )}
+      >
+        <Image src={image} alt={title} className="object-cover min-h-full" />
 
-        <div className="absolute inset-0 w-full h-full bg-primary-base opacity-30 block md:hidden" />
-        <div className="h-full w-[calc(100%+1px)] absolute top-0 right-0 bg-gradient-primary-palest hidden md:block" />
+        <div className="absolute inset-0 w-full h-full bg-primary-base opacity-30 block lg:hidden" />
+        <div className="h-full w-full absolute top-0 right-0 bg-gradient-primary-palest hidden lg:block" />
       </div>
 
       <Container>
         {/* 搜尋欄 標籤 分享資源 */}
-        <div className="relative pt-5 pb-11 lg:w-3/5 flex flex-col gap-5 md:p-0 md:gap-6">
+        <div className="relative pt-5 pb-11 lg:p-0 lg:gap-6 lg:w-3/5 flex flex-col gap-5">
           <div>
             <SectionTitle as={isMediumSize ? "h2" : "h1"} title={title} />
 

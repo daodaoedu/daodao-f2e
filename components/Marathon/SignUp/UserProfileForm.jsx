@@ -25,7 +25,6 @@ import {
 
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { useMarathonByUserEvent } from '@/services/marathons';
-import Fields from '@/components/Group/Form/Fields';
 import useEditProfile from './useEditProfile';
 import ErrorMessage from './ErrorMessage';
 
@@ -478,15 +477,6 @@ export default function UserProfileForm({
         </StyledGroup>
         <StyledGroup>
           <Typography sx={{ fontWeight: 500 }}>標籤</Typography>
-          <Fields.TagsField
-            name="tagList"
-            value={userState.tagList}
-            control={{
-              setRef: (name, element) => setRef(name, element),
-              onChange: ({ target }) =>
-                onChangeHandler({ key: target.name, value: target.value }),
-            }}
-          />
           <Typography
             sx={{
               color: '#92989A',

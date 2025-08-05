@@ -2,7 +2,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { NoteDetail, NoteUpdateModal } from "@/features/projects";
-import SEOConfig from "@/shared/components/SEO";
+import SEOConfig from "@/components/SEOConfig";
 import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
 import {
   useProject,

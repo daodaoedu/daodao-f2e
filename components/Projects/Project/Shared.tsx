@@ -3,7 +3,7 @@ import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { MOTIVATION_MAP, STRATEGY_MAP, OUTCOME_MAP } from "@/constants/project";
-import { FaCheck } from "react-icons/fa6";
+import { Check } from "lucide-react";
 
 const idSchema = z.string().regex(/^[0-9a-fA-F]{24}$/);
 export const validateIdWithZod = (id: string) => {
@@ -129,7 +129,7 @@ export const FakeCheckBox = ({ isChecked, text }: {
             "bg-white border-basic-400 text-basic-400"
         )}
         >
-          <FaCheck />
+          <Check />
         </p>
         <p className="text-basic-500">
           {text}

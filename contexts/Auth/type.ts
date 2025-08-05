@@ -15,7 +15,7 @@ export enum LoginStatus {
 }
 
 export type Callbacks = {
-  successCallback?: (callback: () => void) => void;
+  successCallback?: () => void;
   registerCallback?: (callback: () => void) => void;
 };
 

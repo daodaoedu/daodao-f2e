@@ -2,6 +2,7 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { X } from "lucide-react";
 import dayjs from "dayjs";
 import PostCard from "@/shared/components/Post/PostCard";
 import { Button } from "@/components/ui/button";
@@ -12,9 +13,8 @@ import {
 } from "@/services/projects";
 import numberToChineseNumber from "@/utils/numberToChineseNumber";
 import Image from "@/shared/components/Image";
-import MarkdownEditor from "@/shared/components/MarkdownEditor";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import Upload, { ImageDataType } from "@/shared/components/Upload";
-import { MdClose } from "react-icons/md";
 
 interface OutcomeFormProps {
   projectTitle: string;
@@ -122,7 +122,7 @@ function OutcomeForm({
                   className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-2"
                   onClick={() => handleDeleteImage(image.id)}
                 >
-                  <MdClose />
+                  <X />
                 </Button>
               </div>
             ))}

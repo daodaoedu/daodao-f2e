@@ -19,10 +19,12 @@ function BaseLayout({ children }: React.PropsWithChildren) {
         const headerOffset = headerRef.current.offsetHeight;
         const root = document.querySelector(':root');
 
-        setHeight(Math.floor(headerOffset - 1));
+        setHeight(Math.floor(headerOffset));
         if (root instanceof HTMLElement) {
-          root.style.setProperty('--padding-top', `${headerOffset}px`);
-          root.style.setProperty('scroll-padding-top', `${headerOffset + 80}px`);
+          root.style.setProperty(
+            'scroll-padding-top',
+            `${headerOffset + 80}px`
+          );
         }
       });
     };
@@ -43,7 +45,7 @@ function BaseLayout({ children }: React.PropsWithChildren) {
       <Header ref={headerRef}>
         <PromotionBar />
       </Header>
-      <main className="min-h-screen-with-padding-top bg-white">{children}</main>
+      <main className="bg-white">{children}</main>
       <Footer />
     </>
   );

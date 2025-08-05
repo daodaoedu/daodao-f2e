@@ -1,13 +1,8 @@
-import dynamic from "next/dynamic";
 import React from "react";
 import { format } from "date-fns";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import ShellSvg from "@/public/assets/icons/shell.svg";
-
-const MarkdownEditor = dynamic(
-  () => import("@/components/ui/markdown-editor"),
-  { ssr: false }
-);
 
 interface ResourceIntroductionProps {
   resource: ResourceDetailResponseSchema["data"];

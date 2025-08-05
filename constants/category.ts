@@ -245,7 +245,7 @@ export const NAV_LINK = [
   },
   {
     name: "找揪團",
-    link: "/group",
+    link: "/circles",
     target: "_self",
   },
   // {
@@ -350,7 +350,7 @@ export const FOOTER_LINK = [
   },
   {
     name: "找揪團",
-    link: "/group",
+    link: "/circles",
     target: "_self",
   },
   // {

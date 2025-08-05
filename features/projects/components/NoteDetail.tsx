@@ -3,7 +3,7 @@ import PostDetailCard from "@/shared/components/Post/PostDetailCard";
 import { ProjectNoteSchema } from "@/services/projects";
 import { BaseUserSchema } from "@/services/users";
 import { CommentType } from "@/services/comments";
-import MarkdownEditor from "@/shared/components/MarkdownEditor";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 
 interface NoteDetailProps {
   data?: ProjectNoteSchema;

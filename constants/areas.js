@@ -1649,6 +1649,7 @@ export const TAIWAN_DISTRICT = [
   },
 ];
 
+export const ALL_AREAS = AREAS.concat(ONLINE_OPTION, TBD_OPTION);
 export const ABROAD_OPTION = { value: 'other_country', label: '其他國家' };
 export const TAIWAN_OPTION = { value: 'taiwan', label: '台灣' };
 export const AREA_DELIMITER = '@';

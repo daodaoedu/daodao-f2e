@@ -6,7 +6,7 @@ import { ProtectedComponent } from '@/contexts/Auth';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import Container from '@/shared/components/Container';
 import EditMode from '@/components/Projects/Project/EditMode';
-import SEOConfig from '@/shared/components/SEO';
+import SEOConfig from '@/components/SEOConfig';
 import {
   createProjectSchema,
   useProjectMutation,
