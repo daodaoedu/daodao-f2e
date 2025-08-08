@@ -248,35 +248,11 @@ export const NAV_LINK = [
     link: "/circles",
     target: "_self",
   },
-  // {
-  //   name: '找想法',
-  //   link: '/ideas',
-  //   target: '_self',
-  // },
-  // {
-  //   name: '找活動',
-  //   link: '/activities',
-  //   target: '_self',
-  // },
-  // {
-  //   name: '找故事',
-  //   link: 'https://blog.daoedu.tw',
-  //   target: '_blank',
-  // },
-  // {
-  //   name: '找場域',
-  //   link: '/locations',
-  //   target: '_self',
-  // },
   {
     name: "加入社群",
     link: "/join",
     target: "_self",
   },
-  // {
-  //   name: '找學習空間',
-  //   link: 'https://www.facebook.com/groups/2237666046370459',
-  // },
 ];
 
 // 新首頁導航連結
@@ -324,11 +300,6 @@ export const MARATHON_LINKS = [
     name: "學習計畫分享區",
     link: "/projects",
   },
-  // {
-  //   name: '成果分享（未公開）',
-  //   link: '/project-sharing',
-  //   disabled: true,
-  // },
 ];
 
 export const USER_LINK = [
@@ -353,48 +324,6 @@ export const FOOTER_LINK = [
     link: "/circles",
     target: "_self",
   },
-  // {
-  //   name: '找想法',
-  //   link: '/ideas',
-  //   target: '_self',
-  // },
-  {
-    name: "找故事",
-    link: "https://blog.daoedu.tw",
-    target: "_blank",
-  },
-  // {
-  //   name: '找活動',
-  //   link: '/activities',
-  //   target: '_self',
-  // },
-  // {
-  //   name: '找場域',
-  //   link: '/locations',
-  //   target: '_self',
-  // },
-  // {
-  //   name: '加入社群',
-  //   link: '/join',
-  //   target: '_self',
-  // },
-  // {
-  //   name: '隱私權政策',
-  //   link: '/terms/privacypolicy',
-  //   target: '_self',
-  // },
-  // {
-  //   name: "體驗問卷",
-  //   link: "https://docs.google.com/forms/d/e/1FAIpQLSeyU9-Q-kIWp5uutcik3h-RO4o5VuG6oG0m-4u1Ua18EOu3aw/viewform",
-  // },
-  // {
-  //   name: "關於島島",
-  //   link: "/about",
-  // },
-  // {
-  //   name: '找學習空間',
-  //   link: 'https://www.facebook.com/groups/2237666046370459',
-  // },
 ];
 
 export const OTHER_OPTION = { label: "其他", value: "other" };
