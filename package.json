@@ -8,7 +8,7 @@
     "yarn": ">=1.22.0"
   },
   "scripts": {
-    "postinstall": "husky",
+    "postinstall": "husky && npm run generate:api",
     "dev": "next dev -p 5438",
     "dev-https": "node server.js",
     "static": "serve out",

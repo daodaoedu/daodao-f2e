@@ -1,24 +1,33 @@
 import { defineConfig } from "orval";
 
 export default defineConfig({
-  daodao: {
+  api: {
     input: {
       target: "./services/openapi.yaml",
     },
     output: {
       mode: "tags",
-      target: "services/generated",
-      schemas: "services/generated/schemas",
       client: "swr",
-      mock: false,
-      clean: true,
-      prettier: true,
+      target: "generated/endpoints",
+      schemas: "generated/models",
+      mock: true,
       override: {
         mutator: {
           path: "services/fetcher.ts",
           name: "fetcher",
         },
       },
+    },
+  },
+  zod: {
+    input: {
+      target: "./services/openapi.yaml",
+    },
+    output: {
+      mode: "tags",
+      client: "zod",
+      target: "generated/endpoints",
+      fileExtension: ".zod.ts",
     },
   },
 });

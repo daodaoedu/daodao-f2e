@@ -51,11 +51,3 @@ jobs:
         run: |
           git commit -m "chore: sync OpenAPI spec from backend"
           git push
-
-      - name: Generate API Types
-        if: steps.check_changes.outputs.changes == 'true'
-        run: |
-          yarn install --frozen-lockfile
-          yarn generate:api
-          git add services/generated
-          git diff --cached --quiet || (git commit -m "chore: update generated API types" && git push)
