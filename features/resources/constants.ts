@@ -1,15 +1,51 @@
 import { OptionProps } from "@/components/ui/option";
 import { createOptionMap } from "@/utils/option";
 
-export const resourceTypeOptions: OptionProps[] = [
-  { value: "learning_platform_app", label: "學習平台/APP" },
-  { value: "learning_tools", label: "學習工具" },
-  { value: "books_articles", label: "書籍/文章" },
-  { value: "video_content", label: "影片" },
-  { value: "podcast_content", label: "Podcast" },
-  { value: "workshops_courses", label: "工作坊與課程" },
-  { value: "professional_certificates", label: "專業證書與認證課程" },
-  { value: "community_organization", label: "如 Coursera、Udemy、edX" },
+interface OptionWithDescriptionProps extends OptionProps {
+  description: string;
+}
+
+export const resourceTypeOptions: OptionWithDescriptionProps[] = [
+  {
+    value: "learning_platform_app",
+    label: "學習平台/APP",
+    description: "如 Coursera、Udemy、edX",
+  },
+  {
+    value: "learning_tools",
+    label: "學習工具",
+    description: "如 Google 翻譯、Notion、Grammarly",
+  },
+  {
+    value: "books_articles",
+    label: "書籍/文章",
+    description: "如 《原子習慣》、哈佛商業評論文章",
+  },
+  {
+    value: "video_content",
+    label: "影片",
+    description: "如 YouTube 教育頻道「CrashCourse」、TED Talks 演講",
+  },
+  {
+    value: "podcast_content",
+    label: "Podcast",
+    description: "如 《有聲書評》、《經濟學人》Podcast",
+  },
+  {
+    value: "workshops_courses",
+    label: "工作坊與課程",
+    description: "如 Design Thinking 工作坊、本地社區的公開學習活動",
+  },
+  {
+    value: "professional_certificates",
+    label: "專業證書與認證課程",
+    description: "如 AWS Certification、PMP 課程",
+  },
+  {
+    value: "community_organization",
+    label: "社群/組織",
+    description: "如 Meetup 的技術社群、LinkedIn 的專業小組",
+  },
 ];
 
 export const costTypeOptions: OptionProps[] = [
@@ -18,10 +54,22 @@ export const costTypeOptions: OptionProps[] = [
   { value: "paid", label: "付費" },
 ];
 
-export const targetAudienceTypeOptions: OptionProps[] = [
-  { value: "beginner", label: "初學" },
-  { value: "intermediate", label: "進階" },
-  { value: "expert", label: "專家" },
+export const targetAudienceTypeOptions: OptionWithDescriptionProps[] = [
+  {
+    value: "beginner",
+    label: "初學",
+    description: "剛開始學習某個領域的人，正在打基礎，掌握基本概念和技能。",
+  },
+  {
+    value: "intermediate",
+    label: "進階",
+    description: "已有一定基礎，能獨立處理較複雜的問題，正在深化專業知識。",
+  },
+  {
+    value: "expert",
+    label: "專家",
+    description: "在該領域有豐富經驗和深厚知識，能解決困難問題，並能指導他人。",
+  },
 ];
 
 export const contentFeaturesOptions: OptionProps[] = [
