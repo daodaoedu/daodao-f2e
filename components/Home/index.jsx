@@ -10,7 +10,6 @@ import Edm from './Edm';
 import FacebookPosts from './FacebookPosts';
 import WishResource from './WishResource';
 import APPBanner from './APPBanner';
-import JoinCooperate from './JoinCooperate';
 
 const StyledBannerButton = styled(Button)`
   &.MuiButton-root {
@@ -72,8 +71,6 @@ function Home() {
       <FacebookPosts />
       <Divider sx={{ margin: '10px 0' }} />
       <Group />
-      <Divider sx={{ margin: '10px 0' }} />
-      <JoinCooperate />
       <Divider sx={{ margin: '10px 0' }} />
       <WishResource />
       <Divider sx={{ margin: '10px 0' }} />
