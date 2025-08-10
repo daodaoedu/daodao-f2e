@@ -5,12 +5,12 @@ import {
   useEffect,
   useCallback,
   useMemo,
-} from "react";
-import { Button } from "@/components/ui/button";
+} from 'react';
+import { Button } from '@/components/ui/button';
 import ResponsiveModal, {
   ResponsiveModalProps,
-} from "@/components/ui/responsive-modal";
-import { cn } from "@/utils/cn";
+} from '@/components/ui/responsive-modal';
+import { cn } from '@/utils/cn';
 
 export interface DialogContentProps {
   close: () => void;
@@ -23,18 +23,18 @@ export type RenderDialogContent = (
 interface DialogProps
   extends Omit<
     ResponsiveModalProps,
-    "children" | "open" | "onClose" | "footer"
+    'children' | 'open' | 'onClose' | 'footer'
   > {
   content: React.ReactNode | RenderDialogContent;
   cancelText?: string;
   cancelBtnProps?: Omit<
     React.ComponentPropsWithoutRef<typeof Button>,
-    "onClick"
+    'onClick'
   >;
   confirmText?: string;
   confirmBtnProps?: Omit<
     React.ComponentPropsWithoutRef<typeof Button>,
-    "onClick"
+    'onClick'
   >;
   disableFooter?: boolean;
   onCancel?: () => void;
@@ -61,7 +61,7 @@ export const DialogContext = createContext<DialogContextType | null>(null);
 export const useDialog = () => {
   const context = useContext(DialogContext);
   if (!context) {
-    throw new Error("useDialog must be used within a DialogProvider");
+    throw new Error('useDialog must be used within a DialogProvider');
   }
   return context;
 };
@@ -96,32 +96,30 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
   }, [isOpen, dialogs]);
 
   const openDialog = useCallback(
-    async (props: DialogProps) => {
-      return new Promise<boolean>((resolve) => {
-        const proxyOnConfirm = () => {
-          resolve(true);
-          handleCloseDialog();
-          props.onConfirm?.();
-        };
-        const proxyOnCancel = () => {
-          resolve(false);
-          handleCloseDialog();
-          props.onCancel?.();
-        };
-        const newDialog = {
-          ...props,
-          onConfirm: proxyOnConfirm,
-          onCancel: proxyOnCancel,
-        };
+    async (props: DialogProps) => new Promise<boolean>((resolve) => {
+      const proxyOnConfirm = () => {
+        resolve(true);
+        handleCloseDialog();
+        props.onConfirm?.();
+      };
+      const proxyOnCancel = () => {
+        resolve(false);
+        handleCloseDialog();
+        props.onCancel?.();
+      };
+      const newDialog = {
+        ...props,
+        onConfirm: proxyOnConfirm,
+        onCancel: proxyOnCancel,
+      };
 
-        if (Array.isArray(dialogs) && dialogs.length > 0) {
-          setDialogs((prev) => [...prev, newDialog]);
-        } else {
-          setIsOpen(true);
-          setCurrentDialog(newDialog);
-        }
-      });
-    },
+      if (Array.isArray(dialogs) && dialogs.length > 0) {
+        setDialogs((prev) => [...prev, newDialog]);
+      } else {
+        setIsOpen(true);
+        setCurrentDialog(newDialog);
+      }
+    }),
     [dialogs, handleCloseDialog]
   );
 
@@ -130,18 +128,18 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
       <Button
         variant="secondary"
         {...cancelBtnProps}
-        className={cn("flex-1", cancelBtnProps?.className)}
+        className={cn('flex-1', cancelBtnProps?.className)}
         onClick={onCancel}
       >
-        {cancelText ?? "關閉"}
+        {cancelText ?? '關閉'}
       </Button>
       <Button
         variant="default"
         {...confirmBtnProps}
-        className={cn("flex-1", confirmBtnProps?.className)}
+        className={cn('flex-1', confirmBtnProps?.className)}
         onClick={onConfirm}
       >
-        {confirmText ?? "確認"}
+        {confirmText ?? '確認'}
       </Button>
     </div>
   );
@@ -163,8 +161,8 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
         footer={footer}
         {...restDialogProps}
       >
-        <div className={cn("text-center p-4 pb-0", className)}>
-          {typeof content === "function"
+        <div className={cn('text-center p-4 pb-0', className)}>
+          {typeof content === 'function'
             ? content({ close: handleCloseDialog })
             : content}
         </div>

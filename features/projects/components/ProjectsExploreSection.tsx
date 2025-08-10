@@ -1,8 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { Search, Plus, FolderOpen, SortAsc, RefreshCw } from 'lucide-react';
+import {
+  Search, Plus, FolderOpen, SortAsc, RefreshCw,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card, CardContent, CardHeader, CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
@@ -49,11 +53,9 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
     // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((project) =>
-        project.title.toLowerCase().includes(query) ||
+      filtered = filtered.filter((project) => project.title.toLowerCase().includes(query) ||
         project.description.toLowerCase().includes(query) ||
-        project.goal.toLowerCase().includes(query)
-      );
+        project.goal.toLowerCase().includes(query));
     }
 
     // Apply sorting
@@ -119,92 +121,96 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
   };
 
   // Project Card Component
-  const ProjectCard = ({ project }: { project: ProjectSchema }) => {
-    return (
-      <Card className="hover:shadow-md transition-shadow duration-200 border border-basic-200">
-        <CardContent className="p-4">
-          <div className="space-y-3">
-            {/* Header */}
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <Link
-                  href={`/projects/detail?id=${project.id}`}
-                  className="text-lg font-semibold text-basic-black hover:text-primary-base transition-colors line-clamp-1"
-                >
-                  {project.title}
-                </Link>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-sm text-basic-400">
-                    建立於 {new Date(project.createdDate).toLocaleDateString('zh-TW')}
-                  </span>
-                  {project.isPublic && (
-                    <Badge variant="outline" className="text-xs">
-                      公開
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Description */}
-            <p className="text-basic-600 text-sm line-clamp-2 leading-relaxed">
-              {project.description}
-            </p>
-
-            {/* Goal */}
-            {project.goal && (
-              <div className="bg-primary-50 rounded-lg p-3">
-                <h4 className="text-sm font-medium text-primary-700 mb-1">學習目標</h4>
-                <p className="text-sm text-primary-600 line-clamp-1">{project.goal}</p>
-              </div>
-            )}
-
-            {/* Author Info */}
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-xs font-medium text-primary-600">
-                  {project.user.name.charAt(0)}
-                </span>
-              </div>
-              <span className="text-sm text-basic-500">{project.user.name}</span>
-              <span className="text-xs text-basic-400 ml-auto">
-                v{project.version}
-              </span>
-            </div>
-
-            {/* Motivation Tags */}
-            {project.motivation && project.motivation.length > 0 && (
-              <div className="flex flex-wrap gap-1">
-                {project.motivation.slice(0, 3).map((tag) => (
-                  <Badge key={`motivation-${tag}`} variant="secondary" className="text-xs">
-                    {tag}
-                  </Badge>
-                ))}
-                {project.motivation.length > 3 && (
-                  <Badge variant="secondary" className="text-xs text-basic-400">
-                    +{project.motivation.length - 3}
-                  </Badge>
-                )}
-              </div>
-            )}
-
-            {/* Action */}
-            <div className="flex items-center justify-between pt-2">
-              <span className="text-xs text-basic-400">
-                更新於 {new Date(project.updatedDate).toLocaleDateString('zh-TW')}
-              </span>
+  const ProjectCard = ({ project }: { project: ProjectSchema }) => (
+    <Card className="hover:shadow-md transition-shadow duration-200 border border-basic-200">
+      <CardContent className="p-4">
+        <div className="space-y-3">
+          {/* Header */}
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
               <Link
                 href={`/projects/detail?id=${project.id}`}
-                className="text-xs text-primary-base hover:text-primary-darker"
+                className="text-lg font-semibold text-basic-black hover:text-primary-base transition-colors line-clamp-1"
               >
-                查看詳情 →
+                {project.title}
               </Link>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-sm text-basic-400">
+                  建立於
+                  {' '}
+                  {new Date(project.createdDate).toLocaleDateString('zh-TW')}
+                </span>
+                {project.isPublic && (
+                <Badge variant="outline" className="text-xs">
+                  公開
+                </Badge>
+                )}
+              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
-    );
-  };
+
+          {/* Description */}
+          <p className="text-basic-600 text-sm line-clamp-2 leading-relaxed">
+            {project.description}
+          </p>
+
+          {/* Goal */}
+          {project.goal && (
+          <div className="bg-primary-50 rounded-lg p-3">
+            <h4 className="text-sm font-medium text-primary-700 mb-1">學習目標</h4>
+            <p className="text-sm text-primary-600 line-clamp-1">{project.goal}</p>
+          </div>
+          )}
+
+          {/* Author Info */}
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center">
+              <span className="text-xs font-medium text-primary-600">
+                {project.user.name.charAt(0)}
+              </span>
+            </div>
+            <span className="text-sm text-basic-500">{project.user.name}</span>
+            <span className="text-xs text-basic-400 ml-auto">
+              v
+              {project.version}
+            </span>
+          </div>
+
+          {/* Motivation Tags */}
+          {project.motivation && project.motivation.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {project.motivation.slice(0, 3).map((tag) => (
+              <Badge key={`motivation-${tag}`} variant="secondary" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
+            {project.motivation.length > 3 && (
+            <Badge variant="secondary" className="text-xs text-basic-400">
+              +
+              {project.motivation.length - 3}
+            </Badge>
+            )}
+          </div>
+          )}
+
+          {/* Action */}
+          <div className="flex items-center justify-between pt-2">
+            <span className="text-xs text-basic-400">
+              更新於
+              {' '}
+              {new Date(project.updatedDate).toLocaleDateString('zh-TW')}
+            </span>
+            <Link
+              href={`/projects/detail?id=${project.id}`}
+              className="text-xs text-primary-base hover:text-primary-darker"
+            >
+              查看詳情 →
+            </Link>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   if (error) {
     return (
@@ -241,7 +247,9 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
               探索學習計劃
               {filteredProjects && (
                 <span className="text-sm font-normal text-basic-400">
-                  ({filteredProjects.length})
+                  (
+                  {filteredProjects.length}
+                  )
                 </span>
               )}
             </CardTitle>
@@ -329,8 +337,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
             <p className="text-basic-400 mb-6">
               {searchQuery
                 ? '嘗試調整搜尋關鍵字'
-                : '建立你的第一個學習計劃！'
-              }
+                : '建立你的第一個學習計劃！'}
             </p>
             {showCreateButton && (
               <Button onClick={handleCreateClick} className="flex items-center gap-2">
@@ -349,7 +356,11 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
             {filteredProjects.length > 0 && (
               <div className="text-center pt-4">
                 <p className="text-sm text-basic-400">
-                  顯示 {filteredProjects.length} 個學習計劃
+                  顯示
+                  {' '}
+                  {filteredProjects.length}
+                  {' '}
+                  個學習計劃
                 </p>
               </div>
             )}

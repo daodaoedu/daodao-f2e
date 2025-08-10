@@ -23,9 +23,7 @@ export default function SelectedAreas() {
       items={AREAS}
       itemValue="label"
       itemLabel="label"
-      renderValue={(selected) =>
-        selected.length === 0 ? '地區' : selected.join('、')
-      }
+      renderValue={(selected) => (selected.length === 0 ? '地區' : selected.join('、'))}
       sx={{
         '@media (max-width: 767px)': {
           width: '100%',

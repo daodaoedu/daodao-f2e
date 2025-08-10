@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Dialog,
@@ -8,7 +8,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogContentSize,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Drawer,
   DrawerContent,
@@ -16,8 +16,8 @@ import {
   DrawerTitle,
   DrawerDescription,
   DrawerFooter,
-} from "@/components/ui/drawer";
-import useMediaQuery from "@/hooks/useMediaQuery";
+} from '@/components/ui/drawer';
+import useMediaQuery from '@/hooks/useMediaQuery';
 
 export interface ResponsiveModalProps {
   open: boolean;
@@ -46,11 +46,10 @@ export const ResponsiveModal = ({
   className,
   titleClassName,
 }: ResponsiveModalProps) => {
-  const isXSmall = useMediaQuery("isXSmall");
-  const isMedium = useMediaQuery("isMedium");
-  const isLarge = useMediaQuery("isLarge");
-  const isDialog =
-    (size === DialogContentSize.Large && isLarge) ||
+  const isXSmall = useMediaQuery('isXSmall');
+  const isMedium = useMediaQuery('isMedium');
+  const isLarge = useMediaQuery('isLarge');
+  const isDialog = (size === DialogContentSize.Large && isLarge) ||
     (size === DialogContentSize.Medium && isMedium) ||
     (size === DialogContentSize.Small && isXSmall);
 

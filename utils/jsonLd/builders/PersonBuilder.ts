@@ -1,9 +1,9 @@
-import { Person } from "schema-dts";
-import { JsonLdBuilder } from "./JsonLdBuilder";
+import { Person } from 'schema-dts';
+import { JsonLdBuilder } from './JsonLdBuilder';
 
 export class PersonBuilder extends JsonLdBuilder<Person> {
   protected setType(): void {
-    this.data["@type"] = "Person";
+    this.data['@type'] = 'Person';
   }
 
   setJobTitle(jobTitle: string): this {
@@ -28,10 +28,9 @@ export class PersonBuilder extends JsonLdBuilder<Person> {
 
   setBirthDate(birthDate: string | Date): this {
     if (!birthDate) return this;
-    this.data.birthDate =
-      birthDate instanceof Date
-        ? birthDate.toISOString().split("T")[0]
-        : birthDate;
+    this.data.birthDate = birthDate instanceof Date
+      ? birthDate.toISOString().split('T')[0]
+      : birthDate;
     return this;
   }
 
@@ -42,7 +41,7 @@ export class PersonBuilder extends JsonLdBuilder<Person> {
     postalCode?: string;
     addressCountry?: string;
   }): this {
-    this.data.address = { "@type": "PostalAddress", ...address };
+    this.data.address = { '@type': 'PostalAddress', ...address };
     return this;
   }
 }

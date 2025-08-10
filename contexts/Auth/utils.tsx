@@ -90,6 +90,6 @@ export const redirectToAuth = () => {
   } else if (frontendUrl === currentUrl) {
     const searchParams = new URLSearchParams(window.location.search);
     getDevOriginStorage().set(searchParams.get('origin'));
-    window.location.href = `${apiUrl}/auth/google`;
+    window.location.href = `${apiUrl}/api/v1/auth/google`;
   }
 };

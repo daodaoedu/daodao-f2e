@@ -73,8 +73,7 @@ function GroupCard({
     apiDeleteGroup.mutate();
   };
 
-  const formatToString = (data, defaultValue = '') =>
-    Array.isArray(data) && data.length ? data.join('、') : data || defaultValue;
+  const formatToString = (data, defaultValue = '') => (Array.isArray(data) && data.length ? data.join('、') : data || defaultValue);
 
   return (
     <>

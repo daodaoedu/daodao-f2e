@@ -27,25 +27,23 @@ const TitleWrapper = styled.div`
   }
 `;
 
-const Title = () => {
-  return (
-    <TitleWrapper>
-      <h1>
-        <Typed
-          strings={['歡迎來到島島阿學！一起尋找資源與分享資源吧！']}
-          typeSpeed={80}
-        />
-      </h1>
-      <h2>
-        <Typed
-          strings={[
-            'If you want to go fast go alone. If you want to go far go together.',
-          ]}
-          typeSpeed={80}
-        />
-      </h2>
-    </TitleWrapper>
-  );
-};
+const Title = () => (
+  <TitleWrapper>
+    <h1>
+      <Typed
+        strings={['歡迎來到島島阿學！一起尋找資源與分享資源吧！']}
+        typeSpeed={80}
+      />
+    </h1>
+    <h2>
+      <Typed
+        strings={[
+          'If you want to go fast go alone. If you want to go far go together.',
+        ]}
+        typeSpeed={80}
+      />
+    </h2>
+  </TitleWrapper>
+);
 
 export default Title;

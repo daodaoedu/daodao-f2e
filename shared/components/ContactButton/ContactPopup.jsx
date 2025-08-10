@@ -50,7 +50,8 @@ const StyledDesc = styled.p`
 const desc = (
   <StyledDesc>
     您填的資訊將透過島島阿學 email
-    給這位夥伴，請確認訊息未涉及個人隱私並符合本網站{' '}
+    給這位夥伴，請確認訊息未涉及個人隱私並符合本網站
+    {' '}
     <Link href="/terms/service" target="_blank">
       使用者條款
     </Link>
@@ -76,8 +77,7 @@ function ContactPopup({
   const descriptionId = `modal-description-${id}`;
   const messageId = `message-${id}`;
   const contactId = `contact-${id}`;
-  const role =
-    ROLE.find(({ key }) => user?.roleList?.includes(key))?.label || '暫無資料';
+  const role = ROLE.find(({ key }) => user?.roleList?.includes(key))?.label || '暫無資料';
 
   const handleClose = () => {
     setMessage('');

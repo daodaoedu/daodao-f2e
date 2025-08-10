@@ -87,7 +87,7 @@ const RelatedResources = ({ title, searchScheme }) => {
               ).trim()}
               desc={(
                 (properties['介紹']?.rich_text ?? []).find(
-                  (item) => item?.type === 'text',
+                  (item) => item?.type === 'text'
                 )?.plain_text ?? ''
               ).slice(0, 40)}
               id={id}

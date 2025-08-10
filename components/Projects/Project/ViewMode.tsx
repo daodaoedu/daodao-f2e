@@ -40,7 +40,7 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
 
       <Panel className=" bg-white">
         <Title title="計畫簡述" />
-        <Description description={project?.description || ""} />
+        <Description description={project?.description || ''} />
         <Divider />
         <Title title="學習動機" />
         {
@@ -48,13 +48,13 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
             <Tags category="motivation_tags" tags={project?.motivation} />
           )
         }
-        <Description description={project?.motivationDescription || ""} />
+        <Description description={project?.motivationDescription || ''} />
         <Divider />
         <Title title="學習目標" />
-        <Description description={project?.goal || ""} />
+        <Description description={project?.goal || ''} />
         <Divider />
         <Title title="學習內容" />
-        <Description description={project?.content || ""} />
+        <Description description={project?.content || ''} />
         <Divider />
         <Title title="學習方法與策略" />
         {
@@ -62,14 +62,14 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
             <Tags category="strategy_tags" tags={project?.strategy} />
           )
         }
-        <Description description={project?.strategyDescription || ""} />
+        <Description description={project?.strategyDescription || ''} />
         {
           project?.resourceName && (
             <>
               <Divider />
               <Title title="學習資源" />
               <div className="flex flex-col gap-2">
-                <FakeInput value={project.resourceName || ""} />
+                <FakeInput value={project.resourceName || ''} />
               </div>
             </>
           )
@@ -83,7 +83,7 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
             <Tags category="outcome_tags" tags={project?.outcome} />
           )
         }
-        <Description description={project?.outcomeDescription || ""} />
+        <Description description={project?.outcomeDescription || ''} />
         <Divider />
         <FakeCheckBox
           isChecked={project?.isPublic}

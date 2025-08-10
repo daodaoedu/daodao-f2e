@@ -18,22 +18,17 @@ import {
 } from './Parnter.styled';
 
 // utils
-const _compose =
-  (...fns) =>
-    (x) =>
-      fns.reduceRight((v, f) => f(v), x);
+const _compose = (...fns) => (x) => fns.reduceRight((v, f) => f(v), x);
 const _map = (arr, key) => arr.map((item) => item[key]);
 const mapValues = (values, mapFn) => values.map(mapFn).join(',');
 
-const createObjFromArray = (arr, keyProp = 'label', valueProp = 'label') => {
-  return arr.reduce(
-    (obj, item) => ({
-      ...obj,
-      [item[keyProp]]: item[valueProp],
-    }),
-    {},
-  );
-};
+const createObjFromArray = (arr, keyProp = 'label', valueProp = 'label') => arr.reduce(
+  (obj, item) => ({
+    ...obj,
+    [item[keyProp]]: item[valueProp],
+  }),
+  {}
+);
 
 const AREAS = TAIWAN_DISTRICT.map(({ name, value }) => ({
   label: name,
@@ -61,14 +56,12 @@ function Partner() {
   // queryStr
   const [getSearchParams, , generateParamsItems] = useSearchParamsManager();
   const searchParamsItems = useMemo(
-    () =>
-      generateParamsItems(['area', 'role', 'edu', 'tag', 'q'], keySelections),
-    [getSearchParams],
+    () => generateParamsItems(['area', 'role', 'edu', 'tag', 'q'], keySelections),
+    [getSearchParams]
   );
 
   // fetch api - params
-  const findValues = (params, key) =>
-    params.find((item) => item.key === key)?.values;
+  const findValues = (params, key) => params.find((item) => item.key === key)?.values;
   const prepareData = _compose(
     ([location, educationStage, roleList, tag, search]) => ({
       location,
@@ -83,7 +76,7 @@ function Partner() {
       mapValues(findValues(arg, 'role'), (item) => roleObj[item]),
       findValues(arg, 'tag').join(','),
       findValues(arg, 'q').join(','),
-    ],
+    ]
   );
 
   const { data: partnerItems, hasMore, setSize } = useUserList(prepareData(searchParamsItems));

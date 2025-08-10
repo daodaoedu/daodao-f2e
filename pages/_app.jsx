@@ -13,7 +13,6 @@ import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';
 import { AuthProvider, useAuth } from '@/contexts/Auth';
-import SnackbarProvider from '@/contexts/Snackbar';
 import { DialogProvider } from '@/contexts/Dialog';
 import GlobalStyle from '@/shared/styles/Global';
 import themeFactory from '@/shared/styles/themeFactory';
@@ -159,13 +158,11 @@ const App = ({ Component, pageProps }) => {
 
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
         <SWRConfig value={swrConfig}>
-          <SnackbarProvider>
-            <DialogProvider>
-              <AuthProvider>
-                <ThemeComponentWrap pageProps={pageProps} Component={Component} />
-              </AuthProvider>
-            </DialogProvider>
-          </SnackbarProvider>
+          <DialogProvider>
+            <AuthProvider>
+              <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+            </AuthProvider>
+          </DialogProvider>
         </SWRConfig>
       </LocalizationProvider>
     </>

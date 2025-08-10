@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-  DropdownMenuCheckboxItem
+  DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 
@@ -26,13 +26,13 @@ const FilterBar: React.FC<FilterBarProps> = ({
   onFilterChange,
   onResetFilter,
   totalCount,
-  filteredCount
+  filteredCount,
 }) => {
   const statusOptions: PracticeStatus[] = [
     'active',
     'paused',
     'completed',
-    'archived'
+    'archived',
   ];
 
   const contentTypeOptions: ContentType[] = [
@@ -41,14 +41,14 @@ const FilterBar: React.FC<FilterBarProps> = ({
     'articles',
     'podcast',
     'course',
-    'custom'
+    'custom',
   ];
 
   const sortOptions = [
     { value: 'updatedAt', label: '最近更新' },
     { value: 'createdAt', label: '建立時間' },
     { value: 'progress', label: '完成度' },
-    { value: 'streak', label: '連續天數' }
+    { value: 'streak', label: '連續天數' },
   ];
 
   const hasActiveFilters = !!(
@@ -81,7 +81,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
 
   const handleSortOrderToggle = () => {
     onFilterChange({
-      sortOrder: filter.sortOrder === 'asc' ? 'desc' : 'asc'
+      sortOrder: filter.sortOrder === 'asc' ? 'desc' : 'asc',
     });
   };
 
@@ -108,7 +108,15 @@ const FilterBar: React.FC<FilterBarProps> = ({
 
         <div className="flex flex-col xs:flex-row xs:items-center space-y-2 xs:space-y-0 xs:space-x-4">
           <span className="text-sm text-muted-foreground">
-            顯示 {filteredCount} / {totalCount} 項實踐
+            顯示
+            {' '}
+            {filteredCount}
+            {' '}
+            /
+            {' '}
+            {totalCount}
+            {' '}
+            項實踐
           </span>
 
           {hasActiveFilters && (
@@ -135,7 +143,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
               <Badge variant="default" className="ml-2 h-5 min-w-5 p-0 text-xs">
                 {filter.status.length}
               </Badge>
-                )}
+              )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
@@ -160,7 +168,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
               <Badge variant="default" className="ml-2 h-5 min-w-5 p-0 text-xs">
                 {filter.contentType.length}
               </Badge>
-                )}
+              )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
@@ -236,7 +244,9 @@ const FilterBar: React.FC<FilterBarProps> = ({
               className="cursor-pointer hover:bg-muted"
               onClick={() => onFilterChange({ searchTerm: '' })}
             >
-              搜尋: "{filter.searchTerm}"
+              搜尋: "
+              {filter.searchTerm}
+              "
               <X className="h-3 w-3 ml-1" />
             </Badge>
           )}

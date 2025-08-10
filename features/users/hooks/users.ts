@@ -1,9 +1,9 @@
-import { useMemo } from "react";
-import useSWR from "swr";
-import useSWRInfinite from "swr/infinite";
-import useSWRMutation, { SWRMutationConfiguration } from "swr/mutation";
+import { useMemo } from 'react';
+import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
+import useSWRMutation, { SWRMutationConfiguration } from 'swr/mutation';
 
-import { PaginationResponseType } from "@/utils/http";
+import { PaginationResponseType } from '@/utils/http';
 import {
   getUserPathname,
   refetchUsers,
@@ -11,8 +11,8 @@ import {
   UserQuerySchema,
   userAPI,
   CreateUserResponse,
-} from "@/services/users";
-import { useAuthDispatch } from "@/contexts/Auth";
+} from '@/services/users';
+import { useAuthDispatch } from '@/contexts/Auth';
 
 export function useUserList(query: UserQuerySchema, pageSize = 10) {
   const swr = useSWRInfinite<PaginationResponseType<UserSchema>>(
@@ -24,10 +24,9 @@ export function useUserList(query: UserQuerySchema, pageSize = 10) {
   );
 
   const data = useMemo<UserSchema[] | undefined>(
-    () =>
-      Array.isArray(swr.data)
-        ? swr.data?.flatMap((page) => page.data)
-        : undefined,
+    () => (Array.isArray(swr.data)
+      ? swr.data?.flatMap((page) => page.data)
+      : undefined),
     [swr.data]
   );
 
@@ -88,12 +87,10 @@ export const useUpdateResource = (
     onSuccess,
     ...options
   }: SWRMutationConfiguration<UserSchema, Error, string | null> = {}
-) => {
-  return useSWRMutation(id ? getUserPathname({ id }) : null, userAPI.update, {
-    ...options,
-    onSuccess: (data, key, config) => {
-      onSuccess?.(data, key, config);
-      refetchUsers();
-    },
-  });
-};
+) => useSWRMutation(id ? getUserPathname({ id }) : null, userAPI.update, {
+  ...options,
+  onSuccess: (data, key, config) => {
+    onSuccess?.(data, key, config);
+    refetchUsers();
+  },
+});

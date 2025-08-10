@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Search } from "lucide-react";
-import { cn } from "@/utils/cn";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState } from 'react';
+import { Search } from 'lucide-react';
+import { cn } from '@/utils/cn';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface SearchFunctionProps {
   onSearch: (query: string) => void;
@@ -42,7 +42,7 @@ export function SearchFunction({ onSearch, onSearchToggle, className }: SearchFu
   };
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn('relative', className)}>
       {isExpanded ? (
         <div className="flex items-center">
           <div className="relative">

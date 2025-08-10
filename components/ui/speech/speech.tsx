@@ -1,19 +1,19 @@
-import { useCallback, useEffect } from "react";
-import { MicIcon } from "lucide-react";
+import { useCallback, useEffect } from 'react';
+import { MicIcon } from 'lucide-react';
 import SpeechRecognition, {
   ListeningOptions,
   SpeechRecognitionOptions,
   useSpeechRecognition,
-} from "react-speech-recognition";
-import { Image } from "@/components/ui/image";
-import { useDialog } from "@/contexts/Dialog";
-import faviconPng from "@/public/favicon.png";
-import { Button, ButtonProps } from "@/components/ui";
+} from 'react-speech-recognition';
+import { Image } from '@/components/ui/image';
+import { useDialog } from '@/contexts/Dialog';
+import faviconPng from '@/public/favicon.png';
+import { Button, ButtonProps } from '@/components/ui';
 
 interface SpeechProps
   extends ListeningOptions,
     SpeechRecognitionOptions,
-    Omit<ButtonProps, "onClick"> {
+    Omit<ButtonProps, 'onClick'> {
   onTranscriptEnd?: (transcript: string) => void;
 }
 

@@ -1,3 +1,3 @@
-export * from "./questionMap";
-export * from "./resultDetailMap";
-export * from "./themeMap";
+export * from './questionMap';
+export * from './resultDetailMap';
+export * from './themeMap';

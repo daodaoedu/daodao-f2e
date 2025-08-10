@@ -1,12 +1,12 @@
-import useSWRMutation from "swr/mutation";
-import ResponsiveModal, { ResponsiveModalSize } from "@/components/ui/responsive-modal";
+import useSWRMutation from 'swr/mutation';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
 import {
   getProjectOutcomePathname,
   projectOutcomeAPI,
   refetchProjectOutcome,
-} from "@/services/projects";
-import marathonConfig from "@/constants/marathon";
-import OutcomeForm from "./OutcomeForm";
+} from '@/services/projects';
+import marathonConfig from '@/constants/marathon';
+import OutcomeForm from './OutcomeForm';
 
 interface OutcomeCreateModalProps {
   projectId: string;

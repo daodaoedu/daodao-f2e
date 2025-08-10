@@ -57,7 +57,7 @@ function PartnerList({ items }) {
                   <Grid item xs={12} py="12px">
                     <Box height={1} width="100%" border="1px solid #E5E5E5" />
                   </Grid>
-                )}
+              )}
             </Fragment>
           ))}
         </>

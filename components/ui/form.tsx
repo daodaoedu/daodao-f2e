@@ -1,7 +1,7 @@
-import * as React from "react";
-import * as LabelPrimitive from "@radix-ui/react-label";
-import { ZodError, ZodSchema } from "zod";
-import { Slot } from "@radix-ui/react-slot";
+import * as React from 'react';
+import * as LabelPrimitive from '@radix-ui/react-label';
+import { ZodError, ZodSchema } from 'zod';
+import { Slot } from '@radix-ui/react-slot';
 import {
   Controller,
   FormProvider,
@@ -11,10 +11,10 @@ import {
   type ControllerProps,
   type FieldPath,
   type FieldValues,
-} from "react-hook-form";
+} from 'react-hook-form';
 
-import { cn } from "@/utils/cn";
-import { Label } from "@/components/ui/label";
+import { cn } from '@/utils/cn';
+import { Label } from '@/components/ui/label';
 
 const Form = FormProvider;
 
@@ -41,14 +41,12 @@ const FormField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 >({
-  ...props
-}: ControllerProps<TFieldValues, TName>) => {
-  return (
+    ...props
+  }: ControllerProps<TFieldValues, TName>) => (
     <FormFieldContext.Provider value={{ name: props.name }}>
       <Controller {...props} />
     </FormFieldContext.Provider>
   );
-};
 
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
@@ -58,7 +56,7 @@ const useFormField = () => {
   const fieldState = getFieldState(fieldContext.name, formState);
 
   if (!fieldContext) {
-    throw new Error("useFormField should be used within <FormField>");
+    throw new Error('useFormField should be used within <FormField>');
   }
 
   const { id } = itemContext;
@@ -85,7 +83,7 @@ const FormItem = React.forwardRef<
     </FormItemContext.Provider>
   );
 });
-FormItem.displayName = "FormItem";
+FormItem.displayName = 'FormItem';
 
 interface FormLabelProps
   extends React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> {
@@ -95,15 +93,17 @@ interface FormLabelProps
 const FormLabel = React.forwardRef<
   React.ComponentRef<typeof LabelPrimitive.Root>,
   FormLabelProps
->(({ className, required, children, ...props }, ref) => {
+>(({
+  className, required, children, ...props
+}, ref) => {
   const { error, formItemId } = useFormField();
 
   return (
     <Label
       ref={ref}
       className={cn(
-        "block mb-3 body-lg font-bold text-basic-500 whitespace-nowrap",
-        error && "text-destructive",
+        'block mb-3 body-lg font-bold text-basic-500 whitespace-nowrap',
+        error && 'text-destructive',
         className
       )}
       htmlFor={formItemId}
@@ -115,14 +115,15 @@ const FormLabel = React.forwardRef<
     </Label>
   );
 });
-FormLabel.displayName = "FormLabel";
+FormLabel.displayName = 'FormLabel';
 
 const FormControl = React.forwardRef<
   React.ComponentRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField();
+  const {
+    error, formItemId, formDescriptionId, formMessageId,
+  } = useFormField();
 
   return (
     <Slot
@@ -138,7 +139,7 @@ const FormControl = React.forwardRef<
     />
   );
 });
-FormControl.displayName = "FormControl";
+FormControl.displayName = 'FormControl';
 
 const FormDescription = React.forwardRef<
   HTMLParagraphElement,
@@ -150,19 +151,19 @@ const FormDescription = React.forwardRef<
     <p
       ref={ref}
       id={formDescriptionId}
-      className={cn("block mb-3 body-lg text-basic-500", className)}
+      className={cn('block mb-3 body-lg text-basic-500', className)}
       {...props}
     />
   );
 });
-FormDescription.displayName = "FormDescription";
+FormDescription.displayName = 'FormDescription';
 
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {
   const { error, formMessageId } = useFormField();
-  const body = error ? String(error?.message ?? "") : children;
+  const body = error ? String(error?.message ?? '') : children;
 
   if (!body) {
     return null;
@@ -172,14 +173,14 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("text-[0.8rem] font-medium text-destructive", className)}
+      className={cn('text-[0.8rem] font-medium text-destructive', className)}
       {...props}
     >
       {body}
     </p>
   );
 });
-FormMessage.displayName = "FormMessage";
+FormMessage.displayName = 'FormMessage';
 
 interface ParseSchemaAutoFocusProps<
   T extends FieldValues,
@@ -204,7 +205,7 @@ function parseSchemaAutoFocus<T extends FieldValues, S extends ZodSchema>({
   }
   const { errors } = parsed.error;
 
-  const parsePath = (path: (string | number)[]) => path.join(".") as Path<T>;
+  const parsePath = (path: (string | number)[]) => path.join('.') as Path<T>;
 
   form.clearErrors();
   form.setFocus(parsePath(errors[0].path));

@@ -1,8 +1,8 @@
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
 import {
   Box,
-  Typography
-} from "@mui/material";
+  Typography,
+} from '@mui/material';
 
 const StyledGroup = styled(Box)`
   width: 100%;
@@ -77,7 +77,7 @@ export default function Spotlight() {
     <StyledGroup>
       <StyledCard sx={{
         backgroundColor: '#1F4645',
-        marginBottom: '20px'
+        marginBottom: '20px',
       }}
       >
         <StyledTitle component="h4">專業且客製化的陪跑方式</StyledTitle>
@@ -93,7 +93,7 @@ export default function Spotlight() {
       </StyledCard>
       <StyledCard
         sx={{
-          backgroundColor: '#16B9B3'
+          backgroundColor: '#16B9B3',
         }}
         className="boom"
       >

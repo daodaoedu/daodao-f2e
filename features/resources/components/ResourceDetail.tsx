@@ -1,33 +1,33 @@
-import Link from "next/link";
-import React from "react";
-import { useRouter } from "next/router";
-import { Share2, Globe, Ellipsis } from "lucide-react";
-import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Image } from "@/components/ui/image";
-import GroupSvg from "@/public/assets/icons/group.svg";
-import BoxSvg from "@/public/assets/icons/box.svg";
+import Link from 'next/link';
+import React from 'react';
+import { useRouter } from 'next/router';
+import { Share2, Globe, Ellipsis } from 'lucide-react';
+import { ResourceDetailResponseSchema } from '@/services/resources/core/schema';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Image } from '@/components/ui/image';
+import GroupSvg from '@/public/assets/icons/group.svg';
+import BoxSvg from '@/public/assets/icons/box.svg';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui";
-import { useDialog } from "@/contexts/Dialog";
-import FacebookSvg from "@/public/assets/socials-logos/facebook.svg";
-import LineSvg from "@/public/assets/socials-logos/line.svg";
-import LinkedInSvg from "@/public/assets/socials-logos/linkedin.svg";
-import ShareWindowsSvg from "@/public/assets/socials-logos/share_windows.svg";
-import ThreadsSvg from "@/public/assets/socials-logos/threads.svg";
-import XSvg from "@/public/assets/socials-logos/x.svg";
-import getShareAPI from "@/utils/getShareAPI";
+} from '@/components/ui';
+import { useDialog } from '@/contexts/Dialog';
+import FacebookSvg from '@/public/assets/socials-logos/facebook.svg';
+import LineSvg from '@/public/assets/socials-logos/line.svg';
+import LinkedInSvg from '@/public/assets/socials-logos/linkedin.svg';
+import ShareWindowsSvg from '@/public/assets/socials-logos/share_windows.svg';
+import ThreadsSvg from '@/public/assets/socials-logos/threads.svg';
+import XSvg from '@/public/assets/socials-logos/x.svg';
+import getShareAPI from '@/utils/getShareAPI';
 // import VideoSvg from "@/public/assets/icons/video.svg";
-import { resourceTypeMap, targetAudienceTypeMap } from "../constants";
+import { resourceTypeMap, targetAudienceTypeMap } from '../constants';
 
 interface ResourceDetailProps {
-  resource: ResourceDetailResponseSchema["data"];
+  resource: ResourceDetailResponseSchema['data'];
 }
 
 export default function ResourceDetail({ resource }: ResourceDetailProps) {
@@ -38,12 +38,12 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
     title: `我要分享「${resource.name}」資源`,
     text: `我要分享「${resource.name}」資源`,
     url: asPath,
-    hashtag: "#島島阿學",
+    hashtag: '#島島阿學',
   });
 
   const handleShare = () => {
     openDialog({
-      title: "分享資源",
+      title: '分享資源',
       content: (
         <div className="mb-4 flex justify-between gap-2">
           <Button
@@ -108,7 +108,9 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
           <div className="flex flex-wrap gap-2 mb-4">
             {resource.tags.map((tag) => (
               <Badge key={tag} variant="outline" className="text-primary">
-                # {tag}
+                #
+                {' '}
+                {tag}
               </Badge>
             ))}
           </div>
@@ -180,7 +182,7 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
 
       <div className="relative md:basis-80 aspect-[320/241] rounded-lg overflow-hidden">
         <Image
-          src={resource.imageUrl ?? ""}
+          src={resource.imageUrl ?? ''}
           alt={resource.name}
           className="object-cover"
           fill

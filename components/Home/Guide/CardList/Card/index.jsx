@@ -29,8 +29,7 @@ const CardWrapper = styled.li`
     transition: transform 0.4s;
   }
 
-  ${({ isShow }) =>
-    isShow &&
+  ${({ isShow }) => isShow &&
     css`
       opacity: 1;
       animation: 1.5s ${slideInUp} forwards;
@@ -94,7 +93,9 @@ const BackgroundWrapper = styled.div`
   `}
 `;
 
-const Card = ({ id, image, title, desc }) => {
+const Card = ({
+  id, image, title, desc,
+}) => {
   const router = useRouter();
   return (
     <CardWrapper

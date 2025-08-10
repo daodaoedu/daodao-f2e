@@ -1,25 +1,25 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 import {
   ArrowRight,
   Eye,
   EllipsisVertical,
   LockKeyholeOpen,
   LockKeyhole,
-} from "lucide-react";
-import Link from "next/link";
-import toast from "react-hot-toast";
-import dayjs from "dayjs";
+} from 'lucide-react';
+import Link from 'next/link';
+import toast from 'react-hot-toast';
+import dayjs from 'dayjs';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import Shell from "@/public/assets/icons/shell.svg";
-import Comment from "@/public/assets/icons/comment.svg";
-import { cn } from "@/utils/cn";
+} from '@/components/ui/dropdown-menu';
+import Shell from '@/public/assets/icons/shell.svg';
+import Comment from '@/public/assets/icons/comment.svg';
+import { cn } from '@/utils/cn';
 
 interface PostCardProps {
   className?: string;
@@ -28,7 +28,7 @@ interface PostCardProps {
 
 function PostCard({ className, children }: PostCardProps) {
   return (
-    <div className={cn("bg-basic-white rounded-2xl p-3 md:p-10", className)}>
+    <div className={cn('bg-basic-white rounded-2xl p-3 md:p-10', className)}>
       {children}
     </div>
   );
@@ -86,9 +86,9 @@ function PostCardHeader({
 
     handleResize();
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -116,8 +116,8 @@ function PostCardHeader({
         <div className="body-md text-basic-500 shrink overflow-hidden">
           <h2
             ref={titleRef}
-            className={cn("truncate", isEditable && "invisible absolute")}
-            {...(isEditable && { "aria-hidden": true })}
+            className={cn('truncate', isEditable && 'invisible absolute')}
+            {...(isEditable && { 'aria-hidden': true })}
           >
             {title}
           </h2>
@@ -140,9 +140,9 @@ function PostCardHeader({
         )}
       </div>
       <div className="flex items-center justify-between md:justify-start gap-2 text-basic-300">
-        {date && <time>{dayjs(date).format("YYYY/MM/DD")}</time>}
+        {date && <time>{dayjs(date).format('YYYY/MM/DD')}</time>}
         <div className="flex items-center gap-2">
-          {typeof viewCount === "number" && (
+          {typeof viewCount === 'number' && (
             <div className="flex items-center gap-0.5">
               <Eye className="size-5" />
               <div>{viewCount}</div>
@@ -170,7 +170,7 @@ function PostCardHeader({
                 {dropdownItems.map((item) => (
                   <DropdownMenuItem
                     key={item.key}
-                    className={cn("text-nowrap w-full", item.className)}
+                    className={cn('text-nowrap w-full', item.className)}
                     asChild
                   >
                     {item.children}
@@ -232,14 +232,18 @@ function PostCardReward({ shellCount, userName }: PostCardRewardProps) {
       <Button
         variant="ghost"
         className="px-2"
-        onClick={() => toast.error("感謝您的貝殼，但此功能尚未開放")}
+        onClick={() => toast.error('感謝您的貝殼，但此功能尚未開放')}
       >
         <Shell className="size-5" />
         {shellCount}
       </Button>
       {userName && (
         <p className="pl-2 body-sm font-normal text-basic-400">
-          給予一個或以上的貝殼，讓 {userName} 更有動力吧！
+          給予一個或以上的貝殼，讓
+          {' '}
+          {userName}
+          {' '}
+          更有動力吧！
         </p>
       )}
     </div>

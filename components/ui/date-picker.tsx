@@ -1,29 +1,31 @@
-"use client";
+'use client';
 
-import type { ControllerProps, FieldPath, FieldValues } from "react-hook-form";
-import * as React from "react";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form';
+import * as React from 'react';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
 import {
   DateRange,
   DayPickerRangeProps,
   DayPickerSingleProps,
-} from "react-day-picker";
+} from 'react-day-picker';
 
-import { cn } from "@/utils/cn";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { cn } from '@/utils/cn';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import useControlledState from "@/hooks/useControlledState";
-import { FormField, FormItem, FormLabel, FormMessage } from "./form";
+} from '@/components/ui/popover';
+import useControlledState from '@/hooks/useControlledState';
+import {
+  FormField, FormItem, FormLabel, FormMessage,
+} from './form';
 
-const defaultFormatStr = "yyyy/MM/dd";
+const defaultFormatStr = 'yyyy/MM/dd';
 
-interface DatePickerProps extends Omit<DayPickerSingleProps, "mode"> {
+interface DatePickerProps extends Omit<DayPickerSingleProps, 'mode'> {
   className?: string;
   disabled?: boolean;
   formatStr?: string;
@@ -40,7 +42,7 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
       disabled,
       formatStr = defaultFormatStr,
       withIcon,
-      placeholder = "選擇日期",
+      placeholder = '選擇日期',
       defaultValue,
       value,
       onChange,
@@ -62,9 +64,9 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
             variant="ghost"
             disabled={disabled}
             className={cn(
-              "justify-start rounded border border-basic-200",
-              !internalDate && "text-muted-foreground",
-              disabled && "border-transparent",
+              'justify-start rounded border border-basic-200',
+              !internalDate && 'text-muted-foreground',
+              disabled && 'border-transparent',
               className
             )}
           >
@@ -90,7 +92,7 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
   }
 );
 
-interface DateRangePickerProps extends Omit<DayPickerRangeProps, "mode"> {
+interface DateRangePickerProps extends Omit<DayPickerRangeProps, 'mode'> {
   className?: string;
   disabled?: boolean;
   formatStr?: string;
@@ -111,8 +113,8 @@ export const DateRangePicker = React.forwardRef<
       className,
       disabled,
       formatStr = defaultFormatStr,
-      separator = "-",
-      placeholder = "選擇日期",
+      separator = '-',
+      placeholder = '選擇日期',
       withIcon,
       defaultValue,
       value,
@@ -137,10 +139,10 @@ export const DateRangePicker = React.forwardRef<
               variant="ghost"
               disabled={disabled}
               className={cn(
-                "min-w-48 justify-start rounded border border-basic-200",
-                !internalDate && "text-muted-foreground",
-                disabled && "border-transparent disabled:opacity-100",
-                withIcon && "min-w-56",
+                'min-w-48 justify-start rounded border border-basic-200',
+                !internalDate && 'text-muted-foreground',
+                disabled && 'border-transparent disabled:opacity-100',
+                withIcon && 'min-w-56',
                 className
               )}
             >
@@ -148,7 +150,10 @@ export const DateRangePicker = React.forwardRef<
               {internalDate?.from ? (
                 internalDate.to ? (
                   <>
-                    {format(internalDate.from, formatStr)} {separator}{" "}
+                    {format(internalDate.from, formatStr)}
+                    {' '}
+                    {separator}
+                    {' '}
                     {format(internalDate.to, formatStr)}
                   </>
                 ) : (
@@ -180,25 +185,25 @@ interface DatePickerWithFormProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 > extends DatePickerProps,
-    Omit<ControllerProps<TFieldValues, TName>, "render" | "defaultValue"> {}
+    Omit<ControllerProps<TFieldValues, TName>, 'render' | 'defaultValue'> {}
 
 export const DatePickerWithForm = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 >({
-  control,
-  name,
-  ...props
-}: DatePickerWithFormProps<TFieldValues, TName>) => (
-  <FormField
-    control={control}
-    name={name}
-    render={({ field }) => (
-      <FormItem className="flex flex-col gap-1">
-        <FormLabel required>生日</FormLabel>
-        <DatePicker captionLayout="dropdown-buttons" {...field} {...props} />
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
+    control,
+    name,
+    ...props
+  }: DatePickerWithFormProps<TFieldValues, TName>) => (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className="flex flex-col gap-1">
+          <FormLabel required>生日</FormLabel>
+          <DatePicker captionLayout="dropdown-buttons" {...field} {...props} />
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );

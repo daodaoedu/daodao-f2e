@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 const screens = {
-  isXSmall: "(min-width: 420px)",
-  isSmall: "(min-width: 640px)",
-  isMedium: "(min-width: 768px)",
-  isLarge: "(min-width: 1025px)",
+  isXSmall: '(min-width: 420px)',
+  isSmall: '(min-width: 640px)',
+  isMedium: '(min-width: 768px)',
+  isLarge: '(min-width: 1025px)',
 };
 
 type Breakpoint = keyof typeof screens;
@@ -22,10 +22,10 @@ const useMediaQuery = (breakpoint: Breakpoint) => {
 
     setIsMatch(mediaQuery.matches);
 
-    mediaQuery.addEventListener("change", handleChange);
+    mediaQuery.addEventListener('change', handleChange);
 
     return () => {
-      mediaQuery.removeEventListener("change", handleChange);
+      mediaQuery.removeEventListener('change', handleChange);
     };
   }, [breakpoint]);
 

@@ -32,32 +32,29 @@ interface ButtonProps {
 
 const GoBackButton = ({
   buttonText,
-  className = "",
-  id = "",
+  className = '',
+  id = '',
   onClick = () => { },
   icon = null,
-}: ButtonProps
-) => {
-  return (
-    <button
-      id={id}
-      name={id}
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "flex flex-row items-center group",
-        className
-      )}
-    >
-      {icon && icon}
-      <span className="
+}: ButtonProps) => (
+  <button
+    id={id}
+    name={id}
+    type="button"
+    onClick={onClick}
+    className={cn(
+      'flex flex-row items-center group',
+      className
+    )}
+  >
+    {icon && icon}
+    <span className="
       text-basic-400 font-sans text-sm font-normal
       group-hover:text-primary-base"
-      >
-        {buttonText}
-      </span>
-    </button>
-  );
-};
+    >
+      {buttonText}
+    </span>
+  </button>
+);
 
 export default GoBackButton;

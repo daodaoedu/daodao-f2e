@@ -20,9 +20,7 @@ const SelectedFriendType = () => {
       items={ROLE_TYPE}
       itemValue="label"
       itemLabel="label"
-      renderValue={(selected) =>
-        selected.length === 0 ? '夥伴類型' : selected.join('、')
-      }
+      renderValue={(selected) => (selected.length === 0 ? '夥伴類型' : selected.join('、'))}
       sx={{
         '@media (max-width: 767px)': {
           width: '100%',

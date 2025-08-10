@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import { MARATHON_LINKS, NAV_LINK, USER_LINK } from "@/constants/category";
-import { useAuth, useAuthDispatch } from "@/contexts/Auth";
-import { getManageSidebarItems } from "@/layout/features/getManageLayout";
-import Collapse from "@/shared/components/Collapse";
-import Button from "@/shared/components/Button";
-import { cn } from "@/utils/cn";
-import { usePromotion } from "@/contexts/Promotion";
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
+import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import { getManageSidebarItems } from '@/layout/features/getManageLayout';
+import Collapse from '@/shared/components/Collapse';
+import Button from '@/shared/components/Button';
+import { cn } from '@/utils/cn';
+import { usePromotion } from '@/contexts/Promotion';
 
 interface OnCloseProps {
   onClose: () => void;
@@ -71,19 +71,17 @@ function ProfileMenu({ onClose }: OnCloseProps) {
     auth.isLoggedIn && (
       <nav>
         <ul className="pt-2">
-          {sidebarItems.map((item) =>
-            item.children ? null : (
-              <li key={item.label}>
-                <Link
-                  href={item.href}
-                  className="block px-4 py-2 text-basic-400"
-                  onClick={onClose}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            )
-          )}
+          {sidebarItems.map((item) => (item.children ? null : (
+            <li key={item.label}>
+              <Link
+                href={item.href}
+                className="block px-4 py-2 text-basic-400"
+                onClick={onClose}
+              >
+                {item.label}
+              </Link>
+            </li>
+          )))}
 
           {USER_LINK.map(({ name, id }) => (
             <li key={name}>
@@ -103,8 +101,8 @@ function ProfileMenu({ onClose }: OnCloseProps) {
 }
 
 enum NavType {
-  Explore = "explore",
-  Profile = "profile",
+  Explore = 'explore',
+  Profile = 'profile',
 }
 
 function MobileMenu() {
@@ -116,20 +114,20 @@ function MobileMenu() {
 
   const navList = [
     {
-      name: "探索",
+      name: '探索',
       type: NavType.Explore,
     },
     {
-      name: "關於我",
+      name: '關於我',
       type: NavType.Profile,
     },
   ];
 
   useEffect(() => {
     if (isOpenMenu) {
-      document.body.classList.add("overflow-y-hidden");
+      document.body.classList.add('overflow-y-hidden');
     } else {
-      document.body.classList.remove("overflow-y-hidden");
+      document.body.classList.remove('overflow-y-hidden');
     }
   }, [isOpenMenu]);
 
@@ -137,54 +135,54 @@ function MobileMenu() {
     <>
       <button
         type="button"
-        title="menu"
+        aria-label="menu"
         className="text-transparent flex flex-col items-center justify-center gap-1.5 size-14 overflow-hidden"
         onClick={() => setIsOpenMenu(!isOpenMenu)}
       >
         <div
           className={cn(
-            "w-6 h-0.5 bg-basic-white transition-transform origin-top-right pointer-events-none",
-            isOpenMenu ? "-rotate-45" : "rotate-0"
+            'w-6 h-0.5 bg-basic-white transition-transform origin-top-right pointer-events-none',
+            isOpenMenu ? '-rotate-45' : 'rotate-0'
           )}
         />
         <div
           className={cn(
-            "w-6 h-0.5 bg-basic-white transition-[transform,opacity] origin-left pointer-events-none",
+            'w-6 h-0.5 bg-basic-white transition-[transform,opacity] origin-left pointer-events-none',
             isOpenMenu
-              ? "translate-x-full opacity-0"
-              : "translate-x-0 opacity-100"
+              ? 'translate-x-full opacity-0'
+              : 'translate-x-0 opacity-100'
           )}
         />
         <div
           className={cn(
-            "w-6 h-0.5 bg-basic-white transition-transform origin-bottom-right pointer-events-none",
-            isOpenMenu ? "rotate-45" : "rotate-0"
+            'w-6 h-0.5 bg-basic-white transition-transform origin-bottom-right pointer-events-none',
+            isOpenMenu ? 'rotate-45' : 'rotate-0'
           )}
         />
       </button>
       <div
         className={cn(
-          "absolute top-full inset-x-0 flex flex-col body-md",
-          "bg-basic-white transition-[min-height] overflow-auto h-0"
+          'absolute top-full inset-x-0 flex flex-col body-md',
+          'bg-basic-white transition-[min-height] overflow-auto h-0'
         )}
-        style={{ minHeight: isOpenMenu ? `calc(100dvh - ${height}px)` : "0" }}
+        style={{ minHeight: isOpenMenu ? `calc(100dvh - ${height}px)` : '0' }}
       >
         {auth.isLoggedIn && (
           <div
             className={cn(
-              "relative flex mx-4 pt-1",
+              'relative flex mx-4 pt-1',
               'after:content-[""] after:absolute after:bottom-0 after:left-0',
-              "after:w-full after:h-0.5 after:bg-basic-200 after:rounded-full"
+              'after:w-full after:h-0.5 after:bg-basic-200 after:rounded-full'
             )}
           >
             {navList.map((navItem) => (
               <Button
                 key={navItem.type}
                 className={cn(
-                  "relative flex-1 flex items-center justify-center gap-1.5 py-2",
+                  'relative flex-1 flex items-center justify-center gap-1.5 py-2',
                   'after:content-[""] after:absolute after:bottom-0 after:left-0',
-                  "after:w-full after:h-0.5 after:bg-basic-200 after:rounded-full after:z-10",
-                  navItem.type === navType && "after:bg-primary-base"
+                  'after:w-full after:h-0.5 after:bg-basic-200 after:rounded-full after:z-10',
+                  navItem.type === navType && 'after:bg-primary-base'
                 )}
                 onClick={() => setNavType(navItem.type)}
               >
@@ -211,9 +209,9 @@ function MobileMenu() {
           )}
           <div
             className={cn(
-              "absolute bottom-0 left-0 right-0 flex bg-basic-white",
-              "transition-opacity opacity-0 pointer-events-none",
-              isOpenMenu && "opacity-100 pointer-events-auto"
+              'absolute bottom-0 left-0 right-0 flex bg-basic-white',
+              'transition-opacity opacity-0 pointer-events-none',
+              isOpenMenu && 'opacity-100 pointer-events-auto'
             )}
           >
             {auth.isLoggedIn ? (

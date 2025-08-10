@@ -110,8 +110,7 @@ export const ToggleProvider = ({
       const isOnLeft = anchorX + clientWidth < screenWidth;
       const isOnTop = anchorY + clientHeight < screenHeight;
 
-      const calcPX = (v: number | false) =>
-        typeof v === 'number' ? `${v}px` : undefined;
+      const calcPX = (v: number | false) => (typeof v === 'number' ? `${v}px` : undefined);
 
       setAnchorPoint({
         left: calcPX(isOnLeft && anchorX),

@@ -3,7 +3,9 @@ import { useRouter } from 'next/router';
 import { BASE_URL } from '@/constants/common';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 
-const useMutation = (url, { method, enabled = true, onSuccess, onError } = {}) => {
+const useMutation = (url, {
+  method, enabled = true, onSuccess, onError,
+} = {}) => {
   const { token } = useAuth();
   const authDispatch = useAuthDispatch();
   const router = useRouter();

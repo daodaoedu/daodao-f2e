@@ -22,7 +22,7 @@ interface Resource {
 }
 
 const SetupFlow: React.FC<SetupFlowProps> = ({
-  onComplete
+  onComplete,
 }) => {
   const router = useRouter();
   const { createPracticeFromPathInfo } = usePracticeManager();
@@ -46,7 +46,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
     reminderEnabled: false,
     reminderFrequency: 'daily',
     streak: 0,
-    lastStreakDate: ''
+    lastStreakDate: '',
   });
 
   // 新增：標籤相關狀態
@@ -114,7 +114,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
   const handlePathInfoChange = useCallback((field: keyof PathInfo, value: string | number) => {
     setPathInfo((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
 
     if (validationErrors[field]) {
@@ -150,7 +150,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
       const newResource: Resource = {
         id: Date.now(),
         name: newResourceName.trim(),
-        url: newResourceUrl.trim()
+        url: newResourceUrl.trim(),
       };
       setResources((prev) => [...prev, newResource]);
       setNewResourceName('');
@@ -194,7 +194,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
         type: dailyGoalType,
         timeMinutes: dailyGoalType === 'time' ? dailyGoalTime : undefined,
         amount: dailyGoalType === 'completion' ? dailyGoalPages : undefined,
-        unit: dailyGoalType === 'completion' ? customUnit : undefined
+        unit: dailyGoalType === 'completion' ? customUnit : undefined,
       };
 
       const practiceId = await createPracticeFromPathInfo(pathInfo, practiceAction, resources, selectedTags, dailyGoalConfig);
@@ -221,7 +221,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
     const stepProps = {
       pathInfo,
       handlePathInfoChange,
-      validationErrors
+      validationErrors,
     };
 
     switch (setupStep) {

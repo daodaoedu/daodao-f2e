@@ -95,7 +95,9 @@ const AccountSetting = () => {
           </Button>
         </Box> */}
         <Divider
-          sx={{ width: '100%', color: '#000', margin: '30px 0', height: '2px' }}
+          sx={{
+            width: '100%', color: '#000', margin: '30px 0', height: '2px',
+          }}
         />
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
           <StyledTypographyStyle sx={{ mb: '24px' }}>

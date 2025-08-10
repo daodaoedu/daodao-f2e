@@ -90,7 +90,7 @@ const Profile = ({
       imgLink: 'https://www.daoedu.tw/preview.webp',
       link: `${process.env.HOSTNAME}${router?.asPath}`,
     }),
-    [router?.asPath, name],
+    [router?.asPath, name]
   );
 
   return (
@@ -98,7 +98,7 @@ const Profile = ({
       className={cn(
         'relative min-h-screen-without-padding-top',
         'p-8 md:py-20 bg-primary-palest',
-        'flex flex-col items-center',
+        'flex flex-col items-center'
       )}
     >
       <SEOConfig {...SEOData} />
@@ -205,7 +205,9 @@ const Profile = ({
       {!isMe ? (
         <InfoCompletionGuard>
           <ContactButton
-            user={{ email, name, photoURL, roleList }}
+            user={{
+              email, name, photoURL, roleList,
+            }}
             className="!mt-12"
             dialogTitle="聯繫夥伴"
             description="邀請訊息"

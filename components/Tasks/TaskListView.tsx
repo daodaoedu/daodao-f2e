@@ -1,6 +1,6 @@
-import { useMemo } from "react";
-import { Task as TaskType } from "@/contexts/Milestones/type";
-import TaskView from "./TaskView";
+import { useMemo } from 'react';
+import { Task as TaskType } from '@/contexts/Milestones/type';
+import TaskView from './TaskView';
 
 interface TaskListViewProps {
   tasks: TaskType[];

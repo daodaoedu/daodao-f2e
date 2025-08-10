@@ -30,7 +30,9 @@ export default function PwaPrompt() {
         <Box sx={{ padding: '24px 32px 48px' }}>
           <IconButton
             onClick={() => setDrawerOpen(false)}
-            sx={{ position: 'absolute', right: 24, top: 16, zIndex: 100 }}
+            sx={{
+              position: 'absolute', right: 24, top: 16, zIndex: 100,
+            }}
           >
             <CloseIcon />
           </IconButton>

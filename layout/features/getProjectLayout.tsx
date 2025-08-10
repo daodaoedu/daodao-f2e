@@ -154,20 +154,18 @@ function ProjectLayout({ children, type }: ProjectLayoutProps) {
 
 function getProjectLayout(type: ProjectType) {
   if (type === ProjectType.Public) {
-    return (page: React.ReactElement) =>
-      getBaseLayout(
-        <ProjectProvider>
-          <ProjectLayout type={type}>{page}</ProjectLayout>
-        </ProjectProvider>
-      );
-  }
-
-  return (page: React.ReactElement) =>
-    getPrivateLayout(
+    return (page: React.ReactElement) => getBaseLayout(
       <ProjectProvider>
         <ProjectLayout type={type}>{page}</ProjectLayout>
       </ProjectProvider>
     );
+  }
+
+  return (page: React.ReactElement) => getPrivateLayout(
+    <ProjectProvider>
+      <ProjectLayout type={type}>{page}</ProjectLayout>
+    </ProjectProvider>
+  );
 }
 
 export const getAdminProjectLayout = getProjectLayout(ProjectType.Admin);

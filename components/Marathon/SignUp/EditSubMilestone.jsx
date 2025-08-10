@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
 import {
   Typography,
   Box,
@@ -14,7 +14,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import {
   ZH_WEEK_DAY_MAP,
   ISOToWeekday,
-  weekdayToISO
+  weekdayToISO,
 } from './dateMap';
 
 const StyledMenuItem = styled(MenuItem)`
@@ -249,21 +249,21 @@ export default function EditSubMilestone({
   const handleChangeWeekdays = (e) => {
     setNewMilestone({
       ...newMilestone,
-      dates: e.target.value
+      dates: e.target.value,
     });
   };
 
   const handleChangeName = (e) => {
     setNewMilestone({
       ...newMilestone,
-      name: e.target.value
+      name: e.target.value,
     });
   };
   const handleClickSendButton = () => {
     onShow(false);
     onSubmit({
       ...newMilestone,
-      _tempId: tempId
+      _tempId: tempId,
     });
   };
   const handleCloseEditPanel = () => {
@@ -293,11 +293,10 @@ export default function EditSubMilestone({
             <InputBase placeholder="自訂" startAdornment={(<CalendarTodayOutlinedIcon />)} />
           )}
           renderValue={
-            (selected) =>
-              selected?.length ? selected
-                .map((ISODate) => ISOToWeekday(ISODate))
-                .filter(Boolean)
-                .join(", ") : '自訂'
+            (selected) => (selected?.length ? selected
+              .map((ISODate) => ISOToWeekday(ISODate))
+              .filter(Boolean)
+              .join(', ') : '自訂')
           }
           sx={{
             '.MuiSelect-icon': {
@@ -311,14 +310,14 @@ export default function EditSubMilestone({
                 maxHeight: 150,
                 overflowY: 'auto',
                 scrollbarWidth: 'thin',
-                maxWidth: '140px'
+                maxWidth: '140px',
               },
             },
             MenuListProps: {
               style: {
-                padding: '0'
-              }
-            }
+                padding: '0',
+              },
+            },
           }}
         >
           {ZH_WEEK_DAY_MAP.map((zhDay) => {

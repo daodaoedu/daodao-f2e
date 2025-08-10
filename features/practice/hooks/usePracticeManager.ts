@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import {
   type PracticeFilter,
-  type CreatePracticeInput
+  type CreatePracticeInput,
 } from '@/services/practice';
 import { usePractices } from './usePractices';
 import { useFilteredPractices } from './useFilteredPractices';
@@ -13,7 +13,7 @@ export function usePracticeManager() {
     contentType: undefined,
     motivationType: undefined,
     sortBy: 'updatedAt',
-    sortOrder: 'desc'
+    sortOrder: 'desc',
   });
 
   const {
@@ -27,7 +27,7 @@ export function usePracticeManager() {
     checkIn,
     exportData,
     importData,
-    refreshPractices
+    refreshPractices,
   } = usePractices();
 
   const { practices: filteredPractices } = useFilteredPractices(filter);
@@ -43,7 +43,7 @@ export function usePracticeManager() {
       contentType: undefined,
       motivationType: undefined,
       sortBy: 'updatedAt',
-      sortOrder: 'desc'
+      sortOrder: 'desc',
     });
   }, []);
 
@@ -86,7 +86,7 @@ export function usePracticeManager() {
     refreshPractices,
 
     // 便利方法
-    createPracticeFromPathInfo
+    createPracticeFromPathInfo,
   };
 }
 

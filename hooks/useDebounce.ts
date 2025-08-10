@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef } from 'react';
 
 export default function useDebounce<Args extends unknown[], R>(
   callback: (...args: Args) => R,

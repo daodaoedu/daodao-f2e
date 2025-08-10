@@ -1,8 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { Search, Plus, Target, Filter, SortAsc, RefreshCw } from 'lucide-react';
+import {
+  Search, Plus, Target, Filter, SortAsc, RefreshCw,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card, CardContent, CardHeader, CardTitle,
+} from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -142,7 +146,9 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
               探索主題實踐
               {practices && (
                 <span className="text-sm font-normal text-basic-400">
-                  ({practices.length})
+                  (
+                  {practices.length}
+                  )
                 </span>
               )}
             </CardTitle>
@@ -250,8 +256,7 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
             <p className="text-basic-400 mb-6">
               {searchQuery
                 ? '嘗試調整搜尋關鍵字或清除篩選條件'
-                : '開始你的第一個學習實踐！'
-              }
+                : '開始你的第一個學習實踐！'}
             </p>
             {showCreateButton && (
               <Button onClick={handleCreateClick} className="flex items-center gap-2">
@@ -277,7 +282,11 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
             {practices.length > 0 && (
               <div className="text-center pt-4">
                 <p className="text-sm text-basic-400">
-                  顯示 {practices.length} 個實踐活動
+                  顯示
+                  {' '}
+                  {practices.length}
+                  {' '}
+                  個實踐活動
                 </p>
               </div>
             )}

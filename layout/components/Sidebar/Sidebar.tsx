@@ -1,20 +1,20 @@
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { ChevronLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Container from "@/shared/components/Container";
-import SidebarWrapper from "@/layout/components/Sidebar/SidebarWrapper";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { ChevronLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Container from '@/shared/components/Container';
+import SidebarWrapper from '@/layout/components/Sidebar/SidebarWrapper';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { usePromotion } from "@/contexts/Promotion";
-import { cn } from "@/utils/cn";
-import SidebarItem from "./SidebarItem";
-import SidebarLink from "./SidebarLink";
-import { SidebarItemType } from "./type";
+} from '@/components/ui/accordion';
+import { usePromotion } from '@/contexts/Promotion';
+import { cn } from '@/utils/cn';
+import SidebarItem from './SidebarItem';
+import SidebarLink from './SidebarLink';
+import { SidebarItemType } from './type';
 
 export interface SidebarLayoutProps extends React.PropsWithChildren {
   /**
@@ -39,8 +39,8 @@ export default function SidebarLayout({
   children,
   items,
   showBackButton = false,
-  backPath = "/",
-  backText = "返回",
+  backPath = '/',
+  backText = '返回',
 }: SidebarLayoutProps) {
   const { height, setIsShowShadow } = usePromotion();
   const router = useRouter();
@@ -53,8 +53,8 @@ export default function SidebarLayout({
       setIsShowShadow(window.innerWidth > 1024 ? true : !isSticky);
     };
     handleScroll();
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
@@ -79,51 +79,48 @@ export default function SidebarLayout({
             <Accordion type="single" collapsible asChild>
               <SidebarWrapper
                 className={cn(
-                  "sticky z-20 transition-transform",
-                  "top-[var(--sidebar-top)] mb-6 basis-full -order-1",
-                  "lg:top-[calc(var(--sidebar-top)+24px)] lg:mb-0 lg:basis-80 lg:order-none",
-                  hasSticky && "max-lg:scale-110"
+                  'sticky z-20 transition-transform',
+                  'top-[var(--sidebar-top)] mb-6 basis-full -order-1',
+                  'lg:top-[calc(var(--sidebar-top)+24px)] lg:mb-0 lg:basis-80 lg:order-none',
+                  hasSticky && 'max-lg:scale-110'
                 )}
                 style={
-                  { "--sidebar-top": `${height}px` } as React.CSSProperties
+                  { '--sidebar-top': `${height}px` } as React.CSSProperties
                 }
               >
-                {items.map((item) =>
-                  item.children ? (
-                    <AccordionItem key={item.label} value={item.label}>
-                      <SidebarItem>
-                        <AccordionTrigger className="w-full px-10 py-2">
-                          {item.label}
-                        </AccordionTrigger>
-                      </SidebarItem>
-                      <AccordionContent className="*:my-2 *:aria-hidden:my-0">
-                        {item.children.map(
-                          (child) =>
-                            child.href && (
-                              <SidebarLink
-                                key={child.href}
-                                className="pl-14"
-                                href={child.href}
-                                isActive={child.isActive}
-                                isDisabled={child.isDisabled}
-                              >
-                                {child.label}
-                              </SidebarLink>
-                            )
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ) : (
-                    <SidebarLink
-                      key={item.href}
-                      href={item.href}
-                      isActive={item.isActive}
-                      isDisabled={item.isDisabled}
-                    >
-                      {item.label}
-                    </SidebarLink>
-                  )
-                )}
+                {items.map((item) => (item.children ? (
+                  <AccordionItem key={item.label} value={item.label}>
+                    <SidebarItem>
+                      <AccordionTrigger className="w-full px-10 py-2">
+                        {item.label}
+                      </AccordionTrigger>
+                    </SidebarItem>
+                    <AccordionContent className="*:my-2 *:aria-hidden:my-0">
+                      {item.children.map(
+                        (child) => child.href && (
+                          <SidebarLink
+                            key={child.href}
+                            className="pl-14"
+                            href={child.href}
+                            isActive={child.isActive}
+                            isDisabled={child.isDisabled}
+                          >
+                            {child.label}
+                          </SidebarLink>
+                        )
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                ) : (
+                  <SidebarLink
+                    key={item.href}
+                    href={item.href}
+                    isActive={item.isActive}
+                    isDisabled={item.isDisabled}
+                  >
+                    {item.label}
+                  </SidebarLink>
+                )))}
               </SidebarWrapper>
             </Accordion>
           )}

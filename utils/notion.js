@@ -1,4 +1,4 @@
-import stringSanitizer from "./sanitizer";
+import stringSanitizer from './sanitizer';
 
 // language: "語言與文學",
 // math: "數學與邏輯",
@@ -12,28 +12,30 @@ import stringSanitizer from "./sanitizer";
 // business: "商業與社會創新",
 // multires: "綜合型學習資源",
 const TYPE = [
-  "language",
-  "math",
-  "comsci",
-  "natusci",
-  "humanity",
-  "art",
-  "education",
-  "life",
-  "health",
-  "business",
-  "multires",
+  'language',
+  'math',
+  'comsci',
+  'natusci',
+  'humanity',
+  'art',
+  'education',
+  'life',
+  'health',
+  'business',
+  'multires',
 ];
 
 export const searchTypeHandler = (type) => {
   if (TYPE.includes(type)) {
     return type;
   }
-  return "language";
+  return 'language';
 };
 
 export const bodyHandler = (query, nextCursor, pageSize = 100) => {
-  const { q, tags, cats, ages, fee, filter, page_size } = query;
+  const {
+    q, tags, cats, ages, fee, filter, page_size,
+  } = query;
   const body = {
     filter: {
       and: [],
@@ -56,17 +58,17 @@ export const bodyHandler = (query, nextCursor, pageSize = 100) => {
 
   // 關鍵字
   const keyword = stringSanitizer(q);
-  if (typeof keyword === "string" && keyword.length > 0) {
+  if (typeof keyword === 'string' && keyword.length > 0) {
     body.filter.and.push({
       or: [
         {
-          property: "資源名稱",
+          property: '資源名稱',
           title: {
             contains: keyword,
           },
         },
         {
-          property: "介紹",
+          property: '介紹',
           rich_text: {
             contains: keyword,
           },
@@ -76,8 +78,7 @@ export const bodyHandler = (query, nextCursor, pageSize = 100) => {
   }
 
   // 分類
-  const catTags =
-    typeof cats === "string" ? stringSanitizer(cats).split(",") : [];
+  const catTags = typeof cats === 'string' ? stringSanitizer(cats).split(',') : [];
   if (Array.isArray(catTags) && catTags.length > 0) {
     body.filter.and.push({
       or: [
@@ -85,7 +86,7 @@ export const bodyHandler = (query, nextCursor, pageSize = 100) => {
           (acc, val) => [
             ...acc,
             {
-              property: "領域名稱",
+              property: '領域名稱',
               multi_select: {
                 contains: val,
               },
@@ -98,8 +99,7 @@ export const bodyHandler = (query, nextCursor, pageSize = 100) => {
   }
 
   // 標籤
-  const queryTags =
-    typeof tags === "string" ? stringSanitizer(tags).split(",") : [];
+  const queryTags = typeof tags === 'string' ? stringSanitizer(tags).split(',') : [];
   if (Array.isArray(queryTags) && queryTags.length > 0) {
     body.filter.and.push({
       or: [
@@ -107,13 +107,13 @@ export const bodyHandler = (query, nextCursor, pageSize = 100) => {
           (acc, val) => [
             ...acc,
             {
-              property: "標籤",
+              property: '標籤',
               multi_select: {
                 contains: val,
               },
             },
             {
-              property: "資源類型",
+              property: '資源類型',
               multi_select: {
                 contains: val,
               },
@@ -126,8 +126,7 @@ export const bodyHandler = (query, nextCursor, pageSize = 100) => {
   }
 
   // 年齡層
-  const ageTags =
-    typeof ages === "string" ? stringSanitizer(ages).split(",") : [];
+  const ageTags = typeof ages === 'string' ? stringSanitizer(ages).split(',') : [];
 
   if (Array.isArray(ageTags) && ageTags.length > 0) {
     body.filter.and.push(
@@ -135,7 +134,7 @@ export const bodyHandler = (query, nextCursor, pageSize = 100) => {
         (acc, val) => [
           ...acc,
           {
-            property: "年齡層",
+            property: '年齡層',
             multi_select: {
               contains: val,
             },
@@ -147,10 +146,10 @@ export const bodyHandler = (query, nextCursor, pageSize = 100) => {
   }
 
   // 費用
-  const feeQuery = typeof fee === "string" ? stringSanitizer(fee) : "";
+  const feeQuery = typeof fee === 'string' ? stringSanitizer(fee) : '';
   if (feeQuery.length > 0) {
     body.filter.and.push({
-      property: "費用",
+      property: '費用',
       select: {
         equals: feeQuery,
       },

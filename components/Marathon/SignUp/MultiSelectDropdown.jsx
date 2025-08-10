@@ -5,7 +5,7 @@ import {
   ListItemText,
   FormControl,
   InputLabel,
-  OutlinedInput
+  OutlinedInput,
 } from '@mui/material';
 
 const StyledMenuItem = styled(MenuItem)`
@@ -28,7 +28,7 @@ export default function MultiSelectDropdown({
   selectedItems = [],
   onChange,
   placeholder,
-  type = ""
+  type = '',
 }) {
   // 設定選擇的項目
 
@@ -38,8 +38,8 @@ export default function MultiSelectDropdown({
       type,
       payload: {
         key: 'tags',
-        value
-      }
+        value,
+      },
     });
   };
 
@@ -63,27 +63,25 @@ export default function MultiSelectDropdown({
               padding: '12px',
               maxHeight: 300,
               overflowY: 'auto',
-              scrollbarWidth: 'thin'
+              scrollbarWidth: 'thin',
             },
-          }
+          },
         }}
       >
         {
-          listItems.map((item) => {
-            return (
-              <StyledMenuItem
-                key={item}
-                value={item}
-                style={{
-                  backgroundColor: selectedItems.includes(item) ? '#DEF5F5' : 'transparent',
-                }}
-              >
-                <StyledListItemText
-                  primary={item}
-                />
-              </StyledMenuItem>
-            );
-          })
+          listItems.map((item) => (
+            <StyledMenuItem
+              key={item}
+              value={item}
+              style={{
+                backgroundColor: selectedItems.includes(item) ? '#DEF5F5' : 'transparent',
+              }}
+            >
+              <StyledListItemText
+                primary={item}
+              />
+            </StyledMenuItem>
+          ))
         }
       </Select>
     </FormControl>

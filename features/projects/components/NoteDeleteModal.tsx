@@ -1,10 +1,10 @@
-import useSWRMutation from "swr/mutation";
-import ConfirmModal from "@/shared/components/Confirm";
+import useSWRMutation from 'swr/mutation';
+import ConfirmModal from '@/shared/components/Confirm';
 import {
   getProjectNotePathname,
   projectNoteAPI,
   refetchProjectNote,
-} from "@/services/projects";
+} from '@/services/projects';
 
 interface NoteDeleteModalProps {
   projectId: string;
@@ -22,7 +22,7 @@ export default function NoteDeleteModal({
   onSuccess,
 }: NoteDeleteModalProps) {
   const deleteMutation = useSWRMutation(
-    projectId && typeof noteId === "number"
+    projectId && typeof noteId === 'number'
       ? getProjectNotePathname({ projectId, noteId })
       : null,
     projectNoteAPI.delete,

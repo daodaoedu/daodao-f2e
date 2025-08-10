@@ -24,11 +24,10 @@ const usePwaInstallPrompt = () => {
     };
 
     window.addEventListener('beforeinstallprompt', beforeInstallPromptHandler);
-    return () =>
-      window.removeEventListener(
-        'beforeinstallprompt',
-        beforeInstallPromptHandler,
-      );
+    return () => window.removeEventListener(
+      'beforeinstallprompt',
+      beforeInstallPromptHandler
+    );
   }, []);
 
   const type = useMemo(() => {

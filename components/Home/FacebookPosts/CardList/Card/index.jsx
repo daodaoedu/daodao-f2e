@@ -38,34 +38,31 @@ const ContentWrapper = styled.p`
   font-size: 12px;
 `;
 
-const Card = ({ id, message = '', date }) => {
-  return (
-    <Tooltip title={message.slice(0, 150)}>
-      <CardWrapper
-        onClick={() =>
-          window.open(
-            `https://www.facebook.com/${id.split('_')[0]}/posts/${
-              id.split('_')[1]
-            }`,
-            '_target',
-          )
-        }
+const Card = ({ id, message = '', date }) => (
+  <Tooltip title={message.slice(0, 150)}>
+    <CardWrapper
+      onClick={() => window.open(
+        `https://www.facebook.com/${id.split('_')[0]}/posts/${
+          id.split('_')[1]
+        }`,
+        '_target'
+      )}
+    >
+      <Box
+        sx={{
+          // border: "1px solid #16b9b3",
+          // borderRadius: '10px'
+          fontWeight: 'bold',
+        }}
       >
-        <Box
-          sx={{
-            // border: "1px solid #16b9b3",
-            // borderRadius: '10px'
-            fontWeight: 'bold',
-          }}
-        >
-          {/* {title} */}
-          時間：{dayjs(date).format('YYYY/MM/DD')}
-        </Box>
-        <ContentWrapper>{message}</ContentWrapper>
-        {/* <Typography sx={{ color: "#16b9b3" }}>{message}</Typography> */}
-      </CardWrapper>
-    </Tooltip>
-  );
-};
+        {/* {title} */}
+        時間：
+        {dayjs(date).format('YYYY/MM/DD')}
+      </Box>
+      <ContentWrapper>{message}</ContentWrapper>
+      {/* <Typography sx={{ color: "#16b9b3" }}>{message}</Typography> */}
+    </CardWrapper>
+  </Tooltip>
+);
 
 export default Card;

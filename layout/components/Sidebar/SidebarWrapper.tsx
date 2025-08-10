@@ -1,4 +1,6 @@
-import { CSSProperties, useEffect, useRef, useState } from 'react';
+import {
+  CSSProperties, useEffect, useRef, useState,
+} from 'react';
 import { cn } from '@/utils/cn';
 
 interface SidebarWrapperProps {

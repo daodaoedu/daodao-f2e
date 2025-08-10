@@ -23,10 +23,9 @@ export class VideoObjectBuilder extends JsonLdBuilder<VideoObject> {
 
   setUploadDate(uploadDate: string | Date): this {
     if (!uploadDate) return this;
-    this.data.uploadDate =
-      uploadDate instanceof Date
-        ? uploadDate.toISOString().split("T")[0]
-        : uploadDate;
+    this.data.uploadDate = uploadDate instanceof Date
+      ? uploadDate.toISOString().split('T')[0]
+      : uploadDate;
     return this;
   }
 

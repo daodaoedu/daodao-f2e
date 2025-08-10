@@ -4,7 +4,7 @@ import { Panel } from '@/components/Projects/Project/Shared';
 import InputField from '@/components/Projects/Form/InputField';
 import MultiSelectDropdown from '@/components/Projects/Form/MultiSelectDropDown';
 import { MOTIVATION_MAP, STRATEGY_MAP, OUTCOME_MAP } from '@/constants/project';
-import { Check } from "lucide-react";
+import { Check } from 'lucide-react';
 
 interface EditModeProps {
   project: Partial<Project>;
@@ -43,7 +43,8 @@ const EditMode = ({
       <Panel className="bg-white flex flex-col gap-5">
         <h2 className="text-basic-400 font-sans heading-md">學習計畫</h2>
         <p className="text-basic-400 font-sans text-sm">
-          計劃內容在報名截止日前皆可修改。<br />
+          計劃內容在報名截止日前皆可修改。
+          <br />
           入選公告後，所有入選者及報名者亦可持續修改學習計劃
         </p>
         <InputField>

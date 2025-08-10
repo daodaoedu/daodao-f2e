@@ -8,7 +8,7 @@
     "yarn": ">=1.22.0"
   },
   "scripts": {
-    "postinstall": "husky",
+    "postinstall": "husky && npm run generate:api",
     "dev": "next dev -p 5438",
     "dev-https": "node server.js",
     "static": "serve out",
@@ -118,6 +118,7 @@
     "@babel/preset-typescript": "^7.26.0",
     "@cloudflare/next-on-pages": "^1.13.7",
     "@emotion/babel-plugin": "^11.9.2",
+    "@faker-js/faker": "^9.9.0",
     "@next/bundle-analyzer": "^15.1.6",
     "@next/eslint-plugin-next": "^15.1.7",
     "@svgr/webpack": "^8.1.0",
@@ -141,6 +142,7 @@
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^9.1.7",
+    "msw": "^2.10.4",
     "orval": "^7.11.2",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",

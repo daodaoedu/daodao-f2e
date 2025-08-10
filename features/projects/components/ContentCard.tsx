@@ -35,10 +35,9 @@ function ContentCard<T extends ContentCardData>({
 }: ContentCardProps<T>) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [showGradient, setShowGradient] = useState(false);
-  const previewContent =
-    data.content.length <= 100
-      ? data.content
-      : `${data.content.slice(0, 100)}...`;
+  const previewContent = data.content.length <= 100
+    ? data.content
+    : `${data.content.slice(0, 100)}...`;
 
   useEffect(() => {
     const checkHeight = () => {

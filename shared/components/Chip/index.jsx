@@ -1,7 +1,9 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import { DeletableChip, SwitchableChip } from './Styled';
 
-const Chip = ({ label, value, isActive, onClick, onDelete }) => {
+const Chip = ({
+  label, value, isActive, onClick, onDelete,
+}) => {
   const StyledChip = onDelete ? DeletableChip : SwitchableChip;
 
   return (

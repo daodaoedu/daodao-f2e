@@ -1,5 +1,5 @@
-import { parseToArray } from "@/utils/helper";
-import { CATEGORIES, ICategory, SEARCH_TAGS } from "@/constants/category";
+import { parseToArray } from '@/utils/helper';
+import { CATEGORIES, ICategory, SEARCH_TAGS } from '@/constants/category';
 
 export function parseCategoryHierarchy(source: string[] | null): ICategory[] {
   const data = parseToArray<keyof typeof SEARCH_TAGS>(source);

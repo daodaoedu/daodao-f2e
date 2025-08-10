@@ -24,19 +24,17 @@ export class ArticleBuilder extends JsonLdBuilder<Article> {
 
   setDatePublished(datePublished: string | Date): this {
     if (!datePublished) return this;
-    this.data.datePublished =
-      datePublished instanceof Date
-        ? datePublished.toISOString()
-        : datePublished;
+    this.data.datePublished = datePublished instanceof Date
+      ? datePublished.toISOString()
+      : datePublished;
     return this;
   }
 
   setDateModified(dateModified: string | Date): this {
     if (!dateModified) return this;
-    this.data.dateModified =
-      dateModified instanceof Date
-        ? dateModified.toISOString()
-        : dateModified;
+    this.data.dateModified = dateModified instanceof Date
+      ? dateModified.toISOString()
+      : dateModified;
     return this;
   }
 }

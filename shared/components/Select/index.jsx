@@ -41,7 +41,7 @@ export default function Select({
         },
       },
     }),
-    [width],
+    [width]
   );
 
   const getValue = (any, key) => (typeof any === 'object' ? any[key] : any);

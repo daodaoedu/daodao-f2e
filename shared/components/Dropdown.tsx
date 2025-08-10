@@ -35,7 +35,9 @@ interface DropdownProps extends Omit<DropdownContentProps, 'disableAutoClose'> {
   onChange?: (isEnabled: boolean) => void;
 }
 
-function Dropdown({ as, children, isOpen, onChange }: DropdownProps) {
+function Dropdown({
+  as, children, isOpen, onChange,
+}: DropdownProps) {
   return (
     <ToggleProvider isEnabled={isOpen} onChange={onChange}>
       <DropdownContent as={as} disableAutoClose={!!onChange}>

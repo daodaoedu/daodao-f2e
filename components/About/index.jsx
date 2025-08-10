@@ -43,23 +43,21 @@ const PaperWrapper = styled(Paper)`
   }
 `;
 
-const About = () => {
-  return (
-    <AboutWrapper>
-      <PaperWrapper>
-        <AboutUs />
-        <RealizeMore />
-        <RelatedReport />
-        <AwardInfo />
-        <AboutTeam />
-        <TechStack />
-        <NeedYou />
-        <Cooperate />
-        <Thanks />
-        <ContactUs />
-      </PaperWrapper>
-    </AboutWrapper>
-  );
-};
+const About = () => (
+  <AboutWrapper>
+    <PaperWrapper>
+      <AboutUs />
+      <RealizeMore />
+      <RelatedReport />
+      <AwardInfo />
+      <AboutTeam />
+      <TechStack />
+      <NeedYou />
+      <Cooperate />
+      <Thanks />
+      <ContactUs />
+    </PaperWrapper>
+  </AboutWrapper>
+);
 
 export default About;

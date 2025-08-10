@@ -25,15 +25,13 @@ const FooterWrapper = styled.div`
   font-weight: 500;
 `;
 
-const Card = ({ title, link, image }) => {
-  return (
-    <Link href={link} passHref>
-      <CardWrapper>
-        <ContentWrapper image={image} />
-        <FooterWrapper>{title}</FooterWrapper>
-      </CardWrapper>
-    </Link>
-  );
-};
+const Card = ({ title, link, image }) => (
+  <Link href={link} passHref>
+    <CardWrapper>
+      <ContentWrapper image={image} />
+      <FooterWrapper>{title}</FooterWrapper>
+    </CardWrapper>
+  </Link>
+);
 
 export default Card;

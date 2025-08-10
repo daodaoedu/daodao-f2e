@@ -1,13 +1,13 @@
-import { useRef } from "react";
-import { Button, type ButtonProps } from "@/components/ui/button";
+import { useRef } from 'react';
+import { Button, type ButtonProps } from '@/components/ui/button';
 
-import { GACategory, logEvent } from "@/utils/analytics";
-import { useAuth, useAuthDispatch } from "./AuthContext";
-import { Callbacks } from "./type";
+import { GACategory, logEvent } from '@/utils/analytics';
+import { useAuth, useAuthDispatch } from './AuthContext';
+import { Callbacks } from './type';
 
 interface AuthButtonProps
-  extends Omit<ButtonProps, "asChild">,
-    Pick<Callbacks, "registerCallback"> {}
+  extends Omit<ButtonProps, 'asChild'>,
+    Pick<Callbacks, 'registerCallback'> {}
 
 export const AuthButton = ({
   onClick,
@@ -19,21 +19,21 @@ export const AuthButton = ({
   const { openLoginModal } = useAuthDispatch();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const buttonText = buttonRef.current?.textContent ?? "Unknown Button";
+    const buttonText = buttonRef.current?.textContent ?? 'Unknown Button';
 
     if (isLoggedIn) {
       onClick?.(event);
     } else {
       logEvent(
         GACategory.User,
-        "Auth Button Clicked",
+        'Auth Button Clicked',
         `Button Text: ${buttonText}`
       );
       openLoginModal({
         successCallback: () => {
           logEvent(
             GACategory.User,
-            "Login Success",
+            'Login Success',
             `Button Text: ${buttonText}`
           );
           onClick?.(event);
@@ -41,7 +41,7 @@ export const AuthButton = ({
         registerCallback: (callback) => {
           logEvent(
             GACategory.User,
-            "Register Start",
+            'Register Start',
             `Button Text: ${buttonText}`
           );
           if (registerCallback) {

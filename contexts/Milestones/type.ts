@@ -9,7 +9,7 @@ export interface Task {
 
 export const DEFAULT_TASK: Task = {
   id: 0,
-  name: "",
+  name: '',
   daysOfWeek: [],
   isCompleted: false,
   milestoneId: 0,
@@ -32,14 +32,14 @@ export interface Milestone {
 
 export const DEFAULT_MILESTONE: Milestone = {
   id: 0,
-  projectId: "",
+  projectId: '',
   position: 1000,
-  name: "",
-  startDate: "",
-  endDate: "",
+  name: '',
+  startDate: '',
+  endDate: '',
   isCompleted: false,
   isDeleted: false,
-  createdAt: "2025-02-04T15:17:35.846Z",
-  updatedAt: "2025-02-04T15:17:35.846Z",
-  tasks: []
+  createdAt: '2025-02-04T15:17:35.846Z',
+  updatedAt: '2025-02-04T15:17:35.846Z',
+  tasks: [],
 };

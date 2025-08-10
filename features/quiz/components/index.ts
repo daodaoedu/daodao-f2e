@@ -1,2 +1,2 @@
-export * from "./Styled";
-export * from "./ResultChart";
+export * from './Styled';
+export * from './ResultChart';

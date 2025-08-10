@@ -31,15 +31,13 @@ const BackgroundFilterWrapper = styled.div`
   opacity: 0.4;
   /* backdrop-filter: blur(10px); */
 `;
-const BannerVideo = () => {
-  return (
-    <BannerVideoWrapper>
-      <video autoPlay muted loop playsInline preload="auto">
-        <source src="/assets/daodao-banner.webm" type="video/webm" />
-      </video>
-      <BackgroundFilterWrapper />
-    </BannerVideoWrapper>
-  );
-};
+const BannerVideo = () => (
+  <BannerVideoWrapper>
+    <video autoPlay muted loop playsInline preload="auto">
+      <source src="/assets/daodao-banner.webm" type="video/webm" />
+    </video>
+    <BackgroundFilterWrapper />
+  </BannerVideoWrapper>
+);
 
 export default BannerVideo;

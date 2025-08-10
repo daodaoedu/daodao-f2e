@@ -1,24 +1,24 @@
-import Link from "next/link";
-import Image from "@/shared/components/Image";
-import { format } from "date-fns";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Hot from "@/public/assets/icons/hot.svg";
-import Group from "@/public/assets/icons/group.svg";
-import View from "@/public/assets/icons/view.svg";
-import Comment from "@/public/assets/icons/comment.svg";
-import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
-import More from "@/public/assets/icons/more.svg";
-import dayjs from "dayjs";
-import { cn } from "@/utils/cn";
+import Link from 'next/link';
+import Image from '@/shared/components/Image';
+import { format } from 'date-fns';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Hot from '@/public/assets/icons/hot.svg';
+import Group from '@/public/assets/icons/group.svg';
+import View from '@/public/assets/icons/view.svg';
+import Comment from '@/public/assets/icons/comment.svg';
+import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
+import More from '@/public/assets/icons/more.svg';
+import dayjs from 'dayjs';
+import { cn } from '@/utils/cn';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { targetAudienceTypeMap } from "../constants";
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { targetAudienceTypeMap } from '../constants';
 
 export function ResourceCardSkeleton() {
   return (
@@ -60,22 +60,22 @@ export default function ResourceCard(props: CardProps) {
     userName,
     userAvatar,
     time,
-    title = "",
-    content = "",
-    coverImageUrl = "",
+    title = '',
+    content = '',
+    coverImageUrl = '',
     tags = [],
     label = [],
-    level = "初級",
-    viewCount = "尚未計算",
+    level = '初級',
+    viewCount = '尚未計算',
     commentCount = 12,
   } = props;
 
   const isNewResource = dayjs(time).isBetween(
-    dayjs().subtract(1, "month"),
+    dayjs().subtract(1, 'month'),
     dayjs()
   );
 
-  const labels = isNewResource ? ["近期新增", ...label] : label;
+  const labels = isNewResource ? ['近期新增', ...label] : label;
 
   return (
     <Link
@@ -97,17 +97,15 @@ export default function ResourceCard(props: CardProps) {
 
         {/* Card Image Label */}
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-          {labels.map((_label) => {
-            return (
-              <div
-                key={_label}
-                className="bg-tips text-base leading-[1.5rem] text-white rounded-lg h-8 flex items-center gap-1 px-1"
-              >
-                <Hot />
-                {_label}
-              </div>
-            );
-          })}
+          {labels.map((_label) => (
+            <div
+              key={_label}
+              className="bg-tips text-base leading-[1.5rem] text-white rounded-lg h-8 flex items-center gap-1 px-1"
+            >
+              <Hot />
+              {_label}
+            </div>
+          ))}
         </div>
       </div>
 
@@ -117,7 +115,7 @@ export default function ResourceCard(props: CardProps) {
         <div className="flex justify-between items-center h-9">
           <div className="flex items-center body-md text-basic-500">
             <Avatar>
-              <AvatarImage src={userAvatar ?? ""} />
+              <AvatarImage src={userAvatar ?? ''} />
               <AvatarFallback>
                 <DefaultAvatar />
               </AvatarFallback>
@@ -132,20 +130,18 @@ export default function ResourceCard(props: CardProps) {
 
         {/* Card Tags */}
         <div className="flex gap-1 flex-wrap">
-          {tags.map((tag) => {
-            return (
-              <div
-                key={tag}
-                className={cn(
-                  "px-3 py-0.5 text-primary-base flex items-center justify-center text-nowrap",
-                  "rounded-2xl bg-white border border-solid border-primary-base"
-                )}
-              >
-                <span className="font-bold">#</span>
-                {tag}
-              </div>
-            );
-          })}
+          {tags.map((tag) => (
+            <div
+              key={tag}
+              className={cn(
+                'px-3 py-0.5 text-primary-base flex items-center justify-center text-nowrap',
+                'rounded-2xl bg-white border border-solid border-primary-base'
+              )}
+            >
+              <span className="font-bold">#</span>
+              {tag}
+            </div>
+          ))}
         </div>
 
         <div className="body-lg line-clamp-2 md:line-clamp-3">{content}</div>
@@ -172,7 +168,7 @@ export default function ResourceCard(props: CardProps) {
                 <Comment />
                 <div>{commentCount}</div>
               </div>
-              <div>{time ? format(time, "yyyy/MM/dd") : ""}</div>
+              <div>{time ? format(time, 'yyyy/MM/dd') : ''}</div>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

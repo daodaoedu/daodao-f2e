@@ -54,9 +54,7 @@ export const useDraggableContainer = <T>({
 }: UseDraggableContainerProps<T>) => {
   const [activeId, setActiveId] = useState<string | number | null>(null);
   const [overId, setOverId] = useState<string | number | null>(null);
-  const [items, setItems] = useState<T[]>(() =>
-    Array.isArray(initialItems) ? initialItems : []
-  );
+  const [items, setItems] = useState<T[]>(() => (Array.isArray(initialItems) ? initialItems : []));
 
   useEffect(() => {
     if (Array.isArray(initialItems)) {
@@ -73,8 +71,7 @@ export const useDraggableContainer = <T>({
       const { active, over } = event;
 
       if (over && active.id !== over.id) {
-        const findItemById = (id: string | number) => (item: T) =>
-          getItemId(item) === id;
+        const findItemById = (id: string | number) => (item: T) => getItemId(item) === id;
         const oldIndex = items.findIndex(findItemById(active.id));
         const newIndex = items.findIndex(findItemById(over.id));
 

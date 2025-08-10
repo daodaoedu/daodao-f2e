@@ -22,7 +22,9 @@ const SubHeaderWrapper = styled.h3`
     flex-direction: column;
   }
 `;
-const CardList = ({ title, list, direction = 'left', isLoading }) => {
+const CardList = ({
+  title, list, direction = 'left', isLoading,
+}) => {
   if (isLoading) {
     return (
       <Box sx={{ marginTop: '20px' }}>
@@ -79,7 +81,9 @@ const CardList = ({ title, list, direction = 'left', isLoading }) => {
         direction={direction}
       >
         <CardListWrapper>
-          {list.map(({ id, message, created_time, updated_time }) => (
+          {list.map(({
+            id, message, created_time, updated_time,
+          }) => (
             <Card
               key={id}
               id={id}

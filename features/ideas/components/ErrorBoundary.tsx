@@ -74,27 +74,25 @@ interface NetworkErrorProps {
 export const NetworkError: React.FC<NetworkErrorProps> = ({
   onRetry,
   isRetrying = false,
-  message = '網路連線出現問題'
-}) => {
-  return (
-    <div className="flex flex-col items-center justify-center p-8 text-center bg-white rounded-lg border border-basic-200">
-      <AlertTriangle className="h-12 w-12 text-orange-500 mb-4" />
-      <h3 className="text-lg font-semibold text-basic-500 mb-2">連線問題</h3>
-      <p className="text-sm text-basic-400 mb-4">{message}</p>
-      {onRetry && (
-        <Button
-          onClick={onRetry}
-          disabled={isRetrying}
-          variant="outline"
-          className="border-basic-200 text-basic-500 hover:bg-basic-100"
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${isRetrying ? 'animate-spin' : ''}`} />
-          {isRetrying ? '重試中...' : '重新連線'}
-        </Button>
-      )}
-    </div>
-  );
-};
+  message = '網路連線出現問題',
+}) => (
+  <div className="flex flex-col items-center justify-center p-8 text-center bg-white rounded-lg border border-basic-200">
+    <AlertTriangle className="h-12 w-12 text-orange-500 mb-4" />
+    <h3 className="text-lg font-semibold text-basic-500 mb-2">連線問題</h3>
+    <p className="text-sm text-basic-400 mb-4">{message}</p>
+    {onRetry && (
+    <Button
+      onClick={onRetry}
+      disabled={isRetrying}
+      variant="outline"
+      className="border-basic-200 text-basic-500 hover:bg-basic-100"
+    >
+      <RefreshCw className={`h-4 w-4 mr-2 ${isRetrying ? 'animate-spin' : ''}`} />
+      {isRetrying ? '重試中...' : '重新連線'}
+    </Button>
+    )}
+  </div>
+);
 
 // Hook for network retry logic
 export const useNetworkRetry = (retryFn: () => Promise<void>) => {

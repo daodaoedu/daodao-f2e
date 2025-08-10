@@ -74,7 +74,9 @@ export default function SelectProjectModal({
                 onClick={() => handleSelect(project)}
               >
                 <div>
-                  {index + 1}. {project.title}
+                  {index + 1}
+                  .
+                  {project.title}
                 </div>
                 <time className="body-sm text-basic-300">
                   {dayjs(project.createdDate).format('YYYY/MM/DD')}

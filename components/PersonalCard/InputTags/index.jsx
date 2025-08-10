@@ -1,42 +1,42 @@
 import styled from '@emotion/styled';
-import { TextField, Box, Typography, Icon } from '@mui/material';
+import {
+  TextField, Box, Typography, Icon,
+} from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { forwardRef } from 'react';
 
-const Tag = ({ label, onCancel }) => {
-  return (
-    <Box
+const Tag = ({ label, onCancel }) => (
+  <Box
+    sx={{
+      display: 'flex',
+      alignItems: 'center',
+      color: '#293A3D',
+      bgcolor: '#DEF5F5',
+      borderRadius: '4px',
+      padding: '4px 8px',
+      mr: '8px',
+      mb: '8px',
+    }}
+  >
+    <Typography
       sx={{
-        display: 'flex',
-        alignItems: 'center',
-        color: '#293A3D',
-        bgcolor: '#DEF5F5',
-        borderRadius: '4px',
-        padding: '4px 8px',
-        mr: '8px',
-        mb: '8px',
+        whiteSpace: 'nowrap',
+        paddingRight: '2px',
+        fontWeight: 400,
+        fontSize: '14px',
+        lineHeight: '140%',
+        mr: '4px',
       }}
     >
-      <Typography
-        sx={{
-          whiteSpace: 'nowrap',
-          paddingRight: '2px',
-          fontWeight: 400,
-          fontSize: '14px',
-          lineHeight: '140%',
-          mr: '4px',
-        }}
-      >
-        {label}
-      </Typography>
-      <Icon
-        sx={{ cursor: 'pointer', fontSize: '12px' }}
-        component={CloseOutlinedIcon}
-        onClick={onCancel}
-      />
-    </Box>
-  );
-};
+      {label}
+    </Typography>
+    <Icon
+      sx={{ cursor: 'pointer', fontSize: '12px' }}
+      component={CloseOutlinedIcon}
+      onClick={onCancel}
+    />
+  </Box>
+);
 
 const StyledTagsWrapper = styled(Box)`
   width: 100%;
@@ -77,10 +77,9 @@ function InputTags({ value = [], change }, ref) {
       >
         {Array.isArray(value) &&
           value.map(
-            (item) =>
-              typeof item === 'string' && (
-                <Tag key={item} label={item} onCancel={() => change(item)} />
-              ),
+            (item) => typeof item === 'string' && (
+            <Tag key={item} label={item} onCancel={() => change(item)} />
+            )
           )}
         <TextField
           inputRef={ref}

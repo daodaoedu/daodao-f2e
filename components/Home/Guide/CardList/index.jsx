@@ -1,9 +1,6 @@
 import { useRef } from 'react';
 import styled from '@emotion/styled';
-// import { css } from "@emotion/react";
-// import { slideInUp } from "../../../../shared/styles/animation";
 import Card from './Card';
-// import useIntersectionObserver from "../../../../hooks/useIntersectionObserver";
 
 const CardListWrapper = styled.ul`
   display: flex;
@@ -35,13 +32,7 @@ const data = [
 ];
 
 const CardList = () => {
-  // const [isShow, setIsShow] = useState(false);
   const trigger = useRef();
-
-  // useIntersectionObserver({
-  //   onIntersect: () => setIsShow(true),
-  //   target: trigger,
-  // });
 
   return (
     <CardListWrapper ref={trigger}>

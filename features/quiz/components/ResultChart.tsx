@@ -4,9 +4,9 @@ import {
   PolarRadiusAxis,
   Radar,
   RadarChart,
-} from "recharts";
-import { ChartContainer } from "@/components/ui/chart";
-import { AnalysisType } from "../constants";
+} from 'recharts';
+import { ChartContainer } from '@/components/ui/chart';
+import { AnalysisType } from '../constants';
 
 interface ResultChartProps {
   analysis: AnalysisType;
@@ -20,11 +20,11 @@ export const ResultChart = ({
   className,
 }: ResultChartProps) => {
   const data = [
-    { key: "探究", value: analysis.D },
-    { key: "行動", value: analysis.A },
-    { key: "結構", value: analysis.O },
-    { key: "跨域", value: analysis.L },
-    { key: "連結", value: analysis.C },
+    { key: '探究', value: analysis.D },
+    { key: '行動', value: analysis.A },
+    { key: '結構', value: analysis.O },
+    { key: '跨域', value: analysis.L },
+    { key: '連結', value: analysis.C },
   ];
 
   return (
@@ -32,7 +32,9 @@ export const ResultChart = ({
       <RadarChart data={data}>
         <PolarAngleAxis
           dataKey="key"
-          tick={({ x, y, textAnchor, index, ...props }) => {
+          tick={({
+            x, y, textAnchor, index, ...props
+          }) => {
             const chartData = data[index];
             const diffX = index > 2 ? 4 : -4;
             return (

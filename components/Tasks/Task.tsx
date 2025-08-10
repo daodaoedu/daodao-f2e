@@ -1,17 +1,19 @@
-import toast from "react-hot-toast";
-import React, { useState } from "react";
-import { Check, Calendar, SendHorizonal, X, Pencil, Trash } from "lucide-react";
-import { cn } from "@/utils/cn";
-import { useMilestones } from "@/contexts/Milestones/index";
-import { Task as TaskType } from "@/contexts/Milestones/type";
-import { Button } from "@/components/ui/button";
+import toast from 'react-hot-toast';
+import React, { useState } from 'react';
+import {
+  Check, Calendar, SendHorizonal, X, Pencil, Trash,
+} from 'lucide-react';
+import { cn } from '@/utils/cn';
+import { useMilestones } from '@/contexts/Milestones/index';
+import { Task as TaskType } from '@/contexts/Milestones/type';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useDialog } from "@/contexts/Dialog";
+} from '@/components/ui/dropdown-menu';
+import { useDialog } from '@/contexts/Dialog';
 
 interface TaskProps {
   index?: number;
@@ -23,28 +25,28 @@ interface TaskProps {
 }
 
 const WEEKDAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
 ];
 
 // 加入 dayMap 用於本地化轉換
 const dayMap: { [key: string]: string } = {
-  Monday: "週一",
-  Tuesday: "週二",
-  Wednesday: "週三",
-  Thursday: "週四",
-  Friday: "週五",
-  Saturday: "週六",
-  Sunday: "週日",
+  Monday: '週一',
+  Tuesday: '週二',
+  Wednesday: '週三',
+  Thursday: '週四',
+  Friday: '週五',
+  Saturday: '週六',
+  Sunday: '週日',
 };
 
-const DEFAULT_TASK: Omit<TaskType, "id"> = {
-  name: "",
+const DEFAULT_TASK: Omit<TaskType, 'id'> = {
+  name: '',
   daysOfWeek: [],
   isCompleted: false,
   position: 1000,
@@ -60,10 +62,11 @@ const Task = ({
   onRefreshData,
 }: TaskProps) => {
   const isCreating = !task;
-  const { createTask, dispatchTask, deleteTask, fetchMilestones } =
-    useMilestones();
+  const {
+    createTask, dispatchTask, deleteTask, fetchMilestones,
+  } = useMilestones();
   const [isEditing, setIsEditing] = useState(false);
-  const [newTask, setNewTask] = useState<Omit<TaskType, "id">>(
+  const [newTask, setNewTask] = useState<Omit<TaskType, 'id'>>(
     task ?? DEFAULT_TASK
   );
   const { openDialog } = useDialog();
@@ -74,14 +77,14 @@ const Task = ({
       : await dispatchTask(projectId, milestoneId, newTask);
 
     if (success) {
-      toast.success(isCreating ? "任務新增成功" : "任務更新成功");
+      toast.success(isCreating ? '任務新增成功' : '任務更新成功');
       setIsEditing(false);
       fetchMilestones(projectId);
       onCancel?.();
       onRefreshData?.();
     } else {
       toast.error(
-        isCreating ? "任務新增失敗，請稍後再試" : "任務更新失敗，請稍後再試"
+        isCreating ? '任務新增失敗，請稍後再試' : '任務更新失敗，請稍後再試'
       );
     }
   };
@@ -103,8 +106,8 @@ const Task = ({
     }
 
     const result = await openDialog({
-      title: "取消編輯",
-      content: "取消編輯後，會恢復原本的任務，確定要取消嗎？",
+      title: '取消編輯',
+      content: '取消編輯後，會恢復原本的任務，確定要取消嗎？',
     });
 
     if (result) {
@@ -124,11 +127,11 @@ const Task = ({
     });
 
     if (success) {
-      toast.success("任務更新成功");
+      toast.success('任務更新成功');
       fetchMilestones(projectId);
       onRefreshData?.();
     } else {
-      toast.error("任務更新失敗，請稍後再試");
+      toast.error('任務更新失敗，請稍後再試');
     }
   };
 
@@ -140,20 +143,20 @@ const Task = ({
     if (isCreating) return;
 
     const result = await openDialog({
-      title: "刪除任務",
-      content: "刪除後無法恢復，確定要刪除嗎？",
-      confirmText: "確定",
-      cancelText: "取消",
+      title: '刪除任務',
+      content: '刪除後無法恢復，確定要刪除嗎？',
+      confirmText: '確定',
+      cancelText: '取消',
     });
 
     if (result) {
       const success = await deleteTask(projectId, milestoneId, task);
       if (success) {
-        toast.success("任務刪除成功");
+        toast.success('任務刪除成功');
         fetchMilestones(projectId);
         onRefreshData?.();
       } else {
-        toast.error("任務刪除失敗，請稍後再試");
+        toast.error('任務刪除失敗，請稍後再試');
       }
     }
   };
@@ -172,7 +175,7 @@ const Task = ({
       <div className="flex flex-row items-center justify-between">
         {isCreating || isEditing ? (
           <div className="flex-1 flex flex-col md:flex-row items-center  md:justify-between gap-1">
-            {typeof index === "number" && (
+            {typeof index === 'number' && (
               <span className="text-sm text-text-primary w-5 text-center shrink-0">
                 {`${index + 1}.`}
               </span>
@@ -182,10 +185,10 @@ const Task = ({
               name="name"
               id="name"
               className={cn(
-                "-m-px font-sans text-sm text-basic-400",
-                "w-full rounded-md pl-6 pr-2 py-2 border border-solid border-basic-200"
+                '-m-px font-sans text-sm text-basic-400',
+                'w-full rounded-md pl-6 pr-2 py-2 border border-solid border-basic-200'
               )}
-              value={newTask.name || ""}
+              value={newTask.name || ''}
               onChange={handleChangeInput}
             />
             <DropdownMenu>
@@ -196,9 +199,9 @@ const Task = ({
                     <span className="truncate">
                       {newTask.daysOfWeek?.length > 0
                         ? newTask.daysOfWeek
-                            .map((enDay) => dayMap[enDay])
-                            .join("、")
-                        : "選擇日期"}
+                          .map((enDay) => dayMap[enDay])
+                          .join('、')
+                        : '選擇日期'}
                     </span>
                   </div>
                 </div>
@@ -212,9 +215,9 @@ const Task = ({
                       aria-selected={newTask.daysOfWeek?.includes(day)}
                       onClick={() => handleDaySelect(day)}
                       className={cn(
-                        "my-0.5",
+                        'my-0.5',
                         newTask.daysOfWeek?.includes(day) &&
-                          "bg-primary-lightest text-primary-base"
+                          'bg-primary-lightest text-primary-base'
                       )}
                     >
                       {dayMap[day]}
@@ -227,10 +230,10 @@ const Task = ({
               <button
                 type="button"
                 className={cn(
-                  "shrink-0 font-sans text-lg",
-                  "w-6 h-6 rounded-sm",
-                  "flex items-center justify-center",
-                  "bg-basic-200 text-basic-300 hover:bg-primary-base hover:text-white"
+                  'shrink-0 font-sans text-lg',
+                  'w-6 h-6 rounded-sm',
+                  'flex items-center justify-center',
+                  'bg-basic-200 text-basic-300 hover:bg-primary-base hover:text-white'
                 )}
                 onClick={handleClickCancel}
               >
@@ -239,10 +242,10 @@ const Task = ({
               <button
                 type="button"
                 className={cn(
-                  "shrink-0 font-sans text-lg",
-                  "w-6 h-6 rounded-sm",
-                  "flex items-center justify-center",
-                  "bg-basic-200 text-basic-300 hover:bg-primary-base hover:text-white"
+                  'shrink-0 font-sans text-lg',
+                  'w-6 h-6 rounded-sm',
+                  'flex items-center justify-center',
+                  'bg-basic-200 text-basic-300 hover:bg-primary-base hover:text-white'
                 )}
                 onClick={handleClickUpdate}
               >
@@ -280,16 +283,16 @@ const Task = ({
                 </p>
               </label>
               <p className="font-sans flex-1 py-2 body-sm text-basic-400 truncate">
-                {task.name || ""}
+                {task.name || ''}
               </p>
               <div className="flex flex-row gap-1 ml-auto">
                 <button
                   type="button"
                   className={cn(
-                    "shrink-0 font-sans text-lg",
-                    "w-6 h-6 rounded-sm",
-                    "flex items-center justify-center",
-                    "bg-basic-200 text-basic-300 hover:bg-primary-base hover:text-white"
+                    'shrink-0 font-sans text-lg',
+                    'w-6 h-6 rounded-sm',
+                    'flex items-center justify-center',
+                    'bg-basic-200 text-basic-300 hover:bg-primary-base hover:text-white'
                   )}
                   onClick={handleClickDelete}
                 >
@@ -298,10 +301,10 @@ const Task = ({
                 <button
                   type="button"
                   className={cn(
-                    "shrink-0 font-sans text-lg",
-                    "w-6 h-6 rounded-sm",
-                    "flex items-center justify-center",
-                    "bg-basic-200 text-basic-300 hover:bg-primary-base hover:text-white"
+                    'shrink-0 font-sans text-lg',
+                    'w-6 h-6 rounded-sm',
+                    'flex items-center justify-center',
+                    'bg-basic-200 text-basic-300 hover:bg-primary-base hover:text-white'
                   )}
                   onClick={handleClickEdit}
                 >
@@ -313,8 +316,8 @@ const Task = ({
               <div className="flex items-center gap-1 mt-1 ml-7 text-sm text-text-secondary">
                 <Calendar className="w-4 h-4 text-[#92989A] shrink-0" />
                 <span>
-                  {task.daysOfWeek?.map((enDay) => dayMap[enDay])?.join("、") ??
-                    ""}
+                  {task.daysOfWeek?.map((enDay) => dayMap[enDay])?.join('、') ??
+                    ''}
                 </span>
               </div>
             )}

@@ -9,13 +9,11 @@ const TagListWrapper = styled.div`
   flex-wrap: wrap;
 `;
 
-const TagList = ({ list, onSearch }) => {
-  return (
-    <TagListWrapper>
-      {Array.isArray(list) &&
+const TagList = ({ list, onSearch }) => (
+  <TagListWrapper>
+    {Array.isArray(list) &&
         list.map((tag) => <Tags key={tag} name={tag} onSearch={onSearch} />)}
-    </TagListWrapper>
-  );
-};
+  </TagListWrapper>
+);
 
 export default TagList;

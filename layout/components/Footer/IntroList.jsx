@@ -18,38 +18,36 @@ const IntroListWrapper = styled.div`
   }
 `;
 
-const IntroList = ({ list }) => {
-  return (
-    <IntroListWrapper>
-      <ul>
-        {list.map(({ name, link, target }) => (
-          <li key={name}>
-            {target === '_self' ? (
-              <Link href={link} passHref>
-                <Typography
-                  sx={{
-                    fontSize: '16px',
-                  }}
-                >
-                  {name}
-                </Typography>
-              </Link>
-            ) : (
-              <a href={link} target="_blank" rel="noopener noreferrer">
-                <Typography
-                  sx={{
-                    fontSize: '16px',
-                  }}
-                >
-                  {name}
-                </Typography>
-              </a>
-            )}
-          </li>
-        ))}
-      </ul>
-    </IntroListWrapper>
-  );
-};
+const IntroList = ({ list }) => (
+  <IntroListWrapper>
+    <ul>
+      {list.map(({ name, link, target }) => (
+        <li key={name}>
+          {target === '_self' ? (
+            <Link href={link} passHref>
+              <Typography
+                sx={{
+                  fontSize: '16px',
+                }}
+              >
+                {name}
+              </Typography>
+            </Link>
+          ) : (
+            <a href={link} target="_blank" rel="noopener noreferrer">
+              <Typography
+                sx={{
+                  fontSize: '16px',
+                }}
+              >
+                {name}
+              </Typography>
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  </IntroListWrapper>
+);
 
 export default IntroList;

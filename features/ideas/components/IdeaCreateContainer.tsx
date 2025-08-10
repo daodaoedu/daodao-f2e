@@ -22,7 +22,9 @@ export const IdeaCreateContainer: React.FC<IdeaCreateContainerProps> = ({
   className,
 }) => {
   const { addIdeaToCache } = useIdeasCache();
-  const { createIdea, isCreating, uploadProgress, error } = useIdeaActions({
+  const {
+    createIdea, isCreating, uploadProgress, error,
+  } = useIdeaActions({
     onSuccess: () => {
       // 成功回調在 handleSubmit 中處理
     },
@@ -52,7 +54,8 @@ export const IdeaCreateContainer: React.FC<IdeaCreateContainerProps> = ({
               正在處理你的想法...
             </span>
             <span className="text-sm text-gray-500">
-              {Math.round(uploadProgress)}%
+              {Math.round(uploadProgress)}
+              %
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">

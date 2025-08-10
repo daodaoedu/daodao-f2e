@@ -78,7 +78,9 @@ const MyNote = ({ title, sx, userId }) => {
     <StyledGroupsWrapper sx={sx}>
       {title && (
         <Typography
-          sx={{ fontSize: '22px', color: '#536166', fontWeight: 700, mb: 1 }}
+          sx={{
+            fontSize: '22px', color: '#536166', fontWeight: 700, mb: 1,
+          }}
         >
           {title}
         </Typography>

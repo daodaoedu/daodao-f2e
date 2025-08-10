@@ -6,7 +6,7 @@ import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined
 import {
   Grid,
   IconButton,
-  Typography
+  Typography,
 } from '@mui/material';
 import EditSubMilestone from './EditSubMilestone';
 import { ISOToWeekday } from './dateMap';
@@ -139,14 +139,14 @@ export default function SubMilestonePanel({
   index,
   onChange = null,
   onDelete,
-  isDisabled = false
+  isDisabled = false,
 }) {
   const [/** newMilestone */, setNewMilestone] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const formattedWeekdays = subMilestone.dates
     .map((ISODate) => ISOToWeekday(ISODate))
     .filter(Boolean)
-    .join(", ");
+    .join(', ');
 
   const handleDelete = () => {
     onDelete(subMilestone);
@@ -159,8 +159,8 @@ export default function SubMilestonePanel({
   }, [subMilestone]);
   return (
     <>
-      {isEditing ?
-        (
+      {isEditing
+        ? (
           <EditSubMilestone
             milestone={subMilestone}
             index={index}

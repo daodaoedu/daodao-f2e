@@ -1,18 +1,18 @@
 import { v4 as uuidv4 } from 'uuid';
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import {
   Box,
   TextField,
   MenuItem,
   Typography,
-} from "@mui/material";
+} from '@mui/material';
 import dayjs from 'dayjs';
 import { DatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { StyledGroup } from "./Edit.styled";
-import MilestonePanel from "./MilestonePanel";
+import { StyledGroup } from './Edit.styled';
+import MilestonePanel from './MilestonePanel';
 import ErrorMessage from './ErrorMessage';
 
 const StyledDateSection = styled(Box)`
@@ -42,7 +42,7 @@ export default function MilestoneGroup({
   milestones = [],
   onChangeHandler = null,
   isDisabled = false,
-  errorMessage = null
+  errorMessage = null,
 }) {
   const eventWeekRange = 22;
   const [startDate, setStartDate] = useState('2025-02-09');
@@ -50,14 +50,14 @@ export default function MilestoneGroup({
   const [frequency, setFrequency] = useState('biweekly');
 
   function arabicToChinese(num) {
-    const digits = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
+    const digits = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
 
     if (num < 1 || num > 100 || !Number.isInteger(num)) {
-      return "Input Number must >= 1 && =< 100";
+      return 'Input Number must >= 1 && =< 100';
     }
 
     if (num === 100) {
-      return "一百";
+      return '一百';
     }
 
     const tens = Math.floor(num / 10);
@@ -67,9 +67,9 @@ export default function MilestoneGroup({
       return digits[ones];
     }
     if (tens === 1) {
-      return ones === 0 ? "十" : `十${digits[ones]}`;
+      return ones === 0 ? '十' : `十${digits[ones]}`;
     }
-    return `${digits[tens]}十${ones === 0 ? "" : digits[ones]}`;
+    return `${digits[tens]}十${ones === 0 ? '' : digits[ones]}`;
   }
   function calculateMilestones(
     dateToStart = '2025-02-09',
@@ -93,7 +93,7 @@ export default function MilestoneGroup({
         name: existingMilestone.name || '',
         startDate: start.format('YYYY-MM-DD'),
         endDate: end.format('YYYY-MM-DD'),
-        subMilestones: newSubMilestones
+        subMilestones: newSubMilestones,
       });
     }
 
@@ -112,9 +112,7 @@ export default function MilestoneGroup({
   };
 
   const updateMilestone = (newMilestone) => {
-    const changedMilestones = milestones.map((item) => {
-      return (item._tempId === newMilestone._tempId ? newMilestone : item);
-    });
+    const changedMilestones = milestones.map((item) => (item._tempId === newMilestone._tempId ? newMilestone : item));
     onChangeHandler('milestonesName', changedMilestones);
   };
   useEffect(() => {
@@ -142,7 +140,9 @@ export default function MilestoneGroup({
         學習里程碑 *
       </Typography>
       <Typography
-        sx={{ color: '#92989A', fontWeight: 400, fontSize: '14px', mb: '8px' }}
+        sx={{
+          color: '#92989A', fontWeight: 400, fontSize: '14px', mb: '8px',
+        }}
       >
         請依據時間與精力設定里程碑（入選後時程表須包含每兩週需繳交的學習任務）
       </Typography>
@@ -166,7 +166,7 @@ export default function MilestoneGroup({
                       height: '50px',
                       '& .MuiInputBase-root': {
                         height: '100%',
-                      }
+                      },
                     }}
                   />
                 )}
@@ -211,7 +211,7 @@ export default function MilestoneGroup({
                   height: '50px',
                   '& .MuiInputBase-root': {
                     height: '100%',
-                  }
+                  },
                 }}
               >
                 <MenuItem value="weekly">每週</MenuItem>

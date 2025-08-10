@@ -29,7 +29,11 @@ function CommentSection({ targetId, targetType }: CommentSectionProps) {
         <>
           <div className="pt-2 mb-2 flex items-center gap-0.5 body-md text-basic-500 border-t border-solid border-basic-200">
             <Comment />
-            <span>回覆 ({comments.length})</span>
+            <span>
+              回覆 (
+              {comments.length}
+              )
+            </span>
           </div>
           {Array.isArray(comments) && comments.length > 0 && (
             <div className="px-8 py-6 flex flex-col gap-4 border border-solid border-basic-200 rounded-lg">

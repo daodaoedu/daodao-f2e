@@ -1,8 +1,8 @@
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
 import {
   Box,
-  Typography
-} from "@mui/material";
+  Typography,
+} from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 const StyledGroup = styled(Box)`
@@ -262,7 +262,7 @@ export default function Apply() {
           marginBottom: '8px',
           borderRadius: '4px',
           backgroundColor: '#FFF',
-          padding: '10px 20px'
+          padding: '10px 20px',
         }}
         >
           <Typography
@@ -271,7 +271,7 @@ export default function Apply() {
               fontSize: '16px',
               fontWeight: '700',
               color: '#536166',
-              lineHeight: '140%'
+              lineHeight: '140%',
             }}
           >
             線上課時間
@@ -298,7 +298,7 @@ export default function Apply() {
         <Box sx={{
           borderRadius: '4px',
           backgroundColor: '#FFF',
-          padding: '10px 20px'
+          padding: '10px 20px',
         }}
         >
           <Typography
@@ -307,7 +307,7 @@ export default function Apply() {
               fontSize: '16px',
               fontWeight: '700',
               color: '#536166',
-              lineHeight: '140%'
+              lineHeight: '140%',
             }}
           >
             社群交流線上與實體時間

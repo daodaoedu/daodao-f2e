@@ -24,10 +24,9 @@ export class SearchResultsPageBuilder extends JsonLdBuilder<SearchResultsPage> {
 
   setLastReviewed(lastReviewed: string | Date): this {
     if (!lastReviewed) return this;
-    this.data.lastReviewed =
-      lastReviewed instanceof Date
-        ? lastReviewed.toISOString()
-        : lastReviewed;
+    this.data.lastReviewed = lastReviewed instanceof Date
+      ? lastReviewed.toISOString()
+      : lastReviewed;
     return this;
   }
 

@@ -1,13 +1,13 @@
-import useSWR from "swr";
-import useSWRMutation from "swr/mutation";
-import ResponsiveModal, { ResponsiveModalSize } from "@/components/ui/responsive-modal";
+import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
 import {
   getProjectNotePathname,
   projectNoteAPI,
   ProjectNoteSchema,
   refetchProjectNote,
-} from "@/services/projects";
-import NoteForm from "./NoteForm";
+} from '@/services/projects';
+import NoteForm from './NoteForm';
 
 interface NoteUpdateModalProps {
   noteId: number;
@@ -27,13 +27,13 @@ export default function NoteUpdateModal({
   onSuccess,
 }: NoteUpdateModalProps) {
   const { data: note } = useSWR<ProjectNoteSchema>(
-    projectId && typeof noteId === "number"
+    projectId && typeof noteId === 'number'
       ? getProjectNotePathname({ projectId, noteId })
       : null
   );
 
   const updateMutation = useSWRMutation(
-    projectId && typeof noteId === "number"
+    projectId && typeof noteId === 'number'
       ? getProjectNotePathname({ projectId, noteId })
       : null,
     projectNoteAPI.update,

@@ -1,11 +1,11 @@
-import React from "react";
-import { Plus } from "lucide-react";
-import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
-import { AuthButton } from "@/contexts/Auth";
-import ResourceReviewCard from "./ResourceReviewCard";
+import React from 'react';
+import { Plus } from 'lucide-react';
+import { ResourceDetailResponseSchema } from '@/services/resources/core/schema';
+import { AuthButton } from '@/contexts/Auth';
+import ResourceReviewCard from './ResourceReviewCard';
 
 interface ResourceReviewListProps {
-  resource: ResourceDetailResponseSchema["data"];
+  resource: ResourceDetailResponseSchema['data'];
   onCreateReview: () => void;
 }
 

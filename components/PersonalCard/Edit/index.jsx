@@ -72,7 +72,9 @@ function EditPage() {
     if (user?._id) {
       Object.entries(user).forEach(([key, value]) => {
         if (key === 'contactList') {
-          const { instagram, facebook, discord, line } = value;
+          const {
+            instagram, facebook, discord, line,
+          } = value;
           onChangeHandler({ key: 'instagram', value: instagram || '' });
           onChangeHandler({ key: 'facebook', value: facebook || '' });
           onChangeHandler({ key: 'discord', value: discord || '' });
@@ -158,9 +160,7 @@ function EditPage() {
                 <MobileDatePicker
                   inputFormat="YYYY/MM/DD"
                   value={userState.birthDay}
-                  onChange={(date) =>
-                    onChangeHandler({ key: 'birthDay', value: date })
-                  }
+                  onChange={(date) => onChangeHandler({ key: 'birthDay', value: date })}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -208,13 +208,11 @@ function EditPage() {
                       col={mobileScreen ? '2' : '3'}
                       key={label}
                       isselected={userState.roleList.includes(value).toString()}
-                      onClick={() =>
-                        onChangeHandler({
-                          key: 'roleList',
-                          value,
-                          isMultiple: true,
-                        })
-                      }
+                      onClick={() => onChangeHandler({
+                        key: 'roleList',
+                        value,
+                        isMultiple: true,
+                      })}
                     >
                       <StyledSelectText
                         isselected={userState.roleList
@@ -321,7 +319,7 @@ function EditPage() {
                         <em>鄉鎮市區</em>
                       </MenuItem>
                       {TAIWAN_DISTRICT.find(
-                        ({ name }) => name === userState.city,
+                        ({ name }) => name === userState.city
                       )?.districts.map(({ name, zip }) => (
                         <MenuItem key={zip} value={name}>
                           {name}
@@ -367,8 +365,8 @@ function EditPage() {
                       errors[key]
                         ? errors[key]
                         : errors.socialCode
-                        ? '請填寫您的 ID'
-                        : ''
+                          ? '請填寫您的 ID'
+                          : ''
                     }
                   />
                 </Grid>
@@ -444,8 +442,7 @@ function EditPage() {
                 helperText="可以是學習領域、興趣等等的標籤，例如：音樂創作、程式語言、電繪、社會議題。"
                 control={{
                   setRef: (name, element) => setRef(name, element),
-                  onChange: ({ target }) =>
-                    onChangeHandler({ key: target.name, value: target.value }),
+                  onChange: ({ target }) => onChangeHandler({ key: target.name, value: target.value }),
                 }}
               />
               <ErrorMessage errText={errors.tagList} />

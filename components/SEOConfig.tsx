@@ -1,4 +1,6 @@
-import type { WithContext, Thing, WebSite, Graph } from 'schema-dts';
+import type {
+  WithContext, Thing, WebSite, Graph,
+} from 'schema-dts';
 import React from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -81,10 +83,9 @@ export default function SEOConfig({
 
   const link = originLink ?? `${process.env.HOSTNAME}${router?.asPath}`;
 
-  const keywords =
-    typeof originKeywords === 'string'
-      ? originKeywords
-      : originKeywords?.join(', ');
+  const keywords = typeof originKeywords === 'string'
+    ? originKeywords
+    : originKeywords?.join(', ');
 
   return (
     <Head>

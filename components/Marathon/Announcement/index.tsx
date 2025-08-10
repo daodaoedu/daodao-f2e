@@ -10,60 +10,58 @@ type AnnouncementItem = {
   times: string
 };
 
-const ReadOnlyMarkdownEditor = ({ value }: { value: string }) => {
-  return (
-    <div className="prose max-w-none">
-      <MarkdownEditor
-        readOnly
-        value={value}
-        className=""
-        hasHeadings={false}
-        placeholder=""
-        rootClassName=""
-        editorClassName=""
-        onChange={() => {}}
-      />
-    </div>
-  );
-};
+const ReadOnlyMarkdownEditor = ({ value }: { value: string }) => (
+  <div className="prose max-w-none">
+    <MarkdownEditor
+      readOnly
+      value={value}
+      className=""
+      hasHeadings={false}
+      placeholder=""
+      rootClassName=""
+      editorClassName=""
+      onChange={() => {}}
+    />
+  </div>
+);
 
-const Tag = ({ tag }: { tag: string }) => {
-  return (
-    <div className="flex gap-2">
-      <div
-        key={tag}
-        className="px-2.5 py-[3px] text-xs text-basic-400 bg-primary-lightest rounded-[13px]"
+const Tag = ({ tag }: { tag: string }) => (
+  <div className="flex gap-2">
+    <div
+      key={tag}
+      className="px-2.5 py-[3px] text-xs text-basic-400 bg-primary-lightest rounded-[13px]"
+    >
+      {tag}
+    </div>
+  </div>
+);
+
+const AnnouncementList = ({ items }: { items: AnnouncementItem[] }) => (
+  <div className="flex flex-col gap-3 my-6">
+    {items.map(({
+      id, tag, times, title,
+    }) => (
+      <Link
+        href={`/learning-marathon/announcements/${id}`}
+        key={id}
+        className="text-start p-6 bg-white shadow-md shadow-basic-black/10 rounded-[10px] flex flex-col gap-3"
       >
-        {tag}
-      </div>
-    </div>
-  );
-};
-
-const AnnouncementList = ({ items }: { items: AnnouncementItem[] }) => {
-  return (
-    <div className="flex flex-col gap-3 my-6">
-      {items.map(({ id, tag, times, title }) => (
-        <Link
-          href={`/learning-marathon/announcements/${id}`}
-          key={id}
-          className="text-start p-6 bg-white shadow-md shadow-basic-black/10 rounded-[10px] flex flex-col gap-3"
-        >
-          <h4 className="text-basic-400 body-sm font-normal">{title}</h4>
-          <div className="flex justify-between flex-wrap">
-            <div className="md:w-full">
-              <Tag tag={tag} />
-            </div>
-            <p className="text-basic-300 body-sm">{times}</p>
+        <h4 className="text-basic-400 body-sm font-normal">{title}</h4>
+        <div className="flex justify-between flex-wrap">
+          <div className="md:w-full">
+            <Tag tag={tag} />
           </div>
-        </Link>
-      ))}
-    </div>
-  );
-};
+          <p className="text-basic-300 body-sm">{times}</p>
+        </div>
+      </Link>
+    ))}
+  </div>
+);
 
 const AnnouncementDetail = ({ item }: { item: AnnouncementItem }) => {
-  const { author, content, tag, times, title } = item;
+  const {
+    author, content, tag, times, title,
+  } = item;
 
   return (
     <div className="bg-white h-fit p-6">

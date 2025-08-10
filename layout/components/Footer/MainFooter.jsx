@@ -89,27 +89,25 @@ const socialConfig = [
   },
 ];
 
-const SubFooter = () => {
-  return (
-    <MainFooterWrapper>
-      <BlockWrapper>
-        {/* //img */}
-        <LogoWrapper>
-          <img src="/new-logo-vertical.png" alt="daodao" width="120" height="123" />
-        </LogoWrapper>
-      </BlockWrapper>
-      <BlockWrapper>
-        {/* 連結 */}
-        <IntroList title="關於島島阿學" list={aboutDaoConfig} />
-        <IntroList title="找資源" list={FOOTER_LINK} />
-        <IntroList title="訂閱電子報" list={socialConfig} />
-      </BlockWrapper>
-      <BlockWrapper>
-        {/* 追蹤島島 */}
-        <IconList title="追蹤島島" list={iconListConfig} />
-      </BlockWrapper>
-    </MainFooterWrapper>
-  );
-};
+const SubFooter = () => (
+  <MainFooterWrapper>
+    <BlockWrapper>
+      {/* //img */}
+      <LogoWrapper>
+        <img src="/new-logo-vertical.png" alt="daodao" width="120" height="123" />
+      </LogoWrapper>
+    </BlockWrapper>
+    <BlockWrapper>
+      {/* 連結 */}
+      <IntroList title="關於島島阿學" list={aboutDaoConfig} />
+      <IntroList title="找資源" list={FOOTER_LINK} />
+      <IntroList title="訂閱電子報" list={socialConfig} />
+    </BlockWrapper>
+    <BlockWrapper>
+      {/* 追蹤島島 */}
+      <IconList title="追蹤島島" list={iconListConfig} />
+    </BlockWrapper>
+  </MainFooterWrapper>
+);
 
 export default SubFooter;

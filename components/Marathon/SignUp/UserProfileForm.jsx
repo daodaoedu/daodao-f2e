@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { TAIWAN_DISTRICT, COUNTRIES, AREA_DELIMITER, TAIWAN_OPTION } from '@/constants/areas';
+import {
+  TAIWAN_DISTRICT, COUNTRIES, AREA_DELIMITER, TAIWAN_OPTION,
+} from '@/constants/areas';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
@@ -63,12 +65,12 @@ export default function UserProfileForm({
   } = useEditProfile();
 
   const { data: user } = useAuth();
-  const { data: marathonState } = useMarathonByUserEvent(user._id, "2025S1");
+  const { data: marathonState } = useMarathonByUserEvent(user._id, '2025S1');
   const onUpdateUser = async () => {
     const resultStatus = await onEditSubmit({
       id: user._id,
       email: user.email,
-      type: 'update'
+      type: 'update',
     });
 
     setHasClickNextStep(true);
@@ -85,7 +87,7 @@ export default function UserProfileForm({
     const resultStatus = await onEditSubmit({
       id: user._id,
       email: user.email,
-      type: 'create'
+      type: 'create',
     });
     setHasClickNextStep(true);
     if (Object.values(errors).length) {
@@ -109,7 +111,9 @@ export default function UserProfileForm({
     if (user._id) {
       Object.entries(user).forEach(([key, value]) => {
         if (key === 'contactList') {
-          const { instagram, facebook, discord, line } = value;
+          const {
+            instagram, facebook, discord, line,
+          } = value;
           onChangeHandler({ key: 'instagram', value: instagram || '' });
           onChangeHandler({ key: 'facebook', value: facebook || '' });
           onChangeHandler({ key: 'discord', value: discord || '' });
@@ -194,9 +198,7 @@ export default function UserProfileForm({
             <MobileDatePicker
               inputFormat="YYYY/MM/DD"
               value={userState.birthDay}
-              onChange={(date) =>
-                onChangeHandler({ key: 'birthDay', value: date })
-              }
+              onChange={(date) => onChangeHandler({ key: 'birthDay', value: date })}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -244,13 +246,11 @@ export default function UserProfileForm({
                   col={mobileScreen ? '2' : '3'}
                   key={label}
                   isselected={userState.roleList.includes(value).toString()}
-                  onClick={() =>
-                    onChangeHandler({
-                      key: 'roleList',
-                      value,
-                      isMultiple: true,
-                    })
-                  }
+                  onClick={() => onChangeHandler({
+                    key: 'roleList',
+                    value,
+                    isMultiple: true,
+                  })}
                 >
                   <StyledSelectText
                     isselected={userState.roleList
@@ -357,7 +357,7 @@ export default function UserProfileForm({
                     <em>鄉鎮市區</em>
                   </MenuItem>
                   {TAIWAN_DISTRICT.find(
-                    ({ value }) => value === userState.city,
+                    ({ value }) => value === userState.city
                   )?.districts.map(({ name, zip }) => (
                     <MenuItem key={zip} value={name}>
                       {name}

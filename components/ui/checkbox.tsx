@@ -1,22 +1,22 @@
-import type { FieldPath, FieldValues } from "react-hook-form";
-import * as React from "react";
-import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
-import { Check } from "lucide-react";
+import type { FieldPath, FieldValues } from 'react-hook-form';
+import * as React from 'react';
+import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
+import { Check } from 'lucide-react';
 
-import { cn } from "@/utils/cn";
+import { cn } from '@/utils/cn';
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "./form";
+} from './form';
 import {
   defaultRenderOption,
   Option,
   OptionProps,
   OptionWithFormProps,
-} from "./option";
+} from './option';
 
 const Checkbox = React.forwardRef<
   React.ComponentRef<typeof CheckboxPrimitive.Root>,
@@ -25,13 +25,13 @@ const Checkbox = React.forwardRef<
   <CheckboxPrimitive.Root
     ref={ref}
     className={cn(
-      "peer h-4 w-4 shrink-0 rounded-sm border border-basic-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-primary-foreground",
+      'peer h-4 w-4 shrink-0 rounded-sm border border-basic-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-primary-foreground',
       className
     )}
     {...props}
   >
     <CheckboxPrimitive.Indicator
-      className={cn("flex items-center justify-center text-current")}
+      className={cn('flex items-center justify-center text-current')}
     >
       <Check className="h-4 w-4" />
     </CheckboxPrimitive.Indicator>
@@ -44,14 +44,13 @@ const CheckboxWithForm = <
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
   TOption extends OptionProps = OptionProps
 >({
-  options,
-  label,
-  required,
-  className,
-  renderOption = defaultRenderOption,
-  ...props
-}: OptionWithFormProps<TFieldValues, TName, TOption>) => {
-  return (
+    options,
+    label,
+    required,
+    className,
+    renderOption = defaultRenderOption,
+    ...props
+  }: OptionWithFormProps<TFieldValues, TName, TOption>) => (
     <FormField
       {...props}
       render={({ field }) => (
@@ -94,7 +93,6 @@ const CheckboxWithForm = <
       )}
     />
   );
-};
-CheckboxWithForm.displayName = "CheckboxWithForm";
+CheckboxWithForm.displayName = 'CheckboxWithForm';
 
 export { Checkbox, CheckboxWithForm };

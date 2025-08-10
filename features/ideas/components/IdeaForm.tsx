@@ -1,4 +1,6 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, {
+  useState, useCallback, useRef, useEffect,
+} from 'react';
 import Link from 'next/link';
 import { useFieldArray } from 'react-hook-form';
 import {
@@ -17,17 +19,19 @@ import {
 import Image from '@/shared/components/Image';
 import type {
   CreateIdeaFormSchema,
-  UpdateIdeaFormSchema
+  UpdateIdeaFormSchema,
 } from '@/services/ideas';
 import {
   useIdeaFormValidation,
-  useUpdateIdeaFormValidation
+  useUpdateIdeaFormValidation,
 } from '@/features/ideas/hooks/useIdeaFormValidation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import {
+  Tooltip, TooltipContent, TooltipTrigger, TooltipProvider,
+} from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 
 // 預設標籤 - 參考 mobile.jsx 的分類系統
@@ -43,7 +47,7 @@ const DEFAULT_TAGS = [
   { value: 'design-thinking', label: '設計思維', category: 'design' },
   { value: 'startup', label: '創業', category: 'business' },
   { value: 'time-management', label: '時間管理', category: 'productivity' },
-  { value: 'ai', label: '人工智慧', category: 'tech' }
+  { value: 'ai', label: '人工智慧', category: 'tech' },
 ];
 
 // 標籤分類色彩系統 - 使用專案配色
@@ -56,7 +60,7 @@ const getTagCategoryColor = (category: string) => {
     education: 'bg-primary-palest text-primary-base border-primary-lighter',
     creativity: 'bg-tips/10 text-tips border-tips/30',
     productivity: 'bg-basic-200 text-basic-400 border-basic-300',
-    custom: 'bg-basic-100 text-basic-400 border-basic-200'
+    custom: 'bg-basic-100 text-basic-400 border-basic-200',
   };
   return colors[category] || colors.custom;
 };
@@ -67,7 +71,7 @@ const getResourceIcon = (type: string) => {
     article: <FileText size={16} />,
     course: <Video size={16} />,
     book: <BookOpen size={16} />,
-    website: <Globe size={16} />
+    website: <Globe size={16} />,
   };
   return icons[type] || <LinkIcon size={16} />;
 };
@@ -115,7 +119,9 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
   const form = useIdeaFormValidation();
 
   // Field array for resources
-  const { fields, append, remove, update } = useFieldArray({
+  const {
+    fields, append, remove, update,
+  } = useFieldArray({
     control: form.control,
     name: 'ideaResources',
   });
@@ -150,13 +156,11 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
       setSelectedFiles(files);
 
       // 生成預覽圖片
-      const readers = files.map((file) => {
-        return new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(file);
-        });
-      });
+      const readers = files.map((file) => new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      }));
 
       Promise.all(readers).then((urls) => {
         setPreviewImages(urls);
@@ -279,10 +283,10 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                 <div className="flex items-start">
                   {/* 動態高度的垂直線 */}
                   <div
-                    className={`w-0.5 bg-basic-300 rounded-full mr-4 transition-all duration-200 mt-4 ${watchedContent && watchedContent.split('\n').length > 5 ? 'h-32' :
-                        watchedContent && watchedContent.split('\n').length > 3 ? 'h-24' :
-                          watchedContent && watchedContent.split('\n').length > 1 ? 'h-16' : 'h-8'
-                      }`}
+                    className={`w-0.5 bg-basic-300 rounded-full mr-4 transition-all duration-200 mt-4 ${watchedContent && watchedContent.split('\n').length > 5 ? 'h-32'
+                      : watchedContent && watchedContent.split('\n').length > 3 ? 'h-24'
+                        : watchedContent && watchedContent.split('\n').length > 1 ? 'h-16' : 'h-8'
+                    }`}
                   />
                   <div className="flex-1">
                     <Textarea
@@ -292,7 +296,8 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                       maxLength={5000}
                     />
                     <div className="text-xs text-basic-400 mt-2 text-right">
-                      {charactersUsed}/5000
+                      {charactersUsed}
+                      /5000
                     </div>
                   </div>
                 </div>
@@ -300,7 +305,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
 
               {/* Action Buttons - 使用共用組件 */}
               <div className={`flex items-center space-x-2 relative transition-all duration-200 ml-5 ${charactersUsed > 0 ? 'mt-6' : 'mt-2'
-                }`}
+              }`}
               >
                 <TooltipProvider>
                   <Tooltip>
@@ -520,7 +525,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                                 setEditResourceData((prev) => ({ ...prev, url: e.target.value }));
                                 setUrlError('');
                               }}
-                              className={urlError ? "border-red-500" : "border-basic-200"}
+                              className={urlError ? 'border-red-500' : 'border-basic-200'}
                             />
                             {urlError && (
                               <p className="text-xs text-red-500 mt-1">{urlError}</p>
@@ -654,7 +659,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                       }
                       const newResource = {
                         name: newResourceName,
-                        url: newResourceUrl
+                        url: newResourceUrl,
                       };
                       append(newResource);
                       setNewResourceName('');
@@ -676,7 +681,11 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
               <div className="flex items-center p-3 bg-primary-base/5 rounded-lg mt-4">
                 <Lightbulb size={16} className="mr-2 text-primary-base" />
                 <span className="text-xs text-basic-600">
-                  根據你的標籤，這個想法可能會幫助到 <strong>15-20 位</strong> 對相關主題有興趣的夥伴
+                  根據你的標籤，這個想法可能會幫助到
+                  {' '}
+                  <strong>15-20 位</strong>
+                  {' '}
+                  對相關主題有興趣的夥伴
                 </span>
               </div>
             )}
@@ -756,7 +765,9 @@ const IdeaUpdateForm: React.FC<IdeaUpdateFormProps> = ({
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="content" className="text-sm text-basic-500">
-                想法內容 <span className="text-red-500">*</span>
+                想法內容
+                {' '}
+                <span className="text-red-500">*</span>
               </Label>
               <Textarea
                 id="content"

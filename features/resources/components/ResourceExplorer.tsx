@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { resourceSearchParamsSchema } from "@/services/resources";
-import { ICategory } from "@/constants/category";
-import { Container } from "@/components/ui/wrapper";
-import useQueryState from "@/hooks/useQueryState";
-import ResourceSearchBar from "./ResourceSearchBar";
-import ResourceContainer from "./ResourceContainer";
-import { useResourceList } from "../hooks";
+import { Button } from '@/components/ui/button';
+import { resourceSearchParamsSchema } from '@/services/resources';
+import { ICategory } from '@/constants/category';
+import { Container } from '@/components/ui/wrapper';
+import useQueryState from '@/hooks/useQueryState';
+import ResourceSearchBar from './ResourceSearchBar';
+import ResourceContainer from './ResourceContainer';
+import { useResourceList } from '../hooks';
 
 interface ResourceExplorerProps {
   categories?: ICategory[];
@@ -36,7 +36,9 @@ export default function ResourceExplorer({
 
       {filters.query && (
         <Container className="text-basic-500 body-sm pb-6">
-          "{filters.query}" 共搜尋到
+          "
+          {filters.query}
+          " 共搜尋到
           <span className="mx-1 text-primary-base font-bold">{totalCount}</span>
           筆
         </Container>

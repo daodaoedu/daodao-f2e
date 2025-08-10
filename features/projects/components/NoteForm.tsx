@@ -1,20 +1,20 @@
-import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { X } from "lucide-react";
-import dayjs from "dayjs";
-import PostCard from "@/shared/components/Post/PostCard";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import toast from 'react-hot-toast';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { X } from 'lucide-react';
+import dayjs from 'dayjs';
+import PostCard from '@/shared/components/Post/PostCard';
+import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/form';
 import {
   projectNoteFormSchema,
   ProjectNoteFormSchema,
-} from "@/services/projects";
-import numberToChineseNumber from "@/utils/numberToChineseNumber";
-import Image from "@/shared/components/Image";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
-import Upload, { ImageDataType } from "@/shared/components/Upload";
+} from '@/services/projects';
+import numberToChineseNumber from '@/utils/numberToChineseNumber';
+import Image from '@/shared/components/Image';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import Upload, { ImageDataType } from '@/shared/components/Upload';
 
 interface NoteFormProps {
   projectTitle: string;
@@ -34,20 +34,19 @@ export default function NoteForm({
   onSubmit,
 }: NoteFormProps) {
   const [images, setImages] = useState<ImageDataType[]>(
-    () =>
-      defaultValues?.imgUrls?.map((imgUrl) => ({
-        url: imgUrl,
-        id: crypto.randomUUID(),
-      })) ?? []
+    () => defaultValues?.imgUrls?.map((imgUrl) => ({
+      url: imgUrl,
+      id: crypto.randomUUID(),
+    })) ?? []
   );
 
   const methods = useForm({
     resolver: zodResolver(projectNoteFormSchema),
     defaultValues: {
       title: projectTitle,
-      date: dayjs(createdAt || undefined).format("YYYY-MM-DD"),
+      date: dayjs(createdAt || undefined).format('YYYY-MM-DD'),
       week,
-      content: "",
+      content: '',
       imgUrls: [],
       ...defaultValues,
     },
@@ -56,7 +55,7 @@ export default function NoteForm({
   const handleImageChange = (files: ImageDataType[]) => {
     const updatedImages = [...images, ...files];
     if (updatedImages.length > 5) {
-      toast.error("最多只能上傳5張圖片");
+      toast.error('最多只能上傳5張圖片');
       return;
     }
     setImages(updatedImages);
@@ -68,13 +67,13 @@ export default function NoteForm({
 
   useEffect(() => {
     methods.setValue(
-      "imgUrls",
+      'imgUrls',
       images
-        .filter((image) => image.url.startsWith("http"))
+        .filter((image) => image.url.startsWith('http'))
         .map((image) => image.url)
     );
     methods.setValue(
-      "imgFiles",
+      'imgFiles',
       images
         .filter((image): image is Required<ImageDataType> => !!image.file)
         .map((image) => image.file)
@@ -86,13 +85,11 @@ export default function NoteForm({
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <PostCard className="p-0 md:p-0">
           <PostCard.Header
-            title={methods.watch("title")}
+            title={methods.watch('title')}
             subtitle={`第${numberToChineseNumber(week)}週`}
             tag="便利貼"
-            date={dayjs(createdAt).format("YYYY/MM/DD")}
-            onTitleChange={(title) =>
-              methods.setValue("title", title || projectTitle)
-            }
+            date={dayjs(createdAt).format('YYYY/MM/DD')}
+            onTitleChange={(title) => methods.setValue('title', title || projectTitle)}
             isEditable
           />
         </PostCard>
@@ -100,10 +97,10 @@ export default function NoteForm({
           rootClassName="p-px mb-2 bg-basic-200 rounded-md"
           className="bg-white rounded-md"
           editorClassName="min-h-80 max-w-full"
-          ref={(element) => methods.register("content").ref(element)}
-          value={methods.watch("content")}
+          ref={(element) => methods.register('content').ref(element)}
+          value={methods.watch('content')}
           placeholder="請填寫便利貼內容"
-          onChange={(markdown) => methods.setValue("content", markdown)}
+          onChange={(markdown) => methods.setValue('content', markdown)}
         />
         <div className="px-2">
           {Array.isArray(images) &&

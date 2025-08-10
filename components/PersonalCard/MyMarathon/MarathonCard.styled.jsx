@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import {
   Box,
-  MenuItem
+  MenuItem,
 } from '@mui/material';
 
 export const StyledGroupsWrapper = styled.div`

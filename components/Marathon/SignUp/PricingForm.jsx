@@ -1,4 +1,4 @@
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
 import {
   Typography,
   FormControlLabel,
@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 
 import {
-  StyledInputBase
+  StyledInputBase,
 } from './Edit.styled';
 
 const StyledRadioGroup = styled(RadioGroup)`
@@ -50,7 +50,7 @@ const StyledNote = styled(Typography)`
 export default function PricingForm({
   pricing,
   onChange,
-  type
+  type,
 }) {
   const handleCheckOption = (e) => {
     onChange({
@@ -61,9 +61,9 @@ export default function PricingForm({
           ...pricing,
           option: e.target.value,
           email: [],
-          file: ""
-        }
-      }
+          file: '',
+        },
+      },
     });
   };
   const handleChangeFile = (e) => {
@@ -73,9 +73,9 @@ export default function PricingForm({
         key: 'pricing',
         value: {
           ...pricing,
-          file: e.target.value
-        }
-      }
+          file: e.target.value,
+        },
+      },
     });
   };
 
@@ -88,9 +88,9 @@ export default function PricingForm({
         key: 'pricing',
         value: {
           ...pricing,
-          email: emails
-        }
-      }
+          email: emails,
+        },
+      },
     });
   };
 
@@ -107,13 +107,13 @@ export default function PricingForm({
               (
                 <Radio
                   onChange={handleCheckOption}
-                  checked={(pricing.option === "中低收入戶：將提供三位免費參與資格")}
+                  checked={(pricing.option === '中低收入戶：將提供三位免費參與資格')}
                 />
               )
             }
             label="中低收入戶：將提供三位免費參與資格"
           />
-          {(pricing.option === "中低收入戶：將提供三位免費參與資格") && (
+          {(pricing.option === '中低收入戶：將提供三位免費參與資格') && (
             <Box sx={{ paddingLeft: '20px' }}>
               <Typography
                 sx={{
@@ -142,7 +142,7 @@ export default function PricingForm({
             (
               <Radio
                 onChange={handleCheckOption}
-                checked={(pricing.option === "優惠價：8000 元")}
+                checked={(pricing.option === '優惠價：8000 元')}
               />
             )
           }
@@ -154,7 +154,7 @@ export default function PricingForm({
             (
               <Radio
                 onChange={handleCheckOption}
-                checked={(pricing.option === "個人早鳥價：6000 元")}
+                checked={(pricing.option === '個人早鳥價：6000 元')}
               />
             )
           }
@@ -167,7 +167,7 @@ export default function PricingForm({
               (
                 <Radio
                   onChange={handleCheckOption}
-                  checked={(pricing.option === "2人團報價：10000元（一人5000元）")}
+                  checked={(pricing.option === '2人團報價：10000元（一人5000元）')}
                 />
               )
             }
@@ -205,13 +205,13 @@ export default function PricingForm({
               (
                 <Radio
                   onChange={handleCheckOption}
-                  checked={(pricing.option === "3人團報價：12000元（一人4000元）")}
+                  checked={(pricing.option === '3人團報價：12000元（一人4000元）')}
                 />
               )
             }
             label="3人團報價：12000元（一人4000元）"
           />
-          {(pricing.option === "3人團報價：12000元（一人4000元）") && (
+          {(pricing.option === '3人團報價：12000元（一人4000元）') && (
             <Box sx={{ paddingLeft: '20px' }}>
               <Typography
                 sx={{
@@ -249,13 +249,13 @@ export default function PricingForm({
               (
                 <Radio
                   onChange={handleCheckOption}
-                  checked={(pricing.option === "4人團報價：12000元（一人3000元）")}
+                  checked={(pricing.option === '4人團報價：12000元（一人3000元）')}
                 />
               )
             }
             label="4人團報價：12000元（一人3000元）"
           />
-          {(pricing.option === "4人團報價：12000元（一人3000元）") && (
+          {(pricing.option === '4人團報價：12000元（一人3000元）') && (
             <Box sx={{ paddingLeft: '20px' }}>
               <Typography
                 sx={{

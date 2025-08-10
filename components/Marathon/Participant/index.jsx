@@ -1,13 +1,13 @@
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
 import {
   Box,
-  Typography
-} from "@mui/material";
-import Image from "@/shared/components/Image";
-import PersonaImage1 from "@/public/assets/marathon-persona-1.png";
-import PersonaImage2 from "@/public/assets/marathon-persona-2.png";
-import PersonaImage3 from "@/public/assets/marathon-persona-3.png";
-import PersonaImage4 from "@/public/assets/marathon-persona-4.png";
+  Typography,
+} from '@mui/material';
+import Image from '@/shared/components/Image';
+import PersonaImage1 from '@/public/assets/marathon-persona-1.png';
+import PersonaImage2 from '@/public/assets/marathon-persona-2.png';
+import PersonaImage3 from '@/public/assets/marathon-persona-3.png';
+import PersonaImage4 from '@/public/assets/marathon-persona-4.png';
 
 const StyledGroup = styled(Box)`
   width: 100%;
@@ -50,7 +50,7 @@ export default function Participant() {
   return (
     <StyledGroup>
       <StyledCard sx={{
-        backgroundColor: '#FFF'
+        backgroundColor: '#FFF',
       }}
       >
         <StyledImageContainer sx={{ marginBottom: '10px' }}>
@@ -61,13 +61,17 @@ export default function Participant() {
             height="160px"
           />
         </StyledImageContainer>
-        <StyledTitle>有模糊的職涯／生涯方向，<br />想開始做準備與鋪路</StyledTitle>
+        <StyledTitle>
+          有模糊的職涯／生涯方向，
+          <br />
+          想開始做準備與鋪路
+        </StyledTitle>
       </StyledCard>
       <StyledCard sx={{
-        backgroundColor: '#DEEDF5'
+        backgroundColor: '#DEEDF5',
       }}
       >
-        <StyledImageContainer sx={{ marginBottom: '10px', }}>
+        <StyledImageContainer sx={{ marginBottom: '10px' }}>
           <Image
             alt="marathon-persona-2"
             src={PersonaImage2.src}
@@ -75,10 +79,14 @@ export default function Participant() {
             height="160px"
           />
         </StyledImageContainer>
-        <StyledTitle>考試不適合我，<br />更想用個人經歷上大學</StyledTitle>
+        <StyledTitle>
+          考試不適合我，
+          <br />
+          更想用個人經歷上大學
+        </StyledTitle>
       </StyledCard>
       <StyledCard sx={{
-        backgroundColor: '#DEF5E7'
+        backgroundColor: '#DEF5E7',
       }}
       >
         <StyledImageContainer sx={{ marginBottom: '10px' }}>
@@ -89,10 +97,14 @@ export default function Participant() {
             height="160px"
           />
         </StyledImageContainer>
-        <StyledTitle>學校課程好無聊，希望可以用<br />自己的方式學有興趣的事情</StyledTitle>
+        <StyledTitle>
+          學校課程好無聊，希望可以用
+          <br />
+          自己的方式學有興趣的事情
+        </StyledTitle>
       </StyledCard>
       <StyledCard sx={{
-        backgroundColor: '#FFF'
+        backgroundColor: '#FFF',
       }}
       >
         <StyledImageContainer sx={{ marginBottom: '10px' }}>
@@ -103,7 +115,11 @@ export default function Participant() {
             height="160px"
           />
         </StyledImageContainer>
-        <StyledTitle>想自主學習，<br />有方向但不確定可以怎麼開始</StyledTitle>
+        <StyledTitle>
+          想自主學習，
+          <br />
+          有方向但不確定可以怎麼開始
+        </StyledTitle>
       </StyledCard>
     </StyledGroup>
   );

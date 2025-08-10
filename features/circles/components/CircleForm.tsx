@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { toast } from "sonner";
-import { useEffect, useRef, useState } from "react";
+import Link from 'next/link';
+import { toast } from 'sonner';
+import { useEffect, useRef, useState } from 'react';
 import {
   FormControl,
   FormDescription,
@@ -8,31 +8,31 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Paper } from "@/components/ui/paper";
-import { Selector } from "@/components/ui/select";
-import { Text, Title } from "@/components/ui/typography";
-import { Checkbox, CheckboxWithForm } from "@/components/ui/checkbox";
-import { DatePicker } from "@/components/ui/date-picker";
-import { MultipleSelector } from "@/components/ui/multiple-selector";
-import { OptionProps } from "@/components/ui/option";
-import { Switch } from "@/components/ui/switch";
-import { UploadImage } from "@/components/ui/upload-image";
-import { ACTIVITY_CATEGORIES, CATEGORIES } from "@/constants/category";
-import { EDUCATION } from "@/constants/member";
-import { AREAS, ONLINE_OPTION, TBD_OPTION } from "@/constants/areas";
-import { FormProvider, useForm } from "react-hook-form";
-import { Plus } from "lucide-react";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
-import { zodResolver } from "@hookform/resolvers/zod";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Paper } from '@/components/ui/paper';
+import { Selector } from '@/components/ui/select';
+import { Text, Title } from '@/components/ui/typography';
+import { Checkbox, CheckboxWithForm } from '@/components/ui/checkbox';
+import { DatePicker } from '@/components/ui/date-picker';
+import { MultipleSelector } from '@/components/ui/multiple-selector';
+import { OptionProps } from '@/components/ui/option';
+import { Switch } from '@/components/ui/switch';
+import { UploadImage } from '@/components/ui/upload-image';
+import { ACTIVITY_CATEGORIES, CATEGORIES } from '@/constants/category';
+import { EDUCATION } from '@/constants/member';
+import { AREAS, ONLINE_OPTION, TBD_OPTION } from '@/constants/areas';
+import { FormProvider, useForm } from 'react-hook-form';
+import { Plus } from 'lucide-react';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   CircleFormSchema,
   circleFormSchema,
   CircleSchema,
-} from "@/services/circles";
-import { useCreateCircle, useUpdateCircle } from "../hooks";
+} from '@/services/circles';
+import { useCreateCircle, useUpdateCircle } from '../hooks';
 
 type CircleFormProps = {
   values?: CircleSchema;
@@ -44,7 +44,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
 
   const { trigger: createCircle, isMutating: isCreating } = useCreateCircle({
     onSuccess: () => {
-      toast.success("揪團發起成功");
+      toast.success('揪團發起成功');
       onSuccess?.();
     },
   });
@@ -53,7 +53,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
     values?._id,
     {
       onSuccess: () => {
-        toast.success("揪團更新成功");
+        toast.success('揪團更新成功');
         onSuccess?.();
       },
     }
@@ -65,20 +65,20 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
   const form = useForm<CircleFormSchema>({
     resolver: zodResolver(circleFormSchema),
     defaultValues: values ?? {
-      title: "",
-      photoURL: "",
-      photoAlt: "",
+      title: '',
+      photoURL: '',
+      photoAlt: '',
       activityCategory: [],
       category: [],
       participator: 1,
-      area: "",
-      time: "",
-      partnerStyle: "",
+      area: '',
+      time: '',
+      partnerStyle: '',
       partnerEducationStep: [],
-      motivation: "",
-      content: "",
-      outcome: "",
-      notice: "",
+      motivation: '',
+      content: '',
+      outcome: '',
+      notice: '',
       deadline: undefined,
       isNeedDeadline: false,
       tagList: [],
@@ -88,9 +88,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
 
   const isSubmitting = isCreating || isUpdating;
 
-  const checkIsPhysicalArea = (value: string) => {
-    return AREAS.some((area) => area.value === value);
-  };
+  const checkIsPhysicalArea = (value: string) => AREAS.some((area) => area.value === value);
 
   const handleSubmit = (data: CircleFormSchema) => {
     if (isCreateMode) {
@@ -111,7 +109,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
       <form onSubmit={form.handleSubmit(handleSubmit)}>
         <Paper className="p-10 mb-4">
           <Title as="h1" size="md" className="text-center mb-2">
-            {isCreateMode ? "發起揪團" : "編輯揪團"}
+            {isCreateMode ? '發起揪團' : '編輯揪團'}
           </Title>
           <Text size="sm" className="text-center mb-10">
             填寫完整資訊可以幫助其他夥伴更了解揪團內容哦！
@@ -183,12 +181,8 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                   <FormLabel required>學習領域</FormLabel>
                   <FormControl>
                     <MultipleSelector
-                      value={CATEGORIES.filter((option) =>
-                        field.value?.includes(option.value)
-                      )}
-                      onChange={(options: OptionProps[]) =>
-                        field.onChange(options.map((o) => o.value))
-                      }
+                      value={CATEGORIES.filter((option) => field.value?.includes(option.value))}
+                      onChange={(options: OptionProps[]) => field.onChange(options.map((o) => o.value))}
                       options={CATEGORIES}
                       placeholder="這個活動的學習領域？"
                     />
@@ -209,9 +203,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                       type="number"
                       placeholder="請輸入整數，需大於 0，不可超過 100"
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(parseInt(e.target.value, 10) || 0)
-                      }
+                      onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -246,7 +238,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                       </FormItem>
                       <Selector
                         value={
-                          checkIsPhysicalArea(field.value) ? field.value : ""
+                          checkIsPhysicalArea(field.value) ? field.value : ''
                         }
                         options={AREAS}
                         placeholder="地點"
@@ -334,12 +326,8 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                   <FormLabel required>適合的教育階段</FormLabel>
                   <FormControl>
                     <MultipleSelector
-                      value={EDUCATION.filter((option) =>
-                        field.value?.includes(option.value)
-                      )}
-                      onChange={(options: OptionProps[]) =>
-                        field.onChange(options.map((o) => o.value))
-                      }
+                      value={EDUCATION.filter((option) => field.value?.includes(option.value))}
+                      onChange={(options: OptionProps[]) => field.onChange(options.map((o) => o.value))}
                       options={EDUCATION}
                       placeholder="活動適合什麼教育階段的夥伴？"
                     />
@@ -429,9 +417,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                         label: v,
                         value: v,
                       }))}
-                      onChange={(options: OptionProps[]) =>
-                        field.onChange(options.map((o) => o.value))
-                      }
+                      onChange={(options: OptionProps[]) => field.onChange(options.map((o) => o.value))}
                       placeholder="搜尋或新增標籤"
                       creatable
                     />
@@ -457,22 +443,20 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                   <FormItem className="flex items-center gap-1">
                     <FormControl>
                       <Checkbox
-                        checked={form.watch("isNeedDeadline")}
-                        onCheckedChange={(checked) =>
-                          form.setValue("isNeedDeadline", !!checked)
-                        }
+                        checked={form.watch('isNeedDeadline')}
+                        onCheckedChange={(checked) => form.setValue('isNeedDeadline', !!checked)}
                       />
                     </FormControl>
                     <FormLabel className="font-normal mb-0 text-sm">
                       自訂
                     </FormLabel>
                   </FormItem>
-                  {form.watch("isNeedDeadline") && (
+                  {form.watch('isNeedDeadline') && (
                     <FormControl>
                       <DatePicker
                         {...field}
                         value={
-                          form.watch("isNeedDeadline") && field.value
+                          form.watch('isNeedDeadline') && field.value
                             ? new Date(field.value)
                             : undefined
                         }
@@ -487,10 +471,8 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                 <FormItem className="flex items-center gap-1 h-10">
                   <FormControl>
                     <Checkbox
-                      checked={!form.watch("isNeedDeadline")}
-                      onCheckedChange={(checked) =>
-                        form.setValue("isNeedDeadline", !checked)
-                      }
+                      checked={!form.watch('isNeedDeadline')}
+                      onCheckedChange={(checked) => form.setValue('isNeedDeadline', !checked)}
                     />
                   </FormControl>
                   <FormLabel className="font-normal mb-0 text-sm">
@@ -511,7 +493,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
               render={({ field }) => (
                 <FormItem className="flex items-center justify-between">
                   <FormLabel className="mb-0 text-base">
-                    {field.value ? "開放揪團中" : "已關閉揪團"}
+                    {field.value ? '開放揪團中' : '已關閉揪團'}
                   </FormLabel>
                   <FormControl>
                     <Switch
@@ -533,7 +515,8 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
             />
           </FormControl>
           <FormLabel className="text-sm text-basic-400 mb-0 text-balance">
-            請確認揪團未涉及不雅內容並符合本網站{" "}
+            請確認揪團未涉及不雅內容並符合本網站
+            {' '}
             <Link href="/terms/service" target="_blank" className="underline">
               使用者條款
             </Link>
@@ -548,7 +531,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
             size="lg"
             disabled={isSubmitting || !isTermsChecked}
           >
-            {isCreateMode ? "送出" : "發布修改"}
+            {isCreateMode ? '送出' : '發布修改'}
           </Button>
         </div>
       </form>

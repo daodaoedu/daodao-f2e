@@ -1,4 +1,4 @@
-import checkIsMobileAndTabletDevice from "@/utils/checkIsMobileAndTabletDevice";
+import checkIsMobileAndTabletDevice from '@/utils/checkIsMobileAndTabletDevice';
 
 interface OpenWindowPopupProps {
   url: string;

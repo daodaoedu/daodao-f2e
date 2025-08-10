@@ -18,7 +18,7 @@ const DeleteConfirm: React.FC<DeleteConfirmProps> = ({
   isOpen,
   onConfirm,
   onCancel,
-  loading = false
+  loading = false,
 }) => {
   if (!isOpen || !practice) return null;
 
@@ -29,6 +29,7 @@ const DeleteConfirm: React.FC<DeleteConfirmProps> = ({
         className="fixed inset-0 bg-black/80 transition-opacity"
         onClick={onCancel}
         role="button"
+        aria-label="close"
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -71,11 +72,21 @@ const DeleteConfirm: React.FC<DeleteConfirmProps> = ({
                   {practice.title}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  進度：{practice.currentProgress} / {practice.totalAmount} {practice.unit}
+                  進度：
+                  {practice.currentProgress}
+                  {' '}
+                  /
+                  {' '}
+                  {practice.totalAmount}
+                  {' '}
+                  {practice.unit}
                 </div>
                 {practice.streak > 0 && (
                   <div className="text-sm text-muted-foreground">
-                    連續天數：{practice.streak} 天
+                    連續天數：
+                    {practice.streak}
+                    {' '}
+                    天
                   </div>
                 )}
               </div>

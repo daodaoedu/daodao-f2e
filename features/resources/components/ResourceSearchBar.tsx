@@ -1,17 +1,17 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState } from 'react';
 import {
   SearchIcon,
   SlidersHorizontalIcon,
   ChartNoAxesColumnDecreasingIcon,
   SendHorizontalIcon,
-} from "lucide-react";
-import useShadowToggleOnScroll from "@/hooks/useShadowToggleOnScroll";
-import { cn } from "@/utils/cn";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ResourceSearchParamsSchema } from "@/services/resources/core/schema";
-import { Container } from "@/components/ui/wrapper";
-import ResourceSearchModal from "./ResourceSearchModal";
+} from 'lucide-react';
+import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
+import { cn } from '@/utils/cn';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ResourceSearchParamsSchema } from '@/services/resources/core/schema';
+import { Container } from '@/components/ui/wrapper';
+import ResourceSearchModal from './ResourceSearchModal';
 
 interface ResourceSearchBarProps {
   filters?: ResourceSearchParamsSchema;
@@ -22,7 +22,7 @@ export default function ResourceSearchBar({
   filters,
   onFilter,
 }: ResourceSearchBarProps) {
-  const defaultQuery = filters?.query ?? "";
+  const defaultQuery = filters?.query ?? '';
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { height, isShowShadow, TriggerElement } = useShadowToggleOnScroll();
 
@@ -39,7 +39,7 @@ export default function ResourceSearchBar({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
       handleFilterChange({ query: e.currentTarget.value });
     }
   };
@@ -50,25 +50,21 @@ export default function ResourceSearchBar({
         <TriggerElement />
         <div
           className={cn(
-            "bg-basic-white py-5 gap-6 md:py-6",
-            isShowShadow && "shadow-md shadow-basic-black/10"
+            'bg-basic-white py-5 gap-6 md:py-6',
+            isShowShadow && 'shadow-md shadow-basic-black/10'
           )}
         >
           <Container className="flex justify-between flex-col gap-4 md:flex-row">
             <Input
               type="search"
               prefixIcon={<SearchIcon />}
-              suffixIcon={(v) =>
-                (v.length > 0 || defaultQuery.length > 0) && (
-                  <SendHorizontalIcon />
-                )
-              }
+              suffixIcon={(v) => (v.length > 0 || defaultQuery.length > 0) && (
+              <SendHorizontalIcon />
+              )}
               className="md:w-1/2"
               defaultValue={defaultQuery}
               onKeyDown={handleKeyDown}
-              onSuffixIconClick={(value) =>
-                handleFilterChange({ query: value })
-              }
+              onSuffixIconClick={(value) => handleFilterChange({ query: value })}
               placeholder="想找什麼資源..."
             />
             <div className="flex gap-3 justify-end">

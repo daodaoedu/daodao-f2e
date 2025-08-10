@@ -1,4 +1,4 @@
-import { differenceInDays, differenceInHours, differenceInMinutes } from "date-fns";
+import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
 
 export const timeDuration = (date: string | Date = new Date()) => {
   const currentDate = new Date();
@@ -15,5 +15,5 @@ export const timeDuration = (date: string | Date = new Date()) => {
   if (diffMinute < 60 && diffMinute > 0) {
     return `${diffMinute} 分鐘前`;
   }
-  return `剛剛`;
+  return '剛剛';
 };

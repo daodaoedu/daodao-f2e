@@ -1,7 +1,7 @@
-import dayjs from "dayjs";
-import { useMemo } from "react";
-import { useProject } from "@/services/projects";
-import { useProjectMilestones } from "./milestone";
+import dayjs from 'dayjs';
+import { useMemo } from 'react';
+import { useProject } from '@/services/projects';
+import { useProjectMilestones } from './milestone';
 
 export default function useMilestonesDateRange(projectId?: string) {
   const { data: project } = useProject(projectId);
@@ -23,10 +23,10 @@ export default function useMilestonesDateRange(projectId?: string) {
     return {
       startDate: milestoneStartDate,
       endDate: milestoneEndDate,
-      maxDate: milestoneStartDate.add(1, "year"),
+      maxDate: milestoneStartDate.add(1, 'year'),
       minDate: isVersion2
         ? milestoneStartDate
-        : milestoneEndDate.subtract(1, "year"),
+        : milestoneEndDate.subtract(1, 'year'),
     };
   }, [milestones, project]);
 }

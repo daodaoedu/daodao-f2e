@@ -1,4 +1,4 @@
-import { QuizProvider } from "./contexts";
+import { QuizProvider } from './contexts';
 
 export const getQuizLayout = (page: React.ReactElement) => (
   <QuizProvider>

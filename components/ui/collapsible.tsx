@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
-import { cn } from "@/utils/cn";
-import { ChevronDown } from "lucide-react";
+import * as React from 'react';
+import * as CollapsiblePrimitive from '@radix-ui/react-collapsible';
+import { cn } from '@/utils/cn';
+import { ChevronDown } from 'lucide-react';
 
 const Collapsible = CollapsiblePrimitive.Root;
 
@@ -21,13 +21,15 @@ interface CollapsibleTriggerProps
 const CollapsibleTrigger = React.forwardRef<
   React.ComponentRef<typeof CollapsiblePrimitive.CollapsibleTrigger>,
   CollapsibleTriggerProps
->(({ className, withIcon, expandLabel, collapseLabel, ...props }, ref) => (
+>(({
+  className, withIcon, expandLabel, collapseLabel, ...props
+}, ref) => (
   <CollapsiblePrimitive.CollapsibleTrigger
     ref={ref}
     className={cn(
-      "flex items-center [&[data-state=open]>svg]:rotate-180",
-      "[&>div[data-slot=expand]]:data-[state=open]:hidden",
-      "[&>div[data-slot=collapse]]:data-[state=closed]:hidden",
+      'flex items-center [&[data-state=open]>svg]:rotate-180',
+      '[&>div[data-slot=expand]]:data-[state=open]:hidden',
+      '[&>div[data-slot=collapse]]:data-[state=closed]:hidden',
       className
     )}
     {...props}

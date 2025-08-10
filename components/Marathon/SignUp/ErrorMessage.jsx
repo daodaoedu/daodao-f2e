@@ -1,30 +1,28 @@
 import { Box, Typography } from '@mui/material';
 import { CircleX } from 'lucide-react';
 
-const ErrorMessage = ({ errText }) => {
-  return (
-    errText && (
-      <Box
-        sx={{
-          mt: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          color: '#EF5364',
-          bgcolor: '#FFEFF1',
-          borderRadius: '4px',
-          padding: '4px 8px',
-          fontSize: '14px',
-          svg: {
-            flexShrink: 0,
-          },
-        }}
-      >
-        <CircleX size={20} />
-        <Typography as="p">{errText}</Typography>
-      </Box>
-    )
-  );
-};
+const ErrorMessage = ({ errText }) => (
+  errText && (
+  <Box
+    sx={{
+      mt: '8px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      color: '#EF5364',
+      bgcolor: '#FFEFF1',
+      borderRadius: '4px',
+      padding: '4px 8px',
+      fontSize: '14px',
+      svg: {
+        flexShrink: 0,
+      },
+    }}
+  >
+    <CircleX size={20} />
+    <Typography as="p">{errText}</Typography>
+  </Box>
+  )
+);
 
 export default ErrorMessage;

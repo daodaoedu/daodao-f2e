@@ -23,15 +23,13 @@ const GuideWrapper = styled.div`
   }
 `;
 
-const Guide = () => {
-  return (
-    <GuideWrapper>
-      <h2 className="guide-title">大家正在學...</h2>
-      <Box sx={{ marginTop: '20px' }}>
-        <CardList />
-      </Box>
-    </GuideWrapper>
-  );
-};
+const Guide = () => (
+  <GuideWrapper>
+    <h2 className="guide-title">大家正在學...</h2>
+    <Box sx={{ marginTop: '20px' }}>
+      <CardList />
+    </Box>
+  </GuideWrapper>
+);
 
 export default Guide;

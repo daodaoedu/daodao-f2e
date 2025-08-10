@@ -48,7 +48,7 @@ export default function useSearchParamsManager(): UseSearchParamsManagerReturn {
       }
       return query;
     }) as GetSearchParams,
-    [query],
+    [query]
   );
 
   const pushState = useCallback(
@@ -61,7 +61,7 @@ export default function useSearchParamsManager(): UseSearchParamsManagerReturn {
       }
       push({ query: newQuery }, undefined, { scroll: false });
     },
-    [push, query],
+    [push, query]
   );
 
   const generateParamsItems = useCallback(
@@ -81,7 +81,7 @@ export default function useSearchParamsManager(): UseSearchParamsManagerReturn {
         return [...acc, { key: param, values }];
       }, []);
     },
-    [getSearchParams],
+    [getSearchParams]
   );
 
   return [getSearchParams, pushState, generateParamsItems];

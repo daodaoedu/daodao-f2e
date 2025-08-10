@@ -35,7 +35,9 @@ const VideoWrapper = styled.video`
   height: inherit;
 `;
 
-const Card = ({ message = '', media, url, type }) => {
+const Card = ({
+  message = '', media, url, type,
+}) => {
   if (type === 'VIDEO') {
     return (
       <Tooltip title={message.slice(0, 150)}>

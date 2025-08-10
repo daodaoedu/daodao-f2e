@@ -19,7 +19,10 @@ const SubFooter = () => {
   const year = dayjs().get('year');
   return (
     <SubFooterWrapper>
-      Tomorrow will be fine. 島島阿學 © {year}.
+      Tomorrow will be fine. 島島阿學 ©
+      {' '}
+      {year}
+      .
     </SubFooterWrapper>
   );
 };

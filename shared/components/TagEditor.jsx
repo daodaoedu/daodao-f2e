@@ -1,6 +1,8 @@
-import { useEffect, useId, useRef, useState } from "react";
+import {
+  useEffect, useId, useRef, useState,
+} from 'react';
 import ClearIcon from '@mui/icons-material/Clear';
-import { cn } from "@/utils/cn";
+import { cn } from '@/utils/cn';
 
 function Item({ children, onClick, text }) {
   return (
@@ -9,7 +11,7 @@ function Item({ children, onClick, text }) {
         type="button"
         className={cn(
           'flex items-center justify-between w-full text-primary-base',
-          'text-left px-4 py-2 focus-within:bg-primary-lightest focus-within:outline-primary-lighter',
+          'text-left px-4 py-2 focus-within:bg-primary-lightest focus-within:outline-primary-lighter'
         )}
         onClick={() => onClick(text)}
       >
@@ -20,7 +22,9 @@ function Item({ children, onClick, text }) {
   );
 }
 
-function TagEditor({ name, helperText, control, value = [], tagOptions }) {
+function TagEditor({
+  name, helperText, control, value = [], tagOptions,
+}) {
   const id = useId();
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
@@ -96,42 +100,6 @@ function TagEditor({ name, helperText, control, value = [], tagOptions }) {
     }, 100);
   };
 
-  const handleNavigateTagOptions = (e) => {
-    const buttons = tagOptionsRef.current.querySelectorAll('button');
-
-    switch (e.keyCode) {
-      /** 38 方向鍵上 */
-      case 38: {
-        e.preventDefault();
-        if (tagOptionsFocusIndex.current < 1) {
-          inputRef.current.focus();
-          return;
-        }
-        tagOptionsFocusIndex.current -= 1;
-        buttons[tagOptionsFocusIndex.current].focus();
-        break;
-      }
-      /** 40 方向鍵下 */
-      case 40: {
-        e.preventDefault();
-        if (tagOptionsFocusIndex.current >= buttons.length - 1) return;
-        tagOptionsFocusIndex.current += 1;
-        buttons[tagOptionsFocusIndex.current].focus();
-        break;
-      }
-      /** 9 Tab */
-      case 9: {
-        tagOptionsFocusIndex.current += 1;
-        break;
-      }
-      /** 13 Enter */
-      case 13: break;
-      default:
-        inputRef.current.focus();
-        break;
-    }
-  };
-
   useEffect(() => {
     control.setRef?.(name, inputRef.current);
   }, [control.setRef, name]);
@@ -143,10 +111,9 @@ function TagEditor({ name, helperText, control, value = [], tagOptions }) {
         className={cn(
           'relative flex flex-wrap items-center pl-3 py-1.5 gap-1.5 w-full text-sm',
           'rounded border border-solid border-basic-200 cursor-text',
-          'outline outline-transparent focus-within:outline-primary-base',
+          'outline outline-transparent focus-within:outline-primary-base'
         )}
         onBlur={handleBlur}
-        onKeyDown={handleNavigateTagOptions}
       >
         {value.map((tag) => (
           <div
@@ -184,7 +151,7 @@ function TagEditor({ name, helperText, control, value = [], tagOptions }) {
             'border border-basic-200 rounded-md shadow bg-white',
             'transition-[transform,opacity] origin-top opacity-100 scale-y-100',
             !(hasTagOptions || input) && 'opacity-0 scale-y-0',
-            error && 'opacity-0 scale-y-0',
+            error && 'opacity-0 scale-y-0'
           )}
         >
           {hasTagOptions ? (

@@ -1,23 +1,23 @@
-import React from "react";
-import { format } from "date-fns";
-import { Check, Ellipsis } from "lucide-react";
-import { RecentResourceReviewSchema } from "@/services/resources/reviews/schema";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Rating } from "@/components/ui/rating";
-import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
-import CommentSvg from "@/public/assets/icons/comment.svg";
-import ShellSvg from "@/public/assets/icons/shell.svg";
+import React from 'react';
+import { format } from 'date-fns';
+import { Check, Ellipsis } from 'lucide-react';
+import { RecentResourceReviewSchema } from '@/services/resources/reviews/schema';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Rating } from '@/components/ui/rating';
+import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
+import CommentSvg from '@/public/assets/icons/comment.svg';
+import ShellSvg from '@/public/assets/icons/shell.svg';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import CommentSection from "@/shared/components/Comment/CommentSection";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
-import { CommentType } from "@/services/comments";
-import { cn } from "@/utils/cn";
+} from '@/components/ui/collapsible';
+import CommentSection from '@/shared/components/Comment/CommentSection';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { CommentType } from '@/services/comments';
+import { cn } from '@/utils/cn';
 
 interface ResourceReviewCardProps {
   review: RecentResourceReviewSchema;
@@ -30,7 +30,7 @@ export default function ResourceReviewCard({
     <Collapsible className="bg-primary-palest rounded-lg">
       <header className="flex mb-10 pt-10 px-10">
         <Avatar className="mt-1 mr-3 size-12">
-          <AvatarImage src={review.user.photoURL || ""} />
+          <AvatarImage src={review.user.photoURL || ''} />
           <AvatarFallback className="text-xl">
             <DefaultAvatar />
           </AvatarFallback>
@@ -52,16 +52,15 @@ export default function ResourceReviewCard({
           <h3 className="body-lg font-bold">內容特色</h3>
           <div className="flex mt-1 body-sm gap-2.5">
             {Object.entries(review.contentFeatures ?? {}).map(
-              ([feature, enabled]) =>
-                enabled ? (
-                  <Badge key={feature}>
-                    <Check
-                      size={20}
-                      className="-my-1 mr-1 rounded-full border-2 border-basic-white"
-                    />
-                    {feature}
-                  </Badge>
-                ) : null
+              ([feature, enabled]) => (enabled ? (
+                <Badge key={feature}>
+                  <Check
+                    size={20}
+                    className="-my-1 mr-1 rounded-full border-2 border-basic-white"
+                  />
+                  {feature}
+                </Badge>
+              ) : null)
             )}
           </div>
         </div>
@@ -117,7 +116,7 @@ export default function ResourceReviewCard({
           <time>
             {format(
               new Date(review.updatedAt ?? review.createdAt),
-              "yyyy/MM/dd"
+              'yyyy/MM/dd'
             )}
           </time>
           <Button variant="default" size="icon">
@@ -135,8 +134,8 @@ export default function ResourceReviewCard({
 
       <CollapsibleTrigger
         className={cn(
-          "w-full flex flex-row-reverse justify-center gap-1 mt-10 p-3",
-          "body-md rounded-b-lg bg-primary-lightest hover:bg-primary-lightest/80"
+          'w-full flex flex-row-reverse justify-center gap-1 mt-10 p-3',
+          'body-md rounded-b-lg bg-primary-lightest hover:bg-primary-lightest/80'
         )}
         withIcon
         expandLabel="展開"
