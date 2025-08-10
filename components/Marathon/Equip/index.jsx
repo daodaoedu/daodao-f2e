@@ -1,8 +1,8 @@
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
 import {
   Box,
-  Typography
-} from "@mui/material";
+  Typography,
+} from '@mui/material';
 
 const StyledGroup = styled(Box)`
   width: 100%;
@@ -49,10 +49,14 @@ export default function Equip() {
   return (
     <StyledGroup>
       <StyledCard sx={{
-        backgroundColor: '#DEF5F5'
+        backgroundColor: '#DEF5F5',
       }}
       >
-        <StyledTitle component="h4">「專業陪跑員」<br />陪你規劃路徑與自我釐清</StyledTitle>
+        <StyledTitle component="h4">
+          「專業陪跑員」
+          <br />
+          陪你規劃路徑與自我釐清
+        </StyledTitle>
         <StyledList>
           <ul>
             <li>3 次 1 小時一對一諮詢</li>
@@ -62,10 +66,14 @@ export default function Equip() {
         </StyledList>
       </StyledCard>
       <StyledCard sx={{
-        backgroundColor: '#DEEDF5'
+        backgroundColor: '#DEEDF5',
       }}
       >
-        <StyledTitle component="h4">「專業課程」<br />帶你掌握自主學習要領</StyledTitle>
+        <StyledTitle component="h4">
+          「專業課程」
+          <br />
+          帶你掌握自主學習要領
+        </StyledTitle>
         <StyledList>
           <ul>
             <li>「策略」目標設定與學習策略</li>
@@ -76,10 +84,14 @@ export default function Equip() {
         </StyledList>
       </StyledCard>
       <StyledCard sx={{
-        backgroundColor: '#DEF5E7'
+        backgroundColor: '#DEF5E7',
       }}
       >
-        <StyledTitle component="h4">「百人社群」<br />讓你找到合適夥伴與各界人脈</StyledTitle>
+        <StyledTitle component="h4">
+          「百人社群」
+          <br />
+          讓你找到合適夥伴與各界人脈
+        </StyledTitle>
         <StyledList>
           <ul>
             <li>5 次 1 小時全員每月聚會</li>
@@ -90,10 +102,14 @@ export default function Equip() {
         </StyledList>
       </StyledCard>
       <StyledCard sx={{
-        backgroundColor: '#DEF5F5'
+        backgroundColor: '#DEF5F5',
       }}
       >
-        <StyledTitle component="h4">「AI個人化學習工具」<br />引導你學習方向及自律學習</StyledTitle>
+        <StyledTitle component="h4">
+          「AI個人化學習工具」
+          <br />
+          引導你學習方向及自律學習
+        </StyledTitle>
         <StyledList>
           <ul>
             <li>具引導性的自主學習模板</li>

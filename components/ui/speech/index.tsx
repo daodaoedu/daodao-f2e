@@ -1,5 +1,5 @@
-import dynamic from "next/dynamic";
+import dynamic from 'next/dynamic';
 
-export const Speech = dynamic(() => import("./speech"), {
+export const Speech = dynamic(() => import('./speech'), {
   ssr: false,
 });

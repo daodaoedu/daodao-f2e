@@ -27,7 +27,7 @@ const PartnerSkelton = () => {
             width={60}
             height={23}
             key={`partnerSkelton-${Math.floor(
-              crypto.getRandomValues(array)[0],
+              crypto.getRandomValues(array)[0]
             )}`}
             sx={{ mr: '8px', borderRadius: '18px' }}
           />

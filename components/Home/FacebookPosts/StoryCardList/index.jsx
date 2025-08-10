@@ -22,7 +22,9 @@ const SubHeaderWrapper = styled.h3`
     flex-direction: column;
   }
 `;
-const StoryCardList = ({ title, list, direction = 'left', isLoading }) => {
+const StoryCardList = ({
+  title, list, direction = 'left', isLoading,
+}) => {
   if (isLoading) {
     return (
       <Box sx={{ marginTop: '20px' }}>
@@ -150,7 +152,7 @@ const StoryCardList = ({ title, list, direction = 'left', isLoading }) => {
                   url={permalink}
                   likeCount={like_count}
                 />
-              ),
+              )
             )}
           </CardListWrapper>
         </Marquee>
@@ -177,7 +179,7 @@ const StoryCardList = ({ title, list, direction = 'left', isLoading }) => {
                 url={permalink}
                 likeCount={like_count}
               />
-            ),
+            )
           )}
         </CardListWrapper>
       )}

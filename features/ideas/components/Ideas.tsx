@@ -14,18 +14,16 @@ const Section: React.FC<{
   children: React.ReactNode;
   className?: string;
   as?: React.ElementType;
-}> = ({ children, className = '', as: Component = 'section' }) => {
-  return (
-    <Component
-      className={cn(
-        'flex flex-col gap-6 px-5 py-6 md:px-24 md:py-8',
-        className
-      )}
-    >
-      {children}
-    </Component>
-  );
-};
+}> = ({ children, className = '', as: Component = 'section' }) => (
+  <Component
+    className={cn(
+      'flex flex-col gap-6 px-5 py-6 md:px-24 md:py-8',
+      className
+    )}
+  >
+    {children}
+  </Component>
+);
 
 const IdeasFeature: React.FC<IdeasFeatureProps> = ({ className = '' }) => {
   const [showCreateModal, setShowCreateModal] = useState(false);

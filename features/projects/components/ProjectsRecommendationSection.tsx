@@ -1,7 +1,11 @@
 import React from 'react';
-import { FolderOpen, TrendingUp, RefreshCw, Compass } from 'lucide-react';
+import {
+  FolderOpen, TrendingUp, RefreshCw, Compass,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card, CardContent, CardHeader, CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useContentTypeRecommendations } from '@/services/recommendation';
 import { useAuth } from '@/contexts/Auth';
@@ -154,7 +158,9 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
               <span className="text-sm text-basic-500">{item.user.name}</span>
               {item.participants && (
                 <div className="text-xs text-basic-400 ml-auto">
-                  {item.participants} 人參與
+                  {item.participants}
+                  {' '}
+                  人參與
                 </div>
               )}
             </div>
@@ -169,7 +175,8 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
                 ))}
                 {item.tags.length > 3 && (
                   <Badge variant="outline" className="text-xs text-basic-400">
-                    +{item.tags.length - 3}
+                    +
+                    {item.tags.length - 3}
                   </Badge>
                 )}
               </div>
@@ -208,7 +215,9 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
               推薦學習計劃
               {projectRecommendations.length > 0 && (
                 <span className="text-sm font-normal text-basic-400">
-                  ({projectRecommendations.length}+)
+                  (
+                  {projectRecommendations.length}
+                  +)
                 </span>
               )}
             </CardTitle>

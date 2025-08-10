@@ -28,9 +28,7 @@ export default function MultiSelectDropdown({
     }
   };
 
-  const handleToggleDropdown = () => {
-    return setOpen((prevState) => !prevState);
-  };
+  const handleToggleDropdown = () => setOpen((prevState) => !prevState);
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === 'Space') {
       handleToggleDropdown();
@@ -48,16 +46,15 @@ export default function MultiSelectDropdown({
         aria-controls="dropdown-list"
         aria-haspopup="true"
       >
-        <span className="truncate">{
-        selectedItems.length > 0 ?
-          selectedItems
-          .map((selectedValue) => {
-            return listItems.find((listItem) => listItem.value === selectedValue)?.label;
-          })
-          .filter(Boolean)
-          .join(', ')
-          :
-          placeholder}
+        <span className="truncate">
+          {
+        selectedItems.length > 0
+          ? selectedItems
+            .map((selectedValue) => listItems.find((listItem) => listItem.value === selectedValue)?.label)
+            .filter(Boolean)
+            .join(', ')
+          : placeholder
+}
         </span>
 
         <KeyboardArrowDownIcon />
@@ -75,10 +72,9 @@ export default function MultiSelectDropdown({
               key={listItem.value}
               className={cn(
                 'p-2 rounded-[4px] cursor-pointer hover:bg-teal-200 font-sans text-sm',
-                selectedItems.includes(listItem.value) ?
-                'bg-primary-lightest text-primary-base'
-                :
-                'bg-white text-basic-400'
+                selectedItems.includes(listItem.value)
+                  ? 'bg-primary-lightest text-primary-base'
+                  : 'bg-white text-basic-400'
               )}
               onClick={() => handleChange(listItem.value)}
               role="option"

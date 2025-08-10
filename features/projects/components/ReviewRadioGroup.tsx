@@ -1,8 +1,12 @@
 import { useId } from 'react';
-import { Control, FieldValues, Path, useController } from 'react-hook-form';
+import {
+  Control, FieldValues, Path, useController,
+} from 'react-hook-form';
 import { MOOD_OPTIONS } from '@/constants/project';
 import RadioBox from '@/shared/components/RadioBox';
-import { Smile, Heart, Zap, Moon, CloudRain } from 'lucide-react';
+import {
+  Smile, Heart, Zap, Moon, CloudRain,
+} from 'lucide-react';
 
 type BaseRadioGroupProps<T extends FieldValues> = {
   type: 'emoji' | 'tenPoint';
@@ -20,14 +24,12 @@ function RadioGroupWithoutControl<T extends FieldValues>({
   name,
   value,
 }: RadioGroupProps<T>) {
-  const getOptionProps = (option: string | number) => {
-    return {
-      name,
-      value: option,
-      isChecked: option === value,
-      readOnly: true,
-    };
-  };
+  const getOptionProps = (option: string | number) => ({
+    name,
+    value: option,
+    isChecked: option === value,
+    readOnly: true,
+  });
 
   const getMoodIcon = (iconName: string) => {
     const icons = {
@@ -82,17 +84,15 @@ function RadioGroupWithControl<T extends FieldValues>({
   const generateId = (tag: string) => `${id}-${tag}`;
   const { field, fieldState } = useController({ name, control });
 
-  const getOptionProps = (option: string | number) => {
-    return {
-      ref: field.ref,
-      id: generateId(option.toString()),
-      name,
-      value: option,
-      isChecked: option === field.value,
-      isError: !!fieldState.error,
-      onChange: () => field.onChange(option),
-    };
-  };
+  const getOptionProps = (option: string | number) => ({
+    ref: field.ref,
+    id: generateId(option.toString()),
+    name,
+    value: option,
+    isChecked: option === field.value,
+    isError: !!fieldState.error,
+    onChange: () => field.onChange(option),
+  });
 
   const getMoodIcon = (iconName: string) => {
     const icons = {

@@ -2,8 +2,8 @@ import type {
   CreateUserFormSchema,
   UpdateUserFormSchema,
   UserSchema,
-} from "@/services/users";
-import { LOGIN_TYPE } from "@/utils/env";
+} from '@/services/users';
+import { LOGIN_TYPE } from '@/utils/env';
 
 export enum LoginStatus {
   /** 未登入 */
@@ -53,13 +53,13 @@ export type AuthState =
   | PermanentLoginState;
 
 export enum ActionTypes {
-  OPEN_LOGIN_MODAL = "openLoginModal",
-  CLOSE_LOGIN_MODAL = "closeLoginModal",
-  SET_TOKEN = "setToken",
-  SET_LOADING = "setLoading",
-  UPDATE_USER = "updateUser",
-  LOGIN = "login",
-  LOGOUT = "logout",
+  OPEN_LOGIN_MODAL = 'openLoginModal',
+  CLOSE_LOGIN_MODAL = 'closeLoginModal',
+  SET_TOKEN = 'setToken',
+  SET_LOADING = 'setLoading',
+  UPDATE_USER = 'updateUser',
+  LOGIN = 'login',
+  LOGOUT = 'logout',
 }
 
 export type Action =

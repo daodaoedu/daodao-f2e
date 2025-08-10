@@ -16,7 +16,7 @@ interface DashboardFlowProps {
 
 const DashboardFlow: React.FC<DashboardFlowProps> = ({
   practice,
-  onBack
+  onBack,
 }) => {
   const [currentView, setCurrentView] = useState<DashboardView>('main');
   const [showConfetti, setShowConfetti] = useState(false);
@@ -72,7 +72,11 @@ const DashboardFlow: React.FC<DashboardFlowProps> = ({
   return (
     <>
       <Head>
-        <title>{getPageTitle()} - 主題實踐</title>
+        <title>
+          {getPageTitle()}
+          {' '}
+          - 主題實踐
+        </title>
         <meta name="description" content={getPageDescription()} />
       </Head>
 

@@ -8,9 +8,7 @@ interface UserInfoBarProps {
   }
 }
 const ProjectUserInfoBar = ({ user }: UserInfoBarProps) => {
-  const zhRole = ROLE.find((r) => {
-    return r.value === user.roleList[0];
-  })?.label;
+  const zhRole = ROLE.find((r) => r.value === user.roleList[0])?.label;
 
   return (
     <div className="flex flex-row gap-2 items-center">

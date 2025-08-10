@@ -8,7 +8,7 @@ interface ConfirmModalProps {
   children?: React.ReactNode;
   cancelText?: string;
   confirmText?: string;
-  confirmColor?: "default" | "alert";
+  confirmColor?: 'default' | 'alert';
   onClose: () => void;
   onConfirm?: () => void;
 }

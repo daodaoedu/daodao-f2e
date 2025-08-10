@@ -1,4 +1,6 @@
-import { useState, forwardRef, useId, useImperativeHandle } from 'react';
+import {
+  useState, forwardRef, useId, useImperativeHandle,
+} from 'react';
 import Link from 'next/link';
 import {
   Dialog,
@@ -13,9 +15,7 @@ import {
 } from '@mui/material';
 import { getTrustWebsitesStorage } from '@/utils/storage';
 
-const TransitionSlide = forwardRef((props, ref) => {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+const TransitionSlide = forwardRef((props, ref) => <Slide direction="up" ref={ref} {...props} />);
 
 function InternalCheckLink(props, ref) {
   const id = useId();
@@ -59,7 +59,7 @@ function InternalCheckLink(props, ref) {
         } catch {
           window.open(href, '_blank');
         }
-      }
+      },
     }),
     []
   );

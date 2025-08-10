@@ -11,13 +11,11 @@ const FooterWrapper = styled.footer`
   justify-content: center;
 `;
 
-const Footer = () => {
-  return (
-    <FooterWrapper>
-      <MainFooter />
-      <SubFooter />
-    </FooterWrapper>
-  );
-};
+const Footer = () => (
+  <FooterWrapper>
+    <MainFooter />
+    <SubFooter />
+  </FooterWrapper>
+);
 
 export default Footer;

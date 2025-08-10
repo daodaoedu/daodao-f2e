@@ -1,6 +1,8 @@
-import { Dispatch, SetStateAction, useCallback, useMemo, useRef } from "react";
-import { useRouter } from "next/router";
-import { z } from "zod";
+import {
+  Dispatch, SetStateAction, useCallback, useMemo, useRef,
+} from 'react';
+import { useRouter } from 'next/router';
+import { z } from 'zod';
 
 const formatQuery = <T extends z.ZodObject<z.ZodRawShape>>(
   schema: T,
@@ -18,7 +20,7 @@ const formatQuery = <T extends z.ZodObject<z.ZodRawShape>>(
     if (
       parsedValue.success &&
       parsedValue.data != null &&
-      parsedValue.data !== ""
+      parsedValue.data !== ''
     ) {
       Object.assign(acc, { [key]: parsedValue.data });
     }
@@ -36,7 +38,7 @@ const isSame = <T>(prev: T, next: T): boolean => {
   if (Array.isArray(prev) || Array.isArray(next)) {
     return false;
   }
-  if (prev && next && typeof prev === "object" && typeof next === "object") {
+  if (prev && next && typeof prev === 'object' && typeof next === 'object') {
     if (Object.keys(prev).length !== Object.keys(next).length) {
       return false;
     }
@@ -46,7 +48,7 @@ const isSame = <T>(prev: T, next: T): boolean => {
       return isSame(prevValue, nextValue);
     });
   }
-  if (typeof prev === "number" && typeof next === "number") {
+  if (typeof prev === 'number' && typeof next === 'number') {
     return Number.isNaN(prev) && Number.isNaN(next);
   }
   return prev === next;
@@ -60,7 +62,7 @@ export default function useQueryState<T extends z.AnyZodObject>(schema: T) {
 
   const setState = useCallback<Dispatch<SetStateAction<z.infer<T>>>>(
     (value) => {
-      const newValue = typeof value === "function" ? value(state) : value;
+      const newValue = typeof value === 'function' ? value(state) : value;
       const newQuery = formatQuery(schema, newValue);
       if (!isSame(prevQuery.current, newQuery)) {
         push({ pathname, query: newQuery }, undefined, {

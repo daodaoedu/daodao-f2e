@@ -13,19 +13,17 @@ const CardListWrapper = styled.ul`
   }
 `;
 
-const CardList = ({ list }) => {
-  return (
-    <CardListWrapper>
-      {list.map((category) => (
-        <Card
-          key={category.title}
-          title={category.title}
-          link={category.link}
-          image={category.image}
-        />
-      ))}
-    </CardListWrapper>
-  );
-};
+const CardList = ({ list }) => (
+  <CardListWrapper>
+    {list.map((category) => (
+      <Card
+        key={category.title}
+        title={category.title}
+        link={category.link}
+        image={category.image}
+      />
+    ))}
+  </CardListWrapper>
+);
 
 export default CardList;

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Plus, X, Target, BookOpen, Link as LinkIcon, Clock, BarChart, Book, Video, FileText, Headphones, GraduationCap, Settings, AlertCircle } from 'lucide-react';
+import {
+  Plus, X, Target, BookOpen, Link as LinkIcon, Clock, BarChart, Book, Video, FileText, Headphones, GraduationCap, Settings, AlertCircle,
+} from 'lucide-react';
 import { Practice, Resource, ResourceType } from '@/features/practice';
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
@@ -11,7 +13,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { defaultTags } from '@/constants/practice';
@@ -27,14 +29,14 @@ const EditForm: React.FC<EditFormProps> = ({
   formData,
   onChange,
   errors,
-  practice
+  practice,
 }) => {
   const [resourceErrors, setResourceErrors] = useState<Record<string, { name?: string; url?: string }>>({});
   // 處理基本欄位變更
   const handleFieldChange = (field: keyof Practice, value: string | number | boolean) => {
     onChange({
       ...formData,
-      [field]: value
+      [field]: value,
     });
   };
 
@@ -59,8 +61,8 @@ const EditForm: React.FC<EditFormProps> = ({
       ...prev,
       [resourceId]: {
         ...prev[resourceId],
-        [field]: error || undefined
-      }
+        [field]: error || undefined,
+      },
     }));
 
     return !error;
@@ -68,12 +70,10 @@ const EditForm: React.FC<EditFormProps> = ({
 
   // 處理資源變更
   const handleResourceChange = (resourceId: string, field: 'name' | 'url', value: string) => {
-    const updatedResources = (formData.resources || []).map((resource) =>
-      resource.id === resourceId ? { ...resource, [field]: value } : resource
-    );
+    const updatedResources = (formData.resources || []).map((resource) => (resource.id === resourceId ? { ...resource, [field]: value } : resource));
     onChange({
       ...formData,
-      resources: updatedResources
+      resources: updatedResources,
     });
 
     // 如果之前有錯誤，即時驗證
@@ -92,12 +92,12 @@ const EditForm: React.FC<EditFormProps> = ({
       name: '',
       url: '',
       type: 'website' as ResourceType,
-      order: currentResources.length
+      order: currentResources.length,
     };
 
     onChange({
       ...formData,
-      resources: [...currentResources, newResource]
+      resources: [...currentResources, newResource],
     });
   };
 
@@ -106,7 +106,7 @@ const EditForm: React.FC<EditFormProps> = ({
     const updatedResources = (formData.resources || []).filter((resource) => resource.id !== resourceId);
     onChange({
       ...formData,
-      resources: updatedResources
+      resources: updatedResources,
     });
   };
 
@@ -116,7 +116,7 @@ const EditForm: React.FC<EditFormProps> = ({
     if (tag && !currentTags.includes(tag) && currentTags.length < 3) {
       onChange({
         ...formData,
-        tags: [...currentTags, tag]
+        tags: [...currentTags, tag],
       });
     }
   };
@@ -125,18 +125,30 @@ const EditForm: React.FC<EditFormProps> = ({
     const updatedTags = (formData.tags || []).filter((tag) => tag !== tagToRemove);
     onChange({
       ...formData,
-      tags: updatedTags
+      tags: updatedTags,
     });
   };
 
   // 內容類型選項
   const contentTypeOptions = [
-    { value: 'book', label: '書籍', unit: '頁', icon: Book },
-    { value: 'video', label: '影片課程', unit: '集', icon: Video },
-    { value: 'articles', label: '文章', unit: '篇', icon: FileText },
-    { value: 'podcast', label: 'Podcast', unit: '集', icon: Headphones },
-    { value: 'course', label: '課程', unit: '堂', icon: GraduationCap },
-    { value: 'custom', label: '自定義', unit: '項', icon: Settings }
+    {
+      value: 'book', label: '書籍', unit: '頁', icon: Book,
+    },
+    {
+      value: 'video', label: '影片課程', unit: '集', icon: Video,
+    },
+    {
+      value: 'articles', label: '文章', unit: '篇', icon: FileText,
+    },
+    {
+      value: 'podcast', label: 'Podcast', unit: '集', icon: Headphones,
+    },
+    {
+      value: 'course', label: '課程', unit: '堂', icon: GraduationCap,
+    },
+    {
+      value: 'custom', label: '自定義', unit: '項', icon: Settings,
+    },
   ];
 
   const currentContentType = contentTypeOptions.find((option) => option.value === practice.contentType);
@@ -153,14 +165,16 @@ const EditForm: React.FC<EditFormProps> = ({
         {/* 標題 */}
         <div className="space-y-2">
           <Label htmlFor="title">
-            標題 <span className="text-alert">*</span>
+            標題
+            {' '}
+            <span className="text-alert">*</span>
           </Label>
           <Input
             id="title"
             value={formData.title || ''}
             onChange={(e) => handleFieldChange('title', e.target.value)}
             placeholder="輸入實踐標題"
-            className={cn(errors.title && "border-alert focus:ring-alert")}
+            className={cn(errors.title && 'border-alert focus:ring-alert')}
           />
           {errors.title && (
             <p className="body-sm text-alert">{errors.title}</p>
@@ -171,7 +185,7 @@ const EditForm: React.FC<EditFormProps> = ({
         <div className="space-y-2">
           <Label>實踐類型</Label>
           <div className="px-3 py-2 bg-muted border border-input rounded-md body-sm text-muted-foreground flex items-center gap-2">
-            {currentContentType?.icon && React.createElement(currentContentType.icon, { className: "h-4 w-4" })}
+            {currentContentType?.icon && React.createElement(currentContentType.icon, { className: 'h-4 w-4' })}
             {practice.contentType === 'custom' ? practice.customContentType || '自定義' : (currentContentType?.label || practice.contentType)}
           </div>
           <p className="body-sm text-muted-foreground">實踐類型在建立後無法修改</p>
@@ -182,7 +196,11 @@ const EditForm: React.FC<EditFormProps> = ({
       <div className="space-y-6">
         <div className="flex items-center space-x-3 mb-4">
           <Label>標籤設定</Label>
-          <span className="text-sm text-muted-foreground">({(formData.tags || []).length}/3)</span>
+          <span className="text-sm text-muted-foreground">
+            (
+            {(formData.tags || []).length}
+            /3)
+          </span>
         </div>
 
         {/* 標籤下拉選單 */}
@@ -197,10 +215,10 @@ const EditForm: React.FC<EditFormProps> = ({
               }}
             >
               <SelectTrigger className={cn(
-                (formData.tags || []).length >= 3 && "opacity-50 cursor-not-allowed"
+                (formData.tags || []).length >= 3 && 'opacity-50 cursor-not-allowed'
               )}
               >
-                <SelectValue placeholder={(formData.tags || []).length >= 3 ? "已達到最多標籤數量" : "選擇標籤"} />
+                <SelectValue placeholder={(formData.tags || []).length >= 3 ? '已達到最多標籤數量' : '選擇標籤'} />
               </SelectTrigger>
               <SelectContent>
                 <div className="space-y-1">
@@ -209,36 +227,33 @@ const EditForm: React.FC<EditFormProps> = ({
                     .filter((tag) => !(formData.tags || []).includes(tag.label))
                     .map((tag) => (
                       <SelectItem key={tag.id} value={tag.label}>
-                        <span className={cn("px-2 py-1 rounded text-xs font-medium", tag.color)}>
+                        <span className={cn('px-2 py-1 rounded text-xs font-medium', tag.color)}>
                           {tag.label}
                         </span>
                       </SelectItem>
-                    ))
-                  }
+                    ))}
 
                   <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">難度標籤</p>
                   {defaultTags.difficulty
                     .filter((tag) => !(formData.tags || []).includes(tag.label))
                     .map((tag) => (
                       <SelectItem key={tag.id} value={tag.label}>
-                        <span className={cn("px-2 py-1 rounded text-xs font-medium", tag.color)}>
+                        <span className={cn('px-2 py-1 rounded text-xs font-medium', tag.color)}>
                           {tag.label}
                         </span>
                       </SelectItem>
-                    ))
-                  }
+                    ))}
 
                   <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">時長標籤</p>
                   {defaultTags.duration
                     .filter((tag) => !(formData.tags || []).includes(tag.label))
                     .map((tag) => (
                       <SelectItem key={tag.id} value={tag.label}>
-                        <span className={cn("px-2 py-1 rounded text-xs font-medium", tag.color)}>
+                        <span className={cn('px-2 py-1 rounded text-xs font-medium', tag.color)}>
                           {tag.label}
                         </span>
                       </SelectItem>
-                    ))
-                  }
+                    ))}
                 </div>
               </SelectContent>
             </Select>
@@ -283,7 +298,9 @@ const EditForm: React.FC<EditFormProps> = ({
           {/* 總量 */}
           <div className="space-y-2">
             <Label htmlFor="totalAmount">
-              總量 <span className="text-alert">*</span>
+              總量
+              {' '}
+              <span className="text-alert">*</span>
             </Label>
             <div className="relative">
               <Input
@@ -295,8 +312,8 @@ const EditForm: React.FC<EditFormProps> = ({
                 min="1"
                 max="10000"
                 className={cn(
-                  "pr-12",
-                  errors.totalAmount && "border-alert focus:ring-alert"
+                  'pr-12',
+                  errors.totalAmount && 'border-alert focus:ring-alert'
                 )}
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 body-sm text-muted-foreground">
@@ -316,7 +333,7 @@ const EditForm: React.FC<EditFormProps> = ({
               type="date"
               value={formData.startDate || ''}
               onChange={(e) => handleFieldChange('startDate', e.target.value)}
-              className={cn(errors.startDate && "border-alert focus:ring-alert")}
+              className={cn(errors.startDate && 'border-alert focus:ring-alert')}
             />
             {errors.startDate && (
               <p className="body-sm text-alert">{errors.startDate}</p>
@@ -334,8 +351,8 @@ const EditForm: React.FC<EditFormProps> = ({
                 ...formData,
                 dailyGoal: {
                   ...formData.dailyGoal,
-                  type: value as 'time' | 'completion'
-                }
+                  type: value as 'time' | 'completion',
+                },
               });
             }}
             className="flex items-center space-x-6"
@@ -371,8 +388,8 @@ const EditForm: React.FC<EditFormProps> = ({
                       dailyGoal: {
                         ...formData.dailyGoal,
                         type: 'time',
-                        timeMinutes: parseInt(e.target.value, 10) || 30
-                      }
+                        timeMinutes: parseInt(e.target.value, 10) || 30,
+                      },
                     });
                   }}
                   min="5"
@@ -402,8 +419,8 @@ const EditForm: React.FC<EditFormProps> = ({
                         ...formData.dailyGoal,
                         type: 'completion',
                         amount: parseInt(e.target.value, 10) || 1,
-                        unit: formData.dailyGoal?.unit || currentContentType?.unit || '項'
-                      }
+                        unit: formData.dailyGoal?.unit || currentContentType?.unit || '項',
+                      },
                     });
                   }}
                   min="1"
@@ -438,7 +455,8 @@ const EditForm: React.FC<EditFormProps> = ({
             maxLength={200}
           />
           <div className="text-xs text-muted-foreground text-right">
-            {(formData.practiceAction || '').length}/200
+            {(formData.practiceAction || '').length}
+            /200
           </div>
         </div>
       </div>
@@ -476,7 +494,7 @@ const EditForm: React.FC<EditFormProps> = ({
                       onChange={(e) => handleResourceChange(resource.id, 'name', e.target.value)}
                       onBlur={(e) => validateResourceField(resource.id, 'name', e.target.value)}
                       placeholder="資源名稱"
-                      className={cn(resourceErrors[resource.id]?.name && "border-destructive")}
+                      className={cn(resourceErrors[resource.id]?.name && 'border-destructive')}
                     />
                     {resourceErrors[resource.id]?.name && (
                       <div className="flex items-center mt-1 text-xs text-destructive">
@@ -492,7 +510,7 @@ const EditForm: React.FC<EditFormProps> = ({
                       onChange={(e) => handleResourceChange(resource.id, 'url', e.target.value)}
                       onBlur={(e) => validateResourceField(resource.id, 'url', e.target.value)}
                       placeholder="資源連結（選填）"
-                      className={cn(resourceErrors[resource.id]?.url && "border-destructive")}
+                      className={cn(resourceErrors[resource.id]?.url && 'border-destructive')}
                     />
                     {resourceErrors[resource.id]?.url && (
                       <div className="flex items-center mt-1 text-xs text-destructive">

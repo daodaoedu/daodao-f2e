@@ -1,21 +1,21 @@
-import { z } from "zod";
-import { getTokenStorage } from "@/utils/storage";
-import getEnv from "@/utils/env";
+import { z } from 'zod';
+import { getTokenStorage } from '@/utils/storage';
+import getEnv from '@/utils/env';
 
-export const V1_BASE_URL = "https://api.daoedu.tw";
+export const V1_BASE_URL = 'https://api.daoedu.tw';
 export const BASE_URL = getEnv().apiUrl;
 
 enum RequestMethod {
-  GET = "GET",
-  POST = "POST",
-  PUT = "PUT",
-  PATCH = "PATCH",
-  DELETE = "DELETE",
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  PATCH = 'PATCH',
+  DELETE = 'DELETE',
 }
 
 export enum RequestContentType {
-  JSON = "application/json",
-  FormData = "multipart/form-data",
+  JSON = 'application/json',
+  FormData = 'multipart/form-data',
 }
 
 export type PaginationRequestType<T> = {
@@ -62,27 +62,27 @@ const serialize =
     formattedData: T,
     keys: string[] = []
   ) =>
-  (source: unknown) => {
-    const append = (key: string) => (value: ValidValueType) => {
-      if (formattedData instanceof URLSearchParams) {
-        formattedData.append(key, value.toString());
-      } else if (typeof value === "string" || value instanceof Blob) {
-        formattedData.append(key, value);
+    (source: unknown) => {
+      const append = (key: string) => (value: ValidValueType) => {
+        if (formattedData instanceof URLSearchParams) {
+          formattedData.append(key, value.toString());
+        } else if (typeof value === 'string' || value instanceof Blob) {
+          formattedData.append(key, value);
+        }
+      };
+
+      if (isValidValue(source)) {
+        append(keys.join('.'))(source);
+      } else if (Array.isArray(source)) {
+        source.forEach(serialize(formattedData, keys));
+      } else if (isRecord(source)) {
+        Object.entries(source || {}).forEach(([key, value]) => {
+          serialize(formattedData, keys.concat(key))(value);
+        });
       }
+
+      return formattedData;
     };
-
-    if (isValidValue(source)) {
-      append(keys.join("."))(source);
-    } else if (Array.isArray(source)) {
-      source.forEach(serialize(formattedData, keys));
-    } else if (isRecord(source)) {
-      Object.entries(source || {}).forEach(([key, value]) => {
-        serialize(formattedData, keys.concat(key))(value);
-      });
-    }
-
-    return formattedData;
-  };
 
 const createUrl = (
   pathname: string,
@@ -138,11 +138,11 @@ const http = async <R = void>({
   const headers = new Headers();
 
   if (token) {
-    headers.append("Authorization", `Bearer ${token}`);
+    headers.append('Authorization', `Bearer ${token}`);
   }
 
   if (contentType === RequestContentType.JSON) {
-    headers.append("Content-Type", contentType);
+    headers.append('Content-Type', contentType);
   }
 
   const response = await fetch(url, { method, headers, body });
@@ -169,7 +169,7 @@ export const fetcherV1 = <R = void>(
   params: FetcherParams,
   options: RequestInit = {}
 ): Promise<R> =>
-  fetch(`${V1_BASE_URL}${params}`, options).then((res) => res.json());
+    fetch(`${V1_BASE_URL}${params}`, options).then((res) => res.json());
 
 const getArg = (source: unknown): Record<string, unknown> => {
   if (isRecord(source) && isRecord(source.arg)) {
@@ -184,11 +184,16 @@ const getArg = (source: unknown): Record<string, unknown> => {
 const createMutation =
   (method: RequestMethod) =>
   <R = void>(
-    pathname: string,
-    source?: unknown,
-    contentType = RequestContentType.JSON
-  ): Promise<R> =>
-    http<R>({ pathname, source: getArg(source), method, contentType });
+      pathname: string,
+      source?: unknown,
+      contentType = RequestContentType.JSON
+    ): Promise<R> =>
+      http<R>({
+        pathname,
+        source: getArg(source),
+        method,
+        contentType,
+      });
 
 export const mutations = {
   post: createMutation(RequestMethod.POST),

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const parseToString = (input?: unknown, isEncode = true) => {
   const schema = z
@@ -52,8 +52,7 @@ interface MapItem {
   label: string;
 }
 
-export const mapToTable = (map: MapItem[] = []) =>
-  map.reduce(
-    (acc, item) => ({ ...acc, [item.key ?? item.value]: item.label }),
-    {}
-  );
+export const mapToTable = (map: MapItem[] = []) => map.reduce(
+  (acc, item) => ({ ...acc, [item.key ?? item.value]: item.label }),
+  {}
+);

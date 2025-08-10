@@ -89,7 +89,7 @@ function ComingSoon() {
           onClick={() => {
             window?.open(
               'https://chrome.google.com/webstore/detail/hcjaenainlhcfpofopninhciegmeilae',
-              '_blank',
+              '_blank'
             );
           }}
           sx={{

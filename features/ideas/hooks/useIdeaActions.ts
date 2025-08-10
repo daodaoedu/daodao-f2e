@@ -5,7 +5,7 @@ import { useIdeasCache } from './useIdeasCache';
 import {
   useIdeaSubmission,
   useIdeaUpdateSubmission,
-  useIdeaDeletion
+  useIdeaDeletion,
 } from './useIdeaSubmission';
 
 interface UseIdeaActionsOptions {
@@ -197,7 +197,7 @@ export const useIdeaActions = ({
       const { platform = 'clipboard', customMessage = '' } = options;
 
       const shareUrl = `${window.location.origin}/ideas/detail?ideaId=${id}`;
-      const shareText = customMessage || `分享一個有趣的想法！`;
+      const shareText = customMessage || '分享一個有趣的想法！';
 
       switch (platform) {
         case 'clipboard':

@@ -11,7 +11,9 @@ export function useIdeas(params?: IdeaSearchParamsSchema) {
   const queryString = buildIdeaQueryString(params);
   const swrKey = `/ideas${queryString}`;
 
-  const { data, error, isLoading, mutate } = useSWR(
+  const {
+    data, error, isLoading, mutate,
+  } = useSWR(
     swrKey,
     () => ideaAPI.readList(params),
     {
@@ -38,7 +40,9 @@ export function useIdeas(params?: IdeaSearchParamsSchema) {
 export function useIdea(ideaId: string) {
   const swrKey = ideaId ? `/ideas/${ideaId}` : null;
 
-  const { data, error, isLoading, mutate } = useSWR(
+  const {
+    data, error, isLoading, mutate,
+  } = useSWR(
     swrKey,
     () => ideaAPI.read(ideaId),
     {
@@ -61,11 +65,13 @@ export function useIdeaSearch(initialParams?: IdeaSearchParamsSchema) {
   const [searchParams, setSearchParams] = useState<IdeaSearchParamsSchema>(
     initialParams ?? {
       sortBy: 'createdDate',
-      sortOrder: 'desc'
+      sortOrder: 'desc',
     }
   );
 
-  const { ideas, pagination, isLoading, isError, refresh } = useIdeas(searchParams);
+  const {
+    ideas, pagination, isLoading, isError, refresh,
+  } = useIdeas(searchParams);
 
   const updateSearch = useCallback((newParams: Partial<IdeaSearchParamsSchema>) => {
     setSearchParams((prev) => ({ ...prev, ...newParams }));
@@ -74,7 +80,7 @@ export function useIdeaSearch(initialParams?: IdeaSearchParamsSchema) {
   const clearSearch = useCallback(() => {
     setSearchParams({
       sortBy: 'createdDate',
-      sortOrder: 'desc'
+      sortOrder: 'desc',
     });
   }, []);
 

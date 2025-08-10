@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { usePromotion } from "@/contexts/Promotion";
+import React, { useEffect, useRef, useState } from 'react';
+import { usePromotion } from '@/contexts/Promotion';
 
 export default function useShadowToggleOnScroll() {
   const elementRef = useRef<HTMLDivElement>(null);
@@ -24,9 +24,9 @@ export default function useShadowToggleOnScroll() {
     };
 
     handleScroll();
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, [height, setIsShowHeaderShadow]);
 

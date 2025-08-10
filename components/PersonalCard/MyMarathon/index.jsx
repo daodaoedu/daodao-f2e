@@ -3,12 +3,12 @@ import { useMarathonByUserEvent } from '@/services/marathons';
 
 import {
   Typography,
-  Grid
+  Grid,
 } from '@mui/material';
 
 import {
   StyledGroupsWrapper,
-} from "./MarathonCard.styled";
+} from './MarathonCard.styled';
 import MarathonCard from './MarathonCard';
 
 const MyMarathon = ({ title, sx }) => {
@@ -19,7 +19,9 @@ const MyMarathon = ({ title, sx }) => {
     <StyledGroupsWrapper sx={sx}>
       {title && (
         <Typography
-          sx={{ fontSize: '22px', color: '#536166', fontWeight: 700, mb: 3 }}
+          sx={{
+            fontSize: '22px', color: '#536166', fontWeight: 700, mb: 3,
+          }}
         >
           {title}
         </Typography>

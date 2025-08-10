@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowLeft, CheckCircle, Heart, Frown, Minus as Meh, Smile, Star, Plus, X } from 'lucide-react';
+import {
+  ArrowLeft, CheckCircle, Heart, Frown, Minus as Meh, Smile, Star, Plus, X,
+} from 'lucide-react';
 import { Practice, MoodType, CheckInInput } from '@/services/practice/schema';
 import { CheckInService } from '@/features/practice';
 import { usePracticeManager } from '@/features/practice/hooks';
@@ -18,7 +20,7 @@ interface CheckInViewProps {
 const CheckInView: React.FC<CheckInViewProps> = ({
   practice,
   onBack,
-  onSuccess
+  onSuccess,
 }) => {
   const { checkIn } = usePracticeManager();
   const { scrollToTop } = useScrollToTop();
@@ -36,11 +38,21 @@ const CheckInView: React.FC<CheckInViewProps> = ({
 
   // 心情選項
   const moodOptions = [
-    { value: 'excellent' as MoodType, label: '優秀', icon: Star, color: '#10b981' },
-    { value: 'good' as MoodType, label: '良好', icon: Smile, color: '#06b6d4' },
-    { value: 'average' as MoodType, label: '普通', icon: Meh, color: '#6b7280' },
-    { value: 'challenging' as MoodType, label: '有挑戰', icon: Heart, color: '#f59e0b' },
-    { value: 'difficult' as MoodType, label: '困難', icon: Frown, color: '#ef4444' }
+    {
+      value: 'excellent' as MoodType, label: '優秀', icon: Star, color: '#10b981',
+    },
+    {
+      value: 'good' as MoodType, label: '良好', icon: Smile, color: '#06b6d4',
+    },
+    {
+      value: 'average' as MoodType, label: '普通', icon: Meh, color: '#6b7280',
+    },
+    {
+      value: 'challenging' as MoodType, label: '有挑戰', icon: Heart, color: '#f59e0b',
+    },
+    {
+      value: 'difficult' as MoodType, label: '困難', icon: Frown, color: '#ef4444',
+    },
   ];
 
   // 常用標籤建議
@@ -81,7 +93,7 @@ const CheckInView: React.FC<CheckInViewProps> = ({
       progress,
       note: note.trim(),
       mood,
-      tags: tags.filter((tag) => tag.trim())
+      tags: tags.filter((tag) => tag.trim()),
     };
 
     // 驗證輸入
@@ -141,9 +153,26 @@ const CheckInView: React.FC<CheckInViewProps> = ({
               <div className="bg-basic-50 rounded-lg p-4 text-left">
                 <h4 className="body-sm font-medium text-basic-700 mb-2">今日打卡記錄</h4>
                 <div className="space-y-2 body-sm text-basic-600">
-                  <div>進度：+{todayCheckIn.progress} {practice.unit}</div>
-                  <div>總進度：{todayCheckIn.totalProgress}/{practice.totalAmount} {practice.unit}</div>
-                  {todayCheckIn.note && <div>筆記：{todayCheckIn.note}</div>}
+                  <div>
+                    進度：+
+                    {todayCheckIn.progress}
+                    {' '}
+                    {practice.unit}
+                  </div>
+                  <div>
+                    總進度：
+                    {todayCheckIn.totalProgress}
+                    /
+                    {practice.totalAmount}
+                    {' '}
+                    {practice.unit}
+                  </div>
+                  {todayCheckIn.note && (
+                  <div>
+                    筆記：
+                    {todayCheckIn.note}
+                  </div>
+                  )}
                   {todayCheckIn.mood && (
                     <div className="flex items-center gap-1">
                       心情：
@@ -151,7 +180,7 @@ const CheckInView: React.FC<CheckInViewProps> = ({
                         const moodOption = moodOptions.find((m) => m.value === todayCheckIn.mood);
                         return (
                           <>
-                            {moodOption?.icon && React.createElement(moodOption.icon, { className: "h-4 w-4" })}
+                            {moodOption?.icon && React.createElement(moodOption.icon, { className: 'h-4 w-4' })}
                             {moodOption?.label}
                           </>
                         );
@@ -181,7 +210,10 @@ const CheckInView: React.FC<CheckInViewProps> = ({
       <div className="bg-white rounded-lg shadow-md border border-basic-200 overflow-hidden">
         {/* 標題 */}
         <div className="p-6 border-b border-basic-200">
-          <h3 className="heading-lg text-basic-black">{practice.title}打卡</h3>
+          <h3 className="heading-lg text-basic-black">
+            {practice.title}
+            打卡
+          </h3>
         </div>
 
         {/* 錯誤訊息 */}
@@ -189,7 +221,10 @@ const CheckInView: React.FC<CheckInViewProps> = ({
           <div className="p-4 bg-alert-lighter border-l-4 border-alert">
             <ul className="body-sm text-alert-darker">
               {errors.map((error) => (
-                <li key={error}>• {error}</li>
+                <li key={error}>
+                  •
+                  {error}
+                </li>
               ))}
             </ul>
           </div>
@@ -200,7 +235,9 @@ const CheckInView: React.FC<CheckInViewProps> = ({
           {/* 進度輸入 */}
           <div>
             <Label htmlFor="progress-input" className="block body-sm font-medium text-basic-700 mb-2 w-full">
-              今日實踐進度 <span className="text-alert">*</span>
+              今日實踐進度
+              {' '}
+              <span className="text-alert">*</span>
             </Label>
             <div className="flex items-center space-x-3 mt-2">
               <div className="flex-1 relative">
@@ -222,21 +259,22 @@ const CheckInView: React.FC<CheckInViewProps> = ({
             <div className="mt-3 bg-success-lightest rounded-lg p-3">
               <div className="flex justify-between items-center mb-2">
                 <span className="body-sm font-medium text-success-darker">
-                  {newProgressPercentage}% 完成
+                  {newProgressPercentage}
+                  % 完成
                 </span>
               </div>
               <div className="w-full bg-basic-200 rounded-full h-2">
                 <div className={`h-2 rounded-full bg-success transition-all duration-300 ${
-                  newProgressPercentage >= 100 ? 'w-full' :
-                  newProgressPercentage >= 90 ? 'w-[90%]' :
-                  newProgressPercentage >= 80 ? 'w-[80%]' :
-                  newProgressPercentage >= 70 ? 'w-[70%]' :
-                  newProgressPercentage >= 60 ? 'w-[60%]' :
-                  newProgressPercentage >= 50 ? 'w-1/2' :
-                  newProgressPercentage >= 40 ? 'w-[40%]' :
-                  newProgressPercentage >= 30 ? 'w-[30%]' :
-                  newProgressPercentage >= 20 ? 'w-1/5' :
-                  newProgressPercentage >= 10 ? 'w-[10%]' : 'w-[5%]'
+                  newProgressPercentage >= 100 ? 'w-full'
+                    : newProgressPercentage >= 90 ? 'w-[90%]'
+                      : newProgressPercentage >= 80 ? 'w-[80%]'
+                        : newProgressPercentage >= 70 ? 'w-[70%]'
+                          : newProgressPercentage >= 60 ? 'w-[60%]'
+                            : newProgressPercentage >= 50 ? 'w-1/2'
+                              : newProgressPercentage >= 40 ? 'w-[40%]'
+                                : newProgressPercentage >= 30 ? 'w-[30%]'
+                                  : newProgressPercentage >= 20 ? 'w-1/5'
+                                    : newProgressPercentage >= 10 ? 'w-[10%]' : 'w-[5%]'
                 }`}
                 />
               </div>
@@ -260,17 +298,17 @@ const CheckInView: React.FC<CheckInViewProps> = ({
                     className={`p-2 rounded-lg border-2 transition-all text-center ${isSelected
                       ? 'border-primary-base bg-primary-palest'
                       : 'border-basic-200 hover:border-basic-300 hover:bg-basic-50'
-                      }`}
+                    }`}
                   >
                     <div className="flex items-center justify-center gap-1">
                       {React.createElement(option.icon, {
                         className: `h-4 w-4 ${
-                          option.value === 'excellent' ? 'text-green-500' :
-                          option.value === 'good' ? 'text-cyan-500' :
-                          option.value === 'average' ? 'text-gray-500' :
-                          option.value === 'challenging' ? 'text-amber-500' :
-                          option.value === 'difficult' ? 'text-red-500' : 'text-gray-400'
-                        }`
+                          option.value === 'excellent' ? 'text-green-500'
+                            : option.value === 'good' ? 'text-cyan-500'
+                              : option.value === 'average' ? 'text-gray-500'
+                                : option.value === 'challenging' ? 'text-amber-500'
+                                  : option.value === 'difficult' ? 'text-red-500' : 'text-gray-400'
+                        }`,
                       })}
                       <span className="text-xs text-basic-700">{option.label}</span>
                     </div>
@@ -368,7 +406,8 @@ const CheckInView: React.FC<CheckInViewProps> = ({
               className="w-full resize-none"
             />
             <div className="mt-1 text-right body-sm text-basic-500">
-              {note.length}/500
+              {note.length}
+              /500
             </div>
           </div>
         </div>

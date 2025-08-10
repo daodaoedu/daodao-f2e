@@ -29,14 +29,12 @@ const ImageWrapper = styled(LazyLoadImage)`
   object-position: center;
 `;
 
-const Card = ({ message = '', image, url }) => {
-  return (
-    <Tooltip title={message.slice(0, 150)}>
-      <CardWrapper onClick={() => window.open(url, '_target')}>
-        <ImageWrapper alt={message} src={image} effect="opacity" />
-      </CardWrapper>
-    </Tooltip>
-  );
-};
+const Card = ({ message = '', image, url }) => (
+  <Tooltip title={message.slice(0, 150)}>
+    <CardWrapper onClick={() => window.open(url, '_target')}>
+      <ImageWrapper alt={message} src={image} effect="opacity" />
+    </CardWrapper>
+  </Tooltip>
+);
 
 export default Card;

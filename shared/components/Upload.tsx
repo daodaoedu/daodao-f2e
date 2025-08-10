@@ -1,5 +1,7 @@
 import toast from 'react-hot-toast';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import {
+  ChangeEvent, useEffect, useRef, useState,
+} from 'react';
 import { uploadImagesSchema } from '@/services/images';
 import { Button, type ButtonProps } from '@/components/ui/button';
 
@@ -66,9 +68,7 @@ function Upload({
     inputRef.current?.click();
   };
 
-  useEffect(() => {
-    return () => urls.forEach(URL.revokeObjectURL);
-  }, [urls]);
+  useEffect(() => () => urls.forEach(URL.revokeObjectURL), [urls]);
 
   return (
     <>

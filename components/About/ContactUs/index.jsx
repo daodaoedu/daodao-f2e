@@ -19,53 +19,51 @@ const LineWrapper = styled(Typography)`
   margin: 5px 0;
 `;
 
-const ContactUs = () => {
-  return (
-    <ContactUsWrapper>
-      <Typography
-        variant="h2"
-        sx={{
-          margin: '40px 0 10px 0',
-        }}
-      >
-        聯絡我們
-      </Typography>
-      <Stack
-        sx={{
-          margin: '20px',
-        }}
-      >
-        <LineWrapper variant="p">
-          <LinkWrapper
-            target="_blank"
-            href="https://www.facebook.com/daodao.edu"
-            rel="noopener noreferrer"
-          >
-            🏝️ 島島阿學的 Facebook
-          </LinkWrapper>
-        </LineWrapper>
-        <LineWrapper variant="p">
-          <LinkWrapper
-            target="_blank"
-            href="https://www.instagram.com/daodao_edu/"
-            rel="noopener noreferrer"
-          >
-            🏝️ 島島阿學的 Instagram
-          </LinkWrapper>
-        </LineWrapper>
-        <LineWrapper variant="p">
-          <LinkWrapper
-            target="_blank"
-            href="mailto:contact@daoedu.tw"
-            rel="noopener noreferrer"
-          >
-            🏝️ 島島阿學的信箱 – contact@daoedu.tw
-            <br />
-          </LinkWrapper>
-        </LineWrapper>
-      </Stack>
-    </ContactUsWrapper>
-  );
-};
+const ContactUs = () => (
+  <ContactUsWrapper>
+    <Typography
+      variant="h2"
+      sx={{
+        margin: '40px 0 10px 0',
+      }}
+    >
+      聯絡我們
+    </Typography>
+    <Stack
+      sx={{
+        margin: '20px',
+      }}
+    >
+      <LineWrapper variant="p">
+        <LinkWrapper
+          target="_blank"
+          href="https://www.facebook.com/daodao.edu"
+          rel="noopener noreferrer"
+        >
+          🏝️ 島島阿學的 Facebook
+        </LinkWrapper>
+      </LineWrapper>
+      <LineWrapper variant="p">
+        <LinkWrapper
+          target="_blank"
+          href="https://www.instagram.com/daodao_edu/"
+          rel="noopener noreferrer"
+        >
+          🏝️ 島島阿學的 Instagram
+        </LinkWrapper>
+      </LineWrapper>
+      <LineWrapper variant="p">
+        <LinkWrapper
+          target="_blank"
+          href="mailto:contact@daoedu.tw"
+          rel="noopener noreferrer"
+        >
+          🏝️ 島島阿學的信箱 – contact@daoedu.tw
+          <br />
+        </LinkWrapper>
+      </LineWrapper>
+    </Stack>
+  </ContactUsWrapper>
+);
 
 export default ContactUs;

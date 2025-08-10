@@ -25,13 +25,16 @@ function CloseButton({ onClick }) {
 export default function SnackbarProvider({ children }) {
   const [queue, setQueue] = useState([]);
 
-  const pushSnackbar = ({ message, type, vertical = 'bottom', horizontal = 'left' }) =>
-    new Promise((resolve) => {
-      setQueue((pre) => [
-        ...pre,
-        { id: Math.random(), open: true, message, resolve, type, vertical, horizontal },
-      ]);
-    });
+  const pushSnackbar = ({
+    message, type, vertical = 'bottom', horizontal = 'left',
+  }) => new Promise((resolve) => {
+    setQueue((pre) => [
+      ...pre,
+      {
+        id: Math.random(), open: true, message, resolve, type, vertical, horizontal,
+      },
+    ]);
+  });
 
   const closeSnackbar = (id) => (e) => {
     e?.stopPropagation?.();

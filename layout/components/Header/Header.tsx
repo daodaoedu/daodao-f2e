@@ -1,12 +1,12 @@
-import { useRouter } from "next/router";
-import { forwardRef } from "react";
-import Link from "next/link";
-import newLogo from "@/public/new-logo.png";
-import { usePromotion } from "@/contexts/Promotion";
-import { cn } from "@/utils/cn";
-import { Image } from "@/components/ui/image";
-import MobileMenu from "./MobileMenu";
-import DesktopMenu from "./DesktopMenu";
+import { useRouter } from 'next/router';
+import { forwardRef } from 'react';
+import Link from 'next/link';
+import newLogo from '@/public/new-logo.png';
+import { usePromotion } from '@/contexts/Promotion';
+import { cn } from '@/utils/cn';
+import { Image } from '@/components/ui/image';
+import MobileMenu from './MobileMenu';
+import DesktopMenu from './DesktopMenu';
 
 function Header(
   { children }: React.PropsWithChildren,
@@ -14,15 +14,15 @@ function Header(
 ) {
   const { isShowShadow } = usePromotion();
   const { pathname } = useRouter();
-  const isFixed = pathname === "/";
+  const isFixed = pathname === '/';
 
   return (
     <div
       ref={ref}
       className={cn(
-        "sticky top-0 inset-x-0 z-30",
-        isShowShadow && "shadow-md shadow-basic-black/25",
-        isFixed && "fixed"
+        'sticky top-0 inset-x-0 z-30',
+        isShowShadow && 'shadow-md shadow-basic-black/25',
+        isFixed && 'fixed'
       )}
     >
       {children}

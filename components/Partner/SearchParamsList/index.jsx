@@ -12,11 +12,10 @@ const SearchParamsList = ({ paramsKey = [], paramsKeyOptions = {} }) => {
   const [getSearchParams, pushState, genParamsItems] = useSearchParamsManager();
 
   const params = useMemo(
-    () =>
-      Array.isArray(paramsKey)
-        ? genParamsItems(paramsKey, paramsKeyOptions)
-        : [],
-    [getSearchParams],
+    () => (Array.isArray(paramsKey)
+      ? genParamsItems(paramsKey, paramsKeyOptions)
+      : []),
+    [getSearchParams]
   );
 
   const handleDelete = (key, val) => {
@@ -24,27 +23,25 @@ const SearchParamsList = ({ paramsKey = [], paramsKeyOptions = {} }) => {
       key,
       getSearchParams(key)
         .filter((v) => v !== val)
-        .toString(),
+        .toString()
     );
   };
 
   return (
     params.length > 0 && (
       <StyledGrid container gap="10px" mb="16px">
-        {params.map((item) =>
-          item.values.map((val) => (
-            <StyledGridItem item key={val}>
-              <StyledTag>
-                <StyledTagText>{val}</StyledTagText>
-                <StyledClosed
-                  onClick={() => {
-                    handleDelete(item.key, val);
-                  }}
-                />
-              </StyledTag>
-            </StyledGridItem>
-          )),
-        )}
+        {params.map((item) => item.values.map((val) => (
+          <StyledGridItem item key={val}>
+            <StyledTag>
+              <StyledTagText>{val}</StyledTagText>
+              <StyledClosed
+                onClick={() => {
+                  handleDelete(item.key, val);
+                }}
+              />
+            </StyledTag>
+          </StyledGridItem>
+        )))}
       </StyledGrid>
     )
   );

@@ -8,8 +8,6 @@ export const defaultClass = cn(
   '[&[data-active="true"]_+_*]:before:hidden lg:before:hidden'
 );
 
-export const activeClass =
-  'text-primary-base bg-primary-lightest font-bold cursor-default';
+export const activeClass = 'text-primary-base bg-primary-lightest font-bold cursor-default';
 
-export const disableClass =
-  'text-basic-300 bg-transparent font-medium cursor-not-allowed';
+export const disableClass = 'text-basic-300 bg-transparent font-medium cursor-not-allowed';

@@ -1,5 +1,5 @@
-import { GACategory, logEvent } from "./analytics";
-import getEnv from "./env";
+import { GACategory, logEvent } from './analytics';
+import getEnv from './env';
 
 interface ShareAPIProps {
   url: string;
@@ -10,48 +10,48 @@ interface ShareAPIProps {
 
 export default function getShareAPI({
   url,
-  title = "",
-  text = "",
-  hashtag = "",
+  title = '',
+  text = '',
+  hashtag = '',
 }: ShareAPIProps) {
   if (getEnv().isServerSide) return {};
 
-  const formattedUrl = url.startsWith("https://")
+  const formattedUrl = url.startsWith('https://')
     ? url
     : `${window.location.origin}${url}`;
 
   const openInNewTab = (social: string, _url: string) => () => {
     logEvent(GACategory.Share, `Share to ${social}`, `Share URL: ${_url}`);
-    window.open(_url, "_blank");
+    window.open(_url, '_blank');
   };
 
   const nativeShare = () => {
-    logEvent(GACategory.Share, "Share to Native", `Share URL: ${formattedUrl}`);
+    logEvent(GACategory.Share, 'Share to Native', `Share URL: ${formattedUrl}`);
     navigator.share({ title, text, url: formattedUrl });
   };
 
   const facebookShare = openInNewTab(
-    "Facebook",
+    'Facebook',
     `https://www.facebook.com/sharer/sharer.php?u=${formattedUrl}&source_surface=external_reshare&display=popup&hashtag=${hashtag}`
   );
 
   const lineShare = openInNewTab(
-    "LINE",
+    'LINE',
     `https://social-plugins.line.me/lineit/share?url=${formattedUrl}`
   );
 
   const linkedinShare = openInNewTab(
-    "LinkedIn",
+    'LinkedIn',
     `https://www.linkedin.com/sharing/share-offsite/?url=${formattedUrl}&text=${text}`
   );
 
   const threadsShare = openInNewTab(
-    "Threads",
+    'Threads',
     `https://threads.net/intent/post?text=${formattedUrl}`
   );
 
   const xShare = openInNewTab(
-    "X",
+    'X',
     `https://x.com/intent/tweet?text=${formattedUrl}`
   );
 

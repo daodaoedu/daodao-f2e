@@ -27,8 +27,7 @@ const initialState = {
   district: '',
 };
 
-const buildValidator = (maxLength, regex, maxMsg, regMsg) =>
-  z.string().max(maxLength, maxMsg).regex(regex, regMsg).optional();
+const buildValidator = (maxLength, regex, maxMsg, regMsg) => z.string().max(maxLength, maxMsg).regex(regex, regMsg).optional();
 
 const schema = z.object({
   name: z
@@ -55,25 +54,25 @@ const schema = z.object({
     30,
     /^($|[a-zA-Z0-9_.]{2,20})$/,
     '長度最多30個字元',
-    '長度最少2個字元，支援英文、數字、底線、句號',
+    '長度最少2個字元，支援英文、數字、底線、句號'
   ),
   facebook: buildValidator(
     64,
     /^($|[a-zA-Z0-9_.]{5,20})$/,
     '長度最多64個字元',
-    '長度最少5個字元，支援英文、數字、底線、句號',
+    '長度最少5個字元，支援英文、數字、底線、句號'
   ),
   discord: buildValidator(
     32,
     /^($|[a-zA-Z0-9_.]{2,20})$/,
     '長度最多32個字元',
-    '長度最少2個字元，支援英文、數字、底線、句號',
+    '長度最少2個字元，支援英文、數字、底線、句號'
   ),
   line: buildValidator(
     20,
     /^($|[a-zA-Z0-9_.]{3,20})$/,
     '長度最多20個字元',
-    '長度最少6個字元，支援英文、數字、底線、句號',
+    '長度最少6個字元，支援英文、數字、底線、句號'
   ),
   wantToDoList: z
     .array(z.string())
@@ -99,7 +98,7 @@ const userReducer = (state, payload) => {
         ? state[key].filter((role) => role !== value)
         : [...state[key], value],
     };
-  } else if (state && state[key] !== undefined) {
+  } if (state && state[key] !== undefined) {
     return {
       ...state,
       [key]: value,
@@ -119,24 +118,23 @@ const useEditProfile = () => {
 
     const result = isPartial
       ? schema
-          .partial({ [key]: true })
-          .safeParse({ [key]: key === 'birthDay' ? val?.$d : val })
+        .partial({ [key]: true })
+        .safeParse({ [key]: key === 'birthDay' ? val?.$d : val })
       : schema
-          .refine(
-            (data) =>
-              !!data.instagram ||
+        .refine(
+          (data) => !!data.instagram ||
               !!data.facebook ||
               !!data.discord ||
               !!data.line,
-            {
-              message: '至少填寫一個社交媒體帳號',
-              path: ['socialCode'],
-            },
-          )
-          .safeParse({
-            ...state,
-            birthDay: state.birthDay.$d,
-          });
+          {
+            message: '至少填寫一個社交媒體帳號',
+            path: ['socialCode'],
+          }
+        )
+        .safeParse({
+          ...state,
+          birthDay: state.birthDay.$d,
+        });
 
     let isFocus = false;
 
@@ -154,7 +152,7 @@ const useEditProfile = () => {
             }
           }
           return [err.path[0], err.message];
-        }),
+        })
       );
       setErrors(newErrors);
     }

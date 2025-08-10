@@ -1,9 +1,9 @@
-import { ReactNode } from "react";
-import { InfoIcon, CheckIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { ReactNode } from 'react';
+import { InfoIcon, CheckIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import {
   Form,
   FormControl,
@@ -11,22 +11,22 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 import {
   ResourceSearchParamsSchema,
   resourceSearchParamsSchema,
-} from "@/services/resources/core/schema";
+} from '@/services/resources/core/schema';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
 import {
   costTypeOptions,
   targetAudienceTypeOptions,
   resourceTypeOptions,
-} from "../constants";
+} from '../constants';
 
 interface SearchFormProps {
   onFilter: (filters: ResourceSearchParamsSchema) => void;
@@ -111,8 +111,8 @@ export default function ResourceSearchForm({
     values: filters,
   });
 
-  const handleClear = (type: "type" | "cost" | "level" | "tags") => {
-    form.setValue(type, "");
+  const handleClear = (type: 'type' | 'cost' | 'level' | 'tags') => {
+    form.setValue(type, '');
   };
 
   function onSubmit(data: ResourceSearchParamsSchema) {
@@ -126,7 +126,7 @@ export default function ResourceSearchForm({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-6 bg-white p-6 rounded-xl">
             {/* 資源類型 */}
-            <FormSection title="資源類型" onClear={() => handleClear("type")}>
+            <FormSection title="資源類型" onClear={() => handleClear('type')}>
               <FormField
                 control={form.control}
                 name="type"
@@ -138,9 +138,7 @@ export default function ResourceSearchForm({
                           key={type.value}
                           label={type.label}
                           isChecked={field.value === type.value}
-                          onChange={(checked) =>
-                            field.onChange(checked ? type.value : "")
-                          }
+                          onChange={(checked) => field.onChange(checked ? type.value : '')}
                           hasTooltip
                           tooltipContent={type.description}
                         />
@@ -153,7 +151,7 @@ export default function ResourceSearchForm({
             </FormSection>
 
             {/* 費用 */}
-            <FormSection title="費用" onClear={() => handleClear("cost")}>
+            <FormSection title="費用" onClear={() => handleClear('cost')}>
               <FormField
                 control={form.control}
                 name="cost"
@@ -165,9 +163,7 @@ export default function ResourceSearchForm({
                           key={type.value}
                           label={type.label}
                           isChecked={field.value === type.value}
-                          onChange={(checked) =>
-                            field.onChange(checked ? type.value : "")
-                          }
+                          onChange={(checked) => field.onChange(checked ? type.value : '')}
                         />
                       ))}
                     </div>
@@ -178,7 +174,7 @@ export default function ResourceSearchForm({
             </FormSection>
 
             {/* 適合對象 */}
-            <FormSection title="適合" onClear={() => handleClear("level")}>
+            <FormSection title="適合" onClear={() => handleClear('level')}>
               <FormField
                 control={form.control}
                 name="level"
@@ -190,9 +186,7 @@ export default function ResourceSearchForm({
                           key={type.value}
                           label={type.label}
                           isChecked={field.value === type.value}
-                          onChange={(checked) =>
-                            field.onChange(checked ? type.value : "")
-                          }
+                          onChange={(checked) => field.onChange(checked ? type.value : '')}
                           hasTooltip
                           tooltipContent={type.description}
                         />

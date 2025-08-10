@@ -22,7 +22,9 @@ const SubHeaderWrapper = styled.h3`
     flex-direction: column;
   }
 `;
-const ImageCardList = ({ title, list, direction = 'left', isLoading }) => {
+const ImageCardList = ({
+  title, list, direction = 'left', isLoading,
+}) => {
   if (isLoading) {
     return (
       <Box sx={{ marginTop: '20px' }}>
@@ -125,7 +127,9 @@ const ImageCardList = ({ title, list, direction = 'left', isLoading }) => {
       >
         <CardListWrapper>
           {list.map(
-            ({ id, caption, media_url, timestamp, permalink, like_count }) => (
+            ({
+              id, caption, media_url, timestamp, permalink, like_count,
+            }) => (
               <Card
                 key={id}
                 id={id}
@@ -136,7 +140,7 @@ const ImageCardList = ({ title, list, direction = 'left', isLoading }) => {
                 url={permalink}
                 likeCount={like_count}
               />
-            ),
+            )
           )}
         </CardListWrapper>
       </Marquee>

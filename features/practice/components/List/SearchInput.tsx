@@ -18,7 +18,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   onChange,
   onClear,
   placeholder = '搜尋實踐項目...',
-  className = ''
+  className = '',
 }) => {
   const [focused, setFocused] = React.useState(false);
 

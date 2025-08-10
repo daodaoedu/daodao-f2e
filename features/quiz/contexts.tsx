@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router';
 import {
   createContext,
   useCallback,
@@ -6,8 +6,8 @@ import {
   useEffect,
   useMemo,
   useState,
-} from "react";
-import { getQuizStorage } from "@/utils/storage";
+} from 'react';
+import { getQuizStorage } from '@/utils/storage';
 import {
   AnswerKey,
   questionMap,
@@ -15,8 +15,10 @@ import {
   ResultDetailType,
   themeMap,
   ThemeType,
-} from "./constants";
-import { isAnswerValue, isQuestionId, parseResult, ResultType } from "./utils";
+} from './constants';
+import {
+  isAnswerValue, isQuestionId, parseResult, ResultType,
+} from './utils';
 
 type QuizContextType = {
   result: ResultType;
@@ -62,9 +64,7 @@ const calculateAnalysis = (result: ResultType) => {
 
   if (tiedCategories.length > 1) {
     const reversedAnswers = Object.values(result).reverse();
-    const lastAnswerAmongTied = reversedAnswers.find(({ selectedAnswer }) =>
-      tiedCategories.includes(selectedAnswer)
-    );
+    const lastAnswerAmongTied = reversedAnswers.find(({ selectedAnswer }) => tiedCategories.includes(selectedAnswer));
 
     if (lastAnswerAmongTied) {
       scores[lastAnswerAmongTied.selectedAnswer] += 1;
@@ -81,7 +81,7 @@ export const QuizContext = createContext<QuizContextType | null>(
 export const useQuiz = () => {
   const context = useContext(QuizContext);
   if (!context) {
-    throw new Error("useQuiz must be used within a QuizProvider");
+    throw new Error('useQuiz must be used within a QuizProvider');
   }
   return context;
 };
@@ -102,7 +102,7 @@ export const QuizProvider = ({ children }: React.PropsWithChildren) => {
       };
       setInternalResult(newResult);
       if (nextStep > questionMap.size) {
-        router.push("/quiz/result");
+        router.push('/quiz/result');
       } else {
         router.push(`/quiz/questions/q${nextStep}`);
       }

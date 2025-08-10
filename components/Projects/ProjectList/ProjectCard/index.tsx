@@ -16,8 +16,8 @@ const ProjectCard = ({ project, path }: ProjectCardProps) => {
     <Link
       href={`${pathroute}?id=${project.id}`}
       className={cn(
-        "p-4 md:py-8 md:px-10 flex flex-col gap-5 justify-start items-start",
-        "border-[#EDF0F7] border-solid border-b-[1px]"
+        'p-4 md:py-8 md:px-10 flex flex-col gap-5 justify-start items-start',
+        'border-[#EDF0F7] border-solid border-b-[1px]'
       )}
       data-projectid={project.id}
     >

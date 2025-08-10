@@ -22,9 +22,7 @@ export function useIdeasCache() {
 
         return {
           ...data,
-          ideas: data.ideas.map((idea) =>
-            idea.id === updatedIdea.id ? { ...idea, ...updatedIdea } : idea
-          ),
+          ideas: data.ideas.map((idea) => (idea.id === updatedIdea.id ? { ...idea, ...updatedIdea } : idea)),
         };
       },
       { revalidate: false }
@@ -191,15 +189,13 @@ export function useIdeasCache() {
 
         return {
           ...data,
-          ideas: data.ideas.map((idea) =>
-            idea.id === ideaId
-              ? {
-                  ...idea,
-                  isLiked,
-                  likeCount: Math.max(0, idea.likeCount + likeDelta)
-                }
-              : idea
-          ),
+          ideas: data.ideas.map((idea) => (idea.id === ideaId
+            ? {
+              ...idea,
+              isLiked,
+              likeCount: Math.max(0, idea.likeCount + likeDelta),
+            }
+            : idea)),
         };
       },
       { revalidate: false }
@@ -213,7 +209,7 @@ export function useIdeasCache() {
         return {
           ...existingData,
           isLiked,
-          likeCount: Math.max(0, existingData.likeCount + likeDelta)
+          likeCount: Math.max(0, existingData.likeCount + likeDelta),
         };
       },
       { revalidate: false }
@@ -239,11 +235,9 @@ export function useIdeasCache() {
 
         return {
           ...data,
-          ideas: data.ideas.map((idea) =>
-            idea.id === ideaId
-              ? { ...idea, viewCount: idea.viewCount + viewDelta }
-              : idea
-          ),
+          ideas: data.ideas.map((idea) => (idea.id === ideaId
+            ? { ...idea, viewCount: idea.viewCount + viewDelta }
+            : idea)),
         };
       },
       { revalidate: false }

@@ -16,8 +16,8 @@ import {
   StyledFooter,
   StyledFlex,
   StyledStatus,
-  StyledMenuItem
-} from "./MarathonCard.styled";
+  StyledMenuItem,
+} from './MarathonCard.styled';
 
 export default function MarathonCard({ marathon }) {
   const { title, isPublic } = marathon;
@@ -55,7 +55,7 @@ export default function MarathonCard({ marathon }) {
         </StyledText>
         <StyledFooter>
           <StyledFlex>
-            <StyledStatus>{isPublic ? "公開" : "不公開"}</StyledStatus>
+            <StyledStatus>{isPublic ? '公開' : '不公開'}</StyledStatus>
             <IconButton size="small" onClick={handleMenu}>
               <MoreVertOutlinedIcon />
             </IconButton>

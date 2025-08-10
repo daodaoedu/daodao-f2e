@@ -27,7 +27,7 @@ export default function SharerCard(props: SharerCardProps) {
   } = props;
 
   return (
-    <div className={cn("rounded-xl", className)}>
+    <div className={cn('rounded-xl', className)}>
       <div className="relative h-[17.625rem]">
         <Image
           height="inherit"
@@ -61,7 +61,11 @@ export default function SharerCard(props: SharerCardProps) {
           >
             分享資源
           </span>
-          <span className="text-primary-base font-bold">{sourceCount} 筆</span>
+          <span className="text-primary-base font-bold">
+            {sourceCount}
+            {' '}
+            筆
+          </span>
         </div>
 
         <div className="flex items-center md:h-6">
@@ -73,7 +77,9 @@ export default function SharerCard(props: SharerCardProps) {
             分享心得
           </span>
           <span className="text-primary-base font-bold">
-            {reflectionCount} 筆
+            {reflectionCount}
+            {' '}
+            筆
           </span>
         </div>
       </div>

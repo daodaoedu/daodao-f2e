@@ -1,25 +1,25 @@
-import { memo, useCallback, useMemo } from "react";
-import { DndContext, DragOverlay, closestCenter } from "@dnd-kit/core";
-import { toDate } from "date-fns";
+import { memo, useCallback, useMemo } from 'react';
+import { DndContext, DragOverlay, closestCenter } from '@dnd-kit/core';
+import { toDate } from 'date-fns';
 import {
   SortableContext,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import dayjs from "dayjs";
-import { useDialog } from "@/contexts/Dialog";
+} from '@dnd-kit/sortable';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import dayjs from 'dayjs';
+import { useDialog } from '@/contexts/Dialog';
 import {
   ProjectMilestoneSchema,
   ProjectMilestoneFormSchema,
   ProjectTaskSchema,
-} from "@/services/projects";
-import { getIsCheckDragMilestoneStorage } from "@/utils/storage";
-import { useDraggableSensors } from "@/hooks/useDraggableSensors";
-import { useDraggableContainer } from "@/hooks/useDraggableContainer";
-import DraggableItem from "@/shared/components/DraggableItem";
-import { DateRangePicker } from "@/components/ui/date-picker";
-import SwapRightIcon from "@/public/assets/icons/swap-right.svg";
-import MilestoneItem from "./MilestoneItem";
+} from '@/services/projects';
+import { getIsCheckDragMilestoneStorage } from '@/utils/storage';
+import { useDraggableSensors } from '@/hooks/useDraggableSensors';
+import { useDraggableContainer } from '@/hooks/useDraggableContainer';
+import DraggableItem from '@/shared/components/DraggableItem';
+import { DateRangePicker } from '@/components/ui/date-picker';
+import SwapRightIcon from '@/public/assets/icons/swap-right.svg';
+import MilestoneItem from './MilestoneItem';
 
 const MemoMilestoneItem = memo(MilestoneItem);
 
@@ -61,18 +61,18 @@ const DraggableMilestones = ({
     ) => {
       const dayDiff = dayjs(_overItem.startDate).diff(
         dayjs(_activeItem.startDate),
-        "day"
+        'day'
       );
       const isDown = dayDiff === 0 ? newIndex > oldIndex : dayDiff > 0;
       const positionOffset = isAscending ? 1 : -1;
 
       return {
         startDate: dayjs(_activeItem.startDate)
-          .add(dayDiff, "day")
-          .format("YYYY/MM/DD"),
+          .add(dayDiff, 'day')
+          .format('YYYY/MM/DD'),
         endDate: dayjs(_activeItem.endDate)
-          .add(dayDiff, "day")
-          .format("YYYY/MM/DD"),
+          .add(dayDiff, 'day')
+          .format('YYYY/MM/DD'),
         position: isDown
           ? _overItem.position + positionOffset
           : _overItem.position - positionOffset,
@@ -102,7 +102,7 @@ const DraggableMilestones = ({
 
       if (!isCheckDragMilestone) {
         const result = await openDialog({
-          content: "拖拽里程碑會改變日期，確定要繼續嗎？",
+          content: '拖拽里程碑會改變日期，確定要繼續嗎？',
         });
 
         if (!result) return false;

@@ -18,9 +18,7 @@ export default function SelectedEducationStep() {
       items={EDUCATION}
       itemLabel="label"
       itemValue="label"
-      renderValue={(selected) =>
-        selected.length === 0 ? '教育階段' : selected.join('、')
-      }
+      renderValue={(selected) => (selected.length === 0 ? '教育階段' : selected.join('、'))}
       sx={{
         '@media (max-width: 767px)': {
           width: '100%',

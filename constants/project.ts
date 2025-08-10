@@ -19,7 +19,7 @@ export const MOTIVATION_MAP: MotivationMap[] = [
   { label: '生活發生變化', value: 'life_changes' },
   { label: '影響社會', value: 'impact_on_society' },
   { label: '受群體影響', value: 'influenced_by_a_group' },
-  { label: '其他', value: 'others' }
+  { label: '其他', value: 'others' },
 ];
 
 interface StrategyMap {
@@ -44,7 +44,7 @@ export const STRATEGY_MAP: StrategyMap[] = [
   { label: '田野調查', value: 'field_research' },
   { label: '訪談', value: 'conducting_interviews' },
   { label: '問卷調查', value: 'conducting_surveys' },
-  { label: '其他', value: 'others' }
+  { label: '其他', value: 'others' },
 ];
 
 interface OutcomeMap {
@@ -61,7 +61,7 @@ export const OUTCOME_MAP: OutcomeMap[] = [
   { label: '舉辦活動', value: 'organizing_events' },
   { label: '開課', value: 'teaching_courses' },
   { label: '參與競賽', value: 'participating_in_competitions' },
-  { label: '其他', value: 'others' }
+  { label: '其他', value: 'others' },
 ];
 
 export const MOOD_OPTIONS = [

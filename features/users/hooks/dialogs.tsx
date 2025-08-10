@@ -1,8 +1,8 @@
-import { useRouter } from "next/router";
-import { useDialog } from "@/contexts/Dialog";
-import { useCallback } from "react";
-import { Image } from "@/components/ui/image";
-import { useAuth } from "@/contexts/Auth";
+import { useRouter } from 'next/router';
+import { useDialog } from '@/contexts/Dialog';
+import { useCallback } from 'react';
+import { Image } from '@/components/ui/image';
+import { useAuth } from '@/contexts/Auth';
 
 export const useRegisterSuccessDialog = () => {
   const router = useRouter();
@@ -10,7 +10,7 @@ export const useRegisterSuccessDialog = () => {
 
   return useCallback(() => {
     openDialog({
-      title: "帳號註冊成功！",
+      title: '帳號註冊成功！',
       content: (
         <>
           <p className="mt-2 mb-6 text-center text-basic-400 body-sm">
@@ -23,15 +23,16 @@ export const useRegisterSuccessDialog = () => {
             height={211}
           />
           <p className="my-6 text-center text-basic-400 body-sm">
-            我們會公開你的<strong className="font-bold">個人檔案</strong>
+            我們會公開你的
+            <strong className="font-bold">個人檔案</strong>
             ，填寫完整的資料，才能讓其他夥伴們更了解你喔！
           </p>
         </>
       ),
-      cancelText: "暫時不需要",
-      confirmText: "想，填寫資料",
+      cancelText: '暫時不需要',
+      confirmText: '想，填寫資料',
       onConfirm: () => {
-        router.replace("/personal-card");
+        router.replace('/personal-card');
       },
     });
   }, [openDialog, router]);
@@ -44,7 +45,7 @@ export const useVerifiedSuccessDialog = () => {
 
   return useCallback(() => {
     openDialog({
-      title: "驗證成功",
+      title: '驗證成功',
       content: (
         <>
           <Image
@@ -58,7 +59,8 @@ export const useVerifiedSuccessDialog = () => {
               <span>帳號已驗證成功，快來體驗平台的特色功能！</span>
             ) : (
               <span>
-                我們會公開你的<strong className="font-bold">個人檔案</strong>
+                我們會公開你的
+                <strong className="font-bold">個人檔案</strong>
                 ，填寫完整的資料，才能讓其他夥伴們更了解你喔！
               </span>
             )}
@@ -66,14 +68,14 @@ export const useVerifiedSuccessDialog = () => {
         </>
       ),
       cancelBtnProps: {
-        className: isComplete ? "hidden" : undefined,
+        className: isComplete ? 'hidden' : undefined,
       },
-      cancelText: isComplete ? undefined : "暫時不需要",
-      confirmText: isComplete ? "開始探索" : "想，填寫資料",
+      cancelText: isComplete ? undefined : '暫時不需要',
+      confirmText: isComplete ? '開始探索' : '想，填寫資料',
       onConfirm: isComplete
         ? () => {
-            router.replace("/personal-card");
-          }
+          router.replace('/personal-card');
+        }
         : undefined,
     });
   }, [isComplete, openDialog, router]);
@@ -85,7 +87,7 @@ export const useCompleteInfoReminder = () => {
 
   return useCallback(() => {
     openDialog({
-      title: "島主廣播",
+      title: '島主廣播',
       content: (
         <>
           <p className="mb-6 text-center text-basic-400 body-sm">
@@ -102,10 +104,10 @@ export const useCompleteInfoReminder = () => {
           </div>
         </>
       ),
-      cancelText: "再等等",
-      confirmText: "去填寫資料",
+      cancelText: '再等等',
+      confirmText: '去填寫資料',
       onConfirm: () => {
-        router.replace("/personal-card");
+        router.replace('/personal-card');
       },
     });
   }, [openDialog, router]);

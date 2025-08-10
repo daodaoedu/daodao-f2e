@@ -22,7 +22,7 @@ export type {
   ReminderFrequency,
   Resource,
   ResourceType,
-  DashboardView
+  DashboardView,
 } from '@/services/practice/schema';
 
 // 導出服務

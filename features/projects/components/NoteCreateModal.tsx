@@ -1,12 +1,12 @@
-import useSWRMutation from "swr/mutation";
-import ResponsiveModal, { ResponsiveModalSize } from "@/components/ui/responsive-modal";
+import useSWRMutation from 'swr/mutation';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
 import {
   getProjectNotePathname,
   projectNoteAPI,
   refetchProjectNote,
-} from "@/services/projects";
-import marathonConfig from "@/constants/marathon";
-import NoteForm from "./NoteForm";
+} from '@/services/projects';
+import marathonConfig from '@/constants/marathon';
+import NoteForm from './NoteForm';
 
 interface NoteCreateModalProps {
   projectId: string;

@@ -42,45 +42,44 @@ function PostDetailCard<T extends BasePostDetailData>({
 
   const dropdownItems = isSelf
     ? [
-        {
-          key: 'edit',
-          children: (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="hover:bg-primary-lightest"
-              onClick={onEditClick}
-            >
-              編輯
-            </Button>
-          ),
-        },
-        {
-          key: 'delete',
-          children: (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="hover:bg-primary-lightest"
-              onClick={onDeleteClick}
-            >
-              刪除
-            </Button>
-          ),
-        },
-      ]
+      {
+        key: 'edit',
+        children: (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="hover:bg-primary-lightest"
+            onClick={onEditClick}
+          >
+            編輯
+          </Button>
+        ),
+      },
+      {
+        key: 'delete',
+        children: (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="hover:bg-primary-lightest"
+            onClick={onDeleteClick}
+          >
+            刪除
+          </Button>
+        ),
+      },
+    ]
     : [
-        {
-          key: 'report',
-          children: '檢舉',
-          onClick: () =>
-            window.open(
-              'https://forms.gle/NkVbDWC3eXk4P4gv7',
-              '_blank',
-              'noopener'
-            ),
-        },
-      ];
+      {
+        key: 'report',
+        children: '檢舉',
+        onClick: () => window.open(
+          'https://forms.gle/NkVbDWC3eXk4P4gv7',
+          '_blank',
+          'noopener'
+        ),
+      },
+    ];
 
   if (!data) return null;
 

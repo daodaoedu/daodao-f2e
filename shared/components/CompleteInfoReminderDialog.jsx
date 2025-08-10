@@ -11,9 +11,7 @@ import {
 } from '@mui/material';
 import illustrationImg from '@/public/assets/illustration.png';
 
-const TransitionSlide = forwardRef((props, ref) => {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+const TransitionSlide = forwardRef((props, ref) => <Slide direction="up" ref={ref} {...props} />);
 
 export default function CompleteInfoReminderDialog({ isOpen, onClose }) {
   const id = useId();

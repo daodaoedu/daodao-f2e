@@ -31,15 +31,14 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
   dailyGoalTime = 30,
   dailyGoalPages = 10,
   customUnit = '頁',
-  selectedTags = []
+  selectedTags = [],
 }) => {
   // 格式化目標顯示
   const formatGoalDisplay = (): string => {
     if (dailyGoalType === 'time') {
       return `每次 ${dailyGoalTime} 分鐘`;
-    } else {
-      return `每次 ${dailyGoalPages} ${customUnit}`;
     }
+    return `每次 ${dailyGoalPages} ${customUnit}`;
   };
 
   // 取得日期範圍格式字串
@@ -80,12 +79,12 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg text-gray-900">
-                    {pathInfo.title || "我的主題實踐"}
+                    {pathInfo.title || '我的主題實踐'}
                   </h3>
                   <div className="flex items-center mt-1 text-sm text-gray-600">
                     <BookOpen className="h-4 w-4 mr-1" />
                     <span>
-                      {contentTypeOptions.find((option) => option.id === pathInfo.contentType)?.label || "書籍"}
+                      {contentTypeOptions.find((option) => option.id === pathInfo.contentType)?.label || '書籍'}
                     </span>
                     <span className="mx-2">•</span>
                     <span>{getDateRange()}</span>
@@ -130,7 +129,9 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
                 <div className="p-3 bg-gray-50 rounded-md">
                   <div className="text-xs text-gray-500 mb-1">實踐天數</div>
                   <div className="font-semibold">
-                    {pathInfo.totalAmount} 天
+                    {pathInfo.totalAmount}
+                    {' '}
+                    天
                   </div>
                 </div>
 
@@ -146,7 +147,9 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
               <div className="mb-4">
                 <h4 className="text-sm font-medium mb-2 flex items-center">
                   <BookOpen className="h-4 w-4 mr-1 text-primary" />
-                  資源 ({resources.length})
+                  資源 (
+                  {resources.length}
+                  )
                 </h4>
 
                 {resources.length > 0 ? (
@@ -183,7 +186,11 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
                     ))}
                     {resources.length > 3 && (
                       <div className="text-xs text-gray-500 text-center">
-                        還有 {resources.length - 3} 個資源...
+                        還有
+                        {' '}
+                        {resources.length - 3}
+                        {' '}
+                        個資源...
                       </div>
                     )}
                   </div>

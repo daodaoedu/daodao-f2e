@@ -1,5 +1,7 @@
 import React from 'react';
-import { ArrowLeft, Calendar, TrendingUp, Target, Flame } from 'lucide-react';
+import {
+  ArrowLeft, Calendar, TrendingUp, Target, Flame,
+} from 'lucide-react';
 import { Practice } from '@/services/practice/schema';
 import { CheckInService } from '@/services/practice/checkIn';
 import { Button } from '@/components/ui/button';
@@ -11,7 +13,7 @@ interface HistoryViewProps {
 
 const HistoryView: React.FC<HistoryViewProps> = ({
   practice,
-  onBack
+  onBack,
 }) => {
   // 格式化簽到歷史
   const formattedHistory = CheckInService.formatCheckInHistory(practice);
@@ -34,7 +36,9 @@ const HistoryView: React.FC<HistoryViewProps> = ({
         <div className="mb-8">
           <h1 className="heading-xl text-basic-black mb-2">簽到歷史</h1>
           <p className="body-md text-basic-600">
-            「{practice.title}」的學習歷程記錄
+            「
+            {practice.title}
+            」的學習歷程記錄
           </p>
         </div>
 
@@ -130,10 +134,23 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                       {/* 進度資訊 */}
                       <div className="mb-3">
                         <div className="body-md text-basic-700 mb-1">
-                          學習進度：<span className="font-medium">+{entry.progress} {practice.unit}</span>
+                          學習進度：
+                          <span className="font-medium">
+                            +
+                            {entry.progress}
+                            {' '}
+                            {practice.unit}
+                          </span>
                         </div>
                         <div className="body-sm text-basic-500">
-                          累計進度：{entry.totalProgress} / {practice.totalAmount} {practice.unit}
+                          累計進度：
+                          {entry.totalProgress}
+                          {' '}
+                          /
+                          {' '}
+                          {practice.totalAmount}
+                          {' '}
+                          {practice.unit}
                         </div>
                       </div>
 
@@ -141,7 +158,9 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                       {entry.note && (
                         <div className="mb-3">
                           <div className="body-sm text-basic-600 bg-basic-50 rounded-lg p-3 italic">
-                            「{entry.note}」
+                            「
+                            {entry.note}
+                            」
                           </div>
                         </div>
                       )}
@@ -164,7 +183,8 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                     {/* 進度百分比 */}
                     <div className="ml-6 text-right">
                       <div className="heading-sm text-basic-black">
-                        {Math.round((entry.totalProgress / practice.totalAmount) * 100)}%
+                        {Math.round((entry.totalProgress / practice.totalAmount) * 100)}
+                        %
                       </div>
                       <div className="body-sm text-basic-500">完成度</div>
                     </div>

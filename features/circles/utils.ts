@@ -1,5 +1,5 @@
-import JsonLdFactory from "@/utils/jsonLd";
-import { CircleSchema } from "@/services/circles";
+import JsonLdFactory from '@/utils/jsonLd';
+import { CircleSchema } from '@/services/circles';
 
 export function createCircleJsonLd(result: CircleSchema) {
   return JsonLdFactory.createEventBuilder()
@@ -10,6 +10,6 @@ export function createCircleJsonLd(result: CircleSchema) {
     .setImage(result.photoURL)
     .setLocation(result.area)
     .setStartDate(result.createdDate)
-    .setEndDate(result.deadline ?? "")
+    .setEndDate(result.deadline ?? '')
     .build();
 }

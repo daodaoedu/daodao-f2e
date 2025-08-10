@@ -17,13 +17,13 @@ export function usePractice(id: string | undefined) {
     canCheckInToday: !CheckInService.hasCheckedInToday(practice),
     todayCheckIn: CheckInService.getTodayCheckIn(practice),
     checkInStats: CheckInService.getCheckInStats(practice),
-    suggestions: CheckInService.getCheckInSuggestions(practice)
+    suggestions: CheckInService.getCheckInSuggestions(practice),
   } : undefined;
 
   return {
     practice,
     stats,
     loading: isLoading,
-    error: error?.message
+    error: error?.message,
   };
 }

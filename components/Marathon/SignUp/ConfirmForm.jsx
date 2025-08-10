@@ -21,7 +21,7 @@ import {
   StyledSection,
   StyledButtonGroup,
   StyledButton,
-  StyledGroup
+  StyledGroup,
 } from './Edit.styled';
 import MilestoneGroup from './MilestoneGroup';
 import ApplyClosePopup from '../ApplyClosePopup';
@@ -218,11 +218,11 @@ export default function ConfirmForm({
   const router = useRouter();
   const { openLoginModal } = useAuthDispatch();
   const [user, setUser] = useState({
-    name: "",
-    token: "",
-    roleList: "",
-    education: "",
-    avatar: ""
+    name: '',
+    token: '',
+    roleList: '',
+    education: '',
+    avatar: '',
   });
   const popupRef = useRef(null);
 
@@ -258,7 +258,7 @@ export default function ConfirmForm({
         role: userRole,
         education: userEdu,
         avatar: userState.photoURL,
-        location: userLocation
+        location: userLocation,
       });
     } else {
       openLoginModal();
@@ -268,9 +268,9 @@ export default function ConfirmForm({
     if (!marathonConfig.isMarathonApplyEnabled) {
       popupRef.current.showPopup();
       return;
-    } else {
-      popupRef.current.hidePopup();
     }
+    popupRef.current.hidePopup();
+
     if (!marathonState) {
       console.error('no data to submit');
       return;
@@ -279,7 +279,7 @@ export default function ConfirmForm({
     const submitData = {
       ...marathonState,
       userId: userState._id,
-      status: 'Complete'
+      status: 'Complete',
     };
 
     if (marathonState._id) {
@@ -322,7 +322,10 @@ export default function ConfirmForm({
         <div className="tag">
           <span>學習計畫</span>
         </div>
-        <h2>學習主題名稱：{marathonState?.title}</h2>
+        <h2>
+          學習主題名稱：
+          {marathonState?.title}
+        </h2>
       </StyledMarathonTitleSection>
       <StyledUserSection>
         <div className="content">
@@ -334,7 +337,9 @@ export default function ConfirmForm({
           <div className="userTags">
             <span className="tag">{user?.education}</span>
           </div>
-          <span className="location"><LocationOnOutlinedIcon />{user?.location}
+          <span className="location">
+            <LocationOnOutlinedIcon />
+            {user?.location}
           </span>
         </div>
       </StyledUserSection>
@@ -344,13 +349,11 @@ export default function ConfirmForm({
         <StyledDivider />
         <StyledSectionTitle component="h3">學習動機</StyledSectionTitle>
         <StyledTags sx={{ marginBottom: '8px' }}>
-          {marathonState?.motivation?.tags?.map((tag) => {
-            return (
-              <div className="tag" key={tag}>
-                <span>{tag}</span>
-              </div>
-            );
-          })}
+          {marathonState?.motivation?.tags?.map((tag) => (
+            <div className="tag" key={tag}>
+              <span>{tag}</span>
+            </div>
+          ))}
         </StyledTags>
         <p>{marathonState?.motivation?.description || ''}</p>
         <StyledDivider />
@@ -362,13 +365,11 @@ export default function ConfirmForm({
         <StyledDivider />
         <StyledSectionTitle component="h3">學習方法與策略</StyledSectionTitle>
         <StyledTags sx={{ marginBottom: '8px' }}>
-          {marathonState?.strategies?.tags.map((tag) => {
-            return (
-              <div className="tag" key={tag}>
-                <span>{tag}</span>
-              </div>
-            );
-          })}
+          {marathonState?.strategies?.tags.map((tag) => (
+            <div className="tag" key={tag}>
+              <span>{tag}</span>
+            </div>
+          ))}
         </StyledTags>
         <StyledParagraph>{marathonState?.strategies?.description || ''}</StyledParagraph>
         <StyledDivider />
@@ -378,7 +379,7 @@ export default function ConfirmForm({
             backgroundColor: '#FFF',
             borderRadius: '8px',
             padding: '12px 16px',
-            border: "1px solid #DBDBDB"
+            border: '1px solid #DBDBDB',
           }}
         >
           <Typography component="p">
@@ -394,13 +395,11 @@ export default function ConfirmForm({
       <StyledSection sx={{ mt: '16px' }}>
         <StyledSectionTitle component="h3">學習成果及呈現方式</StyledSectionTitle>
         <StyledTags sx={{ marginBottom: '8px' }}>
-          {marathonState?.outcomes?.tags?.map((tag) => {
-            return (
-              <div className="tag" key={tag}>
-                <span>{tag}</span>
-              </div>
-            );
-          })}
+          {marathonState?.outcomes?.tags?.map((tag) => (
+            <div className="tag" key={tag}>
+              <span>{tag}</span>
+            </div>
+          ))}
         </StyledTags>
         <StyledParagraph>{marathonState?.outcomes?.description || ''}</StyledParagraph>
         <StyledDivider />
@@ -412,7 +411,7 @@ export default function ConfirmForm({
                 checked={!!marathonState.isPublic}
                 disabled
                 sx={{
-                  borderRadius: '4px'
+                  borderRadius: '4px',
                 }}
               />
             )
@@ -440,7 +439,7 @@ export default function ConfirmForm({
                   color: '#92989A',
                   fontWeight: 400,
                   fontSize: '14px',
-                  margin: '0 0 8px'
+                  margin: '0 0 8px',
                 }}
                 component="p"
               >
@@ -451,7 +450,7 @@ export default function ConfirmForm({
                   backgroundColor: '#FFF',
                   borderRadius: '8px',
                   padding: '12px 16px',
-                  border: "1px solid #DBDBDB"
+                  border: '1px solid #DBDBDB',
                 }}
               >
                 <Typography component="p">
@@ -470,31 +469,29 @@ export default function ConfirmForm({
                     color: '#92989A',
                     fontWeight: 400,
                     fontSize: '14px',
-                    margin: '8px 0'
+                    margin: '8px 0',
                   }}
                   component="p"
                 >
                   夥伴的 Email
                 </Typography>
                 {
-                  marathonState.pricing.email.map((email) => {
-                    return (
-                      <Box
-                        sx={{
-                          backgroundColor: '#FFF',
-                          marginLeft: '1em',
-                          borderRadius: '8px',
-                          padding: '12px 16px',
-                          border: "1px solid #DBDBDB"
-                        }}
-                        key={email}
-                      >
-                        <Typography component="p">
-                          {email}
-                        </Typography>
-                      </Box>
-                    );
-                  })
+                  marathonState.pricing.email.map((email) => (
+                    <Box
+                      sx={{
+                        backgroundColor: '#FFF',
+                        marginLeft: '1em',
+                        borderRadius: '8px',
+                        padding: '12px 16px',
+                        border: '1px solid #DBDBDB',
+                      }}
+                      key={email}
+                    >
+                      <Typography component="p">
+                        {email}
+                      </Typography>
+                    </Box>
+                  ))
                 }
               </Box>
             </>

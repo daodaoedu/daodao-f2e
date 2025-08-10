@@ -1,13 +1,13 @@
-import useSWR from "swr";
-import useSWRMutation from "swr/mutation";
-import ResponsiveModal, { ResponsiveModalSize } from "@/components/ui/responsive-modal";
+import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
+import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
 import {
   getProjectOutcomePathname,
   projectOutcomeAPI,
   ProjectOutcomeSchema,
   refetchProjectOutcome,
-} from "@/services/projects";
-import OutcomeForm from "./OutcomeForm";
+} from '@/services/projects';
+import OutcomeForm from './OutcomeForm';
 
 interface OutcomeUpdateModalProps {
   outcomeId: number;
@@ -27,13 +27,13 @@ export default function OutcomeUpdateModal({
   onSuccess,
 }: OutcomeUpdateModalProps) {
   const { data: outcome } = useSWR<ProjectOutcomeSchema>(
-    projectId && typeof outcomeId === "number"
+    projectId && typeof outcomeId === 'number'
       ? getProjectOutcomePathname({ projectId, outcomeId })
       : null
   );
 
   const updateMutation = useSWRMutation(
-    projectId && typeof outcomeId === "number"
+    projectId && typeof outcomeId === 'number'
       ? getProjectOutcomePathname({ projectId, outcomeId })
       : null,
     projectOutcomeAPI.update,

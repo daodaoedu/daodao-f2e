@@ -44,9 +44,7 @@ export function usePractices() {
   };
 
   // 匯出資料
-  const exportData = async () => {
-    return practiceAPI.exportData('export-practices', { arg: undefined });
-  };
+  const exportData = async () => practiceAPI.exportData('export-practices', { arg: undefined });
 
   // 匯入資料
   const importData = async (data: string) => {
@@ -70,7 +68,7 @@ export function usePractices() {
       archived: 0,
       totalCheckIns: 0,
       longestStreak: 0,
-      averageProgress: 0
+      averageProgress: 0,
     },
     loading: isLoading,
     error: error?.message,
@@ -80,6 +78,6 @@ export function usePractices() {
     checkIn,
     exportData,
     importData,
-    refreshPractices
+    refreshPractices,
   };
 }

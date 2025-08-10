@@ -75,9 +75,9 @@ function PartnerCard({
                   {location
                     ? location.length >= 2
                       ? locations
-                          .join('')
-                          .replace(TAIWAN_OPTION.value, '')
-                          .replace('null', '')
+                        .join('')
+                        .replace(TAIWAN_OPTION.value, '')
+                        .replace('null', '')
                       : locations.join('')
                     : '-'}
                 </>

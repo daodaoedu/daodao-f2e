@@ -1,4 +1,4 @@
-import { OptionProps } from "@/components/ui/option";
+import { OptionProps } from '@/components/ui/option';
 
 /**
  * 建立 value 到 label 的映射物件，提升查找效能
@@ -25,7 +25,7 @@ export const createOptionMap = (
 export const getOptionLabel = (
   options: OptionProps[],
   value: string,
-  defaultLabel: string = ""
+  defaultLabel: string = ''
 ): string => {
   if (!Array.isArray(options)) {
     return defaultLabel;
@@ -50,5 +50,5 @@ export const getOptionLabels = (
     return defaultLabels ?? [];
   }
   const map = createOptionMap(options);
-  return values.map((value) => map.get(value) ?? "").filter(Boolean);
+  return values.map((value) => map.get(value) ?? '').filter(Boolean);
 };

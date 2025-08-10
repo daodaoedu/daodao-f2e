@@ -1,15 +1,15 @@
-import { toast } from "sonner";
-import React from "react";
-import Link from "next/link";
-import { Mail } from "lucide-react";
-import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
+import { toast } from 'sonner';
+import React from 'react';
+import Link from 'next/link';
+import { Mail } from 'lucide-react';
+import { ResourceDetailResponseSchema } from '@/services/resources/core/schema';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
 
 interface ContributorInfoProps {
-  user: ResourceDetailResponseSchema["data"]["user"];
+  user: ResourceDetailResponseSchema['data']['user'];
 }
 
 export default function ContributorInfo({ user }: ContributorInfoProps) {
@@ -20,7 +20,7 @@ export default function ContributorInfo({ user }: ContributorInfoProps) {
       <div className="mb-6 flex items-center justify-between">
         <div className="flex">
           <Avatar className="mt-1 mr-3 size-12">
-            <AvatarImage src={user.photoURL || ""} />
+            <AvatarImage src={user.photoURL || ''} />
             <AvatarFallback className="text-xl">
               <DefaultAvatar />
             </AvatarFallback>
@@ -38,7 +38,7 @@ export default function ContributorInfo({ user }: ContributorInfoProps) {
           </div>
         </div>
 
-        <Button size="lg" onClick={() => toast.info("功能尚未開放")}>
+        <Button size="lg" onClick={() => toast.info('功能尚未開放')}>
           <Mail size={15} />
           聯繫分享者
         </Button>
@@ -49,7 +49,9 @@ export default function ContributorInfo({ user }: ContributorInfoProps) {
           <div className="flex flex-wrap gap-2">
             {user.tagList.map((tag) => (
               <Badge key={tag} variant="outline" className="text-primary">
-                # {tag}
+                #
+                {' '}
+                {tag}
               </Badge>
             ))}
           </div>

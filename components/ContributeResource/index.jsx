@@ -26,47 +26,45 @@ const ResourceWrapper = styled.section`
   }
 `;
 
-const ContributeResource = () => {
-  return (
-    <ResourceWrapper>
-      <Paper
-        sx={{
-          width: '95%',
-          margin: '0 auto',
-          padding: '10px',
-        }}
-      >
-        <Box>
-          <Typography
-            variant="h1"
-            sx={{
-              margin: '10px 0',
-            }}
-          >
-            新增資源
-          </Typography>
-          <Typography variant="p">
-            我們期盼能邀請在各領域深耕已久的夥伴，
-            將自身累積的資源新增至教育資源網站，讓資源透明化。
-            若您願意一同共編，以下為新增資源的表單，您新增完後我們將進行審核在新增至上方資料庫中：
-          </Typography>
-        </Box>
-        <Box
+const ContributeResource = () => (
+  <ResourceWrapper>
+    <Paper
+      sx={{
+        width: '95%',
+        margin: '0 auto',
+        padding: '10px',
+      }}
+    >
+      <Box>
+        <Typography
+          variant="h1"
           sx={{
-            margin: '20px 0',
+            margin: '10px 0',
           }}
         >
-          <Typography variant="p">謝謝你成為彼此自學路上的橋樑。</Typography>
-          <Typography variant="p">
-            若有任何問題，歡迎與我們聯繫唷！謝謝！ Email：contact@daoedu.tw
-          </Typography>
-        </Box>
-        <LearningResource />
-        <ActivitiesResource />
-        {/* <LocationResource /> */}
-      </Paper>
-    </ResourceWrapper>
-  );
-};
+          新增資源
+        </Typography>
+        <Typography variant="p">
+          我們期盼能邀請在各領域深耕已久的夥伴，
+          將自身累積的資源新增至教育資源網站，讓資源透明化。
+          若您願意一同共編，以下為新增資源的表單，您新增完後我們將進行審核在新增至上方資料庫中：
+        </Typography>
+      </Box>
+      <Box
+        sx={{
+          margin: '20px 0',
+        }}
+      >
+        <Typography variant="p">謝謝你成為彼此自學路上的橋樑。</Typography>
+        <Typography variant="p">
+          若有任何問題，歡迎與我們聯繫唷！謝謝！ Email：contact@daoedu.tw
+        </Typography>
+      </Box>
+      <LearningResource />
+      <ActivitiesResource />
+      {/* <LocationResource /> */}
+    </Paper>
+  </ResourceWrapper>
+);
 
 export default ContributeResource;

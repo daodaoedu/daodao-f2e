@@ -1,17 +1,17 @@
-import type { UserSchema } from "@/services/users";
-import { useRouter } from "next/router";
-import { PropsWithChildren, useEffect, useState } from "react";
-import { Background, Container, Paper } from "@/components/ui/wrapper";
-import Image from "@/shared/components/Image";
-import { Button } from "@/components/ui/button";
-import SEOConfig from "@/components/SEOConfig";
-import { useAuth, useAuthDispatch } from "./AuthContext";
+import type { UserSchema } from '@/services/users';
+import { useRouter } from 'next/router';
+import { PropsWithChildren, useEffect, useState } from 'react';
+import { Background, Container, Paper } from '@/components/ui/wrapper';
+import Image from '@/shared/components/Image';
+import { Button } from '@/components/ui/button';
+import SEOConfig from '@/components/SEOConfig';
+import { useAuth, useAuthDispatch } from './AuthContext';
 
 enum AuthorizationStatus {
-  IDLE = "IDLE",
-  PENDING = "PENDING",
-  SUCCESS = "SUCCESS",
-  ERROR = "ERROR",
+  IDLE = 'IDLE',
+  PENDING = 'PENDING',
+  SUCCESS = 'SUCCESS',
+  ERROR = 'ERROR',
 }
 
 interface FallbackProps {
@@ -83,11 +83,12 @@ export function ProtectedComponent({
   checkUserAuthorized,
 }: ProtectedComponentProps) {
   const router = useRouter();
-  const { user, isLoggedIn, token, isLoggingIn } = useAuth();
+  const {
+    user, isLoggedIn, token, isLoggingIn,
+  } = useAuth();
   const { openLoginModal } = useAuthDispatch();
   const requiresLogin = onlyCheckToken ? !token : !isLoggedIn;
-  const [authorizationState, setAuthorizationState] =
-    useState<AuthorizationStatus>(AuthorizationStatus.IDLE);
+  const [authorizationState, setAuthorizationState] = useState<AuthorizationStatus>(AuthorizationStatus.IDLE);
 
   useEffect(() => {
     if (!checkUserAuthorized) {
@@ -160,7 +161,7 @@ export function ProtectedComponent({
                 返回
               </Button>
               <Button
-                onClick={() => router.push("/")}
+                onClick={() => router.push('/')}
                 size="lg"
                 className="w-32"
               >

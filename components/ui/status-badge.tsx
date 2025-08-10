@@ -7,7 +7,7 @@ import {
   FileText,
   Clock,
   AlertCircle,
-  CheckCheck
+  CheckCheck,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
@@ -35,55 +35,55 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
   label,
   size = 'md',
   showIcon = true,
-  className = ''
+  className = '',
 }) => {
   const getStatusConfig = () => {
     const configs = {
       draft: {
         icon: FileText,
         label: '草稿',
-        className: 'bg-basic-300/20 text-basic-300 border-basic-300/30'
+        className: 'bg-basic-300/20 text-basic-300 border-basic-300/30',
       },
       active: {
         icon: Play,
         label: '進行中',
-        className: 'bg-primary-base/20 text-primary-base border-primary-base/30'
+        className: 'bg-primary-base/20 text-primary-base border-primary-base/30',
       },
       paused: {
         icon: Pause,
         label: '暫停',
-        className: 'bg-tips/20 text-tips border-tips/30'
+        className: 'bg-tips/20 text-tips border-tips/30',
       },
       completed: {
         icon: CheckCircle,
         label: '已完成',
-        className: 'bg-success/20 text-success border-success/30'
+        className: 'bg-success/20 text-success border-success/30',
       },
       archived: {
         icon: Archive,
         label: '已封存',
-        className: 'bg-basic-400/20 text-basic-400 border-basic-400/30'
+        className: 'bg-basic-400/20 text-basic-400 border-basic-400/30',
       },
       pending: {
         icon: Clock,
         label: '待處理',
-        className: 'bg-basic-300/20 text-basic-300 border-basic-300/30'
+        className: 'bg-basic-300/20 text-basic-300 border-basic-300/30',
       },
       warning: {
         icon: AlertCircle,
         label: '警告',
-        className: 'bg-tips/20 text-tips border-tips/30'
+        className: 'bg-tips/20 text-tips border-tips/30',
       },
       success: {
         icon: CheckCheck,
         label: '成功',
-        className: 'bg-success/20 text-success border-success/30'
+        className: 'bg-success/20 text-success border-success/30',
       },
       error: {
         icon: AlertCircle,
         label: '錯誤',
-        className: 'bg-alert/20 text-alert border-alert/30'
-      }
+        className: 'bg-alert/20 text-alert border-alert/30',
+      },
     };
     return configs[status];
   };

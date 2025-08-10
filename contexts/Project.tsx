@@ -1,9 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import React, {
+  createContext, useContext, useEffect, useState,
+} from 'react';
+import { useRouter } from 'next/router';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
-import { BASE_URL } from "@/constants/common";
-import { getTokenStorage } from "@/utils/storage";
-import { parseToString } from "@/utils/helper";
+import { BASE_URL } from '@/constants/common';
+import { getTokenStorage } from '@/utils/storage';
+import { parseToString } from '@/utils/helper';
 
 interface ProjectContext {
   project: Project;
@@ -58,7 +60,7 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ project, ...newData })
+        body: JSON.stringify({ project, ...newData }),
       });
 
       if (!response.ok) {
@@ -105,7 +107,7 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
 export function useProject() {
   const context = useContext(ProjectContext);
   if (!context) {
-    throw new Error("useProject must be used within an ProjectProvider");
+    throw new Error('useProject must be used within an ProjectProvider');
   }
   return context;
 }

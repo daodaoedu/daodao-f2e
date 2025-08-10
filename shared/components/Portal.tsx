@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface PortalProps {
   children: React.ReactNode;
@@ -16,7 +16,7 @@ function Portal({ children, rootId }: PortalProps) {
     if (existingRoot) {
       root = existingRoot;
     } else {
-      root = document.createElement("div");
+      root = document.createElement('div');
       root.id = rootId;
       document.body.appendChild(root);
     }

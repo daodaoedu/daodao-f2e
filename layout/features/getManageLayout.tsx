@@ -11,9 +11,7 @@ const MENTOR_WORKSPACE_PERMISSIONS = [
   RoleEnum.SuperAdmin,
 ];
 
-const getCanVisitMentorWorkspace = (role?: RoleEnum) => {
-  return role ? MENTOR_WORKSPACE_PERMISSIONS.includes(role) : false;
-};
+const getCanVisitMentorWorkspace = (role?: RoleEnum) => (role ? MENTOR_WORKSPACE_PERMISSIONS.includes(role) : false);
 
 const manageRoutes = {
   manage: '/manage',

@@ -8,7 +8,7 @@ const ApplyClosePopup = forwardRef((props, ref) => {
     description: '本次活動申請已截止，但您仍可以加入排隊名單',
     content: '預計7月初開放申請，8月底申請截止。加入排隊清單後，我們會在下次開放申請時第一時間通知您。同時也歡迎追蹤社群媒體，接收最新活動訊息。',
     waitingListButton: '加入排隊清單',
-    closeButton: '稍後再說'
+    closeButton: '稍後再說',
   };
 
   const handleWaitingListClick = () => {
@@ -41,7 +41,6 @@ const ApplyClosePopup = forwardRef((props, ref) => {
           <img
             src="/assets/marathon-apply-close.png"
             alt="Registration closed illustration"
-            fill
             className="object-contain"
           />
         </div>

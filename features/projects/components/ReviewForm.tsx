@@ -1,18 +1,18 @@
-import dayjs from "dayjs";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import PostCard from "@/shared/components/Post/PostCard";
+import dayjs from 'dayjs';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import PostCard from '@/shared/components/Post/PostCard';
 import {
   projectReviewFormSchema,
   ProjectReviewFormSchema,
-} from "@/services/projects";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
-import numberToChineseNumber from "@/utils/numberToChineseNumber";
-import { cn } from "@/utils/cn";
+} from '@/services/projects';
+import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/form';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import numberToChineseNumber from '@/utils/numberToChineseNumber';
+import { cn } from '@/utils/cn';
 
-import RadioGroup from "./ReviewRadioGroup";
+import RadioGroup from './ReviewRadioGroup';
 
 interface ReviewFormProps {
   projectTitle: string;
@@ -36,10 +36,10 @@ function ReviewForm({
     defaultValues: {
       title: projectTitle,
       week,
-      moodDescription: "",
-      learningFeedback: "",
-      adjustmentPlan: "",
-      mood: "",
+      moodDescription: '',
+      learningFeedback: '',
+      adjustmentPlan: '',
+      mood: '',
       learningReview: 0,
       stressLevel: 0,
       ...defaultValues,
@@ -51,13 +51,11 @@ function ReviewForm({
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <PostCard className="p-0 md:p-0">
           <PostCard.Header
-            title={methods.watch("title")}
+            title={methods.watch('title')}
             subtitle={`第${numberToChineseNumber(week)}週`}
             tag="覆盤"
-            date={dayjs(createdAt).format("YYYY/MM/DD")}
-            onTitleChange={(title) =>
-              methods.setValue("title", title || projectTitle)
-            }
+            date={dayjs(createdAt).format('YYYY/MM/DD')}
+            onTitleChange={(title) => methods.setValue('title', title || projectTitle)}
             isEditable
           />
           <div className="relative">
@@ -77,10 +75,10 @@ function ReviewForm({
                     type="text"
                     placeholder="其他"
                     className={cn(
-                      "w-full px-4 py-2 resize-none body-sm",
-                      "border border-solid border-basic-200 rounded-lg"
+                      'w-full px-4 py-2 resize-none body-sm',
+                      'border border-solid border-basic-200 rounded-lg'
                     )}
-                    {...methods.register("moodDescription")}
+                    {...methods.register('moodDescription')}
                   />
                 </div>
               </li>
@@ -110,14 +108,10 @@ function ReviewForm({
                     rootClassName="p-px mb-2 bg-basic-200 rounded-md"
                     className="bg-white rounded-md"
                     editorClassName="min-h-24"
-                    ref={(element) =>
-                      methods.register("learningFeedback").ref(element)
-                    }
-                    value={methods.watch("learningFeedback")}
+                    ref={(element) => methods.register('learningFeedback').ref(element)}
+                    value={methods.watch('learningFeedback')}
                     placeholder="例如: 有哪些收獲，包含學習、人際互動、身心狀況等，或是目前遇到的困難"
-                    onChange={(markdown) =>
-                      methods.setValue("learningFeedback", markdown)
-                    }
+                    onChange={(markdown) => methods.setValue('learningFeedback', markdown)}
                   />
                 </div>
               </li>
@@ -129,14 +123,10 @@ function ReviewForm({
                     rootClassName="p-px mb-2 bg-basic-200 rounded-md"
                     className="bg-white rounded-md"
                     editorClassName="min-h-24"
-                    ref={(element) =>
-                      methods.register("adjustmentPlan").ref(element)
-                    }
-                    value={methods.watch("adjustmentPlan")}
+                    ref={(element) => methods.register('adjustmentPlan').ref(element)}
+                    value={methods.watch('adjustmentPlan')}
                     placeholder="例如：打算如何克服目前的挑戰，例如在身心、學習環境、方法、資源方面 ，希望獲得何種支持"
-                    onChange={(markdown) =>
-                      methods.setValue("adjustmentPlan", markdown)
-                    }
+                    onChange={(markdown) => methods.setValue('adjustmentPlan', markdown)}
                   />
                 </div>
               </li>

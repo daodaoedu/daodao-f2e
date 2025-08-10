@@ -1,8 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { Search, Plus, Lightbulb, SortAsc, RefreshCw } from 'lucide-react';
+import {
+  Search, Plus, Lightbulb, SortAsc, RefreshCw,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card, CardContent, CardHeader, CardTitle,
+} from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -116,7 +120,9 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
               探索想法
               {pagination && (
                 <span className="text-sm font-normal text-basic-400">
-                  ({pagination.totalCount})
+                  (
+                  {pagination.totalCount}
+                  )
                 </span>
               )}
             </CardTitle>
@@ -204,8 +210,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
             <p className="text-basic-400 mb-6">
               {searchQuery
                 ? '嘗試調整搜尋關鍵字或清除篩選條件'
-                : '成為第一個分享想法的人！'
-              }
+                : '成為第一個分享想法的人！'}
             </p>
             {showCreateButton && (
               <Button onClick={handleCreateClick} className="flex items-center gap-2">
@@ -229,7 +234,15 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
             {pagination && pagination.hasNext && (
               <div className="text-center pt-4">
                 <p className="text-sm text-basic-400">
-                  顯示 {ideas.length} / {pagination.totalCount} 個想法
+                  顯示
+                  {' '}
+                  {ideas.length}
+                  {' '}
+                  /
+                  {' '}
+                  {pagination.totalCount}
+                  {' '}
+                  個想法
                 </p>
               </div>
             )}

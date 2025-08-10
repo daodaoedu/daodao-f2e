@@ -4,7 +4,9 @@ import { CheckInService } from '@/services/practice/checkIn';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Clock, Target, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  TrendingUp, Clock, Target, Lightbulb, ChevronDown, ChevronUp,
+} from 'lucide-react';
 
 interface LearningInsightsProps {
   practices: Practice[];
@@ -21,13 +23,11 @@ const LearningInsights: React.FC<LearningInsightsProps> = ({ practices }) => {
   }
 
   // 收集所有建議
-  const allSuggestions = activePractices.flatMap((practice) =>
-    CheckInService.getCheckInSuggestions(practice).map((suggestion) => ({
-      suggestion,
-      practiceTitle: practice.title,
-      practiceId: practice.id
-    }))
-  );
+  const allSuggestions = activePractices.flatMap((practice) => CheckInService.getCheckInSuggestions(practice).map((suggestion) => ({
+    suggestion,
+    practiceTitle: practice.title,
+    practiceId: practice.id,
+  })));
 
   // 計算總體統計
   const totalCheckIns = activePractices.reduce((sum, p) => sum + (p.checkIns?.length || 0), 0);
@@ -98,7 +98,10 @@ const LearningInsights: React.FC<LearningInsightsProps> = ({ practices }) => {
             <div className="text-xs text-basic-300">總打卡次數</div>
           </div>
           <div className="text-center p-3 bg-basic-50 rounded-lg">
-            <div className="text-lg font-semibold text-basic-black">{Math.round(averageProgress)}%</div>
+            <div className="text-lg font-semibold text-basic-black">
+              {Math.round(averageProgress)}
+              %
+            </div>
             <div className="text-xs text-basic-300">平均進度</div>
           </div>
           <div className="text-center p-3 bg-basic-50 rounded-lg">
@@ -125,7 +128,9 @@ const LearningInsights: React.FC<LearningInsightsProps> = ({ practices }) => {
                   {item.suggestion}
                 </p>
                 <p className="text-xs opacity-75 mt-1">
-                  來自「{item.practiceTitle}」
+                  來自「
+                  {item.practiceTitle}
+                  」
                 </p>
               </div>
             </div>
@@ -142,7 +147,10 @@ const LearningInsights: React.FC<LearningInsightsProps> = ({ practices }) => {
                   className="text-primary hover:text-primary-darker"
                 >
                   <span>
-                    查看更多建議 ({Math.min(3, allSuggestions.length - visibleSuggestionsCount)} 個)
+                    查看更多建議 (
+                    {Math.min(3, allSuggestions.length - visibleSuggestionsCount)}
+                    {' '}
+                    個)
                   </span>
                   <ChevronDown className="h-4 w-4 ml-1" />
                 </Button>
@@ -169,17 +177,20 @@ const LearningInsights: React.FC<LearningInsightsProps> = ({ practices }) => {
               <div className="flex items-center space-x-2">
                 <div className="w-16 h-2 bg-basic-200 rounded-full overflow-hidden">
                   <div className={`h-full bg-primary-base rounded-full transition-all duration-300 ${
-                    thisWeekCheckIns >= 7 ? 'w-full' :
-                    thisWeekCheckIns >= 6 ? 'w-[86%]' :
-                    thisWeekCheckIns >= 5 ? 'w-[71%]' :
-                    thisWeekCheckIns >= 4 ? 'w-[57%]' :
-                    thisWeekCheckIns >= 3 ? 'w-[43%]' :
-                    thisWeekCheckIns >= 2 ? 'w-[29%]' :
-                    thisWeekCheckIns >= 1 ? 'w-[14%]' : 'w-0'
+                    thisWeekCheckIns >= 7 ? 'w-full'
+                      : thisWeekCheckIns >= 6 ? 'w-[86%]'
+                        : thisWeekCheckIns >= 5 ? 'w-[71%]'
+                          : thisWeekCheckIns >= 4 ? 'w-[57%]'
+                            : thisWeekCheckIns >= 3 ? 'w-[43%]'
+                              : thisWeekCheckIns >= 2 ? 'w-[29%]'
+                                : thisWeekCheckIns >= 1 ? 'w-[14%]' : 'w-0'
                   }`}
                   />
                 </div>
-                <span className="text-sm font-medium text-basic-black">{thisWeekCheckIns}/7</span>
+                <span className="text-sm font-medium text-basic-black">
+                  {thisWeekCheckIns}
+                  /7
+                </span>
               </div>
             </div>
           </div>

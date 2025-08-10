@@ -4,7 +4,7 @@ import {
   Typography,
   Button,
   InputBase,
-  TextareaAutosize
+  TextareaAutosize,
 } from '@mui/material';
 
 export const MarathonSignUpWrapper = styled(Box)`
@@ -110,8 +110,7 @@ export const StyledSelectWrapper = styled.div`
 
 export const StyledSelectText = styled(Typography)`
   margin: auto;
-  font-weight: ${({ isselected }) =>
-    isselected === 'true' ? '700' : 'normal'}; 
+  font-weight: ${({ isselected }) => (isselected === 'true' ? '700' : 'normal')}; 
 `;
 
 export const StyledSelectBox = styled(Box)`
@@ -123,10 +122,8 @@ export const StyledSelectBox = styled(Box)`
   justify-items: center;
   align-items: center;
   cursor: pointer;
-  background-color: ${({ isselected }) =>
-    isselected === 'true' ? '#DEF5F5' : 'initial'};
-  border: ${({ isselected }) =>
-    isselected === 'true' ? '1px solid #16B9B3' : '1px solid #DBDBDB'};
+  background-color: ${({ isselected }) => (isselected === 'true' ? '#DEF5F5' : 'initial')};
+  border: ${({ isselected }) => (isselected === 'true' ? '1px solid #16B9B3' : '1px solid #DBDBDB')};
   margin-bottom: 12px;
 `;
 

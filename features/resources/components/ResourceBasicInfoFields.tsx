@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useFormContext } from "react-hook-form";
-import { Link2Icon, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useFormContext } from 'react-hook-form';
+import { Link2Icon, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   FormControl,
   FormDescription,
@@ -11,15 +11,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { ResourceFormSchema } from "@/services/resources/core/schema";
-import { Text, Title } from "@/components/ui/typography";
-import { UploadImage } from "@/components/ui/upload-image";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
+} from '@/components/ui/form';
+import { ResourceFormSchema } from '@/services/resources/core/schema';
+import { Text, Title } from '@/components/ui/typography';
+import { UploadImage } from '@/components/ui/upload-image';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
 
 type ResourceBasicInfoSchema = Pick<
   ResourceFormSchema,
-  "name" | "url" | "imageUrl" | "description" | "videoUrl"
+  'name' | 'url' | 'imageUrl' | 'description' | 'videoUrl'
 >;
 
 export default function ResourceBasicInfoFields() {
@@ -114,7 +114,7 @@ export default function ResourceBasicInfoFields() {
                     placeholder="複製 YouTube 影片網址"
                     prefixIcon={<Link2Icon />}
                     {...field}
-                    value={field.value ?? ""}
+                    value={field.value ?? ''}
                   />
                 </FormControl>
                 <Button type="button" variant="outline" size="lg">

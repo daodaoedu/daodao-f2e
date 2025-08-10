@@ -1,18 +1,18 @@
 import { v4 as uuidv4 } from 'uuid';
 import { useState } from 'react';
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
 
 import {
   Grid,
   Typography,
-} from "@mui/material";
+} from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AddIcon from '@mui/icons-material/Add';
 import SubMilestonePanel from './SubMilestonePanel';
 import EditSubMilestone from './EditSubMilestone';
 
 import {
-  StyledInputBase
+  StyledInputBase,
 } from './Edit.styled';
 
 const StyledWeek = styled(Typography)`
@@ -99,7 +99,7 @@ export default function MilestonePanel({
 }) {
   const {
     name,
-    subMilestones
+    subMilestones,
   } = milestone;
   const [onEdit, setOnEdit] = useState(false);
   const handleClickAddSubMilestone = () => {
@@ -109,14 +109,14 @@ export default function MilestonePanel({
   const handleChangeMilestoneName = (e) => {
     onChange({
       ...milestone,
-      name: e.target.value
+      name: e.target.value,
     });
   };
   const handleAddSubMilestone = (subMilestone) => {
     const newSubMilestones = [...milestone.subMilestones, subMilestone];
     onChange({
       ...milestone,
-      subMilestones: newSubMilestones
+      subMilestones: newSubMilestones,
     });
   };
 
@@ -137,7 +137,7 @@ export default function MilestonePanel({
     });
     onChange({
       ...milestone,
-      subMilestones: newSubMilestones
+      subMilestones: newSubMilestones,
     });
   };
 
@@ -158,7 +158,7 @@ export default function MilestonePanel({
     });
     onChange({
       ...milestone,
-      subMilestones: newSubMilestones
+      subMilestones: newSubMilestones,
     });
   };
 
@@ -193,19 +193,17 @@ export default function MilestonePanel({
         />
       </Grid>
       {
-        milestone.subMilestones.map((subMilestone, index) => {
-          return ((
-            <SubMilestonePanel
-              weekDay={weekNumber}
-              subMilestone={subMilestone}
-              index={index}
-              onChange={handleEditSubMilestone}
-              onDelete={handleDeleteSubMilestone}
-              key={subMilestone._tempId || `temp_${uuidv4()}`}
-              isDisabled={isDisabled}
-            />
-          ));
-        })
+        milestone.subMilestones.map((subMilestone, index) => ((
+          <SubMilestonePanel
+            weekDay={weekNumber}
+            subMilestone={subMilestone}
+            index={index}
+            onChange={handleEditSubMilestone}
+            onDelete={handleDeleteSubMilestone}
+            key={subMilestone._tempId || `temp_${uuidv4()}`}
+            isDisabled={isDisabled}
+          />
+        )))
       }
       {/* adding pannel */}
       {onEdit && (
@@ -224,7 +222,8 @@ export default function MilestonePanel({
             disabled={isDisabled}
             onClick={handleClickAddSubMilestone}
           >
-            <AddIcon />新增子任務
+            <AddIcon />
+            新增子任務
           </StyledAddButton>
         </Grid>
       )}

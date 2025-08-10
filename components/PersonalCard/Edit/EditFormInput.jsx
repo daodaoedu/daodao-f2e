@@ -12,12 +12,14 @@ function EditFormInput(
     isRequire = false,
     placeholder = '',
   },
-  ref,
+  ref
 ) {
   return (
     <StyledGroup>
       <Typography fontWeight="500">
-        {title} {isRequire && '*'}
+        {title}
+        {' '}
+        {isRequire && '*'}
       </Typography>
       <TextField
         inputRef={ref}

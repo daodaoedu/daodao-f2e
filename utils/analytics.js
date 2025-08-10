@@ -1,7 +1,7 @@
-import ReactGA from "react-ga";
+import ReactGA from 'react-ga';
 
 export const initGA = (gaId) => {
-  console.log("GA init");
+  console.log('GA init');
   ReactGA.initialize(gaId);
 };
 
@@ -12,16 +12,16 @@ export const logPageView = () => {
 };
 
 export const GACategory = {
-  User: "User",
-  Share: "Share",
+  User: 'User',
+  Share: 'Share',
 };
 
-export const logEvent = (category = "", action = "", label = "", value = null) => {
+export const logEvent = (category = '', action = '', label = '', value = null) => {
   if (category && action) {
     const eventParams = {
       category,
       action,
-      label
+      label,
     };
 
     if (value !== null) {
@@ -32,7 +32,7 @@ export const logEvent = (category = "", action = "", label = "", value = null) =
   }
 };
 
-export const logException = (description = "", fatal = false) => {
+export const logException = (description = '', fatal = false) => {
   if (description) {
     ReactGA.exception({ description, fatal });
   }

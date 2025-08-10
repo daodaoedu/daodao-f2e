@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import useSWR from "swr";
-import toast from "react-hot-toast";
+import useSWR from 'swr';
+import toast from 'react-hot-toast';
 import {
   ChangeEvent,
   forwardRef,
@@ -9,18 +9,22 @@ import {
   useReducer,
   useRef,
   useState,
-} from "react";
-import { Check, CloudUpload, Dice5Icon, Link2Icon, X } from "lucide-react";
-import { Image } from "@/components/ui/image";
-import { uploadImagesSchema } from "@/services/images";
-import { Button, type ButtonProps } from "@/components/ui/button";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { cn } from "@/utils/cn";
-import ResponsiveModal, { ResponsiveModalSize } from "./responsive-modal";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
-import { Separator } from "./separator";
-import { Input } from "./input";
-import { Skeleton } from "./skeleton";
+} from 'react';
+import {
+  Check, CloudUpload, Dice5Icon, Link2Icon, X,
+} from 'lucide-react';
+import { Image } from '@/components/ui/image';
+import { uploadImagesSchema } from '@/services/images';
+import { Button, type ButtonProps } from '@/components/ui/button';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { cn } from '@/utils/cn';
+import ResponsiveModal, { ResponsiveModalSize } from './responsive-modal';
+import {
+  Tabs, TabsContent, TabsList, TabsTrigger,
+} from './tabs';
+import { Separator } from './separator';
+import { Input } from './input';
+import { Skeleton } from './skeleton';
 
 export interface ImageDataType {
   id: string;
@@ -29,8 +33,8 @@ export interface ImageDataType {
 }
 
 enum TabEnum {
-  Upload = "upload",
-  Random = "random",
+  Upload = 'upload',
+  Random = 'random',
 }
 
 const fetchRandomImage = async ([width, height, random]: [
@@ -44,12 +48,12 @@ const fetchRandomImage = async ([width, height, random]: [
   const blob = await response.blob();
   return new Promise<string>((resolve) => {
     const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target?.result?.toString() ?? "");
+    reader.onload = (e) => resolve(e.target?.result?.toString() ?? '');
     reader.readAsDataURL(blob);
   });
 };
 
-interface UploadFileProps extends Omit<ButtonProps, "onChange"> {
+interface UploadFileProps extends Omit<ButtonProps, 'onChange'> {
   accept?: string;
   children?: React.ReactNode;
   maxCount?: number;
@@ -66,7 +70,7 @@ interface UploadFileProps extends Omit<ButtonProps, "onChange"> {
 export const UploadImage = forwardRef(
   (
     {
-      accept = "image/*",
+      accept = 'image/*',
       children,
       multiple = false,
       ratio = 4 / 3,
@@ -88,7 +92,7 @@ export const UploadImage = forwardRef(
     const [tab, setTab] = useState(TabEnum.Upload);
     const [random, dispatchRandom] = useReducer((state) => state + 1, 0);
     const { data, error, isValidating } = useSWR<string>(
-      tab === "random"
+      tab === 'random'
         ? [Math.floor(height * ratio) * 2, Math.floor(height) * 2, random]
         : null,
       fetchRandomImage,
@@ -127,9 +131,7 @@ export const UploadImage = forwardRef(
       inputRef.current?.click();
     };
 
-    useEffect(() => {
-      return () => urls.forEach(URL.revokeObjectURL);
-    }, [urls]);
+    useEffect(() => () => urls.forEach(URL.revokeObjectURL), [urls]);
 
     return (
       <>
@@ -148,8 +150,8 @@ export const UploadImage = forwardRef(
             variant="ghost"
             onClick={() => setIsOpen(true)}
             className={cn(
-              "relative w-full h-full rounded-lg overflow-hidden",
-              "border border-dashed border-primary-base"
+              'relative w-full h-full rounded-lg overflow-hidden',
+              'border border-dashed border-primary-base'
             )}
             {...props}
           >
@@ -158,9 +160,9 @@ export const UploadImage = forwardRef(
             )}
             <span
               className={cn(
-                "absolute inset-0 flex justify-center items-center gap-2",
-                "text-primary-base hover:bg-primary-lightest/80 transition-opacity",
-                !hasImage ? "bg-primary-lightest" : "opacity-0 hover:opacity-100"
+                'absolute inset-0 flex justify-center items-center gap-2',
+                'text-primary-base hover:bg-primary-lightest/80 transition-opacity',
+                !hasImage ? 'bg-primary-lightest' : 'opacity-0 hover:opacity-100'
               )}
             >
               {children}
@@ -194,8 +196,8 @@ export const UploadImage = forwardRef(
                 <div
                   ref={imageWrapperRef}
                   className={cn(
-                    "p-10 mb-4 flex flex-col justify-center items-center gap-3 w-full",
-                    "border border-dashed border-primary-base rounded-lg"
+                    'p-10 mb-4 flex flex-col justify-center items-center gap-3 w-full',
+                    'border border-dashed border-primary-base rounded-lg'
                   )}
                   style={{ height: `${height}px` }}
                 >
@@ -221,7 +223,7 @@ export const UploadImage = forwardRef(
                     prefixIcon={<Link2Icon />}
                     suffixIcon={<X />}
                     onSuffixIconClick={() => {
-                      console.log("suffixIconClick");
+                      console.log('suffixIconClick');
                     }}
                   />
                   <Button type="button" variant="outline" size="lg">
@@ -283,4 +285,4 @@ export const UploadImage = forwardRef(
     );
   }
 );
-UploadImage.displayName = "UploadFile";
+UploadImage.displayName = 'UploadFile';

@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 export class ApiError extends Error {
   public readonly status: number;
@@ -7,7 +7,7 @@ export class ApiError extends Error {
 
   constructor(status: number, message: string, data?: unknown) {
     super(message);
-    this.name = "ApiError";
+    this.name = 'ApiError';
     this.status = status;
     this.data = data;
   }
@@ -15,7 +15,7 @@ export class ApiError extends Error {
 
 export interface FetcherConfig {
   url: string;
-  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   params?: Record<string, string | number | boolean>;
   data?: unknown;
   headers?: Record<string, string>;
@@ -43,12 +43,12 @@ export const fetcher = async <T>({
   const requestInit: RequestInit = {
     method,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...headers,
     },
   };
 
-  if (data && method !== "GET") {
+  if (data && method !== 'GET') {
     requestInit.body = JSON.stringify(data);
   }
 
@@ -60,8 +60,8 @@ export const fetcher = async <T>({
       const error = await response.json();
       throw new ApiError(status, `HTTP Status: ${status}`, error);
     } catch {
-      throw new ApiError(-1, "HTTP Status: Unknown", {
-        message: "Unknown Error",
+      throw new ApiError(-1, 'HTTP Status: Unknown', {
+        message: 'Unknown Error',
       });
     }
   }

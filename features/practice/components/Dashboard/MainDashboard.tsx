@@ -12,7 +12,7 @@ import {
   Headphones,
   GraduationCap,
   Settings,
-  LinkIcon
+  LinkIcon,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Practice } from '@/services/practice/schema';
@@ -33,7 +33,7 @@ interface MainDashboardProps {
 const MainDashboard: React.FC<MainDashboardProps> = ({
   practice,
   onCheckIn,
-  onBack
+  onBack,
 }) => {
   const router = useRouter();
   const { scrollToTop } = useScrollToTop();
@@ -67,7 +67,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
       articles: <FileText className="h-4 w-4" />,
       podcast: <Headphones className="h-4 w-4" />,
       course: <GraduationCap className="h-4 w-4" />,
-      custom: <Settings className="h-4 w-4" />
+      custom: <Settings className="h-4 w-4" />,
     };
     return iconMap[practice.contentType] || <Book className="h-4 w-4" />;
   };
@@ -80,7 +80,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
       articles: '文章',
       podcast: 'Podcast',
       course: '課程',
-      custom: practice.customContentType || '自定義'
+      custom: practice.customContentType || '自定義',
     };
     return typeMap[practice.contentType] || '學習';
   };
@@ -91,11 +91,13 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
       return '--';
     }
 
-    const { type, timeMinutes, amount, unit } = practice.dailyGoal;
+    const {
+      type, timeMinutes, amount, unit,
+    } = practice.dailyGoal;
 
     if (type === 'time' && timeMinutes) {
       return `${timeMinutes} 分鐘`;
-    } else if (type === 'completion' && amount && unit) {
+    } if (type === 'completion' && amount && unit) {
       return `${amount} ${unit}`;
     }
 
@@ -148,9 +150,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                     {practice.title}
                   </h1>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
-                    {practice.status === 'active' ? '進行中' :
-                      practice.status === 'completed' ? '已完成' :
-                        practice.status === 'paused' ? '暫停' : '草稿'}
+                    {practice.status === 'active' ? '進行中'
+                      : practice.status === 'completed' ? '已完成'
+                        : practice.status === 'paused' ? '暫停' : '草稿'}
                   </span>
                 </div>
 
@@ -203,7 +205,8 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 className="h-3"
               />
               <span className="absolute right-0 -top-7 text-lg text-basic-300 font-medium">
-                {progressPercentage}%
+                {progressPercentage}
+                %
               </span>
             </div>
 
@@ -211,7 +214,12 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 bg-primary/5 rounded-lg">
                 <div className="text-xl font-bold text-primary">
-                  {practice.currentProgress} / {practice.totalAmount} {practice.unit}
+                  {practice.currentProgress}
+                  {' '}
+                  /
+                  {practice.totalAmount}
+                  {' '}
+                  {practice.unit}
                 </div>
                 <div className="text-sm text-muted-foreground">已完成</div>
               </div>
@@ -281,7 +289,10 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                         <p className="text-sm font-medium text-green-600">今日已打卡</p>
                         {todayCheckIn && (
                           <p className="text-xs text-muted-foreground">
-                            進度：+{todayCheckIn.progress} {practice.unit}
+                            進度：+
+                            {todayCheckIn.progress}
+                            {' '}
+                            {practice.unit}
                           </p>
                         )}
                       </div>
@@ -318,19 +329,26 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                         <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
                         <div className="flex-1">
                           <p className="text-sm text-foreground">
-                            我在{' '}
+                            我在
+                            {' '}
                             <span className="text-green-600 font-medium">
                               {formatSmartDate(checkIn.date)}
-                            </span>{' '}
-                            實踐{' '}
+                            </span>
+                            {' '}
+                            實踐
+                            {' '}
                             <span className="text-primary font-medium">
                               {practice.title}
-                            </span>{' '}
+                            </span>
+                            {' '}
                             <span className="text-muted-foreground">
                               {checkIn.progress}
-                            </span>{' '}
+                            </span>
+                            {' '}
                             <span className="text-muted-foreground">
-                              ({practice.unit})
+                              (
+                              {practice.unit}
+                              )
                             </span>
                           </p>
                         </div>

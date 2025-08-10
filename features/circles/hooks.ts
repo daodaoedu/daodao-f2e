@@ -1,9 +1,9 @@
-import { useMemo } from "react";
-import useSWR from "swr";
+import { useMemo } from 'react';
+import useSWR from 'swr';
 import useSWRInfinite, {
   unstable_serialize as infinite_unstable_serialize,
-} from "swr/infinite";
-import useSWRMutation, { SWRMutationConfiguration } from "swr/mutation";
+} from 'swr/infinite';
+import useSWRMutation, { SWRMutationConfiguration } from 'swr/mutation';
 
 import {
   circleAPI,
@@ -14,14 +14,12 @@ import {
   CircleDetailResponseSchema,
   CircleListResponseSchema,
   formatCircleData,
-} from "@/services/circles";
+} from '@/services/circles';
 
-export const getCircleInfiniteKey =
-  (query: CircleSearchParamsSchema, pageSize: number = 6) =>
-  (pageIndex: number, previousPageData: CircleListResponseSchema | null) => {
-    if (previousPageData && !previousPageData.data?.length) return null;
-    return [getCirclePathname(), { ...query, page: pageIndex + 1, pageSize }];
-  };
+export const getCircleInfiniteKey = (query: CircleSearchParamsSchema, pageSize: number = 6) => (pageIndex: number, previousPageData: CircleListResponseSchema | null) => {
+  if (previousPageData && !previousPageData.data?.length) return null;
+  return [getCirclePathname(), { ...query, page: pageIndex + 1, pageSize }];
+};
 
 export const getSerializeCircleInfiniteKey = (
   query: CircleSearchParamsSchema,
@@ -72,32 +70,28 @@ type SWRMutationOptions = SWRMutationConfiguration<
 export const useCreateCircle = ({
   onSuccess,
   ...options
-}: SWRMutationOptions = {}) => {
-  return useSWRMutation(getCirclePathname(), circleAPI.create, {
+}: SWRMutationOptions = {}) => useSWRMutation(getCirclePathname(), circleAPI.create, {
+  ...options,
+  onSuccess: (data, key, config) => {
+    onSuccess?.(data, key, config);
+    refetchCircle();
+  },
+});
+
+export const useUpdateCircle = (
+  id?: string | null,
+  { onSuccess, ...options }: SWRMutationOptions = {}
+) => useSWRMutation(
+  id ? getCirclePathname({ id }) : null,
+  circleAPI.update,
+  {
     ...options,
     onSuccess: (data, key, config) => {
       onSuccess?.(data, key, config);
       refetchCircle();
     },
-  });
-};
-
-export const useUpdateCircle = (
-  id?: string | null,
-  { onSuccess, ...options }: SWRMutationOptions = {}
-) => {
-  return useSWRMutation(
-    id ? getCirclePathname({ id }) : null,
-    circleAPI.update,
-    {
-      ...options,
-      onSuccess: (data, key, config) => {
-        onSuccess?.(data, key, config);
-        refetchCircle();
-      },
-    }
-  );
-};
+  }
+);
 
 export const useDeleteCircle = (
   id: string,
@@ -105,16 +99,14 @@ export const useDeleteCircle = (
     onSuccess,
     ...options
   }: SWRMutationConfiguration<void, Error, string | null> = {}
-) => {
-  return useSWRMutation(
-    id ? getCirclePathname({ id }) : null,
-    circleAPI.delete,
-    {
-      ...options,
-      onSuccess: (data, key, config) => {
-        onSuccess?.(data, key, config);
-        refetchCircle();
-      },
-    }
-  );
-};
+) => useSWRMutation(
+  id ? getCirclePathname({ id }) : null,
+  circleAPI.delete,
+  {
+    ...options,
+    onSuccess: (data, key, config) => {
+      onSuccess?.(data, key, config);
+      refetchCircle();
+    },
+  }
+);

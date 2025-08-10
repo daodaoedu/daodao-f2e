@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useFormContext } from "react-hook-form";
+import { useFormContext } from 'react-hook-form';
 import {
   FormControl,
   FormDescription,
@@ -8,30 +8,30 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Text, Title } from "@/components/ui/typography";
+} from '@/components/ui/form';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Text, Title } from '@/components/ui/typography';
 import {
   ResourceFormSchema,
   ResourceReviewFormSchema,
-} from "@/services/resources";
+} from '@/services/resources';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Rating } from "@/components/ui/rating";
-import { MultipleSelector } from "@/components/ui/multiple-selector";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
+} from '@/components/ui/select';
+import { Rating } from '@/components/ui/rating';
+import { MultipleSelector } from '@/components/ui/multiple-selector';
+import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import {
   contentFeaturesOptions,
   resourceUsageOptions,
   timeUsageOptions,
-} from "@/features/resources";
+} from '@/features/resources';
 
-type ResourceReviewSchema = Pick<ResourceFormSchema, "review">;
+type ResourceReviewSchema = Pick<ResourceFormSchema, 'review'>;
 
 interface ResourceReviewFieldsProps {
   isReviewNested?: boolean;
@@ -44,7 +44,7 @@ export default function ResourceReviewFields({
     ResourceReviewFormSchema | ResourceReviewSchema
   >();
 
-  const prefixKey = isReviewNested ? "review." : "";
+  const prefixKey = isReviewNested ? 'review.' : '';
 
   return (
     <>
@@ -288,20 +288,16 @@ export default function ResourceReviewFields({
                   <FormLabel>能否搭配運用資源</FormLabel>
                   <MultipleSelector
                     options={resourceUsageOptions}
-                    onChange={(options) =>
-                      field.onChange(
-                        options.reduce((acc, option) => {
-                          acc[option.value] = true;
-                          return acc;
-                        }, Object.fromEntries(Object.keys(field.value ?? {}).map((key) => [key, false] as [string, boolean])))
-                      )
-                    }
+                    onChange={(options) => field.onChange(
+                      options.reduce((acc, option) => {
+                        acc[option.value] = true;
+                        return acc;
+                      }, Object.fromEntries(Object.keys(field.value ?? {}).map((key) => [key, false] as [string, boolean])))
+                    )}
                     value={Object.entries(field.value ?? {})
-                      .map(([key, value]) =>
-                        resourceUsageOptions.find(
-                          (option) => option.value === key && value
-                        )
-                      )
+                      .map(([key, value]) => resourceUsageOptions.find(
+                        (option) => option.value === key && value
+                      ))
                       .filter((option) => option !== undefined)}
                     emptyIndicator="沒資料"
                   />

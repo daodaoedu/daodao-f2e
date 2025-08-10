@@ -71,8 +71,8 @@ const SearchTags = ({ searchTags = [] }) => {
       <p>熱門標籤</p>
       <ul>
         {searchTags.map((t) => (
-          <li key={t} onClick={() => handleChange(t)}>
-            {t}
+          <li key={t}>
+            <button type="button" onClick={() => handleChange(t)}>{t}</button>
           </li>
         ))}
       </ul>

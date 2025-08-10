@@ -10,13 +10,13 @@ import {
   Flame,
   Edit3,
   Trash2,
-  MoreVertical
+  MoreVertical,
 } from 'lucide-react';
 import { Practice, ContentType } from '@/services/practice/schema';
 import {
   calculateProgress,
   getContentTypeLabel,
-  canCheckIn
+  canCheckIn,
 } from '@/services/practice/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -42,10 +42,10 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
   onEdit,
   onDelete,
   onCheckIn,
-  showActions = true
+  showActions = true,
 }) => {
   const getContentIcon = (contentType: ContentType) => {
-    const iconProps = { className: "h-5 w-5" };
+    const iconProps = { className: 'h-5 w-5' };
 
     switch (contentType) {
       case 'book': return <Book {...iconProps} />;
@@ -63,7 +63,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
       active: '進行中',
       paused: '暫停',
       completed: '已完成',
-      archived: '已封存'
+      archived: '已封存',
     };
     return statusMap[practice.status] || '未知';
   };
@@ -74,7 +74,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
       active: 'bg-tips/20 text-tips',
       paused: 'bg-orange-100 text-orange-600',
       completed: 'bg-success/20 text-success',
-      archived: 'bg-basic-100 text-basic-300'
+      archived: 'bg-basic-100 text-basic-300',
     };
     return colorMap[practice.status] || 'bg-basic-100 text-basic-300';
   };
@@ -138,9 +138,9 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
                     {canDoCheckIn && onCheckIn && (
                       <DropdownMenuItem
                         onClick={(e) => {
-                        e.stopPropagation();
-                        onCheckIn(practice);
-                      }}
+                          e.stopPropagation();
+                          onCheckIn(practice);
+                        }}
                         className="flex items-center cursor-pointer"
                       >
                         <Flame size={14} className="mr-2" />
@@ -151,9 +151,9 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
                     {onEdit && (
                       <DropdownMenuItem
                         onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit(practice);
-                      }}
+                          e.stopPropagation();
+                          onEdit(practice);
+                        }}
                         className="flex items-center cursor-pointer"
                       >
                         <Edit3 size={14} className="mr-2" />
@@ -201,7 +201,8 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
                 variant="secondary"
                 className="px-1.5 py-0.5 sm:px-2 bg-basic-100 text-basic-300 text-xs font-medium rounded-full"
               >
-                +{practice.tags.length - 2}
+                +
+                {practice.tags.length - 2}
               </Badge>
             )}
           </div>
@@ -214,7 +215,8 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
             className="h-2"
           />
           <span className="absolute right-0 -top-6 text-xs text-basic-300 font-medium">
-            {progressPercentage}%
+            {progressPercentage}
+            %
           </span>
         </div>
 
@@ -222,7 +224,10 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
         <div className="flex items-center justify-between mb-3 sm:mb-4">
           <div className="flex items-center space-x-1">
             <Flame className="h-4 w-4 text-orange-500" />
-            <span className="text-xs text-basic-300 font-medium">{practice.streak}天</span>
+            <span className="text-xs text-basic-300 font-medium">
+              {practice.streak}
+              天
+            </span>
           </div>
           <Badge className={getStatusColor()}>
             {getStatusDisplay()}

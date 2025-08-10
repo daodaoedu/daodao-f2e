@@ -1,8 +1,8 @@
 import ResponsiveModal, {
   ResponsiveModalSize,
-} from "@/components/ui/responsive-modal";
-import { ResourceSearchParamsSchema } from "@/services/resources/core/schema";
-import ResourceSearchForm from "./ResourceSearchForm";
+} from '@/components/ui/responsive-modal';
+import { ResourceSearchParamsSchema } from '@/services/resources/core/schema';
+import ResourceSearchForm from './ResourceSearchForm';
 
 interface SearchModalProps {
   open: boolean;

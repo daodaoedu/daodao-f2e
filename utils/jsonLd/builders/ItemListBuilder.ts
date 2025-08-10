@@ -12,13 +12,11 @@ export class ItemListBuilder extends JsonLdBuilder<ItemList> {
       return this;
     }
 
-    this.data.itemListElement = items.map((item, index) => {
-      return {
-        '@type': 'ListItem',
-        position: index + 1,
-        item,
-      };
-    });
+    this.data.itemListElement = items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item,
+    }));
     return this;
   }
 }

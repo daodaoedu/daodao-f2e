@@ -1,8 +1,8 @@
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
 import {
   Box,
-  Typography
-} from "@mui/material";
+  Typography,
+} from '@mui/material';
 
 const StyledGroup = styled(Box)`
   width: 100%;
@@ -345,7 +345,8 @@ export default function Price() {
   return (
     <StyledGroup>
       <StyledParagraph component="p" sx={{ marginBottom: '36px' }}>
-        申請無需費用，入選後才需繳交！<br />
+        申請無需費用，入選後才需繳交！
+        <br />
         完賽可退全額，完賽標準請見退費標準！
       </StyledParagraph>
       <StyledDiscount sx={{ marginBottom: '16px' }}>
@@ -432,7 +433,7 @@ export default function Price() {
           fontSize: '22px',
           fontWeight: '700',
           lineHeight: '140%',
-          color: "#293A3D"
+          color: '#293A3D',
         }}
       >
         退費標準

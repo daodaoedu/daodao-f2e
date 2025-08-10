@@ -28,6 +28,6 @@ export function usePracticeUpdater(practiceId: string | undefined) {
   return {
     updatePractice: practiceId ? updatePractice : undefined,
     deletePractice: practiceId ? deletePractice : undefined,
-    checkIn: practiceId ? checkIn : undefined
+    checkIn: practiceId ? checkIn : undefined,
   };
 }

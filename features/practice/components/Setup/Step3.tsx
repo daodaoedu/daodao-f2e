@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Plus, X, Link as LinkIcon, AlertCircle } from 'lucide-react';
+import {
+  Plus, X, Link as LinkIcon, AlertCircle,
+} from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,7 +31,7 @@ const Step3: React.FC<Step3Props> = ({
   setNewResourceName,
   setNewResourceUrl,
   addResource,
-  removeResource
+  removeResource,
 }) => {
   const [urlError, setUrlError] = useState<string>('');
   const [nameError, setNameError] = useState<string>('');
@@ -110,13 +112,18 @@ const Step3: React.FC<Step3Props> = ({
           <div className="border border-border rounded-lg p-4">
             <div className="flex justify-between items-center mb-4">
               <Label className="text-sm font-medium text-foreground">添加資源</Label>
-              <span className="text-xs text-muted-foreground">{resources.length}/5</span>
+              <span className="text-xs text-muted-foreground">
+                {resources.length}
+                /5
+              </span>
             </div>
 
             <div className="space-y-4">
               <div>
                 <Label className="block text-xs font-medium text-foreground mb-2">
-                  資源名稱 <span className="text-destructive">*</span>
+                  資源名稱
+                  {' '}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <div className="relative">
                   <Input
@@ -125,11 +132,12 @@ const Step3: React.FC<Step3Props> = ({
                     value={newResourceName}
                     onChange={(e) => handleNameChange(e.target.value)}
                     onBlur={() => validateName(newResourceName)}
-                    className={cn((validationErrors.resourceName || nameError) && "border-destructive")}
+                    className={cn((validationErrors.resourceName || nameError) && 'border-destructive')}
                     maxLength={100}
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                    {newResourceName.length}/100
+                    {newResourceName.length}
+                    /100
                   </span>
                 </div>
                 {nameError && (
@@ -153,7 +161,7 @@ const Step3: React.FC<Step3Props> = ({
                   value={newResourceUrl}
                   onChange={(e) => handleUrlChange(e.target.value)}
                   onBlur={() => validateUrl(newResourceUrl)}
-                  className={cn((validationErrors.resourceUrl || urlError) && "border-destructive")}
+                  className={cn((validationErrors.resourceUrl || urlError) && 'border-destructive')}
                 />
                 {urlError && (
                   <div className="flex items-center mt-1 text-xs text-destructive">

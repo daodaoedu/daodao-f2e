@@ -5,8 +5,7 @@ import { useMyProjects } from '@/services/projects';
 import useMarathonAccess from './useMarathonAccess';
 
 const MAX_PROJECTS = 3;
-const MARATHON_ACCESS_MESSAGE =
-  '目前功能只開放給\n春季學習馬拉松的夥伴使用喔～';
+const MARATHON_ACCESS_MESSAGE = '目前功能只開放給\n春季學習馬拉松的夥伴使用喔～';
 const PROJECT_LIMIT_MESSAGE = `島上空間有限，\n計畫滿 ${MAX_PROJECTS} 個就不能再增加了><`;
 const CREATE_PROJECT_PATH = '/manage/projects/create';
 const PROJECTS_PATH = '/manage/projects';
@@ -15,8 +14,7 @@ export default function useCreateProject() {
   const router = useRouter();
   const { data: projects, isLoading } = useMyProjects();
   const hasMarathonAccess = useMarathonAccess();
-  const isAddedDenied =
-    Array.isArray(projects) && projects.length >= MAX_PROJECTS;
+  const isAddedDenied = Array.isArray(projects) && projects.length >= MAX_PROJECTS;
 
   const canCreateProject = useMemo(() => {
     if (!hasMarathonAccess) {

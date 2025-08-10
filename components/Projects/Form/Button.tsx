@@ -35,22 +35,21 @@ interface ButtonProps {
 
 const Button = ({
   buttonText,
-  buttonStyle = "default",
-  className = "",
-  id = "",
+  buttonStyle = 'default',
+  className = '',
+  id = '',
   style = {},
   onClick = () => { },
-}: ButtonProps
-) => {
-  let styleClasses = "";
+}: ButtonProps) => {
+  let styleClasses = '';
 
   switch (buttonStyle) {
-    case "outline":
+    case 'outline':
       styleClasses = `bg-white text-[#29CAA3] 
         border border-solid border-primary-base 
         hover:border-primary-lighter`;
       break;
-    case "default":
+    case 'default':
       styleClasses = `bg-primary-base text-white 
         hover:bg-primary-darker`;
       break;

@@ -7,7 +7,9 @@ import { cn } from '@/utils/cn';
 import { formatDateISO } from '@/services/practice/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -49,7 +51,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
   customUnit,
   setCustomUnit,
   practiceAction,
-  setPracticeAction
+  setPracticeAction,
 }) => {
   const practiceDays = parseInt(pathInfo.totalAmount, 10) || 7;
   const [frequencyRange, setFrequencyRange] = useState<[number, number]>([3, 4]);
@@ -87,24 +89,30 @@ const StepTwo: React.FC<StepTwoProps> = ({
           {/* Practice Duration Slider */}
           <div>
             <Label className="block text-sm font-medium text-foreground mb-4">
-              實踐時間 <span className="text-destructive">*</span>
+              實踐時間
+              {' '}
+              <span className="text-destructive">*</span>
             </Label>
 
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xl font-bold text-primary">{practiceDays} 天</span>
+                <span className="text-xl font-bold text-primary">
+                  {practiceDays}
+                  {' '}
+                  天
+                </span>
               </div>
 
               <div className="relative">
                 <div className="w-full h-2 bg-muted rounded-lg relative">
                   <div className={`h-2 bg-primary rounded-lg transition-all duration-300 ${
-                    practiceDays <= 10 ? 'w-[13%]' :
-                    practiceDays <= 13 ? 'w-[26%]' :
-                    practiceDays <= 16 ? 'w-[39%]' :
-                    practiceDays <= 19 ? 'w-[52%]' :
-                    practiceDays <= 22 ? 'w-[65%]' :
-                    practiceDays <= 25 ? 'w-[78%]' :
-                    practiceDays <= 28 ? 'w-[91%]' : 'w-full'
+                    practiceDays <= 10 ? 'w-[13%]'
+                      : practiceDays <= 13 ? 'w-[26%]'
+                        : practiceDays <= 16 ? 'w-[39%]'
+                          : practiceDays <= 19 ? 'w-[52%]'
+                            : practiceDays <= 22 ? 'w-[65%]'
+                              : practiceDays <= 25 ? 'w-[78%]'
+                                : practiceDays <= 28 ? 'w-[91%]' : 'w-full'
                   }`}
                   />
                 </div>
@@ -131,23 +139,25 @@ const StepTwo: React.FC<StepTwoProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="block text-sm font-medium text-foreground mb-2">
-                  開始日期 <span className="text-destructive">*</span>
+                  開始日期
+                  {' '}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full px-4 py-3 border-2 rounded-lg justify-start text-left font-normal h-auto",
-                        !startDate && "text-muted-foreground",
+                        'w-full px-4 py-3 border-2 rounded-lg justify-start text-left font-normal h-auto',
+                        !startDate && 'text-muted-foreground',
                         validationErrors.targetDate
-                          ? "border-destructive focus:border-destructive focus:ring-destructive"
-                          : "border-border hover:border-primary focus:border-primary"
+                          ? 'border-destructive focus:border-destructive focus:ring-destructive'
+                          : 'border-border hover:border-primary focus:border-primary'
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {startDate ? (
-                        format(startDate, "yyyy / M / d ", { locale: zhTW })
+                        format(startDate, 'yyyy / M / d ', { locale: zhTW })
                       ) : (
                         <span>選擇開始日期</span>
                       )}
@@ -183,7 +193,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                     if (!startDate) return '請先選擇開始日期';
                     const endDate = new Date(startDate);
                     endDate.setDate(startDate.getDate() + practiceDays);
-                    return format(endDate, "yyyy / M / d", { locale: zhTW });
+                    return format(endDate, 'yyyy / M / d', { locale: zhTW });
                   })()}
                 </div>
               </div>
@@ -193,7 +203,9 @@ const StepTwo: React.FC<StepTwoProps> = ({
           {/* Practice Action Section */}
           <div>
             <Label className="block text-sm font-medium text-foreground mb-4">
-              實踐行動 <span className="text-destructive">*</span>
+              實踐行動
+              {' '}
+              <span className="text-destructive">*</span>
             </Label>
 
             <div className="text-sm text-muted-foreground mb-4">
@@ -205,14 +217,15 @@ const StepTwo: React.FC<StepTwoProps> = ({
               onChange={(e) => setPracticeAction(e.target.value)}
               placeholder="例如：每天閱讀30分鐘，並記錄學習筆記"
               className={cn(
-                "min-h-[80px] resize-none",
-                validationErrors.practiceAction && "border-destructive focus:ring-destructive"
+                'min-h-[80px] resize-none',
+                validationErrors.practiceAction && 'border-destructive focus:ring-destructive'
               )}
               maxLength={200}
             />
             <div className="flex justify-between items-center mt-2">
               <span className="text-xs text-muted-foreground">
-                {practiceAction.length}/200
+                {practiceAction.length}
+                /200
               </span>
             </div>
             {validationErrors.practiceAction && (
@@ -223,7 +236,9 @@ const StepTwo: React.FC<StepTwoProps> = ({
           {/* Weekly Frequency Section */}
           <div>
             <Label className="block text-sm font-medium text-foreground mb-4">
-              每週節奏 <span className="text-destructive">*</span>
+              每週節奏
+              {' '}
+              <span className="text-destructive">*</span>
             </Label>
 
             <div className="space-y-6">
@@ -245,17 +260,17 @@ const StepTwo: React.FC<StepTwoProps> = ({
                   <div className="h-2 bg-muted rounded-full relative">
                     {/* Active range track */}
                     <div className={`h-2 bg-primary rounded-full transition-all duration-300 absolute ${
-                      frequencyRange[0] === 2 && frequencyRange[1] === 3 ? 'left-0 w-1/4' :
-                      frequencyRange[0] === 2 && frequencyRange[1] === 4 ? 'left-0 w-2/4' :
-                      frequencyRange[0] === 2 && frequencyRange[1] === 5 ? 'left-0 w-3/4' :
-                      frequencyRange[0] === 2 && frequencyRange[1] === 6 ? 'left-0 w-full' :
-                      frequencyRange[0] === 3 && frequencyRange[1] === 4 ? 'left-1/4 w-1/4' :
-                      frequencyRange[0] === 3 && frequencyRange[1] === 5 ? 'left-1/4 w-2/4' :
-                      frequencyRange[0] === 3 && frequencyRange[1] === 6 ? 'left-1/4 w-3/4' :
-                      frequencyRange[0] === 4 && frequencyRange[1] === 5 ? 'left-2/4 w-1/4' :
-                      frequencyRange[0] === 4 && frequencyRange[1] === 6 ? 'left-2/4 w-2/4' :
-                      frequencyRange[0] === 5 && frequencyRange[1] === 6 ? 'left-3/4 w-1/4' :
-                      'left-0 w-2/4'
+                      frequencyRange[0] === 2 && frequencyRange[1] === 3 ? 'left-0 w-1/4'
+                        : frequencyRange[0] === 2 && frequencyRange[1] === 4 ? 'left-0 w-2/4'
+                          : frequencyRange[0] === 2 && frequencyRange[1] === 5 ? 'left-0 w-3/4'
+                            : frequencyRange[0] === 2 && frequencyRange[1] === 6 ? 'left-0 w-full'
+                              : frequencyRange[0] === 3 && frequencyRange[1] === 4 ? 'left-1/4 w-1/4'
+                                : frequencyRange[0] === 3 && frequencyRange[1] === 5 ? 'left-1/4 w-2/4'
+                                  : frequencyRange[0] === 3 && frequencyRange[1] === 6 ? 'left-1/4 w-3/4'
+                                    : frequencyRange[0] === 4 && frequencyRange[1] === 5 ? 'left-2/4 w-1/4'
+                                      : frequencyRange[0] === 4 && frequencyRange[1] === 6 ? 'left-2/4 w-2/4'
+                                        : frequencyRange[0] === 5 && frequencyRange[1] === 6 ? 'left-3/4 w-1/4'
+                                          : 'left-0 w-2/4'
                     }`}
                     />
 
@@ -264,12 +279,13 @@ const StepTwo: React.FC<StepTwoProps> = ({
                       className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-6 h-6 bg-white border-2 border-primary rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 ${
                         draggedThumb === 'min' ? 'scale-110 ring-4 ring-primary/30' : ''
                       } ${
-                        frequencyRange[0] === 2 ? 'left-0' :
-                        frequencyRange[0] === 3 ? 'left-1/4' :
-                        frequencyRange[0] === 4 ? 'left-2/4' :
-                        frequencyRange[0] === 5 ? 'left-3/4' : 'left-full'
+                        frequencyRange[0] === 2 ? 'left-0'
+                          : frequencyRange[0] === 3 ? 'left-1/4'
+                            : frequencyRange[0] === 4 ? 'left-2/4'
+                              : frequencyRange[0] === 5 ? 'left-3/4' : 'left-full'
                       }`}
                       role="button"
+                      aria-label="minimum thumb"
                       tabIndex={0}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -305,12 +321,13 @@ const StepTwo: React.FC<StepTwoProps> = ({
                       className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-6 h-6 bg-white border-2 border-primary rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 ${
                         draggedThumb === 'max' ? 'scale-110 ring-4 ring-primary/30' : ''
                       } ${
-                        frequencyRange[1] === 3 ? 'left-1/4' :
-                        frequencyRange[1] === 4 ? 'left-2/4' :
-                        frequencyRange[1] === 5 ? 'left-3/4' :
-                        frequencyRange[1] === 6 ? 'left-full' : 'left-2/4'
+                        frequencyRange[1] === 3 ? 'left-1/4'
+                          : frequencyRange[1] === 4 ? 'left-2/4'
+                            : frequencyRange[1] === 5 ? 'left-3/4'
+                              : frequencyRange[1] === 6 ? 'left-full' : 'left-2/4'
                       }`}
                       role="button"
+                      aria-label="maximum thumb"
                       tabIndex={0}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -347,7 +364,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                     {[2, 3, 4, 5, 6].map((freq) => (
                       <Button
                         key={freq}
-                        variant={freq >= frequencyRange[0] && freq <= frequencyRange[1] ? "default" : "outline"}
+                        variant={freq >= frequencyRange[0] && freq <= frequencyRange[1] ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => {
                           if (freq <= frequencyRange[0]) {
@@ -376,12 +393,12 @@ const StepTwo: React.FC<StepTwoProps> = ({
                 </div>
                 <div className="text-xs font-medium text-primary">
                   {frequencyRange[1] - frequencyRange[0] === 0
-                    ? "無彈性，但規律穩定"
+                    ? '無彈性，但規律穩定'
                     : frequencyRange[1] - frequencyRange[0] === 1
-                    ? "小幅彈性，易於調整"
-                    : frequencyRange[1] - frequencyRange[0] === 2
-                    ? "中等彈性，易於調整"
-                    : "高度彈性，最大自由度"}
+                      ? '小幅彈性，易於調整'
+                      : frequencyRange[1] - frequencyRange[0] === 2
+                        ? '中等彈性，易於調整'
+                        : '高度彈性，最大自由度'}
                 </div>
               </div>
             </div>
@@ -390,7 +407,9 @@ const StepTwo: React.FC<StepTwoProps> = ({
           {/* Daily Goal */}
           <div>
             <Label className="block text-sm font-medium text-foreground mb-4">
-              每次實踐目標 <span className="text-destructive">*</span>
+              每次實踐目標
+              {' '}
+              <span className="text-destructive">*</span>
             </Label>
 
             <div className="space-y-4">

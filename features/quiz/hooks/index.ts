@@ -1,1 +1,1 @@
-export { useResultStyles } from "./useResultStyles";
+export { useResultStyles } from './useResultStyles';

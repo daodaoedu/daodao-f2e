@@ -1,21 +1,21 @@
-import { useState } from "react";
-import dayjs from "dayjs";
-import { Plus } from "lucide-react";
+import { useState } from 'react';
+import dayjs from 'dayjs';
+import { Plus } from 'lucide-react';
 import {
   ProjectMilestoneSchema,
   ProjectMilestoneFormSchema,
   ProjectTaskSchema,
-} from "@/services/projects";
+} from '@/services/projects';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/utils/cn";
-import MilestoneCard from "./MilestoneCard";
-import Task from "../Tasks/Task";
-import DraggableTasks from "../Tasks/DraggableTasks";
+} from '@/components/ui/collapsible';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/utils/cn';
+import MilestoneCard from './MilestoneCard';
+import Task from '../Tasks/Task';
+import DraggableTasks from '../Tasks/DraggableTasks';
 
 interface MilestoneItemProps {
   projectId: string;
@@ -89,9 +89,9 @@ const MilestoneItem = ({
         <CollapsibleTrigger
           withIcon
           className={cn(
-            "pt-1.5 w-full flex justify-center body-sm",
-            "[&[data-state=open]>span:nth-child(1)]:hidden",
-            "[&[data-state=closed]>span:nth-child(2)]:hidden"
+            'pt-1.5 w-full flex justify-center body-sm',
+            '[&[data-state=open]>span:nth-child(1)]:hidden',
+            '[&[data-state=closed]>span:nth-child(2)]:hidden'
           )}
         >
           <span>展開</span>

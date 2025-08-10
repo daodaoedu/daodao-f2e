@@ -1,14 +1,14 @@
-import { StaticImageData } from "next/image";
-import RoleDPng from "@/public/assets/quiz/role-d.webp";
-import RoleAPng from "@/public/assets/quiz/role-a.webp";
-import RoleCPng from "@/public/assets/quiz/role-c.webp";
-import RoleLPng from "@/public/assets/quiz/role-l.webp";
-import RoleOPng from "@/public/assets/quiz/role-o.webp";
-import DeepExplorerSvg from "@/public/assets/quiz/deep-explorer.svg";
-import ActiveShaperSvg from "@/public/assets/quiz/active-shaper.svg";
-import CommunityConnectorSvg from "@/public/assets/quiz/community-connector.svg";
-import LiquidIntegratorSvg from "@/public/assets/quiz/liquid-integrator.svg";
-import OrderBuilderSvg from "@/public/assets/quiz/order-builder.svg";
+import { StaticImageData } from 'next/image';
+import RoleDPng from '@/public/assets/quiz/role-d.webp';
+import RoleAPng from '@/public/assets/quiz/role-a.webp';
+import RoleCPng from '@/public/assets/quiz/role-c.webp';
+import RoleLPng from '@/public/assets/quiz/role-l.webp';
+import RoleOPng from '@/public/assets/quiz/role-o.webp';
+import DeepExplorerSvg from '@/public/assets/quiz/deep-explorer.svg';
+import ActiveShaperSvg from '@/public/assets/quiz/active-shaper.svg';
+import CommunityConnectorSvg from '@/public/assets/quiz/community-connector.svg';
+import LiquidIntegratorSvg from '@/public/assets/quiz/liquid-integrator.svg';
+import OrderBuilderSvg from '@/public/assets/quiz/order-builder.svg';
 
 export type AnalysisType = {
   D: number;
@@ -31,11 +31,11 @@ export type ThemeType = {
 
 const themeList: ThemeType[] = [
   {
-    id: "d",
-    title: "探探島",
-    backgroundColor: "#E9F3F5",
-    color: "#48809A",
-    secondaryColor: "#99ECFF",
+    id: 'd',
+    title: '探探島',
+    backgroundColor: '#E9F3F5',
+    color: '#48809A',
+    secondaryColor: '#99ECFF',
     largeImg: RoleDPng,
     smallImg: DeepExplorerSvg,
     analysis: {
@@ -48,11 +48,11 @@ const themeList: ThemeType[] = [
   },
 
   {
-    id: "a",
-    title: "動動島",
-    backgroundColor: "#F5F0E9",
-    color: "#9A6948",
-    secondaryColor: "#FFA10B",
+    id: 'a',
+    title: '動動島',
+    backgroundColor: '#F5F0E9',
+    color: '#9A6948',
+    secondaryColor: '#FFA10B',
     largeImg: RoleAPng,
     smallImg: ActiveShaperSvg,
     analysis: {
@@ -65,11 +65,11 @@ const themeList: ThemeType[] = [
   },
 
   {
-    id: "o",
-    title: "構構島",
-    backgroundColor: "#E9F5EE",
-    color: "#489A95",
-    secondaryColor: "#16B9B3",
+    id: 'o',
+    title: '構構島',
+    backgroundColor: '#E9F5EE',
+    color: '#489A95',
+    secondaryColor: '#16B9B3',
     largeImg: RoleOPng,
     smallImg: OrderBuilderSvg,
     analysis: {
@@ -82,11 +82,11 @@ const themeList: ThemeType[] = [
   },
 
   {
-    id: "l",
-    title: "跨跨島",
-    backgroundColor: "#F5EDE9",
-    color: "#CB6738",
-    secondaryColor: "#FF6E0B",
+    id: 'l',
+    title: '跨跨島',
+    backgroundColor: '#F5EDE9',
+    color: '#CB6738',
+    secondaryColor: '#FF6E0B',
     largeImg: RoleLPng,
     smallImg: LiquidIntegratorSvg,
     analysis: {
@@ -99,11 +99,11 @@ const themeList: ThemeType[] = [
   },
 
   {
-    id: "c",
-    title: "連連島",
-    backgroundColor: "#F5F4E9",
-    color: "#9D8242",
-    secondaryColor: "#F9E41C",
+    id: 'c',
+    title: '連連島',
+    backgroundColor: '#F5F4E9',
+    color: '#9D8242',
+    secondaryColor: '#F9E41C',
     largeImg: RoleCPng,
     smallImg: CommunityConnectorSvg,
     analysis: {

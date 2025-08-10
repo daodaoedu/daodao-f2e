@@ -1,4 +1,4 @@
-import { Milestone } from "@/contexts/Milestones/type";
+import { Milestone } from '@/contexts/Milestones/type';
 
 interface User {
   photoURL: string;
@@ -32,29 +32,29 @@ export interface Project {
 }
 
 export const DEFAULT_PROJECT: Project = {
-  id: "",
-  title: "",
-  description: "",
+  id: '',
+  title: '',
+  description: '',
   isPublic: false,
   motivation: [],
-  motivationDescription: "",
-  goal: "",
-  content: "",
-  createdAt: "",
-  updatedAt: "",
+  motivationDescription: '',
+  goal: '',
+  content: '',
+  createdAt: '',
+  updatedAt: '',
   strategy: [],
-  strategyDescription: "",
-  resourceName: "",
+  strategyDescription: '',
+  resourceName: '',
   resourceUrl: [],
   outcome: [],
-  outcomeDescription: "",
-  eventId: "",
+  outcomeDescription: '',
+  eventId: '',
   user: {
-    id: "",
-    name: "",
-    _id: "",
-    photoURL: "",
-    roleList: []
+    id: '',
+    name: '',
+    _id: '',
+    photoURL: '',
+    roleList: [],
   },
   milestones: [],
   version: 1,

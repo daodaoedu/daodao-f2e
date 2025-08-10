@@ -1,4 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext, useContext, useEffect, useState,
+} from 'react';
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
 
@@ -131,6 +133,7 @@ export function PromotionBar() {
           type="button"
           className="absolute top-1/2 right-3.5 size-11 -translate-y-1/2 text-basic-white"
           onClick={() => setIsShowPromotionBar(false)}
+          aria-label="close"
         >
           <div
             className={cn(

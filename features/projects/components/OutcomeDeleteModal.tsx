@@ -1,10 +1,10 @@
-import useSWRMutation from "swr/mutation";
-import ConfirmModal from "@/shared/components/Confirm";
+import useSWRMutation from 'swr/mutation';
+import ConfirmModal from '@/shared/components/Confirm';
 import {
   getProjectOutcomePathname,
   projectOutcomeAPI,
   refetchProjectOutcome,
-} from "@/services/projects";
+} from '@/services/projects';
 
 interface OutcomeDeleteModalProps {
   projectId: string;
@@ -22,7 +22,7 @@ export default function OutcomeDeleteModal({
   onSuccess,
 }: OutcomeDeleteModalProps) {
   const deleteMutation = useSWRMutation(
-    projectId && typeof outcomeId === "number"
+    projectId && typeof outcomeId === 'number'
       ? getProjectOutcomePathname({ projectId, outcomeId })
       : null,
     projectOutcomeAPI.delete,

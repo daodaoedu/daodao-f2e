@@ -1,7 +1,11 @@
 import React from 'react';
-import { Target, TrendingUp, RefreshCw, Sparkles } from 'lucide-react';
+import {
+  Target, TrendingUp, RefreshCw, Sparkles,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card, CardContent, CardHeader, CardTitle,
+} from '@/components/ui/card';
 import { useContentTypeRecommendations } from '@/services/recommendation';
 import { useAuth } from '@/contexts/Auth';
 import type { Practice } from '@/services/practice/schema';
@@ -163,7 +167,9 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
               推薦主題實踐
               {practiceRecommendations.length > 0 && (
                 <span className="text-sm font-normal text-basic-400">
-                  ({practiceRecommendations.length}+)
+                  (
+                  {practiceRecommendations.length}
+                  +)
                 </span>
               )}
             </CardTitle>

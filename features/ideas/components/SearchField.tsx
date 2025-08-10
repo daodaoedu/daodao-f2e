@@ -5,7 +5,7 @@ import {
   X,
   Filter,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -124,7 +124,11 @@ const SearchField: React.FC<SearchFieldProps> = ({
             {selectedTags.length > 0 && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-sm text-basic-500">已選標籤 ({selectedTags.length}/3)</Label>
+                  <Label className="text-sm text-basic-500">
+                    已選標籤 (
+                    {selectedTags.length}
+                    /3)
+                  </Label>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -159,7 +163,9 @@ const SearchField: React.FC<SearchFieldProps> = ({
             {/* Tag Selection */}
             <div className="space-y-3">
               <Label className="text-sm text-basic-500">
-                添加標籤 {selectedTags.length < 3 ? `(還可選 ${3 - selectedTags.length} 個)` : '(已達上限)'}
+                添加標籤
+                {' '}
+                {selectedTags.length < 3 ? `(還可選 ${3 - selectedTags.length} 個)` : '(已達上限)'}
               </Label>
 
               {/* Custom Tag Input */}
@@ -192,7 +198,8 @@ const SearchField: React.FC<SearchFieldProps> = ({
                 className="w-full border-basic-200 text-basic-500 hover:border-primary-base hover:text-primary-base"
               >
                 <Hash className="h-4 w-4 mr-2" />
-                {showTagSuggestions ? '隱藏' : '顯示'}熱門標籤
+                {showTagSuggestions ? '隱藏' : '顯示'}
+                熱門標籤
                 {showTagSuggestions ? <ChevronUp className="h-4 w-4 ml-2" /> : <ChevronDown className="h-4 w-4 ml-2" />}
               </Button>
 
@@ -237,7 +244,12 @@ const SearchField: React.FC<SearchFieldProps> = ({
             {searchValue && (
               <div className="pt-3 border-t border-basic-200">
                 <p className="text-xs text-basic-400">
-                  搜尋關鍵字：<span className="font-medium text-basic-500">"{searchValue}"</span>
+                  搜尋關鍵字：
+                  <span className="font-medium text-basic-500">
+                    "
+                    {searchValue}
+                    "
+                  </span>
                 </p>
               </div>
             )}

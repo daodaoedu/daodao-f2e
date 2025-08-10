@@ -24,45 +24,43 @@ const ResourceWrapper = styled.section`
   }
 `;
 
-const ContributeResource = () => {
-  return (
-    <ResourceWrapper>
-      <Paper
-        sx={{
-          width: '95%',
-          margin: '0 auto',
-          padding: '20px',
-        }}
-      >
-        <Box>
-          <Typography
-            variant="h1"
-            sx={{
-              margin: '10px 0',
-            }}
-          >
-            實驗教育場域導覽
-          </Typography>
-        </Box>
-        <Box>
-          <Typography
-            variant="h2"
-            sx={{
-              margin: '40px 0 10px 0',
-            }}
-          >
-            ⬇ 點擊此按鈕能看到篩選工具
-          </Typography>
-          {/* eslint-disable-next-line jsx-a11y/iframe-has-title */}
-          <iframe
-            src="https://www.google.com/maps/d/embed?mid=1I2UZp4qujWgrb9tbztjdkBIDW0Gy3h6V&ehbc=2E312F"
-            width="100%"
-            height="880"
-          />
-        </Box>
-      </Paper>
-    </ResourceWrapper>
-  );
-};
+const ContributeResource = () => (
+  <ResourceWrapper>
+    <Paper
+      sx={{
+        width: '95%',
+        margin: '0 auto',
+        padding: '20px',
+      }}
+    >
+      <Box>
+        <Typography
+          variant="h1"
+          sx={{
+            margin: '10px 0',
+          }}
+        >
+          實驗教育場域導覽
+        </Typography>
+      </Box>
+      <Box>
+        <Typography
+          variant="h2"
+          sx={{
+            margin: '40px 0 10px 0',
+          }}
+        >
+          ⬇ 點擊此按鈕能看到篩選工具
+        </Typography>
+        {/* eslint-disable-next-line jsx-a11y/iframe-has-title */}
+        <iframe
+          src="https://www.google.com/maps/d/embed?mid=1I2UZp4qujWgrb9tbztjdkBIDW0Gy3h6V&ehbc=2E312F"
+          width="100%"
+          height="880"
+        />
+      </Box>
+    </Paper>
+  </ResourceWrapper>
+);
 
 export default ContributeResource;

@@ -49,7 +49,9 @@ const useFetch = (url, { enabled = true, initialValue, onSuccess } = {}) => {
     if (onSuccess) onSuccess(data);
   }, [onSuccess, data]);
 
-  return { data, isFetching, isError, refetch };
+  return {
+    data, isFetching, isError, refetch,
+  };
 };
 
 export default useFetch;

@@ -71,24 +71,22 @@ const FooterWrapper = styled.div`
   }
 `;
 
-const Card = ({ image, title, desc, id }) => {
-  return (
-    <Tooltip title={desc}>
-      <CardWrapper
-        onClick={() =>
-          open(`https://www.daoedu.tw/resource/${id}`, '_target')
-        }
-      >
-        <HeaderWrapper>
-          <ImageWrapper image={image} />
-          <h3>{title}</h3>
-        </HeaderWrapper>
-        <FooterWrapper>
-          <p>{desc}</p>
-        </FooterWrapper>
-      </CardWrapper>
-    </Tooltip>
-  );
-};
+const Card = ({
+  image, title, desc, id,
+}) => (
+  <Tooltip title={desc}>
+    <CardWrapper
+      onClick={() => window.open(`https://www.daoedu.tw/resource/${id}`, '_target')}
+    >
+      <HeaderWrapper>
+        <ImageWrapper image={image} />
+        <h3>{title}</h3>
+      </HeaderWrapper>
+      <FooterWrapper>
+        <p>{desc}</p>
+      </FooterWrapper>
+    </CardWrapper>
+  </Tooltip>
+);
 
 export default Card;

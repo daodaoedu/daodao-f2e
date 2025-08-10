@@ -6,7 +6,7 @@ import {
   Edit,
   Trash2,
   FileText,
-  Eye
+  Eye,
 } from 'lucide-react';
 import Comment from '@/public/assets/icons/comment.svg';
 import Shell from '@/public/assets/icons/shell.svg';
@@ -186,7 +186,10 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
               </span>
             ))}
             {data.tags.length > 3 && (
-              <span className="text-xs text-basic-300">+{data.tags.length - 3}</span>
+              <span className="text-xs text-basic-300">
+                +
+                {data.tags.length - 3}
+              </span>
             )}
           </div>
         </div>
@@ -228,7 +231,11 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
             ))}
             {data.ideaResources!.length > 2 && (
               <p className="body-sm text-basic-300 pl-5">
-                還有 {data.ideaResources!.length - 2} 個資源...
+                還有
+                {' '}
+                {data.ideaResources!.length - 2}
+                {' '}
+                個資源...
               </p>
             )}
           </div>
@@ -248,7 +255,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
             className={`text-xs h-8 px-2 flex items-center gap-1 ${isLiked
               ? 'text-primary-base'
               : 'text-basic-300 hover:text-primary-base'
-              }`}
+            }`}
           >
             <Shell className={isLiked ? 'fill-primary-base' : ''} />
             <span>{data.likeCount || 0}</span>

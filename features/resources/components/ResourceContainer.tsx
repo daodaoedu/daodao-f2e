@@ -1,13 +1,13 @@
-import Link from "next/link";
-import { ArrowRightIcon } from "lucide-react";
-import EmptyPng from "@/public/assets/images/empty.png";
-import { Badge } from "@/components/ui/badge";
-import { Image } from "@/components/ui/image";
-import { Button } from "@/components/ui/button";
-import { HOT_TAGS, ICategory } from "@/constants/category";
-import { ResourceListResponseSchema } from "@/services/resources";
-import { cn } from "@/utils/cn";
-import ResourceCard, { ResourceCardSkeleton } from "./ResourceCard";
+import Link from 'next/link';
+import { ArrowRightIcon } from 'lucide-react';
+import EmptyPng from '@/public/assets/images/empty.png';
+import { Badge } from '@/components/ui/badge';
+import { Image } from '@/components/ui/image';
+import { Button } from '@/components/ui/button';
+import { HOT_TAGS, ICategory } from '@/constants/category';
+import { ResourceListResponseSchema } from '@/services/resources';
+import { cn } from '@/utils/cn';
+import ResourceCard, { ResourceCardSkeleton } from './ResourceCard';
 
 interface EmptyDataProps {
   parentCategoryHasData: boolean;
@@ -31,7 +31,8 @@ function EmptyData({
               {parentCategory?.[parentCategory.length - 1]?.label}
             </b>
             內發現了
-            <b className="font-bold px-0.5">{parentDataCount}</b>筆
+            <b className="font-bold px-0.5">{parentDataCount}</b>
+            筆
             有趣的學習資源~
           </p>
         </>
@@ -50,7 +51,7 @@ function EmptyData({
           <Link
             href={`/resource/categories/${parentCategory
               .map((c) => c.value)
-              .join("/")}`}
+              .join('/')}`}
           >
             <ArrowRightIcon size={15} />
             馬上去探索
@@ -62,7 +63,10 @@ function EmptyData({
           <div className="flex gap-2">
             {HOT_TAGS.map(({ label, value }) => (
               <Badge key={value} variant="outline" asChild>
-                <Link href={`/resource/categories/${value}`}>#{label}</Link>
+                <Link href={`/resource/categories/${value}`}>
+                  #
+                  {label}
+                </Link>
               </Badge>
             ))}
           </div>
@@ -73,7 +77,7 @@ function EmptyData({
 }
 
 interface ResourceContainerProps {
-  data: ResourceListResponseSchema["data"]["resources"];
+  data: ResourceListResponseSchema['data']['resources'];
   categories?: ICategory[];
   parentDataCount?: number;
   className?: string;
@@ -91,11 +95,10 @@ function ResourceContainer({
 }: ResourceContainerProps) {
   const safeData = Array.isArray(data) ? data : [];
   const parentCategory = categories?.slice(0, -1) ?? [];
-  const hasParentCategoryData =
-    parentCategory.length > 0 && !!parentDataCount && parentDataCount > 0;
+  const hasParentCategoryData = parentCategory.length > 0 && !!parentDataCount && parentDataCount > 0;
 
   return (
-    <div className={cn("flex flex-col gap-6", className)}>
+    <div className={cn('flex flex-col gap-6', className)}>
       {!isLoading && safeData.map((resource) => (
         <ResourceCard
           key={resource.id}
