@@ -4,7 +4,12 @@
     "es2023": true,
     "node": true
   },
-  "extends": ["airbnb", "plugin:@typescript-eslint/recommended"],
+  "extends": [
+    "airbnb",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:tailwindcss/recommended"
+  ],
   "ignorePatterns": [
     "*.config.js",
     "*.config.ts",
@@ -41,13 +46,16 @@
     "@typescript-eslint/no-shadow": "error",
     "arrow-body-style": "off",
     "camelcase": "off",
-    "comma-dangle": ["error", {
-      "arrays": "always-multiline",
-      "objects": "always-multiline",
-      "imports": "always-multiline",
-      "exports": "always-multiline",
-      "functions": "never"
-    }],
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "never"
+      }
+    ],
     "implicit-arrow-linebreak": "off",
     "import/extensions": [
       "error",
@@ -70,13 +78,21 @@
     "no-console": "off",
     "no-nested-ternary": "off", // 待調整，暫時允許巢狀三元運算子
     "no-underscore-dangle": "off",
-    "operator-linebreak": ["error", "after", { 
-      "overrides": { 
-        "?": "before", 
-        ":": "before" 
-      } 
-    }],
-    "quotes": ["error", "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
+    "operator-linebreak": [
+      "error",
+      "after",
+      {
+        "overrides": {
+          "?": "before",
+          ":": "before"
+        }
+      }
+    ],
+    "quotes": [
+      "error",
+      "single",
+      { "avoidEscape": true, "allowTemplateLiterals": true }
+    ],
     "react/jsx-filename-extension": [
       "warn",
       {

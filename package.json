@@ -141,6 +141,7 @@
     "eslint-plugin-no-console-log": "^2.0.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-plugin-tailwindcss": "^3.18.2",
     "husky": "^9.1.7",
     "msw": "^2.10.4",
     "orval": "^7.11.2",
