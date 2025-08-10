@@ -13,7 +13,7 @@ export const useRegisterSuccessDialog = () => {
       title: '帳號註冊成功！',
       content: (
         <>
-          <p className="mt-2 mb-6 text-center text-basic-400 body-sm">
+          <p className="body-sm mb-6 mt-2 text-center text-basic-400">
             記得到信箱確認收到帳號驗證信件，並點選驗證Email按鈕，如果沒有看到信件，可以到垃圾桶確認。
           </p>
           <Image
@@ -22,7 +22,7 @@ export const useRegisterSuccessDialog = () => {
             width={272}
             height={211}
           />
-          <p className="my-6 text-center text-basic-400 body-sm">
+          <p className="body-sm my-6 text-center text-basic-400">
             我們會公開你的
             <strong className="font-bold">個人檔案</strong>
             ，填寫完整的資料，才能讓其他夥伴們更了解你喔！
@@ -54,7 +54,7 @@ export const useVerifiedSuccessDialog = () => {
             width={272}
             height={262}
           />
-          <p className="mb-6 text-center text-basic-400 body-sm">
+          <p className="body-sm mb-6 text-center text-basic-400">
             {isComplete ? (
               <span>帳號已驗證成功，快來體驗平台的特色功能！</span>
             ) : (
@@ -90,7 +90,7 @@ export const useCompleteInfoReminder = () => {
       title: '島主廣播',
       content: (
         <>
-          <p className="mb-6 text-center text-basic-400 body-sm">
+          <p className="body-sm mb-6 text-center text-basic-400">
             Hello
             為了讓其他島民能更認識你，要先請你至個人資料頁面完成填寫哦！(,,・ω・,,)
           </p>

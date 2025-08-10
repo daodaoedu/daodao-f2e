@@ -30,7 +30,7 @@ export default function ResourceBasicInfoFields() {
       <Title as="h2" size="lg" className="mb-2 text-center">
         主要資訊
       </Title>
-      <Text size="lg" className="mb-10 text-basic-500 text-center">
+      <Text size="lg" className="mb-10 text-center text-basic-500">
         填寫相關資訊幫助其他人了解這個資源
       </Text>
 

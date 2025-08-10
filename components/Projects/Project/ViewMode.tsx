@@ -20,12 +20,12 @@ interface ViewModeProps {
 const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
   const handleOnClickEdit = onClick;
   return (
-    <div className="flex flex-col gap-6 md:gap-4 md:relative max-w-full">
+    <div className="flex max-w-full flex-col gap-6 md:relative md:gap-4">
 
       {
         isLgScreen &&
         (
-          <div className="absolute right-0 -top-[60px]">
+          <div className="absolute -top-[60px] right-0">
             <Button
               variant="outline"
               className="py-[5px]"
@@ -77,7 +77,7 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
       </Panel>
 
       <Panel className="bg-white">
-        <h3 className="body-md font-medium mb-5">學習成果及呈現方式 *</h3>
+        <h3 className="body-md mb-5 font-medium">學習成果及呈現方式 *</h3>
         {
           Array.isArray(project?.outcome) && project?.outcome?.length > 0 && (
             <Tags category="outcome_tags" tags={project?.outcome} />
@@ -95,7 +95,7 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
         !isLgScreen && (
           <Button
             variant="outline"
-            className="w-full max-w-[272px] py-[5px] justify-center mx-auto"
+            className="mx-auto w-full max-w-[272px] justify-center py-[5px]"
             onClick={handleOnClickEdit}
           >
             <Pencil />

@@ -21,17 +21,17 @@ function EmptyData({
   parentDataCount,
 }: EmptyDataProps) {
   return (
-    <div className="flex flex-col items-center bg-primary-palest p-10 rounded-xl">
+    <div className="flex flex-col items-center rounded-xl bg-primary-palest p-10">
       {parentCategoryHasData ? (
         <>
           <p>這邊沒有符合篩選條件的學習資源！</p>
           <p>
             但我們在
-            <b className="font-bold px-0.5">
+            <b className="px-0.5 font-bold">
               {parentCategory?.[parentCategory.length - 1]?.label}
             </b>
             內發現了
-            <b className="font-bold px-0.5">{parentDataCount}</b>
+            <b className="px-0.5 font-bold">{parentDataCount}</b>
             筆
             有趣的學習資源~
           </p>
@@ -40,7 +40,7 @@ function EmptyData({
         <p>這邊沒有符合的學習資源！ 試試看其他關鍵字!</p>
       )}
       <Image
-        className="mt-4 mb-6"
+        className="mb-6 mt-4"
         src={EmptyPng}
         alt="empty"
         width={210}

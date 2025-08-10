@@ -16,7 +16,7 @@ export default function ReflectionCard(props: ReflectionCardProps) {
   const {
     className,
     userName = '小許',
-    userAvatar = <DefaultAvatarIcon className="scale-150 origin-top-left" />,
+    userAvatar = <DefaultAvatarIcon className="origin-top-left scale-150" />,
     stars = 4,
     content = '學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得學習心得',
     buttonContent = ' 自然語言處理 Naturalewqeqwe',
@@ -30,13 +30,13 @@ export default function ReflectionCard(props: ReflectionCardProps) {
       )}
     >
       <div className="flex gap-2">
-        <div className="w-12 h-12">{userAvatar}</div>
+        <div className="size-12">{userAvatar}</div>
 
         <div className="flex flex-col gap-1">
-          <div className="text-[1.125rem] leading-[1.6875rem] font-bold">
+          <div className="text-[1.125rem] font-bold leading-[1.6875rem]">
             {userName}
           </div>
-          <div className="h-4 flex gap-1">
+          <div className="flex h-4 gap-1">
             {[1, 2, 3, 4, 5].map((unused, idx) => (
               <StarIcon
                 key={unused}
@@ -46,12 +46,12 @@ export default function ReflectionCard(props: ReflectionCardProps) {
           </div>
         </div>
       </div>
-      <div className="w-full line-clamp-3 text-[1.25rem] leading-[1.875rem] md:text-[1.125rem] md:leading-[1.6875rem]">
+      <div className="line-clamp-3 w-full text-[1.25rem] leading-[1.875rem] md:text-[1.125rem] md:leading-[1.6875rem]">
         {content}
       </div>
       <button
         type="button"
-        className="flex items-center justify-center gap-[0.3125rem] h-10 text-[1.125rem] leading-[1.6875rem] border border-primary-base rounded-full"
+        className="flex h-10 items-center justify-center gap-[0.3125rem] rounded-full border border-primary-base text-[1.125rem] leading-[1.6875rem]"
       >
         <ShareIcon />
         <span className="max-w-[11.375rem] truncate">{buttonContent}</span>

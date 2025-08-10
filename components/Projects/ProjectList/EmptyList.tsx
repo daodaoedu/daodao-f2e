@@ -1,7 +1,7 @@
 import EmptyImg from '@/public/assets/images/empty.png';
 
 const EmptyList = () => (
-  <div className="bg-white flex flex-col items-center justify-center p-4 md:p-8">
+  <div className="flex flex-col items-center justify-center bg-white p-4 md:p-8">
     <img
       src={EmptyImg.src}
       alt="no projects available"

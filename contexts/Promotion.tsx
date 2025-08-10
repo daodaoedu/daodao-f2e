@@ -119,7 +119,7 @@ export function PromotionBar() {
 
   return (
     isShowPromotionBar && (
-      <div className="relative text-basic-white bg-tips text-center">
+      <div className="relative bg-tips text-center text-basic-white">
         <Link
           href={link}
           className={cn(
@@ -131,7 +131,7 @@ export function PromotionBar() {
         </Link>
         <button
           type="button"
-          className="absolute top-1/2 right-3.5 size-11 -translate-y-1/2 text-basic-white"
+          className="absolute right-3.5 top-1/2 size-11 -translate-y-1/2 text-basic-white"
           onClick={() => setIsShowPromotionBar(false)}
           aria-label="close"
         >

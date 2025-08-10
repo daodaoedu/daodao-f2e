@@ -30,7 +30,7 @@ function NoteDetail({
       onEditClick={onEditClick}
       onDeleteClick={onDeleteClick}
       renderContent={(noteData) => (
-        <div className="mb-4 body-sm text-basic-500">
+        <div className="body-sm mb-4 text-basic-500">
           <MarkdownEditor className="mb-3" readOnly value={noteData.content} />
           {Array.isArray(noteData.imgUrls) &&
             noteData.imgUrls.map((imgUrl) => (

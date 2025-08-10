@@ -24,7 +24,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/50 hover:bg-primary/90',
+          'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/50',
         alert: 'bg-alert text-alert-foreground shadow-sm hover:bg-alert/90',
         outline:
           'border border-solid border-primary bg-background shadow-sm hover:bg-primary hover:text-primary-foreground [&_svg]:text-primary-base [&_svg]:hover:text-primary-foreground',
@@ -32,15 +32,15 @@ const buttonVariants = cva(
           'bg-secondary text-secondary-foreground shadow-lg hover:bg-primary-lightest',
         ghost: 'hover:text-primary',
         link: 'text-primary underline-offset-4 hover:underline',
-        gray: 'bg-basic-200 border-basic-200 text-basic-300 shadow-lg hover:bg-primary-base hover:border-primary-base hover:text-white',
+        gray: 'border-basic-200 bg-basic-200 text-basic-300 shadow-lg hover:border-primary-base hover:bg-primary-base hover:text-white',
         light:
           'border border-basic-200 bg-background shadow-sm hover:border-primary-base hover:text-primary-base',
       },
       size: {
         default: 'h-9 px-5 py-2',
-        sm: 'h-8 px-3 body-sm',
+        sm: 'body-sm h-8 px-3',
         lg: 'h-10 px-5',
-        icon: 'h-9 w-9',
+        icon: 'size-9',
       },
     },
     defaultVariants: {
@@ -111,7 +111,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         <Slottable>{children}</Slottable>
         <div
           ref={rippleRef}
-          className="absolute inset-0 overflow-hidden pointer-events-none rounded-[inherit]"
+          className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]"
         />
       </Comp>
     );

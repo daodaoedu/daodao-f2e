@@ -26,7 +26,7 @@ function Header(
       )}
     >
       {children}
-      <header className="relative flex items-center justify-between w-full px-4 body-md bg-primary-base">
+      <header className="body-md relative flex w-full items-center justify-between bg-primary-base px-4">
         <div className="flex-1">
           <Link href="/" className="block py-6">
             <Image
@@ -38,7 +38,7 @@ function Header(
             />
           </Link>
         </div>
-        <div className="hidden lg:flex items-center justify-between flex-[3] xl:flex-[2]">
+        <div className="hidden flex-[3] items-center justify-between lg:flex xl:flex-[2]">
           <DesktopMenu />
         </div>
         <div className="lg:hidden">

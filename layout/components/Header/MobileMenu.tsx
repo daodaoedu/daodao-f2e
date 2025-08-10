@@ -34,7 +34,7 @@ function ExploreMenu({ onClose }: OnCloseProps) {
       </nav>
       <Collapse as="nav">
         <Collapse.Toggle
-          className="py-2 px-4 flex items-center rounded-lg text-primary-base w-full"
+          className="flex w-full items-center rounded-lg px-4 py-2 text-primary-base"
           withIcon
         >
           島島盃-春季學習馬拉松
@@ -136,7 +136,7 @@ function MobileMenu() {
       <button
         type="button"
         aria-label="menu"
-        className="text-transparent flex flex-col items-center justify-center gap-1.5 size-14 overflow-hidden"
+        className="flex size-14 flex-col items-center justify-center gap-1.5 overflow-hidden text-transparent"
         onClick={() => setIsOpenMenu(!isOpenMenu)}
       >
         <div
@@ -200,7 +200,7 @@ function MobileMenu() {
             ))}
           </div>
         )}
-        <div className="flex-1 flex flex-col pb-20">
+        <div className="flex flex-1 flex-col pb-20">
           {navType === NavType.Explore && (
             <ExploreMenu onClose={() => setIsOpenMenu(false)} />
           )}
@@ -228,7 +228,7 @@ function MobileMenu() {
               <Button
                 variant="outline"
                 color="primary"
-                className="flex-1 m-4"
+                className="m-4 flex-1"
                 onClick={() => {
                   authDispatch.openLoginModal();
                   setIsOpenMenu(false);

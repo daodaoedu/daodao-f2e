@@ -269,7 +269,7 @@ const InternalMarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>
         />
         <CheckLink ref={checkLinkRef} />
         {maxLength && maxLength > 0 && !readOnly && (
-          <div className="mx-8 mb-2 text-right body-sm text-basic-300">
+          <div className="body-sm mx-8 mb-2 text-right text-basic-300">
             {length}
             {' '}
             /

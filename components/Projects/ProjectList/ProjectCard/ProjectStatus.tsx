@@ -37,7 +37,7 @@ const ProjectStatus = ({ status }: ProjectCardStatus) => {
         statusList.map((stat) => (
           <div
             key={stat.name}
-            className="flex flex-row justify-start items-center gap-[2px]"
+            className="flex flex-row items-center justify-start gap-[2px]"
           >
             <span className="text-basic-500">{stat.icon}</span>
             <span className="font-sans text-sm leading-normal text-basic-500">

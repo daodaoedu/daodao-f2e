@@ -131,28 +131,28 @@ const CheckInView: React.FC<CheckInViewProps> = ({
     const todayCheckIn = CheckInService.getTodayCheckIn(practice);
 
     return (
-      <div className="max-w-md mx-auto p-4">
+      <div className="mx-auto max-w-md p-4">
         <Button
           variant="ghost"
           onClick={onBack}
-          className="flex items-center text-basic-600 mb-4 hover:text-basic-800 transition-colors"
+          className="text-basic-600 hover:text-basic-800 mb-4 flex items-center transition-colors"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="mr-2 size-4" />
           <span>返回儀表板</span>
         </Button>
 
-        <div className="bg-white rounded-lg shadow-md border border-basic-200 overflow-hidden">
+        <div className="overflow-hidden rounded-lg border border-basic-200 bg-white shadow-md">
           <div className="p-6 text-center">
-            <CheckCircle className="h-16 w-16 text-success mx-auto mb-4" />
-            <h3 className="heading-md text-basic-black mb-2">今日已打卡</h3>
-            <p className="body-md text-basic-600 mb-4">
+            <CheckCircle className="mx-auto mb-4 size-16 text-success" />
+            <h3 className="heading-md mb-2 text-basic-black">今日已打卡</h3>
+            <p className="text-basic-600 body-md mb-4">
               你今天已經完成打卡了！明天再來繼續學習吧。
             </p>
 
             {todayCheckIn && (
               <div className="bg-basic-50 rounded-lg p-4 text-left">
-                <h4 className="body-sm font-medium text-basic-700 mb-2">今日打卡記錄</h4>
-                <div className="space-y-2 body-sm text-basic-600">
+                <h4 className="text-basic-700 body-sm mb-2 font-medium">今日打卡記錄</h4>
+                <div className="text-basic-600 body-sm space-y-2">
                   <div>
                     進度：+
                     {todayCheckIn.progress}
@@ -197,19 +197,19 @@ const CheckInView: React.FC<CheckInViewProps> = ({
   }
 
   return (
-    <div className="max-w-md mx-auto p-4">
+    <div className="mx-auto max-w-md p-4">
       <Button
         variant="ghost"
         onClick={onBack}
-        className="flex items-center text-basic-600 mb-4 hover:text-basic-800 transition-colors"
+        className="text-basic-600 hover:text-basic-800 mb-4 flex items-center transition-colors"
       >
-        <ArrowLeft className="h-4 w-4 mr-2" />
+        <ArrowLeft className="mr-2 size-4" />
         <span>返回儀表板</span>
       </Button>
 
-      <div className="bg-white rounded-lg shadow-md border border-basic-200 overflow-hidden">
+      <div className="overflow-hidden rounded-lg border border-basic-200 bg-white shadow-md">
         {/* 標題 */}
-        <div className="p-6 border-b border-basic-200">
+        <div className="border-b border-basic-200 p-6">
           <h3 className="heading-lg text-basic-black">
             {practice.title}
             打卡
@@ -218,8 +218,8 @@ const CheckInView: React.FC<CheckInViewProps> = ({
 
         {/* 錯誤訊息 */}
         {errors.length > 0 && (
-          <div className="p-4 bg-alert-lighter border-l-4 border-alert">
-            <ul className="body-sm text-alert-darker">
+          <div className="bg-alert-lighter border-l-4 border-alert p-4">
+            <ul className="text-alert-darker body-sm">
               {errors.map((error) => (
                 <li key={error}>
                   •
@@ -230,17 +230,17 @@ const CheckInView: React.FC<CheckInViewProps> = ({
           </div>
         )}
 
-        <div className="p-6 space-y-6">
+        <div className="space-y-6 p-6">
 
           {/* 進度輸入 */}
           <div>
-            <Label htmlFor="progress-input" className="block body-sm font-medium text-basic-700 mb-2 w-full">
+            <Label htmlFor="progress-input" className="text-basic-700 body-sm mb-2 block w-full font-medium">
               今日實踐進度
               {' '}
               <span className="text-alert">*</span>
             </Label>
-            <div className="flex items-center space-x-3 mt-2">
-              <div className="flex-1 relative">
+            <div className="mt-2 flex items-center space-x-3">
+              <div className="relative flex-1">
                 <Input
                   id="progress-input"
                   type="number"
@@ -250,28 +250,28 @@ const CheckInView: React.FC<CheckInViewProps> = ({
                   max={practice.totalAmount - practice.currentProgress}
                   className="w-full"
                 />
-                <span className="absolute right-3 top-2 body-sm text-basic-500">
+                <span className="body-sm absolute right-3 top-2 text-basic-500">
                   {practice.unit}
                 </span>
               </div>
             </div>
             {/* 新進度預覽 */}
-            <div className="mt-3 bg-success-lightest rounded-lg p-3">
-              <div className="flex justify-between items-center mb-2">
-                <span className="body-sm font-medium text-success-darker">
+            <div className="bg-success-lightest mt-3 rounded-lg p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-success-darker body-sm font-medium">
                   {newProgressPercentage}
                   % 完成
                 </span>
               </div>
-              <div className="w-full bg-basic-200 rounded-full h-2">
+              <div className="h-2 w-full rounded-full bg-basic-200">
                 <div className={`h-2 rounded-full bg-success transition-all duration-300 ${
                   newProgressPercentage >= 100 ? 'w-full'
                     : newProgressPercentage >= 90 ? 'w-[90%]'
-                      : newProgressPercentage >= 80 ? 'w-[80%]'
+                      : newProgressPercentage >= 80 ? 'w-4/5'
                         : newProgressPercentage >= 70 ? 'w-[70%]'
-                          : newProgressPercentage >= 60 ? 'w-[60%]'
+                          : newProgressPercentage >= 60 ? 'w-3/5'
                             : newProgressPercentage >= 50 ? 'w-1/2'
-                              : newProgressPercentage >= 40 ? 'w-[40%]'
+                              : newProgressPercentage >= 40 ? 'w-2/5'
                                 : newProgressPercentage >= 30 ? 'w-[30%]'
                                   : newProgressPercentage >= 20 ? 'w-1/5'
                                     : newProgressPercentage >= 10 ? 'w-[10%]' : 'w-[5%]'
@@ -283,7 +283,7 @@ const CheckInView: React.FC<CheckInViewProps> = ({
 
           {/* 心情 */}
           <div>
-            <span className="block body-sm font-medium text-basic-700 mb-3">
+            <span className="text-basic-700 body-sm mb-3 block font-medium">
               心情
             </span>
             <div className="grid grid-cols-5 gap-2">
@@ -295,9 +295,9 @@ const CheckInView: React.FC<CheckInViewProps> = ({
                     key={option.value}
                     variant="ghost"
                     onClick={() => setMood(option.value)}
-                    className={`p-2 rounded-lg border-2 transition-all text-center ${isSelected
+                    className={`rounded-lg border-2 p-2 text-center transition-all ${isSelected
                       ? 'border-primary-base bg-primary-palest'
-                      : 'border-basic-200 hover:border-basic-300 hover:bg-basic-50'
+                      : 'hover:bg-basic-50 border-basic-200 hover:border-basic-300'
                     }`}
                   >
                     <div className="flex items-center justify-center gap-1">
@@ -310,7 +310,7 @@ const CheckInView: React.FC<CheckInViewProps> = ({
                                   : option.value === 'difficult' ? 'text-red-500' : 'text-gray-400'
                         }`,
                       })}
-                      <span className="text-xs text-basic-700">{option.label}</span>
+                      <span className="text-basic-700 text-xs">{option.label}</span>
                     </div>
                   </Button>
                 );
@@ -320,11 +320,11 @@ const CheckInView: React.FC<CheckInViewProps> = ({
 
           {/* 打卡標籤 */}
           <div>
-            <Label className="block body-sm font-medium text-basic-700 mb-2">
+            <Label className="text-basic-700 body-sm mb-2 block font-medium">
               打卡標籤 (最多5個)
             </Label>
             {tags.length < 5 && (
-              <div className="flex space-x-2 mb-3">
+              <div className="mb-3 flex space-x-2">
                 <Input
                   type="text"
                   id="new-tag-input"
@@ -341,27 +341,27 @@ const CheckInView: React.FC<CheckInViewProps> = ({
                   size="sm"
                   className="px-3 py-2"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="size-4" />
                 </Button>
               </div>
             )}
 
             {/* 當前標籤 */}
             {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-3">
+              <div className="mb-3 flex flex-wrap gap-2">
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center px-3 py-1 rounded-full bg-primary-base text-white body-sm"
+                    className="body-sm inline-flex items-center rounded-full bg-primary-base px-3 py-1 text-white"
                   >
                     {tag}
                     <Button
                       onClick={() => handleRemoveTag(tag)}
                       variant="ghost"
                       size="sm"
-                      className="ml-2 text-white hover:text-basic-200 p-0 h-auto w-auto"
+                      className="ml-2 size-auto p-0 text-white hover:text-basic-200"
                     >
-                      <X className="h-3 w-3" />
+                      <X className="size-3" />
                     </Button>
                   </span>
                 ))}
@@ -371,7 +371,7 @@ const CheckInView: React.FC<CheckInViewProps> = ({
             {/* 建議標籤 */}
             {tags.length < 5 && (
               <div>
-                <div className="body-sm text-basic-600 mb-2">常用標籤：</div>
+                <div className="text-basic-600 body-sm mb-2">常用標籤：</div>
                 <div className="flex flex-wrap gap-2">
                   {suggestedTags
                     .filter((tag) => !tags.includes(tag))
@@ -381,7 +381,7 @@ const CheckInView: React.FC<CheckInViewProps> = ({
                         key={tag}
                         variant="ghost"
                         onClick={() => handleAddSuggestedTag(tag)}
-                        className="px-3 py-1 rounded-full border border-basic-300 text-basic-600 hover:border-primary-base hover:text-primary-base transition-colors body-sm h-auto"
+                        className="text-basic-600 body-sm h-auto rounded-full border border-basic-300 px-3 py-1 transition-colors hover:border-primary-base hover:text-primary-base"
                       >
                         {tag}
                       </Button>
@@ -393,7 +393,7 @@ const CheckInView: React.FC<CheckInViewProps> = ({
 
           {/* 心情或想法? */}
           <div>
-            <Label htmlFor="note-input" className="block body-sm font-medium text-basic-700 mb-2">
+            <Label htmlFor="note-input" className="text-basic-700 body-sm mb-2 block font-medium">
               心情或想法?
             </Label>
             <Textarea
@@ -405,7 +405,7 @@ const CheckInView: React.FC<CheckInViewProps> = ({
               maxLength={500}
               className="w-full resize-none"
             />
-            <div className="mt-1 text-right body-sm text-basic-500">
+            <div className="body-sm mt-1 text-right text-basic-500">
               {note.length}
               /500
             </div>
@@ -413,20 +413,20 @@ const CheckInView: React.FC<CheckInViewProps> = ({
         </div>
 
         {/* 操作按鈕 */}
-        <div className="p-6 border-t border-basic-200 bg-basic-50">
+        <div className="bg-basic-50 border-t border-basic-200 p-6">
           <Button
             onClick={handleSubmit}
             disabled={submitting || progress <= 0}
-            className="w-full flex items-center justify-center space-x-2"
+            className="flex w-full items-center justify-center space-x-2"
           >
             {submitting ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                <div className="size-4 animate-spin rounded-full border-b-2 border-white" />
                 <span>打卡中...</span>
               </>
             ) : (
               <>
-                <CheckCircle className="h-4 w-4" />
+                <CheckCircle className="size-4" />
                 <span>完成打卡</span>
               </>
             )}

@@ -95,7 +95,7 @@ function OutcomeForm({
         </PostCard>
         <MarkdownEditor
           rootClassName="p-px mb-2 bg-basic-200 rounded-md"
-          className="bg-white rounded-md"
+          className="rounded-md bg-white"
           editorClassName="min-h-80 max-w-full"
           ref={(element) => methods.register('content').ref(element)}
           value={methods.watch('content')}
@@ -105,7 +105,7 @@ function OutcomeForm({
         <div className="px-2">
           {Array.isArray(images) &&
             images.map((image) => (
-              <div key={image.id} className="relative group mb-4">
+              <div key={image.id} className="group relative mb-4">
                 <Image
                   src={image.url}
                   alt="preview"
@@ -113,10 +113,10 @@ function OutcomeForm({
                   height="300px"
                   className="object-contain"
                 />
-                <span className="absolute inset-0 bottom-1.5 group-hover:bg-basic-black/20 transition-colors rounded-lg" />
+                <span className="absolute inset-0 bottom-1.5 rounded-lg transition-colors group-hover:bg-basic-black/20" />
                 <Button
                   variant="alert"
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-2"
+                  className="absolute right-2 top-2 p-2 opacity-0 transition-opacity group-hover:opacity-100"
                   onClick={() => handleDeleteImage(image.id)}
                 >
                   <X />

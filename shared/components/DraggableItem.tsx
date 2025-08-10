@@ -56,7 +56,7 @@ const DraggableItem = ({
           aria-label="拖曳排序"
           title="長按可拖曳排序"
         >
-          <GripVertical className="text-basic-300 h-5 w-5" />
+          <GripVertical className="size-5 text-basic-300" />
         </button>
         {children}
       </div>

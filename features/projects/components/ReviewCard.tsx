@@ -37,13 +37,13 @@ function ReviewCard({
       CloudRain,
     };
     const IconComponent = icons[iconName as keyof typeof icons];
-    return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
+    return IconComponent ? <IconComponent className="size-4" /> : null;
   };
 
   const renderContent = () => (
     <div className="mb-3.5 flex items-center gap-3">
       <p className="body-lg text-basic-500">這段時間的整體心情....</p>
-      <div className="p-2 bg-basic-100 rounded flex items-center gap-2">
+      <div className="flex items-center gap-2 rounded bg-basic-100 p-2">
         {moodOption?.icon && getMoodIcon(moodOption.icon)}
         {moodOption?.label}
       </div>

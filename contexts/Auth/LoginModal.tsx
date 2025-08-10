@@ -67,7 +67,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           onClick={handleOpenLoginWindow}
         >
           {isOpenWindow ? (
-            <span className="flex gap-2 items-center justify-center">
+            <span className="flex items-center justify-center gap-2">
               <span
                 className={cn(
                   'w-4 h-4 rounded-full inline-block animate-spin',
@@ -80,12 +80,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             <span>Google 登入 / 註冊</span>
           )}
         </Button>
-        <div className="text-center text-sm text-basic-400 text-balance mt-4">
+        <div className="mt-4 text-balance text-center text-sm text-basic-400">
           註冊即代表您同意島島阿學的
           <Link
             href="/terms/privacypolicy"
             target="_blank"
-            className="px-1 underline text-primary-base"
+            className="px-1 text-primary-base underline"
           >
             服務條款
           </Link>
@@ -93,7 +93,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           <Link
             href="/terms/privacypolicy"
             target="_blank"
-            className="px-1 underline text-primary-base"
+            className="px-1 text-primary-base underline"
           >
             隱私權政策
           </Link>

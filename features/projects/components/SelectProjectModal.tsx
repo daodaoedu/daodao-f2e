@@ -70,7 +70,7 @@ export default function SelectProjectModal({
               <Button
                 key={project.id}
                 variant="outline"
-                className="w-full rounded-md text-left body-lg flex justify-between items-end"
+                className="body-lg flex w-full items-end justify-between rounded-md text-left"
                 onClick={() => handleSelect(project)}
               >
                 <div>

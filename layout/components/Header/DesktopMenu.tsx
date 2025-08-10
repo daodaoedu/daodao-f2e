@@ -41,7 +41,7 @@ function DesktopMenu() {
             {MARATHON_LINKS.map(({ name, link }) => (
               <Dropdown.Item
                 key={name}
-                className="rounded-lg text-nowrap hover:bg-primary-lightest"
+                className="text-nowrap rounded-lg hover:bg-primary-lightest"
               >
                 <Link href={link} className="block p-2 text-basic-400">
                   {name}
@@ -54,7 +54,7 @@ function DesktopMenu() {
           <div className="flex items-center gap-3.5">
             <Link
               href="/manage"
-              className="px-2 py-5 text-basic-white body-md font-bold"
+              className="body-md px-2 py-5 font-bold text-basic-white"
             >
               我的小島
             </Link>
@@ -72,7 +72,7 @@ function DesktopMenu() {
                 {USER_LINK.map(({ name, id }) => (
                   <Dropdown.Item
                     key={name}
-                    className="rounded-lg text-nowrap hover:bg-primary-lightest"
+                    className="text-nowrap rounded-lg hover:bg-primary-lightest"
                   >
                     <Link
                       href={`/profile?id=${id}`}
@@ -82,7 +82,7 @@ function DesktopMenu() {
                     </Link>
                   </Dropdown.Item>
                 ))}
-                <Dropdown.Item className="rounded-lg text-nowrap hover:bg-primary-lightest">
+                <Dropdown.Item className="text-nowrap rounded-lg hover:bg-primary-lightest">
                   <button
                     type="button"
                     className="block p-2 text-basic-400"
@@ -97,7 +97,7 @@ function DesktopMenu() {
         ) : (
           <button
             type="button"
-            className="text-basic-white my-4 px-4 py-1.5 rounded-full border border-basic-white"
+            className="my-4 rounded-full border border-basic-white px-4 py-1.5 text-basic-white"
             onClick={() => authDispatch.openLoginModal()}
           >
             登入

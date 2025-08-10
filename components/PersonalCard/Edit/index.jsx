@@ -458,7 +458,7 @@ function EditPage() {
                   ref={(element) => setRef('selfIntroduction', element)}
                   value={userState.selfIntroduction}
                   rootClassName="w-full p-px bg-basic-200 rounded-md focus-within:bg-primary-base"
-                  className="bg-white rounded-md"
+                  className="rounded-md bg-white"
                   placeholder="寫下關於你的資訊，讓其他島民更認識你！也可以多描述想和夥伴一起做的事喔！"
                   onChange={(markdown) => {
                     onChangeHandler({

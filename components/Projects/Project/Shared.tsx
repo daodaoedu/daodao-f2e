@@ -38,7 +38,7 @@ export const Panel = ({ children, className = '' }: PanelProps) => (
 export const Title = ({ title }: {
   title: string
 }) => (
-  <h3 className="text-basic-500 body-md font-medium mb-2 font-sans">
+  <h3 className="body-md mb-2 font-sans font-medium text-basic-500">
     {title}
   </h3>
 );
@@ -72,13 +72,13 @@ export const Tags = ({ category, tags }: {
       break;
   }
   return (
-    <div className="flex flex-row gap-2 mb-2 flex-wrap">
+    <div className="mb-2 flex flex-row flex-wrap gap-2">
       {
         category && (
           tags.map((tag: string) => {
             const label = tagsMap.filter((item) => item.value === tag)[0]?.label;
             return (
-              <span key={tag} className="text-sm text-[#2D3648] px-2 bg-primary-lightest rounded-[4px] py-[2px] font-sans">
+              <span key={tag} className="rounded-[4px] bg-primary-lightest px-2 py-[2px] font-sans text-sm text-[#2D3648]">
                 {label || tag}
               </span>
             );
@@ -93,9 +93,9 @@ export const FakeInput = ({ value }: {
   value: string
 }) => (
   <div
-    className="py-3 px-4 hover:cursor-default
-      border border-solid border-basic-200
-      rounded-lg font-sans"
+    className="rounded-lg border border-solid
+      border-basic-200 px-4 py-3
+      font-sans hover:cursor-default"
   >
     {value}
   </div>
@@ -106,7 +106,7 @@ export const FakeCheckBox = ({ isChecked, text }: {
   text: string
 }) => (
   <div className="flex flex-row">
-    <div className="flex flex-row justify-center items-center gap-[5px] hover:cursor-pointer">
+    <div className="flex flex-row items-center justify-center gap-[5px] hover:cursor-pointer">
       <p className={cn(
         'w-[18px] h-[18px] p-[2px] rounded-[4px] m-[1px]',
         'flex items-center justify-center border-2 border-solid',
@@ -130,7 +130,7 @@ export const EditFormButton = ({ onClick }: { onClick: () => void }) => {
     <Button
       onClick={handleOnClick}
       variant="outline"
-      className="flex-shrink-0 flex items-center py-1 gap-[5px]"
+      className="flex shrink-0 items-center gap-[5px] py-1"
     >
       <EditOutlinedIcon className="max-w-5" />
       編輯

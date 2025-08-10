@@ -40,9 +40,9 @@ export default function SharerCard(props: SharerCardProps) {
           {userName}
         </div>
         {(order === 1 || order === 2) && (
-          <div className="absolute w-9 h-9 bg-white top-3 left-3 flex items-center justify-center rounded-full">
+          <div className="absolute left-3 top-3 flex size-9 items-center justify-center rounded-full bg-white">
             <CrownIcon
-              className="w-6 h-6"
+              className="size-6"
               color={order === 1 ? '#FF9526' : '#8F8F8F'}
             />
           </div>
@@ -50,18 +50,18 @@ export default function SharerCard(props: SharerCardProps) {
       </div>
 
       <div
-        className="p-[0.75rem_1.25rem] text-basic-500 text-lg flex flex-col justify-between rounded-b-xl md:p-[1rem_1.5rem] md:h-[5.5rem]"
+        className="flex flex-col justify-between rounded-b-xl p-[0.75rem_1.25rem] text-lg text-basic-500 md:h-[5.5rem] md:p-[1rem_1.5rem]"
         style={{ border: '1px solid #F3F3F3' }}
       >
         <div className="flex items-center md:h-6">
-          <ShareResourceIcon className="w-5 h-5" />
+          <ShareResourceIcon className="size-5" />
           <span
-            className="pr-2 mx-1"
+            className="mx-1 pr-2"
             style={{ borderRight: '1px solid #DBDBDB' }}
           >
             分享資源
           </span>
-          <span className="text-primary-base font-bold">
+          <span className="font-bold text-primary-base">
             {sourceCount}
             {' '}
             筆
@@ -69,14 +69,14 @@ export default function SharerCard(props: SharerCardProps) {
         </div>
 
         <div className="flex items-center md:h-6">
-          <CommentIcon className="w-5 h-5" />
+          <CommentIcon className="size-5" />
           <span
-            className="pr-2 mx-1"
+            className="mx-1 pr-2"
             style={{ borderRight: '1px solid #DBDBDB' }}
           >
             分享心得
           </span>
-          <span className="text-primary-base font-bold">
+          <span className="font-bold text-primary-base">
             {reflectionCount}
             {' '}
             筆

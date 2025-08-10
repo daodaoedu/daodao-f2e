@@ -59,9 +59,9 @@ function ReviewForm({
             isEditable
           />
           <div className="relative">
-            <ul className="ml-8 list-decimal marker:heading-sm body-md font-normal">
+            <ul className="body-md ml-8 list-decimal font-normal marker:heading-sm">
               <li className="mb-8">
-                <h3 className="mb-4 heading-sm">這段時間的整體心情：</h3>
+                <h3 className="heading-sm mb-4">這段時間的整體心情：</h3>
                 <div className="-ml-6">
                   <div className="mb-4">
                     <RadioGroup
@@ -83,7 +83,7 @@ function ReviewForm({
                 </div>
               </li>
               <li className="mb-8">
-                <h3 className="mb-4 heading-sm">壓力程度：</h3>
+                <h3 className="heading-sm mb-4">壓力程度：</h3>
                 <div className="-ml-6">
                   <RadioGroup
                     type="tenPoint"
@@ -93,7 +93,7 @@ function ReviewForm({
                 </div>
               </li>
               <li className="mb-8">
-                <h3 className="mb-4 heading-sm">學習回顧：</h3>
+                <h3 className="heading-sm mb-4">學習回顧：</h3>
                 <div className="-ml-6">
                   <p className="mb-4">學習動力</p>
                   <div className="mb-4">
@@ -106,7 +106,7 @@ function ReviewForm({
                   <p className="mb-4">這段時間，我的收穫與困難...</p>
                   <MarkdownEditor
                     rootClassName="p-px mb-2 bg-basic-200 rounded-md"
-                    className="bg-white rounded-md"
+                    className="rounded-md bg-white"
                     editorClassName="min-h-24"
                     ref={(element) => methods.register('learningFeedback').ref(element)}
                     value={methods.watch('learningFeedback')}
@@ -116,12 +116,12 @@ function ReviewForm({
                 </div>
               </li>
               <li>
-                <h3 className="mb-4 heading-sm">調整與規劃：</h3>
+                <h3 className="heading-sm mb-4">調整與規劃：</h3>
                 <div className="-ml-6">
                   <p className="mb-4">為了更好的學習狀態，我會...</p>
                   <MarkdownEditor
                     rootClassName="p-px mb-2 bg-basic-200 rounded-md"
-                    className="bg-white rounded-md"
+                    className="rounded-md bg-white"
                     editorClassName="min-h-24"
                     ref={(element) => methods.register('adjustmentPlan').ref(element)}
                     value={methods.watch('adjustmentPlan')}
@@ -132,7 +132,7 @@ function ReviewForm({
               </li>
             </ul>
           </div>
-          <div className="pt-5 flex justify-end gap-5">
+          <div className="flex justify-end gap-5 pt-5">
             <Button variant="default" type="submit" disabled={isLoading}>
               發布覆盤
             </Button>

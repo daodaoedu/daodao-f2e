@@ -91,14 +91,14 @@ interface ProgressBarProps {
 }
 
 export const ProgressBar = ({ progress }: ProgressBarProps) => (
-  <div className="flex items-center w-full">
-    <div className="relative w-full h-2 rounded-[100px] overflow-hidden">
+  <div className="flex w-full items-center">
+    <div className="relative h-2 w-full overflow-hidden rounded-[100px]">
       <div
         className="h-full bg-primary-base transition-all duration-300"
         style={{ width: `${progress}%` }}
       />
     </div>
-    <span className="font-sans text-sm ml-3 text-basic-300">
+    <span className="ml-3 font-sans text-sm text-basic-300">
       {progress}
       %
     </span>

@@ -111,7 +111,7 @@ const FormLabel = React.forwardRef<
       {...props}
     >
       {children}
-      {required && <span className="text-alert ml-1">*</span>}
+      {required && <span className="ml-1 text-alert">*</span>}
     </Label>
   );
 });

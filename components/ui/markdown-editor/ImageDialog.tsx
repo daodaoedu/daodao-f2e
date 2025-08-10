@@ -110,7 +110,7 @@ export const ImageDialog = () => {
             onChange={handleChange('src')}
             required
           />
-          {error && <p className="text-destructive text-sm">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
 
         <div className="grid gap-2">

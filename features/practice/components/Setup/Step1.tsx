@@ -40,19 +40,19 @@ const Step1: React.FC<Step1Props> = ({
   removeTag,
   addCustomTag,
 }) => (
-  <div className="bg-white rounded-lg border border-border shadow-sm overflow-hidden">
+  <div className="overflow-hidden rounded-lg border border-border bg-white shadow-sm">
     <div className="p-6">
-      <div className="flex items-center mb-2">
-        <div className="w-2 h-2 rounded-full mr-2 bg-primary" />
+      <div className="mb-2 flex items-center">
+        <div className="mr-2 size-2 rounded-full bg-primary" />
         <span className="body-sm text-muted-foreground">主題實踐</span>
       </div>
       <h3 className="heading-lg text-foreground">你想嘗試什麼？</h3>
-      <p className="body-sm text-muted-foreground mt-1">
+      <p className="body-sm mt-1 text-muted-foreground">
         給你的主題實踐一個清晰的名稱
       </p>
     </div>
 
-    <div className="px-6 pb-6 space-y-6">
+    <div className="space-y-6 px-6 pb-6">
       {/* 標題輸入 */}
       <div className="space-y-2">
         <Label htmlFor="pathTitle">
@@ -86,7 +86,7 @@ const Step1: React.FC<Step1Props> = ({
           {' '}
           <span className="text-destructive">*</span>
         </Label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {contentTypeOptions.map((option) => {
             const Icon = option.icon;
             const isSelected = pathInfo.contentType === option.id;
@@ -114,7 +114,7 @@ const Step1: React.FC<Step1Props> = ({
                       : 'bg-muted text-muted-foreground'
                   )}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="size-4" />
                 </div>
                 <div>
                   <p className={cn(
@@ -147,9 +147,9 @@ const Step1: React.FC<Step1Props> = ({
             maxLength={20}
           />
           {validationErrors.customContentType && (
-          <p className="text-sm text-destructive mt-1">{validationErrors.customContentType}</p>
+          <p className="mt-1 text-sm text-destructive">{validationErrors.customContentType}</p>
           )}
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="mt-1 text-xs text-muted-foreground">
             {(pathInfo.customContentType || '').length}
             /20
           </p>
@@ -179,7 +179,7 @@ const Step1: React.FC<Step1Props> = ({
         {/* 標籤下拉選單 */}
         <div className="space-y-3">
           <div>
-            <p className="text-sm font-medium text-foreground mb-2">選擇標籤</p>
+            <p className="mb-2 text-sm font-medium text-foreground">選擇標籤</p>
             <Select
               disabled={selectedTags.length >= 3}
               onValueChange={(value) => {
@@ -256,7 +256,7 @@ const Step1: React.FC<Step1Props> = ({
                 disabled={!customTag.trim() || selectedTags.length >= 3 || selectedTags.includes(customTag.trim())}
                 size="default"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="size-4" />
               </Button>
             </div>
           </div>
@@ -271,17 +271,17 @@ const Step1: React.FC<Step1Props> = ({
             {selectedTags.map((tag) => (
               <div
                 key={tag}
-                className="flex items-center px-3 py-2 bg-primary/10 border border-primary/20 rounded-lg"
+                className="flex items-center rounded-lg border border-primary/20 bg-primary/10 px-3 py-2"
               >
-                <span className="text-sm font-medium text-primary mr-2">{tag}</span>
+                <span className="mr-2 text-sm font-medium text-primary">{tag}</span>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => removeTag(tag)}
-                  className="text-primary hover:text-destructive p-0 h-auto w-auto"
+                  className="size-auto p-0 text-primary hover:text-destructive"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="size-3" />
                 </Button>
               </div>
             ))}
@@ -292,7 +292,7 @@ const Step1: React.FC<Step1Props> = ({
 
     </div>
 
-    <div className="px-6 py-4 border-t border-border flex justify-end">
+    <div className="flex justify-end border-t border-border px-6 py-4">
       <Button
         onClick={handleNextStep}
         disabled={

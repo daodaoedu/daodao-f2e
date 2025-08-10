@@ -34,7 +34,7 @@ export default function CategoryCard(props: CategoryCardProps) {
         alt={label}
         borderRadius="0.5rem"
         height="inherit"
-        className="group-hover:scale-110 transition-transform"
+        className="transition-transform group-hover:scale-110"
       />
       <div
         className={cn(

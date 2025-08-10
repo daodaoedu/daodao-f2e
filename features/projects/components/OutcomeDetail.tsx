@@ -30,7 +30,7 @@ function OutcomeDetail({
       onEditClick={onEditClick}
       onDeleteClick={onDeleteClick}
       renderContent={(outcomeData) => (
-        <div className="mb-4 body-sm text-basic-500">
+        <div className="body-sm mb-4 text-basic-500">
           <MarkdownEditor className="mb-3" readOnly value={outcomeData.content} />
           {Array.isArray(outcomeData.imgUrls) &&
             outcomeData.imgUrls.map((imgUrl) => (

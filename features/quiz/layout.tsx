@@ -12,6 +12,6 @@ export const getQuizLayout = (page: React.ReactElement) => (
       `}
     </style>
     {page}
-    <div className="font-[JejuHallasan] invisible fixed -z-10">預載字體</div>
+    <div className="invisible fixed -z-10 font-[JejuHallasan]">預載字體</div>
   </QuizProvider>
 );

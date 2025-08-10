@@ -19,7 +19,7 @@ const Nav = ({ activeTab }: { activeTab: string }) => {
       )}
       style={{ top: `${height}px` }}
     >
-      <ul className="max-w-[750px] mx-auto flex justify-between gap-4">
+      <ul className="mx-auto flex max-w-[750px] justify-between gap-4">
         {navItems.map(({ name, link, active }) => (
           <li key={name} className="shrink-0">
             <Link

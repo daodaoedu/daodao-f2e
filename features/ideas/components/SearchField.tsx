@@ -92,33 +92,33 @@ const SearchField: React.FC<SearchFieldProps> = ({
   }, [createCustomTag]);
 
   return (
-    <div className={`bg-white rounded-lg border border-basic-200 transition-all duration-200 ${className}`}>
+    <div className={`rounded-lg border border-basic-200 bg-white transition-all duration-200 ${className}`}>
       {/* Main Search Bar */}
       <div className="p-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-basic-300" />
+          <Search className="absolute left-3 top-1/2 size-5 -translate-y-1/2 text-basic-300" />
           <Input
             type="text"
             placeholder="搜尋想法、標籤或作者..."
             value={searchValue}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className="pl-12 pr-12 py-3 text-lg border-none shadow-none focus:ring-0 bg-basic-100 hover:bg-white focus:bg-white transition-colors"
+            className="border-none bg-basic-100 px-12 py-3 text-lg shadow-none transition-colors hover:bg-white focus:bg-white focus:ring-0"
           />
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-basic-300 hover:text-primary-base"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-basic-300 hover:text-primary-base"
           >
-            <Filter className="h-4 w-4 mr-1" />
-            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            <Filter className="mr-1 size-4" />
+            {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
           </Button>
         </div>
       </div>
 
       {/* Expanded Filters */}
       {isExpanded && (
-        <div className="border-t border-basic-200 p-4 bg-basic-50">
+        <div className="bg-basic-50 border-t border-basic-200 p-4">
           <div className="space-y-4">
             {/* Selected Tags */}
             {selectedTags.length > 0 && (
@@ -142,17 +142,17 @@ const SearchField: React.FC<SearchFieldProps> = ({
                   {selectedTags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-sm border bg-primary-base/10 text-primary-darker border-primary-base/20"
+                      className="inline-flex items-center rounded-full border border-primary-base/20 bg-primary-base/10 px-3 py-1 text-sm text-primary-darker"
                     >
-                      <Hash className="h-3 w-3 mr-1" />
+                      <Hash className="mr-1 size-3" />
                       {tag}
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => removeTag(tag)}
-                        className="ml-2 h-4 w-4 p-0 hover:text-red-500"
+                        className="ml-2 size-4 p-0 hover:text-red-500"
                       >
-                        <X className="h-3 w-3" />
+                        <X className="size-3" />
                       </Button>
                     </span>
                   ))}
@@ -183,7 +183,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
                     onClick={createCustomTag}
                     disabled={!customTagInput.trim() || selectedTags.length >= 3}
                     size="sm"
-                    className="bg-primary-base hover:bg-primary-darker text-white disabled:bg-basic-300"
+                    className="bg-primary-base text-white hover:bg-primary-darker disabled:bg-basic-300"
                   >
                     新增
                   </Button>
@@ -197,16 +197,16 @@ const SearchField: React.FC<SearchFieldProps> = ({
                 onClick={() => setShowTagSuggestions(!showTagSuggestions)}
                 className="w-full border-basic-200 text-basic-500 hover:border-primary-base hover:text-primary-base"
               >
-                <Hash className="h-4 w-4 mr-2" />
+                <Hash className="mr-2 size-4" />
                 {showTagSuggestions ? '隱藏' : '顯示'}
                 熱門標籤
-                {showTagSuggestions ? <ChevronUp className="h-4 w-4 ml-2" /> : <ChevronDown className="h-4 w-4 ml-2" />}
+                {showTagSuggestions ? <ChevronUp className="ml-2 size-4" /> : <ChevronDown className="ml-2 size-4" />}
               </Button>
 
               {/* Tag Suggestions */}
               {showTagSuggestions && (
-                <div className="bg-white border border-basic-200 rounded-lg p-3 max-h-64 overflow-y-auto">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                <div className="max-h-64 overflow-y-auto rounded-lg border border-basic-200 bg-white p-3">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                     {DEFAULT_TAGS.map((tag) => {
                       const isSelected = selectedTags.includes(tag.name);
                       const isDisabled = isSelected || selectedTags.length >= 3;
@@ -218,18 +218,18 @@ const SearchField: React.FC<SearchFieldProps> = ({
                           size="sm"
                           onClick={() => handleTagClick(tag.name)}
                           disabled={!!isDisabled}
-                          className={`justify-start text-left p-2 h-auto ${
+                          className={`h-auto justify-start p-2 text-left ${
                             isSelected
-                              ? 'bg-primary-base/10 text-primary-darker border border-primary-base/20'
+                              ? 'border border-primary-base/20 bg-primary-base/10 text-primary-darker'
                               : isDisabled
-                                ? 'text-basic-300 cursor-not-allowed'
+                                ? 'cursor-not-allowed text-basic-300'
                                 : 'text-basic-500 hover:bg-basic-100'
                           }`}
                         >
-                          <div className="flex items-center justify-between w-full">
+                          <div className="flex w-full items-center justify-between">
                             <div className="flex items-center">
-                              <Hash className="h-3 w-3 mr-2" />
-                              <span className="text-sm truncate">{tag.name}</span>
+                              <Hash className="mr-2 size-3" />
+                              <span className="truncate text-sm">{tag.name}</span>
                             </div>
                           </div>
                         </Button>
@@ -242,7 +242,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
 
             {/* Search Stats */}
             {searchValue && (
-              <div className="pt-3 border-t border-basic-200">
+              <div className="border-t border-basic-200 pt-3">
                 <p className="text-xs text-basic-400">
                   搜尋關鍵字：
                   <span className="font-medium text-basic-500">

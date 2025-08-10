@@ -11,7 +11,7 @@ const FeatureOverlay = ({
   className,
   children,
 }: FeatureOverlayProps) => (
-  <div className="group relative -m-4 p-4 rounded-lg overflow-hidden">
+  <div className="group relative -m-4 overflow-hidden rounded-lg p-4">
     {children}
     <div
       className={cn(

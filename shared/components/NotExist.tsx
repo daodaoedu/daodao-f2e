@@ -108,7 +108,7 @@ export default function NotExist() {
             page_size: 10,
           }}
         />
-        <div className="mt-10 mb-2.5">
+        <div className="mb-2.5 mt-10">
           <Typography
             variant="body1"
             sx={{

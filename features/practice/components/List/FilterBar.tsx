@@ -97,16 +97,16 @@ const FilterBar: React.FC<FilterBarProps> = ({
 
   return (
     <div className="p-3 sm:p-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-2 sm:space-y-0">
+      <div className="mb-4 flex flex-col justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0">
         <div className="flex items-center space-x-2">
-          <Filter className="h-5 w-5 text-muted-foreground" />
+          <Filter className="size-5 text-muted-foreground" />
           <h3 className="text-lg font-semibold text-foreground">篩選器</h3>
           {hasActiveFilters && (
             <Badge variant="secondary">已套用</Badge>
           )}
         </div>
 
-        <div className="flex flex-col xs:flex-row xs:items-center space-y-2 xs:space-y-0 xs:space-x-4">
+        <div className="xs:flex-row xs:items-center xs:space-y-0 xs:space-x-4 flex flex-col space-y-2">
           <span className="text-sm text-muted-foreground">
             顯示
             {' '}
@@ -124,9 +124,9 @@ const FilterBar: React.FC<FilterBarProps> = ({
               variant="ghost"
               size="sm"
               onClick={onResetFilter}
-              className="text-destructive hover:text-destructive self-start xs:self-auto"
+              className="xs:self-auto self-start text-destructive hover:text-destructive"
             >
-              <X className="h-4 w-4 mr-1" />
+              <X className="mr-1 size-4" />
               清除篩選
             </Button>
           )}
@@ -137,7 +137,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
         {/* 狀態篩選 */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="w-full xs:w-auto">
+            <Button variant="outline" size="sm" className="xs:w-auto w-full">
               狀態
               {filter.status?.length && (
               <Badge variant="default" className="ml-2 h-5 min-w-5 p-0 text-xs">
@@ -162,7 +162,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
         {/* 內容類型篩選 */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="w-full xs:w-auto">
+            <Button variant="outline" size="sm" className="xs:w-auto w-full">
               類型
               {filter.contentType?.length && (
               <Badge variant="default" className="ml-2 h-5 min-w-5 p-0 text-xs">
@@ -187,7 +187,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
         {/* 排序選項 */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="w-full xs:w-auto">
+            <Button variant="outline" size="sm" className="xs:w-auto w-full">
               <span className="hidden sm:inline">排序：</span>
               <span className="sm:hidden">排序</span>
               <span className="hidden lg:inline">{sortOptions.find((opt) => opt.value === filter.sortBy)?.label}</span>
@@ -222,7 +222,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
               onClick={() => removeStatusFilter(status)}
             >
               {getStatusLabel(status)}
-              <X className="h-3 w-3 ml-1" />
+              <X className="ml-1 size-3" />
             </Badge>
           ))}
 
@@ -234,7 +234,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
               onClick={() => removeContentTypeFilter(contentType)}
             >
               {getContentTypeLabel(contentType)}
-              <X className="h-3 w-3 ml-1" />
+              <X className="ml-1 size-3" />
             </Badge>
           ))}
 
@@ -247,7 +247,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
               搜尋: "
               {filter.searchTerm}
               "
-              <X className="h-3 w-3 ml-1" />
+              <X className="ml-1 size-3" />
             </Badge>
           )}
         </div>

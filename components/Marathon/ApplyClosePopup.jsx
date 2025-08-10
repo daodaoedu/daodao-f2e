@@ -27,12 +27,12 @@ const ApplyClosePopup = forwardRef((props, ref) => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center">
-      <div className="w-full max-w-[400px] bg-white p-6 rounded-2xl shadow-lg">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50">
+      <div className="w-full max-w-[400px] rounded-2xl bg-white p-6 shadow-lg">
         <div className="space-y-4 text-center">
           <h1 className="text-2xl font-bold text-gray-800">{popupContent.title}</h1>
-          <p className="text-gray-600 leading-relaxed">{popupContent.description}</p>
-          <p className="text-gray-600 leading-relaxed">
+          <p className="leading-relaxed text-gray-600">{popupContent.description}</p>
+          <p className="leading-relaxed text-gray-600">
             {popupContent.content}
           </p>
         </div>
@@ -45,10 +45,10 @@ const ApplyClosePopup = forwardRef((props, ref) => {
           />
         </div>
 
-        <div className="space-y-3 mt-4">
+        <div className="mt-4 space-y-3">
           <button
             type="button"
-            className="w-full bg-primary-base hover:bg-teal-600 hover:shadow-[0px_4px_10px_0px_rgba(89,182,178,0.50)] text-white p-4 rounded-full text-base font-medium"
+            className="w-full rounded-full bg-primary-base p-4 text-base font-medium text-white hover:bg-teal-600 hover:shadow-[0px_4px_10px_0px_rgba(89,182,178,0.50)]"
             onClick={handleWaitingListClick}
           >
             {popupContent.waitingListButton}
@@ -56,7 +56,7 @@ const ApplyClosePopup = forwardRef((props, ref) => {
 
           <button
             type="button"
-            className="w-full bg-white hover:bg-gray-50 hover:shadow-[0px_4px_10px_0px_rgba(89,182,178,0.50)] text-teal-500 p-4 rounded-full text-base font-medium border border-[#16B9B3] transition-shadow "
+            className="w-full rounded-full border border-[#16B9B3] bg-white p-4 text-base font-medium text-teal-500 transition-shadow hover:bg-gray-50 hover:shadow-[0px_4px_10px_0px_rgba(89,182,178,0.50)] "
             onClick={() => setIsVisible(false)}
           >
             {popupContent.closeButton}

@@ -37,7 +37,7 @@ export default function ResourceCategorizationFields() {
       <div className="space-y-10">
         <div>
           <FormLabel required>類別</FormLabel>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-6 mb-6">
+          <div className="mb-6 ml-6 grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="majorCategory"
@@ -147,8 +147,8 @@ export default function ResourceCategorizationFields() {
             <Input placeholder="輸入自訂標籤後按 Enter 新增" />
           </div>
 
-          <div className="flex items-center flex-wrap gap-3 mt-4">
-            <p className="body-md text-basic-500 shrink-0">建議標籤：</p>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <p className="body-md shrink-0 text-basic-500">建議標籤：</p>
             <div className="flex flex-wrap gap-2">
               {[
                 '環保',

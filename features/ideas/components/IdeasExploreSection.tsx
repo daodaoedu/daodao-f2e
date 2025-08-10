@@ -90,9 +90,9 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
       <Card className={`w-full ${className}`}>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <div className="text-center">
-            <Lightbulb className="w-12 h-12 text-basic-200 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-basic-600 mb-2">載入失敗</h3>
-            <p className="text-basic-400 mb-4">
+            <Lightbulb className="mx-auto mb-4 size-12 text-basic-200" />
+            <h3 className="text-basic-600 mb-2 text-lg font-medium">載入失敗</h3>
+            <p className="mb-4 text-basic-400">
               {error?.message || '無法載入想法內容，請稍後再試'}
             </p>
             <Button
@@ -101,7 +101,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
               onClick={() => refresh()}
               className="flex items-center gap-2"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="size-4" />
               重新載入
             </Button>
           </div>
@@ -116,7 +116,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Lightbulb className="w-5 h-5 text-primary-base" />
+              <Lightbulb className="size-5 text-primary-base" />
               探索想法
               {pagination && (
                 <span className="text-sm font-normal text-basic-400">
@@ -132,7 +132,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
                 onClick={handleCreateClick}
                 className="flex items-center gap-2"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="size-4" />
                 <span className="hidden sm:inline">分享想法</span>
               </Button>
             )}
@@ -142,9 +142,9 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
 
       <CardContent className="space-y-4">
         {/* Search and Filter Bar */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-basic-400 w-4 h-4" />
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-basic-400" />
             <Input
               placeholder="搜尋想法內容、標籤..."
               value={searchQuery}
@@ -158,7 +158,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="flex items-center gap-2">
-                  <SortAsc className="w-4 h-4" />
+                  <SortAsc className="size-4" />
                   <span className="hidden sm:inline">{getCurrentSortLabel()}</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -187,7 +187,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
               className="flex items-center gap-2"
               disabled={isLoading}
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`size-4 ${isLoading ? 'animate-spin' : ''}`} />
             </Button>
           </div>
         </div>
@@ -197,24 +197,24 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
           <div className="space-y-4">
             {Array.from({ length: 5 }, (_, index) => (
               <div key={`idea-skeleton-${Date.now()}-${index}`} className="animate-pulse">
-                <div className="bg-basic-100 rounded-lg h-32" />
+                <div className="h-32 rounded-lg bg-basic-100" />
               </div>
             ))}
           </div>
         ) : isEmpty ? (
-          <div className="text-center py-12">
-            <Lightbulb className="w-16 h-16 text-basic-200 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-basic-600 mb-2">
+          <div className="py-12 text-center">
+            <Lightbulb className="mx-auto mb-4 size-16 text-basic-200" />
+            <h3 className="text-basic-600 mb-2 text-lg font-medium">
               {searchQuery ? '找不到相關想法' : '還沒有想法'}
             </h3>
-            <p className="text-basic-400 mb-6">
+            <p className="mb-6 text-basic-400">
               {searchQuery
                 ? '嘗試調整搜尋關鍵字或清除篩選條件'
                 : '成為第一個分享想法的人！'}
             </p>
             {showCreateButton && (
               <Button onClick={handleCreateClick} className="flex items-center gap-2">
-                <Plus className="w-4 h-4" />
+                <Plus className="size-4" />
                 分享第一個想法
               </Button>
             )}
@@ -225,14 +225,14 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
               <IdeaCard
                 key={idea.id}
                 data={idea}
-                className="border border-basic-200 hover:border-basic-300 transition-colors"
+                className="border border-basic-200 transition-colors hover:border-basic-300"
                 showActions
               />
             ))}
 
             {/* Load More or Pagination Info */}
             {pagination && pagination.hasNext && (
-              <div className="text-center pt-4">
+              <div className="pt-4 text-center">
                 <p className="text-sm text-basic-400">
                   顯示
                   {' '}

@@ -157,8 +157,8 @@ const EditForm: React.FC<EditFormProps> = ({
     <div className="space-y-8">
       {/* 基本資訊 */}
       <div className="space-y-6">
-        <div className="flex items-center space-x-3 mb-4">
-          <BookOpen className="h-5 w-5 text-primary-base" />
+        <div className="mb-4 flex items-center space-x-3">
+          <BookOpen className="size-5 text-primary-base" />
           <h3 className="heading-sm text-basic-black">基本資訊</h3>
         </div>
 
@@ -184,7 +184,7 @@ const EditForm: React.FC<EditFormProps> = ({
         {/* 實踐類型（只顯示，不可編輯） */}
         <div className="space-y-2">
           <Label>實踐類型</Label>
-          <div className="px-3 py-2 bg-muted border border-input rounded-md body-sm text-muted-foreground flex items-center gap-2">
+          <div className="body-sm flex items-center gap-2 rounded-md border border-input bg-muted px-3 py-2 text-muted-foreground">
             {currentContentType?.icon && React.createElement(currentContentType.icon, { className: 'h-4 w-4' })}
             {practice.contentType === 'custom' ? practice.customContentType || '自定義' : (currentContentType?.label || practice.contentType)}
           </div>
@@ -194,7 +194,7 @@ const EditForm: React.FC<EditFormProps> = ({
 
       {/* 標籤設定 */}
       <div className="space-y-6">
-        <div className="flex items-center space-x-3 mb-4">
+        <div className="mb-4 flex items-center space-x-3">
           <Label>標籤設定</Label>
           <span className="text-sm text-muted-foreground">
             (
@@ -268,17 +268,17 @@ const EditForm: React.FC<EditFormProps> = ({
               {(formData.tags || []).map((tag) => (
                 <div
                   key={tag}
-                  className="flex items-center px-3 py-2 bg-primary/10 border border-primary/20 rounded-lg"
+                  className="flex items-center rounded-lg border border-primary/20 bg-primary/10 px-3 py-2"
                 >
-                  <span className="text-sm font-medium text-primary mr-2">{tag}</span>
+                  <span className="mr-2 text-sm font-medium text-primary">{tag}</span>
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
                     onClick={() => removeTag(tag)}
-                    className="text-primary hover:text-destructive p-0 h-auto w-auto"
+                    className="size-auto p-0 text-primary hover:text-destructive"
                   >
-                    <X className="h-3 w-3" />
+                    <X className="size-3" />
                   </Button>
                 </div>
               ))}
@@ -289,12 +289,12 @@ const EditForm: React.FC<EditFormProps> = ({
 
       {/* 目標設定 */}
       <div className="space-y-6">
-        <div className="flex items-center space-x-3 mb-4">
-          <Target className="h-5 w-5 text-primary-base" />
+        <div className="mb-4 flex items-center space-x-3">
+          <Target className="size-5 text-primary-base" />
           <h3 className="heading-sm text-basic-black">目標設定</h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* 總量 */}
           <div className="space-y-2">
             <Label htmlFor="totalAmount">
@@ -316,7 +316,7 @@ const EditForm: React.FC<EditFormProps> = ({
                   errors.totalAmount && 'border-alert focus:ring-alert'
                 )}
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 body-sm text-muted-foreground">
+              <span className="body-sm absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                 {currentContentType?.unit || '項'}
               </span>
             </div>
@@ -342,7 +342,7 @@ const EditForm: React.FC<EditFormProps> = ({
         </div>
 
         {/* 每日目標設定 */}
-        <div className="space-y-4 mt-6">
+        <div className="mt-6 space-y-4">
           <Label>每次實踐目標</Label>
           <RadioGroup
             value={formData.dailyGoal?.type || 'time'}
@@ -359,15 +359,15 @@ const EditForm: React.FC<EditFormProps> = ({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="time" id="time-edit" />
-              <Label htmlFor="time-edit" className="text-sm font-medium flex items-center">
-                <Clock className="h-4 w-4 mr-1" />
+              <Label htmlFor="time-edit" className="flex items-center text-sm font-medium">
+                <Clock className="mr-1 size-4" />
                 按時間
               </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="completion" id="completion-edit" />
-              <Label htmlFor="completion-edit" className="text-sm font-medium flex items-center">
-                <BarChart className="h-4 w-4 mr-1" />
+              <Label htmlFor="completion-edit" className="flex items-center text-sm font-medium">
+                <BarChart className="mr-1 size-4" />
                 按完成量
               </Label>
             </div>
@@ -396,7 +396,7 @@ const EditForm: React.FC<EditFormProps> = ({
                   max="240"
                   className="pr-12"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 body-sm text-muted-foreground">
+                <span className="body-sm absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   分鐘
                 </span>
               </div>
@@ -427,7 +427,7 @@ const EditForm: React.FC<EditFormProps> = ({
                   max="100"
                   className="pr-12"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 body-sm text-muted-foreground">
+                <span className="body-sm absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   {formData.dailyGoal?.unit || currentContentType?.unit || '項'}
                 </span>
               </div>
@@ -438,8 +438,8 @@ const EditForm: React.FC<EditFormProps> = ({
 
       {/* 實踐行動 */}
       <div className="space-y-6">
-        <div className="flex items-center space-x-3 mb-4">
-          <Target className="h-5 w-5 text-primary-base" />
+        <div className="mb-4 flex items-center space-x-3">
+          <Target className="size-5 text-primary-base" />
           <h3 className="heading-sm text-basic-black">實踐行動</h3>
         </div>
 
@@ -454,7 +454,7 @@ const EditForm: React.FC<EditFormProps> = ({
             className="resize-none"
             maxLength={200}
           />
-          <div className="text-xs text-muted-foreground text-right">
+          <div className="text-right text-xs text-muted-foreground">
             {(formData.practiceAction || '').length}
             /200
           </div>
@@ -465,7 +465,7 @@ const EditForm: React.FC<EditFormProps> = ({
       <div id="resources" className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <LinkIcon className="h-5 w-5 text-primary-base" />
+            <LinkIcon className="size-5 text-primary-base" />
             <h3 className="heading-sm text-basic-black">資源</h3>
           </div>
           <Button
@@ -475,16 +475,16 @@ const EditForm: React.FC<EditFormProps> = ({
             onClick={addResource}
             disabled={(formData.resources || []).length >= 5}
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="mr-2 size-4" />
             新增資源
           </Button>
         </div>
 
         <div className="space-y-4">
           {(formData.resources || []).map((resource, index) => (
-            <div key={resource.id} className="border border-border rounded-lg p-4">
+            <div key={resource.id} className="rounded-lg border border-border p-4">
               <div className="flex items-start space-x-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-secondary text-secondary-foreground rounded-full flex items-center justify-center body-sm font-medium mt-2">
+                <span className="body-sm mt-2 flex size-6 shrink-0 items-center justify-center rounded-full bg-secondary font-medium text-secondary-foreground">
                   {index + 1}
                 </span>
                 <div className="flex-1 space-y-3">
@@ -497,8 +497,8 @@ const EditForm: React.FC<EditFormProps> = ({
                       className={cn(resourceErrors[resource.id]?.name && 'border-destructive')}
                     />
                     {resourceErrors[resource.id]?.name && (
-                      <div className="flex items-center mt-1 text-xs text-destructive">
-                        <AlertCircle className="h-3 w-3 mr-1" />
+                      <div className="mt-1 flex items-center text-xs text-destructive">
+                        <AlertCircle className="mr-1 size-3" />
                         <span>{resourceErrors[resource.id].name}</span>
                       </div>
                     )}
@@ -513,8 +513,8 @@ const EditForm: React.FC<EditFormProps> = ({
                       className={cn(resourceErrors[resource.id]?.url && 'border-destructive')}
                     />
                     {resourceErrors[resource.id]?.url && (
-                      <div className="flex items-center mt-1 text-xs text-destructive">
-                        <AlertCircle className="h-3 w-3 mr-1" />
+                      <div className="mt-1 flex items-center text-xs text-destructive">
+                        <AlertCircle className="mr-1 size-3" />
                         <span>{resourceErrors[resource.id].url}</span>
                       </div>
                     )}
@@ -525,9 +525,9 @@ const EditForm: React.FC<EditFormProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={() => removeResource(resource.id)}
-                  className="text-muted-foreground hover:text-alert p-2 mt-1"
+                  className="mt-1 p-2 text-muted-foreground hover:text-alert"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="size-4" />
                 </Button>
               </div>
             </div>
@@ -535,14 +535,14 @@ const EditForm: React.FC<EditFormProps> = ({
         </div>
 
         {(formData.resources || []).length === 0 && (
-          <div className="text-center py-8 border-2 border-dashed border-border rounded-lg">
-            <p className="body-md text-muted-foreground mb-3">尚未添加學習資源</p>
+          <div className="rounded-lg border-2 border-dashed border-border py-8 text-center">
+            <p className="body-md mb-3 text-muted-foreground">尚未添加學習資源</p>
             <Button
               type="button"
               variant="ghost"
               onClick={addResource}
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="mr-2 size-4" />
               新增第一個資源
             </Button>
           </div>

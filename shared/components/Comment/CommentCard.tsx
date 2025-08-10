@@ -89,7 +89,7 @@ function CommentCard({
   if (!commentUser) return null;
 
   return (
-    <div className="bg-white body-sm font-normal">
+    <div className="body-sm bg-white font-normal">
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Image
@@ -102,13 +102,13 @@ function CommentCard({
           <div className="flex items-center gap-2">
             <span className="font-medium">{commentUser.name}</span>
             {role && (
-              <div className="px-2.5 py-1 bg-basic-100 rounded">{role}</div>
+              <div className="rounded bg-basic-100 px-2.5 py-1">{role}</div>
             )}
           </div>
         </div>
         <div className="flex items-center gap-3 text-basic-300">
           <time>{timeDuration(updatedAt)}</time>
-          <div className="hidden sm:flex items-center gap-0.5">
+          <div className="hidden items-center gap-0.5 sm:flex">
             {visibility === 'public' ? <LockKeyholeOpen /> : <LockKeyhole />}
             <span>{visibility === 'public' ? '公開' : '不公開'}</span>
           </div>
@@ -189,7 +189,7 @@ function CommentCard({
             />
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3">
-            <div className="pl-6 border-l border-solid border-basic-200">
+            <div className="border-l border-solid border-basic-200 pl-6">
               {replies.map((reply) => (
                 <CommentCard
                   key={reply.id}

@@ -42,10 +42,10 @@ class IdeasErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="flex flex-col items-center justify-center p-8 text-center bg-white rounded-lg border border-basic-200">
-          <AlertTriangle className="h-12 w-12 text-red-500 mb-4" />
-          <h3 className="text-lg font-semibold text-basic-500 mb-2">出現問題了</h3>
-          <p className="text-sm text-basic-400 mb-4">
+        <div className="flex flex-col items-center justify-center rounded-lg border border-basic-200 bg-white p-8 text-center">
+          <AlertTriangle className="mb-4 size-12 text-red-500" />
+          <h3 className="mb-2 text-lg font-semibold text-basic-500">出現問題了</h3>
+          <p className="mb-4 text-sm text-basic-400">
             想法功能暫時無法使用，請稍後再試
           </p>
           <Button
@@ -53,7 +53,7 @@ class IdeasErrorBoundary extends Component<Props, State> {
             variant="outline"
             className="border-basic-200 text-basic-500 hover:bg-basic-100"
           >
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <RefreshCw className="mr-2 size-4" />
             重新載入
           </Button>
         </div>
@@ -76,10 +76,10 @@ export const NetworkError: React.FC<NetworkErrorProps> = ({
   isRetrying = false,
   message = '網路連線出現問題',
 }) => (
-  <div className="flex flex-col items-center justify-center p-8 text-center bg-white rounded-lg border border-basic-200">
-    <AlertTriangle className="h-12 w-12 text-orange-500 mb-4" />
-    <h3 className="text-lg font-semibold text-basic-500 mb-2">連線問題</h3>
-    <p className="text-sm text-basic-400 mb-4">{message}</p>
+  <div className="flex flex-col items-center justify-center rounded-lg border border-basic-200 bg-white p-8 text-center">
+    <AlertTriangle className="mb-4 size-12 text-orange-500" />
+    <h3 className="mb-2 text-lg font-semibold text-basic-500">連線問題</h3>
+    <p className="mb-4 text-sm text-basic-400">{message}</p>
     {onRetry && (
     <Button
       onClick={onRetry}
@@ -87,7 +87,7 @@ export const NetworkError: React.FC<NetworkErrorProps> = ({
       variant="outline"
       className="border-basic-200 text-basic-500 hover:bg-basic-100"
     >
-      <RefreshCw className={`h-4 w-4 mr-2 ${isRetrying ? 'animate-spin' : ''}`} />
+      <RefreshCw className={`mr-2 size-4 ${isRetrying ? 'animate-spin' : ''}`} />
       {isRetrying ? '重試中...' : '重新連線'}
     </Button>
     )}

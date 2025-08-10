@@ -82,8 +82,8 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
   const CardContent = () => (
     <div
       className={`
-        group relative transition-all duration-200 
-        cursor-pointer border-0 bg-white rounded-lg shadow-sm hover:shadow-md
+        group relative cursor-pointer rounded-lg 
+        border-0 bg-white shadow-sm transition-all duration-200 hover:shadow-md
         ${className}
       `}
       onClick={handleCardClick}
@@ -102,9 +102,9 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
     >
       {/* Header */}
       <div className="p-4 pb-3">
-        <div className="flex items-start justify-between mb-3">
+        <div className="mb-3 flex items-start justify-between">
           <div className="flex-1">
-            <div className="flex items-start gap-3 mb-2">
+            <div className="mb-2 flex items-start gap-3">
               {data.user?.photoURL ? (
                 <Image
                   src={data.user.photoURL}
@@ -114,13 +114,13 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
                   borderRadius="9999px"
                 />
               ) : (
-                <div className="w-[30px] h-[30px] flex-shrink-0">
+                <div className="size-[30px] shrink-0">
                   <DefaultAvatar />
                 </div>
               )}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-sm text-[#536166]">{data.user?.name || '匿名用戶'}</span>
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex items-center gap-2">
+                  <span className="text-sm font-medium text-[#536166]">{data.user?.name || '匿名用戶'}</span>
                 </div>
                 {data.user?.roleList?.[0] && (
                   <div className="text-sm font-normal text-[#92989A]">
@@ -132,7 +132,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="px-3 py-1 text-xs bg-primary-base rounded-full text-white whitespace-nowrap">
+            <div className="whitespace-nowrap rounded-full bg-primary-base px-3 py-1 text-xs text-white">
               想法
             </div>
             <span className="text-xs text-basic-300">{formatIdeaDate(data.createdDate || '')}</span>
@@ -142,21 +142,21 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-basic-300 hover:text-basic-500 h-8 w-8 p-0"
+                    className="size-8 p-0 text-basic-300 opacity-0 transition-opacity hover:text-basic-500 group-hover:opacity-100"
                   >
-                    <MoreHorizontal className="h-4 w-4" />
+                    <MoreHorizontal className="size-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-32">
                   <DropdownMenuItem onClick={onEditClick} className="text-sm">
-                    <Edit className="h-3 w-3 mr-2" />
+                    <Edit className="mr-2 size-3" />
                     編輯
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={onDeleteClick}
                     className="text-sm text-red-600 focus:text-red-600"
                   >
-                    <Trash2 className="h-3 w-3 mr-2" />
+                    <Trash2 className="mr-2 size-3" />
                     刪除
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -168,7 +168,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
 
       {/* Content */}
       <div className="px-4 pb-3">
-        <p className="body-sm text-basic-500 leading-relaxed whitespace-pre-wrap line-clamp-4">
+        <p className="body-sm line-clamp-4 whitespace-pre-wrap leading-relaxed text-basic-500">
           {truncateText(data.content, 200)}
         </p>
       </div>
@@ -180,7 +180,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
             {data.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-basic-100 text-gray-700 border border-primary-base/20"
+                className="inline-flex items-center rounded-full border border-primary-base/20 bg-basic-100 px-2 py-1 text-xs text-gray-700"
               >
                 {tag}
               </span>
@@ -198,13 +198,13 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
       {/* Image */}
       {hasImages && (
         <div className="px-4 pb-3">
-          <div className="relative rounded-lg overflow-hidden">
+          <div className="relative overflow-hidden rounded-lg">
             <Image
               src={data.imageUrls![0]}
               alt={data.imageUrls[0]}
               width="400"
               height="192"
-              className="w-full h-48 object-cover transition-transform duration-200 group-hover:scale-105"
+              className="h-48 w-full object-cover transition-transform duration-200 group-hover:scale-105"
             />
           </div>
         </div>
@@ -220,17 +220,17 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
                 href={resource.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center p-2 rounded-lg hover:bg-basic-50/50 transition-colors group/resource"
+                className="hover:bg-basic-50/50 group/resource flex items-center rounded-lg p-2 transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
-                <FileText className="h-5 w-5 mr-2 text-primary-base flex-shrink-0" />
-                <span className="body-sm text-basic-500 group-hover/resource:text-primary-darker truncate">
+                <FileText className="mr-2 size-5 shrink-0 text-primary-base" />
+                <span className="body-sm truncate text-basic-500 group-hover/resource:text-primary-darker">
                   {resource.name}
                 </span>
               </Link>
             ))}
             {data.ideaResources!.length > 2 && (
-              <p className="body-sm text-basic-300 pl-5">
+              <p className="body-sm pl-5 text-basic-300">
                 還有
                 {' '}
                 {data.ideaResources!.length - 2}
@@ -252,7 +252,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
               e.stopPropagation();
               onLikeClick?.();
             }}
-            className={`text-xs h-8 px-2 flex items-center gap-1 ${isLiked
+            className={`flex h-8 items-center gap-1 px-2 text-xs ${isLiked
               ? 'text-primary-base'
               : 'text-basic-300 hover:text-primary-base'
             }`}
@@ -267,7 +267,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
           </div>
 
           <div className="flex items-center gap-1">
-            <Eye className="h-3 w-3" />
+            <Eye className="size-3" />
             <span>{data.viewCount || 0}</span>
           </div>
         </div>

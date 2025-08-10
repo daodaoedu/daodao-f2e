@@ -24,7 +24,7 @@ export const BackButton = ({
       className={cn('-mx-2 px-2 text-basic-400', className)}
       {...props}
     >
-      <ChevronLeft className="h-4 w-4" />
+      <ChevronLeft className="size-4" />
       {label}
     </Button>
   );

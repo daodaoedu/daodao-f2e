@@ -256,15 +256,15 @@ function MilestoneCard(
             isLoading && 'opacity-80'
           )}
         >
-          <div className="flex items-center justify-between mb-2.5">
+          <div className="mb-2.5 flex items-center justify-between">
             <div className="flex items-center">
-              <div className="text-primary-base body-sm">
+              <div className="body-sm text-primary-base">
                 里程碑
                 {' '}
                 {index > -1 && index + 1}
               </div>
               {index > -1 && (
-                <span className="hidden md:block ml-3 body-sm text-basic-300">
+                <span className="body-sm ml-3 hidden text-basic-300 md:block">
                   {tasksInfo.progress}
                   %
                 </span>
@@ -298,7 +298,7 @@ function MilestoneCard(
               }}
             />
           </div>
-          <div className="w-full flex items-center md:justify-between gap-1">
+          <div className="flex w-full items-center gap-1 md:justify-between">
             {isEditing ? (
               <input
                 type="text"
@@ -339,12 +339,12 @@ function MilestoneCard(
                     {isCompleted && <Check />}
                   </p>
                 </label>
-                <p className="font-sans py-2 body-sm text-basic-400 truncate">
+                <p className="body-sm truncate py-2 font-sans text-basic-400">
                   {milestone?.name}
                 </p>
               </>
             )}
-            <div className="flex flex-row gap-1 ml-auto">
+            <div className="ml-auto flex flex-row gap-1">
               {isEditing && (
                 <>
                   <Button

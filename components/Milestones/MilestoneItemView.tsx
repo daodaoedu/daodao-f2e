@@ -9,7 +9,7 @@ interface MilestoneItemViewProps {
 }
 
 const MilestoneItemView = ({ index, milestone }: MilestoneItemViewProps) => (
-  <div className="p-2.5 bg-basic-100 flex flex-col gap-2">
+  <div className="flex flex-col gap-2 bg-basic-100 p-2.5">
     <MilestoneView index={index} milestone={milestone} />
     <TaskListView tasks={milestone.tasks || []} />
   </div>

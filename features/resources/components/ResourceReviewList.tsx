@@ -16,13 +16,13 @@ export default function ResourceReviewList({
   return (
     <div className="flex flex-col items-center gap-10">
       {resource.recentReviews && resource.recentReviews.length > 0 ? (
-        <div className="space-y-10 w-full">
+        <div className="w-full space-y-10">
           {resource.recentReviews.map((review) => (
             <ResourceReviewCard key={review.id} review={review} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 text-basic-400">
+        <div className="py-12 text-center text-basic-400">
           目前還沒有人留下心得，成為第一個吧！
         </div>
       )}

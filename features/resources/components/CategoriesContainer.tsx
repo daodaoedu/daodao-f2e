@@ -84,7 +84,7 @@ export default function CategoriesContainer({
           <Button
             variant="outline"
             color="primary"
-            className="w-full mt-3"
+            className="mt-3 w-full"
             onClick={() => setIsShowAll(!isShowAll)}
           >
             {isShowAll ? '收合' : '展開更多'}

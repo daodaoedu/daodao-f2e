@@ -80,7 +80,7 @@ const DateRangePicker = ({
   endDate,
   maxDate,
   minDate,
-  separator = <SwapRightIcon className="w-4 h-4 text-basic-black/25" />,
+  separator = <SwapRightIcon className="size-4 text-basic-black/25" />,
   afterIcon,
   disabledStartDate,
   disabledEndDate,

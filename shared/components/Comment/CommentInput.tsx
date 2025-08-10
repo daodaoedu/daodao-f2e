@@ -92,7 +92,7 @@ function CommentInput({
               borderRadius="9999px"
             />
             <div>{user.name}</div>
-            <div className="px-2.5 py-1 bg-basic-100 rounded">{role}</div>
+            <div className="rounded bg-basic-100 px-2.5 py-1">{role}</div>
           </div>
           {isEditing && (
             <Button
@@ -122,7 +122,7 @@ function CommentInput({
           onChange={(e) => setContent(e.target.value)}
           onClick={handleClick}
           placeholder={placeholder}
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500"
+          className="focus:ring-primary-500 w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-1"
           autoRows
         />
         {isEditing && (

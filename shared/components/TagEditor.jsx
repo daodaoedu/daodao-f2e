@@ -118,7 +118,7 @@ function TagEditor({
         {value.map((tag) => (
           <div
             key={tag}
-            className="flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-primary-lightest"
+            className="flex items-center gap-0.5 rounded-md bg-primary-lightest px-2 py-0.5"
           >
             <div className="whitespace-nowrap">
               {tag}
@@ -135,7 +135,7 @@ function TagEditor({
         <input
           id={id}
           ref={inputRef}
-          className="px-2 py-0.5 min-w-[var(--min-width)] flex-1 outline-none rounded"
+          className="min-w-[var(--min-width)] flex-1 rounded px-2 py-0.5 outline-none"
           style={{ '--min-width': `${input.length + 3}em` }}
           value={input}
           onChange={handleChange}

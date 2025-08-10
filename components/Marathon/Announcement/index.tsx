@@ -29,7 +29,7 @@ const Tag = ({ tag }: { tag: string }) => (
   <div className="flex gap-2">
     <div
       key={tag}
-      className="px-2.5 py-[3px] text-xs text-basic-400 bg-primary-lightest rounded-[13px]"
+      className="rounded-[13px] bg-primary-lightest px-2.5 py-[3px] text-xs text-basic-400"
     >
       {tag}
     </div>
@@ -37,21 +37,21 @@ const Tag = ({ tag }: { tag: string }) => (
 );
 
 const AnnouncementList = ({ items }: { items: AnnouncementItem[] }) => (
-  <div className="flex flex-col gap-3 my-6">
+  <div className="my-6 flex flex-col gap-3">
     {items.map(({
       id, tag, times, title,
     }) => (
       <Link
         href={`/learning-marathon/announcements/${id}`}
         key={id}
-        className="text-start p-6 bg-white shadow-md shadow-basic-black/10 rounded-[10px] flex flex-col gap-3"
+        className="flex flex-col gap-3 rounded-[10px] bg-white p-6 text-start shadow-md shadow-basic-black/10"
       >
-        <h4 className="text-basic-400 body-sm font-normal">{title}</h4>
-        <div className="flex justify-between flex-wrap">
+        <h4 className="body-sm font-normal text-basic-400">{title}</h4>
+        <div className="flex flex-wrap justify-between">
           <div className="md:w-full">
             <Tag tag={tag} />
           </div>
-          <p className="text-basic-300 body-sm">{times}</p>
+          <p className="body-sm text-basic-300">{times}</p>
         </div>
       </Link>
     ))}
@@ -64,12 +64,12 @@ const AnnouncementDetail = ({ item }: { item: AnnouncementItem }) => {
   } = item;
 
   return (
-    <div className="bg-white h-fit p-6">
+    <div className="h-fit bg-white p-6">
       <Tag tag={tag} />
 
-      <h1 className="text-4xl text-basic-500 font-semibold p-6">{title}</h1>
+      <h1 className="p-6 text-4xl font-semibold text-basic-500">{title}</h1>
 
-      <p className="text-basic-300 body-sm">{[times, author].join(' ・ ')}</p>
+      <p className="body-sm text-basic-300">{[times, author].join(' ・ ')}</p>
 
       <ReadOnlyMarkdownEditor value={content} />
     </div>

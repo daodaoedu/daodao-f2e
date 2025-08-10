@@ -180,7 +180,7 @@ const MentorCard = ({
     onClick={onClick}
   >
     <div className="absolute inset-0 overflow-hidden">
-      <div className="scale-110 group-hover:scale-125 transition-transform duration-300">
+      <div className="scale-110 transition-transform duration-300 group-hover:scale-125">
         <Image src={mentor?.image} alt={mentor?.name} height="inherit" borderRadius="0" />
       </div>
     </div>
@@ -217,13 +217,13 @@ const Mentors = () => {
     <>
       <div className="mb-9">
         <Carousel className="mx-6 lg:ml-60" opts={{ align: 'start' }}>
-          <div className="flex justify-between items-center lg:mr-60">
+          <div className="flex items-center justify-between lg:mr-60">
             <h2 className="heading-md text-basic-500" id="marathon-mentor">
               引導師介紹
             </h2>
             <div className="flex gap-2">
-              <CarouselPrevious className="static translate-y-0 mx-1" />
-              <CarouselNext className="static translate-y-0 mx-1" />
+              <CarouselPrevious className="static mx-1 translate-y-0" />
+              <CarouselNext className="static mx-1 translate-y-0" />
             </div>
           </div>
           <div className="mt-9">
@@ -232,10 +232,10 @@ const Mentors = () => {
                 <CarouselItem key={mentor.name} className="basis-auto">
                   <MentorCard
                     mentor={mentor}
-                    className="cursor-pointer group"
+                    className="group cursor-pointer"
                     onClick={() => handleOpenModal(mentor.name)}
                   >
-                    <div className="absolute bottom-0 left-0 right-0 pt-4">
+                    <div className="absolute inset-x-0 bottom-0 pt-4">
                       <div className="flex gap-2 px-3">
                         {mentor.tags.slice(0, 1).map((tag, index) => (
                           <Tag
@@ -245,14 +245,14 @@ const Mentors = () => {
                           />
                         ))}
                       </div>
-                      <div className="heading-md text-white text-start mt-2 px-3 pb-3">
+                      <div className="heading-md mt-2 px-3 pb-3 text-start text-white">
                         {mentor.title}
                         {' '}
                         |
                         {' '}
                         {mentor.name}
                       </div>
-                      <div className="bg-white flex justify-end items-center text-gray-400 px-3 py-2 gap-1 group-hover:text-primary-base">
+                      <div className="flex items-center justify-end gap-1 bg-white px-3 py-2 text-gray-400 group-hover:text-primary-base">
                         more
                         <EastIcon className="!text-[16px]" />
                       </div>
@@ -271,28 +271,28 @@ const Mentors = () => {
         hasCloseButton
         size={ResponsiveModalSize.Medium}
       >
-        <div className="flex flex-col md:flex-row gap-4 mb-4">
+        <div className="mb-4 flex flex-col gap-4 md:flex-row">
           <picture>
-            <MentorCard mentor={activeMentor} className="w-full md:w-[200px] cursor-default pointer-events-none" />
+            <MentorCard mentor={activeMentor} className="pointer-events-none w-full cursor-default md:w-[200px]" />
           </picture>
           <div className="flex-1">
-            <div className="heading-md text-basic-500 mb-3">
+            <div className="heading-md mb-3 text-basic-500">
               {activeMentor?.title}
               {' '}
               |
               {' '}
               {activeMentor?.name}
             </div>
-            <div className="flex flex-col gap-2 items-start mb-3">
+            <div className="mb-3 flex flex-col items-start gap-2">
               {activeMentor?.tags.map((tag) => (
                 <Tag key={tag} text={tag} className="text-wrap" />
               ))}
             </div>
-            <div className="flex flex-col gap-2.5 items-start">
+            <div className="flex flex-col items-start gap-2.5">
               {Object.keys(activeMentor?.social || {}).map((key) => (
                 <a
                   key={key}
-                  className="body-sm text-primary-base flex items-center gap-1"
+                  className="body-sm flex items-center gap-1 text-primary-base"
                   href={activeMentor?.social[key]?.url}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -306,7 +306,7 @@ const Mentors = () => {
         <section className="mb-4">
           {activeMentor?.experiences?.length > 0 && (
             <>
-              <h3 className="body-md font-bold text-basic-400 mb-2">經歷</h3>
+              <h3 className="body-md mb-2 font-bold text-basic-400">經歷</h3>
               <ul>
                 {activeMentor?.experiences.map((experience) => (
                   <li key={experience} className="body-sm text-basic-400">{experience}</li>
@@ -316,8 +316,8 @@ const Mentors = () => {
           )}
         </section>
         <section>
-          <h3 className="body-md font-bold text-basic-400 mb-2">自我介紹</h3>
-          <p className="body-sm text-basic-400 whitespace-pre-wrap">{activeMentor?.introduction}</p>
+          <h3 className="body-md mb-2 font-bold text-basic-400">自我介紹</h3>
+          <p className="body-sm whitespace-pre-wrap text-basic-400">{activeMentor?.introduction}</p>
         </section>
       </ResponsiveModal>
     </>

@@ -59,13 +59,13 @@ export default function SidebarLayout({
 
   return (
     <div className="bg-primary-palest">
-      <Container className="pt-2 px-4 pb-12 max-w-6xl mx-auto" autoMinHeight>
+      <Container className="mx-auto max-w-6xl px-4 pb-12 pt-2" autoMinHeight>
         <div className="flex flex-wrap gap-x-10">
           {showBackButton && (
             <div className="basis-full">
               <Button
                 size="sm"
-                className="px-0 mb-6 lg:mb-3"
+                className="mb-6 px-0 lg:mb-3"
                 variant="ghost"
                 onClick={() => router.push(backPath)}
               >
@@ -125,7 +125,7 @@ export default function SidebarLayout({
             </Accordion>
           )}
 
-          <div className="basis-full max-w-full lg:flex-1 lg:max-w-[min(760px,100%-360px)]">
+          <div className="max-w-full basis-full lg:max-w-[min(760px,100%-360px)] lg:flex-1">
             {children}
           </div>
         </div>

@@ -58,9 +58,9 @@ export const IdeaUpdateContainer: React.FC<IdeaUpdateContainerProps> = ({
   // 載入狀態
   if (isLoadingIdea) {
     return (
-      <div className={`${className} flex items-center justify-center min-h-[400px]`}>
+      <div className={`${className} flex min-h-[400px] items-center justify-center`}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-base mx-auto" />
+          <div className="mx-auto size-12 animate-spin rounded-full border-b-2 border-primary-base" />
           <p className="mt-4 text-gray-500">載入想法資料中...</p>
         </div>
       </div>
@@ -70,20 +70,20 @@ export const IdeaUpdateContainer: React.FC<IdeaUpdateContainerProps> = ({
   // 錯誤狀態
   if (loadError || !idea) {
     return (
-      <div className={`${className} flex items-center justify-center min-h-[400px]`}>
+      <div className={`${className} flex min-h-[400px] items-center justify-center`}>
         <div className="text-center">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <div className="mb-4 text-6xl text-red-500">⚠️</div>
+          <h3 className="mb-2 text-lg font-medium text-gray-900">
             無法載入想法
           </h3>
-          <p className="text-gray-500 mb-4">
+          <p className="mb-4 text-gray-500">
             {loadError || '找不到指定的想法'}
           </p>
           {onCancel && (
             <button
               type="button"
               onClick={onCancel}
-              className="bg-primary-base text-white px-4 py-2 rounded-lg hover:bg-primary-darker"
+              className="rounded-lg bg-primary-base px-4 py-2 text-white hover:bg-primary-darker"
             >
               返回
             </button>
@@ -97,8 +97,8 @@ export const IdeaUpdateContainer: React.FC<IdeaUpdateContainerProps> = ({
     <div className={className}>
       {/* 上傳進度指示器 */}
       {isUpdating && uploadProgress > 0 && (
-        <div className="mb-4 bg-white rounded-lg shadow-sm border p-4">
-          <div className="flex items-center justify-between mb-2">
+        <div className="mb-4 rounded-lg border bg-white p-4 shadow-sm">
+          <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium text-gray-700">
               正在更新你的想法...
             </span>
@@ -107,9 +107,9 @@ export const IdeaUpdateContainer: React.FC<IdeaUpdateContainerProps> = ({
               %
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="h-2 w-full rounded-full bg-gray-200">
             <div
-              className="bg-primary-base h-2 rounded-full transition-all duration-300"
+              className="h-2 rounded-full bg-primary-base transition-all duration-300"
               style={{ width: `${uploadProgress}%` }}
             />
           </div>
@@ -124,11 +124,11 @@ export const IdeaUpdateContainer: React.FC<IdeaUpdateContainerProps> = ({
 
       {/* 錯誤訊息 */}
       {updateError && (
-        <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
           <div className="flex">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <svg
-                className="h-5 w-5 text-red-400"
+                className="size-5 text-red-400"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"

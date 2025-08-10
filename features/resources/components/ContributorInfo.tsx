@@ -14,12 +14,12 @@ interface ContributorInfoProps {
 
 export default function ContributorInfo({ user }: ContributorInfoProps) {
   return (
-    <div className="bg-primary-palest p-10 rounded-lg">
-      <h2 className="mb-10 heading-md">關於分享者</h2>
+    <div className="rounded-lg bg-primary-palest p-10">
+      <h2 className="heading-md mb-10">關於分享者</h2>
 
       <div className="mb-6 flex items-center justify-between">
         <div className="flex">
-          <Avatar className="mt-1 mr-3 size-12">
+          <Avatar className="mr-3 mt-1 size-12">
             <AvatarImage src={user.photoURL || ''} />
             <AvatarFallback className="text-xl">
               <DefaultAvatar />
@@ -29,7 +29,7 @@ export default function ContributorInfo({ user }: ContributorInfoProps) {
             <div className="flex items-center">
               <h2 className="body-md font-bold">{user.name}</h2>
               {user.educationStage && (
-                <Badge className="body-sm ml-3 px-2 rounded" variant="gray">
+                <Badge className="body-sm ml-3 rounded px-2" variant="gray">
                   {user.educationStage}
                 </Badge>
               )}
@@ -45,7 +45,7 @@ export default function ContributorInfo({ user }: ContributorInfoProps) {
       </div>
 
       <div className="flex-1">
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
+        <div className="mb-6 flex flex-col justify-between md:flex-row md:items-center">
           <div className="flex flex-wrap gap-2">
             {user.tagList.map((tag) => (
               <Badge key={tag} variant="outline" className="text-primary">
@@ -57,7 +57,7 @@ export default function ContributorInfo({ user }: ContributorInfoProps) {
           </div>
         </div>
         <div>
-          <h3 className="mb-2 body-lg font-bold text-basic-500">簡介</h3>
+          <h3 className="body-lg mb-2 font-bold text-basic-500">簡介</h3>
           <p className="mb-2 text-basic-500">{user.selfIntroduction}</p>
           <Button type="button" variant="link" className="-mx-2 px-2" asChild>
             <Link href={`/partner/detail?id=${user._id}`}>了解更多</Link>

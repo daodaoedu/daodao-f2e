@@ -158,10 +158,10 @@ const DraggableMilestones = ({
       {/* 拖曳覆蓋層，當拖動時顯示 */}
       <DragOverlay>
         {activeItem && (
-          <div className="relative opacity-90 w-full">
+          <div className="relative w-full opacity-90">
             <DateRangePicker
               value={previewNewDate}
-              separator={<SwapRightIcon className="w-4 h-4 text-basic-black/25" />}
+              separator={<SwapRightIcon className="size-4 text-basic-black/25" />}
               className="absolute -top-12 left-0 bg-basic-white"
             />
             <MilestoneItem

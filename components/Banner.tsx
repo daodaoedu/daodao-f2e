@@ -80,7 +80,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
             'opacity-0 animate-fade-in animate-duration-500 animate-delay-200'
           )}
         >
-          <div className="animate-oscillate animate-delay-200">
+          <div className="animate-delay-200 animate-oscillate">
             <Image
               src={LearningMarathonImgDesktopIcon5.src}
               alt="icon5"
@@ -95,7 +95,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
             'opacity-0 animate-fade-in animate-duration-500 animate-delay-1700'
           )}
         >
-          <div className="animate-oscillate animate-delay-1700">
+          <div className="animate-delay-1700 animate-oscillate">
             <Image
               src={LearningMarathonImgDesktopIcon3.src}
               alt="icon3"
@@ -110,7 +110,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
             'opacity-0 animate-fade-in animate-duration-500 animate-delay-500'
           )}
         >
-          <div className="animate-oscillate animate-delay-1100">
+          <div className="animate-delay-1100 animate-oscillate">
             <Image
               src={LearningMarathonImgDesktopIcon1.src}
               alt="icon1"
@@ -125,7 +125,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
             'opacity-0 animate-fade-in animate-duration-500 animate-delay-1300'
           )}
         >
-          <div className="animate-oscillate animate-delay-1900">
+          <div className="animate-delay-1900 animate-oscillate">
             <Image
               src={LearningMarathonImgDesktopIcon4.src}
               alt="icon4"
@@ -140,7 +140,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
             'opacity-0 animate-fade-in animate-duration-500 animate-delay-500'
           )}
         >
-          <div className="animate-oscillate animate-delay-300">
+          <div className="animate-delay-300 animate-oscillate">
             <Image
               src={LearningMarathonImgDesktopIcon2.src}
               alt="icon2"
@@ -155,7 +155,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
             'opacity-0 animate-fade-in animate-duration-500 animate-delay-1900'
           )}
         >
-          <div className="animate-oscillate animate-delay-1300">
+          <div className="animate-delay-1300 animate-oscillate">
             <Image
               src={LearningMarathonImgDesktopIcon6.src}
               alt="icon6"
