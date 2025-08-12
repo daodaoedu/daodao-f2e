@@ -32,7 +32,6 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@hookform/resolvers": "^5.0.1",
-    "@jitsi/react-sdk": "^1.0.1",
     "@mdxeditor/editor": "^3.29.0",
     "@mui/base": "^5.0.0-alpha.77",
     "@mui/core": "^5.0.0-alpha.54",
