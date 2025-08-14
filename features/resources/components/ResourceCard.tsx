@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from '@/shared/components/Image';
-import { format } from 'date-fns';
+import { format, isWithinInterval, subMonths } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Hot from '@/public/assets/icons/hot.svg';
 import Group from '@/public/assets/icons/group.svg';
@@ -8,7 +8,6 @@ import View from '@/public/assets/icons/view.svg';
 import Comment from '@/public/assets/icons/comment.svg';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
 import More from '@/public/assets/icons/more.svg';
-import dayjs from 'dayjs';
 import { cn } from '@/utils/cn';
 import {
   DropdownMenu,
@@ -70,10 +69,10 @@ export default function ResourceCard(props: CardProps) {
     commentCount = 12,
   } = props;
 
-  const isNewResource = dayjs(time).isBetween(
-    dayjs().subtract(1, 'month'),
-    dayjs()
-  );
+  const isNewResource = time ? isWithinInterval(new Date(time), {
+    start: subMonths(new Date(), 1),
+    end: new Date(),
+  }) : false;
 
   const labels = isNewResource ? ['近期新增', ...label] : label;
 

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X } from 'lucide-react';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import PostCard from '@/shared/components/Post/PostCard';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
@@ -44,7 +44,7 @@ function OutcomeForm({
     resolver: zodResolver(projectOutcomeFormSchema),
     defaultValues: {
       title: projectTitle,
-      date: dayjs(createdAt || undefined).format('YYYY-MM-DD'),
+      date: format(createdAt ? new Date(createdAt) : new Date(), 'yyyy-MM-dd'),
       week,
       content: '',
       imgUrls: [],
@@ -88,7 +88,7 @@ function OutcomeForm({
             title={methods.watch('title')}
             subtitle={`第${numberToChineseNumber(week)}週`}
             tag="成果"
-            date={dayjs(createdAt).format('YYYY/MM/DD')}
+            date={createdAt ? format(new Date(createdAt), 'yyyy/MM/dd') : format(new Date(), 'yyyy/MM/dd')}
             onTitleChange={(title) => methods.setValue('title', title || projectTitle)}
             isEditable
           />

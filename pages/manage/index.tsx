@@ -1,8 +1,18 @@
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
-import dayjs, { Dayjs } from "dayjs";
-import { CalendarPicker } from "@mui/x-date-pickers/CalendarPicker";
+import { 
+  getHours, 
+  startOfDay, 
+  addDays, 
+  subDays, 
+  format, 
+  isAfter, 
+  isBefore, 
+  isSameDay, 
+  isWithinInterval 
+} from 'date-fns';
+import { Calendar as ShadcnCalendar } from "@/components/ui/calendar";
 import {
   ArrowUpRight,
   CalendarIcon,
@@ -13,6 +23,7 @@ import {
 import Link from "next/link";
 
 import marathonConfig from "@/constants/marathon";
+
 import getManageLayout from "@/layout/features/getManageLayout";
 import useClickOutside from "@/hooks/useClickOutside";
 import SEOConfig from "@/components/SEOConfig";
@@ -174,7 +185,7 @@ const Header = () => {
   return (
     <div className="mb-6 p-2 flex items-center justify-between">
       <h2 className="heading-sm text-basic-500 pr-2 text-balance">
-        {HEADER_TITLES[dayjs().get("hour") % HEADER_TITLES.length]}
+        {HEADER_TITLES[getHours(new Date()) % HEADER_TITLES.length]}
       </h2>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -275,10 +286,10 @@ const Header = () => {
 };
 
 interface CalendarProps {
-  date: Dayjs;
-  maxDate?: Dayjs;
-  minDate?: Dayjs;
-  onChange: (date: Dayjs) => void;
+  date: Date;
+  maxDate?: Date;
+  minDate?: Date;
+  onChange: (date: Date) => void;
 }
 
 const Calendar = ({ date, maxDate, minDate, onChange }: CalendarProps) => {
@@ -286,10 +297,10 @@ const Calendar = ({ date, maxDate, minDate, onChange }: CalendarProps) => {
   const { ref } = useClickOutside<HTMLDivElement>({ setState: setIsOpen });
 
   const handleToday = () => {
-    onChange(dayjs().startOf("day"));
+    onChange(startOfDay(new Date()));
   };
 
-  const handleChange = (value: Dayjs | null) => {
+  const handleChange = (value: Date | undefined) => {
     if (!value) return;
     onChange(value);
     setIsOpen(false);
@@ -305,7 +316,7 @@ const Calendar = ({ date, maxDate, minDate, onChange }: CalendarProps) => {
         >
           <CalendarIcon className="size-6" />
           <div className="heading-sm">
-            {date?.format("YYYY/MM/DD")}（{date?.format("dd")}）任務
+            {format(date, "yyyy/MM/dd")}（{format(date, "E")}）任務
           </div>
         </Button>
         <div className="flex items-center justify-between sm:justify-start gap-0.5">
@@ -320,16 +331,16 @@ const Calendar = ({ date, maxDate, minDate, onChange }: CalendarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              disabled={date.isBefore(minDate) || date.isSame(minDate, "day")}
-              onClick={() => onChange(date.subtract(1, "day"))}
+              disabled={isBefore(date, minDate || new Date()) || isSameDay(date, minDate || new Date())}
+              onClick={() => onChange(subDays(date, 1))}
             >
               <CircleChevronLeft className="size-6" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              disabled={date.isAfter(maxDate) || date.isSame(maxDate, "day")}
-              onClick={() => onChange(date.add(1, "day"))}
+              disabled={isAfter(date, maxDate || new Date()) || isSameDay(date, maxDate || new Date())}
+              onClick={() => onChange(addDays(date, 1))}
             >
               <CircleChevronRight className="size-6" />
             </Button>
@@ -344,15 +355,14 @@ const Calendar = ({ date, maxDate, minDate, onChange }: CalendarProps) => {
           isOpen ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0"
         )}
       >
-        <CalendarPicker
-          date={date}
-          onChange={handleChange}
-          views={["day"]}
-          minDate={minDate}
-          maxDate={maxDate}
-          classes={{
-            root: "[&_.Mui-selected]:!text-basic-white",
-          }}
+        <ShadcnCalendar
+          mode="single"
+          selected={date}
+          onSelect={handleChange}
+          fromDate={minDate}
+          toDate={maxDate}
+          initialFocus
+          className="p-3"
         />
       </div>
     </div>
@@ -410,13 +420,13 @@ const TodayReviews = ({
   date,
 }: {
   projectId: string;
-  date: Dayjs;
+  date: Date;
 }) => {
   const { data: reviews } = useProjectReviewList(projectId);
 
   const todayReviews = useMemo(() => {
     if (!Array.isArray(reviews)) return [];
-    return reviews.filter((review) => date.isSame(review.createdAt));
+    return reviews.filter((review) => isSameDay(date, new Date(review.createdAt)));
   }, [reviews, date]);
 
   return (
@@ -433,7 +443,7 @@ const TodayReviews = ({
   );
 };
 
-const Main = ({ date }: { date: Dayjs }) => {
+const Main = ({ date }: { date: Date }) => {
   const { data: projects, mutate } = useMyProjects();
 
   const { updateMutation } = useProjectMilestoneMutation();
@@ -445,12 +455,10 @@ const Main = ({ date }: { date: Dayjs }) => {
       originalMilestones: project?.milestones,
       milestones:
         project?.milestones?.filter((milestone) =>
-          date.isBetween(
-            dayjs(milestone.startDate),
-            dayjs(milestone.endDate),
-            "day",
-            "[]"
-          )
+          isWithinInterval(date, {
+            start: new Date(milestone.startDate || new Date()),
+            end: new Date(milestone.endDate || new Date()),
+          })
         ) ?? [],
     }));
   }, [projects, date]);
@@ -492,7 +500,7 @@ const Main = ({ date }: { date: Dayjs }) => {
                   ))
                 ) : (
                   <div className="flex flex-col items-center justify-center">
-                    <div>{date.format("YYYY/MM/DD")} 沒有里程碑</div>
+                    <div>{format(date, "yyyy/MM/dd")} 沒有里程碑</div>
                     <Image
                       src={AccessDeniedImg.src}
                       alt="沒有里程碑"
@@ -518,7 +526,7 @@ const Main = ({ date }: { date: Dayjs }) => {
 };
 
 const Manage = () => {
-  const [date, setDate] = useState<Dayjs>(dayjs().startOf("day"));
+  const [date, setDate] = useState<Date>(startOfDay(new Date()));
   const { pathname } = useRouter();
 
   const SEOData = useMemo(

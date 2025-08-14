@@ -90,7 +90,7 @@ The project uses a layout system in `layout/`:
 ### Important Cursor Rules
 
 **UI Migration Rules (.cursor/rules/ui-migration-rules.mdc):**
-- Never use Material-UI, emotion, dayjs, or react-icons
+- Never use Material-UI, emotion, or react-icons
 - Always use shadcn/ui, Tailwind CSS, date-fns, and Lucide React
 - Use React Hook Form + Zod for all forms
 

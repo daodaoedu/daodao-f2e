@@ -1,5 +1,5 @@
 import { z } from "zod";
-import dayjs from "dayjs";
+import { isValid, differenceInDays } from "date-fns";
 import { projectTaskSchema } from "../tasks";
 
 export const projectMilestoneSchema = z.object({
@@ -17,13 +17,13 @@ export const projectMilestoneSchema = z.object({
   startDate: z
     .string()
     .optional()
-    .refine((val) => val !== undefined && dayjs(val).isValid(), {
+    .refine((val) => val !== undefined && isValid(new Date(val)), {
       message: "請輸入有效的日期",
     }),
   endDate: z
     .string()
     .optional()
-    .refine((val) => val !== undefined && dayjs(val).isValid(), {
+    .refine((val) => val !== undefined && isValid(new Date(val)), {
       message: "請輸入有效的日期",
     }),
   isCompleted: z.boolean(),
@@ -43,7 +43,7 @@ const validateDateRange = (
     });
     return;
   }
-  if (dayjs(endDate).diff(dayjs(startDate), "day") <= 0) {
+  if (differenceInDays(new Date(endDate), new Date(startDate)) <= 0) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "時間間隔不能小於 1 天",

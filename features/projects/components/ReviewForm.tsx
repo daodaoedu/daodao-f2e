@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import PostCard from '@/shared/components/Post/PostCard';
@@ -54,7 +54,7 @@ function ReviewForm({
             title={methods.watch('title')}
             subtitle={`第${numberToChineseNumber(week)}週`}
             tag="覆盤"
-            date={dayjs(createdAt).format('YYYY/MM/DD')}
+            date={createdAt ? format(new Date(createdAt), 'yyyy/MM/dd') : format(new Date(), 'yyyy/MM/dd')}
             onTitleChange={(title) => methods.setValue('title', title || projectTitle)}
             isEditable
           />

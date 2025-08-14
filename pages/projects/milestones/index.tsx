@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+
 import { getPublicProjectLayout } from '@/layout/features/getProjectLayout';
 import { useRouter } from 'next/router';
 import { Skeleton } from '@mui/material';
@@ -36,7 +36,9 @@ const ProjectMilestonesPage = () => {
           {projectId && Array.isArray(milestones) && milestones.length > 0 ? (
             milestones
               .sort((a, b) => {
-                return dayjs(a.startDate).diff(dayjs(b.startDate));
+                const aTime = a.startDate ? new Date(a.startDate).getTime() : 0;
+                const bTime = b.startDate ? new Date(b.startDate).getTime() : 0;
+                return aTime - bTime;
               })
               .map((milestone, index) => {
                 return (

@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { differenceInYears, isValid, format } from 'date-fns';
 import { useReducer, useRef, useState } from 'react';
 import { z } from 'zod';
 import { ABROAD_OPTION, AREA_DELIMITER, TAIWAN_OPTION } from '@/constants/areas';
@@ -7,7 +7,7 @@ import { userAPI } from '@/services/users';
 const initialState = {
   name: '',
   photoURL: '',
-  birthDay: dayjs(),
+  birthDay: new Date(),
   gender: '',
   roleList: [],
   wantToDoList: [],
@@ -46,10 +46,10 @@ const schema = z.object({
     .optional(),
   birthDay: z
     .any()
-    .refine((date) => dayjs(date).isValid(), {
+    .refine((date) => isValid(new Date(date)), {
       message: '請選擇您的出生日期',
     })
-    .refine((date) => dayjs().diff(date, 'year') >= 16, {
+    .refine((date) => differenceInYears(new Date(), new Date(date)) >= 16, {
       message: '您的年齡未滿16歲，目前無法於平台註冊，請詳閱島島社群條款',
     })
     .optional(),
@@ -204,7 +204,7 @@ const useEditProfile = () => {
       id,
       email,
       name,
-      birthDay: dayjs(birthDay).format('YYYY/MM/DD'),
+      birthDay: format(new Date(birthDay), 'yyyy/MM/dd'),
       gender,
       roleList,
       contactList: {

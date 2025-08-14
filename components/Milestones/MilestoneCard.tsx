@@ -12,7 +12,6 @@ import {
   ArrowRight, Check, SendHorizonal, X, Pencil,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import dayjs from 'dayjs';
 import { DateRange } from 'react-day-picker';
 import { format, toDate, isValid } from 'date-fns';
 import { cn } from '@/utils/cn';
@@ -31,8 +30,8 @@ import { getDefaultMilestone } from './Shared';
 
 interface MilestoneCardProps {
   projectId: string;
-  minDate?: dayjs.Dayjs;
-  maxDate?: dayjs.Dayjs;
+  minDate?: Date;
+  maxDate?: Date;
   milestone?: ProjectMilestoneSchema;
   milestones?: ProjectMilestoneSchema[];
   disabledChangeDate?: boolean;
@@ -107,8 +106,8 @@ function MilestoneCard(
     defaultValues: getDefaultMilestone({
       projectId,
       milestones: Array.isArray(milestones) ? milestones : [],
-      minDate: minDate || dayjs(),
-      maxDate: maxDate || dayjs(),
+      minDate: minDate || new Date(),
+      maxDate: maxDate || new Date(),
     }),
   });
 
@@ -272,8 +271,8 @@ function MilestoneCard(
             </div>
             <DateRangePicker
               value={date}
-              fromDate={minDate?.toDate()}
-              toDate={maxDate?.toDate()}
+              fromDate={minDate}
+              toDate={maxDate}
               className={cn(
                 'p-1 min-w-40 h-6 gap-1.5 body-sm text-basic-300 rounded',
                 !isEditing && 'disabled:text-basic-300'

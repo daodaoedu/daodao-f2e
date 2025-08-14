@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -140,7 +140,7 @@ function PostCardHeader({
         )}
       </div>
       <div className="flex items-center justify-between gap-2 text-basic-300 md:justify-start">
-        {date && <time>{dayjs(date).format('YYYY/MM/DD')}</time>}
+        {date && <time>{format(new Date(date), 'yyyy/MM/dd')}</time>}
         <div className="flex items-center gap-2">
           {typeof viewCount === 'number' && (
             <div className="flex items-center gap-0.5">

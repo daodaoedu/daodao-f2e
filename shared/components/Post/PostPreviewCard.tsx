@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import PostCard from '@/shared/components/Post/PostCard';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
@@ -63,7 +63,7 @@ function PostPreviewCard<T extends BasePostData>({
         title={data.title}
         subtitle={data.week !== undefined ? `第${numberToChineseNumber(data.week)}週` : ''}
         tag={tag}
-        date={dayjs(data.date).format('YYYY/MM/DD')}
+        date={data.date ? format(new Date(data.date), 'yyyy/MM/dd') : undefined}
         dropdownItems={dropdownItems}
       />
       {renderContent(data)}

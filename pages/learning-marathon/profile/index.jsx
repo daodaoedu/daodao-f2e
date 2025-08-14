@@ -7,7 +7,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import EastIcon from '@mui/icons-material/East';
 import { BASE_URL } from "@/constants/common";
 import { cn } from '@/utils/cn';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import { ISOToWeekday } from '@/components/Marathon/SignUp/dateMap';
 import { EDUCATION, ROLE } from '@/constants/member';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
@@ -244,8 +244,8 @@ const LearningMarathonProfile = () => {
           if (result.milestones.length === biweeklyMilestonesLength) {
             setFrequency('每兩週');
           }
-          setStartDate(dayjs(result.milestones[0].startDate).format('YYYY-MM-DD'));
-          setEndDate(dayjs(result.milestones.at(-1).endDate).format('YYYY-MM-DD'));
+                  setStartDate(format(new Date(result.milestones[0].startDate), 'yyyy-MM-dd'));
+        setEndDate(format(new Date(result.milestones.at(-1).endDate), 'yyyy-MM-dd'));
           setLoadingMarathon(false);
         } catch (error) {
           console.error('error fetching data', error);
@@ -470,7 +470,7 @@ const LearningMarathonProfile = () => {
                   } else {
                     weeks = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十', '二十一', '二十二'];
                   }
-                  const key = dayjs(milestone.startDate).format('YYYY/MM/DD');
+                  const key = format(new Date(milestone.startDate), 'yyyy/MM/dd');
                   return (
                     <div
                       key={key}
@@ -481,7 +481,7 @@ const LearningMarathonProfile = () => {
                           <span className="font-sans body-sm">第{weeks[index]}週</span>
                         </div>
                         <div className="flex flex-row items-center gap-1 pr-1">
-                          <p className="text-basic-300">{dayjs(milestone.startDate).format('YYYY/MM/DD')}</p>
+                          <p className="text-basic-300">{format(new Date(milestone.startDate), 'yyyy/MM/dd')}</p>
                           <EastIcon
                             className="text-basic-300"
                             sx={{
@@ -489,7 +489,7 @@ const LearningMarathonProfile = () => {
                               height: '16px'
                             }}
                           />
-                          <p className="text-basic-300">{dayjs(milestone.endDate).format('YYYY/MM/DD')}</p>
+                          <p className="text-basic-300">{format(new Date(milestone.endDate), 'yyyy/MM/dd')}</p>
                         </div>
                       </div>
                       <div className="w-full py-3 px-4 rounded-lg bg-white border border-solid border-basic-200 box-sizing ">{milestone.name}</div>

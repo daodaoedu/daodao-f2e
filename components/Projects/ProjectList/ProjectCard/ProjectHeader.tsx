@@ -1,5 +1,5 @@
 import { Project as ProjectType } from '@/components/Projects/Project/type';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -17,7 +17,7 @@ const ProjectHeader = ({ project }: ProjectHeaderProps) => (
     </h3>
     <div className="ml-auto flex flex-row items-center justify-start gap-2">
       <span className="font-sans text-sm leading-normal text-basic-300">
-        {dayjs(project.updatedAt).format('YYYY/MM/DD')}
+        {format(new Date(project.updatedAt), 'yyyy/MM/dd')}
       </span>
 
       {/* <span className="flex flex-row items-center justify-start gap-1

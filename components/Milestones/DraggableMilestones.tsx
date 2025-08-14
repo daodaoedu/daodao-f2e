@@ -1,12 +1,11 @@
 import { memo, useCallback, useMemo } from 'react';
 import { DndContext, DragOverlay, closestCenter } from '@dnd-kit/core';
-import { toDate } from 'date-fns';
+import { toDate, addDays, differenceInCalendarDays } from 'date-fns';
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import dayjs from 'dayjs';
 import { useDialog } from '@/contexts/Dialog';
 import {
   ProjectMilestoneSchema,
@@ -26,8 +25,8 @@ const MemoMilestoneItem = memo(MilestoneItem);
 interface DraggableMilestonesProps {
   milestones: ProjectMilestoneSchema[];
   projectId: string;
-  minDate?: dayjs.Dayjs;
-  maxDate?: dayjs.Dayjs;
+  minDate?: Date;
+  maxDate?: Date;
   isEditable?: boolean;
   isAscending?: boolean;
   onRefreshData?: () => void;
@@ -59,20 +58,19 @@ const DraggableMilestones = ({
       oldIndex: number,
       newIndex: number
     ) => {
-      const dayDiff = dayjs(_overItem.startDate).diff(
-        dayjs(_activeItem.startDate),
-        'day'
+      const dayDiff = differenceInCalendarDays(
+        new Date(_overItem.startDate || new Date()),
+        new Date(_activeItem.startDate || new Date())
       );
       const isDown = dayDiff === 0 ? newIndex > oldIndex : dayDiff > 0;
       const positionOffset = isAscending ? 1 : -1;
 
+      const newStart = addDays(new Date(_activeItem.startDate || new Date()), dayDiff);
+      const newEnd = addDays(new Date(_activeItem.endDate || new Date()), dayDiff);
+
       return {
-        startDate: dayjs(_activeItem.startDate)
-          .add(dayDiff, 'day')
-          .format('YYYY/MM/DD'),
-        endDate: dayjs(_activeItem.endDate)
-          .add(dayDiff, 'day')
-          .format('YYYY/MM/DD'),
+        startDate: `${newStart.getFullYear()}/${String(newStart.getMonth() + 1).padStart(2, '0')}/${String(newStart.getDate()).padStart(2, '0')}`,
+        endDate: `${newEnd.getFullYear()}/${String(newEnd.getMonth() + 1).padStart(2, '0')}/${String(newEnd.getDate()).padStart(2, '0')}`,
         position: isDown
           ? _overItem.position + positionOffset
           : _overItem.position - positionOffset,

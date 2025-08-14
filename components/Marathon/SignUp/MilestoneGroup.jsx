@@ -7,10 +7,8 @@ import {
   MenuItem,
   Typography,
 } from '@mui/material';
-import dayjs from 'dayjs';
-import { DatePicker } from '@mui/x-date-pickers';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { addWeeks, addDays, format } from 'date-fns';
+import { DatePicker } from '@/components/ui/date-picker';
 import { StyledGroup } from './Edit.styled';
 import MilestonePanel from './MilestonePanel';
 import ErrorMessage from './ErrorMessage';
@@ -46,7 +44,7 @@ export default function MilestoneGroup({
 }) {
   const eventWeekRange = 22;
   const [startDate, setStartDate] = useState('2025-02-09');
-  const [/** endDate */, setEndDate] = useState(dayjs(startDate).add('22', 'week'));
+  const [/** endDate */, setEndDate] = useState(addWeeks(new Date(startDate), 22));
   const [frequency, setFrequency] = useState('biweekly');
 
   function arabicToChinese(num) {
@@ -82,8 +80,8 @@ export default function MilestoneGroup({
     const mode = defaultMilestones.length ? 'modify' : 'create';
 
     for (let i = 0; i < milestoneLength; i += 1) {
-      const start = dayjs(dateToStart).add(i * interval, 'day');
-      const end = start.add(interval - 1, 'day');
+      const start = addDays(new Date(dateToStart), i * interval);
+      const end = addDays(start, interval - 1);
       const existingMilestone = defaultMilestones[i] || {};
       const newSubMilestones = (mode === 'create') ? [] : existingMilestone.subMilestones || [];
 
@@ -91,8 +89,8 @@ export default function MilestoneGroup({
         ...existingMilestone,
         _tempId: existingMilestone._tempId || `temp_${uuidv4()}`,
         name: existingMilestone.name || '',
-        startDate: start.format('YYYY-MM-DD'),
-        endDate: end.format('YYYY-MM-DD'),
+        startDate: format(start, 'yyyy-MM-dd'),
+        endDate: format(end, 'yyyy-MM-dd'),
         subMilestones: newSubMilestones,
       });
     }
@@ -107,7 +105,7 @@ export default function MilestoneGroup({
   };
 
   const handleEndDate = (/** fakeDate */) => {
-    const eventEndDate = dayjs(startDate).add(eventWeekRange, 'week');
+    const eventEndDate = addWeeks(new Date(startDate), eventWeekRange);
     setEndDate(eventEndDate);
   };
 
@@ -147,90 +145,66 @@ export default function MilestoneGroup({
         請依據時間與精力設定里程碑（入選後時程表須包含每兩週需繳交的學習任務）
       </Typography>
       <Box sx={{ padding: '8px 0', width: '100%' }}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <StyledGroup>
-            <StyledDateSection>
+        <StyledGroup>
+          <StyledDateSection>
+            <div className="startDate">
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                開始日期
+              </Typography>
               <DatePicker
-                className="startDate"
-                label="開始日期"
-                value="2025-02-09"
-                inputFormat="YYYY-MM-DD"
+                value={new Date('2025-02-09')}
                 disabled
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    sx={{
-                      height: '50px',
-                      '& .MuiInputBase-root': {
-                        height: '100%',
-                      },
-                    }}
-                  />
-                )}
+                placeholder="2025/02/09"
+                className="w-full h-12"
               />
+            </div>
 
+            <div className="endDate">
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                結束日期
+              </Typography>
               <DatePicker
-                className="endDate"
-                label="結束日期"
-                value="2025-07-12"
-                inputFormat="YYYY-MM-DD"
+                value={new Date('2025-07-12')}
                 disabled
-                onChange={handleEndDate}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    sx={{
-                      height: '50px',
-                      '& .MuiInputBase-root': {
-                        height: '100%',
-                      },
-                      '& .MuiFormHelperText-root': {
-                        marginTop: '4px',
-                      },
-                    }}
-                  />
-                )}
+                placeholder="2025/07/12"
+                className="w-full h-12"
               />
-              <TextField
-                className="frequency"
-                select
-                label="頻率"
-                defaultValue="weekly"
-                value={frequency}
-                onChange={handleFrequency}
-                variant="outlined"
-                fullWidth
-                disabled={isDisabled}
-                sx={{
-                  height: '50px',
-                  '& .MuiInputBase-root': {
-                    height: '100%',
-                  },
-                }}
-              >
-                <MenuItem value="weekly">每週</MenuItem>
-                <MenuItem value="biweekly">每兩週</MenuItem>
-              </TextField>
-            </StyledDateSection>
-          </StyledGroup>
+            </div>
+
+            <TextField
+              className="frequency"
+              select
+              label="頻率"
+              defaultValue="weekly"
+              value={frequency}
+              onChange={handleFrequency}
+              variant="outlined"
+              fullWidth
+              disabled={isDisabled}
+              sx={{
+                height: '50px',
+                '& .MuiInputBase-root': {
+                  height: '100%',
+                },
+              }}
+            >
+              <MenuItem value="weekly">每週</MenuItem>
+              <MenuItem value="biweekly">每兩週</MenuItem>
+            </TextField>
+          </StyledDateSection>
+        </StyledGroup>
           <StyledGroup>
             {milestones.map((milestone, i) => {
               const interval = frequency === 'biweekly' ? 14 : 7;
-              const taskStartDate = dayjs('2025-02-9').add(i * interval, 'day');
-              const taskEndDate = taskStartDate.add(interval - 1, 'day');
+              const taskStartDate = addDays(new Date('2025-02-09'), i * interval);
+              const taskEndDate = addDays(taskStartDate, interval - 1);
               const weekNumber = frequency === 'biweekly' ? arabicToChinese(i * 2 + 1) : arabicToChinese(i + 1);
               return (
                 <MilestonePanel
                   key={milestone._tempId || uuidv4()}
                   milestone={milestone}
-                  startDate={taskStartDate.format('YYYY/MM/DD')}
-                  endDate={taskEndDate.format('YYYY/MM/DD')}
+                  startDate={format(taskStartDate, 'yyyy/MM/dd')}
+                  endDate={format(taskEndDate, 'yyyy/MM/dd')}
                   weekNumber={`第${weekNumber}週`}
                   onChange={updateMilestone || null}
                   isDisabled={isDisabled}
@@ -238,7 +212,7 @@ export default function MilestoneGroup({
               );
             })}
           </StyledGroup>
-        </LocalizationProvider>
+
         <ErrorMessage
           errText={errorMessage || null}
         />

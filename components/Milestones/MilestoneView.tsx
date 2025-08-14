@@ -1,5 +1,5 @@
 import { ArrowRight } from 'lucide-react';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import { cn } from '@/utils/cn';
 import { Milestone } from '@/contexts/Milestones/type';
 
@@ -24,14 +24,14 @@ const MilestoneView = ({ index, milestone }: MilestoneViewProps) => (
       >
         <p>
           {milestone.startDate
-            ? dayjs(milestone.startDate).format('YYYY/MM/DD')
-            : dayjs().format('YYYY/MM/DD')}
+            ? format(new Date(milestone.startDate), 'yyyy/MM/dd')
+            : format(new Date(), 'yyyy/MM/dd')}
         </p>
         <ArrowRight className="text-basic-300" />
         <p>
           {milestone.endDate
-            ? dayjs(milestone.endDate).format('YYYY/MM/DD')
-            : dayjs().format('YYYY/MM/DD')}
+            ? format(new Date(milestone.endDate), 'yyyy/MM/dd')
+            : format(new Date(), 'yyyy/MM/dd')}
         </p>
       </div>
     </div>

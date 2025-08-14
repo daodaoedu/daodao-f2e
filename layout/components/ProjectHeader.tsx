@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import toast from 'react-hot-toast';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import { LockKeyholeOpen, LockKeyhole, EllipsisVertical } from 'lucide-react';
 import { ROLE } from '@/constants/member';
 import { ProjectSchema } from '@/services/projects';
@@ -31,7 +31,7 @@ export default function ProjectHeader({ project }: ProjectHeaderProps) {
           {project?.title || '學習計畫主題名稱'}
         </h1>
         <div className="flex items-center justify-between gap-2 text-basic-300 lg:justify-end">
-          <time>{dayjs(project?.updatedDate).format('YYYY/MM/DD')}</time>
+          <time>{project?.updatedDate ? format(new Date(project.updatedDate), 'yyyy/MM/dd') : ''}</time>
           <div className="flex items-center gap-2">
             {/* <div className="flex items-center gap-0.5">
           <AiOutlineEye />

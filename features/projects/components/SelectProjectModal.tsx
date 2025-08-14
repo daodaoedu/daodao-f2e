@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import { ProjectSchema, useMyProjects } from '@/services/projects';
 import { Button } from '@/components/ui/button';
 import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
@@ -79,7 +79,7 @@ export default function SelectProjectModal({
                   {project.title}
                 </div>
                 <time className="body-sm text-basic-300">
-                  {dayjs(project.createdDate).format('YYYY/MM/DD')}
+                  {project.createdDate ? format(new Date(project.createdDate), 'yyyy/MM/dd') : ''}
                 </time>
               </Button>
             ))}

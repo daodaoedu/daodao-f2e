@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Box, Tooltip } from '@mui/material';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 
 const CardWrapper = styled.li`
   position: relative;
@@ -57,7 +57,7 @@ const Card = ({ id, message = '', date }) => (
       >
         {/* {title} */}
         時間：
-        {dayjs(date).format('YYYY/MM/DD')}
+        {format(new Date(date), 'yyyy/MM/dd')}
       </Box>
       <ContentWrapper>{message}</ContentWrapper>
       {/* <Typography sx={{ color: "#16b9b3" }}>{message}</Typography> */}

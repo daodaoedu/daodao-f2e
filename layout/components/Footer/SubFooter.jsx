@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import dayjs from 'dayjs';
+import { getYear } from 'date-fns';
 
 const SubFooterWrapper = styled.div`
   background-color: #536166;
@@ -16,7 +16,7 @@ const SubFooterWrapper = styled.div`
 `;
 
 const SubFooter = () => {
-  const year = dayjs().get('year');
+  const year = getYear(new Date());
   return (
     <SubFooterWrapper>
       Tomorrow will be fine. 島島阿學 ©

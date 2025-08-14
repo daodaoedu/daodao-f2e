@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   TAIWAN_DISTRICT, COUNTRIES, AREA_DELIMITER, TAIWAN_OPTION,
 } from '@/constants/areas';
-import dayjs from 'dayjs';
+import { subYears } from 'date-fns';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -25,7 +25,7 @@ import {
   Grid,
 } from '@mui/material';
 
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import { DatePicker } from '@/components/ui/date-picker';
 import { useMarathonByUserEvent } from '@/services/marathons';
 import useEditProfile from './useEditProfile';
 import ErrorMessage from './ErrorMessage';
@@ -119,7 +119,7 @@ export default function UserProfileForm({
           onChangeHandler({ key: 'discord', value: discord || '' });
           onChangeHandler({ key: 'line', value: line || '' });
         } else if (key === 'birthDay') {
-          const parsedDate = dayjs(value);
+          const parsedDate = new Date(value);
           onChangeHandler({ key: 'birthDay', value: parsedDate });
         } else if (key === 'location') {
           onChangeHandler({ key, value });
@@ -195,23 +195,21 @@ export default function UserProfileForm({
           />
           <StyledGroup>
             <Typography fontWeight="500">生日 *</Typography>
-            <MobileDatePicker
-              inputFormat="YYYY/MM/DD"
-              value={userState.birthDay}
-              onChange={(date) => onChangeHandler({ key: 'birthDay', value: date })}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  ref={(element) => setRef('birthDay', element)}
-                  sx={{ width: '100%' }}
-                  label=""
-                  error={!!errors.birthDay}
-                  helperText={errors.birthDay ? errors.birthDay : ''}
-                />
+            <div ref={(element) => setRef('birthDay', element)}>
+              <DatePicker
+                value={userState.birthDay}
+                onChange={(date) => onChangeHandler({ key: 'birthDay', value: date })}
+                toDate={subYears(new Date(), 16)}
+                captionLayout="dropdown-buttons"
+                className="w-full"
+                placeholder="選擇生日"
+              />
+              {errors.birthDay && (
+                <Typography variant="body2" color="error" sx={{ mt: 0.5 }}>
+                  {errors.birthDay}
+                </Typography>
               )}
-              maxDate={dayjs().subtract(16, 'year')}
-              defaultCalendarMonth={dayjs().subtract(18, 'year')}
-            />
+            </div>
           </StyledGroup>
           <StyledGroup>
             <Typography fontWeight="500">性別 *</Typography>

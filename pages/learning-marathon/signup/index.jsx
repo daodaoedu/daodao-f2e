@@ -2,8 +2,7 @@ import { useMemo, useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
 
 import SEOConfig from '@/components/SEOConfig';
 
@@ -102,20 +101,16 @@ const LearningMarathonSignUp = () => {
           background: 'linear-gradient(0deg, #F3FCFC 0%, #F3FCFC 100%), #F7F8FA'
         }}
         >
-          <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-          >
-            <ContentWrapper sx={{ minHeight: '100vh' }}>
-              {
-                currentStep === 0 ? (
-                  <UserProfileForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
-                ) : currentStep === 1 ? (
-                  <MarathonForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
-                ) : <ConfirmForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
-              }
+          <ContentWrapper sx={{ minHeight: '100vh' }}>
+            {
+              currentStep === 0 ? (
+                <UserProfileForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
+              ) : currentStep === 1 ? (
+                <MarathonForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
+              ) : <ConfirmForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
+            }
 
-            </ContentWrapper>
-          </LocalizationProvider>
+          </ContentWrapper>
         </FormWrapper>
       </ProtectedComponent>
     </>

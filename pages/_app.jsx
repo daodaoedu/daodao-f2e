@@ -1,10 +1,8 @@
 import { z } from 'zod';
 import React, { useEffect, useMemo } from 'react';
 import { SWRConfig } from 'swr';
-import dayjs from 'dayjs';
-import isBetween from 'dayjs/plugin/isBetween';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+
+
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
@@ -24,10 +22,6 @@ import { useCompleteInfoReminder, useVerifiedSuccessDialog } from '@/features/us
 import { initGA, logPageView } from '../utils/analytics';
 import 'regenerator-runtime/runtime'; // Speech.js
 import "@/shared/styles/global.css";
-import 'dayjs/locale/zh-tw';
-
-dayjs.locale('zh-tw');
-dayjs.extend(isBetween);
 
 const swrConfig = {
   revalidateOnFocus: false,
@@ -156,15 +150,13 @@ const App = ({ Component, pageProps }) => {
         <link rel="manifest" href="/manifest.json" />
       </Head>
 
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
-        <SWRConfig value={swrConfig}>
-          <DialogProvider>
-            <AuthProvider>
-              <ThemeComponentWrap pageProps={pageProps} Component={Component} />
-            </AuthProvider>
-          </DialogProvider>
-        </SWRConfig>
-      </LocalizationProvider>
+      <SWRConfig value={swrConfig}>
+        <DialogProvider>
+          <AuthProvider>
+            <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+          </AuthProvider>
+        </DialogProvider>
+      </SWRConfig>
     </>
   );
 };

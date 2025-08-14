@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
+import { subYears } from 'date-fns';
 import toast from 'react-hot-toast';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRouter } from 'next/router';
@@ -23,9 +23,7 @@ import {
   Grid,
 } from '@mui/material';
 
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@/components/ui/date-picker';
 import TagEditor from '@/shared/components/TagEditor';
 import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import { useTags } from '@/services/tags';
@@ -80,7 +78,7 @@ function EditPage() {
           onChangeHandler({ key: 'discord', value: discord || '' });
           onChangeHandler({ key: 'line', value: line || '' });
         } else if (key === 'birthDay') {
-          const parsedDate = dayjs(value);
+          const parsedDate = new Date(value);
           onChangeHandler({ key: 'birthDay', value: parsedDate });
         } else if (key === 'location') {
           onChangeHandler({ key, value });
@@ -120,14 +118,12 @@ function EditPage() {
   }, [userState, isComplete]);
 
   return (
-    <FormWrapper>
-      <LocalizationProvider
-        dateAdapter={AdapterDayjs}
-        sx={{
-          background: 'linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa',
-        }}
-      >
-        <ContentWrapper sx={{ minHeight: '100vh' }}>
+    <FormWrapper
+      sx={{
+        background: 'linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa',
+      }}
+          >
+      <ContentWrapper sx={{ minHeight: '100vh' }}>
           <StyledTitleWrap
             sx={{
               border:
@@ -157,23 +153,21 @@ function EditPage() {
               />
               <StyledGroup>
                 <Typography fontWeight="500">生日 *</Typography>
-                <MobileDatePicker
-                  inputFormat="YYYY/MM/DD"
-                  value={userState.birthDay}
-                  onChange={(date) => onChangeHandler({ key: 'birthDay', value: date })}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      ref={(element) => setRef('birthDay', element)}
-                      sx={{ width: '100%' }}
-                      label=""
-                      error={!!errors.birthDay}
-                      helperText={errors.birthDay ? errors.birthDay : ''}
-                    />
+                <div ref={(element) => setRef('birthDay', element)}>
+                  <DatePicker
+                    value={userState.birthDay}
+                    onChange={(date) => onChangeHandler({ key: 'birthDay', value: date })}
+                    toDate={subYears(new Date(), 16)}
+                    captionLayout="dropdown-buttons"
+                    className="w-full"
+                    placeholder="選擇生日"
+                  />
+                  {errors.birthDay && (
+                    <Typography variant="body2" color="error" sx={{ mt: 0.5 }}>
+                      {errors.birthDay}
+                    </Typography>
                   )}
-                  maxDate={dayjs().subtract(16, 'year')}
-                  defaultCalendarMonth={dayjs().subtract(18, 'year')}
-                />
+                </div>
               </StyledGroup>
               <StyledGroup>
                 <Typography fontWeight="500">性別 *</Typography>
@@ -513,7 +507,6 @@ function EditPage() {
             </StyledButton>
           </StyledButtonGroup>
         </ContentWrapper>
-      </LocalizationProvider>
     </FormWrapper>
   );
 }

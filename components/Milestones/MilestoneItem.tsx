@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import dayjs from 'dayjs';
 import { Plus } from 'lucide-react';
 import {
   ProjectMilestoneSchema,
@@ -19,8 +18,8 @@ import DraggableTasks from '../Tasks/DraggableTasks';
 
 interface MilestoneItemProps {
   projectId: string;
-  minDate?: dayjs.Dayjs;
-  maxDate?: dayjs.Dayjs;
+  minDate?: Date;
+  maxDate?: Date;
   isEditable?: boolean;
   milestone: ProjectMilestoneSchema;
   milestones: ProjectMilestoneSchema[];
