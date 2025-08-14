@@ -11,7 +11,6 @@ import SEOConfig from '@/components/SEOConfig';
 import MyGroup from '@/components/PersonalCard/MyGroup';
 import MyResource from '@/components/PersonalCard/MyResource';
 import MyNote from '@/components/PersonalCard/MyNote';
-import MyMarathon from '@/components/PersonalCard/MyMarathon';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import getEnv from '@/utils/env';
 
@@ -83,11 +82,6 @@ const PersonalCardPage = () => {
       tabLabel: '我的便利貼',
       view: <MyNote title="我的便利貼" userId={user?._id} />,
     },
-    {
-      id: 'my-marathon',
-      tabLabel: '我的學習馬拉松',
-      view: <MyMarathon title="我的學習馬拉松" userId={user?._id} />
-    }
   ];
 
   const [value, setValue] = useState(() => {
