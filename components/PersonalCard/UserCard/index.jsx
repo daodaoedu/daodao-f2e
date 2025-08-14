@@ -2,8 +2,7 @@ import { BASE_URL } from '@/constants/common';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import { Box, Button } from '@mui/material';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { MapPin, Edit } from 'lucide-react';
 import DropdownMenu from './Dropdown';
 import SocialMediaItem from './SocialMediaItem';
 import AvatorComponent from './Avator';
@@ -59,7 +58,7 @@ function UserCard({
             router.push('/personal-card');
           }}
         >
-          <EditOutlinedIcon sx={{ color: '#16B9B3' }} />
+          <Edit color="#16B9B3" />
           編輯
         </Button>
       ) : (
@@ -78,7 +77,7 @@ function UserCard({
           </StyledProfileTitle>
 
           <StyledProfileLocation>
-            <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />
+            <MapPin style={{ marginRight: '10px' }} />
             {location
               ? location.length >= 2
                 ? locations.join('').replace('台灣', '').replaceAll('null', '')
@@ -123,21 +122,25 @@ function UserCard({
               text={contactList.facebook}
             />
           )}
-          {!!contactList.line && (
-            <li>
-              <p>{contactList.line}</p>
-            </li>
+          {!!contactList.linkedin && (
+            <SocialMediaItem
+              tag="li"
+              link={`https://www.linkedin.com/in/${contactList.linkedin}`}
+              text={contactList.linkedin}
+            />
           )}
-          {!!contactList.discord && (
-            <li>
-              <p>{contactList.discord}</p>
-            </li>
+          {!!contactList.github && (
+            <SocialMediaItem
+              tag="li"
+              link={`https://github.com/${contactList.github}`}
+              text={contactList.github}
+            />
           )}
         </StyledProfileSocial>
+
         <StyledProfileDate>
-          {updatedDate
-            ? moment(updatedDate).fromNow()
-            : moment(new Date() - 500 * 60 * 60).fromNow()}
+          更新日期：
+          {moment(updatedDate).format('YYYY/MM/DD')}
         </StyledProfileDate>
       </StyledProfileOther>
     </StyledProfileWrapper>

@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Menu from '@mui/material/Menu';
 import IconButton from '@mui/material/IconButton';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
+import { MapPin, EllipsisVertical } from 'lucide-react';
 import Image from '@/shared/components/Image';
 import { useAuth } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
@@ -95,7 +94,7 @@ function GroupCard({
             />
           </StyledText>
           <StyledAreas>
-            <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />
+            <MapPin size={16} color="#536166" />
             <StyledText>{formatToString(area, '待討論')}</StyledText>
           </StyledAreas>
           <StyledFooter>
@@ -108,7 +107,7 @@ function GroupCard({
               )}
               {isEnabledMutation && (
                 <IconButton size="small" onClick={handleMenu}>
-                  <MoreVertOutlinedIcon />
+                  <EllipsisVertical />
                 </IconButton>
               )}
             </StyledFlex>

@@ -3,8 +3,7 @@ import styled from '@emotion/styled';
 import {
   Box, Button, Menu, MenuItem,
 } from '@mui/material';
-import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
-import Icon from '@mui/material/Icon';
+import { EllipsisVertical } from 'lucide-react';
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -58,7 +57,7 @@ export default function Dropdown({ sx }) {
           borderRadius: '100%',
         }}
       >
-        <Icon color="#536166" component={MoreVertRoundedIcon} />
+        <EllipsisVertical />
       </Button>
       <StyledMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <MenuItem

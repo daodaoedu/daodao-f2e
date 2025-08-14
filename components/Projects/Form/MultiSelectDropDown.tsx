@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 interface MultiSelectDropdownProps {
@@ -57,7 +57,7 @@ export default function MultiSelectDropdown({
 }
         </span>
 
-        <KeyboardArrowDownIcon />
+        <ChevronDown />
       </button>
 
       {open && (

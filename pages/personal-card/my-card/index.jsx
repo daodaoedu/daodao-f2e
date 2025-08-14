@@ -1,6 +1,10 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/Auth';
-import PersonalCard from '@/components/PersonalCard';
+
+const PersonalCard = dynamic(() => import('@/components/PersonalCard'), {
+  ssr: false,
+});
 
 const MyCardPage = () => {
   const { user } = useAuth();

@@ -1,9 +1,8 @@
 import z from 'zod';
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { Pencil, Check } from 'lucide-react';
 import { MOTIVATION_MAP, STRATEGY_MAP, OUTCOME_MAP } from '@/constants/project';
-import { Check } from 'lucide-react';
 
 const idSchema = z.string().regex(/^[0-9a-fA-F]{24}$/);
 export const validateIdWithZod = (id: string) => {
@@ -132,7 +131,7 @@ export const EditFormButton = ({ onClick }: { onClick: () => void }) => {
       variant="outline"
       className="flex shrink-0 items-center gap-[5px] py-1"
     >
-      <EditOutlinedIcon className="max-w-5" />
+      <Pencil className="max-w-5" />
       編輯
     </Button>
   );

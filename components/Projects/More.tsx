@@ -2,7 +2,7 @@ import { useState } from 'react';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
+import { EllipsisVertical } from 'lucide-react';
 
 interface MoreProps {
   projectId: string;
@@ -25,7 +25,7 @@ export default function More({ projectId }: MoreProps) {
         classes={{ root: 'block p-0 absolute top-0 right-0' }}
         onClick={handleMenu}
       >
-        <MoreVertOutlinedIcon />
+        <EllipsisVertical />
       </IconButton>
       <Menu
         anchorEl={anchorEl}

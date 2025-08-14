@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import EastIcon from '@mui/icons-material/East';
+import { ArrowRight } from 'lucide-react';
 import Image from '@/shared/components/Image';
 import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
 import { cn } from '@/utils/cn';
@@ -254,7 +254,7 @@ const Mentors = () => {
                       </div>
                       <div className="flex items-center justify-end gap-1 bg-white px-3 py-2 text-gray-400 group-hover:text-primary-base">
                         more
-                        <EastIcon className="!text-[16px]" />
+                        <ArrowRight className="!text-[16px]" />
                       </div>
                     </div>
                   </MentorCard>

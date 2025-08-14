@@ -7,7 +7,7 @@ import {
 import moment from 'moment';
 import { mapToTable } from '@/utils/helper';
 import { AREA_DELIMITER, TAIWAN_OPTION, AREAS } from '@/constants/areas';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import { MapPin } from 'lucide-react';
 import PartnerCardAvator from './PartnerCardAvator';
 import PartnerCardDescription from './PartnerCardDescription';
 import PartnerCardTag from './PartnerCardTag';
@@ -71,7 +71,7 @@ function PartnerCard({
             <FlexAlignCenter>
               {locations && (
                 <>
-                  <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />
+                  <MapPin style={{ marginRight: '10px' }} />
                   {location
                     ? location.length >= 2
                       ? locations
@@ -79,15 +79,13 @@ function PartnerCard({
                         .replace(TAIWAN_OPTION.value, '')
                         .replace('null', '')
                       : locations.join('')
-                    : '-'}
+                    : '未提供'}
                 </>
               )}
             </FlexAlignCenter>
           </StyledTypoCaption>
-          <StyledTypoCaption fontWeight={300}>
-            {updatedDate
-              ? moment(updatedDate).fromNow()
-              : moment(new Date() - 500 * 60 * 60).fromNow()}
+          <StyledTypoCaption>
+            {moment(updatedDate).format('YYYY/MM/DD')}
           </StyledTypoCaption>
         </FlexSBAlignCenter>
       </StyledCardContainer>

@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import {
   TextField, Box, Typography, Icon,
 } from '@mui/material';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import { X } from 'lucide-react';
 import { forwardRef } from 'react';
 
 const Tag = ({ label, onCancel }) => (
@@ -32,7 +32,7 @@ const Tag = ({ label, onCancel }) => (
     </Typography>
     <Icon
       sx={{ cursor: 'pointer', fontSize: '12px' }}
-      component={CloseOutlinedIcon}
+      component={X}
       onClick={onCancel}
     />
   </Box>

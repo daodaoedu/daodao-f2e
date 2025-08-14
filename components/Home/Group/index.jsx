@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import { Button, Typography } from '@mui/material';
-import { FacebookRounded } from '@mui/icons-material';
+import { Facebook } from 'lucide-react';
 import { useRouter } from 'next/router';
 import WramModal from '../../../shared/components/WarmModal';
 
@@ -80,11 +80,6 @@ const Group = () => {
               我們認為社群即資源、支援，讓學習者在民主教育的社群中，以共好的概念，解決彼此學習的問題，支持彼此成為自己想成為的人。
             </Typography>
           </Box>
-          <Box sx={{ margin: '10px 0' }}>
-            <Typography variant="p" sx={{ fontWeight: '500' }}>
-              社群中有許多有愛的島友即時地分享各種學習資源唷！快加入吧！
-            </Typography>
-          </Box>
           <Box
             sx={{
               margin: '20px 0 10px 0',
@@ -98,7 +93,7 @@ const Group = () => {
               onClick={() => router.push('/join')}
               sx={{ margin: '0 10px' }}
             >
-              <FacebookRounded sx={{ margin: '5px 0' }} />
+              <Facebook style={{ margin: '5px 0' }} />
               <Typography variant="p">加入社群</Typography>
             </Button>
             <Box>
@@ -118,11 +113,9 @@ const Group = () => {
           </Box>
         </Box>
         <img
-          // src="https://www.daoedu.tw/cdn-cgi/image/width=300,height=300,quality=80,format=webp/assets/group.gif"
-          src="/assets/group.gif"
-          width="200"
-          height="200"
-          alt="group"
+          src="/assets/circle.png"
+          alt="circle"
+          style={{ width: '400px', marginLeft: '20px' }}
         />
       </Box>
     </GroupWrapper>

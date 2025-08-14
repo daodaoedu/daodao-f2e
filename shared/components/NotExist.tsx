@@ -1,8 +1,7 @@
 import Box from '@mui/material/Box';
 import { Typography, Button, Paper } from '@mui/material';
-import { FacebookRounded } from '@mui/icons-material';
+import { Facebook } from 'lucide-react';
 import Chip from '@mui/material/Chip';
-import { COLOR_TABLE } from '@/constants/notion';
 import { CATEGORIES } from '@/constants/category';
 import RelatedResources from '@/shared/components/RelatedResources';
 
@@ -78,26 +77,7 @@ export default function NotExist() {
           </Typography>
           <Box sx={{ margin: '10px 0' }}>
             {CATEGORIES.map(({ value, label }) => (
-              <Chip
-                key={value}
-                label={label}
-                component="a"
-                href={`/resource/categories/${value}`}
-                sx={{
-                  backgroundColor: COLOR_TABLE.green,
-                  opacity: '60%',
-                  cursor: 'pointer',
-                  margin: '5px',
-                  whiteSpace: 'nowrap',
-                  fontWeight: 500,
-                  fontSize: '16px',
-                  '&:hover': {
-                    opacity: '100%',
-                    backgroundColor: COLOR_TABLE.green,
-                    transition: 'transform 0.4s',
-                  },
-                }}
-              />
+              <Chip label={label} key={value} sx={{ margin: '5px' }} />
             ))}
           </Box>
         </div>
@@ -121,7 +101,7 @@ export default function NotExist() {
             sx={{ margin: '20px 0' }}
           >
             <Button variant="outlined" component="a" href="/join">
-              <FacebookRounded sx={{ margin: '5px 0' }} />
+              <Facebook style={{ margin: '5px 0' }} />
               <Typography variant="body1">加入社群</Typography>
             </Button>
           </Box>

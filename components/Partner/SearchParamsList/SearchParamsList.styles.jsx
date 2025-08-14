@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Box, Grid, Typography } from '@mui/material';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import { X } from 'lucide-react';
 
 export const StyledGrid = styled(Grid)`
   flex-wrap: nowrap;
@@ -40,7 +40,7 @@ export const StyledTagText = styled(Typography)`
   margin-right: 2px;
 `;
 
-export const StyledClosed = styled(CloseOutlinedIcon)`
+export const StyledClosed = styled(X)`
   cursor: pointer;
   padding: 2px;
   font-size: 16px;

@@ -3,7 +3,7 @@ import {
   Box,
   Typography,
 } from '@mui/material';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { ArrowDown } from 'lucide-react';
 
 const StyledGroup = styled(Box)`
   width: 100%;
@@ -234,7 +234,7 @@ export default function Apply() {
               <div className="date">02/09</div>
               <div className="weekday"><span>日</span></div>
             </StyledDateGroup>
-            <ArrowDownwardIcon sx={{ color: '#536166' }} />
+            <ArrowDown sx={{ color: '#536166' }} />
             <StyledDateGroup>
               <div className="date">07/12</div>
               <div className="weekday"><span>六</span></div>

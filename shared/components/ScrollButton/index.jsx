@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import { ArrowDropDownCircle } from '@mui/icons-material';
+import { CircleChevronDown } from 'lucide-react';
 
 const ScrollButton = ({ isShowScrollButton, onScrollEvent, type }) => {
   if (type === 'left' && isShowScrollButton) {
@@ -26,14 +26,11 @@ const ScrollButton = ({ isShowScrollButton, onScrollEvent, type }) => {
             zIndex: -1,
           }}
         />
-        <ArrowDropDownCircle
-          color="white"
-          sx={{
-            fontSize: '40px',
-            cursor: 'pointer',
-            color: '#16b9b3',
-            zIndex: 1,
-          }}
+        <CircleChevronDown
+          size={40}
+          color="#16b9b3"
+          className="cursor-pointer"
+          style={{ zIndex: 1 }}
           onClick={onScrollEvent}
         />
       </Box>
@@ -62,14 +59,11 @@ const ScrollButton = ({ isShowScrollButton, onScrollEvent, type }) => {
             zIndex: -1,
           }}
         />
-        <ArrowDropDownCircle
-          color="white"
-          sx={{
-            fontSize: '40px',
-            cursor: 'pointer',
-            color: '#16b9b3',
-            zIndex: 1,
-          }}
+        <CircleChevronDown
+          size={40}
+          color="#16b9b3"
+          className="cursor-pointer"
+          style={{ zIndex: 1 }}
           onClick={onScrollEvent}
         />
       </Box>

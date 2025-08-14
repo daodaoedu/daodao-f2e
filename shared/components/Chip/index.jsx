@@ -1,4 +1,4 @@
-import ClearIcon from '@mui/icons-material/Clear';
+import { X } from 'lucide-react';
 import { DeletableChip, SwitchableChip } from './Styled';
 
 const Chip = ({
@@ -12,7 +12,7 @@ const Chip = ({
       value={value}
       onClick={onClick}
       onDelete={onDelete}
-      deleteIcon={onDelete && <ClearIcon />}
+      deleteIcon={onDelete && <X />}
       className={[isActive && 'isActive', onClick && 'isPointer']
         .filter(Boolean)
         .join(' ')}

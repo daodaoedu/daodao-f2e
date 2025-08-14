@@ -1,9 +1,11 @@
 import { useCallback, useState } from 'react';
 
-import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
-import CloseIcon from '@mui/icons-material/Close';
-import DownloadIcon from '@mui/icons-material/Download';
-import IosShareIcon from '@mui/icons-material/IosShare';
+import {
+  SquarePlus,
+  X,
+  Download,
+  Share,
+} from 'lucide-react';
 import { Box, IconButton, Typography } from '@mui/material';
 
 import usePwaInstallPrompt from '../../../../hooks/usePwaInstallPrompt';
@@ -23,7 +25,7 @@ export default function PwaPrompt() {
   return (
     <>
       <IconButton onClick={toDownload}>
-        <DownloadIcon />
+        <Download />
       </IconButton>
 
       <BottomDrawer onClose={() => setDrawerOpen(false)} open={drawerOpen}>
@@ -34,7 +36,7 @@ export default function PwaPrompt() {
               position: 'absolute', right: 24, top: 16, zIndex: 100,
             }}
           >
-            <CloseIcon />
+            <X />
           </IconButton>
 
           <Typography
@@ -45,9 +47,9 @@ export default function PwaPrompt() {
 
           <Typography sx={{ alignItems: 'center', display: 'flex' }}>
             Tap&ensp;
-            <IosShareIcon sx={{ color: '#007aff' }} />
+            <Share style={{ color: '#007aff' }} />
             &ensp;then &quot; Add to Home Screen&ensp;
-            <AddBoxOutlinedIcon />
+            <SquarePlus />
             &ensp;&quot;
           </Typography>
         </Box>

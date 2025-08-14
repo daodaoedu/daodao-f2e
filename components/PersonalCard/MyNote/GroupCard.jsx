@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { useRouter } from 'next/router';
 import Menu from '@mui/material/Menu';
 import IconButton from '@mui/material/IconButton';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
+import { MapPin, EllipsisVertical } from 'lucide-react';
 import Image from '@/shared/components/Image';
 import { useAuth } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
@@ -38,7 +36,6 @@ function GroupCard({
   onDeleteGroup,
 }) {
   const { user } = useAuth();
-  const router = useRouter();
   const [anchorEl, setAnchorEl] = useState(null);
   const isEnabledMutation = user?._id === userId;
 
@@ -95,49 +92,40 @@ function GroupCard({
             />
           </StyledText>
           <StyledAreas>
-            <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />
+            <MapPin size={16} color="#536166" />
             <StyledText>{formatToString(area, '待討論')}</StyledText>
           </StyledAreas>
           <StyledFooter>
             <StyledTime>{timeDuration(updatedDate)}</StyledTime>
             <StyledFlex>
-              {isGrouping ? (
-                <StyledStatus>揪團中</StyledStatus>
-              ) : (
-                <StyledStatus className="finished">已結束</StyledStatus>
+              {!!user && user?._id === userId && (
+                <StyledStatus isGrouping={isGrouping} onClick={handleGrouping}>
+                  {isGrouping ? '進行中' : '暫停中'}
+                </StyledStatus>
               )}
-              {isEnabledMutation && (
-                <IconButton size="small" onClick={handleMenu}>
-                  <MoreVertOutlinedIcon />
-                </IconButton>
+              {user?._id === userId && (
+                <>
+                  <IconButton onClick={handleMenu}>
+                    <EllipsisVertical />
+                  </IconButton>
+                  <Menu
+                    id="menu-appbar"
+                    anchorEl={anchorEl}
+                    keepMounted
+                    open={Boolean(anchorEl)}
+                    onClose={handleClose}
+                  >
+                    <StyledMenuItem onClick={handleGrouping}>
+                      {isGrouping ? '暫停進行' : '開始進行'}
+                    </StyledMenuItem>
+                    <StyledMenuItem onClick={handleDeleteGroup}>刪除筆記</StyledMenuItem>
+                  </Menu>
+                </>
               )}
             </StyledFlex>
           </StyledFooter>
         </StyledContainer>
       </StyledGroupCard>
-
-      <Menu
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        keepMounted
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <StyledMenuItem onClick={() => router.push(`/circles/${_id}/edit`)}>
-          編輯
-        </StyledMenuItem>
-        <StyledMenuItem onClick={handleGrouping}>
-          {isGrouping ? '結束揪團' : '開放揪團'}
-        </StyledMenuItem>
-        <StyledMenuItem onClick={handleDeleteGroup}>刪除</StyledMenuItem>
-      </Menu>
     </>
   );
 }

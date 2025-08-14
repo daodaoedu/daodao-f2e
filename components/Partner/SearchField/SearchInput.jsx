@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
-import SearchIcon from '@mui/icons-material/Search';
+import { Search } from 'lucide-react';
 import useSearchParamsManager from '@/hooks/useSearchParamsManager';
 
 const SearchInputWrapper = styled(Paper)`
@@ -73,7 +73,7 @@ const SearchInput = () => {
         onChange={handleChange}
       />
       <IconButtonWrapper aria-label="search" type="submit">
-        <SearchIcon />
+        <Search />
       </IconButtonWrapper>
     </SearchInputWrapper>
   );

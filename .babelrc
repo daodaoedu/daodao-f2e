@@ -21,15 +21,6 @@
         },
         "core"
       ],
-      [
-        "babel-plugin-import",
-        {
-          "libraryName": "@mui/icons-material",
-          "libraryDirectory": "",
-          "camel2DashComponentName": false
-        },
-        "icons"
-      ],
       "@emotion/babel-plugin"
     ]
   }

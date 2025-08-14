@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import CloseIcon from '@mui/icons-material/Close';
+import { X } from 'lucide-react';
 import { ROLE } from '@/constants/member';
 import TransitionSlide from './TransitionSlide';
 
@@ -79,180 +79,95 @@ function ContactPopup({
   const contactId = `contact-${id}`;
   const role = ROLE.find(({ key }) => user?.roleList?.includes(key))?.label || '暫無資料';
 
-  const handleClose = () => {
-    setMessage('');
-    setContact('');
-    onClose();
-  };
-
-  const handleSubmit = () => {
-    onSubmit({ message, contact });
-  };
-
-  const checkbox = (
-    <Checkbox size="small" onClick={() => setIsChecked((pre) => !pre)} />
-  );
-
   return (
     <Dialog
-      keepMounted
-      scroll="body"
-      fullScreen={isMobileScreen}
       open={open}
-      onClose={handleClose}
+      onClose={onClose}
+      TransitionComponent={TransitionSlide}
+      keepMounted
+      tabIndex={-1}
       aria-labelledby={titleId}
       aria-describedby={descriptionId}
-      TransitionComponent={TransitionSlide}
+      fullScreen={isMobileScreen}
       sx={{
-        '.MuiPaper-root': {
-          marginTop: isMobileScreen ? '84px' : undefined,
-        },
-      }}
-      PaperProps={{
-        sx: {
-          p: '16px 40px 32px',
-          borderRadius: '16px',
+        '& .MuiPaper-root': {
+          maxWidth: '720px',
+          width: '100%',
+          position: 'relative',
+          padding: '24px',
+          borderRadius: '20px',
         },
       }}
     >
-      <DialogTitle
-        id={titleId}
-        sx={{
-          color: '#536166',
-          fontWeight: 700,
-          fontSize: '18px',
-          textAlign: 'center',
-        }}
-      >
-        {title}
-      </DialogTitle>
-      <IconButton
-        aria-label="close"
-        onClick={handleClose}
-        sx={{
-          position: 'absolute',
-          right: 32,
-          top: 24,
-          color: '#536166',
-        }}
-      >
-        <CloseIcon />
-      </IconButton>
-      <Box
-        sx={{
-          width: isMobileScreen ? '100%' : '400px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-        }}
-      >
-        <Box
-          sx={{
-            p: '12px',
-            backgroundColor: '#DEF5F5',
-            display: 'flex',
-            borderRadius: '16px',
-            alignItems: 'center',
-            gap: '12px',
-          }}
-        >
-          <Avatar
-            src={user?.photoURL}
-            alt={`${user?.name} avatar`}
-            sx={{ width: '60px', height: '60px' }}
-          />
-          <div>
-            <Typography
-              sx={{
-                display: 'block',
-                color: ' #293A3D',
-                fontWeight: 500,
-                fontSize: '16px',
-                lineHeight: '140%',
-              }}
-            >
-              {user?.name || '名稱'}
-            </Typography>
-            <Typography
-              sx={{
-                display: 'block',
-                color: ' #536166',
-                fontWeight: 400,
-                fontSize: '14px',
-                lineHeight: '140%',
-              }}
-            >
-              {role}
-            </Typography>
+      <DialogTitle id={titleId} sx={{ p: 0, mb: 2 }}>
+        <div className="flex w-full flex-row items-center justify-between">
+          <div className="flex flex-row items-center gap-2">
+            <Avatar alt={user?.name} src={user?.photoURL} />
+            <div className="flex flex-col gap-0">
+              <span className="body-md font-bold text-basic-400">{title}</span>
+              <span className="caption text-basic-300">{role}&nbsp;{user?.name}</span>
+            </div>
           </div>
-        </Box>
+          <IconButton onClick={onClose} aria-label="close">
+            <X />
+          </IconButton>
+        </div>
+      </DialogTitle>
 
+      <div id={descriptionId} className="mb-2 w-full">
+        {desc}
+      </div>
+
+      <div className="flex w-full flex-col gap-4">
         <div>
-          <StyledTitle id={descriptionId} htmlFor={messageId}>
-            {description}
-          </StyledTitle>
+          <StyledTitle htmlFor={messageId}>訊息</StyledTitle>
           <StyledTextArea
             id={messageId}
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => setMessage(e?.target?.value)}
             placeholder={descriptionPlaceholder}
           />
         </div>
 
         <div>
-          <StyledTitle htmlFor={contactId}>聯絡資訊</StyledTitle>
+          <StyledTitle htmlFor={contactId}>聯絡方式（Email 或手機）</StyledTitle>
           <StyledTextArea
             id={contactId}
             value={contact}
-            onChange={(e) => setContact(e.target.value)}
-            placeholder="寫下您的聯絡資訊，初次聯繫建議提供「想公開的社群媒體帳號、email」即可。"
+            onChange={(e) => setContact(e?.target?.value)}
+            placeholder="請提供 Email 或手機"
           />
         </div>
 
-        <div>
-          <FormControlLabel
-            control={checkbox}
-            label={desc}
-            checked={isChecked}
-          />
-        </div>
+        <FormControlLabel
+          control={(
+            <Checkbox
+              checked={isChecked}
+              onChange={(e) => setIsChecked(!!e?.target?.checked)}
+            />
+          )}
+          label={(
+            <span>
+              我已閱讀並同意
+              <Link href="/terms/service" className="text-primary-base underline" target="_blank">使用者條款</Link>
+              與
+              <Link href="/terms/privacy" className="text-primary-base underline" target="_blank">隱私權政策</Link>
+            </span>
+          )}
+        />
 
-        <Box
-          sx={{
-            display: 'flex',
-            gap: '16px',
-          }}
-        >
+        <Box className="flex flex-row gap-2">
+          <Button variant="outlined" onClick={onClose} className="flex-1">取消</Button>
           <Button
-            color="inherit"
-            sx={{
-              flex: 1,
-              borderRadius: '20px',
-              borderColor: 'transparent',
-              boxShadow: '0 4px 10px #C4C2C166',
-            }}
-            variant="outlined"
-            disabled={isLoading}
-            onClick={handleClose}
-          >
-            取消
-          </Button>
-          <Button
-            sx={{
-              flex: 1,
-              borderRadius: '20px',
-              color: '#ffff',
-              bgcolor: '#16B9B3',
-              boxShadow: '0 4px 10px #C4C2C166',
-            }}
-            variant="contained"
-            disabled={isLoading || !message || !contact || !isChecked}
-            onClick={handleSubmit}
+            variant="default"
+            className="flex-1"
+            disabled={!message || !contact || !isChecked}
+            onClick={() => onSubmit?.(message, contact)}
           >
             送出
           </Button>
         </Box>
-      </Box>
+      </div>
     </Dialog>
   );
 }

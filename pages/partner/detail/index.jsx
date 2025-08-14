@@ -1,8 +1,12 @@
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 
-import PersonalCard from '@/components/PersonalCard';
 import { useAuth } from '@/contexts/Auth';
 import { useUser } from '@/features/users';
+
+const PersonalCard = dynamic(() => import('@/components/PersonalCard'), {
+  ssr: false,
+});
 
 const PartnerDetailPage = () => {
   const router = useRouter();

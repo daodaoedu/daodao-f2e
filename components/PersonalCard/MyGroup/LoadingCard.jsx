@@ -1,7 +1,6 @@
 import Skeleton from '@mui/material/Skeleton';
 import IconButton from '@mui/material/IconButton';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
+import { MapPin, EllipsisVertical } from 'lucide-react';
 import {
   StyledAreas,
   StyledContainer,
@@ -34,7 +33,7 @@ function LoadingCard() {
           <Skeleton width="50%" animation="wave" />
         </StyledText>
         <StyledAreas>
-          <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />
+          <MapPin size={16} color="#536166" />
           <StyledText>
             <Skeleton width={42} animation="wave" />
           </StyledText>
@@ -51,7 +50,7 @@ function LoadingCard() {
               animation="wave"
             />
             <IconButton size="small" disabled>
-              <MoreVertOutlinedIcon />
+              <EllipsisVertical />
             </IconButton>
           </StyledFlex>
         </StyledFooter>
