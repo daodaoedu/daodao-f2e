@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
 import {
   Box,
@@ -9,7 +9,6 @@ import {
   Button,
 } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
-import WramModal from '../../../shared/components/WarmModal';
 
 const LineWrapper = styled(Typography)`
   margin: 5px 0;
@@ -247,7 +246,6 @@ const Members = [
 ];
 
 const AboutTeam = () => {
-  const [open, setOpen] = useState(false);
   return (
     <Box
       sx={{
@@ -345,12 +343,11 @@ const AboutTeam = () => {
             margin: '20px 0 10px 0',
           }}
         >
-          <Button variant="outlined" onClick={() => setOpen(true)}>
+          <Button variant="outlined">
             {/* <FacebookRounded sx={{ margin: "5px 0" }} /> */}
             <Typography variant="p">❤️ 送上祝福</Typography>
           </Button>
         </Box>
-        <WramModal open={open} setOpen={setOpen} />
       </Stack>
     </Box>
   );

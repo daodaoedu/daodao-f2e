@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import { Button, Typography } from '@mui/material';
 import { Facebook } from 'lucide-react';
 import { useRouter } from 'next/router';
-import WramModal from '../../../shared/components/WarmModal';
 
 const GroupWrapper = styled.div`
   width: 90%;
@@ -21,7 +20,6 @@ const GroupWrapper = styled.div`
 
 const Group = () => {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
 
   return (
     <GroupWrapper>
@@ -99,7 +97,6 @@ const Group = () => {
             <Box>
               <Button
                 variant="outlined"
-                onClick={() => setOpen(true)}
                 sx={{
                   height: '46px',
                   margin: '0 10px',
@@ -109,7 +106,6 @@ const Group = () => {
                 <Typography variant="p">❤️ 送上祝福</Typography>
               </Button>
             </Box>
-            <WramModal open={open} setOpen={setOpen} />
           </Box>
         </Box>
         <img

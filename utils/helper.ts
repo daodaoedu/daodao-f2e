@@ -1,23 +1,11 @@
 import { z } from 'zod';
 
-export const parseToString = (input?: unknown, isEncode = true) => {
-  const schema = z
-    .string()
-    .or(z.number())
-    .or(z.boolean())
-    .transform((val) => val.toString());
+export const parseToString = (input?: unknown) => {
   try {
-    return isEncode
-      ? encodeURIComponent(schema.parse(input))
-      : schema.parse(input);
-  } catch {
-    return null;
-  }
-};
-
-export const parseToUUID = (input?: unknown) => {
-  try {
-    return z.string().uuid().parse(input);
+    return z
+      .union([z.string(), z.number(), z.boolean()])
+      .transform((val) => val.toString())
+      .parse(input);
   } catch {
     return null;
   }
@@ -26,10 +14,8 @@ export const parseToUUID = (input?: unknown) => {
 export const parseToNumber = (input?: unknown) => {
   try {
     return z
-      .number()
-      .int()
-      .or(z.string().regex(/^\d*$/))
-      .transform((val) => parseInt(val.toString(), 10))
+      .union([z.number(), z.string().transform(parseFloat)])
+      .refine((val) => !Number.isNaN(val), { message: 'Invalid number' })
       .parse(input);
   } catch {
     return null;
@@ -40,7 +26,13 @@ export const parseToArray = <T extends string | number>(
   input?: unknown
 ): T[] | null => {
   try {
-    return Array.isArray(input) ? input : [input];
+    if (Array.isArray(input)) {
+      return input;
+    }
+    if (input != null) {
+      return [input as T];
+    }
+    return null;
   } catch {
     return null;
   }
@@ -52,7 +44,8 @@ interface MapItem {
   label: string;
 }
 
-export const mapToTable = (map: MapItem[] = []) => map.reduce(
-  (acc, item) => ({ ...acc, [item.key ?? item.value]: item.label }),
-  {}
-);
+export const mapToTable = (map: MapItem[] = []) =>
+  map.reduce(
+    (acc, item) => ({ ...acc, [item.key ?? item.value]: item.label }),
+    {}
+  );

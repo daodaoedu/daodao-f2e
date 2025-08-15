@@ -3,7 +3,6 @@ import { Typography, Button, Paper } from '@mui/material';
 import { Facebook } from 'lucide-react';
 import Chip from '@mui/material/Chip';
 import { CATEGORIES } from '@/constants/category';
-import RelatedResources from '@/shared/components/RelatedResources';
 
 export default function NotExist() {
   return (
@@ -81,13 +80,6 @@ export default function NotExist() {
             ))}
           </Box>
         </div>
-        <RelatedResources
-          title="👀 瞧瞧最新資源"
-          searchScheme={{
-            filter: { or: [] },
-            page_size: 10,
-          }}
-        />
         <div className="mb-2.5 mt-10">
           <Typography
             variant="body1"

@@ -12,8 +12,6 @@ import Script from 'next/script';
 import Head from 'next/head';
 import { AuthProvider, useAuth } from '@/contexts/Auth';
 import { DialogProvider } from '@/contexts/Dialog';
-import GlobalStyle from '@/shared/styles/Global';
-import themeFactory from '@/shared/styles/themeFactory';
 import useQueryState from '@/hooks/useQueryState';
 import { fetcher } from '@/utils/http';
 import { getReminderStorage } from '@/utils/storage';
@@ -31,7 +29,6 @@ const swrConfig = {
 };
 
 const ThemeComponentWrap = ({ pageProps, Component }) => {
-  const theme = useMemo(() => themeFactory('light'), []);
   const { isComplete, isLoggedIn } = useAuth();
   const getLayout = Component?.getLayout || getBaseLayout;
   const openCompleteInfoReminderDialog = useCompleteInfoReminder();
@@ -56,11 +53,10 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   }, [queryState, isLoggedIn, isComplete, openCompleteInfoReminderDialog, openVerifiedSuccessDialog]);
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       {/* mui normalize css */}
       <CssBaseline />
       {/* For custum reset css */}
-      <GlobalStyle />
       <Toaster
         position="top-center"
         containerStyle={{ background: 'none', marginTop: '80px' }}
@@ -77,7 +73,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
       />
       <SonnerToaster />
       {getLayout(<Component {...pageProps} />)}
-    </ThemeProvider>
+    </>
   );
 };
 

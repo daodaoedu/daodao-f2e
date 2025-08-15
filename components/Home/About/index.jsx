@@ -2,9 +2,7 @@ import React from 'react';
 import styled from '@emotion/styled';
 import { Box, Chip, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
-import { COLOR_TABLE } from '../../../constants/notion';
 import { CATEGORIES } from '../../../constants/category';
-import RelatedResources from '../../../shared/components/RelatedResources';
 
 const GuideWrapper = styled.div`
   width: 90%;
@@ -118,7 +116,7 @@ const About = () => {
                   value={value}
                   onClick={() => router.push(`/resource/categories/${value}`)}
                   sx={{
-                    backgroundColor: COLOR_TABLE.green,
+                    backgroundColor: 'rgb(219, 237, 219)',
                     opacity: '60%',
                     cursor: 'pointer',
                     margin: '5px',
@@ -127,7 +125,7 @@ const About = () => {
                     fontSize: '16px',
                     '&:hover': {
                       opacity: '100%',
-                      backgroundColor: COLOR_TABLE.green,
+                      backgroundColor: 'rgb(219, 237, 219)',
                       transition: 'transform 0.4s',
                     },
                   }}
@@ -137,13 +135,6 @@ const About = () => {
           </Box>
         </Box>
       </Box>
-      <RelatedResources
-        title="👀 瞧瞧最新資源"
-        searchScheme={{
-          filter: { or: [] },
-          page_size: 10,
-        }}
-      />
     </GuideWrapper>
   );
 };

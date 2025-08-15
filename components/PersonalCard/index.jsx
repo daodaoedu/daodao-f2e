@@ -7,7 +7,7 @@ import { ROLE, EDUCATION } from '@/constants/member';
 import { mapToTable } from '@/utils/helper';
 import SEOConfig from '@/components/SEOConfig';
 import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
-import ContactButton from '@/shared/components/ContactButton';
+import { ContactModal } from '@/features/email';
 import MyGroup from './MyGroup';
 import UserCard from './UserCard';
 import UserTabs from './UserTabs';
@@ -65,6 +65,13 @@ const Profile = ({
   const router = useRouter();
   const role = roleList.length > 0 && ROLE_LIST[roleList[0]];
   const edu = educationStage && EDUCATION_STAGE_TABLE[educationStage];
+  const user = {
+    id: _id,
+    email,
+    name,
+    photoURL,
+    roleList,
+  };
 
   const SEOData = useMemo(
     () => ({
@@ -130,7 +137,18 @@ const Profile = ({
 
         <MyGroup />
       </StyledPanelBox>
-      <ContactButton />
+      {!isMe && (
+        <div className="mt-8 flex justify-center">
+          <ContactModal
+            targetUser={user}
+            emailTitle="你發起的揪團有人來信！"
+            emailSubject="【島島阿學】點開 Email，揪團有新消息"
+            modalTitle="聯繫主揪"
+            description="想跟主揪說的話"
+            descriptionPlaceholder="想參加主揪的團體嗎？可以簡單的自我介紹，寫下想加入的原因。"
+          />
+        </div>
+      )}
     </InfoCompletionGuard>
   );
 };

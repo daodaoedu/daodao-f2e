@@ -237,11 +237,6 @@ export const NAV_LINK = [
     target: '_self',
   },
   {
-    name: '找夥伴',
-    link: '/partner',
-    target: '_self',
-  },
-  {
     name: '找揪團',
     link: '/circles',
     target: '_self',
@@ -310,11 +305,6 @@ export const FOOTER_LINK = [
   {
     name: '找資源',
     link: '/resource',
-    target: '_self',
-  },
-  {
-    name: '找夥伴',
-    link: '/partner',
     target: '_self',
   },
   {

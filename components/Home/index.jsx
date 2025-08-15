@@ -8,7 +8,6 @@ import About from './About';
 import Group from './Group';
 import Edm from './Edm';
 import FacebookPosts from './FacebookPosts';
-import WishResource from './WishResource';
 import APPBanner from './APPBanner';
 
 const StyledBannerButton = styled(Button)`
@@ -71,8 +70,6 @@ function Home() {
       <FacebookPosts />
       <Divider sx={{ margin: '10px 0' }} />
       <Group />
-      <Divider sx={{ margin: '10px 0' }} />
-      <WishResource />
       <Divider sx={{ margin: '10px 0' }} />
       <div ref={guideRef} />
       <Guide />
