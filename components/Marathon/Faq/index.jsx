@@ -22,9 +22,9 @@ function Accordion({ title, children }) {
     }
   }, [isOpen]);
   return (
-    <div className="rounded border-b border-[#DEF5F5] overflow-hidden">
+    <div className="overflow-hidden rounded border-b border-[#DEF5F5]">
       <div
-        className="p-3 cursor-pointer flex justify-start items-center border border-[#DEF5F5] bg-[#DEF5F5]"
+        className="flex cursor-pointer items-center justify-start border border-[#DEF5F5] bg-[#DEF5F5] p-3"
         onClick={toggleAccordion}
         onKeyDown={handleKeyDown}
         role="button"
@@ -34,7 +34,7 @@ function Accordion({ title, children }) {
       >
         <span>
           <ChevronRight
-            className={`${isOpen ? 'rotate-90' : ''} transition-transform duration-300 ease-in-out text-[#293A3D]`}
+            className={`${isOpen ? 'rotate-90' : ''} text-[#293A3D] transition-transform duration-300 ease-in-out`}
           />
         </span>
         <p className="ml-3 text-base font-medium leading-[140%] text-[#293A3D]">{title}</p>
@@ -42,13 +42,13 @@ function Accordion({ title, children }) {
 
       <div
         id={`accordion-content-${title}`}
-        className={`bg-white h-auto max-h-0 overflow-hidden transition-[max-height] duration-300 ease-in-out ${isOpen ? '' : ''}`}
+        className={`h-auto max-h-0 overflow-hidden bg-white transition-[max-height] duration-300 ease-in-out ${isOpen ? '' : ''}`}
         style={{
           maxHeight: isOpen ? `${height}px` : '0px',
         }}
         ref={contentRef}
       >
-        <div className="p-4 text-[#536166] text-sm font-normal leading-[140%]">
+        <div className="p-4 text-sm font-normal leading-[140%] text-[#536166]">
           {children}
         </div>
       </div>
@@ -64,7 +64,7 @@ export default function Faq() {
       >
         <div className="mt-2">
           <ol className="list-decimal pl-6">
-            <li className="text-[#536166] text-sm font-normal leading-[140%] text-left">
+            <li className="text-left text-sm font-normal leading-[140%] text-[#536166]">
               不一定，參考同學習資源的形式，邀請各類型夥伴進行共學。
             </li>
           </ol>
@@ -76,7 +76,7 @@ export default function Faq() {
       >
         <div className="mt-2">
           <ol className="list-decimal pl-6">
-            <li className="text-[#536166] text-sm font-normal leading-[140%] text-left">
+            <li className="text-left text-sm font-normal leading-[140%] text-[#536166]">
               不用，完全免費，任何人都能發起或加入。
             </li>
           </ol>
@@ -88,7 +88,7 @@ export default function Faq() {
       >
         <div className="mt-2">
           <ol className="list-decimal pl-6">
-            <li className="text-[#536166] text-sm font-normal leading-[140%] text-left">
+            <li className="text-left text-sm font-normal leading-[140%] text-[#536166]">
               你可以發表學習計畫、資源、心得、問題，或參加學習馬拉松，從不同面向參與社群。
             </li>
           </ol>

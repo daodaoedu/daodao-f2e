@@ -17,9 +17,9 @@ const Banner = ({ guideRef }) => {
   return (
     <div>
       <section
-        className="h-[var(--section-height)] relative flex flex-col justify-evenly"
+        className="relative flex h-[var(--section-height)] flex-col justify-evenly"
       >
-        <div className="mx-auto min-w-[600px] max-md:min-w-auto max-md:w-[80%] max-md:pt-[10vh]">
+        <div className="max-md:min-w-auto mx-auto min-w-[600px] max-md:w-[80%] max-md:pt-[10vh]">
           <Title />
           <SearchField />
         </div>
@@ -27,14 +27,14 @@ const Banner = ({ guideRef }) => {
           <TypographyTitle
             as="h3"
             size="lg"
-            className="tracking-[0.08em] text-[#f0f0f0] font-medium text-center text-[26px] m-5"
+            className="m-5 text-center text-[26px] font-medium tracking-[0.08em] text-[#f0f0f0]"
           >
             還不知道要學什麼嗎？
           </TypographyTitle>
-          <div className="flex justify-center items-center my-2.5">
+          <div className="my-2.5 flex items-center justify-center">
             <Button
               onClick={smoothScroll}
-              className="bg-white opacity-80 hover:bg-white hover:opacity-100 text-black"
+              className="bg-white text-black opacity-80 hover:bg-white hover:opacity-100"
             >
               看看大家都學什麼
             </Button>

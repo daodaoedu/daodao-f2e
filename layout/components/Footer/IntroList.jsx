@@ -3,7 +3,7 @@ import { Text } from '@/components/ui/typography';
 import Link from 'next/link';
 
 const IntroList = ({ list }) => (
-  <div className="mx-[15px] [&>ul]:flex [&>ul]:flex-col [&>ul]:justify-start [&>li]:cursor-pointer [&>li]:my-2 [&>li]:mx-auto [&>li]:mr-0 [&>li]:text-left">
+  <div className="mx-[15px] [&>li]:mx-auto [&>li]:my-2 [&>li]:mr-0 [&>li]:cursor-pointer [&>li]:text-left [&>ul]:flex [&>ul]:flex-col [&>ul]:justify-start">
     <ul>
       {list.map(({ name, link, target }) => (
         <li key={name}>

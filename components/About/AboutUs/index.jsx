@@ -12,7 +12,7 @@ const AboutUs = () => (
       關於我們
     </Title>
     <div
-      className="flex justify-center items-center my-5"
+      className="my-5 flex items-center justify-center"
     >
       <img src="https://i.imgur.com/1nhGPPR.png" width="100%" alt="daodao" />
     </div>

@@ -31,7 +31,7 @@ function EditFormInput(
         className={errorMsg ? 'border-red-500' : ''}
       />
       {errorMsg && (
-        <Text className="text-sm text-red-500 mt-1">
+        <Text className="mt-1 text-sm text-red-500">
           {errorMsg}
         </Text>
       )}

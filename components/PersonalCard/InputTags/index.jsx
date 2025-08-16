@@ -4,8 +4,8 @@ import { X } from 'lucide-react';
 import { forwardRef } from 'react';
 
 const Tag = ({ label, onCancel }) => (
-  <div className="flex items-center text-[#293A3D] bg-[#DEF5F5] rounded p-2 mr-2 mb-2">
-    <Text className="whitespace-nowrap pr-0.5 font-normal text-sm leading-[140%] mr-1">
+  <div className="mb-2 mr-2 flex items-center rounded bg-[#DEF5F5] p-2 text-[#293A3D]">
+    <Text className="mr-1 whitespace-nowrap pr-0.5 text-sm font-normal leading-[140%]">
       {label}
     </Text>
     <X
@@ -27,7 +27,7 @@ function InputTags({ value = [], change }, ref) {
   };
 
   return (
-    <div className="w-full border border-[#DBDBDB] rounded border-solid items-center py-2 px-4 min-h-[50px]">
+    <div className="min-h-[50px] w-full items-center rounded border border-solid border-[#DBDBDB] px-4 py-2">
       <div className="mt-1.5 flex flex-wrap items-center">
         {Array.isArray(value) &&
           value.map(
@@ -39,7 +39,7 @@ function InputTags({ value = [], change }, ref) {
           ref={ref}
           placeholder={value.length ? '' : '搜尋或新增標籤'}
           onKeyDown={keyDownHandle}
-          className="border-0 p-0 min-w-[50px] w-auto flex-1 focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="w-auto min-w-[50px] flex-1 border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
         />
       </div>
     </div>

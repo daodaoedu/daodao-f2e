@@ -68,7 +68,7 @@ const MyResource = ({ title, sx, userId, className }) => {
       {title && (
         <Title
           size="md"
-          className="text-[22px] text-[#536166] font-bold mb-1"
+          className="mb-1 text-[22px] font-bold text-[#536166]"
         >
           {title}
         </Title>

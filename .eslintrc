@@ -47,6 +47,8 @@
     "@typescript-eslint/no-shadow": "error",
     "arrow-body-style": "off",
     "camelcase": "off",
+    "tailwindcss/classnames-order": "error",
+    "tailwindcss/no-custom-classname": "off",
     "comma-dangle": [
       "error",
       {

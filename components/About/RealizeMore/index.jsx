@@ -6,17 +6,17 @@ const RealizeMore = () => (
     <Title
       as="h2"
       size="lg"
-      className="mt-10 mb-2.5"
+      className="mb-2.5 mt-10"
     >
       想了解更多嗎？
     </Title>
-    <div className="flex flex-col m-5">
+    <div className="m-5 flex flex-col">
       <Text className="my-1.5">
         <a
           target="_blank"
           href="https://www.youtube.com/watch?v=7d8e-onHJfo&t=80s"
           rel="noopener noreferrer"
-          className="text-black hover:text-[#16b9b3] hover:opacity-100 transition-colors duration-500"
+          className="text-black transition-colors duration-500 hover:text-[#16b9b3] hover:opacity-100"
         >
           🤔 島島阿學｜如何透過集體智慧解決自主學習困境，推動民主教育？
         </a>
@@ -26,7 +26,7 @@ const RealizeMore = () => (
           target="_blank"
           href="https://www.behance.net/gallery/113709435/_"
           rel="noopener noreferrer"
-          className="text-black hover:text-[#16b9b3] hover:opacity-100 transition-colors duration-500"
+          className="text-black transition-colors duration-500 hover:text-[#16b9b3] hover:opacity-100"
         >
           🏃 島島阿學發展歷程
         </a>

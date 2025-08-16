@@ -18,11 +18,11 @@ export default function CompleteInfoReminderDialog({ isOpen, onClose }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[400px] w-full rounded-2xl p-8">
+      <DialogContent className="w-full max-w-[400px] rounded-2xl p-8">
         <DialogHeader>
           <DialogTitle
             id={titleId}
-            className="text-center text-[#536166] font-bold text-[22px] mb-2"
+            className="mb-2 text-center text-[22px] font-bold text-[#536166]"
           >
             島主廣播
           </DialogTitle>
@@ -32,7 +32,7 @@ export default function CompleteInfoReminderDialog({ isOpen, onClose }) {
             </Text>
           </DialogDescription>
         </DialogHeader>
-        <div className="flex justify-center my-10">
+        <div className="my-10 flex justify-center">
           <img
             src={illustrationImg.src}
             alt="填寫完能享有更完善的功能"
@@ -40,10 +40,10 @@ export default function CompleteInfoReminderDialog({ isOpen, onClose }) {
             className="h-[204px]"
           />
         </div>
-        <div className="flex flex-row-reverse gap-2 mt-4">
+        <div className="mt-4 flex flex-row-reverse gap-2">
           <Button
             asChild
-            className="rounded-3xl text-white bg-[#16B9B3] shadow-md w-full"
+            className="w-full rounded-3xl bg-[#16B9B3] text-white shadow-md"
             onClick={onClose}
           >
             <Link href="/personal-card">
@@ -52,7 +52,7 @@ export default function CompleteInfoReminderDialog({ isOpen, onClose }) {
           </Button>
           <Button
             variant="outline"
-            className="rounded-3xl bg-white text-[#1f4645] shadow-md w-full hover:bg-gray-100"
+            className="w-full rounded-3xl bg-white text-[#1f4645] shadow-md hover:bg-gray-100"
             onClick={onClose}
           >
             再等等

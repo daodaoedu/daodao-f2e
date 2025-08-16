@@ -5,8 +5,8 @@ import LearningResource from './LearningResource';
 import ActivitiesResource from './ActivitiesResource';
 
 const ContributeResource = () => (
-  <section className="pt-10 pb-10">
-    <Paper className="w-[95%] mx-auto p-2.5">
+  <section className="pb-10 pt-10">
+    <Paper className="mx-auto w-[95%] p-2.5">
       <div>
         <Title
           as="h1"

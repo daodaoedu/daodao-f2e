@@ -106,16 +106,16 @@ function EditPage() {
 
   return (
     <div className="bg-gradient-to-r from-[#f3fcfc] to-[#f7f8fa]">
-      <div className="min-h-screen flex flex-col justify-center items-center rounded-2xl mx-auto w-full max-w-[672px] md:w-[672px]">
+      <div className="mx-auto flex min-h-screen w-full max-w-[672px] flex-col items-center justify-center rounded-2xl md:w-[672px]">
         <div
-          className={`bg-white p-[5%] flex flex-col justify-center items-center w-full rounded-2xl ${
+          className={`flex w-full flex-col items-center justify-center rounded-2xl bg-white p-[5%] ${
             errors.name || errors.birthDay || errors.gender || errors.roleList
               ? 'border border-red-500'
               : ''
           }`}
         >
-          <h2 className="font-bold text-[22px] leading-[140%] text-center text-[#536166]">編輯個人頁面</h2>
-          <p className="font-bold text-sm leading-[140%] text-center text-[#536166] mt-2">
+          <h2 className="text-center text-[22px] font-bold leading-[140%] text-[#536166]">編輯個人頁面</h2>
+          <p className="mt-2 text-center text-sm font-bold leading-[140%] text-[#536166]">
             填寫完整資訊可以幫助其他夥伴更了解你哦！
           </p>
           <TheAvator url={userState.photoURL} />
@@ -142,7 +142,7 @@ function EditPage() {
                   placeholder="選擇生日"
                 />
                 {errors.birthDay && (
-                  <Text className="text-sm text-red-500 mt-2">
+                  <Text className="mt-2 text-sm text-red-500">
                     {errors.birthDay}
                   </Text>
                 )}
@@ -202,7 +202,7 @@ function EditPage() {
           </div>
         </div>
 
-        <div className="bg-white p-10 mt-4 w-full rounded-2xl md:p-10 max-md:p-8">
+        <div className="mt-4 w-full rounded-2xl bg-white p-10 max-md:p-8 md:p-10">
           <StyledGroup mt="0">
             <Text className="font-medium">教育階段</Text>
             <Select
@@ -249,7 +249,7 @@ function EditPage() {
               </SelectContent>
             </Select>
             {(userState.country === '台灣' || userState.country === 'tw') && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+              <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <Select
                   value={userState.city}
                   onValueChange={(val) => {
@@ -298,7 +298,7 @@ function EditPage() {
         </div>
 
         <div
-          className={`bg-white p-10 mt-4 w-full rounded-2xl md:p-10 max-md:p-8 ${
+          className={`mt-4 w-full rounded-2xl bg-white p-10 max-md:p-8 md:p-10 ${
             errors.socialCode ? 'border border-red-500' : ''
           }`}
           ref={(element) => setRef('socialCode', element)}
@@ -307,11 +307,11 @@ function EditPage() {
             <Text className="text-lg font-bold">
               聯絡方式 *
             </Text>
-            <Text className="text-[#92989A] text-sm font-normal">
+            <Text className="text-sm font-normal text-[#92989A]">
               聯絡資訊會呈現在你的公開頁面上，讓夥伴能聯繫你，至少填寫一個社交媒體帳號
             </Text>
           </StyledGroup>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {Object.entries({
               instagram: 'Instagram',
               discord: 'Discord',
@@ -343,7 +343,7 @@ function EditPage() {
         </div>
 
         <div
-          className={`bg-white p-10 mt-4 w-full rounded-2xl md:p-10 max-md:p-8 ${
+          className={`mt-4 w-full rounded-2xl bg-white p-10 max-md:p-8 md:p-10 ${
             errors.wantToDoList || errors.tagList || errors.selfIntroduction
               ? 'border border-red-500'
               : ''
@@ -398,7 +398,7 @@ function EditPage() {
             />
           </StyledGroup>
           <StyledGroup>
-            <Text className="font-medium mb-1.5">標籤</Text>
+            <Text className="mb-1.5 font-medium">標籤</Text>
             <TagEditor
               name="tagList"
               value={userState.tagList}
@@ -413,7 +413,7 @@ function EditPage() {
           </StyledGroup>
 
           <StyledGroup>
-            <Text className="font-medium mb-1.5">
+            <Text className="mb-1.5 font-medium">
               個人簡介 *
             </Text>
             {isSetting && (
@@ -436,9 +436,9 @@ function EditPage() {
           </StyledGroup>
         </div>
 
-        <div className="bg-white p-10 mt-4 w-full rounded-2xl md:p-10 max-md:p-8">
-          <div className="border border-[#dbdbdb] rounded-lg flex justify-between items-center p-4">
-            <Text className="font-medium text-base leading-[140%] text-[#293a3d]">公開顯示居住地</Text>
+        <div className="mt-4 w-full rounded-2xl bg-white p-10 max-md:p-8 md:p-10">
+          <div className="flex items-center justify-between rounded-lg border border-[#dbdbdb] p-4">
+            <Text className="text-base font-medium leading-[140%] text-[#293a3d]">公開顯示居住地</Text>
             <Switch
               checked={userState.isOpenLocation}
               onCheckedChange={(value) => {
@@ -449,8 +449,8 @@ function EditPage() {
               }}
             />
           </div>
-          <div className="border border-[#dbdbdb] rounded-lg flex justify-between items-center p-4 mt-4">
-            <Text className="font-medium text-base leading-[140%] text-[#293a3d]">公開個人頁面尋找夥伴</Text>
+          <div className="mt-4 flex items-center justify-between rounded-lg border border-[#dbdbdb] p-4">
+            <Text className="text-base font-medium leading-[140%] text-[#293a3d]">公開個人頁面尋找夥伴</Text>
             <Switch
               checked={userState.isOpenProfile}
               onCheckedChange={(value) => {
@@ -463,7 +463,7 @@ function EditPage() {
           </div>
         </div>
 
-        <div className="mt-6 w-full flex">
+        <div className="mt-6 flex w-full">
           <StyledButton
             variant="outline"
             onClick={() => {

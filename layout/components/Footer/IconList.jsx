@@ -2,7 +2,7 @@ import React from 'react';
 import { Text } from '@/components/ui/typography';
 
 const SubFooter = ({ title, list }) => (
-  <div className="[&>ul]:flex [&>ul]:justify-start [&>ul]:items-center [&>ul]:mt-[15px] [&>li]:cursor-pointer [&>li]:mx-2.5 [&>li]:my-auto">
+  <div className="[&>li]:mx-2.5 [&>li]:my-auto [&>li]:cursor-pointer [&>ul]:mt-[15px] [&>ul]:flex [&>ul]:items-center [&>ul]:justify-start">
     <Text
       as="h2"
       className="mb-2.5 text-lg font-medium"

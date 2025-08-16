@@ -13,18 +13,18 @@ export default function Dropdown({ sx }) {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="text-[#536166] p-[5px] min-w-0 rounded-full"
+            className="min-w-0 rounded-full p-[5px] text-[#536166]"
           >
             <EllipsisVertical />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="rounded-lg min-w-[150px] p-3 shadow-lg">
+        <DropdownMenuContent className="min-w-[150px] rounded-lg p-3 shadow-lg">
           <DropdownMenuItem asChild className="p-2">
             <a
               href="https://forms.gle/NkVbDWC3eXk4P4gv7"
               target="_blank"
               rel="noopener noreferrer"
-              className="min-w-[146px] block"
+              className="block min-w-[146px]"
             >
               檢舉
             </a>

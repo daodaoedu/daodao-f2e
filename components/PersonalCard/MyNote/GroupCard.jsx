@@ -68,7 +68,7 @@ function GroupCard({
     <>
       <StyledGroupCard href={`/circles/${_id}`}>
         <StyledImageWrapper>
-          <div className="relative w-full h-full">
+          <div className="relative h-full w-full">
             <Image
               alt={photoAlt || '未放封面'}
               src={photoURL || emptyCoverImg.src}

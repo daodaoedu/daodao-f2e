@@ -56,18 +56,18 @@ const socialConfig = [
 ];
 
 const SubFooter = () => (
-  <div className="h-full bg-[#536166] text-white flex justify-around items-start text-base tracking-[0.08em] max-md:flex max-md:flex-col max-md:justify-around max-md:items-center">
-    <div className="flex justify-around mt-[30px]">
+  <div className="flex h-full items-start justify-around bg-[#536166] text-base tracking-[0.08em] text-white max-md:flex max-md:flex-col max-md:items-center max-md:justify-around">
+    <div className="mt-[30px] flex justify-around">
       <div className="mx-2.5 cursor-pointer">
         <img src="/new-logo-vertical.png" alt="daodao" width="120" height="123" />
       </div>
     </div>
-    <div className="flex justify-around mt-[30px]">
+    <div className="mt-[30px] flex justify-around">
       <IntroList title="關於島島阿學" list={aboutDaoConfig} />
       <IntroList title="找資源" list={FOOTER_LINK} />
       <IntroList title="訂閱電子報" list={socialConfig} />
     </div>
-    <div className="flex justify-around mt-[30px]">
+    <div className="mt-[30px] flex justify-around">
       <IconList title="追蹤島島" list={iconListConfig} />
     </div>
   </div>

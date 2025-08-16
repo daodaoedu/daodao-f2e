@@ -10,23 +10,23 @@ const CardList = ({
   if (isLoading) {
     return (
       <div className="mt-5">
-        <h3 className="text-xl text-[#536166] font-bold mb-2.5 max-md:flex max-md:flex-col">
+        <h3 className="mb-2.5 text-xl font-bold text-[#536166] max-md:flex max-md:flex-col">
           {title}
         </h3>
-        <ul className="flex justify-start items-center overflow-x-scroll scroll-smooth">
-          <Skeleton className="m-1.5 flex-[0_0_200px] w-[200px] h-[120px] rounded-[20px]" />
-          <Skeleton className="m-1.5 flex-[0_0_200px] w-[200px] h-[120px] rounded-[20px]" />
-          <Skeleton className="m-1.5 flex-[0_0_200px] w-[200px] h-[120px] rounded-[20px]" />
-          <Skeleton className="m-1.5 flex-[0_0_200px] w-[200px] h-[120px] rounded-[20px]" />
-          <Skeleton className="m-1.5 flex-[0_0_200px] w-[200px] h-[120px] rounded-[20px]" />
-          <Skeleton className="m-1.5 flex-[0_0_200px] w-[200px] h-[120px] rounded-[20px]" />
+        <ul className="flex items-center justify-start overflow-x-scroll scroll-smooth">
+          <Skeleton className="m-1.5 h-[120px] w-[200px] flex-[0_0_200px] rounded-[20px]" />
+          <Skeleton className="m-1.5 h-[120px] w-[200px] flex-[0_0_200px] rounded-[20px]" />
+          <Skeleton className="m-1.5 h-[120px] w-[200px] flex-[0_0_200px] rounded-[20px]" />
+          <Skeleton className="m-1.5 h-[120px] w-[200px] flex-[0_0_200px] rounded-[20px]" />
+          <Skeleton className="m-1.5 h-[120px] w-[200px] flex-[0_0_200px] rounded-[20px]" />
+          <Skeleton className="m-1.5 h-[120px] w-[200px] flex-[0_0_200px] rounded-[20px]" />
         </ul>
       </div>
     );
   }
   return (
     <div className="mt-5">
-      <h3 className="text-xl text-[#536166] font-bold mb-2.5 max-md:flex max-md:flex-col">
+      <h3 className="mb-2.5 text-xl font-bold text-[#536166] max-md:flex max-md:flex-col">
         {title}
       </h3>
       <Marquee
@@ -35,7 +35,7 @@ const CardList = ({
         pauseOnHover
         direction={direction}
       >
-        <ul className="flex justify-start items-center overflow-x-scroll scroll-smooth">
+        <ul className="flex items-center justify-start overflow-x-scroll scroll-smooth">
           {list.map(({
             id, message, created_time, updated_time,
           }) => (

@@ -53,7 +53,7 @@ function UserCard({
       {isLoginUser ? (
         <Button
           variant="outline"
-          className="text-[#536166] text-sm absolute right-[30px] top-[30px] shadow-none rounded-[20px] hover:text-[#16B9B3] max-md:hidden"
+          className="absolute right-[30px] top-[30px] rounded-[20px] text-sm text-[#536166] shadow-none hover:text-[#16B9B3] max-md:hidden"
           onClick={() => {
             router.push('/personal-card');
           }}

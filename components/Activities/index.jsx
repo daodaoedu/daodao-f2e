@@ -4,8 +4,8 @@ import { Text, Title } from '@/components/ui/typography';
 import { Paper } from '@/components/ui/paper';
 
 const ContributeResource = () => (
-  <section className="pt-10 pb-10">
-    <Paper className="w-[95%] mx-auto p-5">
+  <section className="pb-10 pt-10">
+    <Paper className="mx-auto w-[95%] p-5">
       <div>
         <Title
           as="h1"

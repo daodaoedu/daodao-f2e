@@ -6,11 +6,11 @@ const Thanks = () => (
     <Title
       as="h2"
       size="lg"
-      className="mt-10 mb-2.5"
+      className="mb-2.5 mt-10"
     >
       感謝名單
     </Title>
-    <div className="flex flex-col gap-2 m-5">
+    <div className="m-5 flex flex-col gap-2">
       <Text className="my-1.5 font-medium">
         「島島阿學－學習資源平台」是從一個人到一群人，並透過自學從無到有的過程。
         這一路上，感謝每一位曾經參與其中的夥伴，論是針對組織、平台給予建議，又或者協助新增資源，都讓我們由衷的感謝，島島阿學是在每一位橋樑互助共好下誕生的。

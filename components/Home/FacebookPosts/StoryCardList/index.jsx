@@ -9,19 +9,19 @@ const StoryCardList = ({
   if (isLoading) {
     return (
       <div className="mt-5">
-        <h3 className="text-xl text-[#536166] font-bold mb-2.5 max-md:flex max-md:flex-col">
+        <h3 className="mb-2.5 text-xl font-bold text-[#536166] max-md:flex max-md:flex-col">
           {title}
         </h3>
-        <ul className="flex justify-start items-center overflow-x-scroll scroll-smooth">
-          <Skeleton className="m-1 w-[150px] h-[calc(calc(150px/9)*16)] flex-[0_0_150px]" />
-          <Skeleton className="m-1 w-[150px] h-[calc(calc(150px/9)*16)] flex-[0_0_150px]" />
-          <Skeleton className="m-1 w-[150px] h-[calc(calc(150px/9)*16)] flex-[0_0_150px]" />
-          <Skeleton className="m-1 w-[150px] h-[calc(calc(150px/9)*16)] flex-[0_0_150px]" />
-          <Skeleton className="m-1 w-[150px] h-[calc(calc(150px/9)*16)] flex-[0_0_150px]" />
-          <Skeleton className="m-1 w-[150px] h-[calc(calc(150px/9)*16)] flex-[0_0_150px]" />
-          <Skeleton className="m-1 w-[150px] h-[calc(calc(150px/9)*16)] flex-[0_0_150px]" />
-          <Skeleton className="m-1 w-[150px] h-[calc(calc(150px/9)*16)] flex-[0_0_150px]" />
-          <Skeleton className="m-1 w-[150px] h-[calc(calc(150px/9)*16)] flex-[0_0_150px]" />
+        <ul className="flex items-center justify-start overflow-x-scroll scroll-smooth">
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
         </ul>
       </div>
     );
@@ -33,7 +33,7 @@ const StoryCardList = ({
 
   return (
     <div className="mt-5">
-      <h3 className="text-xl text-[#536166] font-bold mb-2.5 max-md:flex max-md:flex-col">
+      <h3 className="mb-2.5 text-xl font-bold text-[#536166] max-md:flex max-md:flex-col">
         {title}
       </h3>
       {list.length > 4 ? (
@@ -43,7 +43,7 @@ const StoryCardList = ({
           pauseOnHover
           direction={direction}
         >
-          <ul className="flex justify-start items-center overflow-x-scroll scroll-smooth">
+          <ul className="flex items-center justify-start overflow-x-scroll scroll-smooth">
             {list.map(
               ({
                 id,
@@ -70,7 +70,7 @@ const StoryCardList = ({
           </ul>
         </Marquee>
       ) : (
-        <ul className="flex justify-start items-center overflow-x-scroll scroll-smooth">
+        <ul className="flex items-center justify-start overflow-x-scroll scroll-smooth">
           {list.map(
             ({
               id,

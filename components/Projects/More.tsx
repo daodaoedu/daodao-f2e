@@ -12,7 +12,7 @@ interface MoreProps {
 }
 export default function More({ projectId }: MoreProps) {
   return (
-    <div className="absolute top-0 right-0">
+    <div className="absolute right-0 top-0">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="p-0">

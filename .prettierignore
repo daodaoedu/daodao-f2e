@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+
+# Build outputs
+.next
+out
+dist
+
+# Generated files
+generated
+services/**/*.ts
+!services/fetcher.ts
+
+# Config files
+*.config.js
+*.config.ts
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Public assets
+public
+
+# Other
+.DS_Store
+*.log 

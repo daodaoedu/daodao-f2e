@@ -88,7 +88,7 @@ export default function ResourceCard(props: CardProps) {
             src={coverImageUrl}
             alt={title}
             fill
-            className="object-cover rounded-lg"
+            className="rounded-lg object-cover"
           />
         </div>
 

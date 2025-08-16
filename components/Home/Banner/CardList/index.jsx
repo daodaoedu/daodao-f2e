@@ -1,7 +1,7 @@
 import Card from './Card';
 
 const CardList = ({ list }) => (
-  <ul className="flex flex-wrap justify-center items-center pt-5 pb-5 [&>li]:m-5">
+  <ul className="flex flex-wrap items-center justify-center pb-5 pt-5 [&>li]:m-5">
     {list.map((category) => (
       <Card
         key={category.title}

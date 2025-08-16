@@ -15,16 +15,16 @@ const AccountSetting = () => {
   };
 
   return (
-    <div className="bg-white w-full max-w-[672px] rounded-2xl p-4 md:p-9 flex flex-col justify-center items-center">
+    <div className="flex w-full max-w-[672px] flex-col items-center justify-center rounded-2xl bg-white p-4 md:p-9">
       <Title className="text-[22px] text-[#536166]">
         帳號設定
       </Title>
-      <div className="flex flex-col items-start w-full max-w-[544px]">
-        <div className="flex flex-col w-full">
-          <Text className="font-medium text-base leading-[1.4] text-[#293a3d]">
+      <div className="flex w-full max-w-[544px] flex-col items-start">
+        <div className="flex w-full flex-col">
+          <Text className="text-base font-medium leading-[1.4] text-[#293a3d]">
             電子信箱
           </Text>
-          <div className="w-full my-2 mb-8 rounded-lg border border-[#DBDBDB] bg-[#F3F3F3] p-3 text-[#92989A] break-all">
+          <div className="my-2 mb-8 w-full break-all rounded-lg border border-[#DBDBDB] bg-[#F3F3F3] p-3 text-[#92989A]">
             {user?.email}
           </div>
         </div>
@@ -38,14 +38,14 @@ const AccountSetting = () => {
             進行驗證
           </Button>
         </div> */}
-        <Separator className="w-full text-black my-8 h-0.5" />
-        <div className="flex flex-col w-full">
-          <Text className="mb-6 font-medium text-base leading-[1.4] text-[#293a3d]">
+        <Separator className="my-8 h-0.5 w-full text-black" />
+        <div className="flex w-full flex-col">
+          <Text className="mb-6 text-base font-medium leading-[1.4] text-[#293a3d]">
             登出帳號
           </Text>
           <Button
             onClick={logout}
-            className="rounded-[20px] bg-white text-[#1f4645] py-1.5 px-0 w-full shadow-[0px_4px_10px_0px_rgba(196,194,193,0.4)] hover:bg-white"
+            className="w-full rounded-[20px] bg-white px-0 py-1.5 text-[#1f4645] shadow-[0px_4px_10px_0px_rgba(196,194,193,0.4)] hover:bg-white"
           >
             登出
           </Button>

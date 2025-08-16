@@ -8,16 +8,16 @@ const Group = () => {
   const router = useRouter();
 
   return (
-    <div className="w-[90%] mx-auto pt-10 pb-10 max-md:pt-10 max-md:pb-5">
+    <div className="mx-auto w-[90%] pb-10 pt-10 max-md:pb-5 max-md:pt-10">
       <Title
         as="h2"
         size="lg"
-        className="text-[#536166] font-bold text-[26px] leading-[50px] tracking-[0.08em] text-right mr-5 max-md:text-left"
+        className="mr-5 text-right text-[26px] font-bold leading-[50px] tracking-[0.08em] text-[#536166] max-md:text-left"
       >
         加入島島阿學學習社群
       </Title>
-      <div className="mt-5 flex justify-center items-start max-md:flex-col-reverse">
-        <div className="mt-12 ml-5 text-lg">
+      <div className="mt-5 flex items-start justify-center max-md:flex-col-reverse">
+        <div className="ml-5 mt-12 text-lg">
           <div className="my-1.5">
             <Text>
               我們是島島阿學學習社群，努力搭起互助學習的橋梁。
@@ -38,7 +38,7 @@ const Group = () => {
               我們認為社群即資源、支援，讓學習者在民主教育的社群中，以共好的概念，解決彼此學習的問題，支持彼此成為自己想成為的人。
             </Text>
           </div>
-          <div className="mt-5 mb-2.5 flex justify-start items-center">
+          <div className="mb-2.5 mt-5 flex items-center justify-start">
             <Button
               variant="outline"
               onClick={() => router.push('/join')}
@@ -50,7 +50,7 @@ const Group = () => {
             <div>
               <Button
                 variant="outline"
-                className="h-[46px] mx-2.5"
+                className="mx-2.5 h-[46px]"
               >
                 <Text>❤️ 送上祝福</Text>
               </Button>

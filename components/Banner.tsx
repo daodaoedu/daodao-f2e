@@ -27,7 +27,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
     >
       <div className="hidden md:block">
         <div className="absolute inset-0">
-          <div className="relative w-full h-full bg-gradient-to-b from-[#fcfefe] via-[#e0f1f2] to-[#e0f1f2]">
+          <div className="relative h-full w-full bg-gradient-to-b from-[#fcfefe] via-[#e0f1f2] to-[#e0f1f2]">
             <Image
               src={LearningMarathonImgDesktopBg.src}
               alt="島島盃 - 學習馬拉松 2025 春季賽"
@@ -42,7 +42,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
             'opacity-0 animate-fade-in animate-duration-700 animate-delay-200'
           )}
         >
-          <div className="relative w-full h-full">
+          <div className="relative h-full w-full">
             <Image
               src={LearningMarathonImgDesktopGroup.src}
               alt="揪團"
@@ -57,7 +57,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
             '-translate-x-full animate-slide-x-in -animate-distance-full animate-duration-1100 animate-delay-500'
           )}
         >
-          <div className="relative w-full h-full">
+          <div className="relative h-full w-full">
             <Image
               src={LearningMarathonImgDesktopBoy.src}
               alt="男角色"
@@ -72,7 +72,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
             'translate-x-full animate-slide-x-in animate-duration-1100 animate-delay-1100'
           )}
         >
-          <div className="relative w-full h-full">
+          <div className="relative h-full w-full">
             <Image
               src={LearningMarathonImgDesktopGirl.src}
               alt="女角色"
@@ -88,7 +88,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
           )}
         >
           <div className="animate-delay-200 animate-oscillate">
-            <div className="relative w-full h-full">
+            <div className="relative h-full w-full">
               <Image
                 src={LearningMarathonImgDesktopIcon5.src}
                 alt="icon5"
@@ -105,7 +105,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
           )}
         >
           <div className="animate-delay-1700 animate-oscillate">
-            <div className="relative w-full h-full">
+            <div className="relative h-full w-full">
               <Image
                 src={LearningMarathonImgDesktopIcon3.src}
                 alt="icon3"
@@ -122,7 +122,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
           )}
         >
           <div className="animate-delay-1100 animate-oscillate">
-            <div className="relative w-full h-full">
+            <div className="relative h-full w-full">
               <Image
                 src={LearningMarathonImgDesktopIcon1.src}
                 alt="icon1"
@@ -139,7 +139,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
           )}
         >
           <div className="animate-delay-1900 animate-oscillate">
-            <div className="relative w-full h-full">
+            <div className="relative h-full w-full">
               <Image
                 src={LearningMarathonImgDesktopIcon4.src}
                 alt="icon4"
@@ -156,7 +156,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
           )}
         >
           <div className="animate-delay-300 animate-oscillate">
-            <div className="relative w-full h-full">
+            <div className="relative h-full w-full">
               <Image
                 src={LearningMarathonImgDesktopIcon2.src}
                 alt="icon2"
@@ -173,7 +173,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
           )}
         >
           <div className="animate-delay-1300 animate-oscillate">
-            <div className="relative w-full h-full">
+            <div className="relative h-full w-full">
               <Image
                 src={LearningMarathonImgDesktopIcon6.src}
                 alt="icon6"
@@ -185,7 +185,7 @@ const Banner = ({ children }: React.PropsWithChildren) => {
         </div>
       </div>
       <div className="md:hidden">
-        <div className="relative w-full h-full bg-gradient-to-b from-[#fcfefe] via-[#e0f1f2] to-[#e0f1f2]">
+        <div className="relative h-full w-full bg-gradient-to-b from-[#fcfefe] via-[#e0f1f2] to-[#e0f1f2]">
           <Image
             src={LearningMarathonImgMobile.src}
             alt="島島盃 - 學習馬拉松 2025 春季賽"

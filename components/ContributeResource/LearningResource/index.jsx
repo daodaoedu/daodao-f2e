@@ -8,7 +8,7 @@ const LearningResource = () => (
       <Title
         as="h2"
         size="lg"
-        className="mt-10 mb-2.5"
+        className="mb-2.5 mt-10"
       >
         一、新增多元學習資源
       </Title>
@@ -22,21 +22,21 @@ const LearningResource = () => (
       </Text>
       <Text
         as="p"
-        className="font-medium text-base mt-3"
+        className="mt-3 text-base font-medium"
       >
         目前新增資源的方式有兩種：
       </Text>
-      <div className="mt-2.5 mb-2.5 ml-5">
+      <div className="mb-2.5 ml-5 mt-2.5">
         <Text as="p" className="font-medium">
           1. 使用全新推出的 Chrome Extension APP 來新增資源
         </Text>
       </div>
       <img
         src="/assets/extension-banner.png"
-        className="block h-[300px] mt-5 mx-auto max-md:w-full max-md:h-auto max-md:mt-5"
+        className="mx-auto mt-5 block h-[300px] max-md:mt-5 max-md:h-auto max-md:w-full"
         alt="Extension Banner"
       />
-      <div className="flex justify-center items-center my-5 mx-auto">
+      <div className="mx-auto my-5 flex items-center justify-center">
         <Button
           onClick={() => {
             window?.open(
@@ -44,18 +44,18 @@ const LearningResource = () => (
               '_blank'
             );
           }}
-          className="bg-[#16b9b3] text-white rounded-2xl hover:bg-[#16b9b3] hover:opacity-80"
+          className="rounded-2xl bg-[#16b9b3] text-white hover:bg-[#16b9b3] hover:opacity-80"
         >
           立即下載體驗！
         </Button>
       </div>
-      <div className="mt-2.5 mb-2.5 ml-5">
+      <div className="mb-2.5 ml-5 mt-2.5">
         <Text as="p" className="font-medium">
           2. 填寫Google Form
         </Text>
       </div>
     </div>
-    <div className="mt-10 mb-5">
+    <div className="mb-5 mt-10">
       {/* eslint-disable-next-line jsx-a11y/iframe-has-title */}
       <iframe
         src="https://docs.google.com/forms/d/e/1FAIpQLSdE9URRYAEJj1I8b-RJ6EG4PZ_5ggm_mcGq7Jis1LFxpjXvrw/viewform?embedded=true"

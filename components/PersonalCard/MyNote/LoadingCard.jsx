@@ -17,28 +17,28 @@ function LoadingCard() {
   return (
     <StyledGroupCard href="#">
       <StyledImageWrapper>
-        <Skeleton className="w-full h-[122px] rounded" />
+        <Skeleton className="h-[122px] w-full rounded" />
       </StyledImageWrapper>
       <StyledContainer>
         <StyledTitle>
-          <Skeleton className="w-[60%] h-4" />
+          <Skeleton className="h-4 w-[60%]" />
         </StyledTitle>
         <StyledText lineClamp="2" style={{ minHeight: '32px' }}>
-          <Skeleton className="w-full h-4 mb-2" />
-          <Skeleton className="w-[50%] h-4" />
+          <Skeleton className="mb-2 h-4 w-full" />
+          <Skeleton className="h-4 w-[50%]" />
         </StyledText>
         <StyledAreas>
           <MapPin size={16} color="#536166" />
           <StyledText>
-            <Skeleton className="w-[42px] h-4" />
+            <Skeleton className="h-4 w-[42px]" />
           </StyledText>
         </StyledAreas>
         <StyledFooter>
           <StyledTime>
-            <Skeleton className="w-[52px] h-4" />
+            <Skeleton className="h-4 w-[52px]" />
           </StyledTime>
           <StyledFlex>
-            <Skeleton className="w-[68px] h-6 rounded" />
+            <Skeleton className="h-6 w-[68px] rounded" />
             <Button variant="ghost" size="sm" disabled>
               <EllipsisVertical />
             </Button>

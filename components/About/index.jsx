@@ -12,8 +12,8 @@ import TechStack from './TechStack';
 import Cooperate from './Cooperate';
 
 const About = () => (
-  <div className="pt-10 pb-10">
-    <Paper className="w-[90%] mx-auto p-5 max-md:p-2.5">
+  <div className="pb-10 pt-10">
+    <Paper className="mx-auto w-[90%] p-5 max-md:p-2.5">
       <AboutUs />
       <RealizeMore />
       <RelatedReport />

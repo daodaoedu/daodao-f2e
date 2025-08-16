@@ -62,18 +62,18 @@ function InternalCheckLink(props, ref) {
 
   return (
     <Dialog open={!!link} onOpenChange={handleClose}>
-      <DialogContent className="max-w-[400px] w-full rounded-2xl p-8">
+      <DialogContent className="w-full max-w-[400px] rounded-2xl p-8">
         <DialogHeader>
           <DialogTitle
             id={titleId}
-            className="text-center text-[#536166] font-bold text-[22px] mb-2"
+            className="mb-2 text-center text-[22px] font-bold text-[#536166]"
           >
             正在離開島島阿學
           </DialogTitle>
           {link && (
             <DialogDescription id={descriptionId} className="space-y-2">
               <Text>這個連結將帶您前往以下網站</Text>
-              <Text className="text-sm text-gray-500 break-words">
+              <Text className="break-words text-sm text-gray-500">
                 {decodeURI(link.href)}
               </Text>
             </DialogDescription>
@@ -91,10 +91,10 @@ function InternalCheckLink(props, ref) {
                 {`從現在開始信任 ${link.hostname} 連結`}
               </label>
             </div>
-            <div className="flex flex-row-reverse gap-2 mt-4">
+            <div className="mt-4 flex flex-row-reverse gap-2">
               <Button
                 asChild
-                className="rounded-3xl text-white bg-[#16B9B3] shadow-md w-full"
+                className="w-full rounded-3xl bg-[#16B9B3] text-white shadow-md"
                 onClick={handleGoToWebsite}
               >
                 <Link href={link.href} target="_blank" rel="noopener noreferrer">
@@ -103,7 +103,7 @@ function InternalCheckLink(props, ref) {
               </Button>
               <Button
                 variant="outline"
-                className="rounded-3xl bg-white text-[#1f4645] shadow-md w-full hover:bg-gray-100"
+                className="w-full rounded-3xl bg-white text-[#1f4645] shadow-md hover:bg-gray-100"
                 onClick={handleClose}
               >
                 返回

@@ -5,7 +5,7 @@ import { StyledTabContextBox } from './UserTabs.styled';
 const UserTabs = ({ panels = [] }) => {
   const [value, setValue] = useState('1');
   return (
-    <div className="w-[720px] bg-white rounded-lg max-md:w-full">
+    <div className="w-[720px] rounded-lg bg-white max-md:w-full">
       <Tabs value={value} onValueChange={setValue}>
         <StyledTabContextBox>
           <TabsList className="w-full">

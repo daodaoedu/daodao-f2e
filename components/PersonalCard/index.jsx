@@ -64,7 +64,7 @@ const Profile = ({
       <StyledPanelBox className="container">
         <Button
           variant="ghost"
-          className="group absolute left-[-10px] top-[-50px] text-[#536166] text-sm shadow-none hover:text-[#16B9B3] max-md:relative max-md:left-0 max-md:top-0"
+          className="group absolute left-[-10px] top-[-50px] text-sm text-[#536166] shadow-none hover:text-[#16B9B3] max-md:relative max-md:left-0 max-md:top-0"
           onClick={() => {
             router.push('/personal-card');
           }}
@@ -87,7 +87,7 @@ const Profile = ({
 
         <Button
           variant="ghost"
-          className="hidden max-md:flex w-full text-[#536166] text-sm shadow-none rounded-[20px] mt-8 py-2 hover:text-[#16B9B3]"
+          className="mt-8 hidden w-full rounded-[20px] py-2 text-sm text-[#536166] shadow-none hover:text-[#16B9B3] max-md:flex"
           onClick={() => {
             router.push('/personal-card');
           }}

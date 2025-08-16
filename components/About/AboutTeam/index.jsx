@@ -241,17 +241,17 @@ const AboutTeam = () => {
       <Title
         as="h2"
         size="lg"
-        className="mt-10 mb-2.5"
+        className="mb-2.5 mt-10"
       >
         團隊組成
       </Title>
       <div className="m-5">
-        <div className="flex justify-start items-center flex-wrap">
+        <div className="flex flex-wrap items-center justify-start">
           <TooltipProvider>
             {Members.map(({ id, name }) => (
               <Tooltip key={id}>
                 <TooltipTrigger asChild>
-                  <Avatar className="m-1 w-[50px] h-[50px]">
+                  <Avatar className="m-1 h-[50px] w-[50px]">
                     <AvatarImage
                       alt={name}
                       src={`https://cataas.com/cat/${IMAGE_TAGS[id]}`}
@@ -266,15 +266,15 @@ const AboutTeam = () => {
             ))}
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex max-w-[2] ml-1">
-                  <Avatar className="w-[50px] h-[50px] -ml-3">
+                <div className="ml-1 flex max-w-[2]">
+                  <Avatar className="-ml-3 h-[50px] w-[50px]">
                     <AvatarImage
                       alt="50+"
                       src="https://media.giphy.com/media/bErElGdAHUmoE/giphy.gif"
                     />
                     <AvatarFallback>50+</AvatarFallback>
                   </Avatar>
-                  <Avatar className="w-[50px] h-[50px] -ml-3">
+                  <Avatar className="-ml-3 h-[50px] w-[50px]">
                     <AvatarImage
                       alt="dummy"
                       src="https://media.giphy.com/media/bErElGdAHUmoE/giphy.gif"
@@ -311,7 +311,7 @@ const AboutTeam = () => {
         <Text className="my-[5px]">
           你知道你的一句話能造成多大的引響力嗎？歡迎送上暖暖的祝福給夥伴們！
         </Text>
-        <div className="mt-5 mb-2.5">
+        <div className="mb-2.5 mt-5">
           <Button variant="outline">
             <Text>❤️ 送上祝福</Text>
           </Button>

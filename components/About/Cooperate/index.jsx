@@ -7,7 +7,7 @@ const Cooperate = () => (
     <Title
       as="h2"
       size="lg"
-      className="mt-10 mb-2.5"
+      className="mb-2.5 mt-10"
     >
       合作夥伴
     </Title>

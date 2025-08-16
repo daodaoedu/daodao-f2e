@@ -8,14 +8,14 @@ import { CATEGORIES } from '@/constants/category';
 export default function NotExist() {
   return (
     <>
-      <Paper className="w-[90%] my-5 mx-auto p-5 min-h-[60vh]">
+      <Paper className="mx-auto my-5 min-h-[60vh] w-[90%] p-5">
         <Title
           as="h2"
-          className="text-[#536166] mt-2.5 font-bold text-[30px] tracking-wide text-center mr-5"
+          className="mr-5 mt-2.5 text-center text-[30px] font-bold tracking-wide text-[#536166]"
         >
           這座島已經搬新家囉
         </Title>
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col items-center justify-center">
           <img
             src="/assets/nobody-land.gif"
             alt="nobody-land"
@@ -23,10 +23,10 @@ export default function NotExist() {
             height="300"
           />
         </div>
-        <Text className="text-xl text-center w-full">
+        <Text className="w-full text-center text-xl">
           近期網站改版，可能有部分頁面無法使用，可以參觀其他地方唷～
         </Text>
-        <Text className="text-xl text-center w-full mt-2.5">
+        <Text className="mt-2.5 w-full text-center text-xl">
           要不要試試我們新版的資源搜尋或是參觀其他地方呢？
         </Text>
         <div className="my-5">

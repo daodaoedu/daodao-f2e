@@ -12,8 +12,8 @@ const Guide = () => {
   const { data: instagramStories = [], isLoading: isLoadingInstagramStories } = useMetaInstagramStory();
 
   return (
-    <div className="w-[90%] mx-auto pt-10 pb-10 max-md:pt-10 max-md:pb-5">
-      <h2 className="text-[#536166] font-bold text-[26px] leading-[50px] tracking-[0.08em]">最新貼文</h2>
+    <div className="mx-auto w-[90%] pb-10 pt-10 max-md:pb-5 max-md:pt-10">
+      <h2 className="text-[26px] font-bold leading-[50px] tracking-[0.08em] text-[#536166]">最新貼文</h2>
       <StoryCardList
         title="🧸 Instagram 限時動態"
         list={instagramStories}

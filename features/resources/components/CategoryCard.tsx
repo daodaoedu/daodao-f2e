@@ -29,12 +29,12 @@ export default function CategoryCard(props: CategoryCardProps) {
         size === 'md' && 'md:h-[6.25rem]'
       )}
     >
-      <div className="relative w-full h-full">
+      <div className="relative h-full w-full">
         <Image
           src={image ?? ''}
           alt={label}
           fill
-          className="transition-transform group-hover:scale-110 object-cover rounded-lg"
+          className="rounded-lg object-cover transition-transform group-hover:scale-110"
         />
       </div>
       <div

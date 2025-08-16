@@ -19,13 +19,13 @@ const Card = ({ message = '', image, url }) => {
         <TooltipTrigger asChild>
           <button
             type="button"
-            className="relative w-[150px] h-[150px] flex-[0_0_150px] m-1.5 text-[#16b9b3] overflow-hidden cursor-pointer object-cover hover:scale-105 hover:transition-transform hover:duration-400 bg-transparent border-none p-0"
+            className="hover:duration-400 relative m-1.5 h-[150px] w-[150px] flex-[0_0_150px] cursor-pointer overflow-hidden border-none bg-transparent object-cover p-0 text-[#16b9b3] hover:scale-105 hover:transition-transform"
             onClick={handleClick}
             onKeyDown={handleKeyDown}
             aria-label={`Instagram post: ${message.slice(0, 50)}...`}
           >
             <Image
-              className="w-[150px] h-[150px] min-w-[150px] min-h-[150px] relative object-cover object-center"
+              className="relative h-[150px] min-h-[150px] w-[150px] min-w-[150px] object-cover object-center"
               alt={message}
               src={image}
               width={150}

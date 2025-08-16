@@ -51,7 +51,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       title="歡迎回來島島阿學！"
     >
       <div className="mx-auto w-max">
-        <div className="relative bg-gray-100 rounded-lg overflow-hidden">
+        <div className="relative overflow-hidden rounded-lg bg-gray-100">
           <Image
             src="https://imgur.com/EADd1UD.png"
             alt="login"

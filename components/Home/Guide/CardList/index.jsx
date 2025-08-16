@@ -23,7 +23,7 @@ const CardList = () => {
   const trigger = useRef();
 
   return (
-    <ul ref={trigger} className="flex justify-between items-center max-md:flex max-md:flex-col">
+    <ul ref={trigger} className="flex items-center justify-between max-md:flex max-md:flex-col">
       {data.map(({ image, title, id }) => (
         <Card
           key={id}

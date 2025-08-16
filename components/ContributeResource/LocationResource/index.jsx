@@ -7,7 +7,7 @@ const LearningResource = () => (
       <Title
         as="h2"
         size="lg"
-        className="mt-10 mb-2.5"
+        className="mb-2.5 mt-10"
       >
         三、實驗教育場域導覽
       </Title>
@@ -16,7 +16,7 @@ const LearningResource = () => (
         很開心你成為島島阿學的一員，新增後我們將由平台管理員審核並放入共用資源區。
       </Text>
     </div>
-    <div className="mt-10 mb-5">
+    <div className="mb-5 mt-10">
       待補
       {/* <iframe
           src="https://docs.google.com/forms/d/e/1FAIpQLSdE9URRYAEJj1I8b-RJ6EG4PZ_5ggm_mcGq7Jis1LFxpjXvrw/viewform?embedded=true"

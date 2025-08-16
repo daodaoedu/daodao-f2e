@@ -3,7 +3,7 @@ import { Text } from '@/components/ui/typography';
 
 const ErrorMessage = ({ errText }) => (
   errText && (
-  <div className="mt-2 flex items-center gap-2 text-[#EF5364] bg-[#FFEFF1] rounded p-2 text-sm">
+  <div className="mt-2 flex items-center gap-2 rounded bg-[#FFEFF1] p-2 text-sm text-[#EF5364]">
     <CircleX size={20} className="flex-shrink-0" />
     <Text as="p">{errText}</Text>
   </div>

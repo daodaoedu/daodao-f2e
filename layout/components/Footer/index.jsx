@@ -3,7 +3,7 @@ import SubFooter from './SubFooter';
 import MainFooter from './MainFooter';
 
 const Footer = () => (
-  <footer className="bg-[#536166] min-h-[270px] flex flex-col justify-center">
+  <footer className="flex min-h-[270px] flex-col justify-center bg-[#536166]">
     <MainFooter />
     <SubFooter />
   </footer>
