@@ -2,7 +2,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { LockKeyholeOpen, LockKeyhole, EllipsisVertical } from 'lucide-react';
 import { useAuth } from '@/contexts/Auth';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import { ROLE } from '@/constants/member';
 import { timeDuration } from '@/utils/date';
 import { CommentSchema, CommentVisibility } from '@/services/comments';
@@ -95,9 +95,9 @@ function CommentCard({
           <Image
             src={commentUser.photoURL}
             alt={`${commentUser.name}'s avatar`}
-            width="30px"
-            height="30px"
-            borderRadius="9999px"
+            width={30}
+            height={30}
+            className="rounded-full"
           />
           <div className="flex items-center gap-2">
             <span className="font-medium">{commentUser.name}</span>
@@ -183,9 +183,9 @@ function CommentCard({
             <Image
               src={replies[0].user.photoURL}
               alt={`${replies[0].user.name}'s avatar`}
-              width="20px"
-              height="20px"
-              borderRadius="9999px"
+              width={20}
+              height={20}
+              className="rounded-full"
             />
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3">

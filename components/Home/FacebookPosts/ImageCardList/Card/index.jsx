@@ -1,5 +1,5 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { Image } from '@/components/ui/image';
 
 const Card = ({ message = '', image, url }) => {
   const handleClick = () => {
@@ -24,11 +24,12 @@ const Card = ({ message = '', image, url }) => {
             onKeyDown={handleKeyDown}
             aria-label={`Instagram post: ${message.slice(0, 50)}...`}
           >
-            <LazyLoadImage
+            <Image
               className="w-[150px] h-[150px] min-w-[150px] min-h-[150px] relative object-cover object-center"
               alt={message}
               src={image}
-              effect="opacity"
+              width={150}
+              height={150}
             />
           </button>
         </TooltipTrigger>

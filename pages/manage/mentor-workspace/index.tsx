@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Container from "@/shared/components/Container";
-import Image from "@/shared/components/Image";
+import { Image } from '@/components/ui/image';
 import { getMentorMarathonPathname, MarathonSchema } from "@/services/mentors";
 import { differenceInDays, format } from "date-fns";
 
@@ -24,7 +24,7 @@ const MentorWorkspaceCard = ({ marathon }: { marathon: MarathonSchema }) => {
       className="block bg-basic-white rounded-lg"
     >
       <div className="rounded-lg overflow-hidden">
-        <Image src="" alt="" />
+        <Image src="/assets/empty-cover.png" alt="馬拉松封面" width={400} height={200} className="object-cover" />
       </div>
       <div className="pb-2.5 px-2.5">
         <div className="mb-2.5 flex items-center justify-between">

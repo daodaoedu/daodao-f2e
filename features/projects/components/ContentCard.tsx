@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import PostPreviewCard from '@/shared/components/Post/PostPreviewCard';
 import { MarkdownEditor } from '@/components/ui/markdown-editor';
 
@@ -78,7 +78,8 @@ function ContentCard<T extends ContentCardData>({
             <Image
               src={data.imgUrls[0]}
               alt={data.title}
-              height="300px"
+              width={400}
+              height={300}
               className="object-contain"
             />
           )}

@@ -16,7 +16,7 @@ import {
   Globe,
   Lightbulb,
 } from 'lucide-react';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import type {
   CreateIdeaFormSchema,
   UpdateIdeaFormSchema,
@@ -478,10 +478,9 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                       <Image
                         src={src}
                         alt={`Preview ${index + 1}`}
-                        width="100%"
-                        height="120px"
-                        className="size-full"
-                        wrapperClassName="w-full"
+                        width={120}
+                        height={120}
+                        className="size-full object-cover"
                       />
                       <Button
                         type="button"

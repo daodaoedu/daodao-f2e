@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import { format, isWithinInterval, subMonths } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Hot from '@/public/assets/icons/hot.svg';
@@ -87,10 +87,8 @@ export default function ResourceCard(props: CardProps) {
           <Image
             src={coverImageUrl}
             alt={title}
-            borderRadius="0.5rem"
-            height="100%"
-            className="object-cover"
-            wrapperClassName="!block"
+            fill
+            className="object-cover rounded-lg"
           />
         </div>
 

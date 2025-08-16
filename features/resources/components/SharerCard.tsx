@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 
 import ShareResourceIcon from '@/public/assets/icons/share-resource.svg';
 import CommentIcon from '@/public/assets/icons/comment.svg';
@@ -28,12 +28,12 @@ export default function SharerCard(props: SharerCardProps) {
 
   return (
     <div className={cn('rounded-xl', className)}>
-      <div className="relative h-[17.625rem]">
+      <div className="relative h-[17.625rem] overflow-hidden rounded-t-xl">
         <Image
-          height="inherit"
           src={userImg}
           alt="avatar"
-          borderRadius="0.75rem 0.75rem 0 0"
+          fill
+          className="object-cover"
         />
         <div className="absolute inset-0 w-full bg-gradient-to-b from-transparent to-primary-base/80" />
         <div className="absolute bottom-[0.8125rem] left-1/2 -translate-x-1/2 text-white">

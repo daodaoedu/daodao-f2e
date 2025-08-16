@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MapPin, EllipsisVertical } from 'lucide-react';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import { useAuth } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
 import useMutation from '@/hooks/useMutation';
@@ -70,10 +70,14 @@ function GroupCard({
     <>
       <StyledGroupCard href={`/circles/${_id}`}>
         <StyledImageWrapper>
-          <Image
-            alt={photoAlt || '未放封面'}
-            src={photoURL || emptyCoverImg.src}
-          />
+          <div className="relative w-full h-full">
+            <Image
+              alt={photoAlt || '未放封面'}
+              src={photoURL || emptyCoverImg.src}
+              fill
+              className="object-cover"
+            />
+          </div>
         </StyledImageWrapper>
         <StyledContainer>
           <StyledTitle>{title}</StyledTitle>

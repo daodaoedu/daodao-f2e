@@ -1,4 +1,4 @@
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import PostDetailCard from '@/shared/components/Post/PostDetailCard';
 import { ProjectOutcomeSchema } from '@/services/projects';
 import { BaseUserSchema } from '@/services/users';
@@ -38,7 +38,8 @@ function OutcomeDetail({
                 key={imgUrl}
                 src={imgUrl}
                 alt={outcomeData.title}
-                height="300px"
+                width={400}
+                height={300}
                 className="object-contain"
               />
             ))}

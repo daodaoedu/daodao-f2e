@@ -11,7 +11,7 @@ import {
 import Comment from '@/public/assets/icons/comment.svg';
 import Shell from '@/public/assets/icons/shell.svg';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import type { IdeaSchema } from '@/services/ideas';
 import { ROLE } from '@/constants/member';
 import {
@@ -109,9 +109,9 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
                 <Image
                   src={data.user.photoURL}
                   alt={`${data.user.name}'s avatar`}
-                  width="30px"
-                  height="30px"
-                  borderRadius="9999px"
+                  width={30}
+                  height={30}
+                  className="rounded-full"
                 />
               ) : (
                 <div className="size-[30px] shrink-0">
@@ -202,8 +202,8 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
             <Image
               src={data.imageUrls![0]}
               alt={data.imageUrls[0]}
-              width="400"
-              height="192"
+              width={400}
+              height={192}
               className="h-48 w-full object-cover transition-transform duration-200 group-hover:scale-105"
             />
           </div>

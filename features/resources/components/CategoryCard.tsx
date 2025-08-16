@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ICategory } from '@/constants/category';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import { cn } from '@/utils/cn';
 
 type CategoryCardProps = {
@@ -29,13 +29,14 @@ export default function CategoryCard(props: CategoryCardProps) {
         size === 'md' && 'md:h-[6.25rem]'
       )}
     >
-      <Image
-        src={image ?? ''}
-        alt={label}
-        borderRadius="0.5rem"
-        height="inherit"
-        className="transition-transform group-hover:scale-110"
-      />
+      <div className="relative w-full h-full">
+        <Image
+          src={image ?? ''}
+          alt={label}
+          fill
+          className="transition-transform group-hover:scale-110 object-cover rounded-lg"
+        />
+      </div>
       <div
         className={cn(
           'absolute inset-0 w-full p-2 bg-primary-base/50',

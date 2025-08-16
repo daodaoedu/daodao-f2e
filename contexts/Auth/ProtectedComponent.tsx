@@ -2,7 +2,7 @@ import type { UserSchema } from '@/services/users';
 import { useRouter } from 'next/router';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { Background, Container, Paper } from '@/components/ui/wrapper';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';
 import SEOConfig from '@/components/SEOConfig';
 import { useAuth, useAuthDispatch } from './AuthContext';
@@ -31,8 +31,8 @@ export const Fallback = ({ title, children }: FallbackProps) => (
           <Image
             src="/assets/nobody-land.gif"
             alt="nobody-land"
-            width="300"
-            height="300"
+            width={300}
+            height={300}
           />
         </div>
         {children}

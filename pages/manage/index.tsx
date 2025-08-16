@@ -45,7 +45,7 @@ import {
   useMyProjects,
   useProjectNoteMutation,
 } from "@/services/projects";
-import Image from "@/shared/components/Image";
+import { Image } from '@/components/ui/image';
 import useCreateProject from "@/features/projects/hooks/useCreateProject";
 import MilestoneCard from "@/components/Milestones/MilestoneCard";
 import {
@@ -504,7 +504,8 @@ const Main = ({ date }: { date: Date }) => {
                     <Image
                       src={AccessDeniedImg.src}
                       alt="沒有里程碑"
-                      height="320px"
+                      width={320}
+                      height={320}
                       className="object-contain h-80"
                     />
                   </div>

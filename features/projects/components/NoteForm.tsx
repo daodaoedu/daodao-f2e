@@ -12,7 +12,7 @@ import {
   ProjectNoteFormSchema,
 } from '@/services/projects';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import Upload, { ImageDataType } from '@/shared/components/Upload';
 
@@ -109,8 +109,8 @@ export default function NoteForm({
                 <Image
                   src={image.url}
                   alt="preview"
-                  width="100%"
-                  height="300px"
+                  width={400}
+                  height={300}
                   className="object-contain"
                 />
                 <span className="absolute inset-0 bottom-1.5 rounded-lg transition-colors group-hover:bg-basic-black/20" />

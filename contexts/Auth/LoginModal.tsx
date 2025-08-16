@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';
 import ResponsiveModal from '@/components/ui/responsive-modal';
 import openWindowPopup from '@/utils/openWindowPopup';
@@ -51,13 +51,15 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       title="歡迎回來島島阿學！"
     >
       <div className="mx-auto w-max">
-        <Image
-          src="https://imgur.com/EADd1UD.png"
-          alt="login"
-          background="rgba(240, 240, 240, .8)"
-          height="233px"
-          width="300px"
-        />
+        <div className="relative bg-gray-100 rounded-lg overflow-hidden">
+          <Image
+            src="https://imgur.com/EADd1UD.png"
+            alt="login"
+            width={300}
+            height={233}
+            className="object-cover"
+          />
+        </div>
       </div>
       <div className="p-4">
         <Button

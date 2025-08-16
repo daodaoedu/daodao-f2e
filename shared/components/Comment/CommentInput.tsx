@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { LockKeyholeOpen, LockKeyhole } from 'lucide-react';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import { ROLE } from '@/constants/member';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
@@ -87,9 +87,9 @@ function CommentInput({
             <Image
               src={user.photoURL}
               alt={`${user.name} avatar`}
-              width="30px"
-              height="30px"
-              borderRadius="9999px"
+              width={30}
+              height={30}
+              className="rounded-full"
             />
             <div>{user.name}</div>
             <div className="rounded bg-basic-100 px-2.5 py-1">{role}</div>

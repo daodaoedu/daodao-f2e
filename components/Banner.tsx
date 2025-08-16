@@ -1,4 +1,4 @@
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 
 import LearningMarathonImgDesktopGroup from '@/public/assets/learning-marathon/2025S1-desktop-group.png';
 import LearningMarathonImgDesktopIcon1 from '@/public/assets/learning-marathon/2025S1-desktop-icon-1.png';
@@ -27,13 +27,14 @@ const Banner = ({ children }: React.PropsWithChildren) => {
     >
       <div className="hidden md:block">
         <div className="absolute inset-0">
-          <Image
-            src={LearningMarathonImgDesktopBg.src}
-            alt="島島盃 - 學習馬拉松 2025 春季賽"
-            height="inherit"
-            background="linear-gradient(#fcfefe 10%, #e0f1f2 40%)"
-            borderRadius="0"
-          />
+          <div className="relative w-full h-full bg-gradient-to-b from-[#fcfefe] via-[#e0f1f2] to-[#e0f1f2]">
+            <Image
+              src={LearningMarathonImgDesktopBg.src}
+              alt="島島盃 - 學習馬拉松 2025 春季賽"
+              fill
+              className="object-cover"
+            />
+          </div>
         </div>
         <div
           className={cn(
@@ -41,12 +42,14 @@ const Banner = ({ children }: React.PropsWithChildren) => {
             'opacity-0 animate-fade-in animate-duration-700 animate-delay-200'
           )}
         >
-          <Image
-            src={LearningMarathonImgDesktopGroup.src}
-            alt="揪團"
-            height="inherit"
-            borderRadius="0"
-          />
+          <div className="relative w-full h-full">
+            <Image
+              src={LearningMarathonImgDesktopGroup.src}
+              alt="揪團"
+              fill
+              className="object-contain"
+            />
+          </div>
         </div>
         <div
           className={cn(
@@ -54,12 +57,14 @@ const Banner = ({ children }: React.PropsWithChildren) => {
             '-translate-x-full animate-slide-x-in -animate-distance-full animate-duration-1100 animate-delay-500'
           )}
         >
-          <Image
-            src={LearningMarathonImgDesktopBoy.src}
-            alt="男角色"
-            height="inherit"
-            borderRadius="0"
-          />
+          <div className="relative w-full h-full">
+            <Image
+              src={LearningMarathonImgDesktopBoy.src}
+              alt="男角色"
+              fill
+              className="object-contain"
+            />
+          </div>
         </div>
         <div
           className={cn(
@@ -67,12 +72,14 @@ const Banner = ({ children }: React.PropsWithChildren) => {
             'translate-x-full animate-slide-x-in animate-duration-1100 animate-delay-1100'
           )}
         >
-          <Image
-            src={LearningMarathonImgDesktopGirl.src}
-            alt="女角色"
-            height="inherit"
-            borderRadius="0"
-          />
+          <div className="relative w-full h-full">
+            <Image
+              src={LearningMarathonImgDesktopGirl.src}
+              alt="女角色"
+              fill
+              className="object-contain"
+            />
+          </div>
         </div>
         <div
           className={cn(
@@ -81,12 +88,14 @@ const Banner = ({ children }: React.PropsWithChildren) => {
           )}
         >
           <div className="animate-delay-200 animate-oscillate">
-            <Image
-              src={LearningMarathonImgDesktopIcon5.src}
-              alt="icon5"
-              height="inherit"
-              borderRadius="0"
-            />
+            <div className="relative w-full h-full">
+              <Image
+                src={LearningMarathonImgDesktopIcon5.src}
+                alt="icon5"
+                fill
+                className="object-contain"
+              />
+            </div>
           </div>
         </div>
         <div
@@ -96,12 +105,14 @@ const Banner = ({ children }: React.PropsWithChildren) => {
           )}
         >
           <div className="animate-delay-1700 animate-oscillate">
-            <Image
-              src={LearningMarathonImgDesktopIcon3.src}
-              alt="icon3"
-              height="inherit"
-              borderRadius="0"
-            />
+            <div className="relative w-full h-full">
+              <Image
+                src={LearningMarathonImgDesktopIcon3.src}
+                alt="icon3"
+                fill
+                className="object-contain"
+              />
+            </div>
           </div>
         </div>
         <div
@@ -111,12 +122,14 @@ const Banner = ({ children }: React.PropsWithChildren) => {
           )}
         >
           <div className="animate-delay-1100 animate-oscillate">
-            <Image
-              src={LearningMarathonImgDesktopIcon1.src}
-              alt="icon1"
-              height="inherit"
-              borderRadius="0"
-            />
+            <div className="relative w-full h-full">
+              <Image
+                src={LearningMarathonImgDesktopIcon1.src}
+                alt="icon1"
+                fill
+                className="object-contain"
+              />
+            </div>
           </div>
         </div>
         <div
@@ -126,12 +139,14 @@ const Banner = ({ children }: React.PropsWithChildren) => {
           )}
         >
           <div className="animate-delay-1900 animate-oscillate">
-            <Image
-              src={LearningMarathonImgDesktopIcon4.src}
-              alt="icon4"
-              height="inherit"
-              borderRadius="0"
-            />
+            <div className="relative w-full h-full">
+              <Image
+                src={LearningMarathonImgDesktopIcon4.src}
+                alt="icon4"
+                fill
+                className="object-contain"
+              />
+            </div>
           </div>
         </div>
         <div
@@ -141,12 +156,14 @@ const Banner = ({ children }: React.PropsWithChildren) => {
           )}
         >
           <div className="animate-delay-300 animate-oscillate">
-            <Image
-              src={LearningMarathonImgDesktopIcon2.src}
-              alt="icon2"
-              height="inherit"
-              borderRadius="0"
-            />
+            <div className="relative w-full h-full">
+              <Image
+                src={LearningMarathonImgDesktopIcon2.src}
+                alt="icon2"
+                fill
+                className="object-contain"
+              />
+            </div>
           </div>
         </div>
         <div
@@ -156,23 +173,26 @@ const Banner = ({ children }: React.PropsWithChildren) => {
           )}
         >
           <div className="animate-delay-1300 animate-oscillate">
-            <Image
-              src={LearningMarathonImgDesktopIcon6.src}
-              alt="icon6"
-              height="inherit"
-              borderRadius="0"
-            />
+            <div className="relative w-full h-full">
+              <Image
+                src={LearningMarathonImgDesktopIcon6.src}
+                alt="icon6"
+                fill
+                className="object-contain"
+              />
+            </div>
           </div>
         </div>
       </div>
       <div className="md:hidden">
-        <Image
-          src={LearningMarathonImgMobile.src}
-          alt="島島盃 - 學習馬拉松 2025 春季賽"
-          height="inherit"
-          background="linear-gradient(#fcfefe 10%, #e0f1f2 40%)"
-          borderRadius="0"
-        />
+        <div className="relative w-full h-full bg-gradient-to-b from-[#fcfefe] via-[#e0f1f2] to-[#e0f1f2]">
+          <Image
+            src={LearningMarathonImgMobile.src}
+            alt="島島盃 - 學習馬拉松 2025 春季賽"
+            fill
+            className="object-cover"
+          />
+        </div>
       </div>
       {children}
     </div>

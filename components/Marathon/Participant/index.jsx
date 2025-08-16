@@ -1,5 +1,5 @@
 import { Title } from '@/components/ui/typography';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import PersonaImage1 from '@/public/assets/marathon-persona-1.png';
 import PersonaImage2 from '@/public/assets/marathon-persona-2.png';
 import PersonaImage3 from '@/public/assets/marathon-persona-3.png';
@@ -13,8 +13,8 @@ export default function Participant() {
           <Image
             alt="marathon-persona-1"
             src={PersonaImage1.src}
-            width="200px"
-            height="160px"
+            width={200}
+            height={160}
             className="block mx-auto object-cover object-center"
           />
         </div>
@@ -29,8 +29,8 @@ export default function Participant() {
           <Image
             alt="marathon-persona-2"
             src={PersonaImage2.src}
-            width="200px"
-            height="160px"
+            width={200}
+            height={160}
             className="block mx-auto object-cover object-center"
           />
         </div>
@@ -45,8 +45,8 @@ export default function Participant() {
           <Image
             alt="marathon-persona-3"
             src={PersonaImage3.src}
-            width="200px"
-            height="160px"
+            width={200}
+            height={160}
             className="block mx-auto object-cover object-center"
           />
         </div>
@@ -61,8 +61,8 @@ export default function Participant() {
           <Image
             alt="marathon-persona-4"
             src={PersonaImage4.src}
-            width="200px"
-            height="160px"
+            width={200}
+            height={160}
             className="block mx-auto object-cover object-center"
           />
         </div>

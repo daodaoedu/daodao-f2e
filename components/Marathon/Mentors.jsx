@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
 import { cn } from '@/utils/cn';
 import {
@@ -181,7 +181,7 @@ const MentorCard = ({
   >
     <div className="absolute inset-0 overflow-hidden">
       <div className="scale-110 transition-transform duration-300 group-hover:scale-125">
-        <Image src={mentor?.image} alt={mentor?.name} height="inherit" borderRadius="0" />
+        <Image src={mentor?.image} alt={mentor?.name} fill className="object-cover" />
       </div>
     </div>
     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-primary-base/80" />
