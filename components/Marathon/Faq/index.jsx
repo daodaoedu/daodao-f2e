@@ -42,7 +42,7 @@ function Accordion({ title, children }) {
 
       <div
         id={`accordion-content-${title}`}
-        className={`h-auto max-h-0 overflow-hidden bg-white transition-[max-height] duration-300 ease-in-out ${isOpen ? '' : ''}`}
+        className="h-auto max-h-0 overflow-hidden bg-white transition-[max-height] duration-300 ease-in-out"
         style={{
           maxHeight: isOpen ? `${height}px` : '0px',
         }}

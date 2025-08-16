@@ -4,8 +4,6 @@ import { ProtectedComponent, useAuth } from '@/contexts/Auth';
 import Edit from '@/components/PersonalCard/Edit';
 import SEOConfig from '@/components/SEOConfig';
 import MyGroup from '@/components/PersonalCard/MyGroup';
-import MyResource from '@/components/PersonalCard/MyResource';
-import MyNote from '@/components/PersonalCard/MyNote';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import getEnv from '@/utils/env';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,7 +26,7 @@ const PersonalCardPage = () => {
     {
       id: 'my-resource',
       tabLabel: '我的學習資源',
-      view: <MyResource title="我的學習資源" userId={user?._id} />,
+      view: <MyGroup title="我的學習資源" userId={user?._id} />,
     },
     {
       id: 'my-project',
@@ -37,7 +35,7 @@ const PersonalCardPage = () => {
     {
       id: 'my-note ',
       tabLabel: '我的便利貼',
-      view: <MyNote title="我的便利貼" userId={user?._id} />,
+      view: <MyGroup title="我的便利貼" userId={user?._id} />,
     },
   ];
 
