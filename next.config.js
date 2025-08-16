@@ -22,12 +22,12 @@ const config = {
   images: {
     unoptimized: true,
   },
-  webpack: (config, options) => {
+  webpack: (config) => {
     const experiments = { ...config.experiments, topLevelAwait: true };
 
     config.module.rules.push({
       test: /\.svg$/,
-      use: [options.defaultLoaders.babel, "@svgr/webpack"],
+      use: ["@svgr/webpack"],
     });
 
     return Object.assign(config, { experiments });

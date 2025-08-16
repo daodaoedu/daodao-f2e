@@ -1,6 +1,6 @@
 import { BASE_URL } from '@/constants/common';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { MapPin, Edit } from 'lucide-react';
 import DropdownMenu from './Dropdown';
@@ -140,7 +140,7 @@ function UserCard({
 
         <StyledProfileDate>
           更新日期：
-          {moment(updatedDate).format('YYYY/MM/DD')}
+          {format(updatedDate, 'yyyy/MM/dd')}
         </StyledProfileDate>
       </StyledProfileOther>
     </StyledProfileWrapper>
