@@ -1,15 +1,13 @@
 import { useState } from 'react';
-import Skeleton from '@mui/material/Skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import emptyCoverWithBackgroundImg from '@/public/assets/empty-cover-with-background.png';
 import { cn } from '@/utils/cn';
 
 const Loading = ({ height }: { height: string }) => (
   <Skeleton
-    variant="rectangular"
-    height={height}
-    sx={{ marginTop: '4px' }}
-    animation="wave"
+    className="mt-1"
+    style={{ height }}
   />
 );
 

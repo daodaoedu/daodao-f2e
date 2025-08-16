@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { Button } from '@mui/material';
+import { Button } from '@/components/ui/button';
 import { ChevronLeft, Edit } from 'lucide-react';
 
 import { ROLE, EDUCATION } from '@/constants/member';
@@ -13,36 +13,7 @@ import UserCard from './UserCard';
 import UserTabs from './UserTabs';
 import { StyledPanelBox } from './UserTabs/UserTabs.styled';
 
-const BottonBack = {
-  color: '#536166',
-  fontSize: '14px',
-  position: 'absolute',
-  left: '-10px',
-  top: '-50px',
-  boxShadow: 'unset',
-  '&:hover': {
-    color: '#16B9B3',
-  },
-  '@media (max-width: 767px)': {
-    position: 'unset',
-  },
-};
-const BottonEdit = {
-  display: 'none',
-  '@media (max-width: 767px)': {
-    display: 'flex',
-    width: '100%',
-    color: '#536166',
-    fontSize: '14px',
-    boxShadow: 'unset',
-    borderRadius: '20px',
-    marginTop: '32px',
-    padding: '8px 0',
-    '&:hover': {
-      color: '#16B9B3',
-    },
-  },
-};
+// Styles moved to className props
 const ROLE_LIST = mapToTable(ROLE);
 const EDUCATION_STAGE_TABLE = mapToTable(EDUCATION);
 
@@ -92,9 +63,8 @@ const Profile = ({
       <SEOConfig {...SEOData} />
       <StyledPanelBox className="container">
         <Button
-          variant="text"
-          sx={BottonBack}
-          className="group"
+          variant="ghost"
+          className="group absolute left-[-10px] top-[-50px] text-[#536166] text-sm shadow-none hover:text-[#16B9B3] max-md:relative max-md:left-0 max-md:top-0"
           onClick={() => {
             router.push('/personal-card');
           }}
@@ -116,8 +86,8 @@ const Profile = ({
         />
 
         <Button
-          variant="text"
-          sx={BottonEdit}
+          variant="ghost"
+          className="hidden max-md:flex w-full text-[#536166] text-sm shadow-none rounded-[20px] mt-8 py-2 hover:text-[#16B9B3]"
           onClick={() => {
             router.push('/personal-card');
           }}

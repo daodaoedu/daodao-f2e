@@ -1,69 +1,49 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import { Typography, Stack } from '@mui/material';
-
-const ContactUsWrapper = styled.address`
-  margin: 20px 0;
-`;
-
-const LinkWrapper = styled.a`
-  color: black;
-  &:hover {
-    opacity: 100%;
-    transition: color 0.5s ease;
-    color: #16b9b3;
-  }
-`;
-
-const LineWrapper = styled(Typography)`
-  margin: 5px 0;
-`;
+import { Title, Text } from '@/components/ui/typography';
 
 const ContactUs = () => (
-  <ContactUsWrapper>
-    <Typography
-      variant="h2"
-      sx={{
-        margin: '40px 0 10px 0',
-      }}
+  <address className="my-5">
+    <Title
+      as="h2"
+      size="lg"
+      className="mt-10 mb-2.5"
     >
       聯絡我們
-    </Typography>
-    <Stack
-      sx={{
-        margin: '20px',
-      }}
-    >
-      <LineWrapper variant="p">
-        <LinkWrapper
+    </Title>
+    <div className="flex flex-col m-5">
+      <Text className="my-1.5">
+        <a
           target="_blank"
           href="https://www.facebook.com/daodao.edu"
           rel="noopener noreferrer"
+          className="text-black hover:text-[#16b9b3] hover:opacity-100 transition-colors duration-500"
         >
           🏝️ 島島阿學的 Facebook
-        </LinkWrapper>
-      </LineWrapper>
-      <LineWrapper variant="p">
-        <LinkWrapper
+        </a>
+      </Text>
+      <Text className="my-1.5">
+        <a
           target="_blank"
           href="https://www.instagram.com/daodao_edu/"
           rel="noopener noreferrer"
+          className="text-black hover:text-[#16b9b3] hover:opacity-100 transition-colors duration-500"
         >
           🏝️ 島島阿學的 Instagram
-        </LinkWrapper>
-      </LineWrapper>
-      <LineWrapper variant="p">
-        <LinkWrapper
+        </a>
+      </Text>
+      <Text className="my-1.5">
+        <a
           target="_blank"
           href="mailto:contact@daoedu.tw"
           rel="noopener noreferrer"
+          className="text-black hover:text-[#16b9b3] hover:opacity-100 transition-colors duration-500"
         >
           🏝️ 島島阿學的信箱 – contact@daoedu.tw
           <br />
-        </LinkWrapper>
-      </LineWrapper>
-    </Stack>
-  </ContactUsWrapper>
+        </a>
+      </Text>
+    </div>
+  </address>
 );
 
 export default ContactUs;

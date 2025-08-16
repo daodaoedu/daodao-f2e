@@ -1,7 +1,11 @@
-import { useState } from 'react';
 import { useRouter } from 'next/router';
-import Menu from '@mui/material/Menu';
-import IconButton from '@mui/material/IconButton';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { MapPin, EllipsisVertical } from 'lucide-react';
 import Image from '@/shared/components/Image';
 import { useAuth } from '@/contexts/Auth';
@@ -19,7 +23,6 @@ import {
   StyledTime,
   StyledFlex,
   StyledStatus,
-  StyledMenuItem,
   StyledImageWrapper,
 } from './GroupCard.styled';
 
@@ -38,7 +41,7 @@ function GroupCard({
 }) {
   const { user } = useAuth();
   const router = useRouter();
-  const [anchorEl, setAnchorEl] = useState(null);
+
   const isEnabledMutation = user?._id === userId;
 
   const apiUpdateGrouping = useMutation(`/circles/${_id}`, {
@@ -53,22 +56,11 @@ function GroupCard({
     onSuccess: onDeleteGroup,
   });
 
-  const handleMenu = (event) => {
-    event.preventDefault();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   const handleGrouping = () => {
-    handleClose();
     apiUpdateGrouping.mutate({ isGrouping: !isGrouping });
   };
 
   const handleDeleteGroup = () => {
-    handleClose();
     apiDeleteGroup.mutate();
   };
 
@@ -106,37 +98,29 @@ function GroupCard({
                 <StyledStatus className="finished">已結束</StyledStatus>
               )}
               {isEnabledMutation && (
-                <IconButton size="small" onClick={handleMenu}>
-                  <EllipsisVertical />
-                </IconButton>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <EllipsisVertical />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => router.push(`/circles/${_id}/edit`)}>
+                      編輯
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleGrouping}>
+                      {isGrouping ? '結束揪團' : '開放揪團'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleDeleteGroup}>
+                      刪除
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </StyledFlex>
           </StyledFooter>
         </StyledContainer>
       </StyledGroupCard>
-
-      <Menu
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        keepMounted
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <StyledMenuItem onClick={() => router.push(`/circles/${_id}/edit`)}>
-          編輯
-        </StyledMenuItem>
-        <StyledMenuItem onClick={handleGrouping}>
-          {isGrouping ? '結束揪團' : '開放揪團'}
-        </StyledMenuItem>
-        <StyledMenuItem onClick={handleDeleteGroup}>刪除</StyledMenuItem>
-      </Menu>
     </>
   );
 }

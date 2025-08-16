@@ -1,15 +1,17 @@
 import React from 'react';
-import { Box } from '@mui/material';
 
 const SocialMediaItem = ({
   link, text, tag, iconComponent,
-}) => (
-  <Box as={tag || 'div'}>
-    {iconComponent}
-    <a target="_blank" rel="noreferrer" href={link}>
-      {text}
-    </a>
-  </Box>
-);
+}) => {
+  const Component = tag || 'div';
+  return (
+    <Component>
+      {iconComponent}
+      <a target="_blank" rel="noreferrer" href={link}>
+        {text}
+      </a>
+    </Component>
+  );
+};
 
 export default SocialMediaItem;

@@ -1,29 +1,13 @@
 import { Fragment, useState } from 'react';
-import styled from '@emotion/styled';
-import { Box, Typography } from '@mui/material';
+import { cn } from '@/utils/cn';
+
+import { Text, Title } from '@/components/ui/typography';
 import useFetch from '@/hooks/useFetch';
 import GroupCard from './GroupCard';
 import LoadingCard from './LoadingCard';
 import { StyledDivider } from './GroupCard.styled';
 
-const StyledGroupsWrapper = styled.div`
-  background-color: #ffffff;
-  max-width: 672px;
-  border-radius: 16px;
-  padding: 36px 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  @media (max-width: 767px) {
-    padding: 16px 20px;
-  }
-
-  ${(props) => props.sx}
-`;
-
-const MyGroup = ({ title, sx, userId }) => {
+const MyGroup = ({ title, sx, userId, className }) => {
   const [response, setResponse] = useState(null);
   const { isFetching } = useFetch(`/circles/user/${userId}`, {
     enabled: !!userId,
@@ -71,22 +55,27 @@ const MyGroup = ({ title, sx, userId }) => {
   };
 
   if (!userId) {
-    return <Typography py={7.5}>趕快發起屬於你的揪團吧～</Typography>;
+    return <Text className="py-[30px]">趕快發起屬於你的揪團吧～</Text>;
   }
 
   return (
-    <StyledGroupsWrapper sx={sx}>
+    <div
+      className={cn(
+        'bg-white max-w-[672px] rounded-2xl py-9 px-10 flex flex-col justify-center items-center max-md:py-4 max-md:px-5',
+        className
+      )}
+      style={sx}
+    >
       {title && (
-        <Typography
-          sx={{
-            fontSize: '22px', color: '#536166', fontWeight: 700, mb: 1,
-          }}
+        <Title
+          size="md"
+          className="text-[22px] text-[#536166] font-bold mb-1"
         >
           {title}
-        </Typography>
+        </Title>
       )}
 
-      <Box width="100%">
+      <div className="w-full">
         {isFetching ? (
           <LoadingCard />
         ) : Array.isArray(response?.data) && response.data.length ? (
@@ -102,10 +91,10 @@ const MyGroup = ({ title, sx, userId }) => {
             </Fragment>
           ))
         ) : (
-          <Typography py={7.5}>趕快發起屬於你的揪團吧～</Typography>
+          <Text className="py-[30px]">趕快發起屬於你的揪團吧～</Text>
         )}
-      </Box>
-    </StyledGroupsWrapper>
+      </div>
+    </div>
   );
 };
 

@@ -1,7 +1,7 @@
 import { BASE_URL } from '@/constants/common';
 import { useRouter } from 'next/router';
 import moment from 'moment';
-import { Box, Button } from '@mui/material';
+import { Button } from '@/components/ui/button';
 import { MapPin, Edit } from 'lucide-react';
 import DropdownMenu from './Dropdown';
 import SocialMediaItem from './SocialMediaItem';
@@ -52,8 +52,8 @@ function UserCard({
     <StyledProfileWrapper>
       {isLoginUser ? (
         <Button
-          variant="outlined"
-          sx={BottonEdit}
+          variant="outline"
+          className="text-[#536166] text-sm absolute right-[30px] top-[30px] shadow-none rounded-[20px] hover:text-[#16B9B3] max-md:hidden"
           onClick={() => {
             router.push('/personal-card');
           }}
@@ -67,7 +67,7 @@ function UserCard({
 
       <StyledProfileBaseInfo>
         <AvatorComponent photoURL={photoURL} />
-        <Box sx={{ marginLeft: '12px' }}>
+        <div className="ml-3">
           <StyledProfileTitle>
             <div>
               <h2>{userName || '-'}</h2>
@@ -84,7 +84,7 @@ function UserCard({
                 : locations.join('')
               : '-'}
           </StyledProfileLocation>
-        </Box>
+        </div>
       </StyledProfileBaseInfo>
 
       {Array.isArray(tagList) && (

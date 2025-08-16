@@ -1,32 +1,14 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import { Typography } from '@mui/material';
-
-const IconListWrapper = styled.div`
-  ul {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    margin-top: 15px;
-  }
-  li {
-    cursor: pointer;
-    margin: auto 10px;
-  }
-`;
+import { Text } from '@/components/ui/typography';
 
 const SubFooter = ({ title, list }) => (
-  <IconListWrapper>
-    <Typography
-      variant="h2"
-      sx={{
-        marginBottom: '10px',
-        fontSize: '18px',
-        fontWeight: '500',
-      }}
+  <div className="[&>ul]:flex [&>ul]:justify-start [&>ul]:items-center [&>ul]:mt-[15px] [&>li]:cursor-pointer [&>li]:mx-2.5 [&>li]:my-auto">
+    <Text
+      as="h2"
+      className="mb-2.5 text-lg font-medium"
     >
       {title}
-    </Typography>
+    </Text>
     <ul>
       {list.map((value) => (
         <a
@@ -39,7 +21,7 @@ const SubFooter = ({ title, list }) => (
         </a>
       ))}
     </ul>
-  </IconListWrapper>
+  </div>
 );
 
 export default SubFooter;

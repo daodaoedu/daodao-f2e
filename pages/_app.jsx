@@ -3,8 +3,6 @@ import React, { useEffect, useMemo } from 'react';
 import { SWRConfig } from 'swr';
 
 
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import { useRouter } from 'next/router';
@@ -54,9 +52,8 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
 
   return (
     <>
-      {/* mui normalize css */}
-      <CssBaseline />
-      {/* For custum reset css */}
+      {/* Reset CSS handled by global.css and shadcn/ui */}
+      {/* For custom reset css */}
       <Toaster
         position="top-center"
         containerStyle={{ background: 'none', marginTop: '80px' }}

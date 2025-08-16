@@ -1,6 +1,10 @@
-import { useState } from 'react';
-import Menu from '@mui/material/Menu';
-import IconButton from '@mui/material/IconButton';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { MapPin, EllipsisVertical } from 'lucide-react';
 import Image from '@/shared/components/Image';
 import { useAuth } from '@/contexts/Auth';
@@ -18,7 +22,6 @@ import {
   StyledTime,
   StyledFlex,
   StyledStatus,
-  StyledMenuItem,
   StyledImageWrapper,
 } from './GroupCard.styled';
 
@@ -36,7 +39,7 @@ function GroupCard({
   onDeleteGroup,
 }) {
   const { user } = useAuth();
-  const [anchorEl, setAnchorEl] = useState(null);
+
   const isEnabledMutation = user?._id === userId;
 
   const apiUpdateGrouping = useMutation(`/circles/${_id}`, {
@@ -51,22 +54,11 @@ function GroupCard({
     onSuccess: onDeleteGroup,
   });
 
-  const handleMenu = (event) => {
-    event.preventDefault();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   const handleGrouping = () => {
-    handleClose();
     apiUpdateGrouping.mutate({ isGrouping: !isGrouping });
   };
 
   const handleDeleteGroup = () => {
-    handleClose();
     apiDeleteGroup.mutate();
   };
 
@@ -104,23 +96,21 @@ function GroupCard({
                 </StyledStatus>
               )}
               {user?._id === userId && (
-                <>
-                  <IconButton onClick={handleMenu}>
-                    <EllipsisVertical />
-                  </IconButton>
-                  <Menu
-                    id="menu-appbar"
-                    anchorEl={anchorEl}
-                    keepMounted
-                    open={Boolean(anchorEl)}
-                    onClose={handleClose}
-                  >
-                    <StyledMenuItem onClick={handleGrouping}>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <EllipsisVertical />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={handleGrouping}>
                       {isGrouping ? '暫停進行' : '開始進行'}
-                    </StyledMenuItem>
-                    <StyledMenuItem onClick={handleDeleteGroup}>刪除筆記</StyledMenuItem>
-                  </Menu>
-                </>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleDeleteGroup}>
+                      刪除筆記
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </StyledFlex>
           </StyledFooter>

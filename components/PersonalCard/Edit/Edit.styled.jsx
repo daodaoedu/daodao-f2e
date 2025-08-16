@@ -1,133 +1,156 @@
-import styled from '@emotion/styled';
-import { Box, Typography, Button } from '@mui/material';
+import { Text } from '@/components/ui/typography';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/utils/cn';
 
-export const FormWrapper = styled.form`
-  --section-height: calc(100vh - 80px);
-  --section-height-offset: 80px;
-`;
+export const FormWrapper = ({ children, ...props }) => (
+  <form
+    {...props}
+    style={{
+      '--section-height': 'calc(100vh - 80px)',
+      '--section-height-offset': '80px',
+    }}
+  >
+    {children}
+  </form>
+);
 
-export const ContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border-radius: 16px;
-  margin: 0 auto;
-  width: 672px;
-  @media (max-width: 767px) {
-    width: 100%;
-    .title {
-      text-overflow: ellipsis;
-      width: 100%;
-    }
-  }
-`;
+export const ContentWrapper = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'flex flex-col justify-center items-center rounded-2xl mx-auto w-[672px] max-md:w-full',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledTitleWrap = styled(Box)`
-  background-color: #ffffff;
-  padding: 5%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  border-radius: 16px;
-  h2 {
-    font-weight: 700;
-    font-size: 22px;
-    line-height: 140%;
-    text-align: center;
-    color: #536166;
-  }
-  .title-memo {
-    font-weight: 700;
-    font-size: 14px;
-    line-height: 140%;
-    text-align: center;
-    color: #536166;
-    margin-top: 8px;
-  }
-`;
+export const StyledTitleWrap = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'bg-white p-[5%] flex flex-col justify-center items-center w-full rounded-2xl',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledSection = styled(Box)`
-  background-color: #ffffff;
-  padding: 40px;
-  margin-top: 16px;
-  width: 100%;
-  border-radius: 16px;
-  @media (max-width: 767px) {
-    padding: 32px 16px;
-  }
-`;
+export const StyledSection = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'bg-white p-10 mt-4 w-full rounded-2xl max-md:px-4 max-md:py-8',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  margin-top: ${({ mt = '20' }) => `${mt}px`};
-  .MuiInputBase-input {
-    padding: 17px 16px 12px;
-  }
-`;
+export const StyledGroup = ({ children, className, mt = '20', ...props }) => (
+  <div
+    className={cn(
+      'flex flex-col justify-center items-start',
+      className
+    )}
+    style={{ marginTop: `${mt}px` }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledSelectWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-top: 10px;
-`;
+export const StyledSelectWrapper = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'flex flex-wrap justify-between items-center w-full mt-2.5',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledSelectText = styled(Typography)`
-  margin: auto;
-  font-weight: ${({ isselected }) => (isselected === 'true' ? '700' : 'normal')};
-`;
+export const StyledSelectText = ({ children, className, isselected, ...props }) => (
+  <Text
+    className={cn(
+      'mx-auto',
+      isselected === 'true' ? 'font-bold' : 'font-normal',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </Text>
+);
 
-export const StyledSelectBox = styled(Box)`
-  border: 1px solid #dbdbdb;
-  border-radius: 8px;
-  padding: 10px;
-  width: ${({ col = '3' }) => `calc(calc(100% - 16px) / ${col})`};
-  display: flex;
-  justify-items: center;
-  align-items: center;
-  cursor: pointer;
-  background-color: ${({ isselected }) => (isselected === 'true' ? '#DEF5F5' : 'initial')};
-  border: ${({ isselected }) => (isselected === 'true' ? '1px solid #16B9B3' : '1px solid #DBDBDB')};
-  margin-bottom: 12px;
-`;
+export const StyledSelectBox = ({ children, className, col = '3', isselected, onClick, ...props }) => (
+  <button
+    type="button"
+    className={cn(
+      'border rounded-lg p-2.5 flex justify-center items-center cursor-pointer mb-3',
+      isselected === 'true'
+        ? 'bg-[#DEF5F5] border-[#16B9B3]'
+        : 'bg-white border-[#DBDBDB]',
+      className
+    )}
+    style={{ width: `calc(calc(100% - 16px) / ${col})` }}
+    onClick={onClick}
+    {...props}
+  >
+    {children}
+  </button>
+);
 
-export const StyledToggleWrapper = styled(Box)`
-  border: 1px solid #dbdbdb;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 13px 16px;
-`;
+export const StyledToggleWrapper = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'border border-[#DBDBDB] rounded-lg flex justify-between items-center py-3 px-4',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledToggleText = styled(Typography)`
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 140%;
-  color: #293a3d;
-`;
+export const StyledToggleText = ({ children, className, ...props }) => (
+  <Text
+    className={cn(
+      'font-medium text-base leading-[140%] text-[#293a3d]',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </Text>
+);
 
-export const StyledButtonGroup = styled(Box)`
-  margin-top: 24px;
-  width: 100%;
-  display: flex;
-`;
+export const StyledButtonGroup = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'mt-6 w-full flex',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledButton = styled(Button)(({ variant = 'contained' }) => ({
-  ...(variant === 'contained' && {
-    color: '#ffffff',
-    backgroundColor: '#16b9b3',
-  }),
-  width: '100%',
-  height: '40px',
-  borderRadius: '20px',
-  marginRight: '8px',
-}));
+export const StyledButton = ({ children, className, variant = 'contained', ...props }) => (
+  <Button
+    className={cn(
+      'w-full h-10 rounded-[20px] mr-2',
+      variant === 'contained' && 'text-white bg-[#16b9b3] hover:bg-[#16b9b3]',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </Button>
+);

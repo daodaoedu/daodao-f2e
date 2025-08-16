@@ -1,6 +1,6 @@
 import React from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { Skeleton } from '@mui/material';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Avator = ({ photoURL }) => (
   <LazyLoadImage
@@ -20,14 +20,10 @@ const Avator = ({ photoURL }) => (
     placeholder={
         // eslint-disable-next-line react/jsx-wrap-multilines
       <Skeleton
-        sx={{
-          height: '80px',
-          width: '80px',
+        className="h-20 w-20 rounded-full mt-1"
+        style={{
           background: 'rgba(240, 240, 240, .8)',
-          marginTop: '4px',
         }}
-        variant="circular"
-        animation="wave"
       />
       }
   />

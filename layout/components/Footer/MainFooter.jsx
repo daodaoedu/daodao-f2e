@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from '@emotion/styled';
 import { Image } from '@/components/ui/image';
 import FacebookIconPng from '@/public/email/fecebook-icon.png';
 import InstagramIconPng from '@/public/email/instagram-icon.png';
@@ -7,45 +6,12 @@ import IntroList from './IntroList';
 import IconList from './IconList';
 import { FOOTER_LINK } from '../../../constants/category';
 
-const MainFooterWrapper = styled.div`
-  height: 100%;
-  background-color: #536166;
-  color: white;
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-start;
-  font-size: 16px;
-  letter-spacing: 0.08em;
-  @media (max-width: 767px) {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-  }
-`;
-
-const LogoWrapper = styled.div`
-  margin: 0 10px;
-  cursor: pointer;
-`;
-
-const BlockWrapper = styled.div`
-  display: flex;
-  justify-content: space-around;
-  margin-top: 30px;
-`;
-
 const aboutDaoConfig = [
   {
     name: '關於島島',
     link: '/about',
     target: '_self',
   },
-  // {
-  //   name: '體驗問卷',
-  //   link: 'https://docs.google.com/forms/d/e/1FAIpQLSeyU9-Q-kIWp5uutcik3h-RO4o5VuG6oG0m-4u1Ua18EOu3aw/viewform',
-  //   target: '_blank',
-  // },
   {
     name: '隱私權政策',
     link: '/terms/privacypolicy',
@@ -90,24 +56,21 @@ const socialConfig = [
 ];
 
 const SubFooter = () => (
-  <MainFooterWrapper>
-    <BlockWrapper>
-      {/* //img */}
-      <LogoWrapper>
+  <div className="h-full bg-[#536166] text-white flex justify-around items-start text-base tracking-[0.08em] max-md:flex max-md:flex-col max-md:justify-around max-md:items-center">
+    <div className="flex justify-around mt-[30px]">
+      <div className="mx-2.5 cursor-pointer">
         <img src="/new-logo-vertical.png" alt="daodao" width="120" height="123" />
-      </LogoWrapper>
-    </BlockWrapper>
-    <BlockWrapper>
-      {/* 連結 */}
+      </div>
+    </div>
+    <div className="flex justify-around mt-[30px]">
       <IntroList title="關於島島阿學" list={aboutDaoConfig} />
       <IntroList title="找資源" list={FOOTER_LINK} />
       <IntroList title="訂閱電子報" list={socialConfig} />
-    </BlockWrapper>
-    <BlockWrapper>
-      {/* 追蹤島島 */}
+    </div>
+    <div className="flex justify-around mt-[30px]">
       <IconList title="追蹤島島" list={iconListConfig} />
-    </BlockWrapper>
-  </MainFooterWrapper>
+    </div>
+  </div>
 );
 
 export default SubFooter;

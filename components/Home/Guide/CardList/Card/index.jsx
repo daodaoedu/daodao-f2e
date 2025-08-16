@@ -1,115 +1,43 @@
-import styled from '@emotion/styled';
-import { css, keyframes } from '@emotion/react';
 import { useRouter } from 'next/router';
-
-const slideInUp = keyframes`
-    0% {
-      opacity: 0;
-      transform: translateY(25%);
-    }
-    100% {
-      opacity: 1;
-      transform: none;
-    }
-`;
-
-const CardWrapper = styled.li`
-  position: relative;
-  width: 30%;
-  height: 430px;
-  border-radius: 20px;
-  opacity: 0;
-
-  margin: 10px;
-
-  cursor: pointer;
-  object-fit: cover;
-  &:hover {
-    transform: scale(1.05);
-    transition: transform 0.4s;
-  }
-
-  ${({ isShow }) => isShow &&
-    css`
-      opacity: 1;
-      animation: 1.5s ${slideInUp} forwards;
-    `}
-
-  @media (max-width: 767px) {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
-    padding-top: 0;
-    padding-left: 0;
-    text-align: center;
-  }
-`;
-
-const ContentWrapper = styled.div`
-  margin: auto;
-  width: 240px;
-  height: 110px;
-  padding-top: 130px;
-  .title {
-    color: #f0f0f0;
-    font-size: 32px;
-    line-height: 45px;
-    letter-spacing: 0.08em;
-    font-weight: bold;
-    text-align: center;
-  }
-
-  .desc {
-    color: #f0f0f0;
-    font-size: 20px;
-    line-height: 45px;
-    letter-spacing: 0.08em;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 20px;
-  }
-
-  @media (max-width: 767px) {
-    padding-top: 0px;
-  }
-`;
-
-const BackgroundWrapper = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  border-radius: 20px;
-  z-index: -1;
-  ${({ image }) => css`
-    background-image: ${`url(${image})`};
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    filter: brightness(50%);
-  `}
-`;
 
 const Card = ({
   id, image, title, desc,
 }) => {
   const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/search?cats=${title}`);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
-    <CardWrapper
+    <button
+      type="button"
       key={id}
-      isShow
-      onClick={() => router.push(`/search?cats=${title}`)}
-      // isShow={isShow}
+      className="relative w-[30%] h-[430px] rounded-[20px] opacity-100 m-2.5 cursor-pointer object-cover hover:scale-105 hover:transition-transform hover:duration-400 animate-[slideInUp_1.5s_forwards] max-md:flex max-md:flex-col max-md:justify-center max-md:w-full max-md:pt-0 max-md:pl-0 max-md:text-center bg-transparent border-none p-0"
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      aria-label={`搜尋 ${title} 相關資源`}
     >
-      <BackgroundWrapper image={image} />
-      <ContentWrapper>
-        <p className="title">{title}</p>
-        <p className="desc">{desc}</p>
-      </ContentWrapper>
-    </CardWrapper>
+      <div
+        className="absolute left-0 top-0 w-full h-full overflow-hidden rounded-[20px] z-[-1] bg-cover bg-no-repeat bg-center brightness-50"
+        style={{ backgroundImage: `url(${image})` }}
+      />
+      <div className="mx-auto w-[240px] h-[110px] pt-[130px] max-md:pt-0">
+        <p className="title text-[#f0f0f0] text-[32px] leading-[45px] tracking-[0.08em] font-bold text-center">
+          {title}
+        </p>
+        <p className="desc text-[#f0f0f0] text-xl leading-[45px] tracking-[0.08em] font-bold text-center mt-5">
+          {desc}
+        </p>
+      </div>
+    </button>
   );
 };
 

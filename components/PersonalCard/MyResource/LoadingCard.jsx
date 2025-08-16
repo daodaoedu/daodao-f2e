@@ -1,5 +1,5 @@
-import Skeleton from '@mui/material/Skeleton';
-import IconButton from '@mui/material/IconButton';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { MapPin, EllipsisVertical } from 'lucide-react';
 import {
   StyledAreas,
@@ -49,9 +49,9 @@ function LoadingCard() {
               height={24}
               animation="wave"
             />
-            <IconButton size="small" disabled>
+            <Button size="sm" disabled>
               <EllipsisVertical />
-            </IconButton>
+            </Button>
           </StyledFlex>
         </StyledFooter>
       </StyledContainer>

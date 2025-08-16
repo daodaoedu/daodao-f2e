@@ -1,18 +1,8 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import {
-  Box,
-  Typography,
-  Stack,
-  Avatar,
-  AvatarGroup,
-  Button,
-} from '@mui/material';
-import Tooltip from '@mui/material/Tooltip';
-
-const LineWrapper = styled(Typography)`
-  margin: 5px 0;
-`;
+import { Button } from '@/components/ui/button';
+import { Title, Text } from '@/components/ui/typography';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 const IMAGE_TAGS = [
   'howcanihelp',
@@ -247,109 +237,87 @@ const Members = [
 
 const AboutTeam = () => {
   return (
-    <Box
-      sx={{
-        margin: '20px 0',
-      }}
-    >
-      <Typography
-        variant="h2"
-        sx={{
-          margin: '40px 0 10px 0',
-        }}
+    <div className="my-5">
+      <Title
+        as="h2"
+        size="lg"
+        className="mt-10 mb-2.5"
       >
         團隊組成
-      </Typography>
-      <Stack
-        sx={{
-          margin: '20px',
-        }}
-      >
-        <Stack
-          sx={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            flexDirection: 'row',
-          }}
-        >
-          {Members.map(({ id, name }) => (
-            <Tooltip key={id} title={name}>
-              <Avatar
-                sx={{ margin: '4px', width: 50, height: 50 }}
-                alt={name}
-                src={`https://cataas.com/cat/${IMAGE_TAGS[id]}`}
-              />
+      </Title>
+      <div className="m-5">
+        <div className="flex justify-start items-center flex-wrap">
+          <TooltipProvider>
+            {Members.map(({ id, name }) => (
+              <Tooltip key={id}>
+                <TooltipTrigger asChild>
+                  <Avatar className="m-1 w-[50px] h-[50px]">
+                    <AvatarImage
+                      alt={name}
+                      src={`https://cataas.com/cat/${IMAGE_TAGS[id]}`}
+                    />
+                    <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{name}</p>
+                </TooltipContent>
+              </Tooltip>
+            ))}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex max-w-[2] ml-1">
+                  <Avatar className="w-[50px] h-[50px] -ml-3">
+                    <AvatarImage
+                      alt="50+"
+                      src="https://media.giphy.com/media/bErElGdAHUmoE/giphy.gif"
+                    />
+                    <AvatarFallback>50+</AvatarFallback>
+                  </Avatar>
+                  <Avatar className="w-[50px] h-[50px] -ml-3">
+                    <AvatarImage
+                      alt="dummy"
+                      src="https://media.giphy.com/media/bErElGdAHUmoE/giphy.gif"
+                    />
+                    <AvatarFallback>+</AvatarFallback>
+                  </Avatar>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>志工夥伴</p>
+              </TooltipContent>
             </Tooltip>
-          ))}
-          <Tooltip title="志工夥伴">
-            <AvatarGroup
-              max={2}
-              sx={{
-                '.MuiAvatarGroup-avatar': {
-                  width: 50,
-                  height: 50,
-                  marginLeft: '-12px',
-                },
-              }}
-            >
-              <Avatar
-                sx={{ margin: '4px 0', width: 50, height: 50 }}
-                alt="50+"
-                src="https://media.giphy.com/media/bErElGdAHUmoE/giphy.gif"
-              />
-              {new Array(50).fill('').map((_, index) => (
-                <Avatar
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  alt={`dummy-${index}`}
-                  src="https://media.giphy.com/media/bErElGdAHUmoE/giphy.gif"
-                />
-              ))}
-              {/* https://media.giphy.com/media/7WH2eHCxpFcI0/giphy.gif */}
-            </AvatarGroup>
-          </Tooltip>
-        </Stack>
-        <LineWrapper variant="p">
+          </TooltipProvider>
+        </div>
+        <Text className="my-[5px]">
           島島阿學團隊由一群國中生、高中生、大學生、教育工作者、家長、工程師、設計師等來自不同背景的夥伴組成，親身經歷自主學習的各種困境，並有感教育不平等之議題，故自主發起島島阿學學習社群計畫。
-        </LineWrapper>
-        <LineWrapper variant="p">
+        </Text>
+        <Text className="my-[5px]">
           包含：
-          <Typography variant="span">🕵 內容部</Typography>
-          <Typography variant="span">🧝 管理部</Typography>
-          <Typography variant="span">🧑‍💻 IT部</Typography>
-          <Typography variant="span">🧑‍💼 行銷公關部</Typography>
-          <Typography variant="span">🧑‍🎨 設計部</Typography>
-          <Typography variant="span">🧚 志工夥伴</Typography>
-        </LineWrapper>
-        {/* <LineWrapper variant="p">
-              臺灣實驗教育推動中心, 唐光華 老師, 丁志仁 老師, 曲智鑛 老師,
-              g0v零時小學校, 柯君翰, 高婷柔, 向恩霈, 詹喬智, 米苔目, 王玠堯, Ael
-            </LineWrapper> */}
-        <Typography
-          variant="h3"
-          sx={{
-            margin: '10px 0',
-          }}
+          <Text as="span">🕵 內容部</Text>
+          <Text as="span">🧝 管理部</Text>
+          <Text as="span">🧑‍💻 IT部</Text>
+          <Text as="span">🧑‍💼 行銷公關部</Text>
+          <Text as="span">🧑‍🎨 設計部</Text>
+          <Text as="span">🧚 志工夥伴</Text>
+        </Text>
+        <Title
+          as="h3"
+          size="md"
+          className="my-2.5"
         >
           來自IT夥伴的小彩蛋
-        </Typography>
-        <LineWrapper variant="p">
+        </Title>
+        <Text className="my-[5px]">
           你知道你的一句話能造成多大的引響力嗎？歡迎送上暖暖的祝福給夥伴們！
-        </LineWrapper>
-        <Box
-          sx={{
-            margin: '20px 0 10px 0',
-          }}
-        >
-          <Button variant="outlined">
-            {/* <FacebookRounded sx={{ margin: "5px 0" }} /> */}
-            <Typography variant="p">❤️ 送上祝福</Typography>
+        </Text>
+        <div className="mt-5 mb-2.5">
+          <Button variant="outline">
+            <Text>❤️ 送上祝福</Text>
           </Button>
-        </Box>
-      </Stack>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };
 

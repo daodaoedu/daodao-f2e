@@ -1,48 +1,37 @@
-import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import { cn } from '@/utils/cn';
 
-export const StyledTabContextBox = styled(Box)(({ theme }) => ({
-  borderBottom: '1px solid #536166',
-  color: theme.secondary, // Assuming secondary is a valid theme property
-  borderColor: theme.secondary, // Use borderColor for indicator color
-  '@media (max-width: 767px)': {
-    width: '100%',
-  },
-}));
+export const StyledTabContextBox = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'border-b border-[#536166] text-[#536166] max-md:w-full',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledPanelBox = styled(Box)`
-  width: 720px;
-  padding: 40px 30px;
-  margin-top: '10px';
-  @media (max-width: 767px) {
-    width: 100%;
-    padding: 30px;
-  }
-`;
+export const StyledPanelBox = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'w-[720px] py-10 px-[30px] mt-2.5 max-md:w-full max-md:p-[30px]',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledPanelText = styled(Box)`
-  display: flex;
-  > p {
-    color: #293a3d;
-    font-weight: 500;
-    white-space: normal;
-    min-width: 50px;
-  }
-  > span {
-    color: #536166;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 140%;
-    margin-left: 12px;
-    display: flex;
-    text-align: left;
-  }
-  @media (max-width: 767px) {
-    flex-direction: column;
-    > span {
-      margin-left: 0px;
-      text-align: left;
-    }
-  }
-`;
+export const StyledPanelText = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'flex [&>p]:text-[#293a3d] [&>p]:font-medium [&>p]:whitespace-normal [&>p]:min-w-[50px] [&>span]:text-[#536166] [&>span]:text-sm [&>span]:font-normal [&>span]:leading-[140%] [&>span]:ml-3 [&>span]:flex [&>span]:text-left max-md:flex-col max-md:[&>span]:ml-0 max-md:[&>span]:text-left',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);

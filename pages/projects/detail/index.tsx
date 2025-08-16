@@ -5,7 +5,7 @@ import { Project as ProjectType } from '@/components/Projects/Project/type';
 import { BASE_URL } from '@/constants/common';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
-import { Skeleton } from '@mui/material';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Panel,
   Title,

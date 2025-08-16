@@ -1,31 +1,12 @@
 import React from 'react';
-import styled from '@emotion/styled';
 import Tags from './Tags';
 
-const SearchFieldWrapper = styled.div`
-  margin: auto;
-  margin-top: 40px;
-  display: flex;
-  flex-direction: column;
-  /* width: 500px; */
-  width: 100%;
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const TrendingWrapper = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  margin-top: 20px;
-`;
-
 const SearchField = () => (
-  <SearchFieldWrapper>
-    <TrendingWrapper>
+  <div className="mx-auto mt-10 flex flex-col w-full max-md:w-full">
+    <div className="flex justify-start mt-5">
       <Tags />
-    </TrendingWrapper>
-  </SearchFieldWrapper>
+    </div>
+  </div>
 );
 
 export default SearchField;

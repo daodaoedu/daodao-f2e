@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { subYears } from 'date-fns';
 import toast from 'react-hot-toast';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import useMediaQuery from '@/hooks/useMediaQuery';
 import { useRouter } from 'next/router';
 import { TAIWAN_DISTRICT, COUNTRIES } from '@/constants/areas';
 import { useAuth } from '@/contexts/Auth';
@@ -13,16 +13,10 @@ import {
   WANT_TO_DO_WITH_PARTNER,
 } from '@/constants/member';
 
-import {
-  Box,
-  Typography,
-  TextField,
-  Switch,
-  MenuItem,
-  Select,
-  Grid,
-} from '@mui/material';
-
+import { Text } from '@/components/ui/typography';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { DatePicker } from '@/components/ui/date-picker';
 import TagEditor from '@/shared/components/TagEditor';
 import { MarkdownEditor } from '@/components/ui/markdown-editor';
@@ -34,23 +28,16 @@ import FormInput from './EditFormInput';
 
 import useEditProfile from './useEditProfile';
 import {
-  FormWrapper,
-  ContentWrapper,
   StyledGroup,
   StyledSelectWrapper,
   StyledSelectBox,
   StyledSelectText,
-  StyledToggleWrapper,
-  StyledToggleText,
-  StyledTitleWrap,
-  StyledSection,
-  StyledButtonGroup,
   StyledButton,
 } from './Edit.styled';
 
 // TODO: 待重構
 function EditPage() {
-  const mobileScreen = useMediaQuery('(max-width: 767px)');
+  const mobileScreen = useMediaQuery('isSmall');
   const [isSetting, setIsSetting] = useState(false);
   const router = useRouter();
 
@@ -118,30 +105,22 @@ function EditPage() {
   }, [userState, isComplete]);
 
   return (
-    <FormWrapper
-      sx={{
-        background: 'linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa',
-      }}
-    >
-      <ContentWrapper sx={{ minHeight: '100vh' }}>
-        <StyledTitleWrap
-          sx={{
-            border:
-              errors.name ||
-                errors.birthDay ||
-                errors.gender ||
-                errors.roleList
-                ? '1px solid red'
-                : '',
-          }}
+    <div className="bg-gradient-to-r from-[#f3fcfc] to-[#f7f8fa]">
+      <div className="min-h-screen flex flex-col justify-center items-center rounded-2xl mx-auto w-full max-w-[672px] md:w-[672px]">
+        <div
+          className={`bg-white p-[5%] flex flex-col justify-center items-center w-full rounded-2xl ${
+            errors.name || errors.birthDay || errors.gender || errors.roleList
+              ? 'border border-red-500'
+              : ''
+          }`}
         >
-          <h2>編輯個人頁面</h2>
-          <p className="title-memo">
+          <h2 className="font-bold text-[22px] leading-[140%] text-center text-[#536166]">編輯個人頁面</h2>
+          <p className="font-bold text-sm leading-[140%] text-center text-[#536166] mt-2">
             填寫完整資訊可以幫助其他夥伴更了解你哦！
           </p>
           <TheAvator url={userState.photoURL} />
 
-          <Box sx={{ marginTop: '24px', width: '100%' }}>
+          <div className="mt-6 w-full">
             <FormInput
               isRequire
               ref={(element) => setRef('name', element)}
@@ -152,7 +131,7 @@ function EditPage() {
               errorMsg={errors.name ? errors.name : ''}
             />
             <StyledGroup>
-              <Typography fontWeight="500">生日 *</Typography>
+              <Text className="font-medium">生日 *</Text>
               <div ref={(element) => setRef('birthDay', element)}>
                 <DatePicker
                   value={userState.birthDay}
@@ -163,14 +142,14 @@ function EditPage() {
                   placeholder="選擇生日"
                 />
                 {errors.birthDay && (
-                  <Typography variant="body2" color="error" sx={{ mt: 0.5 }}>
+                  <Text className="text-sm text-red-500 mt-2">
                     {errors.birthDay}
-                  </Typography>
+                  </Text>
                 )}
               </div>
             </StyledGroup>
             <StyledGroup>
-              <Typography fontWeight="500">性別 *</Typography>
+              <Text className="font-medium">性別 *</Text>
               <StyledSelectWrapper
                 ref={(element) => setRef('gender', element)}
               >
@@ -193,7 +172,7 @@ function EditPage() {
               <ErrorMessage errText={errors.gender} />
             </StyledGroup>
             <StyledGroup>
-              <Typography fontWeight="500">身份 *</Typography>
+              <Text className="font-medium">身份 *</Text>
               <StyledSelectWrapper
                 ref={(element) => setRef('roleList', element)}
               >
@@ -220,134 +199,126 @@ function EditPage() {
               </StyledSelectWrapper>
               <ErrorMessage errText={errors.roleList} />
             </StyledGroup>
-          </Box>
-        </StyledTitleWrap>
+          </div>
+        </div>
 
-        <StyledSection>
+        <div className="bg-white p-10 mt-4 w-full rounded-2xl md:p-10 max-md:p-8">
           <StyledGroup mt="0">
-            <Typography fontWeight="500">教育階段</Typography>
+            <Text className="font-medium">教育階段</Text>
             <Select
-              labelId="education-stage"
-              id="education-stage"
               value={userState.educationStage}
-              onChange={(event) => {
+              onValueChange={(val) => {
                 onChangeHandler({
                   key: 'educationStage',
-                  value: event.target.value,
+                  value: val,
                 });
               }}
-              sx={{ width: '100%' }}
             >
-              <MenuItem disabled>
-                <em>請選擇您目前的教育階段</em>
-              </MenuItem>
-              {EDUCATION.map(({ label, value }) => (
-                <MenuItem key={value} value={value}>
-                  {label}
-                </MenuItem>
-              ))}
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="請選擇您目前的教育階段" />
+              </SelectTrigger>
+              <SelectContent>
+                {EDUCATION.map(({ label, value }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </StyledGroup>
           <StyledGroup>
-            <Typography>居住地</Typography>
+            <Text>居住地</Text>
             <Select
-              labelId="country"
-              id="country"
               value={userState.country}
-              onChange={(event) => {
+              onValueChange={(val) => {
                 onChangeHandler({
                   key: 'country',
-                  value: event.target.value,
+                  value: val,
                 });
               }}
-              sx={{ width: '100%' }}
             >
-              <MenuItem disabled value="-1">
-                <em>請選擇居住地</em>
-              </MenuItem>
-              {COUNTRIES.map(({ name, label }) => (
-                <MenuItem key={name} value={name}>
-                  {label}
-                </MenuItem>
-              ))}
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="請選擇居住地" />
+              </SelectTrigger>
+              <SelectContent>
+                {COUNTRIES.map(({ name, label }) => (
+                  <SelectItem key={name} value={name}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
             {(userState.country === '台灣' || userState.country === 'tw') && (
-              <Grid container columnSpacing={1}>
-                <Grid item xs="12" sm="6">
-                  <Select
-                    labelId="country"
-                    id="country"
-                    value={userState.city}
-                    onChange={(event) => {
-                      onChangeHandler({
-                        key: 'city',
-                        value: event.target.value,
-                      });
-                    }}
-                    sx={{ width: '100%' }}
-                  >
-                    <MenuItem disabled value="-1">
-                      <em>縣市</em>
-                    </MenuItem>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                <Select
+                  value={userState.city}
+                  onValueChange={(val) => {
+                    onChangeHandler({
+                      key: 'city',
+                      value: val,
+                    });
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="縣市" />
+                  </SelectTrigger>
+                  <SelectContent>
                     {TAIWAN_DISTRICT.map(({ name }) => (
-                      <MenuItem key={name} value={name}>
+                      <SelectItem key={name} value={name}>
                         {name}
-                      </MenuItem>
+                      </SelectItem>
                     ))}
-                  </Select>
-                </Grid>
-                <Grid item xs="12" sm="6">
-                  <Select
-                    labelId="district"
-                    id="district"
-                    value={userState.district}
-                    onChange={(event) => {
-                      onChangeHandler({
-                        key: 'district',
-                        value: event.target.value,
-                      });
-                    }}
-                    sx={{ width: '100%' }}
-                  >
-                    <MenuItem disabled value="-1">
-                      <em>鄉鎮市區</em>
-                    </MenuItem>
+                  </SelectContent>
+                </Select>
+                <Select
+                  value={userState.district}
+                  onValueChange={(val) => {
+                    onChangeHandler({
+                      key: 'district',
+                      value: val,
+                    });
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="鄉鎮市區" />
+                  </SelectTrigger>
+                  <SelectContent>
                     {TAIWAN_DISTRICT.find(
                       ({ name }) => name === userState.city
                     )?.districts.map(({ name, zip }) => (
-                      <MenuItem key={zip} value={name}>
+                      <SelectItem key={zip} value={name}>
                         {name}
-                      </MenuItem>
+                      </SelectItem>
                     ))}
-                  </Select>
-                </Grid>
-              </Grid>
+                  </SelectContent>
+                </Select>
+              </div>
             )}
           </StyledGroup>
-        </StyledSection>
+        </div>
 
-        <StyledSection
+        <div
+          className={`bg-white p-10 mt-4 w-full rounded-2xl md:p-10 max-md:p-8 ${
+            errors.socialCode ? 'border border-red-500' : ''
+          }`}
           ref={(element) => setRef('socialCode', element)}
-          sx={{ border: errors.socialCode ? '1px solid red' : '' }}
         >
           <StyledGroup mt="0">
-            <Typography sx={{ fontWeight: 700, fontSize: '18px' }}>
+            <Text className="text-lg font-bold">
               聯絡方式 *
-            </Typography>
-            <Typography
-              sx={{ color: '#92989A', fontWeight: 400, fontSize: '14px' }}
-            >
+            </Text>
+            <Text className="text-[#92989A] text-sm font-normal">
               聯絡資訊會呈現在你的公開頁面上，讓夥伴能聯繫你，至少填寫一個社交媒體帳號
-            </Typography>
+            </Text>
           </StyledGroup>
-          <Grid container columnSpacing={1}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {Object.entries({
               instagram: 'Instagram',
               discord: 'Discord',
               line: 'Line',
               facebook: 'Facebook',
             }).map(([key, title]) => (
-              <Grid item xs="12" sm="6">
+              <div key={key}>
                 <FormInput
                   ref={(element) => setRef(key, element)}
                   title={title}
@@ -363,29 +334,28 @@ function EditPage() {
                         : ''
                   }
                 />
-              </Grid>
+              </div>
             ))}
-          </Grid>
+          </div>
           <StyledGroup>
             <ErrorMessage errText={errors.socialCode} />
           </StyledGroup>
-        </StyledSection>
+        </div>
 
-        <StyledSection
-          sx={{
-            border:
-              errors.wantToDoList || errors.tagList || errors.selfIntroduction
-                ? '1px solid red'
-                : '',
-          }}
+        <div
+          className={`bg-white p-10 mt-4 w-full rounded-2xl md:p-10 max-md:p-8 ${
+            errors.wantToDoList || errors.tagList || errors.selfIntroduction
+              ? 'border border-red-500'
+              : ''
+          }`}
         >
           <StyledGroup mt="0">
-            <Typography
-              sx={{ fontWeight: 500 }}
+            <Text
+              className="font-medium"
               ref={(element) => setRef('wantToDoList', element)}
             >
               想和夥伴一起 *
-            </Typography>
+            </Text>
             <StyledSelectWrapper>
               {WANT_TO_DO_WITH_PARTNER.map(({ label, value }) => (
                 <StyledSelectBox
@@ -415,11 +385,11 @@ function EditPage() {
             <ErrorMessage errText={errors.wantToDoList} />
           </StyledGroup>
           <StyledGroup>
-            <Typography sx={{ fontWeight: 500 }}>
+            <Text className="font-medium">
               可以和夥伴分享的事物
-            </Typography>
-            <TextField
-              sx={{ width: '100%' }}
+            </Text>
+            <Input
+              className="w-full"
               placeholder="你擅長什麼？可以分享什麼呢？"
               value={userState.share}
               onChange={(e) => {
@@ -428,7 +398,7 @@ function EditPage() {
             />
           </StyledGroup>
           <StyledGroup>
-            <Typography sx={{ fontWeight: 500, mb: '6px' }}>標籤</Typography>
+            <Text className="font-medium mb-1.5">標籤</Text>
             <TagEditor
               name="tagList"
               value={userState.tagList}
@@ -443,9 +413,9 @@ function EditPage() {
           </StyledGroup>
 
           <StyledGroup>
-            <Typography sx={{ fontWeight: 500, mb: '6px' }}>
+            <Text className="font-medium mb-1.5">
               個人簡介 *
-            </Typography>
+            </Text>
             {isSetting && (
               <MarkdownEditor
                 name="selfIntroduction"
@@ -464,50 +434,50 @@ function EditPage() {
             )}
             <ErrorMessage errText={errors.selfIntroduction} />
           </StyledGroup>
-        </StyledSection>
+        </div>
 
-        <StyledSection>
-          <StyledToggleWrapper>
-            <StyledToggleText>公開顯示居住地</StyledToggleText>
+        <div className="bg-white p-10 mt-4 w-full rounded-2xl md:p-10 max-md:p-8">
+          <div className="border border-[#dbdbdb] rounded-lg flex justify-between items-center p-4">
+            <Text className="font-medium text-base leading-[140%] text-[#293a3d]">公開顯示居住地</Text>
             <Switch
               checked={userState.isOpenLocation}
-              onChange={(_, value) => {
+              onCheckedChange={(value) => {
                 onChangeHandler({
                   key: 'isOpenLocation',
                   value,
                 });
               }}
             />
-          </StyledToggleWrapper>
-          <StyledToggleWrapper sx={{ mt: '16px' }}>
-            <StyledToggleText>公開個人頁面尋找夥伴</StyledToggleText>
+          </div>
+          <div className="border border-[#dbdbdb] rounded-lg flex justify-between items-center p-4 mt-4">
+            <Text className="font-medium text-base leading-[140%] text-[#293a3d]">公開個人頁面尋找夥伴</Text>
             <Switch
               checked={userState.isOpenProfile}
-              onChange={(_, value) => {
+              onCheckedChange={(value) => {
                 onChangeHandler({
                   key: 'isOpenProfile',
                   value,
                 });
               }}
             />
-          </StyledToggleWrapper>
-        </StyledSection>
+          </div>
+        </div>
 
-        <StyledButtonGroup>
+        <div className="mt-6 w-full flex">
           <StyledButton
-            variant="outlined"
+            variant="outline"
             onClick={() => {
               router.push('/personal-card/my-card');
             }}
           >
             查看我的頁面
           </StyledButton>
-          <StyledButton variant="contained" onClick={onUpdateUser}>
+          <StyledButton onClick={onUpdateUser}>
             儲存資料
           </StyledButton>
-        </StyledButtonGroup>
-      </ContentWrapper>
-    </FormWrapper>
+        </div>
+      </div>
+    </div>
   );
 }
 

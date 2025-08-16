@@ -1,17 +1,13 @@
-import { Chip } from '@mui/material';
+import { Badge } from '@/components/ui/badge';
 
 const Tag = ({ label }) => (
-  <Chip
-    label={label}
-    value={label}
-    sx={{
-      margin: '5px',
-      whiteSpace: 'nowrap',
-      fontWeight: 400,
-      fontSize: '14px',
-      bgcolor: '#DEF5F5',
-    }}
-  />
+  <Badge
+    variant="secondary"
+    className="m-1 whitespace-nowrap font-normal text-sm"
+    style={{ backgroundColor: '#DEF5F5' }}
+  >
+    {label}
+  </Badge>
 );
 
 export default Tag;

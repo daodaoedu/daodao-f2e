@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from '@emotion/styled';
 import {
   useMetaInstagramPost,
   useMetaInstagramStory,
@@ -8,32 +7,13 @@ import {
 import ImageCardList from './ImageCardList';
 import StoryCardList from './StoryCardList';
 
-const GuideWrapper = styled.div`
-  width: 90%;
-  margin: 0 auto;
-  padding-top: 40px;
-  padding-bottom: 40px;
-  .guide-title {
-    color: #536166;
-    font-weight: bold;
-    font-size: 26px;
-    line-height: 50px;
-    letter-spacing: 0.08em;
-  }
-
-  @media (max-width: 767px) {
-    padding-top: 40px;
-    padding-bottom: 20px;
-  }
-`;
-
 const Guide = () => {
   const { data: instagramPosts = [], isLoading: isLoadingInstagramPosts } = useMetaInstagramPost();
   const { data: instagramStories = [], isLoading: isLoadingInstagramStories } = useMetaInstagramStory();
 
   return (
-    <GuideWrapper>
-      <h2 className="guide-title">最新貼文</h2>
+    <div className="w-[90%] mx-auto pt-10 pb-10 max-md:pt-10 max-md:pb-5">
+      <h2 className="text-[#536166] font-bold text-[26px] leading-[50px] tracking-[0.08em]">最新貼文</h2>
       <StoryCardList
         title="🧸 Instagram 限時動態"
         list={instagramStories}
@@ -46,7 +26,7 @@ const Guide = () => {
         isLoading={isLoadingInstagramPosts}
         direction="right"
       />
-    </GuideWrapper>
+    </div>
   );
 };
 

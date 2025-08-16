@@ -1,27 +1,12 @@
 import { CircleX } from 'lucide-react';
-import { Box, Typography } from '@mui/material';
+import { Text } from '@/components/ui/typography';
 
 const ErrorMessage = ({ errText }) => (
   errText && (
-  <Box
-    sx={{
-      mt: '8px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-      color: '#EF5364',
-      bgcolor: '#FFEFF1',
-      borderRadius: '4px',
-      padding: '4px 8px',
-      fontSize: '14px',
-      svg: {
-        flexShrink: 0,
-      },
-    }}
-  >
-    <CircleX size={20} />
-    <Typography as="p">{errText}</Typography>
-  </Box>
+  <div className="mt-2 flex items-center gap-2 text-[#EF5364] bg-[#FFEFF1] rounded p-2 text-sm">
+    <CircleX size={20} className="flex-shrink-0" />
+    <Text as="p">{errText}</Text>
+  </div>
   )
 );
 

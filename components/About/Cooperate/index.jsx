@@ -1,21 +1,16 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from 'react';
-import styled from '@emotion/styled';
-import { Typography } from '@mui/material';
+import { Title } from '@/components/ui/typography';
 
-const SectionWrapper = styled.section`
-  margin: 20px 0;
-`;
 const Cooperate = () => (
-  <SectionWrapper>
-    <Typography
-      variant="h2"
-      sx={{
-        margin: '40px 0 10px 0',
-      }}
+  <section className="my-5">
+    <Title
+      as="h2"
+      size="lg"
+      className="mt-10 mb-2.5"
     >
       合作夥伴
-    </Typography>
+    </Title>
     <div className="flex flex-wrap items-center gap-4">
       <div className="bg-black">
         <a
@@ -83,7 +78,7 @@ const Cooperate = () => (
         </a>
       </div>
     </div>
-  </SectionWrapper>
+  </section>
 );
 
 export default Cooperate;

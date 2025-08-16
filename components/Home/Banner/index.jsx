@@ -1,35 +1,9 @@
 import React, { useCallback } from 'react';
-import styled from '@emotion/styled';
-import { Box, Button, Typography } from '@mui/material';
+import { Button } from '@/components/ui/button';
+import { Title as TypographyTitle } from '@/components/ui/typography';
 import SearchField from '../SearchField';
 import BannerVideo from '../BannerVideo';
 import Title from './Title';
-
-const BannerWrapper = styled.section`
-  height: var(--section-height);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-`;
-
-const MainBannerWrapper = styled.div`
-  margin: 0 auto 0 auto;
-
-  .promo-button {
-    margin: 0 auto 0 auto;
-  }
-
-  min-width: 600px;
-
-  @media (max-width: 768px) {
-    min-width: auto;
-    width: 80%;
-    padding-top: 10vh;
-  }
-`;
-
-const SubBannerWrapper = styled.div``;
 
 const Banner = ({ guideRef }) => {
   const smoothScroll = useCallback(() => {
@@ -41,53 +15,34 @@ const Banner = ({ guideRef }) => {
   }, [guideRef]);
 
   return (
-    <Box>
-      <BannerWrapper>
-        <MainBannerWrapper>
+    <div>
+      <section
+        className="h-[var(--section-height)] relative flex flex-col justify-evenly"
+      >
+        <div className="mx-auto min-w-[600px] max-md:min-w-auto max-md:w-[80%] max-md:pt-[10vh]">
           <Title />
           <SearchField />
-        </MainBannerWrapper>
-        <SubBannerWrapper>
-          <Typography
-            variant="h3"
-            sx={{
-              letterSpacing: '0.08em',
-              color: '#f0f0f0',
-              fontWeight: '500',
-              textAlign: 'center',
-              fontSize: '26px',
-              margin: '20px',
-            }}
+        </div>
+        <div>
+          <TypographyTitle
+            as="h3"
+            size="lg"
+            className="tracking-[0.08em] text-[#f0f0f0] font-medium text-center text-[26px] m-5"
           >
             還不知道要學什麼嗎？
-          </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              margin: '10px 0',
-            }}
-          >
+          </TypographyTitle>
+          <div className="flex justify-center items-center my-2.5">
             <Button
-              variant="contained"
               onClick={smoothScroll}
-              sx={{
-                backgroundColor: '#fff',
-                opacity: '0.8',
-                '&:hover': {
-                  backgroundColor: '#fff',
-                  opacity: '1',
-                },
-              }}
+              className="bg-white opacity-80 hover:bg-white hover:opacity-100 text-black"
             >
               看看大家都學什麼
             </Button>
-          </Box>
-        </SubBannerWrapper>
-      </BannerWrapper>
+          </div>
+        </div>
+      </section>
       <BannerVideo />
-    </Box>
+    </div>
   );
 };
 

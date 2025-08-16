@@ -1,7 +1,7 @@
 import React from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
-import { Skeleton } from '@mui/material';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const EditAvator = ({
   url = 'https://imgur.com/EADd1UD.png',
@@ -26,14 +26,10 @@ const EditAvator = ({
     placeholder={
         // eslint-disable-next-line react/jsx-wrap-multilines
       <Skeleton
-        sx={{
-          height: '128px',
-          width: '128px',
+        className="h-32 w-32 rounded-full mt-1"
+        style={{
           background: 'rgba(240, 240, 240, .8)',
-          marginTop: '4px',
         }}
-        variant="circular"
-        animation="wave"
       />
       }
   />

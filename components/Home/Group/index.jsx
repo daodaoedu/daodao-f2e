@@ -1,120 +1,69 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import Box from '@mui/material/Box';
-import { Button, Typography } from '@mui/material';
+import { Title, Text } from '@/components/ui/typography';
+import { Button } from '@/components/ui/button';
 import { Facebook } from 'lucide-react';
 import { useRouter } from 'next/router';
-
-const GroupWrapper = styled.div`
-  width: 90%;
-  /* height: calc(var(--section-height) + var(--section-height-offset)); */
-  margin: 0 auto;
-  padding-top: 40px;
-  padding-bottom: 40px;
-
-  @media (max-width: 767px) {
-    padding-top: 40px;
-    padding-bottom: 20px;
-  }
-`;
 
 const Group = () => {
   const router = useRouter();
 
   return (
-    <GroupWrapper>
-      <Typography
-        variant="h2"
-        sx={{
-          color: '#536166',
-          fontWeight: 'bold',
-          fontSize: '26px',
-          lineHeight: '50px',
-          letterSpacing: '0.08em',
-          textAlign: 'right',
-          marginRight: '20px',
-          '@media(max-width: 767px)': {
-            textAlign: 'left',
-          },
-        }}
+    <div className="w-[90%] mx-auto pt-10 pb-10 max-md:pt-10 max-md:pb-5">
+      <Title
+        as="h2"
+        size="lg"
+        className="text-[#536166] font-bold text-[26px] leading-[50px] tracking-[0.08em] text-right mr-5 max-md:text-left"
       >
         加入島島阿學學習社群
-      </Typography>
-      <Box
-        sx={{
-          marginTop: '20px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'flex-start',
-          '@media(max-width: 767px)': {
-            flexDirection: 'column-reverse',
-          },
-        }}
-      >
-        <Box
-          sx={{
-            marginTop: '50px',
-            marginLeft: '20px',
-            fontSize: '18px',
-          }}
-        >
-          <Box sx={{ margin: '5px 0' }}>
-            <Typography variant="p">
+      </Title>
+      <div className="mt-5 flex justify-center items-start max-md:flex-col-reverse">
+        <div className="mt-12 ml-5 text-lg">
+          <div className="my-1.5">
+            <Text>
               我們是島島阿學學習社群，努力搭起互助學習的橋梁。
-            </Typography>
-          </Box>
-          <Box sx={{ margin: '5px 0' }}>
-            <Typography variant="p">
+            </Text>
+          </div>
+          <div className="my-1.5">
+            <Text>
               期盼以集體智慧，打造沒有天花板的學習環境，一個以自主學習為主的民主社群。
-            </Typography>
-          </Box>
-          <Box sx={{ margin: '5px 0' }}>
-            <Typography variant="p">
+            </Text>
+          </div>
+          <div className="my-1.5">
+            <Text>
               目前提供學習資源網以及社群的服務，包含各領域各種形式的資源、學習活動、學習經驗、教育新聞等等。
-            </Typography>
-          </Box>
-          <Box sx={{ margin: '5px 0' }}>
-            <Typography variant="p">
+            </Text>
+          </div>
+          <div className="my-1.5">
+            <Text>
               我們認為社群即資源、支援，讓學習者在民主教育的社群中，以共好的概念，解決彼此學習的問題，支持彼此成為自己想成為的人。
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              margin: '20px 0 10px 0',
-              display: 'flex',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-            }}
-          >
+            </Text>
+          </div>
+          <div className="mt-5 mb-2.5 flex justify-start items-center">
             <Button
-              variant="outlined"
+              variant="outline"
               onClick={() => router.push('/join')}
-              sx={{ margin: '0 10px' }}
+              className="mx-2.5"
             >
               <Facebook style={{ margin: '5px 0' }} />
-              <Typography variant="p">加入社群</Typography>
+              <Text>加入社群</Text>
             </Button>
-            <Box>
+            <div>
               <Button
-                variant="outlined"
-                sx={{
-                  height: '46px',
-                  margin: '0 10px',
-                }}
+                variant="outline"
+                className="h-[46px] mx-2.5"
               >
-                {/* <FacebookRounded sx={{ margin: "5px 0" }} /> */}
-                <Typography variant="p">❤️ 送上祝福</Typography>
+                <Text>❤️ 送上祝福</Text>
               </Button>
-            </Box>
-          </Box>
-        </Box>
+            </div>
+          </div>
+        </div>
         <img
           src="/assets/circle.png"
           alt="circle"
           style={{ width: '400px', marginLeft: '20px' }}
         />
-      </Box>
-    </GroupWrapper>
+      </div>
+    </div>
   );
 };
 

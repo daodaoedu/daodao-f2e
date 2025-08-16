@@ -2,7 +2,7 @@ import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig, { JsonLdType } from '@/components/SEOConfig';
-import { Skeleton } from '@mui/material';
+import { Skeleton } from '@/components/ui/skeleton';
 import { AlignLeft } from 'lucide-react';
 import { Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
 import { useProject } from '@/contexts/Project';
@@ -25,19 +25,8 @@ import {
 const SkeletonMilestones = () => {
   return (
     <>
-      <Skeleton
-        variant="rectangular"
-        width="100%"
-        height={120}
-        animation="wave"
-        className="mb-3"
-      />
-      <Skeleton
-        variant="rectangular"
-        width="100%"
-        height={300}
-        animation="wave"
-      />
+      <Skeleton className="w-full h-[120px] mb-3" />
+      <Skeleton className="w-full h-[300px]" />
     </>
   );
 };

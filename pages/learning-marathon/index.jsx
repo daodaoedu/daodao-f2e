@@ -1,12 +1,11 @@
 import Link from 'next/link';
 import React, { useEffect, useMemo, useState, useRef } from 'react';
-import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import SEOConfig from '@/components/SEOConfig';
 import { usePromotion } from '@/contexts/Promotion';
 import { ArrowUpRight, ChevronUp } from 'lucide-react';
 
-import Button from '@mui/material/Button';
+import { Button } from '@/components/ui/button';
 import Participant from '@/components/Marathon/Participant';
 import Equip from '@/components/Marathon/Equip';
 import Spotlight from '@/components/Marathon/Spotlight';
@@ -23,65 +22,6 @@ import ApplyClosePopup from '@/components/Marathon/ApplyClosePopup';
 import marathonConfig from '@/constants/marathon';
 import { MARATHON_LINKS } from '@/constants/category';
 import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
-
-const StyledBannerButton = styled(Button)`
-  &.MuiButton-root {
-    position: absolute;
-    top: calc(100vw / 3.6);
-    left: 50%;
-    transform: translate(-50%);
-    border-radius: 40px;
-    background: #FFA10B;
-    display: flex;
-    width: 124px;
-    height: 50px;
-    padding: 5px 20px;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-    color: #FFF;
-  }
-    &.MuiButton-text {
-      color: #FFF;
-      text-align: center;
-      font-size: 18px;
-      font-weight: 400;
-      line-height: 140%;
-    }
-
-  @media (hover: hover) {
-    &.MuiButton-root:hover {
-      box-shadow: 0px 4px 10px 0px rgba(255, 161, 11, 0.50);
-    }
-  }
-
-  @media (max-width: 767px) {
-    &.MuiButton-root {
-      top: calc(100vw / 1.25);
-    }
-  }
-`;
-
-const StyledSignUpButton = styled(Button)`
-  border-radius: 20px;
-  padding: 10px 20px;
-  background-color: #16B9B3;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 140%;
-  color: #FFF;
-  margin: 0 auto;
-  display: inline-block;
-  height: 40px;
-
-  @media (hover: hover) {
-    &:hover {
-      background-color: #16B9B3;
-      box-shadow: 0px 4px 10px 0px rgba(89, 182, 178, 0.50);
-    }
-  }
-`;
 
 const Sidebar = ({ onClickSignupButton }) => {
   const { height } = usePromotion();
@@ -164,7 +104,12 @@ const Sidebar = ({ onClickSignupButton }) => {
             </li>
           ))}
         </ul>
-        <StyledSignUpButton className="w-full" onClick={onClickSignupButton}>立即申請</StyledSignUpButton>
+        <Button 
+          className="w-full rounded-[20px] py-2.5 px-5 bg-[#16B9B3] text-base font-normal leading-[140%] text-white mx-auto inline-block h-10 hover:bg-[#16B9B3] hover:shadow-[0px_4px_10px_0px_rgba(89,182,178,0.50)]"
+          onClick={onClickSignupButton}
+        >
+          立即申請
+        </Button>
       </aside>
       <div
         className={cn(
@@ -306,9 +251,12 @@ const LearningMarathon = () => {
     <>
       <SEOConfig {...SEOData} />
       <Banner>
-        <StyledBannerButton onClick={handleClickSignupButton}>
+        <Button
+          onClick={handleClickSignupButton}
+          className="absolute top-[calc(100vw/3.6)] left-1/2 transform -translate-x-1/2 rounded-[40px] bg-[#FFA10B] flex w-[124px] h-[50px] py-1.5 px-5 justify-center items-center gap-2.5 flex-shrink-0 text-white text-center text-lg font-normal leading-[140%] hover:shadow-[0px_4px_10px_0px_rgba(255,161,11,0.50)] hover:bg-[#FFA10B] max-md:top-[calc(100vw/1.25)]"
+        >
           立即申請
-        </StyledBannerButton>
+        </Button>
       </Banner>
       <Nav />
       <Sidebar onClickSignupButton={handleClickSignupButton} />
@@ -508,11 +456,12 @@ const LearningMarathon = () => {
       </Section>
 
       <Section className="text-center py-8 px-6 md:py-[50px]">
-        <StyledSignUpButton
+        <Button
           onClick={handleClickSignupButton}
+          className="rounded-[20px] py-2.5 px-5 bg-[#16B9B3] text-base font-normal leading-[140%] text-white mx-auto inline-block h-10 hover:bg-[#16B9B3] hover:shadow-[0px_4px_10px_0px_rgba(89,182,178,0.50)]"
         >
           立即申請
-        </StyledSignUpButton>
+        </Button>
       </Section>
       <ApplyClosePopup
         ref={popupRef}

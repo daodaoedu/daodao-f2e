@@ -1,5 +1,6 @@
 import { forwardRef } from 'react';
-import { Typography, TextField } from '@mui/material';
+import { Input } from '@/components/ui/input';
+import { Text } from '@/components/ui/typography';
 import { StyledGroup } from './Edit.styled';
 
 function EditFormInput(
@@ -16,21 +17,24 @@ function EditFormInput(
 ) {
   return (
     <StyledGroup>
-      <Typography fontWeight="500">
+      <Text className="font-medium">
         {title}
         {' '}
         {isRequire && '*'}
-      </Typography>
-      <TextField
-        inputRef={ref}
+      </Text>
+      <Input
+        ref={ref}
         name={parmKey}
         value={value}
-        fullWidth
         placeholder={placeholder}
         onChange={(e) => onChange({ key: parmKey, value: e.target.value })}
-        error={!!errorMsg}
-        helperText={errorMsg}
+        className={errorMsg ? 'border-red-500' : ''}
       />
+      {errorMsg && (
+        <Text className="text-sm text-red-500 mt-1">
+          {errorMsg}
+        </Text>
+      )}
     </StyledGroup>
   );
 }

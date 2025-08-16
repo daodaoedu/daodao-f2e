@@ -1,17 +1,5 @@
 import { useRef } from 'react';
-import styled from '@emotion/styled';
 import Card from './Card';
-
-const CardListWrapper = styled.ul`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  @media (max-width: 767px) {
-    display: flex;
-    flex-direction: column;
-  }
-`;
 
 const data = [
   {
@@ -35,7 +23,7 @@ const CardList = () => {
   const trigger = useRef();
 
   return (
-    <CardListWrapper ref={trigger}>
+    <ul ref={trigger} className="flex justify-between items-center max-md:flex max-md:flex-col">
       {data.map(({ image, title, id }) => (
         <Card
           key={id}
@@ -45,7 +33,7 @@ const CardList = () => {
           desc="學習夥伴成長中"
         />
       ))}
-    </CardListWrapper>
+    </ul>
   );
 };
 

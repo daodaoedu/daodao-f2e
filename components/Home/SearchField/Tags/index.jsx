@@ -1,48 +1,23 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import { Chip } from '@mui/material';
+import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/router';
 import { HOT_TAGS } from '@/constants/category';
-
-const TagsWrapper = styled.ul`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-
-  @media (max-width: 768px) {
-    justify-content: flex-start;
-  }
-`;
 
 const SearchField = () => {
   const router = useRouter();
   return (
-    <TagsWrapper>
+    <ul className="flex justify-center items-center flex-wrap max-md:justify-start">
       {HOT_TAGS.map(({ value, label }) => (
         <li key={value}>
-          <Chip
+          <Badge
             onClick={() => router.push(`/resource/categories/${value}`)}
-            label={label}
-            value={value}
-            sx={{
-              backgroundColor: '#fff',
-              opacity: '80%',
-              cursor: 'pointer',
-              margin: '5px',
-              whiteSpace: 'nowrap',
-              fontWeight: 500,
-              fontSize: '16px',
-              '&:hover': {
-                opacity: '100%',
-                backgroundColor: '#fff',
-                transition: 'transform 0.4s',
-              },
-            }}
-          />
+            className="bg-white opacity-80 cursor-pointer m-1 whitespace-nowrap font-medium text-base hover:opacity-100 hover:bg-white transition-transform duration-[400ms]"
+          >
+            {label}
+          </Badge>
         </li>
       ))}
-    </TagsWrapper>
+    </ul>
   );
 };
 

@@ -1,75 +1,36 @@
-import { useState } from 'react';
-import styled from '@emotion/styled';
-import {
-  Box, Button, Menu, MenuItem,
-} from '@mui/material';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { EllipsisVertical } from 'lucide-react';
 
-const StyledMenu = styled((props) => (
-  <Menu
-    elevation={0}
-    anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'left',
-    }}
-    transformOrigin={{
-      vertical: 'top',
-      horizontal: 'left',
-    }}
-    {...props}
-  />
-))(() => ({
-  '& .MuiPaper-root': {
-    borderRadius: 8,
-    minWidth: 150,
-    padding: '12px',
-    boxShadow: '0px 4px 10px 0px rgba(196, 194, 193, 0.40)',
-  },
-  '& .MuiMenu-list': {
-    padding: '0',
-  },
-  '& .MuiMenuItem-root': {
-    padding: '8px',
-  },
-}));
+// Styled components removed - using shadcn DropdownMenu instead
 
 export default function Dropdown({ sx }) {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const style = sx || {};
 
   return (
-    <Box sx={{ ...sx }}>
-      <Button
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        disableElevation
-        onClick={handleClick}
-        sx={{
-          color: '#536166',
-          padding: '5px',
-          minWidth: 'unset',
-          borderRadius: '100%',
-        }}
-      >
-        <EllipsisVertical />
-      </Button>
-      <StyledMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem
-          component="a"
-          href="https://forms.gle/NkVbDWC3eXk4P4gv7"
-          target="_blank"
-          sx={{ minWidth: '146px' }}
-          onClick={handleClose}
-        >
-          檢舉
-        </MenuItem>
-      </StyledMenu>
-    </Box>
+    <div style={style}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="text-[#536166] p-[5px] min-w-0 rounded-full"
+          >
+            <EllipsisVertical />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="rounded-lg min-w-[150px] p-3 shadow-lg">
+          <DropdownMenuItem asChild className="p-2">
+            <a
+              href="https://forms.gle/NkVbDWC3eXk4P4gv7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="min-w-[146px] block"
+            >
+              檢舉
+            </a>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }

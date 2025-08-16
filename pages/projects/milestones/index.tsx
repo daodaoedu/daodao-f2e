@@ -1,7 +1,7 @@
 
 import { getPublicProjectLayout } from '@/layout/features/getProjectLayout';
 import { useRouter } from 'next/router';
-import { Skeleton } from '@mui/material';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useProjectMilestones } from '@/features/projects/hooks/milestone';
 import EmptyList from '@/components/Projects/ProjectList/EmptyList';
 import MilestoneItemView from '@/components/Milestones/MilestoneItemView';
@@ -17,19 +17,8 @@ const ProjectMilestonesPage = () => {
     <div className="w-[750px] max-w-full mx-auto">
       {isLoading ? (
         <>
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={120}
-            animation="wave"
-            className="mb-3"
-          />
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={300}
-            animation="wave"
-          />
+          <Skeleton className="w-full h-[120px] mb-3" />
+          <Skeleton className="w-full h-[300px]" />
         </>
       ) : (
         <div>
