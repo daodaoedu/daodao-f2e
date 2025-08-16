@@ -49,7 +49,7 @@ const GoBackButton = ({
   >
     {icon && icon}
     <span className="
-      text-basic-400 font-sans text-sm font-normal
+      font-sans text-sm font-normal text-basic-400
       group-hover:text-primary-base"
     >
       {buttonText}

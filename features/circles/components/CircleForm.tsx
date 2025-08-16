@@ -107,11 +107,11 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
   return (
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)}>
-        <Paper className="p-10 mb-4">
-          <Title as="h1" size="md" className="text-center mb-2">
+        <Paper className="mb-4 p-10">
+          <Title as="h1" size="md" className="mb-2 text-center">
             {isCreateMode ? '發起揪團' : '編輯揪團'}
           </Title>
-          <Text size="sm" className="text-center mb-10">
+          <Text size="sm" className="mb-10 text-center">
             填寫完整資訊可以幫助其他夥伴更了解揪團內容哦！
           </Text>
 
@@ -161,9 +161,9 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
               name="activityCategory"
               label="揪團類型"
               options={ACTIVITY_CATEGORIES}
-              className="w-full grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2"
+              className="grid w-full grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5"
               renderOption={({ Option, isChecked, label }) => (
-                <Option className="border-none flex items-center text-sm gap-1">
+                <Option className="flex items-center gap-1 border-none text-sm">
                   <Checkbox
                     checked={isChecked}
                     className="pointer-events-none"
@@ -218,7 +218,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                 <FormItem>
                   <FormLabel required>地點</FormLabel>
                   <div className="space-y-2">
-                    <div className="flex items-center gap-4 h-10">
+                    <div className="flex h-10 items-center gap-4">
                       <FormItem className="flex items-center gap-4">
                         <FormControl>
                           <Checkbox
@@ -232,7 +232,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                             }}
                           />
                         </FormControl>
-                        <FormLabel className="font-normal text-sm mb-0">
+                        <FormLabel className="mb-0 text-sm font-normal">
                           實體活動
                         </FormLabel>
                       </FormItem>
@@ -250,7 +250,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                         }}
                       />
                     </div>
-                    <FormItem className="flex items-center gap-4 h-10">
+                    <FormItem className="flex h-10 items-center gap-4">
                       <FormControl>
                         <Checkbox
                           checked={field.value === ONLINE_OPTION.value}
@@ -261,11 +261,11 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                           }}
                         />
                       </FormControl>
-                      <FormLabel className="font-normal text-sm mb-0">
+                      <FormLabel className="mb-0 text-sm font-normal">
                         {ONLINE_OPTION.label}
                       </FormLabel>
                     </FormItem>
-                    <FormItem className="flex items-center gap-4 h-10">
+                    <FormItem className="flex h-10 items-center gap-4">
                       <FormControl>
                         <Checkbox
                           checked={field.value === TBD_OPTION.value}
@@ -276,7 +276,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                           }}
                         />
                       </FormControl>
-                      <FormLabel className="font-normal text-sm mb-0">
+                      <FormLabel className="mb-0 text-sm font-normal">
                         {TBD_OPTION.label}
                       </FormLabel>
                     </FormItem>
@@ -302,7 +302,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
           </div>
         </Paper>
 
-        <Paper className="p-10 mb-4">
+        <Paper className="mb-4 p-10">
           <div className="space-y-6">
             <FormField
               control={form.control}
@@ -422,7 +422,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                       creatable
                     />
                   </FormControl>
-                  <FormDescription className="text-xs text-basic-300 mt-1">
+                  <FormDescription className="mt-1 text-xs text-basic-300">
                     標籤填寫完成後，會用 Hashtag 的形式呈現，例如： #一起學日文
                   </FormDescription>
                   <FormMessage />
@@ -432,14 +432,14 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
           </div>
         </Paper>
 
-        <Paper className="p-10 mb-4">
+        <Paper className="mb-4 p-10">
           <FormField
             control={form.control}
             name="deadline"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>揪團期限</FormLabel>
-                <div className="flex items-center gap-2 h-10">
+                <div className="flex h-10 items-center gap-2">
                   <FormItem className="flex items-center gap-1">
                     <FormControl>
                       <Checkbox
@@ -447,7 +447,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                         onCheckedChange={(checked) => form.setValue('isNeedDeadline', !!checked)}
                       />
                     </FormControl>
-                    <FormLabel className="font-normal mb-0 text-sm">
+                    <FormLabel className="mb-0 text-sm font-normal">
                       自訂
                     </FormLabel>
                   </FormItem>
@@ -468,14 +468,14 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                     </FormControl>
                   )}
                 </div>
-                <FormItem className="flex items-center gap-1 h-10">
+                <FormItem className="flex h-10 items-center gap-1">
                   <FormControl>
                     <Checkbox
                       checked={!form.watch('isNeedDeadline')}
                       onCheckedChange={(checked) => form.setValue('isNeedDeadline', !checked)}
                     />
                   </FormControl>
-                  <FormLabel className="font-normal mb-0 text-sm">
+                  <FormLabel className="mb-0 text-sm font-normal">
                     不限
                   </FormLabel>
                 </FormItem>
@@ -507,14 +507,14 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
           </Paper>
         )}
 
-        <FormItem className="flex items-center justify-center my-4 gap-1">
+        <FormItem className="my-4 flex items-center justify-center gap-1">
           <FormControl>
             <Checkbox
               checked={isTermsChecked}
               onCheckedChange={(checked) => setIsTermsChecked(!!checked)}
             />
           </FormControl>
-          <FormLabel className="text-sm text-basic-400 mb-0 text-balance">
+          <FormLabel className="mb-0 text-balance text-sm text-basic-400">
             請確認揪團未涉及不雅內容並符合本網站
             {' '}
             <Link href="/terms/service" target="_blank" className="underline">

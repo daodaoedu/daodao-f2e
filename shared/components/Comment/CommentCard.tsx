@@ -2,7 +2,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { LockKeyholeOpen, LockKeyhole, EllipsisVertical } from 'lucide-react';
 import { useAuth } from '@/contexts/Auth';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import { ROLE } from '@/constants/member';
 import { timeDuration } from '@/utils/date';
 import { CommentSchema, CommentVisibility } from '@/services/comments';
@@ -89,26 +89,26 @@ function CommentCard({
   if (!commentUser) return null;
 
   return (
-    <div className="bg-white body-sm font-normal">
+    <div className="body-sm bg-white font-normal">
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Image
             src={commentUser.photoURL}
             alt={`${commentUser.name}'s avatar`}
-            width="30px"
-            height="30px"
-            borderRadius="9999px"
+            width={30}
+            height={30}
+            className="rounded-full"
           />
           <div className="flex items-center gap-2">
             <span className="font-medium">{commentUser.name}</span>
             {role && (
-              <div className="px-2.5 py-1 bg-basic-100 rounded">{role}</div>
+              <div className="rounded bg-basic-100 px-2.5 py-1">{role}</div>
             )}
           </div>
         </div>
         <div className="flex items-center gap-3 text-basic-300">
           <time>{timeDuration(updatedAt)}</time>
-          <div className="hidden sm:flex items-center gap-0.5">
+          <div className="hidden items-center gap-0.5 sm:flex">
             {visibility === 'public' ? <LockKeyholeOpen /> : <LockKeyhole />}
             <span>{visibility === 'public' ? '公開' : '不公開'}</span>
           </div>
@@ -183,13 +183,13 @@ function CommentCard({
             <Image
               src={replies[0].user.photoURL}
               alt={`${replies[0].user.name}'s avatar`}
-              width="20px"
-              height="20px"
-              borderRadius="9999px"
+              width={20}
+              height={20}
+              className="rounded-full"
             />
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3">
-            <div className="pl-6 border-l border-solid border-basic-200">
+            <div className="border-l border-solid border-basic-200 pl-6">
               {replies.map((reply) => (
                 <CommentCard
                   key={reply.id}

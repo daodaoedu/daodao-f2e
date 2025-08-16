@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { BASE_URL } from "@/constants/common";
 import toast from 'react-hot-toast';
 import { Project as ProjectType } from "@/components/Projects/Project/type";
-import { Skeleton } from '@mui/material';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/utils/cn';
 import ProjectList from '@/components/Projects/ProjectList';
 import EmptyList from '@/components/Projects/ProjectList/EmptyList';
@@ -97,7 +97,7 @@ const PageProjectsEvents = () => {
           <Tabs />
           {
             isFetchingProjects && (
-              <Skeleton animation="wave" width="95%" height="200px" className="mx-auto" />
+              <Skeleton className="w-[95%] h-[200px] mx-auto" />
             )
           }
           {Array.isArray(projects) && projects.length > 0

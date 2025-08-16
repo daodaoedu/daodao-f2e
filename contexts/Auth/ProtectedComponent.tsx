@@ -2,7 +2,7 @@ import type { UserSchema } from '@/services/users';
 import { useRouter } from 'next/router';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { Background, Container, Paper } from '@/components/ui/wrapper';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';
 import SEOConfig from '@/components/SEOConfig';
 import { useAuth, useAuthDispatch } from './AuthContext';
@@ -27,12 +27,12 @@ export const Fallback = ({ title, children }: FallbackProps) => (
         <h2 className="text-center text-3xl font-bold tracking-[0.08em] text-basic-400">
           {title}
         </h2>
-        <div className="flex justify-center items-center">
+        <div className="flex items-center justify-center">
           <Image
             src="/assets/nobody-land.gif"
             alt="nobody-land"
-            width="300"
-            height="300"
+            width={300}
+            height={300}
           />
         </div>
         {children}
@@ -121,7 +121,7 @@ export function ProtectedComponent({
     return (
       fallback ?? (
         <Fallback title="登入後即可使用完整功能">
-          <div className="flex justify-center items-center gap-4">
+          <div className="flex items-center justify-center gap-4">
             <Button
               onClick={() => router.back()}
               variant="outline"
@@ -151,7 +151,7 @@ export function ProtectedComponent({
       return (
         noPermissionFallback ?? (
           <Fallback title="沒有權限">
-            <div className="flex justify-center items-center gap-4">
+            <div className="flex items-center justify-center gap-4">
               <Button
                 onClick={() => router.back()}
                 variant="outline"

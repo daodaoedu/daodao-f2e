@@ -73,7 +73,7 @@ const Confetti: React.FC<ConfettiProps> = ({ active }) => {
   });
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+    <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
       {pieces}
     </div>
   );

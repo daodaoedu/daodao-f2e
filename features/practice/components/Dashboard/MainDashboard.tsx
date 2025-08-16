@@ -62,14 +62,14 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
   // 獲取內容類型圖標
   const getContentTypeIcon = () => {
     const iconMap: Record<string, React.ReactNode> = {
-      book: <Book className="h-4 w-4" />,
-      video: <Video className="h-4 w-4" />,
-      articles: <FileText className="h-4 w-4" />,
-      podcast: <Headphones className="h-4 w-4" />,
-      course: <GraduationCap className="h-4 w-4" />,
-      custom: <Settings className="h-4 w-4" />,
+      book: <Book className="size-4" />,
+      video: <Video className="size-4" />,
+      articles: <FileText className="size-4" />,
+      podcast: <Headphones className="size-4" />,
+      course: <GraduationCap className="size-4" />,
+      custom: <Settings className="size-4" />,
     };
-    return iconMap[practice.contentType] || <Book className="h-4 w-4" />;
+    return iconMap[practice.contentType] || <Book className="size-4" />;
   };
 
   // 獲取內容類型標籤
@@ -128,28 +128,28 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {/* 返回按鈕 */}
         <Button
           variant="ghost"
           onClick={onBack}
-          className="flex items-center text-muted-foreground hover:text-foreground mb-6"
+          className="mb-6 flex items-center text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="mr-2 size-4" />
           <span>返回實踐列表</span>
         </Button>
 
         {/* 主要內容 */}
-        <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+        <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
           {/* 標題區域 */}
-          <div className="p-6 border-b border-border">
-            <div className="flex justify-between items-start">
+          <div className="border-b border-border p-6">
+            <div className="flex items-start justify-between">
               <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-2">
+                <div className="mb-2 flex items-center space-x-3">
                   <h1 className="text-2xl font-bold text-foreground">
                     {practice.title}
                   </h1>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
+                  <span className={`rounded-full px-3 py-1 text-xs font-medium ${getStatusColor()}`}>
                     {practice.status === 'active' ? '進行中'
                       : practice.status === 'completed' ? '已完成'
                         : practice.status === 'paused' ? '暫停' : '草稿'}
@@ -157,7 +157,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 </div>
 
                 {practice.description && (
-                  <p className="text-base text-muted-foreground mb-3">
+                  <p className="mb-3 text-base text-muted-foreground">
                     {practice.description}
                   </p>
                 )}
@@ -188,31 +188,31 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleEdit}
-                className="p-2 text-muted-foreground hover:text-foreground rounded-lg"
+                className="rounded-lg p-2 text-muted-foreground hover:text-foreground"
                 title="編輯實踐"
               >
-                <Edit className="h-5 w-5" />
+                <Edit className="size-5" />
               </Button>
             </div>
           </div>
 
           {/* 進度區域 */}
-          <div className="p-6 border-b border-border">
+          <div className="border-b border-border p-6">
             {/* Progress Bar */}
-            <div className="mb-3 sm:mb-4 relative">
+            <div className="relative mb-3 sm:mb-4">
               <Progress
                 value={progressPercentage}
                 className="h-3"
               />
-              <span className="absolute right-0 -top-7 text-lg text-basic-300 font-medium">
+              <span className="absolute -top-7 right-0 text-lg font-medium text-basic-300">
                 {progressPercentage}
                 %
               </span>
             </div>
 
             {/* 統計數據 */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-primary/5 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              <div className="rounded-lg bg-primary/5 p-4 text-center">
                 <div className="text-xl font-bold text-primary">
                   {practice.currentProgress}
                   {' '}
@@ -224,22 +224,22 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 <div className="text-sm text-muted-foreground">已完成</div>
               </div>
 
-              <div className="text-center p-4 bg-orange-50 rounded-lg">
-                <div className="text-xl font-bold text-orange-500 flex items-center justify-center gap-1">
-                  <Flame className="h-5 w-5" />
+              <div className="rounded-lg bg-orange-50 p-4 text-center">
+                <div className="flex items-center justify-center gap-1 text-xl font-bold text-orange-500">
+                  <Flame className="size-5" />
                   {practice.streak}
                 </div>
                 <div className="text-sm text-muted-foreground">連續天數</div>
               </div>
 
-              <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="rounded-lg bg-green-50 p-4 text-center">
                 <div className="text-xl font-bold text-green-600">
                   {stats.totalCheckIns}
                 </div>
                 <div className="text-sm text-muted-foreground">打卡次數</div>
               </div>
 
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="rounded-lg bg-blue-50 p-4 text-center">
                 <div className="text-xl font-bold text-blue-600">
                   {getDailyGoalDisplay()}
                 </div>
@@ -250,22 +250,22 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
           {/* 實踐行動區域 */}
           {practice.practiceAction && (
-            <div className="p-6 border-b border-border">
-              <h3 className="ml-4 text-lg font-medium text-foreground mb-3 flex items-center">
+            <div className="border-b border-border p-6">
+              <h3 className="mb-3 ml-4 flex items-center text-lg font-medium text-foreground">
                 實踐行動
               </h3>
-              <div className="p-4 bg-primary/5 rounded-lg">
+              <div className="rounded-lg bg-primary/5 p-4">
                 <p className="text-sm text-foreground">{practice.practiceAction}</p>
               </div>
             </div>
           )}
 
           {/* 打卡區域 */}
-          <div className="p-6 border-b border-border">
+          <div className="border-b border-border p-6">
             <div className="space-y-6">
               {/* 打卡 */}
-              <div className="bg-gradient-to-r from-primary/10 to-blue-50 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-foreground mb-3">打卡</h3>
+              <div className="rounded-lg bg-gradient-to-r from-primary/10 to-blue-50 p-4">
+                <h3 className="mb-3 text-lg font-semibold text-foreground">打卡</h3>
                 {canCheckIn ? (
                   <div className="space-y-3">
                     <p className="text-sm text-muted-foreground">
@@ -275,15 +275,15 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                       onClick={onCheckIn}
                       className="flex items-center justify-center space-x-2"
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="size-4" />
                       <span>開始打卡</span>
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-success rounded-full flex items-center justify-center">
-                        <CheckCircle className="h-5 w-5 text-white" />
+                      <div className="flex size-8 items-center justify-center rounded-full bg-success">
+                        <CheckCircle className="size-5 text-white" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-green-600">今日已打卡</p>
@@ -300,9 +300,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                     <Button
                       disabled
                       variant="secondary"
-                      className="flex items-center justify-center space-x-2 cursor-not-allowed"
+                      className="flex cursor-not-allowed items-center justify-center space-x-2"
                     >
-                      <CheckCircle className="h-4 w-4" />
+                      <CheckCircle className="size-4" />
                       <span>已完成打卡</span>
                     </Button>
                   </div>
@@ -310,34 +310,34 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
               </div>
 
               {/* 打卡記錄 */}
-              <div className="bg-card rounded-lg border border-border p-4">
+              <div className="rounded-lg border border-border bg-card p-4">
                 <div className="mb-4">
                   <h3 className="text-lg font-semibold text-foreground">打卡記錄</h3>
-                  <div className="flex items-center justify-between text-muted-foreground text-sm mt-2">
+                  <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
                     <span>上次打卡</span>
                     <span>{formatLastCheckIn()}</span>
                   </div>
                 </div>
 
                 {practice.checkIns.length > 0 ? (
-                  <div className="max-h-80 overflow-y-auto space-y-2">
+                  <div className="max-h-80 space-y-2 overflow-y-auto">
                     {practice.checkIns.map((checkIn, index) => (
                       <div
                         key={checkIn.id || index}
-                        className="flex items-center space-x-3 py-3 border-b border-border last:border-b-0"
+                        className="flex items-center space-x-3 border-b border-border py-3 last:border-b-0"
                       >
-                        <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
+                        <div className="size-2 shrink-0 rounded-full bg-primary" />
                         <div className="flex-1">
                           <p className="text-sm text-foreground">
                             我在
                             {' '}
-                            <span className="text-green-600 font-medium">
+                            <span className="font-medium text-green-600">
                               {formatSmartDate(checkIn.date)}
                             </span>
                             {' '}
                             實踐
                             {' '}
-                            <span className="text-primary font-medium">
+                            <span className="font-medium text-primary">
                               {practice.title}
                             </span>
                             {' '}
@@ -356,9 +356,9 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8">
+                  <div className="py-8 text-center">
                     <p className="text-sm text-muted-foreground">還沒有打卡記錄</p>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       開始你的第一次打卡吧！
                     </p>
                   </div>
@@ -370,29 +370,29 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
           {/* 學習資源區域 */}
           {practice.resources.length > 0 && (
             <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
+              <div className="mb-4 flex items-center justify-between">
                 <h3 className="heading-md text-basic-black">資源</h3>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 {practice.resources.map((resource) => (
                   <div
                     key={resource.id}
-                    className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-basic-200 hover:border-basic-300 transition-colors"
+                    className="flex items-center justify-between rounded-lg border border-basic-200 bg-primary/5 p-3 transition-colors hover:border-basic-300"
                   >
                     {resource.url && (
                       <Link
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center space-x-1 text-primary-base hover:text-primary-darker body-sm ml-3 flex-shrink-0"
+                        className="body-sm ml-3 flex shrink-0 items-center space-x-1 text-primary-base hover:text-primary-darker"
                       >
-                        <div className="flex items-center flex-1">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mr-3">
-                            <LinkIcon className="h-4 w-4 text-primary" />
+                        <div className="flex flex-1 items-center">
+                          <div className="mr-3 flex size-8 shrink-0 items-center justify-center rounded-lg">
+                            <LinkIcon className="size-4 text-primary" />
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="body-sm font-medium text-basic-800 truncate">
+                          <div className="min-w-0 flex-1">
+                            <div className="text-basic-800 body-sm truncate font-medium">
                               {resource.name}
                             </div>
                           </div>

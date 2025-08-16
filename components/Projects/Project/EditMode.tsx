@@ -40,9 +40,9 @@ const EditMode = ({
 
   return (
     <div className="flex flex-col gap-6 md:gap-4">
-      <Panel className="bg-white flex flex-col gap-5">
-        <h2 className="text-basic-400 font-sans heading-md">學習計畫</h2>
-        <p className="text-basic-400 font-sans text-sm">
+      <Panel className="flex flex-col gap-5 bg-white">
+        <h2 className="heading-md font-sans text-basic-400">學習計畫</h2>
+        <p className="font-sans text-sm text-basic-400">
           計劃內容在報名截止日前皆可修改。
           <br />
           入選公告後，所有入選者及報名者亦可持續修改學習計劃
@@ -188,7 +188,7 @@ const EditMode = ({
         </InputField>
 
         <div className="flex flex-row">
-          <label htmlFor="isPublic" className="flex flex-row justify-center items-center gap-[5px] hover:cursor-pointer">
+          <label htmlFor="isPublic" className="flex flex-row items-center justify-center gap-[5px] hover:cursor-pointer">
             <input
               type="checkbox"
               name="isPublic"
@@ -198,12 +198,11 @@ const EditMode = ({
               onChange={handleChangeInput}
             />
             <p className="
-              w-[18px] h-[18px] p-[2px] rounded-[4px] m-[1px]
-              flex items-center justify-center
-              bg-white text-basic-400 border-2 border-solid border-basic-400
+              m-px flex size-[18px] items-center justify-center
+              rounded-[4px] border-2 border-solid
+              border-basic-400 bg-white p-[2px] text-basic-400 peer-checked:border-primary-base
               peer-checked:bg-primary-base
               peer-checked:text-white
-                peer-checked:border-primary-base
               "
             >
               <Check />
@@ -243,9 +242,9 @@ const EditMode = ({
         </InputField>
       </Panel>
       <Panel className="
-        p-0 md:p-0
-        flex flex-col justify-center items-center gap-6
-        md:flex-row md:gap-3"
+        flex flex-col
+        items-center justify-center gap-6 p-0 md:flex-row
+        md:gap-3 md:p-0"
       >
         <Button
           variant="outline"

@@ -1,68 +1,47 @@
-import styled from '@emotion/styled';
-import { Box, Tooltip } from '@mui/material';
-import dayjs from 'dayjs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { format } from 'date-fns';
 
-const CardWrapper = styled.li`
-  position: relative;
-  width: 200px;
-  height: 120px;
-  flex: 0 0 200px;
-  border-radius: 12px;
-  margin: 5px;
-  padding: 10px;
-  color: #16b9b3;
-  border: 2px #16b9b3 solid;
-  overflow: hidden;
+const Card = ({ id, message = '', date }) => {
+  const handleClick = () => {
+    window.open(
+      `https://www.facebook.com/${id.split('_')[0]}/posts/${id.split('_')[1]}`,
+      '_target'
+    );
+  };
 
-  cursor: pointer;
-  object-fit: cover;
-  &:hover {
-    transform: scale(1.05);
-    transition: transform 0.4s;
-  }
-`;
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleClick();
+    }
+  };
 
-const ContentWrapper = styled.p`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: calc(90px - 20px);
-  font-weight: 500;
-  text-align: left;
-  display: -webkit-box;
-  text-overflow: ellipsis;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  white-space: pre-wrap;
-  font-size: 12px;
-`;
-
-const Card = ({ id, message = '', date }) => (
-  <Tooltip title={message.slice(0, 150)}>
-    <CardWrapper
-      onClick={() => window.open(
-        `https://www.facebook.com/${id.split('_')[0]}/posts/${
-          id.split('_')[1]
-        }`,
-        '_target'
-      )}
-    >
-      <Box
-        sx={{
-          // border: "1px solid #16b9b3",
-          // borderRadius: '10px'
-          fontWeight: 'bold',
-        }}
-      >
-        {/* {title} */}
-        時間：
-        {dayjs(date).format('YYYY/MM/DD')}
-      </Box>
-      <ContentWrapper>{message}</ContentWrapper>
-      {/* <Typography sx={{ color: "#16b9b3" }}>{message}</Typography> */}
-    </CardWrapper>
-  </Tooltip>
-);
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            className="hover:duration-400 relative m-1.5 h-[120px] w-[200px] flex-[0_0_200px] cursor-pointer overflow-hidden rounded-xl border-2 border-[#16b9b3] bg-white object-cover p-2.5 text-[#16b9b3] hover:scale-105 hover:transition-transform"
+            onClick={handleClick}
+            onKeyDown={handleKeyDown}
+            aria-label={`Facebook post from ${format(new Date(date), 'yyyy/MM/dd')}`}
+          >
+            <div className="font-bold">
+              時間：
+              {format(new Date(date), 'yyyy/MM/dd')}
+            </div>
+            <p className="flex h-[calc(90px-20px)] flex-col items-center overflow-hidden text-ellipsis whitespace-pre-wrap text-left text-xs font-medium [-webkit-box-orient:vertical] [-webkit-line-clamp:2] [display:-webkit-box]">
+              {message}
+            </p>
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{message.slice(0, 150)}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 export default Card;

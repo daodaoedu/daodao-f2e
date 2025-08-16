@@ -1,20 +1,7 @@
-import styled from '@emotion/styled';
 import Card from './Card';
 
-const CardListWrapper = styled.ul`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  li {
-    margin: 20px;
-  }
-`;
-
 const CardList = ({ list }) => (
-  <CardListWrapper>
+  <ul className="flex flex-wrap items-center justify-center pb-5 pt-5 [&>li]:m-5">
     {list.map((category) => (
       <Card
         key={category.title}
@@ -23,7 +10,7 @@ const CardList = ({ list }) => (
         image={category.image}
       />
     ))}
-  </CardListWrapper>
+  </ul>
 );
 
 export default CardList;

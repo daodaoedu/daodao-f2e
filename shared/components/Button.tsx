@@ -147,7 +147,7 @@ function Button<AS extends 'button' | 'link' = 'button'>(
     <>
       {children}
       {animation !== ButtonAnimationEnum.None && (
-        <div ref={rippleRef} className="absolute inset-0 pointer-events-none" />
+        <div ref={rippleRef} className="pointer-events-none absolute inset-0" />
       )}
     </>
   );

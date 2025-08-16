@@ -95,22 +95,22 @@ const Step3: React.FC<Step3Props> = ({
     }
   };
   return (
-    <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <div className="p-6">
-        <div className="flex items-center mb-2">
-          <div className="w-2 h-2 rounded-full mr-2 bg-primary" />
+        <div className="mb-2 flex items-center">
+          <div className="mr-2 size-2 rounded-full bg-primary" />
           <span className="text-sm text-muted-foreground">主題實踐</span>
         </div>
         <h3 className="text-2xl font-bold text-foreground">資源</h3>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="mt-1 text-sm text-muted-foreground">
           新增實踐中可能會用的資源，例如書籍、Podcast或影片
         </p>
       </div>
 
       <div className="p-6 pt-0">
         <div className="space-y-6">
-          <div className="border border-border rounded-lg p-4">
-            <div className="flex justify-between items-center mb-4">
+          <div className="rounded-lg border border-border p-4">
+            <div className="mb-4 flex items-center justify-between">
               <Label className="text-sm font-medium text-foreground">添加資源</Label>
               <span className="text-xs text-muted-foreground">
                 {resources.length}
@@ -120,7 +120,7 @@ const Step3: React.FC<Step3Props> = ({
 
             <div className="space-y-4">
               <div>
-                <Label className="block text-xs font-medium text-foreground mb-2">
+                <Label className="mb-2 block text-xs font-medium text-foreground">
                   資源名稱
                   {' '}
                   <span className="text-destructive">*</span>
@@ -141,18 +141,18 @@ const Step3: React.FC<Step3Props> = ({
                   </span>
                 </div>
                 {nameError && (
-                  <div className="flex items-center mt-1 text-xs text-destructive">
-                    <AlertCircle className="h-3 w-3 mr-1" />
+                  <div className="mt-1 flex items-center text-xs text-destructive">
+                    <AlertCircle className="mr-1 size-3" />
                     <span>{nameError}</span>
                   </div>
                 )}
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="mt-1 text-xs text-muted-foreground">
                   輸入清楚的資源名稱，方便日後查找
                 </p>
               </div>
 
               <div>
-                <Label className="block text-xs font-medium text-foreground mb-2">
+                <Label className="mb-2 block text-xs font-medium text-foreground">
                   資源連結
                 </Label>
                 <Input
@@ -164,12 +164,12 @@ const Step3: React.FC<Step3Props> = ({
                   className={cn((validationErrors.resourceUrl || urlError) && 'border-destructive')}
                 />
                 {urlError && (
-                  <div className="flex items-center mt-1 text-xs text-destructive">
-                    <AlertCircle className="h-3 w-3 mr-1" />
+                  <div className="mt-1 flex items-center text-xs text-destructive">
+                    <AlertCircle className="mr-1 size-3" />
                     <span>{urlError}</span>
                   </div>
                 )}
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="mt-1 text-xs text-muted-foreground">
                   請輸入完整的網址（需以 https:// 開頭）
                 </p>
               </div>
@@ -180,7 +180,7 @@ const Step3: React.FC<Step3Props> = ({
                   disabled={!newResourceName.trim() || resources.length >= 5 || !!nameError || !!urlError}
                   className="flex items-center"
                 >
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="mr-2 size-4" />
                   添加資源
                 </Button>
 
@@ -192,7 +192,7 @@ const Step3: React.FC<Step3Props> = ({
           </div>
 
           <div>
-            <Label className="text-sm font-medium text-foreground mb-3 block">已添加的資源</Label>
+            <Label className="mb-3 block text-sm font-medium text-foreground">已添加的資源</Label>
 
             {resources.length > 0 ? (
               <div className="space-y-3">
@@ -203,10 +203,10 @@ const Step3: React.FC<Step3Props> = ({
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full flex items-center p-4 bg-primary-lightest  border border-primary/20 rounded-lg text-sm font-medium text-primary transition-colors group"
+                        className="group flex w-full items-center rounded-lg  border border-primary/20 bg-primary-lightest p-4 text-sm font-medium text-primary transition-colors"
                       >
-                        <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mr-3">
-                          <LinkIcon className="h-4 w-4 text-primary" />
+                        <div className="mr-3 flex size-8 shrink-0 items-center justify-center rounded-lg">
+                          <LinkIcon className="size-4 text-primary" />
                         </div>
                         <span className="flex-1 truncate">{resource.name}</span>
                         <Button
@@ -217,26 +217,26 @@ const Step3: React.FC<Step3Props> = ({
                             e.stopPropagation();
                             removeResource(resource.id);
                           }}
-                          className="text-primary hover:text-destructive ml-2 p-1 h-auto w-auto"
+                          className="ml-2 size-auto p-1 text-primary hover:text-destructive"
                         >
-                          <X className="h-4 w-4" />
+                          <X className="size-4" />
                         </Button>
                       </Link>
                     ) : (
-                      <div className="w-full flex items-center p-4 bg-primary-lightest border border-primary/20 rounded-lg text-sm font-medium text-primary">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mr-3">
-                          <LinkIcon className="h-4 w-4 text-primary" />
+                      <div className="flex w-full items-center rounded-lg border border-primary/20 bg-primary-lightest p-4 text-sm font-medium text-primary">
+                        <div className="mr-3 flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                          <LinkIcon className="size-4 text-primary" />
                         </div>
-                        <div className="flex items-center font-medium text-sm transition-colors">
+                        <div className="flex items-center text-sm font-medium transition-colors">
                           <span className="truncate">{resource.name}</span>
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => removeResource(resource.id)}
-                          className="text-primary hover:text-destructive ml-2 p-1 h-auto w-auto"
+                          className="ml-2 size-auto p-1 text-primary hover:text-destructive"
                         >
-                          <X className="h-4 w-4" />
+                          <X className="size-4" />
                         </Button>
                       </div>
                     )}
@@ -244,21 +244,21 @@ const Step3: React.FC<Step3Props> = ({
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-muted-foreground bg-muted/50 rounded-lg border border-border">
+              <div className="rounded-lg border border-border bg-muted/50 py-8 text-center text-muted-foreground">
                 <p className="text-sm">尚未添加任何資源</p>
               </div>
             )}
           </div>
 
-          <div className="p-4 rounded-lg border border-primary/20 bg-primary/5">
-            <p className="text-sm text-center text-foreground">
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+            <p className="text-center text-sm text-foreground">
               你的資源分享將能幫助有相同興趣的島友們
             </p>
           </div>
         </div>
       </div>
 
-      <div className="p-6 pt-0 flex justify-between">
+      <div className="flex justify-between p-6 pt-0">
         <Button
           variant="outline"
           onClick={handlePrevStep}

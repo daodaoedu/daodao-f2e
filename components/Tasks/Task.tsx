@@ -171,12 +171,12 @@ const Task = ({
   };
 
   return (
-    <div className="ml-5 p-[10px] md:py-3 md:px-4 rounded-lg bg-white">
+    <div className="ml-5 rounded-lg bg-white p-[10px] md:px-4 md:py-3">
       <div className="flex flex-row items-center justify-between">
         {isCreating || isEditing ? (
-          <div className="flex-1 flex flex-col md:flex-row items-center  md:justify-between gap-1">
+          <div className="flex flex-1 flex-col items-center gap-1  md:flex-row md:justify-between">
             {typeof index === 'number' && (
-              <span className="text-sm text-text-primary w-5 text-center shrink-0">
+              <span className="text-text-primary w-5 shrink-0 text-center text-sm">
                 {`${index + 1}.`}
               </span>
             )}
@@ -193,7 +193,7 @@ const Task = ({
             />
             <DropdownMenu>
               <DropdownMenuTrigger className="px-2">
-                <Calendar className="w-4 h-4 text-basic-300" />
+                <Calendar className="size-4 text-basic-300" />
                 <div className="ml-2 w-28">
                   <div className="flex items-center justify-between">
                     <span className="truncate">
@@ -226,7 +226,7 @@ const Task = ({
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <div className="flex flex-row gap-1 ml-auto">
+            <div className="ml-auto flex flex-row gap-1">
               <button
                 type="button"
                 className={cn(
@@ -255,11 +255,11 @@ const Task = ({
           </div>
         ) : (
           <div className="w-full">
-            <div className="w-full flex items-center gap-1 overflow-hidden">
+            <div className="flex w-full items-center gap-1 overflow-hidden">
               <label
                 htmlFor={`isCompleted_${task.id}`}
                 className="
-                  flex flex-row justify-center items-center gap-[5px] hover:cursor-pointer w-full basis-0"
+                  flex w-full basis-0 flex-row items-center justify-center gap-[5px] hover:cursor-pointer"
               >
                 <input
                   type="checkbox"
@@ -271,21 +271,20 @@ const Task = ({
                 />
                 <p
                   className="
-                  w-[18px] h-[18px] p-[2px] rounded-[4px] m-[1px]
-                  flex items-center justify-center
-                  bg-white text-basic-400 border-2 border-solid border-basic-400
+                  m-px flex size-[18px] items-center justify-center
+                  rounded-[4px] border-2 border-solid
+                  border-basic-400 bg-white p-[2px] text-basic-400 peer-checked:border-primary-base
                   peer-checked:bg-primary-base
                   peer-checked:text-white
-                    peer-checked:border-primary-base
                   "
                 >
                   {task.isCompleted && <Check />}
                 </p>
               </label>
-              <p className="font-sans flex-1 py-2 body-sm text-basic-400 truncate">
+              <p className="body-sm flex-1 truncate py-2 font-sans text-basic-400">
                 {task.name || ''}
               </p>
-              <div className="flex flex-row gap-1 ml-auto">
+              <div className="ml-auto flex flex-row gap-1">
                 <button
                   type="button"
                   className={cn(
@@ -313,8 +312,8 @@ const Task = ({
               </div>
             </div>
             {task.daysOfWeek?.length > 0 && (
-              <div className="flex items-center gap-1 mt-1 ml-7 text-sm text-text-secondary">
-                <Calendar className="w-4 h-4 text-[#92989A] shrink-0" />
+              <div className="text-text-secondary ml-7 mt-1 flex items-center gap-1 text-sm">
+                <Calendar className="size-4 shrink-0 text-[#92989A]" />
                 <span>
                   {task.daysOfWeek?.map((enDay) => dayMap[enDay])?.join('、') ??
                     ''}

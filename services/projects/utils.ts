@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { differenceInDays } from 'date-fns';
 import { ProjectSchema } from './core';
 import { ProjectMilestoneSchema } from './milestones';
 import { ProjectTaskSchema } from './tasks';
@@ -33,10 +33,16 @@ export const sortMilestones = (milestones: ProjectMilestoneSchema[]) => {
   return milestones
     .concat()
     .sort((a, b) => {
-      const startDiff = dayjs(a.startDate).diff(dayjs(b.startDate), 'd');
+      const startDiff = differenceInDays(
+        new Date(a.startDate || ''),
+        new Date(b.startDate || '')
+      );
       if (startDiff !== 0) return startDiff;
       if (a.position !== b.position) return a.position - b.position;
-      return dayjs(a.endDate).diff(dayjs(b.endDate), 'd');
+      return differenceInDays(
+        new Date(a.endDate || ''),
+        new Date(b.endDate || '')
+      );
     })
     .map((milestone) => ({
       ...milestone,

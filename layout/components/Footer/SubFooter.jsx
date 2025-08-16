@@ -1,29 +1,15 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import dayjs from 'dayjs';
-
-const SubFooterWrapper = styled.div`
-  background-color: #536166;
-  color: white;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 16px;
-  margin-top: auto;
-  letter-spacing: 0.08em;
-  margin-top: 20px;
-`;
+import { getYear } from 'date-fns';
 
 const SubFooter = () => {
-  const year = dayjs().get('year');
+  const year = getYear(new Date());
   return (
-    <SubFooterWrapper>
+    <div className="mt-5 flex h-[50px] items-center justify-center bg-[#536166] text-base tracking-[0.08em] text-white">
       Tomorrow will be fine. 島島阿學 ©
       {' '}
       {year}
       .
-    </SubFooterWrapper>
+    </div>
   );
 };
 

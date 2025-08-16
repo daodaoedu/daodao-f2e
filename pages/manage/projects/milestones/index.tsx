@@ -2,7 +2,7 @@ import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import SEOConfig, { JsonLdType } from '@/components/SEOConfig';
-import { Skeleton } from '@mui/material';
+import { Skeleton } from '@/components/ui/skeleton';
 import { AlignLeft } from 'lucide-react';
 import { Panel, Title, ProgressBar } from '@/components/Milestones/Shared';
 import { useProject } from '@/contexts/Project';
@@ -11,7 +11,7 @@ import MilestoneCard, {
   MilestoneFormRef,
 } from "@/components/Milestones/MilestoneCard";
 import DraggableMilestones from "@/components/Milestones/DraggableMilestones";
-import dayjs from "dayjs";
+import { isAfter, differenceInDays } from 'date-fns';
 import { DateRangePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 import { ProjectMilestoneSchema } from "@/services/projects";
@@ -25,19 +25,8 @@ import {
 const SkeletonMilestones = () => {
   return (
     <>
-      <Skeleton
-        variant="rectangular"
-        width="100%"
-        height={120}
-        animation="wave"
-        className="mb-3"
-      />
-      <Skeleton
-        variant="rectangular"
-        width="100%"
-        height={300}
-        animation="wave"
-      />
+      <Skeleton className="w-full h-[120px] mb-3" />
+      <Skeleton className="w-full h-[300px]" />
     </>
   );
 };
@@ -60,16 +49,19 @@ const MilestonesProgress = ({ milestones = [] }: MilestonesProgressProps) => {
   const milestoneEndDate = useMemo(() => {
     if (!Array.isArray(milestones)) return null;
 
-    return milestones.reduce<dayjs.Dayjs | null>(
-      (d, m) => (d && d.isAfter(dayjs(m.endDate)) ? d : dayjs(m.endDate)),
+    return milestones.reduce<Date | null>(
+      (d, m) => {
+        const mEndDate = new Date(m.endDate || new Date());
+        return (d && isAfter(d, mEndDate)) ? d : mEndDate;
+      },
       null
     );
   }, [milestones]);
 
   const daysRemaining = useMemo(() => {
-    if (!milestoneEndDate || dayjs().isAfter(milestoneEndDate)) return 0;
+    if (!milestoneEndDate || isAfter(new Date(), milestoneEndDate)) return 0;
 
-    return milestoneEndDate.diff(dayjs(), "day");
+    return differenceInDays(milestoneEndDate, new Date());
   }, [milestoneEndDate]);
 
   const remainingMilestonesCount = useMemo(() => {
@@ -191,8 +183,8 @@ const MilestonesContent = () => {
 
   const date = useMemo(() => {
     return {
-      from: milestonesDateRange.startDate?.toDate(),
-      to: milestonesDateRange.endDate?.toDate(),
+      from: milestonesDateRange.startDate,
+      to: milestonesDateRange.endDate,
     };
   }, [milestonesDateRange]);
 

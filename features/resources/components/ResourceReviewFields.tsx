@@ -51,7 +51,7 @@ export default function ResourceReviewFields({
       <Title as="h2" size="lg" className="mb-2 text-center">
         心得
       </Title>
-      <Text size="lg" className="mb-10 text-basic-500 text-center">
+      <Text size="lg" className="mb-10 text-center text-basic-500">
         分享心得讓其他人更了解這個資源
       </Text>
 
@@ -59,13 +59,13 @@ export default function ResourceReviewFields({
         <div>
           <FormLabel required>影響力指標</FormLabel>
 
-          <div className="flex flex-wrap gap-x-3 gap-y-6 p-6 border border-solid border-basic-100 rounded-lg">
+          <div className="flex flex-wrap gap-x-3 gap-y-6 rounded-lg border border-solid border-basic-100 p-6">
             <FormField
               control={form.control}
               name={`${prefixKey}overallImpact`}
               render={({ field }) => (
                 <FormItem className="basis-full">
-                  <div className="flex flex-col justify-center items-center">
+                  <div className="flex flex-col items-center justify-center">
                     <FormLabel className="body-md mb-2">綜合影響力</FormLabel>
                     <FormControl>
                       <Rating
@@ -85,8 +85,8 @@ export default function ResourceReviewFields({
               name={`${prefixKey}changeMindset`}
               render={({ field }) => (
                 <FormItem className="flex-1 basis-2/5">
-                  <div className="flex items-center gap-3 mb-2">
-                    <FormLabel className="flex-1 body-md text-right mb-0">
+                  <div className="mb-2 flex items-center gap-3">
+                    <FormLabel className="body-md mb-0 flex-1 text-right">
                       改變思維方式
                     </FormLabel>
                     <FormControl className="flex-1">
@@ -110,8 +110,8 @@ export default function ResourceReviewFields({
               name={`${prefixKey}gainPerspectives`}
               render={({ field }) => (
                 <FormItem className="flex-1 basis-2/5">
-                  <div className="flex items-center gap-3 mb-2">
-                    <FormLabel className="flex-1 body-md text-right mb-0">
+                  <div className="mb-2 flex items-center gap-3">
+                    <FormLabel className="body-md mb-0 flex-1 text-right">
                       獲得新觀點
                     </FormLabel>
                     <FormControl className="flex-1">
@@ -135,8 +135,8 @@ export default function ResourceReviewFields({
               name={`${prefixKey}solveProblems`}
               render={({ field }) => (
                 <FormItem className="flex-1 basis-2/5">
-                  <div className="flex items-center gap-3 mb-2">
-                    <FormLabel className="flex-1 body-md text-right mb-0">
+                  <div className="mb-2 flex items-center gap-3">
+                    <FormLabel className="body-md mb-0 flex-1 text-right">
                       解決實際問題
                     </FormLabel>
                     <FormControl className="flex-1">
@@ -160,8 +160,8 @@ export default function ResourceReviewFields({
               name={`${prefixKey}achieveGoals`}
               render={({ field }) => (
                 <FormItem className="flex-1 basis-2/5">
-                  <div className="flex items-center gap-3 mb-2">
-                    <FormLabel className="flex-1 body-md text-right mb-0">
+                  <div className="mb-2 flex items-center gap-3">
+                    <FormLabel className="body-md mb-0 flex-1 text-right">
                       達成具體目標
                     </FormLabel>
                     <FormControl className="flex-1">
@@ -206,14 +206,14 @@ export default function ResourceReviewFields({
           render={({ field }) => (
             <FormItem>
               <FormLabel required>內容特色</FormLabel>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
+              <div className="mt-2 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                 {contentFeaturesOptions.map((item) => (
                   <FormItem
                     key={item.value}
-                    className="flex items-center border border-solid border-basic-200 rounded-lg relative gap-2 m-0"
+                    className="relative m-0 flex items-center gap-2 rounded-lg border border-solid border-basic-200"
                   >
                     <FormLabel
-                      className="cursor-pointer flex-1 m-0 p-3 flex items-center gap-2 body-md font-normal"
+                      className="body-md m-0 flex flex-1 cursor-pointer items-center gap-2 p-3 font-normal"
                       htmlFor={item.value}
                     >
                       <FormControl>
@@ -251,7 +251,7 @@ export default function ResourceReviewFields({
 
         <div>
           <FormLabel required>怎麼使用</FormLabel>
-          <div className="ml-6 mb-6 space-y-6">
+          <div className="mb-6 ml-6 space-y-6">
             <FormField
               control={form.control}
               name={`${prefixKey}timeUsage`}

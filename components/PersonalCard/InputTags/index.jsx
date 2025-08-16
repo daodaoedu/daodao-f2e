@@ -1,59 +1,20 @@
-import styled from '@emotion/styled';
-import {
-  TextField, Box, Typography, Icon,
-} from '@mui/material';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import { Text } from '@/components/ui/typography';
+import { Input } from '@/components/ui/input';
+import { X } from 'lucide-react';
 import { forwardRef } from 'react';
 
 const Tag = ({ label, onCancel }) => (
-  <Box
-    sx={{
-      display: 'flex',
-      alignItems: 'center',
-      color: '#293A3D',
-      bgcolor: '#DEF5F5',
-      borderRadius: '4px',
-      padding: '4px 8px',
-      mr: '8px',
-      mb: '8px',
-    }}
-  >
-    <Typography
-      sx={{
-        whiteSpace: 'nowrap',
-        paddingRight: '2px',
-        fontWeight: 400,
-        fontSize: '14px',
-        lineHeight: '140%',
-        mr: '4px',
-      }}
-    >
+  <div className="mb-2 mr-2 flex items-center rounded bg-[#DEF5F5] p-2 text-[#293A3D]">
+    <Text className="mr-1 whitespace-nowrap pr-0.5 text-sm font-normal leading-[140%]">
       {label}
-    </Typography>
-    <Icon
-      sx={{ cursor: 'pointer', fontSize: '12px' }}
-      component={CloseOutlinedIcon}
+    </Text>
+    <X
+      className="cursor-pointer text-xs"
+      size={12}
       onClick={onCancel}
     />
-  </Box>
+  </div>
 );
-
-const StyledTagsWrapper = styled(Box)`
-  width: 100%;
-  border: 1px solid #dbdbdb;
-  border-radius: 4px;
-  align-items: center;
-  padding: 8px 16px;
-  min-height: 50px;
-  div {
-    &::before {
-      border-color: transparent;
-    }
-  }
-  input {
-    padding: 0;
-  }
-`;
 
 function InputTags({ value = [], change }, ref) {
   const keyDownHandle = (e) => {
@@ -66,36 +27,22 @@ function InputTags({ value = [], change }, ref) {
   };
 
   return (
-    <StyledTagsWrapper>
-      <Box
-        sx={{
-          marginTop: '5px',
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-        }}
-      >
+    <div className="min-h-[50px] w-full items-center rounded border border-solid border-[#DBDBDB] px-4 py-2">
+      <div className="mt-1.5 flex flex-wrap items-center">
         {Array.isArray(value) &&
           value.map(
             (item) => typeof item === 'string' && (
             <Tag key={item} label={item} onCancel={() => change(item)} />
             )
           )}
-        <TextField
-          inputRef={ref}
-          fullWidth
+        <Input
+          ref={ref}
           placeholder={value.length ? '' : '搜尋或新增標籤'}
           onKeyDown={keyDownHandle}
-          variant="standard"
-          className="text-field"
-          sx={{
-            padding: '0',
-            minWidth: '50px',
-            width: 'auto',
-          }}
+          className="w-auto min-w-[50px] flex-1 border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
         />
-      </Box>
-    </StyledTagsWrapper>
+      </div>
+    </div>
   );
 }
 

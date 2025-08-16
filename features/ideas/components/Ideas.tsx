@@ -58,7 +58,7 @@ const IdeasFeature: React.FC<IdeasFeatureProps> = ({ className = '' }) => {
     >
       <div className={cn('bg-primary-palest min-h-screen', className)}>
         {/* Main Content Container */}
-        <div className="relative pt-[70px] z-10">
+        <div className="relative z-10 pt-[70px]">
           <Container size="lg">
 
             {/* Ideas List Section */}
@@ -74,12 +74,12 @@ const IdeasFeature: React.FC<IdeasFeatureProps> = ({ className = '' }) => {
 
         {/* Create Idea Modal */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+            <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto">
               <IdeasErrorBoundary
                 fallback={(
-                  <div className="bg-white rounded-lg p-6">
-                    <h3 className="text-lg font-medium mb-4">表單出現問題</h3>
+                  <div className="rounded-lg bg-white p-6">
+                    <h3 className="mb-4 text-lg font-medium">表單出現問題</h3>
                     <NetworkError onRetry={retryCreateIdea} isRetrying={isRetrying} />
                   </div>
                 )}

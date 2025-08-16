@@ -48,19 +48,19 @@ export default function ResourceBanner({
           'lg:aspect-auto lg:w-1/2 lg:absolute lg:top-0 lg:right-0 lg:h-full lg:object-cover'
         )}
       >
-        <Image src={image} alt={title} className="object-cover min-h-full" />
+        <Image src={image} alt={title} className="min-h-full object-cover" />
 
-        <div className="absolute inset-0 w-full h-full bg-primary-base opacity-30 block lg:hidden" />
-        <div className="h-full w-full absolute top-0 right-0 bg-gradient-primary-palest hidden lg:block" />
+        <div className="absolute inset-0 block size-full bg-primary-base opacity-30 lg:hidden" />
+        <div className="bg-gradient-primary-palest absolute right-0 top-0 hidden size-full lg:block" />
       </div>
 
       <Container>
         {/* 搜尋欄 標籤 分享資源 */}
-        <div className="relative pt-5 pb-11 lg:p-0 lg:gap-6 lg:w-3/5 flex flex-col gap-5">
+        <div className="relative flex flex-col gap-5 pb-11 pt-5 lg:w-3/5 lg:gap-6 lg:p-0">
           <div>
             <SectionTitle as={isMediumSize ? 'h2' : 'h1'} title={title} />
 
-            <div className="text-basic-500 text-5 mt-2 md:text-[1.125rem] md:mt-3">
+            <div className="text-5 mt-2 text-basic-500 md:mt-3 md:text-[1.125rem]">
               {content}
             </div>
           </div>
@@ -79,8 +79,8 @@ export default function ResourceBanner({
           <div className="flex flex-col">
             {/* 標籤 */}
             {isLargeSize && Array.isArray(hotTags) && hotTags.length > 0 && (
-              <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-5 md:mb-6">
-                <div className="text-nowrap min-w-[4.5rem] h-[1.875rem] text-xl font-bold md:text-lg md:leading-[1.6875rem] md:h-[1.6875rem]">
+              <div className="mb-5 flex flex-col gap-2 md:mb-6 md:flex-row md:items-center md:gap-3">
+                <div className="h-[1.875rem] min-w-[4.5rem] text-nowrap text-xl font-bold md:h-[1.6875rem] md:text-lg md:leading-[1.6875rem]">
                   熱門標籤
                 </div>
                 <div className="flex flex-wrap gap-1 md:gap-2">
@@ -102,7 +102,7 @@ export default function ResourceBanner({
             )}
 
             {isMediumSize && typeof length === 'number' && (
-              <div className="flex flex-col md:flex-row md:items-center mb-6">
+              <div className="mb-6 flex flex-col md:flex-row md:items-center">
                 <div className="body-lg">
                   共
                   {' '}

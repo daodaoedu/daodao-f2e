@@ -1,120 +1,97 @@
-import styled from '@emotion/styled';
-import { Box, Typography } from '@mui/material';
+import { cn } from '@/utils/cn';
 
-export const StyledProfileWrapper = styled(Box)`
-  width: 100%;
-  padding: 30px;
-  background-color: #fff;
-  border-radius: 20px;
-  @media (max-width: 767px) {
-    width: 100%;
-    padding: 16px;
-  }
-`;
+export const StyledProfileWrapper = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'w-full p-[30px] bg-white rounded-[20px] max-md:w-full max-md:p-4',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledProfileBaseInfo = styled(Box)`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-`;
+export const StyledProfileBaseInfo = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'flex justify-start items-center',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledProfileTitle = styled(Box)`
-  div {
-    display: flex;
-    align-items: center;
-  }
-  h2 {
-    color: #536166;
-    font-size: 18px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 120%;
-    margin-right: 10px;
-  }
-  span {
-    border-radius: 4px;
-    background: #f3f3f3;
-    padding: 3px 10px;
-  }
-  p {
-    color: #92989a;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 140%; /* 19.6px */
-  }
-`;
+export const StyledProfileTitle = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      '[&>div]:flex [&>div]:items-center [&>h2]:text-[#536166] [&>h2]:text-lg [&>h2]:font-bold [&>h2]:leading-[120%] [&>h2]:mr-2.5 [&>span]:rounded [&>span]:bg-[#f3f3f3] [&>span]:py-[3px] [&>span]:px-2.5 [&>p]:text-[#92989a] [&>p]:text-sm [&>p]:font-normal [&>p]:leading-[140%]',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledProfileLocation = styled(Typography)`
-  margin-top: 12px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  color: #536166;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 140%; /* 16.8px */
-`;
+export const StyledProfileLocation = ({ children, className, ...props }) => (
+  <p
+    className={cn(
+      'mt-3 flex justify-start items-center text-[#536166] text-xs font-medium leading-[140%]',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </p>
+);
 
-export const StyledProfileTag = styled(Box)`
-  margin-top: 24px;
-  display: flex;
-  flex-wrap: wrap;
-`;
+export const StyledProfileTag = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'mt-6 flex flex-wrap',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledProfileOther = styled(Box)`
-  margin-top: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  @media (max-width: 767px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-`;
+export const StyledProfileOther = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'mt-6 flex justify-between items-end max-md:flex-col max-md:items-start',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledProfileSocial = styled.ul`
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  align-items: flex-start;
-  li {
-    align-items: center;
-    display: flex;
-    margin-right: 16px;
-    margin-bottom: 8px;
-  }
-  li:last-of-type {
-    margin-bottom: 0;
-  }
-  li svg {
-    color: #16b9b3;
-  }
-  li p,
-  li a {
-    margin-left: 5px;
-    color: #293a3d;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 140%;
-  }
+export const StyledProfileSocial = ({ children, className, ...props }) => (
+  <ul
+    className={cn(
+      'flex items-center flex-col items-start [&>li]:items-center [&>li]:flex [&>li]:mr-4 [&>li]:mb-2 [&>li:last-of-type]:mb-0 [&>li>svg]:text-[#16b9b3] [&>li>p]:ml-1.5 [&>li>p]:text-[#293a3d] [&>li>p]:text-xs [&>li>p]:font-normal [&>li>p]:leading-[140%] [&>li>a]:ml-1.5 [&>li>a]:text-[#293a3d] [&>li>a]:text-xs [&>li>a]:font-normal [&>li>a]:leading-[140%] [&>li>a]:text-[#16b9b3] [&>li>a]:cursor-pointer [&>li>a]:underline',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </ul>
+);
 
-  li a {
-    color: #16b9b3;
-    cursor: pointer;
-    text-decoration: underline;
-  }
-`;
-
-export const StyledProfileDate = styled.p`
-  font-size: 12px;
-  color: #92989a;
-  font-weight: 400;
-  line-height: 140%;
-  @media (max-width: 767px) {
-    width: 100%;
-    text-align: right;
-  }
-`;
+export const StyledProfileDate = ({ children, className, ...props }) => (
+  <p
+    className={cn(
+      'text-xs text-[#92989a] font-normal leading-[140%] max-md:w-full max-md:text-right',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </p>
+);

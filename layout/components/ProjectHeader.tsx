@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import toast from 'react-hot-toast';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import { LockKeyholeOpen, LockKeyhole, EllipsisVertical } from 'lucide-react';
 import { ROLE } from '@/constants/member';
 import { ProjectSchema } from '@/services/projects';
@@ -26,12 +26,12 @@ export default function ProjectHeader({ project }: ProjectHeaderProps) {
 
   return (
     <header className="mb-6">
-      <div className="mb-3 flex flex-col lg:flex-row justify-between lg:items-center gap-y-3">
+      <div className="mb-3 flex flex-col justify-between gap-y-3 lg:flex-row lg:items-center">
         <h1 className="heading-md text-basic-500">
           {project?.title || '學習計畫主題名稱'}
         </h1>
-        <div className="flex items-center justify-between lg:justify-end gap-2 text-basic-300">
-          <time>{dayjs(project?.updatedDate).format('YYYY/MM/DD')}</time>
+        <div className="flex items-center justify-between gap-2 text-basic-300 lg:justify-end">
+          <time>{project?.updatedDate ? format(new Date(project.updatedDate), 'yyyy/MM/dd') : ''}</time>
           <div className="flex items-center gap-2">
             {/* <div className="flex items-center gap-0.5">
           <AiOutlineEye />
@@ -55,8 +55,8 @@ export default function ProjectHeader({ project }: ProjectHeaderProps) {
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-2 body-sm">
-        <div className="rounded-full overflow-hidden *:!block">
+      <div className="body-sm flex items-center gap-2">
+        <div className="overflow-hidden rounded-full *:!block">
           <img
             src={project?.user?.photoURL}
             alt={project?.user?.name}
@@ -65,10 +65,10 @@ export default function ProjectHeader({ project }: ProjectHeaderProps) {
           />
         </div>
         <div className="text-basic-400">{project?.user?.name}</div>
-        <div className="px-2.5 py-0.5 text-basic-500 bg-basic-100 rounded">
+        <div className="rounded bg-basic-100 px-2.5 py-0.5 text-basic-500">
           {roleDisplayName}
         </div>
-        <div className="px-2.5 py-0.5 text-basic-white bg-primary-lighter rounded">
+        <div className="rounded bg-primary-lighter px-2.5 py-0.5 text-basic-white">
           {eventDisplayName}
         </div>
       </div>

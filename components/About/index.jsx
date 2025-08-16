@@ -1,6 +1,5 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import { Paper } from '@mui/material';
+import { Paper } from '@/components/ui/paper';
 import AboutUs from './AboutUs';
 import RealizeMore from './RealizeMore';
 import RelatedReport from './RelatedReport';
@@ -12,40 +11,9 @@ import ContactUs from './ContactUs';
 import TechStack from './TechStack';
 import Cooperate from './Cooperate';
 
-const AboutWrapper = styled.div`
-  padding-top: 40px;
-  padding-bottom: 40px;
-  .title {
-    font-size: 24px;
-    font-weight: 500;
-    margin: 0 10px 0 0;
-    color: black;
-    &:hover {
-      cursor: pointer;
-      color: #37b9eb;
-      transition: 0.5s;
-    }
-  }
-  @media (max-width: 767px) {
-    .title {
-      text-overflow: ellipsis;
-      width: 100%;
-    }
-  }
-`;
-
-const PaperWrapper = styled(Paper)`
-  width: 90%;
-  margin: 0 auto;
-  padding: 20px;
-  @media (max-width: 767px) {
-    padding: 10px;
-  }
-`;
-
 const About = () => (
-  <AboutWrapper>
-    <PaperWrapper>
+  <div className="pb-10 pt-10">
+    <Paper className="mx-auto w-[90%] p-5 max-md:p-2.5">
       <AboutUs />
       <RealizeMore />
       <RelatedReport />
@@ -56,8 +24,8 @@ const About = () => (
       <Cooperate />
       <Thanks />
       <ContactUs />
-    </PaperWrapper>
-  </AboutWrapper>
+    </Paper>
+  </div>
 );
 
 export default About;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
+import { subYears } from 'date-fns';
 import toast from 'react-hot-toast';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import useMediaQuery from '@/hooks/useMediaQuery';
 import { useRouter } from 'next/router';
 import { TAIWAN_DISTRICT, COUNTRIES } from '@/constants/areas';
 import { useAuth } from '@/contexts/Auth';
@@ -13,19 +13,11 @@ import {
   WANT_TO_DO_WITH_PARTNER,
 } from '@/constants/member';
 
-import {
-  Box,
-  Typography,
-  TextField,
-  Switch,
-  MenuItem,
-  Select,
-  Grid,
-} from '@mui/material';
-
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { Text } from '@/components/ui/typography';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { DatePicker } from '@/components/ui/date-picker';
 import TagEditor from '@/shared/components/TagEditor';
 import { MarkdownEditor } from '@/components/ui/markdown-editor';
 import { useTags } from '@/services/tags';
@@ -36,23 +28,16 @@ import FormInput from './EditFormInput';
 
 import useEditProfile from './useEditProfile';
 import {
-  FormWrapper,
-  ContentWrapper,
   StyledGroup,
   StyledSelectWrapper,
   StyledSelectBox,
   StyledSelectText,
-  StyledToggleWrapper,
-  StyledToggleText,
-  StyledTitleWrap,
-  StyledSection,
-  StyledButtonGroup,
   StyledButton,
 } from './Edit.styled';
 
 // TODO: 待重構
 function EditPage() {
-  const mobileScreen = useMediaQuery('(max-width: 767px)');
+  const mobileScreen = useMediaQuery('isSmall');
   const [isSetting, setIsSetting] = useState(false);
   const router = useRouter();
 
@@ -80,7 +65,7 @@ function EditPage() {
           onChangeHandler({ key: 'discord', value: discord || '' });
           onChangeHandler({ key: 'line', value: line || '' });
         } else if (key === 'birthDay') {
-          const parsedDate = dayjs(value);
+          const parsedDate = new Date(value);
           onChangeHandler({ key: 'birthDay', value: parsedDate });
         } else if (key === 'location') {
           onChangeHandler({ key, value });
@@ -120,296 +105,90 @@ function EditPage() {
   }, [userState, isComplete]);
 
   return (
-    <FormWrapper>
-      <LocalizationProvider
-        dateAdapter={AdapterDayjs}
-        sx={{
-          background: 'linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa',
-        }}
-      >
-        <ContentWrapper sx={{ minHeight: '100vh' }}>
-          <StyledTitleWrap
-            sx={{
-              border:
-                errors.name ||
-                errors.birthDay ||
-                errors.gender ||
-                errors.roleList
-                  ? '1px solid red'
-                  : '',
-            }}
-          >
-            <h2>編輯個人頁面</h2>
-            <p className="title-memo">
-              填寫完整資訊可以幫助其他夥伴更了解你哦！
-            </p>
-            <TheAvator url={userState.photoURL} />
+    <div className="bg-gradient-to-r from-[#f3fcfc] to-[#f7f8fa]">
+      <div className="mx-auto flex min-h-screen w-full max-w-[672px] flex-col items-center justify-center rounded-2xl md:w-[672px]">
+        <div
+          className={`flex w-full flex-col items-center justify-center rounded-2xl bg-white p-[5%] ${
+            errors.name || errors.birthDay || errors.gender || errors.roleList
+              ? 'border border-red-500'
+              : ''
+          }`}
+        >
+          <h2 className="text-center text-[22px] font-bold leading-[140%] text-[#536166]">編輯個人頁面</h2>
+          <p className="mt-2 text-center text-sm font-bold leading-[140%] text-[#536166]">
+            填寫完整資訊可以幫助其他夥伴更了解你哦！
+          </p>
+          <TheAvator url={userState.photoURL} />
 
-            <Box sx={{ marginTop: '24px', width: '100%' }}>
-              <FormInput
-                isRequire
-                ref={(element) => setRef('name', element)}
-                title="名稱"
-                parmKey="name"
-                value={userState.name || ''}
-                onChange={onChangeHandler}
-                errorMsg={errors.name ? errors.name : ''}
-              />
-              <StyledGroup>
-                <Typography fontWeight="500">生日 *</Typography>
-                <MobileDatePicker
-                  inputFormat="YYYY/MM/DD"
+          <div className="mt-6 w-full">
+            <FormInput
+              isRequire
+              ref={(element) => setRef('name', element)}
+              title="名稱"
+              parmKey="name"
+              value={userState.name || ''}
+              onChange={onChangeHandler}
+              errorMsg={errors.name ? errors.name : ''}
+            />
+            <StyledGroup>
+              <Text className="font-medium">生日 *</Text>
+              <div ref={(element) => setRef('birthDay', element)}>
+                <DatePicker
                   value={userState.birthDay}
                   onChange={(date) => onChangeHandler({ key: 'birthDay', value: date })}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      ref={(element) => setRef('birthDay', element)}
-                      sx={{ width: '100%' }}
-                      label=""
-                      error={!!errors.birthDay}
-                      helperText={errors.birthDay ? errors.birthDay : ''}
-                    />
-                  )}
-                  maxDate={dayjs().subtract(16, 'year')}
-                  defaultCalendarMonth={dayjs().subtract(18, 'year')}
+                  toDate={subYears(new Date(), 16)}
+                  captionLayout="dropdown-buttons"
+                  className="w-full"
+                  placeholder="選擇生日"
                 />
-              </StyledGroup>
-              <StyledGroup>
-                <Typography fontWeight="500">性別 *</Typography>
-                <StyledSelectWrapper
-                  ref={(element) => setRef('gender', element)}
-                >
-                  {GENDER.map(({ label, value }) => (
-                    <StyledSelectBox
-                      isselected={`${userState.gender === value}`}
-                      key={label}
-                      onClick={() => {
-                        onChangeHandler({ key: 'gender', value });
-                      }}
-                    >
-                      <StyledSelectText
-                        isselected={`${userState.gender === value}`}
-                      >
-                        {label}
-                      </StyledSelectText>
-                    </StyledSelectBox>
-                  ))}
-                </StyledSelectWrapper>
-                <ErrorMessage errText={errors.gender} />
-              </StyledGroup>
-              <StyledGroup>
-                <Typography fontWeight="500">身份 *</Typography>
-                <StyledSelectWrapper
-                  ref={(element) => setRef('roleList', element)}
-                >
-                  {ROLE.map(({ label, value }) => (
-                    <StyledSelectBox
-                      col={mobileScreen ? '2' : '3'}
-                      key={label}
-                      isselected={userState.roleList.includes(value).toString()}
-                      onClick={() => onChangeHandler({
-                        key: 'roleList',
-                        value,
-                        isMultiple: true,
-                      })}
-                    >
-                      <StyledSelectText
-                        isselected={userState.roleList
-                          .includes(value)
-                          .toString()}
-                      >
-                        {label}
-                      </StyledSelectText>
-                    </StyledSelectBox>
-                  ))}
-                </StyledSelectWrapper>
-                <ErrorMessage errText={errors.roleList} />
-              </StyledGroup>
-            </Box>
-          </StyledTitleWrap>
-
-          <StyledSection>
-            <StyledGroup mt="0">
-              <Typography fontWeight="500">教育階段</Typography>
-              <Select
-                labelId="education-stage"
-                id="education-stage"
-                value={userState.educationStage}
-                onChange={(event) => {
-                  onChangeHandler({
-                    key: 'educationStage',
-                    value: event.target.value,
-                  });
-                }}
-                sx={{ width: '100%' }}
-              >
-                <MenuItem disabled>
-                  <em>請選擇您目前的教育階段</em>
-                </MenuItem>
-                {EDUCATION.map(({ label, value }) => (
-                  <MenuItem key={value} value={value}>
-                    {label}
-                  </MenuItem>
-                ))}
-              </Select>
+                {errors.birthDay && (
+                  <Text className="mt-2 text-sm text-red-500">
+                    {errors.birthDay}
+                  </Text>
+                )}
+              </div>
             </StyledGroup>
             <StyledGroup>
-              <Typography>居住地</Typography>
-              <Select
-                labelId="country"
-                id="country"
-                value={userState.country}
-                onChange={(event) => {
-                  onChangeHandler({
-                    key: 'country',
-                    value: event.target.value,
-                  });
-                }}
-                sx={{ width: '100%' }}
+              <Text className="font-medium">性別 *</Text>
+              <StyledSelectWrapper
+                ref={(element) => setRef('gender', element)}
               >
-                <MenuItem disabled value="-1">
-                  <em>請選擇居住地</em>
-                </MenuItem>
-                {COUNTRIES.map(({ name, label }) => (
-                  <MenuItem key={name} value={name}>
-                    {label}
-                  </MenuItem>
-                ))}
-              </Select>
-              {(userState.country === '台灣' || userState.country === 'tw') && (
-                <Grid container columnSpacing={1}>
-                  <Grid item xs="12" sm="6">
-                    <Select
-                      labelId="country"
-                      id="country"
-                      value={userState.city}
-                      onChange={(event) => {
-                        onChangeHandler({
-                          key: 'city',
-                          value: event.target.value,
-                        });
-                      }}
-                      sx={{ width: '100%' }}
-                    >
-                      <MenuItem disabled value="-1">
-                        <em>縣市</em>
-                      </MenuItem>
-                      {TAIWAN_DISTRICT.map(({ name }) => (
-                        <MenuItem key={name} value={name}>
-                          {name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </Grid>
-                  <Grid item xs="12" sm="6">
-                    <Select
-                      labelId="district"
-                      id="district"
-                      value={userState.district}
-                      onChange={(event) => {
-                        onChangeHandler({
-                          key: 'district',
-                          value: event.target.value,
-                        });
-                      }}
-                      sx={{ width: '100%' }}
-                    >
-                      <MenuItem disabled value="-1">
-                        <em>鄉鎮市區</em>
-                      </MenuItem>
-                      {TAIWAN_DISTRICT.find(
-                        ({ name }) => name === userState.city
-                      )?.districts.map(({ name, zip }) => (
-                        <MenuItem key={zip} value={name}>
-                          {name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </Grid>
-                </Grid>
-              )}
-            </StyledGroup>
-          </StyledSection>
-
-          <StyledSection
-            ref={(element) => setRef('socialCode', element)}
-            sx={{ border: errors.socialCode ? '1px solid red' : '' }}
-          >
-            <StyledGroup mt="0">
-              <Typography sx={{ fontWeight: 700, fontSize: '18px' }}>
-                聯絡方式 *
-              </Typography>
-              <Typography
-                sx={{ color: '#92989A', fontWeight: 400, fontSize: '14px' }}
-              >
-                聯絡資訊會呈現在你的公開頁面上，讓夥伴能聯繫你，至少填寫一個社交媒體帳號
-              </Typography>
-            </StyledGroup>
-            <Grid container columnSpacing={1}>
-              {Object.entries({
-                instagram: 'Instagram',
-                discord: 'Discord',
-                line: 'Line',
-                facebook: 'Facebook',
-              }).map(([key, title]) => (
-                <Grid item xs="12" sm="6">
-                  <FormInput
-                    ref={(element) => setRef(key, element)}
-                    title={title}
-                    parmKey={key}
-                    value={userState[key] || ''}
-                    onChange={onChangeHandler}
-                    placeholder="請填寫ID"
-                    errorMsg={
-                      errors[key]
-                        ? errors[key]
-                        : errors.socialCode
-                          ? '請填寫您的 ID'
-                          : ''
-                    }
-                  />
-                </Grid>
-              ))}
-            </Grid>
-            <StyledGroup>
-              <ErrorMessage errText={errors.socialCode} />
-            </StyledGroup>
-          </StyledSection>
-
-          <StyledSection
-            sx={{
-              border:
-                errors.wantToDoList || errors.tagList || errors.selfIntroduction
-                  ? '1px solid red'
-                  : '',
-            }}
-          >
-            <StyledGroup mt="0">
-              <Typography
-                sx={{ fontWeight: 500 }}
-                ref={(element) => setRef('wantToDoList', element)}
-              >
-                想和夥伴一起 *
-              </Typography>
-              <StyledSelectWrapper>
-                {WANT_TO_DO_WITH_PARTNER.map(({ label, value }) => (
+                {GENDER.map(({ label, value }) => (
                   <StyledSelectBox
+                    isselected={`${userState.gender === value}`}
                     key={label}
-                    col={mobileScreen ? '2' : '3'}
-                    isselected={userState.wantToDoList
-                      .includes(value)
-                      .toString()}
                     onClick={() => {
-                      onChangeHandler({
-                        key: 'wantToDoList',
-                        value,
-                        isMultiple: true,
-                      });
+                      onChangeHandler({ key: 'gender', value });
                     }}
                   >
                     <StyledSelectText
-                      isselected={userState.wantToDoList
+                      isselected={`${userState.gender === value}`}
+                    >
+                      {label}
+                    </StyledSelectText>
+                  </StyledSelectBox>
+                ))}
+              </StyledSelectWrapper>
+              <ErrorMessage errText={errors.gender} />
+            </StyledGroup>
+            <StyledGroup>
+              <Text className="font-medium">身份 *</Text>
+              <StyledSelectWrapper
+                ref={(element) => setRef('roleList', element)}
+              >
+                {ROLE.map(({ label, value }) => (
+                  <StyledSelectBox
+                    col={mobileScreen ? '2' : '3'}
+                    key={label}
+                    isselected={userState.roleList.includes(value).toString()}
+                    onClick={() => onChangeHandler({
+                      key: 'roleList',
+                      value,
+                      isMultiple: true,
+                    })}
+                  >
+                    <StyledSelectText
+                      isselected={userState.roleList
                         .includes(value)
                         .toString()}
                     >
@@ -418,103 +197,287 @@ function EditPage() {
                   </StyledSelectBox>
                 ))}
               </StyledSelectWrapper>
-              <ErrorMessage errText={errors.wantToDoList} />
+              <ErrorMessage errText={errors.roleList} />
             </StyledGroup>
-            <StyledGroup>
-              <Typography sx={{ fontWeight: 500 }}>
-                可以和夥伴分享的事物
-              </Typography>
-              <TextField
-                sx={{ width: '100%' }}
-                placeholder="你擅長什麼？可以分享什麼呢？"
-                value={userState.share}
-                onChange={(e) => {
-                  onChangeHandler({ key: 'share', value: e.target.value });
-                }}
-              />
-            </StyledGroup>
-            <StyledGroup>
-              <Typography sx={{ fontWeight: 500, mb: '6px' }}>標籤</Typography>
-              <TagEditor
-                name="tagList"
-                value={userState.tagList}
-                tagOptions={tags}
-                helperText="可以是學習領域、興趣等等的標籤，例如：音樂創作、程式語言、電繪、社會議題。"
-                control={{
-                  setRef: (name, element) => setRef(name, element),
-                  onChange: ({ target }) => onChangeHandler({ key: target.name, value: target.value }),
-                }}
-              />
-              <ErrorMessage errText={errors.tagList} />
-            </StyledGroup>
+          </div>
+        </div>
 
-            <StyledGroup>
-              <Typography sx={{ fontWeight: 500, mb: '6px' }}>
-                個人簡介 *
-              </Typography>
-              {isSetting && (
-                <MarkdownEditor
-                  name="selfIntroduction"
-                  ref={(element) => setRef('selfIntroduction', element)}
-                  value={userState.selfIntroduction}
-                  rootClassName="w-full p-px bg-basic-200 rounded-md focus-within:bg-primary-base"
-                  className="bg-white rounded-md"
-                  placeholder="寫下關於你的資訊，讓其他島民更認識你！也可以多描述想和夥伴一起做的事喔！"
-                  onChange={(markdown) => {
-                    onChangeHandler({
-                      key: 'selfIntroduction',
-                      value: markdown,
-                    });
-                  }}
-                />
-              )}
-              <ErrorMessage errText={errors.selfIntroduction} />
-            </StyledGroup>
-          </StyledSection>
-
-          <StyledSection>
-            <StyledToggleWrapper>
-              <StyledToggleText>公開顯示居住地</StyledToggleText>
-              <Switch
-                checked={userState.isOpenLocation}
-                onChange={(_, value) => {
-                  onChangeHandler({
-                    key: 'isOpenLocation',
-                    value,
-                  });
-                }}
-              />
-            </StyledToggleWrapper>
-            <StyledToggleWrapper sx={{ mt: '16px' }}>
-              <StyledToggleText>公開個人頁面尋找夥伴</StyledToggleText>
-              <Switch
-                checked={userState.isOpenProfile}
-                onChange={(_, value) => {
-                  onChangeHandler({
-                    key: 'isOpenProfile',
-                    value,
-                  });
-                }}
-              />
-            </StyledToggleWrapper>
-          </StyledSection>
-
-          <StyledButtonGroup>
-            <StyledButton
-              variant="outlined"
-              onClick={() => {
-                router.push('/personal-card/my-card');
+        <div className="mt-4 w-full rounded-2xl bg-white p-10 max-md:p-8 md:p-10">
+          <StyledGroup mt="0">
+            <Text className="font-medium">教育階段</Text>
+            <Select
+              value={userState.educationStage}
+              onValueChange={(val) => {
+                onChangeHandler({
+                  key: 'educationStage',
+                  value: val,
+                });
               }}
             >
-              查看我的頁面
-            </StyledButton>
-            <StyledButton variant="contained" onClick={onUpdateUser}>
-              儲存資料
-            </StyledButton>
-          </StyledButtonGroup>
-        </ContentWrapper>
-      </LocalizationProvider>
-    </FormWrapper>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="請選擇您目前的教育階段" />
+              </SelectTrigger>
+              <SelectContent>
+                {EDUCATION.map(({ label, value }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </StyledGroup>
+          <StyledGroup>
+            <Text>居住地</Text>
+            <Select
+              value={userState.country}
+              onValueChange={(val) => {
+                onChangeHandler({
+                  key: 'country',
+                  value: val,
+                });
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="請選擇居住地" />
+              </SelectTrigger>
+              <SelectContent>
+                {COUNTRIES.map(({ name, label }) => (
+                  <SelectItem key={name} value={name}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {(userState.country === '台灣' || userState.country === 'tw') && (
+              <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <Select
+                  value={userState.city}
+                  onValueChange={(val) => {
+                    onChangeHandler({
+                      key: 'city',
+                      value: val,
+                    });
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="縣市" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TAIWAN_DISTRICT.map(({ name }) => (
+                      <SelectItem key={name} value={name}>
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select
+                  value={userState.district}
+                  onValueChange={(val) => {
+                    onChangeHandler({
+                      key: 'district',
+                      value: val,
+                    });
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="鄉鎮市區" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TAIWAN_DISTRICT.find(
+                      ({ name }) => name === userState.city
+                    )?.districts.map(({ name, zip }) => (
+                      <SelectItem key={zip} value={name}>
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </StyledGroup>
+        </div>
+
+        <div
+          className={`mt-4 w-full rounded-2xl bg-white p-10 max-md:p-8 md:p-10 ${
+            errors.socialCode ? 'border border-red-500' : ''
+          }`}
+          ref={(element) => setRef('socialCode', element)}
+        >
+          <StyledGroup mt="0">
+            <Text className="text-lg font-bold">
+              聯絡方式 *
+            </Text>
+            <Text className="text-sm font-normal text-[#92989A]">
+              聯絡資訊會呈現在你的公開頁面上，讓夥伴能聯繫你，至少填寫一個社交媒體帳號
+            </Text>
+          </StyledGroup>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {Object.entries({
+              instagram: 'Instagram',
+              discord: 'Discord',
+              line: 'Line',
+              facebook: 'Facebook',
+            }).map(([key, title]) => (
+              <div key={key}>
+                <FormInput
+                  ref={(element) => setRef(key, element)}
+                  title={title}
+                  parmKey={key}
+                  value={userState[key] || ''}
+                  onChange={onChangeHandler}
+                  placeholder="請填寫ID"
+                  errorMsg={
+                    errors[key]
+                      ? errors[key]
+                      : errors.socialCode
+                        ? '請填寫您的 ID'
+                        : ''
+                  }
+                />
+              </div>
+            ))}
+          </div>
+          <StyledGroup>
+            <ErrorMessage errText={errors.socialCode} />
+          </StyledGroup>
+        </div>
+
+        <div
+          className={`mt-4 w-full rounded-2xl bg-white p-10 max-md:p-8 md:p-10 ${
+            errors.wantToDoList || errors.tagList || errors.selfIntroduction
+              ? 'border border-red-500'
+              : ''
+          }`}
+        >
+          <StyledGroup mt="0">
+            <Text
+              className="font-medium"
+              ref={(element) => setRef('wantToDoList', element)}
+            >
+              想和夥伴一起 *
+            </Text>
+            <StyledSelectWrapper>
+              {WANT_TO_DO_WITH_PARTNER.map(({ label, value }) => (
+                <StyledSelectBox
+                  key={label}
+                  col={mobileScreen ? '2' : '3'}
+                  isselected={userState.wantToDoList
+                    .includes(value)
+                    .toString()}
+                  onClick={() => {
+                    onChangeHandler({
+                      key: 'wantToDoList',
+                      value,
+                      isMultiple: true,
+                    });
+                  }}
+                >
+                  <StyledSelectText
+                    isselected={userState.wantToDoList
+                      .includes(value)
+                      .toString()}
+                  >
+                    {label}
+                  </StyledSelectText>
+                </StyledSelectBox>
+              ))}
+            </StyledSelectWrapper>
+            <ErrorMessage errText={errors.wantToDoList} />
+          </StyledGroup>
+          <StyledGroup>
+            <Text className="font-medium">
+              可以和夥伴分享的事物
+            </Text>
+            <Input
+              className="w-full"
+              placeholder="你擅長什麼？可以分享什麼呢？"
+              value={userState.share}
+              onChange={(e) => {
+                onChangeHandler({ key: 'share', value: e.target.value });
+              }}
+            />
+          </StyledGroup>
+          <StyledGroup>
+            <Text className="mb-1.5 font-medium">標籤</Text>
+            <TagEditor
+              name="tagList"
+              value={userState.tagList}
+              tagOptions={tags}
+              helperText="可以是學習領域、興趣等等的標籤，例如：音樂創作、程式語言、電繪、社會議題。"
+              control={{
+                setRef: (name, element) => setRef(name, element),
+                onChange: ({ target }) => onChangeHandler({ key: target.name, value: target.value }),
+              }}
+            />
+            <ErrorMessage errText={errors.tagList} />
+          </StyledGroup>
+
+          <StyledGroup>
+            <Text className="mb-1.5 font-medium">
+              個人簡介 *
+            </Text>
+            {isSetting && (
+              <MarkdownEditor
+                name="selfIntroduction"
+                ref={(element) => setRef('selfIntroduction', element)}
+                value={userState.selfIntroduction}
+                rootClassName="w-full p-px bg-basic-200 rounded-md focus-within:bg-primary-base"
+                className="rounded-md bg-white"
+                placeholder="寫下關於你的資訊，讓其他島民更認識你！也可以多描述想和夥伴一起做的事喔！"
+                onChange={(markdown) => {
+                  onChangeHandler({
+                    key: 'selfIntroduction',
+                    value: markdown,
+                  });
+                }}
+              />
+            )}
+            <ErrorMessage errText={errors.selfIntroduction} />
+          </StyledGroup>
+        </div>
+
+        <div className="mt-4 w-full rounded-2xl bg-white p-10 max-md:p-8 md:p-10">
+          <div className="flex items-center justify-between rounded-lg border border-[#dbdbdb] p-4">
+            <Text className="text-base font-medium leading-[140%] text-[#293a3d]">公開顯示居住地</Text>
+            <Switch
+              checked={userState.isOpenLocation}
+              onCheckedChange={(value) => {
+                onChangeHandler({
+                  key: 'isOpenLocation',
+                  value,
+                });
+              }}
+            />
+          </div>
+          <div className="mt-4 flex items-center justify-between rounded-lg border border-[#dbdbdb] p-4">
+            <Text className="text-base font-medium leading-[140%] text-[#293a3d]">公開個人頁面尋找夥伴</Text>
+            <Switch
+              checked={userState.isOpenProfile}
+              onCheckedChange={(value) => {
+                onChangeHandler({
+                  key: 'isOpenProfile',
+                  value,
+                });
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="mt-6 flex w-full">
+          <StyledButton
+            variant="outline"
+            onClick={() => {
+              router.push('/personal-card/my-card');
+            }}
+          >
+            查看我的頁面
+          </StyledButton>
+          <StyledButton onClick={onUpdateUser}>
+            儲存資料
+          </StyledButton>
+        </div>
+      </div>
+    </div>
   );
 }
 

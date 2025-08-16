@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -102,18 +102,18 @@ function PostCardHeader({
   return (
     <header
       ref={wrapperRef}
-      className="mb-5 flex flex-col md:flex-row md:items-center justify-between gap-3"
+      className="mb-5 flex flex-col justify-between gap-3 md:flex-row md:items-center"
     >
       <div
         className="flex items-center gap-4"
         style={{ maxWidth: `${maxWidth}px` }}
       >
         {tag && (
-          <div className="px-5 py-2 body-sm bg-primary-base rounded-full text-white whitespace-nowrap">
+          <div className="body-sm whitespace-nowrap rounded-full bg-primary-base px-5 py-2 text-white">
             {tag}
           </div>
         )}
-        <div className="body-md text-basic-500 shrink overflow-hidden">
+        <div className="body-md shrink overflow-hidden text-basic-500">
           <h2
             ref={titleRef}
             className={cn('truncate', isEditable && 'invisible absolute')}
@@ -124,7 +124,7 @@ function PostCardHeader({
           {isEditable && (
             <input
               type="text"
-              className="outline-none flex-1"
+              className="flex-1 outline-none"
               style={{
                 width: `${Math.min(maxWidth, Math.max(titleWidth, 16))}px`,
               }}
@@ -134,13 +134,13 @@ function PostCardHeader({
           )}
         </div>
         {subtitle && (
-          <div className="body-md text-primary-base whitespace-nowrap">
+          <div className="body-md whitespace-nowrap text-primary-base">
             {subtitle}
           </div>
         )}
       </div>
-      <div className="flex items-center justify-between md:justify-start gap-2 text-basic-300">
-        {date && <time>{dayjs(date).format('YYYY/MM/DD')}</time>}
+      <div className="flex items-center justify-between gap-2 text-basic-300 md:justify-start">
+        {date && <time>{format(new Date(date), 'yyyy/MM/dd')}</time>}
         <div className="flex items-center gap-2">
           {typeof viewCount === 'number' && (
             <div className="flex items-center gap-0.5">
@@ -166,7 +166,7 @@ function PostCardHeader({
               <DropdownMenuTrigger className="-m-1 p-1">
                 <EllipsisVertical />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="-mr-2 mt-2 z-20">
+              <DropdownMenuContent className="z-20 -mr-2 mt-2">
                 {dropdownItems.map((item) => (
                   <DropdownMenuItem
                     key={item.key}
@@ -198,7 +198,7 @@ function PostCardFooter({ onMoreClick, detailLink }: PostCardFooterProps) {
           asChild
           size="sm"
           variant="ghost"
-          className="gap-1 px-2 -ml-2 text-basic-300"
+          className="-ml-2 gap-1 px-2 text-basic-300"
           onClick={onMoreClick}
         >
           <Link href={detailLink}>
@@ -228,7 +228,7 @@ interface PostCardRewardProps {
 
 function PostCardReward({ shellCount, userName }: PostCardRewardProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between">
+    <div className="flex flex-col justify-between sm:flex-row sm:items-center">
       <Button
         variant="ghost"
         className="px-2"
@@ -238,7 +238,7 @@ function PostCardReward({ shellCount, userName }: PostCardRewardProps) {
         {shellCount}
       </Button>
       {userName && (
-        <p className="pl-2 body-sm font-normal text-basic-400">
+        <p className="body-sm pl-2 font-normal text-basic-400">
           給予一個或以上的貝殼，讓
           {' '}
           {userName}

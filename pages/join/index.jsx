@@ -1,114 +1,13 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import styled from '@emotion/styled';
 
-import { Divider, Typography } from '@mui/material';
+import { Title, Text } from '@/components/ui/typography';
+import { Separator } from '@/components/ui/separator';
 import SEOConfig from '@/components/SEOConfig';
 
 import CheckIconSvg from '@/public/assets/icons/check_icon.svg';
 import DiscordIconSvg from '@/public/assets/icons/discord_icon.svg';
 import FacebookIconSvg from '@/public/assets/icons/facebook_icon.svg';
-
-const Wrapper = styled.div`
-  background: #f3fcfc;
-`;
-
-const Container = styled.div`
-  margin: 0 auto;
-  padding: 60px 0 72px;
-  min-height: calc(100vh - 418px);
-  width: 640px;
-
-  @media (max-width: 800px) {
-    padding: 0 16px;
-    width: 100%;
-  }
-`;
-
-const Paper = styled.div`
-  padding: 32px;
-  border-radius: 20px;
-  box-shadow: 0px 4px 6px rgba(196, 194, 193, 0.2);
-  background: #fff;
-`;
-
-const PaperColumnCenter = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const PaperBody = styled.ul`
-  margin: 52px 72px 0;
-  display: flex;
-
-  @media (max-width: 800px) {
-    margin: 52px 0 0;
-    flex-direction: column;
-    gap: 20px;
-  }
-`;
-
-const PaperItem = styled.li`
-  flex: 1;
-`;
-
-const PaperLink = styled.a`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: black;
-
-  @media (max-width: 800px) {
-    margin: 0 auto;
-    width: 232px;
-    align-items: flex-start;
-
-    > ul {
-      margin-left: 16px;
-    }
-  }
-`;
-
-const PaperLinkHeader = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  > img {
-    margin-bottom: 12px;
-  }
-
-  > h3 {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  @media (max-width: 800px) {
-    flex-direction: row;
-    gap: 12px;
-
-    > img {
-      width: 50px;
-      height: 50px;
-    }
-
-    > h3 {
-      align-items: flex-start;
-    }
-  }
-`;
-
-const CheckItem = styled.li`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  & + & {
-    margin-top: 8px;
-  }
-`;
 
 function JoinPage() {
   const router = useRouter();
@@ -140,83 +39,88 @@ function JoinPage() {
   );
 
   return (
-    <Wrapper>
+    <div className="bg-[#f3fcfc]">
       <SEOConfig {...SEOData} />
-      <Container>
-        <Paper>
-          <PaperColumnCenter>
-            <Typography variant="h2" fontSize="22px" marginBottom={0.5}>
+      <div className="mx-auto py-[60px] pb-[72px] min-h-[calc(100vh-418px)] w-[640px] max-[800px]:px-4 max-[800px]:w-full">
+        <div className="p-8 rounded-[20px] shadow-[0px_4px_6px_rgba(196,194,193,0.2)] bg-white">
+          <div className="flex flex-col items-center">
+            <Title as="h2" size="md" className="text-[22px] mb-2">
               加入社群
-            </Typography>
-            <Typography variant="body2" color="#536166">
+            </Title>
+            <Text className="text-[#536166]">
               在島島阿學，沒有人是一座孤島！
-            </Typography>
-            <Typography variant="body2" color="#536166">
+            </Text>
+            <Text className="text-[#536166]">
               歡迎加入島島阿學社群一起交流、學習、成長！
-            </Typography>
-          </PaperColumnCenter>
-          <PaperBody>
-            <PaperItem>
-              <PaperLink href="https://discord.gg/2NbQ7cu6jH" target="_blank">
-                <PaperLinkHeader>
+            </Text>
+          </div>
+          <ul className="my-[52px] mx-[72px] flex max-[800px]:my-[52px] max-[800px]:mx-0 max-[800px]:flex-col max-[800px]:gap-5">
+            <li className="flex-1">
+              <a 
+                href="https://discord.gg/2NbQ7cu6jH" 
+                target="_blank"
+                className="flex flex-col items-center text-black max-[800px]:mx-auto max-[800px]:w-[232px] max-[800px]:items-start max-[800px]:[&>ul]:ml-4"
+              >
+                <div className="flex flex-col items-center [&>img]:mb-3 [&>h3]:flex [&>h3]:flex-col [&>h3]:items-center max-[800px]:flex-row max-[800px]:gap-3 max-[800px]:[&>img]:w-[50px] max-[800px]:[&>img]:h-[50px] max-[800px]:[&>h3]:items-start">
                   <DiscordIconSvg />
-                  <Typography variant="h3" fontSize={16} marginBottom={1.25}>
+                  <Title as="h3" size="sm" className="text-base mb-5">
                     <span>Discord：</span>
                     <span>即時交流社群</span>
-                  </Typography>
-                </PaperLinkHeader>
+                  </Title>
+                </div>
                 <ul>
                   {discordCheckList.map((message) => (
-                    <CheckItem key={message}>
+                    <li key={message} className="flex items-center gap-2 [&+&]:mt-2">
                       <CheckIconSvg />
-                      <Typography variant="body2" fontSize={12} color="#536166">
+                      <Text size="sm" className="text-xs text-[#536166]">
                         {message}
-                      </Typography>
-                    </CheckItem>
+                      </Text>
+                    </li>
                   ))}
                 </ul>
-              </PaperLink>
-            </PaperItem>
-            <PaperItem>
-              <PaperLink
+              </a>
+            </li>
+            <li className="flex-1">
+              <a
                 href="https://www.facebook.com/groups/2237666046370459"
                 target="_blank"
+                className="flex flex-col items-center text-black max-[800px]:mx-auto max-[800px]:w-[232px] max-[800px]:items-start max-[800px]:[&>ul]:ml-4"
               >
-                <PaperLinkHeader>
+                <div className="flex flex-col items-center [&>img]:mb-3 [&>h3]:flex [&>h3]:flex-col [&>h3]:items-center max-[800px]:flex-row max-[800px]:gap-3 max-[800px]:[&>img]:w-[50px] max-[800px]:[&>img]:h-[50px] max-[800px]:[&>h3]:items-start">
                   <FacebookIconSvg />
-                  <Typography variant="h3" fontSize={16} marginBottom={1.25}>
+                  <Title as="h3" size="sm" className="text-base mb-5">
                     <span>Facebook：</span>
                     <span>島島阿學－學習資源島</span>
-                  </Typography>
-                </PaperLinkHeader>
+                  </Title>
+                </div>
                 <ul>
                   {facebookCheckList.map((message) => (
-                    <CheckItem key={message}>
+                    <li key={message} className="flex items-center gap-2 [&+&]:mt-2">
                       <CheckIconSvg />
-                      <Typography variant="body2" fontSize={12} color="#536166">
+                      <Text size="sm" className="text-xs text-[#536166]">
                         {message}
-                      </Typography>
-                    </CheckItem>
+                      </Text>
+                    </li>
                   ))}
                 </ul>
-              </PaperLink>
-            </PaperItem>
-          </PaperBody>
-          <Divider sx={{ marginTop: 5, marginBottom: 1 }} />
-          <PaperColumnCenter>
-            <Typography variant="body2" color="#536166">
+              </a>
+            </li>
+          </ul>
+          <Separator className="mt-5 mb-1" />
+          <div className="flex flex-col items-center">
+            <Text className="text-[#536166]">
               社群即資源、支援，
-            </Typography>
-            <Typography variant="body2" color="#536166">
+            </Text>
+            <Text className="text-[#536166]">
               歡迎加入社群，一起在民主教育的社群中，
-            </Typography>
-            <Typography variant="body2" color="#536166">
+            </Text>
+            <Text className="text-[#536166]">
               以共好的概念，協助彼此學習的需求，支持彼此成為自己想成為的人吧！
-            </Typography>
-          </PaperColumnCenter>
-        </Paper>
-      </Container>
-    </Wrapper>
+            </Text>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

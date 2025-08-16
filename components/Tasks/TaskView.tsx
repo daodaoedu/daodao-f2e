@@ -20,13 +20,13 @@ const dayMap: { [key: string]: string } = {
 const TaskView = ({
   task,
 }: TaskViewProps) => (
-  <div className="ml-5 p-[10px] md:py-3 md:px-4 rounded-lg bg-white">
+  <div className="ml-5 rounded-lg bg-white p-[10px] md:px-4 md:py-3">
     <div className="flex flex-row items-center justify-between">
-      <div className="flex flex-col w-full">
-        <div className="flex flex-row w-full justify-start gap-1">
+      <div className="flex w-full flex-col">
+        <div className="flex w-full flex-row justify-start gap-1">
           <div
             className="
-              flex flex-row justify-center items-center gap-[5px] w-full basis-0"
+              flex w-full basis-0 flex-row items-center justify-center gap-[5px]"
           >
             <p className={cn(
               'w-[18px] h-[18px] p-[2px] rounded-[4px] m-[1px]',
@@ -43,8 +43,8 @@ const TaskView = ({
           <p className="w-full">{task.name || ''}</p>
         </div>
         {task.daysOfWeek?.length > 0 && (
-        <div className="flex items-center gap-1 mt-1 ml-7 text-sm text-text-secondary">
-          <Calendar className="w-4 h-4 text-[#92989A] shrink-0" />
+        <div className="text-text-secondary ml-7 mt-1 flex items-center gap-1 text-sm">
+          <Calendar className="size-4 shrink-0 text-[#92989A]" />
           <span>
             {task.daysOfWeek
               ?.map((enDay) => dayMap[enDay])

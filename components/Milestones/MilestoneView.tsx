@@ -1,5 +1,5 @@
 import { ArrowRight } from 'lucide-react';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import { cn } from '@/utils/cn';
 import { Milestone } from '@/contexts/Milestones/type';
 
@@ -9,9 +9,9 @@ interface MilestoneViewProps {
 }
 
 const MilestoneView = ({ index, milestone }: MilestoneViewProps) => (
-  <div className="p-[10px] md:py-3 md:px-4 rounded-lg bg-white">
-    <div className="flex flex-row items-center justify-beetween mb-[10px]">
-      <div className="bg-primary-base text-white py-[5px] px-5 rounded-[20px] font-sans text-sm leading-[140%]">
+  <div className="rounded-lg bg-white p-[10px] md:px-4 md:py-3">
+    <div className="justify-beetween mb-[10px] flex flex-row items-center">
+      <div className="rounded-[20px] bg-primary-base px-5 py-[5px] font-sans text-sm leading-[140%] text-white">
         里程碑
         {' '}
         {index + 1}
@@ -24,19 +24,19 @@ const MilestoneView = ({ index, milestone }: MilestoneViewProps) => (
       >
         <p>
           {milestone.startDate
-            ? dayjs(milestone.startDate).format('YYYY/MM/DD')
-            : dayjs().format('YYYY/MM/DD')}
+            ? format(new Date(milestone.startDate), 'yyyy/MM/dd')
+            : format(new Date(), 'yyyy/MM/dd')}
         </p>
         <ArrowRight className="text-basic-300" />
         <p>
           {milestone.endDate
-            ? dayjs(milestone.endDate).format('YYYY/MM/DD')
-            : dayjs().format('YYYY/MM/DD')}
+            ? format(new Date(milestone.endDate), 'yyyy/MM/dd')
+            : format(new Date(), 'yyyy/MM/dd')}
         </p>
       </div>
     </div>
     <div className="flex flex-row items-center justify-between">
-      <div className="w-full flex flex-col md:flex-row items-center  md:justify-between gap-1">
+      <div className="flex w-full flex-col items-center gap-1  md:flex-row md:justify-between">
         <p
           className={cn(
             'font-sans text-sm text-basic-400',

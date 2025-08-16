@@ -38,7 +38,7 @@ const CollapsibleTrigger = React.forwardRef<
     <div data-slot="collapse">{collapseLabel}</div>
     {props.children}
     {withIcon && (
-      <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+      <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-200" />
     )}
   </CollapsiblePrimitive.CollapsibleTrigger>
 ));
@@ -50,7 +50,7 @@ const CollapsibleContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <CollapsiblePrimitive.Content
     ref={ref}
-    className="overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up"
+    className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
     {...props}
   >
     <div className={cn(className)}>{children}</div>

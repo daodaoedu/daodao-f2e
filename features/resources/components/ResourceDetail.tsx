@@ -100,12 +100,12 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
   };
 
   return (
-    <div className="p-10 bg-white shadow-md rounded-xl mt-4 mb-11 flex flex-col md:mb-12 md:flex-row gap-8">
-      <div className="flex-1 flex flex-col justify-between">
+    <div className="mb-11 mt-4 flex flex-col gap-8 rounded-xl bg-white p-10 shadow-md md:mb-12 md:flex-row">
+      <div className="flex flex-1 flex-col justify-between">
         <div>
-          <h1 className="heading-lg font-bold mb-4">{resource.name}</h1>
+          <h1 className="heading-lg mb-4 font-bold">{resource.name}</h1>
 
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="mb-4 flex flex-wrap gap-2">
             {resource.tags.map((tag) => (
               <Badge key={tag} variant="outline" className="text-primary">
                 #
@@ -115,9 +115,9 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
             ))}
           </div>
 
-          <div className="flex flex-wrap gap-x-6 gap-y-4 mb-6 text-sm text-gray-600">
+          <div className="mb-6 flex flex-wrap gap-x-6 gap-y-4 text-sm text-gray-600">
             <div className="flex items-center gap-2">
-              <span className="font-medium flex items-center gap-2">
+              <span className="flex items-center gap-2 font-medium">
                 <GroupSvg />
                 適合
               </span>
@@ -127,7 +127,7 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-medium flex items-center gap-2">
+              <span className="flex items-center gap-2 font-medium">
                 <BoxSvg />
                 資源類型
               </span>
@@ -180,7 +180,7 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
         </div>
       </div>
 
-      <div className="relative md:basis-80 aspect-[320/241] rounded-lg overflow-hidden">
+      <div className="relative aspect-[320/241] overflow-hidden rounded-lg md:basis-80">
         <Image
           src={resource.imageUrl ?? ''}
           alt={resource.name}

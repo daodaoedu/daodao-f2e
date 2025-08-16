@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { sendLoginEvent, useAuthDispatch } from '@/contexts/Auth';
 import { getRedirectionStorage } from '@/utils/storage';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import { parseToString } from '@/utils/helper';
 
 export default function AuthCallbackPage() {
@@ -33,8 +33,8 @@ export default function AuthCallbackPage() {
         <Image
           src="/assets/nobody-land.gif"
           alt="nobody-land"
-          width="300"
-          height="300"
+          width={300}
+          height={300}
         />
       </div>
     </div>

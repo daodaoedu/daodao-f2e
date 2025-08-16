@@ -70,15 +70,15 @@ const StepTwo: React.FC<StepTwoProps> = ({
   };
 
   return (
-    <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       {/* Header */}
       <div className="p-6">
-        <div className="flex items-center mb-4">
-          <div className="w-2 h-2 rounded-full bg-primary mr-2" />
+        <div className="mb-4 flex items-center">
+          <div className="mr-2 size-2 rounded-full bg-primary" />
           <span className="text-sm text-muted-foreground">主題實踐</span>
         </div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">實踐時間和目標</h2>
-        <p className="text-sm text-muted-foreground mb-8">
+        <h2 className="mb-2 text-2xl font-bold text-foreground">實踐時間和目標</h2>
+        <p className="mb-8 text-sm text-muted-foreground">
           設定你的學習時間和每日目標
         </p>
       </div>
@@ -88,14 +88,14 @@ const StepTwo: React.FC<StepTwoProps> = ({
         <div className="space-y-8">
           {/* Practice Duration Slider */}
           <div>
-            <Label className="block text-sm font-medium text-foreground mb-4">
+            <Label className="mb-4 block text-sm font-medium text-foreground">
               實踐時間
               {' '}
               <span className="text-destructive">*</span>
             </Label>
 
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4 flex items-center justify-between">
                 <span className="text-xl font-bold text-primary">
                   {practiceDays}
                   {' '}
@@ -104,8 +104,8 @@ const StepTwo: React.FC<StepTwoProps> = ({
               </div>
 
               <div className="relative">
-                <div className="w-full h-2 bg-muted rounded-lg relative">
-                  <div className={`h-2 bg-primary rounded-lg transition-all duration-300 ${
+                <div className="relative h-2 w-full rounded-lg bg-muted">
+                  <div className={`h-2 rounded-lg bg-primary transition-all duration-300 ${
                     practiceDays <= 10 ? 'w-[13%]'
                       : practiceDays <= 13 ? 'w-[26%]'
                         : practiceDays <= 16 ? 'w-[39%]'
@@ -122,9 +122,9 @@ const StepTwo: React.FC<StepTwoProps> = ({
                   max="30"
                   value={practiceDays}
                   onChange={(e) => setPracticeDays(parseInt(e.target.value, 10))}
-                  className="absolute top-0 w-full h-2 bg-transparent rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md"
+                  className="absolute top-0 h-2 w-full cursor-pointer appearance-none rounded-lg bg-transparent [&::-webkit-slider-thumb]:size-5 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-md"
                 />
-                <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                <div className="mt-2 flex justify-between text-xs text-muted-foreground">
                   <span>7天</span>
                   <span>14天</span>
                   <span>21天</span>
@@ -138,7 +138,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
           <div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="block text-sm font-medium text-foreground mb-2">
+                <Label className="mb-2 block text-sm font-medium text-foreground">
                   開始日期
                   {' '}
                   <span className="text-destructive">*</span>
@@ -155,7 +155,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                           : 'border-border hover:border-primary focus:border-primary'
                       )}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <CalendarIcon className="mr-2 size-4" />
                       {startDate ? (
                         format(startDate, 'yyyy / M / d ', { locale: zhTW })
                       ) : (
@@ -184,11 +184,11 @@ const StepTwo: React.FC<StepTwoProps> = ({
               </div>
 
               <div>
-                <Label className="block text-sm font-medium text-foreground mb-2">
+                <Label className="mb-2 block text-sm font-medium text-foreground">
                   結束日期
                 </Label>
-                <div className="w-full px-4 py-3 bg-muted border-2 border-border rounded-lg text-muted-foreground flex items-center">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                <div className="flex w-full items-center rounded-lg border-2 border-border bg-muted px-4 py-3 text-muted-foreground">
+                  <CalendarIcon className="mr-2 size-4" />
                   {(() => {
                     if (!startDate) return '請先選擇開始日期';
                     const endDate = new Date(startDate);
@@ -202,13 +202,13 @@ const StepTwo: React.FC<StepTwoProps> = ({
 
           {/* Practice Action Section */}
           <div>
-            <Label className="block text-sm font-medium text-foreground mb-4">
+            <Label className="mb-4 block text-sm font-medium text-foreground">
               實踐行動
               {' '}
               <span className="text-destructive">*</span>
             </Label>
 
-            <div className="text-sm text-muted-foreground mb-4">
+            <div className="mb-4 text-sm text-muted-foreground">
               設定你想要實踐的具體行動
             </div>
 
@@ -222,20 +222,20 @@ const StepTwo: React.FC<StepTwoProps> = ({
               )}
               maxLength={200}
             />
-            <div className="flex justify-between items-center mt-2">
+            <div className="mt-2 flex items-center justify-between">
               <span className="text-xs text-muted-foreground">
                 {practiceAction.length}
                 /200
               </span>
             </div>
             {validationErrors.practiceAction && (
-              <p className="text-sm text-destructive mt-1">{validationErrors.practiceAction}</p>
+              <p className="mt-1 text-sm text-destructive">{validationErrors.practiceAction}</p>
             )}
           </div>
 
           {/* Weekly Frequency Section */}
           <div>
-            <Label className="block text-sm font-medium text-foreground mb-4">
+            <Label className="mb-4 block text-sm font-medium text-foreground">
               每週節奏
               {' '}
               <span className="text-destructive">*</span>
@@ -244,22 +244,22 @@ const StepTwo: React.FC<StepTwoProps> = ({
             <div className="space-y-6">
               {/* Description at top */}
               <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-2">拖曳設定彈性實踐</p>
+                <p className="mb-2 text-sm text-muted-foreground">拖曳設定彈性實踐</p>
               </div>
 
               {/* Dual Range Slider */}
               <div className="px-4">
-                <div className="flex justify-between text-xs text-muted-foreground mb-2">
+                <div className="mb-2 flex justify-between text-xs text-muted-foreground">
                   <span>輕鬆</span>
-                  <span className="text-primary font-medium">平衡</span>
+                  <span className="font-medium text-primary">平衡</span>
                   <span>積極</span>
                 </div>
 
                 <div className="relative mb-6">
                   {/* Slider track */}
-                  <div className="h-2 bg-muted rounded-full relative">
+                  <div className="relative h-2 rounded-full bg-muted">
                     {/* Active range track */}
-                    <div className={`h-2 bg-primary rounded-full transition-all duration-300 absolute ${
+                    <div className={`absolute h-2 rounded-full bg-primary transition-all duration-300 ${
                       frequencyRange[0] === 2 && frequencyRange[1] === 3 ? 'left-0 w-1/4'
                         : frequencyRange[0] === 2 && frequencyRange[1] === 4 ? 'left-0 w-2/4'
                           : frequencyRange[0] === 2 && frequencyRange[1] === 5 ? 'left-0 w-3/4'
@@ -276,7 +276,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 
                     {/* Minimum thumb */}
                     <div
-                      className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-6 h-6 bg-white border-2 border-primary rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 ${
+                      className={`absolute top-1/2 size-6 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full border-2 border-primary bg-white shadow-lg transition-all duration-300 hover:scale-110${
                         draggedThumb === 'min' ? 'scale-110 ring-4 ring-primary/30' : ''
                       } ${
                         frequencyRange[0] === 2 ? 'left-0'
@@ -318,7 +318,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 
                     {/* Maximum thumb */}
                     <div
-                      className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-6 h-6 bg-white border-2 border-primary rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 ${
+                      className={`absolute top-1/2 size-6 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full border-2 border-primary bg-white shadow-lg transition-all duration-300 hover:scale-110${
                         draggedThumb === 'max' ? 'scale-110 ring-4 ring-primary/30' : ''
                       } ${
                         frequencyRange[1] === 3 ? 'left-1/4'
@@ -360,7 +360,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                   </div>
 
                   {/* Frequency markers */}
-                  <div className="flex justify-between mt-6">
+                  <div className="mt-6 flex justify-between">
                     {[2, 3, 4, 5, 6].map((freq) => (
                       <Button
                         key={freq}
@@ -375,7 +375,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                             handleRangeChange([freq, freq]);
                           }
                         }}
-                        className="w-8 h-8 p-0 text-xs font-medium"
+                        className="size-8 p-0 text-xs font-medium"
                       >
                         {freq}
                       </Button>
@@ -385,8 +385,8 @@ const StepTwo: React.FC<StepTwoProps> = ({
               </div>
 
               {/* Description */}
-              <div className="text-center space-y-2">
-                <div className="text-sm text-foreground font-medium">
+              <div className="space-y-2 text-center">
+                <div className="text-sm font-medium text-foreground">
                   {frequencyRange[0] === frequencyRange[1]
                     ? `每週固定 ${frequencyRange[0]} 次`
                     : `每週至少 ${frequencyRange[0]} 次，最多 ${frequencyRange[1]} 次`}
@@ -406,7 +406,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 
           {/* Daily Goal */}
           <div>
-            <Label className="block text-sm font-medium text-foreground mb-4">
+            <Label className="mb-4 block text-sm font-medium text-foreground">
               每次實踐目標
               {' '}
               <span className="text-destructive">*</span>
@@ -432,10 +432,10 @@ const StepTwo: React.FC<StepTwoProps> = ({
               {/* Time-based option */}
               {dailyGoalType === 'time' && (
                 <div className="mt-6">
-                  <div className="flex items-center text-lg text-foreground mb-4">
+                  <div className="mb-4 flex items-center text-lg text-foreground">
                     <span>每次進行</span>
                     <Select value={dailyGoalTime.toString()} onValueChange={(value) => setDailyGoalTime(parseInt(value, 10))}>
-                      <SelectTrigger className="mx-3 w-32 border-2 border-border focus:ring-2 focus:ring-primary focus:border-primary">
+                      <SelectTrigger className="mx-3 w-32 border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -459,7 +459,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                         type="number"
                         value={dailyGoalPages}
                         onChange={(e) => setDailyGoalPages(parseInt(e.target.value, 10) || 0)}
-                        className="mx-3 w-20 px-3 py-2 border-2 border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-center"
+                        className="mx-3 w-20 rounded-lg border-2 border-border px-3 py-2 text-center focus:border-primary focus:ring-2 focus:ring-primary"
                         min="1"
                         max="999"
                       />
@@ -468,7 +468,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                         value={customUnit}
                         onChange={(e) => setCustomUnit(e.target.value)}
                         placeholder="自訂單位"
-                        className="px-3 py-2 border-2 border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary w-32"
+                        className="w-32 rounded-lg border-2 border-border px-3 py-2 focus:border-primary focus:ring-2 focus:ring-primary"
                         maxLength={10}
                       />
                     </div>
@@ -484,7 +484,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
       </div>
 
       {/* Navigation Buttons */}
-      <div className="p-6 pt-0 flex justify-between">
+      <div className="flex justify-between p-6 pt-0">
         <Button
           variant="outline"
           onClick={handlePreviousStep}

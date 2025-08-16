@@ -43,7 +43,7 @@ interface FormSectionProps {
 const FormSection = ({ title, onClear, children }: FormSectionProps) => (
   <div className="space-y-4">
     <div className="flex items-center justify-between">
-      <h3 className="body-md font-bold text-lg">{title}</h3>
+      <h3 className="body-md text-lg font-bold">{title}</h3>
       <Button
         type="button"
         onClick={onClear}
@@ -73,8 +73,8 @@ const CheckboxItem = ({
   tooltipContent,
   hasTooltip = false,
 }: CheckboxItemProps) => (
-  <FormItem className="flex items-center border border-solid border-basic-200 rounded-lg relative gap-2">
-    <FormLabel className="cursor-pointer flex-1 m-0 p-3 flex items-center gap-2 body-md font-normal">
+  <FormItem className="relative flex items-center gap-2 rounded-lg border border-solid border-basic-200">
+    <FormLabel className="body-md m-0 flex flex-1 cursor-pointer items-center gap-2 p-3 font-normal">
       <FormControl>
         <Checkbox checked={isChecked} onCheckedChange={onChange} />
       </FormControl>
@@ -92,7 +92,7 @@ const CheckboxItem = ({
               <InfoIcon />
             </Button>
           </TooltipTrigger>
-          <TooltipContent className="bg-white text-gray-800 border shadow-md p-2">
+          <TooltipContent className="border bg-white p-2 text-gray-800 shadow-md">
             {tooltipContent}
           </TooltipContent>
         </Tooltip>
@@ -124,7 +124,7 @@ export default function ResourceSearchForm({
     <TooltipProvider>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="space-y-6 bg-white p-6 rounded-xl">
+          <div className="space-y-6 rounded-xl bg-white p-6">
             {/* 資源類型 */}
             <FormSection title="資源類型" onClear={() => handleClear('type')}>
               <FormField
@@ -132,7 +132,7 @@ export default function ResourceSearchForm({
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                       {resourceTypeOptions.map((type) => (
                         <CheckboxItem
                           key={type.value}
@@ -157,7 +157,7 @@ export default function ResourceSearchForm({
                 name="cost"
                 render={({ field }) => (
                   <FormItem>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
                       {costTypeOptions.map((type) => (
                         <CheckboxItem
                           key={type.value}
@@ -180,7 +180,7 @@ export default function ResourceSearchForm({
                 name="level"
                 render={({ field }) => (
                   <FormItem>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
                       {targetAudienceTypeOptions.map((type) => (
                         <CheckboxItem
                           key={type.value}
@@ -200,7 +200,7 @@ export default function ResourceSearchForm({
           </div>
 
           {/* 確認按鈕 */}
-          <div className="flex justify-center mt-6">
+          <div className="mt-6 flex justify-center">
             <Button type="submit">
               <CheckIcon size={20} />
               確認

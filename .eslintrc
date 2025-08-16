@@ -4,7 +4,12 @@
     "es2023": true,
     "node": true
   },
-  "extends": ["airbnb", "plugin:@typescript-eslint/recommended"],
+  "extends": [
+    "airbnb",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:tailwindcss/recommended"
+  ],
   "ignorePatterns": [
     "*.config.js",
     "*.config.ts",
@@ -16,6 +21,7 @@
     "node_modules",
     "out",
     "pages", // 重構到 app route，忽略 pages route
+    "public",
     "services/**/*.ts", // @TODO: services 下的 API 檔案將要移除，重構完成後再調整設定檔
     "!services/fetcher.ts",
     "server.js"
@@ -41,13 +47,18 @@
     "@typescript-eslint/no-shadow": "error",
     "arrow-body-style": "off",
     "camelcase": "off",
-    "comma-dangle": ["error", {
-      "arrays": "always-multiline",
-      "objects": "always-multiline",
-      "imports": "always-multiline",
-      "exports": "always-multiline",
-      "functions": "never"
-    }],
+    "tailwindcss/classnames-order": "error",
+    "tailwindcss/no-custom-classname": "off",
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "never"
+      }
+    ],
     "implicit-arrow-linebreak": "off",
     "import/extensions": [
       "error",
@@ -67,16 +78,25 @@
     ],
     "import/prefer-default-export": "off",
     "max-len": "off",
-    "no-console": "off",
-    "no-nested-ternary": "off", // 待調整，暫時允許巢狀三元運算子
+    "no-console": "warn",
+    "no-nested-ternary": "off",
     "no-underscore-dangle": "off",
-    "operator-linebreak": ["error", "after", { 
-      "overrides": { 
-        "?": "before", 
-        ":": "before" 
-      } 
-    }],
-    "quotes": ["error", "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
+    "object-curly-newline": ["error", { "consistent": true }],
+    "operator-linebreak": [
+      "error",
+      "after",
+      {
+        "overrides": {
+          "?": "before",
+          ":": "before"
+        }
+      }
+    ],
+    "quotes": [
+      "error",
+      "single",
+      { "avoidEscape": true, "allowTemplateLiterals": true }
+    ],
     "react/jsx-filename-extension": [
       "warn",
       {

@@ -1,58 +1,15 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import styled from '@emotion/styled';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
 import { ProtectedComponent } from '@/contexts/Auth';
 import SEOConfig from '@/components/SEOConfig';
 import AccountSetting from '@/components/Profile/Accountsetting';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import useMediaQuery from '@/hooks/useMediaQuery';
 import getEnv from '@/utils/env';
-
-const StyledTab = styled(Tab)(({ isActive, mobileScreen }) => ({
-  width: `${mobileScreen ? '33%' : '100%'}`,
-  color: '#536166',
-  borderRadius: '8px',
-  '&.Mui-selected': {
-    borderColor: 'transparent',
-    backgroundColor: `${isActive && '#DEF5F5'}`,
-    color: `${isActive && '#16B9B3'}`,
-  },
-}));
-
-function TabPanel(props) {
-  const mobileScreen = useMediaQuery('(max-width: 767px)');
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`vertical-tabpanel-${index}`}
-      aria-labelledby={`vertical-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: mobileScreen ? 0 : 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
-function a11yProps(index) {
-  return {
-    id: `vertical-tab-${index}`,
-    'aria-controls': `vertical-tabpanel-${index}`,
-  };
-}
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const ProfilePage = () => {
   const router = useRouter();
-  const mobileScreen = useMediaQuery('(max-width: 767px)');
+  const mobileScreen = useMediaQuery('isSmall');
   const tabs = [
     {
       id: 'account-setting',
@@ -70,11 +27,11 @@ const ProfilePage = () => {
   ];
 
   const [value, setValue] = useState(() => {
-    if (getEnv().isServerSide) return 0;
+    if (getEnv().isServerSide) return 'account-setting';
     const id = new URLSearchParams(location.search).get('id');
-    const tabIndex = tabs.findIndex((tab) => tab.id === id);
-    if (tabIndex > -1) return tabIndex;
-    return 0;
+    const tab = tabs.find((tab) => tab.id === id);
+    if (tab) return tab.id;
+    return 'account-setting';
   });
 
   const SEOData = useMemo(
@@ -91,70 +48,45 @@ const ProfilePage = () => {
     [router?.asPath],
   );
 
-  const handleChange = (event, newValue) => {
+  const handleTabChange = (newValue) => {
     setValue(newValue);
   };
 
   return (
     <ProtectedComponent>
       <SEOConfig {...SEOData} />
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginTop: '60px',
-          minHeight: 'calc(100vh - 518px)',
-          background: 'linear-gradient(0deg, #f3fcfc, #f3fcfc), #f7f8fa',
-          '@media (max-width: 767px)': {
-            flexDirection: 'column',
-            marginTop: '0',
-            padding: '16px',
-          },
-        }}
-      >
-        <Box
-          sx={{
-            width: '272px',
-            height: 'max-content',
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            margin: '26px 40px 0 0',
-            padding: '8px',
-            '@media (max-width: 767px)': {
-              width: '100%',
-              height: 'auto',
-              padding: 0,
-              mb: '16px',
-            },
-          }}
+      <div className="flex justify-center mt-15 min-h-[calc(100vh-518px)] bg-gradient-to-r from-[#f3fcfc] to-[#f7f8fa] md:flex-row max-md:flex-col max-md:mt-0 max-md:p-4">
+        <Tabs 
+          value={value} 
+          onValueChange={handleTabChange} 
+          orientation={mobileScreen ? "horizontal" : "vertical"}
+          className="flex md:flex-row max-md:flex-col gap-4"
         >
-          <Tabs
-            orientation={mobileScreen ? 'horizontal' : 'vertical'}
-            variant="scrollable"
-            value={value}
-            onChange={handleChange}
-            aria-label="Vertical tabs example"
-            indicatorColor="transparent"
-          >
-            {tabs.map((tab, index) => (
-              <StyledTab
-                key={tab.id}
-                label={tab.tabLabel}
-                mobileScreen={mobileScreen}
-                isActive={value === index}
-                {...a11yProps(index)}
-              />
+          <div className="w-[272px] h-max bg-white rounded-lg mr-10 mt-6 p-2 max-md:w-full max-md:h-auto max-md:p-0 max-md:mb-4">
+            <TabsList className={`grid h-auto p-0 bg-transparent ${mobileScreen ? 'grid-cols-3' : 'grid-rows-3'} gap-1`}>
+              {tabs.map((tab) => (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className={`w-full text-[#536166] rounded-lg data-[state=active]:bg-[#DEF5F5] data-[state=active]:text-[#16B9B3] ${
+                    mobileScreen ? 'w-1/3' : 'w-full'
+                  }`}
+                  disabled={!tab.view}
+                >
+                  {tab.tabLabel}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
+          <div className="flex-1 max-w-[720px] min-h-[50vh]">
+            {tabs.map((tab) => (
+              <TabsContent key={tab.id} value={tab.id} className={mobileScreen ? 'p-0' : 'p-3'}>
+                {tab.view}
+              </TabsContent>
             ))}
-          </Tabs>
-        </Box>
-        <Box sx={{ flex: 1, maxWidth: '720px', minHeight: '50vh' }}>
-          {tabs.map((tab, index) => (
-            <TabPanel key={tab.id} value={value} index={index}>
-              {tab.view}
-            </TabPanel>
-          ))}
-        </Box>
-      </Box>
+          </div>
+        </Tabs>
+      </div>
     </ProtectedComponent>
   );
 };

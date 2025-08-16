@@ -21,19 +21,19 @@ const ProjectCard = ({ project, path }: ProjectCardProps) => {
       )}
       data-projectid={project.id}
     >
-      <div className="w-full flex flex-col gap-1 justify-start items-start md:flex-row md:justify-between md:items-center">
+      <div className="flex w-full flex-col items-start justify-start gap-1 md:flex-row md:items-center md:justify-between">
         <ProjectHeader project={project} />
       </div>
       <div>
         <p
           className="
       whitespace-pre-wrap
-      text-base text-basic-300 font-sans leading-[1.4]"
+      font-sans text-base leading-[1.4] text-basic-300"
         >
           {project.description}
         </p>
       </div>
-      <div className="w-full flex flex-col gap-2 md:flex-row align-center justify-between">
+      <div className="align-center flex w-full flex-col justify-between gap-2 md:flex-row">
         <ProjectUserInfoBar user={project.user} />
         {/* <ProjectStatus
           status={{

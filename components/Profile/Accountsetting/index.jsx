@@ -1,31 +1,8 @@
-import {
-  Box,
-  Typography,
-  Button,
-  Divider,
-} from '@mui/material';
+import { Title, Text } from '@/components/ui/typography';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { useRouter } from 'next/router';
-import styled from '@emotion/styled';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
-
-const StyledTypographyStyle = styled(Typography)`
-  font-family: Noto Sans TC;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 1.4;
-  color: #293a3d;
-`;
-
-const StyledLogoutBtn = styled(Button)`
-  border-radius: 20px;
-  background: #fff;
-  color: #1f4645;
-  padding: 5px 0;
-  width: 100%;
-  /* shadow-light-gray */
-  box-shadow: 0px 4px 10px 0px rgba(196, 194, 193, 0.4);
-`;
 
 const AccountSetting = () => {
   const router = useRouter();
@@ -38,75 +15,43 @@ const AccountSetting = () => {
   };
 
   return (
-    <Box
-      sx={{
-        backgroundColor: '#ffffff',
-        width: '100%',
-        maxWidth: '672px',
-        borderRadius: '16px',
-        padding: { xs: '16px 20px', md: '36px 40px' },
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <Typography sx={{ fontSize: '22px', color: '#536166' }}>
+    <div className="flex w-full max-w-[672px] flex-col items-center justify-center rounded-2xl bg-white p-4 md:p-9">
+      <Title className="text-[22px] text-[#536166]">
         帳號設定
-      </Typography>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          width: '100%',
-          maxWidth: '544px',
-        }}
-      >
-        <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-          <StyledTypographyStyle>電子信箱</StyledTypographyStyle>
-          <Box
-            sx={{
-              width: '100%',
-              margin: '8px 0 30px 0',
-              borderRadius: '8px',
-              border: '1px solid #DBDBDB',
-              background: '#F3F3F3',
-              padding: '12px 16px',
-              color: '#92989A',
-              wordBreak: 'break-all',
-            }}
-          >
+      </Title>
+      <div className="flex w-full max-w-[544px] flex-col items-start">
+        <div className="flex w-full flex-col">
+          <Text className="text-base font-medium leading-[1.4] text-[#293a3d]">
+            電子信箱
+          </Text>
+          <div className="my-2 mb-8 w-full break-all rounded-lg border border-[#DBDBDB] bg-[#F3F3F3] p-3 text-[#92989A]">
             {user?.email}
-          </Box>
-        </Box>
-        {/* <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography sx={TypographyStyle}>電話驗證</Typography>
+          </div>
+        </div>
+        {/* <div className="flex flex-col">
+          <Text className="font-medium text-base leading-[1.4] text-[#293a3d]">電話驗證</Text>
           <Button
             variant="contained"
             size="small"
-            sx={{
-              width: '100%',
-              margin: '8px 0 30px 0',
-              backgroundColor: 'white',
-            }}
+            className="w-full my-2 mb-8 bg-white"
           >
             進行驗證
           </Button>
-        </Box> */}
-        <Divider
-          sx={{
-            width: '100%', color: '#000', margin: '30px 0', height: '2px',
-          }}
-        />
-        <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-          <StyledTypographyStyle sx={{ mb: '24px' }}>
+        </div> */}
+        <Separator className="my-8 h-0.5 w-full text-black" />
+        <div className="flex w-full flex-col">
+          <Text className="mb-6 text-base font-medium leading-[1.4] text-[#293a3d]">
             登出帳號
-          </StyledTypographyStyle>
-          <StyledLogoutBtn onClick={logout}>登出</StyledLogoutBtn>
-        </Box>
-      </Box>
-    </Box>
+          </Text>
+          <Button
+            onClick={logout}
+            className="w-full rounded-[20px] bg-white px-0 py-1.5 text-[#1f4645] shadow-[0px_4px_10px_0px_rgba(196,194,193,0.4)] hover:bg-white"
+          >
+            登出
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 

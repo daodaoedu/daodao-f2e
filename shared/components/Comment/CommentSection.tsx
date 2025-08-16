@@ -27,7 +27,7 @@ function CommentSection({ targetId, targetType }: CommentSectionProps) {
       />
       {Array.isArray(comments) && comments.length > 0 && (
         <>
-          <div className="pt-2 mb-2 flex items-center gap-0.5 body-md text-basic-500 border-t border-solid border-basic-200">
+          <div className="body-md mb-2 flex items-center gap-0.5 border-t border-solid border-basic-200 pt-2 text-basic-500">
             <Comment />
             <span>
               回覆 (
@@ -36,7 +36,7 @@ function CommentSection({ targetId, targetType }: CommentSectionProps) {
             </span>
           </div>
           {Array.isArray(comments) && comments.length > 0 && (
-            <div className="px-8 py-6 flex flex-col gap-4 border border-solid border-basic-200 rounded-lg">
+            <div className="flex flex-col gap-4 rounded-lg border border-solid border-basic-200 px-8 py-6">
               {comments.map((comment) => (
                 <CommentCard
                   key={comment.id}

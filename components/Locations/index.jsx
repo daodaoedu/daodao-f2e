@@ -1,66 +1,31 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import { Box, Paper, Typography } from '@mui/material';
-
-const ResourceWrapper = styled.section`
-  padding-top: 40px;
-  padding-bottom: 40px;
-  .title {
-    font-size: 24px;
-    font-weight: 500;
-    margin: 0 10px 0 0;
-    color: black;
-    &:hover {
-      cursor: pointer;
-      color: #37b9eb;
-      transition: 0.5s;
-    }
-  }
-  @media (max-width: 767px) {
-    .title {
-      text-overflow: ellipsis;
-      width: 100%;
-    }
-  }
-`;
+import { Title } from '@/components/ui/typography';
+import { Paper } from '@/components/ui/paper';
 
 const ContributeResource = () => (
-  <ResourceWrapper>
-    <Paper
-      sx={{
-        width: '95%',
-        margin: '0 auto',
-        padding: '20px',
-      }}
-    >
-      <Box>
-        <Typography
-          variant="h1"
-          sx={{
-            margin: '10px 0',
-          }}
+  <section className="pb-10 pt-10">
+    <Paper className="mx-auto w-[95%] p-2.5">
+      <div>
+        <Title
+          as="h1"
+          size="xl"
+          className="my-2.5"
         >
-          實驗教育場域導覽
-        </Typography>
-      </Box>
-      <Box>
-        <Typography
-          variant="h2"
-          sx={{
-            margin: '40px 0 10px 0',
-          }}
-        >
-          ⬇ 點擊此按鈕能看到篩選工具
-        </Typography>
-        {/* eslint-disable-next-line jsx-a11y/iframe-has-title */}
+          場域
+        </Title>
+        <div className="my-5">
+          你知道什麼場域，抑或是想新增一個呢？ 歡迎來信至
+          daodaoedunetwork@gmail.com 讓好的場域被更多人看見！
+        </div>
         <iframe
-          src="https://www.google.com/maps/d/embed?mid=1I2UZp4qujWgrb9tbztjdkBIDW0Gy3h6V&ehbc=2E312F"
+          src="https://www.google.com/maps/d/embed?mid=14SDOGwpGbPWQHa52BTEUbMJx9eqJZCNO&hl=zh-TW"
           width="100%"
-          height="880"
+          height="480"
+          title="地圖"
         />
-      </Box>
+      </div>
     </Paper>
-  </ResourceWrapper>
+  </section>
 );
 
 export default ContributeResource;

@@ -293,7 +293,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="mx-auto max-w-2xl px-4 py-8">
         <Confetti active={showConfetti} />
 
         <CelebrationMessage
@@ -301,7 +301,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
           isVisible={!!celebrationMessage}
         />
 
-        <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+        <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
           {renderStepContent()}
         </div>
       </div>

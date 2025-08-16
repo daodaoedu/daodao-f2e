@@ -1,118 +1,29 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import { Box, Skeleton } from '@mui/material';
+import { Skeleton } from '@/components/ui/skeleton';
 import Marquee from 'react-fast-marquee';
 import Card from './Card';
 
-const CardListWrapper = styled.ul`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  overflow-x: scroll;
-  scroll-behavior: smooth;
-`;
-
-const SubHeaderWrapper = styled.h3`
-  font-size: 20px;
-  color: #536166;
-  font-weight: bold;
-  margin-bottom: 10px;
-  @media (max-width: 767px) {
-    display: flex;
-    flex-direction: column;
-  }
-`;
 const StoryCardList = ({
   title, list, direction = 'left', isLoading,
 }) => {
   if (isLoading) {
     return (
-      <Box sx={{ marginTop: '20px' }}>
-        <SubHeaderWrapper>{title}</SubHeaderWrapper>
-        <CardListWrapper>
-          <Skeleton
-            variant="rectangular"
-            sx={{
-              margin: '5px',
-              width: '150px',
-              height: 'calc(calc(150px / 9) * 16)',
-              flex: '0 0 150px',
-            }}
-          />
-          <Skeleton
-            variant="rectangular"
-            sx={{
-              margin: '5px',
-              width: '150px',
-              height: 'calc(calc(150px / 9) * 16)',
-              flex: '0 0 150px',
-            }}
-          />
-          <Skeleton
-            variant="rectangular"
-            sx={{
-              margin: '5px',
-              width: '150px',
-              height: 'calc(calc(150px / 9) * 16)',
-              flex: '0 0 150px',
-            }}
-          />
-          <Skeleton
-            variant="rectangular"
-            sx={{
-              margin: '5px',
-              width: '150px',
-              height: 'calc(calc(150px / 9) * 16)',
-              flex: '0 0 150px',
-            }}
-          />
-          <Skeleton
-            variant="rectangular"
-            sx={{
-              margin: '5px',
-              width: '150px',
-              height: 'calc(calc(150px / 9) * 16)',
-              flex: '0 0 150px',
-            }}
-          />
-          <Skeleton
-            variant="rectangular"
-            sx={{
-              margin: '5px',
-              width: '150px',
-              height: 'calc(calc(150px / 9) * 16)',
-              flex: '0 0 150px',
-            }}
-          />
-          <Skeleton
-            variant="rectangular"
-            sx={{
-              margin: '5px',
-              width: '150px',
-              height: 'calc(calc(150px / 9) * 16)',
-              flex: '0 0 150px',
-            }}
-          />
-          <Skeleton
-            variant="rectangular"
-            sx={{
-              margin: '5px',
-              width: '150px',
-              height: 'calc(calc(150px / 9) * 16)',
-              flex: '0 0 150px',
-            }}
-          />
-          <Skeleton
-            variant="rectangular"
-            sx={{
-              margin: '5px',
-              width: '150px',
-              height: 'calc(calc(150px / 9) * 16)',
-              flex: '0 0 150px',
-            }}
-          />
-        </CardListWrapper>
-      </Box>
+      <div className="mt-5">
+        <h3 className="mb-2.5 text-xl font-bold text-[#536166] max-md:flex max-md:flex-col">
+          {title}
+        </h3>
+        <ul className="flex items-center justify-start overflow-x-scroll scroll-smooth">
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+          <Skeleton className="m-1 h-[calc(calc(150px/9)*16)] w-[150px] flex-[0_0_150px]" />
+        </ul>
+      </div>
     );
   }
 
@@ -121,8 +32,10 @@ const StoryCardList = ({
   }
 
   return (
-    <Box sx={{ marginTop: '20px' }}>
-      <SubHeaderWrapper>{title}</SubHeaderWrapper>
+    <div className="mt-5">
+      <h3 className="mb-2.5 text-xl font-bold text-[#536166] max-md:flex max-md:flex-col">
+        {title}
+      </h3>
       {list.length > 4 ? (
         <Marquee
           gradientWidth={50}
@@ -130,7 +43,7 @@ const StoryCardList = ({
           pauseOnHover
           direction={direction}
         >
-          <CardListWrapper>
+          <ul className="flex items-center justify-start overflow-x-scroll scroll-smooth">
             {list.map(
               ({
                 id,
@@ -154,10 +67,10 @@ const StoryCardList = ({
                 />
               )
             )}
-          </CardListWrapper>
+          </ul>
         </Marquee>
       ) : (
-        <CardListWrapper>
+        <ul className="flex items-center justify-start overflow-x-scroll scroll-smooth">
           {list.map(
             ({
               id,
@@ -181,9 +94,9 @@ const StoryCardList = ({
               />
             )
           )}
-        </CardListWrapper>
+        </ul>
       )}
-    </Box>
+    </div>
   );
 };
 

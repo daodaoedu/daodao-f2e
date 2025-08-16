@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 interface MultiSelectDropdownProps {
@@ -36,10 +36,10 @@ export default function MultiSelectDropdown({
   };
 
   return (
-    <div className="relative max-w-full w-full">
+    <div className="relative w-full max-w-full">
       <button
         type="button"
-        className="w-full bg-primary-lightest p-2 rounded-md cursor-pointer flex justify-between items-center gap-2 flex-nowrap font-sans text-sm focus:outline-none focus:ring-2 focus:ring-primary-base"
+        className="flex w-full cursor-pointer flex-nowrap items-center justify-between gap-2 rounded-md bg-primary-lightest p-2 font-sans text-sm focus:outline-none focus:ring-2 focus:ring-primary-base"
         onClick={handleToggleDropdown}
         onKeyDown={handleKeyDown}
         aria-expanded={open}
@@ -57,14 +57,14 @@ export default function MultiSelectDropdown({
 }
         </span>
 
-        <KeyboardArrowDownIcon />
+        <ChevronDown />
       </button>
 
       {open && (
         <div
           id="dropdown-list"
           role="listbox"
-          className="absolute bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-y-auto shadow-lg z-10 flex flex-col gap-2 p-2"
+          className="absolute z-10 mt-1 flex max-h-40 w-full flex-col gap-2 overflow-y-auto rounded-md border border-gray-300 bg-white p-2 shadow-lg"
         >
           {listItems.map((listItem) => (
             <button

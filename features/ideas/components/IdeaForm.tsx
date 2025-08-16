@@ -16,7 +16,7 @@ import {
   Globe,
   Lightbulb,
 } from 'lucide-react';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import type {
   CreateIdeaFormSchema,
   UpdateIdeaFormSchema,
@@ -247,18 +247,18 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
   const charactersUsed = watchedContent?.length || 0;
 
   return (
-    <div className="min-h-screen bg-basic-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg max-w-2xl w-full overflow-hidden">
+    <div className="bg-basic-50 flex min-h-screen items-center justify-center p-4">
+      <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-lg">
         {/* Header */}
-        <div className="bg-gradient-to-r bg-primary-base px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center justify-between bg-primary-base bg-gradient-to-r px-6 py-4">
           <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border border-white/30 text-white font-medium">
+            <div className="flex size-10 items-center justify-center rounded-full border border-white/30 bg-white/20 font-medium text-white">
               島
             </div>
 
             <div className="ml-3">
-              <div className="text-white font-medium text-sm">分享新想法</div>
-              <div className="text-white text-xs mt-1 opacity-80">
+              <div className="text-sm font-medium text-white">分享新想法</div>
+              <div className="mt-1 text-xs text-white opacity-80">
                 與島友分享你的學習洞察和創新想法
               </div>
             </div>
@@ -268,9 +268,9 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
               type="button"
               variant="ghost"
               onClick={onCancel}
-              className="text-white hover:bg-white/20 p-2"
+              className="p-2 text-white hover:bg-white/20"
             >
-              <X className="h-5 w-5" />
+              <X className="size-5" />
             </Button>
           )}
         </div>
@@ -283,7 +283,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                 <div className="flex items-start">
                   {/* 動態高度的垂直線 */}
                   <div
-                    className={`w-0.5 bg-basic-300 rounded-full mr-4 transition-all duration-200 mt-4 ${watchedContent && watchedContent.split('\n').length > 5 ? 'h-32'
+                    className={`mr-4 mt-4 w-0.5 rounded-full bg-basic-300 transition-all duration-200 ${watchedContent && watchedContent.split('\n').length > 5 ? 'h-32'
                       : watchedContent && watchedContent.split('\n').length > 3 ? 'h-24'
                         : watchedContent && watchedContent.split('\n').length > 1 ? 'h-16' : 'h-8'
                     }`}
@@ -292,10 +292,10 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                     <Textarea
                       {...form.register('content')}
                       placeholder="分享你的學習洞察、重要發現或創新想法..."
-                      className="w-full px-0 py-4 !border-none !border-0 resize-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-transparent text-basic-700 leading-6 min-h-[24px] bg-transparent shadow-none rounded-none"
+                      className="text-basic-700 min-h-[24px] w-full resize-none rounded-none !border-0 !border-none bg-transparent px-0 py-4 leading-6 shadow-none focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
                       maxLength={5000}
                     />
-                    <div className="text-xs text-basic-400 mt-2 text-right">
+                    <div className="mt-2 text-right text-xs text-basic-400">
                       {charactersUsed}
                       /5000
                     </div>
@@ -304,7 +304,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
               </div>
 
               {/* Action Buttons - 使用共用組件 */}
-              <div className={`flex items-center space-x-2 relative transition-all duration-200 ml-5 ${charactersUsed > 0 ? 'mt-6' : 'mt-2'
+              <div className={`relative ml-5 flex items-center space-x-2 transition-all duration-200 ${charactersUsed > 0 ? 'mt-6' : 'mt-2'
               }`}
               >
                 <TooltipProvider>
@@ -317,7 +317,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                         onClick={handleImageUpload}
                         className="text-basic-600 hover:bg-basic-100"
                       >
-                        <ImageIcon className="h-4 w-4" />
+                        <ImageIcon className="size-4" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -334,7 +334,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                         onClick={() => setShowTagSuggestions(!showTagSuggestions)}
                         className="text-basic-600 hover:bg-basic-100"
                       >
-                        <Hash className="h-4 w-4" />
+                        <Hash className="size-4" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -351,7 +351,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                         onClick={() => setShowResourceInput(!showResourceInput)}
                         className="text-basic-600 hover:bg-basic-100"
                       >
-                        <LinkIcon className="h-4 w-4" />
+                        <LinkIcon className="size-4" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
@@ -377,7 +377,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
             </div>
 
             {form.formState.errors.content && (
-              <p className="text-xs text-red-500 mb-2">
+              <p className="mb-2 text-xs text-red-500">
                 {form.formState.errors.content.message}
               </p>
             )}
@@ -398,9 +398,9 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                         <button
                           type="button"
                           onClick={() => removeTag(tag)}
-                          className="ml-2 hover:text-red-500 transition-colors"
+                          className="ml-2 transition-colors hover:text-red-500"
                         >
-                          <X className="h-3 w-3" />
+                          <X className="size-3" />
                         </button>
                       </Badge>
                     );
@@ -412,9 +412,9 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
             {/* 標籤選擇器 - 只在點擊標籤按鈕時顯示 */}
             {showTagSuggestions && (
               <div className="mb-4">
-                <div className="bg-white border border-basic-200 rounded-lg shadow-lg p-3">
-                  <div className="mb-3 pb-3 border-b border-basic-100">
-                    <div className="text-xs text-basic-500 mb-2">建立新標籤</div>
+                <div className="rounded-lg border border-basic-200 bg-white p-3 shadow-lg">
+                  <div className="mb-3 border-b border-basic-100 pb-3">
+                    <div className="mb-2 text-xs text-basic-500">建立新標籤</div>
                     <div className="flex space-x-2">
                       <Input
                         type="text"
@@ -439,21 +439,21 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                           }
                         }}
                         disabled={!customTagInput.trim() || selectedTags.length >= 3}
-                        className="bg-primary-base hover:bg-primary-darker text-white text-sm"
+                        className="bg-primary-base text-sm text-white hover:bg-primary-darker"
                       >
                         新增
                       </Button>
                     </div>
                   </div>
 
-                  <div className="text-xs text-basic-500 mb-2">熱門標籤</div>
+                  <div className="mb-2 text-xs text-basic-500">熱門標籤</div>
                   <div className="max-h-48 overflow-y-auto">
                     {DEFAULT_TAGS.map((tag) => (
                       <button
                         key={tag.value}
                         type="button"
                         onClick={() => addTag(tag)}
-                        className="w-full text-left px-3 py-2 rounded-lg flex items-center justify-between group transition-colors hover:bg-basic-100"
+                        className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition-colors hover:bg-basic-100"
                         disabled={selectedTags.includes(tag.label) || selectedTags.length >= 3}
                       >
                         <span className={`text-sm ${selectedTags.includes(tag.label) || selectedTags.length >= 3 ? 'text-basic-400' : 'text-basic-700'}`}>
@@ -474,23 +474,22 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
               <div className="mb-4">
                 <div className="grid grid-cols-3 gap-3">
                   {previewImages.map((src, index) => (
-                    <div key={src} className="relative group">
+                    <div key={src} className="group relative">
                       <Image
                         src={src}
                         alt={`Preview ${index + 1}`}
-                        width="100%"
-                        height="120px"
-                        className="w-full h-full"
-                        wrapperClassName="w-full"
+                        width={120}
+                        height={120}
+                        className="size-full object-cover"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
                         onClick={() => handleImageRemove(index)}
-                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-white hover:bg-red-600 shadow-lg z-10"
+                        className="absolute -right-2 -top-2 z-10 size-6 rounded-full bg-red-500 text-white shadow-lg hover:bg-red-600"
                       >
-                        <X className="h-3 w-3" />
+                        <X className="size-3" />
                       </Button>
                     </div>
                   ))}
@@ -505,10 +504,10 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                 {fields.map((field, index) => (
                   <div key={field.id}>
                     {editingResourceIndex === index ? (
-                      <div className="border border-primary-base rounded-lg p-4 bg-primary-base/5">
+                      <div className="rounded-lg border border-primary-base bg-primary-base/5 p-4">
                         <div className="space-y-3">
                           <div>
-                            <Label className="text-xs text-basic-600 mb-1">資源名稱</Label>
+                            <Label className="text-basic-600 mb-1 text-xs">資源名稱</Label>
                             <Input
                               placeholder="例如：設計思考入門指南"
                               value={editResourceData.name}
@@ -517,7 +516,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                             />
                           </div>
                           <div>
-                            <Label className="text-xs text-basic-600 mb-1">資源連結</Label>
+                            <Label className="text-basic-600 mb-1 text-xs">資源連結</Label>
                             <Input
                               placeholder="https://example.com"
                               value={editResourceData.url}
@@ -528,7 +527,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                               className={urlError ? 'border-red-500' : 'border-basic-200'}
                             />
                             {urlError && (
-                              <p className="text-xs text-red-500 mt-1">{urlError}</p>
+                              <p className="mt-1 text-xs text-red-500">{urlError}</p>
                             )}
                           </div>
                           <div className="flex justify-end space-x-2">
@@ -553,13 +552,13 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between p-3 rounded-lg border transition-colors hover:shadow-sm bg-primary-base/5 border-primary-base/20">
-                        <div className="flex items-center flex-1">
-                          <div className="mr-3 text-primary-base flex-shrink-0">
+                      <div className="flex items-center justify-between rounded-lg border border-primary-base/20 bg-primary-base/5 p-3 transition-colors hover:shadow-sm">
+                        <div className="flex flex-1 items-center">
+                          <div className="mr-3 shrink-0 text-primary-base">
                             {getResourceIcon('custom')}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <span className="text-sm text-primary-darker block truncate">
+                          <div className="min-w-0 flex-1">
+                            <span className="block truncate text-sm text-primary-darker">
                               {field.name || '未命名資源'}
                             </span>
                             {field.url && (
@@ -567,7 +566,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                                 href={field.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-xs text-primary-base hover:underline block truncate"
+                                className="block truncate text-xs text-primary-base hover:underline"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {field.url}
@@ -575,24 +574,24 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2 ml-3">
+                        <div className="ml-3 flex items-center space-x-2">
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => startEditResource(index)}
-                            className="text-basic-400 hover:text-blue-500 h-8 w-8 p-0"
+                            className="size-8 p-0 text-basic-400 hover:text-blue-500"
                           >
-                            <Edit className="h-3 w-3" />
+                            <Edit className="size-3" />
                           </Button>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => remove(index)}
-                            className="text-basic-400 hover:text-red-500 h-8 w-8 p-0"
+                            className="size-8 p-0 text-basic-400 hover:text-red-500"
                           >
-                            <Trash2 className="h-3 w-3" />
+                            <Trash2 className="size-3" />
                           </Button>
                         </div>
                       </div>
@@ -604,9 +603,9 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
 
             {/* 新增資源輸入框 */}
             {showResourceInput && (
-              <div className="space-y-3 p-4 rounded-lg border bg-primary-base/5 border-primary-base/20">
+              <div className="space-y-3 rounded-lg border border-primary-base/20 bg-primary-base/5 p-4">
                 <div>
-                  <Label className="block text-sm font-medium mb-2 text-primary-darker">
+                  <Label className="mb-2 block text-sm font-medium text-primary-darker">
                     資源名稱
                   </Label>
                   <Input
@@ -618,7 +617,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                   />
                 </div>
                 <div>
-                  <Label className="block text-sm font-medium mb-2 text-primary-darker">
+                  <Label className="mb-2 block text-sm font-medium text-primary-darker">
                     資源連結
                   </Label>
                   <Input
@@ -632,7 +631,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                     className={`w-full ${urlError ? 'border-red-500' : 'border-basic-200'}`}
                   />
                   {urlError && (
-                    <p className="text-xs text-red-500 mt-1">{urlError}</p>
+                    <p className="mt-1 text-xs text-red-500">{urlError}</p>
                   )}
                 </div>
                 <div className="flex space-x-2">
@@ -667,7 +666,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                       setShowResourceInput(false);
                     }}
                     disabled={!newResourceName.trim() || !newResourceUrl.trim()}
-                    className="flex-1 bg-primary-base hover:bg-primary-darker text-white"
+                    className="flex-1 bg-primary-base text-white hover:bg-primary-darker"
                   >
                     新增
                   </Button>
@@ -678,9 +677,9 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
 
             {/* 分類提示 */}
             {selectedTags.length > 0 && (
-              <div className="flex items-center p-3 bg-primary-base/5 rounded-lg mt-4">
+              <div className="mt-4 flex items-center rounded-lg bg-primary-base/5 p-3">
                 <Lightbulb size={16} className="mr-2 text-primary-base" />
-                <span className="text-xs text-basic-600">
+                <span className="text-basic-600 text-xs">
                   根據你的標籤，這個想法可能會幫助到
                   {' '}
                   <strong>15-20 位</strong>
@@ -693,11 +692,11 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
 
           {/* Footer */}
           <div className="border-t border-basic-200 pt-6">
-            <div className="flex items-center justify-end  m-4">
+            <div className="m-4 flex items-center  justify-end">
               <Button
                 type="submit"
                 disabled={isLoading || !watchedContent?.trim()}
-                className="px-6 py-3 rounded-lg font-medium transition-colors text-sm bg-primary-base hover:bg-primary-darker text-white disabled:bg-basic-300 disabled:cursor-not-allowed"
+                className="rounded-lg bg-primary-base px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-darker disabled:cursor-not-allowed disabled:bg-basic-300"
               >
                 {isLoading ? '分享中...' : '分享想法'}
               </Button>
@@ -734,17 +733,17 @@ const IdeaUpdateForm: React.FC<IdeaUpdateFormProps> = ({
   }, [onSubmit]);
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="mx-auto max-w-4xl">
       {/* 類似的 UI 結構，但標題改為 "編輯想法" */}
-      <div className="bg-primary-base px-6 py-4 rounded-t-2xl">
+      <div className="rounded-t-2xl bg-primary-base px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center border border-white border-opacity-30 text-white font-medium mr-3">
+            <div className="mr-3 flex size-10 items-center justify-center rounded-full border border-white border-opacity-30 bg-white bg-opacity-20 font-medium text-white">
               💡
             </div>
             <div>
-              <h1 className="text-white font-medium text-lg">編輯想法</h1>
-              <p className="text-white text-sm opacity-80">修改你的想法內容和相關資源</p>
+              <h1 className="text-lg font-medium text-white">編輯想法</h1>
+              <p className="text-sm text-white opacity-80">修改你的想法內容和相關資源</p>
             </div>
           </div>
           {onCancel && (
@@ -754,14 +753,14 @@ const IdeaUpdateForm: React.FC<IdeaUpdateFormProps> = ({
               onClick={onCancel}
               className="text-white hover:bg-white hover:bg-opacity-20"
             >
-              <X className="h-4 w-4" />
+              <X className="size-4" />
             </Button>
           )}
         </div>
       </div>
 
       <form onSubmit={form.handleSubmit(handleFormSubmit)}>
-        <div className="bg-white rounded-b-2xl p-6 space-y-6">
+        <div className="space-y-6 rounded-b-2xl bg-white p-6">
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="content" className="text-sm text-basic-500">
@@ -774,7 +773,7 @@ const IdeaUpdateForm: React.FC<IdeaUpdateFormProps> = ({
                 placeholder="分享你的學習洞察、重要發現或創新想法..."
                 rows={8}
                 {...form.register('content')}
-                className="border-basic-200 hover:border-primary-base focus:border-primary-base resize-none"
+                className="resize-none border-basic-200 hover:border-primary-base focus:border-primary-base"
               />
               {form.formState.errors.content && (
                 <p className="text-xs text-red-500">
@@ -799,7 +798,7 @@ const IdeaUpdateForm: React.FC<IdeaUpdateFormProps> = ({
               <Button
                 type="submit"
                 disabled={isLoading || !watchedContent?.trim()}
-                className="bg-primary-base hover:bg-primary-darker text-white disabled:bg-basic-300"
+                className="bg-primary-base text-white hover:bg-primary-darker disabled:bg-basic-300"
               >
                 {isLoading ? '更新中...' : '更新想法'}
               </Button>

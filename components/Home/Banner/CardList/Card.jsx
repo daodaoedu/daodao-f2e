@@ -1,36 +1,16 @@
-import styled from '@emotion/styled';
 import Link from 'next/link';
-
-const CardWrapper = styled.li`
-  border-radius: 10px;
-  width: 260px;
-  height: 320px;
-  overflow: hidden;
-  cursor: pointer;
-`;
-
-const ContentWrapper = styled.div`
-  height: 260px;
-  background-image: url(${(props) => props.image});
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-`;
-
-const FooterWrapper = styled.div`
-  background-color: #ffffff;
-  display: flex;
-  align-items: center;
-  height: 60px;
-  padding-left: 20px;
-  font-weight: 500;
-`;
 
 const Card = ({ title, link, image }) => (
   <Link href={link} passHref>
-    <CardWrapper>
-      <ContentWrapper image={image} />
-      <FooterWrapper>{title}</FooterWrapper>
-    </CardWrapper>
+    <li className="h-[320px] w-[260px] cursor-pointer overflow-hidden rounded-[10px]">
+      <div
+        className="h-[260px] bg-cover bg-no-repeat"
+        style={{ backgroundImage: `url(${image})` }}
+      />
+      <div className="flex h-[60px] items-center bg-white pl-5 font-medium">
+        {title}
+      </div>
+    </li>
   </Link>
 );
 

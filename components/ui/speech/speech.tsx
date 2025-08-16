@@ -45,8 +45,8 @@ export default function Speech({
         <div>
           <div className="mb-8 flex justify-center">
             <div className="relative size-20">
-              <span className="animate-ping absolute inset-2 rounded-full bg-primary-base opacity-75" />
-              <div className="relative z-10 p-2.5 bg-white border border-solid border-primary-base rounded-full">
+              <span className="absolute inset-2 animate-ping rounded-full bg-primary-base opacity-75" />
+              <div className="relative z-10 rounded-full border border-solid border-primary-base bg-white p-2.5">
                 <Image src={faviconPng} alt="daodao" width={60} height={60} />
               </div>
             </div>

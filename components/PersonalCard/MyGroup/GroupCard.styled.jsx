@@ -1,121 +1,164 @@
 import Link from 'next/link';
-import styled from '@emotion/styled';
-import Divider from '@mui/material/Divider';
-import MenuItem from '@mui/material/MenuItem';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/utils/cn';
 
-export const StyledText = styled.div`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: ${(props) => props.lineClamp || '1'};
-  overflow: hidden;
-  color: ${(props) => props.color || '#536166'};
-  font-size: ${(props) => props.fontSize || '14px'};
-  word-break: break-word;
-`;
+export const StyledText = ({ children, className, lineClamp = '1', color = '#536166', fontSize = '14px', ...props }) => (
+  <div
+    className={cn(
+      'overflow-hidden break-words',
+      lineClamp === '1' && 'line-clamp-1',
+      lineClamp === '2' && 'line-clamp-2',
+      lineClamp === '3' && 'line-clamp-3',
+      className
+    )}
+    style={{
+      display: '-webkit-box',
+      WebkitBoxOrient: 'vertical',
+      WebkitLineClamp: lineClamp,
+      color,
+      fontSize,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledTitle = styled.h2`
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 1.6;
-  margin-bottom: 4px;
-  display: -webkit-box;
-  color: #293a3d;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  overflow: hidden;
-`;
+export const StyledTitle = ({ children, className, ...props }) => (
+  <h2
+    className={cn(
+      'text-base font-bold leading-[1.6] mb-1 overflow-hidden text-[#293a3d] line-clamp-1',
+      className
+    )}
+    style={{
+      display: '-webkit-box',
+      WebkitBoxOrient: 'vertical',
+      WebkitLineClamp: 1,
+    }}
+    {...props}
+  >
+    {children}
+  </h2>
+);
 
-export const StyledFooter = styled.footer`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
+export const StyledFooter = ({ children, className, ...props }) => (
+  <footer
+    className={cn(
+      'flex justify-between items-center',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </footer>
+);
 
-export const StyledTime = styled.time`
-  font-size: 12px;
-  font-weight: 300;
-  color: #92989a;
-`;
+export const StyledTime = ({ children, className, ...props }) => (
+  <time
+    className={cn(
+      'text-xs font-light text-[#92989a]',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </time>
+);
 
-export const StyledFlex = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
+export const StyledFlex = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'flex items-center gap-2',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledStatus = styled.div`
-  --bg-color: #def5f5;
-  --color: #16b9b3;
-  display: flex;
-  align-items: center;
-  width: max-content;
-  font-size: 12px;
-  padding: 4px 10px;
-  height: 24px;
-  background: var(--bg-color);
-  color: var(--color);
-  border-radius: 4px;
-  font-weight: 500;
-  gap: 4px;
+export const StyledStatus = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'flex items-center w-max text-xs py-1 px-2.5 h-6 bg-[#def5f5] text-[#16b9b3] rounded font-medium gap-1',
+      'before:content-[""] before:block before:w-2 before:h-2 before:bg-[#16b9b3] before:rounded-full',
+      'finished:bg-[#f3f3f3] finished:text-[#92989a] finished:before:bg-[#92989a]',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-  &::before {
-    content: '';
-    display: block;
-    width: 8px;
-    height: 8px;
-    background: var(--color);
-    border-radius: 50%;
-  }
+export const StyledContainer = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'flex flex-col justify-around flex-1 px-2.5',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-  &.finished {
-    --bg-color: #f3f3f3;
-    --color: #92989a;
-  }
-`;
+export const StyledAreas = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'py-1 flex items-center',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  flex: 1;
-  padding: 0 10px;
-`;
+export const StyledGroupCard = ({ children, className, href, ...props }) => (
+  <Link
+    href={href}
+    className={cn(
+      'w-full flex relative bg-white rounded gap-4 max-md:flex-col',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </Link>
+);
 
-export const StyledAreas = styled.div`
-  padding: 4px 0;
-  display: flex;
-  align-items: center;
-`;
+export const StyledImageWrapper = ({ children, className, ...props }) => (
+  <div
+    className={cn(
+      'flex-1 overflow-hidden [&>img]:align-middle',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const StyledGroupCard = styled(Link)`
-  width: 100%;
-  display: flex;
-  position: relative;
-  background: #fff;
-  border-radius: 4px;
-  gap: 16px;
+export const StyledMenuItem = ({ children, className, ...props }) => (
+  <DropdownMenuItem
+    className={cn(
+      'min-w-[146px]',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </DropdownMenuItem>
+);
 
-  @media (max-width: 767px) {
-    flex-direction: column;
-  }
-`;
-
-export const StyledImageWrapper = styled.div`
-  flex: 1;
-  overflow: hidden;
-
-  img {
-    vertical-align: middle;
-  }
-`;
-
-export const StyledMenuItem = styled(MenuItem)`
-  min-width: 146px;
-`;
-
-export const StyledDivider = styled(Divider)`
-  width: 100%;
-  color: #000;
-  margin: 30px 0;
-  height: 2px;
-`;
+export const StyledDivider = ({ className, ...props }) => (
+  <Separator
+    className={cn(
+      'w-full text-black my-[30px] h-0.5',
+      className
+    )}
+    {...props}
+  />
+);

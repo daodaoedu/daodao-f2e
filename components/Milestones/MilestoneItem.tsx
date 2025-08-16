@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import dayjs from 'dayjs';
 import { Plus } from 'lucide-react';
 import {
   ProjectMilestoneSchema,
@@ -19,8 +18,8 @@ import DraggableTasks from '../Tasks/DraggableTasks';
 
 interface MilestoneItemProps {
   projectId: string;
-  minDate?: dayjs.Dayjs;
-  maxDate?: dayjs.Dayjs;
+  minDate?: Date;
+  maxDate?: Date;
   isEditable?: boolean;
   milestone: ProjectMilestoneSchema;
   milestones: ProjectMilestoneSchema[];
@@ -45,7 +44,7 @@ const MilestoneItem = ({
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="p-2.5 bg-basic-100 rounded-xl flex flex-col gap-2">
+    <div className="flex flex-col gap-2 rounded-xl bg-basic-100 p-2.5">
       <MilestoneCard
         projectId={projectId}
         milestone={milestone}
@@ -78,9 +77,9 @@ const MilestoneItem = ({
               <Button
                 onClick={() => setIsEditing(true)}
                 variant="ghost"
-                className="flex items-center gap-2 py-0 body-sm"
+                className="body-sm flex items-center gap-2 py-0"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="size-5" />
                 <span>新增子任務</span>
               </Button>
             </div>

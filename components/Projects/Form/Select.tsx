@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { cn } from '@/utils/cn';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { ChevronDown } from 'lucide-react';
 
 /**
  * @typedef {Object} Option
@@ -30,7 +30,7 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
 
   if (!options.length) {
     console.error('no option');
-    return false;
+    return <></>;
   }
 
   return (
@@ -54,7 +54,7 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
       >
         {selectedLabel}
         <span>
-          <KeyboardArrowDownIcon
+          <ChevronDown
             className={cn(
               'w-5 h-5',
               'transform transition-transform ease-linear',
@@ -98,4 +98,5 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
     </div>
   );
 };
+
 export default Select;

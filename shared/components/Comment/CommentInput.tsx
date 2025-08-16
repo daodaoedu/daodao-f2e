@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { LockKeyholeOpen, LockKeyhole } from 'lucide-react';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import { ROLE } from '@/constants/member';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
@@ -87,12 +87,12 @@ function CommentInput({
             <Image
               src={user.photoURL}
               alt={`${user.name} avatar`}
-              width="30px"
-              height="30px"
-              borderRadius="9999px"
+              width={30}
+              height={30}
+              className="rounded-full"
             />
             <div>{user.name}</div>
-            <div className="px-2.5 py-1 bg-basic-100 rounded">{role}</div>
+            <div className="rounded bg-basic-100 px-2.5 py-1">{role}</div>
           </div>
           {isEditing && (
             <Button
@@ -122,7 +122,7 @@ function CommentInput({
           onChange={(e) => setContent(e.target.value)}
           onClick={handleClick}
           placeholder={placeholder}
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500"
+          className="focus:ring-primary-500 w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-1"
           autoRows
         />
         {isEditing && (

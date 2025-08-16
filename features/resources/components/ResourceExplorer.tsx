@@ -35,11 +35,11 @@ export default function ResourceExplorer({
       <ResourceSearchBar filters={filters} onFilter={setFilters} />
 
       {filters.query && (
-        <Container className="text-basic-500 body-sm pb-6">
+        <Container className="body-sm pb-6 text-basic-500">
           "
           {filters.query}
           " 共搜尋到
-          <span className="mx-1 text-primary-base font-bold">{totalCount}</span>
+          <span className="mx-1 font-bold text-primary-base">{totalCount}</span>
           筆
         </Container>
       )}
@@ -55,7 +55,7 @@ export default function ResourceExplorer({
       </Container>
 
       {hasMore && (
-        <div className="flex justify-center px-5 mb-16 md:px-24">
+        <div className="mb-16 flex justify-center px-5 md:px-24">
           <Button size="lg" onClick={() => setSize((pre) => pre + 1)}>
             查看更多
           </Button>

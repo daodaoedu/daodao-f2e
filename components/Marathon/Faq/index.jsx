@@ -1,104 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import styled from '@emotion/styled';
-import {
-  Box,
-} from '@mui/material';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { cn } from '@/utils/cn';
+import { ChevronRight } from 'lucide-react';
 
-const StyledGroup = styled(Box)`
-  width: 100%;
-  max-width: 100%;
-  border: 1px solid #DEF5F5;
-  @media (max-width: 767px) {
-    grid-template: 1fr / 1fr;
-  }
-`;
-
-const StyledAccordionWrapper = styled.div`
-  border-radius: 4px;
-  overflow: hidden;
-`;
-const StyledAccordionHeader = styled.div`
-  padding: 12px 16px;
-  cursor: pointer;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  border: 1px solid #DEF5F5;
-  background-color: #DEF5F5;
-
-  .title {
-    margin-left: 12px;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 140%;
-    color: #293A3D;
-  }
-
-  .MuiSvgIcon-root {
-    transition: all ease .3s;
-    color: #293A3D;
-  }
-
-  .open.MuiSvgIcon-root {
-    transform: rotate(90deg);
-  }
-`;
-
-const StyledAccordionContent = styled.div`
-  background: #fff;
-  height: auto;
-  max-height: 0px;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-`;
-
-const StyledContent = styled.div`
-  padding: 16px;
-  color: #536166;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 140%; 
-`;
-
-const StyledList = styled(Box)`
-  margin-top: 10px;
-  ol {
-    list-style-type: decimal;
-    padding-left: 1.4em;
-
-    li {
-      color: #536166;
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 140%;
-      text-align: left;
-    }
-  }
-
-  ul {
-    list-style-type: disc;
-    padding-left: 1.4em;
-
-    li {
-      color: #536166;
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 140%;
-      text-align: left;
-    }
-  }
-`;
 function Accordion({ title, children }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [height, setHeight] = useState(0);
   const contentRef = useRef(null);
-
+  const [height, setHeight] = useState(0);
   const toggleAccordion = () => {
     setIsOpen((prev) => !prev);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleAccordion();
+    }
   };
 
   useEffect(() => {
@@ -107,140 +22,78 @@ function Accordion({ title, children }) {
     }
   }, [isOpen]);
   return (
-    <StyledAccordionWrapper>
-      <StyledAccordionHeader onClick={toggleAccordion}>
+    <div className="overflow-hidden rounded border-b border-[#DEF5F5]">
+      <div
+        className="flex cursor-pointer items-center justify-start border border-[#DEF5F5] bg-[#DEF5F5] p-3"
+        onClick={toggleAccordion}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={0}
+        aria-expanded={isOpen}
+        aria-controls={`accordion-content-${title}`}
+      >
         <span>
-          <KeyboardArrowRightIcon
-            className={`${isOpen ? 'open' : ''}`}
+          <ChevronRight
+            className={`${isOpen ? 'rotate-90' : ''} text-[#293A3D] transition-transform duration-300 ease-in-out`}
           />
         </span>
-        <p className="title">{title}</p>
-      </StyledAccordionHeader>
+        <p className="ml-3 text-base font-medium leading-[140%] text-[#293A3D]">{title}</p>
+      </div>
 
-      <StyledAccordionContent
-        css={{
+      <div
+        id={`accordion-content-${title}`}
+        className="h-auto max-h-0 overflow-hidden bg-white transition-[max-height] duration-300 ease-in-out"
+        style={{
           maxHeight: isOpen ? `${height}px` : '0px',
         }}
-        className={`${isOpen ? 'open' : ''}`}
         ref={contentRef}
       >
-        <StyledContent>
+        <div className="p-4 text-sm font-normal leading-[140%] text-[#536166]">
           {children}
-        </StyledContent>
-      </StyledAccordionContent>
-    </StyledAccordionWrapper>
+        </div>
+      </div>
+    </div>
   );
 }
 
 export default function Faq() {
   return (
-    <StyledGroup>
+    <div className="w-full max-w-full border border-[#DEF5F5] max-md:grid-cols-1">
       <Accordion
         title="我自己有一個學習小組，小組裡面的人也一定要參加嗎？"
       >
-        我們歡迎你邀請朋友一起申請，多人申請會有團報優惠價，但如果只有你自己的話也沒問題！
-      </Accordion>
-      <Accordion
-        title="如果我跟朋友一起入選，我們可以在一組嗎？"
-      >
-        我們會根據每位入選者的背景和特質分組。
-      </Accordion>
-      <Accordion
-        title="所有課程和活動都會有錄影嗎？"
-      >
-        僅有工作坊會有錄影，學習小組會議、引導師諮詢、社群活動等不會有錄影。
-      </Accordion>
-      <Accordion
-        title="我最後的成果會有誰看到呢？"
-      >
-        每位入選者的最終成果會公開在島島網站上，除了本次活動入選者外，其他使用者也能了解你在這 5 個月的學習歷程。
-      </Accordion>
-      <Accordion
-        title="所有活動都是線上嗎？"
-      >
-        本次計劃鼓勵各地學習者參與，故多數活動為線上，但為增加實體互動，部分社群活動將以實體為主，實體地點將視入圍學員所在地調整，詳細請參考重要時程。
-      </Accordion>
-      <Accordion
-        title="結束後會收到完成證書嗎？"
-      >
-        完成本計劃的參與者將收到電子版證書。
-      </Accordion>
-      <Accordion
-        title="入選後發現不適合可以退費嗎?"
-      >
-        2025/2/10 課程開始前可全額退費；若於2025/2/16 23:59 前提出退費申請，並將申請寄送至主辦單位電子信箱，即會退還繳納費用總額之二分之一。2025/2/16 23:59 即不退費。
-      </Accordion>
-      <Accordion
-        title="我可以繳交多件計畫嗎？"
-      >
-        在申請期間每人只能提交一件學習計畫，待公告入選者後，使用者可新增至多三個學習計劃。
-      </Accordion>
-      <Accordion
-        title="怎麼樣才算是有申請呢？"
-      >
-        按下最後的提交按鈕即算申請。早鳥票只需要於12/31 23:59 前點擊「提交」，就可以享有早鳥優惠。即使提交後，在申請截止前都可以繼續修改計畫，計畫將會自動儲存。
-      </Accordion>
-      <Accordion
-        title="如果申請時一起團報的朋友沒有入圍，還可以享有團報費用嗎？"
-      >
-        可以唷！我們會以申請時選擇的資格為主。
-      </Accordion>
-      <Accordion
-        title="完賽的定義是什麼呢？"
-      >
-        完賽的定義不在於最終成果做得多好，而是過程的參與，遇到困難時如何反思並做出改變，以及最後對自己甚至社會帶來什麼改變，包含即使沒有達到預期目標也清楚原因及下一步。
-
-        <StyledList>
-          因此我們完賽退費標準只有需符合以下要求：
-          <ol>
-            <li>
-              工作坊、學習小組會議、團體諮詢及 1對1 諮詢，加總不得請假超過5小時。
-            </li>
-            <li>
-              提交所有每兩週的進度報告。
-            </li>
-            <li>
-              參與7/12成果發表日。
-            </li>
-            <li>
-              於 2025/7/10 前完成以下資料
-              <ul>
-                <li>
-                  完成並上傳所有成果發表資料。
-                </li>
-                <li>
-                  分享至少三個於計劃期間使用的學習資源，並分享使用心得。
-                </li>
-                <li>
-                  完成學習馬拉松回饋問卷。
-                </li>
-              </ul>
+        <div className="mt-2">
+          <ol className="list-decimal pl-6">
+            <li className="text-left text-sm font-normal leading-[140%] text-[#536166]">
+              不一定，參考同學習資源的形式，邀請各類型夥伴進行共學。
             </li>
           </ol>
-        </StyledList>
+        </div>
       </Accordion>
+
       <Accordion
-        title="我想團報但找不到人？"
+        title="揪團需要付費嗎？"
       >
-        歡迎填寫團報表單，我們將協助促成！
-        <Link
-          href="https://forms.gle/BZ24JnTxid4y7CCV6"
-          className={cn('block text-sm font-normal p-2.5 rounded-lg text-basic-400 transition-colors duration-300')}
-        >
-          https://forms.gle/BZ24JnTxid4y7CCV6
-        </Link>
+        <div className="mt-2">
+          <ol className="list-decimal pl-6">
+            <li className="text-left text-sm font-normal leading-[140%] text-[#536166]">
+              不用，完全免費，任何人都能發起或加入。
+            </li>
+          </ol>
+        </div>
       </Accordion>
+
       <Accordion
-        title="有哪些機會可以獲得課程費用優惠折抵呢？"
+        title="除了揪團，還有什麼內容可以參與？"
       >
-        前五名提交申請、參加說明會、轉分享貼文等方式都可獲得優惠，優惠活動請參考折價券申請表單：
-        <Link
-          href="https://forms.gle/9Pfa9Q5d27m1JEpUA"
-          className={cn('block text-sm font-normal p-2.5 rounded-lg text-basic-400 transition-colors duration-300')}
-        >
-          https://forms.gle/9Pfa9Q5d27m1JEpUA （折抵金額無上限，，但計畫一、計畫二皆只能各折抵一次，例如同時在 IG、FB分享，只能折抵一次。參加兩場說明會，只能折抵一次。）
-        </Link>
+        <div className="mt-2">
+          <ol className="list-decimal pl-6">
+            <li className="text-left text-sm font-normal leading-[140%] text-[#536166]">
+              你可以發表學習計畫、資源、心得、問題，或參加學習馬拉松，從不同面向參與社群。
+            </li>
+          </ol>
+        </div>
       </Accordion>
-    </StyledGroup>
+    </div>
   );
 }

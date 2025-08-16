@@ -1,58 +1,15 @@
 import { useRouter } from 'next/router';
 import React, { useRef } from 'react';
-import styled from '@emotion/styled';
-import { Button, Divider } from '@mui/material';
+
+import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 import Banner from '../Banner';
 import Guide from './Guide';
 import About from './About';
 import Group from './Group';
 import Edm from './Edm';
 import FacebookPosts from './FacebookPosts';
-import WishResource from './WishResource';
 import APPBanner from './APPBanner';
-
-const StyledBannerButton = styled(Button)`
-  &.MuiButton-root {
-    position: absolute;
-    top: calc(100vw / 3.65);
-    left: 50%;
-    transform: translate(-50%);
-    border-radius: 40px;
-    background: #FFA10B;
-    display: flex;
-    width: 220px;
-    height: 40px;
-    padding: 5px 20px;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-    color: #FFF;
-  }
-    &.MuiButton-text {
-      color: #FFF;
-      text-align: center;
-      font-size: 18px;
-      font-weight: 400;
-      line-height: 140%;
-    }
-
-  @media (hover: hover) {
-    &.MuiButton-root:hover {
-      box-shadow: 0px 4px 10px 0px rgba(255, 161, 11, 0.50);
-    }
-  }
-
-  @media (max-width: 767px) {
-
-    &.MuiButton-root {
-      font-size: 14px;
-      width: 180px;
-      height: 50px;
-      top: calc(100vw / 1.2);
-    }
-  }
-`;
 
 function Home() {
   const guideRef = useRef(null);
@@ -60,23 +17,24 @@ function Home() {
   return (
     <div>
       <Banner>
-        <StyledBannerButton onClick={() => { router.push('/learning-marathon#marathon-intro'); }}>
+        <Button
+          onClick={() => { router.push('/learning-marathon#marathon-intro'); }}
+          className="absolute left-1/2 top-[calc(100vw/3.65)] flex h-10 w-[220px] -translate-x-1/2 transform items-center justify-center gap-2.5 rounded-[40px] bg-[#FFA10B] px-5 py-1.5 text-center text-lg font-normal leading-[140%] text-white hover:shadow-[0px_4px_10px_0px_rgba(255,161,11,0.50)] max-md:top-[calc(100vw/1.2)] max-md:h-[50px] max-md:w-[180px] max-md:text-sm"
+        >
           不要錯過！點我了解
-        </StyledBannerButton>
+        </Button>
       </Banner>
       <About />
-      <Divider sx={{ margin: '10px 0' }} />
+      <Separator className="my-2.5" />
       <APPBanner />
-      <Divider sx={{ margin: '10px 0' }} />
+      <Separator className="my-2.5" />
       <FacebookPosts />
-      <Divider sx={{ margin: '10px 0' }} />
+      <Separator className="my-2.5" />
       <Group />
-      <Divider sx={{ margin: '10px 0' }} />
-      <WishResource />
-      <Divider sx={{ margin: '10px 0' }} />
+      <Separator className="my-2.5" />
       <div ref={guideRef} />
       <Guide />
-      <Divider sx={{ margin: '10px 0' }} />
+      <Separator className="my-2.5" />
       <Edm />
     </div>
   );

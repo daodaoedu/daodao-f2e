@@ -1,21 +1,12 @@
 import React from 'react';
-import styled from '@emotion/styled';
 import SubFooter from './SubFooter';
 import MainFooter from './MainFooter';
 
-const FooterWrapper = styled.footer`
-  background-color: #536166;
-  min-height: 270px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-`;
-
 const Footer = () => (
-  <FooterWrapper>
+  <footer className="flex min-h-[270px] flex-col justify-center bg-[#536166]">
     <MainFooter />
     <SubFooter />
-  </FooterWrapper>
+  </footer>
 );
 
 export default Footer;

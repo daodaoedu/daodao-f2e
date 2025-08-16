@@ -11,19 +11,19 @@ const ProjectUserInfoBar = ({ user }: UserInfoBarProps) => {
   const zhRole = ROLE.find((r) => r.value === user.roleList[0])?.label;
 
   return (
-    <div className="flex flex-row gap-2 items-center">
+    <div className="flex flex-row items-center gap-2">
       <img
         src={user.photoURL}
         alt={user.name}
-        className="rounded-full w-[30px] h-[30px]"
+        className="size-[30px] rounded-full"
       />
       <span className="font-sans text-sm font-medium text-basic-400">
         {user.name}
       </span>
       {zhRole && (
         <div className="
-          py-[3px] px-[10px] bg-basic-100 rounded-[4px]
-          font-sans text-sm text-basic-500 leading-[1.4]
+          rounded-[4px] bg-basic-100 px-[10px] py-[3px]
+          font-sans text-sm leading-[1.4] text-basic-500
           "
         >
           {zhRole}

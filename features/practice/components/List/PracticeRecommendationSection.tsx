@@ -64,14 +64,14 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
       <Card className={`w-full ${className}`}>
         <CardContent className="flex flex-col items-center justify-center py-8">
           <div className="text-center">
-            <p className="text-basic-400 mb-4">推薦內容載入失敗</p>
+            <p className="mb-4 text-basic-400">推薦內容載入失敗</p>
             <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
               className="flex items-center gap-2"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="size-4" />
               重新載入
             </Button>
           </div>
@@ -86,7 +86,7 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
         {showHeader && (
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Target className="w-5 h-5 text-primary-base" />
+              <Target className="size-5 text-primary-base" />
               推薦主題實踐
             </CardTitle>
           </CardHeader>
@@ -95,7 +95,7 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
           <div className="space-y-4">
             {Array.from({ length: 3 }, (_, index) => (
               <div key={`practice-rec-skeleton-${Date.now()}-${index}`} className="animate-pulse">
-                <div className="bg-basic-100 rounded-lg h-40" />
+                <div className="h-40 rounded-lg bg-basic-100" />
               </div>
             ))}
           </div>
@@ -110,15 +110,15 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
         {showHeader && (
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Target className="w-5 h-5 text-primary-base" />
+              <Target className="size-5 text-primary-base" />
               推薦主題實踐
             </CardTitle>
           </CardHeader>
         )}
         <CardContent>
-          <div className="text-center py-8">
-            <Target className="w-12 h-12 text-basic-200 mx-auto mb-4" />
-            <p className="text-basic-400 mb-2">暫無推薦實踐</p>
+          <div className="py-8 text-center">
+            <Target className="mx-auto mb-4 size-12 text-basic-200" />
+            <p className="mb-2 text-basic-400">暫無推薦實踐</p>
             <p className="text-sm text-basic-300">
               多瀏覽和參與實踐活動，我們就能為你提供更精準的推薦
             </p>
@@ -163,7 +163,7 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Target className="w-5 h-5 text-primary-base" />
+              <Target className="size-5 text-primary-base" />
               推薦主題實踐
               {practiceRecommendations.length > 0 && (
                 <span className="text-sm font-normal text-basic-400">
@@ -178,16 +178,16 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
                 variant="ghost"
                 size="sm"
                 onClick={handleRefresh}
-                className="flex items-center gap-1 text-basic-400 hover:text-basic-600"
+                className="hover:text-basic-600 flex items-center gap-1 text-basic-400"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="size-4" />
                 <span className="hidden sm:inline">重新推薦</span>
               </Button>
             </div>
           </div>
           {practiceRecommendations.length > 0 && (
-            <p className="text-sm text-basic-400 flex items-center gap-1">
-              <Sparkles className="w-4 h-4" />
+            <p className="flex items-center gap-1 text-sm text-basic-400">
+              <Sparkles className="size-4" />
               根據你的學習歷程推薦的實踐活動
             </p>
           )}
@@ -205,8 +205,8 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
               showActions
             />
             {item.reason && (
-              <div className="absolute top-2 right-2">
-                <div className="bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-xs">
+              <div className="absolute right-2 top-2">
+                <div className="bg-primary-100 text-primary-700 rounded-full px-2 py-1 text-xs">
                   {item.reason}
                 </div>
               </div>
@@ -215,14 +215,14 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
         ))}
 
         {hasMore && (
-          <div className="text-center pt-4">
+          <div className="pt-4 text-center">
             <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
               className="flex items-center gap-2"
             >
-              <TrendingUp className="w-4 h-4" />
+              <TrendingUp className="size-4" />
               載入更多推薦
             </Button>
           </div>

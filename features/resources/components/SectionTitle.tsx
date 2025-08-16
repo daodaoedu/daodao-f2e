@@ -30,7 +30,7 @@ export default function SectionTitle({
         className
       )}
     >
-      <h2 className="leading-[2.4rem] text-[1.5rem] font-bold text-basic-500">
+      <h2 className="text-[1.5rem] font-bold leading-[2.4rem] text-basic-500">
         {title}
       </h2>
       {children}

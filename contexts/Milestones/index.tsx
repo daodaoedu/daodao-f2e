@@ -5,7 +5,7 @@ import {
 } from '@/contexts/Milestones/type';
 import { BASE_URL } from '@/constants/common';
 import { getTokenStorage } from '@/utils/storage';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 
 interface MilestonesContext {
   milestones: Milestone[];
@@ -62,8 +62,8 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
 
       const formattedMilestone = {
         ...newMilestone,
-        startDate: newMilestone.startDate ? dayjs(newMilestone.startDate).format('YYYY-MM-DD') : undefined,
-        endDate: newMilestone.endDate ? dayjs(newMilestone.endDate).format('YYYY-MM-DD') : undefined,
+        startDate: newMilestone.startDate ? format(new Date(newMilestone.startDate), 'yyyy-MM-dd') : undefined,
+        endDate: newMilestone.endDate ? format(new Date(newMilestone.endDate), 'yyyy-MM-dd') : undefined,
       };
 
       const response = await fetch(`${BASE_URL}/projects/${projectId}/milestones/${newMilestone.id}`, {

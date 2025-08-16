@@ -1,35 +1,15 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import Box from '@mui/material/Box';
 import CardList from './CardList';
 
-const GuideWrapper = styled.div`
-  width: 90%;
-  /* height: calc(var(--section-height) + var(--section-height-offset)); */
-  margin: 0 auto;
-  padding-top: 40px;
-  padding-bottom: 40px;
-  .guide-title {
-    color: #536166;
-    font-weight: bold;
-    font-size: 26px;
-    line-height: 50px;
-    letter-spacing: 0.08em;
-  }
-
-  @media (max-width: 767px) {
-    padding-top: 40px;
-    padding-bottom: 20px;
-  }
-`;
-
 const Guide = () => (
-  <GuideWrapper>
-    <h2 className="guide-title">大家正在學...</h2>
-    <Box sx={{ marginTop: '20px' }}>
+  <div className="mx-auto w-[90%] pb-10 pt-10 max-md:pb-5 max-md:pt-10">
+    <h2 className="text-[26px] font-bold leading-[50px] tracking-[0.08em] text-[#536166]">
+      大家正在學...
+    </h2>
+    <div className="mt-5">
       <CardList />
-    </Box>
-  </GuideWrapper>
+    </div>
+  </div>
 );
 
 export default Guide;

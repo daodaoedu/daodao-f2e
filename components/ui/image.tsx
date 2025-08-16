@@ -5,9 +5,7 @@ import emptyCoverPng from '@/public/assets/empty-cover.png';
 
 export type ImageProps = NextImageProps;
 
-export function Image({
-  src, alt, className, onError, ...props
-}: ImageProps) {
+export function Image({ src, alt, className, onError, ...props }: ImageProps) {
   const [isError, setIsError] = useState(false);
   const handleError = (
     event: React.SyntheticEvent<HTMLImageElement, Event>
@@ -21,7 +19,10 @@ export function Image({
     <NextImage
       src={src}
       alt={alt}
-      className={cn(className, isError && 'p-4 object-contain bg-primary-palest')}
+      className={cn(
+        className,
+        isError && 'p-4 object-contain bg-primary-palest'
+      )}
       {...props}
       onError={handleError}
     />

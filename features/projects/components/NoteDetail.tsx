@@ -1,4 +1,4 @@
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import PostDetailCard from '@/shared/components/Post/PostDetailCard';
 import { ProjectNoteSchema } from '@/services/projects';
 import { BaseUserSchema } from '@/services/users';
@@ -30,7 +30,7 @@ function NoteDetail({
       onEditClick={onEditClick}
       onDeleteClick={onDeleteClick}
       renderContent={(noteData) => (
-        <div className="mb-4 body-sm text-basic-500">
+        <div className="body-sm mb-4 text-basic-500">
           <MarkdownEditor className="mb-3" readOnly value={noteData.content} />
           {Array.isArray(noteData.imgUrls) &&
             noteData.imgUrls.map((imgUrl) => (
@@ -38,7 +38,8 @@ function NoteDetail({
                 key={imgUrl}
                 src={imgUrl}
                 alt={noteData.title}
-                height="300px"
+                width={400}
+                height={300}
                 className="object-contain"
               />
             ))}

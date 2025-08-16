@@ -1,17 +1,15 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { ProtectedComponent } from '@/contexts/Auth';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import { ChevronLeft, Circle } from 'lucide-react';
 import Select from '@/components/Projects/Form/Select';
 import SEOConfig from '@/components/SEOConfig';
 import GoBackButton from '@/components/Projects/GoBackButton';
 import emptyCoverImg from '@/public/assets/empty-cover.png';
-import CircleIcon from '@mui/icons-material/Circle';
 import { useMyProjects } from '@/services/projects';
 import More from '@/components/Projects/More';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
-import { MarathonAccess, useMarathonAccess, EmptyProject } from '@/features/projects';
+import { useMarathonAccess } from '@/features/projects';
 import useCreateProject from '@/features/projects/hooks/useCreateProject';
 
 const Projects = () => {
@@ -59,7 +57,7 @@ const Projects = () => {
             onClick={() => router.push('/manage')}
             icon={
               (
-                <KeyboardArrowLeftIcon
+                <ChevronLeft
                   className="
                   text-basic-400
                   group-hover:text-primary-base"
@@ -78,89 +76,64 @@ const Projects = () => {
             }}
           >
             <div className="flex flex-row justify-between gap-3">
-              <Select
-                isDisabled={!hasMarathonAccess}
-                options={options}
-                className="max-w-[200px]"
-              />
-              <Button
-                onClick={handleCreateProject}
-                variant="default"
-                className="hover:cursor-pointer flex-shrink-0"
-              >
-                新增計畫
-              </Button>
+              <div className="flex flex-row gap-3 items-center">
+                <img
+                  src={emptyCoverImg.src}
+                  alt="空的計畫封面"
+                  width={40}
+                  height={40}
+                  className="rounded-[6px]"
+                />
+                <span className="text-basic-400">新計畫</span>
+              </div>
+              <More projectId="new" />
             </div>
-            {
-              isAddedDenied && (
-                <p className="font-sans font-normal text-[#FF9526]">
-                  {projectLimitMessage}
-                </p>
-              )
-            }
+            <div className="mt-3 flex flex-row gap-3 items-center">
+              <div className="flex flex-row items-center gap-2">
+                <Circle className="text-primary-base w-2 h-2" />
+                <span className="text-basic-300">請選擇集合</span>
+              </div>
+              <Select options={options} isDisabled={!hasMarathonAccess} />
+            </div>
           </div>
-          <MarathonAccess>
-            {projects?.length === 0 && <EmptyProject />}
-            <div className="
-              flex flex-col md:flex-row
-              gap-5"
-            >
-              {
-                projects.map((project) => {
-                  return (
-                    <div
-                      key={project.id}
-                      role="button"
-                      tabIndex={0}
-                      className="w-full md:w-1/3 rounded-[10px] flex flex-col gap-[10px] bg-white cursor-pointer"
-                      onClick={() => router.push(`/manage/projects/detail?id=${project.id}`)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          router.push(`/manage/projects/detail?id=${project.id}`);
-                        }
-                      }}
-                      style={{
-                        boxShadow: '0px 4px 10px 0px rgba(196, 194, 193, 0.40)'
-                      }}
-                    >
-                      <img
-                        src={emptyCoverImg.src}
-                        alt="學習計畫封面圖"
-                        className="rounded-[10px] object-cover max-h-[117px]"
-                      />
-                      <div className="
-                        flex flex-col gap-[10px]
-                        px-[10px] pb-[10px]"
-                      >
-                        <p className="
-                          font-sans
-                          text-basic-500 text-sm font-bold leading-[140%]"
-                        >
-                          {project.title}
-                        </p>
-                        <p className="
-                          font-sans
-                          text-basic-400 text-sm font-normal leading-[140%]"
-                        >
-                          {getProjectType(project.eventId)}
-                        </p>
-                        <div className="flex flex-row justify-between">
-                          <p className="bg-primary-lightest py-[3px] px-[10px] rounded-[4px] inline-flex flex-row gap-1 items-center text-primary-base body-sm">
-                            <CircleIcon className="text-primary-base max-w-2 max-h-2" />
-                            <span className="font-sans text-xs font-bold leading-[140%]">{project.isPublic ? '公開' : '不公開'}</span>
-                          </p>
-                          <More projectId={project.id} />
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              }
-            </div>
-          </MarathonAccess>
+
+          <div className="grid grid-cols-1 gap-4">
+            {projects.map(({ _id, title, coverImage, eventId }) => (
+              <div key={_id}
+                className={cn(
+                  "w-full flex flex-col justify-between bg-white rounded-xl",
+                  "py-3 px-3 md:px-6")
+                }
+                style={{
+                  boxShadow: '0px 4px 10px 0px rgba(196, 194, 193, 0.40)'
+                }}
+              >
+                <div className="flex flex-row justify-between gap-3">
+                  <div className="flex flex-row gap-3 items-center">
+                    <img
+                      src={coverImage || emptyCoverImg.src}
+                      alt={title}
+                      width={40}
+                      height={40}
+                      className="rounded-[6px]"
+                    />
+                    <span className="text-basic-400">{title}</span>
+                  </div>
+                  <More projectId={_id} />
+                </div>
+                <div className="mt-3 flex flex-row gap-3 items-center">
+                  <div className="flex flex-row items-center gap-2">
+                    <Circle className="text-primary-base w-2 h-2" />
+                    <span className="text-basic-300">{getProjectType(eventId)}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </ProtectedComponent>
   );
 };
+
 export default Projects;

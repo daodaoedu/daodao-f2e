@@ -97,7 +97,7 @@ export default function ResourceReviewForm({
           <Container>
             <BackButton label="返回" />
 
-            <Title as="h1" size="xl" className="mt-3 mb-10">
+            <Title as="h1" size="xl" className="mb-10 mt-3">
               分享心得
             </Title>
 
@@ -105,14 +105,14 @@ export default function ResourceReviewForm({
               <ResourceReviewFields />
             </Paper>
           </Container>
-          <footer className="sticky bottom-0 bg-basic-white py-4 shadow-2xl shadow-basic-300 z-10">
-            <Container className="flex justify-end items-center gap-10">
-              <div className="flex flex-col flex-1 body-md space-y-3">
+          <footer className="sticky bottom-0 z-10 bg-basic-white py-4 shadow-2xl shadow-basic-300">
+            <Container className="flex items-center justify-end gap-10">
+              <div className="body-md flex flex-1 flex-col space-y-3">
                 <div>心得</div>
                 <Progress value={1} />
                 <div className="body-sm">就快完成了</div>
               </div>
-              <div className="flex gap-3 shrink-0">
+              <div className="flex shrink-0 gap-3">
                 {typeof reviewId !== 'number' && (
                   <Button
                     variant="outline"

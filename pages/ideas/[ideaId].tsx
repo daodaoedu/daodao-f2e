@@ -7,7 +7,7 @@ import CommentSection from '@/shared/components/Comment/CommentSection';
 import { CommentType } from '@/services/comments';
 import Shell from '@/public/assets/icons/shell.svg';
 import Comment from '@/public/assets/icons/comment.svg';
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import { ROLE } from '@/constants/member';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
 import { Button } from '@/components/ui/button';
@@ -68,9 +68,9 @@ const IdeaDetailPage = () => {
                     <Image
                       src={idea.user.photoURL}
                       alt={`${idea.user.name}'s avatar`}
-                      width="30px"
-                      height="30px"
-                      borderRadius="9999px"
+                      width={30}
+                      height={30}
+                      className="rounded-full"
                     />
                   ) : (
                     <div className="w-[30px] h-[30px] flex-shrink-0">

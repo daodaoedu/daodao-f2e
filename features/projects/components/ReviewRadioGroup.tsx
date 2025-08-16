@@ -40,7 +40,7 @@ function RadioGroupWithoutControl<T extends FieldValues>({
       CloudRain,
     };
     const IconComponent = icons[iconName as keyof typeof icons];
-    return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
+    return IconComponent ? <IconComponent className="size-4" /> : null;
   };
 
   if (type === 'emoji') {
@@ -65,7 +65,7 @@ function RadioGroupWithoutControl<T extends FieldValues>({
       {Array.from({ length: 10 }, (_, index) => index + 1).map((option) => (
         <RadioBox
           key={option}
-          className="md:px-3 pointer-events-none"
+          className="pointer-events-none md:px-3"
           {...getOptionProps(option)}
         >
           {option}
@@ -103,7 +103,7 @@ function RadioGroupWithControl<T extends FieldValues>({
       CloudRain,
     };
     const IconComponent = icons[iconName as keyof typeof icons];
-    return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
+    return IconComponent ? <IconComponent className="size-4" /> : null;
   };
 
   if (type === 'emoji') {

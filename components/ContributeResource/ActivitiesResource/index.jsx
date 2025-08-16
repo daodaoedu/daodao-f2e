@@ -1,30 +1,21 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Title, Text } from '@/components/ui/typography';
 
 const ActivitiesResource = () => (
-  <Box>
-    <Box
-      sx={{
-        margin: '20px 0',
-      }}
-    >
-      <Typography
-        variant="h2"
-        sx={{
-          margin: '40px 0 10px 0',
-        }}
+  <div>
+    <div className="my-5">
+      <Title
+        as="h2"
+        size="lg"
+        className="mb-2.5 mt-10"
       >
         二、島島活動消息
-      </Typography>
-      <Typography variant="p">
+      </Title>
+      <Text>
         島島活動消息以學習相關活動為主，期盼整合「具有學習意義、提倡以學習者為中心、不違反人權、不包含血腥及暴力」等活動、課程、計畫、競賽、提案。
-      </Typography>
-    </Box>
-    <Box
-      sx={{
-        margin: '40px 0 20px 0',
-      }}
-    >
+      </Text>
+    </div>
+    <div className="mb-5 mt-10">
       {/* eslint-disable-next-line jsx-a11y/iframe-has-title */}
       <iframe
         src="https://docs.google.com/forms/d/e/1FAIpQLSeMg55q91VIdvNOmqqkzhqJGCKG4106YM0cVidzX6wHS9AJIA/viewform?embedded=true"
@@ -36,8 +27,8 @@ const ActivitiesResource = () => (
       >
         載入中 . . .
       </iframe>
-    </Box>
-  </Box>
+    </div>
+  </div>
 );
 
 export default ActivitiesResource;

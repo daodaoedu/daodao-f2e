@@ -179,7 +179,7 @@ export const UploadImage = forwardRef(
         >
           <Tabs
             defaultValue={TabEnum.Upload}
-            className="bg-basic-white rounded-lg"
+            className="rounded-lg bg-basic-white"
             onValueChange={(_tab) => setTab(_tab as TabEnum)}
           >
             <TabsList>
@@ -203,7 +203,7 @@ export const UploadImage = forwardRef(
                 >
                   <CloudUpload size={48} className="mb-1" />
                   <div className="body-md">將你要上傳的圖片檔案拖曳到這裡</div>
-                  <ul className="list-disc flex gap-6 text-basic-300 body-sm">
+                  <ul className="body-sm flex list-disc gap-6 text-basic-300">
                     <li>大小限制: 500KB</li>
                     <li>格式限制: .png、.jpg</li>
                   </ul>
@@ -274,7 +274,7 @@ export const UploadImage = forwardRef(
               </div>
             </TabsContent>
           </Tabs>
-          <footer className="flex justify-center mt-2 pb-4">
+          <footer className="mt-2 flex justify-center pb-4">
             <Button type="button" size="lg">
               <Check size={16} />
               確認

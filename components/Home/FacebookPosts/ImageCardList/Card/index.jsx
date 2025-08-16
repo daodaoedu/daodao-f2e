@@ -1,40 +1,44 @@
-import styled from '@emotion/styled';
-import { Tooltip } from '@mui/material';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Image } from '@/components/ui/image';
 
-const CardWrapper = styled.li`
-  position: relative;
-  width: 150px;
-  height: 150px;
-  flex: 0 0 150px;
-  margin: 5px;
-  color: #16b9b3;
-  overflow: hidden;
+const Card = ({ message = '', image, url }) => {
+  const handleClick = () => {
+    window.open(url, '_target');
+  };
 
-  cursor: pointer;
-  object-fit: cover;
-  &:hover {
-    transform: scale(1.05);
-    transition: transform 0.4s;
-  }
-`;
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleClick();
+    }
+  };
 
-const ImageWrapper = styled(LazyLoadImage)`
-  width: 150px;
-  height: 150px;
-  min-width: 150px;
-  min-height: 150px;
-  position: relative;
-  object-fit: cover;
-  object-position: center;
-`;
-
-const Card = ({ message = '', image, url }) => (
-  <Tooltip title={message.slice(0, 150)}>
-    <CardWrapper onClick={() => window.open(url, '_target')}>
-      <ImageWrapper alt={message} src={image} effect="opacity" />
-    </CardWrapper>
-  </Tooltip>
-);
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            className="hover:duration-400 relative m-1.5 h-[150px] w-[150px] flex-[0_0_150px] cursor-pointer overflow-hidden border-none bg-transparent object-cover p-0 text-[#16b9b3] hover:scale-105 hover:transition-transform"
+            onClick={handleClick}
+            onKeyDown={handleKeyDown}
+            aria-label={`Instagram post: ${message.slice(0, 50)}...`}
+          >
+            <Image
+              className="relative h-[150px] min-h-[150px] w-[150px] min-w-[150px] object-cover object-center"
+              alt={message}
+              src={image}
+              width={150}
+              height={150}
+            />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{message.slice(0, 150)}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 export default Card;

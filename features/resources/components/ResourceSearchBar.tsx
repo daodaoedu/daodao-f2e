@@ -54,7 +54,7 @@ export default function ResourceSearchBar({
             isShowShadow && 'shadow-md shadow-basic-black/10'
           )}
         >
-          <Container className="flex justify-between flex-col gap-4 md:flex-row">
+          <Container className="flex flex-col justify-between gap-4 md:flex-row">
             <Input
               type="search"
               prefixIcon={<SearchIcon />}
@@ -67,7 +67,7 @@ export default function ResourceSearchBar({
               onSuffixIconClick={(value) => handleFilterChange({ query: value })}
               placeholder="想找什麼資源..."
             />
-            <div className="flex gap-3 justify-end">
+            <div className="flex justify-end gap-3">
               <Button
                 variant="outline"
                 size="lg"

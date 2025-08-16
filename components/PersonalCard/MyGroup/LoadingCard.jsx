@@ -1,7 +1,6 @@
-import Skeleton from '@mui/material/Skeleton';
-import IconButton from '@mui/material/IconButton';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { MapPin, EllipsisVertical } from 'lucide-react';
 import {
   StyledAreas,
   StyledContainer,
@@ -18,41 +17,31 @@ function LoadingCard() {
   return (
     <StyledGroupCard href="#">
       <StyledImageWrapper>
-        <Skeleton
-          variant="rounded"
-          width="100%"
-          height={122}
-          animation="wave"
-        />
+        <Skeleton className="h-[122px] w-full rounded" />
       </StyledImageWrapper>
       <StyledContainer>
         <StyledTitle>
-          <Skeleton width="60%" animation="wave" />
+          <Skeleton className="h-4 w-[60%]" />
         </StyledTitle>
         <StyledText lineClamp="2" style={{ minHeight: '32px' }}>
-          <Skeleton animation="wave" />
-          <Skeleton width="50%" animation="wave" />
+          <Skeleton className="mb-2 h-4 w-full" />
+          <Skeleton className="h-4 w-[50%]" />
         </StyledText>
         <StyledAreas>
-          <LocationOnOutlinedIcon fontSize="16px" sx={{ color: '#536166' }} />
+          <MapPin size={16} color="#536166" />
           <StyledText>
-            <Skeleton width={42} animation="wave" />
+            <Skeleton className="h-4 w-[42px]" />
           </StyledText>
         </StyledAreas>
         <StyledFooter>
           <StyledTime>
-            <Skeleton width={52} animation="wave" />
+            <Skeleton className="h-4 w-[52px]" />
           </StyledTime>
           <StyledFlex>
-            <Skeleton
-              variant="rounded"
-              width={68}
-              height={24}
-              animation="wave"
-            />
-            <IconButton size="small" disabled>
-              <MoreVertOutlinedIcon />
-            </IconButton>
+            <Skeleton className="h-6 w-[68px] rounded" />
+            <Button variant="ghost" size="sm" disabled>
+              <EllipsisVertical />
+            </Button>
           </StyledFlex>
         </StyledFooter>
       </StyledContainer>

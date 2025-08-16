@@ -59,7 +59,7 @@ const TagList: React.FC<TagListProps> = ({
           </span>
         ))}
         {hasMore && (
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-basic-100 text-basic-400">
+          <span className="rounded-full bg-basic-100 px-2 py-1 text-xs font-medium text-basic-400">
             +
             {tags.length - maxDisplay}
           </span>

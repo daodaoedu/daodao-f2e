@@ -48,15 +48,15 @@ const LearningInsights: React.FC<LearningInsightsProps> = ({ practices }) => {
 
   const getInsightIcon = (suggestion: string) => {
     if (suggestion.includes('進度') || suggestion.includes('快要完成')) {
-      return <Target className="h-4 w-4" />;
+      return <Target className="size-4" />;
     }
     if (suggestion.includes('時間') || suggestion.includes('簽到')) {
-      return <Clock className="h-4 w-4" />;
+      return <Clock className="size-4" />;
     }
     if (suggestion.includes('連續') || suggestion.includes('表現優秀')) {
-      return <TrendingUp className="h-4 w-4" />;
+      return <TrendingUp className="size-4" />;
     }
-    return <Lightbulb className="h-4 w-4" />;
+    return <Lightbulb className="size-4" />;
   };
 
   const getInsightColor = (suggestion: string) => {
@@ -73,38 +73,38 @@ const LearningInsights: React.FC<LearningInsightsProps> = ({ practices }) => {
   };
 
   return (
-    <Card className="bg-basic-white rounded-2xl shadow-sm border border-basic-100 mb-6">
+    <Card className="mb-6 rounded-2xl border border-basic-100 bg-basic-white shadow-sm">
       <CardContent className="p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-full bg-primary-lightest flex items-center justify-center">
-              <TrendingUp className="h-4 w-4 text-primary-base" />
+            <div className="flex size-8 items-center justify-center rounded-full bg-primary-lightest">
+              <TrendingUp className="size-4 text-primary-base" />
             </div>
             <h3 className="text-lg font-semibold text-basic-black">學習洞察</h3>
           </div>
-          <Badge className="bg-primary-lightest text-primary-darker text-xs">
+          <Badge className="bg-primary-lightest text-xs text-primary-darker">
             AI 建議
           </Badge>
         </div>
 
         {/* 統計摘要 */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-          <div className="text-center p-3 bg-basic-50 rounded-lg">
+        <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="bg-basic-50 rounded-lg p-3 text-center">
             <div className="text-lg font-semibold text-basic-black">{activePractices.length}</div>
             <div className="text-xs text-basic-300">活躍實踐</div>
           </div>
-          <div className="text-center p-3 bg-basic-50 rounded-lg">
+          <div className="bg-basic-50 rounded-lg p-3 text-center">
             <div className="text-lg font-semibold text-basic-black">{totalCheckIns}</div>
             <div className="text-xs text-basic-300">總打卡次數</div>
           </div>
-          <div className="text-center p-3 bg-basic-50 rounded-lg">
+          <div className="bg-basic-50 rounded-lg p-3 text-center">
             <div className="text-lg font-semibold text-basic-black">
               {Math.round(averageProgress)}
               %
             </div>
             <div className="text-xs text-basic-300">平均進度</div>
           </div>
-          <div className="text-center p-3 bg-basic-50 rounded-lg">
+          <div className="bg-basic-50 rounded-lg p-3 text-center">
             <div className="text-lg font-semibold text-basic-black">{activeStreaks}</div>
             <div className="text-xs text-basic-300">連續中</div>
           </div>
@@ -112,22 +112,22 @@ const LearningInsights: React.FC<LearningInsightsProps> = ({ practices }) => {
 
         {/* 學習建議 */}
         <div className="space-y-3">
-          <h4 className="text-sm font-medium text-basic-400 mb-3">個人化建議</h4>
+          <h4 className="mb-3 text-sm font-medium text-basic-400">個人化建議</h4>
 
           {/* 顯示當前可見的建議 */}
           {allSuggestions.slice(0, visibleSuggestionsCount).map((item) => (
             <div
               key={`${item.practiceId}-${item.suggestion.slice(0, 20)}`}
-              className={`flex items-start space-x-3 p-3 rounded-lg border ${getInsightColor(item.suggestion)}`}
+              className={`flex items-start space-x-3 rounded-lg border p-3 ${getInsightColor(item.suggestion)}`}
             >
-              <div className="flex-shrink-0 mt-0.5">
+              <div className="mt-0.5 shrink-0">
                 {getInsightIcon(item.suggestion)}
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">
                   {item.suggestion}
                 </p>
-                <p className="text-xs opacity-75 mt-1">
+                <p className="mt-1 text-xs opacity-75">
                   來自「
                   {item.practiceTitle}
                   」
@@ -138,7 +138,7 @@ const LearningInsights: React.FC<LearningInsightsProps> = ({ practices }) => {
 
           {/* 查看更多/收起按鈕 */}
           {allSuggestions.length > 3 && (
-            <div className="text-center pt-3">
+            <div className="pt-3 text-center">
               {visibleSuggestionsCount < allSuggestions.length ? (
                 <Button
                   variant="ghost"
@@ -152,17 +152,17 @@ const LearningInsights: React.FC<LearningInsightsProps> = ({ practices }) => {
                     {' '}
                     個)
                   </span>
-                  <ChevronDown className="h-4 w-4 ml-1" />
+                  <ChevronDown className="ml-1 size-4" />
                 </Button>
               ) : (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setVisibleSuggestionsCount(3)}
-                  className="text-basic-400 hover:text-basic-600"
+                  className="hover:text-basic-600 text-basic-400"
                 >
                   <span>收起建議</span>
-                  <ChevronUp className="h-4 w-4 ml-1" />
+                  <ChevronUp className="ml-1 size-4" />
                 </Button>
               )}
             </div>
@@ -171,12 +171,12 @@ const LearningInsights: React.FC<LearningInsightsProps> = ({ practices }) => {
 
         {/* 本週表現 */}
         {thisWeekCheckIns > 0 && (
-          <div className="mt-4 pt-4 border-t border-basic-100">
+          <div className="mt-4 border-t border-basic-100 pt-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-basic-400">本週學習活躍度</span>
               <div className="flex items-center space-x-2">
-                <div className="w-16 h-2 bg-basic-200 rounded-full overflow-hidden">
-                  <div className={`h-full bg-primary-base rounded-full transition-all duration-300 ${
+                <div className="h-2 w-16 overflow-hidden rounded-full bg-basic-200">
+                  <div className={`h-full rounded-full bg-primary-base transition-all duration-300 ${
                     thisWeekCheckIns >= 7 ? 'w-full'
                       : thisWeekCheckIns >= 6 ? 'w-[86%]'
                         : thisWeekCheckIns >= 5 ? 'w-[71%]'

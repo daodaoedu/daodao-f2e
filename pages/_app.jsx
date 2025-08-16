@@ -1,12 +1,8 @@
 import { z } from 'zod';
 import React, { useEffect, useMemo } from 'react';
 import { SWRConfig } from 'swr';
-import dayjs from 'dayjs';
-import isBetween from 'dayjs/plugin/isBetween';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+
+
 import { Toaster } from 'react-hot-toast';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import { useRouter } from 'next/router';
@@ -14,8 +10,6 @@ import Script from 'next/script';
 import Head from 'next/head';
 import { AuthProvider, useAuth } from '@/contexts/Auth';
 import { DialogProvider } from '@/contexts/Dialog';
-import GlobalStyle from '@/shared/styles/Global';
-import themeFactory from '@/shared/styles/themeFactory';
 import useQueryState from '@/hooks/useQueryState';
 import { fetcher } from '@/utils/http';
 import { getReminderStorage } from '@/utils/storage';
@@ -24,10 +18,6 @@ import { useCompleteInfoReminder, useVerifiedSuccessDialog } from '@/features/us
 import { initGA, logPageView } from '../utils/analytics';
 import 'regenerator-runtime/runtime'; // Speech.js
 import "@/shared/styles/global.css";
-import 'dayjs/locale/zh-tw';
-
-dayjs.locale('zh-tw');
-dayjs.extend(isBetween);
 
 const swrConfig = {
   revalidateOnFocus: false,
@@ -37,7 +27,6 @@ const swrConfig = {
 };
 
 const ThemeComponentWrap = ({ pageProps, Component }) => {
-  const theme = useMemo(() => themeFactory('light'), []);
   const { isComplete, isLoggedIn } = useAuth();
   const getLayout = Component?.getLayout || getBaseLayout;
   const openCompleteInfoReminderDialog = useCompleteInfoReminder();
@@ -62,11 +51,9 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
   }, [queryState, isLoggedIn, isComplete, openCompleteInfoReminderDialog, openVerifiedSuccessDialog]);
 
   return (
-    <ThemeProvider theme={theme}>
-      {/* mui normalize css */}
-      <CssBaseline />
-      {/* For custum reset css */}
-      <GlobalStyle />
+    <>
+      {/* Reset CSS handled by global.css and shadcn/ui */}
+      {/* For custom reset css */}
       <Toaster
         position="top-center"
         containerStyle={{ background: 'none', marginTop: '80px' }}
@@ -83,7 +70,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
       />
       <SonnerToaster />
       {getLayout(<Component {...pageProps} />)}
-    </ThemeProvider>
+    </>
   );
 };
 
@@ -156,15 +143,13 @@ const App = ({ Component, pageProps }) => {
         <link rel="manifest" href="/manifest.json" />
       </Head>
 
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
-        <SWRConfig value={swrConfig}>
-          <DialogProvider>
-            <AuthProvider>
-              <ThemeComponentWrap pageProps={pageProps} Component={Component} />
-            </AuthProvider>
-          </DialogProvider>
-        </SWRConfig>
-      </LocalizationProvider>
+      <SWRConfig value={swrConfig}>
+        <DialogProvider>
+          <AuthProvider>
+            <ThemeComponentWrap pageProps={pageProps} Component={Component} />
+          </AuthProvider>
+        </DialogProvider>
+      </SWRConfig>
     </>
   );
 };

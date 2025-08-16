@@ -11,17 +11,17 @@ export default function EmptyProject() {
         'flex flex-col gap-3 items-center rounded-2xl'
       )}
     >
-      <p className="font-sans text-basic-400 font-bold body-sm">
+      <p className="body-sm font-sans font-bold text-basic-400">
         目前沒有任何計畫
       </p>
       <img
         src={AccessDeniedImg.src}
         alt="沒有計劃"
-        className="w-[232px] h-[180px]
-        md:w-80 md:h-[280px]"
+        className="h-[180px] w-[232px]
+        md:h-[280px] md:w-80"
       />
-      <p className="font-sans text-basic-400 body-md">你可以⋯</p>
-      <div className="w-full flex flex-col gap-3 justify-center md:flex-row">
+      <p className="body-md font-sans text-basic-400">你可以⋯</p>
+      <div className="flex w-full flex-col justify-center gap-3 md:flex-row">
         <Button
           asChild
           variant="outline"

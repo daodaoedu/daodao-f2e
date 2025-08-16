@@ -122,7 +122,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
 
   // Project Card Component
   const ProjectCard = ({ project }: { project: ProjectSchema }) => (
-    <Card className="hover:shadow-md transition-shadow duration-200 border border-basic-200">
+    <Card className="border border-basic-200 transition-shadow duration-200 hover:shadow-md">
       <CardContent className="p-4">
         <div className="space-y-3">
           {/* Header */}
@@ -130,11 +130,11 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
             <div className="flex-1">
               <Link
                 href={`/projects/detail?id=${project.id}`}
-                className="text-lg font-semibold text-basic-black hover:text-primary-base transition-colors line-clamp-1"
+                className="line-clamp-1 text-lg font-semibold text-basic-black transition-colors hover:text-primary-base"
               >
                 {project.title}
               </Link>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="mt-1 flex items-center gap-2">
                 <span className="text-sm text-basic-400">
                   建立於
                   {' '}
@@ -150,27 +150,27 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
           </div>
 
           {/* Description */}
-          <p className="text-basic-600 text-sm line-clamp-2 leading-relaxed">
+          <p className="text-basic-600 line-clamp-2 text-sm leading-relaxed">
             {project.description}
           </p>
 
           {/* Goal */}
           {project.goal && (
           <div className="bg-primary-50 rounded-lg p-3">
-            <h4 className="text-sm font-medium text-primary-700 mb-1">學習目標</h4>
-            <p className="text-sm text-primary-600 line-clamp-1">{project.goal}</p>
+            <h4 className="text-primary-700 mb-1 text-sm font-medium">學習目標</h4>
+            <p className="text-primary-600 line-clamp-1 text-sm">{project.goal}</p>
           </div>
           )}
 
           {/* Author Info */}
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center">
-              <span className="text-xs font-medium text-primary-600">
+            <div className="bg-primary-100 flex size-6 items-center justify-center rounded-full">
+              <span className="text-primary-600 text-xs font-medium">
                 {project.user.name.charAt(0)}
               </span>
             </div>
             <span className="text-sm text-basic-500">{project.user.name}</span>
-            <span className="text-xs text-basic-400 ml-auto">
+            <span className="ml-auto text-xs text-basic-400">
               v
               {project.version}
             </span>
@@ -217,9 +217,9 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
       <Card className={`w-full ${className}`}>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <div className="text-center">
-            <FolderOpen className="w-12 h-12 text-basic-200 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-basic-600 mb-2">載入失敗</h3>
-            <p className="text-basic-400 mb-4">
+            <FolderOpen className="mx-auto mb-4 size-12 text-basic-200" />
+            <h3 className="text-basic-600 mb-2 text-lg font-medium">載入失敗</h3>
+            <p className="mb-4 text-basic-400">
               {error?.message || '無法載入學習計劃，請稍後再試'}
             </p>
             <Button
@@ -228,7 +228,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
               onClick={() => refresh()}
               className="flex items-center gap-2"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="size-4" />
               重新載入
             </Button>
           </div>
@@ -243,7 +243,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <FolderOpen className="w-5 h-5 text-primary-base" />
+              <FolderOpen className="size-5 text-primary-base" />
               探索學習計劃
               {filteredProjects && (
                 <span className="text-sm font-normal text-basic-400">
@@ -259,7 +259,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
                 onClick={handleCreateClick}
                 className="flex items-center gap-2"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="size-4" />
                 <span className="hidden sm:inline">建立計劃</span>
               </Button>
             )}
@@ -269,9 +269,9 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
 
       <CardContent className="space-y-4">
         {/* Search and Filter Bar */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-basic-400 w-4 h-4" />
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-basic-400" />
             <Input
               placeholder="搜尋計劃標題、描述、目標..."
               value={searchQuery}
@@ -285,7 +285,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="flex items-center gap-2">
-                  <SortAsc className="w-4 h-4" />
+                  <SortAsc className="size-4" />
                   <span className="hidden sm:inline">{getCurrentSortLabel()}</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -314,7 +314,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
               className="flex items-center gap-2"
               disabled={isLoading}
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`size-4 ${isLoading ? 'animate-spin' : ''}`} />
             </Button>
           </div>
         </div>
@@ -324,24 +324,24 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
           <div className="space-y-4">
             {Array.from({ length: 5 }, (_, index) => (
               <div key={`project-skeleton-${Date.now()}-${index}`} className="animate-pulse">
-                <div className="bg-basic-100 rounded-lg h-36" />
+                <div className="h-36 rounded-lg bg-basic-100" />
               </div>
             ))}
           </div>
         ) : filteredProjects.length === 0 ? (
-          <div className="text-center py-12">
-            <FolderOpen className="w-16 h-16 text-basic-200 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-basic-600 mb-2">
+          <div className="py-12 text-center">
+            <FolderOpen className="mx-auto mb-4 size-16 text-basic-200" />
+            <h3 className="text-basic-600 mb-2 text-lg font-medium">
               {searchQuery ? '找不到相關計劃' : '還沒有學習計劃'}
             </h3>
-            <p className="text-basic-400 mb-6">
+            <p className="mb-6 text-basic-400">
               {searchQuery
                 ? '嘗試調整搜尋關鍵字'
                 : '建立你的第一個學習計劃！'}
             </p>
             {showCreateButton && (
               <Button onClick={handleCreateClick} className="flex items-center gap-2">
-                <Plus className="w-4 h-4" />
+                <Plus className="size-4" />
                 建立第一個計劃
               </Button>
             )}
@@ -354,7 +354,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
 
             {/* Projects Count Info */}
             {filteredProjects.length > 0 && (
-              <div className="text-center pt-4">
+              <div className="pt-4 text-center">
                 <p className="text-sm text-basic-400">
                   顯示
                   {' '}

@@ -2,7 +2,8 @@ import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { useMemo, useState } from 'react';
 import SEOConfig, { JsonLdType } from '@/components/SEOConfig';
-import { Skeleton, useMediaQuery } from '@mui/material';
+import { Skeleton } from '@/components/ui/skeleton';
+import useMediaQuery from '@/hooks/useMediaQuery';
 
 import { useProject } from '@/contexts/Project';
 import EditMode from '@/components/Projects/Project/EditMode';
@@ -11,7 +12,7 @@ import toast from 'react-hot-toast';
 
 const ProjectPage = () => {
   // same with tailwind lg:
-  const isLgScreen = useMediaQuery('(min-width: 767px)');
+  const isLgScreen = useMediaQuery('isMedium');
   const jsonLd = useMemo<JsonLdType>(
     () => ({
       '@context': 'https://schema.org',
@@ -102,19 +103,8 @@ const ProjectPage = () => {
       />
       {isFetching ? (
         <>
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={120}
-            animation="wave"
-            className="mb-3"
-          />
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={300}
-            animation="wave"
-          />
+          <Skeleton className="w-full h-[120px] mb-3" />
+          <Skeleton className="w-full h-[300px]" />
         </>
       ) : isEditing ? (
         <EditMode

@@ -88,7 +88,7 @@ const DraggableTasks = ({
       {/* 拖曳覆蓋層，當拖動時顯示 */}
       <DragOverlay>
         {activeItem && (
-          <div className="opacity-80 w-full">
+          <div className="w-full opacity-80">
             <Task
               projectId={projectId}
               milestoneId={Number(milestoneId)}

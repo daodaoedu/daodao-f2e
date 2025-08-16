@@ -1,4 +1,4 @@
-import Image from '@/shared/components/Image';
+import { Image } from '@/components/ui/image';
 import PostDetailCard from '@/shared/components/Post/PostDetailCard';
 import { ProjectOutcomeSchema } from '@/services/projects';
 import { BaseUserSchema } from '@/services/users';
@@ -30,7 +30,7 @@ function OutcomeDetail({
       onEditClick={onEditClick}
       onDeleteClick={onDeleteClick}
       renderContent={(outcomeData) => (
-        <div className="mb-4 body-sm text-basic-500">
+        <div className="body-sm mb-4 text-basic-500">
           <MarkdownEditor className="mb-3" readOnly value={outcomeData.content} />
           {Array.isArray(outcomeData.imgUrls) &&
             outcomeData.imgUrls.map((imgUrl) => (
@@ -38,7 +38,8 @@ function OutcomeDetail({
                 key={imgUrl}
                 src={imgUrl}
                 alt={outcomeData.title}
-                height="300px"
+                width={400}
+                height={300}
                 className="object-contain"
               />
             ))}

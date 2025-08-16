@@ -1,9 +1,8 @@
 import { BASE_URL } from '@/constants/common';
 import { useRouter } from 'next/router';
-import moment from 'moment';
-import { Box, Button } from '@mui/material';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { format } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { MapPin, Edit } from 'lucide-react';
 import DropdownMenu from './Dropdown';
 import SocialMediaItem from './SocialMediaItem';
 import AvatorComponent from './Avator';
@@ -53,13 +52,13 @@ function UserCard({
     <StyledProfileWrapper>
       {isLoginUser ? (
         <Button
-          variant="outlined"
-          sx={BottonEdit}
+          variant="outline"
+          className="absolute right-[30px] top-[30px] rounded-[20px] text-sm text-[#536166] shadow-none hover:text-[#16B9B3] max-md:hidden"
           onClick={() => {
             router.push('/personal-card');
           }}
         >
-          <EditOutlinedIcon sx={{ color: '#16B9B3' }} />
+          <Edit color="#16B9B3" />
           編輯
         </Button>
       ) : (
@@ -68,7 +67,7 @@ function UserCard({
 
       <StyledProfileBaseInfo>
         <AvatorComponent photoURL={photoURL} />
-        <Box sx={{ marginLeft: '12px' }}>
+        <div className="ml-3">
           <StyledProfileTitle>
             <div>
               <h2>{userName || '-'}</h2>
@@ -78,14 +77,14 @@ function UserCard({
           </StyledProfileTitle>
 
           <StyledProfileLocation>
-            <LocationOnOutlinedIcon sx={{ marginRight: '10px' }} />
+            <MapPin style={{ marginRight: '10px' }} />
             {location
               ? location.length >= 2
                 ? locations.join('').replace('台灣', '').replaceAll('null', '')
                 : locations.join('')
               : '-'}
           </StyledProfileLocation>
-        </Box>
+        </div>
       </StyledProfileBaseInfo>
 
       {Array.isArray(tagList) && (
@@ -123,21 +122,25 @@ function UserCard({
               text={contactList.facebook}
             />
           )}
-          {!!contactList.line && (
-            <li>
-              <p>{contactList.line}</p>
-            </li>
+          {!!contactList.linkedin && (
+            <SocialMediaItem
+              tag="li"
+              link={`https://www.linkedin.com/in/${contactList.linkedin}`}
+              text={contactList.linkedin}
+            />
           )}
-          {!!contactList.discord && (
-            <li>
-              <p>{contactList.discord}</p>
-            </li>
+          {!!contactList.github && (
+            <SocialMediaItem
+              tag="li"
+              link={`https://github.com/${contactList.github}`}
+              text={contactList.github}
+            />
           )}
         </StyledProfileSocial>
+
         <StyledProfileDate>
-          {updatedDate
-            ? moment(updatedDate).fromNow()
-            : moment(new Date() - 500 * 60 * 60).fromNow()}
+          更新日期：
+          {format(updatedDate, 'yyyy/MM/dd')}
         </StyledProfileDate>
       </StyledProfileOther>
     </StyledProfileWrapper>

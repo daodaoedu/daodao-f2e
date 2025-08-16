@@ -47,7 +47,7 @@ const DrawerContent = React.forwardRef<
       )}
       {...props}
     >
-      <div className="mx-auto mt-4 mb-1 h-2 w-[100px] rounded-full bg-muted" />
+      <div className="mx-auto mb-1 mt-4 h-2 w-[100px] rounded-full bg-muted" />
       <ScrollArea className="max-h-[85vh] overflow-auto">
         <div className="grid gap-4">{children}</div>
       </ScrollArea>
