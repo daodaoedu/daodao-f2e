@@ -1,8 +1,7 @@
-import {
-  Dispatch, SetStateAction, useCallback, useState,
-} from 'react';
+import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 
-const isSetStateActionFn = <T>(value: unknown): value is (prevState: T) => T => typeof value === 'function';
+const isSetStateActionFn = <T>(value: unknown): value is (prevState: T) => T =>
+  typeof value === 'function';
 
 export default function useControlledState<T>(
   initialState: T,

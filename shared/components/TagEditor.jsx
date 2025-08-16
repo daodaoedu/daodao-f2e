@@ -149,9 +149,9 @@ function TagEditor({
           ref={tagOptionsRef}
           className="max-h-32 overflow-y-auto rounded-b-md border border-t-0 border-basic-200 p-2"
         >
-          {filteredTagOptions.map((text, index) => (
+          {filteredTagOptions.map((text) => (
             <Item
-              key={`${text}-${index}`}
+              key={text}
               text={text}
               onClick={handleAddTag}
             />
@@ -169,7 +169,7 @@ function TagEditor({
                 onClick={handleDelete(tag)}
                 className="text-basic-400 hover:text-primary-base"
               >
-                <X className="w-4 h-4" />
+                <X className="size-4" />
               </button>
             </li>
           ))}

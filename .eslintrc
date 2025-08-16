@@ -21,6 +21,7 @@
     "node_modules",
     "out",
     "pages", // 重構到 app route，忽略 pages route
+    "public",
     "services/**/*.ts", // @TODO: services 下的 API 檔案將要移除，重構完成後再調整設定檔
     "!services/fetcher.ts",
     "server.js"
@@ -75,9 +76,10 @@
     ],
     "import/prefer-default-export": "off",
     "max-len": "off",
-    "no-console": "off",
-    "no-nested-ternary": "off", // 待調整，暫時允許巢狀三元運算子
+    "no-console": "warn",
+    "no-nested-ternary": "off",
     "no-underscore-dangle": "off",
+    "object-curly-newline": ["error", { "consistent": true }],
     "operator-linebreak": [
       "error",
       "after",
