@@ -61,6 +61,7 @@
     "embla-carousel-react": "^8.6.0",
     "eslint-config-next": "^15.4.6",
     "feed": "^4.2.2",
+    "gsap": "^3.13.0",
     "html-to-image": "^1.11.13",
     "konva": "^7.0.0",
     "lucide-react": "^0.522.0",
