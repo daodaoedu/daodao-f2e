@@ -24,7 +24,7 @@ const MentorWorkspaceCard = ({ marathon }: { marathon: MarathonSchema }) => {
       className="block bg-basic-white rounded-lg"
     >
       <div className="rounded-lg overflow-hidden">
-        <Image src="/assets/empty-cover.png" alt="馬拉松封面" width={400} height={200} className="object-cover" />
+        <Image src="/assets/images/empty-cover.png" alt="馬拉松封面" width={400} height={200} className="object-cover" />
       </div>
       <div className="pb-2.5 px-2.5">
         <div className="mb-2.5 flex items-center justify-between">

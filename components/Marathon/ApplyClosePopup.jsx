@@ -39,7 +39,7 @@ const ApplyClosePopup = forwardRef((props, ref) => {
 
         <div className="relative h-64 w-full">
           <img
-            src="/assets/marathon-apply-close.png"
+            src="/assets/images/403-error.png"
             alt="Registration closed illustration"
             className="object-contain"
           />

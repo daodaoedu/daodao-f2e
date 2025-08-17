@@ -14,7 +14,7 @@ const HomePage = () => {
       keywords: '島島阿學',
       author: '島島阿學',
       copyright: '島島阿學',
-      imgLink: 'https://www.daoedu.tw/preview.webp',
+      imgLink: 'https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg',
       link: `${process.env.HOSTNAME}${router?.asPath}`,
       jsonLd: {
         '@context': 'https://schema.org',
@@ -33,7 +33,7 @@ const HomePage = () => {
             '@context': 'https://schema.org',
             '@type': 'Organization',
             url: 'https://www.daoedu.tw',
-            logo: 'https://www.daoedu.tw/favicon-112.png',
+            logo: 'https://www.daoedu.tw/assets/brand/favicon-112.png',
           },
         ],
       }

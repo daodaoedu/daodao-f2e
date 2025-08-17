@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/typography';
-import illustrationImg from '@/public/assets/illustration.png';
+import illustrationImg from '@/public/assets/images/review-passed.png';
 
 export default function CompleteInfoReminderDialog({ isOpen, onClose }) {
   const id = useId();

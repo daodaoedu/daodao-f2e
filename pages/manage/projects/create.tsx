@@ -22,7 +22,7 @@ const ProjectPage = () => {
       keywords: '島島阿學',
       author: '島島阿學',
       copyright: '島島阿學',
-      imgLink: 'https://www.daoedu.tw/preview.webp',
+      imgLink: 'https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg',
       link: `${process.env.HOSTNAME}${router?.asPath}`,
     }),
     [router?.asPath]

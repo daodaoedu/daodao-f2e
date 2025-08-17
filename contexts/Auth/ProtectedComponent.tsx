@@ -29,7 +29,7 @@ export const Fallback = ({ title, children }: FallbackProps) => (
         </h2>
         <div className="flex items-center justify-center">
           <Image
-            src="/assets/nobody-land.gif"
+            src="/assets/images/nobody-island.gif"
             alt="nobody-land"
             width={300}
             height={300}

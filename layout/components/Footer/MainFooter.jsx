@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image } from '@/components/ui/image';
-import FacebookIconPng from '@/public/email/fecebook-icon.png';
-import InstagramIconPng from '@/public/email/instagram-icon.png';
+import FacebookIconPng from '@/public/assets/social-icons/facebook-icon.png';
+import InstagramIconPng from '@/public/assets/social-icons/instagram-icon.png';
 import IntroList from './IntroList';
 import IconList from './IconList';
 import { FOOTER_LINK } from '../../../constants/category';
@@ -59,7 +59,7 @@ const SubFooter = () => (
   <div className="flex h-full items-start justify-around bg-[#536166] text-base tracking-[0.08em] text-white max-md:flex max-md:flex-col max-md:items-center max-md:justify-around">
     <div className="mt-[30px] flex justify-around">
       <div className="mx-2.5 cursor-pointer">
-        <img src="/new-logo-vertical.png" alt="daodao" width="120" height="123" />
+        <img src="/assets/brand/vertical-secondary-logo.png" alt="daodao" width="120" height="123" />
       </div>
     </div>
     <div className="mt-[30px] flex justify-around">

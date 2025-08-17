@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, MiddlewareConfig } from 'next/server';
 import { defaultLocale, getLocale, locales } from './constants/i18n';
 
 export function middleware(request: NextRequest) {
@@ -20,9 +20,9 @@ export function middleware(request: NextRequest) {
   return NextResponse.rewrite(redirectURL);
 }
 
-export const config = {
+export const config: MiddlewareConfig = {
   matcher: [
     // Skip paths
-    '/((?!api|_next/static|_next/image|static|feed|manifest.json|sw.js).*)',
+    '/((?!api|_next/static|_next/image|assets|rss|opensearch.xml|sitemap.xml|robots.txt|manifest.json|workbox-*.js|pwabuilder-sw.js|sw.js|google24667896eaae9652.html).*)',
   ],
 };

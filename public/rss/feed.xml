@@ -9,7 +9,7 @@
         <generator>Feed for Node.js</generator>
         <image>
             <title>島島阿學多元學習社群</title>
-            <url>https://www.daoedu.tw/preview.webp</url>
+            <url>https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg</url>
             <link>https://www.daoedu.tw</link>
         </image>
         <copyright>All rights reserved 2023, 島島阿學</copyright>
@@ -8374,7 +8374,7 @@ Instagram:  https://www.instagram.com/gwenasuisse]]></content:encoded>
             <description><![CDATA[分享網頁前端技術]]></description>
             <content:encoded><![CDATA[分享網頁前端技術]]></content:encoded>
             <author>contact@daoedu.tw (島島阿學多元學習社群)</author>
-            <enclosure url="https://blog.yyisyou.tw/img/favicon.png" length="0" type="image/png"/>
+            <enclosure url="https://blog.yyisyou.tw/img/assets/brand/favicon.png" length="0" type="image/png"/>
         </item>
         <item>
             <title><![CDATA[CodeFights的學習資源介紹｜島島阿學]]></title>

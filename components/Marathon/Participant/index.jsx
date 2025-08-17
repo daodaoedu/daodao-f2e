@@ -1,9 +1,9 @@
 import { Title } from '@/components/ui/typography';
 import { Image } from '@/components/ui/image';
-import PersonaImage1 from '@/public/assets/marathon-persona-1.png';
-import PersonaImage2 from '@/public/assets/marathon-persona-2.png';
-import PersonaImage3 from '@/public/assets/marathon-persona-3.png';
-import PersonaImage4 from '@/public/assets/marathon-persona-4.png';
+import PersonaImage1 from '@/public/assets/learning-marathon/marathon-persona-1.png';
+import PersonaImage2 from '@/public/assets/learning-marathon/marathon-persona-2.png';
+import PersonaImage3 from '@/public/assets/learning-marathon/marathon-persona-3.png';
+import PersonaImage4 from '@/public/assets/learning-marathon/marathon-persona-4.png';
 
 export default function Participant() {
   return (

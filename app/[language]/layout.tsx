@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { I18nParams, locales } from '@/constants/i18n';
 import { createMetadata } from '@/utils/metadata';
 import Providers from './Providers';
+import '@/shared/styles/global.css';
 
 export async function generateStaticParams() {
   return locales.map((language) => ({ language }));

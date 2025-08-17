@@ -17,7 +17,7 @@ export default function NotExist() {
         </Title>
         <div className="flex flex-col items-center justify-center">
           <img
-            src="/assets/nobody-land.gif"
+            src="/assets/images/nobody-island.gif"
             alt="nobody-land"
             width="300"
             height="300"

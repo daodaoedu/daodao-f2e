@@ -1,7 +1,7 @@
 export const websiteConfig = {
   title: '島島阿學',
   defaultFullTitle: '多元學習資源平台｜島島阿學',
-  avatarUrl: '/favicon.png',
+  avatarUrl: '/assets/brand/favicon.png',
   authorName: '島島阿學',
   authorEmail: 'daodaoedunetwork@gmail.com',
   authorUrl: 'https://github.com/daodaoedu',

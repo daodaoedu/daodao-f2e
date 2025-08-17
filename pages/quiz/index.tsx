@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import SEOConfig from "@/components/SEOConfig";
-import HorizontalLogoSvg from "@/public/horizontal-logo.svg";
+import HorizontalLogoSvg from "@/public/assets/brand/horizontal-primary-logo.svg";
 import question1Jpg from "@/public/assets/quiz/q1.webp";
 import ResultNoisePng from "@/public/assets/quiz/result-noise.png";
 import { Button } from "@/components/ui/button";

@@ -55,9 +55,9 @@ export async function createMetadata(
       languages: languageAlternates,
     },
     icons: {
-      icon: '/favicon.png',
-      shortcut: '/favicon.png',
-      apple: '/favicon.png',
+      icon: '/assets/brand/favicon.png',
+      shortcut: '/assets/brand/favicon.png',
+      apple: '/assets/brand/favicon.png',
     },
     openGraph: {
       type: 'website',
@@ -70,7 +70,7 @@ export async function createMetadata(
       url: websiteConfig.domainUrl,
       images: [
         {
-          url: '/horizontal-logo.svg',
+          url: '/assets/brand/horizontal-primary-logo.svg',
           width: 1200,
           height: 630,
           alt: '島島阿學 - 自主學習資源平台',
@@ -90,7 +90,7 @@ export async function createMetadata(
         default: title,
       },
       description,
-      images: ['/horizontal-logo.svg'],
+      images: ['/assets/brand/horizontal-primary-logo.svg'],
     },
     robots: {
       index: true,

@@ -5,7 +5,7 @@ import { ChevronLeft, Circle } from 'lucide-react';
 import Select from '@/components/Projects/Form/Select';
 import SEOConfig from '@/components/SEOConfig';
 import GoBackButton from '@/components/Projects/GoBackButton';
-import emptyCoverImg from '@/public/assets/empty-cover.png';
+import emptyCoverImg from '@/public/assets/images/empty-cover.png';
 import { useMyProjects } from '@/services/projects';
 import More from '@/components/Projects/More';
 import { cn } from '@/utils/cn';
@@ -40,7 +40,7 @@ const Projects = () => {
       keywords: '島島阿學',
       author: '島島阿學',
       copyright: '島島阿學',
-      imgLink: 'https://www.daoedu.tw/preview.webp',
+      imgLink: 'https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg',
       link: `${process.env.HOSTNAME}/manage/projects`,
     }),
     []

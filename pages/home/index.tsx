@@ -398,7 +398,7 @@ function HomePage() {
         keywords="島島阿學,學習,教育,社群,資源"
         author="島島阿學"
         copyright="島島阿學"
-        imgLink="https://www.daoedu.tw/preview.webp"
+        imgLink="https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg"
       />
 
       <LandingPage onLogin={openLoginModal} />

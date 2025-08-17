@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { forwardRef } from 'react';
 import Link from 'next/link';
-import newLogo from '@/public/new-logo.png';
+import newLogo from '@/public/assets/brand/horizontal-secondary-logo.png';
 import { usePromotion } from '@/contexts/Promotion';
 import { cn } from '@/utils/cn';
 import { Image } from '@/components/ui/image';
