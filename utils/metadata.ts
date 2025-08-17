@@ -8,11 +8,28 @@ import {
 import { websiteConfig } from '@/constants/websiteConfig';
 
 export async function createMetadata(
-  locale: Locale = defaultLocale
+  locale: Locale = defaultLocale,
+  pathname: string = '/'
 ): Promise<Metadata> {
   const {
     common: { title, description },
   } = await getDictionary(locale);
+
+  const withoutLocalePathname = pathname.replace(`/${locale}`, '');
+
+  const canonicalPath =
+    withoutLocalePathname === '/'
+      ? `/${locale}`
+      : `/${locale}${withoutLocalePathname}`;
+
+  const languageAlternates = Object.fromEntries(
+    locales.map((_locate) => [
+      _locate,
+      withoutLocalePathname === '/'
+        ? `/${_locate}`
+        : `/${_locate}${withoutLocalePathname}`,
+    ])
+  );
 
   return {
     title: {
@@ -34,10 +51,8 @@ export async function createMetadata(
     creator: websiteConfig.authorName,
     publisher: websiteConfig.authorName,
     alternates: {
-      canonical: '/',
-      languages: Object.fromEntries(
-        locales.map((loc) => [loc, `/${loc}`])
-      ),
+      canonical: canonicalPath,
+      languages: languageAlternates,
     },
     icons: {
       icon: '/favicon.png',
@@ -62,7 +77,7 @@ export async function createMetadata(
         },
       ],
       locale: locale === 'zh' ? 'zh_TW' : 'en_US',
-      alternateLocale: locales.filter(loc => loc !== locale),
+      alternateLocale: locales.filter((loc) => loc !== locale),
       ttl: 345600,
     },
     facebook: {
@@ -70,8 +85,6 @@ export async function createMetadata(
     },
     twitter: {
       card: 'summary_large_image',
-      site: '@島島阿學',
-      creator: '@島島阿學',
       title: {
         template: `%s | ${title}`,
         default: title,
