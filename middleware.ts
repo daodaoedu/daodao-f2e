@@ -23,6 +23,6 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Skip paths
-    '/((?!api|_next/static|_next/image|static|feed|favicon|sw.js).*)',
+    '/((?!api|_next/static|_next/image|static|feed|manifest.json|sw.js).*)',
   ],
 };

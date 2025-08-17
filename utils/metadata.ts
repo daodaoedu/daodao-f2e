@@ -104,6 +104,6 @@ export async function createMetadata(
       },
     },
     category: 'education',
-    // manifest: '/manifest.json',
+    manifest: '/manifest.json',
   };
 }
