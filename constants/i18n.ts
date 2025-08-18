@@ -1,13 +1,13 @@
-export const defaultLocale = 'zh';
+export const defaultLocale = 'zh-TW';
 export const locales = [defaultLocale, 'en'] as const;
 export type Locale = (typeof locales)[number];
-export type Dictionary = typeof import('./locales/zh.json');
+export type Dictionary = typeof import('./locales/zh-TW.json');
 export type I18nParams<OtherParams = Record<string, never>> = {
   params: Promise<{ language: Locale } & OtherParams>;
 };
 
 const dictionaries: Record<Locale, () => Promise<Dictionary>> = {
-  zh: () => import('./locales/zh.json'),
+  'zh-TW': () => import('./locales/zh-TW.json'),
   en: () => import('./locales/en.json'),
 };
 
