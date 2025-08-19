@@ -2,13 +2,13 @@ import React from 'react';
 import { Title, Text } from '@/components/ui/typography';
 import { Button } from '@/components/ui/button';
 import { Facebook } from 'lucide-react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const Group = () => {
   const router = useRouter();
 
   return (
-    <div className="mx-auto w-[90%] pb-10 pt-10 max-md:pb-5 max-md:pt-10">
+    <div className="mx-auto w-[90%] py-10 max-md:pb-5 max-md:pt-10">
       <Title
         as="h2"
         size="lg"
