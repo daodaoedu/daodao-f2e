@@ -17,11 +17,6 @@ export async function createMetadata(
 
   const withoutLocalePathname = pathname.replace(`/${locale}`, '');
 
-  const canonicalPath =
-    withoutLocalePathname === '/'
-      ? `/${locale}`
-      : `/${locale}${withoutLocalePathname}`;
-
   const languageAlternates = Object.fromEntries(
     locales.map((_locate) => [
       _locate,
@@ -51,8 +46,16 @@ export async function createMetadata(
     creator: websiteConfig.authorName,
     publisher: websiteConfig.authorName,
     alternates: {
-      canonical: canonicalPath,
+      canonical: withoutLocalePathname,
       languages: languageAlternates,
+      types: {
+        'application/rss+xml': [
+          {
+            title: '島島阿學多元學習資源',
+            url: 'https://www.daoedu.tw/rss/feed.xml',
+          },
+        ],
+      },
     },
     icons: {
       icon: '/assets/brand/favicon.png',
@@ -76,7 +79,7 @@ export async function createMetadata(
           alt: '島島阿學 - 自主學習資源平台',
         },
       ],
-      locale: locale === 'zh' ? 'zh_TW' : 'en_US',
+      locale,
       alternateLocale: locales.filter((loc) => loc !== locale),
       ttl: 345600,
     },
