@@ -12,6 +12,9 @@
   * {
     @apply border-border;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
   }
@@ -28,7 +31,6 @@
     z-index: 50;
   }
   :root {
-    scroll-behavior: smooth;
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;

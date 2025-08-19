@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 import { toast } from 'sonner';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { mutate, SWRConfig } from 'swr';
 
 import { HttpError } from '@/utils/http';

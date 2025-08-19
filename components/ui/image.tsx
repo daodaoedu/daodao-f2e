@@ -1,30 +1,29 @@
+'use client';
+
 import NextImage, { ImageProps as NextImageProps } from 'next/image';
-import { useState } from 'react';
-import { cn } from '@/utils/cn';
 import emptyCoverPng from '@/public/assets/images/empty-cover.png';
 
-export type ImageProps = NextImageProps;
+export interface ImageProps extends NextImageProps {
+  fallbackSrc?: string;
+}
 
-export function Image({ src, alt, className, onError, ...props }: ImageProps) {
-  const [isError, setIsError] = useState(false);
-  const handleError = (
-    event: React.SyntheticEvent<HTMLImageElement, Event>
-  ) => {
-    const target = event.currentTarget as HTMLImageElement;
-    target.src = emptyCoverPng.src;
-    setIsError(true);
-    onError?.(event);
-  };
+export function Image({
+  src,
+  alt,
+  onError,
+  fallbackSrc = emptyCoverPng.src,
+  ...props
+}: ImageProps) {
   return (
     <NextImage
       src={src}
       alt={alt}
-      className={cn(
-        className,
-        isError && 'p-4 object-contain bg-primary-palest'
-      )}
+      onError={(event) => {
+        const target = event.currentTarget;
+        target.src = fallbackSrc;
+        onError?.(event);
+      }}
       {...props}
-      onError={handleError}
     />
   );
 }

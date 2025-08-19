@@ -3,7 +3,7 @@
 import NotExist from '@/shared/components/NotExist';
 import { defaultLocale, getLocale, Locale } from '@/constants/i18n';
 import { useParams } from 'next/navigation';
-import '@/shared/styles/global.css';
+import './global.css';
 
 function GlobalErrorPage() {
   const params = useParams<{ language: Locale }>();
