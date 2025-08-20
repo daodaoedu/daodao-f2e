@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 import { ProtectedComponent } from '@/contexts/Auth';
@@ -15,7 +15,7 @@ import { useCreateProject } from '@/features/projects';
 
 const ProjectPage = () => {
   const router = useRouter();
-
+  const pathname = usePathname();
   const SEOData = useMemo(
     () => ({
       title: '新增計畫｜多元學習資源平台｜島島阿學',
@@ -23,9 +23,9 @@ const ProjectPage = () => {
       author: '島島阿學',
       copyright: '島島阿學',
       imgLink: 'https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg',
-      link: `${process.env.HOSTNAME}${router?.asPath}`,
+      link: `${process.env.HOSTNAME}${pathname}`,
     }),
-    [router?.asPath]
+    [pathname]
   );
   const [formData, setFormData] = useState<Partial<Project>>(DEFAULT_PROJECT);
   const { createMutation } = useProjectMutation({

@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import OutcomeDetail from "@/features/projects/components/OutcomeDetail";
 import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
@@ -16,9 +16,9 @@ enum ModalTypeEnum {
 
 const OutcomeDetailPage = () => {
   const router = useRouter();
-  const { query } = router;
-  const projectId = parseToString(query.id);
-  const outcomeId = parseToNumber(query.outcomeId);
+  const searchParams = useSearchParams();
+  const projectId = parseToString(searchParams?.get('id'));
+  const outcomeId = parseToNumber(searchParams?.get('outcomeId'));
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const { data: project } = useProject(projectId);
   const { data: outcome } = useProjectOutcome({

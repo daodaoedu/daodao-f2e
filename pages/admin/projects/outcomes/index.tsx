@@ -1,12 +1,12 @@
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import { ContentCard } from "@/features/projects";
 import { getAdminProjectLayout } from "@/layout/features/getProjectLayout";
 import { useProjectOutcomes } from "@/features/projects/hooks/outcome";
 import { parseToString } from "@/utils/helper";
 
 const OutcomesPage = () => {
-  const { query } = useRouter();
-  const projectId = parseToString(query.id);
+  const searchParams = useSearchParams();
+  const projectId = parseToString(searchParams?.get('id'));
 
   const { data: outcomes } = useProjectOutcomes(projectId);
 

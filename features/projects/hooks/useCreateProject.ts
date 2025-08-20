@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import { useCallback, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 import { useMyProjects } from '@/services/projects';
 import useMarathonAccess from './useMarathonAccess';
 
@@ -12,6 +12,7 @@ const PROJECTS_PATH = '/manage/projects';
 
 export default function useCreateProject() {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: projects, isLoading } = useMyProjects();
   const hasMarathonAccess = useMarathonAccess();
   const isAddedDenied = Array.isArray(projects) && projects.length >= MAX_PROJECTS;
@@ -38,7 +39,7 @@ export default function useCreateProject() {
   }, [canCreateProject, router]);
 
   useEffect(() => {
-    if (!canCreateProject && router.pathname === CREATE_PROJECT_PATH) {
+    if (!canCreateProject && pathname === CREATE_PROJECT_PATH) {
       router.replace(PROJECTS_PATH);
     }
   }, [canCreateProject, router]);

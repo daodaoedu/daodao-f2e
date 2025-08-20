@@ -1,11 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import Header from '@/layout/components/Header';
 import Footer from '@/layout/components/Footer';
-import {
-  PromotionBar,
-  PromotionProvider,
-  usePromotion,
-} from '@/contexts/Promotion';
+import { PromotionProvider, usePromotion } from '@/contexts/Promotion';
 
 function BaseLayout({ children }: React.PropsWithChildren) {
   const headerRef = useRef<HTMLDivElement>(null);
@@ -42,9 +38,7 @@ function BaseLayout({ children }: React.PropsWithChildren) {
 
   return (
     <>
-      <Header ref={headerRef}>
-        <PromotionBar />
-      </Header>
+      <Header />
       <main className="bg-white">{children}</main>
       <Footer />
     </>

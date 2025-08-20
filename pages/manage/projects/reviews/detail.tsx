@@ -1,6 +1,6 @@
 import { toast } from "react-hot-toast";
 import { useMemo, useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
 import SEOConfig from "@/components/SEOConfig";
 import ReviewDetail from "@/features/projects/components/ReviewDetail";
@@ -16,9 +16,9 @@ enum ModalTypeEnum {
 
 const ReviewPage = () => {
   const router = useRouter();
-  const { query } = router;
-  const projectId = parseToString(query.id);
-  const reviewId = parseToNumber(query.reviewId);
+  const searchParams = useSearchParams();
+  const projectId = parseToString(searchParams?.get('id'));
+  const reviewId = parseToNumber(searchParams?.get('reviewId'));
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const { data: project } = useProject(projectId);
 

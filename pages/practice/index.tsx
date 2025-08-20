@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Plus, AlertCircle } from 'lucide-react';
 
 // 使用新的 hooks

@@ -1,5 +1,5 @@
 import type { UserSchema } from '@/services/users';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { Background, Container, Paper } from '@/components/ui/wrapper';
 import { Image } from '@/components/ui/image';

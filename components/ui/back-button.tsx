@@ -1,11 +1,11 @@
-import { NextRouter, useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { Button, ButtonProps } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
 
 interface BackButtonProps extends Omit<ButtonProps, 'children' | 'onClick'> {
   label?: string;
-  onClick?: (router: NextRouter) => void;
+  onClick?: (router: ReturnType<typeof useRouter>) => void;
 }
 
 export const BackButton = ({
@@ -15,7 +15,7 @@ export const BackButton = ({
   ...props
 }: BackButtonProps) => {
   const router = useRouter();
-  const handleBack = typeof onClick === 'function' ? onClick : (r: NextRouter) => r.back();
+  const handleBack = typeof onClick === 'function' ? onClick : (r: ReturnType<typeof useRouter>) => r.back();
 
   return (
     <Button

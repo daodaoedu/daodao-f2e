@@ -2,7 +2,7 @@ import Link from 'next/link';
 import React from 'react';
 import Nav from '@/components/Marathon/Nav';
 
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   AnnouncementDetail,
   AnnouncementList,
@@ -13,7 +13,8 @@ import NotExist from "@/shared/components/NotExist";
 
 const Announcement = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const searchParams = useSearchParams();
+  const id = searchParams?.get('id');
   const target = announcementItems.find((item) => item.id === id);
   if (target === undefined) return <NotExist />;
 

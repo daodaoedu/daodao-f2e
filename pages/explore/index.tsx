@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Plus, Lightbulb, Target, BookOpen, ChevronDown, MoreVertical, Shell, MessageCircle, Share2, Link as LinkIcon, Bookmark, Flag, User, Flame } from 'lucide-react';
 import SEOConfig from '@/components/SEOConfig';
 import getPrivateLayout from '@/layout/core/getPrivateLayout';

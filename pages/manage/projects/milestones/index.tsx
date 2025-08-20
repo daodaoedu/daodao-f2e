@@ -1,6 +1,6 @@
 import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import { useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 import SEOConfig, { JsonLdType } from '@/components/SEOConfig';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlignLeft } from 'lucide-react';
@@ -290,7 +290,7 @@ const MilestonesContent = () => {
 };
 
 const MilestonesPage = () => {
-  const router = useRouter();
+  const pathname = usePathname();
   const jsonLd = useMemo<JsonLdType>(
     () => ({
       '@context': 'https://schema.org',
@@ -313,7 +313,7 @@ const MilestonesPage = () => {
         },
       ],
     }),
-    [router?.asPath]
+    [pathname]
   );
 
   return (

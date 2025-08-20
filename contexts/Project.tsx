@@ -1,7 +1,7 @@
 import React, {
   createContext, useContext, useEffect, useState,
 } from 'react';
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { BASE_URL } from '@/constants/common';
 import { getTokenStorage } from '@/utils/storage';
@@ -23,7 +23,7 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
   const [project, setProject] = useState(DEFAULT_PROJECT);
   const [isFetching, setIsFetching] = useState(false);
   const [isUpdating, setIsUpdateing] = useState(false);
-  const { query } = useRouter();
+  const searchParams = useSearchParams();
 
   const fetchProject = async (projectId: string) => {
     setIsFetching(true);
@@ -85,9 +85,9 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
   };
 
   useEffect(() => {
-    const projectId = parseToString(query.id);
+    const projectId = parseToString(searchParams?.get('id'));
     if (projectId) fetchProject(projectId);
-  }, [query.id]);
+  }, [searchParams]);
 
   return (
     <ProjectContext.Provider

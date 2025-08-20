@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import SEOConfig from "@/components/SEOConfig";
 import { ProtectedComponent } from "@/contexts/Auth";
@@ -7,8 +7,9 @@ import { parseToNumber, parseToString } from "@/utils/helper";
 
 export default function EditResourceReviewPage() {
   const router = useRouter();
-  const resourceId = parseToString(router.query.resourceId);
-  const reviewId = parseToNumber(router.query.reviewId);
+  const searchParams = useSearchParams();
+  const resourceId = parseToString(searchParams?.get('resourceId'));
+  const reviewId = parseToNumber(searchParams?.get('reviewId'));
 
   return (
     <ProtectedComponent>

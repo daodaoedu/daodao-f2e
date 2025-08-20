@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { sendLoginEvent, useAuthDispatch } from '@/contexts/Auth';
 import { getRedirectionStorage } from '@/utils/storage';
 import { Image } from '@/components/ui/image';
@@ -8,9 +8,9 @@ import { parseToString } from '@/utils/helper';
 export default function AuthCallbackPage() {
   const { setToken } = useAuthDispatch();
   const router = useRouter();
-  const { query } = router;
-  const token = parseToString(query.token);
-  const isVerified = parseToString(query.isVerified);
+  const searchParams = useSearchParams();
+  const token = parseToString(searchParams?.get('token'));
+  const isVerified = parseToString(searchParams?.get('isVerified'));
 
   useEffect(() => {
     if (!token) return;

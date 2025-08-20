@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import SEOConfig from "@/components/SEOConfig";
 import { Background, Container } from "@/components/ui/wrapper";
 import { ProtectedComponent } from "@/contexts/Auth";

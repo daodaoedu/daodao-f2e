@@ -1,7 +1,7 @@
 // 編輯實踐頁面
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { usePracticeDetail, usePracticeManager } from '@/features/practice/hooks';
 import EditForm from '@/features/practice/components/Edit/EditForm';
@@ -11,7 +11,9 @@ import { toast } from 'sonner';
 
 const EditPracticePage: React.FC = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const id = searchParams?.get('id');
 
   // 使用自製 hooks 取代 context
   const { practice, loading, error } = usePracticeDetail(id as string);
@@ -42,8 +44,8 @@ const EditPracticePage: React.FC = () => {
 
   // 處理錯點導航
   useEffect(() => {
-    if (router.asPath.includes('#') && practice) {
-      const hash = router.asPath.split('#')[1];
+    if (pathname?.includes('#') && practice) {
+      const hash = pathname.split('#')[1];
       setTimeout(() => {
         const element = document.getElementById(hash);
         if (element) {
@@ -51,7 +53,7 @@ const EditPracticePage: React.FC = () => {
         }
       }, 100); // 稍微延遲以確保元素已渲染
     }
-  }, [router.asPath, practice]);
+  }, [pathname, practice]);
 
   if (loading) {
     return (

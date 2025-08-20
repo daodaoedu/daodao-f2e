@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import OutcomeDetail from "@/features/projects/components/OutcomeDetail";
 import { getPublicProjectLayout } from "@/layout/features/getProjectLayout";
 import { useProject } from "@/services/projects";
@@ -6,9 +6,9 @@ import { useProjectOutcome } from "@/features/projects/hooks/outcome";
 import { parseToNumber, parseToString } from "@/utils/helper";
 
 const OutcomeDetailPage = () => {
-  const { query } = useRouter();
-  const projectId = parseToString(query.id);
-  const outcomeId = parseToNumber(query.outcomeId);
+  const searchParams = useSearchParams();
+  const projectId = parseToString(searchParams?.get('id'));
+  const outcomeId = parseToNumber(searchParams?.get('outcomeId'));
   const { data: project } = useProject(projectId);
   const { data: outcome } = useProjectOutcome({
     projectId,

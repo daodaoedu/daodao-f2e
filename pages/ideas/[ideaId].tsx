@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, FileText, Eye, Share2 } from 'lucide-react';
 import { parseToString } from '@/utils/helper';
@@ -14,8 +14,8 @@ import { Button } from '@/components/ui/button';
 
 const IdeaDetailPage = () => {
   const router = useRouter();
-  const { query } = router;
-  const ideaId = parseToString(query.ideaId);
+  const searchParams = useSearchParams();
+  const ideaId = parseToString(searchParams?.get('ideaId'));
 
   const { idea, isLoading, isError } = useIdea(ideaId || '');
 

@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { 
@@ -528,7 +528,7 @@ const Main = ({ date }: { date: Date }) => {
 
 const Manage = () => {
   const [date, setDate] = useState<Date>(startOfDay(new Date()));
-  const { pathname } = useRouter();
+  const pathname = usePathname();
 
   const SEOData = useMemo(
     () => ({

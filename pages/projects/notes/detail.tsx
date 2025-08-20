@@ -1,14 +1,13 @@
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import { NoteDetail } from "@/features/projects";
 import { getPublicProjectLayout } from "@/layout/features/getProjectLayout";
 import { useProjectNote } from "@/services/projects";
 import { parseToNumber, parseToString } from "@/utils/helper";
 
 const NoteDetailPage = () => {
-  const router = useRouter();
-  const q = router.query;
-  const projectId = parseToString(q.id);
-  const noteId = parseToNumber(q.noteId);
+  const searchParams = useSearchParams();
+  const projectId = parseToString(searchParams?.get('id'));
+  const noteId = parseToNumber(searchParams?.get('noteId'));
 
   const { data: note } = useProjectNote({
     projectId,

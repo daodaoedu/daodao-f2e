@@ -1,7 +1,7 @@
 // 單一實踐詳情頁面
 import React from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { usePracticeDetail } from '@/features/practice/hooks';
 import DashboardFlow from '@/features/practice/components/Dashboard/DashboardFlow';
 import { useScrollToTopOnMount } from '@/features/practice/hooks/useScrollToTop';
@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button';
 
 const PracticeDetailPage: React.FC = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const searchParams = useSearchParams();
+  const id = searchParams?.get('id');
 
   // 在頁面載入時滾動到頂部
   useScrollToTopOnMount();

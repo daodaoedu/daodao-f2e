@@ -1,13 +1,14 @@
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from 'next/navigation';
 
-import SEOConfig from "@/components/SEOConfig";
-import { ProtectedComponent } from "@/contexts/Auth";
-import { ResourceReviewForm } from "@/features/resources";
-import { parseToString } from "@/utils/helper";
+import SEOConfig from '@/components/SEOConfig';
+import { ProtectedComponent } from '@/contexts/Auth';
+import { ResourceReviewForm } from '@/features/resources';
+import { parseToString } from '@/utils/helper';
 
 export default function EditResourceReviewPage() {
   const router = useRouter();
-  const resourceId = parseToString(router.query.resourceId);
+  const searchParams = useSearchParams();
+  const resourceId = parseToString(searchParams?.get('resourceId'));
 
   return (
     <ProtectedComponent>

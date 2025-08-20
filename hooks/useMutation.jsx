@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { BASE_URL } from '@/constants/common';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 

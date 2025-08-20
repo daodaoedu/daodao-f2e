@@ -1,6 +1,6 @@
 
 import { getPublicProjectLayout } from '@/layout/features/getProjectLayout';
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProjectMilestones } from '@/features/projects/hooks/milestone';
 import EmptyList from '@/components/Projects/ProjectList/EmptyList';
@@ -9,8 +9,8 @@ import { MilestonesProvider } from '@/contexts/Milestones';
 import { parseToString } from '@/utils/helper';
 
 const ProjectMilestonesPage = () => {
-  const { query } = useRouter();
-  const projectId = parseToString(query.id);
+  const searchParams = useSearchParams();
+  const projectId = parseToString(searchParams?.get('id'));
   const { data: milestones, isLoading } = useProjectMilestones(projectId);
 
   return (

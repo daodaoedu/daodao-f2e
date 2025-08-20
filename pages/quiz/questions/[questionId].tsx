@@ -1,5 +1,5 @@
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { ChevronRightIcon, ChevronLeftIcon } from "lucide-react";
 import SEOConfig from "@/components/SEOConfig";
 import { Button } from "@/components/ui/button";

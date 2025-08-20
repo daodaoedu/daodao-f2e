@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { toJpeg } from "html-to-image";
 import SEOConfig from "@/components/SEOConfig";
 import { Button } from "@/components/ui/button";

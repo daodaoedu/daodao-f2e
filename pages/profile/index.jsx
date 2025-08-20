@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { ProtectedComponent } from '@/contexts/Auth';
 import SEOConfig from '@/components/SEOConfig';
 import AccountSetting from '@/components/Profile/Accountsetting';

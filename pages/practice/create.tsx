@@ -1,7 +1,7 @@
 // 建立新實踐頁面
 import React from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import SetupFlow from '@/features/practice/components/Setup/SetupFlow';
 
 const CreatePracticePage: React.FC = () => {

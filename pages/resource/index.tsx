@@ -1,5 +1,5 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronRightIcon } from "lucide-react";
 import SEOConfig, { JsonLdType } from "@/components/SEOConfig";

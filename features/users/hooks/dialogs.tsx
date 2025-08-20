@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useDialog } from '@/contexts/Dialog';
 import { useCallback } from 'react';
 import { Image } from '@/components/ui/image';

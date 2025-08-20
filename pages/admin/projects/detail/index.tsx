@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { getAdminProjectLayout } from '@/layout/features/getProjectLayout';
 import { Project as ProjectType } from '@/components/Projects/Project/type';
 import { BASE_URL } from '@/constants/common';
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -20,8 +20,8 @@ import { parseToString } from '@/utils/helper';
 const ProjectDetailPage = () => {
   const [isFetchingProject, setIsFetchingProject] = useState(false);
   const [project, setProject] = useState<ProjectType>();
-  const { query } = useRouter();
-  const projectId = parseToString(query.id);
+  const searchParams = useSearchParams();
+  const projectId = parseToString(searchParams?.get('id'));
 
   useEffect(() => {
     const fetchProject = async () => {

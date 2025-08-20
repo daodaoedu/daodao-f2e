@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
 import { useAuth } from '@/contexts/Auth';

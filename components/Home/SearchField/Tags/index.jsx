@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { HOT_TAGS } from '@/constants/category';
 
 const SearchField = () => {

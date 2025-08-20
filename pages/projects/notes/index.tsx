@@ -1,12 +1,12 @@
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
 import { ContentCard } from '@/features/projects';
 import { getPublicProjectLayout } from '@/layout/features/getProjectLayout';
 import { useProjectNotes } from '@/services/projects';
 import { parseToString } from '@/utils/helper';
 
 const NotesPage = () => {
-  const { query } = useRouter();
-  const projectId = parseToString(query.id);
+  const searchParams = useSearchParams();
+  const projectId = parseToString(searchParams?.get('id'));
 
   const { data: notes } = useProjectNotes(projectId);
 

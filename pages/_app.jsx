@@ -5,7 +5,7 @@ import { SWRConfig } from 'swr';
 
 import { Toaster } from 'react-hot-toast';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import Script from 'next/script';
 import Head from 'next/head';
 import { AuthProvider, useAuth } from '@/contexts/Auth';

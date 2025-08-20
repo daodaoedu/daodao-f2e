@@ -2,7 +2,7 @@ import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useReducer } from "react";
 import { toast } from "sonner";
 import { SWRConfig } from "swr";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MapPin, SearchIcon } from "lucide-react";
 import groupBannerPng from "@/public/assets/circles/banner.png";

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { ProtectedComponent } from '@/contexts/Auth';
 import { ChevronLeft, Circle } from 'lucide-react';
 import Select from '@/components/Projects/Form/Select';

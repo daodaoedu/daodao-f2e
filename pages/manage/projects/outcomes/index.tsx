@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import SEOConfig from "@/components/SEOConfig";
 import {
   ContentCard,
@@ -24,8 +24,8 @@ enum ModalTypeEnum {
 }
 
 const OutcomesPage = () => {
-  const { query } = useRouter();
-  const projectId = parseToString(query.id);
+  const searchParams = useSearchParams();
+  const projectId = parseToString(searchParams?.get('id'));
   const [modalType, setModalType] = useState<ModalTypeEnum | null>(null);
   const [outcomeId, setOutcomeId] = useState<number | null>(null);
   const { data: project } = useProject(projectId);
