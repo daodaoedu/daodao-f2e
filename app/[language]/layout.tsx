@@ -1,9 +1,12 @@
 import Script from 'next/script';
 import { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import { I18nParams, locales } from '@/constants/i18n';
 import { createMetadata } from '@/utils/metadata';
 import Providers from './Providers';
 import '../global.css';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export async function generateStaticParams() {
   return locales.map((language) => ({ language }));
@@ -29,7 +32,11 @@ export default async function RootLayout({
   const { language } = await params;
 
   return (
-    <html lang={language} className="scroll-smooth" suppressHydrationWarning>
+    <html
+      lang={language}
+      className={`${inter.className} scroll-smooth`}
+      suppressHydrationWarning
+    >
       <body>
         <Providers>{children}</Providers>
       </body>
