@@ -12,8 +12,8 @@ const TermsMenu = () => {
       <ul>
         <li>
           <Link
-            href="/terms/privacypolicy"
-            className={currentPath === '/terms/privacypolicy' ? 'current' : ''}
+            href="/terms/privacy-policy"
+            className={currentPath === '/terms/privacy-policy' ? 'current' : ''}
           >
             隱私權政策
           </Link>

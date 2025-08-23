@@ -14,7 +14,7 @@ const aboutDaoConfig = [
   },
   {
     name: '隱私權政策',
-    link: '/terms/privacypolicy',
+    link: '/terms/privacy-policy',
     target: '_self',
   },
   {

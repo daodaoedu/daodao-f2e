@@ -8,4 +8,5 @@ export const websiteConfig = {
   domainUrl: 'https://daoedu.tw',
   copyright: `2021 - PRESENT © 島島阿學`,
   keywords: ['島島阿學', '自主學習', '學習資源', '教育平台', '共學'],
+  themeColor: '#16b9b3',
 };
