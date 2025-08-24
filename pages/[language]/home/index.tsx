@@ -10,7 +10,7 @@ import { Grid } from '@/components/ui/grid';
 import { Title, Text } from '@/components/ui/typography';
 
 // Import explore page content
-import ExplorePage from '@/pages/explore';
+import ExplorePage from '@/pages/[language]/explore';
 
 // ========================================
 // Internal Components - Landing Page Components

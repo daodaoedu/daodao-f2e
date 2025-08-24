@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import SEOConfig from '@/components/SEOConfig';
 import { usePromotion } from '@/contexts/Promotion';
 import { ArrowUpRight, ChevronUp } from 'lucide-react';

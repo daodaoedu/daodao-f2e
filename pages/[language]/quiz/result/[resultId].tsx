@@ -23,9 +23,14 @@ import { SquareArrowOutUpRightIcon } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 export const getStaticPaths = async () => {
-  const paths = ["a", "c", "d", "l", "o"].map((resultId) => ({
-    params: { resultId },
-  }));
+  const languages = ['zh-TW', 'en'];
+  const resultIds = ['a', 'c', 'd', 'l', 'o'];
+
+  const paths = languages.flatMap((language) =>
+    resultIds.map((resultId) => ({
+      params: { language, resultId },
+    }))
+  );
 
   return {
     paths,

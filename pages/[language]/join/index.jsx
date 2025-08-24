@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 
 import { Title, Text } from '@/components/ui/typography';
 import { Separator } from '@/components/ui/separator';

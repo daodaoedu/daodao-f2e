@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { SWRConfig } from 'swr';
 
 
 import { Toaster } from 'react-hot-toast';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';
 import { AuthProvider, useAuth } from '@/contexts/Auth';

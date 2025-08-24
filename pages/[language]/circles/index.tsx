@@ -389,40 +389,43 @@ function CircleList() {
   );
 }
 
-export const runtime = "experimental-edge";
+// export const runtime = "experimental-edge";
 
-export const getServerSideProps = (async () => {
-  try {
-    const query = { page: 1, pageSize: 6 };
-    const circleList = await circleAPI.readList(query);
+// export const getServerSideProps = (async () => {
+//   try {
+//     const query = { page: 1, pageSize: 6 };
+//     const circleList = await circleAPI.readList(query);
 
-    const jsonLd = JsonLdFactory.createGraph([
-      JsonLdFactory.createItemListBuilder()
-        .setName("揪團學習列表")
-        .setItems(circleList.data.map(createCircleJsonLd)),
-    ]);
+//     const jsonLd = JsonLdFactory.createGraph([
+//       JsonLdFactory.createItemListBuilder()
+//         .setName("揪團學習列表")
+//         .setItems(circleList.data.map(createCircleJsonLd)),
+//     ]);
 
-    return {
-      props: {
-        fallback: {
-          [getSerializeCircleInfiniteKey(query)]: [circleList],
-        },
-        jsonLd,
-      },
-    };
-  } catch (error) {
-    console.log(error);
-    return { props: {} };
-  }
-}) satisfies GetServerSideProps<{
-  fallback?: Record<string, CircleListResponseSchema[]>;
-  jsonLd?: JsonLdType;
-}>;
+//     return {
+//       props: {
+//         fallback: {
+//           [getSerializeCircleInfiniteKey(query)]: [circleList],
+//         },
+//         jsonLd,
+//       },
+//     };
+//   } catch (error) {
+//     console.log(error);
+//     return { props: {} };
+//   }
+// }) satisfies GetServerSideProps<{
+//   fallback?: Record<string, CircleListResponseSchema[]>;
+//   jsonLd?: JsonLdType;
+// }>;
 
 function CircleListPage({
   fallback,
   jsonLd,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+}: {
+  fallback?: Record<string, CircleListResponseSchema[]>;
+  jsonLd?: JsonLdType;
+}) {
   return (
     <SWRConfig value={{ fallback }}>
       <SEOConfig title="揪團學習列表｜島島阿學" jsonLd={jsonLd} />
