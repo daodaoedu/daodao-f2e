@@ -1,8 +1,9 @@
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
 import { useAuth } from '@/contexts/Auth';
 import { useUser } from '@/features/users';
+import { parseToString } from '@/utils/helper';
 
 const PersonalCard = dynamic(() => import('@/components/PersonalCard'), {
   ssr: false,
@@ -10,7 +11,7 @@ const PersonalCard = dynamic(() => import('@/components/PersonalCard'), {
 
 const PartnerDetailPage = () => {
   const router = useRouter();
-  const { id: partnerId } = router.query;
+  const partnerId = parseToString(router.query?.id);
 
   // get partner info
   const { data: partner } = useUser(partnerId);
