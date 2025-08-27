@@ -14,11 +14,14 @@ import {
   useQuiz,
 } from "@/features/quiz";
 import { parseToString } from "@/utils/helper";
+import { locales } from "@/constants/i18n";
 
 export const getStaticPaths = async () => {
-  const paths = Array.from(questionMap.keys()).map((questionId) => ({
-    params: { questionId },
-  }));
+  const paths = locales.flatMap((language) =>
+    Array.from(questionMap.keys()).map((questionId) => ({
+      params: { questionId, language },
+    }))
+  );
 
   return {
     paths,
