@@ -1,5 +1,5 @@
 import Script from 'next/script';
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { getDictionary, locales } from '@/constants/i18n';
 import { websiteConfig } from '@/constants/websiteConfig';
@@ -10,6 +10,12 @@ const inter = Inter({ subsets: ['latin'] });
 
 export async function generateStaticParams() {
   return locales.map((language) => ({ language }));
+}
+
+export function generateViewport(): Viewport {
+  return {
+    themeColor: websiteConfig.themeColor,
+  };
 }
 
 export async function generateMetadata({
@@ -35,7 +41,6 @@ export async function generateMetadata({
     applicationName: title,
     keywords: websiteConfig.keywords,
     referrer: 'origin',
-    themeColor: websiteConfig.themeColor,
     authors: [
       {
         name: websiteConfig.authorName,
