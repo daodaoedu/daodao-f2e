@@ -1,91 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-const {
-  buildReferenceGraph,
-  createRecursiveReferenceAlt,
-  detectCircularReferences,
-  findReferenceLocation,
-  replaceReference,
-} = require('./references');
-const { levenshteinDistance } = require('./utils');
-
-/**
- * 修復循環引用
- * @param {object} spec - OpenAPI 規範
- * @returns {object} 修復後的規範
- */
-const fixCircularReferences = (spec) => {
-  console.log('🔧 檢測並修復所有循環引用...');
-
-  const graph = buildReferenceGraph(spec.components.schemas);
-  const cycles = detectCircularReferences(graph);
-
-  if (cycles.length === 0) {
-    console.log('✅ 未檢測到循環引用');
-    return spec;
-  }
-
-  console.log(`🛑 檢測到 ${cycles.length} 個循環引用:`, cycles);
-
-  const processedCycles = new Set();
-
-  const updatedSchemas = cycles.reduce((currentSchemas, cycle, index) => {
-    const cycleKey = cycle.sort().join('->');
-    if (processedCycles.has(cycleKey)) {
-      return currentSchemas;
-    }
-    processedCycles.add(cycleKey);
-
-    console.log(`🔧 修復循環 ${index + 1}: ${cycle.join(' -> ')}`);
-
-    // 找到最佳斷點
-    const findBestBreakPoint = (cycleToProcess) => {
-      // 優先選擇陣列項目作為斷點
-      for (let i = 0; i < cycleToProcess.length - 1; i += 1) {
-        const currentSchema = cycleToProcess[i];
-        const nextSchema = cycleToProcess[i + 1];
-
-        const arrayBreakPoint = findReferenceLocation(
-          currentSchemas[currentSchema],
-          nextSchema,
-          currentSchema
-        );
-
-        if (arrayBreakPoint && arrayBreakPoint.isArray) {
-          return arrayBreakPoint;
-        }
-      }
-
-      // 如果沒有陣列引用，選擇最後一個引用作為斷點
-      const lastSchema = cycleToProcess[cycleToProcess.length - 2];
-      const targetSchema = cycleToProcess[cycleToProcess.length - 1];
-
-      return findReferenceLocation(
-        currentSchemas[lastSchema],
-        targetSchema,
-        lastSchema
-      );
-    };
-
-    const breakPoint = findBestBreakPoint(cycle);
-
-    if (breakPoint) {
-      console.log(
-        `✅ 在 ${breakPoint.schema}.${breakPoint.property} 處打破循環引用`
-      );
-      return createRecursiveReferenceAlt(currentSchemas, breakPoint);
-    }
-
-    return currentSchemas;
-  }, spec.components.schemas);
-
-  return {
-    ...spec,
-    components: {
-      ...spec.components,
-      schemas: updatedSchemas,
-    },
-  };
-};
+const { levenshteinDistance, replaceReference } = require('./utils');
 
 /**
  * 查找缺失的引用
@@ -279,10 +193,4 @@ const fixSchemaReferences = (spec) => {
   };
 };
 
-module.exports = {
-  fixCircularReferences,
-  findMissingReferences,
-  findSimilarResponse,
-  fixResponseReferences,
-  fixSchemaReferences,
-};
+module.exports = { fixResponseReferences, fixSchemaReferences };

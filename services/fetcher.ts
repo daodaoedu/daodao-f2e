@@ -20,6 +20,7 @@ export interface FetcherConfig {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   params?: Record<string, string | number | boolean>;
   data?: unknown;
+  responseType?: 'json' | 'blob';
   headers?: Record<string, string>;
 }
 
@@ -28,6 +29,7 @@ export const fetcher = async <T>({
   method,
   params,
   data,
+  responseType = 'json',
   headers = {},
 }: FetcherConfig): Promise<T> => {
   const urlObject = new URL(url, API_BASE_URL);
@@ -74,5 +76,5 @@ export const fetcher = async <T>({
     return undefined as T;
   }
 
-  return response.json();
+  return response[responseType]();
 };

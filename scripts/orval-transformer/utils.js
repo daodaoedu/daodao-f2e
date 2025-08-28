@@ -1,7 +1,7 @@
 /**
- * 深度克隆物件 (避免變異原始數據)
- * @param {*} obj - 要克隆的物件
- * @returns {*} 深度克隆後的物件
+ * 深度複製物件
+ * @param {*} obj - 要複製的物件
+ * @returns {*} 深度複製後的物件
  */
 const deepClone = (obj) => {
   if (obj === null || typeof obj !== 'object') return obj;
@@ -17,31 +17,6 @@ const deepClone = (obj) => {
     );
   }
   return obj;
-};
-
-/**
- * 安全的物件路徑設置
- * @param {object} obj - 目標物件
- * @param {string} path - 路徑字符串
- * @param {*} value - 要設置的值
- * @returns {object} 新的物件
- */
-const setPath = (obj, path, value) => {
-  if (!obj || typeof obj !== 'object') return obj;
-
-  const keys = path.split('.').filter(Boolean);
-  if (keys.length === 0) return obj;
-
-  const [head, ...rest] = keys;
-
-  if (rest.length === 0) {
-    return { ...obj, [head]: value };
-  }
-
-  return {
-    ...obj,
-    [head]: setPath(obj[head] || {}, rest.join('.'), value),
-  };
 };
 
 /**
@@ -74,4 +49,29 @@ const levenshteinDistance = (str1, str2) => {
   return calculateDistance(str1.length, str2.length);
 };
 
-module.exports = { deepClone, setPath, levenshteinDistance };
+/**
+ * 替換引用
+ * @param {*} obj - 要處理的物件
+ * @param {string} oldRef - 舊引用
+ * @param {string} newRef - 新引用
+ * @returns {*} 更新後的物件
+ */
+const replaceReference = (obj, oldRef, newRef) => {
+  if (typeof obj !== 'object' || obj === null) return obj;
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => replaceReference(item, oldRef, newRef));
+  }
+
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    if (key === '$ref' && value === oldRef) {
+      return { ...acc, [key]: newRef };
+    }
+    if (typeof value === 'object') {
+      return { ...acc, [key]: replaceReference(value, oldRef, newRef) };
+    }
+    return { ...acc, [key]: value };
+  }, {});
+};
+
+module.exports = { deepClone, levenshteinDistance, replaceReference };
