@@ -5,8 +5,29 @@ import TermsPrivacyPolicy from '@/components/Terms/Privacypolicy';
 import TermsService from '@/components/Terms/Service';
 import { locales } from '@/constants/i18n';
 
+const termsMap = {
+  ipr: {
+    title: '智慧財產權',
+    Component: TermsIPR,
+  },
+  privacy_policy: {
+    title: '隱私政策',
+    Component: TermsPrivacyPolicy,
+  },
+  service: {
+    title: '使用者條款',
+    Component: TermsService,
+  },
+};
+
+const checkTerms = (type: string): type is keyof typeof termsMap => {
+  return Object.keys(termsMap).includes(type);
+};
+
 export async function generateStaticParams() {
-  return locales.map((language) => ({ language, type: 'ipr' }));
+  return Object.keys(termsMap).flatMap((type) =>
+    locales.map((language) => ({ language, type }))
+  );
 }
 
 export async function generateMetadata({
@@ -14,17 +35,9 @@ export async function generateMetadata({
 }: PageProps<'/[language]/terms/[type]'>): Promise<Metadata> {
   const { type } = await params;
 
-  const titleMap = {
-    ipr: '智慧財產權',
-    privacy_policy: '隱私政策',
-    service: '使用者條款',
-  };
+  if (!checkTerms(type)) notFound();
 
-  const title = titleMap[type as keyof typeof titleMap];
-
-  if (!title) {
-    notFound();
-  }
+  const { title } = termsMap[type];
 
   return {
     title,
@@ -38,17 +51,9 @@ export default async function TermsPage({
 }: PageProps<'/[language]/terms/[type]'>) {
   const { type } = await params;
 
-  const termsMap = {
-    ipr: TermsIPR,
-    privacy_policy: TermsPrivacyPolicy,
-    service: TermsService,
-  };
+  if (!checkTerms(type)) notFound();
 
-  const TermsComponent = termsMap[type as keyof typeof termsMap];
+  const { Component } = termsMap[type];
 
-  if (!TermsComponent) {
-    notFound();
-  }
-
-  return <TermsComponent />;
+  return <Component />;
 }
