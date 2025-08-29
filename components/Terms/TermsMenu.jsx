@@ -13,8 +13,8 @@ const TermsMenu = () => {
       <ul>
         <li>
           <Link
-            href="/terms/privacy-policy"
-            className={pathname === '/terms/privacy-policy' ? 'current' : ''}
+            href="/terms/privacy_policy"
+            className={pathname === '/terms/privacy_policy' ? 'current' : ''}
           >
             隱私權政策
           </Link>
