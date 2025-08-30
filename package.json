@@ -4,7 +4,7 @@
   "private": true,
   "engines": {
     "node": "20.19.4",
-    "pnpm": ">=8.0.0"
+    "pnpm": ">=9.8.0"
   },
   "scripts": {
     "postinstall": "husky && pnpm run generate:api && pnpm run typegen",
