@@ -108,7 +108,7 @@ importers:
         specifier: ^8.6.0
         version: 8.6.0(react@19.1.1)
       eslint-config-next:
-        specifier: ^15.5.0
+        specifier: ^15.5.2
         version: 15.5.2(eslint@8.57.1)(typescript@5.7.2)
       feed:
         specifier: ^4.2.2
@@ -126,7 +126,7 @@ importers:
         specifier: ^0.522.0
         version: 0.522.0(react@19.1.1)
       next:
-        specifier: ^15.5.0
+        specifier: ^15.5.2
         version: 15.5.2(@babel/core@7.28.3)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       next-pwa:
         specifier: ^5.6.0
@@ -237,6 +237,9 @@ importers:
       '@types/chrome':
         specifier: ^0.0.206
         version: 0.0.206
+      '@types/react':
+        specifier: ^19.1.12
+        version: 19.1.12
       '@types/react-dom':
         specifier: ^19.0.2
         version: 19.1.9(@types/react@19.1.12)
@@ -276,9 +279,6 @@ importers:
       eslint-plugin-jsx-a11y:
         specifier: ^6.4.1
         version: 6.10.2(eslint@8.57.1)
-      eslint-plugin-no-console-log:
-        specifier: ^2.0.0
-        version: 2.0.0
       eslint-plugin-react:
         specifier: ^7.24.0
         version: 7.37.5(eslint@8.57.1)
@@ -5697,10 +5697,6 @@ packages:
     engines: {node: '>=4.0'}
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9
-
-  eslint-plugin-no-console-log@2.0.0:
-    resolution: {integrity: sha512-TEviomLb2Sl6AbU6HM/YFuOxnYy2RbW+Zn1Qqaqb1lvrOpOB3SqGUnOw+Y+CEL/0RDB97FdXMBjR0K5ZjgYh8A==}
-    deprecated: As of eslint 2.0, this plugin is obsoltete, you can use the built-in `no-console` method http://eslint.org/docs/rules/no-console
 
   eslint-plugin-react-hooks@4.6.2:
     resolution: {integrity: sha512-QzliNJq4GinDBcD8gPB5v0wh6g8q3SUi6EFF0x8N/BL9PoVs0atuGc47ozMRyOWAKdwaZ5OnbOEa3WR+dSGKuQ==}
@@ -15936,8 +15932,6 @@ snapshots:
       object.fromentries: 2.0.8
       safe-regex-test: 1.1.0
       string.prototype.includes: 2.0.1
-
-  eslint-plugin-no-console-log@2.0.0: {}
 
   eslint-plugin-react-hooks@4.6.2(eslint@8.57.1):
     dependencies:
