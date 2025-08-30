@@ -31,7 +31,7 @@ export default function AuthCallbackPage() {
       </h2>
       <div className="flex justify-center items-center">
         <Image
-          src="/assets/nobody-land.gif"
+          src="/assets/images/nobody-island.gif"
           alt="nobody-land"
           width={300}
           height={300}

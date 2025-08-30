@@ -3,7 +3,7 @@ import { ArrowDown } from 'lucide-react';
 
 export default function Apply() {
   return (
-    <div className="relative w-full max-w-full after:absolute after:right-0 after:top-[-90px] after:block after:h-[124px] after:w-[167px] after:bg-[url('/assets/pen.png')] after:bg-cover after:bg-no-repeat after:content-['']">
+    <div className="relative w-full max-w-full after:absolute after:right-0 after:top-[-90px] after:block after:h-[124px] after:w-[167px] after:bg-[url('/assets/learning-marathon/pen.png')] after:bg-cover after:bg-no-repeat after:content-['']">
       <div className="mb-9">
         <Text className="mb-3 text-base font-normal leading-[140%] text-[#536166]">
           （一）重要時程

@@ -40,7 +40,7 @@ runs:
         DISCORD_WEBHOOK_URL: ${{ inputs.DISCORD_WEBHOOK_URL }}
       with:
         script: |
-          const avatarUrl = "https://raw.githubusercontent.com/daodaoedu/daodao-f2e/main/public/daodao-logo.webp";
+          const avatarUrl = "https://raw.githubusercontent.com/daodaoedu/daodao-f2e/main/public/assets/brand/daodao-logo.webp";
           const username = "島島阿學";
           const colors = {
             success: 5763207,

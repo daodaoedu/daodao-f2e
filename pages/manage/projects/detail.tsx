@@ -31,7 +31,7 @@ const ProjectPage = () => {
           '@context': 'https://schema.org',
           '@type': 'Organization',
           url: 'https://www.daoedu.tw',
-          logo: 'https://www.daoedu.tw/favicon-112.png',
+          logo: 'https://www.daoedu.tw/assets/brand/favicon-112.png',
         },
       ],
     }),

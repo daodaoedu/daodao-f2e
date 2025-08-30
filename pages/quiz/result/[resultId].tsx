@@ -4,7 +4,7 @@ import Link from "next/link";
 import SEOConfig from "@/components/SEOConfig";
 import { Button } from "@/components/ui/button";
 import { Image } from "@/components/ui/image";
-import HorizontalLogoSvg from "@/public/horizontal-logo.svg";
+import HorizontalLogoSvg from "@/public/assets/brand/horizontal-primary-logo.svg";
 import {
   getQuizLayout,
   resultDetailMap,

@@ -73,7 +73,7 @@ export default function SEOConfig({
   keywords: originKeywords = '島島阿學',
   author = '島島阿學',
   copyright = '島島阿學',
-  imgLink = 'https://www.daoedu.tw/preview.webp',
+  imgLink = 'https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg',
   imgWidth = 1200,
   imgHeight = 630,
   jsonLd = defaultJsonLd,
@@ -91,9 +91,9 @@ export default function SEOConfig({
     <Head>
       <title>{title}</title>
       <meta itemProp="name" content={title} />
-      <link rel="shortcut icon" href="/favicon.png" />
-      <link rel="apple-touch-icon" href="/favicon.png" />
-      <link rel="mask-icon" href="/favicon.png" color="#5bbad5" />
+      <link rel="shortcut icon" href="/assets/brand/favicon.png" />
+      <link rel="apple-touch-icon" href="/assets/brand/favicon.png" />
+      <link rel="mask-icon" href="/assets/brand/favicon.png" color="#5bbad5" />
       {link && <link rel="canonical" href={link} />}
       {author && <meta name="author" content={author} />}
       {copyright && <meta name="copyright" content={copyright} />}

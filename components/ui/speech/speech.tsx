@@ -7,7 +7,7 @@ import SpeechRecognition, {
 } from 'react-speech-recognition';
 import { Image } from '@/components/ui/image';
 import { useDialog } from '@/contexts/Dialog';
-import faviconPng from '@/public/favicon.png';
+import faviconPng from '@/public/assets/brand/favicon.png';
 import { Button, ButtonProps } from '@/components/ui';
 
 interface SpeechProps

@@ -11,7 +11,7 @@ function CommunityPage() {
         keywords="島島阿學,交流,社群,學習夥伴"
         author="島島阿學"
         copyright="島島阿學"
-        imgLink="https://www.daoedu.tw/preview.webp"
+        imgLink="https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg"
       />
 
       <div className="min-h-screen bg-basic-100 flex items-center justify-center">

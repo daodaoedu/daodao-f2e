@@ -16,12 +16,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui';
 import { useDialog } from '@/contexts/Dialog';
-import FacebookSvg from '@/public/assets/socials-logos/facebook.svg';
-import LineSvg from '@/public/assets/socials-logos/line.svg';
-import LinkedInSvg from '@/public/assets/socials-logos/linkedin.svg';
-import ShareWindowsSvg from '@/public/assets/socials-logos/share_windows.svg';
-import ThreadsSvg from '@/public/assets/socials-logos/threads.svg';
-import XSvg from '@/public/assets/socials-logos/x.svg';
+import FacebookSvg from '@/public/assets/social-icons/facebook.svg';
+import LineSvg from '@/public/assets/social-icons/line.svg';
+import LinkedInSvg from '@/public/assets/social-icons/linkedin.svg';
+import ShareWindowsSvg from '@/public/assets/social-icons/share_windows.svg';
+import ThreadsSvg from '@/public/assets/social-icons/threads.svg';
+import XSvg from '@/public/assets/social-icons/x.svg';
 import getShareAPI from '@/utils/getShareAPI';
 // import VideoSvg from "@/public/assets/icons/video.svg";
 import { resourceTypeMap, targetAudienceTypeMap } from '../constants';

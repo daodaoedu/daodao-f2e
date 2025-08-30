@@ -10,7 +10,7 @@ const IdeasPage: React.FC = () => {
     keywords: '想法分享,創新思維,學習洞察,島島阿學,Ideas,Creative Thinking',
     author: '島島阿學',
     copyright: '島島阿學',
-    imgLink: 'https://www.daoedu.tw/preview.webp',
+    imgLink: 'https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg',
     link: `${process.env.HOSTNAME}/ideas`,
   };
 

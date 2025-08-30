@@ -4,7 +4,7 @@
     "home_page_url": "https://www.daoedu.tw",
     "feed_url": "https://www.daoedu.tw/rss/feed.json",
     "description": "「島島阿學」盼能透過建立多元的學習資源網絡，讓自主學習者能找到合適的成長方法，進一步成為自己想成為的人，從中培養共好精神。目前正積極打造「可共編的學習資源平台」。",
-    "icon": "https://www.daoedu.tw/preview.webp",
+    "icon": "https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg",
     "author": {
         "name": "島島阿學多元學習社群",
         "url": "https://www.daoedu.tw"
@@ -9062,7 +9062,7 @@
             "url": "https://www.daoedu.tw/resource/Yang space｜前端技術",
             "title": "Yang space｜前端技術的學習資源介紹｜島島阿學",
             "summary": "分享網頁前端技術",
-            "image": "https://blog.yyisyou.tw/img/favicon.png",
+            "image": "https://blog.yyisyou.tw/img/assets/brand/favicon.png",
             "date_modified": "2022-01-24T06:26:00.000Z",
             "author": {
                 "name": "島島阿學多元學習社群",

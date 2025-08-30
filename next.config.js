@@ -17,6 +17,7 @@ const config = {
   staticPageGenerationTimeout: 600,
   transpilePackages: ["@mdxeditor/editor"],
   experimental: {
+    globalNotFound: true,
     scrollRestoration: true,
   },
   images: {

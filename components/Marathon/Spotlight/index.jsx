@@ -15,7 +15,7 @@ export default function Spotlight() {
           </ul>
         </div>
       </div>
-      <div className="relative rounded-[10px] bg-[#16B9B3] p-6 after:absolute after:bottom-[-22px] after:right-[-70px] after:block after:h-[140px] after:w-[185px] after:bg-[url('/assets/booming.png')] after:bg-cover after:bg-no-repeat after:content-[''] max-md:after:hidden">
+      <div className="relative rounded-[10px] bg-[#16B9B3] p-6 after:absolute after:bottom-[-22px] after:right-[-70px] after:block after:h-[140px] after:w-[185px] after:bg-[url('/assets/learning-marathon/booming.png')] after:bg-cover after:bg-no-repeat after:content-[''] max-md:after:hidden">
         <Title className="mb-8 text-lg font-bold leading-[140%] text-white">AI 個人化學習工具Ｘ社群支持</Title>
         <Text className="text-sm font-normal leading-[140%] text-white">有 AI 推薦與引導外，也重視人與人真實地互動！</Text>
         <br />

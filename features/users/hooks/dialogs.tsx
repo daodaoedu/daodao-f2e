@@ -17,7 +17,7 @@ export const useRegisterSuccessDialog = () => {
             記得到信箱確認收到帳號驗證信件，並點選驗證Email按鈕，如果沒有看到信件，可以到垃圾桶確認。
           </p>
           <Image
-            src="/assets/partner-popup.png"
+            src="/assets/images/social-validation.png"
             alt="dao-dao-island"
             width={272}
             height={211}
@@ -49,7 +49,7 @@ export const useVerifiedSuccessDialog = () => {
       content: (
         <>
           <Image
-            src="/assets/illustration.png"
+            src="/assets/images/review-passed.png"
             alt="verified-success"
             width={272}
             height={262}
@@ -96,7 +96,7 @@ export const useCompleteInfoReminder = () => {
           </p>
           <div className="mx-auto w-max">
             <Image
-              src="/assets/illustration.png"
+              src="/assets/images/review-passed.png"
               alt="填寫完能享有更完善的功能"
               width={272}
               height={262}

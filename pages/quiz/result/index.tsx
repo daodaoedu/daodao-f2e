@@ -5,9 +5,9 @@ import { useRouter } from "next/router";
 import { toJpeg } from "html-to-image";
 import SEOConfig from "@/components/SEOConfig";
 import { Button } from "@/components/ui/button";
-import favicon112Png from "@/public/favicon-112.png";
-import HorizontalLogoSvg from "@/public/horizontal-logo.svg";
-import VerticalLogoSvg from "@/public/vertical-logo.svg";
+import favicon112Png from "@/public/assets/brand/favicon-112.png";
+import HorizontalLogoSvg from "@/public/assets/brand/horizontal-primary-logo.svg";
+import VerticalLogoSvg from "@/public/assets/brand/vertical-primary-logo.svg";
 import { AuthButton } from "@/contexts/Auth";
 import {
   getQuizLayout,
@@ -19,12 +19,12 @@ import {
   Slogan,
   List,
 } from "@/features/quiz";
-import FacebookSvg from "@/public/assets/socials-logos/facebook.svg";
-import LineSvg from "@/public/assets/socials-logos/line.svg";
-import LinkedInSvg from "@/public/assets/socials-logos/linkedin.svg";
-import ShareWindowsSvg from "@/public/assets/socials-logos/share_windows.svg";
-import ThreadsSvg from "@/public/assets/socials-logos/threads.svg";
-import XSvg from "@/public/assets/socials-logos/x.svg";
+import FacebookSvg from "@/public/assets/social-icons/facebook.svg";
+import LineSvg from "@/public/assets/social-icons/line.svg";
+import LinkedInSvg from "@/public/assets/social-icons/linkedin.svg";
+import ShareWindowsSvg from "@/public/assets/social-icons/share_windows.svg";
+import ThreadsSvg from "@/public/assets/social-icons/threads.svg";
+import XSvg from "@/public/assets/social-icons/x.svg";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import getShareAPI from "@/utils/getShareAPI";

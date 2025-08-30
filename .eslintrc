@@ -8,7 +8,8 @@
     "airbnb",
     "plugin:@typescript-eslint/recommended",
     "plugin:jsx-a11y/recommended",
-    "plugin:tailwindcss/recommended"
+    "plugin:tailwindcss/recommended",
+    "prettier"
   ],
   "ignorePatterns": [
     "*.config.js",
@@ -47,7 +48,7 @@
     "@typescript-eslint/no-shadow": "error",
     "arrow-body-style": "off",
     "camelcase": "off",
-    "tailwindcss/classnames-order": "error",
+    "tailwindcss/classnames-order": "warn",
     "tailwindcss/no-custom-classname": "off",
     "comma-dangle": [
       "error",

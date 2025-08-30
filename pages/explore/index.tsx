@@ -874,7 +874,7 @@ function ExplorePage() {
         keywords="島島阿學,探索,學習,想法,實踐,計劃"
         author="島島阿學"
         copyright="島島阿學"
-        imgLink="https://www.daoedu.tw/preview.webp"
+        imgLink="https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg"
       />
 
       <div className="min-h-screen bg-basic-100 relative">

@@ -1,7 +1,7 @@
 import NextImage, { ImageProps as NextImageProps } from 'next/image';
 import { useState } from 'react';
 import { cn } from '@/utils/cn';
-import emptyCoverPng from '@/public/assets/empty-cover.png';
+import emptyCoverPng from '@/public/assets/images/empty-cover.png';
 
 export type ImageProps = NextImageProps;
 

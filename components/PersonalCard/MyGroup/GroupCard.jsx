@@ -8,7 +8,7 @@ import {
 import { MapPin, EllipsisVertical } from 'lucide-react';
 import { Image } from '@/components/ui/image';
 import { useAuth } from '@/contexts/Auth';
-import emptyCoverImg from '@/public/assets/empty-cover.png';
+import emptyCoverImg from '@/public/assets/images/empty-cover.png';
 import useMutation from '@/hooks/useMutation';
 import { timeDuration } from '@/utils/date';
 import { MarkdownEditor } from '@/components/ui/markdown-editor';

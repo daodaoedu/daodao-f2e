@@ -5,8 +5,8 @@ import { SWRConfig } from "swr";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { MapPin, SearchIcon } from "lucide-react";
-import groupBannerWebp from "@/public/assets/circles/banner.webp";
-import emptyCoverPng from "@/public/assets/empty-cover.png";
+import groupBannerPng from "@/public/assets/circles/banner.png";
+import emptyCoverPng from "@/public/assets/images/empty-cover.png";
 import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import {
@@ -48,7 +48,7 @@ function Banner() {
   return (
     <div className="relative">
       <Image
-        src={groupBannerWebp}
+        src={groupBannerPng}
         alt="揪團封面"
         className="min-w-full h-96 object-cover bg-[linear-gradient(#fcfefe_10%,#e0f1f2_40%)]"
       />
