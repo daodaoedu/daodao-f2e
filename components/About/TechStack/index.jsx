@@ -13,7 +13,7 @@ const TechStack = () => (
     </Title>
     <div className="m-5 flex flex-col">
       <Text className="my-1.5">
-        <p className="flex flex-wrap gap-2">
+        <span className="flex flex-wrap gap-2">
           <img
             src="https://media.giphy.com/media/I2Gobnade5rqM/giphy.gif"
             className="h-20"
@@ -43,7 +43,7 @@ const TechStack = () => (
             src="https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png"
             className="h-20"
           />
-        </p>
+        </span>
       </Text>
       <Text className="my-1.5 font-medium">
         目前專案技術包含：React 18, NEXT.JS 12, MUI, emotion, cloudflare

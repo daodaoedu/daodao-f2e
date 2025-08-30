@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { useRouter } from 'next/router';
 
 // 用於重置頁面滾動位置的 Hook
 export function useScrollToTop() {
@@ -12,26 +11,6 @@ export function useScrollToTop() {
   };
 
   return { scrollToTop };
-}
-
-// 在路由變更時自動滾動到頂部的 Hook
-export function useScrollOnRouteChange() {
-  const router = useRouter();
-  const { scrollToTop } = useScrollToTop();
-
-  useEffect(() => {
-    const handleRouteChange = () => {
-      setTimeout(() => {
-        scrollToTop('auto');
-      }, 0);
-    };
-
-    router.events.on('routeChangeComplete', handleRouteChange);
-
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange);
-    };
-  }, [router.events, scrollToTop]);
 }
 
 // 在組件掛載時滾動到頂部的 Hook

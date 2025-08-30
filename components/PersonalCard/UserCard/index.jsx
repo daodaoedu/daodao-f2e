@@ -1,5 +1,5 @@
 import { BASE_URL } from '@/constants/common';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { MapPin, Edit } from 'lucide-react';

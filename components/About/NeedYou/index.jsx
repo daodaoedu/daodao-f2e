@@ -1,6 +1,7 @@
 import React from 'react';
 import { Title, Text } from '@/components/ui/typography';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const NeedYou = () => (
   <section className="my-5">
@@ -49,14 +50,16 @@ const NeedYou = () => (
         或是點擊以下的了解更多
       </Text>
       <Button
+        asChild
         variant="outline"
-        onClick={() => window.open(
-          'https://g0v.hackmd.io/@daodaoedu/HydZGAUYc/https%3A%2F%2Fg0v.hackmd.io%2Fc%2FHydZGAUYc%2Fedit%3Fedit',
-          '_blank'
-        )}
         className="mx-2.5 h-10 w-[120px]"
       >
-        🏃‍♂️ 了解更多
+        <Link
+          href="https://g0v.hackmd.io/@daodaoedu/HydZGAUYc/https%3A%2F%2Fg0v.hackmd.io%2Fc%2FHydZGAUYc%2Fedit%3Fedit"
+          target="_blank"
+        >
+          🏃‍♂️ 了解更多
+        </Link>
       </Button>
     </div>
     <div className="m-5 flex flex-col">

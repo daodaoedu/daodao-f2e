@@ -1,7 +1,5 @@
-import {
-  Dispatch, SetStateAction, useCallback, useMemo, useRef,
-} from 'react';
-import { useRouter } from 'next/router';
+import { Dispatch, SetStateAction, useCallback, useMemo, useRef } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { z } from 'zod';
 
 const formatQuery = <T extends z.ZodObject<z.ZodRawShape>>(
@@ -55,23 +53,28 @@ const isSame = <T>(prev: T, next: T): boolean => {
 };
 
 export default function useQueryState<T extends z.AnyZodObject>(schema: T) {
-  const { pathname, query, push } = useRouter();
-  const prevQuery = useRef<z.infer<T>>(query);
+  const { push } = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const prevQuery = useRef<z.infer<T>>(searchParams);
 
-  const state = useMemo<z.infer<T>>(() => formatQuery(schema, query), [query]);
+  const state = useMemo<z.infer<T>>(
+    () => formatQuery(schema, searchParams || {}),
+    [searchParams, schema]
+  );
 
   const setState = useCallback<Dispatch<SetStateAction<z.infer<T>>>>(
     (value) => {
       const newValue = typeof value === 'function' ? value(state) : value;
       const newQuery = formatQuery(schema, newValue);
       if (!isSame(prevQuery.current, newQuery)) {
-        push({ pathname, query: newQuery }, undefined, {
+        push(`${pathname}?${newQuery.toString()}`, {
           scroll: false,
         });
       }
       prevQuery.current = newQuery;
     },
-    [state, pathname, push]
+    [state, pathname, push, searchParams, schema]
   );
 
   return [state, setState] as const;

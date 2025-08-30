@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
@@ -59,11 +59,11 @@ function ExploreMenu({ onClose }: OnCloseProps) {
 
 function ProfileMenu({ onClose }: OnCloseProps) {
   const auth = useAuth();
-  const { pathname } = useRouter();
+  const pathname = usePathname();
   const role = auth.user?.role;
 
   const sidebarItems = useMemo(
-    () => getManageSidebarItems({ role, pathname }),
+    () => getManageSidebarItems({ role, pathname: pathname || '' }),
     [role, pathname]
   );
 

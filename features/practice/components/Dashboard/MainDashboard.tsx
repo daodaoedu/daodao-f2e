@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {
   CheckCircle,
   Edit,
@@ -120,9 +120,8 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
   // 導航到編輯頁面
   const handleEdit = () => {
-    router.push(`/practice/${practice.id}/edit`).then(() => {
-      scrollToTop('auto');
-    });
+    router.push(`/practice/${practice.id}/edit`);
+    scrollToTop('auto');
     showToastNotification('正在跳轉到編輯頁面...');
   };
 

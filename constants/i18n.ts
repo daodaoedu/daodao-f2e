@@ -1,20 +1,17 @@
-export const defaultLocale = 'zh';
+export const defaultLocale = 'zh-TW';
 export const locales = [defaultLocale, 'en'] as const;
 export type Locale = (typeof locales)[number];
-export type Dictionary = typeof import('./locales/zh.json');
-export type I18nParams<OtherParams = Record<string, never>> = {
-  params: Promise<{ language: Locale } & OtherParams>;
-};
+export type Dictionary = typeof import('./locales/zh-TW.json');
 
 const dictionaries: Record<Locale, () => Promise<Dictionary>> = {
-  zh: () => import('./locales/zh.json'),
+  'zh-TW': () => import('./locales/zh-TW.json'),
   en: () => import('./locales/en.json'),
 };
 
 export const isLocale = (language: string): language is Locale =>
   locales.findIndex((locale) => locale === language) > -1;
 
-export const getDictionary = (locale: Locale) => {
+export const getDictionary = (locale: string) => {
   return isLocale(locale)
     ? dictionaries[locale]()
     : dictionaries[defaultLocale]();

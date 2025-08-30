@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 // Type definitions
 interface KeyObject {
@@ -32,12 +32,12 @@ type UseSearchParamsManagerReturn = [
  */
 export default function useSearchParamsManager(): UseSearchParamsManagerReturn {
   const { push } = useRouter();
-  const { query } = useRouter();
+  const searchParams = useSearchParams();
 
   const getSearchParams = useCallback(
     ((key?: string) => {
       if (key) {
-        const value = query[key];
+        const value = searchParams?.get(key);
         if (typeof value === 'string') {
           return value.split(',').filter(Boolean);
         }
@@ -46,22 +46,22 @@ export default function useSearchParamsManager(): UseSearchParamsManagerReturn {
         }
         return [];
       }
-      return query;
+      return searchParams;
     }) as GetSearchParams,
-    [query]
+    [searchParams]
   );
 
   const pushState = useCallback(
     (key: string, value: string) => {
-      const newQuery = { ...query };
+      const newQuery = new URLSearchParams(searchParams?.toString() || '');
       if (value) {
-        newQuery[key] = value;
+        newQuery.set(key, value);
       } else {
-        delete newQuery[key];
+        newQuery.delete(key);
       }
-      push({ query: newQuery }, undefined, { scroll: false });
+      push(newQuery.toString(), { scroll: false });
     },
-    [push, query]
+    [push, searchParams]
   );
 
   const generateParamsItems = useCallback(

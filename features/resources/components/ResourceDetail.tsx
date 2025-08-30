@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 import { Share2, Globe, Ellipsis } from 'lucide-react';
 import { ResourceDetailResponseSchema } from '@/services/resources/core/schema';
 import { Button } from '@/components/ui/button';
@@ -32,12 +32,12 @@ interface ResourceDetailProps {
 
 export default function ResourceDetail({ resource }: ResourceDetailProps) {
   const { openDialog } = useDialog();
-  const { asPath } = useRouter();
+  const pathname = usePathname();
 
   const shareAPI = getShareAPI({
     title: `我要分享「${resource.name}」資源`,
     text: `我要分享「${resource.name}」資源`,
-    url: asPath,
+    url: pathname || '',
     hashtag: '#島島阿學',
   });
 

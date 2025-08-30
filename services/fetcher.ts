@@ -1,3 +1,5 @@
+import { getTokenStorage } from '@/utils/storage';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 export class ApiError extends Error {
@@ -18,6 +20,7 @@ export interface FetcherConfig {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   params?: Record<string, string | number | boolean>;
   data?: unknown;
+  responseType?: 'json' | 'blob';
   headers?: Record<string, string>;
 }
 
@@ -26,9 +29,11 @@ export const fetcher = async <T>({
   method,
   params,
   data,
+  responseType = 'json',
   headers = {},
 }: FetcherConfig): Promise<T> => {
   const urlObject = new URL(url, API_BASE_URL);
+  const token = getTokenStorage().get();
 
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
@@ -44,6 +49,7 @@ export const fetcher = async <T>({
     method,
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
   };
@@ -70,5 +76,5 @@ export const fetcher = async <T>({
     return undefined as T;
   }
 
-  return response.json();
+  return response[responseType]();
 };

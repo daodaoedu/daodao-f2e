@@ -3,7 +3,7 @@ import type {
 } from 'schema-dts';
 import React from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 
 /**
  * Schema.org 常用類型參考指南
@@ -79,9 +79,9 @@ export default function SEOConfig({
   jsonLd = defaultJsonLd,
   themeColor = '#16b9b3',
 }: SEOProps) {
-  const router = useRouter();
+  const pathname = usePathname();
 
-  const link = originLink ?? `${process.env.HOSTNAME}${router?.asPath}`;
+  const link = originLink ?? `${process.env.HOSTNAME}${pathname || ''}`;
 
   const keywords = typeof originKeywords === 'string'
     ? originKeywords

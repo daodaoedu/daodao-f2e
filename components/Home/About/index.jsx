@@ -1,13 +1,13 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Title, Text } from '@/components/ui/typography';
 import { Badge } from '@/components/ui/badge';
-import { useRouter } from 'next/router';
 import { CATEGORIES } from '../../../constants/category';
 
 const About = () => {
   const router = useRouter();
   return (
-    <div className="mx-auto w-[90%] pb-10 pt-10 max-md:pb-5 max-md:pt-10">
+    <div className="mx-auto w-[90%] py-10 max-md:pb-5 max-md:pt-10">
       <Title
         as="h2"
         size="lg"

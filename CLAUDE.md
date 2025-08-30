@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `yarn ts:check` - Run TypeScript type checking
 
 ### Deployment
-- `yarn pages:build` - Build for Cloudflare Pages
+- `yarn cf-build` - Build for Cloudflare Pages
 - `yarn preview` - Preview Cloudflare Pages build locally
 - `yarn deploy` - Deploy to Cloudflare Pages
 

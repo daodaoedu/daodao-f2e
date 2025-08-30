@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useRouter } from 'next/router';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { parseToString } from '@/utils/helper';
 import { RoleEnum, useAuth } from '@/contexts/Auth';
 import { ProjectProvider } from '@/contexts/Project';
@@ -89,9 +89,10 @@ function getProjectSidebarItems({
 }
 
 const useProjectPermission = (type: ProjectType) => {
-  const { pathname, query } = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
-  const projectId = parseToString(query.id);
+  const projectId = parseToString(searchParams?.get('id'));
   const swr = useProject(projectId);
 
   const canVisit = useMemo(() => {
@@ -104,7 +105,7 @@ const useProjectPermission = (type: ProjectType) => {
       case ProjectType.Manage:
         return swr.isLoading || swr.data?.user._id === user?._id;
       default:
-        return !pathname.startsWith(`${baseUrl}${projectRoutes.reviews}`);
+        return !pathname?.startsWith(`${baseUrl}${projectRoutes.reviews}`);
     }
   }, [swr, pathname, type, user]);
 
@@ -116,7 +117,7 @@ interface ProjectLayoutProps extends React.PropsWithChildren {
 }
 
 function ProjectLayout({ children, type }: ProjectLayoutProps) {
-  const { pathname } = useRouter();
+  const pathname = usePathname();
 
   const {
     data: project,
@@ -127,7 +128,7 @@ function ProjectLayout({ children, type }: ProjectLayoutProps) {
 
   const sidebarItems = getProjectSidebarItems({
     type,
-    pathname,
+    pathname: pathname || '',
     id: projectId,
   });
 

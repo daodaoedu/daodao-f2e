@@ -1,7 +1,7 @@
 import { Title, Text } from '@/components/ui/typography';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 
 const AccountSetting = () => {

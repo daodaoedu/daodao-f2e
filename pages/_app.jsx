@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { SWRConfig } from 'swr';
 
 
@@ -17,7 +17,7 @@ import getBaseLayout from '@/layout/core/getBaseLayout';
 import { useCompleteInfoReminder, useVerifiedSuccessDialog } from '@/features/users';
 import { initGA, logPageView } from '../utils/analytics';
 import 'regenerator-runtime/runtime'; // Speech.js
-import "@/shared/styles/global.css";
+import "@/app/global.css";
 
 const swrConfig = {
   revalidateOnFocus: false,
