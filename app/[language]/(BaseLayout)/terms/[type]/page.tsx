@@ -20,9 +20,13 @@ const termsMap = {
   },
 };
 
-const checkTerms = (type: string): type is keyof typeof termsMap => {
-  return Object.keys(termsMap).includes(type);
-};
+const checkTerms = (type: string): type is keyof typeof termsMap =>
+  Object.keys(termsMap).includes(type);
+
+const getTerms = (type: string) => {
+  if (!checkTerms(type)) notFound();
+  return termsMap[type];
+}
 
 export async function generateStaticParams() {
   return Object.keys(termsMap).flatMap((type) =>
@@ -35,9 +39,7 @@ export async function generateMetadata({
 }: PageProps<'/[language]/terms/[type]'>): Promise<Metadata> {
   const { type } = await params;
 
-  if (!checkTerms(type)) notFound();
-
-  const { title } = termsMap[type];
+  const { title } = getTerms(type);
 
   return {
     title,
@@ -51,9 +53,7 @@ export default async function TermsPage({
 }: PageProps<'/[language]/terms/[type]'>) {
   const { type } = await params;
 
-  if (!checkTerms(type)) notFound();
-
-  const { Component } = termsMap[type];
+  const { Component } = getTerms(type);
 
   return <Component />;
 }

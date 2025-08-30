@@ -35,7 +35,7 @@ enum TabEnum {
   Contributor = "contributor",
 }
 
-// export const runtime = "experimental-edge";
+export const runtime = "experimental-edge";
 
 export const getServerSideProps = (async (context) => {
   try {
