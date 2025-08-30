@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import { locales } from '@/constants/i18n';
 import About from '@/components/About';
+import { getDynamicRoute } from '@/utils/getDynamicRoute';
 
 const pageMap = {
   about: {
@@ -12,17 +12,9 @@ const pageMap = {
   },
 };
 
-const checkPage = (module: string): module is keyof typeof pageMap =>
-  Object.keys(pageMap).includes(module);
-
-const getPage = (page: string) => {
-  if (!checkPage(page)) notFound();
-  return pageMap[page];
-}
-
 export async function generateStaticParams() {
-  return Object.keys(pageMap).flatMap((module) =>
-    locales.map((language) => ({ language, module }))
+  return Object.keys(pageMap).flatMap((page) =>
+    locales.map((language) => ({ language, page }))
   );
 }
 
@@ -31,7 +23,7 @@ export async function generateMetadata({
 }: PageProps<'/[language]/[page]'>): Promise<Metadata> {
   const { page } = await params;
 
-  const { title, description } = getPage(page);
+  const { title, description } = getDynamicRoute(page, pageMap);
 
   return {
     title,
@@ -44,7 +36,7 @@ export default async function TermsPage({
 }: PageProps<'/[language]/[page]'>) {
   const { page } = await params;
 
-  const { Component } = getPage(page);
+  const { Component } = getDynamicRoute(page, pageMap);
 
   return <Component />;
 }

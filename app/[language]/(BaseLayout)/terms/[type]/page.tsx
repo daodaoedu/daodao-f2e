@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import TermsIPR from '@/components/Terms/Ipr';
 import TermsPrivacyPolicy from '@/components/Terms/Privacypolicy';
 import TermsService from '@/components/Terms/Service';
 import { locales } from '@/constants/i18n';
+import { getDynamicRoute } from '@/utils/getDynamicRoute';
 
 const termsMap = {
   ipr: {
@@ -20,14 +20,6 @@ const termsMap = {
   },
 };
 
-const checkTerms = (type: string): type is keyof typeof termsMap =>
-  Object.keys(termsMap).includes(type);
-
-const getTerms = (type: string) => {
-  if (!checkTerms(type)) notFound();
-  return termsMap[type];
-}
-
 export async function generateStaticParams() {
   return Object.keys(termsMap).flatMap((type) =>
     locales.map((language) => ({ language, type }))
@@ -39,7 +31,7 @@ export async function generateMetadata({
 }: PageProps<'/[language]/terms/[type]'>): Promise<Metadata> {
   const { type } = await params;
 
-  const { title } = getTerms(type);
+  const { title } = getDynamicRoute(type, termsMap);
 
   return {
     title,
@@ -53,7 +45,7 @@ export default async function TermsPage({
 }: PageProps<'/[language]/terms/[type]'>) {
   const { type } = await params;
 
-  const { Component } = getTerms(type);
+  const { Component } = getDynamicRoute(type, termsMap);
 
   return <Component />;
 }
