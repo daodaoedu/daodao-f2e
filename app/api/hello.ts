@@ -1,7 +1,7 @@
-import getEnv from '@/utils/env';
 import { NextResponse } from 'next/server';
+import getEnv from '@/utils/env';
 
-export const runtime = 'experimental-edge';
+export const runtime = 'edge';
 
 export default function handler() {
   const nextResponse = NextResponse.next();

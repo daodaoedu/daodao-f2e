@@ -59,7 +59,7 @@ jobs:
       - name: Build
         id: build
         continue-on-error: true
-        run: yarn pages:build
+        run: yarn cf-build
         env:
           NEXT_PUBLIC_API_URL: ${{ github.ref_name == 'prod' && secrets.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL_DEV }}
 
