@@ -2,13 +2,12 @@
   "name": "daodao-f2e",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "yarn@1.22.22",
   "engines": {
     "node": "20.19.4",
-    "yarn": ">=1.22.0"
+    "pnpm": ">=8.0.0"
   },
   "scripts": {
-    "postinstall": "husky && npm run generate:api && npm run typegen",
+    "postinstall": "husky && pnpm run generate:api && pnpm run typegen",
     "dev": "next dev -p 5438",
     "build": "next build",
     "start": "next start",
@@ -21,8 +20,8 @@
     "ts:check": "tsc --noEmit --incremental false",
     "cf-build": "opennextjs-cloudflare build",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
-    "preview": "npm run cf-build && opennextjs-cloudflare preview",
-    "deploy": "npm run cf-build && opennextjs-cloudflare deploy",
+    "preview": "pnpm run cf-build && opennextjs-cloudflare preview",
+    "deploy": "pnpm run cf-build && opennextjs-cloudflare deploy",
     "generate:api": "orval"
   },
   "dependencies": {
