@@ -31,7 +31,7 @@ const IdeasRecommendationSection: React.FC<IdeasRecommendationSectionProps> = ({
     error,
     mutate: refreshRecommendations,
   } = useContentTypeRecommendations('idea', {
-    userId: user?.id,
+    userId: user?._id,
     limit,
   });
 

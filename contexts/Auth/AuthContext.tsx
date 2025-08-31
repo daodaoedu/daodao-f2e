@@ -22,7 +22,8 @@ import {
   createUserFormSchema,
   updateUserFormSchema,
 } from '@/services/users';
-import { useUserMe } from '@/features/users';
+import { useGetApiV1UsersMe } from '@/generated/endpoints/users';
+import { FormattedUser } from '@/generated/models';
 
 import LoginModal from './LoginModal';
 import {
@@ -82,7 +83,9 @@ const checkIsComplete = (data: AuthState['user']) => {
     'selfIntroduction',
   ] as const;
 
-  return keys.every((key) => Boolean(Array.isArray(data[key]) ? data[key].length : data[key]));
+  return keys.every((key) =>
+    Boolean(Array.isArray(data[key]) ? data[key].length : data[key])
+  );
 };
 
 const authReducer = (state: AuthState, action: Action): AuthState => {
@@ -185,7 +188,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
             const arg = createUserFormSchema.parse(input);
             const { token, user } = await userAPI.create('', { arg });
             setToken(token);
-            dispatch({ type: ActionTypes.UPDATE_USER, payload: user });
+            dispatch({
+              type: ActionTypes.UPDATE_USER,
+              payload: user as unknown as FormattedUser,
+            });
             break;
           }
           case LoginStatus.PERMANENT: {
@@ -194,7 +200,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
               ...input,
             });
             const payload = await userAPI.update('', { arg });
-            dispatch({ type: ActionTypes.UPDATE_USER, payload });
+            dispatch({
+              type: ActionTypes.UPDATE_USER,
+              payload: payload as unknown as FormattedUser,
+            });
             break;
           }
           default: {
@@ -203,7 +212,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
         }
       },
       openLoginModal: (payload) => {
-        const getRelativeUrl = () => window.location.href.replace(window.location.origin, '');
+        const getRelativeUrl = () =>
+          window.location.href.replace(window.location.origin, '');
 
         const redirectPath = getRelativeUrl();
 
@@ -248,10 +258,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     toast.error('系統異常，請稍後再試');
   };
 
-  const { isLoading } = useUserMe({
-    token: state.token,
-    onSuccess: authDispatch.login,
-    onError: handleError,
+  const { isLoading } = useGetApiV1UsersMe({
+    swr: {
+      enabled: !!state.token,
+      onSuccess: (data) => {
+        authDispatch.login(data.data ?? null);
+      },
+      onError: handleError,
+    },
   });
 
   useEffect(() => {

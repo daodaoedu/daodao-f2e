@@ -11,7 +11,7 @@ export default function useMarathonAccess() {
       RoleEnum.Admin,
       RoleEnum.SuperAdmin,
     ];
-    return user ? permissions.includes(user?.role) : false;
+    return user?.role ? permissions.includes(user?.role) : false;
   }, [user]);
 
   return hasMarathonAccess;

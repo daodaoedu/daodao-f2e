@@ -33,7 +33,7 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
     error,
     mutate: refreshRecommendations,
   } = useContentTypeRecommendations('practice', {
-    userId: user?.id,
+    userId: user?._id,
     limit,
   });
 

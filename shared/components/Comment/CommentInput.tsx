@@ -43,7 +43,7 @@ function CommentInput({
   const [content, setContent] = useState(defaultContent);
   const [isPublic, setIsPublic] = useState(defaultIsPublic);
   const [isEditing, setIsEditing] = useState(defaultIsEditing);
-  const role = ROLE.find((r) => r.value === user?.roleList[0])?.label;
+  const role = ROLE.find((r) => r.value === user?.roleList?.[0])?.label;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +85,7 @@ function CommentInput({
         <div className="mb-2 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Image
-              src={user.photoURL}
+              src={user.photoURL ?? ''}
               alt={`${user.name} avatar`}
               width={30}
               height={30}

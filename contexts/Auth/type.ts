@@ -1,7 +1,7 @@
+import { FormattedUser } from '@/generated/models';
 import type {
   CreateUserFormSchema,
   UpdateUserFormSchema,
-  UserSchema,
 } from '@/services/users';
 import { LOGIN_TYPE } from '@/utils/env';
 
@@ -44,7 +44,7 @@ interface PermanentLoginState extends CommonAuthState {
   isLoggedIn: true;
   isTemporary: false;
   loginStatus: LoginStatus.PERMANENT;
-  user: UserSchema;
+  user: FormattedUser;
 }
 
 export type AuthState =
@@ -67,8 +67,8 @@ export type Action =
   | { type: ActionTypes.CLOSE_LOGIN_MODAL }
   | { type: ActionTypes.SET_TOKEN; payload: string }
   | { type: ActionTypes.SET_LOADING; payload: boolean }
-  | { type: ActionTypes.UPDATE_USER; payload: UserSchema }
-  | { type: ActionTypes.LOGIN; payload: UserSchema | null }
+  | { type: ActionTypes.UPDATE_USER; payload: FormattedUser }
+  | { type: ActionTypes.LOGIN; payload: FormattedUser | null }
   | { type: ActionTypes.LOGOUT };
 
 export type AuthDispatch = {
@@ -79,7 +79,7 @@ export type AuthDispatch = {
   [ActionTypes.UPDATE_USER]: (
     payload: CreateUserFormSchema | UpdateUserFormSchema
   ) => Promise<void>;
-  [ActionTypes.LOGIN]: (payload: UserSchema | null) => void;
+  [ActionTypes.LOGIN]: (payload: FormattedUser | null) => void;
   [ActionTypes.LOGOUT]: () => void;
 };
 
