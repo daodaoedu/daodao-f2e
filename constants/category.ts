@@ -265,7 +265,7 @@ export const LOGGED_OUT_NAV_LINK = [
 export const MARATHON_LINKS = [
   {
     name: '活動詳情',
-    link: '/learning-marathon#marathon-intro',
+    link: '/learning-marathons/2025S1#marathon-intro',
   },
   {
     name: '活動公告',
