@@ -1,4 +1,5 @@
 'use client';
+
 import Logo from '@/public/assets/landing-page/logo.svg';
 
 export default function Navbar() {
@@ -10,7 +11,7 @@ export default function Navbar() {
         <div className="navbar-item"><a href="#feature" className="scroll-link">解決困境</a></div>
         <div className="navbar-item"><a href="#functions" className="scroll-link">功能生態</a></div>
         <div className="navbar-item"><a href="#plans" className="scroll-link">方案</a></div>
-        <button className="btn btn-orange btn-small">立即加入</button>
+        <button type="button" className="btn btn-orange btn-small">立即加入</button>
       </div>
     </nav>
   );
