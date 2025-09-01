@@ -48,14 +48,6 @@ const participants: ParticipantType[] = [
 
 // 參與者卡片組件
 const ParticipantCard = ({ participant }: { participant: ParticipantType }) => {
-  // 將標題文字分行處理，避免使用索引作為 key
-  const titleLines = participant.title.split('\n');
-  const titleElements = titleLines.map((line) => {
-    const uniqueKey = `${participant.id}-${line.substring(0, 8)}`;
-
-    return <div key={uniqueKey}>{line}</div>;
-  });
-
   return (
     <div
       className={cn(
@@ -72,8 +64,8 @@ const ParticipantCard = ({ participant }: { participant: ParticipantType }) => {
           className="mx-auto block object-cover object-center"
         />
       </div>
-      <Title className="text-center text-lg font-bold leading-[140%] text-[#293A3D]">
-        {titleElements}
+      <Title className="whitespace-pre-line text-center text-lg font-bold leading-[140%] text-[#293A3D]">
+        {participant.title}
       </Title>
     </div>
   );
