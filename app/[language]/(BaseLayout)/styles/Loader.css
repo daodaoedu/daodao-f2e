@@ -1,0 +1,61 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #fff;
+}
+
+.loader {
+  position: fixed;
+  inset: 0;
+  background: #F3FDFF;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  z-index: 9999;
+}
+
+.loader__center {
+  display: grid;
+  place-items: center;
+}
+
+.loader__logo {
+  width: 140px;
+  height: 140px;
+}
+
+.loader__percent {
+  font-size: 50px;
+  font-weight: 600;
+  padding: 0 24px;
+  color: #16B9B3;
+  margin-bottom: 8px;
+}
+
+.loader__track {
+  position: relative;
+  height: 8px;
+  background: rgba(17, 179, 170, 0.2);
+  overflow: hidden;
+}
+
+.loader__bar {
+  height: 100%;
+  width: 0%;
+  background: #16B9B3;
+  transform: none;
+  transition: width 0.2s ease;
+}
+
+.loader--hide {
+  pointer-events: none;
+  animation: fadeOut 0.4s ease forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}/*# sourceMappingURL=loader.css.map */

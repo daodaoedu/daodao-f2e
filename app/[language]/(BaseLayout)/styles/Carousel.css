@@ -1,0 +1,92 @@
+@charset "UTF-8";
+.carousel {
+  max-width: 100%;
+  padding-left: 24px;
+  /* 軌道：讓卡片橫向排列與滑動 */
+  /* 卡片本體 */
+}
+.carousel .functions-cards {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 280px;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 8px;
+  scroll-snap-type: x mandatory;
+  /* 貼齊 */
+  scroll-behavior: smooth;
+  /* 平滑 */
+  -webkit-overflow-scrolling: touch;
+  /* iOS 慣性 */
+  scrollbar-width: none;
+  /* 隱藏滾動條 */
+}
+.carousel .functions-cards:last-child {
+  padding-right: 24px;
+}
+.carousel .functions-cards::-webkit-scrollbar {
+  display: none;
+}
+.carousel .functions-cards-item {
+  position: relative;
+  scroll-snap-align: start;
+  /* 每張卡對齊開始 */
+  background: white;
+  border-radius: 16px;
+  width: 280px;
+  padding: 16px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+  border-radius: 20px;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+.carousel .functions-cards-item .tag {
+  padding: 8px 4px;
+  width: 84px;
+  text-align: center;
+  border-radius: 8px 0;
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: #FFA10B;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.carousel .functions-cards-item img:nth-of-type(1) {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+  border-radius: 16px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  background: #f1f5f4;
+  /* 沒圖時的灰底 */
+}
+.carousel .functions-cards-item img:nth-of-type(2) {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+}
+.carousel .functions-cards-item p:nth-of-type(1) {
+  width: 100%;
+  color: #295E5C;
+  text-align: center;
+  font-weight: 600;
+  font-size: 20px;
+}
+.carousel .functions-cards-item p:nth-of-type(2) {
+  color: #295E5C;
+  margin: 0 0 12px;
+}
+.carousel .functions-cards-item p:nth-of-type(3) {
+  color: #16B9B3;
+  margin-top: auto;
+  margin-right: 24px;
+  /* 置底 */
+}/*# sourceMappingURL=carousel.css.map */
