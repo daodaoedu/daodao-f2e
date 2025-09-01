@@ -40,7 +40,7 @@ export default function ApplyButton({ className, children }: ApplyButtonProps) {
       cancelText: '稍後再說',
       confirmText: '加入排隊清單',
       onConfirm: () => {
-        window.open('https://daoda.kit.com/marathon', '_blank');
+        window.open('https://daoda.kit.com/marathon', '_blank', 'noopener');
       },
     });
   };

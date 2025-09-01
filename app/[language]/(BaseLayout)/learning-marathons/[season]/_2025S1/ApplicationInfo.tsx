@@ -376,7 +376,6 @@ const EvaluationCriterion = ({ id, title, weight, items }: EvaluationCriteria) =
           </li>
         ))}
       </ul>
-      <br />
     </div>
   </>
 );

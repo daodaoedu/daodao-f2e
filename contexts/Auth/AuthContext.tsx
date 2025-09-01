@@ -17,13 +17,12 @@ import {
   getReminderStorage,
   getTokenStorage,
 } from '@/utils/storage';
+import { createUserFormSchema, updateUserFormSchema } from '@/services/users';
 import {
-  userAPI,
-  createUserFormSchema,
-  updateUserFormSchema,
-} from '@/services/users';
-import { useGetApiV1UsersMe } from '@/generated/endpoints/users';
-import { FormattedUser } from '@/generated/models';
+  postApiV1Users,
+  putApiV1UsersId,
+  useGetApiV1UsersMe,
+} from '@/generated/endpoints/users';
 
 import LoginModal from './LoginModal';
 import {
@@ -186,24 +185,31 @@ export function AuthProvider({ children }: PropsWithChildren) {
         switch (state.loginStatus) {
           case LoginStatus.TEMPORARY: {
             const arg = createUserFormSchema.parse(input);
-            const { token, user } = await userAPI.create('', { arg });
-            setToken(token);
-            dispatch({
-              type: ActionTypes.UPDATE_USER,
-              payload: user as unknown as FormattedUser,
-            });
+            const { token, user } = await postApiV1Users(arg);
+            if (token && user) {
+              setToken(token);
+              dispatch({
+                type: ActionTypes.UPDATE_USER,
+                payload: user,
+              });
+            }
             break;
           }
           case LoginStatus.PERMANENT: {
+            if (!state.user._id) {
+              return;
+            }
             const arg = updateUserFormSchema.parse({
               ...state.user,
               ...input,
             });
-            const payload = await userAPI.update('', { arg });
-            dispatch({
-              type: ActionTypes.UPDATE_USER,
-              payload: payload as unknown as FormattedUser,
-            });
+            const { data: user } = await putApiV1UsersId(state.user._id, arg);
+            if (user) {
+              dispatch({
+                type: ActionTypes.UPDATE_USER,
+                payload: user,
+              });
+            }
             break;
           }
           default: {

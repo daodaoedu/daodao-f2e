@@ -57,7 +57,7 @@ const mockIdeaList: IdeaListResponseSchema = {
       content: '經過一年的自學程式設計，我想分享一些學習心得和遇到的挑戰。從最初的 HTML、CSS 基礎開始，到現在能夠獨立開發小型網站應用，這段旅程充滿了挫折和收穫。特別是在學習 JavaScript 的時候，原型鏈和閉包的概念讓我卡了很久，但透過大量的練習和閱讀相關文章，終於有所突破。',
       user: {
         _id: 'user1',
-        id: 'user1',
+        id: 1,
         name: '陳小明',
         roleList: ['學生'],
         photoURL: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
@@ -89,7 +89,7 @@ const mockIdeaList: IdeaListResponseSchema = {
       content: '參加了一場設計思維工作坊，學到了很多創新方法和解決問題的思維模式。講師帶我們從用戶同理心開始，透過訪談、觀察等方式真正理解使用者需求，然後進行腦力激盪和原型製作。這種以人為中心的設計方法讓我重新思考產品開發的流程，不再只是從技術角度出發，而是真正關注使用者體驗。',
       user: {
         _id: 'user2',
-        id: 'user2',
+        id: 2,
         name: '林小華',
         roleList: ['設計師'],
         photoURL: 'https://images.unsplash.com/photo-1494790108755-2616b612b1e0?w=40&h=40&fit=crop&crop=face',
@@ -117,7 +117,7 @@ const mockIdeaList: IdeaListResponseSchema = {
       content: '最近開始學習數據科學，發現數學基礎真的很重要！統計學、線性代數這些以前覺得很抽象的概念，現在在機器學習中都能找到實際應用。特別是在處理資料清理和特徵工程時，對數據的理解和直覺變得非常關鍵。推薦給想學 AI 的朋友們，不要忽略數學基礎的重要性。',
       user: {
         _id: 'user3',
-        id: 'user3',
+        id: 3,
         name: '王小美',
         roleList: ['工程師'],
         photoURL: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face',
@@ -149,7 +149,7 @@ const mockIdeaList: IdeaListResponseSchema = {
       content: '分享一個語言學習的心得：沉浸式學習真的有效！我開始看英文 YouTube 影片、聽 Podcast，甚至把手機介面都改成英文。雖然一開始很不習慣，但慢慢發現自己的聽力和語感都有明顯進步。重點是要選擇自己感興趣的內容，這樣學習才不會變成負擔。',
       user: {
         _id: 'user4',
-        id: 'user4',
+        id: 4,
         name: '張小偉',
         roleList: ['學生'],
         photoURL: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face',
@@ -177,7 +177,7 @@ const mockIdeaList: IdeaListResponseSchema = {
       content: '創業一年的反思：失敗真的是最好的老師。我的第一個產品因為沒有做好市場驗證就直接開發，結果花了大半年時間做出來卻沒有人要用。現在重新開始，我學會了先做 MVP，早期就開始收集用戶反饋，iterate 的速度也快很多。給想創業的朋友：don\'t be afraid to fail fast and learn faster!',
       user: {
         _id: 'user5',
-        id: 'user5',
+        id: 5,
         name: '劉小強',
         roleList: ['創業家'],
         photoURL: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face',
@@ -558,7 +558,7 @@ const mockReadList = async (params?: IdeaSearchParamsSchema): Promise<IdeaListRe
   }
 
   if (params?.userId) {
-    filteredIdeas = filteredIdeas.filter((idea) => idea.user.id === params.userId);
+    filteredIdeas = filteredIdeas.filter((idea) => idea.user.id === Number(params.userId));
   }
 
   // 排序
@@ -607,7 +607,7 @@ const mockCreate = async (data: CreateIdeaRequestSchema): Promise<IdeaMutationRe
     videoUrls: data.videoUrls || [],
     user: {
       _id: 'mock-user',
-      id: 'mock-user',
+      id: 0,
       name: '測試用戶',
       roleList: ['學生'],
       photoURL: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
