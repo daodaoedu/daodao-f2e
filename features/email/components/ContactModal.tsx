@@ -100,7 +100,7 @@ export const ContactModal = ({
   });
 
   const handleValidSubmit = (data: ContactFormSchema) => {
-    if (!me) return;
+    if (!me || !me.email || !me._id || !me.roleList || !me.name) return;
 
     trigger({
       userId: me._id,
