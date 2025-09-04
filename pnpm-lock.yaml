@@ -309,9 +309,6 @@ importers:
       typescript:
         specifier: 5.7.2
         version: 5.7.2
-      vercel:
-        specifier: ^46.1.1
-        version: 46.1.1(rollup@2.79.2)
 
 packages:
 
