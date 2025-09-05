@@ -1,0 +1,167 @@
+/* Videos 元件樣式 */
+
+.videos-section {
+  background: white;
+  padding: 4rem 0;
+}
+
+.videos-section .container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.videos-section .section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.videos-section .section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.videos-section .section-description {
+  font-size: 1.125rem;
+  color: #6b7280;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.videos-section .videos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.videos-section .video-item {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.videos-section .video-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.videos-section .video-thumbnail {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background: #f3f4f6;
+  overflow: hidden;
+}
+
+.videos-section .video-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.videos-section .video-item:hover .video-thumbnail img {
+  transform: scale(1.05);
+}
+
+.videos-section .video-play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background: rgba(22, 185, 179, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.videos-section .video-play-button:hover {
+  background: #16B9B3;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.videos-section .video-play-button svg {
+  width: 24px;
+  height: 24px;
+  color: white;
+  margin-left: 4px;
+}
+
+.videos-section .video-content {
+  padding: 1.5rem;
+}
+
+.videos-section .video-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.videos-section .video-description {
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.videos-section .video-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.videos-section .video-meta .duration {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.videos-section .video-meta .views {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* RWD */
+@media (max-width: 768px) {
+  .videos-section {
+    padding: 3rem 0;
+  }
+  
+  .videos-section .section-title {
+    font-size: 2rem;
+  }
+  
+  .videos-section .videos-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .videos-section .video-thumbnail {
+    height: 180px;
+  }
+  
+  .videos-section .video-play-button {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .videos-section .video-play-button svg {
+    width: 20px;
+    height: 20px;
+  }
+}

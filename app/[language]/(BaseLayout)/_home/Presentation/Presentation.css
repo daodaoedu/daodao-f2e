@@ -1,0 +1,166 @@
+/* Presentation 元件樣式 */
+
+.presentation-section {
+  background: #f8fafc;
+  padding: 4rem 0;
+}
+
+.presentation-section .container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.presentation-section .section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.presentation-section .section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.presentation-section .section-description {
+  font-size: 1.125rem;
+  color: #6b7280;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.presentation-section .presentation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.presentation-section .presentation-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.presentation-section .presentation-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.presentation-section .presentation-icon {
+  width: 64px;
+  height: 64px;
+  background: #16B9B3;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.presentation-section .presentation-icon svg {
+  width: 32px;
+  height: 32px;
+  color: white;
+}
+
+.presentation-section .presentation-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.presentation-section .presentation-description {
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.presentation-section .presentation-features {
+  list-style: none;
+  padding: 0;
+}
+
+.presentation-section .presentation-features li {
+  padding: 0.5rem 0;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.presentation-section .presentation-features li::before {
+  content: "✓";
+  color: #16B9B3;
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+.presentation-section .presentation-cta {
+  margin-top: 1.5rem;
+}
+
+.presentation-section .presentation-button {
+  background: #16B9B3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.presentation-section .presentation-button:hover {
+  background: #0f8a85;
+  transform: translateY(-2px);
+}
+
+/* 特殊樣式 */
+.presentation-section .presentation-card.featured {
+  border-color: #16B9B3;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ecfdf5 100%);
+}
+
+.presentation-section .presentation-card.featured .presentation-icon {
+  background: linear-gradient(135deg, #16B9B3 0%, #0f8a85 100%);
+}
+
+/* RWD */
+@media (max-width: 768px) {
+  .presentation-section {
+    padding: 3rem 0;
+  }
+  
+  .presentation-section .section-title {
+    font-size: 2rem;
+  }
+  
+  .presentation-section .presentation-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .presentation-section .presentation-card {
+    padding: 1.5rem;
+  }
+  
+  .presentation-section .presentation-icon {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .presentation-section .presentation-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+}

@@ -1,0 +1,333 @@
+/* BubbleDialog 組件樣式 */
+
+/* 主要容器樣式 */
+.bubble-dialog-section {
+  position: relative;
+  min-height: 500px;
+}
+
+/* 主要背景區域 - 淺藍色 */
+.bubble-dialog-main-bg {
+  background-color: #DEF5F5; /* primary-lightest */
+  min-height: 400px;
+  position: relative;
+}
+
+/* 對話文字區域 */
+.bubble-dialog-text-container {
+  position: relative;
+  z-index: 10;
+}
+
+.bubble-dialog-title {
+  font-size: 1.875rem; /* text-3xl */
+  font-weight: bold;
+  color: #536166; /* text-basic-500 */
+  margin-bottom: 1.5rem; /* mb-6 */
+  font-family: "Noto Sans TC", "Roboto", sans-serif;
+}
+
+.bubble-dialog-text-box {
+  background-color: white;
+  border-radius: 1rem; /* rounded-2xl */
+  border: 1px solid #89DAD7; /* border-primary-lighter */
+  padding: 1.5rem; /* p-6 */
+  display: inline-block;
+  position: relative;
+}
+
+.bubble-dialog-text-content {
+  font-size: 1.25rem; /* text-xl */
+  color: #536166; /* text-basic-500 */
+  min-height: 2rem;
+  font-family: "Noto Sans TC", "Roboto", sans-serif;
+  line-height: 1.5;
+}
+
+/* 打字游標動畫 */
+.bubble-dialog-cursor {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* 右側圖形元素容器 */
+.bubble-dialog-graphics {
+  position: relative;
+}
+
+/* 眼睛樣式 */
+.bubble-dialog-eyes {
+  position: absolute;
+  top: 2rem; /* top-8 */
+  right: 8rem; /* right-32 */
+  display: flex;
+  gap: 0.75rem; /* gap-3 */
+}
+
+.bubble-dialog-eye {
+  width: 0.75rem; /* w-3 */
+  height: 1.25rem; /* h-5 */
+  background-color: #536166; /* bg-basic-500 */
+  border-radius: 9999px; /* rounded-full */
+}
+
+/* 放大鏡樣式 */
+.bubble-dialog-magnifier {
+  position: absolute;
+  top: 4rem; /* top-16 */
+  right: 5rem; /* right-20 */
+}
+
+.bubble-dialog-magnifier-lens {
+  width: 2rem; /* w-8 */
+  height: 2rem; /* h-8 */
+  border: 2px solid #536166; /* border-2 border-basic-500 */
+  border-radius: 9999px; /* rounded-full */
+  background-color: white;
+}
+
+.bubble-dialog-magnifier-handle {
+  width: 0.25rem; /* w-1 */
+  height: 1.5rem; /* h-6 */
+  background-color: #536166; /* bg-basic-500 */
+  transform: rotate(45deg);
+  transform-origin: top left;
+  margin-left: 1.5rem; /* ml-6 */
+  margin-top: -0.5rem; /* -mt-2 */
+}
+
+/* 裝飾氣泡樣式 */
+.bubble-dialog-decorative-bubble {
+  position: absolute;
+  border: 1px solid #89DAD7; /* border-primary-lighter */
+  border-radius: 9999px; /* rounded-full */
+  opacity: 0.6;
+}
+
+.bubble-dialog-decorative-bubble.small {
+  width: 1rem; /* w-4 */
+  height: 1rem; /* h-4 */
+  top: 1rem; /* top-4 */
+  right: 2rem; /* right-8 */
+}
+
+.bubble-dialog-decorative-bubble.large {
+  width: 1.5rem; /* w-6 */
+  height: 1.5rem; /* h-6 */
+  top: 2rem; /* top-8 */
+  right: 1rem; /* right-4 */
+}
+
+/* 底部波浪形狀區域 */
+.bubble-dialog-wave-container {
+  position: relative;
+}
+
+.bubble-dialog-wave-bg {
+  position: absolute;
+  inset: 0;
+  background-color: #16B9B3; /* bg-primary-base */
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 70%);
+}
+
+.bubble-dialog-wave-content {
+  position: relative;
+  z-index: 10;
+  max-width: 72rem; /* max-w-6xl */
+  margin: 0 auto;
+  padding: 4rem 1rem; /* py-16 px-4 */
+}
+
+.bubble-dialog-wave-text {
+  color: white;
+  text-align: center;
+  font-family: "Noto Sans TC", "Roboto", sans-serif;
+}
+
+@media (min-width: 1024px) {
+  .bubble-dialog-wave-text {
+    text-align: left;
+    max-width: 28rem; /* lg:max-w-md */
+  }
+}
+
+.bubble-dialog-wave-title {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: bold;
+  margin-bottom: 0.5rem; /* mb-2 */
+}
+
+.bubble-dialog-wave-subtitle {
+  font-size: 1.25rem; /* text-xl */
+}
+
+/* 響應式設計 */
+@media (max-width: 1023px) {
+  .bubble-dialog-main-bg {
+    padding: 5rem 1rem; /* py-20 px-4 */
+  }
+  
+  .bubble-dialog-graphics {
+    display: none; /* 在移動版隱藏圖形元素 */
+  }
+}
+
+@media (min-width: 1024px) {
+  .bubble-dialog-main-bg {
+    padding: 5rem 1rem; /* py-20 px-4 */
+  }
+  
+  .bubble-dialog-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* grid-cols-2 */
+    gap: 3rem; /* gap-12 */
+    align-items: center;
+  }
+}
+
+/* 原始 HTML 結構的樣式支援 */
+.section-block.bubble-dialog {
+  padding-top: 48px;
+  position: relative;
+  min-height: 400px;
+}
+
+.section-block.bubble-dialog .dialog-text {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 24px;
+  padding-right: 10%;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+  .section-block.bubble-dialog .dialog-text {
+    padding-right: 20%;
+    font-size: 20px;
+  }
+}
+
+.section-block.bubble-dialog #type-animation {
+  padding: 8px 24px;
+  background-color: #F3FDFF;
+  border: #99ECFF 2px solid;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  line-height: 1.4;
+  height: 40px;
+}
+
+.section-block.bubble-dialog #type-animation::after {
+  content: "";
+  display: inline-block;
+  width: 0.12em;
+  height: 1em;
+  margin-left: 0.1em;
+  border-right: 0.12em solid currentColor;
+  animation: caret 0.8s step-end infinite;
+  transform: translateY(1px);
+}
+
+@keyframes caret {
+  50% {
+    border-right-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-block.bubble-dialog #type-animation .bubble-dialog #type-animation::after {
+    animation: none;
+    border-right-color: currentColor;
+  }
+}
+
+.section-block.bubble-dialog .block-mascot {
+  padding: 24px 24px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  margin-top: 20px;
+}
+
+@media (min-width: 768px) {
+  .section-block.bubble-dialog .block-mascot {
+    padding-right: 20%;
+    font-size: 28px;
+  }
+}
+
+.section-block.bubble-dialog .block-mascot .block-mascot-body {
+  position: relative;
+  border-radius: 0 100px 0 0;
+  background-color: #4BE8FF;
+  padding: 60px 0;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-block.bubble-dialog .block-mascot img {
+  position: absolute;
+  top: -20px;
+  right: 3px;
+  z-index: 2;
+}
+
+.section-block.bubble-dialog .block-mascot .container {
+  text-align: center;
+  color: white;
+}
+
+.section-block.bubble-dialog .block-mascot .container p {
+  margin: 8px 0;
+  font-weight: 600;
+}
+
+.section-block.bubble-dialog .block-mascot .container p:first-of-type {
+  font-size: 1.2em;
+  margin-bottom: 4px;
+}
+
+.section-block.bubble-dialog .block-mascot .container p:last-of-type {
+  font-size: 1em;
+  opacity: 0.9;
+}
+
+/* 文字顏色樣式 */
+.text-dark-green {
+  color: #295E5C !important;
+}
+
+.text-white {
+  color: white !important;
+}
+
+/* 容器樣式 */
+.container {
+  padding: 0 24px;
+  width: 100%;
+  max-width: 708px;
+  margin: auto;
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 1140px;
+  }
+}

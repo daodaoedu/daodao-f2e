@@ -1,29 +1,70 @@
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import KeyVision from './components/Keyvision';
-import './styles/All.css';
-// import './styles/Reset.css';
-import './styles/Index.css';
-import './styles/Loader.css';
-import './styles/Marquee.css';
-import './styles/Carousel.css';
+import { 
+  Loader,
+  Navbar,
+  MobileMenu,
+  FloatButtons,
+  KeyVision,
+  SloganSection,
+  FeatureGrid,
+  PresentationSection,
+  BubbleDialog,
+  VideoSection,
+  FunctionCarousel,
+  PlanSection,
+  TestimonialMarquee,
+  CTASection,
+  PersonalitySection,
+  Footer,
+} from './_home';
 
-
-function Page() {
-
+export default function HomePage() {
   return (
     <>
+      {/* Loader */}
+      <Loader />
+      
+      {/* Navigation */}
       <Navbar />
-      <main>
-      <KeyVision />
+      <MobileMenu />
+      <FloatButtons />
+      
+      {/* Main Content */}
+        {/* KeyVision */}
+        <KeyVision />
         
-      <div style={{ height: 80 }} />
-      {/* <h1>Vite + React</h1> */}
-
-      </main>
+        
+        {/* Slogan */}
+        <SloganSection />
+        
+        {/* Features */}
+        <FeatureGrid />
+        
+        {/* Presentation */}
+        <PresentationSection />
+        
+        {/* Bubble Dialog */}
+        <BubbleDialog />
+        
+        {/* Videos */}
+        <VideoSection />
+        
+        {/* Functions */}
+        <FunctionCarousel />
+        
+        {/* Plans */}
+        <PlanSection />
+        
+        {/* Testimonials */}
+        <TestimonialMarquee />
+        
+        {/* Call to Action */}
+        <CTASection />
+        
+        {/* Personality Test */}
+        <PersonalitySection />
+      
+      {/* Footer */}
       <Footer />
     </>
-  )
+  );
 }
-
-export default Page

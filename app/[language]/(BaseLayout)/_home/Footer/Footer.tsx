@@ -1,13 +1,12 @@
 'use client';
 
-import LogoWhite from '@/public/assets/landing-page/logo-simple-white.svg';
-
+import './Footer.css';
 
 export default function Footer() {
   return (
     <section className="footer">
       <div className="logo">
-        <img src={LogoWhite} alt="Logo" />
+        <img src="/assets/landing-page/logo-simple-white.svg" alt="Logo" />
         <p>Where personal growth meets collective wisdom!</p>
       </div>
       <div className="desktop-row">
@@ -43,10 +42,10 @@ export default function Footer() {
         <p className="group-title">追蹤島島</p>
         <div className="d-flex gap-s">
           <a href="https://instagram.com/daodao" target="_blank" rel="noopener noreferrer">
-            <img src="./img/icon-Instagram.svg" alt="Instagram" />
+            <img src="/assets/landing-page/icon-Instagram.svg" alt="Instagram" />
           </a>
           <a href="https://facebook.com/daodao" target="_blank" rel="noopener noreferrer">
-            <img src="./img/icon-Facebook.svg" alt="Facebook" />
+            <img src="/assets/landing-page/icon-Facebook.svg" alt="Facebook" />
           </a>
         </div>
       </div>

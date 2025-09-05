@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import lottie, { type AnimationItem } from 'lottie-web';
 
 type Props = {
-  desktopSrc: string;   // e.g. "/img/key-vision-desktop.json"
-  mobileSrc: string;    // e.g. "/img/key-vision-mobile.json"
+  desktopSrc: string;   // e.g. "/assets/landing-page/key-vision-desktop.json"
+  mobileSrc: string;    // e.g. "/assets/landing-page/key-vision-mobile.json"
   breakpoint?: number;  // 切換門檻，預設 768
   className?: string;   // 可傳入 "lottie-animation"
   preserveAspectRatio?: string; // 預設 "xMidYMid meet"
