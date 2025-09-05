@@ -15,6 +15,7 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
   const [bubbleWidth, setBubbleWidth] = useState<number | null>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalsRef = useRef<Set<NodeJS.Timeout>>(new Set());
 
   // 使用 type-animation.js 的相同設定
   const LINES = [
@@ -35,32 +36,37 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
   // 打字動畫
   const type = (text: string): Promise<void> => {
     return new Promise((resolve) => {
-      let i = 1;
+      let i = 0;
       const typeInterval = setInterval(() => {
-        if (i <= text.length) {
-          setCurrentText(text.slice(0, i));
+        if (i < text.length) {
+          setCurrentText(text.slice(0, i + 1));
           i += 1;
         } else {
           clearInterval(typeInterval);
+          intervalsRef.current.delete(typeInterval);
           resolve();
         }
       }, TYPE_SPEED);
+      intervalsRef.current.add(typeInterval);
     });
   };
 
   // 退格動畫
   const erase = (): Promise<void> => {
     return new Promise((resolve) => {
-      let text = currentText;
       const eraseInterval = setInterval(() => {
-        if (text.length > 0) {
-          text = text.slice(0, -1);
-          setCurrentText(text);
-        } else {
-          clearInterval(eraseInterval);
-          resolve();
-        }
+        setCurrentText((prevText) => {
+          if (prevText.length > 0) {
+            return prevText.slice(0, -1);
+          } else {
+            clearInterval(eraseInterval);
+            intervalsRef.current.delete(eraseInterval);
+            resolve();
+            return '';
+          }
+        });
       }, ERASE_SPEED);
+      intervalsRef.current.add(eraseInterval);
     });
   };
 
@@ -94,8 +100,11 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
   // 開始動畫
   const startAnimation = () => {
     let currentLineIndex = 0;
+    let isAnimating = true;
     
     const animateNextLine = async () => {
+      if (!isAnimating) return; // 如果動畫被停止，則退出
+      
       if (currentLineIndex >= LINES.length) {
         currentLineIndex = 0; // 重新開始
       }
@@ -107,24 +116,43 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
       await wait(PAUSE_NEXT);
       
       currentLineIndex += 1;
-      setTimeout(animateNextLine, 0);
+      
+      // 使用 requestAnimationFrame 來確保動畫流暢
+      if (isAnimating) {
+        requestAnimationFrame(() => {
+          setTimeout(animateNextLine, 0);
+        });
+      }
     };
     
     animateNextLine();
+    
+    // 返回停止函數
+    return () => {
+      isAnimating = false;
+    };
   };
 
   useEffect(() => {
     // 計算氣泡寬度
     fitBubbleWidth();
     
-    // 開始動畫
-    startAnimation();
+    // 開始動畫並獲取停止函數
+    const stopAnimation = startAnimation();
     
     // 清理函數
     return () => {
+      // 停止動畫
+      stopAnimation();
+      
       if (animationRef.current) {
         clearTimeout(animationRef.current);
       }
+      // 清理所有 interval
+      intervalsRef.current.forEach((interval) => {
+        clearInterval(interval);
+      });
+      intervalsRef.current.clear();
     };
   }, []);
 
@@ -138,7 +166,6 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
           style={bubbleWidth ? { width: `${bubbleWidth}px` } : {}}
         >
           {currentText}
-          {/* <span className="bubble-dialog-cursor">|</span> */}
         </div>
       </div>
       <div className="block-mascot">
@@ -155,6 +182,15 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
           </div>
         </div>
       </div>
+      {/* 綠色圓弧裝飾圖片 */}
+      <Image 
+        src="/assets/landing-page/deco-island.svg" 
+        width={208} 
+        height={208} 
+        alt="綠色圓弧裝飾"
+        className="position-absolute"
+        style={{ right: 'calc(208px / 2)', bottom: 0 }}
+      />
     </div>
   );
 }

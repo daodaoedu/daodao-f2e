@@ -29,7 +29,7 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
     const step = getStep();
     if (!step) return 0;
     const totalScrollable = trackRef.current.scrollWidth - trackRef.current.clientWidth;
-    return Math.max(0, Math.round(totalScrollable / step));
+    return Math.max(0, Math.floor(totalScrollable / step));
   }, [getStep]);
 
   const enableNoSnap = useCallback(() => {
@@ -50,7 +50,12 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
     const maxIdx = maxIndex();
     const targetIndex = Math.max(0, Math.min(maxIdx, index));
     const targetLeft = targetIndex * step;
-    trackRef.current.scrollTo({ left: targetLeft, behavior: 'smooth' });
+    
+    // 確保不會滾動超出實際範圍
+    const maxScrollLeft = trackRef.current.scrollWidth - trackRef.current.clientWidth;
+    const finalLeft = Math.min(targetLeft, maxScrollLeft);
+    
+    trackRef.current.scrollTo({ left: finalLeft, behavior: 'smooth' });
   }, [getStep, maxIndex]);
 
   useEffect(() => {
@@ -68,7 +73,6 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
 
     let dragging = false;
     let startX = 0;
-    let lastX = 0;
     let startLeft = 0;
     let pointerId: number | null = null;
     let movedPx = 0;
@@ -84,7 +88,6 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
       dragging = true;
       movedPx = 0;
       startX = e.clientX;
-      lastX = e.clientX;
       startLeft = track.scrollLeft;
 
       // 計算起始索引（用於後續計算）
@@ -98,11 +101,11 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
     const onPointerMove = (e: PointerEvent) => {
       if (!dragging || e.pointerId !== pointerId) return;
       const dx = e.clientX - startX;
-      lastX = e.clientX;
-      movedPx += Math.abs(e.clientX - lastX);
+      const currentMovedPx = Math.abs(dx);
 
-      if (movedPx > 5) {
+      if (currentMovedPx > 5) {
         track.scrollLeft = startLeft - dx;
+        movedPx = currentMovedPx;
       }
     };
 
@@ -167,7 +170,7 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
       track.removeEventListener('lostpointercapture', onLostCapture);
       track.removeEventListener('click', swallowClickIfDragged, true);
     };
-  }, [getStep, maxIndex, enableNoSnap, disableNoSnap]);
+  }, [getStep, maxIndex, enableNoSnap, disableNoSnap, scrollToIndex]);
 
   const functions = [
     {
@@ -229,26 +232,6 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
             />
           ))}
         </div>
-        
-        {/* 輪播導航按鈕 */}
-        {maxIndex() > 0 && (
-          <div className="flex justify-center gap-2 mt-6">
-            <button
-              type="button"
-              onClick={() => scrollToIndex(0)}
-              className="px-3 py-2 text-sm bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors"
-            >
-              第一頁
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollToIndex(maxIndex())}
-              className="px-3 py-2 text-sm bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors"
-            >
-              最後一頁
-            </button>
-          </div>
-        )}
       </div>
       
       {/* 底部裝飾圖片 */}

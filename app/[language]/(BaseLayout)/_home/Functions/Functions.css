@@ -6,7 +6,7 @@
   user-select: none !important;
 }
 
-.dragging * {
+.dragging .functions-cards-item {
   pointer-events: none !important;
 }
 
