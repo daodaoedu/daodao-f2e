@@ -58,12 +58,12 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
         setCurrentText((prevText) => {
           if (prevText.length > 0) {
             return prevText.slice(0, -1);
-          } else {
+          } 
             clearInterval(eraseInterval);
             intervalsRef.current.delete(eraseInterval);
             resolve();
             return '';
-          }
+          
         });
       }, ERASE_SPEED);
       intervalsRef.current.add(eraseInterval);
