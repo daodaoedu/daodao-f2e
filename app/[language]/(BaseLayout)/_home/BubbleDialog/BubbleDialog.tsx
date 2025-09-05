@@ -1,4 +1,5 @@
 'use client';
+
 import './BubbleDialog.css';
 
 import { useState, useEffect, useRef } from 'react';
@@ -32,19 +33,35 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
   const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
   // 打字動畫
-  const type = async (text: string) => {
-    for (let i = 1; i <= text.length; i++) {
-      setCurrentText(text.slice(0, i));
-      await wait(TYPE_SPEED);
-    }
+  const type = (text: string): Promise<void> => {
+    return new Promise((resolve) => {
+      let i = 1;
+      const typeInterval = setInterval(() => {
+        if (i <= text.length) {
+          setCurrentText(text.slice(0, i));
+          i += 1;
+        } else {
+          clearInterval(typeInterval);
+          resolve();
+        }
+      }, TYPE_SPEED);
+    });
   };
 
   // 退格動畫
-  const erase = async () => {
-    while (currentText.length > 0) {
-      setCurrentText(prev => prev.slice(0, -1));
-      await wait(ERASE_SPEED);
-    }
+  const erase = (): Promise<void> => {
+    return new Promise((resolve) => {
+      let text = currentText;
+      const eraseInterval = setInterval(() => {
+        if (text.length > 0) {
+          text = text.slice(0, -1);
+          setCurrentText(text);
+        } else {
+          clearInterval(eraseInterval);
+          resolve();
+        }
+      }, ERASE_SPEED);
+    });
   };
 
   // 計算氣泡寬度以避免抖動
@@ -61,10 +78,10 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
     document.body.appendChild(probe);
     
     let max = 0;
-    for (const s of LINES) {
+    LINES.forEach((s) => {
       probe.textContent = s;
       max = Math.max(max, probe.getBoundingClientRect().width);
-    }
+    });
     document.body.removeChild(probe);
     
     // 加上內邊距與邊框
@@ -75,15 +92,25 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
   };
 
   // 開始動畫
-  const startAnimation = async () => {
-    while (true) {
-      for (const s of LINES) {
-        await type(s);
-        await wait(PAUSE_DONE);
-        await erase();
-        await wait(PAUSE_NEXT);
+  const startAnimation = () => {
+    let currentLineIndex = 0;
+    
+    const animateNextLine = async () => {
+      if (currentLineIndex >= LINES.length) {
+        currentLineIndex = 0; // 重新開始
       }
-    }
+      
+      const currentLine = LINES[currentLineIndex];
+      await type(currentLine);
+      await wait(PAUSE_DONE);
+      await erase();
+      await wait(PAUSE_NEXT);
+      
+      currentLineIndex += 1;
+      setTimeout(animateNextLine, 0);
+    };
+    
+    animateNextLine();
   };
 
   useEffect(() => {

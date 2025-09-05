@@ -1,7 +1,8 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import { cn } from '@/utils/cn';
+import { SectionHeader } from '@/app/[language]/(BaseLayout)/SectionHeader';
 import './Plans.css';
 
 interface PlanSectionProps {
@@ -10,65 +11,53 @@ interface PlanSectionProps {
 
 export function PlanSection({ className }: PlanSectionProps) {
   return (
-    <section className={cn('py-20 bg-white relative', className)} id="plans">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            加入島島阿學
-          </h2>
-          <h3 className="text-lg text-gray-600 max-w-2xl mx-auto">
-            搶先體驗完整學習平台，與我們一起打造更好的學習體驗
-          </h3>
-        </div>
+    <section className={cn('section-block plans', className)} id="plans">
+      <SectionHeader
+        title="加入島島阿學"
+        subtitle="搶先體驗完整學習平台，與我們一起打造更好的學習體驗"
+        variant="default"
+        size="lg"
+        alignment="center"
+      />
 
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-lg p-12 relative">
-            {/* 裝飾元素 */}
-            <div className="absolute -left-16 -top-12 opacity-60">
-              <div className="w-32 h-32 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full" />
+      <div className="container">
+        <div className="desktop-row align-items-center">
+          <div className="plan-items">
+            {/* 裝飾元素 - 半圓 */}
+            <Image 
+              src="/assets/landing-page/deco-semicircle.svg" 
+              alt="裝飾半圓" 
+              width={120} 
+              height={120} 
+              className="absolute"
+              style={{ left: '-60px', top: '-50px', zIndex: -1 }}
+            />
+
+            <h2>探索所有功能，完全免費！</h2>
+            <p className="tiny">作為早期使用者，你將可以免費使用所有功能</p>
+
+            <ul className="feature-list">
+              <li>建立學習計劃和主題實踐</li>
+              <li>分享學習想法和資源</li>
+              <li>AI 學習建議和分析</li>
+              <li>成長地圖看見自己的進步和機會</li>
+              <li>優先獲得新功能體驗</li>
+            </ul>
+
+            <div className="btn btn-orange btn-large" style={{ marginTop: '24px' }}>
+              立即免費註冊
             </div>
-            <div className="absolute -right-12 -bottom-12 opacity-60">
-              <div className="w-24 h-24 bg-gradient-to-br from-green-200 to-blue-200 rounded-full" />
-            </div>
+            <p className="tiny">Beta 期間完全免費 • 無需信用卡</p>
 
-            <div className="text-center relative z-10">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                探索所有功能，完全免費！
-              </h2>
-              <p className="text-sm text-gray-500 mb-8">
-                作為早期使用者，你將可以免費使用所有功能
-              </p>
-
-              <ul className="space-y-3 mb-8 text-left max-w-md mx-auto">
-                <li className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-gray-700">建立學習計劃和主題實踐</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-gray-700">分享學習想法和資源</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-gray-700">AI 學習建議和分析</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-gray-700">成長地圖看見自己的進步和機會</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-gray-700">優先獲得新功能體驗</span>
-                </li>
-              </ul>
-
-              <Button size="lg" className="px-8 py-4 text-lg bg-orange-500 hover:bg-orange-600 mb-4">
-                立即免費註冊
-              </Button>
-              <p className="text-sm text-gray-500">
-                Beta 期間完全免費 • 無需信用卡
-              </p>
-            </div>
+            {/* 裝飾元素 - 幾何圖形 */}
+            <Image 
+              src="/assets/landing-page/deco-geometries.svg" 
+              alt="裝飾幾何圖形" 
+              width={100} 
+              height={100} 
+              className="absolute"
+              style={{ right: '-50px', bottom: '-50px' }}
+            />
           </div>
         </div>
       </div>

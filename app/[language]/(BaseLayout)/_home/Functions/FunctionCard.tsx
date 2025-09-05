@@ -1,42 +1,51 @@
 'use client';
 
+import Image from 'next/image';
 import { cn } from '@/utils/cn';
 
 interface FunctionCardProps {
+  tag: string;
   title: string;
   description: string;
-  icon: string;
-  color: string;
+  imageUrl: string;
   action: string;
   className?: string;
 }
 
-export function FunctionCard({ title, description, icon, color, action, className }: FunctionCardProps) {
+export function FunctionCard({ tag, title, description, imageUrl, action, className }: FunctionCardProps) {
   return (
-    <div className={cn('bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1', className)}>
-      <div className="p-6">
-        <div className="text-center mb-4">
-          <div className={`w-16 h-16 rounded-lg ${color} flex items-center justify-center mb-4 mx-auto`}>
-            <span className="text-2xl">{icon}</span>
-          </div>
-          <div className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-3">
-            {title}
-          </div>
-        </div>
-        
-        <div className="text-center mb-6">
-          <p className="text-gray-700 text-sm leading-relaxed mb-4">
-            {description}
-          </p>
-          <div className="flex items-center justify-center text-primary font-medium text-sm">
-            {action}
-            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M5 12h14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M12 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-        </div>
+    <div className={cn('functions-cards-item relative bg-white rounded-2xl w-70 p-4 flex flex-col gap-4 min-w-0 box-border scroll-snap-align-start', className)}>
+      <div className="absolute top-4 left-4 px-2 py-2 w-21 text-center rounded-tl-lg bg-orange-400 text-white text-xs font-semibold">
+        {tag}
       </div>
+      
+      <Image 
+        src={imageUrl} 
+        alt={title}
+        width={248}
+        height={140}
+        className="w-full h-auto aspect-video rounded-2xl object-cover bg-gray-100"
+      />
+      
+      <p className="w-full text-teal-800 text-center font-semibold text-xl">
+        {title}
+      </p>
+      
+      <p className="text-teal-800 m-0 mb-3">
+        {description}
+      </p>
+      
+      <p className="text-cyan-500 mt-auto mr-6">
+        {action}
+      </p>
+      
+      <Image 
+        src="/assets/landing-page/icon-arror-right.svg" 
+        alt="前往"
+        width={16}
+        height={16}
+        className="absolute bottom-4 right-4"
+      />
     </div>
   );
 }

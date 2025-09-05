@@ -17,7 +17,7 @@
   gap: 20px;
   width: -moz-max-content;
   width: max-content;
-  animation: scroll 30s linear infinite;
+  animation: scroll 45s linear infinite;
   will-change: transform;
 }
 
@@ -109,11 +109,11 @@
 
 /* Tailwind CSS 動畫類別 */
 .animate-marquee {
-  animation: marquee 30s linear infinite;
+  animation: marquee 45s linear infinite;
 }
 
 .animate-marquee-reverse {
-  animation: marquee-reverse 30s linear infinite;
+  animation: marquee-reverse 45s linear infinite;
 }
 
 @keyframes marquee {

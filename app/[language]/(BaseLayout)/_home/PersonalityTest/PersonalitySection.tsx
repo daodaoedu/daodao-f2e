@@ -1,8 +1,9 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import Image from 'next/image';
+import Link from 'next/link';
 import { cn } from '@/utils/cn';
-import './PersonalityTest.css';
+import { SectionHeader } from '@/app/[language]/(BaseLayout)/SectionHeader';
 
 interface PersonalitySectionProps {
   className?: string;
@@ -10,61 +11,77 @@ interface PersonalitySectionProps {
 
 export function PersonalitySection({ className }: PersonalitySectionProps) {
   return (
-    <section className={cn('py-20 bg-white relative', className)}>
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* 左側標題和說明 */}
-          <div className="personality-title">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              了解你的學習偏好，<br />
-              獲得個人化的學習建議<br />
-              和推薦路徑
-            </h2>
-            <div className="flex items-center text-primary mb-8">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" strokeWidth="2" />
-                <polyline points="12,6 12,12 16,14" strokeWidth="2" />
-              </svg>
-              2-3分鐘
-            </div>
-          </div>
-
-          {/* 右側進入按鈕 */}
-          <div className="text-center">
-            <a 
-              href="/personality-test" 
-              className="inline-block mb-8 transform hover:scale-105 transition-transform"
-            >
-              <div className="w-48 h-48 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow">
-                <div className="text-center text-white">
-                  <div className="text-2xl mb-2">🧠</div>
-                  <div className="text-lg font-semibold">心理測驗</div>
-                </div>
-              </div>
-            </a>
+    <section 
+      className={cn(
+        'relative bg-contain bg-no-repeat bg-bottom h-[800px] flex flex-col justify-start px-6',
+        'md:px-[20%]',
+        'bg-[url("/assets/landing-page/bg-personality-test-mobile.png")]',
+        'md:bg-[url("/assets/landing-page/bg-personality-test-desktop.png")]',
+        className
+      )}
+      id="personality-test"
+    >
+      <div className="flex flex-col items-center justify-center h-full space-y-8">
+        <div className="text-center space-y-4">
+          <SectionHeader
+            title="了解你的學習偏好，獲得個人化的學習建議和推薦路徑"
+            variant="dark"
+            size="lg"
+            alignment="center"
+            showSubtitle={false}
+            titleClassName="text-gray-800 leading-tight"
+          />
+          <div className="flex items-center justify-center text-green-700 text-lg">
+            <Image 
+              src="/assets/landing-page/icon-clock.svg" 
+              alt="時鐘圖示" 
+              width={20} 
+              height={20} 
+              className="mr-2"
+            />
+            2-3分鐘
           </div>
         </div>
-
-        {/* 底部按鈕和說明 */}
-        <div className="text-center mt-12">
-          <Button size="lg" className="px-8 py-4 text-lg bg-green-600 hover:bg-green-700">
-            查看個人化結果
-            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M5 12h14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M12 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </Button>
-          <p className="text-gray-600 mt-4">獲得專屬學習建議</p>
-        </div>
-
-        {/* 裝飾元素 */}
-        <div className="absolute top-10 right-0 w-32 h-32 opacity-20">
-          <div className="w-full h-full bg-gradient-to-br from-primary to-secondary rounded-full" />
-        </div>
-        <div className="absolute top-30 left-0 w-24 h-24 opacity-20">
-          <div className="w-full h-full bg-gradient-to-br from-secondary to-primary rounded-full" />
-        </div>
+        
+        <Link href="/personality-test" className="transform hover:scale-105 transition-transform duration-200 hover:animate-jelly">
+          <Image 
+            src="/assets/landing-page/button-personality-test.svg" 
+            alt="點擊進入心理測驗" 
+            width={192} 
+            height={192} 
+          />
+        </Link>
       </div>
+
+      <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
+        <button type="button" className="relative bg-[#16B9B3] hover:bg-white text-white hover:text-[#16B9B3] border-2 border-[#16B9B3] rounded-[40px] h-14 w-[180px] font-semibold text-xl flex items-center justify-center space-x-2 transition-all duration-300 ease-in-out shadow-[0_8px_10px_0_rgba(22,185,179,0.1)] hover:shadow-[0_12px_20px_0_rgba(22,185,179,0.2)] hover:-translate-y-0.5 active:translate-y-0">
+          <span>查看個人化結果</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon">
+            <path d="M5 12h14" />
+            <path d="M12 5l7 7-7 7" />
+          </svg>
+        </button>
+        
+        <p className="text-center mt-4 text-[#295E5C] font-medium">獲得專屬學習建議</p>
+      </div>
+
+      {/* 裝飾元素 - 吉祥物 */}
+      <Image 
+        src="/assets/landing-page/deco-mascot.svg" 
+        alt="吉祥物裝飾" 
+        width={128} 
+        height={128} 
+        className="absolute top-[10%] -right-3"
+      />
+
+      {/* 裝飾元素 - 物品 */}
+      <Image 
+        src="/assets/landing-page/deco-items.svg" 
+        alt="物品裝飾" 
+        width={96} 
+        height={96} 
+        className="absolute top-[30%] left-0"
+      />
     </section>
   );
 }

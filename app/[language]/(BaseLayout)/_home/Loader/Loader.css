@@ -30,19 +30,30 @@ body {
   height: 140px;
 }
 
+.loader__bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  width: 100%;
+}
+
 .loader__percent {
   font-size: 50px;
   font-weight: 600;
   padding: 0 24px;
   color: #16B9B3;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
 }
 
 .loader__track {
   position: relative;
   height: 8px;
+  width: 100%;
   background: rgba(17, 179, 170, 0.2);
   overflow: hidden;
+  display: block; /* 確保元素正確顯示 */
+  box-sizing: border-box; /* 確保寬度計算正確 */
 }
 
 .loader__bar {
@@ -51,6 +62,11 @@ body {
   background: #16B9B3;
   transform: none;
   transition: width 0.2s ease;
+  min-width: 1px; /* 確保即使很小的寬度也能顯示 */
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgba(22, 185, 179, 0.3);
+  max-width: 100%; /* 確保不會超過容器寬度 */
+  box-sizing: border-box; /* 確保寬度計算正確 */
 }
 
 .loader--hide {

@@ -1,6 +1,6 @@
 // import Header from '@/layout/components/Header';
 // import Footer from '@/layout/components/Footer';
-// import './styles/All.css';
+import './styles/All.css';
 
 
 export default function BaseLayout({ children }: LayoutProps<'/[language]'>) {

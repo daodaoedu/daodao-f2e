@@ -1,150 +1,25 @@
-/* Functions 元件樣式 */
+/* Functions 元件樣式 - 拖拽功能必需樣式 */
 
-/* Carousel 樣式 - 從 @styles/Carousel.css 提取 */
-.carousel {
-  max-width: 100%;
-  padding-left: 24px;
+/* 拖拽狀態樣式 */
+.dragging {
+  cursor: grabbing !important;
+  user-select: none !important;
 }
 
-.carousel .functions-cards {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 280px;
-  gap: 16px;
-  overflow-x: auto;
-  padding: 8px;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+.dragging * {
+  pointer-events: none !important;
 }
 
-.carousel .functions-cards:last-child {
-  padding-right: 24px;
+/* 觸控優化 */
+.functions-cards-item img {
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
 }
 
-.carousel .functions-cards::-webkit-scrollbar {
-  display: none;
-}
-
-.carousel .functions-cards-item {
-  position: relative;
-  scroll-snap-align: start;
-  background: white;
-  border-radius: 16px;
-  width: 280px;
-  padding: 16px;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 16px;
-  border-radius: 20px;
-  min-width: 0;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-}
-
-.carousel .functions-cards-item .tag {
-  padding: 8px 4px;
-  width: 84px;
-  text-align: center;
-  border-radius: 8px 0;
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  background: #FFA10B;
-  color: white;
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.carousel .functions-cards-item img:nth-of-type(1) {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16/9;
-  border-radius: 16px;
-  object-fit: cover;
-  background: #f1f5f4;
-}
-
-.carousel .functions-cards-item img:nth-of-type(2) {
-  position: absolute;
-  bottom: 18px;
-  right: 18px;
-}
-
-.carousel .functions-cards-item p:nth-of-type(1) {
-  width: 100%;
-  color: #295E5C;
-  text-align: center;
-  font-weight: 600;
-  font-size: 20px;
-}
-
-.carousel .functions-cards-item p:nth-of-type(2) {
-  color: #295E5C;
-  margin: 0 0 12px;
-}
-
-.carousel .functions-cards-item p:nth-of-type(3) {
-  color: #16B9B3;
-  margin-top: auto;
-  margin-right: 24px;
-}
-
-/* 功能卡片樣式 */
-.function-card {
-  background: white;
-  border-radius: 20px;
-  padding: 24px;
-  text-align: center;
-  transition: all 0.3s ease;
-  border: 1px solid #e5e7eb;
-}
-
-.function-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.function-card .icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
-.function-card .title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.75rem;
-}
-
-.function-card .description {
-  color: #6b7280;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-}
-
-.function-card .action {
-  color: #16B9B3;
-  font-weight: 500;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.function-card .action:hover {
-  color: #0f8a85;
-}
-
-/* RWD */
+/* 響應式設計 */
 @media (max-width: 768px) {
-  .carousel .functions-cards-item {
-    width: 240px;
-    padding: 12px;
-  }
-  
-  .function-card {
-    padding: 20px;
+  .auto-cols-70 {
+    grid-auto-columns: 240px;
   }
 }

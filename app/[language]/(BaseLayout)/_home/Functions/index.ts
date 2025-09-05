@@ -1,2 +1,2 @@
-export { FunctionCard } from './FunctionCard';
 export { FunctionCarousel } from './FunctionCarousel';
+export { FunctionCard } from './FunctionCard';

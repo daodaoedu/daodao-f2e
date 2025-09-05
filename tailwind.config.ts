@@ -62,6 +62,7 @@ export default {
       ...defaultTheme.animation,
       "collapsible-down": "collapsible-down 0.2s ease-out",
       "collapsible-up": "collapsible-up 0.2s ease-out",
+      "jelly": "jelly-bounce 600ms cubic-bezier(0.22, 0.61, 0.36, 1) infinite",
     },
     extend: {
       colors: {
@@ -146,6 +147,26 @@ export default {
           },
           to: {
             height: "0",
+          },
+        },
+        "jelly-bounce": {
+          "0%": {
+            transform: "scale(1, 1)",
+          },
+          "20%": {
+            transform: "scale(1.08, 0.92)",
+          },
+          "40%": {
+            transform: "scale(0.95, 1.05)",
+          },
+          "60%": {
+            transform: "scale(1.03, 0.97)",
+          },
+          "80%": {
+            transform: "scale(0.99, 1.01)",
+          },
+          "100%": {
+            transform: "scale(1, 1)",
           },
         },
       },
