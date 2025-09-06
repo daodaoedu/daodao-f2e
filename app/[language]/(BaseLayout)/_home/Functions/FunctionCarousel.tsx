@@ -28,9 +28,10 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
     if (!trackRef.current) return 0;
     const step = getStep();
     if (!step) return 0;
-    const totalScrollable = trackRef.current.scrollWidth - trackRef.current.clientWidth;
-    return Math.max(0, Math.floor(totalScrollable / step));
-  }, [getStep]);
+    // 計算總卡片數量（減去1因為索引從0開始）
+    const totalCards = trackRef.current.children.length;
+    return Math.max(0, totalCards - 1);
+  }, []);
 
   const enableNoSnap = useCallback(() => {
     if (trackRef.current) {
@@ -53,12 +54,24 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
     // 計算讓卡片居中所需的滾動位置
     const containerWidth = trackRef.current.clientWidth;
     const cardWidth = step; // step 包含卡片寬度 + gap
-    const targetLeft = targetIndex * step - (containerWidth - cardWidth) / 2;
     
-    // 確保不會滾動超出實際範圍
+    // 計算理想的置中位置
+    const idealLeft = targetIndex * step - (containerWidth - cardWidth) / 2;
+    
+    // 計算實際可滾動的最大範圍
     const maxScrollLeft = trackRef.current.scrollWidth - trackRef.current.clientWidth;
     const minScrollLeft = 0;
-    const finalLeft = Math.max(minScrollLeft, Math.min(targetLeft, maxScrollLeft));
+    
+    // 對於最後一張卡片，允許滾動到理想位置（即使超出正常範圍）
+    // 對於其他卡片，限制在正常滾動範圍內
+    let finalLeft;
+    if (targetIndex === maxIdx) {
+      // 最後一張卡片：使用理想位置，但至少不能小於0
+      finalLeft = Math.max(minScrollLeft, idealLeft);
+    } else {
+      // 其他卡片：限制在正常滾動範圍內
+      finalLeft = Math.max(minScrollLeft, Math.min(idealLeft, maxScrollLeft));
+    }
     
     trackRef.current.scrollTo({ left: finalLeft, behavior: 'smooth' });
   }, [getStep, maxIndex]);
@@ -126,7 +139,7 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
         let currentIndex = 0;
         let minDistance = Infinity;
         
-        for (let i = 0; i <= maxIndex(); i++) {
+        for (let i = 0; i <= maxIndex(); i += 1) {
           const cardLeft = i * step;
           const cardCenter = cardLeft + step / 2;
           const distance = Math.abs(cardCenter - screenCenter);
@@ -147,6 +160,9 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
           // 向右拖曳：顯示右邊的卡片
           targetIndex = currentIndex + 1;
         }
+        
+        // 確保目標索引在有效範圍內
+        targetIndex = Math.max(0, Math.min(maxIndex(), targetIndex));
         
         scrollToIndex(targetIndex);
       }
@@ -261,7 +277,7 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
             // 覆蓋全域的 scroll-behavior
             scrollBehavior: 'auto',
             // 為卡片末端添加 padding
-            paddingRight: '24px'
+            paddingRight: '24px',
           }}
         >
           {functions.map((func) => (

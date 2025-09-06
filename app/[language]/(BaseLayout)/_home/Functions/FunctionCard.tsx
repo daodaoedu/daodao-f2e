@@ -32,7 +32,7 @@ export function FunctionCard({ tag, title, description, imageUrl, action, classN
         pointerEvents: 'auto',
         // 設定固定的最小寬度
         width: '280px',
-        minWidth: '280px'
+        minWidth: '280px',
       }}
     >
       {/* 標籤 */}

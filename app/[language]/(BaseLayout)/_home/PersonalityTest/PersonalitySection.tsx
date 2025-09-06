@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { cn } from '@/utils/cn';
 import { SectionHeader } from '@/app/[language]/(BaseLayout)/SectionHeader';
 
+
 interface PersonalitySectionProps {
   className?: string;
 }
@@ -29,7 +30,7 @@ export function PersonalitySection({ className }: PersonalitySectionProps) {
             size="lg"
             alignment="center"
             showSubtitle={false}
-            titleClassName="text-gray-800 leading-tight"
+            titleClassName="leading-tight"
           />
           <div className="flex items-center justify-center text-green-700 text-lg">
             <Image 

@@ -21,7 +21,7 @@ export function PresentationSection({ className }: PresentationSectionProps) {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
             展示你的學習成果
           </h2>
-          <h3 className="text-lg md:text-xl text-cyan-400">
+          <h3 className="text-lg md:text-xl text-mascot-aqua">
             在實踐中與眾人一同成長
           </h3>
         </div>

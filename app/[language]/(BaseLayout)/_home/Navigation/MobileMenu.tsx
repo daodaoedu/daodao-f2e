@@ -50,7 +50,7 @@ export function MobileMenu({ className }: MobileMenuProps) {
       const sections = menuItems.map(item => item.targetId);
       const scrollPosition = window.scrollY + 100; // 添加偏移量
 
-      for (let i = sections.length - 1; i >= 0; i--) {
+      for (let i = sections.length - 1; i >= 0; i -= 1) {
         const element = document.getElementById(sections[i]);
         if (element && element.offsetTop <= scrollPosition) {
           setActiveSection(sections[i]);
@@ -90,10 +90,10 @@ export function MobileMenu({ className }: MobileMenuProps) {
               type="button"
               onClick={() => handleMenuClick(item.targetId)}
               className={cn(
-                "flex flex-col items-center justify-center space-y-1 px-3 py-2 text-base transition-all duration-200 border-none cursor-pointer h-full w-full ",
+                'flex flex-col items-center justify-center space-y-1 px-3 py-2 text-base transition-all duration-200 border-none cursor-pointer h-full w-full ',
                 isActive 
-                  ? "bg-white text-primary-darker" 
-                  : "text-primary-darker hover:bg-white hover:text-primary-darker bg-transparent"
+                  ? 'bg-white text-primary-darker' 
+                  : 'text-primary-darker hover:bg-white hover:text-primary-darker bg-transparent'
               )}
             >
               <span>{item.label}</span>

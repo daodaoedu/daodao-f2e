@@ -51,7 +51,7 @@ export function FloatButtons({ className }: FloatButtonsProps) {
             alt="點擊進入心理測驗"
             width={90}
             height={90}
-            className="w-full h-full object-contain rotate"
+            className="w-full h-full object-contain animate-spin-slow"
           />
         </button>
       </div>

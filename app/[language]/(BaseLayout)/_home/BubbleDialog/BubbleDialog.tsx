@@ -170,7 +170,7 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
         >
           {currentText}
           {/* 打字游標 */}
-          <span className="inline-block w-[0.12em] h-4 ml-[0.1em] border-r-[0.12em] border-r-current animate-pulse translate-y-[1px]"></span>
+          <span className="inline-block w-[0.12em] h-4 ml-[0.1em] border-r-[0.12em] border-r-current animate-pulse translate-y-[1px]" />
         </div>
       </div>
       

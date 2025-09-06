@@ -1,7 +1,6 @@
 'use client';
 
 import { cn } from '@/utils/cn';
-import { SectionHeader } from '@/app/[language]/(BaseLayout)/SectionHeader';
 import { FeatureCard } from './FeatureCard';
 
 interface FeatureGridProps {

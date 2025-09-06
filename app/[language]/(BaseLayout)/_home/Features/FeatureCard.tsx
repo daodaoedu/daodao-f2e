@@ -28,9 +28,9 @@ export function FeatureCard({ title, description, tag, image, details, className
       <h4 className="text-[22px] text-primary-base text-center font-semibold mb-2">{title}</h4>
       <p className="text-sm text-center mb-4">{description}</p>
       <ul className="space-y-2">
-        {details.map((detail, index) => (
-          <li key={index} className="pl-10 pr-2 relative leading-6 text-base md:text-sm md:font-bold flex items-center min-h-[40px]">
-            <span className="absolute top-1/2 left-0 w-10 h-10 bg-[url(/assets/landing-page/icon-bulb.svg)] bg-no-repeat bg-center transform -translate-y-1/2"></span>
+        {details.map((detail) => (
+          <li key={detail} className="pl-10 pr-2 relative leading-6 text-base flex items-center min-h-[40px]">
+            <span className="absolute top-1/2 left-0 w-10 h-10 bg-[url(/assets/landing-page/icon-bulb.svg)] bg-no-repeat bg-center transform -translate-y-1/2" />
             {detail}
           </li>
         ))}

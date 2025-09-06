@@ -33,7 +33,7 @@ export function VideoSection({ className }: VideoSectionProps) {
         className="-mt-[100px] w-full bg-cover bg-no-repeat bg-center md:bg-top z-10"
         style={{
           backgroundImage: 'url("/assets/landing-page/bg-curve-green.svg")',
-          height: '150px'
+          height: '150px',
         }}
       />
       
@@ -62,7 +62,7 @@ export function VideoSection({ className }: VideoSectionProps) {
       </div>
 
       <div className="flex justify-center w-full">
-        <button className="
+        <button type="button" className="
           flex justify-center items-center rounded-[40px] border-none px-5 cursor-pointer
           transition-all duration-300 ease-in-out
           h-14 w-45 text-xl font-semibold
