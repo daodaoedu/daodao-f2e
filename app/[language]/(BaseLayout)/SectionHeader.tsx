@@ -1,7 +1,8 @@
 import { cn } from '@/utils/cn';
+import { ReactNode } from 'react';
 
 interface SectionHeaderProps {
-  title: string;
+  title: string | ReactNode;
   subtitle?: string;
   variant?: 'default' | 'light' | 'dark' | 'primary';
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -44,23 +45,23 @@ export function SectionHeader({
 
   const sizeStyles = {
     sm: {
-      title: 'text-2xl md:text-3xl',
-      subtitle: 'text-base md:text-lg',
+      title: 'text-[28px]',
+      subtitle: 'text-sm',
       spacing: 'mb-8',
     },
     md: {
-      title: 'text-2xl md:text-3xl',
-      subtitle: 'text-lg md:text-xl',
+      title: 'text-[28px]',
+      subtitle: 'text-sm',
       spacing: 'mb-12',
     },
     lg: {
-      title: 'text-3xl md:text-4xl',
-      subtitle: 'text-lg md:text-xl',
+      title: 'text-[28px]',
+      subtitle: 'text-sm',
       spacing: 'mb-16',
     },
     xl: {
-      title: 'text-4xl md:text-5xl',
-      subtitle: 'text-xl md:text-2xl',
+      title: 'text-[28px]',
+      subtitle: 'text-sm',
       spacing: 'mb-20',
     },
   };
@@ -83,7 +84,7 @@ export function SectionHeader({
       className
     )}>
       <h2 className={cn(
-        'font-bold mb-4',
+        'font-bold mb-2',
         currentSize.title,
         currentVariant.title,
         titleClassName

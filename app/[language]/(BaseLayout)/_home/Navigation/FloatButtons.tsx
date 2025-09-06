@@ -2,6 +2,7 @@
 
 import { useSmoothScroll } from '@/hooks/useSmoothScroll';
 import { useScrollVisibility } from '@/hooks/useScrollVisibility';
+import useMediaQuery from '@/hooks/useMediaQuery';
 import Image from 'next/image';
 import { ChevronUp } from 'lucide-react';
 
@@ -11,6 +12,7 @@ interface FloatButtonsProps {
 
 export function FloatButtons({ className }: FloatButtonsProps) {
   const { scrollToTop, scrollToElement } = useSmoothScroll();
+  const isTabletAndUp = useMediaQuery('isMedium');
   const isVisible = useScrollVisibility({ threshold: 300 }); // 捲動超過 300px 時顯示
 
   const handleScrollToTop = () => {
@@ -21,10 +23,11 @@ export function FloatButtons({ className }: FloatButtonsProps) {
     scrollToElement('personality-test', 100); // 添加適當的偏移量
   };
 
-  if (!isVisible) return null;
+  // 平板以上始終顯示，手機版根據捲動狀態顯示
+  if (!isTabletAndUp && !isVisible) return null;
 
   return (
-    <div className={`fixed bottom-6 right-6 z-50 ${className || ''}`}>
+    <div className={`fixed bottom-20 right-6 z-50 ${className || ''}`}>
       <div className="flex flex-col items-center space-y-2">
         {/* 回到頂端按鈕 */}
         <button

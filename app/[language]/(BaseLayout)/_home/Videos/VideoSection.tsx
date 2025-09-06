@@ -2,7 +2,7 @@
 
 import { cn } from '@/utils/cn';
 import { VideoItem } from './VideoItem';
-import './Videos.css';
+import { SectionHeader } from '../../SectionHeader';
 
 interface VideoSectionProps {
   className?: string;
@@ -23,17 +23,33 @@ export function VideoSection({ className }: VideoSectionProps) {
   ];
 
   return (
-    <section className={cn('section-block videos bg-green relative', className)}>
+    <section className={cn(
+      'relative flex flex-col items-center justify-center pb-16',
+      'bg-primary-base',
+      className
+    )}>
       {/* 頂部曲線裝飾 */}
-      <div className="top-curve" />
+      <div 
+        className="-mt-[100px] w-full bg-cover bg-no-repeat bg-center md:bg-top z-10"
+        style={{
+          backgroundImage: 'url("/assets/landing-page/bg-curve-green.svg")',
+          height: '150px'
+        }}
+      />
       
-      <div className="title-group text-white" style={{ marginTop: '-70px', marginBottom: '-30px' }}>
-        <h2>兩種起點開始你的學習之旅</h2>
-        <h3>分享想法開始討論，嘗試實踐記錄成長</h3>
+      <div className="px-6 py-15  -mb-[30px]">
+        <SectionHeader
+          title="兩種起點開始你的學習之旅"
+          subtitle="分享想法開始討論，嘗試實踐記錄成長"
+          variant="light"
+          size="lg"
+          alignment="center"
+          className="text-white"
+        />
       </div>
 
-      <div className="container">
-        <div className="desktop-row">
+      <div className="px-6 w-full max-w-[708px] mx-auto md:max-w-[1140px]">
+        <div className="w-full flex flex-col md:flex-row gap-6">
           {videos.map((video) => (
             <VideoItem
               key={video.title}
@@ -45,8 +61,17 @@ export function VideoSection({ className }: VideoSectionProps) {
         </div>
       </div>
 
-      <div className="d-flex justify-content-center w-100">
-        <div className="btn btn-orange btn-large">開始分享想法</div>
+      <div className="flex justify-center w-full">
+        <button className="
+          flex justify-center items-center rounded-[40px] border-none px-5 cursor-pointer
+          transition-all duration-300 ease-in-out
+          h-14 w-45 text-xl font-semibold
+          bg-tips border-2 border-tips text-basic-white
+          shadow-[0_8px_10px_0_rgba(255,149,38,0.2)]
+          hover:bg-basic-white hover:text-tips
+        ">
+          開始分享想法
+        </button>
       </div>
     </section>
   );

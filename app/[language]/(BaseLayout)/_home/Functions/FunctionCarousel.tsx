@@ -5,7 +5,6 @@ import { useEffect, useRef, useCallback } from 'react';
 import { cn } from '@/utils/cn';
 import { SectionHeader } from '@/app/[language]/(BaseLayout)/SectionHeader';
 import { FunctionCard } from './FunctionCard';
-import './Functions.css';
 
 interface FunctionCarouselProps {
   className?: string;
@@ -16,11 +15,12 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
 
   const getStep = useCallback(() => {
     if (!trackRef.current) return 0;
-    const first = trackRef.current.querySelector('.functions-cards-item');
+    // 使用更通用的選擇器來找到卡片元素
+    const first = trackRef.current.querySelector('[data-function-card]') || trackRef.current.firstElementChild;
     if (!first) return 0;
     const rectW = first.getBoundingClientRect().width;
     const styles = getComputedStyle(trackRef.current);
-    const gap = parseFloat(styles.columnGap || styles.gap || '0') || 0;
+    const gap = parseFloat(styles.gap || '0') || 16; // 預設 gap 為 16px (gap-4)
     return rectW + gap;
   }, []);
 
@@ -49,11 +49,16 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
     const step = getStep();
     const maxIdx = maxIndex();
     const targetIndex = Math.max(0, Math.min(maxIdx, index));
-    const targetLeft = targetIndex * step;
+    
+    // 計算讓卡片居中所需的滾動位置
+    const containerWidth = trackRef.current.clientWidth;
+    const cardWidth = step; // step 包含卡片寬度 + gap
+    const targetLeft = targetIndex * step - (containerWidth - cardWidth) / 2;
     
     // 確保不會滾動超出實際範圍
     const maxScrollLeft = trackRef.current.scrollWidth - trackRef.current.clientWidth;
-    const finalLeft = Math.min(targetLeft, maxScrollLeft);
+    const minScrollLeft = 0;
+    const finalLeft = Math.max(minScrollLeft, Math.min(targetLeft, maxScrollLeft));
     
     trackRef.current.scrollTo({ left: finalLeft, behavior: 'smooth' });
   }, [getStep, maxIndex]);
@@ -61,15 +66,6 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return undefined;
-
-    // 避免圖片被原生拖走或選取
-    const images = track.querySelectorAll('img');
-    images.forEach((img) => {
-      const imgElement = img as HTMLImageElement;
-      imgElement.draggable = false;
-      imgElement.style.userSelect = 'none';
-      (imgElement.style as unknown as Record<string, string>).webkitUserDrag = 'none';
-    });
 
     let dragging = false;
     let startX = 0;
@@ -94,8 +90,9 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
       getStep();
 
       enableNoSnap();
-      track.classList.add('dragging');
-      document.body.style.userSelect = 'none';
+      // 使用 Tailwind 類別替代 CSS 類別
+      track.classList.add('cursor-grabbing', 'select-none');
+      document.body.classList.add('select-none');
     };
 
     const onPointerMove = (e: PointerEvent) => {
@@ -119,14 +116,45 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
 
       const step = getStep();
       if (step && movedPx > 5) {
+        // 計算拖曳方向（基於最終滾動位置與起始位置的比較）
         const currentLeft = track.scrollLeft;
-        const currentIndex = Math.round(currentLeft / step);
-        scrollToIndex(currentIndex);
+        const dragDirection = currentLeft > startLeft ? 'right' : 'left';
+        const containerWidth = track.clientWidth;
+        const screenCenter = currentLeft + containerWidth / 2;
+        
+        // 找到當前最接近畫面中央的卡片索引
+        let currentIndex = 0;
+        let minDistance = Infinity;
+        
+        for (let i = 0; i <= maxIndex(); i++) {
+          const cardLeft = i * step;
+          const cardCenter = cardLeft + step / 2;
+          const distance = Math.abs(cardCenter - screenCenter);
+          
+          if (distance < minDistance) {
+            minDistance = distance;
+            currentIndex = i;
+          }
+        }
+        
+        // 根據拖曳方向決定下一張卡片
+        let targetIndex = currentIndex;
+        
+        if (dragDirection === 'left' && currentIndex > 0) {
+          // 向左拖曳：顯示左邊的卡片
+          targetIndex = currentIndex - 1;
+        } else if (dragDirection === 'right' && currentIndex < maxIndex()) {
+          // 向右拖曳：顯示右邊的卡片
+          targetIndex = currentIndex + 1;
+        }
+        
+        scrollToIndex(targetIndex);
       }
 
       disableNoSnap();
-      track.classList.remove('dragging');
-      document.body.style.userSelect = '';
+      // 移除 Tailwind 類別
+      track.classList.remove('cursor-grabbing', 'select-none');
+      document.body.classList.remove('select-none');
     };
 
     const onPointerCancel = (e: PointerEvent) => {
@@ -136,16 +164,16 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
 
       dragging = false;
       disableNoSnap();
-      track.classList.remove('dragging');
-      document.body.style.userSelect = '';
+      track.classList.remove('cursor-grabbing', 'select-none');
+      document.body.classList.remove('select-none');
     };
 
     const onLostCapture = () => {
       pointerId = null;
       dragging = false;
       disableNoSnap();
-      track.classList.remove('dragging');
-      document.body.style.userSelect = '';
+      track.classList.remove('cursor-grabbing', 'select-none');
+      document.body.classList.remove('select-none');
     };
 
     const swallowClickIfDragged = (e: Event) => {
@@ -204,8 +232,8 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
   ];
 
   return (
-    <section className={cn('relative pb-15 overflow-x-clip flex flex-col items-center justify-center bg-cyan-50', className)} id="functions">
-      <div className="text-teal-800 py-15 px-6 pb-10">
+    <section className={cn('relative pt-16 overflow-x-clip flex flex-col items-center justify-center bg-cyan-50', className)} id="functions">
+      <div className="text-teal-800 py-15 px-6">
         <SectionHeader
           title="學習群島上的功能生態"
           variant="dark"
@@ -216,10 +244,25 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
         />
       </div>
       
-      <div className="max-w-full pl-6">
+      <div className="w-full pl-6">
         <div 
           ref={trackRef}
-          className="grid grid-flow-col auto-cols-70 gap-4 overflow-x-auto p-2 scroll-smooth scroll-snap-type-x-mandatory touch-pan-x scrollbar-hide"
+          className={cn(
+            'flex gap-4 overflow-x-auto p-2 scroll-smooth touch-pan-x',
+            'scrollbar-hide',
+            // 拖拽狀態樣式 - 移除 transition 避免與拖曳衝突
+            'transition-none'
+          )}
+          style={{
+            // 確保在拖拽時有適當的游標樣式
+            cursor: 'grab',
+            // 覆蓋全域的 transition 樣式
+            transition: 'none',
+            // 覆蓋全域的 scroll-behavior
+            scrollBehavior: 'auto',
+            // 為卡片末端添加 padding
+            paddingRight: '24px'
+          }}
         >
           {functions.map((func) => (
             <FunctionCard

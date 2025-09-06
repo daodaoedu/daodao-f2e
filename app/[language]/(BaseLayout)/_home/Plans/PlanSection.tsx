@@ -2,8 +2,6 @@
 
 import Image from 'next/image';
 import { cn } from '@/utils/cn';
-import { SectionHeader } from '@/app/[language]/(BaseLayout)/SectionHeader';
-import './Plans.css';
 
 interface PlanSectionProps {
   className?: string;
@@ -11,43 +9,50 @@ interface PlanSectionProps {
 
 export function PlanSection({ className }: PlanSectionProps) {
   return (
-    <section className={cn('section-block plans', className)} id="plans">
-      <SectionHeader
-        title="加入島島阿學"
-        subtitle="搶先體驗完整學習平台，與我們一起打造更好的學習體驗"
-        variant="default"
-        size="lg"
-        alignment="center"
-      />
+    <section className={cn('relative pb-[60px] overflow-x-clip flex flex-col items-center justify-center', className)} id="plans">
+      {/* Section Header */}
+      <div className="text-primary-darker py-[60px] px-6 text-center">
+        <h2 className="text-[28px] font-semibold mb-2">加入島島阿學</h2>
+        <h3 className="text-sm">搶先體驗完整學習平台，與我們一起打造更好的學習體驗</h3>
+      </div>
 
-      <div className="container">
-        <div className="desktop-row align-items-center">
-          <div className="plan-items">
+      <div className="px-6 w-full max-w-[708px] mx-auto md:max-w-[1140px]">
+        <div className="w-full flex justify-center flex-col md:flex-row md:gap-6 items-center">
+          <div className="flex flex-col justify-center items-center relative text-primary-darker max-w-[400px] border-2 border-primary-base rounded-[20px] p-6 bg-primary-palest overflow-hidden">
             {/* 裝飾元素 - 半圓 */}
             <Image 
               src="/assets/landing-page/deco-semicircle.svg" 
               alt="裝飾半圓" 
               width={120} 
               height={120} 
-              className="absolute"
-              style={{ left: '-60px', top: '-50px', zIndex: -1 }}
+              className="absolute -left-[60px] -top-[50px] -z-10"
             />
 
-            <h2>探索所有功能，完全免費！</h2>
-            <p className="tiny">作為早期使用者，你將可以免費使用所有功能</p>
+            <h2 className="text-center text-lg font-semibold">探索所有功能，完全免費！</h2>
+            <p className="text-center text-[13px] mb-6 mt-2">作為早期使用者，你將可以免費使用所有功能</p>
 
-            <ul className="feature-list">
-              <li>建立學習計劃和主題實踐</li>
-              <li>分享學習想法和資源</li>
-              <li>AI 學習建議和分析</li>
-              <li>成長地圖看見自己的進步和機會</li>
-              <li>優先獲得新功能體驗</li>
+            <ul className="list-none p-0 mb-6 w-full">
+              <li className="py-2 text-primary-500 border-b border-gray-200 relative pl-10 before:content-['✓'] before:text-primary-base before:font-bold before:absolute before:left-0 before:top-2">
+                建立學習計劃和主題實踐
+              </li>
+              <li className="py-2 text-primary-500 border-b border-gray-200 relative pl-10 before:content-['✓'] before:text-primary-base before:font-bold before:absolute before:left-0 before:top-2">
+                分享學習想法和資源
+              </li>
+              <li className="py-2 text-primary-500 border-b border-gray-200 relative pl-10 before:content-['✓'] before:text-primary-base before:font-bold before:absolute before:left-0 before:top-2">
+                AI 學習建議和分析
+              </li>
+              <li className="py-2 text-primary-500 border-b border-gray-200 relative pl-10 before:content-['✓'] before:text-primary-base before:font-bold before:absolute before:left-0 before:top-2">
+                成長地圖看見自己的進步和機會
+              </li>
+              <li className="py-2 text-primary-500 relative pl-10 before:content-['✓'] before:text-primary-base before:font-bold before:absolute before:left-0 before:top-2">
+                優先獲得新功能體驗
+              </li>
             </ul>
 
-            <div className="btn btn-orange btn-large" style={{ marginTop: '24px' }}>
+            <button className="flex justify-center items-center rounded-[40px] border-2 border-tips bg-tips text-white px-5 py-3 h-14 w-[180px] text-xl font-semibold transition-all duration-300 ease-in-out hover:bg-white hover:text-tips shadow-[0_8px_10px_0_rgba(255,161,11,0.2)] mt-6">
               立即免費註冊
-            </div>
-            <p className="tiny">Beta 期間完全免費 • 無需信用卡</p>
+            </button>
+            <p className="text-center text-[13px] mt-2">Beta 期間完全免費 • 無需信用卡</p>
 
             {/* 裝飾元素 - 幾何圖形 */}
             <Image 
@@ -55,8 +60,7 @@ export function PlanSection({ className }: PlanSectionProps) {
               alt="裝飾幾何圖形" 
               width={100} 
               height={100} 
-              className="absolute"
-              style={{ right: '-50px', bottom: '-50px' }}
+              className="absolute -right-[50px] -bottom-[50px]"
             />
           </div>
         </div>

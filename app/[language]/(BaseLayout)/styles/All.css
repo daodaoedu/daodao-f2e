@@ -379,7 +379,7 @@ img {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  background-image: url("/public/assets/landing-page/bg-curve-green.svg");
+  background-image: url("/assets/landing-page/bg-curve-green.svg");
   height: 100px;
 }
 @media (min-width: 768px) {
@@ -654,7 +654,7 @@ img {
   margin: 8px 4px;
 }
 .section-block.videos .video-items .video-items-tag p::before {
-  content: url("/public/assets/landing-page/icon-check.svg");
+  content: url("/assets/landing-page/icon-check.svg");
   position: absolute;
   top: 9px;
   left: 8px;
@@ -664,7 +664,7 @@ img {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  background-image: url("/public/assets/landing-page/bg-island.svg");
+  background-image: url("/assets/landing-page/bg-island.svg");
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -687,7 +687,7 @@ img {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: bottom;
-  background-image: url("/public/assets/landing-page/bg-personality-test-mobile.png");
+  background-image: url("/assets/landing-page/bg-personality-test-mobile.png");
   height: 800px;
   display: flex;
   flex-direction: column;
@@ -696,7 +696,7 @@ img {
 }
 @media (min-width: 768px) {
   .section-block.personality {
-    background-image: url("/public/assets/landing-page/bg-personality-test-desktop.png");
+    background-image: url("/assets/landing-page/bg-personality-test-desktop.png");
     padding: 0 20%;
   }
 }
@@ -730,7 +730,7 @@ img {
   position: relative;
 }
 .section-block.personality .btn::after {
-  content: url("/public/assets/landing-page/deco-pencil.svg");
+  content: url("/assets/landing-page/deco-pencil.svg");
   width: 40px;
   height: 40px;
   position: absolute;
@@ -797,7 +797,7 @@ ul.feature-list li {
   }
 }
 ul.feature-list li::before {
-  content: url("/public/assets/landing-page/icon-bulb.svg");
+  content: url("/assets/landing-page/icon-bulb.svg");
   width: 40px;
   height: 40px;
   position: absolute;

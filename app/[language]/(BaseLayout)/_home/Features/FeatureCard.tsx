@@ -14,33 +14,24 @@ interface FeatureCardProps {
 
 export function FeatureCard({ title, description, tag, image, details, className }: FeatureCardProps) {
   return (
-    <div className={cn('bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6', className)}>
-      <div className="text-center mb-4">
-        <div className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
-          {tag}
-        </div>
-        <div className="mb-4">
-          <Image
-            src={image}
-            alt={title}
-            width={200}
-            height={300}
-            className="mx-auto"
-          />
-        </div>
-        <h4 className="text-xl font-semibold text-gray-900 mb-3">
-          {title}
-        </h4>
-        <p className="text-gray-600 mb-4">
-          {description}
-        </p>
+    <div className={cn('p-4 mb-6', className)}>
+      <div className="flex justify-center items-center w-[84px] h-8 text-sm bg-tips text-white rounded">
+        {tag}
       </div>
-      
+      <Image
+        src={image}
+        alt={title}
+        width={400}
+        height={300}
+        className="w-full max-w-[400px]"
+      />
+      <h4 className="text-[22px] text-primary-base text-center font-semibold mb-2">{title}</h4>
+      <p className="text-sm text-center mb-4">{description}</p>
       <ul className="space-y-2">
-        {details.map((detail) => (
-          <li key={detail} className="flex items-start space-x-2">
-            <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-            <span className="text-sm text-gray-700">{detail}</span>
+        {details.map((detail, index) => (
+          <li key={index} className="pl-10 pr-2 relative leading-6 text-base md:text-sm md:font-bold flex items-center min-h-[40px]">
+            <span className="absolute top-1/2 left-0 w-10 h-10 bg-[url(/assets/landing-page/icon-bulb.svg)] bg-no-repeat bg-center transform -translate-y-1/2"></span>
+            {detail}
           </li>
         ))}
       </ul>

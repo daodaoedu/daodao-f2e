@@ -14,38 +14,70 @@ interface FunctionCardProps {
 
 export function FunctionCard({ tag, title, description, imageUrl, action, className }: FunctionCardProps) {
   return (
-    <div className={cn('functions-cards-item relative bg-white rounded-2xl w-70 p-4 flex flex-col gap-4 min-w-0 box-border scroll-snap-align-start', className)}>
-      <div className="absolute top-4 left-4 px-2 py-2 w-21 text-center rounded-tl-lg bg-orange-400 text-white text-xs font-semibold">
+    <div 
+      data-function-card
+      className={cn(
+        'relative bg-white rounded-2xl p-4 flex flex-col gap-4 box-border',
+        'select-none', // 防止拖拽時選取文字
+        'transition-none', // 避免與拖曳功能衝突
+        'flex-shrink-0', // 防止卡片被壓縮
+        className
+      )}
+      style={{
+        // 確保卡片不會受到全域 transition 樣式影響
+        transition: 'none',
+        // 確保卡片可以被拖曳
+        touchAction: 'pan-x',
+        // 確保卡片不會阻止拖曳事件
+        pointerEvents: 'auto',
+        // 設定固定的最小寬度
+        width: '280px',
+        minWidth: '280px'
+      }}
+    >
+      {/* 標籤 */}
+      <div className="absolute top-4 left-4 px-2 py-2 w-21 text-center  rounded-tl-lg rounded-br-lg bg-orange-400 text-white text-xs font-semibold z-10">
         {tag}
       </div>
       
-      <Image 
-        src={imageUrl} 
-        alt={title}
-        width={248}
-        height={140}
-        className="w-full h-auto aspect-video rounded-2xl object-cover bg-gray-100"
-      />
+      {/* 圖片 */}
+      <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-gray-100">
+        <Image 
+          src={imageUrl} 
+          alt={title}
+          fill
+          className="object-cover pointer-events-none select-none"
+          draggable={false}
+          style={{ WebkitUserDrag: 'none' } as React.CSSProperties}
+        />
+      </div>
       
+      {/* 標題 */}
       <p className="w-full text-teal-800 text-center font-semibold text-xl">
         {title}
       </p>
       
-      <p className="text-teal-800 m-0 mb-3">
+      {/* 描述 */}
+      <p className="text-teal-800 m-0 mb-3 leading-relaxed">
         {description}
       </p>
       
-      <p className="text-cyan-500 mt-auto mr-6">
-        {action}
-      </p>
-      
-      <Image 
-        src="/assets/landing-page/icon-arror-right.svg" 
-        alt="前往"
-        width={16}
-        height={16}
-        className="absolute bottom-4 right-4"
-      />
+      {/* 行動按鈕區域 */}
+      <div className="mt-auto flex items-center justify-end gap-2">
+        <p className="text-primary-base font-medium">
+          {action}
+        </p>
+        
+        <Image 
+          src="/assets/landing-page/icon-arrow-right.svg" 
+          alt="前往"
+          width={16}
+          height={16}
+          className="pointer-events-none select-none"
+          draggable={false}
+          style={{ WebkitUserDrag: 'none' } as React.CSSProperties}
+        />
+      </div>
     </div>
   );
 }

@@ -75,12 +75,17 @@ export default {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
+        mascot: {
+          aqua: "#99ECFF",
+          brightBlue: "#4BE8FF",
+        },
         basic: {
           100: "#F3F3F3",
           200: "#DBDBDB",
           300: "#92989A",
           400: "#536166",
           500: "#293A3D",
+          600: "#0D3036",
           white: "#FFFFFF",
           black: "#011416",
         },
@@ -169,10 +174,19 @@ export default {
             transform: "scale(1, 1)",
           },
         },
+        "spin-slow": {
+          from: {
+            transform: "rotate(0deg)",
+          },
+          to: {
+            transform: "rotate(360deg)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "spin-slow": "spin-slow 8s linear infinite",
       },
     },
   },

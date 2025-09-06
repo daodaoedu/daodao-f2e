@@ -10,29 +10,34 @@ interface SloganSectionProps {
 
 export function SloganSection({ className }: SloganSectionProps) {
   return (
-    <section className={cn('slogan-section bg-primary-palest px-6 py-8 text-basic-400 md:py-[100px] relative', className)}>
-      <div className="mx-auto max-w-[750px] lg:ml-56 lg:mr-12 xl:mx-auto">
+    <section className={cn('slogan-section bg-primary-palest px-6  text-basic-400  relative min-h-[195px] md:min-h-[200px]', className)}>
+      {/* 背景島嶼裝飾圖片 */}
+      <Image
+        src="/assets/landing-page/deco-island.svg"
+        alt="島嶼裝飾"
+        width={429}
+        height={208}
+        className="absolute -top-3 left-1/2 transform -translate-x-1/2  "
+      />
+      <div className="absolute top-2/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-full">
         <SectionHeader
-          title="每個人都有自己的學習小島，透過交流與分享，連結成群島"
+          title={
+            <>
+              每個人都有自己的學習小島，
+              <br />
+              透過交流與分享，連結成群島
+            </>
+          }
+
           subtitle="Where personal growth meets collective wisdom!"
           variant="primary"
-          size="md"
           alignment="center"
-          titleClassName="text-primary-darker"
-          subtitleClassName="text-basic-400 italic"
+          titleClassName="text-primary-darker !text-[22px]"
+          subtitleClassName="text-basic-400 italic !text-sm"
         />
       </div>
+
       
-      {/* 背景島嶼裝飾圖片 */}
-      <div className="absolute top-0 bottom-0 opacity-60 -z-1">
-        <Image
-          src="/assets/landing-page/deco-island.svg"
-          alt="島嶼裝飾"
-          width={429}
-          height={208}
-          className="w-429 h-208"
-        />
-      </div>
     </section>
   );
 }

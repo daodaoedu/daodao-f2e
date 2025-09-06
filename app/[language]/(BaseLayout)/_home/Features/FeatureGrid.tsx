@@ -3,7 +3,6 @@
 import { cn } from '@/utils/cn';
 import { SectionHeader } from '@/app/[language]/(BaseLayout)/SectionHeader';
 import { FeatureCard } from './FeatureCard';
-import './Features.css';
 
 interface FeatureGridProps {
   className?: string;
@@ -46,17 +45,13 @@ export function FeatureGrid({ className }: FeatureGridProps) {
   ];
 
   return (
-    <section className={cn('py-20 bg-white', className)} id="feature">
-      <div className="max-w-6xl mx-auto px-4">
-        <SectionHeader
-          title="告別三大學習困境"
-          subtitle="從學習痛點到美好體驗，讓每一步成長都看得見"
-          variant="default"
-          size="lg"
-          alignment="center"
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div className={cn('px-6 pt-16 w-full max-w-[708px] mx-auto md:max-w-[1140px]', className)}>
+      <div className="relative pb-[60px] overflow-x-clip flex flex-col items-center justify-center" id="feature">
+        <div className="text-primary-darker px-6 py-[60px] pb-10 text-center">
+          <h2 className="text-[28px] font-semibold mb-2">告別三大學習困境</h2>
+          <h3 className="text-sm">從學習痛點到美好體驗，讓每一步成長都看得見</h3>
+        </div>
+        <div className="text-primary-darker flex flex-col items-stretch md:flex-row">
           {features.map((feature) => (
             <FeatureCard
               key={feature.title}
@@ -69,6 +64,6 @@ export function FeatureGrid({ className }: FeatureGridProps) {
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

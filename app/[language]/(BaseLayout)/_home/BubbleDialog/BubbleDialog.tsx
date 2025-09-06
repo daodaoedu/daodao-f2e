@@ -1,7 +1,5 @@
 'use client';
 
-import './BubbleDialog.css';
-
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/utils/cn';
 import Image from 'next/image';
@@ -157,39 +155,49 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
   }, []);
 
   return (
-    <div className={cn('section-block bubble-dialog', className)}>
-      <div className="dialog-text">
-        <p className="text-dark-green">在這裡你可以...</p>
+    <div className={cn(
+      'relative pb-[60px] pt-12 overflow-x-clip flex flex-col items-center justify-center min-h-[400px]',
+      className
+    )}>
+      {/* 對話文字區域 */}
+      <div className="w-full flex justify-between items-center pl-6 pr-[10%]  md:pr-[20%] md:text-xl">
+        <p className="text-primary-darker font-medium">在這裡你可以...</p>
         <div 
           ref={textRef}
           id="type-animation"
+          className="px-6 py-2 bg-primary-palest border-2 border-mascot-aqua rounded-[20px] inline-flex items-center whitespace-nowrap overflow-hidden leading-[1.4] h-10 relative"
           style={bubbleWidth ? { width: `${bubbleWidth}px` } : {}}
         >
           {currentText}
+          {/* 打字游標 */}
+          <span className="inline-block w-[0.12em] h-4 ml-[0.1em] border-r-[0.12em] border-r-current animate-pulse translate-y-[1px]"></span>
         </div>
       </div>
-      <div className="block-mascot">
-        <div className="block-mascot-body">
-          <div className="container">
+      
+      {/* 吉祥物區域 */}
+      <div className="pr-6 pt-6 text-xl md:text-3xl font-semibold w-full relative z-[1] mt-5 md:pr-[20%] ">
+        <div className="relative rounded-tr-[100px] bg-mascot-brightBlue py-[60px] min-h-[120px] flex items-center justify-center">
+          <div className="text-left w-full">
             <Image 
               src="/assets/landing-page/mascot-face.svg" 
               width={118} 
               height={92} 
               alt="吉祥物臉部"
+              className="absolute -top-5 right-[3px] z-[2]"
             />
-            <p className="text-white">讓學習從壓力來源</p>
-            <p>變成生活中最期待的部分</p>
+            <p className="text-basic-white my-2 font-semibold mb-1 w-full px-6">讓學習從壓力來源</p>
+            <p className="text-basic-darker my-2 font-semibold w-full px-6">變成生活中最期待的部分</p>
           </div>
         </div>
       </div>
+      
       {/* 綠色圓弧裝飾圖片 */}
       <Image 
         src="/assets/landing-page/deco-island.svg" 
         width={208} 
         height={208} 
         alt="綠色圓弧裝飾"
-        className="position-absolute"
-        style={{ right: 'calc(208px / 2)', bottom: 0 }}
+        className="absolute right-[calc(208px/2)] bottom-0"
       />
     </div>
   );
