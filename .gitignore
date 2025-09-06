@@ -26,6 +26,7 @@ yarn-error.log*
 .env.*
 !.env.example
 
+.open-next
 .vercel
 .vscode
 .yarn

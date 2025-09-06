@@ -26,7 +26,7 @@ import {
 } from "@/services/resources";
 import { parseToString } from "@/utils/helper";
 
-export const runtime = "experimental-edge";
+// export const runtime = "experimental-edge";
 
 export const getServerSideProps = (async (context) => {
   const resourceId = parseToString(context.params?.resourceId);

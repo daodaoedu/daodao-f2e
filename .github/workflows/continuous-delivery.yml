@@ -75,7 +75,8 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          command: pages deploy --branch=${{ env.BRANCH_NAME }}
+          packageManager: pnpm
+          command: deploy
 
       - name: Send Build and Deploy Failed Notification
         if: (steps.build.outcome == 'failure' || steps.deploy.outcome == 'failure')

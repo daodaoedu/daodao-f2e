@@ -8,7 +8,7 @@ import { parseToString } from "@/utils/helper";
 import { circleAPI, CircleSchema } from "@/services/circles";
 import { FormattedUser } from "@/generated/models";
 
-export const runtime = "experimental-edge";
+// export const runtime = "experimental-edge";
 
 export const getServerSideProps = (async (context) => {
   try {
