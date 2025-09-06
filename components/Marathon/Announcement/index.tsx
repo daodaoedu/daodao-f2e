@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { MarkdownEditor } from '@/components/ui/markdown-editor';
 
@@ -42,7 +44,7 @@ const AnnouncementList = ({ items }: { items: AnnouncementItem[] }) => (
       id, tag, times, title,
     }) => (
       <Link
-        href={`/learning-marathon/announcements/${id}`}
+        href={`/learning-marathons/2025S1/announcements/${id}`}
         key={id}
         className="flex flex-col gap-3 rounded-[10px] bg-white p-6 text-start shadow-md shadow-basic-black/10"
       >

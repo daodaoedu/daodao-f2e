@@ -1,6 +1,11 @@
 {
+  "main": ".open-next/worker.js",
   "name": "daodao-f2e",
-  "compatibility_date": "2024-09-23",
+  "compatibility_date": "2025-03-25",
   "compatibility_flags": ["nodejs_compat"],
-  "pages_build_output_dir": ".vercel/output/static"
+  "preview_urls": true,
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  }
 }

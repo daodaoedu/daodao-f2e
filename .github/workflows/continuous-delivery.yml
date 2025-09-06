@@ -64,6 +64,23 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ${{ github.ref_name == 'prod' && secrets.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL_DEV }}
 
+      # 設定部署命令
+      - name: Set deployment command
+        id: set-command
+        run: |
+          if [[ "${{ github.ref_name }}" == "prod" ]]; then
+            echo "command=deploy" >> $GITHUB_OUTPUT
+            echo "environment=production" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" == "dev" ]]; then
+            echo "command=versions upload --preview-alias staging" >> $GITHUB_OUTPUT
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          else
+            # For pull requests or other branches
+            ALIAS="preview-${{ github.event.pull_request.number || github.ref_name }}"
+            echo "command=versions upload --preview-alias $ALIAS" >> $GITHUB_OUTPUT
+            echo "environment=preview" >> $GITHUB_OUTPUT
+          fi
+
       - name: Deploy to Cloudflare
         if: ${{ env.HAS_SECRETS == 'true' && steps.build.outcome == 'success' }}
         id: deploy
@@ -75,7 +92,8 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          command: pages deploy --branch=${{ env.BRANCH_NAME }}
+          packageManager: pnpm
+          command: ${{ steps.set-command.outputs.command }}
 
       - name: Send Build and Deploy Failed Notification
         if: (steps.build.outcome == 'failure' || steps.deploy.outcome == 'failure')
@@ -100,6 +118,6 @@ jobs:
         uses: ./.github/actions/notification
         with:
           TYPE: success
-          TITLE: "✅ Build Succeeded"
-          DESCRIPTION: "Preview URL: ${{ github.ref_name == 'prod' && env.PROD_URL || steps.deploy.outputs.pages-deployment-alias-url }}"
+          TITLE: "✅ Build Succeeded (${{ steps.set-command.outputs.environment }})"
+          DESCRIPTION: "Preview URL: ${{ github.ref_name == 'prod' && env.PROD_URL || steps.deploy.outputs.deployment-url || 'Check Cloudflare Dashboard for preview URL' }}"
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}

@@ -1,15 +1,19 @@
 'use client';
 
 import Link from 'next/link';
+import { useSelectedLayoutSegment } from 'next/navigation';
 import { MARATHON_LINKS } from '@/constants/category';
 import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
 import { cn } from '@/utils/cn';
 
 export default function Nav() {
-  const navItems = MARATHON_LINKS.map((item) => ({
+  const segment = useSelectedLayoutSegment();
+  const announcementsPath = 'announcements';
+
+  const navItems = MARATHON_LINKS.map((item, index) => ({
     label: item.name,
     href: item.link,
-    active: item.name === '活動詳情',
+    active: segment ? item.link.includes(announcementsPath) : index === 0,
   }));
 
   const { isShowShadow, height, TriggerElement } = useShadowToggleOnScroll();

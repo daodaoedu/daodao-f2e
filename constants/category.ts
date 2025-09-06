@@ -269,7 +269,7 @@ export const MARATHON_LINKS = [
   },
   {
     name: '活動公告',
-    link: '/learning-marathon/announcements',
+    link: '/learning-marathons/2025S1/announcements',
   },
   {
     name: '學習計畫分享區',

@@ -21,7 +21,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function TermsPage({
+export default async function LearningMarathonsPage({
   params,
 }: PageProps<'/[language]/learning-marathons/[season]'>) {
   const { season } = await params;
