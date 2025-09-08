@@ -30,14 +30,14 @@ export function VideoSection({ className }: VideoSectionProps) {
     )}>
       {/* 頂部曲線裝飾 */}
       <div 
-        className="-mt-[100px] w-full bg-cover bg-no-repeat bg-center md:bg-top z-10"
+        className="-mt-32 w-full bg-cover bg-no-repeat bg-center md:bg-top z-10"
         style={{
           backgroundImage: 'url("/assets/landing-page/bg-curve-green.svg")',
           height: '150px',
         }}
       />
       
-      <div className="px-6 py-15  -mb-[30px]">
+      <div className="px-6 py-15  -mb-16">
         <SectionHeader
           title="兩種起點開始你的學習之旅"
           subtitle="分享想法開始討論，嘗試實踐記錄成長"

@@ -18,13 +18,14 @@ export function FeatureCard({ title, description, tag, image, details, className
       <div className="flex justify-center items-center w-[84px] h-8 text-sm bg-tips text-white rounded">
         {tag}
       </div>
-      <Image
-        src={image}
-        alt={title}
-        width={400}
-        height={300}
-        className="w-full max-w-[400px]"
-      />
+      <div className="w-full h-[200px] relative overflow-hidden rounded-lg mb-4">
+        <Image
+          src={image}
+          alt={title}
+          fill
+          className="object-cover"
+        />
+      </div>
       <h4 className="text-[22px] text-primary-base text-center font-semibold mb-2">{title}</h4>
       <p className="text-sm text-center mb-4">{description}</p>
       <ul className="space-y-2">
