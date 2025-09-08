@@ -21,8 +21,8 @@ const termsMap = {
 };
 
 export async function generateStaticParams() {
-  return Object.keys(termsMap).flatMap((type) =>
-    locales.map((language) => ({ language, type }))
+  return locales.map((language) =>
+    Object.keys(termsMap).flatMap((type) => ({ language, type }))
   );
 }
 
