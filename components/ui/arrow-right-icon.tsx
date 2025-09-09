@@ -16,7 +16,7 @@ export function ArrowRightIcon({ className }: ArrowRightIconProps) {
       strokeWidth="2" 
       strokeLinecap="round" 
       strokeLinejoin="round"
-      className={cn("w-5 h-5", className)}
+      className={cn('w-5 h-5', className)}
     >
       <path d="M5 12h14" strokeWidth="2" />
       <path d="M12 5l7 7-7 7" strokeWidth="2" />

@@ -1,9 +1,9 @@
 'use client';
 
 import { cn } from '@/utils/cn';
+import { Button } from '@/components/ui/button';
 import { VideoItem } from './VideoItem';
 import { SectionHeader } from '../../SectionHeader';
-import { Button } from '@/components/ui/button';
 
 interface VideoSectionProps {
   className?: string;
