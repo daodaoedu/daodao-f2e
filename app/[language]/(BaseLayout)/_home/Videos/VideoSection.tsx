@@ -3,6 +3,7 @@
 import { cn } from '@/utils/cn';
 import { VideoItem } from './VideoItem';
 import { SectionHeader } from '../../SectionHeader';
+import { Button } from '@/components/ui/button';
 
 interface VideoSectionProps {
   className?: string;
@@ -48,7 +49,7 @@ export function VideoSection({ className }: VideoSectionProps) {
         />
       </div>
 
-      <div className="px-6 w-full max-w-[708px] mx-auto md:max-w-[1140px]">
+      <div className="container">
         <div className="w-full flex flex-col md:flex-row gap-6">
           {videos.map((video) => (
             <VideoItem
@@ -62,16 +63,12 @@ export function VideoSection({ className }: VideoSectionProps) {
       </div>
 
       <div className="flex justify-center w-full">
-        <button type="button" className="
-          flex justify-center items-center rounded-[40px] border-none px-5 cursor-pointer
-          transition-all duration-300 ease-in-out
-          h-14 w-45 text-xl font-semibold
-          bg-tips border-2 border-tips text-basic-white
-          shadow-[0_8px_10px_0_rgba(255,149,38,0.2)]
-          hover:bg-basic-white hover:text-tips
-        ">
+        <Button 
+          variant="ctaOrange"
+          size="huge"
+        >
           開始分享想法
-        </button>
+        </Button>
       </div>
     </section>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/utils/cn';
+import { Button } from '@/components/ui/button';
 
 interface CTASectionProps {
   className?: string;
@@ -23,9 +24,12 @@ export function CTASection({ className }: CTASectionProps) {
         準備好重新打造<br />
         你喜歡的學習生活了嗎？
       </h2>
-      <button type="button" className="flex justify-center items-center rounded-[40px] border-2 border-tips bg-tips text-white px-5 py-3 h-14 w-[180px] text-xl font-semibold transition-all duration-300 ease-in-out hover:bg-white hover:text-tips shadow-[0_8px_10px_0_rgba(255,161,11,0.2)]">
+      <Button 
+        variant="ctaOrange"
+        size="huge"
+      >
         立即加入
-      </button>
+      </Button>
     </section>
   );
 }

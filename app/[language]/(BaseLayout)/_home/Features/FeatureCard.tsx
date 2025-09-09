@@ -27,7 +27,7 @@ export function FeatureCard({ title, description, tag, image, details, className
         />
       </div>
       <h4 className="text-[22px] text-primary-base text-center font-semibold mb-2">{title}</h4>
-      <p className="text-sm text-center mb-4">{description}</p>
+      <p className="text-sm text-basic-400 text-center mb-4">{description}</p>
       <ul className="space-y-2">
         {details.map((detail) => (
           <li key={detail} className="pl-10 pr-2 relative leading-6 text-base flex items-center min-h-[40px]">

@@ -4,7 +4,8 @@ import { useSmoothScroll } from '@/hooks/useSmoothScroll';
 import { useScrollVisibility } from '@/hooks/useScrollVisibility';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import Image from 'next/image';
-import { ChevronUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ArrowUpIcon } from '@/components/ui/arrow-up-icon';
 
 interface FloatButtonsProps {
   className?: string;
@@ -30,14 +31,16 @@ export function FloatButtons({ className }: FloatButtonsProps) {
     <div className={`fixed bottom-20 right-6 z-50 ${className || ''}`}>
       <div className="flex flex-col items-center space-y-2">
         {/* 回到頂端按鈕 */}
-        <button
+        <Button
           type="button"
           onClick={handleScrollToTop}
-          className="w-12 h-12 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 flex items-center justify-center group"
+          variant="ctaPrimary"
+          size="icon"
+          className="w-12 h-12 shadow-none"
           aria-label="回到頂端"
         >
-          <ChevronUp className="w-6 h-6 text-gray-600 group-hover:text-gray-800 transition-colors" />
-        </button>
+          <ArrowUpIcon />
+        </Button>
         
         {/* 心理測驗徽章按鈕 */}
         <button

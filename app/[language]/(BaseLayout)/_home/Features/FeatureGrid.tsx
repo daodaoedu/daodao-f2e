@@ -44,8 +44,9 @@ export function FeatureGrid({ className }: FeatureGridProps) {
   ];
 
   return (
-    <div className={cn('px-6 pt-16 w-full max-w-[708px] mx-auto md:max-w-[1140px]', className)}>
-      <div className="relative pb-[60px] overflow-x-clip flex flex-col items-center justify-center" id="feature">
+    <div className={cn('pt-16 w-full', className)}>
+      <div className="container">
+        <div className="relative pb-[60px] overflow-x-clip flex flex-col items-center justify-center" id="feature">
         <div className="text-primary-darker px-6 py-[60px] pb-10 text-center">
           <h2 className="text-[28px] font-semibold mb-2">告別三大學習困境</h2>
           <h3 className="text-sm">從學習痛點到美好體驗，讓每一步成長都看得見</h3>
@@ -61,6 +62,7 @@ export function FeatureGrid({ className }: FeatureGridProps) {
               details={feature.details}
             />
           ))}
+        </div>
         </div>
       </div>
     </div>

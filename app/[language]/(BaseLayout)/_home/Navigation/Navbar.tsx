@@ -4,6 +4,7 @@ import { useSmoothScroll } from '@/hooks/useSmoothScroll';
 import { useScrollVisibility } from '@/hooks/useScrollVisibility';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { Image } from '@/components/ui/image';
+import { Button } from '@/components/ui/button';
 
 export default function Navbar() {
   const { scrollToElement, scrollToTop } = useSmoothScroll();
@@ -66,12 +67,11 @@ export default function Navbar() {
             方案
           </button>
         </div>
-        <button 
-          type="button" 
-          className="bg-tips text-white px-6 py-2 rounded-full font-medium text-sm border-2 border-tips hover:!bg-white hover:!text-tips hover:!border-tips transition-colors duration-200"
+        <Button 
+          variant="ctaOrangeSmall"
         >
           立即加入
-        </button>
+        </Button>
       </div>
     </nav>
   );

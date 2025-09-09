@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { cn } from '@/utils/cn';
+import { Button } from '@/components/ui/button';
 
 interface PlanSectionProps {
   className?: string;
@@ -16,7 +17,7 @@ export function PlanSection({ className }: PlanSectionProps) {
         <h3 className="text-sm">搶先體驗完整學習平台，與我們一起打造更好的學習體驗</h3>
       </div>
 
-      <div className="px-6 w-full max-w-[708px] mx-auto md:max-w-[1140px]">
+      <div className="container">
         <div className="w-full flex justify-center flex-col md:flex-row md:gap-6 items-center py-8">
           {/* 外層容器 - 用於定位裝飾元素 */}
           <div className="relative">
@@ -53,9 +54,13 @@ export function PlanSection({ className }: PlanSectionProps) {
               </li>
             </ul>
 
-            <button type="button" className="flex justify-center items-center rounded-[40px] border-2 border-tips bg-tips text-white px-5 py-3 h-14 w-[180px] text-xl font-semibold transition-all duration-300 ease-in-out hover:bg-white hover:text-tips shadow-[0_8px_10px_0_rgba(255,161,11,0.2)] mt-6">
+            <Button 
+              variant="ctaOrange"
+              size="huge"
+              className="mt-6"
+            >
               立即免費註冊
-            </button>
+            </Button>
             <p className="text-center text-[13px] mt-2">Beta 期間完全免費 • 無需信用卡</p>
 
             </div>
