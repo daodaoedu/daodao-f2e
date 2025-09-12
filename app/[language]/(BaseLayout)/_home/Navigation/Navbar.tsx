@@ -5,7 +5,6 @@ import { useScrollVisibility } from '@/hooks/useScrollVisibility';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';
-import { ArrowRightIcon } from '@/components/ui/arrow-right-icon';
 
 export default function Navbar() {
   const { scrollToElement, scrollToTop } = useSmoothScroll();
