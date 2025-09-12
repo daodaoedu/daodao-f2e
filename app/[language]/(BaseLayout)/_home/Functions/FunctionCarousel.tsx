@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { cn } from '@/utils/cn';
 import { SectionHeader } from '@/app/[language]/(BaseLayout)/SectionHeader';
-import { FunctionCard } from './FunctionCard';
 import {
   Carousel,
   CarouselContent,
@@ -11,6 +10,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { FunctionCard } from './FunctionCard';
 
 interface FunctionCarouselProps {
   className?: string;

@@ -2,6 +2,7 @@
 
 import { useSmoothScroll } from '@/hooks/useSmoothScroll';
 import { useScrollVisibility } from '@/hooks/useScrollVisibility';
+import useMediaQuery from '@/hooks/useMediaQuery';
 import { useEffect, useState } from 'react';
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
@@ -10,40 +11,18 @@ interface MobileMenuProps {
   className?: string;
 }
 
-// 自定義 hook 來檢測手機寬度
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    // 初始化檢查
-    checkIsMobile();
-
-    // 監聽視窗大小變化
-    window.addEventListener('resize', checkIsMobile);
-    
-    return () => {
-      window.removeEventListener('resize', checkIsMobile);
-    };
-  }, []);
-
-  return isMobile;
-}
+const menuItems = [
+  { label: '解決困境', targetId: 'feature' },
+  { label: '功能生態', targetId: 'functions' },
+  { label: '方案', targetId: 'plans' },
+];
 
 export function MobileMenu({ className }: MobileMenuProps) {
   const { scrollToElement } = useSmoothScroll();
   const isVisible = useScrollVisibility({ threshold: 250 }); // 捲動超過 250px 時顯示
-  const isMobile = useIsMobile(); // 手機寬度：<= 768px
+  const isMobile = !useMediaQuery('isMedium'); // 手機寬度：< 768px
   const [activeSection, setActiveSection] = useState<string>('');
 
-  const menuItems = [
-    { label: '解決困境', targetId: 'feature' },
-    { label: '功能生態', targetId: 'functions' },
-    { label: '方案', targetId: 'plans' },
-  ];
 
   // 監聽滾動位置，判斷當前在哪個錨點區域
   useEffect(() => {
@@ -66,7 +45,7 @@ export function MobileMenu({ className }: MobileMenuProps) {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [menuItems]);
+  }, []);
 
   const handleMenuClick = (targetId: string) => {
     // 為移動端導航添加適當的偏移量
