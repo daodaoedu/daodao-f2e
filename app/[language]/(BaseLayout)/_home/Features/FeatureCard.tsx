@@ -24,6 +24,7 @@ export function FeatureCard({ title, description, tag, image, details, className
           alt={title}
           fill
           className="object-cover"
+          data-preload
         />
       </div>
       <h4 className="text-[22px] text-primary-base text-center font-semibold mb-2">{title}</h4>

@@ -39,6 +39,7 @@ export function KeyVision() {
             width={200}
             height={44}
             className="mb-8 relative z-20"
+            data-preload
           />
           <h2 className="text-xl xl:text-2xl text-primary-darker relative z-20" style={{ lineHeight: '2' }}>
             讓學習成為充滿<br />
@@ -60,10 +61,8 @@ export function KeyVision() {
 
         <div className="col-span-12 md:col-span-8 lg:col-span-7 flex justify-center md:justify-start md:pr-2 lg:pr-24">
           <LottieHero
-            className="w-full h-auto"
             desktopSrc="/assets/landing-page/key-vision-desktop.json"
             mobileSrc="/assets/landing-page/key-vision-mobile.json"
-            breakpoint={768}
             preserveAspectRatio="xMidYMid meet"
           />
         </div>

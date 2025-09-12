@@ -1,15 +1,14 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import './Loader.css';
+import { useEffect, useRef } from 'react';
+import { usePreloadImages } from '@/hooks/usePreloadImages';
 
 interface LoaderProps {
   onComplete?: () => void;
 }
 
 export function Loader({ onComplete }: LoaderProps) {
-  const [progress, setProgress] = useState(0.05); // 設置初始值為 5% 確保可見
-  const [isLoading, setIsLoading] = useState(true);
+  const { progress, done } = usePreloadImages('img[data-preload], video[data-preload]');
   const lottieContainerRef = useRef<HTMLDivElement>(null);
   const lottieAnimationRef = useRef<{ destroy: () => void } | null>(null);
 
@@ -36,56 +35,39 @@ export function Loader({ onComplete }: LoaderProps) {
 
     loadLottie();
 
-    // Progress animation
-    const duration = 3500; // 3.5 seconds
-    const startTime = performance.now();
-
-    const animateProgress = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const currentProgress = Math.min(1, elapsed / duration);
-      
-      // easeOutCubic
-      const eased = 1 - (1 - currentProgress) ** 3;
-      setProgress(eased);
-      console.log('Progress updated:', eased, 'Percentage:', Math.round(eased * 100));
-
-      if (currentProgress < 1) {
-        requestAnimationFrame(animateProgress);
-      } else {
-        // Animation complete
-        setTimeout(() => {
-          setIsLoading(false);
-          onComplete?.();
-        }, 150);
-      }
-    };
-
-    requestAnimationFrame(animateProgress);
-
     return () => {
       if (lottieAnimationRef.current) {
         lottieAnimationRef.current.destroy();
       }
     };
-  }, [onComplete]);
+  }, []);
 
-  if (!isLoading) return null;
+  // 當圖片載入完成時觸發完成回調
+  useEffect(() => {
+    if (done) {
+      setTimeout(() => {
+        onComplete?.();
+      }, 150);
+    }
+  }, [done, onComplete]);
+
+  if (done) return null;
 
   return (
-    <div className="loader">
-      <div className="loader__center">
-        <div ref={lottieContainerRef} className="loader__logo" />
+    <div className="fixed inset-0 bg-primary-palest grid grid-rows-[1fr_auto] z-[9999]">
+      <div className="grid place-items-center">
+        <div ref={lottieContainerRef} className="w-[140px] h-[140px]" />
       </div>
 
-      <div className="loader__bottom">
-        <div className="loader__percent">{Math.round(progress * 100)}%</div>
-        <div className="loader__track">
+      <div className="pb-6">
+        <div className="text-[50px] font-semibold px-6 text-primary-base mb-2">
+          {Math.round(progress * 100)}%
+        </div>
+        <div className="relative h-2 bg-primary-lightest overflow-hidden">
           <div 
-            className="loader__bar" 
+            className="h-full bg-primary-base transition-[width] duration-200 ease-in-out"
             style={{ 
               width: `${Math.min(progress * 100, 100)}%`,
-              backgroundColor: '#16B9B3',
-              height: '100%',
             }}
            />
         </div>

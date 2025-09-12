@@ -303,6 +303,7 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
           height={200}
           className="w-full" 
           priority={false}
+          data-preload
         />
       </picture>
     </section>

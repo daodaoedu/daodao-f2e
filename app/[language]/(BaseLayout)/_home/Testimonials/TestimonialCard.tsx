@@ -20,6 +20,7 @@ export function TestimonialCard({ name, role, content, avatar, className }: Test
           alt={`${name} 的頭像`} 
           width={48} 
           height={48} 
+          data-preload
         />
         <figcaption className="name">{name}</figcaption>
       </figure>

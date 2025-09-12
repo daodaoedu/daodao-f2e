@@ -36,6 +36,7 @@ export function PresentationSection({ className }: PresentationSectionProps) {
             className="w-full h-auto" 
             alt="學習進度展示" 
             loading="lazy" 
+            data-preload
           />
         </picture>
       </div>
