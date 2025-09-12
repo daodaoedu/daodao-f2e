@@ -4,6 +4,7 @@ import { useSmoothScroll } from '@/hooks/useSmoothScroll';
 import { useScrollVisibility } from '@/hooks/useScrollVisibility';
 import { useEffect, useState } from 'react';
 import { cn } from '@/utils/cn';
+import { Button } from '@/components/ui/button';
 
 interface MobileMenuProps {
   className?: string;
@@ -85,19 +86,20 @@ export function MobileMenu({ className }: MobileMenuProps) {
         {menuItems.map((item) => {
           const isActive = activeSection === item.targetId;
           return (
-            <button
+            <Button
               key={item.targetId}
               type="button"
               onClick={() => handleMenuClick(item.targetId)}
+              variant="ghost"
               className={cn(
-                'flex flex-col items-center justify-center space-y-1 px-3 py-2 text-base transition-all duration-200 border-none cursor-pointer h-full w-full ',
+                'flex flex-col items-center justify-center space-y-1 px-3 py-2 text-base h-full w-full rounded-none',
                 isActive 
-                  ? 'bg-white text-primary-darker' 
+                  ? 'bg-white text-primary-darker hover:bg-white' 
                   : 'text-primary-darker hover:bg-white hover:text-primary-darker bg-transparent'
               )}
             >
               <span>{item.label}</span>
-            </button>
+            </Button>
           );
         })}
       </div>

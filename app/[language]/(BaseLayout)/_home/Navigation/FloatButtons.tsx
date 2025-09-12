@@ -43,10 +43,12 @@ export function FloatButtons({ className }: FloatButtonsProps) {
         </Button>
         
         {/* 心理測驗徽章按鈕 */}
-        <button
+        <Button
           type="button"
           onClick={handleScrollToPersonalityTest}
-          className="flex items-center justify-center group"
+          variant="ghost"
+          size="icon"
+          className="w-[90px] h-[90px] p-0 bg-transparent hover:bg-transparent"
           aria-label="點擊進入心理測驗"
         >
           <Image 
@@ -56,7 +58,7 @@ export function FloatButtons({ className }: FloatButtonsProps) {
             height={90}
             className="w-full h-full object-contain animate-spin-slow"
           />
-        </button>
+        </Button>
       </div>
     </div>
   );
