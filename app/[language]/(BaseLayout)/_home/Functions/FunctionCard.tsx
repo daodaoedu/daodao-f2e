@@ -15,21 +15,12 @@ interface FunctionCardProps {
 export function FunctionCard({ tag, title, description, imageUrl, action, className }: FunctionCardProps) {
   return (
     <div 
-      data-function-card
       className={cn(
         'relative bg-white rounded-2xl p-4 flex flex-col gap-4 box-border',
-        'select-none', // 防止拖拽時選取文字
-        'transition-none', // 避免與拖曳功能衝突
-        'flex-shrink-0', // 防止卡片被壓縮
+        'flex-shrink-0 h-full', // 防止卡片被壓縮，並撐滿高度
         className
       )}
       style={{
-        // 確保卡片不會受到全域 transition 樣式影響
-        transition: 'none',
-        // 確保卡片可以被拖曳
-        touchAction: 'pan-x',
-        // 確保卡片不會阻止拖曳事件
-        pointerEvents: 'auto',
         // 設定固定的最小寬度
         width: '280px',
         minWidth: '280px',

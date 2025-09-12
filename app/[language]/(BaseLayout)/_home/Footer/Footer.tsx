@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowRightIcon } from '@/components/ui/arrow-right-icon';
+import { Icon } from '@/components/ui/icon';
 
 export default function Footer() {
   return (
@@ -12,10 +12,11 @@ export default function Footer() {
         <div className="mb-8">
           <Image 
             src="/assets/landing-page/logo-simple-white.svg" 
-            alt="" 
+            alt="島島阿學 Logo" 
             width={142}
             height={24}
             className="mb-2" 
+            data-preload
           />
           <p className="text-white/80">Where personal growth meets collective wisdom!</p>
         </div>
@@ -52,7 +53,7 @@ export default function Footer() {
                 className="w-full"
               >
                 訂閱
-                <ArrowRightIcon />
+                <Icon name="arrow-right" />
               </Button>
             </form>
           </div>

@@ -5,7 +5,7 @@ import { useScrollVisibility } from '@/hooks/useScrollVisibility';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowUpIcon } from '@/components/ui/arrow-up-icon';
+import { Icon } from '@/components/ui/icon';
 
 interface FloatButtonsProps {
   className?: string;
@@ -39,7 +39,7 @@ export function FloatButtons({ className }: FloatButtonsProps) {
           className="w-12 h-12 shadow-none"
           aria-label="回到頂端"
         >
-          <ArrowUpIcon />
+          <Icon name="arrow-up" />
         </Button>
         
         {/* 心理測驗徽章按鈕 */}

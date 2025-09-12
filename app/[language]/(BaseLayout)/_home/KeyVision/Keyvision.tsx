@@ -2,7 +2,7 @@
 
 import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';
-import { ArrowRightIcon } from '@/components/ui/arrow-right-icon';
+import { Icon } from '@/components/ui/icon';
 import LottieHero from './LottieHero';
 
 export function KeyVision() {
@@ -55,7 +55,7 @@ export function KeyVision() {
             className="mt-8 relative z-20"
           >
             立即加入
-            <ArrowRightIcon className="ml-2" />
+            <Icon name="arrow-right" className="ml-2" />
           </Button>
         </div>
 
