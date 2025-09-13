@@ -3512,13 +3512,13 @@ components:
           type: object
           properties:
             id:
-              type: number
-            _id:
               type: string
             name:
               type: string
+              nullable: true
             email:
               type: string
+              nullable: true
             photoURL:
               type: string
               nullable: true
@@ -3688,13 +3688,13 @@ components:
             type: object
             properties:
               id:
-                type: number
-              _id:
                 type: string
               name:
                 type: string
+                nullable: true
               email:
                 type: string
+                nullable: true
               photoURL:
                 type: string
                 nullable: true
@@ -3874,13 +3874,13 @@ components:
               type: object
               properties:
                 id:
-                  type: number
-                _id:
                   type: string
                 name:
                   type: string
+                  nullable: true
                 email:
                   type: string
+                  nullable: true
                 photoURL:
                   type: string
                   nullable: true
@@ -8753,8 +8753,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: >-
-                  #/components/schemas/api-response.validators_authUserUpdateResponseExample
+                $ref: '#/components/schemas/user.validators_userSuccessResponseSchema'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -8830,8 +8829,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: >-
-                  #/components/schemas/api-response.validators_authUserUpdateResponseExample
+                $ref: '#/components/schemas/user.validators_userSuccessResponseSchema'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -8990,8 +8988,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: >-
-                  #/components/schemas/api-response.validators_authUserUpdateResponseExample
+                $ref: '#/components/schemas/user.validators_userSuccessResponseSchema'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -9020,8 +9017,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: >-
-                  #/components/schemas/api-response.validators_authUserUpdateResponseExample
+                $ref: '#/components/schemas/user.validators_userSuccessResponseSchema'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
