@@ -427,6 +427,253 @@ components:
               type: number
               nullable: true
           nullable: true
+    api-response.validators_authUserDataSchema:
+      type: object
+      properties:
+        id:
+          type: number
+        _id:
+          type: string
+        name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        photoUrl:
+          type: string
+          nullable: true
+        roleId:
+          type: number
+          nullable: true
+        gender:
+          type: string
+          nullable: true
+        birthDay:
+          type: string
+          nullable: true
+        isOpenLocation:
+          type: boolean
+          nullable: true
+        isOpenProfile:
+          type: boolean
+          nullable: true
+        tagList:
+          type: array
+          items:
+            type: string
+          nullable: true
+        roleList:
+          type: array
+          items:
+            type: string
+          nullable: true
+        customId:
+          type: string
+          nullable: true
+        customIdVerified:
+          type: boolean
+          nullable: true
+        createdDate:
+          type: string
+          nullable: true
+        updatedDate:
+          type: string
+          nullable: true
+    api-response.validators_authLoginResponseExample:
+      type: object
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+        data:
+          type: object
+          properties:
+            user:
+              type: object
+              properties:
+                id:
+                  type: number
+                _id:
+                  type: string
+                name:
+                  type: string
+                  nullable: true
+                email:
+                  type: string
+                  nullable: true
+                photoUrl:
+                  type: string
+                  nullable: true
+                roleId:
+                  type: number
+                  nullable: true
+                gender:
+                  type: string
+                  nullable: true
+                birthDay:
+                  type: string
+                  nullable: true
+                isOpenLocation:
+                  type: boolean
+                  nullable: true
+                isOpenProfile:
+                  type: boolean
+                  nullable: true
+                tagList:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                roleList:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                customId:
+                  type: string
+                  nullable: true
+                customIdVerified:
+                  type: boolean
+                  nullable: true
+                createdDate:
+                  type: string
+                  nullable: true
+                updatedDate:
+                  type: string
+                  nullable: true
+            token:
+              type: string
+        timestamp:
+          type: string
+        meta:
+          type: object
+          properties:
+            searchQuery:
+              type: string
+              nullable: true
+            searchTime:
+              type: number
+              nullable: true
+            filters:
+              type: object
+              additionalProperties: true
+              nullable: true
+            categoryCounts:
+              type: object
+              additionalProperties: true
+              nullable: true
+            aggregateData:
+              type: object
+              additionalProperties: true
+              nullable: true
+            requestId:
+              type: string
+              nullable: true
+            cacheHit:
+              type: boolean
+              nullable: true
+            processingTime:
+              type: number
+              nullable: true
+          nullable: true
+    api-response.validators_authUserUpdateResponseExample:
+      type: object
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+        data:
+          type: object
+          properties:
+            user:
+              type: object
+              properties:
+                id:
+                  type: number
+                _id:
+                  type: string
+                name:
+                  type: string
+                  nullable: true
+                email:
+                  type: string
+                  nullable: true
+                photoUrl:
+                  type: string
+                  nullable: true
+                roleId:
+                  type: number
+                  nullable: true
+                gender:
+                  type: string
+                  nullable: true
+                birthDay:
+                  type: string
+                  nullable: true
+                isOpenLocation:
+                  type: boolean
+                  nullable: true
+                isOpenProfile:
+                  type: boolean
+                  nullable: true
+                tagList:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                roleList:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                customId:
+                  type: string
+                  nullable: true
+                customIdVerified:
+                  type: boolean
+                  nullable: true
+                createdDate:
+                  type: string
+                  nullable: true
+                updatedDate:
+                  type: string
+                  nullable: true
+        timestamp:
+          type: string
+        meta:
+          type: object
+          properties:
+            searchQuery:
+              type: string
+              nullable: true
+            searchTime:
+              type: number
+              nullable: true
+            filters:
+              type: object
+              additionalProperties: true
+              nullable: true
+            categoryCounts:
+              type: object
+              additionalProperties: true
+              nullable: true
+            aggregateData:
+              type: object
+              additionalProperties: true
+              nullable: true
+            requestId:
+              type: string
+              nullable: true
+            cacheHit:
+              type: boolean
+              nullable: true
+            processingTime:
+              type: number
+              nullable: true
+          nullable: true
     auth.validators_loginValidator:
       type: object
       properties:
@@ -4203,7 +4450,7 @@ paths:
             application/json:
               schema:
                 $ref: >-
-                  #/components/schemas/auth.validators_loginSuccessResponseSchema
+                  #/components/schemas/api-response.validators_authLoginResponseExample
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -4231,7 +4478,7 @@ paths:
             application/json:
               schema:
                 $ref: >-
-                  #/components/schemas/api-response.validators_apiSuccessResponseExample
+                  #/components/schemas/api-response.validators_authLoginResponseExample
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -4420,7 +4667,7 @@ paths:
             application/json:
               schema:
                 $ref: >-
-                  #/components/schemas/auth.validators_loginSuccessResponseSchema
+                  #/components/schemas/api-response.validators_authLoginResponseExample
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -8453,8 +8700,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: >-
-                  #/components/schemas/api-response.validators_apiSuccessResponseExample
+                $ref: '#/components/schemas/user.validators_createUserResponseSchema'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -8507,7 +8753,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user.validators_userSuccessResponseSchema'
+                $ref: >-
+                  #/components/schemas/api-response.validators_authUserUpdateResponseExample
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -8583,7 +8830,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user.validators_userSuccessResponseSchema'
+                $ref: >-
+                  #/components/schemas/api-response.validators_authUserUpdateResponseExample
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -8742,7 +8990,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user.validators_userSuccessResponseSchema'
+                $ref: >-
+                  #/components/schemas/api-response.validators_authUserUpdateResponseExample
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -8771,7 +9020,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user.validators_userSuccessResponseSchema'
+                $ref: >-
+                  #/components/schemas/api-response.validators_authUserUpdateResponseExample
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
