@@ -427,6 +427,253 @@ components:
               type: number
               nullable: true
           nullable: true
+    api-response.validators_authUserDataSchema:
+      type: object
+      properties:
+        id:
+          type: number
+        _id:
+          type: string
+        name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        photoUrl:
+          type: string
+          nullable: true
+        roleId:
+          type: number
+          nullable: true
+        gender:
+          type: string
+          nullable: true
+        birthDay:
+          type: string
+          nullable: true
+        isOpenLocation:
+          type: boolean
+          nullable: true
+        isOpenProfile:
+          type: boolean
+          nullable: true
+        tagList:
+          type: array
+          items:
+            type: string
+          nullable: true
+        roleList:
+          type: array
+          items:
+            type: string
+          nullable: true
+        customId:
+          type: string
+          nullable: true
+        customIdVerified:
+          type: boolean
+          nullable: true
+        createdDate:
+          type: string
+          nullable: true
+        updatedDate:
+          type: string
+          nullable: true
+    api-response.validators_authLoginResponseExample:
+      type: object
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+        data:
+          type: object
+          properties:
+            user:
+              type: object
+              properties:
+                id:
+                  type: number
+                _id:
+                  type: string
+                name:
+                  type: string
+                  nullable: true
+                email:
+                  type: string
+                  nullable: true
+                photoUrl:
+                  type: string
+                  nullable: true
+                roleId:
+                  type: number
+                  nullable: true
+                gender:
+                  type: string
+                  nullable: true
+                birthDay:
+                  type: string
+                  nullable: true
+                isOpenLocation:
+                  type: boolean
+                  nullable: true
+                isOpenProfile:
+                  type: boolean
+                  nullable: true
+                tagList:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                roleList:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                customId:
+                  type: string
+                  nullable: true
+                customIdVerified:
+                  type: boolean
+                  nullable: true
+                createdDate:
+                  type: string
+                  nullable: true
+                updatedDate:
+                  type: string
+                  nullable: true
+            token:
+              type: string
+        timestamp:
+          type: string
+        meta:
+          type: object
+          properties:
+            searchQuery:
+              type: string
+              nullable: true
+            searchTime:
+              type: number
+              nullable: true
+            filters:
+              type: object
+              additionalProperties: true
+              nullable: true
+            categoryCounts:
+              type: object
+              additionalProperties: true
+              nullable: true
+            aggregateData:
+              type: object
+              additionalProperties: true
+              nullable: true
+            requestId:
+              type: string
+              nullable: true
+            cacheHit:
+              type: boolean
+              nullable: true
+            processingTime:
+              type: number
+              nullable: true
+          nullable: true
+    api-response.validators_authUserUpdateResponseExample:
+      type: object
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+        data:
+          type: object
+          properties:
+            user:
+              type: object
+              properties:
+                id:
+                  type: number
+                _id:
+                  type: string
+                name:
+                  type: string
+                  nullable: true
+                email:
+                  type: string
+                  nullable: true
+                photoUrl:
+                  type: string
+                  nullable: true
+                roleId:
+                  type: number
+                  nullable: true
+                gender:
+                  type: string
+                  nullable: true
+                birthDay:
+                  type: string
+                  nullable: true
+                isOpenLocation:
+                  type: boolean
+                  nullable: true
+                isOpenProfile:
+                  type: boolean
+                  nullable: true
+                tagList:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                roleList:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                customId:
+                  type: string
+                  nullable: true
+                customIdVerified:
+                  type: boolean
+                  nullable: true
+                createdDate:
+                  type: string
+                  nullable: true
+                updatedDate:
+                  type: string
+                  nullable: true
+        timestamp:
+          type: string
+        meta:
+          type: object
+          properties:
+            searchQuery:
+              type: string
+              nullable: true
+            searchTime:
+              type: number
+              nullable: true
+            filters:
+              type: object
+              additionalProperties: true
+              nullable: true
+            categoryCounts:
+              type: object
+              additionalProperties: true
+              nullable: true
+            aggregateData:
+              type: object
+              additionalProperties: true
+              nullable: true
+            requestId:
+              type: string
+              nullable: true
+            cacheHit:
+              type: boolean
+              nullable: true
+            processingTime:
+              type: number
+              nullable: true
+          nullable: true
     auth.validators_loginValidator:
       type: object
       properties:
@@ -1351,10 +1598,6 @@ components:
                 type: number
               isSelected:
                 type: boolean
-              weight:
-                type: number
-                default: 1
-                nullable: true
     mentor.validators_assignMentorToMarathonSchema:
       type: object
       properties:
@@ -2709,7 +2952,7 @@ components:
           nullable: true
         type:
           type: string
-          enum: &ref_11
+          enum:
             - learning_platform_app
             - learning_tools
             - books_articles
@@ -2721,13 +2964,13 @@ components:
             - other
         cost:
           type: string
-          enum: &ref_12
+          enum:
             - free
             - paid
             - partial_free
         level:
           type: string
-          enum: &ref_13
+          enum:
             - beginner
             - intermediate
             - expert
@@ -2793,15 +3036,31 @@ components:
           nullable: true
         type:
           type: string
-          enum: *ref_11
+          enum:
+            - learning_platform_app
+            - learning_tools
+            - books_articles
+            - video_content
+            - podcast_content
+            - workshops_courses
+            - professional_certificates
+            - community_organization
+            - other
           nullable: true
         cost:
           type: string
-          enum: *ref_12
+          enum:
+            - free
+            - paid
+            - partial_free
           nullable: true
         level:
           type: string
-          enum: *ref_13
+          enum:
+            - beginner
+            - intermediate
+            - expert
+            - all_levels
           nullable: true
         majorCategory:
           type: string
@@ -2834,7 +3093,7 @@ components:
             - reported
     review.validators_moodSchema:
       type: string
-      enum: &ref_14
+      enum: &ref_11
         - excellent
         - good
         - neutral
@@ -2848,7 +3107,7 @@ components:
       type: number
     review.validators_visibilitySchema:
       type: string
-      enum: &ref_15
+      enum: &ref_12
         - private
         - public
     review.validators_createReviewSchema:
@@ -2861,7 +3120,7 @@ components:
           nullable: true
         mood:
           type: string
-          enum: *ref_14
+          enum: *ref_11
         stressLevel:
           type: number
         moodDescription:
@@ -2877,7 +3136,7 @@ components:
           nullable: true
         visibility:
           type: string
-          enum: *ref_15
+          enum: *ref_12
           nullable: true
           default: private
     review.validators_updateReviewSchema:
@@ -2888,7 +3147,7 @@ components:
           nullable: true
         mood:
           type: string
-          enum: *ref_14
+          enum: *ref_11
           nullable: true
         stressLevel:
           type: number
@@ -2913,7 +3172,7 @@ components:
           nullable: true
         mood:
           type: string
-          enum: *ref_14
+          enum: *ref_11
           nullable: true
         stressLevel:
           type: number
@@ -2954,7 +3213,7 @@ components:
           additionalProperties: true
         entityType:
           type: string
-          enum: &ref_16
+          enum: &ref_13
             - resource
             - project
             - idea
@@ -2970,7 +3229,7 @@ components:
             - type: number
         entityType:
           type: string
-          enum: *ref_16
+          enum: *ref_13
         tagName:
           type: string
     tag.validators_removeEntityTagSchema:
@@ -2983,7 +3242,7 @@ components:
             - type: number
         entityType:
           type: string
-          enum: *ref_16
+          enum: *ref_13
         tagName:
           type: string
     tag.validators_batchTagOperationSchema:
@@ -3001,7 +3260,7 @@ components:
             - type: number
         entityType:
           type: string
-          enum: *ref_16
+          enum: *ref_13
         tagNames:
           type: array
           items:
@@ -3011,7 +3270,7 @@ components:
       properties:
         entityType:
           type: string
-          enum: *ref_16
+          enum: *ref_13
           nullable: true
         timeRange:
           type: string
@@ -3048,7 +3307,7 @@ components:
             - female
             - other
           nullable: true
-        birthDate:
+        birthDay:
           type: string
           nullable: true
         contactList:
@@ -3129,10 +3388,7 @@ components:
         name:
           type: string
           nullable: true
-        email:
-          type: string
-          nullable: true
-        photoUrl:
+        photoURL:
           type: string
           nullable: true
         gender:
@@ -3142,7 +3398,7 @@ components:
             - female
             - other
           nullable: true
-        birthDate:
+        birthDay:
           type: string
           nullable: true
         contactList:
@@ -3256,29 +3512,29 @@ components:
           type: object
           properties:
             id:
-              type: number
-            _id:
               type: string
             name:
               type: string
+              nullable: true
             email:
               type: string
-            photoUrl:
+              nullable: true
+            photoURL:
               type: string
               nullable: true
             gender:
               type: string
-              enum: &ref_17
+              enum: &ref_14
                 - male
                 - female
                 - other
               nullable: true
-            birthDate:
+            birthDay:
               type: string
               nullable: true
             educationStage:
               type: string
-              enum: &ref_18
+              enum: &ref_15
                 - university
                 - high
                 - other
@@ -3291,11 +3547,6 @@ components:
               type: boolean
             location:
               type: string
-              nullable: true
-            roleList:
-              type: array
-              items:
-                type: string
               nullable: true
             selfIntroduction:
               type: string
@@ -3326,13 +3577,40 @@ components:
               type: object
               additionalProperties: true
               nullable: true
+            role:
+              type: number
+              nullable: true
+            roleList:
+              type: array
+              items:
+                type: string
+              nullable: true
+            basicInfo:
+              type: object
+              properties:
+                selfIntroduction:
+                  type: string
+                  nullable: true
+                shareList:
+                  oneOf:
+                    - type: string
+                    - type: array
+                      items:
+                        type: string
+                  nullable: true
+                wantToDoList:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+              nullable: true
             contactList:
               type: object
               properties:
                 email:
                   type: string
                   nullable: true
-                photoUrl:
+                photoURL:
                   type: string
                   nullable: true
                 isSubscribeEmail:
@@ -3360,9 +3638,9 @@ components:
             customIdCreatedAt:
               type: string
               nullable: true
-            createdAt:
+            createdDate:
               type: string
-            updatedAt:
+            updatedDate:
               type: string
         timestamp:
           type: string
@@ -3410,26 +3688,26 @@ components:
             type: object
             properties:
               id:
-                type: number
-              _id:
                 type: string
               name:
                 type: string
+                nullable: true
               email:
                 type: string
-              photoUrl:
+                nullable: true
+              photoURL:
                 type: string
                 nullable: true
               gender:
                 type: string
-                enum: *ref_17
+                enum: *ref_14
                 nullable: true
-              birthDate:
+              birthDay:
                 type: string
                 nullable: true
               educationStage:
                 type: string
-                enum: *ref_18
+                enum: *ref_15
                 nullable: true
               isOpenLocation:
                 type: boolean
@@ -3439,11 +3717,6 @@ components:
                 type: boolean
               location:
                 type: string
-                nullable: true
-              roleList:
-                type: array
-                items:
-                  type: string
                 nullable: true
               selfIntroduction:
                 type: string
@@ -3474,13 +3747,40 @@ components:
                 type: object
                 additionalProperties: true
                 nullable: true
+              role:
+                type: number
+                nullable: true
+              roleList:
+                type: array
+                items:
+                  type: string
+                nullable: true
+              basicInfo:
+                type: object
+                properties:
+                  selfIntroduction:
+                    type: string
+                    nullable: true
+                  shareList:
+                    oneOf:
+                      - type: string
+                      - type: array
+                        items:
+                          type: string
+                    nullable: true
+                  wantToDoList:
+                    type: array
+                    items:
+                      type: string
+                    nullable: true
+                nullable: true
               contactList:
                 type: object
                 properties:
                   email:
                     type: string
                     nullable: true
-                  photoUrl:
+                  photoURL:
                     type: string
                     nullable: true
                   isSubscribeEmail:
@@ -3508,9 +3808,9 @@ components:
               customIdCreatedAt:
                 type: string
                 nullable: true
-              createdAt:
+              createdDate:
                 type: string
-              updatedAt:
+              updatedDate:
                 type: string
         pagination:
           type: object
@@ -3574,26 +3874,26 @@ components:
               type: object
               properties:
                 id:
-                  type: number
-                _id:
                   type: string
                 name:
                   type: string
+                  nullable: true
                 email:
                   type: string
-                photoUrl:
+                  nullable: true
+                photoURL:
                   type: string
                   nullable: true
                 gender:
                   type: string
-                  enum: *ref_17
+                  enum: *ref_14
                   nullable: true
-                birthDate:
+                birthDay:
                   type: string
                   nullable: true
                 educationStage:
                   type: string
-                  enum: *ref_18
+                  enum: *ref_15
                   nullable: true
                 isOpenLocation:
                   type: boolean
@@ -3603,11 +3903,6 @@ components:
                   type: boolean
                 location:
                   type: string
-                  nullable: true
-                roleList:
-                  type: array
-                  items:
-                    type: string
                   nullable: true
                 selfIntroduction:
                   type: string
@@ -3638,13 +3933,40 @@ components:
                   type: object
                   additionalProperties: true
                   nullable: true
+                role:
+                  type: number
+                  nullable: true
+                roleList:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                basicInfo:
+                  type: object
+                  properties:
+                    selfIntroduction:
+                      type: string
+                      nullable: true
+                    shareList:
+                      oneOf:
+                        - type: string
+                        - type: array
+                          items:
+                            type: string
+                      nullable: true
+                    wantToDoList:
+                      type: array
+                      items:
+                        type: string
+                      nullable: true
+                  nullable: true
                 contactList:
                   type: object
                   properties:
                     email:
                       type: string
                       nullable: true
-                    photoUrl:
+                    photoURL:
                       type: string
                       nullable: true
                     isSubscribeEmail:
@@ -3672,9 +3994,9 @@ components:
                 customIdCreatedAt:
                   type: string
                   nullable: true
-                createdAt:
+                createdDate:
                   type: string
-                updatedAt:
+                updatedDate:
                   type: string
             token:
               type: string
@@ -4025,113 +4347,7 @@ components:
               type: number
               nullable: true
           nullable: true
-  parameters:
-    idParam:
-      in: path
-      name: id
-      required: true
-      schema:
-        type: string
-        format: uuid
-      description: 資源的唯一識別碼 (UUID)
-      example: 123e4567-e89b-12d3-a456-426614174000
-    reviewIdParam:
-      in: path
-      name: id
-      required: true
-      schema:
-        type: string
-        pattern: ^[1-9]\d*$
-      description: 評論的唯一識別碼（字串格式的數字）
-      example: '1'
-    resourceIdParam:
-      in: path
-      name: resourceId
-      required: true
-      schema:
-        type: string
-        format: uuid
-      description: 資源的唯一識別碼 (UUID)
-      example: 123e4567-e89b-12d3-a456-426614174000
-    cursorParam:
-      in: query
-      name: cursor
-      required: false
-      schema:
-        type: string
-      description: 游標，用於游標分頁
-    limitParam:
-      in: query
-      name: limit
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-      description: 每頁返回的記錄數
-    resourceLimitParam:
-      in: query
-      name: limit
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 20
-        default: 5
-      description: 每頁返回的資源數
-    reviewLimitParam:
-      in: query
-      name: limit
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 10
-        default: 2
-      description: 每頁返回的評論數
-    sortParam:
-      in: query
-      name: sort
-      required: false
-      schema:
-        type: string
-        enum:
-          - id
-          - name
-          - created_at
-          - updated_at
-      description: 排序欄位
-    orderParam:
-      in: query
-      name: order
-      required: false
-      schema:
-        type: string
-        enum:
-          - asc
-          - desc
-        default: desc
-      description: 排序方向
-    pageParam:
-      in: query
-      name: page
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
-      description: 頁數
-    pageSizeParam:
-      in: query
-      name: pageSize
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 10
-      description: 每頁項目數
+  parameters: {}
   responses:
     BadRequestError:
       description: 請求參數錯誤
@@ -4178,12 +4394,6 @@ components:
                 meta:
                   requestId: req-unauthorized-001
                   processingTime: 12.5
-    ForbiddenError:
-      description: 禁止訪問，權限不足
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiErrorResponse'
     NotFoundError:
       description: 資源不存在
       content:
@@ -4205,12 +4415,6 @@ components:
                     userId: '123'
                     reason: 資料庫中找不到指定的用戶
                 timestamp: '2024-01-15T10:30:00.000Z'
-    ConflictError:
-      description: 資源衝突
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiErrorResponse'
     InternalServerError:
       description: 服務器內部錯誤
       content:
@@ -4246,7 +4450,7 @@ paths:
             application/json:
               schema:
                 $ref: >-
-                  #/components/schemas/auth.validators_loginSuccessResponseSchema
+                  #/components/schemas/api-response.validators_authLoginResponseExample
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -4274,7 +4478,7 @@ paths:
             application/json:
               schema:
                 $ref: >-
-                  #/components/schemas/api-response.validators_apiSuccessResponseExample
+                  #/components/schemas/api-response.validators_authLoginResponseExample
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -4463,7 +4667,7 @@ paths:
             application/json:
               schema:
                 $ref: >-
-                  #/components/schemas/auth.validators_loginSuccessResponseSchema
+                  #/components/schemas/api-response.validators_authLoginResponseExample
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -8476,12 +8680,13 @@ paths:
         canCreateUser, canUpdateUser, // canDeleteUser, requireAdmin } from
         '../middleware/permission.middleware'; import { validate } from
         '../middleware/validation.middleware'; import { createUserSchema,
-        updateUserSchema, getUserParamsSchema, getUserQuerySchema,
-        userPreferencesSchema } from '../validators/user.validators'; import {
-        customIdSchema, customIdParamsSchema } from
-        '../validators/user-custom-id.validators'; const router = Router(); /**
-        GET /users 獲取用戶列表 查詢參數：page, pageSize, educationStage, roleList,
-        location, search 支援可選身份驗證（用於個人化內容）
+        updateUserSchema, getUserParamsSchema, getUserQuerySchema } from
+        '../validators/user.validators'; import { customIdSchema,
+        customIdParamsSchema } from '../validators/user-custom-id.validators';
+        import { preferencesQuerySchema, updatePreferencesSchema } from
+        '../validators/me.validators'; const router = Router(); /** GET /users
+        獲取用戶列表 查詢參數：page, pageSize, educationStage, roleList, location, search
+        支援可選身份驗證（用於個人化內容）
       security:
         - bearerAuth: []
     post:
@@ -8495,8 +8700,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: >-
-                  #/components/schemas/api-response.validators_apiSuccessResponseExample
+                $ref: '#/components/schemas/user.validators_createUserResponseSchema'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -8512,12 +8716,13 @@ paths:
         canCreateUser, canUpdateUser, // canDeleteUser, requireAdmin } from
         '../middleware/permission.middleware'; import { validate } from
         '../middleware/validation.middleware'; import { createUserSchema,
-        updateUserSchema, getUserParamsSchema, getUserQuerySchema,
-        userPreferencesSchema } from '../validators/user.validators'; import {
-        customIdSchema, customIdParamsSchema } from
-        '../validators/user-custom-id.validators'; const router = Router(); /**
-        GET /users 獲取用戶列表 查詢參數：page, pageSize, educationStage, roleList,
-        location, search 支援可選身份驗證（用於個人化內容） / router.get('/', optionalAuth,
+        updateUserSchema, getUserParamsSchema, getUserQuerySchema } from
+        '../validators/user.validators'; import { customIdSchema,
+        customIdParamsSchema } from '../validators/user-custom-id.validators';
+        import { preferencesQuerySchema, updatePreferencesSchema } from
+        '../validators/me.validators'; const router = Router(); /** GET /users
+        獲取用戶列表 查詢參數：page, pageSize, educationStage, roleList, location, search
+        支援可選身份驗證（用於個人化內容） / router.get('/', optionalAuth,
         validate(getUserQuerySchema, 'query'), userController.getAllUsers as
         RequestHandler ); /** GET /users/me 獲取當前用戶資訊 需要身份驗證 / router.get('/me',
         authenticate, userController.getMe as RequestHandler ); /** GET
@@ -8744,7 +8949,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/user.validators_userPreferencesSchema'
+              $ref: '#/components/schemas/me.validators_updatePreferencesSchema'
       security:
         - bearerAuth: []
   /api/v1/users/preferences/available:
