@@ -137,7 +137,7 @@ export default function CircleDetailPage({
     name: data.user.name,
     roleList: data.user.roleList,
   };
-  const isOwnCircle = user?._id === organizer.id;
+  const isOwnCircle = user?.id === organizer.id;
 
   return (
     <Background className="text-basic-400">

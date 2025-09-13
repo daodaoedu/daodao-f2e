@@ -4,7 +4,6 @@ interface User {
   photoURL: string;
   id: string;
   name: string;
-  _id: string;
   roleList: string[];
 }
 
@@ -52,7 +51,6 @@ export const DEFAULT_PROJECT: Project = {
   user: {
     id: '',
     name: '',
-    _id: '',
     photoURL: '',
     roleList: [],
   },

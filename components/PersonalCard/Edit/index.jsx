@@ -54,7 +54,7 @@ function EditPage() {
   const { data: tags } = useTags();
 
   useEffect(() => {
-    if (user?._id) {
+    if (user?.id) {
       Object.entries(user).forEach(([key, value]) => {
         if (key === 'contactList') {
           const {
@@ -85,7 +85,7 @@ function EditPage() {
 
   const onUpdateUser = async () => {
     const resultStatus = await onEditSubmit({
-      id: user._id,
+      id: user.id,
       email: user.email,
     });
     if (Object.values(errors).length) {
