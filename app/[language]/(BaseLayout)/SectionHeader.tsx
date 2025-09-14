@@ -4,8 +4,8 @@ import { ReactNode } from 'react';
 interface SectionHeaderProps {
   title: string | ReactNode;
   subtitle?: string;
-  variant?: 'default' | 'light' | 'dark' | 'primary';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  variant?: 'dark' | 'light';
+  size?: 'md' | 'lg';
   alignment?: 'left' | 'center' | 'right';
   className?: string;
   titleClassName?: string;
@@ -16,7 +16,7 @@ interface SectionHeaderProps {
 export function SectionHeader({
   title,
   subtitle,
-  variant = 'default',
+  variant = 'dark',
   size = 'lg',
   alignment = 'center',
   className,
@@ -25,44 +25,16 @@ export function SectionHeader({
   showSubtitle = true,
 }: SectionHeaderProps) {
   const variantStyles = {
-    default: {
-      title: 'text-primary-darker',
-      subtitle: 'text-primary-darker',
-    },
-    light: {
-      title: 'text-white',
-      subtitle: 'text-white',
-    },
-    dark: {
-      title: 'text-primary-darker',
-      subtitle: 'text-primary-darker',
-    },
-    primary: {
-      title: 'text-primary-darker',
-      subtitle: 'text-primary-darker',
-    },
+    dark: 'text-primary-darker',
+    light: 'text-white',
   };
 
   const sizeStyles = {
-    sm: {
-      title: 'text-[28px]',
-      subtitle: 'text-sm',
-      spacing: 'mb-8',
-    },
     md: {
-      title: 'text-[28px]',
-      subtitle: 'text-sm',
       spacing: 'mb-12',
     },
     lg: {
-      title: 'text-[28px]',
-      subtitle: 'text-sm',
       spacing: 'mb-16',
-    },
-    xl: {
-      title: 'text-[28px]',
-      subtitle: 'text-sm',
-      spacing: 'mb-20',
     },
   };
 
@@ -84,9 +56,8 @@ export function SectionHeader({
       className
     )}>
       <h2 className={cn(
-        'font-bold mb-2',
-        currentSize.title,
-        currentVariant.title,
+        'font-bold mb-2 text-[1.75rem]',
+        currentVariant,
         titleClassName
       )}>
         {title}
@@ -94,9 +65,8 @@ export function SectionHeader({
       
       {showSubtitle && subtitle && (
         <h3 className={cn(
-          'max-w-2xl mx-auto',
-          currentSize.subtitle,
-          currentVariant.subtitle,
+          'max-w-2xl mx-auto text-sm',
+          currentVariant,
           subtitleClassName,
           alignment === 'left' && 'mx-0',
           alignment === 'right' && 'mx-0 ml-auto'

@@ -30,7 +30,7 @@ export function SloganSection({ className }: SloganSectionProps) {
           }
 
           subtitle="Where personal growth meets collective wisdom!"
-          variant="primary"
+          variant="dark"
           alignment="center"
           titleClassName="text-primary-darker !text-[22px]"
           subtitleClassName="text-basic-400 italic !text-sm"

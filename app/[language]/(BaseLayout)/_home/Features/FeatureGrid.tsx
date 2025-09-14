@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/utils/cn';
+import { SectionHeader } from '../../SectionHeader';
 import { FeatureCard } from './FeatureCard';
 
 interface FeatureGridProps {
@@ -47,22 +48,25 @@ export function FeatureGrid({ className }: FeatureGridProps) {
     <div className={cn('pt-16 w-full', className)}>
       <div className="container">
         <div className="relative pb-[60px] overflow-x-clip flex flex-col items-center justify-center" id="feature">
-        <div className="text-primary-darker px-6 py-[60px] pb-10 text-center">
-          <h2 className="text-[28px] font-semibold mb-2">告別三大學習困境</h2>
-          <h3 className="text-sm">從學習痛點到美好體驗，讓每一步成長都看得見</h3>
-        </div>
-        <div className="text-primary-darker flex flex-col items-stretch md:flex-row">
-          {features.map((feature) => (
-            <FeatureCard
-              key={feature.title}
-              title={feature.title}
-              description={feature.description}
-              tag={feature.tag}
-              image={feature.image}
-              details={feature.details}
-            />
-          ))}
-        </div>
+          <SectionHeader
+            title="告別三大學習困境"
+            subtitle="從學習痛點到美好體驗，讓每一步成長都看得見"
+            variant="dark"
+            size="lg"
+            alignment="center"
+          />
+          <div className="text-primary-darker flex flex-col items-stretch md:flex-row">
+            {features.map((feature) => (
+              <FeatureCard
+                key={feature.title}
+                title={feature.title}
+                description={feature.description}
+                tag={feature.tag}
+                image={feature.image}
+                details={feature.details}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

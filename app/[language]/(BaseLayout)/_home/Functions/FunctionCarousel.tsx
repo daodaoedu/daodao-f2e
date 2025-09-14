@@ -57,7 +57,6 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
           size="md"
           alignment="center"
           showSubtitle={false}
-          className="text-teal-800"
         />
       </div>
       
