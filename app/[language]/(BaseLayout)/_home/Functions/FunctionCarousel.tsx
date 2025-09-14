@@ -98,8 +98,7 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
           alt="功能生態裝飾" 
           width={1200}
           height={200}
-          className="w-full" 
-          data-preload
+          className="w-full"
         />
       </picture>
     </section>

@@ -31,7 +31,7 @@ export function VideoSection({ className }: VideoSectionProps) {
     )}>
       {/* 頂部曲線裝飾 */}
       <div 
-        className="-mt-32 w-full bg-cover bg-no-repeat bg-center md:bg-top z-10"
+        className="-mt-24 lg:-mt-32 w-full bg-cover bg-no-repeat bg-center md:bg-top z-10"
         style={{
           backgroundImage: 'url("/assets/landing-page/bg-curve-green.svg")',
           height: '150px',

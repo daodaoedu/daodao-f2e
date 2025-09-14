@@ -40,6 +40,7 @@ export function KeyVision() {
             height={44}
             className="mb-8 relative z-20"
             data-preload
+            priority
           />
           <h2 className="text-xl xl:text-2xl text-primary-darker relative z-20 leading-[2]">
             讓學習成為充滿<br />

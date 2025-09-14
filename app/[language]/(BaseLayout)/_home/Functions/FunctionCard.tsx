@@ -62,7 +62,6 @@ export function FunctionCard({ tag, title, description, imageUrl, action, classN
           className="pointer-events-none select-none"
           draggable={false}
           style={{ WebkitUserDrag: 'none' } as React.CSSProperties}
-          data-preload
         />
       </div>
     </div>

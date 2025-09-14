@@ -35,7 +35,6 @@ export function PersonalitySection({ className }: PersonalitySectionProps) {
               width={20} 
               height={20} 
               className="mr-2"
-              data-preload
             />
             2-3分鐘
           </div>
@@ -46,8 +45,7 @@ export function PersonalitySection({ className }: PersonalitySectionProps) {
             src="/assets/landing-page/button-personality-test.svg" 
             alt="點擊進入心理測驗" 
             width={192} 
-            height={192} 
-            data-preload
+            height={192}
           />
         </Link>
         </div>

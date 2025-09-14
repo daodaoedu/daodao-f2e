@@ -57,7 +57,6 @@ export function FloatButtons({ className }: FloatButtonsProps) {
             width={90}
             height={90}
             className="w-full h-full object-contain animate-spin-slow"
-            data-preload
           />
         </Button>
       </div>

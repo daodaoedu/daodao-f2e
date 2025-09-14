@@ -28,7 +28,6 @@ export function TestimonialCard({ name, role, content, avatar, className }: Test
           width={64} 
           height={64} 
           className="w-16 h-16 rounded-full block sm:w-[52px] sm:h-[52px]"
-          data-preload
         />
         <figcaption className="mt-1.5 text-[13px] leading-none text-[#225a62] text-center">{name}</figcaption>
       </figure>

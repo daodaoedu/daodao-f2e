@@ -18,7 +18,6 @@ export function VideoItem({ title, subtitle, tags, className }: VideoItemProps) 
       <video 
         controls 
         className="aspect-video w-full rounded-[20px]"
-        data-preload
       >
         <source />
         <track kind="captions" srcLang="zh-TW" label="繁體中文" />

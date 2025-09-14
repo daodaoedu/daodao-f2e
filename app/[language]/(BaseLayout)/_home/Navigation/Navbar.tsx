@@ -34,7 +34,7 @@ export default function Navbar() {
           variant="ghost"
           className="bg-none border-none p-0 cursor-pointer transition-transform duration-200 ease-in-out "
         >
-          <Image src="/assets/landing-page/logo-simple.svg" alt="回到首頁" width={142} height={24} data-preload />
+          <Image src="/assets/landing-page/logo-simple.svg" alt="回到首頁" width={142} height={24} />
         </Button>
       </div>
       <div className="flex items-center gap-8">

@@ -15,8 +15,7 @@ export default function Footer() {
             alt="島島阿學 Logo" 
             width={142}
             height={24}
-            className="mb-2" 
-            data-preload
+            className="mb-2"
           />
           <p className="text-white/80">Where personal growth meets collective wisdom!</p>
         </div>

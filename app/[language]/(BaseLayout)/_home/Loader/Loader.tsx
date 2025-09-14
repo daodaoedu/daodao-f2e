@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { usePreloadImages } from '@/hooks/usePreloadImages';
+import { useScrollLock } from '@/hooks/useScrollLock';
 
 interface LoaderProps {
   onComplete?: () => void;
@@ -11,6 +12,16 @@ export function Loader({ onComplete }: LoaderProps) {
   const { progress, done } = usePreloadImages('img[data-preload], video[data-preload]');
   const lottieContainerRef = useRef<HTMLDivElement>(null);
   const lottieAnimationRef = useRef<{ destroy: () => void } | null>(null);
+  
+  // 使用滾動鎖定 hook
+  const { unlockScroll } = useScrollLock();
+
+  // 當載入完成時，確保恢復滾動
+  useEffect(() => {
+    if (done) {
+      unlockScroll();
+    }
+  }, [done, unlockScroll]);
 
   useEffect(() => {
     // Load Lottie animation
