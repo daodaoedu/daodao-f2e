@@ -61,17 +61,17 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
           showSubtitle={false}
         />
       </div>
-      
-      <div className="w-full px-6">
+
+      <div className="w-full px-6 pt-4">
         <Carousel
           opts={{
             align: 'start',
             loop: false,
             dragFree: true,
           }}
-          className="w-full"
+          className="w-full relative"
         >
-          <CarouselContent className="-ml-4 items-stretch">
+          <CarouselContent className="-ml-4 items-stretch xl:justify-center">
             {functions.map((func) => (
               <CarouselItem key={func.title} className="pl-4 basis-auto flex ">
                 <FunctionCard
@@ -85,17 +85,19 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="flex left-4" />
-          <CarouselNext className="flex right-4" />
+          <div className="absolute -top-8 right-16 z-10 flex xl:hidden">
+            <CarouselPrevious />
+            <CarouselNext />
+          </div>
         </Carousel>
       </div>
-      
+
       {/* 底部裝飾圖片 */}
       <picture className="w-full">
         <source media="(max-width: 767.98px)" srcSet="/assets/landing-page/ribbon-mobile.svg" />
-        <Image 
-          src="/assets/landing-page/ribbon-desktop.svg" 
-          alt="功能生態裝飾" 
+        <Image
+          src="/assets/landing-page/ribbon-desktop.svg"
+          alt="功能生態裝飾"
           width={1200}
           height={200}
           className="w-full"

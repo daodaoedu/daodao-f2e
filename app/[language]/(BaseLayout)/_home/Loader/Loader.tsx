@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { usePreloadImages } from '@/hooks/usePreloadImages';
 import { useScrollLock } from '@/hooks/useScrollLock';
+import { Progress } from '@/components/ui/progress';
 
 interface LoaderProps {
   onComplete?: () => void;
@@ -70,18 +71,14 @@ export function Loader({ onComplete }: LoaderProps) {
         <div ref={lottieContainerRef} className="w-[140px] h-[140px]" />
       </div>
 
-      <div className="pb-6">
-        <div className="text-[50px] font-semibold px-6 text-primary-base mb-2">
+      <div className="pb-6 px-6">
+        <div className="text-[50px] font-semibold text-primary-base mb-2">
           {Math.round(progress * 100)}%
         </div>
-        <div className="relative h-2 bg-primary-lightest overflow-hidden">
-          <div 
-            className="h-full bg-primary-base transition-[width] duration-200 ease-in-out"
-            style={{ 
-              width: `${Math.min(progress * 100, 100)}%`,
-            }}
-           />
-        </div>
+        <Progress 
+          value={Math.min(progress * 100, 100)} 
+          className="h-2"
+        />
       </div>
     </div>
   );

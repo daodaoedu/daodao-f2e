@@ -42,12 +42,12 @@ export function KeyVision() {
             data-preload
             priority
           />
-          <h2 className="text-xl xl:text-2xl text-primary-darker relative z-20 leading-[2]">
-            讓學習成為充滿<br />
-            <span className="text-2xl xl:text-3xl text-primary-base">
-              自我掌握、互助支持<br />
-              和看得見進步的美好日常
-            </span>
+          <h2 className="text-xl xl:text-2xl text-primary-darker relative z-20 space-y-3">
+            <div>讓學習成為充滿</div>
+            <div className="text-2xl xl:text-3xl text-primary-base space-y-3">
+              <div>自我掌握、互助支持</div>
+              <div>和看得見進步的美好日常</div>
+            </div>
           </h2>
 
           <Button 

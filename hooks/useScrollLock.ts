@@ -17,7 +17,7 @@ export function useScrollLock() {
       originalScrollY: window.scrollY,
     };
 
-    const { originalStyle, originalScrollY } = scrollRestoreRef.current;
+    const { originalScrollY } = scrollRestoreRef.current;
 
     // 鎖定滾動
     document.body.style.overflow = 'hidden';
