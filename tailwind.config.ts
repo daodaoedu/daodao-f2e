@@ -182,11 +182,29 @@ export default {
             transform: "rotate(360deg)",
           },
         },
+        "marquee": {
+          "0%": {
+            transform: "translateX(0)",
+          },
+          "100%": {
+            transform: "translateX(-50%)",
+          },
+        },
+        "marquee-reverse": {
+          "0%": {
+            transform: "translateX(-50%)",
+          },
+          "100%": {
+            transform: "translateX(0)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "spin-slow": "spin-slow 8s linear infinite",
+        "marquee": "marquee 45s linear infinite",
+        "marquee-reverse": "marquee-reverse 45s linear infinite",
       },
     },
   },
@@ -367,6 +385,10 @@ export default {
             backgroundColor: theme("colors.basic.200"),
             transform: "translateY(-50%)",
           },
+        },
+        ".mask-marquee": {
+          maskImage: "linear-gradient(to right, transparent, white 80px, white calc(100% - 80px), transparent)",
+          WebkitMaskImage: "linear-gradient(to right, transparent, white 80px, white calc(100% - 80px), transparent)",
         },
       });
     }),
