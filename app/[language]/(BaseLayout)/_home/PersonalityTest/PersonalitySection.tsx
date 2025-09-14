@@ -13,14 +13,14 @@ export function PersonalitySection({ className }: PersonalitySectionProps) {
   return (
     <section 
       className={cn(
-        'relative bg-cover bg-no-repeat bg-center h-[600px] md:h-[540px] w-full',
+        'relative bg-cover bg-no-repeat bg-center h-[780px] md:h-[520px] lg:h-[700px] w-full',
         'bg-[url("/assets/landing-page/bg-personality-test-mobile.png")]',
         'md:bg-[url("/assets/landing-page/bg-personality-test-desktop.png")]',
         className
       )}
       id="personality-test"
     >
-      <div className="container mx-auto h-full flex flex-col justify-start">
+      <div className="container mx-auto h-full flex flex-col justify-start lg:pt-24">
         <div className="flex flex-col items-center justify-center md:flex-row w-full">
         <div className="text-center md:text-left w-full md:max-w-[44%] xl:max-w-[30%] relative z-10">
           <h2 className="text-2xl md:text-3xl font-bold text-primary-darker text-left leading-tight mb-4">
@@ -52,7 +52,7 @@ export function PersonalitySection({ className }: PersonalitySectionProps) {
         </Link>
         </div>
 
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2" />
+        
       </div>
 
       {/* 裝飾元素 - 吉祥物 */}

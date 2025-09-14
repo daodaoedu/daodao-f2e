@@ -41,7 +41,7 @@ export function KeyVision() {
             className="mb-8 relative z-20"
             data-preload
           />
-          <h2 className="text-xl xl:text-2xl text-primary-darker relative z-20" style={{ lineHeight: '2' }}>
+          <h2 className="text-xl xl:text-2xl text-primary-darker relative z-20 leading-[2]">
             讓學習成為充滿<br />
             <span className="text-2xl xl:text-3xl text-primary-base">
               自我掌握、互助支持<br />

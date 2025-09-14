@@ -2,6 +2,7 @@
 
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 interface CTASectionProps {
   className?: string;
@@ -16,11 +17,11 @@ export function CTASection({ className }: CTASectionProps) {
         className
       )}
     >
-      <img 
+      <Image 
         src="/assets/landing-page/bg-island.svg" 
         alt="" 
-        data-preload
-        className="absolute inset-0 w-full h-full object-cover md:object-contain object-center z-0"
+        fill
+        className="object-cover md:object-contain object-center z-0"
         aria-hidden="true"
       />
       <h2 className="relative z-10 text-[20px] md:text-[24px] font-semibold text-primary-darker text-center my-4 leading-tight">

@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/utils/cn';
+import Image from 'next/image';
 
 interface PresentationSectionProps {
   className?: string;
@@ -10,10 +11,12 @@ export function PresentationSection({ className }: PresentationSectionProps) {
   return (
     <section className={cn('relative bg-basic-600 pt-16 md:py-24', className)}>
       {/* 裝飾元素 - 黃色花朵 */}
-      <img 
+      <Image 
         className="absolute top-0 left-[12%] animate-spin-slow" 
         src="/assets/landing-page/deco-flower-yellow.svg" 
-        alt="裝飾花朵" 
+        alt="裝飾花朵"
+        width={100}
+        height={100}
       />
       
       <div className="container flex flex-col items-center justify-end text-center">
@@ -29,23 +32,31 @@ export function PresentationSection({ className }: PresentationSectionProps) {
 
       {/* 學習進度展示圖片 - 突破 container padding */}
       <div className="w-full flex justify-end md:justify-center md:container md:mx-auto">
-        <picture className="block w-full md:max-w-[600px]">
-          <source media="(max-width: 767.98px)" srcSet="/assets/landing-page/learning-progress-mobile.png" />
-          <img 
+        <div className="block w-full md:max-w-[600px]">
+          <Image 
             src="/assets/landing-page/learning-progress-desktop.png" 
-            className="w-full h-auto" 
+            className="w-full h-auto hidden md:block" 
             alt="學習進度展示" 
-            loading="lazy" 
-            data-preload
+            width={600}
+            height={400}
           />
-        </picture>
+          <Image 
+            src="/assets/landing-page/learning-progress-mobile.png" 
+            className="w-full h-auto block md:hidden" 
+            alt="學習進度展示" 
+            width={400}
+            height={300}
+          />
+        </div>
       </div>
 
       {/* 裝飾元素 - 吉祥物 */}
-      <img 
+      <Image 
         className="absolute bottom-0 right-[10%]" 
         src="/assets/landing-page/deco-mascot-2.svg" 
-        alt="吉祥物裝飾" 
+        alt="吉祥物裝飾"
+        width={120}
+        height={120}
       />
     </section>
   );

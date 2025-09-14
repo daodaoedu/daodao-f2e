@@ -166,7 +166,7 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
           ref={textRef}
           id="type-animation"
           className="px-6 py-2 bg-primary-palest border-2 border-mascot-aqua rounded-[20px] inline-flex items-center whitespace-nowrap overflow-hidden leading-[1.4] h-10 relative"
-          style={bubbleWidth ? { width: `${bubbleWidth}px` } : {}}
+          style={bubbleWidth ? { width: `${bubbleWidth}px` } : undefined}
         >
           {currentText}
           {/* 打字游標 */}

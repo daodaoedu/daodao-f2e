@@ -99,7 +99,6 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
           width={1200}
           height={200}
           className="w-full" 
-          priority={false}
           data-preload
         />
       </picture>

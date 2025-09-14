@@ -17,14 +17,9 @@ export function FunctionCard({ tag, title, description, imageUrl, action, classN
     <div 
       className={cn(
         'relative bg-white rounded-2xl p-4 flex flex-col gap-4 box-border',
-        'flex-shrink-0 h-full', // 防止卡片被壓縮，並撐滿高度
+        'flex-shrink-0 h-full w-[280px] min-w-[280px]', // 防止卡片被壓縮，並撐滿高度
         className
       )}
-      style={{
-        // 設定固定的最小寬度
-        width: '280px',
-        minWidth: '280px',
-      }}
     >
       {/* 標籤 */}
       <div className="absolute top-4 left-4 px-2 py-2 w-21 text-center  rounded-tl-lg rounded-br-lg bg-orange-400 text-white text-xs font-semibold z-10">
