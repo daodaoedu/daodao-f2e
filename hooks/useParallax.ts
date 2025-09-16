@@ -17,8 +17,8 @@ const PARALLAX_PRESETS = {
   'slow': {
     speed: 0.08,  // 慢速 - 適合背景元素、裝飾圖片
     direction: 'up' as const,
-    offset: 0
-  }
+    offset: 0,
+  },
 };
 
 export function useParallax<T extends HTMLElement = HTMLElement>(

@@ -10,8 +10,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import { FunctionCard } from './FunctionCard';
 import { useParallax } from '@/hooks/useParallax';
+import { FunctionCard } from './FunctionCard';
 
 interface FunctionCarouselProps {
   className?: string;

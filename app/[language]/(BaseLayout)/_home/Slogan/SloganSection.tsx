@@ -12,7 +12,7 @@ interface SloganSectionProps {
 export function SloganSection({ className }: SloganSectionProps) {
   const [backgroundParallax, textParallax] = useMultipleParallax<HTMLDivElement>([
     { preset: 'slow' }, 
-    {}                 
+    {},                 
   ]);
 
   return (
