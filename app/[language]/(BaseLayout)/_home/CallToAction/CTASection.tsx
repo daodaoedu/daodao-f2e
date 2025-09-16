@@ -3,12 +3,17 @@
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { useParallax } from '@/hooks/useParallax';
 
 interface CTASectionProps {
   className?: string;
 }
 
 export function CTASection({ className }: CTASectionProps) {
+  // 為不同元素創建視差效果
+  const titleParallax = useParallax<HTMLHeadingElement>({});
+  const buttonParallax = useParallax<HTMLDivElement>({ preset: 'slow' });
+
   return (
     <section 
       className={cn(
@@ -24,16 +29,26 @@ export function CTASection({ className }: CTASectionProps) {
         className="object-cover md:object-contain object-center z-0"
         aria-hidden="true"
       />
-      <h2 className="relative z-10 text-[20px] md:text-[24px] font-semibold text-primary-darker text-center my-4 leading-tight">
+      <h2 
+        ref={titleParallax.ref}
+        style={titleParallax.style}
+        className="relative z-10 text-[20px] md:text-[24px] font-semibold text-primary-darker text-center my-4 leading-tight"
+      >
         準備好重新打造<br />
         你喜歡的學習生活了嗎？
       </h2>
-      <Button 
-        variant="ctaOrange"
-        size="huge"
+      <div
+        ref={buttonParallax.ref}
+        style={buttonParallax.style}
+        className="relative z-10"
       >
-        立即加入
-      </Button>
+        <Button 
+          variant="ctaOrange"
+          size="huge"
+        >
+          立即加入
+        </Button>
+      </div>
     </section>
   );
 }

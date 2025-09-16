@@ -24,7 +24,7 @@ export function KeyVision() {
             alt="裝飾橘花"
             width={44}
             height={39}
-            className="absolute top-0 left-0 w-6 h-6 md:w-6 md:h-6 z-0"
+            className="absolute top-0 left-0 w-6 h-6 md:w-16 md:h-16 z-0"
           />
           <Image
             src="/assets/landing-page/deco-arrow.svg"

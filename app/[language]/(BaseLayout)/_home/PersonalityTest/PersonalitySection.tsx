@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
+import { useParallax } from '@/hooks/useParallax';
 
 
 interface PersonalitySectionProps {
@@ -10,6 +11,10 @@ interface PersonalitySectionProps {
 }
 
 export function PersonalitySection({ className }: PersonalitySectionProps) {
+  // 為文字內容和按鈕創建視差效果
+  const textParallax = useParallax<HTMLDivElement>({});
+  const buttonParallax = useParallax<HTMLDivElement>({ preset: 'slow' });
+
   return (
     <section 
       className={cn(
@@ -22,7 +27,11 @@ export function PersonalitySection({ className }: PersonalitySectionProps) {
     >
       <div className="container mx-auto h-full flex flex-col justify-start lg:pt-24">
         <div className="flex flex-col items-center justify-center md:flex-row w-full">
-        <div className="text-center md:text-left w-full md:max-w-[44%] xl:max-w-[30%] relative z-10">
+        <div 
+          ref={textParallax.ref}
+          style={textParallax.style}
+          className="text-center md:text-left w-full md:max-w-[44%] xl:max-w-[30%] relative z-10"
+        >
           <h2 className="text-2xl md:text-3xl font-bold text-primary-darker text-left leading-tight mb-4">
             了解你的學習偏好，<br />
             獲得個人化的學習建議<br />
@@ -40,14 +49,20 @@ export function PersonalitySection({ className }: PersonalitySectionProps) {
           </div>
         </div>
         
-        <Link href="/personality-test" className="transform hover:scale-105 transition-transform duration-200 hover:animate-jelly relative z-10">
-          <Image 
-            src="/assets/landing-page/button-personality-test.svg" 
-            alt="點擊進入心理測驗" 
-            width={192} 
-            height={192}
-          />
-        </Link>
+        <div
+          ref={buttonParallax.ref}
+          style={buttonParallax.style}
+          className="relative z-10"
+        >
+          <Link href="/personality-test" className="transform hover:scale-105 transition-transform duration-200 hover:animate-jelly">
+            <Image 
+              src="/assets/landing-page/button-personality-test.svg" 
+              alt="點擊進入心理測驗" 
+              width={192} 
+              height={192}
+            />
+          </Link>
+        </div>
         </div>
 
         

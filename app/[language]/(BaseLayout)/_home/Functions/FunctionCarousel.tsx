@@ -11,6 +11,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { FunctionCard } from './FunctionCard';
+import { useParallax } from '@/hooks/useParallax';
 
 interface FunctionCarouselProps {
   className?: string;
@@ -49,10 +50,14 @@ const functions = [
 
 
 export function FunctionCarousel({ className }: FunctionCarouselProps) {
+  
+  const ribbonParallax = useParallax<HTMLPictureElement>({ direction: 'up' });
 
   return (
     <section className={cn('relative pt-16 overflow-x-clip flex flex-col items-center justify-center bg-cyan-50', className)} id="functions">
-      <div className="text-teal-800 py-15 px-6">
+      <div 
+        className="text-teal-800 py-15 px-6"
+      >
         <SectionHeader
           title="學習群島上的功能生態"
           variant="dark"
@@ -62,7 +67,9 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
         />
       </div>
 
-      <div className="w-full px-6 pt-4">
+      <div 
+        className="w-full px-6 py-4"
+      >
         <Carousel
           opts={{
             align: 'start',
@@ -85,19 +92,23 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <div className="absolute -top-8 right-16 z-10 flex xl:hidden">
+          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-10 flex xl:hidden gap-2">
             <CarouselPrevious />
             <CarouselNext />
           </div>
         </Carousel>
       </div>
 
-      {/* 底部裝飾圖片 */}
-      <picture className="w-full">
+      {/* 底部裝飾圖片 - 使用視差效果 */}
+      <picture 
+        ref={ribbonParallax.ref}
+        style={ribbonParallax.style}
+        className="w-full"
+      >
         <source media="(max-width: 767.98px)" srcSet="/assets/landing-page/ribbon-mobile.svg" />
         <Image
           src="/assets/landing-page/ribbon-desktop.svg"
-          alt="功能生態裝飾"
+          alt="更多功能持續進化為你帶來美好的學習生活"
           width={1200}
           height={200}
           className="w-full"

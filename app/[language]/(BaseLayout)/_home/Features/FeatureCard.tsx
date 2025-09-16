@@ -18,7 +18,7 @@ export function FeatureCard({ title, description, tag, image, details, className
       <div className="flex justify-center items-center w-[84px] h-8 text-sm bg-tips text-white rounded">
         {tag}
       </div>
-      <div className="w-full h-[200px] md:h-[240px] relative overflow-hidden rounded-lg mb-4">
+      <div className="w-full h-[200px] md:h-[200px] relative overflow-hidden rounded-lg mb-4">
         <Image
           src={image}
           alt={title}

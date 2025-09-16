@@ -2,6 +2,7 @@
 
 import { cn } from '@/utils/cn';
 import Image from 'next/image';
+import { SectionHeader } from '@/app/[language]/(BaseLayout)/SectionHeader';
 
 interface PresentationSectionProps {
   className?: string;
@@ -20,14 +21,14 @@ export function PresentationSection({ className }: PresentationSectionProps) {
       />
       
       <div className="container flex flex-col items-center justify-end text-center">
-        <div className="w-full flex flex-col items-center md:items-center">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-            展示你的學習成果
-          </h2>
-          <h3 className="text-lg md:text-xl text-mascot-aqua">
-            在實踐中與眾人一同成長
-          </h3>
-        </div>
+        <SectionHeader
+          title="展示你的學習成果"
+          subtitle="在實踐中與眾人一同成長"
+          variant="light"
+          alignment="center"
+          titleClassName=""
+          subtitleClassName="text-mascot-aqua"
+        />
       </div>
 
       {/* 學習進度展示圖片 - 突破 container padding */}
