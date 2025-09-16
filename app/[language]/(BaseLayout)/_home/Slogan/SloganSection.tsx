@@ -2,7 +2,6 @@
 
 import { cn } from '@/utils/cn';
 import { SectionHeader } from '@/app/[language]/(BaseLayout)/SectionHeader';
-import { useMultipleParallax } from '@/hooks/useParallax';
 import Image from 'next/image';
 
 interface SloganSectionProps {
@@ -10,21 +9,12 @@ interface SloganSectionProps {
 }
 
 export function SloganSection({ className }: SloganSectionProps) {
-  const [backgroundParallax, textParallax] = useMultipleParallax<HTMLDivElement>([
-    { preset: 'slow' }, 
-    {},                 
-  ]);
 
   return (
     <section className={cn('slogan-section bg-primary-palest px-6  text-basic-400  relative min-h-[195px] md:min-h-[200px]', className)}>
       {/* 背景島嶼裝飾圖片 */}
       <div
-        ref={backgroundParallax.ref}
-        style={{
-          ...backgroundParallax.style,
-          transform: `translateX(-50%) ${backgroundParallax.style.transform}`,
-        }}
-        className="absolute top-16 md:-top-4 left-1/2 z-[1] "
+        className="absolute top-16 md:-top-4 left-1/2 z-[1] transform -translate-x-1/2"
       >
         <Image
           src="/assets/landing-page/deco-island.svg"
@@ -37,12 +27,7 @@ export function SloganSection({ className }: SloganSectionProps) {
       
       {/* 文字內容 */}
       <div
-        ref={textParallax.ref}
-        style={{
-          ...textParallax.style,
-          transform: `translateX(-50%) translateY(-50%) ${textParallax.style.transform}`,
-        }}
-        className="absolute top-32 left-1/2 z-10 w-full"
+        className="absolute top-32 left-1/2 z-10 w-full transform -translate-x-1/2 -translate-y-1/2"
       >
         <SectionHeader
           title={

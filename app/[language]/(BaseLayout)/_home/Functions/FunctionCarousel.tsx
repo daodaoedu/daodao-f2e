@@ -10,7 +10,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import { useParallax } from '@/hooks/useParallax';
 import { FunctionCard } from './FunctionCard';
 
 interface FunctionCarouselProps {
@@ -50,8 +49,6 @@ const functions = [
 
 
 export function FunctionCarousel({ className }: FunctionCarouselProps) {
-  
-  const ribbonParallax = useParallax<HTMLPictureElement>({ direction: 'up' });
 
   return (
     <section className={cn('relative pt-16 overflow-x-clip flex flex-col items-center justify-center bg-cyan-50', className)} id="functions">
@@ -99,10 +96,8 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
         </Carousel>
       </div>
 
-      {/* 底部裝飾圖片 - 使用視差效果 */}
+      {/* 底部裝飾圖片 */}
       <picture 
-        ref={ribbonParallax.ref}
-        style={ribbonParallax.style}
         className="w-full"
       >
         <source media="(max-width: 767.98px)" srcSet="/assets/landing-page/ribbon-mobile.svg" />

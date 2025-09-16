@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
-import { useParallax } from '@/hooks/useParallax';
 
 
 interface PersonalitySectionProps {
@@ -11,9 +10,6 @@ interface PersonalitySectionProps {
 }
 
 export function PersonalitySection({ className }: PersonalitySectionProps) {
-  // 為文字內容和按鈕創建視差效果
-  const textParallax = useParallax<HTMLDivElement>({});
-  const buttonParallax = useParallax<HTMLDivElement>({ preset: 'slow' });
 
   return (
     <section 
@@ -28,8 +24,6 @@ export function PersonalitySection({ className }: PersonalitySectionProps) {
       <div className="container mx-auto h-full flex flex-col justify-start lg:pt-24">
         <div className="flex flex-col items-center justify-center md:flex-row w-full">
         <div 
-          ref={textParallax.ref}
-          style={textParallax.style}
           className="text-center md:text-left w-full md:max-w-[44%] xl:max-w-[30%] relative z-10"
         >
           <h2 className="text-2xl md:text-3xl font-bold text-primary-darker text-left leading-tight mb-4">
@@ -50,8 +44,6 @@ export function PersonalitySection({ className }: PersonalitySectionProps) {
         </div>
         
         <div
-          ref={buttonParallax.ref}
-          style={buttonParallax.style}
           className="relative z-10"
         >
           <Link href="/personality-test" className="transform hover:scale-105 transition-transform duration-200 hover:animate-jelly">
