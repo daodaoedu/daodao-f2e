@@ -12,7 +12,6 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
   const [currentText, setCurrentText] = useState('');
   const [bubbleWidth, setBubbleWidth] = useState<number | null>(null);
   const textRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<NodeJS.Timeout | null>(null);
   const intervalsRef = useRef<Set<NodeJS.Timeout>>(new Set());
 
   // 使用 type-animation.js 的相同設定
@@ -117,9 +116,7 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
       
       // 使用 requestAnimationFrame 來確保動畫流暢
       if (isAnimating) {
-        requestAnimationFrame(() => {
-          setTimeout(animateNextLine, 0);
-        });
+        requestAnimationFrame(animateNextLine);
       }
     };
     
@@ -143,9 +140,6 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
       // 停止動畫
       stopAnimation();
       
-      if (animationRef.current) {
-        clearTimeout(animationRef.current);
-      }
       // 清理所有 interval
       intervalsRef.current.forEach((interval) => {
         clearInterval(interval);

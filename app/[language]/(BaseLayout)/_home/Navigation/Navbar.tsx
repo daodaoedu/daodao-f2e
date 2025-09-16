@@ -22,12 +22,11 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-[1000]  backdrop-blur-[10px] px-8 py-4 flex justify-between items-center transition-all duration-300 ease-in-out border-b border-white/20 ${isTabletAndUp
+    <nav className={`fixed top-0 left-0 right-0 z-[1000] backdrop-blur-[10px] px-8 py-4 flex justify-between items-center transition-all duration-300 ease-in-out border-b border-white/20 ${
+      isTabletAndUp || isVisible 
         ? 'opacity-100 translate-y-0 pointer-events-auto'
-        : isVisible
-          ? 'opacity-100 translate-y-0 pointer-events-auto'
-          : 'opacity-0 -translate-y-full pointer-events-none'
-      }`}>
+        : 'opacity-0 -translate-y-full pointer-events-none'
+    }`}>
       <div className="flex items-center">
         <Button
           onClick={handleLogoClick}
