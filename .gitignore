@@ -9,6 +9,9 @@ node_modules
 .next
 out
 
+# typescript
+tsconfig.tsbuildinfo
+
 # production
 build
 
