@@ -119,5 +119,5 @@ jobs:
         with:
           TYPE: success
           TITLE: "✅ Build Succeeded (${{ steps.set-command.outputs.environment }})"
-          DESCRIPTION: "Preview URL: ${{ github.ref_name == 'prod' && env.PROD_URL || steps.deploy.outputs.deployment-url || 'Check Cloudflare Dashboard for preview URL' }}"
+          DESCRIPTION: "Preview URL: ${{ github.ref_name == 'prod' && env.PROD_URL || steps.deploy.outputs.pages-deployment-alias-url || 'Check Cloudflare Dashboard for preview URL' }}"
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}

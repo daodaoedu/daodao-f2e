@@ -185,29 +185,29 @@ export function AuthProvider({ children }: PropsWithChildren) {
         switch (state.loginStatus) {
           case LoginStatus.TEMPORARY: {
             const arg = createUserFormSchema.parse(input);
-            const { token, user } = await postApiV1Users(arg);
-            if (token && user) {
-              setToken(token);
+            const { data } = await postApiV1Users(arg);
+            if (data?.token && data?.user) {
+              setToken(data.token);
               dispatch({
                 type: ActionTypes.UPDATE_USER,
-                payload: user,
+                payload: data.user,
               });
             }
             break;
           }
           case LoginStatus.PERMANENT: {
-            if (!state.user._id) {
+            if (!state.user.id) {
               return;
             }
             const arg = updateUserFormSchema.parse({
               ...state.user,
               ...input,
             });
-            const { data: user } = await putApiV1UsersId(state.user._id, arg);
-            if (user) {
+            const { data } = await putApiV1UsersId(state.user.id, arg);
+            if (data) {
               dispatch({
                 type: ActionTypes.UPDATE_USER,
-                payload: user,
+                payload: data,
               });
             }
             break;
@@ -250,7 +250,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         dispatch({ type: ActionTypes.CLOSE_LOGIN_MODAL });
       },
     };
-  }, [state.loginStatus, state.user, callbacks, dispatch, router.replace]);
+  }, [state.loginStatus, state.user, router, callbacks, dispatch]);
 
   const handleError = (error: unknown) => {
     if (error instanceof HttpError) {
@@ -268,7 +268,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
     swr: {
       enabled: !!state.token,
       onSuccess: (data) => {
-        authDispatch.login(data.data ?? null);
+        if (data.data) {
+          authDispatch.login(data.data);
+        }
       },
       onError: handleError,
     },
@@ -278,7 +280,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (state.isLoggingIn !== isLoading) {
       authDispatch.setLoading(isLoading);
     }
-  }, [state.isLoggingIn, isLoading]);
+  }, [state.isLoggingIn, authDispatch, isLoading]);
 
   useEffect(() => {
     const handleToken = (token: string) => {
@@ -291,7 +293,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     );
 
     return unregisterLoginListener;
-  }, [state.loginStatus, authDispatch.setToken, authDispatch.logout]);
+  }, [state.loginStatus, authDispatch]);
 
   return (
     <AuthContext.Provider value={state}>

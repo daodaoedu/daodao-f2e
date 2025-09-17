@@ -18,9 +18,11 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
   const handleOpenLoginWindow = () => {
     const env = getEnv();
-    const baseUrl = env.isDevHost ? env.frontendUrl : env.apiUrl;
+    const url = env.isDevHost
+      ? `${env.frontendUrl}/auth/google?origin=${window.location.origin}`
+      : `${env.apiUrl}/api/v1/auth/google`;
     const popup = openWindowPopup({
-      url: `${baseUrl}/auth/google?origin=${window.location.origin}`,
+      url,
       title: 'login',
       width: 400,
       height: 632,
@@ -45,11 +47,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   }, [isOpenWindow, timer.current]);
 
   return (
-    <ResponsiveModal
-      open={isOpen}
-      onClose={onClose}
-      title="歡迎回來島島阿學！"
-    >
+    <ResponsiveModal open={isOpen} onClose={onClose} title="歡迎回來島島阿學！">
       <div className="mx-auto w-max">
         <div className="relative overflow-hidden rounded-lg bg-gray-100">
           <Image
@@ -72,8 +70,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             <span className="flex items-center justify-center gap-2">
               <span
                 className={cn(
-                  'w-4 h-4 rounded-full inline-block animate-spin',
-                  'border-solid border-2 border-white/50 border-t-transparent'
+                  'inline-block h-4 w-4 animate-spin rounded-full',
+                  'border-2 border-solid border-white/50 border-t-transparent'
                 )}
               />
               登入中...

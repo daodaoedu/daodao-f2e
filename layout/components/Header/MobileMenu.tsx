@@ -8,6 +8,7 @@ import Collapse from '@/shared/components/Collapse';
 import Button from '@/shared/components/Button';
 import { cn } from '@/utils/cn';
 import { usePromotion } from '@/contexts/Promotion';
+import { Image } from '@/components/ui/image';
 
 interface OnCloseProps {
   onClose: () => void;
@@ -187,9 +188,9 @@ function MobileMenu() {
                 onClick={() => setNavType(navItem.type)}
               >
                 {navItem.type === NavType.Profile && (
-                  <img
-                    src={auth.user.photoURL}
-                    alt={auth.user.name}
+                  <Image
+                    src={auth.user.photoURL ?? ''}
+                    alt={auth.user.name ?? 'user avatar'}
                     width="20"
                     height="20"
                     className="rounded-full"

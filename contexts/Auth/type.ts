@@ -1,4 +1,7 @@
-import { FormattedUser } from '@/generated/models';
+import {
+  UserValidatorsCreateUserResponseSchemaDataUser,
+  UserValidatorsUserSuccessResponseSchemaData,
+} from '@/generated/models';
 import type {
   CreateUserFormSchema,
   UpdateUserFormSchema,
@@ -44,7 +47,7 @@ interface PermanentLoginState extends CommonAuthState {
   isLoggedIn: true;
   isTemporary: false;
   loginStatus: LoginStatus.PERMANENT;
-  user: FormattedUser;
+  user: UserValidatorsCreateUserResponseSchemaDataUser;
 }
 
 export type AuthState =
@@ -67,8 +70,14 @@ export type Action =
   | { type: ActionTypes.CLOSE_LOGIN_MODAL }
   | { type: ActionTypes.SET_TOKEN; payload: string }
   | { type: ActionTypes.SET_LOADING; payload: boolean }
-  | { type: ActionTypes.UPDATE_USER; payload: FormattedUser }
-  | { type: ActionTypes.LOGIN; payload: FormattedUser | null }
+  | {
+      type: ActionTypes.UPDATE_USER;
+      payload: UserValidatorsCreateUserResponseSchemaDataUser;
+    }
+  | {
+      type: ActionTypes.LOGIN;
+      payload: UserValidatorsUserSuccessResponseSchemaData | null;
+    }
   | { type: ActionTypes.LOGOUT };
 
 export type AuthDispatch = {
@@ -79,7 +88,9 @@ export type AuthDispatch = {
   [ActionTypes.UPDATE_USER]: (
     payload: CreateUserFormSchema | UpdateUserFormSchema
   ) => Promise<void>;
-  [ActionTypes.LOGIN]: (payload: FormattedUser | null) => void;
+  [ActionTypes.LOGIN]: (
+    payload: UserValidatorsUserSuccessResponseSchemaData
+  ) => void;
   [ActionTypes.LOGOUT]: () => void;
 };
 

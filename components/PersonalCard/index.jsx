@@ -18,7 +18,7 @@ const ROLE_LIST = mapToTable(ROLE);
 const EDUCATION_STAGE_TABLE = mapToTable(EDUCATION);
 
 const Profile = ({
-  _id,
+  id,
   name,
   email,
   photoURL,
@@ -37,7 +37,7 @@ const Profile = ({
   const role = roleList.length > 0 && ROLE_LIST[roleList[0]];
   const edu = educationStage && EDUCATION_STAGE_TABLE[educationStage];
   const user = {
-    id: _id,
+    id,
     email,
     name,
     photoURL,
@@ -59,7 +59,7 @@ const Profile = ({
   );
 
   return (
-    <InfoCompletionGuard _id={_id} isMe={isMe} contactList={contactList}>
+    <InfoCompletionGuard id={id} isMe={isMe} contactList={contactList}>
       <SEOConfig {...SEOData} />
       <StyledPanelBox className="container">
         <Button
