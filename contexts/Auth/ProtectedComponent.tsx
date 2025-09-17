@@ -1,6 +1,6 @@
 import { useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { FormattedUser } from '@/generated/models';
+import { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
 import { Background, Container, Paper } from '@/components/ui/wrapper';
 import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';
@@ -65,7 +65,7 @@ export interface ProtectedComponentProps extends PropsWithChildren {
    * @param user 使用者物件
    * @returns 回傳一個 Promise，解析為 boolean 值
    */
-  checkUserAuthorized?: (user: FormattedUser) => boolean | Promise<boolean>;
+  checkUserAuthorized?: (user: UserValidatorsUserSuccessResponseSchemaData) => boolean | Promise<boolean>;
 }
 
 /**

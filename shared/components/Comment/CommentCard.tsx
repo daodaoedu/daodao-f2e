@@ -42,7 +42,7 @@ function CommentCard({
   const [isShowCommentInput, setIsShowCommentInput] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const role = ROLE.find((r) => r.value === commentUser?.roleList?.[0])?.label;
-  const isSelf = user?._id === commentUser._id;
+  const isSelf = user?.id === commentUser?.id;
   const isPublic = visibility === 'public';
 
   const actions = isSelf

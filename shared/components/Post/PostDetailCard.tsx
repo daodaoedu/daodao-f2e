@@ -38,7 +38,7 @@ function PostDetailCard<T extends BasePostDetailData>({
   renderContent,
 }: BasePostDetailCardProps<T>) {
   const { user } = useAuth();
-  const isSelf = user?._id === authorUser?._id;
+  const isSelf = user?.id === authorUser?.id;
 
   const dropdownItems = isSelf
     ? [

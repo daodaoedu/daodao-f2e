@@ -33,7 +33,7 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
     error,
     mutate: refreshRecommendations,
   } = useContentTypeRecommendations('project', {
-    userId: user?._id,
+    userId: user?.id,
     limit,
   });
 

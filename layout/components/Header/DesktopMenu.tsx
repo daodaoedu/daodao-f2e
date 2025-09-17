@@ -3,6 +3,7 @@ import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import Dropdown from '@/shared/components/Dropdown';
+import { Image } from '@/components/ui/image';
 
 function DesktopMenu() {
   const auth = useAuth();
@@ -60,9 +61,9 @@ function DesktopMenu() {
             </Link>
             <Dropdown as="nav">
               <Dropdown.Toggle animation="none" className="p-0">
-                <img
-                  src={auth.user.photoURL}
-                  alt={auth.user.name}
+                <Image
+                  src={auth.user.photoURL ?? ''}
+                  alt={auth.user.name ?? 'user avatar'}
                   width="40"
                   height="40"
                   className="rounded-full"

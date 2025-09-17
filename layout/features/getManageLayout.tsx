@@ -11,7 +11,7 @@ const MENTOR_WORKSPACE_PERMISSIONS = [
   RoleEnum.SuperAdmin,
 ];
 
-const getCanVisitMentorWorkspace = (role?: RoleEnum) => (role ? MENTOR_WORKSPACE_PERMISSIONS.includes(role) : false);
+const getCanVisitMentorWorkspace = (role?: RoleEnum | null) => (role ? MENTOR_WORKSPACE_PERMISSIONS.includes(role) : false);
 
 const manageRoutes = {
   manage: '/manage',
@@ -25,7 +25,7 @@ const manageRoutes = {
 
 interface GetManageSidebarItemsOptions {
   pathname: string;
-  role?: RoleEnum;
+  role?: RoleEnum | null;
 }
 
 export const getManageSidebarItems = ({

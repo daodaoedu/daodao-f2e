@@ -16,7 +16,7 @@ const MyGroup = ({ title, sx, userId, className }) => {
 
   const getTargetIndexById = (data, id) => {
     if (!Array.isArray(data)) return -1;
-    const targetIndex = data.findIndex((item) => item?._id === id);
+    const targetIndex = data.findIndex((item) => item?.id === id);
     if (!(targetIndex > -1)) return -1;
     return targetIndex;
   };
@@ -80,13 +80,13 @@ const MyGroup = ({ title, sx, userId, className }) => {
           <LoadingCard />
         ) : Array.isArray(response?.data) && response.data.length ? (
           response.data.map((item, index) => (
-            <Fragment key={item._id}>
+            <Fragment key={item.id}>
               {index > 0 && <StyledDivider />}
               <GroupCard
                 {...item}
                 userId={userId}
-                onUpdateGrouping={() => handleUpdateGrouping(item._id)}
-                onDeleteGroup={() => handleDeleteGroup(item._id)}
+                onUpdateGrouping={() => handleUpdateGrouping(item.id)}
+                onDeleteGroup={() => handleDeleteGroup(item.id)}
               />
             </Fragment>
           ))

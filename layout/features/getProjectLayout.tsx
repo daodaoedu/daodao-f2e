@@ -103,7 +103,7 @@ const useProjectPermission = (type: ProjectType) => {
       case ProjectType.Admin:
         return role ? ADMIN_PERMISSIONS.includes(role) : false;
       case ProjectType.Manage:
-        return swr.isLoading || swr.data?.user._id === user?._id;
+        return swr.isLoading || swr.data?.user._id === user?.id;
       default:
         return !pathname?.startsWith(`${baseUrl}${projectRoutes.reviews}`);
     }

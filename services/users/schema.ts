@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CreateUserRequestEducationStage, CreateUserRequestGender } from "@/generated/models";
+import { UserValidatorsUserSuccessResponseSchemaDataEducationStage, UserValidatorsUserSuccessResponseSchemaDataGender } from "@/generated/models";
 
 export enum RoleEnum {
   /** 訪客 */
@@ -31,7 +31,7 @@ export const contactSchema = z
 
 export const userSchema = z.object({
   _id: z.string(),
-  id: z.number(),
+  id: z.string(),
   name: z.string(),
   roleList: z
     .array(z.string(), { required_error: "請選擇角色" })
@@ -43,15 +43,15 @@ export const userSchema = z.object({
   birthDay: z
     .string({ required_error: "請選擇生日" })
     .min(1, "請選擇生日")
-    .or(z.date({ required_error: "請選擇生日" })),
-  gender: z.nativeEnum(CreateUserRequestGender, { required_error: "請選擇性別" }),
+    .or(z.date({ required_error: "請選擇生日" }).transform((val) => val.toISOString())),
+  gender: z.nativeEnum(UserValidatorsUserSuccessResponseSchemaDataGender, { required_error: "請選擇性別" }),
   interestList: z
     .array(z.string(), {
       required_error: "請選擇 2 ～ 6 個您想要關注的學習領域",
     })
     .min(2, "最少選擇 2 個您想要關注的學習領域")
     .max(6, "最多選擇 6 個您想要關注的學習領域"),
-  educationStage: z.nativeEnum(CreateUserRequestEducationStage, { required_error: "請選擇教育階段" }),
+  educationStage: z.nativeEnum(UserValidatorsUserSuccessResponseSchemaDataEducationStage, { required_error: "請選擇教育階段" }),
   email: z.string().email("請輸入正確的Email格式"),
   location: z.string().min(1, "請輸入所在地"),
   role: z.nativeEnum(RoleEnum),

@@ -26,7 +26,7 @@ import {
 } from './GroupCard.styled';
 
 function GroupCard({
-  _id,
+  id,
   photoURL,
   photoAlt,
   title = '未定義主題',
@@ -39,15 +39,15 @@ function GroupCard({
   onDeleteGroup,
 }) {
   const { user } = useAuth();
-  const isEnabledMutation = user?._id === userId;
+  const isEnabledMutation = user?.id === userId;
 
-  const apiUpdateGrouping = useMutation(`/circles/${_id}`, {
+  const apiUpdateGrouping = useMutation(`/circles/${id}`, {
     method: 'PUT',
     enabled: isEnabledMutation,
     onSuccess: onUpdateGrouping,
   });
 
-  const apiDeleteGroup = useMutation(`/circles/${_id}`, {
+  const apiDeleteGroup = useMutation(`/circles/${id}`, {
     method: 'DELETE',
     enabled: isEnabledMutation,
     onSuccess: onDeleteGroup,
@@ -65,7 +65,7 @@ function GroupCard({
 
   return (
     <>
-      <StyledGroupCard href={`/circles/${_id}`}>
+      <StyledGroupCard href={`/circles/${id}`}>
         <StyledImageWrapper>
           <div className="relative h-full w-full">
             <Image
@@ -93,12 +93,12 @@ function GroupCard({
           <StyledFooter>
             <StyledTime>{timeDuration(updatedDate)}</StyledTime>
             <StyledFlex>
-              {!!user && user?._id === userId && (
+              {!!user && user?.id === userId && (
                 <StyledStatus isGrouping={isGrouping} onClick={handleGrouping}>
                   {isGrouping ? '進行中' : '暫停中'}
                 </StyledStatus>
               )}
-              {user?._id === userId && (
+              {user?.id === userId && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm">

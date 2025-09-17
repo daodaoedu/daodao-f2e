@@ -6,7 +6,7 @@ import { ProtectedComponent } from "@/contexts/Auth";
 import { CircleForm } from "@/features/circles";
 import { parseToString } from "@/utils/helper";
 import { circleAPI, CircleSchema } from "@/services/circles";
-import { FormattedUser } from "@/generated/models";
+import { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
 
 // export const runtime = "experimental-edge";
 
@@ -36,8 +36,8 @@ export default function CircleEditPage({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
 
-  const checkUserAuthorized = (user: FormattedUser) => {
-    const isOwner = user._id === data.user.userId;
+  const checkUserAuthorized = (user: UserValidatorsUserSuccessResponseSchemaData) => {
+    const isOwner = user.id === data.user.userId;
     if (!isOwner) {
       router.replace(`/circles/${data._id}`);
     }
