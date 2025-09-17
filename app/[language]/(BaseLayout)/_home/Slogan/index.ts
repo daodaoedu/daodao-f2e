@@ -1,0 +1,1 @@
+export { SloganSection } from './SloganSection';

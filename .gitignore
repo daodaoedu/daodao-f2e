@@ -9,6 +9,9 @@ node_modules
 .next
 out
 
+# typescript
+tsconfig.tsbuildinfo
+
 # production
 build
 
@@ -37,3 +40,5 @@ public/sw.js.map
 public/workbox-*.js
 public/workbox-*.js.map
 generated
+*.md
+!/*.md

@@ -1,14 +1,70 @@
-import Home from '@/components/Home';
-import { getDictionary } from '@/constants/i18n';
+import { 
+  Loader,
+  Navbar,
+  MobileMenu,
+  FloatButtons,
+  KeyVision,
+  SloganSection,
+  FeatureGrid,
+  PresentationSection,
+  BubbleDialog,
+  VideoSection,
+  FunctionCarousel,
+  PlanSection,
+  TestimonialMarquee,
+  CTASection,
+  PersonalitySection,
+  Footer,
+} from './_home';
 
-export default async function Page({ params }: PageProps<'/[language]'>) {
-  const { language } = await params;
-  const dict = await getDictionary(language);
+export default function HomePage() {
   return (
     <>
-      <Home />
-      {/* 測試多語系用 */}
-      <div className="text-white">{dict.common.title}</div>
+      {/* Loader */}
+      <Loader />
+      
+      {/* Navigation */}
+      <Navbar />
+      <MobileMenu />
+      <FloatButtons />
+      
+      {/* Main Content */}
+        {/* KeyVision */}
+        <KeyVision />
+        
+        
+        {/* Slogan */}
+        <SloganSection />
+        
+        {/* Features */}
+        <FeatureGrid />
+        
+        {/* Presentation */}
+        <PresentationSection />
+        
+        {/* Bubble Dialog */}
+        <BubbleDialog />
+        
+        {/* Videos */}
+        <VideoSection />
+        
+        {/* Functions */}
+        <FunctionCarousel />
+        
+        {/* Plans */}
+        <PlanSection />
+        
+        {/* Testimonials */}
+        <TestimonialMarquee />
+        
+        {/* Call to Action */}
+        <CTASection />
+        
+        {/* Personality Test */}
+        <PersonalitySection />
+      
+      {/* Footer */}
+      <Footer />
     </>
   );
 }

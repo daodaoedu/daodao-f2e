@@ -35,11 +35,18 @@ const buttonVariants = cva(
         gray: 'border-basic-200 bg-basic-200 text-basic-300 shadow-lg hover:border-primary-base hover:bg-primary-base hover:text-white',
         light:
           'border border-basic-200 bg-background shadow-sm hover:border-primary-base hover:text-primary-base',
+        ctaOrange:
+          'border-2 border-tips bg-tips text-white shadow-[0_8px_10px_0_rgba(255,161,11,0.2)] hover:!bg-white hover:!text-tips hover:shadow-[0_12px_20px_0_rgba(255,161,11,0.3)]',
+        ctaOrangeSmall:
+          'border-2 border-tips bg-tips text-white hover:!bg-white hover:!text-tips transition-colors duration-200 px-6 py-2 text-sm font-medium rounded-full',
+        ctaPrimary:
+          'border-2 border-primary-base bg-primary-base text-white shadow-[0_8px_10px_0_rgba(22,185,179,0.2)] hover:!bg-white hover:!text-primary-base hover:shadow-[0_12px_20px_0_rgba(22,185,179,0.3)]',
       },
       size: {
         default: 'h-9 px-5 py-2',
         sm: 'body-sm h-8 px-3',
         lg: 'h-10 px-5',
+        huge: 'h-14 px-10 text-lg font-semibold ',
         icon: 'size-9',
       },
     },

@@ -62,6 +62,7 @@ export default {
       ...defaultTheme.animation,
       "collapsible-down": "collapsible-down 0.2s ease-out",
       "collapsible-up": "collapsible-up 0.2s ease-out",
+      "jelly": "jelly-bounce 600ms cubic-bezier(0.22, 0.61, 0.36, 1) infinite",
     },
     extend: {
       colors: {
@@ -74,12 +75,17 @@ export default {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
+        mascot: {
+          aqua: "#99ECFF",
+          brightBlue: "#4BE8FF",
+        },
         basic: {
           100: "#F3F3F3",
           200: "#DBDBDB",
           300: "#92989A",
           400: "#536166",
           500: "#293A3D",
+          600: "#0D3036",
           white: "#FFFFFF",
           black: "#011416",
         },
@@ -148,10 +154,57 @@ export default {
             height: "0",
           },
         },
+        "jelly-bounce": {
+          "0%": {
+            transform: "scale(1, 1)",
+          },
+          "20%": {
+            transform: "scale(1.08, 0.92)",
+          },
+          "40%": {
+            transform: "scale(0.95, 1.05)",
+          },
+          "60%": {
+            transform: "scale(1.03, 0.97)",
+          },
+          "80%": {
+            transform: "scale(0.99, 1.01)",
+          },
+          "100%": {
+            transform: "scale(1, 1)",
+          },
+        },
+        "spin-slow": {
+          from: {
+            transform: "rotate(0deg)",
+          },
+          to: {
+            transform: "rotate(360deg)",
+          },
+        },
+        "marquee": {
+          "0%": {
+            transform: "translateX(0)",
+          },
+          "100%": {
+            transform: "translateX(-50%)",
+          },
+        },
+        "marquee-reverse": {
+          "0%": {
+            transform: "translateX(-50%)",
+          },
+          "100%": {
+            transform: "translateX(0)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "spin-slow": "spin-slow 8s linear infinite",
+        "marquee": "marquee 45s linear infinite",
+        "marquee-reverse": "marquee-reverse 45s linear infinite",
       },
     },
   },
@@ -332,6 +385,10 @@ export default {
             backgroundColor: theme("colors.basic.200"),
             transform: "translateY(-50%)",
           },
+        },
+        ".mask-marquee": {
+          maskImage: "linear-gradient(to right, transparent, white 80px, white calc(100% - 80px), transparent)",
+          WebkitMaskImage: "linear-gradient(to right, transparent, white 80px, white calc(100% - 80px), transparent)",
         },
       });
     }),
