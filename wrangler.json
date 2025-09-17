@@ -18,7 +18,7 @@
     "production": {
       "observability": {
         "enabled": true,
-        "head_sampling_rate": 0.5
+        "head_sampling_rate": 0.1
       }
     }
   }
