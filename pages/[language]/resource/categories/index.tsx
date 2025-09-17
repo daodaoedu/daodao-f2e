@@ -19,7 +19,7 @@ import {
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
 import { Container } from "@/components/ui/wrapper";
 
-export const runtime = "experimental-edge";
+// export const runtime = "experimental-edge";
 
 export const getServerSideProps = (async () => {
   try {

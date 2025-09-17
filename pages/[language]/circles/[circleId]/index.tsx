@@ -44,7 +44,7 @@ import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { timeDuration } from "@/utils/date";
 import { ContactModal, TargetUserType } from "@/features/email";
 
-export const runtime = "experimental-edge";
+// export const runtime = "experimental-edge";
 
 export const getServerSideProps = (async (context) => {
   try {
