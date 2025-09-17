@@ -15,8 +15,8 @@ const announcementMap = Object.fromEntries(
 export async function generateStaticParams() {
   const season = '2025S1';
 
-  return locales.map((language) =>
-    Object.keys(announcementMap).flatMap((id) => ({
+  return locales.flatMap((language) =>
+    Object.keys(announcementMap).map((id) => ({
       language,
       season,
       id,
