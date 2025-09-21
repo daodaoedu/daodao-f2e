@@ -19,7 +19,7 @@ export function SloganSection({ className }: SloganSectionProps) {
           alt="島嶼裝飾"
           width={429}
           height={208}
-
+          data-preload
         />
       </div>
       

@@ -16,8 +16,7 @@ import { FloatButtons } from './_layout';
 
 export default function HomePage() {
   return (
-    <>
-      <Loader />
+    <Loader>
       <FloatButtons />
       <KeyVision />
       <SloganSection />
@@ -30,6 +29,6 @@ export default function HomePage() {
       <TestimonialMarquee />
       <CTASection />
       <PersonalitySection />
-    </>
+    </Loader>
   );
 }

@@ -13,6 +13,7 @@ export function KeyVision() {
           width={83}
           height={97}
           className="absolute md:top-6"
+          data-preload
         />
       <div className=" mx-auto max-w-none px-0 md:px-16 xl:px-24">
         
@@ -24,6 +25,7 @@ export function KeyVision() {
             width={44}
             height={39}
             className="absolute top-0 left-0 w-6 h-6 md:w-16 md:h-16 z-0"
+            data-preload
           />
           <Image
             src="/assets/landing-page/deco-arrow.svg"
@@ -31,6 +33,7 @@ export function KeyVision() {
             width={93}
             height={75}
             className="absolute -top-5 -right-12 z-0"
+            data-preload
           />
           <Image
             src="/assets/landing-page/logo.svg"
