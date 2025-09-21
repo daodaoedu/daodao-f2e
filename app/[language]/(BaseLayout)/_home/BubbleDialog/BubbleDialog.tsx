@@ -182,7 +182,7 @@ export function BubbleDialog({ className }: BubbleDialogProps) {
       </div>
       
       {/* 吉祥物區域 */}
-      <div className="pr-6 pt-6 text-xl md:text-3xl font-semibold w-full relative z-[1] mt-5 md:pr-[20%] ">
+      <div className="pr-6 pt-6 text-xl md:text-3xl font-semibold w-full relative z-10 mt-5 md:pr-[20%] ">
         <div className="relative rounded-tr-[100px] bg-mascot-brightBlue py-[60px] min-h-[120px] flex items-center justify-center">
           <div className="text-left w-full">
             <Image 

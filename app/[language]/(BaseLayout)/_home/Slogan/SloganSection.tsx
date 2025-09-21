@@ -14,7 +14,7 @@ export function SloganSection({ className }: SloganSectionProps) {
     <section className={cn('slogan-section bg-primary-palest px-6  text-basic-400  relative min-h-[195px] md:min-h-[200px]', className)}>
       {/* 背景島嶼裝飾圖片 */}
       <div
-        className="absolute top-16 md:-top-4 left-1/2 z-[1] transform -translate-x-1/2"
+        className="absolute top-16 md:-top-4 left-1/2 z-10 transform -translate-x-1/2"
       >
         <Image
           src="/assets/landing-page/deco-island.svg"
