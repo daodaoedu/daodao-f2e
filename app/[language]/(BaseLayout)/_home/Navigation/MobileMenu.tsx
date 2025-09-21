@@ -1,87 +1,68 @@
 'use client';
 
-import { useSmoothScroll } from '@/hooks/useSmoothScroll';
+import Link from 'next/link';
 import { useScrollVisibility } from '@/hooks/useScrollVisibility';
-import useMediaQuery from '@/hooks/useMediaQuery';
 import { useEffect, useState } from 'react';
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
+import { NAV_ITEMS } from './constants';
 
 interface MobileMenuProps {
   className?: string;
 }
 
-const menuItems = [
-  { label: '解決困境', targetId: 'feature' },
-  { label: '功能生態', targetId: 'functions' },
-  { label: '方案', targetId: 'plans' },
-];
-
 export function MobileMenu({ className }: MobileMenuProps) {
-  const { scrollToElement } = useSmoothScroll();
-  const isVisible = useScrollVisibility({ threshold: 250 }); // 捲動超過 250px 時顯示
-  const isMobile = !useMediaQuery('isMedium'); // 手機寬度：< 768px
+  const isVisible = useScrollVisibility({ threshold: 250 });
   const [activeSection, setActiveSection] = useState<string>('');
 
-
-  // 監聽滾動位置，判斷當前在哪個錨點區域
   useEffect(() => {
-    const handleScroll = () => {
-      const sections = menuItems.map(item => item.targetId);
-      const scrollPosition = window.scrollY + 100; // 添加偏移量
+    const headings = NAV_ITEMS.map((item) => document.getElementById(item.id));
+    const sections = headings.filter((heading) => heading !== null);
 
-      for (let i = sections.length - 1; i >= 0; i -= 1) {
-        const element = document.getElementById(sections[i]);
-        if (element && element.offsetTop <= scrollPosition) {
-          setActiveSection(sections[i]);
-          break;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry?.target?.id);
         }
-      }
-    };
+      });
+    });
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // 初始化檢查
+    sections.forEach((section) => observer.observe(section));
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
     };
   }, []);
 
-  const handleMenuClick = (targetId: string) => {
-    // 為移動端導航添加適當的偏移量
-    const mobileNavHeight = 60;
-    scrollToElement(targetId, mobileNavHeight);
-  };
-
-  // 在手機寬度時永遠顯示，在平板寬度以上時隱藏
-  if (!isMobile) return null;
-  
-  // 在手機寬度時，需要捲動到指定深度才顯示
   if (!isVisible) return null;
 
   return (
-    <div className={cn('fixed bottom-0 left-0 right-0 z-40 bg-mascot-aqua border-t border-gray-200 animate-in slide-in-from-bottom-4 duration-300 h-[60px]', className)}>
-      <div className="flex justify-around items-center h-full">
-        {menuItems.map((item) => {
-          const isActive = activeSection === item.targetId;
+    <nav
+      className={cn(
+        'fixed bottom-0 left-0 right-0 z-40 block h-[60px] border-t border-gray-200 bg-mascot-aqua duration-300 animate-in slide-in-from-bottom-4 md:hidden',
+        className
+      )}
+    >
+      <ul className="flex h-full items-center justify-around">
+        {NAV_ITEMS.map((item) => {
+          const isActive = activeSection === item.id;
           return (
             <Button
-              key={item.targetId}
-              type="button"
-              onClick={() => handleMenuClick(item.targetId)}
+              key={item.id}
               variant="ghost"
               className={cn(
-                'flex flex-col items-center justify-center space-y-1 px-3 py-2 text-base h-full w-full rounded-none',
-                isActive 
-                  ? 'bg-white text-primary-darker hover:bg-white' 
-                  : 'text-primary-darker hover:bg-white hover:text-primary-darker bg-transparent'
+                'flex h-full w-full flex-col items-center justify-center space-y-1 rounded-none px-3 py-2 text-base',
+                isActive
+                  ? 'bg-white text-primary-darker hover:bg-white'
+                  : 'bg-transparent text-primary-darker hover:bg-white hover:text-primary-darker'
               )}
+              asChild
             >
-              <span>{item.label}</span>
+              <Link href={`/#${item.id}`}>{item.label}</Link>
             </Button>
           );
         })}
-      </div>
-    </div>
+      </ul>
+    </nav>
   );
 }

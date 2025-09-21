@@ -8,9 +8,9 @@ interface PlanSectionProps {
 
 export function PlanSection({ className }: PlanSectionProps) {
   return (
-    <section className={cn('relative pb-[60px] overflow-x-clip flex flex-col items-center justify-center', className)} id="plans">
+    <section className={cn('relative mt-[60px] pb-[60px] overflow-x-clip flex flex-col items-center justify-center', className)} id="plans">
       {/* Section Header */}
-      <div className="text-primary-darker py-[60px] px-6 text-center">
+      <div className="text-primary-darker pb-[60px] px-6 text-center">
         <h2 className="text-[28px] font-semibold mb-2">加入島島阿學</h2>
         <h3 className="text-sm">搶先體驗完整學習平台，與我們一起打造更好的學習體驗</h3>
       </div>

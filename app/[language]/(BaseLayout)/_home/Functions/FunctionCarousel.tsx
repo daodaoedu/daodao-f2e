@@ -49,9 +49,10 @@ const functions = [
 export function FunctionCarousel({ className }: FunctionCarouselProps) {
 
   return (
-    <section className={cn('relative pt-16 overflow-x-clip flex flex-col items-center justify-center bg-cyan-50', className)} id="functions">
+    <section className={cn('relative pt-16 overflow-x-clip flex flex-col items-center justify-center bg-cyan-50', className)}>
       <div 
         className="text-teal-800 py-15 px-6"
+        id="functions"
       >
         <SectionHeader
           title="學習群島上的功能生態"

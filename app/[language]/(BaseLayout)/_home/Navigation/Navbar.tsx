@@ -7,21 +7,7 @@ import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';
 import { AuthButton } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
-
-const NAV_ITEMS = [
-  {
-    label: '解決困境',
-    href: '/#feature',
-  },
-  {
-    label: '功能生態',
-    href: '/#functions',
-  },
-  {
-    label: '方案',
-    href: '/#plans',
-  },
-];
+import { NAV_ITEMS } from './constants';
 
 export function Navbar() {
   const isVisible = useScrollVisibility({ threshold: 200 });
@@ -74,7 +60,7 @@ export function Navbar() {
               animation="none"
               asChild
             >
-              <Link href={item.href}>{item.label}</Link>
+              <Link href={`/#${item.id}`}>{item.label}</Link>
             </Button>
           </li>
         ))}
