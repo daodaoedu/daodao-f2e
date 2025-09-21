@@ -1,3 +1,5 @@
+'use client';
+
 import { useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';

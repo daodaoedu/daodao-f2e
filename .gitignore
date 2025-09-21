@@ -42,3 +42,4 @@ public/workbox-*.js.map
 generated
 *.md
 !/*.md
+!.docs/*.md

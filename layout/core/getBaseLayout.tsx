@@ -5,7 +5,7 @@ import { PromotionProvider, usePromotion } from '@/contexts/Promotion';
 
 function BaseLayout({ children }: React.PropsWithChildren) {
   const headerRef = useRef<HTMLDivElement>(null);
-  const { isShowPromotionBar, setHeight } = usePromotion();
+  const { isShowPromotionBar, height, setHeight } = usePromotion();
   const prevShowPromotionBar = useRef<boolean | null>(null);
 
   useEffect(() => {
@@ -39,7 +39,9 @@ function BaseLayout({ children }: React.PropsWithChildren) {
   return (
     <>
       <Header />
-      <main className="bg-white">{children}</main>
+      <main className="bg-white" style={{ paddingTop: height }}>
+        {children}
+      </main>
       <Footer />
     </>
   );
