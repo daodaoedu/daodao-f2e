@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import lottie, { type AnimationItem } from 'lottie-web';
+import { type AnimationItem } from 'lottie-web';
 import useMediaQuery from '@/hooks/useMediaQuery';
 
 type Props = {
-  desktopSrc: string;   // e.g. "/assets/landing-page/key-vision-desktop.json"
-  mobileSrc: string;    // e.g. "/assets/landing-page/key-vision-mobile.json"
+  desktopSrc: string; // e.g. "/assets/landing-page/key-vision-desktop.json"
+  mobileSrc: string; // e.g. "/assets/landing-page/key-vision-mobile.json"
   preserveAspectRatio?: string; // 預設 "xMidYMid meet"
 };
 
@@ -21,34 +21,40 @@ export default function LottieHero({
 
   useEffect(() => {
     // 尊重使用者偏好：減少動態
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReduced = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
 
-    if (!containerRef.current) {
-      return () => {
-        // 空的 cleanup function
-      };
-    }
+    const loadLottie = async () => {
+      if (!containerRef.current) {
+        return;
+      }
 
-    // 先清掉上一個動畫（避免疊加）
-    if (animRef.current) {
-      animRef.current.destroy();
-      animRef.current = null;
-    }
+      const lottie = (await import('lottie-web')).default;
 
-    animRef.current = lottie.loadAnimation({
-      container: containerRef.current,
-      path: isMobile ? mobileSrc : desktopSrc,
-      renderer: 'svg',
-      loop: !prefersReduced,
-      autoplay: !prefersReduced,
-      name: 'KeyVision',
-      rendererSettings: { preserveAspectRatio },
-    });
+      // 先清掉上一個動畫（避免疊加）
+      if (animRef.current) {
+        animRef.current.destroy();
+        animRef.current = null;
+      }
 
-    if (prefersReduced && animRef.current) {
-      // 若使用者要求減少動態，停在第一幀
-      animRef.current.goToAndStop(0, true);
-    }
+      animRef.current = lottie.loadAnimation({
+        container: containerRef.current,
+        path: isMobile ? mobileSrc : desktopSrc,
+        renderer: 'svg',
+        loop: !prefersReduced,
+        autoplay: !prefersReduced,
+        name: 'KeyVision',
+        rendererSettings: { preserveAspectRatio },
+      });
+
+      if (prefersReduced && animRef.current) {
+        // 若使用者要求減少動態，停在第一幀
+        animRef.current.goToAndStop(0, true);
+      }
+    };
+
+    loadLottie();
 
     return () => {
       if (animRef.current) {
@@ -60,10 +66,6 @@ export default function LottieHero({
   }, [isMobile, desktopSrc, mobileSrc, preserveAspectRatio]);
 
   return (
-    <div
-      ref={containerRef}
-      className="min-h-[240px]"
-      aria-hidden="true"
-    />
+    <div ref={containerRef} className="min-h-[240px]" aria-hidden="true" />
   );
 }

@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import lottie from 'lottie-web';
-import { usePreloadImages } from '@/hooks/usePreloadImages';
+import { useAssetsLoader } from '@/hooks/useAssetsLoader';
 import { useScrollLock } from '@/hooks/useScrollLock';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/Auth';
@@ -13,9 +12,13 @@ export function Loader({ children }: React.PropsWithChildren) {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
-  const { progress, done } = usePreloadImages('img[data-preload]');
+  const [lottieIsLoading, setLottieIsLoading] = useState(true);
+  const { progress, done } = useAssetsLoader(
+    isLoggedIn ? '' : 'img[data-preload]'
+  );
   const lottieContainerRef = useRef<HTMLDivElement>(null);
   const lottieAnimationRef = useRef<{ destroy: () => void } | null>(null);
+  const percent = Math.max(Math.round(progress * 100), lottieIsLoading ? 0 : 5);
 
   // 使用滾動鎖定 hook
   const { unlockScroll } = useScrollLock();
@@ -48,6 +51,7 @@ export function Loader({ children }: React.PropsWithChildren) {
     const loadLottie = async () => {
       try {
         if (lottieContainerRef.current) {
+          const lottie = (await import('lottie-web')).default;
           lottieAnimationRef.current = lottie.loadAnimation({
             container: lottieContainerRef.current,
             path: '/assets/landing-page/logo-action.json',
@@ -57,6 +61,7 @@ export function Loader({ children }: React.PropsWithChildren) {
             name: 'Loader',
             rendererSettings: { preserveAspectRatio: 'xMidYMid meet' },
           });
+          setLottieIsLoading(false);
         }
       } catch (error) {
         console.error('Failed to load Lottie animation:', error);
@@ -72,28 +77,28 @@ export function Loader({ children }: React.PropsWithChildren) {
     };
   }, []);
 
-  if (!isLoading) return null;
-
   return (
     <>
       {!isLoggedIn && children}
-      <div
-        className={cn(
-          'fixed inset-0 z-50 grid grid-rows-[1fr_auto] bg-primary-palest transition-opacity duration-300 ease-in-out',
-          done ? 'opacity-0' : 'opacity-100'
-        )}
-      >
-        <div className="grid place-items-center">
-          <div ref={lottieContainerRef} className="size-[140px]" />
-        </div>
-
-        <div className="px-6 pb-6">
-          <div className="mb-2 text-[50px] font-semibold text-primary-base">
-            {Math.round(progress * 100)}%
+      {isLoading && (
+        <div
+          className={cn(
+            'fixed inset-0 z-50 grid grid-rows-[1fr_auto] bg-primary-palest transition-opacity duration-300 ease-in-out',
+            done ? 'opacity-0' : 'opacity-100'
+          )}
+        >
+          <div className="grid place-items-center">
+            <div ref={lottieContainerRef} className="size-[140px]" />
           </div>
-          <Progress value={Math.min(progress * 100, 100)} className="h-2" />
+
+          <div className="px-6 pb-6">
+            <div className="mb-2 text-[50px] font-semibold text-primary-base">
+              {percent}%
+            </div>
+            <Progress value={percent} className="h-2" />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

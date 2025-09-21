@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useScrollVisibility } from '@/hooks/useScrollVisibility';
 import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';
@@ -11,12 +11,14 @@ import { NAV_ITEMS } from './constants';
 
 export function Navbar() {
   const isVisible = useScrollVisibility({ threshold: 200 });
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const root = document.querySelector(':root');
+    const navHeight = navRef.current?.offsetHeight ?? 0;
 
     if (root instanceof HTMLElement) {
-      root.style.setProperty('scroll-padding-top', '80px');
+      root.style.setProperty('scroll-padding-top', `${navHeight + 16}px`);
     }
 
     return () => {
@@ -28,6 +30,7 @@ export function Navbar() {
 
   return (
     <nav
+      ref={navRef}
       className={cn(
         'fixed left-0 right-0 top-0 z-20 hidden items-center justify-between border-b border-white/20 px-8 py-4 backdrop-blur-[10px] transition-[transform,opacity] duration-300 ease-in-out md:flex',
         isVisible
