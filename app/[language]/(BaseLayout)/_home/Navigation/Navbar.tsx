@@ -5,6 +5,7 @@ import { useScrollVisibility } from '@/hooks/useScrollVisibility';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';
+import { AuthButton } from '@/contexts/Auth';
 
 export function Navbar() {
   const { scrollToElement, scrollToTop } = useSmoothScroll();
@@ -64,11 +65,11 @@ export function Navbar() {
             方案
           </Button>
         </div>
-        <Button
+        <AuthButton
           variant="ctaOrangeSmall"
         >
           立即加入
-        </Button>
+        </AuthButton>
       </div>
     </nav>
   );

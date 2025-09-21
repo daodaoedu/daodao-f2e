@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { cn } from '@/utils/cn';
-import { Button } from '@/components/ui/button';
+import { AuthButton } from '@/contexts/Auth';
 
 interface PlanSectionProps {
   className?: string;
@@ -52,13 +52,13 @@ export function PlanSection({ className }: PlanSectionProps) {
               </li>
             </ul>
 
-            <Button 
+            <AuthButton 
               variant="ctaOrange"
               size="huge"
               className="mt-6"
             >
               立即免費註冊
-            </Button>
+            </AuthButton>
             <p className="text-center text-[13px] mt-2">Beta 期間完全免費 • 無需信用卡</p>
 
             </div>

@@ -1,11 +1,10 @@
-'use client';
-
 import { Image } from '@/components/ui/image';
-import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
+import { AuthButton } from '@/contexts/Auth';
 import LottieHero from './LottieHero';
 
 export function KeyVision() {
+
   return (
     <div className="relative md:pb-32">
       <Image
@@ -50,14 +49,14 @@ export function KeyVision() {
             </div>
           </h2>
 
-          <Button 
+          <AuthButton 
             variant="ctaOrange"
             size="huge"
             className="mt-8 relative z-20"
           >
             立即加入
             <Icon name="arrow-right" className="ml-2" />
-          </Button>
+          </AuthButton>
         </div>
 
         <div className="col-span-12 md:col-span-8 lg:col-span-7 flex justify-center md:justify-start md:pr-2 lg:pr-24">

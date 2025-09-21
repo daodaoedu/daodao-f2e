@@ -1,7 +1,5 @@
-'use client';
-
 import { cn } from '@/utils/cn';
-import { Button } from '@/components/ui/button';
+import { AuthButton } from '@/contexts/Auth';
 import Image from 'next/image';
 
 interface CTASectionProps {
@@ -34,12 +32,12 @@ export function CTASection({ className }: CTASectionProps) {
       <div
         className="relative z-10"
       >
-        <Button 
+        <AuthButton 
           variant="ctaOrange"
           size="huge"
         >
           立即加入
-        </Button>
+        </AuthButton>
       </div>
     </section>
   );
