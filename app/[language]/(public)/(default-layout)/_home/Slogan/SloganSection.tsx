@@ -1,5 +1,5 @@
 import { cn } from '@/utils/cn';
-import { SectionHeader } from '@/app/[language]/(BaseLayout)/SectionHeader';
+import { SectionHeader } from '@/app/[language]/(public)/(default-layout)/SectionHeader';
 import Image from 'next/image';
 
 interface SloganSectionProps {

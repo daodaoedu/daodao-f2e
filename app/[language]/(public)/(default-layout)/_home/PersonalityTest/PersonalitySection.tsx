@@ -44,7 +44,7 @@ export function PersonalitySection({ className }: PersonalitySectionProps) {
         <div
           className="relative z-10"
         >
-          <Link href="/personality-test" className="transform hover:scale-105 transition-transform duration-200 hover:animate-jelly">
+          <Link href="/quiz" className="transform hover:scale-105 transition-transform duration-200 hover:animate-jelly">
             <Image 
               src="/assets/landing-page/button-personality-test.svg" 
               alt="點擊進入心理測驗" 
