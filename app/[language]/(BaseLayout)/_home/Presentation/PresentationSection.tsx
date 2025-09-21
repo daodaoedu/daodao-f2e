@@ -1,5 +1,3 @@
-'use client';
-
 import { cn } from '@/utils/cn';
 import Image from 'next/image';
 import { SectionHeader } from '@/app/[language]/(BaseLayout)/SectionHeader';

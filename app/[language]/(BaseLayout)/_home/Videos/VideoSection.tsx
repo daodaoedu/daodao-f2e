@@ -1,5 +1,3 @@
-'use client';
-
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
 import { VideoItem } from './VideoItem';

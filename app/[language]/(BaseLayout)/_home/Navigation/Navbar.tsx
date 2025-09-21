@@ -6,7 +6,7 @@ import useMediaQuery from '@/hooks/useMediaQuery';
 import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';
 
-export default function Navbar() {
+export function Navbar() {
   const { scrollToElement, scrollToTop } = useSmoothScroll();
   const isTabletAndUp = useMediaQuery('isMedium');
   const isVisible = useScrollVisibility({ threshold: 200 }); // 捲動超過 200px 時顯示
