@@ -7,11 +7,7 @@ import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
 import { NAV_ITEMS } from './constants';
 
-interface MobileMenuProps {
-  className?: string;
-}
-
-export function MobileMenu({ className }: MobileMenuProps) {
+export function MobileMenu() {
   const isVisible = useScrollVisibility({ threshold: 250 });
   const [activeSection, setActiveSection] = useState<string>('');
 
@@ -34,13 +30,13 @@ export function MobileMenu({ className }: MobileMenuProps) {
     };
   }, []);
 
-  if (!isVisible) return null;
-
   return (
     <nav
       className={cn(
-        'fixed bottom-0 left-0 right-0 z-40 block h-[60px] border-t border-gray-200 bg-mascot-aqua duration-300 animate-in slide-in-from-bottom-4 md:hidden',
-        className
+        'fixed bottom-0 left-0 right-0 z-40 block h-[60px] translate-y-full border-t border-gray-200 bg-mascot-aqua transition-[transform,opacity] duration-300 ease-in-out md:hidden',
+        isVisible
+          ? 'pointer-events-auto translate-y-0 opacity-100'
+          : 'pointer-events-none translate-y-full opacity-0'
       )}
     >
       <ul className="flex h-full items-center justify-around">
