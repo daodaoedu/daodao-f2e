@@ -1,77 +1,87 @@
 'use client';
 
-import { useSmoothScroll } from '@/hooks/useSmoothScroll';
+import Link from 'next/link';
+import { useEffect } from 'react';
 import { useScrollVisibility } from '@/hooks/useScrollVisibility';
-import useMediaQuery from '@/hooks/useMediaQuery';
 import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';
 import { AuthButton } from '@/contexts/Auth';
+import { cn } from '@/utils/cn';
+
+const NAV_ITEMS = [
+  {
+    label: '解決困境',
+    href: '/#feature',
+  },
+  {
+    label: '功能生態',
+    href: '/#functions',
+  },
+  {
+    label: '方案',
+    href: '/#plans',
+  },
+];
 
 export function Navbar() {
-  const { scrollToElement, scrollToTop } = useSmoothScroll();
-  const isTabletAndUp = useMediaQuery('isMedium');
-  const isVisible = useScrollVisibility({ threshold: 200 }); // 捲動超過 200px 時顯示
+  const isVisible = useScrollVisibility({ threshold: 200 });
 
-  const handleNavClick = (targetId: string) => {
-    // 為導航欄添加適當的偏移量，避免被固定導航欄遮擋
-    const navbarHeight = 80; // 根據實際導航欄高度調整
-    scrollToElement(targetId, navbarHeight);
-  };
+  useEffect(() => {
+    const root = document.querySelector(':root');
 
-  const handleLogoClick = () => {
-    scrollToTop();
-  };
+    if (root instanceof HTMLElement) {
+      root.style.setProperty('scroll-padding-top', '80px');
+    }
+
+    return () => {
+      if (root instanceof HTMLElement) {
+        root.style.removeProperty('scroll-padding-top');
+      }
+    };
+  }, []);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-20 backdrop-blur-[10px] px-8 py-4 flex justify-between items-center transition-all duration-300 ease-in-out border-b border-white/20 ${
-      isTabletAndUp || isVisible 
-        ? 'opacity-100 translate-y-0 pointer-events-auto'
-        : 'opacity-0 -translate-y-full pointer-events-none'
-    }`}>
+    <nav
+      className={cn(
+        'fixed left-0 right-0 top-0 z-20 hidden items-center justify-between border-b border-white/20 px-8 py-4 backdrop-blur-[10px] transition-all duration-300 ease-in-out md:flex',
+        isVisible
+          ? 'pointer-events-auto translate-y-0 opacity-100'
+          : 'pointer-events-none -translate-y-full opacity-0'
+      )}
+    >
       <div className="flex items-center">
         <Button
-          onClick={handleLogoClick}
           variant="ghost"
-          className="bg-none border-none p-0 cursor-pointer transition-transform duration-200 ease-in-out "
+          className="cursor-pointer border-none bg-none p-0 transition-transform duration-200 ease-in-out"
+          asChild
         >
-          <Image src="/assets/landing-page/logo-simple.svg" alt="回到首頁" width={142} height={24} />
+          <Link href="/">
+            <Image
+              src="/assets/landing-page/logo-simple.svg"
+              alt="回到首頁"
+              width={142}
+              height={24}
+            />
+          </Link>
         </Button>
       </div>
-      <div className="flex items-center gap-8">
-        <div className="hidden md:block">
-          <Button
-            onClick={() => handleNavClick('feature')}
-            variant="ghost"
-            className="text-primary-darker bg-none border-none p-0 font-medium text-base cursor-pointer transition-all duration-300 ease-in-out hover:text-primary-base relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-primary-base after:transition-all after:duration-300 after:ease-in-out hover:after:w-full"
-          >
-            解決困境
-          </Button>
-        </div>
-        <div className="hidden md:block">
-          <Button
-            onClick={() => handleNavClick('functions')}
-            variant="ghost"
-            className="text-primary-darker bg-none border-none p-0 font-medium text-base cursor-pointer transition-all duration-300 ease-in-out hover:text-primary-base relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-primary-base after:transition-all after:duration-300 after:ease-in-out hover:after:w-full"
-          >
-            功能生態
-          </Button>
-        </div>
-        <div className="hidden md:block">
-          <Button
-            onClick={() => handleNavClick('plans')}
-            variant="ghost"
-            className="text-primary-darker bg-none border-none p-0 font-medium text-base cursor-pointer transition-all duration-300 ease-in-out hover:text-primary-base relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-primary-base after:transition-all after:duration-300 after:ease-in-out hover:after:w-full"
-          >
-            方案
-          </Button>
-        </div>
-        <AuthButton
-          variant="ctaOrangeSmall"
-        >
-          立即加入
-        </AuthButton>
-      </div>
+      <ul className="flex items-center gap-8">
+        {NAV_ITEMS.map((item) => (
+          <li key={item.label}>
+            <Button
+              variant="ghost"
+              className="relative cursor-pointer border-none bg-none p-0 text-base font-medium text-primary-darker transition-all duration-300 ease-in-out after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-primary-base after:transition-all after:duration-300 after:ease-in-out after:content-[''] hover:text-primary-base hover:after:w-full"
+              animation="none"
+              asChild
+            >
+              <Link href={item.href}>{item.label}</Link>
+            </Button>
+          </li>
+        ))}
+        <li>
+          <AuthButton variant="ctaOrangeSmall">立即加入</AuthButton>
+        </li>
+      </ul>
     </nav>
   );
 }
-
