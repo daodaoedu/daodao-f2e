@@ -62,7 +62,7 @@ export default function Footer() {
               </div>
               <div>
                 <Link
-                  href="/privacy-policy"
+                  href="/terms/privacy_policy"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   隱私政策
@@ -70,7 +70,7 @@ export default function Footer() {
               </div>
               <div>
                 <Link
-                  href="/terms-of-service"
+                  href="/terms/service"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   服務條款
@@ -78,7 +78,7 @@ export default function Footer() {
               </div>
               <div>
                 <Link
-                  href="/intellectual-property"
+                  href="/terms/ipr"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   智慧財產權
