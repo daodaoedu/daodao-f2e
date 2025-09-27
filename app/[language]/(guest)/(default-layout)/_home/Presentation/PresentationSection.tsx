@@ -1,6 +1,6 @@
 import { cn } from '@/utils/cn';
 import Image from 'next/image';
-import { SectionHeader } from '@/app/[language]/(public)/(default-layout)/SectionHeader';
+import { SectionHeader } from '@/app/[language]/(guest)/(default-layout)/SectionHeader';
 
 interface PresentationSectionProps {
   className?: string;
