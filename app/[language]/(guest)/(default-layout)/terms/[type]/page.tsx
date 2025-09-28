@@ -1,51 +1,51 @@
 import { Metadata } from 'next';
-import TermsIPR from '@/components/Terms/Ipr';
-import TermsPrivacyPolicy from '@/components/Terms/Privacypolicy';
-import TermsService from '@/components/Terms/Service';
-import { locales } from '@/constants/i18n';
-import { getDynamicRoute } from '@/utils/getDynamicRoute';
+import { notFound } from 'next/navigation';
+import { locales, getDictionary } from '@/constants/i18n';
+import MarkdownRenderer from '@/components/ui/markdown-renderer';
 
-const termsMap = {
-  ipr: {
-    title: '智慧財產權',
-    Component: TermsIPR,
-  },
-  privacy_policy: {
-    title: '隱私政策',
-    Component: TermsPrivacyPolicy,
-  },
-  service: {
-    title: '使用者條款',
-    Component: TermsService,
-  },
+const termsTypes = ['ipr', 'privacy-policy', 'service'] as const;
+
+const checkTermsType = (type: string): type is (typeof termsTypes)[number] =>
+  termsTypes.includes(type as (typeof termsTypes)[number]);
+
+const getTermsData = async (type: string, language: string) => {
+  if (!checkTermsType(type)) {
+    notFound();
+  }
+  const dictionary = await getDictionary(language);
+  return {
+    title: dictionary.terms?.[`${type}-title`],
+    content: dictionary.terms?.[`${type}-content`],
+  };
 };
 
 export async function generateStaticParams() {
-  return locales.map((language) =>
-    Object.keys(termsMap).flatMap((type) => ({ language, type }))
+  return locales.flatMap((language) =>
+    termsTypes.map((type) => ({ language, type }))
   );
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<'/[language]/terms/[type]'>): Promise<Metadata> {
-  const { type } = await params;
-
-  const { title } = getDynamicRoute(type, termsMap);
+  const { language, type } = await params;
+  const { title } = await getTermsData(type, language);
 
   return {
     title,
-    description:
-      '感謝您有意願貢獻資料及相關內容（以下統稱「內容」）至島島阿學學習社群（https://www.daoedu.tw，以下簡稱「本網站」）。此使用者條款存在於您及本網站管理機關島島阿學學習社群（「管理者」）間，目的在釐清雙方相關智慧財產權利狀態及其他權利義務關係。請閱讀以下條款及條件並確認，當您上傳內容至本網站時，即表示您接受本協議內容。',
   };
 }
 
 export default async function TermsPage({
   params,
 }: PageProps<'/[language]/terms/[type]'>) {
-  const { type } = await params;
+  const { language, type } = await params;
+  const { content } = await getTermsData(type, language);
 
-  const { Component } = getDynamicRoute(type, termsMap);
-
-  return <Component />;
+  return (
+    <MarkdownRenderer
+      className="container prose my-12 max-w-5xl rounded py-8 shadow-lg"
+      source={content}
+    />
+  );
 }

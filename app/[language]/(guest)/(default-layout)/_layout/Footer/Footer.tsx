@@ -62,7 +62,7 @@ export default function Footer() {
               </div>
               <div>
                 <Link
-                  href="/terms/privacy_policy"
+                  href="/terms/privacy-policy"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   隱私政策
