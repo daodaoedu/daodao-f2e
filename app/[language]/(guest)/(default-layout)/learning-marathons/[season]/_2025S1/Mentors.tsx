@@ -340,7 +340,7 @@ const Mentors = () => {
                       </div>
                       <div className="flex items-center justify-end gap-1 bg-white px-3 py-2 text-gray-400 group-hover:text-primary-base">
                         more
-                        <ArrowRight className="!text-[16px]" />
+                        <ArrowRight className="text-base" />
                       </div>
                     </div>
                   </MentorCard>
