@@ -1,5 +1,5 @@
 import { cn } from '@/utils/cn';
-import { SectionHeader } from '../../SectionHeader';
+import { SectionHeader } from '@/shared/ui/section-header';
 import { FeatureCard } from './FeatureCard';
 
 interface FeatureGridProps {

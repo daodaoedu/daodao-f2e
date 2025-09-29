@@ -1,7 +1,7 @@
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
+import { SectionHeader } from '@/shared/ui/section-header';
 import { VideoItem } from './VideoItem';
-import { SectionHeader } from '../../SectionHeader';
 
 interface VideoSectionProps {
   className?: string;

@@ -49,28 +49,34 @@ export function SectionHeader({
   const currentAlignment = alignmentStyles[alignment];
 
   return (
-    <div className={cn(
-      'section-header',
-      currentAlignment,
-      currentSize.spacing,
-      className
-    )}>
-      <h2 className={cn(
-        'font-bold mb-2 text-[1.75rem]',
-        currentVariant,
-        titleClassName
-      )}>
+    <div
+      className={cn(
+        'section-header',
+        currentAlignment,
+        currentSize.spacing,
+        className
+      )}
+    >
+      <h2
+        className={cn(
+          'mb-2 text-[1.75rem] font-bold',
+          currentVariant,
+          titleClassName
+        )}
+      >
         {title}
       </h2>
-      
+
       {showSubtitle && subtitle && (
-        <h3 className={cn(
-          'max-w-2xl mx-auto text-sm',
-          currentVariant,
-          subtitleClassName,
-          alignment === 'left' && 'mx-0',
-          alignment === 'right' && 'mx-0 ml-auto'
-        )}>
+        <h3
+          className={cn(
+            'mx-auto max-w-2xl text-sm',
+            currentVariant,
+            subtitleClassName,
+            alignment === 'left' && 'mx-0',
+            alignment === 'right' && 'mx-0 ml-auto'
+          )}
+        >
           {subtitle}
         </h3>
       )}

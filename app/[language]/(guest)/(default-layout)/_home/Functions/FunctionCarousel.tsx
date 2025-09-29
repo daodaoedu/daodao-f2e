@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { cn } from '@/utils/cn';
-import { SectionHeader } from '@/app/[language]/(guest)/(default-layout)/SectionHeader';
+import { SectionHeader } from '@/shared/ui/section-header';
 import {
   Carousel,
   CarouselContent,
