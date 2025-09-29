@@ -43,9 +43,11 @@ export default async function TermsPage({
   const { content } = await getTermsData(type, language);
 
   return (
-    <MarkdownRenderer
-      className="container prose my-12 max-w-5xl rounded py-8 shadow-lg"
-      source={content}
-    />
+    <div className="px-4">
+      <MarkdownRenderer
+        className="container prose my-12 max-w-5xl rounded py-8 shadow-lg"
+        source={content}
+      />
+    </div>
   );
 }

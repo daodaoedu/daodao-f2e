@@ -1,34 +1,26 @@
-import { MDXRemote, MDXRemoteProps } from 'next-mdx-remote-client/rsc';
+import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import { cn } from '@/utils/cn';
-import { useMemo } from 'react';
 
-interface MarkdownRendererProps extends MDXRemoteProps {
+interface MarkdownRendererProps {
+  source?: string;
   className?: string;
 }
 
 const MarkdownRenderer = ({
+  source = '',
   className,
-  options,
-  ...props
 }: MarkdownRendererProps) => {
-  const mdxOptions = useMemo<MDXRemoteProps['options']>(
-    () => ({
-      ...options,
-      mdxOptions: {
-        ...options?.mdxOptions,
-        remarkPlugins: [remarkGfm],
-        rehypePlugins: [rehypeRaw, rehypeSanitize],
-      },
-    }),
-    [options]
-  );
-
   return (
     <div className={cn('markdown-renderer', className)}>
-      <MDXRemote options={mdxOptions} {...props} />
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw, rehypeSanitize]}
+      >
+        {source}
+      </ReactMarkdown>
     </div>
   );
 };
