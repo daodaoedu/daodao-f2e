@@ -7,9 +7,9 @@ import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';
 import { AuthButton } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
-import { NAV_ITEMS } from './constants';
+import { NAV_ITEMS } from '../model';
 
-export function Navbar() {
+export const DesktopNavbar = () => {
   const isVisible = useScrollVisibility({ threshold: 200 });
   const navRef = useRef<HTMLDivElement>(null);
 
@@ -73,4 +73,4 @@ export function Navbar() {
       </ul>
     </nav>
   );
-}
+};

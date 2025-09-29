@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 
-export default function Footer() {
+export const Footer = () => {
   return (
     <footer className="bg-basic-600 pb-20 pt-12 text-white md:pb-12">
       <div className="container">
@@ -141,4 +141,4 @@ export default function Footer() {
       </div>
     </footer>
   );
-}
+};

@@ -5,9 +5,9 @@ import { useScrollVisibility } from '@/hooks/useScrollVisibility';
 import { useEffect, useState } from 'react';
 import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
-import { NAV_ITEMS } from './constants';
+import { NAV_ITEMS } from '../model';
 
-export function MobileMenu() {
+export const MobileNavbar = () => {
   const isVisible = useScrollVisibility({ threshold: 250 });
   const [activeSection, setActiveSection] = useState<string>('');
 
@@ -61,4 +61,4 @@ export function MobileMenu() {
       </ul>
     </nav>
   );
-}
+};

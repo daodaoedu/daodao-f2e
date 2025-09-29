@@ -1,3 +1,4 @@
+import { FloatButtons } from '@/widgets/menu';
 import {
   Loader,
   KeyVision,
@@ -12,7 +13,6 @@ import {
   CTASection,
   PersonalitySection,
 } from './_home';
-import { FloatButtons } from './_layout';
 
 export default function HomePage() {
   return (

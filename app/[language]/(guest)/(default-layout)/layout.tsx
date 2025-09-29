@@ -1,10 +1,13 @@
-import { Navbar, MobileMenu, Footer } from './_layout';
+import { DesktopNavbar, MobileNavbar } from '@/widgets/menu';
+import { Footer } from '@/widgets/footer';
 
-export default function BaseLayout({ children }: LayoutProps<'/[language]'>) {
+export default function DefaultLayout({
+  children,
+}: LayoutProps<'/[language]'>) {
   return (
     <>
-      <Navbar />
-      <MobileMenu />
+      <DesktopNavbar />
+      <MobileNavbar />
       <main className="min-h-screen w-full bg-white">{children}</main>
       <Footer />
     </>

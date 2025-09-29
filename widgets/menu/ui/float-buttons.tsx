@@ -8,7 +8,7 @@ import { Icon } from '@/components/ui/icon';
 import { cn } from '@/utils/cn';
 import Link from 'next/link';
 
-export function FloatButtons() {
+export const FloatButtons = () => {
   const { scrollToTop } = useSmoothScroll();
   const isVisible = useScrollVisibility({ threshold: 300 });
 
@@ -54,4 +54,4 @@ export function FloatButtons() {
       </div>
     </div>
   );
-}
+};
