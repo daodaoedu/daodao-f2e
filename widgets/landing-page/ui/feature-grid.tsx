@@ -1,6 +1,50 @@
+import Image from 'next/image';
 import { cn } from '@/utils/cn';
 import { SectionHeader } from '@/shared/ui/section-header';
-import { FeatureCard } from './FeatureCard';
+
+interface FeatureCardProps {
+  title: string;
+  description: string;
+  tag: string;
+  image: string;
+  details: string[];
+  className?: string;
+}
+
+export function FeatureCard({
+  title,
+  description,
+  tag,
+  image,
+  details,
+  className,
+}: FeatureCardProps) {
+  return (
+    <div className={cn('mb-6 p-4', className)}>
+      <div className="flex h-8 w-[84px] items-center justify-center rounded bg-tips text-sm text-white">
+        {tag}
+      </div>
+      <div className="relative mb-4 h-[200px] w-full overflow-hidden rounded-lg md:h-[200px]">
+        <Image src={image} alt={title} fill className="object-contain" />
+      </div>
+      <h4 className="mb-2 text-center text-[22px] font-semibold text-primary-base">
+        {title}
+      </h4>
+      <p className="mb-4 text-center text-sm text-basic-400">{description}</p>
+      <ul className="space-y-2">
+        {details.map((detail) => (
+          <li
+            key={detail}
+            className="relative flex min-h-[40px] items-center pl-10 pr-2 text-base leading-6"
+          >
+            <span className="absolute left-0 top-1/2 size-10 -translate-y-1/2 bg-[url(/assets/landing-page/icon-bulb.svg)] bg-center bg-no-repeat" />
+            {detail}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 interface FeatureGridProps {
   className?: string;
@@ -43,9 +87,12 @@ export function FeatureGrid({ className }: FeatureGridProps) {
   ];
 
   return (
-    <div className={cn('pt-16 w-full', className)}>
+    <div className={cn('w-full pt-16', className)}>
       <div className="container">
-        <div className="relative pb-[60px] overflow-x-clip flex flex-col items-center justify-center" id="feature">
+        <div
+          className="relative flex flex-col items-center justify-center overflow-x-clip pb-[60px]"
+          id="feature"
+        >
           <SectionHeader
             title="告別三大學習困境"
             subtitle="從學習痛點到美好體驗，讓每一步成長都看得見"
@@ -53,7 +100,7 @@ export function FeatureGrid({ className }: FeatureGridProps) {
             size="lg"
             alignment="center"
           />
-          <div className="text-primary-darker flex flex-col items-stretch md:flex-row">
+          <div className="flex flex-col items-stretch text-primary-darker md:flex-row">
             {features.map((feature) => (
               <FeatureCard
                 key={feature.title}

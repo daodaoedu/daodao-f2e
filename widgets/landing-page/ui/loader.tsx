@@ -61,10 +61,11 @@ export function Loader({ children }: React.PropsWithChildren) {
             name: 'Loader',
             rendererSettings: { preserveAspectRatio: 'xMidYMid meet' },
           });
-          setLottieIsLoading(false);
         }
-      } catch (error) {
-        console.error('Failed to load Lottie animation:', error);
+      } catch {
+        setIsLoading(false);
+      } finally {
+        setLottieIsLoading(false);
       }
     };
 

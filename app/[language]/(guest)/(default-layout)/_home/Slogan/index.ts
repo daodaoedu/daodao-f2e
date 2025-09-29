@@ -1,1 +1,0 @@
-export { SloganSection } from './SloganSection';

@@ -1,3 +1,3 @@
-export * from './DesktopNavbar';
-export * from './MobileNavbar';
-export * from './FloatButtons';
+export { DesktopNavbar } from './desktop-navbar';
+export { MobileNavbar } from './mobile-navbar';
+export { FloatButtons } from './float-buttons';

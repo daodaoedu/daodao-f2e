@@ -10,7 +10,7 @@ type Props = {
   preserveAspectRatio?: string; // 預設 "xMidYMid meet"
 };
 
-export default function LottieHero({
+export function LottieHero({
   desktopSrc,
   mobileSrc,
   preserveAspectRatio = 'xMidYMid meet',

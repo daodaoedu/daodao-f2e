@@ -5,14 +5,14 @@ import {
   SloganSection,
   FeatureGrid,
   PresentationSection,
-  BubbleDialog,
+  TypewriterBubble,
   VideoSection,
   FunctionCarousel,
   PlanSection,
   TestimonialMarquee,
-  CTASection,
+  CallToActionSection,
   PersonalitySection,
-} from './_home';
+} from '@/widgets/landing-page';
 
 export default function HomePage() {
   return (
@@ -22,12 +22,12 @@ export default function HomePage() {
       <SloganSection />
       <FeatureGrid />
       <PresentationSection />
-      <BubbleDialog />
+      <TypewriterBubble />
       <VideoSection />
       <FunctionCarousel />
       <PlanSection />
       <TestimonialMarquee />
-      <CTASection />
+      <CallToActionSection />
       <PersonalitySection />
     </Loader>
   );
