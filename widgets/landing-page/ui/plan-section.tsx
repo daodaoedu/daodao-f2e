@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { cn } from '@/utils/cn';
 import { AuthButton } from '@/contexts/Auth';
+import { ANCHOR_IDS } from '@/shared/constants';
 
 interface PlanSectionProps {
   className?: string;
@@ -13,7 +14,7 @@ export function PlanSection({ className }: PlanSectionProps) {
         'relative mt-[60px] flex flex-col items-center justify-center overflow-x-clip pb-[60px]',
         className
       )}
-      id="plans"
+      id={ANCHOR_IDS.PLANS}
     >
       {/* Section Header */}
       <div className="px-6 pb-[60px] text-center text-primary-darker">

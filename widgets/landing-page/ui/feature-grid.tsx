@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { cn } from '@/utils/cn';
 import { SectionHeader } from '@/shared/ui/section-header';
+import { ANCHOR_IDS } from '@/shared/constants';
 
 interface FeatureCardProps {
   title: string;
@@ -91,7 +92,7 @@ export function FeatureGrid({ className }: FeatureGridProps) {
       <div className="container">
         <div
           className="relative flex flex-col items-center justify-center overflow-x-clip pb-[60px]"
-          id="feature"
+          id={ANCHOR_IDS.FEATURE}
         >
           <SectionHeader
             title="告別三大學習困境"

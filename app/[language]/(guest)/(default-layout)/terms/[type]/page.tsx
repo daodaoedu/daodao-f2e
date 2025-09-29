@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { locales, getDictionary } from '@/constants/i18n';
 import MarkdownRenderer from '@/components/ui/markdown-renderer';
+import { Paper } from '@/components/ui/wrapper';
 
 const termsTypes = ['ipr', 'privacy-policy', 'service'] as const;
 
@@ -44,10 +45,9 @@ export default async function TermsPage({
 
   return (
     <div className="px-4">
-      <MarkdownRenderer
-        className="container prose my-12 max-w-5xl rounded py-8 shadow-lg"
-        source={content}
-      />
+      <Paper className="container prose my-12 max-w-5xl rounded py-8 shadow-lg">
+        <MarkdownRenderer source={content} />
+      </Paper>
     </div>
   );
 }

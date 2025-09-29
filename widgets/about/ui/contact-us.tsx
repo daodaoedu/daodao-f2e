@@ -1,49 +1,45 @@
+import Link from 'next/link';
 import React from 'react';
 import { Title, Text } from '@/components/ui/typography';
+import { SOCIAL_LINKS } from '@/shared/constants';
 
-const ContactUs = () => (
+export const ContactUs = () => (
   <address className="my-5">
-    <Title
-      as="h2"
-      size="lg"
-      className="mb-2.5 mt-10"
-    >
+    <Title as="h2" size="lg" className="mb-2.5 mt-10">
       聯絡我們
     </Title>
     <div className="m-5 flex flex-col">
       <Text className="my-1.5">
-        <a
+        <Link
           target="_blank"
-          href="https://www.facebook.com/daodao.edu"
+          href={SOCIAL_LINKS.FACEBOOK}
           rel="noopener noreferrer"
-          className="text-black transition-colors duration-500 hover:text-[#16b9b3] hover:opacity-100"
+          className="no-underline transition-colors hover:text-primary hover:opacity-100"
         >
           🏝️ 島島阿學的 Facebook
-        </a>
+        </Link>
       </Text>
       <Text className="my-1.5">
-        <a
+        <Link
           target="_blank"
-          href="https://www.instagram.com/daodao_edu/"
+          href={SOCIAL_LINKS.INSTAGRAM}
           rel="noopener noreferrer"
-          className="text-black transition-colors duration-500 hover:text-[#16b9b3] hover:opacity-100"
+          className="no-underline transition-colors hover:text-primary hover:opacity-100"
         >
           🏝️ 島島阿學的 Instagram
-        </a>
+        </Link>
       </Text>
       <Text className="my-1.5">
-        <a
+        <Link
           target="_blank"
-          href="mailto:contact@daoedu.tw"
+          href={`mailto:${SOCIAL_LINKS.EMAIL}`}
           rel="noopener noreferrer"
-          className="text-black transition-colors duration-500 hover:text-[#16b9b3] hover:opacity-100"
+          className="no-underline transition-colors hover:text-primary hover:opacity-100"
         >
           🏝️ 島島阿學的信箱 – contact@daoedu.tw
           <br />
-        </a>
+        </Link>
       </Text>
     </div>
   </address>
 );
-
-export default ContactUs;

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
+import { SOCIAL_LINKS, ANCHOR_IDS } from '@/shared/constants';
 
 export const Footer = () => {
   return (
@@ -25,7 +26,7 @@ export const Footer = () => {
             <div className="space-y-2">
               <div>
                 <Link
-                  href="/about"
+                  href={`/about#${ANCHOR_IDS.ABOUT_DAO_DAO}`}
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   關於島島
@@ -33,7 +34,7 @@ export const Footer = () => {
               </div>
               <div>
                 <Link
-                  href="/about#vision"
+                  href={`/about#${ANCHOR_IDS.VISION}`}
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   願景
@@ -41,7 +42,7 @@ export const Footer = () => {
               </div>
               <div>
                 <Link
-                  href="/about#mission"
+                  href={`/about#${ANCHOR_IDS.MISSION}`}
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   使命
@@ -110,7 +111,7 @@ export const Footer = () => {
           <p className="text-lg text-primary-lighter">追蹤島島</p>
           <div className="flex gap-4">
             <Link
-              href="https://www.instagram.com/daodao_learning"
+              href={SOCIAL_LINKS.INSTAGRAM}
               target="_blank"
               rel="noopener noreferrer"
               className="transition-opacity hover:opacity-80"
@@ -123,7 +124,7 @@ export const Footer = () => {
               />
             </Link>
             <Link
-              href="https://www.facebook.com/daodao.learning"
+              href={SOCIAL_LINKS.FACEBOOK}
               target="_blank"
               rel="noopener noreferrer"
               className="transition-opacity hover:opacity-80"

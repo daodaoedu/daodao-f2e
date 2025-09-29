@@ -1,14 +1,16 @@
+import { ANCHOR_IDS } from '@/shared/constants';
+
 export const NAV_ITEMS = [
   {
     label: '解決困境',
-    id: 'feature',
+    id: ANCHOR_IDS.FEATURE,
   },
   {
     label: '功能生態',
-    id: 'functions',
+    id: ANCHOR_IDS.FUNCTIONS,
   },
   {
     label: '方案',
-    id: 'plans',
+    id: ANCHOR_IDS.PLANS,
   },
 ];

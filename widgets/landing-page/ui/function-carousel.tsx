@@ -8,6 +8,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { ANCHOR_IDS } from '@/shared/constants';
 
 interface FunctionCardProps {
   tag: string;
@@ -123,7 +124,7 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
         className
       )}
     >
-      <div className="py-15 px-6 text-teal-800" id="functions">
+      <div className="py-15 px-6 text-teal-800" id={ANCHOR_IDS.FUNCTIONS}>
         <SectionHeader
           title="學習群島上的功能生態"
           variant="dark"
