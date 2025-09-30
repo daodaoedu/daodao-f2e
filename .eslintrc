@@ -26,7 +26,8 @@
     "services/**/*.ts", // @TODO: services 下的 API 檔案將要移除，重構完成後再調整設定檔
     "!services/fetcher.ts",
     "server.js",
-    "next-env.d.ts"
+    "next-env.d.ts",
+    "*.gs"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {

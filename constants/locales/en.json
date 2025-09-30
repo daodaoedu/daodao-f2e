@@ -2,5 +2,13 @@
   "common": {
     "title": "DaoDao",
     "description": "DaoDao aims to build a diverse network of learning resources, enabling self-directed learners to find suitable ways to grow and become the people they aspire to be, while fostering a spirit of mutual support. We are currently actively developing a collaborative learning resource platform."
+  },
+  "terms": {
+    "privacy-policy-title": "",
+    "privacy-policy-content": "",
+    "ipr-title": "",
+    "ipr-content": "",
+    "service-title": "",
+    "service-content": ""
   }
 }
