@@ -138,7 +138,9 @@ export const Footer = () => {
             </Link>
           </div>
         </div>
-        <p className="text-center text-basic-300">島島阿學 © 2025</p>
+        <p className="text-center text-basic-300">
+          島島阿學 © 2022 - {new Date().getFullYear()}
+        </p>
       </div>
     </footer>
   );

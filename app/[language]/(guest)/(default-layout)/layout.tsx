@@ -1,4 +1,4 @@
-import { DesktopNavbar, MobileNavbar } from '@/widgets/menu';
+import { DesktopNavbar } from '@/widgets/navbar';
 import { Footer } from '@/widgets/footer';
 
 export default function DefaultLayout({
@@ -6,9 +6,8 @@ export default function DefaultLayout({
 }: LayoutProps<'/[language]'>) {
   return (
     <>
-      <DesktopNavbar />
-      <MobileNavbar />
-      <main className="min-h-screen w-full bg-white">{children}</main>
+      <DesktopNavbar alwaysShow />
+      <main className="mt-20 min-h-screen bg-white">{children}</main>
       <Footer />
     </>
   );

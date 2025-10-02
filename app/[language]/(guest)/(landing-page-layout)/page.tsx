@@ -1,4 +1,4 @@
-import { FloatButtons } from '@/widgets/menu';
+import { FloatButtons } from '@/widgets/navbar';
 import {
   Loader,
   KeyVision,

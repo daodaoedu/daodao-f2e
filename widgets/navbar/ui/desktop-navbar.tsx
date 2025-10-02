@@ -9,7 +9,11 @@ import { AuthButton } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import { NAV_ITEMS } from '../model';
 
-export const DesktopNavbar = () => {
+interface DesktopNavbarProps {
+  alwaysShow?: boolean;
+}
+
+export const DesktopNavbar = ({ alwaysShow = false }: DesktopNavbarProps) => {
   const isVisible = useScrollVisibility({ threshold: 200 });
   const navRef = useRef<HTMLDivElement>(null);
 
@@ -33,7 +37,8 @@ export const DesktopNavbar = () => {
       ref={navRef}
       className={cn(
         'fixed left-0 right-0 top-0 z-20 hidden items-center justify-between border-b border-white/20 px-8 py-4 backdrop-blur-[10px] transition-[transform,opacity] duration-300 ease-in-out md:flex',
-        isVisible
+        alwaysShow && 'flex',
+        alwaysShow || isVisible
           ? 'pointer-events-auto translate-y-0 opacity-100'
           : 'pointer-events-none -translate-y-full opacity-0'
       )}
@@ -56,7 +61,7 @@ export const DesktopNavbar = () => {
       </div>
       <ul className="flex items-center gap-8">
         {NAV_ITEMS.map((item) => (
-          <li key={item.label}>
+          <li key={item.label} className="hidden md:block">
             <Button
               variant="ghost"
               className="relative cursor-pointer border-none bg-none p-0 text-base font-medium text-primary-darker transition-all duration-300 ease-in-out after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-primary-base after:transition-all after:duration-300 after:ease-in-out after:content-[''] hover:text-primary-base hover:after:w-full"
