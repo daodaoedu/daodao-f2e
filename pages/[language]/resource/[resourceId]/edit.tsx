@@ -6,11 +6,11 @@ import { Check } from "lucide-react";
 import { toast } from "sonner";
 
 import SEOConfig from "@/components/SEOConfig";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { Background, Container, Paper } from "@/components/ui/wrapper";
-import { BackButton } from "@/components/ui/back-button";
-import { Title } from "@/components/ui/typography";
+import { Button } from "@/shared/ui/button";
+import { Form } from "@/shared/ui/form";
+import { Background, Container, Paper } from "@/shared/ui/wrapper";
+import { BackButton } from "@/shared/ui/back-button";
+import { Title } from "@/shared/ui/typography";
 import { ProtectedComponent } from "@/contexts/Auth";
 import {
   ResourceBasicInfoFields,

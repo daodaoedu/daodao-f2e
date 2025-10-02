@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Image } from '@/components/ui/image';
+import { Button } from '@/shared/ui/button';
+import { Image } from '@/shared/ui/image';
 import { useDialog } from '@/contexts/Dialog';
 
 interface ApplyButtonProps {

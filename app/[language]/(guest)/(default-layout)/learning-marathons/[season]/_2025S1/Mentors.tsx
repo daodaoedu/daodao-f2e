@@ -2,10 +2,10 @@
 
 import { useMemo, useState, ReactNode, CSSProperties, MouseEvent } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import ResponsiveModal, {
   ResponsiveModalSize,
-} from '@/components/ui/responsive-modal';
+} from '@/shared/ui/responsive-modal';
 import { cn } from '@/utils/cn';
 import {
   Carousel,
@@ -13,7 +13,7 @@ import {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-} from '@/components/ui/carousel';
+} from '@/shared/ui/carousel';
 
 interface SocialLink {
   text: string;

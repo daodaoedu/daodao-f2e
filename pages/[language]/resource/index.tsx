@@ -13,9 +13,9 @@ import {
 } from "@/features/resources";
 import JsonLdFactory from "@/utils/jsonLd";
 import { HOT_TAGS } from "@/constants/category";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
-import { Container } from "@/components/ui/wrapper";
+import { Container } from "@/shared/ui/wrapper";
 
 // export const runtime = "experimental-edge";
 

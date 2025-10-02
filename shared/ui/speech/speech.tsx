@@ -5,10 +5,10 @@ import SpeechRecognition, {
   SpeechRecognitionOptions,
   useSpeechRecognition,
 } from 'react-speech-recognition';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import { useDialog } from '@/contexts/Dialog';
 import faviconPng from '@/public/assets/brand/favicon.png';
-import { Button, ButtonProps } from '@/components/ui';
+import { Button, ButtonProps } from '@/shared/ui';
 
 interface SpeechProps
   extends ListeningOptions,

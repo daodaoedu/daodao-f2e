@@ -1,5 +1,5 @@
 import { cn } from '@/utils/cn';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import { SectionHeader } from '@/shared/ui/section-header';
 
 interface VideoItemProps {

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ICategory } from '@/constants/category';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import { cn } from '@/utils/cn';
 
 type CategoryCardProps = {

@@ -3,8 +3,8 @@
 import { useSmoothScroll } from '@/hooks/useSmoothScroll';
 import { useScrollVisibility } from '@/hooks/useScrollVisibility';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { Icon } from '@/components/ui/icon';
+import { Button } from '@/shared/ui/button';
+import { Icon } from '@/shared/ui/icon';
 import { cn } from '@/utils/cn';
 import Link from 'next/link';
 

@@ -8,7 +8,7 @@ import Collapse from '@/shared/components/Collapse';
 import Button from '@/shared/components/Button';
 import { cn } from '@/utils/cn';
 import { usePromotion } from '@/contexts/Promotion';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 
 interface OnCloseProps {
   onClose: () => void;

@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
-import { Input } from '@/components/ui/input';
-import { Text } from '@/components/ui/typography';
+import { Input } from '@/shared/ui/input';
+import { Text } from '@/shared/ui/typography';
 import { StyledGroup } from './Edit.styled';
 
 function EditFormInput(

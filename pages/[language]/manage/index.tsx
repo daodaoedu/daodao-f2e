@@ -12,7 +12,7 @@ import {
   isSameDay, 
   isWithinInterval 
 } from 'date-fns';
-import { Calendar as ShadcnCalendar } from "@/components/ui/calendar";
+import { Calendar as ShadcnCalendar } from "@/shared/ui/calendar";
 import {
   ArrowUpRight,
   CalendarIcon,
@@ -27,7 +27,7 @@ import marathonConfig from "@/constants/marathon";
 import getManageLayout from "@/layout/features/getManageLayout";
 import useClickOutside from "@/hooks/useClickOutside";
 import SEOConfig from "@/components/SEOConfig";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import MilestoneItem from "@/components/Milestones/MilestoneItem";
 import {
   SelectProjectModal,
@@ -45,7 +45,7 @@ import {
   useMyProjects,
   useProjectNoteMutation,
 } from "@/services/projects";
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import useCreateProject from "@/features/projects/hooks/useCreateProject";
 import MilestoneCard from "@/components/Milestones/MilestoneCard";
 import {
@@ -53,18 +53,18 @@ import {
   AccordionItem,
   AccordionContent,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/shared/ui/accordion";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from "@/shared/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/shared/ui/dropdown-menu";
 import {
   useProjectReviewList,
   useProjectReviewMutation,

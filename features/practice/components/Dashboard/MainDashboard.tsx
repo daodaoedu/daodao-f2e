@@ -19,9 +19,9 @@ import { Practice } from '@/services/practice/schema';
 import { CheckInService } from '@/services/practice/checkIn';
 import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
 import { formatSmartDate, formatDate } from '@/services/practice/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import Link from 'next/link';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@/shared/ui/progress';
 import TagList from '../Shared/TagList';
 
 interface MainDashboardProps {

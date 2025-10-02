@@ -2,10 +2,10 @@ import React from 'react';
 import { format } from 'date-fns';
 import { Check, Ellipsis } from 'lucide-react';
 import { RecentResourceReviewSchema } from '@/services/resources/reviews/schema';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Rating } from '@/components/ui/rating';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+import { Badge } from '@/shared/ui/badge';
+import { Button } from '@/shared/ui/button';
+import { Rating } from '@/shared/ui/rating';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
 import CommentSvg from '@/public/assets/icons/comment.svg';
 import ShellSvg from '@/public/assets/icons/shell.svg';
@@ -13,9 +13,9 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+} from '@/shared/ui/collapsible';
 import CommentSection from '@/shared/components/Comment/CommentSection';
-import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 import { CommentType } from '@/services/comments';
 import { cn } from '@/utils/cn';
 

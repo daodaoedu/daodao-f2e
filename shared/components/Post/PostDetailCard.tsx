@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import PostCard from '@/shared/components/Post/PostCard';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
 import { BaseUserSchema } from '@/services/users';
 import { useAuth } from '@/contexts/Auth';

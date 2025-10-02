@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAssetsLoader } from '@/hooks/useAssetsLoader';
 import { useScrollLock } from '@/hooks/useScrollLock';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@/shared/ui/progress';
 import { useAuth } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 

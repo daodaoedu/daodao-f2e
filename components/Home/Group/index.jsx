@@ -1,6 +1,6 @@
 import React from 'react';
-import { Title, Text } from '@/components/ui/typography';
-import { Button } from '@/components/ui/button';
+import { Title, Text } from '@/shared/ui/typography';
+import { Button } from '@/shared/ui/button';
 import { Facebook } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

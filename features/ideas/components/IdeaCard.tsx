@@ -11,7 +11,7 @@ import {
 import Comment from '@/public/assets/icons/comment.svg';
 import Shell from '@/public/assets/icons/shell.svg';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import type { IdeaSchema } from '@/services/ideas';
 import { ROLE } from '@/constants/member';
 import {
@@ -19,8 +19,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+} from '@/shared/ui/dropdown-menu';
+import { Button } from '@/shared/ui/button';
 import { formatIdeaDate, truncateText } from '../utils';
 
 interface IdeaCardProps {

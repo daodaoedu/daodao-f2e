@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
-import { Title, Text } from '@/components/ui/typography';
+import { Title, Text } from '@/shared/ui/typography';
 import { SOCIAL_LINKS } from '@/shared/constants';
 
 export const ContactUs = () => (

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { BASE_URL } from "@/constants/common";
 import toast from 'react-hot-toast';
 import { Project as ProjectType } from "@/components/Projects/Project/type";
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/shared/ui/skeleton';
 import { cn } from '@/utils/cn';
 import ProjectList from '@/components/Projects/ProjectList';
 import EmptyList from '@/components/Projects/ProjectList/EmptyList';

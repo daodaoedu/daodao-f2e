@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 
 import ShareResourceIcon from '@/public/assets/icons/share-resource.svg';
 import CommentIcon from '@/public/assets/icons/comment.svg';

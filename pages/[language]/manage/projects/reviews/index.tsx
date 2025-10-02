@@ -2,7 +2,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import ReviewCard from "@/features/projects/components/ReviewCard";
 import {
   ReviewCreateModal,

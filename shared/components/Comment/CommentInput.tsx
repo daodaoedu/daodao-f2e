@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { LockKeyholeOpen, LockKeyhole } from 'lucide-react';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import { ROLE } from '@/constants/member';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import { CommentVisibility } from '@/services/comments';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import Textarea from '../Textarea';
 
 export interface CommentData {

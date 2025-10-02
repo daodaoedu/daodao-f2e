@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { Icon } from '@/components/ui/icon';
+import { Button } from '@/shared/ui/button';
+import { Icon } from '@/shared/ui/icon';
 import { SOCIAL_LINKS, ANCHOR_IDS } from '@/shared/constants';
 
 export const Footer = () => {

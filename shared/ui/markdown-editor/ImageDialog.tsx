@@ -10,10 +10,10 @@ import {
 } from '@mdxeditor/editor';
 import { useState, useEffect } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ResponsiveModal } from '@/components/ui/responsive-modal';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Label } from '@/shared/ui/label';
+import { ResponsiveModal } from '@/shared/ui/responsive-modal';
 
 interface ImageData {
   src: string;

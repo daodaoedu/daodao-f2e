@@ -6,10 +6,10 @@ import { Practice, MoodType, CheckInInput } from '@/services/practice/schema';
 import { CheckInService } from '@/features/practice';
 import { usePracticeManager } from '@/features/practice/hooks';
 import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Textarea } from '@/shared/ui/textarea';
+import { Label } from '@/shared/ui/label';
 
 interface CheckInViewProps {
   practice: Practice;

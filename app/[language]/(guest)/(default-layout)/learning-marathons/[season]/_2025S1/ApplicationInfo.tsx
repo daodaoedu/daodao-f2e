@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { ArrowDown } from 'lucide-react';
-import { Title, Text } from '@/components/ui/typography';
+import { Title, Text } from '@/shared/ui/typography';
 import { cn } from '@/utils/cn';
 
 // 定義類型

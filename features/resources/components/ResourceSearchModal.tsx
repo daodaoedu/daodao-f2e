@@ -1,6 +1,6 @@
 import ResponsiveModal, {
   ResponsiveModalSize,
-} from '@/components/ui/responsive-modal';
+} from '@/shared/ui/responsive-modal';
 import { ResourceSearchParamsSchema } from '@/services/resources/core/schema';
 import ResourceSearchForm from './ResourceSearchForm';
 

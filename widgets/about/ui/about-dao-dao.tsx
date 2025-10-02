@@ -1,6 +1,6 @@
 import React from 'react';
-import { Title, Text } from '@/components/ui/typography';
-import { Image } from '@/components/ui/image';
+import { Title, Text } from '@/shared/ui/typography';
+import { Image } from '@/shared/ui/image';
 import { ANCHOR_IDS } from '@/shared/constants';
 
 export const AboutDaoDao = () => (

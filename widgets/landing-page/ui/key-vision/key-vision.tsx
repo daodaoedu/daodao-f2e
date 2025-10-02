@@ -1,5 +1,5 @@
-import { Image } from '@/components/ui/image';
-import { Icon } from '@/components/ui/icon';
+import { Image } from '@/shared/ui/image';
+import { Icon } from '@/shared/ui/icon';
 import { AuthButton } from '@/contexts/Auth';
 import { LottieHero } from './lottie-hero';
 

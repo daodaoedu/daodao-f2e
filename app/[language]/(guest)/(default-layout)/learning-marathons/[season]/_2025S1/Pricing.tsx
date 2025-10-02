@@ -1,4 +1,4 @@
-import { Title, Text } from '@/components/ui/typography';
+import { Title, Text } from '@/shared/ui/typography';
 import { cn } from '@/utils/cn';
 import { ReactNode } from 'react';
 

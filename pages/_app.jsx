@@ -4,7 +4,7 @@ import { SWRConfig } from 'swr';
 
 
 import { Toaster } from 'react-hot-toast';
-import { Toaster as SonnerToaster } from '@/components/ui/sonner';
+import { Toaster as SonnerToaster } from '@/shared/ui/sonner';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';

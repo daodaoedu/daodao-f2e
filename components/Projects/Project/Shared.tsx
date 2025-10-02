@@ -1,6 +1,6 @@
 import z from 'zod';
 import { cn } from '@/utils/cn';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import { Pencil, Check } from 'lucide-react';
 import { MOTIVATION_MAP, STRATEGY_MAP, OUTCOME_MAP } from '@/constants/project';
 

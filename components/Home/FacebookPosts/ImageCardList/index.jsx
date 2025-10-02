@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/shared/ui/skeleton';
 import Marquee from 'react-fast-marquee';
 import Card from './Card';
 

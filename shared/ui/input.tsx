@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import useControlledState from '@/hooks/useControlledState';
 import { cn } from '@/utils/cn';
 

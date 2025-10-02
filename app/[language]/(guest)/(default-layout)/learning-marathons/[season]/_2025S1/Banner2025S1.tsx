@@ -1,6 +1,6 @@
 'use client';
 
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 
 import LearningMarathonImgDesktopGroup from '@/public/assets/learning-marathon/2025S1-desktop-group.png';
 import LearningMarathonImgDesktopIcon1 from '@/public/assets/learning-marathon/2025S1-desktop-icon-1.png';

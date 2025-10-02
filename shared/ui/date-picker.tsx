@@ -11,13 +11,13 @@ import {
 } from 'react-day-picker';
 
 import { cn } from '@/utils/cn';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@/shared/ui/button';
+import { Calendar } from '@/shared/ui/calendar';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@/shared/ui/popover';
 import useControlledState from '@/hooks/useControlledState';
 import {
   FormField, FormItem, FormLabel, FormMessage,

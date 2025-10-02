@@ -1,5 +1,5 @@
-import { Title } from '@/components/ui/typography';
-import { Image } from '@/components/ui/image';
+import { Title } from '@/shared/ui/typography';
+import { Image } from '@/shared/ui/image';
 import { cn } from '@/utils/cn';
 import { StaticImageData } from 'next/image';
 import React from 'react';

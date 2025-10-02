@@ -5,13 +5,13 @@ import { X } from 'lucide-react';
 import * as React from 'react';
 import { forwardRef, useEffect } from 'react';
 
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/shared/ui/badge';
 import {
   Command,
   CommandGroup,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
+} from '@/shared/ui/command';
 import { cn } from '@/utils/cn';
 import { OptionProps } from './option';
 import { Button } from './button';

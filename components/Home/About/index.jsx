@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Title, Text } from '@/components/ui/typography';
-import { Badge } from '@/components/ui/badge';
+import { Title, Text } from '@/shared/ui/typography';
+import { Badge } from '@/shared/ui/badge';
 import { CATEGORIES } from '../../../constants/category';
 
 const About = () => {

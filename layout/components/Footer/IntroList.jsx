@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text } from '@/components/ui/typography';
+import { Text } from '@/shared/ui/typography';
 import Link from 'next/link';
 
 const IntroList = ({ list }) => (

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
-import { Button, ButtonProps } from '@/components/ui/button';
+import { Button, ButtonProps } from '@/shared/ui/button';
 import { cn } from '@/utils/cn';
 
 interface BackButtonProps extends Omit<ButtonProps, 'children' | 'onClick'> {

@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 import React, { useRef } from 'react';
 
-import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
+import { Separator } from '@/shared/ui/separator';
+import { Button } from '@/shared/ui/button';
 import Banner from '../Banner';
 import Guide from './Guide';
 import About from './About';

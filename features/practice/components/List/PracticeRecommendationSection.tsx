@@ -2,10 +2,10 @@ import React from 'react';
 import {
   Target, TrendingUp, RefreshCw, Sparkles,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import {
   Card, CardContent, CardHeader, CardTitle,
-} from '@/components/ui/card';
+} from '@/shared/ui/card';
 import { useContentTypeRecommendations } from '@/services/recommendation';
 import { useAuth } from '@/contexts/Auth';
 import type { Practice } from '@/services/practice/schema';

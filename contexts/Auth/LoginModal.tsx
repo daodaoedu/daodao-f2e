@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Image } from '@/components/ui/image';
-import { Button } from '@/components/ui/button';
-import ResponsiveModal from '@/components/ui/responsive-modal';
+import { Image } from '@/shared/ui/image';
+import { Button } from '@/shared/ui/button';
+import ResponsiveModal from '@/shared/ui/responsive-modal';
 import openWindowPopup from '@/utils/openWindowPopup';
 import { cn } from '@/utils/cn';
 import getEnv from '@/utils/env';

@@ -4,18 +4,18 @@ import {
 } from 'lucide-react';
 import { Practice, Resource, ResourceType } from '@/features/practice';
 import { cn } from '@/utils/cn';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Textarea } from '@/shared/ui/textarea';
+import { Label } from '@/shared/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+} from '@/shared/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/shared/ui/radio-group';
 import { defaultTags } from '@/constants/practice';
 
 interface EditFormProps {

@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Title as TypographyTitle } from '@/components/ui/typography';
+import { Button } from '@/shared/ui/button';
+import { Title as TypographyTitle } from '@/shared/ui/typography';
 import SearchField from '../SearchField';
 import BannerVideo from '../BannerVideo';
 import Title from './Title';

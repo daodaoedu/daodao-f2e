@@ -5,15 +5,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { X } from 'lucide-react';
 import { format } from 'date-fns';
 import PostCard from '@/shared/components/Post/PostCard';
-import { Button } from '@/components/ui/button';
-import { Form } from '@/components/ui/form';
+import { Button } from '@/shared/ui/button';
+import { Form } from '@/shared/ui/form';
 import {
   projectOutcomeFormSchema,
   ProjectOutcomeFormSchema,
 } from '@/services/projects';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
-import { Image } from '@/components/ui/image';
-import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { Image } from '@/shared/ui/image';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 import Upload, { ImageDataType } from '@/shared/components/Upload';
 
 interface OutcomeFormProps {

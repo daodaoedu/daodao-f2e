@@ -11,9 +11,9 @@ import {
 import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";
 import useSearchParamsManager from "@/hooks/useSearchParamsManager";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
-import { Container } from "@/components/ui/wrapper";
+import { Container } from "@/shared/ui/wrapper";
 
 // export const runtime = "experimental-edge";
 

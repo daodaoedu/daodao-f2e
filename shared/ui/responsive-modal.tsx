@@ -8,7 +8,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogContentSize,
-} from '@/components/ui/dialog';
+} from '@/shared/ui/dialog';
 import {
   Drawer,
   DrawerContent,
@@ -16,7 +16,7 @@ import {
   DrawerTitle,
   DrawerDescription,
   DrawerFooter,
-} from '@/components/ui/drawer';
+} from '@/shared/ui/drawer';
 import useMediaQuery from '@/hooks/useMediaQuery';
 
 export interface ResponsiveModalProps {

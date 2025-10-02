@@ -1,4 +1,4 @@
-import { Title } from '@/components/ui/typography';
+import { Title } from '@/shared/ui/typography';
 import { cn } from '@/utils/cn';
 import React from 'react';
 

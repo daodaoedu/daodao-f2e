@@ -7,10 +7,10 @@ import {
 } from 'lucide-react';
 import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
 import { cn } from '@/utils/cn';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import { ResourceSearchParamsSchema } from '@/services/resources/core/schema';
-import { Container } from '@/components/ui/wrapper';
+import { Container } from '@/shared/ui/wrapper';
 import ResourceSearchModal from './ResourceSearchModal';
 
 interface ResourceSearchBarProps {

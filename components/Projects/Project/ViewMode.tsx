@@ -1,5 +1,5 @@
 import { Project } from '@/components/Projects/Project/type';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import { Pencil } from 'lucide-react';
 import {
   Panel,

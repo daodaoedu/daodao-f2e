@@ -2,7 +2,7 @@ import { getManageProjectLayout } from '@/layout/features/getProjectLayout';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { useMemo, useState } from 'react';
 import SEOConfig, { JsonLdType } from '@/components/SEOConfig';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/shared/ui/skeleton';
 import useMediaQuery from '@/hooks/useMediaQuery';
 
 import { useProject } from '@/contexts/Project';

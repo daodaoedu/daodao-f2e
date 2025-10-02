@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { useDialog } from '@/contexts/Dialog';
 import { useCallback } from 'react';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import { useAuth } from '@/contexts/Auth';
 
 export const useRegisterSuccessDialog = () => {

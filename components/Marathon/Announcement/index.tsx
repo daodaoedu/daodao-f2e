@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 
 type AnnouncementItem = {
   id: string;

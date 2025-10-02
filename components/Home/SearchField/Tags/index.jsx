@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/shared/ui/badge';
 import { useRouter } from 'next/navigation';
 import { HOT_TAGS } from '@/constants/category';
 

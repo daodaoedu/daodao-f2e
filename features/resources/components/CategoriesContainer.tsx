@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { CATEGORIES, ICategory, SEARCH_TAGS } from '@/constants/category';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { cn } from '@/utils/cn';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import CategoryCard from './CategoryCard';
 import SectionTitle from './SectionTitle';
 import { getCategories } from '../utils';

@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { locales, getDictionary } from '@/constants/i18n';
-import MarkdownRenderer from '@/components/ui/markdown-renderer';
-import { Paper } from '@/components/ui/wrapper';
+import MarkdownRenderer from '@/shared/ui/markdown-renderer';
+import { Paper } from '@/shared/ui/wrapper';
 
 const termsTypes = ['ipr', 'privacy-policy', 'service'] as const;
 

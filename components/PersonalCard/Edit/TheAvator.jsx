@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 
 const EditAvator = ({
   url = 'https://imgur.com/EADd1UD.png',

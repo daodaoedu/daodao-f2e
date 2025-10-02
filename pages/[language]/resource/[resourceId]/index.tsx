@@ -14,12 +14,12 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
+} from "@/shared/ui/breadcrumb";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Separator } from "@/shared/ui/separator";
 import NotExist from "@/shared/components/NotExist";
 // import CommentSection from "@/shared/components/Comment/CommentSection";
-import { Container } from "@/components/ui/wrapper";
+import { Container } from "@/shared/ui/wrapper";
 import { parseToString } from "@/utils/helper";
 import {
   ResourceDetail,

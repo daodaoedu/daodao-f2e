@@ -4,8 +4,8 @@ import SEOConfig from "@/components/SEOConfig";
 import HorizontalLogoSvg from "@/public/assets/brand/horizontal-primary-logo.svg";
 import question1Jpg from "@/public/assets/quiz/q1.webp";
 import ResultNoisePng from "@/public/assets/quiz/result-noise.png";
-import { Button } from "@/components/ui/button";
-import { Image } from "@/components/ui/image";
+import { Button } from "@/shared/ui/button";
+import { Image } from "@/shared/ui/image";
 import { getQuizLayout, useQuiz } from "@/features/quiz";
 
 export default function QuizPage() {

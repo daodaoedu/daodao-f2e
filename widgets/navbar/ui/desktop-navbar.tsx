@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { useScrollVisibility } from '@/hooks/useScrollVisibility';
-import { Image } from '@/components/ui/image';
-import { Button } from '@/components/ui/button';
+import { Image } from '@/shared/ui/image';
+import { Button } from '@/shared/ui/button';
 import { AuthButton } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
 import { NAV_ITEMS } from '../model';

@@ -34,7 +34,7 @@ import {
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import { cn } from '@/utils/cn';
-import zhTW from '@/components/ui/markdown-editor/locales/zh-tw';
+import zhTW from '@/shared/ui/markdown-editor/locales/zh-tw';
 import CheckLink from '@/shared/components/CheckLink';
 import { ImageDialog } from './ImageDialog';
 

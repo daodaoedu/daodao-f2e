@@ -1,4 +1,4 @@
-import { OptionProps } from '@/components/ui/option';
+import { OptionProps } from '@/shared/ui/option';
 
 export interface ICategory extends OptionProps {
   image?: string;

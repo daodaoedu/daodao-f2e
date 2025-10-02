@@ -3,18 +3,18 @@ import { subYears } from "date-fns";
 import { useForm, useFormContext } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ProtectedComponent } from "@/contexts/Auth";
-import { Form, parseSchemaAutoFocus } from "@/components/ui/form";
-import { Background, Container, Paper } from "@/components/ui/wrapper";
-import { Text, Title } from "@/components/ui/typography";
-import { RadioGroupWithForm } from "@/components/ui/radio-group";
-import { CheckboxWithForm } from "@/components/ui/checkbox";
+import { Form, parseSchemaAutoFocus } from "@/shared/ui/form";
+import { Background, Container, Paper } from "@/shared/ui/wrapper";
+import { Text, Title } from "@/shared/ui/typography";
+import { RadioGroupWithForm } from "@/shared/ui/radio-group";
+import { CheckboxWithForm } from "@/shared/ui/checkbox";
 import { GENDER, ROLE } from "@/constants/member";
-import { DatePickerWithForm } from "@/components/ui/date-picker";
+import { DatePickerWithForm } from "@/shared/ui/date-picker";
 import { CATEGORIES } from "@/constants/category";
 import { useCreateUser, useRegisterSuccessDialog } from "@/features/users";
 import { createUserFormSchema, CreateUserFormSchema } from "@/services/users";
-import { Image } from "@/components/ui/image";
-import { Button } from "@/components/ui/button";
+import { Image } from "@/shared/ui/image";
+import { Button } from "@/shared/ui/button";
 import SEOConfig from "@/components/SEOConfig";
 
 function OnboardingBaseInfoFields() {

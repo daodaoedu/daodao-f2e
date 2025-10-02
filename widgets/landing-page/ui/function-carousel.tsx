@@ -7,7 +7,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel';
+} from '@/shared/ui/carousel';
 import { ANCHOR_IDS } from '@/shared/constants';
 
 interface FunctionCardProps {

@@ -6,10 +6,10 @@ import {
   useCallback,
   useMemo,
 } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import ResponsiveModal, {
   ResponsiveModalProps,
-} from '@/components/ui/responsive-modal';
+} from '@/shared/ui/responsive-modal';
 import { cn } from '@/utils/cn';
 
 export interface DialogContentProps {

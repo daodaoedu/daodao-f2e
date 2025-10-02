@@ -2,23 +2,23 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { LockKeyholeOpen, LockKeyhole, EllipsisVertical } from 'lucide-react';
 import { useAuth } from '@/contexts/Auth';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import { ROLE } from '@/constants/member';
 import { timeDuration } from '@/utils/date';
 import { CommentSchema, CommentVisibility } from '@/services/comments';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import Shell from '@/public/assets/icons/shell.svg';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+} from '@/shared/ui/collapsible';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/shared/ui/dropdown-menu';
 import CommentInput, { CommentData } from './CommentInput';
 
 interface CommentCardProps extends CommentSchema {

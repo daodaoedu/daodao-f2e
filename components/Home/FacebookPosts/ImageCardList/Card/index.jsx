@@ -1,5 +1,5 @@
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Image } from '@/components/ui/image';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/ui/tooltip';
+import { Image } from '@/shared/ui/image';
 
 const Card = ({ message = '', image, url }) => {
   const handleClick = () => {

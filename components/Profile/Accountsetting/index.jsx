@@ -1,6 +1,6 @@
-import { Title, Text } from '@/components/ui/typography';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { Title, Text } from '@/shared/ui/typography';
+import { Button } from '@/shared/ui/button';
+import { Separator } from '@/shared/ui/separator';
 import { useRouter } from 'next/navigation';
 import { useAuth, useAuthDispatch } from '@/contexts/Auth';
 

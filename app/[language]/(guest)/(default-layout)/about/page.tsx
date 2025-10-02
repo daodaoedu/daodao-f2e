@@ -1,4 +1,4 @@
-import { Paper } from '@/components/ui/wrapper';
+import { Paper } from '@/shared/ui/wrapper';
 import { AboutDaoDao, Vision, Mission, ContactUs } from '@/widgets/about';
 
 export default async function AboutPage() {

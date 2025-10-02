@@ -16,7 +16,7 @@ import {
   Globe,
   Lightbulb,
 } from 'lucide-react';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import type {
   CreateIdeaFormSchema,
   UpdateIdeaFormSchema,
@@ -25,14 +25,14 @@ import {
   useIdeaFormValidation,
   useUpdateIdeaFormValidation,
 } from '@/features/ideas/hooks/useIdeaFormValidation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Textarea } from '@/shared/ui/textarea';
+import { Label } from '@/shared/ui/label';
 import {
   Tooltip, TooltipContent, TooltipTrigger, TooltipProvider,
-} from '@/components/ui/tooltip';
-import { Badge } from '@/components/ui/badge';
+} from '@/shared/ui/tooltip';
+import { Badge } from '@/shared/ui/badge';
 
 // 預設標籤 - 參考 mobile.jsx 的分類系統
 const DEFAULT_TAGS = [

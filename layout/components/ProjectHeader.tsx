@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { LockKeyholeOpen, LockKeyhole, EllipsisVertical } from 'lucide-react';
 import { ROLE } from '@/constants/member';
 import { ProjectSchema } from '@/services/projects';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 
 interface ProjectHeaderProps {
   project: ProjectSchema;

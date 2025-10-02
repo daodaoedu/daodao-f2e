@@ -2,13 +2,13 @@ import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import Link from "next/link";
 import SEOConfig from "@/components/SEOConfig";
 import { circleAPI, CircleSchema } from "@/services/circles";
-import { Background, Container, Paper } from "@/components/ui/wrapper";
+import { Background, Container, Paper } from "@/shared/ui/wrapper";
 import { parseToString } from "@/utils/helper";
-import { BackButton } from "@/components/ui/back-button";
-import { Image } from "@/components/ui/image";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { BackButton } from "@/shared/ui/back-button";
+import { Image } from "@/shared/ui/image";
+import { AspectRatio } from "@/shared/ui/aspect-ratio";
 import { cn } from "@/utils/cn";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/shared/ui/badge";
 import getShareAPI from "@/utils/getShareAPI";
 import FacebookSvg from "@/public/assets/social-icons/facebook.svg";
 import LineSvg from "@/public/assets/social-icons/line.svg";
@@ -31,16 +31,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui";
-import { Text, Title } from "@/components/ui/typography";
+} from "@/shared/ui";
+import { Text, Title } from "@/shared/ui/typography";
 import { EDUCATION, ROLE } from "@/constants/member";
 import { getOptionLabel, getOptionLabels } from "@/utils/option";
 import { ALL_AREAS, AREAS, TBD_OPTION } from "@/constants/areas";
 import { ACTIVITY_CATEGORIES, CATEGORIES } from "@/constants/category";
 import { useAuth } from "@/contexts/Auth";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
+import { MarkdownEditor } from "@/shared/ui/markdown-editor";
 import { timeDuration } from "@/utils/date";
 import { ContactModal, TargetUserType } from "@/features/email";
 

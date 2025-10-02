@@ -6,15 +6,15 @@ import { DayPicker, DropdownProps } from 'react-day-picker';
 import { format } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
 
-import { buttonVariants } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { buttonVariants } from '@/shared/ui/button';
+import { ScrollArea } from '@/shared/ui/scroll-area';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/shared/ui/select';
 import { cn } from '@/utils/cn';
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;

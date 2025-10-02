@@ -13,10 +13,10 @@ import {
 import {
   Check, CloudUpload, Dice5Icon, Link2Icon, X,
 } from 'lucide-react';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import { uploadImagesSchema } from '@/services/images';
-import { Button, type ButtonProps } from '@/components/ui/button';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Button, type ButtonProps } from '@/shared/ui/button';
+import { AspectRatio } from '@/shared/ui/aspect-ratio';
 import { cn } from '@/utils/cn';
 import ResponsiveModal, { ResponsiveModalSize } from './responsive-modal';
 import {

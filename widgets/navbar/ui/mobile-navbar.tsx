@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useScrollVisibility } from '@/hooks/useScrollVisibility';
 import { useEffect, useState } from 'react';
 import { cn } from '@/utils/cn';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import { NAV_ITEMS } from '../model';
 
 export const MobileNavbar = () => {

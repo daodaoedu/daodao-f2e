@@ -15,19 +15,19 @@ import {
   useCircleList,
 } from "@/features/circles";
 import { AuthButton } from "@/contexts/Auth";
-import { Text, Title } from "@/components/ui/typography";
-import { Background, Container, Paper } from "@/components/ui/wrapper";
+import { Text, Title } from "@/shared/ui/typography";
+import { Background, Container, Paper } from "@/shared/ui/wrapper";
 import { ALL_AREAS, TBD_OPTION } from "@/constants/areas";
-import { Checkbox, Input, Label, Button } from "@/components/ui";
+import { Checkbox, Input, Label, Button } from "@/shared/ui";
 import { ACTIVITY_CATEGORIES, CATEGORIES } from "@/constants/category";
 import { EDUCATION } from "@/constants/member";
-import { MultipleSelector } from "@/components/ui/multiple-selector";
-import { Badge } from "@/components/ui/badge";
-import { Image } from "@/components/ui/image";
-import { Separator } from "@/components/ui/separator";
+import { MultipleSelector } from "@/shared/ui/multiple-selector";
+import { Badge } from "@/shared/ui/badge";
+import { Image } from "@/shared/ui/image";
+import { Separator } from "@/shared/ui/separator";
 import { timeDuration } from "@/utils/date";
-import { OptionProps } from "@/components/ui/option";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { OptionProps } from "@/shared/ui/option";
+import { AspectRatio } from "@/shared/ui/aspect-ratio";
 import {
   circleAPI,
   CircleListResponseSchema,
@@ -36,12 +36,12 @@ import {
   circleSearchParamsSchema,
 } from "@/services/circles";
 import { cn } from "@/utils/cn";
-import { Skeleton } from "@/components/ui/skeleton";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
+import { Skeleton } from "@/shared/ui/skeleton";
+import { MarkdownEditor } from "@/shared/ui/markdown-editor";
 import JsonLdFactory from "@/utils/jsonLd";
 import useQueryState from "@/hooks/useQueryState";
 import { getOptionLabel } from "@/utils/option";
-import { Speech } from "@/components/ui/speech";
+import { Speech } from "@/shared/ui/speech";
 
 function Banner() {
   const router = useRouter();

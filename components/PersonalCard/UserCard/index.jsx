@@ -1,7 +1,7 @@
 import { BASE_URL } from '@/constants/common';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import { MapPin, Edit } from 'lucide-react';
 import DropdownMenu from './Dropdown';
 import SocialMediaItem from './SocialMediaItem';

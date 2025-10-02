@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react';
 import { cn } from '@/utils/cn';
 
-import { Text, Title } from '@/components/ui/typography';
+import { Text, Title } from '@/shared/ui/typography';
 import useFetch from '@/hooks/useFetch';
 import GroupCard from './GroupCard';
 import LoadingCard from './LoadingCard';

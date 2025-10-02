@@ -1,5 +1,5 @@
-import { Title, Text } from '@/components/ui/typography';
-import { Button } from '@/components/ui/button';
+import { Title, Text } from '@/shared/ui/typography';
+import { Button } from '@/shared/ui/button';
 
 const GuideWrapper = ({ children }) => (
   <div className="mx-auto pb-10 pt-10 max-md:pb-5 max-md:pt-10">
