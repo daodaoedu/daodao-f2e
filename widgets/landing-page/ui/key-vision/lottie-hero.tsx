@@ -66,6 +66,10 @@ export function LottieHero({
   }, [isMobile, desktopSrc, mobileSrc, preserveAspectRatio]);
 
   return (
-    <div ref={containerRef} className="min-h-[240px]" aria-hidden="true" />
+    <div
+      ref={containerRef}
+      className="aspect-[564/396] w-full md:aspect-[498/320]"
+      aria-hidden="true"
+    />
   );
 }

@@ -18,17 +18,13 @@ export const DesktopNavbar = ({ alwaysShow = false }: DesktopNavbarProps) => {
   const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const root = document.querySelector(':root');
+    const root = document.querySelector<HTMLElement>(':root');
     const navHeight = navRef.current?.offsetHeight ?? 0;
 
-    if (root instanceof HTMLElement) {
-      root.style.setProperty('scroll-padding-top', `${navHeight + 16}px`);
-    }
+    root?.style.setProperty('scroll-padding-top', `${navHeight + 16}px`);
 
     return () => {
-      if (root instanceof HTMLElement) {
-        root.style.removeProperty('scroll-padding-top');
-      }
+      root?.style.removeProperty('scroll-padding-top');
     };
   }, []);
 
