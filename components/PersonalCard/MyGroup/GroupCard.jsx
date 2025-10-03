@@ -9,7 +9,6 @@ import { MapPin, EllipsisVertical } from 'lucide-react';
 import { Image } from '@/shared/ui/image';
 import { useAuth } from '@/contexts/Auth';
 import emptyCoverImg from '@/public/assets/images/empty-cover.png';
-import useMutation from '@/hooks/useMutation';
 import { timeDuration } from '@/utils/date';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 import {
@@ -35,30 +34,15 @@ function GroupCard({
   isGrouping,
   userId,
   updatedDate,
-  onUpdateGrouping,
-  onDeleteGroup,
 }) {
   const { user } = useAuth();
-  const isEnabledMutation = user?.id === userId;
-
-  const apiUpdateGrouping = useMutation(`/circles/${id}`, {
-    method: 'PUT',
-    enabled: isEnabledMutation,
-    onSuccess: onUpdateGrouping,
-  });
-
-  const apiDeleteGroup = useMutation(`/circles/${id}`, {
-    method: 'DELETE',
-    enabled: isEnabledMutation,
-    onSuccess: onDeleteGroup,
-  });
 
   const handleGrouping = () => {
-    apiUpdateGrouping.mutate({ isGrouping: !isGrouping });
+    // apiUpdateGrouping.mutate({ isGrouping: !isGrouping });
   };
 
   const handleDeleteGroup = () => {
-    apiDeleteGroup.mutate();
+    // apiDeleteGroup.mutate();
   };
 
   const formatToString = (data, defaultValue = '') => (Array.isArray(data) && data.length ? data.join('、') : data || defaultValue);

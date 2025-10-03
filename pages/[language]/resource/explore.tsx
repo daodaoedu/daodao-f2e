@@ -1,4 +1,5 @@
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
+import z from "zod";
 import { SWRConfig } from "swr";
 import Link from "next/link";
 import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
@@ -10,10 +11,10 @@ import {
 } from "@/features/resources";
 import JsonLdFactory from "@/utils/jsonLd";
 import { cn } from "@/utils/cn";
-import useSearchParamsManager from "@/hooks/useSearchParamsManager";
 import { Button } from "@/shared/ui/button";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
 import { Container } from "@/shared/ui/wrapper";
+import useQueryState from "@/hooks/useQueryState";
 
 // export const runtime = "experimental-edge";
 
@@ -47,9 +48,10 @@ export default function ResourceCategoriesPage({
   fallback,
   jsonLd,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const [getSearchParams] = useSearchParamsManager();
-  const searchParams = getSearchParams();
-  const keyword = searchParams?.query;
+  const [filters] = useQueryState(z.object({
+    query: z.string(),
+  }));
+  const keyword = filters.query;
 
   return (
     <SWRConfig value={{ fallback }}>

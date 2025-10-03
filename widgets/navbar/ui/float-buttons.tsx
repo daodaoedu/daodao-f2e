@@ -1,6 +1,5 @@
 'use client';
 
-import { useSmoothScroll } from '@/hooks/useSmoothScroll';
 import { useScrollVisibility } from '@/hooks/useScrollVisibility';
 import Image from 'next/image';
 import { Button } from '@/shared/ui/button';
@@ -9,8 +8,14 @@ import { cn } from '@/utils/cn';
 import Link from 'next/link';
 
 export const FloatButtons = () => {
-  const { scrollToTop } = useSmoothScroll();
   const isVisible = useScrollVisibility({ threshold: 300 });
+
+  const handleScrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
 
   return (
     <div
@@ -24,7 +29,7 @@ export const FloatButtons = () => {
       <div className="flex flex-col items-center space-y-2">
         <Button
           type="button"
-          onClick={scrollToTop}
+          onClick={handleScrollToTop}
           variant="ctaPrimary"
           size="icon"
           className="size-12 shadow-none"
