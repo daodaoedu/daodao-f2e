@@ -5,7 +5,7 @@ import {
   ChartNoAxesColumnDecreasingIcon,
   SendHorizontalIcon,
 } from 'lucide-react';
-import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
+import useShadowToggleOnScroll from '@/shared/lib/use-shadow-toggle-on-scroll';
 import { cn } from '@/utils/cn';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';

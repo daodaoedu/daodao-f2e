@@ -1,6 +1,6 @@
 'use client';
 
-import { useScrollVisibility } from '@/hooks/useScrollVisibility';
+import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import Image from 'next/image';
 import { Button } from '@/shared/ui/button';
 import { Icon } from '@/shared/ui/icon';

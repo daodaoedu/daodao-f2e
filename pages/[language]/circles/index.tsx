@@ -8,7 +8,7 @@ import { MapPin, SearchIcon } from "lucide-react";
 import groupBannerPng from "@/public/assets/circles/banner.png";
 import emptyCoverPng from "@/public/assets/images/empty-cover.png";
 import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
-import useMediaQuery from "@/hooks/useMediaQuery";
+import useMediaQuery from "@/shared/lib/use-media-query";
 import {
   createCircleJsonLd,
   getSerializeCircleInfiniteKey,
@@ -39,7 +39,7 @@ import { cn } from "@/utils/cn";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { MarkdownEditor } from "@/shared/ui/markdown-editor";
 import JsonLdFactory from "@/utils/jsonLd";
-import useQueryState from "@/hooks/useQueryState";
+import useQueryState from "@/shared/lib/use-query-state";
 import { getOptionLabel } from "@/utils/option";
 import { Speech } from "@/shared/ui/speech";
 

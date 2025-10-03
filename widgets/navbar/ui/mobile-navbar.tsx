@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useScrollVisibility } from '@/hooks/useScrollVisibility';
+import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import { useEffect, useState } from 'react';
 import { cn } from '@/utils/cn';
 import { Button } from '@/shared/ui/button';

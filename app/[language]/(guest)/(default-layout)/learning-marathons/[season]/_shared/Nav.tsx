@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useSelectedLayoutSegment } from 'next/navigation';
 import { MARATHON_LINKS } from '@/constants/category';
-import useShadowToggleOnScroll from '@/hooks/useShadowToggleOnScroll';
+import useShadowToggleOnScroll from '@/shared/lib/use-shadow-toggle-on-scroll';
 import { cn } from '@/utils/cn';
 
 export default function Nav() {

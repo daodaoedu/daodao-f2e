@@ -1,8 +1,5 @@
 import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 
-const isSetStateActionFn = <T>(value: unknown): value is (prevState: T) => T =>
-  typeof value === 'function';
-
 export default function useControlledState<T>(
   initialState: T,
   controlledState?: T,
@@ -18,7 +15,7 @@ export default function useControlledState<T>(
 
   const setState = useCallback<Dispatch<SetStateAction<T>>>(
     (value) => {
-      const newValue = isSetStateActionFn<T>(value) ? value(state) : value;
+      const newValue = value instanceof Function ? value(state) : value;
 
       if (!Object.is(state, newValue)) {
         onChange?.(newValue);

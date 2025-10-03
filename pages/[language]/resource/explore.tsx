@@ -14,7 +14,7 @@ import { cn } from "@/utils/cn";
 import { Button } from "@/shared/ui/button";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
 import { Container } from "@/shared/ui/wrapper";
-import useQueryState from "@/hooks/useQueryState";
+import useQueryState from "@/shared/lib/use-query-state";
 
 // export const runtime = "experimental-edge";
 

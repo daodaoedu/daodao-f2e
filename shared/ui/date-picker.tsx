@@ -18,7 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/ui/popover';
-import useControlledState from '@/hooks/useControlledState';
+import useControlledState from '@/shared/lib/use-controlled-state';
 import {
   FormField, FormItem, FormLabel, FormMessage,
 } from './form';

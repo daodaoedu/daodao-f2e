@@ -3,7 +3,7 @@ import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { useMemo, useState } from 'react';
 import SEOConfig, { JsonLdType } from '@/components/SEOConfig';
 import { Skeleton } from '@/shared/ui/skeleton';
-import useMediaQuery from '@/hooks/useMediaQuery';
+import useMediaQuery from '@/shared/lib/use-media-query';
 
 import { useProject } from '@/contexts/Project';
 import EditMode from '@/components/Projects/Project/EditMode';

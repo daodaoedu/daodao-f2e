@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { type AnimationItem } from 'lottie-web';
-import useMediaQuery from '@/hooks/useMediaQuery';
+import useMediaQuery from '@/shared/lib/use-media-query';
 
 type Props = {
   desktopSrc: string; // e.g. "/assets/landing-page/key-vision-desktop.json"

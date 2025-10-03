@@ -13,8 +13,8 @@ import {
   ProjectTaskSchema,
 } from '@/services/projects';
 import { getIsCheckDragMilestoneStorage } from '@/utils/storage';
-import { useDraggableSensors } from '@/hooks/useDraggableSensors';
-import { useDraggableContainer } from '@/hooks/useDraggableContainer';
+import { useDraggableSensors } from '@/shared/lib/use-draggable-sensors';
+import { useDraggableContainer } from '@/shared/lib/use-draggable-container';
 import DraggableItem from '@/shared/components/DraggableItem';
 import { DateRangePicker } from '@/shared/ui/date-picker';
 import SwapRightIcon from '@/public/assets/icons/swap-right.svg';

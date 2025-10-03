@@ -17,7 +17,7 @@ import {
   DrawerDescription,
   DrawerFooter,
 } from '@/shared/ui/drawer';
-import useMediaQuery from '@/hooks/useMediaQuery';
+import useMediaQuery from '@/shared/lib/use-media-query';
 
 export interface ResponsiveModalProps {
   open: boolean;
