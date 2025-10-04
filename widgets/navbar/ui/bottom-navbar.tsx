@@ -7,7 +7,7 @@ import { cn } from '@/utils/cn';
 import { Button } from '@/shared/ui/button';
 import { NAV_ITEMS } from '../model';
 
-export const MobileNavbar = () => {
+export const BottomNavbar = () => {
   const isVisible = useScrollVisibility({ threshold: 250 });
   const [activeSection, setActiveSection] = useState<string>('');
 

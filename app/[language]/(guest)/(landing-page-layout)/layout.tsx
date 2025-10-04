@@ -1,4 +1,4 @@
-import { DesktopNavbar, MobileNavbar } from '@/widgets/navbar';
+import { HeaderNavbar, BottomNavbar } from '@/widgets/navbar';
 import { Footer } from '@/widgets/footer';
 
 export default function LandingPageLayout({
@@ -6,8 +6,8 @@ export default function LandingPageLayout({
 }: LayoutProps<'/[language]'>) {
   return (
     <>
-      <DesktopNavbar />
-      <MobileNavbar />
+      <HeaderNavbar />
+      <BottomNavbar />
       <main className="min-h-screen bg-white">{children}</main>
       <Footer />
     </>

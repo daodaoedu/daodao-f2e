@@ -7,26 +7,29 @@ import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
 import { AuthButton } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
+import { usePromotion } from '@/contexts/Promotion';
 import { NAV_ITEMS } from '../model';
 
-interface DesktopNavbarProps {
+interface HeaderNavbarProps {
   alwaysShow?: boolean;
 }
 
-export const DesktopNavbar = ({ alwaysShow = false }: DesktopNavbarProps) => {
+export const HeaderNavbar = ({ alwaysShow = false }: HeaderNavbarProps) => {
   const isVisible = useScrollVisibility({ threshold: 200 });
+  const { setHeight } = usePromotion();
   const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const root = document.querySelector<HTMLElement>(':root');
     const navHeight = navRef.current?.offsetHeight ?? 0;
 
+    setHeight(navHeight);
     root?.style.setProperty('scroll-padding-top', `${navHeight + 16}px`);
 
     return () => {
       root?.style.removeProperty('scroll-padding-top');
     };
-  }, []);
+  }, [setHeight]);
 
   return (
     <nav
