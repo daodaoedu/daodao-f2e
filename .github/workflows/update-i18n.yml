@@ -23,13 +23,15 @@ jobs:
 
       - name: Fetch i18n Translations
         run: pnpm i18n:fetch
+        env:
+          NEXT_I18N_URL: ${{ secrets.NEXT_I18N_URL }}
 
       - name: Check for i18n changes
         id: check_changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add constants/locales
+          git add shared/config/locales
           git diff --cached --quiet || echo "changes=true" >> $GITHUB_OUTPUT
 
       - name: Commit i18n Changes

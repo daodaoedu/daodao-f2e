@@ -1,7 +1,7 @@
 import Script from 'next/script';
 import { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
-import { getDictionary, locales } from '@/constants/i18n';
+import { getDictionary, locales } from '@/shared/config/i18n';
 import { websiteConfig } from '@/constants/websiteConfig';
 import Providers from './Providers';
 import '../global.css';

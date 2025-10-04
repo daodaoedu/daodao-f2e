@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { locales, getDictionary } from '@/constants/i18n';
+import { locales, getDictionary } from '@/shared/config/i18n';
 import MarkdownRenderer from '@/shared/ui/markdown-renderer';
 import { Paper } from '@/shared/ui/wrapper';
 
