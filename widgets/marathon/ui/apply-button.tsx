@@ -9,7 +9,7 @@ interface ApplyButtonProps {
   children: React.ReactNode;
 }
 
-export default function ApplyButton({ className, children }: ApplyButtonProps) {
+export const ApplyButton = ({ className, children }: ApplyButtonProps) => {
   const { openDialog } = useDialog();
 
   const handleClickSignupButton = () => {

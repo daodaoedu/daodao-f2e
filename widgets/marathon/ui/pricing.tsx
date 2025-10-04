@@ -192,7 +192,7 @@ const Section = ({ title, children }: { title?: string; children: ReactNode }) =
 /**
  * 學習馬拉松價格資訊組件
  */
-export default function Pricing() {
+export const Pricing = () => {
   return (
     <div className="w-full max-w-full">
       <Text className="mb-9 text-base font-normal leading-[140%] text-[#536166]">

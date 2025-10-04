@@ -6,7 +6,7 @@ import { MARATHON_LINKS } from '@/constants/category';
 import useShadowToggleOnScroll from '@/shared/lib/use-shadow-toggle-on-scroll';
 import { cn } from '@/utils/cn';
 
-export default function Nav() {
+export const Navbar = () => {
   const segment = useSelectedLayoutSegment();
   const announcementsPath = 'announcements';
 

@@ -259,7 +259,7 @@ function Accordion({
 /**
  * 常見問題元件
  */
-export default function FAQ() {
+export const FAQ = () => {
   return (
     <div className="w-full max-w-full border border-[#DEF5F5] max-md:grid-cols-1">
       {faqItems.map(({ id, question, answer }) => (

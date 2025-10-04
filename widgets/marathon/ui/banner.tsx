@@ -1,5 +1,3 @@
-'use client';
-
 import { Image } from '@/shared/ui/image';
 
 import LearningMarathonImgDesktopGroup from '@/public/assets/learning-marathon/2025S1-desktop-group.png';
@@ -14,18 +12,14 @@ import LearningMarathonImgDesktopBoy from '@/public/assets/learning-marathon/202
 import LearningMarathonImgDesktopBg from '@/public/assets/learning-marathon/2025S1-desktop-bg.png';
 import LearningMarathonImgMobile from '@/public/assets/learning-marathon/2025S1-mobile@2x.png';
 
-import { usePromotion } from '@/contexts/Promotion';
 import { cn } from '@/utils/cn';
-import ApplyButton from './ApplyButton';
+import { ApplyButton } from './apply-button';
 
-const Banner2025S1 = () => {
-  const { isShowPromotionBar } = usePromotion();
-
+export const Banner = () => {
   return (
     <div
       className={cn(
-        'relative mt-16 h-[calc(100vw/0.6428)] overflow-hidden md:h-[calc(100vw/1.6)]',
-        isShowPromotionBar && 'mt-24'
+        'relative h-[calc(100vw/0.6428)] overflow-hidden md:h-[calc(100vw/1.6)]'
       )}
     >
       <div className="hidden md:block">
@@ -203,5 +197,3 @@ const Banner2025S1 = () => {
     </div>
   );
 };
-
-export default Banner2025S1;

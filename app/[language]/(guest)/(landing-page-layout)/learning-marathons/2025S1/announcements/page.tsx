@@ -1,5 +1,4 @@
-import { AnnouncementList } from '@/components/Marathon/Announcement';
-import { announcementItems } from '@/features/marathon';
+import { AnnouncementList, announcements } from '@/entities/marathon';
 
 export async function generateMetadata() {
   return {
@@ -12,7 +11,7 @@ export default async function LearningMarathonsAnnouncementsPage() {
     <div className="min-h-[85dvh] bg-[#EEF9F9]">
       <div className="mx-auto max-w-[750px] px-4 pt-[72px]">
         <h3 className="heading-md text-basic-500">活動公告</h3>
-        <AnnouncementList items={announcementItems} />
+        <AnnouncementList items={announcements} />
       </div>
     </div>
   );

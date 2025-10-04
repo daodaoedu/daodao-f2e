@@ -284,7 +284,7 @@ const Tag = ({ text, className }: TagProps) => (
   </div>
 );
 
-const Mentors = () => {
+export const Mentors = () => {
   const [activeMentorName, setActiveMentorName] = useState<string>('');
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -417,5 +417,3 @@ const Mentors = () => {
     </>
   );
 };
-
-export default Mentors;

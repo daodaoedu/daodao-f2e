@@ -1,28 +1,28 @@
 'use client';
 
 import Link from 'next/link';
+import { ChevronUp } from 'lucide-react';
 import { CSSProperties, useEffect, useState } from 'react';
 import { usePromotion } from '@/contexts/Promotion';
-import { ChevronUp } from 'lucide-react';
 import { cn } from '@/utils/cn';
-import ApplyButton from './ApplyButton';
+import { ApplyButton } from './apply-button';
 
-export default function Sidebar() {
+const sidebarItems = [
+  { label: '活動介紹', href: '#marathon-intro' },
+  { label: '馬拉松進行方式', href: '#marathon-how' },
+  { label: '引導師介紹', href: '#marathon-mentor' },
+  { label: '你可以預期的收穫', href: '#marathon-benefit' },
+  { label: '成果發表與獎勵', href: '#marathon-reward' },
+  { label: '如何申請', href: '#marathon-apply' },
+  { label: '本計畫價值', href: '#marathon-price' },
+  { label: 'FAQ', href: '#marathon-faq' },
+];
+
+export const Sidebar = () => {
   const { height } = usePromotion();
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [isShow, setIsShow] = useState(false);
   const [isOpenSidebar, setIsOpenSidebar] = useState(false);
-
-  const sidebarItems = [
-    { label: '活動介紹', href: '#marathon-intro' },
-    { label: '馬拉松進行方式', href: '#marathon-how' },
-    { label: '引導師介紹', href: '#marathon-mentor' },
-    { label: '你可以預期的收穫', href: '#marathon-benefit' },
-    { label: '成果發表與獎勵', href: '#marathon-reward' },
-    { label: '如何申請', href: '#marathon-apply' },
-    { label: '本計畫價值', href: '#marathon-price' },
-    { label: 'FAQ', href: '#marathon-faq' },
-  ];
 
   useEffect(() => {
     const headings = Array.from(document.querySelectorAll('main h2'));

@@ -150,7 +150,7 @@ const EquipmentCard = ({ equipment }: { equipment: EquipmentItem }) => {
 /**
  * 學習馬拉松裝備展示組件
  */
-export default function Equipment() {
+export const Equipment = () => {
   return (
     <div className="grid w-full max-w-full grid-cols-2 grid-rows-2 gap-5 max-md:grid-cols-1 max-md:grid-rows-none">
       {equipmentItems.map((equipment) => (

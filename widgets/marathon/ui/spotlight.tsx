@@ -103,7 +103,7 @@ const SpotlightCard = ({ spotlight }: { spotlight: SpotlightItem }) => {
 /**
  * 學習馬拉松特色展示組件
  */
-export default function Spotlight() {
+export const Spotlight = () => {
   return (
     <div className="block w-full max-w-full gap-5 space-y-5 max-md:grid-cols-1">
       {spotlightItems.map((spotlight) => (

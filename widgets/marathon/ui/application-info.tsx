@@ -380,7 +380,7 @@ const EvaluationCriterion = ({ id, title, weight, items }: EvaluationCriteria) =
   </>
 );
 
-export default function ApplicationInfo() {
+export const ApplicationInfo = () => {
   return (
     <div className="relative w-full max-w-full after:absolute after:right-0 after:top-[-90px] after:block after:h-[124px] after:w-[167px] after:bg-[url('/assets/learning-marathon/pen.png')] after:bg-cover after:bg-no-repeat after:content-['']">
       <Section title="（一）重要時程">

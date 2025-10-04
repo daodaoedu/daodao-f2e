@@ -1,15 +1,15 @@
-import ApplyButton from './ApplyButton';
-import Sidebar from './Sidebar';
-import Participant from './Participant';
-import Equipment from './Equipment';
-import Spotlight from './Spotlight';
-import ApplicationInfo from './ApplicationInfo';
-import Mentors from './Mentors';
-import Pricing from './Pricing';
-import FAQ from './FAQ';
-import { List, Section } from './Styled';
+import { ApplyButton } from './apply-button';
+import { Sidebar } from './sidebar';
+import { Participant } from './participant';
+import { Equipment } from './equipment';
+import { Spotlight } from './spotlight';
+import { ApplicationInfo } from './application-info';
+import { Mentors } from './mentors';
+import { Pricing } from './pricing';
+import { FAQ } from './f-a-q';
+import { List, Section } from './styled';
 
-const Marathon2025S1 = () => {
+export const Marathon = () => {
   return (
     <>
       <Sidebar />
@@ -209,5 +209,3 @@ const Marathon2025S1 = () => {
     </>
   );
 };
-
-export default Marathon2025S1;

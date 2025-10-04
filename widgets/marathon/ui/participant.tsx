@@ -74,7 +74,7 @@ const ParticipantCard = ({ participant }: { participant: ParticipantType }) => {
 /**
  * 學習馬拉松參與者類型展示組件
  */
-export default function Participant() {
+export const Participant = () => {
   return (
     <div className="grid w-full max-w-full grid-cols-2 grid-rows-2 gap-5 max-md:grid-cols-1 max-md:grid-rows-none">
       {participants.map((participant) => (
