@@ -4,7 +4,6 @@ interface ScrollRestore {
   originalOverflow: string;
   originalPosition: string;
   originalTop: string;
-  originalWidth: string;
   originalScrollY: number;
 }
 
@@ -22,7 +21,6 @@ export function useScrollLock() {
       originalOverflow: originalStyle.overflow,
       originalPosition: originalStyle.position,
       originalTop: originalStyle.top,
-      originalWidth: originalStyle.width,
       originalScrollY: window.scrollY,
     };
 
@@ -32,7 +30,6 @@ export function useScrollLock() {
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.top = `-${originalScrollY}px`;
-    document.body.style.width = '100%';
   }, []);
 
   const unlockScroll = useCallback(() => {
@@ -41,14 +38,12 @@ export function useScrollLock() {
         originalOverflow,
         originalPosition,
         originalTop,
-        originalWidth,
         originalScrollY,
       } = scrollRestoreRef.current;
 
       document.body.style.overflow = originalOverflow;
       document.body.style.position = originalPosition;
       document.body.style.top = originalTop;
-      document.body.style.width = originalWidth;
       window.scrollTo(0, originalScrollY);
 
       scrollRestoreRef.current = null;

@@ -55,10 +55,10 @@ export const Footer = () => {
             <div className="space-y-2">
               <div>
                 <Link
-                  href="/events"
+                  href="/learning-marathons/2025S1"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  活動
+                  學習馬拉松
                 </Link>
               </div>
               <div>

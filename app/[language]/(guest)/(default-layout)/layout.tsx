@@ -7,7 +7,7 @@ export default function DefaultLayout({
   return (
     <>
       <HeaderNavbar alwaysShow />
-      <main className="mt-20 min-h-screen bg-white">{children}</main>
+      <main className="min-h-screen bg-white">{children}</main>
       <Footer />
     </>
   );

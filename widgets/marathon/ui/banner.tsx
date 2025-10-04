@@ -18,20 +18,16 @@ import { ApplyButton } from './apply-button';
 export const Banner = () => {
   return (
     <div
-      className={cn(
-        'relative h-[calc(100vw/0.6428)] overflow-hidden md:h-[calc(100vw/1.6)]'
-      )}
+      className={cn('relative aspect-[9/14] overflow-hidden md:aspect-[16/10]')}
     >
       <div className="hidden md:block">
-        <div className="absolute inset-0">
-          <div className="relative size-full bg-gradient-to-b from-[#fcfefe] via-[#e0f1f2] to-[#e0f1f2]">
-            <Image
-              src={LearningMarathonImgDesktopBg.src}
-              alt="島島盃 - 學習馬拉松 2025 春季賽"
-              fill
-              className="object-cover"
-            />
-          </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#fcfefe] via-[#e0f1f2] to-[#e0f1f2]">
+          <Image
+            src={LearningMarathonImgDesktopBg.src}
+            alt="島島盃 - 學習馬拉松 2025 春季賽"
+            fill
+            className="object-cover"
+          />
         </div>
         <div
           className={cn(
@@ -181,7 +177,7 @@ export const Banner = () => {
           </div>
         </div>
       </div>
-      <div className="md:hidden">
+      <div className="absolute inset-0 md:hidden">
         <div className="relative size-full bg-gradient-to-b from-[#fcfefe] via-[#e0f1f2] to-[#e0f1f2]">
           <Image
             src={LearningMarathonImgMobile.src}
