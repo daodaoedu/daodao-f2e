@@ -1,52 +1,60 @@
-import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/shared/ui/button';
 import { Icon } from '@/shared/ui/icon';
 import { SOCIAL_LINKS, ANCHOR_IDS } from '@/shared/constants';
+import { LanguageSwitcher } from '@/shared/ui/language-switcher';
+import { CustomLink } from '@/shared/ui/custom-link';
 
 export const Footer = () => {
   return (
     <footer className="bg-basic-600 pb-20 pt-12 text-white md:pb-12">
       <div className="container">
-        <div className="mb-8">
-          <Image
-            src="/assets/landing-page/logo-simple-white.svg"
-            alt="島島阿學 Logo"
-            width={142}
-            height={24}
-            className="mb-2"
-          />
-          <p className="text-white/80">
-            Where personal growth meets collective wisdom!
-          </p>
+        <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-start">
+          <div>
+            <Image
+              src="/assets/landing-page/logo-simple-white.svg"
+              alt="島島阿學 Logo"
+              width={142}
+              height={24}
+              className="mb-2"
+            />
+            <p className="text-white/80">
+              Where personal growth meets collective wisdom!
+            </p>
+          </div>
+          
+          {/* 語言切換元件 */}
+          <div className="mt-2 md:mt-0">
+            <LanguageSwitcher />
+          </div>
         </div>
         <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="space-y-4">
             <p className="text-lg text-primary-lighter">關於我們</p>
             <div className="space-y-2">
               <div>
-                <Link
+                <CustomLink
                   href={`/about#${ANCHOR_IDS.ABOUT_DAO_DAO}`}
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   關於島島
-                </Link>
+                </CustomLink>
               </div>
               <div>
-                <Link
+                <CustomLink
                   href={`/about#${ANCHOR_IDS.VISION}`}
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   願景
-                </Link>
+                </CustomLink>
               </div>
               <div>
-                <Link
+                <CustomLink
                   href={`/about#${ANCHOR_IDS.MISSION}`}
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   使命
-                </Link>
+                </CustomLink>
               </div>
             </div>
           </div>
@@ -54,36 +62,36 @@ export const Footer = () => {
             <p className="text-lg text-primary-lighter">資源</p>
             <div className="space-y-2">
               <div>
-                <Link
+                <CustomLink
                   href="/learning-marathons/2025S1"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   學習馬拉松
-                </Link>
+                </CustomLink>
               </div>
               <div>
-                <Link
+                <CustomLink
                   href="/terms/privacy-policy"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   隱私政策
-                </Link>
+                </CustomLink>
               </div>
               <div>
-                <Link
+                <CustomLink
                   href="/terms/service"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   服務條款
-                </Link>
+                </CustomLink>
               </div>
               <div>
-                <Link
+                <CustomLink
                   href="/terms/ipr"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   智慧財產權
-                </Link>
+                </CustomLink>
               </div>
             </div>
           </div>
@@ -110,7 +118,7 @@ export const Footer = () => {
         <div className="mb-8 space-y-4">
           <p className="text-lg text-primary-lighter">追蹤島島</p>
           <div className="flex gap-4">
-            <Link
+            <CustomLink
               href={SOCIAL_LINKS.INSTAGRAM}
               target="_blank"
               rel="noopener noreferrer"
@@ -122,8 +130,8 @@ export const Footer = () => {
                 width={36}
                 height={36}
               />
-            </Link>
-            <Link
+            </CustomLink>
+            <CustomLink
               href={SOCIAL_LINKS.FACEBOOK}
               target="_blank"
               rel="noopener noreferrer"
@@ -135,7 +143,7 @@ export const Footer = () => {
                 width={36}
                 height={36}
               />
-            </Link>
+            </CustomLink>
           </div>
         </div>
         <p className="text-center text-basic-300">

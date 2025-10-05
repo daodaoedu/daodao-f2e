@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import { useEffect, useState } from 'react';
 import { cn } from '@/utils/cn';
@@ -54,7 +54,7 @@ export const BottomNavbar = () => {
               )}
               asChild
             >
-              <Link href={`/#${item.id}`}>{item.label}</Link>
+              <CustomLink href={`/#${item.id}`}>{item.label}</CustomLink>
             </Button>
           );
         })}

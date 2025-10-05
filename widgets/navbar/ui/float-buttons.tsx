@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/shared/ui/button';
 import { Icon } from '@/shared/ui/icon';
 import { cn } from '@/utils/cn';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 
 export const FloatButtons = () => {
   const isVisible = useScrollVisibility({ threshold: 300 });
@@ -46,7 +46,7 @@ export const FloatButtons = () => {
           aria-label="點擊進入心理測驗"
           asChild
         >
-          <Link href="/#personality-test">
+          <CustomLink href="/#personality-test">
             <Image
               src="/assets/landing-page/badge.svg"
               alt="點擊進入心理測驗"
@@ -54,7 +54,7 @@ export const FloatButtons = () => {
               height={90}
               className="animate-spin-slow object-contain"
             />
-          </Link>
+          </CustomLink>
         </Button>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from '@/contexts/Auth';
 import { DialogProvider } from '@/contexts/Dialog';
 import { PromotionProvider } from '@/contexts/Promotion';
+import { NavigationBlockerProvider } from '@/shared/lib/navigation-blocker';
 import { Toaster } from '@/shared/ui/sonner';
 
 const swrConfig = {
@@ -16,16 +17,18 @@ const swrConfig = {
 function Providers({ children }: React.PropsWithChildren) {
   return (
     <SWRConfig value={swrConfig}>
-      <DialogProvider>
-        <AuthProvider>
-          <PromotionProvider>
-            <ThemeProvider attribute="class" themes={['light']}>
-              {children}
-              <Toaster />
-            </ThemeProvider>
-          </PromotionProvider>
-        </AuthProvider>
-      </DialogProvider>
+      <NavigationBlockerProvider>
+        <DialogProvider>
+          <AuthProvider>
+            <PromotionProvider>
+              <ThemeProvider attribute="class" themes={['light']}>
+                {children}
+                <Toaster />
+              </ThemeProvider>
+            </PromotionProvider>
+          </AuthProvider>
+        </DialogProvider>
+      </NavigationBlockerProvider>
     </SWRConfig>
   );
 }

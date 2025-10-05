@@ -1,13 +1,11 @@
 'use client';
 
-import Link from 'next/link';
-import { useEffect, useRef } from 'react';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
 import { AuthButton } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
-import { usePromotion } from '@/contexts/Promotion';
 import { NAV_ITEMS } from '../model';
 
 interface HeaderNavbarProps {
@@ -16,24 +14,9 @@ interface HeaderNavbarProps {
 
 export const HeaderNavbar = ({ alwaysShow = false }: HeaderNavbarProps) => {
   const isVisible = useScrollVisibility({ threshold: 200 });
-  const { setHeight } = usePromotion();
-  const navRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const root = document.querySelector<HTMLElement>(':root');
-    const navHeight = navRef.current?.offsetHeight ?? 0;
-
-    setHeight(navHeight);
-    root?.style.setProperty('scroll-padding-top', `${navHeight + 16}px`);
-
-    return () => {
-      root?.style.removeProperty('scroll-padding-top');
-    };
-  }, [setHeight]);
 
   return (
     <nav
-      ref={navRef}
       className={cn(
         'fixed left-0 right-0 top-0 z-20 hidden items-center justify-between border-b border-white/20 px-8 py-4 backdrop-blur-[10px] transition-[transform,opacity] duration-300 ease-in-out md:flex',
         alwaysShow && 'flex',
@@ -48,14 +31,14 @@ export const HeaderNavbar = ({ alwaysShow = false }: HeaderNavbarProps) => {
           className="cursor-pointer border-none bg-none p-0 transition-transform duration-200 ease-in-out"
           asChild
         >
-          <Link href="/">
+          <CustomLink href="/">
             <Image
               src="/assets/landing-page/logo-simple.svg"
               alt="回到首頁"
               width={142}
               height={24}
             />
-          </Link>
+          </CustomLink>
         </Button>
       </div>
       <ul className="flex items-center gap-8">
@@ -67,7 +50,7 @@ export const HeaderNavbar = ({ alwaysShow = false }: HeaderNavbarProps) => {
               animation="none"
               asChild
             >
-              <Link href={`/#${item.id}`}>{item.label}</Link>
+              <CustomLink href={`/#${item.id}`}>{item.label}</CustomLink>
             </Button>
           </li>
         ))}

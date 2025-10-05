@@ -3,6 +3,11 @@ export const locales = [defaultLocale, 'en'] as const;
 export type Locale = (typeof locales)[number];
 export type Dictionary = typeof import('./locales/zh-TW.json');
 
+export const languageOptions = [
+  { value: 'zh-TW', label: '中文' },
+  { value: 'en', label: 'English' },
+] as const;
+
 const dictionaries: Record<Locale, () => Promise<Dictionary>> = {
   'zh-TW': () => import('./locales/zh-TW.json'),
   en: () => import('./locales/en.json'),
