@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { Banner, Marathon, Navbar } from '@/widgets/marathon';
+import { Banner, Marathon } from '@/widgets/marathon';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -11,7 +11,6 @@ export default async function LearningMarathonsPage() {
   return (
     <>
       <Banner />
-      <Navbar />
       <Marathon />
     </>
   );

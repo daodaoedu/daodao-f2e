@@ -5,14 +5,17 @@ import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import { useEffect, useState } from 'react';
 import { cn } from '@/utils/cn';
 import { Button } from '@/shared/ui/button';
-import { NAV_ITEMS } from '../model';
+import { landingPageNav } from '../model';
 
-export const BottomNavbar = () => {
+export const LandingPageMobileNavbar = () => {
   const isVisible = useScrollVisibility({ threshold: 250 });
-  const [activeSection, setActiveSection] = useState<string>('');
+  const [activeSection, setActiveSection] = useState('');
 
   useEffect(() => {
-    const headings = NAV_ITEMS.map((item) => document.getElementById(item.id));
+    const headings = landingPageNav.map((item) =>
+      document.getElementById(item.href.replace('/#', ''))
+    );
+
     const sections = headings.filter((heading) => heading !== null);
 
     const observer = new IntersectionObserver((entries) => {
@@ -40,11 +43,11 @@ export const BottomNavbar = () => {
       )}
     >
       <ul className="flex h-full items-center justify-around">
-        {NAV_ITEMS.map((item) => {
-          const isActive = activeSection === item.id;
+        {landingPageNav.map((item) => {
+          const isActive = activeSection === item.href.replace('/#', '');
           return (
             <Button
-              key={item.id}
+              key={item.href}
               variant="ghost"
               className={cn(
                 'flex h-full w-full flex-col items-center justify-center space-y-1 rounded-none px-3 py-2 text-base',
@@ -54,7 +57,7 @@ export const BottomNavbar = () => {
               )}
               asChild
             >
-              <CustomLink href={`/#${item.id}`}>{item.label}</CustomLink>
+              <CustomLink href={item.href}>{item.label}</CustomLink>
             </Button>
           );
         })}

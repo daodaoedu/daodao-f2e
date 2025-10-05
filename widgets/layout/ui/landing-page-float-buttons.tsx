@@ -7,7 +7,7 @@ import { Icon } from '@/shared/ui/icon';
 import { cn } from '@/utils/cn';
 import { CustomLink } from '@/shared/ui/custom-link';
 
-export const FloatButtons = () => {
+export const LandingPageFloatButtons = () => {
   const isVisible = useScrollVisibility({ threshold: 300 });
 
   const handleScrollToTop = () => {

@@ -80,7 +80,7 @@ export const Banner = () => {
             'opacity-0 animate-delay-200 animate-duration-500 animate-fade-in'
           )}
         >
-          <div className="animate-delay-200 animate-oscillate">
+          <div className="size-full animate-delay-200 animate-oscillate">
             <div className="relative size-full">
               <Image
                 src={LearningMarathonImgDesktopIcon5.src}
@@ -97,7 +97,7 @@ export const Banner = () => {
             'opacity-0 animate-delay-1700 animate-duration-500 animate-fade-in'
           )}
         >
-          <div className="animate-delay-1700 animate-oscillate">
+          <div className="size-full animate-delay-1700 animate-oscillate">
             <div className="relative size-full">
               <Image
                 src={LearningMarathonImgDesktopIcon3.src}
@@ -114,7 +114,7 @@ export const Banner = () => {
             'opacity-0 animate-delay-500 animate-duration-500 animate-fade-in'
           )}
         >
-          <div className="animate-delay-1100 animate-oscillate">
+          <div className="size-full animate-delay-1100 animate-oscillate">
             <div className="relative size-full">
               <Image
                 src={LearningMarathonImgDesktopIcon1.src}
@@ -131,7 +131,7 @@ export const Banner = () => {
             'opacity-0 animate-delay-1300 animate-duration-500 animate-fade-in'
           )}
         >
-          <div className="animate-delay-1900 animate-oscillate">
+          <div className="size-full animate-delay-1900 animate-oscillate">
             <div className="relative size-full">
               <Image
                 src={LearningMarathonImgDesktopIcon4.src}
@@ -148,7 +148,7 @@ export const Banner = () => {
             'opacity-0 animate-delay-500 animate-duration-500 animate-fade-in'
           )}
         >
-          <div className="animate-delay-300 animate-oscillate">
+          <div className="size-full animate-delay-300 animate-oscillate">
             <div className="relative size-full">
               <Image
                 src={LearningMarathonImgDesktopIcon2.src}
@@ -165,7 +165,7 @@ export const Banner = () => {
             'opacity-0 animate-delay-1900 animate-duration-500 animate-fade-in'
           )}
         >
-          <div className="animate-delay-1300 animate-oscillate">
+          <div className="size-full animate-delay-1300 animate-oscillate">
             <div className="relative size-full">
               <Image
                 src={LearningMarathonImgDesktopIcon6.src}

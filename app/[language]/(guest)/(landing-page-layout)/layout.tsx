@@ -1,13 +1,19 @@
-import { HeaderNavbar, BottomNavbar } from '@/widgets/navbar';
-import { Footer } from '@/widgets/footer';
+import {
+  HeaderNavbar,
+  Footer,
+  LandingPageMobileNavbar,
+  LandingPageFloatButtons,
+  landingPageNav,
+} from '@/widgets/layout';
 
 export default function LandingPageLayout({
   children,
 }: LayoutProps<'/[language]'>) {
   return (
     <>
-      <HeaderNavbar />
-      <BottomNavbar />
+      <HeaderNavbar navItems={landingPageNav} />
+      <LandingPageMobileNavbar />
+      <LandingPageFloatButtons />
       <main className="min-h-screen bg-white">{children}</main>
       <Footer />
     </>

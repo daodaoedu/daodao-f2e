@@ -37,17 +37,15 @@ export default async function LearningMarathonsAnnouncementsPage({
     .slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-[#EEF9F9]">
-      <div className="">
-        <div className="mx-auto max-w-[750px] px-4">
-          <BackButton className="my-4" />
+    <div className="min-h-screen bg-[#EEF9F9] py-14">
+      <div className="mx-auto max-w-[750px] px-4">
+        <BackButton className="my-4" />
 
-          {announcement ? (
-            <AnnouncementDetail item={announcement} />
-          ) : (
-            <div className="text-center text-basic-500">找不到公告</div>
-          )}
-        </div>
+        {announcement ? (
+          <AnnouncementDetail item={announcement} />
+        ) : (
+          <div className="text-center text-basic-500">找不到公告</div>
+        )}
       </div>
 
       <div className="mx-auto max-w-[750px] px-4 pt-[72px]">

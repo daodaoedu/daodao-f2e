@@ -6,19 +6,23 @@ import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
 import { AuthButton } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
-import { NAV_ITEMS } from '../model';
+import { NavItemType } from '../model';
 
 interface HeaderNavbarProps {
+  navItems: NavItemType[];
   alwaysShow?: boolean;
 }
 
-export const HeaderNavbar = ({ alwaysShow = false }: HeaderNavbarProps) => {
+export const HeaderNavbar = ({
+  navItems,
+  alwaysShow = false,
+}: HeaderNavbarProps) => {
   const isVisible = useScrollVisibility({ threshold: 200 });
 
   return (
     <nav
       className={cn(
-        'fixed left-0 right-0 top-0 z-20 hidden items-center justify-between border-b border-white/20 px-8 py-4 backdrop-blur-[10px] transition-[transform,opacity] duration-300 ease-in-out md:flex',
+        'fixed left-0 right-0 top-0 z-20 flex items-center justify-between border-b border-white/20 px-8 py-4 backdrop-blur-[10px] transition-[transform,opacity] duration-300 ease-in-out',
         alwaysShow && 'flex',
         alwaysShow || isVisible
           ? 'pointer-events-auto translate-y-0 opacity-100'
@@ -42,7 +46,7 @@ export const HeaderNavbar = ({ alwaysShow = false }: HeaderNavbarProps) => {
         </Button>
       </div>
       <ul className="flex items-center gap-8">
-        {NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <li key={item.label} className="hidden md:block">
             <Button
               variant="ghost"
@@ -50,7 +54,7 @@ export const HeaderNavbar = ({ alwaysShow = false }: HeaderNavbarProps) => {
               animation="none"
               asChild
             >
-              <CustomLink href={`/#${item.id}`}>{item.label}</CustomLink>
+              <CustomLink href={item.href}>{item.label}</CustomLink>
             </Button>
           </li>
         ))}

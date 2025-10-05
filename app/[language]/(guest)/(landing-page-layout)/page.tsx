@@ -1,4 +1,3 @@
-import { FloatButtons } from '@/widgets/navbar';
 import {
   Loader,
   KeyVision,
@@ -14,10 +13,9 @@ import {
   PersonalitySection,
 } from '@/widgets/landing-page';
 
-export default function HomePage() {
+export default function LandingPage() {
   return (
     <Loader>
-      <FloatButtons />
       <KeyVision />
       <SloganSection />
       <FeatureGrid />
