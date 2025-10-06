@@ -6,6 +6,10 @@ import { AuthProvider } from '@/contexts/Auth';
 import { DialogProvider } from '@/contexts/Dialog';
 import { PromotionProvider } from '@/contexts/Promotion';
 import { NavigationBlockerProvider } from '@/shared/lib/navigation-blocker';
+import {
+  TranslationProvider,
+  TranslationProviderProps,
+} from '@/shared/lib/translation';
 import { Toaster } from '@/shared/ui/sonner';
 
 const swrConfig = {
@@ -14,22 +18,26 @@ const swrConfig = {
   keepPreviousData: true,
 };
 
-function Providers({ children }: React.PropsWithChildren) {
+type ProvidersProps = TranslationProviderProps;
+
+function Providers({ children, dictionary }: ProvidersProps) {
   return (
-    <SWRConfig value={swrConfig}>
-      <NavigationBlockerProvider>
-        <DialogProvider>
-          <AuthProvider>
-            <PromotionProvider>
-              <ThemeProvider attribute="class" themes={['light']}>
-                {children}
-                <Toaster />
-              </ThemeProvider>
-            </PromotionProvider>
-          </AuthProvider>
-        </DialogProvider>
-      </NavigationBlockerProvider>
-    </SWRConfig>
+    <TranslationProvider dictionary={dictionary}>
+      <SWRConfig value={swrConfig}>
+        <NavigationBlockerProvider>
+          <DialogProvider>
+            <AuthProvider>
+              <PromotionProvider>
+                <ThemeProvider attribute="class" themes={['light']}>
+                  {children}
+                  <Toaster />
+                </ThemeProvider>
+              </PromotionProvider>
+            </AuthProvider>
+          </DialogProvider>
+        </NavigationBlockerProvider>
+      </SWRConfig>
+    </TranslationProvider>
   );
 }
 

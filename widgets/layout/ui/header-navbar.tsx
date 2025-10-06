@@ -6,6 +6,7 @@ import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
 import { AuthButton } from '@/contexts/Auth';
 import { cn } from '@/utils/cn';
+import { useTranslation } from '@/shared/lib/translation';
 import { NavItemType } from '../model';
 
 interface HeaderNavbarProps {
@@ -18,6 +19,7 @@ export const HeaderNavbar = ({
   alwaysShow = false,
 }: HeaderNavbarProps) => {
   const isVisible = useScrollVisibility({ threshold: 200 });
+  const { t } = useTranslation();
 
   return (
     <nav
@@ -55,7 +57,7 @@ export const HeaderNavbar = ({
               animation="none"
               asChild
             >
-              <CustomLink href={item.href}>{item.label}</CustomLink>
+              <CustomLink href={item.href}>{t(item.label)}</CustomLink>
             </Button>
           </li>
         ))}

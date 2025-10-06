@@ -1,6 +1,6 @@
 import { HeaderNavbar, Footer, marathonNav } from '@/widgets/layout';
 
-export default function MarathonPageLayout({
+export default async function MarathonPageLayout({
   children,
 }: LayoutProps<'/[language]'>) {
   return (

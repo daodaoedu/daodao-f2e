@@ -1,7 +1,8 @@
 import { ANCHOR_IDS } from '@/shared/constants';
+import { TranslationKeys } from '@/shared/config/i18n';
 
 export interface NavItemType {
-  label: string;
+  label: TranslationKeys;
   href: string;
 }
 

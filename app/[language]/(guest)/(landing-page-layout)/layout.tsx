@@ -6,7 +6,7 @@ import {
   landingPageNav,
 } from '@/widgets/layout';
 
-export default function LandingPageLayout({
+export default async function LandingPageLayout({
   children,
 }: LayoutProps<'/[language]'>) {
   return (

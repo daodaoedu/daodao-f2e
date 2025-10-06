@@ -1,6 +1,11 @@
-import { HeaderNavbar, Footer, LandingPageFloatButtons, landingPageNav } from '@/widgets/layout';
+import {
+  HeaderNavbar,
+  Footer,
+  LandingPageFloatButtons,
+  landingPageNav,
+} from '@/widgets/layout';
 
-export default function DefaultLayout({
+export default async function DefaultLayout({
   children,
 }: LayoutProps<'/[language]'>) {
   return (

@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
   if (pathnameHasLocalePrefix) return NextResponse.next();
 
   const acceptLanguage = request.headers.get('Accept-Language');
-  const locale = getLocale(acceptLanguage, defaultLocale);
+  const locale = getLocale(acceptLanguage);
   const redirectURL = href.replace(origin, `${origin}/${locale}`);
 
   if (locale !== defaultLocale) {
