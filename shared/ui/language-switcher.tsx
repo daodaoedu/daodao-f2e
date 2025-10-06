@@ -1,16 +1,21 @@
 'use client';
 
+import { Suspense } from 'react';
 import { usePathname, useParams, useSearchParams } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import { languageOptions, Locale } from '../config/i18n';
 import { useHash } from '../lib/navigation-blocker';
 import { CustomLink } from './custom-link';
 
+interface LanguageSwitcherButtonsProps {
+  searchParams?: URLSearchParams | null;
+}
 
-export const LanguageSwitcher = () => {
+const LanguageSwitcherButtons = ({
+  searchParams,
+}: LanguageSwitcherButtonsProps) => {
   const params = useParams<{ language: Locale }>();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const hash = useHash();
   const search = searchParams?.size ? `?${searchParams}` : '';
   const finalHref = `${pathname}${search}${hash}`;
@@ -35,5 +40,19 @@ export const LanguageSwitcher = () => {
         </div>
       ))}
     </div>
+  );
+};
+
+const LanguageSwitcherContent = () => {
+  const searchParams = useSearchParams();
+
+  return <LanguageSwitcherButtons searchParams={searchParams} />;
+};
+
+export const LanguageSwitcher = () => {
+  return (
+    <Suspense fallback={<LanguageSwitcherButtons />}>
+      <LanguageSwitcherContent />
+    </Suspense>
   );
 };
