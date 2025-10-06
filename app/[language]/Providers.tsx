@@ -19,7 +19,7 @@ function Providers({ children }: React.PropsWithChildren) {
       <DialogProvider>
         <AuthProvider>
           <PromotionProvider>
-            <ThemeProvider attribute="class">
+            <ThemeProvider attribute="class" themes={['light']}>
               {children}
               <Toaster />
             </ThemeProvider>

@@ -83,7 +83,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         <div className="mt-4 text-balance text-center text-sm text-basic-400">
           註冊即代表您同意島島阿學的
           <Link
-            href="/terms/privacy_policy"
+            href="/terms/privacy-policy"
             target="_blank"
             className="px-1 text-primary-base underline"
           >
@@ -91,7 +91,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </Link>
           與
           <Link
-            href="/terms/privacy_policy"
+            href="/terms/privacy-policy"
             target="_blank"
             className="px-1 text-primary-base underline"
           >

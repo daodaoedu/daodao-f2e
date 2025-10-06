@@ -18,6 +18,8 @@ export default {
     "./layout/**/*.{js,jsx,ts,tsx}",
     "./pages/**/*.{js,jsx,ts,tsx}",
     "./shared/**/*.{js,jsx,ts,tsx}",
+    "./entities/**/*.{ts,tsx}",
+    "./widgets/**/*.{ts,tsx}",
   ],
   theme: {
     container: {
