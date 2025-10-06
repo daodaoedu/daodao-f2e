@@ -1,5 +1,5 @@
-import { Image } from '@/components/ui/image';
-import { Icon } from '@/components/ui/icon';
+import { Image } from '@/shared/ui/image';
+import { Icon } from '@/shared/ui/icon';
 import { AuthButton } from '@/contexts/Auth';
 import { LottieHero } from './lottie-hero';
 
@@ -16,10 +16,7 @@ export function KeyVision() {
       />
       <div className="mx-auto max-w-none px-0 md:px-16 xl:px-24">
         <div className="relative grid grid-cols-12 pt-24 md:pt-32">
-          <div
-            className="relative col-span-12 mx-auto flex w-fit flex-col items-center justify-center text-center font-semibold md:col-span-4 md:items-start md:pl-4 md:text-left lg:col-span-5 lg:pl-32"
-            id="top"
-          >
+          <div className="relative col-span-12 mx-auto flex w-fit flex-col items-center justify-center text-center font-semibold md:col-span-4 md:items-start md:pl-4 md:text-left lg:col-span-5 lg:pl-32">
             <Image
               src="/assets/landing-page/deco-flower-orange.svg"
               alt="裝飾橘花"

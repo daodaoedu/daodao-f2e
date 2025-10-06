@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { ArrowRightIcon } from 'lucide-react';
 import EmptyPng from '@/public/assets/images/empty.png';
-import { Badge } from '@/components/ui/badge';
-import { Image } from '@/components/ui/image';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/shared/ui/badge';
+import { Image } from '@/shared/ui/image';
+import { Button } from '@/shared/ui/button';
 import { HOT_TAGS, ICategory } from '@/constants/category';
 import { ResourceListResponseSchema } from '@/services/resources';
 import { cn } from '@/utils/cn';

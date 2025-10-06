@@ -1,5 +1,5 @@
-import { Text } from '@/components/ui/typography';
-import { Input } from '@/components/ui/input';
+import { Text } from '@/shared/ui/typography';
+import { Input } from '@/shared/ui/input';
 import { X } from 'lucide-react';
 import { forwardRef } from 'react';
 

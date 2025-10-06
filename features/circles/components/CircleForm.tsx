@@ -8,24 +8,24 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Paper } from '@/components/ui/paper';
-import { Selector } from '@/components/ui/select';
-import { Text, Title } from '@/components/ui/typography';
-import { Checkbox, CheckboxWithForm } from '@/components/ui/checkbox';
-import { DatePicker } from '@/components/ui/date-picker';
-import { MultipleSelector } from '@/components/ui/multiple-selector';
-import { OptionProps } from '@/components/ui/option';
-import { Switch } from '@/components/ui/switch';
-import { UploadImage } from '@/components/ui/upload-image';
+} from '@/shared/ui/form';
+import { Input } from '@/shared/ui/input';
+import { Button } from '@/shared/ui/button';
+import { Paper } from '@/shared/ui/paper';
+import { Selector } from '@/shared/ui/select';
+import { Text, Title } from '@/shared/ui/typography';
+import { Checkbox, CheckboxWithForm } from '@/shared/ui/checkbox';
+import { DatePicker } from '@/shared/ui/date-picker';
+import { MultipleSelector } from '@/shared/ui/multiple-selector';
+import { OptionProps } from '@/shared/ui/option';
+import { Switch } from '@/shared/ui/switch';
+import { UploadImage } from '@/shared/ui/upload-image';
 import { ACTIVITY_CATEGORIES, CATEGORIES } from '@/constants/category';
 import { EDUCATION } from '@/constants/member';
 import { AREAS, ONLINE_OPTION, TBD_OPTION } from '@/constants/areas';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Plus } from 'lucide-react';
-import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   CircleFormSchema,

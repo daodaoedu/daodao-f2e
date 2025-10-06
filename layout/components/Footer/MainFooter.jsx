@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import FacebookIconPng from '@/public/assets/social-icons/facebook-icon.png';
 import InstagramIconPng from '@/public/assets/social-icons/instagram-icon.png';
 import IntroList from './IntroList';

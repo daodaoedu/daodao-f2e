@@ -1,4 +1,4 @@
-import { OptionProps } from '@/components/ui/option';
+import { OptionProps } from '@/shared/ui/option';
 import { createOptionMap } from '@/utils/option';
 
 interface OptionWithDescriptionProps extends OptionProps {

@@ -2,8 +2,8 @@
 
 import { useFormContext } from 'react-hook-form';
 import { Link2Icon, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import {
   FormControl,
   FormDescription,
@@ -11,11 +11,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/shared/ui/form';
 import { ResourceFormSchema } from '@/services/resources/core/schema';
-import { Text, Title } from '@/components/ui/typography';
-import { UploadImage } from '@/components/ui/upload-image';
-import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { Text, Title } from '@/shared/ui/typography';
+import { UploadImage } from '@/shared/ui/upload-image';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 
 type ResourceBasicInfoSchema = Pick<
   ResourceFormSchema,

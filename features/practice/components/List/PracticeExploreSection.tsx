@@ -2,17 +2,17 @@ import React, { useState, useCallback } from 'react';
 import {
   Search, Plus, Target, Filter, SortAsc, RefreshCw,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import {
   Card, CardContent, CardHeader, CardTitle,
-} from '@/components/ui/card';
+} from '@/shared/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/shared/ui/dropdown-menu';
 import type { PracticeFilter, Practice } from '@/services/practice/schema';
 import PracticeCard from './PracticeCard';
 import { useFilteredPractices } from '../../hooks';

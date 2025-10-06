@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { subYears } from 'date-fns';
 import toast from 'react-hot-toast';
-import useMediaQuery from '@/hooks/useMediaQuery';
+import useMediaQuery from '@/shared/lib/use-media-query';
 import { useRouter } from 'next/navigation';
 import { TAIWAN_DISTRICT, COUNTRIES } from '@/constants/areas';
 import { useAuth } from '@/contexts/Auth';
@@ -13,13 +13,13 @@ import {
   WANT_TO_DO_WITH_PARTNER,
 } from '@/constants/member';
 
-import { Text } from '@/components/ui/typography';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { DatePicker } from '@/components/ui/date-picker';
+import { Text } from '@/shared/ui/typography';
+import { Input } from '@/shared/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
+import { Switch } from '@/shared/ui/switch';
+import { DatePicker } from '@/shared/ui/date-picker';
 import TagEditor from '@/shared/components/TagEditor';
-import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 import { useTags } from '@/services/tags';
 import ErrorMessage from './ErrorMessage';
 

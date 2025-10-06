@@ -15,9 +15,9 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@/shared/ui/breadcrumb";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
-import { Container } from "@/components/ui/wrapper";
+import { Container } from "@/shared/ui/wrapper";
 
 // export const runtime = "experimental-edge";
 

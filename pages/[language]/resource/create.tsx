@@ -8,12 +8,12 @@ import { toast } from "sonner";
 
 import SEOConfig from "@/components/SEOConfig";
 import DocSvg from "@/public/assets/icons/doc.svg";
-import { Button } from "@/components/ui/button";
-import { Form, parseSchemaAutoFocus } from "@/components/ui/form";
-import { Background, Container, Paper } from "@/components/ui/wrapper";
-import { BackButton } from "@/components/ui/back-button";
-import { Title } from "@/components/ui/typography";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/shared/ui/button";
+import { Form, parseSchemaAutoFocus } from "@/shared/ui/form";
+import { Background, Container, Paper } from "@/shared/ui/wrapper";
+import { BackButton } from "@/shared/ui/back-button";
+import { Title } from "@/shared/ui/typography";
+import { Progress } from "@/shared/ui/progress";
 import { ProtectedComponent } from "@/contexts/Auth";
 import {
   ResourceBasicInfoFields,

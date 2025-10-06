@@ -4,9 +4,9 @@ import { ProtectedComponent, useAuth } from '@/contexts/Auth';
 import Edit from '@/components/PersonalCard/Edit';
 import SEOConfig from '@/components/SEOConfig';
 import MyGroup from '@/components/PersonalCard/MyGroup';
-import useMediaQuery from '@/hooks/useMediaQuery';
+import useMediaQuery from '@/shared/lib/use-media-query';
 import getEnv from '@/utils/env';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 
 const PersonalCardPage = () => {
   const router = useRouter();

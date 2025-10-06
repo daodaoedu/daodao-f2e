@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import Container from '@/shared/components/Container';
 import SidebarWrapper from '@/layout/components/Sidebar/SidebarWrapper';
 import {
@@ -9,7 +9,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
+} from '@/shared/ui/accordion';
 import { usePromotion } from '@/contexts/Promotion';
 import { cn } from '@/utils/cn';
 import SidebarItem from './SidebarItem';

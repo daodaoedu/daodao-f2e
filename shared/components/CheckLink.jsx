@@ -8,10 +8,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Text } from '@/components/ui/typography';
+} from '@/shared/ui/dialog';
+import { Button } from '@/shared/ui/button';
+import { Checkbox } from '@/shared/ui/checkbox';
+import { Text } from '@/shared/ui/typography';
 import { getTrustWebsitesStorage } from '@/utils/storage';
 
 function InternalCheckLink(props, ref) {

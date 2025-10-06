@@ -1,18 +1,12 @@
 import { Fragment, useState } from 'react';
 import { cn } from '@/utils/cn';
 
-import { Text, Title } from '@/components/ui/typography';
-import useFetch from '@/hooks/useFetch';
+import { Text, Title } from '@/shared/ui/typography';
 import GroupCard from './GroupCard';
-import LoadingCard from './LoadingCard';
 import { StyledDivider } from './GroupCard.styled';
 
 const MyGroup = ({ title, sx, userId, className }) => {
   const [response, setResponse] = useState(null);
-  const { isFetching } = useFetch(`/circles/user/${userId}`, {
-    enabled: !!userId,
-    onSuccess: setResponse,
-  });
 
   const getTargetIndexById = (data, id) => {
     if (!Array.isArray(data)) return -1;
@@ -76,9 +70,7 @@ const MyGroup = ({ title, sx, userId, className }) => {
       )}
 
       <div className="w-full">
-        {isFetching ? (
-          <LoadingCard />
-        ) : Array.isArray(response?.data) && response.data.length ? (
+        {Array.isArray(response?.data) && response.data.length ? (
           response.data.map((item, index) => (
             <Fragment key={item.id}>
               {index > 0 && <StyledDivider />}

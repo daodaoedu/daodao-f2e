@@ -3,9 +3,9 @@
 import { useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
-import { Background, Container, Paper } from '@/components/ui/wrapper';
-import { Image } from '@/components/ui/image';
-import { Button } from '@/components/ui/button';
+import { Background, Container, Paper } from '@/shared/ui/wrapper';
+import { Image } from '@/shared/ui/image';
+import { Button } from '@/shared/ui/button';
 import SEOConfig from '@/components/SEOConfig';
 import { useAuth, useAuthDispatch } from './AuthContext';
 

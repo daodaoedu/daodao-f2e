@@ -1,8 +1,8 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import { resourceSearchParamsSchema } from '@/services/resources';
 import { ICategory } from '@/constants/category';
-import { Container } from '@/components/ui/wrapper';
-import useQueryState from '@/hooks/useQueryState';
+import { Container } from '@/shared/ui/wrapper';
+import useQueryState from '@/shared/lib/use-query-state';
 import ResourceSearchBar from './ResourceSearchBar';
 import ResourceContainer from './ResourceContainer';
 import { useResourceList } from '../hooks';

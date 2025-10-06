@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import { format, isWithinInterval, subMonths } from 'date-fns';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import Hot from '@/public/assets/icons/hot.svg';
 import Group from '@/public/assets/icons/group.svg';
 import View from '@/public/assets/icons/view.svg';
@@ -14,9 +14,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+} from '@/shared/ui/dropdown-menu';
+import { Button } from '@/shared/ui/button';
+import { Skeleton } from '@/shared/ui/skeleton';
 import { targetAudienceTypeMap } from '../constants';
 
 export function ResourceCardSkeleton() {

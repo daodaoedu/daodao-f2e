@@ -5,7 +5,7 @@ import {
   Radar,
   RadarChart,
 } from 'recharts';
-import { ChartContainer } from '@/components/ui/chart';
+import { ChartContainer } from '@/shared/ui/chart';
 import { AnalysisType } from '../constants';
 
 interface ResultChartProps {

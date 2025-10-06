@@ -1,5 +1,5 @@
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/shared/ui/skeleton';
+import { Button } from '@/shared/ui/button';
 import { MapPin, EllipsisVertical } from 'lucide-react';
 import {
   StyledAreas,

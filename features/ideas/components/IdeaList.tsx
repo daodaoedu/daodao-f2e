@@ -5,8 +5,8 @@ import {
   RefreshCw,
   Loader2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import IdeaCard from './IdeaCard';
 import { useIdeaSearch, useIdeaActions, useIdeasCache } from '../hooks';
 

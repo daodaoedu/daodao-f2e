@@ -2,7 +2,7 @@ import React from 'react';
 import { Target, BookOpen, LinkIcon } from 'lucide-react';
 import { contentTypeOptions } from '@/constants/practice';
 import { PathInfo } from '@/services/practice/schema';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import Link from 'next/link';
 
 interface StepFivePreviewProps {

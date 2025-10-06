@@ -31,20 +31,18 @@ export function PresentationSection({ className }: PresentationSectionProps) {
 
       {/* 學習進度展示圖片 - 突破 container padding */}
       <div className="flex w-full justify-end md:container md:mx-auto md:justify-center">
-        <div className="block w-full md:max-w-[600px]">
+        <div className="relative block aspect-[78/77] w-full md:aspect-[641/484] md:max-w-[600px]">
           <Image
             src="/assets/landing-page/learning-progress-desktop.png"
-            className="hidden h-auto w-full md:block"
+            className="hidden md:block"
             alt="學習進度展示"
-            width={600}
-            height={400}
+            fill
           />
           <Image
             src="/assets/landing-page/learning-progress-mobile.png"
-            className="block h-auto w-full md:hidden"
+            className="block md:hidden"
             alt="學習進度展示"
-            width={400}
-            height={300}
+            fill
           />
         </div>
       </div>

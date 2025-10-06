@@ -1,5 +1,5 @@
 import useSWRMutation from 'swr/mutation';
-import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
+import ResponsiveModal, { ResponsiveModalSize } from '@/shared/ui/responsive-modal';
 import {
   getProjectOutcomePathname,
   projectOutcomeAPI,

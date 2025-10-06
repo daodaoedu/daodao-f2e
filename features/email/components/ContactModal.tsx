@@ -6,9 +6,9 @@ import { User } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+import { Button } from '@/shared/ui/button';
+import { Checkbox } from '@/shared/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -16,14 +16,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/shared/ui/form';
 import {
   ResponsiveModal,
   ResponsiveModalSize,
-} from '@/components/ui/responsive-modal';
+} from '@/shared/ui/responsive-modal';
 import ChatSvg from '@/public/assets/icons/chat.svg';
 import { AuthButton, useAuth } from '@/contexts/Auth';
-import { Textarea } from '@/components/ui/textarea';
+import { Textarea } from '@/shared/ui/textarea';
 import { ROLE } from '@/constants/member';
 import { contactFormSchema, ContactFormSchema } from '@/services/emails';
 import { getOptionLabel } from '@/utils/option';

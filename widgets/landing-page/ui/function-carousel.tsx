@@ -7,7 +7,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel';
+} from '@/shared/ui/carousel';
 import { ANCHOR_IDS } from '@/shared/constants';
 
 interface FunctionCardProps {
@@ -124,7 +124,7 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
         className
       )}
     >
-      <div className="py-15 px-6 text-teal-800" id={ANCHOR_IDS.FUNCTIONS}>
+      <div className="py-15 px-6 text-teal-800" id={ANCHOR_IDS.FEATURES}>
         <SectionHeader
           title="學習群島上的功能生態"
           variant="dark"
@@ -165,17 +165,15 @@ export function FunctionCarousel({ className }: FunctionCarouselProps) {
       </div>
 
       {/* 底部裝飾圖片 */}
-      <picture className="w-full">
+      <picture className="relative aspect-[111/53] w-full md:aspect-[514/151]">
         <source
-          media="(max-width: 767.98px)"
+          media="(max-width: 767px)"
           srcSet="/assets/landing-page/ribbon-mobile.svg"
         />
         <Image
           src="/assets/landing-page/ribbon-desktop.svg"
           alt="更多功能持續進化為你帶來美好的學習生活"
-          width={1200}
-          height={200}
-          className="w-full"
+          fill
         />
       </picture>
     </section>

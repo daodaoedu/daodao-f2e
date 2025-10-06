@@ -9,8 +9,8 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { Button } from '@/components/ui/button';
+} from '@/shared/ui/collapsible';
+import { Button } from '@/shared/ui/button';
 import { cn } from '@/utils/cn';
 import MilestoneCard from './MilestoneCard';
 import Task from '../Tasks/Task';

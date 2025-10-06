@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import { cn } from '@/utils/cn';
 
 interface TestimonialCardProps {

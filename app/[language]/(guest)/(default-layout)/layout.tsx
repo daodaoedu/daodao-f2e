@@ -1,14 +1,18 @@
-import { DesktopNavbar, MobileNavbar } from '@/widgets/menu';
-import { Footer } from '@/widgets/footer';
+import {
+  HeaderNavbar,
+  Footer,
+  LandingPageFloatButtons,
+  landingPageNav,
+} from '@/widgets/layout';
 
-export default function DefaultLayout({
+export default async function DefaultLayout({
   children,
 }: LayoutProps<'/[language]'>) {
   return (
     <>
-      <DesktopNavbar />
-      <MobileNavbar />
-      <main className="min-h-screen w-full bg-white">{children}</main>
+      <HeaderNavbar alwaysShow navItems={landingPageNav} />
+      <LandingPageFloatButtons />
+      <main className="min-h-screen bg-white">{children}</main>
       <Footer />
     </>
   );

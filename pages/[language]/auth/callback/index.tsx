@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { sendLoginEvent, useAuthDispatch } from '@/contexts/Auth';
 import { getRedirectionStorage } from '@/utils/storage';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import { parseToString } from '@/utils/helper';
 
 export default function AuthCallbackPage() {

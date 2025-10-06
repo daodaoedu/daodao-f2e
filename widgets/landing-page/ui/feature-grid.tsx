@@ -92,7 +92,7 @@ export function FeatureGrid({ className }: FeatureGridProps) {
       <div className="container">
         <div
           className="relative flex flex-col items-center justify-center overflow-x-clip pb-[60px]"
-          id={ANCHOR_IDS.FEATURE}
+          id={ANCHOR_IDS.SOLUTIONS}
         >
           <SectionHeader
             title="告別三大學習困境"

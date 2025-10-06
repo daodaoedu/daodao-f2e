@@ -6,10 +6,9 @@ export const SOCIAL_LINKS = {
 
 // 錨點 ID 常數 - 用於頁面內元素的 id 屬性
 export const ANCHOR_IDS = {
-  ABOUT_DAO_DAO: 'about-dao-dao',
   VISION: 'vision',
   MISSION: 'mission',
-  FEATURE: 'feature',
-  FUNCTIONS: 'functions',
+  SOLUTIONS: 'solutions',
+  FEATURES: 'features',
   PLANS: 'plans',
 } as const;

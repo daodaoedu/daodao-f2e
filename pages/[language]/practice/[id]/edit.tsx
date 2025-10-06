@@ -6,7 +6,7 @@ import { ArrowLeft } from 'lucide-react';
 import { usePracticeDetail, usePracticeManager } from '@/features/practice/hooks';
 import EditForm from '@/features/practice/components/Edit/EditForm';
 import { MotivationType, ReminderFrequency, UpdatePracticeInput, Practice } from '@/features/practice';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import { toast } from 'sonner';
 
 const EditPracticePage: React.FC = () => {

@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import SEOConfig from "@/components/SEOConfig";
-import { Background, Container } from "@/components/ui/wrapper";
+import { Background, Container } from "@/shared/ui/wrapper";
 import { ProtectedComponent } from "@/contexts/Auth";
 import { CircleForm } from "@/features/circles/components/CircleForm";
 

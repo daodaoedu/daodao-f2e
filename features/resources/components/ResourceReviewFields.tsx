@@ -8,9 +8,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Text, Title } from '@/components/ui/typography';
+} from '@/shared/ui/form';
+import { Checkbox } from '@/shared/ui/checkbox';
+import { Text, Title } from '@/shared/ui/typography';
 import {
   ResourceFormSchema,
   ResourceReviewFormSchema,
@@ -21,10 +21,10 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Rating } from '@/components/ui/rating';
-import { MultipleSelector } from '@/components/ui/multiple-selector';
-import { MarkdownEditor } from '@/components/ui/markdown-editor';
+} from '@/shared/ui/select';
+import { Rating } from '@/shared/ui/rating';
+import { MultipleSelector } from '@/shared/ui/multiple-selector';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 import {
   contentFeaturesOptions,
   resourceUsageOptions,

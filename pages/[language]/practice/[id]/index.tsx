@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { usePracticeDetail } from '@/features/practice/hooks';
 import DashboardFlow from '@/features/practice/components/Dashboard/DashboardFlow';
 import { useScrollToTopOnMount } from '@/features/practice/hooks/useScrollToTop';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 
 const PracticeDetailPage: React.FC = () => {
   const router = useRouter();

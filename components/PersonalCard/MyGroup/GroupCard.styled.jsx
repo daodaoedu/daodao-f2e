@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { Separator } from '@/components/ui/separator';
+import { DropdownMenuItem } from '@/shared/ui/dropdown-menu';
+import { Separator } from '@/shared/ui/separator';
 import { cn } from '@/utils/cn';
 
 export const StyledText = ({ children, className, lineClamp = '1', color = '#536166', fontSize = '14px', ...props }) => (

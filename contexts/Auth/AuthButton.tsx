@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { Button, type ButtonProps } from '@/components/ui/button';
+import { Button, type ButtonProps } from '@/shared/ui/button';
 
 import { GACategory, logEvent } from '@/utils/analytics';
 import { useAuth, useAuthDispatch } from './AuthContext';

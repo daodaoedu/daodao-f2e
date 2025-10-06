@@ -3,9 +3,9 @@ import { useRouter } from 'next/router';
 import { ProtectedComponent } from '@/contexts/Auth';
 import SEOConfig from '@/components/SEOConfig';
 import AccountSetting from '@/components/Profile/Accountsetting';
-import useMediaQuery from '@/hooks/useMediaQuery';
+import useMediaQuery from '@/shared/lib/use-media-query';
 import getEnv from '@/utils/env';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 
 const ProfilePage = () => {
   const router = useRouter();

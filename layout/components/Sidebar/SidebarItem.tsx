@@ -1,4 +1,3 @@
-import useSmoothIntoView from '@/hooks/useSmoothIntoView';
 import { cn } from '@/utils/cn';
 import { activeClass, defaultClass, disableClass } from './constant';
 
@@ -14,10 +13,8 @@ function SidebarItem({
   isDisabled,
   ...props
 }: SidebarItemProps) {
-  const ref = useSmoothIntoView<HTMLDivElement>();
   return (
     <div
-      ref={ref}
       className={cn(
         defaultClass,
         isActive && activeClass,

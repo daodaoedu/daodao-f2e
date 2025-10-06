@@ -1,6 +1,6 @@
 import { ToggleProvider, useToggle } from '@/contexts/Toggle';
 import { cn } from '@/utils/cn';
-import useClickOutside from '@/hooks/useClickOutside';
+import useClickOutside from '@/shared/lib/use-click-outside';
 import Button, { ButtonProps } from '@/shared/components/Button';
 
 interface DropdownContentProps {

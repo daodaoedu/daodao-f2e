@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 
-import { Title, Text } from '@/components/ui/typography';
-import { Separator } from '@/components/ui/separator';
+import { Title, Text } from '@/shared/ui/typography';
+import { Separator } from '@/shared/ui/separator';
 import SEOConfig from '@/components/SEOConfig';
 
 import CheckIconSvg from '@/public/assets/icons/check_icon.svg';

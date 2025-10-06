@@ -1,5 +1,5 @@
-import { Text } from '@/components/ui/typography';
-import { Button } from '@/components/ui/button';
+import { Text } from '@/shared/ui/typography';
+import { Button } from '@/shared/ui/button';
 import { cn } from '@/utils/cn';
 
 export const FormWrapper = ({ children, ...props }) => (

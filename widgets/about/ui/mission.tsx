@@ -1,5 +1,5 @@
 import React from 'react';
-import { Title, Text } from '@/components/ui/typography';
+import { Title, Text } from '@/shared/ui/typography';
 import { ANCHOR_IDS } from '@/shared/constants';
 
 export const Mission = () => (

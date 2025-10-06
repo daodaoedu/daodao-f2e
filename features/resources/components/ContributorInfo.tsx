@@ -3,9 +3,9 @@ import React from 'react';
 import Link from 'next/link';
 import { Mail } from 'lucide-react';
 import { ResourceDetailResponseSchema } from '@/services/resources/core/schema';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+import { Badge } from '@/shared/ui/badge';
+import { Button } from '@/shared/ui/button';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
 
 interface ContributorInfoProps {
