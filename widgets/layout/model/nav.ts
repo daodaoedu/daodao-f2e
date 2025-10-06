@@ -7,30 +7,30 @@ export interface NavItemType {
 
 export const landingPageNav: NavItemType[] = [
   {
-    label: '解決困境',
-    href: `/#${ANCHOR_IDS.FEATURE}`,
+    label: 'common.landing_solutions',
+    href: `/#${ANCHOR_IDS.SOLUTIONS}`,
   },
   {
-    label: '功能生態',
-    href: `/#${ANCHOR_IDS.FUNCTIONS}`,
+    label: 'common.landing_features',
+    href: `/#${ANCHOR_IDS.FEATURES}`,
   },
   {
-    label: '方案',
+    label: 'common.landing_plans',
     href: `/#${ANCHOR_IDS.PLANS}`,
   },
 ];
 
 export const marathonNav: NavItemType[] = [
   {
-    label: '活動詳情',
+    label: 'common.marathon_details',
     href: '/learning-marathons/2025S1',
   },
   {
-    label: '活動公告',
+    label: 'common.marathon_announcements',
     href: '/learning-marathons/2025S1/announcements',
   },
   {
-    label: '學習計畫分享區',
+    label: 'common.marathon_projects',
     href: '/projects',
   },
 ];

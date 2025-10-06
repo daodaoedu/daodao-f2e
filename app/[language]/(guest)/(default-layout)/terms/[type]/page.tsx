@@ -15,8 +15,8 @@ const getTermsData = async (type: string, language: string) => {
   }
   const dictionary = await getDictionary(language);
   return {
-    title: dictionary.terms?.[`${type}-title`],
-    content: dictionary.terms?.[`${type}-content`],
+    title: dictionary.terms[`${type}_title`],
+    content: dictionary.terms[`${type}_content`],
   };
 };
 

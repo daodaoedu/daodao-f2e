@@ -1,14 +1,20 @@
 {
   "common": {
     "title": "DaoDao",
-    "description": "DaoDao aims to build a diverse network of learning resources, enabling self-directed learners to find suitable ways to grow and become the people they aspire to be, while fostering a spirit of mutual support. We are currently actively developing a collaborative learning resource platform."
+    "description": "DaoDao aims to build a diverse network of learning resources, enabling self-directed learners to find suitable ways to grow and become the people they aspire to be, while fostering a spirit of mutual support. We are currently actively developing a collaborative learning resource platform.",
+    "landing_solutions": "Solutions",
+    "landing_features": "Features",
+    "landing_plans": "Plans",
+    "marathon_details": "Event Details",
+    "marathon_announcements": "Announcements",
+    "marathon_projects": "Learning Projects"
   },
   "terms": {
-    "privacy-policy-title": "",
-    "privacy-policy-content": "",
-    "ipr-title": "",
-    "ipr-content": "",
-    "service-title": "",
-    "service-content": ""
+    "privacy-policy_title": "Privacy Policy",
+    "privacy-policy_content": "",
+    "ipr_title": "Intellectual Property Rights",
+    "ipr_content": "",
+    "service_title": "Terms of Service",
+    "service_content": ""
   }
 }
