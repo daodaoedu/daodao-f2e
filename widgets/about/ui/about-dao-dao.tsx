@@ -1,10 +1,9 @@
 import React from 'react';
 import { Title, Text } from '@/shared/ui/typography';
 import { Image } from '@/shared/ui/image';
-import { ANCHOR_IDS } from '@/shared/constants';
 
 export const AboutDaoDao = () => (
-  <section id={ANCHOR_IDS.ABOUT_DAO_DAO}>
+  <section>
     <Title as="h1" size="xl">
       關於島島
     </Title>

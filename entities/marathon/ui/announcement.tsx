@@ -3,17 +3,13 @@
 import Link from 'next/link';
 import MarkdownRenderer from '@/shared/ui/markdown-renderer';
 import { Badge } from '@/shared/ui/badge';
+import { AnnouncementItemType } from '../model';
 
-type AnnouncementItem = {
-  id: string;
-  author: string;
-  content: string;
-  title: string;
-  tag: string;
-  times: string;
-};
+interface AnnouncementListProps {
+  items: AnnouncementItemType[];
+}
 
-export const AnnouncementList = ({ items }: { items: AnnouncementItem[] }) => (
+export const AnnouncementList = ({ items }: AnnouncementListProps) => (
   <div className="flex flex-col gap-3 py-6">
     {items.map(({ id, tag, times, title }) => (
       <Link
@@ -33,7 +29,11 @@ export const AnnouncementList = ({ items }: { items: AnnouncementItem[] }) => (
   </div>
 );
 
-export const AnnouncementDetail = ({ item }: { item: AnnouncementItem }) => {
+interface AnnouncementDetailProps {
+  item: AnnouncementItemType;
+}
+
+export const AnnouncementDetail = ({ item }: AnnouncementDetailProps) => {
   const { author, content, tag, times, title } = item;
 
   return (

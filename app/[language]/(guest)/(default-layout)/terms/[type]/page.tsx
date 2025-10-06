@@ -44,7 +44,7 @@ export default async function TermsPage({
   const { content } = await getTermsData(type, language);
 
   return (
-    <div className="px-4 pt-20">
+    <div className="bg-primary-pale px-4 py-20">
       <Paper className="container prose my-12 max-w-5xl rounded py-8 shadow-lg">
         <MarkdownRenderer source={content} />
       </Paper>

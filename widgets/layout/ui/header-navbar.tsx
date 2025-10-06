@@ -33,6 +33,7 @@ export const HeaderNavbar = ({
         <Button
           variant="ghost"
           className="cursor-pointer border-none bg-none p-0 transition-transform duration-200 ease-in-out"
+          animation="none"
           asChild
         >
           <CustomLink href="/">

@@ -22,7 +22,7 @@ export const Footer = () => {
               Where personal growth meets collective wisdom!
             </p>
           </div>
-          
+
           {/* 語言切換元件 */}
           <div className="mt-2 md:mt-0">
             <LanguageSwitcher />
@@ -34,7 +34,7 @@ export const Footer = () => {
             <div className="space-y-2">
               <div>
                 <CustomLink
-                  href={`/about#${ANCHOR_IDS.ABOUT_DAO_DAO}`}
+                  href="/about"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
                   關於島島

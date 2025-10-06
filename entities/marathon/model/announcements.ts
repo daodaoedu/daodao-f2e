@@ -1,4 +1,13 @@
-export const announcements = [
+export interface AnnouncementItemType {
+  id: string;
+  author: string;
+  title: string;
+  tag: string;
+  times: string;
+  content: string;
+}
+
+export const announcements: AnnouncementItemType[] = [
   {
     title: '🚨島島盃｜2025 春季學習馬拉松 即將於1月24日23:59截止',
     tag: '活動公告',

@@ -37,7 +37,7 @@ export default async function LearningMarathonsAnnouncementsPage({
     .slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-[#EEF9F9] py-14">
+    <div className="min-h-screen bg-primary-pale py-14">
       <div className="mx-auto max-w-[750px] px-4">
         <BackButton className="my-4" />
 

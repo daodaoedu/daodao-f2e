@@ -86,7 +86,7 @@ const PageProjectsEvents = () => {
   }, []);
 
   return (
-    <div className="bg-[#EEF9F9]">
+    <div className="bg-primary-pale">
       <div className="mx-auto w-[670px] max-w-full flex flex-col gap-6 px-4 py-8 md:py-28">
         <div>
           <h2 className="text-basic-500 heading-md">
