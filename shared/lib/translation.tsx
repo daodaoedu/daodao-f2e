@@ -1,7 +1,12 @@
 'use client';
 
 import { createContext, useContext, ReactNode } from 'react';
-import { Dictionary, getText, TranslationKeys } from '@/shared/config/i18n';
+import {
+  Dictionary,
+  getText,
+  TranslationKeys,
+  TranslationVariables,
+} from '@/shared/config/i18n';
 
 const TranslationContext = createContext<Dictionary | null>(null);
 
@@ -27,12 +32,13 @@ export const useTranslation = () => {
   }
 
   return {
-    t: (key: TranslationKeys) => getText(dictionary, key),
+    t: (key: TranslationKeys, variables?: TranslationVariables) =>
+      getText(dictionary, key, variables),
     dictionary,
   };
 };
 
 export interface TranslationContextValue {
   dictionary: Dictionary;
-  t: (key: TranslationKeys) => string;
+  t: (key: TranslationKeys, variables?: TranslationVariables) => string;
 }

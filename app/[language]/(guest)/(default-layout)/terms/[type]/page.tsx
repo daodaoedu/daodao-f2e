@@ -4,28 +4,35 @@ import { locales, getDictionary, getText } from '@/shared/config/i18n';
 import MarkdownRenderer from '@/shared/ui/markdown-renderer';
 import { Paper } from '@/shared/ui/wrapper';
 
-const termsTypes = ['ipr', 'privacy-policy', 'service'] as const;
+const termsMap = {
+  ipr: 'ipr',
+  service: 'service',
+  'privacy-policy': 'privacy_policy',
+} as const;
 
-const checkTermsType = (type: string): type is (typeof termsTypes)[number] =>
-  termsTypes.includes(type as (typeof termsTypes)[number]);
+const getTermsI18nKey = (type: string) => {
+  const value = termsMap[type as keyof typeof termsMap];
+  if (!value) {
+    notFound();
+  }
+  return value;
+};
 
 const getTermsData = async (
   params: PageProps<'/[language]/terms/[type]'>['params']
 ) => {
   const { language, type } = await params;
-  if (!checkTermsType(type)) {
-    notFound();
-  }
   const dictionary = await getDictionary(language);
+  const snakeCaseType = getTermsI18nKey(type);
   return {
-    title: getText(dictionary, `terms.${type}_title`),
-    content: getText(dictionary, `terms.${type}_content`),
+    title: getText(dictionary, `terms.${snakeCaseType}_title`),
+    content: getText(dictionary, `terms.${snakeCaseType}_content`),
   };
 };
 
 export async function generateStaticParams() {
   return locales.flatMap((language) =>
-    termsTypes.map((type) => ({ language, type }))
+    Object.keys(termsMap).map((type) => ({ language, type }))
   );
 }
 
@@ -45,7 +52,7 @@ export default async function TermsPage({
   const { content } = await getTermsData(params);
 
   return (
-    <div className="min-h-screen bg-primary-pale px-4 py-24">
+    <div className="bg-primary-pale min-h-screen px-4 py-24">
       <Paper className="container prose max-w-5xl rounded py-8 shadow-lg">
         <MarkdownRenderer source={content} />
       </Paper>

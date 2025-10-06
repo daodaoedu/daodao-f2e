@@ -1,4 +1,6 @@
-import fallbackDictionary from './locales/zh-TW.json';
+import { unstable_rootParams } from 'next/server';
+import zhDictionary from './locales/zh-TW.json';
+import enDictionary from './locales/en.json';
 
 export const defaultLocale = 'zh-TW';
 export const locales = [defaultLocale, 'en'] as const;
@@ -10,26 +12,28 @@ export const languageOptions = [
   { value: 'en', label: 'English' },
 ] as const;
 
-const dictionaries: Record<Locale, () => Promise<Dictionary>> = {
-  'zh-TW': () =>
-    import('./locales/zh-TW.json').then((module) => module.default),
-  en: () => import('./locales/en.json').then((module) => module.default),
+const dictionaries: Record<Locale, Dictionary> = {
+  'zh-TW': zhDictionary,
+  en: enDictionary,
 };
 
 export const isLocale = (language: string): language is Locale =>
   locales.findIndex((locale) => locale === language) > -1;
 
-type LocaleOrParamsType = string | LayoutProps<'/[language]'>['params'];
+type ParamsType = LayoutProps<'/[language]'>['params'];
+
+type LocaleOrParamsType =
+  | string
+  | ParamsType
+  | ReturnType<typeof unstable_rootParams>;
 
 export const getDictionary = async (localeOrParams: LocaleOrParamsType) => {
   const locale =
     typeof localeOrParams === 'string'
       ? localeOrParams
-      : (await localeOrParams).language;
+      : (await (localeOrParams as ParamsType))?.language;
 
-  return isLocale(locale)
-    ? dictionaries[locale]()
-    : dictionaries[defaultLocale]();
+  return isLocale(locale) ? dictionaries[locale] : dictionaries[defaultLocale];
 };
 
 /**
@@ -80,10 +84,23 @@ const getNestedValue = (dictionary: Dictionary, key: string) => {
   }
 };
 
-export const getText = (dictionary: Dictionary, key: TranslationKeys) => {
-  return (
+export type TranslationVariables = Record<string, string | number>;
+
+export const getText = (
+  dictionary: Dictionary,
+  key: TranslationKeys,
+  variables?: TranslationVariables
+) => {
+  let text =
     getNestedValue(dictionary, key) ||
-    getNestedValue(fallbackDictionary, key) ||
-    key
-  );
+    getNestedValue(dictionaries[defaultLocale], key) ||
+    key;
+
+  if (variables) {
+    Object.entries(variables).forEach(([varKey, value]) => {
+      text = text.replace(`{${varKey}}`, value.toString());
+    });
+  }
+
+  return text;
 };
