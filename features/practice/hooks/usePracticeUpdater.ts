@@ -1,4 +1,4 @@
-import practiceAPI, { getPracticePathname } from '@/services/practice/api';
+import practiceAPI from '@/services/practice/api';
 import type { UpdatePracticeInput, CheckInInput } from '@/services/practice/schema';
 import { invalidateAllCaches } from './utils';
 
@@ -6,21 +6,21 @@ import { invalidateAllCaches } from './utils';
 export function usePracticeUpdater(practiceId: string | undefined) {
   const updatePractice = async (updates: UpdatePracticeInput) => {
     if (!practiceId) return undefined;
-    const result = await practiceAPI.update(getPracticePathname(), { arg: { id: practiceId, ...updates } });
+    const result = await practiceAPI.update(practiceId, updates);
     invalidateAllCaches(practiceId);
     return result;
   };
 
   const deletePractice = async () => {
     if (!practiceId) return undefined;
-    await practiceAPI.delete(getPracticePathname(), { arg: { id: practiceId } });
+    await practiceAPI.delete(practiceId);
     invalidateAllCaches(practiceId);
     return undefined;
   };
 
   const checkIn = async (input: CheckInInput) => {
     if (!practiceId) return undefined;
-    const result = await practiceAPI.checkIn(getPracticePathname(), { arg: input });
+    const result = await practiceAPI.checkIn(input);
     invalidateAllCaches(practiceId);
     return result;
   };

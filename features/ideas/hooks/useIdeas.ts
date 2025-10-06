@@ -26,13 +26,13 @@ export function useIdeas(params?: IdeaSearchParamsSchema) {
   );
 
   return {
-    ideas: data?.ideas ?? [],
+    ideas: data?.data ?? [],
     pagination: data?.pagination,
     isLoading,
     isError: !!error,
     error,
     refresh: mutate,
-    isEmpty: !isLoading && (!data?.ideas || data.ideas.length === 0),
+    isEmpty: !isLoading && (!data?.data || data.data.length === 0),
   };
 }
 
@@ -64,6 +64,8 @@ export function useIdea(ideaId: string) {
 export function useIdeaSearch(initialParams?: IdeaSearchParamsSchema) {
   const [searchParams, setSearchParams] = useState<IdeaSearchParamsSchema>(
     initialParams ?? {
+      page: 1,
+      pageSize: 20,
       sortBy: 'createdDate',
       sortOrder: 'desc',
     }
@@ -79,6 +81,8 @@ export function useIdeaSearch(initialParams?: IdeaSearchParamsSchema) {
 
   const clearSearch = useCallback(() => {
     setSearchParams({
+      page: 1,
+      pageSize: 20,
       sortBy: 'createdDate',
       sortOrder: 'desc',
     });

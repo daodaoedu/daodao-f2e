@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Lightbulb, Target, BookOpen, ChevronDown, MoreVertical, Shell, MessageCircle, Share2, Link as LinkIcon, Bookmark, Flag, User, Flame } from 'lucide-react';
+import { Plus, Lightbulb, Target, BookOpen, ChevronDown, MoreVertical, Share2, Bookmark, Flag, User, Flame } from 'lucide-react';
+import Shell from '@/public/assets/icons/shell.svg';
+import Comment from '@/public/assets/icons/comment.svg';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -14,7 +16,14 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Container } from '@/components/ui/container';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/utils/cn';
+import { timeDuration } from '@/utils/date';
+import useSWR from 'swr';
+import { fetcher } from '@/utils/http';
+import { IdeaCard } from '@/features/ideas/components';
+import IdeaCreateContainer from '@/features/ideas/components/IdeaCreateContainer';
+import type { IdeaSchema } from '@/services/ideas/schema';
 
 // ========================================
 // ExploreTabs Component
@@ -49,7 +58,7 @@ function ExploreTabs({ activeTab, onTabChange, onCreateNew }: ExploreTabsProps) 
   return (
     <>
       <div className="mb-4 sm:mb-4 flex justify-center py-2 sm:py-4 px-4">
-        <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl bg-card border border-border rounded-lg px-4 py-4">
+        <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl bg-basic-white border border-basic-200 rounded-lg px-4 py-4">
           <nav className="flex items-center justify-between">
             <div className="flex space-x-2 sm:space-x-4 lg:space-x-8 overflow-x-auto">
               {tabs.map((tab) => (
@@ -61,7 +70,7 @@ function ExploreTabs({ activeTab, onTabChange, onCreateNew }: ExploreTabsProps) 
                     'py-2 sm:py-4 px-1 sm:px-2 font-medium text-xs sm:text-sm transition-colors rounded-lg whitespace-nowrap flex-shrink-0',
                     activeTab === tab
                       ? 'bg-primary-base text-white hover:bg-primary-darker hover:text-white'
-                      : 'text-foreground hover:text-primary-base hover:bg-primary-base/10'
+                      : 'text-basic-500 hover:text-primary-base hover:bg-primary-base/10'
                   )}
                 >
                   {tab}
@@ -83,19 +92,18 @@ function ExploreTabs({ activeTab, onTabChange, onCreateNew }: ExploreTabsProps) 
                   </Button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent className="w-64 sm:w-72 mt-1" align="end">
-                  {createOptions.map((option, index) => (
+                <DropdownMenuContent className="w-64 sm:w-72 mt-1 p-2 bg-basic-white border-basic-200 text-basic-500" align="end">
+                  {createOptions.map((option) => (
                     <DropdownMenuItem
                       key={option.id}
                       className={cn(
-                        'flex items-start w-full px-4 py-3 text-left hover:bg-primary-lightest cursor-pointer',
-                        index < createOptions.length - 1 && 'border-b border-border'
+                        'flex items-start w-full px-4 py-3 text-left cursor-pointer hover:bg-basic-100 focus:bg-basic-100'
                       )}
                       onClick={() => onCreateNew(option.id)}
                     >
                       <div>
-                        <div className="font-medium text-foreground">{option.title}</div>
-                        <div className="text-sm text-muted-foreground mt-1">{option.description}</div>
+                        <div className="font-medium text-basic-500">{option.title}</div>
+                        <div className="text-sm text-basic-300 mt-1">{option.description}</div>
                       </div>
                     </DropdownMenuItem>
                   ))}
@@ -105,181 +113,10 @@ function ExploreTabs({ activeTab, onTabChange, onCreateNew }: ExploreTabsProps) 
           </nav>
         </div>
       </div>
-
-      <div className="flex justify-center px-4 mb-6">
-        <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl h-px bg-border"></div>
-      </div>
     </>
   );
 }
 
-// ========================================
-// IdeaCard Component
-// ========================================
-
-interface IdeaCardProps {
-  idea: {
-    id: string;
-    author: {
-      name: string;
-      avatar?: string;
-      tags: string[];
-    };
-    content: string;
-    tags: string[];
-    link?: string;
-    publishDate: string;
-    likes: number;
-    comments: number;
-  };
-  onLike?: (id: string) => void;
-  onComment?: (id: string) => void;
-  onShare?: (id: string) => void;
-  onSave?: (id: string) => void;
-  onReport?: (id: string) => void;
-}
-
-function IdeaCard({
-  idea,
-  onLike,
-  onComment,
-  onShare,
-  onSave,
-  onReport,
-}: IdeaCardProps) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  return (
-    <Card className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-card rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-border relative">
-      <CardContent className="p-3 sm:p-4 md:p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary-base flex items-center justify-center mr-2 sm:mr-3">
-              <span className="text-primary-foreground text-xs sm:text-sm font-bold">
-                {idea.author.name.charAt(0)}
-              </span>
-            </div>
-            <div>
-              <div>
-                <span className="text-xs sm:text-sm font-medium text-foreground mr-2">
-                  {idea.author.name}
-                </span>
-              </div>
-              <div className="text-xs text-muted-foreground mt-0.5">
-                {idea.author.tags.join(' | ')}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-1 sm:space-x-2 mt-0">
-            <Badge
-              style={{ backgroundColor: '#ffa10b' }}
-              className="text-primary-foreground text-xs hidden sm:inline-block"
-            >
-              想法
-            </Badge>
-            <div className="text-xs text-muted-foreground hidden sm:block">{idea.publishDate}</div>
-            <div className="relative">
-              <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-                  >
-                    <MoreVertical size={14} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-32" align="end">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      onSave?.(idea.id);
-                      setIsDropdownOpen(false);
-                    }}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <Bookmark size={14} className="mr-2" />
-                    儲存
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      onReport?.(idea.id);
-                      setIsDropdownOpen(false);
-                    }}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <Flag size={14} className="mr-2" />
-                    檢舉
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        </div>
-
-        <p className="text-foreground mb-3 sm:mb-4 text-sm sm:text-base line-clamp-3 sm:line-clamp-none">{idea.content}</p>
-
-        <div className="flex gap-1 sm:gap-2 mb-3 sm:mb-4 flex-wrap">
-          {idea.tags.map((tag) => (
-            <Badge
-              key={tag}
-              variant="secondary"
-              className="px-1.5 py-0.5 sm:px-2 bg-muted text-muted-foreground text-xs font-medium rounded-full"
-            >
-              {tag}
-            </Badge>
-          ))}
-        </div>
-
-        {idea.link && (
-          <div className="flex items-center p-2 sm:p-3 bg-primary-lightest rounded-lg mb-3 sm:mb-4">
-            <LinkIcon size={14} className="text-primary-base mr-1 sm:mr-2 flex-shrink-0" />
-            <Button
-              variant="ghost"
-              onClick={() => window.open(idea.link, '_blank')}
-              className="text-primary-darker text-xs sm:text-sm truncate p-0 h-auto hover:underline"
-            >
-              {idea.link}
-            </Button>
-          </div>
-        )}
-
-        <div className="pt-3 sm:pt-4 border-t border-border">
-          <div className="flex items-center space-x-2 sm:space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onLike?.(idea.id)}
-              className="flex items-center space-x-1 text-muted-foreground hover:text-primary-base p-1"
-            >
-              <Shell size={14} />
-              <span className="text-xs sm:text-sm font-medium">{idea.likes}</span>
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onComment?.(idea.id)}
-              className="flex items-center space-x-1 text-muted-foreground hover:text-primary-base p-1"
-            >
-              <MessageCircle size={14} />
-              <span className="text-xs sm:text-sm">{idea.comments}</span>
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onShare?.(idea.id)}
-              className="text-muted-foreground hover:text-primary-base p-1"
-            >
-              <Share2 size={14} />
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 // ========================================
 // PracticeCard Component
@@ -289,20 +126,36 @@ interface PracticeCardProps {
   practice: {
     id: string;
     title: string;
-    author: {
-      name: string;
-      avatar?: string;
-      tags: string[];
-    };
-    description: string;
-    tags: string[];
-    publishDate: string;
-    participants: number;
-    comments: number;
-    progress: number;
+    description?: string;
+    contentType: string;
+    customContentType?: string;
+    totalAmount: number;
+    currentProgress: number;
+    unit: string;
+    startDate: string;
+    targetDate?: string;
+    status: string;
+    motivationType?: string;
+    customMotivation?: string;
+    isPublic: boolean;
+    reminderEnabled: boolean;
+    reminderFrequency: string;
     streak: number;
-    status: '進行中' | '已完成';
-    category?: string;
+    lastCheckinDate?: string;
+    practiceAction?: string;
+    resources: Array<{ id: string; name: string; url?: string; type: string; description?: string; order: number; }>;
+    checkIns: Array<{ id: string; practiceId: string; date: string; progress: number; totalProgress: number; note?: string; mood?: string; tags: string[]; createdAt: string; }>;
+    tags: string[];
+    dailyGoal?: { type: string; timeMinutes?: number; amount?: number; unit?: string; };
+    user?: {
+      _id?: string;
+      id: string;
+      name: string;
+      photoURL?: string;
+      roleList?: string[];
+    };
+    createdAt: string;
+    updatedAt: string;
   };
   onJoin?: (id: string) => void;
   onComment?: (id: string) => void;
@@ -322,21 +175,27 @@ function PracticeCard({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
-    <Card className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-card rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-border group relative">
+    <Card className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-basic-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-basic-200 group relative">
       <CardContent className="p-3 sm:p-4 md:p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary-lightest flex items-center justify-center mr-2 sm:mr-3">
-              <User size={14} className="text-primary-base" />
-            </div>
+            <Avatar className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3">
+              <AvatarImage
+                src={practice.user?.photoURL && practice.user.photoURL.trim() !== '' ? practice.user.photoURL : undefined}
+                alt={practice.user?.name || 'user avatar'}
+              />
+              <AvatarFallback className="bg-primary-lightest text-primary-base text-xs sm:text-sm font-bold">
+                {practice.user?.name?.charAt(0) || <User size={14} />}
+              </AvatarFallback>
+            </Avatar>
             <div>
               <div>
-                <span className="text-xs sm:text-sm font-medium text-foreground mr-2">
-                  {practice.author.name}
+                <span className="text-xs sm:text-sm font-medium text-basic-500 mr-2">
+                  {practice.user?.name || '練習者'}
                 </span>
               </div>
-              <div className="text-xs text-muted-foreground mt-0.5">
-                {practice.author.tags.join(' | ')}
+              <div className="text-xs text-basic-300 mt-0.5">
+                {practice.user?.roleList?.join(' | ') || '實踐者'}
               </div>
             </div>
           </div>
@@ -345,19 +204,19 @@ function PracticeCard({
             <Badge className="bg-primary-lightest text-primary-darker text-xs hidden sm:inline-block">
               主題實踐
             </Badge>
-            <div className="text-xs text-muted-foreground hidden sm:block">{practice.publishDate}</div>
+            <div className="text-xs text-basic-300 hidden sm:block">{timeDuration(practice.createdAt)}</div>
             <div className="relative">
               <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                    className="p-1 text-basic-300 hover:text-basic-500 hover:bg-basic-100 rounded-lg transition-colors"
                   >
                     <MoreVertical size={14} />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-32" align="end">
+                <DropdownMenuContent className="w-32 bg-basic-white border-basic-200 text-basic-500" align="end">
                   <DropdownMenuItem
                     onClick={() => {
                       onSave?.(practice.id);
@@ -384,16 +243,14 @@ function PracticeCard({
           </div>
         </div>
 
-        <h3 className="font-bold text-foreground mb-2 text-base sm:text-lg group-hover:text-primary-base transition-colors flex items-center">
+        <h3 className="font-bold text-basic-500 mb-2 text-base sm:text-lg group-hover:text-primary-base transition-colors flex items-center">
           {practice.title}
-          {practice.category && (
-            <Badge className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-              {practice.category}
-            </Badge>
-          )}
+          <Badge className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+            {practice.contentType}
+          </Badge>
         </h3>
 
-        <p className="text-muted-foreground text-sm mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-none">
+        <p className="text-basic-300 text-sm mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-none">
           {practice.description}
         </p>
 
@@ -402,7 +259,7 @@ function PracticeCard({
             <Badge
               key={tag}
               variant="secondary"
-              className="px-1.5 py-0.5 sm:px-2 bg-muted text-muted-foreground text-xs font-medium rounded-full"
+              className="px-1.5 py-0.5 sm:px-2 bg-basic-100 text-basic-300 text-xs font-medium rounded-full"
             >
               {tag}
             </Badge>
@@ -410,7 +267,7 @@ function PracticeCard({
           {practice.tags.length > 2 && (
             <Badge
               variant="secondary"
-              className="px-1.5 py-0.5 sm:px-2 bg-muted text-muted-foreground text-xs font-medium rounded-full"
+              className="px-1.5 py-0.5 sm:px-2 bg-basic-100 text-basic-300 text-xs font-medium rounded-full"
             >
               +{practice.tags.length - 2}
             </Badge>
@@ -418,13 +275,13 @@ function PracticeCard({
         </div>
 
         <div className="mb-3 sm:mb-4">
-          <div className="w-full bg-muted rounded-full h-2 relative">
+          <div className="w-full bg-basic-100 rounded-full h-2 relative">
             <Progress
-              value={practice.progress}
+              value={(practice.currentProgress / practice.totalAmount) * 100}
               className="h-2 bg-primary-base rounded-full"
             />
-            <span className="absolute right-0 -top-6 text-xs text-muted-foreground font-medium">
-              {practice.progress}%
+            <span className="absolute right-0 -top-6 text-xs text-basic-300 font-medium">
+              {Math.round((practice.currentProgress / practice.totalAmount) * 100)}%
             </span>
           </div>
         </div>
@@ -432,46 +289,49 @@ function PracticeCard({
         <div className="flex items-center justify-between mb-3 sm:mb-4">
           <div className="flex items-center space-x-1">
             <Flame className="h-3 w-3 text-orange-500" />
-            <span className="text-xs text-muted-foreground font-medium">{practice.streak}天</span>
+            <span className="text-xs text-basic-300 font-medium">{practice.streak}天</span>
           </div>
           <Badge
             className={
-              practice.status === '已完成'
+              practice.status === 'completed'
                 ? 'bg-success/20 text-success'
                 : 'bg-tips/20 text-tips'
             }
           >
-            {practice.status}
+            {practice.status === 'completed' ? '已完成'
+             : practice.status === 'active' ? '進行中'
+             : practice.status === 'paused' ? '暫停'
+             : practice.status === 'draft' ? '草稿' : '封存'}
           </Badge>
         </div>
 
-        <div className="pt-3 sm:pt-4 border-t border-border">
-          <div className="flex items-center space-x-2 sm:space-x-4">
+        <div className="pt-3 sm:pt-4">
+          <div className="flex items-center justify-end space-x-2 sm:space-x-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onJoin?.(practice.id)}
-              className="flex items-center space-x-1 text-muted-foreground hover:text-primary-base p-1"
+              className="flex items-center space-x-1 text-basic-300 hover:text-primary-base p-1"
             >
               <Shell size={14} />
-              <span className="text-xs sm:text-sm font-medium">{practice.participants}</span>
+              <span className="text-xs sm:text-sm font-medium">{practice.checkIns?.length || 0}</span>
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onComment?.(practice.id)}
-              className="flex items-center space-x-1 text-muted-foreground hover:text-primary-base p-1"
+              className="flex items-center space-x-1 text-basic-300 hover:text-primary-base p-1"
             >
-              <MessageCircle size={14} />
-              <span className="text-xs sm:text-sm">{practice.comments}</span>
+              <Comment size={14} />
+              <span className="text-xs sm:text-sm">{practice.resources?.length || 0}</span>
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onShare?.(practice.id)}
-              className="text-muted-foreground hover:text-primary-base p-1"
+              className="text-basic-300 hover:text-primary-base p-1"
             >
               <Share2 size={14} />
             </Button>
@@ -483,26 +343,45 @@ function PracticeCard({
 }
 
 // ========================================
-// PlanCard Component
+// ProjectCard Component
 // ========================================
 
-interface PlanCardProps {
-  plan: {
+interface ProjectCardProps {
+  project: {
     id: string;
     title: string;
-    author: {
-      name: string;
-      avatar?: string;
-      tags: string[];
-    };
+    createdDate: string;
+    updatedDate: string;
     description: string;
-    tags: string[];
-    publishDate: string;
-    participants: number;
-    comments: number;
-    progress: number;
-    streak: number;
-    status: '進行中' | '已完成';
+    isPublic: boolean;
+    motivation: string[];
+    motivationDescription: string;
+    goal: string;
+    content: string;
+    strategy: string[];
+    strategyDescription: string;
+    resourceName?: string;
+    resourceUrl: string[];
+    outcome: string[];
+    outcomeDescription: string;
+    eventId?: string;
+    user: {
+      _id?: string;
+      id: string;
+      name: string;
+      photoURL?: string;
+      roleList?: string[];
+    };
+    version: number;
+    milestones: Array<{
+      id: string;
+      title: string;
+      description: string;
+      dueDate?: string;
+      status: string;
+      createdDate: string;
+      updatedDate: string;
+    }>;
   };
   onJoin?: (id: string) => void;
   onComment?: (id: string) => void;
@@ -511,32 +390,38 @@ interface PlanCardProps {
   onReport?: (id: string) => void;
 }
 
-function PlanCard({
-  plan,
+function ProjectCard({
+  project,
   onJoin,
   onComment,
   onShare,
   onSave,
   onReport,
-}: PlanCardProps) {
+}: ProjectCardProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
-    <Card className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-card rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-border group relative">
+    <Card className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-basic-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-basic-200 group relative">
       <CardContent className="p-3 sm:p-4 md:p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-2 sm:mr-3">
-              <User size={14} className="text-indigo-600" />
-            </div>
+            <Avatar className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3">
+              <AvatarImage
+                src={project.user?.photoURL && project.user.photoURL.trim() !== '' ? project.user.photoURL : undefined}
+                alt={project.user?.name || 'user avatar'}
+              />
+              <AvatarFallback className="bg-indigo-600 text-white text-xs font-medium">
+                {project.user?.name?.charAt(0) || '?'}
+              </AvatarFallback>
+            </Avatar>
             <div>
               <div>
-                <span className="text-xs sm:text-sm font-medium text-foreground mr-2">
-                  {plan.author.name}
+                <span className="text-xs sm:text-sm font-medium text-basic-500 mr-2">
+                  {project.user.name}
                 </span>
               </div>
-              <div className="text-xs text-muted-foreground mt-0.5">
-                {plan.author.tags.join(' | ')}
+              <div className="text-xs text-basic-300 mt-0.5">
+                {project.user.roleList?.join(' | ') || '計劃作者'}
               </div>
             </div>
           </div>
@@ -545,22 +430,22 @@ function PlanCard({
             <Badge className="bg-indigo-100 text-indigo-800 text-xs hidden sm:inline-block">
               學習計劃
             </Badge>
-            <div className="text-xs text-muted-foreground hidden sm:block">{plan.publishDate}</div>
+            <div className="text-xs text-basic-300 hidden sm:block">{timeDuration(project.createdDate)}</div>
             <div className="relative">
               <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                    className="p-1 text-basic-300 hover:text-basic-500 hover:bg-basic-100 rounded-lg transition-colors"
                   >
                     <MoreVertical size={14} />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-32" align="end">
+                <DropdownMenuContent className="w-32 bg-basic-white border-basic-200 text-basic-500" align="end">
                   <DropdownMenuItem
                     onClick={() => {
-                      onSave?.(plan.id);
+                      onSave?.(project.id);
                       setIsDropdownOpen(false);
                     }}
                     className="flex items-center cursor-pointer"
@@ -570,7 +455,7 @@ function PlanCard({
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
-                      onReport?.(plan.id);
+                      onReport?.(project.id);
                       setIsDropdownOpen(false);
                     }}
                     className="flex items-center cursor-pointer"
@@ -584,39 +469,39 @@ function PlanCard({
           </div>
         </div>
 
-        <h3 className="font-bold text-foreground mb-2 text-base sm:text-lg group-hover:text-indigo-600 transition-colors">
-          {plan.title}
+        <h3 className="font-bold text-basic-500 mb-2 text-base sm:text-lg group-hover:text-indigo-600 transition-colors">
+          {project.title}
         </h3>
 
-        <p className="text-muted-foreground text-sm mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-none">
-          {plan.description}
+        <p className="text-basic-300 text-sm mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-none">
+          {project.description}
         </p>
 
         <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
-          {plan.tags.slice(0, 2).map((tag) => (
+          {project.strategy.slice(0, 2).map((tag) => (
             <Badge
               key={tag}
               variant="secondary"
-              className="px-1.5 py-0.5 sm:px-2 bg-muted text-muted-foreground text-xs font-medium rounded-full"
+              className="px-1.5 py-0.5 sm:px-2 bg-basic-100 text-basic-300 text-xs font-medium rounded-full"
             >
               {tag}
             </Badge>
           ))}
-          {plan.tags.length > 2 && (
+          {project.strategy.length > 2 && (
             <Badge
               variant="secondary"
-              className="px-1.5 py-0.5 sm:px-2 bg-muted text-muted-foreground text-xs font-medium rounded-full"
+              className="px-1.5 py-0.5 sm:px-2 bg-basic-100 text-basic-300 text-xs font-medium rounded-full"
             >
-              +{plan.tags.length - 2}
+              +{project.strategy.length - 2}
             </Badge>
           )}
         </div>
 
         <div className="mb-3 sm:mb-4">
           <div className="w-full relative">
-            <Progress value={plan.progress} className="h-2" />
-            <span className="absolute right-0 -top-6 text-xs text-muted-foreground font-medium">
-              {plan.progress}%
+            <Progress value={Math.round((project.milestones.filter(m => m.status === 'completed').length / Math.max(project.milestones.length, 1)) * 100)} className="h-2" />
+            <span className="absolute right-0 -top-6 text-xs text-basic-300 font-medium">
+              {Math.round((project.milestones.filter(m => m.status === 'completed').length / Math.max(project.milestones.length, 1)) * 100)}%
             </span>
           </div>
         </div>
@@ -624,46 +509,46 @@ function PlanCard({
         <div className="flex items-center justify-between mb-3 sm:mb-4">
           <div className="flex items-center space-x-1">
             <Flame className="h-3 w-3 text-orange-500" />
-            <span className="text-xs text-muted-foreground font-medium">{plan.streak}天</span>
+            <span className="text-xs text-basic-300 font-medium">{project.milestones.length}個里程碑</span>
           </div>
           <Badge
             className={
-              plan.status === '已完成'
+              project.milestones.filter(m => m.status === 'completed').length === project.milestones.length && project.milestones.length > 0
                 ? 'bg-success/20 text-success'
                 : 'bg-tips/20 text-tips'
             }
           >
-            {plan.status}
+            {project.milestones.filter(m => m.status === 'completed').length === project.milestones.length && project.milestones.length > 0 ? '已完成' : '進行中'}
           </Badge>
         </div>
 
-        <div className="pt-3 sm:pt-4 border-t border-border">
-          <div className="flex items-center space-x-2 sm:space-x-4">
+        <div className="pt-3 sm:pt-4">
+          <div className="flex items-center justify-end space-x-2 sm:space-x-4">
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onJoin?.(plan.id)}
-              className="flex items-center space-x-1 text-muted-foreground hover:text-indigo-600 p-1"
+              onClick={() => onJoin?.(project.id)}
+              className="flex items-center space-x-1 text-basic-300 hover:text-indigo-600 p-1"
             >
               <Shell size={14} />
-              <span className="text-xs sm:text-sm font-medium">{plan.participants}</span>
+              <span className="text-xs sm:text-sm font-medium">{project.milestones.length}</span>
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onComment?.(plan.id)}
-              className="flex items-center space-x-1 text-muted-foreground hover:text-indigo-600 p-1"
+              onClick={() => onComment?.(project.id)}
+              className="flex items-center space-x-1 text-basic-300 hover:text-indigo-600 p-1"
             >
-              <MessageCircle size={14} />
-              <span className="text-xs sm:text-sm">{plan.comments}</span>
+              <Comment size={14} />
+              <span className="text-xs sm:text-sm">{project.resourceUrl.length}</span>
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onShare?.(plan.id)}
-              className="text-muted-foreground hover:text-indigo-600 p-1"
+              onClick={() => onShare?.(project.id)}
+              className="text-basic-300 hover:text-indigo-600 p-1"
             >
               <Share2 size={14} />
             </Button>
@@ -678,37 +563,58 @@ function PlanCard({
 // Floating Create Button Component
 // ========================================
 
-function FloatingCreateButton() {
+function FloatingCreateButton({ onCreateIdea }: { onCreateIdea: () => void }) {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  const createOptions = [
-    { label: '想法', path: '/ideas/create', icon: Lightbulb },
+  const createOptions: Array<{label: string, path?: string, action?: string, icon: React.ComponentType<{className?: string}>}> = [
+    { label: '想法', action: 'idea', icon: Lightbulb },
     { label: '主題實踐', path: '/practice/create', icon: Target },
     { label: '學習計劃', path: '/projects/create', icon: BookOpen },
   ];
 
-  const handleCreate = (path: string) => {
-    router.push(path);
+  const handleCreate = (pathOrAction: string) => {
+    if (pathOrAction === 'idea') {
+      onCreateIdea();
+    } else {
+      router.push(pathOrAction);
+    }
     setShowMenu(false);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMenu]);
+
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div ref={menuRef} className="fixed bottom-6 right-6 z-50">
       {/* Create Options Menu */}
       {showMenu && (
-        <div className="absolute bottom-16 right-0 bg-card rounded-lg shadow-lg border border-border p-2 min-w-[160px]">
+        <div className="absolute bottom-16 right-0 bg-basic-white rounded-lg shadow-lg border border-basic-200 p-2 min-w-[160px]">
           {createOptions.map((option) => {
             const IconComponent = option.icon;
             return (
               <Button
                 key={option.label}
                 variant="ghost"
-                onClick={() => handleCreate(option.path)}
-                className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-muted rounded-md justify-start h-auto"
+                onClick={() => handleCreate(option.path || option.action || '')}
+                className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-basic-100 rounded-md justify-start h-auto"
               >
-                <IconComponent className="h-4 w-4 text-foreground" />
-                <span className="text-sm font-medium text-foreground">{option.label}</span>
+                <IconComponent className="h-4 w-4 text-basic-500" />
+                <span className="text-sm font-medium text-basic-500">{option.label}</span>
               </Button>
             );
           })}
@@ -731,65 +637,69 @@ export default function ExplorePage() {
   const [searchQuery, setSearchQuery] = useState('');
   console.log(setSearchQuery); // Temporary to avoid unused variable warning
   const [isSearching, setIsSearching] = useState(false);
+  const [showIdeaCreateModal, setShowIdeaCreateModal] = useState(false);
 
-  // Mock data - in real app would come from API
-  const mockIdea = {
-    id: '1',
-    author: {
-      name: '林小明',
-      tags: ['UX設計師', '產品經理'],
-    },
-    content: 'this is an idea',
-    tags: ['程式設計', '資料科學'],
-    link: 'test',
-    publishDate: '01/06/2025',
-    likes: 3,
-    comments: 2,
-  };
+  // 使用真實的 Ideas API - 統一使用 useSWR
+  const { data: ideas, isLoading: ideasLoading, error: ideasError, mutate: mutateIdeas } = useSWR<{data: IdeaSchema[]}>('/api/v1/ideas', fetcher, {
+    revalidateIfStale: false,
+  });
 
-  const mockPractice = {
-    id: '2',
-    title: 'UI/UX 設計思維實戰',
-    author: {
-      name: '李設計',
-      tags: ['UX設計師', '設計思維'],
-    },
-    description: '深入了解用戶體驗設計流程，從研究到原型製作',
-    tags: ['用戶研究', 'Figma', '設計思維'],
-    publishDate: '25/05/2025 - 18/06/2025',
-    participants: 189,
-    comments: 2,
-    progress: 65,
-    streak: 7,
-    status: '進行中' as const,
-    category: '書籍',
-  };
+  // 使用真實的 Practice API - 統一使用 useSWR
+  const { data: practices, isLoading: practicesLoading, error: practicesError } = useSWR<{data: unknown[]}>('/api/v1/practices', fetcher, {
+    revalidateIfStale: false,
+  });
 
-  const mockPlan = {
-    id: '3',
-    title: '全端開發工程師養成計劃',
-    author: {
-      name: '陳老師',
-      tags: ['全端工程師', '技術導師'],
-    },
-    description: '從零基礎到獨立開發完整網路應用，涵蓋前端、後端、資料庫設計與部署',
-    tags: ['React', 'Node.js', 'MongoDB', '系統設計'],
-    publishDate: '20/05/2025 - 20/09/2025',
-    participants: 67,
-    comments: 8,
-    progress: 42,
-    streak: 12,
-    status: '進行中' as const,
-  };
+  // 使用真實的 Projects API (公開的 projects 而不是個人的)
+  // 嘗試不同的端點路徑
+  const { data: projects, isLoading: projectsLoading, error: projectsError } = useSWR<{data: unknown[]}>('/api/v1/projects', fetcher, {
+    revalidateIfStale: false,
+  });
+
+  console.log('🔍 Explore Page - practices:', practices);
+  console.log('🔍 Explore Page - practicesLoading:', practicesLoading);
+  console.log('🔍 Explore Page - practicesError:', practicesError);
+  console.log('🔍 Explore Page - projects:', projects);
+  console.log('🔍 Explore Page - projectsLoading:', projectsLoading);
+  console.log('🔍 Explore Page - projectsError:', projectsError);
+  if (projectsError) {
+    console.error('❌ Projects API 詳細錯誤:', {
+      message: projectsError.message,
+      status: projectsError.status,
+      stack: projectsError.stack,
+      full: projectsError,
+    });
+  }
+
+
 
   const handleCreateNew = (type: string) => {
-    console.log('Creating new:', type);
-    // In real app, would navigate to creation form
+    if (type === 'idea') {
+      setShowIdeaCreateModal(true);
+    } else {
+      console.log('Creating new:', type);
+      // In real app, would navigate to creation form
+    }
   };
 
   const handleCardAction = (action: string, id: string) => {
     console.log(`${action} for item:`, id);
     // In real app, would handle the specific action
+  };
+
+  const handleIdeaCreateSuccess = (ideaId: string) => {
+    console.log('Idea created successfully:', ideaId);
+    setShowIdeaCreateModal(false);
+    // 刷新ideas列表
+    mutateIdeas();
+  };
+
+  const handleIdeaCreateError = (error: Error) => {
+    console.error('Failed to create idea:', error);
+    // 可以在這裡顯示錯誤提示
+  };
+
+  const handleIdeaCreateCancel = () => {
+    setShowIdeaCreateModal(false);
   };
 
   const renderContent = () => {
@@ -798,8 +708,8 @@ export default function ExplorePage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-foreground mb-2">搜尋結果</h2>
-              <p className="text-muted-foreground">關於 "{searchQuery}" 的結果</p>
+              <h2 className="text-2xl font-bold text-basic-500 mb-2">搜尋結果</h2>
+              <p className="text-basic-300">關於 "{searchQuery}" 的結果</p>
             </div>
             <Button
               variant="ghost"
@@ -810,7 +720,7 @@ export default function ExplorePage() {
             </Button>
           </div>
           <div className="space-y-8">
-            <p className="text-muted-foreground">搜尋結果將顯示於此：{searchQuery}</p>
+            <p className="text-basic-300">搜尋結果將顯示於此：{searchQuery}</p>
           </div>
         </div>
       );
@@ -828,42 +738,81 @@ export default function ExplorePage() {
           {/* Ideas */}
           {(activeExploreTab === '推薦' || activeExploreTab === '想法') && (
             <div className="flex flex-col items-center space-y-6">
-              <IdeaCard
-                idea={mockIdea}
-                onLike={(id) => handleCardAction('like', id)}
-                onComment={(id) => handleCardAction('comment', id)}
-                onShare={(id) => handleCardAction('share', id)}
-                onSave={(id) => handleCardAction('save', id)}
-                onReport={(id) => handleCardAction('report', id)}
-              />
+              {ideasLoading && (
+                <div className="text-center text-basic-300">載入中...</div>
+              )}
+              {ideasError && (
+                <div className="text-center text-red-500">載入失敗，請稍後再試</div>
+              )}
+              {Array.isArray(ideas?.data) && ideas.data.map((idea) => (
+                <IdeaCard
+                  key={idea.id}
+                  idea={idea}
+                  onClick={(id) => {
+                    // 導航到詳情頁
+                    window.location.href = `/ideas/${id}`;
+                  }}
+                  onSave={(id) => handleCardAction('save', id)}
+                  onReport={(id) => handleCardAction('report', id)}
+                />
+              ))}
+              {Array.isArray(ideas?.data) && ideas.data.length === 0 && !ideasLoading && (
+                <div className="text-center text-basic-300">暫無想法內容</div>
+              )}
             </div>
           )}
 
           {/* Practices */}
           {(activeExploreTab === '推薦' || activeExploreTab === '主題實踐') && (
             <div className="flex flex-col items-center space-y-6">
-              <PracticeCard
-                practice={mockPractice}
-                onJoin={(id) => handleCardAction('join', id)}
-                onComment={(id) => handleCardAction('comment', id)}
-                onShare={(id) => handleCardAction('share', id)}
-                onSave={(id) => handleCardAction('save', id)}
-                onReport={(id) => handleCardAction('report', id)}
-              />
+              {practicesLoading && <div className="text-center py-8">載入中...</div>}
+              {practicesError && <div className="text-center py-8 text-red-500">載入 Practice 失敗</div>}
+              {Array.isArray(practices?.data) && (practices.data as PracticeCardProps['practice'][]).map((practice) => (
+                <PracticeCard
+                  key={practice.id}
+                  practice={practice}
+                  onJoin={(id) => handleCardAction('join', id)}
+                  onComment={(id) => handleCardAction('comment', id)}
+                  onShare={(id) => handleCardAction('share', id)}
+                  onSave={(id) => handleCardAction('save', id)}
+                  onReport={(id) => handleCardAction('report', id)}
+                />
+              ))}
+              {Array.isArray(practices?.data) && practices.data.length === 0 && !practicesLoading && (
+                <div className="text-center py-8 text-basic-300">目前沒有 Practice 數據</div>
+              )}
             </div>
           )}
 
-          {/* Plans */}
+          {/* Projects */}
           {activeExploreTab === '學習計劃' && (
             <div className="flex flex-col items-center space-y-6">
-              <PlanCard
-                plan={mockPlan}
-                onJoin={(id) => handleCardAction('join', id)}
-                onComment={(id) => handleCardAction('comment', id)}
-                onShare={(id) => handleCardAction('share', id)}
-                onSave={(id) => handleCardAction('save', id)}
-                onReport={(id) => handleCardAction('report', id)}
-              />
+              {projectsLoading && <div className="text-center py-8">載入中...</div>}
+              {projectsError && <div className="text-center py-8 text-red-500">載入 Projects 失敗</div>}
+              {Array.isArray(projects?.data) && (projects.data as ProjectCardProps['project'][]).map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  project={{
+                    ...project,
+                    createdDate: project.createdDate,
+                    updatedDate: project.updatedDate,
+                    resourceUrl: project.resourceUrl || [],
+                    milestones: project.milestones || [],
+                    user: {
+                      ...project.user,
+                      photoURL: project.user.photoURL,
+                    },
+                  }}
+                  onJoin={(id) => handleCardAction('join', id)}
+                  onComment={(id) => handleCardAction('comment', id)}
+                  onShare={(id) => handleCardAction('share', id)}
+                  onSave={(id) => handleCardAction('save', id)}
+                  onReport={(id) => handleCardAction('report', id)}
+                />
+              ))}
+              {Array.isArray(projects?.data) && projects.data.length === 0 && !projectsLoading && (
+                <div className="text-center py-8 text-basic-300">目前沒有學習計劃數據</div>
+              )}
             </div>
           )}
         </div>
@@ -872,7 +821,7 @@ export default function ExplorePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background relative pt-20">
+    <div className="min-h-screen bg-basic-white relative pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Container>
           {renderContent()}
@@ -880,7 +829,22 @@ export default function ExplorePage() {
       </div>
 
       {/* Floating Create Button */}
-      <FloatingCreateButton />
+      <FloatingCreateButton onCreateIdea={() => setShowIdeaCreateModal(true)} />
+
+      {/* Create Idea Modal */}
+      {showIdeaCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto">
+            <div className="[&_.bg-basic-50]:!bg-transparent [&_.bg-basic-50]:!min-h-auto [&_.bg-basic-50]:!p-0 [&_textarea]:!text-gray-700 [&_input]:!text-gray-700">
+              <IdeaCreateContainer
+                onSuccess={handleIdeaCreateSuccess}
+                onError={handleIdeaCreateError}
+                onCancel={handleIdeaCreateCancel}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

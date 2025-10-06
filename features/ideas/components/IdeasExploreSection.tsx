@@ -40,6 +40,8 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
     search: searchQuery || undefined,
     sortBy,
     sortOrder,
+    page: 1,
+    pageSize: 20,
   };
 
   // Use Ideas hook to fetch data
@@ -224,9 +226,12 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
             {ideas.map((idea) => (
               <IdeaCard
                 key={idea.id}
-                data={idea}
-                className="border border-basic-200 transition-colors hover:border-basic-300"
-                showActions
+                idea={idea}
+                onClick={(id) => {
+                  window.location.href = `/ideas/${id}`;
+                }}
+                onSave={() => console.log('Save idea:', idea.id)}
+                onReport={() => console.log('Report idea:', idea.id)}
               />
             ))}
 

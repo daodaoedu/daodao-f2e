@@ -34,7 +34,7 @@ const IdeaList: React.FC<IdeaListProps> = ({
     refresh,
   } = useIdeaSearch();
 
-  const { removeIdeaFromCache, updateIdeaInCache } = useIdeasCache();
+  const { removeIdeaFromCache } = useIdeasCache();
 
   const { deleteIdea, isDeleting } = useIdeaActions({
     onSuccess: () => {
@@ -54,10 +54,10 @@ const IdeaList: React.FC<IdeaListProps> = ({
     updateSearch({ search });
   }, [updateSearch]);
 
-  const handleEdit = useCallback((ideaId: string) => {
-    console.log('Edit idea:', ideaId);
-    // TODO: Navigate to edit page or open edit modal
-  }, []);
+  // const handleEdit = useCallback((ideaId: string) => {
+  //   console.log('Edit idea:', ideaId);
+  //   // TODO: Navigate to edit page or open edit modal
+  // }, []);
 
   const handleDeleteClick = useCallback((ideaId: string) => {
     setSelectedIdeaId(ideaId);
@@ -70,28 +70,6 @@ const IdeaList: React.FC<IdeaListProps> = ({
     }
   }, [selectedIdeaId, deleteIdea]);
 
-  const handleLike = useCallback((ideaId: string) => {
-    // Optimistically update the UI
-    const idea = ideas.find((i) => i.id === ideaId);
-    if (idea) {
-      const updatedIdea = {
-        ...idea,
-        isLiked: !idea.isLiked,
-        likeCount: idea.isLiked ? idea.likeCount - 1 : idea.likeCount + 1,
-      };
-      updateIdeaInCache(updatedIdea);
-    }
-
-    // TODO: Call actual like API
-    console.log('Toggle like for idea:', ideaId);
-  }, [ideas, updateIdeaInCache]);
-
-  // const handleShare = useCallback((ideaId: string) => {
-  //   const shareUrl = `${window.location.origin}/ideas/${ideaId}`;
-  //   navigator.clipboard.writeText(shareUrl);
-  //   console.log('Shared idea URL:', shareUrl);
-  //   // TODO: Show toast notification
-  // }, []);
 
   if (isError) {
     return (
@@ -142,12 +120,13 @@ const IdeaList: React.FC<IdeaListProps> = ({
             {ideas.map((idea) => (
               <IdeaCard
                 key={idea.id}
-                data={idea}
-                detailLink={`/ideas/${idea.id}`}
-                onEditClick={() => handleEdit(idea.id)}
-                onDeleteClick={() => handleDeleteClick(idea.id)}
-                onLikeClick={() => handleLike(idea.id)}
-                isLiked={idea.isLiked}
+                idea={idea}
+                onClick={(id) => {
+                  // 導航到詳情頁
+                  window.location.href = `/ideas/${id}`;
+                }}
+                onSave={() => console.log('Save idea:', idea.id)}
+                onReport={() => handleDeleteClick(idea.id)}
               />
             ))}
           </div>

@@ -22,7 +22,7 @@ export function formToCreateApiRequest(
   return {
     content: formData.content,
     tags: formData.tags,
-    ideaResources: formData.ideaResources,
+    resources: formData.ideaResources, // 改為 resources
     imageUrls: uploadedImageUrls,
     videoUrls: uploadedVideoUrls,
   };
@@ -44,7 +44,7 @@ export function formToUpdateApiRequest(
     id: formData.id,
     content: formData.content,
     tags: formData.tags,
-    ideaResources: formData.ideaResources,
+    resources: formData.ideaResources, // 改為 resources
     imageUrls: uploadedImageUrls,
     videoUrls: uploadedVideoUrls,
     status: formData.status,
@@ -69,7 +69,7 @@ export function ideaToFormDefaults(idea: IdeaSchema): Partial<CreateIdeaFormSche
   return {
     content: idea.content,
     tags: idea.tags,
-    ideaResources: idea.ideaResources,
+    ideaResources: idea.resources,
     // 注意：imageFiles 和 videoFiles 是 File 物件，無法從 URL 轉換
     // 這些欄位需要在組件層級處理
   };
@@ -85,7 +85,7 @@ export function ideaToUpdateFormDefaults(idea: IdeaSchema): Partial<UpdateIdeaFo
     id: idea.id,
     content: idea.content,
     tags: idea.tags,
-    ideaResources: idea.ideaResources,
+    ideaResources: idea.resources,
     status: idea.status,
     // 注意：imageFiles 和 videoFiles 是 File 物件，無法從 URL 轉換
     // 這些欄位需要在組件層級處理

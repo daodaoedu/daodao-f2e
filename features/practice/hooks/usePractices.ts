@@ -18,39 +18,40 @@ export function usePractices() {
 
   // 建立實踐
   const createPractice = async (input: CreatePracticeInput) => {
-    const result = await practiceAPI.create(getPracticePathname(), { arg: input });
+    const result = await practiceAPI.create(input);
     invalidateAllCaches();
     return result;
   };
 
   // 更新實踐
   const updatePractice = async (id: string, updates: UpdatePracticeInput) => {
-    const result = await practiceAPI.update(getPracticePathname(), { arg: { id, ...updates } });
+    const result = await practiceAPI.update(id, updates);
     invalidateAllCaches(id);
     return result;
   };
 
   // 刪除實踐
   const deletePractice = async (id: string) => {
-    await practiceAPI.delete(getPracticePathname(), { arg: { id } });
+    await practiceAPI.delete(id);
     invalidateAllCaches(id);
   };
 
   // 簽到
   const checkIn = async (input: CheckInInput) => {
-    const result = await practiceAPI.checkIn(getPracticePathname(), { arg: input });
+    const result = await practiceAPI.checkIn(input);
     invalidateAllCaches(input.practiceId);
     return result;
   };
 
   // 匯出資料
-  const exportData = async () => practiceAPI.exportData('export-practices', { arg: undefined });
+  const exportData = async () => {
+    return practiceAPI.exportData();
+  };
 
   // 匯入資料
   const importData = async (data: string) => {
-    const result = await practiceAPI.importData(getPracticePathname(), { arg: { data } });
+    await practiceAPI.importData(data);
     invalidateAllCaches();
-    return result;
   };
 
   // 重新載入實踐

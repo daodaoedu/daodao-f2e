@@ -61,7 +61,7 @@ export default function ExploreError({ error, reset }: ErrorPageProps) {
                 onClick={() => {
                   window.location.href = '/';
                 }}
-                className="border-basic-200 text-basic-400 hover:bg-basic-100"
+                className="border-basic-200 text-basic-400 hover:bg-basic-100 bg-basic-white"
               >
                 返回首頁
               </Button>

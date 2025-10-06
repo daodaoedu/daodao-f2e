@@ -124,14 +124,17 @@ const IdeasRecommendationSection: React.FC<IdeasRecommendationSectionProps> = ({
       tags: item.tags,
       imageUrls: [],
       videoUrls: [],
-      ideaResources: [],
+      resources: [],
+      hasResources: false,
+      resourceCount: 0,
       likeCount: item.likeCount,
       commentCount: item.commentCount,
       viewCount: 0,
       shareCount: 0,
       isLiked: false,
-      createdDate: item.createdDate,
-      updatedDate: item.createdDate,
+      isFavorited: false,
+      createdAt: item.createdDate,
+      updatedAt: item.createdDate,
     };
   };
 
@@ -176,9 +179,12 @@ const IdeasRecommendationSection: React.FC<IdeasRecommendationSectionProps> = ({
         {ideaRecommendations.map((item) => (
           <div key={item.id} className="relative">
             <IdeaCard
-              data={convertToIdeaSchema(item)}
-              className="bg-basic-50 border-none shadow-none"
-              showActions
+              idea={convertToIdeaSchema(item)}
+              onClick={(id) => {
+                window.location.href = `/ideas/${id}`;
+              }}
+              onSave={() => console.log('Save idea:', item.id)}
+              onReport={() => console.log('Report idea:', item.id)}
             />
             {item.reason && (
               <div className="absolute right-2 top-2">

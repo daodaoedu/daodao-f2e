@@ -83,7 +83,7 @@ const IdeaDetailPage = () => {
                     </div>
                     {idea.user?.roleList?.[0] && (
                       <div className="text-sm font-normal text-[#92989A]">
-                        {ROLE.find((r) => r.value === idea.user.roleList[0])?.label || idea.user.roleList[0]}
+                        {ROLE.find((r) => r.value === idea.user.roleList?.[0])?.label || idea.user.roleList?.[0]}
                       </div>
                     )}
                   </div>
@@ -94,7 +94,7 @@ const IdeaDetailPage = () => {
                     想法
                   </div>
                   <span className="text-sm text-[#92989A]">
-                    {new Date(idea.createdDate).toLocaleDateString('zh-TW')}
+                    {new Date(idea.createdAt).toLocaleDateString('zh-TW')}
                   </span>
                 </div>
               </div>
@@ -111,7 +111,7 @@ const IdeaDetailPage = () => {
               {idea.tags && idea.tags.length > 0 && (
                 <div className="mt-6">
                   <div className="flex flex-wrap">
-                    {idea.tags.map((tag) => (
+                    {idea.tags.map((tag: string) => (
                       <span
                         key={tag}
                         className="inline-flex items-center mr-2 px-2 py-1 rounded-full text-sm bg-basic-100  text-gray-700 border border-primary-base/20"
@@ -124,10 +124,10 @@ const IdeaDetailPage = () => {
               )}
 
               {/* 資源連結 */}
-              {idea.ideaResources && idea.ideaResources.length > 0 && (
+              {idea.resources && idea.resources.length > 0 && (
                 <div className="mt-6">
                   <div className="space-y-2">
-                    {idea.ideaResources.map((resource) => (
+                    {idea.resources.map((resource: { url: string; name: string }) => (
                       <Link
                         key={resource.url}
                         href={resource.url}

@@ -5,7 +5,7 @@ export default function ProtectedBaseLayout({ children }: LayoutProps<'/[languag
   return (
     <>
       <Header />
-      <main className="min-h-screen w-full bg-white">{children}</main>
+      <main className="min-h-screen w-full bg-basic-white">{children}</main>
       <Footer />
     </>
   );
