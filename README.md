@@ -39,15 +39,15 @@
 ### 環境要求 | Prerequisites  
 
 - Node.js 20.19.4 (建議使用 nvm 進行版本管理)  
-- Yarn 套件管理器  
+- pnpm 套件管理器  
 
 **Node.js 20.19.4 (Recommended: Use nvm for version management)**  
-**Yarn package manager**  
+**pnpm package manager**  
 
 ### 安裝依賴 | Install Dependencies  
 
 ```bash
-yarn install
+pnpm install
 ```  
 
 ### 開發模式 | Development Mode  
@@ -55,31 +55,31 @@ yarn install
 一般開發（HTTP）:  
 **Run in development mode (HTTP):**  
 ```bash
-yarn dev
+pnpm dev
 ```  
 
 ### 建置專案 | Build the Project  
 
 ```bash
-yarn build
+pnpm build
 ```  
 
 ### 生產環境運行 | Run in Production  
 
 ```bash
-yarn start
+pnpm start
 ```  
 
 ### 靜態檔案部署 | Static File Deployment  
 
 1. 建置靜態檔案 | **Build static files**:  
 ```bash
-yarn build
+pnpm build
 ```  
 
 2. 預覽靜態檔案 | **Preview static files**:  
 ```bash
-yarn static
+pnpm static
 ```  
 
 ### API 類型生成 | API Type Generation
@@ -93,147 +93,303 @@ yarn static
 
 2. **生成 API 類型 | Generate API Types**:  
 ```bash
-yarn generate:api
+pnpm generate:api
 ```  
 
 3. **監控模式 | Watch Mode** (開發時使用):  
 ```bash
-yarn generate:api:watch
+pnpm generate:api:watch
 ```  
 
 生成的類型檔案會放在 `services/generated/` 目錄下。  
 **Generated type files will be placed in the `services/generated/` directory.**
 
+### 國際化 (i18n) 管理 | Internationalization (i18n) Management
+
+本專案支援多語言國際化，使用 Google App Script 進行翻譯資料管理：  
+**This project supports multilingual internationalization using Google App Script for translation data management:**
+
+1. **取得翻譯資料 | Fetch Translation Data**:  
+   - 翻譯資料透過 Google Sheets 進行管理並自動同步  
+   - Translation data is managed through Google Sheets and automatically synchronized  
+
+2. **更新翻譯檔案 | Update Translation Files**:  
+```bash
+pnpm fetch:i18n
+```
+
+3. **開發模式監控 | Development Mode Monitoring**:  
+```bash
+pnpm fetch:i18n:watch
+```
+
+**配置要求 | Configuration Requirements:**  
+- 需要在 `.env` 檔案中設定 `NEXT_I18N_URL` 環境變數  
+- The `NEXT_I18N_URL` environment variable must be set in the `.env` file  
+- 該 URL 指向包含翻譯資料的 Google App Script 端點  
+- The URL points to a Google App Script endpoint containing translation data
+
 ---
+
+## 專案架構 / Project Architecture
+
+本專案採用 **Feature-Sliced Design (FSD) 混合架構**，結合 Next.js App Router 的特性，實現清晰的職責劃分和穩定的依賴關係。  
+**This project adopts a hybrid Feature-Sliced Design (FSD) architecture combined with Next.js App Router features to achieve clear responsibility separation and stable dependency relationships.**
+
+### 架構概述 / Architecture Overview
+
+```
+Next.js App Router → Widgets → Features → Entities → Shared
+```
+
+**依賴關係原則 / Dependency Rules:**
+- ✅ 上層可以使用下層 / Upper layers can use lower layers
+- ❌ 下層不能使用上層 / Lower layers cannot use upper layers  
+- ⚠️ 同層之間可以相互使用，但要避免循環依賴 / Same-layer usage is allowed but avoid circular dependencies
 
 ## 專案結構 / Project Structure
 
 ```
 daodao-f2e/
-├── pages/                # Next.js 頁面路由 / Next.js page routes
-│   ├── _app.tsx         # 應用程式入口點 / Application entry point
-│   ├── _document.tsx    # 自定義 HTML 文檔 / Custom HTML document
-│   ├── api/             # API 路由處理 / API route handlers
-│   └── [...slug].tsx    # 動態路由頁面 / Dynamic route pages
-├── components/          # 可重用的 React 元件 / Reusable React components
-│   ├── common/          # 通用基礎元件（手刻）/ Basic components (custom-built)
-│   ├── ui/             # UI 組件庫（手刻）/ UI component library (custom-built)
-│   ├── forms/          # 表單相關組件 / Form-related components
-│   └── layouts/        # 布局組件 / Layout components
-├── public/             # 靜態資源文件 / Static assets
-│   ├── images/         # 圖片資源 / Image assets
-│   └── fonts/          # 字體文件 / Font files
-├── services/           # API 服務層 / API service layer
-│   ├── api/            # API 請求處理 / API request handling
-│   └── types/          # API 相關類型定義 / API-related type definitions
-├── hooks/              # 自定義 React Hooks / Custom React Hooks
-│   ├── useAuth/        # 認證相關 hooks / Authentication hooks
-│   └── useForm/        # 表單相關 hooks / Form-related hooks
-├── contexts/           # React Context 定義 / React Context definitions
-│   ├── AuthContext/    # 用戶認證 / User authentication
-│   └── ThemeContext/   # 主題設置 / Theme settings
-├── redux/              # Redux 相關文件 / Redux-related files
-│   ├── store/          # Redux store 配置 / Redux store configuration
-│   ├── actions/        # Action 創建器 / Action creators
-│   ├── reducers/       # Reducer 函數 / Reducer functions
-│   └── sagas/         # Redux Saga 非同步處理 / Redux Saga for async processing
-├── utils/             # 工具函數 / Utility functions
-│   ├── api/           # API 相關工具 / API utilities
-│   ├── format/        # 格式化工具 / Formatting utilities
-│   └── validation/    # 驗證工具 / Validation utilities
-├── constants/         # 常量定義 / Constant definitions
-│   ├── api/           # API 相關常量 / API-related constants
-│   └── config/        # 配置常量 / Configuration constants
-├── shared/            # 共享組件 / Shared components
-│   ├── Nav/           # 導航組件 / Navigation components
-│   └── Footer/        # 頁腳組件 / Footer components
-├── styles/            # 全局樣式 / Global styles
-│   ├── globals.css    # 全局 CSS / Global CSS
-│   └── theme/         # 主題配置 / Theme configuration
-├── types/             # TypeScript 類型定義 / TypeScript type definitions
-├── config/            # 專案配置文件 / Project configuration files
-│   ├── next.config.js # Next.js 配置 / Next.js configuration
-│   └── tailwind.config.js # Tailwind 配置 / Tailwind configuration
-└── package.json       # 專案依賴配置 / Project dependencies
+├── app/                    # Next.js App Router (路由與頁面層)
+│   ├── [language]/         # 多語言路由 / Multi-language routing
+│   │   ├── (guest)/        # 訪客頁面 / Guest pages
+│   │   ├── (authenticated)/ # 認證頁面 / Authenticated pages
+│   │   ├── layout.tsx      # 根布局 / Root layout
+│   │   └── Providers.tsx   # 全域 Providers / Global providers
+│   ├── api/               # API 路由 / API routes
+│   └── global.css         # 全域樣式 / Global styles
+├── widgets/               # 🧩 Widgets 層 - 大型 UI 組件集合
+│   ├── layout/            # 布局相關 widgets / Layout widgets
+│   ├── landing-page/      # 首頁相關 widgets / Landing page widgets
+│   ├── about/             # 關於頁面 widgets / About page widgets
+│   └── marathon/          # 馬拉松相關 widgets / Marathon widgets
+├── features/              # ⚡ Features 層 - 具體業務功能
+│   ├── circles/           # 圈子功能 / Circle features
+│   ├── ideas/             # 想法功能 / Ideas features
+│   ├── practice/          # 練習功能 / Practice features
+│   ├── projects/          # 專案功能 / Project features
+│   ├── quiz/              # 測驗功能 / Quiz features
+│   ├── resources/         # 資源功能 / Resource features
+│   ├── email/             # 郵件功能 / Email features
+│   └── users/             # 用戶功能 / User features
+├── entities/              # 🏢 Entities 層 - 業務實體抽象
+│   └── marathon/          # 馬拉松實體 / Marathon entity
+├── shared/                # 🔧 Shared 層 - 通用工具和組件
+│   ├── ui/                # 通用 UI 組件 / Common UI components
+│   ├── lib/               # 工具函數 / Utility functions
+│   ├── components/        # 共享組件 / Shared components
+│   ├── config/            # 配置文件 / Configuration files
+│   └── constants.ts       # 常量定義 / Constants
+├── components/            # Legacy 組件 (逐步遷移至 FSD)
+├── contexts/              # React Context 定義 / React Context definitions
+├── hooks/                 # 自定義 React Hooks / Custom React Hooks
+├── layout/                # 布局組件 (遷移至 widgets/layout)
+├── services/              # API 服務層 / API service layer
+│   └── generated/         # OpenAPI 生成的代碼 / OpenAPI generated code
+├── utils/                 # 工具函數 / Utility functions
+├── constants/             # 常量定義 / Constant definitions
+└── public/                # 靜態資源 / Static assets
 ```
 
 ## 目錄說明 / Directory Structure
 
-### 核心目錄 / Core Directories
+### FSD 架構層級 / FSD Architecture Layers
 
-- **`/pages`**: Next.js 的檔案系統路由 / Next.js file-based routing system
-  - `_app.tsx`: 應用程式的主要入口點，包含全局設置 / Main entry point of the application, includes global settings
-  - `_document.tsx`: 自定義 HTML 文檔結構 / Custom HTML document structure
-  - `api/`: 後端 API 路由處理 / Backend API route handling
-  - 其他頁面組件 / Other page components
+#### 📄 Next.js App Router 層
+**用途**：路由處理和頁面組件組合  
+**Purpose**: Route handling and page component composition
 
-- **`/components`**: React 組件庫 / React component library
-  - `common/`: 按鈕、輸入框等基礎組件（手刻）/ Basic components such as buttons and input fields (handcrafted)
-  - `ui/`: 複雜 UI 元件（手刻）/ Complex UI components (handcrafted)
-  - `forms/`: 表單相關元件 / Form-related components
-  - `layouts/`: 頁面布局元件 / Layout components
+- **`app/`**: Next.js App Router 目錄 / Next.js App Router directory
+  - `[language]/`: 多語言路由支援 / Multi-language routing support
+  - `layout.tsx`: 根布局組件 / Root layout component
+  - `Providers.tsx`: 全域 Context Providers / Global Context Providers
+  - `api/`: API 路由處理 / API route handlers
 
-- **`/services`**: 後端服務整合 / Backend service integration
-  - API 請求處理 / API request handling
-  - API 類型定義 / API type definitions
-  - 外部服務整合 / External service integration
+**職責 / Responsibilities:**
+- 路由定義和頁面組合 / Route definition and page composition
+- 組合 widgets 形成完整頁面 / Compose widgets to form complete pages
+- 頁面級別的 SEO 和元數據管理 / Page-level SEO and metadata management
 
-### 狀態管理 / State Management
+#### 🧩 Widgets 層
+**用途**：大型的 UI 組件集合，自包含的功能模組  
+**Purpose**: Large UI component collections, self-contained functional modules
 
-- **`/contexts`**: React Context 定義（推薦使用）/ React Context definitions (recommended)
-  - 用於元件內的狀態共享 / Used for component-level state sharing
-  - 主要處理 UI 狀態和主題設置 / Primarily handles UI state and theme settings
-  - 新功能優先使用 Context 實現 / New features should prioritize Context implementation
-  - 目前已實現的 Context / Currently implemented Contexts:
-    - `AuthContext`: 用戶認證狀態 / User authentication state
-    - `ThemeContext`: 主題設置 / Theme settings
-    - 其他業務相關 Context / Other business-related Contexts
+- **`widgets/`**: 可重複使用的大型組件 / Reusable large components
+  - `layout/`: 布局相關 widgets / Layout-related widgets
+  - `landing-page/`: 首頁功能組件 / Landing page components
+  - `about/`: 關於頁面組件 / About page components
+  - `marathon/`: 馬拉松相關組件 / Marathon-related components
 
-- **`/hooks`**: 自定義 React Hooks / Custom React Hooks
-  - 封裝可重用的狀態邏輯 / Encapsulates reusable state logic
-  - 提供通用功能 / Provides general functionality
-  - SWR 數據請求 hooks / SWR data fetching hooks:
-    - `useUser`: 用戶數據 / User data
-    - `usePosts`: 文章列表 / Post list
-    - `useComments`: 評論數據 / Comment data
+**職責 / Responsibilities:**
+- 組合多個 features 和 entities / Combine multiple features and entities
+- 大型 UI 組件實現 / Large UI component implementation
+- 可在多個頁面重複使用 / Reusable across multiple pages
 
-- **`/redux`**: 全局狀態管理（逐步遷移中）/ Global state management (gradually migrating)
-  - `store/`: Redux store 配置 / Redux store configuration
-  - `actions/`: 定義狀態變更動作 / Defines state change actions
-  - `reducers/`: 處理狀態更新邏輯 / Handles state update logic
-  - `sagas/`: 處理非同步操作（逐步遷移至 SWR）/ Handles asynchronous operations (gradually migrating to SWR)
-  - 注意：新功能不建議使用 Redux，優先使用 Context + SWR / Note: Redux is not recommended for new features; prefer Context + SWR
+#### ⚡ Features 層
+**用途**：具體的業務功能實現，用戶可執行的操作  
+**Purpose**: Specific business feature implementation, user-executable operations
 
-### 工具和配置 / Utilities and Configuration
+- **`features/`**: 業務功能模組 / Business feature modules
+  - `circles/`: 圈子相關功能 / Circle-related features
+  - `ideas/`: 想法管理功能 / Ideas management features
+  - `practice/`: 練習相關功能 / Practice-related features
+  - `projects/`: 專案管理功能 / Project management features
+  - `quiz/`: 測驗功能 / Quiz features
+  - `resources/`: 資源管理功能 / Resource management features
+  - `email/`: 郵件功能 / Email features
+  - `users/`: 用戶管理功能 / User management features
 
-- **`/utils`**: 工具函數集 / Utility functions
-  - API 請求輔助函數 / API request helper functions
-  - 數據格式化 / Data formatting
-  - 驗證函數 / Validation functions
+**職責 / Responsibilities:**
+- 具體業務功能實現 / Specific business functionality
+- 用戶交互操作處理 / User interaction handling
+- 帶來業務價值的功能 / Value-bringing features
 
-- **`/constants`**: 常量定義 / Constant definitions
-  - API 端點 / API endpoints
-  - 配置常量 / Configuration constants
-  - 錯誤碼 / Error codes
+#### 🏢 Entities 層
+**用途**：業務實體的抽象，數據模型和相關 UI  
+**Purpose**: Business entity abstraction, data models and related UI
 
-### 樣式和資源 / Styles and Assets
+- **`entities/`**: 業務實體定義 / Business entity definitions
+  - `marathon/`: 馬拉松業務實體 / Marathon business entity
 
-- **`/public`**: 靜態資源 / Static assets
-  - 圖片、字體等靜態文件 / Static files such as images and fonts
-  - PWA 相關文件 / PWA-related files
+**職責 / Responsibilities:**
+- 業務實體抽象和數據模型 / Business entity abstraction and data models
+- 純展示 UI 組件 / Pure presentation UI components
+- 基礎 CRUD 操作 / Basic CRUD operations
 
-- **`/styles`**: 樣式文件 / Style files
-  - 全局樣式設定 / Global style settings
-  - 主題配置 / Theme configuration
-  - Tailwind 自定義設置 / Tailwind custom settings
+#### 🔧 Shared 層
+**用途**：可重複使用的通用組件、工具和應用配置  
+**Purpose**: Reusable common components, utilities, and application configuration
 
-### 類型定義 / Type Definitions
+- **`shared/`**: 通用工具和組件 / Common utilities and components
+  - `ui/`: 通用 UI 組件庫 / Common UI component library
+  - `lib/`: 工具函數和 hooks / Utility functions and hooks
+  - `components/`: 共享組件 / Shared components
+  - `config/`: 應用配置 / Application configuration
+  - `constants.ts`: 全域常量 / Global constants
 
-- **`/types`**: TypeScript 類型定義 / TypeScript type definitions
-  - 全局類型聲明 / Global type declarations
-  - 模組類型定義 / Module-specific type definitions
+**職責 / Responsibilities:**
+- 通用 UI 組件提供 / Common UI component provision
+- 工具函數和 hooks / Utility functions and hooks
+- 全域配置和常量 / Global configuration and constants
+- 與業務邏輯無關的代碼 / Business-logic-agnostic code
+
+### Legacy 目錄 (逐步遷移中) / Legacy Directories (Gradually Migrating)
+
+#### 傳統組件和工具 / Traditional Components and Utilities
+
+- **`components/`**: Legacy React 組件庫 (逐步遷移至 FSD) / Legacy React component library (gradually migrating to FSD)
+- **`contexts/`**: React Context 定義 / React Context definitions
+- **`hooks/`**: 自定義 React Hooks / Custom React Hooks  
+- **`layout/`**: 布局組件 (遷移至 widgets/layout) / Layout components (migrating to widgets/layout)
+- **`services/`**: API 服務層 / API service layer
+  - `generated/`: OpenAPI 生成的代碼 / OpenAPI generated code
+- **`utils/`**: 工具函數 / Utility functions
+- **`constants/`**: 常量定義 / Constant definitions
+- **`public/`**: 靜態資源 / Static assets
+
+**遷移計劃 / Migration Plan:**
+- 逐步將 `components/` 中的組件遷移至對應的 FSD 層級
+- 將通用組件移至 `shared/ui/`
+- 將業務組件移至 `features/` 或 `widgets/`
+- 保持向下兼容直到遷移完成
+
+---
+
+## FSD 開發規範 / FSD Development Guidelines
+
+### ✅ 架構原則 / Architecture Principles
+
+1. **嚴格的依賴關係 / Strict Dependency Rules**
+   - 上層可以使用下層：App Router → Widgets → Features → Entities → Shared
+   - 下層不能使用上層，避免循環依賴
+   - 同層之間可以相互使用，但需謹慎避免循環依賴
+
+2. **業務導向的組織 / Business-Oriented Organization**
+   - 按業務領域劃分 slice（如 auth, projects, users）
+   - 按技術目的劃分 segment（如 ui, api, model, lib）
+   - 保持高內聚、低耦合
+
+3. **漸進式遷移 / Progressive Migration**
+   - 新功能優先使用 FSD 架構
+   - 舊功能按需遷移，不強制一次性重構
+   - 保持向下兼容
+
+### 📂 Segment 組織規範 / Segment Organization Rules
+
+每個 slice 內部按以下 segment 組織：
+
+- **`ui/`**: React 組件和樣式
+- **`api/`**: API 請求函數和數據獲取
+- **`model/`**: 狀態管理和業務邏輯  
+- **`lib/`**: 工具函數和輔助函數
+- **`config/`**: 配置文件和常量
+- **`types/`**: TypeScript 類型定義
+- **`index.ts`**: 統一導出接口
+
+### 🔄 狀態管理策略 / State Management Strategy
+
+1. **優先級順序 / Priority Order**
+   - **Context + SWR**: 新功能的首選方案
+   - **Redux + Saga**: 舊功能暫時保留，逐步遷移
+   - **Component State**: 組件內部狀態
+
+2. **使用場景 / Use Cases**
+   - **Context**: UI 狀態、主題設置、用戶偏好
+   - **SWR**: 數據獲取、API 請求、緩存管理
+   - **Redux**: 複雜全局狀態（待遷移）
+
+### 🎯 組件開發規範 / Component Development Guidelines
+
+1. **FSD 層級選擇 / FSD Layer Selection**
+   ```typescript
+   // ✅ Shared: 通用 UI 組件
+   // shared/ui/button/Button.tsx
+   export const Button = ({ children, ...props }) => (
+     <button className="btn" {...props}>{children}</button>
+   );
+
+   // ✅ Entities: 純展示業務實體
+   // entities/user/ui/UserCard.tsx
+   export const UserCard = ({ user }) => (
+     <div className="user-card">
+       <img src={user.avatar} alt={user.name} />
+       <h3>{user.name}</h3>
+     </div>
+   );
+
+   // ✅ Features: 具體業務功能
+   // features/auth/ui/LoginForm.tsx
+   export const LoginForm = () => {
+     const { login } = useAuth();
+     return <form onSubmit={login}>...</form>;
+   };
+
+   // ✅ Widgets: 組合多個功能
+   // widgets/header/ui/Header.tsx
+   export const Header = () => (
+     <header>
+       <Logo />
+       <Navigation />
+       <UserMenu />
+     </header>
+   );
+   ```
+
+2. **導出規範 / Export Standards**
+   ```typescript
+   // 每個 slice 的 index.ts 統一導出
+   // features/auth/index.ts
+   export { LoginForm } from './ui/LoginForm';
+   export { useAuth } from './model/useAuth';
+   export { authApi } from './api/authApi';
+   ```
+
+---
 
 ## 開發規範 / Development Guidelines
+
+### Git 工作流程 / Git Workflow
 
 1. **分支管理 / Branch Management**:
    - `dev`: 開發分支，用於整合功能和測試 / Development branch for feature integration and testing
@@ -243,14 +399,16 @@ daodao-f2e/
    - 功能開發：從 `dev` 分支建立功能分支 -> 開發 -> 合併回 `dev` / Feature development: Create feature branch from `dev` -> Develop -> Merge back to `dev`
    - 緊急修復：從 `prod` 分支建立 hotfix 分支 -> 修復 -> 合併至 `prod` 和 `dev` / Hotfix: Create hotfix branch from `prod` -> Fix -> Merge into `prod` and `dev`
 
+### 程式碼規範 / Code Standards
+
 3. **程式碼風格 / Code Style**:
    - 遵循 Airbnb ESLint 規範 / Follow Airbnb ESLint rules
    - 組件樣式優先使用 Tailwind CSS 類名 / Prefer Tailwind CSS class names for component styles
    - 避免使用 CSS-in-JS，除非特殊情況 / Avoid CSS-in-JS unless necessary
 
-4. **組件開發 / Component Development**:
-   - 共享元件放置在 `/shared` 目錄 / Shared components are placed in `/shared` directory
-   - 頁面特定元件放置在對應的頁面目錄 / Page-specific components are placed in corresponding page directories
+4. **FSD 組件開發 / FSD Component Development**:
+   - 新組件優先放置在對應的 FSD 層級 / New components should be placed in appropriate FSD layers
+   - Legacy 組件逐步遷移至 FSD 架構 / Legacy components should gradually migrate to FSD architecture
    - 使用 TypeScript 類型定義 / Use TypeScript type definitions
    - UI 組件開發規範 / UI Component Development Guidelines:
      - 優先使用 Tailwind CSS 類名 / Prefer Tailwind CSS class names
@@ -348,6 +506,9 @@ daodao-f2e/
 ```env
 # API 配置 / API Configuration
 NEXT_PUBLIC_API_URL=           # API 基礎 URL / Base API URL
+
+# 國際化配置 / Internationalization Configuration
+NEXT_I18N_URL=                # Google App Script URL for i18n data fetching
 ```
 
 ### 環境變數使用規範 / Environment Variable Usage Guidelines
@@ -373,7 +534,7 @@ NEXT_PUBLIC_API_URL=           # API 基礎 URL / Base API URL
 
 
 ```bash
-yarn deploy
+pnpm deploy
 ```
 # CI/CD 流程 | CI/CD Workflow
 
@@ -397,12 +558,12 @@ jobs:
 
   check:
     # TypeScript 類型檢查 | TypeScript type checking
-    - 運行 yarn ts:check | Run yarn ts:check
+    - 運行 pnpm ts:check | Run pnpm ts:check
     - 錯誤通知（Discord） | Error notification (Discord)
 
   lint:
     # ESLint 代碼檢查 | ESLint code linting
-    - 運行 yarn lint | Run yarn lint
+    - 運行 pnpm lint | Run pnpm lint
     - 自動格式化 | Auto-format code
     - 錯誤通知（Discord） | Error notification (Discord)
 ```

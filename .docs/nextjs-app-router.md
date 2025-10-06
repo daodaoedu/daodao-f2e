@@ -6,16 +6,16 @@
   - Client：使用 SWR，封裝於自訂 hooks（例如 `features/*/hooks`）。
 - API Route 使用 `app/api/*/route.ts`。
 - SEO 與 Metadata 使用 App Router metadata API；共用設定集中於 `components/SEOConfig.tsx` 或 layout。
-- 多語路由：沿用 `app/[language]/*`，跨頁共享 UI 放於 `(public)`、受保護區塊放於 `(protected)`。
+- 多語路由：沿用 `app/[language]/*`，跨頁共享 UI 放於 `(guest)`、受保護區塊放於 `(authenticated)`。
 - 錯誤與 404：使用 `app/global-error.tsx`、`app/global-not-found.tsx`。
 
 ### 登入與權限
 
-- 權限以 `(protected)` 分組 + `ProtectedComponent` 落實；公開頁維持於 `(public)`。
+- 權限以 `(authenticated)` 分組 + `ProtectedComponent` 落實；公開頁維持於 `(guest)`。
 - 權限細節與範例見：[auth-and-app-router.md](mdc:.docs/auth-and-app-router.md)
 
 參考：
-- [app/[language]/(public)/(default-layout)/page.tsx](mdc:app/[language]/(public)/(default-layout)/page.tsx)
+- [app/[language]/(guest)/(default-layout)/page.tsx](mdc:app/[language]/(guest)/(default-layout)/page.tsx)
 - [app/global-error.tsx](mdc:app/global-error.tsx)
 - [app/global-not-found.tsx](mdc:app/global-not-found.tsx)
 - [middleware.ts](mdc:middleware.ts)
