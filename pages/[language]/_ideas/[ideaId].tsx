@@ -173,7 +173,7 @@ const IdeaDetailPage = () => {
 
         {/* 評論區塊 */}
         <div className="mt-6 bg-basic-white rounded-2xl p-3 md:p-10">
-          <CommentSection targetId={Number(idea.id)} targetType={CommentType.Idea} />
+          <CommentSection targetId={idea.id} targetType={CommentType.Idea} />
         </div>
       </div>
     </div>

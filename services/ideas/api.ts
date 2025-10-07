@@ -49,14 +49,19 @@ class IdeaAPI {
     const queryString = buildIdeaQueryString(params);
     const url = queryString ? `${IDEA_BASE_PATH}?${queryString}` : IDEA_BASE_PATH;
 
-    return fetcher<IdeaListResponseSchema>(url);
+    const response = await fetcher<{ success: boolean; data: any; pagination: any }>(url);
+    return {
+      data: response.data,
+      pagination: response.pagination,
+    } as IdeaListResponseSchema;
   }
 
   /**
    * 取得單個想法詳情
    */
   async read(ideaId: string): Promise<IdeaSchema> {
-    return fetcher<IdeaSchema>(getIdeaPathname({ id: ideaId }));
+    const response = await fetcher<{ success: boolean; data: IdeaSchema }>(getIdeaPathname({ id: ideaId }));
+    return response.data;
   }
 
   /**

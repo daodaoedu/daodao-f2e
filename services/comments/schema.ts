@@ -32,7 +32,7 @@ export type CommentSchema = z.infer<typeof baseCommentSchema> & {
 export const createCommentSchema = baseCommentSchema
   .extend({
     targetType: z.nativeEnum(CommentType),
-    targetId: z.number(),
+    targetId: z.string(),
   })
   .omit({
     id: true,

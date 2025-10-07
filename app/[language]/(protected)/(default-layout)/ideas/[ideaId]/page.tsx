@@ -91,7 +91,7 @@ const IdeaDetailPage = () => {
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <div className="px-3 py-1 text-xs bg-primary-base rounded-full text-white whitespace-nowrap text-center">
+                  <div className="px-3 py-1 text-xs bg-orange-400 rounded-full text-white whitespace-nowrap text-center">
                     想法
                   </div>
                   <span className="text-sm text-[#92989A] text-center sm:text-left">
@@ -182,7 +182,7 @@ const IdeaDetailPage = () => {
 
         {/* 評論區塊 */}
         <div className="mt-6 bg-basic-white rounded-2xl p-4 md:p-8 lg:p-10">
-          <CommentSection targetId={Number(idea.id)} targetType={CommentType.Idea} />
+          <CommentSection targetId={idea.id} targetType={CommentType.Idea} />
         </div>
       </div>
     </div>

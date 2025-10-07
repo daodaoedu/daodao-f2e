@@ -91,8 +91,8 @@ function CommentInput({
               height={30}
               className="rounded-full"
             />
-            <div>{user.name}</div>
-            <div className="rounded bg-basic-100 px-2.5 py-1">{role}</div>
+            <div className="text-basic-500">{user.name}</div>
+            <div className="rounded bg-basic-100 px-2.5 py-1 text-basic-500">{role}</div>
           </div>
           {isEditing && (
             <Button

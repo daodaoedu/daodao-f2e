@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
 
 interface ErrorPageProps {
   error: Error & { digest?: string };
@@ -11,11 +13,12 @@ interface ErrorPageProps {
 }
 
 export default function ExploreError({ error, reset }: ErrorPageProps) {
+  const router = useRouter();
   useEffect(() => {
     // Log the error to an error reporting service
     console.error('Explore page error:', error);
   }, [error]);
-
+  
   return (
     <div className="min-h-screen bg-basic-100 relative">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -59,7 +62,7 @@ export default function ExploreError({ error, reset }: ErrorPageProps) {
               <Button
                 variant="outline"
                 onClick={() => {
-                  window.location.href = '/';
+                   router.push('/');
                 }}
                 className="border-basic-200 text-basic-400 hover:bg-basic-100 bg-basic-white"
               >

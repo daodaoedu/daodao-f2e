@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Search, Plus, FolderOpen, SortAsc, RefreshCw,
 } from 'lucide-react';
@@ -31,6 +32,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
   showCreateButton = true,
   onCreateClick,
 }) => {
+  const router = useRouter();
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'createdDate' | 'updatedDate' | 'title'>('createdDate');
@@ -102,7 +104,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
       onCreateClick();
     } else {
       // Default behavior - navigate to create page
-      window.location.href = '/manage/projects/create';
+       router.push('/manage/projects/create');
     }
   };
 

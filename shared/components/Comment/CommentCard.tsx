@@ -89,7 +89,7 @@ function CommentCard({
   if (!commentUser) return null;
 
   return (
-    <div className="body-sm bg-white font-normal">
+    <div className="body-sm bg-white font-normal text-basic-500">
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Image
@@ -100,7 +100,7 @@ function CommentCard({
             className="rounded-full"
           />
           <div className="flex items-center gap-2">
-            <span className="font-medium">{commentUser.name}</span>
+            <span className="font-medium text-basic-500">{commentUser.name}</span>
             {role && (
               <div className="rounded bg-basic-100 px-2.5 py-1">{role}</div>
             )}
@@ -149,7 +149,7 @@ function CommentCard({
             hideHeader
           />
         ) : (
-          <p className="whitespace-pre-wrap">{content}</p>
+          <p className="whitespace-pre-wrap text-basic-500">{content}</p>
         )}
       </div>
       <div className="mb-2 flex items-center gap-2 text-basic-black">
@@ -162,7 +162,7 @@ function CommentCard({
         </Button>
         <Button
           variant="ghost"
-          className="-m-2 p-2"
+          className="-m-2 p-2 text-basic-500"
           onClick={() => setIsShowCommentInput(true)}
         >
           回覆

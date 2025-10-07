@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Lightbulb, TrendingUp, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +23,8 @@ const IdeasRecommendationSection: React.FC<IdeasRecommendationSectionProps> = ({
   showHeader = true,
 }) => {
   const { user } = useAuth();
+  const router = useRouter();
+
 
   // Use recommendation service to get idea-specific recommendations
   const {
@@ -181,10 +184,8 @@ const IdeasRecommendationSection: React.FC<IdeasRecommendationSectionProps> = ({
             <IdeaCard
               idea={convertToIdeaSchema(item)}
               onClick={(id) => {
-                window.location.href = `/ideas/${id}`;
+                 router.push(`/ideas/${id}`);
               }}
-              onSave={() => console.log('Save idea:', item.id)}
-              onReport={() => console.log('Report idea:', item.id)}
             />
             {item.reason && (
               <div className="absolute right-2 top-2">

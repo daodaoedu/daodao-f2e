@@ -277,11 +277,11 @@ function PracticeCard({
         <div className="mb-3 sm:mb-4">
           <div className="w-full bg-basic-100 rounded-full h-2 relative">
             <Progress
-              value={(practice.currentProgress / practice.totalAmount) * 100}
+              value={practice.totalAmount > 0 ? (practice.currentProgress / practice.totalAmount) * 100 : 0}
               className="h-2 bg-primary-base rounded-full"
             />
             <span className="absolute right-0 -top-6 text-xs text-basic-300 font-medium">
-              {Math.round((practice.currentProgress / practice.totalAmount) * 100)}%
+              {practice.totalAmount > 0 ? Math.round((practice.currentProgress / practice.totalAmount) * 100) : 0}%
             </span>
           </div>
         </div>
@@ -638,6 +638,7 @@ export default function ExplorePage() {
   console.log(setSearchQuery); // Temporary to avoid unused variable warning
   const [isSearching, setIsSearching] = useState(false);
   const [showIdeaCreateModal, setShowIdeaCreateModal] = useState(false);
+  const router = useRouter();
 
   // 使用真實的 Ideas API - 統一使用 useSWR
   const { data: ideas, isLoading: ideasLoading, error: ideasError, mutate: mutateIdeas } = useSWR<{data: IdeaSchema[]}>('/api/v1/ideas', fetcher, {
@@ -750,10 +751,8 @@ export default function ExplorePage() {
                   idea={idea}
                   onClick={(id) => {
                     // 導航到詳情頁
-                    window.location.href = `/ideas/${id}`;
+                     router.push(`/ideas/${id}`);
                   }}
-                  onSave={(id) => handleCardAction('save', id)}
-                  onReport={(id) => handleCardAction('report', id)}
                 />
               ))}
               {Array.isArray(ideas?.data) && ideas.data.length === 0 && !ideasLoading && (
@@ -794,14 +793,8 @@ export default function ExplorePage() {
                   key={project.id}
                   project={{
                     ...project,
-                    createdDate: project.createdDate,
-                    updatedDate: project.updatedDate,
                     resourceUrl: project.resourceUrl || [],
                     milestones: project.milestones || [],
-                    user: {
-                      ...project.user,
-                      photoURL: project.user.photoURL,
-                    },
                   }}
                   onJoin={(id) => handleCardAction('join', id)}
                   onComment={(id) => handleCardAction('comment', id)}

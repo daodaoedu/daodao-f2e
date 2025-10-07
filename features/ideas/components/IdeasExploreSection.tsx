@@ -16,6 +16,7 @@ import {
 import type { IdeaSearchParamsSchema } from '@/services/ideas';
 import IdeaCard from './IdeaCard';
 import { useIdeas } from '../hooks';
+import { useRouter } from 'next/navigation';
 
 interface IdeasExploreSectionProps {
   className?: string;
@@ -30,6 +31,8 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
   showCreateButton = true,
   onCreateClick,
 }) => {
+  const router = useRouter();
+
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'createdDate' | 'updatedDate' | 'likeCount'>('createdDate');
@@ -70,7 +73,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
       onCreateClick();
     } else {
       // Default behavior - navigate to create page
-      window.location.href = '/ideas/create';
+       router.push('/ideas/create');
     }
   };
 
@@ -228,10 +231,8 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
                 key={idea.id}
                 idea={idea}
                 onClick={(id) => {
-                  window.location.href = `/ideas/${id}`;
+                   router.push(`/ideas/${id}`);
                 }}
-                onSave={() => console.log('Save idea:', idea.id)}
-                onReport={() => console.log('Report idea:', idea.id)}
               />
             ))}
 

@@ -11,7 +11,7 @@ import {
 
 export type CommentSWRKey = [
   string,
-  { targetType: CommentType; targetId: number | string }
+  { targetType: CommentType; targetId: string }
 ];
 
 interface GetCommentPathnameProps {
@@ -19,7 +19,7 @@ interface GetCommentPathnameProps {
 }
 
 export const getCommentPathname = ({ id }: GetCommentPathnameProps = {}) =>
-  id ? `/comments/${parseToString(id)}` : "/comments";
+  id ? `/api/v1/comments/${parseToString(id)}` : "/api/v1/comments";
 
 interface CommentAPIType {
   create: MutationFetcher<

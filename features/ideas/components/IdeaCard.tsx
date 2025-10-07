@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  MoreVertical,
   Share2,
-  Bookmark,
-  Flag,
   Link as LinkIcon,
   Eye,
 } from 'lucide-react';
@@ -12,12 +9,6 @@ import Shell from '@/public/assets/icons/shell.svg';
 import Comment from '@/public/assets/icons/comment.svg';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
@@ -45,18 +36,13 @@ interface IdeaCardProps {
     createdAt: string;
     updatedAt: string;
   };
-  onSave?: (id: string) => void;
-  onReport?: (id: string) => void;
   onClick?: (id: string) => void;
 }
 
 function IdeaCard({
   idea,
-  onSave,
-  onReport,
   onClick,
 }: IdeaCardProps) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const router = useRouter();
 
   const handleCardClick = (e: React.MouseEvent) => {
@@ -111,48 +97,12 @@ function IdeaCard({
 
           <div className="flex items-center space-x-1 sm:space-x-2 mt-0">
             <Badge
-              style={{ backgroundColor: '#ffa10b' }}
-              className="text-primary-foreground text-xs hidden sm:inline-block"
+              className="bg-orange-400 text-primary-foreground text-xs hidden sm:inline-block"
             >
               想法
             </Badge>
             <div className="text-xs text-basic-300 hidden sm:block">
               {new Date(idea.createdAt).toLocaleDateString('zh-TW')}
-            </div>
-            <div className="relative">
-              <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="p-1 text-basic-300 hover:text-basic-500 hover:bg-basic-100 rounded-lg transition-colors"
-                  >
-                    <MoreVertical size={14} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-32 bg-basic-white border-basic-200 text-basic-500" align="end">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      onSave?.(idea.id);
-                      setIsDropdownOpen(false);
-                    }}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <Bookmark size={14} className="mr-2" />
-                    儲存
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      onReport?.(idea.id);
-                      setIsDropdownOpen(false);
-                    }}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <Flag size={14} className="mr-2" />
-                    檢舉
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
           </div>
         </div>
