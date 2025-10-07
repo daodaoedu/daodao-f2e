@@ -1,4 +1,4 @@
-import { OptionProps } from '@/components/ui/option';
+import { OptionProps } from '@/shared/ui/option';
 
 /**
  * 建立 value 到 label 的映射物件，提升查找效能

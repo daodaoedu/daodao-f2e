@@ -1,8 +1,8 @@
-import { Title, Text } from '@/components/ui/typography';
-import { Paper } from '@/components/ui/paper';
-import { Button } from '@/components/ui/button';
+import { Title, Text } from '@/shared/ui/typography';
+import { Paper } from '@/shared/ui/paper';
+import { Button } from '@/shared/ui/button';
 import { Facebook } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/shared/ui/badge';
 import { CATEGORIES } from '@/constants/category';
 
 export default function NotExist() {

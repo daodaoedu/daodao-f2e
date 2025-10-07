@@ -3,18 +3,18 @@ import { useRouter } from 'next/navigation';
 import {
   Search, Plus, FolderOpen, SortAsc, RefreshCw,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import {
   Card, CardContent, CardHeader, CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+} from '@/shared/ui/card';
+import { Badge } from '@/shared/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/shared/ui/dropdown-menu';
 import { useMyProjects } from '@/services/projects/core/hooks';
 import type { ProjectSchema } from '@/services/projects/core/schema';
 import Link from 'next/link';

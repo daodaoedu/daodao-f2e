@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import PostPreviewCard from '@/shared/components/Post/PostPreviewCard';
-import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 
 const tagMap = {
   outcome: '成果',

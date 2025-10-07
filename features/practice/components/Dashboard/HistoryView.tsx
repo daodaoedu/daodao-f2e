@@ -4,7 +4,7 @@ import {
 } from 'lucide-react';
 import { Practice } from '@/services/practice/schema';
 import { CheckInService } from '@/services/practice/checkIn';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 
 interface HistoryViewProps {
   practice: Practice;

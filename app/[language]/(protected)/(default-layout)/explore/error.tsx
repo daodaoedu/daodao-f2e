@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Container } from '@/components/ui/container';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/shared/ui/button';
+import { Container } from '@/shared/ui/container';
 
 
 interface ErrorPageProps {

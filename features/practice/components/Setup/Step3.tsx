@@ -3,9 +3,9 @@ import {
   Plus, X, Link as LinkIcon, AlertCircle,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Label } from '@/shared/ui/label';
 import Link from 'next/link';
 
 interface Step3Props {

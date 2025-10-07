@@ -1,7 +1,7 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/navigation";
 import SEOConfig from "@/components/SEOConfig";
-import { Background, Container } from "@/components/ui/wrapper";
+import { Background, Container } from "@/shared/ui/wrapper";
 import { ProtectedComponent } from "@/contexts/Auth";
 import { CircleForm } from "@/features/circles";
 import { parseToString } from "@/utils/helper";

@@ -2,9 +2,9 @@ import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import { useRouter } from "next/navigation";
 import { ChevronRightIcon, ChevronLeftIcon } from "lucide-react";
 import SEOConfig from "@/components/SEOConfig";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Image } from "@/components/ui/image";
+import { Button } from "@/shared/ui/button";
+import { Progress } from "@/shared/ui/progress";
+import { Image } from "@/shared/ui/image";
 import RunnerSvg from "@/public/assets/icons/runner.svg";
 import { cn } from "@/utils/cn";
 import {
@@ -14,7 +14,7 @@ import {
   useQuiz,
 } from "@/features/quiz";
 import { parseToString } from "@/utils/helper";
-import { locales } from "@/constants/i18n";
+import { locales } from "@/shared/config/i18n";
 
 export const getStaticPaths = async () => {
   const paths = locales.flatMap((language) =>

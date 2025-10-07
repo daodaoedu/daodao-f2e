@@ -5,18 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Plus, Lightbulb, Target, BookOpen, ChevronDown, MoreVertical, Share2, Bookmark, Flag, User, Flame } from 'lucide-react';
 import Shell from '@/public/assets/icons/shell.svg';
 import Comment from '@/public/assets/icons/comment.svg';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Container } from '@/components/ui/container';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/utils/cn';
 import { timeDuration } from '@/utils/date';
 import useSWR from 'swr';
@@ -24,6 +12,18 @@ import { fetcher } from '@/utils/http';
 import { IdeaCard } from '@/features/ideas/components';
 import IdeaCreateContainer from '@/features/ideas/components/IdeaCreateContainer';
 import type { IdeaSchema } from '@/services/ideas/schema';
+import { Button } from '@/shared/ui/button';
+import { Card, CardContent } from '@/shared/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/ui/dropdown-menu';
+import { Badge } from '@/shared/ui/badge';
+import { Progress } from '@/shared/ui/progress';
+import { Container } from '@/shared/ui/container';
+import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
 
 // ========================================
 // ExploreTabs Component

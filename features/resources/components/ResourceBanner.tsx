@@ -2,13 +2,13 @@
 import Link from 'next/link';
 import { StaticImageData } from 'next/image';
 import { SearchIcon, SendHorizontalIcon } from 'lucide-react';
-import { OptionProps } from '@/components/ui/option';
+import { OptionProps } from '@/shared/ui/option';
 // import { AuthButton } from "@/contexts/Auth";
 import { cn } from '@/utils/cn';
-import { Badge } from '@/components/ui/badge';
-import { Container } from '@/components/ui/wrapper';
-import { Input } from '@/components/ui';
-import { Image } from '@/components/ui/image';
+import { Badge } from '@/shared/ui/badge';
+import { Container } from '@/shared/ui/wrapper';
+import { Input } from '@/shared/ui';
+import { Image } from '@/shared/ui/image';
 import SectionTitle from './SectionTitle';
 
 interface ResourceBannerProps {

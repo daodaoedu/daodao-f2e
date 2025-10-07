@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text } from '@/components/ui/typography';
+import { Text } from '@/shared/ui/typography';
 
 const SubFooter = ({ title, list }) => (
   <div className="[&>li]:mx-2.5 [&>li]:my-auto [&>li]:cursor-pointer [&>ul]:mt-[15px] [&>ul]:flex [&>ul]:items-center [&>ul]:justify-start">

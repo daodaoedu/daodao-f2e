@@ -3,17 +3,17 @@ import { useRouter } from 'next/navigation';
 import { Plus, Lightbulb, Target, BookOpen, ChevronDown, MoreVertical, Shell, MessageCircle, Share2, Link as LinkIcon, Bookmark, Flag, User, Flame } from 'lucide-react';
 import SEOConfig from '@/components/SEOConfig';
 import getPrivateLayout from '@/layout/core/getPrivateLayout';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent } from "@/shared/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Container } from "@/components/ui/container";
+} from "@/shared/ui/dropdown-menu";
+import { Badge } from "@/shared/ui/badge";
+import { Progress } from "@/shared/ui/progress";
+import { Container } from "@/shared/ui/container";
 import { cn } from "@/utils/cn";
 
 // ========================================

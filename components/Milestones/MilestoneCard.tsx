@@ -15,8 +15,8 @@ import toast from 'react-hot-toast';
 import { DateRange } from 'react-day-picker';
 import { format, toDate, isValid } from 'date-fns';
 import { cn } from '@/utils/cn';
-import { Button } from '@/components/ui/button';
-import { Form } from '@/components/ui/form';
+import { Button } from '@/shared/ui/button';
+import { Form } from '@/shared/ui/form';
 import { useDialog } from '@/contexts/Dialog';
 import {
   useProject,
@@ -25,7 +25,7 @@ import {
   projectMilestoneFormSchema,
 } from '@/services/projects';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DateRangePicker } from '@/components/ui/date-picker';
+import { DateRangePicker } from '@/shared/ui/date-picker';
 import { getDefaultMilestone } from './Shared';
 
 interface MilestoneCardProps {

@@ -3,7 +3,7 @@ import {
   ChangeEvent, useEffect, useRef, useState,
 } from 'react';
 import { uploadImagesSchema } from '@/services/images';
-import { Button, type ButtonProps } from '@/components/ui/button';
+import { Button, type ButtonProps } from '@/shared/ui/button';
 
 export interface ImageDataType {
   id: string;

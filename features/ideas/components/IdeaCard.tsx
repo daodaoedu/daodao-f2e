@@ -7,10 +7,10 @@ import {
 } from 'lucide-react';
 import Shell from '@/public/assets/icons/shell.svg';
 import Comment from '@/public/assets/icons/comment.svg';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/shared/ui';
+import { Card, CardContent } from '@/shared/ui/card';
+import { Badge } from '@/shared/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
 
 interface IdeaCardProps {
   idea: {

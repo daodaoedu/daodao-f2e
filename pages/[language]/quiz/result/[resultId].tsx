@@ -2,8 +2,8 @@ import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import { Fragment } from "react";
 import Link from "next/link";
 import SEOConfig from "@/components/SEOConfig";
-import { Button } from "@/components/ui/button";
-import { Image } from "@/components/ui/image";
+import { Button } from "@/shared/ui/button";
+import { Image } from "@/shared/ui/image";
 import HorizontalLogoSvg from "@/public/assets/brand/horizontal-primary-logo.svg";
 import {
   getQuizLayout,
@@ -15,10 +15,10 @@ import {
   List,
 } from "@/features/quiz";
 import { parseToString } from "@/utils/helper";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Badge } from "@/components/ui/badge";
+import { AspectRatio } from "@/shared/ui/aspect-ratio";
+import { Badge } from "@/shared/ui/badge";
 import { ProtectedComponent } from "@/contexts/Auth";
-import { BackButton } from "@/components/ui/back-button";
+import { BackButton } from "@/shared/ui/back-button";
 import { SquareArrowOutUpRightIcon } from "lucide-react";
 import { cn } from "@/utils/cn";
 

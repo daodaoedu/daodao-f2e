@@ -1,7 +1,7 @@
 
 import { getPublicProjectLayout } from '@/layout/features/getProjectLayout';
 import { useSearchParams } from 'next/navigation';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/shared/ui/skeleton';
 import { useProjectMilestones } from '@/features/projects/hooks/milestone';
 import EmptyList from '@/components/Projects/ProjectList/EmptyList';
 import MilestoneItemView from '@/components/Milestones/MilestoneItemView';

@@ -4,13 +4,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check } from 'lucide-react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Form } from '@/components/ui/form';
+import { Button } from '@/shared/ui/button';
+import { Form } from '@/shared/ui/form';
 import DocSvg from '@/public/assets/icons/doc.svg';
-import { Background, Container, Paper } from '@/components/ui/wrapper';
-import { BackButton } from '@/components/ui/back-button';
-import { Title } from '@/components/ui/typography';
-import { Progress } from '@/components/ui/progress';
+import { Background, Container, Paper } from '@/shared/ui/wrapper';
+import { BackButton } from '@/shared/ui/back-button';
+import { Title } from '@/shared/ui/typography';
+import { Progress } from '@/shared/ui/progress';
 import {
   ResourceReviewFormSchema,
   resourceReviewFormSchema,

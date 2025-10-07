@@ -4,13 +4,13 @@ import { SWRConfig } from 'swr';
 
 
 import { Toaster } from 'react-hot-toast';
-import { Toaster as SonnerToaster } from '@/components/ui/sonner';
+import { Toaster as SonnerToaster } from '@/shared/ui/sonner';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';
 import { AuthProvider, useAuth } from '@/contexts/Auth';
 import { DialogProvider } from '@/contexts/Dialog';
-import useQueryState from '@/hooks/useQueryState';
+import useQueryState from '@/shared/lib/use-query-state';
 import { fetcher } from '@/utils/http';
 import { getReminderStorage } from '@/utils/storage';
 import getBaseLayout from '@/layout/core/getBaseLayout';

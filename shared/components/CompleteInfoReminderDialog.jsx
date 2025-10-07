@@ -6,9 +6,9 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Text } from '@/components/ui/typography';
+} from '@/shared/ui/dialog';
+import { Button } from '@/shared/ui/button';
+import { Text } from '@/shared/ui/typography';
 import illustrationImg from '@/public/assets/images/review-passed.png';
 
 export default function CompleteInfoReminderDialog({ isOpen, onClose }) {

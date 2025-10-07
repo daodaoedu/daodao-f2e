@@ -2,11 +2,11 @@ import React from 'react';
 import {
   FolderOpen, TrendingUp, RefreshCw, Compass,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import {
   Card, CardContent, CardHeader, CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+} from '@/shared/ui/card';
+import { Badge } from '@/shared/ui/badge';
 import { useContentTypeRecommendations } from '@/services/recommendation';
 import { useAuth } from '@/contexts/Auth';
 import { type RecommendationItem } from '@/services/recommendation/core/schema';

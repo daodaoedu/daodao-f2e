@@ -1,7 +1,7 @@
 import useSWRMutation from 'swr/mutation';
 import contractDoneImg from '@/public/assets/images/email-contact.png';
 import contractErrorImg from '@/public/assets/images/500-error.png';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import { emailAPI, getEmailPathname, SendEmailSchema } from '@/services/emails';
 import { useDialog } from '@/contexts/Dialog';
 

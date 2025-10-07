@@ -5,16 +5,16 @@ import { zhTW } from 'date-fns/locale';
 import { PathInfo } from '@/services/practice/schema';
 import { cn } from '@/utils/cn';
 import { formatDateISO } from '@/services/practice/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
+} from '@/shared/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/shared/ui/radio-group';
+import { Label } from '@/shared/ui/label';
+import { Textarea } from '@/shared/ui/textarea';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
+import { Calendar } from '@/shared/ui/calendar';
 
 interface StepTwoProps {
   pathInfo: PathInfo;

@@ -7,10 +7,10 @@ import CommentSection from '@/shared/components/Comment/CommentSection';
 import { CommentType } from '@/services/comments';
 import Shell from '@/public/assets/icons/shell.svg';
 import Comment from '@/public/assets/icons/comment.svg';
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import { ROLE } from '@/constants/member';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 
 const IdeaDetailPage = () => {
   const router = useRouter();

@@ -1,22 +1,22 @@
 'use client';
 
 import { useFormContext } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/shared/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/shared/ui/select';
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Badge } from '@/components/ui/badge';
+} from '@/shared/ui/form';
+import { Badge } from '@/shared/ui/badge';
 import { ResourceFormSchema } from '@/services/resources/core/schema';
 import {
   resourceTypeOptions,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse, MiddlewareConfig } from 'next/server';
-import { defaultLocale, getLocale, locales } from './constants/i18n';
+import { defaultLocale, getLocale, locales } from './shared/config/i18n';
 
 export function middleware(request: NextRequest) {
   // Check if there is any supported locale in the pathname
@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
   if (pathnameHasLocalePrefix) return NextResponse.next();
 
   const acceptLanguage = request.headers.get('Accept-Language');
-  const locale = getLocale(acceptLanguage, defaultLocale);
+  const locale = getLocale(acceptLanguage);
   const redirectURL = href.replace(origin, `${origin}/${locale}`);
 
   if (locale !== defaultLocale) {

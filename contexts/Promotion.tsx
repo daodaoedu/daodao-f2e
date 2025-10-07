@@ -26,7 +26,7 @@ export const usePromotion = () => {
 export const PromotionProvider = ({ children }: React.PropsWithChildren) => {
   const [isShowShadow, setIsShowShadow] = useState(true);
   const [isShowPromotionBar, setIsShowPromotionBar] = useState(true);
-  const [height, setHeight] = useState(0);
+  const [height, setHeight] = useState(85);
 
   return (
     <PromotionContext.Provider

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { type AnimationItem } from 'lottie-web';
-import useMediaQuery from '@/hooks/useMediaQuery';
+import useMediaQuery from '@/shared/lib/use-media-query';
 
 type Props = {
   desktopSrc: string; // e.g. "/assets/landing-page/key-vision-desktop.json"
@@ -66,6 +66,10 @@ export function LottieHero({
   }, [isMobile, desktopSrc, mobileSrc, preserveAspectRatio]);
 
   return (
-    <div ref={containerRef} className="min-h-[240px]" aria-hidden="true" />
+    <div
+      ref={containerRef}
+      className="aspect-[564/396] w-full md:aspect-[498/320]"
+      aria-hidden="true"
+    />
   );
 }

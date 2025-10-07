@@ -2,9 +2,9 @@ import useSWR from "swr";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import Container from "@/shared/components/Container";
-import { Image } from '@/components/ui/image';
+import { Image } from '@/shared/ui/image';
 import { getMentorMarathonPathname, MarathonSchema } from "@/services/mentors";
 import { differenceInDays, format } from "date-fns";
 

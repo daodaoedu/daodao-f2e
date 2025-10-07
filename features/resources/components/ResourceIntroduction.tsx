@@ -1,7 +1,7 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { ResourceDetailResponseSchema } from '@/services/resources/core/schema';
-import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 import ShellSvg from '@/public/assets/icons/shell.svg';
 
 interface ResourceIntroductionProps {

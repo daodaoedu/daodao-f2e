@@ -3,10 +3,10 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import { Share2, Globe, Ellipsis } from 'lucide-react';
 import { ResourceDetailResponseSchema } from '@/services/resources/core/schema';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Image } from '@/components/ui/image';
+import { Button } from '@/shared/ui/button';
+import { Badge } from '@/shared/ui/badge';
+import { Separator } from '@/shared/ui/separator';
+import { Image } from '@/shared/ui/image';
 import GroupSvg from '@/public/assets/icons/group.svg';
 import BoxSvg from '@/public/assets/icons/box.svg';
 import {
@@ -14,7 +14,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui';
+} from '@/shared/ui';
 import { useDialog } from '@/contexts/Dialog';
 import FacebookSvg from '@/public/assets/social-icons/facebook.svg';
 import LineSvg from '@/public/assets/social-icons/line.svg';

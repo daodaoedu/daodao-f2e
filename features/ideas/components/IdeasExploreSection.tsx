@@ -2,17 +2,17 @@ import React, { useState, useCallback } from 'react';
 import {
   Search, Plus, Lightbulb, SortAsc, RefreshCw,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import {
   Card, CardContent, CardHeader, CardTitle,
-} from '@/components/ui/card';
+} from '@/shared/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/shared/ui/dropdown-menu';
 import type { IdeaSearchParamsSchema } from '@/services/ideas';
 import { useRouter } from 'next/navigation';
 import IdeaCard from './IdeaCard';

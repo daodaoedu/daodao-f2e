@@ -70,6 +70,7 @@ export default {
       colors: {
         primary: {
           palest: "#F3FCFC",
+          pale: "#EEF9F9",
           lightest: "#DEF5F5",
           lighter: "#89DAD7",
           base: "#16B9B3",

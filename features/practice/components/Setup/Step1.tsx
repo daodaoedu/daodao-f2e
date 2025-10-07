@@ -3,16 +3,16 @@ import { Plus, X } from 'lucide-react';
 import { contentTypeOptions, defaultTags } from '@/constants/practice';
 import { PathInfo } from '@/services/practice/schema';
 import { cn } from '@/utils/cn';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Label } from '@/shared/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/shared/ui/select';
 
 interface Step1Props {
   pathInfo: PathInfo;

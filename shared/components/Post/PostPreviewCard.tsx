@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import PostCard from '@/shared/components/Post/PostCard';
 import numberToChineseNumber from '@/utils/numberToChineseNumber';
 

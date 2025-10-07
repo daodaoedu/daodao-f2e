@@ -1,5 +1,5 @@
 import { Project } from '@/components/Projects/Project/type';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import { Panel } from '@/components/Projects/Project/Shared';
 import InputField from '@/components/Projects/Form/InputField';
 import MultiSelectDropdown from '@/components/Projects/Form/MultiSelectDropDown';

@@ -4,10 +4,10 @@ import SEOConfig from '@/components/SEOConfig';
 import getBaseLayout from '@/layout/core/getBaseLayout';
 
 // UI Components
-import { Button } from '@/components/ui/button';
-import { Section } from '@/components/ui/section';
-import { Grid } from '@/components/ui/grid';
-import { Title, Text } from '@/components/ui/typography';
+import { Button } from '@/shared/ui/button';
+import { Section } from '@/shared/ui/section';
+import { Grid } from '@/shared/ui/grid';
+import { Title, Text } from '@/shared/ui/typography';
 
 // Note: Explore page has been migrated to app router
 

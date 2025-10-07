@@ -13,7 +13,7 @@ import DeleteConfirm from '@/features/practice/components/Edit/DeleteConfirm';
 
 // 型別
 import { Practice } from '@/services/practice/schema';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 
 const PracticeListPage: React.FC = () => {
   const router = useRouter();

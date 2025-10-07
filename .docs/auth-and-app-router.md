@@ -2,11 +2,11 @@
 
 ## 路由分組與保護
 
-- 受保護頁放於 `app/[language]/(protected)/*`，其 `layout.tsx` 以 `ProtectedComponent` 包覆。
-- 公開頁放於 `app/[language]/(public)/*`，不做登入限制。
+- 受保護頁放於 `app/[language]/(authenticated)/*`，其 `layout.tsx` 以 `ProtectedComponent` 包覆。
+- 公開頁放於 `app/[language]/(guest)/*`，不做登入限制。
 
 參考：
-- [app/[language]/(protected)/layout.tsx](mdc:app/[language]/(protected)/layout.tsx)
+- [app/[language]/(authenticated)/layout.tsx](mdc:app/[language]/(authenticated)/layout.tsx)
 - [contexts/Auth/ProtectedComponent.tsx](mdc:contexts/Auth/ProtectedComponent.tsx)
 
 ## 權限檢查流程（Client）
@@ -20,8 +20,8 @@
 頁面層級保護：
 
 ```tsx
-// app/[language]/(protected)/page.tsx
-export default function ProtectedHome() {
+// app/[language]/(authenticated)/page.tsx
+export default function AuthenticatedHome() {
   return <div>僅登入可見</div>
 }
 ```
@@ -58,6 +58,6 @@ export default function AdminOnly() {
 
 ## Middleware 與語系
 
-`middleware.ts` 負責語系前綴導向，不處理登入權限。權限由 Client AuthContext 與 `(protected)` 分組共同落實。
+`middleware.ts` 負責語系前綴導向，不處理登入權限。權限由 Client AuthContext 與 `(authenticated)` 分組共同落實。
 
 

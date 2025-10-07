@@ -1,5 +1,5 @@
 import { CircleX } from 'lucide-react';
-import { Text } from '@/components/ui/typography';
+import { Text } from '@/shared/ui/typography';
 
 const ErrorMessage = ({ errText }) => (
   errText && (

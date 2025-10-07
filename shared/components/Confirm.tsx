@@ -1,5 +1,5 @@
-import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
-import { Button } from '@/components/ui/button';
+import ResponsiveModal, { ResponsiveModalSize } from '@/shared/ui/responsive-modal';
+import { Button } from '@/shared/ui/button';
 
 interface ConfirmModalProps {
   title: string;
