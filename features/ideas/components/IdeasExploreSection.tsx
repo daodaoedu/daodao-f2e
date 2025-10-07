@@ -14,9 +14,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { IdeaSearchParamsSchema } from '@/services/ideas';
+import { useRouter } from 'next/navigation';
 import IdeaCard from './IdeaCard';
 import { useIdeas } from '../hooks';
-import { useRouter } from 'next/navigation';
 
 interface IdeasExploreSectionProps {
   className?: string;
