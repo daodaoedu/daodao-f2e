@@ -142,9 +142,13 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
     const submitData = {
       ...data,
       tags: selectedTags,
+      ideaResources: fields.map(field => ({
+        name: field.name,
+        url: field.url,
+      })),
     };
     await onSubmit(submitData);
-  }, [onSubmit, selectedTags]);
+  }, [onSubmit, selectedTags, fields]);
 
   // 圖片上傳處理 - 參考 mobile.jsx 的模式
   const handleImageUpload = useCallback(() => {

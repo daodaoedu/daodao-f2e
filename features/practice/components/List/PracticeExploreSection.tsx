@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Search, Plus, Target, Filter, SortAsc, RefreshCw,
 } from 'lucide-react';
@@ -30,6 +31,7 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
   showCreateButton = true,
   onCreateClick,
 }) => {
+  const router = useRouter();
   // Filter and search state
   const [searchQuery, setSearchQuery] = useState('');
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
@@ -74,12 +76,12 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
       onCreateClick();
     } else {
       // Default behavior - navigate to create page
-      window.location.href = '/practice/create';
+       router.push('/practice/create');
     }
   };
 
   const handleEdit = (practice: Practice) => {
-    window.location.href = `/practice/${practice.id}/edit`;
+     router.push(`/practice/${practice.id}/edit`);
   };
 
   const handleDelete = (practice: Practice) => {

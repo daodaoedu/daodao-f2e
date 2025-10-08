@@ -1,281 +1,171 @@
 import React from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  MoreHorizontal,
-  Edit,
-  Trash2,
-  FileText,
+  Share2,
+  Link as LinkIcon,
   Eye,
 } from 'lucide-react';
-import Comment from '@/public/assets/icons/comment.svg';
 import Shell from '@/public/assets/icons/shell.svg';
-import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
-import { Image } from '@/shared/ui/image';
-import type { IdeaSchema } from '@/services/ideas';
-import { ROLE } from '@/constants/member';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu';
-import { Button } from '@/shared/ui/button';
-import { formatIdeaDate, truncateText } from '../utils';
+import Comment from '@/public/assets/icons/comment.svg';
+import { Button } from '@/shared/ui';
+import { Card, CardContent } from '@/shared/ui/card';
+import { Badge } from '@/shared/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
 
 interface IdeaCardProps {
-  data: IdeaSchema;
-  className?: string;
-  detailLink?: string;
-  onEditClick?: () => void;
-  onDeleteClick?: () => void;
-  onLikeClick?: () => void;
-  isLiked?: boolean;
-  showActions?: boolean;
+  idea: {
+    id: string;
+    content: string;
+    user: {
+      _id?: string;
+      id: string;
+      name: string;
+      photoURL?: string;
+      roleList?: string[];
+    };
+    tags: string[];
+    resources: Array<{
+      name: string;
+      url: string;
+    }>;
+    likeCount: number;
+    commentCount: number;
+    viewCount: number;
+    shareCount: number;
+    isLiked: boolean;
+    createdAt: string;
+    updatedAt: string;
+  };
+  onClick?: (id: string) => void;
 }
 
-const IdeaCard: React.FC<IdeaCardProps> = ({
-  data,
-  className = '',
-  detailLink,
-  onEditClick,
-  onDeleteClick,
-  onLikeClick,
-  isLiked = false,
-  showActions = true,
-}) => {
+function IdeaCard({
+  idea,
+  onClick,
+}: IdeaCardProps) {
   const router = useRouter();
-  const hasResources = data.ideaResources && data.ideaResources.length > 0;
-  const hasImages = data.imageUrls && data.imageUrls.length > 0;
 
   const handleCardClick = (e: React.MouseEvent) => {
-    console.log('Card clicked!', detailLink); // Debug log
-
-    // Prevent navigation when clicking on specific interactive elements
+    // Prevent navigation when clicking on interactive elements
     const target = e.target as HTMLElement;
-
-    // Get the card element itself
-    const cardElement = e.currentTarget;
-
-    // Check for specific interactive elements that should prevent navigation
-    // but exclude the card itself
     if (
       target.tagName === 'BUTTON' ||
-      target.closest('a[href]') || // Resource links
-      (target.closest('button') && target.closest('button') !== cardElement) ||
+      target.closest('button') ||
+      target.closest('a[href]') ||
       target.closest('[role="menuitem"]') ||
       target.closest('.dropdown-menu')
     ) {
-      console.log('Clicked on interactive element, preventing navigation');
       return;
     }
 
-    // Navigate to detail page if detailLink is provided
-    if (detailLink) {
-      console.log('Navigating to:', detailLink);
-      router.push(detailLink);
+    // Navigate to idea detail page
+    if (onClick) {
+      onClick(idea.id);
     } else {
-      console.log('No detailLink provided');
+      router.push(`/ideas/${idea.id}`);
     }
   };
 
-  const CardContent = () => (
-    <div
-      className={`
-        group relative cursor-pointer rounded-lg 
-        border-0 bg-white shadow-sm transition-all duration-200 hover:shadow-md
-        ${className}
-      `}
+  return (
+    <Card
+      className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-basic-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-basic-200 relative cursor-pointer"
       onClick={handleCardClick}
-      style={{ cursor: 'pointer' }}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === 'Space') {
-          e.preventDefault();
-          const target = e.target as HTMLElement;
-          if (!target.closest('button') && !target.closest('[role="button"]') && !target.closest('a') && detailLink) {
-            router.push(detailLink);
-          }
-        }
-      }}
-      role="button"
-      tabIndex={0}
     >
-      {/* Header */}
-      <div className="p-4 pb-3">
-        <div className="mb-3 flex items-start justify-between">
-          <div className="flex-1">
-            <div className="mb-2 flex items-start gap-3">
-              {data.user?.photoURL ? (
-                <Image
-                  src={data.user.photoURL}
-                  alt={`${data.user.name}'s avatar`}
-                  width={30}
-                  height={30}
-                  className="rounded-full"
-                />
-              ) : (
-                <div className="size-[30px] shrink-0">
-                  <DefaultAvatar />
-                </div>
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="mb-1 flex items-center gap-2">
-                  <span className="text-sm font-medium text-[#536166]">{data.user?.name || '匿名用戶'}</span>
-                </div>
-                {data.user?.roleList?.[0] && (
-                  <div className="text-sm font-normal text-[#92989A]">
-                    {ROLE.find((r) => r.value === data.user.roleList[0])?.label || data.user.roleList[0]}
-                  </div>
-                )}
+      <CardContent className="p-3 sm:p-4 md:p-6">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center">
+            <Avatar className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3">
+              <AvatarImage
+                src={idea.user?.photoURL && idea.user.photoURL.trim() !== '' ? idea.user.photoURL : undefined}
+                alt={idea.user?.name || 'user avatar'}
+              />
+              <AvatarFallback className="bg-primary-base text-primary-foreground text-xs sm:text-sm font-bold">
+                {idea.user?.name?.charAt(0) || '?'}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <div>
+                <span className="text-xs sm:text-sm font-medium text-basic-500 mr-2">
+                  {idea.user?.name || '匿名用戶'}
+                </span>
+              </div>
+              <div className="text-xs text-basic-300 mt-0.5">
+                {idea.user?.roleList?.join(' | ') || '想法分享者'}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="whitespace-nowrap rounded-full bg-primary-base px-3 py-1 text-xs text-white">
+          <div className="flex items-center space-x-1 sm:space-x-2 mt-0">
+            <Badge
+              className="bg-orange-400 text-primary-foreground text-xs hidden sm:inline-block"
+            >
               想法
+            </Badge>
+            <div className="text-xs text-basic-300 hidden sm:block">
+              {new Date(idea.createdAt).toLocaleDateString('zh-TW')}
             </div>
-            <span className="text-xs text-basic-300">{formatIdeaDate(data.createdDate || '')}</span>
-            {showActions && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="size-8 p-0 text-basic-300 opacity-0 transition-opacity hover:text-basic-500 group-hover:opacity-100"
-                  >
-                    <MoreHorizontal className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-32">
-                  <DropdownMenuItem onClick={onEditClick} className="text-sm">
-                    <Edit className="mr-2 size-3" />
-                    編輯
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={onDeleteClick}
-                    className="text-sm text-red-600 focus:text-red-600"
-                  >
-                    <Trash2 className="mr-2 size-3" />
-                    刪除
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="px-4 pb-3">
-        <p className="body-sm line-clamp-4 whitespace-pre-wrap leading-relaxed text-basic-500">
-          {truncateText(data.content, 200)}
-        </p>
-      </div>
+        <p className="text-basic-500 mb-3 sm:mb-4 text-sm sm:text-base line-clamp-3 sm:line-clamp-none">{idea.content}</p>
 
-      {/* Tags */}
-      {data.tags && data.tags.length > 0 && (
-        <div className="px-4 pb-3">
-          <div className="flex flex-wrap gap-1">
-            {data.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center rounded-full border border-primary-base/20 bg-basic-100 px-2 py-1 text-xs text-gray-700"
+        <div className="flex gap-1 sm:gap-2 mb-3 sm:mb-4 flex-wrap">
+          {idea.tags?.map((tag) => (
+            <Badge
+              key={tag}
+              variant="secondary"
+              className="px-1.5 py-0.5 sm:px-2 bg-basic-100 text-basic-300 text-xs font-medium rounded-full"
+            >
+              {tag}
+            </Badge>
+          ))}
+        </div>
+
+        {idea.resources?.[0] && (
+          <div className="flex items-center p-2 sm:p-3 bg-primary-lightest rounded-lg mb-3 sm:mb-4">
+            <LinkIcon size={14} className="text-primary-base mr-1 sm:mr-2 flex-shrink-0" />
+            {idea.resources[0].url ? (
+              <Button
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(idea.resources[0].url, '_blank');
+                }}
+                className="text-primary-darker text-xs sm:text-sm truncate p-0 h-auto hover:underline"
               >
-                {tag}
-              </span>
-            ))}
-            {data.tags.length > 3 && (
-              <span className="text-xs text-basic-300">
-                +
-                {data.tags.length - 3}
+                {idea.resources[0].name}
+              </Button>
+            ) : (
+              <span className="text-primary-darker text-xs sm:text-sm truncate">
+                {idea.resources[0].name}
               </span>
             )}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Image */}
-      {hasImages && (
-        <div className="px-4 pb-3">
-          <div className="relative overflow-hidden rounded-lg">
-            <Image
-              src={data.imageUrls![0]}
-              alt={data.imageUrls[0]}
-              width={400}
-              height={192}
-              className="h-48 w-full object-cover transition-transform duration-200 group-hover:scale-105"
-            />
+        <div className="pt-3 sm:pt-4">
+          <div className="flex items-center justify-end gap-4 text-xs text-basic-300">
+            <div className="flex items-center gap-1">
+              <Shell />
+              <span>{idea.likeCount || 0}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Comment />
+              <span>{idea.commentCount || 0}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Eye className="h-4 w-4" />
+              <span>{idea.viewCount || 0}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Share2 className="h-4 w-4" />
+              <span>{idea.shareCount || 0}</span>
+            </div>
           </div>
         </div>
-      )}
-
-      {/* Resources */}
-      {hasResources && (
-        <div className="px-4 pb-3">
-          <div className="space-y-2">
-            {data.ideaResources!.slice(0, 2).map((resource) => (
-              <Link
-                key={resource.url}
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:bg-basic-50/50 group/resource flex items-center rounded-lg p-2 transition-colors"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <FileText className="mr-2 size-5 shrink-0 text-primary-base" />
-                <span className="body-sm truncate text-basic-500 group-hover/resource:text-primary-darker">
-                  {resource.name}
-                </span>
-              </Link>
-            ))}
-            {data.ideaResources!.length > 2 && (
-              <p className="body-sm pl-5 text-basic-300">
-                還有
-                {' '}
-                {data.ideaResources!.length - 2}
-                {' '}
-                個資源...
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Footer Actions */}
-      <div className="px-4 py-3">
-        <div className="flex items-center justify-end gap-4 text-xs text-basic-300">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onLikeClick?.();
-            }}
-            className={`flex h-8 items-center gap-1 px-2 text-xs ${isLiked
-              ? 'text-primary-base'
-              : 'text-basic-300 hover:text-primary-base'
-            }`}
-          >
-            <Shell className={isLiked ? 'fill-primary-base' : ''} />
-            <span>{data.likeCount || 0}</span>
-          </Button>
-
-          <div className="flex items-center gap-1">
-            <Comment />
-            <span>{data.commentCount || 0}</span>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <Eye className="size-3" />
-            <span>{data.viewCount || 0}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
-
-  return <CardContent />;
-};
+}
 
 export default IdeaCard;

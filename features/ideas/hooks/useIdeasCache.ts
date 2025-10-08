@@ -18,11 +18,11 @@ export function useIdeasCache() {
     mutate(
       (key) => typeof key === 'string' && key.startsWith('/ideas'),
       (data: IdeaListResponseSchema | undefined) => {
-        if (!data || !data.ideas) return data;
+        if (!data || !data.data) return data;
 
         return {
           ...data,
-          ideas: data.ideas.map((idea) => (idea.id === updatedIdea.id ? { ...idea, ...updatedIdea } : idea)),
+          data: data.data.map((idea) => (idea.id === updatedIdea.id ? { ...idea, ...updatedIdea } : idea)),
         };
       },
       { revalidate: false }
@@ -51,7 +51,7 @@ export function useIdeasCache() {
       (data: IdeaListResponseSchema | undefined) => {
         if (!data) {
           return {
-            ideas: [newIdea],
+            data: [newIdea],
             pagination: {
               page: 1,
               pageSize: 20,
@@ -64,12 +64,12 @@ export function useIdeasCache() {
         }
 
         const updatedIdeas = position === 'start'
-          ? [newIdea, ...data.ideas]
-          : [...data.ideas, newIdea];
+          ? [newIdea, ...data.data]
+          : [...data.data, newIdea];
 
         return {
           ...data,
-          ideas: updatedIdeas,
+          data: updatedIdeas,
           pagination: {
             ...data.pagination,
             totalCount: data.pagination.totalCount + 1,
@@ -93,11 +93,11 @@ export function useIdeasCache() {
     mutate(
       (key) => typeof key === 'string' && key.startsWith('/ideas'),
       (data: IdeaListResponseSchema | undefined) => {
-        if (!data || !data.ideas) return data;
+        if (!data || !data.data) return data;
 
         return {
           ...data,
-          ideas: data.ideas.filter((idea) => idea.id !== ideaId),
+          data: data.data.filter((idea) => idea.id !== ideaId),
           pagination: {
             ...data.pagination,
             totalCount: Math.max(0, data.pagination.totalCount - 1),
@@ -121,13 +121,13 @@ export function useIdeasCache() {
     mutate(
       (key) => typeof key === 'string' && key.startsWith('/ideas'),
       (data: IdeaListResponseSchema | undefined) => {
-        if (!data || !data.ideas) return data;
+        if (!data || !data.data) return data;
 
         const updatesMap = new Map(updates.map((update) => [update.id, update]));
 
         return {
           ...data,
-          ideas: data.ideas.map((idea) => {
+          data: data.data.map((idea) => {
             const update = updatesMap.get(idea.id);
             return update ? { ...idea, ...update } : idea;
           }),
@@ -185,11 +185,11 @@ export function useIdeasCache() {
     mutate(
       (key) => typeof key === 'string' && key.startsWith('/ideas'),
       (data: IdeaListResponseSchema | undefined) => {
-        if (!data || !data.ideas) return data;
+        if (!data || !data.data) return data;
 
         return {
           ...data,
-          ideas: data.ideas.map((idea) => (idea.id === ideaId
+          data: data.data.map((idea) => (idea.id === ideaId
             ? {
               ...idea,
               isLiked,
@@ -231,11 +231,11 @@ export function useIdeasCache() {
     mutate(
       (key) => typeof key === 'string' && key.startsWith('/ideas'),
       (data: IdeaListResponseSchema | undefined) => {
-        if (!data || !data.ideas) return data;
+        if (!data || !data.data) return data;
 
         return {
           ...data,
-          ideas: data.ideas.map((idea) => (idea.id === ideaId
+          data: data.data.map((idea) => (idea.id === ideaId
             ? { ...idea, viewCount: idea.viewCount + viewDelta }
             : idea)),
         };

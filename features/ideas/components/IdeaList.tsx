@@ -1,14 +1,14 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Search,
   Plus,
   RefreshCw,
-  Loader2,
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import IdeaCard from './IdeaCard';
-import { useIdeaSearch, useIdeaActions, useIdeasCache } from '../hooks';
+import { useIdeaSearch } from '../hooks';
 
 interface IdeaListProps {
   showCreateButton?: boolean;
@@ -21,10 +21,9 @@ const IdeaList: React.FC<IdeaListProps> = ({
   onCreateClick,
   className = '',
 }) => {
+  const router = useRouter();
   // Local state
-  const [selectedIdeaId, setSelectedIdeaId] = useState<string | null>(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-
+  
   // Hooks
   const {
     ideas,
@@ -34,64 +33,18 @@ const IdeaList: React.FC<IdeaListProps> = ({
     refresh,
   } = useIdeaSearch();
 
-  const { removeIdeaFromCache, updateIdeaInCache } = useIdeasCache();
-
-  const { deleteIdea, isDeleting } = useIdeaActions({
-    onSuccess: () => {
-      if (selectedIdeaId) {
-        removeIdeaFromCache(selectedIdeaId);
-        setShowDeleteModal(false);
-        setSelectedIdeaId(null);
-      }
-    },
-    onError: (error) => {
-      console.error('Failed to delete idea:', error);
-    },
-  });
 
   // Handlers
   const handleSearch = useCallback((search: string) => {
     updateSearch({ search });
   }, [updateSearch]);
 
-  const handleEdit = useCallback((ideaId: string) => {
-    console.log('Edit idea:', ideaId);
-    // TODO: Navigate to edit page or open edit modal
-  }, []);
-
-  const handleDeleteClick = useCallback((ideaId: string) => {
-    setSelectedIdeaId(ideaId);
-    setShowDeleteModal(true);
-  }, []);
-
-  const confirmDelete = useCallback(async () => {
-    if (selectedIdeaId) {
-      await deleteIdea(selectedIdeaId);
-    }
-  }, [selectedIdeaId, deleteIdea]);
-
-  const handleLike = useCallback((ideaId: string) => {
-    // Optimistically update the UI
-    const idea = ideas.find((i) => i.id === ideaId);
-    if (idea) {
-      const updatedIdea = {
-        ...idea,
-        isLiked: !idea.isLiked,
-        likeCount: idea.isLiked ? idea.likeCount - 1 : idea.likeCount + 1,
-      };
-      updateIdeaInCache(updatedIdea);
-    }
-
-    // TODO: Call actual like API
-    console.log('Toggle like for idea:', ideaId);
-  }, [ideas, updateIdeaInCache]);
-
-  // const handleShare = useCallback((ideaId: string) => {
-  //   const shareUrl = `${window.location.origin}/ideas/${ideaId}`;
-  //   navigator.clipboard.writeText(shareUrl);
-  //   console.log('Shared idea URL:', shareUrl);
-  //   // TODO: Show toast notification
+  // const handleEdit = useCallback((ideaId: string) => {
+  //   console.log('Edit idea:', ideaId);
+  //   // TODO: Navigate to edit page or open edit modal
   // }, []);
+
+
 
   if (isError) {
     return (
@@ -142,54 +95,16 @@ const IdeaList: React.FC<IdeaListProps> = ({
             {ideas.map((idea) => (
               <IdeaCard
                 key={idea.id}
-                data={idea}
-                detailLink={`/ideas/${idea.id}`}
-                onEditClick={() => handleEdit(idea.id)}
-                onDeleteClick={() => handleDeleteClick(idea.id)}
-                onLikeClick={() => handleLike(idea.id)}
-                isLiked={idea.isLiked}
+                idea={idea}
+                onClick={(id) => {
+                  // 導航到詳情頁
+                   router.push(`/ideas/${id}`);
+                }}
               />
             ))}
           </div>
         )}
 
-        {/* Delete Confirmation Modal */}
-        {showDeleteModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="mx-4 w-full max-w-md rounded-lg bg-white p-6">
-              <h3 className="mb-4 text-lg font-semibold text-basic-black">確認刪除</h3>
-              <p className="mb-6 text-sm text-basic-500">
-                確定要刪除這個想法嗎？此操作無法撤銷。
-              </p>
-              <div className="flex justify-end space-x-3">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setShowDeleteModal(false);
-                    setSelectedIdeaId(null);
-                  }}
-                  disabled={isDeleting}
-                >
-                  取消
-                </Button>
-                <Button
-                  variant="alert"
-                  onClick={confirmDelete}
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? (
-                    <>
-                      <Loader2 className="mr-2 size-4 animate-spin" />
-                      刪除中...
-                    </>
-                  ) : (
-                    '確認刪除'
-                  )}
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* 浮動創建按鈕 - 只在手機版顯示 */}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Target, TrendingUp, RefreshCw, Sparkles,
 } from 'lucide-react';
@@ -24,6 +25,7 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
   showHeader = true,
 }) => {
   const { user } = useAuth();
+  const router = useRouter();
 
   // Use recommendation service to get practice-specific recommendations
   const {
@@ -46,7 +48,7 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
 
   const handleEdit = (practice: Practice) => {
     // Navigate to edit page
-    window.location.href = `/practice/${practice.id}/edit`;
+     router.push(`/practice/${practice.id}/edit`);
   };
 
   const handleDelete = (practice: Practice) => {

@@ -8,4 +8,4 @@ export * from './useIdeaSubmission';
 export * from './useIdeasCache';
 
 // Legacy exports for backward compatibility
-export { useIdea } from './useIdeas';
+export { useIdea, useIdeaSearch } from './useIdeas';

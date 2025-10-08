@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 import type { IdeaSearchParamsSchema } from '@/services/ideas';
+import { useRouter } from 'next/navigation';
 import IdeaCard from './IdeaCard';
 import { useIdeas } from '../hooks';
 
@@ -30,6 +31,8 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
   showCreateButton = true,
   onCreateClick,
 }) => {
+  const router = useRouter();
+
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'createdDate' | 'updatedDate' | 'likeCount'>('createdDate');
@@ -40,6 +43,8 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
     search: searchQuery || undefined,
     sortBy,
     sortOrder,
+    page: 1,
+    pageSize: 20,
   };
 
   // Use Ideas hook to fetch data
@@ -68,7 +73,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
       onCreateClick();
     } else {
       // Default behavior - navigate to create page
-      window.location.href = '/ideas/create';
+       router.push('/ideas/create');
     }
   };
 
@@ -224,9 +229,10 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
             {ideas.map((idea) => (
               <IdeaCard
                 key={idea.id}
-                data={idea}
-                className="border border-basic-200 transition-colors hover:border-basic-300"
-                showActions
+                idea={idea}
+                onClick={(id) => {
+                   router.push(`/ideas/${id}`);
+                }}
               />
             ))}
 

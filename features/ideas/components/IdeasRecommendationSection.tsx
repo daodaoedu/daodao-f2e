@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Lightbulb, TrendingUp, RefreshCw } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import {
@@ -22,6 +23,8 @@ const IdeasRecommendationSection: React.FC<IdeasRecommendationSectionProps> = ({
   showHeader = true,
 }) => {
   const { user } = useAuth();
+  const router = useRouter();
+
 
   // Use recommendation service to get idea-specific recommendations
   const {
@@ -124,14 +127,17 @@ const IdeasRecommendationSection: React.FC<IdeasRecommendationSectionProps> = ({
       tags: item.tags,
       imageUrls: [],
       videoUrls: [],
-      ideaResources: [],
+      resources: [],
+      hasResources: false,
+      resourceCount: 0,
       likeCount: item.likeCount,
       commentCount: item.commentCount,
       viewCount: 0,
       shareCount: 0,
       isLiked: false,
-      createdDate: item.createdDate,
-      updatedDate: item.createdDate,
+      isFavorited: false,
+      createdAt: item.createdDate,
+      updatedAt: item.createdDate,
     };
   };
 
@@ -176,9 +182,10 @@ const IdeasRecommendationSection: React.FC<IdeasRecommendationSectionProps> = ({
         {ideaRecommendations.map((item) => (
           <div key={item.id} className="relative">
             <IdeaCard
-              data={convertToIdeaSchema(item)}
-              className="bg-basic-50 border-none shadow-none"
-              showActions
+              idea={convertToIdeaSchema(item)}
+              onClick={(id) => {
+                 router.push(`/ideas/${id}`);
+              }}
             />
             {item.reason && (
               <div className="absolute right-2 top-2">

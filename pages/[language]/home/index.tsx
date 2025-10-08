@@ -9,8 +9,7 @@ import { Section } from '@/shared/ui/section';
 import { Grid } from '@/shared/ui/grid';
 import { Title, Text } from '@/shared/ui/typography';
 
-// Import explore page content
-import ExplorePage from '@/pages/[language]/explore';
+// Note: Explore page has been migrated to app router
 
 // ========================================
 // Internal Components - Landing Page Components
@@ -385,8 +384,11 @@ function HomePage() {
   const { openLoginModal } = useAuthDispatch();
 
   if (isLoggedIn) {
-    // Show explore content for logged-in users
-    return <ExplorePage />;
+    // Redirect logged-in users to explore page
+    if (typeof window !== 'undefined') {
+      window.location.href = '/explore';
+    }
+    return null;
   }
 
   // Show landing page for non-logged-in users
