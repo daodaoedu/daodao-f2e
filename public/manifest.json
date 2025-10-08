@@ -2,7 +2,18 @@
   "$schema": "https://json.schemastore.org/web-manifest-combined.json",
   "name": "多元學習資源平台｜島島阿學",
   "short_name": "島島阿學",
-  "icons": [],
+  "icons": [
+    {
+      "src": "/assets/icons/icons-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/icons/icons-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
   "start_url": "/?source=pwa",
   "background_color": "#16b9b3",
   "display": "standalone",
