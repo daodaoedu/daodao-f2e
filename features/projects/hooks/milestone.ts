@@ -14,7 +14,10 @@ import { sortMilestones } from '@/services/projects/utils';
 
 export function useProjectMilestones(projectId?: string | null) {
   const swr = useSWR<ProjectMilestoneSchema[]>(
-    projectId ? getProjectMilestonePathname({ projectId }) : null
+    projectId ? getProjectMilestonePathname({ projectId }) : null,
+    {
+      revalidateIfStale: false,
+    }
   );
 
   return {

@@ -5,7 +5,7 @@ import {
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import {
-  Card, CardContent, CardHeader, CardTitle,
+  Card, CardContent,
 } from '@/shared/ui/card';
 import {
   DropdownMenu,
@@ -22,6 +22,7 @@ interface IdeasExploreSectionProps {
   className?: string;
   showHeader?: boolean;
   showCreateButton?: boolean;
+  showSearchBar?: boolean;
   onCreateClick?: () => void;
 }
 
@@ -29,6 +30,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
   className = '',
   showHeader = true,
   showCreateButton = true,
+  showSearchBar = true,
   onCreateClick,
 }) => {
   const router = useRouter();
@@ -116,11 +118,11 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
   }
 
   return (
-    <Card className={`w-full ${className}`}>
+    <div className={`w-full ${className}`}>
       {showHeader && (
-        <CardHeader className="pb-4">
+        <div className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg">
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
               <Lightbulb className="size-5 text-primary-base" />
               探索想法
               {pagination && (
@@ -130,7 +132,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
                   )
                 </span>
               )}
-            </CardTitle>
+            </h2>
             {showCreateButton && (
               <Button
                 size="sm"
@@ -142,68 +144,75 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
               </Button>
             )}
           </div>
-        </CardHeader>
+        </div>
       )}
 
-      <CardContent className="space-y-4">
+      <div className="space-y-4">
         {/* Search and Filter Bar */}
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-basic-400" />
-            <Input
-              placeholder="搜尋想法內容、標籤..."
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+        {showSearchBar && (
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-basic-400" />
+              <Input
+                placeholder="搜尋想法內容、標籤..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
 
-          <div className="flex gap-2">
-            {/* Sort Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex items-center gap-2">
-                  <SortAsc className="size-4" />
-                  <span className="hidden sm:inline">{getCurrentSortLabel()}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {sortOptions.map((option) => (
-                  <DropdownMenuItem
-                    key={`${option.sortBy}-${option.sortOrder}`}
-                    onClick={() => handleSortChange(option.sortBy, option.sortOrder)}
-                    className={`cursor-pointer ${
-                      sortBy === option.sortBy && sortOrder === option.sortOrder
-                        ? 'bg-primary-50 text-primary-600'
-                        : ''
-                    }`}
-                  >
-                    {option.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex gap-2">
+              {/* Sort Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <SortAsc className="size-4" />
+                    <span className="hidden sm:inline">{getCurrentSortLabel()}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {sortOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={`${option.sortBy}-${option.sortOrder}`}
+                      onClick={() => handleSortChange(option.sortBy, option.sortOrder)}
+                      className={`cursor-pointer ${
+                        sortBy === option.sortBy && sortOrder === option.sortOrder
+                          ? 'bg-primary-50 text-primary-600'
+                          : ''
+                      }`}
+                    >
+                      {option.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-            {/* Refresh Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => refresh()}
-              className="flex items-center gap-2"
-              disabled={isLoading}
-            >
-              <RefreshCw className={`size-4 ${isLoading ? 'animate-spin' : ''}`} />
-            </Button>
+              {/* Refresh Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refresh()}
+                className="flex items-center gap-2"
+                disabled={isLoading}
+              >
+                <RefreshCw className={`size-4 ${isLoading ? 'animate-spin' : ''}`} />
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Ideas Content */}
         {isLoading ? (
           <div className="space-y-4">
             {Array.from({ length: 5 }, (_, index) => (
-              <div key={`idea-skeleton-${Date.now()}-${index}`} className="animate-pulse">
-                <div className="h-32 rounded-lg bg-basic-100" />
-              </div>
+              <Card
+                key={`idea-skeleton-${Date.now()}-${index}`}
+                className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-basic-white rounded-2xl shadow-sm border border-basic-200 animate-pulse"
+              >
+                <CardContent className="p-3 sm:p-4 md:p-6">
+                  <div className="h-32 bg-basic-100 rounded-lg" />
+                </CardContent>
+              </Card>
             ))}
           </div>
         ) : isEmpty ? (
@@ -254,8 +263,8 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
             )}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

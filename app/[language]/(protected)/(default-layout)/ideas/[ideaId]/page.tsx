@@ -129,7 +129,7 @@ const IdeaDetailPage = () => {
               {idea.resources && idea.resources.length > 0 && (
                 <div className="mt-6">
                   <div className="space-y-3">
-                    {idea.resources.map((resource: { url: string; name: string }) => (
+                    {idea.resources.map((resource) => (
                       <div
                         key={resource.url}
                         className="flex items-center p-2 sm:p-3 bg-primary-lightest rounded-lg"

@@ -2,7 +2,7 @@
 import { getPublicProjectLayout } from '@/layout/features/getProjectLayout';
 import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@/shared/ui/skeleton';
-import { useProjectMilestones } from '@/features/projects/hooks/milestone';
+import { useProject } from '@/services/projects/core/hooks';
 import EmptyList from '@/components/Projects/ProjectList/EmptyList';
 import MilestoneItemView from '@/components/Milestones/MilestoneItemView';
 import { MilestonesProvider } from '@/contexts/Milestones';
@@ -11,7 +11,8 @@ import { parseToString } from '@/utils/helper';
 const ProjectMilestonesPage = () => {
   const searchParams = useSearchParams();
   const projectId = parseToString(searchParams?.get('id'));
-  const { data: milestones, isLoading } = useProjectMilestones(projectId);
+  const { data: project, isLoading } = useProject(projectId);
+  const milestones = project?.milestones;
 
   return (
     <div className="w-[750px] max-w-full mx-auto">

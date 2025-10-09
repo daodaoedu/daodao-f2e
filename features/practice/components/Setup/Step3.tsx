@@ -95,14 +95,14 @@ const Step3: React.FC<Step3Props> = ({
     }
   };
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
+    <div className="overflow-hidden rounded-lg border border-basic-200 bg-white shadow-sm">
       <div className="p-6">
         <div className="mb-2 flex items-center">
-          <div className="mr-2 size-2 rounded-full bg-primary" />
-          <span className="text-sm text-muted-foreground">主題實踐</span>
+          <div className="mr-2 size-2 rounded-full bg-primary-base" />
+          <span className="text-sm text-basic-400">主題實踐</span>
         </div>
-        <h3 className="text-2xl font-bold text-foreground">資源</h3>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h3 className="text-2xl font-bold text-basic-600">資源</h3>
+        <p className="mt-1 text-sm text-basic-400">
           新增實踐中可能會用的資源，例如書籍、Podcast或影片
         </p>
       </div>

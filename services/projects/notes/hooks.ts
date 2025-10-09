@@ -4,10 +4,18 @@ import useSWRMutation from "swr/mutation";
 import { projectNoteAPI, getProjectNotePathname } from "./api";
 import { ProjectNoteSchema } from "./schema";
 import { getProjectPathname } from "../core";
+import { fetcher } from "@/utils/http";
 
 export function useProjectNotes(projectId?: string | null) {
   return useSWR<ProjectNoteSchema[]>(
-    projectId ? getProjectNotePathname({ projectId }) : null
+    projectId ? getProjectNotePathname({ projectId }) : null,
+    async (url) => {
+      const response = await fetcher<{ success: boolean; data: ProjectNoteSchema[] }>(url);
+      return response.data;
+    },
+    {
+      revalidateIfStale: false,
+    }
   );
 }
 
@@ -20,7 +28,14 @@ export function useProjectNote({ projectId, noteId }: UseProjectNoteProps) {
   return useSWR<ProjectNoteSchema>(
     projectId && typeof noteId === "number"
       ? getProjectNotePathname({ projectId, noteId })
-      : null
+      : null,
+    async (url) => {
+      const response = await fetcher<{ success: boolean; data: ProjectNoteSchema }>(url);
+      return response.data;
+    },
+    {
+      revalidateIfStale: false,
+    }
   );
 }
 

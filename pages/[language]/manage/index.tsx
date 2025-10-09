@@ -471,7 +471,7 @@ const Main = ({ date }: { date: Date }) => {
             <li key={project.id} className="opacity-100 transition-opacity">
               <Project
                 title={project.title}
-                href={`/manage/projects/detail?id=${project.id}`}
+                href={`/projects/detail?id=${project.id}`}
                 defaultOpen={index === 0}
                 percentage={
                   Array.isArray(project?.originalMilestones) &&

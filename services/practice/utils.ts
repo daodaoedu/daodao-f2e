@@ -690,7 +690,11 @@ export function pathInfoToPractice(pathInfo: Record<string, unknown>, practiceAc
       order: index
     })),
     checkIns: [],
-    tags: []
+    tags: [],
+    likeCount: 0,
+    viewCount: 0,
+    commentCount: 0,
+    shareCount: 0,
   };
 }
 

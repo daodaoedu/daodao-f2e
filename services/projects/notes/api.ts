@@ -18,7 +18,7 @@ export const getProjectNotePathname = ({
   projectId,
   noteId,
 }: GetProjectNotePathnameProps) => {
-  const pathname = `/projects/${parseToString(projectId)}/notes`;
+  const pathname = `/api/v1/projects/${parseToString(projectId)}/notes`;
 
   if (noteId) {
     return `${pathname}/${parseToString(noteId)}`;
