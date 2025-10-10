@@ -166,13 +166,17 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                     {getContentTypeIcon()}
                     <span>{getContentTypeLabel()}</span>
                   </div>
-                  <span>•</span>
-                  <span>
-                    {formatDate(practice.startDate)}
-                    {practice.targetDate && (
-                      ` - ${formatDate(practice.targetDate)}`
-                    )}
-                  </span>
+                  {practice.startDate && (
+                    <>
+                      <span>•</span>
+                      <span>
+                        {formatDate(practice.startDate)}
+                        {practice.targetDate && (
+                          ` - ${formatDate(practice.targetDate)}`
+                        )}
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 {/* 標籤顯示 */}

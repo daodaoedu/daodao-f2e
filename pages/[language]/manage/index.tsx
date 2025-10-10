@@ -31,7 +31,6 @@ import { Button } from "@/shared/ui/button";
 import MilestoneItem from "@/components/Milestones/MilestoneItem";
 import {
   SelectProjectModal,
-  MarathonAccess,
   EmptyProject,
   useMilestonesDateRange,
   ReviewForm,
@@ -554,9 +553,7 @@ const Manage = () => {
         maxDate={marathonConfig.marathonEndDate}
         minDate={marathonConfig.marathonStartDate}
       />
-      <MarathonAccess>
-        <Main date={date} />
-      </MarathonAccess>
+      <Main date={date} />
     </>
   );
 };

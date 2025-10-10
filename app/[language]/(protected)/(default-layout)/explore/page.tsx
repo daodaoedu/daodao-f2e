@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ExploreTabs, FloatingCreateButton } from '@/widgets/explore';
 import IdeasExploreSection from '@/features/ideas/components/IdeasExploreSection';
 import PracticeExploreSection from '@/features/practice/components/List/PracticeExploreSection';
@@ -11,6 +12,7 @@ import IdeaCreateContainer from '@/features/ideas/components/IdeaCreateContainer
 // Required keys: pages.explore_tab_recommendation, pages.explore_tab_practice,
 // pages.explore_tab_project, pages.explore_tab_idea
 export default function ExplorePage() {
+  const router = useRouter();
   // Using hardcoded strings temporarily until translation keys are added
   const [activeTab, setActiveTab] = useState('推薦');
   const [showIdeaModal, setShowIdeaModal] = useState(false);
@@ -18,8 +20,11 @@ export default function ExplorePage() {
   const handleCreateNew = (type: string) => {
     if (type === 'idea') {
       setShowIdeaModal(true);
+    } else if (type === 'practice') {
+      router.push('/practice/create');
+    } else if (type === 'plan') {
+      router.push('/projects/create');
     }
-    // practice 和 project 由 FloatingCreateButton 處理路由
   };
 
   return (

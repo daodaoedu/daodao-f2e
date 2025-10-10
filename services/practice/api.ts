@@ -1,4 +1,5 @@
 import { MutationFetcher } from 'swr/mutation';
+import { getTokenStorage } from '@/utils/storage';
 import {
   Practice,
   CheckInRecord,
@@ -80,9 +81,11 @@ class PracticeAPIClass {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.config.baseURL}${endpoint}`;
+    const token = getTokenStorage().get();
 
     const defaultHeaders = {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
 
     try {

@@ -53,21 +53,21 @@ export const getUnitType = (contentType: string): string => {
 // 預設標籤選項
 export const defaultTags = {
   categories: [
-    { id: 'learning', label: '學習', color: 'bg-blue-100 text-blue-900' },
-    { id: 'skill', label: '技能', color: 'bg-green-100 text-green-900' },
-    { id: 'work', label: '工作', color: 'bg-purple-100 text-purple-900' },
-    { id: 'hobby', label: '興趣', color: 'bg-pink-100 text-pink-900' },
-    { id: 'health', label: '健康', color: 'bg-orange-100 text-orange-900' },
-    { id: 'creative', label: '創作', color: 'bg-yellow-100 text-yellow-900' },
+    { id: 'learning', label: '學習', color: 'bg-blue-100' },
+    { id: 'skill', label: '技能', color: 'bg-green-100' },
+    { id: 'work', label: '工作', color: 'bg-purple-100' },
+    { id: 'hobby', label: '興趣', color: 'bg-pink-100' },
+    { id: 'health', label: '健康', color: 'bg-orange-100' },
+    { id: 'creative', label: '創作', color: 'bg-yellow-100' },
   ],
   difficulty: [
-    { id: 'beginner', label: '初學', color: 'bg-emerald-100 text-emerald-900' },
-    { id: 'intermediate', label: '進階', color: 'bg-amber-100 text-amber-900' },
-    { id: 'advanced', label: '專家', color: 'bg-red-100 text-red-900' },
+    { id: 'beginner', label: '初學', color: 'bg-emerald-100' },
+    { id: 'intermediate', label: '進階', color: 'bg-amber-100' },
+    { id: 'advanced', label: '專家', color: 'bg-red-100' },
   ],
   duration: [
-    { id: 'short-term', label: '短期', color: 'bg-cyan-100 text-cyan-900' },
-    { id: 'medium-term', label: '中期', color: 'bg-indigo-100 text-indigo-900' },
-    { id: 'long-term', label: '長期', color: 'bg-violet-100 text-violet-900' },
+    { id: 'short-term', label: '短期', color: 'bg-cyan-100' },
+    { id: 'medium-term', label: '中期', color: 'bg-indigo-100' },
+    { id: 'long-term', label: '長期', color: 'bg-violet-100' },
   ],
 };

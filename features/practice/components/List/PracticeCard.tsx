@@ -8,7 +8,7 @@ import {
   Share2,
   Eye,
 } from 'lucide-react';
-import { format, differenceInDays } from 'date-fns';
+import { differenceInDays } from 'date-fns';
 import Shell from '@/public/assets/icons/shell.svg';
 import Comment from '@/public/assets/icons/comment.svg';
 import { Practice, PracticeWithUser } from '@/services/practice/schema';
@@ -16,6 +16,7 @@ import {
   calculateProgress,
   getContentTypeLabel,
   canCheckIn,
+  formatDate,
 } from '@/services/practice/utils';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent } from '@/shared/ui/card';
@@ -117,20 +118,22 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
             <Badge className="hidden bg-primary-lightest text-xs text-primary-darker sm:inline-block">
               主題實踐
             </Badge>
-            <div className="text-xs text-basic-300 hidden sm:block">
-              {practice.targetDate ? (
-                <>
-                  {format(new Date(practice.startDate), 'yyyy/MM/dd')}
-                  {' - '}
-                  {format(new Date(practice.targetDate), 'yyyy/MM/dd')}
-                  {' ('}
-                  {differenceInDays(new Date(practice.targetDate), new Date(practice.startDate)) + 1}
-                  天)
-                </>
-              ) : (
-                format(new Date(practice.startDate), 'yyyy/MM/dd')
-              )}
-            </div>
+            {practice.startDate && (
+              <div className="text-xs text-basic-300 hidden sm:block">
+                {practice.targetDate ? (
+                  <>
+                    {formatDate(practice.startDate)}
+                    {' - '}
+                    {formatDate(practice.targetDate)}
+                    {' ('}
+                    {differenceInDays(new Date(practice.targetDate), new Date(practice.startDate)) + 1}
+                    天)
+                  </>
+                ) : (
+                  formatDate(practice.startDate)
+                )}
+              </div>
+            )}
 
             {showActions && (
               <div className="relative">

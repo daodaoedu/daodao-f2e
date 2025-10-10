@@ -543,7 +543,7 @@ export const MultipleSelector = React.forwardRef<
                 : placeholder
             }
             className={cn(
-              'float-left border border-transparent flex-1 bg-transparent outline-none placeholder:text-muted-foreground',
+              'float-left border border-transparent flex-1 bg-transparent outline-none placeholder:text-basic-400 text-basic-600',
               {
                 'w-0 focus:w-full':
                   hidePlaceholderWhenSelected && selected.length !== 0,
@@ -557,7 +557,7 @@ export const MultipleSelector = React.forwardRef<
         <div className="relative">
           {open && (
             <CommandList
-              className="absolute top-1 z-50 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in"
+              className="absolute top-2 z-50 w-full overflow-hidden rounded-md border border-gray-200 bg-white text-basic-500 shadow-xl outline-none animate-in p-1"
               onMouseLeave={() => {
                 setOnScrollbar(false);
               }}
@@ -581,7 +581,6 @@ export const MultipleSelector = React.forwardRef<
                     <CommandGroup
                       key={key}
                       heading={key}
-                      className="h-full overflow-auto"
                     >
                       <>
                         {dropdowns.map((option) => (
