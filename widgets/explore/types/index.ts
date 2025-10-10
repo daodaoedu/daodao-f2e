@@ -15,3 +15,6 @@ export interface BaseExploreSectionProps {
   showSearchBar?: boolean;
   className?: string;
 }
+
+// Explore 頁面狀態類型
+export type ExploreTab = '推薦' | '想法' | '主題實踐' | '學習計劃';
