@@ -1,13 +1,13 @@
 export const LOGIN_TYPE = 'DAODAO-LOGIN-TYPE';
 
 function getWorkersDomain(stagingHostname: string) {
-  if (!stagingHostname) return '';
+  if (!stagingHostname) return null;
   try {
     const parts = stagingHostname.split('.');
     return parts.length > 2 ? parts.slice(1).join('.') : stagingHostname;
   } catch {
     console.error(`Invalid STAGING_HOSTNAME in .env: ${stagingHostname}`);
-    return '';
+    return null;
   }
 }
 
@@ -25,6 +25,7 @@ export default function getEnv() {
   const apiUrl = isDev ? devApiUrl : publicApiUrl;
 
   const isPreviewHost =
+    workersDomain &&
     currentHostname.endsWith(workersDomain) &&
     currentHostname !== stagingHostname;
 
