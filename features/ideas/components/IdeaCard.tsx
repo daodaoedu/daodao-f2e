@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   Share2,
   Link as LinkIcon,
@@ -22,33 +22,16 @@ function IdeaCard({
   idea,
   onClick,
 }: IdeaCardProps) {
-  const router = useRouter();
-
   const handleCardClick = (e: React.MouseEvent) => {
-    // Prevent navigation when clicking on interactive elements
-    const target = e.target as HTMLElement;
-    if (
-      target.tagName === 'BUTTON' ||
-      target.closest('button') ||
-      target.closest('a[href]') ||
-      target.closest('[role="menuitem"]') ||
-      target.closest('.dropdown-menu')
-    ) {
-      return;
-    }
-
-    // Navigate to idea detail page
     if (onClick) {
+      e.preventDefault();
       onClick(idea.id);
-    } else {
-      router.push(`/ideas/${idea.id}`);
     }
   };
 
-  return (
+  const cardContent = (
     <Card
       className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-basic-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-basic-200 relative cursor-pointer"
-      onClick={handleCardClick}
     >
       <CardContent className="p-3 sm:p-4 md:p-6">
         <div className="flex items-start justify-between mb-4">
@@ -144,6 +127,30 @@ function IdeaCard({
         </div>
       </CardContent>
     </Card>
+  );
+
+  if (onClick) {
+    return (
+      <div
+        onClick={handleCardClick}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCardClick(e as unknown as React.MouseEvent);
+          }
+        }}
+        role="button"
+        tabIndex={0}
+      >
+        {cardContent}
+      </div>
+    );
+  }
+
+  return (
+    <Link href={`/ideas/${idea.id}`} className="block">
+      {cardContent}
+    </Link>
   );
 }
 

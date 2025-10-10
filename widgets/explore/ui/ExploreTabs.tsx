@@ -15,9 +15,9 @@ import type { ExploreTabsProps } from '../types';
 export function ExploreTabs({ activeTab, onTabChange, onCreateNew }: ExploreTabsProps) {
   const tabs = [
     '推薦',
+    '想法',
     '主題實踐',
     '學習計劃',
-    '想法',
   ];
 
   const createOptions = [
@@ -42,11 +42,11 @@ export function ExploreTabs({ activeTab, onTabChange, onCreateNew }: ExploreTabs
     <div className="mb-4 sm:mb-4 flex justify-center py-2 sm:py-4 px-4">
       <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl bg-basic-white border border-basic-200 rounded-lg px-4 py-4">
         <nav
-          className="flex items-center justify-between"
+          className="flex items-center sm:justify-between"
           role="navigation"
           aria-label="探索頁籤"
         >
-          <div className="flex space-x-2 sm:space-x-4 lg:space-x-8 overflow-x-auto" role="tablist">
+          <div className="flex gap-1 sm:gap-4 lg:gap-8 overflow-x-auto scrollbar-hide w-full sm:w-auto sm:flex-1" role="tablist">
             {tabs.map((tab) => (
               <Button
                 key={tab}
@@ -56,7 +56,7 @@ export function ExploreTabs({ activeTab, onTabChange, onCreateNew }: ExploreTabs
                 aria-selected={activeTab === tab}
                 aria-controls={`${tab}-panel`}
                 className={cn(
-                  'py-2 sm:py-4 px-1 sm:px-2 font-medium text-xs sm:text-sm transition-colors rounded-lg whitespace-nowrap flex-shrink-0',
+                  'py-2 sm:py-4 px-1 sm:px-3 font-medium text-[11px] sm:text-sm transition-colors rounded-lg whitespace-nowrap flex-1 sm:flex-shrink-0 min-w-0',
                   activeTab === tab
                     ? 'bg-primary-base text-white hover:bg-primary-darker hover:text-white'
                     : 'text-basic-500 hover:text-primary-base hover:bg-primary-base/10'
@@ -67,17 +67,16 @@ export function ExploreTabs({ activeTab, onTabChange, onCreateNew }: ExploreTabs
             ))}
           </div>
 
-          <div className="relative ml-2 sm:ml-4">
+          <div className="relative ml-4 flex-shrink-0 hidden sm:block">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
                   aria-label="創建新項目"
-                  className="px-2 sm:px-4 py-1 sm:py-2 text-primary-base hover:text-primary-darker font-medium hover:bg-primary-lightest rounded-lg text-xs sm:text-sm"
+                  className="px-4 py-2 text-primary-base hover:text-primary-darker font-medium hover:bg-primary-lightest rounded-lg text-sm"
                 >
-                  <span className="hidden sm:inline">+ 開始</span>
-                  <span className="sm:hidden">+</span>
+                  <span>+ 開始</span>
                   <ChevronDown size={14} className="ml-1" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>

@@ -1,5 +1,8 @@
+'use client';
+
 import React, { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   Search, Plus, Target, SortAsc, RefreshCw,
 } from 'lucide-react';
@@ -74,14 +77,6 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
     setSortOrder(newSortOrder);
   }, []);
 
-  const handleCreateClick = () => {
-    if (onCreateClick) {
-      onCreateClick();
-    } else {
-      // Default behavior - navigate to create page
-       router.push('/practice/create');
-    }
-  };
 
   const handleEdit = (practice: Practice) => {
      router.push(`/practice/${practice.id}/edit`);
@@ -158,14 +153,26 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
               )}
             </h2>
             {showCreateButton && (
-              <Button
-                size="sm"
-                onClick={handleCreateClick}
-                className="flex items-center gap-2"
-              >
-                <Plus className="size-4" />
-                <span className="hidden sm:inline">開始實踐</span>
-              </Button>
+              onCreateClick ? (
+                <Button
+                  size="sm"
+                  onClick={onCreateClick}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="size-4" />
+                  <span className="hidden sm:inline">開始實踐</span>
+                </Button>
+              ) : (
+                <Link href="/practice/create">
+                  <Button
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="size-4" />
+                    <span className="hidden sm:inline">開始實踐</span>
+                  </Button>
+                </Link>
+              )
             )}
           </div>
         </div>
@@ -250,10 +257,19 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
                 ? '嘗試調整搜尋關鍵字或清除篩選條件'
                 : '開始你的第一個學習實踐！'}
             </p>
-            <Button onClick={handleCreateClick} className="flex items-center gap-2">
-              <Plus className="size-4" />
-              開始第一個實踐
-            </Button>
+            {onCreateClick ? (
+              <Button onClick={onCreateClick} className="flex items-center gap-2">
+                <Plus className="size-4" />
+                開始第一個實踐
+              </Button>
+            ) : (
+              <Link href="/practice/create">
+                <Button className="flex items-center gap-2">
+                  <Plus className="size-4" />
+                  開始第一個實踐
+                </Button>
+              </Link>
+            )}
           </div>
         ) : (
           <div className="space-y-4">

@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { format } from 'date-fns';
 import {
   Search, Plus, FolderOpen, SortAsc, RefreshCw, Share2, Flag, Eye,
@@ -38,7 +40,6 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
   showSearchBar = true,
   onCreateClick,
 }) => {
-  const router = useRouter();
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'createdDate' | 'updatedDate' | 'title'>('createdDate');
@@ -105,14 +106,6 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
     setSortOrder(newSortOrder);
   }, []);
 
-  const handleCreateClick = () => {
-    if (onCreateClick) {
-      onCreateClick();
-    } else {
-      // Default behavior - navigate to create page
-       router.push('/manage/projects/create');
-    }
-  };
 
   // Sort options
   const sortOptions = [
@@ -154,27 +147,9 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
 
     const dateRange = getProjectDateRange();
 
-    const handleCardClick = (e: React.MouseEvent) => {
-      // Prevent navigation when clicking on interactive elements
-      const target = e.target as HTMLElement;
-      if (
-        target.tagName === 'BUTTON' ||
-        target.closest('button') ||
-        target.closest('a[href]') ||
-        target.closest('[role="menuitem"]') ||
-        target.closest('.dropdown-menu')
-      ) {
-        return;
-      }
-
-      // Navigate to project detail page
-      router.push(`/projects/detail?id=${project.id}`);
-    };
-
-    return (
+    const cardContent = (
       <Card
         className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-basic-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-basic-200 group relative cursor-pointer"
-        onClick={handleCardClick}
       >
         <CardContent className="p-3 sm:p-4 md:p-6">
           {/* Header Section - User Info & Actions */}
@@ -300,6 +275,12 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
         </CardContent>
       </Card>
     );
+
+    return (
+      <Link href={`/projects/detail?id=${project.id}`} className="block">
+        {cardContent}
+      </Link>
+    );
   };
 
   if (error) {
@@ -344,14 +325,26 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
               )}
             </h2>
             {showCreateButton && (
-              <Button
-                size="sm"
-                onClick={handleCreateClick}
-                className="flex items-center gap-2"
-              >
-                <Plus className="size-4" />
-                <span className="hidden sm:inline">建立計劃</span>
-              </Button>
+              onCreateClick ? (
+                <Button
+                  size="sm"
+                  onClick={onCreateClick}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="size-4" />
+                  <span className="hidden sm:inline">建立計劃</span>
+                </Button>
+              ) : (
+                <Link href="/manage/projects/create">
+                  <Button
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="size-4" />
+                    <span className="hidden sm:inline">建立計劃</span>
+                  </Button>
+                </Link>
+              )
             )}
           </div>
         </div>
@@ -437,10 +430,19 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
                 : '建立你的第一個學習計劃！'}
             </p>
             {showCreateButton && (
-              <Button onClick={handleCreateClick} className="flex items-center gap-2">
-                <Plus className="size-4" />
-                建立第一個計劃
-              </Button>
+              onCreateClick ? (
+                <Button onClick={onCreateClick} className="flex items-center gap-2">
+                  <Plus className="size-4" />
+                  建立第一個計劃
+                </Button>
+              ) : (
+                <Link href="/manage/projects/create">
+                  <Button className="flex items-center gap-2">
+                    <Plus className="size-4" />
+                    建立第一個計劃
+                  </Button>
+                </Link>
+              )
             )}
           </div>
         ) : (

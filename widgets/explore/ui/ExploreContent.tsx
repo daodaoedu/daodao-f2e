@@ -1,5 +1,3 @@
-'use client';
-
 import IdeasExploreSection from '@/features/ideas/components/IdeasExploreSection';
 import PracticeExploreSection from '@/features/practice/components/List/PracticeExploreSection';
 import ProjectsExploreSection from '@/features/projects/components/ProjectsExploreSection';

@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useState, useCallback } from 'react';
+import Link from 'next/link';
 import {
   Search, Plus, Lightbulb, SortAsc, RefreshCw,
 } from 'lucide-react';
@@ -15,7 +18,7 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import type { IdeaSearchParamsSchema } from '@/services/ideas';
 import { useRouter } from 'next/navigation';
-import IdeaCard from './IdeaCard';
+import { IdeaCard } from '@/entities/idea';
 import { useIdeas } from '../hooks';
 
 interface IdeasExploreSectionProps {
@@ -70,14 +73,6 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
     setSortOrder(newSortOrder);
   }, []);
 
-  const handleCreateClick = () => {
-    if (onCreateClick) {
-      onCreateClick();
-    } else {
-      // Default behavior - navigate to create page
-       router.push('/ideas/create');
-    }
-  };
 
   // Sort options
   const sortOptions = [
@@ -134,14 +129,26 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
               )}
             </h2>
             {showCreateButton && (
-              <Button
-                size="sm"
-                onClick={handleCreateClick}
-                className="flex items-center gap-2"
-              >
-                <Plus className="size-4" />
-                <span className="hidden sm:inline">分享想法</span>
-              </Button>
+              onCreateClick ? (
+                <Button
+                  size="sm"
+                  onClick={onCreateClick}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="size-4" />
+                  <span className="hidden sm:inline">分享想法</span>
+                </Button>
+              ) : (
+                <Link href="/ideas/create">
+                  <Button
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="size-4" />
+                    <span className="hidden sm:inline">分享想法</span>
+                  </Button>
+                </Link>
+              )
             )}
           </div>
         </div>
@@ -227,10 +234,19 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
                 : '成為第一個分享想法的人！'}
             </p>
             {showCreateButton && (
-              <Button onClick={handleCreateClick} className="flex items-center gap-2">
-                <Plus className="size-4" />
-                分享第一個想法
-              </Button>
+              onCreateClick ? (
+                <Button onClick={onCreateClick} className="flex items-center gap-2">
+                  <Plus className="size-4" />
+                  分享第一個想法
+                </Button>
+              ) : (
+                <Link href="/ideas/create">
+                  <Button className="flex items-center gap-2">
+                    <Plus className="size-4" />
+                    分享第一個想法
+                  </Button>
+                </Link>
+              )
             )}
           </div>
         ) : (
@@ -239,9 +255,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
               <IdeaCard
                 key={idea.id}
                 idea={idea}
-                onClick={(id) => {
-                   router.push(`/ideas/${id}`);
-                }}
+                onClick={(id) => router.push(`/ideas/${id}`)}
               />
             ))}
 
