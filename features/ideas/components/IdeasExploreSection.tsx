@@ -18,7 +18,7 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import type { IdeaSearchParamsSchema } from '@/services/ideas';
 import { useRouter } from 'next/navigation';
-import { IdeaCard } from '@/entities/idea';
+import IdeaCard from './IdeaCard';
 import { useIdeas } from '../hooks';
 
 interface IdeasExploreSectionProps {
@@ -255,7 +255,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
               <IdeaCard
                 key={idea.id}
                 idea={idea}
-                onClick={(id) => router.push(`/ideas/${id}`)}
+                onClick={(id: string) => router.push(`/ideas/${id}`)}
               />
             ))}
 
