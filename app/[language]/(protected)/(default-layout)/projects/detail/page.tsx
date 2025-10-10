@@ -1,7 +1,8 @@
+
 'use client';
 
 import z from 'zod';
-import { useState, useEffect } from 'react';
+import { useState, useEffect , Suspense } from 'react';
 import { Project as ProjectType } from '@/components/Projects/Project/type';
 import { projectAPIClass } from '@/services/projects/core/api';
 import { useSearchParams } from 'next/navigation';
@@ -18,7 +19,7 @@ import {
 } from '@/components/Projects/Project/Shared';
 import { parseToString } from '@/utils/helper';
 
-export default function ProjectDetailPage() {
+function ProjectDetailPageContent() {
   const [isFetchingProject, setIsFetchingProject] = useState(false);
   const [project, setProject] = useState<ProjectType>();
   const searchParams = useSearchParams();
@@ -108,5 +109,13 @@ export default function ProjectDetailPage() {
         )}
       </div>
     </>
+  );
+}
+
+export default function ProjectDetailPage() {
+  return (
+    <Suspense fallback={<Skeleton />}>
+      <ProjectDetailPageContent />
+    </Suspense>
   );
 }
