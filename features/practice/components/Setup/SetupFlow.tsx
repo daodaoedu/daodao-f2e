@@ -51,6 +51,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
 
   // 新增：標籤相關狀態
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [customTag, setCustomTag] = useState('');
 
   // 實踐行動狀態
   const [practiceAction, setPracticeAction] = useState<string>('');
@@ -124,6 +125,25 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
       });
     }
   }, [validationErrors]);
+
+  // 標籤相關函數
+  const addTag = useCallback((tag: string) => {
+    const trimmedTag = tag.trim();
+    if (trimmedTag && !selectedTags.includes(trimmedTag) && selectedTags.length < 3) {
+      setSelectedTags((prev) => [...prev, trimmedTag]);
+    }
+  }, [selectedTags]);
+
+  const removeTag = useCallback((tagToRemove: string) => {
+    setSelectedTags((prev) => prev.filter((tag) => tag !== tagToRemove));
+  }, []);
+
+  const addCustomTag = useCallback(() => {
+    if (customTag.trim()) {
+      addTag(customTag);
+      setCustomTag('');
+    }
+  }, [customTag, addTag]);
 
   const addResource = useCallback(() => {
     if (newResourceName.trim() && resources.length < 5) {
@@ -211,7 +231,11 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
             {...stepProps}
             handleNextStep={handleNextStep}
             selectedTags={selectedTags}
-            setSelectedTags={setSelectedTags}
+            customTag={customTag}
+            setCustomTag={setCustomTag}
+            addTag={addTag}
+            removeTag={removeTag}
+            addCustomTag={addCustomTag}
           />
         );
       case 2:
@@ -268,8 +292,8 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-basic-white pt-20">
-      <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-2xl px-4 py-8">
         <Confetti active={showConfetti} />
 
         <CelebrationMessage
@@ -277,7 +301,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
           isVisible={!!celebrationMessage}
         />
 
-        <div className="overflow-visible rounded-lg border border-basic-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
           {renderStepContent()}
         </div>
       </div>

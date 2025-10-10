@@ -11,10 +11,31 @@ import { Button } from '@/shared/ui';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
-import type { IdeaSchema } from '@/services/ideas/schema';
 
 interface IdeaCardProps {
-  idea: IdeaSchema;
+  idea: {
+    id: string;
+    content: string;
+    user: {
+      _id?: string;
+      id: string;
+      name: string;
+      photoURL?: string;
+      roleList?: string[];
+    };
+    tags: string[];
+    resources: Array<{
+      name: string;
+      url: string;
+    }>;
+    likeCount: number;
+    commentCount: number;
+    viewCount: number;
+    shareCount: number;
+    isLiked: boolean;
+    createdAt: string;
+    updatedAt: string;
+  };
   onClick?: (id: string) => void;
 }
 

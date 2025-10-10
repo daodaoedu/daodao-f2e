@@ -39,25 +39,14 @@ export default function MultiSelectDropdown({
     <div className="relative w-full max-w-full">
       <button
         type="button"
-        className={cn(
-          'flex w-full cursor-pointer flex-nowrap items-center justify-between gap-3',
-          'rounded-md border border-gray-300 bg-white px-4 py-3',
-          'font-sans text-sm text-basic-500',
-          'transition-all duration-200',
-          'hover:border-primary-base',
-          'focus:outline-none focus:ring-1 focus:ring-primary-base focus:border-primary-base',
-          open && 'ring-1 ring-primary-base border-primary-base'
-        )}
+        className="flex w-full cursor-pointer flex-nowrap items-center justify-between gap-2 rounded-md bg-primary-lightest p-2 font-sans text-sm focus:outline-none focus:ring-2 focus:ring-primary-base"
         onClick={handleToggleDropdown}
         onKeyDown={handleKeyDown}
         aria-expanded={open}
         aria-controls="dropdown-list"
         aria-haspopup="true"
       >
-        <span className={cn(
-          'truncate text-left flex-1',
-          selectedItems.length === 0 && 'text-basic-300'
-        )}>
+        <span className="truncate">
           {
         selectedItems.length > 0
           ? selectedItems
@@ -68,48 +57,32 @@ export default function MultiSelectDropdown({
 }
         </span>
 
-        <ChevronDown className={cn(
-          'size-4 text-basic-400 transition-transform duration-200 flex-shrink-0',
-          open && 'rotate-180'
-        )} />
+        <ChevronDown />
       </button>
 
       {open && (
         <div
           id="dropdown-list"
           role="listbox"
-          className="absolute z-10 mt-2 flex max-h-60 w-full flex-col overflow-hidden rounded-md border border-gray-200 bg-white shadow-xl"
+          className="absolute z-10 mt-1 flex max-h-40 w-full flex-col gap-2 overflow-y-auto rounded-md border border-gray-300 bg-white p-2 shadow-lg"
         >
-          <div className="overflow-y-auto p-1">
-            {listItems.map((listItem) => (
-              <button
-                type="button"
-                key={listItem.value}
-                className={cn(
-                  'w-full text-left px-3 py-2.5 rounded-md cursor-pointer',
-                  'font-sans text-sm transition-colors duration-150',
-                  'hover:bg-primary-pale',
-                  selectedItems.includes(listItem.value)
-                    ? 'bg-primary-lightest text-primary-darker font-medium'
-                    : 'bg-white text-basic-500'
-                )}
-                onClick={() => handleChange(listItem.value)}
-                role="option"
-                aria-selected={selectedItems.includes(listItem.value)}
-              >
-                <div className="flex items-center gap-2">
-                  {selectedItems.includes(listItem.value) && (
-                    <div className="size-1.5 rounded-full bg-primary-base flex-shrink-0" />
-                  )}
-                  <span className={cn(
-                    selectedItems.includes(listItem.value) ? '' : 'pl-3.5'
-                  )}>
-                    {listItem.label}
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
+          {listItems.map((listItem) => (
+            <button
+              type="button"
+              key={listItem.value}
+              className={cn(
+                'p-2 rounded-[4px] cursor-pointer hover:bg-teal-200 font-sans text-sm',
+                selectedItems.includes(listItem.value)
+                  ? 'bg-primary-lightest text-primary-base'
+                  : 'bg-white text-basic-400'
+              )}
+              onClick={() => handleChange(listItem.value)}
+              role="option"
+              aria-selected={selectedItems.includes(listItem.value)}
+            >
+              {listItem.label}
+            </button>
+          ))}
         </div>
       )}
     </div>

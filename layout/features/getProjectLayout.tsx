@@ -40,7 +40,7 @@ const getBackText = (type: ProjectType) => {
     case ProjectType.Manage:
       return '返回 我的學習計畫';
     default:
-      return '返回';
+      return '返回 學習計畫分享區';
   }
 };
 
@@ -143,8 +143,8 @@ function ProjectLayout({ children, type }: ProjectLayoutProps) {
   return (
     <Sidebar
       items={sidebarItems}
+      backPath={getProjectBaseUrl(type)}
       backText={getBackText(type)}
-      backUrl={getProjectBaseUrl(type)}
       showBackButton
     >
       <ProjectHeader project={project} />
