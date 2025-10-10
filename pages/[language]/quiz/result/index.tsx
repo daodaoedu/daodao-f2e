@@ -2,6 +2,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import SEOConfig from "@/components/SEOConfig";
 import { Button } from "@/shared/ui/button";
 import favicon112Png from "@/public/assets/brand/favicon-112.png";
@@ -13,11 +14,18 @@ import {
   themeMap,
   useQuiz,
   Title,
-  ResultChart,
   useResultStyles,
   Slogan,
   List,
 } from "@/features/quiz";
+
+const ResultChart = dynamic(
+  () => import("@/features/quiz").then(mod => ({ default: mod.ResultChart })),
+  {
+    ssr: false,
+    loading: () => <div className="aspect-[36/35] animate-pulse bg-gray-100 rounded" />,
+  }
+);
 import FacebookSvg from "@/public/assets/social-icons/facebook.svg";
 import LineSvg from "@/public/assets/social-icons/line.svg";
 import LinkedInSvg from "@/public/assets/social-icons/linkedin.svg";
