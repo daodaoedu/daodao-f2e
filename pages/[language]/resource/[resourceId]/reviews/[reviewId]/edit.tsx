@@ -1,7 +1,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 
 import SEOConfig from "@/components/SEOConfig";
-import { ProtectedComponent } from "@/contexts/Auth";
+import { ProtectedComponent } from "@/features/auth";
 import { ResourceReviewForm } from "@/features/resources";
 import { parseToNumber, parseToString } from "@/utils/helper";
 

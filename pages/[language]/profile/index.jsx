@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ProtectedComponent } from '@/contexts/Auth';
+import { ProtectedComponent } from '@/features/auth';
 import SEOConfig from '@/components/SEOConfig';
 import AccountSetting from '@/components/Profile/Accountsetting';
 import useMediaQuery from '@/shared/lib/use-media-query';

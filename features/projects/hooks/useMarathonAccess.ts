@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { RoleEnum, useAuth } from '@/contexts/Auth';
+import { RoleEnum, useAuth } from '@/features/auth';
 
 export default function useMarathonAccess() {
   const { user } = useAuth();

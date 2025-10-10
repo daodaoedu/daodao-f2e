@@ -1,7 +1,7 @@
 import { forwardRef, useRef } from 'react';
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
-import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import { useAuth, useAuthDispatch } from '@/features/auth';
 
 enum ButtonColorEnum {
   Primary = 'primary',

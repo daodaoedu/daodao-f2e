@@ -25,16 +25,16 @@ import {
   putApiV1UsersId,
   useGetApiV1UsersMe,
 } from '@/generated/endpoints/users';
+import { LOGIN_TYPE } from '@/utils/env';
 
-import LoginModal from './LoginModal';
 import {
   AuthState,
   AuthDispatch,
   Action,
   ActionTypes,
   LoginStatus,
-} from './type';
-import { registerLoginListener } from './utils';
+  LoginMessageEvent,
+} from '../model/type';
 
 const initialState: AuthState = {
   isComplete: false,
@@ -87,6 +87,44 @@ const checkIsComplete = (data: AuthState['user']) => {
   return keys.every((key) =>
     Boolean(Array.isArray(data[key]) ? data[key].length : data[key])
   );
+};
+
+/**
+ * 註冊登入事件
+ * @param loginStatus 登入狀態
+ * @param callback 登入事件回調
+ * @returns 註銷登入事件
+ */
+const registerLoginListener = (
+  loginStatus: LoginStatus,
+  callback: (token: string) => void
+) => {
+  const receiveMessage = (event: LoginMessageEvent) => {
+    if (event.origin !== window.location.origin) {
+      return;
+    }
+    if (event.data.type === LOGIN_TYPE) {
+      const { token } = event.data.payload;
+
+      if (token) callback(token);
+    }
+  };
+
+  const unregisterLoginListener = () => {
+    window.removeEventListener('message', receiveMessage, false);
+  };
+
+  const token = getTokenStorage().get();
+
+  if (token) callback(token);
+
+  if (loginStatus === LoginStatus.PERMANENT) {
+    unregisterLoginListener();
+  } else {
+    window.addEventListener('message', receiveMessage, false);
+  }
+
+  return unregisterLoginListener;
 };
 
 const authReducer = (state: AuthState, action: Action): AuthState => {
@@ -303,10 +341,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
         <SWRConfig value={(props) => ({ ...props, onError: handleError })}>
           {children}
         </SWRConfig>
-        <LoginModal
-          isOpen={state.isOpenLoginModal}
-          onClose={authDispatch.closeLoginModal}
-        />
       </AuthDispatchContext.Provider>
     </AuthContext.Provider>
   );

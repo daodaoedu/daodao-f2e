@@ -37,7 +37,7 @@ import { EDUCATION, ROLE } from "@/constants/member";
 import { getOptionLabel, getOptionLabels } from "@/utils/option";
 import { ALL_AREAS, AREAS, TBD_OPTION } from "@/constants/areas";
 import { ACTIVITY_CATEGORIES, CATEGORIES } from "@/constants/category";
-import { useAuth } from "@/contexts/Auth";
+import { useAuth } from "@/features/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
 import dynamic from "next/dynamic";

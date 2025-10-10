@@ -12,7 +12,7 @@ import {
   userAPI,
   CreateUserResponse,
 } from '@/services/users';
-import { useAuthDispatch } from '@/contexts/Auth';
+import { useAuthDispatch } from '@/features/auth';
 
 export function useUserList(query: UserQuerySchema, pageSize = 10) {
   const swr = useSWRInfinite<PaginationResponseType<UserSchema>>(

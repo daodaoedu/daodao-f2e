@@ -100,7 +100,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       const rect = e.currentTarget.getBoundingClientRect();
       const ripple = document.createElement('span');
 
-      ripple.className = 'absolute size-10 rounded-full bg-black/30 animate-button-ripple';
+      ripple.className =
+        'absolute size-10 rounded-full bg-black/30 animate-button-ripple';
       ripple.style.top = `${((e.clientY - rect.top) / rect.height) * 100}%`;
       ripple.style.left = `${((e.clientX - rect.left) / rect.width) * 100}%`;
       rippleRef.current?.appendChild(ripple);

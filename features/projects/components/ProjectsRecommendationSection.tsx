@@ -8,7 +8,7 @@ import {
 } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { useContentTypeRecommendations } from '@/services/recommendation';
-import { useAuth } from '@/contexts/Auth';
+import { useAuth } from '@/features/auth';
 import { type RecommendationItem } from '@/services/recommendation/core/schema';
 import Link from 'next/link';
 

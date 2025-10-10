@@ -2,7 +2,7 @@ import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/navigation";
 import SEOConfig from "@/components/SEOConfig";
 import { Background, Container } from "@/shared/ui/wrapper";
-import { ProtectedComponent } from "@/contexts/Auth";
+import { ProtectedComponent } from "@/features/auth";
 import { CircleForm } from "@/features/circles";
 import { parseToString } from "@/utils/helper";
 import { circleAPI, CircleSchema } from "@/services/circles";

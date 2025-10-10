@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
-import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import { useAuth, useAuthDispatch } from '@/features/auth';
 import { cn } from '@/utils/cn';
 import Dropdown from '@/shared/components/Dropdown';
 import { Image } from '@/shared/ui/image';

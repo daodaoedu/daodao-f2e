@@ -22,7 +22,7 @@ import {
   ResponsiveModalSize,
 } from '@/shared/ui/responsive-modal';
 import ChatSvg from '@/public/assets/icons/chat.svg';
-import { AuthButton, useAuth } from '@/contexts/Auth';
+import { AuthButton, useAuth } from '@/features/auth';
 import { Textarea } from '@/shared/ui/textarea';
 import { ROLE } from '@/constants/member';
 import { contactFormSchema, ContactFormSchema } from '@/services/emails';

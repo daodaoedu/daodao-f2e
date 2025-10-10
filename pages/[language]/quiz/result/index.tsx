@@ -8,7 +8,7 @@ import { Button } from "@/shared/ui/button";
 import favicon112Png from "@/public/assets/brand/favicon-112.png";
 import HorizontalLogoSvg from "@/public/assets/brand/horizontal-primary-logo.svg";
 import VerticalLogoSvg from "@/public/assets/brand/vertical-primary-logo.svg";
-import { AuthButton } from "@/contexts/Auth";
+import { AuthButton } from "@/features/auth";
 import {
   getQuizLayout,
   themeMap,

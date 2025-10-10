@@ -1,0 +1,71 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthDispatch } from '@/features/auth';
+import {
+  getDevOriginStorage,
+  getRedirectionStorage,
+  getTokenStorage,
+} from '@/utils/storage';
+import { IslandPlaceholder } from '@/shared/ui/island-placeholder';
+import { parseToString } from '@/utils/helper';
+import getEnv, { LOGIN_TYPE } from '@/utils/env';
+
+const sendLoginEvent = async (token: string) => {
+  getTokenStorage().remove();
+
+  try {
+    if (
+      window.opener &&
+      window.opener.location.origin === window.location.origin
+    ) {
+      window.opener.postMessage(
+        { type: LOGIN_TYPE, payload: { token } },
+        window.location.origin
+      );
+      window.close();
+      return true;
+    }
+
+    return false;
+  } catch (e) {
+    if (e instanceof DOMException) {
+      // 非同源政策會拋出錯誤，只有開發分支與本地開發會有此情況
+      const { isLocalOrPreviewHost: isDevHost } = getEnv();
+      const origin = getDevOriginStorage().get();
+
+      if (isDevHost && origin) {
+        getDevOriginStorage().remove();
+        window.location.href = `${origin}/auth/callback?token=${token}`;
+      }
+      return true;
+    }
+    throw e;
+  }
+};
+
+export const AuthCallback = () => {
+  const { setToken } = useAuthDispatch();
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = parseToString(
+      new URLSearchParams(window.location.search).get('token')
+    );
+
+    if (!token) return;
+
+    sendLoginEvent(token).then((isSendOpener) => {
+      const redirectPathname = getRedirectionStorage().get();
+      getRedirectionStorage().remove();
+      if (isSendOpener) return;
+      setToken(token);
+      router.replace(redirectPathname ?? '/');
+    });
+  }, [setToken, router]);
+
+  return (
+    <IslandPlaceholder title="正在前往新的島嶼" />
+  );
+};

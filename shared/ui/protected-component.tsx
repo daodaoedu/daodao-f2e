@@ -3,11 +3,9 @@
 import { useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
-import { Background, Container, Paper } from '@/shared/ui/wrapper';
-import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
-import SEOConfig from '@/components/SEOConfig';
-import { useAuth, useAuthDispatch } from './AuthContext';
+import { useAuth, useAuthDispatch } from '../lib/auth';
+import { IslandPlaceholder } from './island-placeholder';
 
 enum AuthorizationStatus {
   IDLE = 'IDLE',
@@ -15,33 +13,6 @@ enum AuthorizationStatus {
   SUCCESS = 'SUCCESS',
   ERROR = 'ERROR',
 }
-
-interface FallbackProps {
-  title: string;
-  children: React.ReactNode;
-}
-
-export const Fallback = ({ title, children }: FallbackProps) => (
-  <Background className="min-h-screen">
-    <SEOConfig title={`${title} | 島島阿學`} />
-    <Container className="pb-5">
-      <Paper>
-        <h2 className="text-center text-3xl font-bold tracking-[0.08em] text-basic-400">
-          {title}
-        </h2>
-        <div className="flex items-center justify-center">
-          <Image
-            src="/assets/images/nobody-island.gif"
-            alt="nobody-land"
-            width={300}
-            height={300}
-          />
-        </div>
-        {children}
-      </Paper>
-    </Container>
-  </Background>
-);
 
 const defaultFullscreen = <div className="h-screen w-screen bg-white" />;
 
@@ -67,7 +38,9 @@ export interface ProtectedComponentProps extends PropsWithChildren {
    * @param user 使用者物件
    * @returns 回傳一個 Promise，解析為 boolean 值
    */
-  checkUserAuthorized?: (user: UserValidatorsUserSuccessResponseSchemaData) => boolean | Promise<boolean>;
+  checkUserAuthorized?: (
+    user: UserValidatorsUserSuccessResponseSchemaData
+  ) => boolean | Promise<boolean>;
 }
 
 /**
@@ -85,12 +58,11 @@ export function ProtectedComponent({
   checkUserAuthorized,
 }: ProtectedComponentProps) {
   const router = useRouter();
-  const {
-    user, isLoggedIn, token, isLoggingIn,
-  } = useAuth();
+  const { user, isLoggedIn, token, isLoggingIn } = useAuth();
   const { openLoginModal } = useAuthDispatch();
   const requiresLogin = onlyCheckToken ? !token : !isLoggedIn;
-  const [authorizationState, setAuthorizationState] = useState<AuthorizationStatus>(AuthorizationStatus.IDLE);
+  const [authorizationState, setAuthorizationState] =
+    useState<AuthorizationStatus>(AuthorizationStatus.IDLE);
 
   useEffect(() => {
     if (!checkUserAuthorized) {
@@ -122,7 +94,7 @@ export function ProtectedComponent({
   if (requiresLogin) {
     return (
       fallback ?? (
-        <Fallback title="登入後即可使用完整功能">
+        <IslandPlaceholder title="登入後即可使用完整功能">
           <div className="flex items-center justify-center gap-4">
             <Button
               onClick={() => router.back()}
@@ -136,7 +108,7 @@ export function ProtectedComponent({
               登入 / 註冊
             </Button>
           </div>
-        </Fallback>
+        </IslandPlaceholder>
       )
     );
   }
@@ -152,7 +124,7 @@ export function ProtectedComponent({
     if (authorizationState === AuthorizationStatus.ERROR) {
       return (
         noPermissionFallback ?? (
-          <Fallback title="沒有權限">
+          <IslandPlaceholder title="沒有權限">
             <div className="flex items-center justify-center gap-4">
               <Button
                 onClick={() => router.back()}
@@ -170,7 +142,7 @@ export function ProtectedComponent({
                 首頁
               </Button>
             </div>
-          </Fallback>
+          </IslandPlaceholder>
         )
       );
     }

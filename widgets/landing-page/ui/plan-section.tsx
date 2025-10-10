@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { cn } from '@/utils/cn';
-import { AuthButton } from '@/contexts/Auth';
+import { AuthButton } from '@/features/auth';
 import { ANCHOR_IDS } from '@/shared/constants';
 
 interface PlanSectionProps {

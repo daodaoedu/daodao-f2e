@@ -4,8 +4,8 @@ import { useRef } from 'react';
 import { Button, type ButtonProps } from '@/shared/ui/button';
 
 import { GACategory, logEvent } from '@/utils/analytics';
-import { useAuth, useAuthDispatch } from './AuthContext';
-import { Callbacks } from './type';
+import { useAuth, useAuthDispatch } from '../lib/auth';
+import { Callbacks } from '../model/type';
 
 interface AuthButtonProps
   extends Omit<ButtonProps, 'asChild'>,

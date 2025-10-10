@@ -1,6 +1,6 @@
 import { usePathname } from 'next/navigation';
 import Sidebar, { SidebarItemType } from '@/layout/components/Sidebar';
-import { RoleEnum, useAuth } from '@/contexts/Auth';
+import { RoleEnum, useAuth } from '@/features/auth';
 import { ProjectProvider } from '@/contexts/Project';
 import { MilestonesProvider } from '@/contexts/Milestones';
 import getPrivateLayout from '../core/getPrivateLayout';

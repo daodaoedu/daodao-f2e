@@ -1,7 +1,7 @@
 import { differenceInYears, isValid, format } from 'date-fns';
 import { useReducer, useRef, useState } from 'react';
 import { z } from 'zod';
-import { useAuthDispatch } from '@/contexts/Auth';
+import { useAuthDispatch } from '@/features/auth';
 
 const initialState = {
   name: '',
