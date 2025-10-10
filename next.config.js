@@ -66,13 +66,23 @@ const config = {
       'sonner',                // Toast notifications
     ],
 
-    // Exclude client-only packages from server bundle
+    // Exclude client-only packages from server bundle to reduce Worker size
+    // Note: Packages in optimizePackageImports are still bundled unless also listed here
     serverExternalPackages: [
+      // Already externalized
       'html-to-image',         // Canvas/DOM manipulation (client-only)
       'lottie-web',            // Animation (client-only)
       'gsap',                  // Animation (client-only)
       '@mdxeditor/editor',     // Rich editor (client-only, already using dynamic import)
       'react-speech-recognition', // Browser API (client-only)
+
+      // Additional client-only packages to exclude from server bundle
+      'recharts',              // Chart library (large, client-only) ~800KB
+      'react-markdown',        // Markdown renderer (client-only) ~200KB
+      'embla-carousel-react',  // Carousel (client-only)
+      'react-day-picker',      // Calendar (client-only)
+      'cmdk',                  // Command palette (client-only)
+      'vaul',                  // Drawer (client-only)
     ],
   },
 
