@@ -40,13 +40,13 @@ export default function MultiSelectDropdown({
       <button
         type="button"
         className={cn(
-          "flex w-full cursor-pointer flex-nowrap items-center justify-between gap-3",
-          "rounded-md border border-gray-300 bg-white px-4 py-3",
-          "font-sans text-sm text-basic-500",
-          "transition-all duration-200",
-          "hover:border-primary-base",
-          "focus:outline-none focus:ring-1 focus:ring-primary-base focus:border-primary-base",
-          open && "ring-1 ring-primary-base border-primary-base"
+          'flex w-full cursor-pointer flex-nowrap items-center justify-between gap-3',
+          'rounded-md border border-gray-300 bg-white px-4 py-3',
+          'font-sans text-sm text-basic-500',
+          'transition-all duration-200',
+          'hover:border-primary-base',
+          'focus:outline-none focus:ring-1 focus:ring-primary-base focus:border-primary-base',
+          open && 'ring-1 ring-primary-base border-primary-base'
         )}
         onClick={handleToggleDropdown}
         onKeyDown={handleKeyDown}
@@ -55,8 +55,8 @@ export default function MultiSelectDropdown({
         aria-haspopup="true"
       >
         <span className={cn(
-          "truncate text-left flex-1",
-          selectedItems.length === 0 && "text-basic-300"
+          'truncate text-left flex-1',
+          selectedItems.length === 0 && 'text-basic-300'
         )}>
           {
         selectedItems.length > 0
@@ -69,8 +69,8 @@ export default function MultiSelectDropdown({
         </span>
 
         <ChevronDown className={cn(
-          "size-4 text-basic-400 transition-transform duration-200 flex-shrink-0",
-          open && "rotate-180"
+          'size-4 text-basic-400 transition-transform duration-200 flex-shrink-0',
+          open && 'rotate-180'
         )} />
       </button>
 

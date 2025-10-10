@@ -23,17 +23,17 @@ const allTagOptions: OptionProps[] = [
   ...defaultTags.categories.map(tag => ({
     value: tag.label,
     label: tag.label,
-    group: '分類標籤'
+    group: '分類標籤',
   })),
   ...defaultTags.difficulty.map(tag => ({
     value: tag.label,
     label: tag.label,
-    group: '難度標籤'
+    group: '難度標籤',
   })),
   ...defaultTags.duration.map(tag => ({
     value: tag.label,
     label: tag.label,
-    group: '時長標籤'
+    group: '時長標籤',
   })),
 ];
 
