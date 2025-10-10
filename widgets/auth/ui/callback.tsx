@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAuthDispatch } from '@/features/auth';
 import {
   getDevOriginStorage,
@@ -48,11 +48,12 @@ const sendLoginEvent = async (token: string) => {
 export const AuthCallback = () => {
   const { setToken } = useAuthDispatch();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = parseToString(searchParams?.get('token'));
-  const isVerified = parseToString(searchParams?.get('isVerified'));
 
   useEffect(() => {
+    const token = parseToString(
+      new URLSearchParams(window.location.search).get('token')
+    );
+
     if (!token) return;
 
     sendLoginEvent(token).then((isSendOpener) => {
@@ -62,7 +63,7 @@ export const AuthCallback = () => {
       setToken(token);
       router.replace(redirectPathname ?? '/');
     });
-  }, [token, isVerified, setToken, router]);
+  }, [setToken, router]);
 
   return (
     <div className="mx-auto my-5 min-h-[60vh] w-11/12 rounded-lg border border-solid border-basic-100 p-5 shadow-lg">
