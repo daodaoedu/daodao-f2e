@@ -1,33 +1,14 @@
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import projectAPI, { getProjectPathname, projectAPIClass } from './api';
+import projectAPI, { getProjectPathname } from './api';
 import { ProjectSchema } from './schema';
 import { sortProjects } from '../utils';
 
 export function useMyProjects() {
-  const swr = useSWR<ProjectSchema[]>(
-    getProjectPathname({ isMe: true }),
-    () => projectAPIClass.readMyList(),
-    {
-      revalidateIfStale: false,
-    }
-  );
-
-  return {
-    ...swr,
-    data: swr.data && sortProjects(swr.data),
-  };
-}
-
-export function usePublicProjects() {
-  const swr = useSWR<ProjectSchema[]>(
-    getProjectPathname({ isPublic: true }),
-    () => projectAPIClass.readPublicList(),
-    {
-      revalidateIfStale: false,
-    }
-  );
+  const swr = useSWR<ProjectSchema[]>(getProjectPathname({ isMe: true }), {
+    revalidateIfStale: false,
+  });
 
   return {
     ...swr,
@@ -36,13 +17,7 @@ export function usePublicProjects() {
 }
 
 export function useProject(id?: string | null) {
-  return useSWR<ProjectSchema>(
-    id ? getProjectPathname({ id }) : null,
-    id ? () => projectAPIClass.read(id) : null,
-    {
-      revalidateIfStale: false,
-    }
-  );
+  return useSWR<ProjectSchema>(id ? getProjectPathname({ id }) : null);
 }
 
 interface UseProjectMutationProps {

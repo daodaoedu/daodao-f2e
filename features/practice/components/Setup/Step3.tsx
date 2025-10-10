@@ -95,14 +95,14 @@ const Step3: React.FC<Step3Props> = ({
     }
   };
   return (
-    <div className="overflow-hidden rounded-lg border border-basic-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <div className="p-6">
         <div className="mb-2 flex items-center">
-          <div className="mr-2 size-2 rounded-full bg-primary-base" />
-          <span className="text-sm text-basic-400">主題實踐</span>
+          <div className="mr-2 size-2 rounded-full bg-primary" />
+          <span className="text-sm text-muted-foreground">主題實踐</span>
         </div>
-        <h3 className="text-2xl font-bold text-basic-600">資源</h3>
-        <p className="mt-1 text-sm text-basic-400">
+        <h3 className="text-2xl font-bold text-foreground">資源</h3>
+        <p className="mt-1 text-sm text-muted-foreground">
           新增實踐中可能會用的資源，例如書籍、Podcast或影片
         </p>
       </div>
@@ -111,8 +111,8 @@ const Step3: React.FC<Step3Props> = ({
         <div className="space-y-6">
           <div className="rounded-lg border border-border p-4">
             <div className="mb-4 flex items-center justify-between">
-              <Label className="text-sm font-medium text-basic-600">添加資源</Label>
-              <span className="text-xs text-basic-400">
+              <Label className="text-sm font-medium text-foreground">添加資源</Label>
+              <span className="text-xs text-muted-foreground">
                 {resources.length}
                 /5
               </span>
@@ -120,7 +120,7 @@ const Step3: React.FC<Step3Props> = ({
 
             <div className="space-y-4">
               <div>
-                <Label className="mb-2 block text-xs font-medium text-basic-600">
+                <Label className="mb-2 block text-xs font-medium text-foreground">
                   資源名稱
                   {' '}
                   <span className="text-destructive">*</span>
@@ -132,13 +132,10 @@ const Step3: React.FC<Step3Props> = ({
                     value={newResourceName}
                     onChange={(e) => handleNameChange(e.target.value)}
                     onBlur={() => validateName(newResourceName)}
-                    className={cn(
-                      'text-basic-600 placeholder:text-basic-400',
-                      (validationErrors.resourceName || nameError) && 'border-destructive'
-                    )}
+                    className={cn((validationErrors.resourceName || nameError) && 'border-destructive')}
                     maxLength={100}
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-basic-400">
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
                     {newResourceName.length}
                     /100
                   </span>
@@ -149,13 +146,13 @@ const Step3: React.FC<Step3Props> = ({
                     <span>{nameError}</span>
                   </div>
                 )}
-                <p className="mt-1 text-xs text-basic-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   輸入清楚的資源名稱，方便日後查找
                 </p>
               </div>
 
               <div>
-                <Label className="mb-2 block text-xs font-medium text-basic-600">
+                <Label className="mb-2 block text-xs font-medium text-foreground">
                   資源連結
                 </Label>
                 <Input
@@ -164,10 +161,7 @@ const Step3: React.FC<Step3Props> = ({
                   value={newResourceUrl}
                   onChange={(e) => handleUrlChange(e.target.value)}
                   onBlur={() => validateUrl(newResourceUrl)}
-                  className={cn(
-                    'text-basic-600 placeholder:text-basic-400',
-                    (validationErrors.resourceUrl || urlError) && 'border-destructive'
-                  )}
+                  className={cn((validationErrors.resourceUrl || urlError) && 'border-destructive')}
                 />
                 {urlError && (
                   <div className="mt-1 flex items-center text-xs text-destructive">
@@ -175,7 +169,7 @@ const Step3: React.FC<Step3Props> = ({
                     <span>{urlError}</span>
                   </div>
                 )}
-                <p className="mt-1 text-xs text-basic-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   請輸入完整的網址（需以 https:// 開頭）
                 </p>
               </div>
@@ -198,7 +192,7 @@ const Step3: React.FC<Step3Props> = ({
           </div>
 
           <div>
-            <Label className="mb-3 block text-sm font-medium text-basic-600">已添加的資源</Label>
+            <Label className="mb-3 block text-sm font-medium text-foreground">已添加的資源</Label>
 
             {resources.length > 0 ? (
               <div className="space-y-3">
@@ -250,14 +244,14 @@ const Step3: React.FC<Step3Props> = ({
                 ))}
               </div>
             ) : (
-              <div className="rounded-lg border border-basic-200 bg-basic-50 py-8 text-center text-basic-400">
+              <div className="rounded-lg border border-border bg-muted/50 py-8 text-center text-muted-foreground">
                 <p className="text-sm">尚未添加任何資源</p>
               </div>
             )}
           </div>
 
           <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
-            <p className="text-center text-sm text-basic-600">
+            <p className="text-center text-sm text-foreground">
               你的資源分享將能幫助有相同興趣的島友們
             </p>
           </div>
@@ -268,13 +262,11 @@ const Step3: React.FC<Step3Props> = ({
         <Button
           variant="outline"
           onClick={handlePrevStep}
-          className="bg-white text-basic-600 border-basic-200 hover:bg-white hover:border-primary-base hover:text-basic-600"
         >
           上一步
         </Button>
         <Button
           onClick={handleNextStep}
-          className="bg-primary-base text-white hover:bg-primary-base/90"
         >
           下一步
         </Button>

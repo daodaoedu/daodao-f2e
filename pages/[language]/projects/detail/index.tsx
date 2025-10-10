@@ -2,7 +2,7 @@ import z from 'zod';
 import { useState, useEffect } from 'react';
 import { getPublicProjectLayout } from '@/layout/features/getProjectLayout';
 import { Project as ProjectType } from '@/components/Projects/Project/type';
-import { projectAPIClass } from '@/services/projects/core/api';
+import { BASE_URL } from '@/constants/common';
 import { useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { Skeleton } from '@/shared/ui/skeleton';
@@ -24,13 +24,17 @@ const ProjectDetailPage = () => {
   const projectId = parseToString(searchParams?.get('id'));
 
   useEffect(() => {
-    const fetchProject = async (id: string) => {
+    const fetchProject = async () => {
       try {
         setIsFetchingProject(true);
-        const responseData = await projectAPIClass.read(id);
+        const response = await fetch(`${BASE_URL}/projects/${projectId}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const responseData = await response.json();
 
         if (responseData && responseData.id) {
-          setProject(responseData as unknown as ProjectType);
+          setProject(responseData);
         }
       } catch (error) {
         console.error(error);
@@ -42,7 +46,7 @@ const ProjectDetailPage = () => {
 
     if (projectId) {
       if (z.string().uuid().safeParse(projectId).success) {
-        fetchProject(projectId);
+        fetchProject();
       } else {
         toast.error('找不到這個計劃');
       }

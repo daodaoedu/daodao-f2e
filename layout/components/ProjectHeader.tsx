@@ -12,7 +12,7 @@ interface ProjectHeaderProps {
 
 export default function ProjectHeader({ project }: ProjectHeaderProps) {
   const roleDisplayName = ROLE.find(
-    (r) => r.value === project.user?.roleList?.[0]
+    (r) => r.value === project.user.roleList[0]
   )?.label;
 
   const eventDisplayName = useMemo(() => {

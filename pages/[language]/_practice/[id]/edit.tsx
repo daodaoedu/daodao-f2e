@@ -176,7 +176,7 @@ const EditPracticePage: React.FC = () => {
             className="flex items-center text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            <span>返回</span>
+            <span>返回實踐詳情</span>
           </Button>
 
           {/* 編輯表單 */}

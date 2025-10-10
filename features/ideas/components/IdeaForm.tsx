@@ -416,20 +416,15 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
             {/* 標籤選擇器 - 只在點擊標籤按鈕時顯示 */}
             {showTagSuggestions && (
               <div className="mb-4">
-                <div className="overflow-hidden rounded-md border border-gray-200 bg-white shadow-xl">
-                  <div className="border-b border-gray-100 bg-primary-pale/30 p-4">
-                    <div className="mb-2 flex items-center justify-between">
-                      <span className="text-sm font-medium text-basic-600">建立新標籤</span>
-                      <span className="text-xs text-basic-400">
-                        已選擇 {selectedTags.length}/3
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
+                <div className="rounded-lg border border-basic-200 bg-white p-3 shadow-lg">
+                  <div className="mb-3 border-b border-basic-100 pb-3">
+                    <div className="mb-2 text-xs text-basic-500">建立新標籤</div>
+                    <div className="flex space-x-2">
                       <Input
                         type="text"
                         value={customTagInput}
                         onChange={(e) => setCustomTagInput(e.target.value)}
-                        onKeyDown={(e) => {
+                        onKeyPress={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault();
                             if (createCustomTag(customTagInput)) {
@@ -438,7 +433,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                           }
                         }}
                         placeholder="輸入新標籤名稱"
-                        className="flex-1 text-sm bg-white"
+                        className="flex-1 text-sm"
                       />
                       <Button
                         type="button"
@@ -448,44 +443,31 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                           }
                         }}
                         disabled={!customTagInput.trim() || selectedTags.length >= 3}
-                        className="bg-primary-base text-sm text-white hover:bg-primary-darker disabled:bg-basic-300"
+                        className="bg-primary-base text-sm text-white hover:bg-primary-darker"
                       >
                         新增
                       </Button>
                     </div>
                   </div>
 
-                  <div className="p-1">
-                    <div className="px-3 py-2 text-xs font-medium text-basic-500">熱門標籤</div>
-                    <div className="max-h-60 overflow-y-auto">
-                      {DEFAULT_TAGS.map((tag) => (
-                        <button
-                          key={tag.value}
-                          type="button"
-                          onClick={() => addTag(tag)}
-                          className={`
-                            group flex w-full items-center justify-between rounded-md px-3 py-2.5 text-left
-                            transition-colors duration-150 outline-none
-                            ${selectedTags.includes(tag.label) || selectedTags.length >= 3
-                              ? 'cursor-not-allowed opacity-50'
-                              : 'hover:bg-primary-pale cursor-pointer'
-                            }
-                          `}
-                          disabled={selectedTags.includes(tag.label) || selectedTags.length >= 3}
-                        >
-                          <span className={`text-sm ${
-                            selectedTags.includes(tag.label) || selectedTags.length >= 3
-                              ? 'text-basic-400'
-                              : 'text-basic-600'
-                          }`}>
-                            {tag.label}
-                          </span>
-                          <Badge className={`${getTagCategoryColor(tag.category)} text-xs`}>
-                            {tag.category}
-                          </Badge>
-                        </button>
-                      ))}
-                    </div>
+                  <div className="mb-2 text-xs text-basic-500">熱門標籤</div>
+                  <div className="max-h-48 overflow-y-auto">
+                    {DEFAULT_TAGS.map((tag) => (
+                      <button
+                        key={tag.value}
+                        type="button"
+                        onClick={() => addTag(tag)}
+                        className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition-colors hover:bg-basic-100"
+                        disabled={selectedTags.includes(tag.label) || selectedTags.length >= 3}
+                      >
+                        <span className={`text-sm ${selectedTags.includes(tag.label) || selectedTags.length >= 3 ? 'text-basic-400' : 'text-basic-700'}`}>
+                          {tag.label}
+                        </span>
+                        <Badge className={`${getTagCategoryColor(tag.category)} text-xs`}>
+                          {tag.category}
+                        </Badge>
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -526,30 +508,19 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                 {fields.map((field, index) => (
                   <div key={field.id}>
                     {editingResourceIndex === index ? (
-                      <div className="overflow-hidden rounded-md border border-primary-base bg-primary-lightest/50 shadow-sm">
-                        <div className="border-b border-primary-base/20 bg-primary-pale/30 px-4 py-3">
-                          <span className="text-sm font-medium text-primary-darker">編輯資源</span>
-                        </div>
-                        <div className="space-y-4 p-4">
+                      <div className="rounded-lg border border-primary-base bg-primary-base/5 p-4">
+                        <div className="space-y-3">
                           <div>
-                            <Label className="mb-2 block text-sm font-medium text-basic-600">
-                              資源名稱
-                              {' '}
-                              <span className="text-red-500">*</span>
-                            </Label>
+                            <Label className="text-basic-600 mb-1 text-xs">資源名稱</Label>
                             <Input
                               placeholder="例如：設計思考入門指南"
                               value={editResourceData.name}
                               onChange={(e) => setEditResourceData((prev) => ({ ...prev, name: e.target.value }))}
-                              className="bg-white"
+                              className="border-basic-200"
                             />
                           </div>
                           <div>
-                            <Label className="mb-2 block text-sm font-medium text-basic-600">
-                              資源連結
-                              {' '}
-                              <span className="text-red-500">*</span>
-                            </Label>
+                            <Label className="text-basic-600 mb-1 text-xs">資源連結</Label>
                             <Input
                               placeholder="https://example.com"
                               value={editResourceData.url}
@@ -557,45 +528,41 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                                 setEditResourceData((prev) => ({ ...prev, url: e.target.value }));
                                 setUrlError('');
                               }}
-                              className={`bg-white ${urlError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                              className={urlError ? 'border-red-500' : 'border-basic-200'}
                             />
                             {urlError && (
-                              <p className="mt-2 flex items-center text-xs text-red-500">
-                                <span className="mr-1">⚠</span>
-                                {urlError}
-                              </p>
+                              <p className="mt-1 text-xs text-red-500">{urlError}</p>
                             )}
                           </div>
-                        </div>
-                        <div className="flex gap-2 border-t border-primary-base/20 bg-basic-50 px-4 py-3">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={cancelEditResource}
-                            size="sm"
-                            className="flex-1 bg-white hover:bg-basic-50"
-                          >
-                            取消
-                          </Button>
-                          <Button
-                            type="button"
-                            onClick={saveResource}
-                            size="sm"
-                            disabled={!editResourceData.name.trim() || !editResourceData.url.trim()}
-                            className="flex-1 bg-primary-base text-white hover:bg-primary-darker disabled:bg-basic-300 disabled:text-basic-400"
-                          >
-                            保存
-                          </Button>
+                          <div className="flex justify-end space-x-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={saveResource}
+                              size="sm"
+                              disabled={!editResourceData.name.trim() || !editResourceData.url.trim()}
+                            >
+                              保存
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={cancelEditResource}
+                              size="sm"
+                            >
+                              取消
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ) : (
-                      <div className="group flex items-center justify-between rounded-md border border-primary-base/30 bg-gradient-to-r from-primary-palest to-white p-4 transition-all hover:border-primary-base hover:shadow-md">
-                        <div className="flex flex-1 items-center gap-3">
-                          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-base/10 text-primary-base transition-colors group-hover:bg-primary-base group-hover:text-white">
+                      <div className="flex items-center justify-between rounded-lg border border-primary-base/20 bg-primary-base/5 p-3 transition-colors hover:shadow-sm">
+                        <div className="flex flex-1 items-center">
+                          <div className="mr-3 shrink-0 text-primary-base">
                             {getResourceIcon('custom')}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <span className="block truncate text-sm font-medium text-primary-darker">
+                            <span className="block truncate text-sm text-primary-darker">
                               {field.name || '未命名資源'}
                             </span>
                             {field.url && (
@@ -603,33 +570,32 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                                 href={field.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="mt-1 flex items-center gap-1 text-xs text-primary-base transition-colors hover:text-primary-darker hover:underline"
+                                className="block truncate text-xs text-primary-base hover:underline"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <LinkIcon className="size-3" />
-                                <span className="truncate">{field.url}</span>
+                                {field.url}
                               </Link>
                             )}
                           </div>
                         </div>
-                        <div className="ml-3 flex items-center gap-1">
+                        <div className="ml-3 flex items-center space-x-2">
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => startEditResource(index)}
-                            className="size-8 p-0 text-basic-400 transition-all hover:bg-blue-50 hover:text-blue-600"
+                            className="size-8 p-0 text-basic-400 hover:text-blue-500"
                           >
-                            <Edit className="size-4" />
+                            <Edit className="size-3" />
                           </Button>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => remove(index)}
-                            className="size-8 p-0 text-basic-400 transition-all hover:bg-red-50 hover:text-red-600"
+                            className="size-8 p-0 text-basic-400 hover:text-red-500"
                           >
-                            <Trash2 className="size-4" />
+                            <Trash2 className="size-3" />
                           </Button>
                         </div>
                       </div>
@@ -641,107 +607,38 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
 
             {/* 新增資源輸入框 */}
             {showResourceInput && (
-              <div className="mb-4 overflow-hidden rounded-md border border-gray-200 bg-white shadow-xl">
-                <div className="border-b border-gray-100 bg-primary-pale/30 px-4 py-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-basic-600">新增學習資源</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setShowResourceInput(false);
-                        setNewResourceName('');
-                        setNewResourceUrl('');
-                        setUrlError('');
-                      }}
-                      className="size-6 p-0 text-basic-400 hover:bg-white hover:text-basic-600"
-                    >
-                      <X className="size-4" />
-                    </Button>
-                  </div>
-                  <p className="mt-1 text-xs text-basic-400">
-                    分享影片、書籍、文章等資源連結
-                  </p>
+              <div className="space-y-3 rounded-lg border border-primary-base/20 bg-primary-base/5 p-4">
+                <div>
+                  <Label className="mb-2 block text-sm font-medium text-primary-darker">
+                    資源名稱
+                  </Label>
+                  <Input
+                    type="text"
+                    value={newResourceName}
+                    onChange={(e) => setNewResourceName(e.target.value)}
+                    placeholder="例如：設計思考入門指南"
+                    className="w-full border-basic-200"
+                  />
                 </div>
-
-                <div className="space-y-4 p-4">
-                  <div>
-                    <Label className="mb-2 block text-sm font-medium text-basic-600">
-                      資源名稱
-                      {' '}
-                      <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      type="text"
-                      value={newResourceName}
-                      onChange={(e) => setNewResourceName(e.target.value)}
-                      placeholder="例如：設計思考入門指南"
-                      className="w-full"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && newResourceName.trim() && newResourceUrl.trim()) {
-                          e.preventDefault();
-                          if (!validateUrl(newResourceUrl)) {
-                            setUrlError('請輸入有效的網址格式，例如：https://example.com');
-                            return;
-                          }
-                          const newResource = {
-                            name: newResourceName,
-                            url: newResourceUrl,
-                          };
-                          append(newResource);
-                          setNewResourceName('');
-                          setNewResourceUrl('');
-                          setShowResourceInput(false);
-                          setUrlError('');
-                        }
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <Label className="mb-2 block text-sm font-medium text-basic-600">
-                      資源連結
-                      {' '}
-                      <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      type="url"
-                      value={newResourceUrl}
-                      onChange={(e) => {
-                        setNewResourceUrl(e.target.value);
-                        setUrlError('');
-                      }}
-                      placeholder="https://example.com"
-                      className={`w-full ${urlError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && newResourceName.trim() && newResourceUrl.trim()) {
-                          e.preventDefault();
-                          if (!validateUrl(newResourceUrl)) {
-                            setUrlError('請輸入有效的網址格式，例如：https://example.com');
-                            return;
-                          }
-                          const newResource = {
-                            name: newResourceName,
-                            url: newResourceUrl,
-                          };
-                          append(newResource);
-                          setNewResourceName('');
-                          setNewResourceUrl('');
-                          setShowResourceInput(false);
-                          setUrlError('');
-                        }
-                      }}
-                    />
-                    {urlError && (
-                      <p className="mt-2 flex items-center text-xs text-red-500">
-                        <span className="mr-1">⚠</span>
-                        {urlError}
-                      </p>
-                    )}
-                  </div>
+                <div>
+                  <Label className="mb-2 block text-sm font-medium text-primary-darker">
+                    資源連結
+                  </Label>
+                  <Input
+                    type="url"
+                    value={newResourceUrl}
+                    onChange={(e) => {
+                      setNewResourceUrl(e.target.value);
+                      setUrlError('');
+                    }}
+                    placeholder="https://example.com"
+                    className={`w-full ${urlError ? 'border-red-500' : 'border-basic-200'}`}
+                  />
+                  {urlError && (
+                    <p className="mt-1 text-xs text-red-500">{urlError}</p>
+                  )}
                 </div>
-
-                <div className="flex gap-2 border-t border-gray-100 bg-basic-50 px-4 py-3">
+                <div className="flex space-x-2">
                   <Button
                     type="button"
                     variant="outline"
@@ -751,7 +648,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                       setNewResourceUrl('');
                       setUrlError('');
                     }}
-                    className="flex-1 border-basic-300 bg-white text-basic-600 hover:border-basic-400 hover:bg-basic-100"
+                    className="flex-1"
                   >
                     取消
                   </Button>
@@ -773,10 +670,11 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                       setShowResourceInput(false);
                     }}
                     disabled={!newResourceName.trim() || !newResourceUrl.trim()}
-                    className="flex-1 bg-primary-base text-white hover:bg-primary-darker disabled:bg-basic-300 disabled:text-basic-400"
+                    className="flex-1 bg-primary-base text-white hover:bg-primary-darker"
                   >
-                    新增資源
+                    新增
                   </Button>
+
                 </div>
               </div>
             )}
