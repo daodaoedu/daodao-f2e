@@ -27,7 +27,7 @@ export default function getEnv() {
   const isPreviewHost =
     workersDomain &&
     currentHostname.endsWith(workersDomain) &&
-    currentHostname !== stagingHostname;
+    !currentHostname.endsWith(stagingHostname);
 
   const isLocalOrPreviewHost =
     currentHostname.endsWith('localhost') || isPreviewHost;
