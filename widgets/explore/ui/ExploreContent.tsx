@@ -23,6 +23,7 @@ export function ExploreContent({ activeTab }: ExploreContentProps) {
           <IdeasExploreSection
             showHeader={false}
             showCreateButton={false}
+            showSearchBar={false}
           />
         )}
       </div>
@@ -38,6 +39,7 @@ export function ExploreContent({ activeTab }: ExploreContentProps) {
           <PracticeExploreSection
             showHeader={false}
             showCreateButton={false}
+            showSearchBar={false}
           />
         )}
       </div>
@@ -53,6 +55,7 @@ export function ExploreContent({ activeTab }: ExploreContentProps) {
           <ProjectsExploreSection
             showHeader={false}
             showCreateButton={false}
+            showSearchBar={false}
           />
         )}
       </div>

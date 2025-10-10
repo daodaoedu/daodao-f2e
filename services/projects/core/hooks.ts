@@ -1,14 +1,47 @@
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import projectAPI, { getProjectPathname } from './api';
+import projectAPI, { getProjectPathname, projectAPIClass } from './api';
 import { ProjectSchema } from './schema';
 import { sortProjects } from '../utils';
 
 export function useMyProjects() {
-  const swr = useSWR<ProjectSchema[]>(getProjectPathname({ isMe: true }), {
-    revalidateIfStale: false,
-  });
+  const swr = useSWR<ProjectSchema[]>(
+    getProjectPathname({ isMe: true }),
+    async () => {
+      const data = await projectAPIClass.readMyList();
+      // Populate individual project cache immediately
+      data.forEach((project) => {
+        mutate(getProjectPathname({ id: project.id }), project, { revalidate: false });
+      });
+      return data;
+    },
+    {
+      revalidateIfStale: false,
+    }
+  );
+
+  return {
+    ...swr,
+    data: swr.data && sortProjects(swr.data),
+  };
+}
+
+export function usePublicProjects() {
+  const swr = useSWR<ProjectSchema[]>(
+    getProjectPathname({ isPublic: true }),
+    async () => {
+      const data = await projectAPIClass.readPublicList();
+      // Populate individual project cache immediately
+      data.forEach((project) => {
+        mutate(getProjectPathname({ id: project.id }), project, { revalidate: false });
+      });
+      return data;
+    },
+    {
+      revalidateIfStale: false,
+    }
+  );
 
   return {
     ...swr,
@@ -17,7 +50,15 @@ export function useMyProjects() {
 }
 
 export function useProject(id?: string | null) {
-  return useSWR<ProjectSchema>(id ? getProjectPathname({ id }) : null);
+  const key = id ? getProjectPathname({ id }) : null;
+
+  return useSWR<ProjectSchema>(
+    key,
+    id ? () => projectAPIClass.read(id) : null,
+    {
+      revalidateIfStale: false,
+    }
+  );
 }
 
 interface UseProjectMutationProps {

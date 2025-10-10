@@ -16,7 +16,7 @@ export const getProjectOutcomePathname = ({
   projectId,
   outcomeId,
 }: GetProjectOutcomePathnameProps) => {
-  const pathname = `/projects/${parseToString(projectId)}/outcomes`;
+  const pathname = `/api/v1/projects/${parseToString(projectId)}/outcomes`;
 
   if (outcomeId) {
     return `${pathname}/${parseToString(outcomeId)}`;

@@ -143,7 +143,7 @@ function ProjectLayout({ children, type }: ProjectLayoutProps) {
   return (
     <Sidebar
       items={sidebarItems}
-      backPath={getProjectBaseUrl(type)}
+      backUrl={getProjectBaseUrl(type)}
       backText={getBackText(type)}
       showBackButton
     >

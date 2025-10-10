@@ -25,7 +25,10 @@ function ProjectLayoutContent({ children }: ProjectLayoutProps) {
   const pathname = usePathname();
   const projectId = parseToString(searchParams?.get('id'));
 
-  const { data: project, isLoading } = useProject(projectId);
+  // Skip layout for create page
+  const isCreatePage = pathname?.includes('/create');
+
+  const { data: project, isLoading } = useProject(isCreatePage ? null : projectId);
 
   const sidebarItems: SidebarItemType[] = useMemo(() => {
     const urlPrefix = '/projects';
@@ -54,6 +57,11 @@ function ProjectLayoutContent({ children }: ProjectLayoutProps) {
       },
     ];
   }, [projectId, pathname]);
+
+  // For create page, skip the layout wrapper and render directly
+  if (isCreatePage) {
+    return <>{children}</>;
+  }
 
   if (isLoading) {
     return (
