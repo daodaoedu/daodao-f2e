@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
-import { useAuth, useAuthDispatch } from '@/contexts/Auth';
+import { useAuth, useAuthDispatch } from '@/features/auth';
 import { getManageSidebarItems } from '@/layout/features/getManageLayout';
 import Collapse from '@/shared/components/Collapse';
 import Button from '@/shared/components/Button';

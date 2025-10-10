@@ -14,7 +14,7 @@ import {
   getSerializeCircleInfiniteKey,
   useCircleList,
 } from "@/features/circles";
-import { AuthButton } from "@/contexts/Auth";
+import { AuthButton } from "@/features/auth";
 import { Text, Title } from "@/shared/ui/typography";
 import { Background, Container, Paper } from "@/shared/ui/wrapper";
 import { ALL_AREAS, TBD_OPTION } from "@/constants/areas";

@@ -7,7 +7,7 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import { MapPin, EllipsisVertical } from 'lucide-react';
 import { Image } from '@/shared/ui/image';
-import { useAuth } from '@/contexts/Auth';
+import { useAuth } from '@/features/auth';
 import emptyCoverImg from '@/public/assets/images/empty-cover.png';
 import { timeDuration } from '@/utils/date';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';

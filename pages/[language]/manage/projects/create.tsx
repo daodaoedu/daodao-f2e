@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import toast from 'react-hot-toast';
 
-import { ProtectedComponent } from '@/contexts/Auth';
+import { ProtectedComponent } from '@/features/auth';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import Container from '@/shared/components/Container';
 import EditMode from '@/components/Projects/Project/EditMode';

@@ -11,7 +11,7 @@ import { Form } from "@/shared/ui/form";
 import { Background, Container, Paper } from "@/shared/ui/wrapper";
 import { BackButton } from "@/shared/ui/back-button";
 import { Title } from "@/shared/ui/typography";
-import { ProtectedComponent } from "@/contexts/Auth";
+import { ProtectedComponent } from "@/features/auth";
 import {
   ResourceBasicInfoFields,
   ResourceCategorizationFields,

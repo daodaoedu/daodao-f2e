@@ -1,25 +1,25 @@
+'use client';
+
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
+import { useAuth, useAuthDispatch } from '@/shared/lib/auth';
 import ResponsiveModal from '@/shared/ui/responsive-modal';
 import openWindowPopup from '@/utils/openWindowPopup';
 import { cn } from '@/utils/cn';
 import getEnv from '@/utils/env';
 
-interface LoginModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export function LoginModal() {
+  const { isOpenLoginModal } = useAuth();
+  const { closeLoginModal } = useAuthDispatch();
   const [isOpenWindow, setIsOpenWindow] = useState(false);
   const timer = useRef<NodeJS.Timeout | null>(null);
 
   const handleOpenLoginWindow = () => {
     const env = getEnv();
-    const url = env.isDevHost
-      ? `${env.frontendUrl}/auth/google?origin=${window.location.origin}`
+    const url = env.isLocalOrPreviewHost
+      ? `${env.stagingHostname}/auth/google?origin=${window.location.origin}`
       : `${env.apiUrl}/api/v1/auth/google`;
     const popup = openWindowPopup({
       url,
@@ -44,10 +44,14 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     if (!isOpenWindow && timer.current !== null) {
       clearInterval(timer.current);
     }
-  }, [isOpenWindow, timer.current]);
+  }, [isOpenWindow]);
 
   return (
-    <ResponsiveModal open={isOpen} onClose={onClose} title="歡迎回來島島阿學！">
+    <ResponsiveModal
+      open={isOpenLoginModal}
+      onClose={closeLoginModal}
+      title="歡迎回來島島阿學！"
+    >
       <div className="mx-auto w-max">
         <div className="relative overflow-hidden rounded-lg bg-gray-100">
           <Image

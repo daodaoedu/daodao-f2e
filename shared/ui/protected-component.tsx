@@ -6,8 +6,7 @@ import { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models'
 import { Background, Container, Paper } from '@/shared/ui/wrapper';
 import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
-import SEOConfig from '@/components/SEOConfig';
-import { useAuth, useAuthDispatch } from './AuthContext';
+import { useAuth, useAuthDispatch } from '../lib/auth';
 
 enum AuthorizationStatus {
   IDLE = 'IDLE',
@@ -23,7 +22,6 @@ interface FallbackProps {
 
 export const Fallback = ({ title, children }: FallbackProps) => (
   <Background className="min-h-screen">
-    <SEOConfig title={`${title} | 島島阿學`} />
     <Container className="pb-5">
       <Paper>
         <h2 className="text-center text-3xl font-bold tracking-[0.08em] text-basic-400">

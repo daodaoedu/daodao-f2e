@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { subYears } from "date-fns";
 import { useForm, useFormContext } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ProtectedComponent } from "@/contexts/Auth";
+import { ProtectedComponent } from "@/features/auth";
 import { Form, parseSchemaAutoFocus } from "@/shared/ui/form";
 import { Background, Container, Paper } from "@/shared/ui/wrapper";
 import { Text, Title } from "@/shared/ui/typography";

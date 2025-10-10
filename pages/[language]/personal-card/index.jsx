@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ProtectedComponent, useAuth } from '@/contexts/Auth';
+import { ProtectedComponent, useAuth } from '@/features/auth';
 import Edit from '@/components/PersonalCard/Edit';
 import SEOConfig from '@/components/SEOConfig';
 import MyGroup from '@/components/PersonalCard/MyGroup';

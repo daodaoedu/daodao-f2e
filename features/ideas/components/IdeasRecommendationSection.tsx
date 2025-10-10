@@ -6,7 +6,7 @@ import {
   Card, CardContent, CardHeader, CardTitle,
 } from '@/shared/ui/card';
 import { useContentTypeRecommendations } from '@/services/recommendation';
-import { useAuth } from '@/contexts/Auth';
+import { useAuth } from '@/features/auth';
 import { type IdeaSchema } from '@/services/ideas/schema';
 import { type RecommendationItem } from '@/services/recommendation/core/schema';
 import IdeaCard from './IdeaCard';

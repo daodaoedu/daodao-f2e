@@ -40,7 +40,7 @@ const config = {
   },
   env: {
     HOSTNAME: "https://www.daoedu.tw",
-    NEXT_PUBLIC_DEV_URL: "https://dev.daodao-notion-test.pages.dev",
+    STAGING_HOSTNAME: "https://staging-daodao-f2e.daoedu.workers.dev",
   },
   ...(isDev
     ? {

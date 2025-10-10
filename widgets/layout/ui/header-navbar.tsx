@@ -4,7 +4,7 @@ import { CustomLink } from '@/shared/ui/custom-link';
 import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
-import { AuthButton } from '@/contexts/Auth';
+import { AuthButton } from '@/features/auth';
 import { cn } from '@/utils/cn';
 import { useTranslation } from '@/shared/lib/translation';
 import { NavItemType } from '../model';

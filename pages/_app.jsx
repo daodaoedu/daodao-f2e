@@ -8,7 +8,7 @@ import { Toaster as SonnerToaster } from '@/shared/ui/sonner';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';
-import { AuthProvider, useAuth } from '@/contexts/Auth';
+import { AuthProvider, LoginModal, useAuth } from '@/features/auth';
 import { DialogProvider } from '@/contexts/Dialog';
 import useQueryState from '@/shared/lib/use-query-state';
 import { fetcher } from '@/utils/http';
@@ -69,6 +69,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
         }}
       />
       <SonnerToaster />
+      <LoginModal />
       {getLayout(<Component {...pageProps} />)}
     </>
   );

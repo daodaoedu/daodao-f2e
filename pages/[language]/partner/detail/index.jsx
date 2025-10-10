@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
-import { useAuth } from '@/contexts/Auth';
+import { useAuth } from '@/features/auth';
 import { useUser } from '@/features/users';
 import { parseToString } from '@/utils/helper';
 

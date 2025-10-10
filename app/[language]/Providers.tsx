@@ -2,7 +2,7 @@
 
 import { SWRConfig } from 'swr';
 import { ThemeProvider } from 'next-themes';
-import { AuthProvider } from '@/contexts/Auth';
+import { AuthProvider, LoginModal } from '@/features/auth';
 import { DialogProvider } from '@/contexts/Dialog';
 import { PromotionProvider } from '@/contexts/Promotion';
 import { NavigationBlockerProvider } from '@/shared/lib/navigation-blocker';
@@ -31,6 +31,7 @@ function Providers({ children, dictionary }: ProvidersProps) {
                 <ThemeProvider attribute="class">
                   {children}
                   <Toaster />
+                  <LoginModal />
                 </ThemeProvider>
               </PromotionProvider>
             </AuthProvider>

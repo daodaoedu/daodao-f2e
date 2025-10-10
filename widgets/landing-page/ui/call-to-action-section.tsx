@@ -1,5 +1,5 @@
 import { cn } from '@/utils/cn';
-import { AuthButton } from '@/contexts/Auth';
+import { AuthButton } from '@/features/auth';
 import Image from 'next/image';
 
 interface CTASectionProps {
