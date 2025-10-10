@@ -5,7 +5,7 @@ import { ArrowLeft, RefreshCcw, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/shared/ui/button';
 
-export default function Error({
+export default function IdeaErrorPage({
   error,
   reset,
 }: {
