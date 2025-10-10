@@ -156,10 +156,6 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
       tags: item.tags || [],
       createdAt: item.createdDate,
       updatedAt: item.createdDate,
-      likeCount: 0,
-      viewCount: 0,
-      commentCount: 0,
-      shareCount: 0,
     };
   };
 

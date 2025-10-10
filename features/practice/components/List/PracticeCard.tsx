@@ -1,28 +1,27 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  Book,
+  Video,
+  FileText,
+  Headphones,
+  GraduationCap,
+  Settings,
   Flame,
   Edit3,
   Trash2,
   MoreVertical,
-  Share2,
-  Eye,
 } from 'lucide-react';
-import { differenceInDays } from 'date-fns';
-import Shell from '@/public/assets/icons/shell.svg';
-import Comment from '@/public/assets/icons/comment.svg';
-import { Practice, PracticeWithUser } from '@/services/practice/schema';
+import { Practice, ContentType } from '@/services/practice/schema';
 import {
   calculateProgress,
   getContentTypeLabel,
   canCheckIn,
-  formatDate,
 } from '@/services/practice/utils';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { Progress } from '@/shared/ui/progress';
-import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,10 +30,10 @@ import {
 } from '@/shared/ui/dropdown-menu';
 
 interface PracticeCardProps {
-  practice: Practice | PracticeWithUser;
-  onEdit?: (practice: Practice | PracticeWithUser) => void;
-  onDelete?: (practice: Practice | PracticeWithUser) => void;
-  onCheckIn?: (practice: Practice | PracticeWithUser) => void;
+  practice: Practice;
+  onEdit?: (practice: Practice) => void;
+  onDelete?: (practice: Practice) => void;
+  onCheckIn?: (practice: Practice) => void;
   showActions?: boolean;
 }
 
@@ -45,6 +44,18 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
   onCheckIn,
   showActions = true,
 }) => {
+  const getContentIcon = (contentType: ContentType) => {
+    const iconProps = { className: 'h-5 w-5' };
+
+    switch (contentType) {
+      case 'book': return <Book {...iconProps} />;
+      case 'video': return <Video {...iconProps} />;
+      case 'articles': return <FileText {...iconProps} />;
+      case 'podcast': return <Headphones {...iconProps} />;
+      case 'course': return <GraduationCap {...iconProps} />;
+      default: return <Settings {...iconProps} />;
+    }
+  };
 
   const getStatusDisplay = () => {
     const statusMap = {
@@ -79,7 +90,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
 
   return (
     <Card
-      className="group relative mx-auto w-full max-w-xs cursor-pointer overflow-hidden rounded-2xl border border-basic-200 bg-basic-white shadow-sm transition-all duration-300 hover:shadow-lg sm:max-w-sm md:max-w-md lg:max-w-3xl"
+      className="group relative mx-auto w-full max-w-xs cursor-pointer overflow-hidden rounded-2xl border border-basic-100 bg-basic-white shadow-sm transition-all duration-300 hover:shadow-lg sm:max-w-sm md:max-w-md lg:max-w-3xl"
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
@@ -93,23 +104,14 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
       <CardContent className="p-3 sm:p-4 md:p-6">
         <div className="mb-4 flex items-start justify-between">
           <div className="flex items-center">
-            <Avatar className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3">
-              <AvatarImage
-                src={'user' in practice && practice.user?.photoURL && practice.user.photoURL.trim() !== '' ? practice.user.photoURL : undefined}
-                alt={'user' in practice ? practice.user?.name || 'user avatar' : 'user avatar'}
-              />
-              <AvatarFallback className="bg-primary-base text-primary-foreground text-xs sm:text-sm font-bold">
-                {'user' in practice && practice.user?.name ? practice.user.name.charAt(0) : '?'}
-              </AvatarFallback>
-            </Avatar>
+            <div className="mr-2 flex size-6 items-center justify-center rounded-full bg-primary-lightest sm:mr-3 sm:size-8">
+              {getContentIcon(practice.contentType)}
+            </div>
             <div>
               <div>
-                <span className="text-xs sm:text-sm font-medium text-basic-500 mr-2">
-                  {'user' in practice && practice.user?.name ? practice.user.name : '匿名用戶'}
+                <span className="mr-2 text-xs font-medium text-basic-400 sm:text-sm">
+                  {getContentTypeLabel(practice.contentType, practice.customContentType)}
                 </span>
-              </div>
-              <div className="text-xs text-basic-300 mt-0.5">
-                {getContentTypeLabel(practice.contentType, practice.customContentType)}
               </div>
             </div>
           </div>
@@ -118,22 +120,6 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
             <Badge className="hidden bg-primary-lightest text-xs text-primary-darker sm:inline-block">
               主題實踐
             </Badge>
-            {practice.startDate && (
-              <div className="text-xs text-basic-300 hidden sm:block">
-                {practice.targetDate ? (
-                  <>
-                    {formatDate(practice.startDate)}
-                    {' - '}
-                    {formatDate(practice.targetDate)}
-                    {' ('}
-                    {differenceInDays(new Date(practice.targetDate), new Date(practice.startDate)) + 1}
-                    天)
-                  </>
-                ) : (
-                  formatDate(practice.startDate)
-                )}
-              </div>
-            )}
 
             {showActions && (
               <div className="relative">
@@ -194,7 +180,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
           </div>
         </div>
 
-        <h3 className="mb-2 text-base font-bold text-basic-black transition-colors sm:text-lg">
+        <h3 className="mb-2 text-base font-bold text-basic-black transition-colors group-hover:text-primary-base sm:text-lg">
           {practice.title}
         </h3>
 
@@ -256,28 +242,6 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
             </p>
           </div>
         )}
-
-        {/* Action Buttons - Shell, Comment, Eye, Share */}
-        <div className="pt-3 sm:pt-4">
-          <div className="flex items-center justify-end gap-4 text-xs text-basic-300">
-            <div className="flex items-center gap-1">
-              <Shell />
-              <span>{practice.likeCount || 0}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Comment />
-              <span>{practice.commentCount || 0}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Eye className="h-4 w-4" />
-              <span>{practice.viewCount || 0}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Share2 className="h-4 w-4" />
-              <span>{practice.shareCount || 0}</span>
-            </div>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );

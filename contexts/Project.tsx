@@ -3,8 +3,8 @@ import React, {
 } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
-import { projectAPIClass } from '@/services/projects/core/api';
-import { mutations } from '@/utils/http';
+import { BASE_URL } from '@/constants/common';
+import { getTokenStorage } from '@/utils/storage';
 import { parseToString } from '@/utils/helper';
 
 interface ProjectContext {
@@ -28,8 +28,19 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
   const fetchProject = async (projectId: string) => {
     setIsFetching(true);
     try {
-      const result = await projectAPIClass.read(projectId);
-      setProject(result as unknown as Project);
+      const response = await fetch(`${BASE_URL}/projects/${projectId}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const responseData: Project = await response.json();
+
+      if (!responseData) {
+        throw new Error('Invalid response structure');
+      }
+
+      const result = responseData;
+      setProject(result);
     } catch (error) {
       console.error('error fetching data', error);
     } finally {
@@ -39,14 +50,31 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
   const dispatchProject = async (newData: Partial<Project>): Promise<boolean> => {
     setIsUpdateing(true);
     try {
-      if (!project?.id) return false;
+      const token = getTokenStorage().get();
 
-      await mutations.put(`/api/v1/projects/${project.id}`, {
-        ...project,
-        ...newData,
+      if (!token || !project?.id) return false;
+
+      const response = await fetch(`${BASE_URL}/projects/${project.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ project, ...newData }),
       });
 
-      fetchProject(project.id);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const responseData: Project = await response.json();
+
+      if (!responseData) {
+        throw new Error('Invalid response structure');
+      }
+
+      const result = responseData;
+
+      fetchProject(result.id);
       return true;
     } catch (error) {
       console.error('error fetching data', error);

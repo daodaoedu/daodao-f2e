@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { baseUserSchema } from '../_shared/schema';
 
 // ==================== 列舉型別的 zod schema ====================
 export const contentTypeSchema = z.enum([
@@ -156,22 +155,8 @@ export const practiceSchema = z.object({
     amount: z.number().optional(),
     unit: z.string().optional()
   }).optional(),
-  // 社群互動統計
-  likeCount: z.number().min(0).default(0),
-  commentCount: z.number().min(0).default(0),
-  viewCount: z.number().min(0).default(0),
-  shareCount: z.number().min(0).default(0),
   createdAt: z.string(),
   updatedAt: z.string()
-});
-
-// 擴展的實踐 schema - 包含使用者資訊 (用於公開列表等場景)
-export const practiceWithUserSchema = practiceSchema.extend({
-  user: baseUserSchema.extend({
-    _id: z.string().optional(),
-    photoURL: z.string().optional(),
-    roleList: z.array(z.string()).optional(),
-  }).optional(),
 });
 
 // ==================== 操作相關 schema ====================
@@ -317,7 +302,6 @@ export type MoodType = z.infer<typeof moodTypeSchema>;
 export type Resource = z.infer<typeof resourceSchema>;
 export type CheckInRecord = z.infer<typeof checkInRecordSchema>;
 export type Practice = z.infer<typeof practiceSchema>;
-export type PracticeWithUser = z.infer<typeof practiceWithUserSchema>;
 
 export type CreatePracticeInput = z.infer<typeof createPracticeSchema>;
 export type UpdatePracticeInput = z.infer<typeof updatePracticeSchema>;

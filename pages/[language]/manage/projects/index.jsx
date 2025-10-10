@@ -9,12 +9,14 @@ import emptyCoverImg from '@/public/assets/images/empty-cover.png';
 import { useMyProjects } from '@/services/projects';
 import More from '@/components/Projects/More';
 import { cn } from '@/utils/cn';
+import { useMarathonAccess } from '@/features/projects';
 import useCreateProject from '@/features/projects/hooks/useCreateProject';
 
 const Projects = () => {
   const router = useRouter();
   const { data } = useMyProjects();
   const projects = Array.isArray(data) ? data : [];
+  const hasMarathonAccess = useMarathonAccess();
   const options = [
     { value: "all", label: "全部計畫" },
     { value: "learning-marathon", label: "學習馬拉松" },
@@ -91,7 +93,7 @@ const Projects = () => {
                 <Circle className="text-primary-base w-2 h-2" />
                 <span className="text-basic-300">請選擇集合</span>
               </div>
-              <Select options={options} />
+              <Select options={options} isDisabled={!hasMarathonAccess} />
             </div>
           </div>
 

@@ -66,7 +66,6 @@ const Input = ({
     {...props}
     className={cn(
       'border border-gray-300 rounded-md px-4 py-3 text-sm',
-      'bg-white text-basic-500',
       'focus:border-primary-base focus:outline-none focus:ring-1 focus:ring-primary-base',
       className
     )}
@@ -91,7 +90,6 @@ const TextArea = ({
     className={cn(
       'border border-gray-300 rounded-md px-4 py-3 text-sm resize-none',
       'min-h-28',
-      'bg-white text-basic-500',
       'focus:border-primary-base focus:outline-none focus:ring-1 focus:ring-primary-base',
       className
     )}
