@@ -26,21 +26,21 @@ export interface SidebarLayoutProps extends React.PropsWithChildren {
    */
   showBackButton?: boolean;
   /**
-   * 返回按鈕路徑
-   */
-  backPath?: string;
-  /**
    * 返回按鈕文字
    */
   backText?: string;
+  /**
+   * 返回按鈕的 URL（如果提供則使用 router.push，否則使用 router.back）
+   */
+  backUrl?: string;
 }
 
 export default function SidebarLayout({
   children,
   items,
   showBackButton = false,
-  backPath = '/',
   backText = '返回',
+  backUrl,
 }: SidebarLayoutProps) {
   const { height, setIsShowShadow } = usePromotion();
   const router = useRouter();
@@ -58,16 +58,16 @@ export default function SidebarLayout({
   }, []);
 
   return (
-    <div className="bg-primary-palest">
+    <div className="bg-primary-palest pt-24">
       <Container className="mx-auto max-w-6xl px-4 pb-12 pt-2" autoMinHeight>
         <div className="flex flex-wrap gap-x-10">
           {showBackButton && (
             <div className="basis-full">
               <Button
                 size="sm"
-                className="mb-6 px-0 lg:mb-3"
+                className="mb-6 px-0 text-basic-500 lg:mb-3"
                 variant="ghost"
-                onClick={() => router.push(backPath)}
+                onClick={() => backUrl ? router.push(backUrl) : router.back()}
               >
                 <ChevronLeft />
                 {backText}

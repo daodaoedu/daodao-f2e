@@ -1,2 +1,7 @@
+import dynamic from 'next/dynamic';
+
 export * from './Styled';
-export * from './ResultChart';
+
+export const ResultChart = dynamic(() => import('./ResultChart'), {
+  ssr: false,
+});

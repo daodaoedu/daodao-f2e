@@ -49,7 +49,7 @@ export const Divider = () => (
 export const Description = ({ description }: {
   description: string
 }) => (
-  <p className="body-md font-sans font-normal">{description}</p>
+  <p className="body-md font-sans font-normal text-basic-500">{description}</p>
 );
 
 export const Tags = ({ category, tags }: {
@@ -94,7 +94,7 @@ export const FakeInput = ({ value }: {
   <div
     className="rounded-lg border border-solid
       border-basic-200 px-4 py-3
-      font-sans hover:cursor-default"
+      font-sans text-basic-500 hover:cursor-default"
   >
     {value}
   </div>

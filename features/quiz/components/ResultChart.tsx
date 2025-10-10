@@ -1,3 +1,5 @@
+'use client';
+
 import {
   PolarAngleAxis,
   PolarGrid,
@@ -14,7 +16,7 @@ interface ResultChartProps {
   className?: string;
 }
 
-export const ResultChart = ({
+const InternalResultChart = ({
   analysis,
   color,
   className,
@@ -74,3 +76,5 @@ export const ResultChart = ({
     </ChartContainer>
   );
 };
+
+export default InternalResultChart;

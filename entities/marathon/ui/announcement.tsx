@@ -1,9 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import MarkdownRenderer from '@/shared/ui/markdown-renderer';
+import dynamic from 'next/dynamic';
 import { Badge } from '@/shared/ui/badge';
 import { AnnouncementItemType } from '../model';
+
+const MarkdownRenderer = dynamic(
+  () => import('@/shared/ui/markdown-renderer'),
+  {
+    ssr: false,
+    loading: () => <div className="animate-pulse bg-gray-100 rounded h-32" />,
+  }
+);
 
 interface AnnouncementListProps {
   items: AnnouncementItemType[];

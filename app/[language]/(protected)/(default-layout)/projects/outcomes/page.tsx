@@ -1,10 +1,11 @@
-import { useSearchParams } from "next/navigation";
-import { ContentCard } from "@/features/projects";
-import { getPublicProjectLayout } from "@/layout/features/getProjectLayout";
-import { useProjectOutcomes } from "@/features/projects/hooks/outcome";
-import { parseToString } from "@/utils/helper";
+'use client';
 
-const OutcomesPage = () => {
+import { useSearchParams } from 'next/navigation';
+import { ContentCard } from '@/features/projects';
+import { useProjectOutcomes } from '@/features/projects/hooks/outcome';
+import { parseToString } from '@/utils/helper';
+
+export default function OutcomesPage() {
   const searchParams = useSearchParams();
   const projectId = parseToString(searchParams?.get('id'));
 
@@ -33,8 +34,4 @@ const OutcomesPage = () => {
       </ul>
     </>
   );
-};
-
-OutcomesPage.getLayout = getPublicProjectLayout;
-
-export default OutcomesPage;
+}

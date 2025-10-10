@@ -40,9 +40,17 @@ import { ACTIVITY_CATEGORIES, CATEGORIES } from "@/constants/category";
 import { useAuth } from "@/contexts/Auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
-import { MarkdownEditor } from "@/shared/ui/markdown-editor";
+import dynamic from "next/dynamic";
 import { timeDuration } from "@/utils/date";
 import { ContactModal, TargetUserType } from "@/features/email";
+
+const MarkdownEditor = dynamic(
+  () => import("@/shared/ui/markdown-editor").then(mod => ({ default: mod.MarkdownEditor })),
+  {
+    ssr: false,
+    loading: () => <div className="animate-pulse bg-gray-100 rounded h-32" />,
+  }
+);
 
 // export const runtime = "experimental-edge";
 

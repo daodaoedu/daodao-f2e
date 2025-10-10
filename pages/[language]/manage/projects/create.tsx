@@ -32,7 +32,7 @@ const ProjectPage = () => {
     onCreated: (data) => {
       if (data?.id) {
         toast.success('新增成功');
-        router.push(`/manage/projects/detail?id=${data.id}`);
+        router.push(`/projects/detail?id=${data.id}`);
       } else {
         toast.error('系統異常，請稍後再試');
       }
@@ -80,7 +80,7 @@ const ProjectPage = () => {
     });
   };
 
-  const { canCreateProject } = useCreateProject();
+  const { canCreateProject, isLoading } = useCreateProject();
 
   return (
     <ProtectedComponent>
@@ -88,7 +88,11 @@ const ProjectPage = () => {
 
       <Container className="flex justify-center pb-12 px-4" autoMinHeight>
         <div className="max-w-3xl">
-          {canCreateProject && (
+          {isLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="text-gray-500">載入中...</div>
+            </div>
+          ) : canCreateProject ? (
             <EditMode
               project={formData}
               onClickCancel={handleOnClickCancel}
@@ -97,6 +101,10 @@ const ProjectPage = () => {
               onChangeSelected={handleChangeSelected}
               onChangeResourceName={handleChangeResourceName}
             />
+          ) : (
+            <div className="flex justify-center items-center py-20">
+              <div className="text-gray-500">無法建立計畫，請稍後再試</div>
+            </div>
           )}
         </div>
       </Container>

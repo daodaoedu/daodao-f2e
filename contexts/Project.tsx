@@ -1,17 +1,20 @@
 import React, {
-  createContext, useContext, useEffect, useState,
+  createContext, useContext, useState, useMemo,
 } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { BASE_URL } from '@/constants/common';
 import { getTokenStorage } from '@/utils/storage';
 import { parseToString } from '@/utils/helper';
+import { useProject as useSWRProject } from '@/services/projects/core/hooks';
+import { mutate } from 'swr';
+import { getProjectPathname } from '@/services/projects/core/api';
 
 interface ProjectContext {
   project: Project;
   isFetching: boolean;
   isUpdating: boolean;
-  fetchProject: (projectId: string) => void;
+  fetchProject: (projectId?: string) => void;
   dispatchProject: (newData: Partial<Project>) => Promise<boolean>;
 }
 const ProjectContext = createContext<ProjectContext | null>(null);
@@ -20,33 +23,27 @@ interface ProjectContextProviderProps {
   children: React.ReactNode;
 }
 export function ProjectProvider({ children }: ProjectContextProviderProps) {
-  const [project, setProject] = useState(DEFAULT_PROJECT);
-  const [isFetching, setIsFetching] = useState(false);
   const [isUpdating, setIsUpdateing] = useState(false);
   const searchParams = useSearchParams();
+  const projectId = parseToString(searchParams?.get('id'));
 
-  const fetchProject = async (projectId: string) => {
-    setIsFetching(true);
-    try {
-      const response = await fetch(`${BASE_URL}/projects/${projectId}`);
+  // Use SWR hook for data fetching - this will use cached data if available
+  const { data: swrProject, isLoading, mutate: mutateProject } = useSWRProject(projectId);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const responseData: Project = await response.json();
+  // Convert SWR project data to legacy Project type
+  const project = useMemo(() => {
+    if (!swrProject) return DEFAULT_PROJECT;
+    return swrProject as unknown as Project;
+  }, [swrProject]);
 
-      if (!responseData) {
-        throw new Error('Invalid response structure');
-      }
-
-      const result = responseData;
-      setProject(result);
-    } catch (error) {
-      console.error('error fetching data', error);
-    } finally {
-      setIsFetching(false);
-    }
+  // Manual fetch function for backward compatibility (triggers SWR revalidation)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const fetchProject = (_projectId?: string) => {
+    // Note: projectId param is kept for backward compatibility but not used
+    // The actual projectId comes from searchParams
+    mutateProject();
   };
+
   const dispatchProject = async (newData: Partial<Project>): Promise<boolean> => {
     setIsUpdateing(true);
     try {
@@ -74,7 +71,9 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
 
       const result = responseData;
 
-      fetchProject(result.id);
+      // Update SWR cache with new data
+      mutate(getProjectPathname({ id: result.id }), result, { revalidate: false });
+
       return true;
     } catch (error) {
       console.error('error fetching data', error);
@@ -84,16 +83,11 @@ export function ProjectProvider({ children }: ProjectContextProviderProps) {
     }
   };
 
-  useEffect(() => {
-    const projectId = parseToString(searchParams?.get('id'));
-    if (projectId) fetchProject(projectId);
-  }, [searchParams]);
-
   return (
     <ProjectContext.Provider
       value={{
         project,
-        isFetching,
+        isFetching: isLoading,
         isUpdating,
         dispatchProject,
         fetchProject,

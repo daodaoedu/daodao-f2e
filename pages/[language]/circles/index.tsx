@@ -37,8 +37,16 @@ import {
 } from "@/services/circles";
 import { cn } from "@/utils/cn";
 import { Skeleton } from "@/shared/ui/skeleton";
-import { MarkdownEditor } from "@/shared/ui/markdown-editor";
+import dynamic from "next/dynamic";
 import JsonLdFactory from "@/utils/jsonLd";
+
+const MarkdownEditor = dynamic(
+  () => import("@/shared/ui/markdown-editor").then(mod => ({ default: mod.MarkdownEditor })),
+  {
+    ssr: false,
+    loading: () => <div className="line-clamp-2 body-sm h-10 animate-pulse bg-gray-100 rounded" />,
+  }
+);
 import useQueryState from "@/shared/lib/use-query-state";
 import { getOptionLabel } from "@/utils/option";
 import { Speech } from "@/shared/ui/speech";

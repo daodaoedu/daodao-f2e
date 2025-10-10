@@ -119,9 +119,6 @@ importers:
       html-to-image:
         specifier: ^1.11.13
         version: 1.11.13
-      konva:
-        specifier: ^7.0.0
-        version: 7.2.5
       lottie-web:
         specifier: ^5.13.0
         version: 5.13.0
@@ -152,9 +149,6 @@ importers:
       react-dom:
         specifier: ^19.1.1
         version: 19.1.1(react@19.1.1)
-      react-fast-marquee:
-        specifier: ^1.3.2
-        version: 1.6.5(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       react-ga:
         specifier: ^3.3.0
         version: 3.3.1(prop-types@15.8.1)(react@19.1.1)
@@ -164,9 +158,6 @@ importers:
       react-hot-toast:
         specifier: ^2.1.0
         version: 2.6.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      react-konva:
-        specifier: ^17.0.2-5
-        version: 17.0.2-6(konva@7.2.5)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@19.1.12)(react@19.1.1)
@@ -182,9 +173,6 @@ importers:
       react-speech-recognition:
         specifier: ^3.8.2
         version: 3.10.0(react@19.1.1)
-      react-typed:
-        specifier: ^1.2.0
-        version: 1.2.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       recharts:
         specifier: ^2.15.4
         version: 2.15.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -215,9 +203,6 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17(ts-node@10.9.1(@types/node@24.3.0)(typescript@5.7.2)))
-      use-image:
-        specifier: ^1.0.10
-        version: 1.1.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       uuid:
         specifier: ^11.0.3
         version: 11.1.0
@@ -3783,9 +3768,6 @@ packages:
     peerDependencies:
       '@types/react': ^19.0.0
 
-  '@types/react-reconciler@0.26.7':
-    resolution: {integrity: sha512-mBDYl8x+oyPX/VBb3E638N0B7xG+SPk/EAMcVPeexqus/5aTpTphQi0curhhshOqRrc9t6OPoJfEUkbymse/lQ==}
-
   '@types/react-speech-recognition@3.9.6':
     resolution: {integrity: sha512-cdzwXIZXWyp8zfM2XI7APDW1rZf4Nz73T4SIS2y+cC7zHnZluCdumYKH6HacxgxJH+zemAq2oXbHWXcyW0eT3A==}
 
@@ -5934,9 +5916,6 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
-  konva@7.2.5:
-    resolution: {integrity: sha512-yk/li8rUF+09QNlOdkwbEId+QvfATMe/aMGVouWW1oFoUVTYWHsQuIAE6lWy11DK8mLJEJijkNAXC5K+NVlMew==}
-
   language-subtag-registry@0.3.23:
     resolution: {integrity: sha512-0K65Lea881pHotoGEa5gDlMxt3pctLi2RplBb7Ezh4rRdLEOtgi7n4EwK9lamnUCkKBqaeKRVebTq6BAxSkpXQ==}
 
@@ -6938,12 +6917,6 @@ packages:
   react-fast-compare@3.2.2:
     resolution: {integrity: sha512-nsO+KSNgo1SbJqJEYRE9ERzo7YtYbou/OqjSQKxV7jcKox7+usiUVZOAC+XnDOABXggQTno0Y1CpVnuWEc1boQ==}
 
-  react-fast-marquee@1.6.5:
-    resolution: {integrity: sha512-swDnPqrT2XISAih0o74zQVE2wQJFMvkx+9VZXYYNSLb/CUcAzU9pNj637Ar2+hyRw6b4tP6xh4GQZip2ZCpQpg==}
-    peerDependencies:
-      react: '>= 16.8.0 || ^18.0.0'
-      react-dom: '>= 16.8.0 || ^18.0.0'
-
   react-ga@3.3.1:
     resolution: {integrity: sha512-4Vc0W5EvXAXUN/wWyxvsAKDLLgtJ3oLmhYYssx+YzphJpejtOst6cbIHCIyF50Fdxuf5DDKqRYny24yJ2y7GFQ==}
     peerDependencies:
@@ -6972,13 +6945,6 @@ packages:
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
 
-  react-konva@17.0.2-6:
-    resolution: {integrity: sha512-cfRsBKxqAQ6gTBmyrKptKRWhHD+C068dvyqcZ4h8qzKbAacTXQtfLMSpOI+d+ptxSMvayIbbCdbsBmk3bWiClQ==}
-    peerDependencies:
-      konva: ^8.0.1 || ^7.2.5
-      react: '>=16.8.0'
-      react-dom: '>=16.8.0'
-
   react-markdown@10.1.0:
     resolution: {integrity: sha512-qKxVopLT/TyA6BX3Ue5NwabOsAzm0Q7kAPwq6L+wWDwisYs7R8vZ0nRXqq6rkueboxpkjvLGU9fWifiX/ZZFxQ==}
     peerDependencies:
@@ -6989,12 +6955,6 @@ packages:
     resolution: {integrity: sha512-mxP6CqjSWjidtyDoMOSHVPdhX0pY16aSvw5fVr44EMaT7X5Xz46uQ4b/YBm1v2x+3hHkB9PmjEEkmbHb9PXQ4w==}
     peerDependencies:
       react: '>=16.6.0'
-
-  react-reconciler@0.26.2:
-    resolution: {integrity: sha512-nK6kgY28HwrMNwDnMui3dvm3rCFjZrcGiuwLc5COUipBK5hWHLOxMJhSnSomirqWwjPBJKV1QcbkI0VJr7Gl1Q==}
-    engines: {node: '>=0.10.0'}
-    peerDependencies:
-      react: ^17.0.2
 
   react-remove-scroll-bar@2.3.8:
     resolution: {integrity: sha512-9r+yi9+mgU33AKcj6IbT9oRCO78WriSj6t/cF8DWBZJ9aOGPOTEDvdUDz1FwKim7QXWwmHqtdHnRJfhAxEG46Q==}
@@ -7054,12 +7014,6 @@ packages:
     peerDependencies:
       react: '>=16.6.0'
       react-dom: '>=16.6.0'
-
-  react-typed@1.2.0:
-    resolution: {integrity: sha512-aDsaA6zkjAFJs8285APOqE85l/kwJ0/ZJmBhARwUrza4TTttrMM5FcMCGEDdThdfUdHo/0l9WXmxp1m2ik4qdw==}
-    peerDependencies:
-      react: ^16.3.0
-      react-dom: ^16.3.0
 
   react@19.1.1:
     resolution: {integrity: sha512-w8nqGImo45dmMIfljjMwOGtbmC/mk4CMYhWIicdSflH91J9TyCyczcPFXJzrZ/ZXcgGRFeP6BU0BEJTw6tZdfQ==}
@@ -7222,9 +7176,6 @@ packages:
 
   sax@1.4.1:
     resolution: {integrity: sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==}
-
-  scheduler@0.20.2:
-    resolution: {integrity: sha512-2eWfGgAqqWFGqtdMmcL5zCMK1U8KlXv8SQFGglL3CEtd0aDVDWgeF/YoCmvln55m5zSk3J/20hTaSBeSObsQDQ==}
 
   scheduler@0.26.0:
     resolution: {integrity: sha512-NlHwttCI/l5gCPR3D1nNXtWABUmBwvZpEQiD4IXSbIDq8BzLIK/7Ir5gTFSGZDUu37K5cMNp0hFtzO38sC7gWA==}
@@ -7742,9 +7693,6 @@ packages:
     resolution: {integrity: sha512-3KS2b+kL7fsuk/eJZ7EQdnEmQoaho/r6KUef7hxvltNA5DR8NAUM+8wJMbJyZ4G9/7i3v5zPBIMN5aybAh2/Jg==}
     engines: {node: '>= 0.4'}
 
-  typed.js@2.1.0:
-    resolution: {integrity: sha512-bDuXEf7YcaKN4g08NMTUM6G90XU25CK3bh6U0THC/Mod/QPKlEt9g/EjvbYB8x2Qwr2p6J6I3NrsoYaVnY6wsQ==}
-
   typedoc-plugin-markdown@4.8.1:
     resolution: {integrity: sha512-ug7fc4j0SiJxSwBGLncpSo8tLvrT9VONvPUQqQDTKPxCoFQBADLli832RGPtj6sfSVJebNSrHZQRUdEryYH/7g==}
     engines: {node: '>= 18'}
@@ -7876,12 +7824,6 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
-
-  use-image@1.1.4:
-    resolution: {integrity: sha512-P+swhszzHHgEb2X2yQ+vQNPCq/8Ks3hyfdXAVN133pvnvK7UK++bUaZUa5E+A3S02Mw8xOCBr9O6CLhk2fjrWA==}
-    peerDependencies:
-      react: '>=16.8.0'
-      react-dom: '>=16.8.0'
 
   use-sidecar@1.1.3:
     resolution: {integrity: sha512-Fedw0aZvkhynoPYlA5WXrMCAMm+nSWdZt6lzJQ7Ok8S6Q+VsHmHpRWndVRJ8Be0ZbkfPc5LRYH+5XrzXcEeLRQ==}
@@ -13128,10 +13070,6 @@ snapshots:
     dependencies:
       '@types/react': 19.1.12
 
-  '@types/react-reconciler@0.26.7':
-    dependencies:
-      '@types/react': 19.1.12
-
   '@types/react-speech-recognition@3.9.6':
     dependencies:
       '@types/dom-speech-recognition': 0.0.6
@@ -15567,8 +15505,6 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  konva@7.2.5: {}
-
   language-subtag-registry@0.3.23: {}
 
   language-tags@1.0.9:
@@ -16809,11 +16745,6 @@ snapshots:
 
   react-fast-compare@3.2.2: {}
 
-  react-fast-marquee@1.6.5(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
-    dependencies:
-      react: 19.1.1
-      react-dom: 19.1.1(react@19.1.1)
-
   react-ga@3.3.1(prop-types@15.8.1)(react@19.1.1):
     dependencies:
       prop-types: 15.8.1
@@ -16835,15 +16766,6 @@ snapshots:
   react-is@17.0.2: {}
 
   react-is@18.3.1: {}
-
-  react-konva@17.0.2-6(konva@7.2.5)(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
-    dependencies:
-      '@types/react-reconciler': 0.26.7
-      konva: 7.2.5
-      react: 19.1.1
-      react-dom: 19.1.1(react@19.1.1)
-      react-reconciler: 0.26.2(react@19.1.1)
-      scheduler: 0.20.2
 
   react-markdown@10.1.0(@types/react@19.1.12)(react@19.1.1):
     dependencies:
@@ -16871,13 +16793,6 @@ snapshots:
       prop-types: 15.8.1
       react: 19.1.1
       react-fast-compare: 3.2.2
-
-  react-reconciler@0.26.2(react@19.1.1):
-    dependencies:
-      loose-envify: 1.4.0
-      object-assign: 4.1.1
-      react: 19.1.1
-      scheduler: 0.20.2
 
   react-remove-scroll-bar@2.3.8(@types/react@19.1.12)(react@19.1.1):
     dependencies:
@@ -16939,13 +16854,6 @@ snapshots:
       prop-types: 15.8.1
       react: 19.1.1
       react-dom: 19.1.1(react@19.1.1)
-
-  react-typed@1.2.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
-    dependencies:
-      prop-types: 15.8.1
-      react: 19.1.1
-      react-dom: 19.1.1(react@19.1.1)
-      typed.js: 2.1.0
 
   react@19.1.1: {}
 
@@ -17154,11 +17062,6 @@ snapshots:
   safer-buffer@2.1.2: {}
 
   sax@1.4.1: {}
-
-  scheduler@0.20.2:
-    dependencies:
-      loose-envify: 1.4.0
-      object-assign: 4.1.1
 
   scheduler@0.26.0: {}
 
@@ -17812,8 +17715,6 @@ snapshots:
       possible-typed-array-names: 1.1.0
       reflect.getprototypeof: 1.0.10
 
-  typed.js@2.1.0: {}
-
   typedoc-plugin-markdown@4.8.1(typedoc@0.28.11(typescript@5.7.2)):
     dependencies:
       typedoc: 0.28.11(typescript@5.7.2)
@@ -17967,11 +17868,6 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 19.1.12
-
-  use-image@1.1.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
-    dependencies:
-      react: 19.1.1
-      react-dom: 19.1.1(react@19.1.1)
 
   use-sidecar@1.1.3(@types/react@19.1.12)(react@19.1.1):
     dependencies:

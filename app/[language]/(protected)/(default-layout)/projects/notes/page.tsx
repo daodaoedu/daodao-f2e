@@ -1,10 +1,11 @@
+'use client';
+
 import { useSearchParams } from 'next/navigation';
 import { ContentCard } from '@/features/projects';
-import { getPublicProjectLayout } from '@/layout/features/getProjectLayout';
 import { useProjectNotes } from '@/services/projects';
 import { parseToString } from '@/utils/helper';
 
-const NotesPage = () => {
+export default function NotesPage() {
   const searchParams = useSearchParams();
   const projectId = parseToString(searchParams?.get('id'));
 
@@ -33,8 +34,4 @@ const NotesPage = () => {
       </ul>
     </>
   );
-};
-
-NotesPage.getLayout = getPublicProjectLayout;
-
-export default NotesPage;
+}
