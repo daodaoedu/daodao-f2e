@@ -277,7 +277,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
     );
 
     return (
-      <Link href={`/projects/detail?id=${project.id}`} className="block">
+      <Link href={`/projects/${project.id}`} className="block">
         {cardContent}
       </Link>
     );

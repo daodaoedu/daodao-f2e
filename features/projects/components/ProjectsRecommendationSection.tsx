@@ -127,7 +127,7 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <Link
-                  href={`/projects/detail?id=${item.id}`}
+                  href={`/projects/${item.id}`}
                   className="line-clamp-1 text-lg font-semibold text-basic-black transition-colors hover:text-primary-base"
                 >
                   {item.title}
@@ -192,7 +192,7 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
                   {item.status}
                 </Badge>
                 <Link
-                  href={`/projects/detail?id=${item.id}`}
+                  href={`/projects/${item.id}`}
                   className="text-xs text-primary-base hover:text-primary-darker"
                 >
                   查看詳情 →

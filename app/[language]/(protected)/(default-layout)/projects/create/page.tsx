@@ -18,7 +18,7 @@ export default function CreateProjectPage() {
     onCreated: (data) => {
       if (data?.id) {
         toast.success('新增成功');
-        router.push(`/projects/detail?id=${data.id}`);
+        router.push(`/projects/${data.id}`);
       } else {
         toast.error('系統異常，請稍後再試');
       }
