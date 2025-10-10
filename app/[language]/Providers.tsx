@@ -28,7 +28,7 @@ function Providers({ children, dictionary }: ProvidersProps) {
           <DialogProvider>
             <AuthProvider>
               <PromotionProvider>
-                <ThemeProvider attribute="class" themes={['light']}>
+                <ThemeProvider attribute="class">
                   {children}
                   <Toaster />
                 </ThemeProvider>
