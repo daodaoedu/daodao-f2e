@@ -8,7 +8,7 @@ export const GoogleAuthRedirect = () => {
   useLayoutEffect(() => {
     const { isLocalOrPreviewHost, stagingHostname, apiUrl } = getEnv();
     const currentUrl = window.location.origin;
-    console.log(isLocalOrPreviewHost, currentUrl, stagingHostname);
+
     if (isLocalOrPreviewHost) {
       window.location.href = `${stagingHostname}/auth/google?origin=${currentUrl}`;
     } else {
