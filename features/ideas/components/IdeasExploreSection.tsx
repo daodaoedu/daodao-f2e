@@ -17,7 +17,6 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 import type { IdeaSearchParamsSchema } from '@/services/ideas';
-import { useRouter } from 'next/navigation';
 import IdeaCard from './IdeaCard';
 import { useIdeas } from '../hooks';
 
@@ -36,8 +35,6 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
   showSearchBar = true,
   onCreateClick,
 }) => {
-  const router = useRouter();
-
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'createdDate' | 'updatedDate' | 'likeCount'>('createdDate');
@@ -255,7 +252,6 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
               <IdeaCard
                 key={idea.id}
                 idea={idea}
-                onClick={(id: string) => router.push(`/ideas/${id}`)}
               />
             ))}
 
