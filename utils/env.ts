@@ -16,7 +16,7 @@ export default function getEnv() {
   const stagingHostname = process.env.STAGING_HOSTNAME ?? '';
   const hostname = process.env.HOSTNAME ?? '';
   const mode = process.env.NODE_ENV;
-  console.log('stagingHostname', stagingHostname);
+
   const isServerSide = typeof window === 'undefined';
   const currentHostname = isServerSide ? '' : window.location.hostname;
   const workersDomain = getWorkersDomain(stagingHostname);
