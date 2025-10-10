@@ -42,11 +42,6 @@ const EditMode = ({
     <div className="flex flex-col gap-6 md:gap-4">
       <Panel className="flex flex-col gap-5 bg-white">
         <h2 className="heading-md font-sans text-basic-400">學習計畫</h2>
-        <p className="font-sans text-sm text-basic-400">
-          計劃內容在報名截止日前皆可修改。
-          <br />
-          入選公告後，所有入選者及報名者亦可持續修改學習計劃
-        </p>
         <InputField>
           <InputField.Label htmlFor="title" isRequired>學習計畫標題</InputField.Label>
           <InputField.Input

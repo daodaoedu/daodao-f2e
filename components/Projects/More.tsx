@@ -22,7 +22,7 @@ export default function More({ projectId }: MoreProps) {
         <DropdownMenuContent className="mt-4">
           <DropdownMenuItem asChild>
             <a
-              href={`/manage/projects/detail?id=${projectId}`}
+              href={`/projects/detail?id=${projectId}`}
               target="_blank"
               rel="noopener noreferrer"
               className="min-w-[146px]"

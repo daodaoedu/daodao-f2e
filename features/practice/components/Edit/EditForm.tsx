@@ -159,116 +159,128 @@ const EditForm: React.FC<EditFormProps> = ({
       <div className="space-y-6">
         <div className="mb-4 flex items-center space-x-3">
           <BookOpen className="size-5 text-primary-base" />
-          <h3 className="heading-sm text-basic-black">基本資訊</h3>
+          <h3 className="heading-sm text-basic-600">基本資訊</h3>
         </div>
 
         {/* 標題 */}
         <div className="space-y-2">
-          <Label htmlFor="title">
+          <Label htmlFor="title" className="text-basic-600">
             標題
             {' '}
-            <span className="text-alert">*</span>
+            <span className="text-destructive">*</span>
           </Label>
           <Input
             id="title"
             value={formData.title || ''}
             onChange={(e) => handleFieldChange('title', e.target.value)}
             placeholder="輸入實踐標題"
-            className={cn(errors.title && 'border-alert focus:ring-alert')}
+            className={cn(
+              'text-basic-600 placeholder:text-basic-400',
+              errors.title && 'border-destructive focus:ring-destructive'
+            )}
           />
           {errors.title && (
-            <p className="body-sm text-alert">{errors.title}</p>
+            <p className="text-sm text-destructive">{errors.title}</p>
           )}
         </div>
 
         {/* 實踐類型（只顯示，不可編輯） */}
         <div className="space-y-2">
-          <Label>實踐類型</Label>
-          <div className="body-sm flex items-center gap-2 rounded-md border border-input bg-muted px-3 py-2 text-muted-foreground">
-            {currentContentType?.icon && React.createElement(currentContentType.icon, { className: 'h-4 w-4' })}
-            {practice.contentType === 'custom' ? practice.customContentType || '自定義' : (currentContentType?.label || practice.contentType)}
+          <Label className="text-basic-600">實踐類型</Label>
+          <div className="flex items-center gap-3 rounded-lg border border-basic-200 bg-basic-50 px-3 py-2">
+            {currentContentType?.icon && (
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-basic-100 text-basic-400">
+                {React.createElement(currentContentType.icon, { className: 'size-4' })}
+              </div>
+            )}
+            <p className="font-medium text-basic-600">
+              {practice.contentType === 'custom' ? practice.customContentType || '自定義' : (currentContentType?.label || practice.contentType)}
+            </p>
           </div>
-          <p className="body-sm text-muted-foreground">實踐類型在建立後無法修改</p>
+          <p className="text-xs text-basic-400">實踐類型在建立後無法修改</p>
         </div>
       </div>
 
       {/* 標籤設定 */}
-      <div className="space-y-6">
-        <div className="mb-4 flex items-center space-x-3">
-          <Label>標籤設定</Label>
-          <span className="text-sm text-muted-foreground">
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Label className="text-basic-600">標籤設定</Label>
+          <span className="text-sm text-basic-400">
             (
             {(formData.tags || []).length}
             /3)
           </span>
         </div>
 
+        <p className="text-sm text-basic-400">
+          從預設標籤中選擇來分類你的實踐
+        </p>
+
         {/* 標籤下拉選單 */}
-        <div className="space-y-3">
-          <div>
-            <Select
-              disabled={(formData.tags || []).length >= 3}
-              onValueChange={(value) => {
-                if (value && !(formData.tags || []).includes(value) && (formData.tags || []).length < 3) {
-                  addTag(value);
-                }
-              }}
+        <div>
+          <Select
+            disabled={(formData.tags || []).length >= 3}
+            onValueChange={(value) => {
+              if (value && !(formData.tags || []).includes(value) && (formData.tags || []).length < 3) {
+                addTag(value);
+              }
+            }}
+          >
+            <SelectTrigger className={cn(
+              'text-basic-600',
+              (formData.tags || []).length >= 3 && 'opacity-50 cursor-not-allowed'
+            )}
             >
-              <SelectTrigger className={cn(
-                (formData.tags || []).length >= 3 && 'opacity-50 cursor-not-allowed'
-              )}
-              >
-                <SelectValue placeholder={(formData.tags || []).length >= 3 ? '已達到最多標籤數量' : '選擇標籤'} />
-              </SelectTrigger>
-              <SelectContent>
-                <div className="space-y-1">
-                  <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">分類標籤</p>
-                  {defaultTags.categories
-                    .filter((tag) => !(formData.tags || []).includes(tag.label))
-                    .map((tag) => (
-                      <SelectItem key={tag.id} value={tag.label}>
-                        <span className={cn('px-2 py-1 rounded text-xs font-medium', tag.color)}>
-                          {tag.label}
-                        </span>
-                      </SelectItem>
-                    ))}
+              <SelectValue placeholder={(formData.tags || []).length >= 3 ? '已達到最多標籤數量' : '選擇標籤'} />
+            </SelectTrigger>
+            <SelectContent>
+              <div className="space-y-1">
+                <p className="px-2 py-1.5 text-xs font-semibold text-basic-400">分類標籤</p>
+                {defaultTags.categories
+                  .filter((tag) => !(formData.tags || []).includes(tag.label))
+                  .map((tag) => (
+                    <SelectItem key={tag.id} value={tag.label}>
+                      <span className={cn('px-2 py-1 rounded text-xs font-medium', tag.color)}>
+                        {tag.label}
+                      </span>
+                    </SelectItem>
+                  ))}
 
-                  <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">難度標籤</p>
-                  {defaultTags.difficulty
-                    .filter((tag) => !(formData.tags || []).includes(tag.label))
-                    .map((tag) => (
-                      <SelectItem key={tag.id} value={tag.label}>
-                        <span className={cn('px-2 py-1 rounded text-xs font-medium', tag.color)}>
-                          {tag.label}
-                        </span>
-                      </SelectItem>
-                    ))}
+                <p className="px-2 py-1.5 text-xs font-semibold text-basic-400">難度標籤</p>
+                {defaultTags.difficulty
+                  .filter((tag) => !(formData.tags || []).includes(tag.label))
+                  .map((tag) => (
+                    <SelectItem key={tag.id} value={tag.label}>
+                      <span className={cn('px-2 py-1 rounded text-xs font-medium', tag.color)}>
+                        {tag.label}
+                      </span>
+                    </SelectItem>
+                  ))}
 
-                  <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">時長標籤</p>
-                  {defaultTags.duration
-                    .filter((tag) => !(formData.tags || []).includes(tag.label))
-                    .map((tag) => (
-                      <SelectItem key={tag.id} value={tag.label}>
-                        <span className={cn('px-2 py-1 rounded text-xs font-medium', tag.color)}>
-                          {tag.label}
-                        </span>
-                      </SelectItem>
-                    ))}
-                </div>
-              </SelectContent>
-            </Select>
-          </div>
+                <p className="px-2 py-1.5 text-xs font-semibold text-basic-400">時長標籤</p>
+                {defaultTags.duration
+                  .filter((tag) => !(formData.tags || []).includes(tag.label))
+                  .map((tag) => (
+                    <SelectItem key={tag.id} value={tag.label}>
+                      <span className={cn('px-2 py-1 rounded text-xs font-medium', tag.color)}>
+                        {tag.label}
+                      </span>
+                    </SelectItem>
+                  ))}
+              </div>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* 已選標籤 */}
         {(formData.tags || []).length > 0 && (
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">已選標籤</p>
+          <div className="space-y-3">
+            <Label className="text-basic-600">已選標籤</Label>
             <div className="flex flex-wrap gap-2">
               {(formData.tags || []).map((tag) => (
                 <div
                   key={tag}
-                  className="flex items-center rounded-lg border border-primary/20 bg-primary/10 px-3 py-2"
+                  className="flex items-center rounded-lg border border-primary/20 bg-primary-lightest px-3 py-2"
                 >
                   <span className="mr-2 text-sm font-medium text-primary">{tag}</span>
                   <Button
@@ -291,16 +303,16 @@ const EditForm: React.FC<EditFormProps> = ({
       <div className="space-y-6">
         <div className="mb-4 flex items-center space-x-3">
           <Target className="size-5 text-primary-base" />
-          <h3 className="heading-sm text-basic-black">目標設定</h3>
+          <h3 className="heading-sm text-basic-600">目標設定</h3>
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* 總量 */}
           <div className="space-y-2">
-            <Label htmlFor="totalAmount">
+            <Label htmlFor="totalAmount" className="text-basic-600">
               總量
               {' '}
-              <span className="text-alert">*</span>
+              <span className="text-destructive">*</span>
             </Label>
             <div className="relative">
               <Input
@@ -312,38 +324,41 @@ const EditForm: React.FC<EditFormProps> = ({
                 min="1"
                 max="10000"
                 className={cn(
-                  'pr-12',
-                  errors.totalAmount && 'border-alert focus:ring-alert'
+                  'pr-12 text-basic-600 placeholder:text-basic-400',
+                  errors.totalAmount && 'border-destructive focus:ring-destructive'
                 )}
               />
-              <span className="body-sm absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-basic-400">
                 {currentContentType?.unit || '項'}
               </span>
             </div>
             {errors.totalAmount && (
-              <p className="body-sm text-alert">{errors.totalAmount}</p>
+              <p className="text-sm text-destructive">{errors.totalAmount}</p>
             )}
           </div>
 
           {/* 開始日期 */}
           <div className="space-y-2">
-            <Label htmlFor="startDate">開始日期</Label>
+            <Label htmlFor="startDate" className="text-basic-600">開始日期</Label>
             <Input
               id="startDate"
               type="date"
               value={formData.startDate || ''}
               onChange={(e) => handleFieldChange('startDate', e.target.value)}
-              className={cn(errors.startDate && 'border-alert focus:ring-alert')}
+              className={cn(
+                'text-basic-600',
+                errors.startDate && 'border-destructive focus:ring-destructive'
+              )}
             />
             {errors.startDate && (
-              <p className="body-sm text-alert">{errors.startDate}</p>
+              <p className="text-sm text-destructive">{errors.startDate}</p>
             )}
           </div>
         </div>
 
         {/* 每日目標設定 */}
         <div className="mt-6 space-y-4">
-          <Label>每次實踐目標</Label>
+          <Label className="text-basic-600">每次實踐目標</Label>
           <RadioGroup
             value={formData.dailyGoal?.type || 'time'}
             onValueChange={(value) => {
@@ -359,14 +374,14 @@ const EditForm: React.FC<EditFormProps> = ({
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="time" id="time-edit" />
-              <Label htmlFor="time-edit" className="flex items-center text-sm font-medium">
+              <Label htmlFor="time-edit" className="flex items-center text-sm font-medium text-basic-600">
                 <Clock className="mr-1 size-4" />
                 按時間
               </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="completion" id="completion-edit" />
-              <Label htmlFor="completion-edit" className="flex items-center text-sm font-medium">
+              <Label htmlFor="completion-edit" className="flex items-center text-sm font-medium text-basic-600">
                 <BarChart className="mr-1 size-4" />
                 按完成量
               </Label>
@@ -376,7 +391,7 @@ const EditForm: React.FC<EditFormProps> = ({
           {/* 時間目標 */}
           {formData.dailyGoal?.type === 'time' && (
             <div className="space-y-2">
-              <Label htmlFor="dailyTime">每次進行</Label>
+              <Label htmlFor="dailyTime" className="text-basic-600">每次進行</Label>
               <div className="relative">
                 <Input
                   id="dailyTime"
@@ -394,9 +409,9 @@ const EditForm: React.FC<EditFormProps> = ({
                   }}
                   min="5"
                   max="240"
-                  className="pr-12"
+                  className="pr-12 text-basic-600"
                 />
-                <span className="body-sm absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-basic-400">
                   分鐘
                 </span>
               </div>
@@ -406,7 +421,7 @@ const EditForm: React.FC<EditFormProps> = ({
           {/* 完成量目標 */}
           {formData.dailyGoal?.type === 'completion' && (
             <div className="space-y-2">
-              <Label htmlFor="dailyAmount">每次完成</Label>
+              <Label htmlFor="dailyAmount" className="text-basic-600">每次完成</Label>
               <div className="relative">
                 <Input
                   id="dailyAmount"
@@ -425,9 +440,9 @@ const EditForm: React.FC<EditFormProps> = ({
                   }}
                   min="1"
                   max="100"
-                  className="pr-12"
+                  className="pr-12 text-basic-600"
                 />
-                <span className="body-sm absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-basic-400">
                   {formData.dailyGoal?.unit || currentContentType?.unit || '項'}
                 </span>
               </div>
@@ -440,21 +455,21 @@ const EditForm: React.FC<EditFormProps> = ({
       <div className="space-y-6">
         <div className="mb-4 flex items-center space-x-3">
           <Target className="size-5 text-primary-base" />
-          <h3 className="heading-sm text-basic-black">實踐行動</h3>
+          <h3 className="heading-sm text-basic-600">實踐行動</h3>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="practiceAction">描述你的實踐行動</Label>
+          <Label htmlFor="practiceAction" className="text-basic-600">描述你的實踐行動</Label>
           <Textarea
             id="practiceAction"
             value={formData.practiceAction || ''}
             onChange={(e) => handleFieldChange('practiceAction', e.target.value)}
             placeholder="例如：每天閱讀30分鐘，並記錄學習筆記"
             rows={3}
-            className="resize-none"
+            className="resize-none text-basic-600 placeholder:text-basic-400"
             maxLength={200}
           />
-          <div className="text-right text-xs text-muted-foreground">
+          <div className="text-right text-xs text-basic-400">
             {(formData.practiceAction || '').length}
             /200
           </div>
@@ -466,7 +481,7 @@ const EditForm: React.FC<EditFormProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <LinkIcon className="size-5 text-primary-base" />
-            <h3 className="heading-sm text-basic-black">資源</h3>
+            <h3 className="heading-sm text-basic-600">資源</h3>
           </div>
           <Button
             type="button"
@@ -535,15 +550,15 @@ const EditForm: React.FC<EditFormProps> = ({
         </div>
 
         {(formData.resources || []).length === 0 && (
-          <div className="rounded-lg border-2 border-dashed border-border py-8 text-center">
-            <p className="body-md mb-3 text-muted-foreground">尚未添加學習資源</p>
+          <div className="rounded-lg border border-basic-200 bg-basic-50 py-8 text-center">
+            <p className="text-sm text-basic-400 mb-4">尚未添加任何資源</p>
             <Button
               type="button"
-              variant="ghost"
               onClick={addResource}
+              className="bg-primary-base text-white hover:bg-primary-base/90"
             >
               <Plus className="mr-2 size-4" />
-              新增第一個資源
+              添加資源
             </Button>
           </div>
         )}

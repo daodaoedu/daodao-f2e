@@ -31,7 +31,6 @@ import { Button } from "@/shared/ui/button";
 import MilestoneItem from "@/components/Milestones/MilestoneItem";
 import {
   SelectProjectModal,
-  MarathonAccess,
   EmptyProject,
   useMilestonesDateRange,
   ReviewForm,
@@ -471,7 +470,7 @@ const Main = ({ date }: { date: Date }) => {
             <li key={project.id} className="opacity-100 transition-opacity">
               <Project
                 title={project.title}
-                href={`/manage/projects/detail?id=${project.id}`}
+                href={`/projects/detail?id=${project.id}`}
                 defaultOpen={index === 0}
                 percentage={
                   Array.isArray(project?.originalMilestones) &&
@@ -554,9 +553,7 @@ const Manage = () => {
         maxDate={marathonConfig.marathonEndDate}
         minDate={marathonConfig.marathonStartDate}
       />
-      <MarathonAccess>
-        <Main date={date} />
-      </MarathonAccess>
+      <Main date={date} />
     </>
   );
 };
