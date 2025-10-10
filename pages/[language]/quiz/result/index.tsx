@@ -2,7 +2,6 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { toJpeg } from "html-to-image";
 import SEOConfig from "@/components/SEOConfig";
 import { Button } from "@/shared/ui/button";
 import favicon112Png from "@/public/assets/brand/favicon-112.png";
@@ -83,6 +82,8 @@ export default function QuizResultPage() {
       try {
         await new Promise((resolve) => setTimeout(resolve, 100));
 
+        // 動態載入 html-to-image
+        const { toJpeg } = await import('html-to-image');
         const dataUrl = await toJpeg(mainRef.current, {
           quality: 0.95,
           pixelRatio: window.devicePixelRatio,
