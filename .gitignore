@@ -43,3 +43,4 @@ generated
 *.md
 !/*.md
 !.docs/*.md
+!.gemini/*.md

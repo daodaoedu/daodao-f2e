@@ -1,0 +1,1 @@
+Refer to CLAUDE.md and .docs/*.md for codebase styleguide.
