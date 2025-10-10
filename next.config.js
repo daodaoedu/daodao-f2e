@@ -29,11 +29,9 @@ const config = {
     // Optimize package imports to reduce bundle size
     optimizePackageImports: [
       // Date & Time
-      'date-fns',              // Reduce date-fns bundle (1.3MB -> ~400KB)
       'react-day-picker',      // Reduce calendar bundle
 
       // Icons
-      'lucide-react',          // Only import used icons
       '@radix-ui/react-icons', // Only import used icons
 
       // Radix UI Components
