@@ -95,7 +95,7 @@ const checkIsComplete = (data: AuthState['user']) => {
  * @param callback 登入事件回調
  * @returns 註銷登入事件
  */
-export const registerLoginListener = (
+const registerLoginListener = (
   loginStatus: LoginStatus,
   callback: (token: string) => void
 ) => {

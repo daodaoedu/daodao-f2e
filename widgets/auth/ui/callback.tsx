@@ -8,7 +8,7 @@ import {
   getRedirectionStorage,
   getTokenStorage,
 } from '@/utils/storage';
-import { Image } from '@/shared/ui/image';
+import { IslandPlaceholder } from '@/shared/ui/island-placeholder';
 import { parseToString } from '@/utils/helper';
 import getEnv, { LOGIN_TYPE } from '@/utils/env';
 
@@ -66,18 +66,6 @@ export const AuthCallback = () => {
   }, [setToken, router]);
 
   return (
-    <div className="mx-auto my-5 min-h-[60vh] w-11/12 rounded-lg border border-solid border-basic-100 p-5 shadow-lg">
-      <h2 className="text-center text-3xl font-bold tracking-[0.08em] text-basic-400">
-        正在前往新的島嶼
-      </h2>
-      <div className="flex items-center justify-center">
-        <Image
-          src="/assets/images/nobody-island.gif"
-          alt="nobody-land"
-          width={300}
-          height={300}
-        />
-      </div>
-    </div>
+    <IslandPlaceholder title="正在前往新的島嶼" />
   );
 };
