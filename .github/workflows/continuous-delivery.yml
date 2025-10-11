@@ -31,9 +31,9 @@ env:
   PREVIEW_URL_SUFFIX: '-daodao-f2e.daoedu.workers.dev'
 
   # Cloudflare 部署配置
-  PROD_DEPLOY_CMD: 'deploy --minify'
-  DEV_DEPLOY_CMD: 'versions upload --minify --preview-alias staging'
-  PREVIEW_DEPLOY_CMD_PREFIX: 'versions upload --minify --preview-alias '
+  PROD_DEPLOY_CMD: 'deploy'
+  DEV_DEPLOY_CMD: 'versions upload --preview-alias staging'
+  PREVIEW_DEPLOY_CMD_PREFIX: 'versions upload --preview-alias '
 
 jobs:
   continuous_integration:

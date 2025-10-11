@@ -4,6 +4,7 @@
   "compatibility_date": "2025-03-25",
   "compatibility_flags": ["nodejs_compat"],
   "preview_urls": true,
+  "minify": true,
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"

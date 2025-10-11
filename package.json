@@ -20,9 +20,11 @@
     "ts:check": "tsc --noEmit --incremental false",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "cf-build": "opennextjs-cloudflare build",
+    "get-worker-size": "npm run cf-build && wrangler deploy --outdir bundled/ --dry-run",
     "preview": "npm run cf-build  && opennextjs-cloudflare preview",
     "deploy": "npm run cf-build  && opennextjs-cloudflare deploy",
     "generate:api": "orval",
+    "analyze": "ANALYZE=true next build",
     "i18n:fetch": "dotenvx run -- node scripts/google-app-script/fetch-i18n.js"
   },
   "dependencies": {
