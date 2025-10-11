@@ -1,15 +1,6 @@
 'use client';
 
-import {
-  closeImageDialog$,
-  imageDialogState$,
-  saveImage$,
-  useCellValues,
-  usePublisher,
-  useTranslation,
-} from '@mdxeditor/editor';
 import { useState, useEffect } from 'react';
-
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
@@ -21,11 +12,14 @@ interface ImageData {
   altText: string;
 }
 
-export const ImageDialog = () => {
-  const [state] = useCellValues(imageDialogState$);
-  const saveImage = usePublisher(saveImage$);
-  const closeImageDialog = usePublisher(closeImageDialog$);
-  const t = useTranslation();
+interface ImageDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onSave: (data: ImageData) => void;
+  initialData?: Partial<ImageData>;
+}
+
+export const ImageDialog = ({ open, onClose, onSave, initialData }: ImageDialogProps) => {
 
   const [error, setError] = useState('');
   const [imageData, setImageData] = useState<ImageData>({
@@ -35,14 +29,14 @@ export const ImageDialog = () => {
   });
 
   useEffect(() => {
-    if (state.type === 'editing' && state.initialValues) {
+    if (initialData) {
       setImageData({
-        src: state.initialValues.src ?? '',
-        title: state.initialValues.title ?? '',
-        altText: state.initialValues.altText ?? '',
+        src: initialData.src ?? '',
+        title: initialData.title ?? '',
+        altText: initialData.altText ?? '',
       });
     }
-  }, [state]);
+  }, [initialData]);
 
   const handleChange = (key: keyof ImageData) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -58,7 +52,7 @@ export const ImageDialog = () => {
   };
 
   const reset = () => {
-    closeImageDialog();
+    onClose();
     setError('');
     setImageData({ src: '', title: '', altText: '' });
   };
@@ -71,37 +65,32 @@ export const ImageDialog = () => {
       return;
     }
 
-    saveImage(imageData);
+    onSave(imageData);
     reset();
   };
-
-  const isOpen = state.type !== 'inactive';
 
   const footer = (
     <footer className="flex justify-end gap-2">
       <Button type="button" onClick={handleSubmit}>
-        {t('dialogControls.save', 'Save')}
+        儲存
       </Button>
       <Button type="button" variant="outline" onClick={reset}>
-        {t('dialogControls.cancel', 'Cancel')}
+        取消
       </Button>
     </footer>
   );
 
   return (
     <ResponsiveModal
-      open={isOpen}
+      open={open}
       onClose={reset}
-      title={t('uploadImage.dialogTitle', 'Upload an image')}
+      title="上傳圖片"
       footer={footer}
     >
       <div className="flex flex-col gap-4">
         <div className="grid gap-2">
           <Label htmlFor="src">
-            {t(
-              'uploadImage.addViaUrlInstructionsNoUpload',
-              'Add an image from an URL:'
-            )}
+            從網址新增圖片：
           </Label>
           <Input
             type="text"
@@ -114,7 +103,7 @@ export const ImageDialog = () => {
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="alt">{t('uploadImage.alt', 'Alt:')}</Label>
+          <Label htmlFor="alt">替代文字：</Label>
           <Input
             type="text"
             id="alt"
@@ -124,7 +113,7 @@ export const ImageDialog = () => {
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="title">{t('uploadImage.title', 'Title:')}</Label>
+          <Label htmlFor="title">標題：</Label>
           <Input
             type="text"
             id="title"

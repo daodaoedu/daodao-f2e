@@ -28,9 +28,6 @@
   .disabled-prose a {
     @apply text-basic-black;
   }
-  .mdxeditor-popup-container.bg-white {
-    z-index: 50;
-  }
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
