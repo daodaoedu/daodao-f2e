@@ -9,7 +9,7 @@ const parseFormattedText = (text: string): CustomText[] => {
   let currentIndex = 0;
 
   // 處理粗體 **text**
-  const boldRegex = /\*\*([^*]+)\*\*/g;
+  const boldRegex = /\*\*([^*]{1,1000}?)\*\*/g;
   let boldMatch = boldRegex.exec(text);
 
   while (boldMatch !== null) {
@@ -26,7 +26,7 @@ const parseFormattedText = (text: string): CustomText[] => {
   }
 
   // 處理斜體 *text*（但不是粗體）
-  const italicRegex = /(?<!\*)\*([^*]+)\*(?!\*)/g;
+  const italicRegex = /(?<!\*)\*([^*]{1,1000}?)\*(?!\*)/g;
   const remainingText = text.substring(currentIndex);
   const italicMatch = italicRegex.exec(remainingText);
 
@@ -43,7 +43,7 @@ const parseFormattedText = (text: string): CustomText[] => {
   }
 
   // 處理行內程式碼 `code`
-  const codeRegex = /`([^`]+)`/g;
+  const codeRegex = /`([^`]{1,1000}?)`/g;
   const finalText = text.substring(currentIndex);
   const codeMatch = codeRegex.exec(finalText);
 
@@ -76,7 +76,7 @@ const parseInlineText = (text: string): Descendant[] => {
   let currentIndex = 0;
 
   // 處理連結 [text](url)
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const linkRegex = /\[([^\]]{1,1000}?)\]\(([^)]{1,2000}?)\)/g;
   let linkMatch = linkRegex.exec(text);
 
   while (linkMatch !== null) {
@@ -207,7 +207,7 @@ export const deserializeFromMarkdown = (markdown: string): Descendant[] => {
 
     // 圖片 ![alt](url "title")
     const imageMatch = trimmedLine.match(
-      /^!\[([^\]]*)\]\(([^)]+)(?:\s+"([^"]*)")?\)$/
+      /^!\[([^\]]{0,500}?)\]\(([^)]{1,2000}?)(?:\s+"([^"]{0,500}?)")?\)$/
     );
     if (imageMatch) {
       if (currentNode) nodes.push(currentNode);
@@ -224,7 +224,7 @@ export const deserializeFromMarkdown = (markdown: string): Descendant[] => {
     }
 
     // 標題
-    const headingMatch = trimmedLine.match(/^(#{1,6})\s+(.*)$/);
+    const headingMatch = trimmedLine.match(/^(#{1,6})\s+(.{0,1000}?)$/);
     if (headingMatch) {
       if (currentNode) nodes.push(currentNode);
       const level = headingMatch[1].length as HeadingLevel;
@@ -260,7 +260,7 @@ export const deserializeFromMarkdown = (markdown: string): Descendant[] => {
     }
 
     // 無序列表
-    const bulletMatch = trimmedLine.match(/^-\s+(.*)$/);
+    const bulletMatch = trimmedLine.match(/^-\s+(.{0,1000}?)$/);
     if (bulletMatch) {
       if (currentNode && currentNode.type !== 'bulleted-list') {
         nodes.push(currentNode);
@@ -286,7 +286,7 @@ export const deserializeFromMarkdown = (markdown: string): Descendant[] => {
     }
 
     // 有序列表
-    const numberedMatch = trimmedLine.match(/^\d+\.\s+(.*)$/);
+    const numberedMatch = trimmedLine.match(/^\d{1,4}\.\s+(.{0,1000}?)$/);
     if (numberedMatch) {
       if (currentNode && currentNode.type !== 'numbered-list') {
         nodes.push(currentNode);
