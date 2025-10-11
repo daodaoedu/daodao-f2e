@@ -7,6 +7,8 @@ export const locales = [defaultLocale, 'en'] as const;
 export type Locale = (typeof locales)[number];
 export type Dictionary = typeof import('./locales/zh-TW.json');
 
+const localeRegex = new RegExp(`(${locales.join('|')})`);
+
 export const languageOptions = [
   { value: 'zh-TW', label: '中文' },
   { value: 'en', label: 'English' },
@@ -18,7 +20,7 @@ const dictionaries: Record<Locale, Dictionary> = {
 };
 
 export const isLocale = (language: string): language is Locale =>
-  locales.findIndex((locale) => locale === language) > -1;
+  locales.includes(language as Locale);
 
 type ParamsType = LayoutProps<'/[language]'>['params'];
 
@@ -50,13 +52,13 @@ export const getDictionary = async (localeOrParams: LocaleOrParamsType) => {
 export function getLocale(acceptLanguage?: string | null): Locale {
   if (typeof acceptLanguage !== 'string') return defaultLocale;
 
-  // match accept language
-  // e.g. zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7 => [ 'zh-TW', 'zh', 'en-US', 'en' ]
-  const languageRegex = /([\w]{2,3}-?[\w]{0,3})/gm;
-  const languages = acceptLanguage.match(languageRegex);
-  const selectedLocale = languages?.find(isLocale);
+  const languages = acceptLanguage.match(localeRegex);
 
-  return selectedLocale || defaultLocale;
+  if (languages?.[0] && isLocale(languages[0])) {
+    return languages[0];
+  }
+
+  return defaultLocale;
 }
 
 // 遞歸生成所有末端節點的路徑
