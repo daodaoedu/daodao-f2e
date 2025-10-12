@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { locales, getDictionary, getText } from '@/shared/config/i18n';
+import { locales, getDictionary, getTranslation } from '@/shared/config/i18n';
 import MarkdownRenderer from '@/shared/ui/markdown-renderer';
 import { Paper } from '@/shared/ui/wrapper';
 
@@ -22,11 +22,11 @@ const getTermsData = async (
   params: PageProps<'/[language]/terms/[type]'>['params']
 ) => {
   const { language, type } = await params;
-  const dictionary = await getDictionary(language);
+  const t = getTranslation(getDictionary(language));
   const snakeCaseType = getTermsI18nKey(type);
   return {
-    title: getText(dictionary, `terms.${snakeCaseType}_title`),
-    content: getText(dictionary, `terms.${snakeCaseType}_content`),
+    title: t(`terms.${snakeCaseType}_title`),
+    content: t(`terms.${snakeCaseType}_content`),
   };
 };
 
@@ -52,7 +52,7 @@ export default async function TermsPage({
   const { content } = await getTermsData(params);
 
   return (
-    <div className="bg-primary-pale min-h-screen px-4 py-24">
+    <div className="min-h-screen bg-primary-pale px-4 py-24">
       <Paper className="container prose max-w-5xl rounded py-8 shadow-lg">
         <MarkdownRenderer source={content} />
       </Paper>
