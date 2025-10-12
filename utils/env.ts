@@ -1,5 +1,3 @@
-export const LOGIN_TYPE = 'DAODAO-LOGIN-TYPE';
-
 export type Environment = 'production' | 'staging' | 'preview' | 'development';
 
 export default function getEnv() {
