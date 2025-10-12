@@ -3,7 +3,7 @@ import { useReducer } from "react";
 import { toast } from "sonner";
 import { SWRConfig } from "swr";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { CustomLink } from '@/shared/ui/custom-link';
 import { MapPin, SearchIcon } from "lucide-react";
 import groupBannerPng from "@/public/assets/circles/banner.png";
 import emptyCoverPng from "@/public/assets/images/empty-cover.png";
@@ -215,7 +215,7 @@ function CircleCard({ data }: { data: CircleSchema }) {
   };
 
   return (
-    <Link
+    <CustomLink
       className={cn(
         "relative block p-2 rounded-md bg-white text-basic-500 transition-[transform,box-shadow]",
         "hover:scale-105 hover:shadow-md hover:z-10"
@@ -284,7 +284,7 @@ function CircleCard({ data }: { data: CircleSchema }) {
           </Badge>
         </div>
       </div>
-    </Link>
+    </CustomLink>
   );
 }
 

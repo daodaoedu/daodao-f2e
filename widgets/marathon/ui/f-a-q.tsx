@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { ChevronRight } from 'lucide-react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { cn } from '@/utils/cn';
 
 // 定義類型
@@ -138,7 +138,7 @@ const faqItems: FaqItem[] = [
     answer: (
       <div>
         歡迎填寫團報表單，我們將協助促成！
-        <Link
+        <CustomLink
           href="https://forms.gle/BZ24JnTxid4y7CCV6"
           className={cn(
             'block rounded-lg p-2.5 text-sm font-normal text-basic-400 transition-colors duration-300'
@@ -148,7 +148,7 @@ const faqItems: FaqItem[] = [
           aria-label="填寫團報表單"
         >
           https://forms.gle/BZ24JnTxid4y7CCV6
-        </Link>
+        </CustomLink>
       </div>
     ),
   },
@@ -158,7 +158,7 @@ const faqItems: FaqItem[] = [
     answer: (
       <div>
         前五名提交申請、參加說明會、轉分享貼文等方式都可獲得優惠，優惠活動請參考折價券申請表單：
-        <Link
+        <CustomLink
           href="https://forms.gle/9Pfa9Q5d27m1JEpUA"
           className={cn(
             'block rounded-lg p-2.5 text-sm font-normal text-basic-400 transition-colors duration-300'
@@ -172,7 +172,7 @@ const faqItems: FaqItem[] = [
             （折抵金額無上限，但計畫一、計畫二皆只能各折抵一次，例如同時在
             IG、FB分享，只能折抵一次。參加兩場說明會，只能折抵一次。）
           </span>
-        </Link>
+        </CustomLink>
       </div>
     ),
   },

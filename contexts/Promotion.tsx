@@ -1,7 +1,7 @@
 import {
   createContext, useContext, useEffect, useState,
 } from 'react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { cn } from '@/utils/cn';
 
 interface PromotionContextType {
@@ -120,7 +120,7 @@ export function PromotionBar() {
   return (
     isShowPromotionBar && (
       <div className="relative bg-tips text-center text-basic-white">
-        <Link
+        <CustomLink
           href={link}
           className={cn(
             'block cursor-pointer animate-fade-in animate-duration-500 px-14 py-2.5',
@@ -128,7 +128,7 @@ export function PromotionBar() {
           )}
         >
           {texts[currentIndex]}
-        </Link>
+        </CustomLink>
         <button
           type="button"
           className="absolute right-3.5 top-1/2 size-11 -translate-y-1/2 text-basic-white"

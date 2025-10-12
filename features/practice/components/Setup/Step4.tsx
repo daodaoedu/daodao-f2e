@@ -3,7 +3,7 @@ import { Target, BookOpen, LinkIcon } from 'lucide-react';
 import { contentTypeOptions } from '@/constants/practice';
 import { PathInfo } from '@/services/practice/schema';
 import { Button } from '@/shared/ui/button';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 
 interface StepFivePreviewProps {
   pathInfo: PathInfo;
@@ -164,7 +164,7 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
                         {/* 資源內容 */}
                         <div className="min-w-0 flex-1">
                           {resource.url ? (
-                            <Link
+                            <CustomLink
                               href={resource.url}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -173,7 +173,7 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
                               <div className="flex items-center text-sm font-medium text-basic-600 transition-colors group-hover:text-primary-base">
                                 <span className="truncate">{resource.name}</span>
                               </div>
-                            </Link>
+                            </CustomLink>
                           ) : (
                             <div className="truncate text-sm font-medium text-basic-600">
                               {resource.name}

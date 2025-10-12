@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { User } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -53,13 +53,13 @@ const TermsDescription = () => (
     您填的資訊將透過島島阿學 email
     給這位夥伴，請確認訊息未涉及個人隱私並符合本網站
     {' '}
-    <Link
+    <CustomLink
       href="/terms/service"
       target="_blank"
       className="underline hover:text-primary"
     >
       使用者條款
-    </Link>
+    </CustomLink>
   </p>
 );
 

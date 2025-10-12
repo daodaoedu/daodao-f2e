@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import {
   Search, Plus, Lightbulb, SortAsc, RefreshCw,
 } from 'lucide-react';
@@ -136,7 +136,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
                   <span className="hidden sm:inline">分享想法</span>
                 </Button>
               ) : (
-                <Link href="/ideas/create">
+                <CustomLink href="/ideas/create">
                   <Button
                     size="sm"
                     className="flex items-center gap-2"
@@ -144,7 +144,7 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
                     <Plus className="size-4" />
                     <span className="hidden sm:inline">分享想法</span>
                   </Button>
-                </Link>
+                </CustomLink>
               )
             )}
           </div>
@@ -237,12 +237,12 @@ const IdeasExploreSection: React.FC<IdeasExploreSectionProps> = ({
                   分享第一個想法
                 </Button>
               ) : (
-                <Link href="/ideas/create">
+                <CustomLink href="/ideas/create">
                   <Button className="flex items-center gap-2">
                     <Plus className="size-4" />
                     分享第一個想法
                   </Button>
-                </Link>
+                </CustomLink>
               )
             )}
           </div>

@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { cn } from '@/utils/cn';
 
 interface PersonalitySectionProps {
@@ -40,7 +40,7 @@ export function PersonalitySection({ className }: PersonalitySectionProps) {
           </div>
 
           <div className="relative z-10">
-            <Link
+            <CustomLink
               href="/quiz"
               className="transition-transform duration-200 hover:scale-105 hover:animate-jelly"
             >
@@ -50,7 +50,7 @@ export function PersonalitySection({ className }: PersonalitySectionProps) {
                 width={192}
                 height={192}
               />
-            </Link>
+            </CustomLink>
           </div>
         </div>
       </div>

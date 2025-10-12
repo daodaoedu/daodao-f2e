@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
 import { useAuth, useAuthDispatch } from '@/features/auth';
 import { getManageSidebarItems } from '@/layout/features/getManageLayout';
@@ -21,14 +21,14 @@ function ExploreMenu({ onClose }: OnCloseProps) {
         <ul className="pt-2">
           {NAV_LINK.map(({ link, name, target }) => (
             <li key={name}>
-              <Link
+              <CustomLink
                 href={link}
                 target={target}
                 className="block px-4 py-2 text-basic-400"
                 onClick={onClose}
               >
                 {name}
-              </Link>
+              </CustomLink>
             </li>
           ))}
         </ul>
@@ -43,13 +43,13 @@ function ExploreMenu({ onClose }: OnCloseProps) {
         <Collapse.List className="w-full">
           {MARATHON_LINKS.map(({ name, link }) => (
             <Collapse.Item key={name} className="*:px-10 *:leading-10">
-              <Link
+              <CustomLink
                 href={link}
                 className="block text-basic-400"
                 onClick={onClose}
               >
                 {name}
-              </Link>
+              </CustomLink>
             </Collapse.Item>
           ))}
         </Collapse.List>
@@ -74,25 +74,25 @@ function ProfileMenu({ onClose }: OnCloseProps) {
         <ul className="pt-2">
           {sidebarItems.map((item) => (item.children ? null : (
             <li key={item.label}>
-              <Link
+              <CustomLink
                 href={item.href}
                 className="block px-4 py-2 text-basic-400"
                 onClick={onClose}
               >
                 {item.label}
-              </Link>
+              </CustomLink>
             </li>
           )))}
 
           {USER_LINK.map(({ name, id }) => (
             <li key={name}>
-              <Link
+              <CustomLink
                 href={`/profile?id=${id}`}
                 className="block px-4 py-2 text-basic-400"
                 onClick={onClose}
               >
                 {name}
-              </Link>
+              </CustomLink>
             </li>
           ))}
         </ul>

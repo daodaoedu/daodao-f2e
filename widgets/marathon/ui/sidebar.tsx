@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { ChevronUp } from 'lucide-react';
 import { CSSProperties, useEffect, useState } from 'react';
 import { usePromotion } from '@/contexts/Promotion';
@@ -87,7 +87,7 @@ export const Sidebar = () => {
         <ul className="mb-2 flex flex-col gap-2">
           {sidebarItems.map((item) => (
             <li key={item.label}>
-              <Link
+              <CustomLink
                 href={item.href}
                 className={cn(
                   'block rounded-lg p-2.5 text-base font-medium text-basic-400 transition-colors duration-300',
@@ -96,7 +96,7 @@ export const Sidebar = () => {
                 )}
               >
                 {item.label}
-              </Link>
+              </CustomLink>
             </li>
           ))}
         </ul>

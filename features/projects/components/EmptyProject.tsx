@@ -1,7 +1,7 @@
 import AccessDeniedImg from '@/public/assets/projects/access-denied.png';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/utils/cn';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 
 export default function EmptyProject() {
   return (
@@ -26,17 +26,17 @@ export default function EmptyProject() {
           asChild
           variant="outline"
         >
-          <Link href="/personal-card/my-card">
+          <CustomLink href="/personal-card/my-card">
             編輯名片
-          </Link>
+          </CustomLink>
         </Button>
         <Button
           asChild
           variant="default"
         >
-          <Link href="/manage/projects/create">
+          <CustomLink href="/manage/projects/create">
             新增計畫
-          </Link>
+          </CustomLink>
         </Button>
       </div>
     </div>

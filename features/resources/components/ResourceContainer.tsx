@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { ArrowRightIcon } from 'lucide-react';
 import EmptyPng from '@/public/assets/images/empty.png';
 import { Badge } from '@/shared/ui/badge';
@@ -48,14 +48,14 @@ function EmptyData({
       />
       {parentCategoryHasData ? (
         <Button asChild size="lg">
-          <Link
+          <CustomLink
             href={`/resource/categories/${parentCategory
               .map((c) => c.value)
               .join('/')}`}
           >
             <ArrowRightIcon size={15} />
             馬上去探索
-          </Link>
+          </CustomLink>
         </Button>
       ) : (
         <>
@@ -63,10 +63,10 @@ function EmptyData({
           <div className="flex gap-2">
             {HOT_TAGS.map(({ label, value }) => (
               <Badge key={value} variant="outline" asChild>
-                <Link href={`/resource/categories/${value}`}>
+                <CustomLink href={`/resource/categories/${value}`}>
                   #
                   {label}
-                </Link>
+                </CustomLink>
               </Badge>
             ))}
           </div>

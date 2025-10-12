@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import {
   Dialog,
   DialogContent,
@@ -46,9 +46,9 @@ export default function CompleteInfoReminderDialog({ isOpen, onClose }) {
             className="w-full rounded-3xl bg-[#16B9B3] text-white shadow-md"
             onClick={onClose}
           >
-            <Link href="/personal-card">
+            <CustomLink href="/personal-card">
               去填寫資料
-            </Link>
+            </CustomLink>
           </Button>
           <Button
             variant="outline"

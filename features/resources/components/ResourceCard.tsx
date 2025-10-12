@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { Image } from '@/shared/ui/image';
 import { format, isWithinInterval, subMonths } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
@@ -77,7 +77,7 @@ export default function ResourceCard(props: CardProps) {
   const labels = isNewResource ? ['近期新增', ...label] : label;
 
   return (
-    <Link
+    <CustomLink
       href={`/resource/${id}`}
       className="group flex flex-col gap-2 rounded-lg transition-[transform,box-shadow] hover:scale-[1.01] hover:shadow-lg md:flex-row md:gap-4"
     >
@@ -175,20 +175,20 @@ export default function ResourceCard(props: CardProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem asChild>
-                  <Link
+                  <CustomLink
                     href="https://forms.gle/NkVbDWC3eXk4P4gv7"
                     target="_blank"
                     className="block p-2"
                     onClick={(e) => e.stopPropagation()}
                   >
                     檢舉
-                  </Link>
+                  </CustomLink>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
       </section>
-    </Link>
+    </CustomLink>
   );
 }

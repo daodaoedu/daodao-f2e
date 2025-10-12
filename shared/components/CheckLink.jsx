@@ -1,7 +1,7 @@
 import {
   useState, forwardRef, useId, useImperativeHandle,
 } from 'react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import {
   Dialog,
   DialogContent,
@@ -97,9 +97,9 @@ function InternalCheckLink(props, ref) {
                 className="w-full rounded-3xl bg-[#16B9B3] text-white shadow-md"
                 onClick={handleGoToWebsite}
               >
-                <Link href={link.href} target="_blank" rel="noopener noreferrer">
+                <CustomLink href={link.href} target="_blank" rel="noopener noreferrer">
                   前往網站
-                </Link>
+                </CustomLink>
               </Button>
               <Button
                 variant="outline"

@@ -1,6 +1,6 @@
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import { Fragment } from "react";
-import Link from "next/link";
+import { CustomLink } from '@/shared/ui/custom-link';
 import SEOConfig from "@/components/SEOConfig";
 import { Button } from "@/shared/ui/button";
 import { Image } from "@/shared/ui/image";
@@ -148,7 +148,7 @@ export default function QuizResultDetailPage({
                   {resultDetail.recommendedResourceLinks.map(
                     ({ text, link }) => (
                       <li key={text}>
-                        <Link
+                        <CustomLink
                           href={link}
                           className={cn(
                             "flex justify-between items-start underline mt-2",
@@ -162,20 +162,20 @@ export default function QuizResultDetailPage({
                             size={20}
                             className="text-primary-base shrink-0"
                           />
-                        </Link>
+                        </CustomLink>
                       </li>
                     )
                   )}
                 </ul>
               </section>
               <Button className="w-full font-bold" size="lg" asChild>
-                <Link
+                <CustomLink
                   href="https://tally.so/r/w71dbZ"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   搶先體驗新功能測試
-                </Link>
+                </CustomLink>
               </Button>
               <Button
                 variant="outline"
@@ -183,9 +183,9 @@ export default function QuizResultDetailPage({
                 size="lg"
                 asChild
               >
-                <Link href="/resource" target="_blank">
+                <CustomLink href="/resource" target="_blank">
                   先挖掘更多優質資源！
-                </Link>
+                </CustomLink>
               </Button>
             </div>
             <footer>
@@ -195,14 +195,14 @@ export default function QuizResultDetailPage({
                   ({ id, title, color, smallImg: SmallImg }) =>
                     resultId !== id && (
                       <li key={id} className="flex-1 basis-1/3">
-                        <Link
+                        <CustomLink
                           className="flex flex-col body-base font-bold items-center gap-2 p-3 bg-white rounded-md"
                           style={{ color }}
                           href={`/quiz/result/${id}`}
                         >
                           <SmallImg />
                           {title}
-                        </Link>
+                        </CustomLink>
                       </li>
                     )
                 )}

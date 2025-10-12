@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import Link from "next/link";
+import { CustomLink } from '@/shared/ui/custom-link';
 import SEOConfig from "@/components/SEOConfig";
 import HorizontalLogoSvg from "@/public/assets/brand/horizontal-primary-logo.svg";
 import question1Jpg from "@/public/assets/quiz/q1.webp";
@@ -68,7 +68,7 @@ export default function QuizPage() {
           size="lg"
           asChild
         >
-          <Link href="/quiz/questions/q1">開始測驗</Link>
+          <CustomLink href="/quiz/questions/q1">開始測驗</CustomLink>
         </Button>
       </main>
     </>

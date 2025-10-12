@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import newLogo from '@/public/assets/brand/horizontal-secondary-logo.png';
 import { PromotionBar, usePromotion } from '@/contexts/Promotion';
 import { cn } from '@/utils/cn';
@@ -53,7 +53,7 @@ function Header() {
       <PromotionBar />
       <header className="body-md relative flex w-full items-center justify-between bg-primary-base px-4">
         <div className="flex-1">
-          <Link href="/" className="block py-6">
+          <CustomLink href="/" className="block py-6">
             <Image
               src={newLogo}
               alt="島島阿學"
@@ -61,7 +61,7 @@ function Header() {
               height={22}
               priority
             />
-          </Link>
+          </CustomLink>
         </div>
         <div className="hidden flex-[2] items-center justify-between lg:flex">
           <DesktopMenu />

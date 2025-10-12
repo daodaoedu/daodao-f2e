@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import Link from "next/link";
+import { CustomLink } from '@/shared/ui/custom-link';
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -324,7 +324,7 @@ export default function QuizResultPage() {
                 這裡，是個人成長與集體智慧交會的所在。
               </p>
               <Button className="w-full" size="lg" asChild>
-                <Link href="/">前往 島島阿學</Link>
+                <CustomLink href="/">前往 島島阿學</CustomLink>
               </Button>
             </footer>
           </div>

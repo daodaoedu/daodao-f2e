@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import React from 'react';
 import { Title, Text } from '@/shared/ui/typography';
 import { SOCIAL_LINKS } from '@/shared/constants';
@@ -10,27 +10,27 @@ export const ContactUs = () => (
     </Title>
     <div className="m-5 flex flex-col">
       <Text className="my-1.5">
-        <Link
+        <CustomLink
           target="_blank"
           href={SOCIAL_LINKS.FACEBOOK}
           rel="noopener noreferrer"
           className="no-underline transition-colors hover:text-primary hover:opacity-100"
         >
           🏝️ 島島阿學的 Facebook
-        </Link>
+        </CustomLink>
       </Text>
       <Text className="my-1.5">
-        <Link
+        <CustomLink
           target="_blank"
           href={SOCIAL_LINKS.INSTAGRAM}
           rel="noopener noreferrer"
           className="no-underline transition-colors hover:text-primary hover:opacity-100"
         >
           🏝️ 島島阿學的 Instagram
-        </Link>
+        </CustomLink>
       </Text>
       <Text className="my-1.5">
-        <Link
+        <CustomLink
           target="_blank"
           href={`mailto:${SOCIAL_LINKS.EMAIL}`}
           rel="noopener noreferrer"
@@ -38,7 +38,7 @@ export const ContactUs = () => (
         >
           🏝️ 島島阿學的信箱 – contact@daoedu.tw
           <br />
-        </Link>
+        </CustomLink>
       </Text>
     </div>
   </address>

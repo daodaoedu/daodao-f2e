@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
 import { useAuth, useAuthDispatch } from '@/shared/lib/auth';
@@ -52,21 +52,21 @@ export function LoginModal() {
         </Button>
         <div className="mt-4 text-balance text-center text-sm text-basic-400">
           註冊即代表您同意島島阿學的
-          <Link
+          <CustomLink
             href="/terms/privacy-policy"
             target="_blank"
             className="px-1 text-primary-base underline"
           >
             服務條款
-          </Link>
+          </CustomLink>
           與
-          <Link
+          <CustomLink
             href="/terms/privacy-policy"
             target="_blank"
             className="px-1 text-primary-base underline"
           >
             隱私權政策
-          </Link>
+          </CustomLink>
         </div>
       </div>
     </ResponsiveModal>

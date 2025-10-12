@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import { Share2, Globe, Ellipsis } from 'lucide-react';
@@ -150,10 +150,10 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
 
         <div className="flex items-center gap-3 pt-2">
           <Button size="lg" asChild>
-            <Link href={resource.url} target="_blank">
+            <CustomLink href={resource.url} target="_blank">
               <Globe size={16} />
               查看資源
-            </Link>
+            </CustomLink>
           </Button>
           <Button size="lg" onClick={handleShare}>
             <Share2 size={16} />
@@ -166,14 +166,14 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem asChild>
-                <Link
+                <CustomLink
                   href="https://forms.gle/NkVbDWC3eXk4P4gv7"
                   target="_blank"
                   className="block p-2"
                   onClick={(e) => e.stopPropagation()}
                 >
                   檢舉
-                </Link>
+                </CustomLink>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
