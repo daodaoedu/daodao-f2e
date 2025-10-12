@@ -17,10 +17,9 @@ export function LoginModal() {
   const handleOpenLoginWindow = () => {
     const env = getEnv();
 
-    const url =
-      env.isPreview || env.isDevelopment
-        ? `${env.stagingURL}/auth/google?origin=${window.location.origin}&rt=${pathname}`
-        : `${env.apiUrl}/api/v1/auth/google?rt=${pathname}`;
+    const url = env.isProduction
+      ? `${env.prodURL}/auth/google?rt=${pathname}`
+      : `${env.stagingURL}/auth/google?origin=${window.location.origin}&rt=${pathname}`;
 
     router.push(url);
   };

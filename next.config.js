@@ -1,6 +1,3 @@
-const isDev = process.env.NODE_ENV === "development";
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
-
 const withPWA = require("next-pwa")({
   dest: "public",
   buildExcludes: [
@@ -93,18 +90,6 @@ const config = {
     PROD_URL: "https://www.daoedu.tw",
     STAGING_URL: "https://staging-daodao-f2e.daoedu.workers.dev",
   },
-  ...(isDev
-    ? {
-        async rewrites() {
-          return [
-            {
-              source: "/dev-proxy-api/:path*",
-              destination: `${apiUrl}/:path*`,
-            },
-          ];
-        },
-      }
-    : {}),
 };
 
 module.exports = withPWA(withBundleAnalyzer(config));
