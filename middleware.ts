@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse, MiddlewareConfig } from 'next/server';
 import {
   defaultLocale,
-  getLocale,
   isLocale,
+  localeRegex,
   locales,
 } from './shared/config/i18n';
 
@@ -36,8 +36,12 @@ export async function middleware(request: NextRequest) {
   const validCookieLocale =
     cookieLocale && isLocale(cookieLocale) ? cookieLocale : null;
 
-  const acceptLanguage = request.headers.get('Accept-Language');
-  const locale = validCookieLocale || getLocale(acceptLanguage);
+  const acceptLanguage = request.headers
+    .get('Accept-Language')
+    ?.match(localeRegex)?.[0];
+  const validAcceptLanguage =
+    acceptLanguage && isLocale(acceptLanguage) ? acceptLanguage : defaultLocale;
+  const locale = validCookieLocale || validAcceptLanguage || defaultLocale;
   const redirectURL = href.replace(origin, `${origin}/${locale}`);
 
   const response =
