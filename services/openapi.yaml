@@ -13738,6 +13738,19 @@ paths:
         /images/:filename 獲取圖片 路徑參數：filename - 圖片檔案名稱 公開存取，無需身份驗證 /
         router.get('/:filename', imageController.getImage ); /** POST /images
         上傳單一圖片 需要身份驗證和速率限制
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: 上傳的圖片檔案 (支援 JPEG, PNG, WebP，最大 500KB)
       security:
         - bearerAuth: []
   /api/v1/images/multiple:
@@ -13762,6 +13775,21 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - files
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: 上傳的圖片檔案 (支援 JPEG, PNG, WebP，最大 500KB，最多 5 個檔案)
       security:
         - bearerAuth: []
   /api/v1/me/auth:
