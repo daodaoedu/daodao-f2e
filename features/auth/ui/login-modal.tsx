@@ -6,7 +6,7 @@ import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
 import { useAuth, useAuthDispatch } from '@/shared/lib/auth';
 import ResponsiveModal from '@/shared/ui/responsive-modal';
-import getEnv from '@/utils/env';
+import getEnv from '@/shared/config/env';
 
 export function LoginModal() {
   const { isOpenLoginModal } = useAuth();

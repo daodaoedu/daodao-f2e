@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { createContext, useState, useContext, useMemo, useEffect } from 'react';
-import getEnv from '@/utils/env';
+import getEnv from '@/shared/config/env';
 
 interface NavigationBlockerContextType {
   isBlocked: boolean;

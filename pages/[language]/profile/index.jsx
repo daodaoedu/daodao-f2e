@@ -4,7 +4,7 @@ import { ProtectedComponent } from '@/features/auth';
 import SEOConfig from '@/components/SEOConfig';
 import AccountSetting from '@/components/Profile/Accountsetting';
 import useMediaQuery from '@/shared/lib/use-media-query';
-import getEnv from '@/utils/env';
+import getEnv from '@/shared/config/env';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 
 const ProfilePage = () => {

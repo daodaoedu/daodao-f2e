@@ -1,5 +1,5 @@
+import getEnv from '@/shared/config/env';
 import { GACategory, logEvent } from './analytics';
-import getEnv from './env';
 
 interface ShareAPIProps {
   url: string;

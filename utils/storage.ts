@@ -1,5 +1,5 @@
 import { ResultType } from '@/features/quiz';
-import getEnv from './env';
+import getEnv from '@/shared/config/env';
 
 const fn = () => undefined;
 
