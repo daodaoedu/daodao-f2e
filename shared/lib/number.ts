@@ -3,7 +3,7 @@
  * @param num 數字
  * @returns 中文數字
  */
-export default function numberToChineseNumber(num: number) {
+export function numberToChineseNumber(num: number) {
   if (typeof num !== 'number') return '';
 
   const digits = [

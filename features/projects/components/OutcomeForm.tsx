@@ -11,7 +11,7 @@ import {
   projectOutcomeFormSchema,
   ProjectOutcomeFormSchema,
 } from '@/services/projects';
-import numberToChineseNumber from '@/utils/numberToChineseNumber';
+import { numberToChineseNumber } from '@/shared/lib/number';
 import { Image } from '@/shared/ui/image';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 import Upload, { ImageDataType } from '@/shared/components/Upload';
