@@ -5,7 +5,7 @@ import { Button, type ButtonProps } from '@/shared/ui/button';
 
 import { GACategory, logEvent } from '@/utils/analytics';
 import { useAuth, useAuthDispatch } from '../lib/auth';
-import { Callbacks } from '../model/type';
+import { Callbacks } from '../model/auth.type';
 
 interface AuthButtonProps
   extends Omit<ButtonProps, 'asChild'>,

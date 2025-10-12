@@ -70,6 +70,7 @@ jobs:
         run: pnpm cf:build
         env:
           NEXT_PUBLIC_API_URL: ${{ github.ref_name == 'prod' && secrets.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL_DEV }}
+          NEXT_PUBLIC_ENVIRONMENT: ${{ github.ref_name == 'prod' && 'production' || (github.ref_name == 'dev' && 'staging' || 'preview') }}
 
       # 設定部署命令和環境
       - name: Set deployment command and environment

@@ -34,7 +34,7 @@ import {
   ActionTypes,
   LoginStatus,
   LoginMessageEvent,
-} from '../model/type';
+} from '../model/auth.type';
 
 const initialState: AuthState = {
   isComplete: false,
