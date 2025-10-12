@@ -1,5 +1,7 @@
+'use client';
+
 import getEnv from '@/shared/config/env';
-import { GACategory, logEvent } from './analytics';
+import { GACategory, logEvent } from '@/utils/analytics';
 
 interface ShareAPIProps {
   url: string;
@@ -8,7 +10,7 @@ interface ShareAPIProps {
   hashtag?: string;
 }
 
-export default function getShareAPI({
+export function getShareAPI({
   url,
   title = '',
   text = '',

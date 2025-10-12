@@ -9,7 +9,7 @@ import { Image } from "@/shared/ui/image";
 import { AspectRatio } from "@/shared/ui/aspect-ratio";
 import { cn } from "@/shared/lib/cn";
 import { Badge } from "@/shared/ui/badge";
-import getShareAPI from "@/utils/getShareAPI";
+import { getShareAPI } from "@/shared/lib/share";
 import FacebookSvg from "@/public/assets/social-icons/facebook.svg";
 import LineSvg from "@/public/assets/social-icons/line.svg";
 import LinkedInSvg from "@/public/assets/social-icons/linkedin.svg";
