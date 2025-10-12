@@ -3,7 +3,7 @@
 import { CustomLink } from '@/shared/ui/custom-link';
 import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import { useEffect, useState } from 'react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { Button } from '@/shared/ui/button';
 import { landingPageNav } from '../model';
 

@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 import { Separator } from '@/shared/ui/separator';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import {
   insertLink,
   insertThematicBreak,

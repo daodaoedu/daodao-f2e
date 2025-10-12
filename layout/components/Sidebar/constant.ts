@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 export const defaultClass = cn(
   'relative block p-2 px-10 rounded-lg transition-colors cursor-pointer',

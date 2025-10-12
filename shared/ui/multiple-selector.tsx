@@ -12,7 +12,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/shared/ui/command';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { OptionProps } from './option';
 import { Button } from './button';
 

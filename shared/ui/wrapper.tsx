@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { Slot } from '@radix-ui/react-slot';
 
 interface WithAsChildProps extends React.HTMLAttributes<HTMLDivElement> {

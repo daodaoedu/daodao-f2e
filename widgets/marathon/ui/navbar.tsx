@@ -4,7 +4,7 @@ import { CustomLink } from '@/shared/ui/custom-link';
 import { usePathname } from 'next/navigation';
 import { MARATHON_LINKS } from '@/constants/category';
 import useShadowToggleOnScroll from '@/shared/lib/use-shadow-toggle-on-scroll';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 export const Navbar = () => {
   const pathname = usePathname();

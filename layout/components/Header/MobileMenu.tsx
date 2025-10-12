@@ -6,7 +6,7 @@ import { useAuth, useAuthDispatch } from '@/features/auth';
 import { getManageSidebarItems } from '@/layout/features/getManageLayout';
 import Collapse from '@/shared/components/Collapse';
 import Button from '@/shared/components/Button';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { usePromotion } from '@/contexts/Promotion';
 import { Image } from '@/shared/ui/image';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import Image from 'next/image';
 
 interface TypewriterBubbleProps {

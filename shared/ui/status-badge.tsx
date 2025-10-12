@@ -9,7 +9,7 @@ import {
   AlertCircle,
   CheckCheck,
 } from 'lucide-react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 export type StatusVariant =
   | 'draft'

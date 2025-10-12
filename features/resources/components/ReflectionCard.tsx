@@ -1,7 +1,7 @@
 import DefaultAvatarIcon from '@/public/assets/icons/default-avatar.svg';
 import StarIcon from '@/public/assets/icons/star.svg';
 import ShareIcon from '@/public/assets/icons/share.svg';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 type ReflectionCardProps = {
   className?: string;

@@ -19,7 +19,7 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import Shell from '@/public/assets/icons/shell.svg';
 import Comment from '@/public/assets/icons/comment.svg';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 interface PostCardProps {
   className?: string;

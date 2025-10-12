@@ -17,7 +17,7 @@ import { Image } from '@/shared/ui/image';
 import { uploadImagesSchema } from '@/services/images';
 import { Button, type ButtonProps } from '@/shared/ui/button';
 import { AspectRatio } from '@/shared/ui/aspect-ratio';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import ResponsiveModal, { ResponsiveModalSize } from './responsive-modal';
 import {
   Tabs, TabsContent, TabsList, TabsTrigger,

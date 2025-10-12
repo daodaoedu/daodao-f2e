@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 export const StyledProfileWrapper = ({ children, className, ...props }) => (
   <div

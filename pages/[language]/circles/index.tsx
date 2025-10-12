@@ -35,7 +35,7 @@ import {
   CircleSearchParamsSchema,
   circleSearchParamsSchema,
 } from "@/services/circles";
-import { cn } from "@/utils/cn";
+import { cn } from "@/shared/lib/cn";
 import { Skeleton } from "@/shared/ui/skeleton";
 import dynamic from "next/dynamic";
 import JsonLdFactory from "@/utils/jsonLd";

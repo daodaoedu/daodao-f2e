@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 import { Text, Title } from '@/shared/ui/typography';
 import GroupCard from './GroupCard';

@@ -3,7 +3,7 @@ import {
   Plus, X, Target, BookOpen, Link as LinkIcon, Clock, BarChart, Book, Video, FileText, Headphones, GraduationCap, Settings, AlertCircle,
 } from 'lucide-react';
 import { Practice, Resource, ResourceType } from '@/features/practice';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';

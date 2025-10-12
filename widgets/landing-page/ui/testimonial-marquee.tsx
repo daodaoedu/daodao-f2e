@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Image } from '@/shared/ui/image';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 interface TestimonialCardProps {
   name: string;

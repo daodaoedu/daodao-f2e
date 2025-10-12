@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { AuthButton } from '@/features/auth';
 import Image from 'next/image';
 

@@ -5,7 +5,7 @@ import { Image } from '@/shared/ui/image';
 import ShareResourceIcon from '@/public/assets/icons/share-resource.svg';
 import CommentIcon from '@/public/assets/icons/comment.svg';
 import CrownIcon from '@/public/assets/icons/crown.svg';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 type SharerCardProps = {
   className?: string;

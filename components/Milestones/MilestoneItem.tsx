@@ -11,7 +11,7 @@ import {
   CollapsibleTrigger,
 } from '@/shared/ui/collapsible';
 import { Button } from '@/shared/ui/button';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import MilestoneCard from './MilestoneCard';
 import Task from '../Tasks/Task';
 import DraggableTasks from '../Tasks/DraggableTasks';

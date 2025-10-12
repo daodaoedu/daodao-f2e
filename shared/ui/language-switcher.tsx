@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react';
 import { usePathname, useParams, useSearchParams } from 'next/navigation';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { languageOptions, Locale } from '../config/i18n';
 import { useHash } from '../lib/navigation-blocker';
 import { CustomLink } from './custom-link';

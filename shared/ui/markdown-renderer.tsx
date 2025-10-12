@@ -2,7 +2,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 interface MarkdownRendererProps {
   source?: string;

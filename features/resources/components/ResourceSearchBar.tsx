@@ -6,7 +6,7 @@ import {
   SendHorizontalIcon,
 } from 'lucide-react';
 import useShadowToggleOnScroll from '@/shared/lib/use-shadow-toggle-on-scroll';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { ResourceSearchParamsSchema } from '@/services/resources/core/schema';

@@ -8,7 +8,7 @@ import GoBackButton from '@/components/Projects/GoBackButton';
 import emptyCoverImg from '@/public/assets/images/empty-cover.png';
 import { useMyProjects } from '@/services/projects';
 import More from '@/components/Projects/More';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import useCreateProject from '@/features/projects/hooks/useCreateProject';
 
 const Projects = () => {

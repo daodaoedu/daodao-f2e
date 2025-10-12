@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { SectionHeader } from '@/shared/ui/section-header';
 import { ANCHOR_IDS } from '@/shared/constants';
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   Plus, X, Link as LinkIcon, AlertCircle,
 } from 'lucide-react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';

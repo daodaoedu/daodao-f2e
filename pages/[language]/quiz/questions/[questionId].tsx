@@ -6,7 +6,7 @@ import { Button } from "@/shared/ui/button";
 import { Progress } from "@/shared/ui/progress";
 import { Image } from "@/shared/ui/image";
 import RunnerSvg from "@/public/assets/icons/runner.svg";
-import { cn } from "@/utils/cn";
+import { cn } from "@/shared/lib/cn";
 import {
   AnswerKey,
   getQuizLayout,

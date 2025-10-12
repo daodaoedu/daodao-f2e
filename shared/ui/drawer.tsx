@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { ScrollArea } from './scroll-area';
 
 const Drawer = ({

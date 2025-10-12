@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import Image from 'next/image';
 import { SectionHeader } from '@/shared/ui/section-header';
 

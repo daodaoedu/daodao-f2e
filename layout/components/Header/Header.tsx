@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { CustomLink } from '@/shared/ui/custom-link';
 import newLogo from '@/public/assets/brand/horizontal-secondary-logo.png';
 import { PromotionBar, usePromotion } from '@/contexts/Promotion';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { Image } from '@/shared/ui/image';
 import MobileMenu from './MobileMenu';
 import DesktopMenu from './DesktopMenu';

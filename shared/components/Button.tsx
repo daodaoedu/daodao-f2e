@@ -1,6 +1,6 @@
 import { forwardRef, useRef } from 'react';
 import { CustomLink } from '@/shared/ui/custom-link';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { useAuth, useAuthDispatch } from '@/features/auth';
 
 enum ButtonColorEnum {

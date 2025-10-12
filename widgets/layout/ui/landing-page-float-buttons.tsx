@@ -4,7 +4,7 @@ import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import Image from 'next/image';
 import { Button } from '@/shared/ui/button';
 import { Icon } from '@/shared/ui/icon';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { CustomLink } from '@/shared/ui/custom-link';
 
 export const LandingPageFloatButtons = () => {

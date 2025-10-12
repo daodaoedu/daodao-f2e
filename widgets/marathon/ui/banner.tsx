@@ -12,7 +12,7 @@ import LearningMarathonImgDesktopBoy from '@/public/assets/learning-marathon/202
 import LearningMarathonImgDesktopBg from '@/public/assets/learning-marathon/2025S1-desktop-bg.png';
 import LearningMarathonImgMobile from '@/public/assets/learning-marathon/2025S1-mobile@2x.png';
 
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { ApplyButton } from './apply-button';
 
 export const Banner = () => {

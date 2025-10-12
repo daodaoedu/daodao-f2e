@@ -17,7 +17,7 @@ import {
 import CommentSection from '@/shared/components/Comment/CommentSection';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 import { CommentType } from '@/services/comments';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 interface ResourceReviewCardProps {
   review: RecentResourceReviewSchema;

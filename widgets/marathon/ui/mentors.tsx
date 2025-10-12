@@ -6,7 +6,7 @@ import { Image } from '@/shared/ui/image';
 import ResponsiveModal, {
   ResponsiveModalSize,
 } from '@/shared/ui/responsive-modal';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import {
   Carousel,
   CarouselContent,

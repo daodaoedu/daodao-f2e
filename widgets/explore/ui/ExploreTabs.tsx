@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/shared/ui/button';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,

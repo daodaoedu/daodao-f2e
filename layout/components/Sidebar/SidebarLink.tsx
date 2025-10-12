@@ -1,5 +1,5 @@
 import { CustomLink } from '@/shared/ui/custom-link';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { activeClass, defaultClass, disableClass } from './constant';
 
 interface SidebarLinkProps

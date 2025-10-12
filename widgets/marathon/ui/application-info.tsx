@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { ArrowDown } from 'lucide-react';
 import { Title, Text } from '@/shared/ui/typography';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 // 定義類型
 type TimelineEvent = {

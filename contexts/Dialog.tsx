@@ -10,7 +10,7 @@ import { Button } from '@/shared/ui/button';
 import ResponsiveModal, {
   ResponsiveModalProps,
 } from '@/shared/ui/responsive-modal';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 export interface DialogContentProps {
   close: () => void;

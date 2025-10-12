@@ -6,7 +6,7 @@ import {
   format,
 } from 'date-fns';
 import z from 'zod';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import {
   ProjectMilestoneFormSchema,
   ProjectMilestoneSchema,

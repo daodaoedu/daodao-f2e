@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Button } from '@/shared/ui/button';
 import useControlledState from '@/shared/lib/use-controlled-state';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 type IconComponent = React.ReactNode | ((value: string) => React.ReactNode);
 

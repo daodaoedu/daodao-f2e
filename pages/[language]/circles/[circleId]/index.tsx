@@ -7,7 +7,7 @@ import { parseToString } from "@/utils/helper";
 import { BackButton } from "@/shared/ui/back-button";
 import { Image } from "@/shared/ui/image";
 import { AspectRatio } from "@/shared/ui/aspect-ratio";
-import { cn } from "@/utils/cn";
+import { cn } from "@/shared/lib/cn";
 import { Badge } from "@/shared/ui/badge";
 import getShareAPI from "@/utils/getShareAPI";
 import FacebookSvg from "@/public/assets/social-icons/facebook.svg";

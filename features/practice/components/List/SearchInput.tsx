@@ -1,7 +1,7 @@
 // 搜尋輸入組件
 import React from 'react';
 import { Search, X } from 'lucide-react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
 

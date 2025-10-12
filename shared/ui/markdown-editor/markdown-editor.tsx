@@ -19,7 +19,7 @@ import {
   RenderLeafProps,
 } from 'slate-react';
 import { withHistory } from 'slate-history';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import CheckLink from '@/shared/components/CheckLink';
 import { ImageDialog } from './ImageDialog';
 import { Toolbar } from './components/toolbar';

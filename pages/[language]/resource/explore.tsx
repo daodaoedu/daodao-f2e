@@ -10,7 +10,7 @@ import {
   SectionTitle,
 } from "@/features/resources";
 import JsonLdFactory from "@/utils/jsonLd";
-import { cn } from "@/utils/cn";
+import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
 import { Container } from "@/shared/ui/wrapper";
