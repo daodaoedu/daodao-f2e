@@ -1,6 +1,6 @@
 import type { MutationFetcher } from "swr/mutation";
 
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 import { mutations } from "@/utils/http";
 import {
   CommentType,

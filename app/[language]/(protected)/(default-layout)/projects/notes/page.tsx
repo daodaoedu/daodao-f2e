@@ -3,7 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { ContentCard } from '@/features/projects';
 import { useProjectNotes } from '@/services/projects';
-import { parseToString } from '@/utils/helper';
+import { parseToString } from '@/shared/lib/helper';
 
 export default function NotesPage() {
   const searchParams = useSearchParams();

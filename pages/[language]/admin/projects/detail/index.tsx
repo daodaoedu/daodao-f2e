@@ -15,7 +15,7 @@ import {
   FakeInput,
   FakeCheckBox,
 } from '@/components/Projects/Project/Shared';
-import { parseToString } from '@/utils/helper';
+import { parseToString } from '@/shared/lib/helper';
 
 const ProjectDetailPage = () => {
   const [isFetchingProject, setIsFetchingProject] = useState(false);

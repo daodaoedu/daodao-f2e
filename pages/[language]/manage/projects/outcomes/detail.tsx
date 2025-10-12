@@ -6,7 +6,7 @@ import { getManageProjectLayout } from "@/layout/features/getProjectLayout";
 import SEOConfig from "@/components/SEOConfig";
 import { useProject } from "@/services/projects";
 import { useProjectOutcome } from "@/features/projects/hooks/outcome";
-import { parseToNumber, parseToString } from "@/utils/helper";
+import { parseToNumber, parseToString } from "@/shared/lib/helper";
 import { OutcomeDeleteModal, OutcomeUpdateModal } from "@/features/projects";
 
 enum ModalTypeEnum {

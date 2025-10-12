@@ -2,7 +2,7 @@ import { useSearchParams } from "next/navigation";
 import { NoteDetail } from "@/features/projects";
 import { getAdminProjectLayout } from "@/layout/features/getProjectLayout";
 import { useProjectNote } from "@/services/projects";
-import { parseToNumber, parseToString } from "@/utils/helper";
+import { parseToNumber, parseToString } from "@/shared/lib/helper";
 
 const NoteDetailPage = () => {
   const searchParams = useSearchParams();

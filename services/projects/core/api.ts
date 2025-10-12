@@ -1,5 +1,5 @@
 import { MutationFetcher } from "swr/mutation";
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 import { mutations, fetcher } from "@/utils/http";
 
 import {

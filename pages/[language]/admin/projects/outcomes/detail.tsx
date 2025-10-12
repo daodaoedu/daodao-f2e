@@ -3,7 +3,7 @@ import OutcomeDetail from "@/features/projects/components/OutcomeDetail";
 import { getAdminProjectLayout } from "@/layout/features/getProjectLayout";
 import { useProject } from "@/services/projects";
 import { useProjectOutcome } from "@/features/projects/hooks/outcome";
-import { parseToNumber, parseToString } from "@/utils/helper";
+import { parseToNumber, parseToString } from "@/shared/lib/helper";
 
 const OutcomeDetailPage = () => {
   const searchParams = useSearchParams();

@@ -3,7 +3,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import SEOConfig from "@/components/SEOConfig";
 import { ProtectedComponent } from "@/features/auth";
 import { ResourceReviewForm } from "@/features/resources";
-import { parseToNumber, parseToString } from "@/utils/helper";
+import { parseToNumber, parseToString } from "@/shared/lib/helper";
 
 export default function EditResourceReviewPage() {
   const router = useRouter();

@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 import SEOConfig from "@/components/SEOConfig";
 import {
   ContentCard,

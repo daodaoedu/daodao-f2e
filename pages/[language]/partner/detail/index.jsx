@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 
 import { useAuth } from '@/features/auth';
 import { useUser } from '@/features/users';
-import { parseToString } from '@/utils/helper';
+import { parseToString } from '@/shared/lib/helper';
 
 const PersonalCard = dynamic(() => import('@/components/PersonalCard'), {
   ssr: false,

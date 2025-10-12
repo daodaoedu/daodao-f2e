@@ -13,7 +13,7 @@ import {
   questionMap,
   useQuiz,
 } from "@/features/quiz";
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 import { locales } from "@/shared/config/i18n";
 
 export const getStaticPaths = async () => {

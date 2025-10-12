@@ -13,7 +13,7 @@ import SEOConfig from "@/components/SEOConfig";
 import { useProject } from "@/services/projects";
 import { useProjectReview, useProjectReviewList } from "@/features/projects/hooks/review";
 import marathonConfig from "@/constants/marathon";
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 
 enum ModalTypeEnum {
   Create,

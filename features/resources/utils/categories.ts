@@ -1,4 +1,4 @@
-import { parseToArray } from '@/utils/helper';
+import { parseToArray } from '@/shared/lib/helper';
 import { CATEGORIES, ICategory, SEARCH_TAGS } from '@/constants/category';
 
 export function parseCategoryHierarchy(source: string[] | null): ICategory[] {

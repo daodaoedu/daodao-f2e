@@ -3,7 +3,7 @@ import { CustomLink } from '@/shared/ui/custom-link';
 import SEOConfig from "@/components/SEOConfig";
 import { circleAPI, CircleSchema } from "@/services/circles";
 import { Background, Container, Paper } from "@/shared/ui/wrapper";
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 import { BackButton } from "@/shared/ui/back-button";
 import { Image } from "@/shared/ui/image";
 import { AspectRatio } from "@/shared/ui/aspect-ratio";
