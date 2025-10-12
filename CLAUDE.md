@@ -21,10 +21,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm typegen` - Generate Next.js type definitions
 
 ### Deployment
-- `pnpm cf-build` - Build for Cloudflare Pages
+- `pnpm cf:build` - Build for Cloudflare Pages
 - `pnpm preview` - Preview Cloudflare Pages build locally
 - `pnpm deploy` - Deploy to Cloudflare Pages
-- `pnpm cf-typegen` - Generate Cloudflare type definitions
+- `pnpm cf:typegen` - Generate Cloudflare type definitions
 
 ### Other
 - `pnpm sitemap` - Generate sitemap

@@ -90,8 +90,8 @@ const config = {
     return Object.assign(config, { experiments });
   },
   env: {
-    HOSTNAME: "https://www.daoedu.tw",
-    STAGING_HOSTNAME: "https://staging-daodao-f2e.daoedu.workers.dev",
+    PROD_URL: "https://www.daoedu.tw",
+    STAGING_URL: "https://staging-daodao-f2e.daoedu.workers.dev",
   },
   ...(isDev
     ? {

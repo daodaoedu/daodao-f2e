@@ -31,6 +31,7 @@ const LanguageSwitcherButtons = ({
             )}
             locale={language.value}
             href={finalHref}
+            scroll={false}
           >
             {language.label}
           </CustomLink>

@@ -6,19 +6,18 @@ export const defaultLocale = 'zh-TW';
 export const locales = [defaultLocale, 'en'] as const;
 export type Locale = (typeof locales)[number];
 export type Dictionary = typeof import('./locales/zh-TW.json');
+export const localeRegex = new RegExp(`(${locales.join('|')})`);
+export const localePathnameRegex = new RegExp(
+  `^/(${locales.join('|')})((?:/|$))`
+);
 
 export const languageOptions = [
   { value: 'zh-TW', label: '中文' },
   { value: 'en', label: 'English' },
 ] as const;
 
-const dictionaries: Record<Locale, Dictionary> = {
-  'zh-TW': zhDictionary,
-  en: enDictionary,
-};
-
 export const isLocale = (language: string): language is Locale =>
-  locales.findIndex((locale) => locale === language) > -1;
+  locales.includes(language as Locale);
 
 type ParamsType = LayoutProps<'/[language]'>['params'];
 
@@ -28,6 +27,11 @@ type LocaleOrParamsType =
   | ReturnType<typeof unstable_rootParams>;
 
 export const getDictionary = async (localeOrParams: LocaleOrParamsType) => {
+  const dictionaries: Record<Locale, Dictionary> = {
+    'zh-TW': zhDictionary,
+    en: enDictionary,
+  };
+
   const locale =
     typeof localeOrParams === 'string'
       ? localeOrParams
@@ -35,29 +39,6 @@ export const getDictionary = async (localeOrParams: LocaleOrParamsType) => {
 
   return isLocale(locale) ? dictionaries[locale] : dictionaries[defaultLocale];
 };
-
-/**
- * The function get language locale code from the input.
- *
- * Ensures that the selected locale code matches one of the supported locale codes in the ~/data/i18n file.
- *
- * @example
- * import { getLocale } from '@/constants/i18n';
- *
- * getLocale('zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7'); // 'zh-TW'
- * getLocale('/pathname'); // 'zh-TW'
- */
-export function getLocale(acceptLanguage?: string | null): Locale {
-  if (typeof acceptLanguage !== 'string') return defaultLocale;
-
-  // match accept language
-  // e.g. zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7 => [ 'zh-TW', 'zh', 'en-US', 'en' ]
-  const languageRegex = /([\w]{2,3}-?[\w]{0,3})/gm;
-  const languages = acceptLanguage.match(languageRegex);
-  const selectedLocale = languages?.find(isLocale);
-
-  return selectedLocale || defaultLocale;
-}
 
 // 遞歸生成所有末端節點的路徑
 type LeafPaths<T, P extends string = ''> = {
@@ -92,9 +73,7 @@ export const getText = (
   variables?: TranslationVariables
 ) => {
   let text =
-    getNestedValue(dictionary, key) ||
-    getNestedValue(dictionaries[defaultLocale], key) ||
-    key;
+    getNestedValue(dictionary, key) || getNestedValue(zhDictionary, key) || key;
 
   if (variables) {
     Object.entries(variables).forEach(([varKey, value]) => {

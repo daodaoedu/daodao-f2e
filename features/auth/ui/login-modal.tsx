@@ -1,50 +1,29 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
 import { useAuth, useAuthDispatch } from '@/shared/lib/auth';
 import ResponsiveModal from '@/shared/ui/responsive-modal';
-import openWindowPopup from '@/utils/openWindowPopup';
-import { cn } from '@/utils/cn';
 import getEnv from '@/utils/env';
 
 export function LoginModal() {
   const { isOpenLoginModal } = useAuth();
   const { closeLoginModal } = useAuthDispatch();
-  const [isOpenWindow, setIsOpenWindow] = useState(false);
-  const timer = useRef<NodeJS.Timeout | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleOpenLoginWindow = () => {
     const env = getEnv();
-    const url = env.isLocalOrPreviewHost
-      ? `${env.stagingHostname}/auth/google?origin=${window.location.origin}`
-      : `${env.apiUrl}/api/v1/auth/google`;
-    const popup = openWindowPopup({
-      url,
-      title: 'login',
-      width: 400,
-      height: 632,
-    });
-    setIsOpenWindow(!!popup?.parent);
 
-    if (timer.current !== null) {
-      clearInterval(timer.current);
-    }
+    const url =
+      env.isPreview || env.isDevelopment
+        ? `${env.stagingURL}/api/auth/google?origin=${window.location.origin}&rt=${pathname}`
+        : `${env.apiUrl}/api/v1/auth/google?rt=${pathname}`;
 
-    if (popup?.parent) {
-      timer.current = setInterval(() => {
-        setIsOpenWindow(!!popup.parent);
-      }, 300);
-    }
+    router.push(url);
   };
-
-  useEffect(() => {
-    if (!isOpenWindow && timer.current !== null) {
-      clearInterval(timer.current);
-    }
-  }, [isOpenWindow]);
 
   return (
     <ResponsiveModal
@@ -70,19 +49,7 @@ export function LoginModal() {
           size="lg"
           onClick={handleOpenLoginWindow}
         >
-          {isOpenWindow ? (
-            <span className="flex items-center justify-center gap-2">
-              <span
-                className={cn(
-                  'inline-block h-4 w-4 animate-spin rounded-full',
-                  'border-2 border-solid border-white/50 border-t-transparent'
-                )}
-              />
-              登入中...
-            </span>
-          ) : (
-            <span>Google 登入 / 註冊</span>
-          )}
+          Google 登入 / 註冊
         </Button>
         <div className="mt-4 text-balance text-center text-sm text-basic-400">
           註冊即代表您同意島島阿學的

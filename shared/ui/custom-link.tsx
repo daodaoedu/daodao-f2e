@@ -4,12 +4,10 @@ import type { UrlObject } from 'url';
 import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
 import { useNavigationBlocker } from '../lib/navigation-blocker';
-import { Locale, locales } from '../config/i18n';
-
-const localeRegex = new RegExp(`^/(${locales.join('|')})`);
+import { Locale, localePathnameRegex } from '../config/i18n';
 
 const removeLocalePrefix = (path: string): string => {
-  return path.replace(localeRegex, '');
+  return path.replace(localePathnameRegex, '$2');
 };
 
 const addLocalePrefix = (path: string, locale: string): string => {
@@ -58,7 +56,7 @@ export function CustomLink({
   const { isBlocked } = useNavigationBlocker();
   const params = useParams<{ language: Locale }>();
   const pathname = usePathname();
-  const hasPrefix = pathname && localeRegex.test(pathname);
+  const hasPrefix = pathname && localePathnameRegex.test(pathname);
   const language = hasPrefix ? params?.language : undefined;
   const formattedHref = formatHref(href, locale || language);
 

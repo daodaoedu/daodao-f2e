@@ -31,9 +31,9 @@ env:
   PREVIEW_URL_SUFFIX: '-daodao-f2e.daoedu.workers.dev'
 
   # Cloudflare 部署配置
-  PROD_DEPLOY_CMD: 'deploy --minify'
-  DEV_DEPLOY_CMD: 'versions upload --minify --preview-alias staging'
-  PREVIEW_DEPLOY_CMD_PREFIX: 'versions upload --minify --preview-alias '
+  PROD_DEPLOY_CMD: 'deploy'
+  DEV_DEPLOY_CMD: 'versions upload --preview-alias staging'
+  PREVIEW_DEPLOY_CMD_PREFIX: 'versions upload --preview-alias '
 
 jobs:
   continuous_integration:
@@ -67,9 +67,10 @@ jobs:
       - name: Build
         id: build
         continue-on-error: true
-        run: pnpm cf-build
+        run: pnpm cf:build
         env:
           NEXT_PUBLIC_API_URL: ${{ github.ref_name == 'prod' && secrets.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL_DEV }}
+          NEXT_PUBLIC_ENVIRONMENT: ${{ github.ref_name == 'prod' && 'production' || (github.ref_name == 'dev' && 'staging' || 'preview') }}
 
       # 設定部署命令和環境
       - name: Set deployment command and environment
