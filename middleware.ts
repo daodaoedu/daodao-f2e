@@ -6,9 +6,6 @@ import {
   locales,
 } from './shared/config/i18n';
 
-const LOCALE_COOKIE_NAME = 'preferred-locale';
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
-
 export async function middleware(request: NextRequest) {
   const { href, origin, pathname } = request.nextUrl;
   const localePathname = locales.find(
@@ -16,50 +13,22 @@ export async function middleware(request: NextRequest) {
   );
 
   if (localePathname) {
-    const response =
-      localePathname === defaultLocale
-        ? NextResponse.redirect(href.replace(`/${defaultLocale}`, ''))
-        : NextResponse.next();
-
-    response.cookies.set(LOCALE_COOKIE_NAME, localePathname, {
-      maxAge: COOKIE_MAX_AGE,
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-    });
-
-    return response;
+    return localePathname === defaultLocale
+      ? NextResponse.redirect(href.replace(`/${defaultLocale}`, ''))
+      : NextResponse.next();
   }
-
-  const cookieLocale = request.cookies.get(LOCALE_COOKIE_NAME)?.value;
-  const validCookieLocale =
-    cookieLocale && isLocale(cookieLocale) ? cookieLocale : null;
 
   const acceptLanguage = request.headers
     .get('Accept-Language')
     ?.match(localeRegex)?.[0];
-  const validAcceptLanguage =
-    acceptLanguage && isLocale(acceptLanguage) ? acceptLanguage : defaultLocale;
-  const locale = validCookieLocale || validAcceptLanguage || defaultLocale;
+
+  const locale = isLocale(acceptLanguage) ? acceptLanguage : defaultLocale;
+
   const redirectURL = href.replace(origin, `${origin}/${locale}`);
 
-  const response =
-    locale === defaultLocale
-      ? NextResponse.rewrite(redirectURL)
-      : NextResponse.redirect(redirectURL);
-
-  if (!validCookieLocale || validCookieLocale !== locale) {
-    response.cookies.set(LOCALE_COOKIE_NAME, locale, {
-      maxAge: COOKIE_MAX_AGE,
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-    });
-  }
-
-  return response;
+  return locale === defaultLocale
+    ? NextResponse.rewrite(redirectURL)
+    : NextResponse.redirect(redirectURL);
 }
 
 export const config: MiddlewareConfig = {
