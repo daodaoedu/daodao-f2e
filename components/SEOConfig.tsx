@@ -81,7 +81,7 @@ export default function SEOConfig({
 }: SEOProps) {
   const pathname = usePathname();
 
-  const link = originLink ?? `${process.env.HOSTNAME}${pathname || ''}`;
+  const link = originLink ?? `${process.env.PROD_URL}${pathname || ''}`;
 
   const keywords = typeof originKeywords === 'string'
     ? originKeywords

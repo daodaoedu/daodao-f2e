@@ -4,8 +4,8 @@ export type Environment = 'production' | 'staging' | 'preview' | 'development';
 
 export default function getEnv() {
   const publicApiUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
-  const stagingHostname = process.env.STAGING_HOSTNAME ?? '';
-  const hostname = process.env.HOSTNAME ?? '';
+  const stagingURL = process.env.STAGING_URL ?? '';
+  const prodURL = process.env.PROD_URL ?? '';
   const mode = process.env.NODE_ENV;
   const environment = (process.env.NEXT_PUBLIC_ENVIRONMENT ?? 'development') as Environment;
 
@@ -20,8 +20,8 @@ export default function getEnv() {
 
   return {
     apiUrl,
-    stagingHostname,
-    hostname,
+    stagingURL,
+    prodURL,
     environment,
     isClientSide: !isServerSide,
     isDev,

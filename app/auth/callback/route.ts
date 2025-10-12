@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const token = searchParams.get('token');
   const origin = cookies.get('origin')?.value;
   const rt = cookies.get('rt')?.value;
-  const { isStaging, stagingHostname, hostname } = getEnv();
+  const { isStaging, stagingURL, prodURL } = getEnv();
   const redirectUrl = `/onboarding?token=${token}&rt=${rt}`;
 
   cookies.delete('origin');
@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
   if (isStaging) {
     return origin
       ? NextResponse.redirect(`${origin}${redirectUrl}`)
-      : NextResponse.redirect(`${stagingHostname}${redirectUrl}`);
+      : NextResponse.redirect(`${stagingURL}${redirectUrl}`);
   }
 
-  return NextResponse.redirect(`${hostname}${redirectUrl}`);
+  return NextResponse.redirect(`${prodURL}${redirectUrl}`);
 }

@@ -47,7 +47,7 @@ const NotesPage = () => {
       author: "島島阿學",
       copyright: "島島阿學",
       imgLink: "https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg",
-      link: `${process.env.HOSTNAME}/manage/projects/notes?id=${projectId}`,
+      link: `${process.env.PROD_URL}/manage/projects/notes?id=${projectId}`,
     }),
     [project?.title, project?.description, projectId]
   );

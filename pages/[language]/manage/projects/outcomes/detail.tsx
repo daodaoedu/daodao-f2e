@@ -36,7 +36,7 @@ const OutcomeDetailPage = () => {
       author: "島島阿學",
       copyright: "島島阿學",
       imgLink: "https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg",
-      link: `${process.env.HOSTNAME}/manage/projects/outcomes?id=${projectId}&outcomeId=${outcomeId}`,
+      link: `${process.env.PROD_URL}/manage/projects/outcomes?id=${projectId}&outcomeId=${outcomeId}`,
     }),
     [outcome?.title, outcome?.content, projectId, outcomeId]
   );

@@ -53,7 +53,7 @@ const Profile = ({
       author: '島島阿學',
       copyright: '島島阿學',
       imgLink: 'https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg',
-      link: `${process.env.HOSTNAME}/personal-card`,
+      link: `${process.env.PROD_URL}/personal-card`,
     }),
     [name]
   );

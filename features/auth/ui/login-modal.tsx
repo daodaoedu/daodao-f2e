@@ -19,7 +19,7 @@ export function LoginModal() {
 
     const url =
       env.isPreview || env.isDevelopment
-        ? `${env.stagingHostname}/api/auth/google?origin=${window.location.origin}&rt=${pathname}`
+        ? `${env.stagingURL}/api/auth/google?origin=${window.location.origin}&rt=${pathname}`
         : `${env.apiUrl}/api/v1/auth/google?rt=${pathname}`;
 
     router.push(url);
