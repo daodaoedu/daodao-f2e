@@ -41,7 +41,7 @@ import { useAuth } from "@/features/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
 import dynamic from "next/dynamic";
-import { timeDuration } from "@/utils/date";
+import { timeDuration } from "@/shared/lib/date";
 import { ContactModal, TargetUserType } from "@/features/email";
 
 const MarkdownEditor = dynamic(

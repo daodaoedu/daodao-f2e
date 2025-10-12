@@ -25,7 +25,7 @@ import { MultipleSelector } from "@/shared/ui/multiple-selector";
 import { Badge } from "@/shared/ui/badge";
 import { Image } from "@/shared/ui/image";
 import { Separator } from "@/shared/ui/separator";
-import { timeDuration } from "@/utils/date";
+import { timeDuration } from "@/shared/lib/date";
 import { OptionProps } from "@/shared/ui/option";
 import { AspectRatio } from "@/shared/ui/aspect-ratio";
 import {

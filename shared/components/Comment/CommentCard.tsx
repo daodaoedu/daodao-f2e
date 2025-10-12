@@ -4,7 +4,7 @@ import { LockKeyholeOpen, LockKeyhole, EllipsisVertical } from 'lucide-react';
 import { useAuth } from '@/features/auth';
 import { Image } from '@/shared/ui/image';
 import { ROLE } from '@/constants/member';
-import { timeDuration } from '@/utils/date';
+import { timeDuration } from '@/shared/lib/date';
 import { CommentSchema, CommentVisibility } from '@/services/comments';
 import { Button } from '@/shared/ui/button';
 import Shell from '@/public/assets/icons/shell.svg';
