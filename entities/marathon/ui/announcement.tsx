@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import dynamic from 'next/dynamic';
 import { Badge } from '@/shared/ui/badge';
 import { AnnouncementItemType } from '../model';
@@ -20,7 +20,7 @@ interface AnnouncementListProps {
 export const AnnouncementList = ({ items }: AnnouncementListProps) => (
   <div className="flex flex-col gap-3 py-6">
     {items.map(({ id, tag, times, title }) => (
-      <Link
+      <CustomLink
         href={`/learning-marathons/2025S1/announcements/${id}`}
         key={id}
         className="flex flex-col gap-3 rounded-[10px] bg-white p-6 text-start shadow-md shadow-basic-black/10"
@@ -32,7 +32,7 @@ export const AnnouncementList = ({ items }: AnnouncementListProps) => (
           </div>
           <p className="body-sm text-basic-300">{times}</p>
         </div>
-      </Link>
+      </CustomLink>
     ))}
   </div>
 );

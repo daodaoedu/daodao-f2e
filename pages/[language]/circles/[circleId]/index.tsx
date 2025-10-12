@@ -1,5 +1,5 @@
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
-import Link from "next/link";
+import { CustomLink } from '@/shared/ui/custom-link';
 import SEOConfig from "@/components/SEOConfig";
 import { circleAPI, CircleSchema } from "@/services/circles";
 import { Background, Container, Paper } from "@/shared/ui/wrapper";
@@ -186,20 +186,20 @@ export default function CircleDetailPage({
               <DropdownMenuContent>
                 <DropdownMenuItem asChild>
                   {isOwnCircle ? (
-                    <Link
+                    <CustomLink
                       href={`/circles/${data._id}/edit`}
                       className="block p-2"
                     >
                       編輯
-                    </Link>
+                    </CustomLink>
                   ) : (
-                    <Link
+                    <CustomLink
                       href="https://forms.gle/NkVbDWC3eXk4P4gv7"
                       target="_blank"
                       className="block p-2"
                     >
                       檢舉
-                    </Link>
+                    </CustomLink>
                   )}
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -294,7 +294,7 @@ export default function CircleDetailPage({
         <Paper className="mb-4 md:p-8" asChild>
           <section>
             <header className="flex justify-between">
-              <Link href={`/partner/detail?id=${data.user.userId}`}>
+              <CustomLink href={`/partner/detail?id=${data.user.userId}`}>
                 <div className="flex items-center">
                   <Avatar className="mt-1 mr-3 size-12">
                     <AvatarImage src={data.user.photoURL} />
@@ -319,7 +319,7 @@ export default function CircleDetailPage({
                     </span>
                   </div>
                 </div>
-              </Link>
+              </CustomLink>
 
               <div className="flex items-center gap-1">
                 <LocationSvg />

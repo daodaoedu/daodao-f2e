@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
 import { useAuth, useAuthDispatch } from '@/features/auth';
 import { cn } from '@/utils/cn';
@@ -15,13 +15,13 @@ function DesktopMenu() {
         <ul className="flex items-center gap-1">
           {NAV_LINK.map(({ link, name, target }) => (
             <li key={name}>
-              <Link
+              <CustomLink
                 href={link}
                 target={target}
                 className="block p-5 font-bold text-basic-white"
               >
                 {name}
-              </Link>
+              </CustomLink>
             </li>
           ))}
         </ul>
@@ -44,21 +44,21 @@ function DesktopMenu() {
                 key={name}
                 className="text-nowrap rounded-lg hover:bg-primary-lightest"
               >
-                <Link href={link} className="block p-2 text-basic-400">
+                <CustomLink href={link} className="block p-2 text-basic-400">
                   {name}
-                </Link>
+                </CustomLink>
               </Dropdown.Item>
             ))}
           </Dropdown.List>
         </Dropdown>
         {auth.isLoggedIn ? (
           <div className="flex items-center gap-3.5">
-            <Link
+            <CustomLink
               href="/manage"
               className="body-md px-2 py-5 font-bold text-basic-white"
             >
               我的小島
-            </Link>
+            </CustomLink>
             <Dropdown as="nav">
               <Dropdown.Toggle animation="none" className="p-0">
                 <Image
@@ -75,12 +75,12 @@ function DesktopMenu() {
                     key={name}
                     className="text-nowrap rounded-lg hover:bg-primary-lightest"
                   >
-                    <Link
+                    <CustomLink
                       href={`/profile?id=${id}`}
                       className="block p-2 text-basic-400"
                     >
                       {name}
-                    </Link>
+                    </CustomLink>
                   </Dropdown.Item>
                 ))}
                 <Dropdown.Item className="text-nowrap rounded-lg hover:bg-primary-lightest">

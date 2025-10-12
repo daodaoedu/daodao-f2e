@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { usePathname } from 'next/navigation';
 import { MARATHON_LINKS } from '@/constants/category';
 import useShadowToggleOnScroll from '@/shared/lib/use-shadow-toggle-on-scroll';
@@ -32,7 +32,7 @@ export const Navbar = () => {
       <ul className="mx-auto flex max-w-[750px] justify-between gap-4">
         {navItems.map((item) => (
           <li key={item.label} className="shrink-0">
-            <Link
+            <CustomLink
               href={item.href}
               className={cn(
                 'body-sm relative flex items-center gap-1 text-nowrap p-4 font-medium text-primary-base',
@@ -41,7 +41,7 @@ export const Navbar = () => {
               )}
             >
               {item.label}
-            </Link>
+            </CustomLink>
           </li>
         ))}
       </ul>

@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import {
   Share2,
   Link as LinkIcon,
@@ -148,9 +148,9 @@ function IdeaCard({
   }
 
   return (
-    <Link href={`/ideas/${idea.id}`} className="block">
+    <CustomLink href={`/ideas/${idea.id}`} className="block">
       {cardContent}
-    </Link>
+    </CustomLink>
   );
 }
 

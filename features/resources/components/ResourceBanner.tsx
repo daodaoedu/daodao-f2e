@@ -1,5 +1,5 @@
 // import { useRouter } from "next/navigation";
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { StaticImageData } from 'next/image';
 import { SearchIcon, SendHorizontalIcon } from 'lucide-react';
 import { OptionProps } from '@/shared/ui/option';
@@ -91,10 +91,10 @@ export default function ResourceBanner({
                       className="px-3 py-0.5 text-primary-base"
                       asChild
                     >
-                      <Link href={`/resource/categories/${value}`}>
+                      <CustomLink href={`/resource/categories/${value}`}>
                         <span className="font-bold">#</span>
                         {label}
-                      </Link>
+                      </CustomLink>
                     </Badge>
                   ))}
                 </div>

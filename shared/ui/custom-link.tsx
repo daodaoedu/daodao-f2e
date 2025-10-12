@@ -50,6 +50,7 @@ export function CustomLink({
   children,
   href,
   locale,
+  prefetch = false,
   onNavigate,
   ...props
 }: CustomLinkProps) {
@@ -73,7 +74,12 @@ export function CustomLink({
   };
 
   return (
-    <Link href={formattedHref} onNavigate={handleNavigate} {...props}>
+    <Link
+      href={formattedHref}
+      prefetch={prefetch}
+      onNavigate={handleNavigate}
+      {...props}
+    >
       {children}
     </Link>
   );

@@ -1,7 +1,7 @@
 import AccessDeniedImg from '@/public/assets/projects/access-denied.png';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/utils/cn';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import useMarathonAccess from '../hooks/useMarathonAccess';
 
 export default function MarathonAccess({ children }: React.PropsWithChildren) {
@@ -39,14 +39,14 @@ export default function MarathonAccess({ children }: React.PropsWithChildren) {
           asChild
           variant="outline"
         >
-          <Link href="/personal-card/my-card">
+          <CustomLink href="/personal-card/my-card">
             編輯個人名片
-          </Link>
+          </CustomLink>
         </Button>
         <Button asChild variant="default">
-          <Link href="/resources">
+          <CustomLink href="/resources">
             查看學習資源
-          </Link>
+          </CustomLink>
         </Button>
       </div>
     </div>

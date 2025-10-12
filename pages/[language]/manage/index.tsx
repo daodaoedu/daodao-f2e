@@ -20,7 +20,7 @@ import {
   CircleChevronRight,
   CircleChevronLeft,
 } from "lucide-react";
-import Link from "next/link";
+import { CustomLink } from '@/shared/ui/custom-link';
 
 import marathonConfig from "@/constants/marathon";
 
@@ -400,14 +400,14 @@ const Project = ({
           className="w-full px-3 py-2 justify-between"
           withIcon
         >
-          <Link
+          <CustomLink
             href={href}
             target="_blank"
             className="flex items-center gap-2 body-md text-basic-500"
           >
             {title}
             <ArrowUpRight className="stroke-1" />
-          </Link>
+          </CustomLink>
         </CollapsibleTrigger>
         <CollapsibleContent>{children}</CollapsibleContent>
       </Collapsible>

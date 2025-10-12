@@ -1,6 +1,6 @@
 import { toast } from 'sonner';
 import React from 'react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { Mail } from 'lucide-react';
 import { ResourceDetailResponseSchema } from '@/services/resources/core/schema';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
@@ -60,7 +60,7 @@ export default function ContributorInfo({ user }: ContributorInfoProps) {
           <h3 className="body-lg mb-2 font-bold text-basic-500">簡介</h3>
           <p className="mb-2 text-basic-500">{user.selfIntroduction}</p>
           <Button type="button" variant="link" className="-mx-2 px-2" asChild>
-            <Link href={`/partner/detail?id=${user._id}`}>了解更多</Link>
+            <CustomLink href={`/partner/detail?id=${user._id}`}>了解更多</CustomLink>
           </Button>
         </div>
       </div>

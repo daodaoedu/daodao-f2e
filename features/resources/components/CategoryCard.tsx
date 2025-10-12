@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { usePathname } from 'next/navigation';
 import { ICategory } from '@/constants/category';
 import { Image } from '@/shared/ui/image';
@@ -21,7 +21,7 @@ export default function CategoryCard(props: CategoryCardProps) {
     : CATEGORIES_BASE_PATH;
 
   return (
-    <Link
+    <CustomLink
       key={value}
       href={`${currentPath}/${value}`}
       className={cn(
@@ -46,6 +46,6 @@ export default function CategoryCard(props: CategoryCardProps) {
       >
         {label}
       </div>
-    </Link>
+    </CustomLink>
   );
 }

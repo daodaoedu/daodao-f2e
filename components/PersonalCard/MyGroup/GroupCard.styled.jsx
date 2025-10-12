@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { DropdownMenuItem } from '@/shared/ui/dropdown-menu';
 import { Separator } from '@/shared/ui/separator';
 import { cn } from '@/utils/cn';
@@ -117,7 +117,7 @@ export const StyledAreas = ({ children, className, ...props }) => (
 );
 
 export const StyledGroupCard = ({ children, className, href, ...props }) => (
-  <Link
+  <CustomLink
     href={href}
     className={cn(
       'w-full flex relative bg-white rounded gap-4 max-md:flex-col',
@@ -126,7 +126,7 @@ export const StyledGroupCard = ({ children, className, href, ...props }) => (
     {...props}
   >
     {children}
-  </Link>
+  </CustomLink>
 );
 
 export const StyledImageWrapper = ({ children, className, ...props }) => (

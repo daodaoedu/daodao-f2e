@@ -6,7 +6,7 @@ import { cn } from '@/utils/cn';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 
 interface Step3Props {
   handleNextStep: () => void;
@@ -205,7 +205,7 @@ const Step3: React.FC<Step3Props> = ({
                 {resources.map((resource) => (
                   <div key={resource.id} className="w-full">
                     {resource.url ? (
-                      <Link
+                      <CustomLink
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -227,7 +227,7 @@ const Step3: React.FC<Step3Props> = ({
                         >
                           <X className="size-4" />
                         </Button>
-                      </Link>
+                      </CustomLink>
                     ) : (
                       <div className="flex w-full items-center rounded-lg border border-primary/20 bg-primary-lightest p-4 text-sm font-medium text-primary">
                         <div className="mr-3 flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">

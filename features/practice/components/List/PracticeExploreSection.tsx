@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import {
   Search, Plus, Target, SortAsc, RefreshCw,
 } from 'lucide-react';
@@ -163,7 +163,7 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
                   <span className="hidden sm:inline">開始實踐</span>
                 </Button>
               ) : (
-                <Link href="/practice/create">
+                <CustomLink href="/practice/create">
                   <Button
                     size="sm"
                     className="flex items-center gap-2"
@@ -171,7 +171,7 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
                     <Plus className="size-4" />
                     <span className="hidden sm:inline">開始實踐</span>
                   </Button>
-                </Link>
+                </CustomLink>
               )
             )}
           </div>
@@ -263,12 +263,12 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
                 開始第一個實踐
               </Button>
             ) : (
-              <Link href="/practice/create">
+              <CustomLink href="/practice/create">
                 <Button className="flex items-center gap-2">
                   <Plus className="size-4" />
                   開始第一個實踐
                 </Button>
-              </Link>
+              </CustomLink>
             )}
           </div>
         ) : (

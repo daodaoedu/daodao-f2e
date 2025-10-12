@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { cn } from '@/utils/cn';
 import { activeClass, defaultClass, disableClass } from './constant';
 
@@ -26,7 +26,7 @@ function SidebarLink({
     onClick?.(e);
   };
   return (
-    <Link
+    <CustomLink
       href={href}
       className={cn(
         defaultClass,
@@ -39,7 +39,7 @@ function SidebarLink({
       {...props}
     >
       {children}
-    </Link>
+    </CustomLink>
   );
 }
 

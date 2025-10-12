@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { Project as ProjectType } from '@/components/Projects/Project/type';
 import { cn } from '@/utils/cn';
 import ProjectUserInfoBar from './ProjectUserInfoBar';
@@ -13,7 +13,7 @@ const ProjectCard = ({ project, path }: ProjectCardProps) => {
   const pathroute = path === '/admin' ? '/admin/projects/detail' : '/projects/detail';
 
   return (
-    <Link
+    <CustomLink
       href={`${pathroute}?id=${project.id}`}
       className={cn(
         'p-4 md:py-8 md:px-10 flex flex-col gap-5 justify-start items-start',
@@ -43,7 +43,7 @@ const ProjectCard = ({ project, path }: ProjectCardProps) => {
           }}
         /> */}
       </div>
-    </Link>
+    </CustomLink>
   );
 };
 export default ProjectCard;

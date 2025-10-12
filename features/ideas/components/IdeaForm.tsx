@@ -1,7 +1,7 @@
 import React, {
   useState, useCallback, useRef, useEffect,
 } from 'react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { useFieldArray } from 'react-hook-form';
 import {
   Image as ImageIcon,
@@ -599,7 +599,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                               {field.name || '未命名資源'}
                             </span>
                             {field.url && (
-                              <Link
+                              <CustomLink
                                 href={field.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -608,7 +608,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                               >
                                 <LinkIcon className="size-3" />
                                 <span className="truncate">{field.url}</span>
-                              </Link>
+                              </CustomLink>
                             )}
                           </div>
                         </div>

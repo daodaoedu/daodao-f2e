@@ -20,7 +20,7 @@ import { CheckInService } from '@/services/practice/checkIn';
 import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
 import { formatSmartDate, formatDate } from '@/services/practice/utils';
 import { Button } from '@/shared/ui/button';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { Progress } from '@/shared/ui/progress';
 import TagList from '../Shared/TagList';
 
@@ -384,7 +384,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                     className="flex items-center justify-between rounded-lg border border-basic-200 bg-primary/5 p-3 transition-colors hover:border-basic-300"
                   >
                     {resource.url && (
-                      <Link
+                      <CustomLink
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -400,7 +400,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                             </div>
                           </div>
                         </div>
-                      </Link>
+                      </CustomLink>
                     )}
                   </div>
                 ))}

@@ -8,7 +8,7 @@ import './global.css';
 function GlobalErrorPage() {
   const params = useParams<{ language: Locale }>();
   const language = params?.language;
-  const locale = language && isLocale(language) ? language : defaultLocale;
+  const locale = isLocale(language) ? language : defaultLocale;
 
   return (
     <html lang={locale}>

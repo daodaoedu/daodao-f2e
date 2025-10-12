@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { toast } from 'sonner';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -517,9 +517,9 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
           <FormLabel className="mb-0 text-balance text-sm text-basic-400">
             請確認揪團未涉及不雅內容並符合本網站
             {' '}
-            <Link href="/terms/service" target="_blank" className="underline">
+            <CustomLink href="/terms/service" target="_blank" className="underline">
               使用者條款
-            </Link>
+            </CustomLink>
           </FormLabel>
           <FormMessage />
         </FormItem>

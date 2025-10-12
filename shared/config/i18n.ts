@@ -16,8 +16,9 @@ export const languageOptions = [
   { value: 'en', label: 'English' },
 ] as const;
 
-export const isLocale = (language: string): language is Locale =>
-  locales.includes(language as Locale);
+export const isLocale = (
+  language: string | undefined | null
+): language is Locale => locales.includes(language as Locale);
 
 type ParamsType = LayoutProps<'/[language]'>['params'];
 

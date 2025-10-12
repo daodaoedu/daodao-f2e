@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import CheckLink from './CheckLink';
 
 export default function TextWithLinks({ children }) {
@@ -16,9 +16,9 @@ export default function TextWithLinks({ children }) {
 
       if (window.location.hostname === href.hostname) {
         return (
-          <Link key={href} href={href} target="_blank">
+          <CustomLink key={href} href={href} target="_blank">
             {href}
-          </Link>
+          </CustomLink>
         );
       }
 

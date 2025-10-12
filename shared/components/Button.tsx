@@ -1,5 +1,5 @@
 import { forwardRef, useRef } from 'react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { cn } from '@/utils/cn';
 import { useAuth, useAuthDispatch } from '@/features/auth';
 
@@ -154,9 +154,9 @@ function Button<AS extends 'button' | 'link' = 'button'>(
 
   if (as === 'link' && href) {
     return (
-      <Link href={href} {...sharedProps}>
+      <CustomLink href={href} {...sharedProps}>
         {content}
-      </Link>
+      </CustomLink>
     );
   }
 

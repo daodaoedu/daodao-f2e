@@ -6,7 +6,7 @@ import {
   LockKeyholeOpen,
   LockKeyhole,
 } from 'lucide-react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 
@@ -201,10 +201,10 @@ function PostCardFooter({ onMoreClick, detailLink }: PostCardFooterProps) {
           className="-ml-2 gap-1 px-2 text-basic-300"
           onClick={onMoreClick}
         >
-          <Link href={detailLink}>
+          <CustomLink href={detailLink}>
             更多
             <ArrowRight />
-          </Link>
+          </CustomLink>
         </Button>
       )}
       <div className="flex items-center gap-3 text-basic-black">

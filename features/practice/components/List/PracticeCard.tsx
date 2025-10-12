@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import {
   Flame,
   Edit3,
@@ -268,9 +268,9 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
   );
 
   return (
-    <Link href={`/practice/${practice.id}`} className="block">
+    <CustomLink href={`/practice/${practice.id}`} className="block">
       {cardContent}
-    </Link>
+    </CustomLink>
   );
 };
 

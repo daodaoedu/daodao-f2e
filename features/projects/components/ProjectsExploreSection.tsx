@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { format } from 'date-fns';
 import {
   Search, Plus, FolderOpen, SortAsc, RefreshCw, Share2, Flag, Eye,
@@ -277,9 +277,9 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
     );
 
     return (
-      <Link href={`/projects/detail?id=${project.id}`} className="block">
+      <CustomLink href={`/projects/detail?id=${project.id}`} className="block">
         {cardContent}
-      </Link>
+      </CustomLink>
     );
   };
 
@@ -335,7 +335,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
                   <span className="hidden sm:inline">建立計劃</span>
                 </Button>
               ) : (
-                <Link href="/manage/projects/create">
+                <CustomLink href="/manage/projects/create">
                   <Button
                     size="sm"
                     className="flex items-center gap-2"
@@ -343,7 +343,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
                     <Plus className="size-4" />
                     <span className="hidden sm:inline">建立計劃</span>
                   </Button>
-                </Link>
+                </CustomLink>
               )
             )}
           </div>
@@ -436,12 +436,12 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
                   建立第一個計劃
                 </Button>
               ) : (
-                <Link href="/manage/projects/create">
+                <CustomLink href="/manage/projects/create">
                   <Button className="flex items-center gap-2">
                     <Plus className="size-4" />
                     建立第一個計劃
                   </Button>
-                </Link>
+                </CustomLink>
               )
             )}
           </div>
