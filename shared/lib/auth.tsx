@@ -204,7 +204,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         dispatch({ type: ActionTypes.CLOSE_LOGIN_MODAL });
       },
     };
-  }, [state, dispatch]);
+  }, [state.loginStatus, state.user, dispatch]);
 
   const handleError = (error: unknown) => {
     if (error instanceof HttpError) {
