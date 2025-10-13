@@ -4,7 +4,7 @@ import {
   Task,
 } from '@/contexts/Milestones/type';
 import { BASE_URL } from '@/constants/common';
-import { getTokenStorage } from '@/utils/storage';
+import { getTokenStorage } from '@/shared/lib/storage';
 import { format } from 'date-fns';
 
 interface MilestonesContext {

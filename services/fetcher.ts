@@ -1,4 +1,4 @@
-import { getTokenStorage } from '@/utils/storage';
+import { getTokenStorage } from '@/shared/lib/storage';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 

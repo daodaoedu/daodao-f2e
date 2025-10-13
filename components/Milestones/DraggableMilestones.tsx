@@ -12,7 +12,7 @@ import {
   ProjectMilestoneFormSchema,
   ProjectTaskSchema,
 } from '@/services/projects';
-import { getIsCheckDragMilestoneStorage } from '@/utils/storage';
+import { getIsCheckDragMilestoneStorage } from '@/shared/lib/storage';
 import { useDraggableSensors } from '@/shared/lib/use-draggable-sensors';
 import { useDraggableContainer } from '@/shared/lib/use-draggable-container';
 import DraggableItem from '@/shared/components/DraggableItem';

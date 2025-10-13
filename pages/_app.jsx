@@ -12,7 +12,6 @@ import { AuthProvider, LoginModal, useAuth } from '@/features/auth';
 import { DialogProvider } from '@/contexts/Dialog';
 import useQueryState from '@/shared/lib/use-query-state';
 import { fetcher } from '@/utils/http';
-import { getReminderStorage } from '@/utils/storage';
 import getBaseLayout from '@/layout/core/getBaseLayout';
 import { useCompleteInfoReminder, useVerifiedSuccessDialog } from '@/features/users';
 import { initGA, logPageView } from '../utils/analytics';
@@ -42,10 +41,7 @@ const ThemeComponentWrap = ({ pageProps, Component }) => {
       return;
     }
 
-    const isReminder = getReminderStorage().get() % 4 === 3;
-
-    if (isLoggedIn && !isComplete && isReminder) {
-      getReminderStorage().remove();
+    if (isLoggedIn && !isComplete) {
       openCompleteInfoReminderDialog();
     }
   }, [queryState, isLoggedIn, isComplete, openCompleteInfoReminderDialog, openVerifiedSuccessDialog]);

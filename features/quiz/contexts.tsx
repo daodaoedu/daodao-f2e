@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { getQuizStorage } from '@/utils/storage';
+import { getQuizStorage } from '@/shared/lib/storage';
 import {
   AnswerKey,
   questionMap,
