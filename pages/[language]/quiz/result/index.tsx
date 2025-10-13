@@ -34,8 +34,8 @@ import ThreadsSvg from "@/public/assets/social-icons/threads.svg";
 import XSvg from "@/public/assets/social-icons/x.svg";
 import { AspectRatio } from "@/shared/ui/aspect-ratio";
 import { Badge } from "@/shared/ui/badge";
-import getShareAPI from "@/utils/getShareAPI";
-import { GACategory, logEvent } from "@/utils/analytics";
+import { getShareAPI } from "@/shared/lib/share";
+import { GACategory, logEvent } from "@/shared/lib/analytics";
 
 interface ResultImg {
   src: string;

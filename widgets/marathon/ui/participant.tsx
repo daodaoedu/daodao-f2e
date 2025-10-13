@@ -1,6 +1,6 @@
 import { Title } from '@/shared/ui/typography';
 import { Image } from '@/shared/ui/image';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { StaticImageData } from 'next/image';
 import React from 'react';
 

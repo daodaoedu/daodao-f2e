@@ -7,7 +7,7 @@ import ReviewDetail from "@/features/projects/components/ReviewDetail";
 import { ReviewDeleteModal, ReviewUpdateModal } from "@/features/projects";
 import { useProject } from "@/services/projects";
 import { useProjectReview } from "@/features/projects/hooks/review";
-import { parseToNumber, parseToString } from "@/utils/helper";
+import { parseToNumber, parseToString } from "@/shared/lib/helper";
 
 enum ModalTypeEnum {
   Update,

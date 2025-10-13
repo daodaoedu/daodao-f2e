@@ -25,7 +25,7 @@ export async function generateMetadata({
 
   const {
     common: { title, description },
-  } = await getDictionary(language);
+  } = getDictionary(language);
 
   const languageAlternates = Object.fromEntries(
     locales.map((locate) => [locate, `/${locate}`])
@@ -121,7 +121,7 @@ export default async function RootLayout({
 }: LayoutProps<'/[language]'>) {
   const { language } = await params;
 
-  const dictionary = await getDictionary(language);
+  const dictionary = getDictionary(language);
 
   return (
     <html

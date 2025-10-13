@@ -26,7 +26,7 @@ import {
   ResourceFormSchema,
   resourceReviewFormSchema,
 } from "@/services/resources";
-import { cn } from "@/utils/cn";
+import { cn } from "@/shared/lib/cn";
 
 const withoutReviewSchema = resourceFormSchema.omit({ review: true });
 

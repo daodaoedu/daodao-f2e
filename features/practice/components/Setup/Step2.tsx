@@ -3,7 +3,7 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
 import { PathInfo } from '@/services/practice/schema';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { formatDateISO } from '@/services/practice/utils';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';

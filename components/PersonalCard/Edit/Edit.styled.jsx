@@ -1,6 +1,6 @@
 import { Text } from '@/shared/ui/typography';
 import { Button } from '@/shared/ui/button';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 export const FormWrapper = ({ children, ...props }) => (
   <form

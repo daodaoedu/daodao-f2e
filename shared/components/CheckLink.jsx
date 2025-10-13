@@ -12,7 +12,7 @@ import {
 import { Button } from '@/shared/ui/button';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Text } from '@/shared/ui/typography';
-import { getTrustWebsitesStorage } from '@/utils/storage';
+import { getTrustWebsitesStorage } from '@/shared/lib/storage';
 
 function InternalCheckLink(props, ref) {
   const id = useId();

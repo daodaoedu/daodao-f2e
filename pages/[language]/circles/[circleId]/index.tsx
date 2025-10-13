@@ -3,13 +3,13 @@ import { CustomLink } from '@/shared/ui/custom-link';
 import SEOConfig from "@/components/SEOConfig";
 import { circleAPI, CircleSchema } from "@/services/circles";
 import { Background, Container, Paper } from "@/shared/ui/wrapper";
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 import { BackButton } from "@/shared/ui/back-button";
 import { Image } from "@/shared/ui/image";
 import { AspectRatio } from "@/shared/ui/aspect-ratio";
-import { cn } from "@/utils/cn";
+import { cn } from "@/shared/lib/cn";
 import { Badge } from "@/shared/ui/badge";
-import getShareAPI from "@/utils/getShareAPI";
+import { getShareAPI } from "@/shared/lib/share";
 import FacebookSvg from "@/public/assets/social-icons/facebook.svg";
 import LineSvg from "@/public/assets/social-icons/line.svg";
 import LinkedInSvg from "@/public/assets/social-icons/linkedin.svg";
@@ -34,14 +34,14 @@ import {
 } from "@/shared/ui";
 import { Text, Title } from "@/shared/ui/typography";
 import { EDUCATION, ROLE } from "@/constants/member";
-import { getOptionLabel, getOptionLabels } from "@/utils/option";
+import { getOptionLabel, getOptionLabels } from "@/shared/lib/option";
 import { ALL_AREAS, AREAS, TBD_OPTION } from "@/constants/areas";
 import { ACTIVITY_CATEGORIES, CATEGORIES } from "@/constants/category";
 import { useAuth } from "@/features/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
 import dynamic from "next/dynamic";
-import { timeDuration } from "@/utils/date";
+import { timeDuration } from "@/shared/lib/date";
 import { ContactModal, TargetUserType } from "@/features/email";
 
 const MarkdownEditor = dynamic(

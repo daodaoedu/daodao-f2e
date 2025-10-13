@@ -1,5 +1,5 @@
 import { Check, Calendar } from 'lucide-react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { Task as TaskType } from '@/contexts/Milestones/type';
 
 interface TaskViewProps {

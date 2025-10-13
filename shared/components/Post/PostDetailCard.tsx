@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import PostCard from '@/shared/components/Post/PostCard';
 import { Button } from '@/shared/ui/button';
-import numberToChineseNumber from '@/utils/numberToChineseNumber';
+import { numberToChineseNumber } from '@/shared/lib/number';
 import { BaseUserSchema } from '@/services/users';
 import { useAuth } from '@/features/auth';
 import CommentSection from '@/shared/components/Comment/CommentSection';

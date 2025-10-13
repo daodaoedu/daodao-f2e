@@ -6,14 +6,14 @@ import { Button } from "@/shared/ui/button";
 import { Progress } from "@/shared/ui/progress";
 import { Image } from "@/shared/ui/image";
 import RunnerSvg from "@/public/assets/icons/runner.svg";
-import { cn } from "@/utils/cn";
+import { cn } from "@/shared/lib/cn";
 import {
   AnswerKey,
   getQuizLayout,
   questionMap,
   useQuiz,
 } from "@/features/quiz";
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 import { locales } from "@/shared/config/i18n";
 
 export const getStaticPaths = async () => {

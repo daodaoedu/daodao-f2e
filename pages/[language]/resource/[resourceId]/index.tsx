@@ -20,7 +20,7 @@ import { Separator } from "@/shared/ui/separator";
 import NotExist from "@/shared/components/NotExist";
 // import CommentSection from "@/shared/components/Comment/CommentSection";
 import { Container } from "@/shared/ui/wrapper";
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 import {
   ResourceDetail,
   ResourceIntroduction,

@@ -1,4 +1,3 @@
-import { unstable_rootParams } from 'next/server';
 import zhDictionary from './locales/zh-TW.json';
 import enDictionary from './locales/en.json';
 
@@ -20,23 +19,11 @@ export const isLocale = (
   language: string | undefined | null
 ): language is Locale => locales.includes(language as Locale);
 
-type ParamsType = LayoutProps<'/[language]'>['params'];
-
-type LocaleOrParamsType =
-  | string
-  | ParamsType
-  | ReturnType<typeof unstable_rootParams>;
-
-export const getDictionary = async (localeOrParams: LocaleOrParamsType) => {
+export const getDictionary = (locale: string) => {
   const dictionaries: Record<Locale, Dictionary> = {
     'zh-TW': zhDictionary,
     en: enDictionary,
   };
-
-  const locale =
-    typeof localeOrParams === 'string'
-      ? localeOrParams
-      : (await (localeOrParams as ParamsType))?.language;
 
   return isLocale(locale) ? dictionaries[locale] : dictionaries[defaultLocale];
 };
@@ -68,19 +55,19 @@ const getNestedValue = (dictionary: Dictionary, key: string) => {
 
 export type TranslationVariables = Record<string, string | number>;
 
-export const getText = (
-  dictionary: Dictionary,
-  key: TranslationKeys,
-  variables?: TranslationVariables
-) => {
-  let text =
-    getNestedValue(dictionary, key) || getNestedValue(zhDictionary, key) || key;
+export const getTranslation =
+  (dictionary: Dictionary) =>
+  (key: TranslationKeys, variables?: TranslationVariables) => {
+    let text =
+      getNestedValue(dictionary, key) ||
+      getNestedValue(zhDictionary, key) ||
+      key;
 
-  if (variables) {
-    Object.entries(variables).forEach(([varKey, value]) => {
-      text = text.replace(`{${varKey}}`, value.toString());
-    });
-  }
+    if (variables) {
+      Object.entries(variables).forEach(([varKey, value]) => {
+        text = text.replace(`{${varKey}}`, value.toString());
+      });
+    }
 
-  return text;
-};
+    return text;
+  };

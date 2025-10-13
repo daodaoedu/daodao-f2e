@@ -9,7 +9,7 @@ import { MapPin, EllipsisVertical } from 'lucide-react';
 import { Image } from '@/shared/ui/image';
 import { useAuth } from '@/features/auth';
 import emptyCoverImg from '@/public/assets/images/empty-cover.png';
-import { timeDuration } from '@/utils/date';
+import { timeDuration } from '@/shared/lib/date';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 import {
   StyledAreas,

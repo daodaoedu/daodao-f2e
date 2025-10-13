@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import QuoteSvg from '@/public/assets/quiz/quote.svg';
 
 interface TitleProps extends React.PropsWithChildren {

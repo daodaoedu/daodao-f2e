@@ -38,7 +38,7 @@ import {
   ReviewCard,
   NoteForm,
 } from "@/features/projects";
-import { cn } from "@/utils/cn";
+import { cn } from "@/shared/lib/cn";
 import OutcomeForm from "@/features/projects/components/OutcomeForm";
 import AccessDeniedImg from "@/public/assets/projects/access-denied.png";
 import {

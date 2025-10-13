@@ -26,7 +26,7 @@ import { AuthButton, useAuth } from '@/features/auth';
 import { Textarea } from '@/shared/ui/textarea';
 import { ROLE } from '@/constants/member';
 import { contactFormSchema, ContactFormSchema } from '@/services/emails';
-import { getOptionLabel } from '@/utils/option';
+import { getOptionLabel } from '@/shared/lib/option';
 import { useSendEmail } from '../hooks';
 
 export type TargetUserType = {

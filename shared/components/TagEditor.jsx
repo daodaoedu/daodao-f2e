@@ -2,7 +2,7 @@ import {
   useEffect, useId, useRef, useState,
 } from 'react';
 import { X } from 'lucide-react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 function Item({ children, onClick, text }) {
   return (

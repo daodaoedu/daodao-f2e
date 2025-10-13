@@ -1,6 +1,6 @@
 import AccessDeniedImg from '@/public/assets/projects/access-denied.png';
 import { Button } from '@/shared/ui/button';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { CustomLink } from '@/shared/ui/custom-link';
 
 export default function EmptyProject() {

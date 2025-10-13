@@ -3,7 +3,7 @@ import { LockKeyholeOpen, LockKeyhole } from 'lucide-react';
 import { Image } from '@/shared/ui/image';
 import { ROLE } from '@/constants/member';
 import { useAuth, useAuthDispatch } from '@/features/auth';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { CommentVisibility } from '@/services/comments';
 import { Button } from '@/shared/ui/button';
 import Textarea from '../Textarea';

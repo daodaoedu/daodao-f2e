@@ -4,7 +4,7 @@ import useSWRMutation from "swr/mutation";
 import { projectNoteAPI, getProjectNotePathname } from "./api";
 import { ProjectNoteSchema } from "./schema";
 import { getProjectPathname } from "../core";
-import { fetcher } from "@/utils/http";
+import { fetcher } from "@/shared/lib/http";
 
 export function useProjectNotes(projectId?: string | null) {
   return useSWR<ProjectNoteSchema[]>(

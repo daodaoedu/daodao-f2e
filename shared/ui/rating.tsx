@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Star, LucideProps } from 'lucide-react';
 
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 const ratingVariants = {
   default: {

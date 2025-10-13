@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import {
   Check, Calendar, SendHorizonal, X, Pencil, Trash,
 } from 'lucide-react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { useMilestones } from '@/contexts/Milestones/index';
 import { Task as TaskType } from '@/contexts/Milestones/type';
 import { Button } from '@/shared/ui/button';

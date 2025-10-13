@@ -9,8 +9,8 @@ import {
 import { Button } from '@/shared/ui/button';
 import { Form } from '@/shared/ui/form';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
-import numberToChineseNumber from '@/utils/numberToChineseNumber';
-import { cn } from '@/utils/cn';
+import { numberToChineseNumber } from '@/shared/lib/number';
+import { cn } from '@/shared/lib/cn';
 
 import RadioGroup from './ReviewRadioGroup';
 

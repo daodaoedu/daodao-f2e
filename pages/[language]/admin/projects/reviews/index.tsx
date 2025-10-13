@@ -3,7 +3,7 @@ import { getAdminProjectLayout } from '@/layout/features/getProjectLayout';
 import ReviewCard from '@/features/projects/components/ReviewCard';
 import { useProjectReviewList } from '@/features/projects/hooks/review';
 import marathonConfig from '@/constants/marathon';
-import { parseToString } from '@/utils/helper';
+import { parseToString } from '@/shared/lib/helper';
 
 const ReviewPage = () => {
   const searchParams = useSearchParams();

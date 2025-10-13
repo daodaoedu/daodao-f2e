@@ -25,7 +25,7 @@ import { MultipleSelector } from "@/shared/ui/multiple-selector";
 import { Badge } from "@/shared/ui/badge";
 import { Image } from "@/shared/ui/image";
 import { Separator } from "@/shared/ui/separator";
-import { timeDuration } from "@/utils/date";
+import { timeDuration } from "@/shared/lib/date";
 import { OptionProps } from "@/shared/ui/option";
 import { AspectRatio } from "@/shared/ui/aspect-ratio";
 import {
@@ -35,10 +35,10 @@ import {
   CircleSearchParamsSchema,
   circleSearchParamsSchema,
 } from "@/services/circles";
-import { cn } from "@/utils/cn";
+import { cn } from "@/shared/lib/cn";
 import { Skeleton } from "@/shared/ui/skeleton";
 import dynamic from "next/dynamic";
-import JsonLdFactory from "@/utils/jsonLd";
+import JsonLdFactory from "@/shared/lib/jsonLd";
 
 const MarkdownEditor = dynamic(
   () => import("@/shared/ui/markdown-editor").then(mod => ({ default: mod.MarkdownEditor })),
@@ -48,7 +48,7 @@ const MarkdownEditor = dynamic(
   }
 );
 import useQueryState from "@/shared/lib/use-query-state";
-import { getOptionLabel } from "@/utils/option";
+import { getOptionLabel } from "@/shared/lib/option";
 import { Speech } from "@/shared/ui/speech";
 
 function Banner() {

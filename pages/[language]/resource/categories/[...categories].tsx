@@ -9,9 +9,9 @@ import {
   createResourceJsonLd,
   ResourceExplorer,
 } from "@/features/resources";
-import JsonLdFactory from "@/utils/jsonLd";
+import JsonLdFactory from "@/shared/lib/jsonLd";
 import { ICategory } from "@/constants/category";
-import { parseToArray } from "@/utils/helper";
+import { parseToArray } from "@/shared/lib/helper";
 import {
   Breadcrumb,
   BreadcrumbItem,

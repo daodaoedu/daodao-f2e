@@ -1,4 +1,4 @@
-import { fetcher, mutations } from '@/utils/http';
+import { fetcher, mutations } from '@/shared/lib/http';
 import type {
   IdeaListResponseSchema,
   CreateIdeaRequestSchema,

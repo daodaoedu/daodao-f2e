@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { Container } from '@/shared/ui/container';
 import IdeaList from './IdeaList';
 import IdeaCreateContainer from './IdeaCreateContainer';

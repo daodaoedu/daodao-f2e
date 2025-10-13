@@ -4,7 +4,7 @@ import SEOConfig from "@/components/SEOConfig";
 import { Background, Container } from "@/shared/ui/wrapper";
 import { ProtectedComponent } from "@/features/auth";
 import { CircleForm } from "@/features/circles";
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 import { circleAPI, CircleSchema } from "@/services/circles";
 import { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
 

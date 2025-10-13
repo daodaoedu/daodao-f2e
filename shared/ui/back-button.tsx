@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { Button, ButtonProps } from '@/shared/ui/button';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 interface BackButtonProps extends Omit<ButtonProps, 'children' | 'onClick'> {
   label?: string;

@@ -8,7 +8,7 @@ import View from '@/public/assets/icons/view.svg';
 import Comment from '@/public/assets/icons/comment.svg';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
 import More from '@/public/assets/icons/more.svg';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import {
   DropdownMenu,
   DropdownMenuContent,

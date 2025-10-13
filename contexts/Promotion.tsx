@@ -2,7 +2,7 @@ import {
   createContext, useContext, useEffect, useState,
 } from 'react';
 import { CustomLink } from '@/shared/ui/custom-link';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 interface PromotionContextType {
   height: number;

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { CustomLink } from '@/shared/ui/custom-link';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 // 定義類型
 type FaqItem = {

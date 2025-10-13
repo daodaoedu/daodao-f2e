@@ -1,4 +1,4 @@
-import JsonLdFactory from '@/utils/jsonLd';
+import JsonLdFactory from '@/shared/lib/jsonLd';
 import { ResourceSchema } from '@/services/resources';
 
 export default function createResourceJsonLd(result: ResourceSchema) {

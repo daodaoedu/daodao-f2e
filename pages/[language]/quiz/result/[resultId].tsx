@@ -14,13 +14,13 @@ import {
   Slogan,
   List,
 } from "@/features/quiz";
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 import { AspectRatio } from "@/shared/ui/aspect-ratio";
 import { Badge } from "@/shared/ui/badge";
 import { ProtectedComponent } from "@/features/auth";
 import { BackButton } from "@/shared/ui/back-button";
 import { SquareArrowOutUpRightIcon } from "lucide-react";
-import { cn } from "@/utils/cn";
+import { cn } from "@/shared/lib/cn";
 
 export const getStaticPaths = async () => {
   const languages = ['zh-TW', 'en'];

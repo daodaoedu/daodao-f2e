@@ -4,7 +4,7 @@ import { Button } from '@/shared/ui/button';
 import { ChevronLeft, Edit } from 'lucide-react';
 
 import { ROLE, EDUCATION } from '@/constants/member';
-import { mapToTable } from '@/utils/helper';
+import { mapToTable } from '@/shared/lib/helper';
 import SEOConfig from '@/components/SEOConfig';
 import InfoCompletionGuard from '@/shared/components/InfoCompletionGuard';
 import { ContactModal } from '@/features/email';

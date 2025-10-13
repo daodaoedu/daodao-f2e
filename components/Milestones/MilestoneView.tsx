@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { Milestone } from '@/contexts/Milestones/type';
 
 interface MilestoneViewProps {

@@ -1,14 +1,15 @@
-import { unstable_rootParams } from 'next/server';
+'use client';
+
 import Image from 'next/image';
 import { Button } from '@/shared/ui/button';
 import { Icon } from '@/shared/ui/icon';
 import { SOCIAL_LINKS, ANCHOR_IDS } from '@/shared/constants';
 import { LanguageSwitcher } from '@/shared/ui/language-switcher';
 import { CustomLink } from '@/shared/ui/custom-link';
-import { getDictionary, getText } from '@/shared/config/i18n';
+import { useTranslation } from '@/shared/lib/translation';
 
-export const Footer = async () => {
-  const dictionary = await getDictionary(unstable_rootParams());
+export const Footer = () => {
+  const { t } = useTranslation();
 
   return (
     <footer className="bg-basic-600 pb-20 pt-12 text-white md:pb-12">
@@ -23,7 +24,7 @@ export const Footer = async () => {
               className="mb-2"
             />
             <p className="text-white/80">
-              {getText(dictionary, 'common.footer_tagline')}
+              {t('common.footer_tagline')}
             </p>
           </div>
 
@@ -35,7 +36,7 @@ export const Footer = async () => {
         <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="space-y-4">
             <p className="text-lg text-primary-lighter">
-              {getText(dictionary, 'common.footer_about_title')}
+              {t('common.footer_about_title')}
             </p>
             <div className="space-y-2">
               <div>
@@ -43,7 +44,7 @@ export const Footer = async () => {
                   href="/about"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {getText(dictionary, 'common.footer_about_us')}
+                  {t('common.footer_about_us')}
                 </CustomLink>
               </div>
               <div>
@@ -51,7 +52,7 @@ export const Footer = async () => {
                   href={`/about#${ANCHOR_IDS.VISION}`}
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {getText(dictionary, 'common.footer_vision')}
+                  {t('common.footer_vision')}
                 </CustomLink>
               </div>
               <div>
@@ -59,14 +60,14 @@ export const Footer = async () => {
                   href={`/about#${ANCHOR_IDS.MISSION}`}
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {getText(dictionary, 'common.footer_mission')}
+                  {t('common.footer_mission')}
                 </CustomLink>
               </div>
             </div>
           </div>
           <div className="space-y-4">
             <p className="text-lg text-primary-lighter">
-              {getText(dictionary, 'common.footer_resources_title')}
+              {t('common.footer_resources_title')}
             </p>
             <div className="space-y-2">
               <div>
@@ -74,7 +75,7 @@ export const Footer = async () => {
                   href="/learning-marathons/2025S1"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {getText(dictionary, 'common.footer_learning_marathons')}
+                  {t('common.footer_learning_marathons')}
                 </CustomLink>
               </div>
               <div>
@@ -82,7 +83,7 @@ export const Footer = async () => {
                   href="/terms/privacy-policy"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {getText(dictionary, 'common.footer_privacy_policy')}
+                  {t('common.footer_privacy_policy')}
                 </CustomLink>
               </div>
               <div>
@@ -90,7 +91,7 @@ export const Footer = async () => {
                   href="/terms/service"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {getText(dictionary, 'common.footer_terms_of_service')}
+                  {t('common.footer_terms_of_service')}
                 </CustomLink>
               </div>
               <div>
@@ -98,22 +99,20 @@ export const Footer = async () => {
                   href="/terms/ipr"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {getText(dictionary, 'common.footer_intellectual_property')}
+                  {t('common.footer_intellectual_property')}
                 </CustomLink>
               </div>
             </div>
           </div>
           <div className="space-y-4">
             <p className="text-lg text-primary-lighter">
-              {getText(dictionary, 'common.footer_newsletter_title')}
+              {t('common.footer_newsletter_title')}
             </p>
             <form className="space-y-3">
               <input
                 className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white placeholder:text-white/50 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-base"
                 type="email"
-                placeholder={getText(
-                  dictionary,
-                  'common.footer_email_placeholder'
+                placeholder={t(                  'common.footer_email_placeholder'
                 )}
               />
               <Button
@@ -122,7 +121,7 @@ export const Footer = async () => {
                 size="huge"
                 className="w-full"
               >
-                {getText(dictionary, 'common.footer_subscribe_button')}
+                {t('common.footer_subscribe_button')}
                 <Icon name="arrow-right" />
               </Button>
             </form>
@@ -130,7 +129,7 @@ export const Footer = async () => {
         </div>
         <div className="mb-8 space-y-4">
           <p className="text-lg text-primary-lighter">
-            {getText(dictionary, 'common.footer_social_title')}
+            {t('common.footer_social_title')}
           </p>
           <div className="flex gap-4">
             <CustomLink
@@ -141,7 +140,7 @@ export const Footer = async () => {
             >
               <Image
                 src="/assets/landing-page/icon-Instagram.svg"
-                alt={getText(dictionary, 'common.footer_instagram_alt')}
+                alt={t('common.footer_instagram_alt')}
                 width={36}
                 height={36}
               />
@@ -154,7 +153,7 @@ export const Footer = async () => {
             >
               <Image
                 src="/assets/landing-page/icon-Facebook.svg"
-                alt={getText(dictionary, 'common.footer_facebook_alt')}
+                alt={t('common.footer_facebook_alt')}
                 width={36}
                 height={36}
               />
@@ -162,7 +161,7 @@ export const Footer = async () => {
           </div>
         </div>
         <p className="text-center text-basic-300">
-          {getText(dictionary, 'common.footer_copyright', {
+          {t('common.footer_copyright', {
             year: new Date().getFullYear(),
           })}
         </p>

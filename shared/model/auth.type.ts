@@ -6,7 +6,6 @@ import type {
   CreateUserFormSchema,
   UpdateUserFormSchema,
 } from '@/services/users';
-import { LOGIN_TYPE } from '@/utils/env';
 
 export enum LoginStatus {
   /** 未登入 */
@@ -93,8 +92,3 @@ export type AuthDispatch = {
   ) => void;
   [ActionTypes.LOGOUT]: () => void;
 };
-
-export type LoginMessageEvent = MessageEvent<{
-  type: typeof LOGIN_TYPE;
-  payload: { token: string };
-}>;

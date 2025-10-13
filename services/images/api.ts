@@ -1,6 +1,6 @@
 import { ZodError } from "zod";
-import { parseToString } from "@/utils/helper";
-import { HttpError, mutations, RequestContentType } from "@/utils/http";
+import { parseToString } from "@/shared/lib/helper";
+import { HttpError, mutations, RequestContentType } from "@/shared/lib/http";
 
 import { uploadImagesSchema, UploadImagesSchema } from "./schema";
 

@@ -1,6 +1,6 @@
 import { CustomLink } from '@/shared/ui/custom-link';
 import { Project as ProjectType } from '@/components/Projects/Project/type';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import ProjectUserInfoBar from './ProjectUserInfoBar';
 import ProjectHeader from './ProjectHeader';
 

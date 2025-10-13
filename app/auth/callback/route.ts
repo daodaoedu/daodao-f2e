@@ -1,4 +1,4 @@
-import getEnv from '@/utils/env';
+import getEnv from '@/shared/config/env';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {

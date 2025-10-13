@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import { fetcher } from '@/utils/http';
+import { fetcher } from '@/shared/lib/http';
 import commentAPI, { getCommentPathname, CommentSWRKey } from './api';
 import { CommentType, CommentSchema } from './schema';
 

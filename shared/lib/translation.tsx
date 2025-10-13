@@ -1,9 +1,9 @@
 'use client';
 
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useMemo } from 'react';
 import {
   Dictionary,
-  getText,
+  getTranslation,
   TranslationKeys,
   TranslationVariables,
 } from '@/shared/config/i18n';
@@ -31,9 +31,10 @@ export const useTranslation = () => {
     throw new Error('useTranslation must be used within TranslationProvider');
   }
 
+  const t = useMemo(() => getTranslation(dictionary), [dictionary]);
+
   return {
-    t: (key: TranslationKeys, variables?: TranslationVariables) =>
-      getText(dictionary, key, variables),
+    t,
     dictionary,
   };
 };

@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 

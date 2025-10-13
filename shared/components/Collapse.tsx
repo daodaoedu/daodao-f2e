@@ -1,5 +1,5 @@
 import { ToggleProvider, useToggle } from '@/contexts/Toggle';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 interface CollapseProps {
   as?: React.ElementType;

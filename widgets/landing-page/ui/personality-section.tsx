@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { CustomLink } from '@/shared/ui/custom-link';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 interface PersonalitySectionProps {
   className?: string;

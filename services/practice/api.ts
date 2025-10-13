@@ -1,5 +1,5 @@
 import { MutationFetcher } from 'swr/mutation';
-import { getTokenStorage } from '@/utils/storage';
+import { getTokenStorage } from '@/shared/lib/storage';
 import {
   Practice,
   CheckInRecord,

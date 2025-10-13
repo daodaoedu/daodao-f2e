@@ -2,7 +2,7 @@ import { useSearchParams } from 'next/navigation';
 import { getAdminProjectLayout } from '@/layout/features/getProjectLayout';
 import ReviewDetail from '@/features/projects/components/ReviewDetail';
 import { useProjectReview } from '@/features/projects/hooks/review';
-import { parseToNumber, parseToString } from '@/utils/helper';
+import { parseToNumber, parseToString } from '@/shared/lib/helper';
 
 const ReviewPage = () => {
   const searchParams = useSearchParams();

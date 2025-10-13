@@ -24,7 +24,7 @@ import {
   resourceFormSchema,
   ResourceFormSchema,
 } from "@/services/resources";
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 
 // export const runtime = "experimental-edge";
 

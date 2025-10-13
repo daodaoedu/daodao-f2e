@@ -1,5 +1,5 @@
 import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { FormLabel } from './form';
 
 interface OptionLabelProps {

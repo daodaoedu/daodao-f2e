@@ -6,7 +6,7 @@ import { useAssetsLoader } from '@/shared/lib/use-assets-loader';
 import { useScrollLock } from '@/shared/lib/use-scroll-lock';
 import { Progress } from '@/shared/ui/progress';
 import { useAuth } from '@/features/auth';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 export function Loader({ children }: React.PropsWithChildren) {
   const router = useRouter();

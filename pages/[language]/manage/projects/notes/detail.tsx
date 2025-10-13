@@ -9,7 +9,7 @@ import {
   useProjectNote,
   useProjectNoteMutation,
 } from "@/services/projects";
-import { parseToNumber, parseToString } from "@/utils/helper";
+import { parseToNumber, parseToString } from "@/shared/lib/helper";
 import ConfirmModal from "@/shared/components/Confirm";
 
 enum ModalTypeEnum {

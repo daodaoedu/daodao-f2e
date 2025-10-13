@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 // 使用設計系統配色
 const getTagColor = (tag: string): string => {

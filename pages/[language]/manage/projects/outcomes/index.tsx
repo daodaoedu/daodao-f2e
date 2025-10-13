@@ -15,7 +15,7 @@ import {
   useProjectOutcome,
   useProjectOutcomes,
 } from "@/features/projects/hooks/outcome";
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 
 enum ModalTypeEnum {
   Create,

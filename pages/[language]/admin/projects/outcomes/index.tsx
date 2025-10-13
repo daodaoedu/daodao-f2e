@@ -2,7 +2,7 @@ import { useSearchParams } from "next/navigation";
 import { ContentCard } from "@/features/projects";
 import { getAdminProjectLayout } from "@/layout/features/getProjectLayout";
 import { useProjectOutcomes } from "@/features/projects/hooks/outcome";
-import { parseToString } from "@/utils/helper";
+import { parseToString } from "@/shared/lib/helper";
 
 const OutcomesPage = () => {
   const searchParams = useSearchParams();

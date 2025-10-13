@@ -2,7 +2,7 @@ import { useSearchParams } from 'next/navigation';
 import { ContentCard } from '@/features/projects';
 import { getAdminProjectLayout } from '@/layout/features/getProjectLayout';
 import { useProjectNotes } from '@/services/projects';
-import { parseToString } from '@/utils/helper';
+import { parseToString } from '@/shared/lib/helper';
 
 const NotesPage = () => {
   const searchParams = useSearchParams();

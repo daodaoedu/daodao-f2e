@@ -1,4 +1,4 @@
-import JsonLdFactory from '@/utils/jsonLd';
+import JsonLdFactory from '@/shared/lib/jsonLd';
 import { CircleSchema } from '@/services/circles';
 
 export function createCircleJsonLd(result: CircleSchema) {

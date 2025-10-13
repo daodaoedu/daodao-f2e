@@ -14,7 +14,7 @@ import {
 import toast from 'react-hot-toast';
 import { DateRange } from 'react-day-picker';
 import { format, toDate, isValid } from 'date-fns';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { Button } from '@/shared/ui/button';
 import { Form } from '@/shared/ui/form';
 import { useDialog } from '@/contexts/Dialog';

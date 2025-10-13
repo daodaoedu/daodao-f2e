@@ -2,7 +2,7 @@ import { CustomLink } from '@/shared/ui/custom-link';
 import { usePathname } from 'next/navigation';
 import { ICategory } from '@/constants/category';
 import { Image } from '@/shared/ui/image';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 type CategoryCardProps = {
   category: ICategory;

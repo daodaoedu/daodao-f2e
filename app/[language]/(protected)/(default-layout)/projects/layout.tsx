@@ -7,7 +7,7 @@ import Sidebar, { SidebarItemType } from '@/layout/components/Sidebar';
 import { useProject } from '@/services/projects';
 import NotExist from '@/shared/components/NotExist';
 import ProjectHeader from '@/layout/components/ProjectHeader';
-import { parseToString } from '@/utils/helper';
+import { parseToString } from '@/shared/lib/helper';
 
 const projectRoutes = {
   detail: '/detail',

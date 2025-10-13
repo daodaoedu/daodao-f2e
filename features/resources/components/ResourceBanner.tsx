@@ -4,7 +4,7 @@ import { StaticImageData } from 'next/image';
 import { SearchIcon, SendHorizontalIcon } from 'lucide-react';
 import { OptionProps } from '@/shared/ui/option';
 // import { AuthButton } from "@/contexts/Auth";
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { Badge } from '@/shared/ui/badge';
 import { Container } from '@/shared/ui/wrapper';
 import { Input } from '@/shared/ui';

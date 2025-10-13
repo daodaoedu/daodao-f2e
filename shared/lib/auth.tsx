@@ -7,25 +7,18 @@ import {
   useEffect,
   useMemo,
   useReducer,
-  useState,
 } from 'react';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import { mutate, SWRConfig } from 'swr';
 
-import { HttpError } from '@/utils/http';
-import {
-  getRedirectionStorage,
-  getReminderStorage,
-  getTokenStorage,
-} from '@/utils/storage';
+import { HttpError } from '@/shared/lib/http';
+import { getTokenStorage } from '@/shared/lib/storage';
 import { createUserFormSchema, updateUserFormSchema } from '@/services/users';
 import {
   postApiV1Users,
   putApiV1UsersId,
   useGetApiV1UsersMe,
 } from '@/generated/endpoints/users';
-import { LOGIN_TYPE } from '@/utils/env';
 
 import {
   AuthState,
@@ -33,7 +26,6 @@ import {
   Action,
   ActionTypes,
   LoginStatus,
-  LoginMessageEvent,
 } from '../model/auth.type';
 
 const initialState: AuthState = {
@@ -87,44 +79,6 @@ const checkIsComplete = (data: AuthState['user']) => {
   return keys.every((key) =>
     Boolean(Array.isArray(data[key]) ? data[key].length : data[key])
   );
-};
-
-/**
- * 註冊登入事件
- * @param loginStatus 登入狀態
- * @param callback 登入事件回調
- * @returns 註銷登入事件
- */
-const registerLoginListener = (
-  loginStatus: LoginStatus,
-  callback: (token: string) => void
-) => {
-  const receiveMessage = (event: LoginMessageEvent) => {
-    if (event.origin !== window.location.origin) {
-      return;
-    }
-    if (event.data.type === LOGIN_TYPE) {
-      const { token } = event.data.payload;
-
-      if (token) callback(token);
-    }
-  };
-
-  const unregisterLoginListener = () => {
-    window.removeEventListener('message', receiveMessage, false);
-  };
-
-  const token = getTokenStorage().get();
-
-  if (token) callback(token);
-
-  if (loginStatus === LoginStatus.PERMANENT) {
-    unregisterLoginListener();
-  } else {
-    window.addEventListener('message', receiveMessage, false);
-  }
-
-  return unregisterLoginListener;
 };
 
 const authReducer = (state: AuthState, action: Action): AuthState => {
@@ -186,11 +140,6 @@ const authReducer = (state: AuthState, action: Action): AuthState => {
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [state, dispatch] = useReducer(authReducer, initialState);
-  const [callbacks, setCallbacks] = useState({
-    successCallback: () => {},
-    registerCallback: () => {},
-  });
-  const router = useRouter();
 
   const authDispatch = useMemo<AuthDispatch>(() => {
     const setToken = (payload: string) => {
@@ -210,16 +159,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
       logout,
       login: (payload) => {
         dispatch({ type: ActionTypes.LOGIN, payload });
-        const reminderStorage = getReminderStorage();
-        const reminder = reminderStorage.get();
-        authDispatch.closeLoginModal();
-        if (payload) {
-          reminderStorage.set(typeof reminder === 'number' ? reminder + 1 : 1);
-          callbacks.successCallback();
-        } else {
-          reminderStorage.remove();
-          callbacks.registerCallback();
-        }
       },
       updateUser: async (input) => {
         switch (state.loginStatus) {
@@ -257,40 +196,15 @@ export function AuthProvider({ children }: PropsWithChildren) {
           }
         }
       },
-      openLoginModal: (payload) => {
-        const getRelativeUrl = () =>
-          window.location.href.replace(window.location.origin, '');
-
-        const redirectPath = getRelativeUrl();
-
-        const defaultRegisterCallback = () => {
-          router.replace('/onboarding');
-        };
-
-        const successCallback = async () => {
-          const currentPath = getRelativeUrl();
-          getRedirectionStorage().set(redirectPath);
-          if (currentPath !== redirectPath) {
-            await router.replace(redirectPath);
-          }
-          payload?.successCallback?.();
-        };
-        const registerCallback = () => {
-          if (payload?.registerCallback) {
-            payload.registerCallback(defaultRegisterCallback);
-          } else {
-            defaultRegisterCallback();
-          }
-        };
+      openLoginModal: () => {
         logout();
-        setCallbacks({ successCallback, registerCallback });
         dispatch({ type: ActionTypes.OPEN_LOGIN_MODAL });
       },
       closeLoginModal: () => {
         dispatch({ type: ActionTypes.CLOSE_LOGIN_MODAL });
       },
     };
-  }, [state.loginStatus, state.user, router, callbacks, dispatch]);
+  }, [state.loginStatus, state.user, dispatch]);
 
   const handleError = (error: unknown) => {
     if (error instanceof HttpError) {
@@ -321,19 +235,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
       authDispatch.setLoading(isLoading);
     }
   }, [state.isLoggingIn, authDispatch, isLoading]);
-
-  useEffect(() => {
-    const handleToken = (token: string) => {
-      authDispatch.setToken(token);
-    };
-
-    const unregisterLoginListener = registerLoginListener(
-      state.loginStatus,
-      handleToken
-    );
-
-    return unregisterLoginListener;
-  }, [state.loginStatus, authDispatch]);
 
   return (
     <AuthContext.Provider value={state}>

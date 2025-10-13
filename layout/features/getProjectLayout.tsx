@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
-import { parseToString } from '@/utils/helper';
+import { parseToString } from '@/shared/lib/helper';
 import { RoleEnum, useAuth } from '@/features/auth';
 import { ProjectProvider } from '@/contexts/Project';
 import Sidebar, { SidebarItemType } from '@/layout/components/Sidebar';

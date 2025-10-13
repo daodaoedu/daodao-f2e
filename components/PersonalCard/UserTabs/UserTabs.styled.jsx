@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 export const StyledTabContextBox = ({ children, className, ...props }) => (
   <div

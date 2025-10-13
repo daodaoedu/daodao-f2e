@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { Button } from '@/shared/ui/button';
 import PostCard from '@/shared/components/Post/PostCard';
-import numberToChineseNumber from '@/utils/numberToChineseNumber';
+import { numberToChineseNumber } from '@/shared/lib/number';
 
 export interface BasePostData {
   title: string;

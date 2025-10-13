@@ -4,8 +4,8 @@ import React, {
 import { useSearchParams } from 'next/navigation';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import { BASE_URL } from '@/constants/common';
-import { getTokenStorage } from '@/utils/storage';
-import { parseToString } from '@/utils/helper';
+import { getTokenStorage } from '@/shared/lib/storage';
+import { parseToString } from '@/shared/lib/helper';
 import { useProject as useSWRProject } from '@/services/projects/core/hooks';
 import { mutate } from 'swr';
 import { getProjectPathname } from '@/services/projects/core/api';

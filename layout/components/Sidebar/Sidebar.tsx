@@ -11,7 +11,7 @@ import {
   AccordionTrigger,
 } from '@/shared/ui/accordion';
 import { usePromotion } from '@/contexts/Promotion';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import SidebarItem from './SidebarItem';
 import SidebarLink from './SidebarLink';
 import { SidebarItemType } from './type';

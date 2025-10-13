@@ -5,7 +5,7 @@ import Edit from '@/components/PersonalCard/Edit';
 import SEOConfig from '@/components/SEOConfig';
 import MyGroup from '@/components/PersonalCard/MyGroup';
 import useMediaQuery from '@/shared/lib/use-media-query';
-import getEnv from '@/utils/env';
+import getEnv from '@/shared/config/env';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 
 const PersonalCardPage = () => {

@@ -4,7 +4,7 @@ import { CustomLink } from '@/shared/ui/custom-link';
 import { ChevronUp } from 'lucide-react';
 import { CSSProperties, useEffect, useState } from 'react';
 import { usePromotion } from '@/contexts/Promotion';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { ApplyButton } from './apply-button';
 
 const sidebarItems = [

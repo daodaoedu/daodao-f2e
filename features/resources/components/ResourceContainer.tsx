@@ -6,7 +6,7 @@ import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
 import { HOT_TAGS, ICategory } from '@/constants/category';
 import { ResourceListResponseSchema } from '@/services/resources';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import ResourceCard, { ResourceCardSkeleton } from './ResourceCard';
 
 interface EmptyDataProps {
