@@ -1,6 +1,5 @@
 'use client';
 
-import { ResultType } from '@/features/quiz';
 import getEnv from '@/shared/config/env';
 
 const fn = () => undefined;
@@ -43,6 +42,8 @@ export const getTrustWebsitesStorage = () =>
 export const getIsCheckDragMilestoneStorage = () =>
   createStorage<boolean>('_isCheckDragMilestone');
 
+type QuizResultStorageType = Record<string, { selectedAnswer: string }>;
+
 /** 獲取用於存儲使用者做島島測試的 sessionStorage */
 export const getQuizStorage = () =>
-  createStorage<ResultType>('_quiz', StorageType.SessionStorage);
+  createStorage<QuizResultStorageType>('_quiz', StorageType.SessionStorage);
