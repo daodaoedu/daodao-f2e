@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { getTokenStorage } from '@/utils/storage';
+import { getTokenStorage } from '@/shared/lib/storage';
 import getEnv from '@/shared/config/env';
 
 export const V1_BASE_URL = 'https://api.daoedu.tw';

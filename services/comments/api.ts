@@ -1,7 +1,7 @@
 import type { MutationFetcher } from "swr/mutation";
 
 import { parseToString } from "@/shared/lib/helper";
-import { mutations } from "@/utils/http";
+import { mutations } from "@/shared/lib/http";
 import {
   CommentType,
   CommentSchema,

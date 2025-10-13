@@ -7,7 +7,7 @@ import {
 } from '@/services/projects/outcomes/api';
 import { ProjectOutcomeSchema } from '@/services/projects/outcomes/schema';
 import { getProjectPathname } from '@/services/projects/core';
-import { fetcher } from '@/utils/http';
+import { fetcher } from '@/shared/lib/http';
 
 export function useProjectOutcomes(projectId?: string | null) {
   return useSWR<ProjectOutcomeSchema[]>(

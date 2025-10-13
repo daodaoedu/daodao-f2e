@@ -1,6 +1,6 @@
 import { ZodError } from 'zod';
 
-import { HttpError, mutations } from '@/utils/http';
+import { HttpError, mutations } from '@/shared/lib/http';
 
 import { sendEmailSchema, SendEmailSchema } from './schema';
 

@@ -1,6 +1,6 @@
 import { mutate } from "swr";
 import { MutationFetcher } from "swr/mutation";
-import { mutations } from "@/utils/http";
+import { mutations } from "@/shared/lib/http";
 import { parseToString } from "@/shared/lib/helper";
 
 import {

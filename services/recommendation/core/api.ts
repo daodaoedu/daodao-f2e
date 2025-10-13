@@ -1,4 +1,4 @@
-import { fetcher } from '@/utils/http';
+import { fetcher } from '@/shared/lib/http';
 import type {
   RecommendationRequestSchema,
   RecommendationResponseSchema,

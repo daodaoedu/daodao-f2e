@@ -11,7 +11,7 @@ import {
 import { toast } from 'sonner';
 import { mutate, SWRConfig } from 'swr';
 
-import { HttpError } from '@/utils/http';
+import { HttpError } from '@/shared/lib/http';
 import { getTokenStorage } from '@/shared/lib/storage';
 import { createUserFormSchema, updateUserFormSchema } from '@/services/users';
 import {

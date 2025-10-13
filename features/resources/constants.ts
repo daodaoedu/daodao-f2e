@@ -1,5 +1,5 @@
 import { OptionProps } from '@/shared/ui/option';
-import { createOptionMap } from '@/utils/option';
+import { createOptionMap } from '@/shared/lib/option';
 
 interface OptionWithDescriptionProps extends OptionProps {
   description: string;

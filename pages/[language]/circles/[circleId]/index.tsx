@@ -34,7 +34,7 @@ import {
 } from "@/shared/ui";
 import { Text, Title } from "@/shared/ui/typography";
 import { EDUCATION, ROLE } from "@/constants/member";
-import { getOptionLabel, getOptionLabels } from "@/utils/option";
+import { getOptionLabel, getOptionLabels } from "@/shared/lib/option";
 import { ALL_AREAS, AREAS, TBD_OPTION } from "@/constants/areas";
 import { ACTIVITY_CATEGORIES, CATEGORIES } from "@/constants/category";
 import { useAuth } from "@/features/auth";

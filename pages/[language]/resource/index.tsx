@@ -11,7 +11,7 @@ import {
   SectionTitle,
   createResourceJsonLd,
 } from "@/features/resources";
-import JsonLdFactory from "@/utils/jsonLd";
+import JsonLdFactory from "@/shared/lib/jsonLd";
 import { HOT_TAGS } from "@/constants/category";
 import { Button } from "@/shared/ui/button";
 import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";

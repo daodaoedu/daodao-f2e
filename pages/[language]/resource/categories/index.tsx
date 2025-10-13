@@ -7,7 +7,7 @@ import {
   ResourceExplorer,
   SectionTitle,
 } from "@/features/resources";
-import JsonLdFactory from "@/utils/jsonLd";
+import JsonLdFactory from "@/shared/lib/jsonLd";
 import {
   Breadcrumb,
   BreadcrumbItem,

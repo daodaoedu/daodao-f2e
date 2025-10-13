@@ -38,7 +38,7 @@ import {
 import { cn } from "@/shared/lib/cn";
 import { Skeleton } from "@/shared/ui/skeleton";
 import dynamic from "next/dynamic";
-import JsonLdFactory from "@/utils/jsonLd";
+import JsonLdFactory from "@/shared/lib/jsonLd";
 
 const MarkdownEditor = dynamic(
   () => import("@/shared/ui/markdown-editor").then(mod => ({ default: mod.MarkdownEditor })),
@@ -48,7 +48,7 @@ const MarkdownEditor = dynamic(
   }
 );
 import useQueryState from "@/shared/lib/use-query-state";
-import { getOptionLabel } from "@/utils/option";
+import { getOptionLabel } from "@/shared/lib/option";
 import { Speech } from "@/shared/ui/speech";
 
 function Banner() {

@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import { Button, type ButtonProps } from '@/shared/ui/button';
 
-import { GACategory, logEvent } from '@/utils/analytics';
+import { GACategory, logEvent } from '@/shared/lib/analytics';
 import { useAuth, useAuthDispatch } from '../lib/auth';
 import { Callbacks } from '../model/auth.type';
 

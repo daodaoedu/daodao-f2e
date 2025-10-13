@@ -1,7 +1,7 @@
 'use client';
 
 import getEnv from '@/shared/config/env';
-import { GACategory, logEvent } from '@/utils/analytics';
+import { GACategory, logEvent } from '@/shared/lib/analytics';
 
 interface ShareAPIProps {
   url: string;

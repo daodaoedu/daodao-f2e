@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import useSWRMutation, { SWRMutationConfiguration } from 'swr/mutation';
 
-import { PaginationResponseType } from '@/utils/http';
+import { PaginationResponseType } from '@/shared/lib/http';
 import {
   getUserPathname,
   refetchUsers,

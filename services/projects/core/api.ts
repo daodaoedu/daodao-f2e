@@ -1,6 +1,6 @@
 import { MutationFetcher } from "swr/mutation";
 import { parseToString } from "@/shared/lib/helper";
-import { mutations, fetcher } from "@/utils/http";
+import { mutations, fetcher } from "@/shared/lib/http";
 
 import {
   ProjectSchema,
