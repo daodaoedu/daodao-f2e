@@ -7,7 +7,7 @@ import type {
   UpdateUserFormSchema,
 } from '@/services/users';
 
-export enum LoginStatus {
+export enum SessionLoginStatus {
   /** 未登入 */
   EMPTY,
   /** 臨時登入 */
@@ -16,45 +16,40 @@ export enum LoginStatus {
   PERMANENT,
 }
 
-export type Callbacks = {
-  successCallback?: () => void;
-  registerCallback?: (callback: () => void) => void;
-};
-
-interface CommonAuthState {
+interface CommonLoginState {
   isComplete: boolean;
   isLoggingIn: boolean;
   isOpenLoginModal: boolean;
   token: string | null;
 }
 
-interface EmptyLoginState extends CommonAuthState {
+interface EmptyLoginState extends CommonLoginState {
   isLoggedIn: false;
   isTemporary: false;
-  loginStatus: LoginStatus.EMPTY;
+  loginStatus: SessionLoginStatus.EMPTY;
   user: null;
 }
 
-interface TemporaryLoginState extends CommonAuthState {
+interface TemporaryLoginState extends CommonLoginState {
   isLoggedIn: false;
   isTemporary: true;
-  loginStatus: LoginStatus.TEMPORARY;
+  loginStatus: SessionLoginStatus.TEMPORARY;
   user: null;
 }
 
-interface PermanentLoginState extends CommonAuthState {
+interface PermanentLoginState extends CommonLoginState {
   isLoggedIn: true;
   isTemporary: false;
-  loginStatus: LoginStatus.PERMANENT;
+  loginStatus: SessionLoginStatus.PERMANENT;
   user: UserValidatorsCreateUserResponseSchemaDataUser;
 }
 
-export type AuthState =
+export type SessionState =
   | EmptyLoginState
   | TemporaryLoginState
   | PermanentLoginState;
 
-export enum ActionTypes {
+export enum SessionActionTypes {
   OPEN_LOGIN_MODAL = 'openLoginModal',
   CLOSE_LOGIN_MODAL = 'closeLoginModal',
   SET_TOKEN = 'setToken',
@@ -64,31 +59,31 @@ export enum ActionTypes {
   LOGOUT = 'logout',
 }
 
-export type Action =
-  | { type: ActionTypes.OPEN_LOGIN_MODAL }
-  | { type: ActionTypes.CLOSE_LOGIN_MODAL }
-  | { type: ActionTypes.SET_TOKEN; payload: string }
-  | { type: ActionTypes.SET_LOADING; payload: boolean }
+export type SessionAction =
+  | { type: SessionActionTypes.OPEN_LOGIN_MODAL }
+  | { type: SessionActionTypes.CLOSE_LOGIN_MODAL }
+  | { type: SessionActionTypes.SET_TOKEN; payload: string }
+  | { type: SessionActionTypes.SET_LOADING; payload: boolean }
   | {
-      type: ActionTypes.UPDATE_USER;
+      type: SessionActionTypes.UPDATE_USER;
       payload: UserValidatorsCreateUserResponseSchemaDataUser;
     }
   | {
-      type: ActionTypes.LOGIN;
+      type: SessionActionTypes.LOGIN;
       payload: UserValidatorsUserSuccessResponseSchemaData | null;
     }
-  | { type: ActionTypes.LOGOUT };
+  | { type: SessionActionTypes.LOGOUT };
 
-export type AuthDispatch = {
-  [ActionTypes.OPEN_LOGIN_MODAL]: (payload?: Callbacks) => void;
-  [ActionTypes.CLOSE_LOGIN_MODAL]: () => void;
-  [ActionTypes.SET_TOKEN]: (payload: string) => void;
-  [ActionTypes.SET_LOADING]: (payload: boolean) => void;
-  [ActionTypes.UPDATE_USER]: (
+export type SessionActions = {
+  [SessionActionTypes.OPEN_LOGIN_MODAL]: () => void;
+  [SessionActionTypes.CLOSE_LOGIN_MODAL]: () => void;
+  [SessionActionTypes.SET_TOKEN]: (payload: string) => void;
+  [SessionActionTypes.SET_LOADING]: (payload: boolean) => void;
+  [SessionActionTypes.UPDATE_USER]: (
     payload: CreateUserFormSchema | UpdateUserFormSchema
   ) => Promise<void>;
-  [ActionTypes.LOGIN]: (
+  [SessionActionTypes.LOGIN]: (
     payload: UserValidatorsUserSuccessResponseSchemaData
   ) => void;
-  [ActionTypes.LOGOUT]: () => void;
+  [SessionActionTypes.LOGOUT]: () => void;
 };

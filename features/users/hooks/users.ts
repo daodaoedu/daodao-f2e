@@ -12,7 +12,7 @@ import {
   userAPI,
   CreateUserResponse,
 } from '@/services/users';
-import { useAuthDispatch } from '@/features/auth';
+import { useSessionActions } from '@/features/auth';
 
 export function useUserList(query: UserQuerySchema, pageSize = 10) {
   const swr = useSWRInfinite<PaginationResponseType<UserSchema>>(
@@ -70,7 +70,7 @@ export const useCreateUser = ({
   onSuccess,
   ...options
 }: SWRMutationConfiguration<CreateUserResponse, Error, string> = {}) => {
-  const { setToken } = useAuthDispatch();
+  const { setToken } = useSessionActions();
   return useSWRMutation(getUserPathname(), userAPI.create, {
     ...options,
     onSuccess: (data, key, config) => {

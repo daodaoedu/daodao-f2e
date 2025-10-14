@@ -7,7 +7,7 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import { MapPin, EllipsisVertical } from 'lucide-react';
 import { Image } from '@/shared/ui/image';
-import { useAuth } from '@/features/auth';
+import { useSession } from '@/features/auth';
 import emptyCoverImg from '@/public/assets/images/empty-cover.png';
 import { timeDuration } from '@/shared/lib/date';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
@@ -35,7 +35,7 @@ function GroupCard({
   userId,
   updatedDate,
 }) {
-  const { user } = useAuth();
+  const { user } = useSession();
 
   const handleGrouping = () => {
     // apiUpdateGrouping.mutate({ isGrouping: !isGrouping });

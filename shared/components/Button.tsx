@@ -1,7 +1,7 @@
 import { forwardRef, useRef } from 'react';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { cn } from '@/shared/lib/cn';
-import { useAuth, useAuthDispatch } from '@/features/auth';
+import { useSession, useSessionActions } from '@/features/auth';
 
 enum ButtonColorEnum {
   Primary = 'primary',
@@ -74,8 +74,8 @@ function Button<AS extends 'button' | 'link' = 'button'>(
   }: ButtonProps<AS>,
   ref: React.Ref<HTMLButtonElement>
 ) {
-  const { isLoggedIn } = useAuth();
-  const { openLoginModal } = useAuthDispatch();
+  const { isLoggedIn } = useSession();
+  const { openLoginModal } = useSessionActions();
   const rippleRef = useRef<HTMLDivElement>(null);
 
   const handleClick = (e: React.MouseEvent<HTMLElement>) => {

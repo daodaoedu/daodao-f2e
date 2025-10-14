@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
-import { useAuth } from '@/features/auth';
+import { useSession } from '@/features/auth';
 import { useUser } from '@/features/users';
 import { parseToString } from '@/shared/lib/helper';
 
@@ -17,7 +17,7 @@ const PartnerDetailPage = () => {
   const { data: partner } = useUser(partnerId);
 
   // fetch login user info
-  const { user } = useAuth();
+  const { user } = useSession();
 
   return (
     <PersonalCard

@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useAssetsLoader } from '@/shared/lib/use-assets-loader';
 import { useScrollLock } from '@/shared/lib/use-scroll-lock';
 import { Progress } from '@/shared/ui/progress';
-import { useAuth } from '@/features/auth';
+import { useSession } from '@/features/auth';
 import { cn } from '@/shared/lib/cn';
 
 export function Loader({ children }: React.PropsWithChildren) {
   const router = useRouter();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useSession();
   const [isLoading, setIsLoading] = useState(true);
   const [lottieIsLoading, setLottieIsLoading] = useState(true);
   const { progress, done } = useAssetsLoader(

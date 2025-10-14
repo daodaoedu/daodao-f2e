@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
-import { useAuth, useAuthDispatch } from '@/features/auth';
+import { useSession, useSessionActions } from '@/features/auth';
 import { getManageSidebarItems } from '@/layout/features/getManageLayout';
 import Collapse from '@/shared/components/Collapse';
 import Button from '@/shared/components/Button';
@@ -59,7 +59,7 @@ function ExploreMenu({ onClose }: OnCloseProps) {
 }
 
 function ProfileMenu({ onClose }: OnCloseProps) {
-  const auth = useAuth();
+  const auth = useSession();
   const pathname = usePathname();
   const role = auth.user?.role;
 
@@ -108,8 +108,8 @@ enum NavType {
 
 function MobileMenu() {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
-  const auth = useAuth();
-  const authDispatch = useAuthDispatch();
+  const auth = useSession();
+  const authDispatch = useSessionActions();
   const [navType, setNavType] = useState<NavType>(NavType.Explore);
   const { height } = usePromotion();
 

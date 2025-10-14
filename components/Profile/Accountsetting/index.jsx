@@ -2,12 +2,12 @@ import { Title, Text } from '@/shared/ui/typography';
 import { Button } from '@/shared/ui/button';
 import { Separator } from '@/shared/ui/separator';
 import { useRouter } from 'next/navigation';
-import { useAuth, useAuthDispatch } from '@/features/auth';
+import { useSession, useSessionActions } from '@/features/auth';
 
 const AccountSetting = () => {
   const router = useRouter();
-  const authDispatch = useAuthDispatch();
-  const { user } = useAuth();
+  const authDispatch = useSessionActions();
+  const { user } = useSession();
 
   const logout = () => {
     authDispatch.logout();

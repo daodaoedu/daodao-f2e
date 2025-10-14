@@ -2,7 +2,7 @@ import { useRouter } from 'next/navigation';
 import { useDialog } from '@/contexts/Dialog';
 import { useCallback } from 'react';
 import { Image } from '@/shared/ui/image';
-import { useAuth } from '@/features/auth';
+import { useSession } from '@/features/auth';
 
 export const useRegisterSuccessDialog = () => {
   const router = useRouter();
@@ -40,7 +40,7 @@ export const useRegisterSuccessDialog = () => {
 
 export const useVerifiedSuccessDialog = () => {
   const router = useRouter();
-  const { isComplete } = useAuth();
+  const { isComplete } = useSession();
   const { openDialog } = useDialog();
 
   return useCallback(() => {

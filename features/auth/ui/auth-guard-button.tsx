@@ -4,21 +4,12 @@ import { useRef } from 'react';
 import { Button, type ButtonProps } from '@/shared/ui/button';
 
 import { GACategory, logEvent } from '@/shared/lib/analytics';
-import { useAuth, useAuthDispatch } from '../../../shared/lib/auth';
-import { Callbacks } from '../../../shared/model/auth.type';
+import { useSession, useSessionActions } from '@/entities/session';
 
-interface AuthButtonProps
-  extends Omit<ButtonProps, 'asChild'>,
-    Pick<Callbacks, 'registerCallback'> {}
-
-export const AuthGuardButton = ({
-  onClick,
-  registerCallback,
-  ...props
-}: AuthButtonProps) => {
+export const AuthGuardButton = ({ onClick, ...props }: ButtonProps) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const { isLoggedIn } = useAuth();
-  const { openLoginModal } = useAuthDispatch();
+  const { isLoggedIn } = useSession();
+  const { openLoginModal } = useSessionActions();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     const buttonText = buttonRef.current?.textContent ?? 'Unknown Button';
@@ -31,28 +22,7 @@ export const AuthGuardButton = ({
         'Auth Button Clicked',
         `Button Text: ${buttonText}`
       );
-      openLoginModal({
-        successCallback: () => {
-          logEvent(
-            GACategory.User,
-            'Login Success',
-            `Button Text: ${buttonText}`
-          );
-          onClick?.(event);
-        },
-        registerCallback: (callback) => {
-          logEvent(
-            GACategory.User,
-            'Register Start',
-            `Button Text: ${buttonText}`
-          );
-          if (registerCallback) {
-            registerCallback(callback);
-          } else {
-            callback();
-          }
-        },
-      });
+      openLoginModal();
     }
   };
 

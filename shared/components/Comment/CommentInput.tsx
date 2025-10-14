@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { LockKeyholeOpen, LockKeyhole } from 'lucide-react';
 import { Image } from '@/shared/ui/image';
 import { ROLE } from '@/constants/member';
-import { useAuth, useAuthDispatch } from '@/features/auth';
+import { useSession, useSessionActions } from '@/features/auth';
 import { cn } from '@/shared/lib/cn';
 import { CommentVisibility } from '@/services/comments';
 import { Button } from '@/shared/ui/button';
@@ -38,8 +38,8 @@ function CommentInput({
   onSubmit,
   onCancel,
 }: CommentInputProps) {
-  const { user } = useAuth();
-  const { openLoginModal } = useAuthDispatch();
+  const { user } = useSession();
+  const { openLoginModal } = useSessionActions();
   const [content, setContent] = useState(defaultContent);
   const [isPublic, setIsPublic] = useState(defaultIsPublic);
   const [isEditing, setIsEditing] = useState(defaultIsEditing);

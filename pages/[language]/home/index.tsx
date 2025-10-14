@@ -1,5 +1,5 @@
 import { Sprout, Lightbulb, Heart, ArrowRight, Sparkles, CheckCircle } from 'lucide-react';
-import { useAuth, useAuthDispatch } from '@/features/auth';
+import { useSession, useSessionActions } from '@/features/auth';
 import SEOConfig from '@/components/SEOConfig';
 import getBaseLayout from '@/layout/core/getBaseLayout';
 
@@ -380,8 +380,8 @@ function LandingPage({ onLogin }: LandingPageProps) {
 // ========================================
 
 function HomePage() {
-  const { isLoggedIn } = useAuth();
-  const { openLoginModal } = useAuthDispatch();
+  const { isLoggedIn } = useSession();
+  const { openLoginModal } = useSessionActions();
 
   if (isLoggedIn) {
     // Redirect logged-in users to explore page

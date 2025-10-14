@@ -8,7 +8,7 @@ import { Toaster as SonnerToaster } from '@/shared/ui/sonner';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';
-import { AuthProvider, LoginModal, useAuth } from '@/features/auth';
+import { SessionProvider, LoginModal, useSession } from '@/features/auth';
 import { DialogProvider } from '@/contexts/Dialog';
 import useQueryState from '@/shared/lib/use-query-state';
 import { fetcher } from '@/shared/lib/http';
@@ -26,7 +26,7 @@ const swrConfig = {
 };
 
 const ThemeComponentWrap = ({ pageProps, Component }) => {
-  const { isComplete, isLoggedIn } = useAuth();
+  const { isComplete, isLoggedIn } = useSession();
   const getLayout = Component?.getLayout || getBaseLayout;
   const openCompleteInfoReminderDialog = useCompleteInfoReminder();
   const openVerifiedSuccessDialog = useVerifiedSuccessDialog();
@@ -142,9 +142,9 @@ const App = ({ Component, pageProps }) => {
 
       <SWRConfig value={swrConfig}>
         <DialogProvider>
-          <AuthProvider>
+          <SessionProvider>
             <ThemeComponentWrap pageProps={pageProps} Component={Component} />
-          </AuthProvider>
+          </SessionProvider>
         </DialogProvider>
       </SWRConfig>
     </>

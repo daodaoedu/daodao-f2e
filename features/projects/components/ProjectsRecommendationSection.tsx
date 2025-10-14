@@ -8,7 +8,7 @@ import {
 } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { useContentTypeRecommendations } from '@/services/recommendation';
-import { useAuth } from '@/features/auth';
+import { useSession } from '@/features/auth';
 import { type RecommendationItem } from '@/services/recommendation/core/schema';
 import { CustomLink } from '@/shared/ui/custom-link';
 
@@ -23,7 +23,7 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
   limit = 5,
   showHeader = true,
 }) => {
-  const { user } = useAuth();
+  const { user } = useSession();
 
   // Use recommendation service to get project-specific recommendations
   const {

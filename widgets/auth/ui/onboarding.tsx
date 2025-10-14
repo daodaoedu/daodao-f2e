@@ -2,12 +2,12 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthDispatch } from '@/features/auth';
+import { useSessionActions } from '@/features/auth';
 import { IslandPlaceholder } from '@/shared/ui/island-placeholder';
 import { parseToString } from '@/shared/lib/helper';
 
 export const AuthOnboarding = () => {
-  const { setToken } = useAuthDispatch();
+  const { setToken } = useSessionActions();
   const router = useRouter();
 
   useEffect(() => {
