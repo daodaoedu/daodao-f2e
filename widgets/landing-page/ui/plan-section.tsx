@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { cn } from '@/shared/lib/cn';
-import { AuthButton } from '@/features/auth';
+import { AuthGuardButton } from '@/features/auth';
 import { ANCHOR_IDS } from '@/shared/constants';
 
 interface PlanSectionProps {
@@ -64,9 +64,9 @@ export function PlanSection({ className }: PlanSectionProps) {
                 </li>
               </ul>
 
-              <AuthButton variant="ctaOrange" size="huge" className="mt-6">
+              <AuthGuardButton variant="ctaOrange" size="huge" className="mt-6">
                 立即免費註冊
-              </AuthButton>
+              </AuthGuardButton>
               <p className="mt-2 text-center text-[13px]">
                 Beta 期間完全免費 • 無需信用卡
               </p>

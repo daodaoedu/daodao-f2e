@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
 import { ResourceDetailResponseSchema } from '@/services/resources/core/schema';
-import { AuthButton } from '@/features/auth';
+import { AuthGuardButton } from '@/features/auth';
 import ResourceReviewCard from './ResourceReviewCard';
 
 interface ResourceReviewListProps {
@@ -26,10 +26,10 @@ export default function ResourceReviewList({
           目前還沒有人留下心得，成為第一個吧！
         </div>
       )}
-      <AuthButton size="lg" onClick={onCreateReview}>
+      <AuthGuardButton size="lg" onClick={onCreateReview}>
         <Plus size={15} />
         分享心得
-      </AuthButton>
+      </AuthGuardButton>
     </div>
   );
 }

@@ -4,14 +4,14 @@ import { useRef } from 'react';
 import { Button, type ButtonProps } from '@/shared/ui/button';
 
 import { GACategory, logEvent } from '@/shared/lib/analytics';
-import { useAuth, useAuthDispatch } from '../lib/auth';
-import { Callbacks } from '../model/auth.type';
+import { useAuth, useAuthDispatch } from '../../../shared/lib/auth';
+import { Callbacks } from '../../../shared/model/auth.type';
 
 interface AuthButtonProps
   extends Omit<ButtonProps, 'asChild'>,
     Pick<Callbacks, 'registerCallback'> {}
 
-export const AuthButton = ({
+export const AuthGuardButton = ({
   onClick,
   registerCallback,
   ...props

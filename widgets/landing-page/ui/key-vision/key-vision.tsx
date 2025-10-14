@@ -1,6 +1,6 @@
 import { Image } from '@/shared/ui/image';
 import { Icon } from '@/shared/ui/icon';
-import { AuthButton } from '@/features/auth';
+import { AuthGuardButton } from '@/features/auth';
 import { LottieHero } from './lottie-hero';
 
 export function KeyVision() {
@@ -50,14 +50,14 @@ export function KeyVision() {
               </div>
             </h2>
 
-            <AuthButton
+            <AuthGuardButton
               variant="ctaOrange"
               size="huge"
               className="relative z-20 mt-8"
             >
               立即加入
               <Icon name="arrow-right" className="ml-2" />
-            </AuthButton>
+            </AuthGuardButton>
           </div>
 
           <div className="col-span-12 flex justify-center md:col-span-8 md:justify-start md:pr-2 lg:col-span-7 lg:pr-24">

@@ -1,5 +1,5 @@
 import { cn } from '@/shared/lib/cn';
-import { AuthButton } from '@/features/auth';
+import { AuthGuardButton } from '@/features/auth';
 import Image from 'next/image';
 
 interface CTASectionProps {
@@ -28,9 +28,9 @@ export function CallToActionSection({ className }: CTASectionProps) {
         你喜歡的學習生活了嗎？
       </h2>
       <div className="relative z-10">
-        <AuthButton variant="ctaOrange" size="huge">
+        <AuthGuardButton variant="ctaOrange" size="huge">
           立即加入
-        </AuthButton>
+        </AuthGuardButton>
       </div>
     </section>
   );

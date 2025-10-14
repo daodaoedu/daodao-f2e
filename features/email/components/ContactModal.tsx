@@ -22,7 +22,7 @@ import {
   ResponsiveModalSize,
 } from '@/shared/ui/responsive-modal';
 import ChatSvg from '@/public/assets/icons/chat.svg';
-import { AuthButton, useAuth } from '@/features/auth';
+import { AuthGuardButton, useAuth } from '@/features/auth';
 import { Textarea } from '@/shared/ui/textarea';
 import { ROLE } from '@/constants/member';
 import { contactFormSchema, ContactFormSchema } from '@/services/emails';
@@ -120,10 +120,10 @@ export const ContactModal = ({
 
   return (
     <>
-      <AuthButton size="lg" onClick={() => setIsOpen(true)}>
+      <AuthGuardButton size="lg" onClick={() => setIsOpen(true)}>
         <ChatSvg />
         {modalTitle}
-      </AuthButton>
+      </AuthGuardButton>
       <ResponsiveModal
         open={isOpen}
         onClose={handleClose}
