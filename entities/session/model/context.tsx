@@ -7,7 +7,7 @@ import {
   useMemo,
   useReducer,
 } from 'react';
-import { mutate, SWRConfig } from 'swr';
+import { mutate } from 'swr';
 import { getTokenStorage } from '@/shared/lib/storage';
 import { createUserFormSchema, updateUserFormSchema } from '@/services/users';
 import {
@@ -16,6 +16,7 @@ import {
   useGetApiV1UsersMe,
 } from '@/generated/endpoints/users';
 import { ApiError } from '@/services/fetcher';
+import { onUnauthorized } from '@/shared/lib/auth-bus';
 import {
   SessionState,
   SessionActions,
@@ -139,12 +140,15 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
     }
   }, [state.isLoggingIn, sessionActions, isLoading]);
 
+  useEffect(() => {
+    const off = onUnauthorized(() => sessionActions.logout());
+    return off;
+  }, [sessionActions]);
+
   return (
     <SessionContext.Provider value={state}>
       <SessionActionsContext.Provider value={sessionActions}>
-        <SWRConfig value={(props) => ({ ...props, onError: handleError })}>
-          {children}
-        </SWRConfig>
+        {children}
       </SessionActionsContext.Provider>
     </SessionContext.Provider>
   );
