@@ -73,7 +73,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
 
   const cardContent = (
     <Card
-      className="group relative mx-auto w-full max-w-xs cursor-pointer overflow-hidden rounded-2xl border border-basic-200 bg-basic-white shadow-sm transition-all duration-300 hover:shadow-lg sm:max-w-sm md:max-w-md lg:max-w-3xl"
+      className="group relative w-full max-w-xs cursor-pointer overflow-hidden rounded-2xl border border-basic-200 bg-basic-white shadow-sm transition-all duration-300 hover:shadow-lg sm:max-w-sm md:max-w-md lg:max-w-3xl"
     >
       <CardContent className="p-3 sm:p-4 md:p-6">
         <div className="mb-4 flex items-start justify-between">
@@ -268,7 +268,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
   );
 
   return (
-    <CustomLink href={`/practice/${practice.id}`} className="block">
+    <CustomLink href={`/practice/${practice.id}`} className="block max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto">
       {cardContent}
     </CustomLink>
   );

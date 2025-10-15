@@ -23,17 +23,26 @@ function IdeaCard({
   onClick,
 }: IdeaCardProps) {
   const handleCardClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     if (onClick) {
-      e.preventDefault();
       onClick(idea.id);
     }
   };
 
   const cardContent = (
     <Card
-      className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-basic-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-basic-200 relative cursor-pointer"
+      className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl bg-basic-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-basic-200 relative cursor-pointer"
+      onClick={onClick ? handleCardClick : undefined}
+      onKeyDown={onClick ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCardClick(e as unknown as React.MouseEvent);
+        }
+      } : undefined}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
     >
-      <CardContent className="p-3 sm:p-4 md:p-6">
+      <CardContent className="p-2 sm:p-3 md:p-4">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center">
             <Avatar className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3">
@@ -130,25 +139,11 @@ function IdeaCard({
   );
 
   if (onClick) {
-    return (
-      <div
-        onClick={handleCardClick}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleCardClick(e as unknown as React.MouseEvent);
-          }
-        }}
-        role="button"
-        tabIndex={0}
-      >
-        {cardContent}
-      </div>
-    );
+    return cardContent;
   }
 
   return (
-    <CustomLink href={`/ideas/${idea.id}`} className="block">
+    <CustomLink href={`/ideas/${idea.id}`} className="block max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto">
       {cardContent}
     </CustomLink>
   );
