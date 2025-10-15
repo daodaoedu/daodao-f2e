@@ -8,11 +8,9 @@ import { PromotionProvider } from '@/contexts/Promotion';
 import { NavigationBlockerProvider } from '@/shared/lib/navigation-blocker';
 import { emitUnauthorized } from '@/shared/lib/auth-bus';
 import { ApiError } from '@/services/fetcher';
-import {
-  TranslationProvider,
-  TranslationProviderProps,
-} from '@/shared/lib/translation';
+import { TranslationProvider } from '@/shared/lib/translation';
 import { Toaster } from '@/shared/ui/sonner';
+import { getDictionary } from '@/shared/config/i18n';
 
 const swrConfig = {
   revalidateOnFocus: false,
@@ -25,9 +23,14 @@ const swrConfig = {
   },
 };
 
-type ProvidersProps = TranslationProviderProps;
+interface ProvidersProps {
+  children: React.ReactNode;
+  locale: string;
+}
 
-function Providers({ children, dictionary }: ProvidersProps) {
+function Providers({ children, locale }: ProvidersProps) {
+  const dictionary = getDictionary(locale);
+
   return (
     <TranslationProvider dictionary={dictionary}>
       <SWRConfig value={swrConfig}>
