@@ -149,7 +149,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
 
     const cardContent = (
       <Card
-        className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-basic-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-basic-200 group relative cursor-pointer"
+        className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl bg-basic-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-basic-200 group relative cursor-pointer"
       >
         <CardContent className="p-3 sm:p-4 md:p-6">
           {/* Header Section - User Info & Actions */}
@@ -277,7 +277,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
     );
 
     return (
-      <CustomLink href={`/projects/detail?id=${project.id}`} className="block">
+      <CustomLink href={`/projects/detail?id=${project.id}`} className="block max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto">
         {cardContent}
       </CustomLink>
     );
