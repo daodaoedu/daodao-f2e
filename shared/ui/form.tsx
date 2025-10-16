@@ -28,7 +28,7 @@ const FormItemContext = React.createContext<FormItemContextValue>(
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
   name: TName;
 };
@@ -39,14 +39,14 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
 
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
-    ...props
-  }: ControllerProps<TFieldValues, TName>) => (
-    <FormFieldContext.Provider value={{ name: props.name }}>
-      <Controller {...props} />
-    </FormFieldContext.Provider>
-  );
+  ...props
+}: ControllerProps<TFieldValues, TName>) => (
+  <FormFieldContext.Provider value={{ name: props.name }}>
+    <Controller {...props} />
+  </FormFieldContext.Provider>
+);
 
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
@@ -93,16 +93,14 @@ interface FormLabelProps
 const FormLabel = React.forwardRef<
   React.ComponentRef<typeof LabelPrimitive.Root>,
   FormLabelProps
->(({
-  className, required, children, ...props
-}, ref) => {
+>(({ className, required, children, ...props }, ref) => {
   const { error, formItemId } = useFormField();
 
   return (
     <Label
       ref={ref}
       className={cn(
-        'block mb-3 body-lg font-bold text-basic-500 whitespace-nowrap',
+        'body-lg mb-3 block whitespace-nowrap font-bold text-basic-400',
         error && 'text-destructive',
         className
       )}
@@ -121,9 +119,8 @@ const FormControl = React.forwardRef<
   React.ComponentRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
-  const {
-    error, formItemId, formDescriptionId, formMessageId,
-  } = useFormField();
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
 
   return (
     <Slot
@@ -151,7 +148,7 @@ const FormDescription = React.forwardRef<
     <p
       ref={ref}
       id={formDescriptionId}
-      className={cn('block mb-3 body-lg text-basic-500', className)}
+      className={cn('body-lg mb-3 block text-basic-500', className)}
       {...props}
     />
   );
@@ -173,7 +170,11 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn('text-[0.8rem] font-medium text-destructive', className)}
+      className={cn(
+        'text-[0.8rem] font-medium text-basic-300',
+        error && 'text-destructive',
+        className
+      )}
       {...props}
     >
       {body}
@@ -184,7 +185,7 @@ FormMessage.displayName = 'FormMessage';
 
 interface ParseSchemaAutoFocusProps<
   T extends FieldValues,
-  S extends ZodSchema
+  S extends ZodSchema,
 > {
   form: UseFormReturn<T>;
   schema: S;
