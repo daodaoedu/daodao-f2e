@@ -7,18 +7,19 @@ export async function GET(request: NextRequest) {
   const { searchParams } = nextUrl;
   const token = searchParams.get('token');
   const originURL = cookies.get('origin')?.value;
+  const { isProduction } = getEnv();
   const rt = cookies.get('rt')?.value;
-  const { isStaging, stagingURL, prodURL } = getEnv();
-  const redirectUrl = `/onboarding?token=${token}&rt=${rt}`;
+  const redirectSearchParams = new URLSearchParams();
 
   cookies.delete('origin');
   cookies.delete('rt');
 
-  if (isStaging) {
-    return originURL && isValidOrigin(originURL)
-      ? NextResponse.redirect(`${originURL}${redirectUrl}`)
-      : NextResponse.redirect(`${stagingURL}${redirectUrl}`);
-  }
+  if (token) redirectSearchParams.set('token', token);
+  if (rt) redirectSearchParams.set('rt', rt);
 
-  return NextResponse.redirect(`${prodURL}${redirectUrl}`);
+  const redirectTo = `/auth/success?${redirectSearchParams}`;
+
+  return !isProduction && originURL && isValidOrigin(originURL)
+    ? NextResponse.redirect(`${originURL}${redirectTo}`)
+    : NextResponse.redirect(redirectTo);
 }

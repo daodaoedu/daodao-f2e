@@ -18,8 +18,8 @@ export function LoginModal() {
     const env = getEnv();
 
     const url = env.isProduction
-      ? `${env.prodURL}/auth/google?rt=${pathname}`
-      : `${env.stagingURL}/auth/google?origin=${window.location.origin}&rt=${pathname}`;
+      ? `/api/auth/google?rt=${pathname}`
+      : `${env.stagingURL}/api/auth/google?origin=${window.location.origin}&rt=${pathname}`;
 
     router.push(url);
   };
