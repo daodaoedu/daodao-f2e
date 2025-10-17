@@ -91,6 +91,9 @@ components:
               type: object
               additionalProperties: true
               nullable: true
+          required:
+            - code
+            - message
         timestamp:
           type: string
         meta:
@@ -124,6 +127,11 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - error
+        - timestamp
     api-response.validators_paginationInfoSchema:
       type: object
       properties:
@@ -139,6 +147,13 @@ components:
           type: boolean
         hasPrev:
           type: boolean
+      required:
+        - currentPage
+        - totalPages
+        - totalItems
+        - itemsPerPage
+        - hasNext
+        - hasPrev
     api-response.validators_cursorPaginationInfoSchema:
       type: object
       properties:
@@ -173,6 +188,13 @@ components:
         parentTotalEstimate:
           type: number
           nullable: true
+      required:
+        - cursors
+        - hasMore
+        - count
+        - limit
+        - hasNext
+        - hasPrev
     api-response.validators_apiSuccessResponseExample:
       type: object
       properties:
@@ -240,6 +262,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     api-response.validators_paginatedApiResponseExample:
       type: object
       properties:
@@ -291,6 +317,13 @@ components:
               type: boolean
             hasPrev:
               type: boolean
+          required:
+            - currentPage
+            - totalPages
+            - totalItems
+            - itemsPerPage
+            - hasNext
+            - hasPrev
         timestamp:
           type: string
         meta:
@@ -324,6 +357,11 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - pagination
+        - timestamp
     api-response.validators_cursorPaginatedApiResponseExample:
       type: object
       properties:
@@ -394,6 +432,13 @@ components:
             parentTotalEstimate:
               type: number
               nullable: true
+          required:
+            - cursors
+            - hasMore
+            - count
+            - limit
+            - hasNext
+            - hasPrev
         timestamp:
           type: string
         meta:
@@ -427,6 +472,11 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - pagination
+        - timestamp
     api-response.validators_authUserDataSchema:
       type: object
       properties:
@@ -480,6 +530,9 @@ components:
         updatedDate:
           type: string
           nullable: true
+      required:
+        - id
+        - _id
     api-response.validators_authLoginResponseExample:
       type: object
       properties:
@@ -543,8 +596,14 @@ components:
                 updatedDate:
                   type: string
                   nullable: true
+              required:
+                - id
+                - _id
             token:
               type: string
+          required:
+            - user
+            - token
         timestamp:
           type: string
         meta:
@@ -578,6 +637,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     api-response.validators_authUserUpdateResponseExample:
       type: object
       properties:
@@ -641,6 +704,11 @@ components:
                 updatedDate:
                   type: string
                   nullable: true
+              required:
+                - id
+                - _id
+          required:
+            - user
         timestamp:
           type: string
         meta:
@@ -674,6 +742,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     auth.validators_loginValidator:
       type: object
       properties:
@@ -685,6 +757,10 @@ components:
           type: boolean
           nullable: true
           default: false
+      required:
+        - email
+        - password
+        - rememberMe
     auth.validators_registerValidator:
       type: object
       properties:
@@ -699,11 +775,18 @@ components:
         name:
           type: string
           nullable: true
+      required:
+        - username
+        - email
+        - password
+        - confirmPassword
     auth.validators_forgotPasswordValidator:
       type: object
       properties:
         email:
           type: string
+      required:
+        - email
     auth.validators_resetPasswordValidator:
       type: object
       properties:
@@ -713,6 +796,10 @@ components:
           type: string
         confirmPassword:
           type: string
+      required:
+        - token
+        - newPassword
+        - confirmPassword
     auth.validators_verifyEmailValidator:
       type: object
       properties:
@@ -720,6 +807,9 @@ components:
           type: string
         email:
           type: string
+      required:
+        - token
+        - email
     auth.validators_changePasswordValidator:
       type: object
       properties:
@@ -729,6 +819,10 @@ components:
           type: string
         confirmPassword:
           type: string
+      required:
+        - currentPassword
+        - newPassword
+        - confirmPassword
     auth.validators_updateProfileValidator:
       type: object
       properties:
@@ -749,11 +843,15 @@ components:
       properties:
         token:
           type: string
+      required:
+        - token
     auth.validators_revokeAllSessionsValidator:
       type: object
       properties:
         password:
           type: string
+      required:
+        - password
     auth.validators_oauthStateValidator:
       type: object
       properties:
@@ -796,11 +894,19 @@ components:
                 roleId:
                   type: number
                   nullable: true
+              required:
+                - id
+                - _id
+                - name
+                - email
             token:
               type: string
             refreshToken:
               type: string
               nullable: true
+          required:
+            - user
+            - token
         timestamp:
           type: string
         meta:
@@ -834,6 +940,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     auth.validators_logoutResponseSchema:
       type: object
       properties:
@@ -846,6 +956,8 @@ components:
           properties:
             message:
               type: string
+          required:
+            - message
         timestamp:
           type: string
         meta:
@@ -879,6 +991,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     auth.validators_refreshTokenResponseSchema:
       type: object
       properties:
@@ -894,6 +1010,8 @@ components:
             refreshToken:
               type: string
               nullable: true
+          required:
+            - token
         timestamp:
           type: string
         meta:
@@ -927,6 +1045,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     auth.validators_getCurrentUserResponseSchema:
       type: object
       properties:
@@ -969,8 +1091,17 @@ components:
                   type: array
                   items:
                     type: string
+              required:
+                - id
+                - is_active
+                - email_verified
+                - roles
+                - permissions
             isTemporary:
               type: boolean
+          required:
+            - user
+            - isTemporary
         timestamp:
           type: string
         meta:
@@ -1004,6 +1135,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     auth.validators_verifyEmailResponseSchema:
       type: object
       properties:
@@ -1016,6 +1151,8 @@ components:
           properties:
             message:
               type: string
+          required:
+            - message
         timestamp:
           type: string
         meta:
@@ -1049,6 +1186,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     comment.validators_createCommentSchema:
       type: object
       properties:
@@ -1077,6 +1218,11 @@ components:
         parentId:
           type: number
           nullable: true
+      required:
+        - targetType
+        - targetId
+        - content
+        - visibility
     comment.validators_updateCommentSchema:
       type: object
       properties:
@@ -1092,7 +1238,7 @@ components:
     comment.validators_getCommentsQuerySchema:
       type: object
       properties:
-        targetType:
+        targetType: &ref_35
           type: string
           enum:
             - post
@@ -1103,13 +1249,18 @@ components:
             - circle
             - idea
             - portfolio
-        targetId:
+        targetId: &ref_36
           type: string
+      required:
+        - targetType
+        - targetId
     comment.validators_commentParamsSchema:
       type: object
       properties:
         commentId:
           type: number
+      required:
+        - commentId
     comment.validators_bulkCommentOperationSchema:
       type: object
       properties:
@@ -1128,6 +1279,9 @@ components:
             - public
             - private
           nullable: true
+      required:
+        - commentIds
+        - operation
     comment.validators_commentFilterSchema:
       type: object
       properties:
@@ -1191,6 +1345,10 @@ components:
             - desc
           nullable: true
           default: desc
+      required:
+        - limit
+        - sort
+        - order
     comment.validators_commentUserSchema:
       type: object
       properties:
@@ -1205,6 +1363,10 @@ components:
         photoURL:
           type: string
           nullable: true
+      required:
+        - id
+        - name
+        - roleList
     comment.validators_commentResponseSchema:
       type: object
       additionalProperties: true
@@ -1213,6 +1375,8 @@ components:
       properties:
         message:
           type: string
+      required:
+        - message
     comment.validators_createCommentApiResponseSchema:
       type: object
       properties:
@@ -1256,6 +1420,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     comment.validators_getCommentsApiResponseSchema:
       type: object
       properties:
@@ -1301,6 +1469,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     comment.validators_getCommentDetailApiResponseSchema:
       type: object
       properties:
@@ -1344,6 +1516,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     comment.validators_updateCommentApiResponseSchema:
       type: object
       properties:
@@ -1387,6 +1563,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     comment.validators_deleteCommentApiResponseSchema:
       type: object
       properties:
@@ -1399,6 +1579,8 @@ components:
           properties:
             message:
               type: string
+          required:
+            - message
         timestamp:
           type: string
         meta:
@@ -1432,6 +1614,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     email.validators_contactEmailSchema:
       type: object
       properties:
@@ -1458,6 +1644,12 @@ components:
         activityTitle:
           type: string
           nullable: true
+      required:
+        - from
+        - to
+        - subject
+        - text
+        - name
     email.validators_verificationEmailSchema:
       type: object
       properties:
@@ -1468,6 +1660,9 @@ components:
         name:
           type: string
           nullable: true
+      required:
+        - email
+        - verifyLink
     email.validators_welcomeEmailSchema:
       type: object
       properties:
@@ -1475,6 +1670,9 @@ components:
           type: string
         name:
           type: string
+      required:
+        - email
+        - name
     email.validators_passwordResetEmailSchema:
       type: object
       properties:
@@ -1485,6 +1683,9 @@ components:
         name:
           type: string
           nullable: true
+      required:
+        - email
+        - resetLink
     email.validators_marathonEmailSchema:
       type: object
       properties:
@@ -1500,6 +1701,10 @@ components:
         marathonDescription:
           type: string
           nullable: true
+      required:
+        - email
+        - name
+        - marathonTitle
     email.validators_customEmailSchema:
       type: object
       properties:
@@ -1528,6 +1733,9 @@ components:
           type: object
           additionalProperties: true
           nullable: true
+      required:
+        - to
+        - subject
     email.validators_bulkEmailSchema:
       type: object
       properties:
@@ -1552,17 +1760,26 @@ components:
               data:
                 type: object
                 additionalProperties: true
+            required:
+              - email
+              - data
         from:
           type: string
           nullable: true
         scheduledAt:
           type: string
           nullable: true
+      required:
+        - template
+        - subject
+        - recipients
     email.validators_validateEmailSchema:
       type: object
       properties:
         email:
           type: string
+      required:
+        - email
     email.validators_previewEmailSchema:
       type: object
       properties:
@@ -1578,6 +1795,9 @@ components:
         data:
           type: object
           additionalProperties: true
+      required:
+        - template
+        - data
     email.validators_emailStatsQuerySchema:
       type: object
       properties:
@@ -1603,6 +1823,9 @@ components:
         description:
           type: string
           nullable: true
+      required:
+        - name
+        - url
     idea.validators_createIdeaSchema:
       type: object
       properties:
@@ -1625,7 +1848,13 @@ components:
               description:
                 type: string
                 nullable: true
+            required:
+              - name
+              - url
           nullable: true
+      required:
+        - content
+        - tags
     idea.validators_updateIdeaSchema:
       type: object
       properties:
@@ -1649,6 +1878,9 @@ components:
               description:
                 type: string
                 nullable: true
+            required:
+              - name
+              - url
           nullable: true
         status:
           type: string
@@ -1657,22 +1889,22 @@ components:
     idea.validators_ideaQuerySchema:
       type: object
       properties:
-        page:
+        page: &ref_37
           type: number
           default: 1
-        limit:
+        limit: &ref_38
           type: number
           default: 20
-        query:
+        query: &ref_39
           type: string
           nullable: true
-        tags:
+        tags: &ref_40
           type: string
           nullable: true
-        userId:
+        userId: &ref_41
           type: string
           nullable: true
-        status:
+        status: &ref_42
           type: string
           enum:
             - active
@@ -1680,19 +1912,24 @@ components:
             - archived
             - all
           nullable: true
-        sort:
+        sort: &ref_43
           type: string
           enum:
             - createdAt
             - updatedAt
             - likeCount
           default: createdAt
-        order:
+        order: &ref_44
           type: string
           enum:
             - asc
             - desc
           default: desc
+      required:
+        - page
+        - limit
+        - sort
+        - order
     idea.validators_eventViewSchema:
       type: object
       properties:
@@ -1705,6 +1942,9 @@ components:
         duration:
           type: number
           nullable: true
+      required:
+        - entityType
+        - entityId
     idea.validators_eventClickSchema:
       type: object
       properties:
@@ -1717,6 +1957,9 @@ components:
         clickPosition:
           type: string
           nullable: true
+      required:
+        - entityType
+        - entityId
     idea.validators_eventShareSchema:
       type: object
       properties:
@@ -1728,6 +1971,10 @@ components:
           type: string
         shareChannel:
           type: string
+      required:
+        - entityType
+        - entityId
+        - shareChannel
     idea.validators_eventFavoriteSchema:
       type: object
       properties:
@@ -1737,11 +1984,16 @@ components:
             - idea
         entityId:
           type: string
+      required:
+        - entityType
+        - entityId
     idea.validators_ideaParamsSchema:
       type: object
       properties:
         id:
           type: string
+      required:
+        - id
     idea.validators_ideaDataSchema:
       type: object
       properties:
@@ -1765,6 +2017,9 @@ components:
               description:
                 type: string
                 nullable: true
+            required:
+              - name
+              - url
           nullable: true
         status:
           type: string
@@ -1800,6 +2055,10 @@ components:
             selfIntroduction:
               type: string
               nullable: true
+          required:
+            - id
+            - _id
+            - name
         hasResources:
           type: boolean
         resourceCount:
@@ -1826,6 +2085,20 @@ components:
           type: string
         updatedAt:
           type: string
+      required:
+        - id
+        - content
+        - tags
+        - status
+        - user
+        - hasResources
+        - resourceCount
+        - likeCount
+        - commentCount
+        - viewCount
+        - shareCount
+        - createdAt
+        - updatedAt
     idea.validators_ideaSuccessResponseSchema:
       type: object
       properties:
@@ -1856,6 +2129,9 @@ components:
                   description:
                     type: string
                     nullable: true
+                required:
+                  - name
+                  - url
               nullable: true
             status:
               type: string
@@ -1888,6 +2164,10 @@ components:
                 selfIntroduction:
                   type: string
                   nullable: true
+              required:
+                - id
+                - _id
+                - name
             hasResources:
               type: boolean
             resourceCount:
@@ -1914,6 +2194,20 @@ components:
               type: string
             updatedAt:
               type: string
+          required:
+            - id
+            - content
+            - tags
+            - status
+            - user
+            - hasResources
+            - resourceCount
+            - likeCount
+            - commentCount
+            - viewCount
+            - shareCount
+            - createdAt
+            - updatedAt
         timestamp:
           type: string
         meta:
@@ -1947,6 +2241,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     idea.validators_ideasListResponseSchema:
       type: object
       properties:
@@ -1979,6 +2277,9 @@ components:
                     description:
                       type: string
                       nullable: true
+                  required:
+                    - name
+                    - url
                 nullable: true
               status:
                 type: string
@@ -2011,6 +2312,10 @@ components:
                   selfIntroduction:
                     type: string
                     nullable: true
+                required:
+                  - id
+                  - _id
+                  - name
               hasResources:
                 type: boolean
               resourceCount:
@@ -2037,6 +2342,20 @@ components:
                 type: string
               updatedAt:
                 type: string
+            required:
+              - id
+              - content
+              - tags
+              - status
+              - user
+              - hasResources
+              - resourceCount
+              - likeCount
+              - commentCount
+              - viewCount
+              - shareCount
+              - createdAt
+              - updatedAt
         pagination:
           type: object
           properties:
@@ -2052,6 +2371,13 @@ components:
               type: boolean
             hasPrev:
               type: boolean
+          required:
+            - currentPage
+            - totalPages
+            - totalItems
+            - itemsPerPage
+            - hasNext
+            - hasPrev
         timestamp:
           type: string
         meta:
@@ -2085,6 +2411,11 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - pagination
+        - timestamp
     idea.validators_createIdeaResponseSchema:
       type: object
       properties:
@@ -2115,6 +2446,9 @@ components:
                   description:
                     type: string
                     nullable: true
+                required:
+                  - name
+                  - url
               nullable: true
             status:
               type: string
@@ -2147,6 +2481,10 @@ components:
                 selfIntroduction:
                   type: string
                   nullable: true
+              required:
+                - id
+                - _id
+                - name
             hasResources:
               type: boolean
             resourceCount:
@@ -2173,6 +2511,20 @@ components:
               type: string
             updatedAt:
               type: string
+          required:
+            - id
+            - content
+            - tags
+            - status
+            - user
+            - hasResources
+            - resourceCount
+            - likeCount
+            - commentCount
+            - viewCount
+            - shareCount
+            - createdAt
+            - updatedAt
         timestamp:
           type: string
         meta:
@@ -2206,6 +2558,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     idea.validators_updateIdeaResponseSchema:
       type: object
       properties:
@@ -2236,6 +2592,9 @@ components:
                   description:
                     type: string
                     nullable: true
+                required:
+                  - name
+                  - url
               nullable: true
             status:
               type: string
@@ -2268,6 +2627,10 @@ components:
                 selfIntroduction:
                   type: string
                   nullable: true
+              required:
+                - id
+                - _id
+                - name
             hasResources:
               type: boolean
             resourceCount:
@@ -2294,6 +2657,20 @@ components:
               type: string
             updatedAt:
               type: string
+          required:
+            - id
+            - content
+            - tags
+            - status
+            - user
+            - hasResources
+            - resourceCount
+            - likeCount
+            - commentCount
+            - viewCount
+            - shareCount
+            - createdAt
+            - updatedAt
         timestamp:
           type: string
         meta:
@@ -2327,6 +2704,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     idea.validators_deleteIdeaResponseSchema:
       type: object
       properties:
@@ -2339,6 +2720,8 @@ components:
           properties:
             message:
               type: string
+          required:
+            - message
         timestamp:
           type: string
         meta:
@@ -2372,6 +2755,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     image.validators_fileSchema:
       type: object
       properties:
@@ -2384,6 +2771,11 @@ components:
         buffer:
           type: object
           additionalProperties: true
+      required:
+        - mimetype
+        - size
+        - originalname
+        - buffer
     image.validators_filesSchema:
       type: array
       items:
@@ -2398,6 +2790,11 @@ components:
           buffer:
             type: object
             additionalProperties: true
+        required:
+          - mimetype
+          - size
+          - originalname
+          - buffer
     image.validators_filenameParamSchema:
       type: string
     image.validators_uploadRequestSchema:
@@ -2415,6 +2812,11 @@ components:
             buffer:
               type: object
               additionalProperties: true
+          required:
+            - mimetype
+            - size
+            - originalname
+            - buffer
           nullable: true
         files:
           type: array
@@ -2430,6 +2832,11 @@ components:
               buffer:
                 type: object
                 additionalProperties: true
+            required:
+              - mimetype
+              - size
+              - originalname
+              - buffer
           nullable: true
     image.validators_enhancedFileSchema:
       type: object
@@ -2443,6 +2850,11 @@ components:
         buffer:
           type: object
           additionalProperties: true
+      required:
+        - mimetype
+        - size
+        - originalname
+        - buffer
     image.validators_enhancedFilesSchema:
       type: array
       items:
@@ -2457,16 +2869,21 @@ components:
           buffer:
             type: object
             additionalProperties: true
+        required:
+          - mimetype
+          - size
+          - originalname
+          - buffer
     me.validators_practiceQuerySchema:
       type: object
       properties:
-        page:
+        page: &ref_45
           type: number
           default: 1
-        limit:
+        limit: &ref_46
           type: number
           default: 20
-        status:
+        status: &ref_47
           type: string
           enum:
             - active
@@ -2474,7 +2891,7 @@ components:
             - completed
             - archived
           nullable: true
-        contentType:
+        contentType: &ref_48
           type: string
           enum:
             - book
@@ -2484,10 +2901,10 @@ components:
             - course
             - custom
           nullable: true
-        search:
+        search: &ref_49
           type: string
           nullable: true
-        sortBy:
+        sortBy: &ref_50
           type: string
           enum:
             - createdAt
@@ -2495,22 +2912,27 @@ components:
             - title
             - progress
           default: createdAt
-        sortOrder:
+        sortOrder: &ref_51
           type: string
           enum:
             - asc
             - desc
           default: desc
-        dateFrom:
+        dateFrom: &ref_52
           type: string
           nullable: true
-        dateTo:
+        dateTo: &ref_53
           type: string
           nullable: true
+      required:
+        - page
+        - limit
+        - sortBy
+        - sortOrder
     me.validators_practiceStatsQuerySchema:
       type: object
       properties:
-        timeRange:
+        timeRange: &ref_54
           type: string
           enum:
             - 7d
@@ -2519,22 +2941,25 @@ components:
             - 1y
             - all
           default: 30d
-        includeArchived:
+        includeArchived: &ref_55
           type: boolean
           default: false
+      required:
+        - timeRange
+        - includeArchived
     me.validators_resourcesQuerySchema:
       type: object
       properties:
-        page:
+        page: &ref_56
           type: number
           default: 1
-        limit:
+        limit: &ref_57
           type: number
           default: 20
-        category:
+        category: &ref_58
           type: string
           nullable: true
-        type:
+        type: &ref_59
           type: string
           enum:
             - link
@@ -2542,41 +2967,49 @@ components:
             - note
             - draft
           nullable: true
-        status:
+        status: &ref_60
           type: string
           enum:
             - draft
             - published
             - archived
           default: draft
-        search:
+        search: &ref_61
           type: string
           nullable: true
-        sortBy:
+        sortBy: &ref_62
           type: string
           enum:
             - createdAt
             - updatedAt
             - name
           default: updatedAt
-        sortOrder:
+        sortOrder: &ref_63
           type: string
           enum:
             - asc
             - desc
           default: desc
-        tags:
+        tags: &ref_64
           type: string
           nullable: true
+      required:
+        - page
+        - limit
+        - status
+        - sortBy
+        - sortOrder
     me.validators_preferencesQuerySchema:
       type: object
       properties:
-        category:
+        category: &ref_65
           type: string
           nullable: true
-        includeSystem:
+        includeSystem: &ref_66
           type: boolean
           default: false
+      required:
+        - includeSystem
     me.validators_updatePreferencesSchema:
       type: object
       properties:
@@ -2591,6 +3024,12 @@ components:
                 type: number
               isSelected:
                 type: boolean
+            required:
+              - preferenceTypeId
+              - optionId
+              - isSelected
+      required:
+        - preferences
     me.validators_myPracticeItemSchema:
       type: object
       properties:
@@ -2653,6 +3092,8 @@ components:
             unit:
               type: string
               nullable: true
+          required:
+            - type
         tags:
           type: array
           items:
@@ -2662,6 +3103,19 @@ components:
           nullable: true
         hasResources:
           type: boolean
+      required:
+        - id
+        - title
+        - contentType
+        - totalAmount
+        - currentProgress
+        - status
+        - streak
+        - maxStreak
+        - createdAt
+        - dailyGoal
+        - tags
+        - hasResources
     me.validators_practiceStatsDataSchema:
       type: object
       properties:
@@ -2700,6 +3154,10 @@ components:
                 type: number
               avgProgress:
                 type: number
+            required:
+              - category
+              - count
+              - avgProgress
         recentActivity:
           type: array
           items:
@@ -2711,6 +3169,10 @@ components:
                 type: number
               timeSpent:
                 type: number
+            required:
+              - date
+              - checkInCount
+              - timeSpent
         achievements:
           type: array
           items:
@@ -2728,6 +3190,27 @@ components:
                 type: string
               description:
                 type: string
+            required:
+              - type
+              - milestone
+              - achievedAt
+              - description
+      required:
+        - totalPractices
+        - activePractices
+        - completedPractices
+        - pausedPractices
+        - archivedPractices
+        - totalCheckIns
+        - currentStreak
+        - maxStreak
+        - averageProgress
+        - timeSpentToday
+        - timeSpentThisWeek
+        - timeSpentThisMonth
+        - practicesByCategory
+        - recentActivity
+        - achievements
     me.validators_myResourceItemSchema:
       type: object
       properties:
@@ -2778,6 +3261,14 @@ components:
           type: object
           additionalProperties: true
           nullable: true
+      required:
+        - id
+        - name
+        - type
+        - status
+        - tags
+        - createdAt
+        - visibility
     me.validators_preferenceOptionSchema:
       type: object
       properties:
@@ -2790,6 +3281,10 @@ components:
         description:
           type: string
           nullable: true
+      required:
+        - id
+        - value
+        - name
     me.validators_preferenceTypeSchema:
       type: object
       properties:
@@ -2819,6 +3314,15 @@ components:
               description:
                 type: string
                 nullable: true
+            required:
+              - id
+              - value
+              - name
+      required:
+        - id
+        - name
+        - value
+        - options
     me.validators_userPreferenceSchema:
       type: object
       properties:
@@ -2859,6 +3363,15 @@ components:
                   description:
                     type: string
                     nullable: true
+                required:
+                  - id
+                  - value
+                  - name
+          required:
+            - id
+            - name
+            - value
+            - options
         option:
           type: object
           properties:
@@ -2871,6 +3384,17 @@ components:
             description:
               type: string
               nullable: true
+          required:
+            - id
+            - value
+            - name
+      required:
+        - id
+        - preferenceTypeId
+        - optionId
+        - isSelected
+        - preferenceType
+        - option
     me.validators_myPracticesApiResponseSchema:
       type: object
       properties:
@@ -2930,6 +3454,8 @@ components:
                   unit:
                     type: string
                     nullable: true
+                required:
+                  - type
               tags:
                 type: array
                 items:
@@ -2939,6 +3465,19 @@ components:
                 nullable: true
               hasResources:
                 type: boolean
+            required:
+              - id
+              - title
+              - contentType
+              - totalAmount
+              - currentProgress
+              - status
+              - streak
+              - maxStreak
+              - createdAt
+              - dailyGoal
+              - tags
+              - hasResources
         pagination:
           type: object
           properties:
@@ -2954,6 +3493,13 @@ components:
               type: boolean
             hasPrev:
               type: boolean
+          required:
+            - currentPage
+            - totalPages
+            - totalItems
+            - itemsPerPage
+            - hasNext
+            - hasPrev
         timestamp:
           type: string
         meta:
@@ -2987,6 +3533,11 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - pagination
+        - timestamp
     me.validators_myPracticeStatsApiResponseSchema:
       type: object
       properties:
@@ -3032,6 +3583,10 @@ components:
                     type: number
                   avgProgress:
                     type: number
+                required:
+                  - category
+                  - count
+                  - avgProgress
             recentActivity:
               type: array
               items:
@@ -3043,6 +3598,10 @@ components:
                     type: number
                   timeSpent:
                     type: number
+                required:
+                  - date
+                  - checkInCount
+                  - timeSpent
             achievements:
               type: array
               items:
@@ -3057,6 +3616,27 @@ components:
                     type: string
                   description:
                     type: string
+                required:
+                  - type
+                  - milestone
+                  - achievedAt
+                  - description
+          required:
+            - totalPractices
+            - activePractices
+            - completedPractices
+            - pausedPractices
+            - archivedPractices
+            - totalCheckIns
+            - currentStreak
+            - maxStreak
+            - averageProgress
+            - timeSpentToday
+            - timeSpentThisWeek
+            - timeSpentThisMonth
+            - practicesByCategory
+            - recentActivity
+            - achievements
         timestamp:
           type: string
         meta:
@@ -3090,6 +3670,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     me.validators_myResourcesApiResponseSchema:
       type: object
       properties:
@@ -3140,6 +3724,14 @@ components:
                 type: object
                 additionalProperties: true
                 nullable: true
+            required:
+              - id
+              - name
+              - type
+              - status
+              - tags
+              - createdAt
+              - visibility
         pagination:
           type: object
           properties:
@@ -3155,6 +3747,13 @@ components:
               type: boolean
             hasPrev:
               type: boolean
+          required:
+            - currentPage
+            - totalPages
+            - totalItems
+            - itemsPerPage
+            - hasNext
+            - hasPrev
         stats:
           type: object
           properties:
@@ -3167,12 +3766,23 @@ components:
             byCategory:
               type: object
               additionalProperties: true
+          required:
+            - totalResources
+            - draftCount
+            - publishedCount
+            - byCategory
         timestamp:
           type: string
         meta:
           type: object
           additionalProperties: true
           nullable: true
+      required:
+        - success
+        - data
+        - pagination
+        - stats
+        - timestamp
     me.validators_myPreferencesApiResponseSchema:
       type: object
       properties:
@@ -3225,6 +3835,15 @@ components:
                             description:
                               type: string
                               nullable: true
+                          required:
+                            - id
+                            - value
+                            - name
+                    required:
+                      - id
+                      - name
+                      - value
+                      - options
                   option:
                     type: object
                     properties:
@@ -3237,6 +3856,17 @@ components:
                       description:
                         type: string
                         nullable: true
+                    required:
+                      - id
+                      - value
+                      - name
+                required:
+                  - id
+                  - preferenceTypeId
+                  - optionId
+                  - isSelected
+                  - preferenceType
+                  - option
             categories:
               type: array
               items:
@@ -3271,6 +3901,15 @@ components:
                             description:
                               type: string
                               nullable: true
+                          required:
+                            - id
+                            - value
+                            - name
+                    required:
+                      - id
+                      - name
+                      - value
+                      - options
                   userSelections:
                     type: array
                     items:
@@ -3280,6 +3919,15 @@ components:
                           type: number
                         isSelected:
                           type: boolean
+                      required:
+                        - optionId
+                        - isSelected
+                required:
+                  - type
+                  - userSelections
+          required:
+            - preferences
+            - categories
         stats:
           type: object
           properties:
@@ -3290,12 +3938,20 @@ components:
             lastUpdated:
               type: string
               nullable: true
+          required:
+            - totalPreferences
+            - activeSelections
         timestamp:
           type: string
         meta:
           type: object
           additionalProperties: true
           nullable: true
+      required:
+        - success
+        - data
+        - stats
+        - timestamp
     me.validators_updatePreferencesApiResponseSchema:
       type: object
       properties:
@@ -3312,6 +3968,10 @@ components:
               type: number
             deleted:
               type: number
+          required:
+            - updated
+            - created
+            - deleted
         message:
           type: string
         timestamp:
@@ -3320,6 +3980,11 @@ components:
           type: object
           additionalProperties: true
           nullable: true
+      required:
+        - success
+        - data
+        - message
+        - timestamp
     mentor.validators_assignMentorToMarathonSchema:
       type: object
       properties:
@@ -3327,6 +3992,9 @@ components:
           type: number
         eventId:
           type: string
+      required:
+        - mentorId
+        - eventId
     mentor.validators_updateMentorMarathonSchema:
       type: object
       properties:
@@ -3338,23 +4006,31 @@ components:
       properties:
         participantId:
           type: number
+      required:
+        - participantId
     mentor.validators_assignmentIdParamsSchema:
       type: object
       properties:
         assignmentId:
           type: object
           additionalProperties: true
+      required:
+        - assignmentId
     mentor.validators_participantIdParamsSchema:
       type: object
       properties:
         participantId:
           type: object
           additionalProperties: true
+      required:
+        - participantId
     mentor.validators_eventIdParamsSchema:
       type: object
       properties:
         eventId:
           type: string
+      required:
+        - eventId
     mentor.validators_paginationQuerySchema:
       type: object
       properties:
@@ -3368,6 +4044,9 @@ components:
           additionalProperties: true
           nullable: true
           default: 10
+      required:
+        - page
+        - limit
     mentor.validators_mentorMarathonAssignmentResponseSchema:
       type: object
       properties:
@@ -3381,6 +4060,12 @@ components:
           type: string
         assignedAt:
           type: string
+      required:
+        - id
+        - mentorId
+        - marathonId
+        - eventId
+        - assignedAt
     mentor.validators_mentorParticipantResponseSchema:
       type: object
       properties:
@@ -3390,6 +4075,10 @@ components:
           type: number
         assignedAt:
           type: string
+      required:
+        - mentorId
+        - participantId
+        - assignedAt
     mentor.validators_mentorMarathonResponseSchema:
       type: object
       properties:
@@ -3405,6 +4094,13 @@ components:
           type: string
         participantCount:
           type: number
+      required:
+        - id
+        - eventId
+        - title
+        - startDate
+        - endDate
+        - participantCount
     mentor.validators_participantDetailResponseSchema:
       type: object
       properties:
@@ -3447,6 +4143,16 @@ components:
           type: string
         projectTitle:
           type: string
+      required:
+        - id
+        - name
+        - _id
+        - location
+        - wantToDoList
+        - share
+        - updatedDate
+        - projectId
+        - projectTitle
     mentor.validators_mentorMarathonParticipantsResponseSchema:
       type: object
       properties:
@@ -3504,6 +4210,23 @@ components:
                 type: string
               projectTitle:
                 type: string
+            required:
+              - id
+              - name
+              - _id
+              - location
+              - wantToDoList
+              - share
+              - updatedDate
+              - projectId
+              - projectTitle
+      required:
+        - id
+        - eventId
+        - title
+        - startDate
+        - endDate
+        - participants
     mentor.validators_mentorReviewResponseSchema:
       type: object
       properties:
@@ -3534,6 +4257,13 @@ components:
         updatedAt:
           type: string
           nullable: true
+      required:
+        - id
+        - week
+        - title
+        - mood
+        - stressLevel
+        - createdAt
     mentor.validators_marathonInfoSchema:
       type: object
       properties:
@@ -3547,6 +4277,12 @@ components:
           type: string
         endDate:
           type: string
+      required:
+        - id
+        - eventId
+        - title
+        - startDate
+        - endDate
     mentor.validators_mentorParticipantReviewsResponseSchema:
       type: object
       properties:
@@ -3563,6 +4299,12 @@ components:
               type: string
             endDate:
               type: string
+          required:
+            - id
+            - eventId
+            - title
+            - startDate
+            - endDate
         reviews:
           type: array
           items:
@@ -3595,6 +4337,16 @@ components:
               updatedAt:
                 type: string
                 nullable: true
+            required:
+              - id
+              - week
+              - title
+              - mood
+              - stressLevel
+              - createdAt
+      required:
+        - marathon
+        - reviews
     mentor.validators_assignMentorToMarathonApiResponseSchema:
       type: object
       properties:
@@ -3615,6 +4367,12 @@ components:
               type: string
             assignedAt:
               type: string
+          required:
+            - id
+            - mentorId
+            - marathonId
+            - eventId
+            - assignedAt
         timestamp:
           type: string
         meta:
@@ -3648,6 +4406,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     mentor.validators_updateMentorMarathonApiResponseSchema:
       type: object
       properties:
@@ -3668,6 +4430,12 @@ components:
               type: string
             assignedAt:
               type: string
+          required:
+            - id
+            - mentorId
+            - marathonId
+            - eventId
+            - assignedAt
         timestamp:
           type: string
         meta:
@@ -3701,6 +4469,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     mentor.validators_deleteMentorFromMarathonApiResponseSchema:
       type: object
       properties:
@@ -3744,6 +4516,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     mentor.validators_getMentorMarathonsApiResponseSchema:
       type: object
       properties:
@@ -3768,6 +4544,13 @@ components:
                 type: string
               participantCount:
                 type: number
+            required:
+              - id
+              - eventId
+              - title
+              - startDate
+              - endDate
+              - participantCount
         timestamp:
           type: string
         meta:
@@ -3801,6 +4584,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     mentor.validators_assignParticipantToMentorApiResponseSchema:
       type: object
       properties:
@@ -3817,6 +4604,10 @@ components:
               type: number
             assignedAt:
               type: string
+          required:
+            - mentorId
+            - participantId
+            - assignedAt
         timestamp:
           type: string
         meta:
@@ -3850,6 +4641,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     mentor.validators_updateMentorParticipantApiResponseSchema:
       type: object
       properties:
@@ -3893,6 +4688,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     mentor.validators_removeMentorParticipantApiResponseSchema:
       type: object
       properties:
@@ -3936,6 +4735,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     mentor.validators_getMentorParticipantsByMarathonApiResponseSchema:
       type: object
       properties:
@@ -4000,6 +4803,23 @@ components:
                     type: string
                   projectTitle:
                     type: string
+                required:
+                  - id
+                  - name
+                  - _id
+                  - location
+                  - wantToDoList
+                  - share
+                  - updatedDate
+                  - projectId
+                  - projectTitle
+          required:
+            - id
+            - eventId
+            - title
+            - startDate
+            - endDate
+            - participants
         timestamp:
           type: string
         meta:
@@ -4033,6 +4853,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     mentor.validators_getReviewsForMentorParticipantsApiResponseSchema:
       type: object
       properties:
@@ -4056,6 +4880,12 @@ components:
                   type: string
                 endDate:
                   type: string
+              required:
+                - id
+                - eventId
+                - title
+                - startDate
+                - endDate
             reviews:
               type: array
               items:
@@ -4088,6 +4918,16 @@ components:
                   updatedAt:
                     type: string
                     nullable: true
+                required:
+                  - id
+                  - week
+                  - title
+                  - mood
+                  - stressLevel
+                  - createdAt
+          required:
+            - marathon
+            - reviews
         timestamp:
           type: string
         meta:
@@ -4121,6 +4961,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     milestone.validators_createMilestoneSchema:
       type: object
       properties:
@@ -4140,6 +4984,11 @@ components:
           type: boolean
           nullable: true
           default: false
+      required:
+        - name
+        - startDate
+        - endDate
+        - isCompleted
     milestone.validators_updateMilestoneSchema:
       type: object
       properties:
@@ -4167,11 +5016,15 @@ components:
         milestoneId:
           type: object
           additionalProperties: true
+      required:
+        - milestoneId
     milestone.validators_milestoneProjectParamsSchema:
       type: object
       properties:
         projectId:
           type: string
+      required:
+        - projectId
     milestone.validators_milestoneQuerySchema:
       type: object
       properties:
@@ -4229,6 +5082,22 @@ components:
                 additionalProperties: true
               isCompleted:
                 type: boolean
+            required:
+              - id
+              - name
+              - position
+              - description
+              - daysOfWeek
+              - isCompleted
+      required:
+        - id
+        - position
+        - name
+        - description
+        - startDate
+        - endDate
+        - isCompleted
+        - tasks
     milestone.validators_singleMilestoneResponseSchema:
       type: object
       properties:
@@ -4304,6 +5173,26 @@ components:
                     additionalProperties: true
                   isCompleted:
                     type: boolean
+                required:
+                  - id
+                  - name
+                  - position
+                  - description
+                  - daysOfWeek
+                  - isCompleted
+          required:
+            - id
+            - position
+            - name
+            - description
+            - startDate
+            - endDate
+            - isCompleted
+            - tasks
+      required:
+        - success
+        - timestamp
+        - data
     milestone.validators_milestoneListResponseSchema:
       type: object
       properties:
@@ -4381,6 +5270,26 @@ components:
                       additionalProperties: true
                     isCompleted:
                       type: boolean
+                  required:
+                    - id
+                    - name
+                    - position
+                    - description
+                    - daysOfWeek
+                    - isCompleted
+            required:
+              - id
+              - position
+              - name
+              - description
+              - startDate
+              - endDate
+              - isCompleted
+              - tasks
+      required:
+        - success
+        - timestamp
+        - data
     milestone.validators_deleteMilestoneResponseSchema:
       type: object
       properties:
@@ -4426,7 +5335,12 @@ components:
           properties:
             message:
               type: string
+          required:
+            - message
           nullable: true
+      required:
+        - success
+        - timestamp
     milestone.validators_milestoneApiResponseSchema:
       type: object
     milestone.validators_milestoneListApiResponseSchema:
@@ -4461,6 +5375,12 @@ components:
             - public
           nullable: true
           default: private
+      required:
+        - week
+        - title
+        - date
+        - content
+        - visibility
     note.validators_updateNoteSchema:
       type: object
       properties:
@@ -4517,24 +5437,32 @@ components:
         noteId:
           type: object
           additionalProperties: true
+      required:
+        - projectId
+        - noteId
     note.validators_noteProjectParamsSchema:
       type: object
       properties:
         projectId:
           type: string
+      required:
+        - projectId
     note.validators_publicNotesQuerySchema:
       type: object
       properties:
-        page:
+        page: &ref_92
           type: object
           additionalProperties: true
           nullable: true
           default: 1
-        pageSize:
+        pageSize: &ref_93
           type: object
           additionalProperties: true
           nullable: true
           default: 10
+      required:
+        - page
+        - pageSize
     note.validators_noteResponseSchema:
       type: object
       properties:
@@ -4571,7 +5499,16 @@ components:
             _id:
               type: string
               nullable: true
+          required:
+            - id
           nullable: true
+      required:
+        - id
+        - week
+        - title
+        - content
+        - date
+        - visibility
     note.validators_singleNoteResponseSchema:
       type: object
       properties:
@@ -4648,7 +5585,20 @@ components:
                 _id:
                   type: string
                   nullable: true
+              required:
+                - id
               nullable: true
+          required:
+            - id
+            - week
+            - title
+            - content
+            - date
+            - visibility
+      required:
+        - success
+        - timestamp
+        - data
     note.validators_noteListResponseSchema:
       type: object
       properties:
@@ -4727,7 +5677,20 @@ components:
                   _id:
                     type: string
                     nullable: true
+                required:
+                  - id
                 nullable: true
+            required:
+              - id
+              - week
+              - title
+              - content
+              - date
+              - visibility
+      required:
+        - success
+        - timestamp
+        - data
     note.validators_deleteNoteResponseSchema:
       type: object
       properties:
@@ -4771,6 +5734,10 @@ components:
         data:
           type: object
           additionalProperties: true
+      required:
+        - success
+        - timestamp
+        - data
     note.validators_noteApiResponseSchema:
       type: object
     note.validators_noteListApiResponseSchema:
@@ -4805,6 +5772,12 @@ components:
             - public
           nullable: true
           default: private
+      required:
+        - week
+        - title
+        - date
+        - content
+        - visibility
     outcome.validators_updateOutcomeSchema:
       type: object
       properties:
@@ -4861,11 +5834,16 @@ components:
         outcomeId:
           type: object
           additionalProperties: true
+      required:
+        - projectId
+        - outcomeId
     outcome.validators_outcomeProjectParamsSchema:
       type: object
       properties:
         projectId:
           type: string
+      required:
+        - projectId
     outcome.validators_publicOutcomesQuerySchema:
       type: object
       properties:
@@ -4879,6 +5857,9 @@ components:
           additionalProperties: true
           nullable: true
           default: 10
+      required:
+        - page
+        - pageSize
     outcome.validators_outcomeResponseSchema:
       type: object
       properties:
@@ -4904,6 +5885,13 @@ components:
           nullable: true
         visibility:
           type: string
+      required:
+        - id
+        - week
+        - title
+        - content
+        - date
+        - visibility
     outcome.validators_singleOutcomeResponseSchema:
       type: object
       properties:
@@ -4969,6 +5957,17 @@ components:
               nullable: true
             visibility:
               type: string
+          required:
+            - id
+            - week
+            - title
+            - content
+            - date
+            - visibility
+      required:
+        - success
+        - timestamp
+        - data
     outcome.validators_outcomeListResponseSchema:
       type: object
       properties:
@@ -5036,6 +6035,17 @@ components:
                 nullable: true
               visibility:
                 type: string
+            required:
+              - id
+              - week
+              - title
+              - content
+              - date
+              - visibility
+      required:
+        - success
+        - timestamp
+        - data
     outcome.validators_deleteOutcomeResponseSchema:
       type: object
       properties:
@@ -5079,6 +6089,10 @@ components:
         data:
           type: object
           additionalProperties: true
+      required:
+        - success
+        - timestamp
+        - data
     outcome.validators_outcomeApiResponseSchema:
       type: object
     outcome.validators_outcomeListApiResponseSchema:
@@ -5121,6 +6135,8 @@ components:
         unit:
           type: string
           nullable: true
+      required:
+        - type
     practice.validators_practiceResourceInputSchema:
       type: object
       properties:
@@ -5128,6 +6144,9 @@ components:
           type: string
         url:
           type: string
+      required:
+        - name
+        - url
     practice.validators_practiceResourceSchema:
       type: object
       properties:
@@ -5138,6 +6157,9 @@ components:
         url:
           type: string
           nullable: true
+      required:
+        - id
+        - name
     practice.validators_createPracticeSchema:
       type: object
       properties:
@@ -5169,6 +6191,8 @@ components:
             unit:
               type: string
               nullable: true
+          required:
+            - type
         practiceAction:
           type: string
           nullable: true
@@ -5186,7 +6210,16 @@ components:
                 type: string
               url:
                 type: string
+            required:
+              - name
+              - url
           nullable: true
+      required:
+        - title
+        - contentType
+        - totalAmount
+        - dailyGoal
+        - tags
     practice.validators_updatePracticeSchema:
       type: object
       properties:
@@ -5214,6 +6247,8 @@ components:
             unit:
               type: string
               nullable: true
+          required:
+            - type
           nullable: true
         practiceAction:
           type: string
@@ -5232,6 +6267,9 @@ components:
                 type: string
               url:
                 type: string
+            required:
+              - name
+              - url
           nullable: true
         status:
           type: string
@@ -5268,6 +6306,10 @@ components:
           items:
             type: string
           default: []
+      required:
+        - progress
+        - isPublic
+        - tags
     practice.validators_practiceQuerySchema:
       type: object
       properties:
@@ -5314,27 +6356,36 @@ components:
         include:
           type: string
           nullable: true
+      required:
+        - page
+        - limit
+        - status
+        - sort
+        - order
     practice.validators_checkInQuerySchema:
       type: object
       properties:
-        page:
+        page: &ref_77
           type: number
           default: 1
-        limit:
+        limit: &ref_78
           type: number
           default: 20
-        startDate:
+        startDate: &ref_79
           type: string
           nullable: true
-        endDate:
+        endDate: &ref_80
           type: string
           nullable: true
-        mood:
+        mood: &ref_81
           type: string
           nullable: true
-        include:
+        include: &ref_82
           type: string
           nullable: true
+      required:
+        - page
+        - limit
     practice.validators_practiceEventViewSchema:
       type: object
       properties:
@@ -5347,6 +6398,9 @@ components:
         duration:
           type: number
           nullable: true
+      required:
+        - entityType
+        - entityId
     practice.validators_practiceEventClickSchema:
       type: object
       properties:
@@ -5359,6 +6413,9 @@ components:
         clickPosition:
           type: string
           nullable: true
+      required:
+        - entityType
+        - entityId
     practice.validators_practiceEventShareSchema:
       type: object
       properties:
@@ -5370,6 +6427,10 @@ components:
           type: string
         shareChannel:
           type: string
+      required:
+        - entityType
+        - entityId
+        - shareChannel
     practice.validators_practiceEventFavoriteSchema:
       type: object
       properties:
@@ -5379,44 +6440,53 @@ components:
             - practice
         entityId:
           type: string
+      required:
+        - entityType
+        - entityId
     practice.validators_reactionSchema:
       type: object
       properties:
         reactionType:
           type: string
           default: like
+      required:
+        - reactionType
     practice.validators_practiceParamsSchema:
       type: object
       properties:
         id:
           type: string
+      required:
+        - id
     practice.validators_practiceCommentParamsSchema:
       type: object
       properties:
         id:
           type: number
+      required:
+        - id
     practice.validators_myPracticesQuerySchema:
       type: object
       properties:
-        page:
+        page: &ref_67
           type: number
           default: 1
-        limit:
+        limit: &ref_68
           type: number
           default: 20
-        query:
+        query: &ref_69
           type: string
           nullable: true
-        contentType:
+        contentType: &ref_70
           type: string
           nullable: true
-        tags:
+        tags: &ref_71
           type: string
           nullable: true
-        userId:
+        userId: &ref_72
           type: string
           nullable: true
-        status:
+        status: &ref_73
           type: string
           enum:
             - active
@@ -5425,17 +6495,23 @@ components:
             - archived
             - all
           default: all
-        sort:
+        sort: &ref_74
           type: string
           enum: *ref_14
           default: createdAt
-        order:
+        order: &ref_75
           type: string
           enum: *ref_15
           default: desc
-        include:
+        include: &ref_76
           type: string
           nullable: true
+      required:
+        - page
+        - limit
+        - status
+        - sort
+        - order
     practice.validators_userBasicInfoResponseSchema:
       type: object
       properties:
@@ -5464,6 +6540,10 @@ components:
         selfIntroduction:
           type: string
           nullable: true
+      required:
+        - id
+        - _id
+        - name
     practice.validators_practiceStatsResponseSchema:
       type: object
       properties:
@@ -5477,6 +6557,12 @@ components:
           type: number
         commentCount:
           type: number
+      required:
+        - likeCount
+        - viewCount
+        - favoriteCount
+        - shareCount
+        - commentCount
     practice.validators_practiceEntityResponseSchema:
       type: object
       properties:
@@ -5518,6 +6604,8 @@ components:
             unit:
               type: string
               nullable: true
+          required:
+            - type
         practiceAction:
           type: string
           nullable: true
@@ -5570,6 +6658,10 @@ components:
             selfIntroduction:
               type: string
               nullable: true
+          required:
+            - id
+            - _id
+            - name
         tags:
           type: array
           items:
@@ -5587,6 +6679,27 @@ components:
               type: number
             commentCount:
               type: number
+          required:
+            - likeCount
+            - viewCount
+            - favoriteCount
+            - shareCount
+            - commentCount
+      required:
+        - id
+        - title
+        - contentType
+        - totalAmount
+        - currentProgress
+        - dailyGoal
+        - status
+        - hasResources
+        - streak
+        - maxStreak
+        - createdAt
+        - user
+        - tags
+        - stats
     practice.validators_checkInEntityResponseSchema:
       type: object
       properties:
@@ -5627,6 +6740,15 @@ components:
         updatedAt:
           type: string
           nullable: true
+      required:
+        - id
+        - practiceId
+        - userId
+        - checkInDate
+        - progressAmount
+        - streakDay
+        - cumulativeProgress
+        - createdAt
     practice.validators_practiceUserStatsResponseSchema:
       type: object
       properties:
@@ -5644,6 +6766,14 @@ components:
           type: number
         maxStreak:
           type: number
+      required:
+        - totalPractices
+        - activePractices
+        - completedPractices
+        - pausedPractices
+        - totalCheckIns
+        - averageStreak
+        - maxStreak
     practice.validators_toggleLikeResponseSchema:
       type: object
       properties:
@@ -5651,6 +6781,9 @@ components:
           type: boolean
         likeCount:
           type: number
+      required:
+        - isLiked
+        - likeCount
     practice.validators_toggleFavoriteResponseSchema:
       type: object
       properties:
@@ -5658,16 +6791,23 @@ components:
           type: boolean
         favoriteCount:
           type: number
+      required:
+        - isFavorited
+        - favoriteCount
     practice.validators_recordShareResponseSchema:
       type: object
       properties:
         shareCount:
           type: number
+      required:
+        - shareCount
     practice.validators_recordViewResponseSchema:
       type: object
       properties:
         viewCount:
           type: number
+      required:
+        - viewCount
     practice.validators_interactionStatsResponseSchema:
       type: object
       properties:
@@ -5681,6 +6821,12 @@ components:
           type: number
         commentCount:
           type: number
+      required:
+        - likeCount
+        - viewCount
+        - favoriteCount
+        - shareCount
+        - commentCount
     practice.validators_userInteractionStatusResponseSchema:
       type: object
       properties:
@@ -5688,6 +6834,9 @@ components:
           type: boolean
         isFavorited:
           type: boolean
+      required:
+        - isLiked
+        - isFavorited
     practice.validators_checkInStatsResponseSchema:
       type: object
       properties:
@@ -5702,6 +6851,11 @@ components:
         lastCheckInDate:
           type: string
           nullable: true
+      required:
+        - totalCheckIns
+        - currentStreak
+        - maxStreak
+        - averageProgress
     practice.validators_monthlyCheckInCalendarResponseSchema:
       type: object
       properties:
@@ -5720,11 +6874,20 @@ components:
                 type: string
               streakDay:
                 type: number
+            required:
+              - date
+              - streakDay
+      required:
+        - checkInDates
+        - totalCheckIns
+        - streakDays
     practice.validators_operationSuccessResponseSchema:
       type: object
       properties:
         success:
           type: boolean
+      required:
+        - success
     practice.validators_practiceApiResponseSchema:
       type: object
       properties:
@@ -5767,6 +6930,8 @@ components:
                 unit:
                   type: string
                   nullable: true
+              required:
+                - type
             practiceAction:
               type: string
               nullable: true
@@ -5815,6 +6980,10 @@ components:
                 selfIntroduction:
                   type: string
                   nullable: true
+              required:
+                - id
+                - _id
+                - name
             tags:
               type: array
               items:
@@ -5832,6 +7001,27 @@ components:
                   type: number
                 commentCount:
                   type: number
+              required:
+                - likeCount
+                - viewCount
+                - favoriteCount
+                - shareCount
+                - commentCount
+          required:
+            - id
+            - title
+            - contentType
+            - totalAmount
+            - currentProgress
+            - dailyGoal
+            - status
+            - hasResources
+            - streak
+            - maxStreak
+            - createdAt
+            - user
+            - tags
+            - stats
         timestamp:
           type: string
         meta:
@@ -5865,6 +7055,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     practice.validators_practicesListApiResponseSchema:
       type: object
       properties:
@@ -5909,6 +7103,8 @@ components:
                   unit:
                     type: string
                     nullable: true
+                required:
+                  - type
               practiceAction:
                 type: string
                 nullable: true
@@ -5957,6 +7153,10 @@ components:
                   selfIntroduction:
                     type: string
                     nullable: true
+                required:
+                  - id
+                  - _id
+                  - name
               tags:
                 type: array
                 items:
@@ -5974,6 +7174,27 @@ components:
                     type: number
                   commentCount:
                     type: number
+                required:
+                  - likeCount
+                  - viewCount
+                  - favoriteCount
+                  - shareCount
+                  - commentCount
+            required:
+              - id
+              - title
+              - contentType
+              - totalAmount
+              - currentProgress
+              - dailyGoal
+              - status
+              - hasResources
+              - streak
+              - maxStreak
+              - createdAt
+              - user
+              - tags
+              - stats
         pagination:
           type: object
           properties:
@@ -5989,6 +7210,13 @@ components:
               type: boolean
             hasPrev:
               type: boolean
+          required:
+            - currentPage
+            - totalPages
+            - totalItems
+            - itemsPerPage
+            - hasNext
+            - hasPrev
         timestamp:
           type: string
         meta:
@@ -6022,6 +7250,11 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - pagination
+        - timestamp
     practice.validators_checkInApiResponseSchema:
       type: object
       properties:
@@ -6064,6 +7297,15 @@ components:
             updatedAt:
               type: string
               nullable: true
+          required:
+            - id
+            - practiceId
+            - userId
+            - checkInDate
+            - progressAmount
+            - streakDay
+            - cumulativeProgress
+            - createdAt
         timestamp:
           type: string
         meta:
@@ -6097,6 +7339,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     practice.validators_checkInsListApiResponseSchema:
       type: object
       properties:
@@ -6141,6 +7387,15 @@ components:
               updatedAt:
                 type: string
                 nullable: true
+            required:
+              - id
+              - practiceId
+              - userId
+              - checkInDate
+              - progressAmount
+              - streakDay
+              - cumulativeProgress
+              - createdAt
         pagination:
           type: object
           properties:
@@ -6156,6 +7411,13 @@ components:
               type: boolean
             hasPrev:
               type: boolean
+          required:
+            - currentPage
+            - totalPages
+            - totalItems
+            - itemsPerPage
+            - hasNext
+            - hasPrev
         timestamp:
           type: string
         meta:
@@ -6189,6 +7451,11 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - pagination
+        - timestamp
     practice.validators_practiceStatsApiResponseSchema:
       type: object
       properties:
@@ -6213,6 +7480,14 @@ components:
               type: number
             maxStreak:
               type: number
+          required:
+            - totalPractices
+            - activePractices
+            - completedPractices
+            - pausedPractices
+            - totalCheckIns
+            - averageStreak
+            - maxStreak
         timestamp:
           type: string
         meta:
@@ -6246,6 +7521,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     practice.validators_checkInStatsApiResponseSchema:
       type: object
       properties:
@@ -6267,6 +7546,11 @@ components:
             lastCheckInDate:
               type: string
               nullable: true
+          required:
+            - totalCheckIns
+            - currentStreak
+            - maxStreak
+            - averageProgress
         timestamp:
           type: string
         meta:
@@ -6300,6 +7584,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     practice.validators_monthlyCalendarApiResponseSchema:
       type: object
       properties:
@@ -6325,6 +7613,13 @@ components:
                     type: string
                   streakDay:
                     type: number
+                required:
+                  - date
+                  - streakDay
+          required:
+            - checkInDates
+            - totalCheckIns
+            - streakDays
         timestamp:
           type: string
         meta:
@@ -6358,6 +7653,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     practice.validators_toggleLikeApiResponseSchema:
       type: object
       properties:
@@ -6372,6 +7671,9 @@ components:
               type: boolean
             likeCount:
               type: number
+          required:
+            - isLiked
+            - likeCount
         timestamp:
           type: string
         meta:
@@ -6405,6 +7707,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     practice.validators_toggleFavoriteApiResponseSchema:
       type: object
       properties:
@@ -6419,6 +7725,9 @@ components:
               type: boolean
             favoriteCount:
               type: number
+          required:
+            - isFavorited
+            - favoriteCount
         timestamp:
           type: string
         meta:
@@ -6452,6 +7761,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     practice.validators_recordShareApiResponseSchema:
       type: object
       properties:
@@ -6464,6 +7777,8 @@ components:
           properties:
             shareCount:
               type: number
+          required:
+            - shareCount
         timestamp:
           type: string
         meta:
@@ -6497,6 +7812,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     practice.validators_recordViewApiResponseSchema:
       type: object
       properties:
@@ -6509,6 +7828,8 @@ components:
           properties:
             viewCount:
               type: number
+          required:
+            - viewCount
         timestamp:
           type: string
         meta:
@@ -6542,6 +7863,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     practice.validators_interactionStatsApiResponseSchema:
       type: object
       properties:
@@ -6562,6 +7887,12 @@ components:
               type: number
             commentCount:
               type: number
+          required:
+            - likeCount
+            - viewCount
+            - favoriteCount
+            - shareCount
+            - commentCount
         timestamp:
           type: string
         meta:
@@ -6595,6 +7926,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     practice.validators_userInteractionStatusApiResponseSchema:
       type: object
       properties:
@@ -6609,6 +7944,9 @@ components:
               type: boolean
             isFavorited:
               type: boolean
+          required:
+            - isLiked
+            - isFavorited
         timestamp:
           type: string
         meta:
@@ -6642,6 +7980,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     practice.validators_createPracticeApiResponseSchema:
       type: object
       properties:
@@ -6684,6 +8026,8 @@ components:
                 unit:
                   type: string
                   nullable: true
+              required:
+                - type
             practiceAction:
               type: string
               nullable: true
@@ -6732,6 +8076,10 @@ components:
                 selfIntroduction:
                   type: string
                   nullable: true
+              required:
+                - id
+                - _id
+                - name
             tags:
               type: array
               items:
@@ -6749,6 +8097,27 @@ components:
                   type: number
                 commentCount:
                   type: number
+              required:
+                - likeCount
+                - viewCount
+                - favoriteCount
+                - shareCount
+                - commentCount
+          required:
+            - id
+            - title
+            - contentType
+            - totalAmount
+            - currentProgress
+            - dailyGoal
+            - status
+            - hasResources
+            - streak
+            - maxStreak
+            - createdAt
+            - user
+            - tags
+            - stats
         timestamp:
           type: string
         meta:
@@ -6782,6 +8151,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     practice.validators_updatePracticeApiResponseSchema:
       type: object
       properties:
@@ -6824,6 +8197,8 @@ components:
                 unit:
                   type: string
                   nullable: true
+              required:
+                - type
             practiceAction:
               type: string
               nullable: true
@@ -6872,6 +8247,10 @@ components:
                 selfIntroduction:
                   type: string
                   nullable: true
+              required:
+                - id
+                - _id
+                - name
             tags:
               type: array
               items:
@@ -6889,6 +8268,27 @@ components:
                   type: number
                 commentCount:
                   type: number
+              required:
+                - likeCount
+                - viewCount
+                - favoriteCount
+                - shareCount
+                - commentCount
+          required:
+            - id
+            - title
+            - contentType
+            - totalAmount
+            - currentProgress
+            - dailyGoal
+            - status
+            - hasResources
+            - streak
+            - maxStreak
+            - createdAt
+            - user
+            - tags
+            - stats
         timestamp:
           type: string
         meta:
@@ -6922,6 +8322,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     practice.validators_operationSuccessApiResponseSchema:
       type: object
       properties:
@@ -6934,6 +8338,8 @@ components:
           properties:
             success:
               type: boolean
+          required:
+            - success
         timestamp:
           type: string
         meta:
@@ -6967,6 +8373,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     project.validators_createProjectSchema:
       type: object
       properties:
@@ -7092,33 +8502,35 @@ components:
       properties:
         id:
           type: string
+      required:
+        - id
     project.validators_projectQuerySchema:
       type: object
       properties:
-        page:
+        page: &ref_83
           type: object
           additionalProperties: true
           nullable: true
-        limit:
+        limit: &ref_84
           type: object
           additionalProperties: true
           nullable: true
-        status:
+        status: &ref_85
           type: string
           enum: *ref_19
           nullable: true
-        isPublic:
+        isPublic: &ref_86
           type: object
           additionalProperties: true
           nullable: true
-        userId:
+        userId: &ref_87
           type: object
           additionalProperties: true
           nullable: true
-        search:
+        search: &ref_88
           type: string
           nullable: true
-        sortBy:
+        sortBy: &ref_89
           type: string
           enum:
             - createdAt
@@ -7127,7 +8539,7 @@ components:
             - startDate
             - endDate
           nullable: true
-        sortOrder:
+        sortOrder: &ref_90
           type: string
           enum:
             - asc
@@ -7142,7 +8554,7 @@ components:
     project.validators_projectStatsQuerySchema:
       type: object
       properties:
-        userId:
+        userId: &ref_91
           type: object
           additionalProperties: true
           nullable: true
@@ -7170,6 +8582,9 @@ components:
               type: boolean
               nullable: true
           nullable: true
+      required:
+        - action
+        - projectIds
     project.validators_projectResponseSchema:
       type: object
       properties:
@@ -7252,6 +8667,9 @@ components:
             photoURL:
               type: string
               nullable: true
+          required:
+            - id
+            - roleList
           nullable: true
         milestones:
           type: array
@@ -7294,6 +8712,34 @@ components:
                       additionalProperties: true
                     isCompleted:
                       type: boolean
+                  required:
+                    - id
+                    - name
+                    - position
+                    - description
+                    - daysOfWeek
+                    - isCompleted
+            required:
+              - id
+              - position
+              - name
+              - description
+              - isCompleted
+              - tasks
+      required:
+        - id
+        - userId
+        - title
+        - description
+        - motivation
+        - strategy
+        - outcome
+        - isPublic
+        - status
+        - createdAt
+        - updatedAt
+        - version
+        - milestones
     project.validators_projectStatsResponseSchema:
       type: object
       properties:
@@ -7307,6 +8753,12 @@ components:
           type: number
         canceled_projects:
           type: number
+      required:
+        - total_projects
+        - ongoing_projects
+        - completed_projects
+        - not_started_projects
+        - canceled_projects
     project.validators_singleProjectResponseSchema:
       type: object
       properties:
@@ -7432,6 +8884,9 @@ components:
                 photoURL:
                   type: string
                   nullable: true
+              required:
+                - id
+                - roleList
               nullable: true
             milestones:
               type: array
@@ -7474,6 +8929,38 @@ components:
                           additionalProperties: true
                         isCompleted:
                           type: boolean
+                      required:
+                        - id
+                        - name
+                        - position
+                        - description
+                        - daysOfWeek
+                        - isCompleted
+                required:
+                  - id
+                  - position
+                  - name
+                  - description
+                  - isCompleted
+                  - tasks
+          required:
+            - id
+            - userId
+            - title
+            - description
+            - motivation
+            - strategy
+            - outcome
+            - isPublic
+            - status
+            - createdAt
+            - updatedAt
+            - version
+            - milestones
+      required:
+        - success
+        - timestamp
+        - data
     project.validators_projectListResponseSchema:
       type: object
       properties:
@@ -7601,6 +9088,9 @@ components:
                   photoURL:
                     type: string
                     nullable: true
+                required:
+                  - id
+                  - roleList
                 nullable: true
               milestones:
                 type: array
@@ -7643,6 +9133,34 @@ components:
                             additionalProperties: true
                           isCompleted:
                             type: boolean
+                        required:
+                          - id
+                          - name
+                          - position
+                          - description
+                          - daysOfWeek
+                          - isCompleted
+                  required:
+                    - id
+                    - position
+                    - name
+                    - description
+                    - isCompleted
+                    - tasks
+            required:
+              - id
+              - userId
+              - title
+              - description
+              - motivation
+              - strategy
+              - outcome
+              - isPublic
+              - status
+              - createdAt
+              - updatedAt
+              - version
+              - milestones
         pagination:
           type: object
           properties:
@@ -7658,6 +9176,18 @@ components:
               type: boolean
             hasPrev:
               type: boolean
+          required:
+            - currentPage
+            - totalPages
+            - totalItems
+            - itemsPerPage
+            - hasNext
+            - hasPrev
+      required:
+        - success
+        - timestamp
+        - data
+        - pagination
     project.validators_projectStatsSuccessResponseSchema:
       type: object
       properties:
@@ -7714,6 +9244,16 @@ components:
               type: number
             canceled_projects:
               type: number
+          required:
+            - total_projects
+            - ongoing_projects
+            - completed_projects
+            - not_started_projects
+            - canceled_projects
+      required:
+        - success
+        - timestamp
+        - data
     project.validators_deleteProjectResponseSchema:
       type: object
       properties:
@@ -7760,6 +9300,10 @@ components:
         data:
           type: object
           additionalProperties: true
+      required:
+        - success
+        - timestamp
+        - data
     project.validators_projectApiResponseSchema:
       type: object
     project.validators_projectListApiResponseSchema:
@@ -7771,21 +9315,21 @@ components:
     request-params.validator_paginationSchema:
       type: object
       properties:
-        cursor:
+        cursor: &ref_99
           type: string
           nullable: true
-        limit:
+        limit: &ref_100
           type: object
           additionalProperties: true
           nullable: true
-        sort:
+        sort: &ref_101
           type: string
           enum:
             - createdAt
             - updatedAt
             - name
           nullable: true
-        order:
+        order: &ref_102
           type: string
           enum:
             - asc
@@ -7857,6 +9401,10 @@ components:
           type: string
         tagName:
           type: string
+      required:
+        - entityId
+        - entityType
+        - tagName
     resource-review.validator_timeUsageSchema:
       type: string
       enum: &ref_20
@@ -7903,6 +9451,16 @@ components:
         visuallyRich:
           type: boolean
           default: false
+      required:
+        - wellStructured
+        - practiceFocused
+        - wellRoundedConcepts
+        - thoughtProvoking
+        - progressiveLearning
+        - problemBased
+        - realWorldExamples
+        - interactive
+        - visuallyRich
     resource-review.validator_resourceUsageSchema:
       type: object
       properties:
@@ -7924,6 +9482,13 @@ components:
         notApplicableResource:
           type: boolean
           default: false
+      required:
+        - withOnlineCourses
+        - withBooks
+        - withOtherTools
+        - withCommunity
+        - onlyThisResource
+        - notApplicableResource
     resource-review.validator_resourceReviewBaseSchema:
       type: object
       properties:
@@ -7973,6 +9538,16 @@ components:
             visuallyRich:
               type: boolean
               default: false
+          required:
+            - wellStructured
+            - practiceFocused
+            - wellRoundedConcepts
+            - thoughtProvoking
+            - progressiveLearning
+            - problemBased
+            - realWorldExamples
+            - interactive
+            - visuallyRich
           nullable: true
           default:
             wellStructured: false
@@ -8005,6 +9580,13 @@ components:
             notApplicableResource:
               type: boolean
               default: false
+          required:
+            - withOnlineCourses
+            - withBooks
+            - withOtherTools
+            - withCommunity
+            - onlyThisResource
+            - notApplicableResource
           nullable: true
           default:
             withOnlineCourses: false
@@ -8018,6 +9600,15 @@ components:
           items:
             type: string
           nullable: true
+      required:
+        - content
+        - overallImpact
+        - changeMindset
+        - solveProblems
+        - gainPerspectives
+        - achieveGoals
+        - contentFeatures
+        - resourceUsage
     resource-review.validator_resourceReviewSchema:
       type: object
       properties:
@@ -8067,6 +9658,16 @@ components:
             visuallyRich:
               type: boolean
               default: false
+          required:
+            - wellStructured
+            - practiceFocused
+            - wellRoundedConcepts
+            - thoughtProvoking
+            - progressiveLearning
+            - problemBased
+            - realWorldExamples
+            - interactive
+            - visuallyRich
           nullable: true
           default:
             wellStructured: false
@@ -8099,6 +9700,13 @@ components:
             notApplicableResource:
               type: boolean
               default: false
+          required:
+            - withOnlineCourses
+            - withBooks
+            - withOtherTools
+            - withCommunity
+            - onlyThisResource
+            - notApplicableResource
           nullable: true
           default:
             withOnlineCourses: false
@@ -8112,6 +9720,15 @@ components:
           items:
             type: string
           nullable: true
+      required:
+        - content
+        - overallImpact
+        - changeMindset
+        - solveProblems
+        - gainPerspectives
+        - achieveGoals
+        - contentFeatures
+        - resourceUsage
     resource-review.validator_updateResourceReviewSchema:
       type: object
       properties:
@@ -8167,6 +9784,16 @@ components:
             visuallyRich:
               type: boolean
               default: false
+          required:
+            - wellStructured
+            - practiceFocused
+            - wellRoundedConcepts
+            - thoughtProvoking
+            - progressiveLearning
+            - problemBased
+            - realWorldExamples
+            - interactive
+            - visuallyRich
           nullable: true
           default:
             wellStructured: false
@@ -8199,6 +9826,13 @@ components:
             notApplicableResource:
               type: boolean
               default: false
+          required:
+            - withOnlineCourses
+            - withBooks
+            - withOtherTools
+            - withCommunity
+            - onlyThisResource
+            - notApplicableResource
           nullable: true
           default:
             withOnlineCourses: false
@@ -8226,6 +9860,8 @@ components:
             - published
             - archived
             - reported
+      required:
+        - status
     resource-review.validator_resourceReviewResponseSchema:
       type: object
       properties:
@@ -8279,6 +9915,16 @@ components:
             visuallyRich:
               type: boolean
               default: false
+          required:
+            - wellStructured
+            - practiceFocused
+            - wellRoundedConcepts
+            - thoughtProvoking
+            - progressiveLearning
+            - problemBased
+            - realWorldExamples
+            - interactive
+            - visuallyRich
         resourceUsage:
           type: object
           properties:
@@ -8300,6 +9946,13 @@ components:
             notApplicableResource:
               type: boolean
               default: false
+          required:
+            - withOnlineCourses
+            - withBooks
+            - withOtherTools
+            - withCommunity
+            - onlyThisResource
+            - notApplicableResource
         status:
           type: string
           enum: &ref_22
@@ -8335,6 +9988,10 @@ components:
             selfIntroduction:
               type: string
               nullable: true
+          required:
+            - id
+            - name
+            - _id
         tags:
           type: array
           items:
@@ -8345,6 +10002,23 @@ components:
           type: string
         updatedAt:
           type: string
+      required:
+        - id
+        - resourceId
+        - content
+        - overallImpact
+        - changeMindset
+        - solveProblems
+        - gainPerspectives
+        - achieveGoals
+        - contentFeatures
+        - resourceUsage
+        - status
+        - user
+        - tags
+        - likeCount
+        - createdAt
+        - updatedAt
     resource-review.validator_getReviewByIdResponseSchema:
       type: object
       properties:
@@ -8405,6 +10079,16 @@ components:
                 visuallyRich:
                   type: boolean
                   default: false
+              required:
+                - wellStructured
+                - practiceFocused
+                - wellRoundedConcepts
+                - thoughtProvoking
+                - progressiveLearning
+                - problemBased
+                - realWorldExamples
+                - interactive
+                - visuallyRich
             resourceUsage:
               type: object
               properties:
@@ -8426,6 +10110,13 @@ components:
                 notApplicableResource:
                   type: boolean
                   default: false
+              required:
+                - withOnlineCourses
+                - withBooks
+                - withOtherTools
+                - withCommunity
+                - onlyThisResource
+                - notApplicableResource
             status:
               type: string
               enum: *ref_22
@@ -8457,6 +10148,10 @@ components:
                 selfIntroduction:
                   type: string
                   nullable: true
+              required:
+                - id
+                - name
+                - _id
             tags:
               type: array
               items:
@@ -8467,6 +10162,23 @@ components:
               type: string
             updatedAt:
               type: string
+          required:
+            - id
+            - resourceId
+            - content
+            - overallImpact
+            - changeMindset
+            - solveProblems
+            - gainPerspectives
+            - achieveGoals
+            - contentFeatures
+            - resourceUsage
+            - status
+            - user
+            - tags
+            - likeCount
+            - createdAt
+            - updatedAt
         timestamp:
           type: string
         meta:
@@ -8500,6 +10212,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     resource-review.validator_getReviewsListResponseSchema:
       type: object
       properties:
@@ -8562,6 +10278,16 @@ components:
                   visuallyRich:
                     type: boolean
                     default: false
+                required:
+                  - wellStructured
+                  - practiceFocused
+                  - wellRoundedConcepts
+                  - thoughtProvoking
+                  - progressiveLearning
+                  - problemBased
+                  - realWorldExamples
+                  - interactive
+                  - visuallyRich
               resourceUsage:
                 type: object
                 properties:
@@ -8583,6 +10309,13 @@ components:
                   notApplicableResource:
                     type: boolean
                     default: false
+                required:
+                  - withOnlineCourses
+                  - withBooks
+                  - withOtherTools
+                  - withCommunity
+                  - onlyThisResource
+                  - notApplicableResource
               status:
                 type: string
                 enum: *ref_22
@@ -8614,6 +10347,10 @@ components:
                   selfIntroduction:
                     type: string
                     nullable: true
+                required:
+                  - id
+                  - name
+                  - _id
               tags:
                 type: array
                 items:
@@ -8624,6 +10361,23 @@ components:
                 type: string
               updatedAt:
                 type: string
+            required:
+              - id
+              - resourceId
+              - content
+              - overallImpact
+              - changeMindset
+              - solveProblems
+              - gainPerspectives
+              - achieveGoals
+              - contentFeatures
+              - resourceUsage
+              - status
+              - user
+              - tags
+              - likeCount
+              - createdAt
+              - updatedAt
         pagination:
           type: object
           properties:
@@ -8658,6 +10412,13 @@ components:
             parentTotalEstimate:
               type: number
               nullable: true
+          required:
+            - cursors
+            - hasMore
+            - count
+            - limit
+            - hasNext
+            - hasPrev
         timestamp:
           type: string
         meta:
@@ -8691,6 +10452,11 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - pagination
+        - timestamp
     resource-review.validator_createReviewResponseSchema:
       type: object
       properties:
@@ -8751,6 +10517,16 @@ components:
                 visuallyRich:
                   type: boolean
                   default: false
+              required:
+                - wellStructured
+                - practiceFocused
+                - wellRoundedConcepts
+                - thoughtProvoking
+                - progressiveLearning
+                - problemBased
+                - realWorldExamples
+                - interactive
+                - visuallyRich
             resourceUsage:
               type: object
               properties:
@@ -8772,6 +10548,13 @@ components:
                 notApplicableResource:
                   type: boolean
                   default: false
+              required:
+                - withOnlineCourses
+                - withBooks
+                - withOtherTools
+                - withCommunity
+                - onlyThisResource
+                - notApplicableResource
             status:
               type: string
               enum: *ref_22
@@ -8803,6 +10586,10 @@ components:
                 selfIntroduction:
                   type: string
                   nullable: true
+              required:
+                - id
+                - name
+                - _id
             tags:
               type: array
               items:
@@ -8813,6 +10600,23 @@ components:
               type: string
             updatedAt:
               type: string
+          required:
+            - id
+            - resourceId
+            - content
+            - overallImpact
+            - changeMindset
+            - solveProblems
+            - gainPerspectives
+            - achieveGoals
+            - contentFeatures
+            - resourceUsage
+            - status
+            - user
+            - tags
+            - likeCount
+            - createdAt
+            - updatedAt
         timestamp:
           type: string
         meta:
@@ -8846,6 +10650,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     resource-review.validator_updateReviewResponseSchema:
       type: object
       properties:
@@ -8906,6 +10714,16 @@ components:
                 visuallyRich:
                   type: boolean
                   default: false
+              required:
+                - wellStructured
+                - practiceFocused
+                - wellRoundedConcepts
+                - thoughtProvoking
+                - progressiveLearning
+                - problemBased
+                - realWorldExamples
+                - interactive
+                - visuallyRich
             resourceUsage:
               type: object
               properties:
@@ -8927,6 +10745,13 @@ components:
                 notApplicableResource:
                   type: boolean
                   default: false
+              required:
+                - withOnlineCourses
+                - withBooks
+                - withOtherTools
+                - withCommunity
+                - onlyThisResource
+                - notApplicableResource
             status:
               type: string
               enum: *ref_22
@@ -8958,6 +10783,10 @@ components:
                 selfIntroduction:
                   type: string
                   nullable: true
+              required:
+                - id
+                - name
+                - _id
             tags:
               type: array
               items:
@@ -8968,6 +10797,23 @@ components:
               type: string
             updatedAt:
               type: string
+          required:
+            - id
+            - resourceId
+            - content
+            - overallImpact
+            - changeMindset
+            - solveProblems
+            - gainPerspectives
+            - achieveGoals
+            - contentFeatures
+            - resourceUsage
+            - status
+            - user
+            - tags
+            - likeCount
+            - createdAt
+            - updatedAt
         timestamp:
           type: string
         meta:
@@ -9001,6 +10847,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     resource-review.validator_deleteReviewResponseSchema:
       type: object
       properties:
@@ -9013,6 +10863,8 @@ components:
           properties:
             message:
               type: string
+          required:
+            - message
         timestamp:
           type: string
         meta:
@@ -9046,6 +10898,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     resource-review.validator_likeReviewResponseSchema:
       type: object
       properties:
@@ -9060,6 +10916,9 @@ components:
               type: number
             isLiked:
               type: boolean
+          required:
+            - likeCount
+            - isLiked
         timestamp:
           type: string
         meta:
@@ -9093,6 +10952,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     resource-review.validator_getReviewTagsResponseSchema:
       type: object
       properties:
@@ -9137,6 +11000,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     resource.validator_createResourceSchema:
       type: object
       properties:
@@ -9217,7 +11084,21 @@ components:
               items:
                 type: string
               nullable: true
+          required:
+            - title
+            - content
+            - scoreImpact
+            - scoreComprehensiveness
+            - scoreImplementation
           nullable: true
+      required:
+        - name
+        - url
+        - description
+        - type
+        - cost
+        - level
+        - status
     resource.validator_updateResourceSchema:
       type: object
       properties:
@@ -9293,6 +11174,8 @@ components:
             - active
             - archived
             - reported
+      required:
+        - status
     resource.validator_resourceResponseSchema:
       type: object
       properties:
@@ -9373,6 +11256,10 @@ components:
             selfIntroduction:
               type: string
               nullable: true
+          required:
+            - id
+            - name
+            - _id
         majorCategory:
           type: string
           nullable: true
@@ -9397,6 +11284,24 @@ components:
           type: number
         likeCount:
           type: number
+      required:
+        - id
+        - name
+        - url
+        - description
+        - type
+        - cost
+        - level
+        - status
+        - user
+        - tags
+        - createdAt
+        - updatedAt
+        - viewCount
+        - favoriteCount
+        - shareCount
+        - reviewCount
+        - likeCount
     resource.validator_resourceListItemSchema:
       type: object
       properties:
@@ -9457,6 +11362,10 @@ components:
             selfIntroduction:
               type: string
               nullable: true
+          required:
+            - id
+            - name
+            - _id
         majorCategory:
           type: string
           nullable: true
@@ -9481,6 +11390,24 @@ components:
           type: number
         likeCount:
           type: number
+      required:
+        - id
+        - name
+        - url
+        - description
+        - type
+        - cost
+        - level
+        - status
+        - user
+        - tags
+        - createdAt
+        - updatedAt
+        - viewCount
+        - favoriteCount
+        - shareCount
+        - reviewCount
+        - likeCount
     resource.validator_resourceStatsResponseSchema:
       type: object
       properties:
@@ -9494,6 +11421,11 @@ components:
         typeStats:
           type: object
           additionalProperties: true
+      required:
+        - totalResources
+        - activeResources
+        - categoryStats
+        - typeStats
     resource.validator_getResourceByIdResponseSchema:
       type: object
       properties:
@@ -9561,6 +11493,10 @@ components:
                 selfIntroduction:
                   type: string
                   nullable: true
+              required:
+                - id
+                - name
+                - _id
             majorCategory:
               type: string
               nullable: true
@@ -9585,6 +11521,24 @@ components:
               type: number
             likeCount:
               type: number
+          required:
+            - id
+            - name
+            - url
+            - description
+            - type
+            - cost
+            - level
+            - status
+            - user
+            - tags
+            - createdAt
+            - updatedAt
+            - viewCount
+            - favoriteCount
+            - shareCount
+            - reviewCount
+            - likeCount
         timestamp:
           type: string
         meta:
@@ -9618,6 +11572,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     resource.validator_getResourcesListResponseSchema:
       type: object
       properties:
@@ -9687,6 +11645,10 @@ components:
                   selfIntroduction:
                     type: string
                     nullable: true
+                required:
+                  - id
+                  - name
+                  - _id
               majorCategory:
                 type: string
                 nullable: true
@@ -9711,6 +11673,24 @@ components:
                 type: number
               likeCount:
                 type: number
+            required:
+              - id
+              - name
+              - url
+              - description
+              - type
+              - cost
+              - level
+              - status
+              - user
+              - tags
+              - createdAt
+              - updatedAt
+              - viewCount
+              - favoriteCount
+              - shareCount
+              - reviewCount
+              - likeCount
         pagination:
           type: object
           properties:
@@ -9745,6 +11725,13 @@ components:
             parentTotalEstimate:
               type: number
               nullable: true
+          required:
+            - cursors
+            - hasMore
+            - count
+            - limit
+            - hasNext
+            - hasPrev
         timestamp:
           type: string
         meta:
@@ -9778,6 +11765,11 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - pagination
+        - timestamp
     resource.validator_createResourceResponseSchema:
       type: object
       properties:
@@ -9845,6 +11837,10 @@ components:
                 selfIntroduction:
                   type: string
                   nullable: true
+              required:
+                - id
+                - name
+                - _id
             majorCategory:
               type: string
               nullable: true
@@ -9869,6 +11865,24 @@ components:
               type: number
             likeCount:
               type: number
+          required:
+            - id
+            - name
+            - url
+            - description
+            - type
+            - cost
+            - level
+            - status
+            - user
+            - tags
+            - createdAt
+            - updatedAt
+            - viewCount
+            - favoriteCount
+            - shareCount
+            - reviewCount
+            - likeCount
         timestamp:
           type: string
         meta:
@@ -9902,6 +11916,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     resource.validator_updateResourceResponseSchema:
       type: object
       properties:
@@ -9969,6 +11987,10 @@ components:
                 selfIntroduction:
                   type: string
                   nullable: true
+              required:
+                - id
+                - name
+                - _id
             majorCategory:
               type: string
               nullable: true
@@ -9993,6 +12015,24 @@ components:
               type: number
             likeCount:
               type: number
+          required:
+            - id
+            - name
+            - url
+            - description
+            - type
+            - cost
+            - level
+            - status
+            - user
+            - tags
+            - createdAt
+            - updatedAt
+            - viewCount
+            - favoriteCount
+            - shareCount
+            - reviewCount
+            - likeCount
         timestamp:
           type: string
         meta:
@@ -10026,6 +12066,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     resource.validator_getResourceStatsResponseSchema:
       type: object
       properties:
@@ -10046,6 +12090,11 @@ components:
             typeStats:
               type: object
               additionalProperties: true
+          required:
+            - totalResources
+            - activeResources
+            - categoryStats
+            - typeStats
         timestamp:
           type: string
         meta:
@@ -10079,6 +12128,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     resource.validator_getResourceTagsResponseSchema:
       type: object
       properties:
@@ -10123,6 +12176,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     resource.validator_deleteResourceResponseSchema:
       type: object
       properties:
@@ -10135,6 +12192,8 @@ components:
           properties:
             message:
               type: string
+          required:
+            - message
         timestamp:
           type: string
         meta:
@@ -10168,6 +12227,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     review.validators_moodSchema:
       type: string
       enum: &ref_27
@@ -10216,6 +12279,12 @@ components:
           enum: *ref_28
           nullable: true
           default: private
+      required:
+        - week
+        - mood
+        - stressLevel
+        - learningReview
+        - visibility
     review.validators_updateReviewSchema:
       type: object
       properties:
@@ -10244,22 +12313,25 @@ components:
     review.validators_reviewQuerySchema:
       type: object
       properties:
-        week:
+        week: &ref_94
           type: number
           nullable: true
-        mood:
+        mood: &ref_95
           type: string
           enum: *ref_27
           nullable: true
-        stressLevel:
+        stressLevel: &ref_96
           type: number
           nullable: true
-        page:
+        page: &ref_97
           type: object
           additionalProperties: true
-        pageSize:
+        pageSize: &ref_98
           type: object
           additionalProperties: true
+      required:
+        - page
+        - pageSize
     review.validators_reviewParamsSchema:
       type: object
       properties:
@@ -10268,6 +12340,9 @@ components:
         reviewId:
           type: object
           additionalProperties: true
+      required:
+        - projectId
+        - reviewId
     review.validators_reviewResponseSchema:
       type: object
       properties:
@@ -10298,6 +12373,13 @@ components:
         updatedAt:
           type: string
           nullable: true
+      required:
+        - id
+        - week
+        - title
+        - mood
+        - stressLevel
+        - createdAt
     review.validators_reviewStatsResponseSchema:
       type: object
       properties:
@@ -10313,6 +12395,12 @@ components:
         weeklyProgress:
           type: object
           additionalProperties: true
+      required:
+        - total
+        - averageStressLevel
+        - averageLearningReview
+        - moodDistribution
+        - weeklyProgress
     review.validators_singleReviewResponseSchema:
       type: object
       properties:
@@ -10383,6 +12471,17 @@ components:
             updatedAt:
               type: string
               nullable: true
+          required:
+            - id
+            - week
+            - title
+            - mood
+            - stressLevel
+            - createdAt
+      required:
+        - success
+        - timestamp
+        - data
     review.validators_reviewListResponseSchema:
       type: object
       properties:
@@ -10455,6 +12554,17 @@ components:
               updatedAt:
                 type: string
                 nullable: true
+            required:
+              - id
+              - week
+              - title
+              - mood
+              - stressLevel
+              - createdAt
+      required:
+        - success
+        - timestamp
+        - data
     review.validators_reviewStatsSuccessResponseSchema:
       type: object
       properties:
@@ -10510,6 +12620,16 @@ components:
             weeklyProgress:
               type: object
               additionalProperties: true
+          required:
+            - total
+            - averageStressLevel
+            - averageLearningReview
+            - moodDistribution
+            - weeklyProgress
+      required:
+        - success
+        - timestamp
+        - data
     review.validators_deleteReviewApiResponseSchema:
       type: object
       properties:
@@ -10555,6 +12675,12 @@ components:
           properties:
             message:
               type: string
+          required:
+            - message
+      required:
+        - success
+        - timestamp
+        - data
     review.validators_reviewApiResponseSchema:
       type: object
     review.validators_reviewListApiResponseSchema:
@@ -10566,24 +12692,29 @@ components:
     tag.validators_tagSearchQuerySchema:
       type: object
       properties:
-        query:
+        query: &ref_104
           type: string
-        limit:
+        limit: &ref_105
           type: object
           additionalProperties: true
+      required:
+        - query
+        - limit
     tag.validators_popularTagsQuerySchema:
       type: object
       properties:
-        limit:
+        limit: &ref_103
           type: object
           additionalProperties: true
+      required:
+        - limit
     tag.validators_entityTagsQuerySchema:
       type: object
       properties:
-        entityId:
+        entityId: &ref_106
           type: object
           additionalProperties: true
-        entityType:
+        entityType: &ref_107
           type: string
           enum: &ref_29
             - resource
@@ -10591,6 +12722,9 @@ components:
             - idea
             - practice
             - review
+      required:
+        - entityId
+        - entityType
     tag.validators_addEntityTagSchema:
       type: object
       properties:
@@ -10604,6 +12738,10 @@ components:
           enum: *ref_29
         tagName:
           type: string
+      required:
+        - entityId
+        - entityType
+        - tagName
     tag.validators_removeEntityTagSchema:
       type: object
       properties:
@@ -10617,6 +12755,10 @@ components:
           enum: *ref_29
         tagName:
           type: string
+      required:
+        - entityId
+        - entityType
+        - tagName
     tag.validators_batchTagOperationSchema:
       type: object
       properties:
@@ -10637,6 +12779,11 @@ components:
           type: array
           items:
             type: string
+      required:
+        - action
+        - entityId
+        - entityType
+        - tagNames
     tag.validators_tagStatsQuerySchema:
       type: object
       properties:
@@ -10654,6 +12801,8 @@ components:
             - all
           nullable: true
           default: 30d
+      required:
+        - timeRange
     tag.validators_tagEntitySchema:
       type: object
       properties:
@@ -10667,6 +12816,9 @@ components:
         updated_at:
           type: string
           nullable: true
+      required:
+        - id
+        - name
     tag.validators_formattedTagSchema:
       type: object
       properties:
@@ -10674,6 +12826,9 @@ components:
           type: number
         name:
           type: string
+      required:
+        - id
+        - name
     tag.validators_popularTagItemSchema:
       type: object
       properties:
@@ -10683,6 +12838,10 @@ components:
           type: string
         count:
           type: number
+      required:
+        - id
+        - name
+        - count
     tag.validators_tagUsageStatsSchema:
       type: object
       properties:
@@ -10692,6 +12851,10 @@ components:
           type: number
         ideaCount:
           type: number
+      required:
+        - totalUsage
+        - resourceCount
+        - ideaCount
     tag.validators_tagStatsDataSchema:
       type: object
       properties:
@@ -10708,6 +12871,13 @@ components:
                 type: string
               count:
                 type: number
+            required:
+              - id
+              - name
+              - count
+      required:
+        - totalTags
+        - popularTags
     tag.validators_entityTagOperationSchema:
       type: object
       properties:
@@ -10717,11 +12887,17 @@ components:
           type: string
         tagName:
           type: string
+      required:
+        - entityId
+        - entityType
+        - tagName
     tag.validators_tagCleanupResultSchema:
       type: object
       properties:
         deletedCount:
           type: number
+      required:
+        - deletedCount
     tag.validators_getPopularTagsApiResponseSchema:
       type: object
       properties:
@@ -10740,6 +12916,10 @@ components:
                 type: string
               count:
                 type: number
+            required:
+              - id
+              - name
+              - count
         timestamp:
           type: string
         meta:
@@ -10773,6 +12953,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     tag.validators_searchTagsApiResponseSchema:
       type: object
       properties:
@@ -10789,6 +12973,9 @@ components:
                 type: number
               name:
                 type: string
+            required:
+              - id
+              - name
         timestamp:
           type: string
         meta:
@@ -10822,6 +13009,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     tag.validators_getTagStatsApiResponseSchema:
       type: object
       properties:
@@ -10845,6 +13036,13 @@ components:
                     type: string
                   count:
                     type: number
+                required:
+                  - id
+                  - name
+                  - count
+          required:
+            - totalTags
+            - popularTags
         timestamp:
           type: string
         meta:
@@ -10878,6 +13076,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     tag.validators_addEntityTagApiResponseSchema:
       type: object
       properties:
@@ -10894,6 +13096,10 @@ components:
               type: string
             tagName:
               type: string
+          required:
+            - entityId
+            - entityType
+            - tagName
         timestamp:
           type: string
         meta:
@@ -10927,6 +13133,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     tag.validators_removeEntityTagApiResponseSchema:
       type: object
       properties:
@@ -10970,6 +13180,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     tag.validators_getEntityTagsApiResponseSchema:
       type: object
       properties:
@@ -10986,6 +13200,9 @@ components:
                 type: number
               name:
                 type: string
+            required:
+              - id
+              - name
         timestamp:
           type: string
         meta:
@@ -11019,6 +13236,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     tag.validators_getTagUsageStatsApiResponseSchema:
       type: object
       properties:
@@ -11035,6 +13256,10 @@ components:
               type: number
             ideaCount:
               type: number
+          required:
+            - totalUsage
+            - resourceCount
+            - ideaCount
         timestamp:
           type: string
         meta:
@@ -11068,6 +13293,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     tag.validators_tagCleanupApiResponseSchema:
       type: object
       properties:
@@ -11080,6 +13309,8 @@ components:
           properties:
             deletedCount:
               type: number
+          required:
+            - deletedCount
         timestamp:
           type: string
         meta:
@@ -11113,6 +13344,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     task.validators_createTaskSchema:
       type: object
       properties:
@@ -11141,6 +13376,8 @@ components:
               - Saturday
               - Sunday
           nullable: true
+      required:
+        - name
     task.validators_updateTaskSchema:
       type: object
       properties:
@@ -11180,6 +13417,10 @@ components:
         taskId:
           type: object
           additionalProperties: true
+      required:
+        - projectId
+        - milestoneId
+        - taskId
     task.validators_taskMilestoneParamsSchema:
       type: object
       properties:
@@ -11188,6 +13429,9 @@ components:
         milestoneId:
           type: object
           additionalProperties: true
+      required:
+        - projectId
+        - milestoneId
     task.validators_taskDataSchema:
       type: object
       properties:
@@ -11222,6 +13466,13 @@ components:
           type: string
         updatedAt:
           type: string
+      required:
+        - id
+        - name
+        - isCompleted
+        - milestoneId
+        - createdAt
+        - updatedAt
     task.validators_singleTaskResponseSchema:
       type: object
       properties:
@@ -11256,8 +13507,19 @@ components:
               type: string
             updatedAt:
               type: string
+          required:
+            - id
+            - name
+            - isCompleted
+            - milestoneId
+            - createdAt
+            - updatedAt
         timestamp:
           type: string
+      required:
+        - success
+        - data
+        - timestamp
     task.validators_taskListResponseSchema:
       type: object
       properties:
@@ -11294,8 +13556,19 @@ components:
                 type: string
               updatedAt:
                 type: string
+            required:
+              - id
+              - name
+              - isCompleted
+              - milestoneId
+              - createdAt
+              - updatedAt
         timestamp:
           type: string
+      required:
+        - success
+        - data
+        - timestamp
     task.validators_deleteTaskResponseSchema:
       type: object
       properties:
@@ -11308,23 +13581,35 @@ components:
           properties:
             message:
               type: string
+          required:
+            - message
         timestamp:
           type: string
+      required:
+        - success
+        - data
+        - timestamp
     user-custom-id.validators_customIdSchema:
       type: object
       properties:
         customId:
           type: string
+      required:
+        - customId
     user-custom-id.validators_customIdParamsSchema:
       type: object
       properties:
         customId:
           type: string
+      required:
+        - customId
     user-custom-id.validators_setCustomIdRequestSchema:
       type: object
       properties:
         customId:
           type: string
+      required:
+        - customId
     user.validators_createUserSchema:
       type: object
       properties:
@@ -11535,27 +13820,29 @@ components:
       properties:
         id:
           type: string
+      required:
+        - id
     user.validators_getUserQuerySchema:
       type: object
       properties:
-        page:
+        page: &ref_108
           type: object
           additionalProperties: true
           nullable: true
-        pageSize:
+        pageSize: &ref_109
           type: object
           additionalProperties: true
           nullable: true
-        educationStage:
+        educationStage: &ref_110
           type: string
           nullable: true
-        roleList:
+        roleList: &ref_111
           type: string
           nullable: true
-        location:
+        location: &ref_112
           type: string
           nullable: true
-        search:
+        search: &ref_113
           type: string
           nullable: true
     user.validators_userPreferencesSchema:
@@ -11564,6 +13851,8 @@ components:
         preferences:
           type: object
           additionalProperties: true
+      required:
+        - preferences
     user.validators_userSuccessResponseSchema:
       type: object
       properties:
@@ -11727,6 +14016,13 @@ components:
               type: string
             updatedDate:
               type: string
+          required:
+            - id
+            - isOpenLocation
+            - isOpenProfile
+            - isSubscribeEmail
+            - createdDate
+            - updatedDate
         timestamp:
           type: string
         meta:
@@ -11760,6 +14056,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     user.validators_usersListResponseSchema:
       type: object
       properties:
@@ -11907,6 +14207,13 @@ components:
                 type: string
               updatedDate:
                 type: string
+            required:
+              - id
+              - isOpenLocation
+              - isOpenProfile
+              - isSubscribeEmail
+              - createdDate
+              - updatedDate
         pagination:
           type: object
           properties:
@@ -11922,6 +14229,13 @@ components:
               type: boolean
             hasPrev:
               type: boolean
+          required:
+            - currentPage
+            - totalPages
+            - totalItems
+            - itemsPerPage
+            - hasNext
+            - hasPrev
         timestamp:
           type: string
         meta:
@@ -11955,6 +14269,11 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - pagination
+        - timestamp
     user.validators_createUserResponseSchema:
       type: object
       properties:
@@ -12103,8 +14422,18 @@ components:
                   type: string
                 updatedDate:
                   type: string
+              required:
+                - id
+                - isOpenLocation
+                - isOpenProfile
+                - isSubscribeEmail
+                - createdDate
+                - updatedDate
             token:
               type: string
+          required:
+            - user
+            - token
         timestamp:
           type: string
         meta:
@@ -12138,6 +14467,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     user.validators_updateUserResponseSchema:
       type: object
       properties:
@@ -12283,6 +14616,13 @@ components:
               type: string
             updatedDate:
               type: string
+          required:
+            - id
+            - isOpenLocation
+            - isOpenProfile
+            - isSubscribeEmail
+            - createdDate
+            - updatedDate
         timestamp:
           type: string
         meta:
@@ -12316,6 +14656,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     user.validators_deleteUserResponseSchema:
       type: object
       properties:
@@ -12328,6 +14672,8 @@ components:
           properties:
             message:
               type: string
+          required:
+            - message
         timestamp:
           type: string
         meta:
@@ -12361,6 +14707,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     user.validators_userPreferencesResponseSchema:
       type: object
       properties:
@@ -12404,6 +14754,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     user.validators_updateUserPreferencesResponseSchema:
       type: object
       properties:
@@ -12419,6 +14773,9 @@ components:
             preferences:
               type: object
               additionalProperties: true
+          required:
+            - message
+            - preferences
         timestamp:
           type: string
         meta:
@@ -12452,6 +14809,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     user.validators_availablePreferencesResponseSchema:
       type: object
       properties:
@@ -12495,6 +14856,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     user.validators_customIdAvailabilityResponseSchema:
       type: object
       properties:
@@ -12507,6 +14872,8 @@ components:
           properties:
             available:
               type: boolean
+          required:
+            - available
         timestamp:
           type: string
         meta:
@@ -12540,6 +14907,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     user.validators_setCustomIdResponseSchema:
       type: object
       properties:
@@ -12552,6 +14923,8 @@ components:
           properties:
             customId:
               type: string
+          required:
+            - customId
         timestamp:
           type: string
         meta:
@@ -12585,6 +14958,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
     user.validators_removeCustomIdResponseSchema:
       type: object
       properties:
@@ -12597,6 +14974,8 @@ components:
           properties:
             message:
               type: string
+          required:
+            - message
         timestamp:
           type: string
         meta:
@@ -12630,6 +15009,10 @@ components:
               type: number
               nullable: true
           nullable: true
+      required:
+        - success
+        - data
+        - timestamp
   parameters: {}
   responses:
     BadRequestError:
@@ -13076,6 +15459,17 @@ paths:
         (required) - type of target entity - targetId: number (required) - ID of
         target entity Supports optional authentication for personalized
         visibility
+      parameters:
+        - name: targetType
+          in: query
+          required: true
+          schema: *ref_35
+          description: targetType 查詢參數
+        - name: targetId
+          in: query
+          required: true
+          schema: *ref_36
+          description: targetId 查詢參數
       security:
         - bearerAuth: []
   /api/v1/comments/{commentId}:
@@ -13135,7 +15529,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/comment.validators_commentParamsSchema'
+              $ref: '#/components/schemas/comment.validators_updateCommentSchema'
       parameters:
         - name: commentId
           in: path
@@ -13561,6 +15955,47 @@ paths:
         '@/controllers/idea.controller'; const router = Router(); /** GET /ideas
         獲取想法列表 查詢參數：page, limit, query, tags, userId, status, sort, order
         支援可選身份驗證（用於個人化內容）
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema: *ref_37
+          description: page 查詢參數
+        - name: limit
+          in: query
+          required: true
+          schema: *ref_38
+          description: limit 查詢參數
+        - name: query
+          in: query
+          required: false
+          schema: *ref_39
+          description: query 查詢參數
+        - name: tags
+          in: query
+          required: false
+          schema: *ref_40
+          description: tags 查詢參數
+        - name: userId
+          in: query
+          required: false
+          schema: *ref_41
+          description: userId 查詢參數
+        - name: status
+          in: query
+          required: false
+          schema: *ref_42
+          description: status 查詢參數
+        - name: sort
+          in: query
+          required: true
+          schema: *ref_43
+          description: sort 查詢參數
+        - name: order
+          in: query
+          required: true
+          schema: *ref_44
+          description: order 查詢參數
       security:
         - bearerAuth: []
     post:
@@ -13663,7 +16098,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/idea.validators_ideaParamsSchema'
+              $ref: '#/components/schemas/idea.validators_updateIdeaSchema'
       parameters:
         - name: id
           in: path
@@ -13949,6 +16384,47 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema: *ref_37
+          description: page 查詢參數
+        - name: limit
+          in: query
+          required: true
+          schema: *ref_38
+          description: limit 查詢參數
+        - name: query
+          in: query
+          required: false
+          schema: *ref_39
+          description: query 查詢參數
+        - name: tags
+          in: query
+          required: false
+          schema: *ref_40
+          description: tags 查詢參數
+        - name: userId
+          in: query
+          required: false
+          schema: *ref_41
+          description: userId 查詢參數
+        - name: status
+          in: query
+          required: false
+          schema: *ref_42
+          description: status 查詢參數
+        - name: sort
+          in: query
+          required: true
+          schema: *ref_43
+          description: sort 查詢參數
+        - name: order
+          in: query
+          required: true
+          schema: *ref_44
+          description: order 查詢參數
       security:
         - bearerAuth: []
   /api/v1/me/practices:
@@ -13973,6 +16449,52 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema: *ref_45
+          description: page 查詢參數
+        - name: limit
+          in: query
+          required: true
+          schema: *ref_46
+          description: limit 查詢參數
+        - name: status
+          in: query
+          required: false
+          schema: *ref_47
+          description: status 查詢參數
+        - name: contentType
+          in: query
+          required: false
+          schema: *ref_48
+          description: contentType 查詢參數
+        - name: search
+          in: query
+          required: false
+          schema: *ref_49
+          description: search 查詢參數
+        - name: sortBy
+          in: query
+          required: true
+          schema: *ref_50
+          description: sortBy 查詢參數
+        - name: sortOrder
+          in: query
+          required: true
+          schema: *ref_51
+          description: sortOrder 查詢參數
+        - name: dateFrom
+          in: query
+          required: false
+          schema: *ref_52
+          description: dateFrom 查詢參數
+        - name: dateTo
+          in: query
+          required: false
+          schema: *ref_53
+          description: dateTo 查詢參數
       security:
         - bearerAuth: []
   /api/v1/me/practice-stats:
@@ -13997,6 +16519,17 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: timeRange
+          in: query
+          required: true
+          schema: *ref_54
+          description: timeRange 查詢參數
+        - name: includeArchived
+          in: query
+          required: true
+          schema: *ref_55
+          description: includeArchived 查詢參數
       security:
         - bearerAuth: []
   /api/v1/me/resources:
@@ -14021,6 +16554,52 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema: *ref_56
+          description: page 查詢參數
+        - name: limit
+          in: query
+          required: true
+          schema: *ref_57
+          description: limit 查詢參數
+        - name: category
+          in: query
+          required: false
+          schema: *ref_58
+          description: category 查詢參數
+        - name: type
+          in: query
+          required: false
+          schema: *ref_59
+          description: type 查詢參數
+        - name: status
+          in: query
+          required: true
+          schema: *ref_60
+          description: status 查詢參數
+        - name: search
+          in: query
+          required: false
+          schema: *ref_61
+          description: search 查詢參數
+        - name: sortBy
+          in: query
+          required: true
+          schema: *ref_62
+          description: sortBy 查詢參數
+        - name: sortOrder
+          in: query
+          required: true
+          schema: *ref_63
+          description: sortOrder 查詢參數
+        - name: tags
+          in: query
+          required: false
+          schema: *ref_64
+          description: tags 查詢參數
       security:
         - bearerAuth: []
   /api/v1/me/preferences:
@@ -14045,6 +16624,17 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema: *ref_65
+          description: category 查詢參數
+        - name: includeSystem
+          in: query
+          required: true
+          schema: *ref_66
+          description: includeSystem 查詢參數
       security:
         - bearerAuth: []
     put:
@@ -14657,6 +17247,52 @@ paths:
         1-12').transform(Number) }); const router = Router(); /** GET /practices
         取得實踐列表 查詢參數：page, limit, search, contentType, status, sortBy, sortOrder,
         userId 支援可選身份驗證（用於個人化內容）
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema: *ref_45
+          description: page 查詢參數
+        - name: limit
+          in: query
+          required: true
+          schema: *ref_46
+          description: limit 查詢參數
+        - name: status
+          in: query
+          required: false
+          schema: *ref_47
+          description: status 查詢參數
+        - name: contentType
+          in: query
+          required: false
+          schema: *ref_48
+          description: contentType 查詢參數
+        - name: search
+          in: query
+          required: false
+          schema: *ref_49
+          description: search 查詢參數
+        - name: sortBy
+          in: query
+          required: true
+          schema: *ref_50
+          description: sortBy 查詢參數
+        - name: sortOrder
+          in: query
+          required: true
+          schema: *ref_51
+          description: sortOrder 查詢參數
+        - name: dateFrom
+          in: query
+          required: false
+          schema: *ref_52
+          description: dateFrom 查詢參數
+        - name: dateTo
+          in: query
+          required: false
+          schema: *ref_53
+          description: dateTo 查詢參數
       security:
         - bearerAuth: []
     post:
@@ -14738,6 +17374,57 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema: *ref_67
+          description: page 查詢參數
+        - name: limit
+          in: query
+          required: true
+          schema: *ref_68
+          description: limit 查詢參數
+        - name: query
+          in: query
+          required: false
+          schema: *ref_69
+          description: query 查詢參數
+        - name: contentType
+          in: query
+          required: false
+          schema: *ref_70
+          description: contentType 查詢參數
+        - name: tags
+          in: query
+          required: false
+          schema: *ref_71
+          description: tags 查詢參數
+        - name: userId
+          in: query
+          required: false
+          schema: *ref_72
+          description: userId 查詢參數
+        - name: status
+          in: query
+          required: true
+          schema: *ref_73
+          description: status 查詢參數
+        - name: sort
+          in: query
+          required: true
+          schema: *ref_74
+          description: sort 查詢參數
+        - name: order
+          in: query
+          required: true
+          schema: *ref_75
+          description: order 查詢參數
+        - name: include
+          in: query
+          required: false
+          schema: *ref_76
+          description: include 查詢參數
       security:
         - bearerAuth: []
   /api/v1/practices/stats:
@@ -14821,7 +17508,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/practice.validators_practiceParamsSchema'
+              $ref: '#/components/schemas/practice.validators_updatePracticeSchema'
       parameters:
         - name: id
           in: path
@@ -14903,7 +17590,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/practice.validators_practiceParamsSchema'
+              $ref: '#/components/schemas/practice.validators_checkInSchema'
       parameters:
         - name: id
           in: path
@@ -14941,6 +17628,36 @@ paths:
           schema:
             type: string
           description: id 參數
+        - name: page
+          in: query
+          required: true
+          schema: *ref_77
+          description: page 查詢參數
+        - name: limit
+          in: query
+          required: true
+          schema: *ref_78
+          description: limit 查詢參數
+        - name: startDate
+          in: query
+          required: false
+          schema: *ref_79
+          description: startDate 查詢參數
+        - name: endDate
+          in: query
+          required: false
+          schema: *ref_80
+          description: endDate 查詢參數
+        - name: mood
+          in: query
+          required: false
+          schema: *ref_81
+          description: mood 查詢參數
+        - name: include
+          in: query
+          required: false
+          schema: *ref_82
+          description: include 查詢參數
       security:
         - bearerAuth: []
   /api/v1/practices/{id}/checkins/stats:
@@ -15039,12 +17756,6 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/practice.validators_practiceParamsSchema'
       parameters:
         - name: id
           in: path
@@ -15076,12 +17787,6 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/practice.validators_practiceParamsSchema'
       parameters:
         - name: id
           in: path
@@ -15118,7 +17823,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/practice.validators_practiceParamsSchema'
+              $ref: >-
+                #/components/schemas/practice.validators_practiceEventShareSchema
       parameters:
         - name: id
           in: path
@@ -15155,7 +17861,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/practice.validators_practiceParamsSchema'
+              $ref: '#/components/schemas/practice.validators_practiceEventViewSchema'
       parameters:
         - name: id
           in: path
@@ -15286,6 +17992,47 @@ paths:
         '../validators/milestone.validators'; const router = Router(); /** GET
         /projects 獲取專案列表 查詢參數：page, limit, status, is_public, user_id, search,
         sort_by, sort_order 支援可選身份驗證（用於個人化內容）
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema: *ref_83
+          description: page 查詢參數
+        - name: limit
+          in: query
+          required: false
+          schema: *ref_84
+          description: limit 查詢參數
+        - name: status
+          in: query
+          required: false
+          schema: *ref_85
+          description: status 查詢參數
+        - name: isPublic
+          in: query
+          required: false
+          schema: *ref_86
+          description: isPublic 查詢參數
+        - name: userId
+          in: query
+          required: false
+          schema: *ref_87
+          description: userId 查詢參數
+        - name: search
+          in: query
+          required: false
+          schema: *ref_88
+          description: search 查詢參數
+        - name: sortBy
+          in: query
+          required: false
+          schema: *ref_89
+          description: sortBy 查詢參數
+        - name: sortOrder
+          in: query
+          required: false
+          schema: *ref_90
+          description: sortOrder 查詢參數
       security:
         - bearerAuth: []
     post:
@@ -15391,6 +18138,47 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema: *ref_83
+          description: page 查詢參數
+        - name: limit
+          in: query
+          required: false
+          schema: *ref_84
+          description: limit 查詢參數
+        - name: status
+          in: query
+          required: false
+          schema: *ref_85
+          description: status 查詢參數
+        - name: isPublic
+          in: query
+          required: false
+          schema: *ref_86
+          description: isPublic 查詢參數
+        - name: userId
+          in: query
+          required: false
+          schema: *ref_87
+          description: userId 查詢參數
+        - name: search
+          in: query
+          required: false
+          schema: *ref_88
+          description: search 查詢參數
+        - name: sortBy
+          in: query
+          required: false
+          schema: *ref_89
+          description: sortBy 查詢參數
+        - name: sortOrder
+          in: query
+          required: false
+          schema: *ref_90
+          description: sortOrder 查詢參數
       security:
         - bearerAuth: []
   /api/v1/projects/public:
@@ -15415,6 +18203,47 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema: *ref_83
+          description: page 查詢參數
+        - name: limit
+          in: query
+          required: false
+          schema: *ref_84
+          description: limit 查詢參數
+        - name: status
+          in: query
+          required: false
+          schema: *ref_85
+          description: status 查詢參數
+        - name: isPublic
+          in: query
+          required: false
+          schema: *ref_86
+          description: isPublic 查詢參數
+        - name: userId
+          in: query
+          required: false
+          schema: *ref_87
+          description: userId 查詢參數
+        - name: search
+          in: query
+          required: false
+          schema: *ref_88
+          description: search 查詢參數
+        - name: sortBy
+          in: query
+          required: false
+          schema: *ref_89
+          description: sortBy 查詢參數
+        - name: sortOrder
+          in: query
+          required: false
+          schema: *ref_90
+          description: sortOrder 查詢參數
       security:
         - bearerAuth: []
   /api/v1/projects/stats:
@@ -15439,6 +18268,12 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          schema: *ref_91
+          description: userId 查詢參數
       security:
         - bearerAuth: []
   /api/v1/projects/{id}:
@@ -15498,7 +18333,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/project.validators_projectParamsSchema'
+              $ref: '#/components/schemas/project.validators_updateProjectSchema'
       parameters:
         - name: id
           in: path
@@ -15580,7 +18415,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/project.validators_projectParamsSchema'
+              $ref: '#/components/schemas/project.validators_duplicateProjectSchema'
       parameters:
         - name: id
           in: path
@@ -15660,6 +18495,17 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema: *ref_92
+          description: page 查詢參數
+        - name: pageSize
+          in: query
+          required: true
+          schema: *ref_93
+          description: pageSize 查詢參數
       security:
         - bearerAuth: []
   /api/v1/projects/{projectId}/milestones:
@@ -15689,7 +18535,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/note.validators_noteProjectParamsSchema'
+              $ref: '#/components/schemas/milestone.validators_createMilestoneSchema'
       parameters:
         - name: projectId
           in: path
@@ -15756,7 +18602,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/milestone.validators_milestoneParamsSchema'
+              $ref: '#/components/schemas/milestone.validators_updateMilestoneSchema'
       parameters:
         - name: projectId
           in: path
@@ -15850,7 +18696,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/task.validators_taskMilestoneParamsSchema'
+              $ref: '#/components/schemas/task.validators_createTaskSchema'
       parameters:
         - name: projectId
           in: path
@@ -15971,7 +18817,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/task.validators_taskParamsSchema'
+              $ref: '#/components/schemas/task.validators_updateTaskSchema'
       parameters:
         - name: projectId
           in: path
@@ -16078,7 +18924,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/note.validators_noteProjectParamsSchema'
+              $ref: '#/components/schemas/note.validators_createNoteSchema'
       parameters:
         - name: projectId
           in: path
@@ -16182,7 +19028,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/note.validators_noteParamsSchema'
+              $ref: '#/components/schemas/note.validators_updateNoteSchema'
       parameters:
         - name: projectId
           in: path
@@ -16276,7 +19122,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/note.validators_noteProjectParamsSchema'
+              $ref: '#/components/schemas/outcome.validators_createOutcomeSchema'
       parameters:
         - name: projectId
           in: path
@@ -16379,7 +19225,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/outcome.validators_outcomeParamsSchema'
+              $ref: '#/components/schemas/outcome.validators_updateOutcomeSchema'
       parameters:
         - name: projectId
           in: path
@@ -16473,7 +19319,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/note.validators_noteProjectParamsSchema'
+              $ref: '#/components/schemas/review.validators_createReviewSchema'
       parameters:
         - name: projectId
           in: path
@@ -16511,6 +19357,31 @@ paths:
           schema:
             type: string
           description: projectId 參數
+        - name: week
+          in: query
+          required: false
+          schema: *ref_94
+          description: week 查詢參數
+        - name: mood
+          in: query
+          required: false
+          schema: *ref_95
+          description: mood 查詢參數
+        - name: stressLevel
+          in: query
+          required: false
+          schema: *ref_96
+          description: stressLevel 查詢參數
+        - name: page
+          in: query
+          required: true
+          schema: *ref_97
+          description: page 查詢參數
+        - name: pageSize
+          in: query
+          required: true
+          schema: *ref_98
+          description: pageSize 查詢參數
       security:
         - bearerAuth: []
   /api/v1/projects/{projectId}/reviews/{reviewId}:
@@ -16576,7 +19447,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/review.validators_reviewParamsSchema'
+              $ref: '#/components/schemas/review.validators_updateReviewSchema'
       parameters:
         - name: projectId
           in: path
@@ -16686,6 +19557,26 @@ paths:
           schema:
             type: string
           description: resourceId 參數
+        - name: cursor
+          in: query
+          required: false
+          schema: *ref_99
+          description: cursor 查詢參數
+        - name: limit
+          in: query
+          required: false
+          schema: *ref_100
+          description: limit 查詢參數
+        - name: sort
+          in: query
+          required: false
+          schema: *ref_101
+          description: sort 查詢參數
+        - name: order
+          in: query
+          required: false
+          schema: *ref_102
+          description: order 查詢參數
       security:
         - bearerAuth: []
     post:
@@ -17045,6 +19936,27 @@ paths:
         const router = Router(); /** GET /resources 獲取資源列表 查詢參數：cursor, limit,
         type, cost, level, majorCategory, subCategory, tags, query, sort, order
         支援可選身份驗證（用於個人化內容）
+      parameters:
+        - name: cursor
+          in: query
+          required: false
+          schema: *ref_99
+          description: cursor 查詢參數
+        - name: limit
+          in: query
+          required: false
+          schema: *ref_100
+          description: limit 查詢參數
+        - name: sort
+          in: query
+          required: false
+          schema: *ref_101
+          description: sort 查詢參數
+        - name: order
+          in: query
+          required: false
+          schema: *ref_102
+          description: order 查詢參數
       security:
         - bearerAuth: []
     post:
@@ -17322,6 +20234,12 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: limit
+          in: query
+          required: true
+          schema: *ref_103
+          description: limit 查詢參數
       security:
         - bearerAuth: []
   /api/v1/tags/search:
@@ -17346,6 +20264,17 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema: *ref_104
+          description: query 查詢參數
+        - name: limit
+          in: query
+          required: true
+          schema: *ref_105
+          description: limit 查詢參數
       security:
         - bearerAuth: []
   /api/v1/tags/stats:
@@ -17461,6 +20390,17 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: entityId
+          in: query
+          required: true
+          schema: *ref_106
+          description: entityId 查詢參數
+        - name: entityType
+          in: query
+          required: true
+          schema: *ref_107
+          description: entityType 查詢參數
       security:
         - bearerAuth: []
   /api/v1/users/:
@@ -17498,6 +20438,37 @@ paths:
         '../validators/me.validators'; const router = Router(); /** GET /users
         獲取用戶列表 查詢參數：page, pageSize, educationStage, roleList, location, search
         支援可選身份驗證（用於個人化內容）
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema: *ref_108
+          description: page 查詢參數
+        - name: pageSize
+          in: query
+          required: false
+          schema: *ref_109
+          description: pageSize 查詢參數
+        - name: educationStage
+          in: query
+          required: false
+          schema: *ref_110
+          description: educationStage 查詢參數
+        - name: roleList
+          in: query
+          required: false
+          schema: *ref_111
+          description: roleList 查詢參數
+        - name: location
+          in: query
+          required: false
+          schema: *ref_112
+          description: location 查詢參數
+        - name: search
+          in: query
+          required: false
+          schema: *ref_113
+          description: search 查詢參數
       security:
         - bearerAuth: []
     post:
@@ -17536,12 +20507,15 @@ paths:
         支援可選身份驗證（用於個人化內容） / router.get('/', optionalAuth,
         validate(getUserQuerySchema, 'query'), userController.getAllUsers as
         RequestHandler ); /** GET /users/me 獲取當前用戶資訊 需要身份驗證 / router.get('/me',
-        authenticate, userController.getMe as RequestHandler ); /** GET
-        /users/custom-id/check/:customId 檢查自訂 ID 可用性 路徑參數：customId - 要檢查的自訂 ID /
-        router.get('/custom-id/check/:customId', validate(customIdParamsSchema,
-        'params'), userController.checkCustomIdAvailability as RequestHandler );
-        /** GET /users/custom-id/:customId 透過自訂 ID 獲取用戶資訊 路徑參數：customId - 用戶自訂
-        ID / router.get('/custom-id/:customId', validate(customIdParamsSchema,
+        authenticate, userController.getMe as RequestHandler ); /** PUT
+        /users/me 更新當前用戶資訊 需要身份驗證 / router.put('/me', authenticate,
+        validate(updateUserSchema, 'body'), userController.updateMe as
+        RequestHandler ); /** GET /users/custom-id/check/:customId 檢查自訂 ID 可用性
+        路徑參數：customId - 要檢查的自訂 ID / router.get('/custom-id/check/:customId',
+        validate(customIdParamsSchema, 'params'),
+        userController.checkCustomIdAvailability as RequestHandler ); /** GET
+        /users/custom-id/:customId 透過自訂 ID 獲取用戶資訊 路徑參數：customId - 用戶自訂 ID /
+        router.get('/custom-id/:customId', validate(customIdParamsSchema,
         'params'), userController.getUserByCustomId as RequestHandler ); /**
         POST /users/me/custom-id 設置當前用戶的自訂 ID 需要身份驗證
       requestBody:
@@ -17573,6 +20547,34 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      security:
+        - bearerAuth: []
+    put:
+      tags:
+        - Users
+      summary: PUT /me
+      operationId: put_api_v1_users_me
+      responses:
+        '200':
+          description: 成功回應
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user.validators_updateUserResponseSchema'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user.validators_updateUserSchema'
       security:
         - bearerAuth: []
     delete:
@@ -17732,6 +20734,17 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema: *ref_65
+          description: category 查詢參數
+        - name: includeSystem
+          in: query
+          required: true
+          schema: *ref_66
+          description: includeSystem 查詢參數
       security:
         - bearerAuth: []
     put:
@@ -17828,7 +20841,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user.validators_userSuccessResponseSchema'
+                $ref: '#/components/schemas/user.validators_updateUserResponseSchema'
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
@@ -17842,7 +20855,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/user.validators_getUserParamsSchema'
+              $ref: '#/components/schemas/user.validators_updateUserSchema'
       parameters:
         - name: id
           in: path
