@@ -11410,6 +11410,31 @@ components:
         isSendEmail:
           type: boolean
           nullable: true
+        professionalField:
+          type: string
+          enum: &ref_31
+            - information_and_communication_technologies_icts
+            - business_administration_and_law
+            - arts_and_humanities
+            - natural_sciences_mathematics_and_statistics
+            - engineering_manufacturing_and_construction
+            - health_and_welfare
+            - education
+            - social_sciences_journalism_and_information
+            - language_skills_and_knowledge
+            - services
+            - agriculture_forestry_fisheries_and_veterinary
+            - others
+          nullable: true
+        personalSlogan:
+          type: string
+          nullable: true
+        referralSource:
+          type: string
+          nullable: true
+        customId:
+          type: string
+          nullable: true
     user.validators_updateUserSchema:
       type: object
       properties:
@@ -11495,6 +11520,16 @@ components:
           type: object
           additionalProperties: true
           nullable: true
+        professionalField:
+          type: string
+          enum: *ref_31
+          nullable: true
+        personalSlogan:
+          type: string
+          nullable: true
+        referralSource:
+          type: string
+          nullable: true
     user.validators_getUserParamsSchema:
       type: object
       properties:
@@ -11552,7 +11587,7 @@ components:
               nullable: true
             gender:
               type: string
-              enum: &ref_31
+              enum: &ref_32
                 - male
                 - female
                 - other
@@ -11562,7 +11597,7 @@ components:
               nullable: true
             educationStage:
               type: string
-              enum: &ref_32
+              enum: &ref_33
                 - university
                 - high
                 - other
@@ -11666,6 +11701,28 @@ components:
             customIdCreatedAt:
               type: string
               nullable: true
+            professionalField:
+              type: string
+              enum: &ref_34
+                - information_and_communication_technologies_icts
+                - business_administration_and_law
+                - arts_and_humanities
+                - natural_sciences_mathematics_and_statistics
+                - engineering_manufacturing_and_construction
+                - health_and_welfare
+                - education
+                - social_sciences_journalism_and_information
+                - language_skills_and_knowledge
+                - services
+                - agriculture_forestry_fisheries_and_veterinary
+                - others
+              nullable: true
+            personalSlogan:
+              type: string
+              nullable: true
+            referralSource:
+              type: string
+              nullable: true
             createdDate:
               type: string
             updatedDate:
@@ -11728,14 +11785,14 @@ components:
                 nullable: true
               gender:
                 type: string
-                enum: *ref_31
+                enum: *ref_32
                 nullable: true
               birthDay:
                 type: string
                 nullable: true
               educationStage:
                 type: string
-                enum: *ref_32
+                enum: *ref_33
                 nullable: true
               isOpenLocation:
                 type: boolean
@@ -11836,6 +11893,16 @@ components:
               customIdCreatedAt:
                 type: string
                 nullable: true
+              professionalField:
+                type: string
+                enum: *ref_34
+                nullable: true
+              personalSlogan:
+                type: string
+                nullable: true
+              referralSource:
+                type: string
+                nullable: true
               createdDate:
                 type: string
               updatedDate:
@@ -11914,14 +11981,14 @@ components:
                   nullable: true
                 gender:
                   type: string
-                  enum: *ref_31
+                  enum: *ref_32
                   nullable: true
                 birthDay:
                   type: string
                   nullable: true
                 educationStage:
                   type: string
-                  enum: *ref_32
+                  enum: *ref_33
                   nullable: true
                 isOpenLocation:
                   type: boolean
@@ -12022,6 +12089,16 @@ components:
                 customIdCreatedAt:
                   type: string
                   nullable: true
+                professionalField:
+                  type: string
+                  enum: *ref_34
+                  nullable: true
+                personalSlogan:
+                  type: string
+                  nullable: true
+                referralSource:
+                  type: string
+                  nullable: true
                 createdDate:
                   type: string
                 updatedDate:
@@ -12084,14 +12161,14 @@ components:
               nullable: true
             gender:
               type: string
-              enum: *ref_31
+              enum: *ref_32
               nullable: true
             birthDay:
               type: string
               nullable: true
             educationStage:
               type: string
-              enum: *ref_32
+              enum: *ref_33
               nullable: true
             isOpenLocation:
               type: boolean
@@ -12190,6 +12267,16 @@ components:
               type: boolean
               nullable: true
             customIdCreatedAt:
+              type: string
+              nullable: true
+            professionalField:
+              type: string
+              enum: *ref_34
+              nullable: true
+            personalSlogan:
+              type: string
+              nullable: true
+            referralSource:
               type: string
               nullable: true
             createdDate:

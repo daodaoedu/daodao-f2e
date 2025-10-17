@@ -3,16 +3,17 @@ import { IdeaDetailWidget } from '@/widgets/idea-detail';
 import { ideaAPI } from '@/services/ideas/api';
 
 interface IdeaDetailPageProps {
-  params: {
+  params: Promise<{
     ideaId: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({
   params,
 }: IdeaDetailPageProps): Promise<Metadata> {
   try {
-    const idea = await ideaAPI.read(params.ideaId);
+    const { ideaId } = await params;
+    const idea = await ideaAPI.read(ideaId);
 
     const title = `${idea.content.slice(0, 50)}${idea.content.length > 50 ? '...' : ''} | 想法詳情`;
     const description = idea.content.slice(0, 160);
@@ -44,6 +45,7 @@ export async function generateMetadata({
   }
 }
 
-export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
-  return <IdeaDetailWidget ideaId={params.ideaId} />;
+export default async function IdeaDetailPage({ params }: IdeaDetailPageProps) {
+  const { ideaId } = await params;
+  return <IdeaDetailWidget ideaId={ideaId} />;
 }
