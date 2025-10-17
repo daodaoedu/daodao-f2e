@@ -9,10 +9,12 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
+  FormDescription,
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';
 import { DatePickerWithForm } from '@/shared/ui/date-picker';
+import { cn } from '@/shared/lib/cn';
 import type { OnboardingFormData } from '../../model';
 
 export const PersonalInfoStep = () => {
@@ -50,7 +52,7 @@ export const PersonalInfoStep = () => {
       <FormField
         control={form.control}
         name="username"
-        render={({ field }) => (
+        render={({ field, fieldState }) => (
           <FormItem>
             <FormLabel>使用者帳號</FormLabel>
             <FormControl>
@@ -60,7 +62,14 @@ export const PersonalInfoStep = () => {
                 {...field}
               />
             </FormControl>
-            <FormMessage>僅可使用英文字母和數字，長度 3-15 個字元</FormMessage>
+            <FormDescription
+              className={cn(
+                'mt-2',
+                fieldState.error?.message && 'text-destructive'
+              )}
+            >
+              僅可使用英文字母和數字，長度 3-15 個字元
+            </FormDescription>
           </FormItem>
         )}
       />
@@ -73,11 +82,7 @@ export const PersonalInfoStep = () => {
           <FormItem>
             <FormLabel>個人標語</FormLabel>
             <FormControl>
-              <Textarea
-                placeholder="用一句話介紹自己"
-                rows={3}
-                {...field}
-              />
+              <Textarea placeholder="用一句話介紹自己" rows={3} {...field} />
             </FormControl>
             <p className="body-sm mt-1 text-right text-basic-500">
               {field.value?.length || 0}/150

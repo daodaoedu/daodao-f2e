@@ -16,11 +16,23 @@ export const AuthSuccess = () => {
     const token = parseToString(searchParams.get('token'));
     const rt = parseToString(searchParams.get('rt'));
     const redirectTo = rt?.startsWith('/') ? rt : '/';
-    const isTemp = token && !formatJWTInfo(token).payload?.isTemp;
+    const needsOnboarding = token
+      ? formatJWTInfo(token).payload?.isTemp
+      : false;
+
+    const getQueryString = (query: URLSearchParams) =>
+      query.size ? `?${query.toString()}` : '';
+
+    searchParams.delete('token');
 
     if (token) setToken(token);
 
-    router.replace(isTemp ? `/onboarding?rt=${redirectTo}` : redirectTo);
+    if (needsOnboarding) {
+      router.replace(`/onboarding${getQueryString(searchParams)}`);
+    } else {
+      searchParams.delete('rt');
+      router.replace(`${redirectTo}${getQueryString(searchParams)}`);
+    }
   }, [setToken, router]);
 
   return <IslandPlaceholder title="正在前往新的島嶼" />;

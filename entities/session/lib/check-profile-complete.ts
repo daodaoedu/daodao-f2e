@@ -3,7 +3,7 @@ import { SessionState } from '../model/types';
 export const checkProfileComplete = (data: SessionState['user']) => {
   if (!data) return false;
 
-  const hasAnySocialCode = Object.values(data.contactList || '{}').some(
+  const hasAnySocialCode = Object.values(data.contactList || {}).some(
     (socialCode) => Boolean(socialCode)
   );
   if (!hasAnySocialCode) return false;
