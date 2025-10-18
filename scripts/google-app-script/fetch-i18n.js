@@ -1,35 +1,29 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs');
 const path = require('path');
+const { getScriptUrl } = require('./get-script-url');
 
-// eslint-disable-next-line consistent-return
-const getScriptUrl = () => {
-  const urlArg = process.argv.find((arg) => arg.startsWith('--url='));
-  if (urlArg) {
-    return urlArg.split('=')[1];
-  }
-
-  if (process.env.NEXT_I18N_URL) {
-    return process.env.NEXT_I18N_URL;
-  }
-
-  process.stderr.write('錯誤: 請提供 Google App Script URL\n');
-  process.stderr.write('用法: npm run i18n:fetch -- --url=YOUR_SCRIPT_URL\n');
-  process.stderr.write('或設置環境變數 NEXT_I18N_URL\n');
-  process.exit(1);
-};
-
-const scriptUrl = getScriptUrl();
-process.stdout.write('正在從 Google App Script 獲取翻譯數據...\n');
-
-fetch(scriptUrl, { method: 'POST' })
-  .then((response) => {
+const fetchGoogleSheet = async () => {
+  const scriptUrl = getScriptUrl();
+  try {
+    const response = await fetch(scriptUrl, { method: 'GET' });
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
     return response.json();
-  })
-  .then((json) => {
+  } catch (error) {
+    process.stderr.write(`獲取翻譯數據失敗: ${error.message}\n`);
+    process.exit(1);
+    return null;
+  }
+};
+
+const main = async () => {
+  try {
+    process.stdout.write('正在從 Google App Script 獲取翻譯數據...\n');
+
+    const json = await fetchGoogleSheet();
+
     const locales = Object.keys(json);
     const outputDir = path.join(process.cwd(), 'shared/config/locales');
 
@@ -44,8 +38,10 @@ fetch(scriptUrl, { method: 'POST' })
     });
 
     process.stdout.write('翻譯數據更新完成!\n');
-  })
-  .catch((error) => {
-    process.stderr.write(`獲取翻譯數據失敗: ${error.message}\n`);
+  } catch (error) {
+    process.stderr.write(`錯誤: ${error.message}\n`);
     process.exit(1);
-  });
+  }
+};
+
+main();
