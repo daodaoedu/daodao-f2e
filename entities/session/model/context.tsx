@@ -2,7 +2,6 @@
 
 import {
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -55,23 +54,15 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
     createInitialSessionState()
   );
 
-  const setToken = useCallback(
-    (payload: string) => {
-      getTokenStorage().set(payload);
-      dispatch({ type: SessionActionTypes.SET_TOKEN, payload });
-    },
-    [dispatch]
-  );
-
-  const { trigger: triggerPostUser } = usePostApiV1Users({
-    swr: {
-      onSuccess: ({ data }) => setToken(data?.token ?? ''),
-    },
-  });
+  const { trigger: triggerPostUser } = usePostApiV1Users();
 
   const { trigger: triggerPutUser } = usePutApiV1UsersId(state.user?.id ?? '');
 
   const sessionActions = useMemo<SessionActions>(() => {
+    const setToken = (payload: string) => {
+      getTokenStorage().set(payload);
+      dispatch({ type: SessionActionTypes.SET_TOKEN, payload });
+    };
     const logout = () => {
       getTokenStorage().remove();
       dispatch({ type: SessionActionTypes.LOGOUT });
@@ -90,7 +81,8 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
         switch (state.loginStatus) {
           case SessionLoginStatus.TEMPORARY: {
             const arg = postApiV1UsersBody.parse(input);
-            await triggerPostUser(arg);
+            const result = await triggerPostUser(arg);
+            setToken(result?.data?.token ?? '');
             break;
           }
           case SessionLoginStatus.PERMANENT: {
@@ -117,7 +109,6 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
   }, [
     state.loginStatus,
     state.user,
-    setToken,
     triggerPostUser,
     triggerPutUser,
   ]);

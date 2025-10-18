@@ -7,9 +7,11 @@ import { cn } from '@/shared/lib/cn';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useSessionActions } from '@/entities/session';
+import { useDialog } from '@/contexts/Dialog';
 import { Form, parseSchemaAutoFocus } from '@/shared/ui/form';
 import { Button } from '@/shared/ui/button';
 import { Background, Container, Paper } from '@/shared/ui/wrapper';
+import { Image } from '@/shared/ui/image';
 import { Progress } from '@/shared/ui/progress';
 import getEnv from '@/shared/config/env';
 import { PersonalInfoStep, InterestsStep, ReferralSourceStep } from './steps';
@@ -19,6 +21,7 @@ import { ONBOARDING_STEPS } from '../config';
 export const AuthOnboarding = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
+  const { openDialog } = useDialog();
   const { updateUser } = useSessionActions();
   const searchParams = getEnv().isClientSide
     ? new URLSearchParams(window.location.search)
@@ -83,8 +86,36 @@ export const AuthOnboarding = () => {
         professionalField: data.professionalField[0],
       });
 
-      // 完成後重定向
-      router.push(redirectTo);
+      openDialog({
+        title: `${data.name}，歡迎加入島島阿學！`,
+        size: 'md',
+        content: (
+          <Image
+            src="/assets/images/social-validation.png"
+            alt="dao-dao-island"
+            className="mx-auto"
+            width={272}
+            height={211}
+          />
+        ),
+        cancelText: '稍後設定',
+        cancelBtnProps: {
+          variant: 'outline',
+        },
+        confirmText: '前往完成偏好設定獲得個人化推薦',
+        footerButtonsClassName: 'flex-col-reverse',
+        footerDescription: (
+          <p className="body-sm mt-4 rounded bg-basic-100 px-5 py-2 text-center text-basic-400">
+            記得到信箱收我們的歡迎信哦！
+          </p>
+        ),
+        onConfirm: () => {
+          router.replace('/personal-card');
+        },
+        onCancel: () => {
+          router.push(redirectTo);
+        },
+      });
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Onboarding submission error:', error);
