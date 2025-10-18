@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import React, { useEffect } from 'react';
 import { SWRConfig } from 'swr';
 
@@ -8,12 +7,10 @@ import { Toaster as SonnerToaster } from '@/shared/ui/sonner';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';
-import { SessionProvider, LoginModal, useSession } from '@/features/auth';
+import { SessionProvider, LoginModal } from '@/features/auth';
 import { DialogProvider } from '@/contexts/Dialog';
-import useQueryState from '@/shared/lib/use-query-state';
 import { fetcher } from '@/shared/lib/http';
 import getBaseLayout from '@/layout/core/getBaseLayout';
-import { useCompleteInfoReminder, useVerifiedSuccessDialog } from '@/features/users';
 import { initGA, logPageView } from '../shared/lib/analytics';
 import 'regenerator-runtime/runtime'; // Speech.js
 import "@/app/global.css";
@@ -26,25 +23,7 @@ const swrConfig = {
 };
 
 const ThemeComponentWrap = ({ pageProps, Component }) => {
-  const { isComplete, isLoggedIn } = useSession();
   const getLayout = Component?.getLayout || getBaseLayout;
-  const openCompleteInfoReminderDialog = useCompleteInfoReminder();
-  const openVerifiedSuccessDialog = useVerifiedSuccessDialog();
-  const [queryState, setQueryState] = useQueryState(z.object({
-    isVerified: z.string().optional().transform((val) => val === 'true'),
-  }));
-
-  useEffect(() => {
-    if (queryState.isVerified) {
-      openVerifiedSuccessDialog();
-      setQueryState({ isVerified: undefined });
-      return;
-    }
-
-    if (isLoggedIn && !isComplete) {
-      openCompleteInfoReminderDialog();
-    }
-  }, [queryState, isLoggedIn, isComplete, openCompleteInfoReminderDialog, openVerifiedSuccessDialog]);
 
   return (
     <>

@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
 import { useSession } from '@/features/auth';
-import { useUser } from '@/features/users';
+import { useGetApiV1UsersId } from '@/generated/endpoints/users';
 import { parseToString } from '@/shared/lib/helper';
 
 const PersonalCard = dynamic(() => import('@/components/PersonalCard'), {
@@ -14,7 +14,8 @@ const PartnerDetailPage = () => {
   const partnerId = parseToString(router.query?.id);
 
   // get partner info
-  const { data: partner } = useUser(partnerId);
+  const { data } = useGetApiV1UsersId(partnerId);
+  const partner = data?.data;
 
   // fetch login user info
   const { user } = useSession();
