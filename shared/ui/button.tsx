@@ -24,12 +24,12 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/50',
-        alert: 'bg-alert text-alert-foreground shadow-sm hover:bg-alert/90',
+          'border border-solid border-transparent bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/50',
+        alert: 'border border-solid border-transparent bg-alert text-alert-foreground shadow-sm hover:bg-alert/90',
         outline:
-          'border border-solid border-primary bg-background shadow-sm hover:bg-primary hover:text-primary-foreground [&_svg]:text-primary-base [&_svg]:hover:text-primary-foreground',
+          'border border-solid border-primary bg-background text-primary-base shadow-sm hover:bg-primary hover:text-primary-foreground [&_svg]:text-primary-base [&_svg]:hover:text-primary-foreground',
         secondary:
-          'bg-secondary text-secondary-foreground shadow-lg hover:bg-primary-lightest',
+          'border border-solid border-transparent bg-secondary text-secondary-foreground shadow-lg hover:bg-primary-lightest',
         ghost: 'hover:text-primary',
         link: 'text-primary underline-offset-4 hover:underline',
         gray: 'border-basic-200 bg-basic-200 text-basic-300 shadow-lg hover:border-primary-base hover:bg-primary-base hover:text-white',
