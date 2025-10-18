@@ -1,3 +1,4 @@
+import type { ApiResponseValidatorsApiErrorResponseSchema } from '@/generated/models';
 import { getTokenStorage } from '@/shared/lib/storage';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
@@ -63,10 +64,16 @@ export const fetcher = async <T>({
 
   if (!response.ok) {
     try {
-      const error = await response.json();
-      throw new ApiError(status, `HTTP Status: ${status}`, error);
+      const result: ApiResponseValidatorsApiErrorResponseSchema =
+        await response.json();
+
+      if (result.error?.message) {
+        throw new ApiError(status, result.error.message, result.error);
+      }
+      throw new ApiError(status, `HTTP Status: ${status}`, result.error);
     } catch {
-      throw new ApiError(-1, 'HTTP Status: Unknown', {
+      throw new ApiError(400, 'Unknown Error', {
+        code: 'UNKNOWN_ERROR',
         message: 'Unknown Error',
       });
     }

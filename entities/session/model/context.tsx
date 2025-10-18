@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -14,9 +15,9 @@ import {
   putApiV1UsersIdBody,
 } from '@/generated/endpoints/users.zod';
 import {
-  postApiV1Users,
-  putApiV1UsersId,
   useGetApiV1UsersMe,
+  usePostApiV1Users,
+  usePutApiV1UsersId,
 } from '@/generated/endpoints/users';
 import { ApiError } from '@/services/fetcher';
 import { onUnauthorized } from '@/shared/lib/auth-bus';
@@ -54,11 +55,23 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
     createInitialSessionState()
   );
 
-  const sessionActions = useMemo<SessionActions>(() => {
-    const setToken = (payload: string) => {
+  const setToken = useCallback(
+    (payload: string) => {
       getTokenStorage().set(payload);
       dispatch({ type: SessionActionTypes.SET_TOKEN, payload });
-    };
+    },
+    [dispatch]
+  );
+
+  const { trigger: triggerPostUser } = usePostApiV1Users({
+    swr: {
+      onSuccess: ({ data }) => setToken(data?.token ?? ''),
+    },
+  });
+
+  const { trigger: triggerPutUser } = usePutApiV1UsersId(state.user?.id ?? '');
+
+  const sessionActions = useMemo<SessionActions>(() => {
     const logout = () => {
       getTokenStorage().remove();
       dispatch({ type: SessionActionTypes.LOGOUT });
@@ -77,38 +90,19 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
         switch (state.loginStatus) {
           case SessionLoginStatus.TEMPORARY: {
             const arg = postApiV1UsersBody.parse(input);
-            const { data } = await postApiV1Users(arg);
-
-            if (!data?.token || !data?.user) {
-              throw new Error('Failed to login');
-            }
-            setToken(data.token);
-            dispatch({
-              type: SessionActionTypes.UPDATE_USER,
-              payload: data.user,
-            });
+            await triggerPostUser(arg);
             break;
           }
           case SessionLoginStatus.PERMANENT: {
-            if (!state.user.id) {
-              return;
-            }
             const arg = putApiV1UsersIdBody.parse({
               ...state.user,
               ...input,
             });
-            const { data } = await putApiV1UsersId(state.user.id, arg);
-            if (!data) {
-              throw new Error('Failed to update user');
-            }
-            dispatch({
-              type: SessionActionTypes.UPDATE_USER,
-              payload: data,
-            });
+            await triggerPutUser(arg);
             break;
           }
           default: {
-            break;
+            throw new Error('Invalid login status');
           }
         }
       },
@@ -120,7 +114,13 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
         dispatch({ type: SessionActionTypes.CLOSE_LOGIN_MODAL });
       },
     };
-  }, [state.loginStatus, state.user]);
+  }, [
+    state.loginStatus,
+    state.user,
+    setToken,
+    triggerPostUser,
+    triggerPutUser,
+  ]);
 
   const handleError = (error: unknown) => {
     if (error instanceof ApiError && error.status === 401) {
