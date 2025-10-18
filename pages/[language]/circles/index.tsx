@@ -14,7 +14,7 @@ import {
   getSerializeCircleInfiniteKey,
   useCircleList,
 } from "@/features/circles";
-import { AuthButton } from "@/features/auth";
+import { AuthGuardButton } from "@/features/auth";
 import { Text, Title } from "@/shared/ui/typography";
 import { Background, Container, Paper } from "@/shared/ui/wrapper";
 import { ALL_AREAS, TBD_OPTION } from "@/constants/areas";
@@ -72,9 +72,9 @@ function Banner() {
             註冊並加入我們，然後創建你的活動，讓更多人一起參加！
           </Text>
         </div>
-        <AuthButton size="lg" onClick={() => router.push("/circles/create")}>
+        <AuthGuardButton size="lg" onClick={() => router.push("/circles/create")}>
           我想揪團
-        </AuthButton>
+        </AuthGuardButton>
       </Container>
     </div>
   );

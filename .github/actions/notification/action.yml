@@ -49,18 +49,39 @@ runs:
             default: 9868950,
           };
 
-          const author = {
-            name: process.env.AUTHOR_NAME,
-            url: process.env.AUTHOR_URL,
-            icon_url: process.env.AUTHOR_ICON_URL,
-          };
+          // 只有當有有效的 author 資訊時才建立 author 物件
+          let author = undefined;
+          if (process.env.AUTHOR_NAME && process.env.AUTHOR_NAME.trim() !== '') {
+            author = {
+              name: process.env.AUTHOR_NAME,
+              url: process.env.AUTHOR_URL || undefined,
+              icon_url: process.env.AUTHOR_ICON_URL || undefined,
+            };
+          }
+
+          // 處理 description，限制長度並清理格式
+          let description = process.env.DESCRIPTION || '';
+          
+          // 如果內容太長，截斷並添加省略號
+          if (description.length > 4000) {
+            description = description.substring(0, 3900) + '\n\n... (內容已截斷)';
+          }
+          
+          // 如果包含大量錯誤信息，使用代碼塊格式
+          if (description.includes('error TS') || description.includes('Type \'')) {
+            description = '```\n' + description + '\n```';
+          }
 
           const embed = {
-            author,
             title: process.env.TITLE,
-            description: process.env.DESCRIPTION,
-            color: colors[process.env.TYPE],
+            description: description,
+            color: colors[process.env.TYPE] || colors.default,
           };
+          
+          // 只有當 author 存在時才添加到 embed
+          if (author) {
+            embed.author = author;
+          }
 
           const payload = {
             avatar_url: avatarUrl,

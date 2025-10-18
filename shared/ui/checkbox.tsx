@@ -49,44 +49,62 @@ const CheckboxWithForm = <
     required,
     className,
     renderOption = defaultRenderOption,
+    maxSelection,
+    showCounter = false,
     ...props
   }: OptionWithFormProps<TFieldValues, TName, TOption>) => (
     <FormField
       {...props}
       render={({ field }) => (
         <FormItem className="flex flex-col gap-1">
-          {label && <FormLabel required={required}>{label}</FormLabel>}
+          <div className="flex items-center justify-between">
+            {label && <FormLabel required={required}>{label}</FormLabel>}
+            {showCounter && maxSelection && (
+              <span className="text-sm text-gray-500">
+                ({field.value?.length || 0}/{maxSelection})
+              </span>
+            )}
+          </div>
           <div className={className}>
             {Array.isArray(options) &&
-              options.map((option) => (
-                <FormItem key={option.value}>
-                  <FormControl>
-                    <Checkbox
-                      className="sr-only"
-                      checked={field.value?.includes(option.value)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          field.onChange([
-                            ...(field?.value ?? []),
-                            option.value,
-                          ]);
-                        } else {
-                          field.onChange(
-                            field.value?.filter(
-                              (v: string) => v !== option.value
-                            )
-                          );
-                        }
-                      }}
-                    />
-                  </FormControl>
-                  {renderOption({
-                    ...option,
-                    Option,
-                    isChecked: field.value?.includes(option.value),
-                  })}
-                </FormItem>
-              ))}
+              options.map((option) => {
+                const isSelected = field.value?.includes(option.value);
+                const isDisabled = maxSelection 
+                  ? !isSelected && (field.value?.length || 0) >= maxSelection
+                  : false;
+
+                return (
+                  <FormItem key={option.value}>
+                    <FormControl>
+                      <Checkbox
+                        className="sr-only"
+                        checked={isSelected}
+                        disabled={isDisabled}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            field.onChange([
+                              ...(field?.value ?? []),
+                              option.value,
+                            ]);
+                          } else {
+                            field.onChange(
+                              field.value?.filter(
+                                (v: string) => v !== option.value
+                              )
+                            );
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    {renderOption({
+                      ...option,
+                      Option,
+                      isChecked: isSelected,
+                      isDisabled,
+                    })}
+                  </FormItem>
+                );
+              })}
           </div>
           <FormMessage />
         </FormItem>

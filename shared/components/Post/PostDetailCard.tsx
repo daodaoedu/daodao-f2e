@@ -3,7 +3,7 @@ import PostCard from '@/shared/components/Post/PostCard';
 import { Button } from '@/shared/ui/button';
 import { numberToChineseNumber } from '@/shared/lib/number';
 import { BaseUserSchema } from '@/services/users';
-import { useAuth } from '@/features/auth';
+import { useSession } from '@/features/auth';
 import CommentSection from '@/shared/components/Comment/CommentSection';
 import { CommentType } from '@/services/comments';
 
@@ -37,7 +37,7 @@ function PostDetailCard<T extends BasePostDetailData>({
   onDeleteClick,
   renderContent,
 }: BasePostDetailCardProps<T>) {
-  const { user } = useAuth();
+  const { user } = useSession();
   const isSelf = user?.id === authorUser?.id;
 
   const dropdownItems = isSelf

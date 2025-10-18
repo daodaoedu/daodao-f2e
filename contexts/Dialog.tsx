@@ -37,6 +37,9 @@ interface DialogProps
     'onClick'
   >;
   disableFooter?: boolean;
+  footerButtonsClassName?: string;
+  footerClassName?: string;
+  footerDescription?: React.ReactNode;
   onCancel?: () => void;
   onConfirm?: () => void;
   className?: string;
@@ -76,6 +79,9 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
     cancelBtnProps,
     confirmText,
     confirmBtnProps,
+    footerClassName,
+    footerButtonsClassName,
+    footerDescription,
     onCancel,
     onConfirm,
     disableFooter,
@@ -96,51 +102,59 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
   }, [isOpen, dialogs]);
 
   const openDialog = useCallback(
-    async (props: DialogProps) => new Promise<boolean>((resolve) => {
-      const proxyOnConfirm = () => {
-        resolve(true);
-        handleCloseDialog();
-        props.onConfirm?.();
-      };
-      const proxyOnCancel = () => {
-        resolve(false);
-        handleCloseDialog();
-        props.onCancel?.();
-      };
-      const newDialog = {
-        ...props,
-        onConfirm: proxyOnConfirm,
-        onCancel: proxyOnCancel,
-      };
+    async (props: DialogProps) =>
+      new Promise<boolean>((resolve) => {
+        const proxyOnConfirm = () => {
+          resolve(true);
+          handleCloseDialog();
+          props.onConfirm?.();
+        };
+        const proxyOnCancel = () => {
+          resolve(false);
+          handleCloseDialog();
+          props.onCancel?.();
+        };
+        const newDialog = {
+          ...props,
+          onConfirm: proxyOnConfirm,
+          onCancel: proxyOnCancel,
+        };
 
-      if (Array.isArray(dialogs) && dialogs.length > 0) {
-        setDialogs((prev) => [...prev, newDialog]);
-      } else {
-        setIsOpen(true);
-        setCurrentDialog(newDialog);
-      }
-    }),
+        if (Array.isArray(dialogs) && dialogs.length > 0) {
+          setDialogs((prev) => [...prev, newDialog]);
+        } else {
+          setIsOpen(true);
+          setCurrentDialog(newDialog);
+        }
+      }),
     [dialogs, handleCloseDialog]
   );
 
   const footer = disableFooter ? null : (
-    <div className="flex w-full gap-4">
-      <Button
-        variant="secondary"
-        {...cancelBtnProps}
-        className={cn('flex-1', cancelBtnProps?.className)}
-        onClick={onCancel}
-      >
-        {cancelText ?? '關閉'}
-      </Button>
-      <Button
-        variant="default"
-        {...confirmBtnProps}
-        className={cn('flex-1', confirmBtnProps?.className)}
-        onClick={onConfirm}
-      >
-        {confirmText ?? '確認'}
-      </Button>
+    <div className={cn('w-full', footerClassName)}>
+      <div className={cn('flex w-full gap-4', footerButtonsClassName)}>
+        <Button
+          variant="secondary"
+          {...cancelBtnProps}
+          className={cn('flex-1', cancelBtnProps?.className)}
+          onClick={onCancel}
+        >
+          {cancelText ?? '關閉'}
+        </Button>
+        <Button
+          variant="default"
+          {...confirmBtnProps}
+          className={cn('flex-1', confirmBtnProps?.className)}
+          onClick={onConfirm}
+        >
+          {confirmText ?? '確認'}
+        </Button>
+      </div>
+      {footerDescription && (
+        <p className="text-center text-basic-400">
+          {footerDescription}
+        </p>
+      )}
     </div>
   );
 
@@ -161,7 +175,7 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
         footer={footer}
         {...restDialogProps}
       >
-        <div className={cn('text-center p-4 pb-0', className)}>
+        <div className={cn('p-4 pb-0 text-center', className)}>
           {typeof content === 'function'
             ? content({ close: handleCloseDialog })
             : content}

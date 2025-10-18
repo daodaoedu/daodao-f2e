@@ -4,13 +4,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
-import { useAuth, useAuthDispatch } from '@/shared/lib/auth';
+import { useSession, useSessionActions } from '@/entities/session';
 import ResponsiveModal from '@/shared/ui/responsive-modal';
 import getEnv from '@/shared/config/env';
 
 export function LoginModal() {
-  const { isOpenLoginModal } = useAuth();
-  const { closeLoginModal } = useAuthDispatch();
+  const { isOpenLoginModal } = useSession();
+  const { closeLoginModal } = useSessionActions();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -18,8 +18,8 @@ export function LoginModal() {
     const env = getEnv();
 
     const url = env.isProduction
-      ? `${env.prodURL}/auth/google?rt=${pathname}`
-      : `${env.stagingURL}/auth/google?origin=${window.location.origin}&rt=${pathname}`;
+      ? `/api/auth/google?rt=${pathname}`
+      : `${env.stagingURL}/api/auth/google?origin=${window.location.origin}&rt=${pathname}`;
 
     router.push(url);
   };

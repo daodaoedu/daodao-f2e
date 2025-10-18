@@ -8,7 +8,7 @@ import { Button } from "@/shared/ui/button";
 import favicon112Png from "@/public/assets/brand/favicon-112.png";
 import HorizontalLogoSvg from "@/public/assets/brand/horizontal-primary-logo.svg";
 import VerticalLogoSvg from "@/public/assets/brand/vertical-primary-logo.svg";
-import { AuthButton } from "@/features/auth";
+import { AuthGuardButton } from "@/features/auth";
 import {
   getQuizLayout,
   themeMap,
@@ -308,14 +308,14 @@ export default function QuizResultPage() {
             >
               再玩一次
             </Button>
-            <AuthButton
+            <AuthGuardButton
               variant="outline"
               size="lg"
               className="block w-full mb-6 text-basic-400 border-basic-400 hover:bg-basic-400"
               onClick={handleViewAnalysis}
             >
               看深度分析
-            </AuthButton>
+            </AuthGuardButton>
             <footer className="p-5 bg-white rounded-md flex flex-col items-center">
               <VerticalLogoSvg />
               <p className="my-6 text-sm text-center">

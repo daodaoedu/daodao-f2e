@@ -4,7 +4,7 @@ import { CustomLink } from '@/shared/ui/custom-link';
 import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
-import { AuthButton } from '@/features/auth';
+import { AuthGuardButton } from '@/features/auth';
 import { cn } from '@/shared/lib/cn';
 import { useTranslation } from '@/shared/lib/translation';
 import { NavItemType } from '../model';
@@ -62,7 +62,7 @@ export const HeaderNavbar = ({
           </li>
         ))}
         <li>
-          <AuthButton variant="ctaOrangeSmall">立即加入</AuthButton>
+          <AuthGuardButton variant="ctaOrangeSmall">立即加入</AuthGuardButton>
         </li>
       </ul>
     </nav>

@@ -45,3 +45,4 @@ generated
 !/*.md
 !.docs/*.md
 !.gemini/*.md
+!.github/*.md

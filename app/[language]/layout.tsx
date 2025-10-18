@@ -121,8 +121,6 @@ export default async function RootLayout({
 }: LayoutProps<'/[language]'>) {
   const { language } = await params;
 
-  const dictionary = getDictionary(language);
-
   return (
     <html
       lang={language}
@@ -130,7 +128,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <Providers dictionary={dictionary}>{children}</Providers>
+        <Providers locale={language}>{children}</Providers>
       </body>
       {/* <!-- Global site tag (gtag.js) - Google Analytics --> */}
       <Script

@@ -1,9 +1,9 @@
 import { useState, cloneElement } from 'react';
-import { useAuth } from '@/features/auth';
+import { useSession } from '@/features/auth';
 import CompleteInfoReminderDialog from './CompleteInfoReminderDialog';
 
 export default function InfoCompletionGuard({ children }) {
-  const { isComplete, isLoggedIn } = useAuth();
+  const { isComplete, isLoggedIn } = useSession();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleClose = () => {

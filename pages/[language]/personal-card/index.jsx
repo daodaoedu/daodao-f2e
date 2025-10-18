@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ProtectedComponent, useAuth } from '@/features/auth';
+import { ProtectedComponent, useSession } from '@/features/auth';
 import Edit from '@/components/PersonalCard/Edit';
 import SEOConfig from '@/components/SEOConfig';
 import MyGroup from '@/components/PersonalCard/MyGroup';
@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 const PersonalCardPage = () => {
   const router = useRouter();
   const mobileScreen = useMediaQuery('isSmall');
-  const { user } = useAuth();
+  const { user } = useSession();
   const tabs = [
     {
       id: 'person-setting',

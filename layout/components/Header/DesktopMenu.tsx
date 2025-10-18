@@ -1,13 +1,13 @@
 import { CustomLink } from '@/shared/ui/custom-link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
-import { useAuth, useAuthDispatch } from '@/features/auth';
+import { useSession, useSessionActions } from '@/features/auth';
 import { cn } from '@/shared/lib/cn';
 import Dropdown from '@/shared/components/Dropdown';
 import { Image } from '@/shared/ui/image';
 
 function DesktopMenu() {
-  const auth = useAuth();
-  const authDispatch = useAuthDispatch();
+  const auth = useSession();
+  const authDispatch = useSessionActions();
 
   return (
     <>

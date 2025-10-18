@@ -1,7 +1,7 @@
 import { differenceInYears, isValid, format } from 'date-fns';
 import { useReducer, useRef, useState } from 'react';
 import { z } from 'zod';
-import { useAuthDispatch } from '@/features/auth';
+import { useSessionActions } from '@/features/auth';
 
 const initialState = {
   name: '',
@@ -108,7 +108,7 @@ const userReducer = (state, payload) => {
 };
 
 const useEditProfile = () => {
-  const authDispatch = useAuthDispatch();
+  const authDispatch = useSessionActions();
   const [userState, stateDispatch] = useReducer(userReducer, initialState);
   const [errors, setErrors] = useState({});
   const refs = useRef({});

@@ -1,13 +1,14 @@
+import type { ApiResponseValidatorsApiErrorResponseSchema } from '@/generated/models';
 import { getTokenStorage } from '@/shared/lib/storage';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
-export class ApiError extends Error {
+export class ApiError<T = unknown> extends Error {
   public readonly status: number;
 
-  public readonly data?: unknown;
+  public readonly data?: T;
 
-  constructor(status: number, message: string, data?: unknown) {
+  constructor(status: number, message: string, data?: T) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
@@ -18,7 +19,7 @@ export class ApiError extends Error {
 export interface FetcherConfig {
   url: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  params?: Record<string, string | number | boolean>;
+  params?: Record<string, unknown>;
   data?: unknown;
   responseType?: 'json' | 'blob';
   headers?: Record<string, string>;
@@ -63,10 +64,16 @@ export const fetcher = async <T>({
 
   if (!response.ok) {
     try {
-      const error = await response.json();
-      throw new ApiError(status, `HTTP Status: ${status}`, error);
+      const result: ApiResponseValidatorsApiErrorResponseSchema =
+        await response.json();
+
+      if (result.error?.message) {
+        throw new ApiError(status, result.error.message, result.error);
+      }
+      throw new ApiError(status, `HTTP Status: ${status}`, result.error);
     } catch {
-      throw new ApiError(-1, 'HTTP Status: Unknown', {
+      throw new ApiError(400, 'Unknown Error', {
+        code: 'UNKNOWN_ERROR',
         message: 'Unknown Error',
       });
     }

@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import useMediaQuery from '@/shared/lib/use-media-query';
 import { useRouter } from 'next/navigation';
 import { TAIWAN_DISTRICT, COUNTRIES } from '@/constants/areas';
-import { useAuth } from '@/features/auth';
+import { useSession } from '@/features/auth';
 
 import {
   GENDER,
@@ -50,7 +50,7 @@ function EditPage() {
     setRef,
   } = useEditProfile();
 
-  const { user, token, isComplete } = useAuth();
+  const { user, token, isComplete } = useSession();
   const { data: tags } = useTags();
 
   useEffect(() => {

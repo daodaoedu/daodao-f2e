@@ -1,4 +1,5 @@
 import getEnv from '@/shared/config/env';
+import { isValidOrigin } from '@/shared/config/auth';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -9,7 +10,7 @@ export async function GET(request: NextRequest) {
 
   const response = NextResponse.redirect(`${apiUrl}/api/v1/auth/google`);
 
-  if (isStaging && origin) {
+  if (isStaging && origin && isValidOrigin(origin)) {
     response.cookies.set('origin', origin, {
       httpOnly: true,
       secure: true,

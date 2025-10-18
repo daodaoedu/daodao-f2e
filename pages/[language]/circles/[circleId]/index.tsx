@@ -37,7 +37,7 @@ import { EDUCATION, ROLE } from "@/constants/member";
 import { getOptionLabel, getOptionLabels } from "@/shared/lib/option";
 import { ALL_AREAS, AREAS, TBD_OPTION } from "@/constants/areas";
 import { ACTIVITY_CATEGORIES, CATEGORIES } from "@/constants/category";
-import { useAuth } from "@/features/auth";
+import { useSession } from "@/features/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
 import dynamic from "next/dynamic";
@@ -78,7 +78,7 @@ export const getServerSideProps = (async (context) => {
 export default function CircleDetailPage({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { user } = useAuth();
+  const { user } = useSession();
   const shareAPI = getShareAPI({
     title: data.title,
     url: `/circles/${data._id}`,

@@ -2,31 +2,41 @@
 
 import { SWRConfig } from 'swr';
 import { ThemeProvider } from 'next-themes';
-import { AuthProvider, LoginModal } from '@/features/auth';
+import { SessionProvider, LoginModal } from '@/features/auth';
 import { DialogProvider } from '@/contexts/Dialog';
 import { PromotionProvider } from '@/contexts/Promotion';
 import { NavigationBlockerProvider } from '@/shared/lib/navigation-blocker';
-import {
-  TranslationProvider,
-  TranslationProviderProps,
-} from '@/shared/lib/translation';
+import { emitUnauthorized } from '@/shared/lib/auth-bus';
+import { ApiError } from '@/services/fetcher';
+import { TranslationProvider } from '@/shared/lib/translation';
 import { Toaster } from '@/shared/ui/sonner';
+import { getDictionary } from '@/shared/config/i18n';
 
 const swrConfig = {
   revalidateOnFocus: false,
   errorRetryCount: 0,
   keepPreviousData: true,
+  onError: (e: unknown) => {
+    if (e instanceof ApiError && e.status === 401) {
+      emitUnauthorized();
+    }
+  },
 };
 
-type ProvidersProps = TranslationProviderProps;
+interface ProvidersProps {
+  children: React.ReactNode;
+  locale: string;
+}
 
-function Providers({ children, dictionary }: ProvidersProps) {
+function Providers({ children, locale }: ProvidersProps) {
+  const dictionary = getDictionary(locale);
+
   return (
     <TranslationProvider dictionary={dictionary}>
       <SWRConfig value={swrConfig}>
         <NavigationBlockerProvider>
           <DialogProvider>
-            <AuthProvider>
+            <SessionProvider>
               <PromotionProvider>
                 <ThemeProvider attribute="class">
                   {children}
@@ -34,7 +44,7 @@ function Providers({ children, dictionary }: ProvidersProps) {
                   <LoginModal />
                 </ThemeProvider>
               </PromotionProvider>
-            </AuthProvider>
+            </SessionProvider>
           </DialogProvider>
         </NavigationBlockerProvider>
       </SWRConfig>
