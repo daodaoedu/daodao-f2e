@@ -19,7 +19,7 @@ export class ApiError<T = unknown> extends Error {
 export interface FetcherConfig {
   url: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  params?: Record<string, string | number | boolean>;
+  params?: Record<string, unknown>;
   data?: unknown;
   responseType?: 'json' | 'blob';
   headers?: Record<string, string>;
