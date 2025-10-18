@@ -1,23 +1,24 @@
 import type { OptionProps } from '@/shared/ui/option';
+import type { UserValidatorsCreateUserSchemaProfessionalField } from '@/generated/models';
 
 /**
  * 專業領域選項
  */
-export const EXPERTISE_AREAS: OptionProps[] = [
-  { value: 'ict', label: '資訊與資訊通信技術(ICT)' },
-  { value: 'business', label: '商業與管理' },
-  { value: 'arts_design', label: '藝術、創意與設計' },
-  { value: 'science', label: '科學與研究' },
-  { value: 'engineering', label: '工程與製造' },
-  { value: 'health', label: '健康與醫學' },
-  { value: 'education', label: '教育與學習' },
-  { value: 'social_science', label: '社會科學' },
-  { value: 'language', label: '語言' },
-  { value: 'law', label: '法律' },
-  { value: 'service', label: '客戶服務與餐飲' },
-  { value: 'agriculture', label: '農業與環境科學' },
-  { value: 'other', label: '其他' },
-];
+export const EXPERTISE_AREAS: OptionProps<keyof typeof UserValidatorsCreateUserSchemaProfessionalField>[] =
+  [
+    { value: 'information_and_communication_technologies_icts', label: '資訊與資訊通信技術(ICT)' },
+    { value: 'business_administration_and_law', label: '商業與管理' },
+    { value: 'arts_and_humanities', label: '藝術、創意與設計' },
+    { value: 'natural_sciences_mathematics_and_statistics', label: '科學與研究' },
+    { value: 'engineering_manufacturing_and_construction', label: '工程與製造' },
+    { value: 'health_and_welfare', label: '健康與醫學' },
+    { value: 'education', label: '教育與學習' },
+    { value: 'social_sciences_journalism_and_information', label: '社會科學' },
+    { value: 'language_skills_and_knowledge', label: '語言' },
+    { value: 'services', label: '客戶服務與餐飲' },
+    { value: 'agriculture_forestry_fisheries_and_veterinary', label: '農業與環境科學' },
+    { value: 'others', label: '其他' },
+  ];
 
 /**
  * 興趣領域選項
@@ -50,4 +51,3 @@ export const REFERRAL_SOURCES: OptionProps[] = [
   { value: 'friend_referral', label: '朋友介紹' },
   { value: 'other', label: '其他' },
 ];
-

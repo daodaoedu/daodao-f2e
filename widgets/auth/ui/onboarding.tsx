@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { cn } from '@/shared/lib/cn';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import { useSessionActions } from '@/entities/session';
 import { Form, parseSchemaAutoFocus } from '@/shared/ui/form';
 import { Button } from '@/shared/ui/button';
 import { Background, Container, Paper } from '@/shared/ui/wrapper';
@@ -18,23 +19,15 @@ import { ONBOARDING_STEPS } from '../config';
 export const AuthOnboarding = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
+  const { updateUser } = useSessionActions();
   const searchParams = getEnv().isClientSide
     ? new URLSearchParams(window.location.search)
     : new URLSearchParams();
   const redirectTo = searchParams?.get('rt') || '/';
 
-  const form = useForm<OnboardingFormData>({
+  const form = useForm({
     resolver: zodResolver(onboardingSchema),
     mode: 'onChange',
-    defaultValues: {
-      birthDay: undefined,
-      name: '',
-      username: '',
-      bio: '',
-      expertiseAreas: [],
-      interestAreas: [],
-      referralSource: '',
-    },
   });
 
   const progress = ((currentStep - 1) / (ONBOARDING_STEPS.length - 1)) * 100;
@@ -47,14 +40,14 @@ export const AuthOnboarding = () => {
         stepSchema = onboardingSchema.pick({
           birthDay: true,
           name: true,
-          username: true,
-          bio: true,
+          customId: true,
+          personalSlogan: true,
         });
         break;
       case 2:
         stepSchema = onboardingSchema.pick({
-          expertiseAreas: true,
-          interestAreas: true,
+          professionalField: true,
+          interestList: true,
         });
         break;
       case 3:
@@ -85,9 +78,10 @@ export const AuthOnboarding = () => {
 
   const handleSubmit = async (data: OnboardingFormData) => {
     try {
-      // TODO: 實作提交邏輯，將資料發送到後端
-      // eslint-disable-next-line no-console
-      console.log('Onboarding data:', data);
+      await updateUser({
+        ...data,
+        professionalField: data.professionalField[0],
+      });
 
       // 完成後重定向
       router.push(redirectTo);

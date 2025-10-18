@@ -51,7 +51,7 @@ export const PersonalInfoStep = () => {
       {/* 使用者帳號 */}
       <FormField
         control={form.control}
-        name="username"
+        name="customId"
         render={({ field, fieldState }) => (
           <FormItem>
             <FormLabel>使用者帳號</FormLabel>
@@ -77,7 +77,7 @@ export const PersonalInfoStep = () => {
       {/* 個人標語 */}
       <FormField
         control={form.control}
-        name="bio"
+        name="personalSlogan"
         render={({ field }) => (
           <FormItem>
             <FormLabel>個人標語</FormLabel>

@@ -9,7 +9,10 @@ import {
 } from 'react';
 import { mutate } from 'swr';
 import { getTokenStorage } from '@/shared/lib/storage';
-import { createUserFormSchema, updateUserFormSchema } from '@/services/users';
+import {
+  postApiV1UsersBody,
+  putApiV1UsersIdBody,
+} from '@/generated/endpoints/users.zod';
 import {
   postApiV1Users,
   putApiV1UsersId,
@@ -73,32 +76,35 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
       updateUser: async (input) => {
         switch (state.loginStatus) {
           case SessionLoginStatus.TEMPORARY: {
-            const arg = createUserFormSchema.parse(input);
+            const arg = postApiV1UsersBody.parse(input);
             const { data } = await postApiV1Users(arg);
-            if (data?.token && data?.user) {
-              setToken(data.token);
-              dispatch({
-                type: SessionActionTypes.UPDATE_USER,
-                payload: data.user,
-              });
+
+            if (!data?.token || !data?.user) {
+              throw new Error('Failed to login');
             }
+            setToken(data.token);
+            dispatch({
+              type: SessionActionTypes.UPDATE_USER,
+              payload: data.user,
+            });
             break;
           }
           case SessionLoginStatus.PERMANENT: {
             if (!state.user.id) {
               return;
             }
-            const arg = updateUserFormSchema.parse({
+            const arg = putApiV1UsersIdBody.parse({
               ...state.user,
               ...input,
             });
             const { data } = await putApiV1UsersId(state.user.id, arg);
-            if (data) {
-              dispatch({
-                type: SessionActionTypes.UPDATE_USER,
-                payload: data,
-              });
+            if (!data) {
+              throw new Error('Failed to update user');
             }
+            dispatch({
+              type: SessionActionTypes.UPDATE_USER,
+              payload: data,
+            });
             break;
           }
           default: {
@@ -125,10 +131,9 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
   const { isLoading } = useGetApiV1UsersMe({
     swr: {
       enabled: !!state.token,
-      onSuccess: (data) => {
-        if (data.data) {
-          sessionActions.login(data.data);
-        }
+      onSuccess: (result) => {
+        const user = result?.data ?? null;
+        sessionActions.login(user);
       },
       onError: handleError,
     },

@@ -1,4 +1,4 @@
-import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form';
+import type { Control, ControllerProps, FieldPath, FieldValues } from 'react-hook-form';
 import { cn } from '@/shared/lib/cn';
 import { FormLabel } from './form';
 
@@ -27,8 +27,8 @@ export const Option = ({
   </FormLabel>
 );
 
-export interface OptionProps {
-  value: string;
+export interface OptionProps<TValue extends string = string> {
+  value: TValue;
   label: string;
   disable?: boolean;
   /** fixed option that can't be removed. */
@@ -50,8 +50,9 @@ export type RenderOptionFn<TOption extends OptionProps = OptionProps> = (
 export interface OptionWithFormProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-  TOption extends OptionProps = OptionProps
+  TOption extends OptionProps = OptionProps,
 > extends Omit<ControllerProps<TFieldValues, TName>, 'render'> {
+  control: Control<TFieldValues, unknown, TFieldValues>;
   options: TOption[];
   label?: string;
   required?: boolean;

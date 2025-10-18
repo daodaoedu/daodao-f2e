@@ -1,11 +1,9 @@
 import {
   UserValidatorsCreateUserResponseSchemaDataUser,
+  UserValidatorsCreateUserSchema,
+  UserValidatorsGetUserParamsSchema,
   UserValidatorsUserSuccessResponseSchemaData,
 } from '@/generated/models';
-import type {
-  CreateUserFormSchema,
-  UpdateUserFormSchema,
-} from '@/services/users';
 
 export enum SessionLoginStatus {
   /** 未登入 */
@@ -80,10 +78,10 @@ export type SessionActions = {
   [SessionActionTypes.SET_TOKEN]: (payload: string) => void;
   [SessionActionTypes.SET_LOADING]: (payload: boolean) => void;
   [SessionActionTypes.UPDATE_USER]: (
-    payload: CreateUserFormSchema | UpdateUserFormSchema
+    payload: UserValidatorsCreateUserSchema | UserValidatorsGetUserParamsSchema
   ) => Promise<void>;
   [SessionActionTypes.LOGIN]: (
-    payload: UserValidatorsUserSuccessResponseSchemaData
+    payload: UserValidatorsUserSuccessResponseSchemaData | null
   ) => void;
   [SessionActionTypes.LOGOUT]: () => void;
 };

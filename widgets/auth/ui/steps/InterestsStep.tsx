@@ -1,9 +1,11 @@
 'use client';
 
+import { useFormContext } from 'react-hook-form';
 import { cn } from '@/shared/lib/cn';
 import { CheckboxWithForm } from '@/shared/ui/checkbox';
 import type { RenderOptionProps } from '@/shared/ui/option';
 import { EXPERTISE_AREAS, INTEREST_AREAS } from '../../config';
+import { OnboardingFormData } from '../../model';
 
 // 自定義渲染選項，讓選項看起來像按鈕
 const renderAreaOption = ({
@@ -25,11 +27,14 @@ const renderAreaOption = ({
 );
 
 export const InterestsStep = () => {
+  const form = useFormContext<OnboardingFormData>();
+
   return (
     <div className="space-y-8">
       {/* 專業領域 */}
       <CheckboxWithForm
-        name="expertiseAreas"
+        control={form.control}
+        name="professionalField"
         label="你的專業或正在學習的領域"
         options={EXPERTISE_AREAS}
         required
@@ -41,7 +46,8 @@ export const InterestsStep = () => {
 
       {/* 興趣領域 */}
       <CheckboxWithForm
-        name="interestAreas"
+        control={form.control}
+        name="interestList"
         label="你有興趣探索的領域"
         options={INTEREST_AREAS}
         required
