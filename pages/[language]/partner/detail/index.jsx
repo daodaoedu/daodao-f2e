@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
-import { useSession } from '@/features/auth';
+import { useSession } from '@/entities/session';
 import { useGetApiV1UsersId } from '@/generated/endpoints/users';
 import { parseToString } from '@/shared/lib/helper';
 

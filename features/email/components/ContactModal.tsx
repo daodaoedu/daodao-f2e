@@ -22,7 +22,8 @@ import {
   ResponsiveModalSize,
 } from '@/shared/ui/responsive-modal';
 import ChatSvg from '@/public/assets/icons/chat.svg';
-import { AuthGuardButton, useSession } from '@/features/auth';
+import { AuthGuardButton } from '@/features/auth';
+import { useSession } from '@/entities/session';
 import { Textarea } from '@/shared/ui/textarea';
 import { ROLE } from '@/constants/member';
 import { contactFormSchema, ContactFormSchema } from '@/services/emails';

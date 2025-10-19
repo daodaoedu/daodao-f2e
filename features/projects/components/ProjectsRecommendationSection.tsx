@@ -8,7 +8,7 @@ import {
 } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { useContentTypeRecommendations } from '@/services/recommendation';
-import { useSession } from '@/features/auth';
+import { useSession } from '@/entities/session';
 import { type RecommendationItem } from '@/services/recommendation/core/schema';
 import { CustomLink } from '@/shared/ui/custom-link';
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { LockKeyholeOpen, LockKeyhole } from 'lucide-react';
 import { Image } from '@/shared/ui/image';
 import { ROLE } from '@/constants/member';
-import { useSession, useSessionActions } from '@/features/auth';
+import { useSession, useSessionActions } from '@/entities/session';
 import { cn } from '@/shared/lib/cn';
 import { CommentVisibility } from '@/services/comments';
 import { Button } from '@/shared/ui/button';

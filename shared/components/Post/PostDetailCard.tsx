@@ -3,7 +3,7 @@ import PostCard from '@/shared/components/Post/PostCard';
 import { Button } from '@/shared/ui/button';
 import { numberToChineseNumber } from '@/shared/lib/number';
 import { BaseUserSchema } from '@/services/users';
-import { useSession } from '@/features/auth';
+import { useSession } from '@/entities/session';
 import CommentSection from '@/shared/components/Comment/CommentSection';
 import { CommentType } from '@/services/comments';
 

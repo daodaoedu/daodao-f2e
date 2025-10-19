@@ -2,7 +2,8 @@
 
 import { SWRConfig } from 'swr';
 import { ThemeProvider } from 'next-themes';
-import { SessionProvider, LoginModal } from '@/features/auth';
+import { LoginModal } from '@/features/auth';
+import { SessionProvider } from '@/entities/session';
 import { DialogProvider } from '@/contexts/Dialog';
 import { PromotionProvider } from '@/contexts/Promotion';
 import { NavigationBlockerProvider } from '@/shared/lib/navigation-blocker';

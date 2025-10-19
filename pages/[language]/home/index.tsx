@@ -1,5 +1,5 @@
 import { Sprout, Lightbulb, Heart, ArrowRight, Sparkles, CheckCircle } from 'lucide-react';
-import { useSession, useSessionActions } from '@/features/auth';
+import { useSession, useSessionActions } from '@/entities/session';
 import SEOConfig from '@/components/SEOConfig';
 import getBaseLayout from '@/layout/core/getBaseLayout';
 

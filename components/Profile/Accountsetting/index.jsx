@@ -2,7 +2,7 @@ import { Title, Text } from '@/shared/ui/typography';
 import { Button } from '@/shared/ui/button';
 import { Separator } from '@/shared/ui/separator';
 import { useRouter } from 'next/navigation';
-import { useSession, useSessionActions } from '@/features/auth';
+import { useSession, useSessionActions } from '@/entities/session';
 
 const AccountSetting = () => {
   const router = useRouter();
