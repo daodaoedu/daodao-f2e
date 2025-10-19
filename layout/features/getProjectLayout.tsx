@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { parseToString } from '@/shared/lib/helper';
-import { RoleEnum, useSession } from '@/features/auth';
+import { RoleEnum } from '@/services/users';
+import { useSession } from '@/entities/session';
 import { ProjectProvider } from '@/contexts/Project';
 import Sidebar, { SidebarItemType } from '@/layout/components/Sidebar';
 import { useProject } from '@/services/projects';

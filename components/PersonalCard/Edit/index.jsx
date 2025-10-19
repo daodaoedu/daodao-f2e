@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import useMediaQuery from '@/shared/lib/use-media-query';
 import { useRouter } from 'next/navigation';
 import { TAIWAN_DISTRICT, COUNTRIES } from '@/constants/areas';
-import { useSession } from '@/features/auth';
+import { useSession } from '@/entities/session';
 
 import {
   GENDER,

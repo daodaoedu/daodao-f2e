@@ -1,6 +1,6 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { useSession } from '@/features/auth';
+import { useSession } from '@/entities/session';
 
 const PersonalCard = dynamic(() => import('@/components/PersonalCard'), {
   ssr: false,

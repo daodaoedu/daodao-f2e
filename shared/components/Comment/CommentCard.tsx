@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { LockKeyholeOpen, LockKeyhole, EllipsisVertical } from 'lucide-react';
-import { useSession } from '@/features/auth';
+import { useSession } from '@/entities/session';
 import { Image } from '@/shared/ui/image';
 import { ROLE } from '@/constants/member';
 import { timeDuration } from '@/shared/lib/date';

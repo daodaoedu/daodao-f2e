@@ -1,5 +1,5 @@
 import { useState, cloneElement } from 'react';
-import { useSession } from '@/features/auth';
+import { useSession } from '@/entities/session';
 import CompleteInfoReminderDialog from './CompleteInfoReminderDialog';
 
 export default function InfoCompletionGuard({ children }) {

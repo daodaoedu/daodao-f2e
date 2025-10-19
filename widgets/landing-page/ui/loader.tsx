@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAssetsLoader } from '@/shared/lib/use-assets-loader';
 import { useScrollLock } from '@/shared/lib/use-scroll-lock';
 import { Progress } from '@/shared/ui/progress';
-import { useSession } from '@/features/auth';
+import { useSession } from '@/entities/session';
 import { cn } from '@/shared/lib/cn';
 
 export function Loader({ children }: React.PropsWithChildren) {

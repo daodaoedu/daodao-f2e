@@ -1,7 +1,7 @@
 import { differenceInYears, isValid, format } from 'date-fns';
 import { useReducer, useRef, useState } from 'react';
 import { z } from 'zod';
-import { useSessionActions } from '@/features/auth';
+import { useSessionActions } from '@/entities/session';
 
 const initialState = {
   name: '',

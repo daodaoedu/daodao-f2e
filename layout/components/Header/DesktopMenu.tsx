@@ -1,6 +1,6 @@
 import { CustomLink } from '@/shared/ui/custom-link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
-import { useSession, useSessionActions } from '@/features/auth';
+import { useSession, useSessionActions } from '@/entities/session';
 import { cn } from '@/shared/lib/cn';
 import Dropdown from '@/shared/components/Dropdown';
 import { Image } from '@/shared/ui/image';

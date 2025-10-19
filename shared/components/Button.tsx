@@ -1,7 +1,7 @@
 import { forwardRef, useRef } from 'react';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { cn } from '@/shared/lib/cn';
-import { useSession, useSessionActions } from '@/features/auth';
+import { useSession, useSessionActions } from '@/entities/session';
 
 enum ButtonColorEnum {
   Primary = 'primary',

@@ -8,7 +8,7 @@ import {
   Card, CardContent, CardHeader, CardTitle,
 } from '@/shared/ui/card';
 import { useContentTypeRecommendations } from '@/services/recommendation';
-import { useSession } from '@/features/auth';
+import { useSession } from '@/entities/session';
 import type { Practice } from '@/services/practice/schema';
 import { type RecommendationItem } from '@/services/recommendation/core/schema';
 import PracticeCard from './PracticeCard';

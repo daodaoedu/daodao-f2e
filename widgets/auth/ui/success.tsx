@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSessionActions } from '@/features/auth';
+import { useSessionActions } from '@/entities/session';
 import { IslandPlaceholder } from '@/shared/ui/island-placeholder';
 import { parseToString } from '@/shared/lib/helper';
 import { formatJWTInfo } from '@/shared/lib/jwt';

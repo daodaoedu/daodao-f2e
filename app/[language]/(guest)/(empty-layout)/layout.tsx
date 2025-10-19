@@ -1,5 +1,5 @@
 export default async function EmptyLayout({
   children,
 }: LayoutProps<'/[language]'>) {
-  return <main className="min-h-screen bg-white">{children}</main>;
+  return <div className="min-h-screen bg-white">{children}</div>;
 }

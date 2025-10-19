@@ -26,7 +26,8 @@
     "preview": "npm run cf:build  && opennextjs-cloudflare preview",
     "deploy": "npm run cf:build  && opennextjs-cloudflare deploy",
     "generate:api": "orval",
-    "i18n:fetch": "dotenvx run -- node scripts/google-app-script/fetch-i18n.js"
+    "i18n:fetch": "dotenvx run -- node scripts/google-app-script/fetch-i18n.js",
+    "i18n:push": "dotenvx run -- node scripts/google-app-script/push-i18n.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
