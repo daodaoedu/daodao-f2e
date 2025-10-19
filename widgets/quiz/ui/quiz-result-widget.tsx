@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { Button } from '@/shared/ui/button';
 import favicon112Png from '@/public/assets/brand/favicon-112.png';
@@ -12,23 +11,17 @@ import {
   useQuiz,
   Title,
   useResultStyles,
+  ResultChart,
   Slogan,
   List,
   ShareButtons,
 } from '@/features/quiz';
-import { captureElementAsImage, CapturedImageData } from '@/shared/lib/capture-element-as-image';
+import {
+  captureElementAsImage,
+  CapturedImageData,
+} from '@/shared/lib/capture-element-as-image';
 import { ResultCard, themeMap } from '@/entities/quiz';
 import { GACategory, logEvent } from '@/shared/lib/analytics';
-
-const ResultChart = dynamic(
-  () => import('@/features/quiz').then((mod) => ({ default: mod.ResultChart })),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="aspect-[36/35] animate-pulse rounded bg-gray-100" />
-    ),
-  }
-);
 
 export const QuizResultWidget = () => {
   const router = useRouter();
@@ -170,9 +163,9 @@ export const QuizResultWidget = () => {
             <img
               src={resultImg.src}
               alt={theme.title}
-              width={resultImg.width - 2}
-              height={resultImg.height - 2}
-              className="absolute inset-px object-cover"
+              width={resultImg.width}
+              height={resultImg.height}
+              className="absolute inset-0 object-cover"
               onContextMenu={handleImageContextMenu}
             />
           )}

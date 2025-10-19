@@ -15,7 +15,6 @@ export const QuestionCard = ({ question, className }: QuestionCardProps) => {
           src={question.image}
           alt={question.title}
           fill
-          priority
         />
       </div>
       <div className="relative mx-auto aspect-[30/43] max-h-[calc(100dvh-288px)]">

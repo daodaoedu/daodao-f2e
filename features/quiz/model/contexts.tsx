@@ -56,19 +56,18 @@ export const QuizProvider = ({ children }: React.PropsWithChildren) => {
       if (!isQuestionId(questionId) || !isAnswerValue(answer)) {
         return;
       }
-      const nextStep = parseInt(questionId.slice(1), 10) + 1;
-      const newResult = {
-        ...internalResult,
+      const nextStep = parseInt(questionId.replace('q', ''), 10) + 1;
+      setInternalResult((prev) => ({
+        ...prev,
         [questionId]: { selectedAnswer: answer },
-      };
-      setInternalResult(newResult);
+      }));
       if (nextStep > questionMap.size) {
         router.push('/quiz/result');
       } else {
         router.push(`/quiz/questions/q${nextStep}`);
       }
     },
-    [internalResult, router]
+    [router]
   );
 
   const reset = useCallback(() => {

@@ -17,11 +17,11 @@ export const calculateQuizAnalysis = (
   }
 
   // 1. Calculate raw scores
-  const scores = Object.values(result).reduce(
-    (acc, { selectedAnswer }, index) => {
-      const question = questionMap.get(`q${index + 1}`);
+  const scores = Object.entries(result).reduce(
+    (acc, [questionId, { selectedAnswer }]) => {
+      const question = questionMap.get(questionId);
       const answer = question?.answers.find(
-        ({ key }: { key: AnswerKey }) => key === selectedAnswer
+        ({ key }) => key === selectedAnswer
       );
       acc[selectedAnswer] += answer?.value ?? 0;
       return acc;
