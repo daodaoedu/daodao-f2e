@@ -1,13 +1,13 @@
 import type { OptionProps } from '@/shared/ui/option';
-import type { UserValidatorsCreateUserSchemaProfessionalField } from '@/generated/models';
+import type { UserValidatorsCreateUserSchemaProfessionalFieldItem } from '@/generated/models';
 
 /**
  * 專業領域選項
  */
-export const EXPERTISE_AREAS: OptionProps<keyof typeof UserValidatorsCreateUserSchemaProfessionalField>[] =
+export const EXPERTISE_AREAS: OptionProps<UserValidatorsCreateUserSchemaProfessionalFieldItem>[] =
   [
     { value: 'information_and_communication_technologies_icts', label: '資訊與資訊通信技術(ICT)' },
-    { value: 'business_administration_and_law', label: '商業與管理' },
+    { value: 'business_administration_and_law', label: '商業、管理與法律' },
     { value: 'arts_and_humanities', label: '藝術、創意與設計' },
     { value: 'natural_sciences_mathematics_and_statistics', label: '科學與研究' },
     { value: 'engineering_manufacturing_and_construction', label: '工程與製造' },
