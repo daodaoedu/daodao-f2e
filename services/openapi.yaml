@@ -13696,20 +13696,22 @@ components:
           type: boolean
           nullable: true
         professionalField:
-          type: string
-          enum: &ref_31
-            - information_and_communication_technologies_icts
-            - business_administration_and_law
-            - arts_and_humanities
-            - natural_sciences_mathematics_and_statistics
-            - engineering_manufacturing_and_construction
-            - health_and_welfare
-            - education
-            - social_sciences_journalism_and_information
-            - language_skills_and_knowledge
-            - services
-            - agriculture_forestry_fisheries_and_veterinary
-            - others
+          type: array
+          items:
+            type: string
+            enum: &ref_31
+              - information_and_communication_technologies_icts
+              - business_administration_and_law
+              - arts_and_humanities
+              - natural_sciences_mathematics_and_statistics
+              - engineering_manufacturing_and_construction
+              - health_and_welfare
+              - education
+              - social_sciences_journalism_and_information
+              - language_skills_and_knowledge
+              - services
+              - agriculture_forestry_fisheries_and_veterinary
+              - others
           nullable: true
         personalSlogan:
           type: string
@@ -13806,8 +13808,10 @@ components:
           additionalProperties: true
           nullable: true
         professionalField:
-          type: string
-          enum: *ref_31
+          type: array
+          items:
+            type: string
+            enum: *ref_31
           nullable: true
         personalSlogan:
           type: string
@@ -13991,20 +13995,22 @@ components:
               type: string
               nullable: true
             professionalField:
-              type: string
-              enum: &ref_34
-                - information_and_communication_technologies_icts
-                - business_administration_and_law
-                - arts_and_humanities
-                - natural_sciences_mathematics_and_statistics
-                - engineering_manufacturing_and_construction
-                - health_and_welfare
-                - education
-                - social_sciences_journalism_and_information
-                - language_skills_and_knowledge
-                - services
-                - agriculture_forestry_fisheries_and_veterinary
-                - others
+              type: array
+              items:
+                type: string
+                enum: &ref_34
+                  - information_and_communication_technologies_icts
+                  - business_administration_and_law
+                  - arts_and_humanities
+                  - natural_sciences_mathematics_and_statistics
+                  - engineering_manufacturing_and_construction
+                  - health_and_welfare
+                  - education
+                  - social_sciences_journalism_and_information
+                  - language_skills_and_knowledge
+                  - services
+                  - agriculture_forestry_fisheries_and_veterinary
+                  - others
               nullable: true
             personalSlogan:
               type: string
@@ -14194,8 +14200,10 @@ components:
                 type: string
                 nullable: true
               professionalField:
-                type: string
-                enum: *ref_34
+                type: array
+                items:
+                  type: string
+                  enum: *ref_34
                 nullable: true
               personalSlogan:
                 type: string
@@ -14409,8 +14417,10 @@ components:
                   type: string
                   nullable: true
                 professionalField:
-                  type: string
-                  enum: *ref_34
+                  type: array
+                  items:
+                    type: string
+                    enum: *ref_34
                   nullable: true
                 personalSlogan:
                   type: string
@@ -14603,8 +14613,10 @@ components:
               type: string
               nullable: true
             professionalField:
-              type: string
-              enum: *ref_34
+              type: array
+              items:
+                type: string
+                enum: *ref_34
               nullable: true
             personalSlogan:
               type: string
@@ -20507,17 +20519,8 @@ paths:
         支援可選身份驗證（用於個人化內容） / router.get('/', optionalAuth,
         validate(getUserQuerySchema, 'query'), userController.getAllUsers as
         RequestHandler ); /** GET /users/me 獲取當前用戶資訊 需要身份驗證 / router.get('/me',
-        authenticate, userController.getMe as RequestHandler ); /** PUT
-        /users/me 更新當前用戶資訊 需要身份驗證 / router.put('/me', authenticate,
-        validate(updateUserSchema, 'body'), userController.updateMe as
-        RequestHandler ); /** GET /users/custom-id/check/:customId 檢查自訂 ID 可用性
-        路徑參數：customId - 要檢查的自訂 ID / router.get('/custom-id/check/:customId',
-        validate(customIdParamsSchema, 'params'),
-        userController.checkCustomIdAvailability as RequestHandler ); /** GET
-        /users/custom-id/:customId 透過自訂 ID 獲取用戶資訊 路徑參數：customId - 用戶自訂 ID /
-        router.get('/custom-id/:customId', validate(customIdParamsSchema,
-        'params'), userController.getUserByCustomId as RequestHandler ); /**
-        POST /users/me/custom-id 設置當前用戶的自訂 ID 需要身份驗證
+        authenticate, userController.getMe as RequestHandler ); /** POST
+        /users/me 創建新用戶（與 POST /users 功能相同） 需要身份驗證和創建用戶權限（允許臨時用戶）
       requestBody:
         required: true
         content:
@@ -20547,6 +20550,35 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - Users
+      summary: POST /me
+      operationId: post_api_v1_users_me
+      responses:
+        '201':
+          description: 資源創建成功
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/api-response.validators_apiSuccessResponseExample
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user.validators_createUserSchema'
       security:
         - bearerAuth: []
     put:
