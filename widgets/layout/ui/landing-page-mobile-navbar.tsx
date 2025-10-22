@@ -5,11 +5,13 @@ import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import { useEffect, useState } from 'react';
 import { cn } from '@/shared/lib/cn';
 import { Button } from '@/shared/ui/button';
+import { useTranslation } from '@/shared/lib/translation';
 import { landingPageNav } from '../model';
 
 export const LandingPageMobileNavbar = () => {
   const isVisible = useScrollVisibility({ threshold: 250 });
   const [activeSection, setActiveSection] = useState('');
+  const { t } = useTranslation();
 
   useEffect(() => {
     const headings = landingPageNav.map((item) =>
@@ -57,7 +59,7 @@ export const LandingPageMobileNavbar = () => {
               )}
               asChild
             >
-              <CustomLink href={item.href}>{item.label}</CustomLink>
+              <CustomLink href={item.href}>{t(item.label)}</CustomLink>
             </Button>
           );
         })}

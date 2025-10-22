@@ -7,6 +7,8 @@ import { Button } from '@/shared/ui/button';
 import { AuthGuardButton } from '@/features/auth';
 import { cn } from '@/shared/lib/cn';
 import { useTranslation } from '@/shared/lib/translation';
+import { useSession, useSessionActions } from '@/entities/session';
+import Dropdown from '@/shared/components/Dropdown';
 import { NavItemType } from '../model';
 
 interface HeaderNavbarProps {
@@ -18,6 +20,8 @@ export const HeaderNavbar = ({
   navItems,
   alwaysShow = false,
 }: HeaderNavbarProps) => {
+  const { user } = useSession();
+  const { logout } = useSessionActions();
   const isVisible = useScrollVisibility({ threshold: 200 });
   const { t } = useTranslation();
 
@@ -62,7 +66,34 @@ export const HeaderNavbar = ({
           </li>
         ))}
         <li>
-          <AuthGuardButton variant="ctaOrangeSmall">立即加入</AuthGuardButton>
+          {user ? (
+            <div className="flex items-center gap-3.5">
+              <Dropdown as="nav">
+                <Dropdown.Toggle animation="none" className="p-0">
+                  <Image
+                    src={user.photoURL ?? ''}
+                    alt={user.name ?? 'user avatar'}
+                    width="40"
+                    height="40"
+                    className="rounded-full"
+                  />
+                </Dropdown.Toggle>
+                <Dropdown.List className="mt-2">
+                  <Dropdown.Item className="text-nowrap rounded-lg hover:bg-primary-lightest">
+                    <button
+                      type="button"
+                      className="block p-2 text-basic-400"
+                      onClick={logout}
+                    >
+                      登出
+                    </button>
+                  </Dropdown.Item>
+                </Dropdown.List>
+              </Dropdown>
+            </div>
+          ) : (
+            <AuthGuardButton variant="ctaOrangeSmall">立即加入</AuthGuardButton>
+          )}
         </li>
       </ul>
     </nav>
