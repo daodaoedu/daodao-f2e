@@ -119,7 +119,7 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
     }
   };
 
-  const { isLoading } = useGetApiV1UsersMe({
+  const { isValidating } = useGetApiV1UsersMe({
     swr: {
       enabled: !!state.token,
       onSuccess: (result) => {
@@ -131,10 +131,10 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
   });
 
   useEffect(() => {
-    if (state.isLoggingIn !== isLoading) {
-      sessionActions.setLoading(isLoading);
+    if (state.isLoggingIn !== isValidating) {
+      sessionActions.setLoading(isValidating);
     }
-  }, [state.isLoggingIn, sessionActions, isLoading]);
+  }, [state.isLoggingIn, sessionActions, isValidating]);
 
   useEffect(() => {
     const off = onUnauthorized(() => sessionActions.logout());
