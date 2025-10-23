@@ -35,3 +35,14 @@ export const marathonNav: NavItemType[] = [
     href: '/projects',
   },
 ];
+
+export const exploreNav: NavItemType[] = [
+  {
+    label: 'common.explore',
+    href: '/explore',
+  },
+  {
+    label: 'common.resources',
+    href: '/resource',
+  },
+];

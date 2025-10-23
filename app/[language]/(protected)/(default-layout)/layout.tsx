@@ -1,10 +1,11 @@
-import Header from '@/layout/components/Header';
-import Footer from '@/layout/components/Footer';
+import { HeaderNavbar, Footer, exploreNav } from '@/widgets/layout';
 
-export default function ProtectedBaseLayout({ children }: LayoutProps<'/[language]'>) {
+export default function ProtectedBaseLayout({
+  children,
+}: LayoutProps<'/[language]'>) {
   return (
     <>
-      <Header />
+      <HeaderNavbar navItems={exploreNav} alwaysShow />
       <main className="min-h-screen w-full bg-basic-white">{children}</main>
       <Footer />
     </>

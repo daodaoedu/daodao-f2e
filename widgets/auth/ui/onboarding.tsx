@@ -81,10 +81,7 @@ export const AuthOnboarding = () => {
 
   const handleSubmit = async (data: OnboardingFormData) => {
     try {
-      await updateUser({
-        ...data,
-        professionalField: data.professionalField[0],
-      });
+      await updateUser(data);
 
       openDialog({
         title: `${data.name}，歡迎加入島島阿學！`,

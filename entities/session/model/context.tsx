@@ -15,8 +15,8 @@ import {
 } from '@/generated/endpoints/users.zod';
 import {
   useGetApiV1UsersMe,
-  usePostApiV1Users,
-  usePutApiV1UsersId,
+  usePostApiV1UsersMe,
+  usePutApiV1UsersMe,
 } from '@/generated/endpoints/users';
 import { ApiError } from '@/services/fetcher';
 import { onUnauthorized } from '@/shared/lib/auth-bus';
@@ -54,9 +54,9 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
     createInitialSessionState()
   );
 
-  const { trigger: triggerPostUser } = usePostApiV1Users();
+  const { trigger: triggerPostUser } = usePostApiV1UsersMe();
 
-  const { trigger: triggerPutUser } = usePutApiV1UsersId(state.user?.id ?? '');
+  const { trigger: triggerPutUser } = usePutApiV1UsersMe();
 
   const sessionActions = useMemo<SessionActions>(() => {
     const setToken = (payload: string) => {
@@ -82,7 +82,7 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
           case SessionLoginStatus.TEMPORARY: {
             const arg = postApiV1UsersBody.parse(input);
             const result = await triggerPostUser(arg);
-            setToken(result?.data?.token ?? '');
+            setToken(result?.data.token);
             break;
           }
           case SessionLoginStatus.PERMANENT: {
