@@ -49,3 +49,13 @@ export const updateProjectSchema = projectSchema.omit({
 });
 
 export type UpdateProjectSchema = z.infer<typeof updateProjectSchema>;
+
+export const projectMutationResponseSchema = z.object({
+  success: z.boolean(),
+  data: projectSchema,
+  message: z.string().optional(),
+});
+
+export type ProjectMutationResponseSchema = z.infer<
+  typeof projectMutationResponseSchema
+>;

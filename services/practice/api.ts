@@ -116,12 +116,7 @@ class PracticeAPIClass {
     const queryString = buildPracticeQueryString(params);
 
     try {
-      console.log('🔍 Practice API Request:', `${this.config.baseURL}${PRACTICE_BASE_PATH}${queryString}`);
-
       const result = await this.request<any>(`${PRACTICE_BASE_PATH}${queryString}`);
-
-      console.log('📥 Practice API Response:', result);
-
       // 適配 pagination 格式差異
       const adaptedResult = {
         data: result.data || [],
@@ -134,9 +129,6 @@ class PracticeAPIClass {
           hasPrev: result.pagination?.hasPrev,
         }
       };
-
-      console.log('🔄 Practice Adapted Result:', adaptedResult);
-
       return adaptedResult;
     } catch (error) {
       console.error('❌ Practice API Error:', error);
