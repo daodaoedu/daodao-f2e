@@ -28,7 +28,6 @@ interface IdeaActionsProps {
   idea: IdeaSchema;
   onEdit?: () => void;
   onDeleteSuccess?: () => void;
-  variant?: 'icon' | 'text';
 }
 
 /**
@@ -39,7 +38,6 @@ export function IdeaActions({
   idea,
   onEdit,
   onDeleteSuccess,
-  variant = 'icon'
 }: IdeaActionsProps) {
   const router = useRouter();
   const { deleteIdea, isDeleting } = useIdeaActions();

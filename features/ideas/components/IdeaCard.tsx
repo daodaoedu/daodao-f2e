@@ -14,8 +14,8 @@ import { Card, CardContent } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
 import { useSession } from '@/entities/session';
-import { IdeaActions } from './IdeaActions';
 import type { IdeaSchema } from '@/services/ideas/schema';
+import { IdeaActions } from './IdeaActions';
 
 interface IdeaCardProps {
   idea: IdeaSchema;
