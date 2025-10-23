@@ -1,28 +1,31 @@
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { Image } from '@/shared/ui/image';
 import { ROLE } from '@/constants/member';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
+import { useSession } from '@/entities/session';
+import { IdeaActions } from '@/features/ideas/components/IdeaActions';
 import type { IdeaSchema } from '@/services/ideas';
 
 interface IdeaHeaderProps {
   idea: IdeaSchema;
-  onBack: () => void;
+  onEdit?: () => void;
 }
 
-export function IdeaHeader({ idea, onBack }: IdeaHeaderProps) {
+export function IdeaHeader({ idea, onEdit }: IdeaHeaderProps) {
+  const router = useRouter();
+  const { user } = useSession();
+
+  // 檢查是否為想法的作者
+  const isOwner = user?.id === idea.user?.id;
+
+  const handleDeleteSuccess = () => {
+    router.push('/explore');
+  };
+
   return (
     <>
-      {/* 返回按鈕 */}
-      <Button
-        variant="ghost"
-        onClick={onBack}
-        className="mb-4 text-basic-500 hover:text-primary-base px-0"
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        返回
-      </Button>
-
       {/* 想法內容 */}
       <div className="space-y-6">
         <header>
@@ -63,6 +66,15 @@ export function IdeaHeader({ idea, onBack }: IdeaHeaderProps) {
               <span className="text-sm text-[#92989A] text-center sm:text-left">
                 {new Date(idea.createdAt).toLocaleDateString('zh-TW')}
               </span>
+
+              {/* 編輯/刪除選單 - 只有作者可見 */}
+              {isOwner && (
+                <IdeaActions
+                  idea={idea}
+                  onEdit={onEdit}
+                  onDeleteSuccess={handleDeleteSuccess}
+                />
+              )}
             </div>
           </div>
         </header>

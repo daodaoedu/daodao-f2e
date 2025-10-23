@@ -135,7 +135,7 @@ export default function ResourceDetailPage({
               <TabsTrigger
                 value={TabEnum.Contributor}
                 className="basis-1/3"
-                disabled={!data.user?._id}
+                disabled={!data.user?.id}
               >
                 分享者資訊
               </TabsTrigger>

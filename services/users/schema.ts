@@ -69,7 +69,6 @@ export const userSchema = z.object({
 
 export const baseUserSchema = userSchema
   .pick({
-    _id: true,
     id: true,
     name: true,
     photoURL: true,

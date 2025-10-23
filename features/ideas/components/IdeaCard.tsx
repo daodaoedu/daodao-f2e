@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { CustomLink } from '@/shared/ui/custom-link';
 import {
@@ -11,7 +13,9 @@ import { Button } from '@/shared/ui';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
+import { useSession } from '@/entities/session';
 import type { IdeaSchema } from '@/services/ideas/schema';
+import { IdeaActions } from './IdeaActions';
 
 interface IdeaCardProps {
   idea: IdeaSchema;
@@ -22,6 +26,11 @@ function IdeaCard({
   idea,
   onClick,
 }: IdeaCardProps) {
+  const { user } = useSession();
+
+  // 檢查是否為想法的作者
+  const isOwner = user?.id === idea.user?.id;
+
   const handleCardClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (onClick) {
@@ -61,7 +70,7 @@ function IdeaCard({
                 </span>
               </div>
               <div className="text-xs text-basic-300 mt-0.5">
-                {idea.user?.roleList?.join(' | ') || '想法分享者'}
+                {idea.user?.roleList?.[0] || '想法分享者'}
               </div>
             </div>
           </div>
@@ -75,10 +84,13 @@ function IdeaCard({
             <div className="text-xs text-basic-300 hidden sm:block">
               {new Date(idea.createdAt).toLocaleDateString('zh-TW')}
             </div>
+
+            {/* 編輯/刪除選單 - 只有作者可見 */}
+            {isOwner && <IdeaActions idea={idea} />}
           </div>
         </div>
 
-        <p className="text-basic-500 mb-3 sm:mb-4 text-sm sm:text-base line-clamp-3 sm:line-clamp-none">{idea.content}</p>
+        <p className="text-basic-500 mb-3 sm:mb-4 text-sm sm:text-base line-clamp-3 sm:line-clamp-none whitespace-pre-wrap">{idea.content}</p>
 
         <div className="flex gap-1 sm:gap-2 mb-3 sm:mb-4 flex-wrap">
           {idea.tags?.map((tag) => (
@@ -138,13 +150,15 @@ function IdeaCard({
     </Card>
   );
 
+  const content = cardContent;
+
   if (onClick) {
-    return cardContent;
+    return content;
   }
 
   return (
     <CustomLink href={`/ideas/${idea.id}`} className="block max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto">
-      {cardContent}
+      {content}
     </CustomLink>
   );
 }
