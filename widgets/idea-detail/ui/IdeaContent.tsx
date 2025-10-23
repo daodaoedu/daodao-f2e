@@ -8,6 +8,18 @@ import { Textarea } from '@/shared/ui/textarea';
 import { Input } from '@/shared/ui/input';
 import type { IdeaSchema, IdeaResourceSchema } from '@/services/ideas';
 
+/**
+ * 為編輯模式的資源添加唯一 ID
+ *
+ * 為什麼需要這個:
+ * - 當資源列表中有重複的 name 或 url 時,僅用 name 或 url 作為 key 會導致錯誤刪除
+ * - 使用 crypto.randomUUID() 生成的唯一 ID 確保每個資源都能被正確識別和刪除
+ * - 保存時會將 id 移除,只傳送原始的 { name, url } 資料給後端
+ */
+interface EditableResource extends IdeaResourceSchema {
+  id: string;
+}
+
 interface IdeaContentProps {
   idea: IdeaSchema;
   isEditing?: boolean;
@@ -18,7 +30,13 @@ interface IdeaContentProps {
 export function IdeaContent({ idea, isEditing = false, onSave, onCancel }: IdeaContentProps) {
   const [editContent, setEditContent] = useState(idea.content);
   const [editTags, setEditTags] = useState<string[]>(idea.tags || []);
-  const [editResources, setEditResources] = useState<IdeaResourceSchema[]>(idea.resources || []);
+  // 為每個資源添加唯一 ID 以確保正確刪除
+  const [editResources, setEditResources] = useState<EditableResource[]>(
+    () => (idea.resources || []).map((resource) => ({
+      ...resource,
+      id: crypto.randomUUID(),
+    }))
+  );
   const [newTag, setNewTag] = useState('');
   const [newResourceName, setNewResourceName] = useState('');
   const [newResourceUrl, setNewResourceUrl] = useState('');
@@ -36,14 +54,22 @@ export function IdeaContent({ idea, isEditing = false, onSave, onCancel }: IdeaC
 
   const handleAddResource = () => {
     if (newResourceName.trim() && newResourceUrl.trim()) {
-      setEditResources([...editResources, { name: newResourceName.trim(), url: newResourceUrl.trim() }]);
+      setEditResources([
+        ...editResources,
+        {
+          name: newResourceName.trim(),
+          url: newResourceUrl.trim(),
+          id: crypto.randomUUID(),
+        },
+      ]);
       setNewResourceName('');
       setNewResourceUrl('');
     }
   };
 
-  const handleRemoveResource = (index: number) => {
-    setEditResources(editResources.filter((_, i) => i !== index));
+  const handleRemoveResource = (id: string) => {
+    // 使用唯一 ID 刪除,避免重複資源造成錯誤刪除
+    setEditResources(editResources.filter((resource) => resource.id !== id));
   };
 
   const handleSave = () => {
@@ -51,7 +77,10 @@ export function IdeaContent({ idea, isEditing = false, onSave, onCancel }: IdeaC
       onSave({
         content: editContent,
         tags: editTags,
-        resources: editResources,
+        resources: editResources.map((resource) => ({
+          name: resource.name,
+          url: resource.url,
+        })),
       });
     }
   };
@@ -175,7 +204,7 @@ export function IdeaContent({ idea, isEditing = false, onSave, onCancel }: IdeaC
             <div className="space-y-2">
               {editResources.map((resource) => (
                 <div
-                  key={`${resource.url}-${resource.name}`}
+                  key={resource.id}
                   className="flex items-center justify-between p-2 sm:p-3 bg-primary-lightest rounded-lg"
                 >
                   <div className="flex items-center flex-1 min-w-0">
@@ -185,7 +214,7 @@ export function IdeaContent({ idea, isEditing = false, onSave, onCancel }: IdeaC
                     </span>
                   </div>
                   <Button
-                    onClick={() => handleRemoveResource(editResources.indexOf(resource))}
+                    onClick={() => handleRemoveResource(resource.id)}
                     variant="ghost"
                     size="sm"
                     className="size-auto p-1 h-auto hover:text-alert ml-2"

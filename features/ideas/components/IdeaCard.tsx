@@ -1,16 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import React from 'react';
 import { CustomLink } from '@/shared/ui/custom-link';
 import {
   Share2,
   Link as LinkIcon,
   Eye,
-  Edit,
-  Trash2,
-  MoreVertical,
 } from 'lucide-react';
 import Shell from '@/public/assets/icons/shell.svg';
 import Comment from '@/public/assets/icons/comment.svg';
@@ -18,24 +13,8 @@ import { Button } from '@/shared/ui';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/ui/alert-dialog';
 import { useSession } from '@/entities/session';
-import { useIdeaActions } from '@/features/ideas/hooks';
+import { IdeaActions } from './IdeaActions';
 import type { IdeaSchema } from '@/services/ideas/schema';
 
 interface IdeaCardProps {
@@ -47,39 +26,15 @@ function IdeaCard({
   idea,
   onClick,
 }: IdeaCardProps) {
-  const router = useRouter();
   const { user } = useSession();
-  const { deleteIdea, isDeleting } = useIdeaActions();
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // 檢查是否為想法的作者
-  const isOwner = user?.id === idea.user?.id || user?.id === idea.user?._id;
+  const isOwner = user?.id === idea.user?.id;
 
   const handleCardClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (onClick) {
       onClick(idea.id);
-    }
-  };
-
-  const handleEdit = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    router.push(`/ideas/${idea.id}?edit=true`);
-  };
-
-  const handleDelete = async (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    try {
-      await deleteIdea(idea.id);
-      setShowDeleteDialog(false);
-      toast.success('想法已刪除');
-    } catch (error) {
-      console.error('刪除想法失敗:', error);
-      toast.error('刪除失敗，請稍後再試');
     }
   };
 
@@ -131,37 +86,7 @@ function IdeaCard({
             </div>
 
             {/* 編輯/刪除選單 - 只有作者可見 */}
-            {isOwner && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 text-basic-400 hover:text-basic-600"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40">
-                  <DropdownMenuItem onClick={handleEdit}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    編輯
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setShowDeleteDialog(true);
-                    }}
-                    className="text-red-600 focus:text-red-600"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    刪除
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            {isOwner && <IdeaActions idea={idea} />}
           </div>
         </div>
 
@@ -225,35 +150,7 @@ function IdeaCard({
     </Card>
   );
 
-  const content = (
-    <>
-      {cardContent}
-
-      {/* 刪除確認對話框 */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-          <AlertDialogHeader>
-            <AlertDialogTitle>確認刪除想法</AlertDialogTitle>
-            <AlertDialogDescription>
-              此操作無法復原。確定要刪除這個想法嗎?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
-              取消
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              {isDeleting ? '刪除中...' : '確認刪除'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
-  );
+  const content = cardContent;
 
   if (onClick) {
     return content;
