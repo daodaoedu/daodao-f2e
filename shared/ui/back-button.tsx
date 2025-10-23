@@ -11,7 +11,7 @@ interface BackButtonProps extends Omit<ButtonProps, 'children' | 'onClick'> {
 }
 
 export const BackButton = ({
-  label = '返回',
+  label,
   className,
   onClick,
   ...props
@@ -26,7 +26,7 @@ export const BackButton = ({
       className={cn('-mx-2 px-2 text-basic-400', className)}
       {...props}
     >
-      <ChevronLeft className="size-4" />
+      <ChevronLeft className="size-7" />
       {label}
     </Button>
   );

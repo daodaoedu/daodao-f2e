@@ -1,9 +1,16 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { CustomLink } from '@/shared/ui/custom-link';
 import {
   Share2,
   Link as LinkIcon,
   Eye,
+  Edit,
+  Trash2,
+  MoreVertical,
 } from 'lucide-react';
 import Shell from '@/public/assets/icons/shell.svg';
 import Comment from '@/public/assets/icons/comment.svg';
@@ -11,6 +18,24 @@ import { Button } from '@/shared/ui';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/shared/ui/alert-dialog';
+import { useSession } from '@/entities/session';
+import { useIdeaActions } from '@/features/ideas/hooks';
 import type { IdeaSchema } from '@/services/ideas/schema';
 
 interface IdeaCardProps {
@@ -22,10 +47,39 @@ function IdeaCard({
   idea,
   onClick,
 }: IdeaCardProps) {
+  const router = useRouter();
+  const { user } = useSession();
+  const { deleteIdea, isDeleting } = useIdeaActions();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  // 檢查是否為想法的作者
+  const isOwner = user?.id === idea.user?.id || user?.id === idea.user?._id;
+
   const handleCardClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (onClick) {
       onClick(idea.id);
+    }
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    router.push(`/ideas/${idea.id}?edit=true`);
+  };
+
+  const handleDelete = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    try {
+      await deleteIdea(idea.id);
+      setShowDeleteDialog(false);
+      toast.success('想法已刪除');
+    } catch (error) {
+      console.error('刪除想法失敗:', error);
+      toast.error('刪除失敗，請稍後再試');
     }
   };
 
@@ -61,7 +115,7 @@ function IdeaCard({
                 </span>
               </div>
               <div className="text-xs text-basic-300 mt-0.5">
-                {idea.user?.roleList?.join(' | ') || '想法分享者'}
+                {idea.user?.roleList?.[0] || '想法分享者'}
               </div>
             </div>
           </div>
@@ -75,10 +129,43 @@ function IdeaCard({
             <div className="text-xs text-basic-300 hidden sm:block">
               {new Date(idea.createdAt).toLocaleDateString('zh-TW')}
             </div>
+
+            {/* 編輯/刪除選單 - 只有作者可見 */}
+            {isOwner && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 text-basic-400 hover:text-basic-600"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem onClick={handleEdit}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    編輯
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowDeleteDialog(true);
+                    }}
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    刪除
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
 
-        <p className="text-basic-500 mb-3 sm:mb-4 text-sm sm:text-base line-clamp-3 sm:line-clamp-none">{idea.content}</p>
+        <p className="text-basic-500 mb-3 sm:mb-4 text-sm sm:text-base line-clamp-3 sm:line-clamp-none whitespace-pre-wrap">{idea.content}</p>
 
         <div className="flex gap-1 sm:gap-2 mb-3 sm:mb-4 flex-wrap">
           {idea.tags?.map((tag) => (
@@ -138,13 +225,43 @@ function IdeaCard({
     </Card>
   );
 
+  const content = (
+    <>
+      {cardContent}
+
+      {/* 刪除確認對話框 */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>確認刪除想法</AlertDialogTitle>
+            <AlertDialogDescription>
+              此操作無法復原。確定要刪除這個想法嗎?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
+              取消
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isDeleting ? '刪除中...' : '確認刪除'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+
   if (onClick) {
-    return cardContent;
+    return content;
   }
 
   return (
     <CustomLink href={`/ideas/${idea.id}`} className="block max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto">
-      {cardContent}
+      {content}
     </CustomLink>
   );
 }

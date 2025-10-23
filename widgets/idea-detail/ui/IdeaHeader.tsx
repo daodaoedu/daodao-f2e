@@ -1,28 +1,69 @@
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { Edit, Trash2, MoreVertical } from 'lucide-react';
 import { Image } from '@/shared/ui/image';
 import { ROLE } from '@/constants/member';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
+import { Button } from '@/shared/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/shared/ui/alert-dialog';
+import { useSession } from '@/entities/session';
+import { useIdeaActions } from '@/features/ideas/hooks';
 import type { IdeaSchema } from '@/services/ideas';
 
 interface IdeaHeaderProps {
   idea: IdeaSchema;
-  onBack: () => void;
+  onEdit?: () => void;
 }
 
-export function IdeaHeader({ idea, onBack }: IdeaHeaderProps) {
+export function IdeaHeader({ idea, onEdit }: IdeaHeaderProps) {
+  const router = useRouter();
+  const { user } = useSession();
+  const { deleteIdea, isDeleting } = useIdeaActions();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  // 檢查是否為想法的作者
+  const isOwner = user?.id === idea.user?.id || user?.id === idea.user?._id;
+
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit();
+    } else {
+      router.push(`/ideas/${idea.id}/edit`);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteIdea(idea.id);
+      setShowDeleteDialog(false);
+      toast.success('想法已刪除');
+      router.push('/explore');
+    } catch (error) {
+      console.error('刪除想法失敗:', error);
+      toast.error('刪除失敗，請稍後再試');
+    }
+  };
+
   return (
     <>
-      {/* 返回按鈕 */}
-      <Button
-        variant="ghost"
-        onClick={onBack}
-        className="mb-4 text-basic-500 hover:text-primary-base px-0"
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        返回
-      </Button>
-
       {/* 想法內容 */}
       <div className="space-y-6">
         <header>
@@ -63,10 +104,60 @@ export function IdeaHeader({ idea, onBack }: IdeaHeaderProps) {
               <span className="text-sm text-[#92989A] text-center sm:text-left">
                 {new Date(idea.createdAt).toLocaleDateString('zh-TW')}
               </span>
+
+              {/* 編輯/刪除選單 - 只有作者可見 */}
+              {isOwner && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-basic-400 hover:text-basic-600"
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuItem onClick={handleEdit}>
+                      <Edit className="mr-2 h-4 w-4" />
+                      編輯
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setShowDeleteDialog(true)}
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      刪除
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         </header>
       </div>
+
+      {/* 刪除確認對話框 */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>確認刪除想法</AlertDialogTitle>
+            <AlertDialogDescription>
+              此操作無法復原。確定要刪除這個想法嗎?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isDeleting ? '刪除中...' : '確認刪除'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
