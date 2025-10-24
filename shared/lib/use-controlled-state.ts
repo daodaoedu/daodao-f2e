@@ -1,3 +1,5 @@
+'use client';
+
 import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 
 export default function useControlledState<T>(
