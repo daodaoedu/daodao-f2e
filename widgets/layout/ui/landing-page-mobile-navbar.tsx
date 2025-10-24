@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { cn } from '@/shared/lib/cn';
 import { Button } from '@/shared/ui/button';
 import { useTranslation } from '@/shared/lib/translation';
-import { landingPageNav } from '../model';
+import { guestLayoutNav } from '../model';
 
 export const LandingPageMobileNavbar = () => {
   const isVisible = useScrollVisibility({ threshold: 250 });
@@ -14,7 +14,7 @@ export const LandingPageMobileNavbar = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    const headings = landingPageNav.map((item) =>
+    const headings = guestLayoutNav.map((item) =>
       document.getElementById(item.href.replace('/#', ''))
     );
 
@@ -45,7 +45,7 @@ export const LandingPageMobileNavbar = () => {
       )}
     >
       <ul className="flex h-full items-center justify-around">
-        {landingPageNav.map((item) => {
+        {guestLayoutNav.map((item) => {
           const isActive = activeSection === item.href.replace('/#', '');
           return (
             <Button

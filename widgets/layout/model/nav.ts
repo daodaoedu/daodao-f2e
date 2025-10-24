@@ -1,24 +1,49 @@
+import type { UserValidatorsCreateUserResponseSchemaDataUser } from '@/generated/models';
 import { ANCHOR_IDS } from '@/shared/constants';
 import { TranslationKeys } from '@/shared/config/i18n';
+
+export type NavVisibility =
+  | 'all'
+  | 'auth'
+  | 'guest'
+  | ((user: UserValidatorsCreateUserResponseSchemaDataUser | null) => boolean);
 
 export interface NavItemType {
   label: TranslationKeys;
   href: string;
+  visibility?: NavVisibility;
 }
 
-export const landingPageNav: NavItemType[] = [
+export const protectedLayoutNav: NavItemType[] = [
+  {
+    label: 'common.explore',
+    href: '/explore',
+    visibility: 'auth',
+  },
+  {
+    label: 'common.resources',
+    href: '/resource',
+    visibility: 'auth',
+  },
+];
+
+export const guestLayoutNav: NavItemType[] = [
   {
     label: 'common.landing_solutions',
     href: `/#${ANCHOR_IDS.SOLUTIONS}`,
+    visibility: 'guest',
   },
   {
     label: 'common.landing_features',
     href: `/#${ANCHOR_IDS.FEATURES}`,
+    visibility: 'guest',
   },
   {
     label: 'common.landing_plans',
     href: `/#${ANCHOR_IDS.PLANS}`,
+    visibility: 'guest',
   },
+  ...protectedLayoutNav,
 ];
 
 export const marathonNav: NavItemType[] = [
@@ -33,16 +58,5 @@ export const marathonNav: NavItemType[] = [
   {
     label: 'common.marathon_projects',
     href: '/projects',
-  },
-];
-
-export const exploreNav: NavItemType[] = [
-  {
-    label: 'common.explore',
-    href: '/explore',
-  },
-  {
-    label: 'common.resources',
-    href: '/resource',
   },
 ];

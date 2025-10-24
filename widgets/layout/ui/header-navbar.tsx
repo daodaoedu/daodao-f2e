@@ -9,6 +9,7 @@ import { cn } from '@/shared/lib/cn';
 import { useTranslation } from '@/shared/lib/translation';
 import { useSession, useSessionActions } from '@/entities/session';
 import Dropdown from '@/shared/components/Dropdown';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { NavItemType } from '../model';
 
 interface HeaderNavbarProps {
@@ -24,6 +25,24 @@ export const HeaderNavbar = ({
   const { logout } = useSessionActions();
   const isVisible = useScrollVisibility({ threshold: 200 });
   const { t } = useTranslation();
+
+  const filteredNavItems = navItems.filter((item) => {
+    const visibility = item.visibility ?? 'all';
+
+    if (typeof visibility === 'function') {
+      return visibility(user);
+    }
+
+    switch (visibility) {
+      case 'auth':
+        return !!user;
+      case 'guest':
+        return !user;
+      case 'all':
+      default:
+        return true;
+    }
+  });
 
   return (
     <nav
@@ -53,7 +72,7 @@ export const HeaderNavbar = ({
         </Button>
       </div>
       <ul className="flex items-center gap-8">
-        {navItems.map((item) => (
+        {filteredNavItems.map((item) => (
           <li key={item.label} className="hidden md:block">
             <Button
               variant="ghost"
@@ -70,13 +89,15 @@ export const HeaderNavbar = ({
             <div className="flex items-center gap-3.5">
               <Dropdown as="nav">
                 <Dropdown.Toggle animation="none" className="p-0">
-                  <Image
-                    src={user.photoURL ?? ''}
-                    alt={user.name ?? 'user avatar'}
-                    width="40"
-                    height="40"
-                    className="rounded-full"
-                  />
+                  <Avatar className="size-10">
+                    <AvatarImage
+                      src={user.photoURL ?? ''}
+                      alt={user.name ?? 'user avatar'}
+                    />
+                    <AvatarFallback className="bg-primary-base text-xs font-semibold text-white">
+                      {user.name?.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </Dropdown.Toggle>
                 <Dropdown.List className="mt-2">
                   <Dropdown.Item className="text-nowrap rounded-lg hover:bg-primary-lightest">
