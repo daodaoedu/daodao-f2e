@@ -2031,8 +2031,6 @@ components:
           type: object
           properties:
             id:
-              type: number
-            _id:
               type: string
             name:
               type: string
@@ -2057,7 +2055,6 @@ components:
               nullable: true
           required:
             - id
-            - _id
             - name
         hasResources:
           type: boolean
@@ -2140,8 +2137,6 @@ components:
               type: object
               properties:
                 id:
-                  type: number
-                _id:
                   type: string
                 name:
                   type: string
@@ -2166,7 +2161,6 @@ components:
                   nullable: true
               required:
                 - id
-                - _id
                 - name
             hasResources:
               type: boolean
@@ -2288,8 +2282,6 @@ components:
                 type: object
                 properties:
                   id:
-                    type: number
-                  _id:
                     type: string
                   name:
                     type: string
@@ -2314,7 +2306,6 @@ components:
                     nullable: true
                 required:
                   - id
-                  - _id
                   - name
               hasResources:
                 type: boolean
@@ -2457,8 +2448,6 @@ components:
               type: object
               properties:
                 id:
-                  type: number
-                _id:
                   type: string
                 name:
                   type: string
@@ -2483,7 +2472,6 @@ components:
                   nullable: true
               required:
                 - id
-                - _id
                 - name
             hasResources:
               type: boolean
@@ -2603,8 +2591,6 @@ components:
               type: object
               properties:
                 id:
-                  type: number
-                _id:
                   type: string
                 name:
                   type: string
@@ -2629,7 +2615,6 @@ components:
                   nullable: true
               required:
                 - id
-                - _id
                 - name
             hasResources:
               type: boolean
@@ -5492,11 +5477,8 @@ components:
           type: object
           properties:
             id:
-              type: number
-            name:
               type: string
-              nullable: true
-            _id:
+            name:
               type: string
               nullable: true
           required:
@@ -5578,11 +5560,8 @@ components:
               type: object
               properties:
                 id:
-                  type: number
-                name:
                   type: string
-                  nullable: true
-                _id:
+                name:
                   type: string
                   nullable: true
               required:
@@ -5670,11 +5649,8 @@ components:
                 type: object
                 properties:
                   id:
-                    type: number
-                  name:
                     type: string
-                    nullable: true
-                  _id:
+                  name:
                     type: string
                     nullable: true
                 required:
@@ -6516,8 +6492,6 @@ components:
       type: object
       properties:
         id:
-          type: number
-        _id:
           type: string
         name:
           type: string
@@ -6542,7 +6516,6 @@ components:
           nullable: true
       required:
         - id
-        - _id
         - name
     practice.validators_practiceStatsResponseSchema:
       type: object
@@ -6634,8 +6607,6 @@ components:
           type: object
           properties:
             id:
-              type: number
-            _id:
               type: string
             name:
               type: string
@@ -6660,7 +6631,6 @@ components:
               nullable: true
           required:
             - id
-            - _id
             - name
         tags:
           type: array
@@ -6713,6 +6683,9 @@ components:
           type: string
         progressAmount:
           type: number
+        unit:
+          type: string
+          nullable: true
         note:
           type: string
           nullable: true
@@ -6956,8 +6929,6 @@ components:
               type: object
               properties:
                 id:
-                  type: number
-                _id:
                   type: string
                 name:
                   type: string
@@ -6982,7 +6953,6 @@ components:
                   nullable: true
               required:
                 - id
-                - _id
                 - name
             tags:
               type: array
@@ -7129,8 +7099,6 @@ components:
                 type: object
                 properties:
                   id:
-                    type: number
-                  _id:
                     type: string
                   name:
                     type: string
@@ -7155,7 +7123,6 @@ components:
                     nullable: true
                 required:
                   - id
-                  - _id
                   - name
               tags:
                 type: array
@@ -7275,6 +7242,9 @@ components:
               type: string
             progressAmount:
               type: number
+            unit:
+              type: string
+              nullable: true
             note:
               type: string
               nullable: true
@@ -7365,6 +7335,9 @@ components:
                 type: string
               progressAmount:
                 type: number
+              unit:
+                type: string
+                nullable: true
               note:
                 type: string
                 nullable: true
@@ -8052,8 +8025,6 @@ components:
               type: object
               properties:
                 id:
-                  type: number
-                _id:
                   type: string
                 name:
                   type: string
@@ -8078,7 +8049,6 @@ components:
                   nullable: true
               required:
                 - id
-                - _id
                 - name
             tags:
               type: array
@@ -8223,8 +8193,6 @@ components:
               type: object
               properties:
                 id:
-                  type: number
-                _id:
                   type: string
                 name:
                   type: string
@@ -8249,7 +8217,6 @@ components:
                   nullable: true
               required:
                 - id
-                - _id
                 - name
             tags:
               type: array
@@ -8653,13 +8620,9 @@ components:
           type: object
           properties:
             id:
-              type: number
+              type: string
             name:
               type: string
-              nullable: true
-            _id:
-              type: string
-              nullable: true
             roleList:
               type: array
               items:
@@ -8669,6 +8632,7 @@ components:
               nullable: true
           required:
             - id
+            - name
             - roleList
           nullable: true
         milestones:
@@ -8870,13 +8834,9 @@ components:
               type: object
               properties:
                 id:
-                  type: number
+                  type: string
                 name:
                   type: string
-                  nullable: true
-                _id:
-                  type: string
-                  nullable: true
                 roleList:
                   type: array
                   items:
@@ -8886,6 +8846,7 @@ components:
                   nullable: true
               required:
                 - id
+                - name
                 - roleList
               nullable: true
             milestones:
@@ -9074,13 +9035,9 @@ components:
                 type: object
                 properties:
                   id:
-                    type: number
+                    type: string
                   name:
                     type: string
-                    nullable: true
-                  _id:
-                    type: string
-                    nullable: true
                   roleList:
                     type: array
                     items:
@@ -9090,6 +9047,7 @@ components:
                     nullable: true
                 required:
                   - id
+                  - name
                   - roleList
                 nullable: true
               milestones:
@@ -11232,10 +11190,8 @@ components:
           type: object
           properties:
             id:
-              type: number
-            name:
               type: string
-            _id:
+            name:
               type: string
             roleList:
               type: array
@@ -11259,7 +11215,6 @@ components:
           required:
             - id
             - name
-            - _id
         majorCategory:
           type: string
           nullable: true
@@ -11338,10 +11293,8 @@ components:
           type: object
           properties:
             id:
-              type: number
-            name:
               type: string
-            _id:
+            name:
               type: string
             roleList:
               type: array
@@ -11365,7 +11318,6 @@ components:
           required:
             - id
             - name
-            - _id
         majorCategory:
           type: string
           nullable: true
@@ -11469,10 +11421,8 @@ components:
               type: object
               properties:
                 id:
-                  type: number
-                name:
                   type: string
-                _id:
+                name:
                   type: string
                 roleList:
                   type: array
@@ -11496,7 +11446,6 @@ components:
               required:
                 - id
                 - name
-                - _id
             majorCategory:
               type: string
               nullable: true
@@ -11621,10 +11570,8 @@ components:
                 type: object
                 properties:
                   id:
-                    type: number
-                  name:
                     type: string
-                  _id:
+                  name:
                     type: string
                   roleList:
                     type: array
@@ -11648,7 +11595,6 @@ components:
                 required:
                   - id
                   - name
-                  - _id
               majorCategory:
                 type: string
                 nullable: true
@@ -11813,10 +11759,8 @@ components:
               type: object
               properties:
                 id:
-                  type: number
-                name:
                   type: string
-                _id:
+                name:
                   type: string
                 roleList:
                   type: array
@@ -11840,7 +11784,6 @@ components:
               required:
                 - id
                 - name
-                - _id
             majorCategory:
               type: string
               nullable: true
@@ -11963,10 +11906,8 @@ components:
               type: object
               properties:
                 id:
-                  type: number
-                name:
                   type: string
-                _id:
+                name:
                   type: string
                 roleList:
                   type: array
@@ -11990,7 +11931,6 @@ components:
               required:
                 - id
                 - name
-                - _id
             majorCategory:
               type: string
               nullable: true
