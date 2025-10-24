@@ -8,6 +8,7 @@ export enum CommentType {
   Idea = 'idea',
   Resource = 'resource',
   ResourceReview = 'resource-review',
+  Practice = 'practice',
 }
 
 export enum CommentVisibility {

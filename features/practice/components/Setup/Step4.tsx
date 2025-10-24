@@ -61,7 +61,7 @@ const StepFivePreview: React.FC<StepFivePreviewProps> = ({
   };
 
   return (
-    <div className="overflow-hidden rounded-lg bg-white shadow-md">
+    <div>
       <div className="p-4">
         <div className="mb-2 flex items-center">
           <div className="mr-2 size-2 rounded-full bg-primary-base" />

@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from '@/entities/session/model/context';
 import { CustomLink } from '@/shared/ui/custom-link';
 import {
   Search, Plus, Target, SortAsc, RefreshCw,
@@ -37,6 +38,7 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
   onCreateClick,
 }) => {
   const router = useRouter();
+  const { user } = useSession();
   // Filter and search state
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'createdAt' | 'updatedAt' | 'progress' | 'streak'>('createdAt');
@@ -88,8 +90,8 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
   };
 
   const handleCheckIn = (practice: Practice) => {
-    console.log('Check in practice:', practice.id);
-    // Handle check-in operation
+    // Navigate directly to check-in view
+    router.push(`/practice/${practice.id}?view=checkin`);
   };
 
   // const handleJoin = (practice: Practice) => {
@@ -160,7 +162,7 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
                   className="flex items-center gap-2"
                 >
                   <Plus className="size-4" />
-                  <span className="hidden sm:inline">開始實踐</span>
+                  <span>開始實踐</span>
                 </Button>
               ) : (
                 <CustomLink href="/practice/create">
@@ -169,7 +171,7 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
                     className="flex items-center gap-2"
                   >
                     <Plus className="size-4" />
-                    <span className="hidden sm:inline">開始實踐</span>
+                    <span>開始實踐</span>
                   </Button>
                 </CustomLink>
               )
@@ -277,6 +279,7 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
               <PracticeCard
                 key={practice.id}
                 practice={practice}
+                currentUserId={user?.id}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onCheckIn={handleCheckIn}

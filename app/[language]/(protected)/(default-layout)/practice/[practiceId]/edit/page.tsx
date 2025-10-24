@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { usePractice } from '@/services/practice/hooks';
+import { useSession } from '@/entities/session/model/context';
 import { practiceAPI } from '@/services/practice/api';
 import { Practice, UpdatePracticeInput } from '@/services/practice/schema';
 import EditForm from '@/features/practice/components/Edit/EditForm';
@@ -14,6 +15,7 @@ const PracticeEditPage = () => {
   const router = useRouter();
   const params = useParams();
   const practiceId = params?.practiceId as string;
+  const { user } = useSession();
 
   const { practice, isLoading, error, mutate } = usePractice(practiceId || null);
   const [formData, setFormData] = useState<Partial<Practice>>({});
@@ -101,6 +103,24 @@ const PracticeEditPage = () => {
           <Button onClick={() => router.push('/explore')} variant="outline">
             <ArrowLeft className="h-4 w-4 mr-2" />
             返回探索頁面
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if current user is the owner
+  const isOwner = user?.id && practice.user?.id === user.id;
+
+  if (!isOwner) {
+    return (
+      <div className="min-h-screen bg-basic-white pt-20 flex items-center justify-center">
+        <div className="bg-white rounded-lg border border-basic-200 shadow-sm p-6 w-full max-w-2xl text-center">
+          <h1 className="text-xl font-bold mb-4 text-basic-600">無權限編輯</h1>
+          <p className="text-base text-basic-400 mb-4">只有主題實踐的創建者才能進行編輯</p>
+          <Button onClick={() => router.push(`/practice/${practiceId}`)} variant="outline">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            返回主題實踐
           </Button>
         </div>
       </div>

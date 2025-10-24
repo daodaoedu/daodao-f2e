@@ -262,9 +262,6 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
 
             <div className="ml-3">
               <div className="text-sm font-medium text-white">分享新想法</div>
-              <div className="mt-1 text-xs text-white opacity-80">
-                與島友分享你的學習洞察和創新想法
-              </div>
             </div>
           </div>
           {onCancel && (
@@ -297,11 +294,11 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                       {...form.register('content')}
                       placeholder="分享你的學習洞察、重要發現或創新想法..."
                       className="text-basic-700 min-h-[24px] w-full resize-none rounded-none !border-0 !border-none bg-transparent px-0 py-4 leading-6 shadow-none focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
-                      maxLength={5000}
+                      maxLength={1000}
                     />
                     <div className="mt-2 text-right text-xs text-basic-400">
                       {charactersUsed}
-                      /5000
+                      /1000
                     </div>
                   </div>
                 </div>

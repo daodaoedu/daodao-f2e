@@ -70,7 +70,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
   };
 
   return (
-    <div className="overflow-hidden rounded-lg border border-basic-200 bg-white shadow-sm">
+    <div>
       {/* Header */}
       <div className="p-6">
         <div className="mb-4 flex items-center">

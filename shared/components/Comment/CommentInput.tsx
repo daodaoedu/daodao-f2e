@@ -20,6 +20,7 @@ interface CommentInputProps {
   parentId?: number;
   className?: string;
   hideHeader?: boolean;
+  hideVisibilityToggle?: boolean;
   defaultContent?: string;
   defaultIsEditing?: boolean;
   defaultIsPublic?: boolean;
@@ -32,6 +33,7 @@ function CommentInput({
   parentId,
   className,
   hideHeader = false,
+  hideVisibilityToggle = false,
   defaultContent = '',
   defaultIsEditing = false,
   defaultIsPublic = true,
@@ -94,7 +96,7 @@ function CommentInput({
             <div className="text-basic-500">{user.name}</div>
             <div className="rounded bg-basic-100 px-2.5 py-1 text-basic-500">{role}</div>
           </div>
-          {isEditing && (
+          {isEditing && !hideVisibilityToggle && (
             <Button
               className="-mb-1 mt-1 p-1"
               size="sm"
@@ -122,7 +124,7 @@ function CommentInput({
           onChange={(e) => setContent(e.target.value)}
           onClick={handleClick}
           placeholder={placeholder}
-          className="focus:ring-primary-500 w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-1"
+          className="w-full rounded-lg border border-basic-200 bg-white px-4 py-2 text-basic-500 placeholder:text-basic-300 focus:outline-none focus:ring-1 focus:ring-primary-base focus:border-primary-base"
           autoRows
         />
         {isEditing && (

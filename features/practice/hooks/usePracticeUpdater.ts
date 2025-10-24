@@ -20,7 +20,7 @@ export function usePracticeUpdater(practiceId: string | undefined) {
 
   const checkIn = async (input: CheckInInput) => {
     if (!practiceId) return undefined;
-    const result = await practiceAPI.checkIn(input);
+    const result = await practiceAPI.checkIn(practiceId, input);
     invalidateAllCaches(practiceId);
     return result;
   };

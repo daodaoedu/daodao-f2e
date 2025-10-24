@@ -25,6 +25,7 @@ interface CommentCardProps extends CommentSchema {
   onCreate?: (data: Omit<CommentData, 'id'>) => void;
   onUpdate?: (data: CommentData) => void;
   onDelete?: (data: { id: number }) => void;
+  hideVisibilityToggle?: boolean;
 }
 
 function CommentCard({
@@ -37,6 +38,7 @@ function CommentCard({
   onCreate,
   onUpdate,
   onDelete,
+  hideVisibilityToggle = false,
 }: CommentCardProps) {
   const { user } = useSession();
   const [isShowCommentInput, setIsShowCommentInput] = useState(false);
@@ -47,7 +49,7 @@ function CommentCard({
 
   const actions = isSelf
     ? [
-      onUpdate && {
+      !hideVisibilityToggle && onUpdate && {
         key: 'toggleVisibility',
         children: isPublic ? '設為不公開' : '設為公開',
         onClick: () => onUpdate({
@@ -108,10 +110,12 @@ function CommentCard({
         </div>
         <div className="flex items-center gap-3 text-basic-300">
           <time>{timeDuration(updatedAt)}</time>
-          <div className="hidden items-center gap-0.5 sm:flex">
-            {visibility === 'public' ? <LockKeyholeOpen /> : <LockKeyhole />}
-            <span>{visibility === 'public' ? '公開' : '不公開'}</span>
-          </div>
+          {!hideVisibilityToggle && (
+            <div className="hidden items-center gap-0.5 sm:flex">
+              {visibility === 'public' ? <LockKeyholeOpen /> : <LockKeyhole />}
+              <span>{visibility === 'public' ? '公開' : '不公開'}</span>
+            </div>
+          )}
 
           <DropdownMenu>
             <DropdownMenuTrigger className="-m-2 p-2">
@@ -147,6 +151,7 @@ function CommentCard({
             }}
             onCancel={() => setIsEditing(false)}
             hideHeader
+            hideVisibilityToggle={hideVisibilityToggle}
           />
         ) : (
           <p className="whitespace-pre-wrap text-basic-500">{content}</p>
@@ -196,6 +201,7 @@ function CommentCard({
                   onCreate={onCreate}
                   onUpdate={onUpdate}
                   onDelete={onDelete}
+                  hideVisibilityToggle={hideVisibilityToggle}
                   {...reply}
                 />
               ))}
@@ -211,6 +217,7 @@ function CommentCard({
           defaultIsEditing
           onSubmit={handleCreateComment}
           onCancel={() => setIsShowCommentInput(false)}
+          hideVisibilityToggle={hideVisibilityToggle}
         />
       )}
     </div>

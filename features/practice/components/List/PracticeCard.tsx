@@ -32,6 +32,7 @@ import {
 
 interface PracticeCardProps {
   practice: Practice | PracticeWithUser;
+  currentUserId?: string;
   onEdit?: (practice: Practice | PracticeWithUser) => void;
   onDelete?: (practice: Practice | PracticeWithUser) => void;
   onCheckIn?: (practice: Practice | PracticeWithUser) => void;
@@ -40,11 +41,14 @@ interface PracticeCardProps {
 
 const PracticeCard: React.FC<PracticeCardProps> = ({
   practice,
+  currentUserId,
   onEdit,
   onDelete,
   onCheckIn,
   showActions = true,
 }) => {
+  // Check if current user is the owner of this practice
+  const isOwner = currentUserId && practice.user?.id === currentUserId;
 
   const getStatusDisplay = () => {
     const statusMap = {
@@ -60,7 +64,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
   const getStatusColor = () => {
     const colorMap = {
       draft: 'bg-basic-100 text-basic-300',
-      active: 'bg-tips/20 text-tips',
+      active: 'bg-yellow-100 text-yellow-700',
       paused: 'bg-orange-100 text-orange-600',
       completed: 'bg-success/20 text-success',
       archived: 'bg-basic-100 text-basic-300',
@@ -94,7 +98,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
                 </span>
               </div>
               <div className="text-xs text-basic-300 mt-0.5">
-                {getContentTypeLabel(practice.contentType, practice.customContentType)}
+                {'user' in practice && practice.user?.roleList?.[0] ? practice.user.roleList[0] : '實踐者'}
               </div>
             </div>
           </div>
@@ -120,7 +124,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
               </div>
             )}
 
-            {showActions && (
+            {showActions && isOwner && (
               <div className="relative">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -183,6 +187,11 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
           {practice.title}
         </h3>
 
+        {/* 內容類型 - 移到標題底下 */}
+        <div className="mb-3 text-xs text-basic-400">
+          {getContentTypeLabel(practice.contentType, practice.customContentType)}
+        </div>
+
         {/* Tags */}
         {practice.tags && practice.tags.length > 0 && (
           <div className="mb-3 flex flex-wrap gap-1 sm:mb-4 sm:gap-2">
@@ -228,7 +237,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
               天
             </span>
           </div>
-          <Badge className={getStatusColor()}>
+          <Badge className={`${getStatusColor()} whitespace-nowrap`}>
             {getStatusDisplay()}
           </Badge>
         </div>

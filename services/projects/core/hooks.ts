@@ -75,19 +75,62 @@ export function useProjectMutation({
   const createMutation = useSWRMutation(
     getProjectPathname({ isMe: true }),
     projectAPI.create,
-    { onSuccess: onCreated }
+    {
+      onSuccess: (response) => {
+        if (response?.data) {
+          // Update cache for the newly created project
+          mutate(
+            getProjectPathname({ id: response.data.id }),
+            response.data,
+            { revalidate: false }
+          );
+          // Invalidate the project list to refresh it
+          mutate(getProjectPathname({ isMe: true }));
+
+          if (onCreated) {
+            onCreated(response.data);
+          }
+        }
+      },
+    }
   );
 
   const updateMutation = useSWRMutation(
     getProjectPathname({ isMe: true }),
     projectAPI.update,
-    { onSuccess: onUpdated }
+    {
+      onSuccess: (response) => {
+        if (response?.data) {
+          // Update cache for the updated project
+          mutate(
+            getProjectPathname({ id: response.data.id }),
+            response.data,
+            { revalidate: false }
+          );
+          // Invalidate the project list to refresh it
+          mutate(getProjectPathname({ isMe: true }));
+
+          if (onUpdated) {
+            onUpdated(response.data);
+          }
+        }
+      },
+    }
   );
 
   const deleteMutation = useSWRMutation(
     getProjectPathname({ isMe: true }),
     projectAPI.delete,
-    { onSuccess: onDeleted }
+    {
+      onSuccess: () => {
+        // Invalidate the project list to refresh it
+        mutate(getProjectPathname({ isMe: true }));
+
+        if (onDeleted) {
+          onDeleted();
+        }
+      }
+    }
   );
 
   return {
