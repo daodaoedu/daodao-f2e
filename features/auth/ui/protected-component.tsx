@@ -130,7 +130,12 @@ export function ProtectedComponent({
       fallback ?? (
         <IslandPlaceholder title="登入後即可使用完整功能">
           <div className="flex items-center justify-center gap-4">
-            <Button onClick={() => router.push('/')} size="lg" className="w-32">
+            <Button
+              onClick={() => router.push('/')}
+              variant="outline"
+              size="lg"
+              className="w-32"
+            >
               回首頁
             </Button>
             <Button onClick={() => openLoginModal()} size="lg" className="w-32">
