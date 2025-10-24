@@ -57,8 +57,8 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
   };
 
   const handleCheckIn = (practice: Practice) => {
-    console.log('Check in practice:', practice.id);
-    // Handle check-in operation
+    // Navigate directly to check-in view
+    router.push(`/practice/${practice.id}?view=checkin`);
   };
 
   if (error) {
@@ -205,6 +205,7 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
           <div key={item.id} className="relative">
             <PracticeCard
               practice={convertToPracticeSchema(item)}
+              currentUserId={user?.id}
               onEdit={handleEdit}
               onDelete={handleDelete}
               onCheckIn={handleCheckIn}

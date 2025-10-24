@@ -95,7 +95,7 @@ const Step3: React.FC<Step3Props> = ({
     }
   };
   return (
-    <div className="overflow-hidden rounded-lg border border-basic-200 bg-white shadow-sm">
+    <div>
       <div className="p-6">
         <div className="mb-2 flex items-center">
           <div className="mr-2 size-2 rounded-full bg-primary-base" />
@@ -261,6 +261,15 @@ const Step3: React.FC<Step3Props> = ({
               你的資源分享將能幫助有相同興趣的島友們
             </p>
           </div>
+
+          {validationErrors.resources && (
+            <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+              <div className="flex items-center justify-center text-sm text-destructive">
+                <AlertCircle className="mr-2 size-4" />
+                <span>{validationErrors.resources}</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

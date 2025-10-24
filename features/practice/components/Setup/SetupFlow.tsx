@@ -5,6 +5,8 @@ import Confetti from '@/features/practice/components/Shared/Confetti';
 import CelebrationMessage from '@/features/practice/components/Shared/CelebrationMessage';
 import { PathInfo } from '@/services/practice/schema';
 import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
+import { Button } from '@/shared/ui/button';
+import { X } from 'lucide-react';
 import Step1 from './Step1';
 import Step2 from './Step2';
 import Step3 from './Step3';
@@ -23,6 +25,7 @@ interface Resource {
 
 const SetupFlow: React.FC<SetupFlowProps> = ({
   onComplete,
+  onCancel,
 }) => {
   const router = useRouter();
   const { createPracticeFromPathInfo } = usePracticeManager();
@@ -103,6 +106,10 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
         errors.totalAmount = '總量必須大於0';
       } else if (totalAmount > 10000) {
         errors.totalAmount = '總量不能超過10000';
+      }
+    } else if (setupStep === 3) {
+      if (resources.length === 0) {
+        errors.resources = '請至少添加一個資源';
       }
     }
 
@@ -278,6 +285,29 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
         />
 
         <div className="overflow-visible rounded-lg border border-basic-200 bg-white shadow-sm">
+          {/* Header */}
+          <div className="flex items-center justify-between bg-primary-base bg-gradient-to-r px-6 py-4">
+            <div className="flex items-center">
+              <div className="flex size-10 items-center justify-center rounded-full border border-white/30 bg-white/20 font-medium text-white">
+                島
+              </div>
+              <div className="ml-3">
+                <div className="text-sm font-medium text-white">建立主題實踐</div>
+                <div className="text-xs text-white/80">步驟 {setupStep}/4</div>
+              </div>
+            </div>
+            {onCancel && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={onCancel}
+                className="p-2 text-white hover:bg-white/20"
+              >
+                <X className="size-5" />
+              </Button>
+            )}
+          </div>
+
           {renderStepContent()}
         </div>
       </div>

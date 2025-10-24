@@ -45,7 +45,7 @@ const Step1: React.FC<Step1Props> = ({
   selectedTags,
   setSelectedTags,
 }) => (
-  <div className="overflow-visible rounded-lg border border-basic-200 bg-white shadow-sm">
+  <div>
     <div className="p-6">
       <div className="mb-2 flex items-center">
         <div className="mr-2 size-2 rounded-full bg-primary-base" />

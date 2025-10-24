@@ -45,7 +45,22 @@ export function usePractice(id: string | null) {
     id ? getPracticePathname({ id }) : null,
     async () => {
       const { practiceAPI } = await import('./api');
-      return await practiceAPI.read(id!);
+      const practice = await practiceAPI.read(id!);
+
+      // 同時獲取打卡記錄並合併到 practice 對象中
+      try {
+        const checkIns = await practiceAPI.getCheckIns(id!);
+        return {
+          ...practice,
+          checkIns: checkIns || [],
+        };
+      } catch (err) {
+        // 如果獲取失敗，返回原始 practice（checkIns 可能為空或 undefined）
+        return {
+          ...practice,
+          checkIns: practice.checkIns || [],
+        };
+      }
     }
   );
 
