@@ -20,18 +20,17 @@ const HistoryView: React.FC<HistoryViewProps> = ({
   const stats = CheckInService.getCheckInStats(practice);
 
   return (
-    <div className="min-h-screen bg-primary-palest">
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* 返回按鈕 */}
-        <Button
-          variant="ghost"
-          onClick={onBack}
-          className="text-basic-600 hover:text-basic-800 mb-6 flex items-center transition-colors"
-        >
-          <ArrowLeft className="mr-2 size-4" />
-          <span>返回儀表板</span>
-        </Button>
+    <div className="min-h-screen bg-primary-palest pt-16">
+      {/* 返回按鈕 - 固定在左上角 */}
+      <Button
+        variant="ghost"
+        onClick={onBack}
+        className="fixed left-4 top-20 z-10 flex size-10 items-center justify-center rounded-full bg-white p-0 shadow-sm hover:bg-basic-50 sm:left-6"
+      >
+        <ArrowLeft className="size-5 text-basic-600" />
+      </Button>
 
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {/* 標題區域 */}
         <div className="mb-8">
           <h1 className="heading-xl mb-2 text-basic-black">簽到歷史</h1>
@@ -136,21 +135,11 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                         <div className="text-basic-700 body-md mb-1">
                           學習進度：
                           <span className="font-medium">
-                            +
-                            {entry.progress}
-                            {' '}
-                            {practice.unit}
+                            +{entry.progress} {practice.unit || '分鐘'}
                           </span>
                         </div>
                         <div className="body-sm text-basic-500">
-                          累計進度：
-                          {entry.totalProgress}
-                          {' '}
-                          /
-                          {' '}
-                          {practice.totalAmount}
-                          {' '}
-                          {practice.unit}
+                          累計進度：{entry.totalProgress} / {practice.totalAmount} {practice.unit || '分鐘'}
                         </div>
                       </div>
 

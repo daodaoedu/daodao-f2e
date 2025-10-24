@@ -41,7 +41,15 @@ function Providers({ children, locale }: ProvidersProps) {
               <PromotionProvider>
                 <ThemeProvider attribute="class">
                   {children}
-                  <Toaster />
+                  <Toaster
+                    position="top-center"
+                    expand
+                    toastOptions={{
+                      style: {
+                        marginTop: '80px', // 避免被 header 遮擋
+                      },
+                    }}
+                  />
                   <LoginModal />
                 </ThemeProvider>
               </PromotionProvider>

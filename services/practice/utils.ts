@@ -629,12 +629,36 @@ export function pathInfoToCreatePracticeInput(
     other: 'other'
   };
 
+  const contentType = contentTypeMap[String(pathInfo.contentType)] || 'custom';
+
+  // 根據 dailyGoalType 決定 totalAmount 和 unit
+  const dailyGoalType = dailyGoalConfig?.type;
+  const practiceDays = parseInt(String(pathInfo.totalAmount), 10) || 1;
+
+  let totalAmount: number;
+  let unit: string | null;
+
+  if (dailyGoalType === 'time' && dailyGoalConfig) {
+    // 時間目標：totalAmount = 實踐天數，unit = null
+    totalAmount = practiceDays;
+    unit = null;
+  } else if (dailyGoalType === 'completion' && dailyGoalConfig) {
+    // 完成目標：totalAmount = 天數，unit = 自定義單位
+    totalAmount = practiceDays;
+    unit = String(dailyGoalConfig.unit || '');
+  } else {
+    // 預設：使用內容類型的單位
+    totalAmount = practiceDays;
+    unit = getContentTypeUnit(contentType);
+  }
+
   return {
     title: String(pathInfo.title || ''),
     description: pathInfo.notes ? String(pathInfo.notes) : undefined,
-    contentType: contentTypeMap[String(pathInfo.contentType)] || 'custom',
+    contentType,
     customContentType: pathInfo.customContentType ? String(pathInfo.customContentType) : undefined,
-    totalAmount: parseInt(String(pathInfo.totalAmount), 10) || 1,
+    totalAmount,
+    unit: unit || undefined,
     targetDate: pathInfo.targetDate ? String(pathInfo.targetDate) : undefined,
     motivationType: pathInfo.motivationType ? motivationTypeMap[String(pathInfo.motivationType)] : undefined,
     customMotivation: pathInfo.customMotivation ? String(pathInfo.customMotivation) : undefined,

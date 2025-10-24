@@ -37,9 +37,9 @@ export function usePractices() {
   };
 
   // 簽到
-  const checkIn = async (input: CheckInInput) => {
-    const result = await practiceAPI.checkIn(input);
-    invalidateAllCaches(input.practiceId);
+  const checkIn = async (practiceId: string, input: CheckInInput) => {
+    const result = await practiceAPI.checkIn(practiceId, input);
+    invalidateAllCaches(practiceId);
     return result;
   };
 

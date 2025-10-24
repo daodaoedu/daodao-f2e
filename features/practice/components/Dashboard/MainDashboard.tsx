@@ -3,7 +3,6 @@ import { useRouter } from 'next/navigation';
 import {
   CheckCircle,
   Edit,
-  ArrowLeft,
   Plus,
   Flame,
   Book,
@@ -20,23 +19,31 @@ import { CheckInService } from '@/services/practice/checkIn';
 import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
 import { formatSmartDate, formatDate } from '@/services/practice/utils';
 import { Button } from '@/shared/ui/button';
+import { BackButton } from '@/shared/ui/back-button';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { Progress } from '@/shared/ui/progress';
+import CommentSection from '@/shared/components/Comment/CommentSection';
+import { CommentType } from '@/services/comments';
 import TagList from '../Shared/TagList';
 
 interface MainDashboardProps {
   practice: Practice;
+  currentUserId?: string;
   onCheckIn: () => void;
   onBack: () => void;
 }
 
 const MainDashboard: React.FC<MainDashboardProps> = ({
   practice,
+  currentUserId,
   onCheckIn,
   onBack,
 }) => {
   const router = useRouter();
   const { scrollToTop } = useScrollToTop();
+
+  // Check if current user is the owner of this practice
+  const isOwner = currentUserId && practice.user?.id === currentUserId;
 
   // 顯示 Toast 通知
   const showToastNotification = (message: string) => {
@@ -112,7 +119,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
       case 'paused':
         return 'bg-warning text-warning-darker';
       case 'active':
-        return 'bg-primary-base text-white';
+        return 'bg-yellow-100 text-yellow-700';
       default:
         return 'bg-basic-200 text-basic-600';
     }
@@ -129,17 +136,12 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
     <div className="min-h-screen bg-primary-palest pt-24">
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {/* 返回按鈕 */}
-        <Button
-          variant="ghost"
+        <BackButton
           onClick={onBack}
-          className="mb-6 flex items-center text-basic-500 hover:text-basic-black"
-        >
-          <ArrowLeft className="mr-2 size-4" />
-          <span>返回</span>
-        </Button>
-
+          className="mb-6 text-basic-500 hover:text-basic-black"
+        />
         {/* 主要內容 */}
-        <div className="overflow-hidden rounded-lg bg-basic-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl bg-basic-white">
           {/* 標題區域 */}
           <div className="p-6">
             <div className="flex items-start justify-between">
@@ -148,7 +150,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                   <h1 className="text-2xl font-bold text-basic-black">
                     {practice.title}
                   </h1>
-                  <span className={`rounded-full px-3 py-1 text-xs font-medium ${getStatusColor()}`}>
+                  <span className={`rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap ${getStatusColor()}`}>
                     {practice.status === 'active' ? '進行中'
                       : practice.status === 'completed' ? '已完成'
                         : practice.status === 'paused' ? '暫停' : '草稿'}
@@ -187,15 +189,17 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                 )}
               </div>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleEdit}
-                className="rounded-lg p-2 text-basic-500 hover:text-basic-black"
-                title="編輯實踐"
-              >
-                <Edit className="size-5" />
-              </Button>
+              {isOwner && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleEdit}
+                  className="rounded-lg p-2 text-basic-500 hover:text-basic-black"
+                  title="編輯實踐"
+                >
+                  <Edit className="size-5" />
+                </Button>
+              )}
             </div>
           </div>
 
@@ -263,54 +267,56 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
             </div>
           )}
 
-          {/* 打卡區域 */}
-          <div className="p-6">
-            <div className="space-y-6">
-              {/* 打卡 */}
-              <div className="rounded-lg bg-gradient-to-r from-primary/10 to-blue-50 p-4">
-                <h3 className="mb-3 text-lg font-semibold text-basic-black">打卡</h3>
-                {canCheckIn ? (
-                  <div className="space-y-3">
-                    <p className="text-sm text-basic-500">
-                      準備好記錄今天的學習進度了嗎？
-                    </p>
-                    <Button
-                      onClick={onCheckIn}
-                      className="flex items-center justify-center space-x-2"
-                    >
-                      <Plus className="size-4" />
-                      <span>開始打卡</span>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <div className="flex size-8 items-center justify-center rounded-full bg-success">
-                        <CheckCircle className="size-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-green-600">今日已打卡</p>
-                        {todayCheckIn && (
-                          <p className="text-xs text-basic-500">
-                            進度：+
-                            {todayCheckIn.progress}
-                            {' '}
-                            {practice.unit}
-                          </p>
-                        )}
-                      </div>
+          {/* 打卡區域 - 只有主題擁有者可以看到 */}
+          {isOwner && (
+            <div className="p-6">
+              <div className="space-y-6">
+                {/* 打卡 */}
+                <div className="rounded-lg bg-gradient-to-r from-primary/10 to-blue-50 p-4">
+                  <h3 className="mb-3 text-lg font-semibold text-basic-black">打卡</h3>
+                  {canCheckIn ? (
+                    <div className="space-y-3">
+                      <p className="text-sm text-basic-500">
+                        準備好記錄今天的學習進度了嗎？
+                      </p>
+                      <Button
+                        onClick={() => {
+                          console.log('打卡按鈕被點擊');
+                          onCheckIn();
+                        }}
+                        className="flex items-center justify-center space-x-2"
+                        type="button"
+                      >
+                        <Plus className="size-4" />
+                        <span>開始打卡</span>
+                      </Button>
                     </div>
-                    <Button
-                      disabled
-                      variant="secondary"
-                      className="flex cursor-not-allowed items-center justify-center space-x-2"
-                    >
-                      <CheckCircle className="size-4" />
-                      <span>已完成打卡</span>
-                    </Button>
-                  </div>
-                )}
-              </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <div className="flex size-8 items-center justify-center rounded-full bg-success">
+                          <CheckCircle className="size-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-green-600">今日已打卡</p>
+                          {todayCheckIn && (
+                            <p className="text-xs text-basic-500">
+                              進度：+{todayCheckIn.progress}{practice.unit ? ` ${practice.unit}` : ' 天'}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        disabled
+                        variant="secondary"
+                        className="flex cursor-not-allowed items-center justify-center space-x-2"
+                      >
+                        <CheckCircle className="size-4" />
+                        <span>已完成打卡</span>
+                      </Button>
+                    </div>
+                  )}
+                </div>
 
               {/* 打卡記錄 */}
               <div className="rounded-lg border border-basic-200 bg-basic-white p-4">
@@ -327,34 +333,29 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                     {practice.checkIns.map((checkIn, index) => (
                       <div
                         key={checkIn.id || index}
-                        className="flex items-center space-x-3 border-b border-basic-200 py-3 last:border-b-0"
+                        className="border-b border-basic-200 py-3 last:border-b-0"
                       >
-                        <div className="size-2 shrink-0 rounded-full bg-primary" />
-                        <div className="flex-1">
-                          <p className="text-sm text-basic-black">
-                            我在
-                            {' '}
-                            <span className="font-medium text-green-600">
-                              {formatSmartDate(checkIn.date)}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="size-2 shrink-0 rounded-full bg-primary" />
+                            <span className="text-sm font-medium text-basic-black">
+                              {formatDate(checkIn.date)}
                             </span>
-                            {' '}
-                            實踐
-                            {' '}
-                            <span className="font-medium text-primary">
-                              {practice.title}
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm font-medium text-primary">
+                              +{checkIn.progress}{practice.unit ? ` ${practice.unit}` : ' 天'}
                             </span>
-                            {' '}
-                            <span className="text-basic-500">
-                              {checkIn.progress}
+                            <span className="text-xs text-basic-400">
+                              (累積 {checkIn.totalProgress}{practice.unit ? ` ${practice.unit}` : ' 天'})
                             </span>
-                            {' '}
-                            <span className="text-basic-500">
-                              (
-                              {practice.unit}
-                              )
-                            </span>
-                          </p>
+                          </div>
                         </div>
+                        {checkIn.note && (
+                          <div className="ml-5 mt-2">
+                            <p className="text-xs text-basic-500">{checkIn.note}</p>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -366,9 +367,10 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
                     </p>
                   </div>
                 )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* 學習資源區域 */}
           {practice.resources && practice.resources.length > 0 && (
@@ -409,8 +411,16 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
           )}
         </div>
 
+        {/* 留言區域 - 獨立卡片 */}
+        <div className="mt-6 rounded-2xl bg-basic-white p-4 md:p-8 lg:p-10">
+          <CommentSection
+            targetId={practice.id}
+            targetType={CommentType.Practice}
+            hideVisibilityToggle
+            hideCommentCount
+          />
+        </div>
       </div>
-
     </div>
   );
 };

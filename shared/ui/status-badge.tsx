@@ -47,7 +47,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
       active: {
         icon: Play,
         label: '進行中',
-        className: 'bg-primary-base/20 text-primary-base border-primary-base/30',
+        className: 'bg-yellow-100 text-yellow-700 border-yellow-200',
       },
       paused: {
         icon: Pause,
@@ -113,7 +113,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 font-medium rounded-full border',
+        'inline-flex items-center gap-1 font-medium rounded-full border whitespace-nowrap',
         sizeClasses,
         config?.className,
         className

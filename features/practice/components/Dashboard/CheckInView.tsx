@@ -1,29 +1,36 @@
 import React, { useState } from 'react';
 import {
-  ArrowLeft, CheckCircle, Heart, Frown, Minus as Meh, Smile, Star, Plus, X,
+  CheckCircle, Heart, Frown, Minus as Meh, Smile, Star, Plus, X,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Practice, MoodType, CheckInInput } from '@/services/practice/schema';
 import { CheckInService } from '@/features/practice';
 import { usePracticeManager } from '@/features/practice/hooks';
 import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
 import { Button } from '@/shared/ui/button';
+import { BackButton } from '@/shared/ui/back-button';
 import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';
 import { Label } from '@/shared/ui/label';
 
 interface CheckInViewProps {
   practice: Practice;
+  currentUserId?: string;
   onBack: () => void;
   onSuccess?: () => void;
 }
 
 const CheckInView: React.FC<CheckInViewProps> = ({
   practice,
+  currentUserId,
   onBack,
   onSuccess,
 }) => {
   const { checkIn } = usePracticeManager();
   const { scrollToTop } = useScrollToTop();
+
+  // Check if current user is the owner of this practice
+  const isOwner = currentUserId && practice.user?.id === currentUserId;
 
   const [progress, setProgress] = useState<number>(1);
   const [note, setNote] = useState<string>('');
@@ -31,27 +38,51 @@ const CheckInView: React.FC<CheckInViewProps> = ({
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState<string>('');
   const [submitting, setSubmitting] = useState<boolean>(false);
-  const [errors, setErrors] = useState<string[]>([]);
 
   // 檢查是否可以打卡
   const canCheckIn = !CheckInService.hasCheckedInToday(practice);
 
+  // If not the owner, show an error message
+  if (!isOwner) {
+    return (
+      <div className="min-h-screen bg-primary-palest pt-24">
+        <div className="mx-auto max-w-md px-4 py-8">
+          {/* 返回按鈕 */}
+          <BackButton
+            onClick={() => onBack()}
+            className="mb-6 text-basic-500 hover:text-basic-black"
+          />
+
+          <div className="overflow-hidden rounded-lg border border-basic-200 bg-white shadow-md">
+            <div className="p-6 text-center">
+              <CheckCircle className="mx-auto mb-4 size-16 text-alert" />
+              <h3 className="heading-md mb-2 text-basic-black">無權限打卡</h3>
+              <p className="text-basic-600 body-md mb-4">
+                只有主題實踐的創建者才能進行打卡。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // 心情選項
   const moodOptions = [
     {
-      value: 'excellent' as MoodType, label: '優秀', icon: Star, color: '#10b981',
+      value: 'awesome' as MoodType, label: '超棒', icon: Star, color: '#10b981',
     },
     {
-      value: 'good' as MoodType, label: '良好', icon: Smile, color: '#06b6d4',
+      value: 'happy' as MoodType, label: '開心', icon: Smile, color: '#06b6d4',
     },
     {
-      value: 'average' as MoodType, label: '普通', icon: Meh, color: '#6b7280',
+      value: 'neutral' as MoodType, label: '普通', icon: Meh, color: '#6b7280',
     },
     {
-      value: 'challenging' as MoodType, label: '有挑戰', icon: Heart, color: '#f59e0b',
+      value: 'tired' as MoodType, label: '疲累', icon: Heart, color: '#f59e0b',
     },
     {
-      value: 'difficult' as MoodType, label: '困難', icon: Frown, color: '#ef4444',
+      value: 'frustrated' as MoodType, label: '受挫', icon: Frown, color: '#ef4444',
     },
   ];
 
@@ -84,32 +115,40 @@ const CheckInView: React.FC<CheckInViewProps> = ({
   // 處理打卡提交
   const handleSubmit = async () => {
     if (!canCheckIn) {
-      setErrors(['今天已經打卡過了']);
+      toast.error('今天已經打卡過了', {
+        duration: 5000,
+        position: 'top-center',
+      });
       return;
     }
 
     const checkInInput: CheckInInput = {
-      practiceId: practice.id,
       progress,
       note: note.trim(),
       mood,
-      tags: tags.filter((tag) => tag.trim()),
     };
 
     // 驗證輸入
     const validation = CheckInService.validateCheckInInput(practice, checkInInput);
     if (!validation.isValid) {
-      setErrors(validation.errors);
+      validation.errors.forEach((error) => toast.error(error, {
+        duration: 5000,
+        position: 'top-center',
+      }));
       return;
     }
 
     setSubmitting(true);
-    setErrors([]);
 
     try {
-      await checkIn(checkInInput);
+      await checkIn(practice.id, checkInInput);
 
       // 打卡成功，顯示成功訊息
+      toast.success('打卡成功！', {
+        duration: 3000,
+        position: 'top-center',
+      });
+
       if (onSuccess) {
         // 滾動到頂部
         scrollToTop('smooth');
@@ -120,7 +159,12 @@ const CheckInView: React.FC<CheckInViewProps> = ({
         onBack();
       }
     } catch (error) {
-      setErrors([error instanceof Error ? error.message : '打卡失敗']);
+      // Display the backend error message using toast
+      const errorMessage = error instanceof Error ? error.message : '打卡失敗，請稍後再試';
+      toast.error(errorMessage, {
+        duration: 5000, // 顯示 5 秒
+        position: 'top-center', // 顯示在頂部中間
+      });
     } finally {
       setSubmitting(false);
     }
@@ -131,17 +175,14 @@ const CheckInView: React.FC<CheckInViewProps> = ({
     const todayCheckIn = CheckInService.getTodayCheckIn(practice);
 
     return (
-      <div className="mx-auto max-w-md p-4">
-        <Button
-          variant="ghost"
-          onClick={onBack}
-          className="text-basic-600 hover:text-basic-800 mb-4 flex items-center transition-colors"
-        >
-          <ArrowLeft className="mr-2 size-4" />
-          <span>返回儀表板</span>
-        </Button>
-
-        <div className="overflow-hidden rounded-lg border border-basic-200 bg-white shadow-md">
+      <div className="min-h-screen bg-primary-palest pt-24">
+        <div className="mx-auto max-w-md px-4 py-8">
+          {/* 返回按鈕 */}
+          <BackButton
+            onClick={() => onBack()}
+            className="mb-6 text-basic-500 hover:text-basic-black"
+          />
+          <div className="overflow-hidden rounded-lg border border-basic-200 bg-white shadow-md">
           <div className="p-6 text-center">
             <CheckCircle className="mx-auto mb-4 size-16 text-success" />
             <h3 className="heading-md mb-2 text-basic-black">今日已打卡</h3>
@@ -154,18 +195,10 @@ const CheckInView: React.FC<CheckInViewProps> = ({
                 <h4 className="text-basic-700 body-sm mb-2 font-medium">今日打卡記錄</h4>
                 <div className="text-basic-600 body-sm space-y-2">
                   <div>
-                    進度：+
-                    {todayCheckIn.progress}
-                    {' '}
-                    {practice.unit}
+                    進度：+{todayCheckIn.progress} {practice.unit || '分鐘'}
                   </div>
                   <div>
-                    總進度：
-                    {todayCheckIn.totalProgress}
-                    /
-                    {practice.totalAmount}
-                    {' '}
-                    {practice.unit}
+                    總進度：{todayCheckIn.totalProgress}/{practice.totalAmount} {practice.unit || '分鐘'}
                   </div>
                   {todayCheckIn.note && (
                   <div>
@@ -191,23 +224,21 @@ const CheckInView: React.FC<CheckInViewProps> = ({
               </div>
             )}
           </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-md p-4">
-      <Button
-        variant="ghost"
-        onClick={onBack}
-        className="text-basic-600 hover:text-basic-800 mb-4 flex items-center transition-colors"
-      >
-        <ArrowLeft className="mr-2 size-4" />
-        <span>返回儀表板</span>
-      </Button>
-
-      <div className="overflow-hidden rounded-lg border border-basic-200 bg-white shadow-md">
+    <div className="min-h-screen bg-primary-palest pt-24">
+      <div className="mx-auto max-w-md px-4 py-8">
+        {/* 返回按鈕 */}
+        <BackButton
+          onClick={() => onBack()}
+          className="mb-6 text-basic-500 hover:text-basic-black"
+        />
+        <div className="overflow-hidden rounded-lg border border-basic-200 bg-white shadow-md">
         {/* 標題 */}
         <div className="border-b border-basic-200 p-6">
           <h3 className="heading-lg text-basic-black">
@@ -215,20 +246,6 @@ const CheckInView: React.FC<CheckInViewProps> = ({
             打卡
           </h3>
         </div>
-
-        {/* 錯誤訊息 */}
-        {errors.length > 0 && (
-          <div className="bg-alert-lighter border-l-4 border-alert p-4">
-            <ul className="text-alert-darker body-sm">
-              {errors.map((error) => (
-                <li key={error}>
-                  •
-                  {error}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
 
         <div className="space-y-6 p-6">
 
@@ -248,10 +265,10 @@ const CheckInView: React.FC<CheckInViewProps> = ({
                   onChange={(e) => setProgress(Math.max(1, parseInt(e.target.value, 10) || 1))}
                   min="1"
                   max={practice.totalAmount - practice.currentProgress}
-                  className="w-full"
+                  className="w-full pr-16"
                 />
-                <span className="body-sm absolute right-3 top-2 text-basic-500">
-                  {practice.unit}
+                <span className="body-sm absolute right-3 top-1/2 -translate-y-1/2 text-basic-500 pointer-events-none">
+                  {practice.unit || '分鐘'}
                 </span>
               </div>
             </div>
@@ -303,11 +320,11 @@ const CheckInView: React.FC<CheckInViewProps> = ({
                     <div className="flex items-center justify-center gap-1">
                       {React.createElement(option.icon, {
                         className: `h-4 w-4 ${
-                          option.value === 'excellent' ? 'text-green-500'
-                            : option.value === 'good' ? 'text-cyan-500'
-                              : option.value === 'average' ? 'text-gray-500'
-                                : option.value === 'challenging' ? 'text-amber-500'
-                                  : option.value === 'difficult' ? 'text-red-500' : 'text-gray-400'
+                          option.value === 'awesome' ? 'text-green-500'
+                            : option.value === 'happy' ? 'text-cyan-500'
+                              : option.value === 'neutral' ? 'text-gray-500'
+                                : option.value === 'tired' ? 'text-amber-500'
+                                  : option.value === 'frustrated' ? 'text-red-500' : 'text-gray-400'
                         }`,
                       })}
                       <span className="text-basic-700 text-xs">{option.label}</span>
@@ -431,6 +448,7 @@ const CheckInView: React.FC<CheckInViewProps> = ({
               </>
             )}
           </Button>
+        </div>
         </div>
       </div>
     </div>

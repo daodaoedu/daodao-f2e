@@ -98,7 +98,40 @@ class PracticeAPIClass {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // Try to extract error message from response body
+        let errorMessage = `HTTP error! status: ${response.status}`;
+
+        try {
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const errorData = await response.json();
+            // Check for common error message formats from backend
+            if (errorData.message) {
+              errorMessage = errorData.message;
+            } else if (errorData.error?.message) {
+              errorMessage = errorData.error.message;
+            } else if (errorData.error && typeof errorData.error === 'string') {
+              errorMessage = errorData.error;
+            } else if (errorData.msg) {
+              errorMessage = errorData.msg;
+            } else if (errorData.detail) {
+              errorMessage = errorData.detail;
+            }
+
+            // Handle 409 Conflict specifically for duplicate check-in
+            if (response.status === 409 && errorMessage.includes('HTTP error')) {
+              errorMessage = '今日已完成簽到';
+            }
+          }
+        } catch (e) {
+          // If response body is not JSON or parsing fails
+          // Use default error message or status-specific message
+          if (response.status === 409) {
+            errorMessage = '今日已完成簽到';
+          }
+        }
+
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -141,7 +174,8 @@ class PracticeAPIClass {
    */
   read = async (id: string): Promise<Practice> => {
     const result = await this.request<unknown>(`${PRACTICE_BASE_PATH}/${id}`);
-    return (result as { data?: Practice }).data || (result as Practice);
+    const practice = (result as { data?: Practice }).data || (result as Practice);
+    return practice;
   };
 
   /**
@@ -178,11 +212,59 @@ class PracticeAPIClass {
   };
 
   /**
+   * 獲取打卡記錄列表（支持分頁獲取所有記錄）
+   */
+  getCheckIns = async (practiceId: string): Promise<CheckInRecord[]> => {
+    const allCheckIns: CheckInRecord[] = [];
+    let page = 1;
+    const limit = 100; // 後端最大限制為 100
+    let hasMore = true;
+
+    while (hasMore) {
+      const result = await this.request<any>(`${PRACTICE_BASE_PATH}/${practiceId}/checkins?page=${page}&limit=${limit}`);
+
+      // 處理不同的響應格式
+      let data = (result as { data?: any[] }).data || (result as { items?: any[] }).items || [];
+
+      // 如果 data 仍然是包裝對象，嘗試提取內部的數組
+      if (data && typeof data === 'object' && 'items' in data) {
+        data = (data as any).items || [];
+      }
+
+      // 映射後端字段到前端 schema
+      const mappedData: CheckInRecord[] = data.map((item: any) => ({
+        id: String(item.id),
+        practiceId: String(item.practiceId),
+        date: item.checkInDate, // 後端: checkInDate -> 前端: date
+        progress: item.progressAmount || 0, // 後端: progressAmount -> 前端: progress
+        totalProgress: item.cumulativeProgress || 0, // 後端: cumulativeProgress -> 前端: totalProgress
+        note: item.note || '',
+        mood: item.mood,
+        tags: item.tags || [],
+        createdAt: item.createdAt,
+      }));
+
+      if (mappedData.length > 0) {
+        allCheckIns.push(...mappedData);
+      }
+
+      // 檢查是否還有更多數據
+      if (data.length < limit) {
+        hasMore = false;
+      } else {
+        page += 1;
+      }
+    }
+
+    return allCheckIns;
+  };
+
+  /**
    * 簽到
    */
-  checkIn = async (input: CheckInInput): Promise<CheckInRecord> => {
+  checkIn = async (practiceId: string, input: CheckInInput): Promise<CheckInRecord> => {
     const validatedInput = checkInInputSchema.parse(input);
-    const result = await this.request<any>(`${PRACTICE_BASE_PATH}/checkin`, {
+    const result = await this.request<any>(`${PRACTICE_BASE_PATH}/${practiceId}/checkins`, {
       method: 'POST',
       body: JSON.stringify(validatedInput),
     });

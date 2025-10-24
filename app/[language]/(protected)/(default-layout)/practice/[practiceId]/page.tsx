@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { usePractice } from '@/services/practice/hooks';
+import { useSession } from '@/entities/session/model/context';
 import DashboardFlow from '@/features/practice/components/Dashboard/DashboardFlow';
 import { Button } from '@/shared/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -10,8 +11,9 @@ const PracticeDetailPage = () => {
   const router = useRouter();
   const params = useParams();
   const practiceId = params?.practiceId as string;
+  const { user } = useSession();
 
-  const { practice, isLoading, error } = usePractice(practiceId || null);
+  const { practice, isLoading, error, mutate } = usePractice(practiceId || null);
 
   if (!practiceId) {
     return null;
@@ -43,7 +45,9 @@ const PracticeDetailPage = () => {
   return (
     <DashboardFlow
       practice={practice}
-      onBack={() => router.push('/explore')}
+      currentUserId={user?.id}
+      onBack={() => router.back()}
+      onDataUpdate={() => mutate()}
     />
   );
 };
