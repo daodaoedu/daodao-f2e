@@ -1,33 +1,41 @@
 import { defineConfig } from "orval";
 
 export default defineConfig({
-  api: {
+  client: {
     input: {
       target: "./services/openapi.yaml",
     },
     output: {
       mode: "tags",
       client: "swr",
-      target: "generated/endpoints",
+      target: "generated/api",
       schemas: "generated/models",
       clean: true,
+      fileExtension: ".client.ts",
       override: {
         mutator: {
-          path: "services/fetcher.ts",
-          name: "fetcher",
+          path: "shared/api/client-fetcher.ts",
+          name: "clientFetcher",
         },
       },
     },
   },
-  zod: {
+  server: {
     input: {
       target: "./services/openapi.yaml",
     },
     output: {
       mode: "tags",
-      client: "zod",
-      target: "generated/endpoints",
-      fileExtension: ".zod.ts",
+      client: "fetch",
+      fileExtension: ".server.ts",
+      target: "generated/api",
+      schemas: "generated/models",
+      override: {
+        mutator: {
+          path: "shared/api/server-fetcher.ts",
+          name: "serverFetcher",
+        },
+      },
     },
-  }
+  },
 });

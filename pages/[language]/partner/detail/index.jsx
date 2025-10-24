@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 
 import { useSession } from '@/entities/session';
-import { useGetApiV1UsersId } from '@/generated/endpoints/users';
+import { useGetApiV1UsersId } from '@/api/users.client';
 import { parseToString } from '@/shared/lib/helper';
 
 const PersonalCard = dynamic(() => import('@/components/PersonalCard'), {

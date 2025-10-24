@@ -1,20 +1,6 @@
-import type { ApiResponseValidatorsApiErrorResponseSchema } from '@/generated/models';
 import { getTokenStorage } from '@/shared/lib/storage';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
-
-export class ApiError<T = unknown> extends Error {
-  public readonly status: number;
-
-  public readonly data?: T;
-
-  constructor(status: number, message: string, data?: T) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = status;
-    this.data = data;
-  }
-}
+import { ApiResponseValidatorsApiErrorResponseSchema } from '@/models/apiResponseValidatorsApiErrorResponseSchema';
+import { API_BASE_URL, ApiError } from './common';
 
 export interface FetcherConfig {
   url: string;
@@ -25,12 +11,11 @@ export interface FetcherConfig {
   headers?: Record<string, string>;
 }
 
-export const fetcher = async <T>({
+export const clientFetcher = async <T>({
   url,
   method,
   params,
   data,
-  responseType = 'json',
   headers = {},
 }: FetcherConfig): Promise<T> => {
   const urlObject = new URL(url, API_BASE_URL);
@@ -60,9 +45,10 @@ export const fetcher = async <T>({
   }
 
   const response = await fetch(fullUrl, requestInit);
-  const { status } = response;
 
-  if (!response.ok) {
+  const { status, ok } = response;
+
+  if (!ok) {
     try {
       const result: ApiResponseValidatorsApiErrorResponseSchema =
         await response.json();
@@ -83,5 +69,5 @@ export const fetcher = async <T>({
     return undefined as T;
   }
 
-  return response[responseType]();
+  return response.json() as T;
 };

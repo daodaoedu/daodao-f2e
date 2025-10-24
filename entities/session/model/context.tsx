@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -10,24 +11,19 @@ import {
 import { mutate } from 'swr';
 import { getTokenStorage } from '@/shared/lib/storage';
 import {
-  postApiV1UsersBody,
-  putApiV1UsersIdBody,
-} from '@/generated/endpoints/users.zod';
-import {
   useGetApiV1UsersMe,
   usePostApiV1UsersMe,
   usePutApiV1UsersMe,
-} from '@/generated/endpoints/users';
-import { ApiError } from '@/services/fetcher';
+} from '@/api/users.client';
+import { ApiError } from '@/shared/api';
 import { onUnauthorized } from '@/shared/lib/auth-bus';
-import {
-  SessionState,
-  SessionActions,
-  SessionActionTypes,
-  SessionLoginStatus,
-} from './types';
+import { SessionState, SessionActions, SessionActionTypes } from './types';
 import { sessionReducer } from './reducer';
-import { createInitialSessionState } from './state';
+import {
+  createInitialSessionState,
+  isPermanentLogin,
+  isTemporaryLogin,
+} from './state';
 
 const SessionContext = createContext<SessionState | null>(null);
 const SessionActionsContext = createContext<SessionActions | null>(null);
@@ -54,21 +50,56 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
     createInitialSessionState()
   );
 
+  const { loginStatus, user } = state;
+
   const { trigger: triggerPostUser } = usePostApiV1UsersMe();
 
   const { trigger: triggerPutUser } = usePutApiV1UsersMe();
 
-  const sessionActions = useMemo<SessionActions>(() => {
-    const setToken = (payload: string) => {
-      getTokenStorage().set(payload);
-      dispatch({ type: SessionActionTypes.SET_TOKEN, payload });
-    };
-    const logout = () => {
-      getTokenStorage().remove();
-      dispatch({ type: SessionActionTypes.LOGOUT });
-      mutate(() => true, undefined, { revalidate: false });
-    };
-    return {
+  const setToken = useCallback((payload: string) => {
+    getTokenStorage().set(payload);
+    dispatch({ type: SessionActionTypes.SET_TOKEN, payload });
+  }, []);
+
+  const logout = useCallback(() => {
+    getTokenStorage().remove();
+    dispatch({ type: SessionActionTypes.LOGOUT });
+    mutate(() => true, undefined, { revalidate: false });
+  }, []);
+
+  const handleError = useCallback(
+    (error: unknown) => {
+      if (error instanceof ApiError && error.status === 401) {
+        logout();
+      }
+    },
+    [logout]
+  );
+
+  const updateUser = useCallback<SessionActions['updateUser']>(
+    async (input) => {
+      try {
+        if (isTemporaryLogin(loginStatus, input)) {
+          const result = await triggerPostUser(input);
+          setToken(result?.data.token);
+          return;
+        }
+        if (isPermanentLogin(loginStatus, input)) {
+          await triggerPutUser({
+            ...user,
+            ...input,
+          });
+        }
+      } catch (error) {
+        handleError(error);
+        throw error;
+      }
+    },
+    [user, loginStatus, setToken, handleError, triggerPostUser, triggerPutUser]
+  );
+
+  const sessionActions = useMemo<SessionActions>(
+    () => ({
       setToken,
       setLoading: (payload) => {
         dispatch({ type: SessionActionTypes.SET_LOADING, payload });
@@ -77,27 +108,7 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
       login: (payload) => {
         dispatch({ type: SessionActionTypes.LOGIN, payload });
       },
-      updateUser: async (input) => {
-        switch (state.loginStatus) {
-          case SessionLoginStatus.TEMPORARY: {
-            const arg = postApiV1UsersBody.parse(input);
-            const result = await triggerPostUser(arg);
-            setToken(result?.data.token);
-            break;
-          }
-          case SessionLoginStatus.PERMANENT: {
-            const arg = putApiV1UsersIdBody.parse({
-              ...state.user,
-              ...input,
-            });
-            await triggerPutUser(arg);
-            break;
-          }
-          default: {
-            throw new Error('Invalid login status');
-          }
-        }
-      },
+      updateUser,
       openLoginModal: () => {
         logout();
         dispatch({ type: SessionActionTypes.OPEN_LOGIN_MODAL });
@@ -105,26 +116,15 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
       closeLoginModal: () => {
         dispatch({ type: SessionActionTypes.CLOSE_LOGIN_MODAL });
       },
-    };
-  }, [
-    state.loginStatus,
-    state.user,
-    triggerPostUser,
-    triggerPutUser,
-  ]);
-
-  const handleError = (error: unknown) => {
-    if (error instanceof ApiError && error.status === 401) {
-      sessionActions.logout();
-    }
-  };
+    }),
+    [setToken, logout, updateUser]
+  );
 
   const { isValidating } = useGetApiV1UsersMe({
     swr: {
       enabled: !!state.token,
       onSuccess: (result) => {
-        const user = result?.data ?? null;
-        sessionActions.login(user);
+        sessionActions.login(result?.data);
       },
       onError: handleError,
     },
