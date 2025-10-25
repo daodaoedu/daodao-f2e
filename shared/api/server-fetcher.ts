@@ -1,7 +1,7 @@
 'use server';
 
 import { headers as getHeaders } from 'next/headers';
-import { FetcherConfig, getFullUrl, handleResponse } from './common';
+import { FetcherConfig, getFullUrl } from './common';
 
 export const serverFetcher = async <T>({
   url,
@@ -36,5 +36,11 @@ export const serverFetcher = async <T>({
 
   const response = await fetch(fullUrl, requestInit);
 
-  return handleResponse<T>(response);
+  const { status } = response;
+
+  if (status === 204) {
+    return undefined as T;
+  }
+
+  return response.json() as T;
 };

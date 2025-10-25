@@ -1,5 +1,3 @@
-import { ApiResponseValidatorsApiErrorResponseSchema } from '@/models/apiResponseValidatorsApiErrorResponseSchema';
-
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 export class ApiError<T = unknown> extends Error {
@@ -36,31 +34,4 @@ export const getFullUrl = (url: string, params?: Record<string, unknown>) => {
   }
 
   return urlObject.toString();
-};
-
-export const handleResponse = async <T>(response: Response): Promise<T> => {
-  const { status, ok } = response;
-
-  if (!ok) {
-    try {
-      const result: ApiResponseValidatorsApiErrorResponseSchema =
-        await response.json();
-
-      if (result.error?.message) {
-        throw new ApiError(status, result.error.message, result.error);
-      }
-      throw new ApiError(status, `HTTP Status: ${status}`, result.error);
-    } catch {
-      throw new ApiError(400, 'Unknown Error', {
-        code: 'UNKNOWN_ERROR',
-        message: 'Unknown Error',
-      });
-    }
-  }
-
-  if (status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as T;
 };

@@ -1,5 +1,6 @@
 import { getTokenStorage } from '@/shared/lib/storage';
-import { FetcherConfig, getFullUrl, handleResponse } from './common';
+import { ApiResponseValidatorsApiErrorResponseSchema } from '@/models/apiResponseValidatorsApiErrorResponseSchema';
+import { ApiError, FetcherConfig, getFullUrl } from './common';
 
 export const clientFetcher = async <T>({
   url,
@@ -27,5 +28,28 @@ export const clientFetcher = async <T>({
 
   const response = await fetch(fullUrl, requestInit);
 
-  return handleResponse<T>(response);
+  const { status, ok } = response;
+
+  if (!ok) {
+    try {
+      const result: ApiResponseValidatorsApiErrorResponseSchema =
+        await response.json();
+
+      if (result.error?.message) {
+        throw new ApiError(status, result.error.message, result.error);
+      }
+      throw new ApiError(status, `HTTP Status: ${status}`, result.error);
+    } catch (error) {
+      throw new ApiError(400, 'Unknown Error', {
+        code: 'UNKNOWN_ERROR',
+        error,
+      });
+    }
+  }
+
+  if (status === 204) {
+    return undefined as T;
+  }
+
+  return response.json() as T;
 };
