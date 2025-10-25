@@ -1,3 +1,5 @@
+import { ApiResponseValidatorsApiErrorResponseSchema } from '@/models/apiResponseValidatorsApiErrorResponseSchema';
+
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 export class ApiError<T = unknown> extends Error {
@@ -12,3 +14,53 @@ export class ApiError<T = unknown> extends Error {
     this.data = data;
   }
 }
+
+export interface FetcherConfig {
+  url: string;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  params?: Record<string, unknown>;
+  data?: unknown;
+  responseType?: 'json' | 'blob';
+  headers?: Record<string, string>;
+}
+
+export const getFullUrl = (url: string, params?: Record<string, unknown>) => {
+  const urlObject = new URL(url, API_BASE_URL);
+
+  if (typeof params === 'object' && params !== null) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        urlObject.searchParams.append(key, String(value));
+      }
+    });
+  }
+
+  return urlObject.toString();
+};
+
+export const handleResponse = async <T>(response: Response): Promise<T> => {
+  const { status, ok } = response;
+
+  if (!ok) {
+    try {
+      const result: ApiResponseValidatorsApiErrorResponseSchema =
+        await response.json();
+
+      if (result.error?.message) {
+        throw new ApiError(status, result.error.message, result.error);
+      }
+      throw new ApiError(status, `HTTP Status: ${status}`, result.error);
+    } catch {
+      throw new ApiError(400, 'Unknown Error', {
+        code: 'UNKNOWN_ERROR',
+        message: 'Unknown Error',
+      });
+    }
+  }
+
+  if (status === 204) {
+    return undefined as T;
+  }
+
+  return response.json() as T;
+};
