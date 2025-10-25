@@ -8,7 +8,7 @@ import { CustomLink } from '@/shared/ui/custom-link';
 import { Button } from '@/shared/ui';
 import { Badge } from '@/shared/ui/badge';
 import { SocialIcon, SocialPlatform } from '@/shared/ui/social-icon';
-import { useGetApiV1UsersCustomIdCustomId } from '@/api/users.client';
+import { useUserData } from '../lib/use-user-data';
 
 interface SocialPlatformItem {
   platform: SocialPlatform;
@@ -45,45 +45,48 @@ const getContactValue = (
 };
 
 interface UserProfileWidgetProps extends React.PropsWithChildren {
-  customId: string;
+  type: 'customId' | 'userId';
+  id: string;
 }
 
 export function UserProfileWidget({
-  customId,
+  type,
+  id,
   children,
 }: UserProfileWidgetProps) {
-  const { data } = useGetApiV1UsersCustomIdCustomId(customId);
+  const { data } = useUserData({ type, id });
   const user = data?.data;
   const pathname = usePathname();
+  const basePath = type === 'customId' ? `/me/${id}` : `/users/${id}`;
 
   const navItems = useMemo(
     () => [
       {
         label: '基本資訊',
-        href: `/me/${customId}`,
+        href: `${basePath}`,
       },
       {
         label: '學習計劃',
-        href: `/me/${customId}/projects`,
+        href: `${basePath}/projects`,
       },
       {
         label: '主題實踐',
-        href: `/me/${customId}/practices`,
+        href: `${basePath}/practices`,
       },
       {
         label: '分享資源',
-        href: `/me/${customId}/resources`,
+        href: `${basePath}/resources`,
       },
       {
         label: '想法',
-        href: `/me/${customId}/ideas`,
+        href: `${basePath}/ideas`,
       },
       {
         label: '發起揪團',
-        href: `/me/${customId}/circles`,
+        href: `${basePath}/circles`,
       },
     ],
-    [customId]
+    [basePath]
   );
 
   return (

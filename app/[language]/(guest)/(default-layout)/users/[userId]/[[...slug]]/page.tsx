@@ -10,18 +10,18 @@ export const generateStaticParams = generateUserProfileStaticParams;
 
 export async function generateMetadata({
   params,
-}: PageProps<'/[language]/me/[customId]/[[...slug]]'>): Promise<Metadata> {
-  const { customId, slug } = await params;
-  return generateUserProfileMetadata('customId', customId, slug);
+}: PageProps<'/[language]/users/[userId]/[[...slug]]'>): Promise<Metadata> {
+  const { userId, slug } = await params;
+  return generateUserProfileMetadata('userId', userId, slug);
 }
 
 export default async function TabContentPage({
   params,
-}: PageProps<'/[language]/me/[customId]/[[...slug]]'>) {
-  const { customId, slug } = await params;
+}: PageProps<'/[language]/users/[userId]/[[...slug]]'>) {
+  const { userId, slug } = await params;
   const { tabKey, type, id } = handleUserProfileTabContent(
-    'customId',
-    customId,
+    'userId',
+    userId,
     slug
   );
 

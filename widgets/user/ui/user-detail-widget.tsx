@@ -1,14 +1,16 @@
 'use client';
 
-import { useGetApiV1UsersCustomIdCustomId } from '@/api/users.client';
 import { MailIcon, UserIcon, ShapesIcon } from 'lucide-react';
+import { UserIdentifierType } from '@/entities/user';
+import { useUserData } from '../lib/use-user-data';
 
 interface UserDetailWidgetProps {
-  customId: string;
+  type: UserIdentifierType;
+  id: string;
 }
 
-export function UserDetailWidget({ customId }: UserDetailWidgetProps) {
-  const { data } = useGetApiV1UsersCustomIdCustomId(customId);
+export function UserDetailWidget({ type, id }: UserDetailWidgetProps) {
+  const { data } = useUserData({ type, id });
   const user = data?.data;
   const email = user?.email?.trim();
   const selfIntroduction = user?.selfIntroduction?.trim();
