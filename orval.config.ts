@@ -53,8 +53,10 @@ export default defineConfig({
             
             // 移除 SWR hooks 相關的 import
             let transformedContent = content
-              .replace(/import\s+.*?from\s+['"]swr['"];?\n?/g, '')
-              .replace(/import\s+.*?from\s+['"]swr\/.*?['"];?\n?/g, '');
+              .replace("import useSwr from 'swr';", '')
+              .replace("import useSWRMutation from 'swr/mutation';", '')
+              .replace("\n  SWRConfiguration", '')
+              .replace("import type {\n  SWRMutationConfiguration\n} from 'swr/mutation';", '');
             
             // 移除 hook 函數定義 (以 use 開頭的函數)
             transformedContent = transformedContent
