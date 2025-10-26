@@ -3,9 +3,9 @@
 import { useFormContext } from 'react-hook-form';
 import { cn } from '@/shared/lib/cn';
 import { CheckboxWithForm } from '@/shared/ui/checkbox';
+import { EXPERTISE_AREAS, INTEREST_AREAS } from '@/entities/user';
 import type { RenderOptionProps } from '@/shared/ui/option';
-import { EXPERTISE_AREAS, INTEREST_AREAS } from '../../config';
-import { OnboardingFormData } from '../../model';
+import type { OnboardingFormData } from '../../model';
 
 // 自定義渲染選項，讓選項看起來像按鈕
 const renderAreaOption = ({
