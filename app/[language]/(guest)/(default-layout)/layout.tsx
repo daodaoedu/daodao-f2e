@@ -2,7 +2,7 @@ import {
   HeaderNavbar,
   Footer,
   LandingPageFloatButtons,
-  landingPageNav,
+  guestLayoutNav,
 } from '@/widgets/layout';
 
 export default async function DefaultLayout({
@@ -10,7 +10,7 @@ export default async function DefaultLayout({
 }: LayoutProps<'/[language]'>) {
   return (
     <>
-      <HeaderNavbar alwaysShow navItems={landingPageNav} />
+      <HeaderNavbar alwaysShow navItems={guestLayoutNav} />
       <LandingPageFloatButtons />
       <main className="min-h-screen bg-white">{children}</main>
       <Footer />

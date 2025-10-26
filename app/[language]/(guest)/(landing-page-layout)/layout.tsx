@@ -3,7 +3,7 @@ import {
   Footer,
   LandingPageMobileNavbar,
   LandingPageFloatButtons,
-  landingPageNav,
+  guestLayoutNav,
 } from '@/widgets/layout';
 
 export default async function LandingPageLayout({
@@ -11,7 +11,7 @@ export default async function LandingPageLayout({
 }: LayoutProps<'/[language]'>) {
   return (
     <>
-      <HeaderNavbar navItems={landingPageNav} />
+      <HeaderNavbar navItems={guestLayoutNav} />
       <LandingPageMobileNavbar />
       <LandingPageFloatButtons />
       <main className="min-h-screen bg-white">{children}</main>

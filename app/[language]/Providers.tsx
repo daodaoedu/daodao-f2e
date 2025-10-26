@@ -8,7 +8,7 @@ import { DialogProvider } from '@/contexts/Dialog';
 import { PromotionProvider } from '@/contexts/Promotion';
 import { NavigationBlockerProvider } from '@/shared/lib/navigation-blocker';
 import { emitUnauthorized } from '@/shared/lib/auth-bus';
-import { ApiError } from '@/services/fetcher';
+import { ApiError } from '@/shared/api';
 import { TranslationProvider } from '@/shared/lib/translation';
 import { Toaster } from '@/shared/ui/sonner';
 import { getDictionary } from '@/shared/config/i18n';

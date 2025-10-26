@@ -13,6 +13,8 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "paths": {
+      "@/api/*": ["./generated/api/*"],
+      "@/models/*": ["./generated/models/*"],
       "@/*": ["./*"]
     },
     "target": "ES2017",

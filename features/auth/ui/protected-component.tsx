@@ -64,6 +64,14 @@ export function ProtectedComponent({
   const [authorizationState, setAuthorizationState] =
     useState<AuthorizationStatus>(AuthorizationStatus.IDLE);
 
+  const isCheckingAuthorization =
+    checkUserAuthorized &&
+    [AuthorizationStatus.IDLE, AuthorizationStatus.PENDING].includes(
+      authorizationState
+    );
+
+  const isShowSkeleton = isCheckingAuthorization || isLoggingIn;
+
   useEffect(() => {
     if (!checkUserAuthorized) {
       return;
@@ -87,14 +95,14 @@ export function ProtectedComponent({
     }
   }, [isLoggedIn, user, checkUserAuthorized, authorizationState]);
 
-  if (isLoggingIn) {
+  if (isShowSkeleton) {
     return skeleton;
   }
 
-  if (requiresLogin) {
+  if (authorizationState === AuthorizationStatus.ERROR) {
     return (
-      fallback ?? (
-        <IslandPlaceholder title="登入後即可使用完整功能">
+      noPermissionFallback ?? (
+        <IslandPlaceholder title="沒有權限">
           <div className="flex items-center justify-center gap-4">
             <Button
               onClick={() => router.back()}
@@ -104,8 +112,12 @@ export function ProtectedComponent({
             >
               返回
             </Button>
-            <Button onClick={() => openLoginModal()} size="lg" className="w-32">
-              登入 / 註冊
+            <Button
+              onClick={() => router.push(isLoggedIn ? '/explore' : '/')}
+              size="lg"
+              className="w-32"
+            >
+              首頁
             </Button>
           </div>
         </IslandPlaceholder>
@@ -113,39 +125,26 @@ export function ProtectedComponent({
     );
   }
 
-  if (checkUserAuthorized) {
-    if (
-      authorizationState === AuthorizationStatus.IDLE ||
-      authorizationState === AuthorizationStatus.PENDING
-    ) {
-      return skeleton;
-    }
-
-    if (authorizationState === AuthorizationStatus.ERROR) {
-      return (
-        noPermissionFallback ?? (
-          <IslandPlaceholder title="沒有權限">
-            <div className="flex items-center justify-center gap-4">
-              <Button
-                onClick={() => router.back()}
-                variant="outline"
-                size="lg"
-                className="w-32"
-              >
-                返回
-              </Button>
-              <Button
-                onClick={() => router.push('/')}
-                size="lg"
-                className="w-32"
-              >
-                首頁
-              </Button>
-            </div>
-          </IslandPlaceholder>
-        )
-      );
-    }
+  if (requiresLogin) {
+    return (
+      fallback ?? (
+        <IslandPlaceholder title="登入後即可使用完整功能">
+          <div className="flex items-center justify-center gap-4">
+            <Button
+              onClick={() => router.push('/')}
+              variant="outline"
+              size="lg"
+              className="w-32"
+            >
+              回首頁
+            </Button>
+            <Button onClick={() => openLoginModal()} size="lg" className="w-32">
+              登入 / 註冊
+            </Button>
+          </div>
+        </IslandPlaceholder>
+      )
+    );
   }
 
   return children;

@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import { Image } from '@/shared/ui/image';
@@ -8,7 +9,13 @@ import { AuthGuardButton } from '@/features/auth';
 import { cn } from '@/shared/lib/cn';
 import { useTranslation } from '@/shared/lib/translation';
 import { useSession, useSessionActions } from '@/entities/session';
-import Dropdown from '@/shared/components/Dropdown';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/ui';
 import { NavItemType } from '../model';
 
 interface HeaderNavbarProps {
@@ -22,8 +29,53 @@ export const HeaderNavbar = ({
 }: HeaderNavbarProps) => {
   const { user } = useSession();
   const { logout } = useSessionActions();
+  const router = useRouter();
   const isVisible = useScrollVisibility({ threshold: 200 });
   const { t } = useTranslation();
+
+  const filteredNavItems = navItems.filter((item) => {
+    const visibility = item.visibility ?? 'all';
+
+    if (typeof visibility === 'function') {
+      return visibility(user);
+    }
+
+    switch (visibility) {
+      case 'auth':
+        return !!user;
+      case 'guest':
+        return !user;
+      case 'all':
+      default:
+        return true;
+    }
+  });
+
+  const userDropdownItems = [
+    {
+      label: '個人資料',
+      onClick: () =>
+        router.push(
+          user?.customId ? `/me/${user?.customId}` : `/users/${user?.id}`
+        ),
+    },
+    {
+      label: '帳號設定',
+      onClick: () => router.push(`/settings/account`),
+    },
+    {
+      label: '偏好設定',
+      onClick: () => router.push(`/settings/preferences`),
+    },
+    {
+      label: '個人測驗',
+      onClick: () => router.push(`/quiz`),
+    },
+    {
+      label: '登出',
+      onClick: logout,
+    },
+  ];
 
   return (
     <nav
@@ -53,7 +105,7 @@ export const HeaderNavbar = ({
         </Button>
       </div>
       <ul className="flex items-center gap-8">
-        {navItems.map((item) => (
+        {filteredNavItems.map((item) => (
           <li key={item.label} className="hidden md:block">
             <Button
               variant="ghost"
@@ -68,28 +120,35 @@ export const HeaderNavbar = ({
         <li>
           {user ? (
             <div className="flex items-center gap-3.5">
-              <Dropdown as="nav">
-                <Dropdown.Toggle animation="none" className="p-0">
-                  <Image
-                    src={user.photoURL ?? ''}
-                    alt={user.name ?? 'user avatar'}
-                    width="40"
-                    height="40"
-                    className="rounded-full"
-                  />
-                </Dropdown.Toggle>
-                <Dropdown.List className="mt-2">
-                  <Dropdown.Item className="text-nowrap rounded-lg hover:bg-primary-lightest">
-                    <button
-                      type="button"
-                      className="block p-2 text-basic-400"
-                      onClick={logout}
-                    >
-                      登出
-                    </button>
-                  </Dropdown.Item>
-                </Dropdown.List>
-              </Dropdown>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="button" variant="ghost" size="icon">
+                    <Avatar className="size-10">
+                      <AvatarImage
+                        src={user.photoURL || ''}
+                        alt={user.name ?? 'user avatar'}
+                      />
+                      <AvatarFallback className="bg-primary-base text-xs font-semibold text-white">
+                        {user.name?.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" sideOffset={12}>
+                  {userDropdownItems.map((item) => (
+                    <DropdownMenuItem key={item.label} asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={item.onClick}
+                      >
+                        {item.label}
+                      </Button>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           ) : (
             <AuthGuardButton variant="ctaOrangeSmall">立即加入</AuthGuardButton>

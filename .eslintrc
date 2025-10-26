@@ -24,7 +24,6 @@
     "pages", // 重構到 app route，忽略 pages route
     "public",
     "services/**/*.ts", // @TODO: services 下的 API 檔案將要移除，重構完成後再調整設定檔
-    "!services/fetcher.ts",
     "next-env.d.ts",
     "*.gs"
   ],
@@ -122,7 +121,11 @@
     "import/resolver": {
       "alias": {
         "extensions": [".js", ".jsx", ".ts", ".tsx"],
-        "map": [["@", "."]]
+        "map": [
+          ["@/api", "./generated/api"],
+          ["@/models", "./generated/models"],
+          ["@", "."]
+        ]
       },
       "node": {
         "extensions": [".js", ".jsx", ".ts", ".tsx"]

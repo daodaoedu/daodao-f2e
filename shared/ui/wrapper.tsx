@@ -41,7 +41,7 @@ export const Background = ({
   const Comp = asChild ? Slot : 'div';
   return (
     <Comp
-      className={cn('pt-12', backgroundVariants[variant], className)}
+      className={cn('pt-20', backgroundVariants[variant], className)}
       {...props}
     />
   );
