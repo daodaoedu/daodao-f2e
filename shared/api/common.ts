@@ -25,6 +25,15 @@ export interface FetcherConfig {
 export const getFullUrl = (url: string, params?: Record<string, unknown>) => {
   const urlObject = new URL(url, API_BASE_URL);
 
+  const allowedOrigin = new URL(API_BASE_URL).origin;
+
+  if (urlObject.origin !== allowedOrigin) {
+    throw new ApiError(
+      400,
+      `SSR vulnerability: Refusing to make request to untrusted origin: ${urlObject.origin}`
+    );
+  }
+
   if (typeof params === 'object' && params !== null) {
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {

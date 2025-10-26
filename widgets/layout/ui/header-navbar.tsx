@@ -125,7 +125,7 @@ export const HeaderNavbar = ({
                   <Button type="button" variant="ghost" size="icon">
                     <Avatar className="size-10">
                       <AvatarImage
-                        src={user.photoURL ?? ''}
+                        src={user.photoURL || ''}
                         alt={user.name ?? 'user avatar'}
                       />
                       <AvatarFallback className="bg-primary-base text-xs font-semibold text-white">

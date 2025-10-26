@@ -81,7 +81,7 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
       try {
         if (isTemporaryLogin(loginStatus, input)) {
           const result = await triggerPostUser(input);
-          setToken(result?.data.token);
+          setToken(result?.data?.token ?? '');
           return;
         }
         if (isPermanentLogin(loginStatus, input)) {

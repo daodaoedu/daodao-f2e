@@ -96,7 +96,7 @@ export function UserProfileWidget({
           <div className="flex items-center gap-4">
             <Avatar className="size-20">
               <AvatarImage
-                src={user?.photoURL ?? undefined}
+                src={user?.photoURL || ''}
                 alt={user?.name ?? 'user avatar'}
               />
               <AvatarFallback className="bg-primary-base text-2xl font-semibold text-white">
