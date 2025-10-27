@@ -1,9 +1,17 @@
 import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
+import type { FieldPath, FieldValues, Control } from 'react-hook-form';
 
 import { cn } from '@/shared/lib/cn';
 import { OptionProps } from './option';
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from './form';
 
 const Select = SelectPrimitive.Root;
 
@@ -170,6 +178,59 @@ const Selector = React.forwardRef<
   </Select>
 ));
 
+interface SelectWithFormProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+> {
+  control: Control<TFieldValues>;
+  name: TName;
+  label?: string;
+  placeholder?: string;
+  options: OptionProps[];
+  required?: boolean;
+  disabled?: boolean;
+}
+
+const SelectWithForm = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+>({
+  control,
+  name,
+  label,
+  placeholder,
+  options,
+  required,
+  disabled,
+}: SelectWithFormProps<TFieldValues, TName>) => (
+  <FormField
+    control={control}
+    name={name}
+    render={({ field }) => (
+      <FormItem>
+        {label && <FormLabel required={required}>{label}</FormLabel>}
+        <Select onValueChange={field.onChange} value={field.value} disabled={disabled}>
+          <FormControl>
+            <SelectTrigger>
+              <SelectValue placeholder={placeholder} />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent>
+            {options.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
+SelectWithForm.displayName = 'SelectWithForm';
+
 export {
   Select,
   SelectGroup,
@@ -182,4 +243,5 @@ export {
   SelectScrollUpButton,
   SelectScrollDownButton,
   Selector,
+  SelectWithForm,
 };
