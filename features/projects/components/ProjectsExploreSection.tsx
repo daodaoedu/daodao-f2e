@@ -243,8 +243,8 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
             <Badge
               className={
                 isCompleted
-                  ? 'bg-success/20 text-success'
-                  : 'bg-tips/20 text-tips'
+                  ? 'bg-success/20 text-success whitespace-nowrap'
+                  : 'bg-tips/20 text-tips whitespace-nowrap'
               }
             >
               {isCompleted ? '已完成' : '進行中'}
@@ -332,7 +332,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
                   className="flex items-center gap-2"
                 >
                   <Plus className="size-4" />
-                  <span className="hidden sm:inline">建立計劃</span>
+                  <span>建立計劃</span>
                 </Button>
               ) : (
                 <CustomLink href="/manage/projects/create">
@@ -341,7 +341,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
                     className="flex items-center gap-2"
                   >
                     <Plus className="size-4" />
-                    <span className="hidden sm:inline">建立計劃</span>
+                    <span>建立計劃</span>
                   </Button>
                 </CustomLink>
               )
