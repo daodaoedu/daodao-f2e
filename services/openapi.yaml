@@ -13671,6 +13671,9 @@ components:
         photoURL:
           type: string
           nullable: true
+        location:
+          type: string
+          nullable: true
         gender:
           type: string
           enum:
