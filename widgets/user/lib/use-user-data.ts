@@ -3,7 +3,7 @@
 import {
   useGetApiV1UsersId,
   useGetApiV1UsersCustomIdCustomId,
-} from '@/generated/api/users.client';
+} from '@/api/users.client';
 
 interface UseUserDataProps {
   type: 'userId' | 'customId';

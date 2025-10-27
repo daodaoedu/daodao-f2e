@@ -1,14 +1,25 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
+import { PencilIcon } from 'lucide-react';
 import { Container, Paper } from '@/shared/ui/wrapper';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { Button } from '@/shared/ui';
 import { Badge } from '@/shared/ui/badge';
 import { SocialIcon, SocialPlatform } from '@/shared/ui/social-icon';
+import { useTranslation } from '@/shared/lib/translation';
+import { AREA_OPTIONS } from '@/entities/area/model/constants';
+import { useSession, useSessionActions } from '@/entities/session';
+import { UserValidatorsUpdateUserSchema } from '@/models/userValidatorsUpdateUserSchema';
 import { useUserData } from '../lib/use-user-data';
+
+const UserProfileEditor = dynamic(
+  () => import('./user-profile-editor').then((mod) => mod.UserProfileEditor),
+  { ssr: false }
+);
 
 interface SocialPlatformItem {
   platform: SocialPlatform;
@@ -54,65 +65,100 @@ export function UserProfileWidget({
   id,
   children,
 }: UserProfileWidgetProps) {
+  const { user: loginUser } = useSession();
+  const { updateUser } = useSessionActions();
   const { data } = useUserData({ type, id });
+  const [isEditing, setIsEditing] = useState(false);
   const user = data?.data;
   const pathname = usePathname();
   const basePath = type === 'customId' ? `/me/${id}` : `/users/${id}`;
+  const { t } = useTranslation();
+  const isOwnProfile = loginUser?.id === user?.id;
+  const handleSave = async (updateUserSchema: UserValidatorsUpdateUserSchema) => {
+    await updateUser(updateUserSchema);
+    setIsEditing(false);
+  };
 
-  const navItems = useMemo(
-    () => [
-      {
-        label: '基本資訊',
-        href: `${basePath}`,
-      },
-      {
-        label: '學習計劃',
-        href: `${basePath}/projects`,
-      },
-      {
-        label: '主題實踐',
-        href: `${basePath}/practices`,
-      },
-      {
-        label: '分享資源',
-        href: `${basePath}/resources`,
-      },
-      {
-        label: '想法',
-        href: `${basePath}/ideas`,
-      },
-      {
-        label: '發起揪團',
-        href: `${basePath}/circles`,
-      },
-    ],
-    [basePath]
-  );
+  const navItems = [
+    {
+      label: '基本資訊',
+      href: `${basePath}`,
+    },
+    {
+      label: '學習計劃',
+      href: `${basePath}/projects`,
+    },
+    {
+      label: '主題實踐',
+      href: `${basePath}/practices`,
+    },
+    {
+      label: '分享資源',
+      href: `${basePath}/resources`,
+    },
+    {
+      label: '想法',
+      href: `${basePath}/ideas`,
+    },
+    {
+      label: '發起揪團',
+      href: `${basePath}/circles`,
+    },
+  ];
+
+  const area = AREA_OPTIONS.find((option) => option.value === user?.location);
+
+  if (isEditing) {
+    return (
+      <div className="min-h-screen space-y-8 bg-primary-pale px-4 py-24">
+        <Container>
+          <UserProfileEditor
+            initialData={user}
+            onSave={handleSave}
+            onCancel={() => setIsEditing(false)}
+          />
+        </Container>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen space-y-8 bg-primary-pale px-4 py-24">
       <Container>
         <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            <Avatar className="size-20">
-              <AvatarImage
-                src={user?.photoURL || ''}
-                alt={user?.name ?? 'user avatar'}
-              />
-              <AvatarFallback className="bg-primary-base text-2xl font-semibold text-white">
-                {user?.name?.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+          <div className="flex justify-between">
+            <div className="flex items-center gap-4">
+              <Avatar className="size-20">
+                <AvatarImage
+                  src={user?.photoURL || ''}
+                  alt={user?.name ?? 'user avatar'}
+                />
+                <AvatarFallback className="bg-primary-base text-2xl font-semibold text-white">
+                  {user?.name?.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
 
-            <div className="space-y-2">
-              <h1 className="text-basic-800 text-2xl font-bold">
-                {user?.name}
-              </h1>
-              <p className="text-basic-500">{user?.location}</p>
+              <div className="space-y-2">
+                <h1 className="text-basic-800 text-2xl font-bold">
+                  {user?.name}
+                </h1>
+                {area?.label && (
+                  <p className="text-basic-500">{t(area.label)}</p>
+                )}
+              </div>
             </div>
+            {isOwnProfile && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setIsEditing(true)}
+              >
+                <PencilIcon className="size-4" />
+              </Button>
+            )}
           </div>
 
-          <p className="max-w-2xl text-center text-basic-600">
+          <p className="max-w-2xl text-basic-600">
             {user?.personalSlogan}
           </p>
 

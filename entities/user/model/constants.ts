@@ -71,6 +71,18 @@ export const INTEREST_AREAS: OptionProps[] = [
 ];
 
 /**
+ * 角色身份選項
+ */
+export const ROLE_OPTIONS: OptionProps[] = [
+  { value: 'experimental-education-student', label: '實驗教育學生' },
+  { value: 'normal-student', label: '一般學生' },
+  { value: 'experimental-education-parent', label: '家長' },
+  { value: 'experimental-educator', label: '教育工作者' },
+  { value: 'citizen', label: '社會人士' },
+  { value: 'other', label: '不設限' },
+];
+
+/**
  * 推薦來源選項
  */
 export const REFERRAL_SOURCES: OptionProps[] = [
