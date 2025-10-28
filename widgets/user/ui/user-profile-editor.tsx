@@ -6,21 +6,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { SaveIcon, XIcon } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
-import { Textarea } from '@/shared/ui/textarea';
+import { FormInput } from '@/shared/ui/input';
+import { FormTextarea } from '@/shared/ui/textarea';
 import { FormDatePicker } from '@/shared/ui/date-picker';
 import { FormRadioGroup } from '@/shared/ui/radio-group';
-import { MultipleSelector } from '@/shared/ui/multiple-selector';
+import { FormMultipleSelector } from '@/shared/ui/multiple-selector';
 import { FormSelect } from '@/shared/ui/select';
 import { FormCheckbox } from '@/shared/ui/checkbox';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/shared/ui/form';
+import { Form } from '@/shared/ui/form';
 import { Paper } from '@/shared/ui/paper';
 import type { UserValidatorsUpdateUserSchema } from '@/generated/models';
 import { useNavigationBlocker } from '@/shared/lib/navigation-blocker';
@@ -223,48 +216,27 @@ export const UserProfileEditor = ({
 
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* 姓名 */}
-                <FormField
+                <FormInput
                   control={form.control}
                   name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>姓名</FormLabel>
-                      <FormControl>
-                        <Input placeholder="請輸入您的姓名..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="姓名"
+                  placeholder="請輸入您的姓名..."
                 />
 
                 {/* 個人標語 */}
-                <FormField
+                <FormInput
                   control={form.control}
                   name="personalSlogan"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>個人標語</FormLabel>
-                      <FormControl>
-                        <Input placeholder="用一句話介紹自己..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="個人標語"
+                  placeholder="用一句話介紹自己..."
                 />
 
                 {/* 大頭照網址 */}
-                <FormField
+                <FormInput
                   control={form.control}
                   name="photoURL"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>大頭照網址</FormLabel>
-                      <FormControl>
-                        <Input placeholder="請輸入圖片網址..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="大頭照網址"
+                  placeholder="請輸入圖片網址..."
                 />
 
                 {/* 性別 */}
@@ -315,40 +287,20 @@ export const UserProfileEditor = ({
                 自我介紹
               </h3>
 
-              <FormField
+              <FormTextarea
                 control={form.control}
                 name="selfIntroduction"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>自我介紹</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="分享你的學習經歷、興趣或專業背景..."
-                        className="min-h-32"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="自我介紹"
+                placeholder="分享你的學習經歷、興趣或專業背景..."
+                className="min-h-32"
               />
 
-              <FormField
+              <FormTextarea
                 control={form.control}
                 name="share"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>可以和夥伴分享的事物</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="分享你可以提供給其他學習夥伴的資源、經驗或協助..."
-                        className="min-h-32"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="可以和夥伴分享的事物"
+                placeholder="分享你可以提供給其他學習夥伴的資源、經驗或協助..."
+                className="min-h-32"
               />
             </div>
 
@@ -359,60 +311,32 @@ export const UserProfileEditor = ({
               </h3>
 
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <FormField
+                <FormInput
                   control={form.control}
                   name="contactList.instagram"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Instagram</FormLabel>
-                      <FormControl>
-                        <Input placeholder="your_instagram_handle" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Instagram"
+                  placeholder="your_instagram_handle"
                 />
 
-                <FormField
+                <FormInput
                   control={form.control}
                   name="contactList.facebook"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Facebook</FormLabel>
-                      <FormControl>
-                        <Input placeholder="your.facebook.profile" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Facebook"
+                  placeholder="your.facebook.profile"
                 />
 
-                <FormField
+                <FormInput
                   control={form.control}
                   name="contactList.line"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>LINE ID</FormLabel>
-                      <FormControl>
-                        <Input placeholder="your_line_id" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="LINE ID"
+                  placeholder="your_line_id"
                 />
 
-                <FormField
+                <FormInput
                   control={form.control}
                   name="contactList.discord"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Discord</FormLabel>
-                      <FormControl>
-                        <Input placeholder="username#1234" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Discord"
+                  placeholder="username#1234"
                 />
               </div>
             </div>
@@ -425,152 +349,64 @@ export const UserProfileEditor = ({
 
               <div className="space-y-6">
                 {/* 技能標籤 */}
-                <FormField
+                <FormMultipleSelector
                   control={form.control}
                   name="tagList"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>技能標籤</FormLabel>
-                      <FormControl>
-                        <MultipleSelector
-                          value={
-                            field.value?.map((tag) => ({
-                              value: tag,
-                              label: tag,
-                            })) || []
-                          }
-                          onChange={(options) =>
-                            field.onChange(options.map((opt) => opt.value))
-                          }
-                          defaultOptions={commonTags}
-                          placeholder="選擇或新增技能標籤..."
-                          creatable
-                          maxSelected={10}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="技能標籤"
+                  placeholder="選擇或新增技能標籤..."
+                  defaultOptions={commonTags}
+                  creatable
+                  maxSelected={10}
                 />
 
                 {/* 興趣領域 */}
-                <FormField
+                <FormMultipleSelector
                   control={form.control}
                   name="interestList"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>興趣領域</FormLabel>
-                      <FormControl>
-                        <MultipleSelector
-                          value={
-                            field.value?.map((interest) => ({
-                              value: interest,
-                              label:
-                                INTEREST_AREAS.find(
-                                  (opt) => opt.value === interest
-                                )?.label || interest,
-                            })) || []
-                          }
-                          onChange={(options) =>
-                            field.onChange(options.map((opt) => opt.value))
-                          }
-                          defaultOptions={INTEREST_AREAS}
-                          placeholder="選擇或新增興趣領域..."
-                          creatable
-                          maxSelected={8}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="興趣領域"
+                  placeholder="選擇或新增興趣領域..."
+                  defaultOptions={INTEREST_AREAS}
+                  creatable
+                  maxSelected={8}
+                  valueToOption={(value, options) => ({
+                    value,
+                    label: options?.find(opt => opt.value === value)?.label || value,
+                  })}
                 />
 
                 {/* 想要學習的內容 */}
-                <FormField
+                <FormMultipleSelector
                   control={form.control}
                   name="wantToDoList"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>想要學習的內容</FormLabel>
-                      <FormControl>
-                        <MultipleSelector
-                          value={
-                            field.value?.map((item) => ({
-                              value: item,
-                              label: item,
-                            })) || []
-                          }
-                          onChange={(options) =>
-                            field.onChange(options.map((opt) => opt.value))
-                          }
-                          placeholder="新增想要學習的內容..."
-                          creatable
-                          maxSelected={10}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="想要學習的內容"
+                  placeholder="新增想要學習的內容..."
+                  creatable
+                  maxSelected={10}
                 />
 
                 {/* 角色身份 */}
-                <FormField
+                <FormMultipleSelector
                   control={form.control}
                   name="roleList"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>角色身份</FormLabel>
-                      <FormControl>
-                        <MultipleSelector
-                          value={
-                            field.value?.map((role) => ({
-                              value: role,
-                              label: role,
-                            })) || []
-                          }
-                          onChange={(options) =>
-                            field.onChange(options.map((opt) => opt.value))
-                          }
-                          defaultOptions={ROLE_OPTIONS}
-                          placeholder="選擇或新增角色身份..."
-                          creatable
-                          maxSelected={5}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="角色身份"
+                  placeholder="選擇或新增角色身份..."
+                  defaultOptions={ROLE_OPTIONS}
+                  creatable
+                  maxSelected={5}
                 />
 
                 {/* 專業領域 */}
-                <FormField
+                <FormMultipleSelector
                   control={form.control}
                   name="professionalField"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>專業領域</FormLabel>
-                      <FormControl>
-                        <MultipleSelector
-                          value={
-                            field.value?.map((item) => ({
-                              value: item,
-                              label:
-                                EXPERTISE_AREAS.find(
-                                  (opt) => opt.value === item
-                                )?.label || item,
-                            })) || []
-                          }
-                          onChange={(options) =>
-                            field.onChange(options.map((opt) => opt.value))
-                          }
-                          defaultOptions={EXPERTISE_AREAS}
-                          placeholder="選擇專業領域..."
-                          maxSelected={10}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="專業領域"
+                  placeholder="選擇專業領域..."
+                  defaultOptions={EXPERTISE_AREAS}
+                  maxSelected={10}
+                  valueToOption={(value, options) => ({
+                    value,
+                    label: options?.find(opt => opt.value === value)?.label || value,
+                  })}
                 />
               </div>
             </div>

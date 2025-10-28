@@ -4,6 +4,7 @@ import { Command as CommandPrimitive, useCommandState } from 'cmdk';
 import { X } from 'lucide-react';
 import * as React from 'react';
 import { forwardRef, useEffect } from 'react';
+import type { FieldPath, FieldValues, Control } from 'react-hook-form';
 
 import { Badge } from '@/shared/ui/badge';
 import {
@@ -15,6 +16,13 @@ import {
 import { cn } from '@/shared/lib/cn';
 import { OptionProps } from './option';
 import { Button } from './button';
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from './form';
 
 interface GroupOption {
   [key: string]: OptionProps[];
@@ -625,3 +633,123 @@ export const MultipleSelector = React.forwardRef<
   }
 );
 MultipleSelector.displayName = 'MultipleSelector';
+
+interface FormMultipleSelectorProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> {
+  control: Control<TFieldValues>;
+  name: TName;
+  label?: string;
+  required?: boolean;
+  disabled?: boolean;
+  placeholder?: string;
+  defaultOptions?: OptionProps[];
+  options?: OptionProps[];
+  loadingIndicator?: React.ReactNode;
+  emptyIndicator?: React.ReactNode;
+  delay?: number;
+  triggerSearchOnFocus?: boolean;
+  onSearch?: (value: string) => Promise<OptionProps[]>;
+  onSearchSync?: (value: string) => OptionProps[];
+  maxSelected?: number;
+  onMaxSelected?: (maxLimit: number) => void;
+  hidePlaceholderWhenSelected?: boolean;
+  groupBy?: string;
+  className?: string;
+  badgeClassName?: string;
+  selectFirstItem?: boolean;
+  creatable?: boolean;
+  commandProps?: React.ComponentPropsWithoutRef<typeof Command>;
+  inputProps?: Omit<
+    React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>,
+    'value' | 'placeholder' | 'disabled'
+  >;
+  hideClearAllButton?: boolean;
+  /** Custom function to transform field values to OptionProps */
+  valueToOption?: (value: string, options?: OptionProps[]) => OptionProps;
+}
+
+const FormMultipleSelector = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  control,
+  name,
+  label,
+  required,
+  disabled,
+  placeholder,
+  defaultOptions,
+  options,
+  loadingIndicator,
+  emptyIndicator,
+  delay,
+  triggerSearchOnFocus,
+  onSearch,
+  onSearchSync,
+  maxSelected,
+  onMaxSelected,
+  hidePlaceholderWhenSelected,
+  groupBy,
+  className,
+  badgeClassName,
+  selectFirstItem,
+  creatable,
+  commandProps,
+  inputProps,
+  hideClearAllButton,
+  valueToOption,
+}: FormMultipleSelectorProps<TFieldValues, TName>) => (
+  <FormField
+    control={control}
+    name={name}
+    render={({ field }) => (
+      <FormItem>
+        {label && <FormLabel required={required}>{label}</FormLabel>}
+        <FormControl>
+          <MultipleSelector
+            value={
+              Array.isArray(field.value)
+                ? field.value.map((val: string) => 
+                    valueToOption 
+                      ? valueToOption(val, defaultOptions || options)
+                      : { value: val, label: val }
+                  )
+                : []
+            }
+            onChange={(selectedOptions) =>
+              field.onChange(selectedOptions.map((opt) => opt.value))
+            }
+            disabled={disabled}
+            placeholder={placeholder}
+            defaultOptions={defaultOptions}
+            options={options}
+            loadingIndicator={loadingIndicator}
+            emptyIndicator={emptyIndicator}
+            delay={delay}
+            triggerSearchOnFocus={triggerSearchOnFocus}
+            onSearch={onSearch}
+            onSearchSync={onSearchSync}
+            maxSelected={maxSelected}
+            onMaxSelected={onMaxSelected}
+            hidePlaceholderWhenSelected={hidePlaceholderWhenSelected}
+            groupBy={groupBy}
+            className={className}
+            badgeClassName={badgeClassName}
+            selectFirstItem={selectFirstItem}
+            creatable={creatable}
+            commandProps={commandProps}
+            inputProps={inputProps}
+            hideClearAllButton={hideClearAllButton}
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
+FormMultipleSelector.displayName = 'FormMultipleSelector';
+
+export { FormMultipleSelector };
