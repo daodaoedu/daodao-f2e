@@ -34,7 +34,7 @@ export const DEFAULT_PROJECT: Project = {
   id: '',
   title: '',
   description: '',
-  isPublic: false,
+  isPublic: true,
   motivation: [],
   motivationDescription: '',
   goal: '',

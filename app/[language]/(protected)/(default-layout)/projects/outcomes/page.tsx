@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { ContentCard } from '@/features/projects';
 import { useProjectOutcomes } from '@/features/projects/hooks/outcome';
 import { parseToString } from '@/shared/lib/helper';
+import EmptyList from '@/components/Projects/ProjectList/EmptyList';
 
 export default function OutcomesPage() {
   const searchParams = useSearchParams();
@@ -15,10 +16,18 @@ export default function OutcomesPage() {
     return <div>專案不存在</div>;
   }
 
+  if (!outcomes || outcomes.length === 0) {
+    return (
+      <div className="rounded-2xl overflow-hidden">
+        <EmptyList />
+      </div>
+    );
+  }
+
   return (
     <>
       <ul className="px-4 bg-basic-white flex flex-col rounded-2xl">
-        {outcomes?.map((outcome) => (
+        {outcomes.map((outcome) => (
           <li
             key={outcome.id}
             className="py-6 border-b last:border-b-0 border-solid border-basic-200"
@@ -26,8 +35,7 @@ export default function OutcomesPage() {
             <ContentCard
               type="outcome"
               data={outcome}
-              className="p-3 transition-shadow hover:shadow-basic-200/40 hover:shadow-lg"
-              detailLink={`/projects/outcomes/detail?id=${projectId}&outcomeId=${outcome.id}`}
+              className="p-3"
             />
           </li>
         ))}

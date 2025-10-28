@@ -65,23 +65,29 @@ function ProjectLayoutContent({ children }: ProjectLayoutProps) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
+      <div className="bg-primary-palest min-h-screen flex items-center justify-center">
         <div>Loading...</div>
       </div>
     );
   }
 
   if (!project) {
-    return <NotExist />;
+    return (
+      <div className="bg-primary-palest min-h-screen">
+        <NotExist />
+      </div>
+    );
   }
 
   return (
-    <ProjectProvider>
-      <Sidebar items={sidebarItems} backText="返回" showBackButton>
-        <ProjectHeader project={project} />
-        {children}
-      </Sidebar>
-    </ProjectProvider>
+    <div className="bg-primary-palest min-h-screen">
+      <ProjectProvider>
+        <Sidebar items={sidebarItems} backText="" showBackButton backUrl="/explore">
+          <ProjectHeader project={project} />
+          {children}
+        </Sidebar>
+      </ProjectProvider>
+    </div>
   );
 }
 
