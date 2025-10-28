@@ -13,6 +13,7 @@ import { SocialIcon, SocialPlatform } from '@/shared/ui/social-icon';
 import { useTranslation } from '@/shared/lib/translation';
 import { AREA_OPTIONS } from '@/entities/area/model/constants';
 import { useSession, useSessionActions } from '@/entities/session';
+import { getUserProfileBasePath } from '@/entities/user';
 import { UserValidatorsUpdateUserSchema } from '@/models/userValidatorsUpdateUserSchema';
 import { useUserData } from '../lib/use-user-data';
 
@@ -71,7 +72,7 @@ export function UserProfileWidget({
   const [isEditing, setIsEditing] = useState(false);
   const user = data?.data;
   const pathname = usePathname();
-  const basePath = type === 'customId' ? `/me/${id}` : `/users/${id}`;
+  const basePath = getUserProfileBasePath(type, id);
   const { t } = useTranslation();
   const isOwnProfile = loginUser?.id === user?.id;
   const handleSave = async (updateUserSchema: UserValidatorsUpdateUserSchema) => {

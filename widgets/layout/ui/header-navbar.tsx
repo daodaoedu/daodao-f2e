@@ -10,6 +10,7 @@ import { cn } from '@/shared/lib/cn';
 import { useTranslation } from '@/shared/lib/translation';
 import { useSession, useSessionActions } from '@/entities/session';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+import { getUserProfileBasePath } from '@/entities/user';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,7 +57,9 @@ export const HeaderNavbar = ({
       label: '個人資料',
       onClick: () =>
         router.push(
-          user?.customId ? `/me/${user?.customId}` : `/users/${user?.id}`
+          user?.customId
+            ? getUserProfileBasePath('customId', user?.customId)
+            : getUserProfileBasePath('userId', user?.id ?? '')
         ),
     },
     {
