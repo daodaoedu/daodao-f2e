@@ -8,11 +8,11 @@ import { SaveIcon, XIcon } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';
-import { DatePickerWithForm } from '@/shared/ui/date-picker';
-import { RadioGroupWithForm } from '@/shared/ui/radio-group';
+import { FormDatePicker } from '@/shared/ui/date-picker';
+import { FormRadioGroup } from '@/shared/ui/radio-group';
 import { MultipleSelector } from '@/shared/ui/multiple-selector';
-import { SelectWithForm } from '@/shared/ui/select';
-import { CheckboxFieldWithForm } from '@/shared/ui/checkbox';
+import { FormSelect } from '@/shared/ui/select';
+import { FormCheckbox } from '@/shared/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -268,7 +268,7 @@ export const UserProfileEditor = ({
                 />
 
                 {/* 性別 */}
-                <RadioGroupWithForm
+                <FormRadioGroup
                   control={form.control}
                   name="gender"
                   label="性別"
@@ -277,7 +277,7 @@ export const UserProfileEditor = ({
                 />
 
                 {/* 教育階段 */}
-                <RadioGroupWithForm
+                <FormRadioGroup
                   control={form.control}
                   name="educationStage"
                   label="教育階段"
@@ -286,7 +286,7 @@ export const UserProfileEditor = ({
                 />
 
                 {/* 所在地區 */}
-                <SelectWithForm
+                <FormSelect
                   control={form.control}
                   name="location"
                   label="所在地區"
@@ -301,7 +301,7 @@ export const UserProfileEditor = ({
               </div>
 
               {/* 生日 */}
-              <DatePickerWithForm
+              <FormDatePicker
                 control={form.control}
                 name="birthDay"
                 placeholder="選擇生日"
@@ -582,19 +582,19 @@ export const UserProfileEditor = ({
               </h3>
 
               <div className="space-y-4">
-                <CheckboxFieldWithForm
+                <FormCheckbox
                   control={form.control}
                   name="isOpenLocation"
                   label="公開地區資訊"
                 />
 
-                <CheckboxFieldWithForm
+                <FormCheckbox
                   control={form.control}
                   name="isOpenProfile"
                   label="公開個人資料"
                 />
 
-                <CheckboxFieldWithForm
+                <FormCheckbox
                   control={form.control}
                   name="isSubscribeEmail"
                   label="訂閱電子報"
@@ -608,7 +608,7 @@ export const UserProfileEditor = ({
                 其他資訊
               </h3>
 
-              <SelectWithForm
+              <FormSelect
                 control={form.control}
                 name="referralSource"
                 label="推薦來源"

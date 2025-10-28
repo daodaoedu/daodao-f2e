@@ -14,7 +14,7 @@ import { Button } from '@/shared/ui/button';
 import { Paper } from '@/shared/ui/paper';
 import { Selector } from '@/shared/ui/select';
 import { Text, Title } from '@/shared/ui/typography';
-import { Checkbox, CheckboxWithForm } from '@/shared/ui/checkbox';
+import { Checkbox, FormCheckboxGroup } from '@/shared/ui/checkbox';
 import { DatePicker } from '@/shared/ui/date-picker';
 import { MultipleSelector } from '@/shared/ui/multiple-selector';
 import { OptionProps } from '@/shared/ui/option';
@@ -156,7 +156,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
               )}
             />
 
-            <CheckboxWithForm
+            <FormCheckboxGroup
               control={form.control}
               name="activityCategory"
               label="揪團類型"

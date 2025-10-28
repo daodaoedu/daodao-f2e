@@ -39,7 +39,7 @@ const Checkbox = React.forwardRef<
 ));
 Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
-const CheckboxWithForm = <
+const FormCheckboxGroup = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
   TOption extends OptionProps = OptionProps,
@@ -111,9 +111,9 @@ const CheckboxWithForm = <
     )}
   />
 );
-CheckboxWithForm.displayName = 'CheckboxWithForm';
+FormCheckboxGroup.displayName = 'FormCheckboxGroup';
 
-interface CheckboxFieldWithFormProps<
+interface FormCheckboxProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > {
@@ -125,7 +125,7 @@ interface CheckboxFieldWithFormProps<
   className?: string;
 }
 
-const CheckboxFieldWithForm = <
+const FormCheckbox = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
@@ -135,7 +135,7 @@ const CheckboxFieldWithForm = <
   required,
   disabled,
   className,
-}: CheckboxFieldWithFormProps<TFieldValues, TName>) => (
+}: FormCheckboxProps<TFieldValues, TName>) => (
   <FormField
     control={control}
     name={name}
@@ -159,6 +159,6 @@ const CheckboxFieldWithForm = <
   />
 );
 
-CheckboxFieldWithForm.displayName = 'CheckboxFieldWithForm';
+FormCheckbox.displayName = 'FormCheckbox';
 
-export { Checkbox, CheckboxWithForm, CheckboxFieldWithForm };
+export { Checkbox, FormCheckboxGroup, FormCheckbox };

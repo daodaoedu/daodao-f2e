@@ -49,7 +49,7 @@ const RadioGroupItem = React.forwardRef<
 ));
 RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;
 
-const RadioGroupWithForm = <
+const FormRadioGroup = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
   TOption extends OptionProps = OptionProps
@@ -95,6 +95,6 @@ const RadioGroupWithForm = <
       )}
     />
   );
-RadioGroupWithForm.displayName = 'RadioGroupWithForm';
+FormRadioGroup.displayName = 'FormRadioGroup';
 
-export { RadioGroup, RadioGroupItem, RadioGroupWithForm };
+export { RadioGroup, RadioGroupItem, FormRadioGroup };

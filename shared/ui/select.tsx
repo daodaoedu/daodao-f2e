@@ -178,7 +178,7 @@ const Selector = React.forwardRef<
   </Select>
 ));
 
-interface SelectWithFormProps<
+interface FormSelectProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 > {
@@ -191,7 +191,7 @@ interface SelectWithFormProps<
   disabled?: boolean;
 }
 
-const SelectWithForm = <
+const FormSelect = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 >({
@@ -202,7 +202,7 @@ const SelectWithForm = <
   options,
   required,
   disabled,
-}: SelectWithFormProps<TFieldValues, TName>) => (
+}: FormSelectProps<TFieldValues, TName>) => (
   <FormField
     control={control}
     name={name}
@@ -229,7 +229,7 @@ const SelectWithForm = <
   />
 );
 
-SelectWithForm.displayName = 'SelectWithForm';
+FormSelect.displayName = 'FormSelect';
 
 export {
   Select,
@@ -243,5 +243,5 @@ export {
   SelectScrollUpButton,
   SelectScrollDownButton,
   Selector,
-  SelectWithForm,
+  FormSelect,
 };

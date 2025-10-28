@@ -181,20 +181,20 @@ export const DateRangePicker = React.forwardRef<
   }
 );
 
-interface DatePickerWithFormProps<
+interface FormDatePickerProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 > extends DatePickerProps,
     Omit<ControllerProps<TFieldValues, TName>, 'render' | 'defaultValue'> {}
 
-export const DatePickerWithForm = <
+export const FormDatePicker = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 >({
     control,
     name,
     ...props
-  }: DatePickerWithFormProps<TFieldValues, TName>) => (
+  }: FormDatePickerProps<TFieldValues, TName>) => (
     <FormField
       control={control}
       name={name}
