@@ -13,6 +13,7 @@ import { FormRadioGroup } from '@/shared/ui/radio-group';
 import { FormMultipleSelector } from '@/shared/ui/multiple-selector';
 import { FormSelect } from '@/shared/ui/select';
 import { FormCheckbox } from '@/shared/ui/checkbox';
+import { FormUploadAvatar } from '@/shared/ui/upload-image';
 import { Form } from '@/shared/ui/form';
 import { Paper } from '@/shared/ui/paper';
 import type { UserValidatorsUpdateUserSchema } from '@/generated/models';
@@ -214,6 +215,16 @@ export const UserProfileEditor = ({
                 基本資訊
               </h3>
 
+              {/* 大頭照上傳 */}
+              <div className="mb-6 flex justify-center">
+                <FormUploadAvatar
+                  control={form.control}
+                  name="photoURL"
+                  label="大頭照"
+                  size={128}
+                />
+              </div>
+
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* 姓名 */}
                 <FormInput
@@ -229,14 +240,6 @@ export const UserProfileEditor = ({
                   name="personalSlogan"
                   label="個人標語"
                   placeholder="用一句話介紹自己..."
-                />
-
-                {/* 大頭照網址 */}
-                <FormInput
-                  control={form.control}
-                  name="photoURL"
-                  label="大頭照網址"
-                  placeholder="請輸入圖片網址..."
                 />
 
                 {/* 性別 */}

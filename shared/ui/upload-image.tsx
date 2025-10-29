@@ -18,6 +18,8 @@ import { uploadImagesSchema } from '@/services/images';
 import { Button, type ButtonProps } from '@/shared/ui/button';
 import { AspectRatio } from '@/shared/ui/aspect-ratio';
 import { cn } from '@/shared/lib/cn';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shared/ui/form';
+import { Control, FieldPath, FieldValues } from 'react-hook-form';
 import ResponsiveModal, { ResponsiveModalSize } from './responsive-modal';
 import {
   Tabs, TabsContent, TabsList, TabsTrigger,
@@ -286,3 +288,223 @@ export const UploadImage = forwardRef(
   }
 );
 UploadImage.displayName = 'UploadFile';
+
+interface FormUploadImageProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+> extends Omit<UploadFileProps, 'onChange' | 'value'> {
+  control: Control<TFieldValues>;
+  name: TName;
+  label?: string;
+  required?: boolean;
+  disabled?: boolean;
+  onFileSelect?: (files: ImageDataType[]) => void;
+}
+
+export const FormUploadImage = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+>({
+  control,
+  name,
+  label,
+  required = false,
+  disabled = false,
+  onFileSelect,
+  ...uploadProps
+}: FormUploadImageProps<TFieldValues, TName>) => {
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          {label && <FormLabel required={required}>{label}</FormLabel>}
+          <FormControl>
+            <UploadImage
+              {...uploadProps}
+              value={field.value ? [field.value] : []}
+              onChange={onFileSelect}
+              disabled={disabled}
+            >
+              選擇圖片
+            </UploadImage>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+
+FormUploadImage.displayName = 'FormUploadImage';
+
+interface UploadAvatarProps extends Omit<ButtonProps, 'onChange' | 'size'> {
+  value?: string;
+  size?: number;
+  disabled?: boolean;
+  onChange?: (url: string) => void;
+  onFileSelect?: (file: File) => void;
+}
+
+export const UploadAvatar = forwardRef<HTMLButtonElement, UploadAvatarProps>(
+  (
+    {
+      value,
+      size = 128,
+      disabled = false,
+      onChange,
+      onFileSelect,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [previewUrl, setPreviewUrl] = useState<string>(value || '');
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const validation = uploadImagesSchema.safeParse({ files: [file] });
+      if (!validation.success) {
+        toast.error(validation.error.issues[0].message);
+        return;
+      }
+
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+
+      onFileSelect?.(file);
+    };
+
+    const handleClick = () => {
+      if (!disabled) {
+        inputRef.current?.click();
+      }
+    };
+
+    const handleRemove = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setPreviewUrl('');
+      onChange?.('');
+      
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
+    };
+
+    useEffect(() => {
+      setPreviewUrl(value || '');
+    }, [value]);
+
+    return (
+      <div className="relative inline-block">
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileChange}
+          disabled={disabled}
+        />
+        
+        <Button
+          ref={ref}
+          type="button"
+          variant="ghost"
+          className={cn(
+            'relative overflow-hidden rounded-full border-2 border-dashed border-basic-300 p-0',
+            'hover:border-primary-base hover:bg-primary-lightest transition-colors',
+            disabled && 'opacity-50 cursor-not-allowed',
+            className
+          )}
+          style={{ width: size, height: size }}
+          onClick={handleClick}
+          disabled={disabled}
+          {...props}
+        >
+          {previewUrl ? (
+            <>
+              <img
+                src={previewUrl}
+                alt="頭像預覽"
+                className="size-full object-cover"
+                onError={() => setPreviewUrl('')}
+              />
+              {!disabled && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity hover:opacity-100">
+                  <CloudUpload className="size-6 text-white" />
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center text-basic-400">
+              <CloudUpload className="mb-1 size-8" />
+              <span className="text-xs">點擊上傳</span>
+            </div>
+          )}
+        </Button>
+
+        {previewUrl && !disabled && (
+          <Button
+            type="button"
+            variant="alert"
+            size="sm"
+            className="absolute -right-2 -top-2 size-6 rounded-full p-0"
+            onClick={handleRemove}
+          >
+            <X className="size-3" />
+          </Button>
+        )}
+      </div>
+    );
+  }
+);
+
+UploadAvatar.displayName = 'UploadAvatar';
+
+interface FormUploadAvatarProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+> extends Omit<UploadAvatarProps, 'onChange' | 'value'> {
+  control: Control<TFieldValues>;
+  name: TName;
+  label?: string;
+  required?: boolean;
+  onFileSelect?: (file: File) => void;
+}
+
+export const FormUploadAvatar = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+>({
+  control,
+  name,
+  label,
+  required = false,
+  onFileSelect,
+  ...avatarProps
+}: FormUploadAvatarProps<TFieldValues, TName>) => (
+  <FormField
+    control={control}
+    name={name}
+    render={({ field }) => (
+      <FormItem>
+        {label && <FormLabel required={required}>{label}</FormLabel>}
+        <FormControl>
+          <UploadAvatar
+            {...avatarProps}
+            value={field.value}
+            onChange={field.onChange}
+            onFileSelect={onFileSelect}
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
+FormUploadAvatar.displayName = 'FormUploadAvatar';
