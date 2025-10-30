@@ -13,7 +13,7 @@ import { FormRadioGroup } from '@/shared/ui/radio-group';
 import { FormMultipleSelector } from '@/shared/ui/multiple-selector';
 import { FormSelect } from '@/shared/ui/select';
 import { FormCheckbox } from '@/shared/ui/checkbox';
-import { FormUploadAvatar } from '@/shared/ui/upload-image';
+import { FormAvatarPicker } from '@/shared/ui/image-picker';
 import { Form } from '@/shared/ui/form';
 import { Paper } from '@/shared/ui/paper';
 import type { UserValidatorsUpdateUserSchema } from '@/generated/models';
@@ -217,7 +217,7 @@ export const UserProfileEditor = ({
 
               {/* 大頭照上傳 */}
               <div className="mb-6 flex justify-center">
-                <FormUploadAvatar
+                <FormAvatarPicker
                   control={form.control}
                   name="photoURL"
                   label="大頭照"
