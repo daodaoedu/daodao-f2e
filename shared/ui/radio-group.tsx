@@ -64,7 +64,7 @@ const FormRadioGroup = <
     <FormField
       {...props}
       render={({ field }) => (
-        <FormItem className="flex flex-col gap-1">
+        <FormItem className="flex flex-col">
           {label && <FormLabel required={required}>{label}</FormLabel>}
           <FormControl ref={field.ref}>
             <RadioGroup

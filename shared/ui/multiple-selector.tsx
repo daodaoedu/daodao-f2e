@@ -415,7 +415,8 @@ export const MultipleSelector = React.forwardRef<
       }
 
       if (creatable) {
-        return (_value: string, _search: string) => (_value.toLowerCase().includes(_search.toLowerCase()) ? 1 : -1);
+        return (_value: string, _search: string) =>
+          _value.toLowerCase().includes(_search.toLowerCase()) ? 1 : -1;
       }
       // Using default filter in `cmdk`. We don't have to provide it.
       return undefined;
@@ -430,7 +431,7 @@ export const MultipleSelector = React.forwardRef<
           commandProps?.onKeyDown?.(e);
         }}
         className={cn(
-          'h-auto overflow-visible bg-transparent border border-solid border-basic-200',
+          'h-auto overflow-visible border border-solid border-basic-200 bg-transparent',
           commandProps?.className
         )}
         shouldFilter={
@@ -444,7 +445,7 @@ export const MultipleSelector = React.forwardRef<
           role="textbox"
           tabIndex={0}
           className={cn(
-            'min-h-[38px] rounded-md border border-input body-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring focus-within:ring-primary-base',
+            'body-sm min-h-[38px] rounded-md border border-input ring-offset-background focus-within:ring-1 focus-within:ring-primary-base focus-within:ring-ring',
             {
               'px-2 py-1': selected.length !== 0,
               'cursor-text': !disabled && selected.length !== 0,
@@ -478,7 +479,7 @@ export const MultipleSelector = React.forwardRef<
               onChange?.(selected.filter((s) => s.fixed));
             }}
             className={cn(
-              'float-right mt-1 mb-1.5 size-6',
+              'float-right mb-1.5 mt-1 size-6',
               (hideClearAllButton ||
                 disabled ||
                 selected.length < 1 ||
@@ -551,11 +552,11 @@ export const MultipleSelector = React.forwardRef<
                 : placeholder
             }
             className={cn(
-              'float-left border border-transparent flex-1 bg-transparent outline-none placeholder:text-muted-foreground',
+              'float-left flex-1 border border-transparent bg-transparent outline-none placeholder:text-muted-foreground',
               {
                 'w-0 focus:w-full':
                   hidePlaceholderWhenSelected && selected.length !== 0,
-                'px-3 py-2 min-h-[38px]': selected.length === 0,
+                'min-h-[38px] px-3 py-2': selected.length === 0,
                 'ml-1': selected.length !== 0,
               },
               inputProps?.className
@@ -614,7 +615,7 @@ export const MultipleSelector = React.forwardRef<
                             className={cn(
                               'cursor-pointer',
                               option.disable &&
-                                  'cursor-default text-muted-foreground'
+                                'cursor-default text-muted-foreground'
                             )}
                           >
                             {option.label}
@@ -670,6 +671,14 @@ interface FormMultipleSelectorProps<
   valueToOption?: (value: string, options?: OptionProps[]) => OptionProps;
 }
 
+const defaultValueToOption = (
+  value: string,
+  options?: OptionProps[]
+): OptionProps => ({
+  value,
+  label: options?.find((opt) => opt.value === value)?.label || value,
+});
+
 const FormMultipleSelector = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -699,7 +708,7 @@ const FormMultipleSelector = <
   commandProps,
   inputProps,
   hideClearAllButton,
-  valueToOption,
+  valueToOption = defaultValueToOption,
 }: FormMultipleSelectorProps<TFieldValues, TName>) => (
   <FormField
     control={control}
@@ -711,10 +720,8 @@ const FormMultipleSelector = <
           <MultipleSelector
             value={
               Array.isArray(field.value)
-                ? field.value.map((val: string) => 
-                    valueToOption 
-                      ? valueToOption(val, defaultOptions || options)
-                      : { value: val, label: val }
+                ? field.value.map((val: string) =>
+                    valueToOption(val, options || defaultOptions)
                   )
                 : []
             }

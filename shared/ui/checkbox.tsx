@@ -56,7 +56,7 @@ const FormCheckboxGroup = <
   <FormField
     {...props}
     render={({ field }) => (
-      <FormItem className="flex flex-col gap-1">
+      <FormItem className="flex flex-col">
         <div className="flex items-center justify-between">
           {label && <FormLabel required={required}>{label}</FormLabel>}
           {showCounter && maxSelection && (
