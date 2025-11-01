@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { MapPinIcon, PencilIcon } from 'lucide-react';
@@ -10,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { Button, TextCollapse } from '@/shared/ui';
 import { Badge } from '@/shared/ui/badge';
-import { SocialIcon, SocialPlatform } from '@/shared/ui/social-icon';
+import { iconMap, SocialIcon, SocialPlatform } from '@/shared/ui/social-icon';
 import { useTranslation } from '@/shared/lib/translation';
 import { AREA_OPTIONS } from '@/entities/area/model/constants';
 import { useSession } from '@/entities/session';
@@ -108,6 +109,15 @@ export function UserProfileWidget({
 
   const area = AREA_OPTIONS.find((option) => option.value === user?.location);
 
+  const handleCopyContact = async (platform: SocialPlatform) => {
+    const contactValue = getContactValue(user?.contactList, platform);
+    const platformName = iconMap[platform].name;
+    if (contactValue) {
+      await navigator.clipboard.writeText(contactValue);
+      toast.success(`已複製 ${platformName} ID`);
+    }
+  };
+
   if (isEditing) {
     return (
       <div className="min-h-screen space-y-8 bg-primary-pale px-4 py-24">
@@ -186,12 +196,17 @@ export function UserProfileWidget({
                         </CustomLink>
                       </Button>
                     ) : (
-                      <div key={platform} className="flex items-center gap-0.5">
+                      <Button
+                        key={platform}
+                        variant="ghost"
+                        className="flex items-center gap-0.5 p-0"
+                        onClick={() => handleCopyContact(platform)}
+                      >
                         <SocialIcon platform={platform} size={28} />
                         <span className="text-sm text-basic-600">
                           {contactValue}
                         </span>
-                      </div>
+                      </Button>
                     );
                   })}
                 </div>
