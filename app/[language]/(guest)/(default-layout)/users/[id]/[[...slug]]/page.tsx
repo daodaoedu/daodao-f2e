@@ -4,7 +4,6 @@ import {
   USER_PROFILE_TABS,
   UserProfileTab,
   USER_PROFILE_TAB_TITLES,
-  UserDetailWidget,
 } from '@/widgets/user';
 import {
   parseUserId,
@@ -19,7 +18,7 @@ const isValidTabKey = (tabKey: string): tabKey is UserProfileTab => {
 
 const validateTabKey = (
   userIdObject: UserIdObject,
-  tabKey: string = 'profile'
+  tabKey: string = 'projects'
 ): UserProfileTab =>
   isValidTabKey(tabKey)
     ? tabKey
@@ -41,7 +40,7 @@ export async function generateMetadata({
   const titleSuffix = USER_PROFILE_TAB_TITLES[tabKey];
 
   return {
-    title: `${name}${titleSuffix}`,
+    title: `${name}的${titleSuffix}`,
   };
 }
 
@@ -53,8 +52,6 @@ export default async function TabContentPage({
   const tabKey = validateTabKey(userIdObject, slug?.[0]);
 
   switch (tabKey) {
-    case 'profile':
-      return <UserDetailWidget userIdObject={userIdObject} />;
     case 'projects':
       return <div>學習計劃</div>;
     case 'practices':

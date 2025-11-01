@@ -17,6 +17,7 @@ import {
 } from '@/api/users.client';
 import { ApiError } from '@/shared/api';
 import { onUnauthorized } from '@/shared/lib/auth-bus';
+import { mutateUserData } from '@/widgets/user';
 import { SessionState, SessionActions, SessionActionTypes } from './types';
 import { sessionReducer } from './reducer';
 import {
@@ -85,10 +86,12 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
           return;
         }
         if (isPermanentLogin(loginStatus, input)) {
-          await triggerPutUser({
+          const updatedUser = {
             ...user,
             ...input,
-          });
+          };
+          await triggerPutUser(updatedUser);
+          await mutateUserData(updatedUser);
         }
       } catch (error) {
         handleError(error);

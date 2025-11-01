@@ -5,19 +5,20 @@ import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { MapPinIcon, PencilIcon } from 'lucide-react';
-import { differenceInYears } from 'date-fns';
 import { Container, Paper } from '@/shared/ui/wrapper';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { Button, TextCollapse } from '@/shared/ui';
 import { Badge } from '@/shared/ui/badge';
 import { iconMap, SocialIcon, SocialPlatform } from '@/shared/ui/social-icon';
-import { useTranslation } from '@/shared/lib/translation';
-import { AREA_OPTIONS } from '@/entities/area/model/constants';
 import { useSession } from '@/entities/session';
 import { getUserProfileBasePath, UserIdObject } from '@/entities/user';
 import { useUserData } from '../lib/use-user-data';
 import { UserProfileEditorLoading } from './user-profile-editor';
+import {
+  USER_PROFILE_TAB_TITLES,
+  UserProfileTabTitle,
+} from '../model/user-profile';
 
 const UserProfileEditor = dynamic(
   () => import('./user-profile-editor').then((mod) => mod.UserProfileEditor),
@@ -75,37 +76,30 @@ export function UserProfileWidget({
   const user = data?.data;
   const pathname = usePathname();
   const basePath = getUserProfileBasePath(user);
-  const { t } = useTranslation();
   const isOwnProfile = loginUser?.id === user?.id;
 
-  const navItems = [
+  const navItems: { label: UserProfileTabTitle; href: string }[] = [
     {
-      label: '基本資訊',
-      href: `${basePath}`,
-    },
-    {
-      label: '學習計劃',
+      label: USER_PROFILE_TAB_TITLES.projects,
       href: `${basePath}/projects`,
     },
     {
-      label: '主題實踐',
+      label: USER_PROFILE_TAB_TITLES.practices,
       href: `${basePath}/practices`,
     },
     {
-      label: '分享資源',
+      label: USER_PROFILE_TAB_TITLES.resources,
       href: `${basePath}/resources`,
     },
     {
-      label: '想法',
+      label: USER_PROFILE_TAB_TITLES.ideas,
       href: `${basePath}/ideas`,
     },
     {
-      label: '發起揪團',
+      label: USER_PROFILE_TAB_TITLES.circles,
       href: `${basePath}/circles`,
     },
   ];
-
-  const area = AREA_OPTIONS.find((option) => option.value === user?.location);
 
   const handleCopyContact = async (platform: SocialPlatform) => {
     const contactValue = getContactValue(user?.contactList, platform);
@@ -146,25 +140,19 @@ export function UserProfileWidget({
               </Avatar>
 
               <div className="space-y-1">
-                <div className="flex items-end gap-4">
+                <div className="flex items-end gap-2">
                   <h1 className="text-basic-800 heading-sm">{user?.name}</h1>
-                  {user?.birthDay && (
-                    <p className="text-basic-500">
-                      {differenceInYears(new Date(), new Date(user?.birthDay))}
-                      歲
-                    </p>
+                  {user?.customId && (
+                    <p className="text-basic-500">@{user?.customId}</p>
                   )}
                 </div>
 
-                <div className="flex items-center gap-4">
-                  {area?.label && (
-                    <p className="flex items-center gap-0.5 text-basic-500">
-                      <MapPinIcon className="size-4" />
-                      {t(area.label)}
-                    </p>
-                  )}
-                  <p className="text-basic-500">0 追蹤者</p>
-                </div>
+                {user?.location && (
+                  <p className="flex items-center gap-0.5 text-basic-500">
+                    <MapPinIcon className="size-4" />
+                    {user?.location}
+                  </p>
+                )}
 
                 <div className="flex items-center gap-4">
                   {socialPlatformList.map(({ platform, generateHref }) => {
@@ -210,6 +198,7 @@ export function UserProfileWidget({
                 </div>
               </div>
             </div>
+
             {isOwnProfile && (
               <Button
                 variant="outline"
@@ -220,6 +209,8 @@ export function UserProfileWidget({
               </Button>
             )}
           </div>
+
+          <p className="text-basic-600">{user?.personalSlogan}</p>
 
           <div className="flex flex-wrap gap-2">
             {user?.tagList?.map((tag) => (
@@ -232,24 +223,18 @@ export function UserProfileWidget({
             ))}
           </div>
 
-          <p className="text-basic-600">{user?.personalSlogan}</p>
-
-          <div className="space-y-3">
-            <h2 className="text-basic-700 heading-sm border-l-4 border-primary-base pl-4 font-semibold">
-              關於我
-            </h2>
-            <TextCollapse
-              text={user?.selfIntroduction?.trim()}
-              maxLines={2}
-              className="text-basic-600"
-            />
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {user?.tagList?.map((tag) => (
-              <Badge key={tag}>{tag}</Badge>
-            ))}
-          </div>
+          {user?.selfIntroduction && (
+            <div className="space-y-3">
+              <h2 className="text-basic-700 heading-sm border-l-4 border-primary-base pl-4 font-semibold">
+                關於我
+              </h2>
+              <TextCollapse
+                text={user?.selfIntroduction}
+                maxLines={2}
+                className="text-basic-600"
+              />
+            </div>
+          )}
         </div>
       </Container>
 
@@ -257,7 +242,7 @@ export function UserProfileWidget({
         <h2 className="text-basic-700 heading-sm border-l-4 border-primary-base pl-4 font-semibold">
           技能地圖
         </h2>
-        <Paper>尚未開放，敬請期待。</Paper>
+        <Paper>功能即將開放，敬請期待。</Paper>
       </Container>
 
       <Container className="max-w-4xl">
@@ -265,7 +250,11 @@ export function UserProfileWidget({
           <nav className="flex gap-3">
             {navItems.map((item) => (
               <Button
-                variant={pathname === item.href ? 'default' : 'outline'}
+                variant={
+                  pathname === item.href || `${pathname}/projects` === item.href
+                    ? 'default'
+                    : 'outline'
+                }
                 asChild
                 className="rounded-md"
                 key={item.label}
