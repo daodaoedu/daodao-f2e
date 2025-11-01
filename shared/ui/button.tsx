@@ -25,7 +25,8 @@ const buttonVariants = cva(
       variant: {
         default:
           'border border-solid border-transparent bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/50',
-        alert: 'border border-solid border-transparent bg-alert text-alert-foreground shadow-sm hover:bg-alert/90',
+        alert:
+          'border border-solid border-transparent bg-alert text-alert-foreground shadow-sm hover:bg-alert/90',
         outline:
           'border border-solid border-primary bg-background text-primary-base shadow-sm hover:bg-primary hover:text-primary-foreground [&_svg]:text-primary-base [&_svg]:hover:text-primary-foreground',
         secondary:
@@ -38,7 +39,7 @@ const buttonVariants = cva(
         ctaOrange:
           'border-2 border-tips bg-tips text-white shadow-[0_8px_10px_0_rgba(255,161,11,0.2)] hover:!bg-white hover:text-tips hover:shadow-[0_12px_20px_0_rgba(255,161,11,0.3)]',
         ctaOrangeSmall:
-          'border-2 border-tips bg-tips text-white hover:!bg-white hover:text-tips transition-colors duration-200 px-6 py-2 text-sm font-medium rounded-full',
+          'rounded-full border-2 border-tips bg-tips px-6 py-2 text-sm font-medium text-white transition-colors duration-200 hover:!bg-white hover:text-tips',
         ctaPrimary:
           'border-2 border-primary-base bg-primary-base text-white shadow-[0_8px_10px_0_rgba(22,185,179,0.2)] hover:!bg-white hover:text-primary-base hover:shadow-[0_12px_20px_0_rgba(22,185,179,0.3)]',
       },

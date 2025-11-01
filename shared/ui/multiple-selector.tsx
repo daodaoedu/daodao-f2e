@@ -4,7 +4,7 @@ import { Command as CommandPrimitive, useCommandState } from 'cmdk';
 import { X } from 'lucide-react';
 import * as React from 'react';
 import { forwardRef, useEffect } from 'react';
-import type { FieldPath, FieldValues, Control } from 'react-hook-form';
+import type { FieldPath, FieldValues } from 'react-hook-form';
 
 import { Badge } from '@/shared/ui/badge';
 import {
@@ -17,11 +17,8 @@ import { cn } from '@/shared/lib/cn';
 import { OptionProps } from './option';
 import { Button } from './button';
 import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  FormFieldWrapper,
+  BaseFormFieldProps,
 } from './form';
 
 interface GroupOption {
@@ -638,12 +635,7 @@ MultipleSelector.displayName = 'MultipleSelector';
 interface FormMultipleSelectorProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> {
-  control: Control<TFieldValues>;
-  name: TName;
-  label?: string;
-  required?: boolean;
-  disabled?: boolean;
+> extends BaseFormFieldProps<TFieldValues, TName> {
   placeholder?: string;
   defaultOptions?: OptionProps[];
   options?: OptionProps[];
@@ -710,52 +702,49 @@ const FormMultipleSelector = <
   hideClearAllButton,
   valueToOption = defaultValueToOption,
 }: FormMultipleSelectorProps<TFieldValues, TName>) => (
-  <FormField
+  <FormFieldWrapper
     control={control}
     name={name}
-    render={({ field }) => (
-      <FormItem>
-        {label && <FormLabel required={required}>{label}</FormLabel>}
-        <FormControl>
-          <MultipleSelector
-            ref={field.ref}
-            value={
-              Array.isArray(field.value)
-                ? field.value.map((val: string) =>
-                    valueToOption(val, options || defaultOptions)
-                  )
-                : []
-            }
-            onChange={(selectedOptions) =>
-              field.onChange(selectedOptions.map((opt) => opt.value))
-            }
-            disabled={disabled}
-            placeholder={placeholder}
-            defaultOptions={defaultOptions}
-            options={options}
-            loadingIndicator={loadingIndicator}
-            emptyIndicator={emptyIndicator}
-            delay={delay}
-            triggerSearchOnFocus={triggerSearchOnFocus}
-            onSearch={onSearch}
-            onSearchSync={onSearchSync}
-            maxSelected={maxSelected}
-            onMaxSelected={onMaxSelected}
-            hidePlaceholderWhenSelected={hidePlaceholderWhenSelected}
-            groupBy={groupBy}
-            className={className}
-            badgeClassName={badgeClassName}
-            selectFirstItem={selectFirstItem}
-            creatable={creatable}
-            commandProps={commandProps}
-            inputProps={inputProps}
-            hideClearAllButton={hideClearAllButton}
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+    label={label}
+    required={required}
+  >
+    {(field) => (
+      <MultipleSelector
+        ref={field.ref}
+        value={
+          Array.isArray(field.value)
+            ? field.value.map((val: string) =>
+                valueToOption(val, options || defaultOptions)
+              )
+            : []
+        }
+        onChange={(selectedOptions) =>
+          field.onChange(selectedOptions.map((opt) => opt.value))
+        }
+        disabled={disabled}
+        placeholder={placeholder}
+        defaultOptions={defaultOptions}
+        options={options}
+        loadingIndicator={loadingIndicator}
+        emptyIndicator={emptyIndicator}
+        delay={delay}
+        triggerSearchOnFocus={triggerSearchOnFocus}
+        onSearch={onSearch}
+        onSearchSync={onSearchSync}
+        maxSelected={maxSelected}
+        onMaxSelected={onMaxSelected}
+        hidePlaceholderWhenSelected={hidePlaceholderWhenSelected}
+        groupBy={groupBy}
+        className={className}
+        badgeClassName={badgeClassName}
+        selectFirstItem={selectFirstItem}
+        creatable={creatable}
+        commandProps={commandProps}
+        inputProps={inputProps}
+        hideClearAllButton={hideClearAllButton}
+      />
     )}
-  />
+  </FormFieldWrapper>
 );
 
 FormMultipleSelector.displayName = 'FormMultipleSelector';

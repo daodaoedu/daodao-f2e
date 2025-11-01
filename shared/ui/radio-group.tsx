@@ -6,10 +6,8 @@ import { Circle } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
 import {
   FormControl,
-  FormField,
   FormItem,
-  FormLabel,
-  FormMessage,
+  FormFieldWrapper,
 } from './form';
 import {
   defaultRenderOption,
@@ -61,39 +59,39 @@ const FormRadioGroup = <
     renderOption = defaultRenderOption,
     ...props
   }: OptionWithFormProps<TFieldValues, TName, TOption>) => (
-    <FormField
-      {...props}
-      render={({ field }) => (
-        <FormItem className="flex flex-col">
-          {label && <FormLabel required={required}>{label}</FormLabel>}
-          <FormControl ref={field.ref}>
-            <RadioGroup
-              onValueChange={field.onChange}
-              value={field.value}
-              className={className}
-            >
-              {Array.isArray(options) &&
-                options.map((option) => (
-                  <FormItem key={option.value}>
-                    <FormControl>
-                      <RadioGroupItem
-                        className="sr-only"
-                        value={option.value}
-                      />
-                    </FormControl>
-                    {renderOption({
-                      ...option,
-                      Option,
-                      isChecked: field.value === option.value,
-                    })}
-                  </FormItem>
-                ))}
-            </RadioGroup>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+    <FormFieldWrapper
+      control={props.control}
+      name={props.name}
+      label={label}
+      required={required}
+      className="flex flex-col"
+    >
+      {(field) => (
+        <RadioGroup
+          onValueChange={field.onChange}
+          value={field.value}
+          className={className}
+          ref={field.ref}
+        >
+          {Array.isArray(options) &&
+            options.map((option) => (
+              <FormItem key={option.value}>
+                <FormControl>
+                  <RadioGroupItem
+                    className="sr-only"
+                    value={option.value}
+                  />
+                </FormControl>
+                {renderOption({
+                  ...option,
+                  Option,
+                  isChecked: field.value === option.value,
+                })}
+              </FormItem>
+            ))}
+        </RadioGroup>
       )}
-    />
+    </FormFieldWrapper>
   );
 FormRadioGroup.displayName = 'FormRadioGroup';
 

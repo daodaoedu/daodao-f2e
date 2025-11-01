@@ -1,13 +1,10 @@
 import * as React from 'react';
-import type { FieldPath, FieldValues, Control } from 'react-hook-form';
+import type { FieldPath, FieldValues } from 'react-hook-form';
 
 import { cn } from '@/shared/lib/cn';
 import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  FormFieldWrapper,
+  BaseFormFieldProps,
 } from './form';
 
 const Textarea = React.forwardRef<
@@ -28,12 +25,7 @@ Textarea.displayName = 'Textarea';
 interface FormTextareaProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> {
-  control: Control<TFieldValues>;
-  name: TName;
-  label?: string;
-  required?: boolean;
-  disabled?: boolean;
+> extends BaseFormFieldProps<TFieldValues, TName> {
   placeholder?: string;
   className?: string;
   rows?: number;
@@ -52,25 +44,22 @@ const FormTextarea = <
   className,
   rows,
 }: FormTextareaProps<TFieldValues, TName>) => (
-  <FormField
+  <FormFieldWrapper
     control={control}
     name={name}
-    render={({ field }) => (
-      <FormItem>
-        {label && <FormLabel required={required}>{label}</FormLabel>}
-        <FormControl>
-          <Textarea
-            {...field}
-            placeholder={placeholder}
-            disabled={disabled}
-            className={className}
-            rows={rows}
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+    label={label}
+    required={required}
+  >
+    {(field) => (
+      <Textarea
+        {...field}
+        placeholder={placeholder}
+        disabled={disabled}
+        className={className}
+        rows={rows}
+      />
     )}
-  />
+  </FormFieldWrapper>
 );
 
 FormTextarea.displayName = 'FormTextarea';

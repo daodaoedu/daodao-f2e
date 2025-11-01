@@ -1,4 +1,4 @@
-import type { FieldPath, FieldValues, Control } from 'react-hook-form';
+import type { FieldPath, FieldValues } from 'react-hook-form';
 import * as React from 'react';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import { Check } from 'lucide-react';
@@ -10,6 +10,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormFieldWrapperFlex,
+  BaseFormFieldProps,
 } from './form';
 import {
   defaultRenderOption,
@@ -116,12 +118,7 @@ FormCheckboxGroup.displayName = 'FormCheckboxGroup';
 interface FormCheckboxProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> {
-  control: Control<TFieldValues>;
-  name: TName;
-  label?: string;
-  required?: boolean;
-  disabled?: boolean;
+> extends BaseFormFieldProps<TFieldValues, TName> {
   className?: string;
 }
 
@@ -136,27 +133,23 @@ const FormCheckbox = <
   disabled,
   className,
 }: FormCheckboxProps<TFieldValues, TName>) => (
-  <FormField
+  <FormFieldWrapperFlex
     control={control}
     name={name}
-    render={({ field }) => (
-      <FormItem className={cn('flex flex-row items-center', className)}>
-        <FormControl>
-          <Checkbox
-            checked={field.value}
-            onCheckedChange={field.onChange}
-            disabled={disabled}
-          />
-        </FormControl>
-        {label && (
-          <FormLabel required={required} className="mb-0 pl-2 text-base">
-            {label}
-          </FormLabel>
-        )}
-        <FormMessage />
-      </FormItem>
+    label={label}
+    required={required}
+    direction="row"
+    labelPosition="after"
+    className={className}
+  >
+    {(field) => (
+      <Checkbox
+        checked={field.value}
+        onCheckedChange={field.onChange}
+        disabled={disabled}
+      />
     )}
-  />
+  </FormFieldWrapperFlex>
 );
 
 FormCheckbox.displayName = 'FormCheckbox';

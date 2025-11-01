@@ -1,6 +1,6 @@
 'use client';
 
-import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form';
+import type { FieldPath, FieldValues } from 'react-hook-form';
 import * as React from 'react';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
@@ -20,7 +20,8 @@ import {
 } from '@/shared/ui/popover';
 import useControlledState from '@/shared/lib/use-controlled-state';
 import {
-  FormField, FormItem, FormLabel, FormMessage,
+  FormFieldWrapper,
+  BaseFormFieldProps,
 } from './form';
 
 const defaultFormatStr = 'yyyy/MM/dd';
@@ -185,7 +186,7 @@ interface FormDatePickerProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 > extends DatePickerProps,
-    Omit<ControllerProps<TFieldValues, TName>, 'render' | 'defaultValue'> {}
+    Omit<BaseFormFieldProps<TFieldValues, TName>, 'defaultValue'> {}
 
 export const FormDatePicker = <
   TFieldValues extends FieldValues = FieldValues,
@@ -193,17 +194,19 @@ export const FormDatePicker = <
 >({
     control,
     name,
+    label = '生日',
+    required = true,
     ...props
   }: FormDatePickerProps<TFieldValues, TName>) => (
-    <FormField
+    <FormFieldWrapper
       control={control}
       name={name}
-      render={({ field }) => (
-        <FormItem className="flex flex-col gap-1">
-          <FormLabel required>生日</FormLabel>
-          <DatePicker captionLayout="dropdown-buttons" {...field} {...props} />
-          <FormMessage />
-        </FormItem>
+      label={label}
+      required={required}
+      className="flex flex-col gap-1"
+    >
+      {(field) => (
+        <DatePicker captionLayout="dropdown-buttons" {...field} {...props} />
       )}
-    />
+    </FormFieldWrapper>
   );
