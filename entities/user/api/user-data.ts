@@ -1,37 +1,27 @@
-import { 
-  getApiV1UsersId, 
+import {
+  getApiV1UsersId,
   getApiV1UsersCustomIdCustomId,
   getGetApiV1UsersIdKey,
   getGetApiV1UsersCustomIdCustomIdKey,
 } from '@/generated/api/users.server';
-
-export type UserIdentifierType = 'userId' | 'customId';
+import type { UserIdObject } from '../lib/user-profile-utils';
 
 /**
  * 統一的用戶資料獲取函數
  */
-export const getUserData = async (type: UserIdentifierType, id: string) => {
-  switch (type) {
-    case 'userId':
-      return getApiV1UsersId(id);
-    case 'customId':
-      return getApiV1UsersCustomIdCustomId(id);
-    default:
-      throw new Error(`Unsupported user identifier type: ${type}`);
+export const getUserData = async ({ customId, id }: UserIdObject) => {
+  if (customId) {
+    return getApiV1UsersCustomIdCustomId(customId);
   }
+  return getApiV1UsersId(id);
 };
 
 /**
  * 統一的用戶資料 SWR Key 獲取函數
  */
-export const getUserDataKey = (type: UserIdentifierType, id: string) => {
-  
-  switch (type) {
-    case 'userId':
-      return getGetApiV1UsersIdKey(id);
-    case 'customId':
-      return getGetApiV1UsersCustomIdCustomIdKey(id);
-    default:
-      throw new Error(`Unsupported user identifier type: ${type}`);
+export const getUserDataKey = ({ customId, id }: UserIdObject) => {
+  if (customId) {
+    return getGetApiV1UsersCustomIdCustomIdKey(customId);
   }
+  return getGetApiV1UsersIdKey(id);
 };

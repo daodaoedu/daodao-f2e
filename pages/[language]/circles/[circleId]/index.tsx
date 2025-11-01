@@ -43,6 +43,7 @@ import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
 import dynamic from "next/dynamic";
 import { timeDuration } from "@/shared/lib/date";
 import { ContactModal, TargetUserType } from "@/features/email";
+import { getUserProfileBasePath } from "@/entities/user";
 
 const MarkdownEditor = dynamic(
   () => import("@/shared/ui/markdown-editor").then(mod => ({ default: mod.MarkdownEditor })),
@@ -294,7 +295,7 @@ export default function CircleDetailPage({
         <Paper className="mb-4 md:p-8" asChild>
           <section>
             <header className="flex justify-between">
-              <CustomLink href={`/partner/detail?id=${data.user.userId}`}>
+              <CustomLink href={getUserProfileBasePath({ id: data.user.userId })}>
                 <div className="flex items-center">
                   <Avatar className="mt-1 mr-3 size-12">
                     <AvatarImage src={data.user.photoURL} />

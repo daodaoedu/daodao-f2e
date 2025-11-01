@@ -17,7 +17,6 @@ const getCanVisitMentorWorkspace = (role?: RoleEnum | null) => (role ? MENTOR_WO
 const manageRoutes = {
   manage: '/manage',
   projects: '/manage/projects',
-  myCard: '/personal-card/my-card',
   collections: '/manage/treasure/collections',
   footprints: '/manage/treasure/footprints',
   following: '/manage/treasure/following',
@@ -43,7 +42,6 @@ export const getManageSidebarItems = ({
   const items: SidebarItemType[] = [
     genSidebarItem('我的小島', manageRoutes.manage),
     genSidebarItem('我的學習計畫', manageRoutes.projects),
-    genSidebarItem('個人名片', manageRoutes.myCard),
     {
       label: '百寶箱',
       children: [

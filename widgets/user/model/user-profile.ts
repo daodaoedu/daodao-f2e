@@ -1,7 +1,3 @@
-import type { UserIdentifierType } from '@/entities/user';
-
-export type { UserIdentifierType };
-
 /**
  * 用戶資料頁面配置
  */
@@ -24,25 +20,3 @@ export const USER_PROFILE_TAB_TITLES: Record<UserProfileTab, string> = {
   circles: '的揪團',
   resources: '的資源',
 } as const;
-
-/**
- * 用戶資料頁面類型定義
- */
-export interface UserProfileTabConfig {
-  key: string;
-  title: string;
-  path: string;
-}
-
-export interface UserProfilePageParams {
-  type: UserIdentifierType;
-  id: string;
-  slug?: string[];
-}
-
-export interface UserProfileMetadata {
-  name: string;
-  tabKey: string;
-  type: UserIdentifierType;
-  id: string;
-}

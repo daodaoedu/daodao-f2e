@@ -11,18 +11,17 @@ import {
   UserCheckIcon,
 } from 'lucide-react';
 import {
-  UserIdentifierType,
   EDUCATION_OPTIONS,
   ROLE_OPTIONS,
   EXPERTISE_AREAS,
   INTEREST_AREAS,
   WANT_TO_DO_WITH_PARTNER,
+  UserIdObject,
 } from '@/entities/user';
 import { useUserData } from '../lib/use-user-data';
 
 interface UserDetailWidgetProps {
-  type: UserIdentifierType;
-  id: string;
+  userIdObject: UserIdObject;
 }
 
 const Text = ({ children }: React.PropsWithChildren) => (
@@ -31,8 +30,8 @@ const Text = ({ children }: React.PropsWithChildren) => (
   </p>
 );
 
-export function UserDetailWidget({ type, id }: UserDetailWidgetProps) {
-  const { data } = useUserData({ type, id });
+export function UserDetailWidget({ userIdObject }: UserDetailWidgetProps) {
+  const { data } = useUserData(userIdObject);
   const user = data?.data;
 
   // 現有資訊

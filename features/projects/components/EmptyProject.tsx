@@ -2,8 +2,11 @@ import AccessDeniedImg from '@/public/assets/projects/access-denied.png';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/cn';
 import { CustomLink } from '@/shared/ui/custom-link';
+import { useSession } from '@/entities/session';
+import { getUserProfileBasePath } from '@/entities/user';
 
 export default function EmptyProject() {
+  const { user } = useSession();
   return (
     <div
       className={cn(
@@ -26,7 +29,7 @@ export default function EmptyProject() {
           asChild
           variant="outline"
         >
-          <CustomLink href="/personal-card/my-card">
+          <CustomLink href={getUserProfileBasePath(user)}>
             編輯名片
           </CustomLink>
         </Button>

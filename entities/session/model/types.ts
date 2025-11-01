@@ -39,7 +39,7 @@ interface PermanentLoginState extends CommonLoginState {
   isLoggedIn: true;
   isTemporary: false;
   loginStatus: SessionLoginStatus.PERMANENT;
-  user: UserValidatorsCreateUserResponseSchemaDataUser;
+  user: UserValidatorsUserSuccessResponseSchemaData;
 }
 
 export type SessionState =

@@ -8,14 +8,14 @@ export default async function UsersLayout({
   children,
 }: LayoutProps<'/[language]/users/[id]'>) {
   const { id } = await params;
-  const { type, actualId } = parseUserId(id);
-  const userResponse = await getUserData(type, actualId);
+  const userIdObject = parseUserId(id);
+  const userResponse = await getUserData(userIdObject);
 
   if (!userResponse.data) {
     notFound();
   }
 
-  const swrKey = getUserDataKey(type, actualId);
+  const swrKey = getUserDataKey(userIdObject);
 
   return (
     <SWRConfig
@@ -25,7 +25,7 @@ export default async function UsersLayout({
         },
       }}
     >
-      <UserProfileWidget type={type} id={actualId}>
+      <UserProfileWidget userIdObject={userIdObject}>
         {children}
       </UserProfileWidget>
     </SWRConfig>

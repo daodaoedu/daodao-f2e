@@ -10,7 +10,7 @@ import {
   parseUserId,
   getUserProfileBasePath,
   getUserData,
-  UserIdentifierType,
+  UserIdObject,
 } from '@/entities/user';
 
 const isValidTabKey = (tabKey: string): tabKey is UserProfileTab => {
@@ -18,11 +18,12 @@ const isValidTabKey = (tabKey: string): tabKey is UserProfileTab => {
 };
 
 const validateTabKey = (
-  type: UserIdentifierType,
-  id: string,
+  userIdObject: UserIdObject,
   tabKey: string = 'profile'
 ): UserProfileTab =>
-  isValidTabKey(tabKey) ? tabKey : redirect(getUserProfileBasePath(type, id));
+  isValidTabKey(tabKey)
+    ? tabKey
+    : redirect(getUserProfileBasePath(userIdObject));
 
 export const generateStaticParams = () =>
   USER_PROFILE_TABS.map((tabKey) => ({
@@ -33,9 +34,9 @@ export async function generateMetadata({
   params,
 }: PageProps<'/[language]/users/[id]/[[...slug]]'>): Promise<Metadata> {
   const { id, slug } = await params;
-  const { type, actualId } = parseUserId(id);
-  const tabKey = validateTabKey(type, id, slug?.[0]);
-  const { data } = await getUserData(type, actualId);
+  const userIdObject = parseUserId(id);
+  const tabKey = validateTabKey(userIdObject, slug?.[0]);
+  const { data } = await getUserData(userIdObject);
   const name = data?.name?.trim() ?? '未知用戶';
   const titleSuffix = USER_PROFILE_TAB_TITLES[tabKey];
 
@@ -48,12 +49,12 @@ export default async function TabContentPage({
   params,
 }: PageProps<'/[language]/users/[id]/[[...slug]]'>) {
   const { id, slug } = await params;
-  const { type, actualId } = parseUserId(id);
-  const tabKey = validateTabKey(type, id, slug?.[0]);
+  const userIdObject = parseUserId(id);
+  const tabKey = validateTabKey(userIdObject, slug?.[0]);
 
   switch (tabKey) {
     case 'profile':
-      return <UserDetailWidget type={type} id={actualId} />;
+      return <UserDetailWidget userIdObject={userIdObject} />;
     case 'projects':
       return <div>學習計劃</div>;
     case 'practices':

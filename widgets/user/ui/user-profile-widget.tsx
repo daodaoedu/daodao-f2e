@@ -15,7 +15,7 @@ import { iconMap, SocialIcon, SocialPlatform } from '@/shared/ui/social-icon';
 import { useTranslation } from '@/shared/lib/translation';
 import { AREA_OPTIONS } from '@/entities/area/model/constants';
 import { useSession } from '@/entities/session';
-import { getUserProfileBasePath } from '@/entities/user';
+import { getUserProfileBasePath, UserIdObject } from '@/entities/user';
 import { useUserData } from '../lib/use-user-data';
 import { UserProfileEditorLoading } from './user-profile-editor';
 
@@ -62,21 +62,19 @@ const getContactValue = (
 };
 
 interface UserProfileWidgetProps extends React.PropsWithChildren {
-  type: 'customId' | 'userId';
-  id: string;
+  userIdObject: UserIdObject;
 }
 
 export function UserProfileWidget({
-  type,
-  id,
+  userIdObject,
   children,
 }: UserProfileWidgetProps) {
   const { user: loginUser } = useSession();
-  const { data } = useUserData({ type, id });
+  const { data } = useUserData(userIdObject);
   const [isEditing, setIsEditing] = useState(false);
   const user = data?.data;
   const pathname = usePathname();
-  const basePath = getUserProfileBasePath(type, id);
+  const basePath = getUserProfileBasePath(user);
   const { t } = useTranslation();
   const isOwnProfile = loginUser?.id === user?.id;
 

@@ -55,12 +55,7 @@ export const HeaderNavbar = ({
   const userDropdownItems = [
     {
       label: '個人資料',
-      onClick: () =>
-        router.push(
-          user?.customId
-            ? getUserProfileBasePath('customId', user?.customId)
-            : getUserProfileBasePath('userId', user?.id ?? '')
-        ),
+      onClick: () => router.push(getUserProfileBasePath(user)),
     },
     {
       label: '帳號設定',

@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { cn } from '@/shared/lib/cn';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { useSessionActions } from '@/entities/session';
+import { useSession, useSessionActions } from '@/entities/session';
 import { useDialog } from '@/contexts/Dialog';
 import { Form, parseSchemaAutoFocus } from '@/shared/ui/form';
 import { Button } from '@/shared/ui/button';
@@ -14,6 +14,7 @@ import { Background, Container, Paper } from '@/shared/ui/wrapper';
 import { Image } from '@/shared/ui/image';
 import { Progress } from '@/shared/ui/progress';
 import getEnv from '@/shared/config/env';
+import { getUserProfileBasePath } from '@/entities/user';
 import { PersonalInfoStep, InterestsStep, ReferralSourceStep } from './steps';
 import { onboardingSchema, type OnboardingFormData } from '../model';
 import { ONBOARDING_STEPS } from '../config';
@@ -21,6 +22,7 @@ import { ONBOARDING_STEPS } from '../config';
 export const AuthOnboarding = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
+  const { user } = useSession();
   const { openDialog } = useDialog();
   const { updateUser } = useSessionActions();
   const searchParams = getEnv().isClientSide
@@ -107,7 +109,7 @@ export const AuthOnboarding = () => {
           </p>
         ),
         onConfirm: () => {
-          router.replace('/personal-card');
+          router.replace(getUserProfileBasePath(user));
         },
         onCancel: () => {
           router.push(redirectTo);
