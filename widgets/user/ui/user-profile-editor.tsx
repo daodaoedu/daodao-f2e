@@ -26,10 +26,14 @@ import {
   INTEREST_AREAS,
   REFERRAL_SOURCES,
   ROLE_OPTIONS,
+  WANT_TO_DO_WITH_PARTNER,
 } from '@/entities/user';
 import { AREA_OPTIONS } from '@/entities/area/model/constants';
 import type { TranslationKeys } from '@/shared/config/i18n';
 import { useErrorHandler } from '@/shared/lib/error-handler';
+import { useSessionActions } from '@/entities/session';
+import { cn } from '@/shared/lib/cn';
+import { Skeleton } from '@/shared/ui/skeleton';
 
 // 表單驗證 schema
 const userProfileSchema = z.object({
@@ -91,8 +95,7 @@ type UserProfileFormData = z.infer<typeof userProfileSchema>;
 
 interface UserProfileEditorProps {
   initialData?: Partial<UserValidatorsUpdateUserSchema>;
-  onSave: (data: UserProfileFormData) => Promise<void> | void;
-  onCancel: () => void;
+  onClose: () => void;
 }
 
 const commonTags = [
@@ -106,11 +109,81 @@ const commonTags = [
   { value: 'education', label: '教育' },
 ];
 
+interface ActionButtonsProps {
+  onCancel?: () => void;
+  isSaving?: boolean;
+  isLoading?: boolean;
+  className?: string;
+}
+
+const ActionButtons = ({
+  onCancel,
+  isSaving,
+  isLoading,
+  className,
+}: ActionButtonsProps) => (
+  <div className={cn('flex gap-2', className)}>
+    <Button
+      type="button"
+      variant="outline"
+      onClick={onCancel}
+      disabled={isSaving || isLoading}
+      className="flex items-center gap-2"
+    >
+      <XIcon className="size-4" />
+      取消
+    </Button>
+    <Button
+      type="submit"
+      form="profile-form"
+      disabled={isSaving || isLoading}
+      className="flex items-center gap-2"
+    >
+      <SaveIcon className="size-4" />
+      {isSaving ? '儲存中...' : '儲存'}
+    </Button>
+  </div>
+);
+
+interface UserProfileEditorLayoutProps extends React.PropsWithChildren {
+  actionButtons?: React.ReactNode;
+}
+
+const UserProfileEditorLayout = ({
+  children,
+  actionButtons,
+}: UserProfileEditorLayoutProps) => (
+  <Paper>
+    <div className="space-y-6">
+      {/* 標題與操作按鈕 */}
+      <div className="flex items-center justify-between border-b border-basic-200 pb-4">
+        <h2 className="text-basic-800 text-2xl font-bold">編輯個人資料</h2>
+        {actionButtons}
+      </div>
+
+      {children}
+
+      {/* 底部操作按鈕 */}
+      <div className="flex justify-center border-t border-basic-200 pt-4 *:w-full *:*:flex-1 *:gap-4 *:px-4">
+        {actionButtons}
+      </div>
+    </div>
+  </Paper>
+);
+
+export const UserProfileEditorLoading = () => (
+  <UserProfileEditorLayout actionButtons={<ActionButtons isLoading />}>
+    <Skeleton className="h-48 w-full bg-basic-100" />
+    <Skeleton className="h-48 w-full bg-basic-100" />
+    <Skeleton className="h-48 w-full bg-basic-100" />
+  </UserProfileEditorLayout>
+);
+
 export const UserProfileEditor = ({
   initialData,
-  onSave,
-  onCancel,
+  onClose,
 }: UserProfileEditorProps) => {
+  const { updateUser } = useSessionActions();
   const [isSaving, setIsSaving] = useState(false);
   const { t } = useTranslation();
 
@@ -150,7 +223,8 @@ export const UserProfileEditor = ({
   const handleSubmit = async (data: UserProfileFormData) => {
     try {
       setIsSaving(true);
-      await onSave(data);
+      await updateUser(data);
+      onClose();
     } catch (error) {
       handleFormError(error, { defaultMessage: '儲存失敗，請稍後再試' });
     } finally {
@@ -160,7 +234,7 @@ export const UserProfileEditor = ({
 
   const handleCancel = () => {
     form.reset();
-    onCancel();
+    onClose();
   };
 
   const { setIsBlocked } = useNavigationBlocker();
@@ -175,57 +249,34 @@ export const UserProfileEditor = ({
   }, [isDirty, setIsBlocked]);
 
   return (
-    <Paper className="mx-auto max-w-4xl">
-      <div className="space-y-6">
-        {/* 標題與操作按鈕 */}
-        <div className="flex items-center justify-between border-b border-basic-200 pb-4">
-          <h2 className="text-basic-800 text-2xl font-bold">編輯個人資料</h2>
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleCancel}
-              disabled={isSaving}
-              className="flex items-center gap-2"
-            >
-              <XIcon className="size-4" />
-              取消
-            </Button>
-            <Button
-              type="submit"
-              form="profile-form"
-              disabled={isSaving}
-              className="flex items-center gap-2"
-            >
-              <SaveIcon className="size-4" />
-              {isSaving ? '儲存中...' : '儲存'}
-            </Button>
-          </div>
-        </div>
+    <UserProfileEditorLayout
+      actionButtons={
+        <ActionButtons onCancel={handleCancel} isSaving={isSaving} />
+      }
+    >
+      <Form {...form}>
+        <form
+          id="profile-form"
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-8"
+        >
+          {/* 基本資訊區塊 */}
+          <div className="space-y-6">
+            <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
+              基本資訊
+            </h3>
 
-        <Form {...form}>
-          <form
-            id="profile-form"
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-8"
-          >
-            {/* 基本資訊區塊 */}
-            <div className="space-y-6">
-              <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
-                基本資訊
-              </h3>
-
+            <div className="grid grid-cols-1 gap-x-12 gap-y-6 md:grid-cols-[1fr_3fr]">
               {/* 大頭照上傳 */}
-              <div className="mb-6 flex justify-center">
+              <div className="flex items-center justify-center">
                 <FormAvatarPicker
                   control={form.control}
                   name="photoURL"
-                  label="大頭照"
                   size={128}
                 />
               </div>
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="space-y-6">
                 {/* 姓名 */}
                 <FormInput
                   control={form.control}
@@ -234,230 +285,218 @@ export const UserProfileEditor = ({
                   placeholder="請輸入您的姓名..."
                 />
 
-                {/* 個人標語 */}
-                <FormInput
+                {/* 生日 */}
+                <FormDatePicker
                   control={form.control}
-                  name="personalSlogan"
-                  label="個人標語"
-                  placeholder="用一句話介紹自己..."
-                />
-
-                {/* 性別 */}
-                <FormRadioGroup
-                  control={form.control}
-                  name="gender"
-                  label="性別"
-                  options={GENDER_OPTIONS}
-                  className="flex gap-4"
-                />
-
-                {/* 教育階段 */}
-                <FormRadioGroup
-                  control={form.control}
-                  name="educationStage"
-                  label="教育階段"
-                  options={EDUCATION_OPTIONS}
-                  className="flex gap-4"
-                />
-
-                {/* 所在地區 */}
-                <FormSelect
-                  control={form.control}
-                  name="location"
-                  label="所在地區"
-                  placeholder="請選擇所在地區"
-                  options={AREA_OPTIONS.map(
-                    (option: { value: string; label: TranslationKeys }) => ({
-                      value: option.value,
-                      label: t(option.label),
-                    })
-                  )}
+                  name="birthDay"
+                  placeholder="選擇生日"
+                  captionLayout="dropdown-buttons"
                 />
               </div>
 
-              {/* 生日 */}
-              <FormDatePicker
+              {/* 性別 */}
+              <FormRadioGroup
                 control={form.control}
-                name="birthDay"
-                placeholder="選擇生日"
-                captionLayout="dropdown-buttons"
-              />
-            </div>
-
-            {/* 自我介紹區塊 */}
-            <div className="space-y-6">
-              <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
-                自我介紹
-              </h3>
-
-              <FormTextarea
-                control={form.control}
-                name="selfIntroduction"
-                label="自我介紹"
-                placeholder="分享你的學習經歷、興趣或專業背景..."
-                className="min-h-32"
+                name="gender"
+                label="性別"
+                options={GENDER_OPTIONS}
+                className="flex gap-4"
               />
 
-              <FormTextarea
+              {/* 個人標語 */}
+              <FormInput
                 control={form.control}
-                name="share"
-                label="可以和夥伴分享的事物"
-                placeholder="分享你可以提供給其他學習夥伴的資源、經驗或協助..."
-                className="min-h-32"
+                name="personalSlogan"
+                label="個人標語"
+                placeholder="用一句話介紹自己..."
               />
-            </div>
 
-            {/* 聯絡方式區塊 */}
-            <div className="space-y-6">
-              <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
-                聯絡方式
-              </h3>
+              {/* 教育階段 */}
+              <FormRadioGroup
+                control={form.control}
+                name="educationStage"
+                label="教育階段"
+                options={EDUCATION_OPTIONS}
+                className="flex gap-4"
+              />
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <FormInput
-                  control={form.control}
-                  name="contactList.instagram"
-                  label="Instagram"
-                  placeholder="your_instagram_handle"
-                />
-
-                <FormInput
-                  control={form.control}
-                  name="contactList.facebook"
-                  label="Facebook"
-                  placeholder="your.facebook.profile"
-                />
-
-                <FormInput
-                  control={form.control}
-                  name="contactList.line"
-                  label="LINE ID"
-                  placeholder="your_line_id"
-                />
-
-                <FormInput
-                  control={form.control}
-                  name="contactList.discord"
-                  label="Discord"
-                  placeholder="username#1234"
-                />
-              </div>
-            </div>
-
-            {/* 標籤與興趣區塊 */}
-            <div className="space-y-6">
-              <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
-                標籤與興趣
-              </h3>
-
-              <div className="space-y-6">
-                {/* 技能標籤 */}
-                <FormMultipleSelector
-                  control={form.control}
-                  name="tagList"
-                  label="技能標籤"
-                  placeholder="選擇或新增技能標籤..."
-                  defaultOptions={commonTags}
-                  creatable
-                  maxSelected={10}
-                />
-
-                {/* 興趣領域 */}
-                <FormMultipleSelector
-                  control={form.control}
-                  name="interestList"
-                  label="興趣領域"
-                  placeholder="選擇或新增興趣領域..."
-                  defaultOptions={INTEREST_AREAS}
-                  creatable
-                  maxSelected={8}
-                  valueToOption={(value, options) => ({
-                    value,
-                    label: options?.find(opt => opt.value === value)?.label || value,
-                  })}
-                />
-
-                {/* 想要學習的內容 */}
-                <FormMultipleSelector
-                  control={form.control}
-                  name="wantToDoList"
-                  label="想要學習的內容"
-                  placeholder="新增想要學習的內容..."
-                  creatable
-                  maxSelected={10}
-                />
-
-                {/* 角色身份 */}
-                <FormMultipleSelector
-                  control={form.control}
-                  name="roleList"
-                  label="角色身份"
-                  placeholder="選擇或新增角色身份..."
-                  defaultOptions={ROLE_OPTIONS}
-                  creatable
-                  maxSelected={5}
-                />
-
-                {/* 專業領域 */}
-                <FormMultipleSelector
-                  control={form.control}
-                  name="professionalField"
-                  label="專業領域"
-                  placeholder="選擇專業領域..."
-                  defaultOptions={EXPERTISE_AREAS}
-                  maxSelected={10}
-                  valueToOption={(value, options) => ({
-                    value,
-                    label: options?.find(opt => opt.value === value)?.label || value,
-                  })}
-                />
-              </div>
-            </div>
-
-            {/* 隱私設定區塊 */}
-            <div className="space-y-6">
-              <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
-                隱私設定
-              </h3>
-
-              <div className="space-y-4">
-                <FormCheckbox
-                  control={form.control}
-                  name="isOpenLocation"
-                  label="公開地區資訊"
-                />
-
-                <FormCheckbox
-                  control={form.control}
-                  name="isOpenProfile"
-                  label="公開個人資料"
-                />
-
-                <FormCheckbox
-                  control={form.control}
-                  name="isSubscribeEmail"
-                  label="訂閱電子報"
-                />
-              </div>
-            </div>
-
-            {/* 其他資訊區塊 */}
-            <div className="space-y-6">
-              <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
-                其他資訊
-              </h3>
-
+              {/* 所在地區 */}
               <FormSelect
                 control={form.control}
-                name="referralSource"
-                label="推薦來源"
-                placeholder="您是如何得知我們的？"
-                options={REFERRAL_SOURCES}
+                name="location"
+                label="所在地區"
+                placeholder="請選擇所在地區"
+                options={AREA_OPTIONS.map(
+                  (option: { value: string; label: TranslationKeys }) => ({
+                    value: option.value,
+                    label: t(option.label),
+                  })
+                )}
               />
             </div>
-          </form>
-        </Form>
-      </div>
-    </Paper>
+          </div>
+
+          {/* 自我介紹區塊 */}
+          <div className="space-y-6">
+            <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
+              自我介紹
+            </h3>
+
+            <FormTextarea
+              control={form.control}
+              name="selfIntroduction"
+              label="自我介紹"
+              placeholder="分享你的學習經歷、興趣或專業背景..."
+              className="min-h-32"
+            />
+
+            <FormTextarea
+              control={form.control}
+              name="share"
+              label="可以和夥伴分享的事物"
+              placeholder="分享你可以提供給其他學習夥伴的資源、經驗或協助..."
+              className="min-h-32"
+            />
+          </div>
+
+          {/* 聯絡方式區塊 */}
+          <div className="space-y-6">
+            <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
+              聯絡方式
+            </h3>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <FormInput
+                control={form.control}
+                name="contactList.instagram"
+                label="Instagram"
+                placeholder="your_instagram_handle"
+              />
+
+              <FormInput
+                control={form.control}
+                name="contactList.facebook"
+                label="Facebook"
+                placeholder="your.facebook.profile"
+              />
+
+              <FormInput
+                control={form.control}
+                name="contactList.line"
+                label="LINE ID"
+                placeholder="your_line_id"
+              />
+
+              <FormInput
+                control={form.control}
+                name="contactList.discord"
+                label="Discord"
+                placeholder="username#1234"
+              />
+            </div>
+          </div>
+
+          {/* 標籤與興趣區塊 */}
+          <div className="space-y-6">
+            <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
+              標籤與興趣
+            </h3>
+
+            <div className="space-y-6">
+              {/* 技能標籤 */}
+              <FormMultipleSelector
+                control={form.control}
+                name="tagList"
+                label="技能標籤"
+                placeholder="選擇或新增技能標籤..."
+                defaultOptions={commonTags}
+                creatable
+                maxSelected={10}
+              />
+
+              {/* 興趣領域 */}
+              <FormMultipleSelector
+                control={form.control}
+                name="interestList"
+                label="興趣領域"
+                placeholder="選擇或新增興趣領域..."
+                defaultOptions={INTEREST_AREAS}
+                maxSelected={8}
+              />
+
+              {/* 想和夥伴一起 */}
+              <FormMultipleSelector
+                control={form.control}
+                name="wantToDoList"
+                label="想和夥伴一起"
+                placeholder="選擇想和夥伴一起..."
+                defaultOptions={WANT_TO_DO_WITH_PARTNER}
+              />
+
+              {/* 角色身份 */}
+              <FormMultipleSelector
+                control={form.control}
+                name="roleList"
+                label="角色身份"
+                placeholder="選擇或新增角色身份..."
+                defaultOptions={ROLE_OPTIONS}
+              />
+
+              {/* 專業領域 */}
+              <FormMultipleSelector
+                control={form.control}
+                name="professionalField"
+                label="專業領域"
+                placeholder="選擇專業領域..."
+                defaultOptions={EXPERTISE_AREAS}
+                maxSelected={10}
+              />
+            </div>
+          </div>
+
+          {/* 隱私設定區塊 */}
+          <div className="space-y-6">
+            <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
+              隱私設定
+            </h3>
+
+            <div className="space-y-4">
+              <FormCheckbox
+                control={form.control}
+                name="isOpenLocation"
+                label="公開地區資訊"
+              />
+
+              <FormCheckbox
+                control={form.control}
+                name="isOpenProfile"
+                label="公開個人資料"
+              />
+
+              <FormCheckbox
+                control={form.control}
+                name="isSubscribeEmail"
+                label="訂閱電子報"
+              />
+            </div>
+          </div>
+
+          {/* 其他資訊區塊 */}
+          <div className="space-y-6">
+            <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
+              其他資訊
+            </h3>
+
+            <FormSelect
+              control={form.control}
+              name="referralSource"
+              label="推薦來源"
+              placeholder="您是如何得知我們的？"
+              options={REFERRAL_SOURCES}
+            />
+          </div>
+        </form>
+      </Form>
+    </UserProfileEditorLayout>
   );
 };

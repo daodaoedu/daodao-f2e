@@ -93,3 +93,12 @@ export const REFERRAL_SOURCES: OptionProps[] = [
   { value: 'friend_referral', label: '朋友介紹' },
   { value: 'other', label: '其他' },
 ];
+
+export const WANT_TO_DO_WITH_PARTNER: OptionProps[] = [
+  { value: 'interaction', label: '學習交流' },  
+  { value: 'do_project',label: '做專案/競賽' },
+  { value: 'make_group_class',label: '自組課程' },
+  { value: 'find_group',label: '找揪團' },
+  { value: 'find_teacher',label: '找老師' },
+  { value: 'find_student',label: '找學生' },
+];

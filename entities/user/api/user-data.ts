@@ -25,6 +25,7 @@ export const getUserData = async (type: UserIdentifierType, id: string) => {
  * 統一的用戶資料 SWR Key 獲取函數
  */
 export const getUserDataKey = (type: UserIdentifierType, id: string) => {
+  
   switch (type) {
     case 'userId':
       return getGetApiV1UsersIdKey(id);

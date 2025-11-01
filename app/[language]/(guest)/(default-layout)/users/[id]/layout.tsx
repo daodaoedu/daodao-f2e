@@ -15,7 +15,7 @@ export default async function UsersLayout({
     notFound();
   }
 
-  const swrKey = getUserDataKey(type, id);
+  const swrKey = getUserDataKey(type, actualId);
 
   return (
     <SWRConfig

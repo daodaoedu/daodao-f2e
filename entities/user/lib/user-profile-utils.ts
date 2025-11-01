@@ -1,4 +1,4 @@
-import type { UserIdentifierType } from '../model/user-profile';
+import type { UserIdentifierType } from '../api/user-data';
 
 /**
  * 解析用戶 ID，支持 @ 前綴的 customId 和普通的 userId

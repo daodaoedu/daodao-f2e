@@ -108,8 +108,11 @@ export const handleFormError = <T extends Record<string, unknown>>(
   // 處理 ApiError 且有詳細錯誤資訊
   if (error instanceof ApiError && Array.isArray(error.data?.details)) {
     const details = error.data.details as ApiErrorDetail[];
+    const firstDetail = details[0];
 
-    if (form) {
+    if (form && firstDetail) {
+      form.clearErrors();
+      form.setFocus(firstDetail.path as Path<T>);
       details.forEach(({ path, message }) => {
         if (path && message) {
           form.setError(path as Path<T>, { message });
@@ -117,8 +120,8 @@ export const handleFormError = <T extends Record<string, unknown>>(
       });
     }
 
-    if (showToast && details.length > 0) {
-      toast.error(details[0].message);
+    if (showToast && firstDetail) {
+      toast.error(firstDetail.message);
     }
 
     return;

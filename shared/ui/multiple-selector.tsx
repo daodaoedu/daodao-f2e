@@ -718,6 +718,7 @@ const FormMultipleSelector = <
         {label && <FormLabel required={required}>{label}</FormLabel>}
         <FormControl>
           <MultipleSelector
+            ref={field.ref}
             value={
               Array.isArray(field.value)
                 ? field.value.map((val: string) =>
