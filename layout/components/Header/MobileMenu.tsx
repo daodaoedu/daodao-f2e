@@ -5,7 +5,7 @@ import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
 import { useSession, useSessionActions } from '@/entities/session';
 import { getManageSidebarItems } from '@/layout/features/getManageLayout';
 import Collapse from '@/shared/components/Collapse';
-import Button from '@/shared/components/Button';
+import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/cn';
 import { usePromotion } from '@/contexts/Promotion';
 import { Image } from '@/shared/ui/image';
