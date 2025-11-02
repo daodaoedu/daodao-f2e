@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useIdea , useIdeaActions } from '@/features/ideas/hooks';
 import { BackButton } from '@/shared/ui/back-button';
-import CommentSection from '@/shared/components/Comment/CommentSection';
+import { LazyCommentSection } from '@/features/comment';
 import { CommentType } from '@/services/comments';
 import type { IdeaResourceSchema } from '@/services/ideas';
 import { IdeaHeader } from './IdeaHeader';
@@ -91,7 +91,7 @@ export function IdeaDetailWidget({ ideaId }: IdeaDetailWidgetProps) {
         {/* 評論區塊 - 編輯時隱藏 */}
         {!isEditing && (
           <div className="mt-6 bg-basic-white rounded-2xl p-4 md:p-8 lg:p-10">
-            <CommentSection targetId={idea.id} targetType={CommentType.Idea} hideVisibilityToggle hideCommentCount />
+            <LazyCommentSection targetId={idea.id} targetType={CommentType.Idea} hideVisibilityToggle hideCommentCount />
           </div>
         )}
       </div>

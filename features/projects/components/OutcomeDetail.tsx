@@ -2,7 +2,6 @@ import { Image } from '@/shared/ui/image';
 import { PostDetailCard } from '@/entities/post';
 import { ProjectOutcomeSchema } from '@/services/projects';
 import { BaseUserSchema } from '@/services/users';
-import { CommentType } from '@/services/comments';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 import { useAuth } from '@/entities/user';
 
@@ -10,6 +9,7 @@ interface OutcomeDetailProps {
   data?: ProjectOutcomeSchema;
   authorUser?: BaseUserSchema;
   className?: string;
+  commentSection?: React.ReactNode;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
 }
@@ -18,6 +18,7 @@ function OutcomeDetail({
   data,
   authorUser,
   className,
+  commentSection,
   onEditClick,
   onDeleteClick,
 }: OutcomeDetailProps) {
@@ -27,7 +28,7 @@ function OutcomeDetail({
   return (
     <PostDetailCard
       data={data}
-      targetType={CommentType.Outcome}
+      commentSection={commentSection}
       authorUser={authorUser}
       className={className}
       tag="成果"

@@ -6,11 +6,13 @@ import ResourceReviewCard from './ResourceReviewCard';
 
 interface ResourceReviewListProps {
   resource: ResourceDetailResponseSchema['data'];
+  commentSection: React.ReactNode;
   onCreateReview: () => void;
 }
 
 export default function ResourceReviewList({
   resource,
+  commentSection,
   onCreateReview,
 }: ResourceReviewListProps) {
   return (
@@ -18,7 +20,11 @@ export default function ResourceReviewList({
       {resource.recentReviews && resource.recentReviews.length > 0 ? (
         <div className="w-full space-y-10">
           {resource.recentReviews.map((review) => (
-            <ResourceReviewCard key={review.id} review={review} />
+            <ResourceReviewCard
+              key={review.id}
+              review={review}
+              commentSection={commentSection}
+            />
           ))}
         </div>
       ) : (

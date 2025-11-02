@@ -3,6 +3,8 @@ import { getAdminProjectLayout } from '@/layout/features/getProjectLayout';
 import ReviewDetail from '@/features/projects/components/ReviewDetail';
 import { useProjectReview } from '@/features/projects/hooks/review';
 import { parseToNumber, parseToString } from '@/shared/lib/helper';
+import { LazyCommentSection } from '@/features/comment';
+import { CommentType } from '@/services/comments';
 
 const ReviewPage = () => {
   const searchParams = useSearchParams();
@@ -17,7 +19,7 @@ const ReviewPage = () => {
     return null;
   }
 
-  return <ReviewDetail data={review} />;
+  return <ReviewDetail data={review} commentSection={<LazyCommentSection targetId={reviewId} targetType={CommentType.Review} />} />;
 };
 
 ReviewPage.getLayout = getAdminProjectLayout;

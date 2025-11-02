@@ -3,7 +3,7 @@ import { useComments, CommentType } from '@/services/comments';
 import CommentInput from './CommentInput';
 import CommentCard from './CommentCard';
 
-interface CommentSectionProps {
+export interface CommentSectionProps {
   targetId: string | number;
   targetType: CommentType;
   hideVisibilityToggle?: boolean;

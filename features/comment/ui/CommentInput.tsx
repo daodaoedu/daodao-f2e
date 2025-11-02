@@ -6,7 +6,7 @@ import { useAuth, useAuthActions } from '@/entities/user';
 import { cn } from '@/shared/lib/cn';
 import { CommentVisibility } from '@/services/comments';
 import { Button } from '@/shared/ui/button';
-import Textarea from '../Textarea';
+import Textarea from '../../../shared/components/Textarea';
 
 export interface CommentData {
   id: number;

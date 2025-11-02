@@ -22,13 +22,12 @@ import { Button } from '@/shared/ui/button';
 import { BackButton } from '@/shared/ui/back-button';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { Progress } from '@/shared/ui/progress';
-import CommentSection from '@/shared/components/Comment/CommentSection';
-import { CommentType } from '@/services/comments';
 import TagList from '../Shared/TagList';
 
 interface MainDashboardProps {
   practice: Practice;
   currentUserId?: string;
+  commentSection: React.ReactNode;
   onCheckIn: () => void;
   onBack: () => void;
 }
@@ -36,6 +35,7 @@ interface MainDashboardProps {
 const MainDashboard: React.FC<MainDashboardProps> = ({
   practice,
   currentUserId,
+  commentSection,
   onCheckIn,
   onBack,
 }) => {
@@ -413,12 +413,7 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
 
         {/* 留言區域 - 獨立卡片 */}
         <div className="mt-6 rounded-2xl bg-basic-white p-4 md:p-8 lg:p-10">
-          <CommentSection
-            targetId={practice.id}
-            targetType={CommentType.Practice}
-            hideVisibilityToggle
-            hideCommentCount
-          />
+          {commentSection}
         </div>
       </div>
     </div>

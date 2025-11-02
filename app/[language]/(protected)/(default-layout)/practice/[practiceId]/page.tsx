@@ -6,6 +6,8 @@ import { useAuth } from '@/entities/user';
 import DashboardFlow from '@/features/practice/components/Dashboard/DashboardFlow';
 import { Button } from '@/shared/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { LazyCommentSection } from '@/features/comment';
+import { CommentType } from '@/services/comments';
 
 const PracticeDetailPage = () => {
   const router = useRouter();
@@ -46,6 +48,12 @@ const PracticeDetailPage = () => {
     <DashboardFlow
       practice={practice}
       currentUserId={user?.id}
+      commentSection={
+        <LazyCommentSection
+          targetId={practice.id}
+          targetType={CommentType.Practice}
+        />
+      }
       onBack={() => router.back()}
       onDataUpdate={() => mutate()}
     />

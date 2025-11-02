@@ -4,6 +4,8 @@ import { getAdminProjectLayout } from "@/layout/features/getProjectLayout";
 import { useProject } from "@/services/projects";
 import { useProjectOutcome } from "@/features/projects/hooks/outcome";
 import { parseToNumber, parseToString } from "@/shared/lib/helper";
+import { LazyCommentSection } from "@/features/comment";
+import { CommentType } from "@/services/comments";
 
 const OutcomeDetailPage = () => {
   const searchParams = useSearchParams();
@@ -21,7 +23,7 @@ const OutcomeDetailPage = () => {
 
   return (
     <div className="bg-basic-white rounded-2xl">
-      <OutcomeDetail data={outcome} authorUser={project?.user} />
+      <OutcomeDetail data={outcome} authorUser={project?.user} commentSection={<LazyCommentSection targetId={outcomeId} targetType={CommentType.Outcome} />} />
     </div>
   );
 };

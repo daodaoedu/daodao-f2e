@@ -13,6 +13,7 @@ import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
 interface DashboardFlowProps {
   practice: Practice;
   currentUserId?: string;
+  commentSection: React.ReactNode;
   onBack: () => void;
   onDataUpdate?: () => void;
 }
@@ -20,6 +21,7 @@ interface DashboardFlowProps {
 const DashboardFlow: React.FC<DashboardFlowProps> = ({
   practice,
   currentUserId,
+  commentSection,
   onBack,
   onDataUpdate,
 }) => {
@@ -117,6 +119,7 @@ const DashboardFlow: React.FC<DashboardFlowProps> = ({
           <MainDashboard
             practice={practice}
             currentUserId={currentUserId}
+            commentSection={commentSection}
             onCheckIn={() => handleViewChange('checkin')}
             onBack={onBack}
           />

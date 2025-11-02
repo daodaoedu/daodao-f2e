@@ -2,8 +2,6 @@ import { format } from 'date-fns';
 import { Button } from '@/shared/ui/button';
 import { numberToChineseNumber } from '@/shared/lib/number';
 import { BaseUserSchema } from '@/services/users';
-import CommentSection from '@/shared/components/Comment/CommentSection';
-import { CommentType } from '@/services/comments';
 import { PostCard } from './post-card';
 
 export interface BasePostDetailData {
@@ -15,13 +13,12 @@ export interface BasePostDetailData {
 
 interface BasePostDetailCardProps<T extends BasePostDetailData> {
   data?: T;
-  /** 留言類型，不傳則不顯示留言功能 */
-  targetType?: CommentType;
   /** 作者資訊，不傳則不顯示編輯、刪除功能 */
   authorUser?: BaseUserSchema;
   className?: string;
   isOwner?: boolean;
   tag: string;
+  commentSection?: React.ReactNode;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
   renderContent: (data: T) => React.ReactNode;
@@ -29,7 +26,6 @@ interface BasePostDetailCardProps<T extends BasePostDetailData> {
 
 function PostDetailCard<T extends BasePostDetailData>({
   data,
-  targetType,
   authorUser,
   className,
   tag,
@@ -37,47 +33,49 @@ function PostDetailCard<T extends BasePostDetailData>({
   onEditClick,
   onDeleteClick,
   renderContent,
+  commentSection,
 }: BasePostDetailCardProps<T>) {
   const dropdownItems = isOwner
     ? [
-      {
-        key: 'edit',
-        children: (
-          <Button
-            size="sm"
-            variant="ghost"
-            className="hover:bg-primary-lightest"
-            onClick={onEditClick}
-          >
-            編輯
-          </Button>
-        ),
-      },
-      {
-        key: 'delete',
-        children: (
-          <Button
-            size="sm"
-            variant="ghost"
-            className="hover:bg-primary-lightest"
-            onClick={onDeleteClick}
-          >
-            刪除
-          </Button>
-        ),
-      },
-    ]
+        {
+          key: 'edit',
+          children: (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="hover:bg-primary-lightest"
+              onClick={onEditClick}
+            >
+              編輯
+            </Button>
+          ),
+        },
+        {
+          key: 'delete',
+          children: (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="hover:bg-primary-lightest"
+              onClick={onDeleteClick}
+            >
+              刪除
+            </Button>
+          ),
+        },
+      ]
     : [
-      {
-        key: 'report',
-        children: '檢舉',
-        onClick: () => window.open(
-          'https://forms.gle/NkVbDWC3eXk4P4gv7',
-          '_blank',
-          'noopener'
-        ),
-      },
-    ];
+        {
+          key: 'report',
+          children: '檢舉',
+          onClick: () =>
+            window.open(
+              'https://forms.gle/NkVbDWC3eXk4P4gv7',
+              '_blank',
+              'noopener'
+            ),
+        },
+      ];
 
   if (!data) return null;
 
@@ -85,7 +83,11 @@ function PostDetailCard<T extends BasePostDetailData>({
     <PostCard className={className}>
       <PostCard.Header
         title={data.title}
-        subtitle={data.week !== undefined ? `第${numberToChineseNumber(data.week)}週` : ''}
+        subtitle={
+          data.week !== undefined
+            ? `第${numberToChineseNumber(data.week)}週`
+            : ''
+        }
         tag={tag}
         date={data.date ? format(new Date(data.date), 'yyyy/MM/dd') : undefined}
         dropdownItems={dropdownItems}
@@ -93,9 +95,7 @@ function PostDetailCard<T extends BasePostDetailData>({
       {renderContent(data)}
       <hr className="mb-4 h-px bg-basic-100" />
       <PostCard.Reward userName={authorUser?.name} />
-      {targetType && (
-        <CommentSection targetId={data.id} targetType={targetType} />
-      )}
+      {commentSection}
     </PostCard>
   );
 }

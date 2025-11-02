@@ -8,6 +8,8 @@ import { ReviewDeleteModal, ReviewUpdateModal } from "@/features/projects";
 import { useProject } from "@/services/projects";
 import { useProjectReview } from "@/features/projects/hooks/review";
 import { parseToNumber, parseToString } from "@/shared/lib/helper";
+import { LazyCommentSection } from "@/features/comment";
+import { CommentType } from "@/services/comments";
 
 enum ModalTypeEnum {
   Update,
@@ -53,6 +55,7 @@ const ReviewPage = () => {
       <ReviewDetail
         data={review}
         authorUser={project?.user}
+        commentSection={<LazyCommentSection targetId={reviewId} targetType={CommentType.Review} />}
         onEditClick={() => setModalType(ModalTypeEnum.Update)}
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
       />

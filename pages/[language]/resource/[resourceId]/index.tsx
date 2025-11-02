@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import useQueryState from "@/shared/lib/use-query-state";
 import SEOConfig from "@/components/SEOConfig";
-// import { CommentType } from "@/services/comments";
+import { CommentType } from "@/services/comments";
 import { resourceAPI } from "@/services/resources/core/api";
 import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
 import {
@@ -18,7 +18,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { Separator } from "@/shared/ui/separator";
 import NotExist from "@/shared/components/NotExist";
-// import CommentSection from "@/shared/components/Comment/CommentSection";
+import { LazyCommentSection } from "@/features/comment";
 import { Container } from "@/shared/ui/wrapper";
 import { parseToString } from "@/shared/lib/helper";
 import {
@@ -150,6 +150,12 @@ export default function ResourceDetailPage({
             <TabsContent value={TabEnum.Reviews}>
               <ResourceReviewList
                 resource={data}
+                commentSection={
+                  <LazyCommentSection
+                    targetId={data.id}
+                    targetType={CommentType.ResourceReview}
+                  />
+                }
                 onCreateReview={() => {
                   router.push(`/resource/${data.id}/reviews/create`);
                 }}

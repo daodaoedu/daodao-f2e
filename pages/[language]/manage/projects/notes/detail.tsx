@@ -11,6 +11,8 @@ import {
 } from "@/services/projects";
 import { parseToNumber, parseToString } from "@/shared/lib/helper";
 import ConfirmModal from "@/shared/components/Confirm";
+import { LazyCommentSection } from "@/features/comment";
+import { CommentType } from "@/services/comments";
 
 enum ModalTypeEnum {
   Update,
@@ -63,6 +65,7 @@ const NoteDetailPage = () => {
       <NoteDetail
         data={note}
         authorUser={project?.user}
+        commentSection={<LazyCommentSection targetId={noteId} targetType={CommentType.Note} />}
         onEditClick={() => setModalType(ModalTypeEnum.Update)}
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
       />

@@ -8,6 +8,8 @@ import { useProject } from "@/services/projects";
 import { useProjectOutcome } from "@/features/projects/hooks/outcome";
 import { parseToNumber, parseToString } from "@/shared/lib/helper";
 import { OutcomeDeleteModal, OutcomeUpdateModal } from "@/features/projects";
+import { LazyCommentSection } from "@/features/comment";
+import { CommentType } from "@/services/comments";
 
 enum ModalTypeEnum {
   Update,
@@ -51,6 +53,7 @@ const OutcomeDetailPage = () => {
       <OutcomeDetail
         data={outcome}
         authorUser={project?.user}
+        commentSection={<LazyCommentSection targetId={outcomeId} targetType={CommentType.Outcome} />}
         onEditClick={() => setModalType(ModalTypeEnum.Update)}
         onDeleteClick={() => setModalType(ModalTypeEnum.Delete)}
       />
