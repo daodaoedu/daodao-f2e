@@ -135,11 +135,11 @@ export const UserProfileEditor = ({
       selfIntroduction: initialData?.selfIntroduction || '',
       location: initialData?.location || '',
       contactList: {
-        website: initialData?.contactList?.website || '',
+        // website: initialData?.contactList?.website || '',
         facebook: initialData?.contactList?.facebook || '',
         instagram: initialData?.contactList?.instagram || '',
-        linkedin: initialData?.contactList?.linkedin || '',
-        github: initialData?.contactList?.github || '',
+        // linkedin: initialData?.contactList?.linkedin || '',
+        // github: initialData?.contactList?.github || '',
         discord: initialData?.contactList?.discord || '',
       },
     },
@@ -259,12 +259,12 @@ export const UserProfileEditor = ({
                 placeholder="your.facebook.profile"
               />
 
-              <FormInput
+              {/* <FormInput
                 control={form.control}
                 name="contactList.line"
                 label="LINE ID"
                 placeholder="your_line_id"
-              />
+              /> */}
 
               <FormInput
                 control={form.control}
