@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { Button } from '@/shared/ui/button';
-import PostCard from '@/shared/components/Post/PostCard';
 import { numberToChineseNumber } from '@/shared/lib/number';
+import { PostCard } from './post-card';
 
 export interface BasePostData {
   title: string;
@@ -72,4 +72,4 @@ function PostPreviewCard<T extends BasePostData>({
   );
 }
 
-export default PostPreviewCard;
+export { PostPreviewCard };

@@ -254,4 +254,4 @@ PostCard.Header = PostCardHeader;
 PostCard.Footer = PostCardFooter;
 PostCard.Reward = PostCardReward;
 
-export default PostCard;
+export { PostCard };

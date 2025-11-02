@@ -1,9 +1,10 @@
 import { Image } from '@/shared/ui/image';
-import PostDetailCard from '@/shared/components/Post/PostDetailCard';
+import { PostDetailCard } from '@/entities/post';
 import { ProjectNoteSchema } from '@/services/projects';
 import { BaseUserSchema } from '@/services/users';
 import { CommentType } from '@/services/comments';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
+import { useSession } from '@/entities/session';
 
 interface NoteDetailProps {
   data?: ProjectNoteSchema;
@@ -20,6 +21,9 @@ function NoteDetail({
   onEditClick,
   onDeleteClick,
 }: NoteDetailProps) {
+  const { user } = useSession();
+  const isOwner = user?.id === authorUser?.id;
+
   return (
     <PostDetailCard
       data={data}
@@ -27,6 +31,7 @@ function NoteDetail({
       authorUser={authorUser}
       className={className}
       tag="便利貼"
+      isOwner={isOwner}
       onEditClick={onEditClick}
       onDeleteClick={onDeleteClick}
       renderContent={(noteData) => (

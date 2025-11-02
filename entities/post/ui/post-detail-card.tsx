@@ -1,11 +1,10 @@
 import { format } from 'date-fns';
-import PostCard from '@/shared/components/Post/PostCard';
 import { Button } from '@/shared/ui/button';
 import { numberToChineseNumber } from '@/shared/lib/number';
 import { BaseUserSchema } from '@/services/users';
-import { useSession } from '@/entities/session';
 import CommentSection from '@/shared/components/Comment/CommentSection';
 import { CommentType } from '@/services/comments';
+import { PostCard } from './post-card';
 
 export interface BasePostDetailData {
   id: number;
@@ -21,6 +20,7 @@ interface BasePostDetailCardProps<T extends BasePostDetailData> {
   /** 作者資訊，不傳則不顯示編輯、刪除功能 */
   authorUser?: BaseUserSchema;
   className?: string;
+  isOwner?: boolean;
   tag: string;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
@@ -33,14 +33,12 @@ function PostDetailCard<T extends BasePostDetailData>({
   authorUser,
   className,
   tag,
+  isOwner,
   onEditClick,
   onDeleteClick,
   renderContent,
 }: BasePostDetailCardProps<T>) {
-  const { user } = useSession();
-  const isSelf = user?.id === authorUser?.id;
-
-  const dropdownItems = isSelf
+  const dropdownItems = isOwner
     ? [
       {
         key: 'edit',
@@ -102,4 +100,4 @@ function PostDetailCard<T extends BasePostDetailData>({
   );
 }
 
-export default PostDetailCard;
+export { PostDetailCard };

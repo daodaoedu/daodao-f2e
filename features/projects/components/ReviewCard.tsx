@@ -1,6 +1,6 @@
 import { MOOD_OPTIONS } from '@/constants/project';
 import { ProjectReviewSchema } from '@/services/projects';
-import PostPreviewCard, { BasePostData } from '@/shared/components/Post/PostPreviewCard';
+import { PostPreviewCard, BasePostData } from '@/entities/post';
 import {
   Smile, Heart, Zap, Moon, CloudRain,
 } from 'lucide-react';

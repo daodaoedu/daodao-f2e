@@ -1,10 +1,9 @@
-import PostDetailCard, {
-  BasePostDetailData,
-} from '@/shared/components/Post/PostDetailCard';
+import { PostDetailCard, BasePostDetailData } from '@/entities/post';
 import { ProjectReviewSchema } from '@/services/projects';
 import { BaseUserSchema } from '@/services/users';
 import { CommentType } from '@/services/comments';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
+import { useSession } from '@/entities/session';
 import RadioGroup from './ReviewRadioGroup';
 
 interface ReviewDetailProps {
@@ -20,6 +19,9 @@ function ReviewDetail({
   onEditClick,
   onDeleteClick,
 }: ReviewDetailProps) {
+  const { user } = useSession();
+  const isOwner = user?.id === authorUser?.id;
+
   if (!data) return null;
 
   const postData: BasePostDetailData = {
@@ -35,6 +37,7 @@ function ReviewDetail({
       targetType={CommentType.Review}
       tag="覆盤"
       authorUser={authorUser}
+      isOwner={isOwner}
       onEditClick={onEditClick}
       onDeleteClick={onDeleteClick}
       renderContent={() => (
