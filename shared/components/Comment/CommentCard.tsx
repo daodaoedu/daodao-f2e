@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { LockKeyholeOpen, LockKeyhole, EllipsisVertical } from 'lucide-react';
-import { useSession } from '@/entities/session';
+import { useAuth } from '@/entities/user';
 import { Image } from '@/shared/ui/image';
 import { ROLE } from '@/constants/member';
 import { timeDuration } from '@/shared/lib/date';
@@ -40,7 +40,7 @@ function CommentCard({
   onDelete,
   hideVisibilityToggle = false,
 }: CommentCardProps) {
-  const { user } = useSession();
+  const { user } = useAuth();
   const [isShowCommentInput, setIsShowCommentInput] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const role = ROLE.find((r) => r.value === commentUser?.roleList?.[0])?.label;

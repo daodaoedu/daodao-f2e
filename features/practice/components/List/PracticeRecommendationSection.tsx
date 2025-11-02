@@ -8,7 +8,7 @@ import {
   Card, CardContent, CardHeader, CardTitle,
 } from '@/shared/ui/card';
 import { useContentTypeRecommendations } from '@/services/recommendation';
-import { useSession } from '@/entities/session';
+import { useAuth } from '@/entities/user';
 import type { Practice } from '@/services/practice/schema';
 import { type RecommendationItem } from '@/services/recommendation/core/schema';
 import PracticeCard from './PracticeCard';
@@ -24,7 +24,7 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
   limit = 5,
   showHeader = true,
 }) => {
-  const { user } = useSession();
+  const { user } = useAuth();
   const router = useRouter();
 
   // Use recommendation service to get practice-specific recommendations

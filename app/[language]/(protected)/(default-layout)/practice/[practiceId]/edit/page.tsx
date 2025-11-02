@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { usePractice } from '@/services/practice/hooks';
-import { useSession } from '@/entities/session/model/context';
+import { useAuth } from '@/entities/user';
 import { practiceAPI } from '@/services/practice/api';
 import { Practice, UpdatePracticeInput } from '@/services/practice/schema';
 import EditForm from '@/features/practice/components/Edit/EditForm';
@@ -15,7 +15,7 @@ const PracticeEditPage = () => {
   const router = useRouter();
   const params = useParams();
   const practiceId = params?.practiceId as string;
-  const { user } = useSession();
+  const { user } = useAuth();
 
   const { practice, isLoading, error, mutate } = usePractice(practiceId || null);
   const [formData, setFormData] = useState<Partial<Practice>>({});

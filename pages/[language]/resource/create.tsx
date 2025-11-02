@@ -14,7 +14,7 @@ import { Background, Container, Paper } from "@/shared/ui/wrapper";
 import { BackButton } from "@/shared/ui/back-button";
 import { Title } from "@/shared/ui/typography";
 import { Progress } from "@/shared/ui/progress";
-import { ProtectedComponent } from "@/features/auth";
+import { ProtectedComponent } from "@/entities/user";
 import {
   ResourceBasicInfoFields,
   ResourceCategorizationFields,

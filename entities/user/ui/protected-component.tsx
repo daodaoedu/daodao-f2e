@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
 import { Button } from '@/shared/ui/button';
-import { useSession, useSessionActions } from '@/entities/session';
+import { useAuth, useAuthActions } from '@/entities/user';
 import { IslandPlaceholder } from '@/shared/ui/island-placeholder';
 
 enum AuthorizationStatus {
@@ -58,8 +58,8 @@ export function ProtectedComponent({
   checkUserAuthorized,
 }: ProtectedComponentProps) {
   const router = useRouter();
-  const { user, isLoggedIn, token, isLoggingIn } = useSession();
-  const { openLoginModal } = useSessionActions();
+  const { user, isLoggedIn, token, isLoggingIn } = useAuth();
+  const { openLoginModal } = useAuthActions();
   const requiresLogin = onlyCheckToken ? !token : !isLoggedIn;
   const [authorizationState, setAuthorizationState] =
     useState<AuthorizationStatus>(AuthorizationStatus.IDLE);

@@ -2,12 +2,11 @@ import AccessDeniedImg from '@/public/assets/projects/access-denied.png';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/cn';
 import { CustomLink } from '@/shared/ui/custom-link';
-import { getUserProfileBasePath } from '@/entities/user';
-import { useSession } from '@/entities/session';
+import { getUserProfileBasePath , useAuth } from '@/entities/user';
 import useMarathonAccess from '../hooks/useMarathonAccess';
 
 export default function MarathonAccess({ children }: React.PropsWithChildren) {
-  const { user } = useSession();
+  const { user } = useAuth();
   const hasMarathonAccess = useMarathonAccess();
 
   if (hasMarathonAccess) {

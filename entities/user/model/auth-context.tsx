@@ -17,38 +17,38 @@ import {
 } from '@/api/users.client';
 import { ApiError } from '@/shared/api';
 import { onUnauthorized } from '@/shared/lib/auth-bus';
-import { mutateUserData } from '@/widgets/user';
-import { SessionState, SessionActions, SessionActionTypes } from './types';
-import { sessionReducer } from './reducer';
+import { AuthState, AuthActions, AuthActionTypes } from './auth-types';
+import { mutateUserData } from '../lib/mutate-user-data';
+import { authReducer } from './auth-reducer';
 import {
-  createInitialSessionState,
+  createInitialAuthState,
   isPermanentLogin,
   isTemporaryLogin,
-} from './state';
+} from './auth-state';
 
-const SessionContext = createContext<SessionState | null>(null);
-const SessionActionsContext = createContext<SessionActions | null>(null);
+const AuthContext = createContext<AuthState | null>(null);
+const AuthActionsContext = createContext<AuthActions | null>(null);
 
-export const useSession = () => {
-  const context = useContext(SessionContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useSession must be used within an SessionProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
 
-export const useSessionActions = () => {
-  const context = useContext(SessionActionsContext);
+export const useAuthActions = () => {
+  const context = useContext(AuthActionsContext);
   if (!context) {
-    throw new Error('useSessionActions must be used within an SessionProvider');
+    throw new Error('useAuthActions must be used within an AuthProvider');
   }
   return context;
 };
 
-export function SessionProvider({ children }: React.PropsWithChildren) {
+export function AuthProvider({ children }: React.PropsWithChildren) {
   const [state, dispatch] = useReducer(
-    sessionReducer,
-    createInitialSessionState()
+    authReducer,
+    createInitialAuthState()
   );
 
   const { loginStatus, user } = state;
@@ -59,12 +59,12 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
 
   const setToken = useCallback((payload: string) => {
     getTokenStorage().set(payload);
-    dispatch({ type: SessionActionTypes.SET_TOKEN, payload });
+    dispatch({ type: AuthActionTypes.SET_TOKEN, payload });
   }, []);
 
   const logout = useCallback(() => {
     getTokenStorage().remove();
-    dispatch({ type: SessionActionTypes.LOGOUT });
+    dispatch({ type: AuthActionTypes.LOGOUT });
     mutate(() => true, undefined, { revalidate: false });
   }, []);
 
@@ -77,7 +77,7 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
     [logout]
   );
 
-  const updateUser = useCallback<SessionActions['updateUser']>(
+  const updateUser = useCallback<AuthActions['updateUser']>(
     async (input) => {
       try {
         if (isTemporaryLogin(loginStatus, input)) {
@@ -101,23 +101,23 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
     [user, loginStatus, setToken, handleError, triggerPostUser, triggerPutUser]
   );
 
-  const sessionActions = useMemo<SessionActions>(
+  const sessionActions = useMemo<AuthActions>(
     () => ({
       setToken,
       setLoading: (payload) => {
-        dispatch({ type: SessionActionTypes.SET_LOADING, payload });
+        dispatch({ type: AuthActionTypes.SET_LOADING, payload });
       },
       logout,
       login: (payload) => {
-        dispatch({ type: SessionActionTypes.LOGIN, payload });
+        dispatch({ type: AuthActionTypes.LOGIN, payload });
       },
       updateUser,
       openLoginModal: () => {
         logout();
-        dispatch({ type: SessionActionTypes.OPEN_LOGIN_MODAL });
+        dispatch({ type: AuthActionTypes.OPEN_LOGIN_MODAL });
       },
       closeLoginModal: () => {
-        dispatch({ type: SessionActionTypes.CLOSE_LOGIN_MODAL });
+        dispatch({ type: AuthActionTypes.CLOSE_LOGIN_MODAL });
       },
     }),
     [setToken, logout, updateUser]
@@ -145,10 +145,10 @@ export function SessionProvider({ children }: React.PropsWithChildren) {
   }, [sessionActions]);
 
   return (
-    <SessionContext.Provider value={state}>
-      <SessionActionsContext.Provider value={sessionActions}>
+    <AuthContext.Provider value={state}>
+      <AuthActionsContext.Provider value={sessionActions}>
         {children}
-      </SessionActionsContext.Provider>
-    </SessionContext.Provider>
+      </AuthActionsContext.Provider>
+    </AuthContext.Provider>
   );
 }

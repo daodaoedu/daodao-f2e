@@ -13,7 +13,7 @@ import { Button } from '@/shared/ui';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
-import { useSession } from '@/entities/session';
+import { useAuth } from '@/entities/user';
 import type { IdeaSchema } from '@/services/ideas/schema';
 import { IdeaActions } from './IdeaActions';
 
@@ -26,7 +26,7 @@ function IdeaCard({
   idea,
   onClick,
 }: IdeaCardProps) {
-  const { user } = useSession();
+  const { user } = useAuth();
 
   // 檢查是否為想法的作者
   const isOwner = user?.id === idea.user?.id;

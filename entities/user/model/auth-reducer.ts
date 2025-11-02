@@ -1,45 +1,45 @@
 import {
-  SessionState,
-  SessionAction,
-  SessionActionTypes,
-  SessionLoginStatus,
-} from './types';
-import { initialSessionState } from './state';
+  AuthState,
+  AuthAction,
+  AuthActionTypes,
+  AuthLoginStatus,
+} from './auth-types';
+import { initialAuthState } from './auth-state';
 import { checkProfileComplete } from '../lib/check-profile-complete';
 
-export const sessionReducer = (
-  state: SessionState,
-  action: SessionAction
-): SessionState => {
+export const authReducer = (
+  state: AuthState,
+  action: AuthAction
+): AuthState => {
   switch (action.type) {
-    case SessionActionTypes.OPEN_LOGIN_MODAL: {
+    case AuthActionTypes.OPEN_LOGIN_MODAL: {
       return {
-        ...initialSessionState,
+        ...initialAuthState,
         isOpenLoginModal: true,
       };
     }
-    case SessionActionTypes.CLOSE_LOGIN_MODAL: {
+    case AuthActionTypes.CLOSE_LOGIN_MODAL: {
       return {
         ...state,
         isOpenLoginModal: false,
       };
     }
-    case SessionActionTypes.SET_LOADING: {
+    case AuthActionTypes.SET_LOADING: {
       return {
         ...state,
         isLoggingIn: action.payload,
       };
     }
-    case SessionActionTypes.SET_TOKEN: {
+    case AuthActionTypes.SET_TOKEN: {
       return {
         ...state,
         token: action.payload,
       };
     }
-    case SessionActionTypes.UPDATE_USER:
-    case SessionActionTypes.LOGIN: {
+    case AuthActionTypes.UPDATE_USER:
+    case AuthActionTypes.LOGIN: {
       if (!state.token) {
-        return initialSessionState;
+        return initialAuthState;
       }
       if (action.payload) {
         return {
@@ -48,7 +48,7 @@ export const sessionReducer = (
           isLoggedIn: true,
           isTemporary: false,
           user: action.payload,
-          loginStatus: SessionLoginStatus.PERMANENT,
+          loginStatus: AuthLoginStatus.PERMANENT,
         };
       }
       return {
@@ -56,11 +56,11 @@ export const sessionReducer = (
         isLoggedIn: false,
         isTemporary: true,
         user: null,
-        loginStatus: SessionLoginStatus.TEMPORARY,
+        loginStatus: AuthLoginStatus.TEMPORARY,
       };
     }
-    case SessionActionTypes.LOGOUT: {
-      return initialSessionState;
+    case AuthActionTypes.LOGOUT: {
+      return initialAuthState;
     }
     default:
       return state;

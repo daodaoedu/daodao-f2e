@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { parseToString } from '@/shared/lib/helper';
 import { RoleEnum } from '@/services/users';
-import { useSession } from '@/entities/session';
+import { useAuth } from '@/entities/user';
 import { ProjectProvider } from '@/contexts/Project';
 import Sidebar, { SidebarItemType } from '@/layout/components/Sidebar';
 import { useProject } from '@/services/projects';
@@ -92,7 +92,7 @@ function getProjectSidebarItems({
 const useProjectPermission = (type: ProjectType) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { user } = useSession();
+  const { user } = useAuth();
   const projectId = parseToString(searchParams?.get('id'));
   const swr = useProject(projectId);
 

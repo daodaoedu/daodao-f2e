@@ -37,13 +37,12 @@ import { EDUCATION, ROLE } from "@/constants/member";
 import { getOptionLabel, getOptionLabels } from "@/shared/lib/option";
 import { ALL_AREAS, AREAS, TBD_OPTION } from "@/constants/areas";
 import { ACTIVITY_CATEGORIES, CATEGORIES } from "@/constants/category";
-import { useSession } from "@/entities/session";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
 import dynamic from "next/dynamic";
 import { timeDuration } from "@/shared/lib/date";
 import { ContactModal, TargetUserType } from "@/features/email";
-import { getUserProfileBasePath } from "@/entities/user";
+import { getUserProfileBasePath, useAuth } from "@/entities/user";
 
 const MarkdownEditor = dynamic(
   () => import("@/shared/ui/markdown-editor").then(mod => ({ default: mod.MarkdownEditor })),
@@ -79,7 +78,7 @@ export const getServerSideProps = (async (context) => {
 export default function CircleDetailPage({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { user } = useSession();
+  const { user } = useAuth();
   const shareAPI = getShareAPI({
     title: data.title,
     url: `/circles/${data._id}`,

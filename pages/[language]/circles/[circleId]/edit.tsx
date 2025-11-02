@@ -2,13 +2,11 @@ import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/navigation';
 import SEOConfig from '@/components/SEOConfig';
 import { Background, Container } from '@/shared/ui/wrapper';
-import { ProtectedComponent } from '@/features/auth';
 import { CircleForm } from '@/features/circles';
 import { parseToString } from '@/shared/lib/helper';
 import { circleAPI, CircleSchema } from '@/services/circles';
 import { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
-import { getUserProfileBasePath } from '@/entities/user';
-import { useSession } from '@/entities/session';
+import { useAuth, getUserProfileBasePath, ProtectedComponent } from '@/entities/user';
 
 // export const runtime = "experimental-edge";
 
@@ -37,7 +35,7 @@ export default function CircleEditPage({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
-  const { user } = useSession();
+  const { user } = useAuth();
   const basePath = getUserProfileBasePath(user);
 
   const checkUserAuthorized = (

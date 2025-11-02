@@ -3,9 +3,9 @@ import {
   UserValidatorsCreateUserSchema,
   UserValidatorsUpdateUserSchema,
 } from '@/generated/models';
-import { SessionActions, SessionLoginStatus, SessionState } from './types';
+import { AuthActions, AuthLoginStatus, AuthState } from './auth-types';
 
-export const createInitialSessionState = (): SessionState => {
+export const createInitialAuthState = (): AuthState => {
   const token = getTokenStorage().get() ?? null;
   return {
     isComplete: false,
@@ -13,24 +13,24 @@ export const createInitialSessionState = (): SessionState => {
     isLoggingIn: true,
     isTemporary: false,
     isOpenLoginModal: false,
-    loginStatus: SessionLoginStatus.EMPTY,
+    loginStatus: AuthLoginStatus.EMPTY,
     user: null,
     token,
   };
 };
 
-export const initialSessionState = createInitialSessionState();
+export const initialAuthState = createInitialAuthState();
 
 export const isTemporaryLogin = (
-  loginStatus: SessionLoginStatus,
-  input: Parameters<SessionActions['updateUser']>[0]
+  loginStatus: AuthLoginStatus,
+  input: Parameters<AuthActions['updateUser']>[0]
 ): input is UserValidatorsCreateUserSchema => {
-  return loginStatus === SessionLoginStatus.TEMPORARY;
+  return loginStatus === AuthLoginStatus.TEMPORARY;
 };
 
 export const isPermanentLogin = (
-  loginStatus: SessionLoginStatus,
-  input: Parameters<SessionActions['updateUser']>[0]
+  loginStatus: AuthLoginStatus,
+  input: Parameters<AuthActions['updateUser']>[0]
 ): input is UserValidatorsUpdateUserSchema => {
-  return loginStatus === SessionLoginStatus.PERMANENT;
+  return loginStatus === AuthLoginStatus.PERMANENT;
 };

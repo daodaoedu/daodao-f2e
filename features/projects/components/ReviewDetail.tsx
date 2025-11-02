@@ -3,7 +3,7 @@ import { ProjectReviewSchema } from '@/services/projects';
 import { BaseUserSchema } from '@/services/users';
 import { CommentType } from '@/services/comments';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
-import { useSession } from '@/entities/session';
+import { useAuth } from '@/entities/user';
 import RadioGroup from './ReviewRadioGroup';
 
 interface ReviewDetailProps {
@@ -19,7 +19,7 @@ function ReviewDetail({
   onEditClick,
   onDeleteClick,
 }: ReviewDetailProps) {
-  const { user } = useSession();
+  const { user } = useAuth();
   const isOwner = user?.id === authorUser?.id;
 
   if (!data) return null;

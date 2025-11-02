@@ -5,7 +5,7 @@ import {
   UserValidatorsUserSuccessResponseSchemaData,
 } from '@/generated/models';
 
-export enum SessionLoginStatus {
+export enum AuthLoginStatus {
   /** 未登入 */
   EMPTY,
   /** 臨時登入 */
@@ -24,30 +24,30 @@ interface CommonLoginState {
 interface EmptyLoginState extends CommonLoginState {
   isLoggedIn: false;
   isTemporary: false;
-  loginStatus: SessionLoginStatus.EMPTY;
+  loginStatus: AuthLoginStatus.EMPTY;
   user: null;
 }
 
 interface TemporaryLoginState extends CommonLoginState {
   isLoggedIn: false;
   isTemporary: true;
-  loginStatus: SessionLoginStatus.TEMPORARY;
+  loginStatus: AuthLoginStatus.TEMPORARY;
   user: null;
 }
 
 interface PermanentLoginState extends CommonLoginState {
   isLoggedIn: true;
   isTemporary: false;
-  loginStatus: SessionLoginStatus.PERMANENT;
+  loginStatus: AuthLoginStatus.PERMANENT;
   user: UserValidatorsUserSuccessResponseSchemaData;
 }
 
-export type SessionState =
+export type AuthState =
   | EmptyLoginState
   | TemporaryLoginState
   | PermanentLoginState;
 
-export enum SessionActionTypes {
+export enum AuthActionTypes {
   OPEN_LOGIN_MODAL = 'openLoginModal',
   CLOSE_LOGIN_MODAL = 'closeLoginModal',
   SET_TOKEN = 'setToken',
@@ -57,31 +57,31 @@ export enum SessionActionTypes {
   LOGOUT = 'logout',
 }
 
-export type SessionAction =
-  | { type: SessionActionTypes.OPEN_LOGIN_MODAL }
-  | { type: SessionActionTypes.CLOSE_LOGIN_MODAL }
-  | { type: SessionActionTypes.SET_TOKEN; payload: string }
-  | { type: SessionActionTypes.SET_LOADING; payload: boolean }
+export type AuthAction =
+  | { type: AuthActionTypes.OPEN_LOGIN_MODAL }
+  | { type: AuthActionTypes.CLOSE_LOGIN_MODAL }
+  | { type: AuthActionTypes.SET_TOKEN; payload: string }
+  | { type: AuthActionTypes.SET_LOADING; payload: boolean }
   | {
-      type: SessionActionTypes.UPDATE_USER;
+      type: AuthActionTypes.UPDATE_USER;
       payload: UserValidatorsCreateUserResponseSchemaDataUser;
     }
   | {
-      type: SessionActionTypes.LOGIN;
+      type: AuthActionTypes.LOGIN;
       payload: UserValidatorsUserSuccessResponseSchemaData | null;
     }
-  | { type: SessionActionTypes.LOGOUT };
+  | { type: AuthActionTypes.LOGOUT };
 
-export type SessionActions = {
-  [SessionActionTypes.OPEN_LOGIN_MODAL]: () => void;
-  [SessionActionTypes.CLOSE_LOGIN_MODAL]: () => void;
-  [SessionActionTypes.SET_TOKEN]: (payload: string) => void;
-  [SessionActionTypes.SET_LOADING]: (payload: boolean) => void;
-  [SessionActionTypes.UPDATE_USER]: (
+export type AuthActions = {
+  [AuthActionTypes.OPEN_LOGIN_MODAL]: () => void;
+  [AuthActionTypes.CLOSE_LOGIN_MODAL]: () => void;
+  [AuthActionTypes.SET_TOKEN]: (payload: string) => void;
+  [AuthActionTypes.SET_LOADING]: (payload: boolean) => void;
+  [AuthActionTypes.UPDATE_USER]: (
     payload: UserValidatorsCreateUserSchema | UserValidatorsGetUserParamsSchema
   ) => Promise<void>;
-  [SessionActionTypes.LOGIN]: (
+  [AuthActionTypes.LOGIN]: (
     payload: UserValidatorsUserSuccessResponseSchemaData | null
   ) => void;
-  [SessionActionTypes.LOGOUT]: () => void;
+  [AuthActionTypes.LOGOUT]: () => void;
 };

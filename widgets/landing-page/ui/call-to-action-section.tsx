@@ -1,5 +1,5 @@
 import { cn } from '@/shared/lib/cn';
-import { AuthGuardButton } from '@/features/auth';
+import { AuthGuardButton } from '@/entities/user';
 import Image from 'next/image';
 
 interface CTASectionProps {

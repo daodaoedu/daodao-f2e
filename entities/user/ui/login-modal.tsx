@@ -4,13 +4,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
-import { useSession, useSessionActions } from '@/entities/session';
+import { useAuth, useAuthActions } from '@/entities/user';
 import ResponsiveModal from '@/shared/ui/responsive-modal';
 import getEnv from '@/shared/config/env';
 
 export function LoginModal() {
-  const { isOpenLoginModal } = useSession();
-  const { closeLoginModal } = useSessionActions();
+  const { isOpenLoginModal } = useAuth();
+  const { closeLoginModal } = useAuthActions();
   const router = useRouter();
   const pathname = usePathname();
 

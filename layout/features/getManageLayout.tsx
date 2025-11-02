@@ -1,7 +1,7 @@
 import { usePathname } from 'next/navigation';
 import Sidebar, { SidebarItemType } from '@/layout/components/Sidebar';
 import { RoleEnum } from '@/services/users';
-import { useSession } from '@/entities/session';
+import { useAuth } from '@/entities/user';
 import { ProjectProvider } from '@/contexts/Project';
 import { MilestonesProvider } from '@/contexts/Milestones';
 import getPrivateLayout from '../core/getPrivateLayout';
@@ -61,7 +61,7 @@ export const getManageSidebarItems = ({
 
 function ManageLayout({ children }: React.PropsWithChildren) {
   const pathname = usePathname();
-  const { user } = useSession();
+  const { user } = useAuth();
   const role = user?.role;
   const canVisitMentorWorkspace = getCanVisitMentorWorkspace(role);
   const sidebarItems = getManageSidebarItems({

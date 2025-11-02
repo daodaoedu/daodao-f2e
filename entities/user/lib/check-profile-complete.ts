@@ -1,6 +1,6 @@
-import { SessionState } from '../model/types';
+import { AuthState } from '../model/auth-types';
 
-export const checkProfileComplete = (data: SessionState['user']) => {
+export const checkProfileComplete = (data: AuthState['user']) => {
   if (!data) return false;
 
   const hasAnySocialCode = Object.values(data.contactList || {}).some(

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from '@/entities/session/model/context';
+import { useAuth } from '@/entities/user';
 import { CustomLink } from '@/shared/ui/custom-link';
 import {
   Search, Plus, Target, SortAsc, RefreshCw,
@@ -38,7 +38,7 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
   onCreateClick,
 }) => {
   const router = useRouter();
-  const { user } = useSession();
+  const { user } = useAuth();
   // Filter and search state
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'createdAt' | 'updatedAt' | 'progress' | 'streak'>('createdAt');

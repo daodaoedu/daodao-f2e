@@ -6,7 +6,7 @@ import {
   Card, CardContent, CardHeader, CardTitle,
 } from '@/shared/ui/card';
 import { useContentTypeRecommendations } from '@/services/recommendation';
-import { useSession } from '@/entities/session';
+import { useAuth } from '@/entities/user';
 import { type IdeaSchema } from '@/services/ideas/schema';
 import { type RecommendationItem } from '@/services/recommendation/core/schema';
 import IdeaCard from './IdeaCard';
@@ -22,7 +22,7 @@ const IdeasRecommendationSection: React.FC<IdeasRecommendationSectionProps> = ({
   limit = 5,
   showHeader = true,
 }) => {
-  const { user } = useSession();
+  const { user } = useAuth();
   const router = useRouter();
 
 

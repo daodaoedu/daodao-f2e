@@ -9,7 +9,7 @@ import { Title, useResultStyles, Slogan, List } from '@/features/quiz';
 import { resultDetailMap, themeMap } from '@/entities/quiz';
 import { AspectRatio } from '@/shared/ui/aspect-ratio';
 import { Badge } from '@/shared/ui/badge';
-import { ProtectedComponent } from '@/features/auth';
+import { ProtectedComponent } from '@/entities/user';
 import { BackButton } from '@/shared/ui/back-button';
 import { SquareArrowOutUpRightIcon } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';

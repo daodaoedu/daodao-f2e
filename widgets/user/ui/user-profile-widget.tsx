@@ -11,8 +11,7 @@ import { CustomLink } from '@/shared/ui/custom-link';
 import { Button, TextCollapse } from '@/shared/ui';
 import { Badge } from '@/shared/ui/badge';
 import { iconMap, SocialIcon, SocialPlatform } from '@/shared/ui/social-icon';
-import { useSession } from '@/entities/session';
-import { getUserProfileBasePath, UserIdObject } from '@/entities/user';
+import { useAuth , getUserProfileBasePath, UserIdObject } from '@/entities/user';
 import { useUserData } from '../lib/use-user-data';
 import { UserProfileEditorLoading } from './user-profile-editor';
 import {
@@ -70,7 +69,7 @@ export function UserProfileWidget({
   userIdObject,
   children,
 }: UserProfileWidgetProps) {
-  const { user: loginUser } = useSession();
+  const { user: loginUser } = useAuth();
   const { data } = useUserData(userIdObject);
   const [isEditing, setIsEditing] = useState(false);
   const user = data?.data;

@@ -4,7 +4,7 @@ import { ProjectOutcomeSchema } from '@/services/projects';
 import { BaseUserSchema } from '@/services/users';
 import { CommentType } from '@/services/comments';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
-import { useSession } from '@/entities/session';
+import { useAuth } from '@/entities/user';
 
 interface OutcomeDetailProps {
   data?: ProjectOutcomeSchema;
@@ -21,7 +21,7 @@ function OutcomeDetail({
   onEditClick,
   onDeleteClick,
 }: OutcomeDetailProps) {
-  const { user } = useSession();
+  const { user } = useAuth();
   const isOwner = user?.id === authorUser?.id;
 
   return (

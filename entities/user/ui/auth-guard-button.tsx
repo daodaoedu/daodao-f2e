@@ -4,12 +4,12 @@ import { useRef } from 'react';
 import { Button, type ButtonProps } from '@/shared/ui/button';
 
 import { GACategory, logEvent } from '@/shared/lib/analytics';
-import { useSession, useSessionActions } from '@/entities/session';
+import { useAuth, useAuthActions } from '@/entities/user';
 
 export const AuthGuardButton = ({ onClick, ...props }: ButtonProps) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const { isLoggedIn } = useSession();
-  const { openLoginModal } = useSessionActions();
+  const { isLoggedIn } = useAuth();
+  const { openLoginModal } = useAuthActions();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     const buttonText = buttonRef.current?.textContent ?? 'Unknown Button';

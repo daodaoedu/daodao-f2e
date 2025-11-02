@@ -14,7 +14,7 @@ import { Paper } from '@/shared/ui/paper';
 import type { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
 import { useNavigationBlocker } from '@/shared/lib/navigation-blocker';
 import { useErrorHandler } from '@/shared/lib/error-handler';
-import { useSessionActions } from '@/entities/session';
+import { useAuthActions } from '@/entities/user';
 import { cn } from '@/shared/lib/cn';
 import { Skeleton } from '@/shared/ui/skeleton';
 
@@ -122,7 +122,7 @@ export const UserProfileEditor = ({
   initialData,
   onClose,
 }: UserProfileEditorProps) => {
-  const { updateUser } = useSessionActions();
+  const { updateUser } = useAuthActions();
   const [isSaving, setIsSaving] = useState(false);
 
   const form = useForm<UserProfileFormData>({

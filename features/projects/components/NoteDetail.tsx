@@ -4,7 +4,7 @@ import { ProjectNoteSchema } from '@/services/projects';
 import { BaseUserSchema } from '@/services/users';
 import { CommentType } from '@/services/comments';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
-import { useSession } from '@/entities/session';
+import { useAuth } from '@/entities/user';
 
 interface NoteDetailProps {
   data?: ProjectNoteSchema;
@@ -21,7 +21,7 @@ function NoteDetail({
   onEditClick,
   onDeleteClick,
 }: NoteDetailProps) {
-  const { user } = useSession();
+  const { user } = useAuth();
   const isOwner = user?.id === authorUser?.id;
 
   return (

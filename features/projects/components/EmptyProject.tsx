@@ -2,11 +2,10 @@ import AccessDeniedImg from '@/public/assets/projects/access-denied.png';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/cn';
 import { CustomLink } from '@/shared/ui/custom-link';
-import { useSession } from '@/entities/session';
-import { getUserProfileBasePath } from '@/entities/user';
+import { useAuth , getUserProfileBasePath } from '@/entities/user';
 
 export default function EmptyProject() {
-  const { user } = useSession();
+  const { user } = useAuth();
   return (
     <div
       className={cn(

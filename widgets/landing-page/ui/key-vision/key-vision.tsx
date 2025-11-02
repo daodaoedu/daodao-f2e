@@ -1,6 +1,6 @@
 import { Image } from '@/shared/ui/image';
 import { Icon } from '@/shared/ui/icon';
-import { AuthGuardButton } from '@/features/auth';
+import { AuthGuardButton } from '@/entities/user';
 import { LottieHero } from './lottie-hero';
 
 export function KeyVision() {
