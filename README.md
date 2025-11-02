@@ -359,7 +359,7 @@ daodao-f2e/
    );
 
    // ✅ Features: 具體業務功能
-   // features/auth/ui/LoginForm.tsx
+   // entities/user/ui/LoginForm.tsx
    export const LoginForm = () => {
      const { login } = useAuth();
      return <form onSubmit={login}>...</form>;
@@ -379,7 +379,7 @@ daodao-f2e/
 2. **導出規範 / Export Standards**
    ```typescript
    // 每個 slice 的 index.ts 統一導出
-   // features/auth/index.ts
+   // entities/user/index.ts
    export { LoginForm } from './ui/LoginForm';
    export { useAuth } from './model/useAuth';
    export { authApi } from './api/authApi';

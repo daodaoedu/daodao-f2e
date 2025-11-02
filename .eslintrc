@@ -41,7 +41,8 @@
     "@typescript-eslint",
     "import",
     "react",
-    "react-hooks"
+    "react-hooks",
+    "boundaries"
   ],
   "rules": {
     "@typescript-eslint/no-require-imports": "error",
@@ -115,7 +116,54 @@
     "react/prop-types": "off",
     "react/react-in-jsx-scope": "off",
     "react/require-default-props": "off",
-    "react-hooks/exhaustive-deps": "warn"
+    "react-hooks/exhaustive-deps": "warn",
+		"boundaries/element-types": [
+			"error",
+			{
+        "default": "disallow",
+				"message": "${file.type} is not allowed to import (${dependency.type})",
+				"rules": [
+					{
+						"from": ["shared"],
+						"allow": ["shared"]
+					},
+					{
+						"from": ["entities"],
+						"allow": [
+              "shared",
+              ["entities", { "entityName": "${from.entityName}" }]
+            ]
+					},
+					{
+						"from": ["features"],
+						"allow": [
+              "shared",
+              "entities",
+              ["features", { "featureName": "${from.featureName}" }]
+            ]
+					},
+					{
+						"from": ["widgets"],
+						"allow": [
+              "shared",
+              "entities",
+              "features",
+              ["widgets", { "widgetName": "${from.widgetName}" }]
+            ]
+					},
+					{
+						"from": ["app"],
+						"allow": [
+              "shared",
+              "entities",
+              "features",
+              "widgets",
+              ["app", { "appName": "${from.appName}" }]
+            ]
+					}
+				]
+			}
+		]
   },
   "settings": {
     "import/resolver": {
@@ -130,6 +178,38 @@
       "node": {
         "extensions": [".js", ".jsx", ".ts", ".tsx"]
       }
-    }
+    },
+    "boundaries/include": [
+      "app/**/*",
+      "widgets/**/*",
+      "features/**/*",
+      "entities/**/*",
+      "shared/**/*"
+    ],
+    "boundaries/elements": [
+      {
+        "type": "app",
+        "pattern": "app/*"
+      },
+      {
+        "type": "widgets",
+        "pattern": "widgets/*",
+        "capture": ["widgetName"]
+      },
+      {
+        "type": "features", 
+        "pattern": "features/*",
+        "capture": ["featureName"]
+      },
+      {
+        "type": "entities",
+        "pattern": "entities/*",
+        "capture": ["entityName"]
+      },
+      {
+        "type": "shared",
+        "pattern": "shared/*"
+      }
+    ]
   }
 }
