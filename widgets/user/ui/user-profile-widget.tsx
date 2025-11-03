@@ -16,8 +16,8 @@ import { useUserData } from '../lib/use-user-data';
 import { UserProfileEditorLoading } from './user-profile-editor';
 import {
   USER_PROFILE_TAB_TITLES,
-  UserProfileTab,
   UserProfileTabTitle,
+  DEFAULT_TAB,
 } from '../model/user-profile';
 
 const UserProfileEditor = dynamic(
@@ -65,8 +65,6 @@ const getContactValue = (
 interface UserProfileWidgetProps extends React.PropsWithChildren {
   userIdObject: UserIdObject;
 }
-
-export const DEFAULT_TAB: UserProfileTab = 'projects';
 
 export function UserProfileWidget({
   userIdObject,
@@ -222,7 +220,9 @@ export function UserProfileWidget({
             )}
           </div>
 
-          <p className="text-basic-600">{user?.personalSlogan}</p>
+          <p className="break-words text-basic-600">
+            {user?.personalSlogan}
+          </p>
 
           <div className="flex flex-wrap gap-2">
             {user?.tagList?.map((tag) => (

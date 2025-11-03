@@ -14,7 +14,7 @@ import { Paper } from '@/shared/ui/paper';
 import type { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
 import { useNavigationBlocker } from '@/shared/lib/navigation-blocker';
 import { useErrorHandler } from '@/shared/lib/error-handler';
-import { useAuthActions } from '@/entities/user';
+import { useAuth, useAuthActions } from '@/entities/user';
 import { cn } from '@/shared/lib/cn';
 import { Skeleton } from '@/shared/ui/skeleton';
 
@@ -122,6 +122,7 @@ export const UserProfileEditor = ({
   initialData,
   onClose,
 }: UserProfileEditorProps) => {
+  const { user } = useAuth();
   const { updateUser } = useAuthActions();
   const [isSaving, setIsSaving] = useState(false);
 
@@ -150,7 +151,13 @@ export const UserProfileEditor = ({
   const handleSubmit = async (data: UserProfileFormData) => {
     try {
       setIsSaving(true);
-      await updateUser(data);
+      await updateUser({
+        interestList: user?.interestList || [],
+        share: user?.share || '',
+        preferences: user?.preferences || {},
+        professionalField: user?.professionalField || [],
+        ...data,
+      });
       onClose();
     } catch (error) {
       handleFormError(error, { defaultMessage: '儲存失敗，請稍後再試' });

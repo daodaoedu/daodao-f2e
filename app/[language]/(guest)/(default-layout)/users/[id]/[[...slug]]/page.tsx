@@ -13,9 +13,8 @@ import {
   UserIdObject,
 } from '@/entities/user';
 
-const isValidTabKey = (tabKey: string): tabKey is UserProfileTab => {
-  return USER_PROFILE_TABS.includes(tabKey as UserProfileTab);
-};
+const isValidTabKey = (tabKey: string): tabKey is UserProfileTab =>
+  USER_PROFILE_TABS.includes(tabKey as UserProfileTab);
 
 const validateTabKey = (
   userIdObject: UserIdObject,

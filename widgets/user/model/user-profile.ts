@@ -21,3 +21,5 @@ export const USER_PROFILE_TAB_TITLES: Record<UserProfileTab, string> = {
 
 export type UserProfileTabTitle =
   (typeof USER_PROFILE_TAB_TITLES)[keyof typeof USER_PROFILE_TAB_TITLES];
+
+export const DEFAULT_TAB: UserProfileTab = 'projects';
