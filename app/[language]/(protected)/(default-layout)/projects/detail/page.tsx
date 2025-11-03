@@ -18,6 +18,8 @@ import {
   FakeCheckBox,
 } from '@/components/Projects/Project/Shared';
 import { parseToString } from '@/shared/lib/helper';
+import CommentSection from '@/shared/components/Comment/CommentSection';
+import { CommentType } from '@/services/comments';
 
 function ProjectDetailPageContent() {
   const [isFetchingProject, setIsFetchingProject] = useState(false);
@@ -92,7 +94,7 @@ function ProjectDetailPageContent() {
               )}
             </Panel>
 
-            <Panel className="bg-white">
+            <Panel className="bg-white mb-8 md:mb-6">
               <h3 className="body-md font-medium mb-5 text-basic-500">學習成果及呈現方式 *</h3>
               {Array.isArray(project?.outcome) &&
                 project?.outcome?.length > 0 && (
@@ -105,6 +107,18 @@ function ProjectDetailPageContent() {
                 text="是否公開給所有人看到"
               />
             </Panel>
+
+            {/* 評論區塊 */}
+            {projectId && (
+              <Panel className="bg-white">
+                <CommentSection
+                  targetId={projectId}
+                  targetType={CommentType.Project}
+                  hideVisibilityToggle
+                  hideCommentCount
+                />
+              </Panel>
+            )}
           </>
         )}
       </div>

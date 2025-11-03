@@ -187,7 +187,7 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
               <div className="flex items-center justify-between">
                 <Badge
                   variant={item.status === '進行中' ? 'default' : 'secondary'}
-                  className="text-xs"
+                  className="text-xs whitespace-nowrap"
                 >
                   {item.status}
                 </Badge>
