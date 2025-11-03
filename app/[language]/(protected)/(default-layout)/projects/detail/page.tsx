@@ -18,7 +18,7 @@ import {
   FakeCheckBox,
 } from '@/components/Projects/Project/Shared';
 import { parseToString } from '@/shared/lib/helper';
-import CommentSection from '@/shared/components/Comment/CommentSection';
+import { LazyCommentSection } from '@/features/comment';
 import { CommentType } from '@/services/comments';
 
 function ProjectDetailPageContent() {
@@ -111,7 +111,7 @@ function ProjectDetailPageContent() {
             {/* 評論區塊 */}
             {projectId && (
               <Panel className="bg-white">
-                <CommentSection
+                <LazyCommentSection
                   targetId={projectId}
                   targetType={CommentType.Project}
                   hideVisibilityToggle
