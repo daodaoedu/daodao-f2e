@@ -4,6 +4,7 @@ import {
   USER_PROFILE_TABS,
   UserProfileTab,
   USER_PROFILE_TAB_TITLES,
+  DEFAULT_TAB,
 } from '@/widgets/user';
 import {
   parseUserId,
@@ -18,7 +19,7 @@ const isValidTabKey = (tabKey: string): tabKey is UserProfileTab => {
 
 const validateTabKey = (
   userIdObject: UserIdObject,
-  tabKey: string = 'projects'
+  tabKey: string = DEFAULT_TAB
 ): UserProfileTab =>
   isValidTabKey(tabKey)
     ? tabKey

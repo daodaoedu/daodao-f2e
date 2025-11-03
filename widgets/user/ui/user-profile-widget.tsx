@@ -11,11 +11,12 @@ import { CustomLink } from '@/shared/ui/custom-link';
 import { Button, TextCollapse } from '@/shared/ui';
 import { Badge } from '@/shared/ui/badge';
 import { iconMap, SocialIcon, SocialPlatform } from '@/shared/ui/social-icon';
-import { useAuth , getUserProfileBasePath, UserIdObject } from '@/entities/user';
+import { useAuth, getUserProfileBasePath, UserIdObject } from '@/entities/user';
 import { useUserData } from '../lib/use-user-data';
 import { UserProfileEditorLoading } from './user-profile-editor';
 import {
   USER_PROFILE_TAB_TITLES,
+  UserProfileTab,
   UserProfileTabTitle,
 } from '../model/user-profile';
 
@@ -65,6 +66,8 @@ interface UserProfileWidgetProps extends React.PropsWithChildren {
   userIdObject: UserIdObject;
 }
 
+export const DEFAULT_TAB: UserProfileTab = 'projects';
+
 export function UserProfileWidget({
   userIdObject,
   children,
@@ -99,6 +102,16 @@ export function UserProfileWidget({
       href: `${basePath}/circles`,
     },
   ];
+
+  const getActiveTabVariant = (itemHref: string): 'default' | 'outline' => {
+    if (pathname === itemHref) return 'default';
+
+    if (pathname === basePath && itemHref === `${basePath}/${DEFAULT_TAB}`) {
+      return 'default';
+    }
+
+    return 'outline';
+  };
 
   const handleCopyContact = async (platform: SocialPlatform) => {
     const contactValue = getContactValue(user?.contactList, platform);
@@ -249,11 +262,7 @@ export function UserProfileWidget({
           <nav className="flex gap-3">
             {navItems.map((item) => (
               <Button
-                variant={
-                  pathname === item.href || `${pathname}/projects` === item.href
-                    ? 'default'
-                    : 'outline'
-                }
+                variant={getActiveTabVariant(item.href)}
                 asChild
                 className="rounded-md"
                 key={item.label}
