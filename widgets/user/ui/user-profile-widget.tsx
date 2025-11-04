@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
@@ -120,6 +120,12 @@ export function UserProfileWidget({
     }
   };
 
+  useEffect(() => {
+    if (pathname === basePath) {
+      window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
+    }
+  }, [pathname, basePath]);
+
   if (isEditing) {
     return (
       <div className="min-h-screen space-y-8 bg-primary-pale px-4 py-24">
@@ -148,7 +154,6 @@ export function UserProfileWidget({
                   {user?.name?.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-
               <div className="space-y-1">
                 <div className="flex items-end gap-2">
                   <h1 className="text-basic-800 heading-sm">{user?.name}</h1>
@@ -220,9 +225,7 @@ export function UserProfileWidget({
             )}
           </div>
 
-          <p className="break-words text-basic-600">
-            {user?.personalSlogan}
-          </p>
+          <p className="break-words text-basic-600">{user?.personalSlogan}</p>
 
           <div className="flex flex-wrap gap-2">
             {user?.tagList?.map((tag) => (
