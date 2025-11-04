@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/shared/lib/cn';
-import Image from 'next/image';
+import { Image } from '@/shared/ui/image';
 
 interface TypewriterBubbleProps {
   className?: string;
@@ -202,15 +202,6 @@ export function TypewriterBubble({ className }: TypewriterBubbleProps) {
           </div>
         </div>
       </div>
-
-      {/* 綠色圓弧裝飾圖片 */}
-      <Image
-        src="/assets/landing-page/deco-island.svg"
-        width={208}
-        height={208}
-        alt="綠色圓弧裝飾"
-        className="absolute bottom-0 right-[calc(208px/2)]"
-      />
     </div>
   );
 }
