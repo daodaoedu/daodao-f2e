@@ -17,6 +17,8 @@ import { useErrorHandler } from '@/shared/lib/error-handler';
 import { useAuth, useAuthActions } from '@/entities/user';
 import { cn } from '@/shared/lib/cn';
 import { Skeleton } from '@/shared/ui/skeleton';
+import { DynamicContactSelector } from '@/entities/user/ui';
+import { CONTACT_PLATFORM_OPTIONS } from '@/entities/user/model/constants';
 
 // 表單驗證 schema
 const userProfileSchema = z.object({
@@ -237,11 +239,12 @@ export const UserProfileEditor = ({
             />
 
             {/* 個人標語 */}
-            <FormInput
+            <FormTextarea
               control={form.control}
               name="personalSlogan"
               label="個人標語"
               placeholder="用一句話介紹自己..."
+              rows={2}
             />
           </div>
 
@@ -250,36 +253,13 @@ export const UserProfileEditor = ({
             <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
               其他社群
             </h3>
-
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <FormInput
-                control={form.control}
-                name="contactList.instagram"
-                label="Instagram"
-                placeholder="your_instagram_handle"
-              />
-
-              <FormInput
-                control={form.control}
-                name="contactList.facebook"
-                label="Facebook"
-                placeholder="your.facebook.profile"
-              />
-
-              {/* <FormInput
-                control={form.control}
-                name="contactList.line"
-                label="LINE ID"
-                placeholder="your_line_id"
-              /> */}
-
-              <FormInput
-                control={form.control}
-                name="contactList.discord"
-                label="Discord"
-                placeholder="username#1234"
-              />
-            </div>
+            <DynamicContactSelector
+              control={form.control}
+              name="contactList"
+              options={CONTACT_PLATFORM_OPTIONS}
+              platformPlaceholder="選擇社群平台"
+              valuePlaceholder="請輸入帳號或連結"
+            />
           </div>
 
           {/* 自我介紹區塊 */}

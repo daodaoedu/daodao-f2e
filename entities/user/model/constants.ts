@@ -102,3 +102,15 @@ export const WANT_TO_DO_WITH_PARTNER: OptionProps[] = [
   { value: 'find_teacher',label: '找老師' },
   { value: 'find_student',label: '找學生' },
 ];
+
+/**
+ * 聯絡方式選項
+ */
+export const CONTACT_PLATFORM_OPTIONS: OptionProps[] = [
+  { value: 'website', label: 'Website' },
+  { value: 'facebook', label: 'Facebook' },
+  { value: 'instagram', label: 'Instagram' },
+  { value: 'linkedin', label: 'LinkedIn' },
+  { value: 'github', label: 'GitHub' },
+  { value: 'discord', label: 'Discord' },
+];
