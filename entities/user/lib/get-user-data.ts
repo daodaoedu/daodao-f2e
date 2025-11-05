@@ -4,10 +4,10 @@ import {
   getGetApiV1UsersIdKey,
   getGetApiV1UsersCustomIdCustomIdKey,
 } from '@/generated/api/users.server';
-import type { UserIdObject } from '../lib/user-profile-utils';
+import type { UserIdObject } from '../model';
 
 /**
- * 統一的用戶資料獲取函數
+ * 統一的用戶資料獲取函數 (Server 端)
  */
 export const getUserData = async ({ customId, id }: UserIdObject) => {
   if (customId) {

@@ -5,7 +5,7 @@ import {
   AuthLoginStatus,
 } from './auth-types';
 import { initialAuthState } from './auth-state';
-import { checkProfileComplete } from '../lib/check-profile-complete';
+import { checkProfileComplete } from './business-rules';
 
 export const authReducer = (
   state: AuthState,

@@ -131,6 +131,7 @@
 						"from": ["entities"],
 						"allow": [
               "shared",
+              "generated",
               ["entities", { "entityName": "${from.entityName}" }]
             ]
 					},
@@ -169,11 +170,7 @@
     "import/resolver": {
       "alias": {
         "extensions": [".js", ".jsx", ".ts", ".tsx"],
-        "map": [
-          ["@/api", "./generated/api"],
-          ["@/models", "./generated/models"],
-          ["@", "."]
-        ]
+        "map": [["@", "."]]
       },
       "node": {
         "extensions": [".js", ".jsx", ".ts", ".tsx"]
@@ -184,7 +181,8 @@
       "widgets/**/*",
       "features/**/*",
       "entities/**/*",
-      "shared/**/*"
+      "shared/**/*",
+      "generated/**/*"
     ],
     "boundaries/elements": [
       {
@@ -209,6 +207,10 @@
       {
         "type": "shared",
         "pattern": "shared/*"
+      },
+      {
+        "type": "generated",
+        "pattern": "generated/*"
       }
     ]
   }

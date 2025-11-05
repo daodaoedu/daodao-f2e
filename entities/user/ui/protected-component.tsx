@@ -2,10 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
 import { Button } from '@/shared/ui/button';
 import { useAuth, useAuthActions } from '@/entities/user';
 import { IslandPlaceholder } from '@/shared/ui/island-placeholder';
+import type { UserProfile } from '../model';
 
 enum AuthorizationStatus {
   IDLE = 'IDLE',
@@ -39,7 +39,7 @@ export interface ProtectedComponentProps extends PropsWithChildren {
    * @returns 回傳一個 Promise，解析為 boolean 值
    */
   checkUserAuthorized?: (
-    user: UserValidatorsUserSuccessResponseSchemaData
+    user: UserProfile
   ) => boolean | Promise<boolean>;
 }
 

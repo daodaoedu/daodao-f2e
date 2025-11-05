@@ -1,9 +1,8 @@
 import {
-  UserValidatorsCreateUserResponseSchemaDataUser,
   UserValidatorsCreateUserSchema,
   UserValidatorsGetUserParamsSchema,
-  UserValidatorsUserSuccessResponseSchemaData,
 } from '@/generated/models';
+import type { UserProfile } from './constants';
 
 export enum AuthLoginStatus {
   /** 未登入 */
@@ -39,7 +38,7 @@ interface PermanentLoginState extends CommonLoginState {
   isLoggedIn: true;
   isTemporary: false;
   loginStatus: AuthLoginStatus.PERMANENT;
-  user: UserValidatorsUserSuccessResponseSchemaData;
+  user: UserProfile;
 }
 
 export type AuthState =
@@ -64,11 +63,11 @@ export type AuthAction =
   | { type: AuthActionTypes.SET_LOADING; payload: boolean }
   | {
       type: AuthActionTypes.UPDATE_USER;
-      payload: UserValidatorsCreateUserResponseSchemaDataUser;
+      payload: UserProfile;
     }
   | {
       type: AuthActionTypes.LOGIN;
-      payload: UserValidatorsUserSuccessResponseSchemaData | null;
+      payload: UserProfile | null;
     }
   | { type: AuthActionTypes.LOGOUT };
 
@@ -80,8 +79,6 @@ export type AuthActions = {
   [AuthActionTypes.UPDATE_USER]: (
     payload: UserValidatorsCreateUserSchema | UserValidatorsGetUserParamsSchema
   ) => Promise<void>;
-  [AuthActionTypes.LOGIN]: (
-    payload: UserValidatorsUserSuccessResponseSchemaData | null
-  ) => void;
+  [AuthActionTypes.LOGIN]: (payload: UserProfile | null) => void;
   [AuthActionTypes.LOGOUT]: () => void;
 };

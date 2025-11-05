@@ -5,7 +5,7 @@ import { Background, Container } from '@/shared/ui/wrapper';
 import { CircleForm } from '@/features/circles';
 import { parseToString } from '@/shared/lib/helper';
 import { circleAPI, CircleSchema } from '@/services/circles';
-import { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
+import type { UserProfile } from '@/entities/user';
 import { useAuth, getUserProfileBasePath, ProtectedComponent } from '@/entities/user';
 
 // export const runtime = "experimental-edge";
@@ -39,7 +39,7 @@ export default function CircleEditPage({
   const basePath = getUserProfileBasePath(user);
 
   const checkUserAuthorized = (
-    user: UserValidatorsUserSuccessResponseSchemaData
+    user: UserProfile
   ) => {
     const isOwner = user.id === data.user.userId;
     if (!isOwner) {

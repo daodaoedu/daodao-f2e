@@ -44,15 +44,11 @@ export const getErrorMessage = (
   error: unknown,
   defaultMessage = '發生未知錯誤'
 ): string => {
-  if (error instanceof ApiError) {
-    return error.data?.details?.[0]?.message || error.message || defaultMessage;
-  }
-
-  if (error instanceof Error) {
-    return error.message || defaultMessage;
-  }
-
-  return defaultMessage;
+  return (
+    (error as ApiError)?.data?.details?.[0]?.message ||
+    (error as Error)?.message ||
+    defaultMessage
+  );
 };
 
 /**

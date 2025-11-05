@@ -2,8 +2,8 @@ import { mutate } from 'swr';
 import {
   getGetApiV1UsersCustomIdCustomIdKey,
   getGetApiV1UsersIdKey,
-} from '@/api/users.client';
-import { UserIdObject } from './user-profile-utils';
+} from '@/generated/api/users.client';
+import type { UserIdObject } from '../model';
 
 export const mutateUserData = async (userIdObject: UserIdObject) => {
   const { customId, id } = userIdObject;

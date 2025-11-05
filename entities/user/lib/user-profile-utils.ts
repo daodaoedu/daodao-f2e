@@ -1,7 +1,4 @@
-export interface UserIdObject {
-  customId?: string | null;
-  id: string;
-}
+import type { UserIdObject } from '../model';
 
 /**
  * 解析用戶 ID，支持 @ 前綴的 customId 和普通的 userId

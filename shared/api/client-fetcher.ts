@@ -1,6 +1,10 @@
 import { getTokenStorage } from '@/shared/lib/storage';
-import { ApiResponseValidatorsApiErrorResponseSchema } from '@/models/apiResponseValidatorsApiErrorResponseSchema';
-import { ApiError, FetcherConfig, getFullUrl } from './common';
+import {
+  ApiError,
+  ApiErrorResponseSchema,
+  FetcherConfig,
+  getFullUrl,
+} from './common';
 
 export const clientFetcher = async <T>({
   url,
@@ -32,8 +36,7 @@ export const clientFetcher = async <T>({
 
   if (!ok) {
     try {
-      const result: ApiResponseValidatorsApiErrorResponseSchema =
-        await response.json();
+      const result: ApiErrorResponseSchema = await response.json();
 
       throw new ApiError(status, result.error.message, result.error);
     } catch (error) {
@@ -43,7 +46,10 @@ export const clientFetcher = async <T>({
       if (error instanceof Error) {
         throw new ApiError(status, error.message, error);
       }
-      throw new ApiError(status, '系統異常，請稍後再試', error);
+      throw new ApiError(status, '系統異常，請稍後再試', {
+        code: 'SYSTEM_ERROR',
+        message: '系統異常，請稍後再試',
+      });
     }
   }
 

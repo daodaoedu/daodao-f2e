@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { format } from 'date-fns';
-import { UserValidatorsCreateUserSchemaProfessionalFieldItem } from '@/generated/models';
+import { ProfessionalFieldEnum } from '@/entities/user';
 
 /**
  * Onboarding 表單驗證 schema
@@ -22,7 +22,7 @@ export const onboardingSchema = z.object({
 
   // 專業與興趣領域
   professionalField: z
-    .array(z.nativeEnum(UserValidatorsCreateUserSchemaProfessionalFieldItem))
+    .array(z.nativeEnum(ProfessionalFieldEnum))
     .min(1, '請至少選擇一個專業領域')
     .max(5, '最多選擇5個專業領域'),
   interestList: z

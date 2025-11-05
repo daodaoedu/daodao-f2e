@@ -10,13 +10,13 @@ import {
 } from 'react';
 import { mutate } from 'swr';
 import { getTokenStorage } from '@/shared/lib/storage';
+import { ApiError } from '@/shared/api';
+import { onUnauthorized } from '@/shared/lib/auth-bus';
 import {
   useGetApiV1UsersMe,
   usePostApiV1UsersMe,
   usePutApiV1UsersMe,
-} from '@/api/users.client';
-import { ApiError } from '@/shared/api';
-import { onUnauthorized } from '@/shared/lib/auth-bus';
+} from '@/generated/api/users.client';
 import { AuthState, AuthActions, AuthActionTypes } from './auth-types';
 import { mutateUserData } from '../lib/mutate-user-data';
 import { authReducer } from './auth-reducer';
@@ -46,10 +46,7 @@ export const useAuthActions = () => {
 };
 
 export function AuthProvider({ children }: React.PropsWithChildren) {
-  const [state, dispatch] = useReducer(
-    authReducer,
-    createInitialAuthState()
-  );
+  const [state, dispatch] = useReducer(authReducer, createInitialAuthState());
 
   const { loginStatus, user } = state;
 

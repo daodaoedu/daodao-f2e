@@ -11,7 +11,7 @@ import { FormTextarea } from '@/shared/ui/textarea';
 import { FormAvatarPicker } from '@/shared/ui/image-picker';
 import { Form } from '@/shared/ui/form';
 import { Paper } from '@/shared/ui/paper';
-import type { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
+import type { UserProfile } from '@/entities/user';
 import { useNavigationBlocker } from '@/shared/lib/navigation-blocker';
 import { useErrorHandler } from '@/shared/lib/error-handler';
 import { useAuth, useAuthActions } from '@/entities/user';
@@ -46,7 +46,7 @@ const userProfileSchema = z.object({
 type UserProfileFormData = z.infer<typeof userProfileSchema>;
 
 interface UserProfileEditorProps {
-  initialData?: Partial<UserValidatorsUserSuccessResponseSchemaData>;
+  initialData?: Partial<UserProfile>;
   onClose: () => void;
 }
 

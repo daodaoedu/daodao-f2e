@@ -1,7 +1,5 @@
 export * from './ui';
 
-export * from './lib/use-user-data';
-
 export type { UserProfileTab } from './model/user-profile';
 
 export {
