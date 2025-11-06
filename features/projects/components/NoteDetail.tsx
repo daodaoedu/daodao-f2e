@@ -1,14 +1,15 @@
 import { Image } from '@/shared/ui/image';
-import PostDetailCard from '@/shared/components/Post/PostDetailCard';
+import { PostDetailCard } from '@/entities/post';
 import { ProjectNoteSchema } from '@/services/projects';
 import { BaseUserSchema } from '@/services/users';
-import { CommentType } from '@/services/comments';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
+import { useAuth } from '@/entities/user';
 
 interface NoteDetailProps {
   data?: ProjectNoteSchema;
   authorUser?: BaseUserSchema;
   className?: string;
+  commentSection?: React.ReactNode;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
 }
@@ -17,16 +18,21 @@ function NoteDetail({
   data,
   authorUser,
   className,
+  commentSection,
   onEditClick,
   onDeleteClick,
 }: NoteDetailProps) {
+  const { user } = useAuth();
+  const isOwner = user?.id === authorUser?.id;
+
   return (
     <PostDetailCard
       data={data}
-      targetType={CommentType.Note}
+      commentSection={commentSection}
       authorUser={authorUser}
       className={className}
       tag="便利貼"
+      isOwner={isOwner}
       onEditClick={onEditClick}
       onDeleteClick={onDeleteClick}
       renderContent={(noteData) => (

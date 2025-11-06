@@ -7,8 +7,7 @@ import { Toaster as SonnerToaster } from '@/shared/ui/sonner';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import Head from 'next/head';
-import { LoginModal } from '@/features/auth';
-import { SessionProvider } from '@/entities/session';
+import { AuthProvider, LoginModal } from '@/entities/user';
 import { DialogProvider } from '@/contexts/Dialog';
 import { fetcher } from '@/shared/lib/http';
 import getBaseLayout from '@/layout/core/getBaseLayout';
@@ -122,9 +121,9 @@ const App = ({ Component, pageProps }) => {
 
       <SWRConfig value={swrConfig}>
         <DialogProvider>
-          <SessionProvider>
+          <AuthProvider>
             <ThemeComponentWrap pageProps={pageProps} Component={Component} />
-          </SessionProvider>
+          </AuthProvider>
         </DialogProvider>
       </SWRConfig>
     </>

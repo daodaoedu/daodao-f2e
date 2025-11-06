@@ -22,6 +22,19 @@ export const NavigationBlockerProvider = ({
 
   const value = useMemo(() => ({ isBlocked, setIsBlocked }), [isBlocked]);
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isBlocked) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isBlocked]);
+
   return (
     <NavigationBlockerContext.Provider value={value}>
       {children}
@@ -30,7 +43,11 @@ export const NavigationBlockerProvider = ({
 };
 
 export const useNavigationBlocker = () => {
-  return useContext(NavigationBlockerContext);
+  const context = useContext(NavigationBlockerContext);
+  if (!context) {
+    throw new Error('useNavigationBlocker must be used within a NavigationBlockerProvider');
+  }
+  return context;
 };
 
 const getHash = () =>

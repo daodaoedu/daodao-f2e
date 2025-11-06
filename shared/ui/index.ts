@@ -15,4 +15,5 @@ export * from './radio-group';
 export * from './select';
 export * from './slider';
 export * from './switch';
+export * from './text-collapse';
 export * from './textarea';

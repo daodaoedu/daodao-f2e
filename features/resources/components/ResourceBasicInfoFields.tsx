@@ -14,7 +14,7 @@ import {
 } from '@/shared/ui/form';
 import { ResourceFormSchema } from '@/services/resources/core/schema';
 import { Text, Title } from '@/shared/ui/typography';
-import { UploadImage } from '@/shared/ui/upload-image';
+import { ImagePicker } from '@/shared/ui/image-picker';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 
 type ResourceBasicInfoSchema = Pick<
@@ -38,10 +38,10 @@ export default function ResourceBasicInfoFields() {
         <div className="flex gap-6">
           <div className="flex-[2]">
             <FormLabel required>封面圖</FormLabel>
-            <UploadImage ratio={133 / 100}>
+            <ImagePicker ratio={133 / 100}>
               <Plus size={24} />
               選擇封面
-            </UploadImage>
+            </ImagePicker>
           </div>
 
           <div className="flex-[5] space-y-6">

@@ -2,9 +2,11 @@ import AccessDeniedImg from '@/public/assets/projects/access-denied.png';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/cn';
 import { CustomLink } from '@/shared/ui/custom-link';
+import { getUserProfileBasePath , useAuth } from '@/entities/user';
 import useMarathonAccess from '../hooks/useMarathonAccess';
 
 export default function MarathonAccess({ children }: React.PropsWithChildren) {
+  const { user } = useAuth();
   const hasMarathonAccess = useMarathonAccess();
 
   if (hasMarathonAccess) {
@@ -39,7 +41,7 @@ export default function MarathonAccess({ children }: React.PropsWithChildren) {
           asChild
           variant="outline"
         >
-          <CustomLink href="/personal-card/my-card">
+          <CustomLink href={getUserProfileBasePath(user)}>
             編輯個人名片
           </CustomLink>
         </Button>

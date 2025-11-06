@@ -13,7 +13,7 @@ import {
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';
-import { DatePickerWithForm } from '@/shared/ui/date-picker';
+import { FormDatePicker } from '@/shared/ui/date-picker';
 import { cn } from '@/shared/lib/cn';
 import type { OnboardingFormData } from '../../model';
 
@@ -23,7 +23,7 @@ export const PersonalInfoStep = () => {
   return (
     <div className="space-y-6">
       {/* 生日 */}
-      <DatePickerWithForm
+      <FormDatePicker
         control={form.control}
         name="birthDay"
         placeholder="年/月/日"

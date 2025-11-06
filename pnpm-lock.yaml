@@ -279,6 +279,9 @@ importers:
       eslint-import-resolver-alias:
         specifier: ^1.1.2
         version: 1.1.2(eslint-plugin-import@2.32.0)
+      eslint-plugin-boundaries:
+        specifier: ^5.1.0
+        version: 5.1.0(@typescript-eslint/parser@8.41.0(eslint@8.57.1)(typescript@5.7.2))(eslint@8.57.1)
       eslint-plugin-html:
         specifier: ^6.1.2
         version: 6.2.0
@@ -4727,6 +4730,12 @@ packages:
         optional: true
       eslint-import-resolver-webpack:
         optional: true
+
+  eslint-plugin-boundaries@5.1.0:
+    resolution: {integrity: sha512-tgmq22Z+hEb40D8SDr+QavrioSuMvpymA5AT0t0JoDc4lJ6+AQ1S5EzoRo5kfqoA5YEcTKlTTd0a4gYrWSNj0Q==}
+    engines: {node: '>=18.18'}
+    peerDependencies:
+      eslint: '>=6.0.0'
 
   eslint-plugin-html@6.2.0:
     resolution: {integrity: sha512-vi3NW0E8AJombTvt8beMwkL1R/fdRWl4QSNRNMhVQKWm36/X0KF0unGNAY4mqUF06mnwVWZcIcerrCnfn9025g==}
@@ -13345,6 +13354,19 @@ snapshots:
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1)
     transitivePeerDependencies:
+      - supports-color
+
+  eslint-plugin-boundaries@5.1.0(@typescript-eslint/parser@8.41.0(eslint@8.57.1)(typescript@5.7.2))(eslint@8.57.1):
+    dependencies:
+      chalk: 4.1.2
+      eslint: 8.57.1
+      eslint-import-resolver-node: 0.3.9
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.41.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
+      micromatch: 4.0.8
+    transitivePeerDependencies:
+      - '@typescript-eslint/parser'
+      - eslint-import-resolver-typescript
+      - eslint-import-resolver-webpack
       - supports-color
 
   eslint-plugin-html@6.2.0:

@@ -2,16 +2,18 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { usePractice } from '@/services/practice/hooks';
-import { useSession } from '@/entities/session/model/context';
+import { useAuth } from '@/entities/user';
 import DashboardFlow from '@/features/practice/components/Dashboard/DashboardFlow';
 import { Button } from '@/shared/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { LazyCommentSection } from '@/features/comment';
+import { CommentType } from '@/services/comments';
 
 const PracticeDetailPage = () => {
   const router = useRouter();
   const params = useParams();
   const practiceId = params?.practiceId as string;
-  const { user } = useSession();
+  const { user } = useAuth();
 
   const { practice, isLoading, error, mutate } = usePractice(practiceId || null);
 
@@ -46,6 +48,12 @@ const PracticeDetailPage = () => {
     <DashboardFlow
       practice={practice}
       currentUserId={user?.id}
+      commentSection={
+        <LazyCommentSection
+          targetId={practice.id}
+          targetType={CommentType.Practice}
+        />
+      }
       onBack={() => router.back()}
       onDataUpdate={() => mutate()}
     />

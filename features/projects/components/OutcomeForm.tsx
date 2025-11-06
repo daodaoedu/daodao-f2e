@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X } from 'lucide-react';
 import { format } from 'date-fns';
-import PostCard from '@/shared/components/Post/PostCard';
+import { PostCard } from '@/entities/post';
 import { Button } from '@/shared/ui/button';
 import { Form } from '@/shared/ui/form';
 import {

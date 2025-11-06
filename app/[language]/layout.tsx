@@ -125,6 +125,7 @@ export default async function RootLayout({
     <html
       lang={language}
       className={`${inter.className} scroll-smooth`}
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <body>

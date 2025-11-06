@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { Image } from '@/shared/ui/image';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { cn } from '@/shared/lib/cn';
 
@@ -56,22 +56,26 @@ export function PersonalitySection({ className }: PersonalitySectionProps) {
       </div>
 
       {/* 裝飾元素 - 吉祥物 */}
-      <Image
-        src="/assets/landing-page/deco-mascot.svg"
-        alt="吉祥物裝飾"
-        width={128}
-        height={128}
-        className="absolute right-3 top-8 z-0"
-      />
+      <div className="absolute right-3 top-8 z-0">
+        <div className="relative aspect-[120/127] w-[120px]">
+          <Image
+            src="/assets/landing-page/deco-mascot.svg"
+            alt="吉祥物裝飾"
+            fill
+          />
+        </div>
+      </div>
 
       {/* 裝飾元素 - 物品 */}
-      <Image
-        src="/assets/landing-page/deco-items.svg"
-        alt="物品裝飾"
-        width={96}
-        height={96}
-        className="absolute left-3 top-32 z-0"
-      />
+      <div className="absolute left-3 top-32 z-0">
+        <div className="relative aspect-[96/155] w-[96px]">
+          <Image
+            src="/assets/landing-page/deco-items.svg"
+            alt="物品裝飾"
+            fill
+          />
+        </div>
+      </div>
     </section>
   );
 }

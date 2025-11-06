@@ -1,6 +1,22 @@
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
-export class ApiError<T = unknown> extends Error {
+export interface ApiErrorDetail {
+  path?: string;
+  message?: string;
+}
+
+export interface ApiErrorResponseSchema {
+  success: false;
+  error: {
+    code?: string;
+    message: string;
+    details?: ApiErrorDetail[];
+  };
+}
+
+export class ApiError<
+  T extends ApiErrorResponseSchema['error'] = ApiErrorResponseSchema['error'],
+> extends Error {
   public readonly status: number;
 
   public readonly data?: T;

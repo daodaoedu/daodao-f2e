@@ -1,6 +1,11 @@
 import * as React from 'react';
+import type { FieldPath, FieldValues } from 'react-hook-form';
 
 import { cn } from '@/shared/lib/cn';
+import {
+  FormFieldWrapper,
+  BaseFormFieldProps,
+} from './form';
 
 const Textarea = React.forwardRef<
   HTMLTextAreaElement,
@@ -17,4 +22,46 @@ const Textarea = React.forwardRef<
 ));
 Textarea.displayName = 'Textarea';
 
-export { Textarea };
+interface FormTextareaProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> extends BaseFormFieldProps<TFieldValues, TName> {
+  placeholder?: string;
+  className?: string;
+  rows?: number;
+}
+
+const FormTextarea = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  control,
+  name,
+  label,
+  required,
+  disabled,
+  placeholder,
+  className,
+  rows,
+}: FormTextareaProps<TFieldValues, TName>) => (
+  <FormFieldWrapper
+    control={control}
+    name={name}
+    label={label}
+    required={required}
+  >
+    {(field) => (
+      <Textarea
+        {...field}
+        placeholder={placeholder}
+        disabled={disabled}
+        className={className}
+        rows={rows}
+      />
+    )}
+  </FormFieldWrapper>
+);
+
+FormTextarea.displayName = 'FormTextarea';
+
+export { Textarea, FormTextarea };

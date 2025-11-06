@@ -1,5 +1,5 @@
 import { cn } from '@/shared/lib/cn';
-import Image from 'next/image';
+import { Image } from '@/shared/ui/image';
 import { SectionHeader } from '@/shared/ui/section-header';
 
 interface PresentationSectionProps {
@@ -15,7 +15,7 @@ export function PresentationSection({ className }: PresentationSectionProps) {
         src="/assets/landing-page/deco-flower-yellow.svg"
         alt="裝飾花朵"
         width={100}
-        height={100}
+        height={90}
       />
 
       <div className="container flex flex-col items-center justify-end text-center">
@@ -52,8 +52,8 @@ export function PresentationSection({ className }: PresentationSectionProps) {
         className="absolute bottom-0 right-[10%]"
         src="/assets/landing-page/deco-mascot-2.svg"
         alt="吉祥物裝飾"
-        width={120}
-        height={120}
+        width={143}
+        height={132}
       />
     </section>
   );

@@ -14,12 +14,12 @@ import { Button } from '@/shared/ui/button';
 import { Paper } from '@/shared/ui/paper';
 import { Selector } from '@/shared/ui/select';
 import { Text, Title } from '@/shared/ui/typography';
-import { Checkbox, CheckboxWithForm } from '@/shared/ui/checkbox';
+import { Checkbox, FormCheckboxGroup } from '@/shared/ui/checkbox';
 import { DatePicker } from '@/shared/ui/date-picker';
 import { MultipleSelector } from '@/shared/ui/multiple-selector';
 import { OptionProps } from '@/shared/ui/option';
 import { Switch } from '@/shared/ui/switch';
-import { UploadImage } from '@/shared/ui/upload-image';
+import { ImagePicker } from '@/shared/ui/image-picker';
 import { ACTIVITY_CATEGORIES, CATEGORIES } from '@/constants/category';
 import { EDUCATION } from '@/constants/member';
 import { AREAS, ONLINE_OPTION, TBD_OPTION } from '@/constants/areas';
@@ -140,7 +140,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                 <FormItem>
                   <FormLabel>活動圖片</FormLabel>
                   <FormControl>
-                    <UploadImage
+                    <ImagePicker
                       ratio={2 / 1}
                       value={field.value ? [field.value] : []}
                       onPreviewsChange={(previews: string[]) => {
@@ -149,14 +149,14 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                     >
                       <Plus size={24} />
                       選擇封面
-                    </UploadImage>
+                    </ImagePicker>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <CheckboxWithForm
+            <FormCheckboxGroup
               control={form.control}
               name="activityCategory"
               label="揪團類型"

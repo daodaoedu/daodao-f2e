@@ -1,13 +1,19 @@
 import { CustomLink } from '@/shared/ui/custom-link';
 import { MARATHON_LINKS, NAV_LINK, USER_LINK } from '@/constants/category';
-import { useSession, useSessionActions } from '@/entities/session';
+import { useAuth, useAuthActions } from '@/entities/user';
 import { cn } from '@/shared/lib/cn';
-import Dropdown from '@/shared/components/Dropdown';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/ui/dropdown-menu';
 import { Image } from '@/shared/ui/image';
+import { Button } from '@/shared/ui/button';
 
 function DesktopMenu() {
-  const auth = useSession();
-  const authDispatch = useSessionActions();
+  const auth = useAuth();
+  const authDispatch = useAuthActions();
 
   return (
     <>
@@ -27,30 +33,33 @@ function DesktopMenu() {
         </ul>
       </nav>
       <div className="flex items-center gap-3.5">
-        <Dropdown as="nav">
-          <Dropdown.Toggle
-            className={cn(
-              'my-4 py-1.5 pl-3 pr-1 font-bold rounded-lg transition-colors',
-              'text-basic-white hover:text-basic-white bg-transparent',
-              'aria-pressed:text-primary-base aria-pressed:bg-primary-lightest'
-            )}
-            withIcon
-          >
-            島島盃-春季學習馬拉松
-          </Dropdown.Toggle>
-          <Dropdown.List className="mt-1">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className={cn(
+                'my-4 py-1.5 pl-3 pr-1 font-bold rounded-lg transition-colors',
+                'text-basic-white hover:text-basic-white bg-transparent',
+                'aria-pressed:text-primary-base aria-pressed:bg-primary-lightest'
+              )}
+            >
+              島島盃-春季學習馬拉松
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="mt-1">
             {MARATHON_LINKS.map(({ name, link }) => (
-              <Dropdown.Item
+              <DropdownMenuItem
                 key={name}
                 className="text-nowrap rounded-lg hover:bg-primary-lightest"
+                asChild
               >
                 <CustomLink href={link} className="block p-2 text-basic-400">
                   {name}
                 </CustomLink>
-              </Dropdown.Item>
+              </DropdownMenuItem>
             ))}
-          </Dropdown.List>
-        </Dropdown>
+          </DropdownMenuContent>
+        </DropdownMenu>
         {auth.isLoggedIn ? (
           <div className="flex items-center gap-3.5">
             <CustomLink
@@ -59,21 +68,24 @@ function DesktopMenu() {
             >
               我的小島
             </CustomLink>
-            <Dropdown as="nav">
-              <Dropdown.Toggle animation="none" className="p-0">
-                <Image
-                  src={auth.user.photoURL ?? ''}
-                  alt={auth.user.name ?? 'user avatar'}
-                  width="40"
-                  height="40"
-                  className="rounded-full"
-                />
-              </Dropdown.Toggle>
-              <Dropdown.List className="mt-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="p-0">
+                  <Image
+                    src={auth.user.photoURL ?? ''}
+                    alt={auth.user.name ?? 'user avatar'}
+                    width="40"
+                    height="40"
+                    className="rounded-full"
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="mt-2">
                 {USER_LINK.map(({ name, id }) => (
-                  <Dropdown.Item
+                  <DropdownMenuItem
                     key={name}
                     className="text-nowrap rounded-lg hover:bg-primary-lightest"
+                    asChild
                   >
                     <CustomLink
                       href={`/profile?id=${id}`}
@@ -81,9 +93,9 @@ function DesktopMenu() {
                     >
                       {name}
                     </CustomLink>
-                  </Dropdown.Item>
+                  </DropdownMenuItem>
                 ))}
-                <Dropdown.Item className="text-nowrap rounded-lg hover:bg-primary-lightest">
+                <DropdownMenuItem className="text-nowrap rounded-lg hover:bg-primary-lightest">
                   <button
                     type="button"
                     className="block p-2 text-basic-400"
@@ -91,9 +103,9 @@ function DesktopMenu() {
                   >
                     登出
                   </button>
-                </Dropdown.Item>
-              </Dropdown.List>
-            </Dropdown>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         ) : (
           <button

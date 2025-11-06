@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { Image } from '@/shared/ui/image';
-import PostPreviewCard from '@/shared/components/Post/PostPreviewCard';
+import { PostPreviewCard } from '@/entities/post';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 
 const tagMap = {

@@ -2,13 +2,13 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSessionActions } from '@/entities/session';
+import { useAuthActions } from '@/entities/user';
 import { IslandPlaceholder } from '@/shared/ui/island-placeholder';
 import { parseToString } from '@/shared/lib/helper';
 import { formatJWTInfo } from '@/shared/lib/jwt';
 
 export const AuthSuccess = () => {
-  const { setToken } = useSessionActions();
+  const { setToken } = useAuthActions();
   const router = useRouter();
 
   useEffect(() => {

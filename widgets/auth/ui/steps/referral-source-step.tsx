@@ -1,11 +1,11 @@
 'use client';
 
 import { useFormContext } from 'react-hook-form';
-import { RadioGroupWithForm } from '@/shared/ui/radio-group';
+import { FormRadioGroup } from '@/shared/ui/radio-group';
 import { cn } from '@/shared/lib/cn';
+import { REFERRAL_SOURCES } from '@/entities/user';
 import type { RenderOptionFn } from '@/shared/ui/option';
 import type { OnboardingFormData } from '../../model';
-import { REFERRAL_SOURCES } from '../../config';
 
 const renderReferralOption: RenderOptionFn = ({
   Option,
@@ -43,7 +43,7 @@ export const ReferralSourceStep = () => {
   const form = useFormContext<OnboardingFormData>();
 
   return (
-    <RadioGroupWithForm
+    <FormRadioGroup
       control={form.control}
       name="referralSource"
       options={REFERRAL_SOURCES}

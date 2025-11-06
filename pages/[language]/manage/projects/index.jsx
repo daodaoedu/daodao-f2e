@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { ProtectedComponent } from '@/features/auth';
+import { ProtectedComponent } from '@/entities/user';
 import { ChevronLeft, Circle } from 'lucide-react';
 import Select from '@/components/Projects/Form/Select';
 import SEOConfig from '@/components/SEOConfig';

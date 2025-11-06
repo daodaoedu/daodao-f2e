@@ -14,17 +14,17 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/shared/ui/collapsible';
-import CommentSection from '@/shared/components/Comment/CommentSection';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
-import { CommentType } from '@/services/comments';
 import { cn } from '@/shared/lib/cn';
 
 interface ResourceReviewCardProps {
   review: RecentResourceReviewSchema;
+  commentSection: React.ReactNode;
 }
 
 export default function ResourceReviewCard({
   review,
+  commentSection,
 }: ResourceReviewCardProps) {
   return (
     <Collapsible className="rounded-lg bg-primary-palest">
@@ -52,15 +52,16 @@ export default function ResourceReviewCard({
           <h3 className="body-lg font-bold">內容特色</h3>
           <div className="body-sm mt-1 flex gap-2.5">
             {Object.entries(review.contentFeatures ?? {}).map(
-              ([feature, enabled]) => (enabled ? (
-                <Badge key={feature}>
-                  <Check
-                    size={20}
-                    className="-my-1 mr-1 rounded-full border-2 border-basic-white"
-                  />
-                  {feature}
-                </Badge>
-              ) : null)
+              ([feature, enabled]) =>
+                enabled ? (
+                  <Badge key={feature}>
+                    <Check
+                      size={20}
+                      className="-my-1 mr-1 rounded-full border-2 border-basic-white"
+                    />
+                    {feature}
+                  </Badge>
+                ) : null
             )}
           </div>
         </div>
@@ -125,16 +126,11 @@ export default function ResourceReviewCard({
         </div>
       </footer>
 
-      <div className="px-5">
-        <CommentSection
-          targetId={review.id}
-          targetType={CommentType.ResourceReview}
-        />
-      </div>
+      <div className="px-5">{commentSection}</div>
 
       <CollapsibleTrigger
         className={cn(
-          'w-full flex flex-row-reverse justify-center gap-1 mt-10 p-3',
+          'mt-10 flex w-full flex-row-reverse justify-center gap-1 p-3',
           'body-md rounded-b-lg bg-primary-lightest hover:bg-primary-lightest/80'
         )}
         withIcon

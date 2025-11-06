@@ -2,8 +2,7 @@
 
 import { SWRConfig } from 'swr';
 import { ThemeProvider } from 'next-themes';
-import { LoginModal } from '@/features/auth';
-import { SessionProvider } from '@/entities/session';
+import { AuthProvider, LoginModal } from '@/entities/user';
 import { DialogProvider } from '@/contexts/Dialog';
 import { PromotionProvider } from '@/contexts/Promotion';
 import { NavigationBlockerProvider } from '@/shared/lib/navigation-blocker';
@@ -37,7 +36,7 @@ function Providers({ children, locale }: ProvidersProps) {
       <SWRConfig value={swrConfig}>
         <NavigationBlockerProvider>
           <DialogProvider>
-            <SessionProvider>
+            <AuthProvider>
               <PromotionProvider>
                 <ThemeProvider attribute="class">
                   {children}
@@ -53,7 +52,7 @@ function Providers({ children, locale }: ProvidersProps) {
                   <LoginModal />
                 </ThemeProvider>
               </PromotionProvider>
-            </SessionProvider>
+            </AuthProvider>
           </DialogProvider>
         </NavigationBlockerProvider>
       </SWRConfig>

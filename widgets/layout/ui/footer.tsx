@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
 import { Icon } from '@/shared/ui/icon';
 import { SOCIAL_LINKS, ANCHOR_IDS } from '@/shared/constants';
@@ -142,7 +142,7 @@ export const Footer = () => {
                 src="/assets/landing-page/icon-Instagram.svg"
                 alt={t('common.footer_instagram_alt')}
                 width={36}
-                height={36}
+                height={35}
               />
             </CustomLink>
             <CustomLink
@@ -155,7 +155,7 @@ export const Footer = () => {
                 src="/assets/landing-page/icon-Facebook.svg"
                 alt={t('common.footer_facebook_alt')}
                 width={36}
-                height={36}
+                height={35}
               />
             </CustomLink>
           </div>

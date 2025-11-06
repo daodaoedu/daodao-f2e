@@ -1,9 +1,15 @@
 import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
+import type { FieldPath, FieldValues } from 'react-hook-form';
 
 import { cn } from '@/shared/lib/cn';
 import { OptionProps } from './option';
+import {
+  FormControl,
+  FormFieldWrapper,
+  BaseFormFieldProps,
+} from './form';
 
 const Select = SelectPrimitive.Root;
 
@@ -170,6 +176,53 @@ const Selector = React.forwardRef<
   </Select>
 ));
 
+interface FormSelectProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+> extends BaseFormFieldProps<TFieldValues, TName> {
+  placeholder?: string;
+  options: OptionProps[];
+}
+
+const FormSelect = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+>({
+  control,
+  name,
+  label,
+  placeholder,
+  options,
+  required,
+  disabled,
+}: FormSelectProps<TFieldValues, TName>) => (
+  <FormFieldWrapper
+    control={control}
+    name={name}
+    label={label}
+    required={required}
+  >
+    {(field) => (
+      <Select onValueChange={field.onChange} value={field.value} disabled={disabled}>
+        <FormControl>
+          <SelectTrigger>
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+        </FormControl>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    )}
+  </FormFieldWrapper>
+);
+
+FormSelect.displayName = 'FormSelect';
+
 export {
   Select,
   SelectGroup,
@@ -182,4 +235,5 @@ export {
   SelectScrollUpButton,
   SelectScrollDownButton,
   Selector,
+  FormSelect,
 };

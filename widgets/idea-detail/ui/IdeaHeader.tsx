@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Image } from '@/shared/ui/image';
 import { ROLE } from '@/constants/member';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
-import { useSession } from '@/entities/session';
+import { useAuth } from '@/entities/user';
 import { IdeaActions } from '@/features/ideas/components/IdeaActions';
 import type { IdeaSchema } from '@/services/ideas';
 
@@ -15,7 +15,7 @@ interface IdeaHeaderProps {
 
 export function IdeaHeader({ idea, onEdit }: IdeaHeaderProps) {
   const router = useRouter();
-  const { user } = useSession();
+  const { user } = useAuth();
 
   // 檢查是否為想法的作者
   const isOwner = user?.id === idea.user?.id;

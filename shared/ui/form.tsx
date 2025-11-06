@@ -102,7 +102,7 @@ const FormLabel = React.forwardRef<
     <Label
       ref={ref}
       className={cn(
-        'body-lg mb-3 block whitespace-nowrap font-bold text-basic-400',
+        'body-lg mb-2 block whitespace-nowrap font-bold text-basic-400',
         error && 'text-destructive',
         className
       )}
@@ -214,6 +214,110 @@ function parseSchemaAutoFocus<T extends FieldValues, S extends ZodSchema>({
   onError?.(parsed.error);
 }
 
+// 基礎 Form 元件 props 類型
+interface BaseFormFieldProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+> {
+  control: ControllerProps<TFieldValues, TName>['control'];
+  name: TName;
+  label?: string;
+  required?: boolean;
+  // eslint-disable-next-line react/no-unused-prop-types
+  disabled?: boolean;
+}
+
+// Form 元件 wrapper props
+interface FormFieldWrapperProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+> extends BaseFormFieldProps<TFieldValues, TName> {
+  className?: string;
+  labelClassName?: string;
+  children: (field: Parameters<ControllerProps<TFieldValues, TName>['render']>[0]['field']) => React.ReactNode;
+}
+
+// 通用的 FormFieldWrapper 元件
+const FormFieldWrapper = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+>({
+  control,
+  name,
+  label,
+  required,
+  className,
+  labelClassName,
+  children,
+}: FormFieldWrapperProps<TFieldValues, TName>) => (
+  <FormField
+    control={control}
+    name={name}
+    render={({ field }) => (
+      <FormItem className={className}>
+        {label && <FormLabel required={required} className={labelClassName}>{label}</FormLabel>}
+        <FormControl>
+          {children(field)}
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
+// 特殊佈局的 FormFieldWrapper (如 checkbox 需要 label 在右邊)
+interface FormFieldWrapperFlexProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+> extends BaseFormFieldProps<TFieldValues, TName> {
+  className?: string;
+  labelClassName?: string;
+  direction?: 'row' | 'column';
+  labelPosition?: 'before' | 'after';
+  children: (field: Parameters<ControllerProps<TFieldValues, TName>['render']>[0]['field']) => React.ReactNode;
+}
+
+const FormFieldWrapperFlex = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+>({
+  control,
+  name,
+  label,
+  required,
+  className,
+  labelClassName,
+  direction = 'column',
+  labelPosition = 'before',
+  children,
+}: FormFieldWrapperFlexProps<TFieldValues, TName>) => (
+  <FormField
+    control={control}
+    name={name}
+    render={({ field }) => (
+      <FormItem className={cn(
+        direction === 'row' ? 'flex flex-row items-center' : 'flex flex-col',
+        className
+      )}>
+        {labelPosition === 'before' && label && (
+          <FormLabel required={required} className={labelClassName}>
+            {label}
+          </FormLabel>
+        )}
+        <FormControl>
+          {children(field)}
+        </FormControl>
+        {labelPosition === 'after' && label && (
+          <FormLabel required={required} className={cn('mb-0 pl-2 text-base', labelClassName)}>
+            {label}
+          </FormLabel>
+        )}
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
 export {
   useFormField,
   Form,
@@ -224,4 +328,9 @@ export {
   FormMessage,
   FormField,
   parseSchemaAutoFocus,
+  FormFieldWrapper,
+  FormFieldWrapperFlex,
+  type BaseFormFieldProps,
+  type FormFieldWrapperProps,
+  type FormFieldWrapperFlexProps,
 };

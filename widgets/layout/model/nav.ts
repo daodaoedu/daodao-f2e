@@ -1,12 +1,6 @@
-import type { UserValidatorsCreateUserResponseSchemaDataUser } from '@/generated/models';
+import type { NavVisibility } from '@/entities/user';
 import { ANCHOR_IDS } from '@/shared/constants';
 import { TranslationKeys } from '@/shared/config/i18n';
-
-export type NavVisibility =
-  | 'all'
-  | 'auth'
-  | 'guest'
-  | ((user: UserValidatorsCreateUserResponseSchemaDataUser | null) => boolean);
 
 export interface NavItemType {
   label: TranslationKeys;

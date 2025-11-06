@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { cn } from '@/shared/lib/cn';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { useSessionActions } from '@/entities/session';
+import { useAuth, useAuthActions , getUserProfileBasePath } from '@/entities/user';
 import { useDialog } from '@/contexts/Dialog';
 import { Form, parseSchemaAutoFocus } from '@/shared/ui/form';
 import { Button } from '@/shared/ui/button';
@@ -21,8 +21,9 @@ import { ONBOARDING_STEPS } from '../config';
 export const AuthOnboarding = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
+  const { user } = useAuth();
   const { openDialog } = useDialog();
-  const { updateUser } = useSessionActions();
+  const { updateUser } = useAuthActions();
   const searchParams = getEnv().isClientSide
     ? new URLSearchParams(window.location.search)
     : new URLSearchParams();
@@ -107,7 +108,7 @@ export const AuthOnboarding = () => {
           </p>
         ),
         onConfirm: () => {
-          router.replace('/personal-card');
+          router.replace(getUserProfileBasePath(user));
         },
         onCancel: () => {
           router.push(redirectTo);

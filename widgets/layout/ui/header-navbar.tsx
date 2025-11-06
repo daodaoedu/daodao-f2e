@@ -5,10 +5,9 @@ import { CustomLink } from '@/shared/ui/custom-link';
 import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
-import { AuthGuardButton } from '@/features/auth';
 import { cn } from '@/shared/lib/cn';
 import { useTranslation } from '@/shared/lib/translation';
-import { useSession, useSessionActions } from '@/entities/session';
+import { useAuth, useAuthActions, AuthGuardButton, getUserProfileBasePath } from '@/entities/user';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import {
   DropdownMenu,
@@ -27,8 +26,8 @@ export const HeaderNavbar = ({
   navItems,
   alwaysShow = false,
 }: HeaderNavbarProps) => {
-  const { user } = useSession();
-  const { logout } = useSessionActions();
+  const { user } = useAuth();
+  const { logout } = useAuthActions();
   const router = useRouter();
   const isVisible = useScrollVisibility({ threshold: 200 });
   const { t } = useTranslation();
@@ -54,10 +53,7 @@ export const HeaderNavbar = ({
   const userDropdownItems = [
     {
       label: '個人資料',
-      onClick: () =>
-        router.push(
-          user?.customId ? `/me/${user?.customId}` : `/users/${user?.id}`
-        ),
+      onClick: () => router.push(getUserProfileBasePath(user)),
     },
     {
       label: '帳號設定',

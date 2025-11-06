@@ -1,6 +1,6 @@
-import Image from 'next/image';
+import { Image } from '@/shared/ui/image';
 import { cn } from '@/shared/lib/cn';
-import { AuthGuardButton } from '@/features/auth';
+import { AuthGuardButton } from '@/entities/user';
 import { ANCHOR_IDS } from '@/shared/constants';
 
 interface PlanSectionProps {
@@ -32,8 +32,8 @@ export function PlanSection({ className }: PlanSectionProps) {
             <Image
               src="/assets/landing-page/deco-semicircle.svg"
               alt="裝飾半圓"
-              width={120}
-              height={120}
+              width={127}
+              height={84}
               className="absolute -left-16 -top-10 z-0"
             />
 
@@ -76,9 +76,9 @@ export function PlanSection({ className }: PlanSectionProps) {
             <Image
               src="/assets/landing-page/deco-geometries.svg"
               alt="裝飾幾何圖形"
-              width={100}
-              height={100}
-              className="absolute -bottom-10 -right-7 z-20"
+              width={107}
+              height={91}
+              className="absolute -right-8 bottom-[-44px] z-20"
             />
           </div>
         </div>

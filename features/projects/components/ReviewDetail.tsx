@@ -1,15 +1,14 @@
-import PostDetailCard, {
-  BasePostDetailData,
-} from '@/shared/components/Post/PostDetailCard';
+import { PostDetailCard, BasePostDetailData } from '@/entities/post';
 import { ProjectReviewSchema } from '@/services/projects';
 import { BaseUserSchema } from '@/services/users';
-import { CommentType } from '@/services/comments';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
+import { useAuth } from '@/entities/user';
 import RadioGroup from './ReviewRadioGroup';
 
 interface ReviewDetailProps {
   data?: ProjectReviewSchema;
   authorUser?: BaseUserSchema;
+  commentSection?: React.ReactNode;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
 }
@@ -17,9 +16,13 @@ interface ReviewDetailProps {
 function ReviewDetail({
   data,
   authorUser,
+  commentSection,
   onEditClick,
   onDeleteClick,
 }: ReviewDetailProps) {
+  const { user } = useAuth();
+  const isOwner = user?.id === authorUser?.id;
+
   if (!data) return null;
 
   const postData: BasePostDetailData = {
@@ -32,9 +35,10 @@ function ReviewDetail({
   return (
     <PostDetailCard
       data={postData}
-      targetType={CommentType.Review}
+      commentSection={commentSection}
       tag="覆盤"
       authorUser={authorUser}
+      isOwner={isOwner}
       onEditClick={onEditClick}
       onDeleteClick={onDeleteClick}
       renderContent={() => (

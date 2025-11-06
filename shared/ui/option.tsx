@@ -1,4 +1,9 @@
-import type { Control, ControllerProps, FieldPath, FieldValues } from 'react-hook-form';
+import type {
+  Control,
+  ControllerProps,
+  FieldPath,
+  FieldValues,
+} from 'react-hook-form';
 import { cn } from '@/shared/lib/cn';
 import { FormLabel } from './form';
 
@@ -17,8 +22,8 @@ export const Option = ({
 }: OptionLabelProps) => (
   <FormLabel
     className={cn(
-      'block m-0 p-2.5 text-center cursor-pointer border border-solid border-basic-200 rounded-lg',
-      isChecked && 'bg-primary-lightest border-primary-base',
+      'm-0 block cursor-pointer rounded-lg border border-solid border-basic-200 p-2.5 text-center',
+      isChecked && 'border-primary-base bg-primary-lightest',
       isDisabled && 'cursor-not-allowed opacity-50',
       className
     )}
@@ -27,9 +32,12 @@ export const Option = ({
   </FormLabel>
 );
 
-export interface OptionProps<TValue extends string = string> {
+export interface OptionProps<
+  TValue extends string = string,
+  TLabel extends string = string,
+> {
   value: TValue;
-  label: string;
+  label: TLabel;
   disable?: boolean;
   /** fixed option that can't be removed. */
   fixed?: boolean;
@@ -62,6 +70,12 @@ export interface OptionWithFormProps<
   showCounter?: boolean;
 }
 
-export const defaultRenderOption: RenderOptionFn = ({ isChecked, isDisabled, label }) => (
-  <Option isChecked={isChecked} isDisabled={isDisabled}>{label}</Option>
+export const defaultRenderOption: RenderOptionFn = ({
+  isChecked,
+  isDisabled,
+  label,
+}) => (
+  <Option isChecked={isChecked} isDisabled={isDisabled}>
+    {label}
+  </Option>
 );

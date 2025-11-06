@@ -1,7 +1,7 @@
 'use client';
 
 import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
-import Image from 'next/image';
+import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
 import { Icon } from '@/shared/ui/icon';
 import { cn } from '@/shared/lib/cn';
@@ -51,7 +51,7 @@ export const LandingPageFloatButtons = () => {
               src="/assets/landing-page/badge.svg"
               alt="點擊進入心理測驗"
               width={90}
-              height={90}
+              height={91}
               className="animate-spin-slow object-contain"
             />
           </CustomLink>

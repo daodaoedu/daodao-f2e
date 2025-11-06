@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { RoleEnum } from '@/services/users';
-import { useSession } from '@/entities/session';
+import { useAuth } from '@/entities/user';
 
 export default function useMarathonAccess() {
-  const { user } = useSession();
+  const { user } = useAuth();
   const hasMarathonAccess = useMemo(() => {
     const permissions = [
       RoleEnum.MarathonApplicant,

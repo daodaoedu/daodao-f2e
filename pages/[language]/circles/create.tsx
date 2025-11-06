@@ -1,20 +1,20 @@
-import { useRouter } from "next/navigation";
-import SEOConfig from "@/components/SEOConfig";
-import { Background, Container } from "@/shared/ui/wrapper";
-import { ProtectedComponent } from "@/features/auth";
-import { CircleForm } from "@/features/circles/components/CircleForm";
+import { useRouter } from 'next/navigation';
+import SEOConfig from '@/components/SEOConfig';
+import { Background, Container } from '@/shared/ui/wrapper';
+import { CircleForm } from '@/features/circles/components/CircleForm';
+import { useAuth, getUserProfileBasePath, ProtectedComponent } from '@/entities/user';
 
 export default function CircleCreatePage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const basePath = getUserProfileBasePath(user);
 
   return (
     <ProtectedComponent>
-      <Background className="text-basic-400 min-h-screen">
+      <Background className="min-h-screen text-basic-400">
         <SEOConfig title="發起揪團｜島島阿學" />
-        <Container className="pb-12 max-w-3xl">
-          <CircleForm
-            onSuccess={() => router.replace("/personal-card/my-card")}
-          />
+        <Container className="max-w-3xl pb-12">
+          <CircleForm onSuccess={() => router.replace(`${basePath}/circles`)} />
         </Container>
       </Background>
     </ProtectedComponent>

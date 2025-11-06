@@ -1,8 +1,13 @@
 import * as React from 'react';
+import type { FieldPath, FieldValues } from 'react-hook-form';
 
 import { Button } from '@/shared/ui/button';
 import useControlledState from '@/shared/lib/use-controlled-state';
 import { cn } from '@/shared/lib/cn';
+import {
+  FormFieldWrapper,
+  BaseFormFieldProps,
+} from './form';
 
 type IconComponent = React.ReactNode | ((value: string) => React.ReactNode);
 
@@ -112,4 +117,58 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 );
 Input.displayName = 'Input';
 
-export { Input };
+interface FormInputProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> extends BaseFormFieldProps<TFieldValues, TName> {
+  placeholder?: string;
+  prefixIcon?: IconComponent;
+  suffixIcon?: IconComponent;
+  className?: string;
+  inputClassName?: string;
+  onPrefixIconClick?: (value: string) => void;
+  onSuffixIconClick?: (value: string) => void;
+}
+
+const FormInput = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  control,
+  name,
+  label,
+  required,
+  disabled,
+  placeholder,
+  prefixIcon,
+  suffixIcon,
+  className,
+  inputClassName,
+  onPrefixIconClick,
+  onSuffixIconClick,
+}: FormInputProps<TFieldValues, TName>) => (
+  <FormFieldWrapper
+    control={control}
+    name={name}
+    label={label}
+    required={required}
+  >
+    {(field) => (
+      <Input
+        {...field}
+        placeholder={placeholder}
+        disabled={disabled}
+        prefixIcon={prefixIcon}
+        suffixIcon={suffixIcon}
+        className={className}
+        inputClassName={inputClassName}
+        onPrefixIconClick={onPrefixIconClick}
+        onSuffixIconClick={onSuffixIconClick}
+      />
+    )}
+  </FormFieldWrapper>
+);
+
+FormInput.displayName = 'FormInput';
+
+export { Input, FormInput };

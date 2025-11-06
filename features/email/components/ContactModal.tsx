@@ -22,8 +22,7 @@ import {
   ResponsiveModalSize,
 } from '@/shared/ui/responsive-modal';
 import ChatSvg from '@/public/assets/icons/chat.svg';
-import { AuthGuardButton } from '@/features/auth';
-import { useSession } from '@/entities/session';
+import { useAuth, AuthGuardButton } from '@/entities/user';
 import { Textarea } from '@/shared/ui/textarea';
 import { ROLE } from '@/constants/member';
 import { contactFormSchema, ContactFormSchema } from '@/services/emails';
@@ -74,7 +73,7 @@ export const ContactModal = ({
   onCancel,
   onSuccess,
 }: ContactModalProps) => {
-  const { user: me } = useSession();
+  const { user: me } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
   const form = useForm<ContactFormSchema>({
