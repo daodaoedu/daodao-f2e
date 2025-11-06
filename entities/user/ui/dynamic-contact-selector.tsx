@@ -194,8 +194,9 @@ export const DynamicContactSelector = <
             {/* 刪除按鈕 */}
             <Button
               type="button"
-              variant="outline"
+              variant="alert"
               size="icon"
+              className="border-alert bg-transparent text-alert hover:text-basic-white"
               onClick={() => handleRemoveItem(item.id)}
               aria-label="移除此社群連結"
             >

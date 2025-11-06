@@ -19,6 +19,7 @@ import { cn } from '@/shared/lib/cn';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { DynamicContactSelector } from '@/entities/user/ui';
 import { CONTACT_PLATFORM_OPTIONS } from '@/entities/user/model/constants';
+import { FormCitySelector } from '@/entities/area/ui';
 
 // 表單驗證 schema
 const userProfileSchema = z.object({
@@ -231,11 +232,11 @@ export const UserProfileEditor = ({
             </div>
 
             {/* 居住地 */}
-            <FormInput
+            <FormCitySelector
               control={form.control}
               name="location"
               label="居住地"
-              placeholder="請輸入您的居住地..."
+              placeholder="搜尋並選擇您的居住城市..."
             />
 
             {/* 個人標語 */}

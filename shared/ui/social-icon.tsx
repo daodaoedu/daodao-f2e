@@ -1,4 +1,5 @@
 // 靜態導入所有 social icons
+import { GlobeIcon } from 'lucide-react'
 import FacebookIcon from '@/public/assets/social-icons/facebook.svg';
 import LineIcon from '@/public/assets/social-icons/line.svg';
 import LinkedinIcon from '@/public/assets/social-icons/linkedin.svg';
@@ -17,7 +18,8 @@ export type SocialPlatform =
   | 'x'
   | 'github'
   | 'instagram'
-  | 'discord';
+  | 'discord'
+  | 'website';
 
 interface IconComponentProps {
   width: number;
@@ -71,6 +73,11 @@ export const iconMap: Record<SocialPlatform, IconComponent> = {
     Component: DiscordIcon,
     name: 'Discord',
     className: 'text-[#5865F2]', // Discord 紫
+  },
+  website: {
+    Component: GlobeIcon,
+    name: 'Website',
+    className: 'text-black', // Website 黑
   },
 };
 

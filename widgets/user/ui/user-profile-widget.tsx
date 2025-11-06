@@ -34,6 +34,16 @@ interface SocialPlatformItem {
 
 const socialPlatformList: SocialPlatformItem[] = [
   {
+    platform: 'linkedin',
+    generateHref: (linkedin: string) =>
+      `https://www.linkedin.com/in/${linkedin}`,
+  },
+  {
+    platform: 'github',
+    generateHref: (github: string) =>
+      `https://www.github.com/${github}`,
+  },
+  {
     platform: 'instagram',
     generateHref: (instagram: string) =>
       `https://www.instagram.com/${instagram}`,
@@ -43,7 +53,8 @@ const socialPlatformList: SocialPlatformItem[] = [
     generateHref: (facebook: string) => `https://www.facebook.com/${facebook}`,
   },
   {
-    platform: 'line',
+    platform: 'website',
+    generateHref: (website: string) => website,
   },
   {
     platform: 'discord',
