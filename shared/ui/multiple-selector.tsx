@@ -16,10 +16,7 @@ import {
 import { cn } from '@/shared/lib/cn';
 import { OptionProps } from './option';
 import { Button } from './button';
-import {
-  FormFieldWrapper,
-  BaseFormFieldProps,
-} from './form';
+import { FormFieldWrapper, BaseFormFieldProps } from './form';
 
 interface GroupOption {
   [key: string]: OptionProps[];
@@ -54,7 +51,7 @@ interface MultipleSelectorProps {
   /** Limit the maximum number of selected options. */
   maxSelected?: number;
   /** When the number of selected options exceeds the limit, the onMaxSelected will be called. */
-  onMaxSelected?: (maxLimit: number) => void;
+  onMaxSelected?: (maxLimit: number, options: OptionProps) => void;
   /** Hide the placeholder when there are options selected. */
   hidePlaceholderWhenSelected?: boolean;
   disabled?: boolean;
@@ -80,6 +77,17 @@ interface MultipleSelectorProps {
   >;
   /** hide the clear all button. */
   hideClearAllButton?: boolean;
+  /** Enable virtual scrolling for large lists */
+  virtualScroll?: boolean;
+  /** Virtual scrolling configuration */
+  virtualScrollOptions?: {
+    /** Height of each item in pixels */
+    itemHeight?: number;
+    /** Maximum height of the dropdown in pixels */
+    maxHeight?: number;
+    /** Number of items to render outside visible area for smooth scrolling */
+    overscan?: number;
+  };
 }
 
 export interface MultipleSelectorRef {
@@ -101,6 +109,56 @@ export function useDebounce<T>(value: T, delay?: number): T {
   }, [value, delay]);
 
   return debouncedValue;
+}
+
+/**
+ * 虛擬滾動 Hook - 只渲染可見區域的項目以提升性能
+ *
+ * 實現原理：
+ * 1. 根據滾動位置計算可見範圍
+ * 2. 只渲染可見項目 + 緩衝區項目
+ * 3. 使用 transform 來定位項目
+ * 4. 維護總高度以保持滾動條行為
+ */
+function useVirtualScroll(
+  items: OptionProps[],
+  containerHeight: number,
+  itemHeight: number,
+  overscan: number = 5
+) {
+  const [scrollTop, setScrollTop] = React.useState(0);
+
+  const visibleRange = React.useMemo(() => {
+    // 計算可見區域的開始和結束索引
+    const start = Math.floor(scrollTop / itemHeight);
+    const end = Math.min(
+      start + Math.ceil(containerHeight / itemHeight),
+      items.length
+    );
+
+    // 添加緩衝區，讓滾動更流暢
+    return {
+      start: Math.max(0, start - overscan),
+      end: Math.min(items.length, end + overscan),
+    };
+  }, [scrollTop, containerHeight, itemHeight, overscan, items.length]);
+
+  // 只取可見範圍內的項目
+  const visibleItems = React.useMemo(() => {
+    return items.slice(visibleRange.start, visibleRange.end);
+  }, [items, visibleRange]);
+
+  // 計算總高度和偏移量
+  const totalHeight = items.length * itemHeight;
+  const offsetY = visibleRange.start * itemHeight;
+
+  return {
+    visibleItems,
+    totalHeight,
+    offsetY,
+    setScrollTop,
+    visibleRange,
+  };
 }
 
 function transToGroupOption(options: OptionProps[], groupBy?: string) {
@@ -165,6 +223,87 @@ const CommandEmpty = forwardRef<
 
 CommandEmpty.displayName = 'CommandEmpty';
 
+interface VirtualizedOptionsListProps {
+  options: OptionProps[];
+  onSelect: (option: OptionProps) => void;
+  virtualScrollOptions: {
+    itemHeight: number;
+    maxHeight: number;
+    overscan: number;
+  };
+}
+
+/**
+ * 虛擬化選項列表組件
+ *
+ * 這個組件實現了虛擬滾動：
+ * - 只渲染可見的項目
+ * - 使用 transform 來定位項目
+ * - 監聽滾動事件來更新可見範圍
+ */
+const VirtualizedOptionsList = React.memo(
+  ({
+    options,
+    onSelect,
+    virtualScrollOptions,
+  }: VirtualizedOptionsListProps) => {
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const { itemHeight, maxHeight, overscan } = virtualScrollOptions;
+
+    const { visibleItems, totalHeight, offsetY, setScrollTop } =
+      useVirtualScroll(options, maxHeight, itemHeight, overscan);
+
+    const handleScroll = React.useCallback(
+      (e: React.UIEvent<HTMLDivElement>) => {
+        setScrollTop(e.currentTarget.scrollTop);
+      },
+      [setScrollTop]
+    );
+
+    return (
+      <div
+        ref={containerRef}
+        className="overflow-auto focus:outline-none"
+        style={{ maxHeight }}
+        onScroll={handleScroll}
+        tabIndex={-1}
+      >
+        {/* 總高度容器，維持滾動條的正確行為 */}
+        <div style={{ height: totalHeight, position: 'relative' }}>
+          {/* 可見項目容器，使用 transform 定位 */}
+          <div
+            className="absolute inset-x-0 top-0"
+            style={{ transform: `translateY(${offsetY}px)` }}
+          >
+            {visibleItems.map((option) => (
+              <CommandItem
+                key={option.value}
+                value={option.label}
+                disabled={option.disable}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onSelect={() => onSelect(option)}
+                className={cn(
+                  'flex cursor-pointer items-center',
+                  option.disable && 'cursor-default text-muted-foreground'
+                )}
+                style={{
+                  height: itemHeight,
+                  minHeight: itemHeight,
+                }}
+              >
+                {option.label}
+              </CommandItem>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+);
+
 export const MultipleSelector = React.forwardRef<
   MultipleSelectorRef,
   MultipleSelectorProps
@@ -194,6 +333,12 @@ export const MultipleSelector = React.forwardRef<
       commandProps,
       inputProps,
       hideClearAllButton = false,
+      virtualScroll = false,
+      virtualScrollOptions = {
+        itemHeight: 32,
+        maxHeight: 200,
+        overscan: 5,
+      },
     }: MultipleSelectorProps,
     ref: React.Ref<MultipleSelectorRef>
   ) => {
@@ -240,6 +385,25 @@ export const MultipleSelector = React.forwardRef<
         onChange?.(newOptions);
       },
       [onChange, selected]
+    );
+
+    const handleSelect = React.useCallback(
+      (option: OptionProps) => {
+        if (selected.length >= maxSelected && maxSelected !== 1) {
+          onMaxSelected?.(selected.length, option);
+          return;
+        }
+        setInputValue('');
+        if (maxSelected === 1) {
+          setSelected([option]);
+          onChange?.([option]);
+          return;
+        }
+        const newOptions = [...selected, option];
+        setSelected(newOptions);
+        onChange?.(newOptions);
+      },
+      [onChange, selected, maxSelected, onMaxSelected, setInputValue]
     );
 
     const handleKeyDown = React.useCallback(
@@ -315,7 +479,13 @@ export const MultipleSelector = React.forwardRef<
       };
 
       exec();
-    }, [debouncedSearchTerm, groupBy, open, triggerSearchOnFocus]);
+    }, [
+      debouncedSearchTerm,
+      groupBy,
+      open,
+      triggerSearchOnFocus,
+      onSearchSync,
+    ]);
 
     useEffect(() => {
       const doSearch = async () => {
@@ -338,7 +508,7 @@ export const MultipleSelector = React.forwardRef<
       };
 
       exec();
-    }, [debouncedSearchTerm, groupBy, open, triggerSearchOnFocus]);
+    }, [debouncedSearchTerm, groupBy, open, triggerSearchOnFocus, onSearch]);
 
     const CreatableItem = () => {
       if (!creatable) return undefined;
@@ -359,7 +529,10 @@ export const MultipleSelector = React.forwardRef<
           }}
           onSelect={(_value: string) => {
             if (selected.length >= maxSelected) {
-              onMaxSelected?.(selected.length);
+              onMaxSelected?.(selected.length, {
+                value: _value,
+                label: _value,
+              });
               return;
             }
             setInputValue('');
@@ -405,6 +578,11 @@ export const MultipleSelector = React.forwardRef<
       [options, selected]
     );
 
+    // 將所有選項扁平化，用於虛擬滾動
+    const flatOptions = React.useMemo(() => {
+      return Object.values(selectables).flat();
+    }, [selectables]);
+
     /** Avoid Creatable Selector freezing or lagging when paste a long string. */
     const commandFilter = React.useCallback(() => {
       if (commandProps?.filter) {
@@ -434,8 +612,8 @@ export const MultipleSelector = React.forwardRef<
         shouldFilter={
           commandProps?.shouldFilter !== undefined
             ? commandProps.shouldFilter
-            : !onSearch
-        } // When onSearch is provided, we don't want to filter the options. You can still override it.
+            : !onSearch && !virtualScroll // 虛擬滾動時也不要過濾，因為我們自己處理
+        } // When onSearch or virtualScroll is provided, we don't want to filter the options. You can still override it.
         filter={commandFilter()}
       >
         <div
@@ -489,38 +667,41 @@ export const MultipleSelector = React.forwardRef<
           {selected.map((option) => (
             <Badge
               key={option.value}
-              variant="gray"
+              variant={maxSelected === 1 ? 'secondary' : 'gray'}
               className={cn(
                 'float-left m-0.5',
                 'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
                 'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
+                maxSelected === 1 && 'px-0',
                 badgeClassName
               )}
               data-fixed={option.fixed}
               data-disabled={disabled || undefined}
             >
               {option.label}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  '-m-1 ml-0 size-5 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                  (disabled || option.fixed) && 'hidden'
-                )}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleUnselect(option);
-                  }
-                }}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                onClick={() => handleUnselect(option)}
-              >
-                <X className="size-4 text-muted-foreground hover:text-foreground" />
-              </Button>
+              {maxSelected !== 1 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    '-m-1 ml-0 size-5 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                    (disabled || option.fixed) && 'hidden'
+                  )}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleUnselect(option);
+                    }
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onClick={() => handleUnselect(option)}
+                >
+                  <X className="size-4 text-muted-foreground hover:text-foreground" />
+                </Button>
+              )}
             </Badge>
           ))}
           {/* Avoid having the "Search" Icon */}
@@ -563,7 +744,10 @@ export const MultipleSelector = React.forwardRef<
         <div className="relative">
           {open && (
             <CommandList
-              className="absolute top-1 z-50 w-full rounded-md border bg-white text-basic-600 shadow-md outline-none animate-in"
+              className={cn(
+                'absolute top-1 z-50 w-full rounded-md border bg-white text-basic-600 shadow-md outline-none animate-in',
+                virtualScroll && flatOptions.length > 0 && 'overflow-hidden' // 虛擬滾動時禁用 CommandList 的滾動
+              )}
               onMouseLeave={() => {
                 setOnScrollbar(false);
               }}
@@ -583,44 +767,49 @@ export const MultipleSelector = React.forwardRef<
                   {!selectFirstItem && (
                     <CommandItem value="-" className="hidden" />
                   )}
-                  {Object.entries(selectables).map(([key, dropdowns]) => (
-                    <CommandGroup
-                      key={key}
-                      heading={key}
-                      className="h-full overflow-auto"
-                    >
-                      <>
-                        {dropdowns.map((option) => (
-                          <CommandItem
-                            key={option.value}
-                            value={option.label}
-                            disabled={option.disable}
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }}
-                            onSelect={() => {
-                              if (selected.length >= maxSelected) {
-                                onMaxSelected?.(selected.length);
-                                return;
-                              }
-                              setInputValue('');
-                              const newOptions = [...selected, option];
-                              setSelected(newOptions);
-                              onChange?.(newOptions);
-                            }}
-                            className={cn(
-                              'cursor-pointer',
-                              option.disable &&
-                                'cursor-default text-muted-foreground'
-                            )}
-                          >
-                            {option.label}
-                          </CommandItem>
-                        ))}
-                      </>
-                    </CommandGroup>
-                  ))}
+                  {virtualScroll && flatOptions.length > 0 ? (
+                    // 虛擬滾動渲染
+                    <VirtualizedOptionsList
+                      options={flatOptions}
+                      onSelect={handleSelect}
+                      virtualScrollOptions={{
+                        itemHeight: virtualScrollOptions?.itemHeight ?? 32,
+                        maxHeight: virtualScrollOptions?.maxHeight ?? 200,
+                        overscan: virtualScrollOptions?.overscan ?? 5,
+                      }}
+                    />
+                  ) : (
+                    // 傳統渲染（支援分組）
+                    Object.entries(selectables).map(([key, dropdowns]) => (
+                      <CommandGroup
+                        key={key}
+                        heading={key}
+                        className="h-full overflow-auto"
+                      >
+                        <>
+                          {dropdowns.map((option) => (
+                            <CommandItem
+                              key={option.value}
+                              value={option.label}
+                              disabled={option.disable}
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }}
+                              onSelect={() => handleSelect(option)}
+                              className={cn(
+                                'cursor-pointer',
+                                option.disable &&
+                                  'cursor-default text-muted-foreground'
+                              )}
+                            >
+                              {option.label}
+                            </CommandItem>
+                          ))}
+                        </>
+                      </CommandGroup>
+                    ))
+                  )}
                 </>
               )}
             </CommandList>
@@ -661,6 +850,10 @@ interface FormMultipleSelectorProps<
   hideClearAllButton?: boolean;
   /** Custom function to transform field values to OptionProps */
   valueToOption?: (value: string, options?: OptionProps[]) => OptionProps;
+  /** Enable virtual scrolling for large lists */
+  virtualScroll?: boolean;
+  /** Virtual scrolling configuration */
+  virtualScrollOptions?: MultipleSelectorProps['virtualScrollOptions'];
 }
 
 const defaultValueToOption = (
@@ -701,6 +894,8 @@ const FormMultipleSelector = <
   inputProps,
   hideClearAllButton,
   valueToOption = defaultValueToOption,
+  virtualScroll,
+  virtualScrollOptions,
 }: FormMultipleSelectorProps<TFieldValues, TName>) => (
   <FormFieldWrapper
     control={control}
@@ -742,6 +937,8 @@ const FormMultipleSelector = <
         commandProps={commandProps}
         inputProps={inputProps}
         hideClearAllButton={hideClearAllButton}
+        virtualScroll={virtualScroll}
+        virtualScrollOptions={virtualScrollOptions}
       />
     )}
   </FormFieldWrapper>
