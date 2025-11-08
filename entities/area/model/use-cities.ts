@@ -10,7 +10,7 @@ export const useCities = () => {
     const loadCities = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('/assets/data/json/cities.json');
+        const response = await fetch('/data/cities.json');
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
