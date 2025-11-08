@@ -135,7 +135,7 @@ const startAnimation = (
   };
 };
 
-export function TypewriterBubble({ className }: TypewriterBubbleProps) {
+const TypewriterBubbleText = () => {
   const [currentText, setCurrentText] = useState('');
   const [bubbleWidth, setBubbleWidth] = useState<number | null>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -162,6 +162,21 @@ export function TypewriterBubble({ className }: TypewriterBubbleProps) {
 
   return (
     <div
+      ref={textRef}
+      id="type-animation"
+      className="relative inline-flex h-10 items-center overflow-hidden whitespace-nowrap rounded-[20px] border-2 border-mascot-aqua bg-primary-palest px-6 py-2 leading-[1.4]"
+      style={bubbleWidth ? { width: `${bubbleWidth}px` } : undefined}
+    >
+      {currentText}
+      {/* 打字游標 */}
+      <span className="ml-[0.1em] inline-block h-4 w-[0.12em] translate-y-px animate-pulse border-r-[0.12em] border-r-current" />
+    </div>
+  );
+};
+
+export function TypewriterBubble({ className }: TypewriterBubbleProps) {
+  return (
+    <div
       className={cn(
         'relative flex min-h-[400px] flex-col items-center justify-center overflow-x-clip pb-[60px] pt-12',
         className
@@ -170,16 +185,7 @@ export function TypewriterBubble({ className }: TypewriterBubbleProps) {
       {/* 對話文字區域 */}
       <div className="flex w-full items-center justify-between pl-6 pr-[10%] md:pr-[20%] md:text-xl">
         <p className="font-medium text-primary-darker">在這裡你可以...</p>
-        <div
-          ref={textRef}
-          id="type-animation"
-          className="relative inline-flex h-10 items-center overflow-hidden whitespace-nowrap rounded-[20px] border-2 border-mascot-aqua bg-primary-palest px-6 py-2 leading-[1.4]"
-          style={bubbleWidth ? { width: `${bubbleWidth}px` } : undefined}
-        >
-          {currentText}
-          {/* 打字游標 */}
-          <span className="ml-[0.1em] inline-block h-4 w-[0.12em] translate-y-px animate-pulse border-r-[0.12em] border-r-current" />
-        </div>
+        <TypewriterBubbleText />
       </div>
 
       {/* 吉祥物區域 */}
