@@ -21,7 +21,7 @@
     "next-sitemap.js",
     "node_modules",
     "out",
-    "pages", // 重構到 app route，忽略 pages route
+    "_pages", // 重構到 app route，忽略 pages route
     "public",
     "services/**/*.ts", // @TODO: services 下的 API 檔案將要移除，重構完成後再調整設定檔
     "next-env.d.ts",

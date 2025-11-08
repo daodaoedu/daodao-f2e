@@ -1,7 +1,7 @@
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import z from "zod";
 import { SWRConfig } from "swr";
-import { CustomLink } from '@/shared/ui/custom-link';
+import Link from 'next/link';
 import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
 import { ChevronLeftIcon } from "lucide-react";
 import {
@@ -62,10 +62,10 @@ export default function ResourceCategoriesPage({
           className="mb-3 px-2 -mx-2 text-basic-300"
           asChild
         >
-          <CustomLink href="/resource">
+          <Link href="/resource">
             <ChevronLeftIcon className="w-4 h-4" />
             返回
-          </CustomLink>
+          </Link>
         </Button>
         <SectionTitle
           as="h1"

@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { CustomLink } from '@/shared/ui/custom-link';
+import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/shared/ui/button";
@@ -19,7 +19,7 @@ const MentorWorkspaceCard = ({ marathon }: { marathon: MarathonSchema }) => {
     100;
 
   return (
-    <CustomLink
+    <Link
       href={`/manage/mentor-workspace/students?marathonId=${marathon.eventId}`}
       className="block bg-basic-white rounded-lg"
     >
@@ -59,7 +59,7 @@ const MentorWorkspaceCard = ({ marathon }: { marathon: MarathonSchema }) => {
           <div className="body-sm text-basic-400">{days}天</div>
         </div>
       </div>
-    </CustomLink>
+    </Link>
   );
 };
 

@@ -1,6 +1,6 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/navigation";
-import { CustomLink } from '@/shared/ui/custom-link';
+import Link from 'next/link';
 import { ChevronRightIcon } from "lucide-react";
 import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
 import resourceBannerWebp from "@/public/assets/resource/banner.webp";
@@ -69,10 +69,10 @@ export default function ResourcePage({
               size="lg"
               asChild
             >
-              <CustomLink href="/resource/explore">
+              <Link href="/resource/explore">
                 探索 所有資源
                 <ChevronRightIcon className="w-4 h-4" />
-              </CustomLink>
+              </Link>
             </Button>
           </SectionTitle>
           <ResourceContainer data={data?.resources.slice(2, 4) ?? []} />
@@ -85,10 +85,10 @@ export default function ResourcePage({
               className="-mx-2 px-2 body-md font-medium text-basic-300"
               asChild
             >
-              <CustomLink href="/resource/explore">
+              <Link href="/resource/explore">
                 探索 所有資源
                 <ChevronRightIcon className="w-4 h-4" />
-              </CustomLink>
+              </Link>
             </Button>
           </SectionTitle>
           <ResourceContainer data={data?.resources.slice(0, 2) ?? []} />
@@ -101,10 +101,10 @@ export default function ResourcePage({
               className="-mx-2 px-2 body-md font-medium text-basic-300"
               asChild
             >
-              <CustomLink href="/resource/categories">
+              <Link href="/resource/categories">
                 探索 所有分類
                 <ChevronRightIcon className="w-4 h-4" />
-              </CustomLink>
+              </Link>
             </Button>
           </SectionTitle>
           <CategoriesContainer maxLength={8} disabledCollapse />
