@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { locales, getDictionary, getTranslation } from '@/shared/config/i18n';
+import { getDictionary, getTranslation } from '@/shared/config/i18n';
 import MarkdownRenderer from '@/shared/ui/markdown-renderer';
 import { Paper } from '@/shared/ui/wrapper';
 
@@ -31,9 +31,7 @@ const getTermsData = async (
 };
 
 export async function generateStaticParams() {
-  return locales.flatMap((language) =>
-    Object.keys(termsMap).map((type) => ({ language, type }))
-  );
+  return Object.keys(termsMap).map((type) => ({ type }));
 }
 
 export async function generateMetadata({

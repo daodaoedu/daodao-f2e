@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { locales } from '@/shared/config/i18n';
 import {
   AnnouncementDetail,
   AnnouncementList,
@@ -8,12 +7,9 @@ import {
 import { BackButton } from '@/shared/ui/back-button';
 
 export async function generateStaticParams() {
-  return locales.flatMap((language) =>
-    announcements.map(({ id }) => ({
-      language,
-      id,
-    }))
-  );
+  return announcements.map(({ id }) => ({
+    id,
+  }));
 }
 
 export async function generateMetadata({

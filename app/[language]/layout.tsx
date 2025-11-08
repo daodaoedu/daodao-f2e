@@ -1,7 +1,11 @@
 import Script from 'next/script';
 import { Metadata, Viewport } from 'next';
+import { hasLocale } from 'next-intl';
+import { setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 import { Inter } from 'next/font/google';
-import { getDictionary, locales } from '@/shared/config/i18n';
+import { routing } from '@/shared/config/i18n/routing';
+import { getDictionary } from '@/shared/config/i18n';
 import { websiteConfig } from '@/constants/websiteConfig';
 import Providers from './Providers';
 import '../global.css';
@@ -9,7 +13,7 @@ import '../global.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export async function generateStaticParams() {
-  return locales.map((language) => ({ language }));
+  return routing.locales.map((language) => ({ language }));
 }
 
 export function generateViewport(): Viewport {
@@ -28,7 +32,7 @@ export async function generateMetadata({
   } = getDictionary(language);
 
   const languageAlternates = Object.fromEntries(
-    locales.map((locate) => [locate, `/${locate}`])
+    routing.locales.map((locale) => [locale, `/${locale}`])
   );
 
   return {
@@ -84,7 +88,7 @@ export async function generateMetadata({
         },
       ],
       locale: language,
-      alternateLocale: locales.filter((locale) => locale !== language),
+      alternateLocale: routing.locales.filter((locale) => locale !== language),
       ttl: 345600,
     },
     facebook: {
@@ -121,6 +125,13 @@ export default async function RootLayout({
 }: LayoutProps<'/[language]'>) {
   const { language } = await params;
 
+  if (!hasLocale(routing.locales, language)) {
+    notFound();
+  }
+
+  setRequestLocale(language);
+  const dictionary = getDictionary(language);
+
   return (
     <html
       lang={language}
@@ -129,7 +140,9 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <Providers locale={language}>{children}</Providers>
+        <Providers dictionary={dictionary} locale={language}>
+          {children}
+        </Providers>
       </body>
       {/* <!-- Global site tag (gtag.js) - Google Analytics --> */}
       <Script

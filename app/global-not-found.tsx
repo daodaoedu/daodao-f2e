@@ -1,14 +1,17 @@
 'use client';
 
-import NotExist from '@/shared/components/NotExist';
-import { Locale, isLocale, defaultLocale } from '@/shared/config/i18n';
+import { hasLocale, Locale } from 'next-intl';
 import { useParams } from 'next/navigation';
+import NotExist from '@/shared/components/NotExist';
+import { routing } from '@/shared/config/i18n/routing';
 import './global.css';
 
 function GlobalNotFoundPage() {
   const params = useParams<{ language: Locale }>();
-  const language = params?.language;
-  const locale = isLocale(language) ? language : defaultLocale;
+
+  const locale = hasLocale(routing.locales, params?.language)
+    ? params?.language
+    : routing.defaultLocale;
 
   return (
     <html lang={locale}>

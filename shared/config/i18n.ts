@@ -1,8 +1,8 @@
 import zhDictionary from './locales/zh-TW.json';
 import enDictionary from './locales/en.json';
 
-export const defaultLocale = 'zh-TW';
-export const locales = [defaultLocale, 'en'] as const;
+const defaultLocale = 'zh-TW';
+const locales = [defaultLocale, 'en'] as const;
 export type Locale = (typeof locales)[number];
 export type Dictionary = typeof import('./locales/zh-TW.json');
 export const localeRegex = new RegExp(`(${locales.join('|')})`);
