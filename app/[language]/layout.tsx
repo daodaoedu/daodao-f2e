@@ -1,11 +1,10 @@
 import Script from 'next/script';
 import { Metadata, Viewport } from 'next';
 import { hasLocale } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Inter } from 'next/font/google';
-import { routing } from '@/shared/config/i18n/routing';
-import { getDictionary } from '@/shared/config/i18n';
+import { routing } from '@/shared/i18n/routing';
 import { websiteConfig } from '@/constants/websiteConfig';
 import Providers from './Providers';
 import '../global.css';
@@ -27,9 +26,7 @@ export async function generateMetadata({
 }: LayoutProps<'/[language]'>): Promise<Metadata> {
   const { language } = await params;
 
-  const {
-    common: { title, description },
-  } = getDictionary(language);
+  const t = await getTranslations('common');
 
   const languageAlternates = Object.fromEntries(
     routing.locales.map((locale) => [locale, `/${locale}`])
@@ -40,9 +37,9 @@ export async function generateMetadata({
       template: `%s | ${websiteConfig.title}`,
       default: websiteConfig.defaultFullTitle,
     },
-    description,
+    description: t('description'),
     metadataBase: new URL(websiteConfig.domainUrl),
-    applicationName: title,
+    applicationName: t('title'),
     keywords: websiteConfig.keywords,
     referrer: 'origin',
     authors: [
@@ -74,10 +71,10 @@ export async function generateMetadata({
       type: 'website',
       siteName: '島島阿學',
       title: {
-        template: `%s | ${title}`,
-        default: title,
+        template: `%s | ${t('title')}`,
+        default: t('title'),
       },
-      description,
+      description: t('description'),
       url: websiteConfig.domainUrl,
       images: [
         {
@@ -97,10 +94,10 @@ export async function generateMetadata({
     twitter: {
       card: 'summary_large_image',
       title: {
-        template: `%s | ${title}`,
-        default: title,
+        template: `%s | ${t('title')}`,
+        default: t('title'),
       },
-      description,
+      description: t('description'),
       images: ['/assets/brand/horizontal-primary-logo.svg'],
     },
     robots: {
@@ -130,7 +127,8 @@ export default async function RootLayout({
   }
 
   setRequestLocale(language);
-  const dictionary = getDictionary(language);
+
+  const messages = await getMessages();
 
   return (
     <html
@@ -140,7 +138,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <Providers dictionary={dictionary} locale={language}>
+        <Providers messages={messages} locale={language}>
           {children}
         </Providers>
       </body>

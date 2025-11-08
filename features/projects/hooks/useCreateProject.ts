@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import { useCallback, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { useMyProjects } from '@/services/projects';
 
 const MAX_PROJECTS = 3;

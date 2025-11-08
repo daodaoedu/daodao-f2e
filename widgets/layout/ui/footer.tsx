@@ -1,15 +1,15 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
 import { Icon } from '@/shared/ui/icon';
 import { SOCIAL_LINKS, ANCHOR_IDS } from '@/shared/constants';
 import { LanguageSwitcher } from '@/shared/ui/language-switcher';
 import { CustomLink } from '@/shared/ui/custom-link';
-import { useTranslation } from '@/shared/lib/translation';
 
 export const Footer = () => {
-  const { t } = useTranslation();
+  const t = useTranslations('common');
 
   return (
     <footer className="bg-basic-600 pb-20 pt-12 text-white md:pb-12">
@@ -24,7 +24,7 @@ export const Footer = () => {
               className="mb-2"
             />
             <p className="text-white/80">
-              {t('common.footer_tagline')}
+              {t('footer_tagline')}
             </p>
           </div>
 
@@ -36,7 +36,7 @@ export const Footer = () => {
         <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="space-y-4">
             <p className="text-lg text-primary-lighter">
-              {t('common.footer_about_title')}
+              {t('footer_about_title')}
             </p>
             <div className="space-y-2">
               <div>
@@ -44,7 +44,7 @@ export const Footer = () => {
                   href="/about"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {t('common.footer_about_us')}
+                  {t('footer_about_us')}
                 </CustomLink>
               </div>
               <div>
@@ -52,7 +52,7 @@ export const Footer = () => {
                   href={`/about#${ANCHOR_IDS.VISION}`}
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {t('common.footer_vision')}
+                  {t('footer_vision')}
                 </CustomLink>
               </div>
               <div>
@@ -60,14 +60,14 @@ export const Footer = () => {
                   href={`/about#${ANCHOR_IDS.MISSION}`}
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {t('common.footer_mission')}
+                  {t('footer_mission')}
                 </CustomLink>
               </div>
             </div>
           </div>
           <div className="space-y-4">
             <p className="text-lg text-primary-lighter">
-              {t('common.footer_resources_title')}
+              {t('footer_resources_title')}
             </p>
             <div className="space-y-2">
               <div>
@@ -75,7 +75,7 @@ export const Footer = () => {
                   href="/learning-marathons/2025S1"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {t('common.footer_learning_marathons')}
+                  {t('footer_learning_marathons')}
                 </CustomLink>
               </div>
               <div>
@@ -83,7 +83,7 @@ export const Footer = () => {
                   href="/terms/privacy-policy"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {t('common.footer_privacy_policy')}
+                  {t('footer_privacy_policy')}
                 </CustomLink>
               </div>
               <div>
@@ -91,7 +91,7 @@ export const Footer = () => {
                   href="/terms/service"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {t('common.footer_terms_of_service')}
+                  {t('footer_terms_of_service')}
                 </CustomLink>
               </div>
               <div>
@@ -99,20 +99,20 @@ export const Footer = () => {
                   href="/terms/ipr"
                   className="text-white/70 transition-colors hover:text-primary-base"
                 >
-                  {t('common.footer_intellectual_property')}
+                  {t('footer_intellectual_property')}
                 </CustomLink>
               </div>
             </div>
           </div>
           <div className="space-y-4">
             <p className="text-lg text-primary-lighter">
-              {t('common.footer_newsletter_title')}
+              {t('footer_newsletter_title')}
             </p>
             <form className="space-y-3">
               <input
                 className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white placeholder:text-white/50 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-base"
                 type="email"
-                placeholder={t(                  'common.footer_email_placeholder'
+                placeholder={t(                  'footer_email_placeholder'
                 )}
               />
               <Button
@@ -121,7 +121,7 @@ export const Footer = () => {
                 size="huge"
                 className="w-full"
               >
-                {t('common.footer_subscribe_button')}
+                {t('footer_subscribe_button')}
                 <Icon name="arrow-right" />
               </Button>
             </form>
@@ -129,7 +129,7 @@ export const Footer = () => {
         </div>
         <div className="mb-8 space-y-4">
           <p className="text-lg text-primary-lighter">
-            {t('common.footer_social_title')}
+            {t('footer_social_title')}
           </p>
           <div className="flex gap-4">
             <CustomLink
@@ -140,7 +140,7 @@ export const Footer = () => {
             >
               <Image
                 src="/assets/landing-page/icon-Instagram.svg"
-                alt={t('common.footer_instagram_alt')}
+                alt={t('footer_instagram_alt')}
                 width={36}
                 height={35}
               />
@@ -153,7 +153,7 @@ export const Footer = () => {
             >
               <Image
                 src="/assets/landing-page/icon-Facebook.svg"
-                alt={t('common.footer_facebook_alt')}
+                alt={t('footer_facebook_alt')}
                 width={36}
                 height={35}
               />
@@ -161,7 +161,7 @@ export const Footer = () => {
           </div>
         </div>
         <p className="text-center text-basic-300">
-          {t('common.footer_copyright', {
+          {t('footer_copyright', {
             year: new Date().getFullYear(),
           })}
         </p>

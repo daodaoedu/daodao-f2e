@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { Lightbulb, TrendingUp, RefreshCw } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import {

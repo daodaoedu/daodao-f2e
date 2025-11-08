@@ -19,10 +19,11 @@ const isValidTabKey = (tabKey: string): tabKey is UserProfileTab =>
 const validateTabKey = (
   userIdObject: UserIdObject,
   tabKey: string = DEFAULT_TAB
-): UserProfileTab =>
-  isValidTabKey(tabKey)
+): UserProfileTab => {
+  return isValidTabKey(tabKey)
     ? tabKey
     : redirect(getUserProfileBasePath(userIdObject));
+};
 
 export const generateStaticParams = () =>
   USER_PROFILE_TABS.map((tabKey) => ({
@@ -36,7 +37,7 @@ export async function generateMetadata({
   const userIdObject = parseUserId(id);
   const tabKey = validateTabKey(userIdObject, slug?.[0]);
   const { data } = await getUserData(userIdObject);
-  const name = data?.name?.trim() ?? '未知用戶';
+  const name = data?.name?.trim() || '未知用戶';
   const titleSuffix = USER_PROFILE_TAB_TITLES[tabKey];
 
   return {

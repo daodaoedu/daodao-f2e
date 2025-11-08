@@ -7,3 +7,13 @@ export const routing = defineRouting({
   defaultLocale,
   localePrefix: 'as-needed',
 });
+
+type Locale = (typeof routing.locales)[number];
+
+export const languageOptions: {
+  value: Locale;
+  label: string;
+}[] = [
+  { value: 'zh-TW', label: '中文' },
+  { value: 'en', label: 'English' },
+];

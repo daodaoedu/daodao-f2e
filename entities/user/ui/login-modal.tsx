@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter } from '@/shared/i18n/navigation';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';

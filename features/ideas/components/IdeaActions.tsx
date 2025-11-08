@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { toast } from 'sonner';
 import { Edit, Trash2, MoreVertical } from 'lucide-react';
 import { Button } from '@/shared/ui/button';

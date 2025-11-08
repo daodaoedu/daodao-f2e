@@ -1,21 +1,20 @@
 import type { NavVisibility } from '@/entities/user';
 import { ANCHOR_IDS } from '@/shared/constants';
-import { TranslationKeys } from '@/shared/config/i18n';
 
 export interface NavItemType {
-  label: TranslationKeys;
+  label: string;
   href: string;
   visibility?: NavVisibility;
 }
 
 export const protectedLayoutNav: NavItemType[] = [
   {
-    label: 'common.explore',
+    label: 'explore',
     href: '/explore',
     visibility: 'auth',
   },
   {
-    label: 'common.resources',
+    label: 'resources',
     href: '/resource',
     visibility: 'auth',
   },
@@ -23,17 +22,17 @@ export const protectedLayoutNav: NavItemType[] = [
 
 export const guestLayoutNav: NavItemType[] = [
   {
-    label: 'common.landing_solutions',
+    label: 'landing_solutions',
     href: `/#${ANCHOR_IDS.SOLUTIONS}`,
     visibility: 'guest',
   },
   {
-    label: 'common.landing_features',
+    label: 'landing_features',
     href: `/#${ANCHOR_IDS.FEATURES}`,
     visibility: 'guest',
   },
   {
-    label: 'common.landing_plans',
+    label: 'landing_plans',
     href: `/#${ANCHOR_IDS.PLANS}`,
     visibility: 'guest',
   },
@@ -42,15 +41,15 @@ export const guestLayoutNav: NavItemType[] = [
 
 export const marathonNav: NavItemType[] = [
   {
-    label: 'common.marathon_details',
+    label: 'marathon_details',
     href: '/learning-marathons/2025S1',
   },
   {
-    label: 'common.marathon_announcements',
+    label: 'marathon_announcements',
     href: '/learning-marathons/2025S1/announcements',
   },
   {
-    label: 'common.marathon_projects',
+    label: 'marathon_projects',
     href: '/projects',
   },
 ];

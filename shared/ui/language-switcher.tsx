@@ -1,11 +1,12 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
-import { Link, usePathname } from '@/shared/config/i18n/navigation';
+import { useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
+import { usePathname } from '@/shared/i18n/navigation';
+import { languageOptions } from '@/shared/i18n/routing';
 import { cn } from '@/shared/lib/cn';
-import { languageOptions, Locale } from '../config/i18n';
-// import { CustomLink } from './custom-link';
+import { CustomLink } from './custom-link';
 
 interface LanguageSwitcherButtonsProps {
   searchParams?: URLSearchParams | null;
@@ -14,17 +15,17 @@ interface LanguageSwitcherButtonsProps {
 const LanguageSwitcherButtons = ({
   searchParams,
 }: LanguageSwitcherButtonsProps) => {
-  const params = useParams<{ language: Locale }>();
+  const locale = useLocale();
   const pathname = usePathname();
 
   return (
     <div className="flex items-center gap-2">
       {languageOptions.map((language, index) => (
         <div key={language.value} className="flex items-center gap-2">
-          <Link
+          <CustomLink
             className={cn(
               'text-sm font-medium text-white/70 transition-colors hover:text-primary-base',
-              params?.language === language.value && 'text-primary-base'
+              locale === language.value && 'text-primary-base'
             )}
             locale={language.value}
             href={{
@@ -34,7 +35,7 @@ const LanguageSwitcherButtons = ({
             scroll={false}
           >
             {language.label}
-          </Link>
+          </CustomLink>
           {index < languageOptions.length - 1 && (
             <span className="text-sm text-white/40">|</span>
           )}

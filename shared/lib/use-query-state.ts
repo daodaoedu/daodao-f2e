@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useCallback, useMemo, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { z } from 'zod';
 
 const validateAndFormatParams = <T extends z.ZodObject<z.ZodRawShape>>(

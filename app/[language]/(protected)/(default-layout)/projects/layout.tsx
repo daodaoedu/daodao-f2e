@@ -1,7 +1,8 @@
 'use client';
 
-import { useSearchParams, usePathname } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useMemo, Suspense } from 'react';
+import { usePathname } from '@/shared/i18n/navigation';
 import { ProjectProvider } from '@/contexts/Project';
 import Sidebar, { SidebarItemType } from '@/layout/components/Sidebar';
 import { useProject } from '@/services/projects';

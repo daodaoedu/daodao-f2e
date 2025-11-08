@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { toast } from 'sonner';
 import { useIdea , useIdeaActions } from '@/features/ideas/hooks';
 import { BackButton } from '@/shared/ui/back-button';

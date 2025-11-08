@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { Plus, Lightbulb, Target, BookOpen } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import type { FloatingCreateButtonProps } from '../types';

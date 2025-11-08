@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { usePracticeManager } from '@/features/practice/hooks';
 import Confetti from '@/features/practice/components/Shared/Confetti';
 import CelebrationMessage from '@/features/practice/components/Shared/CelebrationMessage';

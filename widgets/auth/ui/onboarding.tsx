@@ -5,7 +5,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { cn } from '@/shared/lib/cn';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { useAuth, useAuthActions , getUserProfileBasePath } from '@/entities/user';
 import { useDialog } from '@/contexts/Dialog';
 import { Form, parseSchemaAutoFocus } from '@/shared/ui/form';

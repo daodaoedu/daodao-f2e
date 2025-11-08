@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getDictionary, getTranslation } from '@/shared/config/i18n';
+import { getTranslations } from 'next-intl/server';
 import MarkdownRenderer from '@/shared/ui/markdown-renderer';
 import { Paper } from '@/shared/ui/wrapper';
 
@@ -21,12 +21,12 @@ const getTermsI18nKey = (type: string) => {
 const getTermsData = async (
   params: PageProps<'/[language]/terms/[type]'>['params']
 ) => {
-  const { language, type } = await params;
-  const t = getTranslation(getDictionary(language));
+  const { type } = await params;
+  const t = await getTranslations('terms');
   const snakeCaseType = getTermsI18nKey(type);
   return {
-    title: t(`terms.${snakeCaseType}_title`),
-    content: t(`terms.${snakeCaseType}_content`),
+    title: t(`${snakeCaseType}_title`),
+    content: t(`${snakeCaseType}_content`),
   };
 };
 

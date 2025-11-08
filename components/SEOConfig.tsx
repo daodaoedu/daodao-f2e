@@ -3,7 +3,7 @@ import type {
 } from 'schema-dts';
 import React from 'react';
 import Head from 'next/head';
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/shared/i18n/navigation';
 
 /**
  * Schema.org 常用類型參考指南

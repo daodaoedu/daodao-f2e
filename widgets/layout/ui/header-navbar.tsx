@@ -1,12 +1,12 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/shared/i18n/navigation';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import { Image } from '@/shared/ui/image';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/cn';
-import { useTranslation } from '@/shared/lib/translation';
 import { useAuth, useAuthActions, AuthGuardButton, getUserProfileBasePath } from '@/entities/user';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import {
@@ -30,7 +30,7 @@ export const HeaderNavbar = ({
   const { logout } = useAuthActions();
   const router = useRouter();
   const isVisible = useScrollVisibility({ threshold: 200 });
-  const { t } = useTranslation();
+  const t = useTranslations('common');
 
   const filteredNavItems = navItems.filter((item) => {
     const visibility = item.visibility ?? 'all';

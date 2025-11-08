@@ -7,7 +7,7 @@ import { MapPinIcon, PencilIcon } from 'lucide-react';
 import { Container, Paper } from '@/shared/ui/wrapper';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { CustomLink } from '@/shared/ui/custom-link';
-import { usePathname } from '@/shared/config/i18n/navigation';
+import { usePathname } from '@/shared/i18n/navigation';
 import { Button, TextCollapse } from '@/shared/ui';
 import { Badge } from '@/shared/ui/badge';
 import { iconMap, SocialIcon, SocialPlatform } from '@/shared/ui/social-icon';

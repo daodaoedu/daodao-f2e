@@ -1,6 +1,6 @@
 import { CustomLink } from '@/shared/ui/custom-link';
 import React from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/shared/i18n/navigation';
 import { Share2, Globe, Ellipsis } from 'lucide-react';
 import { ResourceDetailResponseSchema } from '@/services/resources/core/schema';
 import { Button } from '@/shared/ui/button';

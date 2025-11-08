@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { Button } from '@/shared/ui/button';
 import { Container } from '@/shared/ui/container';
 

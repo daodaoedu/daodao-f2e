@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { useAssetsLoader } from '@/shared/lib/use-assets-loader';
 import { useScrollLock } from '@/shared/lib/use-scroll-lock';
 import { Progress } from '@/shared/ui/progress';

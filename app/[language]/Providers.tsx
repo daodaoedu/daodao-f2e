@@ -2,16 +2,14 @@
 
 import { SWRConfig } from 'swr';
 import { ThemeProvider } from 'next-themes';
-import { NextIntlClientProvider } from 'next-intl';
+import { AbstractIntlMessages, NextIntlClientProvider } from 'next-intl';
 import { AuthProvider, LoginModal } from '@/entities/user';
 import { DialogProvider } from '@/contexts/Dialog';
 import { PromotionProvider } from '@/contexts/Promotion';
 import { NavigationBlockerProvider } from '@/shared/lib/navigation-blocker';
 import { emitUnauthorized } from '@/shared/lib/auth-bus';
 import { ApiError } from '@/shared/api';
-import { TranslationProvider } from '@/shared/lib/translation';
 import { Toaster } from '@/shared/ui/sonner';
-import type { Dictionary } from '@/shared/config/i18n';
 
 const swrConfig = {
   revalidateOnFocus: false,
@@ -26,14 +24,13 @@ const swrConfig = {
 
 interface ProvidersProps {
   children: React.ReactNode;
-  dictionary: Dictionary;
+  messages: AbstractIntlMessages;
   locale: string;
 }
 
-function Providers({ children, dictionary, locale }: ProvidersProps) {
+function Providers({ children, messages, locale }: ProvidersProps) {
   return (
-    <NextIntlClientProvider locale={locale}>
-      <TranslationProvider dictionary={dictionary}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
         <SWRConfig value={swrConfig}>
           <NavigationBlockerProvider>
             <DialogProvider>
@@ -57,7 +54,6 @@ function Providers({ children, dictionary, locale }: ProvidersProps) {
             </DialogProvider>
           </NavigationBlockerProvider>
         </SWRConfig>
-      </TranslationProvider>
     </NextIntlClientProvider>
   );
 }

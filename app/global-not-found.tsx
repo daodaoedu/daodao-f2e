@@ -3,7 +3,7 @@
 import { hasLocale, Locale } from 'next-intl';
 import { useParams } from 'next/navigation';
 import NotExist from '@/shared/components/NotExist';
-import { routing } from '@/shared/config/i18n/routing';
+import { routing } from '@/shared/i18n/routing';
 import './global.css';
 
 function GlobalNotFoundPage() {

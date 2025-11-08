@@ -1,4 +1,4 @@
-const withNextIntl = require('next-intl/plugin')('./shared/config/i18n/request.ts');
+const withNextIntl = require('next-intl/plugin')('./shared/i18n/request.ts');
 
 const withPWA = require("next-pwa")({
   dest: "public",
