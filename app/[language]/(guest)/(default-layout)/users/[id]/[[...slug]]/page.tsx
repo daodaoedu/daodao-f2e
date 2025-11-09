@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
+import { getLocale } from 'next-intl/server';
+import { redirect } from '@/shared/i18n/navigation';
 import {
   USER_PROFILE_TABS,
   UserProfileTab,
@@ -16,13 +17,14 @@ import {
 const isValidTabKey = (tabKey: string): tabKey is UserProfileTab =>
   USER_PROFILE_TABS.includes(tabKey as UserProfileTab);
 
-const validateTabKey = (
+const validateTabKey = async (
   userIdObject: UserIdObject,
   tabKey: string = DEFAULT_TAB
-): UserProfileTab => {
+): Promise<UserProfileTab> => {
+  const locale = await getLocale();
   return isValidTabKey(tabKey)
     ? tabKey
-    : redirect(getUserProfileBasePath(userIdObject));
+    : redirect({ href: getUserProfileBasePath(userIdObject), locale });
 };
 
 export const generateStaticParams = () =>
@@ -35,7 +37,7 @@ export async function generateMetadata({
 }: PageProps<'/[language]/users/[id]/[[...slug]]'>): Promise<Metadata> {
   const { id, slug } = await params;
   const userIdObject = parseUserId(id);
-  const tabKey = validateTabKey(userIdObject, slug?.[0]);
+  const tabKey = await validateTabKey(userIdObject, slug?.[0]);
   const { data } = await getUserData(userIdObject);
   const name = data?.name?.trim() || '未知用戶';
   const titleSuffix = USER_PROFILE_TAB_TITLES[tabKey];
@@ -50,7 +52,7 @@ export default async function TabContentPage({
 }: PageProps<'/[language]/users/[id]/[[...slug]]'>) {
   const { id, slug } = await params;
   const userIdObject = parseUserId(id);
-  const tabKey = validateTabKey(userIdObject, slug?.[0]);
+  const tabKey = await validateTabKey(userIdObject, slug?.[0]);
 
   switch (tabKey) {
     case 'projects':
