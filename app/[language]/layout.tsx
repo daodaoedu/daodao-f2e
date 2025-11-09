@@ -1,15 +1,15 @@
-import Script from 'next/script';
 import { Metadata, Viewport } from 'next';
 import { hasLocale } from 'next-intl';
-import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { Inter } from 'next/font/google';
 import { routing } from '@/shared/i18n/routing';
 import { websiteConfig } from '@/constants/websiteConfig';
-import Providers from './Providers';
+import GlobalProviders from '@/widgets/layout/ui/global-providers';
 import '../global.css';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export async function generateStaticParams() {
   return routing.locales.map((language) => ({ language }));
@@ -131,51 +131,8 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html
-      lang={language}
-      className={`${inter.className} scroll-smooth`}
-      data-scroll-behavior="smooth"
-      suppressHydrationWarning
-    >
-      <body>
-        <Providers messages={messages} locale={language}>
-          {children}
-        </Providers>
-      </body>
-      {/* <!-- Global site tag (gtag.js) - Google Analytics --> */}
-      <Script
-        async
-        src="https://www.googletagmanager.com/gtag/js?id=G-9Z1P1RKY69"
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-9Z1P1RKY69');
-        `}
-      </Script>
-      {/* <!-- Microsoft Clarity --> */}
-      <Script type="text/javascript">
-        {`
-          (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-          })(window, document, "clarity", "script", "duktp01aq0");
-        `}
-      </Script>
-      {/* <!-- Google Tag Manager --> */}
-      <Script type="text/javascript">
-        {`
-          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','GTM-TH83D3J');
-        `}
-      </Script>
-    </html>
+    <GlobalProviders messages={messages} locale={language}>
+      {children}
+    </GlobalProviders>
   );
 }
