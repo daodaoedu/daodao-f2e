@@ -30,6 +30,7 @@ const config = {
     'lottie-web',               // Animation (client-only)
     'gsap',                     // Animation (client-only)
     'react-speech-recognition', // Browser API (client-only)
+    'regenerator-runtime',     // Async/await support (client-only)
   ],
 
   // Optimize server bundle size for Cloudflare Workers (3MB limit)

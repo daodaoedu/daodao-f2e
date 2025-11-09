@@ -3,8 +3,6 @@
 import {
   useGetApiV1UsersId,
   useGetApiV1UsersCustomIdCustomId,
-  getGetApiV1UsersIdKey,
-  getGetApiV1UsersCustomIdCustomIdKey,
 } from '@/generated/api/users.client';
 import type { UserIdObject } from '../model';
 
@@ -18,12 +16,4 @@ export const useUserProfile = (userIdObject: UserIdObject) => {
   const resultByCustomId = useGetApiV1UsersCustomIdCustomId(customId ?? '');
 
   return customId ? resultByCustomId : resultByUserId;
-};
-
-/**
- * 統一的用戶資料 SWR Keys
- */
-export const userProfileKeys = {
-  detail: getGetApiV1UsersIdKey,
-  detailByCustomId: getGetApiV1UsersCustomIdCustomIdKey,
 };

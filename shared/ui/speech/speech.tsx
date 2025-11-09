@@ -1,3 +1,4 @@
+import 'regenerator-runtime/runtime';
 import { useCallback, useEffect } from 'react';
 import { MicIcon } from 'lucide-react';
 import SpeechRecognition, {

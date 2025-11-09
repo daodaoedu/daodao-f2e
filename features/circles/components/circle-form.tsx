@@ -27,42 +27,38 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { Plus } from 'lucide-react';
 import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  CircleFormSchema,
-  circleFormSchema,
-  CircleSchema,
-} from '@/services/circles';
-import { useCreateCircle, useUpdateCircle } from '../hooks';
+import type { CircleData, CircleFormValues } from '@/entities/circle';
+import { circleFormSchema } from '@/entities/circle';
 
 type CircleFormProps = {
-  values?: CircleSchema;
+  values?: CircleData;
   onSuccess?: () => void;
 };
 
 export function CircleForm({ values, onSuccess }: CircleFormProps) {
   const isCreateMode = !values;
 
-  const { trigger: createCircle, isMutating: isCreating } = useCreateCircle({
-    onSuccess: () => {
-      toast.success('揪團發起成功');
-      onSuccess?.();
-    },
-  });
+  // const { trigger: createCircle, isMutating: isCreating } = useCreateCircle({
+  //   onSuccess: () => {
+  //     toast.success('揪團發起成功');
+  //     onSuccess?.();
+  //   },
+  // });
 
-  const { trigger: updateCircle, isMutating: isUpdating } = useUpdateCircle(
-    values?._id,
-    {
-      onSuccess: () => {
-        toast.success('揪團更新成功');
-        onSuccess?.();
-      },
-    }
-  );
+  // const { trigger: updateCircle, isMutating: isUpdating } = useUpdateCircle(
+  //   values?._id,
+  //   {
+  //     onSuccess: () => {
+  //       toast.success('揪團更新成功');
+  //       onSuccess?.();
+  //     },
+  //   }
+  // );
 
   const [isTermsChecked, setIsTermsChecked] = useState(false);
   const originPhotoURL = useRef(values?.photoURL);
 
-  const form = useForm<CircleFormSchema>({
+  const form = useForm<CircleFormValues>({
     resolver: zodResolver(circleFormSchema),
     defaultValues: values ?? {
       title: '',
@@ -86,16 +82,20 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
     },
   });
 
-  const isSubmitting = isCreating || isUpdating;
+  // const isSubmitting = isCreating || isUpdating;
+  const isSubmitting = false;
 
   const checkIsPhysicalArea = (value: string) => AREAS.some((area) => area.value === value);
 
-  const handleSubmit = (data: CircleFormSchema) => {
-    if (isCreateMode) {
-      createCircle(data);
-    } else {
-      updateCircle(data);
-    }
+  const handleSubmit = (data: CircleFormValues) => {
+    // TODO: 串接 API
+    toast.error('暫未串接 API');
+    console.log(data, onSuccess);
+    // if (isCreateMode) {
+    //   createCircle(data);
+    // } else {
+    //   updateCircle(data);
+    // }
   };
 
   useEffect(() => {

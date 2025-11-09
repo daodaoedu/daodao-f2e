@@ -1,7 +1,7 @@
 import JsonLdFactory from '@/shared/lib/jsonLd';
-import { CircleSchema } from '@/services/circles';
+import type { CircleData } from '@/entities/circle';
 
-export function createCircleJsonLd(result: CircleSchema) {
+export function createCircleJsonLd(result: CircleData) {
   return JsonLdFactory.createEventBuilder()
     .setId(`https://www.daoedu.tw/circles/${result._id}`)
     .setName(result.title)

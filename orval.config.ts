@@ -19,6 +19,9 @@ export default defineConfig({
           path: "shared/api/client-fetcher.ts",
           name: "clientFetcher",
         },
+        swr: {
+          useInfinite: true
+        }
       },
     },
   },
