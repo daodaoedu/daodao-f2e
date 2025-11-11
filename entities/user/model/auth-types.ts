@@ -1,8 +1,8 @@
-import {
-  UserValidatorsCreateUserSchema,
-  UserValidatorsGetUserParamsSchema,
-} from '@/generated/models';
-import type { UserProfile } from './constants';
+import type {
+  CreateUserSchema,
+  UpdateUserSchema,
+  UserProfile,
+} from './constants';
 
 export enum AuthLoginStatus {
   /** 未登入 */
@@ -77,7 +77,7 @@ export type AuthActions = {
   [AuthActionTypes.SET_TOKEN]: (payload: string) => void;
   [AuthActionTypes.SET_LOADING]: (payload: boolean) => void;
   [AuthActionTypes.UPDATE_USER]: (
-    payload: UserValidatorsCreateUserSchema | UserValidatorsGetUserParamsSchema
+    payload: CreateUserSchema | UpdateUserSchema
   ) => Promise<void>;
   [AuthActionTypes.LOGIN]: (payload: UserProfile | null) => void;
   [AuthActionTypes.LOGOUT]: () => void;

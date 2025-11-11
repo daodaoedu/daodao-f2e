@@ -4,24 +4,52 @@
  */
 
 import type { OptionProps } from '@/shared/ui/option';
-import { UserValidatorsCreateUserSchemaProfessionalFieldItem } from '@/generated/models';
-import type { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
-
-// ===== 簡潔的類型別名 =====
+import type { components } from '@/shared/api';
+import { optionListToEnum } from '@/shared/lib/option';
 
 /**
- * 專業領域枚舉類型
- * 注意：枚舉值請使用 ProfessionalFieldEnum
+ * User API 型別重新導出
+ * 從 OpenAPI 生成的型別中提取 User 相關的型別
  */
-export type ProfessionalField =
-  UserValidatorsCreateUserSchemaProfessionalFieldItem;
 
-/**
- * 用戶完整資料（包含詳細信息）
- */
-export type UserProfile = UserValidatorsUserSuccessResponseSchemaData;
+export type UserSuccessResponseSchema =
+  components['schemas']['user.validators_userSuccessResponseSchema'];
+
+export type UserProfile = UserSuccessResponseSchema['data'];
+
+// Create/Update schemas
+export type CreateUserSchema =
+  components['schemas']['user.validators_createUserSchema'];
+
+export type UpdateUserSchema =
+  components['schemas']['user.validators_updateUserSchema'];
+
+// Professional Field enum
+export type ProfessionalField = NonNullable<
+  CreateUserSchema['professionalField']
+>[number];
 
 // ===== 業務相關類型 =====
+
+/**
+ * 角色枚舉
+ */
+export enum RoleEnum {
+  /** 訪客 */
+  Visitor = 1,
+  /** 一般使用者 */
+  // User,//暫時註解，等DB資料更新完再解開
+  /** 馬拉松申請者 */
+  MarathonApplicant,
+  /** 馬拉松參與者 */
+  MarathonParticipant,
+  /** 導師 */
+  Mentor,
+  /** 管理者 */
+  Admin,
+  /** 超級管理者 */
+  SuperAdmin,
+}
 
 /**
  * 用戶 ID 對象（支援 id 或 customId）
@@ -39,13 +67,6 @@ export type NavVisibility =
   | 'auth'
   | 'guest'
   | ((user: UserProfile | null) => boolean);
-
-// ===== 枚舉別名 =====
-
-/**
- * 專業領域枚舉值（用於 Zod 等需要實際枚舉的場景）
- */
-export { UserValidatorsCreateUserSchemaProfessionalFieldItem as ProfessionalFieldEnum };
 
 // ===== 選項常數 =====
 
@@ -96,6 +117,8 @@ export const EXPERTISE_AREAS: OptionProps<ProfessionalField>[] = [
   },
   { value: 'others', label: '其他' },
 ];
+
+export const expertiseAreasEnum = optionListToEnum(EXPERTISE_AREAS);
 
 /**
  * 興趣領域選項

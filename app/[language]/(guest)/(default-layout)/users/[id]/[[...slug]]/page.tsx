@@ -38,7 +38,8 @@ export async function generateMetadata({
   const { id, slug } = await params;
   const userIdObject = parseUserId(id);
   const tabKey = await validateTabKey(userIdObject, slug?.[0]);
-  const { data } = await getUserData(userIdObject);
+  const [, userResponse] = await getUserData(userIdObject);
+  const data = userResponse?.data?.data;
   const name = data?.name?.trim() || '未知用戶';
   const titleSuffix = USER_PROFILE_TAB_TITLES[tabKey];
 

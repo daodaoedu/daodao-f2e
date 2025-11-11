@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  useGetApiV1UsersId,
-  useGetApiV1UsersCustomIdCustomId,
-} from '@/generated/api/users.client';
+import { useQuery } from '@/shared/api';
 import type { UserIdObject } from '../model';
 
 /**
@@ -12,8 +9,18 @@ import type { UserIdObject } from '../model';
  */
 export const useUserProfile = (userIdObject: UserIdObject) => {
   const { customId, id } = userIdObject;
-  const resultByUserId = useGetApiV1UsersId(customId ? '' : id);
-  const resultByCustomId = useGetApiV1UsersCustomIdCustomId(customId ?? '');
+
+  const resultByUserId = useQuery(
+    '/api/v1/users/{id}',
+    { params: { path: { id } } },
+    { revalidateOnMount: !customId }
+  );
+
+  const resultByCustomId = useQuery(
+    '/api/v1/users/custom-id/{customId}',
+    { params: { path: { customId: customId ?? '' } } },
+    { revalidateOnMount: !!customId }
+  );
 
   return customId ? resultByCustomId : resultByUserId;
 };

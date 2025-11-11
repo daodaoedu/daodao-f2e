@@ -1,10 +1,11 @@
-export { client, prefixKeys } from './client';
-export { ApiError } from './errors';
-export { isMatch } from './is-match';
 export {
-  createUseQuery,
-  createUseImmutable,
-  createUseInfinite,
-  createUseMutate,
-} from './create-hooks';
+  client,
+  useQuery,
+  useImmutable,
+  useInfinite,
+  useMutate,
+  getSwrKey,
+  getSwrKeyWithResponse,
+} from './client';
+export { ApiError } from './errors';
 export type { paths, components } from './openapi-types';

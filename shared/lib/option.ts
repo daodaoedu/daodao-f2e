@@ -52,3 +52,13 @@ export const getOptionLabels = (
   const map = createOptionMap(options);
   return values.map((value) => map.get(value) ?? '').filter(Boolean);
 };
+
+export const optionListToEnum = <T extends OptionProps[]>(options: T) => {
+  return options.reduce(
+    (result, option) => ({
+      ...result,
+      [option.value]: option.value,
+    }),
+    {} as Record<T[number]['value'], T[number]['value']>
+  );
+};
