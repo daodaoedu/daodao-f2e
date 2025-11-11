@@ -1,29 +1,41 @@
-import createClient from 'openapi-fetch';
-import type {
+import createClient, {
+  type Middleware,
   ClientPathsWithMethod,
   FetchResponse,
   MaybeOptionalInit,
 } from 'openapi-fetch';
-import {
-  createQueryHook,
-  createImmutableHook,
-  createInfiniteHook,
-  createMutateHook,
-} from 'swr-openapi';
 
-import { isMatch } from './is-match';
 import type { paths } from './openapi-types';
+import getEnv from '../config/env';
+import { getTokenStorage } from '../lib/storage';
 
 const PREFIX = 'dao-dao-server-api' as const;
+
+const middleware: Middleware = {
+  async onRequest({ request }) {
+    if (getEnv().isServerSide) {
+      const headers = await import('next/headers').then((mod) => mod.headers());
+      Array.from(headers.entries()).forEach(([key, value]) => {
+        if (key.toLowerCase() === 'accept-encoding') {
+          return;
+        }
+        request.headers.set(key, value);
+      });
+    } else {
+      const token = getTokenStorage().get();
+      if (token) {
+        request.headers.set('Authorization', `Bearer ${token}`);
+      }
+    }
+    return request;
+  },
+};
 
 export const client = createClient<paths>({
   baseUrl: process.env.NEXT_PUBLIC_API_URL,
 });
 
-export const useQuery = createQueryHook(client, PREFIX);
-export const useImmutable = createImmutableHook(client, PREFIX);
-export const useInfinite = createInfiniteHook(client, PREFIX);
-export const useMutate = createMutateHook(client, PREFIX, isMatch);
+client.use(middleware);
 
 type InitParam<Init> = Init extends undefined ? never : Init;
 

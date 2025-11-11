@@ -134,13 +134,16 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
   );
 
   // GET /api/v1/users/me - 取得當前用戶資料
-  const { isValidating } = useQuery('/api/v1/users/me', null, {
-    revalidateOnMount: !!state.token,
-    onSuccess: (result) => {
-      sessionActions.login(result?.data);
-    },
-    onError: handleError,
-  });
+  const { isValidating } = useQuery(
+    '/api/v1/users/me',
+    state.token ? {} : null,
+    {
+      onSuccess: (result) => {
+        sessionActions.login(result?.data);
+      },
+      onError: handleError,
+    }
+  );
 
   useEffect(() => {
     if (state.isLoggingIn !== isValidating) {
