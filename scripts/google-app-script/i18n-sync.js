@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Google Sheets i18n 雙向同步
  * GET: 將 Google Sheets 轉換為 JSON 格式
