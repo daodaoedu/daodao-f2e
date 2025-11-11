@@ -107,20 +107,20 @@ function IdeaCard({
         {idea.resources?.[0] && (
           <div className="flex items-center p-2 sm:p-3 bg-primary-lightest rounded-lg mb-3 sm:mb-4">
             <LinkIcon size={14} className="text-primary-base mr-1 sm:mr-2 flex-shrink-0" />
-            {idea.resources[0].url ? (
+            {idea.resources[0]?.url ? (
               <Button
                 variant="ghost"
                 onClick={(e) => {
                   e.stopPropagation();
-                  window.open(idea.resources[0].url, '_blank');
+                  window.open(idea.resources[0]?.url ?? '', '_blank');
                 }}
                 className="text-primary-darker text-xs sm:text-sm truncate p-0 h-auto hover:underline"
               >
-                {idea.resources[0].name}
+                {idea.resources[0]?.name}
               </Button>
             ) : (
               <span className="text-primary-darker text-xs sm:text-sm truncate">
-                {idea.resources[0].name}
+                {idea.resources[0]?.name}
               </span>
             )}
           </div>

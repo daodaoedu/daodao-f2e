@@ -81,6 +81,8 @@ export const useDraggableContainer = <T>({
           const currentItem = items[oldIndex];
           const overItem = items[newIndex];
 
+          if (!currentItem || !overItem) return;
+
           // 使用提供的函數來更新項目位置
           const updatedItem = updateItem(
             currentItem,

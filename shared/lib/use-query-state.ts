@@ -10,6 +10,7 @@ const validateAndFormatParams = <T extends z.ZodObject<z.ZodRawShape>>(
   return Object.keys(schema.shape).reduce(
     (acc, key) => {
       const keySchema = schema.shape[key];
+      if (!keySchema) return acc;
       const parsedValue = keySchema.safeParse(value[key]);
 
       if (parsedValue.success) {

@@ -306,7 +306,7 @@ export const CircleDetailWidget = ({ circleId }: CircleDetailWidgetProps) => {
                     )}
                   </div>
                   <span className="body-sm">
-                    {getOptionLabel(ROLE, data.user.roleList[0])}
+                    {getOptionLabel(ROLE, data.user.roleList[0] ?? '')}
                   </span>
                 </div>
               </div>

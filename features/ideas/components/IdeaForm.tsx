@@ -220,7 +220,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
   const startEditResource = useCallback((index: number) => {
     const resource = fields[index];
     setEditingResourceIndex(index);
-    setEditResourceData({ name: resource.name, url: resource.url });
+    setEditResourceData({ name: resource?.name ?? '', url: resource?.url ?? '' });
   }, [fields]);
 
   const saveResource = useCallback(() => {

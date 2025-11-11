@@ -36,7 +36,7 @@ export const imageAPI: ImageAPIType = {
       );
     } catch (error: unknown) {
       if (error instanceof ZodError) {
-        throw new HttpError(400, { message: error.issues[0].message });
+        throw new HttpError(400, { message: error.issues[0]?.message ?? '驗證錯誤' });
       }
       throw new HttpError(400, {
         message: "圖片上傳失敗，請稍後再試！",

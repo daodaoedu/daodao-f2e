@@ -94,7 +94,7 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    if (!isOpen && dialogs.length > 0) {
+    if (!isOpen && dialogs.length > 0 && dialogs[0]) {
       setIsOpen(true);
       setCurrentDialog(dialogs[0]);
       setDialogs(dialogs.slice(1));

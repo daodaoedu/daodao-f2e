@@ -19,7 +19,7 @@ export default function useMilestonesDateRange(projectId?: string) {
 
     const isVersion2 = project?.version === 2;
 
-    const milestoneStartDate = new Date(milestones[0].startDate || new Date());
+    const milestoneStartDate = new Date(milestones[0]?.startDate || new Date());
     const milestoneEndDate = milestones.reduce<Date>((compareEndDate, milestone) => {
       const currentEndDate = new Date(milestone.endDate || compareEndDate);
       return isAfter(compareEndDate, currentEndDate) ? compareEndDate : currentEndDate;

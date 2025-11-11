@@ -77,18 +77,20 @@ export class PracticeStorage {
     const practices = await this.getAllPractices();
     const index = practices.findIndex((p) => p.id === id);
 
-    if (index === -1) {
+    if (index === -1 || !practices[index]) {
       return null;
     }
 
-    practices[index] = {
+    const updatedPractice = {
       ...practices[index],
       ...updates,
       updatedAt: new Date().toISOString()
     };
 
+    practices[index] = updatedPractice;
+
     await this.savePractices(practices);
-    return practices[index];
+    return practices[index] ?? null;
   }
 
   static async deletePractice(id: string): Promise<boolean> {

@@ -441,6 +441,7 @@ export function calculateStreak(
   let index = 0;
   while (index < sortedCheckIns.length) {
     const checkIn = sortedCheckIns[index];
+    if (!checkIn) break;
     const checkInDate = startOfDay(parseISO(checkIn.date));
 
     if (isSameDay(checkInDate, expectedDate)) {
@@ -693,7 +694,7 @@ export function pathInfoToPractice(pathInfo: Record<string, unknown>, practiceAc
     totalAmount: parseInt(String(pathInfo.totalAmount), 10) || 1,
     currentProgress: parseInt(String(pathInfo.currentProgress), 10) || 0,
     unit: getContentTypeUnit((pathInfo.contentType as ContentType) || 'custom'),
-    startDate: String(pathInfo.targetDate) || now.split('T')[0],
+    startDate: String(pathInfo.targetDate) || (now.split('T')[0] ?? ''),
     targetDate: undefined,
     status: 'active' as PracticeStatus,
     motivationType: String(pathInfo.motivationType) ? (

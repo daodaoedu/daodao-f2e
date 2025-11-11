@@ -114,6 +114,7 @@ const startAnimation = (
     }
 
     const currentLine = LINES[currentLineIndex];
+    if (!currentLine) return;
     await type(currentLine, setCurrentText, intervalsRef);
     await wait(PAUSE_DONE);
     await erase(setCurrentText, intervalsRef);

@@ -43,7 +43,7 @@ function Upload({
     const parsed = validate.safeParse({ files });
 
     if (parsed.error) {
-      toast.error(parsed.error.issues[0].message);
+      toast.error(parsed.error.issues[0]?.message ?? '驗證錯誤');
       return;
     }
     const objectUrls = files.map(URL.createObjectURL);
@@ -51,7 +51,7 @@ function Upload({
     onChange?.(
       files.map((file, index) => ({
         file,
-        url: objectUrls[index],
+        url: objectUrls[index] ?? '',
         id: crypto.randomUUID(),
       })),
       e

@@ -75,6 +75,7 @@ export class CheckInService {
     let index = 0;
     while (index < sortedCheckIns.length) {
       const checkIn = sortedCheckIns[index];
+      if (!checkIn) break;
       const checkInDate = startOfDay(parseISO(checkIn.date));
 
       if (isSameDay(checkInDate, currentDate)) {

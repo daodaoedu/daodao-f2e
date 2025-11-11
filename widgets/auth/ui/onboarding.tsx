@@ -173,10 +173,10 @@ export const AuthOnboarding = () => {
               {/* 步驟標題 */}
               <div className="mb-8 text-center">
                 <h1 className="mb-2 text-2xl font-bold text-gray-900">
-                  {ONBOARDING_STEPS[currentStep - 1].title}
+                  {ONBOARDING_STEPS[currentStep - 1]?.title}
                 </h1>
                 <p className="text-gray-600">
-                  {ONBOARDING_STEPS[currentStep - 1].description}
+                  {ONBOARDING_STEPS[currentStep - 1]?.description}
                 </p>
               </div>
 

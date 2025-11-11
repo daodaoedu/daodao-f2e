@@ -186,8 +186,8 @@ function CommentCard({
               則回覆
             </div>
             <Image
-              src={replies[0].user.photoURL}
-              alt={`${replies[0].user.name}'s avatar`}
+              src={replies[0]?.user.photoURL ?? ''}
+              alt={`${replies[0]?.user.name ?? 'User'}'s avatar`}
               width={20}
               height={20}
               className="rounded-full"

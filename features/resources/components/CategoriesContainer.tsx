@@ -33,10 +33,12 @@ export default function CategoriesContainer({
 
   const categories = getCategories(selectedCategories?.map((c) => c.value));
   const [majorCategory] = categories;
+  const majorCategoryValue = majorCategory?.value;
 
   const hasSubCategories = Array.isArray(categories) &&
     selectedCategories &&
-    SEARCH_TAGS[majorCategory?.value]?.length > 1;
+    majorCategoryValue !== undefined &&
+    (SEARCH_TAGS[majorCategoryValue]?.length ?? 0) > 1;
 
   const categoryLength = Array.isArray(categories) ? categories.length : 0;
 

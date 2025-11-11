@@ -74,7 +74,7 @@ function ContentCard<T extends ContentCardData>({
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent from-70% to-white" />
             )}
           </div>
-          {data.imgUrls && data.imgUrls.length > 0 && (
+          {data.imgUrls && data.imgUrls.length > 0 && data.imgUrls[0] && (
             <Image
               src={data.imgUrls[0]}
               alt={data.title}

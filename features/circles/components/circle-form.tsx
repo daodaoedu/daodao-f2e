@@ -225,7 +225,7 @@ export function CircleForm({ values, onSuccess }: CircleFormProps) {
                             checked={checkIsPhysicalArea(field.value)}
                             onCheckedChange={(checked) => {
                               if (checked) {
-                                field.onChange(AREAS[0].value);
+                                field.onChange(AREAS[0]?.value ?? '');
                               } else {
                                 field.onChange(TBD_OPTION.value);
                               }

@@ -36,7 +36,10 @@ export const Sidebar = () => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          setActiveSection(entry?.target?.children?.[0]?.id);
+          const sectionId = entry?.target?.children?.[0]?.id;
+          if (sectionId) {
+            setActiveSection(sectionId);
+          }
         }
       });
     });

@@ -514,7 +514,7 @@ const EditForm: React.FC<EditFormProps> = ({
                     {resourceErrors[resource.id]?.name && (
                       <div className="mt-1 flex items-center text-xs text-destructive">
                         <AlertCircle className="mr-1 size-3" />
-                        <span>{resourceErrors[resource.id].name}</span>
+                        <span>{resourceErrors[resource.id]?.name}</span>
                       </div>
                     )}
                   </div>
@@ -530,7 +530,7 @@ const EditForm: React.FC<EditFormProps> = ({
                     {resourceErrors[resource.id]?.url && (
                       <div className="mt-1 flex items-center text-xs text-destructive">
                         <AlertCircle className="mr-1 size-3" />
-                        <span>{resourceErrors[resource.id].url}</span>
+                        <span>{resourceErrors[resource.id]?.url}</span>
                       </div>
                     )}
                   </div>
