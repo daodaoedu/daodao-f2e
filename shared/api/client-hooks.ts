@@ -8,9 +8,7 @@ import {
 } from 'swr-openapi';
 
 import { isMatch } from './is-match';
-import { client } from './client';
-
-const PREFIX = 'dao-dao-server-api' as const;
+import { PREFIX, client } from './client';
 
 export const useQuery = createQueryHook(client, PREFIX);
 export const useImmutable = createImmutableHook(client, PREFIX);

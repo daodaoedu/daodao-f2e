@@ -9,7 +9,11 @@ import type { paths } from './openapi-types';
 import getEnv from '../config/env';
 import { getTokenStorage } from '../lib/storage';
 
-const PREFIX = 'dao-dao-server-api' as const;
+export const PREFIX = 'dao-dao-server-api' as const;
+
+export const client = createClient<paths>({
+  baseUrl: process.env.NEXT_PUBLIC_API_URL,
+});
 
 const middleware: Middleware = {
   async onRequest({ request }) {
@@ -30,10 +34,6 @@ const middleware: Middleware = {
     return request;
   },
 };
-
-export const client = createClient<paths>({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL,
-});
 
 client.use(middleware);
 
