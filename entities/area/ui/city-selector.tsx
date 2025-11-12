@@ -3,6 +3,7 @@
 import React, { forwardRef } from 'react';
 import type { FieldPath, FieldValues } from 'react-hook-form';
 import { Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import {
   MultipleSelector,
   type MultipleSelectorRef,
@@ -28,13 +29,14 @@ interface CitySelectorProps {
 // 共用的 hook 和 UI 元素
 const useCitySelectorLogic = () => {
   const { cities, isLoading, error, searchCities } = useCities();
+  const t = useTranslations('common');
 
   // 載入指示器
   const loadingIndicator = (
     <div className="flex items-center justify-center py-2">
       <Loader2 className="size-4 animate-spin" />
       <span className="ml-2 text-sm text-muted-foreground">
-        載入城市資料中...
+        {t('city_selector_loading')}
       </span>
     </div>
   );
@@ -43,7 +45,9 @@ const useCitySelectorLogic = () => {
   const emptyIndicator = (
     <div className="flex items-center justify-center py-2">
       <span className="text-sm text-muted-foreground">
-        {error ? `載入失敗: ${error}` : '找不到符合的城市'}
+        {error
+          ? t('city_selector_load_error', { error })
+          : t('city_selector_empty')}
       </span>
     </div>
   );
@@ -70,7 +74,7 @@ const CitySelector = forwardRef<MultipleSelectorRef, CitySelectorProps>(
     {
       value,
       onChange,
-      placeholder = '搜尋並選擇城市...',
+      placeholder,
       disabled = false,
       className,
       triggerSearchOnFocus = true,
@@ -87,13 +91,14 @@ const CitySelector = forwardRef<MultipleSelectorRef, CitySelectorProps>(
       loadingIndicator,
       emptyIndicator,
     } = useCitySelectorLogic();
+    const t = useTranslations('common');
 
     // 如果有錯誤，顯示錯誤狀態
     if (error) {
       return (
         <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3">
           <p className="text-sm text-destructive">
-            載入城市資料時發生錯誤: {error}
+            {t('city_selector_error', { error })}
           </p>
         </div>
       );
@@ -149,12 +154,14 @@ const FormCitySelector = <
   label,
   required,
   disabled,
-  placeholder = '搜尋並選擇城市...',
+  placeholder,
   className,
   triggerSearchOnFocus = true,
   hideClearAllButton = false,
   hidePlaceholderWhenSelected = true,
 }: FormCitySelectorProps<TFieldValues, TName>) => {
+  const t = useTranslations('common');
+  const defaultPlaceholder = placeholder || t('city_selector_default_placeholder');
   return (
     <FormFieldWrapper
       control={control}
@@ -168,7 +175,7 @@ const FormCitySelector = <
           value={field.value}
           onChange={field.onChange}
           disabled={disabled}
-          placeholder={placeholder}
+          placeholder={defaultPlaceholder}
           className={className}
           triggerSearchOnFocus={triggerSearchOnFocus}
           hideClearAllButton={hideClearAllButton}

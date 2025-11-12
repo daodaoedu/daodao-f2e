@@ -72,9 +72,10 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
       try {
         if (loginStatus === AuthLoginStatus.TEMPORARY) {
           // POST /api/v1/users/me - 建立新用戶
-          const { data } = await client.POST('/api/v1/users/me', {
+          const { data, error } = await client.POST('/api/v1/users/me', {
             body: input,
           });
+          if (error) throw error;
           setToken(data?.data?.token ?? '');
           return;
         }
@@ -84,9 +85,10 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
             ...input,
           };
           // PUT /api/v1/users/me - 更新用戶資料
-          const { data } = await client.PUT('/api/v1/users/me', {
+          const { data, error } = await client.PUT('/api/v1/users/me', {
             body: updatedUser,
           });
+          if (error) throw error;
           await mutate(['/api/v1/users/me'], data);
           await mutate(
             [

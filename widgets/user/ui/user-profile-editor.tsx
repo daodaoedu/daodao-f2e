@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AtSignIcon, SaveIcon, XIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/shared/ui/button';
 import { FormInput } from '@/shared/ui/input';
 import { FormTextarea } from '@/shared/ui/textarea';
@@ -21,30 +22,41 @@ import { DynamicContactSelector } from '@/entities/user/ui';
 import { CONTACT_PLATFORM_OPTIONS } from '@/entities/user/model/constants';
 import { FormCitySelector } from '@/entities/area/ui';
 
-// 表單驗證 schema
-const userProfileSchema = z.object({
-  name: z.string().max(50, '姓名不能超過 50 字').optional(),
-  photoURL: z.string().url('請輸入有效的圖片網址').optional().or(z.literal('')),
-  customId: z.string().optional(),
-  personalSlogan: z
-    .string()
-    .min(1, '請輸入個人標語')
-    .max(150, '個人標語不能超過 150 字'),
-  selfIntroduction: z.string().max(500, '自我介紹不能超過 350 字').optional(),
-  location: z.string().optional(),
-  contactList: z
-    .object({
-      website: z.string().optional(),
-      facebook: z.string().optional(),
-      instagram: z.string().optional(),
-      linkedin: z.string().optional(),
-      github: z.string().optional(),
-      discord: z.string().optional(),
-    })
-    .optional(),
-});
+// 建立表單驗證 schema 的函數，支援多語系
+const createUserProfileSchema = (t: ReturnType<typeof useTranslations>) =>
+  z.object({
+    name: z
+      .string()
+      .max(50, t('name_max_length', { count: 50 }))
+      .optional(),
+    photoURL: z
+      .string()
+      .url(t('photo_url_invalid'))
+      .optional()
+      .or(z.literal('')),
+    customId: z.string().optional(),
+    personalSlogan: z
+      .string()
+      .min(1, t('personal_slogan_required'))
+      .max(150, t('personal_slogan_max_length', { count: 150 })),
+    selfIntroduction: z
+      .string()
+      .max(350, t('self_introduction_max_length', { count: 350 }))
+      .optional(),
+    location: z.string().optional(),
+    contactList: z
+      .object({
+        website: z.string().optional(),
+        facebook: z.string().optional(),
+        instagram: z.string().optional(),
+        linkedin: z.string().optional(),
+        github: z.string().optional(),
+        discord: z.string().optional(),
+      })
+      .optional(),
+  });
 
-type UserProfileFormData = z.infer<typeof userProfileSchema>;
+type UserProfileFormData = z.infer<ReturnType<typeof createUserProfileSchema>>;
 
 interface UserProfileEditorProps {
   initialData?: Partial<UserProfile>;
@@ -63,29 +75,32 @@ const ActionButtons = ({
   isSaving,
   isLoading,
   className,
-}: ActionButtonsProps) => (
-  <div className={cn('flex flex-col gap-2 sm:flex-row sm:gap-4', className)}>
-    <Button
-      type="button"
-      variant="outline"
-      onClick={onCancel}
-      disabled={isSaving || isLoading}
-      className="flex flex-1 items-center gap-2"
-    >
-      <XIcon className="size-4" />
-      取消
-    </Button>
-    <Button
-      type="submit"
-      form="profile-form"
-      disabled={isSaving || isLoading}
-      className="flex flex-1 items-center gap-2"
-    >
-      <SaveIcon className="size-4" />
-      {isSaving ? '儲存中...' : '儲存'}
-    </Button>
-  </div>
-);
+}: ActionButtonsProps) => {
+  const t = useTranslations('user_profile');
+  return (
+    <div className={cn('flex flex-col gap-2 sm:flex-row sm:gap-4', className)}>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={onCancel}
+        disabled={isSaving || isLoading}
+        className="flex flex-1 items-center gap-2"
+      >
+        <XIcon className="size-4" />
+        {t('cancel')}
+      </Button>
+      <Button
+        type="submit"
+        form="profile-form"
+        disabled={isSaving || isLoading}
+        className="flex flex-1 items-center gap-2"
+      >
+        <SaveIcon className="size-4" />
+        {isSaving ? t('saving') : t('save')}
+      </Button>
+    </div>
+  );
+};
 
 interface UserProfileEditorLayoutProps extends React.PropsWithChildren {
   actionButtons?: React.ReactNode;
@@ -94,24 +109,29 @@ interface UserProfileEditorLayoutProps extends React.PropsWithChildren {
 const UserProfileEditorLayout = ({
   children,
   actionButtons,
-}: UserProfileEditorLayoutProps) => (
-  <Paper>
-    <div className="space-y-6">
-      {/* 標題與操作按鈕 */}
-      <div className="flex items-center justify-between border-b border-basic-200 pb-4">
-        <h2 className="text-basic-800 text-2xl font-bold">編輯個人資料</h2>
-        <div className="hidden sm:block">{actionButtons}</div>
-      </div>
+}: UserProfileEditorLayoutProps) => {
+  const t = useTranslations('user_profile');
+  return (
+    <Paper>
+      <div className="space-y-6">
+        {/* 標題與操作按鈕 */}
+        <div className="flex items-center justify-between border-b border-basic-200 pb-4">
+          <h2 className="text-basic-800 text-2xl font-bold">
+            {t('edit_profile_title')}
+          </h2>
+          <div className="hidden sm:block">{actionButtons}</div>
+        </div>
 
-      {children}
+        {children}
 
-      {/* 底部操作按鈕 */}
-      <div className="flex justify-center border-t border-basic-200 pt-4 *:w-full *:*:flex-1 *:gap-4 *:px-4">
-        {actionButtons}
+        {/* 底部操作按鈕 */}
+        <div className="flex justify-center border-t border-basic-200 pt-4 *:w-full *:*:flex-1 *:gap-4 *:px-4">
+          {actionButtons}
+        </div>
       </div>
-    </div>
-  </Paper>
-);
+    </Paper>
+  );
+};
 
 export const UserProfileEditorLoading = () => (
   <UserProfileEditorLayout actionButtons={<ActionButtons isLoading />}>
@@ -128,6 +148,9 @@ export const UserProfileEditor = ({
   const { user } = useAuth();
   const { updateUser } = useAuthActions();
   const [isSaving, setIsSaving] = useState(false);
+  const t = useTranslations('user_profile');
+
+  const userProfileSchema = createUserProfileSchema(t);
 
   const form = useForm<UserProfileFormData>({
     resolver: zodResolver(userProfileSchema),
@@ -139,11 +162,11 @@ export const UserProfileEditor = ({
       selfIntroduction: initialData?.selfIntroduction || '',
       location: initialData?.location || '',
       contactList: {
-        // website: initialData?.contactList?.website || '',
+        website: '',
         facebook: initialData?.contactList?.facebook || '',
         instagram: initialData?.contactList?.instagram || '',
-        // linkedin: initialData?.contactList?.linkedin || '',
-        // github: initialData?.contactList?.github || '',
+        linkedin: '',
+        github: '',
         discord: initialData?.contactList?.discord || '',
       },
     },
@@ -163,7 +186,7 @@ export const UserProfileEditor = ({
       });
       onClose();
     } catch (error) {
-      handleFormError(error, { defaultMessage: '儲存失敗，請稍後再試' });
+      handleFormError(error, { defaultMessage: t('save_error') });
     } finally {
       setIsSaving(false);
     }
@@ -200,7 +223,7 @@ export const UserProfileEditor = ({
           {/* 基本資訊區塊 */}
           <div className="space-y-4">
             <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
-              基本資訊
+              {t('basic_info_title')}
             </h3>
 
             <div className="flex flex-col items-center gap-8 sm:flex-row">
@@ -216,16 +239,16 @@ export const UserProfileEditor = ({
                 <FormInput
                   control={form.control}
                   name="name"
-                  label="使用者名稱"
-                  placeholder="請輸入您的使用者名稱..."
+                  label={t('name_label')}
+                  placeholder={t('name_placeholder')}
                 />
 
                 {/* 使用者帳號 */}
                 <FormInput
                   control={form.control}
                   name="customId"
-                  label="使用者帳號"
-                  placeholder="請輸入您的使用者帳號..."
+                  label={t('custom_id_label')}
+                  placeholder={t('custom_id_placeholder')}
                   prefixIcon={<AtSignIcon className="size-4" />}
                 />
               </div>
@@ -235,16 +258,16 @@ export const UserProfileEditor = ({
             <FormCitySelector
               control={form.control}
               name="location"
-              label="居住地"
-              placeholder="搜尋並選擇您的居住城市..."
+              label={t('location_label')}
+              placeholder={t('location_placeholder')}
             />
 
             {/* 個人標語 */}
             <FormTextarea
               control={form.control}
               name="personalSlogan"
-              label="個人標語"
-              placeholder="用一句話介紹自己..."
+              label={t('personal_slogan_label')}
+              placeholder={t('personal_slogan_placeholder')}
               rows={2}
             />
           </div>
@@ -252,27 +275,27 @@ export const UserProfileEditor = ({
           {/* 其他社群區塊 */}
           <div className="space-y-6">
             <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
-              其他社群
+              {t('social_media_title')}
             </h3>
             <DynamicContactSelector
               control={form.control}
               name="contactList"
               options={CONTACT_PLATFORM_OPTIONS}
-              platformPlaceholder="選擇社群平台"
-              valuePlaceholder="請輸入帳號或連結"
+              platformPlaceholder={t('platform_placeholder')}
+              valuePlaceholder={t('contact_value_placeholder')}
             />
           </div>
 
           {/* 自我介紹區塊 */}
           <div className="space-y-6">
             <h3 className="text-basic-700 border-l-4 border-primary-base pl-4 text-lg font-semibold">
-              自我介紹
+              {t('self_introduction_title')}
             </h3>
 
             <FormTextarea
               control={form.control}
               name="selfIntroduction"
-              placeholder="分享你的學習經歷、興趣或專業背景..."
+              placeholder={t('self_introduction_placeholder')}
               className="min-h-32"
             />
           </div>

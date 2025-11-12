@@ -1,9 +1,19 @@
 'use client';
 
+/**
+ * TODO: Add translation keys to Google Sheets and run `pnpm fetch:i18n`
+ * Required keys in "user_profile" namespace:
+ * - contact_copied: "已複製 {platform} ID"
+ * - about_me_title: "關於我"
+ * - skill_map_title: "技能地圖"
+ * - skill_map_coming_soon: "功能即將開放，敬請期待。"
+ */
+
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
 import { MapPinIcon, PencilIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Container, Paper } from '@/shared/ui/wrapper';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { CustomLink } from '@/shared/ui/custom-link';
@@ -11,13 +21,14 @@ import { usePathname } from '@/shared/i18n/navigation';
 import { Button, TextCollapse } from '@/shared/ui';
 import { Badge } from '@/shared/ui/badge';
 import { iconMap, SocialIcon, SocialPlatform } from '@/shared/ui/social-icon';
-import { useAuth, getUserProfileBasePath, UserIdObject, useUserProfile } from '@/entities/user';
-import { UserProfileEditorLoading } from './user-profile-editor';
 import {
-  USER_PROFILE_TAB_TITLES,
-  UserProfileTabTitle,
-  DEFAULT_TAB,
-} from '../model/user-profile';
+  useAuth,
+  getUserProfileBasePath,
+  UserIdObject,
+  useUserProfile,
+} from '@/entities/user';
+import { UserProfileEditorLoading } from './user-profile-editor';
+import { USER_PROFILE_TABS, DEFAULT_TAB } from '../model/user-profile';
 
 const UserProfileEditor = dynamic(
   () => import('./user-profile-editor').then((mod) => mod.UserProfileEditor),
@@ -40,8 +51,7 @@ const socialPlatformList: SocialPlatformItem[] = [
   },
   {
     platform: 'github',
-    generateHref: (github: string) =>
-      `https://www.github.com/${github}`,
+    generateHref: (github: string) => `https://www.github.com/${github}`,
   },
   {
     platform: 'instagram',
@@ -87,29 +97,14 @@ export function UserProfileWidget({
   const pathname = usePathname();
   const basePath = getUserProfileBasePath(user);
   const isOwnProfile = loginUser?.id === user?.id;
+  const t = useTranslations('user_profile');
 
-  const navItems: { label: UserProfileTabTitle; href: string }[] = [
-    {
-      label: USER_PROFILE_TAB_TITLES.projects,
-      href: `${basePath}/projects`,
-    },
-    {
-      label: USER_PROFILE_TAB_TITLES.practices,
-      href: `${basePath}/practices`,
-    },
-    {
-      label: USER_PROFILE_TAB_TITLES.resources,
-      href: `${basePath}/resources`,
-    },
-    {
-      label: USER_PROFILE_TAB_TITLES.ideas,
-      href: `${basePath}/ideas`,
-    },
-    {
-      label: USER_PROFILE_TAB_TITLES.circles,
-      href: `${basePath}/circles`,
-    },
-  ];
+  const navItems: { label: string; href: string }[] = USER_PROFILE_TABS.map(
+    (tab) => ({
+      label: t(`tab_${tab}`),
+      href: `${basePath}/${tab}`,
+    })
+  );
 
   const getActiveTabVariant = (itemHref: string): 'default' | 'outline' => {
     if (pathname === itemHref) return 'default';
@@ -126,7 +121,7 @@ export function UserProfileWidget({
     const platformName = iconMap[platform].name;
     if (contactValue) {
       await navigator.clipboard.writeText(contactValue);
-      toast.success(`已複製 ${platformName} ID`);
+      toast.success(t('contact_copied', { platform: platformName }));
     }
   };
 
@@ -251,7 +246,7 @@ export function UserProfileWidget({
           {user?.selfIntroduction && (
             <div className="space-y-3">
               <h2 className="text-basic-700 heading-sm border-l-4 border-primary-base pl-4 font-semibold">
-                關於我
+                {t('about_me_title')}
               </h2>
               <TextCollapse
                 text={user?.selfIntroduction}
@@ -265,23 +260,23 @@ export function UserProfileWidget({
 
       <Container className="max-w-4xl space-y-3">
         <h2 className="text-basic-700 heading-sm border-l-4 border-primary-base pl-4 font-semibold">
-          技能地圖
+          {t('skill_map_title')}
         </h2>
-        <Paper>功能即將開放，敬請期待。</Paper>
+        <Paper>{t('skill_map_coming_soon')}</Paper>
       </Container>
 
       <Container className="max-w-4xl">
         <div className="overflow-x-auto px-2 pb-3">
           <nav className="flex gap-3">
-            {navItems.map((item) => (
+            {navItems.map(({ label, href }) => (
               <Button
-                variant={getActiveTabVariant(item.href)}
+                variant={getActiveTabVariant(href)}
                 asChild
                 className="rounded-md"
-                key={item.label}
+                key={label}
               >
-                <CustomLink href={item.href} scroll={false}>
-                  {item.label}
+                <CustomLink href={href} scroll={false}>
+                  {label}
                 </CustomLink>
               </Button>
             ))}

@@ -1,8 +1,5 @@
 const withNextIntl = require('next-intl/plugin')({
   requestConfig: './shared/i18n/request.ts',
-  experimental: {
-    createMessagesDeclaration: './shared/i18n/locales/zh-TW.json',
-  }
 });
 
 const withPWA = require("next-pwa")({

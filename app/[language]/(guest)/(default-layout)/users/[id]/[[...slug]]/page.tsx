@@ -1,12 +1,7 @@
 import { Metadata } from 'next';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { redirect } from '@/shared/i18n/navigation';
-import {
-  USER_PROFILE_TABS,
-  UserProfileTab,
-  USER_PROFILE_TAB_TITLES,
-  DEFAULT_TAB,
-} from '@/widgets/user';
+import { USER_PROFILE_TABS, UserProfileTab, DEFAULT_TAB } from '@/widgets/user';
 import {
   parseUserId,
   getUserProfileBasePath,
@@ -27,11 +22,6 @@ const validateTabKey = async (
     : redirect({ href: getUserProfileBasePath(userIdObject), locale });
 };
 
-export const generateStaticParams = () =>
-  USER_PROFILE_TABS.map((tabKey) => ({
-    slug: [tabKey],
-  }));
-
 export async function generateMetadata({
   params,
 }: PageProps<'/[language]/users/[id]/[[...slug]]'>): Promise<Metadata> {
@@ -40,11 +30,12 @@ export async function generateMetadata({
   const tabKey = await validateTabKey(userIdObject, slug?.[0]);
   const [, userResponse] = await getUserData(userIdObject);
   const data = userResponse?.data?.data;
-  const name = data?.name?.trim() || '未知用戶';
-  const titleSuffix = USER_PROFILE_TAB_TITLES[tabKey];
+  const t = await getTranslations('user_profile');
+  const name = data?.name?.trim() || t('unknown_user');
+  const tabTitle = t(`tab_${tabKey}`);
 
   return {
-    title: `${name}的${titleSuffix}`,
+    title: t('page_title_format', { name, tab: tabTitle }),
   };
 }
 
@@ -54,18 +45,19 @@ export default async function TabContentPage({
   const { id, slug } = await params;
   const userIdObject = parseUserId(id);
   const tabKey = await validateTabKey(userIdObject, slug?.[0]);
+  const t = await getTranslations('user_profile');
 
   switch (tabKey) {
     case 'projects':
-      return <div>學習計劃</div>;
+      return <div>{t('tab_projects')}</div>;
     case 'practices':
-      return <div>主題實踐</div>;
+      return <div>{t('tab_practices')}</div>;
     case 'ideas':
-      return <div>想法</div>;
+      return <div>{t('tab_ideas')}</div>;
     case 'circles':
-      return <div>揪團</div>;
+      return <div>{t('tab_circles')}</div>;
     case 'resources':
-      return <div>資源</div>;
+      return <div>{t('tab_resources')}</div>;
     default:
       return null;
   }
