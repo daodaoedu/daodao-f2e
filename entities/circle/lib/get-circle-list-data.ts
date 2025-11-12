@@ -1,8 +1,3 @@
-/**
- * Server-side Circle List data fetching
- * 統一的 Circle 列表資料獲取函數（Server 端）
- */
-
 import {
   getApiV1Circles,
   getGetApiV1CirclesKey,

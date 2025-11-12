@@ -1,12 +1,5 @@
-/**
- * Circle data mutation utilities
- * 未來可直接替換 import 路徑為 @generated/api/circles.client
- */
-
 import { mutate } from 'swr';
 import { getGetApiV1CirclesIdKey } from '../generated/api/circles.client';
-// 未來替換為:
-// import { getGetApiV1CirclesIdKey } from '@/generated/api/circles.client';
 
 import type { CircleIdObject } from '../model';
 

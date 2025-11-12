@@ -1,8 +1,3 @@
-/**
- * Client-side Circle data hooks
- * 未來可直接替換 import 路徑為 @generated/api/circles.client
- */
-
 'use client';
 
 import { useGetApiV1CirclesId } from '../generated/api/circles.client';

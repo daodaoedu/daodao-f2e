@@ -1,8 +1,3 @@
-/**
- * Client-side Circle List hooks with Infinite Scroll Support
- * 封裝 useGetApiV1CirclesInfinite，提供更簡潔的 API
- */
-
 'use client';
 
 import { useMemo } from 'react';
