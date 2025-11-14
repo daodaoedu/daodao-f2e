@@ -26,8 +26,11 @@ export type UpdateUserSchema =
 
 // Professional Field enum
 export type ProfessionalField = NonNullable<
-  CreateUserSchema['professionalField']
+  UserProfile['professionalField']
 >[number];
+
+// Education Stage enum
+export type EducationStage = NonNullable<UserProfile['educationStage']>;
 
 // ===== 業務相關類型 =====
 
@@ -76,17 +79,22 @@ export type NavVisibility =
 export const GENDER_OPTIONS: OptionProps[] = [
   { value: 'male', label: '男性' },
   { value: 'female', label: '女性' },
-  { value: 'other', label: '其他' },
+  { value: 'other', label: '保持神秘' },
 ];
 
 /**
  * 教育階段選項
  */
-export const EDUCATION_OPTIONS: OptionProps[] = [
-  { value: 'university', label: '大學' },
+export const EDUCATION_OPTIONS: OptionProps<EducationStage>[] = [
   { value: 'high', label: '高中' },
-  { value: 'other', label: '其他' },
+  { value: 'university', label: '大學' },
+  // TODO: 碩士、博士、不設限暫時註解，等DB資料更新完再解開
+  // { value: 'master', label: '碩士' },
+  // { value: 'phd', label: '博士' },
+  { value: 'other', label: '不設限' },
 ];
+
+export const educationStageEnum = optionListToEnum(EDUCATION_OPTIONS);
 
 /**
  * 專業領域選項
@@ -140,17 +148,19 @@ export const INTEREST_AREAS: OptionProps[] = [
   { value: 'other', label: '其他' },
 ];
 
+export const interestAreasEnum = optionListToEnum(INTEREST_AREAS);
+
 /**
  * 角色身份選項
  */
 export const ROLE_OPTIONS: OptionProps[] = [
   { value: 'experimental-education-student', label: '實驗教育學生' },
   { value: 'normal-student', label: '一般學生' },
-  { value: 'experimental-education-parent', label: '家長' },
   { value: 'experimental-educator', label: '教育工作者' },
   { value: 'citizen', label: '社會人士' },
-  { value: 'other', label: '不設限' },
 ];
+
+export const roleEnum = optionListToEnum(ROLE_OPTIONS);
 
 /**
  * 推薦來源選項

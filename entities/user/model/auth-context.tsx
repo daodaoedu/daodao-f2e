@@ -12,14 +12,10 @@ import { mutate as swrMutate } from 'swr';
 import { getTokenStorage } from '@/shared/lib/storage';
 import { ApiError, client, useMutate, useQuery } from '@/shared/api';
 import { onUnauthorized } from '@/shared/lib/auth-bus';
-import {
-  AuthState,
-  AuthActions,
-  AuthActionTypes,
-  AuthLoginStatus,
-} from './auth-types';
+import { AuthState, AuthActions, AuthActionTypes } from './auth-types';
 import { authReducer } from './auth-reducer';
-import { createInitialAuthState } from './auth-state';
+import { createInitialAuthState, isPermanent, isTemporary } from './auth-state';
+import { UpdateUserSchema } from './constants';
 
 const AuthContext = createContext<AuthState | null>(null);
 const AuthActionsContext = createContext<AuthActions | null>(null);
@@ -45,7 +41,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
 
   const mutate = useMutate();
 
-  const { loginStatus, user } = state;
+  const { user } = state;
 
   const setToken = useCallback((payload: string) => {
     getTokenStorage().set(payload);
@@ -67,10 +63,31 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     [logout]
   );
 
+  const removeNullValues = useCallback(<T extends Record<string, unknown>>(
+    obj: T
+  ): T => {
+    if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) {
+      return obj;
+    }
+
+    return Object.entries(obj).reduce((cleaned, [key, value]) => {
+      const processedValue =
+        value === null
+          ? undefined
+          : typeof value === 'object' && !Array.isArray(value)
+            ? removeNullValues(value as Record<string, unknown>)
+            : value;
+      return {
+        ...cleaned,
+        [key]: processedValue,
+      } as T;
+    }, {} as T);
+  }, []);
+
   const updateUser = useCallback<AuthActions['updateUser']>(
     async (input) => {
       try {
-        if (loginStatus === AuthLoginStatus.TEMPORARY) {
+        if (isTemporary(state, input)) {
           // POST /api/v1/users/me - 建立新用戶
           const { data, error } = await client.POST('/api/v1/users/me', {
             body: input,
@@ -79,14 +96,19 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
           setToken(data?.data?.token ?? '');
           return;
         }
-        if (loginStatus === AuthLoginStatus.PERMANENT) {
-          const updatedUser = {
-            ...user,
-            ...input,
+        if (isPermanent(state, input)) {
+          const updatedUser: UpdateUserSchema = {
+            ...(user || {}),
+            ...(input || {}),
+            contactList: {
+              ...(user?.contactList || {}),
+              ...(input?.contactList || {}),
+            },
+            birthDay: user?.birthDay,
           };
           // PUT /api/v1/users/me - 更新用戶資料
           const { data, error } = await client.PUT('/api/v1/users/me', {
-            body: updatedUser,
+            body: removeNullValues(updatedUser),
           });
           if (error) throw error;
           await mutate(['/api/v1/users/me'], data);
@@ -110,7 +132,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
         throw error;
       }
     },
-    [user, loginStatus, mutate, setToken, handleError]
+    [state, user, mutate, setToken, handleError, removeNullValues]
   );
 
   const sessionActions = useMemo<AuthActions>(
@@ -136,7 +158,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
   );
 
   // GET /api/v1/users/me - 取得當前用戶資料
-  const { isValidating } = useQuery(
+  const { isLoading } = useQuery(
     '/api/v1/users/me',
     state.token ? {} : null,
     {
@@ -148,10 +170,10 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
   );
 
   useEffect(() => {
-    if (state.isLoggingIn !== isValidating) {
-      sessionActions.setLoading(isValidating);
+    if (state.isLoggingIn !== isLoading) {
+      sessionActions.setLoading(isLoading);
     }
-  }, [state.isLoggingIn, sessionActions, isValidating]);
+  }, [state.isLoggingIn, sessionActions, isLoading]);
 
   useEffect(() => {
     const off = onUnauthorized(() => sessionActions.logout());

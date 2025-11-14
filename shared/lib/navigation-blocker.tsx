@@ -45,9 +45,22 @@ export const NavigationBlockerProvider = ({
 export const useNavigationBlocker = () => {
   const context = useContext(NavigationBlockerContext);
   if (!context) {
-    throw new Error('useNavigationBlocker must be used within a NavigationBlockerProvider');
+    throw new Error(
+      'useNavigationBlocker must be used within a NavigationBlockerProvider'
+    );
   }
   return context;
+};
+
+export const useNavigationBlockerEffect = (shouldBlock: boolean) => {
+  const { setIsBlocked } = useNavigationBlocker();
+
+  useEffect(() => {
+    setIsBlocked(shouldBlock);
+    return () => {
+      setIsBlocked(false);
+    };
+  }, [shouldBlock, setIsBlocked]);
 };
 
 const getHash = () =>

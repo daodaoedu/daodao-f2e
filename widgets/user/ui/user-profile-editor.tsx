@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -13,7 +13,7 @@ import { FormAvatarPicker } from '@/shared/ui/image-picker';
 import { Form } from '@/shared/ui/form';
 import { Paper } from '@/shared/ui/paper';
 import type { UserProfile } from '@/entities/user';
-import { useNavigationBlocker } from '@/shared/lib/navigation-blocker';
+import { useNavigationBlockerEffect } from '@/shared/lib/navigation-blocker';
 import { useErrorHandler } from '@/shared/lib/error-handler';
 import { useAuth, useAuthActions } from '@/entities/user';
 import { cn } from '@/shared/lib/cn';
@@ -197,16 +197,9 @@ export const UserProfileEditor = ({
     onClose();
   };
 
-  const { setIsBlocked } = useNavigationBlocker();
-
   const { isDirty } = form.formState;
-
-  useEffect(() => {
-    setIsBlocked(isDirty);
-    return () => {
-      setIsBlocked(false);
-    };
-  }, [isDirty, setIsBlocked]);
+  
+  useNavigationBlockerEffect(isDirty);
 
   return (
     <Form {...form}>
