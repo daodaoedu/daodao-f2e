@@ -8,23 +8,14 @@ import {
   useMemo,
   useReducer,
 } from 'react';
-import { mutate } from 'swr';
+import { mutate as swrMutate } from 'swr';
 import { getTokenStorage } from '@/shared/lib/storage';
-import { ApiError } from '@/shared/api';
+import { ApiError, client, useMutate, useQuery } from '@/shared/api';
 import { onUnauthorized } from '@/shared/lib/auth-bus';
-import {
-  useGetApiV1UsersMe,
-  usePostApiV1UsersMe,
-  usePutApiV1UsersMe,
-} from '@/generated/api/users.client';
 import { AuthState, AuthActions, AuthActionTypes } from './auth-types';
-import { mutateUserData } from '../lib/mutate-user-data';
 import { authReducer } from './auth-reducer';
-import {
-  createInitialAuthState,
-  isPermanentLogin,
-  isTemporaryLogin,
-} from './auth-state';
+import { createInitialAuthState, isPermanent, isTemporary } from './auth-state';
+import { UpdateUserSchema } from './constants';
 
 const AuthContext = createContext<AuthState | null>(null);
 const AuthActionsContext = createContext<AuthActions | null>(null);
@@ -48,11 +39,9 @@ export const useAuthActions = () => {
 export function AuthProvider({ children }: React.PropsWithChildren) {
   const [state, dispatch] = useReducer(authReducer, createInitialAuthState());
 
-  const { loginStatus, user } = state;
+  const mutate = useMutate();
 
-  const { trigger: triggerPostUser } = usePostApiV1UsersMe();
-
-  const { trigger: triggerPutUser } = usePutApiV1UsersMe();
+  const { user } = state;
 
   const setToken = useCallback((payload: string) => {
     getTokenStorage().set(payload);
@@ -62,7 +51,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
   const logout = useCallback(() => {
     getTokenStorage().remove();
     dispatch({ type: AuthActionTypes.LOGOUT });
-    mutate(() => true, undefined, { revalidate: false });
+    swrMutate(() => true, undefined, { revalidate: false });
   }, []);
 
   const handleError = useCallback(
@@ -74,28 +63,76 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     [logout]
   );
 
+  const removeNullValues = useCallback(<T extends Record<string, unknown>>(
+    obj: T
+  ): T => {
+    if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) {
+      return obj;
+    }
+
+    return Object.entries(obj).reduce((cleaned, [key, value]) => {
+      const processedValue =
+        value === null
+          ? undefined
+          : typeof value === 'object' && !Array.isArray(value)
+            ? removeNullValues(value as Record<string, unknown>)
+            : value;
+      return {
+        ...cleaned,
+        [key]: processedValue,
+      } as T;
+    }, {} as T);
+  }, []);
+
   const updateUser = useCallback<AuthActions['updateUser']>(
     async (input) => {
       try {
-        if (isTemporaryLogin(loginStatus, input)) {
-          const result = await triggerPostUser(input);
-          setToken(result?.data?.token ?? '');
+        if (isTemporary(state, input)) {
+          // POST /api/v1/users/me - 建立新用戶
+          const { data, error } = await client.POST('/api/v1/users/me', {
+            body: input,
+          });
+          if (error) throw error;
+          setToken(data?.data?.token ?? '');
           return;
         }
-        if (isPermanentLogin(loginStatus, input)) {
-          const updatedUser = {
-            ...user,
-            ...input,
+        if (isPermanent(state, input)) {
+          const updatedUser: UpdateUserSchema = {
+            ...(user || {}),
+            ...(input || {}),
+            contactList: {
+              ...(user?.contactList || {}),
+              ...(input?.contactList || {}),
+            },
+            birthDay: user?.birthDay,
           };
-          await triggerPutUser(updatedUser);
-          await mutateUserData(updatedUser);
+          // PUT /api/v1/users/me - 更新用戶資料
+          const { data, error } = await client.PUT('/api/v1/users/me', {
+            body: removeNullValues(updatedUser),
+          });
+          if (error) throw error;
+          await mutate(['/api/v1/users/me'], data);
+          await mutate(
+            [
+              '/api/v1/users/{id}',
+              { params: { path: { id: data?.data?.id ?? '' } } },
+            ],
+            data
+          );
+          await mutate(
+            [
+              '/api/v1/users/custom-id/{customId}',
+              { params: { path: { customId: data?.data?.customId ?? '' } } },
+            ],
+            data
+          );
         }
       } catch (error) {
         handleError(error);
         throw error;
       }
     },
-    [user, loginStatus, setToken, handleError, triggerPostUser, triggerPutUser]
+    [state, user, mutate, setToken, handleError, removeNullValues]
   );
 
   const sessionActions = useMemo<AuthActions>(
@@ -120,21 +157,23 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     [setToken, logout, updateUser]
   );
 
-  const { isValidating } = useGetApiV1UsersMe({
-    swr: {
-      enabled: !!state.token,
+  // GET /api/v1/users/me - 取得當前用戶資料
+  const { isLoading } = useQuery(
+    '/api/v1/users/me',
+    state.token ? {} : null,
+    {
       onSuccess: (result) => {
         sessionActions.login(result?.data);
       },
       onError: handleError,
-    },
-  });
+    }
+  );
 
   useEffect(() => {
-    if (state.isLoggingIn !== isValidating) {
-      sessionActions.setLoading(isValidating);
+    if (state.isLoggingIn !== isLoading) {
+      sessionActions.setLoading(isLoading);
     }
-  }, [state.isLoggingIn, sessionActions, isValidating]);
+  }, [state.isLoggingIn, sessionActions, isLoading]);
 
   useEffect(() => {
     const off = onUnauthorized(() => sessionActions.logout());

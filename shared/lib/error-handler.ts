@@ -34,6 +34,10 @@ const logErrorMessage = (error: unknown, context: string) => {
   }
 };
 
+const hasDetailMessage = (error: unknown): error is { message: string } => {
+  return (error as { message: string })?.message !== undefined;
+};
+
 /**
  * 提取錯誤訊息
  * @param error - 錯誤物件
@@ -44,8 +48,10 @@ export const getErrorMessage = (
   error: unknown,
   defaultMessage = '發生未知錯誤'
 ): string => {
+  const detail = (error as ApiError)?.data?.details?.[0];
+
   return (
-    (error as ApiError)?.data?.details?.[0]?.message ||
+    (hasDetailMessage(detail) && detail.message) ||
     (error as Error)?.message ||
     defaultMessage
   );

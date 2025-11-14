@@ -20,7 +20,7 @@ export const Element = ({
     case 'heading-4':
     case 'heading-5':
     case 'heading-6': {
-      const level = parseInt(element.type.split('-')[1], 10) as HeadingLevel;
+      const level = parseInt(element.type.split('-')[1] ?? '1', 10) as HeadingLevel;
       const HeadingTag = `h${level}` as React.ElementType;
       return <HeadingTag {...attributes}>{children}</HeadingTag>;
     }

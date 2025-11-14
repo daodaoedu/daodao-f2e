@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import {
   Search,
   Plus,

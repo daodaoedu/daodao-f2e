@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { Slot } from '@radix-ui/react-slot';
 import { ChevronRight, MoreHorizontal } from 'lucide-react';
 
 import { cn } from '@/shared/lib/cn';
-import { CustomLink } from '@/shared/ui/custom-link';
+import { CustomLink, CustomLinkProps } from '@/shared/ui/custom-link';
 
 const Breadcrumb = React.forwardRef<
   HTMLElement,
@@ -20,7 +19,7 @@ const BreadcrumbList = React.forwardRef<
   <ol
     ref={ref}
     className={cn(
-      'flex flex-wrap items-center gap-1.5 break-words body-md text-muted-foreground sm:gap-2',
+      'body-md flex flex-wrap items-center gap-1.5 break-words text-muted-foreground sm:gap-2',
       className
     )}
     {...props}
@@ -42,14 +41,10 @@ BreadcrumbItem.displayName = 'BreadcrumbItem';
 
 const BreadcrumbLink = React.forwardRef<
   HTMLAnchorElement,
-  React.ComponentPropsWithoutRef<typeof CustomLink> & {
-    asChild?: boolean;
-  }
->(({ asChild, className, ...props }, ref) => {
-  const Comp = asChild ? Slot : CustomLink;
-
+  CustomLinkProps
+>(({ className, ...props }, ref) => {
   return (
-    <Comp
+    <CustomLink
       ref={ref}
       className={cn('transition-colors hover:text-foreground', className)}
       {...props}
@@ -81,7 +76,7 @@ const BreadcrumbSeparator = ({
   <li
     role="presentation"
     aria-hidden="true"
-    className={cn('[&>svg]:w-5 [&>svg]:h-5', className)}
+    className={cn('[&>svg]:h-5 [&>svg]:w-5', className)}
     {...props}
   >
     {children ?? <ChevronRight />}

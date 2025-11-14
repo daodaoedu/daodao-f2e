@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { Button } from '@/shared/ui/button';
 import favicon112Png from '@/public/assets/brand/favicon-112.png';

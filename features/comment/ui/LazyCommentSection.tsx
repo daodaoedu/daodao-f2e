@@ -25,7 +25,7 @@ export const LazyCommentSection = (props: CommentSectionProps) => {
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       const [entry] = entries;
-      if (entry.isIntersecting && !shouldLoad) {
+      if (entry?.isIntersecting && !shouldLoad) {
         setShouldLoad(true);
         observer.disconnect();
       }

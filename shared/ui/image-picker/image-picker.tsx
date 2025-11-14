@@ -363,7 +363,7 @@ export const FormImagePicker = <
               value={field.value ? [field.value] : []}
               onChange={(files) => {
                 // 更新表單值為第一個檔案的 URL
-                if (files.length > 0) {
+                if (files.length > 0 && files[0]) {
                   field.onChange(files[0].url);
                 } else {
                   field.onChange('');

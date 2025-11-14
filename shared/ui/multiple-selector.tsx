@@ -397,6 +397,8 @@ export const MultipleSelector = React.forwardRef<
         if (maxSelected === 1) {
           setSelected([option]);
           onChange?.([option]);
+          setOpen(false);
+          inputRef.current?.blur();
           return;
         }
         const newOptions = [...selected, option];
@@ -730,7 +732,7 @@ export const MultipleSelector = React.forwardRef<
                 : placeholder
             }
             className={cn(
-              'float-left flex-1 border border-transparent bg-transparent outline-none placeholder:text-muted-foreground',
+              'float-left flex-1 w-full border border-transparent bg-transparent outline-none placeholder:text-muted-foreground',
               {
                 'w-0 focus:w-full':
                   hidePlaceholderWhenSelected && selected.length !== 0,

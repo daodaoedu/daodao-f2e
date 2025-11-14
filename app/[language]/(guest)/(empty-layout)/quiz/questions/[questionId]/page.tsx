@@ -1,14 +1,10 @@
 import { QuizQuestionWidget } from '@/widgets/quiz';
 import { questionMap } from '@/entities/quiz';
-import { locales } from '@/shared/config/i18n';
 
 export async function generateStaticParams() {
-  return locales.flatMap((language) =>
-    Array.from(questionMap.keys()).map((questionId) => ({
-      questionId,
-      language,
-    }))
-  );
+  return Array.from(questionMap.keys()).map((questionId) => ({
+    questionId,
+  }));
 }
 
 export async function generateMetadata({

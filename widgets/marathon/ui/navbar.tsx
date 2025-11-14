@@ -1,7 +1,7 @@
 'use client';
 
 import { CustomLink } from '@/shared/ui/custom-link';
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/shared/i18n/navigation';
 import { MARATHON_LINKS } from '@/constants/category';
 import useShadowToggleOnScroll from '@/shared/lib/use-shadow-toggle-on-scroll';
 import { cn } from '@/shared/lib/cn';

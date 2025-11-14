@@ -74,7 +74,7 @@ function PostCardHeader({
   useEffect(() => {
     const handleResize = () => {
       const wrapperWidth = wrapperRef.current?.clientWidth ?? 0;
-      const actionsWidth = wrapperRef.current?.children[1].clientWidth ?? 0;
+      const actionsWidth = wrapperRef.current?.children[1]?.clientWidth ?? 0;
 
       setMaxWidth(
         wrapperWidth > actionsWidth

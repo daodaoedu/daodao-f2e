@@ -51,7 +51,7 @@ export const ResultChart = ({
                 fill="currentColor"
                 {...props}
               >
-                <tspan className="fill-basic-400">{chartData.key}</tspan>
+                <tspan className="fill-basic-400">{chartData?.key}</tspan>
               </text>
             );
           }}

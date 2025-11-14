@@ -1,15 +1,18 @@
-import Script from 'next/script';
-import { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
-import { getDictionary, locales } from '@/shared/config/i18n';
-import { websiteConfig } from '@/constants/websiteConfig';
-import Providers from './Providers';
 import '../global.css';
-
-const inter = Inter({ subsets: ['latin'] });
+import { Metadata, Viewport } from 'next';
+import { hasLocale } from 'next-intl';
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { routing } from '@/shared/i18n/routing';
+import { websiteConfig } from '@/constants/websiteConfig';
+import GlobalProviders from '@/widgets/layout/ui/global-providers';
 
 export async function generateStaticParams() {
-  return locales.map((language) => ({ language }));
+  return routing.locales.map((language) => ({ language }));
 }
 
 export function generateViewport(): Viewport {
@@ -18,17 +21,24 @@ export function generateViewport(): Viewport {
   };
 }
 
+const checkLocale = (locale: string) => {
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+  setRequestLocale(locale);
+}
+
 export async function generateMetadata({
   params,
 }: LayoutProps<'/[language]'>): Promise<Metadata> {
   const { language } = await params;
 
-  const {
-    common: { title, description },
-  } = getDictionary(language);
+  checkLocale(language);
+
+  const t = await getTranslations('common');
 
   const languageAlternates = Object.fromEntries(
-    locales.map((locate) => [locate, `/${locate}`])
+    routing.locales.map((locale) => [locale, `/${locale}`])
   );
 
   return {
@@ -36,9 +46,9 @@ export async function generateMetadata({
       template: `%s | ${websiteConfig.title}`,
       default: websiteConfig.defaultFullTitle,
     },
-    description,
+    description: t('description'),
     metadataBase: new URL(websiteConfig.domainUrl),
-    applicationName: title,
+    applicationName: t('title'),
     keywords: websiteConfig.keywords,
     referrer: 'origin',
     authors: [
@@ -70,10 +80,10 @@ export async function generateMetadata({
       type: 'website',
       siteName: '島島阿學',
       title: {
-        template: `%s | ${title}`,
-        default: title,
+        template: `%s | ${t('title')}`,
+        default: t('title'),
       },
-      description,
+      description: t('description'),
       url: websiteConfig.domainUrl,
       images: [
         {
@@ -84,7 +94,7 @@ export async function generateMetadata({
         },
       ],
       locale: language,
-      alternateLocale: locales.filter((locale) => locale !== language),
+      alternateLocale: routing.locales.filter((locale) => locale !== language),
       ttl: 345600,
     },
     facebook: {
@@ -93,10 +103,10 @@ export async function generateMetadata({
     twitter: {
       card: 'summary_large_image',
       title: {
-        template: `%s | ${title}`,
-        default: title,
+        template: `%s | ${t('title')}`,
+        default: t('title'),
       },
-      description,
+      description: t('description'),
       images: ['/assets/brand/horizontal-primary-logo.svg'],
     },
     robots: {
@@ -121,50 +131,13 @@ export default async function RootLayout({
 }: LayoutProps<'/[language]'>) {
   const { language } = await params;
 
+  checkLocale(language);
+
+  const messages = await getMessages({ locale: language });
+
   return (
-    <html
-      lang={language}
-      className={`${inter.className} scroll-smooth`}
-      data-scroll-behavior="smooth"
-      suppressHydrationWarning
-    >
-      <body>
-        <Providers locale={language}>{children}</Providers>
-      </body>
-      {/* <!-- Global site tag (gtag.js) - Google Analytics --> */}
-      <Script
-        async
-        src="https://www.googletagmanager.com/gtag/js?id=G-9Z1P1RKY69"
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-9Z1P1RKY69');
-        `}
-      </Script>
-      {/* <!-- Microsoft Clarity --> */}
-      <Script type="text/javascript">
-        {`
-          (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-          })(window, document, "clarity", "script", "duktp01aq0");
-        `}
-      </Script>
-      {/* <!-- Google Tag Manager --> */}
-      <Script type="text/javascript">
-        {`
-          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','GTM-TH83D3J');
-        `}
-      </Script>
-    </html>
+    <GlobalProviders messages={messages} locale={language}>
+      {children}
+    </GlobalProviders>
   );
 }

@@ -69,7 +69,7 @@ export default function ResourceReviewFields({
                     <FormLabel className="body-md mb-2">綜合影響力</FormLabel>
                     <FormControl>
                       <Rating
-                        value={field.value}
+                        value={field.value ?? 0}
                         onValueChange={field.onChange}
                         max={5}
                       />
@@ -91,7 +91,7 @@ export default function ResourceReviewFields({
                     </FormLabel>
                     <FormControl className="flex-1">
                       <Rating
-                        value={field.value}
+                        value={field.value ?? 0}
                         onValueChange={field.onChange}
                         max={5}
                       />
@@ -116,7 +116,7 @@ export default function ResourceReviewFields({
                     </FormLabel>
                     <FormControl className="flex-1">
                       <Rating
-                        value={field.value}
+                        value={field.value ?? 0}
                         onValueChange={field.onChange}
                         max={5}
                       />
@@ -141,7 +141,7 @@ export default function ResourceReviewFields({
                     </FormLabel>
                     <FormControl className="flex-1">
                       <Rating
-                        value={field.value}
+                        value={field.value ?? 0}
                         onValueChange={field.onChange}
                         max={5}
                       />
@@ -166,7 +166,7 @@ export default function ResourceReviewFields({
                     </FormLabel>
                     <FormControl className="flex-1">
                       <Rating
-                        value={field.value}
+                        value={field.value ?? 0}
                         onValueChange={field.onChange}
                         max={5}
                       />

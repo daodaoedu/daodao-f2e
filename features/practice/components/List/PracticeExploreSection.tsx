@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { useAuth } from '@/entities/user';
 import { CustomLink } from '@/shared/ui/custom-link';
 import {

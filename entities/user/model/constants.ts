@@ -4,24 +4,55 @@
  */
 
 import type { OptionProps } from '@/shared/ui/option';
-import { UserValidatorsCreateUserSchemaProfessionalFieldItem } from '@/generated/models';
-import type { UserValidatorsUserSuccessResponseSchemaData } from '@/generated/models';
-
-// ===== 簡潔的類型別名 =====
+import type { components } from '@/shared/api';
+import { optionListToEnum } from '@/shared/lib/option';
 
 /**
- * 專業領域枚舉類型
- * 注意：枚舉值請使用 ProfessionalFieldEnum
+ * User API 型別重新導出
+ * 從 OpenAPI 生成的型別中提取 User 相關的型別
  */
-export type ProfessionalField =
-  UserValidatorsCreateUserSchemaProfessionalFieldItem;
 
-/**
- * 用戶完整資料（包含詳細信息）
- */
-export type UserProfile = UserValidatorsUserSuccessResponseSchemaData;
+export type UserSuccessResponseSchema =
+  components['schemas']['user.validators_userSuccessResponseSchema'];
+
+export type UserProfile = UserSuccessResponseSchema['data'];
+
+// Create/Update schemas
+export type CreateUserSchema =
+  components['schemas']['user.validators_createUserSchema'];
+
+export type UpdateUserSchema =
+  components['schemas']['user.validators_updateUserSchema'];
+
+// Professional Field enum
+export type ProfessionalField = NonNullable<
+  UserProfile['professionalField']
+>[number];
+
+// Education Stage enum
+export type EducationStage = NonNullable<UserProfile['educationStage']>;
 
 // ===== 業務相關類型 =====
+
+/**
+ * 角色枚舉
+ */
+export enum RoleEnum {
+  /** 訪客 */
+  Visitor = 1,
+  /** 一般使用者 */
+  // User,//暫時註解，等DB資料更新完再解開
+  /** 馬拉松申請者 */
+  MarathonApplicant,
+  /** 馬拉松參與者 */
+  MarathonParticipant,
+  /** 導師 */
+  Mentor,
+  /** 管理者 */
+  Admin,
+  /** 超級管理者 */
+  SuperAdmin,
+}
 
 /**
  * 用戶 ID 對象（支援 id 或 customId）
@@ -40,13 +71,6 @@ export type NavVisibility =
   | 'guest'
   | ((user: UserProfile | null) => boolean);
 
-// ===== 枚舉別名 =====
-
-/**
- * 專業領域枚舉值（用於 Zod 等需要實際枚舉的場景）
- */
-export { UserValidatorsCreateUserSchemaProfessionalFieldItem as ProfessionalFieldEnum };
-
 // ===== 選項常數 =====
 
 /**
@@ -55,17 +79,22 @@ export { UserValidatorsCreateUserSchemaProfessionalFieldItem as ProfessionalFiel
 export const GENDER_OPTIONS: OptionProps[] = [
   { value: 'male', label: '男性' },
   { value: 'female', label: '女性' },
-  { value: 'other', label: '其他' },
+  { value: 'other', label: '保持神秘' },
 ];
 
 /**
  * 教育階段選項
  */
-export const EDUCATION_OPTIONS: OptionProps[] = [
-  { value: 'university', label: '大學' },
+export const EDUCATION_OPTIONS: OptionProps<EducationStage>[] = [
   { value: 'high', label: '高中' },
-  { value: 'other', label: '其他' },
+  { value: 'university', label: '大學' },
+  // TODO: 碩士、博士、不設限暫時註解，等DB資料更新完再解開
+  // { value: 'master', label: '碩士' },
+  // { value: 'phd', label: '博士' },
+  { value: 'other', label: '不設限' },
 ];
+
+export const educationStageEnum = optionListToEnum(EDUCATION_OPTIONS);
 
 /**
  * 專業領域選項
@@ -97,6 +126,8 @@ export const EXPERTISE_AREAS: OptionProps<ProfessionalField>[] = [
   { value: 'others', label: '其他' },
 ];
 
+export const expertiseAreasEnum = optionListToEnum(EXPERTISE_AREAS);
+
 /**
  * 興趣領域選項
  */
@@ -117,17 +148,19 @@ export const INTEREST_AREAS: OptionProps[] = [
   { value: 'other', label: '其他' },
 ];
 
+export const interestAreasEnum = optionListToEnum(INTEREST_AREAS);
+
 /**
  * 角色身份選項
  */
 export const ROLE_OPTIONS: OptionProps[] = [
   { value: 'experimental-education-student', label: '實驗教育學生' },
   { value: 'normal-student', label: '一般學生' },
-  { value: 'experimental-education-parent', label: '家長' },
   { value: 'experimental-educator', label: '教育工作者' },
   { value: 'citizen', label: '社會人士' },
-  { value: 'other', label: '不設限' },
 ];
+
+export const roleEnum = optionListToEnum(ROLE_OPTIONS);
 
 /**
  * 推薦來源選項

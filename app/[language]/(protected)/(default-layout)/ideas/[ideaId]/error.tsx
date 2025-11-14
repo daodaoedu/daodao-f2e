@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { ArrowLeft, RefreshCcw, AlertCircle } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { Button } from '@/shared/ui/button';
 
 export default function IdeaErrorPage({

@@ -182,7 +182,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
                 學習計劃
               </Badge>
               <div className="text-xs text-basic-300 hidden sm:block">
-                {dateRange ? (
+                {dateRange && dateRange.startDate && dateRange.endDate ? (
                   `${format(dateRange.startDate, 'yyyy/MM/dd')} - ${format(dateRange.endDate, 'yyyy/MM/dd')}`
                 ) : (
                   format(new Date(project.createdDate), 'yyyy/MM/dd')

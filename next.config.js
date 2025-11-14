@@ -1,3 +1,7 @@
+const withNextIntl = require('next-intl/plugin')({
+  requestConfig: './shared/i18n/request.ts',
+});
+
 const withPWA = require("next-pwa")({
   dest: "public",
   buildExcludes: [
@@ -16,11 +20,18 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 const config = {
   reactStrictMode: false,
   staticPageGenerationTimeout: 600,
-  transpilePackages: ["@mdxeditor/editor"],
+  typedRoutes: true,
+  // Exclude client-only packages from server bundle
+  serverExternalPackages: [
+    'html-to-image',            // Canvas/DOM manipulation (client-only)
+    'lottie-web',               // Animation (client-only)
+    'gsap',                     // Animation (client-only)
+    'react-speech-recognition', // Browser API (client-only)
+    'regenerator-runtime',     // Async/await support (client-only)
+  ],
 
   // Optimize server bundle size for Cloudflare Workers (3MB limit)
   experimental: {
-    typedRoutes: true,
     globalNotFound: true,
     scrollRestoration: true,
     // Optimize package imports to reduce bundle size
@@ -62,15 +73,6 @@ const config = {
       'vaul',                  // Drawer
       'sonner',                // Toast notifications
     ],
-
-    // Exclude client-only packages from server bundle
-    serverExternalPackages: [
-      'html-to-image',         // Canvas/DOM manipulation (client-only)
-      'lottie-web',            // Animation (client-only)
-      'gsap',                  // Animation (client-only)
-      '@mdxeditor/editor',     // Rich editor (client-only, already using dynamic import)
-      'react-speech-recognition', // Browser API (client-only)
-    ],
   },
 
   images: {
@@ -92,4 +94,4 @@ const config = {
   },
 };
 
-module.exports = withPWA(withBundleAnalyzer(config));
+module.exports = withNextIntl(withPWA(withBundleAnalyzer(config)));

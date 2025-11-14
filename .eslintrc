@@ -17,15 +17,15 @@
     ".eslintrc.js",
     ".next",
     "dist",
-    "generated",
     "next-sitemap.js",
     "node_modules",
     "out",
-    "pages", // 重構到 app route，忽略 pages route
+    "_pages", // 重構到 app route，忽略 pages route
     "public",
     "services/**/*.ts", // @TODO: services 下的 API 檔案將要移除，重構完成後再調整設定檔
     "next-env.d.ts",
-    "*.gs"
+    "shared/i18n/locales/**/*.d.json.ts", // 忽略 i18n 自動生成的型別檔案
+    "shared/api/openapi-types.ts" // 忽略 openapi-typescript 自動生成的型別檔案
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -131,7 +131,6 @@
 						"from": ["entities"],
 						"allow": [
               "shared",
-              "generated",
               ["entities", { "entityName": "${from.entityName}" }]
             ]
 					},
@@ -182,7 +181,6 @@
       "features/**/*",
       "entities/**/*",
       "shared/**/*",
-      "generated/**/*"
     ],
     "boundaries/elements": [
       {
@@ -207,10 +205,6 @@
       {
         "type": "shared",
         "pattern": "shared/*"
-      },
-      {
-        "type": "generated",
-        "pattern": "generated/*"
       }
     ]
   }

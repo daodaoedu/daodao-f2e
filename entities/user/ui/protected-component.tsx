@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { Button } from '@/shared/ui/button';
 import { useAuth, useAuthActions } from '@/entities/user';

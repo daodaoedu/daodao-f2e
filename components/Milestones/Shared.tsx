@@ -46,21 +46,21 @@ export const numberToZh = (num: number): string => {
   ];
 
   if (num < 10) {
-    return chineseNumbers[num];
+    return chineseNumbers[num] ?? '零';
   }
 
   const tens = Math.floor(num / 10);
   const units = num % 10;
 
   if (tens === 1) {
-    return units === 0 ? '十' : `十${chineseNumbers[units]}`;
+    return units === 0 ? '十' : `十${chineseNumbers[units] ?? ''}`;
   }
 
   if (units === 0) {
-    return `${chineseNumbers[tens]}十`;
+    return `${chineseNumbers[tens] ?? ''}十`;
   }
 
-  return `${chineseNumbers[tens]}十${chineseNumbers[units]}`;
+  return `${chineseNumbers[tens] ?? ''}十${chineseNumbers[units] ?? ''}`;
 };
 
 export const getMilestoneClassNames = ({
@@ -164,23 +164,25 @@ const calcEmptyDateRange = (
     ];
   }
 
-  let latestEndDate = addDays(new Date(milestones[0].endDate || new Date()), 1);
+  let latestEndDate = addDays(new Date(milestones[0]?.endDate || new Date()), 1);
 
   for (let i = 1; i < milestones.length; i += 1) {
     const milestone = milestones[i];
-    const currentStartDate = new Date(milestone.startDate || new Date());
-    const currentEndDate = addDays(new Date(milestone.endDate || new Date()), 1);
+    if (milestone) {
+      const currentStartDate = new Date(milestone.startDate || new Date());
+      const currentEndDate = addDays(new Date(milestone.endDate || new Date()), 1);
 
-    if (
-      isAfter(currentStartDate, latestEndDate) &&
-      differenceInDays(currentStartDate, latestEndDate) > 1
-    ) {
-      break;
+      if (
+        isAfter(currentStartDate, latestEndDate) &&
+        differenceInDays(currentStartDate, latestEndDate) > 1
+      ) {
+        break;
+      }
+
+      latestEndDate = isAfter(currentEndDate, latestEndDate)
+        ? currentEndDate
+        : latestEndDate;
     }
-
-    latestEndDate = isAfter(currentEndDate, latestEndDate)
-      ? currentEndDate
-      : latestEndDate;
   }
 
   const startDate = isAfter(latestEndDate, maxDate)

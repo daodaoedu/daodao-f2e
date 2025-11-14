@@ -50,8 +50,8 @@ export const calculateQuizAnalysis = (
 };
 
 export const getResultId = (analysis: Record<AnswerKey, number>): string => {
-  return Object.entries(analysis)
+  return (Object.entries(analysis)
     .sort((a, b) => b[1] - a[1])
-    .map(([key]) => key)[0]
+    .map(([key]) => key)[0] ?? 'a')
     .toLowerCase();
 };

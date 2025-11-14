@@ -1,5 +1,5 @@
 import { CustomLink } from '@/shared/ui/custom-link';
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/shared/i18n/navigation';
 import { ICategory } from '@/constants/category';
 import { Image } from '@/shared/ui/image';
 import { cn } from '@/shared/lib/cn';

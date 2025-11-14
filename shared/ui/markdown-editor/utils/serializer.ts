@@ -20,7 +20,7 @@ const parseFormattedText = (text: string): CustomText[] => {
     }
 
     // 添加粗體文字
-    tokens.push({ text: boldMatch[1], bold: true });
+    tokens.push({ text: boldMatch[1] ?? '', bold: true });
     currentIndex = boldMatch.index + boldMatch[0].length;
     boldMatch = boldRegex.exec(text);
   }
@@ -38,7 +38,7 @@ const parseFormattedText = (text: string): CustomText[] => {
     }
 
     // 添加斜體文字
-    tokens.push({ text: italicMatch[1], italic: true });
+    tokens.push({ text: italicMatch[1] ?? '', italic: true });
     currentIndex += italicMatch.index + italicMatch[0].length;
   }
 
@@ -55,7 +55,7 @@ const parseFormattedText = (text: string): CustomText[] => {
     }
 
     // 添加程式碼文字
-    tokens.push({ text: codeMatch[1], code: true });
+    tokens.push({ text: codeMatch[1] ?? '', code: true });
     currentIndex += codeMatch.index + codeMatch[0].length;
   }
 
@@ -89,8 +89,8 @@ const parseInlineText = (text: string): Descendant[] => {
     // 添加連結節點
     nodes.push({
       type: 'link',
-      url: linkMatch[2],
-      children: parseFormattedText(linkMatch[1]),
+      url: linkMatch[2] ?? '',
+      children: parseFormattedText(linkMatch[1] ?? ''),
     });
 
     currentIndex = linkMatch.index + linkMatch[0].length;
@@ -142,7 +142,7 @@ const serializeNode = (node: Descendant): string => {
     case 'heading-4':
     case 'heading-5':
     case 'heading-6': {
-      const level = parseInt(node.type.split('-')[1], 10);
+      const level = parseInt(node.type.split('-')[1] ?? '1', 10);
       return `${'#'.repeat(level)} ${children}`;
     }
     case 'block-quote':
@@ -193,6 +193,8 @@ export const deserializeFromMarkdown = (markdown: string): Descendant[] => {
 
   for (let i = 0; i < lines.length; i += 1) {
     const line = lines[i];
+    // eslint-disable-next-line no-continue
+    if (!line) continue;
     const trimmedLine = line.trim();
 
     // 空行處理
@@ -213,7 +215,7 @@ export const deserializeFromMarkdown = (markdown: string): Descendant[] => {
       if (currentNode) nodes.push(currentNode);
       nodes.push({
         type: 'image',
-        url: imageMatch[2],
+        url: imageMatch[2] ?? '',
         alt: imageMatch[1] || '',
         title: imageMatch[3] || '',
         children: [{ text: '' }],
@@ -227,10 +229,10 @@ export const deserializeFromMarkdown = (markdown: string): Descendant[] => {
     const headingMatch = trimmedLine.match(/^(#{1,6})\s+(.{0,1000}?)$/);
     if (headingMatch) {
       if (currentNode) nodes.push(currentNode);
-      const level = headingMatch[1].length as HeadingLevel;
+      const level = (headingMatch[1]?.length ?? 1) as HeadingLevel;
       currentNode = {
         type: `heading-${level}`,
-        children: parseInlineText(headingMatch[2]),
+        children: parseInlineText(headingMatch[2] ?? ''),
       };
       // eslint-disable-next-line no-continue
       continue;
@@ -279,7 +281,7 @@ export const deserializeFromMarkdown = (markdown: string): Descendant[] => {
       };
       bulletListNode.children.push({
         type: 'list-item',
-        children: parseInlineText(bulletMatch[1]),
+        children: parseInlineText(bulletMatch[1] ?? ''),
       });
       // eslint-disable-next-line no-continue
       continue;
@@ -305,7 +307,7 @@ export const deserializeFromMarkdown = (markdown: string): Descendant[] => {
       };
       numberedListNode.children.push({
         type: 'list-item',
-        children: parseInlineText(numberedMatch[1]),
+        children: parseInlineText(numberedMatch[1] ?? ''),
       });
       // eslint-disable-next-line no-continue
       continue;

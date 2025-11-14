@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { Image } from '@/shared/ui/image';
 import { ROLE } from '@/constants/member';
 import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';

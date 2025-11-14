@@ -1,6 +1,7 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { usePractice } from '@/services/practice/hooks';
 import { useAuth } from '@/entities/user';
 import DashboardFlow from '@/features/practice/components/Dashboard/DashboardFlow';

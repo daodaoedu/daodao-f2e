@@ -1,4 +1,4 @@
-// import { useRouter } from "next/navigation";
+// import { useRouter } from "@/shared/i18n/navigation";
 import { CustomLink } from '@/shared/ui/custom-link';
 import { StaticImageData } from 'next/image';
 import { SearchIcon, SendHorizontalIcon } from 'lucide-react';

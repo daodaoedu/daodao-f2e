@@ -13,16 +13,9 @@ import {
 import { cn } from '@/shared/lib/cn';
 import { Button } from '@/shared/ui/button';
 import { Calendar } from '@/shared/ui/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/shared/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import useControlledState from '@/shared/lib/use-controlled-state';
-import {
-  FormFieldWrapper,
-  BaseFormFieldProps,
-} from './form';
+import { FormFieldWrapper, BaseFormFieldProps } from './form';
 
 const defaultFormatStr = 'yyyy/MM/dd';
 
@@ -63,11 +56,12 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
           <Button
             ref={ref}
             variant="ghost"
+            size="lg"
             disabled={disabled}
             className={cn(
-              'justify-start rounded border border-basic-200',
+              'justify-start rounded border border-basic-200 px-3',
               !internalDate && 'text-muted-foreground',
-              disabled && 'border-transparent',
+              'disabled:pointer-events-auto disabled:cursor-not-allowed disabled:text-inherit',
               className
             )}
           >
@@ -138,11 +132,11 @@ export const DateRangePicker = React.forwardRef<
               ref={ref}
               id="date"
               variant="ghost"
+              size="lg"
               disabled={disabled}
               className={cn(
                 'min-w-48 justify-start rounded border border-basic-200',
                 !internalDate && 'text-muted-foreground',
-                disabled && 'border-transparent disabled:opacity-100',
                 withIcon && 'min-w-56',
                 className
               )}
@@ -151,10 +145,7 @@ export const DateRangePicker = React.forwardRef<
               {internalDate?.from ? (
                 internalDate.to ? (
                   <>
-                    {format(internalDate.from, formatStr)}
-                    {' '}
-                    {separator}
-                    {' '}
+                    {format(internalDate.from, formatStr)} {separator}{' '}
                     {format(internalDate.to, formatStr)}
                   </>
                 ) : (
@@ -184,29 +175,29 @@ export const DateRangePicker = React.forwardRef<
 
 interface FormDatePickerProps<
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > extends DatePickerProps,
     Omit<BaseFormFieldProps<TFieldValues, TName>, 'defaultValue'> {}
 
 export const FormDatePicker = <
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
-    control,
-    name,
-    label = '生日',
-    required = true,
-    ...props
-  }: FormDatePickerProps<TFieldValues, TName>) => (
-    <FormFieldWrapper
-      control={control}
-      name={name}
-      label={label}
-      required={required}
-      className="flex flex-col gap-1"
-    >
-      {(field) => (
-        <DatePicker captionLayout="dropdown-buttons" {...field} {...props} />
-      )}
-    </FormFieldWrapper>
-  );
+  control,
+  name,
+  label,
+  required,
+  ...props
+}: FormDatePickerProps<TFieldValues, TName>) => (
+  <FormFieldWrapper
+    control={control}
+    name={name}
+    label={label}
+    required={required}
+    className="flex flex-col"
+  >
+    {(field) => (
+      <DatePicker captionLayout="dropdown-buttons" {...field} {...props} />
+    )}
+  </FormFieldWrapper>
+);

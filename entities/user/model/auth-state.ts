@@ -1,9 +1,6 @@
 import { getTokenStorage } from '@/shared/lib/storage';
-import {
-  UserValidatorsCreateUserSchema,
-  UserValidatorsUpdateUserSchema,
-} from '@/generated/models';
-import { AuthActions, AuthLoginStatus, AuthState } from './auth-types';
+import { AuthLoginStatus, AuthState } from './auth-types';
+import { CreateUserSchema, UpdateUserSchema } from './constants';
 
 export const createInitialAuthState = (): AuthState => {
   const token = getTokenStorage().get() ?? null;
@@ -21,16 +18,12 @@ export const createInitialAuthState = (): AuthState => {
 
 export const initialAuthState = createInitialAuthState();
 
-export const isTemporaryLogin = (
-  loginStatus: AuthLoginStatus,
-  input: Parameters<AuthActions['updateUser']>[0]
-): input is UserValidatorsCreateUserSchema => {
-  return loginStatus === AuthLoginStatus.TEMPORARY;
-};
+export const isTemporary = (
+  state: AuthState,
+  input: CreateUserSchema
+): input is CreateUserSchema => state.loginStatus === AuthLoginStatus.TEMPORARY;
 
-export const isPermanentLogin = (
-  loginStatus: AuthLoginStatus,
-  input: Parameters<AuthActions['updateUser']>[0]
-): input is UserValidatorsUpdateUserSchema => {
-  return loginStatus === AuthLoginStatus.PERMANENT;
-};
+export const isPermanent = (
+  state: AuthState,
+  input: UpdateUserSchema
+): input is UpdateUserSchema => state.loginStatus === AuthLoginStatus.PERMANENT;

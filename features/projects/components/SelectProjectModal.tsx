@@ -49,7 +49,7 @@ export default function SelectProjectModal({
     if (length === 0) {
       toast.error('請先新增計畫');
       onClose();
-    } else if (length === 1 && !selectedProject) {
+    } else if (length === 1 && !selectedProject && projects[0]) {
       handleSelect(projects[0]);
     }
   }, [isOpen, selectedProject, projects, onClose, handleSelect]);

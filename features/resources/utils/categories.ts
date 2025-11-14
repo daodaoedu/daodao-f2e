@@ -24,8 +24,8 @@ export function getCategories(
   if (!Array.isArray(categoryHierarchy) || categoryHierarchy.length === 0) {
     return CATEGORIES;
   }
-  if (categoryHierarchy.length === 1) {
-    return SEARCH_TAGS[majorCategoryKey];
+  if (categoryHierarchy.length === 1 && majorCategoryKey) {
+    return SEARCH_TAGS[majorCategoryKey] ?? [];
   }
   return [];
 }

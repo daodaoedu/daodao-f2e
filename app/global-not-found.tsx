@@ -1,21 +1,30 @@
 'use client';
 
-import NotExist from '@/shared/components/NotExist';
-import { Locale, isLocale, defaultLocale } from '@/shared/config/i18n';
+import { hasLocale, Locale } from 'next-intl';
 import { useParams } from 'next/navigation';
+import NotExist from '@/shared/components/NotExist';
+import { routing } from '@/shared/i18n/routing';
+import GlobalProviders from '@/widgets/layout/ui/global-providers';
 import './global.css';
 
 function GlobalNotFoundPage() {
   const params = useParams<{ language: Locale }>();
-  const language = params?.language;
-  const locale = isLocale(language) ? language : defaultLocale;
+
+  const locale = hasLocale(routing.locales, params?.language)
+    ? params?.language
+    : routing.defaultLocale;
+
+  const head = (
+    <>
+      <title>找不到頁面 | 島島阿學</title>
+      <link rel="shortcut icon" href="/assets/brand/favicon.png" />
+    </>
+  );
 
   return (
-    <html lang={locale}>
-      <body>
-        <NotExist />
-      </body>
-    </html>
+    <GlobalProviders head={head} locale={locale}>
+      <NotExist />
+    </GlobalProviders>
   );
 }
 

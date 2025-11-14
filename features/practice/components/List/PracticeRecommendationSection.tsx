@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import {
   Target, TrendingUp, RefreshCw, Sparkles,
 } from 'lucide-react';
@@ -144,7 +144,7 @@ const PracticeRecommendationSection: React.FC<PracticeRecommendationSectionProps
       totalAmount: 100,
       currentProgress: 0,
       unit: '天',
-      startDate: new Date().toISOString().split('T')[0],
+      startDate: new Date().toISOString().split('T')[0] ?? '',
       status: 'active',
       isPublic: true,
       reminderEnabled: false,

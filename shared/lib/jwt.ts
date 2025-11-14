@@ -56,7 +56,7 @@ const decodeJWT = (token: string): DecodedJWT => {
 
   const parts = token.split('.');
 
-  if (parts.length !== 3) {
+  if (parts.length !== 3 || !parts[1]) {
     throw new Error('Invalid JWT format. Expected 3 parts separated by dots.');
   }
 

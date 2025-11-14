@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import toast from 'react-hot-toast';
 import { Project, DEFAULT_PROJECT } from '@/components/Projects/Project/type';
 import EditMode from '@/components/Projects/Project/EditMode';

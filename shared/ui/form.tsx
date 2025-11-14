@@ -207,7 +207,9 @@ function parseSchemaAutoFocus<T extends FieldValues, S extends ZodSchema>({
   const parsePath = (path: (string | number)[]) => path.join('.') as Path<T>;
 
   form.clearErrors();
-  form.setFocus(parsePath(errors[0].path));
+  if (errors[0]?.path) {
+    form.setFocus(parsePath(errors[0].path));
+  }
   errors.forEach((error) => {
     form.setError(parsePath(error.path), error);
   });

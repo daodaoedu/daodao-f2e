@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { useAuthActions } from '@/entities/user';
 import { IslandPlaceholder } from '@/shared/ui/island-placeholder';
 import { parseToString } from '@/shared/lib/helper';

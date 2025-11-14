@@ -1,17 +1,17 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { CustomLink } from '@/shared/ui/custom-link';
 import { useScrollVisibility } from '@/shared/lib/use-scroll-visibility';
 import { useEffect, useState } from 'react';
 import { cn } from '@/shared/lib/cn';
 import { Button } from '@/shared/ui/button';
-import { useTranslation } from '@/shared/lib/translation';
 import { guestLayoutNav } from '../model';
 
 export const LandingPageMobileNavbar = () => {
   const isVisible = useScrollVisibility({ threshold: 250 });
   const [activeSection, setActiveSection] = useState('');
-  const { t } = useTranslation();
+  const t = useTranslations('common');
 
   useEffect(() => {
     const headings = guestLayoutNav.map((item) =>

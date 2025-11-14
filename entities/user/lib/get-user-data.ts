@@ -1,9 +1,4 @@
-import {
-  getApiV1UsersId,
-  getApiV1UsersCustomIdCustomId,
-  getGetApiV1UsersIdKey,
-  getGetApiV1UsersCustomIdCustomIdKey,
-} from '@/generated/api/users.server';
+import { getSwrKeyWithResponse } from '@/shared/api';
 import type { UserIdObject } from '../model';
 
 /**
@@ -11,17 +6,11 @@ import type { UserIdObject } from '../model';
  */
 export const getUserData = async ({ customId, id }: UserIdObject) => {
   if (customId) {
-    return getApiV1UsersCustomIdCustomId(customId);
+    return getSwrKeyWithResponse('/api/v1/users/custom-id/{customId}', {
+      params: { path: { customId } },
+    });
   }
-  return getApiV1UsersId(id);
-};
-
-/**
- * 統一的用戶資料 SWR Key 獲取函數
- */
-export const getUserDataKey = ({ customId, id }: UserIdObject) => {
-  if (customId) {
-    return getGetApiV1UsersCustomIdCustomIdKey(customId);
-  }
-  return getGetApiV1UsersIdKey(id);
+  return getSwrKeyWithResponse('/api/v1/users/{id}', {
+    params: { path: { id } },
+  });
 };

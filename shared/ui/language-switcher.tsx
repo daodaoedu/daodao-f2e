@@ -1,10 +1,11 @@
 'use client';
 
 import { Suspense } from 'react';
-import { usePathname, useParams, useSearchParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
+import { usePathname } from '@/shared/i18n/navigation';
+import { languageOptions } from '@/shared/i18n/routing';
 import { cn } from '@/shared/lib/cn';
-import { languageOptions, Locale } from '../config/i18n';
-import { useHash } from '../lib/navigation-blocker';
 import { CustomLink } from './custom-link';
 
 interface LanguageSwitcherButtonsProps {
@@ -14,11 +15,8 @@ interface LanguageSwitcherButtonsProps {
 const LanguageSwitcherButtons = ({
   searchParams,
 }: LanguageSwitcherButtonsProps) => {
-  const params = useParams<{ language: Locale }>();
+  const locale = useLocale();
   const pathname = usePathname();
-  const hash = useHash();
-  const search = searchParams?.size ? `?${searchParams}` : '';
-  const finalHref = `${pathname}${search}${hash}`;
 
   return (
     <div className="flex items-center gap-2">
@@ -27,10 +25,13 @@ const LanguageSwitcherButtons = ({
           <CustomLink
             className={cn(
               'text-sm font-medium text-white/70 transition-colors hover:text-primary-base',
-              params?.language === language.value && 'text-primary-base'
+              locale === language.value && 'text-primary-base'
             )}
             locale={language.value}
-            href={finalHref}
+            href={{
+              pathname,
+              query: searchParams?.toString(),
+            }}
             scroll={false}
           >
             {language.label}

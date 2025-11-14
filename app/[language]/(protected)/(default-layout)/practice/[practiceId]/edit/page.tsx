@@ -1,6 +1,7 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/shared/i18n/navigation';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { usePractice } from '@/services/practice/hooks';
