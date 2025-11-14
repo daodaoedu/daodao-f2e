@@ -1,3 +1,4 @@
+import '../global.css';
 import { Metadata, Viewport } from 'next';
 import { hasLocale } from 'next-intl';
 import {
@@ -9,7 +10,6 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/shared/i18n/routing';
 import { websiteConfig } from '@/constants/websiteConfig';
 import GlobalProviders from '@/widgets/layout/ui/global-providers';
-import '../global.css';
 
 export async function generateStaticParams() {
   return routing.locales.map((language) => ({ language }));
@@ -21,10 +21,19 @@ export function generateViewport(): Viewport {
   };
 }
 
+const checkLocale = (locale: string) => {
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+  setRequestLocale(locale);
+}
+
 export async function generateMetadata({
   params,
 }: LayoutProps<'/[language]'>): Promise<Metadata> {
   const { language } = await params;
+
+  checkLocale(language);
 
   const t = await getTranslations('common');
 
@@ -122,13 +131,9 @@ export default async function RootLayout({
 }: LayoutProps<'/[language]'>) {
   const { language } = await params;
 
-  if (!hasLocale(routing.locales, language)) {
-    notFound();
-  }
+  checkLocale(language);
 
-  setRequestLocale(language);
-
-  const messages = await getMessages();
+  const messages = await getMessages({ locale: language });
 
   return (
     <GlobalProviders messages={messages} locale={language}>
