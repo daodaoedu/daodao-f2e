@@ -107,6 +107,63 @@
     "email_label": "Email",
     "email_placeholder": "Email"
   },
+  "preferences_settings": {
+    "title": "Preference Settings",
+    "subtitle": "Set your learning preferences so we can recommend more suitable learning content for you",
+    "save": "Save",
+    "saving": "Saving...",
+    "save_error": "Failed to save, please try again later",
+    "save_success": "Preferences saved successfully",
+    "goals_label": "What are your current goals?",
+    "goals_min_selection": "Please select at least one goal",
+    "goals_max_selection": "Maximum 3 goals allowed",
+    "goals_options": {
+      "career_skills": "Cultivate new skills related to career development",
+      "personal_interests": "Explore personal interests or hobbies",
+      "project_preparation": "Prepare for specific projects or challenges",
+      "deepen_knowledge": "Deepen professional knowledge I already possess",
+      "academic_preparation": "Prepare for further studies"
+    },
+    "learning_style_label": "Which teaching method helps you learn the most?",
+    "learning_style_min_selection": "Please select at least one learning style",
+    "learning_style_max_selection": "Maximum 3 learning styles allowed",
+    "learning_style_options": {
+      "step_by_step": "Clear step-by-step guidance, learn systematically",
+      "free_exploration": "Enjoy free exploration, discover my own learning path",
+      "project_based": "Prefer to learn through practical projects",
+      "structured_flexible": "Hope for structure but retain flexibility for adjustment",
+      "practical_application": "Can only understand concepts when seeing practical applications"
+    },
+    "time_commitment_label": "Learning time commitment?",
+    "time_commitment_min_selection": "Please select at least one time commitment option",
+    "time_commitment_max_selection": "Maximum 3 time commitment options allowed",
+    "time_commitment_options": {
+      "short_daily": "I like to dedicate short periods (5-15 minutes) daily to continuous learning",
+      "weekly_focused": "I tend to set aside several longer periods (30-60 minutes) per week for focused learning",
+      "deep_sessions": "I prefer in-depth learning, arranging 1-2 long sessions (1 hour or more) per week",
+      "irregular": "My learning time is irregular, requiring flexible learning methods"
+    },
+    "interaction_style_label": "How do you like to interact with others while learning?",
+    "interaction_style_min_selection": "Please select at least one interaction style",
+    "interaction_style_max_selection": "Maximum 3 interaction styles allowed",
+    "interaction_style_options": {
+      "solo": "Like to learn alone",
+      "peer_support": "Have peer companionship and mutual encouragement",
+      "mentor_guidance": "Guidance from experienced people",
+      "feedback": "Hope to get feedback and suggestions from others",
+      "teaching_others": "I like to share knowledge and help other learners"
+    },
+    "feedback_style_label": "Which feedback method helps you improve?",
+    "feedback_style_min_selection": "Please select at least one feedback style",
+    "feedback_style_max_selection": "Maximum 3 feedback styles allowed",
+    "feedback_style_options": {
+      "detailed_explanation": "Get detailed explanations when I make mistakes",
+      "encouragement": "Encouraging words to maintain my motivation",
+      "thoughtful_questions": "Questions that make me think deeply",
+      "examples": "Examples of how others solve similar problems",
+      "actionable_guidance": "Specific improvement suggestions and actionable next steps"
+    }
+  },
   "cities": {
     "tokyo_japan": "Tokyo, Japan",
     "jakarta_indonesia": "Jakarta, Indonesia",
