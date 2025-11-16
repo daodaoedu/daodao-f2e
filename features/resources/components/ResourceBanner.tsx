@@ -3,12 +3,12 @@ import { CustomLink } from '@/shared/ui/custom-link';
 import { StaticImageData } from 'next/image';
 import { SearchIcon, SendHorizontalIcon } from 'lucide-react';
 import { OptionProps } from '@/shared/ui/option';
-// import { AuthButton } from "@/contexts/Auth";
 import { cn } from '@/shared/lib/cn';
 import { Badge } from '@/shared/ui/badge';
 import { Container } from '@/shared/ui/wrapper';
 import { Input } from '@/shared/ui';
 import { Image } from '@/shared/ui/image';
+import { AuthGuardButton } from '@/entities/user';
 import SectionTitle from './SectionTitle';
 
 interface ResourceBannerProps {
@@ -19,6 +19,7 @@ interface ResourceBannerProps {
   hotTags?: OptionProps[];
   length?: number;
   onSearch?: (value: string) => void;
+  onCreateClick?: () => void;
 }
 
 export default function ResourceBanner({
@@ -29,6 +30,7 @@ export default function ResourceBanner({
   hotTags,
   length,
   onSearch,
+  onCreateClick,
 }: ResourceBannerProps) {
   // const router = useRouter();
   const isMediumSize = size === 'md';
@@ -113,13 +115,15 @@ export default function ResourceBanner({
               </div>
             )}
 
-            {/* <AuthButton
-              className="md:w-max"
-              size="lg"
-              onClick={() => router.push("/resource/create")}
-            >
-              + 分享資源
-            </AuthButton> */}
+            {isLargeSize && onCreateClick && (
+              <AuthGuardButton
+                className="md:w-max"
+                size="lg"
+                onClick={onCreateClick}
+              >
+                + 分享資源
+              </AuthGuardButton>
+            )}
           </div>
         </div>
       </Container>

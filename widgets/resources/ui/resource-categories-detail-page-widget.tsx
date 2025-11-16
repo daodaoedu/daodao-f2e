@@ -1,17 +1,14 @@
-import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { SWRConfig } from "swr";
-import { Fragment } from "react";
-import SEOConfig, { JsonLdType } from "@/components/SEOConfig";
+'use client';
+
+import { SWRConfig } from 'swr';
+import { Fragment } from 'react';
+import SEOConfig, { JsonLdType } from '@/components/SEOConfig';
 import {
   CategoriesContainer,
   ResourceBanner,
-  parseCategoryHierarchy,
-  createResourceJsonLd,
   ResourceExplorer,
-} from "@/features/resources";
-import JsonLdFactory from "@/shared/lib/jsonLd";
-import { ICategory } from "@/constants/category";
-import { parseToArray } from "@/shared/lib/helper";
+} from '@/features/resources';
+import { ICategory } from '@/constants/category';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,75 +16,21 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/shared/ui/breadcrumb";
-import { resourceAPI, ResourceListResponseSchema } from "@/services/resources";
-import { Container } from "@/shared/ui/wrapper";
+} from '@/shared/ui/breadcrumb';
+import { ResourceListResponseSchema } from '@/services/resources';
+import { Container } from '@/shared/ui/wrapper';
 
-// export const runtime = "experimental-edge";
-
-export const getServerSideProps = (async (context) => {
-  const [majorCategory, subCategory = null] = parseCategoryHierarchy(
-    parseToArray(context.params?.categories)
-  );
-
-  if (!majorCategory) {
-    return {
-      notFound: true,
-    };
-  }
-
-  const title = subCategory?.label ?? majorCategory.label;
-  const fallbackUrl = subCategory?.value
-    ? `/resource/categories/${majorCategory.value}/${subCategory.value}`
-    : `/resource/categories/${majorCategory.value}`;
-
-  try {
-    const { data } = await resourceAPI.readList({
-      majorCategory: majorCategory.value,
-      subCategory: subCategory?.value,
-    });
-
-    const jsonLd = JsonLdFactory.createGraph([
-      JsonLdFactory.createItemListBuilder()
-        .setName(`${title}學習資源列表`)
-        .setItems(data.resources.map(createResourceJsonLd)),
-    ]);
-
-    return {
-      props: {
-        fallback: {
-          [fallbackUrl]: data,
-        },
-        jsonLd,
-        majorCategory,
-        subCategory,
-        title,
-        totalEstimate: data.pagination.totalEstimate ?? 0,
-        parentTotalEstimate: data.pagination.parentTotalEstimate ?? 0,
-      },
-    };
-  } catch {
-    return {
-      props: {
-        title,
-        totalEstimate: 0,
-        parentTotalEstimate: 0,
-        majorCategory,
-        subCategory,
-      },
-    };
-  }
-}) satisfies GetServerSideProps<{
-  fallback?: Record<string, ResourceListResponseSchema["data"]>;
+interface ResourceCategoriesDetailPageWidgetProps {
+  fallback?: Record<string, ResourceListResponseSchema[]>;
   jsonLd?: JsonLdType;
   majorCategory: ICategory;
   subCategory: ICategory | null;
   title: string;
   totalEstimate: number;
   parentTotalEstimate: number;
-}>;
+}
 
-export default function ResourceCategoriesPage({
+export const ResourceCategoriesDetailPageWidget = ({
   fallback,
   jsonLd,
   majorCategory,
@@ -95,7 +38,7 @@ export default function ResourceCategoriesPage({
   title,
   totalEstimate,
   parentTotalEstimate,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+}: ResourceCategoriesDetailPageWidgetProps) => {
   const selectedCategories = [majorCategory, subCategory].filter(
     (value) => value !== null
   );
@@ -103,7 +46,7 @@ export default function ResourceCategoriesPage({
   return (
     <SWRConfig value={{ fallback }}>
       <SEOConfig title={`${title}學習資源列表｜島島阿學`} jsonLd={jsonLd} />
-      <Container className="pt-12 mb-3">
+      <Container className="mb-3 pt-20">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -135,7 +78,7 @@ export default function ResourceCategoriesPage({
                       href={`/resource/categories/${selectedCategories
                         .slice(0, index + 1)
                         .map((c) => c.value)
-                        .join("/")}`}
+                        .join('/')}`}
                     >
                       {category.label}
                     </BreadcrumbLink>
@@ -171,4 +114,4 @@ export default function ResourceCategoriesPage({
       />
     </SWRConfig>
   );
-}
+};

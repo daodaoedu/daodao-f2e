@@ -1,65 +1,73 @@
-import type { AnyZodObject } from "zod";
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
-import { toast } from "sonner";
+'use client';
 
-import SEOConfig from "@/components/SEOConfig";
-import DocSvg from "@/public/assets/icons/doc.svg";
-import { Button } from "@/shared/ui/button";
-import { Form, parseSchemaAutoFocus } from "@/shared/ui/form";
-import { Background, Container, Paper } from "@/shared/ui/wrapper";
-import { BackButton } from "@/shared/ui/back-button";
-import { Title } from "@/shared/ui/typography";
-import { Progress } from "@/shared/ui/progress";
-import { ProtectedComponent } from "@/entities/user";
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from '@/shared/i18n/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { toast } from 'sonner';
+
+import SEOConfig from '@/components/SEOConfig';
+import DocSvg from '@/public/assets/icons/doc.svg';
+import { Button } from '@/shared/ui/button';
+import { Form, parseSchemaAutoFocus } from '@/shared/ui/form';
+import { Background, Container, Paper } from '@/shared/ui/wrapper';
+import { BackButton } from '@/shared/ui/back-button';
+import { Title } from '@/shared/ui/typography';
+import { Progress } from '@/shared/ui/progress';
+import { ProtectedComponent } from '@/entities/user';
 import {
   ResourceBasicInfoFields,
   ResourceCategorizationFields,
   ResourceReviewFields,
   useCreateResource,
-} from "@/features/resources";
+} from '@/features/resources';
 import {
   resourceFormSchema,
   ResourceFormSchema,
   resourceReviewFormSchema,
-} from "@/services/resources";
-import { cn } from "@/shared/lib/cn";
+} from '@/services/resources';
+import { cn } from '@/shared/lib/cn';
+import type { AnyZodObject } from 'zod';
 
 const withoutReviewSchema = resourceFormSchema.omit({ review: true });
 
-export default function CreateResourcePage() {
-  const router = useRouter();
+interface ResourceCreateFormProps {
+  onClose?: () => void;
+}
 
+export const ResourceCreateForm = ({ onClose }: ResourceCreateFormProps) => {
+  const router = useRouter();
   const [step, setStep] = useState(1);
 
   const { trigger: createResource, isMutating: isSubmitting } =
     useCreateResource({
       onSuccess: () => {
-        toast.success("資源分享成功！");
-        router.push("/resource");
+        toast.success('資源分享成功！');
+        if (onClose) {
+          onClose();
+        } else {
+          router.push('/resource');
+        }
       },
-      onError: (error) => {
-        console.error("提交資源時發生錯誤:", error);
-        toast.error("提交失敗，請稍後再試");
+      onError: () => {
+        toast.error('提交失敗，請稍後再試');
       },
     });
 
   const resourceForm = useForm<ResourceFormSchema>({
     resolver: zodResolver(resourceFormSchema),
     defaultValues: {
-      name: "",
-      url: "",
-      imageUrl: "",
-      description: "",
-      videoUrl: "",
-      type: "",
-      level: "",
-      cost: "",
-      majorCategory: "",
-      subCategory: "",
+      name: '',
+      url: '',
+      imageUrl: '',
+      description: '',
+      videoUrl: '',
+      type: '',
+      level: '',
+      cost: '',
+      majorCategory: '',
+      subCategory: '',
       tags: [],
     },
   });
@@ -86,11 +94,21 @@ export default function CreateResourcePage() {
     return resourceProgress + reviewProgress;
   }, [step, resourceValues]);
 
-  const helperText = "開始是成功的一半";
+  const helperText = '開始是成功的一半';
 
   const handleSaveDraft = () => {
-    console.log(resourceForm.getValues());
-    console.log("save draft");
+    if (process.env.NODE_ENV === 'development') {
+      console.log(resourceForm.getValues());
+      console.log('save draft');
+    }
+  };
+
+  const handleBack = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      router.back();
+    }
   };
 
   const handlePrevStep = () => {
@@ -108,7 +126,7 @@ export default function CreateResourcePage() {
   };
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, [step]);
 
   return (
@@ -116,7 +134,7 @@ export default function CreateResourcePage() {
       <SEOConfig title="新增分享資源" />
       <Background>
         <Container>
-          <BackButton label="返回" />
+          <BackButton label="返回" onClick={handleBack} />
 
           <Title as="h1" size="xl" className="mt-3 mb-10">
             分享資源
@@ -150,8 +168,8 @@ export default function CreateResourcePage() {
                   <Progress
                     value={progress}
                     className={cn(
-                      "relative after:absolute after:top-0 after:left-1/2",
-                      "after:w-px after:h-full after:bg-primary-base"
+                      'relative after:absolute after:top-0 after:left-1/2',
+                      'after:w-px after:h-full after:bg-primary-base'
                     )}
                   />
                   <div className="body-sm">{helperText}</div>
@@ -163,7 +181,7 @@ export default function CreateResourcePage() {
                     size="lg"
                     disabled={isSubmitting}
                     onClick={handlePrevStep}
-                    className={cn(step === 1 && "invisible")}
+                    className={cn(step === 1 && 'invisible')}
                   >
                     <ArrowLeft size={16} />
                     上一步
@@ -210,4 +228,5 @@ export default function CreateResourcePage() {
       </Background>
     </ProtectedComponent>
   );
-}
+};
+

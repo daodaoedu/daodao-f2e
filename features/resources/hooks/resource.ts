@@ -37,14 +37,15 @@ export function useResourceList(filter: ResourceSearchParamsSchema) {
   );
 
   const data = useMemo(
-    () => swrInfinite.data?.flatMap((page) => page.data.resources) ?? [],
+    () =>
+      swrInfinite.data?.flatMap((page) => page?.data?.resources ?? []) ?? [],
     [swrInfinite.data]
   );
 
   const lastData = swrInfinite.data?.[swrInfinite.data.length - 1];
-  const hasMore = lastData?.data.pagination?.hasNext;
-  const nextCursor = lastData?.data.pagination?.nextCursor;
-  const totalCount = lastData?.data.pagination?.totalEstimate ?? 0;
+  const hasMore = lastData?.data?.pagination?.hasNext ?? false;
+  const nextCursor = lastData?.data?.pagination?.nextCursor;
+  const totalCount = lastData?.data?.pagination?.totalEstimate ?? 0;
 
   return {
     ...swrInfinite, data, hasMore, nextCursor, totalCount,
