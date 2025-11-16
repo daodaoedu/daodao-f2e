@@ -10,7 +10,7 @@ const getLocalesPath = () => {
     return pathArg.split('=')[1];
   }
 
-  return path.join(process.cwd(), 'shared/config/locales');
+  return path.join(process.cwd(), 'shared/i18n/locales');
 };
 
 /**

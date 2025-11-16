@@ -25,7 +25,7 @@ const main = async () => {
     const json = await fetchGoogleSheet();
 
     const locales = Object.keys(json);
-    const outputDir = path.join(process.cwd(), 'shared/config/locales');
+    const outputDir = path.join(process.cwd(), 'shared/i18n/locales');
 
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
