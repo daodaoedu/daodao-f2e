@@ -16,9 +16,11 @@ const ProjectHeader = ({ project }: ProjectHeaderProps) => (
       {project.title}
     </h3>
     <div className="ml-auto flex flex-row items-center justify-start gap-2">
-      <span className="font-sans text-sm leading-normal text-basic-300">
-        {format(new Date(project.updatedAt), 'yyyy/MM/dd')}
-      </span>
+      {project.updatedAt && (
+        <span className="font-sans text-sm leading-normal text-basic-300">
+          {format(new Date(project.updatedAt), 'yyyy/MM/dd')}
+        </span>
+      )}
 
       {/* <span className="flex flex-row items-center justify-start gap-1
           font-sans text-basic-300 text-base leading-normal"

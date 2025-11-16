@@ -28,9 +28,15 @@ import { resourceTypeMap, targetAudienceTypeMap } from '../constants';
 
 interface ResourceDetailProps {
   resource: ResourceDetailResponseSchema['data'];
+  onEditClick?: () => void;
+  isOwnResource?: boolean;
 }
 
-export default function ResourceDetail({ resource }: ResourceDetailProps) {
+export default function ResourceDetail({
+  resource,
+  onEditClick,
+  isOwnResource = false,
+}: ResourceDetailProps) {
   const { openDialog } = useDialog();
   const pathname = usePathname();
 
@@ -165,16 +171,28 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem asChild>
-                <CustomLink
-                  href="https://forms.gle/NkVbDWC3eXk4P4gv7"
-                  target="_blank"
-                  className="block p-2"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  檢舉
-                </CustomLink>
-              </DropdownMenuItem>
+              {isOwnResource && onEditClick ? (
+                <DropdownMenuItem asChild={false}>
+                  <button
+                    type="button"
+                    onClick={onEditClick}
+                    className="block w-full p-2 text-left"
+                  >
+                    編輯
+                  </button>
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem asChild>
+                  <CustomLink
+                    href="https://forms.gle/NkVbDWC3eXk4P4gv7"
+                    target="_blank"
+                    className="block p-2"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    檢舉
+                  </CustomLink>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

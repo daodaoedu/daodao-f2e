@@ -1,3 +1,5 @@
+'use client';
+
 import { Dispatch, SetStateAction, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/shared/i18n/navigation';

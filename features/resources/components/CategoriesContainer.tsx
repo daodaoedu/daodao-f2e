@@ -1,3 +1,5 @@
+'use client';
+
 import { useMemo, useState } from 'react';
 import { CATEGORIES, ICategory, SEARCH_TAGS } from '@/constants/category';
 import useMediaQuery from '@/shared/lib/use-media-query';
