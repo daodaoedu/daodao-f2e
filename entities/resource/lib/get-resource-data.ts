@@ -22,7 +22,9 @@ export const getResourceListData = async (
 ) => {
   return getSwrKeyWithResponse('/api/v1/resources/', {
     params: {
-      query: searchParams,
+      query: {
+        cursor: searchParams?.cursor,
+      },
     },
   });
 };

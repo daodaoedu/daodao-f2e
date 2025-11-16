@@ -1,11 +1,11 @@
-import type { ResourceIdObject } from '../model';
 import { parseToString } from '@/shared/lib/helper';
+import type { ResourceIdObject } from '../model';
 
 /**
  * 解析 Resource ID
  */
 export const parseResourceId = (id: string): ResourceIdObject => {
-  return { resourceId: parseToString(id) };
+  return { resourceId: parseToString(id) ?? '' };
 };
 
 /**

@@ -1,3 +1,5 @@
+'use client';
+
 import type {
   WithContext, Thing, WebSite, Graph,
 } from 'schema-dts';

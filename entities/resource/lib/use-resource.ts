@@ -12,21 +12,12 @@ export const useResource = (resourceIdObject: ResourceIdObject | null) => {
 
   const result = useQuery(
     '/api/v1/resources/{resourceId}',
-    {
-      params: {
-        path: { resourceId: resourceId || '' },
-      },
-    },
-    {
-      swr: {
-        enabled: !!resourceId,
-      },
-    }
+    resourceId ? { params: { path: { resourceId } } } : null
   );
 
   return {
     ...result,
-    data: result.data?.data?.[0],
+    data: result.data?.data,
   };
 };
 
@@ -34,18 +25,11 @@ export const useResource = (resourceIdObject: ResourceIdObject | null) => {
  * 獲取 Resource 列表的 Hook
  */
 export const useResourceList = (searchParams?: ResourceSearchParams) => {
-  return useQuery(
-    '/api/v1/resources/',
-    {
-      params: {
-        query: searchParams,
+  return useQuery('/api/v1/resources/', {
+    params: {
+      query: {
+        cursor: searchParams?.cursor,
       },
     },
-    {
-      swr: {
-        revalidateOnMount: true,
-      },
-    }
-  );
+  });
 };
-
