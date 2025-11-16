@@ -1,7 +1,6 @@
 'use client';
 
 import useSWR from 'swr';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
@@ -9,6 +8,7 @@ import Container from '@/shared/components/Container';
 import { Image } from '@/shared/ui/image';
 import { getMentorMarathonPathname, MarathonSchema } from '@/services/mentors';
 import { differenceInDays, format } from 'date-fns';
+import { CustomLink } from '@/shared/ui/custom-link';
 
 const MentorWorkspaceCard = ({ marathon }: { marathon: MarathonSchema }) => {
   const days = Math.min(
@@ -24,7 +24,7 @@ const MentorWorkspaceCard = ({ marathon }: { marathon: MarathonSchema }) => {
     100;
 
   return (
-    <Link
+    <CustomLink
       href={`/manage/mentor-workspace/students?marathonId=${marathon.eventId}`}
       className="block rounded-lg bg-basic-white"
     >
@@ -70,7 +70,7 @@ const MentorWorkspaceCard = ({ marathon }: { marathon: MarathonSchema }) => {
           <div className="body-sm text-basic-400">{days}天</div>
         </div>
       </div>
-    </Link>
+    </CustomLink>
   );
 };
 

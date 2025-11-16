@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { ChevronRightIcon } from 'lucide-react';
 import SEOConfig, { JsonLdType } from '@/components/SEOConfig';
 import resourceBannerWebp from '@/public/assets/resource/banner.webp';
@@ -14,6 +13,7 @@ import { HOT_TAGS } from '@/constants/category';
 import { Button } from '@/shared/ui/button';
 import { ResourceListResponseSchema } from '@/services/resources';
 import { Container } from '@/shared/ui/wrapper';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { ResourceBannerClient } from './resource-banner-client';
 import { ResourceCreateForm } from './resource-create-form';
 
@@ -62,10 +62,10 @@ export const ResourceListPageWidget = ({
               size="lg"
               asChild
             >
-              <Link href="/resource/explore">
+              <CustomLink href="/resource/explore">
                 探索 所有資源
                 <ChevronRightIcon className="w-4 h-4" />
-              </Link>
+              </CustomLink>
             </Button>
           </SectionTitle>
           <ResourceContainer data={data?.resources.slice(2, 4) ?? []} />
@@ -78,10 +78,10 @@ export const ResourceListPageWidget = ({
               className="-mx-2 px-2 body-md font-medium text-basic-300"
               asChild
             >
-              <Link href="/resource/explore">
+              <CustomLink href="/resource/explore">
                 探索 所有資源
                 <ChevronRightIcon className="w-4 h-4" />
-              </Link>
+              </CustomLink>
             </Button>
           </SectionTitle>
           <ResourceContainer data={data?.resources.slice(0, 2) ?? []} />
@@ -94,10 +94,10 @@ export const ResourceListPageWidget = ({
               className="-mx-2 px-2 body-md font-medium text-basic-300"
               asChild
             >
-              <Link href="/resource/categories">
+              <CustomLink href="/resource/categories">
                 探索 所有分類
                 <ChevronRightIcon className="w-4 h-4" />
-              </Link>
+              </CustomLink>
             </Button>
           </SectionTitle>
           <CategoriesContainer maxLength={8} disabledCollapse />

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useCircle } from '@/entities/circle';
 import { Paper } from '@/shared/ui/wrapper';
 import { BackButton } from '@/shared/ui/back-button';
@@ -44,6 +43,7 @@ import { timeDuration } from '@/shared/lib/date';
 import { ContactModal, TargetUserType } from '@/features/email';
 import { getUserProfileBasePath, useAuth } from '@/entities/user';
 import { CircleEditForm } from './circle-edit-form';
+import { CustomLink } from '@/shared/ui/custom-link';
 
 const MarkdownEditor = dynamic(
   () =>
@@ -184,13 +184,13 @@ export const CircleDetailWidget = ({ circleId }: CircleDetailWidgetProps) => {
                     編輯
                   </button>
                 ) : (
-                  <Link
+                  <CustomLink
                     href="https://forms.gle/NkVbDWC3eXk4P4gv7"
                     target="_blank"
                     className="block p-2"
                   >
                     檢舉
-                  </Link>
+                  </CustomLink>
                 )}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -285,7 +285,7 @@ export const CircleDetailWidget = ({ circleId }: CircleDetailWidgetProps) => {
       <Paper className="mb-4 md:p-8" asChild>
         <section>
           <header className="flex justify-between">
-            <Link href={getUserProfileBasePath({ id: data.user.userId })}>
+            <CustomLink href={getUserProfileBasePath({ id: data.user.userId })}>
               <div className="flex items-center">
                 <Avatar className="mr-3 mt-1 size-12">
                   <AvatarImage src={data.user.photoURL} />
@@ -310,7 +310,7 @@ export const CircleDetailWidget = ({ circleId }: CircleDetailWidgetProps) => {
                   </span>
                 </div>
               </div>
-            </Link>
+            </CustomLink>
 
             <div className="flex items-center gap-1">
               <LocationSvg />

@@ -1,13 +1,13 @@
 'use client';
 
 import { SWRConfig } from 'swr';
-import Link from 'next/link';
 import SEOConfig, { JsonLdType } from '@/components/SEOConfig';
 import { ChevronLeftIcon } from 'lucide-react';
 import { ResourceExplorer } from '@/features/resources';
 import { Button } from '@/shared/ui/button';
 import { ResourceListResponseSchema } from '@/services/resources';
 import { Container } from '@/shared/ui/wrapper';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { ResourceExploreClient } from './resource-explore-client';
 
 interface ResourceExplorePageWidgetProps {
@@ -28,10 +28,10 @@ export const ResourceExplorePageWidget = ({
           className="-mx-2 mb-3 px-2 text-basic-300"
           asChild
         >
-          <Link href="/resource">
+          <CustomLink href="/resource">
             <ChevronLeftIcon className="h-4 w-4" />
             返回
-          </Link>
+          </CustomLink>
         </Button>
         <ResourceExploreClient />
       </Container>

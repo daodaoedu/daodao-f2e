@@ -22,7 +22,6 @@ import {
   CircleChevronRight,
   CircleChevronLeft,
 } from 'lucide-react';
-import Link from 'next/link';
 
 import marathonConfig from '@/constants/marathon';
 
@@ -72,6 +71,7 @@ import {
 } from '@/features/projects/hooks/review';
 import { useProjectOutcomeMutation } from '@/features/projects/hooks/outcome';
 import { useProjectMilestoneMutation } from '@/features/projects/hooks/milestone';
+import { CustomLink } from '@/shared/ui/custom-link';
 
 const HEADER_TITLES = [
   '今天的每一小步，都在建立你的學習動能！',
@@ -401,14 +401,14 @@ const Project = ({
           className="w-full px-3 py-2 justify-between"
           withIcon
         >
-          <Link
+          <CustomLink
             href={href}
             target="_blank"
             className="flex items-center gap-2 body-md text-basic-500"
           >
             {title}
             <ArrowUpRight className="stroke-1" />
-          </Link>
+          </CustomLink>
         </CollapsibleTrigger>
         <CollapsibleContent>{children}</CollapsibleContent>
       </Collapsible>
