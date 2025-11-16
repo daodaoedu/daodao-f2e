@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { MapPin } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { Image } from '@/shared/ui/image';
@@ -17,6 +16,7 @@ import { CATEGORIES } from '@/constants/category';
 import { EDUCATION } from '@/constants/member';
 import type { CircleData } from '@/entities/circle';
 import emptyCoverPng from '@/public/assets/images/empty-cover.png';
+import { CustomLink } from '@/shared/ui/custom-link';
 
 const MarkdownEditor = dynamic(
   () =>
@@ -50,7 +50,7 @@ const formatToString = (
 
 export const CircleCard = ({ data }: CircleCardProps) => {
   return (
-    <Link
+    <CustomLink
       className={cn(
         'relative block rounded-md bg-white p-2 text-basic-500 transition-[transform,box-shadow]',
         'hover:z-10 hover:scale-105 hover:shadow-md'
@@ -119,7 +119,7 @@ export const CircleCard = ({ data }: CircleCardProps) => {
           </Badge>
         </div>
       </div>
-    </Link>
+    </CustomLink>
   );
 };
 
