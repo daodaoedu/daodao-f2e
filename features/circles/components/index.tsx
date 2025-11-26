@@ -1,1 +1,1 @@
-export * from "./CircleForm";
+export * from './circle-form';

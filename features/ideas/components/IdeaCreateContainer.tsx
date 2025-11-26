@@ -22,7 +22,9 @@ export const IdeaCreateContainer: React.FC<IdeaCreateContainerProps> = ({
   className,
 }) => {
   const { addIdeaToCache } = useIdeasCache();
-  const { createIdea, isCreating, uploadProgress, error } = useIdeaActions({
+  const {
+    createIdea, isCreating, uploadProgress, error,
+  } = useIdeaActions({
     onSuccess: () => {
       // 成功回調在 handleSubmit 中處理
     },
@@ -46,18 +48,19 @@ export const IdeaCreateContainer: React.FC<IdeaCreateContainerProps> = ({
     <div className={className}>
       {/* 上傳進度指示器 */}
       {isCreating && uploadProgress > 0 && (
-        <div className="mb-4 bg-white rounded-lg shadow-sm border p-4">
-          <div className="flex items-center justify-between mb-2">
+        <div className="mb-4 rounded-lg border bg-white p-4 shadow-sm">
+          <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium text-gray-700">
               正在處理你的想法...
             </span>
             <span className="text-sm text-gray-500">
-              {Math.round(uploadProgress)}%
+              {Math.round(uploadProgress)}
+              %
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="h-2 w-full rounded-full bg-gray-200">
             <div
-              className="bg-primary-base h-2 rounded-full transition-all duration-300"
+              className="h-2 rounded-full bg-primary-base transition-all duration-300"
               style={{ width: `${uploadProgress}%` }}
             />
           </div>
@@ -72,11 +75,11 @@ export const IdeaCreateContainer: React.FC<IdeaCreateContainerProps> = ({
 
       {/* 錯誤訊息 */}
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
           <div className="flex">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <svg
-                className="h-5 w-5 text-red-400"
+                className="size-5 text-red-400"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"

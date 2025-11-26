@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 
-import { fetcherV1 } from '@/utils/http';
+import { fetcherV1 } from '@/shared/lib/http';
 import {
   FacebookGroupPostSchema,
   FacebookFanpagePostSchema,

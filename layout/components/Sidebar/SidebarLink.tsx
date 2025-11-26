@@ -1,6 +1,5 @@
-import Link from 'next/link';
-import { cn } from '@/utils/cn';
-import useSmoothIntoView from '@/hooks/useSmoothIntoView';
+import { CustomLink } from '@/shared/ui/custom-link';
+import { cn } from '@/shared/lib/cn';
 import { activeClass, defaultClass, disableClass } from './constant';
 
 interface SidebarLinkProps
@@ -19,7 +18,6 @@ function SidebarLink({
   onClick,
   ...props
 }: SidebarLinkProps) {
-  const ref = useSmoothIntoView<HTMLAnchorElement>();
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (isDisabled) {
       e.preventDefault();
@@ -28,8 +26,7 @@ function SidebarLink({
     onClick?.(e);
   };
   return (
-    <Link
-      ref={ref}
+    <CustomLink
       href={href}
       className={cn(
         defaultClass,
@@ -42,7 +39,7 @@ function SidebarLink({
       {...props}
     >
       {children}
-    </Link>
+    </CustomLink>
   );
 }
 

@@ -1,61 +1,54 @@
 import React from 'react';
-import { useRouter } from 'next/router';
+import { CustomLink } from '@/shared/ui/custom-link';
 import {
-  Book,
-  Video,
-  FileText,
-  Headphones,
-  GraduationCap,
-  Settings,
   Flame,
   Edit3,
   Trash2,
-  MoreVertical
+  MoreVertical,
+  Share2,
+  Eye,
 } from 'lucide-react';
-import { Practice, ContentType } from '@/services/practice/schema';
+import { differenceInDays } from 'date-fns';
+import Shell from '@/public/assets/icons/shell.svg';
+import Comment from '@/public/assets/icons/comment.svg';
+import { Practice, PracticeWithUser } from '@/services/practice/schema';
 import {
   calculateProgress,
   getContentTypeLabel,
-  canCheckIn
+  canCheckIn,
+  formatDate,
 } from '@/services/practice/utils';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Button } from '@/shared/ui/button';
+import { Card, CardContent } from '@/shared/ui/card';
+import { Badge } from '@/shared/ui/badge';
+import { Progress } from '@/shared/ui/progress';
+import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/shared/ui/dropdown-menu';
 
 interface PracticeCardProps {
-  practice: Practice;
-  onEdit?: (practice: Practice) => void;
-  onDelete?: (practice: Practice) => void;
-  onCheckIn?: (practice: Practice) => void;
+  practice: Practice | PracticeWithUser;
+  currentUserId?: string;
+  onEdit?: (practice: Practice | PracticeWithUser) => void;
+  onDelete?: (practice: Practice | PracticeWithUser) => void;
+  onCheckIn?: (practice: Practice | PracticeWithUser) => void;
   showActions?: boolean;
 }
 
 const PracticeCard: React.FC<PracticeCardProps> = ({
   practice,
+  currentUserId,
   onEdit,
   onDelete,
   onCheckIn,
-  showActions = true
+  showActions = true,
 }) => {
-  const getContentIcon = (contentType: ContentType) => {
-    const iconProps = { className: "h-5 w-5" };
-
-    switch (contentType) {
-      case 'book': return <Book {...iconProps} />;
-      case 'video': return <Video {...iconProps} />;
-      case 'articles': return <FileText {...iconProps} />;
-      case 'podcast': return <Headphones {...iconProps} />;
-      case 'course': return <GraduationCap {...iconProps} />;
-      default: return <Settings {...iconProps} />;
-    }
-  };
+  // Check if current user is the owner of this practice
+  const isOwner = currentUserId && practice.user?.id === currentUserId;
 
   const getStatusDisplay = () => {
     const statusMap = {
@@ -63,7 +56,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
       active: '進行中',
       paused: '暫停',
       completed: '已完成',
-      archived: '已封存'
+      archived: '已封存',
     };
     return statusMap[practice.status] || '未知';
   };
@@ -71,10 +64,10 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
   const getStatusColor = () => {
     const colorMap = {
       draft: 'bg-basic-100 text-basic-300',
-      active: 'bg-tips/20 text-tips',
+      active: 'bg-yellow-100 text-yellow-700',
       paused: 'bg-orange-100 text-orange-600',
       completed: 'bg-success/20 text-success',
-      archived: 'bg-basic-100 text-basic-300'
+      archived: 'bg-basic-100 text-basic-300',
     };
     return colorMap[practice.status] || 'bg-basic-100 text-basic-300';
   };
@@ -82,53 +75,63 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
   const progressPercentage = calculateProgress(practice.currentProgress, practice.totalAmount);
   const canDoCheckIn = canCheckIn(practice);
 
-  const router = useRouter();
-
-  const handleCardClick = () => {
-    router.push(`/practice/${practice.id}`);
-  };
-
-  return (
+  const cardContent = (
     <Card
-      className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-basic-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-basic-100 group relative cursor-pointer"
-      onClick={handleCardClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleCardClick();
-        }
-      }}
+      className="group relative w-full max-w-xs cursor-pointer overflow-hidden rounded-2xl border border-basic-200 bg-basic-white shadow-sm transition-all duration-300 hover:shadow-lg sm:max-w-sm md:max-w-md lg:max-w-3xl"
     >
       <CardContent className="p-3 sm:p-4 md:p-6">
-        <div className="flex items-start justify-between mb-4">
+        <div className="mb-4 flex items-start justify-between">
           <div className="flex items-center">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary-lightest flex items-center justify-center mr-2 sm:mr-3">
-              {getContentIcon(practice.contentType)}
-            </div>
+            <Avatar className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3">
+              <AvatarImage
+                src={'user' in practice && practice.user?.photoURL && practice.user.photoURL.trim() !== '' ? practice.user.photoURL : undefined}
+                alt={'user' in practice ? practice.user?.name || 'user avatar' : 'user avatar'}
+              />
+              <AvatarFallback className="bg-primary-base text-primary-foreground text-xs sm:text-sm font-bold">
+                {'user' in practice && practice.user?.name ? practice.user.name.charAt(0) : '?'}
+              </AvatarFallback>
+            </Avatar>
             <div>
               <div>
-                <span className="text-xs sm:text-sm font-medium text-basic-400 mr-2">
-                  {getContentTypeLabel(practice.contentType, practice.customContentType)}
+                <span className="text-xs sm:text-sm font-medium text-basic-500 mr-2">
+                  {'user' in practice && practice.user?.name ? practice.user.name : '匿名用戶'}
                 </span>
+              </div>
+              <div className="text-xs text-basic-300 mt-0.5">
+                {'user' in practice && practice.user?.roleList?.[0] ? practice.user.roleList[0] : '實踐者'}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center space-x-1 sm:space-x-2 mt-0">
-            <Badge className="bg-primary-lightest text-primary-darker text-xs hidden sm:inline-block">
+          <div className="mt-0 flex items-center space-x-1 sm:space-x-2">
+            <Badge className="hidden bg-primary-lightest text-xs text-primary-darker sm:inline-block">
               主題實踐
             </Badge>
+            {practice.startDate && (
+              <div className="text-xs text-basic-300 hidden sm:block">
+                {practice.targetDate ? (
+                  <>
+                    {formatDate(practice.startDate)}
+                    {' - '}
+                    {formatDate(practice.targetDate)}
+                    {' ('}
+                    {differenceInDays(new Date(practice.targetDate), new Date(practice.startDate)) + 1}
+                    天)
+                  </>
+                ) : (
+                  formatDate(practice.startDate)
+                )}
+              </div>
+            )}
 
-            {showActions && (
+            {showActions && isOwner && (
               <div className="relative">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="p-1 text-basic-300 hover:text-basic-400 hover:bg-basic-100 rounded-lg transition-colors"
+                      className="rounded-lg p-1 text-basic-300 transition-colors hover:bg-basic-100 hover:text-basic-400"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <MoreVertical size={14} />
@@ -138,10 +141,10 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
                     {canDoCheckIn && onCheckIn && (
                       <DropdownMenuItem
                         onClick={(e) => {
-                        e.stopPropagation();
-                        onCheckIn(practice);
-                      }}
-                        className="flex items-center cursor-pointer"
+                          e.stopPropagation();
+                          onCheckIn(practice);
+                        }}
+                        className="flex cursor-pointer items-center"
                       >
                         <Flame size={14} className="mr-2" />
                         打卡
@@ -151,10 +154,10 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
                     {onEdit && (
                       <DropdownMenuItem
                         onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit(practice);
-                      }}
-                        className="flex items-center cursor-pointer"
+                          e.stopPropagation();
+                          onEdit(practice);
+                        }}
+                        className="flex cursor-pointer items-center"
                       >
                         <Edit3 size={14} className="mr-2" />
                         編輯
@@ -163,7 +166,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
 
                     {onDelete && (
                       <DropdownMenuItem
-                        className="flex items-center cursor-pointer text-destructive focus:text-destructive"
+                        className="flex cursor-pointer items-center text-destructive focus:text-destructive"
                         onClick={(e) => {
                           e.stopPropagation();
                           onDelete(practice);
@@ -180,18 +183,23 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
           </div>
         </div>
 
-        <h3 className="font-bold text-basic-black mb-2 text-base sm:text-lg group-hover:text-primary-base transition-colors">
+        <h3 className="mb-2 text-base font-bold text-basic-black transition-colors sm:text-lg">
           {practice.title}
         </h3>
 
+        {/* 內容類型 - 移到標題底下 */}
+        <div className="mb-3 text-xs text-basic-400">
+          {getContentTypeLabel(practice.contentType, practice.customContentType)}
+        </div>
+
         {/* Tags */}
         {practice.tags && practice.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
+          <div className="mb-3 flex flex-wrap gap-1 sm:mb-4 sm:gap-2">
             {practice.tags.slice(0, 2).map((tag) => (
               <Badge
                 key={tag}
                 variant="secondary"
-                className="px-1.5 py-0.5 sm:px-2 bg-basic-100 text-basic-300 text-xs font-medium rounded-full"
+                className="rounded-full bg-basic-100 px-1.5 py-0.5 text-xs font-medium text-basic-300 sm:px-2"
               >
                 {tag}
               </Badge>
@@ -199,46 +207,79 @@ const PracticeCard: React.FC<PracticeCardProps> = ({
             {practice.tags.length > 2 && (
               <Badge
                 variant="secondary"
-                className="px-1.5 py-0.5 sm:px-2 bg-basic-100 text-basic-300 text-xs font-medium rounded-full"
+                className="rounded-full bg-basic-100 px-1.5 py-0.5 text-xs font-medium text-basic-300 sm:px-2"
               >
-                +{practice.tags.length - 2}
+                +
+                {practice.tags.length - 2}
               </Badge>
             )}
           </div>
         )}
 
         {/* Progress Bar */}
-        <div className="mb-3 sm:mb-4 relative">
+        <div className="relative mb-3 sm:mb-4">
           <Progress
             value={progressPercentage}
             className="h-2"
           />
-          <span className="absolute right-0 -top-6 text-xs text-basic-300 font-medium">
-            {progressPercentage}%
+          <span className="absolute -top-6 right-0 text-xs font-medium text-basic-300">
+            {progressPercentage}
+            %
           </span>
         </div>
 
         {/* Streak and Status Row */}
-        <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="mb-3 flex items-center justify-between sm:mb-4">
           <div className="flex items-center space-x-1">
-            <Flame className="h-4 w-4 text-orange-500" />
-            <span className="text-xs text-basic-300 font-medium">{practice.streak}天</span>
+            <Flame className="size-4 text-orange-500" />
+            <span className="text-xs font-medium text-basic-300">
+              {practice.streak}
+              天
+            </span>
           </div>
-          <Badge className={getStatusColor()}>
+          <Badge className={`${getStatusColor()} whitespace-nowrap`}>
             {getStatusDisplay()}
           </Badge>
         </div>
 
         {practice.practiceAction && (
-          <div className="pt-3 sm:pt-4 border-t border-basic-100">
-            <div className="text-xs text-basic-300 mb-2">實踐行動</div>
-            <p className="text-sm text-muted-foreground line-clamp-2">
+          <div className="border-t border-basic-100 pt-3 sm:pt-4">
+            <div className="mb-2 text-xs text-basic-300">實踐行動</div>
+            <p className="line-clamp-2 text-sm text-muted-foreground">
               {practice.practiceAction}
             </p>
           </div>
         )}
+
+        {/* Action Buttons - Shell, Comment, Eye, Share */}
+        <div className="pt-3 sm:pt-4">
+          <div className="flex items-center justify-end gap-4 text-xs text-basic-300">
+            <div className="flex items-center gap-1">
+              <Shell />
+              <span>{practice.likeCount || 0}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Comment />
+              <span>{practice.commentCount || 0}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Eye className="h-4 w-4" />
+              <span>{practice.viewCount || 0}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Share2 className="h-4 w-4" />
+              <span>{practice.shareCount || 0}</span>
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
+  );
+
+  return (
+    <CustomLink href={`/practice/${practice.id}`} className="block max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto">
+      {cardContent}
+    </CustomLink>
   );
 };
 

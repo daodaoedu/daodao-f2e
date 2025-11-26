@@ -1,14 +1,23 @@
 import useSWR, { KeyedMutator } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import { projectMilestoneAPI, getProjectMilestonePathname } from '@/services/projects/milestones/api';
-import { ProjectMilestoneSchema, ProjectMilestoneFormSchema } from '@/services/projects/milestones/schema';
+import {
+  projectMilestoneAPI,
+  getProjectMilestonePathname,
+} from '@/services/projects/milestones/api';
+import {
+  ProjectMilestoneSchema,
+  ProjectMilestoneFormSchema,
+} from '@/services/projects/milestones/schema';
 import { getProjectPathname } from '@/services/projects/core';
 import { sortMilestones } from '@/services/projects/utils';
 
 export function useProjectMilestones(projectId?: string | null) {
   const swr = useSWR<ProjectMilestoneSchema[]>(
-    projectId ? getProjectMilestonePathname({ projectId }) : null
+    projectId ? getProjectMilestonePathname({ projectId }) : null,
+    {
+      revalidateIfStale: false,
+    }
   );
 
   return {
@@ -72,8 +81,7 @@ export function useProjectMilestoneMutation({
     updateMutation: {
       ...updateMutation,
       trigger: (updateData: ProjectMilestoneFormSchema) => {
-        // handleMilestones(updateData);
-        return updateMutation.trigger(updateData);
+        updateMutation.trigger(updateData);
       },
     },
     deleteMutation,

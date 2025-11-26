@@ -1,6 +1,6 @@
 import { ZodError } from 'zod';
 
-import { HttpError, mutations } from '@/utils/http';
+import { HttpError, mutations } from '@/shared/lib/http';
 
 import { sendEmailSchema, SendEmailSchema } from './schema';
 
@@ -18,7 +18,7 @@ export const emailAPI: EmailAPIType = {
       return mutations.post(getEmailPathname(), request);
     } catch (error: unknown) {
       if (error instanceof ZodError) {
-        throw new HttpError(400, { message: error.issues[0].message });
+        throw new HttpError(400, { message: error.issues[0]?.message ?? '驗證錯誤' });
       }
       throw new HttpError(400, {
         message: '信件發送失敗，請稍後再試！',

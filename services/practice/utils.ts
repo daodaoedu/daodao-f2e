@@ -197,7 +197,11 @@ export function sortPractices(
 /**
  * 安全地解析日期，統一處理字串和 Date 對象
  */
-export function parseDate(date: string | Date): Date {
+export function parseDate(date: string | Date | undefined | null): Date {
+  if (!date) {
+    return new Date();
+  }
+
   if (date instanceof Date) {
     return isValid(date) ? date : new Date();
   }
@@ -209,7 +213,7 @@ export function parseDate(date: string | Date): Date {
 /**
  * 格式化日期為數字格式
  */
-export function formatDate(date: string | Date): string {
+export function formatDate(date: string | Date | undefined | null): string {
   const dateObj = parseDate(date);
   return format(dateObj, 'yyyy/MM/dd');
 }
@@ -217,7 +221,7 @@ export function formatDate(date: string | Date): string {
 /**
  * 格式化時間
  */
-export function formatTime(date: string | Date): string {
+export function formatTime(date: string | Date | undefined | null): string {
   const dateObj = parseDate(date);
   return format(dateObj, 'HH:mm');
 }
@@ -225,7 +229,7 @@ export function formatTime(date: string | Date): string {
 /**
  * 格式化日期時間
  */
-export function formatDateTime(date: string | Date): string {
+export function formatDateTime(date: string | Date | undefined | null): string {
   const dateObj = parseDate(date);
   return format(dateObj, 'yyyy/MM/dd HH:mm');
 }
@@ -233,7 +237,7 @@ export function formatDateTime(date: string | Date): string {
 /**
  * 格式化為 ISO 日期字串 (YYYY-MM-DD)
  */
-export function formatDateISO(date: string | Date): string {
+export function formatDateISO(date: string | Date | undefined | null): string {
   const dateObj = parseDate(date);
   return format(dateObj, 'yyyy-MM-dd');
 }
@@ -241,7 +245,7 @@ export function formatDateISO(date: string | Date): string {
 /**
  * 格式化相對時間（數字格式）
  */
-export function formatRelativeTime(date: string | Date): string {
+export function formatRelativeTime(date: string | Date | undefined | null): string {
   const dateObj = parseDate(date);
   const now = new Date();
   const diff = now.getTime() - dateObj.getTime();
@@ -263,7 +267,7 @@ export function formatRelativeTime(date: string | Date): string {
 /**
  * 智能日期顯示：today/yesterday/具體日期
  */
-export function formatSmartDate(date: string | Date): string {
+export function formatSmartDate(date: string | Date | undefined | null): string {
   const dateObj = parseDate(date);
   const today = startOfDay(new Date());
   const targetDate = startOfDay(dateObj);
@@ -280,7 +284,7 @@ export function formatSmartDate(date: string | Date): string {
 /**
  * 檢查是否為今天
  */
-export function isToday(date: string | Date): boolean {
+export function isToday(date: string | Date | undefined | null): boolean {
   const dateObj = parseDate(date);
   return isSameDay(dateObj, new Date());
 }
@@ -288,7 +292,7 @@ export function isToday(date: string | Date): boolean {
 /**
  * 計算兩個日期之間的天數差
  */
-export function daysBetween(date1: string | Date, date2: string | Date): number {
+export function daysBetween(date1: string | Date | undefined | null, date2: string | Date | undefined | null): number {
   const date1Obj = parseDate(date1);
   const date2Obj = parseDate(date2);
   return Math.abs(differenceInDays(date2Obj, date1Obj));
@@ -297,7 +301,7 @@ export function daysBetween(date1: string | Date, date2: string | Date): number 
 /**
  * 檢查兩個日期是否為連續天數
  */
-export function isConsecutiveDay(lastDate: string | Date, currentDate: string | Date): boolean {
+export function isConsecutiveDay(lastDate: string | Date | undefined | null, currentDate: string | Date | undefined | null): boolean {
   const lastDateObj = parseDate(lastDate);
   const currentDateObj = parseDate(currentDate);
   return differenceInDays(currentDateObj, lastDateObj) === 1;
@@ -340,7 +344,7 @@ export function getUserTimezone(): string {
 /**
  * 格式化日期為使用者時區
  */
-export function formatDateInUserTimezone(date: string | Date, formatStr: string = 'yyyy-MM-dd HH:mm'): string {
+export function formatDateInUserTimezone(date: string | Date | undefined | null, formatStr: string = 'yyyy-MM-dd HH:mm'): string {
   const dateObj = parseDate(date);
   return format(dateObj, formatStr);
 }
@@ -355,7 +359,7 @@ export function getTimezoneOffset(): number {
 /**
  * 將日期轉換為 UTC
  */
-export function toUTC(date: string | Date): Date {
+export function toUTC(date: string | Date | undefined | null): Date {
   const dateObj = parseDate(date);
   return new Date(dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000));
 }
@@ -363,7 +367,7 @@ export function toUTC(date: string | Date): Date {
 /**
  * 將 UTC 日期轉換為地方時間
  */
-export function fromUTC(utcDate: string | Date): Date {
+export function fromUTC(utcDate: string | Date | undefined | null): Date {
   const dateObj = parseDate(utcDate);
   return new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000));
 }
@@ -371,7 +375,7 @@ export function fromUTC(utcDate: string | Date): Date {
 /**
  * 檢查兩個日期是否在同一時區的同一天
  */
-export function isSameDayInTimezone(date1: string | Date, date2: string | Date): boolean {
+export function isSameDayInTimezone(date1: string | Date | undefined | null, date2: string | Date | undefined | null): boolean {
   const d1 = startOfDay(parseDate(date1));
   const d2 = startOfDay(parseDate(date2));
   return isSameDay(d1, d2);
@@ -437,6 +441,7 @@ export function calculateStreak(
   let index = 0;
   while (index < sortedCheckIns.length) {
     const checkIn = sortedCheckIns[index];
+    if (!checkIn) break;
     const checkInDate = startOfDay(parseISO(checkIn.date));
 
     if (isSameDay(checkInDate, expectedDate)) {
@@ -625,12 +630,36 @@ export function pathInfoToCreatePracticeInput(
     other: 'other'
   };
 
+  const contentType = contentTypeMap[String(pathInfo.contentType)] || 'custom';
+
+  // 根據 dailyGoalType 決定 totalAmount 和 unit
+  const dailyGoalType = dailyGoalConfig?.type;
+  const practiceDays = parseInt(String(pathInfo.totalAmount), 10) || 1;
+
+  let totalAmount: number;
+  let unit: string | null;
+
+  if (dailyGoalType === 'time' && dailyGoalConfig) {
+    // 時間目標：totalAmount = 實踐天數，unit = null
+    totalAmount = practiceDays;
+    unit = null;
+  } else if (dailyGoalType === 'completion' && dailyGoalConfig) {
+    // 完成目標：totalAmount = 天數，unit = 自定義單位
+    totalAmount = practiceDays;
+    unit = String(dailyGoalConfig.unit || '');
+  } else {
+    // 預設：使用內容類型的單位
+    totalAmount = practiceDays;
+    unit = getContentTypeUnit(contentType);
+  }
+
   return {
     title: String(pathInfo.title || ''),
     description: pathInfo.notes ? String(pathInfo.notes) : undefined,
-    contentType: contentTypeMap[String(pathInfo.contentType)] || 'custom',
+    contentType,
     customContentType: pathInfo.customContentType ? String(pathInfo.customContentType) : undefined,
-    totalAmount: parseInt(String(pathInfo.totalAmount), 10) || 1,
+    totalAmount,
+    unit: unit || undefined,
     targetDate: pathInfo.targetDate ? String(pathInfo.targetDate) : undefined,
     motivationType: pathInfo.motivationType ? motivationTypeMap[String(pathInfo.motivationType)] : undefined,
     customMotivation: pathInfo.customMotivation ? String(pathInfo.customMotivation) : undefined,
@@ -665,7 +694,7 @@ export function pathInfoToPractice(pathInfo: Record<string, unknown>, practiceAc
     totalAmount: parseInt(String(pathInfo.totalAmount), 10) || 1,
     currentProgress: parseInt(String(pathInfo.currentProgress), 10) || 0,
     unit: getContentTypeUnit((pathInfo.contentType as ContentType) || 'custom'),
-    startDate: String(pathInfo.targetDate) || now.split('T')[0],
+    startDate: String(pathInfo.targetDate) || (now.split('T')[0] ?? ''),
     targetDate: undefined,
     status: 'active' as PracticeStatus,
     motivationType: String(pathInfo.motivationType) ? (
@@ -690,7 +719,11 @@ export function pathInfoToPractice(pathInfo: Record<string, unknown>, practiceAc
       order: index
     })),
     checkIns: [],
-    tags: []
+    tags: [],
+    likeCount: 0,
+    viewCount: 0,
+    commentCount: 0,
+    shareCount: 0,
   };
 }
 

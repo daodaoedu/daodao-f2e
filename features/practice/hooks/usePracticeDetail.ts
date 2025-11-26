@@ -8,7 +8,7 @@ export function usePracticeDetail(id: string | undefined) {
   return {
     ...practiceData,
     loading,
-    error
+    error,
   };
 }
 

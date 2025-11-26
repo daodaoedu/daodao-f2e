@@ -1,36 +1,36 @@
-import React from "react";
-import { format } from "date-fns";
-import { Check, Ellipsis } from "lucide-react";
-import { RecentResourceReviewSchema } from "@/services/resources/reviews/schema";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Rating } from "@/components/ui/rating";
-import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
-import CommentSvg from "@/public/assets/icons/comment.svg";
-import ShellSvg from "@/public/assets/icons/shell.svg";
+import React from 'react';
+import { format } from 'date-fns';
+import { Check, Ellipsis } from 'lucide-react';
+import { RecentResourceReviewSchema } from '@/services/resources/reviews/schema';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+import { Badge } from '@/shared/ui/badge';
+import { Button } from '@/shared/ui/button';
+import { Rating } from '@/shared/ui/rating';
+import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
+import CommentSvg from '@/public/assets/icons/comment.svg';
+import ShellSvg from '@/public/assets/icons/shell.svg';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import CommentSection from "@/shared/components/Comment/CommentSection";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
-import { CommentType } from "@/services/comments";
-import { cn } from "@/utils/cn";
+} from '@/shared/ui/collapsible';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
+import { cn } from '@/shared/lib/cn';
 
 interface ResourceReviewCardProps {
   review: RecentResourceReviewSchema;
+  commentSection: React.ReactNode;
 }
 
 export default function ResourceReviewCard({
   review,
+  commentSection,
 }: ResourceReviewCardProps) {
   return (
-    <Collapsible className="bg-primary-palest rounded-lg">
-      <header className="flex mb-10 pt-10 px-10">
-        <Avatar className="mt-1 mr-3 size-12">
-          <AvatarImage src={review.user.photoURL || ""} />
+    <Collapsible className="rounded-lg bg-primary-palest">
+      <header className="mb-10 flex px-10 pt-10">
+        <Avatar className="mr-3 mt-1 size-12">
+          <AvatarImage src={review.user.photoURL || ''} />
           <AvatarFallback className="text-xl">
             <DefaultAvatar />
           </AvatarFallback>
@@ -39,7 +39,7 @@ export default function ResourceReviewCard({
           <div className="flex items-center">
             <h2 className="body-md font-bold">{review.user.name}</h2>
             {review.user.roleList.length > 0 && (
-              <Badge className="body-sm ml-3 px-2 rounded" variant="gray">
+              <Badge className="body-sm ml-3 rounded px-2" variant="gray">
                 {review.user.roleList[0]}
               </Badge>
             )}
@@ -50,7 +50,7 @@ export default function ResourceReviewCard({
       <section className="mb-10 px-10">
         <div className="mb-6 flex flex-col gap-4">
           <h3 className="body-lg font-bold">內容特色</h3>
-          <div className="flex mt-1 body-sm gap-2.5">
+          <div className="body-sm mt-1 flex gap-2.5">
             {Object.entries(review.contentFeatures ?? {}).map(
               ([feature, enabled]) =>
                 enabled ? (
@@ -67,7 +67,7 @@ export default function ResourceReviewCard({
         </div>
         <div className="mb-6">
           <h3 className="body-lg font-bold">心得</h3>
-          <div className="text-gray-700 whitespace-pre-line mb-4">
+          <div className="mb-4 whitespace-pre-line text-gray-700">
             <MarkdownEditor value={review.content} readOnly />
           </div>
         </div>
@@ -75,11 +75,11 @@ export default function ResourceReviewCard({
           <div className="mb-6 flex flex-col gap-4">
             <h3 className="body-lg font-bold">怎麼使用</h3>
             <div className="ml-6">
-              <h4 className="mb-3 body-md font-bold">時間運用方式</h4>
+              <h4 className="body-md mb-3 font-bold">時間運用方式</h4>
               <p>每天學習 1-2 小時</p>
             </div>
             <div className="ml-6">
-              <h4 className="mb-3 body-md font-bold">是否搭配運用資源</h4>
+              <h4 className="body-md mb-3 font-bold">是否搭配運用資源</h4>
               <p>是，搭配線上課程</p>
             </div>
           </div>
@@ -104,7 +104,7 @@ export default function ResourceReviewCard({
         </CollapsibleContent>
       </section>
 
-      <footer className="flex justify-between items-center gap-2 px-10 text-basic-300">
+      <footer className="flex items-center justify-between gap-2 px-10 text-basic-300">
         <div className="flex items-center gap-2">
           <CommentSvg />
           <span>{review.helpfulCount}</span>
@@ -117,7 +117,7 @@ export default function ResourceReviewCard({
           <time>
             {format(
               new Date(review.updatedAt ?? review.createdAt),
-              "yyyy/MM/dd"
+              'yyyy/MM/dd'
             )}
           </time>
           <Button variant="default" size="icon">
@@ -126,17 +126,12 @@ export default function ResourceReviewCard({
         </div>
       </footer>
 
-      <div className="px-5">
-        <CommentSection
-          targetId={review.id}
-          targetType={CommentType.ResourceReview}
-        />
-      </div>
+      <div className="px-5">{commentSection}</div>
 
       <CollapsibleTrigger
         className={cn(
-          "w-full flex flex-row-reverse justify-center gap-1 mt-10 p-3",
-          "body-md rounded-b-lg bg-primary-lightest hover:bg-primary-lightest/80"
+          'mt-10 flex w-full flex-row-reverse justify-center gap-1 p-3',
+          'body-md rounded-b-lg bg-primary-lightest hover:bg-primary-lightest/80'
         )}
         withIcon
         expandLabel="展開"

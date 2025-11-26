@@ -1,9 +1,9 @@
 // 搜尋輸入組件
 import React from 'react';
 import { Search, X } from 'lucide-react';
-import { cn } from '@/utils/cn';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { cn } from '@/shared/lib/cn';
+import { Input } from '@/shared/ui/input';
+import { Button } from '@/shared/ui/button';
 
 interface SearchInputProps {
   value: string;
@@ -18,7 +18,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   onChange,
   onClear,
   placeholder = '搜尋實踐項目...',
-  className = ''
+  className = '',
 }) => {
   const [focused, setFocused] = React.useState(false);
 
@@ -57,10 +57,10 @@ const SearchInput: React.FC<SearchInputProps> = ({
             variant="ghost"
             size="sm"
             onClick={handleClear}
-            className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 p-0"
+            className="absolute right-1 top-1/2 size-7 -translate-y-1/2 p-0"
             type="button"
           >
-            <X className="h-4 w-4" />
+            <X className="size-4" />
             <span className="sr-only">清除搜尋</span>
           </Button>
         )}
@@ -68,9 +68,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
       {/* 搜尋建議或快速篩選 */}
       {focused && value.length > 0 && (
-        <div className="absolute top-full left-0 right-0 z-10 mt-2 rounded-md border bg-popover p-3 shadow-md">
-          <div className="text-xs font-medium text-muted-foreground mb-2">搜尋範圍包含：</div>
-          <ul className="text-sm text-muted-foreground space-y-1">
+        <div className="absolute inset-x-0 top-full z-10 mt-2 rounded-md border bg-popover p-3 shadow-md">
+          <div className="mb-2 text-xs font-medium text-muted-foreground">搜尋範圍包含：</div>
+          <ul className="space-y-1 text-sm text-muted-foreground">
             <li>• 實踐標題和描述</li>
             <li>• 小目標內容</li>
             <li>• 學習資源名稱</li>

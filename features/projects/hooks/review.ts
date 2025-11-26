@@ -1,11 +1,11 @@
-import useSWR from "swr";
-import useSWRMutation from "swr/mutation";
+import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 
 import {
   projectReviewAPI,
   getProjectReviewPathname,
-} from "@/services/projects/reviews/api";
-import { ProjectReviewSchema } from "@/services/projects/reviews/schema";
+} from '@/services/projects/reviews/api';
+import { ProjectReviewSchema } from '@/services/projects/reviews/schema';
 
 export function useProjectReviewList(projectId?: string | null) {
   return useSWR<ProjectReviewSchema[]>(
@@ -23,7 +23,7 @@ export function useProjectReview({
   reviewId,
 }: UseProjectReviewProps) {
   return useSWR<ProjectReviewSchema>(
-    projectId && typeof reviewId === "number"
+    projectId && typeof reviewId === 'number'
       ? getProjectReviewPathname({ projectId, reviewId })
       : null
   );

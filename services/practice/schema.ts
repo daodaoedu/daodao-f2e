@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { baseUserSchema } from '../_shared/schema';
 
 // ==================== 列舉型別的 zod schema ====================
 export const contentTypeSchema = z.enum([
@@ -42,11 +43,11 @@ export const resourceTypeSchema = z.enum([
 ]);
 
 export const moodTypeSchema = z.enum([
-  'excellent',
-  'good',
-  'average',
-  'challenging',
-  'difficult'
+  'awesome',
+  'happy',
+  'neutral',
+  'tired',
+  'frustrated'
 ]);
 
 // ==================== 實際的列舉值（可以作為值使用） ====================
@@ -91,11 +92,11 @@ export const ResourceType = {
 } as const;
 
 export const MoodType = {
-  EXCELLENT: 'excellent' as const,
-  GOOD: 'good' as const,
-  AVERAGE: 'average' as const,
-  CHALLENGING: 'challenging' as const,
-  DIFFICULT: 'difficult' as const
+  AWESOME: 'awesome' as const,
+  HAPPY: 'happy' as const,
+  NEUTRAL: 'neutral' as const,
+  TIRED: 'tired' as const,
+  FRUSTRATED: 'frustrated' as const
 } as const;
 
 // ==================== 基礎 schema ====================
@@ -155,9 +156,24 @@ export const practiceSchema = z.object({
     amount: z.number().optional(),
     unit: z.string().optional()
   }).optional(),
+  // 社群互動統計
+  likeCount: z.number().min(0).default(0),
+  commentCount: z.number().min(0).default(0),
+  viewCount: z.number().min(0).default(0),
+  shareCount: z.number().min(0).default(0),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
+  // 使用者資訊 (可選)
+  user: baseUserSchema.extend({
+    _id: z.string().optional(),
+    photoURL: z.string().optional(),
+    roleList: z.array(z.string()).optional(),
+  }).optional(),
 });
+
+// 擴展的實踐 schema - 包含使用者資訊 (用於公開列表等場景)
+// Note: practiceSchema already includes user field, so this is just an alias for backward compatibility
+export const practiceWithUserSchema = practiceSchema;
 
 // ==================== 操作相關 schema ====================
 export const createPracticeSchema = z.object({
@@ -166,6 +182,7 @@ export const createPracticeSchema = z.object({
   contentType: contentTypeSchema,
   customContentType: z.string().max(20, '自定義類型名稱不可超過 20 字').optional(),
   totalAmount: z.number().min(1, '總量必須大於 0').max(999999, '總量不可超過 999999'),
+  unit: z.string().min(1, '請輸入單位').max(20, '單位不可超過 20 字').optional(),
   targetDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '請輸入有效的目標日期格式 YYYY-MM-DD').optional(),
   motivationType: motivationTypeSchema.optional(),
   customMotivation: z.string().max(200, '自定義動機不可超過 200 字').optional(),
@@ -217,11 +234,11 @@ export const updatePracticeSchema = z.object({
 });
 
 export const checkInInputSchema = z.object({
-  practiceId: z.string().min(1, '請提供實踐 ID'),
   progress: z.number().min(0, '進度必須大於等於 0'),
   note: z.string().max(1000, '筆記不可超過 1000 字').optional(),
   mood: moodTypeSchema.optional(),
-  tags: z.array(z.string()).default([])
+  reflectionText: z.string().optional(),
+  relatedResourceId: z.string().optional()
 });
 
 // ==================== 篩選相關 schema ====================
@@ -302,6 +319,7 @@ export type MoodType = z.infer<typeof moodTypeSchema>;
 export type Resource = z.infer<typeof resourceSchema>;
 export type CheckInRecord = z.infer<typeof checkInRecordSchema>;
 export type Practice = z.infer<typeof practiceSchema>;
+export type PracticeWithUser = z.infer<typeof practiceWithUserSchema>;
 
 export type CreatePracticeInput = z.infer<typeof createPracticeSchema>;
 export type UpdatePracticeInput = z.infer<typeof updatePracticeSchema>;

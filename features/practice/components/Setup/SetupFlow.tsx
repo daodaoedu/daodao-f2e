@@ -1,10 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from '@/shared/i18n/navigation';
 import { usePracticeManager } from '@/features/practice/hooks';
 import Confetti from '@/features/practice/components/Shared/Confetti';
 import CelebrationMessage from '@/features/practice/components/Shared/CelebrationMessage';
 import { PathInfo } from '@/services/practice/schema';
 import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
+import { Button } from '@/shared/ui/button';
+import { X } from 'lucide-react';
 import Step1 from './Step1';
 import Step2 from './Step2';
 import Step3 from './Step3';
@@ -22,7 +24,8 @@ interface Resource {
 }
 
 const SetupFlow: React.FC<SetupFlowProps> = ({
-  onComplete
+  onComplete,
+  onCancel,
 }) => {
   const router = useRouter();
   const { createPracticeFromPathInfo } = usePracticeManager();
@@ -46,12 +49,11 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
     reminderEnabled: false,
     reminderFrequency: 'daily',
     streak: 0,
-    lastStreakDate: ''
+    lastStreakDate: '',
   });
 
   // 新增：標籤相關狀態
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [customTag, setCustomTag] = useState('');
 
   // 實踐行動狀態
   const [practiceAction, setPracticeAction] = useState<string>('');
@@ -105,6 +107,10 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
       } else if (totalAmount > 10000) {
         errors.totalAmount = '總量不能超過10000';
       }
+    } else if (setupStep === 3) {
+      if (resources.length === 0) {
+        errors.resources = '請至少添加一個資源';
+      }
     }
 
     setValidationErrors(errors);
@@ -114,7 +120,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
   const handlePathInfoChange = useCallback((field: keyof PathInfo, value: string | number) => {
     setPathInfo((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
 
     if (validationErrors[field]) {
@@ -126,31 +132,12 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
     }
   }, [validationErrors]);
 
-  // 標籤相關函數
-  const addTag = useCallback((tag: string) => {
-    const trimmedTag = tag.trim();
-    if (trimmedTag && !selectedTags.includes(trimmedTag) && selectedTags.length < 3) {
-      setSelectedTags((prev) => [...prev, trimmedTag]);
-    }
-  }, [selectedTags]);
-
-  const removeTag = useCallback((tagToRemove: string) => {
-    setSelectedTags((prev) => prev.filter((tag) => tag !== tagToRemove));
-  }, []);
-
-  const addCustomTag = useCallback(() => {
-    if (customTag.trim()) {
-      addTag(customTag);
-      setCustomTag('');
-    }
-  }, [customTag, addTag]);
-
   const addResource = useCallback(() => {
     if (newResourceName.trim() && resources.length < 5) {
       const newResource: Resource = {
         id: Date.now(),
         name: newResourceName.trim(),
-        url: newResourceUrl.trim()
+        url: newResourceUrl.trim(),
       };
       setResources((prev) => [...prev, newResource]);
       setNewResourceName('');
@@ -194,7 +181,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
         type: dailyGoalType,
         timeMinutes: dailyGoalType === 'time' ? dailyGoalTime : undefined,
         amount: dailyGoalType === 'completion' ? dailyGoalPages : undefined,
-        unit: dailyGoalType === 'completion' ? customUnit : undefined
+        unit: dailyGoalType === 'completion' ? customUnit : undefined,
       };
 
       const practiceId = await createPracticeFromPathInfo(pathInfo, practiceAction, resources, selectedTags, dailyGoalConfig);
@@ -221,7 +208,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
     const stepProps = {
       pathInfo,
       handlePathInfoChange,
-      validationErrors
+      validationErrors,
     };
 
     switch (setupStep) {
@@ -231,11 +218,7 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
             {...stepProps}
             handleNextStep={handleNextStep}
             selectedTags={selectedTags}
-            customTag={customTag}
-            setCustomTag={setCustomTag}
-            addTag={addTag}
-            removeTag={removeTag}
-            addCustomTag={addCustomTag}
+            setSelectedTags={setSelectedTags}
           />
         );
       case 2:
@@ -292,8 +275,8 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-basic-white pt-20">
+      <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-12">
         <Confetti active={showConfetti} />
 
         <CelebrationMessage
@@ -301,7 +284,30 @@ const SetupFlow: React.FC<SetupFlowProps> = ({
           isVisible={!!celebrationMessage}
         />
 
-        <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+        <div className="overflow-visible rounded-lg border border-basic-200 bg-white shadow-sm">
+          {/* Header */}
+          <div className="flex items-center justify-between bg-primary-base bg-gradient-to-r px-6 py-4">
+            <div className="flex items-center">
+              <div className="flex size-10 items-center justify-center rounded-full border border-white/30 bg-white/20 font-medium text-white">
+                島
+              </div>
+              <div className="ml-3">
+                <div className="text-sm font-medium text-white">建立主題實踐</div>
+                <div className="text-xs text-white/80">步驟 {setupStep}/4</div>
+              </div>
+            </div>
+            {onCancel && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={onCancel}
+                className="p-2 text-white hover:bg-white/20"
+              >
+                <X className="size-5" />
+              </Button>
+            )}
+          </div>
+
           {renderStepContent()}
         </div>
       </div>

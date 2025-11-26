@@ -1,7 +1,9 @@
 import toast from 'react-hot-toast';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import {
+  ChangeEvent, useEffect, useRef, useState,
+} from 'react';
 import { uploadImagesSchema } from '@/services/images';
-import { Button, type ButtonProps } from '@/components/ui/button';
+import { Button, type ButtonProps } from '@/shared/ui/button';
 
 export interface ImageDataType {
   id: string;
@@ -41,7 +43,7 @@ function Upload({
     const parsed = validate.safeParse({ files });
 
     if (parsed.error) {
-      toast.error(parsed.error.issues[0].message);
+      toast.error(parsed.error.issues[0]?.message ?? '驗證錯誤');
       return;
     }
     const objectUrls = files.map(URL.createObjectURL);
@@ -49,7 +51,7 @@ function Upload({
     onChange?.(
       files.map((file, index) => ({
         file,
-        url: objectUrls[index],
+        url: objectUrls[index] ?? '',
         id: crypto.randomUUID(),
       })),
       e
@@ -66,9 +68,7 @@ function Upload({
     inputRef.current?.click();
   };
 
-  useEffect(() => {
-    return () => urls.forEach(URL.revokeObjectURL);
-  }, [urls]);
+  useEffect(() => () => urls.forEach(URL.revokeObjectURL), [urls]);
 
   return (
     <>

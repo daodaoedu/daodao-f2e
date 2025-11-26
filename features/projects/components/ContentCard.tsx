@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
-import Image from '@/shared/components/Image';
-import PostPreviewCard from '@/shared/components/Post/PostPreviewCard';
-import { MarkdownEditor } from '@/components/ui/markdown-editor';
+import { Image } from '@/shared/ui/image';
+import { PostPreviewCard } from '@/entities/post';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 
 const tagMap = {
   outcome: '成果',
@@ -35,10 +35,9 @@ function ContentCard<T extends ContentCardData>({
 }: ContentCardProps<T>) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [showGradient, setShowGradient] = useState(false);
-  const previewContent =
-    data.content.length <= 100
-      ? data.content
-      : `${data.content.slice(0, 100)}...`;
+  const previewContent = data.content.length <= 100
+    ? data.content
+    : `${data.content.slice(0, 100)}...`;
 
   useEffect(() => {
     const checkHeight = () => {
@@ -61,10 +60,10 @@ function ContentCard<T extends ContentCardData>({
       onEditClick={onEditClick}
       onDeleteClick={onDeleteClick}
       renderContent={() => (
-        <div className="mb-3 body-sm text-basic-500">
+        <div className="body-sm mb-3 text-basic-500">
           <div
             ref={contentRef}
-            className="relative mb-3 min-h-12 max-h-48 overflow-hidden"
+            className="relative mb-3 max-h-48 min-h-12 overflow-hidden"
           >
             <MarkdownEditor
               editorClassName="max-w-full"
@@ -72,14 +71,15 @@ function ContentCard<T extends ContentCardData>({
               value={previewContent}
             />
             {showGradient && (
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent from-70% to-white pointer-events-none" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent from-70% to-white" />
             )}
           </div>
-          {data.imgUrls && data.imgUrls.length > 0 && (
+          {data.imgUrls && data.imgUrls.length > 0 && data.imgUrls[0] && (
             <Image
               src={data.imgUrls[0]}
               alt={data.title}
-              height="300px"
+              width={400}
+              height={300}
               className="object-contain"
             />
           )}

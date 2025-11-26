@@ -16,6 +16,6 @@ export function useCheckInHistory(practiceId: string | undefined) {
 
   return {
     checkIns: checkInHistory,
-    practice
+    practice,
   };
 }

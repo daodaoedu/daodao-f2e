@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 interface RadioProps<T extends string | number> {
   id?: string;
@@ -40,7 +40,7 @@ function RadioBox<T extends string | number>(
       <input
         ref={ref}
         type="radio"
-        className="[clip:rect(0,0,0,0)] absolute p-0 border-0 w-0 h-0 overflow-hidden"
+        className="absolute size-0 overflow-hidden border-0 p-0 [clip:rect(0,0,0,0)]"
         name={name}
         id={id}
         value={value.toString()}

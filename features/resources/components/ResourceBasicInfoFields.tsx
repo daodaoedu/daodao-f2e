@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useFormContext } from "react-hook-form";
-import { Link2Icon, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useFormContext } from 'react-hook-form';
+import { Link2Icon, Plus } from 'lucide-react';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import {
   FormControl,
   FormDescription,
@@ -11,15 +11,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { ResourceFormSchema } from "@/services/resources/core/schema";
-import { Text, Title } from "@/components/ui/typography";
-import { UploadImage } from "@/components/ui/upload-image";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
+} from '@/shared/ui/form';
+import { ResourceFormSchema } from '@/services/resources/core/schema';
+import { Text, Title } from '@/shared/ui/typography';
+import { ImagePicker } from '@/shared/ui/image-picker';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 
 type ResourceBasicInfoSchema = Pick<
   ResourceFormSchema,
-  "name" | "url" | "imageUrl" | "description" | "videoUrl"
+  'name' | 'url' | 'imageUrl' | 'description' | 'videoUrl'
 >;
 
 export default function ResourceBasicInfoFields() {
@@ -30,7 +30,7 @@ export default function ResourceBasicInfoFields() {
       <Title as="h2" size="lg" className="mb-2 text-center">
         主要資訊
       </Title>
-      <Text size="lg" className="mb-10 text-basic-500 text-center">
+      <Text size="lg" className="mb-10 text-center text-basic-500">
         填寫相關資訊幫助其他人了解這個資源
       </Text>
 
@@ -38,10 +38,10 @@ export default function ResourceBasicInfoFields() {
         <div className="flex gap-6">
           <div className="flex-[2]">
             <FormLabel required>封面圖</FormLabel>
-            <UploadImage ratio={133 / 100}>
+            <ImagePicker ratio={133 / 100}>
               <Plus size={24} />
               選擇封面
-            </UploadImage>
+            </ImagePicker>
           </div>
 
           <div className="flex-[5] space-y-6">
@@ -114,7 +114,7 @@ export default function ResourceBasicInfoFields() {
                     placeholder="複製 YouTube 影片網址"
                     prefixIcon={<Link2Icon />}
                     {...field}
-                    value={field.value ?? ""}
+                    value={field.value ?? ''}
                   />
                 </FormControl>
                 <Button type="button" variant="outline" size="lg">

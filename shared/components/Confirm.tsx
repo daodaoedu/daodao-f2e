@@ -1,5 +1,5 @@
-import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
-import { Button } from '@/components/ui/button';
+import ResponsiveModal, { ResponsiveModalSize } from '@/shared/ui/responsive-modal';
+import { Button } from '@/shared/ui/button';
 
 interface ConfirmModalProps {
   title: string;
@@ -8,7 +8,7 @@ interface ConfirmModalProps {
   children?: React.ReactNode;
   cancelText?: string;
   confirmText?: string;
-  confirmColor?: "default" | "alert";
+  confirmColor?: 'default' | 'alert';
   onClose: () => void;
   onConfirm?: () => void;
 }

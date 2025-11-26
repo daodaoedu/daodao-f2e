@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 export const defaultClass = cn(
   'relative block p-2 px-10 rounded-lg transition-colors cursor-pointer',
@@ -8,8 +8,6 @@ export const defaultClass = cn(
   '[&[data-active="true"]_+_*]:before:hidden lg:before:hidden'
 );
 
-export const activeClass =
-  'text-primary-base bg-primary-lightest font-bold cursor-default';
+export const activeClass = 'text-primary-base bg-primary-lightest font-bold cursor-default';
 
-export const disableClass =
-  'text-basic-300 bg-transparent font-medium cursor-not-allowed';
+export const disableClass = 'text-basic-300 bg-transparent font-medium cursor-not-allowed';

@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { GripVertical } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 interface DraggableItemProps {
   id: string | number;
@@ -56,7 +56,7 @@ const DraggableItem = ({
           aria-label="拖曳排序"
           title="長按可拖曳排序"
         >
-          <GripVertical className="text-basic-300 h-5 w-5" />
+          <GripVertical className="size-5 text-basic-300" />
         </button>
         {children}
       </div>

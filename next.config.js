@@ -1,5 +1,6 @@
-const isDev = process.env.NODE_ENV === "development";
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+const withNextIntl = require('next-intl/plugin')({
+  requestConfig: './shared/i18n/request.ts',
+});
 
 const withPWA = require("next-pwa")({
   dest: "public",
@@ -11,43 +12,86 @@ const withPWA = require("next-pwa")({
   ],
 });
 
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
+
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: false,
   staticPageGenerationTimeout: 600,
-  transpilePackages: ["@mdxeditor/editor"],
+  typedRoutes: true,
+  // Exclude client-only packages from server bundle
+  serverExternalPackages: [
+    'html-to-image',            // Canvas/DOM manipulation (client-only)
+    'lottie-web',               // Animation (client-only)
+    'gsap',                     // Animation (client-only)
+    'react-speech-recognition', // Browser API (client-only)
+    'regenerator-runtime',     // Async/await support (client-only)
+  ],
+
+  // Optimize server bundle size for Cloudflare Workers (3MB limit)
   experimental: {
+    globalNotFound: true,
     scrollRestoration: true,
+    // Optimize package imports to reduce bundle size
+    optimizePackageImports: [
+      // Date & Time
+      'react-day-picker',      // Reduce calendar bundle
+
+      // Icons
+      '@radix-ui/react-icons', // Only import used icons
+
+      // Radix UI Components
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-popover',
+      '@radix-ui/react-select',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-accordion',
+      '@radix-ui/react-alert-dialog',
+      '@radix-ui/react-avatar',
+      '@radix-ui/react-checkbox',
+      '@radix-ui/react-collapsible',
+      '@radix-ui/react-label',
+      '@radix-ui/react-progress',
+      '@radix-ui/react-radio-group',
+      '@radix-ui/react-scroll-area',
+      '@radix-ui/react-separator',
+      '@radix-ui/react-slider',
+      '@radix-ui/react-switch',
+      '@radix-ui/react-tooltip',
+
+      // Content & UI
+      'react-markdown',        // Markdown renderer
+      'react-share',           // Social share buttons
+      'recharts',              // Chart library
+
+      // Other UI
+      'embla-carousel-react',  // Carousel
+      'cmdk',                  // Command palette
+      'vaul',                  // Drawer
+      'sonner',                // Toast notifications
+    ],
   },
+
   images: {
     unoptimized: true,
   },
-  webpack: (config, options) => {
+  webpack: (config) => {
     const experiments = { ...config.experiments, topLevelAwait: true };
 
     config.module.rules.push({
       test: /\.svg$/,
-      use: [options.defaultLoaders.babel, "@svgr/webpack"],
+      use: ["@svgr/webpack"],
     });
 
     return Object.assign(config, { experiments });
   },
   env: {
-    HOSTNAME: "https://www.daoedu.tw",
-    NEXT_PUBLIC_DEV_URL: "https://dev.daodao-notion-test.pages.dev",
+    PROD_URL: "https://www.daoedu.tw",
+    STAGING_URL: "https://staging-daodao-f2e.daoedu.workers.dev",
   },
-  ...(isDev
-    ? {
-        async rewrites() {
-          return [
-            {
-              source: "/dev-proxy-api/:path*",
-              destination: `${apiUrl}/:path*`,
-            },
-          ];
-        },
-      }
-    : {}),
 };
 
-module.exports = withPWA(config);
+module.exports = withNextIntl(withPWA(withBundleAnalyzer(config)));

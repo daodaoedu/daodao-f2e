@@ -1,14 +1,14 @@
-import useSWR from "swr";
-import useSWRMutation from "swr/mutation";
-import ResponsiveModal, { ResponsiveModalSize } from "@/components/ui/responsive-modal";
+import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
+import ResponsiveModal, { ResponsiveModalSize } from '@/shared/ui/responsive-modal';
 import {
   ProjectReviewSchema,
   getProjectReviewPathname,
   projectReviewAPI,
   refetchProjectReview,
-} from "@/services/projects";
+} from '@/services/projects';
 
-import ReviewForm from "./ReviewForm";
+import ReviewForm from './ReviewForm';
 
 interface ReviewUpdateModalProps {
   projectId: string;
@@ -28,13 +28,13 @@ export default function ReviewUpdateModal({
   onSuccess,
 }: ReviewUpdateModalProps) {
   const { data: review } = useSWR<ProjectReviewSchema>(
-    projectId && typeof reviewId === "number"
+    projectId && typeof reviewId === 'number'
       ? getProjectReviewPathname({ projectId, reviewId })
       : null
   );
 
   const updateMutation = useSWRMutation(
-    projectId && typeof reviewId === "number"
+    projectId && typeof reviewId === 'number'
       ? getProjectReviewPathname({ projectId, reviewId })
       : null,
     projectReviewAPI.update,

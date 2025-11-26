@@ -6,14 +6,10 @@ interface ProjectListProps {
   path: string;
 }
 
-const ProjectList = ({ projects, path }: ProjectListProps) => {
-  return (
-    projects.map((project) => {
-      return (
-        <ProjectCard project={project} key={project.id} path={path} />
-      );
-    })
-  );
-};
+const ProjectList = ({ projects, path }: ProjectListProps) => (
+  projects.map((project) => (
+    <ProjectCard project={project} key={project.id} path={path} />
+  ))
+);
 
 export default ProjectList;

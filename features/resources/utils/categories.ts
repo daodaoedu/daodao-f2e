@@ -1,5 +1,5 @@
-import { parseToArray } from "@/utils/helper";
-import { CATEGORIES, ICategory, SEARCH_TAGS } from "@/constants/category";
+import { parseToArray } from '@/shared/lib/helper';
+import { CATEGORIES, ICategory, SEARCH_TAGS } from '@/constants/category';
 
 export function parseCategoryHierarchy(source: string[] | null): ICategory[] {
   const data = parseToArray<keyof typeof SEARCH_TAGS>(source);
@@ -24,8 +24,8 @@ export function getCategories(
   if (!Array.isArray(categoryHierarchy) || categoryHierarchy.length === 0) {
     return CATEGORIES;
   }
-  if (categoryHierarchy.length === 1) {
-    return SEARCH_TAGS[majorCategoryKey];
+  if (categoryHierarchy.length === 1 && majorCategoryKey) {
+    return SEARCH_TAGS[majorCategoryKey] ?? [];
   }
   return [];
 }

@@ -1,5 +1,5 @@
 import { ToggleProvider, useToggle } from '@/contexts/Toggle';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 interface CollapseProps {
   as?: React.ElementType;
@@ -46,7 +46,7 @@ function Toggle({ children, className, withIcon }: CollapseToggleProps) {
             isOpen ? '-rotate-180' : 'rotate-0'
           )}
         >
-          <div className="w-2 h-2 rotate-45 -translate-y-0.5 border-b-2 border-r-2 border-solid border-current" />
+          <div className="size-2 -translate-y-0.5 rotate-45 border-b-2 border-r-2 border-solid border-current" />
         </div>
       )}
     </button>

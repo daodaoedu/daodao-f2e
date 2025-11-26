@@ -1,6 +1,6 @@
 import { MutationFetcher } from "swr/mutation";
-import { parseToString } from "@/utils/helper";
-import { mutations } from "@/utils/http";
+import { parseToString } from "@/shared/lib/helper";
+import { mutations } from "@/shared/lib/http";
 
 import {
   CreateProjectTaskSchema,

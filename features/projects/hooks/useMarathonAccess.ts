@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { RoleEnum, useAuth } from '@/contexts/Auth';
+import { RoleEnum } from '@/services/users';
+import { useAuth } from '@/entities/user';
 
 export default function useMarathonAccess() {
   const { user } = useAuth();
@@ -11,7 +12,7 @@ export default function useMarathonAccess() {
       RoleEnum.Admin,
       RoleEnum.SuperAdmin,
     ];
-    return user ? permissions.includes(user?.role) : false;
+    return user?.role ? permissions.includes(user?.role) : false;
   }, [user]);
 
   return hasMarathonAccess;

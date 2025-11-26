@@ -1,3 +1,5 @@
+'use client';
+
 import {
   createContext,
   useContext,
@@ -5,12 +7,12 @@ import {
   useEffect,
   useCallback,
   useMemo,
-} from "react";
-import { Button } from "@/components/ui/button";
+} from 'react';
+import { Button } from '@/shared/ui/button';
 import ResponsiveModal, {
   ResponsiveModalProps,
-} from "@/components/ui/responsive-modal";
-import { cn } from "@/utils/cn";
+} from '@/shared/ui/responsive-modal';
+import { cn } from '@/shared/lib/cn';
 
 export interface DialogContentProps {
   close: () => void;
@@ -23,20 +25,23 @@ export type RenderDialogContent = (
 interface DialogProps
   extends Omit<
     ResponsiveModalProps,
-    "children" | "open" | "onClose" | "footer"
+    'children' | 'open' | 'onClose' | 'footer'
   > {
   content: React.ReactNode | RenderDialogContent;
   cancelText?: string;
   cancelBtnProps?: Omit<
     React.ComponentPropsWithoutRef<typeof Button>,
-    "onClick"
+    'onClick'
   >;
   confirmText?: string;
   confirmBtnProps?: Omit<
     React.ComponentPropsWithoutRef<typeof Button>,
-    "onClick"
+    'onClick'
   >;
   disableFooter?: boolean;
+  footerButtonsClassName?: string;
+  footerClassName?: string;
+  footerDescription?: React.ReactNode;
   onCancel?: () => void;
   onConfirm?: () => void;
   className?: string;
@@ -61,7 +66,7 @@ export const DialogContext = createContext<DialogContextType | null>(null);
 export const useDialog = () => {
   const context = useContext(DialogContext);
   if (!context) {
-    throw new Error("useDialog must be used within a DialogProvider");
+    throw new Error('useDialog must be used within a DialogProvider');
   }
   return context;
 };
@@ -76,6 +81,9 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
     cancelBtnProps,
     confirmText,
     confirmBtnProps,
+    footerClassName,
+    footerButtonsClassName,
+    footerDescription,
     onCancel,
     onConfirm,
     disableFooter,
@@ -88,7 +96,7 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    if (!isOpen && dialogs.length > 0) {
+    if (!isOpen && dialogs.length > 0 && dialogs[0]) {
       setIsOpen(true);
       setCurrentDialog(dialogs[0]);
       setDialogs(dialogs.slice(1));
@@ -96,8 +104,8 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
   }, [isOpen, dialogs]);
 
   const openDialog = useCallback(
-    async (props: DialogProps) => {
-      return new Promise<boolean>((resolve) => {
+    async (props: DialogProps) =>
+      new Promise<boolean>((resolve) => {
         const proxyOnConfirm = () => {
           resolve(true);
           handleCloseDialog();
@@ -120,29 +128,35 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
           setIsOpen(true);
           setCurrentDialog(newDialog);
         }
-      });
-    },
+      }),
     [dialogs, handleCloseDialog]
   );
 
   const footer = disableFooter ? null : (
-    <div className="flex w-full gap-4">
-      <Button
-        variant="secondary"
-        {...cancelBtnProps}
-        className={cn("flex-1", cancelBtnProps?.className)}
-        onClick={onCancel}
-      >
-        {cancelText ?? "關閉"}
-      </Button>
-      <Button
-        variant="default"
-        {...confirmBtnProps}
-        className={cn("flex-1", confirmBtnProps?.className)}
-        onClick={onConfirm}
-      >
-        {confirmText ?? "確認"}
-      </Button>
+    <div className={cn('w-full', footerClassName)}>
+      <div className={cn('flex w-full gap-4', footerButtonsClassName)}>
+        <Button
+          variant="secondary"
+          {...cancelBtnProps}
+          className={cn('flex-1', cancelBtnProps?.className)}
+          onClick={onCancel}
+        >
+          {cancelText ?? '關閉'}
+        </Button>
+        <Button
+          variant="default"
+          {...confirmBtnProps}
+          className={cn('flex-1', confirmBtnProps?.className)}
+          onClick={onConfirm}
+        >
+          {confirmText ?? '確認'}
+        </Button>
+      </div>
+      {footerDescription && (
+        <p className="text-center text-basic-400">
+          {footerDescription}
+        </p>
+      )}
     </div>
   );
 
@@ -163,8 +177,8 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
         footer={footer}
         {...restDialogProps}
       >
-        <div className={cn("text-center p-4 pb-0", className)}>
-          {typeof content === "function"
+        <div className={cn('p-4 pb-0 text-center', className)}>
+          {typeof content === 'function'
             ? content({ close: handleCloseDialog })
             : content}
         </div>

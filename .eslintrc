@@ -1,0 +1,211 @@
+{
+  "env": {
+    "browser": true,
+    "es2023": true,
+    "node": true
+  },
+  "extends": [
+    "airbnb",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:tailwindcss/recommended",
+    "prettier"
+  ],
+  "ignorePatterns": [
+    "*.config.js",
+    "*.config.ts",
+    ".eslintrc.js",
+    ".next",
+    "dist",
+    "next-sitemap.js",
+    "node_modules",
+    "out",
+    "_pages", // 重構到 app route，忽略 pages route
+    "public",
+    "services/**/*.ts", // @TODO: services 下的 API 檔案將要移除，重構完成後再調整設定檔
+    "next-env.d.ts",
+    "shared/i18n/locales/**/*.d.json.ts", // 忽略 i18n 自動生成的型別檔案
+    "shared/api/openapi-types.ts" // 忽略 openapi-typescript 自動生成的型別檔案
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2023,
+    "project": "./tsconfig.json",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "@next/next",
+    "@typescript-eslint",
+    "import",
+    "react",
+    "react-hooks",
+    "boundaries"
+  ],
+  "rules": {
+    "@typescript-eslint/no-require-imports": "error",
+    "@typescript-eslint/no-shadow": "error",
+    "arrow-body-style": "off",
+    "camelcase": "off",
+    "tailwindcss/classnames-order": "warn",
+    "tailwindcss/no-custom-classname": "off",
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "never"
+      }
+    ],
+    "implicit-arrow-linebreak": "off",
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": ["./*.ts"]
+      }
+    ],
+    "import/prefer-default-export": "off",
+    "max-len": "off",
+    "no-console": "warn",
+    "no-nested-ternary": "off",
+    "no-underscore-dangle": "off",
+    "object-curly-newline": ["error", { "consistent": true }],
+    "operator-linebreak": [
+      "error",
+      "after",
+      {
+        "overrides": {
+          "?": "before",
+          ":": "before"
+        }
+      }
+    ],
+    "quotes": [
+      "error",
+      "single",
+      { "avoidEscape": true, "allowTemplateLiterals": true }
+    ],
+    "react/jsx-filename-extension": [
+      "warn",
+      {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    ],
+    "react/jsx-props-no-spreading": "off",
+    "react/no-unescaped-entities": "off",
+    "react/no-unknown-property": [
+      "error",
+      {
+        "ignore": ["cmdk-empty", "cmdk-input-wrapper"]
+      }
+    ],
+    "react/prop-types": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/require-default-props": "off",
+    "react-hooks/exhaustive-deps": "warn",
+		"boundaries/element-types": [
+			"error",
+			{
+        "default": "disallow",
+				"message": "${file.type} is not allowed to import (${dependency.type})",
+				"rules": [
+					{
+						"from": ["shared"],
+						"allow": ["shared"]
+					},
+					{
+						"from": ["entities"],
+						"allow": [
+              "shared",
+              ["entities", { "entityName": "${from.entityName}" }]
+            ]
+					},
+					{
+						"from": ["features"],
+						"allow": [
+              "shared",
+              "entities",
+              ["features", { "featureName": "${from.featureName}" }]
+            ]
+					},
+					{
+						"from": ["widgets"],
+						"allow": [
+              "shared",
+              "entities",
+              "features",
+              ["widgets", { "widgetName": "${from.widgetName}" }]
+            ]
+					},
+					{
+						"from": ["app"],
+						"allow": [
+              "shared",
+              "entities",
+              "features",
+              "widgets",
+              ["app", { "appName": "${from.appName}" }]
+            ]
+					}
+				]
+			}
+		]
+  },
+  "settings": {
+    "import/resolver": {
+      "alias": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
+        "map": [["@", "."]]
+      },
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    },
+    "boundaries/include": [
+      "app/**/*",
+      "widgets/**/*",
+      "features/**/*",
+      "entities/**/*",
+      "shared/**/*",
+    ],
+    "boundaries/elements": [
+      {
+        "type": "app",
+        "pattern": "app/*"
+      },
+      {
+        "type": "widgets",
+        "pattern": "widgets/*",
+        "capture": ["widgetName"]
+      },
+      {
+        "type": "features", 
+        "pattern": "features/*",
+        "capture": ["featureName"]
+      },
+      {
+        "type": "entities",
+        "pattern": "entities/*",
+        "capture": ["entityName"]
+      },
+      {
+        "type": "shared",
+        "pattern": "shared/*"
+      }
+    ]
+  }
+}

@@ -1,7 +1,7 @@
-import JsonLdFactory from "@/utils/jsonLd";
-import { CircleSchema } from "@/services/circles";
+import JsonLdFactory from '@/shared/lib/jsonLd';
+import type { CircleData } from '@/entities/circle';
 
-export function createCircleJsonLd(result: CircleSchema) {
+export function createCircleJsonLd(result: CircleData) {
   return JsonLdFactory.createEventBuilder()
     .setId(`https://www.daoedu.tw/circles/${result._id}`)
     .setName(result.title)
@@ -10,6 +10,6 @@ export function createCircleJsonLd(result: CircleSchema) {
     .setImage(result.photoURL)
     .setLocation(result.area)
     .setStartDate(result.createdDate)
-    .setEndDate(result.deadline ?? "")
+    .setEndDate(result.deadline ?? '')
     .build();
 }

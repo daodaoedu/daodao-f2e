@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 // 使用設計系統配色
 const getTagColor = (tag: string): string => {
@@ -19,7 +19,7 @@ const getTagColor = (tag: string): string => {
     // 時長標籤
     短期: 'bg-primary-lighter/20 text-primary-base',
     中期: 'bg-basic-200/50 text-basic-400',
-    長期: 'bg-basic-300/30 text-basic-500'
+    長期: 'bg-basic-300/30 text-basic-500',
   };
 
   return tagColors[tag] || 'bg-basic-100 text-basic-400';
@@ -34,7 +34,7 @@ interface TagListProps {
 const TagList: React.FC<TagListProps> = ({
   tags,
   maxDisplay = 5,
-  className = ''
+  className = '',
 }) => {
   if (!tags || tags.length === 0) {
     return null;
@@ -44,14 +44,14 @@ const TagList: React.FC<TagListProps> = ({
   const hasMore = tags.length > maxDisplay;
 
   return (
-    <div className={cn("flex items-center space-x-2", className)}>
+    <div className={cn('flex items-center space-x-2', className)}>
 
       <div className="flex flex-wrap items-center gap-1">
         {displayTags.map((tag) => (
           <span
             key={tag}
             className={cn(
-              "px-2 py-1 rounded-full text-xs font-medium transition-colors",
+              'px-2 py-1 rounded-full text-xs font-medium transition-colors',
               getTagColor(tag)
             )}
           >
@@ -59,8 +59,9 @@ const TagList: React.FC<TagListProps> = ({
           </span>
         ))}
         {hasMore && (
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-basic-100 text-basic-400">
-            +{tags.length - maxDisplay}
+          <span className="rounded-full bg-basic-100 px-2 py-1 text-xs font-medium text-basic-400">
+            +
+            {tags.length - maxDisplay}
           </span>
         )}
       </div>

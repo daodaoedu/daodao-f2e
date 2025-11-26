@@ -1,7 +1,7 @@
 import { mutate } from "swr";
 import { MutationFetcher } from "swr/mutation";
-import { parseToString } from "@/utils/helper";
-import { mutations } from "@/utils/http";
+import { parseToString } from "@/shared/lib/helper";
+import { mutations } from "@/shared/lib/http";
 
 import { ProjectNoteSchema, ProjectNoteFormSchema } from "./schema";
 import { uploadImages } from "../../images";
@@ -18,7 +18,7 @@ export const getProjectNotePathname = ({
   projectId,
   noteId,
 }: GetProjectNotePathnameProps) => {
-  const pathname = `/projects/${parseToString(projectId)}/notes`;
+  const pathname = `/api/v1/projects/${parseToString(projectId)}/notes`;
 
   if (noteId) {
     return `${pathname}/${parseToString(noteId)}`;

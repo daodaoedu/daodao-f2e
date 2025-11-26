@@ -12,6 +12,6 @@ export function usePracticeDataRefresh() {
 
   return {
     refreshAll,
-    refreshPractice
+    refreshPractice,
   };
 }

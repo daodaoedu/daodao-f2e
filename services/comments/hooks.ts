@@ -1,12 +1,13 @@
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
+import { fetcher } from '@/shared/lib/http';
 import commentAPI, { getCommentPathname, CommentSWRKey } from './api';
 import { CommentType, CommentSchema } from './schema';
 
 interface UseCommentListProps {
   targetType: CommentType;
-  targetId: number | string;
+  targetId: string | number;
   disableSearch?: boolean;
 }
 
@@ -17,10 +18,18 @@ export function useComments({
 }: UseCommentListProps) {
   const swrKey: CommentSWRKey = [
     getCommentPathname(),
-    { targetType, targetId },
+    { targetType, targetId: String(targetId) },
   ];
 
-  const swr = useSWR<CommentSchema[]>(disableSearch ? null : swrKey);
+  const swr = useSWR<{ success: boolean; data: CommentSchema[] }>(
+    disableSearch ? null : swrKey,
+    fetcher,
+    {
+      onSuccess: (response) => {
+        console.log('Comments fetched:', response);
+      },
+    }
+  );
 
   const createMutation = useSWRMutation(swrKey, commentAPI.create);
 
@@ -30,6 +39,7 @@ export function useComments({
 
   return {
     ...swr,
+    data: swr.data?.data,
     createMutation,
     updateMutation,
     deleteMutation,

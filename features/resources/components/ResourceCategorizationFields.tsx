@@ -1,32 +1,32 @@
-"use client";
+'use client';
 
-import { useFormContext } from "react-hook-form";
-import { Input } from "@/components/ui/input";
+import { useFormContext } from 'react-hook-form';
+import { Input } from '@/shared/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/shared/ui/select';
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Badge } from "@/components/ui/badge";
-import { ResourceFormSchema } from "@/services/resources/core/schema";
+} from '@/shared/ui/form';
+import { Badge } from '@/shared/ui/badge';
+import { ResourceFormSchema } from '@/services/resources/core/schema';
 import {
   resourceTypeOptions,
   costTypeOptions,
   targetAudienceTypeOptions,
-} from "@/features/resources/constants";
+} from '@/features/resources/constants';
 
 type ResourceCategorizationSchema = Pick<
   ResourceFormSchema,
-  "type" | "level" | "cost" | "majorCategory" | "subCategory" | "tags"
+  'type' | 'level' | 'cost' | 'majorCategory' | 'subCategory' | 'tags'
 >;
 
 export default function ResourceCategorizationFields() {
@@ -37,7 +37,7 @@ export default function ResourceCategorizationFields() {
       <div className="space-y-10">
         <div>
           <FormLabel required>類別</FormLabel>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-6 mb-6">
+          <div className="mb-6 ml-6 grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="majorCategory"
@@ -69,12 +69,16 @@ export default function ResourceCategorizationFields() {
             <FormField
               control={form.control}
               name="subCategory"
-              render={({ field: { ref, onChange, value, ...field } }) => (
+              render={({
+                field: {
+                  ref, onChange, value, ...field
+                },
+              }) => (
                 <FormItem>
                   <FormLabel>子分類</FormLabel>
                   <Select
                     onValueChange={onChange}
-                    disabled={!form.watch("majorCategory")}
+                    disabled={!form.watch('majorCategory')}
                     value={value ?? undefined}
                     {...field}
                   >
@@ -84,24 +88,24 @@ export default function ResourceCategorizationFields() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {form.watch("majorCategory") === "language" && (
-                        <>
-                          <SelectItem value="chinese">中文</SelectItem>
-                          <SelectItem value="english">英文</SelectItem>
-                          <SelectItem value="japanese">日文</SelectItem>
-                          <SelectItem value="other_language">
-                            其他語言
-                          </SelectItem>
-                        </>
+                      {form.watch('majorCategory') === 'language' && (
+                      <>
+                        <SelectItem value="chinese">中文</SelectItem>
+                        <SelectItem value="english">英文</SelectItem>
+                        <SelectItem value="japanese">日文</SelectItem>
+                        <SelectItem value="other_language">
+                          其他語言
+                        </SelectItem>
+                      </>
                       )}
-                      {form.watch("majorCategory") === "comsci" && (
-                        <>
-                          <SelectItem value="programming">程式設計</SelectItem>
-                          <SelectItem value="ai">人工智慧</SelectItem>
-                          <SelectItem value="data_science">資料科學</SelectItem>
-                          <SelectItem value="web_dev">網頁開發</SelectItem>
-                          <SelectItem value="app_dev">應用程式開發</SelectItem>
-                        </>
+                      {form.watch('majorCategory') === 'comsci' && (
+                      <>
+                        <SelectItem value="programming">程式設計</SelectItem>
+                        <SelectItem value="ai">人工智慧</SelectItem>
+                        <SelectItem value="data_science">資料科學</SelectItem>
+                        <SelectItem value="web_dev">網頁開發</SelectItem>
+                        <SelectItem value="app_dev">應用程式開發</SelectItem>
+                      </>
                       )}
                     </SelectContent>
                   </Select>
@@ -143,25 +147,27 @@ export default function ResourceCategorizationFields() {
             <Input placeholder="輸入自訂標籤後按 Enter 新增" />
           </div>
 
-          <div className="flex items-center flex-wrap gap-3 mt-4">
-            <p className="body-md text-basic-500 shrink-0">建議標籤：</p>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <p className="body-md shrink-0 text-basic-500">建議標籤：</p>
             <div className="flex flex-wrap gap-2">
               {[
-                "環保",
-                "監控工具",
-                "生產力工具",
-                "AI工具",
-                "自主學習",
-                "程式設計",
-                "資料科學",
-                "語言學習",
+                '環保',
+                '監控工具',
+                '生產力工具',
+                'AI工具',
+                '自主學習',
+                '程式設計',
+                '資料科學',
+                '語言學習',
               ].map((tag) => (
                 <Badge
                   key={tag}
                   variant="outline"
                   className="cursor-pointer bg-primary-lightest"
                 >
-                  # {tag}
+                  #
+                  {' '}
+                  {tag}
                 </Badge>
               ))}
             </div>

@@ -5,16 +5,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ### Core Development
-- `yarn dev` - Start development server on port 5438
-- `yarn build` - Build production version
-- `yarn start` - Start production server
-- `yarn lint` - Run ESLint and auto-fix issues
-- `yarn ts:check` - Run TypeScript type checking
+- `pnpm dev` - Start development server on port 5438
+- `pnpm build` - Build production version
+- `pnpm start` - Start production server
+- `pnpm lint` - Run ESLint and auto-fix issues
+- `pnpm ts:check` - Run TypeScript type checking
+
+### Code Quality
+- `pnpm format` - Format all code files
+- `pnpm format:check` - Check code formatting
+- `pnpm format:tailwind` - Format Tailwind CSS classes
+
+### API & Types
+- `pnpm generate:api` - Generate API code using Orval
+- `pnpm typegen` - Generate Next.js type definitions
 
 ### Deployment
-- `yarn pages:build` - Build for Cloudflare Pages
-- `yarn preview` - Preview Cloudflare Pages build locally
-- `yarn deploy` - Deploy to Cloudflare Pages
+- `pnpm cf:build` - Build for Cloudflare Pages
+- `pnpm preview` - Preview Cloudflare Pages build locally
+- `pnpm deploy` - Deploy to Cloudflare Pages
+- `pnpm cf:typegen` - Generate Cloudflare type definitions
+
+### Other
+- `pnpm sitemap` - Generate sitemap
 
 ## Architecture Overview
 
@@ -90,7 +103,7 @@ The project uses a layout system in `layout/`:
 ### Important Cursor Rules
 
 **UI Migration Rules (.cursor/rules/ui-migration-rules.mdc):**
-- Never use Material-UI, emotion, dayjs, or react-icons
+- Never use Material-UI, emotion, or react-icons
 - Always use shadcn/ui, Tailwind CSS, date-fns, and Lucide React
 - Use React Hook Form + Zod for all forms
 
@@ -243,8 +256,8 @@ refactor(user): restructure data processing logic
 ### Quality Checks
 Run these commands before committing:
 ```bash
-yarn ts:check    # TypeScript type checking
-yarn lint        # ESLint with auto-fix
+pnpm ts:check    # TypeScript type checking
+pnpm lint        # ESLint with auto-fix
 ```
 
 ### CI/CD Pipeline

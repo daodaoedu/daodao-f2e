@@ -1,11 +1,11 @@
-import React from "react";
-import { format } from "date-fns";
-import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
-import ShellSvg from "@/public/assets/icons/shell.svg";
+import React from 'react';
+import { format } from 'date-fns';
+import { ResourceDetailResponseSchema } from '@/services/resources/core/schema';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
+import ShellSvg from '@/public/assets/icons/shell.svg';
 
 interface ResourceIntroductionProps {
-  resource: ResourceDetailResponseSchema["data"];
+  resource: ResourceDetailResponseSchema['data'];
 }
 
 export default function ResourceIntroduction({
@@ -17,7 +17,7 @@ export default function ResourceIntroduction({
       {resource.videoUrl && (
         <div className="aspect-[1120/633]">
           <iframe
-            className="w-full h-full rounded-lg"
+            className="size-full rounded-lg"
             width="560"
             height="315"
             src={resource.videoUrl}
@@ -30,7 +30,7 @@ export default function ResourceIntroduction({
           />
         </div>
       )}
-      <div className="flex justify-end items-center gap-4">
+      <div className="flex items-center justify-end gap-4">
         <div className="flex items-center gap-1">
           <ShellSvg />
           <span>{resource.favoriteCount}</span>
@@ -38,7 +38,7 @@ export default function ResourceIntroduction({
         <time>
           {format(
             new Date(resource.updatedAt ?? resource.createdAt),
-            "yyyy/MM/dd"
+            'yyyy/MM/dd'
           )}
         </time>
       </div>

@@ -7,13 +7,13 @@ concurrency:
 on:
   push:
     branches:
-      - "prod"
-      - "dev"
+      - 'prod'
+      - 'dev'
 
   pull_request:
     branches:
-      - "**"
-      - "!prod"
+      - '**'
+      - '!prod'
     types:
       - opened
       - synchronize
@@ -22,9 +22,18 @@ on:
   workflow_dispatch:
 
 env:
-  BRANCH_NAME: ${{ github.ref_name }}
-  PROD_URL: "https://www.daoedu.tw/"
   HUSKY: 0
+
+  # Cloudflare Workers URL 配置
+  PROD_URL: 'https://v2.daoedu.tw/'
+  DEV_URL: 'https://staging-daodao-f2e.daoedu.workers.dev'
+  PREVIEW_URL_PREFIX: 'https://preview-'
+  PREVIEW_URL_SUFFIX: '-daodao-f2e.daoedu.workers.dev'
+
+  # Cloudflare 部署配置
+  PROD_DEPLOY_CMD: 'deploy'
+  DEV_DEPLOY_CMD: 'versions upload --preview-alias staging'
+  PREVIEW_DEPLOY_CMD_PREFIX: 'versions upload --preview-alias '
 
 jobs:
   continuous_integration:
@@ -43,62 +52,145 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v4
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: |
-            node_modules
-            ~/.cache/Cypress
-          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        run: pnpm install
 
       - name: Build
         id: build
         continue-on-error: true
-        run: yarn pages:build
+        run: pnpm cf:build
         env:
           NEXT_PUBLIC_API_URL: ${{ github.ref_name == 'prod' && secrets.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL_DEV }}
+          NEXT_PUBLIC_ENVIRONMENT: ${{ github.ref_name == 'prod' && 'production' || (github.ref_name == 'dev' && 'staging' || 'preview') }}
 
+      # 設定部署命令和環境
+      - name: Set deployment command and environment
+        id: set-command
+        run: |
+          if [[ "${{ github.ref_name }}" == "prod" ]]; then
+            echo "command=${{ env.PROD_DEPLOY_CMD }}" >> $GITHUB_OUTPUT
+            echo "environment=production" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" == "dev" ]]; then
+            echo "command=${{ env.DEV_DEPLOY_CMD }}" >> $GITHUB_OUTPUT
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          else
+            # 處理 PR 或其他分支的預覽部署
+            ALIAS="preview-${{ github.event.pull_request.number }}"
+            echo "command=${{ env.PREVIEW_DEPLOY_CMD_PREFIX }}$ALIAS" >> $GITHUB_OUTPUT
+            echo "environment=preview" >> $GITHUB_OUTPUT
+          fi
+
+      # 檢查是否有必要的 Cloudflare 部署密鑰
+      - name: Check for Cloudflare secrets
+        id: check-secrets
+        env:
+          HAS_CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+          HAS_CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
+          HAS_GH_TOKEN: ${{ secrets.GITHUB_TOKEN != '' }}
+          HAS_CF_TOKEN_SO: ${{ secrets.CLOUDFLARE_API_TOKEN_FOR_SO != '' }}
+          HAS_CF_ACCOUNT_SO: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_FOR_SO != '' }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: |
+          # 檢查一般部署所需的密鑰
+          if [[ "$HAS_CF_TOKEN" == "true" && "$HAS_CF_ACCOUNT" == "true" && "$HAS_GH_TOKEN" == "true" ]]; then
+            echo "has_secrets=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_secrets=false" >> $GITHUB_OUTPUT
+            echo "⚠️ 缺少 Cloudflare 部署所需的密鑰，跳過部署步驟"
+          fi
+
+          # 檢查正式環境特殊部署所需的密鑰
+          if [[ "$GITHUB_REF_NAME" == "prod" && "$HAS_CF_TOKEN_SO" == "true" && "$HAS_CF_ACCOUNT_SO" == "true" ]]; then
+            echo "has_so_secrets=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_so_secrets=false" >> $GITHUB_OUTPUT
+          fi
+
+      # 部署到 Cloudflare
       - name: Deploy to Cloudflare
-        if: ${{ env.HAS_SECRETS == 'true' && steps.build.outcome == 'success' }}
+        if: steps.build.outcome == 'success' && steps.check-secrets.outputs.has_secrets == 'true'
         id: deploy
         continue-on-error: true
-        uses: cloudflare/wrangler-action@v3
-        env:
-          HAS_SECRETS: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' && secrets.GITHUB_TOKEN != '' }}
+        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          command: pages deploy --branch=${{ env.BRANCH_NAME }}
+          packageManager: pnpm
+          command: ${{ steps.set-command.outputs.command }}
 
+      # 部署到 SO 正式環境 Cloudflare (僅限 prod 分支)
+      - name: Deploy to Production Cloudflare with SO Secrets
+        if: github.ref_name == 'prod' && steps.build.outcome == 'success' && steps.check-secrets.outputs.has_so_secrets == 'true'
+        id: deploy-so
+        continue-on-error: true
+        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN_FOR_SO }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_FOR_SO }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          packageManager: pnpm
+          command: ${{ steps.set-command.outputs.command }}
+
+      # 處理構建或部署失敗的情況
+      - name: Handle build or deploy failure
+        if: steps.build.outcome == 'failure' || steps.deploy.outcome == 'failure'
+        id: handle-failure
+        run: |
+          echo "❌ Build and Deploy Failed"
+
+          # 確定失敗原因
+          if [[ "${{ steps.build.outcome }}" == "failure" ]]; then
+            echo "failure_reason=構建失敗，請檢查構建日誌" >> $GITHUB_OUTPUT
+          else
+            echo "failure_reason=${{ steps.deploy.outputs.command-stderr }}" >> $GITHUB_OUTPUT
+          fi
+
+          # 輸出錯誤信息到控制台
+          echo "${{ steps.deploy.outputs.command-stderr }}"
+
+      # 發送失敗通知
       - name: Send Build and Deploy Failed Notification
-        if: (steps.build.outcome == 'failure' || steps.deploy.outcome == 'failure')
+        if: steps.build.outcome == 'failure' || steps.deploy.outcome == 'failure'
         uses: ./.github/actions/notification
         with:
           TYPE: failure
-          TITLE: "❌ Build and Deploy Failed"
-          DESCRIPTION: "${{ steps.deploy.outputs.command-stderr }}"
+          TITLE: '❌ Build and Deploy Failed'
+          DESCRIPTION: '${{ steps.handle-failure.outputs.failure_reason }}'
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
-      - name: Check on failure
+      # 如果失敗則退出工作流程
+      - name: Exit workflow on failure
         if: steps.build.outcome == 'failure' || steps.deploy.outcome == 'failure'
-        env:
-          ERROR: ${{ steps.deploy.outputs.command-stderr }}
+        run: exit 1
+
+      - name: Get Deployment URL
+        if: steps.deploy.outcome == 'success'
+        id: get-url
         run: |
-          echo "❌ Build and Deploy Failed"
-          echo $ERROR
-          exit 1
+          if [[ "${{ github.ref_name }}" == "prod" ]]; then
+            echo "deploy_url=${{ env.PROD_URL }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" == "dev" ]]; then
+            echo "deploy_url=${{ env.DEV_URL }}" >> $GITHUB_OUTPUT
+          else
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+            echo "deploy_url=${{ env.PREVIEW_URL_PREFIX }}$PR_NUMBER${{ env.PREVIEW_URL_SUFFIX }}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Send Build Succeeded Notification
         if: steps.deploy.outcome == 'success'
         uses: ./.github/actions/notification
         with:
           TYPE: success
-          TITLE: "✅ Build Succeeded"
-          DESCRIPTION: "Preview URL: ${{ github.ref_name == 'prod' && env.PROD_URL || steps.deploy.outputs.pages-deployment-alias-url }}"
+          TITLE: '✅ Build Succeeded (${{ steps.set-command.outputs.environment }})'
+          DESCRIPTION: 'Preview URL: ${{ steps.get-url.outputs.deploy_url }}'
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}

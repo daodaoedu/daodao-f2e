@@ -1,2 +1,2 @@
-yarn lint
-yarn ts:check
+pnpm lint
+pnpm ts:check

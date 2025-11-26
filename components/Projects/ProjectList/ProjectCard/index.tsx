@@ -1,6 +1,6 @@
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { Project as ProjectType } from '@/components/Projects/Project/type';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import ProjectUserInfoBar from './ProjectUserInfoBar';
 import ProjectHeader from './ProjectHeader';
 
@@ -13,27 +13,27 @@ const ProjectCard = ({ project, path }: ProjectCardProps) => {
   const pathroute = path === '/admin' ? '/admin/projects/detail' : '/projects/detail';
 
   return (
-    <Link
+    <CustomLink
       href={`${pathroute}?id=${project.id}`}
       className={cn(
-        "p-4 md:py-8 md:px-10 flex flex-col gap-5 justify-start items-start",
-        "border-[#EDF0F7] border-solid border-b-[1px]"
+        'p-4 md:py-8 md:px-10 flex flex-col gap-5 justify-start items-start',
+        'border-[#EDF0F7] border-solid border-b-[1px]'
       )}
       data-projectid={project.id}
     >
-      <div className="w-full flex flex-col gap-1 justify-start items-start md:flex-row md:justify-between md:items-center">
+      <div className="flex w-full flex-col items-start justify-start gap-1 md:flex-row md:items-center md:justify-between">
         <ProjectHeader project={project} />
       </div>
       <div>
         <p
           className="
       whitespace-pre-wrap
-      text-base text-basic-300 font-sans leading-[1.4]"
+      font-sans text-base leading-[1.4] text-basic-300"
         >
           {project.description}
         </p>
       </div>
-      <div className="w-full flex flex-col gap-2 md:flex-row align-center justify-between">
+      <div className="align-center flex w-full flex-col justify-between gap-2 md:flex-row">
         <ProjectUserInfoBar user={project.user} />
         {/* <ProjectStatus
           status={{
@@ -43,7 +43,7 @@ const ProjectCard = ({ project, path }: ProjectCardProps) => {
           }}
         /> */}
       </div>
-    </Link>
+    </CustomLink>
   );
 };
 export default ProjectCard;

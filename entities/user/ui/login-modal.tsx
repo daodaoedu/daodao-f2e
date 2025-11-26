@@ -1,0 +1,74 @@
+'use client';
+
+import { usePathname, useRouter } from '@/shared/i18n/navigation';
+import { CustomLink } from '@/shared/ui/custom-link';
+import { Image } from '@/shared/ui/image';
+import { Button } from '@/shared/ui/button';
+import { useAuth, useAuthActions } from '@/entities/user';
+import ResponsiveModal from '@/shared/ui/responsive-modal';
+import getEnv from '@/shared/config/env';
+
+export function LoginModal() {
+  const { isOpenLoginModal } = useAuth();
+  const { closeLoginModal } = useAuthActions();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleOpenLoginWindow = () => {
+    const env = getEnv();
+
+    const url = env.isProduction
+      ? `/api/auth/google?rt=${pathname}`
+      : `${env.stagingURL}/api/auth/google?origin=${window.location.origin}&rt=${pathname}`;
+
+    router.push(url);
+  };
+
+  return (
+    <ResponsiveModal
+      open={isOpenLoginModal}
+      onClose={closeLoginModal}
+      title="歡迎回來島島阿學！"
+    >
+      <div className="mx-auto w-max">
+        <div className="relative overflow-hidden rounded-lg bg-gray-100">
+          <Image
+            src="https://imgur.com/EADd1UD.png"
+            alt="login"
+            width={300}
+            height={233}
+            className="object-cover"
+          />
+        </div>
+      </div>
+      <div className="p-4">
+        <Button
+          type="button"
+          className="w-full"
+          size="lg"
+          onClick={handleOpenLoginWindow}
+        >
+          Google 登入 / 註冊
+        </Button>
+        <div className="mt-4 text-balance text-center text-sm text-basic-400">
+          註冊即代表您同意島島阿學的
+          <CustomLink
+            href="/terms/privacy-policy"
+            target="_blank"
+            className="px-1 text-primary-base underline"
+          >
+            服務條款
+          </CustomLink>
+          與
+          <CustomLink
+            href="/terms/privacy-policy"
+            target="_blank"
+            className="px-1 text-primary-base underline"
+          >
+            隱私權政策
+          </CustomLink>
+        </div>
+      </div>
+    </ResponsiveModal>
+  );
+}

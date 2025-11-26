@@ -1,58 +1,37 @@
-import { useState } from 'react';
-import IconButton from '@mui/material/IconButton';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
+import { Button } from '@/shared/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/ui/dropdown-menu';
+import { EllipsisVertical } from 'lucide-react';
 
 interface MoreProps {
   projectId: string;
 }
 export default function More({ projectId }: MoreProps) {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
-  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   return (
-    <div className="relative">
-      <IconButton
-        size="small"
-        classes={{ root: 'block p-0 absolute top-0 right-0' }}
-        onClick={handleMenu}
-      >
-        <MoreVertOutlinedIcon />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        sx={{ mt: 4 }}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        keepMounted
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-        disableScrollLock
-      >
-        <MenuItem
-          component="a"
-          href={`/manage/projects/detail?id=${projectId}`}
-          target="_blank"
-          sx={{ minWidth: '146px' }}
-          onClick={handleClose}
-        >
-          計畫檔案
-        </MenuItem>
-      </Menu>
+    <div className="absolute right-0 top-0">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="p-0">
+            <EllipsisVertical />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="mt-4">
+          <DropdownMenuItem asChild>
+            <a
+              href={`/projects/detail?id=${projectId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="min-w-[146px]"
+            >
+              計畫檔案
+            </a>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }

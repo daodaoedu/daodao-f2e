@@ -1,5 +1,5 @@
 import { Project } from '@/components/Projects/Project/type';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/ui/button';
 import { Pencil } from 'lucide-react';
 import {
   Panel,
@@ -20,12 +20,12 @@ interface ViewModeProps {
 const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
   const handleOnClickEdit = onClick;
   return (
-    <div className="flex flex-col gap-6 md:gap-4 md:relative max-w-full">
+    <div className="flex max-w-full flex-col gap-6 md:relative md:gap-4">
 
       {
         isLgScreen &&
         (
-          <div className="absolute right-0 -top-[60px]">
+          <div className="absolute -top-[60px] right-0">
             <Button
               variant="outline"
               className="py-[5px]"
@@ -40,7 +40,7 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
 
       <Panel className=" bg-white">
         <Title title="計畫簡述" />
-        <Description description={project?.description || ""} />
+        <Description description={project?.description || ''} />
         <Divider />
         <Title title="學習動機" />
         {
@@ -48,13 +48,13 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
             <Tags category="motivation_tags" tags={project?.motivation} />
           )
         }
-        <Description description={project?.motivationDescription || ""} />
+        <Description description={project?.motivationDescription || ''} />
         <Divider />
         <Title title="學習目標" />
-        <Description description={project?.goal || ""} />
+        <Description description={project?.goal || ''} />
         <Divider />
         <Title title="學習內容" />
-        <Description description={project?.content || ""} />
+        <Description description={project?.content || ''} />
         <Divider />
         <Title title="學習方法與策略" />
         {
@@ -62,14 +62,14 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
             <Tags category="strategy_tags" tags={project?.strategy} />
           )
         }
-        <Description description={project?.strategyDescription || ""} />
+        <Description description={project?.strategyDescription || ''} />
         {
           project?.resourceName && (
             <>
               <Divider />
               <Title title="學習資源" />
               <div className="flex flex-col gap-2">
-                <FakeInput value={project.resourceName || ""} />
+                <FakeInput value={project.resourceName || ''} />
               </div>
             </>
           )
@@ -77,13 +77,13 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
       </Panel>
 
       <Panel className="bg-white">
-        <h3 className="body-md font-medium mb-5">學習成果及呈現方式 *</h3>
+        <h3 className="body-md mb-5 font-medium">學習成果及呈現方式 *</h3>
         {
           Array.isArray(project?.outcome) && project?.outcome?.length > 0 && (
             <Tags category="outcome_tags" tags={project?.outcome} />
           )
         }
-        <Description description={project?.outcomeDescription || ""} />
+        <Description description={project?.outcomeDescription || ''} />
         <Divider />
         <FakeCheckBox
           isChecked={project?.isPublic}
@@ -95,7 +95,7 @@ const ViewMode = ({ project, isLgScreen, onClick }: ViewModeProps) => {
         !isLgScreen && (
           <Button
             variant="outline"
-            className="w-full max-w-[272px] py-[5px] justify-center mx-auto"
+            className="mx-auto w-full max-w-[272px] justify-center py-[5px]"
             onClick={handleOnClickEdit}
           >
             <Pencil />

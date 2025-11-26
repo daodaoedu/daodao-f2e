@@ -1,31 +1,30 @@
-import Link from "next/link";
-import Image from "@/shared/components/Image";
-import { format } from "date-fns";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Hot from "@/public/assets/icons/hot.svg";
-import Group from "@/public/assets/icons/group.svg";
-import View from "@/public/assets/icons/view.svg";
-import Comment from "@/public/assets/icons/comment.svg";
-import DefaultAvatar from "@/public/assets/icons/default-avatar.svg";
-import More from "@/public/assets/icons/more.svg";
-import dayjs from "dayjs";
-import { cn } from "@/utils/cn";
+import { CustomLink } from '@/shared/ui/custom-link';
+import { Image } from '@/shared/ui/image';
+import { format, isWithinInterval, subMonths } from 'date-fns';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+import Hot from '@/public/assets/icons/hot.svg';
+import Group from '@/public/assets/icons/group.svg';
+import View from '@/public/assets/icons/view.svg';
+import Comment from '@/public/assets/icons/comment.svg';
+import DefaultAvatar from '@/public/assets/icons/default-avatar.svg';
+import More from '@/public/assets/icons/more.svg';
+import { cn } from '@/shared/lib/cn';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { targetAudienceTypeMap } from "../constants";
+} from '@/shared/ui/dropdown-menu';
+import { Button } from '@/shared/ui/button';
+import { Skeleton } from '@/shared/ui/skeleton';
+import { targetAudienceTypeMap } from '../constants';
 
 export function ResourceCardSkeleton() {
   return (
-    <div className="group flex flex-col rounded-lg gap-2 md:flex-row md:gap-4 transition-[transform,box-shadow] hover:scale-[1.01] hover:shadow-lg">
-      <div className="relative md:basis-80 aspect-[320/241]">
-        <div className="p-2 relative h-full overflow-hidden rounded-lg">
-          <Skeleton className="w-full h-full" />
+    <div className="group flex flex-col gap-2 rounded-lg transition-[transform,box-shadow] hover:scale-[1.01] hover:shadow-lg md:flex-row md:gap-4">
+      <div className="relative aspect-[320/241] md:basis-80">
+        <div className="relative h-full overflow-hidden rounded-lg p-2">
+          <Skeleton className="size-full" />
         </div>
       </div>
       <div className="flex flex-col gap-2 p-2 md:w-[calc(100%-20rem)]">
@@ -60,100 +59,94 @@ export default function ResourceCard(props: CardProps) {
     userName,
     userAvatar,
     time,
-    title = "",
-    content = "",
-    coverImageUrl = "",
+    title = '',
+    content = '',
+    coverImageUrl = '',
     tags = [],
     label = [],
-    level = "初級",
-    viewCount = "尚未計算",
+    level = '初級',
+    viewCount = '尚未計算',
     commentCount = 12,
   } = props;
 
-  const isNewResource = dayjs(time).isBetween(
-    dayjs().subtract(1, "month"),
-    dayjs()
-  );
+  const isNewResource = time ? isWithinInterval(new Date(time), {
+    start: subMonths(new Date(), 1),
+    end: new Date(),
+  }) : false;
 
-  const labels = isNewResource ? ["近期新增", ...label] : label;
+  const labels = isNewResource ? ['近期新增', ...label] : label;
 
   return (
-    <Link
+    <CustomLink
       href={`/resource/${id}`}
-      className="group flex flex-col rounded-lg gap-2 md:flex-row md:gap-4 transition-[transform,box-shadow] hover:scale-[1.01] hover:shadow-lg"
+      className="group flex flex-col gap-2 rounded-lg transition-[transform,box-shadow] hover:scale-[1.01] hover:shadow-lg md:flex-row md:gap-4"
     >
       {/* Card Image */}
-      <div className="relative md:basis-80 aspect-[320/241]">
-        <div className="p-2 relative h-full overflow-hidden rounded-lg">
+      <div className="relative aspect-[320/241] md:basis-80">
+        <div className="relative h-full overflow-hidden rounded-lg p-2">
           <Image
             src={coverImageUrl}
             alt={title}
-            borderRadius="0.5rem"
-            height="100%"
-            className="object-cover"
-            wrapperClassName="!block"
+            fill
+            className="rounded-lg object-cover"
           />
         </div>
 
         {/* Card Image Label */}
-        <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-          {labels.map((_label) => {
-            return (
-              <div
-                key={_label}
-                className="bg-tips text-base leading-[1.5rem] text-white rounded-lg h-8 flex items-center gap-1 px-1"
-              >
-                <Hot />
-                {_label}
-              </div>
-            );
-          })}
+        <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+          {labels.map((_label) => (
+            <div
+              key={_label}
+              className="flex h-8 items-center gap-1 rounded-lg bg-tips px-1 text-base leading-6 text-white"
+            >
+              <Hot />
+              {_label}
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Card Content */}
       <section className="flex flex-col gap-2 p-2 md:w-[calc(100%-20rem)]">
         {/* Card Info */}
-        <div className="flex justify-between items-center h-9">
-          <div className="flex items-center body-md text-basic-500">
+        <div className="flex h-9 items-center justify-between">
+          <div className="body-md flex items-center text-basic-500">
             <Avatar>
-              <AvatarImage src={userAvatar ?? ""} />
+              <AvatarImage src={userAvatar ?? ''} />
               <AvatarFallback>
                 <DefaultAvatar />
               </AvatarFallback>
             </Avatar>
-            <div className="font-bold mr-1 ml-[0.5rem]">{userName}</div>
+            <div className="ml-2 mr-1 font-bold">{userName}</div>
           </div>
         </div>
 
-        <div className="group-hover:text-primary-base heading-sm text-basic-black truncate">
+        <div className="heading-sm truncate text-basic-black group-hover:text-primary-base">
           {title}
         </div>
 
         {/* Card Tags */}
-        <div className="flex gap-1 flex-wrap">
-          {tags.map((tag) => {
-            return (
-              <div
-                key={tag}
-                className={cn(
-                  "px-3 py-0.5 text-primary-base flex items-center justify-center text-nowrap",
-                  "rounded-2xl bg-white border border-solid border-primary-base"
-                )}
-              >
-                <span className="font-bold">#</span>
-                {tag}
-              </div>
-            );
-          })}
+        <div className="flex flex-wrap gap-1">
+          {tags.map((tag) => (
+            <div
+              key={tag}
+              className={cn(
+                'px-3 py-0.5 text-primary-base flex items-center justify-center text-nowrap',
+                'rounded-2xl bg-white border border-solid border-primary-base'
+              )}
+            >
+              <span className="font-bold">#</span>
+              {tag}
+            </div>
+          ))}
         </div>
 
         <div className="body-lg line-clamp-2 md:line-clamp-3">{content}</div>
 
         {/* Card bottom */}
-        <div className="mt-auto body-md flex gap-2 flex-col flex-wrap md:flex-row md:items-center md:justify-between">
+        <div className="body-md mt-auto flex flex-col flex-wrap gap-2 md:flex-row md:items-center md:justify-between">
           <div className="flex">
-            <div className="flex mr-2 border-r border-solid border-basic-200">
+            <div className="mr-2 flex border-r border-solid border-basic-200">
               <Group />
               <div className="ml-2 mr-1">適合</div>
             </div>
@@ -162,7 +155,7 @@ export default function ResourceCard(props: CardProps) {
             </span>
           </div>
 
-          <div className="flex items-center justify-between md:justify-center gap-3 body-md">
+          <div className="body-md flex items-center justify-between gap-3 md:justify-center">
             <div className="flex items-center justify-center gap-3">
               <div className="flex items-center justify-center gap-1">
                 <View />
@@ -172,7 +165,7 @@ export default function ResourceCard(props: CardProps) {
                 <Comment />
                 <div>{commentCount}</div>
               </div>
-              <div>{time ? format(time, "yyyy/MM/dd") : ""}</div>
+              <div>{time ? format(time, 'yyyy/MM/dd') : ''}</div>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -182,20 +175,20 @@ export default function ResourceCard(props: CardProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem asChild>
-                  <Link
+                  <CustomLink
                     href="https://forms.gle/NkVbDWC3eXk4P4gv7"
                     target="_blank"
                     className="block p-2"
                     onClick={(e) => e.stopPropagation()}
                   >
                     檢舉
-                  </Link>
+                  </CustomLink>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
       </section>
-    </Link>
+    </CustomLink>
   );
 }

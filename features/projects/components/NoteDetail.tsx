@@ -1,14 +1,15 @@
-import Image from "@/shared/components/Image";
-import PostDetailCard from "@/shared/components/Post/PostDetailCard";
-import { ProjectNoteSchema } from "@/services/projects";
-import { BaseUserSchema } from "@/services/users";
-import { CommentType } from "@/services/comments";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
+import { Image } from '@/shared/ui/image';
+import { PostDetailCard } from '@/entities/post';
+import { ProjectNoteSchema } from '@/services/projects';
+import { BaseUserSchema } from '@/services/users';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
+import { useAuth } from '@/entities/user';
 
 interface NoteDetailProps {
   data?: ProjectNoteSchema;
   authorUser?: BaseUserSchema;
   className?: string;
+  commentSection?: React.ReactNode;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
 }
@@ -17,20 +18,25 @@ function NoteDetail({
   data,
   authorUser,
   className,
+  commentSection,
   onEditClick,
   onDeleteClick,
 }: NoteDetailProps) {
+  const { user } = useAuth();
+  const isOwner = user?.id === authorUser?.id;
+
   return (
     <PostDetailCard
       data={data}
-      targetType={CommentType.Note}
+      commentSection={commentSection}
       authorUser={authorUser}
       className={className}
       tag="便利貼"
+      isOwner={isOwner}
       onEditClick={onEditClick}
       onDeleteClick={onDeleteClick}
       renderContent={(noteData) => (
-        <div className="mb-4 body-sm text-basic-500">
+        <div className="body-sm mb-4 text-basic-500">
           <MarkdownEditor className="mb-3" readOnly value={noteData.content} />
           {Array.isArray(noteData.imgUrls) &&
             noteData.imgUrls.map((imgUrl) => (
@@ -38,7 +44,8 @@ function NoteDetail({
                 key={imgUrl}
                 src={imgUrl}
                 alt={noteData.title}
-                height="300px"
+                width={400}
+                height={300}
                 className="object-contain"
               />
             ))}

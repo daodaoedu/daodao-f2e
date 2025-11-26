@@ -1,8 +1,8 @@
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { CustomLink } from '@/shared/ui/custom-link';
+import { usePathname } from '@/shared/i18n/navigation';
 import { ICategory } from '@/constants/category';
-import Image from '@/shared/components/Image';
-import { cn } from '@/utils/cn';
+import { Image } from '@/shared/ui/image';
+import { cn } from '@/shared/lib/cn';
 
 type CategoryCardProps = {
   category: ICategory;
@@ -21,7 +21,7 @@ export default function CategoryCard(props: CategoryCardProps) {
     : CATEGORIES_BASE_PATH;
 
   return (
-    <Link
+    <CustomLink
       key={value}
       href={`${currentPath}/${value}`}
       className={cn(
@@ -29,13 +29,14 @@ export default function CategoryCard(props: CategoryCardProps) {
         size === 'md' && 'md:h-[6.25rem]'
       )}
     >
-      <Image
-        src={image ?? ''}
-        alt={label}
-        borderRadius="0.5rem"
-        height="inherit"
-        className="group-hover:scale-110 transition-transform"
-      />
+      <div className="relative h-full w-full">
+        <Image
+          src={image ?? ''}
+          alt={label}
+          fill
+          className="rounded-lg object-cover transition-transform group-hover:scale-110"
+        />
+      </div>
       <div
         className={cn(
           'absolute inset-0 w-full p-2 bg-primary-base/50',
@@ -45,6 +46,6 @@ export default function CategoryCard(props: CategoryCardProps) {
       >
         {label}
       </div>
-    </Link>
+    </CustomLink>
   );
 }

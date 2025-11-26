@@ -19,5 +19,5 @@ export type {
   CreatePracticeInput,
   UpdatePracticeInput,
   CheckInInput,
-  CheckInRecord
+  CheckInRecord,
 } from '@/services/practice/schema';

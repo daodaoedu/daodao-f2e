@@ -25,11 +25,15 @@ interface FileUploadService {
 const mockFileUploadService: FileUploadService = {
   uploadImages: async (files: File[]) => {
     // TODO: 實作真實的圖片上傳
-    return files.map((file, index) => `https://mock.example.com/images/${Date.now()}_${index}_${file.name}`);
+    return files.map(
+      (file, index) => `https://mock.example.com/images/${Date.now()}_${index}_${file.name}`
+    );
   },
   uploadVideos: async (files: File[]) => {
     // TODO: 實作真實的影片上傳
-    return files.map((file, index) => `https://mock.example.com/videos/${Date.now()}_${index}_${file.name}`);
+    return files.map(
+      (file, index) => `https://mock.example.com/videos/${Date.now()}_${index}_${file.name}`
+    );
   },
 };
 
@@ -47,57 +51,67 @@ export function useIdeaSubmission(options?: {
 
   const fileService = options?.fileUploadService || mockFileUploadService;
 
-  const submit = useCallback(async (formData: CreateIdeaFormSchema): Promise<IdeaSchema> => {
-    setIsSubmitting(true);
-    setUploadProgress(0);
-
-    try {
-      let imageUrls: string[] = [];
-      let videoUrls: string[] = [];
-
-      // 如果有文件需要上傳，先上傳文件
-      if (hasFilesToUpload(formData)) {
-        const { imageFiles, videoFiles } = getFilesToUpload(formData);
-
-        setUploadProgress(25);
-
-        // 並行上傳圖片和影片
-        const [uploadedImageUrls, uploadedVideoUrls] = await Promise.all([
-          imageFiles.length > 0 ? fileService.uploadImages(imageFiles) : Promise.resolve([]),
-          videoFiles.length > 0 ? fileService.uploadVideos(videoFiles) : Promise.resolve([]),
-        ]);
-
-        imageUrls = uploadedImageUrls;
-        videoUrls = uploadedVideoUrls;
-
-        setUploadProgress(75);
-      }
-
-      // 轉換為 API 請求格式
-      const requestData = formToCreateApiRequest(formData, imageUrls, videoUrls);
-
-      setUploadProgress(90);
-
-      // 發送 API 請求
-      const response = await ideaAPI.create(requestData);
-
-      setUploadProgress(100);
-
-      if (response.success && response.data) {
-        options?.onSuccess?.(response.data);
-        return response.data;
-      } else {
-        throw new Error('創建想法失敗');
-      }
-    } catch (error) {
-      const errorInstance = error instanceof Error ? error : new Error('提交失敗');
-      options?.onError?.(errorInstance);
-      throw errorInstance;
-    } finally {
-      setIsSubmitting(false);
+  const submit = useCallback(
+    async (formData: CreateIdeaFormSchema): Promise<IdeaSchema> => {
+      setIsSubmitting(true);
       setUploadProgress(0);
-    }
-  }, [options, fileService]);
+
+      try {
+        let imageUrls: string[] = [];
+        let videoUrls: string[] = [];
+
+        // 如果有文件需要上傳，先上傳文件
+        if (hasFilesToUpload(formData)) {
+          const { imageFiles, videoFiles } = getFilesToUpload(formData);
+
+          setUploadProgress(25);
+
+          // 並行上傳圖片和影片
+          const [uploadedImageUrls, uploadedVideoUrls] = await Promise.all([
+            imageFiles.length > 0
+              ? fileService.uploadImages(imageFiles)
+              : Promise.resolve([]),
+            videoFiles.length > 0
+              ? fileService.uploadVideos(videoFiles)
+              : Promise.resolve([]),
+          ]);
+
+          imageUrls = uploadedImageUrls;
+          videoUrls = uploadedVideoUrls;
+
+          setUploadProgress(75);
+        }
+
+        // 轉換為 API 請求格式
+        const requestData = formToCreateApiRequest(
+          formData,
+          imageUrls,
+          videoUrls
+        );
+
+        setUploadProgress(90);
+
+        // 發送 API 請求
+        const response = await ideaAPI.create(requestData);
+
+        setUploadProgress(100);
+
+        if (response.success && response.data) {
+          options?.onSuccess?.(response.data);
+          return response.data;
+        }
+        throw new Error('創建想法失敗');
+      } catch (error) {
+        const errorInstance = error instanceof Error ? error : new Error('提交失敗');
+        options?.onError?.(errorInstance);
+        throw errorInstance;
+      } finally {
+        setIsSubmitting(false);
+        setUploadProgress(0);
+      }
+    },
+    [options, fileService]
+  );
 
   return {
     submit,
@@ -120,57 +134,67 @@ export function useIdeaUpdateSubmission(options?: {
 
   const fileService = options?.fileUploadService || mockFileUploadService;
 
-  const submit = useCallback(async (formData: UpdateIdeaFormSchema): Promise<IdeaSchema> => {
-    setIsSubmitting(true);
-    setUploadProgress(0);
-
-    try {
-      let imageUrls: string[] = [];
-      let videoUrls: string[] = [];
-
-      // 如果有新文件需要上傳，先上傳文件
-      if (hasFilesToUpload(formData)) {
-        const { imageFiles, videoFiles } = getFilesToUpload(formData);
-
-        setUploadProgress(25);
-
-        // 並行上傳圖片和影片
-        const [uploadedImageUrls, uploadedVideoUrls] = await Promise.all([
-          imageFiles.length > 0 ? fileService.uploadImages(imageFiles) : Promise.resolve([]),
-          videoFiles.length > 0 ? fileService.uploadVideos(videoFiles) : Promise.resolve([]),
-        ]);
-
-        imageUrls = uploadedImageUrls;
-        videoUrls = uploadedVideoUrls;
-
-        setUploadProgress(75);
-      }
-
-      // 轉換為 API 請求格式
-      const requestData = formToUpdateApiRequest(formData, imageUrls, videoUrls);
-
-      setUploadProgress(90);
-
-      // 發送 API 請求
-      const response = await ideaAPI.update(requestData);
-
-      setUploadProgress(100);
-
-      if (response.success && response.data) {
-        options?.onSuccess?.(response.data);
-        return response.data;
-      } else {
-        throw new Error('更新想法失敗');
-      }
-    } catch (error) {
-      const errorInstance = error instanceof Error ? error : new Error('更新失敗');
-      options?.onError?.(errorInstance);
-      throw errorInstance;
-    } finally {
-      setIsSubmitting(false);
+  const submit = useCallback(
+    async (formData: UpdateIdeaFormSchema): Promise<IdeaSchema> => {
+      setIsSubmitting(true);
       setUploadProgress(0);
-    }
-  }, [options, fileService]);
+
+      try {
+        let imageUrls: string[] = [];
+        let videoUrls: string[] = [];
+
+        // 如果有新文件需要上傳，先上傳文件
+        if (hasFilesToUpload(formData)) {
+          const { imageFiles, videoFiles } = getFilesToUpload(formData);
+
+          setUploadProgress(25);
+
+          // 並行上傳圖片和影片
+          const [uploadedImageUrls, uploadedVideoUrls] = await Promise.all([
+            imageFiles.length > 0
+              ? fileService.uploadImages(imageFiles)
+              : Promise.resolve([]),
+            videoFiles.length > 0
+              ? fileService.uploadVideos(videoFiles)
+              : Promise.resolve([]),
+          ]);
+
+          imageUrls = uploadedImageUrls;
+          videoUrls = uploadedVideoUrls;
+
+          setUploadProgress(75);
+        }
+
+        // 轉換為 API 請求格式
+        const requestData = formToUpdateApiRequest(
+          formData,
+          imageUrls,
+          videoUrls
+        );
+
+        setUploadProgress(90);
+
+        // 發送 API 請求
+        const response = await ideaAPI.update(requestData);
+
+        setUploadProgress(100);
+
+        if (response.success && response.data) {
+          options?.onSuccess?.(response.data);
+          return response.data;
+        }
+        throw new Error('更新想法失敗');
+      } catch (error) {
+        const errorInstance = error instanceof Error ? error : new Error('更新失敗');
+        options?.onError?.(errorInstance);
+        throw errorInstance;
+      } finally {
+        setIsSubmitting(false);
+        setUploadProgress(0);
+      }
+    },
+    [options, fileService]
+  );
 
   return {
     submit,
@@ -189,20 +213,23 @@ export function useIdeaDeletion(options?: {
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const submit = useCallback(async (ideaId: string): Promise<void> => {
-    setIsSubmitting(true);
+  const submit = useCallback(
+    async (ideaId: string): Promise<void> => {
+      setIsSubmitting(true);
 
-    try {
-      await ideaAPI.delete(ideaId);
-      options?.onSuccess?.();
-    } catch (error) {
-      const errorInstance = error instanceof Error ? error : new Error('刪除失敗');
-      options?.onError?.(errorInstance);
-      throw errorInstance;
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [options]);
+      try {
+        await ideaAPI.delete(ideaId);
+        options?.onSuccess?.();
+      } catch (error) {
+        const errorInstance = error instanceof Error ? error : new Error('刪除失敗');
+        options?.onError?.(errorInstance);
+        throw errorInstance;
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [options]
+  );
 
   return {
     submit,

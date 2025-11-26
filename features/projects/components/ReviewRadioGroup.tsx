@@ -1,8 +1,12 @@
 import { useId } from 'react';
-import { Control, FieldValues, Path, useController } from 'react-hook-form';
+import {
+  Control, FieldValues, Path, useController,
+} from 'react-hook-form';
 import { MOOD_OPTIONS } from '@/constants/project';
 import RadioBox from '@/shared/components/RadioBox';
-import { Smile, Heart, Zap, Moon, CloudRain } from 'lucide-react';
+import {
+  Smile, Heart, Zap, Moon, CloudRain,
+} from 'lucide-react';
 
 type BaseRadioGroupProps<T extends FieldValues> = {
   type: 'emoji' | 'tenPoint';
@@ -20,14 +24,12 @@ function RadioGroupWithoutControl<T extends FieldValues>({
   name,
   value,
 }: RadioGroupProps<T>) {
-  const getOptionProps = (option: string | number) => {
-    return {
-      name,
-      value: option,
-      isChecked: option === value,
-      readOnly: true,
-    };
-  };
+  const getOptionProps = (option: string | number) => ({
+    name,
+    value: option,
+    isChecked: option === value,
+    readOnly: true,
+  });
 
   const getMoodIcon = (iconName: string) => {
     const icons = {
@@ -38,7 +40,7 @@ function RadioGroupWithoutControl<T extends FieldValues>({
       CloudRain,
     };
     const IconComponent = icons[iconName as keyof typeof icons];
-    return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
+    return IconComponent ? <IconComponent className="size-4" /> : null;
   };
 
   if (type === 'emoji') {
@@ -63,7 +65,7 @@ function RadioGroupWithoutControl<T extends FieldValues>({
       {Array.from({ length: 10 }, (_, index) => index + 1).map((option) => (
         <RadioBox
           key={option}
-          className="md:px-3 pointer-events-none"
+          className="pointer-events-none md:px-3"
           {...getOptionProps(option)}
         >
           {option}
@@ -82,17 +84,15 @@ function RadioGroupWithControl<T extends FieldValues>({
   const generateId = (tag: string) => `${id}-${tag}`;
   const { field, fieldState } = useController({ name, control });
 
-  const getOptionProps = (option: string | number) => {
-    return {
-      ref: field.ref,
-      id: generateId(option.toString()),
-      name,
-      value: option,
-      isChecked: option === field.value,
-      isError: !!fieldState.error,
-      onChange: () => field.onChange(option),
-    };
-  };
+  const getOptionProps = (option: string | number) => ({
+    ref: field.ref,
+    id: generateId(option.toString()),
+    name,
+    value: option,
+    isChecked: option === field.value,
+    isError: !!fieldState.error,
+    onChange: () => field.onChange(option),
+  });
 
   const getMoodIcon = (iconName: string) => {
     const icons = {
@@ -103,7 +103,7 @@ function RadioGroupWithControl<T extends FieldValues>({
       CloudRain,
     };
     const IconComponent = icons[iconName as keyof typeof icons];
-    return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
+    return IconComponent ? <IconComponent className="size-4" /> : null;
   };
 
   if (type === 'emoji') {

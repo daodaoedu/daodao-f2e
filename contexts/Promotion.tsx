@@ -1,6 +1,8 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import Link from 'next/link';
-import { cn } from '@/utils/cn';
+import {
+  createContext, useContext, useEffect, useState,
+} from 'react';
+import { CustomLink } from '@/shared/ui/custom-link';
+import { cn } from '@/shared/lib/cn';
 
 interface PromotionContextType {
   height: number;
@@ -24,7 +26,7 @@ export const usePromotion = () => {
 export const PromotionProvider = ({ children }: React.PropsWithChildren) => {
   const [isShowShadow, setIsShowShadow] = useState(true);
   const [isShowPromotionBar, setIsShowPromotionBar] = useState(true);
-  const [height, setHeight] = useState(0);
+  const [height, setHeight] = useState(69);
 
   return (
     <PromotionContext.Provider
@@ -117,8 +119,8 @@ export function PromotionBar() {
 
   return (
     isShowPromotionBar && (
-      <div className="relative text-basic-white bg-tips text-center">
-        <Link
+      <div className="relative bg-tips text-center text-basic-white">
+        <CustomLink
           href={link}
           className={cn(
             'block cursor-pointer animate-fade-in animate-duration-500 px-14 py-2.5',
@@ -126,11 +128,12 @@ export function PromotionBar() {
           )}
         >
           {texts[currentIndex]}
-        </Link>
+        </CustomLink>
         <button
           type="button"
-          className="absolute top-1/2 right-3.5 size-11 -translate-y-1/2 text-basic-white"
+          className="absolute right-3.5 top-1/2 size-11 -translate-y-1/2 text-basic-white"
           onClick={() => setIsShowPromotionBar(false)}
+          aria-label="close"
         >
           <div
             className={cn(

@@ -1,7 +1,11 @@
-import type { WithContext, Thing, WebSite, Graph } from 'schema-dts';
+'use client';
+
+import type {
+  WithContext, Thing, WebSite, Graph,
+} from 'schema-dts';
 import React from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import { usePathname } from '@/shared/i18n/navigation';
 
 /**
  * Schema.org 常用類型參考指南
@@ -71,28 +75,27 @@ export default function SEOConfig({
   keywords: originKeywords = '島島阿學',
   author = '島島阿學',
   copyright = '島島阿學',
-  imgLink = 'https://www.daoedu.tw/preview.webp',
+  imgLink = 'https://www.daoedu.tw/assets/brand/horizontal-primary-logo.svg',
   imgWidth = 1200,
   imgHeight = 630,
   jsonLd = defaultJsonLd,
   themeColor = '#16b9b3',
 }: SEOProps) {
-  const router = useRouter();
+  const pathname = usePathname();
 
-  const link = originLink ?? `${process.env.HOSTNAME}${router?.asPath}`;
+  const link = originLink ?? `${process.env.PROD_URL}${pathname || ''}`;
 
-  const keywords =
-    typeof originKeywords === 'string'
-      ? originKeywords
-      : originKeywords?.join(', ');
+  const keywords = typeof originKeywords === 'string'
+    ? originKeywords
+    : originKeywords?.join(', ');
 
   return (
     <Head>
       <title>{title}</title>
       <meta itemProp="name" content={title} />
-      <link rel="shortcut icon" href="/favicon.png" />
-      <link rel="apple-touch-icon" href="/favicon.png" />
-      <link rel="mask-icon" href="/favicon.png" color="#5bbad5" />
+      <link rel="shortcut icon" href="/assets/brand/favicon.png" />
+      <link rel="apple-touch-icon" href="/assets/brand/favicon.png" />
+      <link rel="mask-icon" href="/assets/brand/favicon.png" color="#5bbad5" />
       {link && <link rel="canonical" href={link} />}
       {author && <meta name="author" content={author} />}
       {copyright && <meta name="copyright" content={copyright} />}

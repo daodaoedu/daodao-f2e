@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState } from 'react';
 import {
   Milestone,
-  Task
+  Task,
 } from '@/contexts/Milestones/type';
-import { BASE_URL } from "@/constants/common";
-import { getTokenStorage } from "@/utils/storage";
-import dayjs from "dayjs";
+import { BASE_URL } from '@/constants/common';
+import { getTokenStorage } from '@/shared/lib/storage';
+import { format } from 'date-fns';
 
 interface MilestonesContext {
   milestones: Milestone[];
@@ -62,8 +62,8 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
 
       const formattedMilestone = {
         ...newMilestone,
-        startDate: newMilestone.startDate ? dayjs(newMilestone.startDate).format('YYYY-MM-DD') : undefined,
-        endDate: newMilestone.endDate ? dayjs(newMilestone.endDate).format('YYYY-MM-DD') : undefined
+        startDate: newMilestone.startDate ? format(new Date(newMilestone.startDate), 'yyyy-MM-dd') : undefined,
+        endDate: newMilestone.endDate ? format(new Date(newMilestone.endDate), 'yyyy-MM-dd') : undefined,
       };
 
       const response = await fetch(`${BASE_URL}/projects/${projectId}/milestones/${newMilestone.id}`, {
@@ -72,7 +72,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formattedMilestone)
+        body: JSON.stringify(formattedMilestone),
       });
 
       if (!response.ok) {
@@ -85,11 +85,9 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
       }
 
       const result = responseData;
-      const newMilestones = milestones.map((m) => {
-        return m.id === result.id
-          ? { ...result, tasks: m.tasks }
-          : m;
-      });
+      const newMilestones = milestones.map((m) => (m.id === result.id
+        ? { ...result, tasks: m.tasks }
+        : m));
       setMilestones([...newMilestones]);
       return true;
     } catch (error) {
@@ -114,7 +112,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ ...newTask })
+        body: JSON.stringify({ ...newTask }),
       });
 
       if (!response.ok) {
@@ -132,9 +130,8 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
         if (m.id === result.milestoneId) {
           const newTasks = [...m.tasks, result];
           return { ...m, tasks: newTasks };
-        } else {
-          return m;
         }
+        return m;
       });
 
       setMilestones(newMilestones);
@@ -161,7 +158,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ ...newTask })
+        body: JSON.stringify({ ...newTask }),
       });
 
       if (!response.ok) {
@@ -187,7 +184,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
 
           return {
             ...m,
-            tasks: newTasks
+            tasks: newTasks,
           };
         }
         return m;
@@ -217,7 +214,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ ...newTask })
+        body: JSON.stringify({ ...newTask }),
       });
 
       if (!response.ok) {
@@ -233,14 +230,11 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
 
       const newMilestones = milestones.map((m) => {
         if (m.id === result.milestoneId) {
-          const newTasks = m.tasks.filter((t) => {
-            return t.id !== result.id;
-          });
+          const newTasks = m.tasks.filter((t) => t.id !== result.id);
           console.log({ ...m, tasks: newTasks });
           return { ...m, tasks: newTasks };
-        } else {
-          return m;
         }
+        return m;
       });
       setMilestones([...newMilestones]);
       return true;
@@ -262,7 +256,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
         fetchMilestones,
         createTask,
         dispatchTask,
-        deleteTask
+        deleteTask,
       }}
     >
       {children}
@@ -273,7 +267,7 @@ export function MilestonesProvider({ children }: MilestonesContextProviderProps)
 export function useMilestones() {
   const context = useContext(ProjectContext);
   if (!context) {
-    throw new Error("useMilestones must be used within an MilestonesProvider");
+    throw new Error('useMilestones must be used within an MilestonesProvider');
   }
   return context;
 }

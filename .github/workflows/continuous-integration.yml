@@ -30,18 +30,17 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: |
-            node_modules
-            ~/.cache/Cypress
-          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
+          node-version-file: ".nvmrc"
+          cache: 'pnpm'
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        run: pnpm install
 
   check:
     name: TypeScript Check
@@ -54,24 +53,23 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: |
-            node_modules
-            ~/.cache/Cypress
-          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
+          node-version-file: ".nvmrc"
+          cache: 'pnpm'
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        run: pnpm install
 
       - name: TypeScript Check
         id: check
         continue-on-error: true
         run: |
-          if ! ERROR_MSG=$(yarn ts:check 2>&1); then
+          if ! ERROR_MSG=$(pnpm ts:check 2>&1); then
               {
                 echo "check_error<<EOF"
                 echo "$ERROR_MSG"
@@ -109,24 +107,23 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: |
-            node_modules
-            ~/.cache/Cypress
-          key: deps-node-modules-${{ hashFiles('**/yarn.lock') }}
+          node-version-file: ".nvmrc"
+          cache: 'pnpm'
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        run: pnpm install
 
       - name: ESLint Check
         id: lint
         continue-on-error: true
         run: |
-          if ! ERROR_MSG=$(yarn lint 2>&1); then
+          if ! ERROR_MSG=$(pnpm lint 2>&1); then
               {
                 echo "lint_error<<EOF"
                 echo "$ERROR_MSG"

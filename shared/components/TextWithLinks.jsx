@@ -1,13 +1,6 @@
 import { useRef } from 'react';
-import Link from 'next/link';
-import styled from '@emotion/styled';
+import { CustomLink } from '@/shared/ui/custom-link';
 import CheckLink from './CheckLink';
-
-const StyledText = styled.p`
-  a {
-    color: #1a73e8;
-  }
-`;
 
 export default function TextWithLinks({ children }) {
   const checkLinkRef = useRef(null);
@@ -23,9 +16,9 @@ export default function TextWithLinks({ children }) {
 
       if (window.location.hostname === href.hostname) {
         return (
-          <Link key={href} href={href} target="_blank">
+          <CustomLink key={href} href={href} target="_blank">
             {href}
-          </Link>
+          </CustomLink>
         );
       }
 
@@ -49,9 +42,9 @@ export default function TextWithLinks({ children }) {
   });
 
   return (
-    <StyledText>
+    <p className="[&>a]:text-[#1a73e8]">
       {parts}
       <CheckLink ref={checkLinkRef} />
-    </StyledText>
+    </p>
   );
 }

@@ -4,13 +4,21 @@ import useSWRMutation from 'swr/mutation';
 import {
   projectOutcomeAPI,
   getProjectOutcomePathname,
-} from "@/services/projects/outcomes/api";
-import { ProjectOutcomeSchema } from "@/services/projects/outcomes/schema";
-import { getProjectPathname } from "@/services/projects/core";
+} from '@/services/projects/outcomes/api';
+import { ProjectOutcomeSchema } from '@/services/projects/outcomes/schema';
+import { getProjectPathname } from '@/services/projects/core';
+import { fetcher } from '@/shared/lib/http';
 
 export function useProjectOutcomes(projectId?: string | null) {
   return useSWR<ProjectOutcomeSchema[]>(
-    projectId ? getProjectOutcomePathname({ projectId }) : null
+    projectId ? getProjectOutcomePathname({ projectId }) : null,
+    async (url) => {
+      const response = await fetcher<{ success: boolean; data: ProjectOutcomeSchema[] }>(url);
+      return response.data;
+    },
+    {
+      revalidateIfStale: false,
+    }
   );
 }
 
@@ -26,7 +34,14 @@ export function useProjectOutcome({
   return useSWR<ProjectOutcomeSchema>(
     projectId && typeof outcomeId === 'number'
       ? getProjectOutcomePathname({ projectId, outcomeId })
-      : null
+      : null,
+    async (url) => {
+      const response = await fetcher<{ success: boolean; data: ProjectOutcomeSchema }>(url);
+      return response.data;
+    },
+    {
+      revalidateIfStale: false,
+    }
   );
 }
 

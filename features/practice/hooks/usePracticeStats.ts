@@ -17,9 +17,9 @@ export function usePracticeStats() {
       archived: 0,
       totalCheckIns: 0,
       longestStreak: 0,
-      averageProgress: 0
+      averageProgress: 0,
     },
     loading: isLoading,
-    error: error?.message
+    error: error?.message,
   };
 }

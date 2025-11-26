@@ -1,13 +1,13 @@
-import Link from "next/link";
-import { ArrowRightIcon } from "lucide-react";
-import EmptyPng from "@/public/assets/images/empty.png";
-import { Badge } from "@/components/ui/badge";
-import { Image } from "@/components/ui/image";
-import { Button } from "@/components/ui/button";
-import { HOT_TAGS, ICategory } from "@/constants/category";
-import { ResourceListResponseSchema } from "@/services/resources";
-import { cn } from "@/utils/cn";
-import ResourceCard, { ResourceCardSkeleton } from "./ResourceCard";
+import { CustomLink } from '@/shared/ui/custom-link';
+import { ArrowRightIcon } from 'lucide-react';
+import EmptyPng from '@/public/assets/images/empty.png';
+import { Badge } from '@/shared/ui/badge';
+import { Image } from '@/shared/ui/image';
+import { Button } from '@/shared/ui/button';
+import { HOT_TAGS, ICategory } from '@/constants/category';
+import { ResourceListResponseSchema } from '@/services/resources';
+import { cn } from '@/shared/lib/cn';
+import ResourceCard, { ResourceCardSkeleton } from './ResourceCard';
 
 interface EmptyDataProps {
   parentCategoryHasData: boolean;
@@ -21,17 +21,18 @@ function EmptyData({
   parentDataCount,
 }: EmptyDataProps) {
   return (
-    <div className="flex flex-col items-center bg-primary-palest p-10 rounded-xl">
+    <div className="flex flex-col items-center rounded-xl bg-primary-palest p-10">
       {parentCategoryHasData ? (
         <>
           <p>這邊沒有符合篩選條件的學習資源！</p>
           <p>
             但我們在
-            <b className="font-bold px-0.5">
+            <b className="px-0.5 font-bold">
               {parentCategory?.[parentCategory.length - 1]?.label}
             </b>
             內發現了
-            <b className="font-bold px-0.5">{parentDataCount}</b>筆
+            <b className="px-0.5 font-bold">{parentDataCount}</b>
+            筆
             有趣的學習資源~
           </p>
         </>
@@ -39,7 +40,7 @@ function EmptyData({
         <p>這邊沒有符合的學習資源！ 試試看其他關鍵字!</p>
       )}
       <Image
-        className="mt-4 mb-6"
+        className="mb-6 mt-4"
         src={EmptyPng}
         alt="empty"
         width={210}
@@ -47,14 +48,14 @@ function EmptyData({
       />
       {parentCategoryHasData ? (
         <Button asChild size="lg">
-          <Link
+          <CustomLink
             href={`/resource/categories/${parentCategory
               .map((c) => c.value)
-              .join("/")}`}
+              .join('/')}`}
           >
             <ArrowRightIcon size={15} />
             馬上去探索
-          </Link>
+          </CustomLink>
         </Button>
       ) : (
         <>
@@ -62,7 +63,10 @@ function EmptyData({
           <div className="flex gap-2">
             {HOT_TAGS.map(({ label, value }) => (
               <Badge key={value} variant="outline" asChild>
-                <Link href={`/resource/categories/${value}`}>#{label}</Link>
+                <CustomLink href={`/resource/categories/${value}`}>
+                  #
+                  {label}
+                </CustomLink>
               </Badge>
             ))}
           </div>
@@ -73,7 +77,7 @@ function EmptyData({
 }
 
 interface ResourceContainerProps {
-  data: ResourceListResponseSchema["data"]["resources"];
+  data: ResourceListResponseSchema['data']['resources'];
   categories?: ICategory[];
   parentDataCount?: number;
   className?: string;
@@ -91,11 +95,10 @@ function ResourceContainer({
 }: ResourceContainerProps) {
   const safeData = Array.isArray(data) ? data : [];
   const parentCategory = categories?.slice(0, -1) ?? [];
-  const hasParentCategoryData =
-    parentCategory.length > 0 && !!parentDataCount && parentDataCount > 0;
+  const hasParentCategoryData = parentCategory.length > 0 && !!parentDataCount && parentDataCount > 0;
 
   return (
-    <div className={cn("flex flex-col gap-6", className)}>
+    <div className={cn('flex flex-col gap-6', className)}>
       {!isLoading && safeData.map((resource) => (
         <ResourceCard
           key={resource.id}

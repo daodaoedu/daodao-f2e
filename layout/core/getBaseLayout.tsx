@@ -1,15 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import Header from '@/layout/components/Header';
 import Footer from '@/layout/components/Footer';
-import {
-  PromotionBar,
-  PromotionProvider,
-  usePromotion,
-} from '@/contexts/Promotion';
+import { PromotionProvider, usePromotion } from '@/contexts/Promotion';
 
 function BaseLayout({ children }: React.PropsWithChildren) {
   const headerRef = useRef<HTMLDivElement>(null);
-  const { isShowPromotionBar, setHeight } = usePromotion();
+  const { isShowPromotionBar, height, setHeight } = usePromotion();
   const prevShowPromotionBar = useRef<boolean | null>(null);
 
   useEffect(() => {
@@ -42,10 +38,10 @@ function BaseLayout({ children }: React.PropsWithChildren) {
 
   return (
     <>
-      <Header ref={headerRef}>
-        <PromotionBar />
-      </Header>
-      <main className="bg-white">{children}</main>
+      <Header />
+      <main className="bg-white" style={{ paddingTop: height }}>
+        {children}
+      </main>
       <Footer />
     </>
   );

@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { User } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from 'react';
+import { CustomLink } from '@/shared/ui/custom-link';
+import { User } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+import { Button } from '@/shared/ui/button';
+import { Checkbox } from '@/shared/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -16,18 +16,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/shared/ui/form';
 import {
   ResponsiveModal,
   ResponsiveModalSize,
-} from "@/components/ui/responsive-modal";
-import ChatSvg from "@/public/assets/icons/chat.svg";
-import { AuthButton, useAuth } from "@/contexts/Auth";
-import { Textarea } from "@/components/ui/textarea";
-import { ROLE } from "@/constants/member";
-import { contactFormSchema, ContactFormSchema } from "@/services/emails";
-import { getOptionLabel } from "@/utils/option";
-import { useSendEmail } from "../hooks";
+} from '@/shared/ui/responsive-modal';
+import ChatSvg from '@/public/assets/icons/chat.svg';
+import { useAuth, AuthGuardButton } from '@/entities/user';
+import { Textarea } from '@/shared/ui/textarea';
+import { ROLE } from '@/constants/member';
+import { contactFormSchema, ContactFormSchema } from '@/services/emails';
+import { getOptionLabel } from '@/shared/lib/option';
+import { useSendEmail } from '../hooks';
 
 export type TargetUserType = {
   id: string;
@@ -51,14 +51,15 @@ interface ContactModalProps {
 const TermsDescription = () => (
   <p className="text-sm text-gray-500">
     您填的資訊將透過島島阿學 email
-    給這位夥伴，請確認訊息未涉及個人隱私並符合本網站{" "}
-    <Link
+    給這位夥伴，請確認訊息未涉及個人隱私並符合本網站
+    {' '}
+    <CustomLink
       href="/terms/service"
       target="_blank"
       className="underline hover:text-primary"
     >
       使用者條款
-    </Link>
+    </CustomLink>
   </p>
 );
 
@@ -78,8 +79,8 @@ export const ContactModal = ({
   const form = useForm<ContactFormSchema>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
-      message: "",
-      contact: "",
+      message: '',
+      contact: '',
       terms: undefined,
     },
   });
@@ -99,11 +100,11 @@ export const ContactModal = ({
   });
 
   const handleValidSubmit = (data: ContactFormSchema) => {
-    if (!me) return;
+    if (!me || !me.email || !me.id || !me.roleList || !me.name) return;
 
     trigger({
-      userId: me._id,
-      url: `${window.location.origin}/partner/${me._id}`,
+      userId: me.id,
+      url: `${window.location.origin}/partner/${me.id}`,
       name: me.name,
       roleList: me.roleList,
       photoUrl: me.photoURL,
@@ -119,10 +120,10 @@ export const ContactModal = ({
 
   return (
     <>
-      <AuthButton size="lg" onClick={() => setIsOpen(true)}>
+      <AuthGuardButton size="lg" onClick={() => setIsOpen(true)}>
         <ChatSvg />
         {modalTitle}
-      </AuthButton>
+      </AuthGuardButton>
       <ResponsiveModal
         open={isOpen}
         onClose={handleClose}
@@ -149,7 +150,7 @@ export const ContactModal = ({
               <div>
                 <p className="font-medium text-gray-800">{targetUser.name}</p>
                 <p className="text-sm text-gray-600">
-                  {getOptionLabel(ROLE, targetUser.roleList?.[0] || "", "暫無資料")}
+                  {getOptionLabel(ROLE, targetUser.roleList?.[0] || '', '暫無資料')}
                 </p>
               </div>
             </div>

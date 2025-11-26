@@ -1,6 +1,8 @@
-import { useEffect, useId, useRef, useState } from "react";
-import ClearIcon from '@mui/icons-material/Clear';
-import { cn } from "@/utils/cn";
+import {
+  useEffect, useId, useRef, useState,
+} from 'react';
+import { X } from 'lucide-react';
+import { cn } from '@/shared/lib/cn';
 
 function Item({ children, onClick, text }) {
   return (
@@ -9,7 +11,7 @@ function Item({ children, onClick, text }) {
         type="button"
         className={cn(
           'flex items-center justify-between w-full text-primary-base',
-          'text-left px-4 py-2 focus-within:bg-primary-lightest focus-within:outline-primary-lighter',
+          'text-left px-4 py-2 focus-within:bg-primary-lightest focus-within:outline-primary-lighter'
         )}
         onClick={() => onClick(text)}
       >
@@ -20,7 +22,9 @@ function Item({ children, onClick, text }) {
   );
 }
 
-function TagEditor({ name, helperText, control, value = [], tagOptions }) {
+function TagEditor({
+  name, helperText, control, value = [], tagOptions,
+}) {
   const id = useId();
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
@@ -74,7 +78,24 @@ function TagEditor({ name, helperText, control, value = [], tagOptions }) {
         if (isComposing.current || input || !value.length) return;
         const lastTag = value[value.length - 1];
         setInput(lastTag);
-        handleDelete(lastTag)();
+        control.onChange({
+          target: {
+            name,
+            value: value.filter((t) => t !== lastTag),
+          },
+        });
+        break;
+      }
+      case 38: {
+        if (!hasTagOptions) return;
+        tagOptionsFocusIndex.current = Math.max(0, tagOptionsFocusIndex.current - 1);
+        tagOptionsRef.current.childNodes[tagOptionsFocusIndex.current].focus();
+        break;
+      }
+      case 40: {
+        if (!hasTagOptions) return;
+        tagOptionsFocusIndex.current = Math.min(filteredTagOptions.length - 1, tagOptionsFocusIndex.current + 1);
+        tagOptionsRef.current.childNodes[tagOptionsFocusIndex.current].focus();
         break;
       }
       default:
@@ -82,134 +103,79 @@ function TagEditor({ name, helperText, control, value = [], tagOptions }) {
     }
   };
 
-  const handleBlur = () => {
-    setTimeout(() => {
-      if (
-        tagOptionsRef.current.contains(document.activeElement) ||
-        inputRef.current.contains(document.activeElement)
-      ) {
-        return;
-      }
-      tagOptionsFocusIndex.current = -1;
-      setInput('');
-      setError('');
-    }, 100);
-  };
-
-  const handleNavigateTagOptions = (e) => {
-    const buttons = tagOptionsRef.current.querySelectorAll('button');
-
-    switch (e.keyCode) {
-      /** 38 方向鍵上 */
-      case 38: {
-        e.preventDefault();
-        if (tagOptionsFocusIndex.current < 1) {
-          inputRef.current.focus();
-          return;
-        }
-        tagOptionsFocusIndex.current -= 1;
-        buttons[tagOptionsFocusIndex.current].focus();
-        break;
-      }
-      /** 40 方向鍵下 */
-      case 40: {
-        e.preventDefault();
-        if (tagOptionsFocusIndex.current >= buttons.length - 1) return;
-        tagOptionsFocusIndex.current += 1;
-        buttons[tagOptionsFocusIndex.current].focus();
-        break;
-      }
-      /** 9 Tab */
-      case 9: {
-        tagOptionsFocusIndex.current += 1;
-        break;
-      }
-      /** 13 Enter */
-      case 13: break;
-      default:
-        inputRef.current.focus();
-        break;
+  const handleComposition = (e) => {
+    if (e.type === 'compositionend') {
+      isComposing.current = false;
+    } else {
+      isComposing.current = true;
     }
   };
 
   useEffect(() => {
-    control.setRef?.(name, inputRef.current);
-  }, [control.setRef, name]);
+    tagOptionsFocusIndex.current = -1;
+  }, [input]);
 
   return (
-    <>
-      <label
-        htmlFor={id}
-        className={cn(
-          'relative flex flex-wrap items-center pl-3 py-1.5 gap-1.5 w-full text-sm',
-          'rounded border border-solid border-basic-200 cursor-text',
-          'outline outline-transparent focus-within:outline-primary-base',
-        )}
-        onBlur={handleBlur}
-        onKeyDown={handleNavigateTagOptions}
-      >
-        {value.map((tag) => (
-          <div
-            key={tag}
-            className="flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-primary-lightest"
-          >
-            <div className="whitespace-nowrap">
-              {tag}
-            </div>
-            <button
-              type="button"
-              className="text-basic-300"
-              onClick={handleDelete(tag)}
-            >
-              <ClearIcon />
-            </button>
-          </div>
-        ))}
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
         <input
           id={id}
           ref={inputRef}
-          className="px-2 py-0.5 min-w-[var(--min-width)] flex-1 outline-none rounded"
-          style={{ '--min-width': `${input.length + 3}em` }}
-          value={input}
+          onCompositionStart={handleComposition}
+          onCompositionEnd={handleComposition}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          onCompositionStart={() => { isComposing.current = true; }}
-          onCompositionEnd={() => { isComposing.current = false; }}
-          onFocus={() => { tagOptionsFocusIndex.current = -1; }}
+          value={input}
+          className={cn(
+            'flex-1 rounded-md border border-basic-200 p-2 text-sm outline-none',
+            hasTagOptions && 'rounded-b-none border-b-0'
+          )}
+          placeholder={helperText || '輸入標籤，按 Enter 新增'}
         />
+        <button
+          type="button"
+          className={cn(
+            'inline-flex items-center gap-1 rounded-md border border-basic-200 px-3 py-2 text-sm',
+            'hover:bg-primary-lightest hover:text-primary-base'
+          )}
+          onClick={() => handleAddTag(input.trim())}
+        >
+          新增
+        </button>
+      </div>
+
+      {hasTagOptions && (
         <ul
           ref={tagOptionsRef}
-          className={cn(
-            'absolute top-full inset-x-0 mt-1 max-h-40 overflow-y-auto z-10',
-            'border border-basic-200 rounded-md shadow bg-white',
-            'transition-[transform,opacity] origin-top opacity-100 scale-y-100',
-            !(hasTagOptions || input) && 'opacity-0 scale-y-0',
-            error && 'opacity-0 scale-y-0',
-          )}
+          className="max-h-32 overflow-y-auto rounded-b-md border border-t-0 border-basic-200 p-2"
         >
-          {hasTagOptions ? (
-            filteredTagOptions.map((tag) => (
-              <Item key={tag} text={tag} onClick={handleAddTag}>
-                <div>
-                  {tag.split(new RegExp(`(${input})`)).map((part, index) => {
-                    const key = `${part}-${index}`;
-                    return (
-                      part === input
-                        ? part
-                        : <span key={key} className="text-black">{part}</span>
-                    );
-                  })}
-                </div>
-              </Item>
-            ))
-          ) : (
-            <Item text={input} onClick={handleAddTag} />
-          )}
+          {filteredTagOptions.map((text) => (
+            <Item
+              key={text}
+              text={text}
+              onClick={handleAddTag}
+            />
+          ))}
         </ul>
-      </label>
-      <div className="mt-2 text-xs text-basic-400">{helperText}</div>
-      <div className="text-alert">{error}</div>
-    </>
+      )}
+
+      {!!value.length && (
+        <ul className="flex flex-wrap gap-2">
+          {value.map((tag) => (
+            <li key={tag} className="inline-flex items-center gap-1 rounded-md bg-primary-lightest px-2 py-1 text-sm">
+              <span>{tag}</span>
+              <button
+                type="button"
+                onClick={handleDelete(tag)}
+                className="text-basic-400 hover:text-primary-base"
+              >
+                <X className="size-4" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

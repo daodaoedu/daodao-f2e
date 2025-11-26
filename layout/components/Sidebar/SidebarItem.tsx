@@ -1,5 +1,4 @@
-import useSmoothIntoView from '@/hooks/useSmoothIntoView';
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 import { activeClass, defaultClass, disableClass } from './constant';
 
 interface SidebarItemProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -14,10 +13,8 @@ function SidebarItem({
   isDisabled,
   ...props
 }: SidebarItemProps) {
-  const ref = useSmoothIntoView<HTMLDivElement>();
   return (
     <div
-      ref={ref}
       className={cn(
         defaultClass,
         isActive && activeClass,

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { cn } from '@/utils/cn';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { cn } from '@/shared/lib/cn';
+import { ChevronDown } from 'lucide-react';
 
 /**
  * @typedef {Object} Option
@@ -22,7 +22,7 @@ interface SelectProps {
 
 const Select = ({ options, className, isDisabled = false }: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedLabel, setSelectedLabel] = useState("全部計畫");
+  const [selectedLabel, setSelectedLabel] = useState('全部計畫');
   const handleSelect = (label: string) => {
     setSelectedLabel(label);
     setIsOpen(false);
@@ -30,12 +30,12 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
 
   if (!options.length) {
     console.error('no option');
-    return false;
+    return <></>;
   }
 
   return (
     <div className={cn(
-      "relative inline-block w-full",
+      'relative inline-block w-full',
       className
     )}
     >
@@ -47,35 +47,33 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
           'block w-full px-4 py-2 text-left',
           'rounded-lg shadow-sm flex flex-row items-center justify-between',
           'focus:outline-none focus:ring-0 focus:ring-primary-base',
-          isDisabled ?
-            'text-white bg-primary-lighter'
-            :
-            'text-basic-400 bg-primary-lightest'
+          isDisabled
+            ? 'text-white bg-primary-lighter'
+            : 'text-basic-400 bg-primary-lightest'
         )}
       >
         {selectedLabel}
         <span>
-          <KeyboardArrowDownIcon
+          <ChevronDown
             className={cn(
-              "w-5 h-5",
-              "transform transition-transform ease-linear",
-              isOpen ? "rotate-180" : "rotate-0",
-              isDisabled ? "text-white" : "text-gray-400",
+              'w-5 h-5',
+              'transform transition-transform ease-linear',
+              isOpen ? 'rotate-180' : 'rotate-0',
+              isDisabled ? 'text-white' : 'text-gray-400'
             )}
           />
         </span>
 
       </button>
       <ul className={cn(
-        "absolute left-0",
-        "w-full mt-2 p-[10px] overflow-hidden bg-white",
-        "border border-gray-300",
-        "transition-all duration-300 ease-in transform",
-        "rounded-md shadow-lg",
-        isOpen ?
-          "max-h-64 opacity-100 scale-y-100"
-          :
-          "max-h-0 opacity-0 scale-y-95"
+        'absolute left-0',
+        'w-full mt-2 p-[10px] overflow-hidden bg-white',
+        'border border-gray-300',
+        'transition-all duration-300 ease-in transform',
+        'rounded-md shadow-lg',
+        isOpen
+          ? 'max-h-64 opacity-100 scale-y-100'
+          : 'max-h-0 opacity-0 scale-y-95'
       )}
       >
         {options.map((option) => (
@@ -86,9 +84,9 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
             <button
               type="button"
               className={cn(
-                "w-full px-2 py-2 rounded-[5px] text-basic-400 text-left",
-                "hover:bg-primary-lightest hover:cursor-pointer",
-                "focus:bg-primary-lightest focus:ring-0 focus:outline-none"
+                'w-full px-2 py-2 rounded-[5px] text-basic-400 text-left',
+                'hover:bg-primary-lightest hover:cursor-pointer',
+                'focus:bg-primary-lightest focus:ring-0 focus:outline-none'
               )}
               onClick={() => handleSelect(option.label)}
             >
@@ -100,4 +98,5 @@ const Select = ({ options, className, isDisabled = false }: SelectProps) => {
     </div>
   );
 };
+
 export default Select;

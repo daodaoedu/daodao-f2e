@@ -23,19 +23,29 @@ export type IdeaResourceSchema = z.infer<typeof ideaResourceSchema>;
 export const ideaSchema = z.object({
   id: z.string(),
   content: z.string(),
-  user: baseUserSchema,
+  user: baseUserSchema.extend({
+    _id: z.string().optional(),
+    photoURL: z.string().optional(),
+    roleList: z.array(z.string()).optional(),
+    educationStage: z.string().optional().nullable(),
+    tagList: z.array(z.string()).optional().nullable(),
+    selfIntroduction: z.string().optional().nullable(),
+  }),
   status: z.enum(['active', 'draft', 'archived']),
   tags: z.array(z.string()),
-  imageUrls: z.array(z.string()),
-  videoUrls: z.array(z.string()),
-  ideaResources: z.array(ideaResourceSchema),
+  imageUrls: z.array(z.string()).optional(),
+  videoUrls: z.array(z.string()).optional(),
+  resources: z.array(ideaResourceSchema),
+  hasResources: z.boolean(),
+  resourceCount: z.number(),
   likeCount: z.number(),
   commentCount: z.number(),
   viewCount: z.number(),
   shareCount: z.number(),
   isLiked: z.boolean(),
-  createdDate: z.string(),
-  updatedDate: z.string(),
+  isFavorited: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 export type IdeaSchema = z.infer<typeof ideaSchema>;
@@ -71,7 +81,7 @@ export type UpdateIdeaFormSchema = z.infer<typeof updateIdeaFormSchema>;
 export const createIdeaRequestSchema = z.object({
   content: z.string(),
   tags: z.array(z.string()),
-  ideaResources: z.array(ideaResourceSchema),
+  resources: z.array(ideaResourceSchema), // 改為 resources 以匹配後端
   imageUrls: z.array(z.string()), // 由檔案上傳轉換而來
   videoUrls: z.array(z.string()),
 });
@@ -96,10 +106,12 @@ export type DeleteIdeaSchema = z.infer<typeof deleteIdeaSchema>;
 // Idea Search Parameters Schema
 export const ideaSearchParamsSchema = z.object({
   search: z.string().optional(),
-  tags: z.string().optional(), // 逗號分隔的標籤字串
+  tags: z.union([z.string(), z.array(z.string())]).optional(),
   sortBy: z.enum(['createdDate', 'updatedDate', 'likeCount']).optional().default('createdDate'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
   userId: z.string().optional(),
+  page: z.number().min(1).optional().default(1),
+  pageSize: z.number().min(1).max(100).optional().default(20),
 });
 
 export type IdeaSearchParamsSchema = z.infer<typeof ideaSearchParamsSchema>;
@@ -110,15 +122,15 @@ export const paginationSchema = z.object({
   pageSize: z.number().min(1).max(100).default(20),
   totalCount: z.number().min(0),
   totalPages: z.number().min(0),
-  hasNext: z.boolean(),
-  hasPrev: z.boolean(),
+  hasNext: z.boolean().optional(),
+  hasPrev: z.boolean().optional(),
 });
 
 export type PaginationSchema = z.infer<typeof paginationSchema>;
 
 // Idea List Response Schema
 export const ideaListResponseSchema = z.object({
-  ideas: z.array(ideaSchema),
+  data: z.array(ideaSchema),
   pagination: paginationSchema,
 });
 

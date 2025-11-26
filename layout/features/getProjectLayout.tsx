@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
-import { useRouter } from 'next/router';
-import { parseToString } from '@/utils/helper';
-import { RoleEnum, useAuth } from '@/contexts/Auth';
+import { useSearchParams, usePathname } from 'next/navigation';
+import { parseToString } from '@/shared/lib/helper';
+import { RoleEnum } from '@/services/users';
+import { useAuth } from '@/entities/user';
 import { ProjectProvider } from '@/contexts/Project';
 import Sidebar, { SidebarItemType } from '@/layout/components/Sidebar';
 import { useProject } from '@/services/projects';
@@ -89,9 +90,10 @@ function getProjectSidebarItems({
 }
 
 const useProjectPermission = (type: ProjectType) => {
-  const { pathname, query } = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
-  const projectId = parseToString(query.id);
+  const projectId = parseToString(searchParams?.get('id'));
   const swr = useProject(projectId);
 
   const canVisit = useMemo(() => {
@@ -102,9 +104,9 @@ const useProjectPermission = (type: ProjectType) => {
       case ProjectType.Admin:
         return role ? ADMIN_PERMISSIONS.includes(role) : false;
       case ProjectType.Manage:
-        return swr.isLoading || swr.data?.user._id === user?._id;
+        return swr.isLoading || swr.data?.user.id === user?.id;
       default:
-        return !pathname.startsWith(`${baseUrl}${projectRoutes.reviews}`);
+        return !pathname?.startsWith(`${baseUrl}${projectRoutes.reviews}`);
     }
   }, [swr, pathname, type, user]);
 
@@ -116,7 +118,7 @@ interface ProjectLayoutProps extends React.PropsWithChildren {
 }
 
 function ProjectLayout({ children, type }: ProjectLayoutProps) {
-  const { pathname } = useRouter();
+  const pathname = usePathname();
 
   const {
     data: project,
@@ -127,7 +129,7 @@ function ProjectLayout({ children, type }: ProjectLayoutProps) {
 
   const sidebarItems = getProjectSidebarItems({
     type,
-    pathname,
+    pathname: pathname || '',
     id: projectId,
   });
 
@@ -142,7 +144,7 @@ function ProjectLayout({ children, type }: ProjectLayoutProps) {
   return (
     <Sidebar
       items={sidebarItems}
-      backPath={getProjectBaseUrl(type)}
+      backUrl={getProjectBaseUrl(type)}
       backText={getBackText(type)}
       showBackButton
     >
@@ -154,20 +156,18 @@ function ProjectLayout({ children, type }: ProjectLayoutProps) {
 
 function getProjectLayout(type: ProjectType) {
   if (type === ProjectType.Public) {
-    return (page: React.ReactElement) =>
-      getBaseLayout(
-        <ProjectProvider>
-          <ProjectLayout type={type}>{page}</ProjectLayout>
-        </ProjectProvider>
-      );
-  }
-
-  return (page: React.ReactElement) =>
-    getPrivateLayout(
+    return (page: React.ReactElement) => getBaseLayout(
       <ProjectProvider>
         <ProjectLayout type={type}>{page}</ProjectLayout>
       </ProjectProvider>
     );
+  }
+
+  return (page: React.ReactElement) => getPrivateLayout(
+    <ProjectProvider>
+      <ProjectLayout type={type}>{page}</ProjectLayout>
+    </ProjectProvider>
+  );
 }
 
 export const getAdminProjectLayout = getProjectLayout(ProjectType.Admin);

@@ -1,35 +1,41 @@
-import React from "react";
-import { Plus } from "lucide-react";
-import { ResourceDetailResponseSchema } from "@/services/resources/core/schema";
-import { AuthButton } from "@/contexts/Auth";
-import ResourceReviewCard from "./ResourceReviewCard";
+import React from 'react';
+import { Plus } from 'lucide-react';
+import { ResourceDetailResponseSchema } from '@/services/resources/core/schema';
+import { AuthGuardButton } from '@/entities/user';
+import ResourceReviewCard from './ResourceReviewCard';
 
 interface ResourceReviewListProps {
-  resource: ResourceDetailResponseSchema["data"];
+  resource: ResourceDetailResponseSchema['data'];
+  commentSection: React.ReactNode;
   onCreateReview: () => void;
 }
 
 export default function ResourceReviewList({
   resource,
+  commentSection,
   onCreateReview,
 }: ResourceReviewListProps) {
   return (
     <div className="flex flex-col items-center gap-10">
       {resource.recentReviews && resource.recentReviews.length > 0 ? (
-        <div className="space-y-10 w-full">
+        <div className="w-full space-y-10">
           {resource.recentReviews.map((review) => (
-            <ResourceReviewCard key={review.id} review={review} />
+            <ResourceReviewCard
+              key={review.id}
+              review={review}
+              commentSection={commentSection}
+            />
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 text-basic-400">
+        <div className="py-12 text-center text-basic-400">
           目前還沒有人留下心得，成為第一個吧！
         </div>
       )}
-      <AuthButton size="lg" onClick={onCreateReview}>
+      <AuthGuardButton size="lg" onClick={onCreateReview}>
         <Plus size={15} />
         分享心得
-      </AuthButton>
+      </AuthGuardButton>
     </div>
   );
 }

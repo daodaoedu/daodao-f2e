@@ -1,10 +1,10 @@
-import useSWRMutation from "swr/mutation";
-import ConfirmModal from "@/shared/components/Confirm";
+import useSWRMutation from 'swr/mutation';
+import ConfirmModal from '@/shared/components/Confirm';
 import {
   getProjectReviewPathname,
   projectReviewAPI,
   refetchProjectReview,
-} from "@/services/projects";
+} from '@/services/projects';
 
 interface ReviewDeleteModalProps {
   projectId: string;
@@ -22,7 +22,7 @@ export default function ReviewDeleteModal({
   onSuccess,
 }: ReviewDeleteModalProps) {
   const deleteMutation = useSWRMutation(
-    projectId && typeof reviewId === "number"
+    projectId && typeof reviewId === 'number'
       ? getProjectReviewPathname({ projectId, reviewId })
       : null,
     projectReviewAPI.delete,

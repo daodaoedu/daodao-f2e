@@ -1,5 +1,7 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import Link from 'next/link';
+import React, {
+  useState, useCallback, useRef, useEffect,
+} from 'react';
+import { CustomLink } from '@/shared/ui/custom-link';
 import { useFieldArray } from 'react-hook-form';
 import {
   Image as ImageIcon,
@@ -14,21 +16,23 @@ import {
   Globe,
   Lightbulb,
 } from 'lucide-react';
-import Image from '@/shared/components/Image';
+import { Image } from '@/shared/ui/image';
 import type {
   CreateIdeaFormSchema,
-  UpdateIdeaFormSchema
+  UpdateIdeaFormSchema,
 } from '@/services/ideas';
 import {
   useIdeaFormValidation,
-  useUpdateIdeaFormValidation
+  useUpdateIdeaFormValidation,
 } from '@/features/ideas/hooks/useIdeaFormValidation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Textarea } from '@/shared/ui/textarea';
+import { Label } from '@/shared/ui/label';
+import {
+  Tooltip, TooltipContent, TooltipTrigger, TooltipProvider,
+} from '@/shared/ui/tooltip';
+import { Badge } from '@/shared/ui/badge';
 
 // 預設標籤 - 參考 mobile.jsx 的分類系統
 const DEFAULT_TAGS = [
@@ -43,7 +47,7 @@ const DEFAULT_TAGS = [
   { value: 'design-thinking', label: '設計思維', category: 'design' },
   { value: 'startup', label: '創業', category: 'business' },
   { value: 'time-management', label: '時間管理', category: 'productivity' },
-  { value: 'ai', label: '人工智慧', category: 'tech' }
+  { value: 'ai', label: '人工智慧', category: 'tech' },
 ];
 
 // 標籤分類色彩系統 - 使用專案配色
@@ -56,7 +60,7 @@ const getTagCategoryColor = (category: string) => {
     education: 'bg-primary-palest text-primary-base border-primary-lighter',
     creativity: 'bg-tips/10 text-tips border-tips/30',
     productivity: 'bg-basic-200 text-basic-400 border-basic-300',
-    custom: 'bg-basic-100 text-basic-400 border-basic-200'
+    custom: 'bg-basic-100 text-basic-400 border-basic-200',
   };
   return colors[category] || colors.custom;
 };
@@ -67,7 +71,7 @@ const getResourceIcon = (type: string) => {
     article: <FileText size={16} />,
     course: <Video size={16} />,
     book: <BookOpen size={16} />,
-    website: <Globe size={16} />
+    website: <Globe size={16} />,
   };
   return icons[type] || <LinkIcon size={16} />;
 };
@@ -115,7 +119,9 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
   const form = useIdeaFormValidation();
 
   // Field array for resources
-  const { fields, append, remove, update } = useFieldArray({
+  const {
+    fields, append, remove, update,
+  } = useFieldArray({
     control: form.control,
     name: 'ideaResources',
   });
@@ -136,9 +142,13 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
     const submitData = {
       ...data,
       tags: selectedTags,
+      ideaResources: fields.map(field => ({
+        name: field.name,
+        url: field.url,
+      })),
     };
     await onSubmit(submitData);
-  }, [onSubmit, selectedTags]);
+  }, [onSubmit, selectedTags, fields]);
 
   // 圖片上傳處理 - 參考 mobile.jsx 的模式
   const handleImageUpload = useCallback(() => {
@@ -150,13 +160,11 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
       setSelectedFiles(files);
 
       // 生成預覽圖片
-      const readers = files.map((file) => {
-        return new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(file);
-        });
-      });
+      const readers = files.map((file) => new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      }));
 
       Promise.all(readers).then((urls) => {
         setPreviewImages(urls);
@@ -212,7 +220,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
   const startEditResource = useCallback((index: number) => {
     const resource = fields[index];
     setEditingResourceIndex(index);
-    setEditResourceData({ name: resource.name, url: resource.url });
+    setEditResourceData({ name: resource?.name ?? '', url: resource?.url ?? '' });
   }, [fields]);
 
   const saveResource = useCallback(() => {
@@ -243,20 +251,17 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
   const charactersUsed = watchedContent?.length || 0;
 
   return (
-    <div className="min-h-screen bg-basic-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg max-w-2xl w-full overflow-hidden">
+    <div className="bg-basic-50 flex min-h-screen items-center justify-center p-4">
+      <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-lg">
         {/* Header */}
-        <div className="bg-gradient-to-r bg-primary-base px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center justify-between bg-primary-base bg-gradient-to-r px-6 py-4">
           <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border border-white/30 text-white font-medium">
+            <div className="flex size-10 items-center justify-center rounded-full border border-white/30 bg-white/20 font-medium text-white">
               島
             </div>
 
             <div className="ml-3">
-              <div className="text-white font-medium text-sm">分享新想法</div>
-              <div className="text-white text-xs mt-1 opacity-80">
-                與島友分享你的學習洞察和創新想法
-              </div>
+              <div className="text-sm font-medium text-white">分享新想法</div>
             </div>
           </div>
           {onCancel && (
@@ -264,9 +269,9 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
               type="button"
               variant="ghost"
               onClick={onCancel}
-              className="text-white hover:bg-white/20 p-2"
+              className="p-2 text-white hover:bg-white/20"
             >
-              <X className="h-5 w-5" />
+              <X className="size-5" />
             </Button>
           )}
         </div>
@@ -279,28 +284,29 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                 <div className="flex items-start">
                   {/* 動態高度的垂直線 */}
                   <div
-                    className={`w-0.5 bg-basic-300 rounded-full mr-4 transition-all duration-200 mt-4 ${watchedContent && watchedContent.split('\n').length > 5 ? 'h-32' :
-                        watchedContent && watchedContent.split('\n').length > 3 ? 'h-24' :
-                          watchedContent && watchedContent.split('\n').length > 1 ? 'h-16' : 'h-8'
-                      }`}
+                    className={`mr-4 mt-4 w-0.5 rounded-full bg-basic-300 transition-all duration-200 ${watchedContent && watchedContent.split('\n').length > 5 ? 'h-32'
+                      : watchedContent && watchedContent.split('\n').length > 3 ? 'h-24'
+                        : watchedContent && watchedContent.split('\n').length > 1 ? 'h-16' : 'h-8'
+                    }`}
                   />
                   <div className="flex-1">
                     <Textarea
                       {...form.register('content')}
                       placeholder="分享你的學習洞察、重要發現或創新想法..."
-                      className="w-full px-0 py-4 !border-none !border-0 resize-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:border-transparent text-basic-700 leading-6 min-h-[24px] bg-transparent shadow-none rounded-none"
-                      maxLength={5000}
+                      className="text-basic-700 min-h-[24px] w-full resize-none rounded-none !border-0 !border-none bg-transparent px-0 py-4 leading-6 shadow-none focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
+                      maxLength={1000}
                     />
-                    <div className="text-xs text-basic-400 mt-2 text-right">
-                      {charactersUsed}/5000
+                    <div className="mt-2 text-right text-xs text-basic-400">
+                      {charactersUsed}
+                      /1000
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons - 使用共用組件 */}
-              <div className={`flex items-center space-x-2 relative transition-all duration-200 ml-5 ${charactersUsed > 0 ? 'mt-6' : 'mt-2'
-                }`}
+              <div className={`relative ml-5 flex items-center space-x-2 transition-all duration-200 ${charactersUsed > 0 ? 'mt-6' : 'mt-2'
+              }`}
               >
                 <TooltipProvider>
                   <Tooltip>
@@ -312,7 +318,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                         onClick={handleImageUpload}
                         className="text-basic-600 hover:bg-basic-100"
                       >
-                        <ImageIcon className="h-4 w-4" />
+                        <ImageIcon className="size-4" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -329,7 +335,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                         onClick={() => setShowTagSuggestions(!showTagSuggestions)}
                         className="text-basic-600 hover:bg-basic-100"
                       >
-                        <Hash className="h-4 w-4" />
+                        <Hash className="size-4" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -346,7 +352,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                         onClick={() => setShowResourceInput(!showResourceInput)}
                         className="text-basic-600 hover:bg-basic-100"
                       >
-                        <LinkIcon className="h-4 w-4" />
+                        <LinkIcon className="size-4" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
@@ -372,7 +378,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
             </div>
 
             {form.formState.errors.content && (
-              <p className="text-xs text-red-500 mb-2">
+              <p className="mb-2 text-xs text-red-500">
                 {form.formState.errors.content.message}
               </p>
             )}
@@ -393,9 +399,9 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                         <button
                           type="button"
                           onClick={() => removeTag(tag)}
-                          className="ml-2 hover:text-red-500 transition-colors"
+                          className="ml-2 transition-colors hover:text-red-500"
                         >
-                          <X className="h-3 w-3" />
+                          <X className="size-3" />
                         </button>
                       </Badge>
                     );
@@ -407,15 +413,20 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
             {/* 標籤選擇器 - 只在點擊標籤按鈕時顯示 */}
             {showTagSuggestions && (
               <div className="mb-4">
-                <div className="bg-white border border-basic-200 rounded-lg shadow-lg p-3">
-                  <div className="mb-3 pb-3 border-b border-basic-100">
-                    <div className="text-xs text-basic-500 mb-2">建立新標籤</div>
-                    <div className="flex space-x-2">
+                <div className="overflow-hidden rounded-md border border-gray-200 bg-white shadow-xl">
+                  <div className="border-b border-gray-100 bg-primary-pale/30 p-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="text-sm font-medium text-basic-600">建立新標籤</span>
+                      <span className="text-xs text-basic-400">
+                        已選擇 {selectedTags.length}/3
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
                       <Input
                         type="text"
                         value={customTagInput}
                         onChange={(e) => setCustomTagInput(e.target.value)}
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault();
                             if (createCustomTag(customTagInput)) {
@@ -424,7 +435,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                           }
                         }}
                         placeholder="輸入新標籤名稱"
-                        className="flex-1 text-sm"
+                        className="flex-1 text-sm bg-white"
                       />
                       <Button
                         type="button"
@@ -434,31 +445,44 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                           }
                         }}
                         disabled={!customTagInput.trim() || selectedTags.length >= 3}
-                        className="bg-primary-base hover:bg-primary-darker text-white text-sm"
+                        className="bg-primary-base text-sm text-white hover:bg-primary-darker disabled:bg-basic-300"
                       >
                         新增
                       </Button>
                     </div>
                   </div>
 
-                  <div className="text-xs text-basic-500 mb-2">熱門標籤</div>
-                  <div className="max-h-48 overflow-y-auto">
-                    {DEFAULT_TAGS.map((tag) => (
-                      <button
-                        key={tag.value}
-                        type="button"
-                        onClick={() => addTag(tag)}
-                        className="w-full text-left px-3 py-2 rounded-lg flex items-center justify-between group transition-colors hover:bg-basic-100"
-                        disabled={selectedTags.includes(tag.label) || selectedTags.length >= 3}
-                      >
-                        <span className={`text-sm ${selectedTags.includes(tag.label) || selectedTags.length >= 3 ? 'text-basic-400' : 'text-basic-700'}`}>
-                          {tag.label}
-                        </span>
-                        <Badge className={`${getTagCategoryColor(tag.category)} text-xs`}>
-                          {tag.category}
-                        </Badge>
-                      </button>
-                    ))}
+                  <div className="p-1">
+                    <div className="px-3 py-2 text-xs font-medium text-basic-500">熱門標籤</div>
+                    <div className="max-h-60 overflow-y-auto">
+                      {DEFAULT_TAGS.map((tag) => (
+                        <button
+                          key={tag.value}
+                          type="button"
+                          onClick={() => addTag(tag)}
+                          className={`
+                            group flex w-full items-center justify-between rounded-md px-3 py-2.5 text-left
+                            transition-colors duration-150 outline-none
+                            ${selectedTags.includes(tag.label) || selectedTags.length >= 3
+                              ? 'cursor-not-allowed opacity-50'
+                              : 'hover:bg-primary-pale cursor-pointer'
+                            }
+                          `}
+                          disabled={selectedTags.includes(tag.label) || selectedTags.length >= 3}
+                        >
+                          <span className={`text-sm ${
+                            selectedTags.includes(tag.label) || selectedTags.length >= 3
+                              ? 'text-basic-400'
+                              : 'text-basic-600'
+                          }`}>
+                            {tag.label}
+                          </span>
+                          <Badge className={`${getTagCategoryColor(tag.category)} text-xs`}>
+                            {tag.category}
+                          </Badge>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -469,23 +493,22 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
               <div className="mb-4">
                 <div className="grid grid-cols-3 gap-3">
                   {previewImages.map((src, index) => (
-                    <div key={src} className="relative group">
+                    <div key={src} className="group relative">
                       <Image
                         src={src}
                         alt={`Preview ${index + 1}`}
-                        width="100%"
-                        height="120px"
-                        className="w-full h-full"
-                        wrapperClassName="w-full"
+                        width={120}
+                        height={120}
+                        className="size-full object-cover"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
                         onClick={() => handleImageRemove(index)}
-                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-white hover:bg-red-600 shadow-lg z-10"
+                        className="absolute -right-2 -top-2 z-10 size-6 rounded-full bg-red-500 text-white shadow-lg hover:bg-red-600"
                       >
-                        <X className="h-3 w-3" />
+                        <X className="size-3" />
                       </Button>
                     </div>
                   ))}
@@ -500,19 +523,30 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                 {fields.map((field, index) => (
                   <div key={field.id}>
                     {editingResourceIndex === index ? (
-                      <div className="border border-primary-base rounded-lg p-4 bg-primary-base/5">
-                        <div className="space-y-3">
+                      <div className="overflow-hidden rounded-md border border-primary-base bg-primary-lightest/50 shadow-sm">
+                        <div className="border-b border-primary-base/20 bg-primary-pale/30 px-4 py-3">
+                          <span className="text-sm font-medium text-primary-darker">編輯資源</span>
+                        </div>
+                        <div className="space-y-4 p-4">
                           <div>
-                            <Label className="text-xs text-basic-600 mb-1">資源名稱</Label>
+                            <Label className="mb-2 block text-sm font-medium text-basic-600">
+                              資源名稱
+                              {' '}
+                              <span className="text-red-500">*</span>
+                            </Label>
                             <Input
                               placeholder="例如：設計思考入門指南"
                               value={editResourceData.name}
                               onChange={(e) => setEditResourceData((prev) => ({ ...prev, name: e.target.value }))}
-                              className="border-basic-200"
+                              className="bg-white"
                             />
                           </div>
                           <div>
-                            <Label className="text-xs text-basic-600 mb-1">資源連結</Label>
+                            <Label className="mb-2 block text-sm font-medium text-basic-600">
+                              資源連結
+                              {' '}
+                              <span className="text-red-500">*</span>
+                            </Label>
                             <Input
                               placeholder="https://example.com"
                               value={editResourceData.url}
@@ -520,74 +554,79 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                                 setEditResourceData((prev) => ({ ...prev, url: e.target.value }));
                                 setUrlError('');
                               }}
-                              className={urlError ? "border-red-500" : "border-basic-200"}
+                              className={`bg-white ${urlError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                             />
                             {urlError && (
-                              <p className="text-xs text-red-500 mt-1">{urlError}</p>
+                              <p className="mt-2 flex items-center text-xs text-red-500">
+                                <span className="mr-1">⚠</span>
+                                {urlError}
+                              </p>
                             )}
                           </div>
-                          <div className="flex justify-end space-x-2">
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={saveResource}
-                              size="sm"
-                              disabled={!editResourceData.name.trim() || !editResourceData.url.trim()}
-                            >
-                              保存
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={cancelEditResource}
-                              size="sm"
-                            >
-                              取消
-                            </Button>
-                          </div>
+                        </div>
+                        <div className="flex gap-2 border-t border-primary-base/20 bg-basic-50 px-4 py-3">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={cancelEditResource}
+                            size="sm"
+                            className="flex-1 bg-white hover:bg-basic-50"
+                          >
+                            取消
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={saveResource}
+                            size="sm"
+                            disabled={!editResourceData.name.trim() || !editResourceData.url.trim()}
+                            className="flex-1 bg-primary-base text-white hover:bg-primary-darker disabled:bg-basic-300 disabled:text-basic-400"
+                          >
+                            保存
+                          </Button>
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between p-3 rounded-lg border transition-colors hover:shadow-sm bg-primary-base/5 border-primary-base/20">
-                        <div className="flex items-center flex-1">
-                          <div className="mr-3 text-primary-base flex-shrink-0">
+                      <div className="group flex items-center justify-between rounded-md border border-primary-base/30 bg-gradient-to-r from-primary-palest to-white p-4 transition-all hover:border-primary-base hover:shadow-md">
+                        <div className="flex flex-1 items-center gap-3">
+                          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-base/10 text-primary-base transition-colors group-hover:bg-primary-base group-hover:text-white">
                             {getResourceIcon('custom')}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <span className="text-sm text-primary-darker block truncate">
+                          <div className="min-w-0 flex-1">
+                            <span className="block truncate text-sm font-medium text-primary-darker">
                               {field.name || '未命名資源'}
                             </span>
                             {field.url && (
-                              <Link
+                              <CustomLink
                                 href={field.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-xs text-primary-base hover:underline block truncate"
+                                className="mt-1 flex items-center gap-1 text-xs text-primary-base transition-colors hover:text-primary-darker hover:underline"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                {field.url}
-                              </Link>
+                                <LinkIcon className="size-3" />
+                                <span className="truncate">{field.url}</span>
+                              </CustomLink>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2 ml-3">
+                        <div className="ml-3 flex items-center gap-1">
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => startEditResource(index)}
-                            className="text-basic-400 hover:text-blue-500 h-8 w-8 p-0"
+                            className="size-8 p-0 text-basic-400 transition-all hover:bg-blue-50 hover:text-blue-600"
                           >
-                            <Edit className="h-3 w-3" />
+                            <Edit className="size-4" />
                           </Button>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => remove(index)}
-                            className="text-basic-400 hover:text-red-500 h-8 w-8 p-0"
+                            className="size-8 p-0 text-basic-400 transition-all hover:bg-red-50 hover:text-red-600"
                           >
-                            <Trash2 className="h-3 w-3" />
+                            <Trash2 className="size-4" />
                           </Button>
                         </div>
                       </div>
@@ -599,38 +638,107 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
 
             {/* 新增資源輸入框 */}
             {showResourceInput && (
-              <div className="space-y-3 p-4 rounded-lg border bg-primary-base/5 border-primary-base/20">
-                <div>
-                  <Label className="block text-sm font-medium mb-2 text-primary-darker">
-                    資源名稱
-                  </Label>
-                  <Input
-                    type="text"
-                    value={newResourceName}
-                    onChange={(e) => setNewResourceName(e.target.value)}
-                    placeholder="例如：設計思考入門指南"
-                    className="w-full border-basic-200"
-                  />
+              <div className="mb-4 overflow-hidden rounded-md border border-gray-200 bg-white shadow-xl">
+                <div className="border-b border-gray-100 bg-primary-pale/30 px-4 py-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-basic-600">新增學習資源</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setShowResourceInput(false);
+                        setNewResourceName('');
+                        setNewResourceUrl('');
+                        setUrlError('');
+                      }}
+                      className="size-6 p-0 text-basic-400 hover:bg-white hover:text-basic-600"
+                    >
+                      <X className="size-4" />
+                    </Button>
+                  </div>
+                  <p className="mt-1 text-xs text-basic-400">
+                    分享影片、書籍、文章等資源連結
+                  </p>
                 </div>
-                <div>
-                  <Label className="block text-sm font-medium mb-2 text-primary-darker">
-                    資源連結
-                  </Label>
-                  <Input
-                    type="url"
-                    value={newResourceUrl}
-                    onChange={(e) => {
-                      setNewResourceUrl(e.target.value);
-                      setUrlError('');
-                    }}
-                    placeholder="https://example.com"
-                    className={`w-full ${urlError ? 'border-red-500' : 'border-basic-200'}`}
-                  />
-                  {urlError && (
-                    <p className="text-xs text-red-500 mt-1">{urlError}</p>
-                  )}
+
+                <div className="space-y-4 p-4">
+                  <div>
+                    <Label className="mb-2 block text-sm font-medium text-basic-600">
+                      資源名稱
+                      {' '}
+                      <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="text"
+                      value={newResourceName}
+                      onChange={(e) => setNewResourceName(e.target.value)}
+                      placeholder="例如：設計思考入門指南"
+                      className="w-full"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && newResourceName.trim() && newResourceUrl.trim()) {
+                          e.preventDefault();
+                          if (!validateUrl(newResourceUrl)) {
+                            setUrlError('請輸入有效的網址格式，例如：https://example.com');
+                            return;
+                          }
+                          const newResource = {
+                            name: newResourceName,
+                            url: newResourceUrl,
+                          };
+                          append(newResource);
+                          setNewResourceName('');
+                          setNewResourceUrl('');
+                          setShowResourceInput(false);
+                          setUrlError('');
+                        }
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <Label className="mb-2 block text-sm font-medium text-basic-600">
+                      資源連結
+                      {' '}
+                      <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="url"
+                      value={newResourceUrl}
+                      onChange={(e) => {
+                        setNewResourceUrl(e.target.value);
+                        setUrlError('');
+                      }}
+                      placeholder="https://example.com"
+                      className={`w-full ${urlError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && newResourceName.trim() && newResourceUrl.trim()) {
+                          e.preventDefault();
+                          if (!validateUrl(newResourceUrl)) {
+                            setUrlError('請輸入有效的網址格式，例如：https://example.com');
+                            return;
+                          }
+                          const newResource = {
+                            name: newResourceName,
+                            url: newResourceUrl,
+                          };
+                          append(newResource);
+                          setNewResourceName('');
+                          setNewResourceUrl('');
+                          setShowResourceInput(false);
+                          setUrlError('');
+                        }
+                      }}
+                    />
+                    {urlError && (
+                      <p className="mt-2 flex items-center text-xs text-red-500">
+                        <span className="mr-1">⚠</span>
+                        {urlError}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div className="flex space-x-2">
+
+                <div className="flex gap-2 border-t border-gray-100 bg-basic-50 px-4 py-3">
                   <Button
                     type="button"
                     variant="outline"
@@ -640,7 +748,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                       setNewResourceUrl('');
                       setUrlError('');
                     }}
-                    className="flex-1"
+                    className="flex-1 border-basic-300 bg-white text-basic-600 hover:border-basic-400 hover:bg-basic-100"
                   >
                     取消
                   </Button>
@@ -654,7 +762,7 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                       }
                       const newResource = {
                         name: newResourceName,
-                        url: newResourceUrl
+                        url: newResourceUrl,
                       };
                       append(newResource);
                       setNewResourceName('');
@@ -662,21 +770,24 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
                       setShowResourceInput(false);
                     }}
                     disabled={!newResourceName.trim() || !newResourceUrl.trim()}
-                    className="flex-1 bg-primary-base hover:bg-primary-darker text-white"
+                    className="flex-1 bg-primary-base text-white hover:bg-primary-darker disabled:bg-basic-300 disabled:text-basic-400"
                   >
-                    新增
+                    新增資源
                   </Button>
-
                 </div>
               </div>
             )}
 
             {/* 分類提示 */}
             {selectedTags.length > 0 && (
-              <div className="flex items-center p-3 bg-primary-base/5 rounded-lg mt-4">
+              <div className="mt-4 flex items-center rounded-lg bg-primary-base/5 p-3">
                 <Lightbulb size={16} className="mr-2 text-primary-base" />
-                <span className="text-xs text-basic-600">
-                  根據你的標籤，這個想法可能會幫助到 <strong>15-20 位</strong> 對相關主題有興趣的夥伴
+                <span className="text-basic-600 text-xs">
+                  根據你的標籤，這個想法可能會幫助到
+                  {' '}
+                  <strong>15-20 位</strong>
+                  {' '}
+                  對相關主題有興趣的夥伴
                 </span>
               </div>
             )}
@@ -684,11 +795,11 @@ const IdeaCreateForm: React.FC<IdeaCreateFormProps> = ({
 
           {/* Footer */}
           <div className="border-t border-basic-200 pt-6">
-            <div className="flex items-center justify-end  m-4">
+            <div className="m-4 flex items-center  justify-end">
               <Button
                 type="submit"
                 disabled={isLoading || !watchedContent?.trim()}
-                className="px-6 py-3 rounded-lg font-medium transition-colors text-sm bg-primary-base hover:bg-primary-darker text-white disabled:bg-basic-300 disabled:cursor-not-allowed"
+                className="rounded-lg bg-primary-base px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-darker disabled:cursor-not-allowed disabled:bg-basic-300"
               >
                 {isLoading ? '分享中...' : '分享想法'}
               </Button>
@@ -725,17 +836,17 @@ const IdeaUpdateForm: React.FC<IdeaUpdateFormProps> = ({
   }, [onSubmit]);
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="mx-auto max-w-4xl">
       {/* 類似的 UI 結構，但標題改為 "編輯想法" */}
-      <div className="bg-primary-base px-6 py-4 rounded-t-2xl">
+      <div className="rounded-t-2xl bg-primary-base px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center border border-white border-opacity-30 text-white font-medium mr-3">
+            <div className="mr-3 flex size-10 items-center justify-center rounded-full border border-white border-opacity-30 bg-white bg-opacity-20 font-medium text-white">
               💡
             </div>
             <div>
-              <h1 className="text-white font-medium text-lg">編輯想法</h1>
-              <p className="text-white text-sm opacity-80">修改你的想法內容和相關資源</p>
+              <h1 className="text-lg font-medium text-white">編輯想法</h1>
+              <p className="text-sm text-white opacity-80">修改你的想法內容和相關資源</p>
             </div>
           </div>
           {onCancel && (
@@ -745,25 +856,27 @@ const IdeaUpdateForm: React.FC<IdeaUpdateFormProps> = ({
               onClick={onCancel}
               className="text-white hover:bg-white hover:bg-opacity-20"
             >
-              <X className="h-4 w-4" />
+              <X className="size-4" />
             </Button>
           )}
         </div>
       </div>
 
       <form onSubmit={form.handleSubmit(handleFormSubmit)}>
-        <div className="bg-white rounded-b-2xl p-6 space-y-6">
+        <div className="space-y-6 rounded-b-2xl bg-white p-6">
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="content" className="text-sm text-basic-500">
-                想法內容 <span className="text-red-500">*</span>
+                想法內容
+                {' '}
+                <span className="text-red-500">*</span>
               </Label>
               <Textarea
                 id="content"
                 placeholder="分享你的學習洞察、重要發現或創新想法..."
                 rows={8}
                 {...form.register('content')}
-                className="border-basic-200 hover:border-primary-base focus:border-primary-base resize-none"
+                className="resize-none border-basic-200 hover:border-primary-base focus:border-primary-base"
               />
               {form.formState.errors.content && (
                 <p className="text-xs text-red-500">
@@ -788,7 +901,7 @@ const IdeaUpdateForm: React.FC<IdeaUpdateFormProps> = ({
               <Button
                 type="submit"
                 disabled={isLoading || !watchedContent?.trim()}
-                className="bg-primary-base hover:bg-primary-darker text-white disabled:bg-basic-300"
+                className="bg-primary-base text-white hover:bg-primary-darker disabled:bg-basic-300"
               >
                 {isLoading ? '更新中...' : '更新想法'}
               </Button>

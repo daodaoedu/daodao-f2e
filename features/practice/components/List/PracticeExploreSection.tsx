@@ -1,22 +1,32 @@
+'use client';
+
 import React, { useState, useCallback } from 'react';
-import { Search, Plus, Target, Filter, SortAsc, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useRouter } from '@/shared/i18n/navigation';
+import { useAuth } from '@/entities/user';
+import { CustomLink } from '@/shared/ui/custom-link';
+import {
+  Search, Plus, Target, SortAsc, RefreshCw,
+} from 'lucide-react';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import {
+  Card, CardContent,
+} from '@/shared/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/shared/ui/dropdown-menu';
 import type { PracticeFilter, Practice } from '@/services/practice/schema';
+import { usePractices } from '@/services/practice/hooks';
 import PracticeCard from './PracticeCard';
-import { useFilteredPractices } from '../../hooks';
 
 interface PracticeExploreSectionProps {
   className?: string;
   showHeader?: boolean;
   showCreateButton?: boolean;
+  showSearchBar?: boolean;
   onCreateClick?: () => void;
 }
 
@@ -24,11 +34,13 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
   className = '',
   showHeader = true,
   showCreateButton = true,
+  showSearchBar = true,
   onCreateClick,
 }) => {
+  const router = useRouter();
+  const { user } = useAuth();
   // Filter and search state
   const [searchQuery, setSearchQuery] = useState('');
-  const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
   const [sortBy, setSortBy] = useState<'createdAt' | 'updatedAt' | 'progress' | 'streak'>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
@@ -41,18 +53,20 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
     status: ['active'],
   };
 
-  // Use filtered practices hook
+  // Use practices hook from services (real API)
   const {
     practices,
-    loading: isLoading,
+    pagination,
+    isLoading,
     error,
-  } = useFilteredPractices(filter);
+    mutate,
+  } = usePractices(filter);
 
   const isEmpty = !isLoading && (!practices || practices.length === 0);
+  const isError = !!error;
 
   const refresh = () => {
-    // Refresh functionality can be implemented later
-    console.log('Refresh practices');
+    mutate();
   };
 
   // Handlers
@@ -65,17 +79,9 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
     setSortOrder(newSortOrder);
   }, []);
 
-  const handleCreateClick = () => {
-    if (onCreateClick) {
-      onCreateClick();
-    } else {
-      // Default behavior - navigate to create page
-      window.location.href = '/practice/create';
-    }
-  };
 
   const handleEdit = (practice: Practice) => {
-    window.location.href = `/practice/${practice.id}/edit`;
+     router.push(`/practice/${practice.id}/edit`);
   };
 
   const handleDelete = (practice: Practice) => {
@@ -84,8 +90,8 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
   };
 
   const handleCheckIn = (practice: Practice) => {
-    console.log('Check in practice:', practice.id);
-    // Handle check-in operation
+    // Navigate directly to check-in view
+    router.push(`/practice/${practice.id}?view=checkin`);
   };
 
   // const handleJoin = (practice: Practice) => {
@@ -107,14 +113,14 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
     return current?.label || '最新建立';
   };
 
-  if (error) {
+  if (isError) {
     return (
       <Card className={`w-full ${className}`}>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <div className="text-center">
-            <Target className="w-12 h-12 text-basic-200 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-basic-600 mb-2">載入失敗</h3>
-            <p className="text-basic-400 mb-4">
+            <Target className="mx-auto mb-4 size-12 text-basic-200" />
+            <h3 className="text-basic-600 mb-2 text-lg font-medium">載入失敗</h3>
+            <p className="mb-4 text-basic-400">
               {error?.message || '無法載入實踐內容，請稍後再試'}
             </p>
             <Button
@@ -123,7 +129,7 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
               onClick={refresh}
               className="flex items-center gap-2"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="size-4" />
               重新載入
             </Button>
           </div>
@@ -133,39 +139,53 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
   }
 
   return (
-    <Card className={`w-full ${className}`}>
+    <div className={`w-full ${className}`}>
       {showHeader && (
-        <CardHeader className="pb-4">
+        <div className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Target className="w-5 h-5 text-primary-base" />
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              <Target className="size-5 text-primary-base" />
               探索主題實踐
-              {practices && (
+              {pagination && (
                 <span className="text-sm font-normal text-basic-400">
-                  ({practices.length})
+                  (
+                  {pagination.totalCount}
+                  )
                 </span>
               )}
-            </CardTitle>
+            </h2>
             {showCreateButton && (
-              <Button
-                size="sm"
-                onClick={handleCreateClick}
-                className="flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">開始實踐</span>
-              </Button>
+              onCreateClick ? (
+                <Button
+                  size="sm"
+                  onClick={onCreateClick}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="size-4" />
+                  <span>開始實踐</span>
+                </Button>
+              ) : (
+                <CustomLink href="/practice/create">
+                  <Button
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="size-4" />
+                    <span>開始實踐</span>
+                  </Button>
+                </CustomLink>
+              )
             )}
           </div>
-        </CardHeader>
+        </div>
       )}
 
-      <CardContent className="space-y-4">
+      <div className="space-y-4">
         {/* Search and Filter Bar */}
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-basic-400 w-4 h-4" />
+        {showSearchBar && (
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-basic-400" />
               <Input
                 placeholder="搜尋實踐標題、描述、標籤..."
                 value={searchQuery}
@@ -175,22 +195,11 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
             </div>
 
             <div className="flex gap-2">
-              {/* Advanced Filter Toggle */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAdvancedFilter(!showAdvancedFilter)}
-                className={`flex items-center gap-2 ${showAdvancedFilter ? 'bg-primary-50 text-primary-600' : ''}`}
-              >
-                <Filter className="w-4 h-4" />
-                <span className="hidden sm:inline">篩選</span>
-              </Button>
-
               {/* Sort Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <SortAsc className="w-4 h-4" />
+                    <SortAsc className="size-4" />
                     <span className="hidden sm:inline">{getCurrentSortLabel()}</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -219,45 +228,49 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
                 className="flex items-center gap-2"
                 disabled={isLoading}
               >
-                <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`size-4 ${isLoading ? 'animate-spin' : ''}`} />
               </Button>
             </div>
           </div>
-
-          {/* Advanced Filter Bar */}
-          {showAdvancedFilter && (
-            <div className="p-4 bg-basic-50 rounded-lg">
-              <p className="text-sm text-basic-400">進階篩選功能開發中</p>
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Practices Content */}
         {isLoading ? (
           <div className="space-y-4">
             {Array.from({ length: 5 }, (_, index) => (
-              <div key={`practice-skeleton-${Date.now()}-${index}`} className="animate-pulse">
-                <div className="bg-basic-100 rounded-lg h-40" />
-              </div>
+              <Card
+                key={`practice-skeleton-${Date.now()}-${index}`}
+                className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-basic-white rounded-2xl shadow-sm border border-basic-200 animate-pulse"
+              >
+                <CardContent className="p-3 sm:p-4 md:p-6">
+                  <div className="h-40 bg-basic-100 rounded-lg" />
+                </CardContent>
+              </Card>
             ))}
           </div>
         ) : isEmpty ? (
-          <div className="text-center py-12">
-            <Target className="w-16 h-16 text-basic-200 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-basic-600 mb-2">
+          <div className="py-12 text-center">
+            <Target className="mx-auto mb-4 size-16 text-basic-200" />
+            <h3 className="text-basic-600 mb-2 text-lg font-medium">
               {searchQuery ? '找不到相關實踐' : '還沒有實踐活動'}
             </h3>
-            <p className="text-basic-400 mb-6">
+            <p className="mb-6 text-basic-400">
               {searchQuery
                 ? '嘗試調整搜尋關鍵字或清除篩選條件'
-                : '開始你的第一個學習實踐！'
-              }
+                : '開始你的第一個學習實踐！'}
             </p>
-            {showCreateButton && (
-              <Button onClick={handleCreateClick} className="flex items-center gap-2">
-                <Plus className="w-4 h-4" />
+            {onCreateClick ? (
+              <Button onClick={onCreateClick} className="flex items-center gap-2">
+                <Plus className="size-4" />
                 開始第一個實踐
               </Button>
+            ) : (
+              <CustomLink href="/practice/create">
+                <Button className="flex items-center gap-2">
+                  <Plus className="size-4" />
+                  開始第一個實踐
+                </Button>
+              </CustomLink>
             )}
           </div>
         ) : (
@@ -266,6 +279,7 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
               <PracticeCard
                 key={practice.id}
                 practice={practice}
+                currentUserId={user?.id}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onCheckIn={handleCheckIn}
@@ -273,18 +287,26 @@ const PracticeExploreSection: React.FC<PracticeExploreSectionProps> = ({
               />
             ))}
 
-            {/* Load More Info */}
-            {practices.length > 0 && (
-              <div className="text-center pt-4">
+            {/* Load More or Pagination Info */}
+            {pagination && pagination.hasNext && (
+              <div className="pt-4 text-center">
                 <p className="text-sm text-basic-400">
-                  顯示 {practices.length} 個實踐活動
+                  顯示
+                  {' '}
+                  {practices.length}
+                  {' '}
+                  /
+                  {' '}
+                  {pagination.totalCount}
+                  {' '}
+                  個實踐活動
                 </p>
               </div>
             )}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

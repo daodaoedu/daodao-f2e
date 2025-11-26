@@ -1,34 +1,59 @@
-import { useRouter } from "next/router";
-import { forwardRef } from "react";
-import Link from "next/link";
-import newLogo from "@/public/new-logo.png";
-import { usePromotion } from "@/contexts/Promotion";
-import { cn } from "@/utils/cn";
-import { Image } from "@/components/ui/image";
-import MobileMenu from "./MobileMenu";
-import DesktopMenu from "./DesktopMenu";
+'use client';
 
-function Header(
-  { children }: React.PropsWithChildren,
-  ref: React.Ref<HTMLDivElement>
-) {
-  const { isShowShadow } = usePromotion();
-  const { pathname } = useRouter();
-  const isFixed = pathname === "/";
+import { useEffect, useRef } from 'react';
+import { CustomLink } from '@/shared/ui/custom-link';
+import newLogo from '@/public/assets/brand/horizontal-secondary-logo.png';
+import { PromotionBar, usePromotion } from '@/contexts/Promotion';
+import { cn } from '@/shared/lib/cn';
+import { Image } from '@/shared/ui/image';
+import MobileMenu from './MobileMenu';
+import DesktopMenu from './DesktopMenu';
+
+function Header() {
+  const { isShowShadow, isShowPromotionBar, setHeight } = usePromotion();
+  const prevShowPromotionBar = useRef<boolean | null>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScrollPaddingTop = () => {
+      requestAnimationFrame(() => {
+        if (!headerRef.current) return;
+        const headerOffset = headerRef.current.offsetHeight;
+        const root = document.querySelector(':root');
+
+        setHeight(Math.floor(headerOffset));
+        if (root instanceof HTMLElement) {
+          root.style.setProperty(
+            'scroll-padding-top',
+            `${headerOffset + 80}px`
+          );
+        }
+      });
+    };
+
+    if (prevShowPromotionBar.current !== isShowPromotionBar) {
+      handleScrollPaddingTop();
+      prevShowPromotionBar.current = isShowPromotionBar;
+    }
+
+    window.addEventListener('resize', handleScrollPaddingTop);
+    return () => {
+      window.removeEventListener('resize', handleScrollPaddingTop);
+    };
+  }, [headerRef.current, isShowPromotionBar]);
 
   return (
     <div
-      ref={ref}
+      ref={headerRef}
       className={cn(
-        "sticky top-0 inset-x-0 z-30",
-        isShowShadow && "shadow-md shadow-basic-black/25",
-        isFixed && "fixed"
+        'fixed inset-x-0 top-0 z-30',
+        isShowShadow && 'shadow-md shadow-basic-black/25'
       )}
     >
-      {children}
-      <header className="relative flex items-center justify-between w-full px-4 body-md bg-primary-base">
+      <PromotionBar />
+      <header className="body-md relative flex w-full items-center justify-between bg-primary-base px-4">
         <div className="flex-1">
-          <Link href="/" className="block py-6">
+          <CustomLink href="/" className="block py-6">
             <Image
               src={newLogo}
               alt="島島阿學"
@@ -36,9 +61,9 @@ function Header(
               height={22}
               priority
             />
-          </Link>
+          </CustomLink>
         </div>
-        <div className="hidden lg:flex items-center justify-between flex-[3] xl:flex-[2]">
+        <div className="hidden flex-[2] items-center justify-between lg:flex">
           <DesktopMenu />
         </div>
         <div className="lg:hidden">
@@ -49,4 +74,4 @@ function Header(
   );
 }
 
-export default forwardRef(Header);
+export default Header;

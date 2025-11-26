@@ -7,8 +7,8 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { ProjectTaskSchema } from '@/services/projects';
 import { useMilestones } from '@/contexts/Milestones';
-import { useDraggableContainer } from '@/hooks/useDraggableContainer';
-import { useDraggableSensors } from '@/hooks/useDraggableSensors';
+import { useDraggableContainer } from '@/shared/lib/use-draggable-container';
+import { useDraggableSensors } from '@/shared/lib/use-draggable-sensors';
 import DraggableItem from '@/shared/components/DraggableItem';
 import Task from './Task';
 
@@ -88,7 +88,7 @@ const DraggableTasks = ({
       {/* 拖曳覆蓋層，當拖動時顯示 */}
       <DragOverlay>
         {activeItem && (
-          <div className="opacity-80 w-full">
+          <div className="w-full opacity-80">
             <Task
               projectId={projectId}
               milestoneId={Number(milestoneId)}

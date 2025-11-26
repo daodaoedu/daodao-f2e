@@ -1,6 +1,7 @@
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 import Sidebar, { SidebarItemType } from '@/layout/components/Sidebar';
-import { RoleEnum, useAuth } from '@/contexts/Auth';
+import { RoleEnum } from '@/services/users';
+import { useAuth } from '@/entities/user';
 import { ProjectProvider } from '@/contexts/Project';
 import { MilestonesProvider } from '@/contexts/Milestones';
 import getPrivateLayout from '../core/getPrivateLayout';
@@ -11,14 +12,11 @@ const MENTOR_WORKSPACE_PERMISSIONS = [
   RoleEnum.SuperAdmin,
 ];
 
-const getCanVisitMentorWorkspace = (role?: RoleEnum) => {
-  return role ? MENTOR_WORKSPACE_PERMISSIONS.includes(role) : false;
-};
+const getCanVisitMentorWorkspace = (role?: RoleEnum | null) => (role ? MENTOR_WORKSPACE_PERMISSIONS.includes(role) : false);
 
 const manageRoutes = {
   manage: '/manage',
   projects: '/manage/projects',
-  myCard: '/personal-card/my-card',
   collections: '/manage/treasure/collections',
   footprints: '/manage/treasure/footprints',
   following: '/manage/treasure/following',
@@ -27,7 +25,7 @@ const manageRoutes = {
 
 interface GetManageSidebarItemsOptions {
   pathname: string;
-  role?: RoleEnum;
+  role?: RoleEnum | null;
 }
 
 export const getManageSidebarItems = ({
@@ -44,7 +42,6 @@ export const getManageSidebarItems = ({
   const items: SidebarItemType[] = [
     genSidebarItem('我的小島', manageRoutes.manage),
     genSidebarItem('我的學習計畫', manageRoutes.projects),
-    genSidebarItem('個人名片', manageRoutes.myCard),
     {
       label: '百寶箱',
       children: [
@@ -63,12 +60,12 @@ export const getManageSidebarItems = ({
 };
 
 function ManageLayout({ children }: React.PropsWithChildren) {
-  const { pathname } = useRouter();
+  const pathname = usePathname();
   const { user } = useAuth();
   const role = user?.role;
   const canVisitMentorWorkspace = getCanVisitMentorWorkspace(role);
   const sidebarItems = getManageSidebarItems({
-    pathname,
+    pathname: pathname || '',
     role,
   });
 

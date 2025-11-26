@@ -6,11 +6,11 @@ import { getRecentActivity, generateCheckInId, getCurrentDateISO, getCurrentTime
 
 // 簽到輸入驗證 schema
 const checkInInputValidationSchema = z.object({
-  practiceId: z.string().min(1, '請提供實踐 ID'),
   progress: z.number().min(0, '進度必須大於等於 0'),
   note: z.string().max(1000, '簽到筆記不能超過 1000 字元').optional(),
-  mood: z.enum(['excellent', 'good', 'average', 'challenging', 'difficult']).optional(),
-  tags: z.array(z.string().max(20, '單個標籤不能超過 20 字元')).max(5, '標籤不能超過 5 個').default([])
+  mood: z.enum(['awesome', 'happy', 'neutral', 'tired', 'frustrated']).optional(),
+  reflectionText: z.string().optional(),
+  relatedResourceId: z.string().optional()
 });
 
 // 簽到服務類
@@ -25,7 +25,7 @@ export class CheckInService {
       totalProgress: practice.currentProgress + input.progress,
       note: input.note || '',
       mood: input.mood,
-      tags: input.tags || [],
+      tags: [],
       createdAt: getCurrentTimeISO()
     };
 
@@ -75,6 +75,7 @@ export class CheckInService {
     let index = 0;
     while (index < sortedCheckIns.length) {
       const checkIn = sortedCheckIns[index];
+      if (!checkIn) break;
       const checkInDate = startOfDay(parseISO(checkIn.date));
 
       if (isSameDay(checkInDate, currentDate)) {
@@ -138,11 +139,11 @@ export class CheckInService {
         averageProgress: 0,
         lastWeekCheckIns: 0,
         moodDistribution: {
-          excellent: 0,
-          good: 0,
-          average: 0,
-          challenging: 0,
-          difficult: 0
+          awesome: 0,
+          happy: 0,
+          neutral: 0,
+          tired: 0,
+          frustrated: 0
         },
         weeklyProgress: []
       };
@@ -160,11 +161,11 @@ export class CheckInService {
 
     // 心情分佈
     const moodDistribution: Record<MoodType, number> = {
-      excellent: 0,
-      good: 0,
-      average: 0,
-      challenging: 0,
-      difficult: 0
+      awesome: 0,
+      happy: 0,
+      neutral: 0,
+      tired: 0,
+      frustrated: 0
     };
 
     checkIns.forEach((checkIn) => {
@@ -181,6 +182,7 @@ export class CheckInService {
       const weekEnd = subDays(new Date(), i * 7);
 
       const weekCheckIns = checkIns.filter((checkIn) => {
+        if (!checkIn.date) return false;
         const checkInDate = parseISO(checkIn.date);
         return isAfter(checkInDate, weekStart) && isBefore(checkInDate, weekEnd);
       });
@@ -219,7 +221,7 @@ export class CheckInService {
       }
 
       // 心情建議
-      const negativeRatio = (stats.moodDistribution.challenging + stats.moodDistribution.difficult) / stats.totalCheckIns;
+      const negativeRatio = (stats.moodDistribution.tired + stats.moodDistribution.frustrated) / stats.totalCheckIns;
       if (negativeRatio > 0.5) {
         suggestions.push('最近學習感覺有挑戰性，可以考慮降低目標或尋求幫助');
       }
@@ -302,11 +304,11 @@ export class CheckInService {
     const threeDaysAgo = subDays(new Date(), 3);
 
     const moodLabels: Record<MoodType, string> = {
-      excellent: '極佳',
-      good: '良好',
-      average: '普通',
-      challenging: '有挑戰',
-      difficult: '困難'
+      awesome: '超棒',
+      happy: '開心',
+      neutral: '普通',
+      tired: '疲累',
+      frustrated: '受挫'
     };
 
     return checkIns
@@ -361,11 +363,11 @@ export class CheckInService {
         .reduce((a, b) => a[1] > b[1] ? a : b)[0] as MoodType;
 
       const moodLabels: Record<MoodType, string> = {
-        excellent: '優秀',
-        good: '良好',
-        average: '普通',
-        challenging: '有挑戰',
-        difficult: '困難'
+        awesome: '超棒',
+        happy: '開心',
+        neutral: '普通',
+        tired: '疲累',
+        frustrated: '受挫'
       };
 
       summary += `• 主要心情: ${moodLabels[dominantMood]}\n`;

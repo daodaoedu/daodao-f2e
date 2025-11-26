@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
+import { useSearchParams } from 'next/navigation';
 import { Practice } from '@/services/practice/schema';
 import { DashboardView } from '@/features/practice';
 import MainDashboard from '@/features/practice/components/Dashboard/MainDashboard';
@@ -11,20 +12,43 @@ import { useScrollToTop } from '@/features/practice/hooks/useScrollToTop';
 
 interface DashboardFlowProps {
   practice: Practice;
+  currentUserId?: string;
+  commentSection: React.ReactNode;
   onBack: () => void;
+  onDataUpdate?: () => void;
 }
 
 const DashboardFlow: React.FC<DashboardFlowProps> = ({
   practice,
-  onBack
+  currentUserId,
+  commentSection,
+  onBack,
+  onDataUpdate,
 }) => {
+  const searchParams = useSearchParams();
   const [currentView, setCurrentView] = useState<DashboardView>('main');
   const [showConfetti, setShowConfetti] = useState(false);
   const [celebrationMessage, setCelebrationMessage] = useState('');
   const { scrollToTop } = useScrollToTop();
 
+  // 檢查 URL 參數，自動切換到指定視圖
+  useEffect(() => {
+    if (!searchParams) return;
+    const view = searchParams.get('view');
+    if (view === 'checkin') {
+      setCurrentView('checkin');
+    } else if (view === 'history') {
+      setCurrentView('history');
+    }
+  }, [searchParams]);
+
   // 處理打卡成功
   const handleCheckInSuccess = () => {
+    // 重新獲取最新的實踐數據
+    if (onDataUpdate) {
+      onDataUpdate();
+    }
+
     // 顯示慶祝動畫
     setShowConfetti(true);
     setCelebrationMessage('打卡成功！繼續保持學習的好習慣！');
@@ -72,7 +96,11 @@ const DashboardFlow: React.FC<DashboardFlowProps> = ({
   return (
     <>
       <Head>
-        <title>{getPageTitle()} - 主題實踐</title>
+        <title>
+          {getPageTitle()}
+          {' '}
+          - 主題實踐
+        </title>
         <meta name="description" content={getPageDescription()} />
       </Head>
 
@@ -90,6 +118,8 @@ const DashboardFlow: React.FC<DashboardFlowProps> = ({
         {currentView === 'main' && (
           <MainDashboard
             practice={practice}
+            currentUserId={currentUserId}
+            commentSection={commentSection}
             onCheckIn={() => handleViewChange('checkin')}
             onBack={onBack}
           />
@@ -98,6 +128,7 @@ const DashboardFlow: React.FC<DashboardFlowProps> = ({
         {currentView === 'checkin' && (
           <CheckInView
             practice={practice}
+            currentUserId={currentUserId}
             onBack={() => handleViewChange('main')}
             onSuccess={handleCheckInSuccess}
           />

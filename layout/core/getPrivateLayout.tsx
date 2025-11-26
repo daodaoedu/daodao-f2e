@@ -1,4 +1,4 @@
-import { ProtectedComponent, ProtectedComponentProps } from '@/contexts/Auth';
+import { ProtectedComponent, ProtectedComponentProps } from '@/entities/user';
 import getBaseLayout from './getBaseLayout';
 
 export default function getPrivateLayout(

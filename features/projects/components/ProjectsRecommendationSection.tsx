@@ -1,12 +1,16 @@
 import React from 'react';
-import { FolderOpen, TrendingUp, RefreshCw, Compass } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import {
+  FolderOpen, TrendingUp, RefreshCw, Compass,
+} from 'lucide-react';
+import { Button } from '@/shared/ui/button';
+import {
+  Card, CardContent, CardHeader, CardTitle,
+} from '@/shared/ui/card';
+import { Badge } from '@/shared/ui/badge';
 import { useContentTypeRecommendations } from '@/services/recommendation';
-import { useAuth } from '@/contexts/Auth';
+import { useAuth } from '@/entities/user';
 import { type RecommendationItem } from '@/services/recommendation/core/schema';
-import Link from 'next/link';
+import { CustomLink } from '@/shared/ui/custom-link';
 
 interface ProjectsRecommendationSectionProps {
   className?: string;
@@ -45,14 +49,14 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
       <Card className={`w-full ${className}`}>
         <CardContent className="flex flex-col items-center justify-center py-8">
           <div className="text-center">
-            <p className="text-basic-400 mb-4">推薦內容載入失敗</p>
+            <p className="mb-4 text-basic-400">推薦內容載入失敗</p>
             <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
               className="flex items-center gap-2"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="size-4" />
               重新載入
             </Button>
           </div>
@@ -67,7 +71,7 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
         {showHeader && (
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <FolderOpen className="w-5 h-5 text-primary-base" />
+              <FolderOpen className="size-5 text-primary-base" />
               推薦學習計劃
             </CardTitle>
           </CardHeader>
@@ -76,7 +80,7 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
           <div className="space-y-4">
             {Array.from({ length: 3 }, (_, index) => (
               <div key={`project-rec-skeleton-${Date.now()}-${index}`} className="animate-pulse">
-                <div className="bg-basic-100 rounded-lg h-36" />
+                <div className="h-36 rounded-lg bg-basic-100" />
               </div>
             ))}
           </div>
@@ -91,15 +95,15 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
         {showHeader && (
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <FolderOpen className="w-5 h-5 text-primary-base" />
+              <FolderOpen className="size-5 text-primary-base" />
               推薦學習計劃
             </CardTitle>
           </CardHeader>
         )}
         <CardContent>
-          <div className="text-center py-8">
-            <FolderOpen className="w-12 h-12 text-basic-200 mx-auto mb-4" />
-            <p className="text-basic-400 mb-2">暫無推薦計劃</p>
+          <div className="py-8 text-center">
+            <FolderOpen className="mx-auto mb-4 size-12 text-basic-200" />
+            <p className="mb-2 text-basic-400">暫無推薦計劃</p>
             <p className="text-sm text-basic-300">
               多參與學習活動，我們就能為你推薦適合的學習計劃
             </p>
@@ -116,19 +120,19 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
     }
 
     return (
-      <Card className="hover:shadow-md transition-shadow duration-200 border border-basic-200">
+      <Card className="border border-basic-200 transition-shadow duration-200 hover:shadow-md">
         <CardContent className="p-4">
           <div className="space-y-3">
             {/* Header */}
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <Link
+                <CustomLink
                   href={`/projects/detail?id=${item.id}`}
-                  className="text-lg font-semibold text-basic-black hover:text-primary-base transition-colors line-clamp-1"
+                  className="line-clamp-1 text-lg font-semibold text-basic-black transition-colors hover:text-primary-base"
                 >
                   {item.title}
-                </Link>
-                <p className="text-sm text-basic-400 mt-1">
+                </CustomLink>
+                <p className="mt-1 text-sm text-basic-400">
                   {new Date(item.createdDate).toLocaleDateString('zh-TW')}
                 </p>
               </div>
@@ -140,21 +144,23 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
             </div>
 
             {/* Description */}
-            <p className="text-basic-600 text-sm line-clamp-2 leading-relaxed">
+            <p className="text-basic-600 line-clamp-2 text-sm leading-relaxed">
               {item.description}
             </p>
 
             {/* Author Info */}
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-xs font-medium text-primary-600">
+              <div className="bg-primary-100 flex size-6 items-center justify-center rounded-full">
+                <span className="text-primary-600 text-xs font-medium">
                   {item.user.name.charAt(0)}
                 </span>
               </div>
               <span className="text-sm text-basic-500">{item.user.name}</span>
               {item.participants && (
-                <div className="text-xs text-basic-400 ml-auto">
-                  {item.participants} 人參與
+                <div className="ml-auto text-xs text-basic-400">
+                  {item.participants}
+                  {' '}
+                  人參與
                 </div>
               )}
             </div>
@@ -169,7 +175,8 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
                 ))}
                 {item.tags.length > 3 && (
                   <Badge variant="outline" className="text-xs text-basic-400">
-                    +{item.tags.length - 3}
+                    +
+                    {item.tags.length - 3}
                   </Badge>
                 )}
               </div>
@@ -180,16 +187,16 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
               <div className="flex items-center justify-between">
                 <Badge
                   variant={item.status === '進行中' ? 'default' : 'secondary'}
-                  className="text-xs"
+                  className="text-xs whitespace-nowrap"
                 >
                   {item.status}
                 </Badge>
-                <Link
+                <CustomLink
                   href={`/projects/detail?id=${item.id}`}
                   className="text-xs text-primary-base hover:text-primary-darker"
                 >
                   查看詳情 →
-                </Link>
+                </CustomLink>
               </div>
             )}
           </div>
@@ -204,11 +211,13 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <FolderOpen className="w-5 h-5 text-primary-base" />
+              <FolderOpen className="size-5 text-primary-base" />
               推薦學習計劃
               {projectRecommendations.length > 0 && (
                 <span className="text-sm font-normal text-basic-400">
-                  ({projectRecommendations.length}+)
+                  (
+                  {projectRecommendations.length}
+                  +)
                 </span>
               )}
             </CardTitle>
@@ -217,16 +226,16 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
                 variant="ghost"
                 size="sm"
                 onClick={handleRefresh}
-                className="flex items-center gap-1 text-basic-400 hover:text-basic-600"
+                className="hover:text-basic-600 flex items-center gap-1 text-basic-400"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="size-4" />
                 <span className="hidden sm:inline">重新推薦</span>
               </Button>
             </div>
           </div>
           {projectRecommendations.length > 0 && (
-            <p className="text-sm text-basic-400 flex items-center gap-1">
-              <Compass className="w-4 h-4" />
+            <p className="flex items-center gap-1 text-sm text-basic-400">
+              <Compass className="size-4" />
               根據你的學習興趣推薦的計劃
             </p>
           )}
@@ -239,14 +248,14 @@ const ProjectsRecommendationSection: React.FC<ProjectsRecommendationSectionProps
         ))}
 
         {hasMore && (
-          <div className="text-center pt-4">
+          <div className="pt-4 text-center">
             <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
               className="flex items-center gap-2"
             >
-              <TrendingUp className="w-4 h-4" />
+              <TrendingUp className="size-4" />
               載入更多推薦
             </Button>
           </div>

@@ -1,5 +1,5 @@
 import ShellIcon from '@/public/assets/icons/shell.svg';
-import { Bookmark, MessageSquareText } from "lucide-react";
+import { Bookmark, MessageSquareText } from 'lucide-react';
 
 enum StatusEnum {
  FAVORITES = 'favorites',
@@ -22,31 +22,29 @@ const ProjectStatus = ({ status }: ProjectCardStatus) => {
     {
       name: StatusEnum.SHELLS,
       icon: <ShellIcon />,
-      value: status.shells
+      value: status.shells,
     },
     {
       name: StatusEnum.COMMENTS,
       icon: <MessageSquareText />,
-      value: status.comments
-    }
+      value: status.comments,
+    },
   ];
 
   return (
     <div className="flex flex-row items-center gap-3">
       {
-        statusList.map((stat) => {
-          return (
-            <div
-              key={stat.name}
-              className="flex flex-row justify-start items-center gap-[2px]"
-            >
-              <span className="text-basic-500">{stat.icon}</span>
-              <span className="font-sans text-sm leading-normal text-basic-500">
-                {stat.value}
-              </span>
-            </div>
-          );
-        })
+        statusList.map((stat) => (
+          <div
+            key={stat.name}
+            className="flex flex-row items-center justify-start gap-[2px]"
+          >
+            <span className="text-basic-500">{stat.icon}</span>
+            <span className="font-sans text-sm leading-normal text-basic-500">
+              {stat.value}
+            </span>
+          </div>
+        ))
       }
     </div>
   );

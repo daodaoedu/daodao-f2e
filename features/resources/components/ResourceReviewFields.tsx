@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useFormContext } from "react-hook-form";
+import { useFormContext } from 'react-hook-form';
 import {
   FormControl,
   FormDescription,
@@ -8,30 +8,30 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Text, Title } from "@/components/ui/typography";
+} from '@/shared/ui/form';
+import { Checkbox } from '@/shared/ui/checkbox';
+import { Text, Title } from '@/shared/ui/typography';
 import {
   ResourceFormSchema,
   ResourceReviewFormSchema,
-} from "@/services/resources";
+} from '@/services/resources';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Rating } from "@/components/ui/rating";
-import { MultipleSelector } from "@/components/ui/multiple-selector";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
+} from '@/shared/ui/select';
+import { Rating } from '@/shared/ui/rating';
+import { MultipleSelector } from '@/shared/ui/multiple-selector';
+import { MarkdownEditor } from '@/shared/ui/markdown-editor';
 import {
   contentFeaturesOptions,
   resourceUsageOptions,
   timeUsageOptions,
-} from "@/features/resources";
+} from '@/features/resources';
 
-type ResourceReviewSchema = Pick<ResourceFormSchema, "review">;
+type ResourceReviewSchema = Pick<ResourceFormSchema, 'review'>;
 
 interface ResourceReviewFieldsProps {
   isReviewNested?: boolean;
@@ -44,14 +44,14 @@ export default function ResourceReviewFields({
     ResourceReviewFormSchema | ResourceReviewSchema
   >();
 
-  const prefixKey = isReviewNested ? "review." : "";
+  const prefixKey = isReviewNested ? 'review.' : '';
 
   return (
     <>
       <Title as="h2" size="lg" className="mb-2 text-center">
         心得
       </Title>
-      <Text size="lg" className="mb-10 text-basic-500 text-center">
+      <Text size="lg" className="mb-10 text-center text-basic-500">
         分享心得讓其他人更了解這個資源
       </Text>
 
@@ -59,17 +59,17 @@ export default function ResourceReviewFields({
         <div>
           <FormLabel required>影響力指標</FormLabel>
 
-          <div className="flex flex-wrap gap-x-3 gap-y-6 p-6 border border-solid border-basic-100 rounded-lg">
+          <div className="flex flex-wrap gap-x-3 gap-y-6 rounded-lg border border-solid border-basic-100 p-6">
             <FormField
               control={form.control}
               name={`${prefixKey}overallImpact`}
               render={({ field }) => (
                 <FormItem className="basis-full">
-                  <div className="flex flex-col justify-center items-center">
+                  <div className="flex flex-col items-center justify-center">
                     <FormLabel className="body-md mb-2">綜合影響力</FormLabel>
                     <FormControl>
                       <Rating
-                        value={field.value}
+                        value={field.value ?? 0}
                         onValueChange={field.onChange}
                         max={5}
                       />
@@ -85,13 +85,13 @@ export default function ResourceReviewFields({
               name={`${prefixKey}changeMindset`}
               render={({ field }) => (
                 <FormItem className="flex-1 basis-2/5">
-                  <div className="flex items-center gap-3 mb-2">
-                    <FormLabel className="flex-1 body-md text-right mb-0">
+                  <div className="mb-2 flex items-center gap-3">
+                    <FormLabel className="body-md mb-0 flex-1 text-right">
                       改變思維方式
                     </FormLabel>
                     <FormControl className="flex-1">
                       <Rating
-                        value={field.value}
+                        value={field.value ?? 0}
                         onValueChange={field.onChange}
                         max={5}
                       />
@@ -110,13 +110,13 @@ export default function ResourceReviewFields({
               name={`${prefixKey}gainPerspectives`}
               render={({ field }) => (
                 <FormItem className="flex-1 basis-2/5">
-                  <div className="flex items-center gap-3 mb-2">
-                    <FormLabel className="flex-1 body-md text-right mb-0">
+                  <div className="mb-2 flex items-center gap-3">
+                    <FormLabel className="body-md mb-0 flex-1 text-right">
                       獲得新觀點
                     </FormLabel>
                     <FormControl className="flex-1">
                       <Rating
-                        value={field.value}
+                        value={field.value ?? 0}
                         onValueChange={field.onChange}
                         max={5}
                       />
@@ -135,13 +135,13 @@ export default function ResourceReviewFields({
               name={`${prefixKey}solveProblems`}
               render={({ field }) => (
                 <FormItem className="flex-1 basis-2/5">
-                  <div className="flex items-center gap-3 mb-2">
-                    <FormLabel className="flex-1 body-md text-right mb-0">
+                  <div className="mb-2 flex items-center gap-3">
+                    <FormLabel className="body-md mb-0 flex-1 text-right">
                       解決實際問題
                     </FormLabel>
                     <FormControl className="flex-1">
                       <Rating
-                        value={field.value}
+                        value={field.value ?? 0}
                         onValueChange={field.onChange}
                         max={5}
                       />
@@ -160,13 +160,13 @@ export default function ResourceReviewFields({
               name={`${prefixKey}achieveGoals`}
               render={({ field }) => (
                 <FormItem className="flex-1 basis-2/5">
-                  <div className="flex items-center gap-3 mb-2">
-                    <FormLabel className="flex-1 body-md text-right mb-0">
+                  <div className="mb-2 flex items-center gap-3">
+                    <FormLabel className="body-md mb-0 flex-1 text-right">
                       達成具體目標
                     </FormLabel>
                     <FormControl className="flex-1">
                       <Rating
-                        value={field.value}
+                        value={field.value ?? 0}
                         onValueChange={field.onChange}
                         max={5}
                       />
@@ -206,14 +206,14 @@ export default function ResourceReviewFields({
           render={({ field }) => (
             <FormItem>
               <FormLabel required>內容特色</FormLabel>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
+              <div className="mt-2 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                 {contentFeaturesOptions.map((item) => (
                   <FormItem
                     key={item.value}
-                    className="flex items-center border border-solid border-basic-200 rounded-lg relative gap-2 m-0"
+                    className="relative m-0 flex items-center gap-2 rounded-lg border border-solid border-basic-200"
                   >
                     <FormLabel
-                      className="cursor-pointer flex-1 m-0 p-3 flex items-center gap-2 body-md font-normal"
+                      className="body-md m-0 flex flex-1 cursor-pointer items-center gap-2 p-3 font-normal"
                       htmlFor={item.value}
                     >
                       <FormControl>
@@ -251,7 +251,7 @@ export default function ResourceReviewFields({
 
         <div>
           <FormLabel required>怎麼使用</FormLabel>
-          <div className="ml-6 mb-6 space-y-6">
+          <div className="mb-6 ml-6 space-y-6">
             <FormField
               control={form.control}
               name={`${prefixKey}timeUsage`}
@@ -288,20 +288,16 @@ export default function ResourceReviewFields({
                   <FormLabel>能否搭配運用資源</FormLabel>
                   <MultipleSelector
                     options={resourceUsageOptions}
-                    onChange={(options) =>
-                      field.onChange(
-                        options.reduce((acc, option) => {
-                          acc[option.value] = true;
-                          return acc;
-                        }, Object.fromEntries(Object.keys(field.value ?? {}).map((key) => [key, false] as [string, boolean])))
-                      )
-                    }
+                    onChange={(options) => field.onChange(
+                      options.reduce((acc, option) => {
+                        acc[option.value] = true;
+                        return acc;
+                      }, Object.fromEntries(Object.keys(field.value ?? {}).map((key) => [key, false] as [string, boolean])))
+                    )}
                     value={Object.entries(field.value ?? {})
-                      .map(([key, value]) =>
-                        resourceUsageOptions.find(
-                          (option) => option.value === key && value
-                        )
-                      )
+                      .map(([key, value]) => resourceUsageOptions.find(
+                        (option) => option.value === key && value
+                      ))
                       .filter((option) => option !== undefined)}
                     emptyIndicator="沒資料"
                   />

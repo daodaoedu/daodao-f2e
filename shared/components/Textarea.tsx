@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { cn } from '@/shared/lib/cn';
 
 interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -18,10 +18,9 @@ function Textarea({
   ...props
 }: TextareaProps) {
   const newlineCount = value?.split('\n').length;
-  const calcRows =
-    typeof newlineCount === 'number' && autoRows
-      ? Math.max(minRows, Math.min(maxRows, newlineCount))
-      : rows;
+  const calcRows = typeof newlineCount === 'number' && autoRows
+    ? Math.max(minRows, Math.min(maxRows, newlineCount))
+    : rows;
 
   return (
     <textarea

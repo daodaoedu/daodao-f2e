@@ -12,7 +12,7 @@ export function useFilteredPractices(filter: PracticeFilter) {
   return {
     practices: filteredPractices,
     loading: isLoading,
-    error: error?.message
+    error: error?.message,
   };
 }
 
@@ -21,7 +21,7 @@ export function useActivePractices() {
   const activeFilter: PracticeFilter = {
     status: ['active'],
     sortBy: 'updatedAt',
-    sortOrder: 'desc'
+    sortOrder: 'desc',
   };
 
   const { data: activePractices = [], error, isLoading } = useSWR(
@@ -32,6 +32,6 @@ export function useActivePractices() {
   return {
     practices: activePractices,
     loading: isLoading,
-    error: error?.message
+    error: error?.message,
   };
 }

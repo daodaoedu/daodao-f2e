@@ -68,17 +68,16 @@ export function useIdeaFormValidationGeneric<T extends 'create' | 'update'>(
         ...defaultValues,
       } as CreateIdeaFormSchema,
     });
-  } else {
-    return useForm<UpdateIdeaFormSchema>({
-      resolver: zodResolver(updateIdeaFormSchema),
-      defaultValues: {
-        content: '',
-        tags: [],
-        ideaResources: [],
-        ...defaultValues,
-      } as UpdateIdeaFormSchema,
-    });
   }
+  return useForm<UpdateIdeaFormSchema>({
+    resolver: zodResolver(updateIdeaFormSchema),
+    defaultValues: {
+      content: '',
+      tags: [],
+      ideaResources: [],
+      ...defaultValues,
+    } as UpdateIdeaFormSchema,
+  });
 }
 
 /**

@@ -1,26 +1,25 @@
-import { useState } from "react";
-import dayjs from "dayjs";
-import { Plus } from "lucide-react";
+import { useState } from 'react';
+import { Plus } from 'lucide-react';
 import {
   ProjectMilestoneSchema,
   ProjectMilestoneFormSchema,
   ProjectTaskSchema,
-} from "@/services/projects";
+} from '@/services/projects';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/utils/cn";
-import MilestoneCard from "./MilestoneCard";
-import Task from "../Tasks/Task";
-import DraggableTasks from "../Tasks/DraggableTasks";
+} from '@/shared/ui/collapsible';
+import { Button } from '@/shared/ui/button';
+import { cn } from '@/shared/lib/cn';
+import MilestoneCard from './MilestoneCard';
+import Task from '../Tasks/Task';
+import DraggableTasks from '../Tasks/DraggableTasks';
 
 interface MilestoneItemProps {
   projectId: string;
-  minDate?: dayjs.Dayjs;
-  maxDate?: dayjs.Dayjs;
+  minDate?: Date;
+  maxDate?: Date;
   isEditable?: boolean;
   milestone: ProjectMilestoneSchema;
   milestones: ProjectMilestoneSchema[];
@@ -45,7 +44,7 @@ const MilestoneItem = ({
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="p-2.5 bg-basic-100 rounded-xl flex flex-col gap-2">
+    <div className="flex flex-col gap-2 rounded-xl bg-basic-100 p-2.5">
       <MilestoneCard
         projectId={projectId}
         milestone={milestone}
@@ -78,9 +77,9 @@ const MilestoneItem = ({
               <Button
                 onClick={() => setIsEditing(true)}
                 variant="ghost"
-                className="flex items-center gap-2 py-0 body-sm"
+                className="body-sm flex items-center gap-2 py-0"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="size-5" />
                 <span>新增子任務</span>
               </Button>
             </div>
@@ -89,9 +88,9 @@ const MilestoneItem = ({
         <CollapsibleTrigger
           withIcon
           className={cn(
-            "pt-1.5 w-full flex justify-center body-sm",
-            "[&[data-state=open]>span:nth-child(1)]:hidden",
-            "[&[data-state=closed]>span:nth-child(2)]:hidden"
+            'pt-1.5 w-full flex justify-center body-sm',
+            '[&[data-state=open]>span:nth-child(1)]:hidden',
+            '[&[data-state=closed]>span:nth-child(2)]:hidden'
           )}
         >
           <span>展開</span>

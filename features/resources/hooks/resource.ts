@@ -1,7 +1,7 @@
-import { useMemo } from "react";
-import useSWR from "swr";
-import useSWRInfinite from "swr/infinite";
-import useSWRMutation, { SWRMutationConfiguration } from "swr/mutation";
+import { useMemo } from 'react';
+import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
+import useSWRMutation, { SWRMutationConfiguration } from 'swr/mutation';
 
 import {
   getResourcePathname,
@@ -11,7 +11,7 @@ import {
   ResourceDetailResponseSchema,
   ResourceMutationResponseSchema,
   ResourceSearchParamsSchema,
-} from "@/services/resources";
+} from '@/services/resources';
 
 export function useResourceList(filter: ResourceSearchParamsSchema) {
   const resourcePathname = getResourcePathname();
@@ -37,16 +37,19 @@ export function useResourceList(filter: ResourceSearchParamsSchema) {
   );
 
   const data = useMemo(
-    () => swrInfinite.data?.flatMap((page) => page.data.resources) ?? [],
+    () =>
+      swrInfinite.data?.flatMap((page) => page?.data?.resources ?? []) ?? [],
     [swrInfinite.data]
   );
 
   const lastData = swrInfinite.data?.[swrInfinite.data.length - 1];
-  const hasMore = lastData?.data.pagination?.hasNext;
-  const nextCursor = lastData?.data.pagination?.nextCursor;
-  const totalCount = lastData?.data.pagination?.totalEstimate ?? 0;
+  const hasMore = lastData?.data?.pagination?.hasNext ?? false;
+  const nextCursor = lastData?.data?.pagination?.nextCursor;
+  const totalCount = lastData?.data?.pagination?.totalEstimate ?? 0;
 
-  return { ...swrInfinite, data, hasMore, nextCursor, totalCount };
+  return {
+    ...swrInfinite, data, hasMore, nextCursor, totalCount,
+  };
 }
 
 export function useResource(resourceId?: string | null) {
@@ -61,46 +64,40 @@ type SWRMutationOptions<T = ResourceMutationResponseSchema> =
 export const useCreateResource = ({
   onSuccess,
   ...options
-}: SWRMutationOptions = {}) => {
-  return useSWRMutation(getResourcePathname(), resourceAPI.create, {
+}: SWRMutationOptions = {}) => useSWRMutation(getResourcePathname(), resourceAPI.create, {
+  ...options,
+  onSuccess: (data, key, config) => {
+    onSuccess?.(data, key, config);
+    refetchResource();
+  },
+});
+
+export const useUpdateResource = (
+  resourceId?: string | null,
+  { onSuccess, ...options }: SWRMutationOptions = {}
+) => useSWRMutation(
+  resourceId ? getResourcePathname({ resourceId }) : null,
+  resourceAPI.update,
+  {
     ...options,
     onSuccess: (data, key, config) => {
       onSuccess?.(data, key, config);
       refetchResource();
     },
-  });
-};
-
-export const useUpdateResource = (
-  resourceId?: string | null,
-  { onSuccess, ...options }: SWRMutationOptions = {}
-) => {
-  return useSWRMutation(
-    resourceId ? getResourcePathname({ resourceId }) : null,
-    resourceAPI.update,
-    {
-      ...options,
-      onSuccess: (data, key, config) => {
-        onSuccess?.(data, key, config);
-        refetchResource();
-      },
-    }
-  );
-};
+  }
+);
 
 export const useDeleteResource = (
   resourceId: string,
   { onSuccess, ...options }: SWRMutationOptions<void> = {}
-) => {
-  return useSWRMutation(
-    resourceId ? getResourcePathname({ resourceId }) : null,
-    resourceAPI.delete,
-    {
-      ...options,
-      onSuccess: (data, key, config) => {
-        onSuccess?.(data, key, config);
-        refetchResource();
-      },
-    }
-  );
-};
+) => useSWRMutation(
+  resourceId ? getResourcePathname({ resourceId }) : null,
+  resourceAPI.delete,
+  {
+    ...options,
+    onSuccess: (data, key, config) => {
+      onSuccess?.(data, key, config);
+      refetchResource();
+    },
+  }
+);

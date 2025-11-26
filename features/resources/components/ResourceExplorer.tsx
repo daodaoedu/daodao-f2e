@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { resourceSearchParamsSchema } from "@/services/resources";
-import { ICategory } from "@/constants/category";
-import { Container } from "@/components/ui/wrapper";
-import useQueryState from "@/hooks/useQueryState";
-import ResourceSearchBar from "./ResourceSearchBar";
-import ResourceContainer from "./ResourceContainer";
-import { useResourceList } from "../hooks";
+import { Button } from '@/shared/ui/button';
+import { resourceSearchParamsSchema } from '@/services/resources';
+import { ICategory } from '@/constants/category';
+import { Container } from '@/shared/ui/wrapper';
+import useQueryState from '@/shared/lib/use-query-state';
+import ResourceSearchBar from './ResourceSearchBar';
+import ResourceContainer from './ResourceContainer';
+import { useResourceList } from '../hooks';
 
 interface ResourceExplorerProps {
   categories?: ICategory[];
@@ -35,9 +35,11 @@ export default function ResourceExplorer({
       <ResourceSearchBar filters={filters} onFilter={setFilters} />
 
       {filters.query && (
-        <Container className="text-basic-500 body-sm pb-6">
-          "{filters.query}" 共搜尋到
-          <span className="mx-1 text-primary-base font-bold">{totalCount}</span>
+        <Container className="body-sm pb-6 text-basic-500">
+          "
+          {filters.query}
+          " 共搜尋到
+          <span className="mx-1 font-bold text-primary-base">{totalCount}</span>
           筆
         </Container>
       )}
@@ -53,7 +55,7 @@ export default function ResourceExplorer({
       </Container>
 
       {hasMore && (
-        <div className="flex justify-center px-5 mb-16 md:px-24">
+        <div className="mb-16 flex justify-center px-5 md:px-24">
           <Button size="lg" onClick={() => setSize((pre) => pre + 1)}>
             查看更多
           </Button>

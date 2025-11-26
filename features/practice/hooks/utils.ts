@@ -24,7 +24,7 @@ export const invalidateAllCaches = (practiceId?: string) => {
   // 強制刷新所有相關的頁面數據
   setTimeout(() => {
     window.dispatchEvent(new CustomEvent('practice-data-updated', {
-      detail: { practiceId }
+      detail: { practiceId },
     }));
   }, 100);
 };

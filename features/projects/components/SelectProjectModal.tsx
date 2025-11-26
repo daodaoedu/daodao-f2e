@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import { ProjectSchema, useMyProjects } from '@/services/projects';
-import { Button } from '@/components/ui/button';
-import ResponsiveModal, { ResponsiveModalSize } from '@/components/ui/responsive-modal';
+import { Button } from '@/shared/ui/button';
+import ResponsiveModal, { ResponsiveModalSize } from '@/shared/ui/responsive-modal';
 
 interface SelectProjectModalProps {
   isOpen: boolean;
@@ -49,7 +49,7 @@ export default function SelectProjectModal({
     if (length === 0) {
       toast.error('請先新增計畫');
       onClose();
-    } else if (length === 1 && !selectedProject) {
+    } else if (length === 1 && !selectedProject && projects[0]) {
       handleSelect(projects[0]);
     }
   }, [isOpen, selectedProject, projects, onClose, handleSelect]);
@@ -70,14 +70,16 @@ export default function SelectProjectModal({
               <Button
                 key={project.id}
                 variant="outline"
-                className="w-full rounded-md text-left body-lg flex justify-between items-end"
+                className="body-lg flex w-full items-end justify-between rounded-md text-left"
                 onClick={() => handleSelect(project)}
               >
                 <div>
-                  {index + 1}. {project.title}
+                  {index + 1}
+                  .
+                  {project.title}
                 </div>
                 <time className="body-sm text-basic-300">
-                  {dayjs(project.createdDate).format('YYYY/MM/DD')}
+                  {project.createdDate ? format(new Date(project.createdDate), 'yyyy/MM/dd') : ''}
                 </time>
               </Button>
             ))}

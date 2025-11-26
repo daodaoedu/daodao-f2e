@@ -1,23 +1,35 @@
+'use client';
+
 import React, { useState, useCallback } from 'react';
-import { Search, Plus, FolderOpen, SortAsc, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { CustomLink } from '@/shared/ui/custom-link';
+import { format } from 'date-fns';
+import {
+  Search, Plus, FolderOpen, SortAsc, RefreshCw, Share2, Flag, Eye,
+} from 'lucide-react';
+import Shell from '@/public/assets/icons/shell.svg';
+import Comment from '@/public/assets/icons/comment.svg';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import {
+  Card, CardContent,
+} from '@/shared/ui/card';
+import { Badge } from '@/shared/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
+import { Progress } from '@/shared/ui/progress';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useMyProjects } from '@/services/projects/core/hooks';
+} from '@/shared/ui/dropdown-menu';
+import { usePublicProjects } from '@/services/projects/core/hooks';
 import type { ProjectSchema } from '@/services/projects/core/schema';
-import Link from 'next/link';
 
 interface ProjectsExploreSectionProps {
   className?: string;
   showHeader?: boolean;
   showCreateButton?: boolean;
+  showSearchBar?: boolean;
   onCreateClick?: () => void;
 }
 
@@ -25,6 +37,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
   className = '',
   showHeader = true,
   showCreateButton = true,
+  showSearchBar = true,
   onCreateClick,
 }) => {
   // Search and filter state
@@ -32,13 +45,13 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
   const [sortBy, setSortBy] = useState<'createdDate' | 'updatedDate' | 'title'>('createdDate');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  // Use projects hook to fetch data
+  // Use projects hook to fetch data - using public projects for explore page
   const {
     data: projects,
     isLoading,
     error,
     mutate: refresh,
-  } = useMyProjects();
+  } = usePublicProjects();
 
   // Filter and sort projects locally
   const filteredProjects = React.useMemo(() => {
@@ -49,11 +62,9 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
     // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((project) =>
-        project.title.toLowerCase().includes(query) ||
+      filtered = filtered.filter((project: ProjectSchema) => project.title.toLowerCase().includes(query) ||
         project.description.toLowerCase().includes(query) ||
-        project.goal.toLowerCase().includes(query)
-      );
+        project.goal.toLowerCase().includes(query));
     }
 
     // Apply sorting
@@ -95,14 +106,6 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
     setSortOrder(newSortOrder);
   }, []);
 
-  const handleCreateClick = () => {
-    if (onCreateClick) {
-      onCreateClick();
-    } else {
-      // Default behavior - navigate to create page
-      window.location.href = '/manage/projects/create';
-    }
-  };
 
   // Sort options
   const sortOptions = [
@@ -120,89 +123,163 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
 
   // Project Card Component
   const ProjectCard = ({ project }: { project: ProjectSchema }) => {
-    return (
-      <Card className="hover:shadow-md transition-shadow duration-200 border border-basic-200">
-        <CardContent className="p-4">
-          <div className="space-y-3">
-            {/* Header */}
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <Link
-                  href={`/projects/detail?id=${project.id}`}
-                  className="text-lg font-semibold text-basic-black hover:text-primary-base transition-colors line-clamp-1"
-                >
-                  {project.title}
-                </Link>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-sm text-basic-400">
-                    建立於 {new Date(project.createdDate).toLocaleDateString('zh-TW')}
+    const completedMilestones = project.milestones?.filter((m) => m.isCompleted).length || 0;
+    const totalMilestones = project.milestones?.length || 0;
+    const progress = totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0;
+    const isCompleted = completedMilestones === totalMilestones && totalMilestones > 0;
+
+    // Get earliest startDate and latest endDate from milestones
+    const getProjectDateRange = () => {
+      if (!project.milestones || project.milestones.length === 0) return null;
+
+      const dates = project.milestones
+        .filter(m => m.startDate || m.endDate)
+        .flatMap(m => [m.startDate, m.endDate].filter(Boolean) as string[]);
+
+      if (dates.length === 0) return null;
+
+      const sortedDates = dates.map(d => new Date(d)).sort((a, b) => a.getTime() - b.getTime());
+      const startDate = sortedDates[0];
+      const endDate = sortedDates[sortedDates.length - 1];
+
+      return { startDate, endDate };
+    };
+
+    const dateRange = getProjectDateRange();
+
+    const cardContent = (
+      <Card
+        className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl bg-basic-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-basic-200 group relative cursor-pointer"
+      >
+        <CardContent className="p-3 sm:p-4 md:p-6">
+          {/* Header Section - User Info & Actions */}
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center">
+              <Avatar className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3">
+                <AvatarImage
+                  src={project.user?.photoURL && project.user.photoURL.trim() !== '' ? project.user.photoURL : undefined}
+                  alt={project.user?.name || 'user avatar'}
+                />
+                <AvatarFallback className="bg-indigo-600 text-white text-xs font-medium">
+                  {project.user?.name?.charAt(0) || '?'}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <div>
+                  <span className="text-xs sm:text-sm font-medium text-basic-500 mr-2">
+                    {project.user.name}
                   </span>
-                  {project.isPublic && (
-                    <Badge variant="outline" className="text-xs">
-                      公開
-                    </Badge>
-                  )}
+                </div>
+                <div className="text-xs text-basic-300 mt-0.5">
+                  {project.user.roleList?.join(' | ') || '計劃作者'}
                 </div>
               </div>
             </div>
 
-            {/* Description */}
-            <p className="text-basic-600 text-sm line-clamp-2 leading-relaxed">
-              {project.description}
-            </p>
-
-            {/* Goal */}
-            {project.goal && (
-              <div className="bg-primary-50 rounded-lg p-3">
-                <h4 className="text-sm font-medium text-primary-700 mb-1">學習目標</h4>
-                <p className="text-sm text-primary-600 line-clamp-1">{project.goal}</p>
-              </div>
-            )}
-
-            {/* Author Info */}
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-xs font-medium text-primary-600">
-                  {project.user.name.charAt(0)}
-                </span>
-              </div>
-              <span className="text-sm text-basic-500">{project.user.name}</span>
-              <span className="text-xs text-basic-400 ml-auto">
-                v{project.version}
-              </span>
-            </div>
-
-            {/* Motivation Tags */}
-            {project.motivation && project.motivation.length > 0 && (
-              <div className="flex flex-wrap gap-1">
-                {project.motivation.slice(0, 3).map((tag) => (
-                  <Badge key={`motivation-${tag}`} variant="secondary" className="text-xs">
-                    {tag}
-                  </Badge>
-                ))}
-                {project.motivation.length > 3 && (
-                  <Badge variant="secondary" className="text-xs text-basic-400">
-                    +{project.motivation.length - 3}
-                  </Badge>
+            {/* Right Side - Badge, Time */}
+            <div className="flex items-center space-x-1 sm:space-x-2 mt-0">
+              <Badge className="bg-yellow-500 text-basic-white text-xs hidden sm:inline-block">
+                學習計劃
+              </Badge>
+              <div className="text-xs text-basic-300 hidden sm:block">
+                {dateRange && dateRange.startDate && dateRange.endDate ? (
+                  `${format(dateRange.startDate, 'yyyy/MM/dd')} - ${format(dateRange.endDate, 'yyyy/MM/dd')}`
+                ) : (
+                  format(new Date(project.createdDate), 'yyyy/MM/dd')
                 )}
               </div>
-            )}
+            </div>
+          </div>
 
-            {/* Action */}
-            <div className="flex items-center justify-between pt-2">
-              <span className="text-xs text-basic-400">
-                更新於 {new Date(project.updatedDate).toLocaleDateString('zh-TW')}
+          {/* Title */}
+          <h3 className="font-bold text-basic-500 mb-2 text-base sm:text-lg transition-colors">
+            {project.title}
+          </h3>
+
+          {/* Description */}
+          <p className="text-basic-300 text-sm mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-none">
+            {project.description}
+          </p>
+
+          {/* Strategy Tags */}
+          {project.strategy && project.strategy.length > 0 && (
+            <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
+              {project.strategy.slice(0, 2).map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="secondary"
+                  className="px-1.5 py-0.5 sm:px-2 bg-basic-100 text-basic-300 text-xs font-medium rounded-full"
+                >
+                  {tag}
+                </Badge>
+              ))}
+              {project.strategy.length > 2 && (
+                <Badge
+                  variant="secondary"
+                  className="px-1.5 py-0.5 sm:px-2 bg-basic-100 text-basic-300 text-xs font-medium rounded-full"
+                >
+                  +{project.strategy.length - 2}
+                </Badge>
+              )}
+            </div>
+          )}
+
+          {/* Progress Bar */}
+          <div className="mb-3 sm:mb-4">
+            <div className="w-full relative">
+              <Progress value={progress} className="h-2" />
+              <span className="absolute right-0 -top-6 text-xs text-basic-300 font-medium">
+                {progress}%
               </span>
-              <Link
-                href={`/projects/detail?id=${project.id}`}
-                className="text-xs text-primary-base hover:text-primary-darker"
-              >
-                查看詳情 →
-              </Link>
+            </div>
+          </div>
+
+          {/* Milestones Count & Status Badge */}
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <div className="flex items-center space-x-1">
+              <Flag className="h-4 w-4 text-primary-base" />
+              <span className="text-xs text-basic-300 font-medium">{totalMilestones}個里程碑</span>
+            </div>
+            <Badge
+              className={
+                isCompleted
+                  ? 'bg-success/20 text-success whitespace-nowrap'
+                  : 'bg-tips/20 text-tips whitespace-nowrap'
+              }
+            >
+              {isCompleted ? '已完成' : '進行中'}
+            </Badge>
+          </div>
+
+          {/* Action Buttons - Shell, Comment, Eye, Share */}
+          <div className="pt-3 sm:pt-4">
+            <div className="flex items-center justify-end gap-4 text-xs text-basic-300">
+              <div className="flex items-center gap-1">
+                <Shell />
+                <span>{totalMilestones}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Comment />
+                <span>0</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Eye className="h-4 w-4" />
+                <span>0</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Share2 className="h-4 w-4" />
+                <span>0</span>
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
+    );
+
+    return (
+      <CustomLink href={`/projects/detail?id=${project.id}`} className="block max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto">
+        {cardContent}
+      </CustomLink>
     );
   };
 
@@ -211,9 +288,9 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
       <Card className={`w-full ${className}`}>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <div className="text-center">
-            <FolderOpen className="w-12 h-12 text-basic-200 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-basic-600 mb-2">載入失敗</h3>
-            <p className="text-basic-400 mb-4">
+            <FolderOpen className="mx-auto mb-4 size-12 text-basic-200" />
+            <h3 className="text-basic-600 mb-2 text-lg font-medium">載入失敗</h3>
+            <p className="mb-4 text-basic-400">
               {error?.message || '無法載入學習計劃，請稍後再試'}
             </p>
             <Button
@@ -222,7 +299,7 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
               onClick={() => refresh()}
               className="flex items-center gap-2"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="size-4" />
               重新載入
             </Button>
           </div>
@@ -232,71 +309,86 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
   }
 
   return (
-    <Card className={`w-full ${className}`}>
+    <div className={`w-full ${className}`}>
       {showHeader && (
-        <CardHeader className="pb-4">
+        <div className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <FolderOpen className="w-5 h-5 text-primary-base" />
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              <FolderOpen className="size-5 text-primary-base" />
               探索學習計劃
               {filteredProjects && (
                 <span className="text-sm font-normal text-basic-400">
-                  ({filteredProjects.length})
+                  (
+                  {filteredProjects.length}
+                  )
                 </span>
               )}
-            </CardTitle>
+            </h2>
             {showCreateButton && (
-              <Button
-                size="sm"
-                onClick={handleCreateClick}
-                className="flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">建立計劃</span>
-              </Button>
+              onCreateClick ? (
+                <Button
+                  size="sm"
+                  onClick={onCreateClick}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="size-4" />
+                  <span>建立計劃</span>
+                </Button>
+              ) : (
+                <CustomLink href="/manage/projects/create">
+                  <Button
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="size-4" />
+                    <span>建立計劃</span>
+                  </Button>
+                </CustomLink>
+              )
             )}
           </div>
-        </CardHeader>
+        </div>
       )}
 
-      <CardContent className="space-y-4">
+      <div className="space-y-4">
         {/* Search and Filter Bar */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-basic-400 w-4 h-4" />
-            <Input
-              placeholder="搜尋計劃標題、描述、目標..."
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+        {showSearchBar && (
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-basic-400" />
+              <Input
+                placeholder="搜尋計劃標題、描述、目標..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
 
-          <div className="flex gap-2">
-            {/* Sort Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex items-center gap-2">
-                  <SortAsc className="w-4 h-4" />
-                  <span className="hidden sm:inline">{getCurrentSortLabel()}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {sortOptions.map((option) => (
-                  <DropdownMenuItem
-                    key={`${option.sortBy}-${option.sortOrder}`}
-                    onClick={() => handleSortChange(option.sortBy, option.sortOrder)}
-                    className={`cursor-pointer ${
-                      sortBy === option.sortBy && sortOrder === option.sortOrder
-                        ? 'bg-primary-50 text-primary-600'
-                        : ''
-                    }`}
-                  >
-                    {option.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex gap-2">
+              {/* Sort Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <SortAsc className="size-4" />
+                    <span className="hidden sm:inline">{getCurrentSortLabel()}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {sortOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={`${option.sortBy}-${option.sortOrder}`}
+                      onClick={() => handleSortChange(option.sortBy, option.sortOrder)}
+                      className={`cursor-pointer ${
+                        sortBy === option.sortBy && sortOrder === option.sortOrder
+                          ? 'bg-primary-50 text-primary-600'
+                          : ''
+                      }`}
+                    >
+                      {option.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
             {/* Refresh Button */}
             <Button
@@ -306,57 +398,75 @@ const ProjectsExploreSection: React.FC<ProjectsExploreSectionProps> = ({
               className="flex items-center gap-2"
               disabled={isLoading}
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`size-4 ${isLoading ? 'animate-spin' : ''}`} />
             </Button>
           </div>
-        </div>
+          </div>
+        )}
 
         {/* Projects Content */}
         {isLoading ? (
           <div className="space-y-4">
             {Array.from({ length: 5 }, (_, index) => (
-              <div key={`project-skeleton-${Date.now()}-${index}`} className="animate-pulse">
-                <div className="bg-basic-100 rounded-lg h-36" />
-              </div>
+              <Card
+                key={`project-skeleton-${Date.now()}-${index}`}
+                className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto bg-basic-white rounded-2xl shadow-sm border border-basic-200 animate-pulse"
+              >
+                <CardContent className="p-3 sm:p-4 md:p-6">
+                  <div className="h-36 bg-basic-100 rounded-lg" />
+                </CardContent>
+              </Card>
             ))}
           </div>
         ) : filteredProjects.length === 0 ? (
-          <div className="text-center py-12">
-            <FolderOpen className="w-16 h-16 text-basic-200 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-basic-600 mb-2">
+          <div className="py-12 text-center">
+            <FolderOpen className="mx-auto mb-4 size-16 text-basic-200" />
+            <h3 className="text-basic-600 mb-2 text-lg font-medium">
               {searchQuery ? '找不到相關計劃' : '還沒有學習計劃'}
             </h3>
-            <p className="text-basic-400 mb-6">
+            <p className="mb-6 text-basic-400">
               {searchQuery
                 ? '嘗試調整搜尋關鍵字'
-                : '建立你的第一個學習計劃！'
-              }
+                : '建立你的第一個學習計劃！'}
             </p>
             {showCreateButton && (
-              <Button onClick={handleCreateClick} className="flex items-center gap-2">
-                <Plus className="w-4 h-4" />
-                建立第一個計劃
-              </Button>
+              onCreateClick ? (
+                <Button onClick={onCreateClick} className="flex items-center gap-2">
+                  <Plus className="size-4" />
+                  建立第一個計劃
+                </Button>
+              ) : (
+                <CustomLink href="/manage/projects/create">
+                  <Button className="flex items-center gap-2">
+                    <Plus className="size-4" />
+                    建立第一個計劃
+                  </Button>
+                </CustomLink>
+              )
             )}
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredProjects.map((project) => (
+            {filteredProjects.map((project: ProjectSchema) => (
               <ProjectCard key={project.id} project={project} />
             ))}
 
             {/* Projects Count Info */}
             {filteredProjects.length > 0 && (
-              <div className="text-center pt-4">
+              <div className="pt-4 text-center">
                 <p className="text-sm text-basic-400">
-                  顯示 {filteredProjects.length} 個學習計劃
+                  顯示
+                  {' '}
+                  {filteredProjects.length}
+                  {' '}
+                  個學習計劃
                 </p>
               </div>
             )}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

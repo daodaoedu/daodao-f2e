@@ -1,0 +1,290 @@
+'use client';
+
+/**
+ * TODO: Add translation keys to Google Sheets and run `pnpm fetch:i18n`
+ * Required keys in "user_profile" namespace:
+ * - contact_copied: "已複製 {platform} ID"
+ * - about_me_title: "關於我"
+ * - skill_map_title: "技能地圖"
+ * - skill_map_coming_soon: "功能即將開放，敬請期待。"
+ */
+
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import dynamic from 'next/dynamic';
+import { MapPinIcon, PencilIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Container, Paper } from '@/shared/ui/wrapper';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+import { CustomLink } from '@/shared/ui/custom-link';
+import { usePathname } from '@/shared/i18n/navigation';
+import { Button, TextCollapse } from '@/shared/ui';
+import { Badge } from '@/shared/ui/badge';
+import { iconMap, SocialIcon, SocialPlatform } from '@/shared/ui/social-icon';
+import {
+  useAuth,
+  getUserProfileBasePath,
+  UserIdObject,
+  useUserProfile,
+} from '@/entities/user';
+import { UserProfileEditorLoading } from './user-profile-editor';
+import { USER_PROFILE_TABS, DEFAULT_TAB } from '../model/user-profile';
+
+const UserProfileEditor = dynamic(
+  () => import('./user-profile-editor').then((mod) => mod.UserProfileEditor),
+  {
+    ssr: false,
+    loading: UserProfileEditorLoading,
+  }
+);
+
+interface SocialPlatformItem {
+  platform: SocialPlatform;
+  generateHref?: (platform: string) => string;
+}
+
+const socialPlatformList: SocialPlatformItem[] = [
+  {
+    platform: 'linkedin',
+    generateHref: (linkedin: string) =>
+      `https://www.linkedin.com/in/${linkedin}`,
+  },
+  {
+    platform: 'github',
+    generateHref: (github: string) => `https://www.github.com/${github}`,
+  },
+  {
+    platform: 'instagram',
+    generateHref: (instagram: string) =>
+      `https://www.instagram.com/${instagram}`,
+  },
+  {
+    platform: 'facebook',
+    generateHref: (facebook: string) => `https://www.facebook.com/${facebook}`,
+  },
+  {
+    platform: 'website',
+    generateHref: (website: string) => website,
+  },
+  {
+    platform: 'discord',
+  },
+];
+
+const getContactValue = (
+  contactList: Record<string, unknown> | null | undefined,
+  platform: string
+): string | null => {
+  if (!contactList || !(platform in contactList)) {
+    return null;
+  }
+  const value = contactList[platform];
+  return typeof value === 'string' && value.trim() !== '' ? value : null;
+};
+
+interface UserProfileWidgetProps extends React.PropsWithChildren {
+  userIdObject: UserIdObject;
+}
+
+export function UserProfileWidget({
+  userIdObject,
+  children,
+}: UserProfileWidgetProps) {
+  const { user: loginUser } = useAuth();
+  const { data } = useUserProfile(userIdObject);
+  const [isEditing, setIsEditing] = useState(false);
+  const user = data?.data;
+  const pathname = usePathname();
+  const basePath = getUserProfileBasePath(user);
+  const isOwnProfile = loginUser?.id === user?.id;
+  const t = useTranslations('user_profile');
+
+  const navItems: { label: string; href: string }[] = USER_PROFILE_TABS.map(
+    (tab) => ({
+      label: t(`tab_${tab}`),
+      href: `${basePath}/${tab}`,
+    })
+  );
+
+  const getActiveTabVariant = (itemHref: string): 'default' | 'outline' => {
+    if (pathname === itemHref) return 'default';
+
+    if (pathname === basePath && itemHref === `${basePath}/${DEFAULT_TAB}`) {
+      return 'default';
+    }
+
+    return 'outline';
+  };
+
+  const handleCopyContact = async (platform: SocialPlatform) => {
+    const contactValue = getContactValue(user?.contactList, platform);
+    const platformName = iconMap[platform].name;
+    if (contactValue) {
+      await navigator.clipboard.writeText(contactValue);
+      toast.success(t('contact_copied', { platform: platformName }));
+    }
+  };
+
+  useEffect(() => {
+    if (pathname === basePath) {
+      window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
+    }
+  }, [pathname, basePath]);
+
+  if (isEditing) {
+    return (
+      <div className="min-h-screen space-y-8 bg-primary-pale px-4 py-24">
+        <Container className="max-w-4xl">
+          <UserProfileEditor
+            initialData={user}
+            onClose={() => setIsEditing(false)}
+          />
+        </Container>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen space-y-8 bg-primary-pale px-4 py-24">
+      <Container className="max-w-4xl">
+        <div className="space-y-4">
+          <div className="flex justify-between">
+            <div className="flex items-center gap-4">
+              <Avatar className="size-20">
+                <AvatarImage
+                  src={user?.photoURL || ''}
+                  alt={user?.name ?? 'user avatar'}
+                />
+                <AvatarFallback className="bg-primary-base text-2xl font-semibold text-white">
+                  {user?.name?.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="space-y-1">
+                <div className="flex items-end gap-2">
+                  <h1 className="text-basic-800 heading-sm">{user?.name}</h1>
+                  {user?.customId && (
+                    <p className="text-basic-500">@{user?.customId}</p>
+                  )}
+                </div>
+
+                {user?.location && (
+                  <p className="flex items-center gap-0.5 text-basic-500">
+                    <MapPinIcon className="size-4" />
+                    {user?.location}
+                  </p>
+                )}
+
+                <div className="flex items-center gap-4">
+                  {socialPlatformList.map(({ platform, generateHref }) => {
+                    const contactValue = getContactValue(
+                      user?.contactList,
+                      platform
+                    );
+
+                    if (!contactValue) {
+                      return null;
+                    }
+
+                    return generateHref ? (
+                      <Button
+                        key={platform}
+                        variant="ghost"
+                        size="icon"
+                        className="size-7"
+                        asChild
+                      >
+                        <CustomLink
+                          href={generateHref(contactValue)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <SocialIcon platform={platform} size={28} />
+                        </CustomLink>
+                      </Button>
+                    ) : (
+                      <Button
+                        key={platform}
+                        variant="ghost"
+                        className="flex items-center gap-0.5 p-0"
+                        onClick={() => handleCopyContact(platform)}
+                      >
+                        <SocialIcon platform={platform} size={28} />
+                        <span className="text-sm text-basic-600">
+                          {contactValue}
+                        </span>
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {isOwnProfile && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setIsEditing(true)}
+              >
+                <PencilIcon className="size-4" />
+              </Button>
+            )}
+          </div>
+
+          <p className="break-words text-basic-600">{user?.personalSlogan}</p>
+
+          <div className="flex flex-wrap gap-2">
+            {user?.tagList?.map((tag) => (
+              <Badge key={tag} variant="secondary">
+                {tag}
+                <span className="ml-2 flex size-5 items-center justify-center rounded-full bg-basic-200 text-xs text-basic-500">
+                  1
+                </span>
+              </Badge>
+            ))}
+          </div>
+
+          {user?.selfIntroduction && (
+            <div className="space-y-3">
+              <h2 className="text-basic-700 heading-sm border-l-4 border-primary-base pl-4 font-semibold">
+                {t('about_me_title')}
+              </h2>
+              <TextCollapse
+                text={user?.selfIntroduction}
+                maxLines={2}
+                className="text-basic-600"
+              />
+            </div>
+          )}
+        </div>
+      </Container>
+
+      <Container className="max-w-4xl space-y-3">
+        <h2 className="text-basic-700 heading-sm border-l-4 border-primary-base pl-4 font-semibold">
+          {t('skill_map_title')}
+        </h2>
+        <Paper>{t('skill_map_coming_soon')}</Paper>
+      </Container>
+
+      <Container className="max-w-4xl">
+        <div className="overflow-x-auto px-2 pb-3">
+          <nav className="flex gap-3">
+            {navItems.map(({ label, href }) => (
+              <Button
+                variant={getActiveTabVariant(href)}
+                asChild
+                className="rounded-md"
+                key={label}
+              >
+                <CustomLink href={href} scroll={false}>
+                  {label}
+                </CustomLink>
+              </Button>
+            ))}
+          </nav>
+        </div>
+
+        <Paper>{children}</Paper>
+      </Container>
+    </div>
+  );
+}

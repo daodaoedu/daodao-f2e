@@ -1,130 +1,58 @@
-import Box from '@mui/material/Box';
-import { Typography, Button, Paper } from '@mui/material';
-import { FacebookRounded } from '@mui/icons-material';
-import Chip from '@mui/material/Chip';
-import { COLOR_TABLE } from '@/constants/notion';
+import { Title, Text } from '@/shared/ui/typography';
+import { Paper } from '@/shared/ui/paper';
+import { Button } from '@/shared/ui/button';
+import { Facebook } from 'lucide-react';
+import { Badge } from '@/shared/ui/badge';
 import { CATEGORIES } from '@/constants/category';
-import RelatedResources from '@/shared/components/RelatedResources';
 
 export default function NotExist() {
   return (
     <>
-      <Paper
-        sx={{
-          width: '90%',
-          margin: '20px auto',
-          padding: '20px',
-          minHeight: '60vh',
-        }}
-      >
-        <Typography
-          variant="h2"
-          sx={{
-            color: '#536166',
-            marginTop: '10px',
-            fontWeight: 'bold',
-            fontSize: '30px',
-            letterSpacing: '0.08em',
-            textAlign: 'center',
-            marginRight: '20px',
-          }}
+      <Paper className="mx-auto my-5 min-h-[60vh] w-[90%] p-5">
+        <Title
+          as="h2"
+          className="mr-5 mt-2.5 text-center text-[30px] font-bold tracking-wide text-[#536166]"
         >
           這座島已經搬新家囉
-        </Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
+        </Title>
+        <div className="flex flex-col items-center justify-center">
           <img
-            src="/assets/nobody-land.gif"
+            src="/assets/images/nobody-island.gif"
             alt="nobody-land"
             width="300"
             height="300"
           />
-        </Box>
-        <Typography
-          variant="body1"
-          sx={{
-            fontSize: '20px',
-            textAlign: 'center',
-            width: '100%',
-          }}
-        >
-          近期網站改版，可能有部分頁面無法使用，可以參觀其他地方唷～
-        </Typography>
-        <Typography
-          variant="body1"
-          sx={{
-            fontSize: '20px',
-            textAlign: 'center',
-            width: '100%',
-            marginTop: '10px',
-          }}
-        >
-          要不要試試我們新版的資源搜尋或是參觀其他地方呢？
-        </Typography>
-        <div className="my-5">
-          <Typography
-            variant="body1"
-            sx={{
-              fontWeight: 'bold',
-            }}
-          >
-            豐富的學習類別
-          </Typography>
-          <Box sx={{ margin: '10px 0' }}>
-            {CATEGORIES.map(({ value, label }) => (
-              <Chip
-                key={value}
-                label={label}
-                component="a"
-                href={`/resource/categories/${value}`}
-                sx={{
-                  backgroundColor: COLOR_TABLE.green,
-                  opacity: '60%',
-                  cursor: 'pointer',
-                  margin: '5px',
-                  whiteSpace: 'nowrap',
-                  fontWeight: 500,
-                  fontSize: '16px',
-                  '&:hover': {
-                    opacity: '100%',
-                    backgroundColor: COLOR_TABLE.green,
-                    transition: 'transform 0.4s',
-                  },
-                }}
-              />
-            ))}
-          </Box>
         </div>
-        <RelatedResources
-          title="👀 瞧瞧最新資源"
-          searchScheme={{
-            filter: { or: [] },
-            page_size: 10,
-          }}
-        />
-        <div className="mt-10 mb-2.5">
-          <Typography
-            variant="body1"
-            sx={{
-              fontWeight: 'bold',
-            }}
-          >
+        <Text className="w-full text-center text-xl">
+          近期網站改版，可能有部分頁面無法使用，可以參觀其他地方唷～
+        </Text>
+        <Text className="mt-2.5 w-full text-center text-xl">
+          要不要試試我們新版的資源搜尋或是參觀其他地方呢？
+        </Text>
+        <div className="my-5">
+          <Text className="font-bold">
+            豐富的學習類別
+          </Text>
+          <div className="my-2.5">
+            {CATEGORIES.map(({ value, label }) => (
+              <Badge key={value} className="m-1">
+                {label}
+              </Badge>
+            ))}
+          </div>
+        </div>
+        <div className="mb-2.5 mt-10">
+          <Text className="font-bold">
             加入島島社群
-          </Typography>
-          <Box
-            sx={{ margin: '20px 0' }}
-          >
-            <Button variant="outlined" component="a" href="/join">
-              <FacebookRounded sx={{ margin: '5px 0' }} />
-              <Typography variant="body1">加入社群</Typography>
+          </Text>
+          <div className="my-5">
+            <Button variant="outline" asChild>
+              <a href="/join">
+                <Facebook style={{ margin: '5px 0' }} />
+                <Text>加入社群</Text>
+              </a>
             </Button>
-          </Box>
+          </div>
         </div>
       </Paper>
     </>

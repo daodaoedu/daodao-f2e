@@ -2,8 +2,8 @@
 import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import { Practice } from '@/services/practice/schema';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/shared/ui/button';
+import { Badge } from '@/shared/ui/badge';
 
 interface DeleteConfirmProps {
   practice: Practice | null;
@@ -18,7 +18,7 @@ const DeleteConfirm: React.FC<DeleteConfirmProps> = ({
   isOpen,
   onConfirm,
   onCancel,
-  loading = false
+  loading = false,
 }) => {
   if (!isOpen || !practice) return null;
 
@@ -29,6 +29,7 @@ const DeleteConfirm: React.FC<DeleteConfirmProps> = ({
         className="fixed inset-0 bg-black/80 transition-opacity"
         onClick={onCancel}
         role="button"
+        aria-label="close"
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -39,43 +40,53 @@ const DeleteConfirm: React.FC<DeleteConfirmProps> = ({
       />
 
       {/* 對話框 */}
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <div className="relative bg-background rounded-lg shadow-xl max-w-md w-full mx-auto border border-border">
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <div className="relative mx-auto w-full max-w-md rounded-lg border border-border bg-background shadow-xl">
           {/* 關閉按鈕 */}
           <Button
             variant="ghost"
             size="sm"
             onClick={onCancel}
-            className="absolute top-4 right-4 h-8 w-8 p-0"
+            className="absolute right-4 top-4 size-8 p-0"
           >
-            <X className="h-4 w-4" />
+            <X className="size-4" />
             <span className="sr-only">關閉</span>
           </Button>
 
           {/* 對話框內容 */}
           <div className="p-6">
             {/* 警告圖示 */}
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 mb-4">
-              <AlertTriangle className="h-6 w-6 text-destructive" />
+            <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-destructive/10">
+              <AlertTriangle className="size-6 text-destructive" />
             </div>
 
             {/* 標題 */}
-            <h3 className="text-lg font-semibold text-center text-foreground mb-2">
+            <h3 className="mb-2 text-center text-lg font-semibold text-foreground">
               確定要刪除這個實踐嗎？
             </h3>
 
             {/* 實踐資訊 */}
-            <div className="bg-muted rounded-lg p-4 my-4">
+            <div className="my-4 rounded-lg bg-muted p-4">
               <div className="space-y-2">
                 <div className="font-medium text-foreground">
                   {practice.title}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  進度：{practice.currentProgress} / {practice.totalAmount} {practice.unit}
+                  進度：
+                  {practice.currentProgress}
+                  {' '}
+                  /
+                  {' '}
+                  {practice.totalAmount}
+                  {' '}
+                  {practice.unit}
                 </div>
                 {practice.streak > 0 && (
                   <div className="text-sm text-muted-foreground">
-                    連續天數：{practice.streak} 天
+                    連續天數：
+                    {practice.streak}
+                    {' '}
+                    天
                   </div>
                 )}
               </div>
@@ -93,7 +104,7 @@ const DeleteConfirm: React.FC<DeleteConfirmProps> = ({
           </div>
 
           {/* 按鈕區域 */}
-          <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 p-6 pt-0">
+          <div className="flex flex-col-reverse p-6 pt-0 sm:flex-row sm:justify-end sm:space-x-2">
             <Button
               variant="outline"
               onClick={onCancel}
