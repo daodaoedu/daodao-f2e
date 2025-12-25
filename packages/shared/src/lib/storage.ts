@@ -22,7 +22,7 @@ const mapStorageKeyToStorageType: Record<StorageKeyType, StorageType> = {
 export function createStorage<T>(key: StorageKeyType) {
   const storageType = mapStorageKeyToStorageType[key];
 
-  if (typeof window === "undefined") {
+  if (window === undefined) {
     return {
       set: () => undefined,
       get: () => undefined,
