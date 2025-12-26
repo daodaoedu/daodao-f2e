@@ -10,6 +10,11 @@
       "cache": false,
       "persistent": true
     },
+    "start": {
+      "dependsOn": ["^build", "build"],
+      "cache": false,
+      "persistent": true
+    },
     "lint": {
       "dependsOn": ["^build"],
       "outputs": []

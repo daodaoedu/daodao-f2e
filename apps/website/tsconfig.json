@@ -1,0 +1,24 @@
+{
+  "extends": "@daodao/config/nextjs.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "jsx": "preserve"
+  },
+  "include": [
+    "../packages/i18n/src/i18n.d.ts",
+    ".next/types/**/*",
+    "next-env.d.ts",
+    "next.config.ts",
+    "src/**/*",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out"
+  ]
+}

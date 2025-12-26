@@ -2,25 +2,24 @@
 
 type StorageType = "localStorage" | "sessionStorage";
 
-export const StorageKey = {
+export enum StorageEnum {
   /** 用於存儲使用者做島島測試的 sessionStorage */
-  Quiz: "_quiz",
+  Quiz = "Quiz",
   /** 用於存儲用戶令牌的 localStorage */
-  Token: "_token",
+  Token = "Token",
   /** 用於存儲外連結受信任網站列表的 localStorage */
-  Whitelist: "_whitelist",
-};
+  Whitelist = "Whitelist",
+}
 
-export type StorageKeyType = keyof typeof StorageKey;
-
-const mapStorageKeyToStorageType: Record<StorageKeyType, StorageType> = {
+const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
   Quiz: "sessionStorage",
   Token: "localStorage",
   Whitelist: "localStorage",
 };
 
-export function createStorage<T>(key: StorageKeyType) {
+export function createStorage<T>(key: StorageEnum) {
   const storageType = mapStorageKeyToStorageType[key];
+  const storageKey = `_${key.toLowerCase()}`;
 
   if (window === undefined) {
     return {
@@ -32,13 +31,13 @@ export function createStorage<T>(key: StorageKeyType) {
 
   const storage = storageType === "localStorage" ? localStorage : sessionStorage;
 
-  const remove = () => storage.removeItem(key);
+  const remove = () => storage.removeItem(storageKey);
 
-  const set = (value: T) => storage.setItem(key, JSON.stringify(value));
+  const set = (value: T) => storage.setItem(storageKey, JSON.stringify(value));
 
   const get = (): T | undefined => {
     try {
-      return JSON.parse(storage.getItem(key) ?? "undefined");
+      return JSON.parse(storage.getItem(storageKey) ?? "undefined");
     } catch {
       return undefined;
     }

@@ -1,31 +1,15 @@
 {
   "name": "@daodao/shared",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "private": true,
   "description": "Shared utilities and components for DaoDao monorepo",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./lib/*": {
-      "types": "./dist/lib/*.d.ts",
-      "default": "./dist/lib/*.js"
-    },
-    "./hooks/*": {
-      "types": "./dist/hooks/*.d.ts",
-      "default": "./dist/hooks/*.js"
-    },
-    "./constants/*": {
-      "types": "./dist/constants/*.d.ts",
-      "default": "./dist/constants/*.js"
-    },
-    "./config/*": {
-      "types": "./dist/config/*.d.ts",
-      "default": "./dist/config/*.js"
-    }
+    ".": "./src/index.ts",
+    "./lib/*": "./src/lib/*.ts",
+    "./hooks/*": "./src/hooks/*.ts",
+    "./constants/*": "./src/constants/*.ts"
   },
   "scripts": {
     "build": "tsc",
@@ -37,13 +21,15 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "pnpm dlx rimraf dist node_modules"
   },
   "dependencies": {
     "date-fns": "catalog:",
+    "html-to-image": "^1.11.13",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@daodao/config": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:"
   }

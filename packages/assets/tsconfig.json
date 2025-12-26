@@ -1,0 +1,10 @@
+{
+  "extends": "@daodao/config/react.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "jsx": "react-jsx"
+  },
+  "include": ["generated/**/*"],
+  "exclude": ["node_modules", "dist", "images"]
+}
+

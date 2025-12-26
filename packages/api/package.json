@@ -3,29 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "description": "API client package for DaoDao monorepo (OpenAPI)",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./client": {
-      "types": "./dist/client.d.ts",
-      "default": "./dist/client.js"
-    },
-    "./hooks": {
-      "types": "./dist/hooks.d.ts",
-      "default": "./dist/hooks.js"
-    },
-    "./errors": {
-      "types": "./dist/errors.d.ts",
-      "default": "./dist/errors.js"
-    },
-    "./types": {
-      "types": "./dist/types.d.ts",
-      "default": "./dist/types.js"
-    }
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./hooks": "./src/hooks.ts",
+    "./errors": "./src/errors.ts",
+    "./types": "./src/types.ts",
+    "./is-match": "./src/is-match.ts"
   },
   "scripts": {
     "build": "tsc",
@@ -37,15 +22,16 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "pnpm dlx rimraf dist node_modules"
   },
   "dependencies": {
     "@daodao/shared": "workspace:*",
     "next": "catalog:",
-    "openapi-fetch": "^0.9.8",
+    "openapi-fetch": "^0.15.0",
     "swr-openapi": "^5.5.0"
   },
   "devDependencies": {
+    "@daodao/config": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "openapi-typescript": "^7.10.1",

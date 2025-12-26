@@ -1,0 +1,32 @@
+{
+  "name": "@daodao/assets",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared assets (images, icons, etc.) for DaoDao monorepo",
+  "main": "./generated/index.ts",
+  "exports": {
+    ".": "./generated/index.ts",
+    "./images/*.svg": "./generated/*.tsx",
+    "./images/*": "./images/*"
+  },
+  "scripts": {
+    "build": "tsx scripts/build-svg.ts && tsc",
+    "dev": "tsx scripts/build-svg.ts && tsc --watch",
+    "build:svg": "tsx scripts/build-svg.ts",
+    "clean": "pnpm dlx rimraf generated dist node_modules"
+  },
+  "dependencies": {
+    "react": "catalog:"
+  },
+  "devDependencies": {
+    "@daodao/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "tsx": "^4.19.2",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:"
+  }
+}
+

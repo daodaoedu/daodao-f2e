@@ -1,10 +1,9 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@daodao/config/base.json",
   "compilerOptions": {
-    "outDir": "./dist",
     "rootDir": "./src",
-    "jsx": "react-jsx"
+    "outDir": "./dist"
   },
-  "include": ["src/**/*"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }

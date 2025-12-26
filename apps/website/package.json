@@ -1,0 +1,38 @@
+{
+  "name": "@daodao/website",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "clean": "pnpm dlx rimraf .next out node_modules"
+  },
+  "dependencies": {
+    "@daodao/api": "workspace:*",
+    "@daodao/assets": "workspace:*",
+    "@daodao/features-quiz": "workspace:*",
+    "@daodao/i18n": "workspace:*",
+    "@daodao/shared": "workspace:*",
+    "@daodao/ui": "workspace:*",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@daodao/config": "workspace:*",
+    "@svgr/webpack": "^8.1.0",
+    "@tailwindcss/postcss": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  }
+}

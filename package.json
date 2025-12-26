@@ -1,11 +1,12 @@
 {
   "name": "daodao-f2e",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "private": true,
   "description": "DaoDao Frontend Monorepo",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
+    "start": "turbo run start",
     "lint": "turbo run lint",
     "lint:fix": "biome lint --write .",
     "typecheck": "turbo run typecheck",
@@ -13,10 +14,11 @@
     "format:check": "biome format .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "clean": "turbo run clean && rm -rf node_modules"
+    "clean": "turbo run clean && pnpm dlx rimraf node_modules"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",
+    "rimraf": "^6.0.1",
     "turbo": "^2.7.2",
     "typescript": "catalog:"
   },
