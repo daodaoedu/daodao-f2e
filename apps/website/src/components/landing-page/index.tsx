@@ -13,7 +13,7 @@ import { TestimonialMarquee } from "./testimonial-marquee";
 import { TypewriterBubble } from "./typewriter-bubble";
 import { VideoSection } from "./video-section";
 
-export function LandingPageWidget() {
+export function LandingPage() {
   return (
     <Loader>
       <KeyVision />

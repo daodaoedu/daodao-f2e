@@ -5,6 +5,7 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  typedRoutes: true,
   transpilePackages: [
     "@daodao/api",
     "@daodao/assets",
@@ -16,6 +17,10 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  experimental: {
+    globalNotFound: true,
+    scrollRestoration: true,
+  }
 };
 
 export default withNextIntl(nextConfig);

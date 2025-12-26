@@ -7,31 +7,18 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect } from "react";
-import type { NavItemType } from "@/config/nav";
 
+export type NavItemType = {
+  label: string;
+  href: string;
+};
 interface HeaderNavbarProps {
-  navItems: NavItemType[];
-  alwaysShow?: boolean;
+  navItems?: NavItemType[];
 }
 
-export const HeaderNavbar = ({ navItems, alwaysShow = false }: HeaderNavbarProps) => {
+export const HeaderNavbar = ({ navItems }: HeaderNavbarProps) => {
   const isVisible = useScrollVisibility({ threshold: 200 });
   const t = useTranslations("common");
-
-  // 簡化版本：暫時移除認證相關功能
-  const user = null;
-  const filteredNavItems = navItems.filter((item) => {
-    const visibility = item.visibility ?? "all";
-
-    switch (visibility) {
-      case "auth":
-        return !!user;
-      case "guest":
-        return !user;
-      default:
-        return true;
-    }
-  });
 
   useEffect(() => {
     document.documentElement.style.setProperty("scroll-padding-top", "69px");
@@ -44,8 +31,7 @@ export const HeaderNavbar = ({ navItems, alwaysShow = false }: HeaderNavbarProps
     <nav
       className={cn(
         "fixed left-0 right-0 top-0 z-20 flex items-center justify-between border-b border-white/20 px-8 py-4 backdrop-blur-[10px] transition-[translate,opacity] duration-300 ease-in-out",
-        alwaysShow && "flex",
-        alwaysShow || isVisible
+        isVisible
           ? "pointer-events-auto translate-y-0 opacity-100"
           : "pointer-events-none -translate-y-full opacity-0"
       )}
@@ -68,7 +54,7 @@ export const HeaderNavbar = ({ navItems, alwaysShow = false }: HeaderNavbarProps
         </Button>
       </div>
       <ul className="flex items-center gap-8">
-        {filteredNavItems.map((item) => (
+        {navItems?.map((item) => (
           <li key={item.label} className="hidden md:block">
             <Button
               variant="ghost"
