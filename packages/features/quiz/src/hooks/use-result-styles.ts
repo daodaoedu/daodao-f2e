@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
 import ResultNoisePng from "@daodao/assets/images/quiz/result-noise.png";
+import { useEffect, useMemo } from "react";
 
 interface ResultStylesProps {
   backgroundColor: string;

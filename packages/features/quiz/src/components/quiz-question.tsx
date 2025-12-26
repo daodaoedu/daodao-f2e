@@ -1,7 +1,7 @@
 "use client";
 
-import type { AnswerKeyType } from "../types";
 import { useQuiz } from "../hooks/use-quiz";
+import type { AnswerKeyType } from "../types";
 import { questionMap } from "../utils/question-map";
 import { AnswerOption } from "./answer-option";
 import { NavigationButtons } from "./navigation-buttons";

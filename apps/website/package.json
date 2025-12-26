@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "postinstall": "husky && pnpm typegen",
+    "typegen": "next typegen",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -22,6 +24,8 @@
     "@daodao/i18n": "workspace:*",
     "@daodao/shared": "workspace:*",
     "@daodao/ui": "workspace:*",
+    "lottie-web": "catalog:",
+    "lucide-react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"

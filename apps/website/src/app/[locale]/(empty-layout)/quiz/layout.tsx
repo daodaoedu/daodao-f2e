@@ -1,8 +1,6 @@
 import { QuizProvider } from "@daodao/features-quiz";
 
-export default async function QuizLayout({
-  children,
-}: LayoutProps<"/[locale]">) {
+export default async function QuizLayout({ children }: LayoutProps<"/[locale]">) {
   return (
     <QuizProvider>
       <style>

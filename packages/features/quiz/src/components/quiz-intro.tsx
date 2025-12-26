@@ -1,12 +1,12 @@
 "use client";
 
+import HorizontalLogoSvg from "@daodao/assets/images/brand/horizontal-primary-logo.svg";
+import question1Jpg from "@daodao/assets/images/quiz/q1.webp";
+import ResultNoisePng from "@daodao/assets/images/quiz/result-noise.png";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { useEffect } from "react";
-import HorizontalLogoSvg from "@daodao/assets/images/brand/horizontal-primary-logo.svg";
-import question1Jpg from "@daodao/assets/images/quiz/q1.webp";
-import ResultNoisePng from "@daodao/assets/images/quiz/result-noise.png";
 import { useQuiz } from "../hooks/use-quiz";
 
 export const QuizIntro = () => {

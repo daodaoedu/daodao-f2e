@@ -6,9 +6,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps<"/[locale]/quiz/result/[resultId]">) {
+export async function generateMetadata({ params }: PageProps<"/[locale]/quiz/result/[resultId]">) {
   const { resultId } = await params;
   const theme = themeMap.get(resultId);
 

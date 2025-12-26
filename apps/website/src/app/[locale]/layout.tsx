@@ -1,22 +1,15 @@
 import { routing } from "@daodao/i18n/routing";
 import type { Metadata } from "next";
 import "@daodao/ui/globals.css";
-import {
-  getMessages,
-  getTranslations,
-  setRequestLocale,
-} from "@daodao/i18n/server";
-import { NextIntlClientProvider } from "@daodao/i18n";
+import { hasLocale, NextIntlClientProvider } from "@daodao/i18n";
+import { getMessages, getTranslations, setRequestLocale } from "@daodao/i18n/server";
+import { notFound } from "next/navigation";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "common" });
 
@@ -29,16 +22,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function LocaleLayout({
-  children,
-  params,
-}: Readonly<{
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}>) {
+export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {
   const { locale } = await params;
   const messages = await getMessages();
 
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
   setRequestLocale(locale);
 
   return (
@@ -49,11 +39,7 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body>
-        <NextIntlClientProvider
-          messages={messages}
-          locale={locale}
-          timeZone="Asia/Taipei"
-        >
+        <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
           {children}
         </NextIntlClientProvider>
       </body>

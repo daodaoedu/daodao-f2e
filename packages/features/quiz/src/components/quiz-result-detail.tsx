@@ -1,27 +1,24 @@
 "use client";
 
-import { Fragment } from "react";
-import { CustomLink } from "@daodao/ui/components/custom-link";
-import { Button } from "@daodao/ui/components/button";
-import { Image } from "@daodao/ui/components/image";
 import HorizontalLogoSvg from "@daodao/assets/images/brand/horizontal-primary-logo.svg";
 import { AspectRatio } from "@daodao/ui/components/aspect-ratio";
 import { Badge } from "@daodao/ui/components/badge";
-import { BackButton } from "@daodao/ui/components/button";
-import { SquareArrowOutUpRightIcon } from "lucide-react";
+import { BackButton, Button } from "@daodao/ui/components/button";
+import { CustomLink } from "@daodao/ui/components/custom-link";
+import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
+import { SquareArrowOutUpRightIcon } from "lucide-react";
+import { Fragment } from "react";
+import { useResultStyles } from "../hooks/use-result-styles";
 import { resultDetailMap } from "../utils/result-detail-map";
 import { themeMap } from "../utils/theme-map";
-import { useResultStyles } from "../hooks/use-result-styles";
-import { Title, Slogan, List } from "./styled";
+import { List, Slogan, Title } from "./styled";
 
 interface QuizResultDetailProps {
   resultId: string;
 }
 
-export const QuizResultDetail = ({
-  resultId,
-}: QuizResultDetailProps) => {
+export const QuizResultDetail = ({ resultId }: QuizResultDetailProps) => {
   const resultDetail = resultDetailMap.get(resultId);
   const theme = themeMap.get(resultId);
   const { rootStyle } = useResultStyles(theme);
@@ -45,20 +42,14 @@ export const QuizResultDetail = ({
             <div className="flex flex-1 flex-col gap-2">
               <div>它叫...</div>
               <div className="flex gap-1">
-                <h2 className="heading-md leading-relaxed text-[var(--color)]">
-                  {theme.title}
-                </h2>
-                <div className="flex size-7 items-center justify-center rounded-full rounded-bl-none bg-[var(--secondary-color)] text-white">
+                <h2 className="heading-md leading-relaxed text-(--color)">{theme.title}</h2>
+                <div className="flex size-7 items-center justify-center rounded-full rounded-bl-none bg-(--secondary-color) text-white">
                   {resultDetail.id.toUpperCase()}
                 </div>
               </div>
               <div className="flex gap-2">
                 {resultDetail.tags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="secondary"
-                    className="px-2 text-xs text-[var(--color)]"
-                  >
+                  <Badge key={tag} variant="secondary" className="px-2 text-xs text-(--color)">
                     #{tag}
                   </Badge>
                 ))}
@@ -88,7 +79,7 @@ export const QuizResultDetail = ({
                 const { smallImg: SmallImg, title, color } = partnerTheme;
                 return (
                   <Fragment key={roleId}>
-                    <div className="body-sm flex basis-1/2 flex-col items-center gap-2 rounded-md bg-[var(--bg-color)] p-3">
+                    <div className="body-sm flex basis-1/2 flex-col items-center gap-2 rounded-md bg-(--bg-color) p-3">
                       <SmallImg />
                       <p className="flex gap-1">
                         <span className="font-bold" style={{ color }}>
@@ -126,10 +117,7 @@ export const QuizResultDetail = ({
                       rel="noopener noreferrer"
                     >
                       {text}
-                      <SquareArrowOutUpRightIcon
-                        size={20}
-                        className="shrink-0 text-primary-base"
-                      />
+                      <SquareArrowOutUpRightIcon size={20} className="shrink-0 text-primary-base" />
                     </CustomLink>
                   </li>
                 ))}
@@ -144,12 +132,7 @@ export const QuizResultDetail = ({
                 搶先體驗新功能測試
               </CustomLink>
             </Button>
-            <Button
-              variant="outline"
-              className="w-full font-bold"
-              size="lg"
-              asChild
-            >
+            <Button variant="outline" className="w-full font-bold" size="lg" asChild>
               <CustomLink href="/resource" target="_blank">
                 先挖掘更多優質資源！
               </CustomLink>

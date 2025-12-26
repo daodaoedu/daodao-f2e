@@ -1,5 +1,5 @@
-import { Image } from './image';
-import { Background, Container, Paper } from './wrapper';
+import { Image } from "./image";
+import { Background, Container, Paper } from "./wrapper";
 
 interface IslandLoadingProps {
   title: string;
@@ -10,9 +10,7 @@ const IslandPlaceholder = ({ title, children }: IslandLoadingProps) => (
   <Background className="min-h-screen">
     <Container className="pb-5">
       <Paper>
-        <h2 className="text-center text-3xl font-bold tracking-[0.08em] text-basic-400">
-          {title}
-        </h2>
+        <h2 className="text-center text-3xl font-bold tracking-[0.08em] text-basic-400">{title}</h2>
         <div className="flex items-center justify-center">
           <Image
             src="/assets/images/nobody-island.gif"

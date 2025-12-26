@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { QuizIntro } from "@daodao/features-quiz";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "【我有一個島，它叫＿島】學習風格測驗",

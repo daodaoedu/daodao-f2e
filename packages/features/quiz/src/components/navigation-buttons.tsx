@@ -35,8 +35,8 @@ export const NavigationButtons = ({
         onClick={() => router.push(`${basePath}/q${currentStep - 1}`)}
         animation="none"
       >
-          <ChevronLeftIcon size={20} />
-          <span className="hidden sm:block">上一題</span>
+        <ChevronLeftIcon size={20} />
+        <span className="hidden sm:block">上一題</span>
       </Button>
 
       {/* Next Button */}

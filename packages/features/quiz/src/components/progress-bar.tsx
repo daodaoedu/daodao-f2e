@@ -1,8 +1,8 @@
 "use client";
 
+import RunnerSvg from "@daodao/assets/images/quiz/runner.svg";
 import { Progress } from "@daodao/ui/components/progress";
 import { cn } from "@daodao/ui/lib/utils";
-import RunnerSvg from "@daodao/assets/images/quiz/runner.svg";
 
 interface ProgressBarProps {
   currentStep: number;

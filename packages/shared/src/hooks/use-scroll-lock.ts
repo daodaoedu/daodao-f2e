@@ -1,6 +1,60 @@
 "use client";
 
-// Placeholder - will be migrated from _backup
+import { useCallback, useEffect, useRef } from "react";
+
+interface ScrollRestore {
+  originalOverflow: string;
+  originalPosition: string;
+  originalTop: string;
+  originalScrollY: number;
+}
+
+/**
+ * 鎖定頁面滾動的 hook
+ * 當組件掛載時鎖定滾動，卸載時自動恢復
+ */
 export function useScrollLock() {
-  // Implementation will be migrated
+  const scrollRestoreRef = useRef<ScrollRestore | null>(null);
+
+  const lockScroll = useCallback(() => {
+    const originalStyle = window.getComputedStyle(document.body);
+
+    scrollRestoreRef.current = {
+      originalOverflow: originalStyle.overflow,
+      originalPosition: originalStyle.position,
+      originalTop: originalStyle.top,
+      originalScrollY: window.scrollY,
+    };
+
+    const { originalScrollY } = scrollRestoreRef.current;
+
+    // 鎖定滾動
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${originalScrollY}px`;
+  }, []);
+
+  const unlockScroll = useCallback(() => {
+    if (scrollRestoreRef.current) {
+      const { originalOverflow, originalPosition, originalTop, originalScrollY } =
+        scrollRestoreRef.current;
+
+      document.body.style.overflow = originalOverflow;
+      document.body.style.position = originalPosition;
+      document.body.style.top = originalTop;
+      window.scrollTo(0, originalScrollY);
+
+      scrollRestoreRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    lockScroll();
+
+    return () => {
+      unlockScroll();
+    };
+  }, [lockScroll, unlockScroll]);
+
+  return { lockScroll, unlockScroll };
 }

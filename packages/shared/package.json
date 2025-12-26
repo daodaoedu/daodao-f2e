@@ -31,6 +31,12 @@
   "devDependencies": {
     "@daodao/config": "workspace:*",
     "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "react": "catalog:",
     "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@types/react": "catalog:",
+    "react": "catalog:"
   }
 }

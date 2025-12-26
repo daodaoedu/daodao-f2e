@@ -1,5 +1,8 @@
 "use client";
 
+import favicon112Png from "@daodao/assets/images/brand/favicon-112.png";
+import HorizontalLogoSvg from "@daodao/assets/images/brand/horizontal-primary-logo.svg";
+import VerticalLogoSvg from "@daodao/assets/images/brand/vertical-primary-logo.svg";
 import { useRouter } from "@daodao/i18n/navigation";
 import {
   type CapturedImageData,
@@ -8,11 +11,8 @@ import {
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { useEffect, useRef, useState } from "react";
-import favicon112Png from "@daodao/assets/images/brand/favicon-112.png";
-import HorizontalLogoSvg from "@daodao/assets/images/brand/horizontal-primary-logo.svg";
-import VerticalLogoSvg from "@daodao/assets/images/brand/vertical-primary-logo.svg";
-import { themeMap } from "../utils/theme-map";
 import { useQuiz, useResultStyles } from "../hooks";
+import { themeMap } from "../utils/theme-map";
 import { ResultCard } from "./result-card";
 import { ResultChart } from "./result-chart";
 import { ShareButtons } from "./share-buttons";
