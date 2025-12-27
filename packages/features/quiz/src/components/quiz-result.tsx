@@ -1,8 +1,7 @@
 "use client";
 
-import favicon112Png from "@daodao/assets/images/brand/favicon-112.png";
-import HorizontalLogoSvg from "@daodao/assets/images/brand/horizontal-primary-logo.svg";
-import VerticalLogoSvg from "@daodao/assets/images/brand/vertical-primary-logo.svg";
+import { HorizontalFullSvg, VerticalFullSvg } from "@daodao/assets";
+import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
 import { useRouter } from "@daodao/i18n/navigation";
 import {
   type CapturedImageData,
@@ -84,7 +83,7 @@ export const QuizResult = () => {
             style={rootStyle}
           >
             <header className="mb-1">
-              <HorizontalLogoSvg className="h-[22px]" />
+              <HorizontalFullSvg className="h-[22px]" />
             </header>
 
             <ResultCard detail={detail} theme={theme} className="mb-4" />
@@ -113,7 +112,7 @@ export const QuizResult = () => {
               </div>
               <div className="absolute bottom-4 right-4 opacity-20">
                 <img
-                  src={favicon112Png.src}
+                  src={favicon256Png.src}
                   alt={theme.title}
                   width={128}
                   height={64}
@@ -187,7 +186,7 @@ export const QuizResult = () => {
           </Button>
 
           <footer className="flex flex-col items-center rounded-md bg-white p-5">
-            <VerticalLogoSvg />
+            <VerticalFullSvg className="w-24" />
             <p className="my-6 text-center text-sm">
               島島阿學是為「相信學習可以不一樣的人」所打造的學習平台。
               以科技與社群，匯集學習經驗、資源、人脈，並提供個人化學習管理與技能展現的工具，賦予每個人掌握學習旅程的能力。

@@ -9,7 +9,7 @@ catalog:
   '@types/node': ^20.19.27
   '@types/react': 19.2.7
   '@types/react-dom': ^19.2.3
-  date-fns: ^3.6.0
+  date-fns: 3.6.0
   lottie-web: ^5.13.0
   lucide-react: 0.475.0
   next: 15.5.9

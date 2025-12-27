@@ -5,21 +5,35 @@
 ### 使用 Docker Compose（推薦）
 
 ```bash
-# 建置並啟動
+# 建置並啟動所有服務
 docker-compose up -d
 
-# 查看日誌
+# 只啟動特定服務
+docker-compose up -d website
+docker-compose up -d product
+
+# 查看所有日誌
 docker-compose logs -f
 
-# 停止
+# 查看特定服務日誌
+docker-compose logs -f website
+docker-compose logs -f product
+
+# 停止所有服務
 docker-compose down
+
+# 停止特定服務
+docker-compose stop website
+docker-compose stop product
 ```
 
 ### 使用 Docker 命令
 
+#### Website (Port 3000)
+
 ```bash
 # 建置映像
-docker build -t daodao-website .
+docker build --build-arg APP_NAME=website --build-arg APP_PORT=3000 -t daodao-website .
 
 # 運行容器
 docker run -d \
@@ -36,6 +50,27 @@ docker stop daodao-website
 docker rm daodao-website
 ```
 
+#### Product (Port 3001)
+
+```bash
+# 建置映像
+docker build --build-arg APP_NAME=product --build-arg APP_PORT=3001 -t daodao-product .
+
+# 運行容器
+docker run -d \
+  --name daodao-product \
+  -p 3001:3001 \
+  -e NODE_ENV=production \
+  daodao-product
+
+# 查看日誌
+docker logs -f daodao-product
+
+# 停止容器
+docker stop daodao-product
+docker rm daodao-product
+```
+
 ## 環境變數
 
 如果需要設定環境變數，可以：
@@ -44,6 +79,11 @@ docker rm daodao-website
 2. **使用 Docker 命令**：添加 `-e KEY=value` 參數
 3. **使用 .env 文件**：創建 `.env.production` 文件
 
+## Port 配置
+
+- **Website**: Port `3000` - http://localhost:3000
+- **Product**: Port `3001` - http://localhost:3001
+
 ## VPS 部署步驟
 
 ```bash
@@ -51,11 +91,16 @@ docker rm daodao-website
 git clone <your-repo-url>
 cd daodao-f2e
 
-# 2. 建置並啟動（使用 docker-compose）
+# 2. 建置並啟動所有服務（使用 docker-compose）
 docker-compose up -d --build
 
+# 或只啟動特定服務
+docker-compose up -d --build website
+docker-compose up -d --build product
+
 # 3. 設定 Nginx 反向代理（可選）
-# 參考之前的 Nginx 配置
+# Website: proxy_pass http://localhost:3000;
+# Product: proxy_pass http://localhost:3001;
 ```
 
 ## 更新部署

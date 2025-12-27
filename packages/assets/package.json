@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "tsx scripts/build-svg.ts && tsc",
-    "dev": "tsx scripts/build-svg.ts && tsc --watch",
+    "dev": "tsx scripts/build-svg.ts --watch & tsc --watch",
     "build:svg": "tsx scripts/build-svg.ts",
     "clean": "pnpm dlx rimraf generated dist node_modules"
   },

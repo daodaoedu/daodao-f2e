@@ -1,6 +1,6 @@
 declare module "*.png" {
-  const content: import("next/image").StaticImageData;
-  export default content;
+  const favicon256Png: import("next/image").StaticImageData;
+  export default favicon256Png;
 }
 
 declare module "*.svg" {

@@ -1,0 +1,42 @@
+{
+  "name": "@daodao/product",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "husky && pnpm typegen",
+    "typegen": "next typegen",
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "clean": "pnpm dlx rimraf .next out node_modules"
+  },
+  "dependencies": {
+    "@daodao/api": "workspace:*",
+    "@daodao/assets": "workspace:*",
+    "@daodao/features-quiz": "workspace:*",
+    "@daodao/i18n": "workspace:*",
+    "@daodao/shared": "workspace:*",
+    "@daodao/ui": "workspace:*",
+    "date-fns": "catalog:",
+    "lottie-web": "catalog:",
+    "lucide-react": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@daodao/config": "workspace:*",
+    "@tailwindcss/postcss": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import HorizontalLogoSvg from "@daodao/assets/images/brand/horizontal-primary-logo.svg";
+import { HorizontalFullSvg } from "@daodao/assets";
 import question1Jpg from "@daodao/assets/images/quiz/q1.webp";
 import ResultNoisePng from "@daodao/assets/images/quiz/result-noise.png";
 import { Button } from "@daodao/ui/components/button";
@@ -31,7 +31,7 @@ export const QuizIntro = () => {
           style={{ mask: "linear-gradient(transparent 22%, #000 60%)" }}
         />
         <header className="mb-6 pt-10">
-          <HorizontalLogoSvg className="mx-auto w-40" />
+          <HorizontalFullSvg className="mx-auto w-40" />
         </header>
         <h1 className="mb-6 flex flex-col items-center gap-2">
           <div className="text-[28px] font-bold">我有一個島</div>

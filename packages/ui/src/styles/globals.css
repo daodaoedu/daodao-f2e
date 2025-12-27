@@ -65,6 +65,23 @@
   /* Semantic colors */
   --tips: oklch(0.766 0.169 60);
   --success: oklch(0.763 0.172 132.6);
+  /* Logo colors */
+  --logo-gray: oklch(0.483 0.019 221.3);
+  --text-dark: oklch(0.445 0.056 192);
+  --logo-cyan: oklch(0.711 0.12 190.6);
+  --light-cyan: oklch(0.9 0.068 190.3);
+  --blue: oklch(0.896 0.085 213.8);
+  --light-blue: oklch(0.962 0.032 211.1);
+  --red: oklch(0.706 0.197 45.6);
+  --very-light-blue: oklch(0.992 0.011 182.9);
+  --logo-orange: oklch(0.786 0.17 68.2);
+  --logo-yellow: oklch(0.908 0.186 102.5);
+  /* Background colors */
+  --bg-dark: oklch(0.287 0.041 210.8);
+  --light-gray: oklch(0.757 0.025 206.6);
+  --bg-gray: oklch(0.932 0.007 185.3);
+  --very-light-gray: oklch(0.972 0.0021 197.1);
+  --white: oklch(1 0 89.9);
 }
 
 .dark {
@@ -149,6 +166,21 @@
   --color-basic-black: var(--basic-black);
   --color-tips: var(--tips);
   --color-success: var(--success);
+  --color-logo-gray: var(--logo-gray);
+  --color-text-dark: var(--text-dark);
+  --color-logo-cyan: var(--logo-cyan);
+  --color-light-cyan: var(--light-cyan);
+  --color-blue: var(--blue);
+  --color-light-blue: var(--light-blue);
+  --color-red: var(--red);
+  --color-very-light-blue: var(--very-light-blue);
+  --color-logo-orange: var(--logo-orange);
+  --color-logo-yellow: var(--logo-yellow);
+  --color-bg-dark: var(--bg-dark);
+  --color-light-gray: var(--light-gray);
+  --color-bg-gray: var(--bg-gray);
+  --color-very-light-gray: var(--very-light-gray);
+  --color-white: var(--white);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

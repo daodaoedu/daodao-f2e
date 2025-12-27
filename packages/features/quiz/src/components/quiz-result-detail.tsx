@@ -1,6 +1,6 @@
 "use client";
 
-import HorizontalLogoSvg from "@daodao/assets/images/brand/horizontal-primary-logo.svg";
+import { HorizontalFullSvg } from "@daodao/assets";
 import { AspectRatio } from "@daodao/ui/components/aspect-ratio";
 import { Badge } from "@daodao/ui/components/badge";
 import { BackButton, Button } from "@daodao/ui/components/button";
@@ -30,7 +30,7 @@ export const QuizResultDetail = ({ resultId }: QuizResultDetailProps) => {
       <div className="relative mx-auto max-w-[392px]">
         <main className="p-6 text-sm text-basic-400">
           <header className="mb-1">
-            <HorizontalLogoSvg className="h-[22px]" />
+            <HorizontalFullSvg className="h-[22px]" />
           </header>
           <BackButton
             label="返回結果頁"

@@ -1,4 +1,12 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  watch,
+  writeFileSync,
+} from "node:fs";
 import { basename, dirname, extname, join } from "node:path";
 
 const SVG_DIR = join(process.cwd(), "images");
@@ -8,6 +16,7 @@ interface SvgFile {
   path: string;
   relativePath: string;
   componentName: string;
+  isMask: boolean;
 }
 
 function toComponentName(filePath: string): string {
@@ -16,6 +25,20 @@ function toComponentName(filePath: string): string {
     .split(/[-_]/)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join("")}Svg`;
+}
+
+function toMaskConstantName(filePath: string): string {
+  // 移除 .mask.svg 後綴，只保留基本名稱
+  const name = basename(filePath, ".mask.svg");
+  // 轉換為 camelCase，例如: intersect.mask.svg -> intersectMaskDataUri
+  const parts = name.split(/[-_]/);
+  const camelCase =
+    parts[0] +
+    parts
+      .slice(1)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join("");
+  return `${camelCase}MaskDataUri`;
 }
 
 function getRelativePath(from: string, to: string): string {
@@ -43,11 +66,13 @@ function getSvgFiles(dir: string, baseDir: string = dir): SvgFile[] {
       files.push(...getSvgFiles(fullPath, baseDir));
     } else if (entry.endsWith(".svg")) {
       const relativePath = getRelativePath(baseDir, fullPath).replace(/\\/g, "/");
-      const componentName = toComponentName(entry);
+      const isMask = entry.endsWith(".mask.svg");
+      const componentName = isMask ? toMaskConstantName(entry) : toComponentName(entry);
       files.push({
         path: fullPath,
         relativePath,
         componentName,
+        isMask,
       });
     }
   }
@@ -59,17 +84,48 @@ function convertKebabToCamel(str: string): string {
   return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
 }
 
+function convertStyleToReactObject(styleValue: string): string {
+  // Parse CSS style string like "mix-blend-mode:multiply" or "prop1:val1;prop2:val2"
+  const styles = styleValue.split(";").filter(Boolean);
+  const styleObject: Record<string, string> = {};
+
+  for (const style of styles) {
+    const [property, value] = style.split(":").map((s) => s.trim());
+    if (property && value) {
+      const camelProperty = convertKebabToCamel(property);
+      styleObject[camelProperty] = value;
+    }
+  }
+
+  // Convert to React style object format: {{ prop: "value" }}
+  const entries = Object.entries(styleObject)
+    .map(([key, val]) => `${key}: "${val}"`)
+    .join(", ");
+  return `{{ ${entries} }}`;
+}
+
 function convertSvgAttributes(attributes: string): string {
   // Convert kebab-case attributes to camelCase
   // Match attribute names (e.g., fill-rule="evenodd" or clip-path='url(...)')
-  return attributes.replace(/(\s+)([a-z][a-z0-9-]*)\s*=/gi, (match, whitespace, attrName) => {
-    // Skip if already camelCase or if it's a namespace attribute (xml:, xlink:, etc.)
-    if (attrName.includes(":") || !attrName.includes("-")) {
-      return match;
+  // Special handling for style attribute
+  // Match with optional leading whitespace to handle first attribute
+  return attributes.replace(
+    /(\s*)([a-z][a-z0-9-]*)\s*=\s*(["'])([^"']*)\3/gi,
+    (match, whitespace, attrName, quote, attrValue) => {
+      // Handle style attribute specially
+      if (attrName.toLowerCase() === "style") {
+        const reactStyle = convertStyleToReactObject(attrValue);
+        return `${whitespace}style=${reactStyle}`;
+      }
+
+      // Skip if already camelCase or if it's a namespace attribute (xml:, xlink:, etc.)
+      if (attrName.includes(":") || !attrName.includes("-")) {
+        return match;
+      }
+      const camelCaseName = convertKebabToCamel(attrName);
+      return `${whitespace}${camelCaseName}=${quote}${attrValue}${quote}`;
     }
-    const camelCaseName = convertKebabToCamel(attrName);
-    return `${whitespace}${camelCaseName}=`;
-  });
+  );
 }
 
 function convertSvgContent(content: string): string {
@@ -78,6 +134,32 @@ function convertSvgContent(content: string): string {
     const convertedAttributes = convertSvgAttributes(attributes);
     return `<${tagName}${convertedAttributes}>`;
   });
+}
+
+function convertSvgToMaskDataUri(svgFile: SvgFile): string {
+  let svgContent = readFileSync(svgFile.path, "utf-8").trim();
+
+  // Remove XML declaration
+  svgContent = svgContent.replace(/^<\?xml[^>]*\?>\s*/i, "");
+
+  // Remove HTML comments
+  svgContent = svgContent.replace(/<!--[\s\S]*?-->/g, "").trim();
+
+  // 將 SVG 內容轉換為單行
+  const singleLineSvg = svgContent.replace(/\s+/g, " ");
+
+  // 轉義單引號和反引號，以便在模板字符串中使用
+  const escapedSvg = singleLineSvg
+    .replace(/\\/g, "\\\\")
+    .replace(/`/g, "\\`")
+    .replace(/\$/g, "\\$");
+
+  const constantCode = `export const ${svgFile.componentName} = \`data:image/svg+xml,\${encodeURIComponent(
+  '${escapedSvg}'
+)}\`;
+`;
+
+  return constantCode;
 }
 
 function convertSvgToComponent(svgFile: SvgFile): string {
@@ -119,7 +201,17 @@ export default function ${svgFile.componentName}(props: SVGProps<SVGSVGElement>)
 function generateIndexFile(svgFiles: SvgFile[]): string {
   const exports = svgFiles
     .map((file) => {
-      const importPath = `./${file.relativePath.replace(/\.svg$/, "")}`;
+      let importPath: string;
+      if (file.isMask) {
+        // 對於 mask 檔案，將 .mask.svg 替換為 .mask
+        importPath = `./${file.relativePath.replace(/\.mask\.svg$/, ".mask")}`;
+      } else {
+        // 對於普通 SVG 檔案，將 .svg 移除
+        importPath = `./${file.relativePath.replace(/\.svg$/, "")}`;
+      }
+      if (file.isMask) {
+        return `export { ${file.componentName} } from "${importPath}";`;
+      }
       return `export { default as ${file.componentName} } from "${importPath}";`;
     })
     .join("\n");
@@ -131,9 +223,13 @@ function build() {
   console.log("Building SVG components...");
 
   const svgFiles = getSvgFiles(SVG_DIR, SVG_DIR);
-  console.log(`Found ${svgFiles.length} SVG files`);
+  const maskFiles = svgFiles.filter((f) => f.isMask);
+  const regularFiles = svgFiles.filter((f) => !f.isMask);
 
-  for (const svgFile of svgFiles) {
+  console.log(`Found ${regularFiles.length} SVG files and ${maskFiles.length} mask SVG files`);
+
+  // 處理普通 SVG 檔案
+  for (const svgFile of regularFiles) {
     const outputPath = join(OUTPUT_DIR, svgFile.relativePath.replace(/\.svg$/, ".tsx"));
     const outputDir = dirname(outputPath);
 
@@ -147,6 +243,21 @@ function build() {
     console.log(`✓ Converted ${svgFile.relativePath} -> ${svgFile.componentName}`);
   }
 
+  // 處理 mask SVG 檔案
+  for (const svgFile of maskFiles) {
+    const outputPath = join(OUTPUT_DIR, svgFile.relativePath.replace(/\.mask\.svg$/, ".mask.ts"));
+    const outputDir = dirname(outputPath);
+
+    if (!existsSync(outputDir)) {
+      mkdirSync(outputDir, { recursive: true });
+    }
+
+    const constantCode = convertSvgToMaskDataUri(svgFile);
+    writeFileSync(outputPath, constantCode, "utf-8");
+
+    console.log(`✓ Converted ${svgFile.relativePath} -> ${svgFile.componentName}`);
+  }
+
   const indexContent = generateIndexFile(svgFiles);
   const indexPath = join(OUTPUT_DIR, "index.ts");
   writeFileSync(indexPath, indexContent, "utf-8");
@@ -155,8 +266,79 @@ function build() {
   console.log("Build completed!");
 }
 
+function watchFiles() {
+  console.log("Watching for file changes...");
+  let buildTimeout: NodeJS.Timeout | null = null;
+
+  const debouncedBuild = () => {
+    if (buildTimeout) {
+      clearTimeout(buildTimeout);
+    }
+    buildTimeout = setTimeout(() => {
+      try {
+        build();
+      } catch (error) {
+        console.error("Build failed:", error);
+      }
+    }, 300); // 防抖 300ms
+  };
+
+  // 監聽 images 目錄及其子目錄
+  const watchDir = (dir: string) => {
+    if (!existsSync(dir)) {
+      return;
+    }
+
+    const watcher = watch(dir, { recursive: true }, (_eventType, filename) => {
+      if (!filename) return;
+
+      const fullPath = join(dir, filename);
+      // 只處理 SVG 文件變動或目錄變動
+      try {
+        const stat = statSync(fullPath);
+        if (filename.endsWith(".svg") || stat.isDirectory()) {
+          console.log(`\n📁 File changed: ${filename}`);
+          debouncedBuild();
+        }
+      } catch {
+        // 文件可能被刪除，但我們仍然需要重新構建以更新 index
+        if (filename.endsWith(".svg")) {
+          console.log(`\n📁 File removed: ${filename}`);
+          debouncedBuild();
+        }
+      }
+    });
+
+    watcher.on("error", (error) => {
+      console.error("Watch error:", error);
+    });
+
+    return watcher;
+  };
+
+  const watcher = watchDir(SVG_DIR);
+  if (!watcher) {
+    console.error(`Directory ${SVG_DIR} does not exist`);
+    process.exit(1);
+  }
+
+  // 初始構建
+  try {
+    build();
+  } catch (error) {
+    console.error("Initial build failed:", error);
+    process.exit(1);
+  }
+}
+
+const isWatchMode = process.argv.includes("--watch") || process.argv.includes("-w");
+
 try {
-  build();
+  if (isWatchMode) {
+    watchFiles();
+  } else {
+    build();
+  }
 } catch (error) {
   console.error("Build failed:", error);
   process.exit(1);

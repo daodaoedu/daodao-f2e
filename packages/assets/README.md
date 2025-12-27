@@ -26,10 +26,10 @@ pnpm build
 #### 方式 1: 從原始路徑匯入（推薦）
 
 ```tsx
-import HorizontalLogoSvg from "@daodao/assets/images/brand/horizontal-primary-logo.svg";
+import HorizontalFullLight from "@daodao/assets/images/brand/horizontal-full-light.svg";
 
 function MyComponent() {
-  return <HorizontalLogoSvg className="w-40" />;
+  return <HorizontalFullLight className="w-40" />;
 }
 ```
 
@@ -46,7 +46,7 @@ function MyComponent() {
 ### 元件命名規則
 
 SVG 檔案名稱會自動轉換為 PascalCase 元件名稱：
-- `horizontal-primary-logo.svg` → `HorizontalPrimaryLogo`
+- `horizontal-full-light.svg` → `HorizontalFullLight`
 - `active-shaper.svg` → `ActiveShaper`
 - `share_windows.svg` → `ShareWindows`
 

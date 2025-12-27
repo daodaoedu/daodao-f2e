@@ -4,7 +4,7 @@ import type * as React from "react";
 import { cn } from "../lib/utils";
 
 const badgeVariants = cva(
-  "body-sm inline-flex items-center rounded-full border border-solid px-3 py-1 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full border border-solid transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {
@@ -14,9 +14,14 @@ const badgeVariants = cva(
         outline: "border-primary-base bg-basic-white text-foreground",
         gray: "border-basic-100 bg-basic-100 text-basic-500",
       },
+      size: {
+        default: "body-sm px-3 py-1",
+        sm: "text-xs px-2 py-0.5",
+      },
     },
     defaultVariants: {
       variant: "default",
+      size: "default",
     },
   }
 );
@@ -25,12 +30,13 @@ export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {
   asChild?: boolean;
+  size?: "default" | "sm";
 }
 
-function Badge({ className, variant, asChild, ...props }: BadgeProps) {
+function Badge({ className, variant, asChild, size = "default", ...props }: BadgeProps) {
   const Comp = asChild ? Slot : "div";
 
-  return <Comp className={cn(badgeVariants({ variant }), className)} {...props} />;
+  return <Comp className={cn(badgeVariants({ variant, size }), className)} {...props} />;
 }
 
 export { Badge, badgeVariants };

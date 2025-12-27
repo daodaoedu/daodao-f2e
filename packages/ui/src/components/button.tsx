@@ -18,7 +18,7 @@ const buttonVariants = cva(
     "transition-[color,background-color,box-shadow] rounded-full",
     // Interaction
     "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-    "disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none",
+    "disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none cursor-pointer",
     // SVG
     "[&_svg]:pointer-events-none [&_svg]:shrink-0"
   ),
