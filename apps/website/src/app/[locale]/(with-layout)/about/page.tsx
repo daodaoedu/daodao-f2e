@@ -18,14 +18,17 @@ export default async function AboutPage() {
 
   const missionGoals = [
     {
+      id: "mission-goal-1",
       title: t("mission_goal_1_title"),
       description: t("mission_goal_1_desc"),
     },
     {
+      id: "mission-goal-2",
       title: t("mission_goal_2_title"),
       description: t("mission_goal_2_desc"),
     },
     {
+      id: "mission-goal-3",
       title: t("mission_goal_3_title"),
       description: t("mission_goal_3_desc"),
     },
@@ -116,7 +119,7 @@ export default async function AboutPage() {
             <div className="grid gap-6 md:grid-cols-3">
               {missionGoals.map((goal, index) => (
                 <div
-                  key={index}
+                  key={goal.id}
                   className={cn(
                     "rounded-lg border border-primary-lighter bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-md",
                     "flex flex-col"

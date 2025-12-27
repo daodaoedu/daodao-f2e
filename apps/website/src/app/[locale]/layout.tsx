@@ -1,3 +1,4 @@
+import faviconPng from "@daodao/assets/images/brand/favicon.png";
 import { hasLocale } from "@daodao/i18n";
 import { routing } from "@daodao/i18n/routing";
 import { getMessages, getTranslations, setRequestLocale } from "@daodao/i18n/server";
@@ -24,6 +25,9 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
       default: t("title"),
     },
     description: t("description"),
+    icons: {
+      icon: faviconPng.src,
+    },
   };
 }
 

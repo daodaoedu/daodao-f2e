@@ -1,0 +1,16 @@
+services:
+  website:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: daodao-website
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+    # 如果需要環境變數文件，取消下面的註解
+    # env_file:
+    #   - .env.production
+
