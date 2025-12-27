@@ -1,5 +1,7 @@
-import { Title, Text } from "./typography";
-import { Paper } from "./wrapper";
+import nobodyIsland from "@daodao/assets/images/island/nobody-island.gif";
+import { Image } from "@daodao/ui/components/image";
+import { Text, Title } from "@daodao/ui/components/typography";
+import { Paper } from "@daodao/ui/components/wrapper";
 
 export default function NotExist() {
   return (
@@ -11,12 +13,7 @@ export default function NotExist() {
         這座島已經搬新家囉
       </Title>
       <div className="flex flex-col items-center justify-center">
-        <img
-          src="/assets/images/nobody-island.gif"
-          alt="nobody-land"
-          width="300"
-          height="300"
-        />
+        <Image src={nobodyIsland} alt="nobody-land" width="300" height="300" />
       </div>
       <Text className="w-full text-center text-xl">
         近期網站改版，可能有部分頁面無法使用，可以參觀其他地方唷～

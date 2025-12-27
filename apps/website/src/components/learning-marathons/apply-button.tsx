@@ -1,5 +1,6 @@
 "use client";
 
+import blockedIsland from "@daodao/assets/images/island/blocked-island.png";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
 import { useState } from "react";
@@ -44,12 +45,7 @@ export const ApplyButton = ({ className, children }: ApplyButtonProps) => {
             </div>
 
             <div className="relative h-64 w-full">
-              <Image
-                src="/assets/images/403-error.png"
-                alt="Registration closed illustration"
-                className="object-contain"
-                fill
-              />
+              <Image src={blockedIsland} alt="blocked island" className="object-contain" fill />
             </div>
 
             <div className="mt-4 flex gap-2 justify-end">

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Footer, HeaderNavbar } from "@/components/layout";
 import { Marathon } from "@/components/learning-marathons";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -9,13 +8,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function LearningMarathonsPage() {
-  return (
-    <>
-      <HeaderNavbar />
-      <main className="min-h-screen">
-        <Marathon />
-      </main>
-      <Footer />
-    </>
-  );
+  return <Marathon />;
 }

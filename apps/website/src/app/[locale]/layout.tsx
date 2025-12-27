@@ -1,9 +1,9 @@
+import { hasLocale } from "@daodao/i18n";
 import { routing } from "@daodao/i18n/routing";
-import type { Metadata } from "next";
-import "@daodao/ui/globals.css";
-import { hasLocale, NextIntlClientProvider } from "@daodao/i18n";
 import { getMessages, getTranslations, setRequestLocale } from "@daodao/i18n/server";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import GlobalProvider from "../global-provider";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -11,6 +11,11 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
+
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+
   const t = await getTranslations({ locale, namespace: "common" });
 
   return {
@@ -32,17 +37,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   setRequestLocale(locale);
 
   return (
-    <html
-      lang={locale}
-      className="scroll-smooth"
-      data-scroll-behavior="smooth"
-      suppressHydrationWarning
-    >
-      <body>
-        <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
-          {children}
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <GlobalProvider locale={locale} messages={messages}>
+      {children}
+    </GlobalProvider>
   );
 }

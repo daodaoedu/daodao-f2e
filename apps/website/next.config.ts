@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
     scrollRestoration: true,
-  }
+  },
 };
 
 export default withNextIntl(nextConfig);

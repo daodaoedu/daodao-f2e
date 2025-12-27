@@ -1,3 +1,3 @@
 export { Footer } from "./footer";
-export { HeaderNavbar } from "./header-navbar";
+export { Header } from "./header";
 export { LandingPageFloatButtons } from "./landing-page-float-buttons";
