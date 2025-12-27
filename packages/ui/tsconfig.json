@@ -4,6 +4,6 @@
     "rootDir": "./src",
     "outDir": "./dist"
   },
-  "include": ["src", "../../apps/website/src/components/layout/not-exist.tsx"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist", ".turbo"]
 }

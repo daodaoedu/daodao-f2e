@@ -1,6 +1,6 @@
 export const SOCIAL_LINKS = {
-  FACEBOOK: "https://www.facebook.com/daodao.edu",
-  INSTAGRAM: "https://www.instagram.com/daodao_edu",
+  FACEBOOK: "https://www.facebook.com/daodaoedu",
+  INSTAGRAM: "https://www.instagram.com/daodao_learn/",
   EMAIL: "contact@daoedu.tw",
 } as const;
 
