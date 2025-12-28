@@ -109,23 +109,43 @@ function convertSvgAttributes(attributes: string): string {
   // Match attribute names (e.g., fill-rule="evenodd" or clip-path='url(...)')
   // Special handling for style attribute
   // Match with optional leading whitespace to handle first attribute
-  return attributes.replace(
-    /(\s*)([a-z][a-z0-9-]*)\s*=\s*(["'])([^"']*)\3/gi,
-    (match, whitespace, attrName, quote, attrValue) => {
-      // Handle style attribute specially
-      if (attrName.toLowerCase() === "style") {
-        const reactStyle = convertStyleToReactObject(attrValue);
-        return `${whitespace}style=${reactStyle}`;
-      }
-
-      // Skip if already camelCase or if it's a namespace attribute (xml:, xlink:, etc.)
-      if (attrName.includes(":") || !attrName.includes("-")) {
-        return match;
-      }
-      const camelCaseName = convertKebabToCamel(attrName);
-      return `${whitespace}${camelCaseName}=${quote}${attrValue}${quote}`;
+  // Use separate patterns for single and double quotes to avoid ReDoS vulnerability
+  const processMatch = (
+    match: string,
+    whitespace: string,
+    attrName: string,
+    quote: string,
+    attrValue: string
+  ): string => {
+    // Handle style attribute specially
+    if (attrName.toLowerCase() === "style") {
+      const reactStyle = convertStyleToReactObject(attrValue);
+      return `${whitespace}style=${reactStyle}`;
     }
+
+    // Skip if already camelCase or if it's a namespace attribute (xml:, xlink:, etc.)
+    if (attrName.includes(":") || !attrName.includes("-")) {
+      return match;
+    }
+    const camelCaseName = convertKebabToCamel(attrName);
+    return `${whitespace}${camelCaseName}=${quote}${attrValue}${quote}`;
+  };
+
+  // Process double-quoted attributes first (non-greedy match to prevent backtracking)
+  let result = attributes.replace(
+    /(\s*)([a-z][a-z0-9-]*)\s*=\s*"([^"]*?)"/gi,
+    (match, whitespace, attrName, attrValue) =>
+      processMatch(match, whitespace, attrName, '"', attrValue)
   );
+
+  // Process single-quoted attributes (non-greedy match to prevent backtracking)
+  result = result.replace(
+    /(\s*)([a-z][a-z0-9-]*)\s*=\s*'([^']*?)'/gi,
+    (match, whitespace, attrName, attrValue) =>
+      processMatch(match, whitespace, attrName, "'", attrValue)
+  );
+
+  return result;
 }
 
 function convertSvgContent(content: string): string {
@@ -136,14 +156,25 @@ function convertSvgContent(content: string): string {
   });
 }
 
-function convertSvgToMaskDataUri(svgFile: SvgFile): string {
-  let svgContent = readFileSync(svgFile.path, "utf-8").trim();
+function sanitizeSvgContent(filePath: string): string {
+  let svgContent = readFileSync(filePath, "utf-8").trim();
 
   // Remove XML declaration
   svgContent = svgContent.replace(/^<\?xml[^>]*\?>\s*/i, "");
 
-  // Remove HTML comments
-  svgContent = svgContent.replace(/<!--[\s\S]*?-->/g, "").trim();
+  // Remove HTML comments (repeatedly until no more matches)
+  let previousContent: string;
+  do {
+    previousContent = svgContent;
+    svgContent = svgContent.replace(/<!--[\s\S]*?-->/g, "");
+  } while (svgContent !== previousContent);
+  svgContent = svgContent.trim();
+
+  return svgContent;
+}
+
+function convertSvgToMaskDataUri(svgFile: SvgFile): string {
+  const svgContent = sanitizeSvgContent(svgFile.path);
 
   // 將 SVG 內容轉換為單行
   const singleLineSvg = svgContent.replace(/\s+/g, " ");
@@ -163,13 +194,7 @@ function convertSvgToMaskDataUri(svgFile: SvgFile): string {
 }
 
 function convertSvgToComponent(svgFile: SvgFile): string {
-  let svgContent = readFileSync(svgFile.path, "utf-8").trim();
-
-  // Remove XML declaration
-  svgContent = svgContent.replace(/^<\?xml[^>]*\?>\s*/i, "");
-
-  // Remove HTML comments
-  svgContent = svgContent.replace(/<!--[\s\S]*?-->/g, "").trim();
+  const svgContent = sanitizeSvgContent(svgFile.path);
 
   // Extract SVG attributes
   const svgMatch = svgContent.match(/<svg([^>]*)>/i);

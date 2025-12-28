@@ -8,9 +8,7 @@ coverage/
 *.log
 
 # Next.js
-.next/
 out/
-dist/
 build/
 
 # Production
@@ -29,6 +27,27 @@ pnpm-debug.log*
 # Local env files
 .env*.local
 .env
+.env.production
+.env.development
+.env.test
+
+# Credentials and secrets
+*.pem
+*.key
+*.secret
+*.crt
+*.cert
+id_rsa*
+id_ed25519*
+known_hosts
+.ssh/
+.aws/
+.docker/
+
+# Package manager credentials
+.npmrc
+.yarnrc
+.pnpm-store/
 
 # Vercel
 .vercel
