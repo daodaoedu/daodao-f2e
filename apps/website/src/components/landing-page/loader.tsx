@@ -3,15 +3,14 @@
 import { useAssetsLoader, useScrollLock } from "@daodao/shared";
 import { Progress } from "@daodao/ui/components/progress";
 import { cn } from "@daodao/ui/lib/utils";
-import { useEffect, useRef, useState } from "react";
+import Lottie from "lottie-react";
+import { useEffect, useState } from "react";
 
 export function Loader({ children }: React.PropsWithChildren) {
   const [isLoading, setIsLoading] = useState(true);
-  const hasLottieStartedRef = useRef(true);
+  const [animationData, setAnimationData] = useState<object | null>(null);
   const { progress, done } = useAssetsLoader("img[data-preload]");
-  const lottieContainerRef = useRef<HTMLDivElement>(null);
-  const lottieAnimationRef = useRef<{ destroy: () => void } | null>(null);
-  const percent = Math.max(Math.round(progress * 100), hasLottieStartedRef.current ? 0 : 5);
+  const percent = Math.max(Math.round(progress * 100), animationData ? 0 : 5);
 
   // 使用滾動鎖定 hook
   const { unlockScroll } = useScrollLock();
@@ -30,35 +29,19 @@ export function Loader({ children }: React.PropsWithChildren) {
     };
   }, [done, unlockScroll]);
 
+  // Load Lottie animation data
   useEffect(() => {
-    // Load Lottie animation
     const loadLottie = async () => {
       try {
-        if (lottieContainerRef.current && hasLottieStartedRef.current) {
-          hasLottieStartedRef.current = false;
-          const lottie = (await import("lottie-web")).default;
-          lottieAnimationRef.current = lottie.loadAnimation({
-            container: lottieContainerRef.current,
-            path: "/assets/landing-page/logo-action.json",
-            renderer: "svg",
-            loop: true,
-            autoplay: true,
-            name: "Loader",
-            rendererSettings: { preserveAspectRatio: "xMidYMid meet" },
-          });
-        }
+        const response = await fetch("/assets/landing-page/logo-action.json");
+        const data = await response.json();
+        setAnimationData(data);
       } catch {
         setIsLoading(false);
       }
     };
 
     loadLottie();
-
-    return () => {
-      if (lottieAnimationRef.current) {
-        lottieAnimationRef.current.destroy();
-      }
-    };
   }, []);
 
   return (
@@ -72,12 +55,22 @@ export function Loader({ children }: React.PropsWithChildren) {
           )}
         >
           <div className="grid place-items-center">
-            <div ref={lottieContainerRef} className="size-[140px]" />
+            {animationData && (
+              <div className="size-[140px]">
+                <Lottie
+                  animationData={animationData}
+                  loop
+                  autoplay
+                  style={{ width: "100%", height: "100%" }}
+                  rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
+                />
+              </div>
+            )}
           </div>
 
           <div className="px-6 pb-6">
             <div className="mb-2 text-[50px] font-semibold text-primary-base">{percent}%</div>
-            <Progress value={percent} className="h-2" />
+            <Progress value={percent} className="h-2 [--active-color:var(--logo-cyan)]" />
           </div>
         </div>
       )}

@@ -13,7 +13,6 @@ export const AnswerOption = ({ answer, isSelected, onSelect, questionId }: Answe
   return (
     <Button
       variant="light"
-      size="lg"
       key={`${questionId}-${answer.key}`}
       className={cn(
         "text-sm",

@@ -105,34 +105,20 @@ export const Sidebar = () => {
         <div
           className={cn(
             "absolute top-5 left-1/2 -translate-x-1/2 w-fit transition-all duration-300",
-            isCollapsed ||
-              "opacity-0 scale-150 -translate-y-[28px] pointer-events-none"
+            isCollapsed || "opacity-0 scale-150 -translate-y-[28px] pointer-events-none"
           )}
         >
-          <Image
-            src={favicon256Png.src}
-            alt="daodao logo"
-            width={60}
-            height={60}
-          />
+          <Image src={favicon256Png.src} alt="daodao logo" width={60} height={60} />
         </div>
       </div>
 
       {/* Menu Items */}
-      <ul
-        className={cn(
-          "flex flex-col",
-          isCollapsed ? "gap-6 items-center" : "gap-6"
-        )}
-      >
+      <ul className={cn("flex flex-col", isCollapsed ? "gap-6 items-center" : "gap-6")}>
         {menuItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = isActive ? item.activeIcon : item.icon;
           return (
-            <li
-              key={item.label}
-              className={isCollapsed ? "w-full flex justify-center" : ""}
-            >
+            <li key={item.label} className={isCollapsed ? "w-full flex justify-center" : ""}>
               <CustomLink
                 href={item.href}
                 className={cn(

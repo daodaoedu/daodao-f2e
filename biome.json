@@ -21,7 +21,7 @@
       "!!**/.turbo",
       "!!**/out",
       "!!**/.vercel",
-      "!!**/_backup"
+      "!!**/packages/assets"
     ]
   },
   "formatter": {

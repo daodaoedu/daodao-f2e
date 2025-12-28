@@ -1,9 +1,9 @@
 "use client";
 
+import { MessagesSvg } from "@daodao/assets";
 import { Badge } from "@daodao/ui/components/badge";
 import { cn } from "@daodao/ui/lib/utils";
-import { Eye, MessageCircle } from "lucide-react";
-import * as React from "react";
+import { Eye } from "lucide-react";
 
 interface CompletedTaskCardProps {
   label: string;
@@ -31,22 +31,22 @@ export const CompletedTaskCard = ({
     >
       <div className="flex flex-col gap-1">
         {/* Label */}
-        <span className="text-xs font-medium text-muted-foreground">
+        <Badge variant="outline" size="sm" className="w-fit">
           {label}
-        </span>
+        </Badge>
 
         {/* Title */}
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <h3 className="font-medium text-text-dark">{title}</h3>
 
         {/* Engagement Stats */}
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex items-center gap-3 text-xs">
           <div className="flex items-center gap-1">
-            <Eye className="size-4" />
-            <span>{viewCount}</span>
+            <Eye className="size-4 text-text-dark" />
+            <span className="text-text-dark">{viewCount}</span>
           </div>
           <div className="flex items-center gap-1">
-            <MessageCircle className="size-4" />
-            <span>{commentCount}</span>
+            <MessagesSvg className="size-4 text-text-dark" />
+            <span className="text-text-dark">{commentCount}</span>
           </div>
         </div>
       </div>
@@ -54,11 +54,13 @@ export const CompletedTaskCard = ({
       {/* Tags */}
       <div className="flex h-fit flex-wrap gap-2">
         {tags.slice(0, 2).map((tag) => (
-          <Badge key={tag} variant="secondary" size="sm">
+          <Badge key={tag} variant="gray" size="sm">
             {tag}
           </Badge>
         ))}
-        {tags.length > 2 && <span className="text-xs text-basic-500 py-0.5">+{tags.length - 2}</span>}
+        {tags.length > 2 && (
+          <span className="text-xs text-basic-400 py-0.5">+{tags.length - 2}</span>
+        )}
       </div>
     </div>
   );

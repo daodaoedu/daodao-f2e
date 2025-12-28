@@ -123,7 +123,7 @@ export const QuizResultDetail = ({ resultId }: QuizResultDetailProps) => {
                 ))}
               </ul>
             </section>
-            <Button className="w-full font-bold" size="lg" asChild>
+            <Button className="w-full font-bold" asChild>
               <CustomLink
                 href="https://tally.so/r/w71dbZ"
                 target="_blank"
@@ -132,7 +132,7 @@ export const QuizResultDetail = ({ resultId }: QuizResultDetailProps) => {
                 搶先體驗新功能測試
               </CustomLink>
             </Button>
-            <Button variant="outline" className="w-full font-bold" size="lg" asChild>
+            <Button variant="outline" className="w-full font-bold" asChild>
               <CustomLink href="/resource" target="_blank">
                 先挖掘更多優質資源！
               </CustomLink>

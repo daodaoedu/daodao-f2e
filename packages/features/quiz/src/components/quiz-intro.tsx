@@ -61,7 +61,7 @@ export const QuizIntro = () => {
           找到你適合的
           <strong className="font-bold">學習策略與夥伴</strong>！
         </p>
-        <Button className="absolute bottom-28 left-1/2 -translate-x-1/2" size="lg" asChild>
+        <Button className="absolute bottom-28 left-1/2 -translate-x-1/2" asChild>
           <CustomLink href="/quiz/questions/q1">開始測驗</CustomLink>
         </Button>
       </main>

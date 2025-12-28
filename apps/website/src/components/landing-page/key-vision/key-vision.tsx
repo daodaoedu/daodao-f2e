@@ -57,11 +57,7 @@ export function KeyVision() {
           </div>
 
           <div className="col-span-12 flex justify-center md:col-span-8 md:justify-start md:pr-2 lg:col-span-7 lg:pr-24">
-            <LottieHero
-              desktopSrc="/assets/landing-page/key-vision-desktop.json"
-              mobileSrc="/assets/landing-page/key-vision-mobile.json"
-              preserveAspectRatio="xMidYMid meet"
-            />
+            <LottieHero />
           </div>
         </div>
       </div>

@@ -32,7 +32,7 @@ const buttonVariants = cva(
         outline:
           "border border-solid border-primary bg-background text-primary-base shadow-sm hover:bg-primary hover:text-primary-foreground [&_svg]:text-primary-base [&_svg]:hover:text-primary-foreground",
         secondary:
-          "border border-solid border-transparent bg-secondary text-secondary-foreground shadow-lg hover:bg-primary-lightest",
+          "border border-solid border-transparent bg-white text-text-dark shadow-[0_4px_0_color-mix(in_srgb,var(--color-logo-cyan)_40%,transparent)]",
         ghost: "hover:text-primary",
         link: "text-primary underline-offset-4 hover:underline",
         gray: "border-basic-200 bg-basic-200 text-basic-300 shadow-lg hover:border-primary-base hover:bg-primary-base hover:text-white",
@@ -46,9 +46,8 @@ const buttonVariants = cva(
           "border-2 border-primary-base bg-primary-base text-white shadow-[0_8px_10px_0_rgba(22,185,179,0.2)] hover:!bg-white hover:text-primary-base hover:shadow-[0_12px_20px_0_rgba(22,185,179,0.3)]",
       },
       size: {
-        default: "h-9 px-5 py-2",
+        default: "h-10 px-5 py-2",
         sm: "body-sm h-8 px-3",
-        lg: "h-10 px-5",
         huge: "h-14 px-10 text-lg font-semibold ",
         icon: "size-9",
       },

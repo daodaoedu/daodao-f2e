@@ -25,7 +25,7 @@
     "@daodao/shared": "workspace:*",
     "@daodao/ui": "workspace:*",
     "date-fns": "catalog:",
-    "lottie-web": "catalog:",
+    "lottie-react": "catalog:",
     "lucide-react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",

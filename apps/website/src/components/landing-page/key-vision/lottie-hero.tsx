@@ -1,71 +1,53 @@
 "use client";
 
 import { useMediaQuery } from "@daodao/shared";
-import type { AnimationItem } from "lottie-web";
-import { useEffect, useRef } from "react";
+import Lottie from "lottie-react";
+import { useEffect, useMemo, useState } from "react";
 
-type Props = {
-  desktopSrc: string; // e.g. "/assets/landing-page/key-vision-desktop.json"
-  mobileSrc: string; // e.g. "/assets/landing-page/key-vision-mobile.json"
-  preserveAspectRatio?: string; // 預設 "xMidYMid meet"
-};
-
-export function LottieHero({
-  desktopSrc,
-  mobileSrc,
-  preserveAspectRatio = "xMidYMid meet",
-}: Props) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const animRef = useRef<AnimationItem | null>(null);
+export function LottieHero() {
   const isMobile = !useMediaQuery("isMedium");
+  const [animationData, setAnimationData] = useState<object | null>(null);
 
+  // 動態載入動畫資料
   useEffect(() => {
-    // 尊重使用者偏好：減少動態
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    const loadLottie = async () => {
-      if (!containerRef.current) {
-        return;
-      }
-
-      const lottie = (await import("lottie-web")).default;
-
-      // 先清掉上一個動畫（避免疊加）
-      if (animRef.current) {
-        animRef.current.destroy();
-        animRef.current = null;
-      }
-
-      animRef.current = lottie.loadAnimation({
-        container: containerRef.current,
-        path: isMobile ? mobileSrc : desktopSrc,
-        renderer: "svg",
-        loop: !prefersReduced,
-        autoplay: !prefersReduced,
-        name: "KeyVision",
-        rendererSettings: { preserveAspectRatio },
-      });
-
-      if (prefersReduced && animRef.current) {
-        animRef.current.goToAndStop(0, true);
+    const loadAnimation = async () => {
+      const path = isMobile
+        ? "/assets/landing-page/key-vision-mobile.json"
+        : "/assets/landing-page/key-vision-desktop.json";
+      try {
+        const response = await fetch(path);
+        const data = await response.json();
+        setAnimationData(data);
+      } catch (error) {
+        console.error("Failed to load Lottie animation:", error);
       }
     };
 
-    loadLottie();
+    loadAnimation();
+  }, [isMobile]);
 
-    return () => {
-      if (animRef.current) {
-        animRef.current.destroy();
-        animRef.current = null;
-      }
-    };
-  }, [isMobile, desktopSrc, mobileSrc, preserveAspectRatio]);
+  // 尊重使用者偏好：減少動態
+  const prefersReduced = useMemo(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    []
+  );
+
+  if (!animationData) {
+    return <div className="aspect-564/396 w-full md:aspect-498/320" aria-hidden="true" />;
+  }
 
   return (
-    <div
-      ref={containerRef}
-      className="aspect-564/396 w-full md:aspect-498/320"
-      aria-hidden="true"
-    />
+    <div className="aspect-564/396 w-full md:aspect-498/320" aria-hidden="true">
+      <Lottie
+        animationData={animationData}
+        loop={!prefersReduced}
+        autoplay={!prefersReduced}
+        style={{ width: "100%", height: "100%" }}
+        rendererSettings={{ preserveAspectRatio: "xMidYMid meet" }}
+        initialSegment={prefersReduced ? [0, 0] : undefined}
+      />
+    </div>
   );
 }

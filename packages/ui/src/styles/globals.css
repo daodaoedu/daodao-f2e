@@ -84,6 +84,11 @@
   --white: oklch(1 0 89.9);
 }
 
+.lucide {
+  /* Lucide stroke width */
+  stroke-width: 1.5px;
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

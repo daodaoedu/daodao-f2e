@@ -169,7 +169,6 @@ export const QuizResult = () => {
 
           <Button
             variant="outline"
-            size="lg"
             className="mb-4 block w-full border-basic-400 text-basic-400 hover:bg-basic-400"
             onClick={handleReplay}
           >
@@ -178,7 +177,6 @@ export const QuizResult = () => {
 
           <Button
             variant="outline"
-            size="lg"
             className="mb-6 block w-full border-basic-400 text-basic-400 hover:bg-basic-400"
             onClick={handleViewAnalysis}
           >
@@ -192,7 +190,7 @@ export const QuizResult = () => {
               以科技與社群，匯集學習經驗、資源、人脈，並提供個人化學習管理與技能展現的工具，賦予每個人掌握學習旅程的能力。
               這裡，是個人成長與集體智慧交會的所在。
             </p>
-            <Button className="w-full" size="lg" asChild>
+            <Button className="w-full" asChild>
               <CustomLink href="/">前往 島島阿學</CustomLink>
             </Button>
           </footer>
