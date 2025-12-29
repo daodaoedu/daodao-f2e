@@ -1,14 +1,16 @@
 "use client";
 
-import { BannerSvg, intersectMaskDataUri, MessagesSvg } from "@daodao/assets";
-import activeShaper2Json from "@daodao/assets/images/quiz/active-shaper-2.json";
+import { MessagesSvg } from "@daodao/assets";
 import { Button } from "@daodao/ui/components/button";
-import { cn } from "@daodao/ui/lib/utils";
 import { format } from "date-fns";
-import Lottie from "lottie-react";
 import { CheckCircle2, Plus } from "lucide-react";
-import { CompletedTaskCard, InProgressTaskCard, StatCard } from "@/components/dashboard";
-import { Footer, Sidebar } from "@/components/layout";
+import {
+  CompletedTaskCard,
+  InProgressTaskCard,
+  StatCard,
+} from "@/components/dashboard";
+import { Banner, Footer, Sidebar } from "@/components/layout";
+import { cn } from "@daodao/ui/lib/utils";
 
 export default function HomePage() {
   // 格式化日期顯示
@@ -56,7 +58,8 @@ export default function HomePage() {
       id: 6,
       label: "主題實踐",
       title: "學習 React Hooks",
-      description: "每天學習 1.5 小時的 React Hooks 課程,包含理論學習、實作練習和筆記整理...",
+      description:
+        "每天學習 1.5 小時的 React Hooks 課程,包含理論學習、實作練習和筆記整理...",
       progress: "7/14",
       messagesCount: 3,
       isUnreadMessages: true,
@@ -66,7 +69,8 @@ export default function HomePage() {
       id: 7,
       label: "主題實踐",
       title: "學習 React Hooks",
-      description: "每天學習 1.5小時的 React Hooks 課程,包含理論學習、實作練習和筆記整理...",
+      description:
+        "每天學習 1.5小時的 React Hooks 課程,包含理論學習、實作練習和筆記整理...",
       progress: "10/14",
       messagesCount: 7,
       isUnreadMessages: true,
@@ -114,120 +118,106 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-very-light-gray">
       <Sidebar />
-
-      <header
-        className="fixed top-0 right-0 left-0 z-20 pointer-events-none mask-luminance"
-        style={{ maskImage: `url("${intersectMaskDataUri}")` }}
-      >
-        <BannerSvg className="w-full" />
-        <h1
-          className={cn(
-            "absolute top-[calc(3/13*100%)] left-1/2 -translate-x-1/2 -translate-y-full",
-            "text-[1.75rem] text-text-dark font-medium pointer-events-auto"
-          )}
-        >
-          我的小島
-        </h1>
-        <h2
-          className={cn(
-            "absolute top-[calc(3/7*100%)] left-1/2 -translate-x-1/2 -translate-y-full max-w-[540px] w-full h-10",
-            "flex items-center justify-center pointer-events-auto",
-            "text-[1.125rem] bg-white/70 rounded-full text-text-dark border border-white"
-          )}
-        >
-          先做再說，做中學最快！
-          <div className="absolute top-4 -right-[27px] size-4.5 rounded-full bg-white/70 border border-white">
-            <div className="absolute -bottom-[11px] -right-3 w-3 h-[11px] rounded-full bg-white/70 border border-white">
-              <div className="absolute -bottom-7 left-full w-32 rotate-3">
-                <Lottie animationData={activeShaper2Json} className="*:w-full *:h-full" />
-              </div>
-            </div>
-          </div>
-        </h2>
-      </header>
-
-      <div className="aspect-16/3" />
+      <Banner />
 
       {/* Main Content */}
-      <main className="max-w-[600px] mx-auto pb-[72px]">
-        <div className="mx-auto max-w-7xl">
-          {/* Header Section */}
-          <div className="mb-10">
-            <time className="block mb-3">
-              <div className="text-[1.375rem] text-light-gray">{format(today, "yyyy")}</div>
-              <div className="flex gap-2">
-                <span className="flex items-center gap-1">
-                  <span className="text-4xl text-text-dark font-semibold">
-                    {format(today, "M")}
-                  </span>
-                  <span className="mt-1 text-[1.375rem] text-text-dark font-medium">月</span>
+      <main className="pb-[72px]">
+        {/* Header Section */}
+        <div className="max-w-[640px] pt-4 px-5 mx-auto mb-10">
+          <time className="block mb-3">
+            <div className="text-[1.375rem] text-light-gray">
+              {format(today, "yyyy")}
+            </div>
+            <div className="flex gap-2">
+              <span className="flex items-center gap-1">
+                <span className="text-4xl text-text-dark font-semibold">
+                  {format(today, "M")}
                 </span>
-                <span className="flex items-center gap-1">
-                  <span className="text-4xl text-text-dark font-semibold">
-                    {format(today, "d")}
-                  </span>
-                  <span className="mt-1 text-[1.375rem] text-text-dark font-medium">日</span>
+                <span className="mt-1 text-[1.375rem] text-text-dark font-medium">
+                  月
                 </span>
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="text-4xl text-text-dark font-semibold">
+                  {format(today, "d")}
+                </span>
+                <span className="mt-1 text-[1.375rem] text-text-dark font-medium">
+                  日
+                </span>
+              </span>
+            </div>
+          </time>
+          <div className="flex gap-3">
+            {stats.map((stat) => (
+              <div key={stat.label} className="flex-1">
+                <StatCard
+                  label={stat.label}
+                  value={stat.value}
+                  unit={stat.unit}
+                  icon={stat.icon}
+                />
               </div>
-            </time>
-            <div className="flex gap-3">
-              {stats.map((stat) => (
-                <div key={stat.label} className="flex-1">
-                  <StatCard
-                    label={stat.label}
-                    value={stat.value}
-                    unit={stat.unit}
-                    icon={stat.icon}
-                  />
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
-
-          {/* In Progress Section */}
-          <section className="mb-6">
-            <h2 className="mb-3 text-[1.125rem] font-medium text-bg-dark">進行中</h2>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              {inProgressTasks.map((task) => (
-                <InProgressTaskCard
-                  key={task.id}
-                  label={task.label}
-                  title={task.title}
-                  description={task.description}
-                  progress={task.progress}
-                  messagesCount={task.messagesCount}
-                  theme={task.theme}
-                  isUnreadMessages={task.isUnreadMessages}
-                  onCheckIn={() => handleCheckIn(task.title)}
-                />
-              ))}
-            </div>
-          </section>
-
-          {/* Completed Section */}
-          <section>
-            <h2 className="mb-3 text-[1.125rem] font-medium text-bg-dark">已完成</h2>
-            <div className="flex flex-col gap-3">
-              {completedTasks.map((task) => (
-                <CompletedTaskCard
-                  key={task.id}
-                  label={task.label}
-                  title={task.title}
-                  viewCount={task.viewCount}
-                  commentCount={task.commentCount}
-                  tags={task.tags}
-                />
-              ))}
-            </div>
-          </section>
         </div>
+
+        {/* In Progress Section */}
+        <section className="mb-6">
+          <h2
+            className={cn(
+              "max-w-[640px] px-5 mx-auto",
+              "mb-3 text-[1.125rem] font-medium text-bg-dark"
+            )}
+          >
+            進行中
+          </h2>
+          <div
+            className={cn(
+              "max-w-[640px] px-5 mx-auto",
+              "flex overflow-auto *:shrink-0 gap-3 md:grid md:grid-cols-2"
+            )}
+          >
+            {inProgressTasks.map((task) => (
+              <InProgressTaskCard
+                key={task.id}
+                label={task.label}
+                title={task.title}
+                description={task.description}
+                progress={task.progress}
+                messagesCount={task.messagesCount}
+                theme={task.theme}
+                isUnreadMessages={task.isUnreadMessages}
+                onCheckIn={() => handleCheckIn(task.title)}
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* Completed Section */}
+        <section className="max-w-[640px] pt-4 px-5 mx-auto">
+          <h2 className="mb-3 text-[1.125rem] font-medium text-bg-dark">
+            已完成
+          </h2>
+          <div className="flex flex-col gap-3">
+            {completedTasks.map((task) => (
+              <CompletedTaskCard
+                key={task.id}
+                label={task.label}
+                title={task.title}
+                viewCount={task.viewCount}
+                commentCount={task.commentCount}
+                tags={task.tags}
+              />
+            ))}
+          </div>
+        </section>
       </main>
 
       {/* Floating Action Button */}
       <Button
         variant="default"
         size="icon"
-        className="fixed bottom-8 right-8 size-14 rounded-full shadow-lg"
+        className="fixed bottom-20 right-5 md:bottom-15 md:right-15 size-15 z-20"
         onClick={handleAddTask}
         aria-label="新增任務"
       >

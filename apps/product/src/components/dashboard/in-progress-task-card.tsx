@@ -37,7 +37,7 @@ export const InProgressTaskCard = ({
   const Theme = themesMap[theme as keyof typeof themesMap] ?? YellowSvg;
 
   return (
-    <div className="relative">
+    <div className="relative w-[294px]">
       <Theme className="rounded-[12px]" />
       {/* Label */}
       <div className="absolute inset-0 p-5 pb-6 z-10 flex flex-col gap-5">

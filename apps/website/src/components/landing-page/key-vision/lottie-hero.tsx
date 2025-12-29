@@ -1,11 +1,11 @@
 "use client";
 
-import { useMediaQuery } from "@daodao/shared";
+import { useIsMobile } from "@daodao/shared";
 import Lottie from "lottie-react";
 import { useEffect, useMemo, useState } from "react";
 
 export function LottieHero() {
-  const isMobile = !useMediaQuery("isMedium");
+  const isMobile = useIsMobile();
   const [animationData, setAnimationData] = useState<object | null>(null);
 
   // 動態載入動畫資料

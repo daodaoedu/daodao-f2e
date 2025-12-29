@@ -61,7 +61,7 @@ const menuItems = [
   },
 ];
 
-export const Sidebar = () => {
+export const DesktopSidebar = () => {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -94,22 +94,24 @@ export const Sidebar = () => {
       </Button>
 
       <div className="flex-1 relative">
-        <div
-          className={cn(
-            "ml-10 mr-12 transition-all duration-300 relative z-10",
-            isCollapsed && "opacity-0 scale-[45%] translate-y-2 -translate-x-4"
-          )}
-        >
-          <VerticalFullSvg className="w-[90px] h-[90px]" />
-        </div>
-        <div
-          className={cn(
-            "absolute top-5 left-1/2 -translate-x-1/2 w-fit transition-all duration-300",
-            isCollapsed || "opacity-0 scale-150 -translate-y-[28px] pointer-events-none"
-          )}
-        >
-          <Image src={favicon256Png.src} alt="daodao logo" width={60} height={60} />
-        </div>
+        <CustomLink href="/" aria-label="回到官網">
+          <div
+            className={cn(
+              "ml-10 mr-12 transition-all duration-300 relative z-10",
+              isCollapsed && "opacity-0 scale-[45%] translate-y-2 -translate-x-4"
+            )}
+          >
+            <VerticalFullSvg className="w-[90px] h-[90px]" />
+          </div>
+          <div
+            className={cn(
+              "absolute top-5 left-1/2 -translate-x-1/2 w-fit transition-all duration-300",
+              isCollapsed || "opacity-0 scale-150 -translate-y-[28px] pointer-events-none"
+            )}
+          >
+            <Image src={favicon256Png.src} alt="daodao logo" width={60} height={60} />
+          </div>
+        </CustomLink>
       </div>
 
       {/* Menu Items */}

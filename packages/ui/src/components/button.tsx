@@ -26,7 +26,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border border-solid border-transparent bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/50",
+          "border border-solid border-transparent bg-logo-cyan text-white hover:bg-logo-cyan/90 hover:shadow-sm hover:shadow-logo-cyan/50",
         alert:
           "border border-solid border-transparent bg-alert text-alert-foreground shadow-sm hover:bg-alert/90",
         outline:
