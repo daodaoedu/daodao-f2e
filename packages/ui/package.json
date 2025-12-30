@@ -14,6 +14,7 @@
     "clean": "pnpm dlx rimraf dist node_modules"
   },
   "dependencies": {
+    "@base-ui-components/react": "1.0.0-rc.0",
     "@daodao/i18n": "workspace:*",
     "@daodao/shared": "workspace:*",
     "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -22,6 +23,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "catalog:",
+    "motion": "^12.23.26",
     "next": "catalog:",
     "next-themes": "catalog:",
     "react": "catalog:",

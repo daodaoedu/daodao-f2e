@@ -11,6 +11,11 @@ import {
 } from "@/components/dashboard";
 import { Banner, Footer, Sidebar } from "@/components/layout";
 import { cn } from "@daodao/ui/lib/utils";
+import {
+  Tooltip,
+  TooltipPanel,
+  TooltipTrigger,
+} from "@daodao/ui/components/animate-ui/components/base/tooltip";
 
 export default function HomePage() {
   // 格式化日期顯示
@@ -214,15 +219,25 @@ export default function HomePage() {
       </main>
 
       {/* Floating Action Button */}
-      <Button
-        variant="default"
-        size="icon"
-        className="fixed bottom-20 right-5 md:bottom-15 md:right-15 size-15 z-20"
-        onClick={handleAddTask}
-        aria-label="新增任務"
-      >
-        <Plus className="size-6" />
-      </Button>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <Button
+              variant="default"
+              size="icon"
+              className="fixed bottom-20 right-5 md:bottom-15 md:right-15 size-15 z-20"
+              onClick={handleAddTask}
+              aria-label="新增任務"
+            >
+              <Plus className="size-6" />
+            </Button>
+          }
+        />
+        <TooltipPanel>
+          <p>建立主題實踐</p>
+        </TooltipPanel>
+      </Tooltip>
+
       <Footer />
     </div>
   );
