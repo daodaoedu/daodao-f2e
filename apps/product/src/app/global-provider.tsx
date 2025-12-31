@@ -1,5 +1,6 @@
 "use client";
 
+import { AuthProvider } from "@daodao/auth";
 import { type Locale, type Messages, NextIntlClientProvider } from "@daodao/i18n";
 import "@daodao/ui/globals.css";
 
@@ -21,7 +22,7 @@ function GlobalProvider({ head, locale, children, messages }: GlobalProviderProp
       {head}
       <body>
         <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -2,8 +2,8 @@
 
 import {
   DesktopBannerSvg,
-  MobileBannerSvg,
   desktopIntersectMaskDataUri,
+  MobileBannerSvg,
   mobileIntersectMaskDataUri,
 } from "@daodao/assets";
 import activeShaper2Json from "@daodao/assets/images/quiz/active-shaper-2.json";
@@ -45,26 +45,20 @@ export function Banner() {
             "bg-white/70 rounded-full text-text-dark border border-white",
             isMobile
               ? "bottom-[70.5%] -translate-y-full h-7 text-sm"
-              // ? "top-[calc(2/9*100%)] -translate-y-full h-7 text-sm"
-              : "top-[calc(3/7*100%)] -translate-y-full h-10 text-[1.125rem]"
+              : // ? "top-[calc(2/9*100%)] -translate-y-full h-7 text-sm"
+                "top-[calc(3/7*100%)] -translate-y-full h-10 text-[1.125rem]"
           )}
         >
           先做再說，做中學最快！
           {isMobile ? (
             <div className="absolute -bottom-8 left-full w-24 rotate-3">
-              <Lottie
-                animationData={activeShaper2Json}
-                className="*:w-full *:h-full"
-              />
+              <Lottie animationData={activeShaper2Json} className="*:w-full *:h-full" />
             </div>
           ) : (
             <div className="absolute top-4 -right-[27px] size-4.5 rounded-full bg-white/70 border border-white">
               <div className="absolute -bottom-[11px] -right-3 w-3 h-[11px] rounded-full bg-white/70 border border-white">
                 <div className="absolute -bottom-7 left-full w-32 rotate-3">
-                  <Lottie
-                    animationData={activeShaper2Json}
-                    className="*:w-full *:h-full"
-                  />
+                  <Lottie animationData={activeShaper2Json} className="*:w-full *:h-full" />
                 </div>
               </div>
             </div>
@@ -72,11 +66,7 @@ export function Banner() {
         </h2>
       </header>
 
-      {isMobile ? (
-        <div className="aspect-195/73" />
-      ) : (
-        <div className="aspect-16/3" />
-      )}
+      {isMobile ? <div className="aspect-195/73" /> : <div className="aspect-16/3" />}
     </>
   );
 }

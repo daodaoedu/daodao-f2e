@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  ArrowLeftOutlineSvg,
-  ArrowRightOutlineSvg,
   BellOutlineSvg,
   BellSolidSvg,
   HomeOutlineSvg,
@@ -16,11 +14,9 @@ import {
 } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
 import { usePathname } from "@daodao/i18n/navigation";
-import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
-import { useState } from "react";
 
 const menuItems = [
   {

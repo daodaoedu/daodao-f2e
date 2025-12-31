@@ -1,39 +1,113 @@
-import { createStorage, StorageEnum } from "@daodao/shared";
 import createClient, {
   type ClientPathsWithMethod,
   type FetchResponse,
   type MaybeOptionalInit,
-  type Middleware,
 } from "openapi-fetch";
 import type { paths } from "./types";
 
+export type * from "openapi-fetch";
+
 export const PREFIX = "dao-dao-server-api" as const;
+
+/**
+ * 401 錯誤處理器類別
+ * 封裝 Token 刷新邏輯，避免並發請求時多次刷新
+ */
+class UnauthorizedHandler {
+  private static instance: UnauthorizedHandler | null = null;
+  private onUnauthorized: (() => Promise<boolean>) | null = null;
+  private isRefreshing = false;
+  private refreshPromise: Promise<boolean> | null = null;
+  private readonly originalFetch: typeof fetch;
+
+  /**
+   * 私有構造函數，防止外部實例化
+   */
+  private constructor() {
+    this.originalFetch = globalThis.fetch;
+  }
+
+  /**
+   * 獲取單例實例
+   * @returns UnauthorizedHandler 的唯一實例
+   */
+  static getInstance(): UnauthorizedHandler {
+    if (!UnauthorizedHandler.instance) {
+      UnauthorizedHandler.instance = new UnauthorizedHandler();
+    }
+    return UnauthorizedHandler.instance;
+  }
+
+  /**
+   * 設定 401 錯誤處理回調
+   * @param callback 當收到 401 時要執行的回調函數，返回 true 表示刷新成功
+   */
+  setHandler(callback: () => Promise<boolean>): void {
+    this.onUnauthorized = callback;
+  }
+
+  /**
+   * 清除 401 錯誤處理回調
+   */
+  clearHandler(): void {
+    this.onUnauthorized = null;
+  }
+
+  /**
+   * 包裝 fetch 以處理 401 錯誤
+   * @param input 請求 URL 或 Request 物件
+   * @param init 請求選項
+   * @returns Response 物件
+   */
+  wrapFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const response = await this.originalFetch(input, init);
+
+    // 如果不是 401 或沒有處理器，直接返回
+    if (response.status !== 401 || !this.onUnauthorized) {
+      return response;
+    }
+
+    // 如果正在刷新，等待刷新完成
+    if (this.isRefreshing && this.refreshPromise) {
+      const refreshSuccess = await this.refreshPromise;
+      if (refreshSuccess) {
+        // 刷新成功，重試原請求
+        return this.originalFetch(input, init);
+      }
+      // 刷新失敗，返回原始 401 響應
+      return response;
+    }
+
+    // 開始刷新 Token
+    this.isRefreshing = true;
+    this.refreshPromise = this.onUnauthorized();
+
+    try {
+      const refreshSuccess = await this.refreshPromise;
+      if (refreshSuccess) {
+        // 刷新成功，重試原請求
+        return this.originalFetch(input, init);
+      }
+      // 刷新失敗，返回原始 401 響應
+      return response;
+    } finally {
+      // 重置刷新狀態
+      this.isRefreshing = false;
+      this.refreshPromise = null;
+    }
+  };
+}
+
+/**
+ * 全域的 401 錯誤處理器實例
+ */
+export const unauthorizedHandler = UnauthorizedHandler.getInstance();
 
 export const client = createClient<paths>({
   baseUrl: process.env.NEXT_PUBLIC_API_URL,
+  credentials: "include",
+  fetch: typeof window === "undefined" ? globalThis.fetch : unauthorizedHandler.wrapFetch,
 });
-
-const middleware: Middleware = {
-  async onRequest({ request }) {
-    if (window === undefined) {
-      const headers = await import("next/headers").then((mod) => mod.headers());
-      Array.from(headers.entries()).forEach(([key, value]) => {
-        if (key.toLowerCase() === "accept-encoding") {
-          return;
-        }
-        request.headers.set(key, value);
-      });
-    } else {
-      const token = createStorage(StorageEnum.Token).get();
-      if (token) {
-        request.headers.set("Authorization", `Bearer ${token}`);
-      }
-    }
-    return request;
-  },
-};
-
-client.use(middleware);
 
 type InitParam<Init> = Init extends undefined ? never : Init;
 

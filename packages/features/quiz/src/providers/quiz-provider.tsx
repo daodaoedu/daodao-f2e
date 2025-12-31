@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "@daodao/i18n/navigation";
-import { createStorage, StorageEnum } from "@daodao/shared";
+import { getStorage, StorageEnum } from "@daodao/shared";
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import type { AnswerKeyType, IResultDetail, ITheme, QuizResultType } from "../types";
 import { questionMap } from "../utils/question-map";
@@ -49,7 +49,7 @@ export const QuizProvider = ({ children }: React.PropsWithChildren) => {
 
   const reset = useCallback(() => {
     setInternalResult({});
-    createStorage(StorageEnum.Quiz).remove();
+    getStorage(StorageEnum.Quiz).remove();
   }, []);
 
   const value = useMemo(() => {
@@ -68,16 +68,16 @@ export const QuizProvider = ({ children }: React.PropsWithChildren) => {
   }, [internalResult, reset, selectAnswer]);
 
   useEffect(() => {
-    const data = parseQuizResult(createStorage(StorageEnum.Quiz).get(), questionMap);
+    const data = parseQuizResult(getStorage(StorageEnum.Quiz).get(), questionMap);
     if (data) {
       setInternalResult(data);
     } else {
-      createStorage(StorageEnum.Quiz).remove();
+      getStorage(StorageEnum.Quiz).remove();
     }
   }, []);
 
   useEffect(() => {
-    createStorage(StorageEnum.Quiz).set(internalResult);
+    getStorage(StorageEnum.Quiz).set(internalResult);
   }, [internalResult]);
 
   return <QuizContext.Provider value={value}>{children}</QuizContext.Provider>;

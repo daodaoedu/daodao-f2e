@@ -95,6 +95,9 @@ importers:
       '@daodao/assets':
         specifier: workspace:*
         version: link:../../packages/assets
+      '@daodao/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@daodao/features-quiz':
         specifier: workspace:*
         version: link:../../packages/features/quiz
@@ -202,9 +205,6 @@ importers:
 
   packages/api:
     dependencies:
-      '@daodao/shared':
-        specifier: workspace:*
-        version: link:../shared
       next:
         specifier: 'catalog:'
         version: 15.5.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -251,6 +251,34 @@ importers:
       tsx:
         specifier: ^4.19.2
         version: 4.21.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
+  packages/auth:
+    dependencies:
+      '@daodao/api':
+        specifier: workspace:*
+        version: link:../api
+      '@daodao/shared':
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      '@daodao/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: 'catalog:'
+        version: 20.19.27
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.7
+      next:
+        specifier: 'catalog:'
+        version: 15.5.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.3
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

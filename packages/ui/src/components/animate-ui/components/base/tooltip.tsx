@@ -1,3 +1,4 @@
+import { cn } from "../../../../lib/utils";
 import {
   TooltipArrow as TooltipArrowPrimitive,
   TooltipPopup as TooltipPopupPrimitive,
@@ -12,7 +13,6 @@ import {
   TooltipTrigger as TooltipTriggerPrimitive,
   type TooltipTriggerProps as TooltipTriggerPrimitiveProps,
 } from "../../primitives/base/tooltip";
-import { cn } from "../../../../lib/utils";
 
 type TooltipProviderProps = TooltipProviderPrimitiveProps;
 

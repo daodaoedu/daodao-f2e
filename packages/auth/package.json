@@ -1,16 +1,15 @@
 {
-  "name": "@daodao/api",
+  "name": "@daodao/auth",
   "version": "0.0.0",
   "private": true,
-  "description": "API client package for DaoDao monorepo (OpenAPI)",
+  "description": "Authentication & Authorization module for DaoDao monorepo",
   "main": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./client": "./src/client.ts",
-    "./hooks": "./src/hooks.ts",
-    "./errors": "./src/errors.ts",
-    "./types": "./src/types.ts",
-    "./is-match": "./src/is-match.ts"
+    "./lib/*": "./src/lib/*.ts",
+    "./hooks/*": "./src/hooks/*.ts",
+    "./components/*": "./src/components/*.tsx",
+    "./utils/*": "./src/utils/*.ts"
   },
   "scripts": {
     "build": "tsc",
@@ -25,18 +24,20 @@
     "clean": "pnpm dlx rimraf dist node_modules"
   },
   "dependencies": {
-    "next": "catalog:",
-    "openapi-fetch": "^0.15.0",
-    "swr-openapi": "^5.5.0"
+    "@daodao/api": "workspace:*",
+    "@daodao/shared": "workspace:*"
   },
   "devDependencies": {
     "@daodao/config": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
-    "openapi-typescript": "^7.10.1",
+    "next": "catalog:",
+    "react": "catalog:",
     "typescript": "catalog:"
   },
   "peerDependencies": {
+    "@types/react": "catalog:",
+    "next": "catalog:",
     "react": "catalog:"
   }
 }
