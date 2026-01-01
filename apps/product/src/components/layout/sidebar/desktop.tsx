@@ -3,16 +3,6 @@
 import {
   ArrowLeftOutlineSvg,
   ArrowRightOutlineSvg,
-  BellOutlineSvg,
-  BellSolidSvg,
-  HomeOutlineSvg,
-  HomeSolidSvg,
-  MedalOutlineSvg,
-  MedalSolidSvg,
-  SearchOutlineSvg,
-  SearchSolidSvg,
-  UserOutlineSvg,
-  UserSolidSvg,
   VerticalFullSvg,
 } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
@@ -22,44 +12,7 @@ import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { useState } from "react";
-
-const menuItems = [
-  {
-    activeIcon: HomeSolidSvg,
-    icon: HomeOutlineSvg,
-    label: "我的小島",
-    href: "/",
-    disabled: false,
-  },
-  {
-    activeIcon: SearchSolidSvg,
-    icon: SearchOutlineSvg,
-    label: "探索社群",
-    href: "/explore",
-    disabled: true,
-  },
-  {
-    activeIcon: MedalSolidSvg,
-    icon: MedalOutlineSvg,
-    label: "成長地圖",
-    href: "/growth-map",
-    disabled: true,
-  },
-  {
-    activeIcon: BellSolidSvg,
-    icon: BellOutlineSvg,
-    label: "最新通知",
-    href: "/notifications",
-    disabled: true,
-  },
-  {
-    activeIcon: UserSolidSvg,
-    icon: UserOutlineSvg,
-    label: "個人資料",
-    href: "/profile",
-    disabled: true,
-  },
-];
+import { menuItems } from "./constant";
 
 export const DesktopSidebar = () => {
   const pathname = usePathname();
@@ -98,7 +51,8 @@ export const DesktopSidebar = () => {
           <div
             className={cn(
               "ml-10 mr-12 transition-all duration-300 relative z-10",
-              isCollapsed && "opacity-0 scale-[45%] translate-y-2 -translate-x-4"
+              isCollapsed &&
+                "opacity-0 scale-[45%] translate-y-2 -translate-x-4"
             )}
           >
             <VerticalFullSvg className="w-[90px] h-[90px]" />
@@ -106,27 +60,43 @@ export const DesktopSidebar = () => {
           <div
             className={cn(
               "absolute top-5 left-1/2 -translate-x-1/2 w-fit transition-all duration-300",
-              isCollapsed || "opacity-0 scale-150 -translate-y-[28px] pointer-events-none"
+              isCollapsed ||
+                "opacity-0 scale-150 -translate-y-[28px] pointer-events-none"
             )}
           >
-            <Image src={favicon256Png.src} alt="daodao logo" width={60} height={60} />
+            <Image
+              src={favicon256Png.src}
+              alt="daodao logo"
+              width={60}
+              height={60}
+            />
           </div>
         </CustomLink>
       </div>
 
       {/* Menu Items */}
-      <ul className={cn("flex flex-col", isCollapsed ? "gap-6 items-center" : "gap-6")}>
+      <ul
+        className={cn(
+          "flex flex-col",
+          isCollapsed ? "gap-6 items-center" : "gap-6"
+        )}
+      >
         {menuItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = isActive ? item.activeIcon : item.icon;
           return (
-            <li key={item.label} className={isCollapsed ? "w-full flex justify-center" : ""}>
+            <li
+              key={item.label}
+              className={cn(
+                isCollapsed ? "w-full flex justify-center" : "",
+                item.hidden && "hidden"
+              )}
+            >
               <CustomLink
                 href={item.href}
                 className={cn(
                   "flex items-center px-6 py-3 text-text-dark cursor-pointer transition-all duration-300",
-                  isCollapsed ? "justify-center" : "gap-2",
-                  item.disabled && "opacity-50 cursor-not-allowed"
+                  isCollapsed ? "justify-center" : "gap-2"
                 )}
                 aria-label={item.label}
               >

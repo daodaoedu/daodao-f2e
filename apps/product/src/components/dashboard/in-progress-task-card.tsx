@@ -1,16 +1,48 @@
 "use client";
 
 import { BlueSvg, GreenSvg, MessagesSvg, PinkSvg, YellowSvg } from "@daodao/assets";
-import { Badge } from "@daodao/ui/components/badge";
+import { Badge, BadgeProps } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Progress } from "@daodao/ui/components/progress";
-import { Calendar, ChevronRight } from "lucide-react";
+import { CalendarCheck, ChevronRight, PenLine } from "lucide-react";
 
 const themesMap = {
   yellow: YellowSvg,
   blue: BlueSvg,
   pink: PinkSvg,
   green: GreenSvg,
+};
+
+export type TaskStatus = "draft" | "not-started" | "in-progress" | "completed";
+
+const statusConfig: Record<
+  TaskStatus,
+  { label: string; variant: BadgeProps["variant"]; icon: React.ReactNode; buttonLabel: string }
+> = {
+  draft: {
+    label: "草稿",
+    variant: "outline-ghost",
+    icon: <PenLine className="size-4.5 text-logo-cyan" />,
+    buttonLabel: "繼續編輯",
+  },
+  "not-started": {
+    label: "未開始",
+    variant: "very-light-blue",
+    icon: <CalendarCheck className="size-4.5 text-logo-cyan" />,
+    buttonLabel: "打卡",
+  },
+  "in-progress": {
+    label: "進行中",
+    variant: "default",
+    icon: <CalendarCheck className="size-4.5 text-logo-cyan" />,
+    buttonLabel: "打卡",
+  },
+  completed: {
+    label: "已完成",
+    variant: "default",
+    icon: <CalendarCheck className="size-4.5 text-logo-cyan" />,
+    buttonLabel: "打卡",
+  },
 };
 
 interface InProgressTaskCardProps {
@@ -21,6 +53,7 @@ interface InProgressTaskCardProps {
   messagesCount: number;
   isUnreadMessages: boolean;
   theme: string;
+  status: string;
   onCheckIn?: () => void;
 }
 
@@ -32,9 +65,11 @@ export const InProgressTaskCard = ({
   messagesCount,
   isUnreadMessages,
   theme,
+  status,
   onCheckIn,
 }: InProgressTaskCardProps) => {
   const Theme = themesMap[theme as keyof typeof themesMap] ?? YellowSvg;
+  const statusInfo = statusConfig[status as TaskStatus] ?? statusConfig["draft"];
 
   return (
     <div className="relative w-[294px]">
@@ -42,9 +77,20 @@ export const InProgressTaskCard = ({
       {/* Label */}
       <div className="absolute inset-0 p-5 pb-6 z-10 flex flex-col gap-5">
         <div className="flex-1 flex flex-col gap-2">
-          <Badge variant="secondary" size="sm" className="w-fit">
-            {label}
-          </Badge>
+          <div className="flex items-center justify-between gap-2">
+            <Badge variant="secondary" size="sm" className="w-fit">
+              {label}
+            </Badge>
+            {statusInfo && (
+              <Badge
+                variant={statusInfo.variant}
+                size="sm"
+                className="w-fit"
+              >
+                {statusInfo.label}
+              </Badge>
+            )}
+          </div>
 
           <div className="flex justify-between gap-2 flex-1">
             <div className="flex flex-col gap-2">
@@ -69,7 +115,8 @@ export const InProgressTaskCard = ({
             <span className="text-text-dark font-semibold">{progress}</span>
             <span className="text-text-dark">次</span>
           </span>
-          <div className="flex items-center gap-1">
+          {/* TODO: MVP 先不開放 */}
+          <div className="hidden items-center gap-1">
             <MessagesSvg className="size-4 text-text-dark" />
             {isUnreadMessages ? (
               <Badge variant="alert" size="xs" className="font-semibold min-w-5.5 justify-center">
@@ -83,8 +130,8 @@ export const InProgressTaskCard = ({
 
         {/* Check-in Button */}
         <Button variant="secondary" onClick={onCheckIn}>
-          <Calendar className="size-4" />
-          打卡
+          {statusInfo.icon}
+          {statusInfo.buttonLabel}
         </Button>
       </div>
 

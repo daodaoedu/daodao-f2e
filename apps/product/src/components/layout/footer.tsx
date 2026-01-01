@@ -6,9 +6,9 @@ export const Footer = () => {
   const t = useTranslations("common");
 
   return (
-    <footer className="bg-basic-600 py-1 text-white">
+    <footer className="pt-3 pb-21 md:pb-6">
       <div className="container mx-auto">
-        <p className="text-center text-white">
+        <p className="text-center text-text-dark">
           {t("footer_copyright", {
             year: new Date().getFullYear(),
           })}

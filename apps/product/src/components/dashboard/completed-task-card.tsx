@@ -31,7 +31,7 @@ export const CompletedTaskCard = ({
     >
       <div className="flex flex-col gap-1">
         {/* Label */}
-        <Badge variant="outline" size="sm" className="w-fit">
+        <Badge variant="outline-logo" size="sm" className="w-fit">
           {label}
         </Badge>
 
