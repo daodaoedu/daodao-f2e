@@ -2,6 +2,7 @@
 
 import { getStorage, StorageEnum } from "@daodao/shared";
 import type { OAuthState } from "../types";
+import { DEFAULT_REDIRECT_URL } from "./auth-constants";
 
 /**
  * OAuth State 參數有效期（毫秒）
@@ -105,7 +106,7 @@ export const createOAuthState = (
  * @returns OAuth 登入 URL
  */
 export const getOAuthLoginUrl = (
-  redirectUrl: string = "/dashboard",
+  redirectUrl: string = DEFAULT_REDIRECT_URL,
   source: "website" | "app" = "app"
 ): string => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -127,7 +128,7 @@ export const getOAuthLoginUrl = (
  * @param source 來源網站
  */
 export const initiateOAuthLogin = (
-  redirectUrl: string = "/dashboard",
+  redirectUrl: string = DEFAULT_REDIRECT_URL,
   source: "website" | "app" = "app"
 ): void => {
   const oauthUrl = getOAuthLoginUrl(redirectUrl, source);

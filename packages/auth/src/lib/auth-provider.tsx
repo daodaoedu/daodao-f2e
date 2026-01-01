@@ -2,29 +2,17 @@
 
 import { client, unauthorizedHandler } from "@daodao/api";
 import { getStorage, getStorageKey, StorageEnum } from "@daodao/shared";
+import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import type { AuthContextValue, StoredUser, User } from "../types";
-import { redirectTo } from "../utils/redirect";
+import type { AuthContextValue, StoredUser } from "../types";
 import { initiateOAuthLogin } from "./auth-client";
+import { DEFAULT_REDIRECT_URL } from "./auth-constants";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
-
-/**
- * 將完整的 API 使用者資訊轉換為簡化的存儲版本
- * 僅保留非敏感資料
- */
-const convertToStoredUser = (user: User): StoredUser => {
-  return {
-    id: user.id,
-    email: user.email ?? null,
-    name: user.name ?? null,
-    photoUrl: user.photoURL ?? null,
-  };
-};
 
 /**
  * Auth Provider 組件
@@ -35,73 +23,94 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const userInfoStorage = useMemo(() => getStorage<StoredUser>(StorageEnum.UserInfo), []);
+  const router = useRouter();
+
+  /**
+   * 清除認證狀態
+   * 統一處理使用者狀態清除邏輯
+   */
+  const clearAuthState = useCallback(() => {
+    setUser(null);
+    setIsAuthenticated(false);
+    userInfoStorage.remove();
+  }, [userInfoStorage]);
+
+  /**
+   * 設定認證狀態
+   * 統一處理使用者狀態設定邏輯
+   */
+  const setAuthState = useCallback(
+    (storedUser: StoredUser) => {
+      setUser(storedUser);
+      setIsAuthenticated(true);
+      userInfoStorage.set(storedUser);
+    },
+    [userInfoStorage]
+  );
 
   /**
    * 檢查登入狀態
-   * 呼叫 /api/v1/me/auth 端點（Cookie 自動發送）
+   * 呼叫 /api/v1/users/me 端點（Cookie 自動發送）
    */
   const checkAuth = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await client.GET("/api/v1/users/me");
 
-      if (response.data && response.response.ok) {
+      if (response.data && response.response.ok && response.data.data) {
         const userData = response.data.data;
-
-        if (userData) {
-          // 將完整的 API 使用者資訊轉換為簡化的存儲版本
-          const storedUser = convertToStoredUser(userData);
-          setUser(storedUser);
-          setIsAuthenticated(true);
-          // 將使用者資訊存到 localStorage（非敏感資料）
-          userInfoStorage.set(storedUser);
-        } else {
-          // 如果沒有使用者資訊，清除狀態
-          setUser(null);
-          setIsAuthenticated(false);
-          userInfoStorage.remove();
-        }
+        // 將完整的 API 使用者資訊轉換為簡化的存儲版本，避免記住敏感資訊
+        const storedUser: StoredUser = {
+          id: userData.id,
+          email: userData.email ?? null,
+          name: userData.name ?? null,
+          photoUrl: userData.photoURL ?? null,
+        };
+        setAuthState(storedUser);
       } else {
         // 未登入或 Token 無效
-        setUser(null);
-        setIsAuthenticated(false);
-        userInfoStorage.remove();
+        clearAuthState();
       }
     } catch (error) {
       console.error("Failed to check auth status:", error);
-      setUser(null);
-      setIsAuthenticated(false);
-      userInfoStorage.remove();
+      clearAuthState();
     } finally {
       setIsLoading(false);
     }
-  }, [userInfoStorage]);
+  }, [clearAuthState, setAuthState]);
+
+  /**
+   * Token 刷新邏輯
+   * 統一處理 Token 刷新，避免重複代碼
+   */
+  const handleTokenRefresh = useCallback(async (): Promise<boolean> => {
+    try {
+      const response = await client.POST("/api/v1/auth/refresh");
+      if (response.data && response.response.ok) {
+        // Token 刷新成功，重新檢查登入狀態
+        await checkAuth();
+        return true;
+      }
+      // Token 刷新失敗
+      return false;
+    } catch (error) {
+      console.error("Failed to refresh token:", error);
+      return false;
+    }
+  }, [checkAuth]);
 
   /**
    * 註冊 401 錯誤處理器（自動刷新 Token）
    */
   useEffect(() => {
     // 註冊 401 處理器
-    unauthorizedHandler.setHandler(async () => {
-      try {
-        const response = await client.POST("/api/v1/auth/refresh");
-        if (response.data && response.response.ok) {
-          // Token 刷新成功
-          return true;
-        }
-        // Token 刷新失敗
-        return false;
-      } catch (error) {
-        console.error("Failed to refresh token on 401:", error);
-        return false;
-      }
-    });
+    unauthorizedHandler.setHandler(handleTokenRefresh);
 
     // 清理時移除處理器
     return () => {
       unauthorizedHandler.clearHandler();
     };
-  }, []);
+  }, [handleTokenRefresh]);
 
   /**
    * 初始化時檢查登入狀態
@@ -132,26 +141,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setUser(newUserInfo);
           setIsAuthenticated(true);
         } else {
-          setUser(null);
-          setIsAuthenticated(false);
+          clearAuthState();
         }
       }
     };
 
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
-  }, [userInfoStorage]);
+  }, [userInfoStorage, clearAuthState]);
 
   /**
    * 登入
    * 啟動 OAuth 流程
    */
   const login = useCallback(async (redirectUrl?: string) => {
-    const defaultRedirect = redirectUrl || "/dashboard";
-    const source =
-      typeof window !== "undefined" && window.location.hostname.includes("app.")
-        ? "app"
-        : "website";
+    const defaultRedirect = redirectUrl || DEFAULT_REDIRECT_URL;
+    const source = window.location.hostname.includes("app.") ? "app" : "website";
     initiateOAuthLogin(defaultRedirect, source);
   }, []);
 
@@ -166,44 +171,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.error("Failed to logout:", error);
     } finally {
       // 無論 API 是否成功，都清除前端狀態
-      setUser(null);
-      setIsAuthenticated(false);
-      userInfoStorage.remove();
+      clearAuthState();
     }
-  }, [userInfoStorage]);
+  }, [clearAuthState]);
 
   /**
    * 刷新 Token
    * 呼叫後端 API 刷新 Token（後端會更新 Cookie）
    */
   const refreshToken = useCallback(async () => {
-    try {
-      const response = await client.POST("/api/v1/auth/refresh");
-      if (response.data && response.response.ok) {
-        // Token 刷新成功，重新檢查登入狀態
-        await checkAuth();
-      } else {
-        // Token 刷新失敗，清除狀態並跳轉登入頁
-        setUser(null);
-        setIsAuthenticated(false);
-        userInfoStorage.remove();
-        redirectTo("/auth/login");
-      }
-    } catch (error) {
-      console.error("Failed to refresh token:", error);
-      setUser(null);
-      setIsAuthenticated(false);
-      userInfoStorage.remove();
-      redirectTo("/auth/login");
+    const refreshSuccess = await handleTokenRefresh();
+    if (!refreshSuccess) {
+      // Token 刷新失敗，清除狀態並跳轉登入頁
+      clearAuthState();
+      router.push("/auth/login");
     }
-  }, [checkAuth, userInfoStorage]);
-
-  /**
-   * 跳轉到指定 URL
-   */
-  const handleRedirectTo = useCallback((url: string) => {
-    redirectTo(url);
-  }, []);
+  }, [handleTokenRefresh, clearAuthState, router]);
 
   const value: AuthContextValue = useMemo(
     () => ({
@@ -213,9 +196,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       login,
       logout,
       refreshToken,
-      redirectTo: handleRedirectTo,
     }),
-    [user, isAuthenticated, isLoading, login, logout, refreshToken, handleRedirectTo]
+    [user, isAuthenticated, isLoading, login, logout, refreshToken]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

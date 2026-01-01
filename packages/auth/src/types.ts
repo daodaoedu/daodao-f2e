@@ -1,11 +1,3 @@
-import type { components } from "@daodao/api";
-
-/**
- * 完整的使用者資訊類型
- * 從 OpenAPI schema 自動生成，包含所有使用者資料
- */
-export type User = components["schemas"]["user.validators_userSuccessResponseSchema"]["data"];
-
 /**
  * 簡化的使用者資訊介面
  * 僅包含非敏感資料，用於存儲於 localStorage
@@ -41,5 +33,4 @@ export interface AuthContextValue {
   login: (redirectUrl?: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
-  redirectTo: (url: string) => void;
 }

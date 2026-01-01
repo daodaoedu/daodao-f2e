@@ -12,6 +12,3 @@ export * from "./lib/auth-client";
 export * from "./lib/auth-middleware";
 export * from "./lib/auth-provider";
 export type * from "./types";
-
-// Export utils
-export * from "./utils/redirect";
