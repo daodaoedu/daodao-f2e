@@ -25,10 +25,10 @@
   },
   "dependencies": {
     "@daodao/api": "workspace:*",
+    "@daodao/config": "workspace:*",
     "@daodao/shared": "workspace:*"
   },
   "devDependencies": {
-    "@daodao/config": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "next": "catalog:",

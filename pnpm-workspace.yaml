@@ -4,6 +4,7 @@ packages:
   - packages/features/*
 
 catalog:
+  '@next/env': 16.1.1
   '@radix-ui/react-slot': 1.2.4
   '@tailwindcss/postcss': ^4.1.18
   '@types/node': ^20.19.27

@@ -54,7 +54,7 @@ export const useNavigationBlockerEffect = (shouldBlock: boolean) => {
   }, [shouldBlock, setIsBlocked]);
 };
 
-const getHash = () => (window === undefined ? undefined : window.location.hash);
+const getHash = () => (typeof window === "undefined" ? undefined : window.location.hash);
 
 export const useHash = () => {
   const [isClient, setIsClient] = useState(false);

@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -64,8 +63,8 @@ export const authMiddleware = async (request: NextRequest, options: AuthMiddlewa
   }
 
   // 檢查 Cookie 是否存在
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get(config.cookieName);
+  // 在 Middleware 中，直接從 request.cookies 讀取
+  const authToken = request.cookies.get(config.cookieName);
 
   if (!authToken) {
     // Cookie 不存在，跳轉到登入頁，保留原始 URL

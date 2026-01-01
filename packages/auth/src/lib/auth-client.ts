@@ -1,5 +1,6 @@
 "use client";
 
+import { getRequiredEnv } from "@daodao/config";
 import { getStorage, StorageEnum } from "@daodao/shared";
 import type { OAuthState } from "../types";
 import { DEFAULT_REDIRECT_URL } from "./auth-constants";
@@ -9,12 +10,6 @@ import { DEFAULT_REDIRECT_URL } from "./auth-constants";
  * 預設 10 分鐘
  */
 const OAUTH_STATE_EXPIRY = 10 * 60 * 1000;
-
-/**
- * OAuth nonce 存儲實例
- * 使用 sessionStorage 存儲，防止偽造和重放攻擊
- */
-const oauthNonceStorage = getStorage<string>(StorageEnum.OAuthNonce);
 
 /**
  * 生成隨機字串（用於 nonce）
@@ -68,7 +63,7 @@ export const validateOAuthState = (state: OAuthState): boolean => {
   }
 
   // 驗證 nonce 是否與存儲的值一致（防止偽造）
-  const storedNonce = oauthNonceStorage.get();
+  const storedNonce = getStorage<string>(StorageEnum.OAuthNonce).get();
   if (storedNonce !== state.nonce) {
     return false;
   }
@@ -89,7 +84,7 @@ export const createOAuthState = (
   const nonce = generateNonce();
 
   // 存儲 nonce 到 sessionStorage（用於後續驗證）
-  oauthNonceStorage.set(nonce);
+  getStorage<string>(StorageEnum.OAuthNonce).set(nonce);
 
   return {
     redirectUrl,
@@ -109,10 +104,7 @@ export const getOAuthLoginUrl = (
   redirectUrl: string = DEFAULT_REDIRECT_URL,
   source: "website" | "app" = "app"
 ): string => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) {
-    throw new Error("NEXT_PUBLIC_API_URL is not defined");
-  }
+  const apiUrl = getRequiredEnv("NEXT_PUBLIC_API_URL");
 
   // 建立 State 參數
   const state = createOAuthState(redirectUrl, source);
@@ -147,7 +139,7 @@ export const verifyAndConsumeOAuthState = (state: OAuthState): boolean => {
 
   if (isValid) {
     // 驗證成功後清除存儲的 nonce（防止重放攻擊）
-    oauthNonceStorage.remove();
+    getStorage<string>(StorageEnum.OAuthNonce).remove();
   }
 
   return isValid;

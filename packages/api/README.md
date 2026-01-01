@@ -19,10 +19,10 @@ API 客戶端套件，提供類型安全的 API 調用功能。
 ### 基本使用
 
 ```typescript
-import { apiClient } from "@daodao/api";
+import { client } from "@daodao/api";
 
 // 直接調用 API
-const { data, error } = await apiClient.GET("/users/{id}", {
+const { data, error } = await client.GET("/users/{id}", {
   params: {
     path: { id: "123" },
   },
@@ -63,7 +63,7 @@ function UserProfile({ userId }: { userId: string }) {
 import { handleApiError, isApiError } from "@daodao/api";
 
 try {
-  const { data, error } = await apiClient.GET("/users/{id}", {
+  const { data, error } = await client.GET("/users/{id}", {
     params: { path: { id: "123" } },
   });
   
@@ -81,7 +81,37 @@ try {
 
 ### 環境變數
 
-- `NEXT_PUBLIC_API_BASE_URL`: API 基礎 URL（預設: `http://localhost:3000/api`）
+- `NEXT_PUBLIC_API_URL`: API 基礎 URL（預設: `http://localhost:3000/api`）
+
+#### 在 Monorepo 中使用環境變數
+
+此 package 使用 `@daodao/config` 來載入環境變數。環境變數會自動從以下位置載入：
+
+1. **Next.js 應用目錄**：`apps/product/.env.local` 或 `apps/website/.env.local`
+2. **Monorepo 根目錄**：`.env` 或 `.env.local`
+3. **Package 目錄**：`packages/config/.env` 或 `packages/config/.env.local`
+
+在 Next.js 應用中，環境變數會在 build 時被內嵌到 bundle 中，無需額外配置。
+
+詳細說明請參考 `@daodao/config` 的文件。
+
+#### 自訂 API Client
+
+如果需要自訂 baseUrl，可以使用 `createApiClient` 函數：
+
+```typescript
+import { createApiClient } from "@daodao/api";
+
+// 建立自訂的 API client
+const customClient = createApiClient({
+  baseUrl: "https://api.example.com",
+});
+
+// 使用自訂的 client
+const { data, error } = await customClient.GET("/users/{id}", {
+  params: { path: { id: "123" } },
+});
+```
 
 ### 認證配置
 

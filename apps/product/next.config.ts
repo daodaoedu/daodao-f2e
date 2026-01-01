@@ -1,5 +1,8 @@
 import createNextIntlPlugin from "@daodao/i18n/plugin";
+import { loadEnvConfig } from "@next/env";
 import type { NextConfig } from "next";
+
+loadEnvConfig(process.cwd());
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 

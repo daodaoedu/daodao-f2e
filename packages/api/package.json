@@ -25,12 +25,12 @@
     "clean": "pnpm dlx rimraf dist node_modules"
   },
   "dependencies": {
+    "@daodao/config": "workspace:*",
     "next": "catalog:",
     "openapi-fetch": "^0.15.0",
     "swr-openapi": "^5.5.0"
   },
   "devDependencies": {
-    "@daodao/config": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "openapi-typescript": "^7.10.1",

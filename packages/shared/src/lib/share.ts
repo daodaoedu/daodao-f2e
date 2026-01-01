@@ -8,7 +8,7 @@ interface ShareAPIProps {
 }
 
 export function getShareAPI({ url, title = "", text = "", hashtag = "" }: ShareAPIProps) {
-  if (window === undefined) return {};
+  if (typeof window === "undefined") return {};
 
   const formattedUrl = url.startsWith("https://") ? url : `${window.location.origin}${url}`;
 

@@ -2,5 +2,26 @@
   "name": "@daodao/config",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared TypeScript configurations and type definitions for DaoDao monorepo"
+  "description": "Shared TypeScript configurations, type definitions, and utilities for DaoDao monorepo",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./env": "./src/env.ts",
+    "./nextjs.json": "./nextjs.json",
+    "./base.json": "./base.json",
+    "./react.json": "./react.json"
+  },
+  "scripts": {
+    "dev": "pnpm generate:env --watch",
+    "generate:env": "tsx scripts/generate-env.ts",
+    "build": "tsc && pnpm generate:env"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "chokidar": "^4.0.3",
+    "dotenv": "^16.4.7",
+    "tsx": "^4.19.2",
+    "typescript": "catalog:"
+  }
 }

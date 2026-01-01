@@ -39,7 +39,7 @@ export function getStorage<T>(key: StorageEnum): StorageInstance<T> {
   const storageType = mapStorageKeyToStorageType[key];
   const storageKey = getStorageKey(key);
 
-  if (window === undefined) {
+  if (typeof window === "undefined") {
     return {
       set: () => undefined,
       get: () => undefined,

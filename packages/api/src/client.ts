@@ -3,6 +3,7 @@ import createClient, {
   type FetchResponse,
   type MaybeOptionalInit,
 } from "openapi-fetch";
+import { getRequiredEnv } from "@daodao/config";
 import type { paths } from "./types";
 
 export type * from "openapi-fetch";
@@ -18,19 +19,8 @@ class UnauthorizedHandler {
   private onUnauthorized: (() => Promise<boolean>) | null = null;
   private isRefreshing = false;
   private refreshPromise: Promise<boolean> | null = null;
-  private readonly originalFetch: typeof fetch;
+  private constructor() {}
 
-  /**
-   * 私有構造函數，防止外部實例化
-   */
-  private constructor() {
-    this.originalFetch = globalThis.fetch;
-  }
-
-  /**
-   * 獲取單例實例
-   * @returns UnauthorizedHandler 的唯一實例
-   */
   static getInstance(): UnauthorizedHandler {
     if (!UnauthorizedHandler.instance) {
       UnauthorizedHandler.instance = new UnauthorizedHandler();
@@ -59,8 +49,11 @@ class UnauthorizedHandler {
    * @param init 請求選項
    * @returns Response 物件
    */
-  wrapFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    const response = await this.originalFetch(input, init);
+  wrapFetch = async (
+    input: RequestInfo | URL,
+    init?: RequestInit
+  ): Promise<Response> => {
+    const response = await fetch(input, init);
 
     // 如果不是 401 或沒有處理器，直接返回
     if (response.status !== 401 || !this.onUnauthorized) {
@@ -72,7 +65,7 @@ class UnauthorizedHandler {
       const refreshSuccess = await this.refreshPromise;
       if (refreshSuccess) {
         // 刷新成功，重試原請求
-        return this.originalFetch(input, init);
+        return fetch(input, init);
       }
       // 刷新失敗，返回原始 401 響應
       return response;
@@ -86,7 +79,7 @@ class UnauthorizedHandler {
       const refreshSuccess = await this.refreshPromise;
       if (refreshSuccess) {
         // 刷新成功，重試原請求
-        return this.originalFetch(input, init);
+        return fetch(input, init);
       }
       // 刷新失敗，返回原始 401 響應
       return response;
@@ -103,10 +96,26 @@ class UnauthorizedHandler {
  */
 export const unauthorizedHandler = UnauthorizedHandler.getInstance();
 
+/**
+ * API Client 配置選項
+ */
+export interface ApiClientConfig {
+  /**
+   * API 基礎 URL
+   * 如果未提供，會從環境變數 NEXT_PUBLIC_API_URL 讀取
+   */
+  baseUrl?: string;
+}
+
+/**
+ * 預設的 API Client 實例
+ * 使用環境變數 NEXT_PUBLIC_API_URL 或預設值
+ */
 export const client = createClient<paths>({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL,
+  baseUrl: getRequiredEnv("NEXT_PUBLIC_API_URL"),
   credentials: "include",
-  fetch: typeof window === "undefined" ? globalThis.fetch : unauthorizedHandler.wrapFetch,
+  fetch:
+    typeof window === "undefined" ? fetch : unauthorizedHandler.wrapFetch,
 });
 
 type InitParam<Init> = Init extends undefined ? never : Init;
@@ -139,7 +148,10 @@ type InitParam<Init> = Init extends undefined ? never : Init;
  */
 export const getSwrKey = <
   Path extends ClientPathsWithMethod<typeof client, "get">,
-  Init extends MaybeOptionalInit<paths[Path], "get"> = MaybeOptionalInit<paths[Path], "get">,
+  Init extends MaybeOptionalInit<paths[Path], "get"> = MaybeOptionalInit<
+    paths[Path],
+    "get"
+  >
 >(
   path: Path,
   init: InitParam<Init>
@@ -176,14 +188,17 @@ export const getSwrKey = <
  */
 export const getSwrKeyWithResponse = async <
   Path extends ClientPathsWithMethod<typeof client, "get">,
-  Init extends MaybeOptionalInit<paths[Path], "get"> = MaybeOptionalInit<paths[Path], "get">,
-  Media extends `${string}/${string}` = "application/json",
+  Init extends MaybeOptionalInit<paths[Path], "get"> = MaybeOptionalInit<
+    paths[Path],
+    "get"
+  >,
+  Media extends `${string}/${string}` = "application/json"
 >(
   path: Path,
   init: InitParam<Init>
 ): Promise<
   readonly [
     readonly [typeof PREFIX, Path, InitParam<Init>?],
-    FetchResponse<paths[Path]["get"], Init, Media>,
+    FetchResponse<paths[Path]["get"], Init, Media>
   ]
 > => Promise.all([getSwrKey(path, init), client.GET(path, init)] as const);

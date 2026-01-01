@@ -24,6 +24,7 @@
     "@daodao/i18n": "workspace:*",
     "@daodao/shared": "workspace:*",
     "@daodao/ui": "workspace:*",
+    "@next/env": "catalog:",
     "lottie-react": "catalog:",
     "lucide-react": "catalog:",
     "next": "catalog:",
