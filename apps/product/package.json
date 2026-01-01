@@ -25,13 +25,16 @@
     "@daodao/i18n": "workspace:*",
     "@daodao/shared": "workspace:*",
     "@daodao/ui": "workspace:*",
+    "@hookform/resolvers": "catalog:",
     "@next/env": "catalog:",
     "date-fns": "catalog:",
     "lottie-react": "catalog:",
     "lucide-react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "react-hook-form": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@daodao/config": "workspace:*",

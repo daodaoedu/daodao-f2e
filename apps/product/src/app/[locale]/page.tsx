@@ -2,9 +2,12 @@
 
 import { MessagesSvg } from "@daodao/assets";
 import { CheckCircle2 } from "lucide-react";
+import { useState } from "react";
 import {
   AddTaskFAB,
   BackgroundAnimation,
+  CheckInSheet,
+  type CheckInData,
   CompletedSection,
   DashboardHeader,
   InProgressSection,
@@ -106,9 +109,18 @@ export default function HomePage() {
     },
   ];
 
+  const [isCheckInSheetOpen, setIsCheckInSheetOpen] = useState(false);
+  const [currentTaskTitle, setCurrentTaskTitle] = useState("");
+
   const handleCheckIn = (taskTitle: string) => {
-    // TODO: 實作打卡功能
-    console.log("打卡:", taskTitle);
+    setCurrentTaskTitle(taskTitle);
+    setIsCheckInSheetOpen(true);
+  };
+
+  const handleCheckInComplete = (data: CheckInData) => {
+    // TODO: 處理打卡資料
+    console.log("打卡資料:", data);
+    setIsCheckInSheetOpen(false);
   };
 
   const handleAddTask = () => {
@@ -131,6 +143,13 @@ export default function HomePage() {
 
       <AddTaskFAB onAddTask={handleAddTask} />
       <Footer />
+
+      <CheckInSheet
+        open={isCheckInSheetOpen}
+        onOpenChange={setIsCheckInSheetOpen}
+        taskTitle={currentTaskTitle}
+        onComplete={handleCheckInComplete}
+      />
     </div>
   );
 }

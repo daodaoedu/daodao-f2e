@@ -55,6 +55,7 @@ interface InProgressTaskCardProps {
   theme: string;
   status: string;
   onCheckIn?: () => void;
+  onEdit?: () => void;
 }
 
 export const InProgressTaskCard = ({
@@ -67,9 +68,19 @@ export const InProgressTaskCard = ({
   theme,
   status,
   onCheckIn,
+  onEdit,
 }: InProgressTaskCardProps) => {
   const Theme = themesMap[theme as keyof typeof themesMap] ?? YellowSvg;
   const statusInfo = statusConfig[status as TaskStatus] ?? statusConfig["draft"];
+  const isDraft = status === "draft";
+
+  const handleButtonClick = () => {
+    if (isDraft) {
+      onEdit?.();
+    } else {
+      onCheckIn?.();
+    }
+  };
 
   return (
     <div className="relative w-[294px]">
@@ -129,7 +140,7 @@ export const InProgressTaskCard = ({
         </div>
 
         {/* Check-in Button */}
-        <Button variant="secondary" onClick={onCheckIn}>
+        <Button variant="secondary" onClick={handleButtonClick}>
           {statusInfo.icon}
           {statusInfo.buttonLabel}
         </Button>

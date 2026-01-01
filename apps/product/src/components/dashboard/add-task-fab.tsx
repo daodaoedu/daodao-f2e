@@ -9,10 +9,14 @@ import { Button } from "@daodao/ui/components/button";
 import { Plus } from "lucide-react";
 
 interface AddTaskFABProps {
-  onAddTask: () => void;
+  onAddTask?: () => void;
 }
 
 export const AddTaskFAB = ({ onAddTask }: AddTaskFABProps) => {
+  const handleClick = () => {
+    onAddTask?.();
+  };
+
   return (
     <Tooltip>
       <TooltipTrigger
@@ -21,7 +25,7 @@ export const AddTaskFAB = ({ onAddTask }: AddTaskFABProps) => {
             variant="default"
             size="icon"
             className="fixed bottom-20 right-5 md:bottom-15 md:right-15 size-15 z-20"
-            onClick={onAddTask}
+            onClick={handleClick}
             aria-label="新增任務"
           >
             <Plus className="size-6" />

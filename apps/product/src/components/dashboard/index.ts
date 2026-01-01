@@ -1,9 +1,11 @@
 export { AddTaskFAB } from "./add-task-fab";
 export { BackgroundAnimation } from "./background-animation";
+export { CheckInSheet } from "./check-in-sheet";
 export { CompletedSection } from "./completed-section";
 export { CompletedTaskCard } from "./completed-task-card";
 export { DashboardHeader } from "./dashboard-header";
 export { InProgressSection } from "./in-progress-section";
 export { InProgressTaskCard } from "./in-progress-task-card";
 export { StatCard } from "./stat-card";
+export type { CheckInData } from "./check-in-sheet";
 export type { FilterStatus, InProgressTask } from "./in-progress-section";

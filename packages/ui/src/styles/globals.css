@@ -470,7 +470,7 @@
   }
   @keyframes float {
     0% {
-      transform: translate(0, 0) rotate(0deg) scale(0.6);
+      transform: translate(0, 0) rotate(0deg) scale(0.8);
     }
     12.5% {
       transform: translate(60px, -40px) rotate(45deg) scale(1);
@@ -482,7 +482,7 @@
       transform: translate(30px, -100px) rotate(135deg) scale(1);
     }
     50% {
-      transform: translate(-60px, -120px) rotate(180deg) scale(0.6);
+      transform: translate(-60px, -120px) rotate(180deg) scale(0.8);
     }
     62.5% {
       transform: translate(-90px, -90px) rotate(225deg) scale(1);
@@ -494,7 +494,7 @@
       transform: translate(-60px, -30px) rotate(315deg) scale(1);
     }
     100% {
-      transform: translate(0, 0) rotate(360deg) scale(0.6);
+      transform: translate(0, 0) rotate(360deg) scale(0.8);
     }
   }
 
@@ -694,6 +694,10 @@
     font-size: 0.875rem;
     line-height: 140%;
     font-weight: 400;
+  }
+
+  .text-md {
+    font-size: 1.125rem;
   }
 
   /* Gradient background */
