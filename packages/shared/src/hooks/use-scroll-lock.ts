@@ -11,12 +11,18 @@ interface ScrollRestore {
 
 /**
  * 鎖定頁面滾動的 hook
- * 當組件掛載時鎖定滾動，卸載時自動恢復
+ * @param enabled - 是否啟用滾動鎖定，預設為 true（組件掛載時自動鎖定）
+ * @returns 返回 lockScroll 和 unlockScroll 函數，可手動控制滾動鎖定
  */
-export function useScrollLock() {
+export function useScrollLock(enabled: boolean = true) {
   const scrollRestoreRef = useRef<ScrollRestore | null>(null);
 
   const lockScroll = useCallback(() => {
+    // 如果已經鎖定，不重複鎖定
+    if (scrollRestoreRef.current) {
+      return;
+    }
+
     const originalStyle = window.getComputedStyle(document.body);
 
     scrollRestoreRef.current = {
@@ -49,12 +55,16 @@ export function useScrollLock() {
   }, []);
 
   useEffect(() => {
-    lockScroll();
+    if (enabled) {
+      lockScroll();
+    }
 
     return () => {
-      unlockScroll();
+      if (enabled) {
+        unlockScroll();
+      }
     };
-  }, [lockScroll, unlockScroll]);
+  }, [enabled, lockScroll, unlockScroll]);
 
   return { lockScroll, unlockScroll };
 }

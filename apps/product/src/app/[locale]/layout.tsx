@@ -5,6 +5,7 @@ import { getMessages, getTranslations, setRequestLocale } from "@daodao/i18n/ser
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import GlobalProvider from "../global-provider";
+import { Footer, Sidebar } from "@/components/layout";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -43,6 +44,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   return (
     <GlobalProvider locale={locale} messages={messages}>
       {children}
+      <Sidebar />
+      <Footer />
     </GlobalProvider>
   );
 }

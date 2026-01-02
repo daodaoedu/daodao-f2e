@@ -5,7 +5,7 @@ import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import {
   AddTaskFAB,
-  BackgroundAnimation,
+  Banner,
   CheckInSheet,
   type CheckInData,
   CompletedSection,
@@ -13,7 +13,8 @@ import {
   InProgressSection,
   type InProgressTask,
 } from "@/components/dashboard";
-import { Banner, Footer, Sidebar } from "@/components/layout";
+import { CreatePracticeSheet } from "@/components/create-practice";
+import { BackgroundAnimation } from "@/components/layout";
 
 export default function HomePage() {
   // 模擬數據 - 之後可以從 API 取得
@@ -111,6 +112,7 @@ export default function HomePage() {
 
   const [isCheckInSheetOpen, setIsCheckInSheetOpen] = useState(false);
   const [currentTaskTitle, setCurrentTaskTitle] = useState("");
+  const [isCreatePracticeSheetOpen, setIsCreatePracticeSheetOpen] = useState(false);
 
   const handleCheckIn = (taskTitle: string) => {
     setCurrentTaskTitle(taskTitle);
@@ -124,13 +126,11 @@ export default function HomePage() {
   };
 
   const handleAddTask = () => {
-    // TODO: 實作新增任務功能
-    console.log("新增任務");
+    setIsCreatePracticeSheetOpen(true);
   };
 
   return (
     <div className="relative min-h-screen">
-      <Sidebar />
       <Banner />
       <BackgroundAnimation />
 
@@ -142,13 +142,17 @@ export default function HomePage() {
       </main>
 
       <AddTaskFAB onAddTask={handleAddTask} />
-      <Footer />
 
       <CheckInSheet
         open={isCheckInSheetOpen}
         onOpenChange={setIsCheckInSheetOpen}
         taskTitle={currentTaskTitle}
         onComplete={handleCheckInComplete}
+      />
+
+      <CreatePracticeSheet
+        open={isCreatePracticeSheetOpen}
+        onOpenChange={setIsCreatePracticeSheetOpen}
       />
     </div>
   );

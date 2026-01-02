@@ -75,3 +75,100 @@ userStorage.remove();
 1. 在 `packages/shared/src/lib/storage.ts` 的 `StorageEnum` 中新增 key
 2. 在 `mapStorageKeyToStorageType` 中定義對應的 storage 類型（localStorage 或 sessionStorage）
 3. 添加適當的註解說明該 storage 的用途
+
+### UI Components
+
+**必須盡可能使用 `@daodao/ui` 提供的 UI 元件**
+
+- 優先使用 `@daodao/ui` 的元件，避免自行實作或使用原生 HTML 元素
+- 使用 `@daodao/ui` 的元件可以確保設計系統的一致性、可訪問性和樣式統一
+
+```typescript
+import { Button } from "@daodao/ui/components/button";
+import { Input } from "@daodao/ui/components/input";
+import { Badge } from "@daodao/ui/components/badge";
+import { Avatar } from "@daodao/ui/components/avatar";
+
+// ✅ 正確：使用 daodao/ui 的 Button
+<Button variant="outline" onClick={handleClick}>
+  點擊我
+</Button>
+
+// ❌ 錯誤：使用原生 button
+<button onClick={handleClick}>點擊我</button>
+```
+
+- 更多元件請參考 `packages/ui/src/components/`
+
+**禁止直接使用原生 HTML 元素**（如 `<button>`, `<input>` 等），除非 `@daodao/ui` 沒有提供對應的元件。
+
+### Shared Utilities
+
+**必須使用 `@daodao/shared` 提供的共用方法和 Hooks**
+
+- 優先使用 `@daodao/shared` 提供的共用功能，避免重複實作
+- 使用共用方法可以確保行為一致性和可維護性
+
+```typescript
+import { useScrollLock } from "@daodao/shared";
+import { useMediaQuery } from "@daodao/shared";
+import { useQueryState } from "@daodao/shared";
+import { formatDate } from "@daodao/shared";
+import { shareContent } from "@daodao/shared";
+
+// ✅ 正確：使用 daodao/shared 的 hook
+const isLocked = useScrollLock(open);
+
+// ✅ 正確：使用 daodao/shared 的工具函數
+const formattedDate = formatDate(date);
+```
+
+**可用的 Hooks：**
+- `useScrollLock` - 鎖定頁面滾動
+- `useMediaQuery` - 響應式媒體查詢
+- `useQueryState` - URL query 參數狀態管理
+- `useScrollVisibility` - 滾動可見性檢測
+- `useAssetsLoader` - 資源載入器
+
+**可用的工具函數：**
+- `formatDate` - 日期格式化
+- `shareContent` - 分享內容功能
+- `captureElementAsImage` - 將元素轉換為圖片
+- `getStorage`, `StorageEnum` - Storage 操作（見上方 Storage Operations 章節）
+
+**禁止重複實作** `@daodao/shared` 已經提供的功能。
+
+### API Calls
+
+**必須使用 `@daodao/api` 來進行 API 呼叫**
+
+- 使用 `@daodao/api` 提供的 hooks 和 client 來發送 API 請求
+- 使用 `@daodao/api` 可以確保 API 呼叫的一致性、錯誤處理和類型安全
+
+```typescript
+import { useQuery, useMutate, useInfinite } from "@daodao/api";
+import { client } from "@daodao/api";
+
+// ✅ 正確：使用 daodao/api 的 hooks
+const { data, error, isLoading } = useQuery("GET", "/api/users/{id}", {
+  params: { path: { id: "123" } },
+});
+
+const { trigger, isMutating } = useMutate("POST", "/api/users");
+
+// ✅ 正確：使用 daodao/api 的 client（在 Server Component 或非 React 環境）
+const response = await client.GET("/api/users/{id}", {
+  params: { path: { id: "123" } },
+});
+```
+
+**可用的 API Hooks：**
+- `useQuery` - 查詢資料（GET 請求）
+- `useMutate` - 變更資料（POST, PUT, DELETE 等請求）
+- `useInfinite` - 無限滾動查詢
+- `useImmutable` - 不可變資料查詢
+
+**可用的 API Client：**
+- `client` - 用於 Server Component 或非 React 環境的 API 客戶端
+
+**禁止直接使用 `fetch` 或 `axios`**，請統一使用 `@daodao/api` 提供的 API 客戶端和 hooks。
