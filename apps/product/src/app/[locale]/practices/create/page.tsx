@@ -14,6 +14,7 @@ import { PracticeTopicGrid } from "@/components/create-practice/practice-topic-g
 import { BackgroundAnimation } from "@/components/layout";
 import { BgRadialAnimation } from "@/components/layout/bg-radial-animation";
 import { useRouter } from "@daodao/i18n/navigation";
+import { Badge } from "@daodao/ui/components/badge";
 
 // 模擬數據 - 之後可以從 API 取得
 const featuredPractices = [
@@ -43,7 +44,7 @@ const featuredPractices = [
 export default function CreatePracticePage() {
   const router = useRouter();
 
-  const handleTemplateSelect = (templateId: string | number) => {
+  const handleTemplateSelect = (templateId: string) => {
     router.push(`/practices/create/template/${templateId}`);
   };
 
@@ -59,14 +60,14 @@ export default function CreatePracticePage() {
           aria-label="關閉"
           animation="none"
         >
-          <X className="size-5 text-light-gray" />
+          <X className="size-6 text-light-gray" />
         </Button>
       </div>
 
-      <div className="relative px-4 max-w-[600px] mx-auto">
+      <main className="relative px-4 max-w-[600px] mx-auto">
         {/* Header */}
         <div className="text-center pt-5 md:pt-12">
-          <h2 className="text-xs md:text-sm text-text-dark mb-3">主題實踐</h2>
+          <Badge size="sm" variant="secondary" className="text-xs md:text-sm text-text-dark mb-3">主題實踐</Badge>
           <h1 className="text-2xl md:text-4xl font-semibold text-text-dark mb-3 relative">
             小而美的學習生活提案
             <BgRadialAnimation className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[calc(50%-64px)] md:-translate-y-[calc(50%-24px)] -z-10" variant="deco" />
@@ -110,7 +111,7 @@ export default function CreatePracticePage() {
             />
           </Carousel>
         </div>
-      </div>
+      </main>
 
       {/* Practice Topics Grid */}
       <PracticeTopicGrid onTopicClick={handleTemplateSelect} />

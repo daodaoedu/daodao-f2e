@@ -143,15 +143,17 @@ function convertSvgAttributes(attributes: string): string {
   };
 
   // Process namespace attributes (xlink:href) first with double quotes
+  // Match namespace attributes like xlink:href, xmlns:xlink, etc.
+  // Use [a-z0-9-] with - at the end to ensure it's treated as literal character
   let result = attributes.replace(
-    /(\s*)([a-z]+:[a-z-]+)\s*=\s*"([^"]*?)"/gi,
+    /(\s*)([a-z]+:[a-z0-9-]+)\s*=\s*"([^"]*?)"/gi,
     (match, whitespace, attrName, attrValue) =>
       processMatch(match, whitespace, attrName, '"', attrValue)
   );
 
   // Process namespace attributes (xlink:href) with single quotes
   result = result.replace(
-    /(\s*)([a-z]+:[a-z-]+)\s*=\s*'([^']*?)'/gi,
+    /(\s*)([a-z]+:[a-z0-9-]+)\s*=\s*'([^']*?)'/gi,
     (match, whitespace, attrName, attrValue) =>
       processMatch(match, whitespace, attrName, "'", attrValue)
   );
@@ -175,9 +177,9 @@ function convertSvgAttributes(attributes: string): string {
 
 function convertSvgContent(content: string): string {
   // Convert attributes in all SVG elements (path, g, circle, rect, etc.)
-  return content.replace(/<([a-z][a-z0-9]*)([^>]*)>/gi, (_match, tagName, attributes) => {
+  return content.replace(/<([a-z][a-z0-9]*)([^>]*?)(\/?)>/gi, (_match, tagName, attributes, selfClosing) => {
     const convertedAttributes = convertSvgAttributes(attributes);
-    return `<${tagName}${convertedAttributes}>`;
+    return `<${tagName}${convertedAttributes}${selfClosing}>`;
   });
 }
 

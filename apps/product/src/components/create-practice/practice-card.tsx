@@ -1,13 +1,14 @@
 "use client";
 
 import { Badge } from "@daodao/ui/components/badge";
+import { cn } from "@daodao/ui/lib/utils";
 
 interface PracticeCardProps {
   category: string;
   title: string;
   description: string;
-  templateId: string | number;
-  onClick?: (templateId: string | number) => void;
+  templateId: string;
+  onClick?: (templateId: string) => void;
 }
 
 export const PracticeCard = ({
@@ -36,11 +37,11 @@ export const PracticeCard = ({
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         aria-label={onClick ? `選擇模板：${title}` : undefined}
-        className={`relative rounded-xl p-4 pt-5 text-white shadow-[0_0_25px_var(--logo-cyan)]/20 bg-logo-cyan ${
-          onClick
-            ? "cursor-pointer transition-all hover:brightness-110 hover:-translate-y-1 hover:scale-[1.02] hover:outline-2 hover:outline-white hover:outline-offset-2 active:scale-[0.98] active:translate-y-0 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
-            : ""
-        }`}
+        className={cn(
+          "relative rounded-xl p-4 pt-5 text-white shadow-[0_0_25px_var(--logo-cyan)]/20 bg-logo-cyan",
+          onClick &&
+            "cursor-pointer transition-all hover:brightness-110 hover:-translate-y-1 hover:scale-[1.02] hover:outline-2 hover:outline-white hover:outline-offset-2 active:scale-[0.98] active:translate-y-0 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+        )}
       >
         {/* Category Badge */}
         <Badge

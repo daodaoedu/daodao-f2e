@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@daodao/ui/components/badge";
+import { cn } from "@daodao/ui/lib/utils";
 
 // 模擬數據 - 之後可以從 API 取得
 const practiceTopics = [
@@ -17,7 +18,11 @@ const practiceTopics = [
   { id: 11, label: "睡前伸展操", templateId: "bedtime-stretching" },
   { id: 12, label: "動手做早餐", templateId: "make-breakfast" },
   { id: 13, label: "《設計》線上課", templateId: "design-online-course" },
-  { id: 14, label: "《角色設計》線上課", templateId: "character-design-course" },
+  {
+    id: 14,
+    label: "《角色設計》線上課",
+    templateId: "character-design-course",
+  },
   { id: 15, label: "電繪光影技巧", templateId: "digital-painting-lighting" },
   { id: 16, label: "冥想", templateId: "meditation" },
   { id: 17, label: "每天情緒日記", templateId: "daily-emotion-journal" },
@@ -59,11 +64,11 @@ export const PracticeTopicGrid = ({ onTopicClick }: PracticeTopicGridProps) => {
             onClick={() => handleTopicClick(topic.templateId)}
             onKeyDown={(e) => handleKeyDown(e, topic.templateId)}
             aria-label={onTopicClick ? `選擇模板：${topic.label}` : undefined}
-            className={`text-sm md:text-lg border-bg-gray text-light-gray ${
-              onTopicClick
-                ? "cursor-pointer transition-all hover:border-logo-cyan hover:text-logo-cyan hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-logo-cyan focus-visible:outline-offset-2"
-                : ""
-            }`}
+            className={cn(
+              "text-sm md:text-lg border-bg-gray text-light-gray",
+              onTopicClick &&
+                "cursor-pointer transition-all hover:border-logo-cyan hover:text-logo-cyan hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-logo-cyan focus-visible:outline-offset-2"
+            )}
           >
             {topic.label}
           </Badge>
