@@ -28,7 +28,7 @@
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "catalog:",
-    "motion": "^12.23.26",
+    "motion": "catalog:",
     "next": "catalog:",
     "next-themes": "catalog:",
     "radix-ui": "^1.4.3",

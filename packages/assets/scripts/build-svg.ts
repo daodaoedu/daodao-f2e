@@ -107,7 +107,7 @@ function convertStyleToReactObject(styleValue: string): string {
 function convertSvgAttributes(attributes: string): string {
   // Convert kebab-case attributes to camelCase
   // Match attribute names (e.g., fill-rule="evenodd" or clip-path='url(...)')
-  // Special handling for style attribute
+  // Special handling for style attribute and xlink:href
   // Match with optional leading whitespace to handle first attribute
   // Use separate patterns for single and double quotes to avoid ReDoS vulnerability
   const processMatch = (
@@ -123,7 +123,18 @@ function convertSvgAttributes(attributes: string): string {
       return `${whitespace}style=${reactStyle}`;
     }
 
+    // Handle xlink:href attribute specially (convert to xlinkHref for React)
+    if (attrName.toLowerCase() === "xlink:href") {
+      return `${whitespace}xlinkHref=${quote}${attrValue}${quote}`;
+    }
+
+    // Handle xmlns:xlink attribute specially (convert to xmlnsXlink for React)
+    if (attrName.toLowerCase() === "xmlns:xlink") {
+      return `${whitespace}xmlnsXlink=${quote}${attrValue}${quote}`;
+    }
+
     // Skip if already camelCase or if it's a namespace attribute (xml:, xlink:, etc.)
+    // But we already handled xlink:href and xmlns:xlink above, so skip other namespace attributes
     if (attrName.includes(":") || !attrName.includes("-")) {
       return match;
     }
@@ -131,8 +142,22 @@ function convertSvgAttributes(attributes: string): string {
     return `${whitespace}${camelCaseName}=${quote}${attrValue}${quote}`;
   };
 
-  // Process double-quoted attributes first (non-greedy match to prevent backtracking)
+  // Process namespace attributes (xlink:href) first with double quotes
   let result = attributes.replace(
+    /(\s*)([a-z]+:[a-z-]+)\s*=\s*"([^"]*?)"/gi,
+    (match, whitespace, attrName, attrValue) =>
+      processMatch(match, whitespace, attrName, '"', attrValue)
+  );
+
+  // Process namespace attributes (xlink:href) with single quotes
+  result = result.replace(
+    /(\s*)([a-z]+:[a-z-]+)\s*=\s*'([^']*?)'/gi,
+    (match, whitespace, attrName, attrValue) =>
+      processMatch(match, whitespace, attrName, "'", attrValue)
+  );
+
+  // Process double-quoted attributes (non-greedy match to prevent backtracking)
+  result = result.replace(
     /(\s*)([a-z][a-z0-9-]*)\s*=\s*"([^"]*?)"/gi,
     (match, whitespace, attrName, attrValue) =>
       processMatch(match, whitespace, attrName, '"', attrValue)

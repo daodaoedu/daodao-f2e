@@ -19,6 +19,7 @@ interface AuthGuardProps {
  * ```
  *
  * @remarks
+ * 此組件用於需要根據認證狀態顯示不同內容的情況。
  * 如果需要自動跳轉到登入頁，請使用 `useRequireAuth()` hook：
  * ```typescript
  * export default function ProtectedPage() {
@@ -26,6 +27,9 @@ interface AuthGuardProps {
  *   return <div>Protected Content</div>;
  * }
  * ```
+ *
+ * 對於 Product app，路由保護主要由 Middleware 在服務器端處理。
+ * 對於 Website app，可以使用 `useRequireAuth()` 進行客戶端保護。
  */
 export const AuthGuard = ({ children, fallback = null }: AuthGuardProps) => {
   const { isAuthenticated, isLoading } = useAuth();

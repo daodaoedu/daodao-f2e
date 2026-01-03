@@ -14,17 +14,14 @@ const i18nMiddleware = createMiddleware(routing);
  * 可以在這裡自訂需要保護的路徑和公開路徑
  */
 const authConfig = {
-  // 需要保護的路徑（需要登入）
+  // @TODO: 後續移除，方便開發用
   protectedPaths: [
     "/dashboard",
-    "/quiz/advanced-analysis",
-    // 可以在這裡添加更多需要保護的路徑
   ],
   // 公開路徑（不需要登入）
   publicPaths: [
     "/auth/login",
     "/auth/callback",
-    "/auth/logout",
     // 可以在這裡添加更多公開路徑
   ],
   cookieName: process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME,

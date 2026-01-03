@@ -26,6 +26,14 @@ const LOGIN_URL = "/auth/login";
  *   return <div>Protected Content</div>;
  * }
  * ```
+ *
+ * @remarks
+ * 此 hook 適用於以下情境：
+ * - Website app：大部分頁面公開，只有少數頁面需要保護
+ * - 條件式保護：需要根據客戶端狀態決定是否保護
+ * - 動態路由保護：需要載入資料後才能判斷權限
+ *
+ * 對於 Product app，建議使用 Middleware 在服務器端選擇要公開的路徑，預設為保護。
  */
 export const useRequireAuth = (redirectUrl?: string) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -39,3 +47,4 @@ export const useRequireAuth = (redirectUrl?: string) => {
     }
   }, [isAuthenticated, isLoading, redirectUrl, router]);
 };
+

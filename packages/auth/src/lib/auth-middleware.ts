@@ -35,8 +35,14 @@ const isProtectedPath = (pathname: string, options: Required<AuthMiddlewareOptio
     return false;
   }
 
-  // 檢查是否為保護路徑
-  return options.protectedPaths.some((path) => pathname.startsWith(path));
+  // 如果指定了 protectedPaths，只保護這些路徑
+  // 如果 protectedPaths 為空，預設保護所有路徑（除了 publicPaths）
+  if (options.protectedPaths.length > 0) {
+    return options.protectedPaths.some((path) => pathname.startsWith(path));
+  }
+
+  // 預設保護所有路徑
+  return true;
 };
 
 /**

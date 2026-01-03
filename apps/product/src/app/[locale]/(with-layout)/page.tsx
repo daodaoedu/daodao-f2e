@@ -13,10 +13,12 @@ import {
   InProgressSection,
   type InProgressTask,
 } from "@/components/dashboard";
-import { CreatePracticeSheet } from "@/components/create-practice";
 import { BackgroundAnimation } from "@/components/layout";
+import { useRouter } from "@daodao/i18n/navigation";
 
 export default function HomePage() {
+  const router = useRouter();
+  
   // 模擬數據 - 之後可以從 API 取得
   const stats = [
     {
@@ -112,7 +114,6 @@ export default function HomePage() {
 
   const [isCheckInSheetOpen, setIsCheckInSheetOpen] = useState(false);
   const [currentTaskTitle, setCurrentTaskTitle] = useState("");
-  const [isCreatePracticeSheetOpen, setIsCreatePracticeSheetOpen] = useState(false);
 
   const handleCheckIn = (taskTitle: string) => {
     setCurrentTaskTitle(taskTitle);
@@ -126,7 +127,7 @@ export default function HomePage() {
   };
 
   const handleAddTask = () => {
-    setIsCreatePracticeSheetOpen(true);
+    router.push("/practices/create");
   };
 
   return (
@@ -148,11 +149,6 @@ export default function HomePage() {
         onOpenChange={setIsCheckInSheetOpen}
         taskTitle={currentTaskTitle}
         onComplete={handleCheckInComplete}
-      />
-
-      <CreatePracticeSheet
-        open={isCreatePracticeSheetOpen}
-        onOpenChange={setIsCreatePracticeSheetOpen}
       />
     </div>
   );
