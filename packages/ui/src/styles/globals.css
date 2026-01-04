@@ -230,6 +230,17 @@
   /* Animation distances */
   --animate-distance-100dvh: 100dvh;
   --animate-distance-full: 100%;
+
+  /* Spin reverse animation (counter-clockwise) */
+  --animate-spin-reverse: spin-reverse 1s linear infinite;
+  @keyframes spin-reverse {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(-360deg);
+    }
+  }
 }
 
 @utility container {

@@ -37,6 +37,7 @@
   },
   "peerDependencies": {
     "@types/react": "catalog:",
-    "react": "catalog:"
+    "react": "catalog:",
+    "react-hook-form": "catalog:"
   }
 }

@@ -172,3 +172,37 @@ const response = await client.GET("/api/users/{id}", {
 - `client` - 用於 Server Component 或非 React 環境的 API 客戶端
 
 **禁止直接使用 `fetch` 或 `axios`**，請統一使用 `@daodao/api` 提供的 API 客戶端和 hooks。
+
+### Date Operations
+
+**必須使用 `date-fns` 來處理所有日期相關的操作**
+
+- 使用 `date-fns` 提供的函數來進行日期解析、格式化、計算等操作
+- 使用 `date-fns` 可以確保日期處理的一致性、時區正確性和可維護性
+
+```typescript
+import { format, addDays, parse, isValid } from "date-fns";
+
+// ✅ 正確：使用 date-fns 解析日期
+const start = parse("2026-01-01", "yyyy-MM-dd", new Date());
+
+// ✅ 正確：使用 date-fns 格式化日期
+const formattedDate = format(new Date(), "yyyy/MM/dd");
+
+// ✅ 正確：使用 date-fns 計算日期
+const endDate = addDays(start, 7);
+
+// ✅ 正確：使用 date-fns 驗證日期
+if (isValid(date)) {
+  // 處理日期
+}
+```
+
+**常用的 date-fns 函數：**
+- `format` - 格式化日期
+- `parse` - 解析日期字串
+- `addDays`, `addWeeks`, `addMonths` - 日期計算
+- `isValid` - 驗證日期是否有效
+- `differenceInDays`, `differenceInWeeks` - 計算日期差異
+
+**禁止直接使用原生 `Date` 物件的方法**（如 `toLocaleDateString()`, `setDate()`, `getDate()` 等）來處理日期格式化和計算，請統一使用 `date-fns` 提供的函數。

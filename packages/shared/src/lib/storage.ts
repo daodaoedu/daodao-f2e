@@ -11,6 +11,8 @@ export enum StorageEnum {
   Whitelist = "Whitelist",
   /** 用於存儲 OAuth nonce 的 sessionStorage（防止偽造和重放攻擊） */
   OAuthNonce = "OAuthNonce",
+  /** 用於存儲手動建立實踐表單草稿的 sessionStorage */
+  ManualPracticeDraft = "ManualPracticeDraft",
 }
 
 const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
@@ -18,6 +20,7 @@ const mapStorageKeyToStorageType: Record<StorageEnum, StorageType> = {
   UserInfo: "localStorage",
   Whitelist: "localStorage",
   OAuthNonce: "sessionStorage",
+  ManualPracticeDraft: "sessionStorage",
 };
 
 export interface StorageInstance<T> {

@@ -19,7 +19,7 @@ const Form = FormProvider;
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 > = {
   name: TName;
 };
@@ -30,7 +30,7 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
 
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 >({
   ...props
 }: ControllerProps<TFieldValues, TName>) => {
@@ -88,17 +88,17 @@ FormItem.displayName = "FormItem";
 
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => {
-  const { error, formItemId } = useFormField();
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
+    required?: boolean;
+  }
+>(({ className, required, children, ...props }, ref) => {
+  const { formItemId } = useFormField();
 
   return (
-    <Label
-      ref={ref}
-      className={cn(error && "text-destructive", className)}
-      htmlFor={formItemId}
-      {...props}
-    />
+    <Label ref={ref} className={cn(className)} htmlFor={formItemId} {...props}>
+      {children}
+      {required && <span className="text-red">*</span>}
+    </Label>
   );
 });
 FormLabel.displayName = "FormLabel";
@@ -158,7 +158,7 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("text-sm font-medium text-destructive", className)}
+      className={cn("text-sm text-red", className)}
       {...props}
     >
       {body}
@@ -177,4 +177,3 @@ export {
   FormMessage,
   FormField,
 };
-

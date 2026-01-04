@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, X } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Button } from "@daodao/ui/components/button";
 import {
   Carousel,
@@ -11,7 +11,7 @@ import {
 } from "@daodao/ui/components/carousel";
 import { PracticeCard } from "@/components/create-practice/practice-card";
 import { PracticeTopicGrid } from "@/components/create-practice/practice-topic-grid";
-import { BackgroundAnimation } from "@/components/layout";
+import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { BgRadialAnimation } from "@/components/layout/bg-radial-animation";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Badge } from "@daodao/ui/components/badge";
@@ -49,28 +49,27 @@ export default function CreatePracticePage() {
   };
 
   return (
-    <div className="fixed inset-0 z-30 pt-12 overflow-hidden overflow-y-auto bg-white">
+    <div className="fixed inset-0 z-30 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
-      <div className="flex justify-end absolute top-5 right-5 md:static md:max-w-[600px] md:mx-auto">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => router.back()}
-          aria-label="關閉"
-          animation="none"
-        >
-          <X className="size-6 text-light-gray" />
-        </Button>
-      </div>
+      <PageHeader closeTo="/" />
 
       <main className="relative px-4 max-w-[600px] mx-auto">
         {/* Header */}
         <div className="text-center pt-5 md:pt-12">
-          <Badge size="sm" variant="secondary" className="text-xs md:text-sm text-text-dark mb-3">主題實踐</Badge>
+          <Badge
+            size="sm"
+            variant="secondary"
+            className="text-xs md:text-sm text-text-dark mb-3"
+          >
+            主題實踐
+          </Badge>
           <h1 className="text-2xl md:text-4xl font-semibold text-text-dark mb-3 relative">
             小而美的學習生活提案
-            <BgRadialAnimation className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[calc(50%-64px)] md:-translate-y-[calc(50%-24px)] -z-10" variant="deco" />
+            <BgRadialAnimation
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[calc(50%-64px)] md:-translate-y-[calc(50%-24px)] -z-10"
+              variant="deco"
+            />
           </h1>
           <p className="md:text-lg text-text-dark text-center">
             不需要完美
@@ -116,13 +115,16 @@ export default function CreatePracticePage() {
       {/* Practice Topics Grid */}
       <PracticeTopicGrid onTopicClick={handleTemplateSelect} />
 
-      {/* Create Custom Practice Button */}
+      {/* Create Manual Practice Button */}
       <div className="flex justify-center mt-8 mb-4">
-        <Button variant="white" onClick={() => router.push("/practices/create/custom")}>
+        <Button
+          variant="white"
+          onClick={() => router.push("/practices/create/manual")}
+        >
           我想自己建立
           <ChevronRight className="size-4" />
         </Button>
       </div>
     </div>
   );
-};
+}

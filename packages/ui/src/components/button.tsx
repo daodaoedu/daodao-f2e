@@ -30,7 +30,7 @@ const buttonVariants = cva(
         alert:
           "border border-solid border-transparent bg-alert text-alert-foreground shadow-sm hover:bg-alert/90",
         outline:
-          "border border-solid border-primary bg-background text-primary-base shadow-sm hover:bg-primary hover:text-primary-foreground [&_svg]:text-primary-base [&_svg]:hover:text-primary-foreground",
+          "border border-solid border-logo-cyan bg-background text-text-dark hover:bg-logo-cyan hover:text-white",
         secondary:
           "border border-solid border-transparent bg-white text-text-dark shadow-[0_4px_0_color-mix(in_srgb,var(--color-logo-cyan)_40%,transparent)]",
         ghost: "hover:text-primary",
@@ -51,7 +51,7 @@ const buttonVariants = cva(
         default: "h-10 px-5 py-2",
         sm: "body-sm h-8 px-3",
         huge: "h-14 px-10 text-lg font-semibold ",
-        icon: "size-9",
+        icon: "size-10",
       },
     },
     defaultVariants: {
@@ -80,6 +80,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       variant,
       size,
       asChild = false,
+      type = "button",
       disabled,
       animation = ButtonAnimationEnum.Ripple,
       onClick,
@@ -116,6 +117,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        type={type}
         onClick={handleClick}
         disabled={disabled}
         {...props}
