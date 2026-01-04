@@ -33,13 +33,15 @@ const buttonVariants = cva(
           "border border-solid border-logo-cyan bg-background text-text-dark hover:bg-logo-cyan hover:text-white",
         secondary:
           "border border-solid border-transparent bg-white text-text-dark shadow-[0_4px_0_color-mix(in_srgb,var(--color-logo-cyan)_40%,transparent)]",
-        ghost: "hover:text-primary",
+        ghost: "text-text-dark hover:text-logo-cyan",
         link: "text-primary underline-offset-4 hover:underline",
         gray: "border-basic-200 bg-basic-200 text-basic-300 shadow-lg hover:border-primary-base hover:bg-primary-base hover:text-white",
         light:
           "border border-basic-200 bg-background shadow-sm hover:border-primary-base hover:text-primary-base",
-        white:
-          "border border-solid border-transparent bg-basic-white text-text-dark hover:shadow",
+        white: "border border-solid border-transparent bg-basic-white text-text-dark hover:shadow",
+        orange:
+          "border border-solid border-transparent bg-logo-orange text-bg-dark hover:bg-logo-orange/90 hover:shadow-sm hover:shadow-logo-orange/50",
+        blue: "border border-solid border-transparent bg-blue text-bg-dark hover:bg-blue/90 hover:shadow-sm hover:shadow-blue/50",
         ctaOrange:
           "border-2 border-tips bg-tips text-white shadow-[0_8px_10px_0_rgba(255,161,11,0.2)] hover:!bg-white hover:text-tips hover:shadow-[0_12px_20px_0_rgba(255,161,11,0.3)]",
         ctaOrangeSmall:
@@ -105,8 +107,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       const rect = e.currentTarget.getBoundingClientRect();
       const ripple = document.createElement("span");
 
-      ripple.className =
-        "absolute size-10 rounded-full bg-black/30 animate-button-ripple";
+      ripple.className = "absolute size-10 rounded-full bg-black/30 animate-button-ripple";
       ripple.style.top = `${((e.clientY - rect.top) / rect.height) * 100}%`;
       ripple.style.left = `${((e.clientX - rect.left) / rect.width) * 100}%`;
       rippleRef.current?.appendChild(ripple);
@@ -142,9 +143,7 @@ const BackButton = React.forwardRef<HTMLButtonElement, BackButtonProps>(
   ({ label, className, onClick, ...props }, ref) => {
     const router = useRouter();
     const handleBack =
-      typeof onClick === "function"
-        ? onClick
-        : (r: ReturnType<typeof useRouter>) => r.back();
+      typeof onClick === "function" ? onClick : (r: ReturnType<typeof useRouter>) => r.back();
 
     return (
       <Button

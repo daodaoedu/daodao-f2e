@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
-import { X, ImageIcon } from "lucide-react";
 import { GalleryAddSvg } from "@daodao/assets";
+import { ImageIcon, X } from "lucide-react";
+import * as React from "react";
 
 import { cn } from "../lib/utils";
 
@@ -28,11 +28,7 @@ const FilePreviewImage = ({ file, index }: { file: File; index: number }) => {
   }
 
   return (
-    <img
-      src={previewUrl}
-      alt={`Preview ${index + 1}`}
-      className="w-full h-full object-cover"
-    />
+    <img src={previewUrl} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
   );
 };
 
@@ -64,9 +60,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     const [isDragging, setIsDragging] = React.useState(false);
 
     const handleFileSelect = (selectedFiles: File[]) => {
-      const newFiles = multiple
-        ? [...files, ...selectedFiles]
-        : selectedFiles.slice(0, 1);
+      const newFiles = multiple ? [...files, ...selectedFiles] : selectedFiles.slice(0, 1);
 
       if (maxFiles && newFiles.length > maxFiles) {
         const limitedFiles = newFiles.slice(0, maxFiles);
@@ -124,15 +118,26 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       }
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleClick();
+      }
+    };
+
     return (
       <div ref={ref} className={cn("w-full", className)} {...props}>
-        <div
+        <button
+          type="button"
+          disabled={disabled}
+          aria-label="上傳檔案"
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={handleClick}
+          onKeyDown={handleKeyDown}
           className={cn(
-            "border border-solid rounded-lg p-6 text-center cursor-pointer transition-colors",
+            "block w-full border border-solid rounded-lg p-6 text-center cursor-pointer transition-colors",
             isDragging && !disabled
               ? "border-logo-cyan bg-logo-cyan/5"
               : "border-bg-gray hover:border-logo-cyan",
@@ -152,7 +157,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             <GalleryAddSvg className="size-10 text-logo-cyan" />
             <p className="text-light-gray">點擊開啟資料夾或直接拖曳</p>
           </div>
-        </div>
+        </button>
 
         {files.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">

@@ -49,7 +49,7 @@ export default function CreatePracticePage() {
   };
 
   return (
-    <div className="fixed inset-0 z-30 overflow-hidden overflow-y-auto bg-white">
+    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
       <PageHeader closeTo="/" />

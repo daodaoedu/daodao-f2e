@@ -38,10 +38,7 @@ type SheetOverlayProps = SheetOverlayPrimitiveProps;
 
 function SheetOverlay({ className, ...props }: SheetOverlayProps) {
   return (
-    <SheetOverlayPrimitive
-      className={cn("fixed inset-0 z-50 bg-black/50", className)}
-      {...props}
-    />
+    <SheetOverlayPrimitive className={cn("fixed inset-0 z-50 bg-black/50", className)} {...props} />
   );
 }
 
@@ -53,12 +50,7 @@ function SheetClose(props: SheetCloseProps) {
 
 type SheetContentProps = SheetContentPrimitiveProps;
 
-function SheetContent({
-  className,
-  children,
-  side = "right",
-  ...props
-}: SheetContentProps) {
+function SheetContent({ className, children, side = "right", ...props }: SheetContentProps) {
   return (
     <SheetPortalPrimitive>
       <SheetOverlay />
@@ -67,10 +59,8 @@ function SheetContent({
           "bg-background fixed z-50 flex flex-col gap-4 shadow-lg",
           side === "right" && "h-full w-[400px] border-l rounded-l-3xl",
           side === "left" && "h-full w-[400px] border-r rounded-r-3xl",
-          side === "top" &&
-            "w-full h-[calc(100vh-64px)] border-b rounded-b-3xl",
-          side === "bottom" &&
-            "w-full h-[calc(100vh-64px)] border-t rounded-t-3xl",
+          side === "top" && "w-full h-[calc(100vh-64px)] border-b rounded-b-3xl",
+          side === "bottom" && "w-full h-[calc(100vh-64px)] border-t rounded-t-3xl",
           className
         )}
         side={side}
@@ -118,10 +108,7 @@ type SheetFooterProps = SheetFooterPrimitiveProps;
 
 function SheetFooter({ className, ...props }: SheetFooterProps) {
   return (
-    <SheetFooterPrimitive
-      className={cn("mt-auto flex flex-col gap-2 p-4", className)}
-      {...props}
-    />
+    <SheetFooterPrimitive className={cn("mt-auto flex flex-col gap-2 p-4", className)} {...props} />
   );
 }
 
@@ -129,10 +116,7 @@ type SheetTitleProps = SheetTitlePrimitiveProps;
 
 function SheetTitle({ className, ...props }: SheetTitleProps) {
   return (
-    <SheetTitlePrimitive
-      className={cn("text-center text-md font-medium", className)}
-      {...props}
-    />
+    <SheetTitlePrimitive className={cn("text-center text-md font-medium", className)} {...props} />
   );
 }
 

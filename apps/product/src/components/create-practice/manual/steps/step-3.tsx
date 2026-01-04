@@ -11,8 +11,9 @@ import {
 } from "@daodao/ui/components/form";
 import { Checkbox } from "@daodao/ui/components/checkbox";
 import { cn } from "@daodao/ui/lib/utils";
-import { ManualPracticeFormValues, EXECUTION_TIMING_OPTIONS } from "../schema";
+import { ManualPracticeFormValues, EXECUTION_TIMING_OPTIONS, DURATION_MINUTES_OPTIONS } from "../schema";
 import { Input } from "@daodao/ui/components/input";
+import { Slider } from "@daodao/ui/components/slider";
 
 interface Step3Props {
   form: UseFormReturn<ManualPracticeFormValues>;
@@ -21,6 +22,56 @@ interface Step3Props {
 export const Step3 = ({ form }: Step3Props) => {
   return (
     <div className="space-y-4">
+      <FormField
+        control={form.control}
+        name="durationMinutes"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel
+              required
+              className="block text-base font-medium text-text-dark mb-3"
+            >
+              每次執行時間
+            </FormLabel>
+            <FormControl>
+              <div className="space-y-4">
+                <Slider
+                  defaultValue={[30]}
+                  value={[field.value]}
+                  onValueChange={(value: number[]) => {
+                    field.onChange(value[0]);
+                  }}
+                  min={15}
+                  max={60}
+                  step={1}
+                  className="w-full"
+                  renderTooltip={(value) => <div>{value}分鐘</div>}
+                />
+                {/* Labels */}
+                <div className="flex justify-between">
+                  {DURATION_MINUTES_OPTIONS.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => field.onChange(option.value)}
+                      className={cn(
+                        "text-sm transition-colors",
+                        field.value === option.value
+                          ? "text-logo-cyan font-medium"
+                          : "text-light-gray hover:text-text-dark"
+                      )}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
       <FormField
         control={form.control}
         name="executionTiming"
@@ -33,7 +84,9 @@ export const Step3 = ({ form }: Step3Props) => {
               >
                 執行時機
               </FormLabel>
-              <FormDescription className="text-sm text-light-gray">多選</FormDescription>
+              <FormDescription className="text-sm text-light-gray">
+                多選
+              </FormDescription>
             </div>
             <FormControl>
               <div className="grid grid-cols-3 gap-3">
@@ -81,7 +134,7 @@ export const Step3 = ({ form }: Step3Props) => {
         render={({ field }) => (
           <FormItem>
             <FormLabel className="block text-sm font-normal text-text-dark mb-3">
-              其他時機
+              其他時段
             </FormLabel>
             <FormControl>
               <Input

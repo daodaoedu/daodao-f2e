@@ -46,7 +46,7 @@ export const Step2 = ({ form }: Step2Props) => {
                 required
                 className="block text-base font-medium text-text-dark mb-3"
               >
-                開始時間
+                開始日期
               </FormLabel>
               <FormControl>
                 <DatePicker
@@ -115,7 +115,7 @@ export const Step2 = ({ form }: Step2Props) => {
               </RadioGroup>
             </FormControl>
             {startDate && durationDays && endDate && (
-              <p className="text-sm text-light-gray mt-2">結束於 {endDate}</p>
+              <p className="text-sm text-text-dark mt-2">結束於 {endDate}</p>
             )}
             <FormMessage />
           </FormItem>
@@ -131,7 +131,7 @@ export const Step2 = ({ form }: Step2Props) => {
               required
               className="block text-base font-medium text-text-dark mb-3"
             >
-              頻率
+              每週實踐頻率
             </FormLabel>
             <FormControl>
               <RadioGroup

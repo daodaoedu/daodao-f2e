@@ -85,7 +85,7 @@ export default function TemplateDetailPage() {
   };
 
   return (
-    <div className="fixed inset-0 z-30 overflow-hidden overflow-y-auto bg-logo-cyan">
+    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
       <Deco4Svg className="absolute top-0 right-0" width={270} height={484} />
 
       {/* Top Navigation */}
@@ -189,8 +189,11 @@ export default function TemplateDetailPage() {
         >
           <Button
             onClick={() => {
-              // TODO: 處理開始實踐的邏輯
-              router.push(`/practices/create/template/${templateId}/confirm`);
+              // TODO: 處理開始實踐的邏輯（提交到 API）
+              // 提交成功後導航到成功頁面
+              router.push(
+                `/practices/create/success?practiceName=${encodeURIComponent(template.name || "")}`
+              );
             }}
             className="w-full sm:max-w-[288px]"
           >

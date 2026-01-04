@@ -1,28 +1,26 @@
-import * as React from 'react';
-import { XIcon } from 'lucide-react';
-
+import { XIcon } from "lucide-react";
+import { cn } from "../../../../lib/utils";
 import {
-  Dialog as DialogPrimitive,
-  DialogContent as DialogContentPrimitive,
-  DialogDescription as DialogDescriptionPrimitive,
-  DialogFooter as DialogFooterPrimitive,
-  DialogHeader as DialogHeaderPrimitive,
-  DialogTitle as DialogTitlePrimitive,
-  DialogTrigger as DialogTriggerPrimitive,
-  DialogPortal as DialogPortalPrimitive,
-  DialogOverlay as DialogOverlayPrimitive,
   DialogClose as DialogClosePrimitive,
-  type DialogProps as DialogPrimitiveProps,
-  type DialogContentProps as DialogContentPrimitiveProps,
-  type DialogDescriptionProps as DialogDescriptionPrimitiveProps,
-  type DialogFooterProps as DialogFooterPrimitiveProps,
-  type DialogHeaderProps as DialogHeaderPrimitiveProps,
-  type DialogTitleProps as DialogTitlePrimitiveProps,
-  type DialogTriggerProps as DialogTriggerPrimitiveProps,
-  type DialogOverlayProps as DialogOverlayPrimitiveProps,
   type DialogCloseProps as DialogClosePrimitiveProps,
-} from '../../primitives/radix/dialog';
-import { cn } from '../../../../lib/utils';
+  DialogContent as DialogContentPrimitive,
+  type DialogContentProps as DialogContentPrimitiveProps,
+  DialogDescription as DialogDescriptionPrimitive,
+  type DialogDescriptionProps as DialogDescriptionPrimitiveProps,
+  DialogFooter as DialogFooterPrimitive,
+  type DialogFooterProps as DialogFooterPrimitiveProps,
+  DialogHeader as DialogHeaderPrimitive,
+  type DialogHeaderProps as DialogHeaderPrimitiveProps,
+  DialogOverlay as DialogOverlayPrimitive,
+  type DialogOverlayProps as DialogOverlayPrimitiveProps,
+  DialogPortal as DialogPortalPrimitive,
+  Dialog as DialogPrimitive,
+  type DialogProps as DialogPrimitiveProps,
+  DialogTitle as DialogTitlePrimitive,
+  type DialogTitleProps as DialogTitlePrimitiveProps,
+  DialogTrigger as DialogTriggerPrimitive,
+  type DialogTriggerProps as DialogTriggerPrimitiveProps,
+} from "../../primitives/radix/dialog";
 
 type DialogProps = DialogPrimitiveProps;
 
@@ -47,7 +45,7 @@ type DialogOverlayProps = DialogOverlayPrimitiveProps;
 function DialogOverlay({ className, ...props }: DialogOverlayProps) {
   return (
     <DialogOverlayPrimitive
-      className={cn('fixed inset-0 z-50 bg-black/50', className)}
+      className={cn("fixed inset-0 z-50 bg-black/50", className)}
       {...props}
     />
   );
@@ -68,8 +66,8 @@ function DialogContent({
       <DialogOverlay />
       <DialogContentPrimitive
         className={cn(
-          'bg-background fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg sm:max-w-lg',
-          className,
+          "bg-background fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg sm:max-w-lg",
+          className
         )}
         {...props}
       >
@@ -90,7 +88,7 @@ type DialogHeaderProps = DialogHeaderPrimitiveProps;
 function DialogHeader({ className, ...props }: DialogHeaderProps) {
   return (
     <DialogHeaderPrimitive
-      className={cn('flex flex-col gap-2 text-center sm:text-left', className)}
+      className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
       {...props}
     />
   );
@@ -101,10 +99,7 @@ type DialogFooterProps = DialogFooterPrimitiveProps;
 function DialogFooter({ className, ...props }: DialogFooterProps) {
   return (
     <DialogFooterPrimitive
-      className={cn(
-        'flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
-        className,
-      )}
+      className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
       {...props}
     />
   );
@@ -115,7 +110,7 @@ type DialogTitleProps = DialogTitlePrimitiveProps;
 function DialogTitle({ className, ...props }: DialogTitleProps) {
   return (
     <DialogTitlePrimitive
-      className={cn('text-lg leading-none font-semibold', className)}
+      className={cn("text-lg leading-none font-semibold", className)}
       {...props}
     />
   );
@@ -126,7 +121,7 @@ type DialogDescriptionProps = DialogDescriptionPrimitiveProps;
 function DialogDescription({ className, ...props }: DialogDescriptionProps) {
   return (
     <DialogDescriptionPrimitive
-      className={cn('text-muted-foreground text-sm', className)}
+      className={cn("text-muted-foreground text-sm", className)}
       {...props}
     />
   );

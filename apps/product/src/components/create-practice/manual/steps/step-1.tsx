@@ -10,10 +10,8 @@ import {
   FormMessage,
 } from "@daodao/ui/components/form";
 import { Input } from "@daodao/ui/components/input";
-import { cn } from "@daodao/ui/lib/utils";
-import { ManualPracticeFormValues, DURATION_MINUTES_OPTIONS } from "../schema";
+import { ManualPracticeFormValues } from "../schema";
 import { Textarea } from "@daodao/ui/components/textarea";
-import { Slider } from "@daodao/ui/components/slider";
 
 interface Step1Props {
   form: UseFormReturn<ManualPracticeFormValues>;
@@ -73,59 +71,6 @@ export const Step1 = ({ form }: Step1Props) => {
                 maxLength={50}
                 invalid={!!form.formState.errors.actionDescription}
               />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="durationMinutes"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel
-              required
-              className="block text-base font-medium text-text-dark mb-3"
-            >
-              實踐執行目標
-            </FormLabel>
-            <FormDescription className="text-sm text-text-dark mt-2 mb-4">
-              一次實踐時間
-            </FormDescription>
-            <FormControl>
-              <div className="space-y-4">
-                <Slider
-                  defaultValue={[30]}
-                  value={[field.value]}
-                  onValueChange={(value: number[]) => {
-                    field.onChange(value[0]);
-                  }}
-                  min={15}
-                  max={60}
-                  step={1}
-                  className="w-full"
-                  renderTooltip={(value) => <div>{value}分鐘</div>}
-                />
-                {/* Labels */}
-                <div className="flex justify-between">
-                  {DURATION_MINUTES_OPTIONS.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => field.onChange(option.value)}
-                      className={cn(
-                        "text-sm transition-colors",
-                        field.value === option.value
-                          ? "text-logo-cyan font-medium"
-                          : "text-light-gray hover:text-text-dark"
-                      )}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
             </FormControl>
             <FormMessage />
           </FormItem>

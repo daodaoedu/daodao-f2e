@@ -60,26 +60,26 @@ export default function CreateManualPracticePage() {
   // 處理恢復暫存資料（包含恢復步驟）
   const handleRestoreDraft = () => {
     restoreDraft();
-    
+
     // 恢復當前步驟
-    if (draft?.currentStep && draft.currentStep >= 1 && draft.currentStep <= TOTAL_STEPS) {
+    if (
+      draft?.currentStep &&
+      draft.currentStep >= 1 &&
+      draft.currentStep <= TOTAL_STEPS
+    ) {
       setCurrentStep(draft.currentStep);
     }
   };
 
   const name = form.watch("name");
-  const durationMinutes = form.watch("durationMinutes");
+  const actionDescription = form.watch("actionDescription");
 
   const handleNext = async () => {
     let isValid = false;
 
     switch (currentStep) {
       case 1:
-        isValid = await form.trigger([
-          "name",
-          "actionDescription",
-          "durationMinutes",
-        ]);
+        isValid = await form.trigger(["name", "actionDescription"]);
         break;
       case 2:
         isValid = await form.trigger([
@@ -89,7 +89,11 @@ export default function CreateManualPracticePage() {
         ]);
         break;
       case 3:
-        isValid = await form.trigger(["executionTiming", "customTiming"]);
+        isValid = await form.trigger([
+          "durationMinutes",
+          "executionTiming",
+          "customTiming",
+        ]);
         break;
       case 4:
         isValid = await form.trigger(["tags", "resources"]);
@@ -101,6 +105,7 @@ export default function CreateManualPracticePage() {
     }
 
     if (isValid && currentStep < TOTAL_STEPS) {
+      window.scrollTo(0, 0);
       setCurrentStep(currentStep + 1);
     } else if (isValid && currentStep === TOTAL_STEPS) {
       // 在預覽步驟點擊下一步時提交表單
@@ -119,12 +124,24 @@ export default function CreateManualPracticePage() {
     console.log("Form submitted:", values);
     // 提交成功後清除暫存資料
     clearDraft();
-    // 提交後可以導航到成功頁面或返回
-    router.push("/practices");
+    // 提交後導航到成功頁面
+    router.push(
+      `/practices/create/success?practiceName=${encodeURIComponent(
+        values.name || ""
+      )}`
+    );
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (currentStep === TOTAL_STEPS) {
+      await form.handleSubmit(handleSubmit)();
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-30 overflow-hidden overflow-y-auto bg-white">
+    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-white">
       <BackgroundAnimation />
 
       {/* 恢復暫存確認對話框 */}
@@ -177,18 +194,13 @@ export default function CreateManualPracticePage() {
 
         {/* Form */}
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-6"
-          >
+          <form onSubmit={handleFormSubmit} className="space-y-6">
             {currentStep >= 2 && currentStep <= 4 && (
               <div>
                 <h1 className="text-xl font-semibold text-text-dark mb-1">
                   {name}
                 </h1>
-                <p className="text-sm text-text-dark">
-                  一次 {durationMinutes} 分鐘
-                </p>
+                <p className="text-sm text-text-dark">{actionDescription}</p>
               </div>
             )}
 

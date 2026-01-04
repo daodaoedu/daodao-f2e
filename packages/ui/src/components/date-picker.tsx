@@ -1,14 +1,13 @@
 "use client";
 
-import * as React from "react";
-import { CalendarIcon } from "lucide-react";
 import { format, isValid } from "date-fns";
-
+import { CalendarIcon } from "lucide-react";
+import * as React from "react";
+import { cn } from "../lib/utils";
 import { Button } from "./button";
 import { Calendar } from "./calendar";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
-import { cn } from "../lib/utils";
 
 function formatDate(date: Date | undefined) {
   if (date && isValid(date)) {
@@ -21,7 +20,7 @@ function isValidDate(date: Date | undefined) {
   if (!date) {
     return false;
   }
-  return !isNaN(date.getTime());
+  return !Number.isNaN(date.getTime());
 }
 
 interface DatePickerProps {

@@ -17,6 +17,7 @@ import { ArrowRightOutlineSvg } from "@daodao/assets";
 import { ResourceCard } from "../../resource-card";
 import { Badge } from "@daodao/ui/components/badge";
 import { TagEditSheet } from "../tag-edit-sheet";
+import { useCompositionState } from "@daodao/shared";
 
 interface Step4Props {
   form: UseFormReturn<ManualPracticeFormValues>;
@@ -26,6 +27,8 @@ export const Step4 = ({ form }: Step4Props) => {
   const [isTagEditSheetOpen, setIsTagEditSheetOpen] = useState(false);
   const [resourceName, setResourceName] = useState("");
   const [resourceUrl, setResourceUrl] = useState("");
+  const nameComposition = useCompositionState();
+  const urlComposition = useCompositionState();
 
   return (
     <div className="space-y-8">
@@ -132,8 +135,9 @@ export const Step4 = ({ form }: Step4Props) => {
                     value={resourceName}
                     maxLength={20}
                     onChange={(e) => setResourceName(e.target.value)}
+                    {...nameComposition.compositionProps}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") {
+                      if (e.key === "Enter" && !nameComposition.isComposing) {
                         e.preventDefault();
                         handleAddResource();
                       }
@@ -145,8 +149,9 @@ export const Step4 = ({ form }: Step4Props) => {
                     className="w-full mb-3"
                     value={resourceUrl}
                     onChange={(e) => setResourceUrl(e.target.value)}
+                    {...urlComposition.compositionProps}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") {
+                      if (e.key === "Enter" && !urlComposition.isComposing) {
                         e.preventDefault();
                         handleAddResource();
                       }

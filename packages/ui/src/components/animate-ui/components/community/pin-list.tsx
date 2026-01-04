@@ -1,21 +1,20 @@
 "use client";
 
-import * as React from "react";
 import { Plus, X } from "lucide-react";
 import {
-  motion,
-  LayoutGroup,
   AnimatePresence,
   type HTMLMotionProps,
+  LayoutGroup,
+  motion,
   type Transition,
 } from "motion/react";
+import * as React from "react";
 import { cn } from "../../../../lib/utils";
 
 type PinListItem = {
-  id: number;
+  id: string;
   name: string;
-  info: string;
-  icon: React.ElementType;
+  className?: string;
   pinned: boolean;
 };
 
@@ -33,6 +32,7 @@ type PinListProps = {
   unpinnedSectionClassName?: string;
   zIndexResetDelay?: number;
   onItemToggle?: (item: PinListItem) => void;
+  transformItems?: (items: PinListItem[]) => PinListItem[];
 } & Omit<HTMLMotionProps<"div">, "onToggle">;
 
 function PinList({
@@ -51,12 +51,11 @@ function PinList({
   unpinnedSectionClassName,
   zIndexResetDelay = 500,
   onItemToggle,
+  transformItems,
   ...props
 }: PinListProps) {
   const [listItems, setListItems] = React.useState(items);
-  const [togglingGroup, setTogglingGroup] = React.useState<
-    "pinned" | "unpinned" | null
-  >(null);
+  const [togglingGroup, setTogglingGroup] = React.useState<"pinned" | "unpinned" | null>(null);
   const previousItemsRef = React.useRef(items);
   const isInternalUpdateRef = React.useRef(false);
 
@@ -82,15 +81,17 @@ function PinList({
       });
 
     if (itemsChanged) {
-      setListItems(items);
-      previousItemsRef.current = items;
+      // Apply transformItems if provided when syncing external items
+      const transformedItems = transformItems ? transformItems(items) : items;
+      setListItems(transformedItems);
+      previousItemsRef.current = transformedItems;
     }
-  }, [items]);
+  }, [items, transformItems]);
 
   const pinned = listItems.filter((u) => u.pinned);
   const unpinned = listItems.filter((u) => !u.pinned);
 
-  const toggleStatus = (id: number) => {
+  const toggleStatus = (id: string) => {
     const item = listItems.find((u) => u.id === id);
     if (!item) return;
 
@@ -109,7 +110,9 @@ function PinList({
       if (toggled.pinned) updated.push(toggled);
       else updated.unshift(toggled);
 
-      return updated;
+      // Apply transformItems if provided to update items and adjust order
+      const transformed = transformItems ? transformItems(updated) : updated;
+      return transformed;
     });
 
     onItemToggle?.(toggled);
@@ -148,7 +151,10 @@ function PinList({
                   layoutId={`item-${item.id}`}
                   onClick={() => toggleStatus(item.id)}
                   transition={transition}
-                  className="flex items-center justify-between gap-5 rounded-lg bg-white border border-blue px-4 py-1.5"
+                  className={cn(
+                    "flex items-center justify-between gap-5 rounded-lg bg-white border border-blue px-4 py-1.5",
+                    item.className
+                  )}
                 >
                   <div className="text-text-dark">{item.name}</div>
                   <X className="size-4.5 text-text-dark" />
@@ -185,7 +191,10 @@ function PinList({
                   layoutId={`item-${item.id}`}
                   onClick={() => toggleStatus(item.id)}
                   transition={transition}
-                  className="flex items-center justify-between gap-5 rounded-lg bg-very-light-blue border border-blue px-4 py-1.5"
+                  className={cn(
+                    "flex items-center justify-between gap-5 rounded-lg bg-very-light-blue border border-blue px-4 py-1.5",
+                    item.className
+                  )}
                 >
                   <div className="text-text-dark">{item.name}</div>
                   <Plus className="size-4.5 text-text-dark" />

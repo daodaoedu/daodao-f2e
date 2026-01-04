@@ -39,12 +39,7 @@ export interface TagEditData {
   selectedTags: string[];
 }
 
-const AVAILABLE_TAGS = [
-  "讀唇語",
-  "講唇語",
-  "教學閱讀策略",
-  "諮詢患者改善聽力",
-] as const;
+const AVAILABLE_TAGS = ["讀唇語", "講唇語", "教學閱讀策略", "諮詢患者改善聽力"];
 
 // Zod schema for form validation
 const tagEditFormSchema = z.object({
@@ -71,6 +66,9 @@ export const TagEditSheet = ({
     },
   });
 
+  const keyword = form.watch("keyword");
+  const selectedTags = form.watch("selectedTags");
+
   // Reset form when initial values change
   React.useEffect(() => {
     form.reset({
@@ -86,45 +84,82 @@ export const TagEditSheet = ({
     onOpenChange(false);
   };
 
-  const handleAddCustomKeyword = () => {
-    const keyword = form.getValues("keyword").trim();
-    if (keyword && !form.getValues("selectedTags").includes(keyword)) {
-      form.setValue("selectedTags", [
-        ...form.getValues("selectedTags"),
-        keyword,
-      ]);
-      form.setValue("keyword", "");
-    }
-  };
-
-  const selectedTags = form.watch("selectedTags");
-
-  // Convert tags to PinList items with stable IDs
-  // Use useMemo to prevent recreating the array on every render
   const pinListItems: PinListItem[] = React.useMemo(() => {
-    // Combine available tags and custom tags (selected tags that are not in AVAILABLE_TAGS)
-    const customTags = selectedTags.filter(
-      (tag) => !AVAILABLE_TAGS.includes(tag as (typeof AVAILABLE_TAGS)[number])
+    const availableTags = AVAILABLE_TAGS.filter(
+      (tag) => !selectedTags.includes(tag)
     );
-    const allTags = [...AVAILABLE_TAGS, ...customTags];
+    const allTags = [...availableTags, ...selectedTags];
 
-    // Generate stable IDs based on tag name
-    const tagToIdMap = new Map<string, number>();
-    let idCounter = 1;
+    const keywordItem =
+      keyword && !allTags.includes(keyword)
+        ? {
+            id: keyword,
+            name: keyword,
+            pinned: selectedTags.includes(keyword),
+          }
+        : null;
+
+    const items: PinListItem[] = [];
+
+    // Add keyword item if exists
+    if (keywordItem) {
+      items.push(keywordItem);
+    }
+
+    // Add other tags
     allTags.forEach((tag) => {
-      if (!tagToIdMap.has(tag)) {
-        tagToIdMap.set(tag, idCounter++);
-      }
+      items.push({
+        id: tag,
+        name: tag,
+        pinned: selectedTags.includes(tag),
+      });
     });
 
-    return allTags.map((tag) => ({
-      id: tagToIdMap.get(tag) ?? 0,
-      name: tag,
-      info: "",
-      icon: Tag,
-      pinned: selectedTags.includes(tag),
-    }));
-  }, [selectedTags]);
+    return items;
+  }, [selectedTags, keyword]);
+
+  // Transform items to apply custom styles and adjust order
+  const transformItems = React.useCallback(
+    (items: PinListItem[]): PinListItem[] => {
+      // Transform items: apply custom styles for keyword based on pinned state
+      const transformed = items.map((item) => {
+        // Check if this is the current keyword
+        const isKeyword = keyword && item.name === keyword;
+
+        if (isKeyword) {
+          // If pinned, use default pinned style (no custom className)
+          // If unpinned, use custom style for keyword
+          return {
+            ...item,
+            className: item.pinned
+              ? undefined
+              : "bg-bg-gray border border-very-light-gray",
+          };
+        }
+
+        return item;
+      });
+
+      // Separate items into pinned and unpinned groups
+      const pinnedItems: PinListItem[] = [];
+      const unpinnedItems: PinListItem[] = [];
+
+      transformed.forEach((item) => {
+        if (item.pinned) {
+          pinnedItems.push(item);
+        } else if (
+          AVAILABLE_TAGS.includes(item.name) ||
+          (keyword && item.name === keyword)
+        ) {
+          unpinnedItems.push(item);
+        }
+      });
+      unpinnedItems.sort((a) => (a.name === keyword ? -1 : 1));
+
+      return [...unpinnedItems, ...pinnedItems];
+    },
+    [keyword]
+  );
 
   const handleToggleTag = (item: PinListItem) => {
     const currentTags = form.getValues("selectedTags");
@@ -169,12 +204,6 @@ export const TagEditSheet = ({
                         {...field}
                         placeholder="輸入自訂關鍵字"
                         className="w-full"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            handleAddCustomKeyword();
-                          }
-                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -191,6 +220,7 @@ export const TagEditSheet = ({
                     unpinned: "可用標籤",
                   }}
                   onItemToggle={handleToggleTag}
+                  transformItems={transformItems}
                   className="flex flex-col-reverse"
                   pinnedSectionClassName="bg-light-blue border border-blue rounded-lg p-3"
                 />

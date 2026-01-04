@@ -5,6 +5,7 @@ export * from "./constants";
 
 // Export all hooks
 export * from "./hooks/use-assets-loader";
+export * from "./hooks/use-composition-state";
 export * from "./hooks/use-form-draft";
 export * from "./hooks/use-media-query";
 export * from "./hooks/use-query-state";
