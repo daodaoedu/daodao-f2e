@@ -1,10 +1,10 @@
 "use client";
 
-import { X } from "lucide-react";
+import { ArrowLeftOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
-import { ArrowLeftOutlineSvg } from "@daodao/assets";
 import { cn } from "@daodao/ui/lib/utils";
+import { X } from "lucide-react";
 import type { ReactNode } from "react";
 
 type PageHeaderProps = {
@@ -74,10 +74,7 @@ export const PageHeader = ({
           variant="ghost"
           onClick={handleBack}
           animation="none"
-          className={cn(
-            "px-0 font-normal",
-            isLight && "text-white hover:text-white"
-          )}
+          className={cn("px-0 font-normal", isLight && "text-white hover:text-white")}
         >
           <ArrowLeftOutlineSvg className="size-6" />
           {backLabel}
@@ -90,12 +87,7 @@ export const PageHeader = ({
       {centerContent ? (
         centerContent
       ) : title ? (
-        <h1
-          className={cn(
-            "text-lg font-medium",
-            isLight ? "text-white" : "text-bg-dark"
-          )}
-        >
+        <h1 className={cn("text-lg font-medium", isLight ? "text-white" : "text-bg-dark")}>
           {title}
         </h1>
       ) : (
@@ -110,9 +102,7 @@ export const PageHeader = ({
         aria-label="關閉"
         animation="none"
         className={cn(
-          isLight
-            ? "text-white hover:text-white bg-very-light-gray/50"
-            : "text-light-gray"
+          isLight ? "text-white hover:text-white bg-very-light-gray/50" : "text-light-gray"
         )}
       >
         <X className={cn("size-6", isLight && "size-5")} />
@@ -120,4 +110,3 @@ export const PageHeader = ({
     </div>
   );
 };
-

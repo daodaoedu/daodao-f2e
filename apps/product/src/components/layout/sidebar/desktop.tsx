@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  ArrowLeftOutlineSvg,
-  ArrowRightOutlineSvg,
-  VerticalFullSvg,
-} from "@daodao/assets";
+import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg, VerticalFullSvg } from "@daodao/assets";
 import favicon256Png from "@daodao/assets/images/brand/favicon256.png";
 import { usePathname } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
@@ -51,8 +47,7 @@ export const DesktopSidebar = () => {
           <div
             className={cn(
               "ml-10 mr-12 transition-all duration-300 relative z-10",
-              isCollapsed &&
-                "opacity-0 scale-[45%] translate-y-2 -translate-x-4"
+              isCollapsed && "opacity-0 scale-[45%] translate-y-2 -translate-x-4"
             )}
           >
             <VerticalFullSvg className="w-[90px] h-[90px]" />
@@ -60,27 +55,16 @@ export const DesktopSidebar = () => {
           <div
             className={cn(
               "absolute top-5 left-1/2 -translate-x-1/2 w-fit transition-all duration-300",
-              isCollapsed ||
-                "opacity-0 scale-150 -translate-y-[28px] pointer-events-none"
+              isCollapsed || "opacity-0 scale-150 -translate-y-[28px] pointer-events-none"
             )}
           >
-            <Image
-              src={favicon256Png.src}
-              alt="daodao logo"
-              width={60}
-              height={60}
-            />
+            <Image src={favicon256Png.src} alt="daodao logo" width={60} height={60} />
           </div>
         </CustomLink>
       </div>
 
       {/* Menu Items */}
-      <ul
-        className={cn(
-          "flex flex-col",
-          isCollapsed ? "gap-6 items-center" : "gap-6"
-        )}
-      >
+      <ul className={cn("flex flex-col", isCollapsed ? "gap-6 items-center" : "gap-6")}>
         {menuItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = isActive ? item.activeIcon : item.icon;

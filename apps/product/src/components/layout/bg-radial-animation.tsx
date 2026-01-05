@@ -17,10 +17,7 @@ interface BgRadialAnimationProps {
   variant?: "deco" | "notebook";
 }
 
-export const BgRadialAnimation = ({
-  className,
-  variant,
-}: BgRadialAnimationProps) => {
+export const BgRadialAnimation = ({ className, variant }: BgRadialAnimationProps) => {
   const isMobile = useIsMobile();
   const absoluteClassName = "absolute left-1/2 top-1/2";
   const initial = { x: "-50%", y: "-50%", opacity: 0 };

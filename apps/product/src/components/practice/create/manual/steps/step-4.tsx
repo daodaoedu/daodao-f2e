@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { UseFormReturn } from "react-hook-form";
+import { ArrowRightOutlineSvg } from "@daodao/assets";
+import { useCompositionState } from "@daodao/shared";
+import { Badge } from "@daodao/ui/components/badge";
+import { Button } from "@daodao/ui/components/button";
 import {
   FormControl,
   FormDescription,
@@ -11,13 +13,11 @@ import {
   FormMessage,
 } from "@daodao/ui/components/form";
 import { Input } from "@daodao/ui/components/input";
-import { Button } from "@daodao/ui/components/button";
-import { ManualPracticeFormValues } from "../schema";
-import { ArrowRightOutlineSvg } from "@daodao/assets";
-import { ResourceCard } from "../../resource-card";
-import { Badge } from "@daodao/ui/components/badge";
+import { useState } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import { ResourceCard } from "@/components/practice/shared";
+import type { ManualPracticeFormValues } from "../schema";
 import { TagEditSheet } from "../tag-edit-sheet";
-import { useCompositionState } from "@daodao/shared";
 
 interface Step4Props {
   form: UseFormReturn<ManualPracticeFormValues>;
@@ -37,19 +37,12 @@ export const Step4 = ({ form }: Step4Props) => {
         name="tags"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="block text-base font-normal text-text-dark mb-3">
-              標籤
-            </FormLabel>
+            <FormLabel className="block text-base font-normal text-text-dark mb-3">標籤</FormLabel>
             <FormControl>
               <div>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {(field.value || []).map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="outline-blue"
-                      size="lg"
-                      className="rounded-lg"
-                    >
+                    <Badge key={tag} variant="outline-blue" size="lg" className="rounded-lg">
                       {tag}
                     </Badge>
                   ))}

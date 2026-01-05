@@ -1,33 +1,27 @@
 "use client";
 
 import { ArrowRightOutlineSvg, CompassSvg, Deco4Svg } from "@daodao/assets";
-import { Button } from "@daodao/ui/components/button";
-import { Badge } from "@daodao/ui/components/badge";
-import {
-  ResourceCard,
-  PracticeOverviewCard,
-  ExecutionTimingCard,
-  ExecutionDurationCard,
-} from "@/components/create-practice";
-import { Loader, RefreshCcw } from "lucide-react";
 import { useRouter } from "@daodao/i18n/navigation";
-import { PageHeader } from "@/components/layout";
-import { useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { Badge } from "@daodao/ui/components/badge";
+import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
+import { Loader, RefreshCcw } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { PageHeader } from "@/components/layout";
 import {
-  type ManualPracticeFormValues,
   DURATION_DAYS_OPTIONS,
+  ExecutionDurationCard,
+  ExecutionTimingCard,
   FREQUENCY_OPTIONS,
-} from "@/components/create-practice/manual/schema";
+  type ManualPracticeFormValues,
+  PracticeOverviewCard,
+  ResourceCard,
+} from "@/components/practice";
 
 // 模擬數據 - 之後可以從 API 取得
-const templateData: Record<
-  string,
-  ManualPracticeFormValues & { category: string }
-> = {
+const templateData: Record<string, ManualPracticeFormValues> = {
   "learn-vibe-coding": {
-    category: "主題實踐",
     // Step 1
     name: "學習 Vibe coding",
     actionDescription: "搭配 Gemini,看 30 天線上教學、實際 做一個專案。",
@@ -67,10 +61,13 @@ export default function TemplateDetailPage() {
   const router = useRouter();
   const params = useParams();
   const templateId = params.templateId as string;
-  const template =
-    templateData[templateId as keyof typeof templateData] ??
-    templateData["learn-vibe-coding"]!;
+  const defaultTemplate = templateData["learn-vibe-coding"];
+  const template = templateData[templateId as keyof typeof templateData] ?? defaultTemplate;
   const [showActions, setShowActions] = useState(false);
+
+  if (!template) {
+    return null;
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -94,12 +91,8 @@ export default function TemplateDetailPage() {
       <main className="relative max-w-[600px] mx-auto pb-8">
         {/* Category Label */}
         <div className="px-5 py-4">
-          <Badge
-            variant="secondary"
-            size="sm"
-            className="text-xs md:text-sm mb-2"
-          >
-            {template.category}
+          <Badge variant="secondary" size="sm" className="text-xs md:text-sm mb-2">
+            主題實踐
           </Badge>
           <div className="flex">
             <div className="flex-1">
@@ -158,26 +151,25 @@ export default function TemplateDetailPage() {
           </div>
 
           {/* Recommended Resources Section */}
-          {Array.isArray(template.resources) &&
-            template.resources.length > 0 && (
-              <div>
-                <h2 className="text-sm text-center font-medium text-white mt-4 mb-3.5">
-                  推薦你使用以下資源
-                </h2>
-                <div className="grid grid-cols-2 gap-3">
-                  {template.resources?.map((resource) => (
-                    <ResourceCard
-                      key={resource.id}
-                      resource={{
-                        id: resource.id,
-                        name: resource.name,
-                        url: resource.url,
-                      }}
-                    />
-                  ))}
-                </div>
+          {Array.isArray(template.resources) && template.resources.length > 0 && (
+            <div>
+              <h2 className="text-sm text-center font-medium text-white mt-4 mb-3.5">
+                推薦你使用以下資源
+              </h2>
+              <div className="grid grid-cols-2 gap-3">
+                {template.resources?.map((resource) => (
+                  <ResourceCard
+                    key={resource.id}
+                    resource={{
+                      id: resource.id,
+                      name: resource.name,
+                      url: resource.url,
+                    }}
+                  />
+                ))}
               </div>
-            )}
+            </div>
+          )}
         </div>
 
         {/* Action Button */}

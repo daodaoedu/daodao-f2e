@@ -15,9 +15,7 @@ const i18nMiddleware = createMiddleware(routing);
  */
 const authConfig = {
   // @TODO: 後續移除，方便開發用
-  protectedPaths: [
-    "/dashboard",
-  ],
+  protectedPaths: ["/dashboard"],
   // 公開路徑（不需要登入）
   publicPaths: [
     "/auth/login",

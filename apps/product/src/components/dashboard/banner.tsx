@@ -46,18 +46,12 @@ export function Banner() {
         >
           先做再說，做中學最快！
           <div className="md:hidden absolute -bottom-8 left-full w-24 rotate-3">
-            <Lottie
-              animationData={activeShaper2Json}
-              className="*:w-full *:h-full"
-            />
+            <Lottie animationData={activeShaper2Json} className="*:w-full *:h-full" />
           </div>
           <div className="hidden md:block absolute top-4 -right-[27px] size-4.5 rounded-full bg-white/70 border border-white">
             <div className="absolute -bottom-[11px] -right-3 w-3 h-[11px] rounded-full bg-white/70 border border-white">
               <div className="absolute -bottom-[30px] left-full w-32 lg:w-[168px] rotate-3">
-                <Lottie
-                  animationData={activeShaper2Json}
-                  className="*:w-full *:h-full"
-                />
+                <Lottie animationData={activeShaper2Json} className="*:w-full *:h-full" />
               </div>
             </div>
           </div>

@@ -10,7 +10,7 @@ import {
 import { cn } from "@daodao/ui/lib/utils";
 import { Ellipsis } from "lucide-react";
 import { useState } from "react";
-import { InProgressTaskCard, TaskStatus } from "./in-progress-task-card";
+import { InProgressTaskCard, type TaskStatus } from "./in-progress-task-card";
 
 export type FilterStatus = "all" | "draft" | "not-started" | "in-progress";
 
@@ -24,6 +24,7 @@ export interface InProgressTask {
   isUnreadMessages: boolean;
   theme: string;
   status: TaskStatus;
+  isCheckIn: boolean;
 }
 
 interface InProgressSectionProps {
@@ -31,26 +32,11 @@ interface InProgressSectionProps {
   onCheckIn: (taskTitle: string) => void;
 }
 
-const getFilterLabel = (status: FilterStatus): string => {
-  const labels: Record<FilterStatus, string> = {
-    all: "全部",
-    draft: "草稿",
-    "not-started": "未開始",
-    "in-progress": "進行中",
-  };
-  return labels[status];
-};
-
-export const InProgressSection = ({
-  tasks,
-  onCheckIn,
-}: InProgressSectionProps) => {
+export const InProgressSection = ({ tasks, onCheckIn }: InProgressSectionProps) => {
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
 
   const filteredTasks =
-    filterStatus === "all"
-      ? tasks
-      : tasks.filter((task) => task.status === filterStatus);
+    filterStatus === "all" ? tasks : tasks.filter((task) => task.status === filterStatus);
 
   return (
     <section className="mb-6">
@@ -62,8 +48,7 @@ export const InProgressSection = ({
               variant="ghost"
               size="icon"
               className={cn(
-                filterStatus !== "all" &&
-                  "bg-light-cyan text-logo-cyan hover:text-logo-cyan"
+                filterStatus !== "all" && "bg-light-cyan text-logo-cyan hover:text-logo-cyan"
               )}
             >
               <Ellipsis className="size-6" />
@@ -72,36 +57,25 @@ export const InProgressSection = ({
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() => setFilterStatus("all")}
-              className={cn(
-                filterStatus === "all" && "bg-accent text-accent-foreground"
-              )}
+              className={cn(filterStatus === "all" && "bg-accent text-accent-foreground")}
             >
               全部
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => setFilterStatus("draft")}
-              className={cn(
-                filterStatus === "draft" &&
-                  "bg-accent text-accent-foreground"
-              )}
+              className={cn(filterStatus === "draft" && "bg-accent text-accent-foreground")}
             >
               草稿
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => setFilterStatus("not-started")}
-              className={cn(
-                filterStatus === "not-started" &&
-                  "bg-accent text-accent-foreground"
-              )}
+              className={cn(filterStatus === "not-started" && "bg-accent text-accent-foreground")}
             >
               未開始
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => setFilterStatus("in-progress")}
-              className={cn(
-                filterStatus === "in-progress" &&
-                  "bg-accent text-accent-foreground"
-              )}
+              className={cn(filterStatus === "in-progress" && "bg-accent text-accent-foreground")}
             >
               進行中
             </DropdownMenuItem>
@@ -117,6 +91,7 @@ export const InProgressSection = ({
         {filteredTasks.map((task) => (
           <InProgressTaskCard
             key={task.id}
+            id={task.id.toString()}
             label={task.label}
             title={task.title}
             description={task.description}
@@ -124,6 +99,7 @@ export const InProgressSection = ({
             messagesCount={task.messagesCount}
             theme={task.theme}
             isUnreadMessages={task.isUnreadMessages}
+            isCheckIn={task.isCheckIn}
             status={task.status}
             onCheckIn={() => onCheckIn(task.title)}
           />
@@ -132,4 +108,3 @@ export const InProgressSection = ({
     </section>
   );
 };
-

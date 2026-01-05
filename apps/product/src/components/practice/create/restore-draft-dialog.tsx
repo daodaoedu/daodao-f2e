@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@daodao/ui/components/button";
+import type { DraftData } from "@daodao/shared";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@daodao/ui/components/animate-ui/components/radix/dialog";
-import type { DraftData } from "@daodao/shared";
+import { Button } from "@daodao/ui/components/button";
 import type { FieldValues } from "react-hook-form";
 
 interface RestoreDraftDialogProps<TFormValues extends FieldValues> {
@@ -63,21 +63,19 @@ export function RestoreDraftDialog<TFormValues extends FieldValues>({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        {renderPreview ? (
-          renderPreview(draft)
-        ) : (
-          draft.formValues &&
-          typeof draft.formValues === "object" &&
-          "name" in draft.formValues &&
-          draft.formValues.name && (
-            <div className="mb-6 rounded-lg bg-bg-gray p-4">
-              <p className="text-xs text-text-dark mb-1">名稱</p>
-              <p className="text-sm font-medium text-text-dark">
-                {String(draft.formValues.name)}
-              </p>
-            </div>
-          )
-        )}
+        {renderPreview
+          ? renderPreview(draft)
+          : draft.formValues &&
+            typeof draft.formValues === "object" &&
+            "name" in draft.formValues &&
+            draft.formValues.name && (
+              <div className="mb-6 rounded-lg bg-bg-gray p-4">
+                <p className="text-xs text-text-dark mb-1">名稱</p>
+                <p className="text-sm font-medium text-text-dark">
+                  {String(draft.formValues.name)}
+                </p>
+              </div>
+            )}
 
         <DialogFooter className="flex-row gap-3 sm:justify-end">
           <Button
@@ -88,11 +86,7 @@ export function RestoreDraftDialog<TFormValues extends FieldValues>({
           >
             {discardButtonText}
           </Button>
-          <Button
-            type="button"
-            onClick={onRestore}
-            className="flex-1 sm:flex-initial"
-          >
+          <Button type="button" onClick={onRestore} className="flex-1 sm:flex-initial">
             {restoreButtonText}
           </Button>
         </DialogFooter>
@@ -100,4 +94,3 @@ export function RestoreDraftDialog<TFormValues extends FieldValues>({
     </Dialog>
   );
 }
-

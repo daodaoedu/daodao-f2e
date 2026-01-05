@@ -1,8 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
-import { UseFormReturn } from "react-hook-form";
-import { isValid, format, addDays, parse } from "date-fns";
+import { DatePicker } from "@daodao/ui/components/date-picker";
 import {
   FormControl,
   FormField,
@@ -10,10 +8,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@daodao/ui/components/form";
-import { DatePicker } from "@daodao/ui/components/date-picker";
 import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
 import { cn } from "@daodao/ui/lib/utils";
-import { ManualPracticeFormValues, DURATION_DAYS_OPTIONS, FREQUENCY_OPTIONS } from "../schema";
+import { addDays, format, isValid, parse } from "date-fns";
+import { useMemo } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import { DURATION_DAYS_OPTIONS, FREQUENCY_OPTIONS, type ManualPracticeFormValues } from "../schema";
 
 interface Step2Props {
   form: UseFormReturn<ManualPracticeFormValues>;
@@ -42,10 +42,7 @@ export const Step2 = ({ form }: Step2Props) => {
 
           return (
             <FormItem>
-              <FormLabel
-                required
-                className="block text-base font-medium text-text-dark mb-3"
-              >
+              <FormLabel required className="block text-base font-medium text-text-dark mb-3">
                 開始日期
               </FormLabel>
               <FormControl>
@@ -75,10 +72,7 @@ export const Step2 = ({ form }: Step2Props) => {
         name="durationDays"
         render={({ field }) => (
           <FormItem>
-            <FormLabel
-              required
-              className="block text-base font-medium text-text-dark mb-3"
-            >
+            <FormLabel required className="block text-base font-medium text-text-dark mb-3">
               想要持續多久
             </FormLabel>
             <FormControl>
@@ -90,9 +84,11 @@ export const Step2 = ({ form }: Step2Props) => {
               >
                 {DURATION_DAYS_OPTIONS.map((option) => {
                   const isSelected = field.value === option.value;
+                  const inputId = `duration-${option.value}`;
                   return (
                     <label
                       key={option.value}
+                      htmlFor={inputId}
                       className={cn(
                         "flex items-center justify-center p-4.5 rounded-lg border transition-colors cursor-pointer bg-white text-text-dark",
                         isSelected
@@ -102,13 +98,11 @@ export const Step2 = ({ form }: Step2Props) => {
                     >
                       <RadioGroupItem
                         value={option.value}
-                        id={`duration-${option.value}`}
+                        id={inputId}
                         className="sr-only"
                         aria-label={option.label}
                       />
-                      <span className="text-base font-medium">
-                        {option.label}
-                      </span>
+                      <span className="text-base font-medium">{option.label}</span>
                     </label>
                   );
                 })}
@@ -127,10 +121,7 @@ export const Step2 = ({ form }: Step2Props) => {
         name="frequency"
         render={({ field }) => (
           <FormItem>
-            <FormLabel
-              required
-              className="block text-base font-medium text-text-dark mb-3"
-            >
+            <FormLabel required className="block text-base font-medium text-text-dark mb-3">
               每週實踐頻率
             </FormLabel>
             <FormControl>
@@ -142,9 +133,11 @@ export const Step2 = ({ form }: Step2Props) => {
               >
                 {FREQUENCY_OPTIONS.map((option) => {
                   const isSelected = field.value === option.value;
+                  const inputId = `frequency-${option.value}`;
                   return (
                     <label
                       key={option.value}
+                      htmlFor={inputId}
                       className={cn(
                         "flex flex-col gap-1 items-center justify-center p-2 rounded-lg border transition-colors cursor-pointer bg-white text-text-dark",
                         isSelected
@@ -154,7 +147,7 @@ export const Step2 = ({ form }: Step2Props) => {
                     >
                       <RadioGroupItem
                         value={option.value}
-                        id={`frequency-${option.value}`}
+                        id={inputId}
                         className="sr-only"
                         aria-label={`${option.label} ${option.description}`}
                       />
@@ -168,10 +161,7 @@ export const Step2 = ({ form }: Step2Props) => {
                         {option.unit}
                       </span>
                       <span
-                        className={cn(
-                          "text-xs",
-                          isSelected ? "text-logo-cyan" : "text-text-dark"
-                        )}
+                        className={cn("text-xs", isSelected ? "text-logo-cyan" : "text-text-dark")}
                       >
                         {option.description}
                       </span>

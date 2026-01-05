@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import { useRouter } from "@daodao/i18n/navigation";
+import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import {
   Carousel,
@@ -9,12 +10,10 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@daodao/ui/components/carousel";
-import { PracticeCard } from "@/components/create-practice/practice-card";
-import { PracticeTopicGrid } from "@/components/create-practice/practice-topic-grid";
+import { ChevronRight } from "lucide-react";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import { BgRadialAnimation } from "@/components/layout/bg-radial-animation";
-import { useRouter } from "@daodao/i18n/navigation";
-import { Badge } from "@daodao/ui/components/badge";
+import { PracticeCard, PracticeTopicGrid } from "@/components/practice";
 
 // 模擬數據 - 之後可以從 API 取得
 const featuredPractices = [
@@ -57,11 +56,7 @@ export default function CreatePracticePage() {
       <main className="relative px-4 max-w-[600px] mx-auto">
         {/* Header */}
         <div className="text-center pt-5 md:pt-12">
-          <Badge
-            size="sm"
-            variant="secondary"
-            className="text-xs md:text-sm text-text-dark mb-3"
-          >
+          <Badge size="sm" variant="secondary" className="text-xs md:text-sm text-text-dark mb-3">
             主題實踐
           </Badge>
           <h1 className="text-2xl md:text-4xl font-semibold text-text-dark mb-3 relative">
@@ -117,10 +112,7 @@ export default function CreatePracticePage() {
 
       {/* Create Manual Practice Button */}
       <div className="flex justify-center mt-8 mb-4">
-        <Button
-          variant="white"
-          onClick={() => router.push("/practices/create/manual")}
-        >
+        <Button variant="white" onClick={() => router.push("/practices/create/manual")}>
           我想自己建立
           <ChevronRight className="size-4" />
         </Button>

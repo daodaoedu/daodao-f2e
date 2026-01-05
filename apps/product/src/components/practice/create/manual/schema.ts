@@ -35,34 +35,37 @@ export const manualPracticeFormSchema = z.object({
   // Step 1
   name: z.string().min(1, "請輸入名稱"),
   actionDescription: z.string().min(1, "請輸入實踐行動").max(50, "最多50字").default(""),
-  durationMinutes: z.number().min(15, "請選擇實踐執行目標").max(60, "請選擇實踐執行目標").default(30),
-  
+
   // Step 2
   startDate: z.string().min(1, "請選擇開始時間"),
   durationDays: z.enum(["7", "14", "21", "30"], { required_error: "請選擇想要持續多久" }),
-  frequency: z.enum(["2-4", "3-5", "4-7"], { required_error: "請選擇頻率" }),
-  
+  frequency: z.enum(["2-4", "3-5", "4-7"], { required_error: "請選擇每週實踐頻率" }),
+
   // Step 3
-  executionTiming: z.array(z.enum(["morning", "lunchBreak", "commute", "holiday", "evening", "beforeSleep"])).min(1, "請至少選擇一個執行時機"),
+  durationMinutes: z.number(),
+  executionTiming: z
+    .array(z.enum(["morning", "lunchBreak", "commute", "holiday", "evening", "beforeSleep"]))
+    .min(1, "請至少選擇一個執行時機"),
   customTiming: z.string(),
-  
+
   // Step 4
   tags: z.array(z.string()).optional(),
-  resources: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string().min(1, "請輸入資源名稱"),
-      url: z
-        .string()
-        .url("請輸入有效的網址")
-        .refine((val) => !val || val.startsWith("https://"), {
-          message: "網址必須使用 HTTPS",
-        })
-        .optional()
-        .or(z.literal("")),
-    })
-  ).optional(),
+  resources: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string().min(1, "請輸入資源名稱"),
+        url: z
+          .string()
+          .url("請輸入有效的網址")
+          .refine((val) => !val || val.startsWith("https://"), {
+            message: "網址必須使用 HTTPS",
+          })
+          .optional()
+          .or(z.literal("")),
+      })
+    )
+    .optional(),
 });
 
 export type ManualPracticeFormValues = z.infer<typeof manualPracticeFormSchema>;
-

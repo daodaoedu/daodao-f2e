@@ -1,11 +1,8 @@
 "use client";
 
-import { BulbSvg, BookSvg, ClockSolidSvg } from "@daodao/assets";
+import { BookSvg, BulbSvg, ClockSolidSvg } from "@daodao/assets";
 import { Badge } from "@daodao/ui/components/badge";
-import {
-  EXECUTION_TIMING_OPTIONS,
-  type ManualPracticeFormValues,
-} from "./manual/schema";
+import { EXECUTION_TIMING_OPTIONS, type ManualPracticeFormValues } from "../create/manual/schema";
 
 interface ExecutionTimingCardProps {
   executionTiming: ManualPracticeFormValues["executionTiming"];
@@ -32,9 +29,7 @@ export const ExecutionTimingCard = ({
         <h3 className="text-xs text-text-dark mb-2">執行時機</h3>
         <div className="flex flex-wrap gap-2">
           {executionTiming.map((timing) => {
-            const option = EXECUTION_TIMING_OPTIONS.find(
-              (opt) => opt.value === timing
-            );
+            const option = EXECUTION_TIMING_OPTIONS.find((opt) => opt.value === timing);
             if (!option) return null;
             return (
               <Badge
@@ -43,26 +38,14 @@ export const ExecutionTimingCard = ({
                 size="sm"
                 className="text-sm py-[3px] rounded gap-1"
               >
-                <ClockSolidSvg
-                  width={18}
-                  height={18}
-                  className="text-light-cyan shrink-0"
-                />
+                <ClockSolidSvg width={18} height={18} className="text-light-cyan shrink-0" />
                 {option.label}
               </Badge>
             );
           })}
           {customTiming && (
-            <Badge
-              variant="very-light-blue"
-              size="sm"
-              className="text-sm py-[3px] rounded gap-1"
-            >
-              <ClockSolidSvg
-                width={18}
-                height={18}
-                className="text-light-cyan shrink-0"
-              />
+            <Badge variant="very-light-blue" size="sm" className="text-sm py-[3px] rounded gap-1">
+              <ClockSolidSvg width={18} height={18} className="text-light-cyan shrink-0" />
               {customTiming}
             </Badge>
           )}
@@ -71,4 +54,3 @@ export const ExecutionTimingCard = ({
     </div>
   );
 };
-

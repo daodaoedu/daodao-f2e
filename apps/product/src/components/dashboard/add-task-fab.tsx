@@ -38,4 +38,3 @@ export const AddTaskFAB = ({ onAddTask }: AddTaskFABProps) => {
     </Tooltip>
   );
 };
-

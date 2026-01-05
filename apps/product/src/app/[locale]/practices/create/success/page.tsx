@@ -1,13 +1,13 @@
 "use client";
 
 import { ArrowRightOutlineSvg } from "@daodao/assets";
-import { Button } from "@daodao/ui/components/button";
-import { useRouter } from "@daodao/i18n/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { motion } from "motion/react";
-import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
 import featureHappyJson from "@daodao/assets/images/quiz/feature-happy.json";
+import { useRouter } from "@daodao/i18n/navigation";
+import { Button } from "@daodao/ui/components/button";
+import { ConfettiAnimation } from "@daodao/ui/components/confetti-animation";
 import Lottie from "lottie-react";
+import { motion } from "motion/react";
+import { useCallback, useEffect, useState } from "react";
 import { BackgroundAnimation } from "@/components/layout";
 
 export default function PracticeSuccessPage() {
@@ -60,9 +60,7 @@ export default function PracticeSuccessPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-4xl font-medium text-text-dark leading-normal">
-              太棒啦！
-            </h1>
+            <h1 className="text-4xl font-medium text-text-dark leading-normal">太棒啦！</h1>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -90,9 +88,7 @@ export default function PracticeSuccessPage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.7 }}
         >
-          <p className="text-sm text-logo-cyan">
-            鼓勵文字鼓勵文字鼓勵文字鼓勵文字
-          </p>
+          <p className="text-sm text-logo-cyan">鼓勵文字鼓勵文字鼓勵文字鼓勵文字</p>
           <p className="text-sm text-logo-cyan">鼓勵文字鼓勵文字鼓勵文字</p>
         </motion.div>
 
@@ -103,11 +99,7 @@ export default function PracticeSuccessPage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.9 }}
         >
-          <Button
-            onClick={handleStartPractice}
-            variant="ctaOrange"
-            className="inline-flex mb-6"
-          >
+          <Button onClick={handleStartPractice} variant="ctaOrange" className="inline-flex mb-6">
             開始主題實踐
             <ArrowRightOutlineSvg className="size-4.5" />
           </Button>
@@ -134,4 +126,4 @@ export default function PracticeSuccessPage() {
       </main>
     </div>
   );
-};
+}

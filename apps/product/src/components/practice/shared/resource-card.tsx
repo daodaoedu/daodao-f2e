@@ -1,11 +1,10 @@
 "use client";
 
-import { Link2Icon, X } from "lucide-react";
-import * as React from "react";
-
+import { BookSvg } from "@daodao/assets";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
-import { BookSvg } from "@daodao/assets";
+import { Link2Icon, X } from "lucide-react";
+import * as React from "react";
 
 export interface ResourceCardData {
   id: string | number;
@@ -20,47 +19,25 @@ export interface ResourceCardProps {
   onRemove?: () => void;
 }
 
-export const ResourceCard = ({
-  resource,
-  className,
-  onClick,
-  onRemove,
-}: ResourceCardProps) => {
+export const ResourceCard = ({ resource, className, onClick, onRemove }: ResourceCardProps) => {
   const [imageError, setImageError] = React.useState(false);
-  return (
-    <div
-      className={cn(
-        "rounded-lg border border-logo-cyan bg-white",
-        onClick && "cursor-pointer transition-shadow hover:shadow-md",
-        className
-      )}
-      onClick={onClick}
-      role={onClick ? "button" : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      onKeyDown={
-        onClick
-          ? (e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onClick();
-              }
-            }
-          : undefined
-      }
-      aria-label={onClick ? `開啟資源：${resource.name}` : undefined}
-    >
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick?.();
+    }
+  };
+
+  const cardContent = (
+    <>
       <div className="relative aspect-169/93 rounded-t-lg overflow-hidden bg-bg-gray">
         {imageError || !resource.url ? (
           <div className="absolute inset-0 flex items-center justify-center bg-light-cyan">
             <BookSvg width={100} height={95} className="opacity-50" />
           </div>
         ) : (
-          <Image
-            src={resource.url}
-            alt={resource.name}
-            onError={() => setImageError(true)}
-            fill
-          />
+          <Image src={resource.url} alt={resource.name} onError={() => setImageError(true)} fill />
         )}
         {onRemove && (
           <button
@@ -78,10 +55,31 @@ export const ResourceCard = ({
       </div>
       <div className="flex items-center justify-between gap-1 text-xs text-text-dark p-2">
         <span className="line-clamp-1">{resource.name}</span>
-        {resource.url && (
-          <Link2Icon className="size-4 text-logo-cyan shrink-0" />
-        )}
+        {resource.url && <Link2Icon className="size-4 text-logo-cyan shrink-0" />}
       </div>
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        aria-label={`開啟資源：${resource.name}`}
+        className={cn(
+          "rounded-lg border border-logo-cyan bg-white cursor-pointer transition-shadow hover:shadow-md",
+          className
+        )}
+      >
+        {cardContent}
+      </button>
+    );
+  }
+
+  return (
+    <div className={cn("rounded-lg border border-logo-cyan bg-white", className)}>
+      {cardContent}
     </div>
   );
 };

@@ -1,6 +1,15 @@
 "use client";
 
 import {
+  BoredSvg,
+  FineSvg,
+  FrustratedSvg,
+  HappySvg,
+  HopelessSvg,
+  NeutralSvg,
+} from "@daodao/assets";
+import { useIsMobile } from "@daodao/shared";
+import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -8,6 +17,8 @@ import {
   SheetTitle,
 } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Button } from "@daodao/ui/components/button";
+import { Checkbox } from "@daodao/ui/components/checkbox";
+import { FileUpload } from "@daodao/ui/components/file-upload";
 import {
   Form,
   FormControl,
@@ -17,23 +28,12 @@ import {
   FormMessage,
 } from "@daodao/ui/components/form";
 import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
-import { Checkbox } from "@daodao/ui/components/checkbox";
 import { Textarea } from "@daodao/ui/components/textarea";
-import { FileUpload } from "@daodao/ui/components/file-upload";
 import { cn } from "@daodao/ui/lib/utils";
-import { useIsMobile } from "@daodao/shared";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, X } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import {
-  BoredSvg,
-  FineSvg,
-  FrustratedSvg,
-  HappySvg,
-  HopelessSvg,
-  NeutralSvg,
-} from "@daodao/assets";
 
 interface CheckInSheetProps {
   open: boolean;
@@ -49,13 +49,7 @@ export interface CheckInData {
   media: File[];
 }
 
-type MoodType =
-  | "hopeless"
-  | "frustrated"
-  | "bored"
-  | "neutral"
-  | "fine"
-  | "happy";
+type MoodType = "hopeless" | "frustrated" | "bored" | "neutral" | "fine" | "happy";
 
 const MOOD_OPTIONS: Array<{
   id: MoodType;
@@ -70,21 +64,11 @@ const MOOD_OPTIONS: Array<{
   { id: "happy", label: "開心", emoji: HappySvg },
 ];
 
-const AVAILABLE_TAGS = [
-  "練習",
-  "新概念",
-  "實作",
-  "有趣",
-  "創造",
-  "困難",
-  "刻意練習",
-] as const;
+const AVAILABLE_TAGS = ["練習", "新概念", "實作", "有趣", "創造", "困難", "刻意練習"] as const;
 
 // Zod schema for form validation
 const checkInFormSchema = z.object({
-  mood: z
-    .enum(["hopeless", "frustrated", "bored", "neutral", "fine", "happy"])
-    .nullable(),
+  mood: z.enum(["hopeless", "frustrated", "bored", "neutral", "fine", "happy"]).nullable(),
   tags: z.array(z.string()).default([]),
   thoughts: z.string().default(""),
   media: z.array(z.instanceof(File)).default([]),
@@ -92,12 +76,7 @@ const checkInFormSchema = z.object({
 
 type CheckInFormValues = z.infer<typeof checkInFormSchema>;
 
-export const CheckInSheet = ({
-  open,
-  onOpenChange,
-  taskTitle,
-  onComplete,
-}: CheckInSheetProps) => {
+export const CheckInSheet = ({ open, onOpenChange, taskTitle, onComplete }: CheckInSheetProps) => {
   const isMobile = useIsMobile();
 
   const form = useForm<CheckInFormValues>({
@@ -109,7 +88,6 @@ export const CheckInSheet = ({
       media: [],
     },
   });
-
 
   const onSubmit = (values: CheckInFormValues) => {
     onComplete({
@@ -124,15 +102,10 @@ export const CheckInSheet = ({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side={isMobile ? "bottom" : "right"}
-        className="overflow-y-auto"
-      >
+      <SheetContent side={isMobile ? "bottom" : "right"} className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>打卡</SheetTitle>
-          <SheetDescription className="sr-only">
-            記錄你的學習進度和心情
-          </SheetDescription>
+          <SheetDescription className="sr-only">記錄你的學習進度和心情</SheetDescription>
         </SheetHeader>
 
         <Form {...form}>
@@ -160,23 +133,24 @@ export const CheckInSheet = ({
                     >
                       {MOOD_OPTIONS.map(({ id, label, emoji: Emoji }) => {
                         const isSelected = field.value === id;
+                        const inputId = `mood-${id}`;
                         return (
                           <label
                             key={id}
+                            htmlFor={inputId}
                             className={cn(
                               "flex flex-col items-center gap-1 opacity-30 transition-opacity cursor-pointer",
-                              isSelected &&  "opacity-100"
+                              isSelected && "opacity-100"
                             )}
                           >
                             <RadioGroupItem
                               value={id}
+                              id={inputId}
                               className="sr-only"
                               aria-label={label}
                             />
                             <Emoji className="size-12" />
-                            <span className="text-xs text-gray-700">
-                              {label}
-                            </span>
+                            <span className="text-xs text-gray-700">{label}</span>
                           </label>
                         );
                       })}
@@ -189,9 +163,7 @@ export const CheckInSheet = ({
 
             {/* Thought Sharing */}
             <div className="mb-8">
-              <h3 className="text-base font-medium mb-3 text-text-dark">
-                想法分享
-              </h3>
+              <h3 className="text-base font-medium mb-3 text-text-dark">想法分享</h3>
               <FormField
                 control={form.control}
                 name="tags"
@@ -201,36 +173,42 @@ export const CheckInSheet = ({
                       <div className="flex flex-wrap gap-x-2 gap-y-3 mb-3">
                         {AVAILABLE_TAGS.map((tag) => {
                           const isSelected = field.value?.includes(tag);
+                          const checkboxId = `tag-${tag}`;
+                          const handleToggle = () => {
+                            const currentTags = field.value || [];
+                            const newTags = isSelected
+                              ? currentTags.filter((t: string) => t !== tag)
+                              : [...currentTags, tag];
+                            field.onChange(newTags);
+                          };
                           return (
                             <div key={tag} className="flex items-center">
                               <Checkbox
+                                id={checkboxId}
                                 checked={isSelected}
                                 onCheckedChange={(checked: boolean) => {
                                   const currentTags = field.value || [];
                                   const newTags = checked
                                     ? [...currentTags, tag]
-                                    : currentTags.filter(
-                                        (t: string) => t !== tag
-                                      );
+                                    : currentTags.filter((t: string) => t !== tag);
                                   field.onChange(newTags);
                                 }}
                                 className="sr-only"
                               />
                               <label
+                                htmlFor={checkboxId}
                                 className={cn(
                                   "px-5 py-1.5 text-sm rounded-full border transition-colors flex items-center gap-1 cursor-pointer",
                                   isSelected
                                     ? "bg-logo-cyan text-white border-logo-cyan"
                                     : "bg-white text-gray-700 border-logo-cyan hover:bg-logo-cyan/10"
                                 )}
-                                onClick={() => {
-                                  const currentTags = field.value || [];
-                                  const newTags = isSelected
-                                    ? currentTags.filter(
-                                        (t: string) => t !== tag
-                                      )
-                                    : [...currentTags, tag];
-                                  field.onChange(newTags);
+                                onClick={handleToggle}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    handleToggle();
+                                  }
                                 }}
                               >
                                 <span>{tag}</span>
@@ -240,11 +218,7 @@ export const CheckInSheet = ({
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       const currentTags = field.value || [];
-                                      field.onChange(
-                                        currentTags.filter(
-                                          (t: string) => t !== tag
-                                        )
-                                      );
+                                      field.onChange(currentTags.filter((t: string) => t !== tag));
                                     }}
                                   />
                                 )}
@@ -265,10 +239,7 @@ export const CheckInSheet = ({
                   <FormItem>
                     <FormLabel className="sr-only">想法分享</FormLabel>
                     <FormControl>
-                      <Textarea
-                        {...field}
-                        placeholder="分享一下你的心得,或是遇到的困難"
-                      />
+                      <Textarea {...field} placeholder="分享一下你的心得,或是遇到的困難" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -282,9 +253,7 @@ export const CheckInSheet = ({
               name="media"
               render={({ field }) => (
                 <FormItem className="mb-16 md:mb-8">
-                  <FormLabel className="block text-base font-medium mb-3">
-                    上傳照片或影片
-                  </FormLabel>
+                  <FormLabel className="block text-base font-medium mb-3">上傳照片或影片</FormLabel>
                   <FormControl>
                     <FileUpload
                       files={field.value}

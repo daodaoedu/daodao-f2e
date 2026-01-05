@@ -1,14 +1,14 @@
 import {
-  HomeSolidSvg,
-  HomeOutlineSvg,
-  SearchSolidSvg,
-  SearchOutlineSvg,
-  MedalSolidSvg,
-  MedalOutlineSvg,
-  BellSolidSvg,
   BellOutlineSvg,
-  UserSolidSvg,
+  BellSolidSvg,
+  HomeOutlineSvg,
+  HomeSolidSvg,
+  MedalOutlineSvg,
+  MedalSolidSvg,
+  SearchOutlineSvg,
+  SearchSolidSvg,
   UserOutlineSvg,
+  UserSolidSvg,
 } from "@daodao/assets";
 
 export const menuItems = [

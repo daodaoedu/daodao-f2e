@@ -1,6 +1,6 @@
 "use client";
 
-import { UseFormReturn } from "react-hook-form";
+import { Checkbox } from "@daodao/ui/components/checkbox";
 import {
   FormControl,
   FormDescription,
@@ -9,11 +9,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@daodao/ui/components/form";
-import { Checkbox } from "@daodao/ui/components/checkbox";
-import { cn } from "@daodao/ui/lib/utils";
-import { ManualPracticeFormValues, EXECUTION_TIMING_OPTIONS, DURATION_MINUTES_OPTIONS } from "../schema";
 import { Input } from "@daodao/ui/components/input";
 import { Slider } from "@daodao/ui/components/slider";
+import { cn } from "@daodao/ui/lib/utils";
+import type { UseFormReturn } from "react-hook-form";
+import {
+  DURATION_MINUTES_OPTIONS,
+  EXECUTION_TIMING_OPTIONS,
+  type ManualPracticeFormValues,
+} from "../schema";
 
 interface Step3Props {
   form: UseFormReturn<ManualPracticeFormValues>;
@@ -27,10 +31,7 @@ export const Step3 = ({ form }: Step3Props) => {
         name="durationMinutes"
         render={({ field }) => (
           <FormItem>
-            <FormLabel
-              required
-              className="block text-base font-medium text-text-dark mb-3"
-            >
+            <FormLabel required className="block text-base font-medium text-text-dark mb-3">
               每次執行時間
             </FormLabel>
             <FormControl>
@@ -78,23 +79,20 @@ export const Step3 = ({ form }: Step3Props) => {
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center justify-between mb-3">
-              <FormLabel
-                required
-                className="text-base font-medium text-text-dark"
-              >
+              <FormLabel required className="text-base font-medium text-text-dark">
                 執行時機
               </FormLabel>
-              <FormDescription className="text-sm text-light-gray">
-                多選
-              </FormDescription>
+              <FormDescription className="text-sm text-light-gray">多選</FormDescription>
             </div>
             <FormControl>
               <div className="grid grid-cols-3 gap-3">
                 {EXECUTION_TIMING_OPTIONS.map((option) => {
                   const isSelected = field.value?.includes(option.value);
+                  const inputId = `execution-timing-${option.value}`;
                   return (
                     <label
                       key={option.value}
+                      htmlFor={inputId}
                       className={cn(
                         "flex items-center justify-center p-4.5 rounded-lg border transition-colors cursor-pointer bg-white text-text-dark",
                         isSelected
@@ -103,6 +101,7 @@ export const Step3 = ({ form }: Step3Props) => {
                       )}
                     >
                       <Checkbox
+                        id={inputId}
                         checked={isSelected}
                         onCheckedChange={(checked) => {
                           const currentValue = field.value || [];
@@ -115,9 +114,7 @@ export const Step3 = ({ form }: Step3Props) => {
                         className="sr-only"
                         aria-label={option.label}
                       />
-                      <span className="text-base font-medium">
-                        {option.label}
-                      </span>
+                      <span className="text-base font-medium">{option.label}</span>
                     </label>
                   );
                 })}

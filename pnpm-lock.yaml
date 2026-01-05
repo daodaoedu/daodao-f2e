@@ -12,9 +12,6 @@ catalogs:
     '@next/env':
       specifier: 16.1.1
       version: 16.1.1
-    '@radix-ui/react-slot':
-      specifier: 1.2.4
-      version: 1.2.4
     '@tailwindcss/postcss':
       specifier: ^4.1.18
       version: 4.1.18
@@ -42,9 +39,6 @@ catalogs:
     next:
       specifier: 15.5.9
       version: 15.5.9
-    next-themes:
-      specifier: ^0.4.6
-      version: 0.4.6
     react:
       specifier: 19.2.3
       version: 19.2.3
@@ -54,24 +48,6 @@ catalogs:
     react-hook-form:
       specifier: 7.69.0
       version: 7.69.0
-    react-markdown:
-      specifier: ^10.1.0
-      version: 10.1.0
-    recharts:
-      specifier: 2.15.4
-      version: 2.15.4
-    rehype-raw:
-      specifier: ^7.0.0
-      version: 7.0.0
-    rehype-sanitize:
-      specifier: ^6.0.0
-      version: 6.0.0
-    remark-gfm:
-      specifier: ^4.0.1
-      version: 4.0.1
-    tailwindcss:
-      specifier: ^4.1.11
-      version: 4.1.18
     typescript:
       specifier: ^5.9.3
       version: 5.9.3
@@ -385,6 +361,9 @@ importers:
       '@daodao/shared':
         specifier: workspace:*
         version: link:../shared
+      next:
+        specifier: 'catalog:'
+        version: 15.5.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       next-intl:
         specifier: ^4.6.1
         version: 4.6.1(next@15.5.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)(typescript@5.9.3)

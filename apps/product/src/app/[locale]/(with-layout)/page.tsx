@@ -1,24 +1,24 @@
 "use client";
 
 import { MessagesSvg } from "@daodao/assets";
+import { useRouter } from "@daodao/i18n/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import {
   AddTaskFAB,
   Banner,
-  CheckInSheet,
   type CheckInData,
+  CheckInSheet,
   CompletedSection,
   DashboardHeader,
   InProgressSection,
   type InProgressTask,
 } from "@/components/dashboard";
 import { BackgroundAnimation } from "@/components/layout";
-import { useRouter } from "@daodao/i18n/navigation";
 
 export default function HomePage() {
   const router = useRouter();
-  
+
   // 模擬數據 - 之後可以從 API 取得
   const stats = [
     {
@@ -44,6 +44,7 @@ export default function HomePage() {
       progress: "2",
       messagesCount: 17,
       isUnreadMessages: true,
+      isCheckIn: false,
       theme: "yellow",
       status: "draft",
     },
@@ -56,6 +57,7 @@ export default function HomePage() {
       progress: "2",
       messagesCount: 2,
       isUnreadMessages: false,
+      isCheckIn: false,
       theme: "blue",
       status: "in-progress",
     },
@@ -63,11 +65,11 @@ export default function HomePage() {
       id: 6,
       label: "主題實踐",
       title: "學習 React Hooks",
-      description:
-        "每天學習 1.5 小時的 React Hooks 課程,包含理論學習、實作練習和筆記整理...",
+      description: "每天學習 1.5 小時的 React Hooks 課程,包含理論學習、實作練習和筆記整理...",
       progress: "7/14",
       messagesCount: 3,
       isUnreadMessages: true,
+      isCheckIn: false,
       theme: "pink",
       status: "not-started",
     },
@@ -75,11 +77,11 @@ export default function HomePage() {
       id: 7,
       label: "主題實踐",
       title: "學習 React Hooks",
-      description:
-        "每天學習 1.5小時的 React Hooks 課程,包含理論學習、實作練習和筆記整理...",
+      description: "每天學習 1.5小時的 React Hooks 課程,包含理論學習、實作練習和筆記整理...",
       progress: "10/14",
       messagesCount: 7,
       isUnreadMessages: true,
+      isCheckIn: true,
       theme: "green",
       status: "in-progress",
     },
@@ -90,6 +92,7 @@ export default function HomePage() {
       id: 1,
       label: "主題實踐",
       title: "練習冥想",
+      description: "每天練習冥想 10 分鐘,包含正念冥想、呼吸練習和身體掃描...",
       viewCount: 20,
       commentCount: 4,
       tags: ["正念冥想", "Youtube", "放鬆", "專注", "健康"],
@@ -98,6 +101,7 @@ export default function HomePage() {
       id: 2,
       label: "主題實踐",
       title: "練習冥想",
+      description: "每天練習冥想 10 分鐘,包含正念冥想、呼吸練習和身體掃描...",
       viewCount: 20,
       commentCount: 4,
       tags: ["正念冥想", "Youtube", "放鬆", "專注", "健康"],
@@ -106,6 +110,7 @@ export default function HomePage() {
       id: 3,
       label: "主題實踐",
       title: "練習冥想",
+      description: "每天練習冥想 10 分鐘,包含正念冥想、呼吸練習和身體掃描...",
       viewCount: 20,
       commentCount: 4,
       tags: ["正念冥想", "Youtube", "放鬆", "專注", "健康"],

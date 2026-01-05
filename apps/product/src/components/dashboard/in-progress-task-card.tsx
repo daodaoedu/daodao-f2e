@@ -1,10 +1,18 @@
 "use client";
 
-import { BlueSvg, GreenSvg, MessagesSvg, PinkSvg, YellowSvg } from "@daodao/assets";
-import { Badge, BadgeProps } from "@daodao/ui/components/badge";
+import {
+  ArrowRightOutlineSvg,
+  BlueSvg,
+  GreenSvg,
+  MessagesSvg,
+  PinkSvg,
+  YellowSvg,
+} from "@daodao/assets";
+import { Badge, type BadgeProps } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
+import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Progress } from "@daodao/ui/components/progress";
-import { CalendarCheck, ChevronRight, PenLine } from "lucide-react";
+import { CalendarCheck, PenLine } from "lucide-react";
 
 const themesMap = {
   yellow: YellowSvg,
@@ -17,7 +25,12 @@ export type TaskStatus = "draft" | "not-started" | "in-progress" | "completed";
 
 const statusConfig: Record<
   TaskStatus,
-  { label: string; variant: BadgeProps["variant"]; icon: React.ReactNode; buttonLabel: string }
+  {
+    label: string;
+    variant: BadgeProps["variant"];
+    icon: React.ReactNode;
+    buttonLabel: string;
+  }
 > = {
   draft: {
     label: "草稿",
@@ -47,11 +60,13 @@ const statusConfig: Record<
 
 interface InProgressTaskCardProps {
   label: string;
+  id: string;
   title: string;
   description: string;
   progress: string;
   messagesCount: number;
   isUnreadMessages: boolean;
+  isCheckIn: boolean;
   theme: string;
   status: string;
   onCheckIn?: () => void;
@@ -60,18 +75,20 @@ interface InProgressTaskCardProps {
 
 export const InProgressTaskCard = ({
   label,
+  id,
   title,
   description,
   progress,
   messagesCount,
   isUnreadMessages,
+  isCheckIn,
   theme,
   status,
   onCheckIn,
   onEdit,
 }: InProgressTaskCardProps) => {
   const Theme = themesMap[theme as keyof typeof themesMap] ?? YellowSvg;
-  const statusInfo = statusConfig[status as TaskStatus] ?? statusConfig["draft"];
+  const statusInfo = statusConfig[status as TaskStatus] ?? statusConfig.draft;
   const isDraft = status === "draft";
 
   const handleButtonClick = () => {
@@ -93,11 +110,7 @@ export const InProgressTaskCard = ({
               {label}
             </Badge>
             {statusInfo && (
-              <Badge
-                variant={statusInfo.variant}
-                size="sm"
-                className="w-fit"
-              >
+              <Badge variant={statusInfo.variant} size="sm" className="w-fit">
                 {statusInfo.label}
               </Badge>
             )}
@@ -114,7 +127,11 @@ export const InProgressTaskCard = ({
               </div>
             </div>
             <div className="shrink-0 self-center">
-              <ChevronRight className="size-6 text-light-gray" />
+              <Button variant="ghost" size="icon" asChild>
+                <CustomLink href={`/practices/${id}`}>
+                  <ArrowRightOutlineSvg className="size-6 text-light-gray" />
+                </CustomLink>
+              </Button>
             </div>
           </div>
         </div>
@@ -140,9 +157,9 @@ export const InProgressTaskCard = ({
         </div>
 
         {/* Check-in Button */}
-        <Button variant="secondary" onClick={handleButtonClick}>
+        <Button variant="secondary" onClick={handleButtonClick} disabled={isCheckIn}>
           {statusInfo.icon}
-          {statusInfo.buttonLabel}
+          {isCheckIn ? "今天已打過卡囉！" : statusInfo.buttonLabel}
         </Button>
       </div>
 

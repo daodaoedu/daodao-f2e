@@ -3,6 +3,7 @@
 import { AuthProvider } from "@daodao/auth";
 import { type Locale, type Messages, NextIntlClientProvider } from "@daodao/i18n";
 import "@daodao/ui/globals.css";
+import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
 
 interface GlobalProviderProps {
   head?: React.ReactNode;
@@ -22,7 +23,9 @@ function GlobalProvider({ head, locale, children, messages }: GlobalProviderProp
       {head}
       <body>
         <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
-          <AuthProvider>{children}</AuthProvider>
+          <NavigationBlockerProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </NavigationBlockerProvider>
         </NextIntlClientProvider>
       </body>
     </html>

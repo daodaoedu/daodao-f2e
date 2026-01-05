@@ -1,6 +1,5 @@
 "use client";
 
-import { UseFormReturn } from "react-hook-form";
 import {
   FormControl,
   FormDescription,
@@ -10,8 +9,9 @@ import {
   FormMessage,
 } from "@daodao/ui/components/form";
 import { Input } from "@daodao/ui/components/input";
-import { ManualPracticeFormValues } from "../schema";
 import { Textarea } from "@daodao/ui/components/textarea";
+import type { UseFormReturn } from "react-hook-form";
+import type { ManualPracticeFormValues } from "../schema";
 
 interface Step1Props {
   form: UseFormReturn<ManualPracticeFormValues>;
@@ -27,10 +27,7 @@ export const Step1 = ({ form }: Step1Props) => {
         name="name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel
-              required
-              className="block text-base font-medium text-text-dark mb-3"
-            >
+            <FormLabel required className="block text-base font-medium text-text-dark mb-3">
               名稱
             </FormLabel>
             <FormControl>
@@ -53,10 +50,7 @@ export const Step1 = ({ form }: Step1Props) => {
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center justify-between mb-3">
-              <FormLabel
-                required
-                className="text-base font-medium text-text-dark"
-              >
+              <FormLabel required className="text-base font-medium text-text-dark">
                 實踐行動
               </FormLabel>
               <FormDescription className="text-sm text-light-gray">

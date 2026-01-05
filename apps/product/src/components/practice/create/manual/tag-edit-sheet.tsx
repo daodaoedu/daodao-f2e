@@ -1,6 +1,10 @@
 "use client";
 
-import React from "react";
+import { useIsMobile } from "@daodao/shared";
+import {
+  PinList,
+  type PinListItem,
+} from "@daodao/ui/components/animate-ui/components/community/pin-list";
 import {
   Sheet,
   SheetContent,
@@ -17,15 +21,11 @@ import {
   FormMessage,
 } from "@daodao/ui/components/form";
 import { Input } from "@daodao/ui/components/input";
-import { useIsMobile } from "@daodao/shared";
-import { Check, Tag } from "lucide-react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Check } from "lucide-react";
+import React from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  PinList,
-  type PinListItem,
-} from "@daodao/ui/components/animate-ui/components/community/pin-list";
 
 interface TagEditSheetProps {
   open: boolean;
@@ -71,11 +71,13 @@ export const TagEditSheet = ({
 
   // Reset form when initial values change
   React.useEffect(() => {
-    form.reset({
-      keyword: initialKeyword,
-      selectedTags: initialTags,
-    });
-  }, [initialKeyword, initialTags, open]);
+    if (open) {
+      form.reset({
+        keyword: initialKeyword,
+        selectedTags: initialTags,
+      });
+    }
+  }, [initialKeyword, initialTags, open, form]);
 
   const onSubmit = (values: TagEditFormValues) => {
     onComplete({
@@ -85,9 +87,7 @@ export const TagEditSheet = ({
   };
 
   const pinListItems: PinListItem[] = React.useMemo(() => {
-    const availableTags = AVAILABLE_TAGS.filter(
-      (tag) => !selectedTags.includes(tag)
-    );
+    const availableTags = AVAILABLE_TAGS.filter((tag) => !selectedTags.includes(tag));
     const allTags = [...availableTags, ...selectedTags];
 
     const keywordItem =
@@ -131,9 +131,7 @@ export const TagEditSheet = ({
           // If unpinned, use custom style for keyword
           return {
             ...item,
-            className: item.pinned
-              ? undefined
-              : "bg-bg-gray border border-very-light-gray",
+            className: item.pinned ? undefined : "bg-bg-gray border border-very-light-gray",
           };
         }
 
@@ -147,10 +145,7 @@ export const TagEditSheet = ({
       transformed.forEach((item) => {
         if (item.pinned) {
           pinnedItems.push(item);
-        } else if (
-          AVAILABLE_TAGS.includes(item.name) ||
-          (keyword && item.name === keyword)
-        ) {
+        } else if (AVAILABLE_TAGS.includes(item.name) || (keyword && item.name === keyword)) {
           unpinnedItems.push(item);
         }
       });
@@ -179,10 +174,7 @@ export const TagEditSheet = ({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side={isMobile ? "bottom" : "right"}
-        className="overflow-y-auto"
-      >
+      <SheetContent side={isMobile ? "bottom" : "right"} className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="text-bg-dark">編輯標籤</SheetTitle>
         </SheetHeader>
@@ -200,11 +192,7 @@ export const TagEditSheet = ({
                       關鍵字
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="輸入自訂關鍵字"
-                        className="w-full"
-                      />
+                      <Input {...field} placeholder="輸入自訂關鍵字" className="w-full" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -229,11 +217,7 @@ export const TagEditSheet = ({
 
             {/* Complete Button */}
             <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6">
-              <Button
-                type="button"
-                className="w-full"
-                onClick={form.handleSubmit(onSubmit)}
-              >
+              <Button type="button" className="w-full" onClick={form.handleSubmit(onSubmit)}>
                 <Check className="size-4.5" />
                 完成
               </Button>

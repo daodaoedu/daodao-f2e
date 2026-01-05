@@ -14,12 +14,7 @@ export const MobileSidebar = () => {
     <>
       <div className="fixed top-5 left-5 z-30">
         <CustomLink href="/" aria-label="回到官網">
-          <Image
-            src={favicon256Png.src}
-            alt="daodao logo"
-            width={40}
-            height={40}
-          />
+          <Image src={favicon256Png.src} alt="daodao logo" width={40} height={40} />
         </CustomLink>
       </div>
       <nav
