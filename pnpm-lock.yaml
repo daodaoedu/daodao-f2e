@@ -12,6 +12,9 @@ catalogs:
     '@next/env':
       specifier: 16.1.1
       version: 16.1.1
+    '@radix-ui/react-slot':
+      specifier: 1.2.4
+      version: 1.2.4
     '@tailwindcss/postcss':
       specifier: ^4.1.18
       version: 4.1.18
@@ -39,6 +42,9 @@ catalogs:
     next:
       specifier: 15.5.9
       version: 15.5.9
+    next-themes:
+      specifier: ^0.4.6
+      version: 0.4.6
     react:
       specifier: 19.2.3
       version: 19.2.3
@@ -48,6 +54,24 @@ catalogs:
     react-hook-form:
       specifier: 7.69.0
       version: 7.69.0
+    react-markdown:
+      specifier: ^10.1.0
+      version: 10.1.0
+    recharts:
+      specifier: 2.15.4
+      version: 2.15.4
+    rehype-raw:
+      specifier: ^7.0.0
+      version: 7.0.0
+    rehype-sanitize:
+      specifier: ^6.0.0
+      version: 6.0.0
+    remark-gfm:
+      specifier: ^4.0.1
+      version: 4.0.1
+    tailwindcss:
+      specifier: ^4.1.11
+      version: 4.1.18
     typescript:
       specifier: ^5.9.3
       version: 5.9.3
@@ -104,6 +128,9 @@ importers:
       '@next/env':
         specifier: 'catalog:'
         version: 16.1.1
+      add:
+        specifier: ^2.0.6
+        version: 2.0.6
       date-fns:
         specifier: 'catalog:'
         version: 3.6.0
@@ -113,12 +140,18 @@ importers:
       lucide-react:
         specifier: 'catalog:'
         version: 0.475.0(react@19.2.3)
+      matter-js:
+        specifier: ^0.20.0
+        version: 0.20.0
       motion:
         specifier: 'catalog:'
         version: 12.23.26(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       next:
         specifier: 'catalog:'
         version: 15.5.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      poly-decomp-es:
+        specifier: ^0.4.2
+        version: 0.4.2
       react:
         specifier: 'catalog:'
         version: 19.2.3
@@ -138,6 +171,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: 'catalog:'
         version: 4.1.18
+      '@types/matter-js':
+        specifier: ^0.20.2
+        version: 0.20.2
       '@types/node':
         specifier: 'catalog:'
         version: 20.19.27
@@ -2174,6 +2210,9 @@ packages:
   '@types/inquirer@6.5.0':
     resolution: {integrity: sha512-rjaYQ9b9y/VFGOpqBEXRavc3jh0a+e6evAbI31tMda8VlPaSy0AZJfXsvmIe3wklc7W6C3zCSfleuMXR7NOyXw==}
 
+  '@types/matter-js@0.20.2':
+    resolution: {integrity: sha512-3PPKy3QxvZ89h9+wdBV2488I1JLVs7DEpIkPvgO8JC1mUdiVSO37ZIvVctOTD7hIq8OAL2gJ3ugGSuUip6DhCw==}
+
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
 
@@ -2218,6 +2257,9 @@ packages:
     resolution: {integrity: sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==}
     engines: {node: '>=0.4.0'}
     hasBin: true
+
+  add@2.0.6:
+    resolution: {integrity: sha512-j5QzrmsokwWWp6kUcJQySpbG+xfOBqqKnup3OIk1pz+kB/80SLorZ9V8zHFLO92Lcd+hbvq8bT+zOGoPkmBV0Q==}
 
   agent-base@7.1.4:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
@@ -3059,6 +3101,9 @@ packages:
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
 
+  matter-js@0.20.0:
+    resolution: {integrity: sha512-iC9fYR7zVT3HppNnsFsp9XOoQdQN2tUyfaKg4CHLH8bN+j6GT4Gw7IH2rP0tflAebrHFw730RR3DkVSZRX8hwA==}
+
   mdast-util-find-and-replace@3.0.2:
     resolution: {integrity: sha512-Tmd1Vg/m3Xz43afeNxDIhWRtFZgM2VLyaf4vSTYwudTyeuTneoL3qtWMA5jeLyz/O1vDJmmV4QuScFCA2tBPwg==}
 
@@ -3429,6 +3474,9 @@ packages:
 
   po-parser@2.0.0:
     resolution: {integrity: sha512-SZvoKi3PoI/hHa2V9je9CW7Xgxl4dvO74cvaa6tWShIHT51FkPxje6pt0gTJznJrU67ix91nDaQp2hUxkOYhKA==}
+
+  poly-decomp-es@0.4.2:
+    resolution: {integrity: sha512-akjZkaTeyfECMNkMqv0g9gFiU2HjpZ5ubJA/aczw1ILdgWQbv1OPwCi05/9JbY2GnGpjm9k85Jdbd/j/p/lg/g==}
 
   postcss-selector-parser@6.0.10:
     resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
@@ -5527,6 +5575,8 @@ snapshots:
       '@types/through': 0.0.33
       rxjs: 6.6.7
 
+  '@types/matter-js@0.20.2': {}
+
   '@types/mdast@4.0.4':
     dependencies:
       '@types/unist': 3.0.3
@@ -5566,6 +5616,8 @@ snapshots:
       acorn: 8.15.0
 
   acorn@8.15.0: {}
+
+  add@2.0.6: {}
 
   agent-base@7.1.4: {}
 
@@ -6436,6 +6488,8 @@ snapshots:
 
   markdown-table@3.0.4: {}
 
+  matter-js@0.20.0: {}
+
   mdast-util-find-and-replace@3.0.2:
     dependencies:
       '@types/mdast': 4.0.4
@@ -7041,6 +7095,8 @@ snapshots:
   pluralize@8.0.0: {}
 
   po-parser@2.0.0: {}
+
+  poly-decomp-es@0.4.2: {}
 
   postcss-selector-parser@6.0.10:
     dependencies:

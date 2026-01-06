@@ -10,7 +10,7 @@ try {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const staticModule = require("../generated/env");
   staticEnv = staticModule.env || null;
-} catch (error) {
+} catch {
   // 靜態檔案不存在時，在開發環境給出提示
   if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
     console.warn(
@@ -63,4 +63,3 @@ export const getRequiredEnv = (key: string): string => {
 
   throw new Error(`Required environment variable ${key} is not defined`);
 };
-

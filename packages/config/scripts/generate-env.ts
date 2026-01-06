@@ -1,11 +1,12 @@
 #!/usr/bin/env node
+
 /**
  * 生成靜態環境變數配置檔案
  * 監聽 .env 檔案變化並自動生成靜態 TypeScript 檔案
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as dotenv from "dotenv";
 
 const CONFIG_DIR = path.resolve(__dirname, "..");
@@ -89,7 +90,7 @@ generateStaticEnv();
 // 如果使用 watch 模式
 if (process.argv.includes("--watch")) {
   const chokidar = require("chokidar");
-  
+
   const watchPaths = [
     path.resolve(process.cwd(), ".env*"),
     path.resolve(CONFIG_DIR, "../../.env*"),
@@ -98,7 +99,7 @@ if (process.argv.includes("--watch")) {
   ];
 
   console.log("\n👀 Watching for .env file changes...");
-  
+
   const watcher = chokidar.watch(watchPaths, {
     ignored: /node_modules/,
     persistent: true,
@@ -115,4 +116,3 @@ if (process.argv.includes("--watch")) {
     generateStaticEnv();
   });
 }
-

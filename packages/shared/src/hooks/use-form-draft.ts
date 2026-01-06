@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FieldValues, Path, UseFormReturn, useWatch } from "react-hook-form";
-import { getStorage, StorageEnum } from "../lib/storage";
+import { type FieldValues, type Path, type UseFormReturn, useWatch } from "react-hook-form";
+import { getStorage, type StorageEnum } from "../lib/storage";
 
 export interface DraftData<TFormValues> {
   formValues: TFormValues;
@@ -218,7 +218,17 @@ export function useFormDraft<TFormValues extends FieldValues>(
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [watchedValues, currentStep, showRestoreDialog, autoSave, debounceMs, form, draftStorage, onFormValuesChange, isCheckingDraft]);
+  }, [
+    watchedValues,
+    currentStep,
+    showRestoreDialog,
+    autoSave,
+    debounceMs,
+    form,
+    draftStorage,
+    onFormValuesChange,
+    isCheckingDraft,
+  ]);
 
   // 當步驟變化時立即儲存（只有在使用者已互動時）
   useEffect(() => {
@@ -263,4 +273,3 @@ export function useFormDraft<TFormValues extends FieldValues>(
     saveDraft,
   };
 }
-

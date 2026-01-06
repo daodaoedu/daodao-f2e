@@ -3,6 +3,7 @@
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import {
   CheckInRecordCard,
+  CheckInStack,
   ExecutionDurationCard,
   ExecutionTimingCard,
   type ManualPracticeFormValues,
@@ -67,7 +68,7 @@ export default function PracticeDetailPage() {
 
       <BackgroundAnimation />
 
-      <main className="max-w-[448px] mx-auto px-5 pb-28">
+      <main className="max-w-[448px] mx-auto px-5 pb-6">
         {/* Practice Title Section */}
         <PracticeDetailTitle
           title={practice.name}
@@ -105,6 +106,11 @@ export default function PracticeDetailPage() {
         {/* Check-in Record Card */}
         <CheckInRecordCard />
       </main>
+
+      {/* CheckIn Stack */}
+      <div className="max-w-[448px] mx-auto">
+        <CheckInStack />
+      </div>
     </div>
   );
 }

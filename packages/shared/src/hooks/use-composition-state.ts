@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 
 /**
  * 追蹤輸入法組合狀態的 hook
@@ -41,4 +41,3 @@ export function useCompositionState() {
     },
   };
 }
-

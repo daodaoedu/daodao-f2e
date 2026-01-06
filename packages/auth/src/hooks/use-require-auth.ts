@@ -47,4 +47,3 @@ export const useRequireAuth = (redirectUrl?: string) => {
     }
   }, [isAuthenticated, isLoading, redirectUrl, router]);
 };
-

@@ -1,9 +1,9 @@
+import { getRequiredEnv } from "@daodao/config";
 import createClient, {
   type ClientPathsWithMethod,
   type FetchResponse,
   type MaybeOptionalInit,
 } from "openapi-fetch";
-import { getRequiredEnv } from "@daodao/config";
 import type { paths } from "./types";
 
 export type * from "openapi-fetch";
@@ -49,10 +49,7 @@ class UnauthorizedHandler {
    * @param init 請求選項
    * @returns Response 物件
    */
-  wrapFetch = async (
-    input: RequestInfo | URL,
-    init?: RequestInit
-  ): Promise<Response> => {
+  wrapFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const response = await fetch(input, init);
 
     // 如果不是 401 或沒有處理器，直接返回
@@ -114,8 +111,7 @@ export interface ApiClientConfig {
 export const client = createClient<paths>({
   baseUrl: getRequiredEnv("NEXT_PUBLIC_API_URL"),
   credentials: "include",
-  fetch:
-    typeof window === "undefined" ? fetch : unauthorizedHandler.wrapFetch,
+  fetch: typeof window === "undefined" ? fetch : unauthorizedHandler.wrapFetch,
 });
 
 type InitParam<Init> = Init extends undefined ? never : Init;
@@ -148,10 +144,7 @@ type InitParam<Init> = Init extends undefined ? never : Init;
  */
 export const getSwrKey = <
   Path extends ClientPathsWithMethod<typeof client, "get">,
-  Init extends MaybeOptionalInit<paths[Path], "get"> = MaybeOptionalInit<
-    paths[Path],
-    "get"
-  >
+  Init extends MaybeOptionalInit<paths[Path], "get"> = MaybeOptionalInit<paths[Path], "get">,
 >(
   path: Path,
   init: InitParam<Init>
@@ -188,17 +181,14 @@ export const getSwrKey = <
  */
 export const getSwrKeyWithResponse = async <
   Path extends ClientPathsWithMethod<typeof client, "get">,
-  Init extends MaybeOptionalInit<paths[Path], "get"> = MaybeOptionalInit<
-    paths[Path],
-    "get"
-  >,
-  Media extends `${string}/${string}` = "application/json"
+  Init extends MaybeOptionalInit<paths[Path], "get"> = MaybeOptionalInit<paths[Path], "get">,
+  Media extends `${string}/${string}` = "application/json",
 >(
   path: Path,
   init: InitParam<Init>
 ): Promise<
   readonly [
     readonly [typeof PREFIX, Path, InitParam<Init>?],
-    FetchResponse<paths[Path]["get"], Init, Media>
+    FetchResponse<paths[Path]["get"], Init, Media>,
   ]
 > => Promise.all([getSwrKey(path, init), client.GET(path, init)] as const);
