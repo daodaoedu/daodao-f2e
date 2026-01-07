@@ -6,6 +6,7 @@ import HexagonSvg from "@daodao/assets/images/dashboard/hexagon.svg";
 import SemiCircleSvg from "@daodao/assets/images/dashboard/semi-circle.svg";
 import SpeechBubbleSvg from "@daodao/assets/images/dashboard/speech-bubble.svg";
 import { Link } from "@daodao/i18n/navigation";
+import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { cn } from "@daodao/ui/lib/utils";
 import Matter from "matter-js";
 import * as decomp from "poly-decomp-es";
@@ -85,7 +86,10 @@ const extractSvgGeometry = (svgElement: SVGSVGElement): SvgGeometry | null => {
  * @param samples 採樣點數量
  * @returns Matter.js 頂點陣列
  */
-const pathElementToVertices = (pathElement: SVGPathElement, samples: number): Matter.Vector[] => {
+const pathElementToVertices = (
+  pathElement: SVGPathElement,
+  samples: number
+): Matter.Vector[] => {
   const pathLength = pathElement.getTotalLength();
   const vertices: Matter.Vector[] = [];
 
@@ -108,7 +112,9 @@ const pathElementToVertices = (pathElement: SVGPathElement, samples: number): Ma
 
     if (!current || !next) continue;
 
-    const distance = Math.sqrt((current.x - next.x) ** 2 + (current.y - next.y) ** 2);
+    const distance = Math.sqrt(
+      (current.x - next.x) ** 2 + (current.y - next.y) ** 2
+    );
 
     // 如果距離太近，跳過這個點
     if (distance > VERTEX_DISTANCE_THRESHOLD) {
@@ -141,17 +147,22 @@ const LAYER_SPACING = 1.2;
 const PATH_SAMPLES = 50;
 const VERTEX_DISTANCE_THRESHOLD = 0.1;
 
+// 角度限制（-20度到20度，轉換為弧度）
+const MIN_ANGLE = (-20 * Math.PI) / 180; // -20度
+const MAX_ANGLE = (20 * Math.PI) / 180; // 20度
+const MAX_ANGULAR_VELOCITY = 0.1; // 最大角速度，防止快速旋轉
+
 // 物理屬性常數
 const PHYSICS_CONFIG = {
-  gravity: { x: 0, y: -0.5 },
+  gravity: { x: 0, y: -0.1 },
   friction: 1,
   frictionAir: 0,
   frictionStatic: 1,
-  density: 0.01,
-  restitution: 0.15,
+  density: 0.0001,
+  restitution: 0.0001,
   positionIterations: 10,
   velocityIterations: 4,
-  timeScale: 2,
+  timeScale: 3,
 } as const;
 
 interface BodyPosition {
@@ -159,10 +170,6 @@ interface BodyPosition {
   x: number;
   y: number;
   angle: number;
-}
-
-interface CheckInStackProps {
-  count?: number;
 }
 
 /**
@@ -210,6 +217,19 @@ const createWalls = (containerWidth: number, containerHeight: number) => {
 };
 
 /**
+ * 限制角度在指定範圍內
+ */
+const clampAngle = (angle: number): number => {
+  // 將角度正規化到 -π 到 π 範圍
+  let normalizedAngle = angle;
+  while (normalizedAngle > Math.PI) normalizedAngle -= 2 * Math.PI;
+  while (normalizedAngle < -Math.PI) normalizedAngle += 2 * Math.PI;
+
+  // 限制在 MIN_ANGLE 和 MAX_ANGLE 之間
+  return Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, normalizedAngle));
+};
+
+/**
  * 從 body 位置提取安全的位置數據
  */
 const extractBodyPosition = (body: Matter.Body): BodyPosition => ({
@@ -222,7 +242,11 @@ const extractBodyPosition = (body: Matter.Body): BodyPosition => ({
 /**
  * 創建圓形物體
  */
-const createCircleBody = (x: number, y: number, radius: number): Matter.Body => {
+const createCircleBody = (
+  x: number,
+  y: number,
+  radius: number
+): Matter.Body => {
   return Bodies.circle(x, y, radius, {
     friction: PHYSICS_CONFIG.friction,
     frictionAir: PHYSICS_CONFIG.frictionAir,
@@ -235,7 +259,11 @@ const createCircleBody = (x: number, y: number, radius: number): Matter.Body => 
 /**
  * 從 path 創建多邊形物體
  */
-const createPathBody = (x: number, y: number, pathElement: SVGPathElement): Matter.Body | null => {
+const createPathBody = (
+  x: number,
+  y: number,
+  pathElement: SVGPathElement
+): Matter.Body | null => {
   const vertices = pathElementToVertices(pathElement, PATH_SAMPLES);
   const sortedVertices = Vertices.clockwiseSort(vertices);
 
@@ -247,17 +275,81 @@ const createPathBody = (x: number, y: number, pathElement: SVGPathElement): Matt
     restitution: PHYSICS_CONFIG.restitution,
   });
 
-  return Array.isArray(bodiesFromVertices) ? bodiesFromVertices[0] : bodiesFromVertices;
+  return Array.isArray(bodiesFromVertices)
+    ? bodiesFromVertices[0]
+    : bodiesFromVertices;
 };
 
-export const CheckInStack = ({ count = 10 }: CheckInStackProps) => {
+const MOOD_MAP = Object.fromEntries(
+  MOOD_OPTIONS.map((option) => [option.id, option.emoji])
+) as Record<MoodType, React.FC<React.SVGProps<SVGSVGElement>>>;
+
+interface CheckInItem {
+  date: string;
+  mood: MoodType;
+  content: string;
+}
+
+const defaultItems: CheckInItem[] = [
+  {
+    date: "2026.01.01",
+    mood: "happy",
+    content:
+      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第一次打卡",
+  },
+  {
+    date: "2026.01.03",
+    mood: "neutral",
+    content:
+      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第二次打卡",
+  },
+  {
+    date: "2026.01.04",
+    mood: "bored",
+    content:
+      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
+  },
+  {
+    date: "2026.01.05",
+    mood: "fine",
+    content:
+      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
+  },
+  {
+    date: "2026.01.09",
+    mood: "frustrated",
+    content:
+      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
+  },
+  {
+    date: "2026.01.11",
+    mood: "frustrated",
+    content:
+      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
+  },
+  {
+    date: "2026.01.13",
+    mood: "frustrated",
+    content:
+      "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
+  }
+];
+
+interface CheckInStackProps {
+  items?: CheckInItem[];
+}
+
+export const CheckInStack = ({ items = defaultItems }: CheckInStackProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRefsRef = useRef<(SVGSVGElement | null)[]>([]);
   const bodiesRef = useRef<Matter.Body[]>([]);
   const [positions, setPositions] = useState<BodyPosition[]>([]);
   const [containerHeight, setContainerHeight] = useState(MIN_CONTAINER_HEIGHT);
   const animationFrameRef = useRef<number | undefined>(undefined);
-  const [svgGeometries, setSvgGeometries] = useState<(SvgGeometry | null)[]>([]);
+  const [svgGeometries, setSvgGeometries] = useState<(SvgGeometry | null)[]>(
+    []
+  );
+  const count = items.length;
 
   // 從實際渲染的 SVG 元素中提取幾何數據
   useEffect(() => {
@@ -291,7 +383,10 @@ export const CheckInStack = ({ count = 10 }: CheckInStackProps) => {
     }
 
     // 初始化容器高度
-    const initialHeight = Math.max(MIN_CONTAINER_HEIGHT, count * MIN_CONTAINER_HEIGHT);
+    const initialHeight = Math.max(
+      MIN_CONTAINER_HEIGHT,
+      count * MIN_CONTAINER_HEIGHT
+    );
     setContainerHeight(initialHeight);
 
     // 創建並配置物理引擎
@@ -347,6 +442,8 @@ export const CheckInStack = ({ count = 10 }: CheckInStackProps) => {
       Body.setPosition(body, { x, y: currentY });
       Body.setVelocity(body, { x: 0, y: 0 });
       Body.setAngle(body, 0);
+      // 限制角速度，防止快速旋轉
+      Body.setAngularVelocity(body, 0);
       bodies.push(body);
     }
 
@@ -361,6 +458,33 @@ export const CheckInStack = ({ count = 10 }: CheckInStackProps) => {
     let currentContainerHeight = initialHeight;
 
     const updatePositions = () => {
+      // 限制所有物體的角度在 -20度 到 20度 之間
+      bodies.forEach((body) => {
+        // 限制角度
+        const clampedAngle = clampAngle(body.angle);
+        if (Math.abs(body.angle - clampedAngle) > 0.001) {
+          Body.setAngle(body, clampedAngle);
+        }
+
+        // 限制角速度，防止快速旋轉
+        const currentAngularVelocity = body.angularVelocity ?? 0;
+        if (Math.abs(currentAngularVelocity) > MAX_ANGULAR_VELOCITY) {
+          const clampedVelocity =
+            currentAngularVelocity > 0
+              ? MAX_ANGULAR_VELOCITY
+              : -MAX_ANGULAR_VELOCITY;
+          Body.setAngularVelocity(body, clampedVelocity);
+        }
+
+        // 如果角度已經達到邊界，停止旋轉
+        if (
+          (clampedAngle <= MIN_ANGLE && currentAngularVelocity < 0) ||
+          (clampedAngle >= MAX_ANGLE && currentAngularVelocity > 0)
+        ) {
+          Body.setAngularVelocity(body, 0);
+        }
+      });
+
       const newPositions = bodies.map(extractBodyPosition);
       setPositions(newPositions);
 
@@ -416,9 +540,11 @@ export const CheckInStack = ({ count = 10 }: CheckInStackProps) => {
   /**
    * 獲取 SVG 組件配置
    */
-  const getSvgConfig = (index: number) => SVG_CONFIGS[index % SVG_CONFIGS.length];
+  const getSvgConfig = (index: number) =>
+    SVG_CONFIGS[index % SVG_CONFIGS.length];
 
-  const getSvgRef = (index: number) => svgRefsRef.current[index % svgRefsRef.current.length];
+  const getSvgRef = (index: number) =>
+    svgRefsRef.current[index % svgRefsRef.current.length];
 
   /**
    * 處理 SVG ref 的回調
@@ -435,7 +561,8 @@ export const CheckInStack = ({ count = 10 }: CheckInStackProps) => {
 
     if (geometry.isCircle && geometry.radius) {
       // 對於圓形，使用 circle() 函數
-      const radiusPercent = (geometry.radius / Math.max(geometry.width, geometry.height)) * 100;
+      const radiusPercent =
+        (geometry.radius / Math.max(geometry.width, geometry.height)) * 100;
       return `circle(${radiusPercent}% at 50% 50%)`;
     }
 
@@ -452,7 +579,7 @@ export const CheckInStack = ({ count = 10 }: CheckInStackProps) => {
   return (
     <div
       ref={containerRef}
-      className="relative overflow-hidden"
+      className="relative"
       style={{ width: CONTAINER_WIDTH, height: containerHeight }}
     >
       {/* 隱藏的 SVG 區域，用於提取幾何數據 */}
@@ -486,7 +613,6 @@ export const CheckInStack = ({ count = 10 }: CheckInStackProps) => {
 
         const geometry = svgGeometries[i];
         if (!geometry) return null;
-
         const { width, height } = geometry;
         const x = Number.isFinite(position.x) ? position.x : 0;
         const y = Number.isFinite(position.y) ? position.y : 0;
@@ -495,7 +621,7 @@ export const CheckInStack = ({ count = 10 }: CheckInStackProps) => {
         const h = Number.isFinite(height) ? height : 0;
         const id = position.id;
 
-        const left = x - w / 2;
+        const left = x - w / 2 - WALL_THICKNESS;
         const top = y - h / 2;
 
         // 如果計算結果無效，不渲染
@@ -504,6 +630,12 @@ export const CheckInStack = ({ count = 10 }: CheckInStackProps) => {
         }
 
         const clipPath = getClipPath(geometry, i);
+        const item = items[i];
+
+        if (!item) return null;
+
+        const { mood, date, content } = item;
+        const Emoji = MOOD_MAP[mood];
 
         return (
           <Link
@@ -515,20 +647,27 @@ export const CheckInStack = ({ count = 10 }: CheckInStackProps) => {
               height: h,
               left,
               top,
-              transform: `rotate(${angle}rad)`,
+              transform: `rotate(${angle}rad) ${i % 5 === 3 ? "translateY(20px)" : ""}`,
               transformOrigin: "center center",
               clipPath: clipPath || undefined,
             }}
           >
             <Component className="w-full h-full" />
-            <span
+            <div
               className={cn(
-                "absolute top-0 left-0 w-full h-full flex items-center justify-center",
-                i % 5 === 3 && "pb-11"
+                "absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2",
+                i % 5 === 3 && "pb-11",
               )}
             >
-              123
-            </span>
+              <Emoji className="size-6" />
+              <div className="text-xs text-bg-dark">
+                #{i + 1}{' '}
+                {date}
+              </div>
+              <div className="max-w-40 text-bg-dark line-clamp-2">
+                {content}
+              </div>
+            </div>
           </Link>
         );
       })}

@@ -8,54 +8,17 @@ import {
   PinkSvg,
   YellowSvg,
 } from "@daodao/assets";
-import { Badge, type BadgeProps } from "@daodao/ui/components/badge";
+import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Progress } from "@daodao/ui/components/progress";
-import { CalendarCheck, PenLine } from "lucide-react";
+import { getStatusConfig } from "@/constants/task-status";
 
 const themesMap = {
   yellow: YellowSvg,
   blue: BlueSvg,
   pink: PinkSvg,
   green: GreenSvg,
-};
-
-export type TaskStatus = "draft" | "not-started" | "in-progress" | "completed";
-
-const statusConfig: Record<
-  TaskStatus,
-  {
-    label: string;
-    variant: BadgeProps["variant"];
-    icon: React.ReactNode;
-    buttonLabel: string;
-  }
-> = {
-  draft: {
-    label: "草稿",
-    variant: "outline-ghost",
-    icon: <PenLine className="size-4.5 text-logo-cyan" />,
-    buttonLabel: "繼續編輯",
-  },
-  "not-started": {
-    label: "未開始",
-    variant: "very-light-blue",
-    icon: <CalendarCheck className="size-4.5 text-logo-cyan" />,
-    buttonLabel: "打卡",
-  },
-  "in-progress": {
-    label: "進行中",
-    variant: "default",
-    icon: <CalendarCheck className="size-4.5 text-logo-cyan" />,
-    buttonLabel: "打卡",
-  },
-  completed: {
-    label: "已完成",
-    variant: "default",
-    icon: <CalendarCheck className="size-4.5 text-logo-cyan" />,
-    buttonLabel: "打卡",
-  },
 };
 
 interface InProgressTaskCardProps {
@@ -88,7 +51,7 @@ export const InProgressTaskCard = ({
   onEdit,
 }: InProgressTaskCardProps) => {
   const Theme = themesMap[theme as keyof typeof themesMap] ?? YellowSvg;
-  const statusInfo = statusConfig[status as TaskStatus] ?? statusConfig.draft;
+  const statusInfo = getStatusConfig(status);
   const isDraft = status === "draft";
 
   const handleButtonClick = () => {

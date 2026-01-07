@@ -1,33 +1,11 @@
 "use client";
 
-import {
-  BoredSvg,
-  FineSvg,
-  FrustratedSvg,
-  HappySvg,
-  HopelessSvg,
-  NeutralSvg,
-} from "@daodao/assets";
+import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { ChevronUp } from "lucide-react";
 import { useState } from "react";
-
-type MoodType = "hopeless" | "frustrated" | "bored" | "neutral" | "fine" | "happy";
-
-const MOOD_OPTIONS: Array<{
-  id: MoodType;
-  label: string;
-  emoji: React.FC<React.SVGProps<SVGSVGElement>>;
-}> = [
-  { id: "hopeless", label: "想放棄", emoji: HopelessSvg },
-  { id: "frustrated", label: "受挫", emoji: FrustratedSvg },
-  { id: "bored", label: "無聊", emoji: BoredSvg },
-  { id: "neutral", label: "普通", emoji: NeutralSvg },
-  { id: "fine", label: "還不錯", emoji: FineSvg },
-  { id: "happy", label: "開心", emoji: HappySvg },
-];
 
 interface MoodStat {
   mood: MoodType;

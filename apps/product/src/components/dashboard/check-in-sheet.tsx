@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  BoredSvg,
-  FineSvg,
-  FrustratedSvg,
-  HappySvg,
-  HopelessSvg,
-  NeutralSvg,
-} from "@daodao/assets";
 import { useIsMobile } from "@daodao/shared";
+import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import {
   Sheet,
   SheetContent,
@@ -49,26 +42,11 @@ export interface CheckInData {
   media: File[];
 }
 
-type MoodType = "hopeless" | "frustrated" | "bored" | "neutral" | "fine" | "happy";
-
-const MOOD_OPTIONS: Array<{
-  id: MoodType;
-  label: string;
-  emoji: React.FC<React.SVGProps<SVGSVGElement>>;
-}> = [
-  { id: "hopeless", label: "想放棄", emoji: HopelessSvg },
-  { id: "frustrated", label: "受挫", emoji: FrustratedSvg },
-  { id: "bored", label: "無聊", emoji: BoredSvg },
-  { id: "neutral", label: "普通", emoji: NeutralSvg },
-  { id: "fine", label: "還不錯", emoji: FineSvg },
-  { id: "happy", label: "開心", emoji: HappySvg },
-];
-
 const AVAILABLE_TAGS = ["練習", "新概念", "實作", "有趣", "創造", "困難", "刻意練習"] as const;
 
 // Zod schema for form validation
 const checkInFormSchema = z.object({
-  mood: z.enum(["hopeless", "frustrated", "bored", "neutral", "fine", "happy"]).nullable(),
+  mood: z.enum(MOOD_OPTIONS.map((option) => option.id) as [MoodType, ...MoodType[]]).nullable(),
   tags: z.array(z.string()).default([]),
   thoughts: z.string().default(""),
   media: z.array(z.instanceof(File)).default([]),

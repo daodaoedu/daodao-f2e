@@ -16,8 +16,6 @@ type PageHeaderProps = {
   onBack?: () => void;
   /** 中間標題，可選 */
   title?: string;
-  /** 中間自訂內容，優先於 title */
-  centerContent?: ReactNode;
   /** 右側關閉按鈕的點擊處理函數，預設為 router.back() */
   onClose?: () => void;
   /** 關閉按鈕的目標路由，設定後會使用 router.replace() */
@@ -33,7 +31,6 @@ export const PageHeader = ({
   backLabel = "返回",
   onBack,
   title,
-  centerContent,
   onClose,
   closeTo,
   variant = "default",
@@ -64,49 +61,59 @@ export const PageHeader = ({
   return (
     <div
       className={cn(
-        "max-w-[600px] mx-auto flex items-center justify-between px-5 py-4 md:pt-16",
+        "max-w-[600px] mx-auto grid grid-cols-3 items-center px-5 py-4 md:pt-16",
         className
       )}
     >
       {/* Left Action */}
-      {leftAction === "back" ? (
-        <Button
-          variant="ghost"
-          onClick={handleBack}
-          animation="none"
-          className={cn("px-0 font-normal", isLight && "text-white hover:text-white")}
-        >
-          <ArrowLeftOutlineSvg className="size-6" />
-          {backLabel}
-        </Button>
-      ) : (
-        <div className="size-9" />
-      )}
+      <div className="flex items-center justify-start">
+        {leftAction === "back" && (
+          <Button
+            variant="ghost"
+            onClick={handleBack}
+            animation="none"
+            className={cn(
+              "px-0 font-normal",
+              isLight && "text-white hover:text-white"
+            )}
+          >
+            <ArrowLeftOutlineSvg className="size-6" />
+            {backLabel}
+          </Button>
+        )}
+      </div>
 
       {/* Center Content */}
-      {centerContent ? (
-        centerContent
-      ) : title ? (
-        <h1 className={cn("text-lg font-medium", isLight ? "text-white" : "text-bg-dark")}>
-          {title}
-        </h1>
-      ) : (
-        <div />
-      )}
+      <div className="flex items-center justify-center">
+        {title && (
+          <h1
+            className={cn(
+              "text-lg font-medium",
+              isLight ? "text-white" : "text-bg-dark"
+            )}
+          >
+            {title}
+          </h1>
+        )}
+      </div>
 
       {/* Right Action */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={handleClose}
-        aria-label="關閉"
-        animation="none"
-        className={cn(
-          isLight ? "text-white hover:text-white bg-very-light-gray/50" : "text-light-gray"
-        )}
-      >
-        <X className={cn("size-6", isLight && "size-5")} />
-      </Button>
+      <div className="flex items-center justify-end">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleClose}
+          aria-label="關閉"
+          animation="none"
+          className={cn(
+            isLight
+              ? "text-white hover:text-white bg-very-light-gray/50"
+              : "text-light-gray"
+          )}
+        >
+          <X className={cn("size-6", isLight && "size-5")} />
+        </Button>
+      </div>
     </div>
   );
 };

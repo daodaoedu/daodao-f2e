@@ -10,7 +10,8 @@ import {
 import { cn } from "@daodao/ui/lib/utils";
 import { Ellipsis } from "lucide-react";
 import { useState } from "react";
-import { InProgressTaskCard, type TaskStatus } from "./in-progress-task-card";
+import { type TaskStatus } from "@/constants/task-status";
+import { InProgressTaskCard } from "./in-progress-task-card";
 
 export type FilterStatus = "all" | "draft" | "not-started" | "in-progress";
 
