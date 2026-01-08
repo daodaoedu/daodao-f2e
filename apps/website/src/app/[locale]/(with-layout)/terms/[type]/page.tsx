@@ -19,8 +19,8 @@ const getTermsI18nKey = (type: string) => {
 };
 
 const getTermsData = async (params: PageProps<"/[locale]/terms/[type]">["params"]) => {
-  const { type } = await params;
-  const t = await getTranslations("terms");
+  const { locale, type } = await params;
+  const t = await getTranslations({ locale, namespace: "terms" });
   const snakeCaseType = getTermsI18nKey(type);
   return {
     title: t(`${snakeCaseType}_title`),

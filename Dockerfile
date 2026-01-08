@@ -1,52 +1,81 @@
-# 生產階段 - 假設本地已經完成 build
-# 使用方式：在本地執行 pnpm build 後，使用此 Dockerfile 打包
-FROM node:20.19.4-alpine
+# 生產階段 - 預先建置模式
+# 使用方式：在本地執行 `pnpm build` 後，使用此 Dockerfile 打包
+# 構建命令：docker build -f Dockerfile.prod --target website --build-arg APP_NAME=website --build-arg APP_PORT=3000 -t daodao-website .
 
 # Build argument 指定要運行的 app
 ARG APP_NAME=website
 ARG APP_PORT=3000
 
-# 啟用 corepack 並安裝 pnpm
-RUN corepack enable && corepack prepare pnpm@10.20.0 --activate
+# 生產階段 - Website (靜態導出 + Nginx)
+FROM node:20.19.4-alpine AS website
+
+ARG APP_NAME=website
+ARG APP_PORT=3000
+
+WORKDIR /app
+
+# 設置環境變數
+ENV NODE_ENV=production
+ENV PORT=${APP_PORT}
 
 # 創建非 root 用戶
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
-WORKDIR /app
-
-# 複製必要的配置檔案（用於 pnpm workspace 解析）
-COPY --chown=nextjs:nodejs package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
-# 複製所有 package.json（用於 pnpm workspace 解析）
-COPY --chown=nextjs:nodejs apps/website/package.json ./apps/website/
-COPY --chown=nextjs:nodejs apps/product/package.json ./apps/product/
-COPY --chown=nextjs:nodejs packages/api/package.json ./packages/api/
-COPY --chown=nextjs:nodejs packages/assets/package.json ./packages/assets/
-COPY --chown=nextjs:nodejs packages/config/package.json ./packages/config/
-COPY --chown=nextjs:nodejs packages/features/quiz/package.json ./packages/features/quiz/
-COPY --chown=nextjs:nodejs packages/i18n/package.json ./packages/i18n/
-COPY --chown=nextjs:nodejs packages/shared/package.json ./packages/shared/
-COPY --chown=nextjs:nodejs packages/ui/package.json ./packages/ui/
-
-# 安裝 production 依賴（使用 cache mount 快取 pnpm store）
-# 注意：需要啟用 Docker BuildKit (DOCKER_BUILDKIT=1)
-RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile --prod --ignore-scripts && \
-    chown -R nextjs:nodejs /app/node_modules
-
-# 複製 Next.js 建置產物和必要檔案
-COPY --chown=nextjs:nodejs apps/${APP_NAME}/.next ./apps/${APP_NAME}/.next
+# 從本地複製預先建置的靜態導出文件
+COPY --chown=nextjs:nodejs apps/${APP_NAME}/out ./apps/${APP_NAME}/out
 COPY --chown=nextjs:nodejs apps/${APP_NAME}/public ./apps/${APP_NAME}/public
 
-# 複製 packages 的建置產物和必要檔案
-# 注意：由於 Next.js transpilePackages 配置，大部分 packages 的源碼已被編譯到 .next 中
-# 但某些 packages 仍需要其建置產物（如 shared/dist, assets/generated）
+# 複製 packages 的靜態資源
 COPY --chown=nextjs:nodejs packages/assets/generated ./packages/assets/generated
 COPY --chown=nextjs:nodejs packages/assets/images ./packages/assets/images
-COPY --chown=nextjs:nodejs packages/shared/dist ./packages/shared/dist
+
+# 安裝 Nginx
+RUN apk add --no-cache nginx
+
+# 複製 Nginx 配置檔
+COPY apps/${APP_NAME}/nginx.conf /etc/nginx/http.d/default.conf
+
+# 創建 Nginx 運行時目錄並設置權限
+RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run && \
+    chown -R nextjs:nodejs /var/cache/nginx /var/log/nginx /var/run && \
+    chmod -R 755 /var/cache/nginx /var/log/nginx /var/run
 
 WORKDIR /app/apps/${APP_NAME}
+
+# 暴露端口
+EXPOSE ${APP_PORT}
+
+# 啟動 Nginx（使用 daemon off 模式以在前台運行）
+CMD ["nginx", "-g", "daemon off;"]
+
+# 生產階段 - Product (Standalone + Node.js)
+FROM node:20.19.4-alpine AS product
+
+ARG APP_NAME=product
+ARG APP_PORT=3001
+
+WORKDIR /app
+
+# 設置環境變數
+ENV NODE_ENV=production
+ENV PORT=${APP_PORT}
+
+# 創建非 root 用戶
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# 安裝 sharp 所需的系統依賴（根據 Next.js 官方建議）
+RUN apk add --no-cache libc6-compat
+
+# 從本地複製預先建置的 standalone 輸出
+COPY --chown=nextjs:nodejs apps/${APP_NAME}/.next/standalone ./
+COPY --chown=nextjs:nodejs apps/${APP_NAME}/.next/static ./apps/${APP_NAME}/.next/static
+COPY --chown=nextjs:nodejs apps/${APP_NAME}/public ./apps/${APP_NAME}/public
+
+# 複製 packages 的靜態資源
+COPY --chown=nextjs:nodejs packages/assets/generated ./packages/assets/generated
+COPY --chown=nextjs:nodejs packages/assets/images ./packages/assets/images
 
 # 切換到非 root 用戶
 USER nextjs
@@ -54,9 +83,7 @@ USER nextjs
 # 暴露端口
 EXPOSE ${APP_PORT}
 
-ENV NODE_ENV=production
-ENV PORT=${APP_PORT}
-
-# 啟動應用
-CMD ["pnpm", "start"]
+# 設置工作目錄並啟動應用
+WORKDIR /app/apps/${APP_NAME}
+CMD ["node", "server.js"]
 

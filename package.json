@@ -14,6 +14,7 @@
     "format:check": "biome format .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
+    "docker:build": "pnpm build && docker-compose up -d --build",
     "clean": "turbo run clean && pnpm dlx rimraf node_modules"
   },
   "devDependencies": {

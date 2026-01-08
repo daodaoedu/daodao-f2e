@@ -6,15 +6,21 @@ import { Text, Title } from "@daodao/ui/components/typography";
 import { cn } from "@daodao/ui/lib/utils";
 import type { Metadata } from "next";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("about");
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/about">): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "about" });
   return {
     title: t("hero_title"),
   };
 }
 
-export default async function AboutPage() {
-  const t = await getTranslations("about");
+export default async function AboutPage({
+  params,
+}: PageProps<"/[locale]/about">) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "about" });
 
   const missionGoals = [
     {

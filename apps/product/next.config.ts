@@ -7,6 +7,7 @@ loadEnvConfig(process.cwd());
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   reactStrictMode: true,
   typedRoutes: true,
   transpilePackages: [

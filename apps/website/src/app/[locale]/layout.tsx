@@ -33,11 +33,12 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
 
 export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {
   const { locale } = await params;
-  const messages = await getMessages();
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+
+  const messages = await getMessages({ locale });
   setRequestLocale(locale);
 
   return (

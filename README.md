@@ -56,6 +56,22 @@ pnpm build
 pnpm --filter @daodao/shared build
 ```
 
+### Docker
+
+```bash
+# 構建專案並啟動 Docker 容器
+pnpm docker:build
+
+# 此命令會：
+# 1. 執行 pnpm build 構建所有專案
+# 2. 執行 docker-compose up -d --build 構建並啟動容器
+```
+
+Docker Compose 會啟動兩個服務：
+
+- **website**: 運行在 `http://localhost:3000`（使用 Nginx 服務靜態導出）
+- **product**: 運行在 `http://localhost:3001`（使用 Node.js 運行 standalone 輸出）
+
 ### 代碼檢查與格式化
 
 ```bash

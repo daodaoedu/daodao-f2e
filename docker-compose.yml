@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: website
       args:
         APP_NAME: website
         APP_PORT: 3000
@@ -21,6 +22,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: product
       args:
         APP_NAME: product
         APP_PORT: 3001
