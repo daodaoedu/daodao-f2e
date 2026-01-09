@@ -6,7 +6,7 @@ export default getRequestConfig(async ({ requestLocale, locale: explicitLocale }
   // If an explicit locale is provided (e.g., from getTranslations({locale: 'en'})),
   // use it to avoid calling headers() during static generation
   let locale: string | undefined = explicitLocale;
-  
+
   if (!locale) {
     // Fallback to requestLocale for dynamic rendering
     // Note: requestLocale may use headers() internally, which prevents static generation

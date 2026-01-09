@@ -12,7 +12,9 @@ import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { Progress } from "@daodao/ui/components/progress";
+import { PenLine } from "lucide-react";
 import { getStatusConfig } from "@/constants/task-status";
+import { CheckInButton } from "./check-in-sheet";
 
 const themesMap = {
   yellow: YellowSvg,
@@ -29,10 +31,8 @@ interface InProgressTaskCardProps {
   progress: string;
   messagesCount: number;
   isUnreadMessages: boolean;
-  isCheckIn: boolean;
   theme: string;
   status: string;
-  onCheckIn?: () => void;
   onEdit?: () => void;
 }
 
@@ -44,23 +44,13 @@ export const InProgressTaskCard = ({
   progress,
   messagesCount,
   isUnreadMessages,
-  isCheckIn,
   theme,
   status,
-  onCheckIn,
   onEdit,
 }: InProgressTaskCardProps) => {
   const Theme = themesMap[theme as keyof typeof themesMap] ?? YellowSvg;
   const statusInfo = getStatusConfig(status);
   const isDraft = status === "draft";
-
-  const handleButtonClick = () => {
-    if (isDraft) {
-      onEdit?.();
-    } else {
-      onCheckIn?.();
-    }
-  };
 
   return (
     <div className="relative w-[294px]">
@@ -120,10 +110,20 @@ export const InProgressTaskCard = ({
         </div>
 
         {/* Check-in Button */}
-        <Button variant="secondary" onClick={handleButtonClick} disabled={isCheckIn}>
-          {statusInfo.icon}
-          {isCheckIn ? "今天已打過卡囉！" : statusInfo.buttonLabel}
-        </Button>
+        {isDraft ? (
+          <Button variant="secondary" onClick={onEdit}>
+            <PenLine className="size-4.5 text-logo-cyan" />
+            繼續編輯
+          </Button>
+        ) : (
+          <CheckInButton
+            variant="secondary"
+            className="w-full sm:max-w-[288px]"
+            taskTitle={title}
+            showIcon
+            onComplete={() => {}}
+          />
+        )}
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 overflow-hidden rounded-b-full">

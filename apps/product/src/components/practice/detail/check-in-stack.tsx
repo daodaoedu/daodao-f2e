@@ -6,11 +6,11 @@ import HexagonSvg from "@daodao/assets/images/dashboard/hexagon.svg";
 import SemiCircleSvg from "@daodao/assets/images/dashboard/semi-circle.svg";
 import SpeechBubbleSvg from "@daodao/assets/images/dashboard/speech-bubble.svg";
 import { Link } from "@daodao/i18n/navigation";
-import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { cn } from "@daodao/ui/lib/utils";
 import Matter from "matter-js";
 import * as decomp from "poly-decomp-es";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 
 const { Engine, World, Bodies, Vertices, Runner, Body } = Matter;
 Matter.Common.setDecomp(decomp);
@@ -86,10 +86,7 @@ const extractSvgGeometry = (svgElement: SVGSVGElement): SvgGeometry | null => {
  * @param samples 採樣點數量
  * @returns Matter.js 頂點陣列
  */
-const pathElementToVertices = (
-  pathElement: SVGPathElement,
-  samples: number
-): Matter.Vector[] => {
+const pathElementToVertices = (pathElement: SVGPathElement, samples: number): Matter.Vector[] => {
   const pathLength = pathElement.getTotalLength();
   const vertices: Matter.Vector[] = [];
 
@@ -112,9 +109,7 @@ const pathElementToVertices = (
 
     if (!current || !next) continue;
 
-    const distance = Math.sqrt(
-      (current.x - next.x) ** 2 + (current.y - next.y) ** 2
-    );
+    const distance = Math.sqrt((current.x - next.x) ** 2 + (current.y - next.y) ** 2);
 
     // 如果距離太近，跳過這個點
     if (distance > VERTEX_DISTANCE_THRESHOLD) {
@@ -242,11 +237,7 @@ const extractBodyPosition = (body: Matter.Body): BodyPosition => ({
 /**
  * 創建圓形物體
  */
-const createCircleBody = (
-  x: number,
-  y: number,
-  radius: number
-): Matter.Body => {
+const createCircleBody = (x: number, y: number, radius: number): Matter.Body => {
   return Bodies.circle(x, y, radius, {
     friction: PHYSICS_CONFIG.friction,
     frictionAir: PHYSICS_CONFIG.frictionAir,
@@ -259,11 +250,7 @@ const createCircleBody = (
 /**
  * 從 path 創建多邊形物體
  */
-const createPathBody = (
-  x: number,
-  y: number,
-  pathElement: SVGPathElement
-): Matter.Body | null => {
+const createPathBody = (x: number, y: number, pathElement: SVGPathElement): Matter.Body | null => {
   const vertices = pathElementToVertices(pathElement, PATH_SAMPLES);
   const sortedVertices = Vertices.clockwiseSort(vertices);
 
@@ -275,9 +262,7 @@ const createPathBody = (
     restitution: PHYSICS_CONFIG.restitution,
   });
 
-  return Array.isArray(bodiesFromVertices)
-    ? bodiesFromVertices[0]
-    : bodiesFromVertices;
+  return Array.isArray(bodiesFromVertices) ? bodiesFromVertices[0] : bodiesFromVertices;
 };
 
 const MOOD_MAP = Object.fromEntries(
@@ -285,6 +270,7 @@ const MOOD_MAP = Object.fromEntries(
 ) as Record<MoodType, React.FC<React.SVGProps<SVGSVGElement>>>;
 
 interface CheckInItem {
+  id: string;
   date: string;
   mood: MoodType;
   content: string;
@@ -292,64 +278,75 @@ interface CheckInItem {
 
 const defaultItems: CheckInItem[] = [
   {
+    id: "1",
     date: "2026.01.01",
     mood: "happy",
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第一次打卡",
   },
   {
+    id: "2",
     date: "2026.01.03",
     mood: "neutral",
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第二次打卡",
   },
   {
+    id: "3",
     date: "2026.01.04",
     mood: "bored",
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
   },
   {
+    id: "4",
     date: "2026.01.05",
     mood: "fine",
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
   },
   {
+    id: "5",
     date: "2026.01.09",
     mood: "frustrated",
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
   },
   {
+    id: "6",
     date: "2026.01.11",
     mood: "frustrated",
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
   },
   {
+    id: "7",
     date: "2026.01.13",
     mood: "frustrated",
     content:
       "今天我主要練習了我學到的一個新概念是新概念是Podcast裡面主持人提到過程中發生了一件有趣的事，就是過程中發生了一件有趣的第三次打卡",
-  }
+  },
 ];
 
 interface CheckInStackProps {
+  practiceId?: string;
   items?: CheckInItem[];
 }
 
-export const CheckInStack = ({ items = defaultItems }: CheckInStackProps) => {
+export const CheckInStack = ({ practiceId, items = defaultItems }: CheckInStackProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRefsRef = useRef<(SVGSVGElement | null)[]>([]);
   const bodiesRef = useRef<Matter.Body[]>([]);
   const [positions, setPositions] = useState<BodyPosition[]>([]);
   const [containerHeight, setContainerHeight] = useState(MIN_CONTAINER_HEIGHT);
   const animationFrameRef = useRef<number | undefined>(undefined);
-  const [svgGeometries, setSvgGeometries] = useState<(SvgGeometry | null)[]>(
-    []
-  );
+  const [svgGeometries, setSvgGeometries] = useState<(SvgGeometry | null)[]>([]);
   const count = items.length;
+
+  /**
+   * 獲取 SVG 組件配置
+   */
+  const getSvgConfig = (index: number) => SVG_CONFIGS[index % SVG_CONFIGS.length];
 
   const getSvgRef = useCallback(
     (index: number) => svgRefsRef.current[index % svgRefsRef.current.length],
@@ -388,10 +385,7 @@ export const CheckInStack = ({ items = defaultItems }: CheckInStackProps) => {
     }
 
     // 初始化容器高度
-    const initialHeight = Math.max(
-      MIN_CONTAINER_HEIGHT,
-      count * MIN_CONTAINER_HEIGHT
-    );
+    const initialHeight = Math.max(MIN_CONTAINER_HEIGHT, count * MIN_CONTAINER_HEIGHT);
     setContainerHeight(initialHeight);
 
     // 創建並配置物理引擎
@@ -475,9 +469,7 @@ export const CheckInStack = ({ items = defaultItems }: CheckInStackProps) => {
         const currentAngularVelocity = body.angularVelocity ?? 0;
         if (Math.abs(currentAngularVelocity) > MAX_ANGULAR_VELOCITY) {
           const clampedVelocity =
-            currentAngularVelocity > 0
-              ? MAX_ANGULAR_VELOCITY
-              : -MAX_ANGULAR_VELOCITY;
+            currentAngularVelocity > 0 ? MAX_ANGULAR_VELOCITY : -MAX_ANGULAR_VELOCITY;
           Body.setAngularVelocity(body, clampedVelocity);
         }
 
@@ -543,12 +535,6 @@ export const CheckInStack = ({ items = defaultItems }: CheckInStackProps) => {
   }, [count, svgGeometries, getSvgRef]);
 
   /**
-   * 獲取 SVG 組件配置
-   */
-  const getSvgConfig = (index: number) =>
-    SVG_CONFIGS[index % SVG_CONFIGS.length];
-
-  /**
    * 處理 SVG ref 的回調
    */
   const handleSvgRef = (index: number) => (el: SVGSVGElement | null) => {
@@ -563,8 +549,7 @@ export const CheckInStack = ({ items = defaultItems }: CheckInStackProps) => {
 
     if (geometry.isCircle && geometry.radius) {
       // 對於圓形，使用 circle() 函數
-      const radiusPercent =
-        (geometry.radius / Math.max(geometry.width, geometry.height)) * 100;
+      const radiusPercent = (geometry.radius / Math.max(geometry.width, geometry.height)) * 100;
       return `circle(${radiusPercent}% at 50% 50%)`;
     }
 
@@ -642,7 +627,7 @@ export const CheckInStack = ({ items = defaultItems }: CheckInStackProps) => {
         return (
           <Link
             key={id}
-            href="#"
+            href={`/practices/${practiceId}/check-ins/${item.id}`}
             className="absolute cursor-pointer hover:shadow-2xl"
             style={{
               width: w,
@@ -658,17 +643,14 @@ export const CheckInStack = ({ items = defaultItems }: CheckInStackProps) => {
             <div
               className={cn(
                 "absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2",
-                i % 5 === 3 && "pb-11",
+                i % 5 === 3 && "pb-11"
               )}
             >
               <Emoji className="size-6" />
               <div className="text-xs text-bg-dark">
-                #{i + 1}{' '}
-                {date}
+                #{i + 1} {date}
               </div>
-              <div className="max-w-40 text-bg-dark line-clamp-2">
-                {content}
-              </div>
+              <div className="max-w-40 text-bg-dark line-clamp-2">{content}</div>
             </div>
           </Link>
         );

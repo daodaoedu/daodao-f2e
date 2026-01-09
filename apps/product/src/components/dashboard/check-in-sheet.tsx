@@ -1,7 +1,6 @@
 "use client";
 
 import { useIsMobile } from "@daodao/shared";
-import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import {
   Sheet,
   SheetContent,
@@ -9,7 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@daodao/ui/components/animate-ui/components/radix/sheet";
-import { Button } from "@daodao/ui/components/button";
+import { Button, type ButtonProps } from "@daodao/ui/components/button";
 import { Checkbox } from "@daodao/ui/components/checkbox";
 import { FileUpload } from "@daodao/ui/components/file-upload";
 import {
@@ -24,9 +23,12 @@ import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, X } from "lucide-react";
+import { isSameDay, isValid, parse } from "date-fns";
+import { CalendarCheck, Check, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 
 interface CheckInSheetProps {
   open: boolean;
@@ -256,5 +258,156 @@ export const CheckInSheet = ({ open, onOpenChange, taskTitle, onComplete }: Chec
         </Form>
       </SheetContent>
     </Sheet>
+  );
+};
+
+export type CheckInStatus = "available" | "already-checked-in" | "practice-completed";
+
+export interface CheckInStatusOptions {
+  /**
+   * 實踐狀態
+   * - "active" | "paused" | "completed" | "archived"
+   */
+  practiceStatus?: string;
+  /**
+   * 最後打卡日期 (ISO 格式字串，例如 "2026-01-01")
+   */
+  lastCheckInDate?: string | null;
+}
+
+/**
+ * 檢查指定日期是否為今天
+ */
+const isDateToday = (dateString: string | null | undefined): boolean => {
+  if (!dateString) return false;
+
+  try {
+    const checkInDate = parse(dateString, "yyyy-MM-dd", new Date());
+
+    if (!isValid(checkInDate)) return false;
+
+    const today = new Date();
+    return isSameDay(checkInDate, today);
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * 檢查打卡狀態
+ */
+const useCheckInStatus = (options: CheckInStatusOptions) => {
+  const { practiceStatus, lastCheckInDate } = options;
+
+  return useMemo(() => {
+    // 檢查實踐是否已完成
+    const isPracticeCompleted = practiceStatus === "completed" || practiceStatus === "archived";
+
+    // 檢查今天是否已打卡
+    const isTodayCheckedIn = isDateToday(lastCheckInDate);
+
+    // 決定最終狀態（優先級：已完成 > 今天已打卡 > 可打卡）
+    const getStatus = (): CheckInStatus => {
+      if (isPracticeCompleted) return "practice-completed";
+      if (isTodayCheckedIn) return "already-checked-in";
+      return "available";
+    };
+    const status = getStatus();
+
+    // 取得按鈕文字
+    const getButtonLabel = (): string => {
+      switch (status) {
+        case "practice-completed":
+          return "實踐已完成";
+        case "already-checked-in":
+          return "今天已打過卡囉！";
+        case "available":
+          return "打卡";
+        default:
+          return "打卡";
+      }
+    };
+
+    // 是否可以點擊
+    const canCheckIn = status === "available";
+
+    return {
+      status,
+      isPracticeCompleted,
+      isTodayCheckedIn,
+      canCheckIn,
+      getButtonLabel,
+    };
+  }, [practiceStatus, lastCheckInDate]);
+};
+
+interface CheckInButtonProps
+  extends CheckInStatusOptions,
+    Omit<ButtonProps, "onClick" | "children"> {
+  /**
+   * 任務標題（用於顯示在 Sheet 中）
+   */
+  taskTitle: string;
+  /**
+   * 打卡完成回調函數
+   */
+  onComplete: (data: CheckInData) => void;
+  /**
+   * 是否顯示圖標
+   */
+  showIcon?: boolean;
+}
+
+/**
+ * 統一的打卡按鈕組件
+ * 根據打卡狀態自動顯示對應的文字和禁用狀態
+ * 點擊後會自動打開 CheckInSheet（除非提供了自訂 onClick）
+ */
+export const CheckInButton = ({
+  practiceStatus,
+  lastCheckInDate,
+  taskTitle,
+  onComplete,
+  variant = "secondary",
+  className,
+  showIcon,
+  ...props
+}: CheckInButtonProps) => {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const { canCheckIn, getButtonLabel } = useCheckInStatus({
+    practiceStatus,
+    lastCheckInDate,
+  });
+
+  const handleClick = () => {
+    if (!canCheckIn) return;
+    setIsSheetOpen(true);
+  };
+
+  const handleComplete = (data: CheckInData) => {
+    onComplete(data);
+    setIsSheetOpen(false);
+  };
+
+  return (
+    <>
+      <Button
+        variant={variant}
+        onClick={handleClick}
+        disabled={!canCheckIn}
+        className={className}
+        {...props}
+      >
+        {showIcon && <CalendarCheck className="size-4.5 text-logo-cyan" />}
+        {getButtonLabel()}
+      </Button>
+
+      <CheckInSheet
+        open={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+        taskTitle={taskTitle}
+        onComplete={handleComplete}
+      />
+    </>
   );
 };

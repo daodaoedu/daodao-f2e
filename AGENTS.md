@@ -64,6 +64,7 @@ userStorage.remove();
 ```
 
 **可用的 StorageEnum：**
+
 - `StorageEnum.Quiz` - sessionStorage，用於存儲使用者做島島測試的資料
 - `StorageEnum.UserInfo` - localStorage，用於存儲使用者資訊（非敏感資料）
 - `StorageEnum.Whitelist` - localStorage，用於存儲外連結受信任網站列表
@@ -72,6 +73,7 @@ userStorage.remove();
 **禁止直接使用 `localStorage` 或 `sessionStorage`**，請統一使用 `@daodao/shared` 提供的 storage 函數。
 
 **新增 storage key 的流程：**
+
 1. 在 `packages/shared/src/lib/storage.ts` 的 `StorageEnum` 中新增 key
 2. 在 `mapStorageKeyToStorageType` 中定義對應的 storage 類型（localStorage 或 sessionStorage）
 3. 添加適當的註解說明該 storage 的用途
@@ -124,6 +126,7 @@ const formattedDate = formatDate(date);
 ```
 
 **可用的 Hooks：**
+
 - `useScrollLock` - 鎖定頁面滾動
 - `useMediaQuery` - 響應式媒體查詢
 - `useQueryState` - URL query 參數狀態管理
@@ -131,6 +134,7 @@ const formattedDate = formatDate(date);
 - `useAssetsLoader` - 資源載入器
 
 **可用的工具函數：**
+
 - `formatDate` - 日期格式化
 - `shareContent` - 分享內容功能
 - `captureElementAsImage` - 將元素轉換為圖片
@@ -163,12 +167,14 @@ const response = await client.GET("/api/users/{id}", {
 ```
 
 **可用的 API Hooks：**
+
 - `useQuery` - 查詢資料（GET 請求）
 - `useMutate` - 變更資料（POST, PUT, DELETE 等請求）
 - `useInfinite` - 無限滾動查詢
 - `useImmutable` - 不可變資料查詢
 
 **可用的 API Client：**
+
 - `client` - 用於 Server Component 或非 React 環境的 API 客戶端
 
 **禁止直接使用 `fetch` 或 `axios`**，請統一使用 `@daodao/api` 提供的 API 客戶端和 hooks。
@@ -199,6 +205,7 @@ if (isValid(date)) {
 ```
 
 **常用的 date-fns 函數：**
+
 - `format` - 格式化日期
 - `parse` - 解析日期字串
 - `addDays`, `addWeeks`, `addMonths` - 日期計算
@@ -206,3 +213,118 @@ if (isValid(date)) {
 - `differenceInDays`, `differenceInWeeks` - 計算日期差異
 
 **禁止直接使用原生 `Date` 物件的方法**（如 `toLocaleDateString()`, `setDate()`, `getDate()` 等）來處理日期格式化和計算，請統一使用 `date-fns` 提供的函數。
+
+### Code Style Guidelines
+
+#### 禁止使用 IIFE (Immediately Invoked Function Expression)
+
+- 避免使用立即執行函數表達式 `(() => { ... })()` 的寫法
+- 優先使用明確的變數宣告和條件判斷，讓代碼更易讀易維護
+
+```typescript
+// ❌ 錯誤：使用 IIFE
+const result = (() => {
+  if (!value) return false;
+  try {
+    return processValue(value);
+  } catch {
+    return false;
+  }
+})();
+
+// ✅ 正確：使用明確的變數宣告
+let result = false;
+if (value) {
+  try {
+    result = processValue(value);
+  } catch {
+    // 處理錯誤，保持預設值
+  }
+}
+```
+
+**在 `useMemo` 或 `useEffect` 中也要避免使用 IIFE**，應該將邏輯拆分成清晰的步驟：
+
+```typescript
+// ❌ 錯誤：在 useMemo 中使用 IIFE
+const value = useMemo(() => {
+  const computed = (() => {
+    // 複雜計算
+    return result;
+  })();
+  return computed;
+}, [deps]);
+
+// ✅ 正確：直接計算
+const value = useMemo(() => {
+  // 直接進行計算
+  let result = defaultValue;
+  // ... 計算邏輯
+  return result;
+}, [deps]);
+```
+
+#### 禁止使用嵌套三元運算子
+
+- 避免使用嵌套的三元運算子（ternary operator），優先使用 `if-else` 語句或早期返回（early return）
+- 嵌套三元運算子會降低代碼可讀性，增加維護難度
+
+```typescript
+// ❌ 錯誤：使用嵌套三元運算子
+const status = isActive
+  ? isPremium
+    ? "premium-active"
+    : "active"
+  : isPremium
+    ? "premium-inactive"
+    : "inactive";
+
+// ✅ 正確：使用 if-else 語句
+let status: string;
+if (isActive) {
+  status = isPremium ? "premium-active" : "active";
+} else {
+  status = isPremium ? "premium-inactive" : "inactive";
+}
+
+// ✅ 正確：使用早期返回（適用於函數中）
+const getStatus = (isActive: boolean, isPremium: boolean): string => {
+  if (isActive) {
+    return isPremium ? "premium-active" : "active";
+  }
+  return isPremium ? "premium-inactive" : "inactive";
+};
+```
+
+**在 JSX 中也要避免使用嵌套三元運算子**，優先使用條件渲染或提取成函數：
+
+```typescript
+// ❌ 錯誤：在 JSX 中使用嵌套三元運算子
+<div>
+  {isLoading
+    ? "載入中..."
+    : hasError
+      ? "發生錯誤"
+      : data
+        ? data.map(...)
+        : "無資料"}
+</div>
+
+// ✅ 正確：使用條件渲染
+<div>
+  {isLoading && "載入中..."}
+  {!isLoading && hasError && "發生錯誤"}
+  {!isLoading && !hasError && data && data.map(...)}
+  {!isLoading && !hasError && !data && "無資料"}
+</div>
+
+// ✅ 正確：提取成函數
+const renderContent = () => {
+  if (isLoading) return "載入中...";
+  if (hasError) return "發生錯誤";
+  if (!data) return "無資料";
+  return data.map(...);
+};
+
+<div>{renderContent()}</div>
+```

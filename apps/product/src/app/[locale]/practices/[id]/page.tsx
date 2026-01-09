@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "@daodao/i18n/navigation";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import {
   CheckInRecordCard,
@@ -53,6 +54,9 @@ const practice: ManualPracticeFormValues & {
 };
 
 export default function PracticeDetailPage() {
+  const params = useParams();
+  const practiceId = params.id as string;
+
   // TODO: 取得上一個和下一個實踐的 ID（需要從 API 取得實踐列表）
   const handlePrevious = () => {
     // router.push(`/practices/${previousId}`);
@@ -109,7 +113,7 @@ export default function PracticeDetailPage() {
 
       {/* CheckIn Stack */}
       <div className="max-w-[448px] mx-auto">
-        <CheckInStack />
+        <CheckInStack practiceId={practiceId} />
       </div>
     </div>
   );

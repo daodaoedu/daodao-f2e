@@ -1,10 +1,10 @@
 "use client";
 
-import { getStatusBadgeConfig } from "@/constants/task-status";
 import { ArrowLeftOutlineSvg, ArrowRightOutlineSvg } from "@daodao/assets";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
+import { getStatusConfig } from "@/constants/task-status";
 
 interface PracticeDetailTitleProps {
   title: string;
@@ -23,7 +23,7 @@ export const PracticeDetailTitle = ({
 }: PracticeDetailTitleProps) => {
   // TODO: 從 API 取得實踐的 status
   const status = "in-progress";
-  const statusInfo = getStatusBadgeConfig(status);
+  const statusInfo = getStatusConfig(status);
 
   return (
     <div className="flex items-center gap-2 mb-6 h-[84px]">
@@ -33,10 +33,7 @@ export const PracticeDetailTitle = ({
         onClick={onPrevious}
         disabled={!hasPrevious}
         aria-label="上一個實踐"
-        className={cn(
-          "shadow-sm",
-          !hasPrevious && "opacity-50 cursor-not-allowed"
-        )}
+        className={cn("shadow-sm", !hasPrevious && "opacity-50 cursor-not-allowed")}
         animation="none"
       >
         <ArrowLeftOutlineSvg className="size-6" />

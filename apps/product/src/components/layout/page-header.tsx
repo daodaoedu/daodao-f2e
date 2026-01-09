@@ -2,6 +2,7 @@
 
 import { ArrowLeftOutlineSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
+import { useIsDesktop, useIsMobile } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { X } from "lucide-react";
@@ -21,6 +22,8 @@ type PageHeaderProps = {
   closeTo?: string;
   /** 樣式變體：'default' 為預設樣式，'light' 為白色文字樣式 */
   variant?: "default" | "light";
+  /** 在指定設備類型上停用 light 樣式，即使 variant 為 'light' 也不會套用 */
+  disableLightOn?: "mobile" | "desktop";
   /** 自訂 className */
   className?: string;
 };
@@ -33,9 +36,12 @@ export const PageHeader = ({
   onClose,
   closeTo,
   variant = "default",
+  disableLightOn,
   className,
 }: PageHeaderProps) => {
   const router = useRouter();
+  const isMobile = useIsMobile();
+  const isDesktop = useIsDesktop();
 
   const handleBack = () => {
     if (onBack) {
@@ -55,12 +61,16 @@ export const PageHeader = ({
     }
   };
 
-  const isLight = variant === "light";
+  // 判斷是否應該停用 light 樣式
+  const shouldDisableLight =
+    (disableLightOn === "mobile" && isMobile) || (disableLightOn === "desktop" && isDesktop);
+
+  const isLight = variant === "light" && !shouldDisableLight;
 
   return (
     <div
       className={cn(
-        "max-w-[600px] mx-auto grid grid-cols-3 items-center px-5 py-4 md:pt-16",
+        "relative max-w-[600px] mx-auto grid grid-cols-3 items-center px-5 py-4 md:pt-16",
         className
       )}
     >
@@ -71,10 +81,7 @@ export const PageHeader = ({
             variant="ghost"
             onClick={handleBack}
             animation="none"
-            className={cn(
-              "px-0 font-normal",
-              isLight && "text-white hover:text-white"
-            )}
+            className={cn("px-0 font-normal", isLight && "text-white hover:text-white")}
           >
             <ArrowLeftOutlineSvg className="size-6" />
             {backLabel}
@@ -85,12 +92,7 @@ export const PageHeader = ({
       {/* Center Content */}
       <div className="flex items-center justify-center">
         {title && (
-          <h1
-            className={cn(
-              "text-lg font-medium",
-              isLight ? "text-white" : "text-bg-dark"
-            )}
-          >
+          <h1 className={cn("text-lg font-medium", isLight ? "text-white" : "text-bg-dark")}>
             {title}
           </h1>
         )}
@@ -107,7 +109,7 @@ export const PageHeader = ({
           className={cn(
             isLight
               ? "text-white hover:text-white bg-very-light-gray/50"
-              : "text-light-gray"
+              : "text-light-gray bg-very-light-gray/50"
           )}
         >
           <X className={cn("size-6", isLight && "size-5")} />

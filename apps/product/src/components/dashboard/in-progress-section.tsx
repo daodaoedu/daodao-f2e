@@ -25,15 +25,13 @@ export interface InProgressTask {
   isUnreadMessages: boolean;
   theme: string;
   status: TaskStatus;
-  isCheckIn: boolean;
 }
 
 interface InProgressSectionProps {
   tasks: InProgressTask[];
-  onCheckIn: (taskTitle: string) => void;
 }
 
-export const InProgressSection = ({ tasks, onCheckIn }: InProgressSectionProps) => {
+export const InProgressSection = ({ tasks }: InProgressSectionProps) => {
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
 
   const filteredTasks =
@@ -100,9 +98,7 @@ export const InProgressSection = ({ tasks, onCheckIn }: InProgressSectionProps) 
             messagesCount={task.messagesCount}
             theme={task.theme}
             isUnreadMessages={task.isUnreadMessages}
-            isCheckIn={task.isCheckIn}
             status={task.status}
-            onCheckIn={() => onCheckIn(task.title)}
           />
         ))}
       </div>

@@ -1,7 +1,7 @@
 export { AddTaskFAB } from "./add-task-fab";
 export { Banner } from "./banner";
-export type { CheckInData } from "./check-in-sheet";
-export { CheckInSheet } from "./check-in-sheet";
+export type { CheckInData, CheckInStatus, CheckInStatusOptions } from "./check-in-sheet";
+export { CheckInButton } from "./check-in-sheet";
 export { CompletedSection } from "./completed-section";
 export { CompletedTaskCard } from "./completed-task-card";
 export { DashboardHeader } from "./dashboard-header";

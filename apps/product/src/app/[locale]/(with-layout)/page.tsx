@@ -3,12 +3,9 @@
 import { MessagesSvg } from "@daodao/assets";
 import { useRouter } from "@daodao/i18n/navigation";
 import { CheckCircle2 } from "lucide-react";
-import { useState } from "react";
 import {
   AddTaskFAB,
   Banner,
-  type CheckInData,
-  CheckInSheet,
   CompletedSection,
   DashboardHeader,
   InProgressSection,
@@ -44,7 +41,6 @@ export default function HomePage() {
       progress: "2",
       messagesCount: 17,
       isUnreadMessages: true,
-      isCheckIn: false,
       theme: "yellow",
       status: "draft",
     },
@@ -57,7 +53,6 @@ export default function HomePage() {
       progress: "2",
       messagesCount: 2,
       isUnreadMessages: false,
-      isCheckIn: false,
       theme: "blue",
       status: "in-progress",
     },
@@ -69,7 +64,6 @@ export default function HomePage() {
       progress: "7/14",
       messagesCount: 3,
       isUnreadMessages: true,
-      isCheckIn: false,
       theme: "pink",
       status: "not-started",
     },
@@ -81,7 +75,6 @@ export default function HomePage() {
       progress: "10/14",
       messagesCount: 7,
       isUnreadMessages: true,
-      isCheckIn: true,
       theme: "green",
       status: "in-progress",
     },
@@ -117,20 +110,6 @@ export default function HomePage() {
     },
   ];
 
-  const [isCheckInSheetOpen, setIsCheckInSheetOpen] = useState(false);
-  const [currentTaskTitle, setCurrentTaskTitle] = useState("");
-
-  const handleCheckIn = (taskTitle: string) => {
-    setCurrentTaskTitle(taskTitle);
-    setIsCheckInSheetOpen(true);
-  };
-
-  const handleCheckInComplete = (data: CheckInData) => {
-    // TODO: 處理打卡資料
-    console.log("打卡資料:", data);
-    setIsCheckInSheetOpen(false);
-  };
-
   const handleAddTask = () => {
     router.push("/practices/create");
   };
@@ -143,18 +122,11 @@ export default function HomePage() {
       {/* Main Content */}
       <main className="pb-[72px]">
         <DashboardHeader stats={stats} />
-        <InProgressSection tasks={inProgressTasks} onCheckIn={handleCheckIn} />
+        <InProgressSection tasks={inProgressTasks} />
         <CompletedSection tasks={completedTasks} />
       </main>
 
       <AddTaskFAB onAddTask={handleAddTask} />
-
-      <CheckInSheet
-        open={isCheckInSheetOpen}
-        onOpenChange={setIsCheckInSheetOpen}
-        taskTitle={currentTaskTitle}
-        onComplete={handleCheckInComplete}
-      />
     </div>
   );
 }

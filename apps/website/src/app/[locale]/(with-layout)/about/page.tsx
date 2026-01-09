@@ -16,9 +16,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function AboutPage({
-  params,
-}: PageProps<"/[locale]/about">) {
+export default async function AboutPage({ params }: PageProps<"/[locale]/about">) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "about" });
 

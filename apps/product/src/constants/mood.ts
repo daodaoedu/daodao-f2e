@@ -23,4 +23,3 @@ export const MOOD_OPTIONS: MoodOption[] = [
   { id: "fine", label: "還不錯", emoji: FineSvg },
   { id: "happy", label: "開心", emoji: HappySvg },
 ];
-
