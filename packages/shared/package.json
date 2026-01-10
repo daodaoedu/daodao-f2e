@@ -9,7 +9,8 @@
     ".": "./src/index.ts",
     "./lib/*": "./src/lib/*.ts",
     "./hooks/*": "./src/hooks/*.ts",
-    "./constants/*": "./src/constants/*.ts"
+    "./constants/*": "./src/constants/*.ts",
+    "./providers/*": "./src/providers/*.tsx"
   },
   "scripts": {
     "build": "tsc",

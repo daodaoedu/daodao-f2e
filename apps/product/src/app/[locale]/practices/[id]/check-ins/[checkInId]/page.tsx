@@ -4,10 +4,16 @@ import { Deco4Svg } from "@daodao/assets";
 import { useParams } from "@daodao/i18n/navigation";
 import { addDays, format, isValid, parse } from "date-fns";
 import { useMemo } from "react";
-import { CheckInButton, type CheckInData as CheckInSheetData } from "@/components/dashboard";
+import {
+  CheckInButton,
+  type CheckInData as CheckInSheetData,
+} from "@/components/dashboard";
 import { PageHeader } from "@/components/layout";
-import { type CheckInData, CheckInDetail } from "@/components/practice/detail";
-import { CheckInDateSelector } from "@/components/practice/detail/check-in-date-selector";
+import {
+  CheckInDateSelector,
+  type CheckInData,
+  CheckInDetail,
+} from "@/components/practice/detail";
 
 // 模擬資料 - 之後替換為實際 API 資料
 const mockCheckIns: Record<string, CheckInData> = {
@@ -20,8 +26,8 @@ const mockCheckIns: Record<string, CheckInData> = {
     tags: ["新概念", "有趣"],
     images: [
       "https://placehold.co/600x400",
-      "https://placehold.co/600x400",
-      "https://placehold.co/600x400",
+      "https://placehold.co/600x399",
+      "https://placehold.co/600x398",
     ],
     practiceTitle: "學習 Vibe coding",
   },
@@ -63,7 +69,10 @@ const generateFullDateRange = (
 
   const dates: Array<{ id: string; date: string; hasCheckIn: boolean }> = [];
   const checkInDateMap = new Map(
-    Object.values(mockCheckIns).map((checkIn) => [checkIn.date.replace(/\./g, "-"), checkIn.id])
+    Object.values(mockCheckIns).map((checkIn) => [
+      checkIn.date.replace(/\./g, "-"),
+      checkIn.id,
+    ])
   );
 
   for (let i = 0; i < durationDays; i++) {
@@ -89,7 +98,8 @@ export default function CheckInDetailPage() {
 
   // 生成完整的日期列表（包含空缺的日期）
   const fullCheckInDates = useMemo(
-    () => generateFullDateRange(mockPractice.startDate, mockPractice.durationDays),
+    () =>
+      generateFullDateRange(mockPractice.startDate, mockPractice.durationDays),
     []
   );
 
@@ -104,7 +114,11 @@ export default function CheckInDetailPage() {
 
   return (
     <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-logo-cyan">
-      <Deco4Svg className="absolute top-0 right-0 -z-10" width={270} height={484} />
+      <Deco4Svg
+        className="absolute top-0 right-0 -z-10"
+        width={270}
+        height={484}
+      />
 
       {/* 日期選擇器 */}
       <CheckInDateSelector
@@ -123,7 +137,7 @@ export default function CheckInDetailPage() {
         disableLightOn="mobile"
       />
 
-      <main className="max-w-[448px] mx-auto pt-[88px] px-5 pb-40">
+      <main className="max-w-[448px] mx-auto pt-[88px] md:pt-3 px-5 pb-40">
         <CheckInDetail checkInData={checkInData} />
       </main>
 

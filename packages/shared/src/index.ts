@@ -13,5 +13,7 @@ export * from "./hooks/use-scroll-lock";
 export * from "./hooks/use-scroll-visibility";
 export * from "./lib/capture-element-as-image";
 export * from "./lib/date";
+export * from "./lib/device-detection";
 export * from "./lib/share";
 export * from "./lib/storage";
+export * from "./providers/device-provider";

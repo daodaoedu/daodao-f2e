@@ -18,7 +18,7 @@ interface Step1Props {
 }
 
 export const Step1 = ({ form }: Step1Props) => {
-  const actionDescription = form.watch("actionDescription");
+  const descriptionLength = form.watch("actionDescription")?.length || 0;
 
   return (
     <div className="space-y-4">
@@ -54,7 +54,7 @@ export const Step1 = ({ form }: Step1Props) => {
                 實踐行動
               </FormLabel>
               <FormDescription className="text-sm text-light-gray">
-                {actionDescription?.length || 0}/50
+                {descriptionLength}/50
               </FormDescription>
             </div>
             <FormControl>

@@ -38,7 +38,7 @@ type SheetOverlayProps = SheetOverlayPrimitiveProps;
 
 function SheetOverlay({ className, ...props }: SheetOverlayProps) {
   return (
-    <SheetOverlayPrimitive className={cn("fixed inset-0 z-50 bg-black/50", className)} {...props} />
+    <SheetOverlayPrimitive className={cn("fixed inset-0 z-50 bg-[#0D3036B2]", className)} {...props} />
   );
 }
 

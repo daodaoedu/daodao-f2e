@@ -1,5 +1,6 @@
 "use client";
 
+import { useIsMobile } from "@daodao/shared";
 import { CallToActionSection } from "./call-to-action-section";
 import { FeatureGrid } from "./feature-grid";
 import { FunctionCarousel } from "./function-carousel";
@@ -14,6 +15,8 @@ import { TypewriterBubble } from "./typewriter-bubble";
 import { VideoSection } from "./video-section";
 
 export function LandingPage() {
+  const isMobile = useIsMobile();
+  console.log(isMobile);
   return (
     <Loader>
       <KeyVision />

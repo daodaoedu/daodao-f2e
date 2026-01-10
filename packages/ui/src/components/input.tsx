@@ -1,5 +1,6 @@
 "use client";
 
+import { useCompositionState } from "@daodao/shared";
 import * as React from "react";
 import { cn } from "../lib/utils";
 
@@ -8,7 +9,39 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, invalid, ...props }, ref) => {
+  ({ className, type, invalid, onKeyDown, onCompositionStart, onCompositionEnd, ...props }, ref) => {
+    const { isComposing, compositionProps } = useCompositionState();
+
+    const handleKeyDown = React.useCallback(
+      (e: React.KeyboardEvent<HTMLInputElement>) => {
+        // 如果正在輸入法組合狀態且按下 Enter，阻止預設行為和事件冒泡
+        if (isComposing && e.key === "Enter") {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+
+        onKeyDown?.(e);
+      },
+      [isComposing, onKeyDown]
+    );
+
+    const handleCompositionStart = React.useCallback(
+      (e: React.CompositionEvent<HTMLInputElement>) => {
+        compositionProps.onCompositionStart();
+        onCompositionStart?.(e);
+      },
+      [compositionProps.onCompositionStart, onCompositionStart]
+    );
+
+    const handleCompositionEnd = React.useCallback(
+      (e: React.CompositionEvent<HTMLInputElement>) => {
+        compositionProps.onCompositionEnd();
+        onCompositionEnd?.(e);
+      },
+      [compositionProps.onCompositionEnd, onCompositionEnd]
+    );
+
     return (
       <input
         type={type}
@@ -22,6 +55,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         aria-invalid={invalid}
         ref={ref}
+        onKeyDown={handleKeyDown}
+        onCompositionStart={handleCompositionStart}
+        onCompositionEnd={handleCompositionEnd}
         {...props}
       />
     );

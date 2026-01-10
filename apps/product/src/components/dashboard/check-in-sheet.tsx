@@ -14,18 +14,20 @@ import { FileUpload } from "@daodao/ui/components/file-upload";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@daodao/ui/components/form";
 import { RadioGroup, RadioGroupItem } from "@daodao/ui/components/radio-group";
+import { Input } from "@daodao/ui/components/input";
 import { Textarea } from "@daodao/ui/components/textarea";
 import { cn } from "@daodao/ui/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isSameDay, isValid, parse } from "date-fns";
-import { CalendarCheck, Check, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { CalendarCheck, Check, Plus, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
@@ -40,52 +42,107 @@ interface CheckInSheetProps {
 export interface CheckInData {
   mood: MoodType | null;
   tags: string[];
-  thoughts: string;
+  description: string;
   media: File[];
 }
 
-const AVAILABLE_TAGS = ["練習", "新概念", "實作", "有趣", "創造", "困難", "刻意練習"] as const;
+const AVAILABLE_TAGS = [
+  "練習",
+  "新概念",
+  "實作",
+  "有趣",
+  "創造",
+  "困難",
+  "刻意練習",
+] as const;
 
 // Zod schema for form validation
 const checkInFormSchema = z.object({
-  mood: z.enum(MOOD_OPTIONS.map((option) => option.id) as [MoodType, ...MoodType[]]).nullable(),
-  tags: z.array(z.string()).default([]),
-  thoughts: z.string().default(""),
+  mood: z
+    .enum(
+      MOOD_OPTIONS.map((option) => option.id) as [MoodType, ...MoodType[]]
+    )
+    .nullable()
+    .refine((val) => val !== null, {
+      message: "請選擇心情",
+    }),
+  tags: z.array(z.string()).min(1, "請至少選擇一個標籤"),
+  description: z.string().min(1, "請輸入描述").max(300, "最多300字"),
   media: z.array(z.instanceof(File)).default([]),
 });
 
-type CheckInFormValues = z.infer<typeof checkInFormSchema>;
+type CheckInFormValues = {
+  mood: MoodType | null;
+  tags: string[];
+  description: string;
+  media: File[];
+};
 
-export const CheckInSheet = ({ open, onOpenChange, taskTitle, onComplete }: CheckInSheetProps) => {
+export const CheckInSheet = ({
+  open,
+  onOpenChange,
+  taskTitle,
+  onComplete,
+}: CheckInSheetProps) => {
   const isMobile = useIsMobile();
+  const [customTagInput, setCustomTagInput] = useState("");
 
   const form = useForm<CheckInFormValues>({
     resolver: zodResolver(checkInFormSchema),
     defaultValues: {
       mood: null,
       tags: [],
-      thoughts: "",
+      description: "",
       media: [],
     },
   });
 
+  const descriptionLength = form.watch("description")?.length || 0;
+  const mediaLength = form.watch("media")?.length || 0;
+  const tags = form.watch("tags");
+
+  const availableTags = useMemo(
+    () => Array.from(new Set([
+      ...AVAILABLE_TAGS,
+      ...(tags || []),
+    ])),
+    [tags]
+  );
+
+  // 當 Sheet 關閉時清空輸入框
+  useEffect(() => {
+    if (!open) {
+      setCustomTagInput("");
+    }
+  }, [open]);
+
   const onSubmit = (values: CheckInFormValues) => {
+    // Zod 驗證已確保 mood 不是 null
+    if (values.mood === null) {
+      return;
+    }
     onComplete({
       mood: values.mood,
       tags: values.tags,
-      thoughts: values.thoughts,
+      description: values.description,
       media: values.media,
     });
     form.reset();
+    setCustomTagInput("");
     onOpenChange(false);
   };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side={isMobile ? "bottom" : "right"} className="overflow-y-auto">
+      <SheetContent
+        side={isMobile ? "bottom" : "right"}
+        className="overflow-y-auto"
+      >
         <SheetHeader>
           <SheetTitle>打卡</SheetTitle>
-          <SheetDescription className="sr-only">記錄你的學習進度和心情</SheetDescription>
+          <SheetDescription className="sr-only">
+            記錄你的學習進度和心情
+          </SheetDescription>
         </SheetHeader>
 
         <Form {...form}>
@@ -130,7 +187,9 @@ export const CheckInSheet = ({ open, onOpenChange, taskTitle, onComplete }: Chec
                               aria-label={label}
                             />
                             <Emoji className="size-12" />
-                            <span className="text-xs text-gray-700">{label}</span>
+                            <span className="text-xs text-gray-700">
+                              {label}
+                            </span>
                           </label>
                         );
                       })}
@@ -143,83 +202,145 @@ export const CheckInSheet = ({ open, onOpenChange, taskTitle, onComplete }: Chec
 
             {/* Thought Sharing */}
             <div className="mb-8">
-              <h3 className="text-base font-medium mb-3 text-text-dark">想法分享</h3>
+              <h3 className="text-base font-medium mb-3 text-text-dark">
+                想法分享
+              </h3>
               <FormField
                 control={form.control}
                 name="tags"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <div className="flex flex-wrap gap-x-2 gap-y-3 mb-3">
-                        {AVAILABLE_TAGS.map((tag) => {
-                          const isSelected = field.value?.includes(tag);
-                          const checkboxId = `tag-${tag}`;
-                          const handleToggle = () => {
-                            const currentTags = field.value || [];
-                            const newTags = isSelected
-                              ? currentTags.filter((t: string) => t !== tag)
-                              : [...currentTags, tag];
-                            field.onChange(newTags);
-                          };
-                          return (
-                            <div key={tag} className="flex items-center">
-                              <Checkbox
-                                id={checkboxId}
-                                checked={isSelected}
-                                onCheckedChange={(checked: boolean) => {
-                                  const currentTags = field.value || [];
-                                  const newTags = checked
-                                    ? [...currentTags, tag]
-                                    : currentTags.filter((t: string) => t !== tag);
-                                  field.onChange(newTags);
-                                }}
-                                className="sr-only"
-                              />
-                              <label
-                                htmlFor={checkboxId}
-                                className={cn(
-                                  "px-5 py-1.5 text-sm rounded-full border transition-colors flex items-center gap-1 cursor-pointer",
-                                  isSelected
-                                    ? "bg-logo-cyan text-white border-logo-cyan"
-                                    : "bg-white text-gray-700 border-logo-cyan hover:bg-logo-cyan/10"
-                                )}
-                                onClick={handleToggle}
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter" || e.key === " ") {
-                                    e.preventDefault();
-                                    handleToggle();
-                                  }
-                                }}
-                              >
-                                <span>{tag}</span>
-                                {isSelected && (
-                                  <X
-                                    className="size-4"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      const currentTags = field.value || [];
-                                      field.onChange(currentTags.filter((t: string) => t !== tag));
-                                    }}
+                render={({ field }) => {
+                  const handleAddCustomTag = () => {
+                    const trimmedTag = customTagInput.trim();
+                    if (!trimmedTag) return;
+
+                    const currentTags = field.value || [];
+                    const tagExists = currentTags.includes(trimmedTag);
+
+                    if (!tagExists) {
+                      field.onChange([...currentTags, trimmedTag]);
+                    }
+                    setCustomTagInput("");
+                  };
+
+                  const handleInputKeyDown = (
+                    e: React.KeyboardEvent<HTMLInputElement>
+                  ) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddCustomTag();
+                    }
+                  };
+
+                  return (
+                    <FormItem className="mb-3">
+                      <FormControl>
+                        <div>
+                          <div className="flex flex-wrap gap-x-2 gap-y-3 mb-3">
+                            {availableTags.map((tag) => {
+                              const isSelected = field.value?.includes(tag);
+                              const checkboxId = `tag-${tag}`;
+                              const handleToggle = () => {
+                                const currentTags = field.value || [];
+                                const newTags = isSelected
+                                  ? currentTags.filter((t: string) => t !== tag)
+                                  : [...currentTags, tag];
+                                field.onChange(newTags);
+                              };
+                              return (
+                                <div key={tag} className="flex items-center">
+                                  <Checkbox
+                                    id={checkboxId}
+                                    checked={isSelected}
+                                    className="sr-only"
                                   />
-                                )}
-                              </label>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                                  <label
+                                    htmlFor={checkboxId}
+                                    className={cn(
+                                      "px-5 py-1.5 text-sm rounded-full border transition-colors flex items-center gap-1 cursor-pointer",
+                                      isSelected
+                                        ? "bg-logo-gray text-white border-logo-gray"
+                                        : "bg-white text-gray-700 border-logo-cyan hover:bg-logo-cyan/10"
+                                    )}
+                                    onClick={handleToggle}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter" || e.key === " ") {
+                                        e.preventDefault();
+                                        handleToggle();
+                                      }
+                                    }}
+                                  >
+                                    <span>{tag}</span>
+                                    {isSelected && (
+                                      <X
+                                        className="size-4"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          const currentTags = field.value || [];
+                                          field.onChange(
+                                            currentTags.filter(
+                                              (t: string) => t !== tag
+                                            )
+                                          );
+                                        }}
+                                      />
+                                    )}
+                                  </label>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          {/* 自訂標籤輸入框 */}
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="text"
+                              placeholder="輸入自訂標籤"
+                              value={customTagInput}
+                              onChange={(e) =>
+                                setCustomTagInput(e.target.value)
+                              }
+                              onKeyDown={handleInputKeyDown}
+                              className="flex-1"
+                              aria-label="輸入自訂標籤"
+                            />
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="blue"
+                              onClick={handleAddCustomTag}
+                              disabled={!customTagInput.trim()}
+                              aria-label="加入標籤"
+                              className="h-8"
+                            >
+                              <Plus className="size-4" />
+                              加入
+                            </Button>
+                          </div>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
               <FormField
                 control={form.control}
-                name="thoughts"
+                name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="sr-only">想法分享</FormLabel>
+                    <div className="mb-1.5 flex items-center justify-between gap-2">
+                      <FormLabel className="text-sm text-text-dark font-normal">
+                        詳細描述
+                      </FormLabel>
+
+                      <FormDescription className="text-sm text-light-gray">
+                        {descriptionLength}/300
+                      </FormDescription>
+                    </div>
                     <FormControl>
-                      <Textarea {...field} placeholder="分享一下你的心得,或是遇到的困難" />
+                      <Textarea
+                        {...field}
+                        placeholder="簡單紀錄今天的發現，或卡關的地方"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -233,7 +354,15 @@ export const CheckInSheet = ({ open, onOpenChange, taskTitle, onComplete }: Chec
               name="media"
               render={({ field }) => (
                 <FormItem className="mb-16 md:mb-8">
-                  <FormLabel className="block text-base font-medium mb-3">上傳照片或影片</FormLabel>
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <FormLabel className="block text-base font-medium text-text-dark">
+                      上傳照片或影片
+                    </FormLabel>
+
+                    <FormDescription className="text-sm text-light-gray">
+                      已上傳 {mediaLength}/3 張
+                    </FormDescription>
+                  </div>
                   <FormControl>
                     <FileUpload
                       files={field.value}
@@ -249,7 +378,7 @@ export const CheckInSheet = ({ open, onOpenChange, taskTitle, onComplete }: Chec
 
             {/* Complete Button */}
             <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">
-              <Button type="submit" className="w-full">
+              <Button type="submit" variant="orange" className="w-full">
                 <Check className="size-4.5" />
                 完成打卡
               </Button>
@@ -261,7 +390,10 @@ export const CheckInSheet = ({ open, onOpenChange, taskTitle, onComplete }: Chec
   );
 };
 
-export type CheckInStatus = "available" | "already-checked-in" | "practice-completed";
+export type CheckInStatus =
+  | "available"
+  | "already-checked-in"
+  | "practice-completed";
 
 export interface CheckInStatusOptions {
   /**
@@ -301,7 +433,8 @@ const useCheckInStatus = (options: CheckInStatusOptions) => {
 
   return useMemo(() => {
     // 檢查實踐是否已完成
-    const isPracticeCompleted = practiceStatus === "completed" || practiceStatus === "archived";
+    const isPracticeCompleted =
+      practiceStatus === "completed" || practiceStatus === "archived";
 
     // 檢查今天是否已打卡
     const isTodayCheckedIn = isDateToday(lastCheckInDate);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useDeviceSafe } from "../providers/device-provider";
 
 /**
  * Breakpoint 定義
@@ -58,17 +59,36 @@ export function useMediaQuery(query: BreakpointKey | string): boolean {
 
 /**
  * 統一的 breakpoint 狀態管理 hook
- * 避免在多個 hook 中重複監聽相同的 media query
- *
- * @returns 包含所有 breakpoint 狀態的物件
+ * 如果 Device Provider 存在，會使用 Provider 提供的初始值避免閃爍
  */
 function useBreakpoints() {
-  const [breakpointState, setBreakpointState] = useState({
-    sm: false,
-    md: false,
-    lg: false,
-    xl: false,
-  });
+  const device = useDeviceSafe();
+  const initialDevice = device
+    ? {
+        isMobile: device.isMobile,
+        isDesktop: device.isDesktop,
+      }
+    : null;
+
+  const getInitialState = () => {
+    if (initialDevice) {
+      return {
+        sm: !initialDevice.isMobile,
+        md: !initialDevice.isMobile,
+        lg: initialDevice.isDesktop,
+        xl: initialDevice.isDesktop,
+      };
+    }
+
+    return {
+      sm: false,
+      md: false,
+      lg: false,
+      xl: false,
+    };
+  };
+
+  const [breakpointState, setBreakpointState] = useState(getInitialState);
 
   useEffect(() => {
     const queries = {
@@ -87,10 +107,8 @@ function useBreakpoints() {
       });
     };
 
-    // 初始化狀態
     updateState();
 
-    // 監聽所有 breakpoint 變化
     Object.values(queries).forEach((query) => {
       query.addEventListener("change", updateState);
     });
@@ -106,16 +124,7 @@ function useBreakpoints() {
 }
 
 /**
- * 取得當前有效的 breakpoint 名稱
- * 返回最大的匹配 breakpoint
- *
- * @returns 當前 breakpoint 名稱或 null
- *
- * @example
- * ```tsx
- * const breakpoint = useBreakpoint();
- * // 'sm' | 'md' | 'lg' | 'xl' | null
- * ```
+ * 取得當前有效的 breakpoint 名稱（返回最大的匹配 breakpoint）
  */
 export function useBreakpoint(): BreakpointKey | null {
   const { sm, md, lg, xl } = useBreakpoints();
@@ -128,51 +137,52 @@ export function useBreakpoint(): BreakpointKey | null {
 }
 
 /**
- * 判斷是否為行動裝置（小於 md breakpoint，即 < 768px）
- *
- * @example
- * ```tsx
- * const isMobile = useIsMobile();
- * ```
+ * 判斷是否為行動裝置（< 768px）
+ * 如果 Device Provider 存在，會優先使用 Provider 提供的值以避免閃爍
  */
 export function useIsMobile(): boolean {
+  const device = useDeviceSafe();
   const { md } = useBreakpoints();
+
+  if (device?.isInitialized) {
+    return device.isMobile;
+  }
+
   return !md;
 }
 
 /**
- * 判斷是否為平板裝置（md breakpoint 以上但小於 lg，即 >= 768px 且 < 1024px）
- *
- * @example
- * ```tsx
- * const isTablet = useIsTablet();
- * ```
+ * 判斷是否為平板裝置（>= 768px 且 < 1025px）
+ * 如果 Device Provider 存在，會優先使用 Provider 提供的值以避免閃爍
  */
 export function useIsTablet(): boolean {
+  const device = useDeviceSafe();
   const { md, lg } = useBreakpoints();
+
+  if (device?.isInitialized) {
+    return device.isTablet;
+  }
+
   return md && !lg;
 }
 
 /**
- * 判斷是否為桌面裝置（lg breakpoint 以上，即 >= 1024px）
- *
- * @example
- * ```tsx
- * const isDesktop = useIsDesktop();
- * ```
+ * 判斷是否為桌面裝置（>= 1025px）
+ * 如果 Device Provider 存在，會優先使用 Provider 提供的值以避免閃爍
  */
 export function useIsDesktop(): boolean {
+  const device = useDeviceSafe();
   const { lg } = useBreakpoints();
+
+  if (device?.isInitialized) {
+    return device.isDesktop;
+  }
+
   return lg;
 }
 
 /**
- * 判斷是否為小螢幕（小於 sm breakpoint，即 < 640px）
- *
- * @example
- * ```tsx
- * const isXSmall = useIsXSmall();
- * ```
+ * 判斷是否為小螢幕（< 640px）
  */
 export function useIsXSmall(): boolean {
   const { sm } = useBreakpoints();
@@ -180,12 +190,7 @@ export function useIsXSmall(): boolean {
 }
 
 /**
- * 判斷是否為中等以上螢幕（md breakpoint 以上，即 >= 768px）
- *
- * @example
- * ```tsx
- * const isMediumUp = useIsMediumUp();
- * ```
+ * 判斷是否為中等以上螢幕（>= 768px）
  */
 export function useIsMediumUp(): boolean {
   const { md } = useBreakpoints();
@@ -193,12 +198,7 @@ export function useIsMediumUp(): boolean {
 }
 
 /**
- * 判斷是否為大螢幕以上（lg breakpoint 以上，即 >= 1024px）
- *
- * @example
- * ```tsx
- * const isLargeUp = useIsLargeUp();
- * ```
+ * 判斷是否為大螢幕以上（>= 1025px）
  */
 export function useIsLargeUp(): boolean {
   const { lg } = useBreakpoints();
