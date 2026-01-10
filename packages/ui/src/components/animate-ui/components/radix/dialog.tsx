@@ -45,7 +45,7 @@ type DialogOverlayProps = DialogOverlayPrimitiveProps;
 function DialogOverlay({ className, ...props }: DialogOverlayProps) {
   return (
     <DialogOverlayPrimitive
-      className={cn("fixed inset-0 z-50 bg-black/50", className)}
+      className={cn("fixed inset-0 z-50 bg-[#0D3036B2]", className)}
       {...props}
     />
   );
@@ -145,3 +145,11 @@ export {
   type DialogTitleProps,
   type DialogDescriptionProps,
 };
+
+// 導出 DialogManager 相關功能
+export {
+  DialogManagerProvider,
+  useDialogManager,
+  type DialogConfig,
+  type DialogAction,
+} from "./dialog-manager";

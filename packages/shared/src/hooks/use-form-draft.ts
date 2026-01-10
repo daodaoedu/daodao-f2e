@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type FieldValues, type Path, type UseFormReturn, useWatch } from "react-hook-form";
 import { getStorage, type StorageEnum } from "../lib/storage";
 
@@ -109,7 +109,7 @@ export function useFormDraft<TFormValues extends FieldValues>(
   }, [draftStorage, checkOnMount]);
 
   // 恢復暫存資料
-  const restoreDraft = () => {
+  const restoreDraft = useCallback(() => {
     if (!draft) return;
 
     isRestoringRef.current = true;
@@ -130,23 +130,23 @@ export function useFormDraft<TFormValues extends FieldValues>(
     setTimeout(() => {
       isRestoringRef.current = false;
     }, 100);
-  };
+  }, [draft, form]);
 
   // 清除暫存資料
-  const clearDraft = () => {
+  const clearDraft = useCallback(() => {
     draftStorage.remove();
     setShowRestoreDialog(false);
     setDraft(null);
-  };
+  }, [draftStorage]);
 
   // 手動儲存暫存資料
-  const saveDraft = () => {
+  const saveDraft = useCallback(() => {
     const currentFormValues = form.getValues();
     draftStorage.set({
       formValues: currentFormValues,
       currentStep,
     } as DraftData<TFormValues>);
-  };
+  }, [form, draftStorage, currentStep]);
 
   // 使用 useWatch 監聽所有表單欄位變化
   const watchedValues = useWatch({

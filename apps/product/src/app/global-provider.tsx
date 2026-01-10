@@ -6,8 +6,13 @@ import {
   type Messages,
   NextIntlClientProvider,
 } from "@daodao/i18n";
-import { detectDeviceClient, DeviceProvider, type DeviceInfo } from "@daodao/shared";
+import {
+  detectDeviceClient,
+  DeviceProvider,
+  type DeviceInfo,
+} from "@daodao/shared";
 import "@daodao/ui/globals.css";
+import { DialogManagerProvider } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
 
 interface GlobalProviderProps {
@@ -41,7 +46,9 @@ function GlobalProvider({
         >
           <DeviceProvider initialDevice={initialDevice}>
             <NavigationBlockerProvider>
-              <AuthProvider>{children}</AuthProvider>
+              <AuthProvider>
+                <DialogManagerProvider>{children}</DialogManagerProvider>
+              </AuthProvider>
             </NavigationBlockerProvider>
           </DeviceProvider>
         </NextIntlClientProvider>
