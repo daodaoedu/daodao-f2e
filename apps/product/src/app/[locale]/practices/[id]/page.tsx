@@ -11,6 +11,11 @@ import {
   PracticeDetailTitle,
   PracticeOverviewCard,
 } from "@/components/practice";
+import { Button } from "@daodao/ui/components/button";
+import { Archive, Trash2 } from "lucide-react";
+import { CheckInButton } from "@/components/dashboard";
+import { useArchivePracticeDialog } from "@/hooks/use-archive-practice-dialog";
+import { useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
 
 const practice: ManualPracticeFormValues & {
   total: number;
@@ -56,6 +61,16 @@ const practice: ManualPracticeFormValues & {
 export default function PracticeDetailPage() {
   const params = useParams();
   const practiceId = params.id as string;
+
+  const { openArchiveDialog } = useArchivePracticeDialog({
+    onConfirm: () => {},
+    onCancel: () => {},
+  });
+
+  const { openDeleteDialog } = useDeletePracticeDialog({
+    onConfirm: () => {},
+    onCancel: () => {},
+  });
 
   // TODO: 取得上一個和下一個實踐的 ID（需要從 API 取得實踐列表）
   const handlePrevious = () => {
@@ -115,6 +130,27 @@ export default function PracticeDetailPage() {
       <div className="max-w-[448px] mx-auto">
         <CheckInStack practiceId={practiceId} />
       </div>
+
+      <div className="flex flex-col w-fit gap-4 mx-auto pb-40 pt-6">
+        <Button variant="white" className="px-8" onClick={openArchiveDialog}>
+          <Archive className="size-4.5" />
+          <span>封存實踐</span>
+        </Button>
+        <Button variant="ghost" className="px-8 border border-logo-cyan" onClick={openDeleteDialog}>
+          <Trash2 className="size-4.5" />
+          <span>刪除實踐</span>
+        </Button>
+      </div>
+
+      <footer className="fixed bottom-0 left-0 right-0 flex justify-center gap-6 p-6 border-t border-light-gray bg-very-light-gray z-20">
+        {/* 打卡按鈕 */}
+        <CheckInButton
+          variant="orange"
+          className="w-full sm:max-w-[288px]"
+          taskTitle={practice.name}
+          onComplete={() => {}}
+        />
+      </footer>
     </div>
   );
 }

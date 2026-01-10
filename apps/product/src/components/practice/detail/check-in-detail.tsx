@@ -6,8 +6,9 @@ import { CircularText } from "@daodao/ui/components/circular-text";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
-import { Share2 } from "lucide-react";
+import { Share2, Trash2 } from "lucide-react";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
+import { useDeleteCheckInDialog } from "@/hooks/use-delete-check-in-dialog";
 
 export interface CheckInData {
   id: string;
@@ -43,6 +44,14 @@ export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
   const handleShare = () => {
     // TODO: 實作分享功能
   };
+
+  // 處理刪除打卡
+  const { openDeleteDialog } = useDeleteCheckInDialog({
+    onConfirm: () => {
+      // TODO: 實作刪除打卡功能
+    },
+    onCancel: () => {},
+  });
 
   return (
     <div className="max-w-[350px] mx-auto">
@@ -135,11 +144,15 @@ export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
         </main>
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex flex-col w-fit gap-4 mx-auto">
         {/* 分享按鈕 */}
         <Button onClick={handleShare} variant="white">
           <Share2 className="size-4 mr-2" />
           分享這篇打卡
+        </Button>
+        <Button variant="ghost" className="px-8 text-white hover:text-white/80 border border-white" onClick={openDeleteDialog}>
+          <Trash2 className="size-4.5" />
+          <span>刪除打卡</span>
         </Button>
       </div>
     </div>

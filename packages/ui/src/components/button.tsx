@@ -13,7 +13,7 @@ const buttonVariants = cva(
     // Display
     "relative inline-flex items-center justify-center gap-2",
     // Text & Space
-    "whitespace-nowrap body-md font-medium",
+    "whitespace-nowrap body-md",
     // Visual Style
     "transition-[color,background-color,box-shadow] rounded-full",
     // Interaction

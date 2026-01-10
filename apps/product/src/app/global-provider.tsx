@@ -14,6 +14,7 @@ import {
 import "@daodao/ui/globals.css";
 import { DialogManagerProvider } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
+import { Toaster } from "@daodao/ui/components/sonner";
 
 interface GlobalProviderProps {
   head?: React.ReactNode;
@@ -47,7 +48,10 @@ function GlobalProvider({
           <DeviceProvider initialDevice={initialDevice}>
             <NavigationBlockerProvider>
               <AuthProvider>
-                <DialogManagerProvider>{children}</DialogManagerProvider>
+                <DialogManagerProvider>
+                  <Toaster />
+                  {children}
+                </DialogManagerProvider>
               </AuthProvider>
             </NavigationBlockerProvider>
           </DeviceProvider>

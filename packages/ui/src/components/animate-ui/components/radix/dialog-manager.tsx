@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useCallback, useContext, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 import { useIsMobile } from "@daodao/shared";
 import type { DialogFlipDirection } from "../../primitives/radix/dialog";
 import {
@@ -55,7 +61,9 @@ interface DialogManagerContextType {
   close: () => void;
 }
 
-const DialogManagerContext = createContext<DialogManagerContextType | undefined>(undefined);
+const DialogManagerContext = createContext<
+  DialogManagerContextType | undefined
+>(undefined);
 
 export function DialogManagerProvider({ children }: React.PropsWithChildren) {
   const [isOpen, setIsOpen] = useState(false);
@@ -128,17 +136,23 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
           >
             <SheetHeader showCloseButton={config.showCloseButton ?? false}>
               <SheetTitle>{config.title}</SheetTitle>
-              {config.description && <SheetDescription>{config.description}</SheetDescription>}
+              {config.description && (
+                <SheetDescription>{config.description}</SheetDescription>
+              )}
             </SheetHeader>
 
-            <div className="px-5 text-text-dark">
-              {config.content}
-            </div>
+            <div className="px-5 text-text-dark">{config.content}</div>
 
             {config.actions && config.actions.length > 0 && (
               <SheetFooter className="flex-row gap-6 p-6 border-t border-light-gray">
                 {config.actions.map((action, index) => {
-                  const { onClick: _onClick, label, variant, className, ...restProps } = action;
+                  const {
+                    onClick: _onClick,
+                    label,
+                    variant,
+                    className,
+                    ...restProps
+                  } = action;
                   return (
                     <Button
                       key={`${action.label}-${index}`}
@@ -168,22 +182,30 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
         >
           <DialogHeader>
             <DialogTitle>{config.title}</DialogTitle>
-            {config.description && <DialogDescription>{config.description}</DialogDescription>}
+            {config.description && (
+              <DialogDescription>{config.description}</DialogDescription>
+            )}
           </DialogHeader>
 
-          {config.content}
+          <div className="px-5 text-text-dark">{config.content}</div>
 
           {config.actions && config.actions.length > 0 && (
-            <DialogFooter className="flex-row gap-3 sm:justify-end">
+            <DialogFooter className="flex-row gap-6 p-6">
               {config.actions.map((action, index) => {
-                const { onClick: _onClick, label, variant, className, ...restProps } = action;
+                const {
+                  onClick: _onClick,
+                  label,
+                  variant,
+                  className,
+                  ...restProps
+                } = action;
                 return (
                   <Button
                     key={`${action.label}-${index}`}
                     type="button"
-                    variant={variant}
+                    variant={variant ?? "orange"}
                     onClick={() => handleActionClick(action)}
-                    className={`flex-1 sm:flex-initial ${className ?? ""}`}
+                    className={cn("flex-1", className)}
                     {...restProps}
                   >
                     {label}
@@ -208,8 +230,9 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
 export function useDialogManager() {
   const context = useContext(DialogManagerContext);
   if (!context) {
-    throw new Error("useDialogManager must be used within a DialogManagerProvider");
+    throw new Error(
+      "useDialogManager must be used within a DialogManagerProvider"
+    );
   }
   return context;
 }
-

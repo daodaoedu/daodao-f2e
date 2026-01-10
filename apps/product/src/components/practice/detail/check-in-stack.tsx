@@ -493,7 +493,7 @@ export const CheckInStack = ({ practiceId, items = defaultItems }: CheckInStackP
         return Math.max(max, y);
       }, 0);
 
-      const newHeight = Math.max(MIN_CONTAINER_HEIGHT, maxY + 150);
+      const newHeight = Math.max(MIN_CONTAINER_HEIGHT, maxY + 8);
       if (newHeight !== currentContainerHeight) {
         currentContainerHeight = newHeight;
         setContainerHeight(newHeight);

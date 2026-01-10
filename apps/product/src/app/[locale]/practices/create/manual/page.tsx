@@ -14,13 +14,13 @@ import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import {
   type ManualPracticeFormValues,
   manualPracticeFormSchema,
-  useRestoreDraftDialog,
 } from "@/components/practice";
 import { Step1 } from "@/components/practice/create/manual/steps/step-1";
 import { Step2 } from "@/components/practice/create/manual/steps/step-2";
 import { Step3 } from "@/components/practice/create/manual/steps/step-3";
 import { Step4 } from "@/components/practice/create/manual/steps/step-4";
 import { Step5 } from "@/components/practice/create/manual/steps/step-5";
+import { useRestoreDraftDialog } from "@/hooks/use-restore-draft-dialog";
 
 const TOTAL_STEPS = 5;
 

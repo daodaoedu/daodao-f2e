@@ -27,10 +27,11 @@ import { cn } from "@daodao/ui/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isSameDay, isValid, parse } from "date-fns";
 import { CalendarCheck, Check, Plus, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
+import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
 
 interface CheckInSheetProps {
   open: boolean;
@@ -512,14 +513,34 @@ export const CheckInButton = ({
     lastCheckInDate,
   });
 
+  // 使用 ref 來保存打卡資料，以便在成功對話框中使用
+  const checkInDataRef = useRef<CheckInData | null>(null);
+
+  const { openSuccessDialog } = useCheckInSuccessDialog({
+    onShare: () => {
+      // TODO: 實作分享功能
+    },
+    onComplete: () => {
+      // 成功對話框關閉後，執行原本的完成回調
+      if (checkInDataRef.current) {
+        onComplete(checkInDataRef.current);
+        checkInDataRef.current = null;
+      }
+    },
+  });
+
   const handleClick = () => {
     if (!canCheckIn) return;
     setIsSheetOpen(true);
   };
 
   const handleComplete = (data: CheckInData) => {
-    onComplete(data);
+    // 保存打卡資料
+    checkInDataRef.current = data;
+    // 關閉 Sheet
     setIsSheetOpen(false);
+    // 顯示成功對話框
+    openSuccessDialog();
   };
 
   return (

@@ -14,6 +14,7 @@ import {
   type CheckInData,
   CheckInDetail,
 } from "@/components/practice/detail";
+import { toast } from "@daodao/ui/components/sonner";
 
 // 模擬資料 - 之後替換為實際 API 資料
 const mockCheckIns: Record<string, CheckInData> = {
