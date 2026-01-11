@@ -1,9 +1,9 @@
 "use client";
 
 import { ArrowLeftOutlineSvg } from "@daodao/assets";
-import { useRouter } from "@daodao/i18n/navigation";
 import { useIsDesktop, useIsMobile } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
+import { useSafeRouter } from "@daodao/ui/hooks/use-safe-router";
 import { cn } from "@daodao/ui/lib/utils";
 import { X } from "lucide-react";
 
@@ -39,7 +39,7 @@ export const PageHeader = ({
   disableLightOn,
   className,
 }: PageHeaderProps) => {
-  const router = useRouter();
+  const router = useSafeRouter();
   const isMobile = useIsMobile();
   const isDesktop = useIsDesktop();
 

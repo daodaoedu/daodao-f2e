@@ -13,6 +13,7 @@ import {
 } from "@daodao/shared";
 import "@daodao/ui/globals.css";
 import { DialogManagerProvider } from "@daodao/ui/components/animate-ui/components/radix/dialog";
+import { SheetManagerProvider } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { NavigationBlockerProvider } from "@daodao/ui/hooks/navigation-blocker";
 import { Toaster } from "@daodao/ui/components/sonner";
 
@@ -49,8 +50,10 @@ function GlobalProvider({
             <NavigationBlockerProvider>
               <AuthProvider>
                 <DialogManagerProvider>
-                  <Toaster />
-                  {children}
+                  <SheetManagerProvider>
+                    <Toaster />
+                    {children}
+                  </SheetManagerProvider>
                 </DialogManagerProvider>
               </AuthProvider>
             </NavigationBlockerProvider>

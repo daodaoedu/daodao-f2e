@@ -16,16 +16,22 @@ import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { ResourceCard } from "@/components/practice/shared";
 import type { ManualPracticeFormValues } from "../schema";
-import { TagEditSheet } from "../tag-edit-sheet";
+import { useTagEditSheet } from "@/hooks/use-tag-edit-sheet";
 
 interface Step4Props {
   form: UseFormReturn<ManualPracticeFormValues>;
 }
 
 export const Step4 = ({ form }: Step4Props) => {
-  const [isTagEditSheetOpen, setIsTagEditSheetOpen] = useState(false);
   const [resourceName, setResourceName] = useState("");
   const [resourceUrl, setResourceUrl] = useState("");
+
+  const { openTagEditSheet } = useTagEditSheet({
+    initialTags: form.watch("tags") || [],
+    onComplete: (data) => {
+      form.setValue("tags", data.selectedTags);
+    },
+  });
 
   return (
     <div className="space-y-8">
@@ -46,7 +52,7 @@ export const Step4 = ({ form }: Step4Props) => {
                 </div>
                 <Button
                   type="button"
-                  onClick={() => setIsTagEditSheetOpen(true)}
+                  onClick={openTagEditSheet}
                   className="w-full"
                 >
                   編輯
@@ -175,13 +181,6 @@ export const Step4 = ({ form }: Step4Props) => {
             </FormItem>
           );
         }}
-      />
-
-      <TagEditSheet
-        open={isTagEditSheetOpen}
-        onOpenChange={setIsTagEditSheetOpen}
-        initialTags={form.watch("tags") || []}
-        onComplete={(data) => form.setValue("tags", data.selectedTags)}
       />
     </div>
   );

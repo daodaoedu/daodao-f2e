@@ -257,13 +257,10 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
         >
           <DialogHeader>
             <DialogTitle>{config.title}</DialogTitle>
-            {config.description ? (
-              <DialogDescription>{config.description}</DialogDescription>
-            ) : (
-              <DialogDescription className="sr-only" aria-hidden="true">
-                {typeof config.title === "string" ? config.title : ""}
-              </DialogDescription>
-            )}
+            <DialogDescription className="sr-only" aria-hidden="true">
+              {config.description ??
+                (typeof config.title === "string" ? config.title : "")}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="px-5 text-text-dark">{config.content}</div>

@@ -149,3 +149,10 @@ export {
   type SheetTitleProps,
   type SheetDescriptionProps,
 };
+
+// 導出 SheetManager 相關功能
+export {
+  SheetManagerProvider,
+  useSheetManager,
+  type SheetConfig,
+} from "./sheet-manager";

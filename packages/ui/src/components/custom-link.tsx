@@ -1,7 +1,8 @@
 "use client";
 
-import { Link } from "@daodao/i18n/navigation";
+import { Link, useRouter } from "@daodao/i18n/navigation";
 import { useNavigationBlocker } from "../hooks/navigation-blocker";
+import { useUnsavedChangesConfirm } from "../hooks/use-unsaved-changes-confirm";
 
 export type CustomLinkProps = React.ComponentProps<typeof Link>;
 
@@ -13,14 +14,17 @@ export function CustomLink({
   ...props
 }: CustomLinkProps) {
   const { isBlocked } = useNavigationBlocker();
+  const confirmUnsavedChanges = useUnsavedChangesConfirm();
+  const router = useRouter();
 
-  const handleNavigate: CustomLinkProps["onNavigate"] = (e) => {
-    if (
-      isBlocked &&
-      // eslint-disable-next-line no-alert
-      !window.confirm("You have unsaved changes. Leave anyway?")
-    ) {
+  const handleNavigate: CustomLinkProps["onNavigate"] = async (e) => {
+    if (isBlocked) {
       e.preventDefault();
+      const shouldLeave = await confirmUnsavedChanges();
+      if (shouldLeave) {
+        // 使用 router 來導航，router.push 接受與 Link href 相同的型別
+        router.push(href as Parameters<typeof router.push>[0]);
+      }
       return;
     }
     onNavigate?.(e);

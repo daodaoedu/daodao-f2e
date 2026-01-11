@@ -1,13 +1,5 @@
 "use client";
 
-import { useIsMobile } from "@daodao/shared";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Button, type ButtonProps } from "@daodao/ui/components/button";
 import { Checkbox } from "@daodao/ui/components/checkbox";
 import { FileUpload } from "@daodao/ui/components/file-upload";
@@ -32,13 +24,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { useCheckInSuccessDialog } from "@/hooks/use-check-in-success-dialog";
-
-interface CheckInSheetProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  taskTitle: string;
-  onComplete: (data: CheckInData) => void;
-}
+import { useCheckInSheet } from "@/hooks/use-check-in-sheet";
 
 export interface CheckInData {
   mood: MoodType | null;
@@ -79,13 +65,19 @@ type CheckInFormValues = {
   media: File[];
 };
 
-export const CheckInSheet = ({
-  open,
-  onOpenChange,
+/**
+ * 打卡 Sheet 的內容組件（不包含 Sheet 外層）
+ * 可用於 SheetManager 或直接使用 CheckInSheet
+ */
+export const CheckInSheetContent = ({
   taskTitle,
   onComplete,
-}: CheckInSheetProps) => {
-  const isMobile = useIsMobile();
+  onClose,
+}: {
+  taskTitle: string;
+  onComplete: (data: CheckInData) => void;
+  onClose?: () => void;
+}) => {
   const [customTagInput, setCustomTagInput] = useState("");
 
   const form = useForm<CheckInFormValues>({
@@ -112,10 +104,10 @@ export const CheckInSheet = ({
 
   // 當 Sheet 關閉時清空輸入框
   useEffect(() => {
-    if (!open) {
+    return () => {
       setCustomTagInput("");
-    }
-  }, [open]);
+    };
+  }, []);
 
   const onSubmit = (values: CheckInFormValues) => {
     // Zod 驗證已確保 mood 不是 null
@@ -130,24 +122,12 @@ export const CheckInSheet = ({
     });
     form.reset();
     setCustomTagInput("");
-    onOpenChange(false);
+    onClose?.();
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side={isMobile ? "bottom" : "right"}
-        className="overflow-y-auto"
-      >
-        <SheetHeader>
-          <SheetTitle>打卡</SheetTitle>
-          <SheetDescription className="sr-only">
-            記錄你的學習進度和心情
-          </SheetDescription>
-        </SheetHeader>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="px-6">
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="px-6">
             {/* Activity Title */}
             <h2 className="text-md leading-8 font-medium text-bg-dark wrap-break-word mb-8">
               {taskTitle}
@@ -384,10 +364,8 @@ export const CheckInSheet = ({
                 完成打卡
               </Button>
             </div>
-          </form>
-        </Form>
-      </SheetContent>
-    </Sheet>
+      </form>
+    </Form>
   );
 };
 
@@ -507,7 +485,6 @@ export const CheckInButton = ({
   showIcon,
   ...props
 }: CheckInButtonProps) => {
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { canCheckIn, getButtonLabel } = useCheckInStatus({
     practiceStatus,
     lastCheckInDate,
@@ -516,52 +493,46 @@ export const CheckInButton = ({
   // 使用 ref 來保存打卡資料，以便在成功對話框中使用
   const checkInDataRef = useRef<CheckInData | null>(null);
 
-  const { openSuccessDialog } = useCheckInSuccessDialog({
-    onShare: () => {
+  const { openSuccessDialog } = useCheckInSuccessDialog();
+
+  const handleCheckInSuccess = async () => {
+    const result = await openSuccessDialog();
+    if (result.value === "share") {
       // TODO: 實作分享功能
-    },
-    onComplete: () => {
+    } else if (result.value === "complete") {
       // 成功對話框關閉後，執行原本的完成回調
       if (checkInDataRef.current) {
         onComplete(checkInDataRef.current);
         checkInDataRef.current = null;
       }
+    }
+  };
+
+  const { openCheckInSheet } = useCheckInSheet({
+    taskTitle,
+    onComplete: async (data) => {
+      // 保存打卡資料
+      checkInDataRef.current = data;
+      // 顯示成功對話框（Sheet 會自動關閉）
+      await handleCheckInSuccess();
     },
   });
 
   const handleClick = () => {
     if (!canCheckIn) return;
-    setIsSheetOpen(true);
-  };
-
-  const handleComplete = (data: CheckInData) => {
-    // 保存打卡資料
-    checkInDataRef.current = data;
-    // 關閉 Sheet
-    setIsSheetOpen(false);
-    // 顯示成功對話框
-    openSuccessDialog();
+    openCheckInSheet();
   };
 
   return (
-    <>
-      <Button
-        variant={variant}
-        onClick={handleClick}
-        disabled={!canCheckIn}
-        className={className}
-        {...props}
-      >
-        {showIcon && <CalendarCheck className="size-4.5 text-logo-cyan" />}
-        {getButtonLabel()}
-      </Button>
-
-      <CheckInSheet
-        open={isSheetOpen}
-        onOpenChange={setIsSheetOpen}
-        taskTitle={taskTitle}
-        onComplete={handleComplete}
-      />
-    </>
+    <Button
+      variant={variant}
+      onClick={handleClick}
+      disabled={!canCheckIn}
+      className={className}
+      {...props}
+    >
+      {showIcon && <CalendarCheck className="size-4.5 text-logo-cyan" />}
+      {getButtonLabel()}
+    </Button>
   );
 };

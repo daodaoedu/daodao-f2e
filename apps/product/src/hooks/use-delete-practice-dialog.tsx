@@ -1,72 +1,36 @@
 "use client";
 
-import { useDialogManager } from "@daodao/ui/components/animate-ui/components/radix/dialog";
+import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { useCallback } from "react";
-import { Image } from "@daodao/ui/components/image";
-import WarningPng from "@daodao/assets/images/dialog/warning.png";
-
-interface UseDeletePracticeDialogOptions {
-  /** 確認刪除的回調 */
-  onConfirm: () => void;
-  /** 取消的回調 */
-  onCancel?: () => void;
-}
-
-const DIALOG_CONTENT = (
-  <div className="p-4">
-    {/* TODO: 當 delete.png 準備好後，替換為 DeletePng */}
-    <Image src={WarningPng} alt="delete" width={172} height={172} className="mx-auto pb-8" />
-    <p className="text-left text-text-dark">
-      確定要跟這個主題說再見了嗎？一旦刪除，就無法復原囉。
-    </p>
-  </div>
-);
-
-const DIALOG_TITLE = "確定刪除這個實踐？";
-const CONFIRM_BUTTON_TEXT = "確定刪除";
-const CANCEL_BUTTON_TEXT = "先不要";
 
 /**
  * 使用全局 DialogManager 來顯示刪除實踐對話框的 Hook
  *
  * @example
  * ```tsx
- * const { openDeleteDialog } = useDeletePracticeDialog({
- *   onConfirm: handleDelete,
- *   onCancel: handleCancel,
- * });
+ * const { openDeleteDialog } = useDeletePracticeDialog();
  *
  * // 當需要顯示對話框時
- * openDeleteDialog();
+ * const result = await openDeleteDialog();
+ * if (result.value === "confirm") {
+ *   await handleDelete();
+ * }
  * ```
  */
-export function useDeletePracticeDialog({
-  onConfirm,
-  onCancel,
-}: UseDeletePracticeDialogOptions) {
-  const { open } = useDialogManager();
+export function useDeletePracticeDialog() {
+  const { openWarningDialog } = useDialog();
 
   const openDeleteDialog = useCallback(() => {
-    open({
-      title: DIALOG_TITLE,
-      content: DIALOG_CONTENT,
-      actions: [
-        {
-          label: CONFIRM_BUTTON_TEXT,
-          variant: "outline",
-          onClick: onConfirm,
-        },
-        {
-          label: CANCEL_BUTTON_TEXT,
-          onClick: onCancel || (() => {}),
-        },
+    return openWarningDialog({
+      title: "確定刪除這個實踐？",
+      message: "確定要跟這個主題說再見了嗎？一旦刪除，就無法復原囉。",
+      textAlign: "left",
+      buttons: [
+        { label: "確定刪除", value: "confirm", variant: "outline" },
+        { label: "先不要", value: "cancel", variant: "orange" },
       ],
-      from: "bottom",
-      dismissible: true,
-      closeOnEscape: true,
-      showCloseButton: true,
     });
-  }, [onConfirm, onCancel, open]);
+  }, [openWarningDialog]);
 
   return { openDeleteDialog };
 }

@@ -8,10 +8,10 @@ import { Image } from "@daodao/ui/components/image";
 import { ImageLightbox } from "@daodao/ui/components/image-lightbox";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
-import { Trash2 } from "lucide-react";
+import { Share2, Trash2 } from "lucide-react";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { useDeleteCheckInDialog } from "@/hooks/use-delete-check-in-dialog";
-import { ShareCheckInButton } from "@/components/dashboard/share-check-in-sheet";
+import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
 
 export interface CheckInData {
   id: string;
@@ -47,11 +47,26 @@ export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
     : date.split(".").slice(1).join("/") || "";
 
   // 處理刪除打卡
-  const { openDeleteDialog } = useDeleteCheckInDialog({
-    onConfirm: () => {
+  const { openDeleteDialog } = useDeleteCheckInDialog();
+
+  const handleDeleteCheckIn = async () => {
+    const result = await openDeleteDialog();
+    if (result.value === "confirm") {
       // TODO: 實作刪除打卡功能
+    }
+  };
+
+  // 處理分享打卡
+  const { openShareSheet } = useShareCheckInSheet({
+    taskTitle: practiceTitle,
+    checkInData: {
+      mood,
+      tags,
+      description: content,
+      media: [],
+      date,
+      images,
     },
-    onCancel: () => {},
   });
 
   // 處理圖片點擊，開啟 lightbox
@@ -156,18 +171,11 @@ export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
 
       <div className="flex flex-col w-fit gap-4 mx-auto">
         {/* 分享按鈕 */}
-        <ShareCheckInButton
-          taskTitle={practiceTitle}
-          checkInData={{
-            mood,
-            tags,
-            description: content,
-            media: [],
-            date,
-            images,
-          }}
-        />
-        <Button variant="ghost" className="px-8 text-white hover:text-white/80 border border-white" onClick={openDeleteDialog}>
+        <Button variant="white" className="px-8" onClick={openShareSheet}>
+          <Share2 className="size-4 mr-2" />
+          分享這篇打卡
+        </Button>
+        <Button variant="ghost" className="px-8 text-white hover:text-white/80 border border-white" onClick={handleDeleteCheckIn}>
           <Trash2 className="size-4.5" />
           <span>刪除打卡</span>
         </Button>

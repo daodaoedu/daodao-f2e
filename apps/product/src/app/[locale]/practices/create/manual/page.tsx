@@ -141,17 +141,21 @@ export default function CreateManualPracticePage() {
     }
   };
 
-  const { openRestoreDialog } = useRestoreDraftDialog({
-    draft,
-    onRestore: handleRestoreDraft,
-    onDiscard: clearDraft,
-  });
+  const { openRestoreDialog } = useRestoreDraftDialog({ draft });
 
   useEffect(() => {
     if (showRestoreDialog) {
-      openRestoreDialog();
+      const handleRestore = async () => {
+        const result = await openRestoreDialog();
+        if (result.value === "restore") {
+          handleRestoreDraft();
+        } else if (result.value === "discard") {
+          clearDraft();
+        }
+      };
+      handleRestore();
     }
-  }, [showRestoreDialog, openRestoreDialog]);
+  }, [showRestoreDialog, openRestoreDialog, handleRestoreDraft, clearDraft]);
 
   useNavigationBlockerEffect(form.formState.isDirty);
 

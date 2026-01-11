@@ -7,34 +7,15 @@ import LineSvg from "@daodao/assets/images/social-icons/line.svg";
 import LinkedInSvg from "@daodao/assets/images/social-icons/linkedin.svg";
 import XSvg from "@daodao/assets/images/social-icons/x.svg";
 import { captureElementAsImage, getShareAPI } from "@daodao/shared";
-import { useIsMobile } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { CircularText } from "@daodao/ui/components/circular-text";
 import { Image } from "@daodao/ui/components/image";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
-import { Download, Share2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { Download } from "lucide-react";
+import { useRef } from "react";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import type { CheckInData } from "./check-in-sheet";
-import type { ButtonProps } from "@daodao/ui/components/button";
-
-interface ShareCheckInSheetProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  taskTitle: string;
-  checkInData: CheckInData & {
-    date: string;
-    images?: string[];
-  };
-}
 
 /**
  * 打卡卡片預覽組件（用於分享 Sheet 中顯示）
@@ -154,13 +135,19 @@ const CheckInCardPreview = ({
   );
 };
 
-export const ShareCheckInSheet = ({
-  open,
-  onOpenChange,
+/**
+ * 分享打卡 Sheet 的內容組件（不包含 Sheet 外層）
+ * 可用於 SheetManager 或直接使用 ShareCheckInSheet
+ */
+export const ShareCheckInSheetContent = ({
   taskTitle,
   checkInData,
-}: ShareCheckInSheetProps) => {
-  const isMobile = useIsMobile();
+  onClose,
+}: {
+  taskTitle: string;
+  checkInData: CheckInData & { date: string; images?: string[] };
+  onClose?: () => void;
+}) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   // 準備分享內容
@@ -201,151 +188,84 @@ export const ShareCheckInSheet = ({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side={isMobile ? "bottom" : "right"}
-        className="overflow-y-auto"
-      >
-        <SheetHeader>
-          <SheetTitle>分享</SheetTitle>
-          <SheetDescription className="sr-only">
-            分享你的打卡記錄
-          </SheetDescription>
-        </SheetHeader>
+    <div className="px-6">
+      {/* 打卡卡片預覽 */}
+      <div ref={cardRef} className="mb-8">
+        <CheckInCardPreview taskTitle={taskTitle} checkInData={checkInData} />
+      </div>
 
-        <div className="px-6">
-          {/* 打卡卡片預覽 */}
-          <div ref={cardRef} className="mb-8">
-            <CheckInCardPreview taskTitle={taskTitle} checkInData={checkInData} />
-          </div>
-
-          {/* 分享到社群媒體 */}
-          <div className="mb-8">
-            <h3 className="text-base font-medium mb-3 text-text-dark text-center">
-              分享到社群媒體
-            </h3>
-            <div className="flex justify-center gap-4">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="size-12"
-                onClick={shareAPI.lineShare}
-                aria-label="分享到 LINE"
-              >
-                <LineSvg className="size-6" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="size-12"
-                onClick={handleInstagramShare}
-                aria-label="分享到 Instagram"
-              >
-                <InstagramSvg className="size-6" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="size-12"
-                onClick={shareAPI.facebookShare}
-                aria-label="分享到 Facebook"
-              >
-                <FacebookSvg className="size-6" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="size-12"
-                onClick={shareAPI.xShare}
-                aria-label="分享到 X (Twitter)"
-              >
-                <XSvg className="size-6" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="size-12"
-                onClick={shareAPI.linkedinShare}
-                aria-label="分享到 LinkedIn"
-              >
-                <LinkedInSvg className="size-6" />
-              </Button>
-            </div>
-          </div>
-
-          {/* 下載打卡圖片 */}
-          <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={handleDownloadImage}
-            >
-              <Download className="size-4.5" />
-              下載打卡圖片
-            </Button>
-          </div>
+      {/* 分享到社群媒體 */}
+      <div className="mb-8">
+        <h3 className="text-base font-medium mb-3 text-text-dark text-center">
+          分享到社群媒體
+        </h3>
+        <div className="flex justify-center gap-4">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-12"
+            onClick={shareAPI.lineShare}
+            aria-label="分享到 LINE"
+          >
+            <LineSvg className="size-6" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-12"
+            onClick={handleInstagramShare}
+            aria-label="分享到 Instagram"
+          >
+            <InstagramSvg className="size-6" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-12"
+            onClick={shareAPI.facebookShare}
+            aria-label="分享到 Facebook"
+          >
+            <FacebookSvg className="size-6" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-12"
+            onClick={shareAPI.xShare}
+            aria-label="分享到 X (Twitter)"
+          >
+            <XSvg className="size-6" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-12"
+            onClick={shareAPI.linkedinShare}
+            aria-label="分享到 LinkedIn"
+          >
+            <LinkedInSvg className="size-6" />
+          </Button>
         </div>
-      </SheetContent>
-    </Sheet>
-  );
-};
+      </div>
 
-/**
- * 分享打卡按鈕組件（包含觸發按鈕和分享 Sheet）
- * 內部管理 Sheet 的開關狀態
- */
-interface ShareCheckInButtonProps extends Omit<ButtonProps, "onClick"> {
-  taskTitle: string;
-  checkInData: CheckInData & {
-    date: string;
-    images?: string[];
-  };
-  /** 按鈕文字，預設為 "分享這篇打卡" */
-  buttonText?: string;
-  /** 是否顯示圖標，預設為 true */
-  showIcon?: boolean;
-}
-
-export const ShareCheckInButton = ({
-  taskTitle,
-  checkInData,
-  buttonText = "分享這篇打卡",
-  showIcon = true,
-  variant = "white",
-  className,
-  ...buttonProps
-}: ShareCheckInButtonProps) => {
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-
-  const handleClick = () => {
-    setIsSheetOpen(true);
-  };
-
-  return (
-    <>
-      <Button
-        variant={variant}
-        onClick={handleClick}
-        className={className}
-        {...buttonProps}
-      >
-        {showIcon && <Share2 className="size-4 mr-2" />}
-        {buttonText}
-      </Button>
-
-      <ShareCheckInSheet
-        open={isSheetOpen}
-        onOpenChange={setIsSheetOpen}
-        taskTitle={taskTitle}
-        checkInData={checkInData}
-      />
-    </>
+      {/* 下載打卡圖片 */}
+      <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={handleDownloadImage}
+        >
+          <Download className="size-4.5" />
+          下載打卡圖片
+        </Button>
+      </div>
+    </div>
   );
 };
 

@@ -1,16 +1,9 @@
 "use client";
 
-import { useIsMobile } from "@daodao/shared";
 import {
   PinList,
   type PinListItem,
 } from "@daodao/ui/components/animate-ui/components/community/pin-list";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { Button } from "@daodao/ui/components/button";
 import {
   Form,
@@ -27,14 +20,6 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-interface TagEditSheetProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  initialTags?: string[];
-  initialKeyword?: string;
-  onComplete: (data: TagEditData) => void;
-}
-
 export interface TagEditData {
   selectedTags: string[];
 }
@@ -49,15 +34,21 @@ const tagEditFormSchema = z.object({
 
 type TagEditFormValues = z.infer<typeof tagEditFormSchema>;
 
-export const TagEditSheet = ({
-  open,
-  onOpenChange,
+/**
+ * 編輯標籤 Sheet 的內容組件（不包含 Sheet 外層）
+ * 可用於 SheetManager 通過 useTagEditSheet hook 使用
+ */
+export const TagEditSheetContent = ({
   initialTags = [],
   initialKeyword = "",
   onComplete,
-}: TagEditSheetProps) => {
-  const isMobile = useIsMobile();
-
+  onClose,
+}: {
+  initialTags?: string[];
+  initialKeyword?: string;
+  onComplete: (data: TagEditData) => void;
+  onClose?: () => void;
+}) => {
   const form = useForm<TagEditFormValues>({
     resolver: zodResolver(tagEditFormSchema),
     defaultValues: {
@@ -71,19 +62,17 @@ export const TagEditSheet = ({
 
   // Reset form when initial values change
   React.useEffect(() => {
-    if (open) {
-      form.reset({
-        keyword: initialKeyword,
-        selectedTags: initialTags,
-      });
-    }
-  }, [initialKeyword, initialTags, open, form]);
+    form.reset({
+      keyword: initialKeyword,
+      selectedTags: initialTags,
+    });
+  }, [initialKeyword, initialTags, form]);
 
   const onSubmit = (values: TagEditFormValues) => {
     onComplete({
       selectedTags: values.selectedTags,
     });
-    onOpenChange(false);
+    onClose?.();
   };
 
   const pinListItems: PinListItem[] = React.useMemo(() => {
@@ -173,58 +162,50 @@ export const TagEditSheet = ({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side={isMobile ? "bottom" : "right"} className="overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle className="text-bg-dark">編輯標籤</SheetTitle>
-        </SheetHeader>
+    <Form {...form}>
+      <form className="flex-1 flex flex-col">
+        <div className="flex-1 px-4">
+          {/* Keyword Input */}
+          <FormField
+            control={form.control}
+            name="keyword"
+            render={({ field }) => (
+              <FormItem className="mb-8">
+                <FormLabel className="block text-base font-medium mb-3 text-text-dark">
+                  關鍵字
+                </FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="輸入自訂關鍵字" className="w-full" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Form {...form}>
-          <form className="flex-1 flex flex-col">
-            <div className="flex-1 px-4">
-              {/* Keyword Input */}
-              <FormField
-                control={form.control}
-                name="keyword"
-                render={({ field }) => (
-                  <FormItem className="mb-8">
-                    <FormLabel className="block text-base font-medium mb-3 text-text-dark">
-                      關鍵字
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="輸入自訂關鍵字" className="w-full" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          {/* Tags List using PinList */}
+          <div className="mb-16 md:mb-8">
+            <PinList
+              items={pinListItems}
+              labels={{
+                pinned: "已選用標籤",
+                unpinned: "可用標籤",
+              }}
+              onItemToggle={handleToggleTag}
+              transformItems={transformItems}
+              className="flex flex-col-reverse"
+              pinnedSectionClassName="bg-light-blue border border-blue rounded-lg p-3"
+            />
+          </div>
+        </div>
 
-              {/* Tags List using PinList */}
-              <div className="mb-16 md:mb-8">
-                <PinList
-                  items={pinListItems}
-                  labels={{
-                    pinned: "已選用標籤",
-                    unpinned: "可用標籤",
-                  }}
-                  onItemToggle={handleToggleTag}
-                  transformItems={transformItems}
-                  className="flex flex-col-reverse"
-                  pinnedSectionClassName="bg-light-blue border border-blue rounded-lg p-3"
-                />
-              </div>
-            </div>
-
-            {/* Complete Button */}
-            <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6">
-              <Button type="button" className="w-full" onClick={form.handleSubmit(onSubmit)}>
-                <Check className="size-4.5" />
-                完成
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </SheetContent>
-    </Sheet>
+        {/* Complete Button */}
+        <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6">
+          <Button type="button" className="w-full" onClick={form.handleSubmit(onSubmit)}>
+            <Check className="size-4.5" />
+            完成
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };

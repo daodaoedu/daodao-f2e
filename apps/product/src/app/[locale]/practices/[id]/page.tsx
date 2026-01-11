@@ -62,15 +62,22 @@ export default function PracticeDetailPage() {
   const params = useParams();
   const practiceId = params.id as string;
 
-  const { openArchiveDialog } = useArchivePracticeDialog({
-    onConfirm: () => {},
-    onCancel: () => {},
-  });
+  const { openArchiveDialog } = useArchivePracticeDialog();
+  const { openDeleteDialog } = useDeletePracticeDialog();
 
-  const { openDeleteDialog } = useDeletePracticeDialog({
-    onConfirm: () => {},
-    onCancel: () => {},
-  });
+  const handleArchive = async () => {
+    const result = await openArchiveDialog();
+    if (result.value === "confirm") {
+      // TODO: 實作封存功能
+    }
+  };
+
+  const handleDelete = async () => {
+    const result = await openDeleteDialog();
+    if (result.value === "confirm") {
+      // TODO: 實作刪除功能
+    }
+  };
 
   // TODO: 取得上一個和下一個實踐的 ID（需要從 API 取得實踐列表）
   const handlePrevious = () => {
@@ -132,11 +139,11 @@ export default function PracticeDetailPage() {
       </div>
 
       <div className="flex flex-col w-fit gap-4 mx-auto pb-40 pt-6">
-        <Button variant="white" className="px-8" onClick={openArchiveDialog}>
+        <Button variant="white" className="px-8" onClick={handleArchive}>
           <Archive className="size-4.5" />
           <span>封存實踐</span>
         </Button>
-        <Button variant="ghost" className="px-8 border border-logo-cyan" onClick={openDeleteDialog}>
+        <Button variant="ghost" className="px-8 border border-logo-cyan" onClick={handleDelete}>
           <Trash2 className="size-4.5" />
           <span>刪除實踐</span>
         </Button>
