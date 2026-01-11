@@ -3,28 +3,16 @@
 import { useDialogManager } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { useCallback } from "react";
 import { Image } from "@daodao/ui/components/image";
-// TODO: 需要添加封存插圖（橙色角色和燈泡）
-// 圖片路徑：packages/assets/images/dialog/archive.png
 import InfoPng from "@daodao/assets/images/dialog/info.png";
 
 interface UseArchivePracticeDialogOptions {
-  /** 標題 */
-  title?: React.ReactNode;
-  /** 描述文字 */
-  description?: React.ReactNode;
-  /** 取消按鈕文字 */
-  cancelButtonText?: string;
-  /** 確認按鈕文字 */
-  confirmButtonText?: string;
-  /** 自訂預覽內容的渲染函數 */
-  content?: React.ReactNode;
   /** 確認封存的回調 */
   onConfirm: () => void;
   /** 取消的回調 */
   onCancel?: () => void;
 }
 
-const DEFAULT_CONTENT = (
+const DIALOG_CONTENT = (
   <div className="p-4">
     {/* TODO: 當 archive.png 準備好後，替換為 ArchivePng */}
     <Image src={InfoPng} alt="archive" width={172} height={172} className="mx-auto pb-8" />
@@ -33,6 +21,10 @@ const DEFAULT_CONTENT = (
     </p>
   </div>
 );
+
+const DIALOG_TITLE = "即將封存這個實踐";
+const CANCEL_BUTTON_TEXT = "先不要";
+const CONFIRM_BUTTON_TEXT = "確定封存";
 
 /**
  * 使用全局 DialogManager 來顯示封存實踐對話框的 Hook
@@ -49,11 +41,6 @@ const DEFAULT_CONTENT = (
  * ```
  */
 export function useArchivePracticeDialog({
-  title = "即將封存這個實踐",
-  description,
-  cancelButtonText = "先不要",
-  confirmButtonText = "確定封存",
-  content = DEFAULT_CONTENT,
   onConfirm,
   onCancel,
 }: UseArchivePracticeDialogOptions) {
@@ -61,17 +48,16 @@ export function useArchivePracticeDialog({
 
   const openArchiveDialog = useCallback(() => {
     open({
-      title,
-      description,
-      content,
+      title: DIALOG_TITLE,
+      content: DIALOG_CONTENT,
       actions: [
         {
-          label: cancelButtonText,
+          label: CANCEL_BUTTON_TEXT,
           variant: "outline",
           onClick: onCancel || (() => {}),
         },
         {
-          label: confirmButtonText,
+          label: CONFIRM_BUTTON_TEXT,
           onClick: onConfirm,
         },
       ],
@@ -80,16 +66,7 @@ export function useArchivePracticeDialog({
       closeOnEscape: true,
       showCloseButton: true,
     });
-  }, [
-    title,
-    description,
-    cancelButtonText,
-    confirmButtonText,
-    content,
-    onConfirm,
-    onCancel,
-    open,
-  ]);
+  }, [onConfirm, onCancel, open]);
 
   return { openArchiveDialog };
 }

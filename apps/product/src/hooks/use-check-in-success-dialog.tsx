@@ -3,28 +3,16 @@
 import { useDialogManager } from "@daodao/ui/components/animate-ui/components/radix/dialog";
 import { useCallback } from "react";
 import { Image } from "@daodao/ui/components/image";
-// TODO: 需要添加打卡成功插圖（黃色角色坐在藍色紙飛機裡，左邊有黃色星爆圖標，右邊有藍色曲線）
-// 圖片路徑：packages/assets/images/dialog/check-in-success.png
 import SuccessPng from "@daodao/assets/images/dialog/success.png";
 
 interface UseCheckInSuccessDialogOptions {
-  /** 標題 */
-  title?: React.ReactNode;
-  /** 描述文字 */
-  description?: React.ReactNode;
-  /** 分享按鈕文字 */
-  shareButtonText?: string;
-  /** 完成按鈕文字 */
-  completeButtonText?: string;
-  /** 自訂預覽內容的渲染函數 */
-  content?: React.ReactNode;
   /** 分享的回調 */
   onShare?: () => void;
   /** 完成的回調 */
   onComplete: () => void;
 }
 
-const DEFAULT_CONTENT = (
+const DIALOG_CONTENT = (
   <div className="p-4">
     {/* TODO: 當 check-in-success.png 準備好後，替換為 CheckInSuccessPng */}
     <Image src={SuccessPng} alt="check-in-success" width={172} height={172} className="mx-auto pb-8" />
@@ -35,6 +23,10 @@ const DEFAULT_CONTENT = (
     </div>
   </div>
 );
+
+const DIALOG_TITLE = "打卡成功!";
+const SHARE_BUTTON_TEXT = "分享心得";
+const COMPLETE_BUTTON_TEXT = "完成";
 
 /**
  * 使用全局 DialogManager 來顯示打卡成功對話框的 Hook
@@ -51,11 +43,6 @@ const DEFAULT_CONTENT = (
  * ```
  */
 export function useCheckInSuccessDialog({
-  title = "打卡成功!",
-  description,
-  shareButtonText = "分享心得",
-  completeButtonText = "完成",
-  content = DEFAULT_CONTENT,
   onShare,
   onComplete,
 }: UseCheckInSuccessDialogOptions) {
@@ -63,17 +50,16 @@ export function useCheckInSuccessDialog({
 
   const openSuccessDialog = useCallback(() => {
     open({
-      title,
-      description,
-      content,
+      title: DIALOG_TITLE,
+      content: DIALOG_CONTENT,
       actions: [
         {
-          label: shareButtonText,
+          label: SHARE_BUTTON_TEXT,
           variant: "outline",
           onClick: onShare || (() => {}),
         },
         {
-          label: completeButtonText,
+          label: COMPLETE_BUTTON_TEXT,
           variant: "orange",
           onClick: onComplete,
         },
@@ -83,16 +69,7 @@ export function useCheckInSuccessDialog({
       closeOnEscape: true,
       showCloseButton: true,
     });
-  }, [
-    title,
-    description,
-    shareButtonText,
-    completeButtonText,
-    content,
-    onShare,
-    onComplete,
-    open,
-  ]);
+  }, [onShare, onComplete, open]);
 
   return { openSuccessDialog };
 }

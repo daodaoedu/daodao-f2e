@@ -8,9 +8,10 @@ import { Image } from "@daodao/ui/components/image";
 import { ImageLightbox } from "@daodao/ui/components/image-lightbox";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
-import { Share2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { useDeleteCheckInDialog } from "@/hooks/use-delete-check-in-dialog";
+import { ShareCheckInButton } from "@/components/dashboard/share-check-in-sheet";
 
 export interface CheckInData {
   id: string;
@@ -44,11 +45,6 @@ export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
   const dateMonthDay = isValid(dateObj)
     ? format(dateObj, "MM/dd")
     : date.split(".").slice(1).join("/") || "";
-
-  // 處理分享功能
-  const handleShare = () => {
-    // TODO: 實作分享功能
-  };
 
   // 處理刪除打卡
   const { openDeleteDialog } = useDeleteCheckInDialog({
@@ -160,10 +156,17 @@ export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
 
       <div className="flex flex-col w-fit gap-4 mx-auto">
         {/* 分享按鈕 */}
-        <Button onClick={handleShare} variant="white">
-          <Share2 className="size-4 mr-2" />
-          分享這篇打卡
-        </Button>
+        <ShareCheckInButton
+          taskTitle={practiceTitle}
+          checkInData={{
+            mood,
+            tags,
+            description: content,
+            media: [],
+            date,
+            images,
+          }}
+        />
         <Button variant="ghost" className="px-8 text-white hover:text-white/80 border border-white" onClick={openDeleteDialog}>
           <Trash2 className="size-4.5" />
           <span>刪除打卡</span>

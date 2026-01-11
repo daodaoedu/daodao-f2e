@@ -56,9 +56,15 @@ export interface DialogConfig {
   onClose?: () => void;
 }
 
+interface DialogItem {
+  id: string;
+  config: DialogConfig;
+  isOpen: boolean;
+}
+
 interface DialogManagerContextType {
-  open: (config: DialogConfig) => void;
-  close: () => void;
+  open: (config: DialogConfig) => { id: string; close: () => void };
+  close: (id?: string) => void;
 }
 
 const DialogManagerContext = createContext<
@@ -66,47 +72,114 @@ const DialogManagerContext = createContext<
 >(undefined);
 
 export function DialogManagerProvider({ children }: React.PropsWithChildren) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [config, setConfig] = useState<DialogConfig | null>(null);
-  const configRef = useRef<DialogConfig | null>(null);
+  const [dialogs, setDialogs] = useState<DialogItem[]>([]);
+  const dialogsRef = useRef<DialogItem[]>([]);
   const isMobile = useIsMobile();
+  const nextIdRef = useRef(0);
 
   const open = useCallback((newConfig: DialogConfig) => {
-    configRef.current = newConfig;
-    setConfig(newConfig);
-    setIsOpen(true);
+    const id = `dialog-${nextIdRef.current++}`;
+    const newDialog: DialogItem = { id, config: newConfig, isOpen: true };
+
+    setDialogs((prev) => {
+      const updated = [...prev, newDialog];
+      dialogsRef.current = updated;
+      return updated;
+    });
+
+    const close = () => {
+      setDialogs((prev) => {
+        const dialog = prev.find((d) => d.id === id);
+        if (!dialog) return prev;
+
+        dialog.config.onClose?.();
+
+        const updated = prev.map((d) =>
+          d.id === id ? { ...d, isOpen: false } : d
+        );
+        dialogsRef.current = updated;
+
+        setTimeout(() => {
+          setDialogs((current) => {
+            const filtered = current.filter((d) => d.id !== id);
+            dialogsRef.current = filtered;
+            return filtered;
+          });
+        }, 300);
+
+        return updated;
+      });
+    };
+
+    return { id, close };
   }, []);
 
-  const close = useCallback(() => {
-    setIsOpen(false);
-    const currentConfig = configRef.current;
-    currentConfig?.onClose?.();
-    // 延遲清除配置，確保動畫完成
-    setTimeout(() => {
-      configRef.current = null;
-      setConfig(null);
-    }, 300);
+  const close = useCallback((id?: string) => {
+    if (id) {
+      setDialogs((prev) => {
+        const dialog = prev.find((d) => d.id === id);
+        if (!dialog) return prev;
+
+        dialog.config.onClose?.();
+
+        const updated = prev.map((d) =>
+          d.id === id ? { ...d, isOpen: false } : d
+        );
+        dialogsRef.current = updated;
+
+        setTimeout(() => {
+          setDialogs((current) => {
+            const filtered = current.filter((d) => d.id !== id);
+            dialogsRef.current = filtered;
+            return filtered;
+          });
+        }, 300);
+
+        return updated;
+      });
+    } else {
+      setDialogs((prev) => {
+        if (prev.length === 0) return prev;
+        const lastDialog = prev[prev.length - 1];
+        lastDialog?.config.onClose?.();
+
+        const updated = prev.map((d, index) =>
+          index === prev.length - 1 ? { ...d, isOpen: false } : d
+        );
+        dialogsRef.current = updated;
+
+        setTimeout(() => {
+          setDialogs((current) => {
+            const filtered = current.slice(0, -1);
+            dialogsRef.current = filtered;
+            return filtered;
+          });
+        }, 300);
+
+        return updated;
+      });
+    }
   }, []);
 
   const handleOpenChange = useCallback(
-    (open: boolean) => {
+    (dialogId: string) => (open: boolean) => {
       if (!open) {
-        close();
+        close(dialogId);
       }
     },
     [close]
   );
 
   const handleActionClick = useCallback(
-    async (action: DialogAction) => {
+    (dialogId: string) => async (action: DialogAction) => {
       await action.onClick();
-      close();
+      close(dialogId);
     },
     [close]
   );
 
-  const renderContent = () => {
-    if (!config) return null;
+  const renderDialog = (dialog: DialogItem, index: number) => {
+    const { id, config, isOpen } = dialog;
 
     const commonProps = {
       onPointerDownOutside: (e: { preventDefault: () => void }) => {
@@ -128,10 +201,11 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
 
     if (isMobile) {
       return (
-        <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+        <Sheet key={id} open={isOpen} onOpenChange={handleOpenChange(id)}>
           <SheetContent
             side="bottom"
             className="h-auto max-h-[calc(100vh-64px)] overflow-y-auto gap-0"
+            style={{ zIndex: 50 + index }}
             {...commonProps}
           >
             <SheetHeader showCloseButton={config.showCloseButton ?? false}>
@@ -145,7 +219,7 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
 
             {config.actions && config.actions.length > 0 && (
               <SheetFooter className="flex-row gap-6 p-6 border-t border-light-gray">
-                {config.actions.map((action, index) => {
+                {config.actions.map((action, actionIndex) => {
                   const {
                     onClick: _onClick,
                     label,
@@ -155,10 +229,10 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
                   } = action;
                   return (
                     <Button
-                      key={`${action.label}-${index}`}
+                      key={`${action.label}-${actionIndex}`}
                       type="button"
                       variant={variant}
-                      onClick={() => handleActionClick(action)}
+                      onClick={() => handleActionClick(id)(action)}
                       className={cn("flex-1", className)}
                       {...restProps}
                     >
@@ -174,16 +248,21 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
     }
 
     return (
-      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <Dialog key={id} open={isOpen} onOpenChange={handleOpenChange(id)}>
         <DialogContent
           from={config.from ?? "bottom"}
           showCloseButton={config.showCloseButton ?? false}
+          style={{ zIndex: 50 + index }}
           {...commonProps}
         >
           <DialogHeader>
             <DialogTitle>{config.title}</DialogTitle>
-            {config.description && (
+            {config.description ? (
               <DialogDescription>{config.description}</DialogDescription>
+            ) : (
+              <DialogDescription className="sr-only" aria-hidden="true">
+                {typeof config.title === "string" ? config.title : ""}
+              </DialogDescription>
             )}
           </DialogHeader>
 
@@ -191,7 +270,7 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
 
           {config.actions && config.actions.length > 0 && (
             <DialogFooter className="flex-row gap-6 p-6">
-              {config.actions.map((action, index) => {
+              {config.actions.map((action, actionIndex) => {
                 const {
                   onClick: _onClick,
                   label,
@@ -201,10 +280,10 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
                 } = action;
                 return (
                   <Button
-                    key={`${action.label}-${index}`}
+                    key={`${action.label}-${actionIndex}`}
                     type="button"
                     variant={variant ?? "orange"}
-                    onClick={() => handleActionClick(action)}
+                    onClick={() => handleActionClick(id)(action)}
                     className={cn("flex-1", className)}
                     {...restProps}
                   >
@@ -222,7 +301,7 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
   return (
     <DialogManagerContext.Provider value={{ open, close }}>
       {children}
-      {config && renderContent()}
+      {dialogs.map((dialog, index) => renderDialog(dialog, index))}
     </DialogManagerContext.Provider>
   );
 }
