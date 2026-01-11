@@ -1,9 +1,11 @@
 "use client";
 
+import * as React from "react";
 import { NotebookHoleSvg } from "@daodao/assets";
 import { Button } from "@daodao/ui/components/button";
 import { CircularText } from "@daodao/ui/components/circular-text";
 import { Image } from "@daodao/ui/components/image";
+import { ImageLightbox } from "@daodao/ui/components/image-lightbox";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
 import { Share2, Trash2 } from "lucide-react";
@@ -29,6 +31,9 @@ export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
   const moodOption = MOOD_OPTIONS.find((option) => option.id === mood);
   const MoodEmoji = moodOption?.emoji;
 
+  const [lightboxOpen, setLightboxOpen] = React.useState(false);
+  const [lightboxIndex, setLightboxIndex] = React.useState(0);
+
   // 格式化日期（將 "2026.01.01" 轉換為 Date 物件）
   // 注意：需要將 "2026.01.01" 轉換為 "2026-01-01" 格式才能正確解析
   const dateStr = date.replace(/\./g, "-");
@@ -52,6 +57,12 @@ export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
     },
     onCancel: () => {},
   });
+
+  // 處理圖片點擊，開啟 lightbox
+  const handleImageClick = React.useCallback((index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  }, []);
 
   return (
     <div className="max-w-[350px] mx-auto">
@@ -120,14 +131,17 @@ export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
               {images && images.length > 0 && (
                 <div className="relative">
                   {images.map((imageUrl: string, index: number) => (
-                    <div
+                    <button
+                      type="button"
                       key={imageUrl}
+                      onClick={() => handleImageClick(index)}
                       className={cn(
-                        "relative aspect-103/67 rounded border overflow-hidden w-[206px]",
+                        "relative block aspect-103/67 rounded border overflow-hidden w-[206px] cursor-pointer",
                         index === 0 && "top-4 left-4 -rotate-6 z-2",
                         index === 1 && "ml-auto right-4 rotate-8 z-1",
                         index === 2 && "mx-auto bottom-4"
                       )}
+                      aria-label={`查看圖片 ${index + 1}`}
                     >
                       <Image
                         src={imageUrl}
@@ -135,7 +149,7 @@ export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
                         fill
                         className="object-cover"
                       />
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}
@@ -155,6 +169,16 @@ export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
           <span>刪除打卡</span>
         </Button>
       </div>
+
+      {/* 圖片 Lightbox */}
+      {images && images.length > 0 && (
+        <ImageLightbox
+          images={images}
+          initialIndex={lightboxIndex}
+          open={lightboxOpen}
+          onOpenChange={setLightboxOpen}
+        />
+      )}
     </div>
   );
 };
