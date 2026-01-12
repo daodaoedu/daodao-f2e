@@ -27,6 +27,7 @@
     "@daodao/ui": "workspace:*",
     "@hookform/resolvers": "catalog:",
     "@next/env": "catalog:",
+    "@vercel/og": "^0.8.6",
     "add": "^2.0.6",
     "date-fns": "catalog:",
     "lottie-react": "catalog:",
