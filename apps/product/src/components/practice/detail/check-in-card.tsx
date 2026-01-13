@@ -1,7 +1,6 @@
 "use client";
 
-import { NotebookHoleSvg, TapeSvg } from "@daodao/assets";
-import { CircularText } from "@daodao/ui/components/circular-text";
+import { NotebookHoleSvg, StampSvg, TapeSvg } from "@daodao/assets";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
@@ -73,22 +72,15 @@ export const CheckInCard = ({
             <div className="absolute top-0 left-0 w-full h-8 bg-white" />
             <div className="relative space-y-4">
               {/* 時間戳/印章 */}
-              <div className="float-right anonymous-pro rotate-15 translate-x-2 translate-y-3">
-                <CircularText
-                  size={100}
-                  fontSize={0.1}
-                  additionalSpacing={-0.15}
-                  className="rounded-full border border-logo-gray"
-                  text="Practice Checked In • Practice Checked In • "
-                  textClassName="text-logo-gray -rotate-15 origin-center font-bold"
-                  textRadius={0.75}
-                  centerContent={
-                    <div className="text-center border-t border-b border-logo-gray size-10 flex flex-col items-center justify-center">
-                      <div className="text-xs font-bold text-logo-gray">{dateYear}</div>
-                      <div className="text-xs font-bold text-logo-gray">{dateMonthDay}</div>
-                    </div>
-                  }
+              <div className="relative float-right anonymous-pro translate-x-2 translate-y-3">
+                <StampSvg
+                  width={100}
+                  height={100}
                 />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-xs font-bold text-logo-gray rotate-15 size-10 flex flex-col items-center justify-center">
+                  <div>{dateYear}</div>
+                  <div>{dateMonthDay}</div>
+                </div>
               </div>
 
               {/* 心情狀態 */}
