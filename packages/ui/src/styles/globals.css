@@ -627,6 +627,21 @@
     }
   }
 
+  /* Stamp animation - 蓋印章特效 */
+  .animate-stamp {
+    animation: stamp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  @keyframes stamp {
+    0% {
+      transform: scale(1.25) rotate(5deg);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0) scale(1) rotate(0deg);
+      opacity: 1;
+    }
+  }
+
   /* Vertical separator */
   .vertical-separator-left {
     position: relative;
