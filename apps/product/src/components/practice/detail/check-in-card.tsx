@@ -78,7 +78,7 @@ export const CheckInCard = ({
 
         // 繪製漸層遮罩
         const gradient = ctx.createLinearGradient(0, 0, 0, imageData.height);
-        gradient.addColorStop(0, "rgba(255, 255, 255, 0)");
+        gradient.addColorStop(0.5, "rgba(255, 255, 255, 0)");
         gradient.addColorStop(1, "#FFFFFF");
 
         ctx.fillStyle = gradient;
@@ -129,11 +129,11 @@ export const CheckInCard = ({
       </div>
 
       {/* 筆記本風格內容區 */}
-      <div className="relative bg-white pb-9 mb-5 mt-[49px] rounded-b">
+      <div className="relative bg-white pb-9 mb-5 mt-5 rounded-b">
         {/* 筆記本裝訂線（頂部） */}
-        <NotebookHoleSvg className="absolute bottom-full left-0" />
+        <NotebookHoleSvg className="absolute -top-7 left-0" />
 
-        <main ref={mainRef} className="bg-white max-h-[460px] overflow-y-auto scrollbar-hide px-5">
+        <main ref={mainRef} className="pt-4.5 bg-white max-h-[460px] overflow-y-auto scrollbar-hide px-5">
           <div
             style={{
               backgroundImage:
@@ -144,7 +144,7 @@ export const CheckInCard = ({
               backgroundPositionY: "24px",
             }}
           >
-            <div className="absolute top-0 left-0 w-full h-8 bg-white" />
+            <div className="absolute top-0 left-0 w-full h-12 bg-white" />
             <div className="relative space-y-4">
               {/* 時間戳/印章 */}
               <div className="relative float-right anonymous-pro translate-x-2 translate-y-3 animate-stamp pointer-events-none z-30">

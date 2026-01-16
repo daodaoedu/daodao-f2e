@@ -4,6 +4,7 @@ packages:
   - packages/features/*
 
 catalog:
+  '@gsap/react': ^2.1.2
   '@hookform/resolvers': 3.10.0
   '@next/env': 16.1.1
   '@radix-ui/react-slot': 1.2.4
@@ -12,6 +13,7 @@ catalog:
   '@types/react': 19.2.7
   '@types/react-dom': ^19.2.3
   date-fns: 3.6.0
+  gsap: ^3.14.2
   lottie-react: 2.4.1
   lucide-react: 0.475.0
   motion: 12.23.26

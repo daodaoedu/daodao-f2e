@@ -493,13 +493,13 @@ export const CheckInButton = ({
   // 使用 ref 來保存打卡資料，以便在成功對話框中使用
   const checkInDataRef = useRef<CheckInData | null>(null);
 
-  const { openSuccessDialog } = useCheckInSuccessDialog();
+  const { openSuccessDialog } = useCheckInSuccessDialog({
+    title: taskTitle,
+  });
 
   const handleCheckInSuccess = async () => {
     const result = await openSuccessDialog();
-    if (result.value === "share") {
-      // TODO: 實作分享功能
-    } else if (result.value === "complete") {
+    if (result.value === "complete") {
       // 成功對話框關閉後，執行原本的完成回調
       if (checkInDataRef.current) {
         onComplete(checkInDataRef.current);

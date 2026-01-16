@@ -1,15 +1,15 @@
 "use client";
 
-import FacebookSvg from "@daodao/assets/images/social-icons/facebook.svg";
-import InstagramSvg from "@daodao/assets/images/social-icons/instagram.svg";
-import LineSvg from "@daodao/assets/images/social-icons/line.svg";
-import LinkedInSvg from "@daodao/assets/images/social-icons/linkedin.svg";
-import XSvg from "@daodao/assets/images/social-icons/x.svg";
+import FacebookSvg from "@daodao/assets/images/social-icons/facebook-filled.svg";
+import ThreadsSvg from "@daodao/assets/images/social-icons/threads-filled.svg";
+import LineSvg from "@daodao/assets/images/social-icons/line-filled.svg";
+import LinkedInSvg from "@daodao/assets/images/social-icons/linkedin-filled.svg";
+import XSvg from "@daodao/assets/images/social-icons/x-filled.svg";
 import { getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Download } from "lucide-react";
 import type { CheckInData } from "./check-in-sheet";
-import { CheckInCard } from "../practice/detail/check-in-card";
+import { Image } from "@daodao/ui/components/image";
 
 /**
  * 分享打卡 Sheet 的內容組件（不包含 Sheet 外層）
@@ -23,7 +23,7 @@ export const ShareCheckInSheetContent = ({
   checkInData: CheckInData & { date: string; images?: string[] };
   onClose?: () => void;
 }) => {
-  const { date, mood, tags, description, images } = checkInData;
+  const { description, images } = checkInData;
 
   // 準備分享內容
   const shareText = `${taskTitle}\n${description || ""}`;
@@ -35,13 +35,6 @@ export const ShareCheckInSheetContent = ({
     hashtag: "#島島阿學",
   });
 
-  // 處理 Instagram 分享（使用 Threads，因為 Instagram 沒有直接的分享 API）
-  const handleInstagramShare = () => {
-    if (shareAPI.threadsShare) {
-      shareAPI.threadsShare();
-    }
-  };
-
   // 處理下載打卡圖片
   const handleDownloadImage = async () => {
     try {
@@ -52,77 +45,76 @@ export const ShareCheckInSheetContent = ({
   };
 
   return (
-    <div className="px-6">
-      {/* 打卡卡片預覽 */}
-      <div className="relative mb-8">
-        <CheckInCard
-          taskTitle={taskTitle}
-          date={date}
-          mood={mood}
-          content={description}
-          tags={tags}
-          images={images}
-          titleClassName="text-text-dark"
-          showTape={false}
-        />
-      </div>
+    <div className="px-6 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col gap-8">
+        <h2 className="text-xl font-medium text-bg-dark">{taskTitle}</h2>
 
-      {/* 分享到社群媒體 */}
-      <div className="mb-8">
-        <h3 className="text-base font-medium mb-3 text-text-dark text-center">
-          分享到社群媒體
-        </h3>
-        <div className="flex justify-center gap-4">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-12"
-            onClick={shareAPI.lineShare}
-            aria-label="分享到 LINE"
-          >
-            <LineSvg className="size-6" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-12"
-            onClick={handleInstagramShare}
-            aria-label="分享到 Instagram"
-          >
-            <InstagramSvg className="size-6" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-12"
-            onClick={shareAPI.facebookShare}
-            aria-label="分享到 Facebook"
-          >
-            <FacebookSvg className="size-6" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-12"
-            onClick={shareAPI.xShare}
-            aria-label="分享到 X (Twitter)"
-          >
-            <XSvg className="size-6" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-12"
-            onClick={shareAPI.linkedinShare}
-            aria-label="分享到 LinkedIn"
-          >
-            <LinkedInSvg className="size-6" />
-          </Button>
+        <div className="relative overflow-hidden w-[350px] h-[192px]">
+          <Image
+            src={images?.[0] ?? ""}
+            alt="打卡圖片"
+            fill
+            className="object-contain bg-white"
+          />
+        </div>
+
+        {/* 分享到社群媒體 */}
+        <div>
+          <h3 className="text-base font-medium mb-3 text-text-dark text-center">
+            分享到社群媒體
+          </h3>
+          <div className="flex justify-center gap-4">
+            <Button
+              type="button"
+              variant="link"
+              size="icon"
+              className="size-12 text-[#06C755] hover:no-underline"
+              onClick={shareAPI.lineShare}
+              aria-label="分享到 LINE"
+            >
+              <LineSvg className="size-10" />
+            </Button>
+            <Button
+              type="button"
+              variant="link"
+              size="icon"
+              className="size-12"
+              onClick={shareAPI.threadsShare}
+              aria-label="分享到 Instagram"
+            >
+              <ThreadsSvg className="size-10 text-logo-purple" />
+            </Button>
+            <Button
+              type="button"
+              variant="link"
+              size="icon"
+              className="size-12 text-[#1877F2] hover:no-underline"
+              onClick={shareAPI.facebookShare}
+              aria-label="分享到 Facebook"
+            >
+              <FacebookSvg className="size-10 text-logo-blue" />
+            </Button>
+            <Button
+              type="button"
+              variant="link"
+              size="icon"
+              className="size-12 text-[#000000] hover:no-underline"
+              onClick={shareAPI.xShare}
+              aria-label="分享到 X (Twitter)"
+            >
+              <XSvg className="size-10" />
+            </Button>
+            <Button
+              type="button"
+              variant="link"
+              size="icon"
+              className="size-12 text-[#0076B2] hover:no-underline"
+              onClick={shareAPI.linkedinShare}
+              aria-label="分享到 LinkedIn"
+            >
+              <LinkedInSvg className="size-10" />
+            </Button>
+          </div>
         </div>
       </div>
 

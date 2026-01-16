@@ -19,9 +19,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
           success: "success border-logo-cyan",
           error: "error border-red",
           actionButton: cn(
-            "px-5 py-2 h-10 flex items-center justify-center rounded-full cursor-pointer",
+            "px-5 py-2 h-10 mr-4 flex items-center justify-center rounded-full cursor-pointer",
             "[.success_&]:bg-logo-cyan [.success_&]:text-white",
-            "[.error_&]:bg-red [.error_&]:text-bg-dark"
+            "[.error_&]:bg-red [.error_&]:text-bg-dark shrink-0"
           ),
           title: "font-medium text-text-dark",
           description: "text-sm !text-text-dark",

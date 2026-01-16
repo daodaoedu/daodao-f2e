@@ -5,7 +5,7 @@ import { Button } from "@daodao/ui/components/button";
 import { ImageLightbox } from "@daodao/ui/components/image-lightbox";
 import { Share2, Trash2 } from "lucide-react";
 import { type MoodType } from "@/constants/mood";
-import { useDeleteCheckInDialog } from "@/hooks/use-delete-check-in-dialog";
+import { DeleteCheckInResult, useDeleteCheckInDialog } from "@/hooks/use-delete-check-in-dialog";
 import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
 import { CheckInCard } from "./check-in-card";
 
@@ -33,8 +33,8 @@ export const CheckInDetail = ({ checkInData }: CheckInDetailProps) => {
   const { openDeleteDialog } = useDeleteCheckInDialog();
 
   const handleDeleteCheckIn = async () => {
-    const result = await openDeleteDialog();
-    if (result.value === "confirm") {
+    const result = await openDeleteDialog(checkInData.id);
+    if (result === DeleteCheckInResult.Deleted) {
       // TODO: 實作刪除打卡功能
     }
   };

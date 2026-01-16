@@ -14,8 +14,8 @@ import {
 import { Button } from "@daodao/ui/components/button";
 import { Archive, Trash2 } from "lucide-react";
 import { CheckInButton } from "@/components/dashboard";
-import { useArchivePracticeDialog } from "@/hooks/use-archive-practice-dialog";
-import { useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
+import { ArchivePracticeResult, useArchivePracticeDialog } from "@/hooks/use-archive-practice-dialog";
+import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
 
 const practice: ManualPracticeFormValues & {
   total: number;
@@ -66,15 +66,15 @@ export default function PracticeDetailPage() {
   const { openDeleteDialog } = useDeletePracticeDialog();
 
   const handleArchive = async () => {
-    const result = await openArchiveDialog();
-    if (result.value === "confirm") {
+    const result = await openArchiveDialog(practiceId);
+    if (result === ArchivePracticeResult.Archived) {
       // TODO: 實作封存功能
     }
   };
 
   const handleDelete = async () => {
-    const result = await openDeleteDialog();
-    if (result.value === "confirm") {
+    const result = await openDeleteDialog(practiceId);
+    if (result === DeletePracticeResult.Deleted) {
       // TODO: 實作刪除功能
     }
   };

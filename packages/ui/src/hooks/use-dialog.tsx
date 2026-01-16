@@ -92,27 +92,6 @@ function getDialogImage(type: DialogType) {
 }
 
 /**
- * 根據類型獲取預設按鈕配置
- */
-function getDefaultButtons(type: DialogType): DialogButton<"confirm" | "cancel">[] {
-  switch (type) {
-    case "info":
-      return [
-        { label: "確定", value: "confirm", variant: "orange" },
-      ];
-    case "success":
-      return [
-        { label: "確定", value: "confirm", variant: "orange" },
-      ];
-    case "warning":
-      return [
-        { label: "取消", value: "cancel", variant: "outline" },
-        { label: "確定", value: "confirm", variant: "orange" },
-      ];
-  }
-}
-
-/**
  * 統一的 Dialog Hook，類似 toast 的使用方式
  * 
  * @example
@@ -147,20 +126,19 @@ export function useDialog() {
     <TValue extends string = string>(
       type: DialogType,
       options: DialogOptions<TValue>
-    ): Promise<DialogResult<TValue>> => {
+    ): Promise<DialogResult<TValue | "close">> => {
       return new Promise((resolve) => {
         const {
           title,
           message,
           content,
-          buttons: providedButtons,
+          buttons,
           strict = false,
           textAlign = "left",
           containerClassName,
           customConfig,
         } = options;
 
-        const buttons = providedButtons ?? getDefaultButtons(type);
         const image = getDialogImage(type);
         const baseConfig = strict ? STRICT_DIALOG_CONFIG : DEFAULT_DIALOG_CONFIG;
 
@@ -179,7 +157,7 @@ export function useDialog() {
           ) : null);
 
         // 構建按鈕
-        const actions: DialogAction[] = buttons.map((button, index) => ({
+        const actions: DialogAction[] = (buttons ?? []).map((button, index) => ({
           label: button.label,
           variant: button.variant,
           onClick: () => {
@@ -193,17 +171,8 @@ export function useDialog() {
         // 處理關閉事件
         const handleClose = () => {
           // 如果沒有按鈕，resolve 預設值
-          if (buttons.length === 0) {
-            resolve({ value: "close" as TValue, index: -1 });
-          } else if (strict) {
-            // 嚴格模式下，關閉時不 resolve（應該由按鈕觸發）
-            return;
-          } else {
-            // 關閉時 resolve 第一個按鈕（通常是取消）
-            resolve({
-              value: (buttons[0]?.value || "close") as TValue,
-              index: 0,
-            });
+          if (actions.length === 0 || !strict) {
+            resolve({ value: "close", index: -1 });
           }
         };
 
