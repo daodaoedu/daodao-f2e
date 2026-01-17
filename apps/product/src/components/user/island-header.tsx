@@ -99,7 +99,7 @@ export function IslandHeader({
           <Lottie animationData={activeShaper1Json} className="*:w-full *:h-full" />
           <div className="hidden md:block absolute bottom-[25px] -left-[5px] w-3 h-[11px] rounded-full bg-white/70 border border-light-cyan" />
           <div className="hidden md:block absolute bottom-[35px] -left-[22px] size-4.5 rounded-full bg-white/70 border border-light-cyan" />
-          <div className="absolute -bottom-[126px] left-1/2 -translate-x-1/2 w-[calc(100vw-40px)] md:translate-x-0 md:bottom-[37px] md:-left-[241px] md:w-[219px] rounded-[20px] bg-white/70 py-3 px-4 border border-light-cyan">
+          <div className="absolute -bottom-[126px] left-1/2 -translate-x-1/2 w-[calc(100vw-40px)] max-w-[600px] md:translate-x-0 md:bottom-[37px] md:-left-[241px] md:w-[219px] rounded-[20px] bg-white/70 py-3 px-4 border border-light-cyan">
             <div className="flex items-center justify-between mb-1">
               <p className="text-sm text-logo-cyan font-medium">學習類型</p>
               <Button

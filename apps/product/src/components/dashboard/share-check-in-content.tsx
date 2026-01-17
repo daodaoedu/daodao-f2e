@@ -8,8 +8,13 @@ import XSvg from "@daodao/assets/images/social-icons/x-filled.svg";
 import { getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
 import { Image } from "@daodao/ui/components/image";
-import { Download } from "lucide-react";
+import { Download, ExternalLink } from "lucide-react";
 import type { CheckInData } from "./check-in-sheet";
+
+interface ShareCheckInSheetContentProps {
+  taskTitle: string;
+  checkInData: CheckInData & { date: string; images?: string[] };
+}
 
 /**
  * 分享打卡 Sheet 的內容組件（不包含 Sheet 外層）
@@ -18,16 +23,13 @@ import type { CheckInData } from "./check-in-sheet";
 export const ShareCheckInSheetContent = ({
   taskTitle,
   checkInData,
-}: {
-  taskTitle: string;
-  checkInData: CheckInData & { date: string; images?: string[] };
-  onClose?: () => void;
-}) => {
+}: ShareCheckInSheetContentProps) => {
   const { description, images } = checkInData;
 
   // 準備分享內容
   const shareText = `${taskTitle}\n${description || ""}`;
-  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const shareUrl = typeof window !== "undefined" ? window.location.pathname : "";
+
   const shareAPI = getShareAPI({
     title: taskTitle,
     text: shareText,
@@ -57,7 +59,6 @@ export const ShareCheckInSheetContent = ({
               type="button"
               variant="link"
               size="icon"
-              className="size-12 text-[#06C755] hover:no-underline"
               onClick={shareAPI.lineShare}
               aria-label="分享到 LINE"
             >
@@ -67,9 +68,8 @@ export const ShareCheckInSheetContent = ({
               type="button"
               variant="link"
               size="icon"
-              className="size-12"
               onClick={shareAPI.threadsShare}
-              aria-label="分享到 Instagram"
+              aria-label="分享到 Threads"
             >
               <ThreadsSvg className="size-10 text-logo-purple" />
             </Button>
@@ -77,7 +77,6 @@ export const ShareCheckInSheetContent = ({
               type="button"
               variant="link"
               size="icon"
-              className="size-12 text-[#1877F2] hover:no-underline"
               onClick={shareAPI.facebookShare}
               aria-label="分享到 Facebook"
             >
@@ -87,7 +86,6 @@ export const ShareCheckInSheetContent = ({
               type="button"
               variant="link"
               size="icon"
-              className="size-12 text-[#000000] hover:no-underline"
               onClick={shareAPI.xShare}
               aria-label="分享到 X (Twitter)"
             >
@@ -97,11 +95,20 @@ export const ShareCheckInSheetContent = ({
               type="button"
               variant="link"
               size="icon"
-              className="size-12 text-[#0076B2] hover:no-underline"
               onClick={shareAPI.linkedinShare}
               aria-label="分享到 LinkedIn"
             >
               <LinkedInSvg className="size-10" />
+            </Button>
+            <Button
+              type="button"
+              variant="link"
+              size="icon"
+              className="bg-light-blue rounded-lg"
+              onClick={shareAPI.nativeShare}
+              aria-label="分享到其他平台"
+            >
+              <ExternalLink className="size-7" />
             </Button>
           </div>
         </div>

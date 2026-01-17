@@ -1,14 +1,13 @@
 "use client";
 
-import { ArrowRightOutlineSvg } from "@daodao/assets";
+import { ArrowRightOutlineSvg, ExperimentSvg, FlagSvg, NoteSvg } from "@daodao/assets";
 import { useIsMobile, useScrollVisibility } from "@daodao/shared";
 import { Badge } from "@daodao/ui/components/badge";
 import { Button } from "@daodao/ui/components/button";
 import { Checkbox } from "@daodao/ui/components/checkbox";
 import { CustomLink } from "@daodao/ui/components/custom-link";
 import { cn } from "@daodao/ui/lib/utils";
-import { Flag } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 type TabType = "practices" | "plans" | "ideas";
@@ -29,6 +28,7 @@ interface Tab {
   id: TabType;
   label: string;
   disabled?: boolean;
+  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
 /**
@@ -37,13 +37,18 @@ interface Tab {
 export function PracticeSection({ practices = [] }: PracticeSectionProps) {
   const [activeTab, setActiveTab] = useState<TabType>("practices");
   const [includeCompleted, setIncludeCompleted] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
   const isMobile = useIsMobile();
   const isScrolled = useScrollVisibility({ threshold: 167 });
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const tabs: Tab[] = [
-    { id: "practices", label: "主題實踐" },
-    { id: "plans", label: "學習計劃", disabled: true },
-    { id: "ideas", label: "想法", disabled: true },
+    { id: "practices", label: "主題實踐", Icon: ExperimentSvg },
+    { id: "plans", label: "學習計劃", disabled: true, Icon: FlagSvg },
+    { id: "ideas", label: "想法", disabled: true, Icon: NoteSvg },
   ];
 
   const getStatusBadge = (status: PracticeItem["status"]) => {
@@ -76,7 +81,7 @@ export function PracticeSection({ practices = [] }: PracticeSectionProps) {
   const renderSubNavigation = () => {
     const content = (
       <>
-        {tabs.map((tab) => (
+        {tabs.map(({ Icon, ...tab }) => (
           <Button
             key={tab.id}
             variant="ghost"
@@ -94,7 +99,7 @@ export function PracticeSection({ practices = [] }: PracticeSectionProps) {
                   : "bg-white text-bg-dark"
               )}
             >
-              <Flag className="size-6" />
+              <Icon className="size-6" />
             </div>
             <div
               className={cn(
@@ -108,6 +113,8 @@ export function PracticeSection({ practices = [] }: PracticeSectionProps) {
         ))}
       </>
     );
+
+    if (!isMounted) return null;
 
     if (isMobile) {
       return createPortal(

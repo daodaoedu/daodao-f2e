@@ -5,7 +5,7 @@ import { ArchivedContentList } from "@/components/settings/archived-content-list
 
 export default function ArchivedContentPage() {
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gradient-to-br from-[#E0F7FA] via-[#F0FDFF] to-white">
+    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto">
       <PageHeader leftAction="back" title="已封存的內容" />
 
       <BackgroundAnimation />

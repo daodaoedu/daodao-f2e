@@ -5,7 +5,7 @@ import { SettingsList } from "@/components/settings";
 
 export default function SettingsPage() {
   return (
-    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto bg-gradient-to-br from-[#E0F7FA] via-[#F0FDFF] to-white">
+    <div className="relative w-screen min-h-screen z-10 overflow-hidden overflow-y-auto">
       <PageHeader leftAction="back" title="設定" />
 
       <BackgroundAnimation />
