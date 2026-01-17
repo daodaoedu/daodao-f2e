@@ -65,7 +65,7 @@ export default function UserProfilePage() {
       >
         <PageHeader
           title="我的小島"
-          rightActionTo="/"
+          rightActionTo="/settings"
           rightLabel="設定"
           rightActionIcon={<SlidersHorizontal className="size-6" />}
         />

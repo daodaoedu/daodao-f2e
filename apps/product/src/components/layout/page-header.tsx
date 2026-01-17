@@ -61,7 +61,7 @@ export const PageHeader = ({
     if (onRightAction) {
       onRightAction();
     } else if (rightActionTo) {
-      router.replace(rightActionTo);
+      router.push(rightActionTo);
     } else {
       router.back();
     }

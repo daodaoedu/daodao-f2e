@@ -81,7 +81,7 @@ export function IslandHeader({
   return (
     <>
       <div className="h-[378px] md:h-[333px] relative -z-20" />
-      <header ref={headerRef} className="fixed top-0 inset-x-0 h-[420px] md:pt-4 -z-10">
+      <header ref={headerRef} className="fixed top-0 inset-x-0 h-[420px] -z-10">
         <Image
           src={userDesktopBannerPng}
           alt="user-desktop-banner"
