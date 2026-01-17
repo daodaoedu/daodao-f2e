@@ -22,12 +22,13 @@ function TooltipProvider({ delay = 0, ...props }: TooltipProviderProps) {
 
 type TooltipProps = TooltipPrimitiveProps & {
   delay?: TooltipPrimitiveProps["delay"];
+  alwaysOpen?: boolean;
 };
 
-function Tooltip({ delay = 0, ...props }: TooltipProps) {
+function Tooltip({ delay = 0, alwaysOpen, ...props }: TooltipProps) {
   return (
     <TooltipProvider delay={delay}>
-      <TooltipPrimitive {...props} />
+      <TooltipPrimitive alwaysOpen={alwaysOpen} {...props} />
     </TooltipProvider>
   );
 }
@@ -52,7 +53,7 @@ function TooltipPanel({ className, sideOffset = 4, children, style, ...props }: 
           style={style}
         >
           {children}
-          <TooltipArrowPrimitive className="bg-primary fill-primary z-50 size-2.5 data-[side='bottom']:-top-[4px] data-[side='right']:-left-[4px] data-[side='left']:-right-[4px] data-[side='inline-start']:-right-[4px] data-[side='inline-end']:-left-[4px] rotate-45 rounded-[2px]" />
+          <TooltipArrowPrimitive className="bg-inherit fill-inherit z-50 size-(--arrow-size,10px) data-[side='bottom']:-top-[4px] data-[side='right']:-left-[4px] data-[side='left']:-right-[4px] data-[side='inline-start']:-right-[4px] data-[side='inline-end']:-left-[4px] rotate-45 rounded-[2px] skew-10" />
         </TooltipPopupPrimitive>
       </TooltipPositionerPrimitive>
     </TooltipPortalPrimitive>

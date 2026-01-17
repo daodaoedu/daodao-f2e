@@ -35,11 +35,13 @@ type TooltipProps = React.ComponentProps<typeof TooltipPrimitive.Root> & {
   followCursor?: boolean | "x" | "y";
   followCursorSpringOptions?: SpringOptions;
   delay?: number;
+  alwaysOpen?: boolean;
 };
 
 function Tooltip({
   followCursor = false,
   followCursorSpringOptions = { stiffness: 200, damping: 17 },
+  alwaysOpen = false,
   ...props
 }: TooltipProps) {
   const [isOpen, setIsOpen] = useControlledState({
@@ -53,7 +55,7 @@ function Tooltip({
   return (
     <LocalTooltipProvider
       value={{
-        isOpen,
+        isOpen: alwaysOpen ? true : isOpen,
         setIsOpen,
         x,
         y,
