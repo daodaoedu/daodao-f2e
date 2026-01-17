@@ -3,7 +3,7 @@
 import { Button } from "@daodao/ui/components/button";
 import { cn } from "@daodao/ui/lib/utils";
 import { MOOD_OPTIONS } from "@/constants/mood";
-import type { CheckInDate, CheckInData } from "./types";
+import type { CheckInData, CheckInDate } from "./types";
 
 interface CheckInDateButtonProps {
   item: CheckInDate;
@@ -26,9 +26,7 @@ export const CheckInDateButton = ({
   const isActive = hasCheckIn && item.id === activeCheckInId;
   const itemCheckIn = checkIns[item.id];
   const itemMood = itemCheckIn?.mood;
-  const itemMoodOption = itemMood
-    ? MOOD_OPTIONS.find((option) => option.id === itemMood)
-    : null;
+  const itemMoodOption = itemMood ? MOOD_OPTIONS.find((option) => option.id === itemMood) : null;
   const ItemMoodEmoji = itemMoodOption?.emoji;
 
   return (
@@ -47,17 +45,10 @@ export const CheckInDateButton = ({
         !hasCheckIn && "opacity-30 cursor-not-allowed",
         className
       )}
-      aria-label={
-        hasCheckIn
-          ? `選擇 ${item.date} 的打卡記錄`
-          : `${item.date} 尚未打卡`
-      }
+      aria-label={hasCheckIn ? `選擇 ${item.date} 的打卡記錄` : `${item.date} 尚未打卡`}
     >
-      {ItemMoodEmoji && (
-        <ItemMoodEmoji className="absolute top-0 right-0 size-4" />
-      )}
+      {ItemMoodEmoji && <ItemMoodEmoji className="absolute top-0 right-0 size-4" />}
       <span>{index + 1}</span>
     </Button>
   );
 };
-

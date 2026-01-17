@@ -2,7 +2,7 @@
 
 import { XIcon } from "lucide-react";
 import { useTheme } from "next-themes";
-import { toast, Toaster as Sonner, type ToasterProps } from "sonner";
+import { Toaster as Sonner, type ToasterProps, toast } from "sonner";
 import { cn } from "../lib/utils";
 
 const Toaster = ({ ...props }: ToasterProps) => {
@@ -14,8 +14,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       closeButton
       toastOptions={{
         classNames: {
-          closeButton:
-            "absolute right-2 top-2 size-6 rounded-full cursor-pointer",
+          closeButton: "absolute right-2 top-2 size-6 rounded-full cursor-pointer",
           success: "success border-logo-cyan",
           error: "error border-red",
           actionButton: cn(

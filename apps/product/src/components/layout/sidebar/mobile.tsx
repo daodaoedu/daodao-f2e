@@ -25,12 +25,12 @@ export const MobileSidebar = () => {
         {/* Menu Items */}
         <ul className="flex px-10 py-3 justify-evenly">
           {menuItems.map((item) => {
-            const isActive = item.isMatch(pathname, '123');
+            const isActive = item.isMatch(pathname, "123");
             const Icon = isActive ? item.activeIcon : item.icon;
             return (
               <li key={item.label} className={cn(item.hidden && "hidden")}>
                 <CustomLink
-                  href={typeof item.href === 'function' ? item.href('123') : item.href}
+                  href={typeof item.href === "function" ? item.href("123") : item.href}
                   className="flex items-center text-text-dark"
                   aria-label={item.label}
                 >

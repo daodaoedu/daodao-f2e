@@ -12,4 +12,3 @@ export const CheckInDateSelector = (props: CheckInDateSelectorProps) => {
   }
   return <DesktopCheckInDateSelector {...props} />;
 };
-

@@ -2,8 +2,8 @@
 
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { useCallback, useRef } from "react";
-import { CheckInSheetContent } from "@/components/dashboard/check-in-sheet";
 import type { CheckInData } from "@/components/dashboard/check-in-sheet";
+import { CheckInSheetContent } from "@/components/dashboard/check-in-sheet";
 
 interface UseCheckInSheetOptions {
   /** 任務標題 */
@@ -29,11 +29,7 @@ interface UseCheckInSheetOptions {
  * openCheckInSheet();
  * ```
  */
-export function useCheckInSheet({
-  taskTitle,
-  onComplete,
-  onClose,
-}: UseCheckInSheetOptions) {
+export function useCheckInSheet({ taskTitle, onComplete, onClose }: UseCheckInSheetOptions) {
   const { open } = useSheetManager();
   const closeRef = useRef<(() => void) | null>(null);
 
@@ -64,4 +60,3 @@ export function useCheckInSheet({
 
   return { openCheckInSheet };
 }
-

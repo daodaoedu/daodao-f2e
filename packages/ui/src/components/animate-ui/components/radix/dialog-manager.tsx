@@ -1,13 +1,9 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useRef,
-  useState,
-} from "react";
 import { useIsMobile } from "@daodao/shared";
+import { createContext, useCallback, useContext, useRef, useState } from "react";
+import { cn } from "../../../../lib/utils";
+import { Button, type ButtonProps } from "../../../button";
 import type { DialogFlipDirection } from "../../primitives/radix/dialog";
 import {
   Dialog,
@@ -25,8 +21,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "./sheet";
-import { Button, ButtonProps } from "../../../button";
-import { cn } from "../../../../lib/utils";
 
 export interface DialogAction extends Omit<ButtonProps, "children"> {
   /** 按鈕文字 */
@@ -67,9 +61,7 @@ interface DialogManagerContextType {
   close: (id?: string) => void;
 }
 
-const DialogManagerContext = createContext<
-  DialogManagerContextType | undefined
->(undefined);
+const DialogManagerContext = createContext<DialogManagerContextType | undefined>(undefined);
 
 export function DialogManagerProvider({ children }: React.PropsWithChildren) {
   const [dialogs, setDialogs] = useState<DialogItem[]>([]);
@@ -94,9 +86,7 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
 
         dialog.config.onClose?.();
 
-        const updated = prev.map((d) =>
-          d.id === id ? { ...d, isOpen: false } : d
-        );
+        const updated = prev.map((d) => (d.id === id ? { ...d, isOpen: false } : d));
         dialogsRef.current = updated;
 
         setTimeout(() => {
@@ -122,9 +112,7 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
 
         dialog.config.onClose?.();
 
-        const updated = prev.map((d) =>
-          d.id === id ? { ...d, isOpen: false } : d
-        );
+        const updated = prev.map((d) => (d.id === id ? { ...d, isOpen: false } : d));
         dialogsRef.current = updated;
 
         setTimeout(() => {
@@ -210,9 +198,7 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
           >
             <SheetHeader showCloseButton={config.showCloseButton ?? false}>
               <SheetTitle>{config.title}</SheetTitle>
-              {config.description && (
-                <SheetDescription>{config.description}</SheetDescription>
-              )}
+              {config.description && <SheetDescription>{config.description}</SheetDescription>}
             </SheetHeader>
 
             <div className="px-5 text-text-dark">{config.content}</div>
@@ -220,13 +206,7 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
             {config.actions && config.actions.length > 0 && (
               <SheetFooter className="flex-row gap-6 p-6 border-t border-light-gray">
                 {config.actions.map((action, actionIndex) => {
-                  const {
-                    onClick: _onClick,
-                    label,
-                    variant,
-                    className,
-                    ...restProps
-                  } = action;
+                  const { onClick: _onClick, label, variant, className, ...restProps } = action;
                   return (
                     <Button
                       key={`${action.label}-${actionIndex}`}
@@ -258,8 +238,7 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
           <DialogHeader>
             <DialogTitle>{config.title}</DialogTitle>
             <DialogDescription className="sr-only" aria-hidden="true">
-              {config.description ??
-                (typeof config.title === "string" ? config.title : "")}
+              {config.description ?? (typeof config.title === "string" ? config.title : "")}
             </DialogDescription>
           </DialogHeader>
 
@@ -268,13 +247,7 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
           {config.actions && config.actions.length > 0 && (
             <DialogFooter className="flex-row gap-6 p-6">
               {config.actions.map((action, actionIndex) => {
-                const {
-                  onClick: _onClick,
-                  label,
-                  variant,
-                  className,
-                  ...restProps
-                } = action;
+                const { onClick: _onClick, label, variant, className, ...restProps } = action;
                 return (
                   <Button
                     key={`${action.label}-${actionIndex}`}
@@ -306,9 +279,7 @@ export function DialogManagerProvider({ children }: React.PropsWithChildren) {
 export function useDialogManager() {
   const context = useContext(DialogManagerContext);
   if (!context) {
-    throw new Error(
-      "useDialogManager must be used within a DialogManagerProvider"
-    );
+    throw new Error("useDialogManager must be used within a DialogManagerProvider");
   }
   return context;
 }

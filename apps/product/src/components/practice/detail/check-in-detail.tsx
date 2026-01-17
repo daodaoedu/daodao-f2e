@@ -1,10 +1,10 @@
 "use client";
 
-import * as React from "react";
 import { Button } from "@daodao/ui/components/button";
 import { ImageLightbox } from "@daodao/ui/components/image-lightbox";
 import { Share2, Trash2 } from "lucide-react";
-import { type MoodType } from "@/constants/mood";
+import * as React from "react";
+import type { MoodType } from "@/constants/mood";
 import { DeleteCheckInResult, useDeleteCheckInDialog } from "@/hooks/use-delete-check-in-dialog";
 import { useShareCheckInSheet } from "@/hooks/use-share-check-in-sheet";
 import { CheckInCard } from "./check-in-card";

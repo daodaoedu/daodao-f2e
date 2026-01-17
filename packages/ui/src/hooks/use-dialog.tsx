@@ -1,12 +1,15 @@
 "use client";
 
-import { useDialogManager } from "../components/animate-ui/components/radix/dialog";
-import { useCallback } from "react";
-import type { DialogConfig, DialogAction } from "../components/animate-ui/components/radix/dialog-manager";
-import { DialogContentWithImage } from "../components/dialog-content-with-image";
 import InfoPng from "@daodao/assets/images/dialog/info.png";
 import SuccessPng from "@daodao/assets/images/dialog/success.png";
 import WarningPng from "@daodao/assets/images/dialog/warning.png";
+import { useCallback } from "react";
+import { useDialogManager } from "../components/animate-ui/components/radix/dialog";
+import type {
+  DialogAction,
+  DialogConfig,
+} from "../components/animate-ui/components/radix/dialog-manager";
+import { DialogContentWithImage } from "../components/dialog-content-with-image";
 
 /**
  * Dialog 預設配置
@@ -93,17 +96,17 @@ function getDialogImage(type: DialogType) {
 
 /**
  * 統一的 Dialog Hook，類似 toast 的使用方式
- * 
+ *
  * @example
  * ```tsx
  * const { openInfoDialog, openSuccessDialog, openWarningDialog } = useDialog();
- * 
+ *
  * // 簡單使用
  * await openSuccessDialog({
  *   title: "操作成功",
  *   message: "您的操作已成功完成",
  * });
- * 
+ *
  * // 自訂按鈕（TypeScript 會自動推斷 result.value 為 "cancel" | "delete"）
  * const result = await openWarningDialog({
  *   title: "確定刪除？",
@@ -113,7 +116,7 @@ function getDialogImage(type: DialogType) {
  *     { label: "刪除", value: "delete", variant: "orange" },
  *   ],
  * });
- * 
+ *
  * if (result.value === "delete") {
  *   // 執行刪除
  * }
@@ -213,4 +216,3 @@ export function useDialog() {
     openWarningDialog,
   };
 }
-

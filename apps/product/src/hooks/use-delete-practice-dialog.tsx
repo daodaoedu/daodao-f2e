@@ -22,7 +22,7 @@ export enum DeletePracticeResult {
  *
  * // 當需要顯示對話框時
  * const result = await openDeleteDialog(practiceId);
- * 
+ *
  * if (result === DeletePracticeResult.Deleted) {
  *   // 實踐已成功刪除，執行後續處理（如重新載入列表、導航等）
  *   router.push("/practices");
@@ -80,4 +80,3 @@ export function useDeletePracticeDialog() {
 
   return { openDeleteDialog };
 }
-

@@ -42,8 +42,7 @@ export function useArchivePracticeDialog() {
       // 先顯示確認對話框
       const result = await openInfoDialog({
         title: "即將封存這個實踐",
-        message:
-          "我們會幫你把實踐收在「封存」裡面，你會暫時看不到它，除非取消封存喔！",
+        message: "我們會幫你把實踐收在「封存」裡面，你會暫時看不到它，除非取消封存喔！",
         textAlign: "left",
         buttons: [
           { label: "先不要", value: "cancel", variant: "outline" },

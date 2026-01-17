@@ -24,9 +24,7 @@ function GlobalProvider({ head, locale, children, messages }: GlobalProviderProp
       <body>
         <NextIntlClientProvider messages={messages} locale={locale} timeZone="Asia/Taipei">
           <NavigationBlockerProvider>
-            <DialogManagerProvider>
-              {children}
-            </DialogManagerProvider>
+            <DialogManagerProvider>{children}</DialogManagerProvider>
           </NavigationBlockerProvider>
         </NextIntlClientProvider>
       </body>

@@ -1,12 +1,12 @@
 "use client";
 
 import { NotebookHoleSvg, StampSvg, TapeSvg } from "@daodao/assets";
+import { type CapturedImageData, captureElementAsImage } from "@daodao/shared";
 import { Image } from "@daodao/ui/components/image";
 import { cn } from "@daodao/ui/lib/utils";
 import { format, isValid } from "date-fns";
-import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 import { useEffect, useRef } from "react";
-import { CapturedImageData, captureElementAsImage } from "@daodao/shared";
+import { MOOD_OPTIONS, type MoodType } from "@/constants/mood";
 
 interface CheckInCardProps {
   taskTitle: string;
@@ -19,6 +19,54 @@ interface CheckInCardProps {
   onImageClick?: (index: number) => void;
   showTape?: boolean;
 }
+
+/**
+ * 在圖片上套用漸層遮罩
+ */
+const applyGradientMask = async (imageData: CapturedImageData): Promise<CapturedImageData> => {
+  return new Promise((resolve) => {
+    const img = document.createElement("img");
+    img.crossOrigin = "anonymous";
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      if (!ctx) {
+        resolve(imageData);
+        return;
+      }
+
+      canvas.width = imageData.width;
+      canvas.height = imageData.height;
+
+      // 繪製原始圖片
+      ctx.drawImage(img, 0, 0, imageData.width, imageData.height);
+
+      // 繪製漸層遮罩
+      const gradient = ctx.createLinearGradient(0, 0, 0, imageData.height);
+      gradient.addColorStop(0.5, "rgba(255, 255, 255, 0)");
+      gradient.addColorStop(1, "#FFFFFF");
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, imageData.width, imageData.height);
+
+      const maskedDataUrl = canvas.toDataURL("image/jpeg", 0.95);
+
+      resolve({
+        src: maskedDataUrl,
+        width: imageData.width,
+        height: imageData.height,
+      });
+    };
+
+    img.onerror = () => {
+      resolve(imageData);
+    };
+
+    img.src = imageData.src;
+  });
+};
 
 /**
  * 打卡卡片組件
@@ -50,56 +98,6 @@ export const CheckInCard = ({
 
   const mainRef = useRef<HTMLDivElement>(null);
   const checkInImageRef = useRef<CapturedImageData | null>(null);
-
-  /**
-   * 在圖片上套用漸層遮罩
-   */
-  const applyGradientMask = async (
-    imageData: CapturedImageData
-  ): Promise<CapturedImageData> => {
-    return new Promise((resolve) => {
-      const img = document.createElement("img");
-      img.crossOrigin = "anonymous";
-
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        if (!ctx) {
-          resolve(imageData);
-          return;
-        }
-
-        canvas.width = imageData.width;
-        canvas.height = imageData.height;
-
-        // 繪製原始圖片
-        ctx.drawImage(img, 0, 0, imageData.width, imageData.height);
-
-        // 繪製漸層遮罩
-        const gradient = ctx.createLinearGradient(0, 0, 0, imageData.height);
-        gradient.addColorStop(0.5, "rgba(255, 255, 255, 0)");
-        gradient.addColorStop(1, "#FFFFFF");
-
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, imageData.width, imageData.height);
-
-        const maskedDataUrl = canvas.toDataURL("image/jpeg", 0.95);
-
-        resolve({
-          src: maskedDataUrl,
-          width: imageData.width,
-          height: imageData.height,
-        });
-      };
-
-      img.onerror = () => {
-        resolve(imageData);
-      };
-
-      img.src = imageData.src;
-    });
-  };
 
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -133,7 +131,10 @@ export const CheckInCard = ({
         {/* 筆記本裝訂線（頂部） */}
         <NotebookHoleSvg className="absolute -top-7 left-0" />
 
-        <main ref={mainRef} className="pt-4.5 bg-white max-h-[460px] overflow-y-auto scrollbar-hide px-5">
+        <main
+          ref={mainRef}
+          className="pt-4.5 bg-white max-h-[460px] overflow-y-auto scrollbar-hide px-5"
+        >
           <div
             style={{
               backgroundImage:
@@ -148,10 +149,7 @@ export const CheckInCard = ({
             <div className="relative space-y-4">
               {/* 時間戳/印章 */}
               <div className="relative float-right anonymous-pro translate-x-2 translate-y-3 animate-stamp pointer-events-none z-30">
-                <StampSvg
-                  width={100}
-                  height={100}
-                />
+                <StampSvg width={100} height={100} />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-xs font-bold text-logo-gray rotate-15 size-10 flex flex-col items-center justify-center">
                   <div>{dateYear}</div>
                   <div>{dateMonthDay}</div>
@@ -242,4 +240,3 @@ export const CheckInCard = ({
     </div>
   );
 };
-

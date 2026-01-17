@@ -1,4 +1,4 @@
-import { type MoodType } from "@/constants/mood";
+import type { MoodType } from "@/constants/mood";
 
 export interface CheckInDate {
   id: string;
@@ -22,4 +22,3 @@ export interface CheckInDateSelectorProps {
   practiceId: string;
   activeCheckInId: string;
 }
-

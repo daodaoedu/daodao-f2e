@@ -15,8 +15,8 @@ import { Input } from "@daodao/ui/components/input";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { ResourceCard } from "@/components/practice/shared";
-import type { ManualPracticeFormValues } from "../schema";
 import { useTagEditSheet } from "@/hooks/use-tag-edit-sheet";
+import type { ManualPracticeFormValues } from "../schema";
 
 interface Step4Props {
   form: UseFormReturn<ManualPracticeFormValues>;
@@ -50,11 +50,7 @@ export const Step4 = ({ form }: Step4Props) => {
                     </Badge>
                   ))}
                 </div>
-                <Button
-                  type="button"
-                  onClick={openTagEditSheet}
-                  className="w-full"
-                >
+                <Button type="button" onClick={openTagEditSheet} className="w-full">
                   編輯
                   <ArrowRightOutlineSvg className="size-4.5" />
                 </Button>

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { detectDeviceClient, type DeviceInfo } from "../lib/device-detection";
+import { type DeviceInfo, detectDeviceClient } from "../lib/device-detection";
 
 interface DeviceContextValue extends DeviceInfo {
   isInitialized: boolean;
@@ -84,4 +84,3 @@ function useDeviceSafe(): DeviceContextValue | null {
 }
 
 export { DeviceProviderComponent as DeviceProvider, useDevice, useDeviceSafe };
-

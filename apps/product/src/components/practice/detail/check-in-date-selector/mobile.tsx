@@ -3,8 +3,8 @@
 import { useRouter } from "@daodao/i18n/navigation";
 import { cn } from "@daodao/ui/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import type { CheckInDateSelectorProps } from "./types";
 import { CheckInDateButton } from "./check-in-date-button";
+import type { CheckInDateSelectorProps } from "./types";
 
 export const MobileCheckInDateSelector = ({
   checkInDates,
@@ -81,4 +81,3 @@ export const MobileCheckInDateSelector = ({
     </nav>
   );
 };
-

@@ -1,21 +1,9 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useRef,
-  useState,
-} from "react";
 import { useIsMobile } from "@daodao/shared";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "./sheet";
+import { createContext, useCallback, useContext, useRef, useState } from "react";
 import { cn } from "../../../../lib/utils";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "./sheet";
 
 export interface SheetConfig {
   /** 標題 */
@@ -51,9 +39,7 @@ interface SheetManagerContextType {
   close: (id?: string) => void;
 }
 
-const SheetManagerContext = createContext<SheetManagerContextType | undefined>(
-  undefined
-);
+const SheetManagerContext = createContext<SheetManagerContextType | undefined>(undefined);
 
 export function SheetManagerProvider({ children }: React.PropsWithChildren) {
   const [sheets, setSheets] = useState<SheetItem[]>([]);
@@ -78,9 +64,7 @@ export function SheetManagerProvider({ children }: React.PropsWithChildren) {
 
         sheet.config.onClose?.();
 
-        const updated = prev.map((s) =>
-          s.id === id ? { ...s, isOpen: false } : s
-        );
+        const updated = prev.map((s) => (s.id === id ? { ...s, isOpen: false } : s));
         sheetsRef.current = updated;
 
         setTimeout(() => {
@@ -106,9 +90,7 @@ export function SheetManagerProvider({ children }: React.PropsWithChildren) {
 
         sheet.config.onClose?.();
 
-        const updated = prev.map((s) =>
-          s.id === id ? { ...s, isOpen: false } : s
-        );
+        const updated = prev.map((s) => (s.id === id ? { ...s, isOpen: false } : s));
         sheetsRef.current = updated;
 
         setTimeout(() => {
@@ -187,14 +169,11 @@ export function SheetManagerProvider({ children }: React.PropsWithChildren) {
           <SheetHeader showCloseButton={config.showCloseButton ?? true}>
             <SheetTitle>{config.title}</SheetTitle>
             <SheetDescription className="sr-only" aria-hidden="true">
-              {config.description ??
-                (typeof config.title === "string" ? config.title : "")}
+              {config.description ?? (typeof config.title === "string" ? config.title : "")}
             </SheetDescription>
           </SheetHeader>
 
-          <div className={cn("flex-1", config.contentClassName)}>
-            {config.content}
-          </div>
+          <div className={cn("flex-1", config.contentClassName)}>{config.content}</div>
         </SheetContent>
       </Sheet>
     );
@@ -211,9 +190,7 @@ export function SheetManagerProvider({ children }: React.PropsWithChildren) {
 export function useSheetManager() {
   const context = useContext(SheetManagerContext);
   if (!context) {
-    throw new Error(
-      "useSheetManager must be used within a SheetManagerProvider"
-    );
+    throw new Error("useSheetManager must be used within a SheetManagerProvider");
   }
   return context;
 }

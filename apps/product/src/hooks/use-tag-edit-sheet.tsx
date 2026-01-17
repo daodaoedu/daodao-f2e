@@ -2,8 +2,8 @@
 
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { useCallback, useRef } from "react";
-import { TagEditSheetContent } from "@/components/practice/create/manual/tag-edit-content";
 import type { TagEditData } from "@/components/practice/create/manual/tag-edit-content";
+import { TagEditSheetContent } from "@/components/practice/create/manual/tag-edit-content";
 
 interface UseTagEditSheetOptions {
   /** 初始標籤 */
@@ -70,4 +70,3 @@ export function useTagEditSheet({
 
   return { openTagEditSheet };
 }
-

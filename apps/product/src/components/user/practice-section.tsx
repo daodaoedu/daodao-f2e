@@ -192,9 +192,7 @@ export function PracticeSection({ practices = [] }: PracticeSectionProps) {
                     <h3 className="text-base font-medium text-text-dark line-clamp-1 mb-1">
                       {practice.title}
                     </h3>
-                    <p className="text-xs text-text-dark line-clamp-1">
-                      {practice.description}
-                    </p>
+                    <p className="text-xs text-text-dark line-clamp-1">{practice.description}</p>
                   </div>
                   <div className="shrink-0">
                     <Button variant="ghost" size="icon" asChild>

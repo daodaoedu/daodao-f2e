@@ -2,8 +2,8 @@
 
 import { useSheetManager } from "@daodao/ui/components/animate-ui/components/radix/sheet";
 import { useCallback } from "react";
-import { ShareCheckInSheetContent } from "@/components/dashboard/share-check-in-content";
 import type { CheckInData } from "@/components/dashboard/check-in-sheet";
+import { ShareCheckInSheetContent } from "@/components/dashboard/share-check-in-content";
 
 interface UseShareCheckInSheetOptions {
   /** 任務標題 */
@@ -59,4 +59,3 @@ export function useShareCheckInSheet({
 
   return { openShareSheet };
 }
-

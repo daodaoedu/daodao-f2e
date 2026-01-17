@@ -109,10 +109,7 @@ type DialogTitleProps = DialogTitlePrimitiveProps;
 
 function DialogTitle({ className, ...props }: DialogTitleProps) {
   return (
-    <DialogTitlePrimitive
-      className={cn("text-center text-lg font-medium", className)}
-      {...props}
-    />
+    <DialogTitlePrimitive className={cn("text-center text-lg font-medium", className)} {...props} />
   );
 }
 
@@ -148,8 +145,8 @@ export {
 
 // 導出 DialogManager 相關功能
 export {
+  type DialogAction,
+  type DialogConfig,
   DialogManagerProvider,
   useDialogManager,
-  type DialogConfig,
-  type DialogAction,
 } from "./dialog-manager";

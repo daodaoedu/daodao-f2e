@@ -4,6 +4,6 @@
     "rootDir": "./src",
     "outDir": "./dist"
   },
-  "include": ["src/**/*", "../config/types/image.d.ts", "../i18n/src/i18n.d.ts"],
+  "include": ["src/**/*", "../config/types/image.d.ts"],
   "exclude": ["node_modules", "dist", ".turbo"]
 }

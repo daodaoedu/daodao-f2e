@@ -1,15 +1,15 @@
 "use client";
 
 import FacebookSvg from "@daodao/assets/images/social-icons/facebook-filled.svg";
-import ThreadsSvg from "@daodao/assets/images/social-icons/threads-filled.svg";
 import LineSvg from "@daodao/assets/images/social-icons/line-filled.svg";
 import LinkedInSvg from "@daodao/assets/images/social-icons/linkedin-filled.svg";
+import ThreadsSvg from "@daodao/assets/images/social-icons/threads-filled.svg";
 import XSvg from "@daodao/assets/images/social-icons/x-filled.svg";
 import { getShareAPI } from "@daodao/shared";
 import { Button } from "@daodao/ui/components/button";
+import { Image } from "@daodao/ui/components/image";
 import { Download } from "lucide-react";
 import type { CheckInData } from "./check-in-sheet";
-import { Image } from "@daodao/ui/components/image";
 
 /**
  * 分享打卡 Sheet 的內容組件（不包含 Sheet 外層）
@@ -37,11 +37,7 @@ export const ShareCheckInSheetContent = ({
 
   // 處理下載打卡圖片
   const handleDownloadImage = async () => {
-    try {
-      // TODO: 實作下載圖片功能
-    } catch (error) {
-      console.error("下載圖片失敗:", error);
-    }
+    // TODO: 實作下載圖片功能
   };
 
   return (
@@ -50,19 +46,12 @@ export const ShareCheckInSheetContent = ({
         <h2 className="text-xl font-medium text-bg-dark">{taskTitle}</h2>
 
         <div className="relative overflow-hidden w-[350px] h-[192px]">
-          <Image
-            src={images?.[0] ?? ""}
-            alt="打卡圖片"
-            fill
-            className="object-contain bg-white"
-          />
+          <Image src={images?.[0] ?? ""} alt="打卡圖片" fill className="object-contain bg-white" />
         </div>
 
         {/* 分享到社群媒體 */}
         <div>
-          <h3 className="text-base font-medium mb-3 text-text-dark text-center">
-            分享到社群媒體
-          </h3>
+          <h3 className="text-base font-medium mb-3 text-text-dark text-center">分享到社群媒體</h3>
           <div className="flex justify-center gap-4">
             <Button
               type="button"
@@ -120,12 +109,7 @@ export const ShareCheckInSheetContent = ({
 
       {/* 下載打卡圖片 */}
       <div className="sticky bottom-0 left-0 right-0 border-t border-light-gray bg-white p-6 -mx-6 -mb-6">
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={handleDownloadImage}
-        >
+        <Button type="button" variant="outline" className="w-full" onClick={handleDownloadImage}>
           <Download className="size-4.5" />
           下載打卡圖片
         </Button>

@@ -1,8 +1,8 @@
 "use client";
 
-import { Image } from "./image";
-import { cn } from "../lib/utils";
 import type { StaticImageData } from "next/image";
+import { cn } from "../lib/utils";
+import { Image } from "./image";
 
 interface DialogContentWithImageProps {
   /** 圖片來源 */
@@ -40,22 +40,10 @@ export function DialogContentWithImage({
 }: DialogContentWithImageProps) {
   return (
     <div className={containerClassName}>
-      <Image
-        src={image}
-        alt={imageAlt}
-        width={172}
-        height={172}
-        className="mx-auto pb-8"
-      />
-      <div
-        className={cn(
-          "text-text-dark",
-          textAlign === "left" ? "text-left" : "text-center"
-        )}
-      >
+      <Image src={image} alt={imageAlt} width={172} height={172} className="mx-auto pb-8" />
+      <div className={cn("text-text-dark", textAlign === "left" ? "text-left" : "text-center")}>
         {children}
       </div>
     </div>
   );
 }
-

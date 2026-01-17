@@ -1,6 +1,9 @@
 "use client";
 
 import { useParams } from "@daodao/i18n/navigation";
+import { Button } from "@daodao/ui/components/button";
+import { Archive, Trash2 } from "lucide-react";
+import { CheckInButton } from "@/components/dashboard";
 import { BackgroundAnimation, PageHeader } from "@/components/layout";
 import {
   CheckInRecordCard,
@@ -11,10 +14,10 @@ import {
   PracticeDetailTitle,
   PracticeOverviewCard,
 } from "@/components/practice";
-import { Button } from "@daodao/ui/components/button";
-import { Archive, Trash2 } from "lucide-react";
-import { CheckInButton } from "@/components/dashboard";
-import { ArchivePracticeResult, useArchivePracticeDialog } from "@/hooks/use-archive-practice-dialog";
+import {
+  ArchivePracticeResult,
+  useArchivePracticeDialog,
+} from "@/hooks/use-archive-practice-dialog";
 import { DeletePracticeResult, useDeletePracticeDialog } from "@/hooks/use-delete-practice-dialog";
 
 const practice: ManualPracticeFormValues & {

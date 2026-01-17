@@ -1,5 +1,5 @@
+import { type DeviceInfo, detectDeviceFromUserAgent } from "@daodao/shared";
 import { headers } from "next/headers";
-import { detectDeviceFromUserAgent, type DeviceInfo } from "@daodao/shared";
 
 /**
  * 在 Server Side 解析設備資訊
@@ -24,4 +24,3 @@ export async function detectDevice(): Promise<DeviceInfo> {
     };
   }
 }
-

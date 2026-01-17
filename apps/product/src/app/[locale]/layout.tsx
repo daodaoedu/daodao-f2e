@@ -4,8 +4,8 @@ import { routing } from "@daodao/i18n/routing";
 import { getMessages, getTranslations, setRequestLocale } from "@daodao/i18n/server";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import GlobalProvider from "../global-provider";
 import { detectDevice } from "@/lib/device-detection";
+import GlobalProvider from "../global-provider";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));

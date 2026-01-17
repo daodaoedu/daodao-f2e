@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import activeShaper1Json from "@daodao/assets/images/quiz/active-shaper-1.json";
 import userDesktopBannerPng from "@daodao/assets/images/users/user-desktop-banner.png";
 import userMobileBannerPng from "@daodao/assets/images/users/user-mobile-banner.png";
 import { Button } from "@daodao/ui/components/button";
-import activeShaper1Json from "@daodao/assets/images/quiz/active-shaper-1.json";
 import { Image } from "@daodao/ui/components/image";
-import { ChevronRight, RefreshCcw } from "lucide-react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lottie from "lottie-react";
+import { ChevronRight, RefreshCcw } from "lucide-react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -81,10 +81,7 @@ export function IslandHeader({
   return (
     <>
       <div className="h-[378px] md:h-[333px] relative -z-20" />
-      <header
-        ref={headerRef}
-        className="fixed top-0 inset-x-0 h-[420px] md:pt-4 -z-10"
-      >
+      <header ref={headerRef} className="fixed top-0 inset-x-0 h-[420px] md:pt-4 -z-10">
         <Image
           src={userDesktopBannerPng}
           alt="user-desktop-banner"
@@ -99,10 +96,7 @@ export function IslandHeader({
         />
         {children}
         <div className="absolute left-1/2 top-[92px] md:top-[127px] -translate-x-1/2 w-[149px] h-[140px] md:w-[168px] md:h-[158px]">
-          <Lottie
-            animationData={activeShaper1Json}
-            className="*:w-full *:h-full"
-          />
+          <Lottie animationData={activeShaper1Json} className="*:w-full *:h-full" />
           <div className="hidden md:block absolute bottom-[25px] -left-[5px] w-3 h-[11px] rounded-full bg-white/70 border border-light-cyan" />
           <div className="hidden md:block absolute bottom-[35px] -left-[22px] size-4.5 rounded-full bg-white/70 border border-light-cyan" />
           <div className="absolute -bottom-[126px] left-1/2 -translate-x-1/2 w-[calc(100vw-40px)] md:translate-x-0 md:bottom-[37px] md:-left-[241px] md:w-[219px] rounded-[20px] bg-white/70 py-3 px-4 border border-light-cyan">
@@ -111,6 +105,7 @@ export function IslandHeader({
               <Button
                 variant="ghost"
                 className="group text-text-dark text-xs p-0 h-auto"
+                onClick={onRetakeQuiz}
               >
                 <RefreshCcw className="size-4.5 text-light-gray group-hover:animate-spin-reverse" />
                 重新測驗

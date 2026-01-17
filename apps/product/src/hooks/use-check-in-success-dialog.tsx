@@ -1,15 +1,14 @@
 "use client";
 
-import { useDialog } from "@daodao/ui/hooks/use-dialog";
-import { useCallback, useState, useEffect, useMemo, useId } from "react";
-import type * as React from "react";
-import { SplitText } from "@daodao/ui/components/split-text";
 import {
   Tooltip,
   TooltipPanel,
   TooltipTrigger,
 } from "@daodao/ui/components/animate-ui/components/base/tooltip";
+import { SplitText } from "@daodao/ui/components/split-text";
+import { useDialog } from "@daodao/ui/hooks/use-dialog";
 import { cn } from "@daodao/ui/lib/utils";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 
 interface UseCheckInSuccessDialogOptions {
   title: string;
@@ -25,10 +24,7 @@ interface DelayedSplitTextProps {
 /**
  * 延遲啟用動畫的 SplitText 包裝組件
  */
-function DelayedSplitText({
-  title,
-  onLetterAnimationComplete,
-}: DelayedSplitTextProps) {
+function DelayedSplitText({ title, onLetterAnimationComplete }: DelayedSplitTextProps) {
   const [isAnimationEnabled, setIsAnimationEnabled] = useState(false);
 
   useEffect(() => {
@@ -180,17 +176,20 @@ function AlwaysOpenTooltip({
     if (isAnimated) return;
 
     // 執行進度動畫
-    const interval = setInterval(() => {
-      requestAnimationFrame(() => {
-        setPercentage((prev) => {
-          const next = prev + 1;
-          if (next >= to) {
-            return to;
-          }
-          return next;
+    const interval = setInterval(
+      () => {
+        requestAnimationFrame(() => {
+          setPercentage((prev) => {
+            const next = prev + 1;
+            if (next >= to) {
+              return to;
+            }
+            return next;
+          });
         });
-      });
-    }, 600 / Math.abs(to - from));
+      },
+      600 / Math.abs(to - from)
+    );
 
     return () => clearInterval(interval);
   }, [from, to, percentage, isAnimated, shouldStartAnimation, onAnimationComplete]);
@@ -263,10 +262,7 @@ function Step1Animation({ title, from, to }: Step1AnimationProps) {
       )}
     >
       <div className="mx-auto w-fit">
-        <DelayedSplitText
-          title={title}
-          onLetterAnimationComplete={() => setShowProgress(true)}
-        />
+        <DelayedSplitText title={title} onLetterAnimationComplete={() => setShowProgress(true)} />
       </div>
       {showProgress && !isHidden && (
         <AlwaysOpenTooltip
@@ -295,11 +291,7 @@ interface CheckInSuccessContentProps {
   to: number;
 }
 
-function CheckInSuccessContent({
-  title,
-  from,
-  to,
-}: CheckInSuccessContentProps) {
+function CheckInSuccessContent({ title, from, to }: CheckInSuccessContentProps) {
   return (
     <>
       <Step1Animation title={title} from={from} to={to} />

@@ -1,9 +1,8 @@
 "use client";
 
-import { useParams } from "@daodao/i18n/navigation";
-import { BackgroundAnimation, PageHeader } from "@/components/layout";
-import { IslandHeader, PracticeSection, UserInfoCard } from "@/components/user";
 import { SlidersHorizontal } from "lucide-react";
+import { PageHeader } from "@/components/layout";
+import { IslandHeader, PracticeSection, UserInfoCard } from "@/components/user";
 
 /**
  * 個人頁面
@@ -14,9 +13,6 @@ import { SlidersHorizontal } from "lucide-react";
  * - /users/john-doe (customId)
  */
 export default function UserProfilePage() {
-  const params = useParams();
-  const identifier = params.identifier as string | undefined;
-
   const userData = {
     name: "John Doe",
     location: "Taiwan",
@@ -69,8 +65,8 @@ export default function UserProfilePage() {
       >
         <PageHeader
           title="我的小島"
-					rightActionTo="/"
-					rightLabel="設定"
+          rightActionTo="/"
+          rightLabel="設定"
           rightActionIcon={<SlidersHorizontal className="size-6" />}
         />
       </IslandHeader>

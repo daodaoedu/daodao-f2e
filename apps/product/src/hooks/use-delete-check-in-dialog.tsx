@@ -22,7 +22,7 @@ export enum DeleteCheckInResult {
  *
  * // 當需要顯示對話框時
  * const result = await openDeleteDialog(checkInId);
- * 
+ *
  * if (result === DeleteCheckInResult.Deleted) {
  *   // 打卡已成功刪除，執行後續處理（如重新載入列表、導航等）
  *   router.push("/practices");
@@ -80,4 +80,3 @@ export function useDeleteCheckInDialog() {
 
   return { openDeleteDialog };
 }
-

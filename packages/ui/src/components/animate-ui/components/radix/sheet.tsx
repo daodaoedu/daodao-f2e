@@ -38,7 +38,10 @@ type SheetOverlayProps = SheetOverlayPrimitiveProps;
 
 function SheetOverlay({ className, ...props }: SheetOverlayProps) {
   return (
-    <SheetOverlayPrimitive className={cn("fixed inset-0 z-50 bg-[#0D3036B2]", className)} {...props} />
+    <SheetOverlayPrimitive
+      className={cn("fixed inset-0 z-50 bg-[#0D3036B2]", className)}
+      {...props}
+    />
   );
 }
 
@@ -123,12 +126,7 @@ function SheetTitle({ className, ...props }: SheetTitleProps) {
 type SheetDescriptionProps = SheetDescriptionPrimitiveProps;
 
 function SheetDescription({ className, ...props }: SheetDescriptionProps) {
-  return (
-    <SheetDescriptionPrimitive
-      className={cn("text-text-dark", className)}
-      {...props}
-    />
-  );
+  return <SheetDescriptionPrimitive className={cn("text-text-dark", className)} {...props} />;
 }
 
 export {
@@ -152,7 +150,7 @@ export {
 
 // 導出 SheetManager 相關功能
 export {
+  type SheetConfig,
   SheetManagerProvider,
   useSheetManager,
-  type SheetConfig,
 } from "./sheet-manager";

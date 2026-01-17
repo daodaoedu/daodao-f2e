@@ -4,8 +4,8 @@ import { useRouter } from "@daodao/i18n/navigation";
 import { Button } from "@daodao/ui/components/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { CheckInDateSelectorProps } from "./types";
 import { CheckInDateButton } from "./check-in-date-button";
+import type { CheckInDateSelectorProps } from "./types";
 
 export const DesktopCheckInDateSelector = ({
   checkInDates,
@@ -61,7 +61,7 @@ export const DesktopCheckInDateSelector = ({
       container.removeEventListener("wheel", preventScroll);
       container.removeEventListener("touchmove", preventScroll);
     };
-  }, [checkInDates.length]);
+  }, []);
 
   // 處理上下箭頭滾動（一次滾動 5 個項目）
   const handleScrollUp = () => {

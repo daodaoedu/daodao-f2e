@@ -1,22 +1,18 @@
 "use client";
 
+import { RotateCcw, XIcon, ZoomIn, ZoomOut } from "lucide-react";
 import * as React from "react";
+import { Dialog, DialogContent, DialogTitle } from "./animate-ui/components/radix/dialog";
+import { Button } from "./button";
 import {
   Carousel,
+  type CarouselApi,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  type CarouselApi,
 } from "./carousel";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "./animate-ui/components/radix/dialog";
-import { Button } from "./button";
 import { Image } from "./image";
-import { XIcon, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 
 interface ImageLightboxProps {
   images: string[];
@@ -93,21 +89,18 @@ export const ImageLightbox = ({
     }
   }, [scale]);
 
-  const handleWheel = React.useCallback(
-    (e: React.WheelEvent<HTMLDivElement>) => {
-      if (!e.ctrlKey && !e.metaKey) {
-        return;
-      }
+  const handleWheel = React.useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+    if (!e.ctrlKey && !e.metaKey) {
+      return;
+    }
 
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? -SCALE_STEP : SCALE_STEP;
-      setScale((prev) => {
-        const newScale = prev + delta;
-        return Math.max(MIN_SCALE, Math.min(newScale, MAX_SCALE));
-      });
-    },
-    []
-  );
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -SCALE_STEP : SCALE_STEP;
+    setScale((prev) => {
+      const newScale = prev + delta;
+      return Math.max(MIN_SCALE, Math.min(newScale, MAX_SCALE));
+    });
+  }, []);
 
   if (images.length === 0) {
     return null;
@@ -178,12 +171,10 @@ export const ImageLightbox = ({
           <DialogTitle className="sr-only">圖片</DialogTitle>
           <CarouselContent className="h-screen">
             {images.map((imageUrl, index) => (
-              <CarouselItem
-                key={imageUrl}
-                className="h-full flex items-center justify-center"
-              >
+              <CarouselItem key={imageUrl} className="h-full flex items-center justify-center">
                 <div
                   ref={index === currentIndex ? imageRef : null}
+                  role="img"
                   className="relative w-full h-full flex items-center justify-center p-4 overflow-hidden cursor-zoom-in"
                   onDoubleClick={handleDoubleClick}
                   onWheel={handleWheel}
